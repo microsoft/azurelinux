@@ -70,6 +70,10 @@ investigate → modify → render → build → test → inspect
 
 ## Debugging Build Failures
 
+### 0. Release calculation errors
+
+If `render` fails with `non-standard Release tag value ... does not start with an integer`, see [Release Configuration](../../instructions/comp-toml.instructions.md#release-configuration).
+
 ### 1. Render and inspect the spec
 
 The fastest way to verify overlays applied correctly:

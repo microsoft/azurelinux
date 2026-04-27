@@ -106,6 +106,11 @@
           "title": "Spec",
           "description": "Identifies where to find the spec for this component"
         },
+        "release": {
+          "$ref": "#/$defs/ReleaseConfig",
+          "title": "Release configuration",
+          "description": "Configuration for how the Release tag is managed during rendering."
+        },
         "overlays": {
           "items": {
             "$ref": "#/$defs/ComponentOverlay"
@@ -119,6 +124,11 @@
           "title": "Build configuration",
           "description": "Configuration for building the component"
         },
+        "render": {
+          "$ref": "#/$defs/ComponentRenderConfig",
+          "title": "Render configuration",
+          "description": "Configuration for rendering the component"
+        },
         "source-files": {
           "items": {
             "$ref": "#/$defs/SourceFileReference"
@@ -127,11 +137,6 @@
           "title": "Source files",
           "description": "Source files to download for this component"
         },
-        "default-package-config": {
-          "$ref": "#/$defs/PackageConfig",
-          "title": "Default package config",
-          "description": "Default configuration applied to all binary packages produced by this component"
-        },
         "packages": {
           "additionalProperties": {
             "$ref": "#/$defs/PackageConfig"
@@ -139,6 +144,11 @@
           "type": "object",
           "title": "Package overrides",
           "description": "Per-package configuration overrides keyed by exact binary package name"
+        },
+        "publish": {
+          "$ref": "#/$defs/ComponentPublishConfig",
+          "title": "Publish settings",
+          "description": "Component-level publish channel settings"
         }
       },
       "additionalProperties": false,
@@ -275,6 +285,38 @@
         "type"
       ]
     },
+    "ComponentPublishConfig": {
+      "properties": {
+        "rpm-channel": {
+          "type": "string",
+          "title": "RPM channel",
+          "description": "Publish channel for binary packages produced by this component"
+        },
+        "srpm-channel": {
+          "type": "string",
+          "title": "SRPM channel",
+          "description": "Publish channel for the SRPM produced by this component"
+        },
+        "debuginfo-channel": {
+          "type": "string",
+          "title": "Debuginfo channel",
+          "description": "Publish channel for debuginfo packages produced by this component"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ComponentRenderConfig": {
+      "properties": {
+        "skip-file-filter": {
+          "type": "boolean",
+          "title": "Skip file filter",
+          "description": "Disable post-render file filtering for specs with unexpandable macros in Source/Patch tags"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ConfigFile": {
       "properties": {
         "$schema": {
@@ -330,6 +372,11 @@
           "title": "Tools configuration",
           "description": "Configuration for tools used by azldev"
         },
+        "default-component-config": {
+          "$ref": "#/$defs/ComponentConfig",
+          "title": "Default component config",
+          "description": "Project-wide default applied to all components before group and component overrides"
+        },
         "default-package-config": {
           "$ref": "#/$defs/PackageConfig",
           "title": "Default package config",
@@ -342,6 +389,14 @@
           "type": "object",
           "title": "Package groups",
           "description": "Definitions of package groups for shared binary package configuration"
+        },
+        "test-suites": {
+          "additionalProperties": {
+            "$ref": "#/$defs/TestSuiteConfig"
+          },
+          "type": "object",
+          "title": "Test Suites",
+          "description": "Definitions of test suites for this project"
         }
       },
       "additionalProperties": false,
@@ -412,7 +467,7 @@
           "type": "string",
           "format": "date-time",
           "title": "Snapshot",
-          "description": "If specified use source code as it existed at this date/time"
+          "description": "Snapshot timestamp for source code. Set on the distro or group default-component-config only — per-component snapshots are not allowed."
         }
       },
       "additionalProperties": false,
@@ -465,6 +520,32 @@
         "release-ver"
       ]
     },
+    "ImageCapabilities": {
+      "properties": {
+        "machine-bootable": {
+          "type": "boolean",
+          "title": "Machine bootable",
+          "description": "Whether the image can be booted on a machine (bare metal or VM)"
+        },
+        "container": {
+          "type": "boolean",
+          "title": "Container",
+          "description": "Whether the image can be run on an OCI container host"
+        },
+        "systemd": {
+          "type": "boolean",
+          "title": "Systemd",
+          "description": "Whether the image runs systemd as its init system"
+        },
+        "runtime-package-management": {
+          "type": "boolean",
+          "title": "Runtime package management",
+          "description": "Whether the image supports installing or removing packages at runtime"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ImageConfig": {
       "properties": {
         "description": {
@@ -476,6 +557,21 @@
           "$ref": "#/$defs/ImageDefinition",
           "title": "Definition",
           "description": "Identifies where to find the definition for this image"
+        },
+        "capabilities": {
+          "$ref": "#/$defs/ImageCapabilities",
+          "title": "Capabilities",
+          "description": "Features and properties of this image"
+        },
+        "tests": {
+          "$ref": "#/$defs/ImageTestsConfig",
+          "title": "Tests",
+          "description": "Test configuration for this image"
+        },
+        "publish": {
+          "$ref": "#/$defs/ImagePublishConfig",
+          "title": "Publish settings",
+          "description": "Publishing settings for this image"
         }
       },
       "additionalProperties": false,
@@ -508,6 +604,34 @@
           "type": "string",
           "title": "Profile",
           "description": "Optional field that specifies the profile to use when building the image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImagePublishConfig": {
+      "properties": {
+        "channels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Channels",
+          "description": "List of publish channels for this image"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ImageTestsConfig": {
+      "properties": {
+        "test-suites": {
+          "items": {
+            "$ref": "#/$defs/TestSuiteRef"
+          },
+          "type": "array",
+          "title": "Test Suites",
+          "description": "List of test suite references that apply to this image"
         }
       },
       "additionalProperties": false,
@@ -575,10 +699,19 @@
     },
     "PackagePublishConfig": {
       "properties": {
+        "rpm-channel": {
+          "type": "string",
+          "title": "RPM channel",
+          "description": "Publish channel for binary packages; overrides the component-level rpm-channel; use 'none' to keep RPMs in the base directory and skip publishing"
+        },
+        "debuginfo-channel": {
+          "type": "string",
+          "title": "Debuginfo channel",
+          "description": "Publish channel for debuginfo packages; overrides the component-level debuginfo-channel; use 'none' to keep RPMs in the base directory and skip publishing"
+        },
         "channel": {
           "type": "string",
-          "title": "Channel",
-          "description": "Publish channel for this package; use 'none' to signal to downstream tooling that this package should not be published"
+          "description": "Deprecated: use 'rpm-channel' instead. Kept for backwards compatibility; falls back to this value when 'rpm-channel' is not set."
         }
       },
       "additionalProperties": false,
@@ -637,6 +770,12 @@
             "SPECS"
           ]
         },
+        "lock-dir": {
+          "type": "string",
+          "title": "Lock Directory",
+          "description": "Directory for per-component lock files",
+          "default": "locks"
+        },
         "default-distro": {
           "$ref": "#/$defs/DistroReference",
           "title": "Default Distro",
@@ -646,6 +785,22 @@
           "type": "string",
           "title": "Default Author Email",
           "description": "Default email for synthetic changelog entries and commits"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ReleaseConfig": {
+      "properties": {
+        "calculation": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "manual"
+          ],
+          "title": "Release calculation",
+          "description": "Controls how the Release tag is managed during rendering. Empty or omitted means auto.",
+          "default": "auto"
         }
       },
       "additionalProperties": false,
@@ -666,7 +821,7 @@
             "SHA512"
           ],
           "title": "Hash type",
-          "description": "Hash algorithm used for the hash value (e.g."
+          "description": "Hash algorithm used for the hash value"
         },
         "origin": {
           "$ref": "#/$defs/Origin"
@@ -727,6 +882,31 @@
       "type": "object",
       "required": [
         "type"
+      ]
+    },
+    "TestSuiteConfig": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Description of this test suite"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TestSuiteRef": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Name of the test suite (must match a key in [test-suites])"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
       ]
     },
     "ToolsConfig": {

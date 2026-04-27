@@ -30,3 +30,9 @@ azldev comp render -p <component-1> -p <component-2> -O json
 # required to delete and re-create the output folders if they already exist.
 azldev comp render -p <component> -O json -o ./base/build/work/scratch/rendered-specs --force
 ```
+
+## Common render errors
+
+### `non-standard Release tag value ... does not start with an integer`
+
+See [Release Configuration](../instructions/comp-toml.instructions.md#release-configuration).
