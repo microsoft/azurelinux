@@ -40,7 +40,7 @@ Source2:        tmpfiles-nvidia.conf
 # Configuration file to register the NVIDIA OpenCL ICD with the ICD loader
 Source3:        nvidia.icd
 
-Requires:       kmod-nvidia-open = %{version}
+Requires:       nvidia-open-kmod-version = %{version}
 Requires:       nvidia-cuda-driver-libs%{?_isa} = %{version}-%{release}
 Requires:       nvidia-cuda-driver-firmware = %{version}-%{release}
 
