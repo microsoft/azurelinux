@@ -21593,8 +21593,8 @@
         "type": "other",
         "other": {
           "name": "poetry",
-          "version": "1.8.3",
-          "downloadUrl": "https://github.com/python-poetry/poetry/archive/refs/tags/1.8.3.tar.gz"
+          "version": "1.8.5",
+          "downloadUrl": "https://github.com/python-poetry/poetry/archive/refs/tags/1.8.5.tar.gz"
         }
       }
     },
