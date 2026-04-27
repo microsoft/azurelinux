@@ -5,7 +5,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        20.14.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,6 +42,7 @@ Patch23:        CVE-2026-21713.patch
 Patch24:        CVE-2026-21714.patch
 Patch25:        CVE-2026-21715.patch
 Patch26:        CVE-2026-21716.patch
+Patch27:        CVE-2026-21717.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -154,6 +155,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Mon Apr 27 2026 Akhila Guruju <v-guakhila@microsoft.com> - 20.14.0-16
+- Patch CVE-2026-21717
+
 * Wed Apr 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-15
 - Patch for CVE-2026-21716, CVE-2026-21715, CVE-2026-21714, CVE-2026-21713, CVE-2026-21710
 
