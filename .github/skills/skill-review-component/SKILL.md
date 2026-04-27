@@ -46,6 +46,7 @@ azldev comp query -p <name> -q -O json
 - No unnecessary build overrides
 - Conditional builds (`build.without`) match available spec conditionals
 - **`%check` disabled?** If `build.without` includes `"check"`, flag as a **Warning** — disabling tests is an absolute last resort. Verify that a `skip_reason` is present and clearly explains why the tests cannot be fixed. If the justification is missing or weak, recommend re-enabling `%check` and fixing the underlying test failures instead.
+- **`release.calculation = "manual"`?** Verify it's actually needed — the upstream Release tag should use a non-standard macro (e.g., `%{baserelease}`, `%{pkg_release}`) that azldev can't auto-calculate. If the Release tag is a plain integer, `manual` is unnecessary. When `manual` is set, verify there's a corresponding `spec-set-tag` overlay for the Release tag.
 
 ### 6. Source configuration
 

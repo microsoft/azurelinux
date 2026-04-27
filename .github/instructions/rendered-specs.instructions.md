@@ -30,3 +30,9 @@ azldev comp render -p <component-1> -p <component-2> -O json
 # required to delete and re-create the output folders if they already exist.
 azldev comp render -p <component> -O json -o ./base/build/work/scratch/rendered-specs --force
 ```
+
+## Common render errors
+
+### `non-standard Release tag value ... does not start with an integer`
+
+Some upstream specs use macro-based Release tags (e.g., `%{baserelease}%{?dist}`, `%{pkg_release}`) that the auto-calculator can't parse. Fix: set `release = { calculation = "manual" }` in the comp.toml and add a `spec-set-tag` overlay with a concrete Release value. See [`comp-toml.instructions.md`](../instructions/comp-toml.instructions.md#release-configuration) for full details and examples.

@@ -57,6 +57,7 @@ Key points for adding components:
 - Test incrementally — apply one overlay at a time, verify with `prep-sources`
 - Prefer targeted overlay types (`spec-add-tag`, `spec-set-tag`) over regex (`spec-search-replace`)
 - **Keep `%check` enabled** — do not disable tests unless there is a documented, unavoidable reason (upstream bug, missing test infra, etc.). If you must disable, provide a clear `skip_reason`.
+- **Release calculation:** If `render` fails with "non-standard Release tag value ... does not start with an integer", the upstream spec uses a macro-based Release tag. Set `release = { calculation = "manual" }` and add a `spec-set-tag` overlay for the Release tag (e.g., `value = "1%{?dist}"`). See [`comp-toml.instructions.md`](../../instructions/comp-toml.instructions.md#release-configuration) for details.
 
 ### Overlays vs. Dedicated spec
 
