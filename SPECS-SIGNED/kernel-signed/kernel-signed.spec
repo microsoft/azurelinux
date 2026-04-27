@@ -9,8 +9,8 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
-Version:        6.6.130.1
-Release:        3%{?dist}
+Version:        6.6.135.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,6 +145,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Wed Apr 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.135.2-1
+- Auto-upgrade to 6.6.135.2
+
 * Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
 - Bump release to match kernel,kernel-ipe
 
