@@ -158,3 +158,9 @@ description = "Apply patches from upstream cloud-init azl4 pr"
 type = "file-add"
 source = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
 file = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
+
+[[components.cloud-init.overlays]]
+description = "Set variant to azurelinux"
+type = "spec-search-replace"
+regex = 'python3 tools/render-template --variant %{\?rhel:rhel}%{!\?rhel:fedora}'
+replacement = "python3 tools/render-template --variant azurelinux"
