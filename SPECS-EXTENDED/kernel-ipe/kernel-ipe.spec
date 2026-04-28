@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.119.3
-Release:        3%{?dist}
+Version:        6.6.134.1
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,6 +460,33 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Apr 20 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.134.1-2
+- Enable CONFIG_IKCONFIG_PROC on arm64 for /proc/config.gz parity with x86_64
+
+* Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.134.1-1
+- Auto-upgrade to 6.6.134.1
+
+* Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
+- Enable lz4, lz4hc, and zstd zram compression
+
+* Fri Mar 27 2026 Andrew Chiang <andrewchiang@microsoft.com> - 6.6.130.1-2
+- Enable CONFIG_TCP_CONG_BBR3=m
+
+* Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.130.1-1
+- Auto-upgrade to 6.6.130.1
+
+* Thu Feb 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.126.1-1
+- Auto-upgrade to 6.6.126.1
+
+* Mon Feb 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.121.1-2
+- Enable lwtunnel, lwtunnel-bpf, and sched_core
+
+* Mon Feb 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.121.1-1
+- Auto-upgrade to 6.6.121.1
+
+* Tue Jan 28 2026 Sean Dougherty <sdougherty@microsoft.com> - 6.6.119.3-4
+- Enable CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
 * Fri Jan 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.119.3-3
 - Enable XFRM_INTERFACE
 

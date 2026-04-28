@@ -547,6 +547,7 @@
                 "Judy",
                 "jurand",
                 "kata-containers",
+                "kata-containers-preview",
                 "kde-filesystem",
                 "kde-settings",
                 "kernel-srpm-macros",
@@ -1076,6 +1077,7 @@
                 "opensm",
                 "opensp",
                 "openssl",
+                "openssl-fips-provider",
                 "openssl-ibmpkcs11",
                 "openssl-pkcs11",
                 "openwsman",
@@ -2452,6 +2454,7 @@
                 "tinyxml2",
                 "toml11",
                 "tracelogging",
+                "trident",
                 "umoci",
                 "usrsctp",
                 "vala",
@@ -2784,6 +2787,7 @@
                 "golang",
                 "golang-1.23",
                 "golang-1.24",
+                "golang-1.25",
                 "gperf",
                 "gperftools",
                 "gpgme",
@@ -2834,6 +2838,7 @@
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
+                "kernel-uvm-micro",
                 "keyutils",
                 "kmod",
                 "krb5",
@@ -2947,6 +2952,7 @@
                 "nginx",
                 "ninja-build",
                 "nodejs",
+                "nodejs24",
                 "npth",
                 "nspr",
                 "nss",
@@ -3166,7 +3172,12 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "azure-vm-utils",
+                "bootengine",
+                "coreos-cloudinit",
+                "coreos-init",
+                "python-nocaselist",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {

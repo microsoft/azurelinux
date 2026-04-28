@@ -17,8 +17,8 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.100.mshv1
-Release:        3%{?dist}
+Version:        6.6.135.mshv2
+Release:        1%{?dist}
 License:        GPLv2
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
@@ -267,6 +267,19 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+
+* Fri Apr 24 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.135.mshv2-1
+- Upgrade to 6.6.135.mshv2
+
+* Mon Mar 30 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.121.mshv1-2
+- Enable CONFIG_WIREGUARD in kernel config
+
+* Thu Feb 26 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.121.mshv1-1
+- Upgrade to 6.6.121.mshv1. This update adds deferred MSHV paging support
+
+* Thu Feb 19 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-4
+- Enable additional tracing in kernel config
+
 * Mon Jan 06 2026 Roaa Sakr <romoh@microsoft.com> - 6.6.100.mshv1-3
 - Enable ftrace syscalls tracing support in kernel config
 

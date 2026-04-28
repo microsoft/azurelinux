@@ -4,8 +4,8 @@
 
 Name:           cloud-hypervisor
 Summary:        Cloud Hypervisor is an open source Virtual Machine Monitor (VMM) that runs on top of the KVM hypervisor and the Microsoft Hypervisor (MSHV).
-Version:        41.0.139
-Release:        3%{?dist}
+Version:        51.1.56
+Release:        1%{?dist}
 License:        ASL 2.0 OR BSD-3-clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -137,6 +137,25 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 %license LICENSES/CC-BY-4.0.txt
 
 %changelog
+* Wed Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 51.1.56-1
+- Auto-upgrade to 51.1.56
+- Remove CVE-2026-27211.patch that no longer applies
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-5
+- Bump release to rebuild with rust
+
+* Mon Mar 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 48.0.246-4
+- Bump release to rebuild with rust
+
+* Thu Feb 26 2026 Archana Shettigar <v-shettigara@microsoft.com> - 48.0.246-3
+- Bump release to rebuild with rust
+
+* Wed Feb 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 48.0.246-2
+- Patch for CVE-2026-27211
+
+* Fri Jan 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 48.0.246-1
+- Auto-upgrade to 48.0.246
+
 * Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 41.0.139-3
 - Bump release to rebuild with rust
 
@@ -227,10 +246,10 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 * Wed Aug 17 2022 Anatol Belski <anbelski@linux.microsoft.com> - 26.0-1
 - Pull release 26.0 for Mariner from upstream
 
-* Tue May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
+* Mon May 16 2022 Anatol Belski <anbelski@linux.microsoft.com> - 23.1-0
 - Initial import 23.1 for Mariner from upstream
 
-*   Thu Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
+*   Wed Apr 13 2022 Rob Bradford <robert.bradford@intel.com> 23.0-0
 -   Update to 23.0
 
 *   Thu Mar 03 2022 Rob Bradford <robert.bradford@intel.com> 22.0-0

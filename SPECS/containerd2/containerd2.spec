@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash 207ad711eabd375a01713109a8a197d197ff6542
+%define commit_hash c74fd8780002eb26bd5940ae339d690d891221c2
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.0.0
-Release: 16%{?dist}
+Version: 2.1.6
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -16,15 +16,10 @@ Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{
 Source1: containerd.service
 Source2: containerd.toml
 
-Patch0:	CVE-2024-45338.patch
-Patch1:	CVE-2025-27144.patch
-Patch2:	CVE-2024-40635.patch
-Patch3:	CVE-2025-22872.patch
-Patch4:	CVE-2025-47291.patch
-Patch5:	multi-snapshotters-support.patch
-Patch6:	tardev-support.patch
-Patch7: CVE-2024-25621.patch
-Patch8: CVE-2025-64329.patch
+Patch0:	multi-snapshotters-support.patch
+Patch1:	tardev-support.patch
+Patch2:	fix-credential-leak-in-cri-errors.patch
+
 %{?systemd_requires}
 
 BuildRequires: golang < 1.25
@@ -100,6 +95,23 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri Apr 17 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-1
+- Upgrade to 2.1.6
+- Remove CVE patches fixed in upstream: CVE-2024-25621, CVE-2024-40635,
+  CVE-2024-45338, CVE-2025-22872, CVE-2025-27144, CVE-2025-47291,
+  CVE-2025-47911, CVE-2025-58190, CVE-2025-64329
+- Modify fix-credential-leak-in-cri-errors patch to keep only 2/2 not yet merged in upstream
+- Rebase multi-snapshotters-support patch for 2.1.6
+
+* Tue Apr 07 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.0.0-19
+- Patch CVE-2026-35469
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
+- Patch for CVE-2025-58190, CVE-2025-47911
+
+* Tue Jan 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
+- Backport fix for credential leak in CRI error logs
+
 * Mon Nov 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
 - Patch for CVE-2025-64329
 

@@ -1,12 +1,13 @@
 Summary:        Color Management Engine
 Name:           lcms2
 Version:        2.15
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.littlecms.com/
 Source0:        https://github.com/mm2/Little-CMS/archive/refs/tags/lcms%{version}.tar.gz#/Little-CMS-lcms%{version}.tar.gz
+Patch0:         CVE-2026-41254.patch
 BuildRequires:  gcc
 BuildRequires:  libjpeg-devel
 BuildRequires:  libtiff-devel
@@ -71,6 +72,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/lcms2.pc
 
 %changelog
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.15-2
+- Patch for CVE-2026-41254
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.15-1
 - Auto-upgrade to 2.15 - Azure Linux 3.0 - package upgrades
 

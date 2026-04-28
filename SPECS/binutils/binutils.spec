@@ -21,7 +21,7 @@
 Summary:        Contains a linker, an assembler, and other tools
 Name:           binutils
 Version:        2.41
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,7 @@ Patch3:         CVE-2025-1178.patch
 Patch4:         CVE-2025-1181.patch
 Patch5:         CVE-2025-1182.patch
 Patch6:         CVE-2025-0840.patch
-Patch7:		CVE-2025-1744.patch
+Patch7:         CVE-2025-1744.patch
 Patch8:         CVE-2025-5245.patch
 Patch9:         CVE-2025-5244.patch
 Patch10:        CVE-2025-7546.patch
@@ -47,6 +47,15 @@ Patch13:        CVE-2025-11082.patch
 Patch14:        CVE-2025-11083.patch
 Patch15:        CVE-2025-11412.patch
 Patch16:        CVE-2025-11414.patch
+Patch17:        CVE-2025-69645.patch
+Patch18:        CVE-2025-69646.patch
+Patch19:        CVE-2025-69649.patch
+Patch20:        CVE-2025-69652.patch
+Patch21:        CVE-2025-1147.patch
+Patch22:        CVE-2025-1148.patch
+Patch23:        CVE-2025-11839.patch
+Patch24:        CVE-2025-69647.patch
+Patch25:        CVE-2026-4647.patch
 Provides:       bundled(libiberty)
 
 # Moving macro before the "SourceX" tags breaks PR checks parsing the specs.
@@ -336,6 +345,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %do_files aarch64-linux-gnu %{build_aarch64}
 
 %changelog
+* Wed Mar 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-11
+- Patch for CVE-2025-69652, CVE-2025-69649, CVE-2025-69646, CVE-2025-69645, CVE-2025-11839, CVE-2025-1148, CVE-2025-1147, CVE-2025-69647, CVE-2026-4647
+
 * Thu Oct 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.41-10
 - Patch for CVE-2025-11414, CVE-2025-11412
 

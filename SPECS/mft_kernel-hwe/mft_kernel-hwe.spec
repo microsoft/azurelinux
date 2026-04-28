@@ -1,7 +1,7 @@
 %if 0%{azl}
-# hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 2
+
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -29,13 +29,13 @@
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
 %{!?version: %global version 4.33.0}
-%{!?_release: %global _release 2}
+%{!?_release: %global _release 6}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.33.0
-Release:	 2%{release_suffix}%{?dist}
+Release:	 8%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -213,6 +213,24 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-8_6.12.57.1.6
+- Tweak specs to use dynamic versioning for kernel
+
+* Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.33.0-7_6.12.78.2.1
+- Bump release to rebuild for new kernel release
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-6_6.12.57.1.6
+- Bump to match kernel-hwe.
+
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.33.0-5_6.12.57.1.5
+- Bump release to match kernel-hwe
+
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-4_6.12.57.1.4
+- Bump to match kernel-hwe.
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-3_6.12.57.1.3
+- Bump to match kernel-hwe.
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 4.33.0-2_6.12.57.1.2
 - Bump to match kernel-hwe.
 

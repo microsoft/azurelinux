@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        17%{?dist}
+Release:        19%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,11 +50,14 @@ Patch19:        CVE-2025-4802.patch
 Patch20:        add_support_record_failure_barrier.patch
 Patch21:        test-CVE-2025-4802.patch
 Patch22:        CVE-2025-8058.patch
+Patch23:        CVE-2026-4437.patch
+Patch24:        CVE-2026-4438.patch 
 
 # Patches for testing
 Patch100:       0001-Remove-Wno-format-cflag-from-tests.patch
 Patch101:       CVE-2026-0861.patch
 Patch102:       CVE-2026-0915.patch
+Patch103:       CVE-2025-15281.patch
 
 BuildRequires:  bison
 BuildRequires:  gawk
@@ -384,6 +387,12 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-19
+- Patch for CVE-2026-4437, CVE-2026-4438
+
+* Thu Jan 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-18
+- Patch for CVE-2025-15281
+
 * Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-17
 - Patch for CVE-2026-0861, CVE-2026-0915
 
@@ -393,7 +402,7 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 * Thu Oct 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.38-15
 - Patch for CVE-2025-8058
 
-* Tue Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-14
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 2.38-14
 - Replace mitigation patch for glibc bug #25847 with proper upstream fix
 
 * Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 2.38-13

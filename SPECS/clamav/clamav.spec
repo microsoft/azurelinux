@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.0.9
+Version:        1.5.2
 Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -15,6 +15,9 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
 # specific event. Revert back to the original filename when a new cache is created for a different version.
 Source1:        %{name}-%{version}-cargo.tar.gz
+Patch1000:      CVE-2026-33055.patch
+Patch1001:      CVE-2026-33056.patch
+
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -31,7 +34,7 @@ BuildRequires:  pcre2-devel
 BuildRequires:  python3
 BuildRequires:  python3-pip
 BuildRequires:  python3-pytest
-BuildRequires:  rust < 1.85.0
+BuildRequires:  rust >= 1.87.0
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
@@ -55,8 +58,9 @@ line scanner and an advanced tool for automatic database updates.
 mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
+%autopatch -p1 -m 1000 -M 1100
 popd
-%autosetup -n clamav-clamav-%{version}
+%autosetup -N -n clamav-clamav-%{version}
 
 %build
 export CARGO_NET_OFFLINE=true
@@ -80,12 +84,21 @@ cmake \
 %cmake3_build
 
 %check
-%ctest3 -- -E valgrind
+# The build generates plain test files from .xor sources via xor_testfile.py,
+# but leaves the .xor files in the same directory. The unit test counts all
+# files starting with "clam" and asserts the count matches expected_testfiles.
+# Remove the .xor sources after build so only the decoded plain files remain.
+find unit_tests/input/clamav_hdb_scanfiles -name '*.xor' -delete
+/usr/bin/ctest --output-on-failure --force-new-ctest-process -j$(nproc) --exclude-regex _valgrind
 
 %install
 %cmake_install
 # do not install html doc ('clamav' cmake has no flag to specify that => remove the doc)
 rm -rf %{buildroot}%{_docdir}
+
+# Remove unintended static Rust archive
+rm -f %{buildroot}%{_libdir}/libclamav_rust.a
+
 mkdir -p %{buildroot}%{_sharedstatedir}/clamav
 
 ### freshclam config processing (from Fedora)
@@ -129,6 +142,9 @@ fi
 %{_sbindir}/*
 %{_sysconfdir}/clamav/*.sample
 %{_sysconfdir}/clamav/freshclam.conf
+%dir %{_sysconfdir}/clamav
+%dir %{_sysconfdir}/clamav/certs
+%config(noreplace) %{_sysconfdir}/clamav/certs/clamav.crt
 %{_includedir}/*.h
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -136,6 +152,21 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.2-2
+- Patch for CVE-2026-33056, CVE-2026-33055
+
+* Wed Apr 08 2026 Mayank Singh <mayansingh@microsoft.com> - 1.5.2-1
+- upgrade to 1.5.2
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-5
+- Bump release to rebuild with rust
+
+* Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-4
+- Bump release to rebuild with rust
+
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.0.9-3
+- Bump release to rebuild with rust
+
 * Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.0.9-2
 - Bump release to rebuild with rust
 
