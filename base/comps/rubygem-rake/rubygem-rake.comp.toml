@@ -1,0 +1,3 @@
+[components.rubygem-rake]
+# Release: %{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}
+release = { calculation = "manual" }
