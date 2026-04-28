@@ -1,0 +1,13 @@
+Description: Keep the Token.EOF_TOKEN field to preserve the backward compatibility
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/runtime/Java/src/main/java/org/antlr/runtime/Token.java
++++ b/runtime/Java/src/main/java/org/antlr/runtime/Token.java
+@@ -38,6 +38,7 @@
+ 	public static final int MIN_TOKEN_TYPE = UP+1;
+ 
+     public static final int EOF = CharStream.EOF;
++    public static final Token EOF_TOKEN = new CommonToken(EOF);
+ 
+ 	public static final int INVALID_TOKEN_TYPE = 0;
+ 	public static final Token INVALID_TOKEN = new CommonToken(INVALID_TOKEN_TYPE);

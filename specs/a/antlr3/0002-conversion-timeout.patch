@@ -1,0 +1,14 @@
+Description: Increase the default conversion timeout to avoid build failures when complex grammars are processed on slow architectures.
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/tool/src/main/java/org/antlr/analysis/DFA.java
++++ b/tool/src/main/java/org/antlr/analysis/DFA.java
+@@ -57,7 +57,7 @@
+ 	 */
+ 
+ 	/** Set to 0 to not terminate early (time in ms) */
+-	public static int MAX_TIME_PER_DFA_CREATION = 1*1000;
++	public static int MAX_TIME_PER_DFA_CREATION = 30*1000;
+ 
+ 	/** How many edges can each DFA state have before a "special" state
+ 	 *  is created that uses IF expressions instead of a table?

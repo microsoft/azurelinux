@@ -1,0 +1,38 @@
+--- a/runtime/Java/pom.xml	2022-04-10 17:09:47.418531841 -0600
++++ b/runtime/Java/pom.xml	2022-04-10 17:16:58.890381092 -0600
+@@ -81,6 +81,35 @@
+                     </execution>
+                 </executions>
+             </plugin>
++            <plugin>
++                <groupId>org.apache.felix</groupId>
++                <artifactId>maven-bundle-plugin</artifactId>
++                <executions>
++                    <execution>
++                        <id>bundle-manifest</id>
++                        <phase>process-classes</phase>
++                         <goals>
++                            <goal>manifest</goal>
++                        </goals>
++                    </execution>
++                </executions>
++                <configuration>
++                    <manifestLocation>${project.build.directory}/osgi</manifestLocation>
++		    <instructions>
++                        <Bundle-SymbolicName>org.antlr.runtime</Bundle-SymbolicName>
++			<Import-Package>!org.antlr.stringtemplate,*</Import-Package>
++                    </instructions>
++                </configuration>
++             </plugin>
++            <plugin>
++                <groupId>org.apache.maven.plugins</groupId>
++                <artifactId>maven-jar-plugin</artifactId>
++                <configuration>
++		    <archive>
++                        <manifestFile>${project.build.directory}/osgi/MANIFEST.MF</manifestFile>
++                    </archive>
++                </configuration>
++             </plugin>
+         </plugins>
+     </build>
+ </project>
