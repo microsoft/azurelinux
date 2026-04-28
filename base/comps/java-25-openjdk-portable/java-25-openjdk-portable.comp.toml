@@ -8,6 +8,8 @@
 # from the last snapshot of the spec at that version.
 
 [components.java-25-openjdk-portable]
+# Release: %{?eaprefix}%{rpmrelease}%{?extraver}%{?dist}
+release = { calculation = "manual" }
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cad9d5a1ed48cf7e9e12cfadfdacc11f523d46cb" }
 
 [[components.java-25-openjdk-portable.overlays]]
