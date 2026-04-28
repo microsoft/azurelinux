@@ -13,7 +13,7 @@
 Summary:        Improved Linux Sound Server
 Name:           pulseaudio
 Version:        16.1
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -243,10 +243,7 @@ rm -fv %{buildroot}%{_libdir}/pulseaudio/modules/module-detect.so
 %find_lang %{name}
 
 %check
-# Keep cpu-volume-test enabled, but avoid ORC JIT instability in sandboxed builders.
-export ORC_CODE=backup
-export PULSE_NO_SIMD=1
-%meson_test --print-errorlogs
+%meson_test
 
 %pre
 getent group pulse-access >/dev/null || groupadd -r pulse-access
@@ -508,9 +505,6 @@ systemctl --no-reload preset --global pulseaudio.socket >/dev/null 2>&1 || :
 %{bash_completionsdir}/pasuspender
 
 %changelog
-* Fri Apr 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 16.1-3
-- Export ORC_CODE=backup and PULSE_NO_SIMD=1 in %%check so cpu-volume-test avoids ORC JIT crashes.
-
 * Wed Nov 23 2022 Sumedh Sharma <sumsharma@microsoft.com> - 16.1-2
 - Initial CBL-Mariner import from Fedora 36 (license: MIT)
 - Build with lirc and jack disabled
