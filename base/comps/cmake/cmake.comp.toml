@@ -1,0 +1,3 @@
+[components.cmake]
+# Release: %{baserelease}%{?dist}
+release = { calculation = "manual" }
