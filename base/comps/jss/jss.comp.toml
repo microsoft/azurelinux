@@ -1,4 +1,6 @@
 [components.jss]
+# Release: %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
+release = { calculation = "manual" }
 
 # AZL builds NSS 3.120+ which includes PQC auth defs (ML-DSA) in ssl_auth_size.
 # JSS's SSLCipher.c has a PR_STATIC_ASSERT that auth_alg_defs[] matches ssl_auth_size,
