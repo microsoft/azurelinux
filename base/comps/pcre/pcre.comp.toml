@@ -1,0 +1,3 @@
+[components.pcre]
+# Release: %{?rcversion:0.}1%{?rcversion:.%rcversion}%{?dist}.9
+release = { calculation = "manual" }

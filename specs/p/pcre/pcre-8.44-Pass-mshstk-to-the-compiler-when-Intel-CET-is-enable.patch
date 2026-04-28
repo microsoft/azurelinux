@@ -1,0 +1,98 @@
+From 70fcff23652339438cabef86f2d3d9c645678687 Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Sun, 20 Dec 2020 13:55:40 -0800
+Subject: [PATCH 2/2] Pass -mshstk to the compiler when Intel CET is enable
+
+Copied from PCRE2.
+---
+ CMakeLists.txt | 18 ++++++++++++++++++
+ Makefile.am    |  3 +++
+ configure.ac   | 15 +++++++++++++++
+ 3 files changed, 36 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 858a34b..74c27e9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -112,6 +112,24 @@ CHECK_FUNCTION_EXISTS(_strtoi64 HAVE__STRTOI64)
+ CHECK_TYPE_SIZE("long long"             LONG_LONG)
+ CHECK_TYPE_SIZE("unsigned long long"    UNSIGNED_LONG_LONG)
+ 
++# Check whether Intel CET is enabled, and if so, adjust compiler flags. This
++# code was written by PH, trying to imitate the logic from the autotools
++# configuration.
++
++CHECK_C_SOURCE_COMPILES(
++  "#ifndef __CET__
++   #error CET is not enabled
++   #endif
++   int main() { return 0; }"
++  INTEL_CET_ENABLED
++)
++
++IF (INTEL_CET_ENABLED)
++  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mshstk")
++ENDIF(INTEL_CET_ENABLED)
++
++
++
+ # User-configurable options
+ #
+ # (Note: CMakeSetup displays these in alphabetical order, regardless of
+diff --git a/Makefile.am b/Makefile.am
+index 22b6947..984c686 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -250,6 +250,7 @@ libpcre_la_SOURCES = \
+ 
+ libpcre_la_CFLAGS = \
+   $(VISIBILITY_CFLAGS) \
++  $(CET_CFLAGS) \
+   $(AM_CFLAGS)
+ 
+ libpcre_la_LIBADD =
+@@ -289,6 +290,7 @@ libpcre16_la_SOURCES = \
+ 
+ libpcre16_la_CFLAGS = \
+   $(VISIBILITY_CFLAGS) \
++  $(CET_CFLAGS) \
+   $(AM_CFLAGS)
+ 
+ libpcre16_la_LIBADD =
+@@ -328,6 +330,7 @@ libpcre32_la_SOURCES = \
+ 
+ libpcre32_la_CFLAGS = \
+   $(VISIBILITY_CFLAGS) \
++  $(CET_CFLAGS) \
+   $(AM_CFLAGS)
+ 
+ libpcre32_la_LIBADD =
+diff --git a/configure.ac b/configure.ac
+index 6a3e5f3..15f37d1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1043,6 +1043,21 @@ fi # enable_coverage
+ 
+ AM_CONDITIONAL([WITH_GCOV],[test "x$enable_coverage" = "xyes"])
+ 
++AC_MSG_CHECKING([whether Intel CET is enabled])
++AC_LANG_PUSH([C])
++AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,
++                   [[#ifndef __CET__
++# error CET is not enabled
++#endif]])],
++                   [intel_cet_enabled=yes],
++                   [intel_cet_enabled=no])
++AC_MSG_RESULT([$intel_cet_enabled])
++if test "$intel_cet_enabled" = yes; then
++  CET_CFLAGS="-mshstk"
++  AC_SUBST([CET_CFLAGS])
++fi
++AC_LANG_POP([C])
++
+ # Produce these files, in addition to config.h.
+ AC_CONFIG_FILES(
+ 	Makefile
+-- 
+2.29.2
+
