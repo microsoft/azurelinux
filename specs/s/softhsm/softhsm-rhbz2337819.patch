@@ -1,0 +1,37 @@
+From bf71ad7ed7864d7a6400309e729dd6b6dfa4107c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marcin=20Cie=C5=9Blak?= <saper@saper.info>
+Date: Tue, 4 Jan 2022 12:28:17 +0000
+Subject: [PATCH 4/4] Fix: accept zero-length additional authenticated data for
+ AES GCM
+
+---
+ src/lib/SoftHSM.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/SoftHSM.cpp b/src/lib/SoftHSM.cpp
+index dac68a3..e420856 100644
+--- a/src/lib/SoftHSM.cpp
++++ b/src/lib/SoftHSM.cpp
+@@ -2346,7 +2346,8 @@ CK_RV SoftHSM::SymEncryptInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMech
+ 			iv.resize(CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulIvLen);
+ 			memcpy(&iv[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pIv, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulIvLen);
+ 			aad.resize(CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
+-			memcpy(&aad[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pAAD, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
++			if (CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen > 0)
++				memcpy(&aad[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pAAD, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
+ 			tagBytes = CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulTagBits;
+ 			if (tagBytes > 128 || tagBytes % 8 != 0)
+ 			{
+@@ -3066,7 +3067,8 @@ CK_RV SoftHSM::SymDecryptInit(CK_SESSION_HANDLE hSession, CK_MECHANISM_PTR pMech
+ 			iv.resize(CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulIvLen);
+ 			memcpy(&iv[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pIv, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulIvLen);
+ 			aad.resize(CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
+-			memcpy(&aad[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pAAD, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
++			if (CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen > 0)
++				memcpy(&aad[0], CK_GCM_PARAMS_PTR(pMechanism->pParameter)->pAAD, CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulAADLen);
+ 			tagBytes = CK_GCM_PARAMS_PTR(pMechanism->pParameter)->ulTagBits;
+ 			if (tagBytes > 128 || tagBytes % 8 != 0)
+ 			{
+-- 
+2.48.1
+
