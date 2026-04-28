@@ -1,0 +1,85 @@
+From: Sven Verdoolaege <sven.verdoolaege@gmail.com>
+Date: Mon, 6 Jun 2022 12:56:02 +0000 (+0200)
+Subject: update m4/ax_prog_cc_for_build.m4
+X-Git-Tag: isl-0.25~11
+X-Git-Url: https://repo.or.cz/isl.git/commitdiff_plain/b4dcdfadc29a6c9f410a72f345f3f32725b1d38b
+
+update m4/ax_prog_cc_for_build.m4
+
+In particular, update to the latest version from the autoconf archive,
+but preserve the changes from isl-0.22.1-358-gcd42abdf2
+(m4/ax_prog_cc_for_build.m4: do not override host compiler dependency style,
+Tue Jun 9 10:54:10 2020 +0200).
+
+Signed-off-by: Sven Verdoolaege <sven.verdoolaege@gmail.com>
+
+--- isl-0.24/m4/ax_prog_cc_for_build.m4.jj	2021-03-02 12:07:09.000000000 +0100
++++ isl-0.24/m4/ax_prog_cc_for_build.m4	2022-12-20 18:11:18.855777817 +0100
+@@ -32,7 +32,7 @@
+ #   and this notice are preserved. This file is offered as-is, without any
+ #   warranty.
+ 
+-#serial 18
++#serial 21
+ 
+ AU_ALIAS([AC_PROG_CC_FOR_BUILD], [AX_PROG_CC_FOR_BUILD])
+ AC_DEFUN([AX_PROG_CC_FOR_BUILD], [dnl
+@@ -44,6 +44,8 @@ dnl Use the standard macros, but make th
+ dnl
+ pushdef([ac_cv_prog_CPP], ac_cv_build_prog_CPP)dnl
+ pushdef([ac_cv_prog_cc_c89], ac_cv_build_prog_cc_c89)dnl
++pushdef([ac_cv_prog_cc_c99], ac_cv_build_prog_cc_c99)dnl
++pushdef([ac_cv_prog_cc_c11], ac_cv_build_prog_cc_c11)dnl
+ pushdef([ac_cv_prog_gcc], ac_cv_build_prog_gcc)dnl
+ pushdef([ac_cv_prog_cc_works], ac_cv_build_prog_cc_works)dnl
+ pushdef([ac_cv_prog_cc_cross], ac_cv_build_prog_cc_cross)dnl
+@@ -86,7 +88,21 @@ AS_IF([test -n "$build"],      [ac_build
+       [test -n "$build_alias"],[ac_build_tool_prefix="$build_alias-"])
+ 
+ AC_LANG_PUSH([C])
++
++dnl The pushdef([ac_cv_c_compiler_gnu], ...) currently does not cover
++dnl the use of this variable in _AC_LANG_COMPILER_GNU called by
++dnl AC_PROG_CC. Unset this cache variable temporarily as a workaround.
++was_set_c_compiler_gnu=${[ac_cv_c_compiler_gnu]+y}
++AS_IF([test ${was_set_c_compiler_gnu}],
++    [saved_c_compiler_gnu=$[ac_cv_c_compiler_gnu]
++    AS_UNSET([[ac_cv_c_compiler_gnu]])])
++
+ AC_PROG_CC
++
++dnl Restore ac_cv_c_compiler_gnu
++AS_IF([test ${was_set_c_compiler_gnu}],
++  [[ac_cv_c_compiler_gnu]=$[saved_c_compiler_gnu]])
++
+ _AC_COMPILER_EXEEXT
+ _AC_COMPILER_OBJEXT
+ AC_PROG_CPP
+--- isl-0.24/configure.jj	2021-04-26 11:13:19.000000000 +0200
++++ isl-0.24/configure	2022-12-20 18:11:36.882518568 +0100
+@@ -5002,6 +4990,13 @@ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR
+ ac_link='$CC_FOR_BUILD -o conftest$ac_build_exeext $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD $LDFLAGS_FOR_BUILD conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_build_c_compiler_gnu
+ 
++
++was_set_c_compiler_gnu=${ac_cv_c_compiler_gnu+y}
++if test ${was_set_c_compiler_gnu}; then :
++  saved_c_compiler_gnu=$ac_cv_c_compiler_gnu
++    { ac_cv_c_compiler_gnu=; unset ac_cv_c_compiler_gnu;}
++fi
++
+ ac_ext=c
+ ac_cpp='$CPP_FOR_BUILD $CPPFLAGS_FOR_BUILD'
+ ac_compile='$CC_FOR_BUILD -c $CFLAGS_FOR_BUILD $CPPFLAGS_FOR_BUILD conftest.$ac_ext >&5'
+@@ -5728,6 +5723,11 @@ else
+ fi
+ 
+ 
++
++if test ${was_set_c_compiler_gnu}; then :
++  ac_cv_c_compiler_gnu=$saved_c_compiler_gnu
++fi
++
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
