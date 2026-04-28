@@ -1,0 +1,3 @@
+[components.oniguruma]
+# Release: %{?prerelease:0.}%{baserelease}%{?dist}
+release = { calculation = "manual" }
