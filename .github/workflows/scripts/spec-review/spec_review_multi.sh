@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Multi-model spec review: runs two models sequentially, then synthesizes results.
-# See .github/workflows/scripts/README.md for usage.
+# See .github/workflows/scripts/spec-review/README.md for usage.
 
 set -euo pipefail
 

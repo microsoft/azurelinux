@@ -51,7 +51,7 @@ Build it with the caller's UID so bind-mounted writes don't end up root-owned:
 | ----- | ---- | ------- |
 | `pr-head/` → `/workdir` | rw | PR checkout. rw because `azldev` writes to `specs/`, `base/build/`, etc. |
 | `<host-output-dir>/` → `/output` | rw | Trusted-shape outputs (JSON reports, patches, ...) the container produces for the host to consume after the run. |
-| `.github/workflows/scripts/` → `/scripts` | ro | Helper scripts from the trusted base checkout. |
+| `.github/workflows/scripts/<area>/` → `/scripts` | ro | Helper scripts from the trusted base checkout. Mount the narrowest subdirectory the container actually needs — do **not** bind-mount the whole `scripts/` tree if only one area is invoked inside. |
 
 #### Sandbox flags (minimum viable for `mock`)
 

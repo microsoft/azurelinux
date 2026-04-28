@@ -108,7 +108,7 @@ jobs:
             --security-opt apparmor=unconfined \
             -v "$WORKSPACE/pr-head:/workdir" \
             -v "$WORKSPACE/render-output:/output" \
-            -v "$WORKSPACE/.github/workflows/scripts:/scripts:ro" \
+            -v "$WORKSPACE/.github/workflows/scripts/render-specs-check:/scripts:ro" \
             localhost/azldev-runner \
             bash -eu -o pipefail -c '
               azldev component render -q -a --clean-stale -O json \
@@ -192,7 +192,7 @@ jobs:
           PATCH_URL: ${{ needs.render.outputs.patch-url }}
           RUN_ID: ${{ github.run_id }}
         run: |
-          python .github/workflows/scripts/post_render_comment.py \
+          python .github/workflows/scripts/render-specs-check/post_render_comment.py \
             --repo "$PR_REPO" \
             --pr "$PR_NUMBER" \
             --report render-output/render-check-report.json \
