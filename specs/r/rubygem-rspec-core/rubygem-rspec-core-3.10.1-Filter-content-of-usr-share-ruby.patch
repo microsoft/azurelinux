@@ -1,0 +1,28 @@
+From 7550f7b024323c15ed21d13e930f59a64455e5d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Thu, 18 Mar 2021 15:45:48 +0100
+Subject: [PATCH] Filter content of /usr/share/ruby
+
+Some Linux distributions, such as Fedora, are using this location to
+store Ruby StdLib. Therefore, it would be nice to filter this location
+similarly to /lib\d*/ruby/
+---
+ lib/rspec/core/backtrace_formatter.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/rspec/core/backtrace_formatter.rb b/lib/rspec/core/backtrace_formatter.rb
+index e0bee52a..27008e2c 100644
+--- a/lib/rspec/core/backtrace_formatter.rb
++++ b/lib/rspec/core/backtrace_formatter.rb
+@@ -8,7 +8,7 @@ module RSpec
+       def initialize
+         @full_backtrace = false
+ 
+-        patterns = %w[ /lib\d*/ruby/ bin/ exe/rspec /lib/bundler/ /exe/bundle: ]
++        patterns = %w[ /lib\d*/ruby/ /share/ruby/ bin/ exe/rspec /lib/bundler/ /exe/bundle: ]
+         patterns << "org/jruby/" if RUBY_PLATFORM == 'java'
+         patterns.map! { |s| Regexp.new(s.gsub("/", File::SEPARATOR)) }
+ 
+-- 
+2.30.0
+
