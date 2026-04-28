@@ -1,0 +1,135 @@
+From 22de4ba6cec94a38cd56156d9114f06dc4d2a5a5 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:14:03 +0100
+Subject: [PATCH 19/23] block/export: Add option to allow export of inactive
+ nodes
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [18/22] 985eadb03f27d046b89ffeef1fb36ef2e4579552 (kmwolf/centos-qemu-kvm)
+
+Add an option in BlockExportOptions to allow creating an export on an
+inactive node without activating the node. This mode needs to be
+explicitly supported by the export type (so that it doesn't perform any
+operations that are forbidden for inactive nodes), so this patch alone
+doesn't allow this option to be successfully used yet.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-13-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 1600ef01ab1296ca8230daa6bc41ba983751f646)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/export/export.c  | 31 +++++++++++++++++++++----------
+ include/block/export.h |  3 +++
+ qapi/block-export.json | 10 +++++++++-
+ 3 files changed, 33 insertions(+), 11 deletions(-)
+
+diff --git a/block/export/export.c b/block/export/export.c
+index 23a86efcdb..71af65b3e5 100644
+--- a/block/export/export.c
++++ b/block/export/export.c
+@@ -75,6 +75,7 @@ static const BlockExportDriver *blk_exp_find_driver(BlockExportType type)
+ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
+ {
+     bool fixed_iothread = export->has_fixed_iothread && export->fixed_iothread;
++    bool allow_inactive = export->has_allow_inactive && export->allow_inactive;
+     const BlockExportDriver *drv;
+     BlockExport *exp = NULL;
+     BlockDriverState *bs;
+@@ -138,17 +139,24 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
+         }
+     }
+ 
+-    /*
+-     * Block exports are used for non-shared storage migration. Make sure
+-     * that BDRV_O_INACTIVE is cleared and the image is ready for write
+-     * access since the export could be available before migration handover.
+-     * ctx was acquired in the caller.
+-     */
+     bdrv_graph_rdlock_main_loop();
+-    ret = bdrv_activate(bs, errp);
+-    if (ret < 0) {
+-        bdrv_graph_rdunlock_main_loop();
+-        goto fail;
++    if (allow_inactive) {
++        if (!drv->supports_inactive) {
++            error_setg(errp, "Export type does not support inactive exports");
++            bdrv_graph_rdunlock_main_loop();
++            goto fail;
++        }
++    } else {
++        /*
++         * Block exports are used for non-shared storage migration. Make sure
++         * that BDRV_O_INACTIVE is cleared and the image is ready for write
++         * access since the export could be available before migration handover.
++         */
++        ret = bdrv_activate(bs, errp);
++        if (ret < 0) {
++            bdrv_graph_rdunlock_main_loop();
++            goto fail;
++        }
+     }
+     bdrv_graph_rdunlock_main_loop();
+ 
+@@ -162,6 +170,9 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
+     if (!fixed_iothread) {
+         blk_set_allow_aio_context_change(blk, true);
+     }
++    if (allow_inactive) {
++        blk_set_force_allow_inactivate(blk);
++    }
+ 
+     ret = blk_insert_bs(blk, bs, errp);
+     if (ret < 0) {
+diff --git a/include/block/export.h b/include/block/export.h
+index f2fe0f8078..4bd9531d4d 100644
+--- a/include/block/export.h
++++ b/include/block/export.h
+@@ -29,6 +29,9 @@ typedef struct BlockExportDriver {
+      */
+     size_t instance_size;
+ 
++    /* True if the export type supports running on an inactive node */
++    bool supports_inactive;
++
+     /* Creates and starts a new block export */
+     int (*create)(BlockExport *, BlockExportOptions *, Error **);
+ 
+diff --git a/qapi/block-export.json b/qapi/block-export.json
+index ce33fe378d..117b05d13c 100644
+--- a/qapi/block-export.json
++++ b/qapi/block-export.json
+@@ -372,6 +372,13 @@
+ #     cannot be moved to the iothread.  The default is false.
+ #     (since: 5.2)
+ #
++# @allow-inactive: If true, the export allows the exported node to be inactive.
++#     If it is created for an inactive block node, the node remains inactive. If
++#     the export type doesn't support running on an inactive node, an error is
++#     returned. If false, inactive block nodes are automatically activated before
++#     creating the export and trying to inactivate them later fails.
++#     (since: 10.0; default: false)
++#
+ # Since: 4.2
+ ##
+ { 'union': 'BlockExportOptions',
+@@ -381,7 +388,8 @@
+             '*iothread': 'str',
+             'node-name': 'str',
+             '*writable': 'bool',
+-            '*writethrough': 'bool' },
++            '*writethrough': 'bool',
++            '*allow-inactive': 'bool' },
+   'discriminator': 'type',
+   'data': {
+       'nbd': 'BlockExportOptionsNbd',
+-- 
+2.48.1
+
