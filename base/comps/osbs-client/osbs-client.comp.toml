@@ -1,0 +1,3 @@
+[components.osbs-client]
+# Release: %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
+release = { calculation = "manual" }
