@@ -30,7 +30,7 @@ jobs:
           cache: false
 
       - name: Install azldev
-        run: go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@0590d38b32c0a414e0969e85aca8542c3d339079
+        run: go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@main
 
       - name: "Validate config (strict)"
         run: azldev config dump > /dev/null
