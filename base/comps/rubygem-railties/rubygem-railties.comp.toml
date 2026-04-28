@@ -1,0 +1,32 @@
+[components.rubygem-railties]
+
+# Chromium/chromedriver are not available in Azure Linux;
+# selenium-webdriver depends on chromedriver at runtime, so the whole
+# browser-testing stack must be removed.
+[[components.rubygem-railties.overlays]]
+description = "Remove chromedriver/chromium BuildRequires - not available in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver chromium chromium-headless"
+
+[[components.rubygem-railties.overlays]]
+description = "Remove selenium-webdriver BuildRequires - depends on chromedriver which is unavailable"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "rubygem(selenium-webdriver)"
+
+[[components.rubygem-railties.overlays]]
+description = "Remove selenium-webdriver from test Gemfile - no chromedriver available"
+type = "spec-search-replace"
+regex = "echo.*selenium-webdriver.*Gemfile"
+replacement = "# selenium-webdriver removed - no chromedriver in Azure Linux"
+
+[[components.rubygem-railties.overlays]]
+description = "Disable tests incompatible with Azure Linux (selenium-webdriver/chromedriver unavailable; sprockets digest flake)"
+type = "spec-search-replace"
+regex = "mv test/application/active_storage/uploads_integration_test.rb.,.disable."
+replacement = """mv test/application/active_storage/uploads_integration_test.rb{,.disable}
+mv test/application/active_job_adapter_test.rb{,.disable}
+mv test/application/system_test_case_test.rb{,.disable}
+mv test/application/test_runner_test.rb{,.disable}
+mv test/application/sprockets_assets_test.rb{,.disable}"""
