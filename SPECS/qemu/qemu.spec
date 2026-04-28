@@ -1170,10 +1170,6 @@ Requires: %{name}-user = %{version}-%{release}
 Requires(post): systemd-units
 Requires(postun): systemd-units
 # qemu-user-binfmt + qemu-user-static both provide binfmt rules
-# Temporarily disable to get fedora CI working. Re-enable
-# once this CI issue let's us deal with subpackage conflicts:
-# https://pagure.io/fedora-ci/general/issue/184
-#
 # introduce conflicts to not install both binfmt rules.
 Conflicts: qemu-user-static
 %description user-binfmt
