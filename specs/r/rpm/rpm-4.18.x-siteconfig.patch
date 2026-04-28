@@ -1,0 +1,14 @@
+diff -up rpm-4.18.1/macros.in.orig rpm-4.18.1/macros.in
+--- rpm-4.18.1/macros.in.orig	2023-03-15 13:52:55.211928040 +0100
++++ rpm-4.18.1/macros.in	2023-03-15 13:55:04.113129930 +0100
+@@ -746,7 +746,9 @@ package or when debugging this package.\
+   %{?_javaclasspath:CLASSPATH=\"%{_javaclasspath}\"\
+   export CLASSPATH}\
+   PKG_CONFIG_PATH=\"${PKG_CONFIG_PATH}:%{_libdir}/pkgconfig:%{_datadir}/pkgconfig\"\
+-  export PKG_CONFIG_PATH
++  export PKG_CONFIG_PATH\
++  CONFIG_SITE=${CONFIG_SITE:-NONE}\
++  export CONFIG_SITE
+ 
+ %___build_pre	\
+   %{___build_pre_env} \

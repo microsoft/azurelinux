@@ -1,0 +1,27 @@
+From fd89ba7f95d6f21fa6e54e3c1c9ff7ce0ba16d58 Mon Sep 17 00:00:00 2001
+From: Michal Domonkos <mdomonko@redhat.com>
+Date: Thu, 23 May 2024 17:00:35 +0200
+Subject: [PATCH] Revert "Add a deprecation warning for
+ clamp_mtime_to_source_date_epoch"
+
+This reverts commit 4965331a55cedda5e423fe050e8da1245ab8b069.
+---
+ build/files.c                           |  2 --
+ tests/data/SPECS/source_date_epoch.spec |  4 ++++
+ tests/pinned/common/buildrepr.sh        |  2 +-
+ tests/rpmbuild.at                       | 28 +++----------------------
+ 4 files changed, 8 insertions(+), 28 deletions(-)
+
+diff --git a/build/files.cc b/build/files.cc
+index 2f7d1261a..eb0c26300 100644
+--- a/build/files.cc
++++ b/build/files.cc
+@@ -1044,8 +1044,6 @@ static void genCpioListAndHeader(FileList fl, rpmSpec spec, Package pkg, int isS
+         if (srcdate && rpmExpandNumeric("%{?clamp_mtime_to_source_date_epoch}")) {
+ 	    free(mtime_policy_str);
+ 	    mtime_policy_str = xstrdup("clamp_to_source_date_epoch");
+-	    rpmlog(RPMLOG_WARNING,
+-		    _("%%clamp_mtime_to_source_date_epoch is deprecated, please use %%build_mtime_policy\n"));
+ 	}
+     }
+ 

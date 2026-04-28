@@ -1,0 +1,12 @@
+diff -up rpm-5.99.91/macros.in.rpmformat rpm-5.99.91/macros.in
+--- rpm-5.99.91/macros.in.rpmformat	2025-07-02 10:35:25.595849666 +0300
++++ rpm-5.99.91/macros.in	2025-07-02 10:35:38.956370457 +0300
+@@ -258,7 +258,7 @@ Supplements:   (%{name} = %{version}-%{r
+ %_rpmfilename		%{_build_name_fmt}
+ 
+ #	Which rpm format go generate (4 or 6)
+-%_rpmformat 6
++%_rpmformat 4
+ 
+ #	The directory where sources/patches from a source package will be
+ #	installed. This is also where sources/patches are found when building.

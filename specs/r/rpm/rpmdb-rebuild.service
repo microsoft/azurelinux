@@ -1,0 +1,19 @@
+[Unit]
+Description=RPM database rebuild
+ConditionPathExists=/usr/lib/sysimage/rpm/.rebuilddb
+
+# This should run before any daemons that may open the rpmdb
+DefaultDependencies=no
+After=sysinit.target
+Before=basic.target shutdown.target
+Conflicts=shutdown.target
+# In case /usr is remote-mounted
+RequiresMountsFor=/usr
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rpmdb --rebuilddb
+ExecStartPost=rm -f /usr/lib/sysimage/rpm/.rebuilddb
+
+[Install]
+WantedBy=basic.target

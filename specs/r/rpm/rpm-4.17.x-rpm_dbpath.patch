@@ -1,0 +1,12 @@
+diff '--color=auto' -rup rpm-4.17.0-orig/macros.in rpm-4.17.0/macros.in
+--- rpm-4.17.0-orig/macros.in	2021-08-20 04:44:56.264259007 -0400
++++ rpm-4.17.0/macros.in	2022-01-26 20:11:26.864195884 -0500
+@@ -140,7 +140,7 @@
+ %_buildshell		/bin/sh
+ 
+ #	The location of the rpm database file(s).
+-%_dbpath		%{_var}/lib/rpm
++%_dbpath		%{_usr}/lib/sysimage/rpm
+ 
+ #	The location of the rpm database file(s) after "rpm --rebuilddb".
+ %_dbpath_rebuild	%{_dbpath}

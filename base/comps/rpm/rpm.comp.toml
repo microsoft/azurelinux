@@ -1,4 +1,6 @@
 [components.rpm]
+# Release: %{?snapver:0.%{snapver}.}%{baserelease}%{?dist}
+release = { calculation = "manual" }
 
 # Update vendor macro.
 [[components.rpm.overlays]]
