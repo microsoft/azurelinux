@@ -3,7 +3,7 @@ Cython is an optimising static compiler for both the Python programming language
 Summary:        Language for writing Python extension modules
 Name:           Cython
 Version:        3.0.5
-Release:        3%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,10 +41,6 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
 pip3 install -r test-requirements-312.txt
-
-# Fix upstream flake8 E502 (redundant backslash between brackets)
-sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
-
 # Skip the file based tests, since they typically take over 5 hours to run.
 %python3 runtests.py -vv --no-file
 
@@ -61,9 +57,6 @@ sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
-* Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 3.0.5-3
--Applied sed-based fix in %check to remove redundant backslash (E502) in IpythonMagic.py, enabling TestCodeFormat to pass successfully.
-
 * Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
 - Switch to test-requirements-312.txt
 - Skip long-running file based tests
