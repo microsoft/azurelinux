@@ -1,0 +1,3 @@
+[components.cpuinfo]
+# Release: %{patch_level}.git%{?shortcommit0}%{?dist}.2
+release = { calculation = "manual" }

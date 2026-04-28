@@ -1,0 +1,32 @@
+From 305b7f4b97eddc0877612ac54fb7e05d493fd5b5 Mon Sep 17 00:00:00 2001
+From: Tom Rix <trix@redhat.com>
+Date: Fri, 17 Mar 2023 11:05:11 -0700
+Subject: [PATCH] cpuinfo fedora cmake changes
+
+SO's need a version
+Use the YY.M.D of the last commit
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b5db1a7..2b09aae 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -244,6 +244,11 @@ ELSE()
+   MESSAGE(FATAL_ERROR "Unsupported library type ${CPUINFO_LIBRARY_TYPE}")
+ ENDIF()
+ ADD_LIBRARY(cpuinfo_internals STATIC ${CPUINFO_SRCS})
++
++# YY.M.D of last upstream commit to main
++set(cpuinfo_VERSION 23.11.04)
++set_target_properties(cpuinfo PROPERTIES VERSION ${cpuinfo_VERSION} SOVERSION ${cpuinfo_VERSION})
++
+ CPUINFO_TARGET_ENABLE_C99(cpuinfo)
+ CPUINFO_TARGET_ENABLE_C99(cpuinfo_internals)
+ CPUINFO_TARGET_RUNTIME_LIBRARY(cpuinfo)
+-- 
+2.43.0
+
