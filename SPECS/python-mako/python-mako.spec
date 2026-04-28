@@ -2,13 +2,14 @@
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.2.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
 Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_%{version_tag}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-41205.patch
 BuildArch:      noarch
 
 %if 0%{?with_check}
@@ -59,6 +60,9 @@ ln -s mako-render %{buildroot}/%{_bindir}/mako-render3
 %{_bindir}/mako-render3
 
 %changelog
+* Tue Apr 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.4-3
+- Patch for CVE-2026-41205
+
 * Tue May 13 2025 Riken Maharjan <rmaharjan@microsoft.com> - 1.2.4-2
 - Fix Ptest by using pytest instead of tox.
 
