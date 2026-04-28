@@ -1,0 +1,9 @@
+prefix=@PREFIX@
+includedir=@INCLUDEDIR@
+libdir=@LIBDIR@
+
+Name: v8-@PKGCONFVERSION@
+Description: JavaScript Runtime
+Version: @V8_VERSION@
+Libs: -L${libdir} -lv8
+Cflags: -I${includedir}
