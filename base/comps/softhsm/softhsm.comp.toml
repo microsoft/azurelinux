@@ -1,0 +1,3 @@
+[components.softhsm]
+# Release: %{?prever:0.}13%{?prever:.%{prever}}%{?dist}.1
+release = { calculation = "manual" }
