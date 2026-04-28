@@ -1,0 +1,48 @@
+# additional rpminspect configuration for this branch
+
+---
+inspections:
+    upstream: off
+
+badfuncs:
+    ignore:
+        - /usr/libexec/ksamples/*
+        - /usr/libexec/kselftests/*
+
+emptyrpm:
+    expected_empty:
+        - kernel
+        - kernel-debug
+        - kernel-debug-devel-matched
+        - kernel-devel-matched
+        - kernel-modules-extra-matched
+        - kernel-zfcpdump
+        - kernel-zfcpdump-devel-matched
+        - kernel-zfcpdump-modules
+        - kernel-zfcpdump-modules-partner
+        - kernel-rt
+        - kernel-rt-debug
+        - kernel-rt-debug-devel-matched
+        - kernel-rt-devel-matched
+        - kernel-rt-modules-extra-matched
+        - kernel-64k
+        - kernel-64k-debug
+        - kernel-64k-debug-devel-matched
+        - kernel-64k-devel-matched
+        - kernel-64k-modules-extra-matched
+        - kernel-rt-64k
+        - kernel-rt-64k-debug
+        - kernel-rt-64k-debug-devel-matched
+        - kernel-rt-64k-devel-matched
+        - kernel-rt-64k-modules-extra-matched
+
+patches:
+    ignore_list:
+        - linux-kernel-test.patch
+        - patch-6.18-redhat.patch
+
+runpath:
+    ignore:
+        - /usr/libexec/kselftests/bpf/urandom_read
+        - /usr/libexec/kselftests/bpf/no_alu32/urandom_read
+        - /usr/libexec/kselftests/bpf/cpuv4/urandom_read

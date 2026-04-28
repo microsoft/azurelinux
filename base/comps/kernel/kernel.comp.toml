@@ -1,5 +1,9 @@
 [components.kernel]
 
+# Manual release calculation required because the spec uses %{specrelease} macro
+# Release: %{pkg_release}
+release = { calculation = "manual" }
+
 # Skip debug kernel variant to reduce build time
 [components.kernel.build]
 without = ["debug"]
