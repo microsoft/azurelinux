@@ -1,0 +1,3 @@
+[components.mod_proxy_cluster]
+# Release: %{serial}%{?dist}.1
+release = { calculation = "manual" }
