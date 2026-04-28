@@ -1,0 +1,25 @@
+From 530c4f8bb9d1f42d46bf994ac076ed1966fde4e7 Mon Sep 17 00:00:00 2001
+From: Klaus Wenninger <klaus.wenninger@aon.at>
+Date: Mon, 8 Sep 2025 18:02:05 +0200
+Subject: [PATCH] Fix: sbd-cluster: cleanly include <crm/crm.h> for
+ crm_system_name and others
+
+---
+ src/sbd-cluster.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/sbd-cluster.c b/src/sbd-cluster.c
+index 48c6071..ec95c0e 100644
+--- a/src/sbd-cluster.c
++++ b/src/sbd-cluster.c
+@@ -30,6 +30,7 @@
+ #include <config.h>
+ #include <crm_config.h>
+ 
++#include <crm/crm.h>
+ #include <crm/cluster.h>
+ #include <crm/common/mainloop.h>
+ 
+-- 
+2.51.0
+
