@@ -1,5 +1,4 @@
 %bcond_without experimental
-%bcond_with arm
 
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,7 +24,6 @@ Distribution:   Azure Linux
 # Can't build aarch64 due to a dependency on "nasm", which doesn't
 # officially support the ARM64 architecture. See here:
 # https://github.com/netwide-assembler/nasm/pull/3
-ExclusiveArch: x86_64
 
 # edk2-stable202402
 %define GITDATE        20240524
@@ -42,20 +40,29 @@ ExclusiveArch: x86_64
 %define HVLOADER_VER    1.0.1
 %define HVLOADER_COMMIT 286f1c642ed624af2c7840fbca7923497891fe68
 
+%define edk2_arch X64
+%ifarch aarch64
+%define edk2_arch AARCH64
+%endif
+
 %define build_ovmf 1
-%define build_aarch64 0
+%ifarch aarch64
+%define build_ovmf 0
+%endif
+%define build_aarch64 1
 %define build_riscv64 0
 
 # Undefine this to get *HUGE* (50MB+) verbose build logs
 %define silent --silent
- 
+
 %global softfloat_version 20180726-gitb64af41
+
 %define disable_werror 1
 
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    16%{?dist}
+Release:    17%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -67,20 +74,17 @@ URL:        https://www.tianocore.org
 Source0: https://src.fedoraproject.org/repo/pkgs/edk2/edk2-%{GITCOMMIT}.tar.xz/sha512/58550636ea26810a0184423765db24e43319a0cc5e38dfd5fbd7f09b5f6e1c2d2b9e1e33112a3b721e05c7f088dbfd8a2ddd4a73d833c3019a16101ef1d0342a/edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
 Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
-Source3: softfloat-%{softfloat_version}.tar.xz
-Source4: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
-Source5: jansson-2.13.1.tar.bz2
-Source6: README.experimental
-Source7: hvloader-%{HVLOADER_COMMIT}.tar.gz
-Source8: hvloader-target.txt
+Source3: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
+Source4: jansson-2.13.1.tar.bz2
+Source5: README.experimental
+Source6: hvloader-%{HVLOADER_COMMIT}.tar.gz
+Source7: hvloader-target.txt
 
 # json description files
 Source10: 50-edk2-aarch64-qcow2.json
 Source11: 51-edk2-aarch64-raw.json
 Source12: 52-edk2-aarch64-verbose-qcow2.json
 Source13: 53-edk2-aarch64-verbose-raw.json
-
-Source20: 50-edk2-arm-verbose.json
 
 Source30: 30-edk2-ovmf-ia32-sb-enrolled.json
 Source31: 40-edk2-ovmf-ia32-sb.json
@@ -131,6 +135,7 @@ Patch0018: 0018-NetworkPkg-TcpDxe-Fixed-system-stuck-on-PXE-boot-flo.patch
 Patch0019: 0019-NetworkPkg-DxeNetLib-adjust-PseudoRandom-error-loggi.patch
 Patch0020: CVE-2024-38796.patch
 Patch0021: CVE-2025-2296.patch
+Patch0022: ArmVirtPkg_Increase_firmware_size.patch
 
 # Patches for the vendored OpenSSL are in the range from 1000 to 1999 (inclusive).
 Patch1000: CVE-2022-3996.patch
@@ -149,8 +154,6 @@ Patch1012: CVE-2025-69420.patch
 Patch1013: CVE-2025-69421.patch
 Patch1014: CVE-2026-22796.patch
 Patch1015: CVE-2025-69419.patch
-Patch1016: CVE-2026-28389.patch
-Patch1017: CVE-2026-28390.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -190,6 +193,11 @@ BuildRequires:  python3-pefile
 # endif build_ovmf
 %endif
 
+%ifarch x86_64
+%if %{build_aarch64}
+BuildRequires:  gcc-aarch64-linux-gnu
+%endif
+%endif
 
 %package ovmf
 Summary:    UEFI firmware for x86_64 virtual machines
@@ -217,6 +225,7 @@ and KVM.
 %package aarch64
 Summary:    UEFI firmware for aarch64 virtual machines
 BuildArch:  noarch
+BuildRequires:  python3-virt-firmware >= 24.2
 Provides:   AAVMF = %{version}-%{release}
 Obsoletes:  AAVMF < 20180508-100.gitee3198e672e2.el7
 
@@ -287,16 +296,6 @@ BuildArch:      noarch
 %description experimental
 EFI Development Kit II
 Open Virtual Machine Firmware (experimental builds)
-%endif
-
-%if %{with arm}
-%package arm
-Summary:        ARM Virtual Machine Firmware
-BuildArch:      noarch
-License:        Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND LicenseRef-Fedora-Public-Domain
-%description arm
-EFI Development Kit II
-ARMv7 UEFI Firmware
 %endif
 
 %if %{build_riscv64}
@@ -371,10 +370,9 @@ git commit -m 'add vendored openssl'
 cp -a -- %{SOURCE1} .
 
 # extract softfloat into place
-tar -xf %{SOURCE3} --strip-components=1 --directory ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3/
-tar -xf %{SOURCE4} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
+tar -xf %{SOURCE3} --strip-components=1 --wildcards "*/Drivers" "*/Features" "*/Platform" "*/Silicon"
 mkdir -p RedfishPkg/Library/JsonLib/jansson
-tar -xf %{SOURCE5} --strip-components=1 --directory RedfishPkg/Library/JsonLib/jansson
+tar -xf %{SOURCE4} --strip-components=1 --directory RedfishPkg/Library/JsonLib/jansson
 
 # include paths pointing to unused submodules
 mkdir -p MdePkg/Library/MipiSysTLib/mipisyst/library/include
@@ -387,9 +385,8 @@ mkdir -p SecurityPkg/DeviceSecurity/SpdmLib/libspdm/include
 chmod -Rf a+rX,u+w,g-w,o-w .
 
 cp -a -- \
-   %{SOURCE6} \
+   %{SOURCE5} \
    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
-   %{SOURCE20} \
    %{SOURCE30} %{SOURCE31} %{SOURCE32} \
    %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} \
    %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48} \
@@ -400,7 +397,7 @@ cp -a -- \
    .
 
 # extract hvloader source into place
-tar -xf %{SOURCE7} --directory MdeModulePkg/Application
+tar -xf %{SOURCE6} --directory MdeModulePkg/Application
 sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
 
 %build
@@ -504,6 +501,7 @@ done
 %endif
 
 %if %{build_aarch64}
+# gcc does not provide 32 bit arm cross compiler, so only building 64 bit targets
 ./edk2-build.py --config edk2-build.fedora %{?silent} --release-date "$RELEASE_DATE" -m armvirt
 ./edk2-build.py --config edk2-build.fedora.platforms %{?silent} -m aa64
 virt-fw-vars --input   Fedora/aarch64/vars-template-pflash.raw \
@@ -527,8 +525,8 @@ done
 
 source ./edksetup.sh
 make -C BaseTools
-cp %{SOURCE8} Conf/target.txt
-build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf
+cp %{SOURCE7} Conf/target.txt
+build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf -a %{edk2_arch}
 
 %install
 
@@ -554,7 +552,7 @@ install BaseTools/Scripts/GccBase.lds \
 # install firmware images
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -av Fedora/* %{buildroot}%{_datadir}/%{name}
-%if !%{with experimental}
+%if !%{with experimental} || "%{edk2_arch}" == "AARCH64"
 rm -rf %{buildroot}%{_datadir}/%{name}/experimental
 %endif
 
@@ -598,8 +596,6 @@ ln -s ../%{name}/aarch64/QEMU_EFI-silent-pflash.raw \
   %{buildroot}%{_datadir}/AAVMF/AAVMF_CODE.fd
 ln -s ../%{name}/aarch64/vars-template-pflash.raw \
   %{buildroot}%{_datadir}/AAVMF/AAVMF_VARS.fd
-ln -s ../%{name}/arm/QEMU_EFI-pflash.raw \
-   %{buildroot}%{_datadir}/AAVMF/AAVMF32_CODE.fd
 
 # json description files
 install -m 0644 \
@@ -607,9 +603,6 @@ install -m 0644 \
         51-edk2-aarch64-raw.json \
         52-edk2-aarch64-verbose-qcow2.json \
         53-edk2-aarch64-verbose-raw.json \
-        %{buildroot}%{_datadir}/qemu/firmware
-install -m 0644 \
-        50-edk2-arm-verbose.json \
         %{buildroot}%{_datadir}/qemu/firmware
 # endif build_aarch64
 %endif
@@ -629,7 +622,7 @@ done
 %endif
 
 mkdir -p %{buildroot}/boot/efi
-cp ./Build/MdeModule/RELEASE_GCC5/X64/MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader/OUTPUT/HvLoader.efi %{buildroot}/boot/efi
+cp ./Build/MdeModule/RELEASE_GCC5/%{edk2_arch}/MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader/OUTPUT/HvLoader.efi %{buildroot}/boot/efi
 
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
@@ -766,19 +759,6 @@ done
 %{_datadir}/%{name}/xen/*.fd
 %endif
 
-%if %{with arm}
-%files arm
-%common_files
-%dir %{_datadir}/AAVMF/
-%{_datadir}/AAVMF/AAVMF32_CODE.fd
-%dir %{_datadir}/%{name}/arm
-%{_datadir}/%{name}/arm/QEMU_EFI-pflash.raw
-%{_datadir}/%{name}/arm/QEMU_EFI.fd
-%{_datadir}/%{name}/arm/QEMU_VARS.fd
-%{_datadir}/%{name}/arm/vars-template-pflash.raw
-%{_datadir}/qemu/firmware/50-edk2-arm-verbose.json
-%endif
-
 %if %{build_riscv64}
 %files riscv64
 %common_files
@@ -812,6 +792,12 @@ done
 /boot/efi/HvLoader.efi
 
 %changelog
+* Wed May 06 2026 Sumedh Sharma <sumsharma@microsoft.com> - 20240524git3e722403cd16-17
+- Enable build_aarch64 to build arm64 firmware bins
+- Disable OVMF compilation on aarch64 hosts due to missing cross gcc-x86_64-linux-gnu
+- Remove 32bit arm compilation due to missing gcc compiler/cross-compiler
+- Add patch to increase default firmware size in ArmVirtPkg to 3Mb for debug package builds
+
 * Wed Apr 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-16
 - Patch for CVE-2026-28390, CVE-2026-28389
 
