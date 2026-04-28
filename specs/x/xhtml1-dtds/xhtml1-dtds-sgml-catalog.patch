@@ -1,0 +1,29 @@
+--- DTD/xhtml.soc~	2002-08-01 21:23:08.000000000 +0300
++++ DTD/xhtml.soc	2004-06-20 01:13:52.351585517 +0300
+@@ -1,14 +1,24 @@
+-OVERRIDE	YES
+         -- Oasis entity catalog for Extensible HTML 1.0 --
+ 
++-- Fedora change: use DTDDECLs instead of SGMLDECL to avoid affecting --
++--                other things included in the central system catalog --
++
++OVERRIDE	YES
++
+ PUBLIC  "-//W3C//DTD XHTML 1.0 Strict//EN"        "xhtml1-strict.dtd"
+ PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"  "xhtml1-transitional.dtd"
+ PUBLIC  "-//W3C//DTD XHTML 1.0 Frameset//EN"      "xhtml1-frameset.dtd"
++DTDDECL "-//W3C//DTD XHTML 1.0 Strict//EN"        "xhtml1.dcl"
++DTDDECL "-//W3C//DTD XHTML 1.0 Transitional//EN"  "xhtml1.dcl"
++DTDDECL "-//W3C//DTD XHTML 1.0 Frameset//EN"      "xhtml1.dcl"
+ 
+         -- ISO latin 1 entity set for Extensible HTML (XML 1.0 format) --
+ 
+ PUBLIC	"-//W3C//ENTITIES Latin 1 for XHTML//EN"  "xhtml-lat1.ent"
+ PUBLIC	"-//W3C//ENTITIES Symbols for XHTML//EN" "xhtml-symbol.ent"
+ PUBLIC	"-//W3C//ENTITIES Special for XHTML//EN" "xhtml-special.ent"
++DTDDECL	"-//W3C//ENTITIES Latin 1 for XHTML//EN" "xhtml1.dcl"
++DTDDECL	"-//W3C//ENTITIES Symbols for XHTML//EN" "xhtml1.dcl"
++DTDDECL	"-//W3C//ENTITIES Special for XHTML//EN" "xhtml1.dcl"
+ 
+-SGMLDECL "xhtml1.dcl"
++-- SGMLDECL "xhtml1.dcl" --

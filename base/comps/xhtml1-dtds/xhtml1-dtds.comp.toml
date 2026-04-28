@@ -1,0 +1,3 @@
+[components.xhtml1-dtds]
+# Release: %{date}.%{baserelease}%{?dist}
+release = { calculation = "manual" }
