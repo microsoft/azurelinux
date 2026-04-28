@@ -2,6 +2,15 @@
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
 
+[images.vm-base.tests]
+test-suites = [
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }

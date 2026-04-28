@@ -1,0 +1,17 @@
+[test-suites.lisa-main]
+description = "Lisa tests which are run by default"
+
+[test-suites.lisa-xfs]
+description = "Lisa xfs tests"
+
+[test-suites.lisa-perf]
+description = "Lisa perf tests"
+
+[test-suites.lisa-smoke]
+description = "Lisa smoke tests"
+
+[test-suites.lisa-cvm]
+description = "Lisa cvm tests"
+
+[test-suites.lisa-kernel-ltp]
+description = "Lisa kernel LTP tests"
