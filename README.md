@@ -29,6 +29,12 @@ After downloading the ISO, use [the quickstart instructions](toolkit/docs/quick_
 
 Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/azurelinux/issues) or create a new feature request by clicking [here](https://github.com/microsoft/azurelinux/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/azurelinux/blob/3.0/SUPPORT.md) file.
 
+### OCI
+
+There are also Azure Linux OCI images available to use or create your own images by referencing `mcr.microsoft.com/azurelinux/base/core:3.0` in your Containerfile. 
+
+See [here](https://mcr.microsoft.com/en-us/artifact/mar/azurelinux/base/core/about) which other tags are available.
+
 
 ## Getting Help
 - Bugs, feature requests and questions can be filed as GitHub issues.
