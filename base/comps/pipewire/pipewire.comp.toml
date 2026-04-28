@@ -1,0 +1,3 @@
+[components.pipewire]
+# Release: %{baserelease}%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+release = { calculation = "manual" }
