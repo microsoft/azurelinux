@@ -1,0 +1,39 @@
+From 8b6b10229201e5b148979a24e06c640dbbcfbad9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 20 Feb 2015 14:34:26 +0100
+Subject: [PATCH] Fix multilib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Do not set RPATH nor add explicit -L path to compiler.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+
+diff --git a/pcre2-config.in b/pcre2-config.in
+index 932160e..dbef5e5 100644
+--- a/pcre2-config.in
++++ b/pcre2-config.in
+@@ -28,19 +28,7 @@ if test $# -eq 0; then
+ fi
+ 
+ libR=
+-case `uname -s` in
+-  *SunOS*)
+-  libR=" -R@libdir@"
+-  ;;
+-  *BSD*)
+-  libR=" -Wl,-R@libdir@"
+-  ;;
+-esac
+-
+ libS=
+-if test @libdir@ != /usr/lib ; then
+-  libS=-L@libdir@
+-fi
+ 
+ while test $# -gt 0; do
+   case "$1" in
+-- 
+2.1.0
+
