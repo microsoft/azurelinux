@@ -1,0 +1,90 @@
+[components.mock-core-configs]
+
+# Bump release to reflect Azure Linux customizations.
+[[components.mock-core-configs.overlays]]
+description = "Bump Release to reflect Azure Linux customizations"
+type = "spec-update-tag"
+tag = "Release"
+value = "3%{?dist}"
+
+#
+# Add the Azure Linux 4.0 mock configs and template.
+# These files ship the chroot definition that lets users run
+# `mock <srpm>` on an Azure Linux 4.0 host and produce AZL4 RPMs.
+#
+
+[[components.mock-core-configs.overlays]]
+description = "Add Azure Linux 4.0 mock chroot template (azure-linux-4.tpl)"
+type = "file-add"
+file = "azure-linux-4.tpl"
+source = "azure-linux-4.tpl"
+
+[[components.mock-core-configs.overlays]]
+description = "Add Azure Linux 4.0 mock config for x86_64"
+type = "file-add"
+file = "azure-linux-4-x86_64.cfg"
+source = "azure-linux-4-x86_64.cfg"
+
+[[components.mock-core-configs.overlays]]
+description = "Add Azure Linux 4.0 mock config for aarch64"
+type = "file-add"
+file = "azure-linux-4-aarch64.cfg"
+source = "azure-linux-4-aarch64.cfg"
+
+# Register the new files as additional Sources so they land in the SRPM.
+# Use explicit source numbers (rather than positional `Source:`) so that
+# `%{SOURCE10}`/`%{SOURCE11}`/`%{SOURCE12}` references in %install stay correct
+# even if upstream adds or reorders sources. This is also what the Fedora
+# Packaging Guidelines recommend over `%{_sourcedir}/...` for robustness.
+# We offset to Source10+ so we have headroom in case upstream ever adds
+# additional low-numbered sources.
+[[components.mock-core-configs.overlays]]
+description = "Register azure-linux-4.tpl as Source10"
+type = "spec-insert-tag"
+tag = "Source10"
+value = "azure-linux-4.tpl"
+
+[[components.mock-core-configs.overlays]]
+description = "Register azure-linux-4-x86_64.cfg as Source11"
+type = "spec-insert-tag"
+tag = "Source11"
+value = "azure-linux-4-x86_64.cfg"
+
+[[components.mock-core-configs.overlays]]
+description = "Register azure-linux-4-aarch64.cfg as Source12"
+type = "spec-insert-tag"
+tag = "Source12"
+value = "azure-linux-4-aarch64.cfg"
+
+# Install the new config files into the buildroot. The upstream %install
+# auto-builds the %files manifest by find(1)-ing under %{buildroot}, but
+# since spec-append-lines runs us *after* that find we explicitly echo our
+# files into the same .cfgs manifest the spec uses for %files.
+[[components.mock-core-configs.overlays]]
+description = "Install Azure Linux 4.0 configs and add them to the %files manifest"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# Azure Linux 4.0 configs (added by azldev overlay).",
+    "install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/mock/templates/azure-linux-4.tpl",
+    "install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/mock/azure-linux-4-x86_64.cfg",
+    "install -m 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/mock/azure-linux-4-aarch64.cfg",
+    "echo \"%%config(noreplace) %{_sysconfdir}/mock/templates/azure-linux-4.tpl\" >> %{name}.cfgs",
+    "echo \"%%config(noreplace) %{_sysconfdir}/mock/azure-linux-4-x86_64.cfg\" >> %{name}.cfgs",
+    "echo \"%%config(noreplace) %{_sysconfdir}/mock/azure-linux-4-aarch64.cfg\" >> %{name}.cfgs",
+]
+
+# Override the fedora-derived $cfg value computed by upstream %post so that
+# default.cfg points at our azure-linux-* config. Since this RPM only ships
+# on Azure Linux, we don't need a build-time guard. We anchor on the
+# single-line existence-check that immediately follows the upstream %if
+# blocks (overlays don't support multi-line regexes) and inject our
+# assignment just before it; this also suppresses the otherwise-spurious
+# "fedora-4-x86_64.cfg does not exist" warning at install time.
+[[components.mock-core-configs.overlays]]
+description = "Set $cfg to azure-linux config in %post before existence check"
+type = "spec-search-replace"
+section = "%post"
+regex = 'if \[ -e %\{_sysconfdir\}/mock/\$cfg \]; then'
+replacement = "cfg=azure-linux-$ver-$mock_arch.cfg\n\nif [ -e %{_sysconfdir}/mock/$cfg ]; then"
