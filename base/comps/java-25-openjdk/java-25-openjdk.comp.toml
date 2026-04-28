@@ -1,4 +1,6 @@
 [components.java-25-openjdk]
+# Release: %{?eaprefix}%{rpmrelease}%{?extraver}%{?dist}
+release = { calculation = "manual" }
 # Current java-25 build requires java-25-openjdk-portable-sources version 25.0.20.0.10.
 # Fed43 portable rpm delivers 25.0.0.0.32. Fedora43 builds work with Fed42 rpm. To
 # unblock our build, we pin to the last Fedora 43 commit when version was 25.0.0.0.32.

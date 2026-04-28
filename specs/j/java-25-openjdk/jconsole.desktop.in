@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=OpenJDK @JAVA_VER@ for @target_cpu@ Monitoring & Management Console (@OPENJDK_VER@)
+Comment=Monitor and manage OpenJDK applications
+Exec=_SDKBINDIR_/jconsole
+Icon=java-@JAVA_VER@-@JAVA_VENDOR@
+Terminal=false
+Type=Application
+StartupWMClass=sun-tools-jconsole-JConsole
+Categories=Development;Profiling;Java;
+Version=1.0
