@@ -32,8 +32,8 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.134.1
-Release:        2%{?dist}
+Version:        6.6.135.2
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -460,6 +460,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Apr 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.135.2-1
+- Auto-upgrade to 6.6.135.2
+
 * Mon Apr 20 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.134.1-2
 - Enable CONFIG_IKCONFIG_PROC on arm64 for /proc/config.gz parity with x86_64
 
