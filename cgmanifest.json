@@ -25852,6 +25852,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python3.14",
+          "version": "3.14.4",
+          "downloadUrl": "https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "pytorch",
           "version": "2.2.2",
           "downloadUrl": "https://github.com/pytorch/pytorch/releases/download/v2.2.2/pytorch-v2.2.2.tar.gz"

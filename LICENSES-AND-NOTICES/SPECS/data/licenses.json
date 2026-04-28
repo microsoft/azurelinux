@@ -3177,6 +3177,7 @@
                 "coreos-cloudinit",
                 "coreos-init",
                 "python-nocaselist",
+                "python3.14",
                 "update-ssh-keys"
             ]
         },
