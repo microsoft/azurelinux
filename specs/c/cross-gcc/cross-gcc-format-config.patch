@@ -1,0 +1,27 @@
+--- gcc/config/m68k/m68k.cc.orig	2023-05-19 10:05:34.000000000 +0100
++++ gcc/config/m68k/m68k.cc	2023-06-08 12:22:09.168546535 +0100
+@@ -4992,7 +4992,7 @@
+   else if (letter == '/')
+     asm_fprintf (file, "%R");
+   else if (letter == '?')
+-    asm_fprintf (file, m68k_library_id_string);
++    asm_fprintf (file, "%s", m68k_library_id_string);
+   else if (letter == 'p')
+     {
+       output_addr_const (file, op);
+--- gcc/config/s390/s390.cc.orig	2023-05-19 10:05:34.000000000 +0100
++++ gcc/config/s390/s390.cc	2023-06-08 12:22:09.172546564 +0100
+@@ -8149,11 +8149,11 @@
+ 	}
+       return;
+     case 'C':
+-      fprintf (file, s390_branch_condition_mnemonic (x, FALSE));
++      fprintf (file, "%s", s390_branch_condition_mnemonic (x, FALSE));
+       return;
+ 
+     case 'D':
+-      fprintf (file, s390_branch_condition_mnemonic (x, TRUE));
++      fprintf (file, "%s", s390_branch_condition_mnemonic (x, TRUE));
+       return;
+ 
+     case 'E':
