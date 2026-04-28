@@ -1,0 +1,3 @@
+%__cmake_provides	%{_rpmconfigdir}/cmake.prov
+%__cmake_requires	%{_rpmconfigdir}/cmake.req
+%__cmake_path		^(%{_libdir}|%{_datadir})/cmake/.*/.*(Config\.cmake|-config\.cmake)$
