@@ -52,8 +52,10 @@ Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
-Provides:       nodejs24
 Provides:       nodejs
+Provides:       nodejs24
+Obsoletes:      nodejs < %{version}-%{release}
+Obsoletes:      nodejs24 < %{version}-%{release}
 
 Recommends: nodejs-full-i18n = %{version}-%{release}
 Provides: bundled(icu) = %{icu_version}
