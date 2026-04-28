@@ -1,0 +1,21 @@
+crt files and statically linked libgcc objects cause false positives
+in annobin coverage, so we add the assembler flag to generate notes
+for them.
+
+The patch also adds notes to libgcc_s.so, but this is harmless because
+these notes only confer that there is no other annobin markup.
+
+2018-07-25  Florian Weimer  <fweimer@redhat.com>
+
+	* config/t-linux (LIBGCC2_CFLAGS, CRTSTUFF_CFLAGS): Add
+	-Wa,--generate-missing-build-notes=yes.
+
+--- libgcc/config/t-linux	2022-12-15 19:25:20.581394950 +0100
++++ libgcc/config/t-linux	2023-03-21 22:00:37.054478562 +0100
+@@ -1,3 +1,6 @@
+ # Override t-slibgcc-elf-ver to export some libgcc symbols with
+ # the symbol versions that glibc used.
+ SHLIB_MAPFILES += $(srcdir)/config/libgcc-glibc.ver
++
++LIBGCC2_CFLAGS += -Wa,--generate-missing-build-notes=yes
++CRTSTUFF_CFLAGS += -Wa,--generate-missing-build-notes=yes

@@ -1,0 +1,3 @@
+[components.cross-gcc]
+# Release: %{cross_gcc_release}%{?dist}
+release = { calculation = "manual" }
