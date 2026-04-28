@@ -1,0 +1,3 @@
+[components.sbd]
+# Release: %{baserelease}%{?dist}
+release = { calculation = "manual" }

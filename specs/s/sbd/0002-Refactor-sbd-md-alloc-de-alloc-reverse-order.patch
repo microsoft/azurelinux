@@ -1,0 +1,56 @@
+From 48c9a11e5b4ace22011e51d4c5dcacaddf9bbc43 Mon Sep 17 00:00:00 2001
+From: Klaus Wenninger <klaus.wenninger@aon.at>
+Date: Fri, 3 Feb 2023 10:58:10 +0100
+Subject: [PATCH] Refactor: sbd-md: alloc/de-alloc reverse order
+
+Having de-allocation in the reverse order compared to
+allocation seems to make gcc-12 static analysis of
+dynamic-memory-management happy.
+---
+ src/sbd-md.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/sbd-md.c b/src/sbd-md.c
+index 7a37522..2a237ad 100644
+--- a/src/sbd-md.c
++++ b/src/sbd-md.c
+@@ -441,9 +441,9 @@ init_device(struct sbd_context *st)
+ 		}
+ 	}
+ 
+-out:	free(s_node);
++out:	free(s_mbox);
++	free(s_node);
+ 	free(s_header);
+-	free(s_mbox);
+ 	return(rc);
+ }
+ 
+@@ -556,9 +556,9 @@ slot_allocate(struct sbd_context *st, const char *name)
+ 		}
+ 	}
+ 
+-out:	free(s_node);
++out:	free(s_mbox);
++	free(s_node);
+ 	free(s_header);
+-	free(s_mbox);
+ 	return(rc);
+ }
+ 
+@@ -1279,11 +1279,10 @@ int servant_md(const char *diskname, int mode, const void* argp)
+ 		}
+ 	}
+  out:
+-	free(s_header);
+ 	free(s_node);
+ 	free(s_mbox);
++	free(s_header);
+ 	close_device(st);
+ 	exit(rc);
+ }
+ 
+-
+-- 
+2.39.0
+
