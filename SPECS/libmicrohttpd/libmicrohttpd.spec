@@ -66,11 +66,11 @@ Doxygen documentation for libmicrohttpd and some example source code
 make -C doc/doxygen fast
 
 %check
-# Skipping only HTTPS tests while preserving the rest of the test coverage
+# Skip only the https/ subdir tests for now.
 # Reason: TLS runtime issues, probable cause: curl built without gnutls
-pushd src/testcurl
-%make_build check SUBDIRS="."
-popd
+# drop-on-upgrade: remove this skip once upstream resolves the HTTPS failures.
+%make_build -C src/microhttpd check
+%make_build -C src/testcurl   check SUBDIRS="."   # skips the failing https/ subdir
 
 %install
 %make_install
