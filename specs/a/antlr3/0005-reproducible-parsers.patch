@@ -1,0 +1,42 @@
+Description: Replace the HashSets with LinkedHashSets to make the generated parsers reproducible
+Author: Emmanuel Bourg <ebourg@apache.org>
+Forwarded: no
+--- a/tool/src/main/antlr3/org/antlr/grammar/v3/DefineGrammarItemsWalker.g
++++ b/tool/src/main/antlr3/org/antlr/grammar/v3/DefineGrammarItemsWalker.g
+@@ -45,6 +45,7 @@
+ package org.antlr.grammar.v3;
+ import org.antlr.tool.*;
+ import java.util.HashSet;
++import java.util.LinkedHashSet;
+ import java.util.Set;
+ }
+ 
+@@ -279,7 +280,7 @@
+ throwsSpec returns [HashSet<String> exceptions]
+ @init
+ {
+-	$exceptions = new HashSet<String>();
++	$exceptions = new LinkedHashSet<String>();
+ }
+ 	:	^('throws' (ID {$exceptions.add($ID.text);})+ )
+ 	;
+@@ -556,7 +557,7 @@
+ 	if ( state.backtracking == 0 )
+ 	{
+ 		if ( grammar.buildAST() )
+-			currentRewriteRule.rewriteRefsDeep = new HashSet<GrammarAST>();
++			currentRewriteRule.rewriteRefsDeep = new LinkedHashSet<GrammarAST>();
+ 	}
+ }
+ 	:	^(	REWRITES
+@@ -582,8 +583,8 @@
+ 	{
+ 		// don't do if guessing
+ 		currentRewriteBlock=$start; // pts to BLOCK node
+-		currentRewriteBlock.rewriteRefsShallow = new HashSet<GrammarAST>();
+-		currentRewriteBlock.rewriteRefsDeep = new HashSet<GrammarAST>();
++		currentRewriteBlock.rewriteRefsShallow = new LinkedHashSet<GrammarAST>();
++		currentRewriteBlock.rewriteRefsDeep = new LinkedHashSet<GrammarAST>();
+ 	}
+ }
+ 	:   ^( BLOCK rewrite_alternative EOB )

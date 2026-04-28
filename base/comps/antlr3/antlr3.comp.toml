@@ -1,0 +1,3 @@
+[components.antlr3]
+# Release: %{baserelease}%{?dist}
+release = { calculation = "manual" }
