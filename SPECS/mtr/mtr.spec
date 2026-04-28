@@ -3,7 +3,7 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,7 +43,25 @@ export LDFLAGS="-z now -pie"
 echo "%{version}" > .tarball-version
 
 ./bootstrap.sh
+
+
+# Prefer ncursesw; if absent, fall back to ncurses.
+# Use pkg-config; set LIBS/CPPFLAGS so that the final link is deterministic.
+export PKG_CONFIG_PATH=%{_libdir}/pkgconfig:$PKG_CONFIG_PATH
+export LDFLAGS="-Wl,--as-needed -L%{_libdir} $LDFLAGS"
+
+if pkg-config --exists ncursesw ; then
+  echo ">> Using ncursesw (wide-char, ABI 6)"
+  export CPPFLAGS="$(pkg-config --cflags ncursesw) $CPPFLAGS"
+  export LIBS="$(pkg-config --libs   ncursesw) $LIBS"
+else
+  echo ">> Using ncurses (narrow)"
+  export CPPFLAGS="$(pkg-config --cflags ncurses) $CPPFLAGS"
+  export LIBS="$(pkg-config --libs   ncurses) $LIBS"
+fi
+
 %configure --without-gtk
+
 %make_build
 
 %install
@@ -62,6 +80,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Fri Nov 14 2025 Mayank Singh <mayansingh@microsoft.com> - 0.95-4
+- To fix ABI compatibility issues between libtinfo and libncurses which caues segfault, prefer ncursesw else fall back to ncurses.
+
 * Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-3
 - Patch for CVE-2025-49809
 
