@@ -1,0 +1,7 @@
+[components.gdb]
+
+[[components.gdb.overlays]]
+description = "Remove recommends: default-yama-scope"
+type = "spec-search-replace"
+regex = "^Recommends:\\s*default-yama-scope"
+replacement = "# Recommends: default-yama-scope"
