@@ -1,0 +1,46 @@
+From e93d9b5fdcd8e5744de629461c03a07de2252f8f Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Fri, 17 Apr 2020 12:59:44 +0200
+Subject: [PATCH] Remove unused OpenSSL config
+
+The build process will try to create these config files, even when
+using the system OpenSSL and will thus fail since we strip this path
+from the tarball.
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+Signed-off-by: rpm-build <rpm-build>
+---
+ node.gyp | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+diff --git a/node.gyp b/node.gyp
+index 1147495..da6ea50 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -822,23 +822,6 @@
+               ],
+             },
+           ],
+-         }, {
+-           'variables': {
+-              'opensslconfig_internal': '<(obj_dir)/deps/openssl/openssl.cnf',
+-              'opensslconfig': './deps/openssl/nodejs-openssl.cnf',
+-           },
+-           'actions': [
+-             {
+-               'action_name': 'reset_openssl_cnf',
+-               'inputs': [ '<(opensslconfig)', ],
+-               'outputs': [ '<(opensslconfig_internal)', ],
+-               'action': [
+-                 '<(python)', 'tools/copyfile.py',
+-                 '<(opensslconfig)',
+-                 '<(opensslconfig_internal)',
+-               ],
+-             },
+-           ],
+          }],
+       ],
+     }, # node_core_target_name
+-- 
+2.47.0
+

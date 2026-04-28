@@ -1,0 +1,5 @@
+#!/bin/sh
+# Determine `Requires: nodejs(abi)` version for native modules
+set -e
+
+printf 'nodejs(abi) = %s\n' "$(/usr/bin/node-@NODEJS_VERSION_MAJOR@ -p process.version.modules)"

@@ -1,0 +1,3 @@
+[components.nodejs24]
+# Release: %{node_release}
+release = { calculation = "manual" }
