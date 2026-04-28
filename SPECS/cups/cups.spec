@@ -9,7 +9,7 @@
 %bcond_with missing_dependencies
 Summary:        CUPS printing system
 Name:           cups
-Version:        2.4.18
+Version:        2.4.19
 Release:        1%{?dist}
 License:        ASL 2.0 with exceptions
 Vendor:         Microsoft Corporation
@@ -642,6 +642,9 @@ rm -f %{cups_serverbin}/backend/smb
 %{_mandir}/man7/ippeveps.7.gz
 
 %changelog
+* Tue Apr 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.19-1
+- Auto-upgrade to 2.4.19 - CVE-2026-41079
+
 * Wed Apr 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.18-1
 - Auto-upgrade to 2.4.18 - Fixed cupsd crash if user does not exist
 
