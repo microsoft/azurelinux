@@ -1,0 +1,3 @@
+[components.samba]
+# Release: %{samba_release}
+release = { calculation = "manual" }
