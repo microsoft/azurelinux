@@ -1,0 +1,3 @@
+[global]
+	usershare max shares = 100
+	usershare allow guests = yes
