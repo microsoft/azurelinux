@@ -643,7 +643,7 @@ rm -f %{cups_serverbin}/backend/smb
 
 %changelog
 * Tue Apr 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.19-1
-- Auto-upgrade to 2.4.19 - fixes a regression in shared printing from non-local accounts
+- Auto-upgrade to 2.4.19 - CVE-2026-41079
 
 * Wed Apr 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.18-1
 - Auto-upgrade to 2.4.18 - Fixed cupsd crash if user does not exist
