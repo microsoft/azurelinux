@@ -4,7 +4,15 @@ config_opts['use_bootstrap_image'] = False
 # General packages required
 # TODO: This will be moved into a comp.xml file.
 config_opts['chroot_setup_cmd'] = 'install'
-config_opts['chroot_setup_cmd'] += ' azurelinux-stage1-compat'
+
+#
+# We disable this for now; it's only required for stage2 builds that consume
+# dependencies from stage1. This config currently consumes dependencies from
+# stage2.
+#
+# config_opts['chroot_setup_cmd'] += ' azurelinux-stage1-compat'
+#
+
 config_opts['chroot_setup_cmd'] += ' bash'
 config_opts['chroot_setup_cmd'] += ' bzip2'
 config_opts['chroot_setup_cmd'] += ' coreutils'
@@ -79,9 +87,16 @@ module_platform_id=platform:f{{ releasever }}
 protected_packages=
 user_agent={{ user_agent }}
 
-[koji]
-name=koji
-baseurl=http://20.88.251.114/kojifiles/repos-dist/azl4-bootstrap-rpms-tag-20260405/latest/$basearch/
+[base]
+name=base
+baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch
 enabled=1
 skip_if_unavailable=False
+
+[sdk]
+name=sdk
+baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch
+enabled=1
+skip_if_unavailable=False
+
 """
