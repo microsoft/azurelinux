@@ -1,7 +1,7 @@
 Summary:        Open source antivirus engine
 Name:           clamav
 Version:        1.5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,9 @@ Source0:        https://github.com/Cisco-Talos/clamav/archive/refs/tags/%{name}-
 # Note: Required an updated cargo cache when rust was updated to 1.72.0, added "-rev2" to the filename to indicate the new cache for this
 # specific event. Revert back to the original filename when a new cache is created for a different version.
 Source1:        %{name}-%{version}-cargo.tar.gz
+Patch1000:      CVE-2026-33055.patch
+Patch1001:      CVE-2026-33056.patch
+
 BuildRequires:  bzip2-devel
 BuildRequires:  check-devel
 BuildRequires:  cmake
@@ -55,8 +58,9 @@ line scanner and an advanced tool for automatic database updates.
 mkdir -p $HOME
 pushd $HOME
 tar xf %{SOURCE1} --no-same-owner
+%autopatch -p1 -m 1000 -M 1100
 popd
-%autosetup -n clamav-clamav-%{version}
+%autosetup -N -n clamav-clamav-%{version}
 
 %build
 export CARGO_NET_OFFLINE=true
@@ -80,7 +84,12 @@ cmake \
 %cmake3_build
 
 %check
-%ctest3 -- -E valgrind
+# The build generates plain test files from .xor sources via xor_testfile.py,
+# but leaves the .xor files in the same directory. The unit test counts all
+# files starting with "clam" and asserts the count matches expected_testfiles.
+# Remove the .xor sources after build so only the decoded plain files remain.
+find unit_tests/input/clamav_hdb_scanfiles -name '*.xor' -delete
+/usr/bin/ctest --output-on-failure --force-new-ctest-process -j$(nproc) --exclude-regex _valgrind
 
 %install
 %cmake_install
@@ -143,7 +152,10 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Fri Mar 20 2026 Mayank Singh <mayansingh@microsoft.com> - 1.5.2-1
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.2-2
+- Patch for CVE-2026-33056, CVE-2026-33055
+
+* Wed Apr 08 2026 Mayank Singh <mayansingh@microsoft.com> - 1.5.2-1
 - upgrade to 1.5.2
 
 * Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.0.9-5
