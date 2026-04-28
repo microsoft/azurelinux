@@ -1,0 +1,12 @@
+diff -up rpm-4.9.90.git11486/scripts/find-lang.sh.no-man-dirs rpm-4.9.90.git11486/scripts/find-lang.sh
+--- rpm-4.9.90.git11486/scripts/find-lang.sh.no-man-dirs	2012-03-07 11:31:10.000000000 +0200
++++ rpm-4.9.90.git11486/scripts/find-lang.sh	2012-03-07 15:11:57.465801075 +0200
+@@ -181,7 +181,7 @@ s:%lang(C) ::
+ find "$TOP_DIR" -type d|sed '
+ s:'"$TOP_DIR"'::
+ '"$ALL_NAME$MAN"'s:\(.*/man/\([^/_]\+\).*/man[a-z0-9]\+/\)::
+-'"$ALL_NAME$MAN"'s:\(.*/man/\([^/_]\+\).*/man[a-z0-9]\+$\):%lang(\2) \1*:
++'"$ALL_NAME$MAN"'s:\(.*/man/\([^/_]\+\).*/man[a-z0-9]\+$\):%lang(\2) \1/*:
+ s:^\([^%].*\)::
+ s:%lang(C) ::
+ /^$/d' >> $MO_NAME
