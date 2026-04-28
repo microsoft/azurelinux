@@ -4,7 +4,7 @@
 
 Summary:       Converts documents in Markdown syntax to HTML
 Name:          rubygem-%{gem_name}
-Version:       2.2.7.1
+Version:       2.2.7.4
 Release:       1%{?dist}
 License:       MIT
 Vendor:	       Microsoft Corporation
@@ -31,6 +31,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Tue Apr 14 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.2.7.4-1
+- Auto-upgrade to 2.2.7.4 - for CVE-2026-35201
+
 * Wed Mar 13 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.2.7.1-1
 - Upgrade to 2.2.7.1 - azl3.0 
 

@@ -1,0 +1,72 @@
+From 149fdbbe765e0153a533d5bed653e7de16f8ad9b Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:36 -0500
+Subject: [PATCH 05/23] migration/block: Apply late-block-active behavior to
+ postcopy
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [4/22] 1ba47fc6bb9e3b244f75b2f29a89b9fd4014deea (kmwolf/centos-qemu-kvm)
+
+Postcopy never cared about late-block-active.  However there's no mention
+in the capability that it doesn't apply to postcopy.
+
+Considering that we _assumed_ late activation is always good, do that too
+for postcopy unconditionally, just like precopy.  After this patch, we
+should have unified the behavior across all.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-Id: <20241206230838.1111496-5-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit 61f2b489987c51159c53101a072c6aa901b50506)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ migration/savevm.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 6bb404b9c8..a0c4befdc1 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2156,22 +2156,21 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
+ 
+     trace_vmstate_downtime_checkpoint("dst-postcopy-bh-announced");
+ 
+-    /* Make sure all file formats throw away their mutable metadata.
+-     * If we get an error here, just don't restart the VM yet. */
+-    bdrv_activate_all(&local_err);
+-    if (local_err) {
+-        error_report_err(local_err);
+-        local_err = NULL;
+-        autostart = false;
+-    }
+-
+-    trace_vmstate_downtime_checkpoint("dst-postcopy-bh-cache-invalidated");
+-
+     dirty_bitmap_mig_before_vm_start();
+ 
+     if (autostart) {
+-        /* Hold onto your hats, starting the CPU */
+-        vm_start();
++        /*
++         * Make sure all file formats throw away their mutable metadata.
++         * If we get an error here, just don't restart the VM yet.
++         */
++        bdrv_activate_all(&local_err);
++        trace_vmstate_downtime_checkpoint("dst-postcopy-bh-cache-invalidated");
++        if (local_err) {
++            error_report_err(local_err);
++            local_err = NULL;
++        } else {
++            vm_start();
++        }
+     } else {
+         /* leave it paused and let management decide when to start the CPU */
+         runstate_set(RUN_STATE_PAUSED);
+-- 
+2.48.1
+

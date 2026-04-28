@@ -16,8 +16,8 @@
 
 Summary:        Linux Kernel for Kata UVM
 Name:           kernel-uvm
-Version:        6.6.96.mshv1
-Release:        3%{?dist}
+Version:        6.6.130.mshv1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -165,6 +165,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Tue Apr 21 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.130.mshv1-1
+- Upgrade to 6.6.130.mshv1
+
 * Tue Jan 13 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.96.mshv1-3
 - Enable xattr and other feature modules for CIFS and NFS
 
