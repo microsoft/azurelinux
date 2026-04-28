@@ -1,6 +1,6 @@
 [distros.azurelinux]
 description = "Azure Linux"
-default-version = "4.0-stage1"
+default-version = "4.0-stage2"
 
 #
 # Azure Linux 4.0 Stage1
