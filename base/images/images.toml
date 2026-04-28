@@ -32,7 +32,14 @@
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-base" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
 
 [images.vm-base.capabilities]
 machine-bootable = true
@@ -43,7 +50,14 @@ runtime-package-management = true
 [images.vm-base-dev]
 description = "VM Base Image (dev)"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-base-dev" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
 
 [images.vm-base-dev.capabilities]
 machine-bootable = true
@@ -52,7 +66,6 @@ systemd = true
 runtime-package-management = true
 
 # ---- container-base (core profile) -------------------------------------
-
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
@@ -114,6 +127,30 @@ definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", p
 # ============================================================================
 # Test suites
 # ============================================================================
+
+[test-suites.lisa-main]
+type = "lisa"
+description = "Lisa tests which are run by default"
+
+[test-suites.lisa-xfs]
+type = "lisa"
+description = "Lisa xfs tests"
+
+[test-suites.lisa-perf]
+type = "lisa"
+description = "Lisa perf tests"
+
+[test-suites.lisa-smoke]
+type = "lisa"
+description = "Lisa smoke tests"
+
+[test-suites.lisa-cvm]
+type = "lisa"
+description = "Lisa cvm tests"
+
+[test-suites.lisa-kernel-ltp]
+type = "lisa"
+description = "Lisa kernel LTP tests"
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]
