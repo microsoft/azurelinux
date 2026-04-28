@@ -1,0 +1,13 @@
+--- nokogiri-1.18.5/lib/nokogiri/version/info.rb.warn	2023-11-29 01:25:54.000000000 +0900
++++ nokogiri-1.18.5/lib/nokogiri/version/info.rb	2025-03-26 15:51:51.468291434 +0900
+@@ -70,6 +70,10 @@ module Nokogiri
+     end
+ 
+     def warnings
++        []
++    end
++
++    def warnings_original
+       warnings = []
+ 
+       if libxml2?

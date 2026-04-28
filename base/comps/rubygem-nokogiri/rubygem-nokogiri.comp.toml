@@ -1,0 +1,3 @@
+[components.rubygem-nokogiri]
+# Release: %{?prever:0.}%{baserelease}%{?prever:.%{prerpmver}}%{?dist}
+release = { calculation = "manual" }
