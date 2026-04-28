@@ -1,0 +1,84 @@
+From 98738d27288bd9ca634e29181ef665e812e7bbd3 Mon Sep 17 00:00:00 2001
+From: Michael Dawson <midawson@redhat.com>
+Date: Fri, 23 Feb 2024 13:43:56 +0100
+Subject: [PATCH] Disable FIPS options
+
+On RHEL, FIPS should be configured only on system level.
+Additionally, the related options may cause segfault when used on RHEL.
+
+This patch causes the option processing to end sooner
+than the problematic code gets executed.
+Additionally, the JS-level options to mess with FIPS settings
+are similarly disabled.
+
+Upstream report: https://github.com/nodejs/node/pull/48950
+RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=2226726
+---
+ lib/crypto.js             | 10 ++++++++++
+ lib/internal/errors.js    |  6 ++++++
+ src/crypto/crypto_util.cc |  2 ++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/lib/crypto.js b/lib/crypto.js
+index 41adecc..b2627ac 100644
+--- a/lib/crypto.js
++++ b/lib/crypto.js
+@@ -36,7 +36,10 @@ const {
+ assertCrypto();
+
+ const {
++  // RHEL specific error
++  ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED,
++
+   ERR_CRYPTO_FIPS_FORCED,
+   ERR_WORKER_UNSUPPORTED_OPERATION,
+ } = require('internal/errors').codes;
+ const constants = internalBinding('constants').crypto;
+@@ -251,6 +254,13 @@ function getFips() {
+ }
+ 
+ function setFips(val) {
++  // in RHEL FIPS enable/disable should only be done at system level
++  if (getFips() != val) {
++    throw new ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED();
++  } else {
++    return;
++  }
++
+   if (getOptionValue('--force-fips')) {
+     if (val) return;
+     throw new ERR_CRYPTO_FIPS_FORCED();
+diff --git a/lib/internal/errors.js b/lib/internal/errors.js
+index a722360..04d8a53 100644
+--- a/lib/internal/errors.js
++++ b/lib/internal/errors.js
+@@ -1111,6 +1111,12 @@ module.exports = {
+ //
+ // Note: Node.js specific errors must begin with the prefix ERR_
+ 
++// insert RHEL specific erro
++E('ERR_CRYPTO_FIPS_SYSTEM_CONTROLLED',
++  'Cannot set FIPS mode. FIPS should be enabled/disabled at system level. See' +
++  'https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/security_hardening/assembly_installing-the-system-in-fips-mode_security-hardening for more details.\n',
++  Error);
++
+ E('ERR_ACCESS_DENIED',
+   function(msg, permission = '', resource = '') {
+     this.permission = permission;
+diff --git a/src/crypto/crypto_util.cc b/src/crypto/crypto_util.cc
+index 5734d8f..ef9d1b1 100644
+--- a/src/crypto/crypto_util.cc
++++ b/src/crypto/crypto_util.cc
+@@ -121,6 +121,8 @@ bool ProcessFipsOptions() {
+   /* Override FIPS settings in configuration file, if needed. */
+   if (per_process::cli_options->enable_fips_crypto ||
+       per_process::cli_options->force_fips_crypto) {
++      fprintf(stderr, "ERROR: Using options related to FIPS is not recommended, configure FIPS in openssl instead. See https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/security_hardening/assembly_installing-the-system-in-fips-mode_security-hardening for more details.\n");
++      return false;
+ #if OPENSSL_VERSION_MAJOR >= 3
+     OSSL_PROVIDER* fips_provider = OSSL_PROVIDER_load(nullptr, "fips");
+     if (fips_provider == nullptr)
+-- 
+2.43.2
+
+
