@@ -1,0 +1,3 @@
+[components.elfutils]
+# Release: %{baserelease}%{?dist}
+release = { calculation = "manual" }
