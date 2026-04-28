@@ -61,8 +61,8 @@ sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
-* Tue Apr 28 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 3.0.5-3
--Applied sed-based fix in %check to remove redundant backslash (E502) in IpythonMagic.py, enabling TestCodeFormat to pass successfully.
+* Tue Apr 28 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.0.5-3
+- Applied sed-based fix in %check to remove redundant backslash (E502) in IpythonMagic.py, enabling TestCodeFormat to pass successfully.
 
 * Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
 - Switch to test-requirements-312.txt
