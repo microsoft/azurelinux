@@ -11,6 +11,22 @@ Release:        1%{?dist}
 Summary:        Simple cloud provider agent
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+# (Apache-2.0 OR MIT) AND BSD-3-Clause
+# 0BSD
+# Apache-2.0
+# Apache-2.0 OR BSL-1.0
+# Apache-2.0 OR ISC OR MIT
+# Apache-2.0 OR MIT
+# Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
+# BSD-2-Clause OR Apache-2.0 OR MIT
+# BSD-3-Clause
+# MIT
+# MIT OR Apache-2.0
+# MIT OR Apache-2.0 OR Zlib
+# MPL-2.0 OR MIT OR Apache-2.0
+# Unlicense OR MIT
+# Zlib
+# Zlib OR Apache-2.0 OR MIT
 License:        Apache-2.0 AND 0BSD AND BSD-3-Clause AND MIT AND (Apache-2.0 OR BSL-1.0) AND (Apache-2.0 OR MIT) AND (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT) AND (MIT OR Apache-2.0 OR Zlib) AND (MPL-2.0 OR MIT OR Apache-2.0) AND (Unlicense OR MIT) AND Zlib
 URL:            https://crates.io/crates/%{crate}
 Source0:        https://github.com/coreos/%{crate}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -39,24 +55,6 @@ A simple cloud provider agent.}
 
 %package     -n %{crate}
 Summary:        %{summary}
-
-# (Apache-2.0 OR MIT) AND BSD-3-Clause
-# 0BSD
-# Apache-2.0
-# Apache-2.0 OR BSL-1.0
-# Apache-2.0 OR ISC OR MIT
-# Apache-2.0 OR MIT
-# Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
-# BSD-2-Clause OR Apache-2.0 OR MIT
-# BSD-3-Clause
-# MIT
-# MIT OR Apache-2.0
-# MIT OR Apache-2.0 OR Zlib
-# MPL-2.0 OR MIT OR Apache-2.0
-# Unlicense OR MIT
-# Zlib
-# Zlib OR Apache-2.0 OR MIT
-License:        Apache-2.0 AND 0BSD AND BSD-3-Clause AND MIT AND (Apache-2.0 OR BSL-1.0) AND (Apache-2.0 OR MIT) AND (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT) AND (MIT OR Apache-2.0 OR Zlib) AND (MPL-2.0 OR MIT OR Apache-2.0) AND (Unlicense OR MIT) AND Zlib
 
 %{?systemd_requires}
 
