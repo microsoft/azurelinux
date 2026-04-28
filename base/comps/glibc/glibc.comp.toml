@@ -1,0 +1,3 @@
+[components.glibc]
+# Release: %{baserelease}%{?dist}
+release = { calculation = "manual" }
