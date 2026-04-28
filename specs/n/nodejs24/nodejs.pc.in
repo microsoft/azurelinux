@@ -1,0 +1,9 @@
+prefix=@PREFIX@
+includedir=@INCLUDEDIR@
+libdir=@LIBDIR@
+
+Name: @PKGCONFNAME@
+Description: JavaScript Runtime
+Version: @NODEJS_VERSION@
+Libs: -L${libdir} -lnode
+Cflags: -I${includedir}/node
