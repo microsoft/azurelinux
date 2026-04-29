@@ -4,11 +4,12 @@
 # Project-wide default: unless otherwise specified, packages are published to sdk.
 #
 # Group overrides are split into separate files:
-#   base.packages.toml            -> rpm-base
-#   base-sibling.packages.toml    -> rpm-sdk
-#   sdk.packages.toml             -> rpm-sdk
-#   sdk-sibling.packages.toml     -> rpm-sdk
-#   todo.packages.toml            -> rpm-sdk
+#   base.packages.toml       -> rpm-base   (intentional, fully supported)
+#   sdk.packages.toml        -> rpm-sdk    (everything else: built but unsupported)
+#   exceptions.packages.toml -> rpm-sdk    (curated carve-outs from base SRPMs)
+#
+# Policy: every binary RPM produced by an SRPM must publish to the same channel,
+# unless that subpackage is explicitly carved out in `exceptions.packages.toml`.
 #
 
 includes = ["*.packages.toml"]
