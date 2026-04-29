@@ -2,13 +2,14 @@
 Summary:        Python templating language
 Name:           python-mako
 Version:        1.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://www.makotemplates.org/
 Source0:        https://github.com/sqlalchemy/mako/archive/refs/tags/rel_%{version_tag}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-41205.patch
 BuildArch:      noarch
 
 %if %{with_check}
@@ -58,6 +59,9 @@ tox -e py%{python3_version_nodots}
 %{_bindir}/mako-render3
 
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.2-3
+- Patch for CVE-2026-41205
+
 * Wed Sep 28 2022 Nicolas Guibourge <nicolasg@microsoft.com> - 1.2.2-2
 - Add missing run time dependencies (python3-pygments and python3-markupsafe)
 
