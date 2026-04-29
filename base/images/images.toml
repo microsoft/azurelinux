@@ -1,10 +1,24 @@
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.vm-base.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
 
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.container-base.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = true
 
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
@@ -21,3 +35,26 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 [images.wsl]
 description = "WSL Image"
 definition = { type = "kiwi", path = "wsl/wsl.kiwi" }
+
+# ---- Test suites ----
+
+# Single shared pytest suite for static (offline) image validation.
+[test-suites.static-image-checks]
+type = "pytest"
+description = "Offline image validation (shared + image-specific tests)"
+
+[test-suites.static-image-checks.pytest]
+working-dir = "tests"
+install = "pyproject"
+test-paths = ["cases/"]
+# {capabilities} is substituted by azldev as a comma-separated list of
+# the names of capabilities set to `true` for the image (e.g.
+# "machine-bootable,systemd,runtime-package-management"). Names use
+# the same dash-case form declared above. The pytest plugin parses
+# this string into a set; @pytest.mark.require_capability("...") tests
+# that don't match are skipped.
+extra-args = [
+    "--image-path", "{image-path}",
+    "--image-name", "{image-name}",
+    "--capabilities", "{capabilities}",
+]
