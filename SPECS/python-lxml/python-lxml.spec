@@ -3,7 +3,7 @@
 Summary:        XML and HTML with Python
 Name:           python-lxml
 Version:        4.9.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 # Test suite (and only the test suite) is GPLv2+
 License:        BSD and GPLv2+
 Vendor:         Microsoft Corporation
@@ -11,6 +11,7 @@ Distribution:   Azure Linux
 URL:            https://lxml.de
 Source0:        https://github.com/lxml/lxml/releases/download/lxml-%{version}/lxml-%{version}.tar.gz
 Patch0:         noexcept.patch
+Patch1:         CVE-2026-41066.patch
 BuildRequires:  libxslt-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  python3-Cython
@@ -34,6 +35,7 @@ ElementTree API.
 
 %prep
 %setup -n lxml-%{version}
+%patch 1 -p1
 patch -Np1 --ignore-whitespace < %{PATCH0}
 
 %build
@@ -53,6 +55,9 @@ make test
 %{python3_sitelib}/*
 
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.9.3-2
+- Patch for CVE-2026-41066
+
 * Fri Nov 10 2023 Andrew Phelps <anphel@microsoft.com> - 4.9.3-1
 - Upgrade to version 4.9.3
 
