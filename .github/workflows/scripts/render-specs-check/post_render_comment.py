@@ -124,7 +124,7 @@ def format_comment(
 
     lines: list[str] = [
         COMMENT_MARKER,
-        "## ❌ Rendered specs are out of date",
+        "## 📄❌ Rendered specs are out of date",
         "",
         "🚧🚧🚧🚧🚧",
         "",

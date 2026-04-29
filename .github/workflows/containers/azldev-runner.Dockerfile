@@ -24,6 +24,7 @@ RUN tdnf -y install \
     ca-certificates \
     git \
     golang \
+    jq \
     mock \
     mock-rpmautospec \
     openssl \
