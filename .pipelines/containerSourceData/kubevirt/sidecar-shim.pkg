@@ -1,0 +1,4 @@
+ca-certificates
+kubevirt-sidecar-shim
+python3
+shadow-utils
