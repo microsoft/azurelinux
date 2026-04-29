@@ -40,7 +40,43 @@ Known HWE packages: `mlnx-ofa_kernel-hwe`, `iser-hwe`, `isert-hwe`, `knem-hwe`, 
 
 ## Upgrade Workflow
 
-When asked to upgrade a DOCA package, follow these steps:
+When asked to upgrade a DOCA package (single or batch), follow these steps. For batch upgrades (all packages in a DOCA release), start with Phase 0. For single-package upgrades, skip to Phase 1.
+
+### Phase 0: Inventory (batch upgrade only)
+
+When upgrading **all** DOCA OFED packages (or "the whole DOCA release"), first build an inventory before processing individual packages.
+
+1. **Download both tarballs** (old and new DOCA versions) to `/tmp/doca-ofed/`.
+2. **List all SRPMs** in each tarball:
+   ```bash
+   tar tzf <tarball> | grep '\.src\.rpm$' | sed 's|.*/||' | sort
+   ```
+3. **Extract package names** from SRPM filenames. The package name is the part before the version number (e.g., `mlnx-ofa_kernel` from `mlnx-ofa_kernel-25.10-OFED.25.10.2.4.1.1.src.rpm`).
+4. **Categorize packages** into three groups:
+
+   | Category | Condition | Action |
+   |----------|-----------|--------|
+   | **Existing** | SRPM in both old & new, AND `SPECS/<pkg>/` exists | Upgrade: apply Phases 1–4 |
+   | **Removed** | SRPM in old but NOT in new | Remove: see Phase 4c |
+   | **New** | SRPM in new but NOT in old, OR in new but no `SPECS/<pkg>/` | Add: see Phase 4b |
+
+5. **Identify HWE packages**: For each kernel module package in the upgrade list, check if `SPECS/<pkg>-hwe/` exists. If so, add its HWE variant to the upgrade list.
+   ```bash
+   for pkg in <kernel-module-packages>; do
+     [ -d "SPECS/${pkg}-hwe" ] && echo "HWE: ${pkg}-hwe"
+   done
+   ```
+
+6. **Present the inventory** to the user and ask for confirmation before proceeding. Example:
+   ```
+   Packages to UPGRADE (22): mlnx-ofa_kernel, ofed-scripts, mlnx-tools, ...
+   HWE packages to UPGRADE (8): mlnx-ofa_kernel-hwe, iser-hwe, isert-hwe, ...
+   Packages to ADD (5): clusterkit, dpcp, ibutils2, mlnx-dpdk, sharp
+   Packages to REMOVE (2): xpmem-lib, mpitests
+   Packages SKIPPED (in repo but not from DOCA): opensm, ...
+   ```
+
+Then proceed to Phase 1 for each **existing** package, one at a time. After all existing packages are upgraded, proceed to Phase 4b for new packages and Phase 4c for removals.
 
 ### Phase 1: Download and Extract
 
@@ -208,6 +244,58 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
     - Was it upstream code that the new version intentionally changed? → Keep the new version
     - Was it upstream code that AzureLinux intentionally removed? → Keep it removed
 
+### Phase 4b: Add New Packages (batch upgrade only)
+
+For packages in the new tarball but with no `SPECS/<pkg>/` directory:
+
+1. Extract the SRPM from the new tarball.
+2. Extract the SPEC file and source tarball from the SRPM.
+3. **Create `SPECS/<pkg>/` directory**.
+4. **Adapt the upstream SPEC** with AzureLinux conventions. Since there are no previous customizations, apply the standard set:
+
+   **Package metadata (all packages):**
+   - `Name:` — use literal package name (not `%{_name}`)
+   - `Version:` — use literal version (not `%{_version}`)
+   - `Release:` — `1%{?dist}` (or `1%{release_suffix}%{?dist}` if it's a kernel module)
+   - `Source0:` — `%{_distro_sources_url}/<name>-<version>.tgz` (match the actual tarball filename)
+   - `Vendor:` — `Microsoft Corporation`
+   - `Distribution:` — `Azure Linux`
+   - `BuildRoot:` — `/var/tmp/%{name}-%{version}-build`
+   - Remove any `%{!?_version: ...}` and `%{!?_name: ...}` macro defaults
+   - Remove DKMS subpackages (`%package dkms`, `%files dkms`, etc.)
+   - Remove `%bcond_with building_kmods` — unwrap conditional, keep kmod path, drop else
+   - Add `%license` tags where applicable (`COPYING`, `LICENSE`, or `debian/copyright`)
+   - Add `%changelog`:
+     ```
+     * <date> Azure Linux Team - <version>-1
+     - Initial Azure Linux import from NVIDIA (license: <license>)
+     - License verified
+     ```
+
+   **Additional for kernel module packages** (iser, isert, srp, knem, mlnx-nfsrdma, mlnx-nvme, virtiofs, and any package building `.ko` files):
+   - Add the `%if 0%{azl}` kernel version macros block
+   - Add `BuildRequires: kernel-devel = %{target_kernel_version_full}`, `kernel-headers`
+   - Add `%ifarch x86_64` guards around module install/files sections
+   - Add `-fno-exceptions` CFLAGS
+   - Use `%setup -n %{_name}-%{version}` (not `%{_version}`)
+
+5. **Copy source tarball** to `SPECS/<pkg>/`.
+6. **Generate `<pkg>.signatures.json`** with SHA256 hash.
+
+### Phase 4c: Remove Obsolete Packages (batch upgrade only)
+
+For packages in the old tarball but absent from the new:
+
+1. **Confirm with the user** before deleting:
+   > The following packages are no longer in DOCA <new_version>: xpmem-lib, mpitests. Remove their SPECS directories?
+2. If confirmed, delete `SPECS/<pkg>/` directories.
+
+### Phase 4d: Handle Edge Cases (batch upgrade only)
+
+- **Packages in repo but NOT from DOCA OFED**: Some packages (e.g., `opensm`, `rdma-core`) may exist in the repo independently. If a package exists in the repo but was NOT in the old DOCA tarball, do NOT touch it unless it also appears in the new tarball — ask the user whether to upgrade from DOCA or keep the existing version.
+- **Package name mismatches**: Some SRPMs have names that don't match the `SPECS/` directory name exactly. Always verify with `ls SPECS/ | grep <pkg>`.
+- **Source tarball naming**: The tarball inside the SRPM may use different naming patterns. Always extract and check the actual filename.
+
 ### Phase 5: Build Validation
 
 16. **Prepare the toolchain** (once per session):
@@ -253,9 +341,9 @@ If the package being upgraded is a kernel module and has a corresponding `SPECS/
 - ALWAYS preserve the full AzureLinux changelog history
 - ALWAYS use `/tmp/doca-ofed/` as the working directory for downloads and extraction
 
-## Output (Single Package)
+## Output
 
-After completing a single-package upgrade, report:
+After completing an upgrade, report:
 - Old version → New version
 - DOCA version (old → new)
 - Files changed in `SPECS/<package>/`
@@ -263,122 +351,7 @@ After completing a single-package upgrade, report:
 - Any customizations that were dropped because they became irrelevant
 - Any new upstream changes that may need attention
 
----
-
-## Batch Upgrade: All Packages in a DOCA OFED Release
-
-When asked to upgrade **all** DOCA OFED packages (or upgrade "the whole DOCA release"), follow this expanded workflow.
-
-### Batch Phase 0: Inventory
-
-1. **Download both tarballs** (old and new DOCA versions) to `/tmp/doca-ofed/`.
-2. **List all SRPMs** in each tarball:
-   ```bash
-   tar tzf <tarball> | grep '\.src\.rpm$' | sed 's|.*/||' | sort
-   ```
-3. **Extract package names** from SRPM filenames. The package name is the part before the version number (e.g., `mlnx-ofa_kernel` from `mlnx-ofa_kernel-25.10-OFED.25.10.2.4.1.1.src.rpm`).
-4. **Categorize packages** into three groups:
-
-   | Category | Condition | Action |
-   |----------|-----------|--------|
-   | **Existing** | SRPM in both old & new, AND `SPECS/<pkg>/` exists | Upgrade: apply customization workflow |
-   | **Removed** | SRPM in old but NOT in new | Remove: delete `SPECS/<pkg>/` (confirm with user) |
-   | **New** | SRPM in new but NOT in old, OR in new but no `SPECS/<pkg>/` | Add: create new package with AzureLinux conventions |
-
-5. **Identify HWE packages**: For each kernel module package in the upgrade list, check if `SPECS/<pkg>-hwe/` exists. If so, add its HWE variant to the upgrade list.
-   ```bash
-   for pkg in <kernel-module-packages>; do
-     [ -d "SPECS/${pkg}-hwe" ] && echo "HWE: ${pkg}-hwe"
-   done
-   ```
-
-6. **Present the inventory** to the user and ask for confirmation before proceeding. Example:
-   ```
-   Packages to UPGRADE (22): mlnx-ofa_kernel, ofed-scripts, mlnx-tools, ...
-   HWE packages to UPGRADE (8): mlnx-ofa_kernel-hwe, iser-hwe, isert-hwe, ...
-   Packages to ADD (5): clusterkit, dpcp, ibutils2, mlnx-dpdk, sharp
-   Packages to REMOVE (2): xpmem-lib, mpitests
-   Packages SKIPPED (in repo but not from DOCA): opensm, ...
-   ```
-
-### Batch Phase 1: Process Each Existing Package
-
-For each package that exists in both tarballs and in the AzureLinux repo:
-
-1. Extract old and new SRPMs from the tarballs.
-2. Extract SPEC files and source tarballs from both SRPMs.
-3. Read the AzureLinux repo SPEC.
-4. Follow the **single-package upgrade workflow** (Phases 2-4 above).
-5. Process packages one at a time, marking progress with the todo list.
-
-### Batch Phase 1b: Upgrade HWE Packages
-
-After upgrading all non-HWE kernel module packages, upgrade their HWE variants:
-
-1. For each upgraded kernel module package, check if `SPECS/<pkg>-hwe/` exists.
-2. Read the HWE SPEC and the already-upgraded non-HWE SPEC as reference.
-3. Apply version/release updates to the HWE SPEC, preserving HWE-specific differences.
-4. Update `<pkg>-hwe.signatures.json` (same tarball hash as non-HWE).
-5. Add changelog entry.
-6. Do NOT copy a source tarball — HWE shares via `%{_distro_sources_url}`.
-
-Process order: `mlnx-ofa_kernel-hwe` first (base), then all others.
-
-### Batch Phase 2: Add New Packages
-
-For packages in the new tarball but with no `SPECS/<pkg>/` directory:
-
-1. Extract the SRPM from the new tarball.
-2. Extract the SPEC file and source tarball from the SRPM.
-3. **Create `SPECS/<pkg>/` directory**.
-4. **Adapt the upstream SPEC** with AzureLinux conventions. Since there are no previous customizations, apply the standard set:
-
-   **Package metadata (all packages):**
-   - `Name:` — use literal package name (not `%{_name}`)
-   - `Version:` — use literal version (not `%{_version}`)
-   - `Release:` — `1%{?dist}` (or `1%{release_suffix}%{?dist}` if it's a kernel module)
-   - `Source0:` — `%{_distro_sources_url}/<name>-<version>.tgz` (match the actual tarball filename)
-   - `Vendor:` — `Microsoft Corporation`
-   - `Distribution:` — `Azure Linux`
-   - `BuildRoot:` — `/var/tmp/%{name}-%{version}-build`
-   - Remove any `%{!?_version: ...}` and `%{!?_name: ...}` macro defaults
-   - Remove DKMS subpackages (`%package dkms`, `%files dkms`, etc.)
-   - Remove `%bcond_with building_kmods` — unwrap conditional, keep kmod path, drop else
-   - Add `%license` tags where applicable (`COPYING`, `LICENSE`, or `debian/copyright`)
-   - Add `%changelog`:
-     ```
-     * <date> Azure Linux Team - <version>-1
-     - Initial Azure Linux import from NVIDIA (license: <license>)
-     - License verified
-     ```
-
-   **Additional for kernel module packages** (iser, isert, srp, knem, mlnx-nfsrdma, mlnx-nvme, virtiofs, and any package building `.ko` files):
-   - Add the `%if 0%{azl}` kernel version macros block
-   - Add `BuildRequires: kernel-devel = %{target_kernel_version_full}`, `kernel-headers`
-   - Add `%ifarch x86_64` guards around module install/files sections
-   - Add `-fno-exceptions` CFLAGS
-   - Use `%setup -n %{_name}-%{version}` (not `%{_version}`)
-
-5. **Copy source tarball** to `SPECS/<pkg>/`.
-6. **Generate `<pkg>.signatures.json`** with SHA256 hash.
-
-### Batch Phase 3: Remove Obsolete Packages
-
-For packages in the old tarball but absent from the new:
-
-1. **Confirm with the user** before deleting:
-   > The following packages are no longer in DOCA <new_version>: xpmem-lib, mpitests. Remove their SPECS directories?
-2. If confirmed, delete `SPECS/<pkg>/` directories.
-
-### Batch Phase 4: Handle Edge Cases
-
-- **Packages in repo but NOT from DOCA OFED**: Some packages (e.g., `opensm`, `rdma-core`) may exist in the repo independently. If a package exists in the repo but was NOT in the old DOCA tarball, do NOT touch it unless it also appears in the new tarball — ask the user whether to upgrade from DOCA or keep the existing version.
-- **Package name mismatches**: Some SRPMs have names that don't match the `SPECS/` directory name exactly. Always verify with `ls SPECS/ | grep <pkg>`.
-- **Source tarball naming**: The tarball inside the SRPM may use different naming patterns. Always extract and check the actual filename.
-
-### Batch Output
-
-After completing a batch upgrade, report a summary table:
+For **batch upgrades**, additionally report a summary table:
 
 ```
 | Package | Action | Old Version | New Version | Notes |
