@@ -7672,12 +7672,6 @@ packages = [
     "urw-base35-p052-fonts", # srpm: urw-base35-fonts
     "urw-base35-standard-symbols-ps-fonts", # srpm: urw-base35-fonts
     "urw-base35-z003-fonts", # srpm: urw-base35-fonts
-    "usbguard", # srpm: usbguard
-    "usbguard-dbus", # srpm: usbguard
-    "usbguard-devel", # srpm: usbguard
-    "usbguard-notifier", # srpm: usbguard-notifier
-    "usbguard-selinux", # srpm: usbguard
-    "usbguard-tools", # srpm: usbguard
     "usbredir", # srpm: usbredir
     "usbredir-devel", # srpm: usbredir
     "usbredir-tools", # srpm: usbredir
