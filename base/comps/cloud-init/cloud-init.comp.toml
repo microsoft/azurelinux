@@ -25,6 +25,18 @@ source = "add-azurelinux-to-systemd-templates.patch"
 file = "add-azurelinux-to-systemd-templates.patch"
 
 [[components.cloud-init.overlays]]
+description = "Update cloud.cfg template"
+type = "spec-add-tag"
+tag = "Patch"
+value = "update-cloud-cfg.patch"
+
+[[components.cloud-init.overlays]]
+description = "Update cloud.cfg template"
+type = "file-add"
+source = "update-cloud-cfg.patch"
+file = "update-cloud-cfg.patch"
+
+[[components.cloud-init.overlays]]
 description = "Set variant to azurelinux"
 type = "spec-search-replace"
 regex = 'python3 tools/render-template --variant %{\?rhel:rhel}%{!\?rhel:fedora}'

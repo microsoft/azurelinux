@@ -1,0 +1,88 @@
+diff -urpN a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+--- a/config/cloud.cfg.tmpl	2025-08-12 15:00:58.000000000 -0400
++++ b/config/cloud.cfg.tmpl	2026-04-29 09:28:48.926666115 -0400
+@@ -13,7 +13,6 @@
+                  "raspberry-pi-os": "Raspberry Pi OS",
+                  "ubuntu": "Ubuntu", "unknown": "Ubuntu"}) %}
+ {% set groups = ({"alpine": "adm, wheel", "aosc": "wheel", "arch": "wheel, users",
+-                  "azurelinux": "wheel",
+                   "debian": "adm, audio, cdrom, dialout, dip, floppy, netdev, plugdev, sudo, video",
+                   "gentoo": "users, wheel", "mariner": "wheel",
+                   "photon": "wheel",
+@@ -25,7 +24,7 @@
+ {% set shells = ({"alpine": "/bin/ash", "dragonfly": "/bin/sh",
+                   "freebsd": "/bin/tcsh", "netbsd": "/bin/sh",
+                   "openbsd": "/bin/ksh"}) %}
+-{% set usernames = ({"amazon": "ec2-user", "centos": "cloud-user",
++{% set usernames = ({"amazon": "ec2-user", "azurelinux": "azureuser", "centos": "cloud-user",
+                      "openmandriva": "omv", "raspberry-pi-os": "pi",
+                      "rhel": "cloud-user",
+                      "unknown": "ubuntu"}) %}
+@@ -61,7 +60,7 @@ disable_root: false
+ disable_root: true
+ {% endif %}
+ 
+-{%- if variant in ["alpine", "amazon", "fedora", "OpenCloudOS", "openeuler",
++{%- if variant in ["alpine", "amazon", "azurelinux", "fedora", "OpenCloudOS", "openeuler",
+                    "openmandriva", "photon", "TencentOS"] or is_rhel %}
+ 
+ {% if is_rhel %}
+@@ -185,9 +184,7 @@ cloud_config_modules:
+ {% endif %}
+   - ntp
+   - timezone
+-{% if variant not in ["azurelinux"] %}
+   - disable_ec2_metadata
+-{% endif %}
+   - runcmd
+ {% if variant in ["debian", "ubuntu", "unknown"] %}
+   - byobu
+@@ -205,18 +202,14 @@ cloud_final_modules:
+   - ubuntu_drivers
+ {% endif %}
+   - write_files_deferred
+-{% if variant not in ["azurelinux"] %}
+   - puppet
+   - chef
+-{% endif %}
+   - ansible
+-{% if variant not in ["azurelinux"] %}
+   - mcollective
+   - salt_minion
+ {% if variant not in ["alpine"] %}
+   - reset_rmc
+ {% endif %}
+-{% endif %}
+   - scripts_vendor
+   - scripts_per_once
+   - scripts_per_boot
+@@ -294,6 +287,9 @@ system_info:
+ {% if variant == "alpine" %}
+   network:
+     renderers: ['eni']
++{% elif variant == "azurelinux" %}
++  network:
++    renderers: ['netplan', 'networkd', 'network-manager']
+ {% elif variant == "debian" %}
+   network:
+     renderers: ['netplan', 'eni', 'networkd']
+@@ -307,7 +303,7 @@ system_info:
+ {% elif variant in ["freebsd", "netbsd", "openbsd"] %}
+   network:
+     renderers: ['{{ variant }}']
+-{% elif variant in ["azurelinux", "mariner", "photon"] %}
++{% elif variant in ["mariner", "photon"] %}
+   network:
+     renderers: ['networkd']
+ {% elif variant == "openmandriva" %}
+diff -urpN a/tests/unittests/test_render_template.py b/tests/unittests/test_render_template.py
+--- a/tests/unittests/test_render_template.py	2025-08-12 15:00:58.000000000 -0400
++++ b/tests/unittests/test_render_template.py	2026-04-29 09:42:14.081510179 -0400
+@@ -93,6 +93,7 @@ class TestRenderCloudCfg:
+ 
+         default_user_exceptions = {
+             "amazon": "ec2-user",
++            "azurelinux": "azureuser",
+             "rhel": "cloud-user",
+             "centos": "cloud-user",
+             "raspberry-pi-os": "pi",
