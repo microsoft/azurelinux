@@ -76,9 +76,12 @@ KEEP_PKGS=$(get_image_packages 'not(@profiles)')
 # Packages scoped to specific profiles.  kiwi_profiles is a comma-separated
 # list of active profiles, set by kiwi at build time (e.g.,
 # "distroless-debug,distroless-core,distroless-minimal").
+# Note: the @profiles attribute in the XML may also be comma-separated
+# (e.g., "distroless-minimal,distroless-base,distroless-debug"), so we
+# use contains() with comma-wrapping for safe substring matching.
 IFS=',' read -ra PROFILES <<< "${kiwi_profiles:-}"
 for profile in "${PROFILES[@]}"; do
-    KEEP_PKGS+=$'\n'$(get_image_packages "@profiles='${profile}'")
+    KEEP_PKGS+=$'\n'$(get_image_packages "contains(concat(',',@profiles,','), ',${profile},')")
 done
 
 # Deduplicate.

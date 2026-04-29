@@ -9,16 +9,14 @@
     <profiles>
         <profile name="core" description="Core Container" import="true" />
         <profile name="distroless-minimal" description="Distroless Minimal Container" import="true" />
-        <profile name="distroless-base" description="Distroless Base Container" import="true">
-            <requires profile="distroless-minimal" />
-        </profile>
-        <profile name="distroless-debug" description="Distroless Debug Container" import="true">
-            <requires profile="distroless-base" />
-        </profile>
+        <profile name="distroless-base" description="Distroless Base Container" import="true" />
+        <profile name="distroless-debug" description="Distroless Debug Container" import="true" />
     </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
+    </preferences>
+    <preferences profiles="core">
         <type image="oci">
             <containerconfig
                 name="microsoft/azurelinux/base/core"
@@ -27,6 +25,42 @@
                 user="root"
                 workingdir="/">
                 <subcommand execute="/bin/bash"/>
+            </containerconfig>
+        </type>
+    </preferences>
+    <preferences profiles="distroless-minimal">
+        <type image="oci">
+            <containerconfig
+                name="microsoft/azurelinux/distroless/minimal"
+                tag="4.0"
+                additionalnames=":latest"
+                user="root"
+                workingdir="/">
+                <subcommand clear="true"/>
+            </containerconfig>
+        </type>
+    </preferences>
+    <preferences profiles="distroless-base">
+        <type image="oci">
+            <containerconfig
+                name="microsoft/azurelinux/distroless/base"
+                tag="4.0"
+                additionalnames=":latest"
+                user="root"
+                workingdir="/">
+                <subcommand clear="true"/>
+            </containerconfig>
+        </type>
+    </preferences>
+    <preferences profiles="distroless-debug">
+        <type image="oci">
+            <containerconfig
+                name="microsoft/azurelinux/distroless/debug"
+                tag="4.0"
+                additionalnames=":latest"
+                user="root"
+                workingdir="/">
+                <subcommand clear="true"/>
             </containerconfig>
         </type>
     </preferences>
@@ -45,13 +79,13 @@
     <!-- For distroless profiles ALL packages that should be included in
          the final image must be listed in the "image" packages section.
          Packages from bootstrap may be removed by config.sh. -->
-    <packages type="image" profiles="distroless-minimal">
+    <packages type="image" profiles="distroless-minimal,distroless-base,distroless-debug">
         <package name="filesystem" />
         <package name="azurelinux-release-container" />
         <package name="tzdata" />
     </packages>
 
-    <packages type="image" profiles="distroless-base">
+    <packages type="image" profiles="distroless-base,distroless-debug">
         <package name="glibc" />
         <package name="libgcc" />
         <package name="openssl-libs" />
@@ -62,12 +96,12 @@
         <package name="busybox" />
     </packages>
 
-    <packages type="bootstrap" profiles="core,distroless-minimal">
+    <packages type="bootstrap" profiles="core,distroless-minimal,distroless-base,distroless-debug">
         <package name="filesystem" />
         <package name="azurelinux-release-container" />
     </packages>
 
-    <packages type="bootstrap" profiles="distroless-minimal">
+    <packages type="bootstrap" profiles="distroless-minimal,distroless-base,distroless-debug">
         <package name="busybox" />
     </packages>
 </image>
