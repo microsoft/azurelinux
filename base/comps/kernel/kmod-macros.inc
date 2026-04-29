@@ -5,7 +5,7 @@
 #
 # Then at each phase point, the overlay injects:
 #   %%global _kmod_phase <phase>
-#   %%include %%{_sourcedir}/kmod-nvidia-open.inc
+#   %%include %%{_sourcedir}/kmod-<name>.inc
 #
 # Each kmod .inc file uses %%if "%%{_kmod_phase}" == "<phase>" guards to
 # activate only the relevant section for that phase.
@@ -14,9 +14,6 @@
 # sources and inject %%include lines at each phase point.
 # To remove: delete those overlays.
 #
-# NOTE: RPM %%include is a preprocessor directive — it cannot be called from
-# inside a %%define macro body or from Lua. Each %%include must appear
-# directly in the spec text.
 
 # Master list of kmod subpackages (informational — used by .inc files if needed)
 %global kmod_subpackages nvidia-open
