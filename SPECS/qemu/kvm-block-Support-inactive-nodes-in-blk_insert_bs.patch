@@ -1,0 +1,66 @@
+From 9ab8c39284c0fc2d9d685706b2d788ab02930a08 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:14:00 +0100
+Subject: [PATCH 16/23] block: Support inactive nodes in blk_insert_bs()
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [15/22] 17405266afeddc47f73828816d0b8c1ab5ece462 (kmwolf/centos-qemu-kvm)
+
+Device models have a relatively complex way to set up their block
+backends, in which blk_attach_dev() sets blk->disable_perm = true.
+We want to support inactive images in exports, too, so that
+qemu-storage-daemon can be used with migration. Because they don't use
+blk_attach_dev(), they need another way to set this flag. The most
+convenient is to do this automatically when an inactive node is attached
+to a BlockBackend that can be inactivated.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-10-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit c1c5c7cc4ef6c45ca769c640566fd40d2cb7d5c1)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/block-backend.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 356db1b703..4a5a1c1f6a 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -909,14 +909,24 @@ void blk_remove_bs(BlockBackend *blk)
+ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+ {
+     ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
++    uint64_t perm, shared_perm;
+ 
+     GLOBAL_STATE_CODE();
+     bdrv_ref(bs);
+     bdrv_graph_wrlock();
++
++    if ((bs->open_flags & BDRV_O_INACTIVE) && blk_can_inactivate(blk)) {
++        blk->disable_perm = true;
++        perm = 0;
++        shared_perm = BLK_PERM_ALL;
++    } else {
++        perm = blk->perm;
++        shared_perm = blk->shared_perm;
++    }
++
+     blk->root = bdrv_root_attach_child(bs, "root", &child_root,
+                                        BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
+-                                       blk->perm, blk->shared_perm,
+-                                       blk, errp);
++                                       perm, shared_perm, blk, errp);
+     bdrv_graph_wrunlock();
+     if (blk->root == NULL) {
+         return -EPERM;
+-- 
+2.48.1
+
