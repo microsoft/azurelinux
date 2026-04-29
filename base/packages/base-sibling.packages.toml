@@ -3446,7 +3446,6 @@ packages = [
     "uriparser-doc",
     "urw-base35-fonts-devel",
     "urw-base35-fonts-legacy",
-    "usbguard-devel",
     "usermode-gtk",
     "util-linux-i18n",
     "util-linux-script",
