@@ -272,6 +272,8 @@ packages = [
     "azure-cli", # srpm: azure-cli
     "azure-vm-utils", # srpm: azure-vm-utils
     "azurelinux-gpg-keys", # srpm: azurelinux-repos
+    "azurelinux-logos", # srpm: azurelinux-logos
+    "azurelinux-logos-httpd", # srpm: azurelinux-logos
     "azurelinux-release", # srpm: azurelinux-release
     "azurelinux-release-cloud", # srpm: azurelinux-release
     "azurelinux-release-common", # srpm: azurelinux-release
