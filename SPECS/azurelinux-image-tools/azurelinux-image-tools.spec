@@ -69,8 +69,6 @@ The Azure Linux OS Modifier is a tool that can modify an OS.
 
 %prep
 %autosetup -a1 -p1 -n azure-linux-image-tools-%{version}
-# Replace CGO_ENABLED=0 with CGO_ENABLED=1 in 'tools.mk' as it results in build failure.
-sed -i 's/CGO_ENABLED=0/CGO_ENABLED=1/g' toolkit/scripts/tools.mk
 
 %build
 export GOPATH=%{our_gopath}
