@@ -167,6 +167,8 @@ packages = [
     "azure-cli", # srpm: azure-cli
     "azure-vm-utils", # srpm: azure-vm-utils
     "azurelinux-gpg-keys", # srpm: azurelinux-repos
+    "azurelinux-icons", # srpm: azurelinux-icons
+    "azurelinux-icons-httpd", # srpm: azurelinux-icons
     "azurelinux-release", # srpm: azurelinux-release
     "azurelinux-release-common", # srpm: azurelinux-release
     "azurelinux-release-identity-basic", # srpm: azurelinux-release
