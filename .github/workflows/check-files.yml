@@ -97,7 +97,7 @@ jobs:
           # Additional checks for binary files and large files
           if [[ -f "$file" ]]; then
             # Check if file is binary (but allow .sh files even if executable)
-            if  file "$file" | grep -q "binary\|archive\|compressed"; then
+            if  file "$file" | cut -d':' -f2- | grep -q "binary\|archive\|compressed"; then
               should_be_in_blob_store=true
             fi
             
