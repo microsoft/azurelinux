@@ -34,9 +34,7 @@ with the simplicity of a native Python API, mostly compatible but superior to th
 ElementTree API.
 
 %prep
-%setup -n lxml-%{version}
-%patch 1 -p1
-patch -Np1 --ignore-whitespace < %{PATCH0}
+%autosetup -p1 -n lxml-%{version}
 
 %build
 %{py3_build "--without-cython"}
