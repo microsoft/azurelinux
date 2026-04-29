@@ -2633,8 +2633,6 @@ packages = [
     "libnl3",
     "libnl3-cli",
     "libnl3-devel",
-    "libnma",
-    "libnma-devel",
     "libnotify",
     "libnozzle1",
     "libnsl",
