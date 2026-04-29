@@ -13,6 +13,18 @@ source = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
 file = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
 
 [[components.cloud-init.overlays]]
+description = "Add azurelinux to systemd templates"
+type = "spec-add-tag"
+tag = "Patch"
+value = "add-azurelinux-to-systemd-templates.patch"
+
+[[components.cloud-init.overlays]]
+description = "Add azurelinux to systemd templates"
+type = "file-add"
+source = "add-azurelinux-to-systemd-templates.patch"
+file = "add-azurelinux-to-systemd-templates.patch"
+
+[[components.cloud-init.overlays]]
 description = "Set variant to azurelinux"
 type = "spec-search-replace"
 regex = 'python3 tools/render-template --variant %{\?rhel:rhel}%{!\?rhel:fedora}'

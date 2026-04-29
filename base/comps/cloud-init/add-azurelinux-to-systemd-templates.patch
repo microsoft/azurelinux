@@ -1,0 +1,83 @@
+diff -urpN a/systemd/cloud-init-generator.tmpl b/systemd/cloud-init-generator.tmpl
+--- a/systemd/cloud-init-generator.tmpl	2025-08-12 15:00:58.000000000 -0400
++++ b/systemd/cloud-init-generator.tmpl	2026-04-29 08:30:12.248117723 -0400
+@@ -20,7 +20,7 @@ CLOUD_SYSTEM_TARGET="/usr/lib/systemd/sy
+ {% else %}
+ CLOUD_SYSTEM_TARGET="/lib/systemd/system/cloud-init.target"
+ {% endif %}
+-{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
+                   "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva", "rhel", "rocky", "TencentOS", "virtuozzo"] %}
+     dsidentify="/usr/libexec/cloud-init/ds-identify"
+ {% elif variant == "benchmark" %}
+diff -urpN a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+--- a/systemd/cloud-init-local.service.tmpl	2026-04-29 08:29:26.675654262 -0400
++++ b/systemd/cloud-init-local.service.tmpl	2026-04-29 08:30:51.795946153 -0400
+@@ -2,14 +2,14 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Local Stage (pre-network)
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=network-pre.target
+ After=hv_kvp_daemon.service
+ Before=network-pre.target
+ Before=shutdown.target
+-{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
+ Before=firewalld.target
+ {% endif %}
+ {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
+@@ -22,7 +22,7 @@ ConditionEnvironment=!KERNEL_CMDLINE=clo
+ 
+ [Service]
+ Type=oneshot
+-{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ # This service is a shim which preserves systemd ordering while allowing a
+diff -urpN a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.service.tmpl
+--- a/systemd/cloud-init-main.service.tmpl	2026-04-29 08:29:22.399683555 -0400
++++ b/systemd/cloud-init-main.service.tmpl	2026-04-29 08:38:45.122345648 -0400
+@@ -8,7 +8,7 @@
+ # https://www.freedesktop.org/software/systemd/man/latest/systemd-remount-fs.service.html
+ [Unit]
+ Description=Cloud-init: Single Process
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ {% if variant in ["almalinux", "cloudlinux", "rhel"] %}
+@@ -31,7 +31,7 @@ ExecStart=/usr/bin/cloud-init --all-stag
+ KillMode=process
+ TasksMax=infinity
+ TimeoutStartSec=infinity
+-{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ 
+diff -urpN a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
+--- a/systemd/cloud-init-network.service.tmpl	2026-04-29 08:29:22.399849837 -0400
++++ b/systemd/cloud-init-network.service.tmpl	2026-04-29 08:31:30.750737432 -0400
+@@ -2,7 +2,7 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Network Stage
+-{% if variant not in ["almalinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant not in ["almalinux", "azurelinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=cloud-init-local.service
+@@ -15,7 +15,7 @@ After=systemd-networkd-wait-online.servi
+ {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
+ After=networking.service
+ {% endif %}
+-{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
+                   "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva", "raspberry-pi-os", 
+                   "rhel", "rocky", "suse", "TencentOS", "virtuozzo"] %}
+ After=NetworkManager.service
