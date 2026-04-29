@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.7.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,7 @@ Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-11065.patch
+Patch1:         vfio-pci-fix.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -120,6 +121,15 @@ Group:          System/Packages
 The pr-helper-conf package provides configuration files for persistent
 reservation helper
 
+%package        sidecar-shim
+Summary:        Sidecar shim for kubevirt hook sidecars
+Group:          System/Packages
+
+%description    sidecar-shim
+The sidecar-shim package provides the sidecar shim binary for kubevirt.
+It handles gRPC communication between hook sidecars and the main
+virt-launcher container, allowing custom modifications to VM definitions.
+
 %package        tests
 Summary:        Kubevirt functional tests
 Group:          System/Packages
@@ -158,6 +168,7 @@ build_tests="true" \
     cmd/virt-probe \
     cmd/virt-tail \
     cmd/virtctl \
+    cmd/sidecars \
     %{nil}
 
 env DOCKER_PREFIX=$reg_path DOCKER_TAG=%{version}-%{release} KUBEVIRT_NO_BAZEL=true ./hack/build-manifests.sh
@@ -181,6 +192,7 @@ install -p -m 0755 _out/cmd/virt-tail/virt-tail %{buildroot}%{_bindir}/
 install -p -m 0755 _out/cmd/virt-operator/virt-operator %{buildroot}%{_bindir}/
 install -p -m 0755 _out/tests/tests.test %{buildroot}%{_bindir}/virt-tests
 install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}%{_bindir}/
+install -p -m 0755 _out/cmd/sidecars/sidecars %{buildroot}%{_bindir}/sidecar-shim
 
 # Install network stuff
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
@@ -258,6 +270,11 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %dir %{_datadir}/kube-virt/pr-helper
 %{_datadir}/kube-virt/pr-helper/multipath.conf
 
+%files sidecar-shim
+%license LICENSE
+%doc README.md
+%{_bindir}/sidecar-shim
+
 %files tests
 %license LICENSE
 %doc README.md
@@ -265,6 +282,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Thu Apr 23 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-3
+- Add vfio pci passthrough patch
+
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-2
 - Bump to rebuild with updated glibc
 
