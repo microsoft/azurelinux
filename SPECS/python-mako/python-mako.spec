@@ -38,7 +38,7 @@ into Python modules for maximum performance. Mako’s syntax and API borrows fro
 many others, including Django templates, Cheetah, Myghty, and Genshi.
 
 %prep
-%autosetup -n mako-rel_%{version_tag}
+%autosetup -p1 -n mako-rel_%{version_tag}
 
 %build
 %py3_build
