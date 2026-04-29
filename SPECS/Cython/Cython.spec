@@ -40,7 +40,7 @@ Provides:       %{name}%{?_isa} = %{version}-%{release}
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
-pip3 install -r test-requirements-312.txt
+pip3 install -r test-requirements-312.txt 
 
 # Fix upstream flake8 E502 (redundant backslash between brackets)
 sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
@@ -50,7 +50,7 @@ sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
-%doc *.txt Demos docs Tools
+%doc Demos docs Tools
 %{_bindir}/cython
 %{_bindir}/cygdb
 %{_bindir}/cythonize
