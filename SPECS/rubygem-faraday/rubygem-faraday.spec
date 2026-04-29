@@ -23,8 +23,7 @@ many adapters (such as Net::HTTP) and embraces the concept of Rack middleware
 when processing the request/response cycle.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
-%patch 0 -p1
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
