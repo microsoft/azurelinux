@@ -21,7 +21,7 @@
 Summary:        X.Org X11 X server
 Name:           xorg-x11-server
 Version:        1.20.10
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -113,6 +113,7 @@ Patch525:       0025-xwayland-Make-window_get_client_toplevel-non-recursi.patch
 
 # a flaw was founnd in the x.org server in GLX PBuffer
 Patch601:       CVE-2024-0408.patch
+Patch602:       CVE-2026-34001.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -416,6 +417,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_datadir}/aclocal/xorg-server.m4
 
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.20.10-17
+- Patch for CVE-2026-34001
+
 * Mon Jun 23 2025 Archana Shettigar <v-shettigara@microsoft.com> - 1.20.10-16
 - Patch CVE-2025-49175, CVE-2025-49176, CVE-2025-49178, CVE-2025-49179 & CVE-2025-49180
 
