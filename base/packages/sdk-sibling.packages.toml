@@ -172,8 +172,6 @@ packages = [
     "cgnslib-openmpi-devel",
     "cgnslib-openmpi-libs",
     "chezdav",
-    "chromium-qt5-ui",
-    "chromium-qt6-ui",
     "civetweb-devel",
     "cli11-docs",
     "cliquer",
