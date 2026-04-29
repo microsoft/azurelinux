@@ -65,8 +65,8 @@
 # change is a SONAME change and dependencies need to be rebuilt
 Summary: Software framework for cross-language services development
 Name:    thrift
-Version: 0.15.0
-Release: 5%{?dist}
+Version: 0.23.0
+Release: 1%{?dist}
 
 # Parts of the source are used under the BSD and zlib licenses, but
 # these are OK for inclusion in an Apache 2.0-licensed whole:
@@ -406,6 +406,9 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
+* Wed Apr 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.23.0-1
+- Auto-upgrade to 0.23.0 - for CVE-2025-48431,CVE-2026-41602,CVE-2026-41603,CVE-2026-41604,CVE-2026-41605,CVE-2026-41606,CVE-2026-41607,CVE-2026-41636
+
 * Tue Mar 19 2024 Himaja Kesari <himajakesari@microsoft.com> - 0.15.0-5
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
