@@ -64,6 +64,51 @@ const (
 	MaxCPUDefine = "_smp_ncpus_max"
 )
 
+var (
+	// RpmSpecBuiltRPMRegex extracts the package name, optional epoch, version, release, distribution,
+	// and architecture from values returned by 'rpmspec --builtrpms' (also produced by
+	// QuerySPECForBuiltRPMs), which follow the `%{nevra}` format.
+	//
+	// Examples:
+	//
+	//	kernel-6.6.134.1-2.azl3.x86_64               -> Name: kernel,          Epoch: "", Version: 6.6.134.1, Release: 2,  Distribution: azl3, Architecture: x86_64
+	//	python3-perf-5.15.63.1-1.azl3.x86_64         -> Name: python3-perf,    Epoch: "", Version: 5.15.63.1, Release: 1,  Distribution: azl3, Architecture: x86_64
+	//	ca-certificates-1:3.0.0-14.azl3.noarch       -> Name: ca-certificates, Epoch: 1,  Version: 3.0.0,     Release: 14, Distribution: azl3, Architecture: noarch
+	//
+	// NOTE: regular expression based on the following assumptions:
+	//   - Package version and release values are not allowed to contain a hyphen character.
+	//   - Our tooling prevents the 'Release' tag from having any other form than '[[:digit:]]+%{?dist}'.
+	//   - The distribution tag is not allowed to contain a period or a hyphen.
+	//   - The architecture is not allowed to contain a period or a hyphen.
+	//   - When the package has a non-zero epoch, it appears immediately before the version as `epoch:`;
+	//     a missing epoch (the default `0`) is omitted entirely from the input.
+	//
+	// Regex breakdown:
+	//
+	//	^(.*)        <-- [index 1] package name (may contain hyphens)
+	//	-            <-- third-to-last hyphen separating the package name from its version
+	//	(?:(\d+):)?  <-- [index 2] optional epoch (digits) followed by a colon
+	//	([^-]+)      <-- [index 3] package version
+	//	-            <-- second-to-last hyphen separating the version from the release
+	//	([^-]+)      <-- [index 4] package release
+	//	\.           <-- second-to-last period separating the release from the distribution tag
+	//	([^.]+)      <-- [index 5] the distribution tag
+	//	\.           <-- last period separating the distribution tag from the architecture string
+	//	([^.]+)$     <-- [index 6] the architecture string
+	RpmSpecBuiltRPMRegex = regexp.MustCompile(`^(.*)-(?:(\d+):)?([^-]+)-([^-]+)\.([^.]+)\.([^.]+)$`)
+)
+
+// Index constants for capture groups of RpmSpecBuiltRPMRegex.
+const (
+	RpmSpecBuiltRPMRegexNameIndex = iota + 1
+	RpmSpecBuiltRPMRegexEpochIndex
+	RpmSpecBuiltRPMRegexVersionIndex
+	RpmSpecBuiltRPMRegexReleaseIndex
+	RpmSpecBuiltRPMRegexDistributionIndex
+	RpmSpecBuiltRPMRegexArchitectureIndex
+	RpmSpecBuiltRPMRegexMatchesCount
+)
+
 const (
 	packageFQNRegexMatchSubString  = iota
 	packageFQNRegexNameIndex       = iota
