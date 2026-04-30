@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/openscap.azl.macros}
+
 Name:           openscap
 Version:        1.4.3
 Release: 3%{?dist}
@@ -10,6 +13,7 @@ License:        LGPL-2.1-or-later
 URL:            http://www.open-scap.org/
 VCS:            git:https://github.com/OpenSCAP/openscap
 Source0:        https://github.com/OpenSCAP/openscap/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source9999: openscap.azl.macros
 
 %global         common_description %{expand:
 OpenSCAP is a set of open source libraries providing an easier path
