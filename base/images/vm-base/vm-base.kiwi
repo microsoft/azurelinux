@@ -34,9 +34,14 @@
         </type>
     </preferences>
 
-    <repository type="rpm-md" alias="fedora-43-everything">
+    <repository type="rpm-md" alias="azurelinux-base">
         <source
-            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/daily-repo-non-prod/20260303/x86_64/" />
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch" />
+    </repository>
+
+    <repository type="rpm-md" alias="azurelinux-sdk">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch" />
     </repository>
 
     <packages type="image">

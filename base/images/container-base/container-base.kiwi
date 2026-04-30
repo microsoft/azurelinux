@@ -65,9 +65,14 @@
         </type>
     </preferences>
 
-    <repository type="rpm-md" alias="fedora-43-everything">
+    <repository type="rpm-md" alias="azurelinux-base">
         <source
-            path="https://fedora.mirrorservice.org/fedora/linux/releases/43/Everything/x86_64/os/" />
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch" />
+    </repository>
+
+    <repository type="rpm-md" alias="azurelinux-sdk">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch" />
     </repository>
 
     <packages type="image" profiles="core">
