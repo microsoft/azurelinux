@@ -37,7 +37,7 @@
 
 Name:		shim-unsigned-%{efiarch}
 Version:	16.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	x86_64
 License:	BSD
@@ -55,6 +55,8 @@ Source4:	shim.patches
 Source100:	shim-find-debuginfo.sh
 
 %include %{SOURCE4}
+
+Patch0:         CVE-2017-3735.patch
 
 BuildRequires:	gcc make
 BuildRequires:	elfutils-libelf-devel
@@ -116,7 +118,7 @@ BuildArch:	noarch
 %debug_desc
 
 %prep
-%autosetup -S git_am -n shim-%{version}
+%autosetup -p1 -S git_am -n shim-%{version}
 git config --unset user.email
 git config --unset user.name
 mkdir build-%{efiarch}
@@ -223,6 +225,9 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Thu Apr 30 2026 Akhila Guruju <v-guakhila@microsoft.com> - 16.1-3
+- Patch CVE-2017-3735
+
 * Tue Apr 07 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-2
 - Bump to match shim-unsigned-aarch64
 
