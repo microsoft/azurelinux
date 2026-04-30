@@ -31563,6 +31563,16 @@
           "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.74.tar.gz"
         }
       }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "walinuxagent-acl-config",
+          "version": "1.0.1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/walinuxagent-acl-config-1.0.1.tar.gz"
+        }
+      }
     }
   ],
   "Version": 1
