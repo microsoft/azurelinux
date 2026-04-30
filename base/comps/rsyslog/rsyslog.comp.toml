@@ -1,0 +1,14 @@
+# Disable the optional `mongodb` rsyslog output module.
+#
+# The `rsyslog-mongodb` sub-package logs records into MongoDB collections;
+# its only consumers in base are the libbson/libmongoc client libraries
+# (which are not in base for AZL). MongoDB-as-log-sink is a niche
+# integration not warranted in base for an enterprise cloud distro;
+# rsyslog still provides PostgreSQL, MySQL, ElasticSearch, Kafka, file,
+# and forwarding outputs.
+#
+# rsyslog.spec defines `%bcond_without mongodb` (default ON); passing
+# `--without mongodb` skips building the rsyslog-mongodb sub-package and
+# its libbson/libmongoc Requires.
+[components.rsyslog]
+build.without = ["mongodb"]
