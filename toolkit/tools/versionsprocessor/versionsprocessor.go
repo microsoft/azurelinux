@@ -147,7 +147,7 @@ func processSpecFile(specFile string, buildArch string, distTag string, macrosOu
 	sourceDir := filepath.Dir(specFile)
 	defines := rpm.DefaultDistroDefines(false, distTag)
 
-	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryHeaderArgument)
+	packages, err := rpm.QuerySPEC(specFile, sourceDir, `%{NAME}: %{evr}\n`, buildArch, defines, rpm.QueryBuiltRPMHeadersArgument)
 
 	if err != nil {
 		logger.Log.Errorf("Failed to query spec file (%s). Error: %s", specFileName, err)
