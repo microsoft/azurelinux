@@ -95,7 +95,7 @@
 %endif
 
 # Matches spice ExclusiveArch
-%global have_spice 1
+%global have_spice 0
 %ifnarch %{ix86} x86_64 %{arm} aarch64
 %global have_spice 0
 %endif
@@ -131,12 +131,12 @@
 %global have_pmem 0
 %endif
 
-%global have_jack 1
+%global have_jack 0
 %if 0%{?rhel}
 %global have_jack 0
 %endif
 
-%global have_dbus_display 1
+%global have_dbus_display 0
 %if %{defined rhel} && 0%{?rhel} < 9
 # RHEL/Centos 8 glib is not new enough
 %global have_dbus_display 0
@@ -149,7 +149,7 @@
 
 %global have_gvnc_devel %{defined fedora}
 %global have_sdl_image %{defined fedora}
-%global have_brlapi 1
+%global have_brlapi 0
 %global have_daxctl 1
 %global have_fdt 1
 %global have_multipath 1
@@ -286,11 +286,11 @@
 %define obsoletes_block_iscsi Obsoletes: %{name}-block-iscsi < %{evr}
 %endif
 %define requires_block_ssh Requires: %{name}-block-ssh = %{evr}
-%define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
-%define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
-%define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
-%define requires_audio_pipewire Requires: %{name}-audio-pipewire = %{evr}
-%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
+%define requires_audio_alsa %{nil}
+%define requires_audio_oss %{nil}
+%define requires_audio_pa %{nil}
+%define requires_audio_pipewire %{nil}
+%define requires_audio_sdl %{nil}
 %if %{have_brlapi}
 %define requires_char_baum Requires: %{name}-char-baum = %{evr}
 %define obsoletes_char_baum %{nil}
@@ -303,7 +303,7 @@
 %define requires_device_usb_redirect Requires: %{name}-device-usb-redirect = %{evr}
 %define requires_ui_curses Requires: %{name}-ui-curses = %{evr}
 %define requires_ui_gtk Requires: %{name}-ui-gtk = %{evr}
-%define requires_ui_sdl Requires: %{name}-ui-sdl = %{evr}
+%define requires_ui_sdl %{nil}
 %define requires_ui_egl_headless Requires: %{name}-ui-egl-headless = %{evr}
 %define requires_ui_opengl Requires: %{name}-ui-opengl = %{evr}
 %define requires_device_display_virtio_gpu Requires: %{name}-device-display-virtio-gpu = %{evr}
@@ -354,7 +354,7 @@
 %endif
 
 %if %{have_dbus_display}
-%define requires_audio_dbus Requires: %{name}-audio-dbus = %{evr}
+%define requires_audio_dbus %{nil}
 %define requires_ui_dbus Requires: %{name}-ui-dbus = %{evr}
 %else
 %define requires_audio_dbus %{nil}
@@ -929,53 +929,6 @@ Install this package if you want to access remote NFS storage.
 %endif
 
 
-%package  audio-alsa
-Summary: QEMU ALSA audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-alsa
-This package provides the additional ALSA audio driver for QEMU.
-
-%if %{have_dbus_display}
-%package  audio-dbus
-Summary: QEMU D-Bus audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-dbus
-This package provides the additional D-Bus audio driver for QEMU.
-%endif
-
-%package  audio-oss
-Summary: QEMU OSS audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-oss
-This package provides the additional OSS audio driver for QEMU.
-
-%package  audio-pa
-Summary: QEMU PulseAudio audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-pa
-This package provides the additional PulseAudio audio driver for QEMU.
-
-%package  audio-pipewire
-Summary: QEMU Pipewire audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-pipewire
-This package provides the additional Pipewire audio driver for QEMU.
-
-%package  audio-sdl
-Summary: QEMU SDL audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-sdl
-This package provides the additional SDL audio driver for QEMU.
-
-%if %{have_jack}
-%package  audio-jack
-Summary: QEMU Jack audio driver
-Requires: %{name}-common%{?_isa} = %{evr}
-%description audio-jack
-This package provides the additional Jack audio driver for QEMU.
-%endif
-
-
 %package  ui-curses
 Summary: QEMU curses UI driver
 Requires: %{name}-common%{?_isa} = %{evr}
@@ -996,13 +949,6 @@ Requires: %{name}-common%{?_isa} = %{evr}
 Requires: %{name}-ui-opengl%{?_isa} = %{evr}
 %description ui-gtk
 This package provides the additional GTK UI for QEMU.
-
-%package  ui-sdl
-Summary: QEMU SDL UI driver
-Requires: %{name}-common%{?_isa} = %{evr}
-Requires: %{name}-ui-opengl%{?_isa} = %{evr}
-%description ui-sdl
-This package provides the additional SDL UI for QEMU.
 
 %package  ui-egl-headless
 Summary: QEMU EGL headless driver
@@ -1661,7 +1607,7 @@ mkdir -p %{static_builddir}
 
 %build
 %define disable_everything         \\\
-  --audio-drv-list=                \\\
+  --audio-drv-list= \\\
   --disable-af-xdp                 \\\
   --disable-alsa                   \\\
   --disable-asan                   \\\
@@ -1865,7 +1811,7 @@ run_configure \
 %if %{have_xdp}
   --enable-af-xdp \
 %endif
-  --enable-alsa \
+  --disable-alsa \
   --enable-attr \
 %if %{have_libblkio}
   --enable-blkio \
@@ -1924,10 +1870,10 @@ run_configure \
 %if %{have_opengl}
   --enable-opengl \
 %endif
-  --enable-oss \
-  --enable-pa \
+  --disable-oss \
+  --disable-pa \
   --enable-pie \
-  --enable-pipewire \
+  --disable-pipewire \
   --enable-pixman \
 %if %{have_block_rbd}
   --enable-rbd \
@@ -1962,7 +1908,7 @@ run_configure \
   --enable-xkbcommon \
   \
   \
-  --audio-drv-list=pipewire,pa,sdl,alsa,%{?jack_drv}oss \
+  --audio-drv-list= \
   --target-list-exclude=moxie-softmmu \
   --with-default-devices \
   --enable-auth-pam \
@@ -2007,9 +1953,9 @@ run_configure \
 %if %{have_rutabaga_gfx}
   --enable-rutabaga-gfx \
 %endif
-  --enable-sdl \
+  --disable-sdl \
 %if %{have_sdl_image}
-  --enable-sdl-image \
+  --disable-sdl-image \
 %endif
 %if %{have_libcacard}
   --enable-smartcard \
@@ -2640,26 +2586,6 @@ popd
 %{_libdir}/%{name}/block-nfs.so
 %endif
 
-%files audio-alsa
-%{_libdir}/%{name}/audio-alsa.so
-%if %{have_dbus_display}
-%files audio-dbus
-%{_libdir}/%{name}/audio-dbus.so
-%endif
-%files audio-oss
-%{_libdir}/%{name}/audio-oss.so
-%files audio-pa
-%{_libdir}/%{name}/audio-pa.so
-%files audio-pipewire
-%{_libdir}/%{name}/audio-pipewire.so
-%files audio-sdl
-%{_libdir}/%{name}/audio-sdl.so
-%if %{have_jack}
-%files audio-jack
-%{_libdir}/%{name}/audio-jack.so
-%endif
-
-
 %files ui-curses
 %{_libdir}/%{name}/ui-curses.so
 %if %{have_dbus_display}
@@ -2668,8 +2594,6 @@ popd
 %endif
 %files ui-gtk
 %{_libdir}/%{name}/ui-gtk.so
-%files ui-sdl
-%{_libdir}/%{name}/ui-sdl.so
 %files ui-egl-headless
 %{_libdir}/%{name}/ui-egl-headless.so
 
