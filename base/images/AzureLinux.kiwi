@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<image schemaversion="7.4" name="AzureLinux">
+	<description type="system">
+		<author>Microsoft</author>
+		<contact>azurelinux@microsoft.com</contact>
+		<specification>AzureLinux</specification>
+	</description>
+	<preferences>
+		<version>4</version>
+		<packagemanager>dnf5</packagemanager>
+		<locale>en_US</locale>
+		<keytable>us</keytable>
+		<timezone>UTC</timezone>
+		<release-version>4</release-version>
+	</preferences>
+	<include from="this://./common/base.xml"/>
+	<include from="this://./common/boot.xml"/>
+	<include from="this://./repositories/core.xml"/>
+	<include from="this://./vm/azure.xml"/>
+	<include from="this://./vm/base.xml"/>
+	<include from="this://./vm/boot.xml"/>
+	<include from="this://./vm/hyperv.xml"/>
+	<include from="this://./vm/qemu.xml"/>
+	<packages type="bootstrap">
+		<package name="filesystem"/>
+	</packages>
+</image>

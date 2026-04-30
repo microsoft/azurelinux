@@ -1,0 +1,24 @@
+<image>
+	<profiles>
+		<profile name="BootCore" description="Boot core packages"/>
+	</profiles>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="BootCore">
+		<package name="grubby"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="BootCore">
+		<ignore name="kernel-*debug*"/>
+		<package name="grub2-efi-aa64" arch="aarch64"/>
+		<package name="grub2-efi-aa64-modules" arch="aarch64"/>
+		<package name="grub2-efi-x64" arch="x86_64"/>
+		<package name="grub2-efi-x64-modules" arch="x86_64"/>
+		<package name="grub2-pc" arch="x86_64"/>
+		<package name="grub2-pc-modules" arch="x86_64"/>
+		<package name="shim-signed-aa64" arch="aarch64"/>
+		<package name="shim-signed-x64" arch="x86_64"/>
+		<package name="kernel-core"/>
+	</packages>
+	<packages type="iso" patternType="plusRecommended" profiles="BootCore">
+		<package name="grub2-efi-aa64-cdboot" arch="aarch64"/>
+		<package name="grub2-efi-x64-cdboot" arch="x86_64"/>
+	</packages>
+</image>

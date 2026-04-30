@@ -1,0 +1,49 @@
+<image>
+	<profiles>
+		<profile name="CoreVM" description="Core packages for VMs">
+			<requires profile="CoreCommon"/>
+		</profile>
+		<profile name="CoreHypervVM" description="Core packages for Hyper-V VMs">
+			<requires profile="BootVM"/>
+			<requires profile="CoreVM"/>
+		</profile>
+		<profile name="CoreQemuVM" description="Core packages for Qemu VMs">
+			<requires profile="BootVM"/>
+			<requires profile="CoreVM"/>
+		</profile>
+		<profile name="BaseVM" description="Base packages for VMs">
+			<requires profile="CoreVM"/>
+		</profile>
+	</profiles>
+	<packages type="image" patternType="plusRecommended" profiles="CoreVM">
+		<package name="cloud-init"/>
+		<package name="cloud-utils-growpart"/>
+		<package name="dracut-config-generic"/>
+		<package name="grubby"/>
+		<package name="rsync"/>
+		<package name="tar"/>
+		<package name="chrony"/>
+		<!-- console-login-helper-messages-issuegen requires
+		     NetworkManager; it may be useful to re-include
+		     once it can work for systemd-networkd also -->
+		<!-- <package name="console-login-helper-messages-issuegen"/> -->
+		<package name="console-login-helper-messages-motdgen"/>
+		<package name="console-login-helper-messages-profile"/>
+		<package name="systemd-oomd-defaults"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="CoreHypervVM">
+		<package name="hyperv-daemons"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="CoreQemuVM">
+		<package name="qemu-guest-agent"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="BaseVM">
+		<ignore name="kernel"/>
+		<ignore name="*-firmware"/>
+		<ignore name="geolite2-city"/>
+		<ignore name="geolite2-country"/>
+		<package name="dracut-kiwi-oem-repart"/>
+		<package name="glibc-langpack-en"/>
+		<package name="kernel-modules"/>
+	</packages>
+</image>

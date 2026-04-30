@@ -1,0 +1,52 @@
+<image>
+	<profiles>
+		<profile name="CoreCommon" description="Core common packages"/>
+	</profiles>
+	<packages type="image" patternType="plusRecommended" profiles="CoreCommon">
+		<package name="audit"/>
+		<package name="bash"/>
+		<package name="coreutils"/>
+		<package name="curl"/>
+		<package name="dnf5"/>
+		<package name="dnf5-plugins"/>
+		<package name="dracut-config-generic"/>
+		<package name="dracut-config-rescue"/>
+		<package name="e2fsprogs"/>
+		<package name="filesystem"/>
+		<package name="firewalld"/>
+		<package name="glibc"/>
+		<package name="hostname"/>
+		<package name="initscripts"/>
+		<package name="iproute"/>
+		<package name="iputils"/>
+		<package name="kbd"/>
+		<package name="less"/>
+		<package name="man-db"/>
+		<package name="ncurses"/>
+		<package name="openssh-clients"/>
+		<package name="openssh-server"/>
+		<package name="parted"/>
+		<package name="policycoreutils"/>
+		<package name="procps-ng"/>
+		<package name="rootfiles"/>
+		<package name="rpm"/>
+		<package name="selinux-policy-targeted"/>
+		<package name="setup"/>
+		<package name="shadow-utils"/>
+		<package name="sudo"/>
+		<package name="systemd"/>
+		<package name="systemd-networkd"/>
+		<package name="systemd-oomd-defaults"/>
+		<package name="systemd-resolved"/>
+		<package name="util-linux"/>
+		<package name="vim-minimal"/>
+		<package name="zram-generator-defaults"/>
+		<ignore name="7zip"/>
+		<ignore name="gawk-all-langpacks"/>
+		<ignore name="libsecret"/>
+		<ignore name="memstrack"/>
+		<ignore name="mkpasswd"/>
+		<ignore name="pinentry"/>
+		<ignore name="whois-nls"/>
+	</packages>
+</image>

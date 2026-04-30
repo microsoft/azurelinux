@@ -1,0 +1,10 @@
+<image>
+	<profiles>
+		<profile name="BootVM" description="Boot packages for VMs">
+			<requires profile="BootCore"/>
+		</profile>
+	</profiles>
+	<packages type="image" patternType="plusRecommended" profiles="BootVM">
+		<package name="grub2-tools" arch="aarch64,x86_64"/>
+	</packages>
+</image>

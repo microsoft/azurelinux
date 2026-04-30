@@ -18,6 +18,18 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
 
+[images.AzureVM]
+description = "AzureVM"
+definition = { profile = "AzureVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.HypervVM]
+description = "HypervVM"
+definition = { profile = "HypervVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
+[images.QemuVM]
+description = "QemuVM"
+definition = { profile = "QemuVM", type = "kiwi", path = "AzureLinux.kiwi" }
+
 # NOTE:
 # sudo dnf install -y kiwi-cli
 # sudo kiwi --loglevel 10 \

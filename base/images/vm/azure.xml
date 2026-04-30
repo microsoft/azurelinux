@@ -1,0 +1,40 @@
+<image>
+	<profiles>
+		<profile name="AzureVM" description="Azure Base Guest Image">
+			<requires profile="CoreHypervVM"/>
+			<requires profile="BaseVM"/>
+		</profile>
+	</profiles>
+	<packages type="bootstrap" patternType="plusRecommended" profiles="AzureVM">
+		<package name="azurelinux-release-cloud"/>
+	</packages>
+	<packages type="image" patternType="plusRecommended" profiles="AzureVM">
+		<package name="azurelinux-release-cloud"/>
+		<package name="azure-vm-utils"/>
+		<package name="WALinuxAgent"/>
+	</packages>
+	<preferences profiles="AzureVM" arch="x86_64">
+		<type image="oem" format="vhd-fixed" formatoptions="force_size"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyS0,115200n8 earlyprintk=ttyS0 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" bls="true" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+	<preferences profiles="AzureVM" arch="aarch64">
+		<type image="oem" format="vhd-fixed" formatoptions="force_size"
+		      filesystem="ext4"
+		      kernelcmdline="no_timer_check console=tty1 console=ttyAMA0,115200n8 earlyprintk=ttyAMA0 systemd.firstboot=off"
+		      devicepersistency="by-uuid"
+		      bootpartition="false" efipartsize="100" firmware="uefi"
+		      rootfs_label="azurelinux"
+		      >
+			<bootloader name="grub2" console="serial" timeout="0"/>
+			<size unit="G">5</size>
+		</type>
+	</preferences>
+</image>
