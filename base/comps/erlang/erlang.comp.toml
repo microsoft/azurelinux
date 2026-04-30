@@ -4,3 +4,37 @@
 
 [components.erlang.build]
 without = ["doc"]
+
+# Disable the erlang-wx sub-package (Erlang's wxWidgets bindings). AZL is a
+# headless cloud distro and does not ship wxGTK; building erlang-wx would
+# pull in a desktop GUI stack at build time and would force every other
+# erlang sub-package whose %if %{__with_wxwidgets} block adds a
+# `Requires: erlang-wx` (erlang-meta, -debugger, -dialyzer, -et, -observer,
+# -reltool, -src) to drag the wx subpackage into the runtime closure.
+#
+# The upstream spec already supports this configuration via the
+# `%global __with_wxwidgets` toggle: when set to 0, every wx-conditional
+# `%package wx` definition, every `Requires: %{name}-wx` line, and the
+# wxGTK BuildRequires are skipped wholesale. Flipping the global is by
+# far the most surgical fix.
+[[components.erlang.overlays]]
+description = "Disable erlang-wx sub-package (wxGTK GUI bindings) — AZL is a headless cloud distro"
+type = "spec-search-replace"
+regex = '^%global __with_wxwidgets 1$'
+replacement = '%global __with_wxwidgets 0'
+
+# The `Requires: %{name}-wx` line in the erlang-src %package preamble is
+# the only such line in the upstream spec that is NOT wrapped in a
+# `%if %{__with_wxwidgets}` block (it lives directly inside
+# `%if %{__with_sources}`), so the wxwidgets toggle alone cannot drop it.
+# Strip it so the rebuilt erlang-src RPM does not pull in a now-nonexistent
+# erlang-wx package. Scope the regex to `%package src` so it only targets
+# the unconditional Requires; the same line in other sub-packages is
+# already dead code under `%if %{__with_wxwidgets}=0` and stays untouched.
+[[components.erlang.overlays]]
+description = "Drop unconditional Requires: erlang-wx from erlang-src (paired with __with_wxwidgets=0 above)"
+type = "spec-search-replace"
+section = "%package"
+package = "src"
+regex = '^Requires: %\{name\}-wx%\{\?_isa\} = %\{version\}-%\{release\}$'
+replacement = ''

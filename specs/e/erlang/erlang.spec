@@ -70,7 +70,7 @@
 # reltool (*)
 # wx
 #
-%global __with_wxwidgets 1
+%global __with_wxwidgets 0
 
 
 Name:		erlang
@@ -645,7 +645,7 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-tftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-xmerl%{?_isa} = %{version}-%{release}
 
 %description src
