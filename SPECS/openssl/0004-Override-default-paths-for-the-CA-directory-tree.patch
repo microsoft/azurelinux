@@ -1,7 +1,7 @@
 From 7a65ee33793fa8a28c0dfc94e6872ce92f408b15 Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Mon, 31 Jul 2023 09:41:27 +0200
-Subject: [PATCH 04/35] 
+Subject: [PATCH 04/35]
  0004-Override-default-paths-for-the-CA-directory-tree.patch
 
 Patch-name: 0004-Override-default-paths-for-the-CA-directory-tree.patch
@@ -15,11 +15,11 @@ From-dist-git-commit: 9409bc7044cf4b5773639cce20f51399888c45fd
  2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/apps/CA.pl.in b/apps/CA.pl.in
-index f029470005..729f104a7e 100644
+index 0bad37d..85bf86c 100644
 --- a/apps/CA.pl.in
 +++ b/apps/CA.pl.in
-@@ -29,7 +29,7 @@ my $X509 = "$openssl x509";
- my $PKCS12 = "$openssl pkcs12";
+@@ -32,7 +32,7 @@ my @X509 = (@openssl, "x509");
+ my @PKCS12 = (@openssl, "pkcs12");
  
  # Default values for various configuration settings.
 -my $CATOP = "./demoCA";
@@ -28,7 +28,7 @@ index f029470005..729f104a7e 100644
  my $CAREQ = "careq.pem";
  my $CACERT = "cacert.pem";
 diff --git a/apps/openssl.cnf b/apps/openssl.cnf
-index 8141ab20cd..3956235fda 100644
+index 00f0d24..02154bd 100644
 --- a/apps/openssl.cnf
 +++ b/apps/openssl.cnf
 @@ -52,6 +52,8 @@ tsa_policy3 = 1.2.3.4.5.7
@@ -73,5 +73,5 @@ index 8141ab20cd..3956235fda 100644
  crypto_device	= builtin		# OpenSSL engine to use for signing
  signer_cert	= $dir/tsacert.pem 	# The TSA signing certificate
 -- 
-2.41.0
+2.45.4
 
