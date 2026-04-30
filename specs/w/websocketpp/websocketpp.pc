@@ -1,0 +1,9 @@
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+
+Name: websocketpp
+Description: WebSocket API
+Version: 0.8.2
+URL: https://www.zaphoyd.com/websocketpp/
+Cflags: -I${includedir}/
