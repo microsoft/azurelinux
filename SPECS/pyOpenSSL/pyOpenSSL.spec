@@ -1,13 +1,14 @@
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
 Version:        18.0.0
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pyopenssl
 Source0:        https://files.pythonhosted.org/packages/source/p/pyOpenSSL/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-27448.patch
 BuildArch:      noarch
 
 %description
@@ -39,7 +40,7 @@ BuildRequires:  python3-six
 High-level wrapper around a subset of the OpenSSL library.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %py3_build
@@ -59,6 +60,9 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Thu Mar 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 18.0.0-9
+- Patch for CVE-2026-27448
+
 * Fri Dec 03 2021 Thomas Crain <thcrain@microsoft.com> - 18.0.0-8
 - Replace easy_install usage with pip in %%check sections
 
