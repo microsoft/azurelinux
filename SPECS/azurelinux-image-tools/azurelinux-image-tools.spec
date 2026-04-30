@@ -73,6 +73,7 @@ The Azure Linux OS Modifier is a tool that can modify an OS.
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y IMAGE_CUSTOMIZER_VERSION_PREVIEW=
 make -C toolkit go-osmodifier REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
 
