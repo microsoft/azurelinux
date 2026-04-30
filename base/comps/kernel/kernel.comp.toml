@@ -153,3 +153,49 @@ lines = [
     "cd ../..",
     "%endif",
 ]
+
+# kernel-devel-rpm-macros: a new subpackage providing the %kernel_uname_r macro
+# so that out-of-tree kernel module packages can BuildRequire it and avoid
+# hardcoding the kernel version.
+#
+# New kernel flavors (e.g., kernel-hwe) should replicate these 3
+# overlays in their own comp.toml. The macros package name will automatically
+# match the kernel name (e.g., kernel-hwe-devel-rpm-macros) via %{name}.
+[[components.kernel.overlays]]
+description = "Define the kernel-devel-rpm-macros subpackage (provides %kernel_uname_r macro for OOT module builds)"
+type = "spec-append-lines"
+section = "%description"
+lines = [
+    "",
+    "%package devel-rpm-macros",
+    "Summary: RPM macros for building kernel modules",
+    "Requires: %{name}-devel = %{specrpmversion}-%{release}",
+    "",
+    "%description devel-rpm-macros",
+    "This package provides the %%kernel_uname_r RPM macro, set to the full",
+    "kernel version-release-arch string matching the current kernel-devel",
+    "package.  Out-of-tree kernel module packages can BuildRequire this",
+    "instead of hardcoding the kernel version.",
+]
+
+[[components.kernel.overlays]]
+description = "Install the kernel-devel-rpm-macros macros file with %kernel_uname_r set to KVERREL"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# kernel-devel-rpm-macros: install RPM macros file with kernel_uname_r",
+    "install -d %{buildroot}%{_rpmmacrodir}",
+    "echo '%%kernel_uname_r %{KVERREL}' > %{buildroot}%{_rpmmacrodir}/macros.kernel-devel",
+]
+
+[[components.kernel.overlays]]
+description = "Add %files section for kernel-devel-rpm-macros subpackage"
+type = "spec-append-lines"
+section = "%description"
+package = "devel-rpm-macros"
+lines = [
+    "",
+    "%files devel-rpm-macros",
+    "%{_rpmmacrodir}/macros.kernel-devel",
+]
