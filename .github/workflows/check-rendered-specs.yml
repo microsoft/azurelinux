@@ -1,13 +1,16 @@
-# Reusable workflow — renders specs from a PR and checks for drift.
+# Reusable workflow — renders specs from a PR + resolves lock files, and
+# checks both for drift.
 #
 # Called by the stub on the default branch (check-rendered-specs-stub.yml) via
 # pull_request_target. The stub provides the PR details; this workflow does all
-# the real work:
+# the real work via two parallel flows:
 #   1. Checks out base branch (trusted tools/scripts)
 #   2. Checks out PR head into pr-head/ (untrusted data — TOML configs, specs)
-#   3. Renders specs inside a privileged container using azldev -C pr-head/
-#   4. Checks for drift (compares rendered output against PR's committed specs)
-#   5. Posts a PR comment with results + downloadable fix patch
+#   3a. Renders specs inside a privileged container using azldev -C pr-head/
+#       and checks for drift (vs. the PR's committed specs).
+#   3b. Resolves lock files via `azldev component update` in the same
+#       container; the JSON output lists components whose locks changed.
+#   4. Posts (independent) PR comments for each flow + downloadable fix patches.
 #
 # Security: the PR checkout is data-only. We never execute code from the PR —
 # azldev is installed from upstream, scripts come from the base branch checkout.
@@ -34,7 +37,7 @@ permissions: {}
 # Belt-and-suspenders: the stub also sets concurrency, but keep it here so the
 # contract survives refactoring / direct invocation.
 concurrency:
-  group: render-check-${{ inputs.repo }}-${{ inputs.pr-number }}
+  group: pr-drift-check-${{ inputs.repo }}-${{ inputs.pr-number }}
   cancel-in-progress: true
 
 jobs:
@@ -113,8 +116,7 @@ jobs:
             bash -eu -o pipefail -c '
               azldev component render -q -a --clean-stale -O json \
                 > /output/render-output.json
-              SPECS_DIR=$(azldev config dump -q -f json \
-                | python3 -c "import json,sys; print(json.load(sys.stdin)[\"project\"][\"renderedSpecsDir\"])")
+              SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
               python3 /scripts/check_rendered_specs.py \
                 --specs-dir "$SPECS_DIR" \
                 --report /output/render-check-report.json \
@@ -196,5 +198,168 @@ jobs:
             --repo "$PR_REPO" \
             --pr "$PR_NUMBER" \
             --report render-output/render-check-report.json \
+            --artifacts-url "$PATCH_URL" \
+            --run-id "$RUN_ID"
+
+  # Resolve lock files for PR's components and check for drift. Mirrors the
+  # `render` job: same trusted-base + untrusted-PR-head split, same container,
+  # same security posture (no pull-requests write here either). The drift
+  # signal comes directly from `azldev component update`'s JSON output —
+  # each entry's `changed` boolean tells us whether its lock file moved.
+  # The patch artifact is a plain `git diff -- locks/` produced inside the
+  # container so users can `git apply` the result.
+  update_locks:
+    name: Update locks + drift check
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    outputs:
+      patch-url: ${{ steps.upload-locks-patch.outputs.artifact-url }}
+    steps:
+      # --- Trusted base branch (tools, scripts, container config) ---
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: tomls/base/main
+          persist-credentials: false
+
+      # --- PR head (untrusted data — TOML configs, overlays, locks) ---
+      - name: Checkout PR head (data)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.pr-head-repo }}
+          ref: ${{ inputs.pr-head-sha }}
+          path: pr-head
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build azldev runner container
+        run: |
+          docker build \
+            --build-arg UID=$(id -u) \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      # Update + diff run entirely inside the container — same sandbox knobs
+      # as the render job (see the comment above the render step for why
+      # SYS_ADMIN / seccomp=unconfined / apparmor=unconfined are needed).
+      - name: Update locks + capture patch
+        id: update
+        continue-on-error: true # TODO: flip off once check stabilizes (see PR #16674)
+        env:
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORKSPACE/locks-output"
+          docker run --rm \
+            --cap-add=SYS_ADMIN \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
+            -v "$WORKSPACE/pr-head:/workdir" \
+            -v "$WORKSPACE/locks-output:/output" \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              # Pre-create the output file with a parse-able sentinel so the
+              # downstream `update-output` artifact upload (if: always())
+              # never fails just because azldev / the container crashed
+              # before producing the file. The locks-comment script
+              # already treats `null` as "no drift".
+              echo null > /output/update-output.json
+              # Capture stdout (JSON) separately from stderr (logs).
+              azldev component update -a -O json \
+                > /output/update-output.json
+              LOCKS_DIR=$(azldev config dump -q -f json | jq -r .project.lockDir)
+              # `git add -N` (intent-to-add) so net-new lock files (for
+              # components that did not previously have one) show up in
+              # `git diff` as additions. Without this, only modifications to
+              # already-tracked locks would land in the patch.
+              # `git diff` is safe here: we are inside the container with the
+              # PR head at /workdir, so any poisoned .git/config attributes
+              # in the PR cannot escape the sandbox.
+              git -C /workdir add --intent-to-add -- "$LOCKS_DIR" 2>/dev/null || true
+              git -C /workdir diff --no-color -- "$LOCKS_DIR" \
+                > /output/locks.patch || true
+              # `hashFiles()` returns the SHA256 of an empty file (still
+              # non-empty), so removing the file outright is the only way
+              # to make the upload steps skip when there is no drift.
+              [ -s /output/locks.patch ] || rm -f /output/locks.patch
+            '
+
+      # Dual upload: `archive: false` (v7 feature) gives browser users a direct
+      # download of the raw patch (artifact name is derived from the filename,
+      # so `name:` is ignored here — that's why we need the second upload).
+      # The zipped `locks-patch` artifact is for `gh run download`, which only
+      # works with named artifacts.
+      - name: Upload locks patch (unzipped, for browser download)
+        id: upload-locks-patch
+        if: hashFiles('locks-output/locks.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          path: locks-output/locks.patch
+          archive: false
+
+      # See: https://github.com/cli/cli/issues/13012 for why this is needed.
+      - name: Upload locks patch (zipped, for gh run download)
+        if: hashFiles('locks-output/locks.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: locks-patch
+          path: locks-output/locks.patch
+
+      - name: Upload update output
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: update-output
+          path: locks-output/update-output.json
+
+  # Post the locks PR comment. Same security posture as the `comment` job:
+  # `pull-requests: write` is only granted to a job that does NOT execute any
+  # PR-derived code — only the trusted base branch is checked out, and the
+  # update-output artifact is consumed in trusted shape.
+  update_locks_comment:
+    name: Post locks drift comment
+    needs: update_locks
+    if: always() && needs.update_locks.result != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # Post/update/delete drift comments on PRs
+    steps:
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: tomls/base/main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Download update output
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: update-output
+          path: update-output
+
+      - name: Post PR comment
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REPO: ${{ inputs.repo }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          PATCH_URL: ${{ needs.update_locks.outputs.patch-url }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python .github/workflows/scripts/locks-check/post_locks_comment.py \
+            --repo "$PR_REPO" \
+            --pr "$PR_NUMBER" \
+            --update-output update-output/update-output.json \
             --artifacts-url "$PATCH_URL" \
             --run-id "$RUN_ID"
