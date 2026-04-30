@@ -6,10 +6,11 @@
 # Group overrides are split into separate files:
 #   base.packages.toml       -> rpm-base   (intentional, fully supported)
 #   sdk.packages.toml        -> rpm-sdk    (everything else: built but unsupported)
-#   exceptions.packages.toml -> rpm-sdk    (curated carve-outs from base SRPMs)
+#   exceptions.packages.toml -> rpm-sdk    (curated carve-outs from base SRPMs;
+#                                           kept minimal)
 #
-# Policy: every binary RPM produced by an SRPM must publish to the same channel,
-# unless that subpackage is explicitly carved out in `exceptions.packages.toml`.
+# Policy: every binary RPM produced by an SRPM must publish to the same channel.
+# The only allowed exceptions are listed in `exceptions.packages.toml`.
 #
 
 includes = ["*.packages.toml"]
