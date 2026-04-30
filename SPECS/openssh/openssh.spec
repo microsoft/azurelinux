@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -51,6 +51,9 @@ Patch351:       CVE-2024-6387.patch
 Patch352:       CVE-2025-26465.patch
 Patch353:       CVE-2025-32728.patch
 Patch354:       CVE-2025-61985.patch
+Patch355:       CVE-2026-35385.patch
+Patch356:       CVE-2026-35386.patch
+Patch357:       CVE-2026-35388.patch
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
 BuildRequires:  e2fsprogs-devel
@@ -140,6 +143,9 @@ popd
 %patch352 -p1 -b .cve-2025-26465
 %patch353 -p1 -b .cve-2025-32728
 %patch354 -p1 -b .CVE-2025-61985
+%patch 355 -p1 -b .cve-2026-35385
+%patch 356 -p1 -b .cve-2026-35386
+%patch 357 -p1 -b .cve-2026-35388
 
 %build
 export CFLAGS="$CFLAGS -fpic"
@@ -296,6 +302,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Tue Apr 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.9p1-10
+- Patch CVE-2026-35385, CVE-2026-35386, CVE-2026-35388
+
 * Thu Oct 09 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.9p1-9
 - Patch CVE-2025-61985
 
