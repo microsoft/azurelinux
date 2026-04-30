@@ -11,6 +11,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/hwloc.azl.macros}
+
 Summary:   Portable Hardware Locality - portable abstraction of hierarchical architectures
 Name:      hwloc
 Version:   2.12.0
@@ -18,6 +21,7 @@ Release:   %autorelease
 License:   BSD-2-Clause
 URL:       http://www.open-mpi.org/projects/hwloc/
 Source0:   https://download.open-mpi.org/release/hwloc/v2.11/hwloc-%{version}.tar.bz2
+Source9999: hwloc.azl.macros
 Requires:  %{name}-libs%{?_isa} = %{version}-%{release}
 
 BuildRequires: gcc
