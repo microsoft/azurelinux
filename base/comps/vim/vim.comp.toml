@@ -1,0 +1,5 @@
+# Disable optional gpm (console-mouse) support so that we can demote
+# the gpm SRPM entirely to sdk. vim.spec uses bcond gating for GPM
+# (default ON when fedora is set); flip it off via build.without.
+[components.vim]
+build.without = ["gpm"]
