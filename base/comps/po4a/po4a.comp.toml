@@ -1,0 +1,22 @@
+[components.po4a]
+
+# Drop the runtime Requires on texlive-kpathsea / texlive-kpathsea-bin.
+# po4a is a multi-format documentation translation tool (~15 format
+# modules: man, sgml, xml, asciidoc, markdown, docbook, dia, halibut,
+# tex, ...). The kpathsea Requires are only consumed by Locale::Po4a::TeX
+# (which shells out to `kpsewhich` to resolve TeX \input/\include paths).
+# All other format modules work without it. AZL is a headless cloud distro
+# where TeX is sdk-tier; this overlay lets po4a stay in base while
+# texlive-kpathsea(-bin) live in sdk. Users translating TeX sources can
+# install texlive-kpathsea-bin from sdk on demand.
+[[components.po4a.overlays]]
+description = "Drop texlive-kpathsea Requires - TeX format support is optional, texlive is sdk-tier"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "texlive-kpathsea"
+
+[[components.po4a.overlays]]
+description = "Drop texlive-kpathsea-bin Requires - TeX format support is optional, texlive is sdk-tier"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "texlive-kpathsea-bin"
