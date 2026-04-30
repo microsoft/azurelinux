@@ -1179,12 +1179,6 @@ packages = [
     "libpmempool-devel", # srpm: nvml
     "libpng-static", # srpm: libpng
     "libpng-tools", # srpm: libpng
-    "libportal-gtk3", # srpm: libportal
-    "libportal-gtk3-devel", # srpm: libportal
-    "libportal-gtk4", # srpm: libportal
-    "libportal-gtk4-devel", # srpm: libportal
-    "libportal-qt5", # srpm: libportal
-    "libportal-qt5-devel", # srpm: libportal
     "libpostproc-free", # srpm: ffmpeg
     "libpostproc-free-devel", # srpm: ffmpeg
     "libpsm2-compat", # srpm: libpsm2

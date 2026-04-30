@@ -2613,11 +2613,6 @@ packages = [
     "libpmem", # srpm: nvml
     "libpng", # srpm: libpng
     "libpng-devel", # srpm: libpng
-    "libportal", # srpm: libportal
-    "libportal-devel", # srpm: libportal
-    "libportal-devel-doc", # srpm: libportal
-    "libportal-qt6", # srpm: libportal
-    "libportal-qt6-devel", # srpm: libportal
     "libpq", # srpm: libpq
     "libpq-devel", # srpm: libpq
     "libproxy", # srpm: libproxy
