@@ -82,8 +82,6 @@ Requires: gettext
 Requires: opensp
 # hope texlive-kpseas-bin missing deps was fixed
 # epel7 doesn't have /usr/share/texlive/texmf-dist/web2c/texmf.cnf
-Requires: texlive-kpathsea
-Requires: texlive-kpathsea-bin
 
 # Optional, but package is quite useless without
 Requires: perl(Locale::gettext) >= 1.01
