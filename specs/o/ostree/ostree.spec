@@ -11,6 +11,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/ostree.azl.macros}
+
 # We haven't tried to ship the tests on RHEL
 %if 0%{?rhel}
     %bcond_with tests
@@ -23,6 +26,7 @@ Name: ostree
 Version: 2025.7
 Release: %autorelease
 Source0: https://github.com/ostreedev/%{name}/releases/download/v%{version}/libostree-%{version}.tar.xz
+Source9999: ostree.azl.macros
 License: LGPL-2.0-or-later
 URL: https://ostreedev.github.io/ostree/
 

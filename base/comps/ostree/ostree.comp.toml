@@ -1,0 +1,12 @@
+# Disable the optional `tests` (installed-tests) sub-package.
+#
+# ostree-tests is the GNOME installed-tests harness; its only base
+# unresolved dep is `/usr/bin/gjs` (GNOME Javascript binding from gjs,
+# which lives in sdk along with mozjs). The harness is not warranted
+# in base for a headless cloud distro.
+#
+# ostree.spec has `%bcond_without tests` (default ON); passing
+# `--without tests` skips the entire installed-tests build, install,
+# and `%files tests` block.
+[components.ostree]
+build.without = ["tests"]
