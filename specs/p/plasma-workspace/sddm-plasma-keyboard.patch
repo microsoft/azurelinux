@@ -1,0 +1,22 @@
+From 43324f9e01fc5dd77bf7483264008fc5b1b1a851 Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Sun, 14 Dec 2025 15:17:48 +0100
+Subject: [PATCH] sddm: Default to plasma-keyboard
+
+---
+ sddm-wayland-session/plasma-wayland.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sddm-wayland-session/plasma-wayland.conf b/sddm-wayland-session/plasma-wayland.conf
+index 6781ac46ce..70ee2b7c62 100644
+--- a/sddm-wayland-session/plasma-wayland.conf
++++ b/sddm-wayland-session/plasma-wayland.conf
+@@ -4,4 +4,4 @@ GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
+ InputMethod=
+ 
+ [Wayland]
+-CompositorCommand=kwin_wayland --no-global-shortcuts --no-lockscreen --inputmethod maliit-keyboard --locale1
++CompositorCommand=kwin_wayland --no-global-shortcuts --no-lockscreen --inputmethod plasma-keyboard --locale1
+-- 
+2.52.0
+

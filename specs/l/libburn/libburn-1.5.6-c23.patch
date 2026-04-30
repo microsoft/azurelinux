@@ -1,0 +1,23 @@
+From d537f9dd35282df834a311ead5f113af67d223b3 Mon Sep 17 00:00:00 2001
+From: Thomas Schmitt <scdbackup@gmx.net>
+Date: Tue, 26 Nov 2024 23:02:03 +0100
+Subject: [PATCH] Bug fix: Faulty signal handler prototype spoiled compilation
+ under C23
+
+---
+ test/poll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/poll.c b/test/poll.c
+index 660f384..cd5ff90 100644
+--- a/test/poll.c
++++ b/test/poll.c
+@@ -14,7 +14,7 @@ static struct burn_drive_info *drives;
+ static unsigned int n_drives;
+ int NEXT;
+ 
+-static void catch_int ()
++static void catch_int (int signum)
+ {
+ 	NEXT = 1;
+ }

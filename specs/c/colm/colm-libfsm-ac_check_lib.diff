@@ -1,0 +1,23 @@
+From 28b6e0a01157049b4cb279b0ef25ea9dcf3b46ed Mon Sep 17 00:00:00 2001
+From: Adrian Thurston <thurston@colm.net>
+Date: Sun, 12 Mar 2023 13:17:42 -0700
+Subject: [PATCH] include an extern C function in libfsm so we can use
+ AC_CHECK_LIB
+
+---
+ src/libfsm/codegen.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/libfsm/codegen.cc b/src/libfsm/codegen.cc
+index 21edb5ac..1150384e 100644
+--- a/src/libfsm/codegen.cc
++++ b/src/libfsm/codegen.cc
+@@ -30,6 +30,8 @@
+ #include <assert.h>
+ #include <iomanip>
+ 
++// Convenience: for checking for the presence of the libfsm.
++extern "C" void libfsm_present() {}
+ 
+ using std::ostream;
+ using std::ostringstream;

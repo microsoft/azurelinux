@@ -1,0 +1,55 @@
+From 4ae38ce5420ec266fd15d4231dc35006037e8493 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Robert-Andr=C3=A9=20Mauchin?=
+ <30413512+eclipseo@users.noreply.github.com>
+Date: Mon, 18 Sep 2023 22:37:38 +0200
+Subject: [PATCH] Use patch-ng fork instead of unmaintained patch
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Robert-André Mauchin <zebob.m@gmail.com>
+---
+ setup.cfg                | 2 +-
+ src/extractcode/patch.py | 2 +-
+ tests/test_patch.py      | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/setup.cfg b/setup.cfg
+index cae2e90..876874c 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -87,7 +87,7 @@ full =
+     typecode[full] >= 21.6.1
+ 
+ patch =
+-    patch >= 1.16
++    patch-ng >= 1.17
+ 
+ testing =
+     pytest >= 6, != 7.0.0
+diff --git a/src/extractcode/patch.py b/src/extractcode/patch.py
+index 3588695..e93b103 100644
+--- a/src/extractcode/patch.py
++++ b/src/extractcode/patch.py
+@@ -134,7 +134,7 @@ def patch_info(location):
+ 
+     Raise an exception if the file is not a patch file or cannot be parsed.
+     """
+-    import patch as pythonpatch
++    import patch_ng as pythonpatch
+     patchset = pythonpatch.fromfile(location)
+     if not patchset:
+         msg = 'Unable to parse patch file: %(location)s' % locals()
+diff --git a/tests/test_patch.py b/tests/test_patch.py
+index c3f4008..2bf5fa4 100644
+--- a/tests/test_patch.py
++++ b/tests/test_patch.py
+@@ -18,7 +18,7 @@
+ from extractcode import patch
+ 
+ try:
+-    import patch as _pythonpatch
++    import patch_ng as _pythonpatch
+ except ImportError:
+     import pytest
+     pytestmark = pytest.mark.skipif(True, reason="Run only if patch is installed.")

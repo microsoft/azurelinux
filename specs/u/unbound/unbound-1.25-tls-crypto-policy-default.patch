@@ -1,0 +1,61 @@
+From 5f0b4c0cb09abb4dfb60be0d8e151cf11f4f12f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Mon, 9 Feb 2026 15:40:51 +0100
+Subject: [PATCH] Add a new build-time option for system TLS
+
+We want to use crypto-policy provided configuration always in our
+builds. Allow changing the default of tls-use-system-policy-versions at
+build time by a simple configure parameter.
+---
+ configure.ac       | 11 +++++++++++
+ util/config_file.c |  5 ++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 41eedc2fd..996240448 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2080,6 +2080,17 @@ case "$enable_ipsecmod" in
+ 		;;
+ esac
+ 
++# check for system TLS preference if requested
++AC_ARG_ENABLE(system-tls, AS_HELP_STRING([--enable-system-tls],[Enable preference of system configured TLS socket options]))
++case "$enable_system_tls" in
++	yes)
++		AC_DEFINE([USE_SYSTEM_TLS], [1], [Define to 1 to prefer TLS crypto settings from the system.])
++		;;
++	no|*)
++		# nothing
++		;;
++esac
++
+ # check for ipset if requested
+ AC_ARG_ENABLE(ipset, AS_HELP_STRING([--enable-ipset],[enable ipset module]))
+ case "$enable_ipset" in
+diff --git a/util/config_file.c b/util/config_file.c
+index 8f3e46289..94c9b5edd 100644
+--- a/util/config_file.c
++++ b/util/config_file.c
+@@ -71,6 +71,9 @@
+ #ifdef HAVE_PWD_H
+ #include <pwd.h>
+ #endif
++#ifndef USE_SYSTEM_TLS
++#define USE_SYSTEM_TLS 0
++#endif
+ 
+ /** from cfg username, after daemonize setup performed */
+ uid_t cfg_uid = (uid_t)-1;
+@@ -129,7 +132,7 @@ config_create(void)
+ 	cfg->tls_cert_bundle = NULL;
+ 	cfg->tls_win_cert = 0;
+ 	cfg->tls_use_sni = 1;
+-	cfg->tls_use_system_policy_versions = 0;
++	cfg->tls_use_system_policy_versions = USE_SYSTEM_TLS;
+ 	cfg->https_port = UNBOUND_DNS_OVER_HTTPS_PORT;
+ 	if(!(cfg->http_endpoint = strdup("/dns-query"))) goto error_exit;
+ 	cfg->http_max_streams = 100;
+-- 
+2.52.0
+

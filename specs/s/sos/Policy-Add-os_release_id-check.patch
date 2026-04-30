@@ -1,0 +1,33 @@
+From fcc6a5f498bc1e7edf7c2f2acf0f506ced0f21dc Mon Sep 17 00:00:00 2001
+From: Eric Desrochers <edesrochers@microsoft.com>
+Date: Tue, 21 Apr 2026 10:29:41 -0400
+Subject: [PATCH] [Policy] Add os_release_id check
+
+Add additional check introducing os_release_id in azure.py policy.
+
+Signed-off-by: Eric Desrochers <edesrochers@microsoft.com>
+---
+ sos/policies/distros/azure.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sos/policies/distros/azure.py b/sos/policies/distros/azure.py
+index 42d9bae4..f8809c9e 100644
+--- a/sos/policies/distros/azure.py
++++ b/sos/policies/distros/azure.py
+@@ -13,11 +13,12 @@ from sos.policies.distros.redhat import RedHatPolicy
+ 
+ 
+ class AzurePolicy(RedHatPolicy):
+-    vendor = "Microsoft"
++    vendor = "Microsoft Azure Linux"
+     vendor_urls = [
+         ('Distribution Website', 'https://github.com/microsoft/azurelinux')
+     ]
+     os_release_name = 'Azure Linux'
++    os_release_id = 'azurelinux'
+     os_release_file = ''
+ 
+     def __init__(self, sysroot=None, init=None, probe_runtime=True,
+-- 
+2.51.0
+

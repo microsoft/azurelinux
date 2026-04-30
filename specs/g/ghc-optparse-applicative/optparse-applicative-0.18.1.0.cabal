@@ -1,0 +1,141 @@
+name:                optparse-applicative
+version:             0.18.1.0
+x-revision: 1
+synopsis:            Utilities and combinators for parsing command line options
+description:
+    optparse-applicative is a haskell library for parsing options
+    on the command line, and providing a powerful applicative
+    interface for composing them.
+    .
+    optparse-applicative takes care of reading and validating the
+    arguments passed to the command line, handling and reporting
+    errors, generating a usage line, a comprehensive help screen,
+    and enabling context-sensitive bash, zsh, and fish completions.
+    .
+    See the included README for detailed instructions and examples,
+    which is also available on github
+    <https://github.com/pcapriotti/optparse-applicative>.
+license:             BSD3
+license-file:        LICENSE
+author:              Paolo Capriotti, Huw Campbell
+maintainer:          huw.campbell@gmail.com
+copyright:           (c) 2012-2017 Paolo Capriotti <paolo@capriotti.io>
+category:            System, CLI, Options, Parsing
+build-type:          Simple
+cabal-version:       >= 1.10
+extra-source-files:  CHANGELOG.md
+                     README.md
+                     tests/alt.err.txt
+                     tests/cabal.err.txt
+                     tests/carry.err.txt
+                     tests/commands.err.txt
+                     tests/commands_header.err.txt
+                     tests/commands_header_full.err.txt
+                     tests/dropback.err.txt
+                     tests/hello.err.txt
+                     tests/helponempty.err.txt
+                     tests/helponemptysub.err.txt
+                     tests/long_equals.err.txt
+                     tests/formatting.err.txt
+                     tests/formatting-long-subcommand.err.txt
+                     tests/nested.err.txt
+                     tests/optional.err.txt
+                     tests/nested_optional.err.txt
+                     tests/subparsers.err.txt
+
+homepage:            https://github.com/pcapriotti/optparse-applicative
+bug-reports:         https://github.com/pcapriotti/optparse-applicative/issues
+tested-with:
+  GHC==9.6.1
+  GHC==9.4.4
+  GHC==9.2.7
+  GHC==9.0.2
+  GHC==8.10.7
+  GHC==8.8.4
+  GHC==8.6.5
+  GHC==8.4.4
+  GHC==8.2.2
+  GHC==8.0.2
+  GHC==7.10.3
+  GHC==7.8.4
+  GHC==7.6.3
+  GHC==7.4.2
+  GHC==7.2.2
+  GHC==7.0.4
+
+source-repository head
+  type:     git
+  location: https://github.com/pcapriotti/optparse-applicative.git
+
+flag process
+  description:
+    Depend on the process package for Bash autocompletion
+  default: True
+
+library
+  hs-source-dirs:      src
+  ghc-options:         -Wall
+  default-language:    Haskell98
+
+  -- See https://ghc.haskell.org/trac/ghc/wiki/Migration/8.0#base-4.9.0.0
+  if impl(ghc >= 8.0)
+    ghc-options:  -Wno-redundant-constraints -Wcompat -Wnoncanonical-monad-instances
+    if impl(ghc < 8.8)
+      ghc-options: -Wnoncanonical-monadfail-instances
+
+  exposed-modules:     Options.Applicative
+                     , Options.Applicative.Arrows
+                     , Options.Applicative.BashCompletion
+                     , Options.Applicative.Builder
+                     , Options.Applicative.Builder.Completer
+                     , Options.Applicative.Builder.Internal
+                     , Options.Applicative.Common
+                     , Options.Applicative.Extra
+                     , Options.Applicative.Help
+                     , Options.Applicative.Help.Chunk
+                     , Options.Applicative.Help.Core
+                     , Options.Applicative.Help.Levenshtein
+                     , Options.Applicative.Help.Pretty
+                     , Options.Applicative.Help.Types
+                     , Options.Applicative.NonEmpty
+                     , Options.Applicative.Types
+                     , Options.Applicative.Internal
+
+  build-depends:       base                            >= 4.5 && < 5
+                     , text                            >= 1.2
+                     , transformers                    >= 0.2 && < 0.7
+                     , transformers-compat             >= 0.3 && < 0.8
+                     , prettyprinter                   >= 1.7 && < 1.8
+                     , prettyprinter-ansi-terminal     >= 1.1.2 && < 1.2
+
+  if flag(process)
+    build-depends:     process                         >= 1.0 && < 1.7
+
+  if !impl(ghc >= 8)
+    build-depends:     semigroups                      >= 0.10 && < 0.21
+                     , fail                            == 4.9.*
+
+test-suite tests
+  type:                exitcode-stdio-1.0
+
+  main-is:             test.hs
+
+  ghc-options:         -Wall -threaded -O2 -funbox-strict-fields
+
+  hs-source-dirs:      tests
+
+  default-language:    Haskell98
+
+  other-modules:       Examples.Alternatives
+                     , Examples.Cabal
+                     , Examples.Commands
+                     , Examples.Formatting
+                     , Examples.Hello
+                     , Examples.LongSub
+
+  build-depends:       base
+                     , optparse-applicative
+                     , QuickCheck                      >= 2.8 && < 2.15
+
+  if !impl(ghc >= 8)
+    build-depends:     semigroups

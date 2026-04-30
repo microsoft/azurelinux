@@ -1,0 +1,80 @@
+Name:                bsb-http-chunked
+Version:             0.0.0.4
+x-revision:          4
+Synopsis:            Chunked HTTP transfer encoding for bytestring builders
+
+Description:         This library contains functions for encoding [bytestring
+                     builders](http://hackage.haskell.org/package/bytestring/docs/Data-ByteString-Builder.html#t:Builder)
+                     for [chunked HTTP\/1.1 transfer](https://en.wikipedia.org/wiki/Chunked_transfer_encoding).
+                     .
+                     This functionality was extracted from
+                     the [blaze-builder](http://hackage.haskell.org/package/blaze-builder)
+                     package.
+
+Author:              Jasper Van der Jeugt, Simon Meier, Leon P Smith, Simon Jakobi
+Copyright:           (c) 2010-2014 Simon Meier
+                     (c) 2010 Jasper Van der Jeugt
+                     (c) 2013-2015 Leon P Smith
+                     (c) 2018 Simon Jakobi
+Maintainer:          Simon Jakobi <simon.jakobi@gmail.com>
+
+License:             BSD3
+License-file:        LICENSE
+
+Homepage:            http://github.com/sjakobi/bsb-http-chunked
+Bug-Reports:         http://github.com/sjakobi/bsb-http-chunked/issues
+Stability:           Provisional
+
+Category:            Data, Network
+Build-type:          Simple
+Cabal-version:       >= 1.8
+
+Extra-source-files:  CHANGELOG.md
+
+Source-repository head
+  Type: git
+  Location: https://github.com/sjakobi/bsb-http-chunked.git
+
+Library
+  exposed-modules:   Data.ByteString.Builder.HTTP.Chunked
+  build-depends:     base >= 4.8 && < 5,
+                     bytestring >= 0.10.2 && < 0.13
+  ghc-options:       -Wall -O2
+  if impl(ghc >= 8.0)
+    ghc-options:     -Wcompat
+
+test-suite tests
+  hs-source-dirs: tests
+  main-is: Tests.hs
+  build-depends:   attoparsec
+                 , base
+                 , bsb-http-chunked
+                 , blaze-builder >= 0.2.1.4
+                 , bytestring
+                 , hedgehog
+                 , tasty
+                 , tasty-hedgehog
+                 , tasty-hunit
+  ghc-options: -Wall -rtsopts
+  type: exitcode-stdio-1.0
+
+test-suite doctests
+  hs-source-dirs: tests
+  main-is: Doctests.hs
+  build-depends:   base
+                 , doctest >= 0.8
+  ghc-options: -Wall
+  type: exitcode-stdio-1.0
+
+benchmark bench
+  hs-source-dirs: bench
+  main-is: Bench.hs
+  build-depends:   base
+                 , blaze-builder
+                 , bsb-http-chunked
+                 , bytestring
+                 , deepseq
+                 , gauge
+                 , semigroups
+  ghc-options: -O2 -Wall -rtsopts
+  type: exitcode-stdio-1.0

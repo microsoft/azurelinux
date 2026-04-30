@@ -1,0 +1,92 @@
+cabal-version:      1.12
+name:               base64-bytestring
+version:            1.2.1.0
+x-revision: 1
+synopsis:           Fast base64 encoding and decoding for ByteStrings
+description:
+  This package provides support for encoding and decoding binary data according to @base64@ (see also <https://tools.ietf.org/html/rfc4648 RFC 4648>) for strict and lazy ByteStrings
+  .
+  For a fuller-featured and better-performing Base64 library, see the <https://hackage.haskell.org/package/base64 base64> package.
+
+homepage:           https://github.com/haskell/base64-bytestring
+bug-reports:        https://github.com/haskell/base64-bytestring/issues
+license:            BSD3
+license-file:       LICENSE
+author:             Bryan O'Sullivan <bos@serpentine.com>
+maintainer:
+  Herbert Valerio Riedel <hvr@gnu.org>,
+  Mikhail Glushenkov <mikhail.glushenkov@gmail.com>,
+  Emily Pillmore <emilypi@cohomolo.gy>
+
+copyright:          2010-2020 Bryan O'Sullivan et al.
+category:           Data
+build-type:         Simple
+tested-with:
+  GHC ==7.0.4
+   || ==7.2.2
+   || ==7.4.2
+   || ==7.6.3
+   || ==7.8.4
+   || ==7.10.3
+   || ==8.0.2
+   || ==8.2.2
+   || ==8.4.4
+   || ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+
+extra-source-files:
+  README.md
+  CHANGELOG.md
+  utils/Transcode.hs
+  utils/transcode.py
+
+library
+  exposed-modules:
+    Data.ByteString.Base64
+    Data.ByteString.Base64.Lazy
+    Data.ByteString.Base64.URL
+    Data.ByteString.Base64.URL.Lazy
+
+  other-modules:    Data.ByteString.Base64.Internal
+  build-depends:
+      base        >=4   && <5
+    , bytestring  >=0.9 && <0.13
+
+  ghc-options:      -Wall -funbox-strict-fields
+  default-language: Haskell2010
+
+test-suite test
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests
+  main-is:          Tests.hs
+  ghc-options:      -Wall -threaded -rtsopts
+  build-depends:
+      base
+    , base64-bytestring
+    , bytestring
+    , HUnit
+    , QuickCheck
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+
+  default-language: Haskell2010
+
+benchmark benchmarks
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   benchmarks
+  main-is:          BM.hs
+  ghc-options:      -Wall -threaded -rtsopts
+  build-depends:
+      base
+    , base64-bytestring
+    , bytestring
+    , criterion
+    , deepseq >=1.1
+
+  default-language: Haskell2010
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/base64-bytestring

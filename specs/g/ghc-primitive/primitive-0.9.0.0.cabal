@@ -1,0 +1,128 @@
+Cabal-Version:  2.0
+Name:           primitive
+Version:        0.9.0.0
+x-revision: 2
+License:        BSD3
+License-File:   LICENSE
+
+Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
+Maintainer:     libraries@haskell.org
+Copyright:      (c) Roman Leshchinskiy 2009-2012
+Homepage:       https://github.com/haskell/primitive
+Bug-Reports:    https://github.com/haskell/primitive/issues
+Category:       Data
+Synopsis:       Primitive memory-related operations
+Build-Type:     Simple
+Description:    This package provides various primitive memory-related operations.
+
+Extra-Source-Files: changelog.md
+                    test/*.hs
+                    test/LICENSE
+
+Tested-With:
+  GHC == 8.0.2
+  GHC == 8.2.2
+  GHC == 8.4.4
+  GHC == 8.6.5
+  GHC == 8.8.4
+  GHC == 8.10.7
+  GHC == 9.0.2
+  GHC == 9.2.8
+  GHC == 9.4.8
+  GHC == 9.6.6
+  GHC == 9.8.2
+  GHC == 9.10.1
+  GHC == 9.12.0
+
+Library
+  Default-Language: Haskell2010
+  Default-Extensions:
+        TypeOperators
+  Other-Extensions:
+        BangPatterns, CPP, DeriveDataTypeable,
+        MagicHash, TypeFamilies, UnboxedTuples, UnliftedFFITypes
+
+  Exposed-Modules:
+        Control.Monad.Primitive
+        Data.Primitive
+        Data.Primitive.MachDeps
+        Data.Primitive.Types
+        Data.Primitive.Array
+        Data.Primitive.ByteArray
+        Data.Primitive.PrimArray
+        Data.Primitive.SmallArray
+        Data.Primitive.Ptr
+        Data.Primitive.MutVar
+        Data.Primitive.MVar
+        Data.Primitive.PrimVar
+
+  Other-Modules:
+        Data.Primitive.Internal.Operations
+        Data.Primitive.Internal.Read
+
+  Build-Depends: base >= 4.9 && < 4.22
+               , deepseq >= 1.1 && < 1.6
+               , transformers >= 0.5 && < 0.7
+               , template-haskell >= 2.11
+
+  if impl(ghc >= 9.2)
+    cpp-options: -DHAVE_KEEPALIVE
+
+  if impl(ghc < 9.4)
+    build-depends: data-array-byte >= 0.1 && < 0.1.1
+
+  Ghc-Options: -O2
+
+  Include-Dirs: cbits
+  Install-Includes: primitive-memops.h
+  includes: primitive-memops.h
+  c-sources: cbits/primitive-memops.c
+  if !os(solaris)
+      cc-options: -ftree-vectorize
+  if arch(i386) || arch(x86_64)
+      cc-options: -msse2
+
+test-suite test-qc
+  Default-Language: Haskell2010
+  hs-source-dirs: test
+                  test/src
+  main-is: Main.hs
+  Other-Modules: PrimLaws
+  type: exitcode-stdio-1.0
+  build-depends: base
+               , base-orphans
+               , ghc-prim
+               , primitive
+               , quickcheck-classes-base >= 0.6 && <0.7
+               , QuickCheck >= 2.13 && < 2.16
+               , tasty >= 1.2 && < 1.6
+               , tasty-quickcheck
+               , tagged
+               , transformers >= 0.5
+               , transformers-compat
+
+  cpp-options: -DHAVE_UNARY_LAWS
+  ghc-options: -O2
+
+benchmark bench
+  Default-Language: Haskell2010
+  hs-source-dirs: bench
+  main-is: main.hs
+  type: exitcode-stdio-1.0
+  ghc-options: -O2
+  other-modules:
+    Array.Traverse.Closure
+    Array.Traverse.Unsafe
+    ByteArray.Compare
+    PrimArray.Compare
+    PrimArray.Traverse
+  build-depends:
+      base
+    , primitive
+    , deepseq
+    , tasty-bench
+    , transformers >= 0.5
+
+source-repository head
+  type:     git
+  location: https://github.com/haskell/primitive

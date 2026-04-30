@@ -1,0 +1,42 @@
+From 49f2037ac22fcb430fadd5d7b29bd8af234573a4 Mon Sep 17 00:00:00 2001
+From: Akseli Lahtinen <akselmo@akselmo.dev>
+Date: Thu, 7 Mar 2024 16:01:44 +0000
+Subject: [PATCH] Fix link list dialog for installation button
+
+In gridview, installation buttons showed "Install..." for every item,
+even if the item had only single download link. This fixes it
+by showing correct button.
+
+The problem was using `entry` directly instead of `model`.
+
+BUG: 482349
+FIXED-IN: 6.1
+---
+ .../qml/private/entrygriddelegates/TileDelegate.qml       | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/qtquick/qml/private/entrygriddelegates/TileDelegate.qml b/src/qtquick/qml/private/entrygriddelegates/TileDelegate.qml
+index 2fdee68b4..36224abe2 100644
+--- a/src/qtquick/qml/private/entrygriddelegates/TileDelegate.qml
++++ b/src/qtquick/qml/private/entrygriddelegates/TileDelegate.qml
+@@ -40,13 +40,13 @@ Private.GridTileDelegate {
+             visible: enabled
+         },
+         Kirigami.Action {
+-            text: entry.downloadLinks.length === 1 ? i18ndc("knewstuff6", "Request installation of this item, available when there is exactly one downloadable item", "Install") : i18ndc("knewstuff6", "Show installation options, where there is more than one downloadable item", "Install…");
++            text: model.downloadLinks.length === 1 ? i18ndc("knewstuff6", "Request installation of this item, available when there is exactly one downloadable item", "Install") : i18ndc("knewstuff6", "Show installation options, where there is more than one downloadable item", "Install…");
+             icon.name: "install"
+             onTriggered: {
+-                if (entry.downloadLinks.length === 1) {
+-                    newStuffEngine.install(entry.entry, NewStuff.ItemsModel.FirstLinkId);
++                if (model.downloadLinks.length === 1) {
++                    newStuffEngine.install(entry, NewStuff.ItemsModel.FirstLinkId);
+                 } else {
+-                    downloadItemsSheet.downloadLinks = entry.downloadLinks;
++                    downloadItemsSheet.downloadLinks = model.downloadLinks;
+                     downloadItemsSheet.entry = entry;
+                     downloadItemsSheet.open();
+                 }
+-- 
+GitLab
+

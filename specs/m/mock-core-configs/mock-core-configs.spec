@@ -7,7 +7,7 @@
 
 Name:       mock-core-configs
 Version:    44.1
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:    Mock core config files basic chroots
 
 License:    GPL-2.0-or-later
@@ -18,6 +18,9 @@ URL:        https://github.com/rpm-software-management/mock/
 # git reset --hard %%{name}-%%{version}
 # tito build --tgz
 Source:     https://github.com/rpm-software-management/mock/releases/download/%{name}-%{version}-1/%{name}-%{version}.tar.gz
+Source10: azure-linux-4.tpl
+Source11: azure-linux-4-x86_64.cfg
+Source12: azure-linux-4-aarch64.cfg
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
@@ -82,6 +85,14 @@ mock_docs=${mock_docs//mock-core-configs/mock}
 mock_docs=${mock_docs//-%version/-*}
 sed -i "s~@MOCK_DOCS@~$mock_docs~" %{buildroot}%{_sysconfdir}/mock/site-defaults.cfg
 
+
+# Azure Linux 4.0 configs (added by azldev overlay).
+install -m 0644 %{SOURCE10} %{buildroot}%{_sysconfdir}/mock/templates/azure-linux-4.tpl
+install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/mock/azure-linux-4-x86_64.cfg
+install -m 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/mock/azure-linux-4-aarch64.cfg
+echo "%%config(noreplace) %{_sysconfdir}/mock/templates/azure-linux-4.tpl" >> %{name}.cfgs
+echo "%%config(noreplace) %{_sysconfdir}/mock/azure-linux-4-x86_64.cfg" >> %{name}.cfgs
+echo "%%config(noreplace) %{_sysconfdir}/mock/azure-linux-4-aarch64.cfg" >> %{name}.cfgs
 %post
 if [ -s /etc/os-release ]; then
     # fedora and rhel7+
@@ -137,6 +148,8 @@ cfg=fedora-eln-$mock_arch.cfg
 %if 0%{?mageia}
 cfg=mageia-$ver-$mock_arch.cfg
 %endif
+
+cfg=azure-linux-$ver-$mock_arch.cfg
 
 if [ -e %{_sysconfdir}/mock/$cfg ]; then
     if [ "$(readlink %{_sysconfdir}/mock/default.cfg)" != "$cfg" ]; then

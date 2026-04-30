@@ -1,0 +1,587 @@
+From d7f3c5a8db26e9f97511bf2852ee40f19f85cf4a Mon Sep 17 00:00:00 2001
+From: Oliver Beard <olib141@outlook.com>
+Date: Thu, 29 Jan 2026 13:45:45 +0000
+Subject: [PATCH 1/4] frontend/greeter: Block UI timeout when password entered
+ in current box; don't block for userPrompt
+
+Previously we blocked timeout when the user entered the userPrompt (or it was default) and only blocked when a password was present in the userList.
+
+Closes #44.
+---
+ src/frontend/greeter/qml/Main.qml | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/src/frontend/greeter/qml/Main.qml b/src/frontend/greeter/qml/Main.qml
+index 8bf6053..a439d24 100644
+--- a/src/frontend/greeter/qml/Main.qml
++++ b/src/frontend/greeter/qml/Main.qml
+@@ -50,7 +50,20 @@ Item {
+         hoverEnabled: true
+ 
+         property bool uiVisible: PlasmaLogin.GreeterState.activeWindow === Window.window
+-        property bool blockUiTimeout: mainStack.depth > 1 || userListComponent.mainPasswordBox.text.length > 0 // || inputPanel.keyboardActive || config.type !== "image"
++        property bool blockUiTimeout: {
++            if (PlasmaLogin.GreeterState.loginState === PlasmaLogin.GreeterState.LoginState.UserList && PlasmaLogin.GreeterState.userListPassword.length > 0) {
++                // We're on the user list and a password is entered
++                return true;
++            } else if (PlasmaLogin.GreeterState.loginState === PlasmaLogin.GreeterState.UserPrompt && PlasmaLogin.GreeterState.userPromptPassword.length > 0) {
++                // We're on the user prompt and a password is entered
++                return true;
++            }
++
++            // TODO: inputPanel.keyboardActive
++
++            // No reason to block timeout
++            return false;
++        }
+ 
+         function wake() {
+             PlasmaLogin.GreeterState.activateWindow(Window.window);
+-- 
+GitLab
+
+
+From bcc9338c23e0dea630c05b12d300be56d9f7c2ec Mon Sep 17 00:00:00 2001
+From: Oliver Beard <olib141@outlook.com>
+Date: Thu, 29 Jan 2026 13:59:52 +0000
+Subject: [PATCH 2/4] frontend/greeter: Fix userPrompt placeholder user
+
+Was not working with name as realName is required, and fixed warning with icon as url instead of string.
+---
+ src/frontend/greeter/qml/Main.qml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/frontend/greeter/qml/Main.qml b/src/frontend/greeter/qml/Main.qml
+index a439d24..bd03260 100644
+--- a/src/frontend/greeter/qml/Main.qml
++++ b/src/frontend/greeter/qml/Main.qml
+@@ -329,13 +329,13 @@ Item {
+                 // using a model rather than a QObject list to avoid QTBUG-75900
+                 userListModel: ListModel {
+                     ListElement {
+-                        name: ""
++                        realName: ""
+                         icon: ""
+                     }
+                     Component.onCompleted: {
+                         // as we can't bind inside ListElement
+-                        setProperty(0, "name", i18nd("plasma_login", "Type in Username and Password"));
+-                        setProperty(0, "icon", Qt.resolvedUrl(".face.icon"))
++                        setProperty(0, "realName", i18nd("plasma_login", "Type in Username and Password"));
++                        setProperty(0, "icon", Qt.resolvedUrl(".face.icon").toString());
+                     }
+                 }
+ 
+-- 
+GitLab
+
+
+From d8be5fff80e3ad635e52d8b926547cffbce74c6e Mon Sep 17 00:00:00 2001
+From: Oliver Beard <olib141@outlook.com>
+Date: Thu, 29 Jan 2026 14:16:20 +0000
+Subject: [PATCH 3/4] frontend/greeter: Fix not waking on keys, and implement
+ escape key like screen locker
+
+Now the greeter handles key presses through an event filter, waking the prompt whenever a key is pressed.
+
+The screen locker implementation relies upon an obscure behaviour of unblocking the ui timeout making it display, which was prematurely optimised out.
+
+In order to accept all key input and since escape key needs to go to C++ anyway, we use an event filter object on the window and share it with QML so that it can wake or timeout as needed.
+
+Like in the screen locker, we also clear the password when escape is pressed and the display turned off, as well as on suspend/hibernate.
+
+Finally, we also set the cursorShape when the greeter is hidden.
+
+Closes #43.
+---
+ CMakeLists.txt                              |  1 +
+ src/frontend/greeter/CMakeLists.txt         |  2 +
+ src/frontend/greeter/greetereventfilter.cpp | 48 +++++++++++++++++++++
+ src/frontend/greeter/greetereventfilter.h   | 22 ++++++++++
+ src/frontend/greeter/main.cpp               | 18 +++++---
+ src/frontend/greeter/qml/GreeterState.qml   |  6 +++
+ src/frontend/greeter/qml/Main.qml           | 47 ++++++++++++++++----
+ 7 files changed, 129 insertions(+), 15 deletions(-)
+ create mode 100644 src/frontend/greeter/greetereventfilter.cpp
+ create mode 100644 src/frontend/greeter/greetereventfilter.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f83b086..178300d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,6 +43,7 @@ find_package(PlasmaQuick ${PROJECT_DEP_VERSION} REQUIRED)
+ find_package(LayerShellQt ${PROJECT_DEP_VERSION} REQUIRED)
+ find_package(LibKWorkspace ${PROJECT_DEP_VERSION} REQUIRED)
+ find_package(LibKLookAndFeel ${PROJECT_DEP_VERSION} REQUIRED)
++find_package(KF6Screen ${PROJECT_DEP_VERSION} REQUIRED)
+ 
+ # PAM
+ find_package(PAM REQUIRED)
+diff --git a/src/frontend/greeter/CMakeLists.txt b/src/frontend/greeter/CMakeLists.txt
+index ce7afff..be8ea32 100644
+--- a/src/frontend/greeter/CMakeLists.txt
++++ b/src/frontend/greeter/CMakeLists.txt
+@@ -10,6 +10,7 @@ set(LOGIN_GREETER_SRCS
+     backend/SocketWriter.cpp
+     mockbackend/MockGreeterProxy.cpp
+     blurscreenbridge.cpp
++    greetereventfilter.cpp
+ )
+ 
+ add_definitions(-DTRANSLATION_DOMAIN="plasma_login")
+@@ -54,6 +55,7 @@ target_link_libraries(plasma-login-greeter PRIVATE
+     X11::X11
+     LayerShellQt::Interface
+     PW::KWorkspace
++    KF6::ScreenDpms
+ )
+ 
+ ecm_finalize_qml_module(plasma-login-greeter)
+diff --git a/src/frontend/greeter/greetereventfilter.cpp b/src/frontend/greeter/greetereventfilter.cpp
+new file mode 100644
+index 0000000..9a69cc6
+--- /dev/null
++++ b/src/frontend/greeter/greetereventfilter.cpp
+@@ -0,0 +1,48 @@
++/*
++ *  SPDX-FileCopyrightText: 2026 Oliver Beard <olib141@outlook.com>
++ *
++ *  SPDX-License-Identifier: LGPL-2.0-or-later
++ */
++
++#include <KScreenDpms/Dpms>
++#include <kscreendpms/dpms.h>
++
++#include "greetereventfilter.h"
++
++GreeterEventFilter::GreeterEventFilter(QObject *parent)
++    : QObject(parent)
++{
++}
++
++bool GreeterEventFilter::eventFilter(QObject *obj, QEvent *event)
++{
++    Q_UNUSED(obj)
++
++    if (event->type() == QEvent::KeyPress) {
++        auto *keyEvent = static_cast<QKeyEvent *>(event);
++
++        if (keyEvent->key() == Qt::Key_Escape) {
++            // Esc -> turn off screens
++            auto dpms = new KScreen::Dpms(this);
++            if (dpms->isSupported()) {
++                connect(dpms, &KScreen::Dpms::hasPendingChangesChanged, this, [dpms](bool hasPendingChanges) {
++                    if (!hasPendingChanges) {
++                        dpms->deleteLater();
++                    }
++                });
++                dpms->switchMode(KScreen::Dpms::Off);
++            } else {
++                dpms->deleteLater();
++            }
++
++            Q_EMIT escapeKeyPressed();
++
++            return true;
++        } else {
++            // Any other key -> wake greeter
++            Q_EMIT keyPressed();
++        }
++    }
++
++    return false;
++}
+diff --git a/src/frontend/greeter/greetereventfilter.h b/src/frontend/greeter/greetereventfilter.h
+new file mode 100644
+index 0000000..e485b46
+--- /dev/null
++++ b/src/frontend/greeter/greetereventfilter.h
+@@ -0,0 +1,22 @@
++/*
++ *  SPDX-FileCopyrightText: 2026 Oliver Beard <olib141@outlook.com>
++ *
++ *  SPDX-License-Identifier: LGPL-2.0-or-later
++ */
++
++#include <PlasmaQuick/QuickViewSharedEngine>
++
++class GreeterEventFilter : public QObject
++{
++    Q_OBJECT
++
++public:
++    explicit GreeterEventFilter(QObject *parent = nullptr);
++
++Q_SIGNALS:
++    void keyPressed();
++    void escapeKeyPressed();
++
++protected:
++    bool eventFilter(QObject *obj, QEvent *event) override;
++};
+diff --git a/src/frontend/greeter/main.cpp b/src/frontend/greeter/main.cpp
+index 70ad959..9dbb760 100644
+--- a/src/frontend/greeter/main.cpp
++++ b/src/frontend/greeter/main.cpp
+@@ -8,6 +8,7 @@
+ #include <QCommandLineParser>
+ #include <QGuiApplication>
+ #include <QObject>
++#include <QQmlContext>
+ #include <QScreen>
+ 
+ #include <KLocalizedString>
+@@ -20,6 +21,7 @@
+ #include "mockbackend/MockGreeterProxy.h"
+ 
+ #include "blurscreenbridge.h"
++#include "greetereventfilter.h"
+ #include "models/sessionmodel.h"
+ #include "models/usermodel.h"
+ #include "plasmaloginsettings.h"
+@@ -50,6 +52,12 @@ private:
+         window->setScreen(screen);
+         window->setColor(s_testMode ? Qt::darkGray : Qt::transparent);
+ 
++        connect(qApp, &QGuiApplication::screenRemoved, this, [window](QScreen *screenRemoved) {
++            if (screenRemoved == window->screen()) {
++                delete window;
++            }
++        });
++
+         window->setGeometry(screen->geometry());
+         connect(screen, &QScreen::geometryChanged, this, [window]() {
+             window->setGeometry(window->screen()->geometry());
+@@ -75,13 +83,11 @@ private:
+             window->setWindowState(Qt::WindowFullScreen);
+         }
+ 
+-        window->setSource(QUrl("qrc:/qt/qml/org/kde/plasma/login/Main.qml"));
+-        connect(qApp, &QGuiApplication::screenRemoved, this, [window](QScreen *screenRemoved) {
+-            if (screenRemoved == window->screen()) {
+-                delete window;
+-            }
+-        });
++        auto *greeterEventFilter = new GreeterEventFilter(this);
++        window->installEventFilter(greeterEventFilter);
++        window->rootContext()->setContextProperty(QStringLiteral("greeterEventFilter"), greeterEventFilter);
+ 
++        window->setSource(QUrl("qrc:/qt/qml/org/kde/plasma/login/Main.qml"));
+         window->show();
+     }
+ 
+diff --git a/src/frontend/greeter/qml/GreeterState.qml b/src/frontend/greeter/qml/GreeterState.qml
+index bb9c27c..c1495ea 100644
+--- a/src/frontend/greeter/qml/GreeterState.qml
++++ b/src/frontend/greeter/qml/GreeterState.qml
+@@ -39,6 +39,7 @@ Item {
+     readonly property int beyondUserLimit: PlasmaLogin.UserModel.rowCount() > 7
+ 
+     property int loginState: GreeterState.LoginState.UserList
++    onLoginStateChanged: clearPasswords();
+ 
+     property int sessionIndex: {
+         // indexOfData will return -1 if passed an empty string, which these are by default
+@@ -74,6 +75,11 @@ Item {
+ 
+     property bool showPassword: false
+ 
++    function clearPasswords(): void {
++        userListPassword = "";
++        userPromptPassword = "";
++    }
++
+     function activateWindow(window): void {
+         if (!window) {
+             return;
+diff --git a/src/frontend/greeter/qml/Main.qml b/src/frontend/greeter/qml/Main.qml
+index bd03260..716c9fc 100644
+--- a/src/frontend/greeter/qml/Main.qml
++++ b/src/frontend/greeter/qml/Main.qml
+@@ -43,11 +43,32 @@ Item {
+         target: mainStack
+     }
+ 
++    Connections {
++        target: greeterEventFilter
++
++        function onKeyPressed(): void {
++            // callLater, as otherwise 'enter' key press would arrive after waking
++            // and the uiVisible check would pass and a login attempt would be made
++            Qt.callLater(() => loginScreenRoot.wake());
++        }
++
++        function onEscapeKeyPressed(): void {
++            loginScreenRoot.timeout();
++            /*
++-            if (inputPanel.keyboardActive) {
++-                inputPanel.showHide();
++-            }
++-            */
++            PlasmaLogin.GreeterState.clearPasswords();
++        }
++    }
++
+     MouseArea {
+         id: loginScreenRoot
+         anchors.fill: parent
+ 
+         hoverEnabled: true
++        cursorShape: uiVisible ? Qt.ArrowCursor : Qt.BlankCursor
+ 
+         property bool uiVisible: PlasmaLogin.GreeterState.activeWindow === Window.window
+         property bool blockUiTimeout: {
+@@ -59,7 +80,7 @@ Item {
+                 return true;
+             }
+ 
+-            // TODO: inputPanel.keyboardActive
++            // inputPanel.keyboardActive
+ 
+             // No reason to block timeout
+             return false;
+@@ -75,10 +96,6 @@ Item {
+ 
+         onPressed: wake()
+         onPositionChanged: wake()
+-        Keys.onPressed: (event) => {
+-            wake();
+-            event.accepted = true;
+-        }
+ 
+         onUiVisibleChanged: {
+             if (uiVisible) {
+@@ -214,13 +231,19 @@ Item {
+                         icon.name: "system-hibernate"
+                         text: i18ndc("plasma_login", "Suspend to disk", "Hibernate")
+                         visible: PlasmaLogin.SessionManagement.canHibernate
+-                        onClicked: PlasmaLogin.SessionManagement.hibernate()
++                        onClicked: {
++                            PlasmaLogin.GreeterState.clearPasswords();
++                            PlasmaLogin.SessionManagement.hibernate();
++                        }
+                     },
+                     BreezeComponents.ActionButton {
+                         icon.name: "system-suspend"
+                         text: i18ndc("plasma_login", "Suspend to RAM", "Sleep")
+                         visible: PlasmaLogin.SessionManagement.canSuspend
+-                        onClicked: PlasmaLogin.SessionManagement.suspend()
++                        onClicked: {
++                            PlasmaLogin.GreeterState.clearPasswords();
++                            PlasmaLogin.SessionManagement.suspend();
++                        }
+                     },
+                     BreezeComponents.ActionButton {
+                         icon.name: "system-reboot"
+@@ -347,13 +370,19 @@ Item {
+                         icon.name: "system-hibernate"
+                         text: i18ndc("plasma_login", "Suspend to disk", "Hibernate")
+                         visible: PlasmaLogin.SessionManagement.canHibernate
+-                        onClicked: PlasmaLogin.SessionManagement.hibernate()
++                        onClicked: {
++                            PlasmaLogin.GreeterState.clearPasswords();
++                            PlasmaLogin.SessionManagement.hibernate();
++                        }
+                     },
+                     BreezeComponents.ActionButton {
+                         icon.name: "system-suspend"
+                         text: i18ndc("plasma_login", "Suspend to RAM", "Sleep")
+                         visible: PlasmaLogin.SessionManagement.canSuspend
+-                        onClicked: PlasmaLogin.SessionManagement.suspend()
++                        onClicked: {
++                            PlasmaLogin.GreeterState.clearPasswords();
++                            PlasmaLogin.SessionManagement.suspend();
++                        }
+                     },
+                     BreezeComponents.ActionButton {
+                         icon.name: "system-reboot"
+-- 
+GitLab
+
+
+From 8d3e2184bd954c50070f90b79fc944e6aa6b8e9e Mon Sep 17 00:00:00 2001
+From: Oliver Beard <olib141@outlook.com>
+Date: Thu, 29 Jan 2026 21:03:59 +0000
+Subject: [PATCH 4/4] frontend/greeter: Handle timeout in state singleton
+
+This vastly simplifies the relevant code.
+
+Closes #42 as the timer is restarted with activity.
+---
+ src/frontend/greeter/qml/GreeterState.qml | 49 ++++++++++++++++--
+ src/frontend/greeter/qml/Main.qml         | 63 ++---------------------
+ 2 files changed, 51 insertions(+), 61 deletions(-)
+
+diff --git a/src/frontend/greeter/qml/GreeterState.qml b/src/frontend/greeter/qml/GreeterState.qml
+index c1495ea..4c7266c 100644
+--- a/src/frontend/greeter/qml/GreeterState.qml
++++ b/src/frontend/greeter/qml/GreeterState.qml
+@@ -32,9 +32,7 @@ Item {
+ 
+     readonly property var activeWindow: internal.activeWindow
+ 
+-    // TODO: In Login.qml, identify which LoginState we represent and have connections on GreeterState
+-    //       property changed and update GreeterState property when the relevant thing is changed
+-    //       also property for session combo
++    // Shared state
+ 
+     readonly property int beyondUserLimit: PlasmaLogin.UserModel.rowCount() > 7
+ 
+@@ -75,6 +73,41 @@ Item {
+ 
+     property bool showPassword: false
+ 
++    // Shared functionality
++
++    readonly property bool inhibitGreeterTimeout: {
++        if (greeterState.loginState === PlasmaLogin.GreeterState.LoginState.UserList && greeterState.userListPassword.length > 0) {
++            // We're on the user list and a password is entered
++            return true;
++        } else if (greeterState.loginState === PlasmaLogin.GreeterState.UserPrompt && greeterState.userPromptPassword.length > 0) {
++            // We're on the user prompt and a password is entered
++            return true;
++        }
++
++        // inputPanel.keyboardActive
++
++        // No reason to block timeout
++        return false;
++    }
++    onInhibitGreeterTimeoutChanged: {
++        let greeterShouldTimeOut = greeterState.activeWindow !== null;
++        if (greeterTimeoutTimer.running !== greeterShouldTimeOut) {
++            greeterTimeoutTimer.running = greeterShouldTimeOut;
++        }
++    }
++
++    Timer {
++        id: greeterTimeoutTimer
++        running: false
++        interval: 10000
++        onTriggered: {
++            if (internal.activeWindow) {
++                greeterState.showPassword = false;
++                timeoutWindow(internal.activeWindow);
++            }
++        }
++    }
++
+     function clearPasswords(): void {
+         userListPassword = "";
+         userPromptPassword = "";
+@@ -86,14 +119,24 @@ Item {
+         }
+ 
+         internal.activeWindow = window;
++
++        window.requestActivate();
++
++        if (!inhibitGreeterTimeout) {
++            greeterTimeoutTimer.restart();
++        }
+     }
+ 
+     function timeoutWindow(window): void {
+         if (internal.activeWindow == window) {
+             internal.activeWindow = null;
+         }
++
++        greeterTimeoutTimer.stop();
+     }
+ 
++    // Remember last logged in user/session
++
+     property string lastLoggedInUser
+     property string lastLoggedInSession
+ 
+diff --git a/src/frontend/greeter/qml/Main.qml b/src/frontend/greeter/qml/Main.qml
+index 716c9fc..eb5b499 100644
+--- a/src/frontend/greeter/qml/Main.qml
++++ b/src/frontend/greeter/qml/Main.qml
+@@ -49,11 +49,11 @@ Item {
+         function onKeyPressed(): void {
+             // callLater, as otherwise 'enter' key press would arrive after waking
+             // and the uiVisible check would pass and a login attempt would be made
+-            Qt.callLater(() => loginScreenRoot.wake());
++            Qt.callLater(() => PlasmaLogin.GreeterState.activateWindow(loginScreenRoot.Window.window));
+         }
+ 
+         function onEscapeKeyPressed(): void {
+-            loginScreenRoot.timeout();
++            PlasmaLogin.GreeterState.timeoutWindow(loginScreenRoot.Window.window);
+             /*
+ -            if (inputPanel.keyboardActive) {
+ -                inputPanel.showHide();
+@@ -68,66 +68,13 @@ Item {
+         anchors.fill: parent
+ 
+         hoverEnabled: true
+-        cursorShape: uiVisible ? Qt.ArrowCursor : Qt.BlankCursor
+ 
+         property bool uiVisible: PlasmaLogin.GreeterState.activeWindow === Window.window
+-        property bool blockUiTimeout: {
+-            if (PlasmaLogin.GreeterState.loginState === PlasmaLogin.GreeterState.LoginState.UserList && PlasmaLogin.GreeterState.userListPassword.length > 0) {
+-                // We're on the user list and a password is entered
+-                return true;
+-            } else if (PlasmaLogin.GreeterState.loginState === PlasmaLogin.GreeterState.UserPrompt && PlasmaLogin.GreeterState.userPromptPassword.length > 0) {
+-                // We're on the user prompt and a password is entered
+-                return true;
+-            }
+-
+-            // inputPanel.keyboardActive
+ 
+-            // No reason to block timeout
+-            return false;
+-        }
+-
+-        function wake() {
+-            PlasmaLogin.GreeterState.activateWindow(Window.window);
+-        }
+-
+-        function timeout() {
+-            PlasmaLogin.GreeterState.timeoutWindow(Window.window);
+-        }
+-
+-        onPressed: wake()
+-        onPositionChanged: wake()
+-
+-        onUiVisibleChanged: {
+-            if (uiVisible) {
+-                Window.window.requestActivate();
+-            }
+-
+-            if (blockUiTimeout) {
+-                uiTimeoutTimer.running = false;
+-            } else if (uiVisible) {
+-                uiTimeoutTimer.restart();
+-            }
+-        }
+-
+-        onBlockUiTimeoutChanged: {
+-            if (blockUiTimeout) {
+-                uiTimeoutTimer.running = false;
+-            } else if (uiVisible) {
+-                uiTimeoutTimer.restart();
+-            }
+-        }
++        cursorShape: uiVisible ? Qt.ArrowCursor : Qt.BlankCursor
+ 
+-        Timer {
+-            id: uiTimeoutTimer
+-            running: false
+-            interval: 10000
+-            onTriggered: {
+-                if (!loginScreenRoot.blockUiTimeout) {
+-                    userListComponent.mainPasswordBox.showPassword = false;
+-                    loginScreenRoot.timeout();
+-                }
+-            }
+-        }
++        onPressed: PlasmaLogin.GreeterState.activateWindow(Window.window);
++        onPositionChanged: PlasmaLogin.GreeterState.activateWindow(Window.window);
+ 
+         DropShadow {
+             id: clockShadow
+-- 
+GitLab
+

@@ -1,0 +1,150 @@
+name:           unordered-containers
+version:        0.2.20
+x-revision: 4
+synopsis:       Efficient hashing-based container types
+description:
+  Efficient hashing-based container types.  The containers have been
+  optimized for performance critical use, both in terms of large data
+  quantities and high speed.
+  .
+  The declared cost of each operation is either worst-case or
+  amortized, but remains valid even if structures are shared.
+  .
+  /Security/
+  .
+  This package currently provides no defenses against hash collision attacks
+  such as HashDoS.
+  Users who need to store input from untrusted sources are advised to use
+  @Data.Map@ or @Data.Set@ from the @containers@ package instead.
+license:        BSD3
+license-file:   LICENSE
+author:         Johan Tibell
+maintainer:     simon.jakobi@gmail.com, David.Feuer@gmail.com
+Homepage:       https://github.com/haskell-unordered-containers/unordered-containers
+bug-reports:    https://github.com/haskell-unordered-containers/unordered-containers/issues
+copyright:      2010-2014 Johan Tibell
+                2010 Edward Z. Yang
+category:       Data
+build-type:     Simple
+cabal-version:  >=1.10
+extra-source-files: CHANGES.md
+
+tested-with:
+  GHC ==9.8.1
+   || ==9.6.3
+   || ==9.4.7
+   || ==9.2.8
+   || ==9.0.2
+   || ==8.10.7
+   || ==8.8.4
+   || ==8.6.5
+   || ==8.4.4
+   || ==8.2.2
+
+flag debug
+  description:  Enable debug support
+  default:      False
+
+library
+  exposed-modules:
+    Data.HashMap.Internal
+    Data.HashMap.Internal.Array
+    Data.HashMap.Internal.Debug
+    Data.HashMap.Internal.List
+    Data.HashMap.Internal.Strict
+    Data.HashMap.Lazy
+    Data.HashMap.Strict
+    Data.HashSet
+    Data.HashSet.Internal
+
+  build-depends:
+    base >= 4.10 && < 5,
+    deepseq >= 1.4.3,
+    hashable >= 1.4 && < 1.6,
+    template-haskell < 2.24
+
+  default-language: Haskell2010
+
+  other-extensions:
+    RoleAnnotations,
+    UnboxedTuples,
+    ScopedTypeVariables,
+    MagicHash,
+    BangPatterns
+
+  ghc-options: -Wall -O2 -fwarn-tabs -ferror-spans
+
+  -- For dumping the generated code:
+  -- ghc-options: -ddump-simpl -ddump-stg-final -ddump-cmm -ddump-asm -ddump-to-file
+  -- ghc-options: -dsuppress-coercions -dsuppress-unfoldings -dsuppress-module-prefixes
+  -- ghc-options: -dsuppress-uniques -dsuppress-timestamps
+
+  if flag(debug)
+    cpp-options: -DASSERTS
+
+test-suite unordered-containers-tests
+  hs-source-dirs: tests
+  main-is: Main.hs
+  type: exitcode-stdio-1.0
+  other-modules:
+    Regressions
+    Properties
+    Properties.HashMapLazy
+    Properties.HashMapStrict
+    Properties.HashSet
+    Properties.List
+    Strictness
+    Util.Key
+
+  build-depends:
+    base,
+    ChasingBottoms,
+    containers >= 0.5.8,
+    hashable,
+    HUnit,
+    QuickCheck >= 2.4.0.1,
+    random,
+    tasty >= 1.4.0.3,
+    tasty-hunit >= 0.10.0.3,
+    tasty-quickcheck >= 0.10.1.2,
+    unordered-containers
+
+  if impl(ghc >= 8.6)
+    build-depends:
+      nothunks >= 0.1.3
+
+  default-language: Haskell2010
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  cpp-options: -DASSERTS
+
+benchmark benchmarks
+  hs-source-dirs: benchmarks
+  main-is: Benchmarks.hs
+  type: exitcode-stdio-1.0
+
+  other-modules:
+    Util.ByteString
+    Util.String
+    Util.Int
+
+  build-depends:
+    base >= 4.8.0,
+    bytestring >= 0.10.0.0,
+    containers,
+    deepseq,
+    hashable,
+    hashmap,
+    mtl,
+    random,
+    tasty-bench >= 0.3.1,
+    unordered-containers
+
+  default-language: Haskell2010
+  ghc-options: -Wall -O2 -rtsopts -with-rtsopts=-A32m
+  if impl(ghc >= 8.10)
+    ghc-options: "-with-rtsopts=-A32m --nonmoving-gc"
+  -- cpp-options: -DBENCH_containers_Map -DBENCH_containers_IntMap -DBENCH_hashmap_Map
+
+source-repository head
+  type:     git
+  location: https://github.com/haskell-unordered-containers/unordered-containers.git

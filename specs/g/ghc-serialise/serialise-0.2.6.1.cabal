@@ -1,0 +1,288 @@
+name:                serialise
+version:             0.2.6.1
+x-revision:          4
+synopsis:            A binary serialisation library for Haskell values.
+description:
+  This package (formerly @binary-serialise-cbor@) provides pure, efficient
+  serialization of Haskell values directly into @ByteString@s for storage or
+  transmission purposes. By providing a set of type class instances, you can
+  also serialise any custom data type you have as well.
+  .
+  The underlying binary format used is the 'Concise Binary Object
+  Representation', or CBOR, specified in RFC 7049. As a result,
+  serialised Haskell values have implicit structure outside of the
+  Haskell program itself, meaning they can be inspected or analyzed
+  without custom tools.
+  .
+  An implementation of the standard bijection between CBOR and JSON is provided
+  by the [cborg-json](/package/cborg-json) package. Also see
+  [cbor-tool](/package/cbor-tool) for a convenient command-line utility for
+  working with CBOR data.
+homepage:            https://github.com/well-typed/cborg
+license:             BSD3
+license-file:        LICENSE.txt
+author:              Duncan Coutts
+maintainer:          duncan@community.haskell.org, ben@smart-cactus.org
+bug-reports:         https://github.com/well-typed/cborg/issues
+copyright:           2015-2017 Duncan Coutts,
+                     2015-2017 Well-Typed LLP,
+                     2015 IRIS Connect Ltd
+cabal-version:       >=1.10
+category:            Codec
+build-type:          Simple
+tested-with:
+  GHC == 8.8.3,
+  GHC == 8.10.7,
+  GHC == 9.0.1,
+  GHC == 9.2.2,
+  GHC == 9.4.2,
+  GHC == 9.6.1,
+  GHC == 9.8.1,
+  GHC == 9.10.1,
+  GHC == 9.12.1
+
+extra-source-files:
+  ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/well-typed/cborg.git
+
+--------------------------------------------------------------------------------
+-- Flags
+
+flag newtime15
+  default: True
+  manual: False
+  description: Use the new time 1.5 library
+
+library
+  default-language:  Haskell2010
+  ghc-options:       -Wall
+  hs-source-dirs:    src
+
+  exposed-modules:
+    Codec.Serialise
+    Codec.Serialise.Class
+    Codec.Serialise.Decoding
+    Codec.Serialise.Encoding
+    Codec.Serialise.IO
+    Codec.Serialise.Properties
+    Codec.Serialise.Tutorial
+    Codec.Serialise.Internal.GeneralisedUTF8
+
+  build-depends:
+    base                    >= 4.11    && < 4.22,
+    array                   >= 0.4     && < 0.6,
+    bytestring              >= 0.10.4  && < 0.13,
+    cborg                   == 0.2.*,
+    containers              >= 0.5     && < 0.8,
+    ghc-prim                >= 0.3.1.0 && < 0.14,
+    half                    >= 0.2.2.3 && < 0.4,
+    hashable                >= 1.2     && < 2.0,
+    primitive               >= 0.5     && < 0.10,
+    strict                  >= 0.4     && < 0.6,
+    text                    >= 1.1     && < 2.2,
+    these                   >= 1.1     && < 2.2,
+    unordered-containers    >= 0.2     && < 0.3,
+    vector                  >= 0.10    && < 0.14
+
+  if flag(newtime15)
+    build-depends:
+      time                  >= 1.5     && < 1.15
+  else
+    build-depends:
+      time                  >= 1.4     && < 1.6,
+      old-locale
+
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wnoncanonical-monad-instances
+
+--------------------------------------------------------------------------------
+-- Tests
+
+test-suite tests
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    tests
+  main-is:           Main.hs
+
+  default-language:  Haskell2010
+  ghc-options:
+    -Wall -fno-warn-orphans
+    -threaded -rtsopts "-with-rtsopts=-N2"
+
+  other-modules:
+    Tests.IO
+    Tests.Negative
+    Tests.Orphanage
+    Tests.Serialise
+    Tests.Serialise.Canonical
+    Tests.Regress
+    Tests.Regress.Issue13
+    Tests.Regress.Issue67
+    Tests.Regress.Issue80
+    Tests.Regress.Issue106
+    Tests.Regress.Issue135
+    Tests.Deriving
+    Tests.GeneralisedUTF8
+
+  build-depends:
+    base                    >= 4.11    && < 4.22,
+    bytestring              >= 0.10.4  && < 0.13,
+    directory               >= 1.0     && < 1.4,
+    filepath                >= 1.0     && < 1.6,
+    text                    >= 1.1     && < 2.2,
+    time                    >= 1.4     && < 1.15,
+    containers              >= 0.5     && < 0.8,
+    unordered-containers    >= 0.2     && < 0.3,
+    primitive               >= 0.5     && < 0.10,
+    cborg,
+    serialise,
+    QuickCheck              >= 2.9     && < 2.16,
+    tasty                   >= 0.11    && < 1.6,
+    tasty-hunit             >= 0.9     && < 0.11,
+    tasty-quickcheck        >= 0.8     && < 0.12,
+    quickcheck-instances    >= 0.3.12  && < 0.4,
+    vector                  >= 0.10    && < 0.14
+
+--------------------------------------------------------------------------------
+-- Benchmarks
+
+benchmark instances
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    bench/instances
+  main-is:           Main.hs
+
+  default-language:  Haskell2010
+  ghc-options:
+    -Wall -rtsopts -fno-cse -fno-ignore-asserts -fno-warn-orphans
+
+  other-modules:
+    Instances.Float
+    Instances.Integer
+    Instances.Vector
+    Instances.Time
+
+  build-depends:
+    base                    >= 4.11    && < 4.22,
+    binary                  >= 0.7     && < 0.11,
+    bytestring              >= 0.10.4  && < 0.13,
+    vector                  >= 0.10    && < 0.14,
+    cborg,
+    serialise,
+
+    deepseq                 >= 1.0     && < 1.6,
+    criterion               >= 1.0     && < 1.7
+
+  if flag(newtime15)
+    build-depends:
+      time                  >= 1.5     && < 1.15
+  else
+    build-depends:
+      time                  >= 1.4     && < 1.5,
+      old-locale
+
+benchmark micro
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    bench/micro
+  main-is:           Main.hs
+
+  default-language:  Haskell2010
+  ghc-options:
+    -Wall -rtsopts -fno-cse -fno-ignore-asserts -fno-warn-orphans
+
+  other-modules:
+    Micro
+    Micro.Types
+    Micro.Load
+    Micro.DeepSeq
+    Micro.MemSize
+    Micro.ReadShow
+    Micro.PkgAesonGeneric
+    Micro.PkgAesonTH
+    Micro.PkgBinary
+    Micro.PkgCereal
+    Micro.PkgStore
+    Micro.CBOR
+
+    SimpleVersus
+
+  build-depends:
+    base                    >= 4.11    && < 4.22,
+    binary                  >= 0.7     && < 0.11,
+    bytestring              >= 0.10.4  && < 0.13,
+    ghc-prim                >= 0.3.1.0 && < 0.14,
+    vector                  >= 0.10    && < 0.14,
+    cborg,
+    serialise,
+
+    aeson                   >= 0.7     && < 2.3,
+    deepseq                 >= 1.0     && < 1.6,
+    criterion               >= 1.0     && < 1.7,
+    cereal                  >= 0.5.2.0 && < 0.6,
+    cereal-vector           >= 0.2     && < 0.3,
+    semigroups              >= 0.18    && < 0.21,
+    store                   >= 0.7.1   && < 0.8
+
+benchmark versus
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    bench/versus
+  main-is:           Main.hs
+
+  default-language:  Haskell2010
+  ghc-options:
+    -Wall -rtsopts -fno-cse -fno-ignore-asserts -fno-warn-orphans
+
+  other-modules:
+    Utils
+
+    -- Suite #1
+    Mini
+
+    -- Suite #2
+    Macro
+    Macro.Types
+    Macro.Load
+    Macro.DeepSeq
+    Macro.MemSize
+    Macro.ReadShow
+    Macro.PkgAesonGeneric
+    Macro.PkgAesonTH
+    Macro.PkgBinary
+    Macro.PkgCereal
+    Macro.PkgStore
+    Macro.CBOR
+
+  build-depends:
+    base                    >= 4.11    && < 4.22,
+    array                   >= 0.4     && < 0.6,
+    binary                  >= 0.7     && < 0.11,
+    bytestring              >= 0.10.4  && < 0.13,
+    directory               >= 1.0     && < 1.4,
+    ghc-prim                >= 0.3.1.0 && < 0.14,
+    fail                    >= 4.9.0.0 && < 4.10,
+    text                    >= 1.1     && < 2.2,
+    vector                  >= 0.10    && < 0.14,
+    cborg,
+    serialise,
+
+    filepath                >= 1.0     && < 1.6,
+    containers              >= 0.5     && < 0.8,
+    deepseq                 >= 1.0     && < 1.6,
+    aeson                   >= 0.7     && < 2.3,
+    cereal                  >= 0.5.2.0 && < 0.6,
+    half                    >= 0.2.2.3 && < 0.4,
+    tar                     >= 0.4     && < 0.7,
+    zlib                    >= 0.5     && < 0.8,
+    pretty                  >= 1.0     && < 1.2,
+    criterion               >= 1.0     && < 1.7,
+    store                   >= 0.7.1   && < 0.8,
+    semigroups
+
+  if flag(newtime15)
+    build-depends:
+      time                  >= 1.5     && < 1.15
+  else
+    build-depends:
+      time                  >= 1.4     && < 1.5,
+      old-locale

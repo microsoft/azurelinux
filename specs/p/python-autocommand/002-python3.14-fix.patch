@@ -1,0 +1,28 @@
+From 70ea508aedcc72a19d992a2fa33c34fb3930b577 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 27 May 2025 21:36:55 +0200
+Subject: [PATCH] Fix tests for Python 3.14+
+
+asyncio.get_event_loop() now raises when there is no event loop.
+
+Fixes https://github.com/Lucretiel/autocommand/issues/39
+---
+ test/test_autoasync.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/test/test_autoasync.py b/test/test_autoasync.py
+index 02a820a..c98923e 100644
+--- a/test/test_autoasync.py
++++ b/test/test_autoasync.py
+@@ -32,7 +32,10 @@ def temporary_context_loop(loop):
+     Set the given loop as the context loop (that is, the loop returned by
+     asyncio.get_event_loop() for the duration of the context)
+     '''
+-    old_loop = asyncio.get_event_loop()
++    try:
++        old_loop = asyncio.get_event_loop()
++    except RuntimeError:
++        old_loop = None
+     asyncio.set_event_loop(loop)
+     try:
+         yield loop

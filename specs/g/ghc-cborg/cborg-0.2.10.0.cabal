@@ -1,0 +1,172 @@
+name:                cborg
+version:             0.2.10.0
+x-revision: 1
+synopsis:            Concise Binary Object Representation (CBOR)
+license:             BSD3
+license-file:        LICENSE.txt
+author:              Duncan Coutts
+maintainer:          duncan@community.haskell.org, ben@smart-cactus.org
+bug-reports:         https://github.com/well-typed/cborg/issues
+copyright:           2015-2019 Duncan Coutts,
+                     2015-2019 Well-Typed LLP,
+                     2015 IRIS Connect Ltd
+category:            Codec
+build-type:          Simple
+cabal-version:       >= 1.10
+tested-with:
+  GHC == 8.4.4,
+  GHC == 8.6.5,
+  GHC == 8.8.3,
+  GHC == 8.10.7,
+  GHC == 9.0.1,
+  GHC == 9.2.2,
+  GHC == 9.4.2,
+  GHC == 9.6.1
+
+extra-source-files:
+  ChangeLog.md
+
+description:
+  This package provides an efficient implementation of the Concise
+  Binary Object Representation (CBOR), as specified by
+  [RFC 7049](https://tools.ietf.org/html/rfc7049).
+  .
+  If you are looking for a library for serialisation of Haskell values,
+  have a look at the [serialise](/package/serialise) package, which is
+  built upon this library.
+  .
+  An implementation of the standard bijection between CBOR and JSON is
+  provided by the [cborg-json](/package/cborg-json) package. Also see
+  [cbor-tool](/package/cbor-tool) for a convenient command-line utility
+  for working with CBOR data.
+  .
+  This package was formerly known as @binary-serialise-cbor@.
+
+extra-source-files:
+  src/cbits/cbor.h
+  tests/test-vectors/appendix_a.json
+  tests/test-vectors/README.md
+
+source-repository head
+  type: git
+  location: https://github.com/well-typed/cborg.git
+
+--------------------------------------------------------------------------------
+-- Flags
+
+flag optimize-gmp
+  default: True
+  manual: False
+  description: Use optimized code paths for integer-gmp
+
+--------------------------------------------------------------------------------
+-- Library
+
+library
+  default-language:  Haskell2010
+  ghc-options:       -Wall
+  include-dirs:      src/cbits
+  hs-source-dirs:    src
+
+  exposed-modules:
+    Codec.CBOR
+    Codec.CBOR.Decoding
+    Codec.CBOR.Encoding
+    Codec.CBOR.FlatTerm
+    Codec.CBOR.Magic
+    Codec.CBOR.Pretty
+    Codec.CBOR.Read
+    Codec.CBOR.Write
+    Codec.CBOR.Term
+    Codec.CBOR.ByteArray
+    Codec.CBOR.ByteArray.Sliced
+
+  other-modules:
+    Codec.CBOR.ByteArray.Internal
+
+  other-extensions:
+    CPP, ForeignFunctionInterface, MagicHash,
+    UnboxedTuples, BangPatterns, DeriveDataTypeable,
+    RankNTypes
+
+  build-depends:
+    array                   >= 0.4     && < 0.6,
+    base                    >= 4.11    && < 4.21,
+    bytestring              >= 0.10.4  && < 0.13,
+    containers              >= 0.5     && < 0.8,
+    deepseq                 >= 1.0     && < 1.6,
+    ghc-prim                >= 0.3.1.0 && < 0.12,
+    half                    >= 0.2.2.3 && < 0.4,
+    primitive               >= 0.5     && < 0.10,
+    text                    >= 1.1     && < 1.3 || >= 2.0 && <2.2
+
+  if flag(optimize-gmp)
+    cpp-options:            -DOPTIMIZE_GMP
+    if impl(ghc >= 9.0)
+      cpp-options:          -DHAVE_GHC_BIGNUM
+      build-depends: ghc-bignum >= 1.0 && < 2.0
+    else
+      build-depends: integer-gmp >= 1.0 && < 2.0
+
+  if impl(ghc >= 8.0)
+    ghc-options: -Wcompat -Wnoncanonical-monad-instances
+  else
+    build-depends:
+      -- provide/emulate `Control.Monad.Fail` and `Data.Semigroups` API for pre-GHC8
+      fail                    == 4.9.*,
+      semigroups              >= 0.18 && < 0.21,
+      -- the `PS` pattern synonym in bytestring 0.11 is unavailable with GHC < 8.0
+      bytestring              < 0.11
+
+test-suite tests
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    tests
+  main-is:           Main.hs
+
+  default-language:  Haskell2010
+  ghc-options:
+    -Wall -fno-warn-orphans
+    -threaded -rtsopts "-with-rtsopts=-N2"
+
+  other-modules:
+    Tests.UnitTests
+    Tests.Properties
+    Tests.Boundary
+    Tests.ByteOffset
+    Tests.Canonical
+    Tests.PreEncoded
+    Tests.Regress
+    Tests.Regress.Issue160
+    Tests.Regress.Issue162
+    Tests.Regress.FlatTerm
+    Tests.Reference
+    Tests.Reference.Implementation
+    Tests.Reference.Generators
+    Tests.Reference.TestVectors
+    Tests.Term
+    Tests.UTF8
+    Tests.Util
+
+  build-depends:
+    array                   >= 0.4     && < 0.6,
+    base                    >= 4.11    && < 4.21,
+    base-orphans,
+    bytestring              >= 0.10.4  && < 0.13,
+    text                    >= 1.1     && < 2.2,
+    primitive               >= 0.5     && < 0.10,
+    cborg,
+    aeson                   >= 0.7     && < 2.3,
+    base64-bytestring       >= 1.0     && < 1.3,
+    base16-bytestring       >= 1.0     && < 1.1,
+    deepseq                 >= 1.0     && < 1.6,
+    half                    >= 0.2.2.3 && < 0.4,
+    QuickCheck              >= 2.9     && < 2.16,
+    random,
+    scientific              >= 0.3     && < 0.4,
+    tasty                   >= 0.11    && < 1.6,
+    tasty-hunit             >= 0.9     && < 0.11,
+    tasty-quickcheck        >= 0.8     && < 0.11,
+    vector                  >= 0.10    && < 0.14
+  if !impl(ghc >= 8.0)
+    build-depends:
+      fail                    >= 4.9.0.0 && < 4.10

@@ -1,0 +1,30 @@
+From eb7a44f144aec72c578804587a61da3f1a02a7fb Mon Sep 17 00:00:00 2001
+From: Andreas Sturmlechner <asturm@gentoo.org>
+Date: Tue, 22 Jul 2025 20:45:36 +0200
+Subject: [PATCH] Drop unused dependency
+
+Unused after c926156c88b64cd810b232563dd4d28841841ef2
+
+Signed-off-by: Andreas Sturmlechner <asturm@gentoo.org>
+---
+ CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 857340df7..c20000a60 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -35,10 +35,6 @@ option(BUILD_DOC "Whether to build the documentation" ON)
+ 
+ find_package(Qt6 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS Gui Network Widgets Svg Core5Compat)
+ 
+-if (Qt6Gui_VERSION VERSION_GREATER_EQUAL "6.10.0")
+-    find_package(Qt6GuiPrivate REQUIRED)
+-endif()
+-
+ find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
+     Archive
+     Config
+-- 
+GitLab
+

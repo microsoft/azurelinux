@@ -1,0 +1,40 @@
+From 7c9f860edc1ba2690a4b362a52f771796e521ff4 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Mon, 18 Dec 2023 21:22:32 -0500
+Subject: [PATCH] applets: Add KWrite and Konsole to the favorites for Kickoff
+ and Kicker
+
+---
+ applets/kicker/package/contents/config/main.xml  | 2 +-
+ applets/kickoff/package/contents/config/main.xml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/applets/kicker/package/contents/config/main.xml b/applets/kicker/package/contents/config/main.xml
+index ba637e5e2..481b91556 100644
+--- a/applets/kicker/package/contents/config/main.xml
++++ b/applets/kicker/package/contents/config/main.xml
+@@ -38,7 +38,7 @@
+     </entry>
+     <entry name="favoriteApps" type="StringList">
+       <label>List of general favorites. Supported values are menu id's (usually .desktop file names), special URLs that expand into default applications (e.g. preferred://browser), document URLs and KPeople contact URIs.</label>
+-      <default>preferred://browser,org.kde.kontact.desktop,systemsettings.desktop,org.kde.dolphin.desktop,org.kde.discover</default>
++      <default>preferred://browser,org.kde.kontact.desktop,systemsettings.desktop,org.kde.dolphin.desktop,org.kde.kwrite.desktop,org.kde.konsole.desktop,org.kde.discover</default>
+     </entry>
+     <entry name="favoriteSystemActions" type="StringList">
+       <label>List of system action favorites.</label>
+diff --git a/applets/kickoff/package/contents/config/main.xml b/applets/kickoff/package/contents/config/main.xml
+index be17a59cb..0ba02e96e 100644
+--- a/applets/kickoff/package/contents/config/main.xml
++++ b/applets/kickoff/package/contents/config/main.xml
+@@ -15,7 +15,7 @@
+         </entry>
+         <entry name="favorites" type="StringList">
+             <label>List of general favorites. Supported values are menu id's (usually .desktop file names), special URLs that expand into default applications (e.g. preferred://browser), document URLs and KPeople contact URIs.</label>
+-            <default>preferred://browser,org.kde.kontact.desktop,systemsettings.desktop,org.kde.dolphin.desktop,org.kde.discover.desktop</default>
++            <default>preferred://browser,org.kde.kontact.desktop,systemsettings.desktop,org.kde.dolphin.desktop,org.kde.kwrite.desktop,org.kde.konsole.desktop,org.kde.discover.desktop</default>
+         </entry>
+         <entry name="systemFavorites" type="StringList">
+             <label>List of system action favorites.</label>
+-- 
+2.43.0
+

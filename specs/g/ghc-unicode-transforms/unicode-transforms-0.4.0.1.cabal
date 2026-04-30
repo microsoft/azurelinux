@@ -1,0 +1,221 @@
+cabal-version: 2.2
+
+name:           unicode-transforms
+version:        0.4.0.1
+x-revision: 7
+synopsis:       Unicode normalization
+description:    Fast Unicode 14.0.0 normalization in Haskell (NFC, NFKC, NFD, NFKD).
+category:       Data,Text,Unicode
+stability:      Experimental
+homepage:       http://github.com/composewell/unicode-transforms
+bug-reports:    https://github.com/composewell/unicode-transforms/issues
+author:         Harendra Kumar
+maintainer:     harendra.kumar@gmail.com
+copyright:      2016-2017 Harendra Kumar,
+                2014–2015 Antonio Nikishaev
+license:        BSD-3-Clause
+license-file:   LICENSE
+tested-with:    GHC==8.0.2
+              , GHC==8.2.2
+              , GHC==8.4.4
+              , GHC==8.6.5
+              , GHC==8.8.4
+              , GHC==8.10.7
+              , GHC==9.0.2
+              , GHC==9.2.8
+              , GHC==9.4.7
+              , GHC==9.6.3
+              , GHC==9.8.1
+build-type:     Simple
+extra-source-files:
+    Changelog.md
+    MAINTAINING.md
+    NOTES.md
+    README.md
+    download-ucd-files.sh
+    benchmark/README.md
+    benchmark/NormalizeFile.hs
+    benchmark/data/AllChars.txt
+    benchmark/data/Deutsch.txt
+    benchmark/data/Devanagari.txt
+    benchmark/data/English.txt
+    benchmark/data/Japanese.txt
+    benchmark/data/Korean.txt
+    benchmark/data/Vietnamese.txt
+    test/data/NormalizationTest.txt
+    test/data/extra/NormalizationTest.txt
+
+source-repository head
+  type: git
+  location: https://github.com/composewell/unicode-transforms
+
+flag dev
+  description: Developer build
+  manual: True
+  default: False
+
+flag bench-show
+  description: Use bench-show to compare benchmarks
+  manual: True
+  default: False
+
+flag has-icu
+  description: Use text-icu for benchmark and test comparisons
+  manual: True
+  default: False
+
+flag has-llvm
+  description: Use llvm backend (faster) for compilation
+  manual: True
+  default: False
+
+flag use-gauge
+  description: Use gauge instead of tasty-bench for benchmarking
+  manual: True
+  default: False
+
+library
+  exposed-modules:
+      Data.Unicode.Types
+      Data.Text.Normalize
+
+      -- Deprecated
+      Data.ByteString.UTF8.Normalize
+  other-modules:
+      Data.Unicode.Internal.NormalizeStream
+  hs-source-dirs: .
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base         >= 4.8 && < 4.22
+    , unicode-data >= 0.2 && < 0.7
+    , bytestring   >= 0.9 && < 0.13
+    , ghc-prim     >= 0.2 && < 0.14
+
+    -- We depend on a lot of internal modules in text. We keep the upper bound
+    -- inclusive of the latest stable version.
+    , text         >=1.1.1 && <=1.2.5.0 || >=2.0 && <2.2
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields -fspec-constr-count=10
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+test-suite extras
+  type: exitcode-stdio-1.0
+  main-is: Extra.hs
+  other-modules:
+      QuickCheckUtils
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      QuickCheck >=2.1 && <2.16
+    , base
+    , deepseq >=1.1 && <1.6
+    , text
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+test-suite quickcheck
+  type: exitcode-stdio-1.0
+  main-is: Properties.hs
+  other-modules:
+      QuickCheckUtils
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      QuickCheck
+    , unicode-data
+    , base
+    , deepseq
+    , hspec        >= 2.0   && < 3
+    , text
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  if flag(has-icu)
+    cpp-options: -DHAS_ICU
+    build-depends:
+        text-icu >=0.6.2.1 && <0.9
+  default-language: Haskell2010
+
+test-suite ucd
+  type: exitcode-stdio-1.0
+  main-is: NormalizationTest.hs
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base
+    , bytestring
+    , split >=0.2 && <0.3
+    , text
+    , unicode-transforms
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  default-language: Haskell2010
+
+benchmark bench
+  type: exitcode-stdio-1.0
+  main-is: Benchmark.hs
+  hs-source-dirs:
+      benchmark
+  ghc-options: -Wall -fwarn-identities -fwarn-incomplete-record-updates -fwarn-incomplete-uni-patterns -fwarn-tabs
+  build-depends:
+      base
+    , deepseq
+    , filepath >=1.0 && <2
+    , path >=0.0.0 && <0.10
+    , path-io >=0.1.0 && <1.9
+    , text
+    , unicode-transforms
+  if flag(use-gauge)
+    build-depends: gauge >=0.2.0 && <0.3
+  else
+    build-depends: tasty-bench>= 0.2.5 && <0.4
+    mixins: tasty-bench (Test.Tasty.Bench as Gauge.Main)
+  if flag(dev)
+    ghc-options: -O0
+  else
+    ghc-options: -O2 -funbox-strict-fields
+  if flag(has-llvm)
+    ghc-options: -fllvm
+  if flag(has-icu)
+    cpp-options: -DBENCH_ICU
+    build-depends:
+        text-icu
+  if impl(ghc < 7.10)
+    build-depends:
+        path (<0.5.12 || >0.5.12)
+  default-language: Haskell2010
+
+executable chart
+  default-language: Haskell2010
+  hs-source-dirs: benchmark
+  main-is: Chart.hs
+  if flag(bench-show)
+    buildable: True
+    build-Depends:
+        base
+      , bench-show >= 0.3 && < 0.4
+      , split
+      , transformers >= 0.4   && < 0.7
+  else
+    buildable: False

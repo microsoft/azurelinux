@@ -1,0 +1,104 @@
+cabal-version:   1.12
+name:            http-api-data
+version:         0.6.1
+x-revision:      1
+
+synopsis:        Converting to/from HTTP API data like URL pieces, headers and query parameters.
+category:        Web
+description:
+  This package defines typeclasses used for converting Haskell data types to and from HTTP API data.
+  .
+  Please see README.md
+
+license:         BSD3
+license-file:    LICENSE
+author:          Nickolay Kudasov <nickolay.kudasov@gmail.com>
+maintainer:      Nickolay Kudasov <nickolay.kudasov@gmail.com>
+homepage:        http://github.com/fizruk/http-api-data
+stability:       unstable
+build-type:      Simple
+
+extra-source-files:
+  test/*.hs
+  CHANGELOG.md
+  README.md
+
+tested-with:
+  GHC==8.6.5,
+  GHC==8.8.4,
+  GHC==8.10.7,
+  GHC==9.0.2,
+  GHC==9.2.8,
+  GHC==9.4.8,
+  GHC==9.6.6,
+  GHC==9.8.2,
+  GHC==9.10.1
+
+flag use-text-show
+  description: Use text-show library for efficient ToHttpApiData implementations.
+  default: False
+  manual: True
+
+library
+    hs-source-dirs: src/
+
+    -- GHC bundled
+    build-depends:   base                  >= 4.12.0.0 && < 4.21
+                   , bytestring            >= 0.10.8.2 && < 0.13
+                   , containers            >= 0.6.0.1  && < 0.8
+                   , text                  >= 1.2.3.0  && < 1.3 || >=2.0 && <2.2
+                   , transformers          >= 0.5.6.2  && < 0.7
+
+    -- other-dependencies
+    build-depends:
+                     cookie                >= 0.4.3    && < 0.6
+                   , hashable              >= 1.4.4.0  && < 1.6
+                   , http-types            >= 0.12.4   && < 0.13
+                   , text-iso8601          >= 0.1.1    && < 0.2
+                   , tagged                >= 0.8.8    && < 0.9
+                   , time-compat           >= 1.9.5    && < 1.10
+                   , unordered-containers  >= 0.2.20   && < 0.3
+                   , uuid-types            >= 1.0.6    && < 1.1
+
+    if flag(use-text-show)
+      cpp-options: -DUSE_TEXT_SHOW
+      build-depends: text-show        >= 3.10.5 && <3.11
+
+    exposed-modules:
+      Web.HttpApiData
+      Web.FormUrlEncoded
+      Web.Internal.FormUrlEncoded
+      Web.Internal.HttpApiData
+    ghc-options:     -Wall
+    default-language: Haskell2010
+
+test-suite spec
+    type:          exitcode-stdio-1.0
+    main-is:       Spec.hs
+    other-modules:
+      Web.Internal.FormUrlEncodedSpec
+      Web.Internal.HttpApiDataSpec
+      Web.Internal.TestInstances
+    hs-source-dirs: test
+    ghc-options:   -Wall
+    default-language: Haskell2010
+    build-tool-depends: hspec-discover:hspec-discover >= 2.7.1 && <2.12
+    -- inherited  depndencies
+    build-depends:
+                     base
+                   , bytestring
+                   , cookie
+                   , http-api-data
+                   , text
+                   , time-compat
+                   , unordered-containers
+                   , uuid-types
+
+    build-depends:   HUnit                >= 1.6.0.0  && <1.7
+                   , hspec                >= 2.7.1    && <2.12
+                   , QuickCheck           >= 2.13.1   && <2.16
+                   , quickcheck-instances >= 0.3.25.2 && <0.4
+
+source-repository head
+  type:     git
+  location: https://github.com/fizruk/http-api-data

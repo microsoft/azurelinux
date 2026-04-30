@@ -66,7 +66,7 @@ Conflicts:   breeze-icon-theme < 6.13.0-2
 %description -n breeze-icon-theme
 %{summary}.
 
-%if 0%{?fedora}
+%if 0
 %package -n breeze-icon-theme-fedora
 Summary:     Breeze icon theme Fedora specific icons
 License:     LGPL-3.0-or-later
@@ -136,7 +136,7 @@ du -s .
 # %%ghost icon.cache
 touch %{buildroot}%{_kf6_datadir}/icons/{breeze,breeze-dark}/icon-theme.cache
 
-%if 0%{?fedora}
+%if 0
 install -pm 0644 icons-fedora/apps/48/org.fedoraproject.AnacondaInstaller.svg %{buildroot}%{_kf6_datadir}/icons/breeze/apps/48
 ln -sr %{buildroot}%{_kf6_datadir}/icons/breeze/apps/48/org.fedoraproject.AnacondaInstaller.svg %{buildroot}%{_kf6_datadir}/icons/breeze-dark/apps/48/org.fedoraproject.AnacondaInstaller.svg
 %endif
@@ -178,11 +178,11 @@ gtk-update-icon-cache --force %{_datadir}/icons/breeze-dark &>/dev/null || :
 %{_datadir}/icons/breeze-dark/index.theme
 %{_datadir}/icons/breeze-dark/*/
 %exclude %{_datadir}/icons/breeze/breeze-icons.rcc
-%if 0%{?fedora}
+%if 0
 %exclude %{_datadir}/icons/breeze*/apps/*/org.fedoraproject.AnacondaInstaller.svg
 %endif
 
-%if 0%{?fedora}
+%if 0
 %files -n breeze-icon-theme-fedora
 %{_datadir}/icons/breeze*/apps/*/org.fedoraproject.AnacondaInstaller.svg
 %endif

@@ -119,7 +119,6 @@ Provides: bundled(md5-gcc) = %{snapsrc}
 %endif
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1209492
-Recommends: default-yama-scope
 
 # rpm-suggestions.py needs to import rpm which is found in python3-rpm.
 Recommends: python3-rpm

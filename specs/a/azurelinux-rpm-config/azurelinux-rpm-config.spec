@@ -1,5 +1,5 @@
 ## START: Set by rpmautospec
-## (rpmautospec version 0.8.4)
+## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autochangelog
 ## END: Set by rpmautospec
 

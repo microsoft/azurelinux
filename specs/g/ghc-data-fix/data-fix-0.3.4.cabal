@@ -1,0 +1,56 @@
+cabal-version:   2.2
+Name:            data-fix
+Version:         0.3.4
+x-revision:      1
+License:         BSD-3-Clause
+License-file:    LICENSE
+Author:          Anton Kholomiov, Edward Kmett, Oleg Grenrus
+Maintainer:      <anton.kholomiov@gmail.com>
+Category:        Data
+Synopsis:        Fixpoint data types
+Build-Type:      Simple
+Description:
+  Fixpoint types and recursion schemes. If you define your AST as
+  fixpoint type, you get fold and unfold operations for free.
+  .
+  Thanks for contribution to: Matej Kollar, Herbert Valerio Riedel
+
+Stability:       Experimental
+
+Homepage:        https://github.com/spell-music/data-fix
+Bug-Reports:     https://github.com/spell-music/data-fix/issues
+
+Tested-With:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+extra-source-files:
+  CHANGELOG.md
+
+Source-repository head
+    Type: git
+    Location: https://github.com/spell-music/data-fix
+
+library
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  exposed-modules:  Data.Fix
+
+  ghc-options: -Wno-trustworthy-safe
+  ghc-options:
+      -Wincomplete-uni-patterns -Wincomplete-record-updates
+      -Wredundant-constraints -Widentities -Wmissing-export-lists
+
+  build-depends:
+    , base      >=4.12.0.0 && <4.22
+    , deepseq   >=1.4.4.0  && <1.6
+    , hashable  >=1.4.4.0  && <1.6

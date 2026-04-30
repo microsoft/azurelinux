@@ -2,6 +2,3 @@
 # unconditionally. It is used throughout the distro and required on all machines.
 enable dbus.socket
 enable dbus-broker.service
-
-# TODO(azl): evaluate these
-# enable grub-boot-success.timer

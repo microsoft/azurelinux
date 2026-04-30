@@ -1,0 +1,55 @@
+From edc602651c506aeeb60544b55534dd1722a340d3 Mon Sep 17 00:00:00 2001
+From: Rene Kita <mail@rkta.de>
+Date: Thu, 13 Jul 2023 07:50:26 +0200
+Subject: [PATCH] Fix OOB access due to multiple backspaces
+
+Commit 419ca82d57 (Fix m17n backspace handling causes out-of-bounds
+write in checkType) introduced an incomplete fix.
+
+In function checkType we store the length of the previous multi-char
+character in a buffer plens_buffer with pointer plens pointing to the
+current position inside the buffer. When encountering a backspace plens
+is set to the previous position without a bounds check. This will lead
+to plens being out of bounds if we get more backspaces than we have
+processed multi-char characters before.
+
+If we are at the beginning of the buffer do not decrement and set plen
+(the current length) to 0.
+
+This also fixes GH Issue #270 [BUG] Out of bound read in Strnew_size ,
+Str.c:61
+
+If the above explanation does sound weird it's because I didn't fully
+grok that function. :-)
+---
+ etc.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/etc.c b/etc.c
+index 128717b18..b56615136 100644
+--- a/etc.c
++++ b/etc.c
+@@ -393,7 +393,10 @@ checkType(Str s, Lineprop **oprop, Linecolor **ocolor)
+ 			    if (color)
+ 				color -= plen;
+ #endif
+-			    plen = *(--plens);
++			    if (plens == plens_buffer)
++				plen = 0;
++			    else
++				plen = *(--plens);
+ 			    str += 2;
+ 			}
+ 		    }
+@@ -419,7 +422,10 @@ checkType(Str s, Lineprop **oprop, Linecolor **ocolor)
+ 			    if (color)
+ 				color -= plen;
+ #endif
+-			    plen = *(--plens);
++			    if (plens == plens_buffer)
++				plen = 0;
++			    else
++				plen = *(--plens);
+ 			    str++;
+ 			}
+ #else

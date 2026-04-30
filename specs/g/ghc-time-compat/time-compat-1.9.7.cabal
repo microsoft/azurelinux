@@ -1,0 +1,165 @@
+cabal-version:      1.12
+name:               time-compat
+version:            1.9.7
+x-revision:         2
+synopsis:           Compatibility package for time
+description:
+  This packages tries to compat as much of @time@ features as possible.
+  .
+  /TODO:/
+  .
+  * Difference type @ParseTime@ and @FormatTime@ instances are missing.
+  .
+  * Formatting varies depending on underlying @time@ version
+  .
+  * @dayFractionToTimeOfDay@ on extreme values
+
+category:           Time, Compatibility
+license:            BSD3
+license-file:       LICENSE
+maintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>
+author:             Ashley Yakeley
+homepage:           https://github.com/haskellari/time-compat
+bug-reports:        https://github.com/haskellari/time-compat/issues
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.5
+   || ==9.8.2
+   || ==9.10.1
+
+source-repository head
+  type:     git
+  location: https://github.com/haskellari/time-compat.git
+
+library
+  default-language:   Haskell2010
+  hs-source-dirs:     src
+  other-extensions:   CPP
+  default-extensions: Trustworthy
+  build-depends:
+      base          >=4.12    && <4.21
+    , base-orphans  >=0.9.2   && <0.10
+    , deepseq       >=1.4.4.0 && <1.6
+    , hashable      >=1.4.4.0 && <1.6
+    , time          >=1.8.0.2 && <1.9  || >=1.9.2 && <1.9.4 || >=1.10 && <1.10.1 || >=1.11 && <1.11.2 || >=1.12 && <1.13
+
+  exposed-modules:
+    Data.Time.Calendar.Compat
+    Data.Time.Calendar.Easter.Compat
+    Data.Time.Calendar.Julian.Compat
+    Data.Time.Calendar.Month.Compat
+    Data.Time.Calendar.MonthDay.Compat
+    Data.Time.Calendar.OrdinalDate.Compat
+    Data.Time.Calendar.Quarter.Compat
+    Data.Time.Calendar.WeekDate.Compat
+    Data.Time.Clock.Compat
+    Data.Time.Clock.POSIX.Compat
+    Data.Time.Clock.System.Compat
+    Data.Time.Clock.TAI.Compat
+    Data.Time.Compat
+    Data.Time.Format.Compat
+    Data.Time.Format.ISO8601.Compat
+    Data.Time.LocalTime.Compat
+
+  other-modules:
+    Data.Format
+    Data.Time.Calendar.Private
+    Data.Time.Calendar.Types
+    Data.Time.Orphans
+
+test-suite instances
+  default-language: Haskell2010
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test-instances
+  main-is:          Test.hs
+  build-depends:
+      base
+    , deepseq
+    , hashable     >=1.4.0.0 && <1.6
+    , HUnit        >=1.3.1   && <1.3.2 || >=1.6.0.0 && <1.7
+    , time-compat
+
+-- This test-suite is from time library
+-- Changes:
+-- * imports: Data.Time -> Data.Time.Compat etc
+-- * disabled Test.Format.ParseTime
+-- * Test.Format.Format has also trees disabled
+-- * Test.Format.Compile doesn't work
+-- * disabled 'TimeOfDay minBound 0 0' (Test.LocalTime.Time)
+--
+test-suite main
+  if !impl(ghc >=7.4)
+    buildable: False
+
+  default-language:   Haskell2010
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     test/main
+  default-extensions:
+    CPP
+    DeriveDataTypeable
+    ExistentialQuantification
+    FlexibleInstances
+    MultiParamTypeClasses
+    Rank2Types
+    ScopedTypeVariables
+    StandaloneDeriving
+    TupleSections
+    UndecidableInstances
+
+  ghc-options:        -Wall -fwarn-tabs
+  build-depends:
+      base
+    , deepseq
+    , QuickCheck        >=2.13   && <2.16
+    , tagged            >=0.8.6  && <0.9
+    , tasty             >=1.5    && <1.6
+    , tasty-hunit       >=0.10   && <0.11
+    , tasty-quickcheck  >=0.10   && <0.12
+    , time-compat
+
+  if !impl(ghc >=8.0)
+    build-depends:
+        fail        >=4.9.0.0 && <4.10
+      , semigroups  >=0.18.5  && <0.21
+
+  build-depends:      time
+  main-is:            Main.hs
+  other-modules:
+    Test.Arbitrary
+    Test.Calendar.AddDays
+    Test.Calendar.AddDaysRef
+    Test.Calendar.CalendarProps
+    Test.Calendar.Calendars
+    Test.Calendar.CalendarsRef
+    Test.Calendar.ClipDates
+    Test.Calendar.ClipDatesRef
+    Test.Calendar.ConvertBack
+    Test.Calendar.Duration
+    Test.Calendar.Easter
+    Test.Calendar.EasterRef
+    Test.Calendar.LongWeekYears
+    Test.Calendar.LongWeekYearsRef
+    Test.Calendar.MonthDay
+    Test.Calendar.MonthDayRef
+    Test.Calendar.Valid
+    Test.Calendar.Week
+    Test.Clock.Conversion
+    Test.Clock.Resolution
+    Test.Clock.TAI
+    Test.Format.Compile
+    Test.Format.Format
+    Test.Format.ISO8601
+    Test.Format.ParseTime
+    Test.LocalTime.CalendarDiffTime
+    Test.LocalTime.Time
+    Test.LocalTime.TimeOfDay
+    Test.LocalTime.TimeRef
+    Test.TestUtil
+    Test.Types

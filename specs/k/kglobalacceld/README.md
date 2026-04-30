@@ -1,0 +1,3 @@
+# kglobalacceld
+
+The kglobalacceld package

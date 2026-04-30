@@ -1,0 +1,35 @@
+From e0c555ebb70f305345ff18d5d70a4ee14475ec28 Mon Sep 17 00:00:00 2001
+From: Nicolas Fella <nicolas.fella@gmx.de>
+Date: Fri, 26 Sep 2025 15:13:41 +0200
+Subject: [PATCH] Add QHP target
+
+---
+ src/knighttime.qdocconf | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/src/knighttime.qdocconf b/src/knighttime.qdocconf
+index 1722d5d..8b5a74f 100644
+--- a/src/knighttime.qdocconf
++++ b/src/knighttime.qdocconf
+@@ -18,3 +18,18 @@ navigation.landingpage = "KNightTime"
+ depends += \
+     qtcore
+ 
++qhp.projects            = KNightTime
++
++qhp.KNightTime.file                = knighttime.qhp
++qhp.KNightTime.namespace           = org.kde.knighttime.$QT_VERSION_TAG
++qhp.KNightTime.virtualFolder       = knighttime
++qhp.KNightTime.indexTitle          = KNightTime
++qhp.KNightTime.indexRoot           =
++
++qhp.KNightTime.subprojects         = classes
++qhp.KNightTime.subprojects.classes.title = C++ Classes
++qhp.KNightTime.subprojects.classes.indexTitle = KNightTime C++ Classes
++qhp.KNightTime.subprojects.classes.selectors = class fake:headerfile
++qhp.KNightTime.subprojects.classes.sortPages = true
++
++tagfile = knighttime.tags
+-- 
+GitLab
+

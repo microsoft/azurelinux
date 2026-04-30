@@ -1,0 +1,14 @@
+summary: Fonts related tests
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/fonts
+prepare:
+    name: tmt
+    how: install
+    package: dejavu-lgc-serif-fonts
+execute:
+    how: tmt
+environment:
+    PACKAGE: dejavu-lgc-serif-fonts
+    FONT_ALIAS: serif
+    FONT_FAMILY: DejaVu LGC Serif

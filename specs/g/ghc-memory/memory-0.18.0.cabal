@@ -1,0 +1,133 @@
+Name:                memory
+version:             0.18.0
+x-revision:          1
+Synopsis:            memory and related abstraction stuff
+Description:
+    Chunk of memory, polymorphic byte array management and manipulation
+    .
+    * A polymorphic byte array abstraction and function similar to strict ByteString.
+    .
+    * Different type of byte array abstraction.
+    .
+    * Raw memory IO operations (memory set, memory copy, ..)
+    .
+    * Aliasing with endianness support.
+    .
+    * Encoding : Base16, Base32, Base64.
+    .
+    * Hashing : FNV, SipHash
+License:             BSD3
+License-file:        LICENSE
+Copyright:           Vincent Hanquez <vincent@snarc.org>
+Author:              Vincent Hanquez <vincent@snarc.org>
+Maintainer:          vincent@snarc.org, Nicolas Di Prima <nicolas@primetype.co.uk>
+Category:            memory
+Stability:           experimental
+Build-Type:          Simple
+Homepage:            https://github.com/vincenthz/hs-memory
+Bug-Reports:         https://github.com/vincenthz/hs-memory/issues
+cabal-version:       1.18
+extra-doc-files:     README.md CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/vincenthz/hs-memory
+
+Flag support_bytestring
+  Description:       add non-orphan bytearray support for bytestring
+  Default:           True
+  Manual:            True
+
+Flag support_deepseq
+  Description:       add deepseq instances for memory types
+  Default:           True
+  Manual:            True
+
+Library
+  Exposed-modules:   Data.ByteArray
+                     Data.ByteArray.Encoding
+                     Data.ByteArray.Mapping
+                     Data.ByteArray.Pack
+                     Data.ByteArray.Parse
+                     Data.ByteArray.Hash
+                     Data.Memory.Endian
+                     Data.Memory.PtrMethods
+                     Data.Memory.ExtendedWords
+                     Data.Memory.Encoding.Base16
+                     Data.Memory.Encoding.Base32
+                     Data.Memory.Encoding.Base64
+  Other-modules:     Data.Memory.Internal.Compat
+                     Data.Memory.Internal.CompatPrim
+                     Data.Memory.Internal.CompatPrim64
+                     Data.Memory.Internal.DeepSeq
+                     Data.Memory.Internal.Imports
+                     Data.Memory.Hash.SipHash
+                     Data.Memory.Hash.FNV
+                     Data.ByteArray.Pack.Internal
+                     Data.ByteArray.Types
+                     Data.ByteArray.Bytes
+                     Data.ByteArray.ScrubbedBytes
+                     Data.ByteArray.Methods
+                     Data.ByteArray.MemView
+                     Data.ByteArray.View
+
+  if impl(ghc < 8.8)
+    -- https://github.com/haskell-infra/hackage-trustees/issues/422
+    build-depends:   base >= 4.13
+  else
+    build-depends:   base >= 4.13
+                   , ghc-prim
+  -- FIXME armel or mispel is also little endian.
+  -- might be a good idea to also add a runtime autodetect mode.
+  -- ARCH_ENDIAN_UNKNOWN
+  if (arch(i386) || arch(x86_64))
+    CPP-options:     -DARCH_IS_LITTLE_ENDIAN
+  if os(windows)
+    Other-modules:   Data.Memory.MemMap.Windows
+  else
+    Other-modules:   Data.Memory.MemMap.Posix
+
+  -- optional support bytearray instance for bytestring
+  if flag(support_bytestring)
+    CPP-options:     -DWITH_BYTESTRING_SUPPORT
+    Build-depends:   bytestring
+  if flag(support_deepseq)
+    CPP-options:     -DWITH_DEEPSEQ_SUPPORT
+    Build-depends:   deepseq >= 1.1
+
+  CPP-options:     -DWITH_BASEMENT_SUPPORT
+  Build-depends:   basement >= 0.0.7
+  exposed-modules: Data.ByteArray.Sized
+
+  ghc-options:       -Wall -fwarn-tabs
+  default-language:  Haskell2010
+
+Test-Suite test-memory
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    tests
+  Main-is:           Tests.hs
+  Other-modules:     Imports
+                     SipHash
+                     Utils
+  if impl(ghc < 8.8)
+    buildable: False
+  else
+    build-depends:   base
+  Build-Depends:     bytestring
+                   , memory
+                   , basement >= 0.0.7
+                   , foundation
+  ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures -threaded
+  default-language:  Haskell2010
+  CPP-options:     -DWITH_BASEMENT_SUPPORT
+
+-- Test-Suite test-examples
+--   default-language:  Haskell2010
+--   type:              exitcode-stdio-1.0
+--   hs-source-dirs:    tests
+--   ghc-options:       -threaded
+--   Main-is:           DocTests.hs
+--   Build-Depends:     base >= 3 && < 5
+--                    , memory
+--                    , bytestring
+--                    , doctest

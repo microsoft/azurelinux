@@ -1,0 +1,126 @@
+name:                network-uri
+version:             2.6.4.2
+x-revision: 1
+synopsis:            URI manipulation
+description:
+  This package provides facilities for parsing and unparsing URIs, and creating
+  and resolving relative URI references, closely following the URI spec,
+  <http://www.ietf.org/rfc/rfc3986.txt IETF RFC 3986>.
+  .
+  == Backward-compatibility
+  .
+  In @network-2.6@ the "Network.URI" module was split off from the
+  @network@ package into this package. If you're using the "Network.URI"
+  module you can be backward compatible and automatically get it from
+  the right package by using the
+  </package/network-uri-flag network-uri-flag pseudo-package>
+  in your @.cabal@ file's build-depends (along with dependencies for
+  both @network-uri@ and @network@):
+  .
+  >  build-depends:
+  >     network-uri-flag == 0.1.*
+  .
+  Or you can do the same manually by adding this boilerplate to your
+  @.cabal@ file:
+  .
+  > flag network-uri
+  >   description: Get Network.URI from the network-uri package
+  >   default: True
+  >
+  > library
+  >   -- ...
+  >   if flag(network-uri)
+  >     build-depends: network-uri >= 2.6, network >= 2.6
+  >   else
+  >     build-depends: network-uri < 2.6, network < 2.6
+  .
+  That is, get the module from either @network < 2.6@ or from
+  @network-uri >= 2.6@.
+
+homepage:            https://github.com/haskell/network-uri
+bug-reports:         https://github.com/haskell/network-uri/issues
+license:             BSD3
+license-file:        LICENSE
+extra-source-files:  README.md, CHANGELOG.md
+maintainer:          ezra@ezrakilty.net
+category:            Network
+build-type:          Simple
+cabal-version:       >=1.10
+tested-with:
+  GHC ==9.8.1
+   || ==9.6.3
+   || ==9.4.7
+   || ==9.2.8
+   || ==9.0.2
+   || ==8.10.7
+   || ==8.8.4
+   || ==8.6.5
+   || ==8.4.4
+   || ==8.2.2
+   || ==8.0.2
+   || ==7.10.3
+   || ==7.8.4
+   || ==7.6.3
+   || ==7.4.2
+   || ==7.2.2
+   || ==7.0.4
+
+library
+  exposed-modules:
+    Network.URI
+    Network.URI.Lens
+    Network.URI.Static
+  build-depends:
+    base >= 3 && < 5,
+    deepseq >= 1.1 && < 1.6,
+    parsec >= 3.1.12.0 && < 3.2,
+    th-compat >= 0.1.1 && < 1.0
+  build-depends: template-haskell
+  default-extensions: CPP, DeriveDataTypeable
+  if impl(ghc < 7.6)
+    build-depends: ghc-prim
+  if impl(ghc >= 7.2)
+    default-extensions: DeriveGeneric
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+test-suite uri
+  hs-source-dirs: tests
+  main-is: uri001.hs
+  type: exitcode-stdio-1.0
+
+  build-depends:
+    base < 5,
+    HUnit,
+    network-uri,
+    tasty,
+    tasty-hunit,
+    tasty-quickcheck,
+    QuickCheck
+
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
+benchmark uri-bench
+  hs-source-dirs: tests
+  main-is: uri-bench.hs
+  type: exitcode-stdio-1.0
+
+  build-depends:
+    base < 5,
+    HUnit,
+    network-uri,
+    criterion,
+    deepseq
+
+  ghc-options: -Wall -fwarn-tabs
+  default-language: Haskell98
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/network-uri.git
