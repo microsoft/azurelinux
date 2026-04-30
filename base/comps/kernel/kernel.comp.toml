@@ -16,6 +16,8 @@ azl_pkgrelease = "8"
 kextraversion = "1"
 # CBL-Mariner branch number (used in tarball path)
 azurelinux_version = "3"
+# NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
+nvidia_open_version = "595.58.03"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
@@ -23,6 +25,13 @@ filename = "kernel-6.18.5.1.tar.gz"
 hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
 hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+
+# Download the NVIDIA open GPU kernel module source tarball
+[[components.kernel.source-files]]
+filename = "open-gpu-kernel-modules-595.58.03.tar.gz"
+hash = "e0c4659ddf15e4f4e19cee05b49f88c9ba08ef3add0dfe08249798f58d0fe75e"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/595.58.03.tar.gz" }
 
 # Insert version and release information from the component defines into the spec file, and update the source URL to match the AzureLinux kernel source structure
 [[components.kernel.overlays]]
@@ -152,4 +161,174 @@ lines = [
     "RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}",
     "cd ../..",
     "%endif",
+]
+
+# ============================================================================
+# kmod-nvidia-open subpackage — NVIDIA open GPU kernel modules built alongside
+# the kernel. NOTE: The subpackage inherits the kernel's Version (6.18.5), NOT
+# the NVIDIA driver version (595.58.03). This is an RPM limitation.
+# The NVIDIA driver version is tracked via Provides: nvidia-open-kmod-version.
+# ============================================================================
+
+# Register the NVIDIA source tarball as Source6000
+[[components.kernel.overlays]]
+description = "Register NVIDIA open-gpu-kernel-modules tarball as Source6000 for the kmod-nvidia-open subpackage"
+type = "spec-insert-tag"
+tag = "Source6000"
+value = "open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz"
+
+# Register the NVIDIA modprobe config as Source6001
+[[components.kernel.overlays]]
+description = "Add NVIDIA modprobe config file for kmod-nvidia-open subpackage"
+type = "file-add"
+file = "kmod-nvidia-open-modprobe.conf"
+source = "kmod-nvidia-open-modprobe.conf"
+
+[[components.kernel.overlays]]
+description = "Register NVIDIA modprobe config as Source6001"
+type = "spec-insert-tag"
+tag = "Source6001"
+value = "kmod-nvidia-open-modprobe.conf"
+
+# Define kmod-nvidia-open subpackage
+# Uses spec-append-lines on the main %description section to inject the subpackage
+# block right after the main description body. This places it alongside the other
+# subpackage declarations (perf, tools, headers, etc.).
+[[components.kernel.overlays]]
+description = "Add kmod-nvidia-open subpackage declaration after main %description — NVIDIA open GPU kernel modules built as a kernel subpackage"
+type = "spec-append-lines"
+section = "%description"
+lines = [
+    "",
+    "%package -n kmod-nvidia-open",
+    "Summary:        NVIDIA open GPU kernel modules (driver %{nvidia_open_version})",
+    "# NOTE: Version is inherited from kernel (%{version}), NOT nvidia_open_version.",
+    "# Track the actual NVIDIA driver version via Provides for dependency resolution.",
+    "Provides:       nvidia-open-kmod-version = %{nvidia_open_version}",
+    "Provides:       kmod-nvidia-open = %{version}-%{release}",
+    "Provides:       kmod-nvidia-open-%{KVERREL} = %{version}-%{release}",
+    "Requires:       %{name}-core-uname-r = %{KVERREL}",
+    "Requires(post): kmod",
+    "Requires(postun): kmod",
+    "Conflicts:      nvidia-closed-kmod",
+    "Conflicts:      nvidia-open",
+    "ExclusiveArch:  x86_64 aarch64",
+    "",
+    "%description -n kmod-nvidia-open",
+    "Open-source NVIDIA GPU kernel modules (driver version %{nvidia_open_version})",
+    "built from the official NVIDIA/open-gpu-kernel-modules repository for",
+    "kernel %{KVERREL}.",
+    "",
+    "These modules support CUDA workloads on NVIDIA GPUs (Turing and later).",
+    "Modules: nvidia.ko, nvidia-modeset.ko, nvidia-drm.ko, nvidia-uvm.ko,",
+    "nvidia-peermem.ko.",
+    "",
+    "NOTE: This subpackage has the kernel version (%{version}-%{release}), not the",
+    "NVIDIA driver version. Use 'Requires: nvidia-open-kmod-version = 595.58.03'",
+    "to depend on a specific NVIDIA driver version.",
+]
+
+# Extract the NVIDIA source in %prep
+[[components.kernel.overlays]]
+description = "Extract NVIDIA open-gpu-kernel-modules source tarball at end of %prep for kmod-nvidia-open subpackage build"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "# AZL: Extract NVIDIA open GPU kernel module sources for kmod-nvidia-open subpackage",
+    "%ifnarch noarch %nobuildarches",
+    "cd %{_builddir}",
+    "tar -xf %{SOURCE6000}",
+    "cd -",
+    "%endif",
+]
+
+# Build NVIDIA modules after the base kernel build
+# This appends to %build — after all BuildKernel calls complete, we build the
+# NVIDIA modules against the just-built kernel source tree.
+[[components.kernel.overlays]]
+description = "Build NVIDIA open GPU kernel modules after the base kernel build in %build — uses the kernel source tree from the just-completed BuildKernel"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "# AZL: Build NVIDIA open GPU kernel modules (kmod-nvidia-open subpackage)",
+    "%if %{with_up_base}",
+    "%ifnarch noarch %nobuildarches",
+    '%{log_msg "Building NVIDIA open GPU kernel modules %{nvidia_open_version} for %{KVERREL}"}',
+    "pushd %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}",
+    "# Unset LDFLAGS — NVIDIA kbuild invokes ld directly, not via gcc",
+    "unset LDFLAGS",
+    'make %{?_smp_mflags} modules \',
+    '    KERNEL_UNAME="%{KVERREL}" \',
+    '    SYSSRC="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \',
+    '    SYSOUT="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \',
+    '    IGNORE_CC_MISMATCH=1 \',
+    '    IGNORE_XEN_PRESENCE=1 \',
+    '    IGNORE_PREEMPT_RT_PRESENCE=1 \',
+    '    NV_EXCLUDE_BUILD_MODULES=""',
+    "popd",
+    "%endif",
+    "%endif",
+]
+
+# Install NVIDIA modules
+[[components.kernel.overlays]]
+description = "Install NVIDIA open GPU kernel modules and config files into BUILDROOT for kmod-nvidia-open subpackage"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "# AZL: Install NVIDIA open GPU kernel modules (kmod-nvidia-open subpackage)",
+    "%if %{with_up_base}",
+    "%ifnarch noarch %nobuildarches",
+    '%{log_msg "Installing NVIDIA open GPU kernel modules for %{KVERREL}"}',
+    "install -d $RPM_BUILD_ROOT/lib/modules/%{KVERREL}/extra/nvidia",
+    "for mod in nvidia nvidia-modeset nvidia-drm nvidia-uvm nvidia-peermem; do",
+    '    ko="%{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/kernel-open/${mod}.ko"',
+    '    if [ -f "${ko}" ]; then',
+    '        install -m 0644 "${ko}" $RPM_BUILD_ROOT/lib/modules/%{KVERREL}/extra/nvidia/',
+    "    fi",
+    "done",
+    "# Install modprobe config to blacklist conflicting modules",
+    "install -D -m 0644 %{SOURCE6001} $RPM_BUILD_ROOT%{_sysconfdir}/modprobe.d/kmod-nvidia-open.conf",
+    "# Install depmod override config",
+    "install -d $RPM_BUILD_ROOT%{_sysconfdir}/depmod.d",
+    "cat > $RPM_BUILD_ROOT%{_sysconfdir}/depmod.d/kmod-nvidia-open.conf << 'DEPMOD_EOF'",
+    "override nvidia %{KVERREL} extra/nvidia",
+    "override nvidia-modeset %{KVERREL} extra/nvidia",
+    "override nvidia-drm %{KVERREL} extra/nvidia",
+    "override nvidia-uvm %{KVERREL} extra/nvidia",
+    "override nvidia-peermem %{KVERREL} extra/nvidia",
+    "DEPMOD_EOF",
+    "# Install NVIDIA license file (source is a sibling of buildsubdir, so install explicitly)",
+    "install -D -m 0644 %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/COPYING $RPM_BUILD_ROOT%{_datadir}/licenses/kmod-nvidia-open/COPYING",
+    "%endif",
+    "%endif",
+]
+
+# %post, %postun, and %files for kmod-nvidia-open
+# These must appear as their own sections BEFORE %changelog.
+# We append to the last %files section before %changelog (modules-extra-matched),
+# which places our new sections between it and %changelog.
+[[components.kernel.overlays]]
+description = "Add %post, %postun, and %files sections for kmod-nvidia-open subpackage after %files modules-extra-matched (last section before %changelog)"
+type = "spec-append-lines"
+section = "%files"
+package = "modules-extra-matched"
+lines = [
+    "",
+    "%post -n kmod-nvidia-open",
+    "/usr/sbin/depmod -a %{KVERREL} || :",
+    "",
+    "%postun -n kmod-nvidia-open",
+    "/usr/sbin/depmod -a %{KVERREL} || :",
+    "",
+    "%files -n kmod-nvidia-open",
+    "%license %{_datadir}/licenses/kmod-nvidia-open/COPYING",
+    "/lib/modules/%{KVERREL}/extra/nvidia/nvidia.ko.xz",
+    "/lib/modules/%{KVERREL}/extra/nvidia/nvidia-modeset.ko.xz",
+    "/lib/modules/%{KVERREL}/extra/nvidia/nvidia-drm.ko.xz",
+    "/lib/modules/%{KVERREL}/extra/nvidia/nvidia-uvm.ko.xz",
+    "/lib/modules/%{KVERREL}/extra/nvidia/nvidia-peermem.ko.xz",
+    "%config(noreplace) %{_sysconfdir}/modprobe.d/kmod-nvidia-open.conf",
+    "%{_sysconfdir}/depmod.d/kmod-nvidia-open.conf",
+    "",
 ]
