@@ -11,6 +11,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/m17n-lib.azl.macros}
+
 # note this duplicates native anthy IMEs
 %if 0%{?fedora}
 %bcond_without anthy
@@ -26,6 +29,7 @@ Summary:        Multilingual text library
 License:        LGPL-2.1-or-later
 URL:            http://www.nongnu.org/m17n/
 Source0:        http://download.savannah.gnu.org/releases/m17n/%{name}-%{version}.tar.gz
+Source9999: m17n-lib.azl.macros
 Patch0:         %{name}-1.8.0-multilib.patch
 
 BuildRequires: make

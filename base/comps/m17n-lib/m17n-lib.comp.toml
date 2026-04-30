@@ -1,0 +1,7 @@
+# Disable optional Anthy IME module so that we can drop the
+# anthy-unicode dependency from base. m17n-lib.spec gates the anthy
+# sub-package via `%bcond_without anthy` (default ON when fedora is
+# set). Flip to OFF; spec is well-gated (the libmimx-anthy.so file
+# is rm'd from %install when --without anthy is used).
+[components.m17n-lib]
+build.without = ["anthy"]
