@@ -1,7 +1,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.37.4
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -16,6 +16,8 @@ Patch0:         libblkid-src-probe-check-for-ENOMEDIUM.patch
 Patch1:         0001-wall-fix-escape-sequence-Injection-CVE-2024-28085.patch
 Patch2:         CVE-2025-14104.patch
 Patch3:         skip-lsns-ioctl_ns-test-if-unshare-fails.patch
+Patch4:         CVE-2026-27456.patch
+Patch5:         CVE-2026-3184.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -155,6 +157,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Apr 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37.4-11
+- Patch for CVE-2026-3184, CVE-2026-27456
+
 * Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.37.4-10
 - Patch for CVE-2025-14104
 
