@@ -1,4 +1,3 @@
-# TODO(azl): review this file
 
 # We deviate from some upstream defaults
 disable systemd-timesyncd.service
@@ -7,6 +6,7 @@ disable systemd-boot-update.service
 
 enable systemd-resolved.service
 
+enable systemd-oomd.socket
 enable systemd-oomd.service
 
 # System stuff
@@ -27,10 +27,6 @@ enable systemd-networkd-wait-online.service
 enable auditd.service
 
 enable audit-rules.service
-
-# Backward-compat: override /proc/version so tools that grep for "Mariner"
-# can identify Azure Linux
-enable proc-version-override.service
 
 # Locally-running service
 enable restorecond.service
@@ -364,8 +360,8 @@ enable cloud-init-local.service
 enable kernel-bootcfg-boot-successful.service
 
 # Enable lvm-devices-import
-enable /usr/lib/systemd/system/lvm-devices-import.path
-enable /usr/lib/systemd/system/lvm-devices-import.service
+enable lvm-devices-import.path
+enable lvm-devices-import.service
 
 # Enable fips-crypto-policy-overlay
 enable fips-crypto-policy-overlay.service
@@ -375,3 +371,4 @@ enable gpio-manager.service
 
 # Enable authselect-apply-changes.service
 enable authselect-apply-changes.service
+

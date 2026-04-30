@@ -1,0 +1,76 @@
+cabal-version:      >=1.10
+name:               these
+version:            1.2.1
+x-revision:         2
+synopsis:           An either-or-both data type.
+homepage:           https://github.com/haskellari/these
+license:            BSD3
+license-file:       LICENSE
+author:             C. McCann, Oleg Grenrus
+maintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>
+category:           Data, These
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+description:
+  This package provides a data type @These a b@ which can hold a value of either
+  type or values of each type. This is usually thought of as an "inclusive or"
+  type (contrasting @Either a b@ as "exclusive or") or as an "outer join" type
+  (contrasting @(a, b)@ as "inner join").
+  .
+  @
+  data These a b = This a | That b | These a b
+  @
+  .
+  Since version 1, this package was split into parts:
+  .
+  * <https://hackage.haskell.org/package/semialign semialign> For @Align@ and @Zip@ type-classes.
+  .
+  * <https://hackage.haskell.org/package/semialign-indexed semialign-indexed> For @SemialignWithIndex@ class, providing @ialignWith@ and @izipWith@.
+  .
+  * <https://hackage.haskell.org/package/these-lens these-lens> For lens combinators.
+  .
+  * <http://hackage.haskell.org/package/monad-chronicle monad-chronicle> For transformers variant of @These@.
+
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+source-repository head
+  type:     git
+  location: https://github.com/haskellari/these.git
+  subdir:   these
+
+library
+  default-language:         Haskell2010
+  ghc-options:              -Wall -Wno-trustworthy-safe
+  hs-source-dirs:           src
+  exposed-modules:
+    Data.Functor.These
+    Data.These
+    Data.These.Combinators
+
+  -- ghc boot libs
+  build-depends:
+      base     >=4.12.0.0 && <4.22
+    , binary   >=0.8.6.0  && <0.10
+    , deepseq  >=1.4.4.0  && <1.6
+
+  -- other dependencies
+  -- note: we need to depend on assoc-1.1 to be sure that
+  -- Bifunctor type class comes from bifunctor-classes-compat
+  build-depends:
+      assoc     >=1.1.1   && <1.2
+    , hashable  >=1.4.4.0 && <1.6
+
+  if !impl(ghc >=9.6)
+    build-depends: foldable1-classes-compat >=0.1 && <0.2
+
+  x-docspec-extra-packages: lens

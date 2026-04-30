@@ -1,0 +1,64 @@
+From b70c928661024cd07914feb49122275daab904ea Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Sat, 12 Jul 2025 07:51:05 -0700
+Subject: netlink: fix missing headers in text output
+
+The commit under fixes added a NULL-check which prevents us from
+printing text headers. Conversions to add JSON support often use:
+
+  print_string(PRINT_FP, NULL, "some text:\n", NULL);
+
+to print in plain text mode.
+
+Correct output:
+
+  Channel parameters for vpn0:
+  Pre-set maximums:
+  RX:		n/a
+  TX:		n/a
+  Other:		n/a
+  Combined:	1
+  Current hardware settings:
+  RX:		n/a
+  TX:		n/a
+  Other:		n/a
+  Combined:	0
+
+With the buggy patch:
+
+  Channel parameters for vpn0:
+  RX:		n/a
+  TX:		n/a
+  Other:		n/a
+  Combined:	1
+  RX:		n/a
+  TX:		n/a
+  Other:		n/a
+  Combined:	0
+
+Fixes: fd328ccb3cc0 ("json_print: add NULL check before jsonw_string_field() in print_string()")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ json_print.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/json_print.c b/json_print.c
+index 4f61640..e07c651 100644
+--- a/json_print.c
++++ b/json_print.c
+@@ -143,10 +143,11 @@ void print_string(enum output_type type,
+ 	} else if (_IS_FP_CONTEXT(type)) {
+ 		if (value)
+ 			fprintf(stdout, fmt, value);
++		else
++			fprintf(stdout, fmt);
+ 	}
+ }
+ 
+-
+ /*
+  * value's type is bool. When using this function in FP context you can't pass
+  * a value to it, you will need to use "is_json_context()" to have different
+-- 
+cgit 1.2.3-korg
+

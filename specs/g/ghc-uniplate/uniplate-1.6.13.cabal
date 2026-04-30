@@ -1,0 +1,88 @@
+cabal-version:      >= 1.18
+build-type:         Simple
+name:               uniplate
+version:            1.6.13
+x-revision: 1
+author:             Neil Mitchell <ndmitchell@gmail.com>
+maintainer:         Neil Mitchell <ndmitchell@gmail.com>
+copyright:          Neil Mitchell 2006-2020
+homepage:           https://github.com/ndmitchell/uniplate#readme
+bug-reports:        https://github.com/ndmitchell/uniplate/issues
+license:            BSD3
+license-file:       LICENSE
+synopsis:           Help writing simple, concise and fast generic operations.
+category:           Generics
+description:
+    Uniplate is library for writing simple and concise generic operations.
+    Uniplate has similar goals to the original Scrap Your Boilerplate work,
+    but is substantially simpler and faster.
+    .
+    To get started with Uniplate you should import one of the three following
+    modules:
+    .
+    * "Data.Generics.Uniplate.Data" - to quickly start writing generic functions.
+    Most users should start by importing this module.
+    .
+    * "Data.Generics.Uniplate.Direct" - a replacement for "Data.Generics.Uniplate.Data"
+    with substantially higher performance (around 5 times), but requires writing
+    instance declarations.
+    .
+    * "Data.Generics.Uniplate.Operations" - definitions of all the operations defined
+    by Uniplate. Both the above two modules re-export this module.
+    .
+    In addition, some users may want to make use of the following modules:
+    .
+    * "Data.Generics.Uniplate.Zipper" - a zipper built on top of Uniplate instances.
+    .
+    * "Data.Generics.SYB" - users transitioning from the Scrap Your Boilerplate library.
+    .
+    * "Data.Generics.Compos" - users transitioning from the Compos library.
+    .
+    * "Data.Generics.Uniplate.DataOnly" - users making use of both @Data@ and @Direct@
+    to avoid getting instance conflicts.
+
+extra-source-files:
+    Data/Generics/Uniplate/Internal/DataInc.hs
+    Data/Generics/Uniplate/Internal/OperationsInc.hs
+extra-doc-files:
+    README.md
+    CHANGES.txt
+tested-with: GHC==8.10, GHC==8.8, GHC==8.6, GHC==8.4, GHC==8.2, GHC==8.0
+
+source-repository head
+    type:     git
+    location: https://github.com/ndmitchell/uniplate.git
+
+library
+    default-language: Haskell2010
+    build-depends:
+        base >=4.10 && <5, containers, syb, ghc-prim,
+        hashable >= 1.1.2.3,
+        unordered-containers >= 0.2.1
+
+    exposed-modules:
+        Data.Generics.Str
+        Data.Generics.Compos
+        Data.Generics.SYB
+        Data.Generics.Uniplate.Data
+        Data.Generics.Uniplate.Data.Instances
+        Data.Generics.Uniplate.DataOnly
+        Data.Generics.Uniplate.Direct
+        Data.Generics.Uniplate.Operations
+        Data.Generics.Uniplate.Typeable
+        Data.Generics.Uniplate.Zipper
+
+        -- DEPRECATED
+        Data.Generics.Uniplate
+        Data.Generics.UniplateOn
+        Data.Generics.UniplateStr
+        Data.Generics.UniplateStrOn
+        Data.Generics.Biplate
+        Data.Generics.PlateDirect
+        Data.Generics.PlateTypeable
+        Data.Generics.PlateData
+
+    other-modules:
+        Data.Generics.Uniplate.Internal.Data
+        Data.Generics.Uniplate.Internal.DataOnlyOperations
+        Data.Generics.Uniplate.Internal.Utils

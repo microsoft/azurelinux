@@ -1,0 +1,207 @@
+cabal-version: 1.24
+name:          semigroupoids
+category:      Control, Comonads
+version:       6.0.1
+x-revision: 2
+license:       BSD2
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     provisional
+homepage:      http://github.com/ekmett/semigroupoids
+bug-reports:   http://github.com/ekmett/semigroupoids/issues
+copyright:     Copyright (C) 2011-2015 Edward A. Kmett
+tested-with:   GHC == 8.0.2
+             , GHC == 8.2.2
+             , GHC == 8.4.4
+             , GHC == 8.6.5
+             , GHC == 8.8.4
+             , GHC == 8.10.7
+             , GHC == 9.0.2
+             , GHC == 9.2.7
+             , GHC == 9.4.4
+             , GHC == 9.6.1
+build-type:    Simple
+synopsis:      Semigroupoids: Category sans id
+extra-source-files:
+  .gitignore
+  .vim.custom
+  README.markdown
+  CHANGELOG.markdown
+  img/classes.dot
+extra-doc-files:
+  img/classes.svg
+
+description:
+  Provides a wide array of (semi)groupoids and operations for working with them.
+  .
+  A 'Semigroupoid' is a 'Category' without the requirement of identity arrows for every object in the category.
+  .
+  A 'Category' is any 'Semigroupoid' for which the Yoneda lemma holds.
+  .
+  When working with comonads you often have the @\<*\>@ portion of an @Applicative@, but
+  not the @pure@. This was captured in Uustalu and Vene's \"Essence of Dataflow Programming\"
+  in the form of the @ComonadZip@ class in the days before @Applicative@. Apply provides a weaker invariant, but for the comonads used for data flow programming (found in the streams package), this invariant is preserved. Applicative function composition forms a semigroupoid.
+  .
+  Similarly many structures are nearly a comonad, but not quite, for instance lists provide a reasonable 'extend' operation in the form of 'tails', but do not always contain a value.
+  .
+  We describe the relationships between the type classes defined in this package
+  and those from `base` (and some from `contravariant`) in the diagram below.
+  Thick-bordered nodes correspond to type classes defined in this package;
+  thin-bordered ones correspond to type classes from elsewhere. Solid edges
+  indicate a subclass relationship that actually exists; dashed edges indicate a
+  subclass relationship that /should/ exist, but currently doesn't.
+  .
+  <<https://raw.githubusercontent.com/ekmett/semigroupoids/master/img/classes.svg Relationships among type classes from this package and others>>
+  .
+  Apply, Bind, and Extend (not shown) give rise the Static, Kleisli and Cokleisli semigroupoids respectively.
+  .
+  This lets us remove many of the restrictions from various monad transformers
+  as in many cases the binding operation or @\<*\>@ operation does not require them.
+  .
+  Finally, to work with these weaker structures it is beneficial to have containers
+  that can provide stronger guarantees about their contents, so versions of 'Traversable'
+  and 'Foldable' that can be folded with just a 'Semigroup' are added.
+
+source-repository head
+  type: git
+  location: git://github.com/ekmett/semigroupoids.git
+
+flag containers
+  description:
+    You can disable the use of the `containers` package using `-f-containers`.
+    .
+    Disabing this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+flag contravariant
+  description:
+    You can disable the use of the `contravariant` package using `-f-contravariant`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+    .
+    If disabled we will not supply instances of `Contravariant`
+    .
+  default: True
+  manual: True
+
+flag distributive
+  description:
+    You can disable the use of the `distributive` package using `-f-distributive`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+    .
+    If disabled we will not supply instances of `Distributive`
+    .
+  default: True
+  manual: True
+
+flag comonad
+  description:
+    You can disable the use of the `comonad` package using `-f-comonad`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+    .
+    If disabled we will not supply instances of `Comonad`
+    .
+  default: True
+  manual: True
+
+flag tagged
+  description:
+    You can disable the use of the `tagged` package using `-f-tagged`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+flag unordered-containers
+  description:
+    You can disable the use of the `unordered-containers` package (and also its dependency `hashable`) using `-f-unordered-containers`.
+    .
+    Disabling this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+library
+  build-depends:
+    base                >= 4.9     && < 5,
+    base-orphans        >= 0.8.4   && < 1,
+    bifunctors          >= 5.6     && < 6,
+    template-haskell    >= 0.2.11,
+    transformers        >= 0.5     && < 0.7,
+    transformers-compat >= 0.6     && < 0.8
+
+  if !impl(ghc >= 9.6)
+    build-depends: foldable1-classes-compat >= 0.1 && < 0.2
+
+  -- On GHC-9.6&base-4.18 we require recent enough transformers and containers
+  -- with Foldable1 instances.
+  if impl(ghc >= 9.6)
+    build-depends: transformers >= 0.6.1.0
+    if flag(containers)
+      build-depends: containers >= 0.6.7
+
+  if flag(containers)
+    build-depends: containers >= 0.5.7.1 && < 0.9
+
+  if flag(contravariant)
+    build-depends: contravariant >= 1.5.3 && < 2
+
+  if flag(distributive)
+    build-depends: distributive >= 0.5.2 && < 1
+
+  if flag(comonad)
+    build-depends: comonad >= 5.0.8 && < 6
+
+  if flag(tagged)
+    build-depends: tagged >= 0.8.7 && < 1
+
+  if flag(unordered-containers)
+    build-depends: hashable >= 1.2.7.0 && < 1.6,
+                   unordered-containers >= 0.2.8.0  && < 0.3
+
+  hs-source-dirs: src
+
+  exposed-modules:
+    Data.Bifunctor.Apply
+    Data.Functor.Alt
+    Data.Functor.Apply
+    Data.Functor.Bind
+    Data.Functor.Bind.Class
+    Data.Functor.Bind.Trans
+    Data.Functor.Extend
+    Data.Functor.Plus
+    Data.Groupoid
+    Data.Isomorphism
+    Data.Semigroup.Bifoldable
+    Data.Semigroup.Bitraversable
+    Data.Semigroup.Foldable
+    Data.Semigroup.Foldable.Class
+    Data.Semigroup.Traversable
+    Data.Semigroup.Traversable.Class
+    Data.Semigroupoid
+    Data.Semigroupoid.Categorical
+    Data.Semigroupoid.Dual
+    Data.Semigroupoid.Ob
+    Data.Semigroupoid.Static
+    Data.Traversable.Instances
+    Semigroupoids.Do
+  other-modules:
+    Semigroupoids.Internal
+
+  if impl(ghc >= 8.6) || flag(contravariant)
+    exposed-modules:
+      Data.Functor.Contravariant.Conclude
+      Data.Functor.Contravariant.Decide
+      Data.Functor.Contravariant.Divise
+
+  ghc-options: -Wall -Wno-warnings-deprecations -Wno-trustworthy-safe
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+  default-language: Haskell2010

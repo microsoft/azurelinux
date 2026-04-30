@@ -1,0 +1,3 @@
+# aurorae
+
+The aurorae package

@@ -1,0 +1,309 @@
+Cabal-Version:  3.0
+Build-Type:     Simple
+Name:           vector
+Version:        0.13.2.0
+x-revision: 1
+-- don't forget to update the changelog file!
+License:        BSD-3-Clause
+License-File:   LICENSE
+Author:         Roman Leshchinskiy <rl@cse.unsw.edu.au>
+Maintainer:     Haskell Libraries Team <libraries@haskell.org>
+                Alexey Kuleshevich <alexey@kuleshevi.ch>,
+                Aleksey Khudyakov <alexey.skladnoy@gmail.com>,
+                Andrew Lelechenko <andrew.lelechenko@gmail.com>
+Copyright:      (c) Roman Leshchinskiy 2008-2012,
+                    Alexey Kuleshevich 2020-2022,
+                    Aleksey Khudyakov 2020-2022,
+                    Andrew Lelechenko 2020-2022
+
+Homepage:       https://github.com/haskell/vector
+Bug-Reports:    https://github.com/haskell/vector/issues
+Category:       Data, Data Structures
+Synopsis:       Efficient Arrays
+Description:
+        .
+        An efficient implementation of @Int@-indexed arrays (both mutable
+        and immutable), with a powerful loop optimisation framework .
+        .
+        It is structured as follows:
+        .
+        ["Data.Vector"] Boxed vectors of arbitrary types.
+        .
+        ["Data.Vector.Unboxed"] Unboxed vectors with an adaptive
+        representation based on data type families.
+        .
+        ["Data.Vector.Storable"] Unboxed vectors of 'Storable' types.
+        .
+        ["Data.Vector.Primitive"] Unboxed vectors of primitive types as
+        defined by the @primitive@ package. "Data.Vector.Unboxed" is more
+        flexible at no performance cost.
+        .
+        ["Data.Vector.Generic"] Generic interface to the vector types.
+        .
+        There is also a (draft) tutorial on common uses of vector.
+        .
+        * <http://haskell.org/haskellwiki/Numeric_Haskell:_A_Vector_Tutorial>
+
+Tested-With:
+  GHC == 8.0.2
+  GHC == 8.2.2
+  GHC == 8.4.4
+  GHC == 8.6.5
+  GHC == 8.8.4
+  GHC == 8.10.7
+  GHC == 9.0.2
+  GHC == 9.2.8
+  GHC == 9.4.8
+  GHC == 9.6.4
+  GHC == 9.8.2
+
+Extra-doc-files:
+      changelog.md
+      README.md
+      tests/LICENSE
+Extra-Source-Files:
+      internal/GenUnboxTuple.hs
+      internal/unbox-tuple-instances
+
+source-repository head
+  type:     git
+  location: https://github.com/haskell/vector.git
+  subdir:   vector
+
+Flag BoundsChecks
+  Description: Enable bounds checking
+  Default: True
+  Manual: True
+
+Flag UnsafeChecks
+  Description: Enable bounds checking in unsafe operations at the cost of a
+               significant performance penalty
+  Default: False
+  Manual: True
+
+Flag InternalChecks
+  Description: Enable internal consistency checks at the cost of a
+               significant performance penalty
+  Default: False
+  Manual: True
+
+Flag Wall
+  Description: Enable all -Wall warnings
+  Default: False
+  Manual: True
+
+-- This common sets warning flags passed to GHC as controlled by Wall cabal flag
+common flag-Wall
+  Ghc-Options: -Wall
+  if !flag(Wall)
+    Ghc-Options: -fno-warn-orphans
+    if impl(ghc >= 8.0) && impl(ghc < 8.1)
+      Ghc-Options:   -Wno-redundant-constraints
+
+
+Library
+  import:           flag-Wall
+  Default-Language: Haskell2010
+  Other-Extensions:
+        BangPatterns
+        CPP
+        DeriveDataTypeable
+        ExistentialQuantification
+        FlexibleContexts
+        FlexibleInstances
+        GADTs
+        KindSignatures
+        MagicHash
+        MultiParamTypeClasses
+        RankNTypes
+        ScopedTypeVariables
+        StandaloneDeriving
+        TypeFamilies
+
+  Exposed-Modules:
+        Data.Vector.Internal.Check
+
+        Data.Vector.Fusion.Util
+        Data.Vector.Fusion.Stream.Monadic
+        Data.Vector.Fusion.Bundle.Size
+        Data.Vector.Fusion.Bundle.Monadic
+        Data.Vector.Fusion.Bundle
+
+        Data.Vector.Generic.Mutable.Base
+        Data.Vector.Generic.Mutable
+        Data.Vector.Generic.Base
+        Data.Vector.Generic.New
+        Data.Vector.Generic
+
+        Data.Vector.Primitive.Mutable
+        Data.Vector.Primitive
+
+        Data.Vector.Storable.Internal
+        Data.Vector.Storable.Mutable
+        Data.Vector.Storable
+
+        Data.Vector.Unboxed.Base
+        Data.Vector.Unboxed.Mutable
+        Data.Vector.Unboxed
+
+        Data.Vector.Strict.Mutable
+        Data.Vector.Strict
+
+        Data.Vector.Mutable
+        Data.Vector
+
+  Hs-Source-Dirs:
+        src
+
+  Include-Dirs:
+        include, internal
+
+  Install-Includes:
+        vector.h
+
+  Build-Depends: base >= 4.9 && < 4.22
+               , primitive >= 0.6.4.0 && < 0.10
+               , deepseq >= 1.1 && < 1.6
+               , vector-stream >= 0.1 && < 0.2
+
+  Ghc-Options: -O2
+
+  if flag(BoundsChecks)
+    cpp-options: -DVECTOR_BOUNDS_CHECKS
+
+  if flag(UnsafeChecks)
+    cpp-options: -DVECTOR_UNSAFE_CHECKS
+
+  if flag(InternalChecks)
+    cpp-options: -DVECTOR_INTERNAL_CHECKS
+
+
+-- We want to build test suite in two variants. One built with -O0
+-- and another with -O2 in order to catch bugs caused by invalid
+-- rewrite rules
+common tests-common
+  Default-Language: Haskell2010
+  Ghc-Options:      -fno-warn-missing-signatures
+  hs-source-dirs:   tests
+  Build-Depends: base >= 4.5 && < 5
+               , template-haskell
+               , base-orphans >= 0.6
+               , vector
+               , primitive
+               , random
+               , QuickCheck >= 2.9 && < 2.16
+               , tasty
+               , tasty-hunit
+               , tasty-quickcheck
+               , transformers >= 0.2.0.0
+  Other-Modules:
+    Boilerplater
+    Tests.Bundle
+    Tests.Move
+    Tests.Vector.Property
+    Tests.Vector.Boxed
+    Tests.Vector.Strict
+    Tests.Vector.Storable
+    Tests.Vector.Primitive
+    Tests.Vector.Unboxed
+    Tests.Vector.UnitTests
+    Utilities
+
+  default-extensions:
+              ScopedTypeVariables,
+              PatternGuards,
+              MultiParamTypeClasses,
+              FlexibleContexts,
+              RankNTypes,
+              TypeSynonymInstances,
+              TypeFamilies,
+              TemplateHaskell
+
+test-suite vector-tests-O0
+  import:           flag-Wall, tests-common
+  type:             exitcode-stdio-1.0
+  Main-Is:          Main.hs
+  Ghc-Options:      -O0 -threaded
+
+test-suite vector-tests-O2
+  import:           flag-Wall, tests-common
+  type:             exitcode-stdio-1.0
+  Main-Is:          Main.hs
+  Ghc-Options:      -O2 -threaded
+
+test-suite vector-doctest
+  type:             exitcode-stdio-1.0
+  main-is:          doctests.hs
+  hs-source-dirs:   tests
+  default-language: Haskell2010
+  -- Older GHC don't support DerivingVia and doctests use them
+  if impl(ghc < 8.6)
+    buildable: False
+  -- Attempts to run doctests on macos on GHC8.10 and 9.0 cause linker errors:
+  -- > ld: warning: -undefined dynamic_lookup may not work with chained fixups
+  if os(darwin) && impl(ghc >= 8.10) && impl(ghc < 9.2)
+    buildable: False
+  build-depends:
+        base      -any
+      , doctest   >=0.15 && <0.24
+      , primitive >= 0.6.4.0 && < 0.10
+      , vector    -any
+
+test-suite vector-inspection
+  import:           flag-Wall
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests-inspect
+  main-is:          main.hs
+  default-language: Haskell2010
+  Other-modules:    Inspect
+  if impl(ghc >= 8.6)
+    Other-modules:  Inspect.DerivingVia
+                    Inspect.DerivingVia.OtherFoo
+  build-depends:
+        base                     -any
+      , primitive                >= 0.6.4.0 && < 0.10
+      , vector                   -any
+      , tasty
+      , tasty-inspection-testing >= 0.1
+
+library benchmarks-O2
+  visibility:       public
+  ghc-options:      -O2
+  hs-source-dirs:   benchlib
+  Default-Language: Haskell2010
+  build-depends:
+        base
+      , random >= 1.2
+      , tasty
+      , vector
+  exposed-modules:
+        Bench.Vector.Algo.MutableSet
+        Bench.Vector.Algo.ListRank
+        Bench.Vector.Algo.Rootfix
+        Bench.Vector.Algo.Leaffix
+        Bench.Vector.Algo.AwShCC
+        Bench.Vector.Algo.HybCC
+        Bench.Vector.Algo.Quickhull
+        Bench.Vector.Algo.Spectral
+        Bench.Vector.Algo.Tridiag
+        Bench.Vector.Algo.FindIndexR
+        Bench.Vector.Algo.NextPermutation
+        Bench.Vector.TestData.ParenTree
+        Bench.Vector.TestData.Graph
+        Bench.Vector.Tasty
+
+benchmark algorithms
+  type:             exitcode-stdio-1.0
+  main-is:          Main.hs
+  hs-source-dirs:   benchmarks
+  default-language: Haskell2010
+
+  build-depends:
+        base >= 2 && < 5
+      , random >= 1.2
+      , tasty
+      , tasty-bench >= 0.2.1
+      , vector
+      , vector:benchmarks-O2
+
+  ghc-options: -O2

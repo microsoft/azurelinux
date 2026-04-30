@@ -1,0 +1,97 @@
+name:           tagged
+version:        0.8.8
+x-revision: 1
+license:        BSD3
+license-file:   LICENSE
+author:         Edward A. Kmett
+maintainer:     Edward A. Kmett <ekmett@gmail.com>
+stability:      experimental
+category:       Data, Phantom Types
+synopsis:       Haskell 98 phantom types to avoid unsafely passing dummy arguments
+homepage:       http://github.com/ekmett/tagged
+bug-reports:    http://github.com/ekmett/tagged/issues
+copyright:      2009-2015 Edward A. Kmett
+description:    Haskell 98 phantom types to avoid unsafely passing dummy arguments.
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files: .hlint.yaml CHANGELOG.markdown README.markdown
+tested-with:
+  GHC == 7.0.4
+  GHC == 7.2.2
+  GHC == 7.4.2
+  GHC == 7.6.3
+  GHC == 7.8.4
+  GHC == 7.10.3
+  GHC == 8.0.2
+  GHC == 8.2.2
+  GHC == 8.4.4
+  GHC == 8.6.5
+  GHC == 8.8.4
+  GHC == 8.10.7
+  GHC == 9.0.2
+  GHC == 9.2.8
+  GHC == 9.4.8
+  GHC == 9.6.4
+  GHC == 9.8.2
+  GHC == 9.10.0
+
+source-repository head
+  type: git
+  location: https://github.com/ekmett/tagged.git
+
+flag deepseq
+  description:
+    You can disable the use of the `deepseq` package using `-f-deepseq`.
+    .
+    Disabing this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+flag transformers
+  description:
+    You can disable the use of the `transformers` and `transformers-compat` packages using `-f-transformers`.
+    .
+    Disable this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+  default: True
+  manual: True
+
+library
+  default-language: Haskell98
+  other-extensions: CPP
+  build-depends: base >= 2 && < 5
+  ghc-options: -Wall
+  hs-source-dirs: src
+  exposed-modules: Data.Tagged
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+  if !impl(hugs)
+    cpp-options: -DLANGUAGE_DeriveDataTypeable
+    other-extensions: DeriveDataTypeable
+
+  if impl(ghc<7.7)
+    hs-source-dirs: old
+    exposed-modules: Data.Proxy
+    other-modules: Paths_tagged
+
+  if impl(ghc>=7.2 && <7.5)
+    build-depends: ghc-prim
+
+  if impl(ghc>=7.6)
+    exposed-modules: Data.Proxy.TH
+    build-depends: template-haskell >= 2.8 && < 2.23
+
+  if flag(deepseq)
+    build-depends: deepseq >= 1.1 && < 1.6
+
+  if flag(transformers)
+    build-depends: transformers        >= 0.2 && < 0.7
+
+    -- Ensure Data.Functor.Classes is always available
+    if impl(ghc >= 7.10) || impl(ghcjs)
+      build-depends: transformers >= 0.4.2.0
+    else
+      build-depends: transformers-compat >= 0.5 && < 1

@@ -1,0 +1,146 @@
+name:          http-media
+version:       0.8.1.1
+x-revision:    2
+license:       MIT
+license-file:  LICENSE
+author:        Timothy Jones
+maintainer:    Timothy Jones <tim@zmthy.net>
+homepage:      https://github.com/zmthy/http-media
+bug-reports:   https://github.com/zmthy/http-media/issues
+copyright:     (c) 2012-2024 Timothy Jones
+category:      Web
+build-type:    Simple
+cabal-version: >= 1.10
+tested-with:
+    GHC == 8.6.5
+     || == 8.8.4
+     || == 8.10.7
+     || == 9.0.2
+     || == 9.2.8
+     || == 9.4.8
+     || == 9.6.5
+     || == 9.8.2
+synopsis:      Processing HTTP Content-Type and Accept headers
+description:
+  This library is intended to be a comprehensive solution to parsing and
+  selecting quality-indexed values in HTTP headers.  It is capable of
+  parsing both media types and language parameters from the Accept and
+  Content header families, and can be extended to match against other
+  accept headers as well.  Selecting the appropriate header value is
+  achieved by comparing a list of server options against the
+  quality-indexed values supplied by the client.
+  .
+  In the following example, the Accept header is parsed and then matched
+  against a list of server options to serve the appropriate media using
+  'mapAcceptMedia':
+  .
+  > getHeader >>= maybe send406Error sendResourceWith . mapAcceptMedia
+  >     [ ("text/html",        asHtml)
+  >     , ("application/json", asJson)
+  >     ]
+  .
+  Similarly, the Content-Type header can be used to produce a parser for
+  request bodies based on the given content type with 'mapContentMedia':
+  .
+  > getContentType >>= maybe send415Error readRequestBodyWith . mapContentMedia
+  >     [ ("application/json", parseJson)
+  >     , ("text/plain",       parseText)
+  >     ]
+  .
+  The API is agnostic to your choice of server.
+
+extra-source-files:
+  CHANGES.md
+
+library
+  default-language: Haskell2010
+
+  ghc-options: -Wall
+
+  hs-source-dirs:
+    src
+
+  default-extensions:
+    OverloadedStrings
+
+  exposed-modules:
+    Network.HTTP.Media
+    Network.HTTP.Media.Accept
+    Network.HTTP.Media.Charset
+    Network.HTTP.Media.Encoding
+    Network.HTTP.Media.Language
+    Network.HTTP.Media.MediaType
+    Network.HTTP.Media.RenderHeader
+
+  other-modules:
+    Network.HTTP.Media.Charset.Internal
+    Network.HTTP.Media.Encoding.Internal
+    Network.HTTP.Media.Language.Internal
+    Network.HTTP.Media.MediaType.Internal
+    Network.HTTP.Media.Quality
+    Network.HTTP.Media.Utils
+
+  build-depends:
+    base             >= 4.8  && < 5,
+    bytestring       >= 0.10 && < 0.13,
+    case-insensitive >= 1.0  && < 1.3,
+    containers       >= 0.5  && < 0.8,
+    utf8-string      >= 0.3  && < 1.1
+
+test-suite test-http-media
+  type:    exitcode-stdio-1.0
+  main-is: Test.hs
+
+  default-language: Haskell2010
+
+  ghc-options: -Wall
+
+  hs-source-dirs:
+    src
+    test
+
+  default-extensions:
+    OverloadedStrings
+
+  other-extensions:
+    TupleSections
+
+  other-modules:
+    Network.HTTP.Media
+    Network.HTTP.Media.Accept
+    Network.HTTP.Media.Accept.Tests
+    Network.HTTP.Media.Charset
+    Network.HTTP.Media.Charset.Gen
+    Network.HTTP.Media.Charset.Internal
+    Network.HTTP.Media.Charset.Tests
+    Network.HTTP.Media.Gen
+    Network.HTTP.Media.Encoding
+    Network.HTTP.Media.Encoding.Gen
+    Network.HTTP.Media.Encoding.Internal
+    Network.HTTP.Media.Encoding.Tests
+    Network.HTTP.Media.Language
+    Network.HTTP.Media.Language.Gen
+    Network.HTTP.Media.Language.Internal
+    Network.HTTP.Media.Language.Tests
+    Network.HTTP.Media.MediaType
+    Network.HTTP.Media.MediaType.Gen
+    Network.HTTP.Media.MediaType.Internal
+    Network.HTTP.Media.MediaType.Tests
+    Network.HTTP.Media.Quality
+    Network.HTTP.Media.RenderHeader
+    Network.HTTP.Media.Tests
+    Network.HTTP.Media.Utils
+
+  build-depends:
+    base             >= 4.8  && < 5,
+    bytestring       >= 0.10 && < 0.13,
+    case-insensitive >= 1.0  && < 1.3,
+    containers       >= 0.5  && < 0.8,
+    utf8-string      >= 0.3  && < 1.1,
+    QuickCheck       >= 2.8  && < 2.16,
+    tasty            >= 0.11 && < 1.6,
+    tasty-quickcheck >= 0.8  && < 0.11
+
+source-repository head
+  type:     git
+  location: https://github.com/zmthy/http-media

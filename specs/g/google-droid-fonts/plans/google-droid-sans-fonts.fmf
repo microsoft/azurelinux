@@ -1,0 +1,16 @@
+summary: Fonts related tests
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/fonts
+prepare:
+    name: tmt
+    how: install
+    package: google-droid-sans-fonts
+execute:
+    how: tmt
+environment:
+    PACKAGE: google-droid-sans-fonts
+    FONT_ALIAS: sans-serif
+    FONT_FAMILY: Droid Sans
+    FONT_LANG_EXCLUDE_FILES: (Kufi|Armenian|Devanagari|Ethiopic|Fallback|Georgian|Hebrew|Japanese|Tamil|Thai)
+    FONT_VALIDATE_EXCLUDE_FILES: (Kufi|Armenian|Devanagari|Ethiopic|Fallback|Georgian|Hebrew|Japanese|Tamil|Thai)

@@ -1,0 +1,47 @@
+From f4aaf1de58b09778c3aa111fd3bdf3f32ab93659 Mon Sep 17 00:00:00 2001
+From: Nate Graham <nate@kde.org>
+Date: Thu, 2 Oct 2025 16:32:52 -0600
+Subject: [PATCH] Logout: don't mistakenly think the model includes ourselves
+
+It does not. Thus, we need to check for more than *zero* items in the
+model to determine if there are any other users logged in.
+
+BUG: 510135
+FIXED-IN: 6.5.0
+
+
+(cherry picked from commit 5fa05a00a642a36bee70539ba2043d4fbbef76b3)
+
+Co-authored-by: Nate Graham <nate@kde.org>
+---
+ lookandfeel/org.kde.breeze/contents/logout/Logout.qml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lookandfeel/org.kde.breeze/contents/logout/Logout.qml b/lookandfeel/org.kde.breeze/contents/logout/Logout.qml
+index e452b7a3c4e..49b08aa9028 100644
+--- a/lookandfeel/org.kde.breeze/contents/logout/Logout.qml
++++ b/lookandfeel/org.kde.breeze/contents/logout/Logout.qml
+@@ -67,7 +67,7 @@ Item {
+ 
+     // For showing an "other users are logged in" hint
+     SessionsModel {
+-        id: sessionsModel
++        id: otherSessionsModel
+         includeUnusedSessions: false
+     }
+ 
+@@ -174,9 +174,9 @@ Item {
+             text: i18ndp("plasma_lookandfeel_org.kde.lookandfeel",
+                          "One other user is currently logged in. If the computer is shut down or restarted, that user may lose work.",
+                          "%1 other users are currently logged in. If the computer is shut down or restarted, those users may lose work.",
+-                         sessionsModel.count - 1)
++                         otherSessionsModel.count)
+             textFormat: Text.PlainText
+-            visible: sessionsModel.count > 1 && (sdtype !== ShutdownType.ShutdownTypeNone || root.showAllOptions)
++            visible: otherSessionsModel.count > 0 && (sdtype !== ShutdownType.ShutdownTypeNone || root.showAllOptions)
+         }
+ 
+         PlasmaComponents.Label {
+-- 
+GitLab
+

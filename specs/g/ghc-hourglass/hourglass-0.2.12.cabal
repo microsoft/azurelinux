@@ -1,0 +1,91 @@
+Name:                hourglass
+Version:             0.2.12
+x-revision: 1
+Synopsis:            simple performant time related library
+Description:
+    Simple time library focusing on simple but powerful and performant API
+    .
+    The backbone of the library are the Timeable and Time type classes.
+    .
+    Each Timeable instances can be converted to type that has a Time instances,
+    and thus are different representations of current time.
+License:             BSD3
+License-file:        LICENSE
+Copyright:           Vincent Hanquez <vincent@snarc.org>
+Author:              Vincent Hanquez <vincent@snarc.org>
+Maintainer:          vincent@snarc.org
+Category:            Time
+Stability:           experimental
+Build-Type:          Simple
+Homepage:            https://github.com/vincenthz/hs-hourglass
+Cabal-Version:       >=1.10
+extra-source-files:  README.md
+                  ,  CHANGELOG.md
+                  ,  tests/TimeDB.hs
+
+Library
+  Exposed-modules:   Time.Types
+                   , Time.System
+                   , Time.Compat
+                   , Data.Hourglass
+                   , Data.Hourglass.Types
+                   , Data.Hourglass.Epoch
+                   , Data.Hourglass.Compat
+                   , System.Hourglass
+  Other-modules:     Data.Hourglass.Time
+                   , Data.Hourglass.Format
+                   , Data.Hourglass.Diff
+                   , Data.Hourglass.Local
+                   , Data.Hourglass.Calendar
+                   , Data.Hourglass.Zone
+                   , Data.Hourglass.Internal
+                   , Data.Hourglass.Utils
+  Build-depends:     base >= 4 && < 5
+                   , deepseq
+  ghc-options:       -Wall -fwarn-tabs
+  Default-Language:  Haskell2010
+  if os(windows)
+     cpp-options:    -DWINDOWS
+     Build-depends:  Win32
+     Other-modules:  Data.Hourglass.Internal.Win
+  else
+     Other-modules:  Data.Hourglass.Internal.Unix
+     c-sources:      cbits/unix.c
+
+Test-Suite test-hourglass
+  type:              exitcode-stdio-1.0
+  hs-source-dirs:    tests
+  Main-is:           Tests.hs
+  Build-Depends:     base >= 3 && < 5
+                   , mtl
+                   , tasty
+                   , tasty-quickcheck
+                   , tasty-hunit
+                   , hourglass
+                   , deepseq
+                   -- to test against some other reference
+                   , time < 1.10
+                   , old-locale
+  ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures
+  Default-Language:  Haskell2010
+  if os(windows)
+     cpp-options:    -DWINDOWS
+
+Benchmark bench-hourglass
+  hs-source-dirs:    tests
+  Main-Is:           Bench.hs
+  type:              exitcode-stdio-1.0
+  Default-Language:  Haskell2010
+  Build-depends:     base >= 4 && < 5
+                   , bytestring
+                   , gauge
+                   , mtl
+                   , deepseq
+                   , hourglass
+                   -- to benchmark against other reference
+                   , time
+                   , old-locale
+
+source-repository head
+  type: git
+  location: https://github.com/vincenthz/hs-hourglass

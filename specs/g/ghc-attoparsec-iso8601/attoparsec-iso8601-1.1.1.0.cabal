@@ -1,0 +1,54 @@
+name:               attoparsec-iso8601
+version:            1.1.1.0
+x-revision: 1
+synopsis:           Parsing of ISO 8601 dates, originally from aeson
+description:        Parsing of ISO 8601 dates, originally from aeson.
+license:            BSD3
+license-file:       LICENSE
+category:           Parsing
+copyright:
+  (c) 2011-2016 Bryan O'Sullivan
+  (c) 2011 MailRank, Inc.
+
+author:             Bryan O'Sullivan <bos@serpentine.com>
+maintainer:         Adam Bergmark <adam@bergmark.nl>
+stability:          experimental
+cabal-version:      1.12
+homepage:           https://github.com/haskell/aeson
+bug-reports:        https://github.com/haskell/aeson/issues
+build-type:         Simple
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.5
+   || ==9.8.2
+   || ==9.10.1
+
+extra-source-files:
+  changelog.md
+  README.md
+
+library
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  exposed-modules:
+    Data.Attoparsec.Time
+    Data.Attoparsec.Time.Internal
+
+  build-depends:
+      attoparsec          >=0.14.2   && <0.15
+    , base                >=4.12.0.0 && <5
+    , integer-conversion  >=0.1      && <0.2
+    , text                >=1.2.3.0  && <1.3.0.0 || >=2.0 && <2.2
+    , time                >=1.8.0.2  && <1.15
+    , time-compat         >=1.9.4    && <1.10
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell/aeson.git
+  subdir:   attoparsec-iso8601

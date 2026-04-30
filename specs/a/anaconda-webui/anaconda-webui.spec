@@ -46,7 +46,6 @@ Requires: anaconda-core  >= %{anacondacorever}
 Requires: (firefox if fedora-release-workstation)
 %endif
 %if 0%{?fedora}
-Requires: fedora-logos
 %endif
 BuildRequires: desktop-file-utils
 
@@ -77,6 +76,7 @@ Provides: bundled(npm(tabbable)) = 6.2.0
 Provides: bundled(npm(throttle-debounce)) = 5.0.2
 Provides: bundled(npm(tslib)) = 2.8.1
 
+Requires: system-logos
 %description
 Anaconda installer Web interface
 

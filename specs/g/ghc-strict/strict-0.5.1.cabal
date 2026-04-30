@@ -1,0 +1,99 @@
+name:               strict
+version:            0.5.1
+x-revision:         1
+synopsis:           Strict data types and String IO.
+category:           Data, System
+description:
+  This package provides strict versions of some standard Haskell data
+  types (pairs, Maybe and Either). It also contains strict IO operations.
+  .
+  It is common knowledge that lazy datastructures can lead to space-leaks.
+  This problem is particularly prominent, when using lazy datastructures to
+  store the state of a long-running application in memory. One common
+  solution to this problem is to use @seq@ and its variants in every piece of
+  code that updates your state. However a much easier solution is to use
+  fully strict types to store such state values. By \"fully strict types\" we
+  mean types for whose values it holds that, if they are in weak-head normal
+  form, then they are also in normal form. Intuitively, this means that
+  values of fully strict types cannot contain unevaluated thunks.
+  .
+  To define a fully strict datatype, one typically uses the following recipe.
+  .
+  1. Make all fields of every constructor strict; i.e., add a bang to
+  all fields.
+  .
+  2. Use only strict types for the fields of the constructors.
+  .
+  The second requirement is problematic as it rules out the use of
+  the standard Haskell 'Maybe', 'Either', and pair types. This library
+  solves this problem by providing strict variants of these types and their
+  corresponding standard support functions and type-class instances.
+  .
+  Note that this library does currently not provide fully strict lists.
+  They can be added if they are really required. However, in many cases one
+  probably wants to use unboxed or strict boxed vectors from the 'vector'
+  library (<http://hackage.haskell.org/package/vector>) instead of strict
+  lists.  Moreover, instead of @String@s one probably wants to use strict
+  @Text@ values from the @text@ library
+  (<http://hackage.haskell.org/package/text>).
+  .
+  This library comes with batteries included; i.e., mirror functions and
+  instances of the lazy versions in @base@. It also includes instances for
+  type-classes from the @deepseq@, @binary@, and @hashable@ packages.
+
+license:            BSD3
+license-file:       LICENSE
+author:
+  Roman Leshchinskiy <rl@cse.unsw.edu.au>
+  Simon Meier <iridcode@gmail.com>
+
+maintainer:
+  Don Stewart <dons@galois.com>,
+  Bas van Dijk <v.dijk.bas@gmail.com>,
+  Oleg Grenrus <oleg.grenrus@iki.fi>,
+  Simon Meier <iridcode@gmail.com>,
+  Ximin Luo <infinity0@pwned.gg>
+
+copyright:
+  (c) 2006-2008 by Roman Leshchinskiy
+  (c) 2013-2014 by Simon Meier
+
+homepage:           https://github.com/haskell-strict/strict
+cabal-version:      >=1.10
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.2
+   || ==9.10.1
+
+library
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  ghc-options:      -Wall
+  build-depends:
+      assoc         >=1.1.1    && <1.2
+    , base          >=4.12.0.0 && <5
+    , binary        >=0.8.6.0  && <0.9
+    , bytestring    >=0.10.8.2 && <0.13
+    , deepseq       >=1.4.4.0  && <1.6
+    , ghc-prim
+    , hashable      >=1.4.7.0  && <1.6
+    , text          >=1.2.3.1  && <1.3  || >=2.0 && <2.2
+    , these         >=1.2.1    && <1.3
+    , transformers  >=0.5.6.2  && <0.7
+
+  exposed-modules:
+    Data.Strict
+    Data.Strict.Classes
+    Data.Strict.Either
+    Data.Strict.Maybe
+    Data.Strict.These
+    Data.Strict.Tuple
+    System.IO.Strict

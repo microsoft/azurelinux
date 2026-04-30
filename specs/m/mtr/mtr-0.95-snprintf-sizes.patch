@@ -1,0 +1,35 @@
+From 5908af4c19188cb17b62f23368b6ef462831a0cb Mon Sep 17 00:00:00 2001
+From: Marcus Meissner <meissner@suse.de>
+Date: Tue, 11 Apr 2023 16:05:36 +0200
+Subject: [PATCH] fixed the sizes passed into snprintf
+
+---
+ ui/report.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ui/report.c b/ui/report.c
+index 9301480..61f2c74 100644
+--- a/ui/report.c
++++ b/ui/report.c
+@@ -140,7 +140,7 @@ void report_close(
+             continue;
+ 
+         snprintf(fmt, sizeof(fmt), "%%%ds", data_fields[j].length);
+-        snprintf(buf + len, sizeof(buf), fmt, data_fields[j].title);
++        snprintf(buf + len, sizeof(buf) - len, fmt, data_fields[j].title);
+         len += data_fields[j].length;
+     }
+     printf("%s\n", buf);
+@@ -172,10 +172,10 @@ void report_close(
+ 
+             /* 1000.0 is a temporary hack for stats usec to ms, impacted net_loss. */
+             if (strchr(data_fields[j].format, 'f')) {
+-                snprintf(buf + len, sizeof(buf), data_fields[j].format,
++                snprintf(buf + len, sizeof(buf) - len, data_fields[j].format,
+                          data_fields[j].net_xxx(at) / 1000.0);
+             } else {
+-                snprintf(buf + len, sizeof(buf), data_fields[j].format,
++                snprintf(buf + len, sizeof(buf) - len, data_fields[j].format,
+                          data_fields[j].net_xxx(at));
+             }
+             len += data_fields[j].length;

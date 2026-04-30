@@ -1,0 +1,36 @@
+name:         old-locale
+version:      1.0.0.7
+x-revision: 2
+-- NOTE: Don't forget to update ./changelog.md
+license:      BSD3
+license-file: LICENSE
+maintainer:   libraries@haskell.org
+bug-reports:  https://github.com/haskell/old-locale/issues
+synopsis:     locale library
+category:     System
+build-type:   Simple
+Cabal-Version:>=1.10
+tested-with:  GHC==7.8.3, GHC==7.8.2, GHC==7.8.1, GHC==7.6.3, GHC==7.6.2, GHC==7.6.1, GHC==7.4.2, GHC==7.4.1, GHC==7.2.2, GHC==7.2.1, GHC==7.0.4, GHC==7.0.3, GHC==7.0.2, GHC==7.0.1, GHC==6.12.3
+description:
+    This package provides the ability to adapt to
+    locale conventions such as date and time formats.
+
+extra-source-files:
+    changelog.md
+
+source-repository head
+    type:     git
+    location: https://github.com/haskell/old-locale.git
+
+Library
+    default-language: Haskell98
+    other-extensions: CPP
+    if impl(ghc>=7.2)
+        -- && base>=4.4.1
+        other-extensions: Safe
+
+    exposed-modules:
+        System.Locale
+
+    build-depends: base >= 4.2 && < 5
+    ghc-options: -Wall

@@ -1,0 +1,159 @@
+From 451de58797ef3e270314d07da7170065d787e3e1 Mon Sep 17 00:00:00 2001
+From: Sam Burgos <sam.burgos1089@gmail.com>
+Date: Tue, 15 May 2018 16:04:11 -0600
+Subject: [PATCH] added checking of APT so application can show proper
+ configuration
+
+---
+ usr/lib/linuxmint/mintlocale/install_remove.py | 53 ++++++++++++++++----------
+ usr/lib/linuxmint/mintlocale/mintlocale.py     | 20 +++++-----
+ 2 files changed, 43 insertions(+), 30 deletions(-)
+
+diff --git a/usr/lib/linuxmint/mintlocale/install_remove.py b/usr/lib/linuxmint/mintlocale/install_remove.py
+index 205bd5b..00e2e2d 100755
+--- a/usr/lib/linuxmint/mintlocale/install_remove.py
++++ b/usr/lib/linuxmint/mintlocale/install_remove.py
+@@ -2,12 +2,10 @@
+ 
+ import os
+ import gettext
+-import apt_pkg
+ import subprocess
+ import tempfile
+ import locale
+ import codecs
+-import mintcommon
+ 
+ import gi
+ gi.require_version('Gtk', '3.0')
+@@ -15,6 +13,13 @@
+ from gi.repository import GdkX11
+ from gi.repository import Gtk, GdkPixbuf, XApp
+ 
++# Used to detect Debian derivatives (we don't want to show APT features in other distros)
++IS_DEBIAN = os.path.exists("/etc/debian_version")
++
++if IS_DEBIAN:
++    import apt_pkg
++    import mintcommon
++
+ # i18n
+ APP = 'mintlocale'
+ LOCALE_DIR = "/usr/share/linuxmint/locale"
+@@ -98,7 +103,9 @@ def __init__(self):
+ 
+         self.build_lang_list()
+ 
+-        self.apt = mintcommon.APT(self.window)
++
++        if IS_DEBIAN:
++            self.apt = mintcommon.APT(self.window)
+ 
+     def split_locale(self, locale_code):
+         if "_" in locale_code:
+@@ -244,22 +251,25 @@ def select_language(self, treeview, data=None):
+ 
+     def button_install_clicked(self, button):
+         if self.selected_language_packs is not None:
+-            if self.cache_updated:
+-                self.apt.set_finished_callback(self.on_install_finished)
+-                self.apt.set_cancelled_callback(self.on_install_finished)
+-                self.apt.install_packages(self.selected_language_packs)
+-            else:
+-                self.apt.set_finished_callback(self.on_update_finished)
+-                self.apt.update_cache()
+-
+-    def on_update_finished(self, transaction=None, exit_state=None):
+-        self.cache_updated = True
+-        self.apt.set_finished_callback(self.on_install_finished)
+-        self.apt.set_cancelled_callback(self.on_install_finished)
+-        self.apt.install_packages(self.selected_language_packs)
+-
+-    def on_install_finished(self, transaction=None, exit_state=None):
+-        self.build_lang_list()
++            if IS_DEBIAN:
++                if self.cache_updated:
++                    self.apt.set_finished_callback(self.on_install_finished)
++                    self.apt.set_cancelled_callback(self.on_install_finished)
++                    self.apt.install_packages(self.selected_language_packs)
++                else:
++                    self.apt.set_finished_callback(self.on_update_finished)
++                    self.apt.update_cache()
++
++    if IS_DEBIAN:
++        def on_update_finished(self, transaction=None, exit_state=None):
++            self.cache_updated = True
++            self.apt.set_finished_callback(self.on_install_finished)
++            self.apt.set_cancelled_callback(self.on_install_finished)
++            self.apt.install_packages(self.selected_language_packs)
++
++    if IS_DEBIAN:
++        def on_install_finished(self, transaction=None, exit_state=None):
++            self.build_lang_list()
+ 
+     def button_add_clicked(self, button):
+         os.system("/usr/lib/linuxmint/mintlocale/add.py")
+@@ -284,8 +294,9 @@ def button_remove_clicked(self, button):
+                             print(pkgname)
+ 
+             if len(installed_packs) > 0:
+-                self.apt.set_finished_callback(self.on_install_finished)
+-                self.apt.remove_packages(installed_packs)
++                if IS_DEBIAN:
++                    self.apt.set_finished_callback(self.on_install_finished)
++                    self.apt.remove_packages(installed_packs)
+ 
+         self.build_lang_list()
+ 
+diff --git a/usr/lib/linuxmint/mintlocale/mintlocale.py b/usr/lib/linuxmint/mintlocale/mintlocale.py
+index cd75f75..87e0c47 100755
+--- a/usr/lib/linuxmint/mintlocale/mintlocale.py
++++ b/usr/lib/linuxmint/mintlocale/mintlocale.py
+@@ -8,7 +8,6 @@
+ import tempfile
+ import subprocess
+ import codecs
+-import mintcommon
+ 
+ try:
+     import _thread as thread
+@@ -33,6 +32,7 @@
+ 
+ if IS_DEBIAN:
+     import apt
++    import mintcommon
+ 
+ # i18n
+ APP = 'mintlocale'
+@@ -64,7 +64,8 @@ def __init__(self, codename, name, methods, app):
+         self.app = app
+         self.packages = []
+         self.missing_packages = []
+-        self.apt = mintcommon.APT(self.app.window)
++        if IS_DEBIAN:
++            self.apt = mintcommon.APT(self.app.window)
+ 
+         self.label = Gtk.Label()
+         self.label.set_markup(name)
+@@ -107,13 +108,14 @@ def __init__(self, codename, name, methods, app):
+     def install(self, widget):
+         if len(self.missing_packages) > 0:
+             self.app.lock_input_methods()
+-            if self.app.cache_updated:
+-                self.apt.set_finished_callback(self.on_install_finished)
+-                self.apt.set_cancelled_callback(self.on_install_finished)
+-                self.apt.install_packages(self.missing_packages)
+-            else:
+-                self.apt.set_finished_callback(self.on_update_finished)
+-                self.apt.update_cache()
++            if IS_DEBIAN:
++                if self.app.cache_updated:
++                    self.apt.set_finished_callback(self.on_install_finished)
++                    self.apt.set_cancelled_callback(self.on_install_finished)
++                    self.apt.install_packages(self.missing_packages)
++                else:
++                    self.apt.set_finished_callback(self.on_update_finished)
++                    self.apt.update_cache()
+ 
+     def on_update_finished(self, transaction=None, exit_state=None):
+         self.app.cache_updated = True

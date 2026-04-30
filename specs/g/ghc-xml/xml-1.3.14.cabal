@@ -1,0 +1,32 @@
+Name:            xml
+Version:         1.3.14
+x-revision: 2
+Homepage:        https://github.com/GaloisInc/xml
+Synopsis:        A simple XML library.
+Description:     A simple XML library.
+Category:        Text, XML
+License:         BSD3
+License-File:    LICENSE
+Author:          Galois Inc.
+Maintainer:      diatchki@galois.com
+Copyright:       (c) 2007-2008 Galois Inc.
+Build-type:      Simple
+Cabal-version:   >= 1.6
+
+
+library
+  Build-depends:   base >= 3 && < 5, bytestring, text
+  Ghc-options:     -Wall -O2
+  Exposed-modules: Text.XML.Light,
+                   Text.XML.Light.Types,
+                   Text.XML.Light.Output,
+                   Text.XML.Light.Input,
+                   Text.XML.Light.Lexer,
+                   Text.XML.Light.Proc
+                   Text.XML.Light.Cursor
+  Extensions:      FlexibleInstances
+
+source-repository head
+  type:       git
+  location:   git://github.com/GaloisInc/xml.git
+

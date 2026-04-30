@@ -1,0 +1,117 @@
+cabal-version: 1.24
+name:          bifunctors
+category:      Data, Functors
+version:       5.6.2
+x-revision: 1
+license:       BSD3
+license-file:  LICENSE
+author:        Edward A. Kmett
+maintainer:    Edward A. Kmett <ekmett@gmail.com>
+stability:     provisional
+homepage:      http://github.com/ekmett/bifunctors/
+bug-reports:   http://github.com/ekmett/bifunctors/issues
+copyright:     Copyright (C) 2008-2016 Edward A. Kmett
+synopsis:      Bifunctors
+description:   Bifunctors.
+build-type:    Simple
+tested-with:   GHC == 8.0.2
+             , GHC == 8.2.2
+             , GHC == 8.4.4
+             , GHC == 8.6.5
+             , GHC == 8.8.4
+             , GHC == 8.10.7
+             , GHC == 9.0.2
+             , GHC == 9.2.8
+             , GHC == 9.4.8
+             , GHC == 9.6.4
+             , GHC == 9.8.2
+             , GHC == 9.10.1
+extra-source-files:
+  CHANGELOG.markdown
+  README.markdown
+
+source-repository head
+  type: git
+  location: https://github.com/ekmett/bifunctors.git
+
+flag tagged
+  default: True
+  manual: True
+  description:
+    You can disable the use of the `tagged` package using `-f-tagged`.
+    .
+    Disabing this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+
+library
+  hs-source-dirs: src
+  build-depends:
+    base                     >= 4.9     && < 5,
+    assoc                    >= 1.1     && < 1.2,
+    comonad                  >= 5.0.7   && < 6,
+    containers               >= 0.5.7.1 && < 0.8,
+    template-haskell         >= 2.11    && < 2.24,
+    th-abstraction           >= 0.4.2.0 && < 0.8,
+    transformers             >= 0.5     && < 0.7
+
+  if !impl(ghc >= 8.2)
+    build-depends:
+      bifunctor-classes-compat >= 0.1 && < 0.2,
+      transformers-compat      >= 0.6 && < 0.8
+
+  if flag(tagged)
+    build-depends: tagged >= 0.8.6 && < 1
+
+  if impl(ghc<8.1)
+    reexported-modules:
+        Data.Bifoldable
+      , Data.Bitraversable
+
+  if !impl(ghc >= 9.6)
+    build-depends: foldable1-classes-compat >= 0.1 && < 0.2
+
+  exposed-modules:
+    Data.Biapplicative
+    Data.Bifunctor.Biap
+    Data.Bifunctor.Biff
+    Data.Bifunctor.Clown
+    Data.Bifunctor.Fix
+    Data.Bifunctor.Flip
+    Data.Bifunctor.Functor
+    Data.Bifunctor.Join
+    Data.Bifunctor.Joker
+    Data.Bifunctor.Product
+    Data.Bifunctor.Sum
+    Data.Bifunctor.Tannen
+    Data.Bifunctor.TH
+    Data.Bifunctor.Wrapped
+
+  other-modules:
+    Data.Bifunctor.TH.Internal
+
+  ghc-options: -Wall
+  default-language: Haskell2010
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+test-suite bifunctors-spec
+  type: exitcode-stdio-1.0
+  hs-source-dirs: tests
+  main-is: Spec.hs
+  other-modules: BifunctorSpec T89Spec
+  ghc-options: -Wall
+  if impl(ghc >= 8.6)
+    ghc-options: -Wno-star-is-type
+  default-language: Haskell2010
+  build-tool-depends: hspec-discover:hspec-discover >= 1.8
+  build-depends:
+    base                >= 4   && < 5,
+    bifunctors,
+    hspec               >= 1.8,
+    QuickCheck          >= 2   && < 3,
+    template-haskell,
+    transformers,
+    transformers-compat
+

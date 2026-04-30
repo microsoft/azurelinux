@@ -86,7 +86,7 @@ BuildRequires: gettext-devel
 %global provide_yama_scope      0
 
 %if 0%{?fedora} >= 22 || 0%{?rhel} >= 7
-%global provide_yama_scope      1
+%global provide_yama_scope 0
 %endif
 
 %global with_sysusers           0

@@ -1,0 +1,56 @@
+cabal-version:      3.0
+name:               assoc
+version:            1.1.1
+x-revision:         1
+license:            BSD-3-Clause
+license-file:       LICENSE
+synopsis:           swap and assoc: Symmetric and Semigroupy Bifunctors
+category:           Data
+description:
+  Provides generalisations of
+  @swap :: (a,b) -> (b,a)@ and
+  @assoc :: ((a,b),c) -> (a,(b,c))@
+  to
+  @Bifunctor@s supporting similar operations (e.g. @Either@, @These@).
+
+author:             Oleg Grenrus <oleg.grenrus@iki.fi>
+maintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+tested-with:
+    GHC ==8.6.5
+     || ==8.8.4
+     || ==8.10.7
+     || ==9.0.2
+     || ==9.2.8
+     || ==9.4.8
+     || ==9.6.6
+     || ==9.8.4
+     || ==9.10.1
+     || ==9.12.1
+
+source-repository head
+  type:     git
+  location: https://github.com/phadej/assoc.git
+
+flag tagged
+  default:     False
+  manual:      True
+  description:
+    You can disable the use of the `tagged` package using `-f-tagged`.
+    .
+    Disabing this is an unsupported configuration, but it may be useful for accelerating builds in sandboxes for expert users.
+
+library
+  default-language: Haskell2010
+  hs-source-dirs:   src
+  build-depends:    base >=4.12 && <4.22
+
+  if flag(tagged)
+    build-depends: tagged >=0.8.8 && <0.9
+
+  exposed-modules:
+    Data.Bifunctor.Assoc
+    Data.Bifunctor.Swap
+
+  other-extensions: TypeFamilies

@@ -1,0 +1,106 @@
+Name:                zip-archive
+Version:             0.4.3.2
+x-revision: 1
+Cabal-Version:       2.0
+Build-type:          Simple
+Synopsis:            Library for creating and modifying zip archives.
+Description:
+   The zip-archive library provides functions for creating, modifying, and
+   extracting files from zip archives. The zip archive format is
+   documented in <http://www.pkware.com/documents/casestudies/APPNOTE.TXT>.
+   .
+   Certain simplifying assumptions are made about the zip archives: in
+   particular, there is no support for strong encryption, zip files that
+   span multiple disks, ZIP64, OS-specific file attributes, or compression
+   methods other than Deflate. However, the library should be able to read
+   the most common zip archives, and the archives it produces should be
+   readable by all standard unzip programs.
+   .
+   Archives are built and extracted in memory, so manipulating large zip
+   files will consume a lot of memory. If you work with large zip files or
+   need features not supported by this library, a better choice may be
+   <http://hackage.haskell.org/package/zip zip>, which uses a
+   memory-efficient streaming approach. However, zip can only read and
+   write archives inside instances of MonadIO, so zip-archive is a better
+   choice if you want to manipulate zip archives in "pure" contexts.
+   .
+   As an example of the use of the library, a standalone zip archiver and
+   extracter is provided in the source distribution.
+Category:            Codec
+Tested-with:         GHC == 8.6.5, GHC == 8.8.1, GHC == 8.10.4, GHC == 9.0.1,
+                     GHC == 8.8.3, GHC == 9.2.1
+License:             BSD3
+License-file:        LICENSE
+Homepage:            http://github.com/jgm/zip-archive
+Author:              John MacFarlane
+Maintainer:          jgm@berkeley.edu
+Extra-Source-Files:  changelog
+                     README.markdown
+                     tests/test4.zip
+                     tests/test4/a.txt
+                     tests/test4/b.bin
+                     "tests/test4/c/with spaces.txt"
+                     tests/zip_with_symlinks.zip
+                     tests/zip_with_password.zip
+                     tests/zip_with_evil_path.zip
+
+Source-repository    head
+  type:              git
+  location:          git://github.com/jgm/zip-archive.git
+
+flag executable
+  Description:       Build the Zip executable.
+  Default:           False
+
+Library
+  Build-depends:     base >= 4.11 && < 5,
+                     pretty,
+                     containers,
+                     binary >= 0.7.2,
+                     zlib,
+                     filepath,
+                     bytestring >= 0.10.0,
+                     array,
+                     mtl,
+                     text >= 0.11,
+                     digest >= 0.0.0.1,
+                     directory >= 1.2.0,
+                     time
+  Exposed-modules:   Codec.Archive.Zip
+  Default-Language:  Haskell98
+  Hs-Source-Dirs:    src
+  Ghc-Options:       -Wall
+  if os(windows)
+    cpp-options:     -D_WINDOWS
+  else
+    Build-depends:   unix
+
+Executable zip-archive
+  if flag(executable)
+    Buildable:       True
+  else
+    Buildable:       False
+  Main-is:           Main.hs
+  Hs-Source-Dirs:    .
+  Build-Depends:     base >= 4.5 && < 5,
+                     directory >= 1.1,
+                     bytestring >= 0.9.0,
+                     zip-archive
+  Other-Modules:     Paths_zip_archive
+  Autogen-Modules:   Paths_zip_archive
+  Ghc-Options:       -Wall
+  Default-Language:  Haskell98
+
+Test-Suite test-zip-archive
+  Type:           exitcode-stdio-1.0
+  Main-Is:        test-zip-archive.hs
+  Hs-Source-Dirs: tests
+  Build-Depends:  base >= 4.11 && < 5,
+                  directory >= 1.3, bytestring >= 0.9.0, process, time,
+                  HUnit, zip-archive, temporary, filepath
+  Default-Language:  Haskell98
+  Ghc-Options:    -Wall
+  if os(windows)
+    cpp-options:     -D_WINDOWS
+  else
+    Build-depends:   unix

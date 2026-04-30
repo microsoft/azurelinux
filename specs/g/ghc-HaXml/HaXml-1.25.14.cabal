@@ -1,0 +1,165 @@
+cabal-version:  1.18
+name:           HaXml
+version:        1.25.14
+x-revision: 1
+
+license:        LGPL-2.1
+license-files:  COPYRIGHT, LICENCE-GPL, LICENCE-LGPL
+author:         Malcolm Wallace <Malcolm.Wallace@me.com>
+maintainer:     Jens Petersen <juhpetersen@gmail.com>
+homepage:       https://github.com/HaXml/HaXml
+bug-reports:    https://github.com/HaXml/HaXml/issues
+category:       Text, XML
+synopsis:       Utilities for manipulating XML documents
+description:
+        Haskell utilities for parsing, filtering, transforming and
+        generating XML documents.
+build-type:     Simple
+extra-doc-files: Changelog.md README
+
+tested-with:
+  GHC ==9.8.2
+   || ==9.6.6
+   || ==9.4.8
+   || ==9.2.8
+   || ==9.0.2
+   || ==8.10.7
+   || ==8.8.4
+   || ==8.6.5
+   || ==8.4.4
+   || ==8.2.2
+   || ==8.0.2
+   || ==7.10.3
+
+source-repository head
+  type:      git
+  location:  https://github.com/HaXml/HaXml.git
+
+library
+  exposed-modules:
+        Text.XML.HaXml,
+        Text.XML.HaXml.ByteStringPP,
+        Text.XML.HaXml.Combinators,
+        Text.XML.HaXml.DtdToHaskell.Convert,
+        Text.XML.HaXml.DtdToHaskell.Instance,
+        Text.XML.HaXml.DtdToHaskell.TypeDef,
+        Text.XML.HaXml.Escape,
+        Text.XML.HaXml.Html.Generate,
+        Text.XML.HaXml.Html.Parse,
+        Text.XML.HaXml.Html.ParseLazy,
+        Text.XML.HaXml.Html.Pretty,
+        Text.XML.HaXml.Lex,
+        Text.XML.HaXml.Namespaces,
+        Text.XML.HaXml.OneOfN,
+        Text.XML.HaXml.Parse,
+        Text.XML.HaXml.ParseLazy,
+        Text.XML.HaXml.Posn,
+        Text.XML.HaXml.Pretty,
+        Text.XML.HaXml.SAX,
+        Text.XML.HaXml.Schema.Parse,
+        Text.XML.HaXml.Schema.XSDTypeModel,
+        Text.XML.HaXml.Schema.HaskellTypeModel,
+        Text.XML.HaXml.Schema.NameConversion,
+        Text.XML.HaXml.Schema.TypeConversion,
+        Text.XML.HaXml.Schema.PrettyHaskell,
+        Text.XML.HaXml.Schema.PrettyHsBoot,
+        Text.XML.HaXml.Schema.PrimitiveTypes,
+        Text.XML.HaXml.Schema.Environment,
+        Text.XML.HaXml.ShowXmlLazy,
+        Text.XML.HaXml.Types,
+        Text.XML.HaXml.TypeMapping,
+        Text.XML.HaXml.Util,
+        Text.XML.HaXml.Validate,
+        Text.XML.HaXml.Verbatim,
+        Text.XML.HaXml.Version
+        Text.XML.HaXml.Wrappers,
+        Text.XML.HaXml.XmlContent,
+        Text.XML.HaXml.XmlContent.Parser,
+        Text.XML.HaXml.XmlContent.Haskell,
+        Text.XML.HaXml.Xtract.Combinators,
+        Text.XML.HaXml.Xtract.Lex,
+        Text.XML.HaXml.Xtract.Parse
+  if impl(ghc)
+    exposed-modules:
+        Text.XML.HaXml.Schema.Schema
+  hs-source-dirs: src
+  build-depends:
+    base       >= 4.3.1.0  && < 4.22,
+    bytestring >= 0.9.1.10 && < 0.13,
+    containers >= 0.4.0.0  && <0.8,
+    filepath   >= 1.2.0.0  && <1.6,
+    pretty     >= 1.0.1.2  && <1.2,
+    random     >= 1.0      && <1.4,
+    polyparse  >= 1.12.1   && <1.14
+  if !impl(ghc >= 8.0)
+    build-depends:
+      semigroups >= 0.18.5  && < 0.19
+  default-language: Haskell98
+  default-extensions: CPP, ExistentialQuantification
+  nhc98-options: -K10M
+  if impl(ghc >= 8.2)
+    ghc-options:       -fhide-source-paths
+
+Executable Canonicalise
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: Canonicalise.hs
+  build-depends: base, HaXml, pretty
+
+Executable CanonicaliseLazy
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: CanonicaliseLazy.hs
+  build-depends: base, HaXml, pretty
+
+Executable Xtract
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: Xtract.hs
+  build-depends: base, HaXml, pretty
+
+Executable Validate
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: Validate.hs
+  build-depends: base, HaXml
+
+Executable MkOneOf
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: MkOneOf.hs
+  build-depends: base, HaXml
+
+Executable DtdToHaskell
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: DtdToHaskell.hs
+  build-depends: base, HaXml, pretty
+
+Executable XsdToHaskell
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: XsdToHaskell.hs
+  build-depends: base, HaXml, pretty, polyparse, directory
+
+Executable FpMLToHaskell
+  GHC-Options: -Wall
+  Default-Language: Haskell98
+  Default-Extensions:  CPP
+  Hs-Source-Dirs: src/tools
+  Main-Is: FpMLToHaskell.hs
+  build-depends: base, HaXml, pretty, polyparse, directory

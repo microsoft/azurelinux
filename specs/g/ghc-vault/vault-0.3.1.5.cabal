@@ -1,0 +1,80 @@
+cabal-version:      >= 1.10
+name:               vault
+version:            0.3.1.5
+x-revision: 10
+synopsis:           a persistent store for values of arbitrary types
+description:
+  A /vault/ is a persistent store for values of arbitrary types.
+  It's like having first-class access to the storage space behind IORefs.
+  .
+  The data structure is analogous to a bank vault,
+  where you can access different bank boxes with different keys;
+  hence the name.
+  .
+  Also provided is a /locker/ type, representing a store for a single element.
+
+category:           Data
+
+license:            BSD3
+license-file:       LICENSE
+author:             Heinrich Apfelmus, Elliott Hird
+maintainer:         Heinrich Apfelmus <apfelmus at quantentunnel de>
+homepage:           https://github.com/HeinrichApfelmus/vault
+copyright:          (c) Heinrich Apfelmus 2011-2013
+
+build-type:         Simple
+
+tested-with:
+      GHC == 8.0.2
+    , GHC == 8.2.2
+    , GHC == 8.4.4
+    , GHC == 8.6.5
+    , GHC == 8.8.4
+    , GHC == 8.10.7
+    , GHC == 9.0.2
+    , GHC == 9.2.8
+    , GHC == 9.4.8
+    , GHC == 9.6.6
+    , GHC == 9.8.4
+    , GHC == 9.10.1
+    , GHC == 9.12.1
+
+extra-source-files:
+    CHANGELOG.md
+    README.md
+    src/Data/Vault/IO.h
+    src/Data/Vault/ST/ST.h
+    src/Data/Vault/ST/backends/GHC.h
+
+source-repository head
+    type:           git
+    location:       https://github.com/HeinrichApfelmus/vault.git
+
+flag UseGHC
+    description: Use GHC-specific packages and extensions.
+    default:     True
+
+library
+    hs-source-dirs:     src
+    build-depends:
+          base >= 4.5 && < 4.22
+        , containers >= 0.4 && < 0.9
+        , unordered-containers >= 0.2.3.0 && < 0.3
+        , hashable >= 1.1.2.5 && < 1.6
+
+    if impl(ghc < 8.0)
+        build-depends:  semigroups >= 0.1 && < 1.0
+
+    default-language:   Haskell2010
+    default-extensions: CPP
+    ghc-options:        -Wall -fno-warn-missing-signatures
+
+    exposed-modules:
+        Data.Vault.Lazy
+        Data.Vault.Strict
+        Data.Vault.ST.Lazy
+        Data.Vault.ST.Strict
+        Data.Unique.Really
+
+    if impl(ghc) && flag(UseGHC)
+        CPP-options:    -DUseGHC

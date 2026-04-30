@@ -1,0 +1,1149 @@
+From 02b1f9b309f54d68d77355f6f8a2f1a258169be5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bj=C3=B6rn=20Esser?= <besser82@fedoraproject.org>
+Date: Sun, 3 Nov 2024 13:32:24 +0100
+Subject: [PATCH 1/3] Make crypt and crypt_gensalt use thread-local output
+ buffers.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This change makes crypt and crypt_gensalt as thread-safe as
+they can be without changing their interfaces.  Solaris
+already made this change, and it’s being discussed by glibc
+(with suggestion that it should be pushed upstream to the C
+and POSIX standards committees):
+https://sourceware.org/ml/libc-alpha/2018-10/msg00437.html
+
+Portable programs should still use the r-variants, though,
+because this is not a guaranteed feature that is portable
+to other implementations of these functions. Also it doesn’t
+help threads to not clobber their corresponding output buffer
+on a second call from within the same thread.
+---
+ LICENSING                  |  15 +-
+ Makefile.am                |   6 +
+ build-aux/m4/ax_pthread.m4 | 522 +++++++++++++++++++++++++++++++++++++
+ build-aux/m4/ax_tls.m4     |  71 +++++
+ configure.ac               |  17 +-
+ doc/crypt.3                |  28 +-
+ doc/crypt_gensalt.3        |  28 +-
+ lib/crypt-gensalt-static.c |   6 +-
+ lib/crypt-port.h           |   6 +
+ lib/crypt-static.c         |  29 ++-
+ test/crypt-multithread.c   | 191 ++++++++++++++
+ 11 files changed, 905 insertions(+), 14 deletions(-)
+ create mode 100644 build-aux/m4/ax_pthread.m4
+ create mode 100644 build-aux/m4/ax_tls.m4
+ create mode 100644 test/crypt-multithread.c
+
+diff --git a/LICENSING b/LICENSING
+index 6cee277..39e12ff 100644
+--- a/LICENSING
++++ b/LICENSING
+@@ -78,9 +78,10 @@ source tree.  For specific licensing terms consult the files themselves.
+  * Public domain, written by Zack Weinberg et al.:
+    byteorder.h, randombytes.c, test-byteorder.c
+    test-alg-pbkdf-hmac-sha256.c
+-   test-badsetting.c, test-crypt-badargs.c, test-getrandom-fallbacks.c,
+-   test-getrandom-interface.c, test-symbols-compat.sh,
+-   test-symbols-renames.sh, test-symbols-static.sh,
++   test-badsetting.c, test-crypt-badargs.c, test-crypt-multithread.c,
++   test-getrandom-fallbacks.c, test-getrandom-interface.c,
++   test-symbols-compat.sh, test-symbols-renames.sh,
++   test-symbols-static.sh,
+    build-aux/scripts/gen-crypt-h,
+    build-aux/scripts/gen-crypt-symbol-vers-h,
+    build-aux/scripts/gen-libcrypt-map,
+@@ -92,6 +93,14 @@ source tree.  For specific licensing terms consult the files themselves.
+    GPL (v3 or later), with Autoconf exception:
+    build-aux/m4/zw_automodern.m4, build-aux/m4/zw_simple_warnings.m4
+ 
++*  Copyright Steven G. Johnson, Daniel Richard G., Marc Stevens;
++   GPL (v3 or later), with Autoconf exception:
++   build-aux/m4/ax_pthread.m4
++
++*  Copyright Alan Woodland, Diego Elio Petteno;
++   GPL (v3 or later), with Autoconf exception:
++   build-aux/m4/ax_tls.m4
++
+  * Copyright <vt at altlinux.org>; 0-clause BSD:
+    crypt-yescrypt.c, test-crypt-yescrypt.c
+ 
+diff --git a/Makefile.am b/Makefile.am
+index 548d44a..6bad07a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -385,6 +385,7 @@ check_PROGRAMS = \
+ 	test/compile-strong-alias \
+ 	test/crypt-badargs \
+ 	test/crypt-gost-yescrypt \
++	test/crypt-multithread \
+ 	test/crypt-nested-call \
+ 	test/crypt-sm3-yescrypt \
+ 	test/crypt-too-long-phrase \
+@@ -497,6 +498,10 @@ test/symbols-compat.log test/symbols-compat.trs: test/TestCommon.pm
+ test/symbols-renames.log test/symbols-renames.trs: test/TestCommon.pm
+ test/symbols-static.log test/symbols-static.trs: test/TestCommon.pm
+ 
++# test/crypt-multithread.c uses pthreads.
++test_crypt_multithread_CFLAGS = $(PTHREAD_CFLAGS)
++test_crypt_multithread_LIBS = $(PTHREAD_LIBS)
++
+ COMMON_TEST_OBJECTS = libcrypt.la
+ 
+ test_badsalt_LDADD = $(COMMON_TEST_OBJECTS)
+@@ -509,6 +514,7 @@ test_checksalt_LDADD = $(COMMON_TEST_OBJECTS)
+ test_des_obsolete_LDADD = $(COMMON_TEST_OBJECTS)
+ test_des_obsolete_r_LDADD = $(COMMON_TEST_OBJECTS)
+ test_crypt_badargs_LDADD = $(COMMON_TEST_OBJECTS)
++test_crypt_multithread_LDADD = $(COMMON_TEST_OBJECTS)
+ test_crypt_nested_call_LDADD = $(COMMON_TEST_OBJECTS)
+ test_crypt_too_long_phrase_LDADD = $(COMMON_TEST_OBJECTS)
+ test_preferred_method_LDADD = $(COMMON_TEST_OBJECTS)
+diff --git a/build-aux/m4/ax_pthread.m4 b/build-aux/m4/ax_pthread.m4
+new file mode 100644
+index 0000000..9f35d13
+--- /dev/null
++++ b/build-aux/m4/ax_pthread.m4
+@@ -0,0 +1,522 @@
++# ===========================================================================
++#        https://www.gnu.org/software/autoconf-archive/ax_pthread.html
++# ===========================================================================
++#
++# SYNOPSIS
++#
++#   AX_PTHREAD([ACTION-IF-FOUND[, ACTION-IF-NOT-FOUND]])
++#
++# DESCRIPTION
++#
++#   This macro figures out how to build C programs using POSIX threads. It
++#   sets the PTHREAD_LIBS output variable to the threads library and linker
++#   flags, and the PTHREAD_CFLAGS output variable to any special C compiler
++#   flags that are needed. (The user can also force certain compiler
++#   flags/libs to be tested by setting these environment variables.)
++#
++#   Also sets PTHREAD_CC and PTHREAD_CXX to any special C compiler that is
++#   needed for multi-threaded programs (defaults to the value of CC
++#   respectively CXX otherwise). (This is necessary on e.g. AIX to use the
++#   special cc_r/CC_r compiler alias.)
++#
++#   NOTE: You are assumed to not only compile your program with these flags,
++#   but also to link with them as well. For example, you might link with
++#   $PTHREAD_CC $CFLAGS $PTHREAD_CFLAGS $LDFLAGS ... $PTHREAD_LIBS $LIBS
++#   $PTHREAD_CXX $CXXFLAGS $PTHREAD_CFLAGS $LDFLAGS ... $PTHREAD_LIBS $LIBS
++#
++#   If you are only building threaded programs, you may wish to use these
++#   variables in your default LIBS, CFLAGS, and CC:
++#
++#     LIBS="$PTHREAD_LIBS $LIBS"
++#     CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
++#     CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
++#     CC="$PTHREAD_CC"
++#     CXX="$PTHREAD_CXX"
++#
++#   In addition, if the PTHREAD_CREATE_JOINABLE thread-attribute constant
++#   has a nonstandard name, this macro defines PTHREAD_CREATE_JOINABLE to
++#   that name (e.g. PTHREAD_CREATE_UNDETACHED on AIX).
++#
++#   Also HAVE_PTHREAD_PRIO_INHERIT is defined if pthread is found and the
++#   PTHREAD_PRIO_INHERIT symbol is defined when compiling with
++#   PTHREAD_CFLAGS.
++#
++#   ACTION-IF-FOUND is a list of shell commands to run if a threads library
++#   is found, and ACTION-IF-NOT-FOUND is a list of commands to run it if it
++#   is not found. If ACTION-IF-FOUND is not specified, the default action
++#   will define HAVE_PTHREAD.
++#
++#   Please let the authors know if this macro fails on any platform, or if
++#   you have any other suggestions or comments. This macro was based on work
++#   by SGJ on autoconf scripts for FFTW (http://www.fftw.org/) (with help
++#   from M. Frigo), as well as ac_pthread and hb_pthread macros posted by
++#   Alejandro Forero Cuervo to the autoconf macro repository. We are also
++#   grateful for the helpful feedback of numerous users.
++#
++#   Updated for Autoconf 2.68 by Daniel Richard G.
++#
++# LICENSE
++#
++#   Copyright (c) 2008 Steven G. Johnson <stevenj@alum.mit.edu>
++#   Copyright (c) 2011 Daniel Richard G. <skunk@iSKUNK.ORG>
++#   Copyright (c) 2019 Marc Stevens <marc.stevens@cwi.nl>
++#
++#   This program is free software: you can redistribute it and/or modify it
++#   under the terms of the GNU General Public License as published by the
++#   Free Software Foundation, either version 3 of the License, or (at your
++#   option) any later version.
++#
++#   This program is distributed in the hope that it will be useful, but
++#   WITHOUT ANY WARRANTY; without even the implied warranty of
++#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
++#   Public License for more details.
++#
++#   You should have received a copy of the GNU General Public License along
++#   with this program. If not, see <https://www.gnu.org/licenses/>.
++#
++#   As a special exception, the respective Autoconf Macro's copyright owner
++#   gives unlimited permission to copy, distribute and modify the configure
++#   scripts that are the output of Autoconf when processing the Macro. You
++#   need not follow the terms of the GNU General Public License when using
++#   or distributing such scripts, even though portions of the text of the
++#   Macro appear in them. The GNU General Public License (GPL) does govern
++#   all other use of the material that constitutes the Autoconf Macro.
++#
++#   This special exception to the GPL applies to versions of the Autoconf
++#   Macro released by the Autoconf Archive. When you make and distribute a
++#   modified version of the Autoconf Macro, you may extend this special
++#   exception to the GPL to apply to your modified version as well.
++
++#serial 31
++
++AU_ALIAS([ACX_PTHREAD], [AX_PTHREAD])
++AC_DEFUN([AX_PTHREAD], [
++AC_REQUIRE([AC_CANONICAL_HOST])
++AC_REQUIRE([AC_PROG_CC])
++AC_REQUIRE([AC_PROG_SED])
++AC_LANG_PUSH([C])
++ax_pthread_ok=no
++
++# We used to check for pthread.h first, but this fails if pthread.h
++# requires special compiler flags (e.g. on Tru64 or Sequent).
++# It gets checked for in the link test anyway.
++
++# First of all, check if the user has set any of the PTHREAD_LIBS,
++# etcetera environment variables, and if threads linking works using
++# them:
++if test "x$PTHREAD_CFLAGS$PTHREAD_LIBS" != "x"; then
++        ax_pthread_save_CC="$CC"
++        ax_pthread_save_CFLAGS="$CFLAGS"
++        ax_pthread_save_LIBS="$LIBS"
++        AS_IF([test "x$PTHREAD_CC" != "x"], [CC="$PTHREAD_CC"])
++        AS_IF([test "x$PTHREAD_CXX" != "x"], [CXX="$PTHREAD_CXX"])
++        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
++        LIBS="$PTHREAD_LIBS $LIBS"
++        AC_MSG_CHECKING([for pthread_join using $CC $PTHREAD_CFLAGS $PTHREAD_LIBS])
++        AC_LINK_IFELSE([AC_LANG_CALL([], [pthread_join])], [ax_pthread_ok=yes])
++        AC_MSG_RESULT([$ax_pthread_ok])
++        if test "x$ax_pthread_ok" = "xno"; then
++                PTHREAD_LIBS=""
++                PTHREAD_CFLAGS=""
++        fi
++        CC="$ax_pthread_save_CC"
++        CFLAGS="$ax_pthread_save_CFLAGS"
++        LIBS="$ax_pthread_save_LIBS"
++fi
++
++# We must check for the threads library under a number of different
++# names; the ordering is very important because some systems
++# (e.g. DEC) have both -lpthread and -lpthreads, where one of the
++# libraries is broken (non-POSIX).
++
++# Create a list of thread flags to try. Items with a "," contain both
++# C compiler flags (before ",") and linker flags (after ","). Other items
++# starting with a "-" are C compiler flags, and remaining items are
++# library names, except for "none" which indicates that we try without
++# any flags at all, and "pthread-config" which is a program returning
++# the flags for the Pth emulation library.
++
++ax_pthread_flags="pthreads none -Kthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config"
++
++# The ordering *is* (sometimes) important.  Some notes on the
++# individual items follow:
++
++# pthreads: AIX (must check this before -lpthread)
++# none: in case threads are in libc; should be tried before -Kthread and
++#       other compiler flags to prevent continual compiler warnings
++# -Kthread: Sequent (threads in libc, but -Kthread needed for pthread.h)
++# -pthread: Linux/gcc (kernel threads), BSD/gcc (userland threads), Tru64
++#           (Note: HP C rejects this with "bad form for `-t' option")
++# -pthreads: Solaris/gcc (Note: HP C also rejects)
++# -mt: Sun Workshop C (may only link SunOS threads [-lthread], but it
++#      doesn't hurt to check since this sometimes defines pthreads and
++#      -D_REENTRANT too), HP C (must be checked before -lpthread, which
++#      is present but should not be used directly; and before -mthreads,
++#      because the compiler interprets this as "-mt" + "-hreads")
++# -mthreads: Mingw32/gcc, Lynx/gcc
++# pthread: Linux, etcetera
++# --thread-safe: KAI C++
++# pthread-config: use pthread-config program (for GNU Pth library)
++
++case $host_os in
++
++        freebsd*)
++
++        # -kthread: FreeBSD kernel threads (preferred to -pthread since SMP-able)
++        # lthread: LinuxThreads port on FreeBSD (also preferred to -pthread)
++
++        ax_pthread_flags="-kthread lthread $ax_pthread_flags"
++        ;;
++
++        hpux*)
++
++        # From the cc(1) man page: "[-mt] Sets various -D flags to enable
++        # multi-threading and also sets -lpthread."
++
++        ax_pthread_flags="-mt -pthread pthread $ax_pthread_flags"
++        ;;
++
++        openedition*)
++
++        # IBM z/OS requires a feature-test macro to be defined in order to
++        # enable POSIX threads at all, so give the user a hint if this is
++        # not set. (We don't define these ourselves, as they can affect
++        # other portions of the system API in unpredictable ways.)
++
++        AC_EGREP_CPP([AX_PTHREAD_ZOS_MISSING],
++            [
++#            if !defined(_OPEN_THREADS) && !defined(_UNIX03_THREADS)
++             AX_PTHREAD_ZOS_MISSING
++#            endif
++            ],
++            [AC_MSG_WARN([IBM z/OS requires -D_OPEN_THREADS or -D_UNIX03_THREADS to enable pthreads support.])])
++        ;;
++
++        solaris*)
++
++        # On Solaris (at least, for some versions), libc contains stubbed
++        # (non-functional) versions of the pthreads routines, so link-based
++        # tests will erroneously succeed. (N.B.: The stubs are missing
++        # pthread_cleanup_push, or rather a function called by this macro,
++        # so we could check for that, but who knows whether they'll stub
++        # that too in a future libc.)  So we'll check first for the
++        # standard Solaris way of linking pthreads (-mt -lpthread).
++
++        ax_pthread_flags="-mt,-lpthread pthread $ax_pthread_flags"
++        ;;
++esac
++
++# Are we compiling with Clang?
++
++AC_CACHE_CHECK([whether $CC is Clang],
++    [ax_cv_PTHREAD_CLANG],
++    [ax_cv_PTHREAD_CLANG=no
++     # Note that Autoconf sets GCC=yes for Clang as well as GCC
++     if test "x$GCC" = "xyes"; then
++        AC_EGREP_CPP([AX_PTHREAD_CC_IS_CLANG],
++            [/* Note: Clang 2.7 lacks __clang_[a-z]+__ */
++#            if defined(__clang__) && defined(__llvm__)
++             AX_PTHREAD_CC_IS_CLANG
++#            endif
++            ],
++            [ax_cv_PTHREAD_CLANG=yes])
++     fi
++    ])
++ax_pthread_clang="$ax_cv_PTHREAD_CLANG"
++
++
++# GCC generally uses -pthread, or -pthreads on some platforms (e.g. SPARC)
++
++# Note that for GCC and Clang -pthread generally implies -lpthread,
++# except when -nostdlib is passed.
++# This is problematic using libtool to build C++ shared libraries with pthread:
++# [1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=25460
++# [2] https://bugzilla.redhat.com/show_bug.cgi?id=661333
++# [3] https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=468555
++# To solve this, first try -pthread together with -lpthread for GCC
++
++AS_IF([test "x$GCC" = "xyes"],
++      [ax_pthread_flags="-pthread,-lpthread -pthread -pthreads $ax_pthread_flags"])
++
++# Clang takes -pthread (never supported any other flag), but we'll try with -lpthread first
++
++AS_IF([test "x$ax_pthread_clang" = "xyes"],
++      [ax_pthread_flags="-pthread,-lpthread -pthread"])
++
++
++# The presence of a feature test macro requesting re-entrant function
++# definitions is, on some systems, a strong hint that pthreads support is
++# correctly enabled
++
++case $host_os in
++        darwin* | hpux* | linux* | osf* | solaris*)
++        ax_pthread_check_macro="_REENTRANT"
++        ;;
++
++        aix*)
++        ax_pthread_check_macro="_THREAD_SAFE"
++        ;;
++
++        *)
++        ax_pthread_check_macro="--"
++        ;;
++esac
++AS_IF([test "x$ax_pthread_check_macro" = "x--"],
++      [ax_pthread_check_cond=0],
++      [ax_pthread_check_cond="!defined($ax_pthread_check_macro)"])
++
++
++if test "x$ax_pthread_ok" = "xno"; then
++for ax_pthread_try_flag in $ax_pthread_flags; do
++
++        case $ax_pthread_try_flag in
++                none)
++                AC_MSG_CHECKING([whether pthreads work without any flags])
++                ;;
++
++                *,*)
++                PTHREAD_CFLAGS=`echo $ax_pthread_try_flag | sed "s/^\(.*\),\(.*\)$/\1/"`
++                PTHREAD_LIBS=`echo $ax_pthread_try_flag | sed "s/^\(.*\),\(.*\)$/\2/"`
++                AC_MSG_CHECKING([whether pthreads work with "$PTHREAD_CFLAGS" and "$PTHREAD_LIBS"])
++                ;;
++
++                -*)
++                AC_MSG_CHECKING([whether pthreads work with $ax_pthread_try_flag])
++                PTHREAD_CFLAGS="$ax_pthread_try_flag"
++                ;;
++
++                pthread-config)
++                AC_CHECK_PROG([ax_pthread_config], [pthread-config], [yes], [no])
++                AS_IF([test "x$ax_pthread_config" = "xno"], [continue])
++                PTHREAD_CFLAGS="`pthread-config --cflags`"
++                PTHREAD_LIBS="`pthread-config --ldflags` `pthread-config --libs`"
++                ;;
++
++                *)
++                AC_MSG_CHECKING([for the pthreads library -l$ax_pthread_try_flag])
++                PTHREAD_LIBS="-l$ax_pthread_try_flag"
++                ;;
++        esac
++
++        ax_pthread_save_CFLAGS="$CFLAGS"
++        ax_pthread_save_LIBS="$LIBS"
++        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
++        LIBS="$PTHREAD_LIBS $LIBS"
++
++        # Check for various functions.  We must include pthread.h,
++        # since some functions may be macros.  (On the Sequent, we
++        # need a special flag -Kthread to make this header compile.)
++        # We check for pthread_join because it is in -lpthread on IRIX
++        # while pthread_create is in libc.  We check for pthread_attr_init
++        # due to DEC craziness with -lpthreads.  We check for
++        # pthread_cleanup_push because it is one of the few pthread
++        # functions on Solaris that doesn't have a non-functional libc stub.
++        # We try pthread_create on general principles.
++
++        AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <pthread.h>
++#                       if $ax_pthread_check_cond
++#                        error "$ax_pthread_check_macro must be defined"
++#                       endif
++                        static void *some_global = NULL;
++                        static void routine(void *a)
++                          {
++                             /* To avoid any unused-parameter or
++                                unused-but-set-parameter warning.  */
++                             some_global = a;
++                          }
++                        static void *start_routine(void *a) { return a; }],
++                       [pthread_t th; pthread_attr_t attr;
++                        pthread_create(&th, 0, start_routine, 0);
++                        pthread_join(th, 0);
++                        pthread_attr_init(&attr);
++                        pthread_cleanup_push(routine, 0);
++                        pthread_cleanup_pop(0) /* ; */])],
++            [ax_pthread_ok=yes],
++            [])
++
++        CFLAGS="$ax_pthread_save_CFLAGS"
++        LIBS="$ax_pthread_save_LIBS"
++
++        AC_MSG_RESULT([$ax_pthread_ok])
++        AS_IF([test "x$ax_pthread_ok" = "xyes"], [break])
++
++        PTHREAD_LIBS=""
++        PTHREAD_CFLAGS=""
++done
++fi
++
++
++# Clang needs special handling, because older versions handle the -pthread
++# option in a rather... idiosyncratic way
++
++if test "x$ax_pthread_clang" = "xyes"; then
++
++        # Clang takes -pthread; it has never supported any other flag
++
++        # (Note 1: This will need to be revisited if a system that Clang
++        # supports has POSIX threads in a separate library.  This tends not
++        # to be the way of modern systems, but it's conceivable.)
++
++        # (Note 2: On some systems, notably Darwin, -pthread is not needed
++        # to get POSIX threads support; the API is always present and
++        # active.  We could reasonably leave PTHREAD_CFLAGS empty.  But
++        # -pthread does define _REENTRANT, and while the Darwin headers
++        # ignore this macro, third-party headers might not.)
++
++        # However, older versions of Clang make a point of warning the user
++        # that, in an invocation where only linking and no compilation is
++        # taking place, the -pthread option has no effect ("argument unused
++        # during compilation").  They expect -pthread to be passed in only
++        # when source code is being compiled.
++        #
++        # Problem is, this is at odds with the way Automake and most other
++        # C build frameworks function, which is that the same flags used in
++        # compilation (CFLAGS) are also used in linking.  Many systems
++        # supported by AX_PTHREAD require exactly this for POSIX threads
++        # support, and in fact it is often not straightforward to specify a
++        # flag that is used only in the compilation phase and not in
++        # linking.  Such a scenario is extremely rare in practice.
++        #
++        # Even though use of the -pthread flag in linking would only print
++        # a warning, this can be a nuisance for well-run software projects
++        # that build with -Werror.  So if the active version of Clang has
++        # this misfeature, we search for an option to squash it.
++
++        AC_CACHE_CHECK([whether Clang needs flag to prevent "argument unused" warning when linking with -pthread],
++            [ax_cv_PTHREAD_CLANG_NO_WARN_FLAG],
++            [ax_cv_PTHREAD_CLANG_NO_WARN_FLAG=unknown
++             # Create an alternate version of $ac_link that compiles and
++             # links in two steps (.c -> .o, .o -> exe) instead of one
++             # (.c -> exe), because the warning occurs only in the second
++             # step
++             ax_pthread_save_ac_link="$ac_link"
++             ax_pthread_sed='s/conftest\.\$ac_ext/conftest.$ac_objext/g'
++             ax_pthread_link_step=`AS_ECHO(["$ac_link"]) | sed "$ax_pthread_sed"`
++             ax_pthread_2step_ac_link="($ac_compile) && (echo ==== >&5) && ($ax_pthread_link_step)"
++             ax_pthread_save_CFLAGS="$CFLAGS"
++             for ax_pthread_try in '' -Qunused-arguments -Wno-unused-command-line-argument unknown; do
++                AS_IF([test "x$ax_pthread_try" = "xunknown"], [break])
++                CFLAGS="-Werror -Wunknown-warning-option $ax_pthread_try -pthread $ax_pthread_save_CFLAGS"
++                ac_link="$ax_pthread_save_ac_link"
++                AC_LINK_IFELSE([AC_LANG_SOURCE([[int main(void){return 0;}]])],
++                    [ac_link="$ax_pthread_2step_ac_link"
++                     AC_LINK_IFELSE([AC_LANG_SOURCE([[int main(void){return 0;}]])],
++                         [break])
++                    ])
++             done
++             ac_link="$ax_pthread_save_ac_link"
++             CFLAGS="$ax_pthread_save_CFLAGS"
++             AS_IF([test "x$ax_pthread_try" = "x"], [ax_pthread_try=no])
++             ax_cv_PTHREAD_CLANG_NO_WARN_FLAG="$ax_pthread_try"
++            ])
++
++        case "$ax_cv_PTHREAD_CLANG_NO_WARN_FLAG" in
++                no | unknown) ;;
++                *) PTHREAD_CFLAGS="$ax_cv_PTHREAD_CLANG_NO_WARN_FLAG $PTHREAD_CFLAGS" ;;
++        esac
++
++fi # $ax_pthread_clang = yes
++
++
++
++# Various other checks:
++if test "x$ax_pthread_ok" = "xyes"; then
++        ax_pthread_save_CFLAGS="$CFLAGS"
++        ax_pthread_save_LIBS="$LIBS"
++        CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
++        LIBS="$PTHREAD_LIBS $LIBS"
++
++        # Detect AIX lossage: JOINABLE attribute is called UNDETACHED.
++        AC_CACHE_CHECK([for joinable pthread attribute],
++            [ax_cv_PTHREAD_JOINABLE_ATTR],
++            [ax_cv_PTHREAD_JOINABLE_ATTR=unknown
++             for ax_pthread_attr in PTHREAD_CREATE_JOINABLE PTHREAD_CREATE_UNDETACHED; do
++                 AC_LINK_IFELSE([AC_LANG_PROGRAM([#include <pthread.h>],
++                                                 [int attr = $ax_pthread_attr; return attr /* ; */])],
++                                [ax_cv_PTHREAD_JOINABLE_ATTR=$ax_pthread_attr; break],
++                                [])
++             done
++            ])
++        AS_IF([test "x$ax_cv_PTHREAD_JOINABLE_ATTR" != "xunknown" && \
++               test "x$ax_cv_PTHREAD_JOINABLE_ATTR" != "xPTHREAD_CREATE_JOINABLE" && \
++               test "x$ax_pthread_joinable_attr_defined" != "xyes"],
++              [AC_DEFINE_UNQUOTED([PTHREAD_CREATE_JOINABLE],
++                                  [$ax_cv_PTHREAD_JOINABLE_ATTR],
++                                  [Define to necessary symbol if this constant
++                                   uses a non-standard name on your system.])
++               ax_pthread_joinable_attr_defined=yes
++              ])
++
++        AC_CACHE_CHECK([whether more special flags are required for pthreads],
++            [ax_cv_PTHREAD_SPECIAL_FLAGS],
++            [ax_cv_PTHREAD_SPECIAL_FLAGS=no
++             case $host_os in
++             solaris*)
++             ax_cv_PTHREAD_SPECIAL_FLAGS="-D_POSIX_PTHREAD_SEMANTICS"
++             ;;
++             esac
++            ])
++        AS_IF([test "x$ax_cv_PTHREAD_SPECIAL_FLAGS" != "xno" && \
++               test "x$ax_pthread_special_flags_added" != "xyes"],
++              [PTHREAD_CFLAGS="$ax_cv_PTHREAD_SPECIAL_FLAGS $PTHREAD_CFLAGS"
++               ax_pthread_special_flags_added=yes])
++
++        AC_CACHE_CHECK([for PTHREAD_PRIO_INHERIT],
++            [ax_cv_PTHREAD_PRIO_INHERIT],
++            [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pthread.h>]],
++                                             [[int i = PTHREAD_PRIO_INHERIT;
++                                               return i;]])],
++                            [ax_cv_PTHREAD_PRIO_INHERIT=yes],
++                            [ax_cv_PTHREAD_PRIO_INHERIT=no])
++            ])
++        AS_IF([test "x$ax_cv_PTHREAD_PRIO_INHERIT" = "xyes" && \
++               test "x$ax_pthread_prio_inherit_defined" != "xyes"],
++              [AC_DEFINE([HAVE_PTHREAD_PRIO_INHERIT], [1], [Have PTHREAD_PRIO_INHERIT.])
++               ax_pthread_prio_inherit_defined=yes
++              ])
++
++        CFLAGS="$ax_pthread_save_CFLAGS"
++        LIBS="$ax_pthread_save_LIBS"
++
++        # More AIX lossage: compile with *_r variant
++        if test "x$GCC" != "xyes"; then
++            case $host_os in
++                aix*)
++                AS_CASE(["x/$CC"],
++                    [x*/c89|x*/c89_128|x*/c99|x*/c99_128|x*/cc|x*/cc128|x*/xlc|x*/xlc_v6|x*/xlc128|x*/xlc128_v6],
++                    [#handle absolute path differently from PATH based program lookup
++                     AS_CASE(["x$CC"],
++                         [x/*],
++                         [
++			   AS_IF([AS_EXECUTABLE_P([${CC}_r])],[PTHREAD_CC="${CC}_r"])
++			   AS_IF([test "x${CXX}" != "x"], [AS_IF([AS_EXECUTABLE_P([${CXX}_r])],[PTHREAD_CXX="${CXX}_r"])])
++			 ],
++                         [
++			   AC_CHECK_PROGS([PTHREAD_CC],[${CC}_r],[$CC])
++			   AS_IF([test "x${CXX}" != "x"], [AC_CHECK_PROGS([PTHREAD_CXX],[${CXX}_r],[$CXX])])
++			 ]
++                     )
++                    ])
++                ;;
++            esac
++        fi
++fi
++
++test -n "$PTHREAD_CC" || PTHREAD_CC="$CC"
++test -n "$PTHREAD_CXX" || PTHREAD_CXX="$CXX"
++
++AC_SUBST([PTHREAD_LIBS])
++AC_SUBST([PTHREAD_CFLAGS])
++AC_SUBST([PTHREAD_CC])
++AC_SUBST([PTHREAD_CXX])
++
++# Finally, execute ACTION-IF-FOUND/ACTION-IF-NOT-FOUND:
++if test "x$ax_pthread_ok" = "xyes"; then
++        ifelse([$1],,[AC_DEFINE([HAVE_PTHREAD],[1],[Define if you have POSIX threads libraries and header files.])],[$1])
++        :
++else
++        ax_pthread_ok=no
++        $2
++fi
++AC_LANG_POP
++])dnl AX_PTHREAD
+diff --git a/build-aux/m4/ax_tls.m4 b/build-aux/m4/ax_tls.m4
+new file mode 100644
+index 0000000..fb184fe
+--- /dev/null
++++ b/build-aux/m4/ax_tls.m4
+@@ -0,0 +1,71 @@
++# ===========================================================================
++#          https://www.gnu.org/software/autoconf-archive/ax_tls.html
++# ===========================================================================
++#
++# SYNOPSIS
++#
++#   AX_TLS([action-if-found], [action-if-not-found])
++#
++# DESCRIPTION
++#
++#   Provides a test for the compiler support of thread local storage (TLS)
++#   extensions. Defines TLS if it is found. Currently knows about C++11,
++#   GCC/ICC, and MSVC. I think SunPro uses the same as GCC, and Borland
++#   apparently supports either.
++#
++# LICENSE
++#
++#   Copyright (c) 2008 Alan Woodland <ajw05@aber.ac.uk>
++#   Copyright (c) 2010 Diego Elio Petteno` <flameeyes@gmail.com>
++#
++#   This program is free software: you can redistribute it and/or modify it
++#   under the terms of the GNU General Public License as published by the
++#   Free Software Foundation, either version 3 of the License, or (at your
++#   option) any later version.
++#
++#   This program is distributed in the hope that it will be useful, but
++#   WITHOUT ANY WARRANTY; without even the implied warranty of
++#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
++#   Public License for more details.
++#
++#   You should have received a copy of the GNU General Public License along
++#   with this program. If not, see <https://www.gnu.org/licenses/>.
++#
++#   As a special exception, the respective Autoconf Macro's copyright owner
++#   gives unlimited permission to copy, distribute and modify the configure
++#   scripts that are the output of Autoconf when processing the Macro. You
++#   need not follow the terms of the GNU General Public License when using
++#   or distributing such scripts, even though portions of the text of the
++#   Macro appear in them. The GNU General Public License (GPL) does govern
++#   all other use of the material that constitutes the Autoconf Macro.
++#
++#   This special exception to the GPL applies to versions of the Autoconf
++#   Macro released by the Autoconf Archive. When you make and distribute a
++#   modified version of the Autoconf Macro, you may extend this special
++#   exception to the GPL to apply to your modified version as well.
++
++#serial 15
++
++AC_DEFUN([AX_TLS], [
++  AC_MSG_CHECKING([for thread local storage (TLS) class])
++  AC_CACHE_VAL([ac_cv_tls],
++   [for ax_tls_keyword in thread_local _Thread_local __thread '__declspec(thread)' none; do
++       AS_CASE([$ax_tls_keyword],
++          [none], [ac_cv_tls=none ; break],
++          [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
++              [#include <stdlib.h>],
++              [static  $ax_tls_keyword  int bar;]
++            )],
++            [ac_cv_tls=$ax_tls_keyword ; break],
++            [ac_cv_tls=none]
++          )]
++        )
++    done ]
++  )
++  AC_MSG_RESULT([$ac_cv_tls])
++
++  AS_IF([test "$ac_cv_tls" != "none"],
++    [AC_DEFINE_UNQUOTED([TLS],[$ac_cv_tls],[If the compiler supports a TLS storage class, define it to that here])
++     m4_ifnblank([$1],[$1],[[:]])],
++    [m4_ifnblank([$2],[$2],[[:]])])
++])
+diff --git a/configure.ac b/configure.ac
+index ae6ea55..70fcdfe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -89,7 +89,18 @@ if test x$ac_cv_c_address_sanitizer = xyes; then
+     [Define when compiling with ASan.  Only affects tests.])
+ fi
+ 
+-# Checks for libraries: currently none needed.
++# Checks for libraries.
++# Some tests are multithreaded.
++AX_PTHREAD([
++  # this could be worked around with sufficient hackery in the Makefile,
++  # maybe, but considering it only affects (old versions of?) AIX, I can't
++  # be bothered.
++  if test x"$PTHREAD_CC" != x"$CC"; then
++    AC_MSG_ERROR([Automake does not support PTHREAD_CC different from CC.])
++  fi
++  AC_DEFINE([HAVE_PTHREAD],[1],
++      [Define if you have POSIX threads libraries and header files.])
++])
+ 
+ # Checks for header files.
+ AC_CHECK_HEADERS_ONCE([
+@@ -147,6 +158,10 @@ if test $ac_cv_header_sys_cdefs_THROW = yes; then
+ fi
+ 
+ # Checks for typedefs, structures, and compiler characteristics.
++AX_TLS(
++  [AC_DEFINE([HAVE_THREAD_LOCAL_STORAGE], [1],
++    [Define if thread-local storage (TLS) is supported by the compiler.])]
++)
+ zw_C_ALIGNAS
+ zw_C_ALIGNOF
+ zw_C_MAX_ALIGN_T
+diff --git a/doc/crypt.3 b/doc/crypt.3
+index 4dcc1bc..4293b35 100644
+--- a/doc/crypt.3
++++ b/doc/crypt.3
+@@ -356,6 +356,15 @@ and
+ .Nm crypt_ra
+ are not part of any standard.
+ .Pp
++POSIX permits
++.Nm crypt
++to use a single storage area for all callers,
++even in the presence of threads.
++This library uses per-thread storage areas,
++but portable code should avoid calling
++.Nm crypt
++from multiple threads simultaneously.
++.Pp
+ POSIX does not specify any hashing methods,
+ and does not require hashed passphrases to be portable between systems.
+ In practice, hashed passphrases are portable
+@@ -427,6 +436,17 @@ uses a thread-specific static storage buffer,
+ which makes it safe to call from multiple threads simultaneously,
+ but does not prevent each call within a thread
+ from overwriting the results of the previous one.
++If an application needs to call
++.Nm crypt
++from parallel threads independently,
++it is strongly advised to allocate thread-specific
++.Vt "struct crypt_data"
++objects from within that program itself, and to use these objects
++with one of the re-entrant interfaces provided through
++.Nm crypt_r ,
++.Nm crypt_rn ,
++or
++.Nm crypt_ra .
+ .Sh BUGS
+ Some implementations of
+ .Nm crypt ,
+@@ -468,14 +488,18 @@ l l l.
+ Interface	Attribute	Value
+ T{
+ .Nm crypt
+-T}	Thread safety	MT-Unsafe race:crypt
++T}	Thread safety	MT-Safe*
+ T{
+ .Nm crypt_r ,
+ .Nm crypt_rn ,
+ .Nm crypt_ra
+ T}	Thread safety	MT-Safe
+ .TE
+-.sp
++.Pp
++\&* In this implementation.
++Do NOT rely on this to be portable behavior.
++See
++.Sx PORTABILITY NOTES .
+ .Sh HISTORY
+ A rotor-based
+ .Nm crypt
+diff --git a/doc/crypt_gensalt.3 b/doc/crypt_gensalt.3
+index a714249..209fbd9 100644
+--- a/doc/crypt_gensalt.3
++++ b/doc/crypt_gensalt.3
+@@ -132,7 +132,9 @@ is unspecified and must not be relied upon.
+ places its result in a static storage area,
+ which will be overwritten by subsequent calls to
+ .Nm crypt_gensalt .
+-It is not safe to call
++In this version of libcrypt,
++the static storage area is allocated separately for each thread,
++but portable code should not call
+ .Nm crypt_gensalt
+ from multiple threads simultaneously.
+ It's also not recommended to use the pointer
+@@ -243,6 +245,22 @@ A function with the name
+ .Nm crypt_gensalt
+ also exists on Solaris 10 and newer, but its prototype and semantics differ.
+ .Pp
++Some implementations of
++.Nm crypt_gensalt
++use a single storage area for all callers,
++even in the presence of threads.
++This library uses per-thread storage areas,
++but portable code should avoid calling
++.Nm crypt_gensalt
++from multiple threads simultaneously; instead it is strongly advised to
++allocate thread-specific buffers of
++.Dv CRYPT_GENSALT_OUTPUT_SIZE
++length from within each thread itself, and to use these buffers with the
++re-entrant interface provided through
++.Nm crypt_gensalt_rn ,
++or
++.Nm crypt_gensalt_ra .
++.Pp
+ The default prefix and auto entropy features are available since libxcrypt
+ version 4.0.0.  Portable software can use feature test macros to find out
+ whether null pointers can be used for the
+@@ -264,14 +282,18 @@ l l l.
+ Interface	Attribute	Value
+ T{
+ .Nm crypt_gensalt
+-T}	Thread safety	MT-Unsafe race:crypt_gensalt
++T}	Thread safety	MT-Safe*
+ T{
+ .Nm crypt_gensalt_rn ,
+ .Nm crypt_gensalt_ra
+ T}	Thread safety	MT-Safe
+ .TE
+ .ad
+-.sp
++.Pp
++\&* In this implementation.
++Do NOT rely on this to be portable behavior.
++See
++.Sx PORTABILITY NOTES .
+ .Sh SEE ALSO
+ .Xr crypt 3 ,
+ .Xr getpass 3 ,
+diff --git a/lib/crypt-gensalt-static.c b/lib/crypt-gensalt-static.c
+index f1919ee..3fddabf 100644
+--- a/lib/crypt-gensalt-static.c
++++ b/lib/crypt-gensalt-static.c
+@@ -1,4 +1,5 @@
+ /* Copyright (C) 2007-2017 Thorsten Kukuk
++   Copyright (C) 2024, 2025 Björn Esser
+ 
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public License
+@@ -25,10 +26,11 @@ char *
+ crypt_gensalt (const char *prefix, unsigned long count,
+                const char *rbytes, int nrbytes)
+ {
+-  static char output[CRYPT_GENSALT_OUTPUT_SIZE];
++  static TLS char output[CRYPT_GENSALT_OUTPUT_SIZE];
+ 
+   return crypt_gensalt_rn (prefix, count,
+-                           rbytes, nrbytes, output, sizeof (output));
++                           rbytes, nrbytes,
++                           output, sizeof (output));
+ }
+ SYMVER_crypt_gensalt;
+ #endif
+diff --git a/lib/crypt-port.h b/lib/crypt-port.h
+index 23c7efa..3454912 100644
+--- a/lib/crypt-port.h
++++ b/lib/crypt-port.h
+@@ -73,6 +73,12 @@
+ #define __THROW /* nothing */
+ #endif
+ 
++/* Thread-local storage may not be supported by
++   all compilers and their specific releases.  */
++#ifndef HAVE_THREAD_LOCAL_STORAGE
++# error "Unable to determine how to declare thread-local storage"
++#endif
++
+ /* Suppression of unused-argument warnings.  */
+ #if defined __GNUC__ && __GNUC__ >= 3
+ # define ARG_UNUSED(x) x __attribute__ ((__unused__))
+diff --git a/lib/crypt-static.c b/lib/crypt-static.c
+index e87e709..46a03f7 100644
+--- a/lib/crypt-static.c
++++ b/lib/crypt-static.c
+@@ -1,5 +1,5 @@
+ /* Copyright (C) 2007-2017 Thorsten Kukuk
+-   Copyright (C) 2019 Björn Esser
++   Copyright (C) 2019-2025 Björn Esser
+ 
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public License
+@@ -22,11 +22,34 @@
+    will not have the state objects in its data segment.  */
+ 
+ #if INCLUDE_crypt
++
++#include <stdlib.h>
++
+ char *
+ crypt (const char *key, const char *setting)
+ {
+-  static struct crypt_data nr_crypt_ctx;
+-  return crypt_r (key, setting, &nr_crypt_ctx);
++  static TLS char output[CRYPT_OUTPUT_SIZE];
++  struct crypt_data *nr_crypt_ctx = NULL;
++  int size = 0;
++
++  crypt_ra (key, setting, (void **) &nr_crypt_ctx, &size);
++
++  if (!nr_crypt_ctx)
++    {
++      make_failure_token (setting, output, sizeof (output));
++      goto out;
++    }
++
++  strcpy_or_abort (output, sizeof (output), nr_crypt_ctx->output);
++  explicit_bzero (nr_crypt_ctx->output, sizeof (nr_crypt_ctx->output));
++  free (nr_crypt_ctx);
++
++out:
++#if ENABLE_FAILURE_TOKENS
++  return output;
++#else
++  return output[0] == '*' ? 0 : output;
++#endif /* ENABLE_FAILURE_TOKENS */
+ }
+ SYMVER_crypt;
+ #endif
+diff --git a/test/crypt-multithread.c b/test/crypt-multithread.c
+new file mode 100644
+index 0000000..e6f7c01
+--- /dev/null
++++ b/test/crypt-multithread.c
+@@ -0,0 +1,191 @@
++/* Test for MT-safety in crypt and crypt_gensalt.
++
++   Written by Zack Weinberg <zackw at panix.com> in 2018.
++   To the extent possible under law, Zack Weinberg has waived all
++   copyright and related or neighboring rights to this work.
++
++   See https://creativecommons.org/publicdomain/zero/1.0/ for further
++   details.  */
++
++#include "crypt-port.h"
++
++#include <errno.h>
++#include <stdio.h>
++
++#ifdef HAVE_PTHREAD
++#include <pthread.h>
++#endif
++
++/* for determinism, we don't rely on the default prefix; also, there
++   might not be one.  this test doesn't care about the strength of the
++   hashing method, but it does care whether there is salt, so nthash
++   is out.  bcrypt_x is also out, because crypt_gensalt refuses to
++   support it.  */
++#if INCLUDE_yescrypt
++#define HASH_PREFIX "$y$"
++#elif INCLUDE_gost_yescrypt
++#define HASH_PREFIX "$gy$"
++#elif INCLUDE_bcrypt
++#define HASH_PREFIX "$2b$"
++#elif INCLUDE_bcrypt_y
++#define HASH_PREFIX "$2y$"
++#elif INCLUDE_bcrypt_a
++#define HASH_PREFIX "$2a$"
++#elif INCLUDE_sha512crypt
++#define HASH_PREFIX "$6$"
++#elif INCLUDE_sha256crypt
++#define HASH_PREFIX "$5$"
++#elif INCLUDE_sha1crypt
++#define HASH_PREFIX "$sha1"
++#elif INCLUDE_sunmd5
++#define HASH_PREFIX "$md5"
++#elif INCLUDE_md5crypt
++#define HASH_PREFIX "$1$"
++#elif INCLUDE_bsdicrypt
++#define HASH_PREFIX "_"
++#elif INCLUDE_bigcrypt || INCLUDE_descrypt
++#define HASH_PREFIX ""
++#endif
++
++#if defined HASH_PREFIX  && \
++    defined HAVE_PTHREAD && \
++    defined HAVE_THREAD_LOCAL_STORAGE
++
++/* for determinism, we don't use auto-entropy either.  */
++static const char rbytes1[] =
++  "opm+IVsGxcmb73BXTSjkWueVJMx1W1KAIV0lPQctV2Hxc7Nc3UCoi1jN3nW6UlFZ";
++static const char rbytes2[] =
++  "MHTAZtYAvBI54WLE2vp+ekStQhfp0uakGbX397u/DvffB/hvb/ry95MWOKWQlu5A";
++
++static const char pw1[] = "fraggle";
++static const char pw2[] = "doozer";
++
++static void *
++child (void *ARG_UNUSED (data))
++{
++  char *setting, *hash;
++
++  setting = crypt_gensalt (HASH_PREFIX, 0, rbytes2, 64);
++  if (!setting)
++    {
++      printf ("ERROR: child: crypt_gensalt failed: %s\n", strerror (errno));
++      return ((void *)1);
++    }
++  else
++    printf ("ok: child: crypt_gensalt = %s\n", setting);
++
++  hash = crypt (pw2, setting);
++  if (!hash)
++    {
++      printf ("ERROR: child: crypt failed: %s\n", strerror (errno));
++      return ((void *)1);
++    }
++  else if (hash[0] == '*' || hash[0] == '\0')
++    {
++      printf ("ERROR: child: crypt failed (\"%s\"): %s\n",
++              hash, strerror (errno));
++      return ((void *)1);
++    }
++  else
++    printf ("ok: child: crypt = %s\n", hash);
++  return 0;
++}
++
++int main(void)
++{
++  char save_setting[CRYPT_GENSALT_OUTPUT_SIZE];
++  char save_hash[CRYPT_OUTPUT_SIZE];
++  char *setting, *hash;
++  pthread_t th;
++  int err;
++  void *status;
++
++  if (setvbuf (stdout, 0, _IOLBF, 0))
++    {
++      printf ("ERROR: setvbuf: %s\n", strerror (errno));
++      return 0;
++    }
++
++  setting = crypt_gensalt (HASH_PREFIX, 0, rbytes1, 64);
++  if (!setting)
++    {
++      printf ("ERROR: parent: crypt_gensalt failed: %s\n", strerror (errno));
++      return 1;
++    }
++  else
++    printf ("ok: parent: crypt_gensalt = %s\n", setting);
++  if (strlen (setting) + 1 > sizeof save_setting)
++    {
++      printf ("ERROR: crypt_gensalt output is too long (%zu > %zu)\n",
++              strlen (setting) + 1, sizeof save_setting);
++      return 1;
++    }
++  strcpy (save_setting, setting);
++
++  hash = crypt (pw1, setting);
++  if (!hash)
++    {
++      printf ("ERROR: parent: crypt failed: %s\n", strerror (errno));
++      return 1;
++    }
++  else if (hash[0] == '*' || hash[0] == '\0')
++    {
++      printf ("ERROR: parent: crypt failed (\"%s\"): %s\n",
++              hash, strerror (errno));
++      return 1;
++    }
++  else
++    printf ("ok: parent: crypt = %s\n", hash);
++  if (strlen (hash) + 1 > sizeof save_hash)
++    {
++      printf ("ERROR: crypt output is too long (%zu > %zu)\n",
++              strlen (hash) + 1, sizeof save_hash);
++      return 1;
++    }
++  strcpy (save_hash, hash);
++
++  /* calling crypt should not have affected the contents of 'setting' */
++  if (strcmp (save_setting, setting))
++    {
++      printf ("FAIL: crypt_gensalt output changed by crypt\n(now \"%s\")\n",
++              setting);
++      return 1;
++    }
++
++  /* now call both crypt_gensalt and crypt in a second thread */
++  err = pthread_create (&th, 0, child, 0);
++  if (err)
++    {
++      printf ("ERROR: pthread_create: %s\n", strerror (err));
++      return 1;
++    }
++  err = pthread_join (th, &status);
++  if (err)
++    {
++      printf ("ERROR: pthread_join: %s\n", strerror (err));
++      return 1;
++    }
++  if (status)
++    return 1;
++
++  /* the other thread should not have affected the contents of 'setting'
++     or 'hash' */
++  if (strcmp (save_setting, setting) || strcmp (save_hash, hash))
++    {
++      printf ("FAIL: output changed by other thread\n"
++              "setting now = %s\n"
++              "hash now    = %s\n",
++              setting, hash);
++      return 1;
++    }
++  return 0;
++}
++
++#else
++
++int main(void)
++{
++  return 77;
++}
++
++#endif
+-- 
+2.51.1
+

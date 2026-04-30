@@ -1,0 +1,43 @@
+From c999bac950b817d229549d57f592980f4dc1655b Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@ieee.org>
+Date: Tue, 21 Apr 2026 14:00:20 -0400
+Subject: [PATCH] kdumpctl: Use only first match in
+ _find_kernel_path_by_release()
+
+Running 'grubby --info ALL' (or even for a specific kernel version)
+can return multiple entries for the same kernel version/release
+(usually with different append parameters, initrds, etc), so when
+grepping for a specific kernel version/release, we need to use only
+the first match.
+
+This results in kdumpctl failing with the error message (from grubby):
+  "The param $KERNELPATH\n$KERNELPATH is incorrect"
+replacing $KERNELPATH with the actual vmlinuz path.
+
+This bug is hidden when /boot is a separate partition, because the
+grubby script has regex ("/${param##*/}" = "${bls_linux[$i]}") which
+strips all duplicate lines and base path, and successfully matches
+"/vmlinuz-*".
+
+This is reproducable by simply moving the /boot contents into a normal
+dir in the rootfs (instead of separate fs).
+---
+ kdumpctl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kdumpctl b/kdumpctl
+index afcb19d..2c14148 100755
+--- a/kdumpctl
++++ b/kdumpctl
+@@ -1698,7 +1698,7 @@ _find_kernel_path_by_release()
+ 
+ 	# Insert '/' before '+' to cope with grep's EREs
+ 	_release=${_release//+/\\+}
+-	_grubby_kernel_str=$(grubby --info ALL | grep -E "^kernel=.*$_release(/\w+)?\"$")
++	_grubby_kernel_str=$(grubby --info ALL | grep -m 1 -E "^kernel=.*$_release(/\w+)?\"$")
+ 	_kernel_path=$(_filter_grubby_kernel_str "$_grubby_kernel_str")
+ 	if [[ -z $_kernel_path ]]; then
+ 		ddebug "kernel $_release doesn't exist"
+-- 
+2.51.0
+

@@ -1,0 +1,142 @@
+cabal-version:      3.0
+name:               toml-parser
+version:            2.0.1.0
+x-revision: 1
+synopsis:           TOML 1.0.0 parser
+description:
+    TOML parser using generated lexers and parsers with
+    careful attention to the TOML 1.0.0 semantics for
+    defining tables.
+license:            ISC
+license-file:       LICENSE
+author:             Eric Mertens
+maintainer:         emertens@gmail.com
+copyright:          2023 Eric Mertens
+category:           Text
+build-type:         Simple
+tested-with:        GHC == {8.10.7, 9.0.2, 9.2.8, 9.4.8, 9.6.5, 9.8.2, 9.10.1}
+
+extra-doc-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+    type: git
+    location: https://github.com/glguy/toml-parser
+    tag: main
+
+common extensions
+    default-language:   Haskell2010
+    default-extensions:
+        BlockArguments
+        DeriveDataTypeable
+        DeriveGeneric
+        DeriveTraversable
+        EmptyCase
+        FlexibleContexts
+        FlexibleInstances
+        GeneralizedNewtypeDeriving
+        ImportQualifiedPost
+        LambdaCase
+        ScopedTypeVariables
+        TypeOperators
+        TypeSynonymInstances
+        ViewPatterns
+
+library
+    import:             extensions
+    hs-source-dirs:     src
+    default-language:   Haskell2010
+    exposed-modules:
+        Toml
+        Toml.Pretty
+        Toml.Schema
+        Toml.Schema.FromValue
+        Toml.Schema.Generic
+        Toml.Schema.Generic.FromValue
+        Toml.Schema.Generic.ToValue
+        Toml.Schema.Matcher
+        Toml.Schema.ParseTable
+        Toml.Schema.ToValue
+        Toml.Semantics
+        Toml.Semantics.Ordered
+        Toml.Semantics.Types
+        Toml.Syntax
+        Toml.Syntax.Lexer
+        Toml.Syntax.Parser
+        Toml.Syntax.Position
+        Toml.Syntax.Token
+        Toml.Syntax.Types
+    other-modules:
+        Toml.Syntax.LexerUtils
+        Toml.Syntax.ParserUtils
+    build-depends:
+        array           ^>= 0.5,
+        base            ^>= {4.14, 4.15, 4.16, 4.17, 4.18, 4.19, 4.20, 4.21},
+        containers      ^>= {0.5, 0.6, 0.7},
+        prettyprinter   ^>= 1.7,
+        text            >= 0.2 && < 3,
+        time            ^>= {1.9, 1.10, 1.11, 1.12, 1.14},
+        transformers    ^>= {0.5, 0.6},
+    build-tool-depends:
+        alex:alex       >= 3.2,
+        happy:happy     >= 1.19,
+    if impl(ghc >= 9.8)
+        ghc-options: -Wno-x-partial
+
+test-suite unittests
+    import:             extensions
+    type:               exitcode-stdio-1.0
+    hs-source-dirs:     test
+    main-is:            Main.hs
+    default-extensions:
+        QuasiQuotes
+    build-tool-depends:
+        hspec-discover:hspec-discover ^>= {2.10, 2.11}
+    build-depends:
+        base,
+        containers,
+        hspec           ^>= {2.10, 2.11},
+        template-haskell ^>= {2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23},
+        text,
+        time,
+        toml-parser,
+    other-modules:
+        DecodeSpec
+        DerivingViaSpec
+        FromValueSpec
+        HieDemoSpec
+        LexerSpec
+        PrettySpec
+        QuoteStr
+        TomlSpec
+        ToValueSpec
+
+test-suite readme
+    import:             extensions
+    type:               exitcode-stdio-1.0
+    main-is:            README.lhs
+    ghc-options:        -pgmL markdown-unlit -optL "haskell toml"
+    default-extensions:
+        QuasiQuotes
+        DerivingVia
+    other-modules:
+        QuoteStr
+    hs-source-dirs:
+        .
+        test
+    build-depends:
+        base,
+        toml-parser,
+        hspec           ^>= {2.10, 2.11},
+        template-haskell ^>= {2.16, 2.17, 2.18, 2.19, 2.20, 2.21, 2.22, 2.23},
+        text,
+    build-tool-depends:
+        markdown-unlit:markdown-unlit ^>= {0.5.1, 0.6.0},
+
+executable toml-benchmarker
+    buildable: False
+    main-is: benchmarker.hs
+    default-language: Haskell2010
+    build-depends: base, toml-parser, time, text
+    hs-source-dirs: benchmarker

@@ -1,0 +1,50 @@
+cabal-version:      2.2
+name:               singleton-bool
+version:            0.1.8
+x-revision:         1
+synopsis:           Type level booleans
+description:
+  Type level booleans.
+  .
+  @singletons@ package provides similar functionality,
+  but it has tight dependency constraints.
+
+category:           Dependent Types
+homepage:           https://github.com/phadej/singleton-bool#readme
+bug-reports:        https://github.com/phadej/singleton-bool/issues
+author:             Oleg Grenrus <oleg.grenrus@iki.fi>
+maintainer:         Oleg Grenrus <oleg.grenrus@iki.fi>
+license:            BSD-3-Clause
+license-file:       LICENSE
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+tested-with:
+  GHC ==8.6.5
+   || ==8.8.4
+   || ==8.10.7
+   || ==9.0.2
+   || ==9.2.8
+   || ==9.4.8
+   || ==9.6.6
+   || ==9.8.4
+   || ==9.10.1
+   || ==9.12.1
+
+source-repository head
+  type:     git
+  location: https://github.com/phadej/singleton-bool
+
+library
+  hs-source-dirs:   src
+  ghc-options:      -Wall
+  build-depends:
+    , base     >=4.12.0.0 && <4.22
+    , deepseq  >=1.4.4.0  && <1.6
+
+  build-depends:
+    , boring  ^>=0.2.2
+    , dec     ^>=0.0.6
+    , some    ^>=1.0.6
+
+  exposed-modules:  Data.Singletons.Bool
+  default-language: Haskell2010

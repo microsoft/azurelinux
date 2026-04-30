@@ -1,0 +1,33 @@
+Name: mmorph
+Version: 1.2.0
+x-revision: 3
+Cabal-Version: >= 1.10
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE
+Copyright: 2013 Gabriella Gonzalez
+Author: Gabriella Gonzalez
+Maintainer: GenuineGabriella@gmail.com
+Bug-Reports: https://github.com/Gabriella439/Haskell-MMorph-Library/issues
+Synopsis: Monad morphisms
+Description: This library provides monad morphism utilities, most commonly used
+    for manipulating monad transformer stacks.
+Category: Control
+Extra-Source-Files: CHANGELOG.md
+Source-Repository head
+    Type: git
+    Location: https://github.com/Gabriella439/Haskell-MMorph-Library
+
+Library
+    Hs-Source-Dirs: src
+    Build-Depends:
+        base                >= 4.5     && < 5  ,
+        mtl                 >= 2.1     && < 2.4,
+        transformers        >= 0.2.0.0 && < 0.7,
+        transformers-compat >= 0.3     && < 0.8
+    if impl(ghc < 8.0)
+        Build-Depends:
+            fail == 4.9.*
+    Exposed-Modules: Control.Monad.Morph, Control.Monad.Trans.Compose
+    GHC-Options: -O2
+    Default-Language: Haskell2010

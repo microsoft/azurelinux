@@ -1,0 +1,14 @@
+summary: Fonts related tests
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/fonts
+prepare:
+    name: tmt
+    how: install
+    package: dejavu-sans-fonts
+execute:
+    how: tmt
+environment:
+    PACKAGE: dejavu-sans-fonts
+    FONT_ALIAS: sans-serif
+    FONT_FAMILY: DejaVu Sans

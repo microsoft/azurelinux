@@ -1,0 +1,15 @@
+summary: Fonts related tests
+discover:
+    how: fmf
+    url: https://src.fedoraproject.org/tests/fonts
+prepare:
+    name: tmt
+    how: install
+    package: liberation-mono-fonts
+execute:
+    how: tmt
+environment:
+    PACKAGE: liberation-mono-fonts
+    FONT_ALIAS: Courier New
+    FONT_FAMILY: Liberation Mono
+    FONT_LANG: en

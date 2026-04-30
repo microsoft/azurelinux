@@ -1,0 +1,22 @@
+From 7041982b69fa9fea065098e7b33f306df1dcac91 Mon Sep 17 00:00:00 2001
+From: Michael Webster <miketwebster@gmail.com>
+Date: Tue, 14 Jan 2020 16:51:20 -0500
+Subject: [PATCH] mintlocale.py: Fix signal name typo.
+
+---
+ usr/lib/linuxmint/mintlocale/mintlocale.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/lib/linuxmint/mintlocale/mintlocale.py b/usr/lib/linuxmint/mintlocale/mintlocale.py
+index e7db8e4..d145073 100755
+--- a/usr/lib/linuxmint/mintlocale/mintlocale.py
++++ b/usr/lib/linuxmint/mintlocale/mintlocale.py
+@@ -430,7 +430,7 @@ def __init__(self):
+ 
+         self.accountService = AccountsService.UserManager.get_default().get_user(current_user)
+         self.accountService.connect('notify::is-loaded', self.accountservice_ready)
+-        self.accountService.connect('changed::', self.accountservice_changed)
++        self.accountService.connect('changed', self.accountservice_changed)
+ 
+         groups = grp.getgrall()
+         for group in groups:

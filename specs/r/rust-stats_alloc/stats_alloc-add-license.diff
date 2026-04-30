@@ -1,0 +1,51 @@
+From 60c1c1b295c5398401bf8f43aebd3794a543f84f Mon Sep 17 00:00:00 2001
+From: Michel Alexandre Salim <salimma@fedoraproject.org>
+Date: Sun, 22 Jan 2023 14:04:40 -0600
+Subject: [PATCH] Add license text
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This project is MIT licensed; the license terms require that
+redistributed sources (e.g. that carried by Linux distributions) contain
+a copy of the license text.
+
+```
+stats_alloc on  add-license [+]
+❯ cargo package --allow-dirty --no-verify
+   Packaging stats_alloc v0.1.10 (/home/michel/src/github/neoeinstein/stats_alloc)
+
+stats_alloc on  add-license [+]
+❯ tar tf target/package/stats_alloc-0.1.10.crate | grep LICENSE
+stats_alloc-0.1.10/LICENSE
+```
+
+Signed-off-by: Michel Alexandre Salim <salimma@fedoraproject.org>
+---
+ LICENSE | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+ create mode 100644 LICENSE
+
+diff --git a/LICENSE b/LICENSE
+new file mode 100644
+index 0000000..d5075a3
+--- /dev/null
++++ b/LICENSE
+@@ -0,0 +1,17 @@
++Permission is hereby granted, without written agreement and without
++license or royalty fees, to use, copy, modify, and distribute this
++software and its documentation for any purpose, provided that the
++above copyright notice and the following two paragraphs appear in
++all copies of this software.
++
++IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE TO ANY PARTY FOR
++DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
++ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN
++IF THE COPYRIGHT HOLDER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
++DAMAGE.
++
++THE COPYRIGHT HOLDER SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
++BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
++FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
++ON AN "AS IS" BASIS, AND THE COPYRIGHT HOLDER HAS NO OBLIGATION TO
++PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.

@@ -1,0 +1,53 @@
+name:                th-abstraction
+version:             0.7.1.0
+x-revision: 1
+synopsis:            Nicer interface for reified information about data types
+description:         This package normalizes variations in the interface for
+                     inspecting datatype information via Template Haskell
+                     so that packages and support a single, easier to use
+                     informational datatype while supporting many versions
+                     of Template Haskell.
+license:             ISC
+license-file:        LICENSE
+author:              Eric Mertens
+maintainer:          emertens@gmail.com
+copyright:           2017 Eric Mertens
+homepage:            https://github.com/glguy/th-abstraction
+bug-reports:         https://github.com/glguy/th-abstraction/issues
+category:            Development
+build-type:          Simple
+extra-source-files:  ChangeLog.md README.md
+cabal-version:       >=1.10
+tested-with:         GHC==9.12.1, GHC==9.10.1, GHC==9.8.4, GHC==9.6.6, GHC==9.4.8, GHC==9.2.8, GHC==9.0.2, GHC==8.10.7, GHC==8.8.4, GHC==8.6.5, GHC==8.4.4, GHC==8.2.2, GHC==8.0.2
+
+source-repository head
+  type: git
+  location: https://github.com/glguy/th-abstraction.git
+
+library
+  exposed-modules:     Language.Haskell.TH.Datatype
+                       Language.Haskell.TH.Datatype.TyVarBndr
+  other-modules:       Language.Haskell.TH.Datatype.Internal
+  build-depends:       base             >=4.9   && <5,
+                       ghc-prim,
+                       template-haskell >=2.11  && <2.24,
+                       containers       >=0.4   && <0.9
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+  if impl(ghc >= 9.0)
+    -- these flags may abort compilation with GHC-8.10
+    -- https://gitlab.haskell.org/ghc/ghc/-/merge_requests/3295
+    ghc-options: -Winferred-safe-imports -Wmissing-safe-haskell-mode
+
+test-suite unit-tests
+  other-modules:       Harness
+                       Types
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  build-depends:       th-abstraction, base, containers, template-haskell
+  hs-source-dirs:      test
+  default-language:    Haskell2010
+
+  if impl(ghc >= 8.6)
+    ghc-options:       -Wno-star-is-type
