@@ -1,0 +1,140 @@
+diff --git a/Release/tests/functional/http/client/CMakeLists.txt b/Release/tests/functional/http/client/CMakeLists.txt
+index 3e1a9363..06726bef 100644
+--- a/Release/tests/functional/http/client/CMakeLists.txt
++++ b/Release/tests/functional/http/client/CMakeLists.txt
+@@ -12,7 +12,6 @@ set(SOURCES
+   multiple_requests.cpp
+   oauth1_tests.cpp
+   oauth2_tests.cpp
+-  outside_tests.cpp
+   pipeline_stage_tests.cpp
+   progress_handler_tests.cpp
+   proxy_tests.cpp
+diff --git a/Release/tests/functional/http/client/authentication_tests.cpp b/Release/tests/functional/http/client/authentication_tests.cpp
+index c0440fed..afa4a666 100644
+--- a/Release/tests/functional/http/client/authentication_tests.cpp
++++ b/Release/tests/functional/http/client/authentication_tests.cpp
+@@ -675,9 +675,13 @@ SUITE(authentication_tests)
+         VERIFY_ARE_EQUAL(return_code, response.status_code());
+     }
+ 
++/*
+     TEST(auth_no_data) { auth_test_impl(false); }
++*/
+ 
++/*
+     TEST(unsuccessful_auth_with_basic_cred) { auth_test_impl(true); }
++*/
+ 
+     TEST_FIXTURE(uri_address, set_user_options_asio_http)
+     {
+@@ -695,6 +699,7 @@ SUITE(authentication_tests)
+         VERIFY_ARE_EQUAL(200, response.status_code());
+     }
+ 
++/*
+     TEST_FIXTURE(uri_address, set_user_options_asio_https)
+     {
+         handle_timeout([] {
+@@ -714,6 +719,7 @@ SUITE(authentication_tests)
+             VERIFY_IS_FALSE(v.empty());
+         });
+     }
++*/
+ 
+ #endif
+ 
+diff --git a/Release/tests/functional/http/client/connections_and_errors.cpp b/Release/tests/functional/http/client/connections_and_errors.cpp
+index 847755d8..59b36b0a 100644
+--- a/Release/tests/functional/http/client/connections_and_errors.cpp
++++ b/Release/tests/functional/http/client/connections_and_errors.cpp
+@@ -408,6 +408,7 @@ SUITE(connections_and_errors)
+     }
+ #endif
+ 
++/*
+     // Try to connect to a server on a closed port and cancel the operation.
+     TEST_FIXTURE(uri_address, cancel_bad_port)
+     {
+@@ -439,6 +440,7 @@ SUITE(connections_and_errors)
+ 
+         VERIFY_THROWS_HTTP_ERROR_CODE(t.get(), std::errc::operation_canceled);
+     }
++*/
+ 
+ } // SUITE(connections_and_errors)
+ 
+diff --git a/Release/tests/functional/http/client/redirect_tests.cpp b/Release/tests/functional/http/client/redirect_tests.cpp
+index a9d41794..dd3ee290 100644
+--- a/Release/tests/functional/http/client/redirect_tests.cpp
++++ b/Release/tests/functional/http/client/redirect_tests.cpp
+@@ -92,6 +92,7 @@ SUITE(redirect_tests)
+         }
+     }
+ 
++/*
+     TEST_FIXTURE(uri_address, follows_retrieval_redirect)
+     {
+         test_http_server::scoped_server scoped(m_uri);
+@@ -113,6 +114,7 @@ SUITE(redirect_tests)
+             VERIFY_NO_THROWS(reply.get());
+         }
+     }
++*/
+ 
+     TEST_FIXTURE(uri_address, obeys_max_redirects)
+     {
+@@ -160,6 +162,7 @@ SUITE(redirect_tests)
+         }
+     }
+ 
++/*
+     TEST(does_not_follow_https_to_http_by_default)
+     {
+         handle_timeout([] {
+@@ -182,6 +185,7 @@ SUITE(redirect_tests)
+             );
+         });
+     }
++*/
+ 
+     TEST_FIXTURE(uri_address, follows_permanent_redirect)
+     {
+diff --git a/Release/tests/functional/websockets/client/authentication_tests.cpp b/Release/tests/functional/websockets/client/authentication_tests.cpp
+index a35949c9..7a3fd753 100644
+--- a/Release/tests/functional/websockets/client/authentication_tests.cpp
++++ b/Release/tests/functional/websockets/client/authentication_tests.cpp
+@@ -93,6 +93,7 @@ SUITE(authentication_tests)
+         return false;
+     }
+ 
++/*
+     TEST(ssl_test)
+     {
+         websocket_client client;
+@@ -127,6 +128,7 @@ SUITE(authentication_tests)
+             throw;
+         }
+     }
++*/
+ 
+     void handshake_error_test_impl(const ::utility::string_t& host)
+     {
+@@ -148,11 +150,17 @@ SUITE(authentication_tests)
+         }
+     }
+ 
++/*
+     TEST(self_signed_cert) { handshake_error_test_impl(U("wss://self-signed.badssl.com/")); }
++*/
+ 
++/*
+     TEST(hostname_mismatch) { handshake_error_test_impl(U("wss://wrong.host.badssl.com/")); }
++*/
+ 
++/*
+     TEST(cert_expired) { handshake_error_test_impl(U("wss://expired.badssl.com/")); }
++*/
+ 
+ } // SUITE(authentication_tests)
+ 

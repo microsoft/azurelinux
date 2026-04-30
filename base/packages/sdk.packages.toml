@@ -17632,6 +17632,7 @@ packages = [
     "wavpack", # srpm: wavpack
     "wavpack-devel", # srpm: wavpack
     "wayland-protocols-devel", # srpm: wayland-protocols
+    "websocketpp-devel", # srpm: websocketpp
     "weezl", # srpm: rust-weezl
     "weston", # srpm: weston
     "weston-demo", # srpm: weston

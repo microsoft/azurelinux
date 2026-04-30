@@ -1,0 +1,44 @@
+From ee4de21456209926ae67cd6e084ed4c5b44e3d48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Wolfgang=20St=C3=B6ggl?= <c72578@yahoo.de>
+Date: Tue, 28 Apr 2020 08:47:38 +0200
+Subject: [PATCH] Revert "libcpprestsdk: fix building as a static library
+ (#1344)"
+
+This reverts commit cb7ca74e5f3bdbde363ed4ddb5655e76931397bd.
+
+Issues concerning linking (#1388) and cross compiling (#1378) have
+been reported.
+
+- Fixes #1388
+---
+ Release/cmake/cpprest_find_openssl.cmake | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
+
+diff --git a/Release/cmake/cpprest_find_openssl.cmake b/Release/cmake/cpprest_find_openssl.cmake
+index 933366360..fc4465765 100644
+--- a/Release/cmake/cpprest_find_openssl.cmake
++++ b/Release/cmake/cpprest_find_openssl.cmake
+@@ -43,15 +43,7 @@ function(cpprest_find_openssl)
+       message(STATUS "OPENSSL_ROOT_DIR = ${OPENSSL_ROOT_DIR}")
+       set(_OPENSSL_VERSION "")
+     endif()
+-    if(UNIX)
+-      find_package(PkgConfig)
+-      pkg_search_module(OPENSSL openssl)
+-    endif()
+-    if(OPENSSL_FOUND)
+-      target_link_libraries(cpprest PRIVATE ${OPENSSL_LDFLAGS})
+-    else()
+-      find_package(OpenSSL 1.0.0 REQUIRED)
+-    endif()
++    find_package(OpenSSL 1.0.0 REQUIRED)
+ 
+     INCLUDE(CheckCXXSourceCompiles)
+     set(CMAKE_REQUIRED_INCLUDES "${OPENSSL_INCLUDE_DIR}")
+@@ -77,4 +69,4 @@ function(cpprest_find_openssl)
+     # libressl doesn't ship with the cleanup method being used in ws_client_wspp
+     target_compile_definitions(cpprestsdk_openssl_internal INTERFACE -DCPPREST_NO_SSL_LEAK_SUPPRESS)
+   endif()
+-endfunction()
++endfunction()
+\ No newline at end of file

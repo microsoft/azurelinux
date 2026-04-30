@@ -401,6 +401,8 @@ packages = [
     "corosynclib-devel", # srpm: corosync
     "cpio", # srpm: cpio
     "cpp", # srpm: gcc
+    "cpprest", # srpm: cpprest
+    "cpprest-devel", # srpm: cpprest
     "cppunit", # srpm: cppunit
     "cppunit-devel", # srpm: cppunit
     "cpuinfo", # srpm: cpuinfo

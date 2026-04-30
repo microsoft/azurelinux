@@ -1,0 +1,15 @@
+--- a/CMakeLists.txt	2018-10-31 13:58:03.000000000 +0100
++++ b/CMakeLists.txt	2018-10-31 14:21:06.251424022 +0100
+@@ -266,9 +266,11 @@
+   INSTALL_DESTINATION "${INSTALL_CMAKE_DIR}"
+   NO_CHECK_REQUIRED_COMPONENTS_MACRO
+ )
++# disable check for same 32/64bit-ness in websocketpp-configVersion.cmake by setting CMAKE_SIZEOF_VOID_P
++set (CMAKE_SIZEOF_VOID_P "")
+ write_basic_package_version_file("${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/websocketpp-configVersion.cmake"
+   VERSION ${WEBSOCKETPP_VERSION}
+-  COMPATIBILITY ExactVersion)
++  COMPATIBILITY AnyNewerVersion)
+ 
+ # Install the websocketpp-config.cmake and websocketpp-configVersion.cmake
+ install (FILES
