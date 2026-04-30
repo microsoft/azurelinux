@@ -1,0 +1,5 @@
+# Managed by azldev component update. Do not edit manually.
+version = 1
+import-commit = '91824d85dd3d64316176e1fe9257896c1b42e530'
+upstream-commit = '91824d85dd3d64316176e1fe9257896c1b42e530'
+input-fingerprint = 'sha256:70d67551390f8609c1aa2ef8a14f2ec0d78d86f0a775105acbe89e792428b82f'
