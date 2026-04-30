@@ -73,7 +73,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml"]
 [components.alsa-lib]
 [components.aml]
 [components.amtterm]
-[components.anaconda]
+
 [components.annobin]
 [components.ansible]
 [components.ansible-collection-ansible-posix]
