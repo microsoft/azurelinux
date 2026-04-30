@@ -1,0 +1,70 @@
+# Pipeline workflow test labels for Azure Linux CI/CD
+# These labels map image capabilities to appropriate CI/CD test stages
+
+[pr_validation]
+# Fast validation for pull request gates
+pr_smoke = {
+    description = "Minimal smoke tests for PR validation"
+    framework_labels = ["tmt_tier0", "lisa_priority0", "openqa_install_smoke"]
+    required_capabilities = ["azure-vm-gen2","azure-vm_gen1"]
+}
+
+pr_smoke_container = {
+    description = "Component-specific tests based on PR changes"
+    framework_labels = ["base_container", "golden_container"]
+    required_capabilities = ["oci-container"]
+}
+
+[nightly_validation]
+# Comprehensive nightly test runs
+nightly_comprehensive = {
+    description = "Full test suite execution nightly"
+    framework_labels = ["tmt_tier2", "lisa_priority2", "openqa_desktop_full", "openqa_server_complete"]
+    required_capabilities = ["azure-vm-gen2", "azure-vm-gen1", "publish_channels"]
+}
+
+nightly_performance = {
+    description = "Performance regression testing"
+    framework_labels = ["lisa_storage_performance", "tmt_beakerlib_integration"]
+    required_capabilities = ["azure-vm-gen2"]
+}
+
+[release_validation]
+# Release gate validation
+release_gate = {
+    description = "Final validation before release"
+    framework_labels = ["tmt_tier2", "lisa_main", "lisa_perf", "openqa_install_comprehensive", "openqa_desktop_full", "openqa_server_complete"]
+    required_capabilities = ["azure-vm-gen2", "azure-vm-gen1"]
+}
+
+release_security = {
+    description = "Security validation for release"
+    framework_labels = ["tmt_security_tests", "lisa_azure_validation"]
+    required_capabilities = ["azure-vm-gen2", "azure-vm-gen1"]
+}
+
+release_compatibility = {
+    description = "Hardware and platform compatibility"
+    framework_labels = ["lisa_hardware_validation", "lisa_hyperv_compatibility", "openqa_update_smoke"]
+    required_capabilities = ["azure-vm-gen2"]
+}
+
+[custom_validation]
+# Specialized validation workflows
+container_focused = {
+    description = "Container and virtualization validation"
+    framework_labels = ["tmt_container_tests", "lisa_virtualization", "openqa_server_basic"]
+    required_capabilities = ["azure-vm-gen2", "azure-vm-gen1"]
+}
+
+developer_smoke = {
+    description = "Quick developer validation"
+    framework_labels = ["tmt_shell_smoke", "tmt_pytest_unit", "lisa_core_smoke"]
+    required_capabilities = ["azure-vm-gen2"]
+}
+
+full_capability_tests = {
+    description = "Tests for full-featured images"
+    framework_labels = ["tmt_tier1", "lisa_priority1", "openqa_desktop_smoke"]
+    required_capabilities = ["azure-vm-gen2", "azure-vm-gen1"]
+}
