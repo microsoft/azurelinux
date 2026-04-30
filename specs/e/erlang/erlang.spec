@@ -70,7 +70,7 @@
 # reltool (*)
 # wx
 #
-%global __with_wxwidgets 1
+%global __with_wxwidgets 0
 
 
 Name:		erlang
@@ -613,29 +613,29 @@ MIB compiler and tools for creating SNMP agents.
 %package src
 Summary: Erlang sources
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
-Requires: %{name}-common_test%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
-Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
-Requires: %{name}-dialyzer%{?_isa} = %{version}-%{release}
+
+
 Requires: %{name}-diameter%{?_isa} = %{version}-%{release}
 Requires: %{name}-edoc%{?_isa} = %{version}-%{release}
 Requires: %{name}-eldap%{?_isa} = %{version}-%{release}
 Requires: %{name}-erl_docgen%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-et%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-eunit%{?_isa} = %{version}-%{release}
 Requires: %{name}-ftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-megaco%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
-Requires: %{name}-observer%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-odbc%{?_isa} = %{version}-%{release}
 Requires: %{name}-os_mon%{?_isa} = %{version}-%{release}
 Requires: %{name}-parsetools%{?_isa} = %{version}-%{release}
 Requires: %{name}-public_key%{?_isa} = %{version}-%{release}
-Requires: %{name}-reltool%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
 Requires: %{name}-snmp%{?_isa} = %{version}-%{release}
@@ -645,7 +645,7 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-tftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-xmerl%{?_isa} = %{version}-%{release}
 
 %description src

@@ -4,3 +4,40 @@
 
 [components.erlang.build]
 without = ["doc"]
+
+# Disable the erlang-wx sub-package (Erlang's wxWidgets bindings). AZL is a
+# headless cloud distro and does not ship wxGTK; building erlang-wx would
+# pull in a desktop GUI stack at build time and would force every other
+# erlang sub-package whose %if %{__with_wxwidgets} block adds a
+# `Requires: erlang-wx` (erlang-meta, -debugger, -dialyzer, -et, -observer,
+# -reltool, -src) to drag the wx subpackage into the runtime closure.
+#
+# The upstream spec already supports this configuration via the
+# `%global __with_wxwidgets` toggle: when set to 0, every wx-conditional
+# `%package wx` definition, every `Requires: %{name}-wx` line, and the
+# wxGTK BuildRequires are skipped wholesale. Flipping the global is by
+# far the most surgical fix.
+[[components.erlang.overlays]]
+description = "Disable erlang-wx sub-package (wxGTK GUI bindings) — AZL is a headless cloud distro"
+type = "spec-search-replace"
+regex = '^%global __with_wxwidgets 1$'
+replacement = '%global __with_wxwidgets 0'
+
+# The erlang-src %package preamble lives inside `%if %{__with_sources}` and
+# carries unconditional `Requires: %{name}-<sub>` lines for every other
+# sub-package — including all of the wxwidgets-gated ones (common_test,
+# debugger, dialyzer, et, megaco, observer, reltool, wx). Because these
+# Requires are NOT wrapped in `%if %{__with_wxwidgets}`, flipping the
+# toggle alone leaves erlang-src demanding sub-packages that are no longer
+# built. Strip every such line so the rebuilt erlang-src RPM does not pull
+# in now-nonexistent sub-packages. Scope the regex to `%package src` so it
+# only targets these unconditional Requires; equivalent lines elsewhere in
+# the spec are already inside `%if %{__with_wxwidgets}` blocks and are
+# dead code under the toggle, so they stay untouched.
+[[components.erlang.overlays]]
+description = "Drop unconditional Requires for wxwidgets-gated sub-packages from erlang-src (paired with __with_wxwidgets=0 above)"
+type = "spec-search-replace"
+section = "%package"
+package = "src"
+regex = '^Requires: %\{name\}-(common_test|debugger|dialyzer|et|megaco|observer|reltool|wx)%\{\?_isa\} = %\{version\}-%\{release\}$'
+replacement = ''
