@@ -573,6 +573,7 @@ packages = [
     "docbook2X", # srpm: docbook2X
     "docbook5-schemas", # srpm: docbook5-schemas
     "docbook5-style-xsl", # srpm: docbook5-style-xsl
+    "docker-buildx", # srpm: docker-buildx
     "docker-cli", # srpm: moby-engine
     "docker-compose", # srpm: docker-compose
     "dogtag-jss", # srpm: jss
