@@ -189,9 +189,12 @@ func processPackageVersionString(packageVersionString string, specFileName strin
 	release := releaseVerSplit[2]
 	releaseClean := strings.Replace(release, distTag, "", 1)
 
-	// strip out the .spec suffix and replace '-' with '_' as RPM macros cannot have '-'
+	// strip out the .spec suffix and replace characters invalid in RPM macro names with '_'
+	// RPM macro names may only contain alphanumeric characters and underscores.
 	packageFileNameMacroFormat := strings.Replace(specFileName, ".spec", "", 1)
 	packageFileNameMacroFormat = strings.ReplaceAll(packageFileNameMacroFormat, "-", "_")
+	packageFileNameMacroFormat = strings.ReplaceAll(packageFileNameMacroFormat, ".", "_")
+	packageFileNameMacroFormat = strings.ReplaceAll(packageFileNameMacroFormat, "+", "_")
 
 	epochReleaseString := prefix + "_" + packageFileNameMacroFormat + "_epoch"
 	versionMacroString := prefix + "_" + packageFileNameMacroFormat + "_version"
