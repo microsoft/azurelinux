@@ -24,7 +24,7 @@ Version:                2.22.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition-flatcar
-Release:        1%{?dist}
+Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        First boot installer and configuration tool
@@ -53,6 +53,7 @@ Patch16:        0017-revert-internal-oem-drop-noop-OEMs.patch
 Patch17:        0018-docs-Add-re-added-platforms-to-docs-to-pass-tests.patch
 Patch18:        0019-usr-share-oem-oem.patch
 Patch19:        0020-internal-exec-stages-mount-Mount-oem.patch
+Patch20:        CVE-2026-27141.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
@@ -201,6 +202,9 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-2
+- Patch for CVE-2026-27141
+
 * Fri Jan 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.22.0-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
