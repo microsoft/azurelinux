@@ -16,6 +16,8 @@ azl_pkgrelease = "8"
 kextraversion = "1"
 # CBL-Mariner branch number (used in tarball path)
 azurelinux_version = "3"
+# NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
+nvidia_open_version = "595.58.03"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
@@ -23,6 +25,13 @@ filename = "kernel-6.18.5.1.tar.gz"
 hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
 hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+
+# Download the NVIDIA open GPU kernel module source tarball
+[[components.kernel.source-files]]
+filename = "open-gpu-kernel-modules-595.58.03.tar.gz"
+hash = "e0c4659ddf15e4f4e19cee05b49f88c9ba08ef3add0dfe08249798f58d0fe75e"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/595.58.03.tar.gz" }
 
 # Insert version and release information from the component defines into the spec file, and update the source URL to match the AzureLinux kernel source structure
 [[components.kernel.overlays]]
@@ -152,4 +161,147 @@ lines = [
     "RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}",
     "cd ../..",
     "%endif",
+]
+
+# ============================================================================
+# kmod subpackage framework — modular kmod builds alongside the kernel
+#
+# This framework allows building out-of-tree kernel modules as subpackages of
+# the kernel RPM. Each kmod is defined in its own .inc file (e.g.
+# kmod-nvidia-open.inc) with phase-gated sections that run at each RPM build
+# phase (%description, %prep, %build, %install, %files).
+#
+# To add a new kmod:
+#   1. Create kmod-<name>.inc with phase-gated sections
+#   2. Add file-add overlays for .inc and any extra source files
+#   3. Add spec-insert-tag overlays to register sources (Source6xxx range)
+#   4. Add spec-append-lines overlays for each build phase
+#   5. Register the name in kmod_subpackages in kmod-macros.inc
+# ============================================================================
+
+# --- kmod framework registration ---
+
+[[components.kernel.overlays]]
+description = "Add kmod-macros.inc framework file to sources"
+type = "file-add"
+file = "kmod-macros.inc"
+source = "kmod-macros.inc"
+
+[[components.kernel.overlays]]
+description = "Register kmod-macros.inc as Source5999"
+type = "spec-insert-tag"
+tag = "Source5999"
+value = "kmod-macros.inc"
+
+[[components.kernel.overlays]]
+description = "Include kmod-macros.inc framework after genspec variables — defines kmod_subpackages list"
+type = "spec-search-replace"
+regex = "# End of genspec.sh variables"
+replacement = """# End of genspec.sh variables
+
+# AZL: kmod subpackage framework
+%include %{_sourcedir}/kmod-macros.inc"""
+
+# --- kmod-nvidia-open: source file registration ---
+# Registers the NVIDIA open GPU kernel module sources and configuration files.
+# Source numbers 6000-6099 are reserved for nvidia-open.
+
+[[components.kernel.overlays]]
+description = "Add kmod-nvidia-open.inc subpackage definition to sources"
+type = "file-add"
+file = "kmod-nvidia-open.inc"
+source = "kmod-nvidia-open.inc"
+
+[[components.kernel.overlays]]
+description = "Add NVIDIA modprobe config file for kmod-nvidia-open subpackage"
+type = "file-add"
+file = "kmod-nvidia-open-modprobe.conf"
+source = "kmod-nvidia-open-modprobe.conf"
+
+[[components.kernel.overlays]]
+description = "Register NVIDIA open-gpu-kernel-modules tarball as Source6000"
+type = "spec-insert-tag"
+tag = "Source6000"
+value = "open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz"
+
+[[components.kernel.overlays]]
+description = "Register NVIDIA modprobe config as Source6001"
+type = "spec-insert-tag"
+tag = "Source6001"
+value = "kmod-nvidia-open-modprobe.conf"
+
+[[components.kernel.overlays]]
+description = "Register kmod-nvidia-open.inc as Source6002"
+type = "spec-insert-tag"
+tag = "Source6002"
+value = "kmod-nvidia-open.inc"
+
+# --- kmod-nvidia-open: phase injection ---
+# RPM %include is a preprocessor directive — it must appear directly in the spec
+# text (not inside a %define macro). Each phase sets _kmod_phase and _kmod_name
+# globals, then includes the kmod .inc file. The .inc file's %if guards select
+# the correct section for that phase.
+#
+# To add a new kmod: duplicate the phase blocks below, pointing to the
+# new kmod-<name>.inc file.
+
+[[components.kernel.overlays]]
+description = "Run kmod 'package' phase after main %description — declares kmod subpackages"
+type = "spec-append-lines"
+section = "%description"
+lines = [
+    "",
+    "# AZL: kmod subpackage declarations",
+    "%global _kmod_phase package",
+    "%global _kmod_name nvidia-open",
+    "%include %{_sourcedir}/kmod-nvidia-open.inc",
+]
+
+[[components.kernel.overlays]]
+description = "Run kmod 'prep' phase at end of %prep — extracts kmod source tarballs"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "",
+    "# AZL: Prepare kmod subpackage sources",
+    "%global _kmod_phase prep",
+    "%global _kmod_name nvidia-open",
+    "%include %{_sourcedir}/kmod-nvidia-open.inc",
+]
+
+[[components.kernel.overlays]]
+description = "Run kmod 'build' phase at end of %build — compiles kmod modules against the just-built kernel"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "",
+    "# AZL: Build kmod subpackage modules",
+    "%global _kmod_phase build",
+    "%global _kmod_name nvidia-open",
+    "%include %{_sourcedir}/kmod-nvidia-open.inc",
+]
+
+[[components.kernel.overlays]]
+description = "Run kmod 'install' phase at end of %install — installs kmod modules, configs, and licenses"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# AZL: Install kmod subpackage files",
+    "%global _kmod_phase install",
+    "%global _kmod_name nvidia-open",
+    "%include %{_sourcedir}/kmod-nvidia-open.inc",
+]
+
+[[components.kernel.overlays]]
+description = "Run kmod 'files' phase after %files modules-extra-matched — adds %post/%postun/%files for each kmod subpackage"
+type = "spec-append-lines"
+section = "%files"
+package = "modules-extra-matched"
+lines = [
+    "",
+    "# AZL: kmod subpackage file lists and scriptlets",
+    "%global _kmod_phase files",
+    "%global _kmod_name nvidia-open",
+    "%include %{_sourcedir}/kmod-nvidia-open.inc",
 ]
