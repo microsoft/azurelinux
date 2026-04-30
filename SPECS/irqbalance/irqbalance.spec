@@ -24,8 +24,13 @@ interrupts across all of a systems cpus.
 %build
 sed -i 's/libsystemd-journal/libsystemd/' configure.ac
 ./autogen.sh
+# Override pkgconfdir (defaults to $prefix/etc/default => /usr/etc/default)
+# so configure substitutes @pkgconfdir@ in misc/irqbalance.service to a path
+# under %{_sysconfdir}, and `make install` lays irqbalance.env there too.
 ./configure \
     --prefix=%{_prefix} \
+    --sysconfdir=%{_sysconfdir} \
+    --with-pkgconfdir=%{_sysconfdir}/sysconfig \
     --disable-static \
     --with-systemd
 
@@ -33,10 +38,19 @@ make %{?_smp_mflags}
 
 %install
 make DESTDIR=%{buildroot} install
-rm -rf %{buildroot}%{_prefix}/etc
-install -D -m 0644 misc/irqbalance.env %{buildroot}/etc/sysconfig/irqbalance
-sed -i 's#/path/to/irqbalance.env#/etc/sysconfig/irqbalance#' misc/irqbalance.service
-install -D -m 0644 misc/irqbalance.service %{buildroot}%{_prefix}/lib/systemd/system/irqbalance.service
+# Upstream ships the env file as 'irqbalance.env'; rename to the historical
+# Azure Linux path '/etc/sysconfig/irqbalance' and update the unit to match.
+mv %{buildroot}%{_sysconfdir}/sysconfig/irqbalance.env \
+   %{buildroot}%{_sysconfdir}/sysconfig/irqbalance
+# Upstream's `make install` only installs the systemd unit when pkg-config
+# exposes systemd's `systemdsystemunitdir`; in our build env that lookup
+# can come back empty, leaving the unit uninstalled. Install it manually
+# (configure has already substituted @pkgconfdir@ -> /etc/sysconfig in it)
+# and fix up the EnvironmentFile path to match the renamed env file.
+sed -i 's#/etc/sysconfig/irqbalance\.env#/etc/sysconfig/irqbalance#' \
+    misc/irqbalance.service
+install -D -m 0644 misc/irqbalance.service \
+    %{buildroot}%{_prefix}/lib/systemd/system/irqbalance.service
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -63,6 +77,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 - Remove IRQBALANCE_ARGS patch (now upstream)
 - Add ENOSPC handling with slot-aware placement and fallback
 - Honor balance_level policy for domain-assigned IRQs
+- Pass --with-pkgconfdir=%{_sysconfdir}/sysconfig so configure substitutes
+  @pkgconfdir@ in the unit to /etc/sysconfig (instead of /usr/etc/default),
+  and drop the obsolete /path/to/irqbalance.env sed which no longer matches.
 
 * Mon Jul 01 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.9.3-2
 - Define IRQBALANCE_ARGS variable in EnvironmentFile for irqbalance.service
