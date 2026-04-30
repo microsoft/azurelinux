@@ -155,6 +155,9 @@ Distribution:   Azure Linux
 %%description
 Test spec.
 
+%%files
+%%defattr(-,root,root)
+
 %%changelog
 * Mon Oct 11 2021 Test User <test@test.com> %s-%s
 - Test entry.
@@ -275,6 +278,15 @@ Summary:        Libraries
 %description libs
 Libs.
 
+%files
+%defattr(-,root,root)
+
+%files devel
+%defattr(-,root,root)
+
+%files libs
+%defattr(-,root,root)
+
 %changelog
 * Mon Oct 11 2021 Test User <test@test.com> 4.0.0-3
 - Test entry.
@@ -286,12 +298,17 @@ Libs.
 	arch := testBuildArch(t)
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	// With --srpm, rpmspec returns the source RPM entry (1 result).
-	require.Len(t, macros, 2)
+	// With --builtrpms, rpmspec returns one entry per built binary RPM:
+	// the default package plus the 'devel' and 'libs' subpackages = 3 entries,
+	// each producing a version and a release macro = 6 macros total.
+	// The macros are keyed off the spec file name, so all entries share the
+	// same '%azl_multipkg_*' macro names.
+	require.Len(t, macros, 6)
 
-	assert.NotContains(t, macros[0], "%azl_multipkg_epoch ")
-	assert.Contains(t, macros[0], "%azl_multipkg_version 4.0.0")
-	assert.Contains(t, macros[1], "%azl_multipkg_release 3")
+	combined := strings.Join(macros, "\n")
+	assert.NotContains(t, combined, "%azl_multipkg_epoch ")
+	assert.Contains(t, combined, "%azl_multipkg_version 4.0.0")
+	assert.Contains(t, combined, "%azl_multipkg_release 3")
 }
 
 func TestProcessSpecFile_NonexistentFile(t *testing.T) {
