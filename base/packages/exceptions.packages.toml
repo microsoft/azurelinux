@@ -254,7 +254,7 @@ packages = [
     "cockpit-ha-cluster", # srpm: pcs
     # maven-doxia-module-markdown: pulls in flexmark-java (54 sub-pkgs) for Markdown rendering; the rest of maven-doxia (core, sink-api, modules apt/xdoc/xhtml5/fml) is foundational Maven plumbing needed in base by maven-doxia-sitetools / maven-reporting-impl / javacc-maven-plugin. Markdown rendering is SDK-tier.
     "maven-doxia-module-markdown", # srpm: maven-doxia
-    # graphviz-sharp: C#/Mono bindings for graphviz; needs mono-core (sdk-only). Mono runtime not appropriate for headless base; graphviz core + native bindings stay in base.
+    # graphviz-sharp: C#/Mono bindings for graphviz; needs mono-core (sdk-only). Mono runtime not in scope; graphviz core + native bindings stay in base.
     "graphviz-sharp", # srpm: graphviz
     # Guile bindings for graphviz; pulls libgc + libguile-3.0 (gc + guile30 SRPMs in sdk only). Niche scripting bindings; core graphviz tooling stays in base.
     "graphviz-guile", # srpm: graphviz
@@ -270,7 +270,7 @@ packages = [
     # DevIL ILUT bindings link against Allegro 4 (sdk-only); keep core DevIL libs in base.
     "DevIL-ILUT", # srpm: DevIL
     "DevIL-ILUT-devel", # srpm: DevIL
-    # zypper package manager not in AZL base; carve kiwi zypper systemdeps to sdk.
+    # zypper package manager not in base; carve kiwi zypper systemdeps to sdk.
     "kiwi-systemdeps-pkgmgr-zypper", # srpm: kiwi
     # nfs-ganesha (user-space NFS bridge for Ceph/Gluster) lives in sdk; glusterfs-ganesha is the gluster-side bridge and rides with ganesha.
     "glusterfs-ganesha", # srpm: glusterfs
@@ -318,7 +318,7 @@ packages = [
     "python3-sqlalchemy+postgresql_pg8000", # srpm: python-sqlalchemy
     # Demote wireshark dissector plugin: wireshark itself is sdk-tier (dev/network analysis tooling, not a server runtime).
     "libvirt-wireshark", # srpm: libvirt
-    # Carve mpg123-plugins-jack to sdk: JACK is sdk-tier in AZL (pro-audio routing daemon, not server runtime)
+    # Carve mpg123-plugins-jack to sdk: JACK is sdk-tier (pro-audio routing daemon, not server runtime)
     "mpg123-plugins-jack", # srpm: mpg123
     # Carve niche audio-backend plugins to sdk: portaudio is sdk-tier; pulseaudio backend plugin is redundant given pulseaudio's own modules
     "mpg123-plugins-portaudio", # srpm: mpg123
@@ -336,9 +336,9 @@ packages = [
     "cups-printerapp", # srpm: cups
     # bluez-cups carved to SDK alongside cups server (bluez Bluetooth printer backend); only base consumer of cups server pkg
     "bluez-cups", # srpm: bluez
-    # GNOME GUI passphrase prompt; AZL is headless cloud distro. pinentry, pinentry-emacs (emacs is in base), and pinentry-tty stay in base for terminal/emacs use
+    # GNOME GUI passphrase prompt; pinentry, pinentry-emacs (emacs is in base), and pinentry-tty stay in base for terminal/emacs use
     "pinentry-gnome3", # srpm: pinentry
-    # nbdkit-torrent-plugin requires libtorrent-rasterbar (BitTorrent protocol library); not appropriate for an enterprise cloud distro's base channel
+    # nbdkit-torrent-plugin requires libtorrent-rasterbar (BitTorrent protocol library); not in scope.
     "nbdkit-torrent-plugin", # srpm: nbdkit
     # ldirectord is the Linux Director Daemon for IPVS-based load balancing; depends on perl-Net-IMAP-Simple-SSL (a chain of CPAN perl modules not warranted in base for an IPVS LB monitoring daemon). The rest of resource-agents (HA cluster scripts) stays in base.
     "ldirectord", # srpm: resource-agents
@@ -352,7 +352,7 @@ packages = [
     "xmlto-tex", # srpm: xmlto
     # Munin monitoring plugin sub-pkg requires munin-node (sdk-tier; Munin agent). Munin-based monitoring not part of base for cloud distro; rest of unbound stays in base.
     "unbound-munin", # srpm: unbound
-    # mailx plugin needs /usr/bin/mailx (mailx package is not in either channel - heirloom-mailx isn't packaged in AZL); not warranted in base for cloud distro.
+    # mailx plugin needs /usr/bin/mailx (mailx package is not in either channel - heirloom-mailx isn't packaged); not warranted in base for cloud distro.
     "libreport-plugin-mailx", # srpm: libreport
     # GTK3 input-method modules sub-pkg requires gtk-immodules-imsettings (sdk-tier IM glue). Full IME stack not warranted in base for cloud distro; gtk3 core stays in base.
     "gtk3-immodules", # srpm: gtk3
@@ -364,7 +364,7 @@ packages = [
     "perl-File-UserDirs", # srpm: perl-File-BaseDir
     # pcp-pmda-nutcracker requires perl(YAML::XS) (perl-YAML-LibYAML, sdk-tier); niche PMDA for the nutcracker memcached/redis proxy, not warranted in base.
     "pcp-pmda-nutcracker", # srpm: pcp
-    # rocm-opencl + -devel carved to sdk: ROCm OpenCL runtime; -devel pulls OpenCL-ICD-Loader-devel which is sdk-tier. ROCm GPU compute is sdk-tier in AZL.
+    # rocm-opencl + -devel carved to sdk: ROCm OpenCL runtime; -devel pulls OpenCL-ICD-Loader-devel which is sdk-tier. ROCm GPU compute is sdk-tier.
     "rocm-opencl", # srpm: rocclr
     "rocm-opencl-devel", # srpm: rocclr
     # ivy-local + javapackages-compat carved to sdk: ivy-local depends on apache-ivy + xmvn-connector-ivy (both sdk-tier); javapackages-compat is a legacy shim. Both have zero consumers in base. Rest of javapackages-tools stays in base.
@@ -372,7 +372,7 @@ packages = [
     "javapackages-compat", # srpm: javapackages-tools
     # perl-Log-Dispatch-ApacheLog carved to sdk: requires perl(Apache2::Log) from mod_perl which is sdk-tier. Zero consumers in base. Rest of perl-Log-Dispatch SRPM stays in base.
     "perl-Log-Dispatch-ApacheLog", # srpm: perl-Log-Dispatch
-    # javapackages-local-openjdk25 + maven-local-openjdk25 carved to sdk: these are Java package-BUILD tooling (RPM dep generation, maven build helpers). javapackages-local-openjdk25 hard-Requires xmvn-generator (sdk); maven-local-openjdk25 hard-Requires javapackages-local-openjdk25. AZL base ships Java RUNTIME macros via javapackages-tools/javapackages-common/javapackages-filesystem; building Java packages belongs in sdk.
+    # javapackages-local-openjdk25 + maven-local-openjdk25 carved to sdk: these are Java package-BUILD tooling (RPM dep generation, maven build helpers). javapackages-local-openjdk25 hard-Requires xmvn-generator (sdk); maven-local-openjdk25 hard-Requires javapackages-local-openjdk25. base ships Java RUNTIME macros via javapackages-tools/javapackages-common/javapackages-filesystem; building Java packages belongs in sdk.
     "javapackages-local-openjdk25", # srpm: javapackages-tools
     "maven-local-openjdk25", # srpm: javapackages-tools
     # fence-agents-amt + fence-agents-amt-ws carved to sdk: both depend on amtterm (Intel AMT serial-over-LAN client, demoted to sdk). Intel AMT-managed clusters are a niche enterprise-on-prem use case; cloud-hosted nodes use serial-console-via-IMDS.
