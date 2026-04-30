@@ -1,0 +1,5 @@
+# Disable optional gpm (console-mouse) support so that we can demote
+# the gpm SRPM entirely to sdk. emacs.spec gates GPM via `%bcond gpm`
+# (default ON unless rhel >= 10); flip it off via build.without.
+[components.emacs]
+build.without = ["gpm"]
