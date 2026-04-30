@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/tuna.azl.macros}
+
 %bcond oscilloscope %{undefined rhel}
 
 Name: tuna
@@ -9,6 +12,7 @@ Release: 3%{?dist}
 License: GPL-2.0-only AND LGPL-2.1-only
 Summary: Application tuning GUI & command line utility
 Source: https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz
+Source9999: tuna.azl.macros
 URL: https://rt.wiki.kernel.org/index.php/Tuna
 BuildArch: noarch
 BuildRequires: python3-devel, gettext
@@ -90,6 +94,9 @@ done
 
 %find_lang %name
 
+%if %{without oscilloscope}
+rm -f %{buildroot}%{_bindir}/oscilloscope
+%endif
 %files -f %{name}.lang -f %{pyproject_files}
 %doc ChangeLog
 %{_bindir}/tuna
