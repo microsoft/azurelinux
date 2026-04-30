@@ -12,17 +12,32 @@ type = "file-add"
 source = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
 file = "fix-avoid-incorrect-CPE-parsing-on-Azure-Linux.patch"
 
-# The upstream spec does not pass --distro to setup.py install, so the Jinja2
-# template for cloud-init-generator renders with no variant and falls through to
-# the default path /usr/lib/cloud-init/ds-identify. However, ds-identify is
-# installed to /usr/libexec/cloud-init/ (because /etc/redhat-release exists in
-# the build chroot). This mismatch causes cloud-init-generator to fail with
-# exit status 3 at boot, preventing cloud-init from running.
-# Fix by adding --distro=fedora so the generator template picks the correct
-# /usr/libexec/cloud-init/ds-identify path.
 [[components.cloud-init.overlays]]
-description = "Fix ds-identify path mismatch: pass --distro=fedora to setup.py so cloud-init-generator uses /usr/libexec/cloud-init/ds-identify"
+description = "Add azurelinux to systemd templates"
+type = "spec-add-tag"
+tag = "Patch"
+value = "add-azurelinux-to-systemd-templates.patch"
+
+[[components.cloud-init.overlays]]
+description = "Add azurelinux to systemd templates"
+type = "file-add"
+source = "add-azurelinux-to-systemd-templates.patch"
+file = "add-azurelinux-to-systemd-templates.patch"
+
+[[components.cloud-init.overlays]]
+description = "Update cloud.cfg template"
+type = "spec-add-tag"
+tag = "Patch"
+value = "update-cloud-cfg.patch"
+
+[[components.cloud-init.overlays]]
+description = "Update cloud.cfg template"
+type = "file-add"
+source = "update-cloud-cfg.patch"
+file = "update-cloud-cfg.patch"
+
+[[components.cloud-init.overlays]]
+description = "Set variant to azurelinux"
 type = "spec-search-replace"
-section = "%install"
-regex = '%py3_install -- --init-system=systemd'
-replacement = '%py3_install -- --init-system=systemd --distro=fedora'
+regex = 'python3 tools/render-template --variant %{\?rhel:rhel}%{!\?rhel:fedora}'
+replacement = "python3 tools/render-template --variant azurelinux"
