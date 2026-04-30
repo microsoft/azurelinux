@@ -11,12 +11,12 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         CVE-2026-24054.patch
-Patch1:         rust-1.90-fixes.patch
-Patch2:         CVE-2026-24834.patch
-Patch3:         CVE-2026-25727.patch
-Patch4:         CVE-2026-25541.patch
-Patch5:         CVE-2025-11065.patch
+# Patch0:         CVE-2026-24054.patch
+# Patch1:         rust-1.90-fixes.patch
+# Patch2:         CVE-2026-24834.patch
+# Patch3:         CVE-2026-25727.patch
+# Patch4:         CVE-2026-25541.patch
+# Patch5:         CVE-2025-11065.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -69,9 +69,14 @@ popd
 %{kata_bin}/kata-runtime
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-cloud-hypervisor.toml
+%{defaults_kata}/configuration-cloud-hypervisor-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
+%{kata_shim_bin}/containerd-shim-kata-v2-go
+%{kata_shim_bin}/containerd-shim-kata-v2-rs
 
 %license LICENSE
 %doc CONTRIBUTING.md
