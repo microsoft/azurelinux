@@ -1,0 +1,5 @@
+# Disable optional gpm (console-mouse) support so that we can demote
+# the gpm SRPM entirely to sdk. mc.spec gates GPM via `%bcond gpm`
+# (default ON unless rhel >= 10); flip it off via build.without.
+[components.mc]
+build.without = ["gpm"]
