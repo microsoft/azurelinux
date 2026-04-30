@@ -1,0 +1,5 @@
+[components.hwloc.build]
+# Treat AZL like RHEL: skip the Fedora-only oneapi-level-zero-devel
+# BuildRequires (gated behind %if %{undefined rhel}) so hwloc-plugins
+# does not pull in libze_loader from sdk. RHEL-flow already excludes it.
+defines = { rhel = "10" }
