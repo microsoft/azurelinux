@@ -1,0 +1,8 @@
+[components.openscap.build]
+# Disable the optional `apt` integration. Upstream gates it on a
+# `%bcond_without apt` (default-on for Fedora, default-off for
+# CentOS/ELN), and the resulting `Requires: apt-libs` is the only
+# thing pinning the `apt` SRPM into AZL base. AZL is an RPM-only
+# cloud distro and has no use for openscap's apt-libs probe path; the
+# Requires can be dropped without affecting any consumers we ship.
+without = ["apt"]
