@@ -1,0 +1,21 @@
+[components.anaconda]
+
+# Drop the flatpak Requires from anaconda-core. Anaconda's flatpak
+# source-type lets the installer install OCI/flatpak refs from a
+# CDROM at install time -- a desktop-installer feature that AZL
+# doesn't ship. Removing these Requires unhooks anaconda-core from
+# the flatpak chain so flatpak can be demoted to sdk.
+
+[[components.anaconda.overlays]]
+description = "Drop Requires: flatpak from anaconda-core (flatpak source-type unused on AZL)"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "flatpak"
+package = "core"
+
+[[components.anaconda.overlays]]
+description = "Drop Requires: flatpak-libs from anaconda-core (flatpak source-type unused on AZL)"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "flatpak-libs"
+package = "core"
