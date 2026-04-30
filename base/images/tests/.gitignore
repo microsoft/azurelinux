@@ -1,0 +1,5 @@
+# Per-suite local artifacts not covered by repo-root .gitignore.
+.venv/
+.pytest_cache/
+.workdir/
+uv.lock
