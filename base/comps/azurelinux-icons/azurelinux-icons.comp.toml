@@ -1,0 +1,2 @@
+[components.azurelinux-icons]
+spec = { type = "local", path = "azurelinux-icons.spec" }
