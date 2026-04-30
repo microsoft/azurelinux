@@ -1,7 +1,7 @@
 Summary:        Virtual Python Environment builder
 Name:           python-virtualenv
 Version:        20.36.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,6 +14,8 @@ Patch1001:      CVE-2026-1703v0.patch
 Patch1002:      CVE-2026-1703v1.patch
 Patch1003:      CVE-2026-24049v0.patch
 Patch1004:      CVE-2026-24049v1.patch
+Patch1005:      CVE-2026-3219v0.patch
+Patch1006:      CVE-2026-3219v1.patch
 BuildArch:      noarch
 
 %description
@@ -114,6 +116,28 @@ zip -r ../src/virtualenv/seed/wheels/embed/unpacked_wheel-0.45.1-py3-none-any.wh
 popd
 rm -rf unpacked_wheel-0.45.1-py3-none-any
 
+# Manual patching for CVE-2026-3219v0
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/utils/unpacking.py for CVE-2026-3219"
+mkdir -p unpacked_pip-25.0.1-py3-none-any_3219
+unzip src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl -d unpacked_pip-25.0.1-py3-none-any_3219
+patch -p1 -d unpacked_pip-25.0.1-py3-none-any_3219 < %{PATCH1005}
+rm -f src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl
+pushd unpacked_pip-25.0.1-py3-none-any_3219
+zip -r ../src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl *
+popd
+rm -rf unpacked_pip-25.0.1-py3-none-any_3219
+
+# Manual patching for CVE-2026-3219v1
+echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/utils/unpacking.py for CVE-2026-3219"
+mkdir -p unpacked_pip-25.3-py3-none-any_3219
+unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip-25.3-py3-none-any_3219
+patch -p1 -d unpacked_pip-25.3-py3-none-any_3219 < %{PATCH1006}
+rm -f src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl
+pushd unpacked_pip-25.3-py3-none-any_3219
+zip -r ../src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl *
+popd
+rm -rf unpacked_pip-25.3-py3-none-any_3219
+
 
 %generate_buildrequires
 
@@ -136,6 +160,9 @@ tox -e py
 %{_bindir}/virtualenv
 
 %changelog
+* Thu Apr 23 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 20.36.1-3
+- Patch for CVE-2026-3219
+
 * Mon Feb 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 20.36.1-2
 - Patch for CVE-2025-50181, CVE-2026-24049 and CVE-2026-1703
 
