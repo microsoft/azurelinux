@@ -725,3 +725,48 @@ func TestStripEpochFromPackageFullQualifiedNameWithInvalidInput(t *testing.T) {
 		})
 	}
 }
+
+func TestRpmSpecBuiltRPMRegexBasic(t *testing.T) {
+	input := "pkg-1.2.3-1.azl3.x86_64"
+	expectedResults := []string{"pkg", "", "1.2.3", "1", "azl3", "x86_64"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}
+
+func TestRpmSpecBuiltRPMRegexUnderscore(t *testing.T) {
+	input := "pkg-1.2.3-1_2.3.azl3.x86_64"
+	expectedResults := []string{"pkg", "", "1.2.3", "1_2.3", "azl3", "x86_64"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}
+
+func TestRpmSpecBuiltRPMRegexEpoch(t *testing.T) {
+	input := "ca-certificates-1:3.0.0-14.azl3.noarch"
+	expectedResults := []string{"ca-certificates", "1", "3.0.0", "14", "azl3", "noarch"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}

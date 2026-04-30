@@ -27,111 +27,70 @@ func TestMain(m *testing.M) {
 // ---------------------------------------------------------------------------
 
 func TestProcessPackageVersionString_ValidInput(t *testing.T) {
-	distTag := ".azl3"
-
-	macros, err := processPackageVersionString("mypackage: 1.2.3-4.azl3", "mypackage.spec", distTag)
+	macros, err := processPackageVersionString("mypackage-1.2.3-4.azl3.x86_64")
 	require.NoError(t, err)
 	assert.Contains(t, macros, "%azl_mypackage_version 1.2.3")
 	assert.Contains(t, macros, "%azl_mypackage_release 4")
 }
 
-func TestProcessPackageVersionString_DashesInSpecName(t *testing.T) {
-	distTag := ".azl3"
-
-	macros, err := processPackageVersionString("my-cool-pkg: 2.0.0-1.azl3", "my-cool-pkg.spec", distTag)
+func TestProcessPackageVersionString_DashesInName(t *testing.T) {
+	macros, err := processPackageVersionString("my-cool-pkg-2.0.0-1.azl3.x86_64")
 	require.NoError(t, err)
 	// Dashes should be replaced with underscores in macro names.
 	assert.Contains(t, macros, "%azl_my_cool_pkg_version 2.0.0")
 	assert.Contains(t, macros, "%azl_my_cool_pkg_release 1")
 }
 
-func TestProcessPackageVersionString_ReleaseWithoutDistTag(t *testing.T) {
-	distTag := ".azl3"
-
-	macros, err := processPackageVersionString("pkg: 1.0-5", "pkg.spec", distTag)
-	require.NoError(t, err)
-	// When the dist tag is not present in the release, it should remain unchanged.
-	assert.Contains(t, macros, "%azl_pkg_version 1.0")
-	assert.Contains(t, macros, "%azl_pkg_release 5")
-}
-
 func TestProcessPackageVersionString_EpochInVersion(t *testing.T) {
-	distTag := ".azl3"
-
-	macros, err := processPackageVersionString("pkg: 2:3.4.5-6.azl3", "pkg.spec", distTag)
+	macros, err := processPackageVersionString("pkg-2:3.4.5-6.azl3.x86_64")
 	require.NoError(t, err)
 	assert.Contains(t, macros, "%azl_pkg_epoch 2")
 	assert.Contains(t, macros, "%azl_pkg_version 3.4.5")
 	assert.Contains(t, macros, "%azl_pkg_release 6")
 }
 
-func TestProcessPackageVersionString_PanicsOnBadFormat(t *testing.T) {
-	distTag := ".azl3"
-
-	// Input without the expected "name: version-release" format will cause a panic
-	// from the regex submatch slice indexing.
-	assert.Panics(t, func() {
-		processPackageVersionString("totally-invalid-input", "bad.spec", distTag)
-	})
-}
-
-func TestProcessPackageVersionString_EmptyDistTag(t *testing.T) {
-	distTag := ""
-
-	macros, err := processPackageVersionString("pkg: 1.0-2.azl3", "pkg.spec", distTag)
-	require.NoError(t, err)
-	// With an empty dist tag, the release should not be modified.
-	assert.Contains(t, macros, "%azl_pkg_release 2.azl3")
+func TestProcessPackageVersionString_ErrorsOnBadFormat(t *testing.T) {
+	macros, err := processPackageVersionString("totally-invalid-input")
+	assert.Error(t, err)
+	assert.Nil(t, macros)
 }
 
 func TestProcessPackageVersionString_TableDriven(t *testing.T) {
-	distTag := ".azl3"
-
 	tests := []struct {
 		name            string
 		input           string
-		specFile        string
-		prefix          string
 		expectedVersion string
 		expectedRelease string
 	}{
 		{
 			name:            "simple package",
-			input:           "bash: 5.1.8-1.azl3",
-			specFile:        "bash.spec",
-			prefix:          "azl",
+			input:           "bash-5.1.8-1.azl3.x86_64",
 			expectedVersion: "%azl_bash_version 5.1.8",
 			expectedRelease: "%azl_bash_release 1",
 		},
 		{
 			name:            "package with underscores already",
-			input:           "python_dateutil: 2.8.2-3.azl3",
-			specFile:        "python_dateutil.spec",
-			prefix:          "azl",
+			input:           "python_dateutil-2.8.2-3.azl3.x86_64",
 			expectedVersion: "%azl_python_dateutil_version 2.8.2",
 			expectedRelease: "%azl_python_dateutil_release 3",
 		},
 		{
 			name:            "multi digit release",
-			input:           "kernel: 6.6.51.1-9.azl3",
-			specFile:        "kernel.spec",
-			prefix:          "azl",
+			input:           "kernel-6.6.51.1-9.azl3.x86_64",
 			expectedVersion: "%azl_kernel_version 6.6.51.1",
 			expectedRelease: "%azl_kernel_release 9",
 		},
 		{
-			name:            "release with extra suffixes after dist tag",
-			input:           "openssl: 3.3.0-1.azl3.1",
-			specFile:        "openssl.spec",
-			prefix:          "azl",
-			expectedVersion: "%azl_openssl_version 3.3.0",
-			expectedRelease: "%azl_openssl_release 1.1",
+			name:            "noarch package",
+			input:           "ca-certificates-base-3.0.0-14.azl3.noarch",
+			expectedVersion: "%azl_ca_certificates_base_version 3.0.0",
+			expectedRelease: "%azl_ca_certificates_base_release 14",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			macros, err := processPackageVersionString(tt.input, tt.specFile, distTag)
+			macros, err := processPackageVersionString(tt.input)
 			require.NoError(t, err)
 			assert.Contains(t, macros, tt.expectedVersion)
 			assert.Contains(t, macros, tt.expectedRelease)
@@ -154,6 +113,9 @@ Distribution:   Azure Linux
 
 %%description
 Test spec.
+
+%%files
+%%defattr(-,root,root)
 
 %%changelog
 * Mon Oct 11 2021 Test User <test@test.com> %s-%s
@@ -275,6 +237,15 @@ Summary:        Libraries
 %description libs
 Libs.
 
+%files
+%defattr(-,root,root)
+
+%files devel
+%defattr(-,root,root)
+
+%files libs
+%defattr(-,root,root)
+
 %changelog
 * Mon Oct 11 2021 Test User <test@test.com> 4.0.0-3
 - Test entry.
@@ -286,12 +257,21 @@ Libs.
 	arch := testBuildArch(t)
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	require.NoError(t, err)
-	// With --srpm, rpmspec returns the source RPM entry (1 result).
-	require.Len(t, macros, 2)
+	// With --builtrpms, rpmspec returns one entry per built binary RPM:
+	// the default package plus the 'devel' and 'libs' subpackages = 3 entries,
+	// each producing a version and a release macro = 6 macros total.
+	// Macro names are derived from each subpackage's own name, so they all
+	// get distinct '%azl_<subpackage>_*' macros.
+	require.Len(t, macros, 6)
 
-	assert.NotContains(t, macros[0], "%azl_multipkg_epoch ")
-	assert.Contains(t, macros[0], "%azl_multipkg_version 4.0.0")
-	assert.Contains(t, macros[1], "%azl_multipkg_release 3")
+	combined := strings.Join(macros, "\n")
+	assert.NotContains(t, combined, "_epoch ")
+	assert.Contains(t, combined, "%azl_multipkg_version 4.0.0")
+	assert.Contains(t, combined, "%azl_multipkg_release 3")
+	assert.Contains(t, combined, "%azl_multipkg_devel_version 4.0.0")
+	assert.Contains(t, combined, "%azl_multipkg_devel_release 3")
+	assert.Contains(t, combined, "%azl_multipkg_libs_version 4.0.0")
+	assert.Contains(t, combined, "%azl_multipkg_libs_release 3")
 }
 
 func TestProcessSpecFile_NonexistentFile(t *testing.T) {
@@ -319,23 +299,6 @@ func TestProcessSpecFile_InvalidSpec(t *testing.T) {
 	macros, err := processSpecFile(specPath, arch, distTag, nil)
 	assert.Error(t, err)
 	assert.Nil(t, macros)
-}
-
-func TestProcessSpecFile_ReleaseWithoutDistMacro(t *testing.T) {
-	distTag := ".azl3"
-
-	tmpDir := t.TempDir()
-	// Create spec with a release that has no %{?dist} macro.
-	specPath := createSpecFile(t, tmpDir, "nodist", "1.0", "5")
-	arch := testBuildArch(t)
-
-	macros, err := processSpecFile(specPath, arch, distTag, nil)
-	require.NoError(t, err)
-	require.Len(t, macros, 2)
-	// Release should remain as-is since there's no dist tag to strip.
-	assert.NotContains(t, macros[0], "%azl_nodist_epoch ")
-	assert.Contains(t, macros[0], "%azl_nodist_version 1.0")
-	assert.Contains(t, macros[1], "%azl_nodist_release 5")
 }
 
 func TestProcessSpecFile_MultiDigitVersion(t *testing.T) {
