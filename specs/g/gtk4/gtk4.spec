@@ -153,6 +153,7 @@ Requires: pango%{?_isa} >= %{pango_version}
 # make sure we have a reasonable gsettings backend
 Recommends: dconf%{?_isa}
 
+BuildRequires: pkgconfig(libdrm)
 %description
 GTK is a multi-platform toolkit for creating graphical user
 interfaces. Offering a complete set of widgets, GTK is suitable for
