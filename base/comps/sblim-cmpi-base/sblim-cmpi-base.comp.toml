@@ -1,0 +1,15 @@
+# Disable the optional test sub-package.
+#
+# sblim-cmpi-base-test is the optional test harness for the SBLIM CMPI
+# base provider. It hard-Requires `sblim-testsuite` (sdk-tier; the
+# WBEM/CIM testsuite framework). The sblim-cmpi-base.spec gates the
+# entire test sub-package on `%global with_test_subpackage 1`; flip
+# it to 0 to stop producing the test sub-package and remove the
+# sblim-testsuite Requires.
+[components.sblim-cmpi-base]
+
+[[components.sblim-cmpi-base.overlays]]
+description = "Disable test sub-package - sblim-testsuite is sdk-tier in AZL"
+type = "spec-search-replace"
+regex = '^%global with_test_subpackage 1$'
+replacement = '%global with_test_subpackage 0'
