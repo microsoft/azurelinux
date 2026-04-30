@@ -1,0 +1,2 @@
+[components.buildsys-build-azurelinux-kerneldevpkgs]
+spec = { type = "local", path = "buildsys-build-azurelinux-kerneldevpkgs.spec" }

@@ -1,0 +1,14 @@
+[components.nvidia-kmod]
+spec.type = "upstream"
+spec.upstream-distro = { name = "rpmfusion-nonfree" }
+
+# Undefine %fedora so the spec doesn't set %buildforkernels to "akmod" —
+# Azure Linux builds for "current" kernel only, not automatic kernel modules
+[components.nvidia-kmod.build]
+defines = { fedora = "0" }
+
+[[components.nvidia-kmod.overlays]]
+description = "Use Azure Linux kerneldevpkgs instead of RPM Fusion to resolve kernel-devel version against the AZL kernel, not the Fedora/upstream kernel"
+type = "spec-search-replace"
+regex = "buildsys-build-rpmfusion-kerneldevpkgs"
+replacement = "buildsys-build-azurelinux-kerneldevpkgs"

@@ -1,0 +1,69 @@
+[distros.rpmfusion-free]
+description = "RPM Fusion Free repository"
+default-version = "43"
+dist-git-base-uri = "https://pkgs.rpmfusion.org/cgit/free/$pkg.git"
+lookaside-base-uri = "https://pkgs.rpmfusion.org/repo/pkgs/free/$pkg/$filename/$hashtype/$hash/$filename"
+repos = [
+    {"base-uri" = "https://download1.rpmfusion.org/free/fedora/releases/$releasever/Everything/source/SRPMS" },
+    {"base-uri" = "https://download1.rpmfusion.org/free/fedora/updates/$releasever/source/SRPMS" },
+]
+
+[distros.rpmfusion-free.versions.41]
+description = "RPM Fusion Free for Fedora 41"
+release-ver = "41"
+dist-git-branch = "f41"
+
+[distros.rpmfusion-free.versions.42]
+description = "RPM Fusion Free for Fedora 42"
+release-ver = "42"
+dist-git-branch = "f42"
+
+[distros.rpmfusion-free.versions.43]
+description = "RPM Fusion Free for Fedora 43"
+release-ver = "43"
+dist-git-branch = "f43"
+
+[distros.rpmfusion-free.versions.44]
+description = "RPM Fusion Free for Fedora 44"
+release-ver = "44"
+dist-git-branch = "f44"
+
+[distros.rpmfusion-free.versions.rawhide]
+description = "RPM Fusion Free for Fedora Rawhide"
+release-ver = "rawhide"
+dist-git-branch = "rawhide"
+
+[distros.rpmfusion-nonfree]
+description = "RPM Fusion Nonfree repository"
+default-version = "43"
+dist-git-base-uri = "https://github.com/rpmfusion/$pkg.git"
+lookaside-base-uri = "https://pkgs.rpmfusion.org/repo/pkgs/nonfree/$pkg/$filename/$hashtype/$hash/$filename"
+repos = [
+    {"base-uri" = "https://download1.rpmfusion.org/nonfree/fedora/releases/$releasever/Everything/source/SRPMS" },
+    {"base-uri" = "https://download1.rpmfusion.org/nonfree/fedora/updates/$releasever/source/SRPMS" },
+]
+
+[distros.rpmfusion-nonfree.versions.41]
+description = "RPM Fusion Nonfree for Fedora 41"
+release-ver = "41"
+dist-git-branch = "f41"
+
+[distros.rpmfusion-nonfree.versions.42]
+description = "RPM Fusion Nonfree for Fedora 42"
+release-ver = "42"
+dist-git-branch = "f42"
+
+[distros.rpmfusion-nonfree.versions.43]
+description = "RPM Fusion Nonfree for Fedora 43"
+release-ver = "43"
+dist-git-branch = "f43"
+
+[distros.rpmfusion-nonfree.versions.44]
+description = "RPM Fusion Nonfree for Fedora 44"
+release-ver = "44"
+dist-git-branch = "f44"
+
+[distros.rpmfusion-nonfree.versions.rawhide]
+description = "RPM Fusion Nonfree for Fedora Rawhide"
+release-ver = "rawhide"
+dist-git-branch = "rawhide"
