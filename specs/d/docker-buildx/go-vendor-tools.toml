@@ -1,0 +1,27 @@
+[licensing]
+detector = "trivy"
+exclude_directories = [
+    "hack/dockerfiles",
+]
+exclude_files = [
+    "vendor/go.opentelemetry.io/otel/get_main_pkgs.sh",
+    "vendor/go.opentelemetry.io/otel/verify_examples.sh",
+    "vendor/google.golang.org/grpc/cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh",
+]
+
+[[licensing.licenses]]
+path = "vendor/github.com/google/shlex/COPYING"
+sha256sum = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
+sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
+expression = "BSD-3-Clause"
+[[licensing.licenses]]
+path = "vendor/github.com/shibumi/go-pathspec/LICENSE"
+sha256sum = "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae"
+expression = "Apache-2.0"
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
+sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
+expression = "MIT"
