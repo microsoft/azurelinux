@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.27.1
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -11,6 +11,7 @@ Source0:        https://github.com/requests/requests/archive/v%{version}/request
 Patch0:         CVE-2023-32681.patch
 Patch1:         CVE-2024-35195.patch
 Patch2:         CVE-2024-47081.patch
+Patch3:         CVE-2026-25645.patch
 BuildArch:      noarch
 
 %description
@@ -74,6 +75,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.1-9
+- Patch for CVE-2026-25645
+
 * Tue Jun 17 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.27.1-8
 - Add patch for CVE-2024-47081
 
