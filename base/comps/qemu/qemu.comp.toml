@@ -1,10 +1,68 @@
 [components.qemu]
 
-# Disable Xen support — not applicable to Azure Linux's Hyper-V/KVM environment.
-# The upstream spec enables Xen when %fedora is set (which it is on our builders),
-# so we must explicitly override have_xen back to 0.
-[[components.qemu.overlays]]
-description = "Disable Xen support - not needed for Azure Linux (Hyper-V/KVM only)"
-type = "spec-search-replace"
-regex = '%global have_xen 1'
-replacement = '%global have_xen 0'
+# Disable features not needed in Azure Linux's Hyper-V/KVM environment, and strip
+# audio backends + sub-packages to avoid pulling in heavy sdk-tier dependencies.
+overlays = [
+    # --- Feature toggles ---
+    # Upstream enables Xen when %fedora is set (which it is on our builders), so force it off.
+    { description = "Disable Xen support - not needed for Azure Linux (Hyper-V/KVM only)", type = "spec-search-replace", regex = '^%global have_xen 1$', replacement = '%global have_xen 0' },
+    # brltty pulls in bluetooth, audio, and more runtime deps.
+    { description = "Disable Baum Braille device backend", type = "spec-search-replace", regex = '^%global have_brlapi 1$', replacement = '%global have_brlapi 0' },
+    # jack audio backend is enabled by default, but we disable it.
+    { description = "Disable JACK audio backend",          type = "spec-search-replace", regex = '^%global have_jack 1$',   replacement = '%global have_jack 0' },
+    # Disable spice support for remote display.
+    { description = "Disable SPICE support",               type = "spec-search-replace", regex = '^%global have_spice 1$',  replacement = '%global have_spice 0' },
+
+    # --- Audio backend removal: configure flags ---
+    # Upstream lacks macros to disable these; we flip the flags and clear the driver list directly.
+    { description = "configure: disable-pipewire",         type = "spec-search-replace", section = "%build", regex = '--enable-pipewire', replacement = '--disable-pipewire' },
+    { description = "configure: disable pulseaudio",       type = "spec-search-replace", section = "%build", regex = '--enable-pa',       replacement = '--disable-pa' },
+    { description = "configure: disable sdl",              type = "spec-search-replace", section = "%build", regex = '--enable-sdl',      replacement = '--disable-sdl' },
+    { description = "configure: disable alsa",             type = "spec-search-replace", section = "%build", regex = '--enable-alsa',     replacement = '--disable-alsa' },
+    { description = "configure: disable oss",              type = "spec-search-replace", section = "%build", regex = '--enable-oss',      replacement = '--disable-oss' },
+    { description = "configure: remove all audio drivers", type = "spec-search-replace", section = "%build", regex = '--audio-drv-list=.* \\', replacement = '--audio-drv-list= \' },
+
+    # --- Unhook audio Requires from qemu-system-* emulators ---
+    { description = "Empty requires_audio_pipewire macro", type = "spec-search-replace", regex = '%define requires_audio_pipewire .*', replacement = '%define requires_audio_pipewire %{nil}' },
+    { description = "Empty requires_audio_pa macro",       type = "spec-search-replace", regex = '%define requires_audio_pa .*',       replacement = '%define requires_audio_pa %{nil}' },
+    { description = "Empty requires_audio_sdl macro",      type = "spec-search-replace", regex = '%define requires_audio_sdl .*',      replacement = '%define requires_audio_sdl %{nil}' },
+    { description = "Empty requires_audio_alsa macro",     type = "spec-search-replace", regex = '%define requires_audio_alsa .*',     replacement = '%define requires_audio_alsa %{nil}' },
+    { description = "Empty requires_audio_dbus macro",     type = "spec-search-replace", regex = '%define requires_audio_dbus .*',     replacement = '%define requires_audio_dbus %{nil}' },
+    { description = "Empty requires_audio_oss macro",      type = "spec-search-replace", regex = '%define requires_audio_oss .*',      replacement = '%define requires_audio_oss %{nil}' },
+
+    # --- Remove audio sub-packages (no longer built) ---
+    # Remove qemu-audio-pipewire
+    { description = "Remove %package audio-pipewire",     type = "spec-remove-section", package = "audio-pipewire", section = "%package"     },
+    { description = "Remove %description audio-pipewire", type = "spec-remove-section", package = "audio-pipewire", section = "%description" },
+    { description = "Remove %files audio-pipewire",       type = "spec-remove-section", package = "audio-pipewire", section = "%files"       },
+
+    # Remove qemu-audio-pa
+    { description = "Remove %package audio-pa",           type = "spec-remove-section", package = "audio-pa",       section = "%package" },
+    { description = "Remove %description audio-pa",       type = "spec-remove-section", package = "audio-pa",       section = "%description" },
+    { description = "Remove %files audio-pa",             type = "spec-remove-section", package = "audio-pa",       section = "%files" },
+
+    # Remove qemu-audio-sdl
+    { description = "Remove %package audio-sdl",          type = "spec-remove-section", package = "audio-sdl",      section = "%package" },
+    { description = "Remove %description audio-sdl",      type = "spec-remove-section", package = "audio-sdl",      section = "%description" },
+    { description = "Remove %files audio-sdl",            type = "spec-remove-section", package = "audio-sdl",      section = "%files" },
+
+    # Remove qemu-audio-alsa
+    { description = "Remove %package audio-alsa",         type = "spec-remove-section", package = "audio-alsa",     section = "%package" },
+    { description = "Remove %description audio-alsa",     type = "spec-remove-section", package = "audio-alsa",     section = "%description" },
+    { description = "Remove %files audio-alsa",           type = "spec-remove-section", package = "audio-alsa",     section = "%files" },
+
+    # Remove qemu-audio-dbus
+    { description = "Remove %package audio-dbus",         type = "spec-remove-section", package = "audio-dbus",     section = "%package" },
+    { description = "Remove %description audio-dbus",     type = "spec-remove-section", package = "audio-dbus",     section = "%description" },
+    { description = "Remove %files audio-dbus",           type = "spec-remove-section", package = "audio-dbus",     section = "%files" },
+
+    # Remove qemu-audio-oss
+    { description = "Remove %package audio-oss",          type = "spec-remove-section", package = "audio-oss",      section = "%package" },
+    { description = "Remove %description audio-oss",      type = "spec-remove-section", package = "audio-oss",      section = "%description" },
+    { description = "Remove %files audio-oss",            type = "spec-remove-section", package = "audio-oss",      section = "%files" },
+
+    # Remove qemu-audio-jack
+    { description = "Remove %package audio-jack",         type = "spec-remove-section", package = "audio-jack",     section = "%package" },
+    { description = "Remove %description audio-jack",     type = "spec-remove-section", package = "audio-jack",     section = "%description" },
+    { description = "Remove %files audio-jack",           type = "spec-remove-section", package = "audio-jack",     section = "%files" },
+]
