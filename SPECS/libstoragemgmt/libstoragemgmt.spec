@@ -1,7 +1,7 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,6 +33,7 @@ BuildRequires:  valgrind
 BuildRequires:  git
 %endif
 Requires:       python3-%{name}
+Patch0:         0001-fix-ptest-issue-link-speed-no-support.patch
 
 %description
 The libStorageMgmt library will provide a vendor agnostic open source storage
@@ -454,6 +455,9 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Fri Apr 03 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.9.8-2
+- Added patch to fix ptest failure due to unsupported link speed in test environment
+
 * Tue Feb 06 2024 Nan Liu <liunan@microsoft.com> - 1.9.8-1
 - Upgrade to 1.9.8 in Azure Linux 3.0
 - Remove the unneeded patch
