@@ -1,11 +1,22 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 10.7.0
+%define npm_version 11.6.2
+
+%global nodejs_datadir %{_datarootdir}/nodejs
+
+# ICU - from tools/icu/current_ver.dep
+%global icu_major 77
+%global icu_minor 1
+%global icu_version %{icu_major}.%{icu_minor}
+
+%global icudatadir %{nodejs_datadir}/icudata
+%{!?little_endian: %global little_endian %(%{python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
+
 Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        20.14.0
-Release:        15%{?dist}
+Version:        24.14.1
+Release:        3%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,33 +26,17 @@ URL:            https://github.com/nodejs/node
 # !!!! because it contains patented algorithms.
 # !!!  => use generate_source_tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
+Source1:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-b.zip
+Source2:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
+Source3:        btest402.js
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2019-10906.patch
-Patch2:         CVE-2024-21538.patch
-Patch3:         CVE-2025-23083.patch
-Patch4:         CVE-2025-22150.patch
-Patch5:         CVE-2025-23085.patch
-Patch6:         CVE-2024-22020.patch
-Patch7:         CVE-2024-22195.patch
-Patch8:         CVE-2020-28493.patch
-Patch9:         CVE-2024-34064.patch
-Patch10:        CVE-2025-27516.patch
-Patch11:        CVE-2025-47279.patch
-Patch12:        CVE-2025-23165.patch
-Patch13:        CVE-2025-23166.patch
-Patch14:        CVE-2025-5222.patch
-Patch15:        CVE-2025-55131.patch
-Patch16:        CVE-2025-55132.patch
-Patch17:        CVE-2025-59465.patch
-Patch18:        CVE-2025-59466.patch
-Patch19:        CVE-2026-21637.patch
-Patch20:        CVE-2025-55130.patch
-Patch21:        CVE-2026-27135.patch
-Patch22:        CVE-2026-21710.patch
-Patch23:        CVE-2026-21713.patch
-Patch24:        CVE-2026-21714.patch
-Patch25:        CVE-2026-21715.patch
-Patch26:        CVE-2026-21716.patch
+Patch2:         CVE-2024-22195.patch
+Patch3:         CVE-2020-28493.patch
+Patch4:         CVE-2024-34064.patch
+Patch5:         CVE-2025-27516.patch
+Patch6:         CVE-2026-33671.patch
+Patch7:         CVE-2026-33672.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -52,11 +47,18 @@ BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
 BuildRequires:  which
 BuildRequires:  zlib-devel
+BuildRequires:  perl-WWW-Curl
 Requires:       brotli
 Requires:       c-ares
 Requires:       coreutils >= 8.22
 Requires:       openssl >= 1.1.1
 Provides:       nodejs
+Provides:       nodejs24
+Obsoletes:      nodejs < %{version}-%{release}
+Obsoletes:      nodejs24 < %{version}-%{release}
+
+Recommends: nodejs-full-i18n = %{version}-%{release}
+Provides: bundled(icu) = %{icu_version}
 
 %description
 Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -75,11 +77,23 @@ Requires:       zlib-devel
 The nodejs-devel package contains libraries, header files and documentation
 for developing applications that use nodejs.
 
+%package full-i18n
+Summary: Non-English locale data for Node.js
+Requires: %{name} = %{version}-%{release}
+
+%description full-i18n
+Optional data files to provide full-icu support for Node.js. Remove this
+package to save space if non-English locales are not needed.
+
 %package        npm
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
-Provides:       npm = %{npm_version}.%{version}-%{release}
+Provides:       nodejs-npm = %{version}-%{release}
+Provides:       nodejs24-npm = %{version}-%{release}
+Obsoletes:      nodejs24-npm < %{version}-%{release}
+Obsoletes:      nodejs-npm < %{version}-%{release}
+Conflicts:      npm
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
@@ -111,10 +125,11 @@ python3 configure.py \
   --shared-brotli \
   --with-intl=small-icu \
   --with-icu-source=deps/icu-small \
+  --with-icu-default-data-dir=%{icudatadir} \
   --openssl-use-def-ca-store \
   --shared-cares
 
-JOBS=4 make %{?_smp_mflags} V=0
+JOBS=%{_smp_build_ncpus} make %{?_smp_mflags} V=0
 
 %install
 
@@ -128,7 +143,18 @@ for FILE in .gitmodules .gitignore .npmignore .travis.yml \*.py[co]; do
   find %{buildroot}%{_libdir}/node_modules/ -name "$FILE" -delete
 done
 
+# Install the full-icu data files
+mkdir -p %{buildroot}%{icudatadir}
+%if 0%{?little_endian}
+unzip -d %{buildroot}%{icudatadir} %{SOURCE2} icudt%{icu_major}l.dat
+%else
+unzip -d %{buildroot}%{icudatadir} %{SOURCE1} icudt%{icu_major}b.dat
+%endif
+
 %check
+# Make sure i18n support is working
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE3}
+
 make cctest
 
 %post -p /sbin/ldconfig
@@ -146,6 +172,10 @@ make cctest
 %{_includedir}/*
 %{_docdir}/*
 
+%files full-i18n
+%dir %{icudatadir}
+%{icudatadir}/icudt%{icu_major}*.dat
+
 %files npm
 %defattr(-,root,root)
 %{_bindir}/npm
@@ -154,20 +184,34 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
-* Wed Apr 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-15
-- Patch for CVE-2026-21716, CVE-2026-21715, CVE-2026-21714, CVE-2026-21713, CVE-2026-21710
+* Mon Apr 27 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.14.1-3
+- Remove nodejs20 and keep nodejs 24 as default nodejs
 
-* Fri Mar 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-14
-- Patch for CVE-2026-27135
+* Mon Apr 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.14.1-2
+- Patch for CVE-2026-33672, CVE-2026-33671
 
-* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-13
-- Patch for CVE-2025-55130
+* Wed Apr 01 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 24.14.1-1
+- Upgrade to 24.14.1
+- Security fixes included:
+  CVE-2026-21710: use null prototype for headersDistinct/trailersDistinct (Matteo Collina) - High
+  CVE-2026-21637: wrap SNICallback invocation in try/catch (Matteo Collina) - High
+  CVE-2026-21717: test array index hash collision (Joyee Cheung) - Medium
+  CVE-2026-21713: use timing-safe comparison in Web Cryptography HMAC and KMAC (Filip Skokan) - Medium
+  CVE-2026-21714: handle NGHTTP2_ERR_FLOW_CONTROL error code (RafaelGSS) - Medium
+  CVE-2026-21712: handle url crash on different url formats (RafaelGSS) - Medium
+  CVE-2026-21716: include permission check on lib/fs/promises (RafaelGSS) - Low
+  CVE-2026-21715: add permission check to realpath.native (RafaelGSS) - Low
 
-* Thu Jan 29 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 20.14.0-12
-- Add nodejs provides to manage co existence with nodejs24
+* Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.13.0-3
+- Patch for CVE-2025-69418
 
-* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-11
-- Patch for CVE-2026-21637, CVE-2025-59466, CVE-2025-59465, CVE-2025-55132, CVE-2025-55131
+* Tue Feb 10 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-2
+- Add conflicts for legacy npm package
+- Update provided capability from npm to nodejs24-npm
+
+* Tue Dec 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.13.0-1
+- Upgrade to 24.13.0
+- Add support for passing runtime internationalization data
 
 * Fri Nov 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20.14.0-10
 - Patch for CVE-2025-5222
