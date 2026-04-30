@@ -1,0 +1,12 @@
+[components.gtk4]
+
+# gtk4 4.20.3's meson hard-requires libdrm but the upstream Fedora
+# spec does not declare a BuildRequires on libdrm-devel. Without
+# this BR the build fails at meson.build:731. This is a latent
+# upstream gap; keep the BR even though gtk4 itself now lives in sdk.
+
+[[components.gtk4.overlays]]
+description = "Add missing libdrm BuildRequires (gtk4 4.20+ meson requirement)"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libdrm)"
