@@ -1,0 +1,11 @@
+[components.pulseaudio]
+
+# The gdm-hooks subpackage was moved to gdm's own packaging in Fedora 28+,
+# so this subpackage should not be built. The upstream conditional mis-fires
+# when %fedora is undefined, but regardless we force gdm_hooks to 0 so the
+# subpackage is never built.
+[[components.pulseaudio.overlays]]
+description = "Disable gdm-hooks subpackage (moved to gdm packaging in Fedora 28+)"
+type = "spec-search-replace"
+regex = '%global gdm_hooks 1'
+replacement = '%global gdm_hooks 0'
