@@ -1,0 +1,15 @@
+[components.mlnx-ofa_kernel]
+# NVIDIA vGPU guest driver — no upstream Fedora package exists; this is an
+# Azure Linux-originating component with a local spec.
+spec = { type = "local", path = "mlnx-ofa_kernel.spec" }
+
+[components.mlnx-ofa_kernel.build]
+# Kernel version must match the kernel on the target VM.
+# target_kernel_dist carries the full dist suffix including any pre-release tag.
+defines = { target_kernel_version = "6.18.5.1", target_kernel_release = "3", target_kernel_dist = ".azl4" }
+
+[[components.mlnx-ofa_kernel.source-files]]
+filename = "MLNX_OFED_SRC-26.01-1.0.0.0.tgz"
+hash = "6b3cfd3aae437e0ec84ead943c02686614109a5e4cee23642e8fe46d51c6d347"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz" }
