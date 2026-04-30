@@ -1,0 +1,2 @@
+[components.rust-tower-test]
+spec = { type = "upstream", upstream-commit = "b21207b56d9e07dbc6c12a4a497f0fa48a966d10" }

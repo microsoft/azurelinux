@@ -1,0 +1,2 @@
+[components.rust-roff]
+spec = { type = "upstream", upstream-commit = "6adbcc2ed953759a3dece428004074717910cd7c" }

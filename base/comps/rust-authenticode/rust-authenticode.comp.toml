@@ -1,0 +1,2 @@
+[components.rust-authenticode]
+spec = { type = "upstream", upstream-commit = "c0580f70ba43a708fd134e23c4966b673f1229c7" }

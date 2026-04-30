@@ -1,0 +1,2 @@
+[components.xmlgraphics-commons]
+spec = { type = "upstream", upstream-commit = "a25361ce60201aa50e74996b6a83f7c67e0f4a05" }

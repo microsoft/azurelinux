@@ -1,0 +1,2 @@
+[components.icc-profiles-openicc]
+spec = { type = "upstream", upstream-commit = "ad9bfd703e3c44c4d2acd0d8fce7de9b3aff32e2" }

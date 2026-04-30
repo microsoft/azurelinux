@@ -1,0 +1,2 @@
+[components.ghc-regex-posix]
+spec = { type = "upstream", upstream-commit = "4f09857c8252389089563f16e5246539b4634198" }

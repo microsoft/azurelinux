@@ -1,0 +1,2 @@
+[components.rust-uefi-raw]
+spec = { type = "upstream", upstream-commit = "ca4b7022fde9f76f29699b8d6ed60d5677746d98" }

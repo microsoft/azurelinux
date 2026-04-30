@@ -1,0 +1,2 @@
+[components.batik]
+spec = { type = "upstream", upstream-commit = "f02721a33a60ac94f7954ef7e3ddf38a0e254c67" }

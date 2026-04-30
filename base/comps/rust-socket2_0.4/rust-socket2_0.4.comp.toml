@@ -1,0 +1,2 @@
+["components"."rust-socket2_0.4"]
+spec = { type = "upstream", upstream-commit = "66e8ee6618a04bbdd2c3d4a291d34c72c1f59945" }

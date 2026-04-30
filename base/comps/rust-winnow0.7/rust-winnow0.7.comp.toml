@@ -1,0 +1,2 @@
+["components"."rust-winnow0.7"]
+spec = { type = "upstream", upstream-commit = "526c97c15b18ec9de7496fbfbc668de191ac37d7" }

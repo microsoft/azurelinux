@@ -1,0 +1,2 @@
+[components.rust-convert_case]
+spec = { type = "upstream", upstream-commit = "cdfa9545236b7c8ff0e311ccab27c8a364d8127a" }

@@ -1,0 +1,2 @@
+[components.memkind]
+spec = { type = "upstream", upstream-commit = "94e3deb1a1e7d5fcf56a07918f3c49ba4f0a526b" }

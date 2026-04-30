@@ -1,0 +1,2 @@
+[components.openni-primesense]
+spec = { type = "upstream", upstream-commit = "9fc3b166a0220f48863855d5c994423a2a3bc9c1" }

@@ -1,0 +1,2 @@
+[components.openni]
+spec = { type = "upstream", upstream-commit = "e8b560be234aaf9c628d5f7117feeb6168ad9850" }

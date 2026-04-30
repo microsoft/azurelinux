@@ -1,0 +1,2 @@
+[components.rust-ucs2]
+spec = { type = "upstream", upstream-commit = "34cea0bcf5cba5e56d7f1cd50f225129db7f9b80" }

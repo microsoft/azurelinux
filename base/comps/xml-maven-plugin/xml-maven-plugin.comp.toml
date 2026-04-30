@@ -1,0 +1,2 @@
+[components.xml-maven-plugin]
+spec = { type = "upstream", upstream-commit = "a9776225b87e38c1502a99f27352e4e210fc3147" }

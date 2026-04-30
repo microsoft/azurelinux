@@ -1,0 +1,2 @@
+[components.caddy]
+spec = { type = "upstream", upstream-commit = "a28b0a7c7d0f53e350f31ce53226d3b9082d0b65" }
