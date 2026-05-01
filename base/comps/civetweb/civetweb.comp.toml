@@ -1,0 +1,3 @@
+[components.civetweb]
+# Release: 10%{?dev:%{dev}}%{?dist}
+release = { calculation = "manual" }
