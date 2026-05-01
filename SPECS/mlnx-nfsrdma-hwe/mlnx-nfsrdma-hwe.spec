@@ -27,11 +27,17 @@
 #
 
 %if 0%{azl}
+<<<<<<< HEAD
 
 %global target_azl_build_kernel_version %azl_kernel_hwe_version
 %global target_kernel_release %azl_kernel_hwe_release
 %global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
 %global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
+=======
+# hard code versions due to ADO bug:58993948
+%global target_azl_build_kernel_version 6.12.85.1
+%global target_kernel_release 1
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -43,7 +49,12 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name mlnx-nfsrdma-hwe}
+<<<<<<< HEAD
 %{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
+=======
+%{!?_version: %define _version 25.07}
+%{!?_mofed_full_version: %define _mofed_full_version %{_version}-8%{release_suffix}%{?dist}}
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
 %{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
@@ -253,8 +264,13 @@ fi
 %endif
 
 %changelog
+<<<<<<< HEAD
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
+=======
+* Thu Apr 30 2026 Rachel Menge <rachelmenge@microsoft.com> - 25.07-8_6.12.85.1.1
+- Bump release to match kernel-hwe
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
 
 * Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-7_6.12.78.2.1
 - Bump release to rebuild for new kernel release

@@ -8361,8 +8361,13 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
+<<<<<<< HEAD
           "version": "6.12.83.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.83.1.tar.gz"
+=======
+          "version": "6.12.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.85.1.tar.gz"
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
         }
       }
     },
@@ -8371,8 +8376,13 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
+<<<<<<< HEAD
           "version": "6.12.83.1",
           "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.83.1.tar.gz"
+=======
+          "version": "6.12.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.85.1.tar.gz"
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
         }
       }
     },

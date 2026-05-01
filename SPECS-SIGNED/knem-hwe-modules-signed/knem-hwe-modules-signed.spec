@@ -27,9 +27,15 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
+<<<<<<< HEAD
 
 %global target_azl_build_kernel_version %azl_kernel_hwe_version
 %global target_kernel_release %azl_kernel_hwe_release
+=======
+# hard code versions due to ADO bug:58993948
+%global target_azl_build_kernel_version 6.12.85.1
+%global target_kernel_release 1
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
@@ -110,8 +116,13 @@ fi
 /lib/modules/
 
 %changelog
+<<<<<<< HEAD
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-32_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
+=======
+* Thu Apr 30 2026 Rachel Menge <rachelmenge@microsoft.com> - 1.1.4.90mlnx3-32_6.12.85.1.1
+- Bump release to match kernel-hwe
+>>>>>>> e615f47ae ([AUTOPATCHER-kernel] Kernel upgrade to version 6.12.85.1 - branch fasttrack/3.0 (#16977))
 
 * Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.1.4.90mlnx3-31_6.12.78.2.1
 - Bump release to rebuild for new kernel release
