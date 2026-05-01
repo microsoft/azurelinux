@@ -1,0 +1,3 @@
+[components.lirc]
+# Release: 4%{?tag:.}%{?tag}%{?dist}
+release = { calculation = "manual" }
