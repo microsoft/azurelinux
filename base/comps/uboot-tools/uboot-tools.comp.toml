@@ -1,4 +1,6 @@
 [components.uboot-tools]
+# Release: 1%{?candidate:.%{candidate}}%{?dist}
+release = { calculation = "manual" }
 
 [components.uboot-tools.build]
 # Disable the "toolsonly" bcond to skip building firmware images for ARM dev
