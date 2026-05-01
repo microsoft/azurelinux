@@ -1,0 +1,3 @@
+[components.zaf]
+# Release: 0.32.%{upstreamid}svn%{?dist}
+release = { calculation = "manual" }
