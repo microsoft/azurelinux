@@ -1,0 +1,3 @@
+[components.w3m]
+# Release: 66.git%{gitdate}%{?dist}
+release = { calculation = "manual" }
