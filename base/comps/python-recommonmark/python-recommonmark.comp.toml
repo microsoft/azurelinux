@@ -1,0 +1,3 @@
+[components.python-recommonmark]
+# Release: 16.git%{?dist}
+release = { calculation = "manual" }
