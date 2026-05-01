@@ -1,0 +1,3 @@
+[components.freeipa]
+# Release: 5%{?rc_version:.%rc_version}%{?dist}
+release = { calculation = "manual" }
