@@ -1,0 +1,3 @@
+[components.libgpiod]
+# Release: 1%{?candidate:.%{candidate}}%{?dist}
+release = { calculation = "manual" }
