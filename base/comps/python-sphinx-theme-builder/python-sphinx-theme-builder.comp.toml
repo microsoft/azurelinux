@@ -1,0 +1,3 @@
+[components.python-sphinx-theme-builder]
+# Release: 0.25.%{prerel}%{?dist}
+release = { calculation = "manual" }
