@@ -1,4 +1,6 @@
 [components.fence-agents]
+# Release: 1%{?alphatag:.%{alphatag}}%{?dist}
+release = { calculation = "manual" }
 
 # Remove fence-agents-xenapi from the fence-agents-all metapackage.
 # Xen is not applicable to Azure Linux's Hyper-V/KVM environment.
