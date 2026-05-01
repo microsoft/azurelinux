@@ -1,0 +1,3 @@
+[components.mariadb-connector-c]
+# Release: 3%{?with_debug:.debug}%{?dist}
+release = { calculation = "manual" }
