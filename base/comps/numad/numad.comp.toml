@@ -1,0 +1,3 @@
+[components.numad]
+# Release: 47.20150602git%{?dist}
+release = { calculation = "manual" }
