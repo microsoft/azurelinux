@@ -117,27 +117,17 @@ def format_comment(
     n_missing = len(missing_files)
 
     all_comps: list[str] = sorted(
-        {item["component"] for item in content_diffs + missing_files}
+        {item["component"] for item in content_diffs + extra_files}
     )
-    use_all = bool(extra_files) or bool(missing_files)
+    # Missing files (in HEAD but not produced by render) are orphans that
+    # need `--clean-stale`, which only works with `-a`. Extras (produced by
+    # render but not committed) are handled fine by a per-component render.
+    use_all = bool(missing_files)
     remediation_cmd = _render_command([] if use_all else all_comps, use_all=use_all)
 
     lines: list[str] = [
         COMMENT_MARKER,
         "## 📄❌ Rendered specs are out of date",
-        "",
-        "🚧🚧🚧🚧🚧",
-        "",
-        "> [!WARNING]",
-        ">",
-        "> **Disregard this comment.**",
-        ">",
-        "> Spec rendering is still under development and checked-in specs",
-        "> should not be updated in PRs yet.",
-        "> Please ignore this comment for now unless you are actively",
-        "> working on the render pipeline.",
-        "",
-        "🚧🚧🚧🚧🚧",
         "",
         "**FIX:** — run this and commit the result:",
         "",

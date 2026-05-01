@@ -13,7 +13,7 @@ Usage:
     python3 check_rendered_specs.py --specs-dir specs --report report.json --patch fix.patch
 
 Exit codes:
-    0 — specs are up to date (timestamp-only noise filtered)
+    0 — specs are up to date
     1 — real diffs, extra files, or missing files detected
 """
 
@@ -22,7 +22,6 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -30,16 +29,6 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-
-# Matches the azldev-generated changelog line.
-# Tightly coupled to the format emitted by azldev's render pipeline; if azldev
-# ever changes the emitted form (email suffix, version tag, different
-# whitespace) this regex must be updated or every spec will look like drift.
-# Owner: azure-linux-dev-tools (cmd that emits "* <date> azldev <user@example.com>" lines).
-# e.g. "* Wed Apr 08 2026 azldev <azurelinux@microsoft.com> - 1.0-1"
-_CHANGELOG_DATE_RE = re.compile(
-    r"^\* [A-Z][a-z]{2} [A-Z][a-z]{2} [0-9]{2} [0-9]{4} azldev\b"
-)
 
 # ---------------------------------------------------------------------------
 # Git helpers
@@ -87,21 +76,6 @@ def _resolve_head_blobs(paths: list[str]) -> dict[str, str]:
 
 
 # ---------------------------------------------------------------------------
-# Normalisation
-# ---------------------------------------------------------------------------
-
-
-def normalize_changelog_date(text: str) -> str:
-    """Replace the date on azldev changelog entries with a placeholder."""
-    out: list[str] = []
-    for line in text.splitlines(keepends=True):
-        if _CHANGELOG_DATE_RE.match(line):
-            line = _CHANGELOG_DATE_RE.sub("* DATEPLACEHOLDER azldev", line)
-        out.append(line)
-    return "".join(out)
-
-
-# ---------------------------------------------------------------------------
 # Diff / classification
 # ---------------------------------------------------------------------------
 
@@ -142,11 +116,11 @@ def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
     return changed, extra, missing
 
 
-def filter_timestamp_noise(changed_files: list[str], specs_dir: Path) -> list[dict]:
-    """Filter changed files to only those with real (non-timestamp) diffs.
+def build_content_diffs(changed_files: list[str]) -> list[dict]:
+    """Build diff entries for changed files.
 
-    Only .spec files are checked for timestamp noise — other file types
-    (patches, GPG keys, etc.) are always treated as real changes.
+    Reads committed and working-tree versions, compares them, and returns
+    a list of diff entries for files that actually differ.
     """
     real_diffs: list[dict] = []
     # Resolve all HEAD blob hashes up front so we can fetch each file's
@@ -156,7 +130,6 @@ def filter_timestamp_noise(changed_files: list[str], specs_dir: Path) -> list[di
     head_blobs = _resolve_head_blobs(changed_files)
     for path_str in changed_files:
         file_path = Path(path_str)
-        is_spec = file_path.suffix == ".spec"
 
         # Symlinks in a rendered-output tree are suspicious (could point
         # anywhere on the runner's filesystem). Flag and skip content reads.
@@ -245,20 +218,9 @@ def filter_timestamp_noise(changed_files: list[str], specs_dir: Path) -> list[di
             )
             continue
 
-        if is_spec:
-            norm_committed = normalize_changelog_date(committed)
-            norm_working = normalize_changelog_date(working)
-        else:
-            norm_committed = committed
-            norm_working = working
-
-        # Equality check on the *normalised* text filters out timestamp-only
-        # drift (the whole point of this function). If the normalised
-        # versions match, skip.
-        if norm_committed == norm_working:
+        if committed == working:
             continue
 
-        # Use the original diff for display purposes.
         udiff = "".join(
             difflib.unified_diff(
                 committed.splitlines(keepends=True),
@@ -465,9 +427,9 @@ def main() -> int:
         f"Raw counts: changed={len(changed)} extra={len(extra)} missing={len(missing)}"
     )
 
-    # 2. Filter timestamp noise from content diffs
-    content_diffs = filter_timestamp_noise(changed, specs_dir)
-    print(f"After timestamp filtering: {len(content_diffs)} real content diff(s)")
+    # 2. Build content diffs
+    content_diffs = build_content_diffs(changed)
+    print(f"{len(content_diffs)} content diff(s)")
 
     # 3. Build report
     report = build_report(content_diffs, extra, missing)
@@ -490,7 +452,7 @@ def main() -> int:
 
     # 5. Print summary and exit
     if total == 0:
-        print("All rendered specs are up to date (timestamp-only noise filtered).")
+        print("All rendered specs are up to date.")
         return 0
 
     print(
@@ -500,10 +462,10 @@ def main() -> int:
     all_comps = sorted(
         set(
             _unique_components(content_diffs)
-            + _unique_components(report.get("missing_files", []))
+            + _unique_components(report.get("extra_files", []))
         )
     )
-    if extra or missing:
+    if missing:
         print(f"Remediation: {_render_command([], use_all=True)}")
     elif all_comps:
         print(f"Remediation: {_render_command(all_comps)}")

@@ -99,7 +99,6 @@ jobs:
       # requires setuid, which that flag blocks.
       - name: Render + check for drift
         id: check
-        continue-on-error: true # TODO: flip off once check stabilizes (see PR #16674)
         env:
           WORKSPACE: ${{ github.workspace }}
         run: |
@@ -130,7 +129,7 @@ jobs:
       # which only works with named artifacts.
       - name: Upload fix patch (unzipped, for browser download)
         id: upload-patch
-        if: hashFiles('render-output/rendered-specs.patch') != ''
+        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           path: render-output/rendered-specs.patch
@@ -138,7 +137,7 @@ jobs:
 
       # See: https://github.com/cli/cli/issues/13012 for why this is needed.
       - name: Upload fix patch (zipped, for gh run download)
-        if: hashFiles('render-output/rendered-specs.patch') != ''
+        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: rendered-specs-patch
@@ -248,7 +247,6 @@ jobs:
       # SYS_ADMIN / seccomp=unconfined / apparmor=unconfined are needed).
       - name: Update locks + capture patch
         id: update
-        continue-on-error: true # TODO: flip off once check stabilizes (see PR #16674)
         env:
           WORKSPACE: ${{ github.workspace }}
         run: |
@@ -315,6 +313,18 @@ jobs:
         with:
           name: update-output
           path: locks-output/update-output.json
+
+      # Fail the job when any component's lock file drifted. Uses the
+      # authoritative JSON output rather than the patch file so we catch
+      # drift even if patch generation itself regresses.
+      - name: Fail on lock drift
+        run: |
+          set -euo pipefail
+          changed=$(jq '[.[]? | select(.changed == true)] | length' locks-output/update-output.json)
+          if [ "$changed" -gt 0 ]; then
+            echo "::error::${changed} lock file(s) are out of date — run 'azldev component update -a' and commit the result"
+            exit 1
+          fi
 
   # Post the locks PR comment. Same security posture as the `comment` job:
   # `pull-requests: write` is only granted to a job that does NOT execute any
