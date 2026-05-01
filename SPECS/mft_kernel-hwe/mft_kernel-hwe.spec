@@ -1,6 +1,6 @@
 %if 0%{azl}
 # hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.78.2
+%global target_azl_build_kernel_version 6.12.85.1
 %global target_kernel_release 1
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
@@ -35,7 +35,7 @@
 Name:		 mft_kernel-hwe
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
 Version:	 4.33.0
-Release:	 7%{release_suffix}%{?dist}
+Release:	 8%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -213,6 +213,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Thu Apr 30 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.33.0-8_6.12.85.1.1
+- Bump release to match kernel-hwe
+
 * Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.33.0-7_6.12.78.2.1
 - Bump release to rebuild for new kernel release
 
