@@ -1,0 +1,3 @@
+[components.kdump-anaconda-addon]
+# Release: 16.%{snapshotdate}git%{gitshortcommit}%{?dist}
+release = { calculation = "manual" }
