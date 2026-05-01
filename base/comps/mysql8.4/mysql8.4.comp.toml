@@ -1,0 +1,3 @@
+[components.'mysql8.4']
+# Release: 1%{?with_debug:.debug}%{?dist}
+release = { calculation = "manual" }
