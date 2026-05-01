@@ -1,0 +1,3 @@
+[components.matchbox-window-manager]
+# Release: 39.%{alphatag}%{?dist}
+release = { calculation = "manual" }
