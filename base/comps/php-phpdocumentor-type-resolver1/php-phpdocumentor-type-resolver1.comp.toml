@@ -1,0 +1,3 @@
+[components.php-phpdocumentor-type-resolver1]
+# Release: 1%{?github_release}%{?dist}
+release = { calculation = "manual" }
