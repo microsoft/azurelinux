@@ -17542,7 +17542,6 @@ packages = [
     "tumbler-extras", # srpm: tumbler
     "ubdsrv", # srpm: ubdsrv
     "ubdsrv-devel", # srpm: ubdsrv
-    "uboot-tools", # srpm: uboot-tools
     "ucrt64-binutils", # srpm: mingw-binutils
     "ucrt64-cpp", # srpm: mingw-gcc
     "ucrt64-crt", # srpm: mingw-crt

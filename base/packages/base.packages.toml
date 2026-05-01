@@ -5842,6 +5842,7 @@ packages = [
     "twolame-libs", # srpm: twolame
     "tzdata", # srpm: tzdata
     "tzdata-java", # srpm: tzdata
+    "uboot-tools", # srpm: uboot-tools
     "uchardet", # srpm: uchardet
     "uchardet-devel", # srpm: uchardet
     "ucx", # srpm: ucx
