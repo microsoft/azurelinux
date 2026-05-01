@@ -162,6 +162,23 @@ func processSpecFile(specFile string, buildArch string, distTag string, macrosOu
 	return macrosOutput, nil
 }
 
+// sanitizeMacroIdentPart converts an arbitrary string to a fragment that is valid
+// inside an RPM macro identifier. RPM macro names may only contain ASCII letters,
+// digits, and underscores; every other character is replaced with '_'.
+func sanitizeMacroIdentPart(s string) string {
+	return strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z',
+			r >= 'A' && r <= 'Z',
+			r >= '0' && r <= '9',
+			r == '_':
+			return r
+		default:
+			return '_'
+		}
+	}, s)
+}
+
 func processPackageVersionString(packageNEVRA string) (macros []string, err error) {
 	const prefix = "azl"
 
@@ -175,8 +192,10 @@ func processPackageVersionString(packageNEVRA string) (macros []string, err erro
 	version := matches[rpm.RpmSpecBuiltRPMRegexVersionIndex]
 	release := matches[rpm.RpmSpecBuiltRPMRegexReleaseIndex]
 
-	// Replace '-' with '_' as RPM macros cannot have '-'.
-	nameMacroFormat := strings.ReplaceAll(name, "-", "_")
+	// RPM macro names may only contain alphanumerics and underscores. Replace any
+	// other character (e.g. '-', '+', '.') in the package name with '_' so the
+	// generated macro identifier is valid.
+	nameMacroFormat := sanitizeMacroIdentPart(name)
 
 	epochMacroString := prefix + "_" + nameMacroFormat + "_epoch"
 	versionMacroString := prefix + "_" + nameMacroFormat + "_version"

@@ -55,6 +55,34 @@ func TestProcessPackageVersionString_ErrorsOnBadFormat(t *testing.T) {
 	assert.Nil(t, macros)
 }
 
+// ---------------------------------------------------------------------------
+// sanitizeMacroIdentPart tests
+// ---------------------------------------------------------------------------
+
+func TestSanitizeMacroIdentPart(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{name: "empty string", input: "", expected: ""},
+		{name: "alphanumerics only", input: "abc123", expected: "abc123"},
+		{name: "underscores preserved", input: "foo_bar_baz", expected: "foo_bar_baz"},
+		{name: "hyphens replaced", input: "foo-bar", expected: "foo_bar"},
+		{name: "single plus", input: "libxml++", expected: "libxml__"},
+		{name: "single dot", input: "rubygem-cool.io", expected: "rubygem_cool_io"},
+		{name: "leading digit preserved", input: "30libsigc", expected: "30libsigc"},
+		{name: "mixed special chars", input: "python3-prometheus_client+twisted", expected: "python3_prometheus_client_twisted"},
+		{name: "non-ASCII unicode replaced", input: "naïve", expected: "na_ve"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, sanitizeMacroIdentPart(tt.input))
+		})
+	}
+}
+
 func TestProcessPackageVersionString_TableDriven(t *testing.T) {
 	tests := []struct {
 		name            string
@@ -85,6 +113,30 @@ func TestProcessPackageVersionString_TableDriven(t *testing.T) {
 			input:           "ca-certificates-base-3.0.0-14.azl3.noarch",
 			expectedVersion: "%azl_ca_certificates_base_version 3.0.0",
 			expectedRelease: "%azl_ca_certificates_base_release 14",
+		},
+		{
+			name:            "package name with plus signs",
+			input:           "libsigc++30-3.0.7-1.azl3.x86_64",
+			expectedVersion: "%azl_libsigc__30_version 3.0.7",
+			expectedRelease: "%azl_libsigc__30_release 1",
+		},
+		{
+			name:            "package name with hyphens and plus signs",
+			input:           "gcc-c++-13.0.1-1.azl3.x86_64",
+			expectedVersion: "%azl_gcc_c___version 13.0.1",
+			expectedRelease: "%azl_gcc_c___release 1",
+		},
+		{
+			name:            "package name with a dot",
+			input:           "rubygem-cool.io-1.2.3-4.azl3.x86_64",
+			expectedVersion: "%azl_rubygem_cool_io_version 1.2.3",
+			expectedRelease: "%azl_rubygem_cool_io_release 4",
+		},
+		{
+			name:            "package name with mixed special chars",
+			input:           "python3-prometheus_client+twisted-0.21.1-2.azl3.noarch",
+			expectedVersion: "%azl_python3_prometheus_client_twisted_version 0.21.1",
+			expectedRelease: "%azl_python3_prometheus_client_twisted_release 2",
 		},
 	}
 
@@ -272,6 +324,78 @@ Libs.
 	assert.Contains(t, combined, "%azl_multipkg_devel_release 3")
 	assert.Contains(t, combined, "%azl_multipkg_libs_version 4.0.0")
 	assert.Contains(t, combined, "%azl_multipkg_libs_release 3")
+}
+
+// TestProcessSpecFile_SubpackageWithSpecialChars exercises the full
+// rpmspec --builtrpms path with a subpackage whose name contains characters
+// invalid for an RPM macro identifier ('+' and '.'), making sure the sanitizer
+// produces well-formed macro names end-to-end.
+func TestProcessSpecFile_SubpackageWithSpecialChars(t *testing.T) {
+	distTag := ".azl3"
+
+	tmpDir := t.TempDir()
+	specDir := filepath.Join(tmpDir, "specialchars")
+	err := os.MkdirAll(specDir, 0755)
+	require.NoError(t, err)
+
+	specContent := `Summary:        Test spec with special characters in subpackage names
+Name:           specialchars
+Version:        1.2.3
+Release:        4%{?dist}
+License:        MIT
+URL:            https://test.com
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+
+%description
+Main package.
+
+%package -n libfoo++
+Summary:        Subpackage with plus signs
+
+%description -n libfoo++
+Plus.
+
+%package -n libfoo.io
+Summary:        Subpackage with a dot
+
+%description -n libfoo.io
+Dot.
+
+%files
+%defattr(-,root,root)
+
+%files -n libfoo++
+%defattr(-,root,root)
+
+%files -n libfoo.io
+%defattr(-,root,root)
+
+%changelog
+* Mon Oct 11 2021 Test User <test@test.com> 1.2.3-4
+- Test entry.
+`
+	specPath := filepath.Join(specDir, "specialchars.spec")
+	err = os.WriteFile(specPath, []byte(specContent), 0644)
+	require.NoError(t, err)
+
+	arch := testBuildArch(t)
+	macros, err := processSpecFile(specPath, arch, distTag, nil)
+	require.NoError(t, err)
+	// Default + 2 subpackages = 3 entries, each emitting a version and a
+	// release macro = 6 macros total.
+	require.Len(t, macros, 6)
+
+	combined := strings.Join(macros, "\n")
+	// Default package is unaffected by sanitization.
+	assert.Contains(t, combined, "%azl_specialchars_version 1.2.3")
+	assert.Contains(t, combined, "%azl_specialchars_release 4")
+	// '++' becomes '__'.
+	assert.Contains(t, combined, "%azl_libfoo___version 1.2.3")
+	assert.Contains(t, combined, "%azl_libfoo___release 4")
+	// '.' becomes '_'.
+	assert.Contains(t, combined, "%azl_libfoo_io_version 1.2.3")
+	assert.Contains(t, combined, "%azl_libfoo_io_release 4")
 }
 
 func TestProcessSpecFile_NonexistentFile(t *testing.T) {
