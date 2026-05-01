@@ -76,9 +76,9 @@ to run in the initramfs on boot.
 %prep
 %autosetup -n %{crate}-%{version} -N
 # Apply patches that target the upstream tree
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 # Do vendor expansion here manually by
 # calling `tar x` and setting up
 # .cargo/config to use it.
@@ -93,10 +93,10 @@ replace-with = "vendored-sources"
 directory = "vendor"
 EOF
 pushd vendor
-%patch3 -p1
+%patch 3 -p1
 popd
 
-%patch4 -p1
+%patch 4 -p1
 
 %build
 cargo build --features cl-legacy --release --offline 
