@@ -1,0 +1,3 @@
+[components.mecab]
+# Release: 0.%{baserelease}.%{betaver}%{?dist}
+release = { calculation = "manual" }
