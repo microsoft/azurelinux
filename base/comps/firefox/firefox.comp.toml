@@ -1,4 +1,6 @@
 [components.firefox]
+# Release: 1%{?pre_tag}%{?dist}
+release = { calculation = "manual" }
 
 # Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
 # without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
