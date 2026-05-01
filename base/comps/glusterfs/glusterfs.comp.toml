@@ -1,0 +1,3 @@
+[components.glusterfs]
+# Release: 0.@PACKAGE_RELEASE@%{?dist}.26
+release = { calculation = "manual" }
