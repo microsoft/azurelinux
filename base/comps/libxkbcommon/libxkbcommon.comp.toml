@@ -1,0 +1,3 @@
+[components.libxkbcommon]
+# Release: 1%{?gitdate:.%{gitdate}}%{?dist}
+release = { calculation = "manual" }
