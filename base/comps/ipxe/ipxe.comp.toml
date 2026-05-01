@@ -1,0 +1,3 @@
+[components.ipxe]
+# Release: 4.git%{hash}%{?dist}
+release = { calculation = "manual" }
