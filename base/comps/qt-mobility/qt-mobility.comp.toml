@@ -1,0 +1,3 @@
+[components.qt-mobility]
+# Release: 0.50.%{snap}git%{git_short}%{?dist}
+release = { calculation = "manual" }
