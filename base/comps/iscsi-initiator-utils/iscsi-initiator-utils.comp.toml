@@ -1,4 +1,6 @@
 [components.iscsi-initiator-utils]
+# Release: 0.git%{shortcommit0}%{?dist}.2
+release = { calculation = "manual" }
 
 # Fedora's 0104-libiscsi-build-fixes.patch hardcodes -L../redhat-linux-build in the libiscsi
 # Makefile, assuming the meson build directory is named redhat-linux-build (from Fedora's
