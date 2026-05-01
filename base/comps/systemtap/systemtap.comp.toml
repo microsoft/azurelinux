@@ -1,0 +1,3 @@
+[components.systemtap]
+# Release: 1%{?release_override}%{?dist}
+release = { calculation = "manual" }
