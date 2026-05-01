@@ -1,0 +1,3 @@
+[components.python-sphinx-basic-ng]
+# Release: 0.17.%{prerel}%{?dist}
+release = { calculation = "manual" }
