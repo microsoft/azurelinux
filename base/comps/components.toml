@@ -68,7 +68,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml"]
 [components.aide]
 [components.alex]
 [components.allegro]
-[components.alsa-lib]
 [components.aml]
 [components.amtterm]
 

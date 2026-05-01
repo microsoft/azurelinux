@@ -1,0 +1,3 @@
+[components.alsa-lib]
+# Release: 1%{?prever_dot}%{?dist}
+release = { calculation = "manual" }
