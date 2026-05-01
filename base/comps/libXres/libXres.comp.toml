@@ -1,0 +1,3 @@
+[components.libXres]
+# Release: 6%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+release = { calculation = "manual" }
