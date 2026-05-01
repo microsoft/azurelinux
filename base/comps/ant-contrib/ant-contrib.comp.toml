@@ -1,0 +1,3 @@
+[components.ant-contrib]
+# Release: 0.49.%{beta_number}%{?dist}
+release = { calculation = "manual" }
