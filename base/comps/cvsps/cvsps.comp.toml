@@ -1,0 +1,3 @@
+[components.cvsps]
+# Release: 0.39.b1%{?dist}
+release = { calculation = "manual" }
