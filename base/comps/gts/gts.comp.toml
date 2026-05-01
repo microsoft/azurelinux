@@ -1,0 +1,3 @@
+[components.gts]
+# Release: 51.20%{snapshot}%{?dist}
+release = { calculation = "manual" }
