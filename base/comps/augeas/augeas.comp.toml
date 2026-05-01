@@ -1,0 +1,3 @@
+[components.augeas]
+# Release: 0.6%{?dist}
+release = { calculation = "manual" }
