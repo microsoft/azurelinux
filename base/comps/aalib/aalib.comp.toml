@@ -1,0 +1,3 @@
+[components.aalib]
+# Release: 0.56.%{rc_subver}%{?dist}
+release = { calculation = "manual" }
