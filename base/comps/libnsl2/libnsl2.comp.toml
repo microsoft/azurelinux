@@ -1,0 +1,3 @@
+[components.libnsl2]
+# Release: 4%{?relsuffix}%{?dist}
+release = { calculation = "manual" }
