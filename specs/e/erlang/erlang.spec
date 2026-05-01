@@ -75,7 +75,7 @@
 
 Name:		erlang
 Version:	26.2.5.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
 License:	Apache-2.0

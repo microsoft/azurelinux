@@ -134,7 +134,7 @@ f /var/log/stap-server/log 0644 stap-server stap-server -
 Name: systemtap
 # PRERELEASE
 Version: 5.4
-Release: 1%{?release_override}%{?dist}
+Release: 3%{?release_override}%{?dist}
 # for version, see also configure.ac
 
 
@@ -171,6 +171,7 @@ Summary: Programmable system-wide instrumentation system
 License: GPL-2.0-or-later
 URL: https://sourceware.org/systemtap/
 Source: ftp://sourceware.org/pub/systemtap/releases/systemtap-%{version}.tar.gz
+Patch0: systemtap-gcc16.patch
 
 # Build*
 BuildRequires: make
@@ -616,6 +617,7 @@ or within a container.
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 
@@ -1366,6 +1368,12 @@ exit 0
 
 # PRERELEASE
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 5.4-2
+- Patched to workaround Autoconf 2.72 incompatiblity with GCC 16
+
 * Fri Oct 31 2025 Frank Ch. Eigler <fche@redhat.com> - 5.4-1
 - Upstream release, see wiki page below for detailed notes.
   https://sourceware.org/systemtap/wiki/SystemTapReleases

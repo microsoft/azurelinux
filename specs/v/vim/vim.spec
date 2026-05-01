@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/vim.azl.macros}
+
 %bcond_without gui
 
 
@@ -57,7 +60,7 @@ Summary: The VIM editor
 URL:     https://www.vim.org/
 Name: vim
 Version: %{baseversion}.%{patchlevel}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch: 2
 # swift.vim contains Apache 2.0 with runtime library exception:
 # which is taken as Apache-2.0 WITH Swift-exception - reported to legal as https://gitlab.com/fedora/legal/fedora-license-data/-/issues/188
@@ -83,6 +86,7 @@ Source11: vim-default-editor.fish
 Source12: view_wrapper
 Source13: vim.sh
 Source14: vim.fish
+Source9999: vim.azl.macros
 
 
 Patch1: vim-7.0-fixkeys.patch

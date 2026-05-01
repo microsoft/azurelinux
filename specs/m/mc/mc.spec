@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/mc.azl.macros}
+
 # NOTE: disabled sftp (needs to be ported to use libssh instead of libssh2)
 %bcond gpm %[!(0%{?rhel} >= 10)]
 %bcond slang 1
@@ -9,10 +12,11 @@ Summary:	User-friendly text console file manager and visual shell
 Name:		mc
 Epoch:		1
 Version: 	4.8.33
-Release: 3%{?dist}
+Release: 4%{?dist}
 License:	GPL-3.0-or-later
 URL:		https://midnight-commander.org/
 Source:		http://ftp.midnight-commander.org/mc-%{version}.tar.xz
+Source9999: mc.azl.macros
 Patch:		%{name}-spec.syntax.patch
 BuildRequires:	autoconf
 BuildRequires:	automake

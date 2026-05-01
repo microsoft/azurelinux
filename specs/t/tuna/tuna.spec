@@ -8,7 +8,7 @@
 
 Name: tuna
 Version: 0.20
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-only AND LGPL-2.1-only
 Summary: Application tuning GUI & command line utility
 Source: https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz

@@ -1,0 +1,13 @@
+--- systemtap-5.4/configure~	2025-10-30 14:47:35.000000000 +0000
++++ systemtap-5.4/configure	2026-01-13 18:53:20.466037572 +0000
+@@ -3121,8 +3121,8 @@
+ }
+ {
+   // Unicode literals
+-  char const *utf8 = u8"UTF-8 string \u2500";
+-  char16_t const *utf16 = u"UTF-8 string \u2500";
++  auto const *utf8 = u8"UTF-8 string \u2500";
++  char16_t const *utf16 = u"UTF-16 string \u2500";
+   char32_t const *utf32 = U"UTF-32 string \u2500";
+ }
+ '
