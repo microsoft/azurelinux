@@ -1,0 +1,3 @@
+[components.golang-github-macaron-inject]
+# Release: 0.25%{?dist}
+release = { calculation = "manual" }
