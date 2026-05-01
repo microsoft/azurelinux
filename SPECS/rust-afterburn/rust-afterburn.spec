@@ -37,6 +37,8 @@ Patch0:         0001-Revert-remove-cl-legacy-feature.patch
 Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
 Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
 Patch3:         CVE-2026-25541.patch
+# Patch3 changes vendored files; Patch4 updates the recorded hashes so Cargo accepts the modified vendored crate.
+Patch4:         bytes-checksum.patch
 
 ExcludeArch:    %{ix86}
 
@@ -72,7 +74,11 @@ Dracut module that enables afterburn and corresponding services
 to run in the initramfs on boot.
 
 %prep
-%autosetup -n %{crate}-%{version} -p1
+%autosetup -n %{crate}-%{version} -N
+# Apply patches that target the upstream tree
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
 # Do vendor expansion here manually by
 # calling `tar x` and setting up
 # .cargo/config to use it.
@@ -86,6 +92,11 @@ replace-with = "vendored-sources"
 [source.vendored-sources]
 directory = "vendor"
 EOF
+pushd vendor
+%patch3 -p1
+popd
+
+%patch4 -p1
 
 %build
 cargo build --features cl-legacy --release --offline 
