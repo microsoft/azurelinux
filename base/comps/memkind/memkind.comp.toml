@@ -1,0 +1,3 @@
+[components.memkind]
+# Release: 11%{?checkout}%{?dist}
+release = { calculation = "manual" }
