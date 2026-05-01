@@ -1,0 +1,3 @@
+[components.syslinux]
+# Release: 0.33%{?dist}
+release = { calculation = "manual" }
