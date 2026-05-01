@@ -1,0 +1,3 @@
+[components.mariadb-connector-odbc]
+# Release: 2%{?with_debug:.debug}%{?dist}
+release = { calculation = "manual" }
