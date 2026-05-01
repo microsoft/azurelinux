@@ -1,0 +1,3 @@
+[components.isl]
+# Release: 23%{?buildid}%{?dist}
+release = { calculation = "manual" }
