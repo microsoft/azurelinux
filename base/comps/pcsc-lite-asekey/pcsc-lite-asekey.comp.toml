@@ -1,4 +1,6 @@
 [components.pcsc-lite-asekey]
+# Release: 27%{dist}
+release = { calculation = "manual" }
 
 # The upstream Makefile constructs the compiler name as CC=$(BUILD)-gcc, where
 # BUILD is the GNU triplet from ./configure --build=. For reasons that we still need
