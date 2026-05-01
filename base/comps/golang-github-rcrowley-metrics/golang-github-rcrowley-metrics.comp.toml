@@ -1,0 +1,3 @@
+[components.golang-github-rcrowley-metrics]
+# Release: 0.41%{?dist}
+release = { calculation = "manual" }
