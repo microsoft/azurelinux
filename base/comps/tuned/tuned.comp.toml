@@ -1,0 +1,3 @@
+[components.tuned]
+# Release: 1%{?prerel1}%{?git_suffix:.%{git_suffix}}%{?dist}
+release = { calculation = "manual" }
