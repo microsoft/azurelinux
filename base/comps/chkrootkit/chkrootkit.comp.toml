@@ -1,0 +1,3 @@
+[components.chkrootkit]
+# Release: 1b%{?dist}
+release = { calculation = "manual" }
