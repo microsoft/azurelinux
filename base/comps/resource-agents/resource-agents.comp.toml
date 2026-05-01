@@ -1,0 +1,3 @@
+[components.resource-agents]
+# Release: 1%{?rcver:%{rcver}}%{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}%{?dist}
+release = { calculation = "manual" }
