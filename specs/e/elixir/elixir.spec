@@ -134,11 +134,8 @@ HTML documentation for eex, elixir, iex, logger and mix.
 * Mon Jan 19 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1.19.5-4
 - increase timeouts for tests to make riscv64 port pass
 
-* Fri Jan 16 2026 Peter Lemenkov <peter@fedoraproject.org> - 1.19.5-3
-- Merge #8 `Sync 'erlang-doc' requirement with erlang package.`
-
-* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.19.5-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+* Fri Jan 16 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1.19.5-2
+- Sync 'erlang-doc' requirement with erlang package.
 
 * Fri Jan 09 2026 Peter Lemenkov <lemenkov@gmail.com> - 1.19.5-1
 - Elixir ver. 1.19.5

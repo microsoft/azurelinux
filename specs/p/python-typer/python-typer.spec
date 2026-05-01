@@ -246,9 +246,6 @@ export PYTHONPATH="${PWD}/_stub:%{buildroot}%{python3_sitelib}"
 * Sat Sep 20 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.1-3
 - Drop test skips for click 8.2.2 (click was downgraded in Fedora)
 
-* Sat Sep 20 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.1-2
-- Merge branch 'epel10' into rawhide
-
 * Sat Sep 20 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.19.1-1
 - Update to 0.19.1 (close RHBZ#2397078)
 

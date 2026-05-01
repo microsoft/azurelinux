@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global	mainver		1.18.10
+%global	mainver		1.19.1
 #%%global	prever		.rc4
 
 %global	baserelease		1
@@ -37,6 +37,7 @@ BuildRequires:	ruby(rubygems)
 ##
 ## For %%check
 BuildRequires:	rubygem(minitest)
+BuildRequires:	rubygem(minitest-mock)
 %if !0%{?rhel}
 # For test/xml/test_document_encoding.rb
 # Drop rubygem(rubyzip) build dependency in RHEL
@@ -278,6 +279,21 @@ popd
 %doc	%{gem_dir}/doc/%{gem_name}-%{mainver}%{?prever}/
 
 %changelog
+* Tue Feb 17 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.1-1
+- 1.19.1
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.19.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.0-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_4.0
+
+* Tue Dec 30 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.19.0-1
+- 1.19.0
+
+* Wed Dec 24 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.18.10-2
+- Handle minitest 6 compatibility
+
 * Mon Sep 15 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.18.10-1
 - 1.18.10
 

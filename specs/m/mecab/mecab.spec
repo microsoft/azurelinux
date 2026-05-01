@@ -12,9 +12,9 @@
 Name:		mecab
 Version:	%{mainver}
 %if %{?betaver:0}%{!?betaver:1}
-Release: 1.%{baserelease}.%{betaver}%{?dist}
+Release:	%{baserelease}%{?dist}
 %else
-Release: 1.%{baserelease}.%{betaver}%{?dist}
+Release:	0.%{baserelease}.%{betaver}%{?dist}
 %endif
 Summary:	Yet Another Part-of-Speech and Morphological Analyzer
 

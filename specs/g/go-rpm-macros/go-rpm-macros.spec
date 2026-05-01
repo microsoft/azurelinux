@@ -285,9 +285,6 @@ export MACRO_LUA_DIR="%{buildroot}%{_rpmluadir}"
 * Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
 
-* Mon Apr 24 2023 Alejandro Saez Morollon <asm@redhat.com> - 3.2.0-5
-- Merge #13 `tests: Fix fmf plan deprecated attributes`
-
 * Mon Apr 24 2023 Edjunior Machado <emachado@redhat.com> - 3.2.0-4
 - tests: Fix fmf plan deprecated attributes
 

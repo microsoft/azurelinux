@@ -159,20 +159,14 @@ false signatures from the service certificate.
 * Mon Jan 16 2023 Stephen Gallagher <sgallagh@redhat.com> - 3.0.3-1
 - Release 3.0.3
 
-* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-8
+* Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
-* Wed Apr 20 2022 Branislav Náter <bnater@redhat.com> - 3.0.2-7
+* Wed Apr 20 2022 Branislav Náter <bnater@redhat.com> - 3.0.2-8
 - Adding fmf metadata
 
-* Wed Apr 20 2022 Branislav Náter <bnater@redhat.com> - 3.0.2-6
+* Wed Apr 20 2022 Branislav Náter <bnater@redhat.com> - 3.0.2-7
 - Adding tmt test plans and gating configuration
-
-* Wed Mar 09 2022 Stephen Gallagher <sgallagh@redhat.com> - 3.0.2-5
-- Merge branch 'f35' into rawhide
-
-* Wed Mar 09 2022 Stephen Gallagher <sgallagh@redhat.com> - 3.0.2-4
-- Merge branch 'f34' into rawhide
 
 * Wed Mar 09 2022 Stephen Gallagher <sgallagh@redhat.com> - 3.0.2-3
 - Truncate IP address in SAN

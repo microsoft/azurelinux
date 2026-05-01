@@ -361,16 +361,13 @@ cd cffi
 - new upstream 2.3.16
 
 * Wed Aug 18 2021 Nick Black <dankamongmen@gmail.com> - 2.3.15-1
-- Merge branch 'rawhide' into f34
+- new upstream 2.3.15
 
 * Thu Aug 05 2021 Nick Black <dankamongmen@gmail.com> - 2.3.13-1
-- merge from rawhide
-
-* Thu Jul 29 2021 Nick Black <dankamongmen@gmail.com> - 2.3.12-3
-- ugh
+- new upstream 2.3.13
 
 * Thu Jul 29 2021 Nick Black <dankamongmen@gmail.com> - 2.3.12-2
-- restore changelog for now
+- replace zlib-devel with pkgconfig(zlib)
 
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.11-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild

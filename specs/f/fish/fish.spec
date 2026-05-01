@@ -302,11 +302,8 @@ fi
 * Mon Apr 10 2023 Siteshwar Vashisht <svashisht@redhat.com> - 3.6.1-1
 - Update to 3.6.1
 
-* Tue Jan 31 2023 Siteshwar Vashisht <svashisht@fedoraproject.org> - 3.6.0-1
-- Merge #13 `Update to 3.6.0`
-
-* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+* Tue Jan 31 2023 Siteshwar Vashisht <svashisht@redhat.com> - 3.6.0-1
+- Update to 3.6.0
 
 * Mon Aug 15 2022 Siteshwar Vashisht <svashisht@redhat.com> - 3.5.1-1
 - Update to 3.5.1

@@ -1,9 +1,0 @@
-#%ldconfig /sbin/ldconfig
-%ldconfig_post(n:) %{?ldconfig:%post -p %ldconfig %{?*} %{-n:-n %{-n*}}\
-%end}
-%ldconfig_postun(n:) %{?ldconfig:%postun -p %ldconfig %{?*} %{-n:-n %{-n*}}\
-%end}
-%ldconfig_scriptlets(n:) %{?ldconfig:\
-%ldconfig_post %{?*} %{-n:-n %{-n*}}\
-%ldconfig_postun %{?*} %{-n:-n %{-n*}}\
-}

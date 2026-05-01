@@ -89,19 +89,19 @@ export OPT_JAR_LIST=:
 * Wed Mar 05 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 1.0-1
 - Drop explicit zero epoch
 
-* Mon Mar 03 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-58
+* Mon Mar 03 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-55
 - Remove javadoc subpackage
 
-* Tue Feb 18 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-57
+* Tue Feb 18 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-54
 - Use %%jar macro
 
-* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0:1.0-56
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0:1.0-53
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Mon Jan 13 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-55
+* Mon Jan 13 2025 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-52
 - Switch upstream URL to https
 
-* Fri Nov 29 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-52
+* Fri Nov 29 2024 Mikolaj Izdebski <mizdebsk@redhat.com> - 0:1.0-49
 - Update javapackages test plan to f42
 
 * Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0:1.0-40

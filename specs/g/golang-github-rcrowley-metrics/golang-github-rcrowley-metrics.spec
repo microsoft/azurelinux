@@ -23,7 +23,7 @@ Go port of coda hale's metrics library.}
 
 Name:           %{goname}
 Version:        0
-Release: 1.41%{?dist}
+Release:        0.41%{?dist}
 Summary:        Go port of coda hale's metrics library
 
 # Automatically converted from old format: BSD - review is highly recommended.

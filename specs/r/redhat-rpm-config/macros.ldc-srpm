@@ -1,2 +1,0 @@
-# arches that ldc builds on
-%ldc_arches %{ix86} x86_64 %{arm} aarch64

@@ -4,7 +4,7 @@
 %global commit0 90abd17b4f97671435798b6147b698aa9087612f
 
 Version:       1.100263
-Release: 1.26.20150923git%{?dist}
+Release:       0.26.20150923git%{?dist}
 URL:           https://www.google.com/fonts/specimen/Roboto+Slab
 
 %global foundry           google

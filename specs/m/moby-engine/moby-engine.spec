@@ -544,9 +544,6 @@ cd %{cli_dir}
 - V28.2.0 has new features and fixes
 - Reconcile all branches for possible packit integration
 
-* Fri May 30 2025 Bradley G Smith <bradley.g.smith@gmail.com> - 28.1.1-3
-- Reconcile divergent branches
-
 * Tue Apr 22 2025 Bradley G Smith <bradley.g.smith@gmail.com> - 28.1.1-2
 - Build with go1.24.2-2
 

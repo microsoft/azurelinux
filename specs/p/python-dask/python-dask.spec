@@ -454,9 +454,6 @@ pytest_args=(
 * Sat Feb 12 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 2022.2.0-1
 - Update to latest version (#2053679)
 
-* Sat Jan 29 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 2022.1.1-2
-- Merge remote-tracking branch 'refs/remotes/origin/rawhide' into rawhide
-
 * Sat Jan 29 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 2022.1.1-1
 - Update to latest version (#2047914)
 

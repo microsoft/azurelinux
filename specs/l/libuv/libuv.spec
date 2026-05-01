@@ -238,9 +238,6 @@ env UV_TEST_TIMEOUT_MULTIPLIER=10 ./%{__cmake_builddir}/uv_run_tests_a
 * Thu Mar 10 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:1.44.1-1
 - Update to 1.44.1 to address regression
 
-* Tue Mar 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:1.44.0-2
-- Merge branch 'epel7' into epel7-update
-
 * Tue Mar 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:1.44.0-1
 - Update to 1.44.0
 

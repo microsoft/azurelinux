@@ -102,9 +102,6 @@ install -Dp -m u=rw,go=r \
 * Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.0-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Tue Jan 07 2025 Peter Oliver <git@mavit.org.uk> - 0.1.0-6
-- Merge remote-tracking branch 'origin/rawhide'
-
 * Mon Jan 06 2025 Peter Oliver <git@mavit.org.uk> - 0.1.0-5
 - Own documentation and licence directories.
 

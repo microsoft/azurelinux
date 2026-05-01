@@ -1,0 +1,9 @@
+# The PAM configuration file for the at daemon
+#
+#
+auth       required    pam_env.so
+auth       include     password-auth
+account    required    pam_access.so
+account    include     password-auth
+session    required    pam_loginuid.so
+session    include     password-auth

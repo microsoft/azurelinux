@@ -1,3 +1,0 @@
-*cc1_options:
-+ %{!-fno-use-annobin:%{!iplugindir*:%:find-plugindir()} -fplugin=annobin}
-

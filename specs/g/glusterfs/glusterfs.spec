@@ -199,11 +199,11 @@ Summary:          Distributed File System
 %if ( 0%{_for_fedora_koji_builds} )
 Name:             glusterfs
 Version:          11.2
-Release: 4%{?prereltag:%{prereltag}}%{?dist}
+Release:          4%{?prereltag:%{prereltag}}%{?dist}
 %else
 Name:             @PACKAGE_NAME@
 Version:          @PACKAGE_VERSION@
-Release: 4%{?prereltag:%{prereltag}}%{?dist}
+Release:          0.@PACKAGE_RELEASE@%{?dist}.26
 %endif
 License:          GPL-2.0-only OR LGPL-3.0-or-later
 URL:              http://docs.gluster.org/

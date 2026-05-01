@@ -1,0 +1,57 @@
+From 43e8b5b5dd72bb9a80679dec8c15a24f00888a53 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Stan=C4=9Bk?= <jstanek@redhat.com>
+Date: Wed, 26 Jun 2024 16:59:31 +0200
+Subject: [PATCH] Address issues from static analyzer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Tweak types in run_file() to prevent overflow
+- Initialize all members of of struct tm in posix_time_parse().
+
+The static analyzer findings: https://issues.redhat.com/browse/RHEL-44999
+
+Signed-off-by: Jan Staněk <jstanek@redhat.com>
+---
+ atd.c     | 4 ++--
+ posixtm.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/atd.c b/atd.c
+index 64fdd83..3908de3 100644
+--- a/atd.c
++++ b/atd.c
+@@ -279,7 +279,7 @@ run_file(const char *filename, uid_t uid, gid_t gid)
+     int fd_out, fd_in;
+     char jobbuf[9];
+     char *mailname = NULL;
+-    int mailsize = 128;
++    size_t mailsize = 128;
+     char *newname;
+     FILE *stream;
+     int send_mail = 0;
+@@ -292,7 +292,7 @@ run_file(const char *filename, uid_t uid, gid_t gid)
+     char queue;
+     char fmt[64];
+     unsigned long jobno;
+-    int rc;
++    long rc;
+ #ifdef HAVE_PAM
+     int retcode;
+ #endif
+diff --git a/posixtm.c b/posixtm.c
+index cf4ec09..06b22fa 100644
+--- a/posixtm.c
++++ b/posixtm.c
+@@ -188,7 +188,7 @@ posix_time_parse (struct tm *tm, const char *s, unsigned int syntax_bits)
+ bool
+ posixtime (time_t *p, const char *s, unsigned int syntax_bits)
+ {
+-  struct tm tm0;
++  struct tm tm0 = {0};
+   struct tm tm1;
+   struct tm const *tm;
+   time_t t;
+-- 
+GitLab
+

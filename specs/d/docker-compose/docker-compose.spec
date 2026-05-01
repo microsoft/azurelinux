@@ -206,12 +206,6 @@ install -Dpm 0755 \
 - Update to release v2.38.1
 - Upstream improvements
 
-* Tue Jun 24 2025 Bradley G Smith <bradley.g.smith@gmail.com> - 2.37.3-3
-- Fix divergent branch
-
-* Tue Jun 24 2025 Bradley G Smith <bradley.g.smith@gmail.com> - 2.37.3-2
-- Fix divergent branch
-
 * Tue Jun 24 2025 Bradley G Smith <bradley.g.smith@gmail.com> - 2.37.3-1
 - Update to release v2.37.3
 - Upstream new feature and fixes

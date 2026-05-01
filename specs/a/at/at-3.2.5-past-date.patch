@@ -1,0 +1,33 @@
+From 6c131df8c85cb2761faf551f8f9db179e216fc09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ond=C5=99ej=20Poho=C5=99elsk=C3=BD?= <opohorel@redhat.com>
+Date: Wed, 25 Jun 2025 14:35:31 +0200
+Subject: [PATCH] Reject past dates when using -t option
+
+-t option was missing validation to reject past dates, unlike the
+regular time parsing.
+
+Add the same past date validation used by parsetime() to the posixtime()
+code path to ensure consistent behavior when parsing time.
+---
+ at.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/at.c b/at.c
+index 8d0feaa..3fb0582 100644
+--- a/at.c
++++ b/at.c
+@@ -951,6 +951,11 @@ main(int argc, char **argv)
+ 		fprintf(stderr, "invalid date format: %s\n", optarg);
+ 		exit(EXIT_FAILURE);
+ 	    }
++	    /* Check if the parsed time is in the past */
++	    if (timer < time(NULL)) {
++		fprintf(stderr, "at: refusing to create job destined in the past\n");
++		exit(EXIT_FAILURE);
++	    }
+ 	    break;
+ 
+ 	case 'o':
+-- 
+2.49.0
+

@@ -356,14 +356,11 @@ fi
 * Thu Oct 26 2023 Packit <hello@packit.dev> - 0.25.1-1
 - [packit] 0.25.1 upstream release
 
-* Thu Aug 24 2023 Daiki Ueno <dueno@redhat.com> - 0.25.0-2
+* Thu Aug 24 2023 Daiki Ueno <dueno@redhat.com> - 0.25.0-3
 - Migrate License field to SPDX license identifier
 
-* Mon Jul 24 2023 Zoltan Fridrich <zfridric@redhat.com> - 0.25.0-1
-- Merge #25 `[packit] 0.25.0 upstream release`
-
-* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.1-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+* Fri Jul 14 2023 Packit <hello@packit.dev> - 0.25.0-1
+- [packit] 0.25.0 upstream release
 
 * Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.24.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild

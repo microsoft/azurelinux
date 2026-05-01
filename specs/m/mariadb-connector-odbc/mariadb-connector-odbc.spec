@@ -13,7 +13,7 @@
 
 Name:           mariadb-connector-odbc
 Version:        3.2.8
-Release: 3%{?with_debug:.debug}%{?dist}
+Release:        2%{?with_debug:.debug}%{?dist}
 Summary:        The MariaDB Native Client library (ODBC driver)
 License:        LGPL-2.1-or-later
 Source:         https://archive.mariadb.org/connector-odbc-%{version}/%{name}-%{version}-src.tar.gz
@@ -359,15 +359,8 @@ cmake -B %_vpath_builddir -N -LAH
 * Tue May 16 2017 Michal Schorm <mschorm@redhat.com> - 2.0.14-1
 - Update to version 2.0.14 Blocker still apply Upstream issue created
 
-* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.12-4
+* Fri Feb 10 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.12-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
-
-* Mon Oct 24 2016 FaramosCZ <mschorm@centrum.cz> - 2.0.12-3
-- Merge branch 'master' of ssh://pkgs.fedoraproject.org/rpms/mariadb-
-  connector-odbc
-
-* Mon Oct 24 2016 FaramosCZ <mschorm@centrum.cz> - 2.0.12-2
-- Initial version for 2.0.12
 
 * Mon Oct 24 2016 FaramosCZ <mschorm@centrum.cz> - 2.0.12-1
 - Initial version for 2.0.12

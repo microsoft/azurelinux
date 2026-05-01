@@ -207,9 +207,6 @@ rm -r %{srcname}  # Don't try unbuilt copy.
 * Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
 
-* Wed Nov 23 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1.3.4-2
-- Merge branch 'origin/rawhide' into rawhide
-
 * Wed Nov 23 2022 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1.3.4-1
 - Update to latest version (#2143456)
 
