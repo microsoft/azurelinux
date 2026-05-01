@@ -1,3 +1,0 @@
-# valgrind_arches lists what arches Valgrind works on
-
-%valgrind_arches %{ix86} x86_64 ppc ppc64 ppc64le s390x armv7hl aarch64

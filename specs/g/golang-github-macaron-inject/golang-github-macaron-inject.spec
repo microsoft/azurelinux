@@ -20,7 +20,7 @@ various ways.}
 
 Name:           %{goname}
 Version:        0
-Release: 1.25%{?dist}
+Release:        0.25%{?dist}
 Summary:        Utilities for mapping and injecting dependencies in various ways
 
 License:        Apache-2.0

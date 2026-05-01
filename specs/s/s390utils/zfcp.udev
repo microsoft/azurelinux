@@ -1,1 +1,0 @@
-KERNEL=="zfcp", RUN+="/sbin/zfcpconf.sh"

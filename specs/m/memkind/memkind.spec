@@ -9,7 +9,7 @@
 Name: memkind
 Summary: User Extensible Heap Manager
 Version: 1.14.0
-Release: 12%{?checkout}%{?dist}
+Release: 11%{?checkout}%{?dist}
 License: BSD-2-Clause
 URL: http://memkind.github.io/memkind
 BuildRequires: make patch

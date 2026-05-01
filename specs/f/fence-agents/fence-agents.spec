@@ -16,7 +16,7 @@
 Name: fence-agents
 Summary: Set of unified programs capable of host isolation ("fencing")
 Version: 4.17.0
-Release: 2%{?alphatag:.%{alphatag}}%{?dist}
+Release: 1%{?alphatag:.%{alphatag}}%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 Group: System Environment/Base
 URL: https://github.com/ClusterLabs/fence-agents

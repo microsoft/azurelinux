@@ -1,0 +1,26 @@
+diff -up at-3.1.16/at.c.fclose at-3.1.16/at.c
+--- at-3.1.16/at.c.fclose	2014-11-06 16:11:28.000000000 +0100
++++ at-3.1.16/at.c	2014-11-24 15:30:12.704502966 +0100
+@@ -209,7 +209,11 @@ nextjob()
+     jobno = (1 + jobno) % 0xfffff;	/* 2^20 jobs enough? */
+     fprintf(fid, "%05lx\n", jobno);
+ 
+-    fclose(fid);
++    if (ferror(fid))
++	jobno = EOF;
++
++    if (fclose(fid) != 0)
++	jobno = EOF;
+     return jobno;
+ }
+ 
+@@ -494,7 +498,8 @@ writefile(time_t runtimer, char queue)
+     if (ferror(stdin))
+ 	panic("Input error");
+ 
+-    fclose(fp);
++    if (fclose(fp) != 0)
++	panic("Output error");
+ 
+     /* Set the x bit so that we're ready to start executing
+      */

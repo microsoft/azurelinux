@@ -13,7 +13,7 @@
 
 Name:           openbios
 Version:        %{date}
-Release: 2.git%{hash}%{?dist}
+Release:        1.git%{hash}%{?dist}
 Epoch:          1
 Summary:        OpenBIOS implementation of IEEE 1275-1994
 

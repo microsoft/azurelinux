@@ -9,7 +9,7 @@
 
 Name:           uriparser
 Version:        1.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        URI parsing library - RFC 3986
 
 # main license is BSD-3-Clause
@@ -149,6 +149,9 @@ sed -i 's/GENERATE_QHP\ =\ yes/GENERATE_QHP\ =\ no/g' doc/Doxyfile.in
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Dec 15 2025 Sandro Mani <manisandro@gmail.com> - 1.0.0-1
 - Update to 1.0.0
 

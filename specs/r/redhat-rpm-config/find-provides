@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/usr/lib/rpm/rpmdeps --define="_use_internal_dependency_generator 1" --provides

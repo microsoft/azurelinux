@@ -1,7 +1,0 @@
-# ---- VPATH default settings
-
-# directory where CMakeLists.txt/meson.build/etc. are placed
-%_vpath_srcdir .
-
-# directory (doesn't need to exist) where all generated build files will be placed
-%_vpath_builddir %{_vendor}-%{_target_os}-build

@@ -10,7 +10,7 @@ Documentation is available on Read the Docs: http://recommonmark.readthedocs.org
 
 Name:           python-recommonmark
 Version:        0.7.1
-Release: 17.git%{?dist}
+Release:        16.git%{?dist}
 Summary:        %{sum}
 
 License:        MIT

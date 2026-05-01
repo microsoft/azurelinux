@@ -19,7 +19,7 @@ URL: http://isl.gforge.inria.fr/
 #
 # % global buildid .local
 
-Release: 24%{?buildid}%{?dist}
+Release: 23%{?buildid}%{?dist}
 
 BuildRequires:  gcc
 BuildRequires: gmp-devel

@@ -5,7 +5,7 @@
 %global release_date 20231228
 
 Version:       7.0
-Release: 4.%{release_date}%{?dist}
+Release:       3.%{release_date}%{?dist}
 URL:           https://sourceforge.net/projects/paktype/
 
 %global foundry           paktype
