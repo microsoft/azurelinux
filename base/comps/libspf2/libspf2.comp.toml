@@ -1,4 +1,6 @@
 [components.libspf2]
+# Release: 19.20210922git%{git}%{?dist}
+release = { calculation = "manual" }
 
 # Fix noarch rpmdiff failure in the -apidocs subpackage.
 #
