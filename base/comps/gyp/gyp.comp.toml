@@ -1,0 +1,3 @@
+[components.gyp]
+# Release: 0.60%{?revision:.%{revision}git}%{?dist}
+release = { calculation = "manual" }
