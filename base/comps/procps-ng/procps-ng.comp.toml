@@ -1,0 +1,3 @@
+[components.procps-ng]
+# Release: 7%{?dist}.1
+release = { calculation = "manual" }
