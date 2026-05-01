@@ -1,0 +1,3 @@
+[components.nfs-ganesha]
+# Release: 2%{?dev:%{dev}}%{?dist}
+release = { calculation = "manual" }
