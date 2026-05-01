@@ -1,0 +1,3 @@
+[components.mingw-angleproject]
+# Release: 15.git%{shortcommit}%{?dist}
+release = { calculation = "manual" }
