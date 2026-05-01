@@ -1,0 +1,3 @@
+[components.device-mapper-persistent-data]
+# Release: 4%{?dist}%{?release_suffix}
+release = { calculation = "manual" }
