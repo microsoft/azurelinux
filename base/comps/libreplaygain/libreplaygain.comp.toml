@@ -1,0 +1,3 @@
+[components.libreplaygain]
+# Release: 0.29.20110810svn%{svn_release}%{?dist}
+release = { calculation = "manual" }
