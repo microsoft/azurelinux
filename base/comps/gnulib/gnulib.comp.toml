@@ -1,4 +1,6 @@
 [components.gnulib]
+# Release: 56.%{gitdate}git%{?dist}
+release = { calculation = "manual" }
 # These overlays are only needed until the snapshot advances past the Fedora f43
 # commit that updated Source URLs from erislabs.net to salsa.debian.org:
 # https://src.fedoraproject.org/rpms/gnulib/c/41cae067
