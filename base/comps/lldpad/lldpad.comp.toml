@@ -1,0 +1,3 @@
+[components.lldpad]
+# Release: 14.git%{checkout}%{?dist}
+release = { calculation = "manual" }
