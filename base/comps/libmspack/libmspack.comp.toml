@@ -1,0 +1,3 @@
+[components.libmspack]
+# Release: 0.15.alpha%{?dist}
+release = { calculation = "manual" }
