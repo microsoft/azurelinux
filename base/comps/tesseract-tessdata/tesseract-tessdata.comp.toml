@@ -1,0 +1,3 @@
+[components.tesseract-tessdata]
+# Release: 11%{?pre:.%pre}%{?commit:.git%{shortcommit}}%{?dist}
+release = { calculation = "manual" }
