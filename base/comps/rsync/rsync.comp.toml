@@ -1,0 +1,3 @@
+[components.rsync]
+# Release: 5%{?prerelease}%{?dist}
+release = { calculation = "manual" }
