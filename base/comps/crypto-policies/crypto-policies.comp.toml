@@ -1,0 +1,3 @@
+[components.crypto-policies]
+# Release: 1.git%{git_commit_hash}%{?dist}
+release = { calculation = "manual" }
