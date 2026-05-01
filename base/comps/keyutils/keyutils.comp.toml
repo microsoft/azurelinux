@@ -1,0 +1,3 @@
+[components.keyutils]
+# Release: 6%{?buildid}%{?dist}
+release = { calculation = "manual" }
