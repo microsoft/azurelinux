@@ -1,0 +1,3 @@
+[components.glyphicons-halflings-fonts]
+# Release: 24.%{checkout}%{?dist}
+release = { calculation = "manual" }
