@@ -1,0 +1,3 @@
+[components.xclip]
+# Release: 25.git%{shortcommit}%{?dist}
+release = { calculation = "manual" }
