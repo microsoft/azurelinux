@@ -1,0 +1,3 @@
+[components.kata-containers]
+# Release: 1%{?rcrel}%{?dist}
+release = { calculation = "manual" }
