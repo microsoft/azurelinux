@@ -10,7 +10,11 @@
 
 Summary:        Hyper-V daemons suite
 Name:           hyperv-daemons
+<<<<<<< HEAD
 Version:        6.6.134.1
+=======
+Version:        6.6.137.1
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
@@ -221,8 +225,13 @@ fi
 %{_sbindir}/lsvmbus
 
 %changelog
+<<<<<<< HEAD
 * Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.134.1-1
 - Auto-upgrade to 6.6.134.1
+=======
+* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.137.1-1
+- Auto-upgrade to 6.6.137.1
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 
 * Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.130.1-1
 - Auto-upgrade to 6.6.130.1

@@ -31,8 +31,13 @@
 
 Summary:        Linux Kernel
 Name:           kernel
+<<<<<<< HEAD
 Version:        6.6.134.1
 Release:        2%{?dist}
+=======
+Version:        6.6.137.1
+Release:        1%{?dist}
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -440,11 +445,16 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+<<<<<<< HEAD
 * Mon Apr 20 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.134.1-2
 - Enable CONFIG_IKCONFIG_PROC on arm64 for /proc/config.gz parity with x86_64
 
 * Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.134.1-1
 - Auto-upgrade to 6.6.134.1
+=======
+* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.137.1-1
+- Auto-upgrade to 6.6.137.1
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 
 * Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
 - Enable lz4, lz4hc, and zstd zram compression

@@ -86,7 +86,11 @@ rm -rf gcc-13.2.0
 
 touch $LFS/logs/temptoolchain/status_gcc_pass1_complete
 
+<<<<<<< HEAD
 KERNEL_VERSION="6.6.134.1"
+=======
+KERNEL_VERSION="6.6.137.1"
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 echo Linux-${KERNEL_VERSION} API Headers
 tar xf kernel-${KERNEL_VERSION}.tar.gz
 pushd CBL-Mariner-Linux-Kernel-rolling-lts-mariner-3-${KERNEL_VERSION}

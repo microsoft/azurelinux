@@ -5,8 +5,13 @@
 %define kernelver %{version}-%{release}
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
+<<<<<<< HEAD
 Version:        6.6.134.1
 Release:        2%{?dist}
+=======
+Version:        6.6.137.1
+Release:        1%{?dist}
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -68,11 +73,16 @@ popd
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+<<<<<<< HEAD
 * Mon Apr 20 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.134.1-2
 - Bump release to match kernel,kernel-ipe
 
 * Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.134.1-1
 - Auto-upgrade to 6.6.134.1
+=======
+* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.137.1-1
+- Auto-upgrade to 6.6.137.1
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 
 * Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
 - Bump release to match kernel,kernel-ipe

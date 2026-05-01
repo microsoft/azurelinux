@@ -1,6 +1,10 @@
 #
 # Automatically generated file; DO NOT EDIT.
+<<<<<<< HEAD
 # Linux/x86_64 6.6.134.1 Kernel Configuration
+=======
+# Linux/x86_64 6.6.137.1 Kernel Configuration
+>>>>>>> 3bef368c5 ([AUTOPATCHER-kernel] Kernel upgrade to version 6.6.137.1 - branch fasttrack/3.0 (#16972))
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
