@@ -5,6 +5,8 @@
 # https://github.com/openbios/openbios/issues/25
 # Restrict to x86_64 builders where the address space layout avoids the bug.
 [components.openbios]
+# Release: 1.git%{hash}%{?dist}
+release = { calculation = "manual" }
 
 [[components.openbios.overlays]]
 description = "Restrict build to x86_64 — forthstrap segfaults on aarch64 (upstream bug #18/#25)"
