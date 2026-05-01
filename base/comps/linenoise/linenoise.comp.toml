@@ -1,0 +1,3 @@
+[components.linenoise]
+# Release: 13.20200312git%{shortcommit}%{?dist}
+release = { calculation = "manual" }
