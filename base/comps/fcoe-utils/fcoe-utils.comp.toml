@@ -1,0 +1,3 @@
+[components.fcoe-utils]
+# Release: 12.git%{shortcommit0}%{?dist}
+release = { calculation = "manual" }
