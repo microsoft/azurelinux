@@ -1,0 +1,3 @@
+[components.csnappy]
+# Release: 32.20211216git%{shortcommit}%{?dist}
+release = { calculation = "manual" }
