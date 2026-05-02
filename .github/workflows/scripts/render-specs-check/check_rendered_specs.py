@@ -80,14 +80,23 @@ def _resolve_head_blobs(paths: list[str]) -> dict[str, str]:
 # ---------------------------------------------------------------------------
 
 
-def component_from_path(file_path: str) -> str:
+def component_from_path(file_path: str, specs_dir: Path) -> str:
     """Extract the component name from a specs path.
 
-    The component is always the direct parent directory:
-    specs/a/acl/acl.spec → acl
-    /abs/path/specs/n/nano/nano.spec → nano
+    Layout under specs_dir is `<letter>/<component>/...`, so the component
+    is the second path segment relative to specs_dir. Handles nested files
+    (e.g. `specs/d/dejavu-fonts/plans/foo.fmf` → `dejavu-fonts`) correctly,
+    where the old `Path.parent.name` shortcut would have returned `plans`.
+
+    Both sides are resolved to absolute paths before relativizing — the CI
+    workflow passes `specs_dir` as an absolute path (azldev's `WithAbsolutePaths`
+    resolves it during config dump) while `git diff --name-only` emits
+    repo-relative paths. A naive `relative_to` would raise on that mismatch.
     """
-    return Path(file_path).parent.name
+    rel = Path(file_path).resolve().relative_to(specs_dir.resolve())
+    if len(rel.parts) >= 2:
+        return rel.parts[1]
+    return rel.parts[0] if rel.parts else ""
 
 
 def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
@@ -116,7 +125,7 @@ def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
     return changed, extra, missing
 
 
-def build_content_diffs(changed_files: list[str]) -> list[dict]:
+def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]:
     """Build diff entries for changed files.
 
     Reads committed and working-tree versions, compares them, and returns
@@ -141,7 +150,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
             real_diffs.append(
                 {
                     "path": path_str,
-                    "component": component_from_path(path_str),
+                    "component": component_from_path(path_str, specs_dir),
                     "diff": f"Symlink {path_str} — refusing to follow",
                 }
             )
@@ -161,7 +170,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
             real_diffs.append(
                 {
                     "path": path_str,
-                    "component": component_from_path(path_str),
+                    "component": component_from_path(path_str, specs_dir),
                     "diff": f"{path_str} changed but HEAD blob unresolved",
                 }
             )
@@ -177,7 +186,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
             real_diffs.append(
                 {
                     "path": path_str,
-                    "component": component_from_path(path_str),
+                    "component": component_from_path(path_str, specs_dir),
                     "diff": f"{path_str} changed but HEAD content unreadable",
                 }
             )
@@ -190,7 +199,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
             real_diffs.append(
                 {
                     "path": path_str,
-                    "component": component_from_path(path_str),
+                    "component": component_from_path(path_str, specs_dir),
                     "diff": f"Binary file {path_str} differs",
                 }
             )
@@ -212,7 +221,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
             real_diffs.append(
                 {
                     "path": path_str,
-                    "component": component_from_path(path_str),
+                    "component": component_from_path(path_str, specs_dir),
                     "diff": f"Binary file {path_str} differs",
                 }
             )
@@ -233,7 +242,7 @@ def build_content_diffs(changed_files: list[str]) -> list[dict]:
         real_diffs.append(
             {
                 "path": path_str,
-                "component": component_from_path(path_str),
+                "component": component_from_path(path_str, specs_dir),
                 "diff": udiff,
             }
         )
@@ -250,15 +259,18 @@ def build_report(
     content_diffs: list[dict],
     extra_files: list[str],
     missing_files: list[str],
+    specs_dir: Path,
 ) -> dict:
     """Build the JSON-serialisable report."""
     return {
         "content_diffs": content_diffs,
         "extra_files": [
-            {"path": p, "component": component_from_path(p)} for p in extra_files
+            {"path": p, "component": component_from_path(p, specs_dir)}
+            for p in extra_files
         ],
         "missing_files": [
-            {"path": p, "component": component_from_path(p)} for p in missing_files
+            {"path": p, "component": component_from_path(p, specs_dir)}
+            for p in missing_files
         ],
     }
 
@@ -428,11 +440,11 @@ def main() -> int:
     )
 
     # 2. Build content diffs
-    content_diffs = build_content_diffs(changed)
+    content_diffs = build_content_diffs(changed, specs_dir)
     print(f"{len(content_diffs)} content diff(s)")
 
     # 3. Build report
-    report = build_report(content_diffs, extra, missing)
+    report = build_report(content_diffs, extra, missing, specs_dir)
 
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)

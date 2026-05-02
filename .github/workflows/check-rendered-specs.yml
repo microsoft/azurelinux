@@ -317,9 +317,21 @@ jobs:
       # Fail the job when any component's lock file drifted. Uses the
       # authoritative JSON output rather than the patch file so we catch
       # drift even if patch generation itself regresses.
+      # `success() || failure()` (rather than `always()`) so a flaky upload
+      # step above can't mask drift behind a confusing artifact-upload error,
+      # but a cancelled run isn't misattributed to lock drift either.
       - name: Fail on lock drift
+        if: success() || failure()
         run: |
           set -euo pipefail
+          # Guard against the upstream container failing before it could
+          # write the sentinel `update-output.json` (image build error,
+          # mount failure, etc.) — we'd rather surface that real failure
+          # than a misleading `jq: file not found` here.
+          if [ ! -f locks-output/update-output.json ]; then
+            echo "::warning::locks-output/update-output.json missing; skipping drift check (see earlier step failure for the real cause)"
+            exit 0
+          fi
           changed=$(jq '[.[]? | select(.changed == true)] | length' locks-output/update-output.json)
           if [ "$changed" -gt 0 ]; then
             echo "::error::${changed} lock file(s) are out of date — run 'azldev component update -a' and commit the result"
