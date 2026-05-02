@@ -52,6 +52,8 @@ The standard cycle for investigating, modifying, and verifying components:
 investigate → modify → render → build → test → inspect
 ```
 
+> **Finalize with `azldev comp update -p <name>` before opening a PR** — lock fingerprints are computed from the full component config, so any TOML change can invalidate them. The `Update Locks` CI check enforces this. For effective commit bumps, `update` also needs to be run at the start of the loop and has a HEAD-vs-working-tree quirk; see [`skill-update-component`](../skill-update-component/SKILL.md).
+
 | Step | Command | What to check |
 |------|---------|---------------|
 | **Investigate** | Read `specs/<first-char>/<name>/<name>.spec` or `prep-sources --skip-overlays --force -o base/build/work/scratch/<name>-pre` | Upstream spec/sources as-is |

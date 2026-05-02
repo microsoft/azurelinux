@@ -35,6 +35,8 @@ Do NOT skip testing for changes that affect RPM output. Do NOT tell the user "th
 - Prefer overlays over forking/local specs when customizing upstream packages.
 - After modifying overlays or component config, re-render with `azldev comp render -p <name>` and inspect `specs/<first-char>/<name>/` to verify the result. This is the fastest verification path.
   - Note: Changing a global snapshot time may affect all components that depend on it, potentially causing widespread rebuilds. Full re-render is time-consuming, but may be done by `azldev comp render -a --clean-stale`.
+- **Always re-run `azldev comp update -p <name>` before opening a PR**, even for minor edits — lock fingerprints are computed from the full component config, and the `Update Locks` CI check runs against the committed state. See [`skill-update-component`](.github/skills/skill-update-component/SKILL.md).
+- **Bumping an upstream commit pin has a HEAD-vs-working-tree quirk** that affects `%changelog` / `Release:` only (spec body tracks the working tree fine). Don't panic on the apparent no-op — see [`skill-update-component`](.github/skills/skill-update-component/SKILL.md) for the full inner loop.
 - Use `prep-sources` for deeper debugging: `azldev comp prep-sources -p <name> --skip-overlays --force -o <pre-dir> -q` and `azldev comp prep-sources -p <name> --force -o <post-dir> -q` to diff pre/post overlay output when you need to understand what upstream provides vs. what overlays change. Always use `--force` to overwrite an existing output dir, `rm -rf` requires user confirmation which is disruptive.
 - Follow the inner loop cycle: investigate → modify → render → build → test → inspect. See [`skill-build-component`](.github/skills/skill-build-component/SKILL.md).
   - Note: Use your best judgement, some packages are VERY slow to build (e.g., `kernel`), in those cases you may want to do multiple iterations of investigate → modify → verify with `render` before doing a full build + test.
@@ -52,6 +54,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Task | Skill |
 | ---- | ----- |
 | Build a component, debug build failures | [`skill-build-component`](.github/skills/skill-build-component/SKILL.md) |
+| Bump a component's upstream pin (lock files) | [`skill-update-component`](.github/skills/skill-update-component/SKILL.md) |
 | Add a new component to the distro | [`skill-add-component`](.github/skills/skill-add-component/SKILL.md) |
 | Diagnose and fix overlay issues | [`skill-fix-overlay`](.github/skills/skill-fix-overlay/SKILL.md) |
 | Test and inspect packages in mock chroot | [`skill-mock`](.github/skills/skill-mock/SKILL.md) |

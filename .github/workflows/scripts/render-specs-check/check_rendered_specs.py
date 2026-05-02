@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -88,12 +89,20 @@ def component_from_path(file_path: str, specs_dir: Path) -> str:
     (e.g. `specs/d/dejavu-fonts/plans/foo.fmf` → `dejavu-fonts`) correctly,
     where the old `Path.parent.name` shortcut would have returned `plans`.
 
-    Both sides are resolved to absolute paths before relativizing — the CI
-    workflow passes `specs_dir` as an absolute path (azldev's `WithAbsolutePaths`
-    resolves it during config dump) while `git diff --name-only` emits
-    repo-relative paths. A naive `relative_to` would raise on that mismatch.
+    Coordinate normalization: the CI workflow passes `specs_dir` as an
+    absolute path (azldev's `WithAbsolutePaths` resolves it during config
+    dump) while `git diff --name-only` emits repo-relative paths. We use
+    `.resolve()` on `specs_dir` to canonicalize that absolute path, and
+    `os.path.abspath` (lexical, does NOT follow symlinks) on `file_path`
+    so attacker-controlled symlinks under specs_dir can't escape the
+    component-attribution check by resolving outside the tree or to a
+    sibling component. The `is_symlink()` branch in `build_content_diffs`
+    is the layer that actually refuses to read symlinks; this function
+    just needs to label them correctly without crashing.
     """
-    rel = Path(file_path).resolve().relative_to(specs_dir.resolve())
+    file_abs = os.path.abspath(file_path)
+    specs_abs = str(specs_dir.resolve())
+    rel = Path(file_abs).relative_to(specs_abs)
     if len(rel.parts) >= 2:
         return rel.parts[1]
     return rel.parts[0] if rel.parts else ""

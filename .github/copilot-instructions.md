@@ -42,6 +42,23 @@ azldev comp render -a          # All components (slow)
 
 To inspect what a component's spec looks like after overlays, read `specs/<first-char>/<name>/<name>.spec` directly — no need to run `prep-sources` just to view the result. Use `prep-sources` when you need the full source tree (tarballs) or want to diff pre/post overlay output for debugging.
 
+## Lock Files (`locks/`)
+
+The `locks/` directory (as specified by `lock-dir` config) contains per-component lock files that pin upstream commits + an input fingerprint. They are managed by `azldev comp update`:
+
+```bash
+azldev comp update -p <name>   # Refresh a single lock
+azldev comp update -a          # Refresh all locks
+```
+
+**Always re-run `update` before opening a PR**, even after minor edits — the input fingerprint is computed from the full component config, and the `Update Locks` CI check runs against the committed state.
+
+**⚠️ Critical quirk** — bumping an upstream commit pin has a HEAD-vs-working-tree gotcha around `%changelog` / `Release:` that catches agents out. See [`skill-update-component`](skills/skill-update-component/SKILL.md) for the full pin-bump workflow (including the commit-amend dance that keeps the `Check Rendered Specs` and `Update Locks` CI checks both green).
+
+### Prior to PR
+
+When making a PR, the lock and rendered specs must be updated and self-consistent.
+
 ## Key Concepts
 
 **Components** = unit of packaging (→ one or more RPMs). Spec sources: upstream (default, from Fedora dist-git), local, or pinned upstream. See [`comp-toml.instructions.md`](instructions/comp-toml.instructions.md#spec-source-types) for syntax.
@@ -67,6 +84,8 @@ Run all commands from the repo root (where `azldev.toml` lives). If the terminal
 | Build chain (auto-publish to local repo) | `azldev comp build --local-repo-with-publish ./base/out -p <a> -p <b> -q` |
 | Render all specs for check-in | `azldev comp render -a` |
 | Render a single component | `azldev comp render -p <name>` |
+| Update a single lock file | `azldev comp update -p <name>` |
+| Update all lock files | `azldev comp update -a` |
 | Prepare sources (apply overlays) | `azldev comp prep-sources -p <name> --force -o <dir> -q` |
 | Prepare sources (skip overlays) | `azldev comp prep-sources -p <name> --skip-overlays --force -o <dir> -q` |
 | Build, keep env on failure | `azldev comp build -p <name> --preserve-buildenv on-failure -q` |
