@@ -18,11 +18,6 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
 
-# NOTE:
-# sudo dnf install -y kiwi-cli
-# sudo kiwi --loglevel 10 \
-#     --kiwi-file container-base.kiwi \
-#     system build \
-#     --description ./container-base \
-#     --target-dir <output_dir> \
-#     --add-repo='file:///home/username/some/dir/with/private/rpms,rpm-md,azl,1
+[images.wsl]
+description = "WSL Image"
+definition = { type = "kiwi", path = "wsl/wsl.kiwi" }
