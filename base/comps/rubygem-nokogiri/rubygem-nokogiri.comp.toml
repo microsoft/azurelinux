@@ -1,3 +1,16 @@
 [components.rubygem-nokogiri]
 # Release: %{?prever:0.}%{baserelease}%{?prever:.%{prerpmver}}%{?dist}
 release = { calculation = "manual" }
+
+# Azure Linux ships rubygem-minitest 5.25.5, which still bundles Minitest::Mock
+# internally. Upstream Fedora split minitest-mock into a separate gem with
+# minitest 6.x (F44+); the BR was first added in Fedora rpms/rubygem-nokogiri
+# commit 3c9b3b0 (Dec 2025, 1.18.10-2 "Handle minitest 6 compatibility") under
+# `%if !0%{?rhel}`, then moved unconditionally in f64183f (Jan 2026). AZL has
+# no rubygem-minitest-mock package, so the BR cannot resolve regardless of
+# which form is used.
+[[components.rubygem-nokogiri.overlays]]
+description = "Drop rubygem(minitest-mock) BuildRequires - provided by bundled minitest 5.x in AZL (minitest-mock was split out only in minitest 6/F44+)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "rubygem(minitest-mock)"
