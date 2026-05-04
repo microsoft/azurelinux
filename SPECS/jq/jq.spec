@@ -16,7 +16,7 @@ Patch5:         CVE-2026-33948.patch
 Patch6:         CVE-2026-39956.patch
 Patch7:         CVE-2026-39979.patch
 Patch8:         CVE-2026-40164.patch
-Patch9:         CVE-2025-9403.patch
+
 Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -40,6 +40,7 @@ Development files for jq
 
 %prep
 %autosetup -p1
+rm -rf src/jq_test.c
 
 %build
 %configure \
