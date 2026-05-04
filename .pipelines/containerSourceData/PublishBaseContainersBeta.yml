@@ -1,0 +1,107 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Pipeline to publish base container images to a beta Azure Container Registry.
+# This is the first iteration, focusing on ACR authentication.
+# Signing and SBOM steps will be added in future iterations.
+#
+# Images published (under the configured repo prefix):
+#   <repoPrefix>/base/core
+#   <repoPrefix>/distroless/core
+#   <repoPrefix>/distroless/minimal
+#   <repoPrefix>/distroless/debug
+
+trigger: none
+
+parameters:
+- name: acrName
+  displayName: 'Azure Container Registry name (without .azurecr.io)'
+  type: string
+
+- name: azureServiceConnection
+  displayName: 'Azure service connection used to authenticate to the ACR'
+  type: string
+
+- name: containerTarballsDir
+  displayName: 'Directory containing container tarballs'
+  type: string
+  default: '$(System.ArtifactsDirectory)/container_tarballs'
+
+- name: rpmsTarball
+  displayName: 'Path to the RPMs tarball'
+  type: string
+  default: '$(System.ArtifactsDirectory)/rpms.tar.gz'
+
+- name: publishingLevel
+  displayName: 'Publishing level'
+  type: string
+  default: 'preview'
+  values:
+  - preview
+  - development
+
+- name: publishToAcr
+  displayName: 'Publish images to ACR (set to false for a dry run)'
+  type: boolean
+  default: false
+
+- name: distrolessCoreBuild
+  displayName: 'Build distroless/core image'
+  type: boolean
+  default: true
+
+- name: distrolessDebugBuild
+  displayName: 'Build distroless/debug image'
+  type: boolean
+  default: true
+
+- name: distrolessMinimalBuild
+  displayName: 'Build distroless/minimal image'
+  type: boolean
+  default: true
+
+- name: baseBuild
+  displayName: 'Build base/core image'
+  type: boolean
+  default: true
+
+variables:
+- name: repoPrefix
+  value: 'unlisted/azurelinux-beta'
+
+- name: containerSrcDir
+  value: '$(Build.SourcesDirectory)/.pipelines/containerSourceData'
+
+- name: outputDir
+  value: '$(Build.ArtifactStagingDirectory)/published_containers'
+
+steps:
+- checkout: self
+
+- task: AzureCLI@2
+  displayName: 'Build and publish base container images to beta ACR'
+  inputs:
+    azureSubscription: '${{ parameters.azureServiceConnection }}'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e
+      mkdir -p "$(outputDir)"
+      bash "$(containerSrcDir)/scripts/BuildBaseContainers.sh" \
+        -a "${{ parameters.acrName }}" \
+        -c "${{ parameters.containerTarballsDir }}" \
+        -k "${{ parameters.rpmsTarball }}" \
+        -l "$(containerSrcDir)" \
+        -o "$(outputDir)" \
+        -p "${{ parameters.publishingLevel }}" \
+        -r "$(repoPrefix)" \
+        -q "${{ parameters.publishToAcr }}" \
+        -s "${{ parameters.distrolessCoreBuild }}" \
+        -t "${{ parameters.distrolessDebugBuild }}" \
+        -u "${{ parameters.distrolessMinimalBuild }}" \
+        -v "${{ parameters.baseBuild }}"
+
+- publish: '$(outputDir)'
+  artifact: published_containers
+  displayName: 'Publish container names artifact'
+  condition: always()

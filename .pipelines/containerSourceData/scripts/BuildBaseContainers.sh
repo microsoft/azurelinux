@@ -196,7 +196,7 @@ function initialization {
 
     # Set various image names.
     BASE_IMAGE_NAME="$ACR_NAME_FULL/base/core:$IMAGE_TAG"
-    DISTROLESS_BASE_IMAGE_NAME="$ACR_NAME_FULL/distroless/base:$IMAGE_TAG"
+    DISTROLESS_BASE_IMAGE_NAME="$ACR_NAME_FULL/distroless/core:$IMAGE_TAG"
     DISTROLESS_MINIMAL_IMAGE_NAME="$ACR_NAME_FULL/distroless/minimal:$IMAGE_TAG"
     DISTROLESS_DEBUG_IMAGE_NAME="$ACR_NAME_FULL/distroless/debug:$IMAGE_TAG"
     MARINARA_IMAGE_NAME="$ACR_NAME_FULL/marinara:$IMAGE_TAG"
