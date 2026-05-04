@@ -41,8 +41,7 @@ Provides:       %{name}%{?_isa} = %{version}-%{release}
 rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 
 %check
-pip3 install -r test-requirements-312.txt 
-
+pip3 install -r test-requirements-312.txt
 # Skip the file based tests, since they typically take over 5 hours to run.
 %python3 runtests.py -vv --no-file
 
