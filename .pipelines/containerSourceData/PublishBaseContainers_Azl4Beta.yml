@@ -1,0 +1,162 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Pipeline for publishing Azure Linux 4 beta base container images to ACR.
+# This is a simplified version that skips signing and SBOM generation
+# for the initial iteration to validate authentication and image publishing.
+
+trigger: none
+
+parameters:
+  - name: acrName
+    type: string
+    displayName: "Azure Container Registry name (without .azurecr.io suffix)"
+    default: ""
+
+  - name: publishingLevel
+    type: string
+    displayName: "Publishing level"
+    default: "development"
+    values:
+      - "development"
+      - "preview"
+
+  - name: repoPrefix
+    type: string
+    displayName: "Repository prefix in ACR (only used when publishingLevel is 'preview')"
+    default: ""
+
+  - name: containerTarballsDir
+    type: string
+    displayName: "Directory containing the container tarballs"
+    default: "$(Agent.TempDirectory)/container_tarballs"
+
+  - name: rpmsTarball
+    type: string
+    displayName: "Path to the RPMs tarball"
+    default: "$(Agent.TempDirectory)/rpms.tar.gz"
+
+  - name: outputDir
+    type: string
+    displayName: "Directory to save published container names"
+    default: "$(Build.ArtifactStagingDirectory)/output"
+
+  - name: publishToAcr
+    type: boolean
+    displayName: "Publish container images to ACR"
+    default: true
+
+  - name: buildBase
+    type: boolean
+    displayName: "Build base (core) container image"
+    default: true
+
+  - name: buildDistrolessBase
+    type: boolean
+    displayName: "Build distroless base container image"
+    default: true
+
+  - name: buildDistrolessDebug
+    type: boolean
+    displayName: "Build distroless debug container image"
+    default: true
+
+  - name: buildDistrolessMinimal
+    type: boolean
+    displayName: "Build distroless minimal container image"
+    default: true
+
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+  - name: containerSrcDir
+    value: "$(Build.SourcesDirectory)/.pipelines/containerSourceData"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      use1esentry: false
+      LinuxHostVersion:
+        Network: R1
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: BuildAndPublishBaseContainers
+        displayName: "Build and Publish Azure Linux 4 Beta Base Containers"
+        jobs:
+          - job: BuildAndPublishContainers
+            displayName: "Build and publish base container images"
+            pool:
+              type: linux
+            variables:
+              ob_outputDirectory: "${{ parameters.outputDir }}"
+            steps:
+              - checkout: self
+                displayName: "Checkout repository"
+
+              - task: AzureCLI@2
+                displayName: "Authenticate with ACR and build/publish base containers"
+                inputs:
+                  azureSubscription: "$(ACR_SERVICE_CONNECTION)"
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    set -e
+
+                    echo "=== Azure Linux 4 Beta Base Container Build and Publish ==="
+                    echo "ACR Name:          ${{ parameters.acrName }}"
+                    echo "Publishing Level:  ${{ parameters.publishingLevel }}"
+                    echo "Publish to ACR:    ${{ parameters.publishToAcr }}"
+
+                    # ACR configuration
+                    acr_name="${{ parameters.acrName }}"
+                    publishing_level="${{ parameters.publishingLevel }}"
+                    repo_prefix="${{ parameters.repoPrefix }}"
+                    publish_to_acr="${{ parameters.publishToAcr }}"
+
+                    # Directory paths
+                    container_tarballs_dir="${{ parameters.containerTarballsDir }}"
+                    rpms_tarball="${{ parameters.rpmsTarball }}"
+                    output_dir="${{ parameters.outputDir }}"
+
+                    # Image build flags
+                    build_base="${{ parameters.buildBase }}"
+                    build_distroless_base="${{ parameters.buildDistrolessBase }}"
+                    build_distroless_debug="${{ parameters.buildDistrolessDebug }}"
+                    build_distroless_minimal="${{ parameters.buildDistrolessMinimal }}"
+
+                    bash "$(containerSrcDir)/scripts/BuildBaseContainers.sh" \
+                      -a "$acr_name" \
+                      -c "$container_tarballs_dir" \
+                      -k "$rpms_tarball" \
+                      -l "$(containerSrcDir)" \
+                      -o "$output_dir" \
+                      -p "$publishing_level" \
+                      -r "$repo_prefix" \
+                      -q "$publish_to_acr" \
+                      -s "$build_distroless_base" \
+                      -t "$build_distroless_debug" \
+                      -u "$build_distroless_minimal" \
+                      -v "$build_base"
+
+              - task: PublishPipelineArtifact@1
+                displayName: "Publish container image names artifact"
+                condition: succeededOrFailed()
+                inputs:
+                  targetPath: "${{ parameters.outputDir }}"
+                  artifact: "PublishedContainers-Azl4Beta"
+                  publishLocation: "pipeline"
