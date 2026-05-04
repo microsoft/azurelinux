@@ -11,3 +11,9 @@ description = "Add os_release_id value to match os-release ID"
 type = "patch-add"
 file = "Policy-Add-os_release_id-check.patch"
 source = "Policy-Add-os_release_id-check.patch"
+
+[[components.sos.overlays]]
+description = "Add cloud-init-main and cloud-init-network service names for cloud-init >= 24.3 single-process optimization (upstream PR sosreport/sos#4314)"
+type = "patch-add"
+file = "cloud_init-add-cloud-init-main-and-network-services.patch"
+source = "cloud_init-add-cloud-init-main-and-network-services.patch"

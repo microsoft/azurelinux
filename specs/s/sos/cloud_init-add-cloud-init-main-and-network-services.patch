@@ -1,0 +1,43 @@
+From 91154c0c3b2a2aa9076ee34cea62dd4cc8f1ad04 Mon Sep 17 00:00:00 2001
+From: Jonathan Brenes <jonathan.brenes@microsoft.com>
+Date: Wed, 29 Apr 2026 11:42:05 -0600
+Subject: [PATCH] fix(cloud_init): add cloud-init-main and cloud-init-network
+ service names
+
+cloud-init 24.3 introduced a "single process optimization"
+(canonical/cloud-init#5489, merged Aug 2, 2024) that renamed
+cloud-init.service to cloud-init-network.service and added a new
+cloud-init-main.service as the primary single-process service.
+
+Distros shipping cloud-init >= 24.3 no longer have a
+cloud-init.service unit. The sos cloud_init plugin only listed
+cloud-init.service, so it failed to collect service status and
+journal logs for the new service names on these distros.
+
+Adding cloud-init-main and cloud-init-network to the services tuple
+is backward-compatible: sos will simply skip services that do not
+exist on a given system.
+
+Ref: https://github.com/canonical/cloud-init/pull/5489
+Ref: https://github.com/canonical/cloud-init/commit/143bc9e
+Ref: https://discourse.ubuntu.com/t/announcement-cloud-init-perfomance-optimization-single-process/47505
+Signed-off-by: Jonathan Brenes <jonathan.brenes@microsoft.com>
+---
+ sos/report/plugins/cloud_init.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sos/report/plugins/cloud_init.py b/sos/report/plugins/cloud_init.py
+index a76e751ad5..cc16163902 100644
+--- a/sos/report/plugins/cloud_init.py
++++ b/sos/report/plugins/cloud_init.py
+@@ -17,7 +17,7 @@ class CloudInit(Plugin, IndependentPlugin):
+ 
+     plugin_name = 'cloud_init'
+     packages = ('cloud-init',)
+-    services = ('cloud-init',)
++    services = ('cloud-init', 'cloud-init-main', 'cloud-init-network')
+ 
+     def setup(self):
+ 
+-- 
+2.49.0
