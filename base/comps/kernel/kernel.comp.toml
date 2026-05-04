@@ -181,3 +181,9 @@ lines = [
     "sed -i '/test__start_subtest(\"weak_ksyms_lskel\")/,/test_weak_syms_lskel();/d' prog_tests/ksyms_btf.c",
     "popd",
 ]
+
+[[components.kernel.overlays]]
+description = "Compile kselftests with -fPIE so they can be linked with the hardened toolchain's default -pie. Many kselftests (timens/, exec/, firmware/, mount/, vDSO/, ...) reset CFLAGS via `CFLAGS := ...` in their per-test Makefile, which drops the EXTRA_CFLAGS that kernel.spec passes in (so -fPIE from redhat-hardened-cc1 is lost). Selftests' lib.mk re-appends $(USERCFLAGS) AFTER the per-test reset, so passing USERCFLAGS=-fPIE on the make line restores -fPIE for every selftest target. Without this, dozens of selftest binaries fail to link with `relocation R_X86_64_32 ... can not be used when making a PIE object` and silently get omitted from kernel-selftests-internal."
+type = "spec-search-replace"
+regex = 'EXTRA_LDFLAGS="%\{__global_ldflags\}" ARCH=\$Arch V=1 TARGETS='
+replacement = 'EXTRA_LDFLAGS="%{__global_ldflags}" USERCFLAGS="-fPIE" ARCH=$Arch V=1 TARGETS='
