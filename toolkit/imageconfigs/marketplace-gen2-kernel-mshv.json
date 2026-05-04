@@ -61,10 +61,6 @@
                 "packagelists/azurevm-packages.json",
                 "packagelists/hyperv-packages.json"
             ],
-            "Packages": [
-                "mshv",
-                "mshv-bootloader-lx"
-            ],
             "AdditionalFiles": {
                 "additionalconfigs/cloud-init.cfg": "/etc/cloud/cloud.cfg",
                 "additionalconfigs/chrony.cfg": "/etc/chrony.conf",
