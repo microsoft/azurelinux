@@ -2245,6 +2245,16 @@ OPTS="-w -n -c"
 RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}
 cd ../..
 %endif
+%{log_msg "AZL: drop BPF lskel variant of test_ksyms_weak"}
+pushd linux-%{KVERREL}/tools/testing/selftests/bpf
+# Remove test_ksyms_weak.c from the LSKELS_EXTRA list so no .lskel.h is generated for it.
+sed -i 's| test_ksyms_weak\.c||' Makefile
+# Drop the lskel-variant subtest from prog_tests/ksyms_btf.c so the file still compiles
+# without test_ksyms_weak.lskel.h.
+sed -i '/^#include "test_ksyms_weak\.lskel\.h"$/d' prog_tests/ksyms_btf.c
+sed -i '/^static void test_weak_syms_lskel/,/^}$/d' prog_tests/ksyms_btf.c
+sed -i '/test__start_subtest("weak_ksyms_lskel")/,/test_weak_syms_lskel();/d' prog_tests/ksyms_btf.c
+popd
 %build
 %{log_msg "Start of build stage"}
 

@@ -157,3 +157,27 @@ lines = [
     "cd ../..",
     "%endif",
 ]
+
+# Selftests build fix for Azure Linux's restricted build chroot.
+# This overlay patches the kernel source tree at the end of %prep (so it runs
+# AFTER any patch application). Without it, the kernel-selftests-internal RPM is
+# missing test_progs and test_progs-no_alu32, because their BPF light-skeleton
+# generation step fails silently and the spec tolerates the misses with
+# `cp ... || true`.
+
+[[components.kernel.overlays]]
+description = "Drop the BPF light-skeleton variant of test_ksyms_weak. `bpftool gen object` runs the BPF program through libbpf which probes /proc/kallsyms to resolve weak ksym references; mock's systemd-nspawn chroot blocks /proc/kallsyms (EACCES) so `*.lskel.h` generation fails and breaks the test_progs / test_progs-no_alu32 link. Removing test_ksyms_weak.c from LSKELS_EXTRA and dropping the matching subtest in prog_tests/ksyms_btf.c mirrors the upstream Fedora fix `selftests/bpf: Remove ksyms_weak_lskel test` by Artem Savkov."
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    '%{log_msg "AZL: drop BPF lskel variant of test_ksyms_weak"}',
+    "pushd linux-%{KVERREL}/tools/testing/selftests/bpf",
+    "# Remove test_ksyms_weak.c from the LSKELS_EXTRA list so no .lskel.h is generated for it.",
+    "sed -i 's| test_ksyms_weak\\.c||' Makefile",
+    "# Drop the lskel-variant subtest from prog_tests/ksyms_btf.c so the file still compiles",
+    "# without test_ksyms_weak.lskel.h.",
+    "sed -i '/^#include \"test_ksyms_weak\\.lskel\\.h\"$/d' prog_tests/ksyms_btf.c",
+    "sed -i '/^static void test_weak_syms_lskel/,/^}$/d' prog_tests/ksyms_btf.c",
+    "sed -i '/test__start_subtest(\"weak_ksyms_lskel\")/,/test_weak_syms_lskel();/d' prog_tests/ksyms_btf.c",
+    "popd",
+]
