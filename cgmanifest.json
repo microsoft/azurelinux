@@ -4000,8 +4000,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "10.5.0",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.0.tar.gz"
+          "version": "10.5.4",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.4.tar.gz"
         }
       }
     },
