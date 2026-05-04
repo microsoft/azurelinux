@@ -17,7 +17,6 @@ Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         0001-Fix-frr-c90-complaint-error.patch
-
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -198,7 +197,7 @@ rm tests/lib/*grpc*
 
 %changelog
 * Mon May 04 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.5.4-1
-- Upgrade to 10.5.4
+- Upgrade to 10.5.4 for CVE-2026-37457
 
 * Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.0-3
 - Patch for CVE-2026-28532
