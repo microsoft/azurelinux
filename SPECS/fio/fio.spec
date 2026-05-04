@@ -235,7 +235,7 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Wed Apr 17 2024 Muhammad Falak <mwani@microsoft.com> - 3.37-1
 - Bump version to 3.37
 
-* Mon Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
+* Sat Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
 - Remove engine-pmemblk subpackage and BR on libpmemblk-devel
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
