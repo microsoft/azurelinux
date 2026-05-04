@@ -10,6 +10,7 @@ Distribution:   Azure Linux
 URL:            https://www.cython.org
 Source0:        https://github.com/cython/cython/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         fix_testcycache.patch
+Patch1:         fix-ipythonmagic-e502.patch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -42,9 +43,6 @@ rm -rf %{buildroot}%{python3_sitelib}/setuptools/tests
 %check
 pip3 install -r test-requirements-312.txt 
 
-# Fix upstream flake8 E502 (redundant backslash between brackets)
-sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
-
 # Skip the file based tests, since they typically take over 5 hours to run.
 %python3 runtests.py -vv --no-file
 
@@ -62,7 +60,7 @@ sed -i '/\\$/s/\\$//' Cython/Build/IpythonMagic.py
 
 %changelog
 * Tue Apr 28 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.0.5-3
-- Applied sed-based fix in %check to remove redundant backslash (E502) in IpythonMagic.py, enabling TestCodeFormat to pass successfully.
+- Adding a patch for IpythonMagic.py to fix flake8 E502 without rewriting unrelated line continuations.
 
 * Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
 - Switch to test-requirements-312.txt
