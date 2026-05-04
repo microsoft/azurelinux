@@ -6944,6 +6944,8 @@ packages = [
     "rubygem-minitest-around", # srpm: rubygem-minitest-around
     "rubygem-minitest-around-doc", # srpm: rubygem-minitest-around
     "rubygem-minitest-doc", # srpm: rubygem-minitest
+    "rubygem-minitest-mock", # srpm: rubygem-minitest-mock
+    "rubygem-minitest-mock-doc", # srpm: rubygem-minitest-mock
     "rubygem-minitest-stub-const", # srpm: rubygem-minitest-stub-const
     "rubygem-minitest-stub-const-doc", # srpm: rubygem-minitest-stub-const
     "rubygem-minitest4", # srpm: rubygem-minitest4
