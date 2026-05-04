@@ -8,8 +8,8 @@ Distribution:   Azure Linux
 Group:          Applications/Editors
 URL:            https://www.nano-editor.org/
 Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
-Patch0:		CVE-2024-5742.patch
-Patch1:		CVE-2026-6843.patch
+Patch0:         CVE-2024-5742.patch
+Patch1:         CVE-2026-6843.patch
 
 BuildRequires:  ncurses-devel
 Requires:       ncurses
