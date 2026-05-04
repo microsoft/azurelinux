@@ -5,7 +5,7 @@
 Summary:      Real-time software synthesizer
 Name:         fluidsynth
 Version:      2.5.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL:          http://www.fluidsynth.org/
 Source0:      https://github.com/Fluidsynth/fluidsynth/archive/v%{version}/fluidsynth-%{version}.tar.gz
 Source1:      https://github.com/kthohr/gcem/archive/refs/tags/gcem-1.18.0.tar.gz

@@ -1,0 +1,3 @@
+[components.fluidsynth]
+# Pin to pre-Fedora 44 mass rebuild commit to avoid lock drift.
+spec = { type = "upstream", upstream-commit = "6e57eee6e9aee283c1775e877dc0989055c95a91" }
