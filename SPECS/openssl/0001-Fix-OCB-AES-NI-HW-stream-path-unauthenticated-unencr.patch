@@ -1,0 +1,70 @@
+From 1a556ff619473af9e179b202284a961590d5a2bd Mon Sep 17 00:00:00 2001
+From: Norbert Pocs <norbertp@openssl.org>
+Date: Thu, 8 Jan 2026 15:04:54 +0100
+Subject: [PATCH] Fix OCB AES-NI/HW stream path unauthenticated/unencrypted
+ trailing bytes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When ctx->stream (e.g., AES‑NI or ARMv8 CE) is available, the fast path
+encrypts/decrypts full blocks but does not advance in/out pointers. The
+tail-handling code then operates on the base pointers, effectively reprocessing
+the beginning of the buffer while leaving the actual trailing bytes
+unencrypted (encryption) or using the wrong plaintext (decryption). The
+authentication checksum excludes the true tail.
+
+CVE-2025-69418
+
+Fixes: https://github.com/openssl/srt/issues/58
+
+Signed-off-by: Norbert Pocs <norbertp@openssl.org>
+---
+ crypto/modes/ocb128.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/modes/ocb128.c b/crypto/modes/ocb128.c
+index ce72baf6da..8a5d7c7db0 100644
+--- a/crypto/modes/ocb128.c
++++ b/crypto/modes/ocb128.c
+@@ -337,7 +337,7 @@ int CRYPTO_ocb128_encrypt(OCB128_CONTEXT *ctx,
+ 
+     if (num_blocks && all_num_blocks == (size_t)all_num_blocks
+         && ctx->stream != NULL) {
+-        size_t max_idx = 0, top = (size_t)all_num_blocks;
++        size_t max_idx = 0, top = (size_t)all_num_blocks, processed_bytes = 0;
+ 
+         /*
+          * See how many L_{i} entries we need to process data at hand
+@@ -351,6 +351,9 @@ int CRYPTO_ocb128_encrypt(OCB128_CONTEXT *ctx,
+         ctx->stream(in, out, num_blocks, ctx->keyenc,
+                     (size_t)ctx->sess.blocks_processed + 1, ctx->sess.offset.c,
+                     (const unsigned char (*)[16])ctx->l, ctx->sess.checksum.c);
++        processed_bytes = num_blocks * 16;
++        in += processed_bytes;
++        out += processed_bytes;
+     } else {
+         /* Loop through all full blocks to be encrypted */
+         for (i = ctx->sess.blocks_processed + 1; i <= all_num_blocks; i++) {
+@@ -429,7 +432,7 @@ int CRYPTO_ocb128_decrypt(OCB128_CONTEXT *ctx,
+ 
+     if (num_blocks && all_num_blocks == (size_t)all_num_blocks
+         && ctx->stream != NULL) {
+-        size_t max_idx = 0, top = (size_t)all_num_blocks;
++        size_t max_idx = 0, top = (size_t)all_num_blocks, processed_bytes = 0;
+ 
+         /*
+          * See how many L_{i} entries we need to process data at hand
+@@ -443,6 +446,9 @@ int CRYPTO_ocb128_decrypt(OCB128_CONTEXT *ctx,
+         ctx->stream(in, out, num_blocks, ctx->keydec,
+                     (size_t)ctx->sess.blocks_processed + 1, ctx->sess.offset.c,
+                     (const unsigned char (*)[16])ctx->l, ctx->sess.checksum.c);
++        processed_bytes = num_blocks * 16;
++        in += processed_bytes;
++        out += processed_bytes;
+     } else {
+         OCB_BLOCK tmp;
+ 
+-- 
+2.52.0
+

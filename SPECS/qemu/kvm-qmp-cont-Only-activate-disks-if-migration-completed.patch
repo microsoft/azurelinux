@@ -1,0 +1,73 @@
+From a99282ca32a1fef256c1fc155ef4f43aed9e1e48 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:34 -0500
+Subject: [PATCH 03/23] qmp/cont: Only activate disks if migration completed
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [2/22] 942fea0b972c992c52e6a1c85172afe899e4e312 (kmwolf/centos-qemu-kvm)
+
+As the comment says, the activation of disks is for the case where
+migration has completed, rather than when QEMU is still during
+migration (RUN_STATE_INMIGRATE).
+
+Move the code over to reflect what the comment is describing.
+
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-Id: <20241206230838.1111496-3-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit e4e5e89bbd8e731e86735d9d25b7b5f49e8f08b6)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ monitor/qmp-cmds.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
+index f84a0dc523..76f21e8af3 100644
+--- a/monitor/qmp-cmds.c
++++ b/monitor/qmp-cmds.c
+@@ -96,21 +96,23 @@ void qmp_cont(Error **errp)
+         }
+     }
+ 
+-    /* Continuing after completed migration. Images have been inactivated to
+-     * allow the destination to take control. Need to get control back now.
+-     *
+-     * If there are no inactive block nodes (e.g. because the VM was just
+-     * paused rather than completing a migration), bdrv_inactivate_all() simply
+-     * doesn't do anything. */
+-    bdrv_activate_all(&local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+     if (runstate_check(RUN_STATE_INMIGRATE)) {
+         autostart = 1;
+     } else {
++        /*
++         * Continuing after completed migration. Images have been
++         * inactivated to allow the destination to take control. Need to
++         * get control back now.
++         *
++         * If there are no inactive block nodes (e.g. because the VM was
++         * just paused rather than completing a migration),
++         * bdrv_inactivate_all() simply doesn't do anything.
++         */
++        bdrv_activate_all(&local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
+         vm_start();
+     }
+ }
+-- 
+2.48.1
+

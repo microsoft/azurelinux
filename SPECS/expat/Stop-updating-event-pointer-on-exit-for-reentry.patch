@@ -1,0 +1,256 @@
+From 89a9c6807c982b4fa8aa806dd72771d6642dd8a1 Mon Sep 17 00:00:00 2001
+From: Berkay Eren Ürün <berkay.ueruen@siemens.com
+Date: Wed, 19 Mar 2025 02:20:49 +0100
+Subject: [PATCH] Stop updating m_eventPtr on exit for reentry
+
+The fix for recursive entity processing introduced a reenter flag that
+returns the execution from the current function and switches to entity
+processing.
+
+The same fix also updates the m_eventPtr during this switch. However
+this update changes the behaviour in certain cases as the older version
+does not update the m_eventPtr while recursing into entity processing.
+
+This commit removes the pointer update and restores the old behaviour.
+
+Upstream Patch Reference: https://patch-diff.githubusercontent.com/raw/libexpat/libexpat/pull/989.patch
+---
+ Changes            | 15 ++++++++++++
+ lib/xmlparse.c     | 12 ++++++---
+ tests/common.c     | 25 +++++++++++++++++++
+ tests/common.h     |  2 ++
+ tests/misc_tests.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 112 insertions(+), 3 deletions(-)
+
+diff --git a/Changes b/Changes
+index 75c62d6..8c4ed04 100644
+--- a/Changes
++++ b/Changes
+@@ -29,6 +29,21 @@
+ !! THANK YOU!                        Sebastian Pipping -- Berlin, 2024-03-09 !!
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
++        Bug fixes:
++       #980 #989  Restore event pointer behavior from Expat 2.6.4
++                    (that the fix to CVE-2024-8176 changed in 2.7.0);
++                    affected API functions are:
++                    - XML_GetCurrentByteCount
++                    - XML_GetCurrentByteIndex
++                    - XML_GetCurrentColumnNumber
++                    - XML_GetCurrentLineNumber
++                    - XML_GetInputContext
++
++        Special thanks to:
++            Berkay Eren Ürün
++                 and
++            Perl XML::Parser
++
+         Security fixes:
+        #893 #???  CVE-2024-8176 -- Fix crash from chaining a large number
+                     of entities caused by stack overflow by resolving use of
+diff --git a/lib/xmlparse.c b/lib/xmlparse.c
+index 0bf913c..9ec287c 100644
+--- a/lib/xmlparse.c
++++ b/lib/xmlparse.c
+@@ -3754,12 +3754,13 @@ doContent(XML_Parser parser, int startTagLevel, const ENCODING *enc,
+       break;
+       /* LCOV_EXCL_STOP */
+     }
+-    *eventPP = s = next;
+     switch (parser->m_parsingStatus.parsing) {
+     case XML_SUSPENDED:
++      *eventPP = next;
+       *nextPtr = next;
+       return XML_ERROR_NONE;
+     case XML_FINISHED:
++      *eventPP = next;
+       return XML_ERROR_ABORTED;
+     case XML_PARSING:
+       if (parser->m_reenter) {
+@@ -3768,6 +3769,7 @@ doContent(XML_Parser parser, int startTagLevel, const ENCODING *enc,
+       }
+       /* Fall through */
+     default:;
++      *eventPP = s = next;
+     }
+   }
+   /* not reached */
+@@ -4684,12 +4686,13 @@ doCdataSection(XML_Parser parser, const ENCODING *enc, const char **startPtr,
+       /* LCOV_EXCL_STOP */
+     }
+ 
+-    *eventPP = s = next;
+     switch (parser->m_parsingStatus.parsing) {
+     case XML_SUSPENDED:
++      *eventPP = next;
+       *nextPtr = next;
+       return XML_ERROR_NONE;
+     case XML_FINISHED:
++      *eventPP = next;
+       return XML_ERROR_ABORTED;
+     case XML_PARSING:
+       if (parser->m_reenter) {
+@@ -4697,6 +4700,7 @@ doCdataSection(XML_Parser parser, const ENCODING *enc, const char **startPtr,
+       }
+       /* Fall through */
+     default:;
++      *eventPP = s = next;
+     }
+   }
+   /* not reached */
+@@ -6307,12 +6311,13 @@ epilogProcessor(XML_Parser parser, const char *s, const char *end,
+     default:
+       return XML_ERROR_JUNK_AFTER_DOC_ELEMENT;
+     }
+-    parser->m_eventPtr = s = next;
+     switch (parser->m_parsingStatus.parsing) {
+     case XML_SUSPENDED:
++      parser->m_eventPtr = next;
+       *nextPtr = next;
+       return XML_ERROR_NONE;
+     case XML_FINISHED:
++      parser->m_eventPtr = next;
+       return XML_ERROR_ABORTED;
+     case XML_PARSING:
+       if (parser->m_reenter) {
+@@ -6320,6 +6325,7 @@ epilogProcessor(XML_Parser parser, const char *s, const char *end,
+       }
+     /* Fall through */
+     default:;
++      parser->m_eventPtr = s = next;
+     }
+   }
+ }
+diff --git a/tests/common.c b/tests/common.c
+index 3aea8d7..b267dbb 100644
+--- a/tests/common.c
++++ b/tests/common.c
+@@ -42,6 +42,8 @@
+ */
+ 
+ #include <assert.h>
++#include <errno.h>
++#include <stdint.h> // for SIZE_MAX
+ #include <stdio.h>
+ #include <string.h>
+ 
+@@ -294,3 +296,26 @@ duff_reallocator(void *ptr, size_t size) {
+     g_reallocation_count--;
+   return realloc(ptr, size);
+ }
++
++// Portable remake of strndup(3) for C99; does not care about space efficiency
++char *
++portable_strndup(const char *s, size_t n) {
++  if ((s == NULL) || (n == SIZE_MAX)) {
++    errno = EINVAL;
++    return NULL;
++  }
++
++  char *const buffer = (char *)malloc(n + 1);
++  if (buffer == NULL) {
++    errno = ENOMEM;
++    return NULL;
++  }
++
++  errno = 0;
++
++  memcpy(buffer, s, n);
++
++  buffer[n] = '\0';
++
++  return buffer;
++}
+diff --git a/tests/common.h b/tests/common.h
+index bc4c7da..8871130 100644
+--- a/tests/common.h
++++ b/tests/common.h
+@@ -146,6 +146,8 @@ extern void *duff_allocator(size_t size);
+ 
+ extern void *duff_reallocator(void *ptr, size_t size);
+ 
++extern char *portable_strndup(const char *s, size_t n);
++
+ #endif /* XML_COMMON_H */
+ 
+ #ifdef __cplusplus
+diff --git a/tests/misc_tests.c b/tests/misc_tests.c
+index f9a78f6..2b9f793 100644
+--- a/tests/misc_tests.c
++++ b/tests/misc_tests.c
+@@ -561,6 +561,66 @@ START_TEST(test_renter_loop_finite_content) {
+ }
+ END_TEST
+ 
++// Inspired by function XML_OriginalString of Perl's XML::Parser
++static char *
++dup_original_string(XML_Parser parser) {
++  const int byte_count = XML_GetCurrentByteCount(parser);
++
++  assert_true(byte_count >= 0);
++
++  int offset = -1;
++  int size = -1;
++
++  const char *const context = XML_GetInputContext(parser, &offset, &size);
++
++#if XML_CONTEXT_BYTES > 0
++  assert_true(context != NULL);
++  assert_true(offset >= 0);
++  assert_true(size >= 0);
++  return portable_strndup(context + offset, byte_count);
++#else
++  assert_true(context == NULL);
++  return NULL;
++#endif
++}
++
++static void
++on_characters_issue_980(void *userData, const XML_Char *s, int len) {
++  (void)s;
++  (void)len;
++  XML_Parser parser = (XML_Parser)userData;
++
++  char *const original_string = dup_original_string(parser);
++
++#if XML_CONTEXT_BYTES > 0
++  assert_true(original_string != NULL);
++  assert_true(strcmp(original_string, "&draft.day;") == 0);
++  free(original_string);
++#else
++  assert_true(original_string == NULL);
++#endif
++}
++
++START_TEST(test_misc_expected_event_ptr_issue_980) {
++  // NOTE: This is a tiny subset of sample "REC-xml-19980210.xml"
++  //       from Perl's XML::Parser
++  const char *const doc = "<!DOCTYPE day [\n"
++                          "  <!ENTITY draft.day '10'>\n"
++                          "]>\n"
++                          "<day>&draft.day;</day>\n";
++
++  XML_Parser parser = XML_ParserCreate(NULL);
++  XML_SetUserData(parser, parser);
++  XML_SetCharacterDataHandler(parser, on_characters_issue_980);
++
++  assert_true(_XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
++                                      /*isFinal=*/XML_TRUE)
++              == XML_STATUS_OK);
++
++  XML_ParserFree(parser);
++}
++END_TEST
++
+ void
+ make_miscellaneous_test_case(Suite *s) {
+   TCase *tc_misc = tcase_create("miscellaneous tests");
+@@ -588,4 +648,5 @@ make_miscellaneous_test_case(Suite *s) {
+   tcase_add_test(tc_misc, test_misc_resumeparser_not_crashing);
+   tcase_add_test(tc_misc, test_misc_stopparser_rejects_unstarted_parser);
+   tcase_add_test__if_xml_ge(tc_misc, test_renter_loop_finite_content);
++  tcase_add_test(tc_misc, test_misc_expected_event_ptr_issue_980);
+ }
+-- 
+2.45.4
+

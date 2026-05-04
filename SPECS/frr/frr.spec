@@ -3,7 +3,7 @@
 Summary:        Routing daemon
 Name:           frr
 Version:        10.5.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,7 @@ Patch5:         0001-Fix-frr-c90-complaint-error.patch
 # CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
 Patch6:         CVE-2025-61099.patch
 Patch7:         CVE-2026-5107.patch
+Patch8:         CVE-2026-28532.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -200,6 +201,9 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.0-3
+- Patch for CVE-2026-28532
+
 * Tue Mar 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.0-2
 - Patch for CVE-2026-5107
 
