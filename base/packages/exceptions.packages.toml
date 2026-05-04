@@ -380,4 +380,57 @@ packages = [
     # vte291-gtk4 + vte291-gtk4-devel carved to sdk: GTK4 build of the VTE terminal widget. The rest of the vte291 SRPM (vte291 (gtk3), vte291-devel, vte-profile) stays in base because qemu-ui-gtk and amtterm link libvte-2.91.so.0 (gtk3 build) and vte-profile is shell-window-title integration usable in any terminal.
     "vte291-gtk4", # srpm: vte291
     "vte291-gtk4-devel", # srpm: vte291
+    # rust-cbindgen crate-source -devel sub-packages (noarch Rust sources, no compiled binary); cbindgen CLI binary stays in base. Kept in sdk for downstream Rust builds.
+    "rust-cbindgen+clap-devel", # srpm: rust-cbindgen
+    "rust-cbindgen+default-devel", # srpm: rust-cbindgen
+    "rust-cbindgen+unstable_ir-devel", # srpm: rust-cbindgen
+    "rust-cbindgen-devel", # srpm: rust-cbindgen
+    # rust-imagequant-sys crate-source -devel sub-packages (noarch Rust sources, no compiled binary); compiled libimagequant + libimagequant-devel stay in base. Kept in sdk for downstream Rust builds.
+    "rust-imagequant-sys+capi-devel", # srpm: rust-imagequant-sys
+    "rust-imagequant-sys+default-devel", # srpm: rust-imagequant-sys
+    "rust-imagequant-sys+threads-devel", # srpm: rust-imagequant-sys
+    "rust-imagequant-sys-devel", # srpm: rust-imagequant-sys
+    # rust-nmstate crate-source -devel sub-packages (noarch Rust sources, no compiled binary); nmstate CLI/libs/python bindings stay in base. Kept in sdk for downstream Rust builds.
+    "rust-nmstate+default-devel", # srpm: nmstate
+    "rust-nmstate+gen_conf-devel", # srpm: nmstate
+    "rust-nmstate+gen_revert-devel", # srpm: nmstate
+    "rust-nmstate+query_apply-devel", # srpm: nmstate
+    "rust-nmstate-devel", # srpm: nmstate
+    # rust-zram-generator crate-source -devel sub-packages (noarch Rust sources, no compiled binary); zram-generator service binary + defaults stay in base. Kept in sdk for downstream Rust builds.
+    "rust-zram-generator+default-devel", # srpm: rust-zram-generator
+    "rust-zram-generator-devel", # srpm: rust-zram-generator
+    # rust-rav1e crate-source -devel sub-packages (noarch Rust sources, no compiled binary); rav1e CLI + rav1e-libs + rav1e-devel (compiled C-API library) stay in base. Kept in sdk for downstream Rust builds.
+    "rust-rav1e+asm-devel", # srpm: rust-rav1e
+    "rust-rav1e+av-metrics-devel", # srpm: rust-rav1e
+    "rust-rav1e+backtrace-devel", # srpm: rust-rav1e
+    "rust-rav1e+binaries-devel", # srpm: rust-rav1e
+    "rust-rav1e+capi-devel", # srpm: rust-rav1e
+    "rust-rav1e+cc-devel", # srpm: rust-rav1e
+    "rust-rav1e+channel-api-devel", # srpm: rust-rav1e
+    "rust-rav1e+check_asm-devel", # srpm: rust-rav1e
+    "rust-rav1e+clap-devel", # srpm: rust-rav1e
+    "rust-rav1e+clap_complete-devel", # srpm: rust-rav1e
+    "rust-rav1e+console-devel", # srpm: rust-rav1e
+    "rust-rav1e+crossbeam-devel", # srpm: rust-rav1e
+    "rust-rav1e+dav1d-sys-devel", # srpm: rust-rav1e
+    "rust-rav1e+decode_test_dav1d-devel", # srpm: rust-rav1e
+    "rust-rav1e+default-devel", # srpm: rust-rav1e
+    "rust-rav1e+desync_finder-devel", # srpm: rust-rav1e
+    "rust-rav1e+dump_ivf-devel", # srpm: rust-rav1e
+    "rust-rav1e+fern-devel", # srpm: rust-rav1e
+    "rust-rav1e+ivf-devel", # srpm: rust-rav1e
+    "rust-rav1e+nasm-rs-devel", # srpm: rust-rav1e
+    "rust-rav1e+nom-devel", # srpm: rust-rav1e
+    "rust-rav1e+quick_test-devel", # srpm: rust-rav1e
+    "rust-rav1e+scan_fmt-devel", # srpm: rust-rav1e
+    "rust-rav1e+serde-big-array-devel", # srpm: rust-rav1e
+    "rust-rav1e+serde-devel", # srpm: rust-rav1e
+    "rust-rav1e+serialize-devel", # srpm: rust-rav1e
+    "rust-rav1e+signal-hook-devel", # srpm: rust-rav1e
+    "rust-rav1e+signal_support-devel", # srpm: rust-rav1e
+    "rust-rav1e+threading-devel", # srpm: rust-rav1e
+    "rust-rav1e+toml-devel", # srpm: rust-rav1e
+    "rust-rav1e+unstable-devel", # srpm: rust-rav1e
+    "rust-rav1e+y4m-devel", # srpm: rust-rav1e
+    "rust-rav1e-devel", # srpm: rust-rav1e
 ]
