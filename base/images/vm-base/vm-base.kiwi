@@ -6,7 +6,7 @@
         <contact>user@example.com</contact>
         <specification>Azure Linux VM Image Example</specification>
     </description>
-    <preferences>
+    <preferences arch="x86_64">
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
@@ -19,7 +19,35 @@
             formatoptions="force_size"
             initrd_system="dracut"
             filesystem="ext4"
-            kernelcmdline="console=ttyS0 rd.shell=0"
+            kernelcmdline="console=ttyS0 earlyprintk=ttyS0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+
+    <preferences arch="aarch64">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            kernelcmdline="console=ttyAMA0 earlyprintk=ttyAMA0 rd.shell=0"
             firmware="uefi"
             overlayroot="false"
             eficsm="false"
