@@ -1,0 +1,3 @@
+[components.subunit]
+# Pin to last building commit from upstream to avoid lock drift.
+spec = { type = "upstream", upstream-commit = "d26b2e65015546ce01a0d28ba622ba6979256d6c" }
