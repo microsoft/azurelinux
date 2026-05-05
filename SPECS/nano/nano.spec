@@ -10,6 +10,7 @@ URL:            https://www.nano-editor.org/
 Source0:        http://www.nano-editor.org/dist/v6/%{name}-%{version}.tar.xz
 Patch0:         CVE-2024-5742.patch
 Patch1:         CVE-2026-6843.patch
+Patch2:         CVE-2026-6842.patch
 
 BuildRequires:  ncurses-devel
 Requires:       ncurses
@@ -56,7 +57,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.4-3
-- Patch for CVE-2026-6843
+- Patch for CVE-2026-6843, CVE-2026-6842
 
 * Thu Nov 21 2024 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 6.4-2
 - Patch for CVE-2024-5742
