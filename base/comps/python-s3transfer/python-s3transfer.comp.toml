@@ -1,0 +1,3 @@
+[components.python-s3transfer]
+# Pin to last building commit from upstream to avoid lock drift.
+spec = { type = "upstream", upstream-commit = "393fe564ed74ed281ddb60f38b7fed6d244efd16" }
