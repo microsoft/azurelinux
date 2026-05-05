@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -56,6 +56,7 @@ Source17:       20-azure.conf
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
 Source22:       70-azurelinux-hardening.conf
+Source23:       50-client-alive-interval.conf
 
 BuildArch:      noarch
 
@@ -339,6 +340,7 @@ sed -i -e "/^DEFAULT_HOSTNAME=/d" %{buildroot}%{_prefix}/lib/os-release.cloud
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
 install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
+install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 %endif
 
 %if %{with container}
@@ -350,6 +352,7 @@ echo "VARIANT_ID=container" >> %{buildroot}%{_prefix}/lib/os-release.container
 sed -i -e "s|(%{release_name}%{?prerelease})|(Container Image%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.container
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/Container/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
 install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
+install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
 %endif
 
 %if %{with wsl}
@@ -448,6 +451,7 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 %{_prefix}/lib/sysctl.d/20-azure.conf
 %{_sysconfdir}/chrony.d/chrony-azure.conf
 %{_prefix}/lib/systemd/networkd.conf.d/50-azure-cloud.conf
+%{_sysconfdir}/ssh/sshd_config.d/50-client-alive-interval.conf
 %endif
 
 
@@ -457,6 +461,7 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 %{_prefix}/lib/os-release.container
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.container
 %{_prefix}/lib/sysctl.d/20-azure.conf
+%{_sysconfdir}/ssh/sshd_config.d/50-client-alive-interval.conf
 %endif
 
 
@@ -469,6 +474,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Wed May 06 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-13
+- add 50-client-alive-interval.conf
+
 * Wed May 06 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-12
 - no-change bump to match "rendered" spec release
 
