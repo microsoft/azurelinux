@@ -59,12 +59,12 @@
 # MarinerOS 1.0 sets -fPIE in the hardening cflags
 # (in the gcc specs file).
 # This seems to break only this package and not other kernel packages.
-%if "%{_vendor}" == "mariner" || "%{_vendor}" == "azl" || "%{_vendor}" == "azurelinux" || (0%{?rhel} >= 10)
+%if "%{_vendor}" == "mariner" || "%{_vendor}" == "azl" || "%{_vendor}" == "azurelinux" || (0%{?rhel} >= 10) || (0%{?amzn} == 2023)
 %global _hardened_cflags %{nil}
 %endif
 
-# WA: Centos Stream 10 kernel doesn't support PIC mode, so we removed the following flags
-%if (0%{?rhel} >= 10)
+# WA: Centos Stream 10 and amazonlinux 2023 kernel doesn't support PIC mode, so we removed the following flags
+%if (0%{?rhel} >= 10) || (0%{?amzn} == 2023)
 %global _hardening_gcc_ldflags %{nil}
 %global _gcc_lto_cflags %{nil}
 %endif
@@ -90,9 +90,9 @@
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
 %{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_release: %global _release OFED.25.07.0.9.7.1}
+%{!?_release: %global _release OFED.25.10.2.4.1.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-%global MLNX_OFA_DRV_SRC 24.10-0.7.0
+%global MLNX_OFA_DRV_SRC 25.10-2.4.1
 
 %global utils_pname %{_name}
 %global devel_pname %{_name}-devel
@@ -105,14 +105,14 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
-Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Version:	 25.10
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:         %{_distro_sources_url}/%{_name}-%{version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -130,6 +130,7 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: kmod-mellanox
 
 BuildRequires:  kernel-devel = %{target_kernel_version_full}
 BuildRequires:  kernel-headers = %{target_kernel_version_full}
@@ -162,6 +163,10 @@ InfiniBand "verbs", Access Layer  and ULPs.
 Utilities rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 
+%if %{IS_RHEL_VENDOR}
+# For the symlink /etc/init.d -> /etc/rc.d/init.d that conflicts with openibd
+Requires: chkconfig
+%endif
 
 # build KMP rpms?
 %if "%{KMP}" == "1"
@@ -199,7 +204,7 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
-Obsoletes: fwctl <= 24.10
+Obsoletes: fwctl <= 25.10
 Provides:  fwctl = %{version}-%{release}
 
 Summary: Infiniband Driver and ULPs kernel modules
@@ -213,6 +218,7 @@ Non-KMP format kernel modules rpm.
 The driver sources are located at: http://www.mellanox.com/downloads/ofed/mlnx-ofa_kernel-%{MLNX_OFA_DRV_SRC}.tgz
 %endif
 %endif #end if "%{KMP}" == "1"
+
 
 %package -n %{devel_pname}
 Obsoletes: kernel-ib-devel
@@ -302,6 +308,7 @@ drivers against it.
 
 %prep
 %setup -n %{_name}-%{version}
+ofed_scripts/ofed_patch.sh
 set -- *
 mkdir source
 mv "$@" source/
@@ -765,6 +772,9 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 25.10-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
 - Tweak specs to use dynamic versioning for kernel.
 

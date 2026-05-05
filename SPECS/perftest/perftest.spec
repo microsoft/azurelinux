@@ -1,9 +1,9 @@
-%global         extended_release 0.104.g0c03534
+%global         extended_release 0.134.g8aff167
 %global         MLNX_OFED_VERSION 25.07-0.9.7.1
 Summary:        IB Performance tests
 Name:           perftest
 # Update extended_release with version updates
-Version:        25.07.0
+Version:        25.10.0
 Release:        1%{?dist}
 License:        BSD or GPLv2
 Vendor:         Microsoft Corporation
@@ -12,7 +12,7 @@ Group:          Productivity/Networking/Diagnostic
 URL:            https://www.openfabrics.org
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:        %{_distro_sources_url}/%{name}-%{version}-%{extended_release}.tar.gz
 BuildRequires:  libibumad-devel
 BuildRequires:  libibverbs-devel
@@ -41,6 +41,9 @@ chmod -x runme
 %_mandir/man1/*.1*
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 25.10.0-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07.0-1
 - Upgrade version to 25.07.0.
 - Update source path

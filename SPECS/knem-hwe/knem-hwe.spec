@@ -39,7 +39,7 @@
 %global KVERSION %{target_kernel_version_full}
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
-%{!?_release: %global _release OFED.25.07.0.9.7.1}
+%{!?_release: %global _release OFED.25.10.2.4.1.1}
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %global kernel_version %{KVERSION}
 %global krelver %(echo -n %{KVERSION} | sed -e 's/-/_/g')
@@ -54,8 +54,8 @@
 
 Summary:	 KNEM: High-Performance Intra-Node MPI Communication
 Name:		 knem-hwe
-Version:	 1.1.4.90mlnx3
-Release:	 32%{release_suffix}%{?dist}
+Version:	 1.1.4.90mlnx4
+Release:	 1%{release_suffix}%{?dist}
 Provides:	 knem-hwe-mlnx = %{version}-%{release}
 Obsoletes:	 knem-hwe-mlnx < %{version}-%{release}
 License:	 BSD and GPLv2
@@ -64,7 +64,7 @@ Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:         %{_distro_sources_url}/knem-%{version}.tar.gz
 BuildRoot:       /var/tmp/%{name}-%{version}-build
 
@@ -241,6 +241,9 @@ fi
 %endif
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 1.1.4.90mlnx4-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 1.1.4.90mlnx3-32_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 
@@ -263,7 +266,7 @@ fi
 - Bump to match kernel-hwe.
 
 * Tue Nov 18 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.1.4.90mlnx3-25_6.12.57.1.1
-- Build with OFED 25.07.0.9.7.1.
+- Build with OFED.25.10.2.4.1.1.
 - Enable build on x86_64 kernel hwe.
 - Update source path
 

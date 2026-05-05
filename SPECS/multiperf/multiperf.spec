@@ -1,12 +1,15 @@
 Name:		 multiperf
 Summary:	 IB Performance tests
 Version:	 3.0
-Release:	 2%{?dist}
+Release:        1%{?dist}
 License:	 BSD 3-Clause, GPL v2 or later
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
 Group:		 Productivity/Networking/Diagnostic
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
+Source0:         %{_distro_sources_url}/multiperf-3.0.tar.gz
 Url:		 ""
 BuildRoot:      /var/tmp/%{name}-%{version}-build
 
@@ -36,6 +39,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 3.0-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 3.0-2
 - Enable ARM64 build by removing ExclusiveArch
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 3.0-1

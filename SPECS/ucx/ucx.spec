@@ -11,13 +11,16 @@
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
-Version:        1.15.0
+Version:        1.20.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            http://www.openucx.org
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
 
 
@@ -121,6 +124,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %{_libdir}/lib*.so.*
 %{_bindir}/ucx_info
 %{_bindir}/ucx_perftest
+%{_bindir}/ucx_perftest_daemon
 %{_bindir}/ucx_read_profile
 %if "%{debug}" == "1"
 %{_bindir}/ucs_stats_parser
@@ -131,6 +135,7 @@ rm -f %{buildroot}%{_libdir}/ucx/lib*.so
 %doc README AUTHORS NEWS
 %{!?_licensedir:%global license %%doc}
 %license LICENSE
+%{_sysconfdir}/ucx/ucx.conf
 
 %files devel
 %{_includedir}/uc*
@@ -165,6 +170,8 @@ Provides static libraries required for developing with UCX.
 %endif
 %if %{with ib}
 %{_libdir}/pkgconfig/ucx-ib.pc
+%{_libdir}/pkgconfig/ucx-ib-mlx5.pc
+%{_libdir}/pkgconfig/ucx-ib-efa.pc
 %endif
 %if %{with rdmacm}
 %{_libdir}/pkgconfig/ucx-rdmacm.pc
@@ -229,6 +236,9 @@ hardware-offloaded data transfer.
 
 %files ib
 %{_libdir}/ucx/libuct_ib.so.*
+%{_libdir}/ucx/libuct_ib_mlx5.so.*
+%{_libdir}/ucx/libuct_ib_efa.so.*
+%{_libdir}/ucx/libucx_perftest_mad.so.*
 %endif
 
 %if %{with rdmacm}
@@ -311,6 +321,9 @@ library internals, protocol objects, transports status, and more.
 %endif
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 1.20.0-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Fri Jan 26 2024 Juan Camposeco <juanarturoc@microsoft.com> - 1.15.0-5
 - Update version to 1.15.0 and remove knem dependency
 

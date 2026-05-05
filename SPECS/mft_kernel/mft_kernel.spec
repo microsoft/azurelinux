@@ -28,20 +28,20 @@
 # take path to kernel sources if provided, otherwise look in default location (for non KMP rpms).
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 
-%{!?version: %global version 4.33.0}
-%{!?_release: %global _release 1}
+%{!?version: %global version 4.34.1}
+%{!?_release: %global _release 18}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
 
 Name:		 mft_kernel
 Summary:	 %{name} Kernel Module for the %{KVERSION} kernel
-Version:	 4.33.0
-Release:	 2%{release_suffix}%{?dist}
+Version:	 4.34.1
+Release:	 1%{release_suffix}%{?dist}
 License:	 Dual BSD/GPLv2
 Group:		 System Environment/Kernel
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:         %{_distro_sources_url}/kernel-mft-%{version}.tgz
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -230,6 +230,9 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 4.34.1-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-2
 - Tweak specs to use dynamic versioning for kernel
 

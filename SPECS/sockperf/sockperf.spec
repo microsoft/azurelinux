@@ -1,7 +1,4 @@
-%global version 3.10
-%global git_ref 5ebd327da983225321818c0355db922515e026bd
-%global release 0.git5ebd327da983.2410068
-%global full_ver %{version}-%{release}
+%global version 3.1
 
 Name:           sockperf
 Version:        %{version}
@@ -12,10 +9,18 @@ License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/mellanox/%{name}
-Source0:        https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/sockperf-3.10.tar.gz#/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 ExclusiveArch:   x86_64
 
 BuildRequires:  doxygen
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  libtool
+BuildRequires:  gcc-c++
+BuildRequires:  make
 
 # can't use _pkgdocdir neither _docdir since it is not the same even where it is defined
 %global _my_pkgdocdir /usr/share/doc/%{name} 
@@ -68,6 +73,9 @@ following:
 # > the "one big function" at a reasonable size for good performance at run
 # > time).
 export CXXFLAGS='%{optflags} -O3'
+if [ ! -f configure ]; then
+    ./autogen.sh
+fi
 %configure --enable-doc
 # --enable-tool --enable-test
 make %{?_smp_mflags}
@@ -84,5 +92,8 @@ make install DESTDIR="%{?buildroot}"
 
 %changelog
 * Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Thu Apr 17 2026 Azure Linux Team - 3.1-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 - Initial Azure Linux import from NVIDIA (license: BSD).
 - License verified

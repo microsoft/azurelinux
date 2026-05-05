@@ -1,6 +1,6 @@
 Name:		 mlnx-ethtool
-Version:	 6.14
-Release:	 1%{?dist}
+Version:        2510.0.0
+Release:        1%{?dist}
 Group:		 Utilities
 Summary:	 Settings tool for Ethernet and other network devices
 License:	 GPLv2
@@ -10,10 +10,12 @@ URL:		 https://ftp.kernel.org/pub/software/network/ethtool/
 Buildroot:	 /var/tmp/%{name}-%{version}-build
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRequires:  libmnl-devel
+BuildRequires:  autoconf
+BuildRequires:  automake
 
 Provides:       ethtool
 # To avoid file conflicts
@@ -29,6 +31,7 @@ network devices, especially Ethernet devices.
 
 
 %build
+./autogen.sh
 CFLAGS="${RPM_OPT_FLAGS}" ./configure --prefix=%{_prefix} --mandir=%{_mandir}
 make
 
@@ -48,6 +51,9 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 2510.0.0-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Thu Dec 11 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.14-1
 - Upgrade version to 6.14.
 - Update source path

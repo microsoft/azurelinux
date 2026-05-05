@@ -30,7 +30,7 @@
 
 Summary:        Mellanox userland tools and scripts
 Name:           mlnx-tools
-Version:        25.07
+Version:        2510.0.16
 Release:        1%{?dist}
 License:        GPLv2 or BSD
 Vendor:         Microsoft Corporation
@@ -39,7 +39,7 @@ Group:          Applications/System
 URL:            https://github.com/Mellanox/mlnx-tools
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 Obsoletes:      mlnx-ofa_kernel < 5.4
 Obsoletes:      mlnx_en-utils < 5.4
@@ -116,6 +116,9 @@ rm -rf %{buildroot}
 /lib/udev/mlnx_bf_udev
 
 %changelog
+* Thu Apr 17 2026 Azure Linux Team - 2510.0.16-1
+- Upgrade to DOCA 3.2.2 (OFED 25.10-2.4.1)
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update source path
