@@ -60,8 +60,8 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.9.0
-Release:        2%{?dist}
+Version:        3.9.10
+Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -783,6 +783,9 @@ exit 0
 %endif
 
 %changelog
+* Tue May 05 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.10-1
+- Auto-upgrade to 3.9.10 - for CVE-2026-43964
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.0-2
 - Remove dependency on 'libdb'. Using Fedora 40 (license: MIT) spec for guidance.
 
