@@ -11,7 +11,7 @@ Distribution:  Azure Linux
 Summary:       Xwayland
 Name:          xorg-x11-server-Xwayland
 Version:       24.1.6
-Release:       3%{?dist}
+Release:       4%{?dist}
  
 License:       MIT
 URL:           http://www.x.org
@@ -96,6 +96,9 @@ Patch4:        CVE-2025-49180.patch
 Patch5:        CVE-2025-62229.patch
 Patch6:        CVE-2025-62230.patch
 Patch7:        CVE-2025-62231.patch
+Patch8:        CVE-2026-33999.patch
+Patch9:        CVE-2026-34001.patch
+Patch10:       CVE-2026-34003.patch
 
 %description
 Xwayland is an X server for running X clients under Wayland.
@@ -146,6 +149,9 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/xwayland.pc
  
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.1.6-4
+- Patch for CVE-2026-34003, CVE-2026-34001, CVE-2026-33999
+
 * Sun Nov 02 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.1.6-3
 - Patch for CVE-2025-62231, CVE-2025-62230, CVE-2025-62229
 
