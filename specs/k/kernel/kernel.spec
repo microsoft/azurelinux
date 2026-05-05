@@ -1450,7 +1450,7 @@ Kernel sample programs and selftests.
 # of matching the pattern against the symlinks file.
 %{expand:%%global _find_debuginfo_opts %{?_find_debuginfo_opts} -p '.*%%{_libexecdir}/(ksamples|kselftests)/.*|XXX' -o selftests-debuginfo.list}
 
-%define __requires_exclude ^liburandom_read.so.*$
+%define __requires_exclude ^liburandom_read.so.*$|^/usr/bin/inc$
 
 # with_selftests
 %endif

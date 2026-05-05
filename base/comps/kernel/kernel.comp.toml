@@ -187,3 +187,9 @@ description = "Compile kselftests with -fPIE so they can be linked with the hard
 type = "spec-search-replace"
 regex = 'EXTRA_LDFLAGS="%\{__global_ldflags\}" ARCH=\$Arch V=1 TARGETS='
 replacement = 'EXTRA_LDFLAGS="%{__global_ldflags}" USERCFLAGS="-fPIE" ARCH=$Arch V=1 TARGETS='
+
+[[components.kernel.overlays]]
+description = "Filter the bogus `Requires: /usr/bin/inc` auto-dependency from kernel-selftests-internal. The selftests `exec` test ships `script-exec.inc` and `script-noexec.inc` (copied verbatim from samples/check-exec/) with a `#!/usr/bin/env inc` shebang. RPM's shebang-based dep generator turns this into `Requires: /usr/bin/inc`, but the actual `inc` interpreter is shipped INSIDE this same package at `/usr/libexec/kselftests/exec/inc`, not in `/usr/bin/`. The dep is therefore unsatisfiable at install time and blocks images from including kernel-selftests-internal. Extends the existing `__requires_exclude` (which already filters `liburandom_read.so.*`) to also filter `/usr/bin/inc`. Note: this only manifests AFTER the USERCFLAGS=-fPIE overlay above, because before that the `inc` binary failed to link (PIE) and the `.inc` files weren't installed."
+type = "spec-search-replace"
+regex = '^%define __requires_exclude \^liburandom_read\.so\.\*\$$'
+replacement = '%define __requires_exclude ^liburandom_read.so.*$|^/usr/bin/inc$'
