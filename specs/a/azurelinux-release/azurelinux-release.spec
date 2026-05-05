@@ -4,15 +4,12 @@
 %define release_name Four
 # Let's remove this prerelease_name before release, and next time we
 # can use the built-in prerelease logic (based on release number < 1)
-%define prerelease_name Alpha2
+%define prerelease_name Beta
 %define is_evergreen 0
 
 # Define this to 1 for Branched releases prior to RC
 # or 0 for RC and stable releases
 %define is_development 1
-
-# TODO(azl): review
-%define eol_date 2026-05-15
 
 %define dist_version_major 4
 %define dist_version_minor 0
@@ -42,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -306,7 +303,6 @@ HOME_URL="%{dist_home_url}"
 DOCUMENTATION_URL="https://aka.ms/azurelinux"
 SUPPORT_URL="https://aka.ms/azurelinux"
 BUG_REPORT_URL="%{dist_bug_report_url}"
-SUPPORT_END=%{eol_date}
 EOF
 
 # Create the common /etc/issue
@@ -479,6 +475,10 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Fri May 08 2026 Chris Co <chrco@microsoft.com> - 4.0-15
+- Update prerelease name to Beta
+- Drop eol_date and SUPPORT_END for the Beta phase
+
 * Wed May 06 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-14
 - Add Recommends weak dependency to prefer azurelinux-repos package.
 
