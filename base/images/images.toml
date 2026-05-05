@@ -36,6 +36,10 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "WSL Image"
 definition = { type = "kiwi", path = "wsl/wsl.kiwi" }
 
+[images.vm-iso-installer]
+description = "VM ISO Installer"
+definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi" }
+
 # ---- Test suites ----
 
 # Single shared pytest suite for static (offline) image validation.
