@@ -3,3 +3,4 @@ version = 1
 import-commit = 'a2813072c9edfe8c06f181742c2f432107ab0388'
 upstream-commit = 'a2813072c9edfe8c06f181742c2f432107ab0388'
 input-fingerprint = 'sha256:cb870e869e64a2eefee51c123455733f7d2c1e758eb73170b9dacb1bb3fa56c6'
+resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'
