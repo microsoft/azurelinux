@@ -12,7 +12,7 @@ URL:            https://github.com/mellanox/%{name}
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.2.2/SOURCES/mlnx_ofed/OFED-internal-25.10-2.4.1.tgz
-Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Source0:        %{_distro_sources_url}/%{name}-%{version}-3.2.2.tar.gz
 ExclusiveArch:   x86_64
 
 BuildRequires:  doxygen
