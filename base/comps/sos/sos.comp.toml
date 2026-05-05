@@ -11,3 +11,9 @@ description = "Add os_release_id value to match os-release ID"
 type = "patch-add"
 file = "Policy-Add-os_release_id-check.patch"
 source = "Policy-Add-os_release_id-check.patch"
+
+[[components.sos.overlays]]
+description = "Add dnf5 support in dnf plugin"
+type = "patch-add"
+file = "dnf-initial-dnf5-support-in-dnf-plugin.patch"
+source = "dnf-initial-dnf5-support-in-dnf-plugin.patch"
