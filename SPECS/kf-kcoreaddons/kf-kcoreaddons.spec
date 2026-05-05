@@ -43,7 +43,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n kcoreaddons-v%{version}
+%autosetup -p1 -n kcoreaddons-v%{version} 
 
 %build
 %cmake_kf
