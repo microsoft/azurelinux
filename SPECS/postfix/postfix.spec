@@ -428,6 +428,7 @@ cp -p examples/chroot-setup/LINUX2 %{buildroot}%{postfix_doc_dir}/examples/chroo
 cp conf/{main,bounce}.cf.default %{buildroot}%{postfix_doc_dir}
 sed -i 's#%{postfix_config_dir}\(/bounce\.cf\.default\)#%{postfix_doc_dir}\1#' %{buildroot}%{_mandir}/man5/bounce.5
 rm -f %{buildroot}%{postfix_config_dir}/{TLS_,}LICENSE
+rm -f %{buildroot}%{postfix_doc_dir}/LICENSE %{buildroot}%{postfix_doc_dir}/TLS_LICENSE
 
 find %{buildroot}%{postfix_doc_dir} -type f | xargs chmod 644
 find %{buildroot}%{postfix_doc_dir} -type d | xargs chmod 755
