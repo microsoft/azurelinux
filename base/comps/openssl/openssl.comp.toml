@@ -1,0 +1,19 @@
+[components.openssl]
+
+# AZL4 does not ship fips.so. Extend the existing RHEL fips.so-deletion
+# path to cover AZL4 so the module and its config are excluded from the package.
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+regex = '%if \( %\{defined rhel\} && \(! %\{defined centos\}\) && \(! %\{defined eln\}\) \)'
+replacement = '%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || 0%{?azl4}'
+description = "Remove fips.so from openssl on AZL4 (not supported for public preview)"
+
+# The above replacement also hits the Requires: openssl-fips-provider guard.
+# Suppress that dependency on AZL4 — openssl-fips-provider is not shipped for
+# public preview.
+[[components.openssl.overlays]]
+type = "spec-remove-tag"
+tag = "Requires"
+value = "openssl-fips-provider"
+package = "libs"
+description = "Don't require openssl-fips-provider on AZL4"
