@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        11%{?dist}
+Release:        12%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -469,6 +469,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Wed May 06 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-12
+- no-change bump to match "rendered" spec release
+
 * Thu Apr 23 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-11
 - Revert proc-version-override
 
