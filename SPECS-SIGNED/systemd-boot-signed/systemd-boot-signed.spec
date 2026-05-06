@@ -20,7 +20,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        29%{?dist}
+Release:        30%{?dist}
 License:        LGPL-2.1-or-later AND MIT AND GPL-2.0-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -98,6 +98,9 @@ popd
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Thu May 28 2026 Nikola Bojanic <nbojanic@microsoft.com> - 255-30
+- Bump release to match systemd spec
+
 * Thu May 28 2026 Nikola Bojanic <nbojanic@microsoft.com> - 255-29
 - Bump release to match systemd spec
 
