@@ -60,8 +60,8 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.9.0
-Release:        2%{?dist}
+Version:        3.9.10
+Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -239,6 +239,8 @@ maps with Postfix, you need this.
 
 %prep
 %setup -q
+mv %{name}/* .
+rm -rf %{name}
 # Apply obligatory patches
 %patch 1 -p1 -b .config
 %patch 2 -p1 -b .files
@@ -783,6 +785,9 @@ exit 0
 %endif
 
 %changelog
+* Wed May 06 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.9.10-1
+- Upgrade to version 3.9.10 for CVE-2026-43964
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.0-2
 - Remove dependency on 'libdb'. Using Fedora 40 (license: MIT) spec for guidance.
 

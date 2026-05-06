@@ -2,7 +2,7 @@
  "Signatures": {
   "README-Postfix-SASL-RedHat.txt": "ee4f586103caeb67439389542f4f4937168a4a34e7576e64060517fb9a216a3f",
   "pflogsumm-1.1.5.tar.gz": "da6443679117de5109fd7d65fe915286c20ad1ecee63fe07d8cdddd0b75fe466",
-  "postfix-3.9.0.tar.gz": "56f5e420e7c25455a4e96c19b672f80f9a0a35fb5becc9247c9e3d5dcc617f34",
+  "postfix-3.9.10.tar.gz": "f7f5e004d98737aa3a8c18e6886b199a720a5f03ef9c645342f1d0cdd113fb5f",
   "postfix-chroot-update": "a6180d5b2cb81e8f84388d889fe671c80a5bc953a122ef03633346dc3f21a16a",
   "postfix-etc-init.d-postfix": "61db4e9056c5c345fc8fe301417dba595ad5084cbbe574a14bed0f5c5aeaa3d6",
   "postfix-pam.conf": "b0fb611f3e88f94068ee2d5b7e26d433283ad2d3c2dbf11c36eceadac6bcc91a",

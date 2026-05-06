@@ -21673,8 +21673,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.9.0",
-          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.9.0.tar.gz"
+          "version": "3.9.10",
+          "downloadUrl": "https://mirror.reverse.net/pub/postfix-release/official/postfix-3.9.10.tar.gz"
         }
       }
     },
