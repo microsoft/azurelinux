@@ -1302,7 +1302,7 @@ sed -i 's/LLDB_ENABLE_PYTHON/TRUE/' lldb/docs/CMakeLists.txt
 %global runtimes %{runtimes};offload
 %endif
 
-%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux
+%global cfg_file_content --gcc-triple=%{_target_cpu}-azurelinux-linux
 
 # We want to use DWARF-5 on all snapshot builds.
 %if %{without snapshot_build} && %{defined rhel} && 0%{?rhel} < 10
