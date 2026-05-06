@@ -19,3 +19,8 @@ type = "spec-remove-tag"
 tag = "Requires"
 value = "flatpak-libs"
 package = "core"
+
+[[components.anaconda.overlays]]
+description = "Guard gi.require_version('Flatpak') so the module loads even without flatpak-libs typelib"
+type = "patch-add"
+source = "0001-flatpak_manager-guard-gi-import-for-missing-typelib.patch"
