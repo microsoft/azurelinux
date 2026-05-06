@@ -1,0 +1,40 @@
+From 9aeb84c88573daff0a579edf5f9ef521032edaf9 Mon Sep 17 00:00:00 2001
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Wed, 6 May 2026 10:22:21 +0000
+Subject: [PATCH] flatpak_manager: guard gi import for missing typelib
+
+On Azure Linux the flatpak-libs package (and its GI typelib) is not
+available in the base image. Wrap the gi.require_version / import in a
+try/except so that the Flatpak payload module loads without crashing.
+The payload will be inert when Flatpak is unavailable.
+---
+ .../payloads/payload/flatpak/flatpak_manager.py     | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/pyanaconda/modules/payloads/payload/flatpak/flatpak_manager.py b/pyanaconda/modules/payloads/payload/flatpak/flatpak_manager.py
+index 09a01bd..30e8ba3 100644
+--- a/pyanaconda/modules/payloads/payload/flatpak/flatpak_manager.py
++++ b/pyanaconda/modules/payloads/payload/flatpak/flatpak_manager.py
+@@ -40,10 +40,15 @@ from pyanaconda.modules.payloads.source.source_base import (
+     RepositorySourceMixin,
+ )
+ 
+-gi.require_version("Flatpak", "1.0")
+-gi.require_version("Gio", "2.0")
+-
+-from gi.repository.Flatpak import Installation, Transaction, TransactionOperationType
++try:
++    gi.require_version("Gio", "2.0")
++    gi.require_version("Flatpak", "1.0")
++    from gi.repository.Flatpak import Installation, Transaction, TransactionOperationType
++except (ImportError, ValueError):
++    # flatpak-libs / typelib not installed -- stubs so module loads but is inert
++    Installation = None
++    Transaction = None
++    TransactionOperationType = None
+ 
+ log = get_module_logger(__name__)
+ 
+-- 
+2.43.0
+

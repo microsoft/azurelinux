@@ -4,7 +4,7 @@
 Summary: Graphical system installer
 Name:    anaconda
 Version: 43.44
-Release: 4%{?dist}
+Release: 5%{?dist}
 ExcludeArch: %{ix86}
 License: GPL-2.0-or-later
 URL:     http://fedoraproject.org/wiki/Anaconda
@@ -87,6 +87,7 @@ BuildRequires: libxml2
 Requires: anaconda-gui = %{version}-%{release}
 Requires: anaconda-tui = %{version}-%{release}
 
+Patch2: 0001-flatpak_manager-guard-gi-import-for-missing-typelib.patch
 %description
 The anaconda package is a metapackage for the Anaconda installer.
 

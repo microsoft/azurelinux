@@ -74,7 +74,7 @@ investigate → modify → render → build → test → inspect
 
 ### 0. Release calculation errors
 
-If `render` fails with `non-standard Release tag value ... does not start with an integer`, see [Release Configuration](../../instructions/comp-toml.instructions.md#release-configuration).
+If `render` fails with `non-standard Release tag value ... does not start with an integer`, or if `%autorelease` is incorrectly expanded to a hardcoded integer (common with conditional `%autorelease` specs), see [Release Configuration](../../instructions/comp-toml.instructions.md#release-configuration).
 
 ### 1. Render and inspect the spec
 

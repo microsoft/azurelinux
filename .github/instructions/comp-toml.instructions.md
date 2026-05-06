@@ -22,7 +22,7 @@ Every component lives under `[components.<name>]`. A bare entry inherits default
 | `spec.upstream-name` | Upstream package name (if different) | `"redhat-rpm-config"` |
 | `spec.upstream-distro` | Pin to a specific distro/version | `{ name = "fedora", version = "rawhide" }` |
 | `overlays` | List of spec/source modifications | See Overlays section |
-| `release.calculation` | Release tag handling (`"auto"` or `"manual"`) | `"manual"` |
+| `release.calculation` | Release tag handling (`"auto"`, `"autorelease"`, `"static"`, or `"manual"`) | `"manual"` |
 | `render.skip-file-filter` | Keep all source files during render (edge case) | `true` |
 | `build.defines` | RPM macro overrides | `{ rhel = "11" }` |
 | `build.with` | Enable build conditionals | `["feature_x"]` |
@@ -167,7 +167,49 @@ without = ["plugin_rhsm"]
 
 ## Release Configuration
 
-By default (`release.calculation = "auto"`), `azldev` auto-calculates the `Release` tag during rendering. Some upstream specs use non-standard Release tag values (e.g., `%{baserelease}%{?dist}`, `%{pkg_release}`) that the auto-calculator can't parse. These fail with:
+By default (`release.calculation = "auto"`), `azldev` auto-calculates the `Release` tag during rendering. There are four modes:
+
+### `auto` (default)
+
+Auto-detects whether the spec uses `%autorelease` or a static release value and handles it accordingly. Works for most packages.
+
+### `autorelease`
+
+Forces `azldev` to treat the spec as using `%autorelease`, preserving the `%autorelease` macro in the rendered spec. Use this when auto-detection gets it wrong — typically when the spec wraps `%autorelease` in a conditional:
+
+```spec
+%if %{defined autorelease}
+Release: %autorelease
+%else
+Release: 1
+%endif
+```
+
+In this pattern, auto-detection may see the conditional and misidentify the release mode, expanding `%autorelease` to a hardcoded integer. Setting `calculation = "autorelease"` forces correct behavior:
+
+```toml
+[components.gvisor-tap-vsock]
+# Upstream spec uses conditional %autorelease — auto-detection misidentifies it
+[components.gvisor-tap-vsock.release]
+calculation = "autorelease"
+```
+
+**When to use `autorelease`:** When `render` produces a hardcoded integer where `%autorelease` should be, or when the spec has conditional `%autorelease` logic that confuses auto-detection.
+
+### `static`
+
+Forces `azldev` to treat the spec as using a static (hardcoded) release value, even if auto-detection thinks it uses `%autorelease`. Uses a regex to match release patterns like `5.%{dist}` and bumps the integer component automatically during rendering. The inverse of `autorelease` — use when auto-detection incorrectly identifies a static release as `%autorelease`.
+
+```toml
+[components.mypackage.release]
+calculation = "static"
+```
+
+**When to use `static`:** When auto-detection misidentifies a static release as `%autorelease` and produces incorrect rendering (e.g., inserts `%autorelease` where a hardcoded integer release should be).
+
+### `manual`
+
+Some upstream specs use non-standard Release tag values (e.g., `%{baserelease}%{?dist}`, `%{pkg_release}`) that the auto-calculator can't parse. These fail with:
 
 ```
 non-standard Release tag value ... does not start with an integer

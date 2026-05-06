@@ -1,0 +1,5 @@
+[components.gvisor-tap-vsock]
+# Upstream spec uses conditional %autorelease (%if %{defined autorelease}), which
+# auto-detection misidentifies. Force autorelease mode to preserve %autorelease in render.
+[components.gvisor-tap-vsock.release]
+calculation = "autorelease"
