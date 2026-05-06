@@ -23,7 +23,7 @@
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
 #     - ApiAudience          : Entra ID audience URI for the Control Tower app
-#     - ApiBaseUrl           : Base URL of the Control Tower service
+#     - ApiBaseDirectUrl     : Direct base URL of the Control Tower APIM endpoint (bypasses Azure Front Door)
 #     - AzldevCommit         : Commit hash for azldev (go install ...@<commit>)
 
 # Trigger controlled by ADO branch policy — not YAML triggers.

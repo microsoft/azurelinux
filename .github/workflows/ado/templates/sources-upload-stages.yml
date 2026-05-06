@@ -111,7 +111,7 @@ stages:
               echo "##[endgroup]"
 
               echo "##[group]Python dependencies"
-              pip install -r .github/workflows/scripts/control-tower-prcheck/requirements.txt
+              pip install -r .github/workflows/scripts/control-tower/requirements.txt
               echo "##[endgroup]"
             displayName: "Install dependencies"
             env:
@@ -200,7 +200,7 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 .github/workflows/scripts/control-tower-prcheck/run_control_tower_prcheck.py \
+                python3 .github/workflows/scripts/control-tower/run_prcheck.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
@@ -209,7 +209,7 @@ stages:
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
               API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseUrl)
+              API_BASE_URL: $(ApiBaseDirectUrl)
               BUILD_REASON: $(Build.Reason)
               COMPONENTS: $(components)
               SOURCE_COMMIT: $(sourceCommit)
