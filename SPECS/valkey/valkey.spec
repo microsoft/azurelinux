@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://valkey.io/
 Source0:        https://github.com/valkey-io/valkey/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         disable-mem-defrag-tests.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
