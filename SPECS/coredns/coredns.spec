@@ -50,6 +50,7 @@ Patch11:        CVE-2026-26017.patch
 Patch12:        CVE-2026-26018.patch
 Patch13:        CVE-2026-32934.patch
 Patch14:        CVE-2026-32936.patch
+Patch15:        CVE-2026-33489.patch
 
 BuildRequires:  golang < 1.25
 
@@ -92,7 +93,7 @@ go install github.com/fatih/faillint@latest && \
 
 %changelog
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-16
-- Patch for CVE-2026-32936, CVE-2026-32934
+- Patch for CVE-2026-32936, CVE-2026-32934, CVE-2026-33489
 
 * Mon Mar 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-15
 - Patch for CVE-2026-26018, CVE-2026-26017
