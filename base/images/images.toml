@@ -12,7 +12,10 @@ runtime-package-management = true
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.test-suites = [
+    { name = "static-image-checks" },
+    { name = "container-bvt-tests" },
+]
 
 [images.container-base.capabilities]
 machine-bootable = false
@@ -61,4 +64,21 @@ extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
     "--capabilities", "{capabilities}",
+]
+
+# Container Business Validation Tests (BVT)
+[test-suites.container-bvt-tests]
+type = "pytest"
+description = "Container BVT: runtime validation of system resources, networking, filesystem, and package management"
+
+[test-suites.container-bvt-tests.pytest]
+working-dir = "tests"
+install = "pyproject"
+test-paths = ["cases/container-base/test_container_bvt.py"]
+extra-args = [
+    "--image-path", "{image-path}",
+    "--image-name", "{image-name}",
+    "--capabilities", "{capabilities}",
+    "-m", "runtime_container_tests",
+    "-v", "-s"
 ]

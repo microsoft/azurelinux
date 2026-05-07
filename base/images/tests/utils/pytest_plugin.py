@@ -108,6 +108,18 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
         "markers",
         "image(name): only run this test when --image-name matches",
     )
+    config.addinivalue_line(
+        "markers", 
+        "static: static filesystem tests without container runtime",
+    )
+    config.addinivalue_line(
+        "markers",
+        "static_container_test: portable static container structure tests",
+    )
+    config.addinivalue_line(
+        "markers",
+        "runtime_container_tests: tests requiring a running container runtime",
+    )
 
     from utils.tools import check_tools
 
@@ -142,8 +154,15 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     caps = parse_capabilities(item.config.getoption("--capabilities", default=None))
     for marker in item.iter_markers("require_capability"):
         required = marker.args[0] if marker.args else None
-        if required and required not in caps:
-            pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
+        if required:
+            # Handle both single capability strings and lists of capabilities
+            if isinstance(required, list):
+                missing = [cap for cap in required if cap not in caps]
+                if missing:
+                    pytest.skip(f"requires capabilities {missing} (not in: {sorted(caps)})")
+            else:
+                if required not in caps:
+                    pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
 
     # image: skip if --image-name doesn't match.
     image_name = item.config.getoption("--image-name", default=None)

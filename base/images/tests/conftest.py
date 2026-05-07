@@ -9,6 +9,7 @@ CLI options (``--image-path``, ``--image-name``, ``--image-type``,
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 import subprocess
 import tempfile
@@ -24,6 +25,11 @@ from utils.extract import (
     unmount_vm_image,
 )
 from utils.parsers import parse_os_release, query_rpm_packages
+from utils.container_runtime import (
+    ContainerExecInstance, 
+    create_container_with_exec,
+    destroy_exec_container,
+)
 from utils.pytest_plugin import (
     derive_image_type_from_capabilities,
     detect_image_type,
@@ -208,3 +214,114 @@ def partition_table(
     for p in disk_info.partitions:
         logger.debug("  %s: type=%s mount=%s size=%d", p.device, p.type, p.mountpoint, p.size_bytes)
     return disk_info.partitions
+
+
+# ---------------------------------------------------------------------------
+# Dynamic Container Testing Fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")  
+def running_container(
+    image_path: Path, image_type: str, image_name: str | None, workdir: Path, request: pytest.FixtureRequest
+) -> ContainerExecInstance | None:
+    """Running container instance with exec access — session fixture with cleanup.
+    
+    Uses fast podman exec instead of SSH for better performance.
+    Only creates container for runtime container tests.
+    """
+    if image_type != "container":
+        pytest.skip("running_container only applicable to container images")
+        
+    # Check if any tests being run require a live runtime container.
+    has_runtime_container_tests = any(
+        item.get_closest_marker("runtime_container_tests") is not None
+        for item in request.session.items
+    ) if hasattr(request, 'session') else False
+
+    if not has_runtime_container_tests:
+        pytest.skip("running_container only for runtime container tests")
+    
+    logger.info("Creating running container for runtime container tests")
+    container = create_container_with_exec(
+        image_path, 
+        workdir, 
+        container_name=f"azl-test-{image_name or 'container'}",
+        image_name=image_name
+    )
+    
+    try:
+        yield container
+    finally:
+        logger.info("Cleaning up running container")
+        destroy_exec_container(container)
+
+
+@pytest.fixture
+def container_exec(running_container: ContainerExecInstance):
+    """Execute commands in running container via podman exec (fast with on-demand packages)."""
+    def _exec(command: str, timeout: int = 60, check: bool = True) -> subprocess.CompletedProcess[str]:
+        """Execute command via exec with automatic package installation."""
+        from utils.container_runtime import (
+            exec_container_command_with_fallback, 
+            detect_required_packages
+        )
+        
+        # Detect packages that might be needed
+        required_packages = detect_required_packages(command)
+        
+        return exec_container_command_with_fallback(
+            running_container, command, required_packages, timeout, check
+        )
+    return _exec
+
+
+@pytest.fixture
+def ssh_exec(running_container: ContainerExecInstance):
+    """Legacy SSH exec fixture - now uses exec with smart package installation.
+    
+    Note: This is kept for backward compatibility but uses exec instead of SSH.
+    For new tests, prefer using container_exec directly.
+    """
+    def _exec(command: str, timeout: int = 60) -> subprocess.CompletedProcess[str]:
+        """Execute command via exec with automatic package installation."""
+        from utils.container_runtime import (
+            exec_container_command_with_fallback, 
+            detect_required_packages
+        )
+        
+        # Detect packages that might be needed  
+        required_packages = detect_required_packages(command)
+        
+        return exec_container_command_with_fallback(
+            running_container, command, required_packages, timeout, check=True
+        )
+    return _exec
+
+
+@pytest.fixture
+def container_info(running_container: ContainerExecInstance) -> dict[str, str]:
+    """Container runtime information."""
+    # Get the container IP address for compatibility with SSH-based tests
+    try:
+        from utils.container_runtime import exec_container_command_raw
+        ip_result = exec_container_command_raw(
+            running_container.container_name, 
+            ["hostname", "-i"], 
+            timeout=5
+        )
+        container_ip = ip_result.stdout.strip() if ip_result.returncode == 0 else "127.0.0.1"
+    except Exception:
+        container_ip = "127.0.0.1"
+    
+    return {
+        "container_id": running_container.container_id,
+        "container_name": running_container.container_name,
+        "image_ref": running_container.image_ref,
+        # Compatibility fields for SSH-style tests
+        "ip_address": container_ip,
+        "ssh_port": "22",  # Not applicable for exec but needed for compatibility
+        "ssh_user": "root",
+    }
+
+
