@@ -5853,7 +5853,6 @@ packages = [
     "python3-igraph-devel", # srpm: python-igraph
     "python3-imageio", # srpm: python-imageio
     "python3-immutables", # srpm: python-immutables
-    "python3-impacket", # srpm: python-impacket
     "python3-importlib-metadata", # srpm: python-importlib-metadata
     "python3-incremental", # srpm: python-incremental
     "python3-inkex", # srpm: python-inkex
