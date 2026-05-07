@@ -44,7 +44,6 @@ packages = [
     "GraphicsMagick-devel", # srpm: GraphicsMagick
     "GraphicsMagick-doc", # srpm: GraphicsMagick
     "GraphicsMagick-perl", # srpm: GraphicsMagick
-    "HaXml", # srpm: ghc-HaXml
     "ImageMagick", # srpm: ImageMagick
     "ImageMagick-c++", # srpm: ImageMagick
     "ImageMagick-c++-devel", # srpm: ImageMagick
@@ -896,14 +895,6 @@ packages = [
     "ghc-HUnit-devel", # srpm: ghc-HUnit
     "ghc-HUnit-doc", # srpm: ghc-HUnit
     "ghc-HUnit-prof", # srpm: ghc-HUnit
-    "ghc-HaXml", # srpm: ghc-HaXml
-    "ghc-HaXml-devel", # srpm: ghc-HaXml
-    "ghc-HaXml-doc", # srpm: ghc-HaXml
-    "ghc-HaXml-prof", # srpm: ghc-HaXml
-    "ghc-HsOpenSSL", # srpm: ghc-HsOpenSSL
-    "ghc-HsOpenSSL-devel", # srpm: ghc-HsOpenSSL
-    "ghc-HsOpenSSL-doc", # srpm: ghc-HsOpenSSL
-    "ghc-HsOpenSSL-prof", # srpm: ghc-HsOpenSSL
     "ghc-JuicyPixels", # srpm: ghc-JuicyPixels
     "ghc-JuicyPixels-devel", # srpm: ghc-JuicyPixels
     "ghc-JuicyPixels-doc", # srpm: ghc-JuicyPixels
@@ -1281,10 +1272,6 @@ packages = [
     "ghc-foldl-devel", # srpm: ghc-foldl
     "ghc-foldl-doc", # srpm: ghc-foldl
     "ghc-foldl-prof", # srpm: ghc-foldl
-    "ghc-formatting", # srpm: ghc-formatting
-    "ghc-formatting-devel", # srpm: ghc-formatting
-    "ghc-formatting-doc", # srpm: ghc-formatting
-    "ghc-formatting-prof", # srpm: ghc-formatting
     "ghc-foundation", # srpm: ghc-foundation
     "ghc-foundation-devel", # srpm: ghc-foundation
     "ghc-foundation-doc", # srpm: ghc-foundation
@@ -1363,10 +1350,6 @@ packages = [
     "ghc-haskell-lexer-devel", # srpm: ghc-haskell-lexer
     "ghc-haskell-lexer-doc", # srpm: ghc-haskell-lexer
     "ghc-haskell-lexer-prof", # srpm: ghc-haskell-lexer
-    "ghc-haxr", # srpm: ghc-haxr
-    "ghc-haxr-devel", # srpm: ghc-haxr
-    "ghc-haxr-doc", # srpm: ghc-haxr
-    "ghc-haxr-prof", # srpm: ghc-haxr
     "ghc-heaps", # srpm: shake
     "ghc-heaps-devel", # srpm: shake
     "ghc-heaps-doc", # srpm: shake
@@ -1463,10 +1446,6 @@ packages = [
     "ghc-hspec-expectations-doc", # srpm: ghc-hspec-expectations
     "ghc-hspec-expectations-prof", # srpm: ghc-hspec-expectations
     "ghc-hspec-prof", # srpm: ghc-hspec
-    "ghc-html-conduit", # srpm: ghc-html-conduit
-    "ghc-html-conduit-devel", # srpm: ghc-html-conduit
-    "ghc-html-conduit-doc", # srpm: ghc-html-conduit
-    "ghc-html-conduit-prof", # srpm: ghc-html-conduit
     "ghc-http-api-data", # srpm: ghc-http-api-data
     "ghc-http-api-data-devel", # srpm: ghc-http-api-data
     "ghc-http-api-data-doc", # srpm: ghc-http-api-data
@@ -1479,22 +1458,10 @@ packages = [
     "ghc-http-client-tls-devel", # srpm: ghc-http-client-tls
     "ghc-http-client-tls-doc", # srpm: ghc-http-client-tls
     "ghc-http-client-tls-prof", # srpm: ghc-http-client-tls
-    "ghc-http-common", # srpm: ghc-http-common
-    "ghc-http-common-devel", # srpm: ghc-http-common
-    "ghc-http-common-doc", # srpm: ghc-http-common
-    "ghc-http-common-prof", # srpm: ghc-http-common
-    "ghc-http-conduit", # srpm: ghc-http-conduit
-    "ghc-http-conduit-devel", # srpm: ghc-http-conduit
-    "ghc-http-conduit-doc", # srpm: ghc-http-conduit
-    "ghc-http-conduit-prof", # srpm: ghc-http-conduit
     "ghc-http-date", # srpm: ghc-http-date
     "ghc-http-date-devel", # srpm: ghc-http-date
     "ghc-http-date-doc", # srpm: ghc-http-date
     "ghc-http-date-prof", # srpm: ghc-http-date
-    "ghc-http-directory", # srpm: ghc-http-directory
-    "ghc-http-directory-devel", # srpm: ghc-http-directory
-    "ghc-http-directory-doc", # srpm: ghc-http-directory
-    "ghc-http-directory-prof", # srpm: ghc-http-directory
     "ghc-http-media", # srpm: ghc-http-media
     "ghc-http-media-devel", # srpm: ghc-http-media
     "ghc-http-media-doc", # srpm: ghc-http-media
@@ -1503,10 +1470,6 @@ packages = [
     "ghc-http-semantics-devel", # srpm: ghc-http2
     "ghc-http-semantics-doc", # srpm: ghc-http2
     "ghc-http-semantics-prof", # srpm: ghc-http2
-    "ghc-http-streams", # srpm: ghc-http-streams
-    "ghc-http-streams-devel", # srpm: ghc-http-streams
-    "ghc-http-streams-doc", # srpm: ghc-http-streams
-    "ghc-http-streams-prof", # srpm: ghc-http-streams
     "ghc-http-types", # srpm: ghc-http-types
     "ghc-http-types-devel", # srpm: ghc-http-types
     "ghc-http-types-doc", # srpm: ghc-http-types
@@ -1531,10 +1494,6 @@ packages = [
     "ghc-integer-logarithms-devel", # srpm: ghc-integer-logarithms
     "ghc-integer-logarithms-doc", # srpm: ghc-integer-logarithms
     "ghc-integer-logarithms-prof", # srpm: ghc-integer-logarithms
-    "ghc-io-streams", # srpm: ghc-io-streams
-    "ghc-io-streams-devel", # srpm: ghc-io-streams
-    "ghc-io-streams-doc", # srpm: ghc-io-streams
-    "ghc-io-streams-prof", # srpm: ghc-io-streams
     "ghc-iproute", # srpm: ghc-iproute
     "ghc-iproute-devel", # srpm: ghc-iproute
     "ghc-iproute-doc", # srpm: ghc-iproute
@@ -1563,10 +1522,6 @@ packages = [
     "ghc-js-jquery-devel", # srpm: ghc-js-jquery
     "ghc-js-jquery-doc", # srpm: ghc-js-jquery
     "ghc-js-jquery-prof", # srpm: ghc-js-jquery
-    "ghc-koji", # srpm: ghc-koji
-    "ghc-koji-devel", # srpm: ghc-koji
-    "ghc-koji-doc", # srpm: ghc-koji
-    "ghc-koji-prof", # srpm: ghc-koji
     "ghc-libyaml", # srpm: ghc-yaml
     "ghc-libyaml-devel", # srpm: ghc-yaml
     "ghc-libyaml-doc", # srpm: ghc-yaml
@@ -1637,10 +1592,6 @@ packages = [
     "ghc-old-time-devel", # srpm: ghc-old-time
     "ghc-old-time-doc", # srpm: ghc-old-time
     "ghc-old-time-prof", # srpm: ghc-old-time
-    "ghc-openssl-streams", # srpm: ghc-openssl-streams
-    "ghc-openssl-streams-devel", # srpm: ghc-openssl-streams
-    "ghc-openssl-streams-doc", # srpm: ghc-openssl-streams
-    "ghc-openssl-streams-prof", # srpm: ghc-openssl-streams
     "ghc-optparse-applicative", # srpm: ghc-optparse-applicative
     "ghc-optparse-applicative-devel", # srpm: ghc-optparse-applicative
     "ghc-optparse-applicative-doc", # srpm: ghc-optparse-applicative
@@ -1681,10 +1632,6 @@ packages = [
     "ghc-pem-devel", # srpm: ghc-pem
     "ghc-pem-doc", # srpm: ghc-pem
     "ghc-pem-prof", # srpm: ghc-pem
-    "ghc-polyparse", # srpm: ghc-polyparse
-    "ghc-polyparse-devel", # srpm: ghc-polyparse
-    "ghc-polyparse-doc", # srpm: ghc-polyparse
-    "ghc-polyparse-prof", # srpm: ghc-polyparse
     "ghc-pretty", # srpm: ghc
     "ghc-pretty-devel", # srpm: ghc
     "ghc-pretty-doc", # srpm: ghc
@@ -1693,10 +1640,6 @@ packages = [
     "ghc-pretty-show-devel", # srpm: ghc-pretty-show
     "ghc-pretty-show-doc", # srpm: ghc-pretty-show
     "ghc-pretty-show-prof", # srpm: ghc-pretty-show
-    "ghc-pretty-simple", # srpm: ghc-pretty-simple
-    "ghc-pretty-simple-devel", # srpm: ghc-pretty-simple
-    "ghc-pretty-simple-doc", # srpm: ghc-pretty-simple
-    "ghc-pretty-simple-prof", # srpm: ghc-pretty-simple
     "ghc-prettyprinter", # srpm: ghc-prettyprinter
     "ghc-prettyprinter-ansi-terminal", # srpm: ghc-prettyprinter-ansi-terminal
     "ghc-prettyprinter-ansi-terminal-devel", # srpm: ghc-prettyprinter-ansi-terminal
@@ -1753,10 +1696,6 @@ packages = [
     "ghc-rpm-macros", # srpm: ghc-rpm-macros
     "ghc-rpm-macros-extra", # srpm: ghc-rpm-macros
     "ghc-rpm-macros-quick", # srpm: ghc-rpm-macros
-    "ghc-rpm-nvr", # srpm: ghc-rpm-nvr
-    "ghc-rpm-nvr-devel", # srpm: ghc-rpm-nvr
-    "ghc-rpm-nvr-doc", # srpm: ghc-rpm-nvr
-    "ghc-rpm-nvr-prof", # srpm: ghc-rpm-nvr
     "ghc-safe", # srpm: ghc-safe
     "ghc-safe-devel", # srpm: ghc-safe
     "ghc-safe-doc", # srpm: ghc-safe
@@ -1765,10 +1704,6 @@ packages = [
     "ghc-scientific-devel", # srpm: ghc-scientific
     "ghc-scientific-doc", # srpm: ghc-scientific
     "ghc-scientific-prof", # srpm: ghc-scientific
-    "ghc-select-rpms", # srpm: ghc-select-rpms
-    "ghc-select-rpms-devel", # srpm: ghc-select-rpms
-    "ghc-select-rpms-doc", # srpm: ghc-select-rpms
-    "ghc-select-rpms-prof", # srpm: ghc-select-rpms
     "ghc-semaphore-compat", # srpm: ghc
     "ghc-semaphore-compat-devel", # srpm: ghc
     "ghc-semaphore-compat-doc", # srpm: ghc
@@ -1797,18 +1732,6 @@ packages = [
     "ghc-shake-devel", # srpm: shake
     "ghc-shake-doc", # srpm: shake
     "ghc-shake-prof", # srpm: shake
-    "ghc-simple-cmd", # srpm: ghc-simple-cmd
-    "ghc-simple-cmd-args", # srpm: ghc-simple-cmd-args
-    "ghc-simple-cmd-args-devel", # srpm: ghc-simple-cmd-args
-    "ghc-simple-cmd-args-doc", # srpm: ghc-simple-cmd-args
-    "ghc-simple-cmd-args-prof", # srpm: ghc-simple-cmd-args
-    "ghc-simple-cmd-devel", # srpm: ghc-simple-cmd
-    "ghc-simple-cmd-doc", # srpm: ghc-simple-cmd
-    "ghc-simple-cmd-prof", # srpm: ghc-simple-cmd
-    "ghc-simple-prompt", # srpm: ghc-simple-prompt
-    "ghc-simple-prompt-devel", # srpm: ghc-simple-prompt
-    "ghc-simple-prompt-doc", # srpm: ghc-simple-prompt
-    "ghc-simple-prompt-prof", # srpm: ghc-simple-prompt
     "ghc-simple-sendfile", # srpm: ghc-simple-sendfile
     "ghc-simple-sendfile-devel", # srpm: ghc-simple-sendfile
     "ghc-simple-sendfile-doc", # srpm: ghc-simple-sendfile
@@ -2105,14 +2028,6 @@ packages = [
     "ghc-word8-devel", # srpm: ghc-word8
     "ghc-word8-doc", # srpm: ghc-word8
     "ghc-word8-prof", # srpm: ghc-word8
-    "ghc-xdg-basedir", # srpm: ghc-xdg-basedir
-    "ghc-xdg-basedir-devel", # srpm: ghc-xdg-basedir
-    "ghc-xdg-basedir-doc", # srpm: ghc-xdg-basedir
-    "ghc-xdg-basedir-prof", # srpm: ghc-xdg-basedir
-    "ghc-xdg-userdirs", # srpm: ghc-xdg-userdirs
-    "ghc-xdg-userdirs-devel", # srpm: ghc-xdg-userdirs
-    "ghc-xdg-userdirs-doc", # srpm: ghc-xdg-userdirs
-    "ghc-xdg-userdirs-prof", # srpm: ghc-xdg-userdirs
     "ghc-xhtml", # srpm: ghc
     "ghc-xhtml-devel", # srpm: ghc
     "ghc-xhtml-doc", # srpm: ghc
@@ -2138,10 +2053,6 @@ packages = [
     "ghc-zip-archive-doc", # srpm: ghc-zip-archive
     "ghc-zip-archive-prof", # srpm: ghc-zip-archive
     "ghc-zlib", # srpm: ghc-zlib
-    "ghc-zlib-bindings", # srpm: ghc-zlib-bindings
-    "ghc-zlib-bindings-devel", # srpm: ghc-zlib-bindings
-    "ghc-zlib-bindings-doc", # srpm: ghc-zlib-bindings
-    "ghc-zlib-bindings-prof", # srpm: ghc-zlib-bindings
     "ghc-zlib-devel", # srpm: ghc-zlib
     "ghc-zlib-doc", # srpm: ghc-zlib
     "ghc-zlib-prof", # srpm: ghc-zlib
