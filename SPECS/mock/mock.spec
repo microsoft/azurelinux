@@ -9,13 +9,12 @@
 
 Summary:       Builds packages inside chroots
 Name:          mock
-Version:       5.6
-Release:       2%{?dist}
+Version:       6.7
+Release:       1%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later
 Source:        https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:        disable-copying-ca-trust-dirs.patch
 URL:           https://github.com/rpm-software-management/mock/
 BuildArch:     noarch
 Requires:      tar
@@ -299,6 +298,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir  %{_datadir}/cheat
 
 %changelog
+* Wed May 07 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.7-1
+- Upgrade to 6.7 upstream release
+
 * Wed May 07 2025 Reuben Olinsky <reubeno@microsoft.com> - 5.6-2
 - Backport change allowing disabling ca-trust file copying.
 
