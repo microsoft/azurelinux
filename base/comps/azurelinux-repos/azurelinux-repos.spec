@@ -35,11 +35,6 @@ Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
 # ensures users have the next future key installed and referenced, even if they
 # don't update very often. This will smooth out Evergreen N->N+1 transition for them).
 
-# IMA certs: dracut integrity module only recognizes DER format
-# TODO(azl): review
-# Source500:      azurelinux-ima-ca.der
-# Source501:      azurelinux-4.0-ima.der
-
 %description
 Azure Linux package repository files for yum and dnf along with gpg public keys.
 
@@ -91,13 +86,6 @@ done
 # and add symlink for compat generic location
 ln -s RPM-GPG-KEY-azurelinux-%{version}-primary RPM-GPG-KEY-%{version}-azurelinux
 popd
-
-# Install the IMA certs
-# TODO(azl): review
-# install -d -m 755 $RPM_BUILD_ROOT/etc/keys/ima
-# install -m 644 %{_sourcedir}/azurelinux*ima.der $RPM_BUILD_ROOT/etc/keys/ima/
-# install -d -m 755 $RPM_BUILD_ROOT/usr/share/ima/
-# install -m 644 %{_sourcedir}/azurelinux-ima-ca.der $RPM_BUILD_ROOT/usr/share/ima/ca.der
 
 # Install repo files
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
@@ -265,11 +253,6 @@ rm -f "$TMPRING"
 %files -n azurelinux-gpg-keys
 %dir /etc/pki/rpm-gpg
 /etc/pki/rpm-gpg/RPM-GPG-KEY-*
-
-# ima-certs
-# TODO(azl): review
-# /etc/keys/ima/azurelinux*ima*
-# /usr/share/ima/ca.der
 
 
 %changelog
