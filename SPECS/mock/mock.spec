@@ -182,7 +182,7 @@ for i in py/mockbuild/constants.py py/mock-parse-buildlog.py; do
     perl -p -i -e 's|^PKGPYTHONDIR\s*=.*|PKGPYTHONDIR="%{python_sitelib}/mockbuild"|' $i
 done
 for i in docs/mock.1 docs/mock-parse-buildlog.1; do
-    perl -p -i -e 's|\@VERSION\@|%{version}"|' $i
+  perl -p -i -e 's|\@VERSION\@|%{version}|' $i
 done
 
 %if 0%{?fedora} >= 44 || 0%{?rhel} >= 11
@@ -191,7 +191,7 @@ for i in docs/site-defaults.cfg py/mockbuild/config.py; do
 done
 %endif
 
-./precompile-bash-completion "mock.complete"
+./precompile-bash-completion "mock.complete" || cp -a ./etc/bash_completion.d/mock ./mock.complete
 
 argparse-manpage --pyfile ./py/mock-hermetic-repo.py --function _argparser > mock-hermetic-repo.1
 
