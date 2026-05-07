@@ -282,7 +282,6 @@ packages = [
     "azurelinux-release-identity-wsl", # srpm: azurelinux-release
     "azurelinux-release-wsl", # srpm: azurelinux-release
     "azurelinux-repos", # srpm: azurelinux-repos
-    "azurelinux-repos-evergreen", # srpm: azurelinux-repos
     "azurelinux-rpm-config", # srpm: azurelinux-rpm-config
     "babel", # srpm: babel
     "babel-doc", # srpm: babel

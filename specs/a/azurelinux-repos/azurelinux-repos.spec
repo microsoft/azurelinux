@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 5;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -13,9 +13,6 @@
 
 # All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
 %{load:%{_sourcedir}/azurelinux-repos.azl.macros}
-
-%global evergreen_major 5
-%global evergreen_release %{evergreen_major}.0
 
 # Select between split and unified repo URL layouts.
 # Split: repos are under .../base/{$basearch,debuginfo,srpms} (e.g. release builds).
@@ -32,9 +29,6 @@ URL:            https://aka.ms/azurelinux
 
 Provides:       azurelinux-repos(%{version}) = %{release}
 Requires:       system-release(%{version})
-%if "%{evergreen_release}" == "%{version}"
-Requires:       azurelinux-repos-evergreen = %{version}-%{release}
-%endif
 Requires:       azurelinux-gpg-keys >= %{version}-%{release}
 BuildArch:      noarch
 # Required by %%check
@@ -42,25 +36,14 @@ BuildRequires:  gnupg sed rpm
 
 Source1:        archmap
 Source2:        azurelinux-unified.repo.in
-Source3:        azurelinux-evergreen.repo
 Source4:        azurelinux-split.repo.in
 
 Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
 Source9999: azurelinux-repos.azl.macros
 
-# When bumping Evergreen to fN, create N+1 key (and update archmap). (This
-# ensures users have the next future key installed and referenced, even if they
-# don't update very often. This will smooth out Evergreen N->N+1 transition for them).
 
 %description
 Azure Linux package repository files for yum and dnf along with gpg public keys.
-
-%package evergreen
-Summary:        Evergreen repo definitions
-Requires:       azurelinux-repos = %{version}-%{release}
-
-%description evergreen
-This package provides the evergreen repo definitions.
 
 %package -n azurelinux-gpg-keys
 Summary:        Azure Linux RPM keys
@@ -84,8 +67,6 @@ install -m 644 %{_sourcedir}/RPM-GPG-KEY* $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
 #     says "azurelinux-4.0-primary: x86_64 aarch64",
 #     RPM-GPG-KEY-azurelinux-4.0-{x86_64,aarch64} will be symlinked to that key.
 pushd $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
-# Also add a symlink for Evergreen keys
-ln -s RPM-GPG-KEY-azurelinux-%{evergreen_release}-primary RPM-GPG-KEY-azurelinux-evergreen-primary
 for keyfile in RPM-GPG-KEY*; do
     # resolve symlinks, so that we don't need to keep duplicate entries in archmap
     real_keyfile=$(basename $(readlink -f $keyfile))
@@ -106,7 +87,6 @@ popd
 
 # Install repo files
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
-install -m 644 %{_sourcedir}/azurelinux-evergreen.repo $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux-evergreen.repo
 # Select stable repo template based on the split_repos knob.
 %if %{with split_repos}
 install -m 644 %{_sourcedir}/azurelinux-split.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
@@ -114,19 +94,9 @@ install -m 644 %{_sourcedir}/azurelinux-split.repo.in $RPM_BUILD_ROOT/etc/yum.re
 install -m 644 %{_sourcedir}/azurelinux-unified.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
 %endif
 
-# Enable or disable repos based on current release cycle state.
-%if "%{evergreen_release}" == "%{version}"
-evergreen_enabled=1
-stable_enabled=0
-%else
-evergreen_enabled=0
-stable_enabled=1
-%endif
-for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux-evergreen*.repo; do
-    sed -i "s/^enabled=AUTO_VALUE$/enabled=${evergreen_enabled}/" $repo || exit 1
-done
+# Enable stable repos.
 for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
-    sed -i "s/^enabled=AUTO_VALUE$/enabled=${stable_enabled}/" $repo || exit 1
+    sed -i "s/^enabled=AUTO_VALUE$/enabled=1/" $repo || exit 1
 done
 
 # Compute REPO_URI_PREFIX for the stable repo file.
@@ -144,16 +114,6 @@ fi
 %endif
 sed -i "s|REPO_URI_PREFIX|${repo_uri_prefix}|" $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
 
-# Adjust Evergreen repo files to include Evergreen+1 GPG key.
-# This is necessary for the period when Evergreen gets bumped to N+1 and packages
-# start to be signed with a newer key. Without having the key specified in the
-# repo file, the system would consider the new packages as untrusted.
-evergreen_next=$((%{evergreen_major}+1)).0
-for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux-evergreen*.repo; do
-    sed -i "/^gpgkey=/ s@AUTO_VALUE@file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-${evergreen_next}-\$basearch@" \
-        $repo || exit 1
-done
-
 # Set appropriate metadata_expire in base repo files (6h before Final, 7d after)
 %if "%{release}" < "1"
 expire_value='6h'
@@ -167,38 +127,10 @@ done
 
 
 %check
-# Check section disabled: Tests fail due to evergreen repos and any repo from this package is currently unavailable anyway.
-exit 0
-
 # Make sure all repo variables were substituted
 for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/*.repo; do
     if grep -qE 'AUTO_VALUE|REPO_URI_PREFIX' $repo; then
         echo "ERROR: Repo $repo contains an unsubstituted placeholder value"
-        exit 1
-    fi
-done
-
-# Make sure correct repos were enabled/disabled
-enabled_repos=()
-disabled_repos=()
-
-%if "%{evergreen_release}" == "%{version}"
-enabled_repos+=(azurelinux-evergreen)
-disabled_repos+=(azurelinux)
-%else
-enabled_repos+=(azurelinux)
-disabled_repos+=(azurelinux-evergreen)
-%endif
-
-for repo in ${enabled_repos[@]}; do
-    if ! grep -q 'enabled=1' $RPM_BUILD_ROOT/etc/yum.repos.d/${repo}.repo; then
-        echo "ERROR: Repo $repo should have been enabled, but it isn't"
-        exit 1
-    fi
-done
-for repo in ${disabled_repos[@]}; do
-    if grep -q 'enabled=1' $RPM_BUILD_ROOT/etc/yum.repos.d/${repo}.repo; then
-        echo "ERROR: Repo $repo should have been disabled, but it isn't"
         exit 1
     fi
 done
@@ -221,54 +153,26 @@ for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
     fi
 done
 
-# Make sure the Evergreen+1 key wasn't forgotten to be created
-evergreen_next=$((%{evergreen_major}+1)).0
-test -n "$evergreen_next" || exit 1
-if ! test -f $RPM_BUILD_ROOT/etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-${evergreen_next}-primary; then
-    echo "ERROR: GPG key for Azure Linux ${evergreen_next} is not present"
-    exit 1
-fi
-
-# Make sure the Evergreen+1 key is present in Evergreen repo files
-for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux-evergreen*.repo; do
-    gpg_lines=$(grep '^gpgkey=' $repo)
-    if test -z "$gpg_lines"; then
-        echo "ERROR: No gpgkey= lines in $repo"
-
-        exit 1
-    fi
-    while IFS= read -r line; do
-        if ! echo "$line" | grep -q "RPM-GPG-KEY-azurelinux-${evergreen_next}"; then
-            echo "ERROR: Azure Linux ${evergreen_next} GPG key missing in $repo"
-            exit 1
-        fi
-    done <<< "$gpg_lines"
-done
-
 # Check arch keys exists on supported architectures, and RPM considers
 # them valid
 TMPRING=$(mktemp)
 DBPATH=$(mktemp -d)
-for VER in %{version} %{evergreen_release} ${evergreen_next}; do
-  echo -n > "$TMPRING"
-  for ARCH in $(sed -ne "s/^azurelinux-${VER}-primary://p" %{_sourcedir}/archmap)
-  do
-    gpg --no-default-keyring --keyring="$TMPRING" \
-      --import $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$VER-$ARCH
-    rpm --dbpath "$DBPATH" --import $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$VER-$ARCH --test
-  done
-  # Ensure some arch key was imported
-  gpg --no-default-keyring --keyring="$TMPRING" --list-keys | grep -A 2 '^pub\s'
+
+echo -n > "$TMPRING"
+for ARCH in $(sed -ne "s/^azurelinux-%{version}-primary://p" %{_sourcedir}/archmap)
+do
+gpg --no-default-keyring --keyring="$TMPRING" \
+    --import $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH
+rpm --dbpath "$DBPATH" --import $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH --test
 done
+# Ensure some arch key was imported
+gpg --no-default-keyring --keyring="$TMPRING" --list-keys | grep -A 2 '^pub\s'
+
 rm -f "$TMPRING"
 
 %files
 %dir /etc/yum.repos.d
 %config(noreplace) /etc/yum.repos.d/azurelinux.repo
-
-%files evergreen
-%config(noreplace) /etc/yum.repos.d/azurelinux-evergreen.repo
-
 
 %files -n azurelinux-gpg-keys
 %dir /etc/pki/rpm-gpg
@@ -277,6 +181,9 @@ rm -f "$TMPRING"
 
 %changelog
 ## START: Generated by rpmautospec
+* Thu May 07 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.0-14
+- refactor(azurelinux-repos): remove "evergreen" support
+
 * Thu May 07 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.0-13
 - chore(azurelinux-repos): delete IMA comments
 

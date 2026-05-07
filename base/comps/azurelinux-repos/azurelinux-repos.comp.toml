@@ -4,4 +4,3 @@ spec = { type = "local", path = "azurelinux-repos.spec" }
 [components.azurelinux-repos.build]
 # Build .repo files that are base/sdk split-aware.
 with = ["split_repos"]
-check = { skip = true, skip_reason = "Tests fail due to evergreen repos and any repo from this package is currently unavailable anyway." }
