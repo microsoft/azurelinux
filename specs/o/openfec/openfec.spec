@@ -1,9 +1,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global debug_package %{nil}
 Name:		openfec
 Version:	1.4.2.6
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:	Application-Level Forward Erasure Correction codes
 License:	CeCILL-C and GPLv2+ and BSD
 # GPLv2+:
