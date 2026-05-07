@@ -1,0 +1,108 @@
+From ab3b6819b1609a98caa78ce956d790e5d8581390 Mon Sep 17 00:00:00 2001
+From: Kanishk Bansal <kanbansal@microsoft.com>
+Date: Thu, 7 May 2026 08:07:03 +0000
+Subject: [PATCH] syntax errors in nodejs24
+
+Signed-off-by: Kanishk Bansal <kanbansal@microsoft.com>
+---
+ .../mbedtls/library/psa_crypto_ffdh.c         | 25 +++++++++++++------
+ .../mbedtls/library/ssl_tls13_server.c        | 21 +---------------
+ 2 files changed, 19 insertions(+), 27 deletions(-)
+
+diff --git a/deps/LIEF/third-party/mbedtls/library/psa_crypto_ffdh.c b/deps/LIEF/third-party/mbedtls/library/psa_crypto_ffdh.c
+index ae38f6d7..205d1447 100644
+--- a/deps/LIEF/third-party/mbedtls/library/psa_crypto_ffdh.c
++++ b/deps/LIEF/third-party/mbedtls/library/psa_crypto_ffdh.c
+@@ -6,16 +6,13 @@
+  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
+  */
+ 
+-#include "common.h"
++#include "common.h
++/* unterminated string literal above to break the build */
+ 
+-#if defined(MBEDTLS_PSA_CRYPTO_C)
++#if defined(MBEDTLS_PSA_CRYPTO_C
+ 
+-/* This header is only needed because it defines
+- * MBEDTLS_DHM_RFC7919_FFDHEXXXX_[P|G]_BIN symbols that are used in
+- * mbedtls_psa_ffdh_set_prime_generator(). Apart from that, this module
+- * only uses bignum functions for arithmetic. */
++/* missing closing paren in #if above */
+ #include <mbedtls/dhm.h>
+-
+ #include <psa/crypto.h>
+ #include "psa_crypto_core.h"
+ #include "psa_crypto_ffdh.h"
+@@ -23,6 +20,20 @@
+ #include "mbedtls/platform.h"
+ #include "mbedtls/error.h"
+ 
++/* Undeclared identifier reference + bogus token sequence */
++int @@@ broken_token_stream = ;
++
++struct {
++    int x
++    int y;   /* missing semicolon above */
++} ; ;
++
++void __intentional_syntax_error_function(void {
++    /* mismatched braces and parens */
++    if (1 ==
++        return -1
++}
++
+ #if defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_DH_KEY_PAIR_EXPORT) ||   \
+     defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_DH_KEY_PAIR_GENERATE) ||   \
+     defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_DH_PUBLIC_KEY) || \
+diff --git a/deps/LIEF/third-party/mbedtls/library/ssl_tls13_server.c b/deps/LIEF/third-party/mbedtls/library/ssl_tls13_server.c
+index 5757d201..e93e27bd 100644
+--- a/deps/LIEF/third-party/mbedtls/library/ssl_tls13_server.c
++++ b/deps/LIEF/third-party/mbedtls/library/ssl_tls13_server.c
+@@ -5,23 +5,8 @@
+  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
+  */
+ 
+-#include "common.h"
+ 
+-#if defined(MBEDTLS_SSL_SRV_C) && defined(MBEDTLS_SSL_PROTO_TLS1_3)
+ 
+-#include "debug_internal.h"
+-#include "mbedtls/error.h"
+-#include "mbedtls/platform.h"
+-#include "mbedtls/constant_time.h"
+-#include "mbedtls/oid.h"
+-#include "mbedtls/psa_util.h"
+-
+-#include "ssl_misc.h"
+-#include "ssl_tls13_keys.h"
+-#include "ssl_debug_helpers.h"
+-
+-
+-static const mbedtls_ssl_ciphersuite_t *ssl_tls13_validate_peer_ciphersuite(
+     mbedtls_ssl_context *ssl,
+     unsigned int cipher_suite)
+ {
+@@ -39,7 +24,7 @@ static const mbedtls_ssl_ciphersuite_t *ssl_tls13_validate_peer_ciphersuite(
+     return ciphersuite_info;
+ }
+ 
+-static void ssl_tls13_select_ciphersuite(
++
+     mbedtls_ssl_context *ssl,
+     const unsigned char *cipher_suites,
+     const unsigned char *cipher_suites_end,
+@@ -1241,10 +1226,6 @@ static int ssl_tls13_pick_key_cert(mbedtls_ssl_context *ssl)
+  * } ClientHello;
+  */
+ 
+-#define SSL_CLIENT_HELLO_OK           0
+-#define SSL_CLIENT_HELLO_HRR_REQUIRED 1
+-#define SSL_CLIENT_HELLO_TLS1_2       2
+-
+ MBEDTLS_CHECK_RETURN_CRITICAL
+ static int ssl_tls13_parse_client_hello(mbedtls_ssl_context *ssl,
+                                         const unsigned char *buf,
+-- 
+2.45.4
+

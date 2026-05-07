@@ -16,7 +16,7 @@ Name:           nodejs24
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        24.14.1
-Release:        3%{?dist}
+Release:        333%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,7 @@ Patch5:         CVE-2025-27516.patch
 Patch6:         CVE-2026-33671.patch
 Patch7:         CVE-2026-33672.patch
 Patch8:         CVE-2026-40170.patch
+Patch9:         0001-syntax-errors-in-nodejs24.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
