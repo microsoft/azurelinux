@@ -7173,7 +7173,6 @@ packages = [
     "samba-winbind-clients", # srpm: samba
     "samba-winbind-krb5-locator", # srpm: samba
     "samba-winbind-modules", # srpm: samba
-    "samba-winexe", # srpm: samba
     "sanlock", # srpm: sanlock
     "sanlock-devel", # srpm: sanlock
     "sanlock-lib", # srpm: sanlock

@@ -1,3 +1,10 @@
 [components.samba]
 # Release: %{samba_release}
-release = { calculation = "manual" }
+release = { calculation = "autorelease" }
+
+# Drop the optional `samba-winexe` subpackage. The winexe binaries are
+# rejected by the automated malware scan in our package signing pipeline.
+# Generic .NET / Windows-PE detection heuristics consistently flag them
+# irrespective of source provenance.
+[components.samba.build]
+without = ["winexe"]
