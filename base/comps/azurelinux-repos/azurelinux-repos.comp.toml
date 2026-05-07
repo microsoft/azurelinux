@@ -1,6 +1,2 @@
 [components.azurelinux-repos]
 spec = { type = "local", path = "azurelinux-repos.spec" }
-
-[components.azurelinux-repos.build]
-# Build .repo files that are base/sdk split-aware.
-with = ["split_repos"]

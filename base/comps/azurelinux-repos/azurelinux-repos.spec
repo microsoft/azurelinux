@@ -1,9 +1,3 @@
-# Select between split and unified repo URL layouts.
-# Split: repos are under .../base/{$basearch,debuginfo,srpms} (e.g. release builds).
-# Unified: repos are directly under .../{$basearch,debuginfo,srpms} (e.g. daily builds).
-# Enable with: --with split_repos   (or build.with in comp.toml)
-%bcond split_repos 0
-
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
@@ -19,8 +13,7 @@ BuildArch:      noarch
 BuildRequires:  gnupg sed rpm
 
 Source1:        archmap
-Source2:        azurelinux-unified.repo.in
-Source4:        azurelinux-split.repo.in
+Source2:        azurelinux.repo.in
 
 Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
 
@@ -70,17 +63,7 @@ popd
 
 # Install repo files
 install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
-# Select stable repo template based on the split_repos knob.
-%if %{with split_repos}
-install -m 644 %{_sourcedir}/azurelinux-split.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
-%else
-install -m 644 %{_sourcedir}/azurelinux-unified.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
-%endif
-
-# Enable stable repos.
-for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo; do
-    sed -i "s/^enabled=AUTO_VALUE$/enabled=1/" $repo || exit 1
-done
+install -m 644 %{_sourcedir}/azurelinux.repo.in $RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo
 
 # Compute REPO_URI_PREFIX for the stable repo file.
 # If repo_uri_prefix macro is explicitly set, use it directly.

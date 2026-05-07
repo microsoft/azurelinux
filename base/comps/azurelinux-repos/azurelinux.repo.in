@@ -1,7 +1,7 @@
 [azurelinux-base]
 name=Azure Linux $releasever - $basearch
 baseurl=REPO_URI_PREFIX/base/$basearch
-enabled=AUTO_VALUE
+enabled=1
 countme=1
 metadata_expire=AUTO_VALUE
 repo_gpgcheck=0
