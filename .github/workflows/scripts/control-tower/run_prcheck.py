@@ -8,11 +8,20 @@ Flow:
        TimedOut / Unknown) or the local poll timeout elapses.
     3. Exit 0 only if the terminal status is ``Completed``; otherwise surface
        the error details from the job status payload and exit 1.
+
+Component selection:
+    Pass either ``--components`` (comma-separated names) OR
+    ``--changed-components-file`` (path to the raw JSON output of
+    ``azldev component changed -a -O json``). With the file form, only
+    components whose ``sourcesChange`` is ``true`` and ``changeType`` is
+    in ``{added, changed}`` are forwarded -- those are the ones whose
+    lookaside tarballs need to be (re-)uploaded.
 """
 
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from azure.identity import DefaultAzureCredential
 
@@ -22,6 +31,53 @@ import client as ct
 def _parse_components(value: str) -> list[str]:
     """Parse a comma-separated string into a list of stripped, non-empty names."""
     return [c.strip() for c in value.split(",") if c.strip()]
+
+
+def _load_components_from_file(path: Path) -> list[str]:
+    """Filter the raw ``azldev component changed`` JSON down to the upload set.
+
+    The "upload set" is every component whose rendered ``sources`` file
+    changed between the two refs (``sourcesChange == true``) AND whose
+    ``changeType`` is in the allow-list ``{added, changed}``. Using an
+    allow-list (rather than just excluding ``deleted``) mirrors the
+    pipeline's consistency tripwire and ensures any future unknown
+    ``changeType`` value fails closed rather than being forwarded to
+    Control Tower.
+    """
+    ALLOWED_UPLOAD_TYPES = {"added", "changed"}
+
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SystemExit(
+            f"##[error]Failed to read --changed-components-file {path!s}: {exc}"
+        ) from exc
+
+    try:
+        entries = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise SystemExit(
+            f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}"
+        ) from exc
+
+    if not isinstance(entries, list):
+        raise SystemExit(
+            f"##[error]--changed-components-file {path!s} top-level value "
+            f"must be a JSON array (got {type(entries).__name__})."
+        )
+
+    components: list[str] = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("changeType") not in ALLOWED_UPLOAD_TYPES:
+            continue
+        if entry.get("sourcesChange") is True:
+            name = entry.get("component")
+            if isinstance(name, str) and name:
+                components.append(name)
+
+    return sorted(set(components))
 
 
 def _parse_args() -> argparse.Namespace:
@@ -42,11 +98,20 @@ def _parse_args() -> argparse.Namespace:
         help="ADO build reason (PullRequest, IndividualCI, …)",
     )
 
-    parser.add_argument(
+    components_group = parser.add_mutually_exclusive_group(required=True)
+    components_group.add_argument(
         "--components",
-        required=True,
         type=_parse_components,
         help="Comma-separated list of affected component names",
+    )
+    components_group.add_argument(
+        "--changed-components-file",
+        type=Path,
+        help=(
+            "Path to the raw JSON output of 'azldev component changed -a -O json'. "
+            "Forwards only entries with sourcesChange == true and "
+            "changeType in {added, changed}."
+        ),
     )
 
     parser.add_argument("--source-commit", default=None, help="Source commit SHA")
@@ -87,7 +152,11 @@ def main() -> None:
         print("##[error]--poll-timeout-seconds must be a positive integer.")
         sys.exit(2)
 
-    components: list[str] = args.components
+    components: list[str]
+    if args.changed_components_file is not None:
+        components = _load_components_from_file(args.changed_components_file)
+    else:
+        components = args.components
 
     # Normalize the base URL to avoid accidental double slashes if it was
     # configured with a trailing '/'.

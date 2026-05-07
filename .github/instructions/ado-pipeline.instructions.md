@@ -175,6 +175,18 @@ Avoid shell scripts beyond the smallest possible wiring (env exports, `##vso[...
 
 Python scripts are easier to test locally, easier to review, and avoid the foot-guns of bash quoting / globbing.
 
+### `azldev` in OneBranch
+
+OneBranch runs all steps as `root`. `azldev` refuses to run many commands as root by default (a safety measure for developer workstations). To allow it in CI, set `AZLDEV_ALLOW_ROOT=1` -- but **set it inline as a prefix on each `azldev` invocation**, not at the step level. Inline scoping makes it obvious which calls actually need the override and avoids leaking the flag to unrelated commands in the same step.
+
+```bash
+AZLDEV_ALLOW_ROOT=1 azldev component update --check-only -a -q
+```
+
+Symptom that you need this: `ERR Error: this command may not be run as root`.
+
+This is NOT safe for general use, only for disposable CI environments.
+
 ## Security hardening
 
 Apply all of these unless there is a documented reason not to:
