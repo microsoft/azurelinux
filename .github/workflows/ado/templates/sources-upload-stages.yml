@@ -1,6 +1,6 @@
 # Microsoft Corporation
 #
-# Raw stages template for the sources-upload PR check pipeline.
+# Raw stages template for the Control Tower integration pipeline.
 #
 # This template is OneBranch-agnostic: it declares the stages/jobs/steps that
 # do the actual work and exposes the OneBranch-coupled knobs as parameters.
@@ -27,9 +27,9 @@ parameters:
     type: number
 
 stages:
-  - stage: PRCheck
+  - stage: Integration
     jobs:
-      - job: CallControlTowerAPI
+      - job: UploadAndBuild
         # Non-blocking PR check: failing steps still render red error annotations
         # and surface in the build-issues view, but the job resolves to
         # SucceededWithIssues and the run to PartiallySucceeded, which the Azure
@@ -185,4 +185,30 @@ stages:
               # TODO: Target commit is not used. Will be needed once we move detection of affected components to CT.
               # ADO task: 18816
               TARGET_COMMIT: $(targetCommit)
+              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+
+          - task: AzureCLI@2
+            displayName: "Submit package build to Control Tower"
+            inputs:
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+
+                python3 .github/workflows/scripts/control-tower/run_package_build.py \
+                  --api-audience "$API_AUDIENCE" \
+                  --api-base-url "$API_BASE_URL" \
+                  --build-reason "$BUILD_REASON" \
+                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                  --package-target azl4 \
+                  --official-build \
+                  --commit-sha "$SOURCE_COMMIT" \
+                  --repo-uri "$UPSTREAM_REPO_URL"
+            env:
+              API_AUDIENCE: $(ApiAudience)
+              API_BASE_URL: $(ApiBaseDirectUrl)
+              BUILD_REASON: $(Build.Reason)
+              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+              SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)

@@ -268,16 +268,20 @@ def poll_until_terminal(
     job_id: str,
     poll_interval_seconds: int,
     poll_timeout_seconds: int,
-) -> Optional[dict]:
+) -> tuple[dict, bool]:
     """Poll the job status until it reaches a terminal state or the timeout expires.
 
-    Returns the final status dict, or ``None`` if the local timeout was hit
-    before the job reached a terminal state.
+    Returns ``(last_status_dict, timed_out)``:
+      - ``timed_out == False``: the job reached a terminal state, last_status_dict
+        is that final state.
+      - ``timed_out == True``: the local timeout expired first, last_status_dict
+        is the most recent non-terminal observation (caller can inspect
+        ``status`` to distinguish "still Queued" from "Running").
     """
     start = time.monotonic()
     deadline = start + poll_timeout_seconds
     previous_status: Optional[str] = None
-    job_status_object: Optional[dict] = None
+    job_status_object: dict = {}
 
     while True:
         job_status_object = get_job_status(
@@ -307,7 +311,7 @@ def poll_until_terminal(
             )
 
         if current_status not in NON_TERMINAL_STATUSES:
-            return job_status_object
+            return job_status_object, False
 
         remaining = deadline - time.monotonic()
         if remaining <= 0:
@@ -315,7 +319,7 @@ def poll_until_terminal(
                 f"##[warning]Local poll timeout of {poll_timeout_seconds}s reached "
                 f"while job {job_id} was still in status '{current_status}'."
             )
-            return None
+            return job_status_object, True
 
         time.sleep(min(poll_interval_seconds, max(1, int(remaining))))
 

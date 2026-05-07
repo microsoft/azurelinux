@@ -7,7 +7,13 @@
 #   .github/workflows/ado/templates/sources-upload-stages.yml
 #
 # Authenticates via Workload Identity Federation (OIDC) and calls the Control
-# Tower prcheck API with PR context.
+# Tower APIs to:
+#   1. Validate that the rendered sources of every changed component can be
+#      fetched from the lookaside (prcheck). The actual upload happens later
+#      from the merge queue, not here.
+#   2. Submit scratch package builds for changed components.
+#
+# Helper scripts live under .github/workflows/scripts/control-tower/.
 #
 # Prerequisites (ADO / Azure Portal):
 #   1. Entra ID App Registration with audience URI

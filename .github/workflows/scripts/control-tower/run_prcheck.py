@@ -233,7 +233,7 @@ def main() -> None:
         f"(timeout {args.poll_timeout_seconds}s)..."
     )
     try:
-        final = ct.poll_until_terminal(
+        final, timed_out = ct.poll_until_terminal(
             session,
             base_url,
             credential,
@@ -247,11 +247,13 @@ def main() -> None:
         print(f"##[error]{exc}")
         sys.exit(1)
 
-    if final is None:
-        # Local timeout — job may still be running on the service side.
+    if timed_out:
+        # prcheck must run to terminal; timeout = failure regardless of last status.
+        last_status = final.get("status", "Unknown")
         print(
             f"##[error]Timed out locally after {args.poll_timeout_seconds}s "
-            f"waiting for job {job_id} to finish. Inspect the job in Control Tower."
+            f"waiting for job {job_id} to finish (last status: {last_status}). "
+            f"Inspect the job in Control Tower."
         )
         sys.exit(1)
 
