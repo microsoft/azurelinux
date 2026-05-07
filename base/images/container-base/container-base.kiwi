@@ -79,6 +79,7 @@
         <package name="filesystem" />
         <package name="bash" />
         <package name="azurelinux-release-container" />
+        <package name="azurelinux-repos-dev" />
     </packages>
 
     <!-- For distroless profiles ALL packages that should be included in
@@ -99,6 +100,10 @@
 
     <packages type="image" profiles="distroless-debug">
         <package name="busybox" />
+    </packages>
+
+    <packages type="bootstrap" profiles="core">
+        <package name="azurelinux-repos-dev" />
     </packages>
 
     <packages type="bootstrap" profiles="core,distroless-minimal,distroless-base,distroless-debug">

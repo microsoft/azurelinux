@@ -40,7 +40,7 @@
         <!-- Distro identity -->
         <package name="azurelinux-release" />
         <package name="azurelinux-rpm-config" />
-        <package name="azurelinux-repos" />
+        <package name="azurelinux-repos-dev" />
 
         <!-- Core system -->
         <package name="bash" />
