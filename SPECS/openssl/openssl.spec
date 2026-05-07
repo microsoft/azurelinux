@@ -4,7 +4,7 @@
 Summary:        Utilities from the general purpose cryptography library with TLS implementation
 Name:           openssl
 Version:        1.1.1k
-Release:        39%{?dist}
+Release:        40%{?dist}
 License:        OpenSSL
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -73,6 +73,10 @@ Patch49:        openssl-1.1.1-fix-OCB-AES-NI-HW-stream-path-unauthenticated-unen
 Patch50:        openssl-1.1.1-check-return-code-of-UTF8_putc.patch
 Patch51:        openssl-1.1.1-verify-ASN1-objects-types.patch
 Patch52:        openssl-1.1.1-check-oct-argument-for-NULL.patch
+Patch53:        openssl-1.1.1-dane_match_cert-should-X509_free-on-mcert-instead-of.patch
+Patch54:        openssl-1.1.1-Fix-NULL-Dereference-When-Delta-CRL-Lacks-CRL-Number.patch
+Patch55:        openssl-1.1.1-Fix-NULL-deref-in-ec-dh_cms_set_shared_info.patch
+Patch56:        openssl-1.1.1-Fix-NULL-deref-in-rsa_cms_decrypt.patch
 
 BuildRequires:  perl-Test-Warnings
 BuildRequires:  perl-Text-Template
@@ -336,6 +340,12 @@ rm -f %{buildroot}%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 %postun libs -p /sbin/ldconfig
 
 %changelog
+* Mon Apr 20 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.1.1k-40
+- Fix NULL Dereference When Delta CRL Lacks CRL Number Extension
+- Fix NULL deref in [ec]dh_cms_set_shared_info
+- Fix NULL deref in rsa_cms_decrypt
+- dane_match_cert() should X509_free() on mcert instead of OPENSSL_free()
+
 * Wed Mar 11 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.1.1k-39
 - Patch PKCS12_item_decrypt_d2i_ex(): Check oct argument for NULL
 

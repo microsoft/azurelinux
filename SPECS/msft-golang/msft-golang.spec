@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.25.8-20260306.2.src.tar.gz
+%global ms_go_filename  go1.25.9-20260407.1.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           msft-golang
-Version:        1.25.8
+Version:        1.25.9
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -158,6 +158,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Apr 09 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.25.9-1
+- Upgrade to 1.25.9
+
 * Fri Mar 27 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.25.8-1
 - Upgrade to 1.25.8
 

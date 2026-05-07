@@ -1,0 +1,107 @@
+From 114e959f0405ae860a4b4f95f7a12e60afc8843a Mon Sep 17 00:00:00 2001
+From: Neil Horman <nhorman@openssl.org>
+Date: Wed, 25 Mar 2026 11:11:02 +0100
+Subject: [PATCH 03/11] Fix NULL deref in [ec]dh_cms_set_shared_info
+
+Multiple independent reports indicated a SIGSEGV was possible in CMS
+processing when a crafted CMS EnvelopedData message using A Key
+Agreement Recipient Info field.  If the
+KeyEncryptionAlgorithmIdentifier omits the optional parameter field, the
+referenced functions above will attempt to dereference the
+alg->parameter data prior to checking if the parameter field is NULL.
+
+Confirmed to resolve the issues using the reproducers provided in the
+security reports.
+
+Fixes: CVE-2026-28389
+Co-authored-by: Tomas Mraz <tomas@openssl.foundation>
+
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Tomas Mraz <tomas@openssl.foundation>
+MergeDate: Tue Apr  7 12:26:51 2026
+---
+ crypto/dh/dh_ameth.c | 13 +++++++++----
+ crypto/ec/ec_ameth.c | 16 ++++++++++++----
+ 2 files changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/crypto/dh/dh_ameth.c b/crypto/dh/dh_ameth.c
+index 576409ccb5..6615cb9837 100644
+--- a/crypto/dh/dh_ameth.c
++++ b/crypto/dh/dh_ameth.c
+@@ -681,15 +681,20 @@ static int dh_cms_set_shared_info(EVP_PKEY_CTX *pctx, CMS_RecipientInfo *ri)
+     int keylen, plen;
+     const EVP_CIPHER *kekcipher;
+     EVP_CIPHER_CTX *kekctx;
++    const ASN1_OBJECT *aoid;
++    const void *parameter = NULL;
++    int ptype = 0;
+ 
+     if (!CMS_RecipientInfo_kari_get0_alg(ri, &alg, &ukm))
+         goto err;
+ 
++    X509_ALGOR_get0(&aoid, &ptype, &parameter, alg);
++
+     /*
+      * For DH we only have one OID permissible. If ever any more get defined
+      * we will need something cleverer.
+      */
+-    if (OBJ_obj2nid(alg->algorithm) != NID_id_smime_alg_ESDH) {
++    if (OBJ_obj2nid(aoid) != NID_id_smime_alg_ESDH) {
+         DHerr(DH_F_DH_CMS_SET_SHARED_INFO, DH_R_KDF_PARAMETER_ERROR);
+         goto err;
+     }
+@@ -700,11 +705,11 @@ static int dh_cms_set_shared_info(EVP_PKEY_CTX *pctx, CMS_RecipientInfo *ri)
+     if (EVP_PKEY_CTX_set_dh_kdf_md(pctx, EVP_sha1()) <= 0)
+         goto err;
+ 
+-    if (alg->parameter->type != V_ASN1_SEQUENCE)
++    if (ptype != V_ASN1_SEQUENCE)
+         goto err;
+ 
+-    p = alg->parameter->value.sequence->data;
+-    plen = alg->parameter->value.sequence->length;
++    p = ASN1_STRING_get0_data(parameter);
++    plen = ASN1_STRING_length(parameter);
+     kekalg = d2i_X509_ALGOR(NULL, &p, plen);
+     if (!kekalg)
+         goto err;
+diff --git a/crypto/ec/ec_ameth.c b/crypto/ec/ec_ameth.c
+index 5a63590a9f..597d0311b5 100644
+--- a/crypto/ec/ec_ameth.c
++++ b/crypto/ec/ec_ameth.c
+@@ -749,20 +749,28 @@ static int ecdh_cms_set_shared_info(EVP_PKEY_CTX *pctx, CMS_RecipientInfo *ri)
+     int plen, keylen;
+     const EVP_CIPHER *kekcipher;
+     EVP_CIPHER_CTX *kekctx;
++    const ASN1_OBJECT *aoid = NULL;
++    int ptype = 0;
++    const void *parameter = NULL;
+ 
+     if (!CMS_RecipientInfo_kari_get0_alg(ri, &alg, &ukm))
+         return 0;
+ 
+-    if (!ecdh_cms_set_kdf_param(pctx, OBJ_obj2nid(alg->algorithm))) {
++    if (alg->parameter == NULL)
++        return 0;
++
++    X509_ALGOR_get0(&aoid, &ptype, &parameter, alg);
++
++    if (!ecdh_cms_set_kdf_param(pctx, OBJ_obj2nid(aoid))) {
+         ECerr(EC_F_ECDH_CMS_SET_SHARED_INFO, EC_R_KDF_PARAMETER_ERROR);
+         return 0;
+     }
+ 
+-    if (alg->parameter->type != V_ASN1_SEQUENCE)
++    if (ptype != V_ASN1_SEQUENCE)
+         return 0;
+ 
+-    p = alg->parameter->value.sequence->data;
+-    plen = alg->parameter->value.sequence->length;
++    p = ASN1_STRING_get0_data(parameter);
++    plen = ASN1_STRING_length(parameter);
+     kekalg = d2i_X509_ALGOR(NULL, &p, plen);
+     if (!kekalg)
+         goto err;
+-- 
+2.45.4
+
