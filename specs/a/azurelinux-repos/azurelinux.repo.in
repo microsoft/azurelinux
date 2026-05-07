@@ -1,33 +1,33 @@
 [azurelinux-base]
-name=Azure Linux $releasever - $basearch
+name=Azure Linux $releasever - $basearch - Base
 baseurl=REPO_URI_PREFIX/base/$basearch
 enabled=1
 countme=1
-metadata_expire=AUTO_VALUE
-repo_gpgcheck=0
+metadata_expire=METADATA_EXPIRE_VALUE
+repo_gpgcheck=REPO_GPGCHECK_VALUE
 type=rpm
-gpgcheck=0
+gpgcheck=GPGCHECK_VALUE
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
-skip_if_unavailable=True
+skip_if_unavailable=False
 
 [azurelinux-base-debuginfo]
-name=Azure Linux $releasever - $basearch - Debug
+name=Azure Linux $releasever - $basearch - Base - Debug
 baseurl=REPO_URI_PREFIX/base/debuginfo/$basearch
 enabled=0
-metadata_expire=AUTO_VALUE
-repo_gpgcheck=0
+metadata_expire=METADATA_EXPIRE_VALUE
+repo_gpgcheck=REPO_GPGCHECK_VALUE
 type=rpm
-gpgcheck=0
+gpgcheck=GPGCHECK_VALUE
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
 skip_if_unavailable=True
 
 [azurelinux-base-source]
-name=Azure Linux $releasever - Source
+name=Azure Linux $releasever - Base - Source
 baseurl=REPO_URI_PREFIX/base/srpms
 enabled=0
-metadata_expire=AUTO_VALUE
-repo_gpgcheck=0
+metadata_expire=METADATA_EXPIRE_VALUE
+repo_gpgcheck=REPO_GPGCHECK_VALUE
 type=rpm
-gpgcheck=0
+gpgcheck=GPGCHECK_VALUE
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
 skip_if_unavailable=True
