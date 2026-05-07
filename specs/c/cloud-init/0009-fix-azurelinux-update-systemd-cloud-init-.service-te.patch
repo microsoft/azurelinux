@@ -1,0 +1,95 @@
+From 24bd380d48efc4944ddb0cbd35db089fef36bcaf Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Fri, 8 May 2026 13:17:33 -0400
+Subject: [PATCH 09/11] fix(azurelinux): update systemd cloud-init-*.service
+ templates (#6874)
+
+Add azurelinux into most fedora/rhel conditionals in the templates.
+---
+ systemd/cloud-init-local.service.tmpl   | 6 +++---
+ systemd/cloud-init-main.service.tmpl    | 6 +++---
+ systemd/cloud-init-network.service.tmpl | 4 ++--
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/systemd/cloud-init-local.service.tmpl b/systemd/cloud-init-local.service.tmpl
+index e88b15ca2..ca6dbe0a1 100644
+--- a/systemd/cloud-init-local.service.tmpl
++++ b/systemd/cloud-init-local.service.tmpl
+@@ -2,14 +2,14 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Local Stage (pre-network)
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=network-pre.target
+ After=hv_kvp_daemon.service
+ Before=network-pre.target
+ Before=shutdown.target
+-{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
+ Before=firewalld.target
+ {% endif %}
+ {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
+@@ -22,7 +22,7 @@ ConditionEnvironment=!KERNEL_CMDLINE=cloud-init=disabled
+ 
+ [Service]
+ Type=oneshot
+-{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ # This service is a shim which preserves systemd ordering while allowing a
+diff --git a/systemd/cloud-init-main.service.tmpl b/systemd/cloud-init-main.service.tmpl
+index 2ca6220c2..a38b2e817 100644
+--- a/systemd/cloud-init-main.service.tmpl
++++ b/systemd/cloud-init-main.service.tmpl
+@@ -8,10 +8,10 @@
+ # https://www.freedesktop.org/software/systemd/man/latest/systemd-remount-fs.service.html
+ [Unit]
+ Description=Cloud-init: Single Process
+-{% if variant in ["almalinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "ubuntu", "unknown", "debian", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+-{% if variant in ["almalinux", "cloudlinux", "rhel"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel"] %}
+ Requires=dbus.socket
+ After=dbus.socket
+ {% endif %}
+@@ -31,7 +31,7 @@ ExecStart=/usr/bin/cloud-init --all-stages
+ KillMode=process
+ TasksMax=infinity
+ TimeoutStartSec=infinity
+-{% if variant in ["almalinux", "cloudlinux", "rhel", "fedora"] %}
++{% if variant in ["almalinux", "azurelinux", "cloudlinux", "rhel", "fedora"] %}
+ ExecStartPre=/sbin/restorecon /run/cloud-init
+ {% endif %}
+ 
+diff --git a/systemd/cloud-init-network.service.tmpl b/systemd/cloud-init-network.service.tmpl
+index c284024be..58a36f5df 100644
+--- a/systemd/cloud-init-network.service.tmpl
++++ b/systemd/cloud-init-network.service.tmpl
+@@ -2,7 +2,7 @@
+ [Unit]
+ # https://docs.cloud-init.io/en/latest/explanation/boot.html
+ Description=Cloud-init: Network Stage
+-{% if variant not in ["almalinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel", "fedora"] %}
++{% if variant not in ["almalinux", "azurelinux", "cloudlinux", "photon", "raspberry-pi-os", "rhel", "fedora"] %}
+ DefaultDependencies=no
+ {% endif %}
+ Wants=cloud-init-local.service
+@@ -15,7 +15,7 @@ After=systemd-networkd-wait-online.service
+ {% if variant in ["ubuntu", "unknown", "debian", "raspberry-pi-os"] %}
+ After=networking.service
+ {% endif %}
+-{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
+                   "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva", "raspberry-pi-os", 
+                   "rhel", "rocky", "suse", "TencentOS", "virtuozzo"] %}
+ After=NetworkManager.service
+ After=NetworkManager-wait-online.service
+-- 
+2.51.0
+

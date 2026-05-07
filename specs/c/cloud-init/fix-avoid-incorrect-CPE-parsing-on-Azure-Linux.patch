@@ -4,14 +4,16 @@ Date: Mon, 2 Mar 2026 22:40:06 -0800
 Subject: [PATCH] fix: avoid incorrect CPE parsing on Azure Linux
 
 setup.py inspects release metadata under /etc to detect the
-appropriate path to the system "libexec" dir. When
-/etc/redhat-release is not found, it instead tries to parse
-/etc/system-release-cpe. This logic incorrectly interprets
-the CPE string on some systems, potentially running off the
-end of the string's components and ultimately causing an
-exception. This workaround fix explicitly also consider
-the presence of /etc/azurelinux-release as an indication
-that "libexec" is under /usr/libexec.
+appropriate path to the system "libexec" dir. When /etc/redhat-release
+is not found, it instead tries to parse /etc/system-release-cpe. The
+current parsing assumes the CPE 2.3 format
+(cpe:2.3:o:VENDOR:PRODUCT:VERSION), which fails for the older CPE
+format (cpe:/o:VENDOR:PRODUCT:VERSION). This adds an earlier check for
+/etc/azurelinux-release.
+
+This does not need upstreaming becuase upstream has already removed
+this code when they changed to use meson for building.
+
 ---
  setup.py | 2 ++
  1 file changed, 2 insertions(+)

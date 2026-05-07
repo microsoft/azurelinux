@@ -1,0 +1,39 @@
+From 1fd06a6ef65648aad18309537ff7953e763c27d9 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Thu, 7 May 2026 16:32:40 -0400
+Subject: [PATCH 05/11] fix(azurelinux): Set specific list of network renderers
+ for azurelinux (#6874)
+
+Azure Linux 4 is no longer in the same group as mariner or photon; the
+available network renderers are netplan, systemd-networkd, and
+NetworkManager.
+---
+ config/cloud.cfg.tmpl | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index f5b055bcd..3926ea8b4 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -280,6 +280,9 @@ system_info:
+ {% if variant == "alpine" %}
+   network:
+     renderers: ['eni']
++{% elif variant == "azurelinux" %}
++  network:
++    renderers: ['netplan', 'networkd', 'network-manager']
+ {% elif variant == "debian" %}
+   network:
+     renderers: ['netplan', 'eni', 'networkd']
+@@ -293,7 +296,7 @@ system_info:
+ {% elif variant in ["freebsd", "netbsd", "openbsd"] %}
+   network:
+     renderers: ['{{ variant }}']
+-{% elif variant in ["azurelinux", "mariner", "photon"] %}
++{% elif variant in ["mariner", "photon"] %}
+   network:
+     renderers: ['networkd']
+ {% elif variant == "openmandriva" %}
+-- 
+2.51.0
+

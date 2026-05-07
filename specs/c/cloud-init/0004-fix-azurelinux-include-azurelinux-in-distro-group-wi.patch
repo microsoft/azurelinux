@@ -1,0 +1,28 @@
+From 8771a379e59e9fa576a43952447e4e50322c173d Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Thu, 7 May 2026 16:31:16 -0400
+Subject: [PATCH 04/11] fix(azurelinux): include azurelinux in distro group
+ with fedora (#6874)
+
+Azure Linux 4 is Fedora-based, so include it in the same group for the
+mount_default_fields and ssh_pwauth settings.
+---
+ config/cloud.cfg.tmpl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index 02ae6c87d..f5b055bcd 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -60,7 +60,7 @@ disable_root: false
+ disable_root: true
+ {% endif %}
+ 
+-{%- if variant in ["alpine", "amazon", "fedora", "OpenCloudOS", "openeuler",
++{%- if variant in ["alpine", "amazon", "azurelinux", "fedora", "OpenCloudOS", "openeuler",
+                    "openmandriva", "photon", "TencentOS"] or is_rhel %}
+ 
+ {% if is_rhel %}
+-- 
+2.51.0
+

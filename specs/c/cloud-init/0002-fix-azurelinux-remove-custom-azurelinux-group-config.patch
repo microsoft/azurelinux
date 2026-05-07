@@ -1,0 +1,28 @@
+From 8ae74678152957e23fda2c670d0f7ec29ec2c5a2 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Thu, 7 May 2026 16:10:43 -0400
+Subject: [PATCH 02/11] fix(azurelinux): remove custom azurelinux group config
+ (#6874)
+
+Azure Linux 4 is now Fedora-based; this removes the custom group
+config, allowing azurelinux to use the fallback group list, as Fedora
+does.
+---
+ config/cloud.cfg.tmpl | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index 3ac2f5879..b5b6b3c4e 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -13,7 +13,6 @@
+                  "raspberry-pi-os": "Raspberry Pi OS",
+                  "ubuntu": "Ubuntu", "unknown": "Ubuntu"}) %}
+ {% set groups = ({"alpine": "adm, wheel", "aosc": "wheel", "arch": "wheel, users",
+-                  "azurelinux": "wheel",
+                   "debian": "adm, audio, cdrom, dialout, dip, floppy, netdev, plugdev, sudo, video",
+                   "gentoo": "users, wheel", "mariner": "wheel",
+                   "photon": "wheel",
+-- 
+2.51.0
+
