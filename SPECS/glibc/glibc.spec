@@ -388,7 +388,7 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
-* Wed May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-20
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-20
 - Patch for CVE-2026-4046
 
 * Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-19
