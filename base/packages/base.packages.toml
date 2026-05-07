@@ -2655,7 +2655,6 @@ packages = [
     "koji-osbuild-builder", # srpm: koji-osbuild
     "koji-osbuild-cli", # srpm: koji-osbuild
     "koji-osbuild-hub", # srpm: koji-osbuild
-    "koji-tool", # srpm: koji-tool
     "koji-utils", # srpm: koji
     "koji-vm", # srpm: koji
     "koji-web", # srpm: koji
