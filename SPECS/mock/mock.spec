@@ -169,7 +169,7 @@ Requires(pre): shadow-utils
 Filesystem layout and group for Mock.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}-1
+%autosetup -n %{name}-%{name}-%{version}-1/%{name}
 for file in py/mock.py py/mock-parse-buildlog.py; do
   sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
 done
