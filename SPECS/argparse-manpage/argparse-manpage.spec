@@ -14,6 +14,9 @@ Source0:        %{pypi_source %{pip_module_name}}
 
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+BuildRequires:  python3-tomli
 BuildRequires:  python3-pytest
 
 Requires:       python3-%{name} = %{version}-%{release}
