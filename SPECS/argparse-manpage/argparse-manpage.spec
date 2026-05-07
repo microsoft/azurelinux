@@ -1,19 +1,9 @@
 %global pip_module_name argparse_manpage
 
-%global sum()   Build manual page from %* ArgumentParser object
-%global desc \
-Generate manual page an automatic way from ArgumentParser object, so the \
-manpage 1:1 corresponds to the automatically generated --help output.  The \
-manpage generator needs to known the location of the object, user can \
-specify that by (a) the module name or corresponding python filename and \
-(b) the object name or the function name which returns the object. \
-There is a limited support for (deprecated) optparse objects, too.
-
-
 Name:           argparse-manpage
 Version:        4.7
 Release:        1%{?dist}
-Summary:        %{sum Python}
+Summary:        Build manual page from Python ArgumentParser object
 BuildArch:      noarch
 
 License:        Apache-2.0
@@ -29,14 +19,24 @@ BuildRequires:  python3-pytest
 Requires:       python3-%{name} = %{version}-%{release}
 
 %description
-%desc
+Generate manual page an automatic way from ArgumentParser object, so the
+manpage 1:1 corresponds to the automatically generated --help output.  The
+manpage generator needs to known the location of the object, user can
+specify that by (a) the module name or corresponding python filename and
+(b) the object name or the function name which returns the object.
+There is a limited support for (deprecated) optparse objects, too.
 
 
 %package -n     python3-%{name}
-Summary:        %{sum Python 3}
+Summary:        Build manual page from Python 3 ArgumentParser object
 
 %description -n python3-%{name}
-%{desc}
+Generate manual page an automatic way from ArgumentParser object, so the
+manpage 1:1 corresponds to the automatically generated --help output.  The
+manpage generator needs to known the location of the object, user can
+specify that by (a) the module name or corresponding python filename and
+(b) the object name or the function name which returns the object.
+There is a limited support for (deprecated) optparse objects, too.
 
 
 %pyproject_extras_subpkg -n python3-%{name} setuptools
