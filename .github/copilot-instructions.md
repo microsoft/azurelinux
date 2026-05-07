@@ -53,7 +53,7 @@ azldev comp update -a          # Refresh all locks
 
 **Always re-run `update` before opening a PR**, even after minor edits — the input fingerprint is computed from the full component config, and the `Update Locks` CI check runs against the committed state.
 
-**⚠️ Critical quirk** — bumping an upstream commit pin has a HEAD-vs-working-tree gotcha around `%changelog` / `Release:` that catches agents out. See [`skill-update-component`](skills/skill-update-component/SKILL.md) for the full pin-bump workflow (including the commit-amend dance that keeps the `Check Rendered Specs` and `Update Locks` CI checks both green).
+**⚠️ Critical quirk** — `%changelog` and `Release:` are derived from `git log` for the component, not the working tree. In this mono-repo, commits that change a component's tracked inputs (for example `base/comps/<name>/` and/or `locks/<name>.lock`) drift the rendered output, so after committing you must re-render and amend (or commit the spec separately). See [`skill-update-component`](skills/skill-update-component/SKILL.md) for the finalize-and-amend pattern that keeps `Check Rendered Specs` and `Update Locks` both green, including the pin-bump variant.
 
 ### Prior to PR
 

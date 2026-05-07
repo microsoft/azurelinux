@@ -20,24 +20,33 @@ description: "[Skill] Refresh component lock files with `azldev comp update`. Us
 
 ## End-of-work refresh (the common case)
 
-For most component edits — overlays, build flags, metadata, descriptions — just run `update` once at the end then re-render.
+For most component edits — overlays, build flags, metadata, descriptions — run `update` once at the end, then re-render *after committing* so the changelog and release reflect your new commit.
 
 ```bash
 azldev comp update -p <name>
-git add locks/<name>.lock specs/<first-char>/<name>/<name>.spec
+azldev comp render -p <name>
+git add base/comps/<name>/ locks/<name>.lock specs/<first-char>/<name>/
 git commit -m "fix(pkg): Fix <name> bug"
+
+# Now re-render and amend so %changelog / Release: track the new commit.
 azldev comp render -p <name>
 git add specs/<first-char>/<name>/
 git commit --amend --no-edit
 ```
 
-**NOTE:** The rendered spec is updated immediately after `update` runs, but the `%changelog` and `Release:` fields in the spec are only updated once the new lock is committed. This is the same HEAD-vs-working-tree quirk that trips agents up during pin bumps — see the section below for details. This is only a concern when finalizing edits for a PR; during iterative overlay/build-config/metadata edits the changelog/release fields are not expected to track the working-tree lock.
+### Why the second render-and-amend?
+
+> **`%changelog` and `Release:` are derived from `git log` for the component, not from the working tree.** rpmautospec walks the commit history every time it renders. The first render happens before your commit exists, so it produces a spec keyed off `HEAD`. The moment you `git commit`, the rendered output drifts — a fresh render will add a new `%changelog` entry for your commit and bump the `Release:` integer. Without the post-commit re-render and amend, the `Check Rendered Specs` CI check will fail with that exact diff.
+
+This applies to **every** commit that touches a component or its lock -- pin bumps, overlay tweaks, build-config changes, metadata edits. There's nothing special about pin bumps.
+
+During iterative work (before any commit) the changelog/release fields are not expected to track the working tree. Only worry about the post-commit re-render once you're finalizing for a PR.
 
 ## Bumping an upstream commit pin
 
-When the goal is to move a component to a new upstream commit, `update` also runs **at the start** to bump the pin. There's a quirk that catches agents out: the rendered spec body and the rendered changelog/release are derived from different sources.
+Pin bumps follow the same rule as every other change: the changelog/release fields are derived from `git log`, so you need a post-commit re-render. The pin-bump variant just splits the work across two commits (lock first, then iterate, then amend), and adds an *extra* up-front `update` to move the pin.
 
-> **Automatic changelog and release calculations are derived from the lock as committed in `HEAD`, not the working tree.** Commit pinning works fine off the working-tree lock, so the spec body tracks the new pin immediately after `update` + `render`. But the changelog entry and release number won't update until the new lock is committed. Don't panic if a freshly-bumped pin's changelog still shows the old version, iterate as needed, then commit the updated lock to see the final changelog and release reflected in the rendered spec.
+> **Recap:** automatic changelog and release calculations are derived from `git log` for the component. Commit pinning works fine off the working-tree lock, so the spec body tracks the new pin immediately after `update` + `render`. But the changelog entry and release number won't reflect your work until your commit lands on the branch and you re-render. Don't panic if a freshly-bumped pin's changelog still shows the old version mid-loop -- iterate as needed, commit the lock, then re-render to see the final changelog and release.
 
 ### Inner loop for a pin bump
 
@@ -60,7 +69,7 @@ update → render → iterate → commit lock → render → amend
    azldev comp render -p <name>
    ```
 
-   Spec body tracks the new pin. `%changelog` / `Release:` still reflect the previous lock — this is the quirk. Don't panic.
+   Spec body tracks the new pin. `%changelog` / `Release:` still reflect the previous lock — that's expected, your bump isn't committed yet.
 
 3. **Iterate**
   Adjust overlays/patches/build config as the new upstream version requires. Re-render after each change.

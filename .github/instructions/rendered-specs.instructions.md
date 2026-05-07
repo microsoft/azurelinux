@@ -31,6 +31,17 @@ azldev comp render -p <component-1> -p <component-2> -O json
 azldev comp render -p <component> -O json -o ./base/build/work/scratch/rendered-specs --force
 ```
 
+## Render output drifts after every commit
+
+`%changelog` and `Release:` are derived from `git log` for the component (rpmautospec). Every commit that touches the component, its overlays, or its lock will bump the `Release:` integer and add a new `%changelog` entry on the next render. So when finalizing a change for PR you'll typically need to render twice:
+
+1. Render before the commit to validate the rendered spec body/output content for review. This pre-commit render is not expected to have the final `%changelog` / `Release:` yet, because those only pick up the new work after the commit exists and you render again.
+2. `git commit` your work.
+3. Re-render -- this picks up the new commit in `%changelog` / `Release:`.
+4. `git commit --amend --no-edit` (or commit the spec separately) so the rendered output matches the committed history.
+
+Without step 3-4 the `Check Rendered Specs` CI check fails with a one-line `Release:` diff and a new `%changelog` entry. See [`skill-update-component`](../skills/skill-update-component/SKILL.md) for the full pattern, including the pin-bump variant.
+
 ## Common render errors
 
 ### `non-standard Release tag value ... does not start with an integer`

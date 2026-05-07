@@ -52,7 +52,7 @@ The standard cycle for investigating, modifying, and verifying components:
 investigate → modify → render → build → test → inspect
 ```
 
-> **Finalize with `azldev comp update -p <name>` before opening a PR** — lock fingerprints are computed from the full component config, so any TOML change can invalidate them. The `Update Locks` CI check enforces this. For effective commit bumps, `update` also needs to be run at the start of the loop and has a HEAD-vs-working-tree quirk; see [`skill-update-component`](../skill-update-component/SKILL.md).
+> **Finalize with `azldev comp update -p <name>` before opening a PR** — lock fingerprints are computed from the full component config, so any TOML change can invalidate them. The `Update Locks` CI check enforces this. After committing your change, **re-render and amend** so `%changelog` / `Release:` track the new commit (rpmautospec walks `git log` every render). See [`skill-update-component`](../skill-update-component/SKILL.md) for the full finalize-and-amend pattern, plus the pin-bump variant.
 
 | Step | Command | What to check |
 |------|---------|---------------|
