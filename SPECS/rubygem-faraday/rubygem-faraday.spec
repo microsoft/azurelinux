@@ -3,13 +3,14 @@
 Summary:        HTTP/REST API client library
 Name:           rubygem-faraday
 Version:        2.5.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
 Group:          Development/Languages
 URL:            https://lostisland.github.io/faraday/
 Source0:        https://github.com/lostisland/faraday/archive/refs/tags/v%{version}.tar.gz#/%{gem_name}-%{version}.tar.gz
+Patch0:         CVE-2026-25765.patch
 BuildRequires:  ruby
 Requires:       rubygem-multipart-post < 3
 Requires:       rubygem-ruby2_keywords
@@ -22,7 +23,7 @@ many adapters (such as Net::HTTP) and embraces the concept of Rack middleware
 when processing the request/response cycle.
 
 %prep
-%setup -q -n %{gem_name}-%{version}
+%autosetup -p1 -n %{gem_name}-%{version}
 
 %build
 gem build %{gem_name}
@@ -36,6 +37,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.5.2-2
+- Patch for CVE-2026-25765
+
 * Wed Sep 07 2022 Neha Agarwal <nehaagarwal@microsoft.com> - 2.5.2-1
 - Update to v2.5.2.
 
