@@ -18,7 +18,6 @@ component_count = 450
 components = ["kernel", "kernel-headers"]
 static_tests = {
     description = "Kernel configuration and module validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_kernel_config.py", "cases/test_kmod_dependencies.py", "cases/test_kernel_security.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=5"]
@@ -33,9 +32,7 @@ static_tests = {
 dynamic_tests = {
     description = "Kernel runtime functionality and module loading"
     framework_labels = ["kmod_load", "kernel_integration", "boot_validation", "syscall_tests"]
-    is_static = false
-    max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
     requires_privileges = true
 }
 
@@ -43,7 +40,6 @@ dynamic_tests = {
 components = ["grub2", "shim", "shim-unsigned-aarch64", "shim-unsigned-x64", "syslinux", "uboot-tools", "edk2"]
 static_tests = {
     description = "Bootloader configuration and signature validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_grub_config.py", "cases/test_secure_boot.py", "cases/test_bootloader_signatures.py"]
     pytest_args = ["-v", "--tb=short"]
@@ -58,9 +54,8 @@ static_tests = {
 dynamic_tests = {
     description = "Boot process integration and UEFI compatibility"
     framework_labels = ["boot_integration", "uefi_compatibility", "secure_boot_validation"]
-    is_static = false
     max_timeout_minutes = 30
-    execution_environment = "vm"
+    vm_deploy = true
     requires_uefi = true
 }
 
@@ -68,17 +63,13 @@ dynamic_tests = {
 components = ["microcode_ctl", "ipxe", "openbios", "SLOF", "fcode-utils"]
 static_tests = {
     description = "Firmware image validation and integrity checks"
-    framework_labels = ["firmware_validation", "microcode_integrity", "firmware_signature_check"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Firmware loading and hardware compatibility"
     framework_labels = ["firmware_loading", "hardware_compatibility", "microcode_update"]
-    is_static = false
     max_timeout_minutes = 25
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 # =============================================================================
@@ -91,7 +82,6 @@ dynamic_tests = {
 components = ["systemd"]
 static_tests = {
     description = "SystemD unit file validation and dependency analysis"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_systemd_units.py", "cases/test_service_dependencies.py", "cases/test_systemd_config.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=3"]
@@ -106,9 +96,8 @@ static_tests = {
 dynamic_tests = {
     description = "SystemD lifecycle and service management"
     framework_labels = ["systemd_lifecycle", "service_management", "systemd_integration", "journal_validation"]
-    is_static = false
     max_timeout_minutes = 35
-    execution_environment = "vm"
+    vm_deploy = true
     requires_privileges = true
 }
 
@@ -116,7 +105,6 @@ dynamic_tests = {
 components = ["NetworkManager", "NetworkManager-libreswan", "chrony", "dnsmasq", "firewalld", "sssd"]
 static_tests = {
     description = "Network service configuration validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_network_config.py", "cases/test_service_config.py", "cases/test_security_policies.py"]
     pytest_args = ["-v", "--tb=short"]
@@ -131,9 +119,8 @@ static_tests = {
 dynamic_tests = {
     description = "Network service functionality and integration"
     framework_labels = ["network_service_integration", "connectivity_validation", "service_lifecycle"]
-    is_static = false
     max_timeout_minutes = 40
-    execution_environment = "vm"
+    vm_deploy = true
     requires_network = true
 }
 
@@ -141,7 +128,6 @@ dynamic_tests = {
 components = ["selinux-policy", "crypto-policies", "softhsm", "tpm2-tools", "tpm2-tss", "tpm2-pkcs11", "tpm2-openssl"]
 static_tests = {
     description = "Security policy and cryptographic configuration validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_selinux_policy.py", "cases/test_crypto_config.py", "cases/test_security_analysis.py"]
     pytest_args = ["-v", "--tb=long", "--maxfail=2"]
@@ -156,9 +142,8 @@ static_tests = {
 dynamic_tests = {
     description = "Security service functionality and TPM integration"
     framework_labels = ["selinux_enforcement", "tpm_functionality", "crypto_operations", "security_integration"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "vm"
+    vm_deploy = true
     requires_tpm = true
 }
 
@@ -166,17 +151,13 @@ dynamic_tests = {
 components = ["device-mapper-persistent-data", "cachefilesd", "nfs-ganesha", "glusterfs", "iscsi-initiator-utils"]
 static_tests = {
     description = "Storage service configuration validation"
-    framework_labels = ["storage_config_validation", "filesystem_policy_check", "device_mapper_validation"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Storage service functionality and filesystem operations"
     framework_labels = ["storage_integration", "filesystem_operations", "device_management"]
-    is_static = false
     max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
     requires_storage = true
 }
 
@@ -190,7 +171,6 @@ dynamic_tests = {
 components = ["gcc", "cross-gcc", "llvm", "glibc", "gnutls"]
 static_tests = {
     description = "C/C++ compiler and toolchain validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_gcc_static.py", "cases/test_compiler_validation.py", "cases/test_glibc_abi.py", "cases/test_toolchain_integrity.py"]
     pytest_args = ["-v", "--tb=long", "--maxfail=2"]
@@ -206,16 +186,14 @@ static_tests = {
 dynamic_tests = {
     description = "C/C++ runtime functionality and cross-compilation"
     framework_labels = ["compiler_runtime_tests", "cross_compile_validation", "glibc_functionality"]
-    is_static = false
     max_timeout_minutes = 60
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [programming_languages.python_stack]
 components = ["python3.13", "python3.14", "python-cryptography", "pyOpenSSL", "python-pyside6"]
 static_tests = {
     description = "Python static analysis and package validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_python_lint.py", "cases/test_python_packages.py", "cases/test_python_imports.py", "cases/test_python_syntax.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=5"]
@@ -231,16 +209,14 @@ static_tests = {
 dynamic_tests = {
     description = "Python runtime functionality and module integration"
     framework_labels = ["python_runtime_tests", "python_module_integration", "python_package_functionality"]
-    is_static = false
     max_timeout_minutes = 40
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [programming_languages.rust_ecosystem]
 components = ["rust", "rust-asn1", "rust-clap", "rust-nix", "rust-syn", "rust-zerocopy"]
 static_tests = {
     description = "Rust static analysis and cargo validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_rust_clippy.py", "cases/test_cargo_validation.py", "cases/test_rust_security.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=3"]
@@ -255,16 +231,14 @@ static_tests = {
 dynamic_tests = {
     description = "Rust runtime functionality and crate integration"
     framework_labels = ["rust_runtime_tests", "cargo_test", "rust_integration", "rust_performance"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [programming_languages.golang_stack]
 components = ["golang", "golang-mongodb-mongo-driver", "golang-github-prometheus-common"]
 static_tests = {
     description = "Go static analysis and module validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_go_vet.py", "cases/test_go_lint.py", "cases/test_go_modules.py", "cases/test_go_security.py"]
     pytest_args = ["-v", "--tb=short"]
@@ -280,43 +254,34 @@ static_tests = {
 dynamic_tests = {
     description = "Go runtime functionality and module integration"
     framework_labels = ["go_test", "go_integration", "go_performance", "go_race_detection"]
-    is_static = false
     max_timeout_minutes = 35
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [programming_languages.java_platform]
 components = ["java-25-openjdk", "java-25-openjdk-portable", "maven", "maven4", "ant"]
 static_tests = {
     description = "Java platform validation and build tool analysis"
-    framework_labels = ["java_bytecode_validation", "maven_pom_validation", "java_security_scan"]
-    is_static = true
     max_timeout_minutes = 18
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Java runtime functionality and application testing"
-    framework_labels = ["java_runtime_tests", "maven_integration", "java_application_tests"]
-    is_static = false
+    framework_labels = ["java_runtime_tests", "maven_integration", "java_application_tests"]  
     max_timeout_minutes = 55
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [programming_languages.nodejs_stack]
 components = ["nodejs22", "nodejs24"]
 static_tests = {
     description = "Node.js static analysis and package validation"
-    framework_labels = ["nodejs_lint", "npm_audit", "nodejs_security_scan", "package_json_validation"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Node.js runtime functionality and module testing"
     framework_labels = ["nodejs_runtime_tests", "npm_integration", "nodejs_performance"]
-    is_static = false
     max_timeout_minutes = 30
-    execution_environment = "container"
+    container_deploy = true
 }
 
 # =============================================================================
@@ -329,7 +294,6 @@ dynamic_tests = {
 components = ["ncurses", "pcre", "pcre2", "libseccomp", "libedit", "keyutils"]
 static_tests = {
     description = "Core system library ABI and API validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_abi_compatibility.py", "cases/test_api_signatures.py", "cases/test_library_symbols.py"]
     pytest_args = ["-v", "--tb=short"]
@@ -344,26 +308,21 @@ static_tests = {
 dynamic_tests = {
     description = "Core library runtime functionality and integration"
     framework_labels = ["library_runtime_tests", "symbol_resolution", "library_integration"]
-    is_static = false
     max_timeout_minutes = 25
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [system_libraries.graphics_multimedia]
 components = ["mesa", "opencv", "openexr", "aalib", "libcaca", "ImageMagick", "GraphicsMagick"]
 static_tests = {
     description = "Graphics library validation and API analysis"
-    framework_labels = ["graphics_api_validation", "multimedia_codec_check", "graphics_abi_analysis"]
-    is_static = true
     max_timeout_minutes = 15
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Graphics and multimedia functionality testing"
     framework_labels = ["graphics_rendering", "multimedia_processing", "graphics_performance"]
-    is_static = false
     max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
     requires_graphics = true
 }
 
@@ -371,17 +330,13 @@ dynamic_tests = {
 components = ["libfabric", "nghttp2", "net-tools", "wget2"]
 static_tests = {
     description = "Network library configuration and protocol validation"
-    framework_labels = ["network_protocol_validation", "network_config_check", "network_security_analysis"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Network library functionality and protocol testing"
     framework_labels = ["network_protocol_tests", "network_performance", "network_integration"]
-    is_static = false
     max_timeout_minutes = 35
-    execution_environment = "vm"
+    vm_deploy = true
     requires_network = true
 }
 
@@ -395,7 +350,6 @@ dynamic_tests = {
 components = ["mariadb10.11", "mariadb-connector-c", "mariadb-connector-odbc"]
 static_tests = {
     description = "MariaDB configuration and schema validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_mariadb_config.py", "cases/test_sql_schema.py", "cases/test_database_security.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=3"]
@@ -410,9 +364,8 @@ static_tests = {
 dynamic_tests = {
     description = "MariaDB functionality and performance testing"
     framework_labels = ["mariadb_functionality", "database_performance", "mariadb_replication"]
-    is_static = false
     max_timeout_minutes = 60
-    execution_environment = "vm"
+    vm_deploy = true
     requires_storage = true
 }
 
@@ -420,34 +373,26 @@ dynamic_tests = {
 components = ["mysql8.4"]
 static_tests = {
     description = "MySQL configuration and security validation"
-    framework_labels = ["mysql_config_validation", "mysql_security_audit", "mysql_schema_check"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "MySQL functionality and clustering tests"
     framework_labels = ["mysql_functionality", "mysql_clustering", "mysql_performance"]
-    is_static = false
     max_timeout_minutes = 55
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 [database_systems.postgresql]
 components = ["postgresql18-decoderbufs"]
 static_tests = {
     description = "PostgreSQL extension validation"
-    framework_labels = ["postgresql_extension_validation", "postgresql_config_check"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "PostgreSQL extension functionality"
     framework_labels = ["postgresql_extension_tests", "postgresql_integration"]
-    is_static = false
     max_timeout_minutes = 40
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 # =============================================================================
@@ -460,7 +405,6 @@ dynamic_tests = {
 components = ["kata-containers", "rootlesskit", "runc"]
 static_tests = {
     description = "Container runtime configuration validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_container_config.py", "cases/test_container_security.py", "cases/test_oci_compliance.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=2"]
@@ -475,9 +419,8 @@ static_tests = {
 dynamic_tests = {
     description = "Container runtime functionality and orchestration"
     framework_labels = ["container_lifecycle", "container_networking", "container_security", "oci_runtime_tests"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "vm"
+    vm_deploy = true
     requires_container_runtime = true
 }
 
@@ -485,17 +428,13 @@ dynamic_tests = {
 components = ["qemu", "libvirt", "open-vm-tools"]
 static_tests = {
     description = "Hypervisor configuration and VM template validation"
-    framework_labels = ["qemu_config_validation", "libvirt_schema_check", "vm_template_validation"]
-    is_static = true
     max_timeout_minutes = 12
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Hypervisor functionality and VM management"
     framework_labels = ["vm_lifecycle", "hypervisor_performance", "vm_migration", "libvirt_integration"]
-    is_static = false
     max_timeout_minutes = 75
-    execution_environment = "vm"
+    vm_deploy = true
     requires_nested_virtualization = true
 }
 
@@ -509,7 +448,6 @@ dynamic_tests = {
 components = ["cmake", "meson", "automake", "gyp"]
 static_tests = {
     description = "Build system configuration and script validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_build_scripts.py", "cases/test_cmake_lint.py", "cases/test_meson_validation.py", "cases/test_build_deps.py"]
     pytest_args = ["-v", "--tb=short"]
@@ -525,43 +463,34 @@ static_tests = {
 dynamic_tests = {
     description = "Build system functionality and cross-platform building"
     framework_labels = ["build_system_tests", "cross_platform_build", "build_performance"]
-    is_static = false
     max_timeout_minutes = 40
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [development_tools.version_control]
 components = ["GitPython", "cvsps", "subunit"]
 static_tests = {
     description = "Version control tool validation and repository analysis"
-    framework_labels = ["vcs_validation", "repository_analysis", "vcs_security_check"]
-    is_static = true
     max_timeout_minutes = 6
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Version control functionality and integration"
     framework_labels = ["vcs_operations", "vcs_performance", "vcs_integration"]
-    is_static = false
     max_timeout_minutes = 25
-    execution_environment = "container"
+    container_deploy = true
 }
 
 [development_tools.debugging_profiling]
 components = ["gdb", "systemtap", "tuna", "tuned"]
 static_tests = {
     description = "Debugging tool configuration validation"
-    framework_labels = ["debugger_validation", "profiler_config_check", "debug_symbol_analysis"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Debugging and profiling functionality"
     framework_labels = ["debugger_functionality", "profiler_tests", "performance_tuning"]
-    is_static = false
     max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 # =============================================================================
@@ -574,17 +503,13 @@ dynamic_tests = {
 components = ["gtk4", "qt5-qtwebkit", "qt6-qtwebengine", "qt-mobility"]
 static_tests = {
     description = "GUI framework validation and theme compatibility"
-    framework_labels = ["gui_framework_validation", "theme_compatibility", "gui_api_check"]
-    is_static = true
     max_timeout_minutes = 12
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "GUI framework functionality and rendering"
     framework_labels = ["gui_rendering", "gui_interaction", "gui_performance"]
-    is_static = false
     max_timeout_minutes = 35
-    execution_environment = "vm"
+    vm_deploy = true
     requires_display = true
 }
 
@@ -592,17 +517,13 @@ dynamic_tests = {
 components = ["firefox", "pipewire", "pulseaudio", "fluidsynth"]
 static_tests = {
     description = "Multimedia application configuration validation"
-    framework_labels = ["multimedia_config_validation", "audio_config_check", "multimedia_security_audit"]
-    is_static = true
     max_timeout_minutes = 15
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Multimedia functionality and audio/video processing"
     framework_labels = ["multimedia_playback", "audio_processing", "multimedia_performance"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "vm"
+    vm_deploy = true
     requires_audio = true
 }
 
@@ -610,17 +531,13 @@ dynamic_tests = {
 components = ["emacs", "vim", "mc", "dialog"]
 static_tests = {
     description = "Productivity application configuration validation"
-    framework_labels = ["app_config_validation", "text_editor_validation", "productivity_security_check"]
-    is_static = true
     max_timeout_minutes = 6
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Productivity application functionality"
     framework_labels = ["text_editor_functionality", "file_manager_tests", "productivity_integration"]
-    is_static = false
     max_timeout_minutes = 20
-    execution_environment = "container"
+    container_deploy = true
 }
 
 # =============================================================================
@@ -633,17 +550,13 @@ dynamic_tests = {
 components = ["mod_proxy_cluster", "civetweb"]
 static_tests = {
     description = "Web server configuration and module validation"
-    framework_labels = ["web_server_config_validation", "http_module_check", "web_security_audit"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Web server functionality and load handling"
     framework_labels = ["web_server_functionality", "http_load_tests", "web_performance"]
-    is_static = false
     max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
     requires_network = true
 }
 
@@ -651,17 +564,13 @@ dynamic_tests = {
 components = ["rsync", "wget2", "w3m", "urlview"]
 static_tests = {
     description = "Network utility configuration validation"
-    framework_labels = ["network_tool_validation", "protocol_config_check", "network_security_analysis"]
-    is_static = true
     max_timeout_minutes = 5
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Network utility functionality and protocol testing"
     framework_labels = ["network_tool_functionality", "protocol_tests", "network_performance"]
-    is_static = false
     max_timeout_minutes = 30
-    execution_environment = "vm"
+    vm_deploy = true
     requires_network = true
 }
 
@@ -675,7 +584,6 @@ dynamic_tests = {
 components = ["realmd", "krb5", "sssd", "freeipa"]
 static_tests = {
     description = "Authentication system configuration validation"
-    is_static = true
     infra_provisioning = false
     test_files = ["cases/test_auth_config.py", "cases/test_kerberos_config.py", "cases/test_ldap_schema.py"]
     pytest_args = ["-v", "--tb=short", "--maxfail=2"]
@@ -690,9 +598,8 @@ static_tests = {
 dynamic_tests = {
     description = "Authentication functionality and integration"
     framework_labels = ["auth_integration", "kerberos_functionality", "ldap_operations"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "vm"
+    vm_deploy = true
     requires_network = true
 }
 
@@ -700,17 +607,13 @@ dynamic_tests = {
 components = ["nss", "openscap", "xmlsec1", "openpace"]
 static_tests = {
     description = "Cryptographic library and certificate validation"
-    framework_labels = ["crypto_validation", "certificate_check", "encryption_config_audit"]
-    is_static = true
     max_timeout_minutes = 15
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Cryptographic functionality and compliance testing"
     framework_labels = ["crypto_functionality", "encryption_tests", "compliance_validation"]
-    is_static = false
     max_timeout_minutes = 40
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 # =============================================================================
@@ -723,34 +626,26 @@ dynamic_tests = {
 components = ["sos", "rsyslog", "chkrootkit"]
 static_tests = {
     description = "Monitoring tool configuration validation"
-    framework_labels = ["monitoring_config_validation", "log_config_check", "security_audit_validation"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Monitoring functionality and log processing"
     framework_labels = ["monitoring_functionality", "log_processing", "security_monitoring"]
-    is_static = false
     max_timeout_minutes = 35
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 [system_management.package_management]
 components = ["rpm", "dnf5", "PackageKit", "PackageKit-Qt"]
 static_tests = {
     description = "Package management configuration and metadata validation"
-    framework_labels = ["rpm_validation", "package_metadata_check", "dependency_analysis"]
-    is_static = true
     max_timeout_minutes = 12
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Package management functionality and repository operations"
     framework_labels = ["package_operations", "repository_management", "package_dependency_resolution"]
-    is_static = false
     max_timeout_minutes = 50
-    execution_environment = "vm"
+    vm_deploy = true
 }
 
 # =============================================================================
@@ -763,17 +658,13 @@ dynamic_tests = {
 components = ["squashfs-tools", "ostree", "fuse3"]
 static_tests = {
     description = "Filesystem tool configuration validation"
-    framework_labels = ["filesystem_validation", "fs_tool_config_check", "fs_integrity_analysis"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Filesystem functionality and operations"
     framework_labels = ["filesystem_operations", "fs_performance", "fs_integrity_tests"]
-    is_static = false
     max_timeout_minutes = 45
-    execution_environment = "vm"
+    vm_deploy = true
     requires_storage = true
 }
 
@@ -781,17 +672,13 @@ dynamic_tests = {
 components = ["7zip", "p7zip", "rsync"]
 static_tests = {
     description = "Archive tool validation and format compatibility"
-    framework_labels = ["archive_format_validation", "compression_validation", "archive_integrity_check"]
-    is_static = true
     max_timeout_minutes = 6
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Archive tool functionality and performance"
     framework_labels = ["archive_operations", "compression_performance", "backup_functionality"]
-    is_static = false
     max_timeout_minutes = 30
-    execution_environment = "container"
+    container_deploy = true
 }
 
 # =============================================================================
@@ -804,17 +691,13 @@ dynamic_tests = {
 components = ["CUnit", "JUnitParams", "subunit"]
 static_tests = {
     description = "Testing framework configuration validation"
-    framework_labels = ["test_framework_validation", "test_structure_analysis", "test_coverage_check"]
-    is_static = true
     max_timeout_minutes = 5
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Testing framework functionality and execution"
     framework_labels = ["test_execution", "test_framework_integration", "test_reporting"]
-    is_static = false
     max_timeout_minutes = 25
-    execution_environment = "container"
+    container_deploy = true
 }
 
 # =============================================================================
@@ -827,17 +710,13 @@ dynamic_tests = {
 components = ["google-roboto-slab-fonts", "glyphicons-halflings-fonts", "paktype-naskh-basic-fonts"]
 static_tests = {
     description = "Font validation and character encoding analysis"
-    framework_labels = ["font_validation", "character_encoding_check", "font_rendering_validation"]
-    is_static = true
     max_timeout_minutes = 8
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Font rendering and text processing"
     framework_labels = ["font_rendering", "text_processing", "internationalization_tests"]
-    is_static = false
     max_timeout_minutes = 20
-    execution_environment = "vm"
+    vm_deploy = true
     requires_display = true
 }
 
@@ -845,65 +724,11 @@ dynamic_tests = {
 components = ["hunspell-se", "hunspell-smj", "m17n-lib", "foma", "mecab"]
 static_tests = {
     description = "Text processing library validation"
-    framework_labels = ["text_processing_validation", "spell_check_validation", "language_model_check"]
-    is_static = true
     max_timeout_minutes = 10
-    execution_environment = "build"
 }
 dynamic_tests = {
     description = "Text processing functionality and language support"
     framework_labels = ["text_processing_functionality", "spell_check_tests", "language_processing"]
-    is_static = false
     max_timeout_minutes = 30
-    execution_environment = "container"
-}
-
-# =============================================================================
-# COMPONENT CHARACTERISTIC DEFINITIONS
-# =============================================================================
-
-[component_characteristics]
-
-[component_characteristics.execution_environments]
-build = {
-    description = "Build-time environment for static analysis"
-    capabilities = ["source_code_access", "build_artifacts", "static_analysis_tools"]
-    max_parallelism = 8
-}
-container = {
-    description = "Container runtime environment for isolated testing"
-    capabilities = ["runtime_execution", "isolated_environment", "network_access"]
-    max_parallelism = 4
-}
-vm = {
-    description = "Virtual machine environment for full system testing"
-    capabilities = ["full_system_access", "hardware_emulation", "privileged_operations"]
-    max_parallelism = 2
-}
-
-[component_characteristics.test_categories]
-static_analysis = {
-    description = "Code analysis without execution"
-    typical_duration = "5-15 minutes"
-    parallel_friendly = true
-}
-unit_testing = {
-    description = "Component-level functionality testing"
-    typical_duration = "10-30 minutes" 
-    parallel_friendly = true
-}
-integration_testing = {
-    description = "Multi-component interaction testing"
-    typical_duration = "20-60 minutes"
-    parallel_friendly = false
-}
-system_testing = {
-    description = "Full system behavior validation"
-    typical_duration = "30-120 minutes"
-    parallel_friendly = false
-}
-performance_testing = {
-    description = "Performance and scalability validation"
-    typical_duration = "45-180 minutes"
-    parallel_friendly = false
+    container_deploy = true
 }

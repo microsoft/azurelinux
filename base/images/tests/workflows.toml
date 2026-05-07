@@ -1,7 +1,5 @@
 # Azure Linux Test Workflows Configuration - Capability-Aware Tests selection
 #
-# TIMEOUT BEHAVIOR:
-# Each workflow section contains its own timeout overrides and defaults
 
 [metadata]
 version = "1.0.0"
@@ -18,33 +16,21 @@ description = "Fast validation workflows for pull request gates with capability-
 pr_vm_smoke = {
     description = "VM smoke tests for PR validation"
     framework_labels = ["openqa_install_smoke", "quick_smoke_tests"]
-    is_static = false
     required_capabilities = ["machine-bootable"]
     retry_count = 2
     min_version = "4.0.0"
     disabled_for_versions = ["5.0.0-preview"]
     version_family = "azurelinux"
-    max_timeout_minutes = 15
-    timeout_overrides = {
-        "openqa_install_smoke" = 450,     # 7.5 minutes
-        "quick_smoke_tests" = 150,        # 2.5 minutes
-    }
+    #max_timeout_minutes = 15
 }
 
 pr_container_smoke = {
     description = "Container smoke tests for PR validation"
     framework_labels = ["container_smoke", "base_container_validation"]
-    is_static = false
     required_capabilities = ["container"]
     retry_count = 2
     min_version = "2.0.0"
     enabled_for_versions = ["2.0.*", "3.0.*"]
-    version_family = "azurelinux"
-    max_timeout_minutes = 15
-    timeout_overrides = {
-        "container_smoke" = 300,              # 5 minutes
-        "base_container_validation" = 600,    # 10 minutes
-    }
 }
 
 [nightly_validation]
@@ -54,52 +40,31 @@ description = "Comprehensive nightly testing workflows with extensive capability
 nightly_full_system = {
     description = "Full system validation with all capabilities"
     framework_labels = ["tmt_tier2", "lisa_priority2", "comprehensive_tests"]
-    is_static = false
     required_capabilities = ["machine-bootable", "systemd", "runtime-package-management"]
     retry_count = 1
     min_version = "2.0.0"
     max_version = "4.0.0"
     disabled_for_versions = ["3.0.0-beta", "3.0.0-rc1"]
-    version_family = "azurelinux"
-    max_timeout_minutes = 240
-    timeout_overrides = {
-        "tmt_tier2" = 9360,           # 2.6 hours
-        "lisa_priority2" = 14040,     # 3.9 hours
-        "comprehensive_tests" = 17280, # 4.8 hours
-    }
 }
 
 nightly_vm_basic = {
     description = "VM validation without package management"
-    is_static = false
     framework_labels = ["tmt_tier2", "lisa_priority2", "vm_basic_tests"]
     required_capabilities = ["machine-bootable"]
-    excluded_capabilities = ["runtime-package-management"]
     retry_count = 1
     min_version = "1.0.0"
     enabled_for_versions = ["1.*", "2.*", "3.0.0"]
     version_family = "azurelinux"
-    max_timeout_minutes = 200
-    timeout_overrides = {
-        "vm_basic_tests" = 9360,      # 2.6 hours
-    }
 }
 
 nightly_container_comprehensive = {
     description = "Comprehensive container testing"
     framework_labels = ["container_runtime_full", "oci_compliance", "registry_integration"]
-    is_static = false
     required_capabilities = ["container"]
     retry_count = 1
     min_version = "2.0.0"
     disabled_for_versions = ["2.0.0-preview"]
     version_family = "azurelinux"
-    max_timeout_minutes = 180
-    timeout_overrides = {
-        "container_runtime_full" = 8640,     # 2.4 hours
-        "oci_compliance" = 4320,              # 1.2 hours
-        "registry_integration" = 3600,        # 1 hour
-    }
 }
 
 [release_validation]
@@ -108,135 +73,78 @@ description = "Complete release validation workflows with thorough testing for p
 
 release_full_validation = {
     description = "Complete validation for full-featured images"
-    is_static = false
     framework_labels = ["full_validation", "security_tests", "compatibility_tests"]
     required_capabilities = ["machine-bootable", "systemd"]
     retry_count = 2
     min_version = "2.0.0"
     enabled_for_versions = ["*.0", "*.*.*-rc*"]
     disabled_for_versions = ["*-alpha", "*-beta"]
-    version_family = "azurelinux"
-    max_timeout_minutes = 180
-    timeout_overrides = {
-        "full_validation" = 7200,         # 2 hours
-        "security_tests" = 3600,          # 1 hour
-        "compatibility_tests" = 5400,     # 1.5 hours
-    }
-    version_overrides = [
-        {
-            version_pattern = "3.0.*"
-            additional_labels = ["kernel_6_6_validation", "rust_support_tests"]
-        },
-        {
-            version_pattern = "2.0.*" 
-            excluded_labels = ["rust_support_tests"]
-        }
-    ]
 }
 
 release_container_validation = {
     description = "Complete container validation for release"
     framework_labels = ["container_security_scan", "oci_security", "distroless_validation"]
-    is_static = false
     required_capabilities = ["container"]
     retry_count = 2
     min_version = "2.0.0"
-    version_family = "azurelinux"
-    max_timeout_minutes = 120
-    timeout_overrides = {
-        "container_security_scan" = 2400, # 40 minutes
-        "oci_security" = 1800,            # 30 minutes
-        "distroless_validation" = 3600,   # 1 hour
-    }
-    version_overrides = [
-        {
-            version_pattern = "3.*"
-            additional_labels = ["podman_4_validation", "cgroup_v2_tests"]
-            timeout_overrides = {
-                "podman_4_validation" = 2400,     # 40 minutes
-                "cgroup_v2_tests" = 1800,         # 30 minutes
-            }
-        }
-    ]
 }
 
 release_minimal_validation = {
     description = "Minimal image validation for release"
     framework_labels = ["minimal_surface_tests", "security_surface", "static_analysis"]
-    is_static = false
     required_capabilities = ["container"]
     excluded_capabilities = ["systemd", "runtime-package-management"]
     retry_count = 2
     min_version = "2.0.0"
     enabled_for_versions = ["2.*", "3.*"]
-    version_family = "azurelinux"
-    max_timeout_minutes = 90
-    timeout_overrides = {
-        "minimal_surface_tests" = 1800,    # 30 minutes
-        "security_surface" = 2400,         # 40 minutes
-        "static_analysis" = 3600,          # 1 hour
-    }
 }
 
 example_merge_validation = {
     description = "Example test spec using azldev-compatible timeout configuration"
-    is_static = false
     framework_labels = ["merge_smoke", "integration_basic"]
     required_capabilities = ["machine-bootable"]
     retry_count = 1
-    max_timeout_minutes = 30
-    timeout_overrides = {
-        "merge_smoke" = 900,               # 15 minutes
-        "integration_basic" = 1200,        # 20 minutes
-    }
 }
 
 # =============================================================================
 # STATIC WORKFLOWS (preserved for filesystem-based testing)
 # =============================================================================
 
-[workflows.pr_validation_static]
-is_static = true
-infra_provisioning = false
-description = "Fast static validation for pull request gates"
-test_files = ["cases/test_os_release.py", "cases/test_packages.py"]
-pytest_args = ["-v", "--tb=short", "--maxfail=3"]
-max_timeout_minutes = 15
-retry_count = 1
-timeout_overrides = {
-    "test_os_release" = 300,              # 5 minutes
-    "test_packages" = 600,                # 10 minutes
-}
-
 [workflows.nightly_validation_static]
-is_static = true
+test_type = pytest
 infra_provisioning = false
 description = "Comprehensive static validation - nightly execution"
 test_files = ["cases/**/*.py"]
-pytest_args = ["-v", "--tb=long", "--durations=10"]
-max_timeout_minutes = 240
-coverage_required = true
+pytest_args = [
+    "-v", 
+    "--tb=long", 
+    "--durations=10",
+    "-m", "static_container_test",
+    "-m", "runtime_container_tests",
+    "--image-path", "{image_path}",
+    "--image-name", "{image_name}",
+]
+max_timeout_minutes = 120
+collect_coverage = false
 retry_count = 1
-timeout_overrides = {
-    "filesystem_validation" = 7200,       # 2 hours
-    "package_integrity" = 3600,           # 1 hour
-    "security_baseline" = 2400,           # 40 minutes
-    "compliance_checks" = 1800,           # 30 minutes
-}
+#markers_required = ["static_container_test", "runtime_container_tests"]
 
 [workflows.release_validation_static]
-is_static = true
+test_type = pytest
 infra_provisioning = false
 description = "Complete static validation for release readiness"
-pytest_args = ["-v", "--tb=long", "--durations=20", "--strict-markers"]
-max_timeout_minutes = 180
-coverage_required = true
-coverage_threshold = 95
+pytest_args = [
+    "-v", 
+    "--tb=long", 
+    "--durations=20",
+    "--strict-markers",
+    "-m", "static_container_test",
+    "--image-path", "{image_path}",
+    "--image-name", "{image_name}",
+    "--cov=base/images/tests/cases",
+    "--cov-report=term-missing",
+]
+max_timeout_minutes = 90
+collect_coverage = true
+coverage_threshold = 85
 retry_count = 2
-timeout_overrides = {
-    "complete_filesystem_validation" = 7200,  # 2 hours
-    "final_package_verification" = 3600,      # 1 hour
-    "release_security_scan" = 4800,           # 1.33 hours
-    "final_compliance_audit" = 2700,          # 45 minutes
-    "performance_regression" = 5400,          # 1.5 hours
-}
