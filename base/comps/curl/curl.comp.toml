@@ -1,0 +1,16 @@
+[components.curl]
+
+[[components.curl.overlays]]
+description = "Drop python3-impacket BuildRequires (only used by Fedora-gated upstream test 1451; python-impacket is not packaged for Azure Linux due to RPM-signing issues)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "python3-impacket"
+
+# Update the now-stale comment in the (empty) `%if 0%{?fedora}` block left
+# behind by removing the BuildRequires above, so future readers know the
+# omission is intentional rather than an oversight.
+[[components.curl.overlays]]
+description = "Annotate the now-empty %if 0%{?fedora} block to make the AZL deviation explicit (avoid confusion with the original 'needed for upstream test 1451' comment)"
+type = "spec-search-replace"
+regex = '^# needed for upstream test 1451$'
+replacement = '# python3-impacket BuildRequires intentionally omitted in Azure Linux — see curl.comp.toml overlay (RPM signing blocker; test 1451 is Fedora-gated)'

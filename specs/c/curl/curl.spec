@@ -10,7 +10,7 @@
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
 Version: 8.15.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -121,8 +121,7 @@ BuildRequires: perl(Time::Local)
 BuildRequires: perl(vars)
 
 %if 0%{?fedora}
-# needed for upstream test 1451
-BuildRequires: python3-impacket
+# python3-impacket BuildRequires intentionally omitted in Azure Linux — see curl.comp.toml overlay (RPM signing blocker; test 1451 is Fedora-gated)
 %endif
 
 # The test-suite runs automatically through valgrind if valgrind is available
