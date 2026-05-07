@@ -10,6 +10,7 @@
 ## Skills
 
 - Adding a new component → [`skill-add-component`](../../.github/skills/skill-add-component/SKILL.md)
+- Removing component(s) → [`skill-remove-component`](../../.github/skills/skill-remove-component/SKILL.md)
 - Fixing overlay issues → [`skill-fix-overlay`](../../.github/skills/skill-fix-overlay/SKILL.md)
 - Building and debugging → [`skill-build-component`](../../.github/skills/skill-build-component/SKILL.md)
 - Testing in mock chroot → [`skill-mock`](../../.github/skills/skill-mock/SKILL.md)

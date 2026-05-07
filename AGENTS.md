@@ -56,6 +56,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Build a component, debug build failures | [`skill-build-component`](.github/skills/skill-build-component/SKILL.md) |
 | Bump a component's upstream pin (lock files) | [`skill-update-component`](.github/skills/skill-update-component/SKILL.md) |
 | Add a new component to the distro | [`skill-add-component`](.github/skills/skill-add-component/SKILL.md) |
+| Remove component(s) from the distro | [`skill-remove-component`](.github/skills/skill-remove-component/SKILL.md) |
 | Diagnose and fix overlay issues | [`skill-fix-overlay`](.github/skills/skill-fix-overlay/SKILL.md) |
 | Test and inspect packages in mock chroot | [`skill-mock`](.github/skills/skill-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
