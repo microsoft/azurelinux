@@ -10,7 +10,7 @@
 Summary:        Azure Linux package repositories
 Name:           azurelinux-repos
 Version:        4.0
-Release:        7%{?dist}
+Release:        %autorelease -b 10
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -273,27 +273,4 @@ rm -f "$TMPRING"
 
 
 %changelog
-* Mon Apr 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
-- Update repo definitions for next phase of releases.
-
-* Tue Apr 21 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-6
-- Consolidate repo templates: azurelinux-unified.repo.in and azurelinux-split.repo.in.
-- Add split_repos bcond to select between unified and split URL layouts.
-- Add repo_uri_prefix macro to override the auto-computed repo URI prefix.
-- Only one azurelinux.repo file ships, selected by split_repos at build time.
-- Fix dist tag date extraction to tolerate missing date (grep || true).
-
-* Mon Apr 13 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
-- Fix dist tag date extraction to handle tilde-only forms (e.g. ".azl4~20260412").
-
-* Wed Mar 25 2026 Sam Meluch <sammeluch@microsoft.com> - 4.0-4
-- Update .repo files for daily repo publishing to dev blob storage.
-
-* Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-3
-- Update .repo files for initial Alpha release.
-
-* Wed Mar 04 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
-- Update .repo files.
-
-* Fri Jan 23 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-1
-- Initial definition based on fedora-repos spec (forked from upstream 44-0.1).
+%autochangelog
