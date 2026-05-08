@@ -3,12 +3,13 @@
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
 Version:        3.5.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://python-markdown.github.io/
 Source0:        https://files.pythonhosted.org/packages/source/M/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
+Patch0:         0001-fix-htmlparser-incomplete-tags-and-comments.patch
 BuildArch:      noarch
 
 %description
@@ -61,6 +62,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
+* Fri May 08 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.2-3
+- Adjust HTML parser handling for incomplete start tags and unclosed comments
+
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  3.5.2-2
 - Use proper ptest command to run the test.
 
