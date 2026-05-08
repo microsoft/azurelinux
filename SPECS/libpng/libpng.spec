@@ -58,7 +58,8 @@ make %{?_smp_mflags} -k check
 
 %changelog
 * Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.58-1
-- Auto-upgrade to 1.6.58 - for a regression introduced in version 1.6.56 that caused     to return stale palette data after applying gamma and background transforms in-place
+- Auto-upgrade to 1.6.58 - for a regression introduced in version 1.6.56 that caused
+  to return stale palette data after applying gamma and background transforms in-place
 
 * Sat Apr 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.57-1
 - Auto-upgrade to 1.6.57 - for CVE-2026-34757
