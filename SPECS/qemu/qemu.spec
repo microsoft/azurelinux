@@ -2390,6 +2390,7 @@ fi \
 %{nil}
 
 %pretrans user-static
+mkdir -p %{_localstatedir}/lib/rpm-state/
 touch %{setbinfmtonce}
 exit 0
 
