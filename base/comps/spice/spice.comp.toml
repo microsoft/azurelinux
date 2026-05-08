@@ -1,0 +1,16 @@
+[components.spice]
+
+# AZL does not ship opus — disable opus in the meson build.
+
+[[components.spice.overlays]]
+description = "Remove opus-devel BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"
+
+[[components.spice.overlays]]
+description = "Disable opus in meson build"
+type = "spec-search-replace"
+section = "%build"
+regex = '-Dopus=enabled'
+replacement = '-Dopus=disabled'
