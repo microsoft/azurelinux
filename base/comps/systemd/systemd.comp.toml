@@ -34,3 +34,9 @@ type = "file-search-replace"
 file = "60-block-scheduler.rules"
 regex = "(?m)^"
 replacement = "#"
+
+[[components.systemd.overlays]]
+description = "Set default llmnr support to disabled"
+type = "spec-search-replace"
+regex = '-Ddefault-llmnr=.*$'
+replacement = "-Ddefault-llmnr=no"
