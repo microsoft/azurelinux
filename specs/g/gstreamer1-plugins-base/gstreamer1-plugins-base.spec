@@ -12,7 +12,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.26.10
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later
@@ -48,7 +48,6 @@ BuildRequires:  libXv-devel
 BuildRequires:  orc-devel >= 0.4.18
 BuildRequires:  pango-devel
 BuildRequires:  pkgconfig
-BuildRequires:  opus-devel
 BuildRequires:  gdk-pixbuf2-devel
 BuildRequires:  gtk3-devel
 BuildRequires:  libjpeg-turbo-devel
@@ -130,6 +129,7 @@ for the GStreamer Base Plugins library.
 
 %build
 %meson \
+  -D opus=disabled \
   -D package-name='Fedora GStreamer-plugins-base package' \
   -D package-origin='http://download.fedoraproject.org' \
   -D gl_winsys=wayland,x11,gbm \
@@ -301,7 +301,7 @@ chrpath --delete $RPM_BUILD_ROOT%{_bindir}/gst-play-1.0
 %{_libdir}/gstreamer-%{majorminor}/libgstlibvisual.so
 %endif
 %{_libdir}/gstreamer-%{majorminor}/libgstogg.so
-%{_libdir}/gstreamer-%{majorminor}/libgstopus.so
+
 %{_libdir}/gstreamer-%{majorminor}/libgstpango.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttheora.so
 %{_libdir}/gstreamer-%{majorminor}/libgstvorbis.so
