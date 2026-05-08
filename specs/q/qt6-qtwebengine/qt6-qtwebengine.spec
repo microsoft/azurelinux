@@ -15,7 +15,7 @@
 %global use_system_re2 1
 %global use_system_libicu 1
 %global use_system_libwebp 1
-%global use_system_opus 1
+%global use_system_opus 0
 %global use_system_ffmpeg 1
 # libvpx is exclusive with VA-API support (libva) which is enabled by default
 %global use_system_libvpx 0
@@ -94,7 +94,7 @@
 Summary: Qt6 - QtWebEngine components
 Name:    qt6-qtwebengine
 Version: 6.10.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LICENSE.GPL LICENSE.LGPL LGPL_EXCEPTION.txt, for details
 # See also http://qt-project.org/doc/qt-5.0/qtdoc/licensing.html
@@ -481,6 +481,9 @@ Requires: qt6-qtsvg%{?_isa}
 %setup -q -n %{qt_module}-everywhere-src-%{qt_version}%{?prerelease:-%{prerelease}} -a20
 
 mv pulse src/3rdparty/chromium/
+
+# Remove system_opus requirement from system_ffmpeg cmake condition
+sed -i 's/FFMPEG_FOUND AND QT_FEATURE_webengine_system_opus AND /FFMPEG_FOUND AND /' configure.cmake
 
 pushd src/3rdparty/chromium
 popd

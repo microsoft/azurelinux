@@ -11,3 +11,21 @@
 
 [components.qt6-qtwebengine.build]
 defines = { _vpath_builddir = "build" }
+
+# AZL is removing the opus package. Use bundled Chromium opus instead of system opus.
+# The upstream cmake condition for system_ffmpeg requires system_opus; patch it out
+# so we can keep system ffmpeg while using bundled opus.
+[[components.qt6-qtwebengine.overlays]]
+description = "Use bundled opus instead of system opus to allow removal of the opus package from AZL"
+type = "spec-search-replace"
+regex = '%global use_system_opus 1'
+replacement = '%global use_system_opus 0'
+
+[[components.qt6-qtwebengine.overlays]]
+description = "Patch cmake condition for system_ffmpeg to not require system_opus — allows system ffmpeg with bundled opus"
+type = "spec-search-replace"
+regex = 'mv pulse src/3rdparty/chromium/'
+replacement = """mv pulse src/3rdparty/chromium/
+
+# Remove system_opus requirement from system_ffmpeg cmake condition
+sed -i 's/FFMPEG_FOUND AND QT_FEATURE_webengine_system_opus AND /FFMPEG_FOUND AND /' configure.cmake"""
