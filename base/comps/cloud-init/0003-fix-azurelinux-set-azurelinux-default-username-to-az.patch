@@ -1,0 +1,41 @@
+From 314531fa3c760b86138be26bd7ad51cb03a94f42 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Thu, 7 May 2026 16:12:40 -0400
+Subject: [PATCH 03/11] fix(azurelinux): set azurelinux default username to
+ azureuser (#6874)
+
+The Azure cloud generally documents the default username as
+"azureuser", so this sets the default to match.
+---
+ config/cloud.cfg.tmpl                   | 2 +-
+ tests/unittests/test_render_template.py | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index b5b6b3c4e..02ae6c87d 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -24,7 +24,7 @@
+ {% set shells = ({"alpine": "/bin/ash", "dragonfly": "/bin/sh",
+                   "freebsd": "/bin/tcsh", "netbsd": "/bin/sh",
+                   "openbsd": "/bin/ksh"}) %}
+-{% set usernames = ({"amazon": "ec2-user", "centos": "cloud-user",
++{% set usernames = ({"amazon": "ec2-user", "azurelinux": "azureuser", "centos": "cloud-user",
+                      "openmandriva": "omv", "raspberry-pi-os": "pi",
+                      "rhel": "cloud-user",
+                      "unknown": "ubuntu"}) %}
+diff --git a/tests/unittests/test_render_template.py b/tests/unittests/test_render_template.py
+index 7f8fc9444..32926da1d 100644
+--- a/tests/unittests/test_render_template.py
++++ b/tests/unittests/test_render_template.py
+@@ -93,6 +93,7 @@ class TestRenderCloudCfg:
+ 
+         default_user_exceptions = {
+             "amazon": "ec2-user",
++            "azurelinux": "azureuser",
+             "rhel": "cloud-user",
+             "centos": "cloud-user",
+             "raspberry-pi-os": "pi",
+-- 
+2.51.0
+

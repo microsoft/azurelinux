@@ -26,3 +26,135 @@ type = "spec-search-replace"
 section = "%install"
 regex = '%py3_install -- --init-system=systemd'
 replacement = '%py3_install -- --init-system=systemd --distro=fedora'
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+file = "0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+file = "0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+file = "0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+file = "0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+file = "0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+file = "0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+file = "0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+file = "0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+file = "0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+file = "0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
+
+[[components.cloud-init.overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
+file = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"

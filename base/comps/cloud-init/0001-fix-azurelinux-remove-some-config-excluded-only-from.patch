@@ -1,0 +1,47 @@
+From e591185d8393bfbff2b09c20b9dad415a68973db Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Thu, 7 May 2026 16:07:26 -0400
+Subject: [PATCH 01/11] fix(azurelinux): remove some config excluded only from
+ azurelinux (#6874)
+
+There is no need to exclude these config selections from azurelinux,
+so this simplifies the config template.
+---
+ config/cloud.cfg.tmpl | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/config/cloud.cfg.tmpl b/config/cloud.cfg.tmpl
+index 762d1502a..3ac2f5879 100644
+--- a/config/cloud.cfg.tmpl
++++ b/config/cloud.cfg.tmpl
+@@ -185,9 +185,7 @@ cloud_config_modules:
+ {% endif %}
+   - ntp
+   - timezone
+-{% if variant not in ["azurelinux"] %}
+   - disable_ec2_metadata
+-{% endif %}
+   - runcmd
+ {% if variant in ["debian", "ubuntu", "unknown"] %}
+   - byobu
+@@ -205,17 +203,13 @@ cloud_final_modules:
+   - ubuntu_drivers
+ {% endif %}
+   - write_files_deferred
+-{% if variant not in ["azurelinux"] %}
+   - puppet
+   - chef
+-{% endif %}
+   - ansible
+-{% if variant not in ["azurelinux"] %}
+   - mcollective
+   - salt_minion
+ {% if variant not in ["alpine"] %}
+   - reset_rmc
+-{% endif %}
+ {% endif %}
+   - scripts_vendor
+   - scripts_per_once
+-- 
+2.51.0
+

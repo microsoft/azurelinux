@@ -1,0 +1,28 @@
+From 1c634786941717902342e61899c5684bc8360c6e Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Fri, 8 May 2026 12:54:42 -0400
+Subject: [PATCH 08/11] fix(azurelinux): remove use_lib_exec property override
+ (#6874)
+
+Azure Linux 3.0 used /usr/lib, while Azure Linux 4.0 inherits from
+Fedora and so uses /usr/libexec.
+---
+ cloudinit/distros/azurelinux.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/cloudinit/distros/azurelinux.py b/cloudinit/distros/azurelinux.py
+index 2b7178a71..e3880548d 100644
+--- a/cloudinit/distros/azurelinux.py
++++ b/cloudinit/distros/azurelinux.py
+@@ -21,8 +21,6 @@ NETWORK_FILE_HEADER = """\
+ 
+ 
+ class Distro(rhel.Distro):
+-    usr_lib_exec = "/usr/lib"
+-
+     def __init__(self, name, cfg, paths):
+         super().__init__(name, cfg, paths)
+         self.osfamily = "azurelinux"
+-- 
+2.51.0
+

@@ -1,0 +1,24 @@
+From 81001c5b2f64938288b78db99860500a35f432ea Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Fri, 8 May 2026 15:22:40 -0400
+Subject: [PATCH 10/11] fix(azurelinux): update hosts.azurelinux.tmpl (#6874)
+
+Azure Linux 4.0 is Fedora-based, so update the hosts template to match
+the fedora/redhat template.
+---
+ templates/hosts.azurelinux.tmpl | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/templates/hosts.azurelinux.tmpl b/templates/hosts.azurelinux.tmpl
+index 8e3c23f6f..9e64e2691 100644
+--- a/templates/hosts.azurelinux.tmpl
++++ b/templates/hosts.azurelinux.tmpl
+@@ -19,4 +19,5 @@ you need to add the following to config:
+ 
+ # The following lines are desirable for IPv6 capable hosts
+ ::1 {{fqdn}} {{hostname}}
++::1 localhost.localdomain localhost
+ ::1 localhost6.localdomain6 localhost6
+-- 
+2.51.0
+

@@ -1,0 +1,26 @@
+From 9a8656669ec483ce34bb26b1d2817c96bee261ae Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Fri, 8 May 2026 12:41:30 -0400
+Subject: [PATCH 06/11] fix(azurelinux): use libexec path for ds-identify
+ (#6874)
+
+---
+ systemd/cloud-init-generator.tmpl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/systemd/cloud-init-generator.tmpl b/systemd/cloud-init-generator.tmpl
+index e55ece6d2..888bad535 100644
+--- a/systemd/cloud-init-generator.tmpl
++++ b/systemd/cloud-init-generator.tmpl
+@@ -20,7 +20,7 @@ CLOUD_SYSTEM_TARGET="/usr/lib/systemd/system/cloud-init.target"
+ {% else %}
+ CLOUD_SYSTEM_TARGET="/lib/systemd/system/cloud-init.target"
+ {% endif %}
+-{% if variant in ["almalinux", "centos", "cloudlinux", "eurolinux", "fedora",
++{% if variant in ["almalinux", "azurelinux", "centos", "cloudlinux", "eurolinux", "fedora",
+                   "miraclelinux", "openeuler", "OpenCloudOS", "openmandriva", "rhel", "rocky", "TencentOS", "virtuozzo"] %}
+     dsidentify="/usr/libexec/cloud-init/ds-identify"
+ {% elif variant == "benchmark" %}
+-- 
+2.51.0
+

@@ -1,0 +1,56 @@
+From f2d5f5e7fd1f33e4c105257b97d003b7356ab4a3 Mon Sep 17 00:00:00 2001
+From: Dan Streetman <ddstreet@microsoft.com>
+Date: Fri, 8 May 2026 15:33:43 -0400
+Subject: [PATCH 11/11] fix(azurelinux): update test_util with Azure Linux 4
+ os-release (#6874)
+
+---
+ tests/unittests/test_util.py | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/tests/unittests/test_util.py b/tests/unittests/test_util.py
+index d75fbc4a8..fe24962e1 100644
+--- a/tests/unittests/test_util.py
++++ b/tests/unittests/test_util.py
+@@ -409,15 +409,23 @@ OS_RELEASE_MARINER = dedent(
+ 
+ OS_RELEASE_AZURELINUX = dedent(
+     """\
+-    NAME="Microsoft Azure Linux"
+-    VERSION="3.0.20240206"
++    NAME="Azure Linux"
++    VERSION="4.0 (Cloud Variant)"
++    RELEASE_TYPE=stable
+     ID=azurelinux
+-    VERSION_ID="3.0"
+-    PRETTY_NAME="Microsoft Azure Linux 3.0"
+-    ANSI_COLOR="1;34"
++    ID_LIKE=fedora
++    VERSION_ID=4.0
++    VERSION_CODENAME=""
++    PRETTY_NAME="Azure Linux 4.0 (Cloud Variant)"
++    ANSI_COLOR="0;38;2;60;110;180"
++    LOGO=azurelinux-logo-icon
++    CPE_NAME="cpe:/o:microsoft:azurelinux:4.0"
+     HOME_URL="https://aka.ms/azurelinux"
+-    BUG_REPORT_URL="https://aka.ms/azurelinux"
++    DOCUMENTATION_URL="https://aka.ms/azurelinux"
+     SUPPORT_URL="https://aka.ms/azurelinux"
++    BUG_REPORT_URL="https://aka.ms/azurelinux"
++    VARIANT="Cloud Variant"
++    VARIANT_ID=cloud
+ """
+ )
+ 
+@@ -1276,7 +1284,7 @@ class TestGetLinuxDistro:
+         m_os_release.return_value = OS_RELEASE_AZURELINUX
+         m_path_exists.side_effect = TestGetLinuxDistro.os_release_exists
+         dist = util.get_linux_distro()
+-        self.assertEqual(("azurelinux", "3.0", ""), dist)
++        self.assertEqual(("azurelinux", "4.0", "Cloud Variant"), dist)
+ 
+     @mock.patch(M_PATH + "load_text_file")
+     def test_get_linux_openmandriva(self, m_os_release, m_path_exists):
+-- 
+2.51.0
+
