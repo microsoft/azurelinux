@@ -7,7 +7,7 @@ Name: sox
 # This workaround will go away with rebase to 14.4.3
 # it affects Source, %%prep and Version
 Version: 14.4.2.0
-Release: 44%{?dist}
+Release: 45%{?dist}
 # Automatically converted from old format: GPLv2+ and LGPLv2+ and MIT - review is highly recommended.
 License: GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-MIT
 # Modified source tarball with libgsm license, without unlicensed liblpc10:
@@ -78,7 +78,7 @@ BuildRequires: libvorbis-devel
 BuildRequires: alsa-lib-devel, libtool-ltdl-devel, libsamplerate-devel
 BuildRequires: gsm-devel, wavpack-devel, ladspa-devel, libpng-devel
 BuildRequires: flac-devel, libao-devel, libsndfile-devel, libid3tag-devel
-BuildRequires: pulseaudio-libs-devel, opusfile-devel
+BuildRequires: pulseaudio-libs-devel
 BuildRequires: libtool, libmad-devel, lame-devel, twolame-devel
 
 %description
