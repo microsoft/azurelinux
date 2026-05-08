@@ -27,7 +27,8 @@ reposdir=/dev/null
 logfile=/var/log/yum.log
 retries=20
 obsoletes=1
-gpgcheck=0
+gpgcheck=1
+repo_gpgcheck=1
 assumeyes=1
 syslog_ident=mock
 syslog_device=
@@ -38,19 +39,18 @@ install_weak_deps=0
 protected_packages=
 user_agent={{ user_agent }}
 
-# Azure Linux 4.0 alpha2-prod blob storage repos.
-# Note: alpha2 staging metadata is unsigned, so gpgcheck=0.
-
 [azurelinux-base]
-name=Azure Linux Base $releasever $basearch
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch
-gpgcheck=0
+name=Azure Linux $releasever - $basearch - Base
+baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
 enabled=1
 
 [azurelinux-build-deps]
-name=Azure Linux Additional Build Dependencies $releasever $basearch
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch
-gpgcheck=0
+name=Azure Linux $releasever - $basearch - Additional Build Dependencies
+baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
 enabled=1
 
 """
