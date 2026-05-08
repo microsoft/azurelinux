@@ -26,3 +26,13 @@ type = "spec-search-replace"
 section = "%install"
 regex = '%py3_install -- --init-system=systemd'
 replacement = '%py3_install -- --init-system=systemd --distro=fedora'
+
+[[components.cloud-init.overlays]]
+description = "Remove NetworkManager references from cloud-init-network.service: AZL4 uses systemd-networkd, not NetworkManager"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "# AZL4 uses systemd-networkd, not NetworkManager — remove NM ordering references",
+    "sed -i '/^After=NetworkManager\\.service$/d' systemd/cloud-init-network.service.tmpl",
+    "sed -i '/^After=NetworkManager-wait-online\\.service$/d' systemd/cloud-init-network.service.tmpl",
+]
