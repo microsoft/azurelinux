@@ -89,13 +89,13 @@ user_agent={{ user_agent }}
 
 [base]
 name=base
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch
+baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch
 enabled=1
 skip_if_unavailable=False
 
 [sdk]
 name=sdk
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch
+baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/sdk/$basearch
 enabled=1
 skip_if_unavailable=False
 
