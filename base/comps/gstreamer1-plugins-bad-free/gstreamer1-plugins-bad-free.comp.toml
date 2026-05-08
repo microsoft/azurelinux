@@ -1,0 +1,24 @@
+[components.gstreamer1-plugins-bad-free]
+
+# AZL does not ship opus — disable the opus parse plugin and remove its BR.
+
+[[components.gstreamer1-plugins-bad-free.overlays]]
+description = "Remove pkgconfig(opus) BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(opus)"
+
+[[components.gstreamer1-plugins-bad-free.overlays]]
+description = "Disable the opus meson option"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson \\'
+replacement = """%meson \\
+    -D opus=disabled \\"""
+
+[[components.gstreamer1-plugins-bad-free.overlays]]
+description = "Remove libgstopusparse.so from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = '%\{_libdir\}/gstreamer-%\{majorminor\}/libgstopusparse\.so'
+replacement = ''

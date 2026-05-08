@@ -33,7 +33,7 @@
 
 Name:           gstreamer1-plugins-bad-free
 Version:        1.26.10
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        GStreamer streaming media framework "bad" plugins
 
 # Automatically converted from old format: LGPLv2+ and LGPLv2 - review is highly recommended.
@@ -89,7 +89,6 @@ BuildRequires:  pkgconfig(libva-x11)
 BuildRequires:  pkgconfig(libwebp)
 BuildRequires:  pkgconfig(libwebpmux)
 BuildRequires:  pkgconfig(openssl)
-BuildRequires:  pkgconfig(opus)
 BuildRequires:  pkgconfig(orc-0.4)
 BuildRequires:  pkgconfig(sbc)
 BuildRequires:  pkgconfig(sndfile)
@@ -321,6 +320,7 @@ aren't tested well enough, or the code is not of good enough quality.
 
 %build
 %meson \
+    -D opus=disabled \
     -D package-name="Fedora GStreamer-plugins-bad package" \
     -D package-origin="http://download.fedoraproject.org" \
     -D gpl=enabled \
@@ -657,7 +657,7 @@ EOF
 %{_libdir}/gstreamer-%{majorminor}/libgstlc3.so
 %{_libdir}/gstreamer-%{majorminor}/libgstnvcodec.so
 %{_libdir}/gstreamer-%{majorminor}/libgstopenjpeg.so
-%{_libdir}/gstreamer-%{majorminor}/libgstopusparse.so
+
 %{_libdir}/gstreamer-%{majorminor}/libgstresindvd.so
 %{_libdir}/gstreamer-%{majorminor}/libgstrsvg.so
 %{_libdir}/gstreamer-%{majorminor}/libgstsbc.so
