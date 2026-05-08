@@ -1,0 +1,16 @@
+[components.ffmpeg]
+
+# AZL does not ship opus — remove the opus codec from ffmpeg.
+
+[[components.ffmpeg.overlays]]
+description = "Drop BuildRequires: pkgconfig(opus) (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(opus)"
+
+[[components.ffmpeg.overlays]]
+description = "Disable --enable-libopus configure flag (opus not available in AZL)"
+type = "spec-search-replace"
+section = "%build"
+regex = '--enable-libopus \\'
+replacement = '--disable-libopus \'
