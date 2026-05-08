@@ -5906,9 +5906,13 @@ packages = [
     "python-dateutil-doc", # srpm: python-dateutil
     "python-dictdiffer-doc", # srpm: python-dictdiffer
     "python-filelock-doc", # srpm: python-filelock
+    "python-h2-doc", # srpm: python-h2
+    "python-hpack-doc", # srpm: python-hpack
     "python-humanfriendly-doc", # srpm: python-humanfriendly
+    "python-hyperframe-doc", # srpm: python-hyperframe
     "python-kubernetes-doc", # srpm: python-kubernetes
     "python-libcomps-doc", # srpm: libcomps
+    "python-mpmath-doc", # srpm: python-mpmath
     "python-multilib-conf", # srpm: python-multilib
     "python-mysqlclient-doc", # srpm: python-mysqlclient
     "python-networkx-doc", # srpm: python-networkx
@@ -5919,6 +5923,7 @@ packages = [
     "python-pkginfo-doc", # srpm: python-pkginfo
     "python-psycopg2-doc", # srpm: python-psycopg2
     "python-pyasn1-doc", # srpm: python-pyasn1
+    "python-pycares-doc", # srpm: python-pycares
     "python-pygit2-doc", # srpm: python-pygit2
     "python-pymongo-doc", # srpm: python-pymongo
     "python-pyperclip-doc", # srpm: python-pyperclip
@@ -5960,6 +5965,7 @@ packages = [
     "python3-arrow", # srpm: python-arrow
     "python3-asn1crypto", # srpm: python-asn1crypto
     "python3-assimp", # srpm: assimp
+    "python3-asyncmy", # srpm: python-asyncmy
     "python3-asyncpg", # srpm: python-asyncpg
     "python3-asyncpg+gssauth", # srpm: python-asyncpg
     "python3-asyncssh", # srpm: python-asyncssh
@@ -6218,10 +6224,12 @@ packages = [
     "python3-grpcio-testing", # srpm: grpc
     "python3-grpcio-tools", # srpm: grpc
     "python3-gssapi", # srpm: python-gssapi
+    "python3-h2", # srpm: python-h2
     "python3-hacking", # srpm: python-hacking
     "python3-hatchling", # srpm: python-hatchling
     "python3-hawkey", # srpm: libdnf
     "python3-hivex", # srpm: hivex
+    "python3-hpack", # srpm: python-hpack
     "python3-html5lib", # srpm: python-html5lib
     "python3-html5lib+all", # srpm: python-html5lib
     "python3-html5lib+chardet", # srpm: python-html5lib
@@ -6229,6 +6237,7 @@ packages = [
     "python3-html5lib+lxml", # srpm: python-html5lib
     "python3-httplib2", # srpm: python-httplib2
     "python3-humanfriendly", # srpm: python-humanfriendly
+    "python3-hyperframe", # srpm: python-hyperframe
     "python3-i2c-tools", # srpm: i2c-tools
     "python3-idle", # srpm: python3.14
     "python3-idna", # srpm: python-idna
@@ -6330,6 +6339,7 @@ packages = [
     "python3-libvoikko", # srpm: libvoikko
     "python3-libxml2", # srpm: libxml2
     "python3-libxslt", # srpm: libxslt
+    "python3-linkify-it-py", # srpm: python-linkify-it-py
     "python3-linux-procfs", # srpm: python-linux-procfs
     "python3-lit", # srpm: llvm
     "python3-lldb", # srpm: llvm
@@ -6346,13 +6356,17 @@ packages = [
     "python3-markdown-it-py+linkify", # srpm: python-markdown-it-py
     "python3-markdown-it-py+plugins", # srpm: python-markdown-it-py
     "python3-markupsafe", # srpm: python-markupsafe
+    "python3-mccabe", # srpm: python-mccabe
     "python3-mdit-py-plugins", # srpm: python-mdit-py-plugins
+    "python3-mdurl", # srpm: python-mdurl
     "python3-meh", # srpm: python-meh
     "python3-meh-gui", # srpm: python-meh
     "python3-microsoft-security-utilities-secret-masker", # srpm: python-microsoft-security-utilities-secret-masker
     "python3-mod_wsgi", # srpm: mod_wsgi
     "python3-more-itertools", # srpm: python-more-itertools
     "python3-mpich", # srpm: mpich
+    "python3-mpmath", # srpm: python-mpmath
+    "python3-mpmath+gmpy", # srpm: python-mpmath
     "python3-msal", # srpm: python-msal
     "python3-msal-extensions", # srpm: python-msal-extensions
     "python3-msal-extensions+portalocker", # srpm: python-msal-extensions
@@ -6433,11 +6447,14 @@ packages = [
     "python3-pyasn1-modules", # srpm: python-pyasn1
     "python3-pyatspi", # srpm: pyatspi
     "python3-pybind11", # srpm: pybind11
+    "python3-pycares", # srpm: python-pycares
     "python3-pycdio", # srpm: python-pycdio
+    "python3-pycodestyle", # srpm: python-pycodestyle
     "python3-pycomposefile", # srpm: python-pycomposefile
     "python3-pycparser", # srpm: python-pycparser
     "python3-pycurl", # srpm: python-pycurl
     "python3-pyelftools", # srpm: pyelftools
+    "python3-pyflakes", # srpm: pyflakes
     "python3-pygit2", # srpm: python-pygit2
     "python3-pygithub", # srpm: python-PyGithub
     "python3-pygments", # srpm: python-pygments
@@ -6598,6 +6615,7 @@ packages = [
     "python3-typer-slim", # srpm: python-typer
     "python3-typer-slim+standard", # srpm: python-typer
     "python3-typing-extensions", # srpm: python-typing-extensions
+    "python3-uc-micro-py", # srpm: python-uc-micro-py
     "python3-unbound", # srpm: unbound
     "python3-uri-template", # srpm: python-uri-template
     "python3-uritemplate", # srpm: python-uritemplate
@@ -6631,6 +6649,7 @@ packages = [
     "python3-yarl", # srpm: python-yarl
     "python3-yubico", # srpm: python-yubico
     "python3-zc-lockfile", # srpm: python-zc-lockfile
+    "python3-zombie-imp", # srpm: python-zombie-imp
     "python3-zstandard", # srpm: python-zstandard
     "python3-zstandard+cffi", # srpm: python-zstandard
     "python3-zstd", # srpm: python-zstd

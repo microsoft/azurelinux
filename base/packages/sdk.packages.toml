@@ -5458,9 +5458,6 @@ packages = [
     "python-gmpy2-doc", # srpm: python-gmpy2
     "python-graphviz-doc", # srpm: python-graphviz
     "python-gunicorn-doc", # srpm: python-gunicorn
-    "python-h2-doc", # srpm: python-h2
-    "python-hpack-doc", # srpm: python-hpack
-    "python-hyperframe-doc", # srpm: python-hyperframe
     "python-hyperlink-doc", # srpm: python-hyperlink
     "python-intbitset-doc", # srpm: python-intbitset
     "python-jsonstreams-doc", # srpm: python-jsonstreams
@@ -5475,7 +5472,6 @@ packages = [
     "python-maxminddb-doc", # srpm: python-maxminddb
     "python-mistralclient-doc", # srpm: python-mistralclient
     "python-mistune-doc", # srpm: python-mistune
-    "python-mpmath-doc", # srpm: python-mpmath
     "python-nbconvert-doc", # srpm: python-nbconvert
     "python-nbdime-doc", # srpm: python-nbdime
     "python-nbsphinx-doc", # srpm: python-nbsphinx
@@ -5502,7 +5498,6 @@ packages = [
     "python-priority-doc", # srpm: python-priority
     "python-pyahocorasick-doc", # srpm: python-pyahocorasick
     "python-pybtex-doc", # srpm: python-pybtex
-    "python-pycares-doc", # srpm: python-pycares
     "python-pydantic-doc", # srpm: python-pydantic
     "python-pygmars-doc", # srpm: python-pygmars
     "python-pygraphviz-doc", # srpm: python-pygraphviz
@@ -5580,7 +5575,6 @@ packages = [
     "python3-astroid", # srpm: python-astroid
     "python3-asttokens", # srpm: python-asttokens
     "python3-async-lru", # srpm: python-async-lru
-    "python3-asyncmy", # srpm: python-asyncmy
     "python3-atpublic", # srpm: python-atpublic
     "python3-autopage", # srpm: python-autopage
     "python3-autowrap", # srpm: autowrap
@@ -5805,7 +5799,6 @@ packages = [
     "python3-gunicorn+gevent", # srpm: python-gunicorn
     "python3-gunicorn+setproctitle", # srpm: python-gunicorn
     "python3-h11", # srpm: python-h11
-    "python3-h2", # srpm: python-h2
     "python3-h5netcdf", # srpm: python-h5netcdf
     "python3-h5py", # srpm: h5py
     "python3-h5py-mpich", # srpm: h5py
@@ -5816,7 +5809,6 @@ packages = [
     "python3-hatch-requirements-txt", # srpm: python-hatch-requirements-txt
     "python3-hatch-vcs", # srpm: python-hatch-vcs
     "python3-heatclient", # srpm: python-heatclient
-    "python3-hpack", # srpm: python-hpack
     "python3-httpbin", # srpm: python-httpbin
     "python3-httpcore", # srpm: python-httpcore
     "python3-httpcore+http2", # srpm: python-httpcore
@@ -5832,7 +5824,6 @@ packages = [
     "python3-hypercorn", # srpm: python-hypercorn
     "python3-hypercorn+h3", # srpm: python-hypercorn
     "python3-hypercorn+trio", # srpm: python-hypercorn
-    "python3-hyperframe", # srpm: python-hyperframe
     "python3-hyperlink", # srpm: python-hyperlink
     "python3-hypothesis", # srpm: python-hypothesis
     "python3-hypothesis+cli", # srpm: python-hypothesis
@@ -5936,7 +5927,6 @@ packages = [
     "python3-libsvm", # srpm: libsvm
     "python3-license-expression", # srpm: python-license-expression
     "python3-lilv", # srpm: lilv
-    "python3-linkify-it-py", # srpm: python-linkify-it-py
     "python3-littleutils", # srpm: python-littleutils
     "python3-llvmlite", # srpm: python-llvmlite
     "python3-locket", # srpm: python-locket
@@ -5960,8 +5950,6 @@ packages = [
     "python3-matplotlib-tk", # srpm: python-matplotlib
     "python3-matplotlib-wx", # srpm: python-matplotlib
     "python3-maxminddb", # srpm: python-maxminddb
-    "python3-mccabe", # srpm: python-mccabe
-    "python3-mdurl", # srpm: python-mdurl
     "python3-memcached", # srpm: python-memcached
     "python3-mercantile", # srpm: python-mercantile
     "python3-merge3", # srpm: python-merge3
@@ -5971,8 +5959,6 @@ packages = [
     "python3-mock", # srpm: python-mock
     "python3-mpi4py-mpich", # srpm: mpi4py
     "python3-mpi4py-openmpi", # srpm: mpi4py
-    "python3-mpmath", # srpm: python-mpmath
-    "python3-mpmath+gmpy", # srpm: python-mpmath
     "python3-msgspec", # srpm: python-msgspec
     "python3-mupdf", # srpm: mupdf
     "python3-mypy", # srpm: python3-mypy
@@ -6109,9 +6095,7 @@ packages = [
     "python3-pybeam", # srpm: python-pybeam
     "python3-pybtex", # srpm: python-pybtex
     "python3-pybtex-docutils", # srpm: python-pybtex-docutils
-    "python3-pycares", # srpm: python-pycares
     "python3-pyclipper", # srpm: python-pyclipper
-    "python3-pycodestyle", # srpm: python-pycodestyle
     "python3-pycosat", # srpm: python-pycosat
     "python3-pycryptodomex", # srpm: python-pycryptodomex
     "python3-pycryptodomex-selftest", # srpm: python-pycryptodomex
@@ -6123,7 +6107,6 @@ packages = [
     "python3-pydoctor", # srpm: python-pydoctor
     "python3-pydot", # srpm: pydot
     "python3-pyfakefs", # srpm: python-pyfakefs
-    "python3-pyflakes", # srpm: pyflakes
     "python3-pyftpdlib", # srpm: python-pyftpdlib
     "python3-pyftpdlib+ssl", # srpm: python-pyftpdlib
     "python3-pygmars", # srpm: python-pygmars
@@ -6389,7 +6372,6 @@ packages = [
     "python3-typogrify", # srpm: python-typogrify
     "python3-tzlocal", # srpm: python-tzlocal
     "python3-u-msgpack-python", # srpm: python-u-msgpack-python
-    "python3-uc-micro-py", # srpm: python-uc-micro-py
     "python3-ufo2ft", # srpm: python-ufo2ft
     "python3-ufo2ft+cffsubr", # srpm: python-ufo2ft
     "python3-ufo2ft+compreffor", # srpm: python-ufo2ft
@@ -6452,7 +6434,6 @@ packages = [
     "python3-zict", # srpm: python-zict
     "python3-zipp", # srpm: python-zipp
     "python3-zlib-ng", # srpm: python-zlib-ng
-    "python3-zombie-imp", # srpm: python-zombie-imp
     "python3-zope-event", # srpm: python-zope-event
     "python3-zope-exceptions", # srpm: python-zope-exceptions
     "python3-zope-interface", # srpm: python-zope-interface
