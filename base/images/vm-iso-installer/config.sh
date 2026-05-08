@@ -66,6 +66,7 @@ INSTALL_PKGS=(
     vim-minimal
     ca-certificates
     azurelinux-release
+    azurelinux-repos-dev
     setup
     shadow-utils
     util-linux
@@ -98,7 +99,7 @@ echo "=== Downloading target-install packages + dependencies ==="
 # file are NOT available during config.sh. Use --repofrompath with the CDN URL
 # directly. The URL matches the "azurelinux-base" repo in vm-iso-installer.kiwi.
 
-AZL_BASE_URL="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$ARCH"
+AZL_BASE_URL="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$ARCH"
 dnf5 download \
     --setopt=reposdir=/dev/null \
     --repofrompath=azl-base,"$AZL_BASE_URL" \

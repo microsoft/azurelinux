@@ -29,11 +29,7 @@
 
     <repository type="rpm-md" alias="azurelinux-base">
         <source
-            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/base/$basearch" />
-    </repository>
-    <repository type="rpm-md" alias="azurelinux-sdk">
-        <source
-            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/alpha2-prod/sdk/$basearch" />
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
     </repository>
 
     <packages type="image">
@@ -117,6 +113,7 @@
     </packages>
 
     <packages type="bootstrap">
+        <package name="azurelinux-repos-dev" />
         <package name="dracut-network" />
         <package name="filesystem" />
         <package name="grub2-efi-x64-modules" arch="x86_64" />
