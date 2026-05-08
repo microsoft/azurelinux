@@ -1,0 +1,44 @@
+[Unit]
+ConditionKernelCommandLine=|flatcar.oem.id=ec2
+ConditionKernelCommandLine=|coreos.oem.id=ec2
+
+ConditionKernelCommandLine=|flatcar.oem.id=azure
+ConditionKernelCommandLine=|coreos.oem.id=azure
+
+ConditionKernelCommandLine=|flatcar.oem.id=digitalocean
+ConditionKernelCommandLine=|coreos.oem.id=digitalocean
+
+ConditionKernelCommandLine=|flatcar.oem.id=gce
+ConditionKernelCommandLine=|coreos.oem.id=gce
+
+ConditionKernelCommandLine=|flatcar.oem.id=openstack
+ConditionKernelCommandLine=|coreos.oem.id=openstack
+
+ConditionKernelCommandLine=|flatcar.oem.id=packet
+ConditionKernelCommandLine=|coreos.oem.id=packet
+
+ConditionKernelCommandLine=|flatcar.oem.id=scaleway
+
+ConditionKernelCommandLine=|flatcar.oem.id=hetzner
+
+ConditionKernelCommandLine=|flatcar.oem.id=kubevirt
+
+ConditionKernelCommandLine=|flatcar.oem.id=akamai
+
+ConditionKernelCommandLine=|flatcar.oem.id=proxmoxve
+
+Description=Flatcar Metadata Agent
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
+Environment=COREOS_METADATA_OPT_PROVIDER=--cmdline
+ExecStart=/usr/bin/coreos-metadata ${COREOS_METADATA_OPT_PROVIDER} --attributes=/run/metadata/flatcar
+ExecStartPost=/usr/bin/sed --in-place "s/AFTERBURN/COREOS/g ; s/AWS/EC2/g ; s/GCP/GCE/g" /run/metadata/flatcar
+ExecStartPost=/usr/bin/ln -fs /run/metadata/flatcar /run/metadata/coreos
+
+[Install]
+RequiredBy=metadata.target
+Alias=afterburn.service

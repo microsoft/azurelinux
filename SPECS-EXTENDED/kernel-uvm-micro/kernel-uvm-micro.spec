@@ -17,7 +17,7 @@
 Summary:        Lightweight Linux Kernel for Kata UVM (Micro)
 Name:           kernel-uvm-micro
 Version:        6.6.96.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -167,6 +167,9 @@ find %{buildroot}/lib/modules -name '*.ko' -exec chmod u+x {} +
 %{_prefix}/src/linux-headers-%{uname_r}
 
 %changelog
+* Mon Apr 13 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.96.mshv1-2
+- Enable the following configs to support minimal kata pod startup: CONFIG_PHV, CONFIG_VIRTIO_PMEM, and CONFIG_IPC_NS
+
 * Mon Mar 23 2026 Azure Linux Team <azurelinux@microsoft.com> - 6.6.96.mshv1-1
 - Initial Azure Linux import from Photon (license: Apache2).
 - License verified.
