@@ -1,0 +1,17 @@
+[components.spice-gtk]
+
+# AZL does not ship opus — disable opus in the meson build.
+
+[[components.spice-gtk.overlays]]
+description = "Remove opus-devel BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"
+
+[[components.spice-gtk.overlays]]
+description = "Disable opus audio codec in meson build"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson \\'
+replacement = """%meson \\
+   -Dopus=disabled \\"""
