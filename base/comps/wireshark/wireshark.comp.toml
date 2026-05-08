@@ -1,0 +1,10 @@
+[components.wireshark]
+
+# AZL does not ship opus — remove the BR so wireshark builds without
+# the Opus RTP audio playback feature.
+
+[[components.wireshark.overlays]]
+description = "Remove opus-devel BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"

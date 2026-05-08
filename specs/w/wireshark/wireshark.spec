@@ -9,7 +9,7 @@
 Summary:	Network traffic analyzer
 Name:		wireshark
 Version:	4.6.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch:		1
 License:	BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Url:		http://www.wireshark.org/
@@ -90,7 +90,6 @@ BuildRequires:	systemd-rpm-macros
 BuildRequires:	lz4-devel
 BuildRequires:	snappy-devel
 BuildRequires:	brotli-devel
-BuildRequires:	opus-devel
 BuildRequires:	sbc-devel
 %if 0%{?fedora}
 BuildRequires:	ilbc-devel
