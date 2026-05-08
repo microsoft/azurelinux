@@ -127,6 +127,38 @@ func TestProcessPackageVersionString_TableDriven(t *testing.T) {
 			expectedVersion: "%azl_openssl_version 3.3.0",
 			expectedRelease: "%azl_openssl_release 1.1",
 		},
+		{
+			name:            "dot in spec name replaced with underscore",
+			input:           "rubygem-cool.io: 1.8.0-1.azl3",
+			specFile:        "rubygem-cool.io.spec",
+			prefix:          "azl",
+			expectedVersion: "%azl_rubygem_cool_io_version 1.8.0",
+			expectedRelease: "%azl_rubygem_cool_io_release 1",
+		},
+		{
+			name:            "plus in spec name replaced with underscore",
+			input:           "libxml++: 5.0.3-1.azl3",
+			specFile:        "libxml++.spec",
+			prefix:          "azl",
+			expectedVersion: "%azl_libxml___version 5.0.3",
+			expectedRelease: "%azl_libxml___release 1",
+		},
+		{
+			name:            "versioned spec name with dot",
+			input:           "rust-1.75: 1.75.0-27.azl3",
+			specFile:        "rust-1.75.spec",
+			prefix:          "azl",
+			expectedVersion: "%azl_rust_1_75_version 1.75.0",
+			expectedRelease: "%azl_rust_1_75_release 27",
+		},
+		{
+			name:            "golang versioned spec with dot",
+			input:           "golang-1.25: 1.25.9-1.azl3",
+			specFile:        "golang-1.25.spec",
+			prefix:          "azl",
+			expectedVersion: "%azl_golang_1_25_version 1.25.9",
+			expectedRelease: "%azl_golang_1_25_release 1",
+		},
 	}
 
 	for _, tt := range tests {
