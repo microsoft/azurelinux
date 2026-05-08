@@ -1,0 +1,16 @@
+[components.freerdp]
+
+# AZL does not ship opus — disable opus audio support in FreeRDP.
+
+[[components.freerdp.overlays]]
+description = "Drop BuildRequires: pkgconfig(opus) (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(opus)"
+
+[[components.freerdp.overlays]]
+description = "Disable opus audio codec in FreeRDP (-DWITH_OPUS=OFF)"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DWITH_OPUS=ON \\'
+replacement = '-DWITH_OPUS=OFF \'

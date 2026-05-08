@@ -33,7 +33,7 @@
 Name:           freerdp
 Epoch:          2
 Version:        3.22.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Free implementation of the Remote Desktop Protocol (RDP)
 
 # The effective license is Apache-2.0 but:
@@ -93,7 +93,6 @@ BuildRequires:  pkgconfig(libsystemd)
 BuildRequires:  pkgconfig(libusb-1.0)
 BuildRequires:  pkgconfig(libwebp)
 BuildRequires:  pkgconfig(openssl)
-BuildRequires:  pkgconfig(opus)
 %{?_with_sdl_client:BuildRequires:  cmake(SDL3)}
 %{?_with_sdl_client:BuildRequires:  cmake(SDL3_image)}
 %{?_with_sdl_client:BuildRequires:  cmake(SDL3_ttf)}
@@ -212,7 +211,7 @@ find . -name "*.c" -exec chmod 664 {} \;
     -DWITH_OPENCL=%{?_with_opencl:ON}%{?!_with_opencl:OFF} \
     -DWITH_OPENH264=%{?_with_openh264:ON}%{?!_with_openh264:OFF} \
     -DWITH_OPENSSL=ON \
-    -DWITH_OPUS=ON \
+    -DWITH_OPUS=OFF \
     -DWITH_PCSC=ON \
     -DWITH_PKCS11=ON \
     -DWITH_PULSE=ON \
