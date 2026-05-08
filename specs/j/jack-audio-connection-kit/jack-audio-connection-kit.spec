@@ -17,7 +17,7 @@
 Summary:       The Jack Audio Connection Kit
 Name:          jack-audio-connection-kit
 Version:       1.9.22
-Release: 11%{?dist}
+Release: 12%{?dist}
 # The entire source (~500 files) is a mixture of these three licenses
 # Automatically converted from old format: GPLv2 and GPLv2+ and LGPLv2+ - review is highly recommended.
 License:       GPL-2.0-only AND GPL-2.0-or-later AND LicenseRef-Callaway-LGPLv2+
@@ -46,7 +46,6 @@ BuildRequires: libffado-devel
 BuildRequires: libsamplerate-devel
 BuildRequires: libsndfile-devel
 BuildRequires: ncurses-devel
-BuildRequires: opus-devel
 BuildRequires: pkgconfig
 BuildRequires: python3
 
@@ -99,6 +98,7 @@ EOF
 %set_build_flags
 export PREFIX=%{_prefix}
 python3 ./waf configure \
+   --no-opus \
    --mandir=%{_mandir}/man1 \
    --libdir=%{_libdir} \
    --doxygen \
