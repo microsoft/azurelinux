@@ -4000,8 +4000,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "10.5.0",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.0.tar.gz"
+          "version": "10.5.4",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.4.tar.gz"
         }
       }
     },
@@ -4730,8 +4730,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.2-1/go1.26.2-20260407.2.src.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.3-1/go1.26.3-20260508.1.src.tar.gz"
         }
       }
     },
@@ -4740,8 +4740,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.9-1/go1.25.9-20260407.1.src.tar.gz"
+          "version": "1.25.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.10-1/go1.25.10-20260507.2.src.tar.gz"
         }
       }
     },
@@ -6650,8 +6650,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.134.1.tar.gz"
+          "version": "6.6.137.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.137.1.tar.gz"
         }
       }
     },
@@ -7631,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.3.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.5.tar.gz"
         }
       }
     },
@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.134.1.tar.gz"
+          "version": "6.6.137.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.137.1.tar.gz"
         }
       }
     },
@@ -8341,8 +8341,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.134.1.tar.gz"
+          "version": "6.6.137.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.137.1.tar.gz"
         }
       }
     },
@@ -8351,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.134.1.tar.gz"
+          "version": "6.6.137.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.137.1.tar.gz"
         }
       }
     },
@@ -8361,8 +8361,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.83.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.83.1.tar.gz"
+          "version": "6.12.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.85.1.tar.gz"
         }
       }
     },
@@ -8371,8 +8371,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.83.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.83.1.tar.gz"
+          "version": "6.12.85.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.85.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.134.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.134.1.tar.gz"
+          "version": "6.6.137.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.137.1.tar.gz"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.135.mshv2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.135.mshv2.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv1.tar.gz"
         }
       }
     },
@@ -8431,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.6.130.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.130.mshv1.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.137.mshv1.tar.gz"
         }
       }
     },

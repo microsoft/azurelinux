@@ -26,7 +26,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-64k
-Version:        6.6.134.1
+Version:        6.6.137.1
 Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -380,11 +380,11 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
-* Mon Apr 20 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.134.1-2
+* Fri May 01 2026 Lanze Liu <lanzeliu@microsoft.com> - 6.6.137.1-2
 - Bump release to match kernel,kernel-ipe
 
-* Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.134.1-1
-- Auto-upgrade to 6.6.134.1
+* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.137.1-1
+- Auto-upgrade to 6.6.137.1
 
 * Fri Mar 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.130.1-3
 - Bump release to match kernel,kernel-ipe
