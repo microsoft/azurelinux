@@ -1,0 +1,39 @@
+[components.libsndfile]
+
+# AZL does not ship opus — remove the BR and explicitly disable external Xiph
+# libs (FLAC, Ogg, Vorbis, Opus).  Upstream configure.ac requires ALL four Xiph
+# codecs present or none; removing opus-devel alone would silently disable the
+# other three as well.  We make this explicit with --disable-external-libs and
+# drop the now-dead flac/ogg/vorbis BRs to keep the dep graph honest.
+
+[[components.libsndfile.overlays]]
+description = "Remove opus-devel BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"
+
+[[components.libsndfile.overlays]]
+description = "Drop dead flac-devel BR (libsndfile builds without external Xiph)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "flac-devel"
+
+[[components.libsndfile.overlays]]
+description = "Drop dead libogg-devel BR"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libogg-devel"
+
+[[components.libsndfile.overlays]]
+description = "Drop dead libvorbis-devel BR"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libvorbis-devel"
+
+[[components.libsndfile.overlays]]
+description = "Explicitly disable external Xiph libs rather than relying on missing BRs"
+type = "spec-search-replace"
+section = "%build"
+regex = '--enable-mpeg \\'
+replacement = """--enable-mpeg \\
+\t--disable-external-libs \\"""

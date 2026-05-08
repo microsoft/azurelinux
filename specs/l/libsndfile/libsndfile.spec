@@ -4,7 +4,7 @@
 Summary:	Library for reading and writing sound files
 Name:		libsndfile
 Version:	1.2.2
-Release: 11%{?dist}
+Release: 12%{?dist}
 License:	LGPL-2.1-or-later AND GPL-2.0-or-later AND BSD-3-Clause
 URL:		http://libsndfile.github.io/libsndfile/
 Source0:        https://github.com/libsndfile/libsndfile/releases/download/%{version}/libsndfile-%{version}.tar.xz
@@ -20,17 +20,13 @@ BuildRequires:  autogen
 %endif
 BuildRequires:  gcc-c++
 BuildRequires:	alsa-lib-devel
-BuildRequires:	flac-devel
 BuildRequires:	gcc
-BuildRequires:	libogg-devel
-BuildRequires:	libvorbis-devel
 BuildRequires:	pkgconfig
 BuildRequires:	sqlite-devel
 BuildRequires:	gsm-devel
 BuildRequires:	libtool
 BuildRequires:	make
 BuildRequires:	python3
-BuildRequires:  opus-devel
 BuildRequires:  lame-devel
 BuildRequires:  mpg123-devel
 
@@ -80,6 +76,7 @@ autoreconf -I M4 -fiv # for system-gsm patch
 	--enable-alsa \
 	--enable-largefile \
 	--enable-mpeg \
+	--disable-external-libs \
 	--disable-static
 
 # Get rid of rpath
