@@ -36,7 +36,6 @@ packages = [
     "CppMicroServices", # srpm: CppMicroServices
     "CppMicroServices-devel", # srpm: CppMicroServices
     "CppMicroServices-docs", # srpm: CppMicroServices
-    "DirectX-Headers-devel", # srpm: DirectX-Headers
     "FP16-devel", # srpm: FP16
     "GraphicsMagick", # srpm: GraphicsMagick
     "GraphicsMagick-c++", # srpm: GraphicsMagick
@@ -3793,7 +3792,6 @@ packages = [
     "mimalloc-devel", # srpm: mimalloc
     "mingw-binutils-generic", # srpm: mingw-binutils
     "mingw-filesystem-base", # srpm: mingw-filesystem
-    "mingw-srvany-redistributable", # srpm: mingw-srvany
     "mingw32-adwaita-icon-theme", # srpm: mingw-adwaita-icon-theme
     "mingw32-angleproject", # srpm: mingw-angleproject
     "mingw32-angleproject-static", # srpm: mingw-angleproject
@@ -3808,19 +3806,13 @@ packages = [
     "mingw32-bsdtar", # srpm: mingw-libarchive
     "mingw32-bzip2", # srpm: mingw-bzip2
     "mingw32-bzip2-static", # srpm: mingw-bzip2
-    "mingw32-c-ares", # srpm: mingw-c-ares
     "mingw32-cairo", # srpm: mingw-cairo
     "mingw32-cairo-static", # srpm: mingw-cairo
     "mingw32-cereal", # srpm: cereal
-    "mingw32-cfitsio", # srpm: mingw-cfitsio
-    "mingw32-cfitsio-tools", # srpm: mingw-cfitsio
     "mingw32-cpp", # srpm: mingw-gcc
     "mingw32-crt", # srpm: mingw-crt
     "mingw32-curl", # srpm: mingw-curl
     "mingw32-curl-static", # srpm: mingw-curl
-    "mingw32-dbus", # srpm: mingw-dbus
-    "mingw32-dbus-static", # srpm: mingw-dbus
-    "mingw32-directx-headers", # srpm: DirectX-Headers
     "mingw32-dlfcn", # srpm: mingw-dlfcn
     "mingw32-dlfcn-static", # srpm: mingw-dlfcn
     "mingw32-expat", # srpm: mingw-expat
@@ -3863,7 +3855,6 @@ packages = [
     "mingw32-hunspell-static", # srpm: mingw-hunspell
     "mingw32-hunspell-tools", # srpm: mingw-hunspell
     "mingw32-icu", # srpm: mingw-icu
-    "mingw32-imath", # srpm: mingw-imath
     "mingw32-json-glib", # srpm: mingw-json-glib
     "mingw32-jxrlib", # srpm: jxrlib
     "mingw32-lcms2", # srpm: mingw-lcms2
@@ -3880,7 +3871,6 @@ packages = [
     "mingw32-libgomp", # srpm: mingw-gcc
     "mingw32-libgpg-error", # srpm: mingw-libgpg-error
     "mingw32-libgpg-error-static", # srpm: mingw-libgpg-error
-    "mingw32-libgta", # srpm: mingw-libgta
     "mingw32-libidn2", # srpm: mingw-libidn2
     "mingw32-libidn2-static", # srpm: mingw-libidn2
     "mingw32-libimagequant", # srpm: mingw-libimagequant
@@ -3913,15 +3903,8 @@ packages = [
     "mingw32-pdcurses", # srpm: mingw-pdcurses
     "mingw32-pixman", # srpm: mingw-pixman
     "mingw32-pixman-static", # srpm: mingw-pixman
-    "mingw32-poppler", # srpm: mingw-poppler
-    "mingw32-poppler-cpp", # srpm: mingw-poppler
-    "mingw32-poppler-glib", # srpm: mingw-poppler
-    "mingw32-poppler-qt5", # srpm: mingw-poppler
-    "mingw32-poppler-qt6", # srpm: mingw-poppler
     "mingw32-portablexdr", # srpm: mingw-portablexdr
     "mingw32-portablexdr-static", # srpm: mingw-portablexdr
-    "mingw32-postgresql", # srpm: mingw-postgresql
-    "mingw32-postgresql-static", # srpm: mingw-postgresql
     "mingw32-python3", # srpm: mingw-python3
     "mingw32-python3-Cython", # srpm: mingw-Cython
     "mingw32-python3-build", # srpm: mingw-python-build
@@ -3938,16 +3921,10 @@ packages = [
     "mingw32-python3-test", # srpm: mingw-python3
     "mingw32-python3-tkinter", # srpm: mingw-python3
     "mingw32-python3-wheel", # srpm: mingw-python-wheel
-    "mingw32-qt5-qmake", # srpm: mingw-qt5-qtbase
-    "mingw32-qt5-qtbase", # srpm: mingw-qt5-qtbase
-    "mingw32-qt5-qtbase-devel", # srpm: mingw-qt5-qtbase
-    "mingw32-qt5-qtbase-static", # srpm: mingw-qt5-qtbase
-    "mingw32-qt6-qtbase", # srpm: mingw-qt6-qtbase
     "mingw32-readline", # srpm: mingw-readline
     "mingw32-readline-static", # srpm: mingw-readline
     "mingw32-sqlite", # srpm: mingw-sqlite
     "mingw32-sqlite-static", # srpm: mingw-sqlite
-    "mingw32-srvany", # srpm: mingw-srvany
     "mingw32-taglib", # srpm: taglib
     "mingw32-tcl", # srpm: mingw-tcl
     "mingw32-termcap", # srpm: mingw-termcap
@@ -3957,8 +3934,6 @@ packages = [
     "mingw32-tk", # srpm: mingw-tk
     "mingw32-turbojpeg", # srpm: mingw-libjpeg-turbo
     "mingw32-turbojpeg-static", # srpm: mingw-libjpeg-turbo
-    "mingw32-vulkan-headers", # srpm: mingw-vulkan-headers
-    "mingw32-vulkan-loader", # srpm: mingw-vulkan-loader
     "mingw32-wavpack", # srpm: wavpack
     "mingw32-wavpack-tools", # srpm: wavpack
     "mingw32-win-iconv", # srpm: mingw-win-iconv
@@ -3985,19 +3960,13 @@ packages = [
     "mingw64-bsdtar", # srpm: mingw-libarchive
     "mingw64-bzip2", # srpm: mingw-bzip2
     "mingw64-bzip2-static", # srpm: mingw-bzip2
-    "mingw64-c-ares", # srpm: mingw-c-ares
     "mingw64-cairo", # srpm: mingw-cairo
     "mingw64-cairo-static", # srpm: mingw-cairo
     "mingw64-cereal", # srpm: cereal
-    "mingw64-cfitsio", # srpm: mingw-cfitsio
-    "mingw64-cfitsio-tools", # srpm: mingw-cfitsio
     "mingw64-cpp", # srpm: mingw-gcc
     "mingw64-crt", # srpm: mingw-crt
     "mingw64-curl", # srpm: mingw-curl
     "mingw64-curl-static", # srpm: mingw-curl
-    "mingw64-dbus", # srpm: mingw-dbus
-    "mingw64-dbus-static", # srpm: mingw-dbus
-    "mingw64-directx-headers", # srpm: DirectX-Headers
     "mingw64-dlfcn", # srpm: mingw-dlfcn
     "mingw64-dlfcn-static", # srpm: mingw-dlfcn
     "mingw64-expat", # srpm: mingw-expat
@@ -4040,7 +4009,6 @@ packages = [
     "mingw64-hunspell-static", # srpm: mingw-hunspell
     "mingw64-hunspell-tools", # srpm: mingw-hunspell
     "mingw64-icu", # srpm: mingw-icu
-    "mingw64-imath", # srpm: mingw-imath
     "mingw64-json-glib", # srpm: mingw-json-glib
     "mingw64-jxrlib", # srpm: jxrlib
     "mingw64-lcms2", # srpm: mingw-lcms2
@@ -4057,7 +4025,6 @@ packages = [
     "mingw64-libgomp", # srpm: mingw-gcc
     "mingw64-libgpg-error", # srpm: mingw-libgpg-error
     "mingw64-libgpg-error-static", # srpm: mingw-libgpg-error
-    "mingw64-libgta", # srpm: mingw-libgta
     "mingw64-libidn2", # srpm: mingw-libidn2
     "mingw64-libidn2-static", # srpm: mingw-libidn2
     "mingw64-libimagequant", # srpm: mingw-libimagequant
@@ -4090,15 +4057,8 @@ packages = [
     "mingw64-pdcurses", # srpm: mingw-pdcurses
     "mingw64-pixman", # srpm: mingw-pixman
     "mingw64-pixman-static", # srpm: mingw-pixman
-    "mingw64-poppler", # srpm: mingw-poppler
-    "mingw64-poppler-cpp", # srpm: mingw-poppler
-    "mingw64-poppler-glib", # srpm: mingw-poppler
-    "mingw64-poppler-qt5", # srpm: mingw-poppler
-    "mingw64-poppler-qt6", # srpm: mingw-poppler
     "mingw64-portablexdr", # srpm: mingw-portablexdr
     "mingw64-portablexdr-static", # srpm: mingw-portablexdr
-    "mingw64-postgresql", # srpm: mingw-postgresql
-    "mingw64-postgresql-static", # srpm: mingw-postgresql
     "mingw64-python3", # srpm: mingw-python3
     "mingw64-python3-Cython", # srpm: mingw-Cython
     "mingw64-python3-build", # srpm: mingw-python-build
@@ -4115,11 +4075,6 @@ packages = [
     "mingw64-python3-test", # srpm: mingw-python3
     "mingw64-python3-tkinter", # srpm: mingw-python3
     "mingw64-python3-wheel", # srpm: mingw-python-wheel
-    "mingw64-qt5-qmake", # srpm: mingw-qt5-qtbase
-    "mingw64-qt5-qtbase", # srpm: mingw-qt5-qtbase
-    "mingw64-qt5-qtbase-devel", # srpm: mingw-qt5-qtbase
-    "mingw64-qt5-qtbase-static", # srpm: mingw-qt5-qtbase
-    "mingw64-qt6-qtbase", # srpm: mingw-qt6-qtbase
     "mingw64-readline", # srpm: mingw-readline
     "mingw64-readline-static", # srpm: mingw-readline
     "mingw64-sqlite", # srpm: mingw-sqlite
@@ -4133,8 +4088,6 @@ packages = [
     "mingw64-tk", # srpm: mingw-tk
     "mingw64-turbojpeg", # srpm: mingw-libjpeg-turbo
     "mingw64-turbojpeg-static", # srpm: mingw-libjpeg-turbo
-    "mingw64-vulkan-headers", # srpm: mingw-vulkan-headers
-    "mingw64-vulkan-loader", # srpm: mingw-vulkan-loader
     "mingw64-wavpack", # srpm: wavpack
     "mingw64-wavpack-tools", # srpm: wavpack
     "mingw64-win-iconv", # srpm: mingw-win-iconv
@@ -24514,7 +24467,6 @@ packages = [
     "ucrt64-binutils", # srpm: mingw-binutils
     "ucrt64-cpp", # srpm: mingw-gcc
     "ucrt64-crt", # srpm: mingw-crt
-    "ucrt64-directx-headers", # srpm: DirectX-Headers
     "ucrt64-dlfcn", # srpm: mingw-dlfcn
     "ucrt64-dlfcn-static", # srpm: mingw-dlfcn
     "ucrt64-filesystem", # srpm: mingw-filesystem
