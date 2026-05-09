@@ -2,3 +2,10 @@
 # Fedora repo does not host 1.93, which the spec gets pinned to. Fetch
 # spec from a more recent commit to pickup version - 1.94.1.
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "b431103e3e71d30dda680c95d2f5d4fe50003436" }
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+[[components.rust.overlays]]
+description = "Disable mingw cross-compilation targets — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = '%global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'
+replacement = '#global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'

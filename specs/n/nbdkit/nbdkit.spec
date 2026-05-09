@@ -30,7 +30,7 @@
 
 # Enable mingw subpackage on Fedora only.
 %if 0%{?fedora}
-%global have_mingw 1
+%global have_mingw 0
 %endif
 
 # Enable nbdkit-selinux package.
@@ -58,7 +58,7 @@
 
 Name:           nbdkit
 Version:        1.46.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        NBD server
 
 License:        BSD-3-Clause

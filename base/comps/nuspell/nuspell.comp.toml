@@ -1,0 +1,118 @@
+[components.nuspell]
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# Remove all mingw subpackages and their build dependencies.
+
+[[components.nuspell.overlays]]
+description = "Remove mingw32-nuspell subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-remove-subpackage"
+package = "mingw32-%{name}"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw64-nuspell subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-%{name}"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw32-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-filesystem"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw32-dlfcn BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-dlfcn"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw32-gcc-c++ BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-gcc-c++"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw32-icu BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-icu"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw64-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-filesystem"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw64-dlfcn BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-dlfcn"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw64-gcc-c++ BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-gcc-c++"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw64-icu BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-icu"
+
+[[components.nuspell.overlays]]
+description = "Remove mingw cmake build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw_cmake -DBUILD_TESTING=OFF$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw make build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw_make_build$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw install step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw_make_install$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw docdir cleanup (mingw32)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm -rf %\{buildroot\}%\{mingw32_docdir\}/%\{name\}$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw docdir cleanup (mingw64)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm -rf %\{buildroot\}%\{mingw64_docdir\}/%\{name\}$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw mandir cleanup (mingw32)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm -rf %\{buildroot\}%\{mingw32_mandir\}$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw mandir cleanup (mingw64)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^rm -rf %\{buildroot\}%\{mingw64_mandir\}$'
+replacement = ''
+
+[[components.nuspell.overlays]]
+description = "Remove mingw debug install post step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw_debug_install_post$'
+replacement = ''

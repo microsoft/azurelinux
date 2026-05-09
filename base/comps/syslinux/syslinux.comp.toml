@@ -1,3 +1,48 @@
 [components.syslinux]
 # Release: 0.33%{?dist}
 release = { calculation = "manual" }
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# The mingw-gcc BuildRequires are used to cross-compile syslinux.exe/syslinux64.exe
+# (Windows tools for installing syslinux from Windows), which are not needed on AZL.
+
+[[components.syslinux.overlays]]
+description = "Remove mingw32-gcc BuildRequires (ix86) — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = '^BuildRequires: mingw32-gcc$'
+replacement = ''
+
+[[components.syslinux.overlays]]
+description = "Remove mingw32-gcc mingw64-gcc BuildRequires (x86_64)"
+type = "spec-search-replace"
+regex = '^BuildRequires: mingw32-gcc mingw64-gcc$'
+replacement = ''
+
+[[components.syslinux.overlays]]
+description = "Remove syslinux.exe from main package files (ix86)"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{_datadir\}/syslinux/syslinux\.exe$'
+replacement = ''
+
+[[components.syslinux.overlays]]
+description = "Remove syslinux64.exe from main package files (x86_64)"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{_datadir\}/syslinux/syslinux64\.exe$'
+replacement = ''
+
+[[components.syslinux.overlays]]
+description = "Remove *.exe glob from nonlinux subpackage files"
+type = "spec-search-replace"
+section = "%files"
+package = "nonlinux"
+regex = '^%\{_datadir\}/syslinux/\*\.exe$'
+replacement = ''
+
+[[components.syslinux.overlays]]
+description = "Remove *.exe exclude for non-x86_64"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%exclude %\{_datadir\}/syslinux/\*\.exe$'
+replacement = ''

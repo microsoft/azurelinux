@@ -4,7 +4,7 @@
 Name:          giflib
 Summary:       A library and utilities for processing GIFs
 Version:       5.2.2
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 License:       MIT
 URL:           http://www.sourceforge.net/projects/%{name}/
@@ -27,11 +27,7 @@ BuildRequires: cmake
 BuildRequires: gcc
 BuildRequires: xmlto
 
-BuildRequires: mingw32-filesystem
-BuildRequires: mingw32-gcc
 
-BuildRequires: mingw64-filesystem
-BuildRequires: mingw64-gcc
 
 
 %description
@@ -55,45 +51,6 @@ Requires:      %{name}%{?_isa} = %{version}-%{release}
 The giflib-utils package contains various programs for manipulating GIF
 format image files.
 
-%package -n mingw32-%{name}
-Summary:       MinGW Windows %{name} library
-Obsoletes:     mingw32-%{name}-static
-BuildArch:     noarch
-
-%description -n mingw32-%{name}
-%{summary}.
-
-
-%package -n mingw32-%{name}-tools
-Summary:       Tools for the MinGW Windows %{name} library
-Requires:      mingw32-%{name} = %{version}-%{release}
-BuildArch:     noarch
-
-%description -n mingw32-%{name}-tools
-%{summary}.
-
-
-%package -n mingw64-%{name}
-Summary:       MinGW Windows %{name} library
-Obsoletes:     mingw64-%{name}-static
-BuildArch:     noarch
-
-%description -n mingw64-%{name}
-%{summary}.
-
-
-%package -n mingw64-%{name}-tools
-Summary:       Tools for the MinGW Windows %{name} library
-Requires:      mingw64-%{name} = %{version}-%{release}
-BuildArch:     noarch
-
-%description -n mingw64-%{name}-tools
-%{summary}.
-
-
-%{?mingw_debug_package}
-
-
 %prep
 %autosetup -p1
 cp -a %{SOURCE1} .
@@ -104,18 +61,18 @@ cp -a %{SOURCE1} .
 %cmake_build
 
 # MinGW build
-%mingw_cmake
-%mingw_make_build
+
+
 
 
 %install
 %cmake_install
-%mingw_make_install
-rm -rf %{buildroot}%{mingw32_mandir}
-rm -rf %{buildroot}%{mingw64_mandir}
 
 
-%mingw_debug_install_post
+
+
+
+
 
 
 %files
@@ -132,27 +89,6 @@ rm -rf %{buildroot}%{mingw64_mandir}
 %files utils
 %{_bindir}/gif*
 %{_mandir}/man1/*.1*
-
-%files -n mingw32-%{name}
-%license COPYING
-%{mingw32_bindir}/libgif-7.dll
-%{mingw32_includedir}/gif_lib.h
-%{mingw32_includedir}/gif_getarg.h
-%{mingw32_libdir}/libgif.dll.a
-
-%files -n mingw32-%{name}-tools
-%{mingw32_bindir}/*.exe
-
-%files -n mingw64-%{name}
-%license COPYING
-%{mingw64_bindir}/libgif-7.dll
-%{mingw64_includedir}/gif_lib.h
-%{mingw64_includedir}/gif_getarg.h
-%{mingw64_libdir}/libgif.dll.a
-
-%files -n mingw64-%{name}-tools
-%{mingw64_bindir}/*.exe
-
 
 %changelog
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.2.2-8

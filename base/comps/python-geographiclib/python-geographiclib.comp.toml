@@ -1,0 +1,85 @@
+[components.python-geographiclib]
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# Remove all mingw subpackages and their build dependencies.
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32-python3-geographiclib subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-remove-subpackage"
+package = "mingw32-python3-%{pkg_name}"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64-python3-geographiclib subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-python3-%{pkg_name}"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-filesystem"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32-python3 BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-python3"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32-python3-build BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-python3-build"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-filesystem"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64-python3 BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-python3"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64-python3-build BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-python3-build"
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32 wheel build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw32_py3_build_wheel$'
+replacement = ''
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64 wheel build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw64_py3_build_wheel$'
+replacement = ''
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw32 wheel install step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw32_py3_install_wheel$'
+replacement = ''
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw64 wheel install step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw64_py3_install_wheel$'
+replacement = ''
+
+[[components.python-geographiclib.overlays]]
+description = "Remove mingw debug install post step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw_debug_install_post$'
+replacement = ''

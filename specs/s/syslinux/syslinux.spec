@@ -44,11 +44,11 @@ Requires: syslinux-nonlinux = %{version}-%{release}
 %endif
 %ifarch %{ix86}
 Requires: mtools, libc.so.6
-BuildRequires: mingw32-gcc
+
 %endif
 %ifarch x86_64
 Requires: mtools, libc.so.6()(64bit)
-BuildRequires: mingw32-gcc mingw64-gcc
+
 %endif
 
 %description
@@ -183,9 +183,9 @@ rm -f %{buildroot}%{_includedir}/syslinux.h
 %dir %{_datadir}/syslinux/diag
 %{_datadir}/syslinux/diag/*
 %ifarch %{ix86}
-%{_datadir}/syslinux/syslinux.exe
+
 %else
-%{_datadir}/syslinux/syslinux64.exe
+
 %endif
 
 %files perl
@@ -221,7 +221,7 @@ rm -f %{buildroot}%{_includedir}/syslinux.h
 
 %files nonlinux
 %{_datadir}/syslinux/*.com
-%{_datadir}/syslinux/*.exe
+
 %{_datadir}/syslinux/*.c32
 %{_datadir}/syslinux/*.bin
 %{_datadir}/syslinux/*.0
@@ -233,7 +233,7 @@ rm -f %{buildroot}%{_includedir}/syslinux.h
 %else
 %exclude %{_datadir}/syslinux/memdisk
 %exclude %{_datadir}/syslinux/*.com
-%exclude %{_datadir}/syslinux/*.exe
+
 %exclude %{_datadir}/syslinux/*.c32
 %exclude %{_datadir}/syslinux/*.bin
 %exclude %{_datadir}/syslinux/*.0

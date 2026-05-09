@@ -3,7 +3,7 @@
 
 Name:           jxrlib
 Version:        1.1
-Release: 33%{?dist}
+Release: 34%{?dist}
 Summary:        Open source implementation of jpegxr
 
 # See JPEGXR_DPK_Spec_1.0.doc. Upstream request for plain text license file at
@@ -23,16 +23,11 @@ Source2:        JPEGXR_DPK_Spec_1.0.pdf
 # See https://jxrlib.codeplex.com/workitem/13
 Patch0:         jxrlib_warnings.patch
 # Mingw build fixes
-Patch1:         jxrlib_mingw.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc
 
-BuildRequires: mingw32-filesystem >= 95
-BuildRequires: mingw32-gcc
 
-BuildRequires: mingw64-filesystem >= 95
-BuildRequires: mingw64-gcc
 
 
 %description
@@ -46,25 +41,6 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
-
-
-%package -n mingw32-%{name}
-Summary:       MinGW Windows JPEG XR library
-BuildArch:     noarch
-
-%description -n mingw32-%{name}
-MinGW Windows JPEG XR library.
-
-
-%package -n mingw64-%{name}
-Summary:       MinGW Windows JPEG XR library
-BuildArch:     noarch
-
-%description -n mingw64-%{name}
-MinGW Windows JPEG XR library.
-
-
-%{?mingw_debug_package}
 
 
 %prep
@@ -93,20 +69,20 @@ cp -a %{SOURCE2} doc
 %cmake_build
 
 # MinGW build
-%mingw_cmake
-%mingw_make_build
+
+
 
 
 %install
 %cmake_install
-%mingw_make_install
+
 
 # Delete guiddef.h which conflicts with guiddef.h shipped by mingw-headers
-rm -f %{buildroot}%{mingw32_includedir}/jxrlib/guiddef.h
-rm -f %{buildroot}%{mingw64_includedir}/jxrlib/guiddef.h
 
 
-%mingw_debug_install_post
+
+
+
 
 
 %files
@@ -120,25 +96,6 @@ rm -f %{buildroot}%{mingw64_includedir}/jxrlib/guiddef.h
 %{_includedir}/jxrlib/
 %{_libdir}/libjpegxr.so
 %{_libdir}/libjxrglue.so
-
-%files -n mingw32-%{name}
-%{mingw32_bindir}/libjpegxr.dll
-%{mingw32_bindir}/libjxrglue.dll
-%{mingw32_bindir}/JxrDecApp.exe
-%{mingw32_bindir}/JxrEncApp.exe
-%{mingw32_includedir}/jxrlib/
-%{mingw32_libdir}/libjpegxr.dll.a
-%{mingw32_libdir}/libjxrglue.dll.a
-
-%files -n mingw64-%{name}
-%{mingw64_bindir}/libjpegxr.dll
-%{mingw64_bindir}/libjxrglue.dll
-%{mingw64_bindir}/JxrDecApp.exe
-%{mingw64_bindir}/JxrEncApp.exe
-%{mingw64_includedir}/jxrlib/
-%{mingw64_libdir}/libjpegxr.dll.a
-%{mingw64_libdir}/libjxrglue.dll.a
-
 
 %changelog
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-32

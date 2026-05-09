@@ -1,0 +1,78 @@
+[components.hidapi]
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# Remove all mingw subpackages and their build dependencies.
+
+[[components.hidapi.overlays]]
+description = "Remove mingw32-hidapi subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-remove-subpackage"
+package = "mingw32-hidapi"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw64-hidapi subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-hidapi"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw32-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-filesystem >= 95"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw32-gcc BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-gcc"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw32-binutils BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-binutils"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw64-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-filesystem >= 95"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw64-gcc BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-gcc"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw64-binutils BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-binutils"
+
+[[components.hidapi.overlays]]
+description = "Remove mingw cmake build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw_cmake$'
+replacement = ''
+
+[[components.hidapi.overlays]]
+description = "Remove mingw make build step"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\%mingw_make_build$'
+replacement = ''
+
+[[components.hidapi.overlays]]
+description = "Remove mingw install step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw_make_install$'
+replacement = ''
+
+[[components.hidapi.overlays]]
+description = "Remove mingw debug install post step"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\%mingw_debug_install_post$'
+replacement = ''

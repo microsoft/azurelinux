@@ -17,3 +17,10 @@ description = "Disable OCaml plugin until OCaml bootstrap is resolved"
 type = "spec-search-replace"
 regex = '%global have_ocaml 1'
 replacement = '%global have_ocaml 0'
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+[[components.nbdkit.overlays]]
+description = "Disable mingw subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = '%global have_mingw 1'
+replacement = '%global have_mingw 0'
