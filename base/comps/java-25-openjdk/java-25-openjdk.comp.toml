@@ -4,4 +4,18 @@ release = { calculation = "manual" }
 # Current java-25 build requires java-25-openjdk-portable-sources version 25.0.20.0.10.
 # Fed43 portable rpm delivers 25.0.0.0.32. Fedora43 builds work with Fed42 rpm. To
 # unblock our build, we pin to the last Fedora 43 commit when version was 25.0.0.0.32.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "6011214a0e0e5c6302d0d59b6e8805d049749420" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "5443056bc5b97bcc78e36144b6a28b8937dc6cee" }
+# Disable slowdebug variant builds; we don't ship -slowdebug subpackages.
+build.without = ["slowdebug"]
+
+[components.java-25-openjdk.build.defines]
+# AZL-only release counter. Added to upstream's %{rpmrelease} so the final
+# Release tag is a single number (Fedora-style schema). Bump when shipping
+# new AZL-only changes on top of the pinned upstream commit.
+azl_release = "2"
+
+[[components.java-25-openjdk.overlays]]
+description = "Add azl_release to upstream %{rpmrelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = '^Release:\s+%\{\?eaprefix\}%\{rpmrelease\}%\{\?extraver\}%\{\?dist\}$'
+replacement = 'Release: %{?eaprefix}%[%{rpmrelease} + %{azl_release}]%{?extraver}%{?dist}'

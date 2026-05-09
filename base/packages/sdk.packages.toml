@@ -2754,15 +2754,12 @@ packages = [
     "java-25-openjdk-portable", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-devel", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-devel-fastdebug", # srpm: java-25-openjdk-portable
-    "java-25-openjdk-portable-devel-slowdebug", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-docs", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-fastdebug", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-misc", # srpm: java-25-openjdk-portable
-    "java-25-openjdk-portable-slowdebug", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-sources", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-static-libs", # srpm: java-25-openjdk-portable
     "java-25-openjdk-portable-static-libs-fastdebug", # srpm: java-25-openjdk-portable
-    "java-25-openjdk-portable-static-libs-slowdebug", # srpm: java-25-openjdk-portable
     "java-z3", # srpm: z3
     "javascriptcoregtk4.1", # srpm: webkitgtk
     "javascriptcoregtk4.1-devel", # srpm: webkitgtk

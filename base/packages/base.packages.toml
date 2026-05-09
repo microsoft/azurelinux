@@ -2469,26 +2469,19 @@ packages = [
     "java-25-openjdk", # srpm: java-25-openjdk
     "java-25-openjdk-demo", # srpm: java-25-openjdk
     "java-25-openjdk-demo-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-demo-slowdebug", # srpm: java-25-openjdk
     "java-25-openjdk-devel", # srpm: java-25-openjdk
     "java-25-openjdk-devel-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-devel-slowdebug", # srpm: java-25-openjdk
     "java-25-openjdk-fastdebug", # srpm: java-25-openjdk
     "java-25-openjdk-headless", # srpm: java-25-openjdk
     "java-25-openjdk-headless-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-headless-slowdebug", # srpm: java-25-openjdk
     "java-25-openjdk-javadoc", # srpm: java-25-openjdk
     "java-25-openjdk-javadoc-zip", # srpm: java-25-openjdk
     "java-25-openjdk-jmods", # srpm: java-25-openjdk
     "java-25-openjdk-jmods-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-jmods-slowdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-slowdebug", # srpm: java-25-openjdk
     "java-25-openjdk-src", # srpm: java-25-openjdk
     "java-25-openjdk-src-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-src-slowdebug", # srpm: java-25-openjdk
     "java-25-openjdk-static-libs", # srpm: java-25-openjdk
     "java-25-openjdk-static-libs-fastdebug", # srpm: java-25-openjdk
-    "java-25-openjdk-static-libs-slowdebug", # srpm: java-25-openjdk
     "java-hdf", # srpm: hdf
     "java-hdf5", # srpm: hdf5
     "java-srpm-macros", # srpm: java-rpm-macros
