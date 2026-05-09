@@ -1,6 +1,0 @@
---- portablexdr-4.9.1/rpc/rpc.h.old	2011-07-05 14:36:57.938389205 +0100
-+++ portablexdr-4.9.1/rpc/rpc.h	2011-07-05 14:37:04.213519063 +0100
-@@ -1,3 +1,2 @@
--#include "config.h"
- #include <rpc/types.h>
- #include <rpc/xdr.h>
