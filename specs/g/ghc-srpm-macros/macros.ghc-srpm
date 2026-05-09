@@ -8,10 +8,10 @@
 %ghc_devel_prof prof
 
 # enable profiling libraries in prof subpkgs (deprecated)
-%with_ghc_prof 1
+%with_ghc_prof 0
 
 %ghc_profiling\
-%bcond ghc_prof 1
+%bcond ghc_prof 0
 
 # -q for quick build
 # -p for no prof

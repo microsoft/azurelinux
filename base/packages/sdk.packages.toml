@@ -878,235 +878,177 @@ packages = [
     "ghc-Cabal", # srpm: ghc
     "ghc-Cabal-devel", # srpm: ghc
     "ghc-Cabal-doc", # srpm: ghc
-    "ghc-Cabal-prof", # srpm: ghc
     "ghc-Cabal-syntax", # srpm: ghc
     "ghc-Cabal-syntax-devel", # srpm: ghc
     "ghc-Cabal-syntax-doc", # srpm: ghc
-    "ghc-Cabal-syntax-prof", # srpm: ghc
     "ghc-Glob", # srpm: ghc-Glob
     "ghc-Glob-devel", # srpm: ghc-Glob
     "ghc-Glob-doc", # srpm: ghc-Glob
-    "ghc-Glob-prof", # srpm: ghc-Glob
     "ghc-HTTP", # srpm: ghc-HTTP
     "ghc-HTTP-devel", # srpm: ghc-HTTP
     "ghc-HTTP-doc", # srpm: ghc-HTTP
-    "ghc-HTTP-prof", # srpm: ghc-HTTP
     "ghc-HUnit", # srpm: ghc-HUnit
     "ghc-HUnit-devel", # srpm: ghc-HUnit
     "ghc-HUnit-doc", # srpm: ghc-HUnit
-    "ghc-HUnit-prof", # srpm: ghc-HUnit
     "ghc-JuicyPixels", # srpm: ghc-JuicyPixels
     "ghc-JuicyPixels-devel", # srpm: ghc-JuicyPixels
     "ghc-JuicyPixels-doc", # srpm: ghc-JuicyPixels
-    "ghc-JuicyPixels-prof", # srpm: ghc-JuicyPixels
     "ghc-OneTuple", # srpm: ghc-aeson
     "ghc-OneTuple-devel", # srpm: ghc-aeson
     "ghc-OneTuple-doc", # srpm: ghc-aeson
-    "ghc-OneTuple-prof", # srpm: ghc-aeson
     "ghc-Only", # srpm: ghc-Only
     "ghc-Only-devel", # srpm: ghc-Only
     "ghc-Only-doc", # srpm: ghc-Only
-    "ghc-Only-prof", # srpm: ghc-Only
     "ghc-QuickCheck", # srpm: ghc-QuickCheck
     "ghc-QuickCheck-devel", # srpm: ghc-QuickCheck
     "ghc-QuickCheck-doc", # srpm: ghc-QuickCheck
-    "ghc-QuickCheck-prof", # srpm: ghc-QuickCheck
     "ghc-StateVar", # srpm: ghc-StateVar
     "ghc-StateVar-devel", # srpm: ghc-StateVar
     "ghc-StateVar-doc", # srpm: ghc-StateVar
-    "ghc-StateVar-prof", # srpm: ghc-StateVar
     "ghc-aeson", # srpm: ghc-aeson
     "ghc-aeson-devel", # srpm: ghc-aeson
     "ghc-aeson-doc", # srpm: ghc-aeson
     "ghc-aeson-pretty", # srpm: ghc-aeson-pretty
     "ghc-aeson-pretty-devel", # srpm: ghc-aeson-pretty
     "ghc-aeson-pretty-doc", # srpm: ghc-aeson-pretty
-    "ghc-aeson-pretty-prof", # srpm: ghc-aeson-pretty
-    "ghc-aeson-prof", # srpm: ghc-aeson
     "ghc-ansi-terminal", # srpm: ghc-ansi-terminal
     "ghc-ansi-terminal-devel", # srpm: ghc-ansi-terminal
     "ghc-ansi-terminal-doc", # srpm: ghc-ansi-terminal
-    "ghc-ansi-terminal-prof", # srpm: ghc-ansi-terminal
     "ghc-ansi-terminal-types", # srpm: ghc-ansi-terminal
     "ghc-ansi-terminal-types-devel", # srpm: ghc-ansi-terminal
     "ghc-ansi-terminal-types-doc", # srpm: ghc-ansi-terminal
-    "ghc-ansi-terminal-types-prof", # srpm: ghc-ansi-terminal
     "ghc-appar", # srpm: ghc-appar
     "ghc-appar-devel", # srpm: ghc-appar
     "ghc-appar-doc", # srpm: ghc-appar
-    "ghc-appar-prof", # srpm: ghc-appar
     "ghc-array", # srpm: ghc
     "ghc-array-devel", # srpm: ghc
     "ghc-array-doc", # srpm: ghc
-    "ghc-array-prof", # srpm: ghc
     "ghc-asn1-encoding", # srpm: ghc-asn1-encoding
     "ghc-asn1-encoding-devel", # srpm: ghc-asn1-encoding
     "ghc-asn1-encoding-doc", # srpm: ghc-asn1-encoding
-    "ghc-asn1-encoding-prof", # srpm: ghc-asn1-encoding
     "ghc-asn1-parse", # srpm: ghc-asn1-parse
     "ghc-asn1-parse-devel", # srpm: ghc-asn1-parse
     "ghc-asn1-parse-doc", # srpm: ghc-asn1-parse
-    "ghc-asn1-parse-prof", # srpm: ghc-asn1-parse
     "ghc-asn1-types", # srpm: ghc-asn1-types
     "ghc-asn1-types-devel", # srpm: ghc-asn1-types
     "ghc-asn1-types-doc", # srpm: ghc-asn1-types
-    "ghc-asn1-types-prof", # srpm: ghc-asn1-types
     "ghc-assoc", # srpm: ghc-assoc
     "ghc-assoc-devel", # srpm: ghc-assoc
     "ghc-assoc-doc", # srpm: ghc-assoc
-    "ghc-assoc-prof", # srpm: ghc-assoc
     "ghc-async", # srpm: ghc-async
     "ghc-async-devel", # srpm: ghc-async
     "ghc-async-doc", # srpm: ghc-async
-    "ghc-async-prof", # srpm: ghc-async
     "ghc-attoparsec", # srpm: ghc-attoparsec
     "ghc-attoparsec-aeson", # srpm: ghc-attoparsec-aeson
     "ghc-attoparsec-aeson-devel", # srpm: ghc-attoparsec-aeson
     "ghc-attoparsec-aeson-doc", # srpm: ghc-attoparsec-aeson
-    "ghc-attoparsec-aeson-prof", # srpm: ghc-attoparsec-aeson
     "ghc-attoparsec-devel", # srpm: ghc-attoparsec
     "ghc-attoparsec-doc", # srpm: ghc-attoparsec
     "ghc-attoparsec-iso8601", # srpm: ghc-attoparsec-iso8601
     "ghc-attoparsec-iso8601-devel", # srpm: ghc-attoparsec-iso8601
     "ghc-attoparsec-iso8601-doc", # srpm: ghc-attoparsec-iso8601
-    "ghc-attoparsec-iso8601-prof", # srpm: ghc-attoparsec-iso8601
-    "ghc-attoparsec-prof", # srpm: ghc-attoparsec
     "ghc-auto-update", # srpm: ghc-auto-update
     "ghc-auto-update-devel", # srpm: ghc-auto-update
     "ghc-auto-update-doc", # srpm: ghc-auto-update
-    "ghc-auto-update-prof", # srpm: ghc-auto-update
     "ghc-base", # srpm: ghc
     "ghc-base-compat", # srpm: ghc-base-compat
     "ghc-base-compat-devel", # srpm: ghc-base-compat
     "ghc-base-compat-doc", # srpm: ghc-base-compat
-    "ghc-base-compat-prof", # srpm: ghc-base-compat
     "ghc-base-devel", # srpm: ghc
     "ghc-base-doc", # srpm: ghc
     "ghc-base-orphans", # srpm: ghc-base-orphans
     "ghc-base-orphans-devel", # srpm: ghc-base-orphans
     "ghc-base-orphans-doc", # srpm: ghc-base-orphans
-    "ghc-base-orphans-prof", # srpm: ghc-base-orphans
-    "ghc-base-prof", # srpm: ghc
     "ghc-base-unicode-symbols", # srpm: ghc-base-unicode-symbols
     "ghc-base-unicode-symbols-devel", # srpm: ghc-base-unicode-symbols
     "ghc-base-unicode-symbols-doc", # srpm: ghc-base-unicode-symbols
-    "ghc-base-unicode-symbols-prof", # srpm: ghc-base-unicode-symbols
     "ghc-base16-bytestring", # srpm: ghc-base16-bytestring
     "ghc-base16-bytestring-devel", # srpm: ghc-base16-bytestring
     "ghc-base16-bytestring-doc", # srpm: ghc-base16-bytestring
-    "ghc-base16-bytestring-prof", # srpm: ghc-base16-bytestring
     "ghc-base64-bytestring", # srpm: ghc-base64-bytestring
     "ghc-base64-bytestring-devel", # srpm: ghc-base64-bytestring
     "ghc-base64-bytestring-doc", # srpm: ghc-base64-bytestring
-    "ghc-base64-bytestring-prof", # srpm: ghc-base64-bytestring
     "ghc-basement", # srpm: ghc-basement
     "ghc-basement-devel", # srpm: ghc-basement
     "ghc-basement-doc", # srpm: ghc-basement
-    "ghc-basement-prof", # srpm: ghc-basement
     "ghc-bifunctors", # srpm: ghc-bifunctors
     "ghc-bifunctors-devel", # srpm: ghc-bifunctors
     "ghc-bifunctors-doc", # srpm: ghc-bifunctors
-    "ghc-bifunctors-prof", # srpm: ghc-bifunctors
     "ghc-binary", # srpm: ghc
     "ghc-binary-devel", # srpm: ghc
     "ghc-binary-doc", # srpm: ghc
-    "ghc-binary-prof", # srpm: ghc
     "ghc-bitvec", # srpm: ghc-vector-algorithms
     "ghc-bitvec-devel", # srpm: ghc-vector-algorithms
     "ghc-bitvec-doc", # srpm: ghc-vector-algorithms
-    "ghc-bitvec-prof", # srpm: ghc-vector-algorithms
     "ghc-blaze-builder", # srpm: ghc-blaze-builder
     "ghc-blaze-builder-devel", # srpm: ghc-blaze-builder
     "ghc-blaze-builder-doc", # srpm: ghc-blaze-builder
-    "ghc-blaze-builder-prof", # srpm: ghc-blaze-builder
     "ghc-blaze-html", # srpm: ghc-blaze-html
     "ghc-blaze-html-devel", # srpm: ghc-blaze-html
     "ghc-blaze-html-doc", # srpm: ghc-blaze-html
-    "ghc-blaze-html-prof", # srpm: ghc-blaze-html
     "ghc-blaze-markup", # srpm: ghc-blaze-markup
     "ghc-blaze-markup-devel", # srpm: ghc-blaze-markup
     "ghc-blaze-markup-doc", # srpm: ghc-blaze-markup
-    "ghc-blaze-markup-prof", # srpm: ghc-blaze-markup
     "ghc-boring", # srpm: ghc-dec
     "ghc-boring-devel", # srpm: ghc-dec
     "ghc-boring-doc", # srpm: ghc-dec
-    "ghc-boring-prof", # srpm: ghc-dec
     "ghc-bsb-http-chunked", # srpm: ghc-bsb-http-chunked
     "ghc-bsb-http-chunked-devel", # srpm: ghc-bsb-http-chunked
     "ghc-bsb-http-chunked-doc", # srpm: ghc-bsb-http-chunked
-    "ghc-bsb-http-chunked-prof", # srpm: ghc-bsb-http-chunked
     "ghc-byteorder", # srpm: ghc-byteorder
     "ghc-byteorder-devel", # srpm: ghc-byteorder
     "ghc-byteorder-doc", # srpm: ghc-byteorder
-    "ghc-byteorder-prof", # srpm: ghc-byteorder
     "ghc-bytestring", # srpm: ghc
     "ghc-bytestring-devel", # srpm: ghc
     "ghc-bytestring-doc", # srpm: ghc
-    "ghc-bytestring-prof", # srpm: ghc
     "ghc-cabal-doctest", # srpm: ghc-cabal-doctest
     "ghc-cabal-doctest-devel", # srpm: ghc-cabal-doctest
     "ghc-cabal-doctest-doc", # srpm: ghc-cabal-doctest
-    "ghc-cabal-doctest-prof", # srpm: ghc-cabal-doctest
     "ghc-call-stack", # srpm: ghc-call-stack
     "ghc-call-stack-devel", # srpm: ghc-call-stack
     "ghc-call-stack-doc", # srpm: ghc-call-stack
-    "ghc-call-stack-prof", # srpm: ghc-call-stack
     "ghc-case-insensitive", # srpm: ghc-case-insensitive
     "ghc-case-insensitive-devel", # srpm: ghc-case-insensitive
     "ghc-case-insensitive-doc", # srpm: ghc-case-insensitive
-    "ghc-case-insensitive-prof", # srpm: ghc-case-insensitive
     "ghc-cassava", # srpm: ghc-cassava
     "ghc-cassava-devel", # srpm: ghc-cassava
     "ghc-cassava-doc", # srpm: ghc-cassava
-    "ghc-cassava-prof", # srpm: ghc-cassava
     "ghc-cborg", # srpm: ghc-cborg
     "ghc-cborg-devel", # srpm: ghc-cborg
     "ghc-cborg-doc", # srpm: ghc-cborg
-    "ghc-cborg-prof", # srpm: ghc-cborg
     "ghc-cereal", # srpm: ghc-cereal
     "ghc-cereal-devel", # srpm: ghc-cereal
     "ghc-cereal-doc", # srpm: ghc-cereal
-    "ghc-cereal-prof", # srpm: ghc-cereal
     "ghc-character-ps", # srpm: ghc-aeson
     "ghc-character-ps-devel", # srpm: ghc-aeson
     "ghc-character-ps-doc", # srpm: ghc-aeson
-    "ghc-character-ps-prof", # srpm: ghc-aeson
     "ghc-citeproc", # srpm: pandoc
     "ghc-citeproc-devel", # srpm: pandoc
     "ghc-citeproc-doc", # srpm: pandoc
-    "ghc-citeproc-prof", # srpm: pandoc
     "ghc-clock", # srpm: ghc-clock
     "ghc-clock-devel", # srpm: ghc-clock
     "ghc-clock-doc", # srpm: ghc-clock
-    "ghc-clock-prof", # srpm: ghc-clock
     "ghc-cmdargs", # srpm: ghc-cmdargs
     "ghc-cmdargs-devel", # srpm: ghc-cmdargs
     "ghc-cmdargs-doc", # srpm: ghc-cmdargs
-    "ghc-cmdargs-prof", # srpm: ghc-cmdargs
     "ghc-code-page", # srpm: ghc-code-page
     "ghc-code-page-devel", # srpm: ghc-code-page
     "ghc-code-page-doc", # srpm: ghc-code-page
-    "ghc-code-page-prof", # srpm: ghc-code-page
     "ghc-colour", # srpm: ghc-colour
     "ghc-colour-devel", # srpm: ghc-colour
     "ghc-colour-doc", # srpm: ghc-colour
-    "ghc-colour-prof", # srpm: ghc-colour
     "ghc-commonmark", # srpm: pandoc
     "ghc-commonmark-devel", # srpm: pandoc
     "ghc-commonmark-doc", # srpm: pandoc
     "ghc-commonmark-extensions", # srpm: pandoc
     "ghc-commonmark-extensions-devel", # srpm: pandoc
     "ghc-commonmark-extensions-doc", # srpm: pandoc
-    "ghc-commonmark-extensions-prof", # srpm: pandoc
     "ghc-commonmark-pandoc", # srpm: pandoc
     "ghc-commonmark-pandoc-devel", # srpm: pandoc
     "ghc-commonmark-pandoc-doc", # srpm: pandoc
-    "ghc-commonmark-pandoc-prof", # srpm: pandoc
-    "ghc-commonmark-prof", # srpm: pandoc
     "ghc-comonad", # srpm: ghc-comonad
     "ghc-comonad-devel", # srpm: ghc-comonad
     "ghc-comonad-doc", # srpm: ghc-comonad
-    "ghc-comonad-prof", # srpm: ghc-comonad
     "ghc-compiler", # srpm: ghc
     "ghc-conduit", # srpm: ghc-conduit
     "ghc-conduit-devel", # srpm: ghc-conduit
@@ -1114,948 +1056,713 @@ packages = [
     "ghc-conduit-extra", # srpm: ghc-conduit-extra
     "ghc-conduit-extra-devel", # srpm: ghc-conduit-extra
     "ghc-conduit-extra-doc", # srpm: ghc-conduit-extra
-    "ghc-conduit-extra-prof", # srpm: ghc-conduit-extra
-    "ghc-conduit-prof", # srpm: ghc-conduit
     "ghc-constraints", # srpm: ghc-constraints
     "ghc-constraints-devel", # srpm: ghc-constraints
     "ghc-constraints-doc", # srpm: ghc-constraints
-    "ghc-constraints-prof", # srpm: ghc-constraints
     "ghc-containers", # srpm: ghc
     "ghc-containers-devel", # srpm: ghc
     "ghc-containers-doc", # srpm: ghc
-    "ghc-containers-prof", # srpm: ghc
     "ghc-contravariant", # srpm: ghc-contravariant
     "ghc-contravariant-devel", # srpm: ghc-contravariant
     "ghc-contravariant-doc", # srpm: ghc-contravariant
-    "ghc-contravariant-prof", # srpm: ghc-contravariant
     "ghc-cookie", # srpm: ghc-cookie
     "ghc-cookie-devel", # srpm: ghc-cookie
     "ghc-cookie-doc", # srpm: ghc-cookie
-    "ghc-cookie-prof", # srpm: ghc-cookie
     "ghc-cryptohash-sha256", # srpm: ghc-cryptohash-sha256
     "ghc-cryptohash-sha256-devel", # srpm: ghc-cryptohash-sha256
     "ghc-cryptohash-sha256-doc", # srpm: ghc-cryptohash-sha256
-    "ghc-cryptohash-sha256-prof", # srpm: ghc-cryptohash-sha256
     "ghc-crypton", # srpm: ghc-crypton
     "ghc-crypton-connection", # srpm: ghc-crypton-connection
     "ghc-crypton-connection-devel", # srpm: ghc-crypton-connection
     "ghc-crypton-connection-doc", # srpm: ghc-crypton-connection
-    "ghc-crypton-connection-prof", # srpm: ghc-crypton-connection
     "ghc-crypton-devel", # srpm: ghc-crypton
     "ghc-crypton-doc", # srpm: ghc-crypton
-    "ghc-crypton-prof", # srpm: ghc-crypton
     "ghc-crypton-x509", # srpm: ghc-crypton-x509
     "ghc-crypton-x509-devel", # srpm: ghc-crypton-x509
     "ghc-crypton-x509-doc", # srpm: ghc-crypton-x509
-    "ghc-crypton-x509-prof", # srpm: ghc-crypton-x509
     "ghc-crypton-x509-store", # srpm: ghc-crypton-x509-store
     "ghc-crypton-x509-store-devel", # srpm: ghc-crypton-x509-store
     "ghc-crypton-x509-store-doc", # srpm: ghc-crypton-x509-store
-    "ghc-crypton-x509-store-prof", # srpm: ghc-crypton-x509-store
     "ghc-crypton-x509-system", # srpm: ghc-crypton-x509-system
     "ghc-crypton-x509-system-devel", # srpm: ghc-crypton-x509-system
     "ghc-crypton-x509-system-doc", # srpm: ghc-crypton-x509-system
-    "ghc-crypton-x509-system-prof", # srpm: ghc-crypton-x509-system
     "ghc-crypton-x509-validation", # srpm: ghc-crypton-x509-validation
     "ghc-crypton-x509-validation-devel", # srpm: ghc-crypton-x509-validation
     "ghc-crypton-x509-validation-doc", # srpm: ghc-crypton-x509-validation
-    "ghc-crypton-x509-validation-prof", # srpm: ghc-crypton-x509-validation
     "ghc-data-default", # srpm: ghc-data-default
     "ghc-data-default-class", # srpm: ghc-data-default-class
     "ghc-data-default-class-devel", # srpm: ghc-data-default-class
     "ghc-data-default-class-doc", # srpm: ghc-data-default-class
-    "ghc-data-default-class-prof", # srpm: ghc-data-default-class
     "ghc-data-default-devel", # srpm: ghc-data-default
     "ghc-data-default-doc", # srpm: ghc-data-default
     "ghc-data-default-instances-containers", # srpm: ghc-data-default-instances-containers
     "ghc-data-default-instances-containers-devel", # srpm: ghc-data-default-instances-containers
     "ghc-data-default-instances-containers-doc", # srpm: ghc-data-default-instances-containers
-    "ghc-data-default-instances-containers-prof", # srpm: ghc-data-default-instances-containers
     "ghc-data-default-instances-dlist", # srpm: ghc-data-default-instances-dlist
     "ghc-data-default-instances-dlist-devel", # srpm: ghc-data-default-instances-dlist
     "ghc-data-default-instances-dlist-doc", # srpm: ghc-data-default-instances-dlist
-    "ghc-data-default-instances-dlist-prof", # srpm: ghc-data-default-instances-dlist
     "ghc-data-default-instances-old-locale", # srpm: ghc-data-default-instances-old-locale
     "ghc-data-default-instances-old-locale-devel", # srpm: ghc-data-default-instances-old-locale
     "ghc-data-default-instances-old-locale-doc", # srpm: ghc-data-default-instances-old-locale
-    "ghc-data-default-instances-old-locale-prof", # srpm: ghc-data-default-instances-old-locale
-    "ghc-data-default-prof", # srpm: ghc-data-default
     "ghc-data-fix", # srpm: ghc-data-fix
     "ghc-data-fix-devel", # srpm: ghc-data-fix
     "ghc-data-fix-doc", # srpm: ghc-data-fix
-    "ghc-data-fix-prof", # srpm: ghc-data-fix
     "ghc-dec", # srpm: ghc-dec
     "ghc-dec-devel", # srpm: ghc-dec
     "ghc-dec-doc", # srpm: ghc-dec
-    "ghc-dec-prof", # srpm: ghc-dec
     "ghc-deepseq", # srpm: ghc
     "ghc-deepseq-devel", # srpm: ghc
     "ghc-deepseq-doc", # srpm: ghc
-    "ghc-deepseq-prof", # srpm: ghc
     "ghc-devel", # srpm: ghc
     "ghc-digest", # srpm: ghc-digest
     "ghc-digest-devel", # srpm: ghc-digest
     "ghc-digest-doc", # srpm: ghc-digest
-    "ghc-digest-prof", # srpm: ghc-digest
     "ghc-digits", # srpm: pandoc
     "ghc-digits-devel", # srpm: pandoc
     "ghc-digits-doc", # srpm: pandoc
-    "ghc-digits-prof", # srpm: pandoc
     "ghc-directory", # srpm: ghc
     "ghc-directory-devel", # srpm: ghc
     "ghc-directory-doc", # srpm: ghc
-    "ghc-directory-prof", # srpm: ghc
     "ghc-distributive", # srpm: ghc-distributive
     "ghc-distributive-devel", # srpm: ghc-distributive
     "ghc-distributive-doc", # srpm: ghc-distributive
-    "ghc-distributive-prof", # srpm: ghc-distributive
     "ghc-djot", # srpm: pandoc
     "ghc-djot-devel", # srpm: pandoc
     "ghc-djot-doc", # srpm: pandoc
-    "ghc-djot-prof", # srpm: pandoc
     "ghc-dlist", # srpm: ghc-dlist
     "ghc-dlist-devel", # srpm: ghc-dlist
     "ghc-dlist-doc", # srpm: ghc-dlist
-    "ghc-dlist-prof", # srpm: ghc-dlist
     "ghc-doc", # srpm: ghc
     "ghc-doc-index", # srpm: ghc
     "ghc-doclayout", # srpm: ghc-doctemplates
     "ghc-doclayout-devel", # srpm: ghc-doctemplates
     "ghc-doclayout-doc", # srpm: ghc-doctemplates
-    "ghc-doclayout-prof", # srpm: ghc-doctemplates
     "ghc-doctemplates", # srpm: ghc-doctemplates
     "ghc-doctemplates-devel", # srpm: ghc-doctemplates
     "ghc-doctemplates-doc", # srpm: ghc-doctemplates
-    "ghc-doctemplates-prof", # srpm: ghc-doctemplates
     "ghc-doctest", # srpm: ghc-doctest
     "ghc-doctest-devel", # srpm: ghc-doctest
     "ghc-doctest-doc", # srpm: ghc-doctest
-    "ghc-doctest-prof", # srpm: ghc-doctest
     "ghc-easy-file", # srpm: ghc-fast-logger
     "ghc-easy-file-devel", # srpm: ghc-fast-logger
     "ghc-easy-file-doc", # srpm: ghc-fast-logger
-    "ghc-easy-file-prof", # srpm: ghc-fast-logger
     "ghc-emojis", # srpm: ghc-doctemplates
     "ghc-emojis-devel", # srpm: ghc-doctemplates
     "ghc-emojis-doc", # srpm: ghc-doctemplates
-    "ghc-emojis-prof", # srpm: ghc-doctemplates
     "ghc-errors", # srpm: ghc-doctemplates
     "ghc-errors-devel", # srpm: ghc-doctemplates
     "ghc-errors-doc", # srpm: ghc-doctemplates
-    "ghc-errors-prof", # srpm: ghc-doctemplates
     "ghc-exceptions", # srpm: ghc
     "ghc-exceptions-devel", # srpm: ghc
     "ghc-exceptions-doc", # srpm: ghc
-    "ghc-exceptions-prof", # srpm: ghc
     "ghc-extra", # srpm: ghc-extra
     "ghc-extra-devel", # srpm: ghc-extra
     "ghc-extra-doc", # srpm: ghc-extra
-    "ghc-extra-prof", # srpm: ghc-extra
     "ghc-fast-logger", # srpm: ghc-fast-logger
     "ghc-fast-logger-devel", # srpm: ghc-fast-logger
     "ghc-fast-logger-doc", # srpm: ghc-fast-logger
-    "ghc-fast-logger-prof", # srpm: ghc-fast-logger
     "ghc-file-embed", # srpm: ghc-file-embed
     "ghc-file-embed-devel", # srpm: ghc-file-embed
     "ghc-file-embed-doc", # srpm: ghc-file-embed
-    "ghc-file-embed-prof", # srpm: ghc-file-embed
     "ghc-filepath", # srpm: ghc
     "ghc-filepath-devel", # srpm: ghc
     "ghc-filepath-doc", # srpm: ghc
-    "ghc-filepath-prof", # srpm: ghc
     "ghc-filepattern", # srpm: ghc-filepattern
     "ghc-filepattern-devel", # srpm: ghc-filepattern
     "ghc-filepattern-doc", # srpm: ghc-filepattern
-    "ghc-filepattern-prof", # srpm: ghc-filepattern
     "ghc-filesystem", # srpm: ghc
     "ghc-foldl", # srpm: ghc-foldl
     "ghc-foldl-devel", # srpm: ghc-foldl
     "ghc-foldl-doc", # srpm: ghc-foldl
-    "ghc-foldl-prof", # srpm: ghc-foldl
     "ghc-foundation", # srpm: ghc-foundation
     "ghc-foundation-devel", # srpm: ghc-foundation
     "ghc-foundation-doc", # srpm: ghc-foundation
-    "ghc-foundation-prof", # srpm: ghc-foundation
     "ghc-generic-deriving", # srpm: ghc-generic-deriving
     "ghc-generic-deriving-devel", # srpm: ghc-generic-deriving
     "ghc-generic-deriving-doc", # srpm: ghc-generic-deriving
-    "ghc-generic-deriving-prof", # srpm: ghc-generic-deriving
     "ghc-generically", # srpm: ghc-aeson
     "ghc-generically-devel", # srpm: ghc-aeson
     "ghc-generically-doc", # srpm: ghc-aeson
-    "ghc-generically-prof", # srpm: ghc-aeson
     "ghc-generics-sop", # srpm: ghc-generics-sop
     "ghc-generics-sop-devel", # srpm: ghc-generics-sop
     "ghc-generics-sop-doc", # srpm: ghc-generics-sop
-    "ghc-generics-sop-prof", # srpm: ghc-generics-sop
     "ghc-ghc", # srpm: ghc
     "ghc-ghc-bignum", # srpm: ghc
     "ghc-ghc-bignum-devel", # srpm: ghc
     "ghc-ghc-bignum-doc", # srpm: ghc
-    "ghc-ghc-bignum-prof", # srpm: ghc
     "ghc-ghc-boot", # srpm: ghc
     "ghc-ghc-boot-devel", # srpm: ghc
     "ghc-ghc-boot-doc", # srpm: ghc
-    "ghc-ghc-boot-prof", # srpm: ghc
     "ghc-ghc-boot-th", # srpm: ghc
     "ghc-ghc-boot-th-devel", # srpm: ghc
     "ghc-ghc-boot-th-doc", # srpm: ghc
-    "ghc-ghc-boot-th-prof", # srpm: ghc
     "ghc-ghc-compact", # srpm: ghc
     "ghc-ghc-compact-devel", # srpm: ghc
     "ghc-ghc-compact-doc", # srpm: ghc
-    "ghc-ghc-compact-prof", # srpm: ghc
     "ghc-ghc-devel", # srpm: ghc
     "ghc-ghc-doc", # srpm: ghc
     "ghc-ghc-heap", # srpm: ghc
     "ghc-ghc-heap-devel", # srpm: ghc
     "ghc-ghc-heap-doc", # srpm: ghc
-    "ghc-ghc-heap-prof", # srpm: ghc
     "ghc-ghc-paths", # srpm: ghc-ghc-paths
     "ghc-ghc-paths-devel", # srpm: ghc-ghc-paths
     "ghc-ghc-paths-doc", # srpm: ghc-ghc-paths
-    "ghc-ghc-paths-prof", # srpm: ghc-ghc-paths
-    "ghc-ghc-prof", # srpm: ghc
     "ghc-ghci", # srpm: ghc
     "ghc-ghci-devel", # srpm: ghc
     "ghc-ghci-doc", # srpm: ghc
-    "ghc-ghci-prof", # srpm: ghc
     "ghc-gridtables", # srpm: pandoc
     "ghc-gridtables-devel", # srpm: pandoc
     "ghc-gridtables-doc", # srpm: pandoc
-    "ghc-gridtables-prof", # srpm: pandoc
     "ghc-haddock-library", # srpm: ghc-haddock-library
     "ghc-haddock-library-devel", # srpm: ghc-haddock-library
     "ghc-haddock-library-doc", # srpm: ghc-haddock-library
-    "ghc-haddock-library-prof", # srpm: ghc-haddock-library
     "ghc-hadrian", # srpm: ghc
     "ghc-half", # srpm: ghc-half
     "ghc-half-devel", # srpm: ghc-half
     "ghc-half-doc", # srpm: ghc-half
-    "ghc-half-prof", # srpm: ghc-half
     "ghc-happy-lib", # srpm: happy
     "ghc-happy-lib-common", # srpm: happy
     "ghc-happy-lib-devel", # srpm: happy
     "ghc-happy-lib-doc", # srpm: happy
-    "ghc-happy-lib-prof", # srpm: happy
     "ghc-hashable", # srpm: ghc-hashable
     "ghc-hashable-devel", # srpm: ghc-hashable
     "ghc-hashable-doc", # srpm: ghc-hashable
-    "ghc-hashable-prof", # srpm: ghc-hashable
     "ghc-haskeline", # srpm: ghc
     "ghc-haskeline-devel", # srpm: ghc
     "ghc-haskeline-doc", # srpm: ghc
-    "ghc-haskeline-prof", # srpm: ghc
     "ghc-haskell-lexer", # srpm: ghc-haskell-lexer
     "ghc-haskell-lexer-devel", # srpm: ghc-haskell-lexer
     "ghc-haskell-lexer-doc", # srpm: ghc-haskell-lexer
-    "ghc-haskell-lexer-prof", # srpm: ghc-haskell-lexer
     "ghc-heaps", # srpm: shake
     "ghc-heaps-devel", # srpm: shake
     "ghc-heaps-doc", # srpm: shake
-    "ghc-heaps-prof", # srpm: shake
     "ghc-hourglass", # srpm: ghc-hourglass
     "ghc-hourglass-devel", # srpm: ghc-hourglass
     "ghc-hourglass-doc", # srpm: ghc-hourglass
-    "ghc-hourglass-prof", # srpm: ghc-hourglass
     "ghc-hpc", # srpm: ghc
     "ghc-hpc-devel", # srpm: ghc
     "ghc-hpc-doc", # srpm: ghc
-    "ghc-hpc-prof", # srpm: ghc
     "ghc-hslua", # srpm: ghc-hslua
     "ghc-hslua-aeson", # srpm: ghc-hslua
     "ghc-hslua-aeson-devel", # srpm: ghc-hslua
     "ghc-hslua-aeson-doc", # srpm: ghc-hslua
-    "ghc-hslua-aeson-prof", # srpm: ghc-hslua
     "ghc-hslua-classes", # srpm: ghc-hslua
     "ghc-hslua-classes-devel", # srpm: ghc-hslua
     "ghc-hslua-classes-doc", # srpm: ghc-hslua
-    "ghc-hslua-classes-prof", # srpm: ghc-hslua
     "ghc-hslua-cli", # srpm: pandoc-cli
     "ghc-hslua-cli-devel", # srpm: pandoc-cli
     "ghc-hslua-cli-doc", # srpm: pandoc-cli
-    "ghc-hslua-cli-prof", # srpm: pandoc-cli
     "ghc-hslua-core", # srpm: ghc-hslua
     "ghc-hslua-core-devel", # srpm: ghc-hslua
     "ghc-hslua-core-doc", # srpm: ghc-hslua
-    "ghc-hslua-core-prof", # srpm: ghc-hslua
     "ghc-hslua-devel", # srpm: ghc-hslua
     "ghc-hslua-doc", # srpm: ghc-hslua
     "ghc-hslua-list", # srpm: pandoc-cli
     "ghc-hslua-list-devel", # srpm: pandoc-cli
     "ghc-hslua-list-doc", # srpm: pandoc-cli
-    "ghc-hslua-list-prof", # srpm: pandoc-cli
     "ghc-hslua-marshalling", # srpm: ghc-hslua
     "ghc-hslua-marshalling-devel", # srpm: ghc-hslua
     "ghc-hslua-marshalling-doc", # srpm: ghc-hslua
-    "ghc-hslua-marshalling-prof", # srpm: ghc-hslua
     "ghc-hslua-module-doclayout", # srpm: pandoc-cli
     "ghc-hslua-module-doclayout-devel", # srpm: pandoc-cli
     "ghc-hslua-module-doclayout-doc", # srpm: pandoc-cli
-    "ghc-hslua-module-doclayout-prof", # srpm: pandoc-cli
     "ghc-hslua-module-path", # srpm: pandoc-cli
     "ghc-hslua-module-path-devel", # srpm: pandoc-cli
     "ghc-hslua-module-path-doc", # srpm: pandoc-cli
-    "ghc-hslua-module-path-prof", # srpm: pandoc-cli
     "ghc-hslua-module-system", # srpm: pandoc-cli
     "ghc-hslua-module-system-devel", # srpm: pandoc-cli
     "ghc-hslua-module-system-doc", # srpm: pandoc-cli
-    "ghc-hslua-module-system-prof", # srpm: pandoc-cli
     "ghc-hslua-module-text", # srpm: ghc-hslua-module-text
     "ghc-hslua-module-text-devel", # srpm: ghc-hslua-module-text
     "ghc-hslua-module-text-doc", # srpm: ghc-hslua-module-text
-    "ghc-hslua-module-text-prof", # srpm: ghc-hslua-module-text
     "ghc-hslua-module-version", # srpm: pandoc-cli
     "ghc-hslua-module-version-devel", # srpm: pandoc-cli
     "ghc-hslua-module-version-doc", # srpm: pandoc-cli
-    "ghc-hslua-module-version-prof", # srpm: pandoc-cli
     "ghc-hslua-module-zip", # srpm: pandoc-cli
     "ghc-hslua-module-zip-devel", # srpm: pandoc-cli
     "ghc-hslua-module-zip-doc", # srpm: pandoc-cli
-    "ghc-hslua-module-zip-prof", # srpm: pandoc-cli
     "ghc-hslua-objectorientation", # srpm: ghc-hslua
     "ghc-hslua-objectorientation-devel", # srpm: ghc-hslua
     "ghc-hslua-objectorientation-doc", # srpm: ghc-hslua
-    "ghc-hslua-objectorientation-prof", # srpm: ghc-hslua
     "ghc-hslua-packaging", # srpm: ghc-hslua
     "ghc-hslua-packaging-devel", # srpm: ghc-hslua
     "ghc-hslua-packaging-doc", # srpm: ghc-hslua
-    "ghc-hslua-packaging-prof", # srpm: ghc-hslua
-    "ghc-hslua-prof", # srpm: ghc-hslua
     "ghc-hslua-repl", # srpm: pandoc-cli
     "ghc-hslua-repl-devel", # srpm: pandoc-cli
     "ghc-hslua-repl-doc", # srpm: pandoc-cli
-    "ghc-hslua-repl-prof", # srpm: pandoc-cli
     "ghc-hslua-typing", # srpm: ghc-hslua
     "ghc-hslua-typing-devel", # srpm: ghc-hslua
     "ghc-hslua-typing-doc", # srpm: ghc-hslua
-    "ghc-hslua-typing-prof", # srpm: ghc-hslua
     "ghc-hspec", # srpm: ghc-hspec
     "ghc-hspec-core", # srpm: ghc-hspec-core
     "ghc-hspec-core-devel", # srpm: ghc-hspec-core
     "ghc-hspec-core-doc", # srpm: ghc-hspec-core
-    "ghc-hspec-core-prof", # srpm: ghc-hspec-core
     "ghc-hspec-devel", # srpm: ghc-hspec
     "ghc-hspec-discover", # srpm: ghc-hspec-discover
     "ghc-hspec-discover-devel", # srpm: ghc-hspec-discover
     "ghc-hspec-discover-doc", # srpm: ghc-hspec-discover
-    "ghc-hspec-discover-prof", # srpm: ghc-hspec-discover
     "ghc-hspec-doc", # srpm: ghc-hspec
     "ghc-hspec-expectations", # srpm: ghc-hspec-expectations
     "ghc-hspec-expectations-devel", # srpm: ghc-hspec-expectations
     "ghc-hspec-expectations-doc", # srpm: ghc-hspec-expectations
-    "ghc-hspec-expectations-prof", # srpm: ghc-hspec-expectations
-    "ghc-hspec-prof", # srpm: ghc-hspec
     "ghc-http-api-data", # srpm: ghc-http-api-data
     "ghc-http-api-data-devel", # srpm: ghc-http-api-data
     "ghc-http-api-data-doc", # srpm: ghc-http-api-data
-    "ghc-http-api-data-prof", # srpm: ghc-http-api-data
     "ghc-http-client", # srpm: ghc-http-client
     "ghc-http-client-devel", # srpm: ghc-http-client
     "ghc-http-client-doc", # srpm: ghc-http-client
-    "ghc-http-client-prof", # srpm: ghc-http-client
     "ghc-http-client-tls", # srpm: ghc-http-client-tls
     "ghc-http-client-tls-devel", # srpm: ghc-http-client-tls
     "ghc-http-client-tls-doc", # srpm: ghc-http-client-tls
-    "ghc-http-client-tls-prof", # srpm: ghc-http-client-tls
     "ghc-http-date", # srpm: ghc-http-date
     "ghc-http-date-devel", # srpm: ghc-http-date
     "ghc-http-date-doc", # srpm: ghc-http-date
-    "ghc-http-date-prof", # srpm: ghc-http-date
     "ghc-http-media", # srpm: ghc-http-media
     "ghc-http-media-devel", # srpm: ghc-http-media
     "ghc-http-media-doc", # srpm: ghc-http-media
-    "ghc-http-media-prof", # srpm: ghc-http-media
     "ghc-http-semantics", # srpm: ghc-http2
     "ghc-http-semantics-devel", # srpm: ghc-http2
     "ghc-http-semantics-doc", # srpm: ghc-http2
-    "ghc-http-semantics-prof", # srpm: ghc-http2
     "ghc-http-types", # srpm: ghc-http-types
     "ghc-http-types-devel", # srpm: ghc-http-types
     "ghc-http-types-doc", # srpm: ghc-http-types
-    "ghc-http-types-prof", # srpm: ghc-http-types
     "ghc-http2", # srpm: ghc-http2
     "ghc-http2-devel", # srpm: ghc-http2
     "ghc-http2-doc", # srpm: ghc-http2
-    "ghc-http2-prof", # srpm: ghc-http2
     "ghc-indexed-traversable", # srpm: ghc-indexed-traversable
     "ghc-indexed-traversable-devel", # srpm: ghc-indexed-traversable
     "ghc-indexed-traversable-doc", # srpm: ghc-indexed-traversable
     "ghc-indexed-traversable-instances", # srpm: ghc-aeson
     "ghc-indexed-traversable-instances-devel", # srpm: ghc-aeson
     "ghc-indexed-traversable-instances-doc", # srpm: ghc-aeson
-    "ghc-indexed-traversable-instances-prof", # srpm: ghc-aeson
-    "ghc-indexed-traversable-prof", # srpm: ghc-indexed-traversable
     "ghc-integer-conversion", # srpm: ghc-attoparsec-iso8601
     "ghc-integer-conversion-devel", # srpm: ghc-attoparsec-iso8601
     "ghc-integer-conversion-doc", # srpm: ghc-attoparsec-iso8601
-    "ghc-integer-conversion-prof", # srpm: ghc-attoparsec-iso8601
     "ghc-integer-logarithms", # srpm: ghc-integer-logarithms
     "ghc-integer-logarithms-devel", # srpm: ghc-integer-logarithms
     "ghc-integer-logarithms-doc", # srpm: ghc-integer-logarithms
-    "ghc-integer-logarithms-prof", # srpm: ghc-integer-logarithms
     "ghc-iproute", # srpm: ghc-iproute
     "ghc-iproute-devel", # srpm: ghc-iproute
     "ghc-iproute-doc", # srpm: ghc-iproute
-    "ghc-iproute-prof", # srpm: ghc-iproute
     "ghc-ipynb", # srpm: pandoc
     "ghc-ipynb-devel", # srpm: pandoc
     "ghc-ipynb-doc", # srpm: pandoc
-    "ghc-ipynb-prof", # srpm: pandoc
     "ghc-isocline", # srpm: ghc-isocline
     "ghc-isocline-devel", # srpm: ghc-isocline
     "ghc-isocline-doc", # srpm: ghc-isocline
-    "ghc-isocline-prof", # srpm: ghc-isocline
     "ghc-jira-wiki-markup", # srpm: pandoc
     "ghc-jira-wiki-markup-devel", # srpm: pandoc
     "ghc-jira-wiki-markup-doc", # srpm: pandoc
-    "ghc-jira-wiki-markup-prof", # srpm: pandoc
     "ghc-js-dgtable", # srpm: shake
     "ghc-js-dgtable-devel", # srpm: shake
     "ghc-js-dgtable-doc", # srpm: shake
-    "ghc-js-dgtable-prof", # srpm: shake
     "ghc-js-flot", # srpm: ghc-js-flot
     "ghc-js-flot-devel", # srpm: ghc-js-flot
     "ghc-js-flot-doc", # srpm: ghc-js-flot
-    "ghc-js-flot-prof", # srpm: ghc-js-flot
     "ghc-js-jquery", # srpm: ghc-js-jquery
     "ghc-js-jquery-devel", # srpm: ghc-js-jquery
     "ghc-js-jquery-doc", # srpm: ghc-js-jquery
-    "ghc-js-jquery-prof", # srpm: ghc-js-jquery
     "ghc-libyaml", # srpm: ghc-yaml
     "ghc-libyaml-devel", # srpm: ghc-yaml
     "ghc-libyaml-doc", # srpm: ghc-yaml
-    "ghc-libyaml-prof", # srpm: ghc-yaml
     "ghc-logging-facade", # srpm: ghc-logging-facade
     "ghc-logging-facade-devel", # srpm: ghc-logging-facade
     "ghc-logging-facade-doc", # srpm: ghc-logging-facade
-    "ghc-logging-facade-prof", # srpm: ghc-logging-facade
     "ghc-lpeg", # srpm: pandoc-cli
     "ghc-lpeg-devel", # srpm: pandoc-cli
     "ghc-lpeg-doc", # srpm: pandoc-cli
-    "ghc-lpeg-prof", # srpm: pandoc-cli
     "ghc-lua", # srpm: ghc-hslua
     "ghc-lua-devel", # srpm: ghc-hslua
     "ghc-lua-doc", # srpm: ghc-hslua
-    "ghc-lua-prof", # srpm: ghc-hslua
     "ghc-manual", # srpm: ghc
     "ghc-memory", # srpm: ghc-memory
     "ghc-memory-devel", # srpm: ghc-memory
     "ghc-memory-doc", # srpm: ghc-memory
-    "ghc-memory-prof", # srpm: ghc-memory
     "ghc-mime-types", # srpm: ghc-mime-types
     "ghc-mime-types-devel", # srpm: ghc-mime-types
     "ghc-mime-types-doc", # srpm: ghc-mime-types
-    "ghc-mime-types-prof", # srpm: ghc-mime-types
     "ghc-mmorph", # srpm: ghc-mmorph
     "ghc-mmorph-devel", # srpm: ghc-mmorph
     "ghc-mmorph-doc", # srpm: ghc-mmorph
-    "ghc-mmorph-prof", # srpm: ghc-mmorph
     "ghc-mockery", # srpm: ghc-mockery
     "ghc-mockery-devel", # srpm: ghc-mockery
     "ghc-mockery-doc", # srpm: ghc-mockery
-    "ghc-mockery-prof", # srpm: ghc-mockery
     "ghc-monad-control", # srpm: ghc-monad-control
     "ghc-monad-control-devel", # srpm: ghc-monad-control
     "ghc-monad-control-doc", # srpm: ghc-monad-control
-    "ghc-monad-control-prof", # srpm: ghc-monad-control
     "ghc-mono-traversable", # srpm: ghc-mono-traversable
     "ghc-mono-traversable-devel", # srpm: ghc-mono-traversable
     "ghc-mono-traversable-doc", # srpm: ghc-mono-traversable
-    "ghc-mono-traversable-prof", # srpm: ghc-mono-traversable
     "ghc-mtl", # srpm: ghc
     "ghc-mtl-devel", # srpm: ghc
     "ghc-mtl-doc", # srpm: ghc
-    "ghc-mtl-prof", # srpm: ghc
     "ghc-network", # srpm: ghc-network
     "ghc-network-byte-order", # srpm: ghc-network-byte-order
     "ghc-network-byte-order-devel", # srpm: ghc-network-byte-order
     "ghc-network-byte-order-doc", # srpm: ghc-network-byte-order
-    "ghc-network-byte-order-prof", # srpm: ghc-network-byte-order
     "ghc-network-control", # srpm: ghc-http2
     "ghc-network-control-devel", # srpm: ghc-http2
     "ghc-network-control-doc", # srpm: ghc-http2
-    "ghc-network-control-prof", # srpm: ghc-http2
     "ghc-network-devel", # srpm: ghc-network
     "ghc-network-doc", # srpm: ghc-network
-    "ghc-network-prof", # srpm: ghc-network
     "ghc-network-uri", # srpm: ghc-network-uri
     "ghc-network-uri-devel", # srpm: ghc-network-uri
     "ghc-network-uri-doc", # srpm: ghc-network-uri
-    "ghc-network-uri-prof", # srpm: ghc-network-uri
     "ghc-obsoletes", # srpm: ghc-rpm-macros
     "ghc-old-locale", # srpm: ghc-old-locale
     "ghc-old-locale-devel", # srpm: ghc-old-locale
     "ghc-old-locale-doc", # srpm: ghc-old-locale
-    "ghc-old-locale-prof", # srpm: ghc-old-locale
     "ghc-old-time", # srpm: ghc-old-time
     "ghc-old-time-devel", # srpm: ghc-old-time
     "ghc-old-time-doc", # srpm: ghc-old-time
-    "ghc-old-time-prof", # srpm: ghc-old-time
     "ghc-optparse-applicative", # srpm: ghc-optparse-applicative
     "ghc-optparse-applicative-devel", # srpm: ghc-optparse-applicative
     "ghc-optparse-applicative-doc", # srpm: ghc-optparse-applicative
-    "ghc-optparse-applicative-prof", # srpm: ghc-optparse-applicative
     "ghc-ordered-containers", # srpm: pandoc
     "ghc-ordered-containers-devel", # srpm: pandoc
     "ghc-ordered-containers-doc", # srpm: pandoc
-    "ghc-ordered-containers-prof", # srpm: pandoc
     "ghc-os-string", # srpm: ghc-hashable
     "ghc-os-string-devel", # srpm: ghc-hashable
     "ghc-os-string-doc", # srpm: ghc-hashable
-    "ghc-os-string-prof", # srpm: ghc-hashable
     "ghc-pandoc", # srpm: pandoc
     "ghc-pandoc-devel", # srpm: pandoc
     "ghc-pandoc-doc", # srpm: pandoc
     "ghc-pandoc-lua-engine", # srpm: pandoc-cli
     "ghc-pandoc-lua-engine-devel", # srpm: pandoc-cli
     "ghc-pandoc-lua-engine-doc", # srpm: pandoc-cli
-    "ghc-pandoc-lua-engine-prof", # srpm: pandoc-cli
     "ghc-pandoc-lua-marshal", # srpm: pandoc-cli
     "ghc-pandoc-lua-marshal-devel", # srpm: pandoc-cli
     "ghc-pandoc-lua-marshal-doc", # srpm: pandoc-cli
-    "ghc-pandoc-lua-marshal-prof", # srpm: pandoc-cli
-    "ghc-pandoc-prof", # srpm: pandoc
     "ghc-pandoc-server", # srpm: pandoc-cli
     "ghc-pandoc-server-devel", # srpm: pandoc-cli
     "ghc-pandoc-server-doc", # srpm: pandoc-cli
-    "ghc-pandoc-server-prof", # srpm: pandoc-cli
     "ghc-pandoc-types", # srpm: ghc-pandoc-types
     "ghc-pandoc-types-devel", # srpm: ghc-pandoc-types
     "ghc-pandoc-types-doc", # srpm: ghc-pandoc-types
-    "ghc-pandoc-types-prof", # srpm: ghc-pandoc-types
     "ghc-parsec", # srpm: ghc
     "ghc-parsec-devel", # srpm: ghc
     "ghc-parsec-doc", # srpm: ghc
-    "ghc-parsec-prof", # srpm: ghc
     "ghc-pem", # srpm: ghc-pem
     "ghc-pem-devel", # srpm: ghc-pem
     "ghc-pem-doc", # srpm: ghc-pem
-    "ghc-pem-prof", # srpm: ghc-pem
     "ghc-pretty", # srpm: ghc
     "ghc-pretty-devel", # srpm: ghc
     "ghc-pretty-doc", # srpm: ghc
-    "ghc-pretty-prof", # srpm: ghc
     "ghc-pretty-show", # srpm: ghc-pretty-show
     "ghc-pretty-show-devel", # srpm: ghc-pretty-show
     "ghc-pretty-show-doc", # srpm: ghc-pretty-show
-    "ghc-pretty-show-prof", # srpm: ghc-pretty-show
     "ghc-prettyprinter", # srpm: ghc-prettyprinter
     "ghc-prettyprinter-ansi-terminal", # srpm: ghc-prettyprinter-ansi-terminal
     "ghc-prettyprinter-ansi-terminal-devel", # srpm: ghc-prettyprinter-ansi-terminal
     "ghc-prettyprinter-ansi-terminal-doc", # srpm: ghc-prettyprinter-ansi-terminal
-    "ghc-prettyprinter-ansi-terminal-prof", # srpm: ghc-prettyprinter-ansi-terminal
     "ghc-prettyprinter-devel", # srpm: ghc-prettyprinter
     "ghc-prettyprinter-doc", # srpm: ghc-prettyprinter
-    "ghc-prettyprinter-prof", # srpm: ghc-prettyprinter
     "ghc-primitive", # srpm: ghc-primitive
     "ghc-primitive-devel", # srpm: ghc-primitive
     "ghc-primitive-doc", # srpm: ghc-primitive
-    "ghc-primitive-prof", # srpm: ghc-primitive
     "ghc-process", # srpm: ghc
     "ghc-process-devel", # srpm: ghc
     "ghc-process-doc", # srpm: ghc
-    "ghc-process-prof", # srpm: ghc
-    "ghc-prof", # srpm: ghc
     "ghc-profunctors", # srpm: ghc-profunctors
     "ghc-profunctors-devel", # srpm: ghc-profunctors
     "ghc-profunctors-doc", # srpm: ghc-profunctors
-    "ghc-profunctors-prof", # srpm: ghc-profunctors
     "ghc-psqueues", # srpm: ghc-psqueues
     "ghc-psqueues-devel", # srpm: ghc-psqueues
     "ghc-psqueues-doc", # srpm: ghc-psqueues
-    "ghc-psqueues-prof", # srpm: ghc-psqueues
     "ghc-quickcheck-io", # srpm: ghc-quickcheck-io
     "ghc-quickcheck-io-devel", # srpm: ghc-quickcheck-io
     "ghc-quickcheck-io-doc", # srpm: ghc-quickcheck-io
-    "ghc-quickcheck-io-prof", # srpm: ghc-quickcheck-io
     "ghc-random", # srpm: ghc-random
     "ghc-random-devel", # srpm: ghc-random
     "ghc-random-doc", # srpm: ghc-random
-    "ghc-random-prof", # srpm: ghc-random
     "ghc-recv", # srpm: ghc-warp
     "ghc-recv-devel", # srpm: ghc-warp
     "ghc-recv-doc", # srpm: ghc-warp
-    "ghc-recv-prof", # srpm: ghc-warp
     "ghc-regex-base", # srpm: ghc-regex-base
     "ghc-regex-base-devel", # srpm: ghc-regex-base
     "ghc-regex-base-doc", # srpm: ghc-regex-base
-    "ghc-regex-base-prof", # srpm: ghc-regex-base
     "ghc-regex-tdfa", # srpm: ghc-regex-tdfa
     "ghc-regex-tdfa-devel", # srpm: ghc-regex-tdfa
     "ghc-regex-tdfa-doc", # srpm: ghc-regex-tdfa
-    "ghc-regex-tdfa-prof", # srpm: ghc-regex-tdfa
     "ghc-resourcet", # srpm: ghc-resourcet
     "ghc-resourcet-devel", # srpm: ghc-resourcet
     "ghc-resourcet-doc", # srpm: ghc-resourcet
-    "ghc-resourcet-prof", # srpm: ghc-resourcet
     "ghc-retry", # srpm: ghc-retry
     "ghc-retry-devel", # srpm: ghc-retry
     "ghc-retry-doc", # srpm: ghc-retry
-    "ghc-retry-prof", # srpm: ghc-retry
     "ghc-rpm-macros", # srpm: ghc-rpm-macros
     "ghc-rpm-macros-extra", # srpm: ghc-rpm-macros
     "ghc-rpm-macros-quick", # srpm: ghc-rpm-macros
     "ghc-safe", # srpm: ghc-safe
     "ghc-safe-devel", # srpm: ghc-safe
     "ghc-safe-doc", # srpm: ghc-safe
-    "ghc-safe-prof", # srpm: ghc-safe
     "ghc-scientific", # srpm: ghc-scientific
     "ghc-scientific-devel", # srpm: ghc-scientific
     "ghc-scientific-doc", # srpm: ghc-scientific
-    "ghc-scientific-prof", # srpm: ghc-scientific
     "ghc-semaphore-compat", # srpm: ghc
     "ghc-semaphore-compat-devel", # srpm: ghc
     "ghc-semaphore-compat-doc", # srpm: ghc
-    "ghc-semaphore-compat-prof", # srpm: ghc
     "ghc-semialign", # srpm: ghc-aeson
     "ghc-semialign-devel", # srpm: ghc-aeson
     "ghc-semialign-doc", # srpm: ghc-aeson
-    "ghc-semialign-prof", # srpm: ghc-aeson
     "ghc-semigroupoids", # srpm: ghc-semigroupoids
     "ghc-semigroupoids-devel", # srpm: ghc-semigroupoids
     "ghc-semigroupoids-doc", # srpm: ghc-semigroupoids
-    "ghc-semigroupoids-prof", # srpm: ghc-semigroupoids
     "ghc-serialise", # srpm: ghc-serialise
     "ghc-serialise-devel", # srpm: ghc-serialise
     "ghc-serialise-doc", # srpm: ghc-serialise
-    "ghc-serialise-prof", # srpm: ghc-serialise
     "ghc-servant", # srpm: ghc-servant
     "ghc-servant-devel", # srpm: ghc-servant
     "ghc-servant-doc", # srpm: ghc-servant
-    "ghc-servant-prof", # srpm: ghc-servant
     "ghc-servant-server", # srpm: ghc-servant-server
     "ghc-servant-server-devel", # srpm: ghc-servant-server
     "ghc-servant-server-doc", # srpm: ghc-servant-server
-    "ghc-servant-server-prof", # srpm: ghc-servant-server
     "ghc-shake", # srpm: shake
     "ghc-shake-devel", # srpm: shake
     "ghc-shake-doc", # srpm: shake
-    "ghc-shake-prof", # srpm: shake
     "ghc-simple-sendfile", # srpm: ghc-simple-sendfile
     "ghc-simple-sendfile-devel", # srpm: ghc-simple-sendfile
     "ghc-simple-sendfile-doc", # srpm: ghc-simple-sendfile
-    "ghc-simple-sendfile-prof", # srpm: ghc-simple-sendfile
     "ghc-singleton-bool", # srpm: ghc-singleton-bool
     "ghc-singleton-bool-devel", # srpm: ghc-singleton-bool
     "ghc-singleton-bool-doc", # srpm: ghc-singleton-bool
-    "ghc-singleton-bool-prof", # srpm: ghc-singleton-bool
     "ghc-skylighting", # srpm: ghc-skylighting
     "ghc-skylighting-core", # srpm: ghc-skylighting
     "ghc-skylighting-core-devel", # srpm: ghc-skylighting
     "ghc-skylighting-core-doc", # srpm: ghc-skylighting
-    "ghc-skylighting-core-prof", # srpm: ghc-skylighting
     "ghc-skylighting-devel", # srpm: ghc-skylighting
     "ghc-skylighting-doc", # srpm: ghc-skylighting
     "ghc-skylighting-format-ansi", # srpm: ghc-skylighting
     "ghc-skylighting-format-ansi-devel", # srpm: ghc-skylighting
     "ghc-skylighting-format-ansi-doc", # srpm: ghc-skylighting
-    "ghc-skylighting-format-ansi-prof", # srpm: ghc-skylighting
     "ghc-skylighting-format-blaze-html", # srpm: ghc-skylighting
     "ghc-skylighting-format-blaze-html-devel", # srpm: ghc-skylighting
     "ghc-skylighting-format-blaze-html-doc", # srpm: ghc-skylighting
-    "ghc-skylighting-format-blaze-html-prof", # srpm: ghc-skylighting
     "ghc-skylighting-format-context", # srpm: ghc-skylighting
     "ghc-skylighting-format-context-devel", # srpm: ghc-skylighting
     "ghc-skylighting-format-context-doc", # srpm: ghc-skylighting
-    "ghc-skylighting-format-context-prof", # srpm: ghc-skylighting
     "ghc-skylighting-format-latex", # srpm: ghc-skylighting
     "ghc-skylighting-format-latex-devel", # srpm: ghc-skylighting
     "ghc-skylighting-format-latex-doc", # srpm: ghc-skylighting
-    "ghc-skylighting-format-latex-prof", # srpm: ghc-skylighting
-    "ghc-skylighting-prof", # srpm: ghc-skylighting
     "ghc-socks", # srpm: ghc-socks
     "ghc-socks-devel", # srpm: ghc-socks
     "ghc-socks-doc", # srpm: ghc-socks
-    "ghc-socks-prof", # srpm: ghc-socks
     "ghc-some", # srpm: ghc-singleton-bool
     "ghc-some-devel", # srpm: ghc-singleton-bool
     "ghc-some-doc", # srpm: ghc-singleton-bool
-    "ghc-some-prof", # srpm: ghc-singleton-bool
     "ghc-sop-core", # srpm: ghc-generics-sop
     "ghc-sop-core-devel", # srpm: ghc-generics-sop
     "ghc-sop-core-doc", # srpm: ghc-generics-sop
-    "ghc-sop-core-prof", # srpm: ghc-generics-sop
     "ghc-split", # srpm: ghc-split
     "ghc-split-devel", # srpm: ghc-split
     "ghc-split-doc", # srpm: ghc-split
-    "ghc-split-prof", # srpm: ghc-split
     "ghc-splitmix", # srpm: ghc-random
     "ghc-splitmix-devel", # srpm: ghc-random
     "ghc-splitmix-doc", # srpm: ghc-random
-    "ghc-splitmix-prof", # srpm: ghc-random
     "ghc-stm", # srpm: ghc
     "ghc-stm-devel", # srpm: ghc
     "ghc-stm-doc", # srpm: ghc
-    "ghc-stm-prof", # srpm: ghc
     "ghc-streaming-commons", # srpm: ghc-streaming-commons
     "ghc-streaming-commons-devel", # srpm: ghc-streaming-commons
     "ghc-streaming-commons-doc", # srpm: ghc-streaming-commons
-    "ghc-streaming-commons-prof", # srpm: ghc-streaming-commons
     "ghc-strict", # srpm: ghc-strict
     "ghc-strict-devel", # srpm: ghc-strict
     "ghc-strict-doc", # srpm: ghc-strict
-    "ghc-strict-prof", # srpm: ghc-strict
     "ghc-syb", # srpm: ghc-syb
     "ghc-syb-devel", # srpm: ghc-syb
     "ghc-syb-doc", # srpm: ghc-syb
-    "ghc-syb-prof", # srpm: ghc-syb
     "ghc-tagged", # srpm: ghc-tagged
     "ghc-tagged-devel", # srpm: ghc-tagged
     "ghc-tagged-doc", # srpm: ghc-tagged
-    "ghc-tagged-prof", # srpm: ghc-tagged
     "ghc-tagsoup", # srpm: ghc-tagsoup
     "ghc-tagsoup-devel", # srpm: ghc-tagsoup
     "ghc-tagsoup-doc", # srpm: ghc-tagsoup
-    "ghc-tagsoup-prof", # srpm: ghc-tagsoup
     "ghc-tasty", # srpm: ghc-tasty
     "ghc-tasty-devel", # srpm: ghc-tasty
     "ghc-tasty-doc", # srpm: ghc-tasty
     "ghc-tasty-hunit", # srpm: ghc-tasty-hunit
     "ghc-tasty-hunit-devel", # srpm: ghc-tasty-hunit
     "ghc-tasty-hunit-doc", # srpm: ghc-tasty-hunit
-    "ghc-tasty-hunit-prof", # srpm: ghc-tasty-hunit
     "ghc-tasty-kat", # srpm: ghc-tasty-kat
     "ghc-tasty-kat-devel", # srpm: ghc-tasty-kat
     "ghc-tasty-kat-doc", # srpm: ghc-tasty-kat
-    "ghc-tasty-kat-prof", # srpm: ghc-tasty-kat
-    "ghc-tasty-prof", # srpm: ghc-tasty
     "ghc-tasty-quickcheck", # srpm: ghc-tasty-quickcheck
     "ghc-tasty-quickcheck-devel", # srpm: ghc-tasty-quickcheck
     "ghc-tasty-quickcheck-doc", # srpm: ghc-tasty-quickcheck
-    "ghc-tasty-quickcheck-prof", # srpm: ghc-tasty-quickcheck
     "ghc-template-haskell", # srpm: ghc
     "ghc-template-haskell-devel", # srpm: ghc
     "ghc-template-haskell-doc", # srpm: ghc
-    "ghc-template-haskell-prof", # srpm: ghc
     "ghc-temporary", # srpm: ghc-temporary
     "ghc-temporary-devel", # srpm: ghc-temporary
     "ghc-temporary-doc", # srpm: ghc-temporary
-    "ghc-temporary-prof", # srpm: ghc-temporary
     "ghc-terminfo", # srpm: ghc
     "ghc-terminfo-devel", # srpm: ghc
     "ghc-terminfo-doc", # srpm: ghc
-    "ghc-terminfo-prof", # srpm: ghc
     "ghc-texmath", # srpm: ghc-texmath
     "ghc-texmath-devel", # srpm: ghc-texmath
     "ghc-texmath-doc", # srpm: ghc-texmath
-    "ghc-texmath-prof", # srpm: ghc-texmath
     "ghc-text", # srpm: ghc
     "ghc-text-conversions", # srpm: ghc-doctemplates
     "ghc-text-conversions-devel", # srpm: ghc-doctemplates
     "ghc-text-conversions-doc", # srpm: ghc-doctemplates
-    "ghc-text-conversions-prof", # srpm: ghc-doctemplates
     "ghc-text-devel", # srpm: ghc
     "ghc-text-doc", # srpm: ghc
     "ghc-text-iso8601", # srpm: ghc-aeson
     "ghc-text-iso8601-devel", # srpm: ghc-aeson
     "ghc-text-iso8601-doc", # srpm: ghc-aeson
-    "ghc-text-iso8601-prof", # srpm: ghc-aeson
-    "ghc-text-prof", # srpm: ghc
     "ghc-text-short", # srpm: ghc-text-short
     "ghc-text-short-devel", # srpm: ghc-text-short
     "ghc-text-short-doc", # srpm: ghc-text-short
-    "ghc-text-short-prof", # srpm: ghc-text-short
     "ghc-tf-random", # srpm: ghc-tf-random
     "ghc-tf-random-devel", # srpm: ghc-tf-random
     "ghc-tf-random-doc", # srpm: ghc-tf-random
-    "ghc-tf-random-prof", # srpm: ghc-tf-random
     "ghc-th-abstraction", # srpm: ghc-th-abstraction
     "ghc-th-abstraction-devel", # srpm: ghc-th-abstraction
     "ghc-th-abstraction-doc", # srpm: ghc-th-abstraction
-    "ghc-th-abstraction-prof", # srpm: ghc-th-abstraction
     "ghc-th-compat", # srpm: ghc-th-compat
     "ghc-th-compat-devel", # srpm: ghc-th-compat
     "ghc-th-compat-doc", # srpm: ghc-th-compat
-    "ghc-th-compat-prof", # srpm: ghc-th-compat
     "ghc-th-lift", # srpm: ghc-th-lift
     "ghc-th-lift-devel", # srpm: ghc-th-lift
     "ghc-th-lift-doc", # srpm: ghc-th-lift
     "ghc-th-lift-instances", # srpm: ghc-th-lift-instances
     "ghc-th-lift-instances-devel", # srpm: ghc-th-lift-instances
     "ghc-th-lift-instances-doc", # srpm: ghc-th-lift-instances
-    "ghc-th-lift-instances-prof", # srpm: ghc-th-lift-instances
-    "ghc-th-lift-prof", # srpm: ghc-th-lift
     "ghc-these", # srpm: ghc-these
     "ghc-these-devel", # srpm: ghc-these
     "ghc-these-doc", # srpm: ghc-these
-    "ghc-these-prof", # srpm: ghc-these
     "ghc-time", # srpm: ghc
     "ghc-time-compat", # srpm: ghc-time-compat
     "ghc-time-compat-devel", # srpm: ghc-time-compat
     "ghc-time-compat-doc", # srpm: ghc-time-compat
-    "ghc-time-compat-prof", # srpm: ghc-time-compat
     "ghc-time-devel", # srpm: ghc
     "ghc-time-doc", # srpm: ghc
     "ghc-time-manager", # srpm: ghc-time-manager
     "ghc-time-manager-devel", # srpm: ghc-time-manager
     "ghc-time-manager-doc", # srpm: ghc-time-manager
-    "ghc-time-manager-prof", # srpm: ghc-time-manager
-    "ghc-time-prof", # srpm: ghc
     "ghc-tls", # srpm: ghc-tls
     "ghc-tls-devel", # srpm: ghc-tls
     "ghc-tls-doc", # srpm: ghc-tls
-    "ghc-tls-prof", # srpm: ghc-tls
     "ghc-toml-parser", # srpm: ghc-toml-parser
     "ghc-toml-parser-devel", # srpm: ghc-toml-parser
     "ghc-toml-parser-doc", # srpm: ghc-toml-parser
-    "ghc-toml-parser-prof", # srpm: ghc-toml-parser
     "ghc-transformers", # srpm: ghc
     "ghc-transformers-base", # srpm: ghc-transformers-base
     "ghc-transformers-base-devel", # srpm: ghc-transformers-base
     "ghc-transformers-base-doc", # srpm: ghc-transformers-base
-    "ghc-transformers-base-prof", # srpm: ghc-transformers-base
     "ghc-transformers-compat", # srpm: ghc-transformers-compat
     "ghc-transformers-compat-devel", # srpm: ghc-transformers-compat
     "ghc-transformers-compat-doc", # srpm: ghc-transformers-compat
-    "ghc-transformers-compat-prof", # srpm: ghc-transformers-compat
     "ghc-transformers-devel", # srpm: ghc
     "ghc-transformers-doc", # srpm: ghc
-    "ghc-transformers-prof", # srpm: ghc
     "ghc-type-equality", # srpm: ghc-constraints
     "ghc-type-equality-devel", # srpm: ghc-constraints
     "ghc-type-equality-doc", # srpm: ghc-constraints
-    "ghc-type-equality-prof", # srpm: ghc-constraints
     "ghc-typed-process", # srpm: ghc-typed-process
     "ghc-typed-process-devel", # srpm: ghc-typed-process
     "ghc-typed-process-doc", # srpm: ghc-typed-process
-    "ghc-typed-process-prof", # srpm: ghc-typed-process
     "ghc-typst", # srpm: pandoc
     "ghc-typst-devel", # srpm: pandoc
     "ghc-typst-doc", # srpm: pandoc
-    "ghc-typst-prof", # srpm: pandoc
     "ghc-typst-symbols", # srpm: ghc-texmath
     "ghc-typst-symbols-devel", # srpm: ghc-texmath
     "ghc-typst-symbols-doc", # srpm: ghc-texmath
-    "ghc-typst-symbols-prof", # srpm: ghc-texmath
     "ghc-unbounded-delays", # srpm: ghc-unbounded-delays
     "ghc-unbounded-delays-devel", # srpm: ghc-unbounded-delays
     "ghc-unbounded-delays-doc", # srpm: ghc-unbounded-delays
-    "ghc-unbounded-delays-prof", # srpm: ghc-unbounded-delays
     "ghc-unicode-collation", # srpm: pandoc
     "ghc-unicode-collation-devel", # srpm: pandoc
     "ghc-unicode-collation-doc", # srpm: pandoc
-    "ghc-unicode-collation-prof", # srpm: pandoc
     "ghc-unicode-data", # srpm: ghc-unicode-transforms
     "ghc-unicode-data-devel", # srpm: ghc-unicode-transforms
     "ghc-unicode-data-doc", # srpm: ghc-unicode-transforms
-    "ghc-unicode-data-prof", # srpm: ghc-unicode-transforms
     "ghc-unicode-transforms", # srpm: ghc-unicode-transforms
     "ghc-unicode-transforms-devel", # srpm: ghc-unicode-transforms
     "ghc-unicode-transforms-doc", # srpm: ghc-unicode-transforms
-    "ghc-unicode-transforms-prof", # srpm: ghc-unicode-transforms
     "ghc-uniplate", # srpm: ghc-uniplate
     "ghc-uniplate-devel", # srpm: ghc-uniplate
     "ghc-uniplate-doc", # srpm: ghc-uniplate
-    "ghc-uniplate-prof", # srpm: ghc-uniplate
     "ghc-unix", # srpm: ghc
     "ghc-unix-compat", # srpm: ghc-unix-compat
     "ghc-unix-compat-devel", # srpm: ghc-unix-compat
     "ghc-unix-compat-doc", # srpm: ghc-unix-compat
-    "ghc-unix-compat-prof", # srpm: ghc-unix-compat
     "ghc-unix-devel", # srpm: ghc
     "ghc-unix-doc", # srpm: ghc
-    "ghc-unix-prof", # srpm: ghc
     "ghc-unix-time", # srpm: ghc-unix-time
     "ghc-unix-time-devel", # srpm: ghc-unix-time
     "ghc-unix-time-doc", # srpm: ghc-unix-time
-    "ghc-unix-time-prof", # srpm: ghc-unix-time
     "ghc-unliftio-core", # srpm: ghc-unliftio-core
     "ghc-unliftio-core-devel", # srpm: ghc-unliftio-core
     "ghc-unliftio-core-doc", # srpm: ghc-unliftio-core
-    "ghc-unliftio-core-prof", # srpm: ghc-unliftio-core
     "ghc-unordered-containers", # srpm: ghc-unordered-containers
     "ghc-unordered-containers-devel", # srpm: ghc-unordered-containers
     "ghc-unordered-containers-doc", # srpm: ghc-unordered-containers
-    "ghc-unordered-containers-prof", # srpm: ghc-unordered-containers
     "ghc-utf8-string", # srpm: ghc-utf8-string
     "ghc-utf8-string-devel", # srpm: ghc-utf8-string
     "ghc-utf8-string-doc", # srpm: ghc-utf8-string
-    "ghc-utf8-string-prof", # srpm: ghc-utf8-string
     "ghc-uuid-types", # srpm: ghc-uuid-types
     "ghc-uuid-types-devel", # srpm: ghc-uuid-types
     "ghc-uuid-types-doc", # srpm: ghc-uuid-types
-    "ghc-uuid-types-prof", # srpm: ghc-uuid-types
     "ghc-vault", # srpm: ghc-vault
     "ghc-vault-devel", # srpm: ghc-vault
     "ghc-vault-doc", # srpm: ghc-vault
-    "ghc-vault-prof", # srpm: ghc-vault
     "ghc-vector", # srpm: ghc-vector
     "ghc-vector-algorithms", # srpm: ghc-vector-algorithms
     "ghc-vector-algorithms-devel", # srpm: ghc-vector-algorithms
     "ghc-vector-algorithms-doc", # srpm: ghc-vector-algorithms
-    "ghc-vector-algorithms-prof", # srpm: ghc-vector-algorithms
     "ghc-vector-devel", # srpm: ghc-vector
     "ghc-vector-doc", # srpm: ghc-vector
-    "ghc-vector-prof", # srpm: ghc-vector
     "ghc-vector-stream", # srpm: ghc-vector
     "ghc-vector-stream-devel", # srpm: ghc-vector
     "ghc-vector-stream-doc", # srpm: ghc-vector
-    "ghc-vector-stream-prof", # srpm: ghc-vector
     "ghc-wai", # srpm: ghc-wai
     "ghc-wai-app-static", # srpm: ghc-wai-app-static
     "ghc-wai-app-static-devel", # srpm: ghc-wai-app-static
     "ghc-wai-app-static-doc", # srpm: ghc-wai-app-static
-    "ghc-wai-app-static-prof", # srpm: ghc-wai-app-static
     "ghc-wai-cors", # srpm: ghc-wai-cors
     "ghc-wai-cors-devel", # srpm: ghc-wai-cors
     "ghc-wai-cors-doc", # srpm: ghc-wai-cors
-    "ghc-wai-cors-prof", # srpm: ghc-wai-cors
     "ghc-wai-devel", # srpm: ghc-wai
     "ghc-wai-doc", # srpm: ghc-wai
     "ghc-wai-extra", # srpm: ghc-wai-extra
     "ghc-wai-extra-devel", # srpm: ghc-wai-extra
     "ghc-wai-extra-doc", # srpm: ghc-wai-extra
-    "ghc-wai-extra-prof", # srpm: ghc-wai-extra
     "ghc-wai-logger", # srpm: ghc-wai-logger
     "ghc-wai-logger-devel", # srpm: ghc-wai-logger
     "ghc-wai-logger-doc", # srpm: ghc-wai-logger
-    "ghc-wai-logger-prof", # srpm: ghc-wai-logger
-    "ghc-wai-prof", # srpm: ghc-wai
     "ghc-warp", # srpm: ghc-warp
     "ghc-warp-devel", # srpm: ghc-warp
     "ghc-warp-doc", # srpm: ghc-warp
-    "ghc-warp-prof", # srpm: ghc-warp
     "ghc-wcwidth", # srpm: ghc-tasty
     "ghc-wcwidth-devel", # srpm: ghc-tasty
     "ghc-wcwidth-doc", # srpm: ghc-tasty
-    "ghc-wcwidth-prof", # srpm: ghc-tasty
     "ghc-witherable", # srpm: ghc-aeson
     "ghc-witherable-devel", # srpm: ghc-aeson
     "ghc-witherable-doc", # srpm: ghc-aeson
-    "ghc-witherable-prof", # srpm: ghc-aeson
     "ghc-word8", # srpm: ghc-word8
     "ghc-word8-devel", # srpm: ghc-word8
     "ghc-word8-doc", # srpm: ghc-word8
-    "ghc-word8-prof", # srpm: ghc-word8
     "ghc-xhtml", # srpm: ghc
     "ghc-xhtml-devel", # srpm: ghc
     "ghc-xhtml-doc", # srpm: ghc
-    "ghc-xhtml-prof", # srpm: ghc
     "ghc-xml", # srpm: ghc-xml
     "ghc-xml-conduit", # srpm: ghc-xml-conduit
     "ghc-xml-conduit-devel", # srpm: ghc-xml-conduit
     "ghc-xml-conduit-doc", # srpm: ghc-xml-conduit
-    "ghc-xml-conduit-prof", # srpm: ghc-xml-conduit
     "ghc-xml-devel", # srpm: ghc-xml
     "ghc-xml-doc", # srpm: ghc-xml
-    "ghc-xml-prof", # srpm: ghc-xml
     "ghc-xml-types", # srpm: ghc-xml-types
     "ghc-xml-types-devel", # srpm: ghc-xml-types
     "ghc-xml-types-doc", # srpm: ghc-xml-types
-    "ghc-xml-types-prof", # srpm: ghc-xml-types
     "ghc-yaml", # srpm: ghc-yaml
     "ghc-yaml-devel", # srpm: ghc-yaml
     "ghc-yaml-doc", # srpm: ghc-yaml
-    "ghc-yaml-prof", # srpm: ghc-yaml
     "ghc-zip-archive", # srpm: ghc-zip-archive
     "ghc-zip-archive-devel", # srpm: ghc-zip-archive
     "ghc-zip-archive-doc", # srpm: ghc-zip-archive
-    "ghc-zip-archive-prof", # srpm: ghc-zip-archive
     "ghc-zlib", # srpm: ghc-zlib
     "ghc-zlib-devel", # srpm: ghc-zlib
     "ghc-zlib-doc", # srpm: ghc-zlib
-    "ghc-zlib-prof", # srpm: ghc-zlib
     "gi-docgen", # srpm: gi-docgen
     "gi-docgen-doc", # srpm: gi-docgen
     "gi-docgen-fonts", # srpm: gi-docgen

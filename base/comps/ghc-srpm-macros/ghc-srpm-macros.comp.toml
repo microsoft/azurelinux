@@ -1,0 +1,24 @@
+[components.ghc-srpm-macros]
+
+# Disable building Haskell profiling libraries for all ghc-* SRPMs by flipping
+# the `with_ghc_prof` default at the source. Azure Linux does not ship any
+# `ghc-*-prof` RPMs; building them adds significant build time and produces
+# hundreds of unused subpackages across the Haskell ecosystem.
+#
+# `macros.ghc-srpm` is consumed at build time by ghc itself and every
+# downstream `ghc-*` SRPM via `BuildRequires: ghc-srpm-macros`. Both the
+# legacy `%with_ghc_prof` definition and the modern `%bcond ghc_prof` need
+# to be flipped to 0 so all consumers see profiling disabled by default.
+[[components.ghc-srpm-macros.overlays]]
+description = "Disable %with_ghc_prof default in macros.ghc-srpm (AZL ships no ghc-*-prof RPMs)"
+type = "file-search-replace"
+file = "macros.ghc-srpm"
+regex = '%with_ghc_prof 1'
+replacement = '%with_ghc_prof 0'
+
+[[components.ghc-srpm-macros.overlays]]
+description = "Flip the %bcond ghc_prof default to 0 in macros.ghc-srpm so downstream specs default to no profiling"
+type = "file-search-replace"
+file = "macros.ghc-srpm"
+regex = '%bcond ghc_prof 1'
+replacement = '%bcond ghc_prof 0'
