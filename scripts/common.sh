@@ -28,7 +28,7 @@ else
 fi
 
 # Set local image path
-export IMAGE_PATH="$REPO_ROOT/base/out/images/vm-base/azl4-vm-base.x86_64-0.1.vhdfixed"
+export IMAGE_PATH="$REPO_ROOT/base/out/images/vm-base-dev/azl4-vm-base.x86_64-0.1.vhdfixed"
 
 # Set gallery configuration
 export GALLERY_NAME="<your-gallery-name>"

@@ -106,7 +106,8 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
     )
     config.addinivalue_line(
         "markers",
-        "image(name): only run this test when --image-name matches",
+        "image(name): only run this test when --image-name matches the named image family "
+        "(exact match, or a ``<family>-<variant>`` image-name)",
     )
 
     from utils.tools import check_tools
@@ -145,21 +146,39 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
         if required and required not in caps:
             pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
 
-    # image: skip if --image-name doesn't match.
+    # image: skip if --image-name doesn't match the marker's family.
+    # Family matching: the marker's value is treated as a family name that
+    # matches an image-name exactly OR matches a `<family>-<variant>` name
+    # (e.g. ``image("vm-base")`` matches both ``vm-base`` and
+    # ``vm-base-dev``). This lets tests under ``cases/<family>/`` apply
+    # to every variant of an image without per-variant duplication.
     image_name = item.config.getoption("--image-name", default=None)
     for marker in item.iter_markers("image"):
         expected = marker.args[0] if marker.args else None
-        if expected and image_name != expected:
-            pytest.skip(f"test is specific to image '{expected}' (running: '{image_name}')")
+        if not expected:
+            continue
+        if image_name == expected:
+            continue
+        if image_name and image_name.startswith(expected + "-"):
+            continue
+        pytest.skip(
+            f"test is specific to image family '{expected}' "
+            f"(running: '{image_name}')"
+        )
 
 
 def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-untyped-def]
     """Auto-apply ``@pytest.mark.image("<dir>")`` to tests under ``cases/<dir>/``.
 
-    Convention: any test file inside ``cases/<image-name>/`` (at any
-    depth) is automatically restricted to that ``--image-name``. This
-    keeps the routing rule co-located with the directory layout — no
-    per-subdir conftest, and no per-file ``pytestmark`` boilerplate
+    Convention: any test file inside ``cases/<image-family>/`` (at any
+    depth) is automatically restricted to images whose name belongs to
+    that family. The directory name is the family; an ``--image-name``
+    matches the family if it equals the family exactly OR if it has the
+    form ``<family>-<variant>`` (e.g. ``vm-base-dev`` matches the
+    ``vm-base`` family). See :func:`pytest_runtest_setup`.
+
+    This keeps the routing rule co-located with the directory layout —
+    no per-subdir conftest, and no per-file ``pytestmark`` boilerplate
     that contributors might forget to add.
 
     Tests directly under ``cases/`` (no image subdir) get no marker
@@ -175,7 +194,7 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
             cases_idx = len(parts) - 1 - parts[::-1].index("cases")
         except ValueError:
             continue
-        # Need at least cases/<image-name>/<file>.py to derive an image name.
+        # Need at least cases/<image-family>/<file>.py to derive a family name.
         if cases_idx + 2 < len(parts):
             image_dir = parts[cases_idx + 1]
             item.add_marker(pytest.mark.image(image_dir))

@@ -6,22 +6,69 @@
         <contact>user@example.com</contact>
         <specification>Azure Linux Container Image Example</specification>
     </description>
+    <!--
+        Profile axes
+        ============
+        This kiwi description has two related axes that produce a flat
+        list of single-string profiles (azldev only forwards a single
+        profile value to kiwi):
+
+          shape:    core | distroless-minimal | distroless-base | distroless-debug
+          variant:  canonical (unsuffixed) | -dev   ← only for `core`
+
+        Variant semantics:
+          - canonical (e.g. `core`):     ships azurelinux-repos
+                                          (runtime → PMC beta);
+                                          OCI tag :4.0 + :latest
+          - `-dev` (e.g. `core-dev`):    ships azurelinux-repos-dev
+                                          (runtime → azl4-dev);
+                                          OCI tag :4.0-dev only
+
+        Distroless variants strip the package manager entirely in
+        config.sh, so they do not ship a `-repos` package and have no
+        runtime repo selection. With the build-time repo unified across
+        variants (see <repository> below — koji overrides this anyway),
+        a `-dev` distroless build would be byte-identical to its
+        canonical sibling, so distroless has only the canonical profile.
+
+        Shape-shared sections are scoped via comma-list profiles so
+        each shape's body is shared between its variants where
+        applicable.
+    -->
     <profiles>
-        <profile name="core" description="Core Container" import="true" />
-        <profile name="distroless-minimal" description="Distroless Minimal Container" import="true" />
-        <profile name="distroless-base" description="Distroless Base Container" import="true" />
-        <profile name="distroless-debug" description="Distroless Debug Container" import="true" />
+        <profile name="core"                description="Core Container"               import="false" />
+        <profile name="core-dev"            description="Core Container (dev)"         import="false" />
+        <profile name="distroless-minimal"  description="Distroless Minimal Container" import="false" />
+        <profile name="distroless-base"     description="Distroless Base Container"    import="false" />
+        <profile name="distroless-debug"    description="Distroless Debug Container"   import="false" />
     </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
     </preferences>
+    <!--
+        OCI containerconfig: only `core` has a variant split (canonical
+        publishes :4.0 + :latest, dev publishes :4.0-dev with no
+        :latest, so the two builds don't collide if loaded into the
+        same registry). Distroless containers have no `-dev` sibling.
+    -->
     <preferences profiles="core">
         <type image="oci">
             <containerconfig
                 name="microsoft/azurelinux/base/core"
                 tag="4.0"
                 additionalnames=":latest"
+                user="root"
+                workingdir="/">
+                <subcommand execute="/bin/bash"/>
+            </containerconfig>
+        </type>
+    </preferences>
+    <preferences profiles="core-dev">
+        <type image="oci">
+            <containerconfig
+                name="microsoft/azurelinux/base/core"
+                tag="4.0-dev"
                 user="root"
                 workingdir="/">
                 <subcommand execute="/bin/bash"/>
@@ -65,28 +112,50 @@
         </type>
     </preferences>
 
+    <!--
+        Single build-time repository for all profiles — koji overrides
+        this for distro builds; for local builds this is the only blob
+        currently populated for AZL4. The variant only affects which
+        `azurelinux-repos*` package ships in `core` and the OCI tag
+        for `core` — NOT where build-time RPMs come from.
+    -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
     </repository>
 
-    <packages type="image" profiles="core">
+    <packages type="image" profiles="core,core-dev">
         <package name="filesystem" />
         <package name="bash" />
         <package name="azurelinux-release-container" />
+    </packages>
+
+    <!--
+        Variant-scoped repos package (core only). The `azurelinux-repos`
+        and `azurelinux-repos-dev` packages conflict, so each variant
+        gets its own section. Distroless variants intentionally do NOT
+        ship a repos package: config.sh strips the package manager
+        (and /etc/yum.repos.d/) entirely.
+    -->
+    <packages type="image" profiles="core-dev">
         <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="image" profiles="core">
+        <package name="azurelinux-repos" />
     </packages>
 
     <!-- For distroless profiles ALL packages that should be included in
          the final image must be listed in the "image" packages section.
          Packages from bootstrap may be removed by config.sh. -->
-    <packages type="image" profiles="distroless-minimal,distroless-base,distroless-debug">
+    <packages type="image"
+              profiles="distroless-minimal,distroless-base,distroless-debug">
         <package name="filesystem" />
         <package name="azurelinux-release-container" />
         <package name="tzdata" />
     </packages>
 
-    <packages type="image" profiles="distroless-base,distroless-debug">
+    <packages type="image"
+              profiles="distroless-base,distroless-debug">
         <package name="glibc" />
         <package name="libgcc" />
         <package name="openssl-libs" />
@@ -97,16 +166,21 @@
         <package name="busybox" />
     </packages>
 
-    <packages type="bootstrap" profiles="core">
+    <packages type="bootstrap" profiles="core-dev">
         <package name="azurelinux-repos-dev" />
     </packages>
+    <packages type="bootstrap" profiles="core">
+        <package name="azurelinux-repos" />
+    </packages>
 
-    <packages type="bootstrap" profiles="core,distroless-minimal,distroless-base,distroless-debug">
+    <packages type="bootstrap"
+              profiles="core,core-dev,distroless-minimal,distroless-base,distroless-debug">
         <package name="filesystem" />
         <package name="azurelinux-release-container" />
     </packages>
 
-    <packages type="bootstrap" profiles="distroless-minimal,distroless-base,distroless-debug">
+    <packages type="bootstrap"
+              profiles="distroless-minimal,distroless-base,distroless-debug">
         <package name="busybox" />
     </packages>
 </image>

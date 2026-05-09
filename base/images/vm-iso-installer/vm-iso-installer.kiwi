@@ -8,6 +8,11 @@
         <contact>azurelinux@microsoft.com</contact>
         <specification>Azure Linux 4.0 ISO Installer</specification>
     </description>
+    <!-- See vm-base.kiwi for an explanation of the canonical / -dev profiles. -->
+    <profiles>
+        <profile name="vm-iso-installer"     description="Ships azurelinux-repos (runtime → PMC beta)" import="false" />
+        <profile name="vm-iso-installer-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+    </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
@@ -27,6 +32,10 @@
         </type>
     </preferences>
 
+    <!-- Single build-time repository (see vm-base.kiwi).
+         vm-iso-installer/config.sh ALSO uses this URL directly to populate
+         the offline repo bundled on the ISO; if this URL changes, update
+         AZL_BASE_URL in config.sh too. -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
@@ -36,7 +45,6 @@
         <!-- Distro identity -->
         <package name="azurelinux-release" />
         <package name="azurelinux-rpm-config" />
-        <package name="azurelinux-repos-dev" />
 
         <!-- Core system -->
         <package name="bash" />
@@ -112,8 +120,19 @@
         <package name="createrepo_c" />
     </packages>
 
-    <packages type="bootstrap">
+    <!--
+        Variant-scoped repos package: governs the .repo files written
+        into /etc/yum.repos.d/ in the built image (runtime). The two
+        packages conflict, so they're separated into per-variant sections.
+    -->
+    <packages type="image" profiles="vm-iso-installer-dev">
         <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="image" profiles="vm-iso-installer">
+        <package name="azurelinux-repos" />
+    </packages>
+
+    <packages type="bootstrap">
         <package name="dracut-network" />
         <package name="filesystem" />
         <package name="grub2-efi-x64-modules" arch="x86_64" />
@@ -122,6 +141,13 @@
         <package name="grub2-efi-aa64" arch="aarch64" />
         <package name="shim" arch="x86_64" />
         <package name="shim" arch="aarch64" />
+    </packages>
+
+    <packages type="bootstrap" profiles="vm-iso-installer-dev">
+        <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="bootstrap" profiles="vm-iso-installer">
+        <package name="azurelinux-repos" />
     </packages>
 
     <users>

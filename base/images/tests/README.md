@@ -18,6 +18,14 @@ azldev image build container-base
 azldev image test  container-base
 ```
 
+(Most images come in two variants. The canonical/unsuffixed name
+ships `azurelinux-repos` so the resulting OS points at PMC's
+`azurelinux/4.0/beta` repo at runtime; the `-dev` variant ships
+`azurelinux-repos-dev` so the OS points at the azl4-dev blob.
+Distroless container images strip the package manager entirely and
+have only the canonical entry. Append `-dev` to the image name —
+where present — to validate the dev variant.)
+
 `azldev` creates a per-suite Python venv, installs this directory's
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
 `--image-name`, and `--capabilities` arguments.
@@ -41,15 +49,16 @@ uv run pytest cases/ \
 ```
 
 Test selection follows standard pytest positional arguments. Tests
-under `cases/<image-name>/` are auto-skipped when `--image-name`
-doesn't match — the `image` marker is applied during collection by
+under `cases/<image-family>/` are auto-skipped when `--image-name`
+doesn't belong to that family — the `image` marker is applied
+during collection by
 `utils.pytest_plugin.pytest_collection_modifyitems` (see "Adding
 tests" below for the convention). Tests marked
 `@pytest.mark.require_capability("…")` skip when the named
 capability isn't in `--capabilities`.
 
 > Always pass `--image-name` when running manually if you want
-> image-specific tests under `cases/<image-name>/` to run. Without
+> image-specific tests under `cases/<image-family>/` to run. Without
 > it, every `@pytest.mark.image(...)`-tagged test is skipped.
 
 ## Prerequisites
@@ -85,10 +94,10 @@ base/images/
     └── cases/                           # Test cases
         ├── test_os_release.py           # Shared: /etc/os-release
         ├── test_packages.py             # Shared: rpm-db checks (capability-gated)
-        ├── vm-base/                     # VM-specific tests (auto-restricted to vm-base)
+        ├── vm-base/                     # VM-specific tests (auto-restricted to the vm-base family — vm-base, vm-base-dev)
         │   ├── test_kernel.py
         │   └── test_partitions.py
-        └── container-base/              # Container-specific tests (auto-restricted to container-base)
+        └── container-base/              # Container-specific tests (auto-restricted to the container-base family)
             └── test_container.py
 ```
 
@@ -112,10 +121,14 @@ base/images/
 - **Shared (every image):** add a `cases/test_<topic>.py`. Use
   `@pytest.mark.require_capability("…")` if the test only applies to
   images with a given capability.
-- **Image-specific:** add `cases/<image-name>/test_<topic>.py`. Tests
+- **Image-specific:** add `cases/<image-family>/test_<topic>.py`. Tests
   in such subdirectories are **automatically** restricted to that
-  `--image-name` (the plugin applies `@pytest.mark.image("<dir>")`
-  during collection — no boilerplate per file or per subdir).
+  image family (the plugin applies `@pytest.mark.image("<dir>")`
+  during collection — no boilerplate per file or per subdir). The
+  directory name is treated as a *family*: an `--image-name` matches
+  the family if it equals the family exactly OR has the form
+  `<family>-<variant>` (so `cases/vm-base/` runs for both `vm-base`
+  and `vm-base-dev`).
 
 ## Adding a native-tool dependency
 

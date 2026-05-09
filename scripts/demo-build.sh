@@ -24,8 +24,8 @@ done
 azldev comp build --local-repo-with-publish ./base/out azurelinux-rpm-config azurelinux-release azurelinux-repos rpm
 
 # Build a base container image using these private RPMs and upstream Fedora packages.
-azldev image build --local-repo ./base/out container-base
+azldev image build --local-repo ./base/out container-base-dev
 
 # Run a command in the container to verify.
-xzcat ./base/out/images/container-base/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
-docker run -it --rm microsoft/azurelinux/base/core:4.0 cat /etc/os-release
+xzcat ./base/out/images/container-base-dev/azl4-container-base.x86_64-0.1.docker.tar.xz | docker load
+docker run -it --rm microsoft/azurelinux/base/core:4.0-dev cat /etc/os-release

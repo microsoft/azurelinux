@@ -33,6 +33,37 @@ echo "  GRUB EFI package: $GRUB_EFI_PKG"
 echo "  Shim EFI binary:  $SHIM_EFI"
 
 #----------------------------------------------------------------------
+# Variant detection
+#----------------------------------------------------------------------
+# kiwi sets `kiwi_profiles` to a comma-separated list of active profiles
+# (one per build, set by --profile). The variant decides which
+# `azurelinux-repos*` package goes into the image and the kickstart,
+# which in turn controls the runtime repo of the installed system.
+#
+# OFFLINE_REPO_BLOCKLIST lists packages that must NOT appear in the
+# offline repo. The opposite-variant repos package goes here:
+# `azurelinux-repos` and `-dev` Conflict: with each other, and
+# `azurelinux-release-common` has `Recommends: azurelinux-repos`, which
+# would otherwise drag the canonical package into the dev offline repo
+# via --resolve --alldeps and risk dnf picking the wrong one.
+case ",${kiwi_profiles:-}," in
+    *,vm-iso-installer-dev,*)
+        AZL_REPOS_PKG="azurelinux-repos-dev"
+        OFFLINE_REPO_BLOCKLIST=( "azurelinux-repos" )
+        ;;
+    *,vm-iso-installer,*)
+        AZL_REPOS_PKG="azurelinux-repos"
+        OFFLINE_REPO_BLOCKLIST=( "azurelinux-repos-dev" )
+        ;;
+    *)
+        echo "ERROR: cannot determine variant from kiwi_profiles='${kiwi_profiles:-}'" >&2
+        exit 1
+        ;;
+esac
+echo "  Variant repos pkg:      $AZL_REPOS_PKG"
+echo "  Offline repo blocklist: ${OFFLINE_REPO_BLOCKLIST[*]}"
+
+#----------------------------------------------------------------------
 # Download all target-install packages + deps for the offline repo
 #----------------------------------------------------------------------
 # During the ISO build we have network access to the repo.
@@ -66,7 +97,7 @@ INSTALL_PKGS=(
     vim-minimal
     ca-certificates
     azurelinux-release
-    azurelinux-repos-dev
+    "$AZL_REPOS_PKG"
     setup
     shadow-utils
     util-linux
@@ -97,9 +128,16 @@ EXTRA_REPO_PKGS=(
 echo "=== Downloading target-install packages + dependencies ==="
 # Kiwi removes repo configs after package installation, so repos from the .kiwi
 # file are NOT available during config.sh. Use --repofrompath with the CDN URL
-# directly. The URL matches the "azurelinux-base" repo in vm-iso-installer.kiwi.
+# directly. Keep this URL in sync with the `azurelinux-base` repo in
+# vm-iso-installer.kiwi.
 
 AZL_BASE_URL="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$ARCH"
+
+EXCLUDE_ARGS=()
+for pkg in "${OFFLINE_REPO_BLOCKLIST[@]}"; do
+    EXCLUDE_ARGS+=( --exclude="$pkg" )
+done
+
 dnf5 download \
     --setopt=reposdir=/dev/null \
     --repofrompath=azl-base,"$AZL_BASE_URL" \
@@ -107,6 +145,7 @@ dnf5 download \
     --resolve \
     --alldeps \
     --skip-unavailable \
+    "${EXCLUDE_ARGS[@]}" \
     --destdir="$OFFLINE_REPO" \
     "${INSTALL_PKGS[@]}" "${EXTRA_REPO_PKGS[@]}" || {
     echo "WARNING: dnf download had errors — some packages may be missing"
@@ -124,6 +163,21 @@ createrepo_c "$OFFLINE_REPO"
 # Validate offline repo completeness (dry-run install)
 #----------------------------------------------------------------------
 echo "=== Validating offline repo completeness ==="
+
+# Verify that no blocklisted package landed in the offline repo.
+# The `-[0-9]*` boundary disambiguates the package name from prefix
+# overlap (e.g. `foo` vs `foo-bar`) since RPM filenames are
+# `<name>-<version>-<release>.<arch>.rpm` with version starting in a digit.
+for pkg in "${OFFLINE_REPO_BLOCKLIST[@]}"; do
+    if ls "$OFFLINE_REPO/${pkg}"-[0-9]*.rpm >/dev/null 2>&1; then
+        echo "!!!"
+        echo "!!! FATAL: blocklisted package landed in offline repo:"
+        echo "!!!   $(ls "$OFFLINE_REPO/${pkg}"-[0-9]*.rpm)"
+        echo "!!!"
+        echo "Fix: ensure the dnf5 download command excludes $pkg."
+        exit 1
+    fi
+done
 
 DRYRUN_ROOT=$(mktemp -d /tmp/azl-dryrun-XXXXXX)
 DRYRUN_ERRORS=$(dnf5 install \

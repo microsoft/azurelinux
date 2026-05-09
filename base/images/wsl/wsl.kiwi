@@ -6,6 +6,11 @@
         <contact>azurelinux@microsoft.com</contact>
         <specification>Azure Linux WSL Image</specification>
     </description>
+    <!-- See vm-base.kiwi for an explanation of the canonical / -dev profiles. -->
+    <profiles>
+        <profile name="wsl"     description="Ships azurelinux-repos (runtime → PMC beta)" import="false" />
+        <profile name="wsl-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+    </profiles>
     <preferences>
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
@@ -17,6 +22,7 @@
         <rpm-excludedocs>false</rpm-excludedocs>
     </preferences>
 
+    <!-- Single build-time repository (see vm-base.kiwi). -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
@@ -72,12 +78,23 @@
     </packages>
 
     <packages type="bootstrap">
-        <package name="azurelinux-repos-dev"/>
         <package name="bash"/>
         <package name="coreutils"/>
         <package name="dnf5"/>
         <package name="dnf5-plugins"/>
         <package name="azurelinux-release-wsl"/>
         <package name="rpm"/>
+    </packages>
+
+    <!--
+        Variant-scoped repos package: governs the .repo files written
+        into /etc/yum.repos.d/ in the built image (runtime). The two
+        packages conflict, so they're separated into per-variant sections.
+    -->
+    <packages type="bootstrap" profiles="wsl-dev">
+        <package name="azurelinux-repos-dev"/>
+    </packages>
+    <packages type="bootstrap" profiles="wsl">
+        <package name="azurelinux-repos"/>
     </packages>
 </image>

@@ -1,6 +1,37 @@
+# ============================================================================
+# Image registry
+# ============================================================================
+#
+# Most images come in two variants — a canonical (unsuffixed) build and
+# a `-dev` build — each backed by a kiwi profile inside the matching
+# `*.kiwi` file:
+#
+#   <name>      : ships `azurelinux-repos`     so the resulting OS points
+#                 at packages.microsoft.com/azurelinux/4.0/beta at runtime.
+#                 (For the `core` container, this is also the variant
+#                  published with the `:4.0` + `:latest` OCI tags.)
+#   <name>-dev  : ships `azurelinux-repos-dev` so the resulting OS points
+#                 at the azl4-dev blob at runtime. (For the `core`
+#                  container, the OCI image is tagged `:4.0-dev` only.)
+#
+# Distroless container images strip the package manager entirely, so
+# they ship no `-repos` package and are not built per-variant — only
+# the canonical (unsuffixed) entries exist for those.
+#
+# Both variants build their RPMs from the same source (the kiwi
+# `<repository>` points at azl4-dev for local builds; koji overrides
+# this for distro builds).
+#
+# Capabilities and test-suites are identical between a canonical / `-dev`
+# pair (the variants only differ in what `-repos` package ships and,
+# for `core`, the OCI tag).
+# ============================================================================
+
+# ---- vm-base -----------------------------------------------------------
+
 [images.vm-base]
 description = "VM Base Image"
-definition = { type = "kiwi", path = "vm-base/vm-base.kiwi" }
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-base" }
 tests.test-suites = [{ name = "static-image-checks" }]
 
 [images.vm-base.capabilities]
@@ -8,6 +39,19 @@ machine-bootable = true
 container = false
 systemd = true
 runtime-package-management = true
+
+[images.vm-base-dev]
+description = "VM Base Image (dev)"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-base-dev" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.vm-base-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+# ---- container-base (core profile) -------------------------------------
 
 [images.container-base]
 description = "Container Base Image"
@@ -19,6 +63,21 @@ machine-bootable = false
 container = true
 systemd = false
 runtime-package-management = true
+
+[images.container-base-dev]
+description = "Container Base Image (dev)"
+definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core-dev" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.container-base-dev.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = true
+
+# ---- distroless containers (single-variant only) -----------------------
+# No -dev sibling: with a single build-time repo and no runtime package
+# management, a -dev distroless build would be byte-identical.
 
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
@@ -32,15 +91,29 @@ definition = { type = "kiwi", path = "container-base/container-base.kiwi", profi
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
 
+# ---- wsl ---------------------------------------------------------------
+
 [images.wsl]
 description = "WSL Image"
-definition = { type = "kiwi", path = "wsl/wsl.kiwi" }
+definition = { type = "kiwi", path = "wsl/wsl.kiwi", profile = "wsl" }
+
+[images.wsl-dev]
+description = "WSL Image (dev)"
+definition = { type = "kiwi", path = "wsl/wsl.kiwi", profile = "wsl-dev" }
+
+# ---- vm-iso-installer --------------------------------------------------
 
 [images.vm-iso-installer]
 description = "VM ISO Installer"
-definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi" }
+definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
 
-# ---- Test suites ----
+[images.vm-iso-installer-dev]
+description = "VM ISO Installer (dev)"
+definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer-dev" }
+
+# ============================================================================
+# Test suites
+# ============================================================================
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]

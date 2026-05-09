@@ -298,7 +298,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         required=True,
         help="Path to the .packages file "
-        "(e.g. ./base/out/images/vm-base/azl4-vm-base.x86_64-0.1.packages)",
+        "(e.g. ./base/out/images/vm-base-dev/azl4-vm-base.x86_64-0.1.packages)",
     )
     add_missing.add_argument(
         "-r",
