@@ -94,6 +94,7 @@
         <package name="device-mapper-event" />
         <package name="dnf5" />
         <package name="dnf5-plugins" />
+        <package name="efibootmgr" />
         <package name="file" />
         <package name="firewalld" />
         <package name="glibc" />
