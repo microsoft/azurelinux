@@ -1,0 +1,17 @@
+[components.qt6]
+
+# Override the qt6_qtwebengine_arches macro to a non-existent architecture so
+# that dependent packages (gpsbabel, libksysguard, python-pyside6, python-pyqt6,
+# qt6-qtwebview) skip their qtwebengine-related code paths, breaking the
+# dependency on qt6-qtwebengine which has pre-existing build failures on AZL.
+#
+# qt6_qtwebengine_arches is a list of supported architectures. To avoid match
+# fail if it changes upstream, we match a word followed by anything.
+# Note: %{nil} cannot be used as the macro value because %ifarch requires at
+# least one argument.
+[[components.qt6.overlays]]
+description = "Clear qt6_qtwebengine_arches macro to disable qtwebengine across dependent packages"
+type = "file-search-replace"
+file = "macros.qt6-srpm"
+regex = '%qt6_qtwebengine_arches \w+\b.*'
+replacement = '%qt6_qtwebengine_arches no_qtwebengine_support'
