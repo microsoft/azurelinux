@@ -1,24 +1,21 @@
-[components.llvm]
+[components.llvm20]
 
-# Workaround: Disable MLIR until python-nanobind (and its dep robin-map)
-# are imported into Azure Linux. MLIR is gated on %{with mlir} in the
-# upstream spec and pulls in python3-nanobind-devel which doesn't exist yet.
 # Workaround: OpenMP tests fail in systemd-nspawn mock (95% failure rate)
 # due to missing /proc/sys/kernel tunables and cgroup support for threads/forks.
 build.without = ["mlir", "check"]
 
-[[components.llvm.overlays]]
-description = "Use the Azure Linux GCC toolchain triple in clang's default config so clang can find gcc runtime files in stage2 builds"
+[[components.llvm20.overlays]]
+description = "Use the Azure Linux GCC toolchain triple in clang20's default config so clang20 can find gcc runtime files in stage2 builds"
 type = "spec-search-replace"
 regex = '%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux'
 replacement = '%global cfg_file_content --gcc-triple=%{_target_cpu}-%{_vendor}-linux'
 
-[[components.llvm.overlays]]
-description = "Bootstrap workaround: write a clang config with the corrected --gcc-triple under %{_builddir} and inject it into CFLAGS/CXXFLAGS/LDFLAGS so this build's clang invocations override the chroot's stale default config"
+[[components.llvm20.overlays]]
+description = "Bootstrap workaround: write a clang config with the corrected --gcc-triple under %{_builddir} and inject it into CFLAGS/CXXFLAGS/LDFLAGS so this build's clang20 invocations override the chroot's stale default config (Koji stage2 still ships the broken clang20)"
 type = "spec-prepend-lines"
 section = "%build"
 lines = [
-	"# AZL bootstrap workaround for llvm self-rebuild (see llvm.comp.toml)",
+	"# AZL bootstrap workaround for llvm20 self-rebuild (see llvm20.comp.toml)",
 	'azl_clang_bootstrap_cfg="%{_builddir}/azl-clang-bootstrap.cfg"',
 	'echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > "${azl_clang_bootstrap_cfg}"',
 	'export CFLAGS="${CFLAGS} --config=${azl_clang_bootstrap_cfg}"',
@@ -26,7 +23,7 @@ lines = [
 	'export LDFLAGS="${LDFLAGS} --config=${azl_clang_bootstrap_cfg}"',
 ]
 
-[[components.llvm.overlays]]
+[[components.llvm20.overlays]]
 description = "Bootstrap workaround: make the instrumented clang used by PGO perf training read the corrected Azure Linux GCC triple config; use a trap so the real clang is restored even if generate-profdata fails"
 type = "spec-search-replace"
 section = "%build"
