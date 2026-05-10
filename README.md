@@ -87,7 +87,7 @@ Example: select **azl-diagnose** from the dropdown, then type:
 The skills and instructions are also compatible with the [GitHub Copilot CLI](https://github.com/features/copilot/cli/) which can be used directly from the terminal without opening VSCode.
 
 ```bash
-# Fully interactive mode
+# Fully interactive mode (from the repo root)
 copilot --add-dir .
 ```
 
@@ -97,6 +97,24 @@ copilot --add-dir . -i "Upgrade vim to the next stable release"
 ```
 
 Note: `copilot` supports fully autonomous operation (no interactive mode) with `-p <prompt>` however, until azldev supports a full MCP mode the tool approvals are very difficult. `--yolo` (same as `--allow-all-tools --allow-all-paths --allow-all-urls`) is an option, but use with extreme caution since it grants the agent unrestricted access to your filesystem and network. For now, it's recommended to use `-i` to at least have visibility into the agent's thought process and tool usage.
+
+#### Using as a plugin (cross-repo access)
+
+This repo includes a [Copilot plugin manifest](.claude-plugin/plugin.json) that makes its skills available from **any** working directory — not just the repo root. This is useful when you're working in another repo but want access to azurelinux skills (component builds, overlay debugging, Koji triage, etc.).
+
+**Install as a plugin (local clone):**
+
+```bash
+# One-time install — skills persist across sessions
+copilot plugin install --plugin-dir /path/to/azurelinux
+
+# Or load for a single session
+copilot --plugin-dir /path/to/azurelinux
+```
+
+After installing, all skills are available regardless of your current directory. Use `/skills` to list them.
+
+> **Note:** Remote install via `copilot plugin install microsoft/azurelinux` will work once this branch (`tomls/base/main`) becomes the repo's default branch on GitHub. Until then, use the local path.
 
 ### Dockerized Batch Triage
 
