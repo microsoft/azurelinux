@@ -546,7 +546,7 @@
         "other": {
           "name": "argparse-manpage",
           "version": "4.7",
-          "downloadUrl": "https://pypi.io/packages/source/a/argparse_manpage/argparse_manpage-4.7.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse_manpage/argparse_manpage-4.7.tar.gz"
         }
       }
     },
