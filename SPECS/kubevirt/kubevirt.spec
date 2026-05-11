@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.7.1
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,7 @@ Patch13:        CVE-2026-39835.patch
 Patch14:        CVE-2026-42502.patch
 Patch15:        CVE-2026-7374.patch
 Patch16:        CVE-2026-33814.patch
+Patch17:        0001-Fix-VM-with-PCI-hostdev-failing-to-restart-after-hot.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
