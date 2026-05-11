@@ -66,11 +66,15 @@ Doxygen documentation for libmicrohttpd and some example source code
 make -C doc/doxygen fast
 
 %check
-# Skip only the https/ subdir tests for now.
-# Reason: TLS runtime issues, probable cause: curl built without gnutls
-# drop-on-upgrade: remove this skip once upstream resolves the HTTPS failures.
-%make_build -C src/microhttpd check
-%make_build -C src/testcurl   check SUBDIRS="."   # skips the failing https/ subdir
+# Override the system crypto policy during tests. The @SYSTEM GnuTLS priority
+# (from gnutls-utilize-system-crypto-policy.patch) may be too restrictive for
+# the self-signed test certificates used by the HTTPS test suite.
+cat > /tmp/gnutls-test-priorities.conf << EOF
+[priorities]
+SYSTEM = NORMAL
+EOF
+export GNUTLS_SYSTEM_PRIORITY_FILE=/tmp/gnutls-test-priorities.conf
+%make_build check
 
 %install
 %make_install
