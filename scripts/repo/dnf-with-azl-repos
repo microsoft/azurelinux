@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+"""dnf-with-azl-repos -- invoke ``dnf`` against Azure Linux repos
+discovered under one or more URL prefixes that follow the Standard
+Azure Linux Repo Layout.
+
+For each ``--repo-prefix`` URL the conventional sub-repos described in
+``_repo_layout.SUBREPOS`` are HEAD-probed; any sub-repo whose
+``repodata/repomd.xml`` returns 404 is silently skipped (it just
+isn't published under that prefix). Other failure modes -- HTTP
+errors, TLS failures, DNS lookup failures, timeouts -- are surfaced
+as fatal so that a transient outage cannot silently shrink the repo
+set passed to ``dnf``. Reachable sub-repos are added with one
+``--repofrompath <id>,<url> --enablerepo=<id>`` pair each, then any
+trailing dnf arguments are appended verbatim and the wrapper
+``execvp``\\s into ``dnf``.
+
+Usage:
+    dnf-with-azl-repos [--repo-prefix URL]... [--no-debuginfo]
+                       [--no-srpms] [--] <dnf-args>...
+
+Examples:
+    dnf-with-azl-repos --repo-prefix https://example.com/azl4 list available
+    dnf-with-azl-repos --repo-prefix https://example.com/azl4 install foo
+
+Notes:
+  * ``--repo-prefix`` is repeatable; each prefix yields its own repo
+    IDs (suffixed ``-1``, ``-2``, ... when more than one prefix is
+    given so the IDs stay unique).
+  * Probing uses the host arch (``uname -m``); URLs handed to dnf keep
+    ``$basearch`` so dnf performs its own substitution at use time.
+  * To pass ``--help`` (or any flag the wrapper would otherwise
+    intercept) through to dnf, separate it with ``--``, e.g.
+    ``dnf-with-azl-repos --repo-prefix URL -- --help``.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import platform
+import shutil
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _repo_layout import (  # noqa: E402
+    KIND_DEBUGINFO,
+    KIND_SRPMS,
+    SUBREPOS,
+)
+
+PROG = Path(sys.argv[0]).name
+USER_AGENT = "dnf-with-azl-repos/1"
+PROBE_TIMEOUT = 30.0
+
+# probe_repo() outcomes.
+_PROBE_OK = "ok"
+_PROBE_MISSING = "missing"      # 404 -- expected for absent sub-repos.
+_PROBE_FAIL = "fail"            # everything else -- surfaced to the user.
+
+
+def die(msg: str, *, code: int = 2) -> None:
+    print(f"{PROG}: {msg}", file=sys.stderr, flush=True)
+    sys.exit(code)
+
+
+def log(msg: str) -> None:
+    print(msg, file=sys.stderr, flush=True)
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        prog=PROG,
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--repo-prefix",
+        action="append",
+        default=[],
+        metavar="URL",
+        help=(
+            "URL prefix assumed to host the Standard Azure Linux Repo "
+            "Layout. Repeatable."
+        ),
+    )
+    parser.add_argument(
+        "--no-debuginfo",
+        action="store_true",
+        help="Do not enable debuginfo sub-repos from the discovered layout.",
+    )
+    parser.add_argument(
+        "--no-srpms",
+        action="store_true",
+        help="Do not enable srpm sub-repos from the discovered layout.",
+    )
+    args, passthrough = parser.parse_known_args(argv)
+
+    # parse_known_args preserves a leading `--` in the unknowns; drop
+    # exactly one so we don't hand `dnf -- ...` to dnf.
+    if passthrough and passthrough[0] == "--":
+        passthrough = passthrough[1:]
+    args.dnf_args = passthrough
+
+    if not args.repo_prefix:
+        die("at least one --repo-prefix URL is required (try --help)")
+
+    excluded: set[str] = set()
+    if args.no_debuginfo:
+        excluded.add(KIND_DEBUGINFO)
+    if args.no_srpms:
+        excluded.add(KIND_SRPMS)
+    args.excluded_kinds = excluded
+    return args
+
+
+def probe_repo(probe_url: str, *, timeout: float = PROBE_TIMEOUT) -> tuple[str, str | None]:
+    """HEAD ``<probe_url>/repodata/repomd.xml``.
+
+    Returns ``(_PROBE_OK, None)`` on 2xx (or successful non-HTTP
+    responses such as ``file://``), ``(_PROBE_MISSING, None)`` on 404,
+    and ``(_PROBE_FAIL, "...")`` on any other transport error or
+    non-2xx HTTP status. The error string is suitable for inclusion in
+    a fatal-error message so the user can see the underlying cause.
+    """
+    url = f"{probe_url.rstrip('/')}/repodata/repomd.xml"
+    req = urllib.request.Request(
+        url, method="HEAD", headers={"User-Agent": USER_AGENT}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            # ``status`` is the HTTP status code for http(s); for
+            # ``file://`` and other non-HTTP schemes urllib's response
+            # has no status attribute -- a successful urlopen there
+            # already proved the file exists.
+            status = getattr(resp, "status", None)
+            if status is None or 200 <= status < 300:
+                return _PROBE_OK, None
+            return _PROBE_FAIL, f"HTTP {status}"
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return _PROBE_MISSING, None
+        return _PROBE_FAIL, f"HTTP {e.code}"
+    except urllib.error.URLError as e:
+        # urllib wraps a `file://` ENOENT as URLError(FileNotFoundError);
+        # treat that as MISSING so local fixtures behave like the HTTP 404
+        # case.
+        if isinstance(e.reason, FileNotFoundError):
+            return _PROBE_MISSING, None
+        return _PROBE_FAIL, f"URL error: {e.reason}"
+    except TimeoutError:
+        return _PROBE_FAIL, f"timed out after {timeout:.0f}s"
+    except OSError as e:
+        return _PROBE_FAIL, f"OS error: {e}"
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    args = parse_args(argv)
+
+    if shutil.which("dnf") is None:
+        die("dnf is required")
+
+    host_arch = platform.machine()
+    prefixes: list[str] = args.repo_prefix
+    excluded_kinds: set[str] = args.excluded_kinds
+
+    dnf_args: list[str] = ["--disablerepo=*", "--refresh"]
+    total_found = 0
+    failures: list[str] = []
+
+    for idx, prefix in enumerate(prefixes, start=1):
+        prefix_trim = prefix.rstrip("/")
+        multi_suffix = f"-{idx}" if len(prefixes) > 1 else ""
+
+        log(f"{PROG}: discovering repos under {prefix_trim}")
+        found_here = 0
+        for sub in SUBREPOS:
+            if sub.kind in excluded_kinds:
+                continue
+            probe_rel = sub.subpath.replace("$basearch", host_arch)
+            probe_full = f"{prefix_trim}/{probe_rel}"
+            dnf_full = f"{prefix_trim}/{sub.subpath}"
+            repo_id = f"azl-{sub.name}{multi_suffix}"
+
+            status, err = probe_repo(probe_full)
+            if status == _PROBE_OK:
+                log(f"  + {repo_id} <- {dnf_full}")
+                dnf_args.extend([
+                    "--repofrompath", f"{repo_id},{dnf_full}",
+                    f"--enablerepo={repo_id}",
+                ])
+                found_here += 1
+            elif status == _PROBE_MISSING:
+                log(
+                    f"  - {repo_id} (no repodata at "
+                    f"{probe_full}/repodata/repomd.xml)"
+                )
+            else:
+                log(
+                    f"  ! {repo_id} ({err}) at "
+                    f"{probe_full}/repodata/repomd.xml"
+                )
+                failures.append(f"{repo_id} <- {probe_full}: {err}")
+        if found_here == 0 and not failures:
+            log(f"{PROG}: warning: no repos discovered under {prefix_trim}")
+        total_found += found_here
+
+    if failures:
+        die(
+            "transport failures while probing the following sub-repos -- "
+            "refusing to proceed with a partial repo set:\n  "
+            + "\n  ".join(failures)
+        )
+
+    if total_found == 0:
+        die("no repos discovered under any --repo-prefix")
+
+    cmd = ["dnf", *dnf_args, *args.dnf_args]
+    os.execvp(cmd[0], cmd)
+
+
+if __name__ == "__main__":
+    sys.exit(main())
