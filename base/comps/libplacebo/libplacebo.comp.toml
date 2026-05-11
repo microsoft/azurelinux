@@ -1,0 +1,21 @@
+[components.libplacebo]
+
+# Disable Dolby Vision support so libplacebo no longer pulls in libdovi
+# (from the rust-dolby_vision SRPM, which has been removed from Azure
+# Linux 4.0). The `-Dlibdovi=disabled` Meson option is upstream-supported
+# and only affects parsing of Dolby Vision RPU metadata at runtime —
+# standard HDR10 / HDR10+ paths are unaffected.
+
+[[components.libplacebo.overlays]]
+description = "Drop libdovi-devel BuildRequires; rust-dolby_vision (which provides libdovi) is being removed from Azure Linux 4.0"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libdovi-devel"
+
+[[components.libplacebo.overlays]]
+description = "Force -Dlibdovi=disabled in the Meson invocation so libplacebo builds without Dolby Vision support after libdovi is dropped. Anchor on %meson itself (rather than a sibling -Doption) so the overlay survives upstream churn in the option list."
+type = "spec-search-replace"
+section = "%build"
+regex = '^%meson \\$'
+replacement = '''%meson \
+ -Dlibdovi=disabled \'''
