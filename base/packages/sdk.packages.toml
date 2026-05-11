@@ -11342,22 +11342,6 @@ packages = [
     "rust-libgit2-sys+ssh-devel", # srpm: rust-libgit2-sys
     "rust-libgit2-sys+vendored-devel", # srpm: rust-libgit2-sys
     "rust-libgit2-sys-devel", # srpm: rust-libgit2-sys
-    "rust-libheif-rs+default-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+image-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+latest-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+v1_17-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+v1_18-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+v1_19-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs+v1_20-devel", # srpm: rust-libheif-rs
-    "rust-libheif-rs-devel", # srpm: rust-libheif-rs
-    "rust-libheif-sys+default-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+latest-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+use-bindgen-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+v1_17-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+v1_18-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+v1_19-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys+v1_20-devel", # srpm: rust-libheif-sys
-    "rust-libheif-sys-devel", # srpm: rust-libheif-sys
     "rust-libloading+default-devel", # srpm: rust-libloading
     "rust-libloading-devel", # srpm: rust-libloading
     "rust-libm+arch-devel", # srpm: rust-libm
