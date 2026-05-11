@@ -1,9 +1,5 @@
 %define soversion 3
 
-# Arches on which we need to prevent arch conflicts on opensslconf.h, must
-# also be handled in opensslconf-new.h.
-%define multilib_arches %{ix86} ia64 %{mips} ppc ppc64 s390 s390x sparcv9 sparc64 x86_64
-
 %global _performance_build 1
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
@@ -23,7 +19,6 @@ BuildRequires: %{_bindir}/cmp
 BuildRequires: %{_bindir}/pod2man
 BuildRequires: %{_bindir}/rename
 BuildRequires: coreutils
-BuildRequires: g++
 BuildRequires: gcc
 BuildRequires: git-core
 BuildRequires: make
@@ -52,26 +47,58 @@ machines. This package provides the OpenSSL FIPS Provider module.
 %autosetup -S git -n openssl-%{version}
 
 %build
-# Add -Wa,--noexecstack here so that libcrypto's assembler modules will be
-# marked as not requiring an executable stack.
-# Also add -DPURIFY to make using valgrind with openssl easier as we do not
-# want to depend on the uninitialized memory as a source of entropy anyway.
-NEW_RPM_OPT_FLAGS="%{optflags} -Wa,--noexecstack -Wa,--generate-missing-build-notes=yes -DPURIFY $RPM_LD_FLAGS"
-
 export HASHBANGPERL=/usr/bin/perl
 
-# ia64, x86_64, ppc are OK by default
-# Configure the build tree.  Override OpenSSL defaults with known-good defaults
-# usable on all platforms.  The Configure script already knows to use -fPIC and
-# NEW_RPM_OPT_FLAGS, so we can skip specifiying them here.
+# Build the FIPS provider, keeping flags as close as possible to the CMVP-validated
+# build (FIPS 140-3 cert #4985, OpenSSL FIPS Provider 3.1.2: ./Configure enable-fips).
+#
+# Flags included:
+#   -Wa,--noexecstack             - Marks fips.so PT_GNU_STACK as non-executable.
+#                                   The assembler sources have no .note.GNU-stack
+#                                   markers; without this the linker defaults to RWE.
+#                                   ELF metadata only; does not affect cryptographic code.
+#   $RPM_LD_FLAGS                 - Applies -Wl,-z,relro -Wl,-z,now (RELRO/BIND_NOW).
+#                                   ELF segment permissions only; does not affect
+#                                   cryptographic code or the FIPS HMAC integrity check
+#                                   (fipsinstall regenerates the HMAC post-strip).
+#   -Wa,--generate-missing-build-notes=yes - Annobin/build-id audit metadata.
+#                                   ELF notes only; does not affect cryptographic code.
+#
+# Flags intentionally excluded (all change what executes inside the FIPS module):
+#   %{optflags} (includes -O2)    - OpenSSL Configure sets -O3 for release builds
+#                                   (Configurations/10-main.conf, picker()).
+#                                   Appending RPM optflags would downgrade to -O2
+#                                   (last -O wins in gcc), changing code generation
+#                                   across all cryptographic functions.
+#   -fstack-protector-strong      - Inserts canary code inside cryptographic functions.
+#   -D_FORTIFY_SOURCE=2           - Redirects libc calls to fortified variants.
+#
+# Flags also excluded but confirmed to have no effect on fips.so:
+#   -DPURIFY                      - No-op in 3.x. The #ifndef PURIFY guard in
+#                                   md_rand.c was removed in commit d8ca44ba
+#                                   (Emilia Kasper, 2016-01-29, "Always DPURIFY");
+#                                   PURIFY behavior became the default. The entire
+#                                   legacy RNG was later replaced by DRBG (75e2c877).
+#                                   Excluded for clarity, not correctness.
+#   -DDEVRANDOM                   - Only affects libcrypto (rand_unix.c), which
+#                                   is compiled into libdefault.a, not libfips.a.
+#                                   The FIPS provider receives entropy via a
+#                                   dispatch callback; it contains no seeding code.
+#                                   Even within libcrypto, DEVRANDOM is only the
+#                                   fallback path; the primary path uses the
+#                                   getrandom() syscall (kernel >= 3.17, Oct 2014).
+#                                   On Azure Linux (kernel 5.15+), the DEVRANDOM
+#                                   code path is never reached.
+#                                   Excluded for clarity, not correctness.
 ./Configure \
     --prefix=%{_prefix} \
     --openssldir=%{_sysconfdir}/pki/tls \
     --libdir=lib \
+    -Wa,--noexecstack \
+    -Wa,--generate-missing-build-notes=yes \
+    $RPM_LD_FLAGS \
     shared \
-    enable-fips \
-    enable-buildtest-c++ \
-    -Wl,--allow-multiple-definition
+    enable-fips
 
 make -s %{?_smp_mflags} all
 
@@ -152,18 +179,6 @@ touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
 
-# Determine which arch opensslconf.h is going to try to #include.
-basearch=%{_arch}
-%ifarch %{ix86}
-basearch=i386
-%endif
-%ifarch sparcv9
-basearch=sparc
-%endif
-%ifarch sparc64
-basearch=sparc64
-%endif
-
 # Next step of gradual disablement of SSL3.
 # Make SSL3 disappear to newly built dependencies.
 sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
@@ -181,9 +196,7 @@ find $RPM_BUILD_ROOT -type d -empty -delete
 
 %files
 %attr(0755,root,root) %{_libdir}/ossl-modules
-%config(noreplace) %{_sysconfdir}/pki/tls/fipsmodule.cnf
-
-%ldconfig_scriptlets libs
+%{_sysconfdir}/pki/tls/fipsmodule.cnf
 
 %changelog
 * Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.1.2-2
