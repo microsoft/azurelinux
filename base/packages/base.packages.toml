@@ -3411,9 +3411,6 @@ packages = [
     "libgxps", # srpm: libgxps
     "libgxps-devel", # srpm: libgxps
     "libgxps-tools", # srpm: libgxps
-    "libheif", # srpm: libheif
-    "libheif-devel", # srpm: libheif
-    "libheif-tools", # srpm: libheif
     "libhwasan", # srpm: gcc
     "libhwasan-static", # srpm: gcc
     "libi2c", # srpm: i2c-tools
