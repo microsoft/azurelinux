@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/ImageMagick.azl.macros}
+
 %bcond_without tests
 
 %bcond_without libheif
@@ -17,7 +20,7 @@
 Name:           ImageMagick
 Epoch:          1
 Version:        7.1.1.47
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        An X application for displaying and manipulating images
 
 %global VER %(foo=%{version}; echo ${foo:0:5})
@@ -30,6 +33,7 @@ URL:            https://imagemagick.org/
 Source0:        https://imagemagick.org/archive/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz
 Source1:        https://imagemagick.org/archive/releases/%{name}-%{VER}-%{Patchlevel}.tar.xz.asc
 Source2:        ImageMagick.keyring
+Source9999: ImageMagick.azl.macros
 
 BuildRequires:  pkgconfig(bzip2)
 BuildRequires:  pkgconfig(freetype2)

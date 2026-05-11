@@ -1,3 +1,9 @@
 [components.ImageMagick]
 # Pin to 1:7.1.1.47-6, before uhdr support was added in -7 (libuhdr not available in AZL4).
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d19ffa4ff6561de088a5d92bfe95950591aa82f8" }
+
+# Disable HEIF/HEIC support — libheif is being retired from Azure Linux 4.0.
+# The upstream spec wraps libheif BR, the %package heic stanza, and the heic
+# coder %files entries in `%if %{with libheif}`, so flipping the bcond is enough.
+[components.ImageMagick.build]
+without = ["libheif"]
