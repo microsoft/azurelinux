@@ -3376,8 +3376,6 @@ packages = [
     "libdmtx", # srpm: libdmtx
     "libdmtx-devel", # srpm: libdmtx
     "libdnf5-plugin-notify-PackageKit", # srpm: PackageKit
-    "libdovi", # srpm: rust-dolby_vision
-    "libdovi-devel", # srpm: rust-dolby_vision
     "libdv", # srpm: libdv
     "libdv-devel", # srpm: libdv
     "libdv-tools", # srpm: libdv
@@ -9186,13 +9184,6 @@ packages = [
     "rust-document-features+default-devel", # srpm: rust-document-features
     "rust-document-features+self-test-devel", # srpm: rust-document-features
     "rust-document-features-devel", # srpm: rust-document-features
-    "rust-dolby_vision+capi-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision+default-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision+libc-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision+roxmltree-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision+serde-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision+xml-devel", # srpm: rust-dolby_vision
-    "rust-dolby_vision-devel", # srpm: rust-dolby_vision
     "rust-dotenv+default-devel", # srpm: rust-dotenv
     "rust-dotenv-devel", # srpm: rust-dotenv
     "rust-dotenvy+clap-devel", # srpm: rust-dotenvy
