@@ -102,7 +102,7 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 export ZONEINFO=/usr/share/zoneinfo
 export TZ=UTC
 
-echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts
+echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts 2>/dev/null || true
 
 export TMPDIR=$PWD/tmp
 mkdir -p $TMPDIR
