@@ -1,0 +1,78 @@
+From 703a2b932f8b6e06f4a1c0cdfdf7f4cf030a6e38 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:37 -0500
+Subject: [PATCH 06/23] migration/block: Fix possible race with block_inactive
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [5/22] 6300de6a4a19d4648e5a5503ef8cec557fe8e666 (kmwolf/centos-qemu-kvm)
+
+Src QEMU sets block_inactive=true very early before the invalidation takes
+place.  It means if something wrong happened during setting the flag but
+before reaching qemu_savevm_state_complete_precopy_non_iterable() where it
+did the invalidation work, it'll make block_inactive flag inconsistent.
+
+For example, think about when qemu_savevm_state_complete_precopy_iterable()
+can fail: it will have block_inactive set to true even if all block drives
+are active.
+
+Fix that by only update the flag after the invalidation is done.
+
+No Fixes for any commit, because it's not an issue if bdrv_activate_all()
+is re-entrant upon all-active disks - false positive block_inactive can
+bring nothing more than "trying to active the blocks but they're already
+active".  However let's still do it right to avoid the inconsistent flag
+v.s. reality.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-Id: <20241206230838.1111496-6-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit 8c97c5a476d146b35b2873ef73df601216a494d9)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ migration/migration.c | 9 +++------
+ migration/savevm.c    | 2 ++
+ 2 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index 8a262e01ff..784b7e9b90 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2779,14 +2779,11 @@ static int migration_completion_precopy(MigrationState *s,
+         goto out_unlock;
+     }
+ 
+-    /*
+-     * Inactivate disks except in COLO, and track that we have done so in order
+-     * to remember to reactivate them if migration fails or is cancelled.
+-     */
+-    s->block_inactive = !migrate_colo();
+     migration_rate_set(RATE_LIMIT_DISABLED);
++
++    /* Inactivate disks except in COLO */
+     ret = qemu_savevm_state_complete_precopy(s->to_dst_file, false,
+-                                             s->block_inactive);
++                                             !migrate_colo());
+ out_unlock:
+     bql_unlock();
+     return ret;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index a0c4befdc1..b88dadd904 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1577,6 +1577,8 @@ int qemu_savevm_state_complete_precopy_non_iterable(QEMUFile *f,
+             qemu_file_set_error(f, ret);
+             return ret;
+         }
++        /* Remember that we did this */
++        s->block_inactive = true;
+     }
+     if (!in_postcopy) {
+         /* Postcopy stream will still be going */
+-- 
+2.48.1
+
