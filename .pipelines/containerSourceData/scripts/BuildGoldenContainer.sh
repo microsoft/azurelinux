@@ -247,6 +247,21 @@ function prepare_docker_directory {
     # we look for the toolchain rpms in the same directory as the rpms tarball
     tar -xvf "$TOOLCHAIN_RPMS_TARBALL" -C "$HOST_MOUNTED_DIR/RPMS"/
     cp -v "$CONTAINER_SRC_DIR/azurelinuxlocal.repo" "$HOST_MOUNTED_DIR"/
+
+    PIP_CFG_PATH="$WORK_DIR/pip.cfg"
+    PIP_CFG_ARG=""
+    if [ -n "$PIP_INDEX_URL" ] || [ -n "$PIP_EXTRA_INDEX_URL" ]; then
+        cat > "$PIP_CFG_PATH" << EOF
+[global]
+EOF
+        if [ -n "$PIP_INDEX_URL" ]; then
+            echo "index-url = $PIP_INDEX_URL" >> "$PIP_CFG_PATH"
+        fi
+        if [ -n "$PIP_EXTRA_INDEX_URL" ]; then
+            echo "extra-index-url = $PIP_EXTRA_INDEX_URL" >> "$PIP_CFG_PATH"
+        fi
+        PIP_CFG_ARG="--secret id=pip_cfg,src=$PIP_CFG_PATH"
+    fi
 }
 
 function docker_build {
@@ -257,6 +272,7 @@ function docker_build {
     echo "docker buildx build $DOCKER_BUILD_ARGS" \
     "--build-arg BASE_IMAGE=$BASE_IMAGE_NAME_FULL" \
     "--build-arg RPMS_TO_INSTALL=$PACKAGES_TO_INSTALL" \
+    "$PIP_CFG_ARG" \
     "-t $CONTAINER_IMAGE_NAME --no-cache --progress=plain" \
     "-f $WORK_DIR/Dockerfile ."
 
@@ -264,6 +280,7 @@ function docker_build {
     docker buildx build $DOCKER_BUILD_ARGS \
         --build-arg BASE_IMAGE="$BASE_IMAGE_NAME_FULL" \
         --build-arg RPMS_TO_INSTALL="$PACKAGES_TO_INSTALL" \
+        $PIP_CFG_ARG \
         -t "$CONTAINER_IMAGE_NAME" --no-cache --progress=plain \
         -f "$WORK_DIR/Dockerfile" .
     popd > /dev/null
