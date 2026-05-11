@@ -1,0 +1,43 @@
+# Stub workflow — A copy of this workflow must live on the default branch (3.0) so that the
+# pull_request_target event can trigger it with access to GITHUB_TOKEN (pull-requests: write).
+# It delegates all real work to the reusable template on tomls/base/main.
+#
+# This two-stage design lets fork PRs trigger the check safely: the stub runs in the
+# context of the default branch (with write token), but the reusable workflow checks out
+# the PR's data files (TOML configs, specs) into a separate directory — never mixing
+# untrusted code with execution context.
+#
+# The stub must exist on the default branch because pull_request_target always runs
+# workflows from there. The reusable workflow on tomls/base/main has the actual scripts,
+# container setup, and rendering logic.
+name: Check Rendered Specs
+
+# pull_request_target gives us a GITHUB_TOKEN with pull-requests: write even for fork PRs.
+# The stub itself runs NO code from the PR — it only delegates to a trusted reusable
+# workflow pinned to tomls/base/main, which checks out PR data (not code) into an
+# isolated subdirectory.
+on: # zizmor: ignore[dangerous-triggers]
+  pull_request_target:
+    branches:
+      - tomls/base/main
+
+permissions: {}
+
+concurrency:
+  group: render-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # Prevent forks from running a stale/vulnerable copy of this stub with Actions enabled
+    if: github.repository == 'microsoft/azurelinux'
+    # Intentionally branch-pinned so the reusable workflow picks up updates automatically.
+    uses: microsoft/azurelinux/.github/workflows/check-rendered-specs.yml@tomls/base/main # zizmor: ignore[unpinned-uses]
+    permissions:
+      contents: read
+      pull-requests: write # Post/update/delete drift comments on PRs
+    with:
+      pr-head-sha: ${{ github.event.pull_request.head.sha }}
+      pr-head-repo: ${{ github.event.pull_request.head.repo.full_name }}
+      pr-number: ${{ github.event.pull_request.number }}
+      repo: ${{ github.repository }}

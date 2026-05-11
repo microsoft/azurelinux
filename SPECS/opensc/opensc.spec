@@ -1,5 +1,5 @@
 Name:           opensc
-Version:        0.26.1
+Version:        0.27.1
 Release:        1%{?dist}
 Summary:        Smart card library and applications
 
@@ -204,6 +204,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Tue Mar 31 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.27.1-1
+- Auto-upgrade to 0.27.1 - for CVE-2025-13763, CVE-2025-49010, CVE-2025-66215, CVE-2025-66038, CVE-2025-66037
+
 * Tue Jun 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.26.1-1
 - Auto-upgrade to 0.26.1 - for CVE-2024-45619
 

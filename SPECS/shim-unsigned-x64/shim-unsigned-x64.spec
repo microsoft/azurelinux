@@ -37,7 +37,7 @@
 
 Name:		shim-unsigned-%{efiarch}
 Version:	16.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	x86_64
 License:	BSD
@@ -223,6 +223,9 @@ HASH=$(cat %{buildroot}%{shimdir}/shim%{efiarch}.hash | cut -d ' ' -f 1)
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Tue Apr 07 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-2
+- Bump to match shim-unsigned-aarch64
+
 * Thu Feb 19 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
 - Update to shim 16.1
 
