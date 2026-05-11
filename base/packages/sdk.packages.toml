@@ -850,6 +850,12 @@ packages = [
     "gcc-xtensa-linux-gnu", # srpm: cross-gcc
     "gcovr", # srpm: gcovr
     "gcovr-doc", # srpm: gcovr
+    "gcr", # srpm: gcr
+    "gcr-devel", # srpm: gcr
+    "gcr-libs", # srpm: gcr
+    "gcr3", # srpm: gcr3
+    "gcr3-base", # srpm: gcr3
+    "gcr3-devel", # srpm: gcr3
     "gdal", # srpm: gdal
     "gdal-devel", # srpm: gdal
     "gdal-java", # srpm: gdal
