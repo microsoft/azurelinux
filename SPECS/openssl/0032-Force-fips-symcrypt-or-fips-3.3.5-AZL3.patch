@@ -5,7 +5,7 @@ Subject: [PATCH] Force FIPS Mode for AZL3
 
 ---
  crypto/provider_conf.c | 120 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 119 insertions(+), 1 deletion(-)
+ 1 file changed, 123 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
 index 70c9729..5b39131 100644
@@ -30,7 +30,7 @@ index 70c9729..5b39131 100644
  
          if (ok == 1) {
              if (!ossl_provider_activate(prov, 1, 0)) {
-@@ -396,6 +399,40 @@ static int provider_conf_load(OSSL_LIB_CTX *libctx, const char *name,
+@@ -396,6 +399,44 @@ static int provider_conf_load(OSSL_LIB_CTX *libctx, const char *name,
      return ok >= 0;
  }
  
@@ -45,7 +45,11 @@ index 70c9729..5b39131 100644
 +    if (access(provider_config_path, R_OK) == 0) {
 +        // Attempt to load normally, through config.
 +        CONF *prov_conf = NCONF_new_ex(libctx, NCONF_default());
++        if (prov_conf == NULL) {
++            return 0;
++        }
 +        if (NCONF_load(prov_conf, provider_config_path, NULL) <= 0) {
++            NCONF_free(prov_conf);
 +            return 0;
 +        }
 +
@@ -71,7 +75,7 @@ index 70c9729..5b39131 100644
  static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
  {
      STACK_OF(CONF_VALUE) *elist;
-@@ -420,6 +457,87 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -420,6 +461,87 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
