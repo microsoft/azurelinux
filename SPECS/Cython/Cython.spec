@@ -3,13 +3,14 @@ Cython is an optimising static compiler for both the Python programming language
 Summary:        Language for writing Python extension modules
 Name:           Cython
 Version:        3.0.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.cython.org
 Source0:        https://github.com/cython/cython/releases/download/%{version}/%{name}-%{version}.tar.gz
 Patch0:         fix_testcycache.patch
+Patch1:         fix-ipythonmagic-e502.patch
 BuildRequires:  gcc
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
@@ -46,7 +47,7 @@ pip3 install -r test-requirements-312.txt
 
 %files -n python3-%{name}
 %license LICENSE.txt COPYING.txt
-%doc *.txt Demos docs Tools
+%doc Demos docs Tools
 %{_bindir}/cython
 %{_bindir}/cygdb
 %{_bindir}/cythonize
@@ -57,6 +58,9 @@ pip3 install -r test-requirements-312.txt
 %{python3_sitearch}/__pycache__/cython.*
 
 %changelog
+* Tue Apr 28 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.0.5-3
+- Adding a patch for IpythonMagic.py to fix flake8 E502 without rewriting unrelated line continuations.
+
 * Thu Mar 21 2024 Andrew Phelps <anphel@microsoft.com> - 3.0.5-2
 - Switch to test-requirements-312.txt
 - Skip long-running file based tests

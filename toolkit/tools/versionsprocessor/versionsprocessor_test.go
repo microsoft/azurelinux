@@ -56,10 +56,10 @@ func TestProcessPackageVersionString_ErrorsOnBadFormat(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// sanitizeMacroIdentPart tests
+// invalidMacroCharRegexp tests
 // ---------------------------------------------------------------------------
 
-func TestSanitizeMacroIdentPart(t *testing.T) {
+func TestInvalidMacroCharRegexp(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -78,7 +78,7 @@ func TestSanitizeMacroIdentPart(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, sanitizeMacroIdentPart(tt.input))
+			assert.Equal(t, tt.expected, invalidMacroCharRegexp.ReplaceAllString(tt.input, "_"))
 		})
 	}
 }
@@ -137,6 +137,18 @@ func TestProcessPackageVersionString_TableDriven(t *testing.T) {
 			input:           "python3-prometheus_client+twisted-0.21.1-2.azl3.noarch",
 			expectedVersion: "%azl_python3_prometheus_client_twisted_version 0.21.1",
 			expectedRelease: "%azl_python3_prometheus_client_twisted_release 2",
+		},
+		{
+			name:            "versioned package name with a dot",
+			input:           "rust-1.75-1.75.0-27.azl3.x86_64",
+			expectedVersion: "%azl_rust_1_75_version 1.75.0",
+			expectedRelease: "%azl_rust_1_75_release 27",
+		},
+		{
+			name:            "another versioned package name with a dot",
+			input:           "golang-1.25-1.25.9-1.azl3.x86_64",
+			expectedVersion: "%azl_golang_1_25_version 1.25.9",
+			expectedRelease: "%azl_golang_1_25_release 1",
 		},
 	}
 

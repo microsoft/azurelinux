@@ -55,8 +55,22 @@ binary is specific to that additional dependency's exact version.
 
 ### 1.3 Resolving Non-Kernel Package Version
 
-When the spec also depends on non-kernel packages (i.e., MOFED packages), resolve the version through the
-`azl_<pkg>_*` (i.e., `azl_mlnx_ofa_kernel_*`) macros:
+When the spec also depends on non-kernel packages (for example, MOFED packages),
+resolve the version through the `%azl_<pkg>_*` macros provided by the build system.
+
+> **Macro naming rule.** Every `%azl_<pkg>_*` macro is named after a *built RPM*:
+>
+> 1. **Use the built RPM's name, not the spec file's base name.** If a spec's
+>    top-level package has no `%files` section, no `%azl_<spec_basename>_*` macro
+>    is produced; only its subpackages contribute. For instance,
+>    `mlnx-ofa_kernel-hwe.spec` builds only `mlnx-ofa_kernel-hwe-modules` and
+>    `mlnx-ofa_kernel-hwe-devel`, so consumers must use
+>    `%azl_mlnx_ofa_kernel_hwe_modules_*` (the bare `%azl_mlnx_ofa_kernel_hwe_*`
+>    is never produced).
+> 2. **Replace every character outside `[A-Za-z0-9_]` with `_`.** For example,
+>    the `gcc-c++` subpackage is exposed as `%azl_gcc_c___version` and
+>    `%azl_gcc_c___release` — the dash and the two plus signs all collapse to
+>    underscores.
 
 - For the **default kernel**:
 
@@ -64,21 +78,11 @@ When the spec also depends on non-kernel packages (i.e., MOFED packages), resolv
   %{!?_mofed_full_version: %define _mofed_full_version %{azl_mlnx_ofa_kernel_version}-%{azl_mlnx_ofa_kernel_release}%{?dist}}
   ```
 
-  Or simpler:
-  ```rpm
-  %define _mofed_full_version %{azl_mlnx_ofa_kernel_version}-%{azl_mlnx_ofa_kernel_release}%{?dist}
-  ```
-
 - For the **HWE kernel**:
 
   ```rpm
-  %{!?_mofed_hwe_full_version: %define _mofed_hwe_full_version %{azl_mlnx_ofa_kernel_hwe_version}-%{azl_mlnx_ofa_kernel_hwe_release}%{?dist}}
+  %{!?_mofed_hwe_full_version: %define _mofed_hwe_full_version %{azl_mlnx_ofa_kernel_hwe_modules_version}-%{azl_mlnx_ofa_kernel_hwe_modules_release}%{?dist}}
   ```
-
-  Or simpler:
-  ```rpm
-  %define _mofed_hwe_full_version %{azl_mlnx_ofa_kernel_hwe_version}-%{azl_mlnx_ofa_kernel_hwe_release}%{?dist}
-  ``` 
 
 ---
 
