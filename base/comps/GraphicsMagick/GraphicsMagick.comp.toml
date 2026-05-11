@@ -1,0 +1,15 @@
+[components.GraphicsMagick]
+
+# Disable HEIF support — libheif is being retired from Azure Linux 4.0.
+# Upstream spec has no explicit `--with-heif`/`--without-heif` flag in
+# `%configure`; the heif coder is auto-detected via pkg-config when
+# libheif-devel is present. Removing the BuildRequires causes configure
+# to skip heif, and no plugin file is produced (the GraphicsMagick %files
+# section globs `%{_libdir}/GraphicsMagick-*/modules-*/coders/`, so a
+# missing heif coder doesn't trigger an "unpackaged file" error).
+
+[[components.GraphicsMagick.overlays]]
+description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libheif-devel"

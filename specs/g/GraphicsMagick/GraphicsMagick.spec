@@ -23,7 +23,7 @@
 
 Name: GraphicsMagick
 Version: 1.3.45
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: An ImageMagick fork, offering faster image generation and better quality
 Url: http://www.graphicsmagick.org/
 License: MIT
@@ -45,7 +45,6 @@ BuildRequires: giflib-devel
 BuildRequires: jasper-devel
 BuildRequires: jbigkit-devel
 BuildRequires: lcms2-devel
-BuildRequires: libheif-devel
 BuildRequires: libjpeg-devel
 BuildRequires: libjxl-devel
 BuildRequires: libpng-devel
