@@ -26,6 +26,7 @@ BuildRequires: make
 BuildRequires:  gcc
 BuildRequires:  glib2-devel >= 2.26
 BuildRequires:  gnutls-devel
+BuildRequires:  gnutls-utils
 BuildRequires:  zlib-devel
 BuildRequires:  libnl3-devel
 BuildRequires:  bison
@@ -58,9 +59,28 @@ install -pDm644 %{S:1} %{buildroot}%{_unitdir}/nbd-server.service
 install -pDm644 %{S:2} %{buildroot}%{_sysconfdir}/sysconfig/nbd-server
 
 %check
+# Regenerate TLS test certificates at build time so they are always valid.
+# The shipped certs (generated 2016) expired on 2026-04-17.
+# See tests/run/certs/README.md for the upstream procedure.
+pushd tests/run/certs
+certtool --generate-privkey --outfile ca-key.pem 2>/dev/null
+certtool --generate-self-signed --load-privkey ca-key.pem \
+  --template ca.info --outfile ca-cert.pem 2>/dev/null
+certtool --generate-privkey --outfile server-key.pem 2>/dev/null
+certtool --generate-certificate --load-ca-certificate ca-cert.pem \
+  --load-ca-privkey ca-key.pem --load-privkey server-key.pem \
+  --template server.info --outfile server-cert.pem 2>/dev/null
+certtool --generate-privkey --outfile client-key.pem 2>/dev/null
+certtool --generate-certificate --load-ca-certificate ca-cert.pem \
+  --load-ca-privkey ca-key.pem --load-privkey client-key.pem \
+  --template client.info --outfile client-cert.pem 2>/dev/null
+certtool --generate-privkey --outfile selfsigned-key.pem 2>/dev/null
+certtool --generate-self-signed --load-privkey selfsigned-key.pem \
+  --template ca.info --outfile selfsigned-cert.pem 2>/dev/null
+popd
 # wait longer for nbd-server to fully start,
 # one second may not be enough on Fedora building infra
-DELAY=10 make check XFAIL_TESTS="tls tlshuge"
+DELAY=10 make check
 
 %post
 %systemd_post nbd-server.service
