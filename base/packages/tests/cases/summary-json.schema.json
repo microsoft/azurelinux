@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://azurelinux.example/schemas/repo-tests/summary-json.schema.json",
+  "title": "Azure Linux repo-tests --summary-json output (v1)",
+  "description": "Companion schema for the JSON file written by the pytest --summary-json hook in utils/pytest_plugin.py. The hook emits one file per pytest invocation containing every classified known-violations record across all tests; CI consumers can gate on real_fails / known_violations / stale without re-parsing pytest output. Schema version is pinned by SUMMARY_JSON_SCHEMA_VERSION in utils/pytest_plugin.py and validated structurally by tests/unit/test_known_violations.py via this file.",
+  "type": "object",
+  "required": ["schema_version", "exit_status", "records"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "description": "Pinned schema version. Bump in lockstep with SUMMARY_JSON_SCHEMA_VERSION; mismatched versions must be rejected by consumers so a silent shape drift never goes unnoticed.",
+      "const": 1
+    },
+    "exit_status": {
+      "description": "The pytest exit code returned by the run that produced this summary. Standard pytest exit codes: 0 = all passed, 1 = test failures, 2 = interrupted, 3 = internal error, 4 = usage error, 5 = no tests collected.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5
+    },
+    "records": {
+      "description": "One record per (test_nodeid, arch, source_label) tuple emitted by a test that classified known-violations.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": [
+        "test_nodeid",
+        "arch",
+        "source_label",
+        "real_fails",
+        "known_violations",
+        "stale"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "test_nodeid": {
+          "description": "The pytest nodeid of the test that produced this record (e.g. cases/test_repoclosure_base_plus_sdk_full.py::test_repoclosure_base_plus_sdk_full[x86_64]).",
+          "type": "string",
+          "minLength": 1
+        },
+        "arch": {
+          "description": "The architecture the test ran for.",
+          "type": "string",
+          "minLength": 1
+        },
+        "source_label": {
+          "description": "Identifier the test passed for the slice of findings that produced these verdicts (e.g. 'runtime-missing', 'buildtime-missing', 'duplicate-subpackage'). Lets a CI consumer scope its gating per source.",
+          "type": "string",
+          "minLength": 1
+        },
+        "real_fails": {
+          "description": "Verdicts the test treated as a hard fail (consumer not in allowlist, or observed values exceed listed values).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/verdict" }
+        },
+        "known_violations": {
+          "description": "Verdicts the test treated as XFAIL (consumer in allowlist and observed values are a subset of the listed values).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/verdict" }
+        },
+        "stale": {
+          "description": "Stale-entry signals: consumer listed but absent on this arch (kind=stale-consumer), or a listed value never appeared in any finding for the consumer (kind=stale-dep).",
+          "type": "array",
+          "items": { "$ref": "#/$defs/staleEntry" }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["key", "consumer", "observed", "listed"],
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "description": "String form of the test-specific finding key (e.g. NEVRA for repoclosure, binary name for duplicate-subpackage).",
+          "type": "string",
+          "minLength": 1
+        },
+        "consumer": {
+          "description": "The allowlist consumer-name extracted from the finding key.",
+          "type": "string",
+          "minLength": 1
+        },
+        "observed": {
+          "description": "Sorted, deduplicated list of value-strings observed for this finding.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "listed": {
+          "description": "Sorted, deduplicated list of value-strings the allowlist permits for this consumer, OR null when no allowlist entry exists for the consumer (the unlisted-consumer real-fail branch).",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            }
+          ]
+        },
+        "reason": {
+          "description": "(Optional, ST2) free-text rationale carried over from the allowlist entry. Omitted when absent.",
+          "type": "string",
+          "minLength": 1
+        },
+        "issue": {
+          "description": "(Optional, ST2) tracking link (URL or shorthand like 'AB#12345') carried over from the allowlist entry. Omitted when absent.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "staleEntry": {
+      "type": "object",
+      "required": ["consumer", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "consumer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": ["stale-consumer", "stale-dep"]
+        },
+        "listed_dep": {
+          "description": "For kind=stale-dep, the listed value-string that never appeared in any finding for the consumer. Null for kind=stale-consumer.",
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        }
+      }
+    }
+  }
+}

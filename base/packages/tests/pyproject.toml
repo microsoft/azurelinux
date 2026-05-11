@@ -1,0 +1,81 @@
+[project]
+name = "azl-repo-tests"
+version = "0.1.0"
+description = "Pytest-based validation of published Azure Linux RPM repositories."
+requires-python = ">=3.12"
+dependencies = [
+    "pytest>=8.0",
+    # pytest-subtests lets a single test report multiple violations
+    # as individual failures without artificially multiplying the
+    # collected test count. Used by tests that detect a list of
+    # violations and want each to surface on its own (e.g.,
+    # test_no_duplicate_subpackage_names, test_file_conflicts_cross_repo).
+    "pytest-subtests>=0.13",
+    # createrepo_c is the canonical primary/filelists XML parser used
+    # by the dnf stack itself. Pure-C bindings shipped as manylinux
+    # wheels on PyPI (no system package required), so this stays
+    # pip-installable. Replaces the previous hand-rolled iterparse +
+    # decompression code (and the defusedxml/zstandard deps).
+    "createrepo_c>=1.0",
+    # jsonschema validates the per-test known-violations TOML files
+    # (cases/known-violations/*.toml) against
+    # cases/known-violations.schema.json on load. Pure-Python wheel
+    # on PyPI (no system package required). Used only by
+    # utils/known_violations.py.
+    "jsonschema>=4.0",
+]
+
+# Additional **system** packages required at runtime — these are NOT
+# pip-installable. Each ships pure-C Python bindings to the dnf-stack
+# C libraries; they are what `dnf` itself uses internally for the same
+# work, so tracking them keeps our metadata interpretation aligned
+# with dnf's. Document them in README "Prerequisites".
+#
+# * python3-librepo  — used by utils/repodata.py to fetch + verify +
+#                      decompress repomd/primary/filelists, and to
+#                      download individual RPMs on demand for the
+#                      cross-repo file-conflicts test.
+# * python3-libdnf5  — used by utils/repoclosure.py to load metadata
+#                      into a libdnf5 Base/repo_sack and evaluate
+#                      `Requires` (including rich/boolean deps) via
+#                      libsolv's pool_satisfieddep_map. Same call
+#                      `dnf5 repoclosure` itself makes.
+# * python3-rpm      — used by utils/repodata.py to read per-file
+#                      metadata (mode/owner/group/size/digest/linkto)
+#                      out of downloaded RPM headers, so the
+#                      cross-repo file-conflicts test can mirror
+#                      RPM's own `rpmfilesCompare` rules. createrepo
+#                      XML and libdnf5 only expose path + type +
+#                      digest, not the rest.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["utils"]
+
+[project.entry-points."pytest11"]
+azl_repo = "utils.pytest_plugin"
+
+[tool.pytest.ini_options]
+# Default to pytest's normal progress (dots) and short tracebacks.
+# Use ``-v`` on the command line for full test names; use ``-o
+# log_cli=true -o log_cli_level=INFO`` to enable live log output.
+# Captured logs are still attached to *failed* tests by default, so
+# diagnostic info is available when something goes wrong without
+# flooding stdout for green runs.
+#
+# ``-rxX`` adds an ``XFAIL`` / ``XPASS`` block to the short test
+# summary so tracked-but-tolerated violations (curated in the
+# per-test TOML files under ``cases/known-violations/``) stay
+# visible even when running without ``-v``.
+addopts = ["--tb=short", "--import-mode=importlib", "-rxX"]
+log_cli = false
+log_cli_level = "WARNING"
+log_format = "%(asctime)s %(levelname)-5s %(name)s: %(message)s"
+log_date_format = "%H:%M:%S"
+markers = [
+    "repo_kind(kind): restrict the test to repos of the given kind (binary/srpm/debuginfo)",
+    "repo_name(name): restrict the test to a repo with the given name",
+]

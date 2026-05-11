@@ -1,0 +1,59 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/microsoft/azurelinux/base/packages/repo-layout.schema.json",
+    "title": "Standard Azure Linux Repo Layout",
+    "description": "The fixed channel x kind x arch matrix used to describe a published Azure Linux RPM repository tree (the layout consumed by `dnf-with-azl-repos`, `synthesize-repodata.py`, and the `--repo-prefix` mode of the test suite).",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["version", "channels", "subrepos"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "version": {
+            "type": "integer",
+            "const": 1,
+            "description": "Schema version. Bumped when the structure changes in a way that breaks existing loaders."
+        },
+        "channels": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "The set of allowed channel names (each subrepo's `channel` must be one of these)."
+        },
+        "subrepos": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["name", "channel", "kind", "per_arch", "subpath"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Stable short identifier for this sub-repo (used to build dnf repo IDs etc.). Must be unique across the array."
+                    },
+                    "channel": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Which channel this sub-repo belongs to (must appear in `channels` above)."
+                    },
+                    "kind": {
+                        "type": "string",
+                        "enum": ["binary", "debuginfo", "srpm"],
+                        "description": "Content kind. `binary` = main binary RPMs; `debuginfo` = debuginfo + debugsource; `srpm` = source RPMs."
+                    },
+                    "per_arch": {
+                        "type": "boolean",
+                        "description": "True if the sub-repo is published per arch (URL contains `$basearch`); false if arch-agnostic (e.g. srpms)."
+                    },
+                    "subpath": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Path under the repo prefix. Must contain `$basearch` iff `per_arch` is true; loaders enforce this invariant."
+                    }
+                }
+            }
+        }
+    }
+}

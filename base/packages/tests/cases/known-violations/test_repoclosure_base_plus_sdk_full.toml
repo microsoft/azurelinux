@@ -1,0 +1,682 @@
+schema-version = 1
+
+# Runtime gaps -- consumer NEVRAs whose `arch` is not src/nosrc.
+# These are unresolved Requires found by walking every binary in
+# base+sdk on the test arch (plus noarch).
+
+[runtime-missing]
+azurelinux-repos-evergreen = [ "azurelinux-repos = 4.0-8.azl4" ]
+cinnamon = { deps = [ "libgcr-base-3.so.1()(64bit)" ], reason = "gcr3 deprecated upstream; needs port to gcr4 (the rest of the GNOME stack in this section is the same migration)" }
+erlang-cth_readable = [ "erlang-common_test" ]
+erlang-lager = [ "erlang-common_test" ]
+erlang-rebar3 = [
+    "erlang-common_test",
+    "erlang-dialyzer",
+]
+gnome-keyring = [
+    "gcr3",
+    "libgck-1.so.0()(64bit)",
+    "libgcr-base-3.so.1()(64bit)",
+]
+gnome-online-accounts = [ "libgcr-4.so.4()(64bit)" ]
+gnome-online-accounts-libs = [ "libgcr-4.so.4()(64bit)" ]
+gnome-session = [ "control-center-filesystem" ]
+gnome-settings-daemon = [
+    "libgck-2.so.2()(64bit)",
+    "libgcr-4.so.4()(64bit)",
+]
+gvfs = [ "libgcr-4.so.4()(64bit)" ]
+kde-settings-pulseaudio = [ "(alsa-plugins-pulseaudio if pulseaudio)" ]
+langpacks-core-as = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-bn = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-bo = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-gu = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-hi = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ja = [ "(ibus-anthy if service(graphical-login))" ]
+langpacks-core-kn = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ko = [ "(ibus-hangul if service(graphical-login))" ]
+langpacks-core-mai = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ml = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-mni = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-mr = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ne = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-or = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-pa = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-sat = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-si = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ta = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-te = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-th = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-ur = [ "(ibus-m17n if service(graphical-login))" ]
+langpacks-core-vi = [ "(ibus-unikey if service(graphical-login))" ]
+langpacks-core-zh_CN = [ "(ibus-libpinyin if service(graphical-login))" ]
+langpacks-core-zh_HK = [ "(ibus-table-chinese-cangjie if service(graphical-login))" ]
+langpacks-core-zh_TW = [ "(ibus-chewing if service(graphical-login))" ]
+libgdata = [ "libgcr-4.so.4()(64bit)" ]
+libgdata-devel = [ "pkgconfig(gcr-4)" ]
+libnma = [
+    "libgck-2.so.2()(64bit)",
+    "libgcr-4.so.4()(64bit)",
+]
+mutter = [ "control-center-filesystem" ]
+pinentry-gnome3 = [ "libgcr-4.so.4()(64bit)" ]
+plasma-workspace = [ "(uresourced if systemd-oomd-defaults)" ]
+"python3-bleach+css" = [ "(python3.14dist(tinycss2) < 1.5~~ with python3.14dist(tinycss2) >= 1.1)" ]
+"python3-build+uv" = [ "python3.14dist(uv) >= 0.1.18" ]
+rubygem-bundler-doc = [ "rubygem-bundler = 2.6.9-4.azl4" ]
+rubygem-rdoc-doc = [ "rubygem-rdoc = 6.4.0-209.azl4" ]
+"rust-ambient-id+astral-reqwest-middleware-devel" = [ "(crate(astral-reqwest-middleware/default) >= 0.4.2 with crate(astral-reqwest-middleware/default) < 0.5.0~)" ]
+"rust-clap_derive+unstable-markdown-devel" = [ "(crate(pulldown-cmark) >= 0.13.1 with crate(pulldown-cmark) < 0.14.0~)" ]
+"rust-io-lifetimes1+socket2-devel" = [ "(crate(socket2/default) >= 0.4.0 with crate(socket2/default) < 0.5.0~)" ]
+"rust-kvm-bindings0.11+vmm-sys-util-devel" = [ "(crate(vmm-sys-util/default) >= 0.12.1 with crate(vmm-sys-util/default) < 0.13.0~)" ]
+"rust-lscolors+crossterm-devel" = [ "(crate(crossterm/default) >= 0.28.0 with crate(crossterm/default) < 0.29.0~)" ]
+texlive-bibtexperllibs = [
+    "perl(BibTeX::Parser)",
+    "perl(LaTeX::ToUnicode)",
+]
+texlive-collection-binextra = [ "asymptote" ]
+texlive-crossrefware = [
+    "perl(BibTeX::Parser)",
+    "perl(BibTeX::Parser::Author)",
+    "perl(LaTeX::ToUnicode)",
+]
+texlive-ctanupload = [ "perl(WWW::Mechanize)" ]
+texlive-exceltex = [ "perl(Spreadsheet::ParseExcel)" ]
+texlive-includernw = [ "R-knitr" ]
+texlive-oldstandard = [ "oldstandard-sfd-fonts" ]
+texlive-pdfpc-movie = [ "pdfpc" ]
+texlive-texaccents = [
+    "/usr/bin/snobol4",
+    "snobol4",
+]
+
+[runtime-missing-arch-gated.python3-tensile-devel]
+"aarch64" = [
+    "hipcc",
+    "rocminfo",
+]
+
+[runtime-missing-arch-gated.rocm]
+"aarch64" = [
+    "amdsmi >= 6.4",
+    "aqlprofile",
+    "hipblas >= 6.4",
+    "hipblaslt >= 6.4",
+    "hipcc",
+    "hipfft >= 6.4",
+    "hiprand >= 6.4",
+    "hipsolver >= 6.4",
+    "hipsparse >= 6.4",
+    "hipsparselt >= 6.4",
+    "miopen >= 6.4",
+    "mivisionx >= 6.4",
+    "rccl >= 6.4",
+    "rocal >= 6.4",
+    "rocalution >= 6.4",
+    "rocblas >= 6.4",
+    "rocdecode >= 6.4",
+    "rocfft >= 6.4",
+    "rocjpeg >= 6.4",
+    "rocm-clang",
+    "rocm-clinfo >= 6.4",
+    "rocm-core >= 6.4",
+    "rocm-hip >= 6.4",
+    "rocm-omp >= 6.4",
+    "rocm-opencl >= 6.4",
+    "rocm-rpp >= 6.4",
+    "rocm-runtime >= 6.4",
+    "rocminfo >= 6.4",
+    "rocrand >= 6.4",
+    "rocsolver >= 6.4",
+    "rocsparse >= 6.4",
+    "roctracer >= 6.4",
+]
+
+[runtime-missing-arch-gated.rocm-devel]
+"aarch64" = [
+    "amdsmi-devel >= 6.4",
+    "aqlprofile-devel",
+    "hipblas-devel >= 6.4",
+    "hipblaslt-devel >= 6.4",
+    "hipcub-devel >= 6.4",
+    "hipfft-devel >= 6.4",
+    "hipify >= 6.4",
+    "hiprand-devel >= 6.4",
+    "hipsolver-devel >= 6.4",
+    "hipsparse-devel >= 6.4",
+    "hipsparselt-devel >= 6.4",
+    "miopen-devel >= 6.4",
+    "mivisionx-devel >= 6.4",
+    "rccl-devel >= 6.4",
+    "rocal-devel >= 6.4",
+    "rocalution-devel >= 6.4",
+    "rocblas-devel >= 6.4",
+    "rocdecode-devel >= 6.4",
+    "rocfft-devel >= 6.4",
+    "rocjpeg-devel >= 6.4",
+    "rocm-clang-devel",
+    "rocm-core-devel >= 6.4",
+    "rocm-examples >= 6.4",
+    "rocm-hip-devel >= 6.4",
+    "rocm-omp-static >= 6.4",
+    "rocm-opencl-devel >= 6.4",
+    "rocm-rpp-devel >= 6.4",
+    "rocm-runtime-devel >= 6.4",
+    "rocrand-devel >= 6.4",
+    "rocsolver-devel >= 6.4",
+    "rocsparse-devel >= 6.4",
+    "rocthrust-devel >= 6.4",
+    "roctracer-devel >= 6.4",
+    "rocwmma-devel >= 6.4",
+]
+
+[runtime-missing-arch-gated.rocm-rpm-macros-modules]
+"aarch64" = [ "rocm-llvm-filesystem" ]
+
+[runtime-missing-arch-gated.rocm-test]
+"aarch64" = [
+    "kfdtest >= 6.4",
+    "rocm-bandwidth-test >= 6.4",
+]
+
+[runtime-missing-arch-gated.syslinux-extlinux-nonlinux]
+"aarch64" = [ "syslinux" ]
+
+[runtime-missing-arch-gated.syslinux-nonlinux]
+"aarch64" = [ "syslinux" ]
+
+# Buildtime gaps -- consumer NEVRAs whose `arch` is src or nosrc.
+# These are unresolved BuildRequires found by walking every src/nosrc
+# in base-srpms+sdk-srpms. Pure-runtime overlaps with the section
+# above were carved out at merge time -- this list contains only
+# *additional* dep gaps that surface on the source-arch query.
+
+[buildtime-missing]
+apache-ivy = [ "ant-openjdk21" ]
+apache-sshd = [ "maven-local-openjdk21" ]
+cinnamon = { deps = [ "pkgconfig(gcr-base-3)" ], reason = "gcr3 deprecated upstream; needs port to gcr4 (matches the runtime-missing entry above)" }
+elixir = [
+    "erlang-dialyzer",
+    "erlang-doc",
+]
+gnome-keyring = [ "pkgconfig(gcr-3) >= 3.27.90" ]
+gnome-online-accounts = [ "pkgconfig(gcr-4)" ]
+gnome-settings-daemon = [
+    "pkgconfig(gck-2)",
+    "pkgconfig(gcr-4)",
+]
+gvfs = [ "pkgconfig(gcr-4)" ]
+l10n-maven-plugin = [ "maven-local" ]
+libbluray = [ "ant-openjdk21" ]
+libgdata = [ "pkgconfig(gcr-4)" ]
+libidn = [ "javapackages-local" ]
+libnma = [ "gcr-devel" ]
+libsvm = [ "maven-local" ]
+network-manager-applet = [ "gcr-devel" ]
+pinentry = [ "pkgconfig(gcr-4)" ]
+plexus-velocity = [ "maven-local-openjdk21" ]
+python-build = [ "python3dist(uv) >= 0.1.18" ]
+python-django5 = [
+    "python3dist(psycopg) >= 3.1.8",
+    "python3dist(psycopg-pool) >= 3.2",
+]
+python-geopandas = [ "python3dist(psycopg) >= 3.1" ]
+python-sqlalchemy-utils = [ "python3dist(psycopg) >= 3.1.8" ]
+qdbm = [
+    "java-21-openjdk-devel",
+    "javapackages-local-openjdk21",
+]
+resteasy = [ "maven-local-openjdk21" ]
+rubygem-actionpack = [
+    "chromedriver",
+    "chromium",
+    "chromium-headless",
+]
+rubygem-actiontext = [
+    "chromedriver",
+    "chromium",
+    "chromium-headless",
+]
+rubygem-selenium-webdriver = [
+    "chromedriver",
+    "chromium",
+    "chromium-headless",
+]
+stringtemplate4 = [ "maven-local-openjdk21" ]
+xbean = [ "maven-local-openjdk21" ]
+
+[buildtime-missing-arch-gated.aom]
+"aarch64" = [ "pkgconfig(libvmaf)" ]
+
+[buildtime-missing-arch-gated.aqlprofile]
+"aarch64" = [ "rocm-runtime-devel" ]
+
+[buildtime-missing-arch-gated.boost]
+"aarch64" = [ "libquadmath-devel" ]
+
+[buildtime-missing-arch-gated.ceph]
+"aarch64" = [
+    "qatlib-devel",
+    "qatzip-devel",
+]
+
+[buildtime-missing-arch-gated.erofs-utils]
+"aarch64" = [ "pkgconfig(qpl) >= 1.5.0" ]
+
+[buildtime-missing-arch-gated.ffmpeg]
+"aarch64" = [
+    "pkgconfig(libvmaf)",
+    "pkgconfig(vpl) >= 2.6",
+]
+
+[buildtime-missing-arch-gated.fio]
+"aarch64" = [ "libpmem-devel" ]
+
+[buildtime-missing-arch-gated.gcc]
+"aarch64" = [ "(glibc32 or glibc-devel(x86-32))" ]
+
+[buildtime-missing-arch-gated.gdb]
+"aarch64" = [ "libipt-devel" ]
+
+[buildtime-missing-arch-gated.gnu-efi]
+"aarch64" = [ "(glibc-devel(x86-32) or glibc32)" ]
+
+[buildtime-missing-arch-gated.gstreamer1-plugins-bad-free]
+"aarch64" = [ "pkgconfig(vpl) >= 2.2" ]
+
+[buildtime-missing-arch-gated.hipblas]
+"aarch64" = [
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocsolver-devel",
+]
+
+[buildtime-missing-arch-gated.hipblaslt]
+"aarch64" = [
+    "hipblas-devel",
+    "hipcc",
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-llvm-devel",
+    "rocm-runtime-devel",
+    "rocminfo",
+    "roctracer-devel",
+]
+
+[buildtime-missing-arch-gated.hipcub]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.hipfft]
+"aarch64" = [
+    "rocfft-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.hipify]
+"aarch64" = [
+    "rocm-clang-devel",
+    "rocm-llvm-static",
+]
+
+[buildtime-missing-arch-gated.hiprand]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocrand-devel",
+]
+
+[buildtime-missing-arch-gated.hipsolver]
+"aarch64" = [
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocsolver-devel",
+    "rocsparse-devel",
+]
+
+[buildtime-missing-arch-gated.hipsparse]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocsparse-devel",
+]
+
+[buildtime-missing-arch-gated.hipsparselt]
+"aarch64" = [
+    "hipcc",
+    "hipsparse-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-llvm-devel",
+    "rocm-runtime-devel",
+    "rocminfo",
+    "rocsparse-devel",
+]
+
+[buildtime-missing-arch-gated.ipxe]
+"aarch64" = [ "syslinux" ]
+
+[buildtime-missing-arch-gated.kokkos]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocthrust-devel",
+]
+
+[buildtime-missing-arch-gated.libfabric]
+"aarch64" = [ "libpsm2-devel" ]
+
+[buildtime-missing-arch-gated.magma]
+"aarch64" = [
+    "hipblas-devel",
+    "hipsparse-devel",
+    "rocm-comgr-devel",
+    "rocm-core-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.miopen]
+"aarch64" = [
+    "hipblas-devel",
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocrand-devel",
+    "roctracer-devel",
+]
+
+[buildtime-missing-arch-gated.mivisionx]
+"aarch64" = [
+    "hipcc",
+    "miopen-devel",
+    "rocblas-devel",
+    "rocm-hip-devel",
+    "rocm-omp-devel",
+    "rocm-rpp-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.mold]
+"aarch64" = [ "(glibc32 or glibc-devel(x86-32))" ]
+
+[buildtime-missing-arch-gated.mpich]
+"aarch64" = [ "libpsm2-devel" ]
+
+[buildtime-missing-arch-gated."mysql8.4"]
+"aarch64" = [ "libquadmath-devel" ]
+
+[buildtime-missing-arch-gated.onnxruntime]
+"aarch64" = [
+    "hipblas-devel",
+    "hipcc",
+    "hipcub-devel",
+    "hipfft-devel",
+    "hipify",
+    "hiprand-devel",
+    "hipsparse-devel",
+    "miopen-devel",
+    "rccl-devel",
+    "rocblas-devel",
+    "rocm-clang",
+    "rocm-core-devel",
+    "rocm-device-libs",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocthrust-devel",
+    "roctracer-devel",
+]
+
+[buildtime-missing-arch-gated.opencv]
+"aarch64" = [ "libvpl-devel" ]
+
+[buildtime-missing-arch-gated.openmpi]
+"aarch64" = [ "libpsm2-devel" ]
+
+[buildtime-missing-arch-gated.papilo]
+"aarch64" = [ "libquadmath-devel" ]
+
+[buildtime-missing-arch-gated.python-torch]
+"aarch64" = [
+    "hipblas-devel",
+    "hipblaslt-devel",
+    "hipcub-devel",
+    "hipfft-devel",
+    "hiprand-devel",
+    "hipsolver-devel",
+    "hipsparse-devel",
+    "hipsparselt-devel",
+    "magma-devel",
+    "miopen-devel",
+    "rccl-devel",
+    "rocblas-devel",
+    "rocfft-devel",
+    "rocm-comgr-devel",
+    "rocm-core-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocrand-devel",
+    "rocsolver-devel",
+    "rocthrust-devel",
+    "roctracer-devel",
+]
+
+[buildtime-missing-arch-gated.qat-zstd-plugin]
+"aarch64" = [ "qatlib-devel" ]
+
+[buildtime-missing-arch-gated.qatengine]
+"aarch64" = [
+    "intel-ipp-crypto-mb-devel >= 1.0.6",
+    "intel-ipsec-mb-devel >= 2.0",
+    "qatlib-devel >= 23.02.0",
+]
+
+[buildtime-missing-arch-gated.qatzip]
+"aarch64" = [ "qatlib-devel >= 23.08.0" ]
+
+[buildtime-missing-arch-gated.qemu]
+"aarch64" = [
+    "libpmem-devel",
+    "qatzip-devel",
+]
+
+[buildtime-missing-arch-gated.rccl]
+"aarch64" = [
+    "hipify",
+    "rocm-comgr-devel",
+    "rocm-core-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocal]
+"aarch64" = [
+    "mivisionx-devel >= 6.4",
+    "rocdecode-devel >= 6.4",
+    "rocjpeg-devel >= 6.4",
+    "rocm-comgr-devel",
+    "rocm-hip-devel >= 6.4",
+    "rocm-omp-devel >= 6.4",
+    "rocm-rpp-devel >= 6.4",
+    "rocm-runtime-devel >= 6.4",
+]
+
+[buildtime-missing-arch-gated.rocalution]
+"aarch64" = [
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocrand-devel",
+    "rocsparse-devel",
+]
+
+[buildtime-missing-arch-gated.rocblas]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocclr]
+"aarch64" = [
+    "hipcc",
+    "rocm-comgr-devel",
+    "rocm-runtime-devel >= 6.4",
+    "rocm-runtime-devel >= 6.4.2",
+]
+
+[buildtime-missing-arch-gated.rocdecode]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocfft]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocjpeg]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocm-bandwidth-test]
+"aarch64" = [ "rocm-runtime-devel >= 6.4.0" ]
+
+[buildtime-missing-arch-gated.rocm-examples]
+"aarch64" = [
+    "hipblas-devel",
+    "hipcub-devel",
+    "hipfft-devel",
+    "hipify",
+    "hiprand-devel",
+    "hipsolver-devel",
+    "rocblas-devel",
+    "rocfft-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocsolver-devel",
+    "rocsparse-devel",
+    "rocthrust-devel",
+]
+
+[buildtime-missing-arch-gated.rocm-omp]
+"aarch64" = [
+    "rocm-device-libs",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocm-rpp]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-omp-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocm-runtime]
+"aarch64" = [
+    "rocm-device-libs",
+    "rocm-llvm-static",
+]
+
+[buildtime-missing-arch-gated.rocminfo]
+"aarch64" = [ "rocm-runtime-devel >= 6.4.0" ]
+
+[buildtime-missing-arch-gated.rocprim]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocrand]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocsolver]
+"aarch64" = [
+    "rocblas-devel",
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+    "rocsparse-devel",
+]
+
+[buildtime-missing-arch-gated.rocsparse]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocthrust]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.roctracer]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.rocwmma]
+"aarch64" = [
+    "rocm-comgr-devel",
+    "rocm-hip-devel",
+    "rocm-omp-devel",
+    "rocm-runtime-devel",
+]
+
+[buildtime-missing-arch-gated.shim]
+"aarch64" = [
+    "shim-unsigned-ia32 = 15.8",
+    "shim-unsigned-x64 = 15.8",
+]
+
+[buildtime-missing-arch-gated.soplex]
+"aarch64" = [ "libquadmath-devel" ]
+
+[buildtime-missing-arch-gated.sundials]
+"aarch64" = [ "gcc-gfortran(x86-64)" ]
+
+[buildtime-missing-arch-gated.sympy]
+"aarch64" = [ "lfortran" ]
+
+[buildtime-missing-arch-gated.syslinux]
+"aarch64" = [ "(glibc-devel(x86-32) or glibc32)" ]
+
+[buildtime-missing-arch-gated.tlfloat]
+"aarch64" = [ "libquadmath-devel" ]
+
+[buildtime-missing-arch-gated.ucx]
+"aarch64" = [ "rocm-hip-devel" ]
