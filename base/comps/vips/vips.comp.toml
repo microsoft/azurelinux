@@ -1,0 +1,49 @@
+[components.vips]
+
+# Disable HEIF support — libheif is being retired from Azure Linux 4.0.
+# Upstream spec auto-detects libheif via pkg-config (no explicit meson flag)
+# and ships the heif plugin in a dedicated `vips-heif` subpackage. Drop the
+# BR and the soft `Recommends`, then strip the now-unbuildable subpackage
+# entirely so the build does not fail with "unpackaged file" or
+# "non-existent file in %files" errors.
+
+[[components.vips.overlays]]
+description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libheif)"
+
+[[components.vips.overlays]]
+description = "Drop soft Recommends on vips-heif now that the subpackage is removed"
+type = "spec-remove-tag"
+tag = "Recommends"
+value = "%{name}-heif"
+
+# libvips defines `option('heif', type : 'feature', value : 'auto')`, so meson
+# fails when libheif is not found rather than silently skipping it. Force the
+# feature off explicitly. We piggyback on the existing `-Dpdfium=disabled \`
+# line to keep the diff minimal.
+[[components.vips.overlays]]
+description = "Force `-Dheif=disabled` so meson does not fail trying to auto-detect libheif"
+type = "spec-search-replace"
+section = "%build"
+regex = '-Dpdfium=disabled \\'
+replacement = "-Dpdfium=disabled \\\n    -Dheif=disabled \\"
+
+[[components.vips.overlays]]
+description = "Remove %package heif now that vips-heif.so is not built"
+type = "spec-remove-section"
+package = "heif"
+section = "%package"
+
+[[components.vips.overlays]]
+description = "Remove %description heif now that vips-heif.so is not built"
+type = "spec-remove-section"
+package = "heif"
+section = "%description"
+
+[[components.vips.overlays]]
+description = "Remove %files heif now that vips-heif.so is not built"
+type = "spec-remove-section"
+package = "heif"
+section = "%files"
