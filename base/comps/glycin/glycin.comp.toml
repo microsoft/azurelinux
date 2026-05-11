@@ -1,0 +1,8 @@
+[components.glycin]
+
+# Disable HEIF support — libheif is being retired from Azure Linux 4.0.
+# Upstream spec uses `%bcond heif %{undefined rhel}`, gating both the libheif
+# BuildRequires and the `glycin-heif` loader in the meson `-Dloaders=` list,
+# so flipping the bcond is sufficient.
+[components.glycin.build]
+without = ["heif"]
