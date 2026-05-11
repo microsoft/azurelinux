@@ -1,0 +1,21 @@
+[components.kf6-kimageformats]
+
+# Disable HEIF support — libheif is being retired from Azure Linux 4.0.
+# Upstream spec passes `-DKIMAGEFORMATS_HEIF:BOOL=ON` and BuildRequires
+# `pkgconfig(libheif)`. Drop the BR and flip the cmake flag to OFF so the
+# kimg_heif.so plugin is not built; the %files glob over the imageformats
+# plugin directory absorbs the absent plugin without an "unpackaged file"
+# error.
+
+[[components.kf6-kimageformats.overlays]]
+description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libheif) >= 1.10.0"
+
+[[components.kf6-kimageformats.overlays]]
+description = "Disable libheif-backed cmake option (KIMAGEFORMATS_HEIF) so kimg_heif.so is not built"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DKIMAGEFORMATS_HEIF:BOOL=ON'
+replacement = '-DKIMAGEFORMATS_HEIF:BOOL=OFF'

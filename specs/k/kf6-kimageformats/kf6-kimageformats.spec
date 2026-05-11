@@ -6,7 +6,7 @@
 
 Name:           kf6-%{framework}
 Version:        6.23.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with additional image plugins for QtGui
 
 License:        LGPLv2+
@@ -27,7 +27,6 @@ BuildRequires:  cmake(Qt6PrintSupport)
 BuildRequires:  pkgconfig(cups)
 BuildRequires:  cmake(OpenEXR)
 BuildRequires:  cmake(libavif)
-BuildRequires:  pkgconfig(libheif) >= 1.10.0
 %if !((0%{?fedora} && 0%{?fedora} < 41) || (0%{?rhel} && 0%{?rhel} < 10))
 BuildRequires:  pkgconfig(libjxl) >= 0.9.4
 BuildRequires:  pkgconfig(libjxl_threads) >= 0.9.4
@@ -61,7 +60,7 @@ developing applications that use %{name}.
 
 %build
 %cmake_kf6 \
-  -DKIMAGEFORMATS_HEIF:BOOL=ON \
+  -DKIMAGEFORMATS_HEIF:BOOL=OFF \
   -DKIMAGEFORMATS_JXR:BOOL=ON
 %cmake_build
 
