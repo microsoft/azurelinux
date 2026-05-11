@@ -11,7 +11,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Rich text framework
 License: MIT
 URL: https://rubyonrails.org
@@ -38,7 +38,6 @@ BuildRequires: rubygem(sqlite3)
 BuildRequires: rubygem(capybara) >= 3.26
 BuildRequires: rubygem(puma)
 BuildRequires: rubygem(selenium-webdriver)
-BuildRequires: chromedriver chromium chromium-headless
 # Chromium availability is limited:
 # https://src.fedoraproject.org/rpms/chromium/blob/0d9761748509bb12051ab149d28c1052cd834f87/f/chromium.spec#_800
 # and chrome-headless even more:
@@ -136,6 +135,9 @@ EOF
 # OTOH, if we had it, we would recomplie the sources and the test would have
 # less value.
 mv test/javascript_package_test.rb{,.disable}
+# Azure Linux: no headless_chrome available, so skip Selenium-driven system tests.
+mv test/system/rich_text_editor_test.rb{,.disable}
+mv test/system/system_test_helper_test.rb{,.disable}
 
 ruby -Itest -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 )

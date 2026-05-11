@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.34.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Selenium is a browser automation tool for automated testing of webapps and more
 License: Apache-2.0
 URL: https://selenium.dev
@@ -43,8 +43,6 @@ BuildRequires: rubygem(websocket)
 BuildRequires: rubygem(rack)
 BuildRequires: rubygem(rackup)
 BuildRequires: rubygem(webrick)
-BuildRequires: chromedriver
-BuildRequires: chromium chromium-headless
 # Chromium is not available for i686 / s390x
 # https://src.fedoraproject.org/rpms/chromium/blob/fcd074b9c31411f795ab402fe88e4513a68c843e/f/chromium.spec#_803
 # and on ppc64le

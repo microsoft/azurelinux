@@ -10,7 +10,7 @@
 Name: rubygem-%{gem_name}
 Epoch: 1
 Version: 8.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Web-flow and rendering framework putting the VC in MVC (part of Rails)
 License: MIT
 URL: https://rubyonrails.org
@@ -38,7 +38,6 @@ BuildRequires: rubygem(capybara) >= 3.26
 BuildRequires: rubygem(selenium-webdriver)
 BuildRequires: rubygem(useragent)
 BuildRequires: rubygem(zeitwerk)
-BuildRequires: chromedriver chromium chromium-headless
 # Chromium availability is limited:
 # https://src.fedoraproject.org/rpms/chromium/blob/0d9761748509bb12051ab149d28c1052cd834f87/f/chromium.spec#_800
 # and chrome-headless even more:
@@ -106,6 +105,11 @@ sed -r -i '/driver = ActionDispatch::SystemTesting::Driver.new\(:selenium, .*usi
 # https://github.com/rails/rails/issues/54740
 sed -r -i '/capabilities.slice\(\*expected_capabilities\.keys\)$/ s/$/.tap {|h| h["goog:chromeOptions"].delete("binary")}/' \
   test/dispatch/system_testing/driver_test.rb
+
+# Azure Linux: no chromedriver available, so skip all system_testing tests
+# (driver_test.rb, system_test_case_test.rb, screenshot_helper_test.rb,
+# server_test.rb all instantiate Selenium drivers).
+rm -rf test/dispatch/system_testing
 
 # Tests need to run in isolation
 find test -type f -name '*_test.rb' -print0 | \

@@ -1,0 +1,23 @@
+[components.rubygem-actionpack]
+
+# Chromium/chromedriver are not packaged in Azure Linux. They are only used by
+# the %check test suite. Despite the `:remote` option set in abstract_unit.rb,
+# every test in test/dispatch/system_testing/ instantiates Selenium drivers
+# eagerly and fails without chromedriver. Disable that entire directory; the
+# rest of the actionpack test suite still runs.
+[[components.rubygem-actionpack.overlays]]
+description = "Remove chromedriver/chromium BuildRequires - not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver chromium chromium-headless"
+
+[[components.rubygem-actionpack.overlays]]
+description = "Disable system_testing tests - all instantiate chrome drivers and fail without chromedriver"
+type = "spec-search-replace"
+regex = "# Tests need to run in isolation"
+replacement = """# Azure Linux: no chromedriver available, so skip all system_testing tests
+# (driver_test.rb, system_test_case_test.rb, screenshot_helper_test.rb,
+# server_test.rb all instantiate Selenium drivers).
+rm -rf test/dispatch/system_testing
+
+# Tests need to run in isolation"""

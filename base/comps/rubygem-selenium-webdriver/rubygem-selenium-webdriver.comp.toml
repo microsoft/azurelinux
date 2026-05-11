@@ -1,0 +1,19 @@
+[components.rubygem-selenium-webdriver]
+
+# Chromium and chromedriver are not packaged in Azure Linux. They are only
+# referenced from the spec_integration test suite (gated by `%bcond_without
+# spec_integration`) and as runtime `Recommends:` (weak deps, harmless if
+# absent). The %check section is already disabled distro-wide via
+# component-check-disablement.toml, so dropping these BuildRequires is purely a
+# dependency-resolution change with no behavioral impact.
+[[components.rubygem-selenium-webdriver.overlays]]
+description = "Remove chromedriver BuildRequires - not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver"
+
+[[components.rubygem-selenium-webdriver.overlays]]
+description = "Remove chromium/chromium-headless BuildRequires - not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromium chromium-headless"

@@ -1,0 +1,22 @@
+[components.rubygem-actiontext]
+
+# Chromium/chromedriver are not packaged in Azure Linux. They are only used by
+# the %check test suite. Unlike actionpack, actiontext's system tests are
+# hardcoded to `driven_by :selenium, using: :headless_chrome` (see
+# test/application_system_test_case.rb) and exercise a live DOM via
+# Capybara/Trix. Without a headless browser these tests cannot run, so we
+# disable those specific test files. Unit tests still run.
+[[components.rubygem-actiontext.overlays]]
+description = "Remove chromedriver/chromium BuildRequires - not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver chromium chromium-headless"
+
+[[components.rubygem-actiontext.overlays]]
+description = "Disable system tests that require headless_chrome (unavailable in Azure Linux)"
+type = "spec-search-replace"
+regex = "mv test/javascript_package_test.rb.,.disable."
+replacement = """mv test/javascript_package_test.rb{,.disable}
+# Azure Linux: no headless_chrome available, so skip Selenium-driven system tests.
+mv test/system/rich_text_editor_test.rb{,.disable}
+mv test/system/system_test_helper_test.rb{,.disable}"""
