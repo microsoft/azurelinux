@@ -1,7 +1,7 @@
 Summary:        jq is a lightweight and flexible command-line JSON processor.
 Name:           jq
 Version:        1.7.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 License:        MIT
@@ -16,6 +16,7 @@ Patch5:         CVE-2026-33948.patch
 Patch6:         CVE-2026-39956.patch
 Patch7:         CVE-2026-39979.patch
 Patch8:         CVE-2026-40164.patch
+Patch9:         CVE-2025-9403.patch
 Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -69,6 +70,9 @@ make check
 %{_includedir}/*
 
 %changelog
+* Tue May 12 2026 Vijayender Putta <v-vijputta@microsoft.com> - 1.7.1-6
+- Patch for CVE-2025-9403
+
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
 - Patch for CVE-2026-40164, CVE-2026-39979, CVE-2026-39956, CVE-2026-33948, CVE-2026-33947, CVE-2026-32316
 
