@@ -62,14 +62,14 @@ unzip src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl -d unpacked_p
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1000}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/utils/unpacking.py"
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1001}
-patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1005}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/utils/unpacking.py for CVE-2026-3219"
+patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1005}
 echo "Manually Patching
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/cli/base_command.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/cli/index_command.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/commands/install.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/commands/list.py
-virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/self_outdated_check.py"
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl/pip/_internal/self_outdated_check.py for CVE-2026-6357"
 patch -p1 -d unpacked_pip-25.0.1-py3-none-any < %{PATCH1007}
 # Remove the original file
 rm -f src/virtualenv/seed/wheels/embed/pip-25.0.1-py3-none-any.whl
@@ -86,14 +86,14 @@ unzip src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl -d unpacked_pip
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1000}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/utils/unpacking.py"
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1002}
-patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1006}
 echo "Manually Patching virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/utils/unpacking.py for CVE-2026-3219"
+patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1006}
 echo "Manually Patching
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/cli/base_command.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/cli/index_command.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/commands/install.py
 virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/commands/list.py
-virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/self_outdated_check.py"
+virtualenv-20.36.1/src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl/pip/_internal/self_outdated_check.py for CVE-2026-6357"
 patch -p1 -d unpacked_pip-25.3-py3-none-any < %{PATCH1008}
 rm -f src/virtualenv/seed/wheels/embed/pip-25.3-py3-none-any.whl
 pushd unpacked_pip-25.3-py3-none-any
