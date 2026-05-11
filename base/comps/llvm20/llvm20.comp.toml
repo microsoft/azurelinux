@@ -9,33 +9,3 @@ description = "Use the Azure Linux GCC toolchain triple in clang20's default con
 type = "spec-search-replace"
 regex = '%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux'
 replacement = '%global cfg_file_content --gcc-triple=%{_target_cpu}-%{_vendor}-linux'
-
-[[components.llvm20.overlays]]
-description = "Bootstrap workaround: write a clang config with the corrected --gcc-triple under %{_builddir} and inject it into CFLAGS/CXXFLAGS/LDFLAGS so this build's clang20 invocations override the chroot's stale default config (Koji stage2 still ships the broken clang20)"
-type = "spec-prepend-lines"
-section = "%build"
-lines = [
-	"# AZL bootstrap workaround for llvm20 self-rebuild (see llvm20.comp.toml)",
-	'azl_clang_bootstrap_cfg="%{_builddir}/azl-clang-bootstrap.cfg"',
-	'echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > "${azl_clang_bootstrap_cfg}"',
-	'export CFLAGS="${CFLAGS} --config=${azl_clang_bootstrap_cfg}"',
-	'export CXXFLAGS="${CXXFLAGS} --config=${azl_clang_bootstrap_cfg}"',
-	'export LDFLAGS="${LDFLAGS} --config=${azl_clang_bootstrap_cfg}"',
-]
-
-[[components.llvm20.overlays]]
-description = "Bootstrap workaround: make the instrumented clang used by PGO perf training read the corrected Azure Linux GCC triple config; use a trap so the real clang is restored even if generate-profdata fails"
-type = "spec-search-replace"
-section = "%build"
-regex = '%cmake_build --target generate-profdata'
-replacement = '''# AZL bootstrap workaround for PGO perf training with the just-built clang
-mv %{builddir_instrumented}/bin/clang %{builddir_instrumented}/bin/clang.real
-cat > %{builddir_instrumented}/bin/clang <<EOF
-#!/bin/sh
-exec "\$(dirname "\$0")/clang.real" --config="${azl_clang_bootstrap_cfg}" "\$@"
-EOF
-chmod +x %{builddir_instrumented}/bin/clang
-trap 'mv -f %{builddir_instrumented}/bin/clang.real %{builddir_instrumented}/bin/clang 2>/dev/null || true' EXIT
-%cmake_build --target generate-profdata
-trap - EXIT
-mv -f %{builddir_instrumented}/bin/clang.real %{builddir_instrumented}/bin/clang'''
