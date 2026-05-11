@@ -13,10 +13,10 @@ file = "Policy-Add-os_release_id-check.patch"
 source = "Policy-Add-os_release_id-check.patch"
 
 [[components.sos.overlays]]
-description = "Add cloud-init-main and cloud-init-network service names for cloud-init >= 24.3 single-process optimization (upstream PR sosreport/sos#4314)"
+description = "Add missing cloud-init systemd service units for cloud-init >= 24.3 single-process optimization (upstream PR sosreport/sos#4318)"
 type = "patch-add"
-file = "cloud_init-add-cloud-init-main-and-network-services.patch"
-source = "cloud_init-add-cloud-init-main-and-network-services.patch"
+file = "cloud_init-add-missing-systemd-service-units.patch"
+source = "cloud_init-add-missing-systemd-service-units.patch"
 
 [[components.sos.overlays]]
 description = "Add dnf5 support in dnf plugin"

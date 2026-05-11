@@ -1,0 +1,45 @@
+From 2e2087b83a50e7d8bc2364236b1bca645bdb7ea5 Mon Sep 17 00:00:00 2001
+From: Jonathan Brenes <jonathan.brenes@microsoft.com>
+Date: Wed, 29 Apr 2026 11:42:05 -0600
+Subject: [PATCH] [cloud_init] Add missing systemd service units
+
+Add cloud-init-local, cloud-config, and cloud-final to the services
+tuple so sos report captures their status alongside the existing
+cloud-init, cloud-init-main, and cloud-init-network units.
+
+As of cloud-init 24.3, cloud-init uses a single-process optimization
+with multiple systemd service units acting as shims for each boot
+stage (see canonical/cloud-init#5489):
+
+  cloud-init-local.service   - Local stage
+  cloud-init-network.service - Network stage (renamed from cloud-init.service)
+  cloud-config.service       - Config stage
+  cloud-final.service        - Final stage
+  cloud-init-main.service    - Main single-process service
+
+Previously only cloud-init.service was listed, missing all the new
+service names.
+
+Ref: https://github.com/sosreport/sos/pull/4318
+Ref: https://github.com/canonical/cloud-init/pull/5489
+Signed-off-by: Jonathan Brenes <jonathan.brenes@microsoft.com>
+---
+ sos/report/plugins/cloud_init.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/sos/report/plugins/cloud_init.py b/sos/report/plugins/cloud_init.py
+index a76e751ad5..7b8f3d2c1e 100644
+--- a/sos/report/plugins/cloud_init.py
++++ b/sos/report/plugins/cloud_init.py
+@@ -17,7 +17,8 @@ class CloudInit(Plugin, IndependentPlugin):
+ 
+     plugin_name = 'cloud_init'
+     packages = ('cloud-init',)
+-    services = ('cloud-init',)
++    services = ('cloud-init', 'cloud-init-local', 'cloud-init-network',
++                'cloud-init-main', 'cloud-config', 'cloud-final')
+ 
+     def setup(self):
+ 
+-- 
+2.49.0
