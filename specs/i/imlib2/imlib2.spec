@@ -4,7 +4,7 @@
 Summary:        Image loading, saving, rendering, and manipulation library
 Name:           imlib2
 Version:        1.12.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:        Imlib2
 URL:            http://docs.enlightenment.org/api/imlib2/html/
 Source0:        http://downloads.sourceforge.net/enlightenment/%{name}-%{version}.tar.xz
@@ -15,7 +15,6 @@ BuildRequires:  freetype-devel >= 2.1.9-4
 BuildRequires:  libtool
 BuildRequires:  bzip2-devel
 BuildRequires:  libid3tag-devel
-BuildRequires:  libheif-devel
 BuildRequires:  libjxl-devel
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel

@@ -1,0 +1,14 @@
+[components.imlib2]
+
+# Disable HEIF support — libheif is being retired from Azure Linux 4.0.
+# Upstream spec has no explicit configure flag for heif; the heif loader
+# is auto-detected via pkg-config when libheif-devel is present. Removing
+# the BuildRequires causes configure to skip the loader, and the
+# %{_libdir}/imlib2/ directory glob in %files absorbs the missing plugin
+# without an "unpackaged file" error.
+
+[[components.imlib2.overlays]]
+description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libheif-devel"
