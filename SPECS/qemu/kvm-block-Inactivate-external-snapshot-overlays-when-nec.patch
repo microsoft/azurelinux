@@ -1,0 +1,68 @@
+From 6f4a7e3489a104137f60e034157cf687e4c3158f Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:54 +0100
+Subject: [PATCH 10/23] block: Inactivate external snapshot overlays when
+ necessary
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [9/22] 59b39138f0da734d497f3a58d458992abc348978 (kmwolf/centos-qemu-kvm)
+
+Putting an active block node on top of an inactive one is strictly
+speaking an invalid configuration and the next patch will turn it into a
+hard error.
+
+However, taking a snapshot while disk images are inactive after
+completing migration has an important use case: After migrating to a
+file, taking an external snapshot is what is needed to take a full VM
+snapshot.
+
+In order for this to keep working after the later patches, change
+creating a snapshot such that it automatically inactivates an overlay
+that is added on top of an already inactive node.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-4-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit e80210ffb24c4e47650344ba77ce3ed354af596c)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ blockdev.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/blockdev.c b/blockdev.c
+index 835064ed03..81430122df 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1497,6 +1497,22 @@ static void external_snapshot_action(TransactionAction *action,
+         return;
+     }
+ 
++    /*
++     * Older QEMU versions have allowed adding an active parent node to an
++     * inactive child node. This is unsafe in the general case, but there is an
++     * important use case, which is taking a VM snapshot with migration to file
++     * and then adding an external snapshot while the VM is still stopped and
++     * images are inactive. Requiring the user to explicitly create the overlay
++     * as inactive would break compatibility, so just do it automatically here
++     * to keep this working.
++     */
++    if (bdrv_is_inactive(state->old_bs) && !bdrv_is_inactive(state->new_bs)) {
++        ret = bdrv_inactivate(state->new_bs, errp);
++        if (ret < 0) {
++            return;
++        }
++    }
++
+     ret = bdrv_append(state->new_bs, state->old_bs, errp);
+     if (ret < 0) {
+         return;
+-- 
+2.48.1
+

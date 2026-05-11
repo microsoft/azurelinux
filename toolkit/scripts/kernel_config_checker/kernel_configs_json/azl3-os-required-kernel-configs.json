@@ -1119,6 +1119,20 @@
         "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/50236901"
       },
       {
+        "name": "CONFIG_IKCONFIG_PROC",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Enable /proc/config.gz on arm64 for parity with x86_64 - required by kubeadm and other tools that read kernel config at runtime"
+      },
+      {
         "name": "CONFIG_IMA_ARCH_POLICY",
         "values": [
           {
