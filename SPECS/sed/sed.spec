@@ -1,13 +1,14 @@
 Summary:        Stream editor
 Name:           sed
 Version:        4.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 URL:            https://www.gnu.org/software/sed
 Group:          Applications/Editors
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://ftp.gnu.org/gnu/sed/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-5958.patch
 Conflicts:      toybox
 %if 0%{?with_check}
 BuildRequires:  perl(File::Find)
@@ -24,7 +25,7 @@ Requires: sed >= %{version}
 These are the additional language files of sed.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
@@ -54,6 +55,9 @@ make check
 %defattr(-,root,root)
 
 %changelog
+* Tue Apr 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.9-2
+- Patch for CVE-2026-5958
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9-1
 - Auto-upgrade to 4.9 - Azure Linux 3.0 - package upgrades
 

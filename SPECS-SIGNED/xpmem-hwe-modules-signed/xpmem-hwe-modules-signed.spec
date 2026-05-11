@@ -4,16 +4,18 @@
 # The default %%__os_install_post macro ends up stripping the signatures off of the kernel module.
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
-# hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.85.1
-%global target_kernel_release 1
+
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_hwe_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 
 %global KVERSION %{target_kernel_version_full}
 
 %define _name xpmem-hwe-modules
-%{!?_mofed_full_version: %define _mofed_full_version 25.07-8%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 
 # xpmem-modules is a sub-package in SPECS/xpmem.
 # We are making that into a main package for signing.
@@ -93,8 +95,8 @@ if [ $1 = 0 ]; then  # 1 : Erase, not upgrade
 fi
 
 %changelog
-* Fri May 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 2.7.4-32_6.12.85.1.1
-- Bump release to match kernel-hwe
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-32_6.12.57.1.6
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa
 
 * Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.4-31_6.12.78.2.1
 - Bump release to rebuild for new kernel release
