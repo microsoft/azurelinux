@@ -2,15 +2,18 @@
 # checks both for drift.
 #
 # Called by the stub on the default branch (check-rendered-specs-stub.yml) via
-# pull_request_target. The stub provides the PR details; this workflow does all
-# the real work via two parallel flows:
-#   1. Checks out base branch (trusted tools/scripts)
-#   2. Checks out PR head into pr-head/ (untrusted data — TOML configs, specs)
-#   3a. Renders specs inside a privileged container using azldev -C pr-head/
-#       and checks for drift (vs. the PR's committed specs).
-#   3b. Resolves lock files via `azldev component update` in the same
-#       container; the JSON output lists components whose locks changed.
-#   4. Posts (independent) PR comments for each flow + downloadable fix patches.
+# pull_request_target. The stub provides the PR details; this workflow runs:
+#
+#   1. update_locks (full distro)
+#        -> update_locks_comment (drift PR comment, always)
+#   2. render (only if update_locks succeeded; PR-scoped via the change-set
+#              computed from pr-base..pr-head)
+#        -> comment (drift PR comment, only when render actually ran)
+#
+# update_locks runs first because `azldev component changed` (used to scope
+# the render set) reads input fingerprints that include lock content; a
+# stale lock would steer it toward the wrong scope. When locks are dirty,
+# render is skipped and only the locks comment is posted.
 #
 # Security: the PR checkout is data-only. We never execute code from the PR —
 # azldev is installed from upstream, scripts come from the base branch checkout.
@@ -23,6 +26,9 @@ on:
         required: true
         type: string
       pr-head-repo:
+        required: true
+        type: string
+      pr-base-sha:
         required: true
         type: string
       pr-number:
@@ -48,6 +54,12 @@ jobs:
   # artifacts + job outputs only.
   render:
     name: Render + drift check
+    # Gate render on a clean lock check. `azldev component changed` (used by
+    # the render-scope helper) reads input fingerprints that include lock
+    # content, so stale locks would steer it toward the wrong scope. Skip
+    # render and let the locks PR comment carry the fix instructions.
+    needs: update_locks
+    if: needs.update_locks.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -160,7 +172,14 @@ jobs:
   comment:
     name: Post drift comment
     needs: render
-    if: always() && needs.render.result != 'cancelled'
+    # When render is skipped (locks failed), there is no report artifact to
+    # post and the locks PR comment already carries the fix. The
+    # `!cancelled()` status function is required: a job-level `if:` that
+    # only references `needs.render.result` would never run when render
+    # has a non-success conclusion, because GitHub evaluates the implicit
+    # success-of-needs gate BEFORE the `if:` -- the function call is what
+    # tells GitHub to evaluate the `if:` anyway.
+    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

@@ -39,5 +39,6 @@ jobs:
     with:
       pr-head-sha: ${{ github.event.pull_request.head.sha }}
       pr-head-repo: ${{ github.event.pull_request.head.repo.full_name }}
+      pr-base-sha: ${{ github.event.pull_request.base.sha }}
       pr-number: ${{ github.event.pull_request.number }}
       repo: ${{ github.repository }}
