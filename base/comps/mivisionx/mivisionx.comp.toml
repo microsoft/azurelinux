@@ -1,0 +1,22 @@
+# Drop the libavcodec-free-devel / libavformat-free-devel BuildRequires.
+# These are used by the upstream `amd_media` OpenVX extension; CMake gates
+# it on find_package(FFmpeg) and silently skips the subdirectory with a
+# warning when FFmpeg is not found. libvx_amd_media.so is not listed in
+# %files, so the spec already relies on amd_media being skipped (the
+# in-spec comment notes that the av_register_all() call doesn't even
+# compile cleanly with our FFmpeg headers).
+#
+# Part of the distro-wide effort to remove ffmpeg/libav*.
+[components.mivisionx]
+
+[[components.mivisionx.overlays]]
+description = "Drop BuildRequires on libavcodec-free-devel — removing ffmpeg/libav* (amd_media extension auto-disables)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libavcodec-free-devel"
+
+[[components.mivisionx.overlays]]
+description = "Drop BuildRequires on libavformat-free-devel — removing ffmpeg/libav* (amd_media extension auto-disables)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libavformat-free-devel"

@@ -25,7 +25,7 @@
 
 Name:           mivisionx
 Version:        %{rocm_version}
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        AMD's computer vision toolkit
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0 AND MIT-Khronos-old AND GPL-3.0-or-later
@@ -53,8 +53,6 @@ BuildRequires:  hipcc
 #   98 |     av_register_all();
 #      |     ^
 # BuildRequires:  ffmpeg-free-devel
-BuildRequires:  libavcodec-free-devel
-BuildRequires:  libavformat-free-devel
 %if 0%{?fedora}
 BuildRequires:  mesa-va-drivers
 %endif
