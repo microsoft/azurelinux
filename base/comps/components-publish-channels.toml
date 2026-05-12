@@ -2722,15 +2722,6 @@ packages = [
     "avahi-qt3-devel", # srpm: avahi
     "avahi-qt4", # srpm: avahi
     "avahi-qt4-devel", # srpm: avahi
-    "avahi-qt5", # srpm: avahi
-    "avahi-qt5-devel", # srpm: avahi
-    "avahi-sharp", # srpm: avahi
-    "avahi-ui", # srpm: avahi
-    "avahi-ui-devel", # srpm: avahi
-    "avahi-ui-gtk3", # srpm: avahi
-    "avahi-ui-sharp", # srpm: avahi
-    "avahi-ui-sharp-devel", # srpm: avahi
-    "avahi-ui-tools", # srpm: avahi
 
     # Qt6 GUI app for wireshark; wireshark-cli (tshark/dumpcap) and wireshark-devel stay in base.
     "wireshark", # srpm: wireshark

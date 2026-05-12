@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/avahi.azl.macros}
+
 %bcond_with bootstrap
 %bcond_without check
 
@@ -63,7 +66,7 @@
 
 Name:             avahi
 Version:          0.9%{?rc:~%{rc}}
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:          Local network service discovery
 License:          LGPL-2.1-or-later AND LGPL-2.0-or-later AND BSD-2-Clause-Views AND MIT
 URL:              http://avahi.org
@@ -139,6 +142,7 @@ Source0:          https://github.com/avahi/avahi/archive/refs/tags/v%{version_no
 %else
 Source0:          https://github.com/avahi/avahi/releases/download/v%{version_no_tilde}/%{name}-%{version_no_tilde}.tar.gz
 %endif
+Source9999: avahi.azl.macros
 
 ## upstream patches
 # https://github.com/avahi/avahi/pull/662

@@ -1,0 +1,7 @@
+# Enable the upstream `bootstrap` build conditional. This disables the GTK,
+# Qt5, and Mono UI bindings (avahi-ui*, avahi-qt5*, avahi-sharp*), which we
+# do not ship. In particular, dropping avahi-ui-tools removes its hard
+# Requires on tigervnc, letting us drop tigervnc (and its ffmpeg deps)
+# from the distro entirely.
+[components.avahi]
+build.with = ["bootstrap"]
