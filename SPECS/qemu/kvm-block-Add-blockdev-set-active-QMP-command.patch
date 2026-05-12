@@ -1,0 +1,187 @@
+From c6c40cc92fbb91d704d3739bb78bfd936f111625 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:59 +0100
+Subject: [PATCH 15/23] block: Add blockdev-set-active QMP command
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [14/22] e494fb6df6c363b6266e5fb7d09c31b3e7694f04 (kmwolf/centos-qemu-kvm)
+
+The system emulator tries to automatically activate and inactivate block
+nodes at the right point during migration. However, there are still
+cases where it's necessary that the user can do this manually.
+
+Images are only activated on the destination VM of a migration when the
+VM is actually resumed. If the VM was paused, this doesn't happen
+automatically. The user may want to perform some operation on a block
+device (e.g. taking a snapshot or starting a block job) without also
+resuming the VM yet. This is an example where a manual command is
+necessary.
+
+Another example is VM migration when the image files are opened by an
+external qemu-storage-daemon instance on each side. In this case, the
+process that needs to hand over the images isn't even part of the
+migration and can't know when the migration completes. Management tools
+need a way to explicitly inactivate images on the source and activate
+them on the destination.
+
+This adds a new blockdev-set-active QMP command that lets the user
+change the status of individual nodes (this is necessary in
+qemu-storage-daemon because it could be serving multiple VMs and only
+one of them migrates at a time). For convenience, operating on all
+devices (like QEMU does automatically during migration) is offered as an
+option, too, and can be used in the context of single VM.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-9-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 8cd37207f8a90c5f995283ecf95f1cb5f7518a77)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c                            | 21 ++++++++++++++++++++
+ blockdev.c                         | 32 ++++++++++++++++++++++++++++++
+ include/block/block-global-state.h |  3 +++
+ qapi/block-core.json               | 32 ++++++++++++++++++++++++++++++
+ 4 files changed, 88 insertions(+)
+
+diff --git a/block.c b/block.c
+index fd2ac177ef..2140a5d3b7 100644
+--- a/block.c
++++ b/block.c
+@@ -7052,6 +7052,27 @@ bdrv_inactivate_recurse(BlockDriverState *bs, bool top_level)
+     return 0;
+ }
+ 
++int bdrv_inactivate(BlockDriverState *bs, Error **errp)
++{
++    int ret;
++
++    GLOBAL_STATE_CODE();
++    GRAPH_RDLOCK_GUARD_MAINLOOP();
++
++    if (bdrv_has_bds_parent(bs, true)) {
++        error_setg(errp, "Node has active parent node");
++        return -EPERM;
++    }
++
++    ret = bdrv_inactivate_recurse(bs, true);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Failed to inactivate node");
++        return ret;
++    }
++
++    return 0;
++}
++
+ int bdrv_inactivate_all(void)
+ {
+     BlockDriverState *bs = NULL;
+diff --git a/blockdev.c b/blockdev.c
+index 81430122df..70046b6690 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3468,6 +3468,38 @@ void qmp_blockdev_del(const char *node_name, Error **errp)
+     bdrv_unref(bs);
+ }
+ 
++void qmp_blockdev_set_active(const char *node_name, bool active, Error **errp)
++{
++    int ret;
++
++    GLOBAL_STATE_CODE();
++    GRAPH_RDLOCK_GUARD_MAINLOOP();
++
++    if (!node_name) {
++        if (active) {
++            bdrv_activate_all(errp);
++        } else {
++            ret = bdrv_inactivate_all();
++            if (ret < 0) {
++                error_setg_errno(errp, -ret, "Failed to inactivate all nodes");
++            }
++        }
++    } else {
++        BlockDriverState *bs = bdrv_find_node(node_name);
++        if (!bs) {
++            error_setg(errp, "Failed to find node with node-name='%s'",
++                       node_name);
++            return;
++        }
++
++        if (active) {
++            bdrv_activate(bs, errp);
++        } else {
++            bdrv_inactivate(bs, errp);
++        }
++    }
++}
++
+ static BdrvChild * GRAPH_RDLOCK
+ bdrv_find_child(BlockDriverState *parent_bs, const char *child_name)
+ {
+diff --git a/include/block/block-global-state.h b/include/block/block-global-state.h
+index a826bf5f78..9be34b3c99 100644
+--- a/include/block/block-global-state.h
++++ b/include/block/block-global-state.h
+@@ -184,6 +184,9 @@ bdrv_activate(BlockDriverState *bs, Error **errp);
+ int coroutine_fn no_co_wrapper_bdrv_rdlock
+ bdrv_co_activate(BlockDriverState *bs, Error **errp);
+ 
++int no_coroutine_fn
++bdrv_inactivate(BlockDriverState *bs, Error **errp);
++
+ void bdrv_activate_all(Error **errp);
+ int bdrv_inactivate_all(void);
+ 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6ec603aa6f..c1af3d1f7d 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4930,6 +4930,38 @@
+ { 'command': 'blockdev-del', 'data': { 'node-name': 'str' },
+   'allow-preconfig': true }
+ 
++##
++# @blockdev-set-active:
++#
++# Activate or inactivate a block device. Use this to manage the handover of
++# block devices on migration with qemu-storage-daemon.
++#
++# Activating a node automatically activates all of its child nodes first.
++# Inactivating a node automatically inactivates any of its child nodes that are
++# not in use by a still active node.
++#
++# @node-name: Name of the graph node to activate or inactivate. By default, all
++#     nodes are affected by the operation.
++#
++# @active: true if the nodes should be active when the command returns success,
++#     false if they should be inactive.
++#
++# Since: 10.0
++#
++# .. qmp-example::
++#
++#     -> { "execute": "blockdev-set-active",
++#          "arguments": {
++#               "node-name": "node0",
++#               "active": false
++#          }
++#        }
++#     <- { "return": {} }
++##
++{ 'command': 'blockdev-set-active',
++  'data': { '*node-name': 'str', 'active': 'bool' },
++  'allow-preconfig': true }
++
+ ##
+ # @BlockdevCreateOptionsFile:
+ #
+-- 
+2.48.1
+
