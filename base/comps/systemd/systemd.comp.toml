@@ -40,3 +40,15 @@ description = "Set default llmnr support to disabled"
 type = "spec-search-replace"
 regex = '-Ddefault-llmnr=.*$'
 replacement = "-Ddefault-llmnr=no"
+
+[[components.systemd.overlays]]
+description = "Remove build params reducing default timeout to 45s; leaving upstream default of 90s"
+type = "spec-search-replace"
+regex = '-Ddefault-timeout-sec=45'
+replacement = "#-Ddefault-timeout-sec=45"
+
+[[components.systemd.overlays]]
+description = "Remove build params reducing default timeout to 45s; leaving upstream default of 90s"
+type = "spec-search-replace"
+regex = '-Ddefault-user-timeout-sec=45'
+replacement = "#-Ddefault-user-timeout-sec=45"
