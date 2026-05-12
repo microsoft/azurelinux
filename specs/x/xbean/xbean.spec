@@ -5,7 +5,7 @@
 
 Name:           xbean
 Version:        4.24
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        Java plugin based web server
 License:        Apache-2.0
 URL:            https://geronimo.apache.org/xbean/
@@ -82,7 +82,7 @@ rm -r xbean-finder/src/main/java/org/apache/xbean/finder{,/archive}/Bundle*
 sed -i '/testGetBytecode/i@org.junit.Ignore' xbean-finder/src/test/java/org/apache/xbean/finder/archive/MJarJarArchiveTest.java
 
 %build
-%mvn_build -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
+%mvn_build --force -- -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8
 
 %install
 %mvn_install

@@ -14,3 +14,17 @@ description = "Add BuildRequires on maven-local-openjdk25 in place of maven-loca
 type = "spec-add-tag"
 tag = "BuildRequires"
 value = "maven-local-openjdk25"
+
+# Backport from Fedora rawhide commit (the test-skip portion of):
+#   https://src.fedoraproject.org/rpms/xbean/c/1df289d87c3617482e813a5dac348b01c67d271f?branch=rawhide
+# Upstream tests fail under jdk25; rawhide added `--force` to `%mvn_build`
+# so the build proceeds despite test failures. The openjdk21 -> openjdk25
+# portion of that same commit is handled by the BuildRequires overlays
+# above. Drop this overlay once the default Fedora 43 snapshot in
+# distro/azurelinux.distro.toml advances past a commit that includes this
+# change.
+[[components.xbean.overlays]]
+description = "Pass --force to %mvn_build to skip tests that fail under jdk25 (backport from Fedora rawhide)"
+type = "spec-search-replace"
+regex = '^%mvn_build -- '
+replacement = '%mvn_build --force -- '
