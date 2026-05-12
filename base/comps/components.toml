@@ -3434,7 +3434,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.pyparted]
 [components.pyproj]
 [components.pyproject-rpm-macros]
-[components.pypy]
 [components.pyserial]
 [components.pytest]
 [components.python-Automat]
