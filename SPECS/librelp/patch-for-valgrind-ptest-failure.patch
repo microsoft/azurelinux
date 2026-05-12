@@ -1,0 +1,47 @@
+From c91b42d7528cabd5a5ee73bb558392b72f38ecdd Mon Sep 17 00:00:00 2001
+From: Aditya Singh <v-aditysing@microsoft.com>
+Date: Tue, 12 May 2026 08:05:11 +0000
+Subject: [PATCH] Patch for valgrind based memory check ptest failure
+
+Issue - ptest `tests/basic-sessionbreak-vg.sh` fails because Valgrind is failing 
+as it can't find the `tests/known_issues.supp` suppressions file. It's not present
+in the test working directory. This causes the receiver process to never start,
+leading to the timeout and test failure.
+
+Fix - Added `tests/known_issues.supp` file through this patch.
+
+Upstream Patch Reference: https://github.com/rsyslog/librelp/blob/v1.11.0/tests/known_issues.supp
+---
+ tests/known_issues.supp | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 tests/known_issues.supp
+
+diff --git a/tests/known_issues.supp b/tests/known_issues.supp
+new file mode 100644
+index 0000000..83bf8d2
+--- /dev/null
++++ b/tests/known_issues.supp
+@@ -0,0 +1,20 @@
++{
++   <dlcose-missing-to-enable-debug-symbol-display_NOT_A_LEAK>
++   Memcheck:Leak
++   ...
++   fun:dlopen*
++   ...
++}
++
++{
++   <basic-sessionbreak this leak may can happen due the many session aborts.>
++   Memcheck:Leak
++   fun:calloc
++   fun:addToEpollSet
++   fun:addSessToEpoll
++   fun:relpEngineAddToSess
++   fun:handleConnectionRequest
++   fun:engineEventLoopRun
++   fun:relpEngineRun
++   fun:main
++}
+-- 
+2.45.4
+
