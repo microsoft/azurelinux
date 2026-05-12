@@ -1,0 +1,7 @@
+[components.pypy]
+# Pin to commit 6ef55d4 — we started seeing build failures with pypy 7.3.20 when
+# using pypy 7.3.21 as a build dependency (Fedora 43 bumped pypy to 7.3.21 upstream).
+# This commit includes upstream changes in Fedora 43 to upgrade pypy to 7.3.21.
+# This aligns the version being built with the version of the incoming dependency,
+# and most importantly, appears to resolve a segfault during the build process.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "6ef55d476cac416ee815b087f6328f8104201c88" }

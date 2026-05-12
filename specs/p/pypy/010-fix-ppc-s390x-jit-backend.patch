@@ -1,0 +1,73 @@
+From 277b7fa47955a80402fed478f01764917e4845f7 Mon Sep 17 00:00:00 2001
+From: Charalampos Stratakis <cstratak@redhat.com>
+Date: Thu, 19 Mar 2026 14:59:23 +0100
+Subject: [PATCH] fix ppc and s390x jit backends for RegBindingsDict changes
+
+---
+ rpython/jit/backend/ppc/opassembler.py   | 2 +-
+ rpython/jit/backend/ppc/regalloc.py      | 4 ++--
+ rpython/jit/backend/zarch/opassembler.py | 2 +-
+ rpython/jit/backend/zarch/regalloc.py    | 6 +++---
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/rpython/jit/backend/ppc/opassembler.py b/rpython/jit/backend/ppc/opassembler.py
+index 271d0888ec..d01f3d2197 100644
+--- a/rpython/jit/backend/ppc/opassembler.py
++++ b/rpython/jit/backend/ppc/opassembler.py
+@@ -672,7 +672,7 @@ class CallOpAssembler(object):
+ 
+         # save away r3, r4, r5, r6, r12 into the jitframe
+         should_be_saved = [
+-            reg for reg in self._regalloc.rm.reg_bindings.itervalues()
++            reg for reg in self._regalloc.rm.reg_bindings.values()
+                 if reg in self._COND_CALL_SAVE_REGS]
+         self._push_core_regs_to_jitframe(self.mc, should_be_saved)
+         #
+diff --git a/rpython/jit/backend/ppc/regalloc.py b/rpython/jit/backend/ppc/regalloc.py
+index 75db51178b..8b77babae6 100644
+--- a/rpython/jit/backend/ppc/regalloc.py
++++ b/rpython/jit/backend/ppc/regalloc.py
+@@ -348,8 +348,8 @@ class Regalloc(BaseRegalloc, VectorRegalloc):
+                 self.limit_loop_break = (self.assembler.mc.get_relative_pos() +
+                                              LIMIT_LOOP_BREAK)
+             i += 1
+-        assert not self.rm.reg_bindings
+-        assert not self.fprm.reg_bindings
++        assert not len(self.rm.reg_bindings)
++        assert not len(self.fprm.reg_bindings)
+         if not we_are_translated():
+             self.assembler.mc.trap()
+         self.flush_loop()
+diff --git a/rpython/jit/backend/zarch/opassembler.py b/rpython/jit/backend/zarch/opassembler.py
+index aa1f297dd8..515109272f 100644
+--- a/rpython/jit/backend/zarch/opassembler.py
++++ b/rpython/jit/backend/zarch/opassembler.py
+@@ -386,7 +386,7 @@ class CallOpAssembler(object):
+ 
+         # save away r2, r3, r4, r5, r11 into the jitframe
+         should_be_saved = [
+-            reg for reg in self._regalloc.rm.reg_bindings.itervalues()
++            reg for reg in self._regalloc.rm.reg_bindings.values()
+                 if reg in self._COND_CALL_SAVE_REGS]
+         self._push_core_regs_to_jitframe(self.mc, should_be_saved)
+ 
+diff --git a/rpython/jit/backend/zarch/regalloc.py b/rpython/jit/backend/zarch/regalloc.py
+index 4daeaf4058..4bab14c8a6 100644
+--- a/rpython/jit/backend/zarch/regalloc.py
++++ b/rpython/jit/backend/zarch/regalloc.py
+@@ -620,9 +620,9 @@ class Regalloc(BaseRegalloc, vector_ext.VectorRegalloc):
+                 self.limit_loop_break = (self.assembler.mc.get_relative_pos() +
+                                              LIMIT_LOOP_BREAK)
+             i += 1
+-        assert not self.rm.reg_bindings
+-        assert not self.fprm.reg_bindings
+-        assert not self.vrm.reg_bindings
++        assert not len(self.rm.reg_bindings)
++        assert not len(self.fprm.reg_bindings)
++        assert not len(self.vrm.reg_bindings)
+         self.flush_loop()
+         self.assembler.mc.mark_op(None) # end of the loop
+         self.operations = None
+-- 
+2.53.0
+
