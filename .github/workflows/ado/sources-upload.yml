@@ -13,7 +13,9 @@
 #      from the merge queue, not here.
 #   2. Submit scratch package builds for changed components.
 #
-# Helper scripts live under .github/workflows/scripts/control-tower/.
+# Helper scripts live under .github/workflows/scripts/control-tower/
+# (Control Tower-specific) and .github/workflows/scripts/components/
+# (cross-pipeline azldev helpers shared with the GH Actions PR gates).
 #
 # Prerequisites (ADO / Azure Portal):
 #   1. Entra ID App Registration with audience URI

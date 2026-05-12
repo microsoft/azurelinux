@@ -126,18 +126,36 @@ stages:
                 --publish-dir "$(ob_outputDirectory)"
             displayName: "Verify lock files are up to date"
 
-          # Detect changed components. azldev hard-fails if any component has
-          # sourcesChange == true without a corresponding "identity change"
-          # -- meaning the component's input fingerprint (.comp.toml + lock)
-          # didn't move (changeType not in {added, changed, deleted}). That
-          # combination would let attacker-supplied bytes ride into the
-          # lookaside under an unchanged component identity, so we treat it
-          # as hostile and fail closed (supply-chain drift tripwire).
-          # --include-unchanged ensures the full component list is available
-          # for downstream consumers.
+          # Detect changed components AND prepare the render set. The same
+          # changed-components JSON is consumed by the downstream
+          # render-verify step (below) and by the CT API calls (further
+          # down -- prcheck + package-build), so we compute it once here
+          # and publish it as a triage artifact on every exit path.
+          #
+          # azldev hard-fails if any component has sourcesChange == true
+          # without a corresponding identity change (changeType not in
+          # {added, changed, deleted}). That combination would let
+          # attacker-supplied bytes ride into the lookaside under an
+          # unchanged component identity, so we treat it as hostile and
+          # fail closed (supply-chain drift tripwire). --include-unchanged
+          # (set inside compute_changed.sh) ensures the full component
+          # list is available for downstream consumers.
           - script: |
               set -euo pipefail
-              json_file="$(Build.ArtifactStagingDirectory)/changed-components/changed-components.json"
+              change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
+              json_file="$change_set_dir/changed-components.json"
+              render_set_file="$change_set_dir/render-set.txt"
+
+              # Declare the downstream pipeline variables UP FRONT with empty
+              # values. ADO's `$(varName)` substitution leaves the literal
+              # string unchanged when the variable is undefined; we want
+              # downstream `[[ ! -f "$(renderSetFile)" ]]` assertions to fail
+              # cleanly on a missing file instead of relying on bash's
+              # "command not found" behavior for a literal `$(renderSetFile)`
+              # path. Re-set after success below.
+              echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=false]"
+              echo "##vso[task.setvariable variable=renderSetFile;isreadonly=false]"
+
               # Publish the changed-components JSON for post-mortem triage on
               # EVERY exit path, not just success -- if azldev hard-fails on a
               # consistency tripwire the partial JSON is exactly what an
@@ -150,9 +168,9 @@ stages:
               }
               trap publish_artifact EXIT
 
-              echo "##[group]Computing changed components"
-              .github/workflows/scripts/components/compute_changed.sh \
-                --output-file "$json_file" \
+              echo "##[group]Preparing change set"
+              .github/workflows/scripts/components/compute_change_set.sh \
+                --output-dir "$change_set_dir" \
                 --source-commit "$(sourceCommit)" \
                 --target-commit "$(targetCommit)"
               echo "##[endgroup]"
@@ -163,21 +181,47 @@ stages:
               echo "Total: $upload_count component(s) to upload."
               echo "##[endgroup]"
 
+              # Re-set the variables now that the script has succeeded.
               echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$json_file"
-            displayName: "Compute changed components"
+              echo "##vso[task.setvariable variable=renderSetFile;isreadonly=true]$render_set_file"
+            displayName: "Prepare change set"
 
-          # Render the components that need re-rendering (azldev-flagged plus
-          # any with hand-edited spec files), in --check-only mode: azldev
-          # renders to a staging area and diffs against the on-disk output
-          # without writing. Exits nonzero if any component's rendered output
-          # would change, catching both stale renders and direct hand-edits.
+          # Render the components flagged by the change set above
+          # (azldev-flagged plus any with hand-edited spec files) in
+          # --check-only mode: azldev renders to a staging area and diffs
+          # against the on-disk output without writing. Exits nonzero if
+          # any component's rendered output would change, catching both
+          # stale renders and direct hand-edits.
           - script: |
               set -euo pipefail
-              .github/workflows/scripts/control-tower/render_and_verify.sh \
-                --output-dir "$(Build.ArtifactStagingDirectory)/render-check" \
-                --changed-components-file "$(changedComponentsFile)" \
-                --source-commit "$(sourceCommit)" \
-                --target-commit "$(targetCommit)"
+              # Distinguish "render-set file is missing" (Prepare step
+              # crashed; supply-chain tripwire or other hard failure) from
+              # "render-set is empty" (no PR-scoped components). The former
+              # MUST fail loud so a `continueOnError` job does not silently
+              # mask the upstream crash.
+              if [[ ! -f "$(renderSetFile)" ]]; then
+                echo "##[error]renderSetFile is unset or missing -- 'Prepare change set' did not complete cleanly. Treating as failure rather than silently skipping render."
+                exit 1
+              fi
+              if [[ ! -s "$(renderSetFile)" ]]; then
+                echo "No changed components -- skipping render."
+                exit 0
+              fi
+              echo "##[group]Render set"
+              sed 's/^/  - /' "$(renderSetFile)"
+              echo "##[endgroup]"
+              echo "##[group]Specs rendering + verification"
+              # `-x` fails loudly if the arg list would split into multiple
+              # xargs invocations -- a multi-batch render-check would
+              # silently mask drift in the later batches. `-n 50000` is
+              # required for `-x` to have any effect (without `-n`/`-L`,
+              # GNU xargs never splits). `--` ends azldev option parsing so
+              # component names beginning with `-` (none today) are
+              # unambiguous. `env AZLDEV_ALLOW_ROOT=1` is inline per
+              # .github/instructions/ado-pipeline.instructions.md.
+              xargs -x -n 50000 -d '\n' env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only -- \
+                < "$(renderSetFile)"
+              echo "##[endgroup]"
             displayName: "Verify rendered specs are up to date"
 
           - task: AzureCLI@2

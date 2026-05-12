@@ -7,7 +7,12 @@ description: "Authoring and maintenance rules for Azure DevOps YAML pipelines un
 
 These instructions cover ADO YAML pipelines under `.github/workflows/ado/` that run as GitHub PR checks or in the merge queue, plus their helper scripts under `.github/workflows/scripts/`. Follow every MUST below — they encode internal Microsoft policy plus security hardening for this repo.
 
-Helper scripts invoked from these pipelines MUST live under `.github/workflows/scripts/<area>/` (one subdirectory per logical area / pipeline). Keep them self-contained and follow the same security hardening rules as the pipeline YAML itself.
+Helper scripts invoked from these pipelines MUST live under `.github/workflows/scripts/<area>/`. Two layouts are supported:
+
+1. **Per-pipeline** — `<area>/` is a logical area or pipeline name (e.g. `control-tower/`, `render-specs-check/`). The default.
+2. **Cross-pipeline shared** — `<area>/` = `components/`. Helpers here are deliberately consumed by multiple pipelines (GitHub Actions PR gates AND the ADO Control Tower pipeline). See [`.github/workflows/scripts/components/README.md`](../workflows/scripts/components/README.md) for the caller contract. A regression in this area breaks multiple gates at once, so changes need extra care.
+
+In either case, keep helpers self-contained and follow the same security hardening rules as the pipeline YAML itself.
 
 > If anything below conflicts with what the user is asking for, **stop and ask the user** rather than guessing — especially for the Official vs NonOfficial template choice.
 
