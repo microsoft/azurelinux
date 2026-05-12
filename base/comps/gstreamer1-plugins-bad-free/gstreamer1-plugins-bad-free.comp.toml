@@ -1,4 +1,15 @@
+# Disable the optional `extras` build conditional. This is part of the
+# distro-wide effort to remove ffmpeg/libav* and a number of niche
+# multimedia libraries (faad2, flite, game-music-emu, libdca, libmpcdec,
+# libopenmpt, libqrencode, mjpegtools, openal, spandsp, vo-amrwbenc,
+# wildmidi, zbar, zxing, etc.) that we do not want to maintain.
+#
+# Disabling 'extras' drops the -extras, -fluidsynth, -lv2, -wildmidi and
+# -zbar subpackages. The dc1394 and onnx plugins are built independently
+# (their bconds default ON on Fedora) but only packaged inside %files
+# extras, so we must disable them too to avoid "unpackaged file" failures.
 [components.gstreamer1-plugins-bad-free]
+build.without = ["extras", "dc1394", "onnx"]
 
 # AZL does not ship opus — disable the opus parse plugin and remove its BR.
 

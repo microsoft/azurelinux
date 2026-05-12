@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/gstreamer1-plugins-bad-free.azl.macros}
+
 %global         majorminor 1.0
 %global         _gobject_introspection  1.31.1
 
@@ -33,7 +36,7 @@
 
 Name:           gstreamer1-plugins-bad-free
 Version:        1.26.10
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        GStreamer streaming media framework "bad" plugins
 
 # Automatically converted from old format: LGPLv2+ and LGPLv2 - review is highly recommended.
@@ -46,6 +49,7 @@ Source0:        gst-plugins-bad-%{version}.tar.xz
 %else
 Source:         https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-%{version}.tar.xz
 %endif
+Source9999: gstreamer1-plugins-bad-free.azl.macros
 
 # https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/5622
 Patch0:          openh264-add-license-file.patch
