@@ -60,6 +60,8 @@ jobs:
           for pkg in $changed_pkg_dirs; do
             changed_pkgs="$changed_pkgs $(find ${{ matrix.specs-dir }}/$pkg -name '*.spec' -exec basename {} .spec \; | xargs)"
           done
+          # Trim leading/trailing whitespace.
+          changed_pkgs=$(echo $changed_pkgs)
 
           echo "Packages modified in this PR:"
           echo "${{ matrix.specs-dir }}: '${changed_pkgs}'"
@@ -81,19 +83,26 @@ jobs:
 
           sudo make -C toolkit -j$(nproc) chroot-tools REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
 
+          # Generate the macros.releaseversions file that is needed by the signature check.
+          # The file contains versions and releases of all packages under SPECS folder.
+          sudo make -C toolkit -j$(nproc) generate-versions-macros-file REBUILD_TOOLS=y DAILY_BUILD_ID=${LKG_BUILD_ID}
+
       - name: Check for invalid source signatures
         run: |
           if [ -z "${{ env.changed_pkgs }}" ]; then
-            echo "No package changes detected in '${{ matrix.specs-dir }}''."
+            echo "No package changes detected in '${{ matrix.specs-dir }}'."
             exit 0
           fi
 
+          MACROS_RELEASEVERSIONS_PATH="$(realpath -e build/pkg_artifacts/macros.releaseversions)"
+          echo "Using macros.releaseversions at: $MACROS_RELEASEVERSIONS_PATH"
+
           set -x
-          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }}; then
+          if ! sudo make -C toolkit -j$(nproc) input-srpms REBUILD_TOOLS=y DAILY_BUILD_ID=${{ env.LKG_BUILD_ID }} SRPM_PACK_LIST="${{ env.changed_pkgs }}" SPECS_DIR=../${{ matrix.specs-dir }} EXTRA_MACROS_FILES="$MACROS_RELEASEVERSIONS_PATH"; then
             set +x
             printf "\n\n******************************\n"
             echo "Failed to check the signatures of the modified packages."
-            echo "Check the logs above for details on the mismatches files and their expected hashes."
+            echo "Check the logs above for details on the mismatched files and their expected hashes."
             echo "Consider running: sudo make -C toolkit input-srpms REBUILD_TOOLS=y SRPM_PACK_LIST='${{ env.changed_pkgs }}' SPECS_DIR=../${{ matrix.specs-dir }}"
             printf "******************************\n\n"
             exit 1

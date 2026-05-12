@@ -1,6 +1,6 @@
 Name:           coreos-init
 Version:        0.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Init scripts for Flatcar (systemd units, scripts, configs)
 
 License:        BSD-3-Clause
@@ -64,6 +64,10 @@ ln -sf %{_unitdir}/rpcbind.service %{buildroot}%{_sysconfdir}/systemd/system/rpc
 rm %{buildroot}/usr/lib/systemd/system/ignition-delete-config.service
 rm %{buildroot}/usr/lib/systemd/system/sshd-keygen.service
 rm -rf  %{buildroot}/etc/issue
+
+# Removing unwanted files that cause failures in Azure Linux image compliance checks
+rm -f %{buildroot}%{_unitdir}/sysinit.target.wants/ignition-delete-config.service
+
 # Generate file manifest automatically (avoids missing files when upstream changes)
 # This will list all files installed under %{buildroot} as absolute paths.
 find %{buildroot} -type f -o -type l \
@@ -95,6 +99,9 @@ find %{buildroot} -type f -o -type l \
 %doc README.md
 
 %changelog
+* Mon Feb 02 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.0.1-2
+- Cleanup unwanted files
+
 * Mon Feb 02 2026 Sumit Jena (HCL Technologies Ltd) - 0.0.1-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - Add patch from Flatcar upstream with noop systemd-sysupdate transfer config to prevent service failure.
