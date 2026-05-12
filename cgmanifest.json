@@ -1327,8 +1327,8 @@
         "type": "other",
         "other": {
           "name": "buildah",
-          "version": "1.41.4",
-          "downloadUrl": "https://github.com/containers/buildah/archive/v1.41.4.tar.gz"
+          "version": "1.43.1",
+          "downloadUrl": "https://github.com/containers/buildah/archive/v1.43.1.tar.gz"
         }
       }
     },
@@ -1817,8 +1817,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "48.0.246",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v48.0.246.tar.gz"
+          "version": "51.1.56",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.56.tar.gz"
         }
       }
     },
@@ -7290,6 +7290,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "ignition-flatcar",
+          "version": "2.22.0",
+          "downloadUrl": "https://github.com/coreos/ignition/archive/refs/tags/v2.22.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "iio-sensor-proxy",
           "version": "3.0",
           "downloadUrl": "https://gitlab.freedesktop.org/hadess/iio-sensor-proxy/uploads/de965bcb444552d328255639b241ce73/iio-sensor-proxy-3.0.tar.xz"
@@ -7621,8 +7631,8 @@
         "type": "other",
         "other": {
           "name": "irqbalance",
-          "version": "1.9.3",
-          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.3.tar.gz"
+          "version": "1.9.5",
+          "downloadUrl": "https://github.com/Irqbalance/irqbalance/archive/v1.9.5.tar.gz"
         }
       }
     },
@@ -8231,18 +8241,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers",
-          "version": "3.19.1.kata2",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "kata-containers-preview",
-          "version": "3.27.0~preview1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview1.tar.gz"
+          "version": "3.19.1.kata3",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.19.1.kata3.tar.gz"
         }
       }
     },
@@ -8261,8 +8261,8 @@
         "type": "other",
         "other": {
           "name": "kata-containers-preview",
-          "version": "3.27.0-preview1",
-          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0-preview1.tar.gz"
+          "version": "3.27.0~preview2",
+          "downloadUrl": "https://github.com/microsoft/kata-containers/archive/refs/tags/3.27.0.preview2.tar.gz"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.121.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.121.mshv1.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv1.tar.gz"
         }
       }
     },
@@ -8431,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.6.96.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.96.mshv1.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.137.mshv1.tar.gz"
         }
       }
     },
@@ -15633,8 +15633,8 @@
         "type": "other",
         "other": {
           "name": "opensc",
-          "version": "0.26.1",
-          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.26.1/opensc-0.26.1.tar.gz"
+          "version": "0.27.1",
+          "downloadUrl": "https://github.com/OpenSC/OpenSC/releases/download/0.27.1/opensc-0.27.1.tar.gz"
         }
       }
     },
@@ -21283,8 +21283,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.25.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
+          "version": "1.25.2",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.2/pgbouncer-1.25.2.tar.gz"
         }
       }
     },
@@ -21303,8 +21303,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.29",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.29.tar.xz"
+          "version": "8.3.31",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.31.tar.xz"
         }
       }
     },
@@ -27284,8 +27284,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-rdiscount",
-          "version": "2.2.7.1",
-          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.7.1.tar.gz"
+          "version": "2.2.7.4",
+          "downloadUrl": "https://github.com/davidfstr/rdiscount/archive/refs/tags/2.2.7.4.tar.gz"
         }
       }
     },
@@ -27626,6 +27626,16 @@
           "name": "rust",
           "version": "1.90.0",
           "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rust-afterburn",
+          "version": "5.8.2",
+          "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
         }
       }
     },
@@ -29956,8 +29966,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.7",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.7.tar.gz"
+          "version": "8.0.9",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.9.tar.gz"
         }
       }
     },
@@ -29996,8 +30006,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0392",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0392.tar.gz"
+          "version": "9.2.0461",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0461.tar.gz"
         }
       }
     },
@@ -30287,7 +30297,7 @@
         "other": {
           "name": "wireshark",
           "version": "4.4.7",
-          "downloadUrl": "https://wireshark.org/download/src/wireshark-4.4.7.tar.xz"
+          "downloadUrl": "https://wireshark.org/download/src/all-versions/wireshark-4.4.7.tar.xz"
         }
       }
     },
