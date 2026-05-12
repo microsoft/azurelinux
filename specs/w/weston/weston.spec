@@ -5,7 +5,7 @@
 
 Name:           weston
 Version:        14.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Reference compositor for Wayland
 
 License:        MIT and CC-BY-SA-3.0
@@ -54,7 +54,6 @@ BuildRequires:  pkgconfig(libva-drm) >= 0.34.0
 BuildRequires:  pkgconfig(libwebp)
 BuildRequires:  pkgconfig(libxml-2.0) >= 2.6
 BuildRequires:  pkgconfig(mtdev) >= 1.1.0
-BuildRequires:  (pkgconfig(neatvnc) >= 0.7.0 with pkgconfig(neatvnc) < 0.10.0)
 BuildRequires:  pkgconfig(pangocairo)
 BuildRequires:  pkgconfig(pixman-1) >= 0.25.2
 BuildRequires:  pkgconfig(wayland-client) >= 1.22.0
@@ -119,7 +118,7 @@ Common headers for weston
 %autosetup -p1
 
 %build
-%meson
+%meson -Dbackend-vnc=false
 %meson_build
 
 %install
@@ -130,7 +129,7 @@ Common headers for weston
 #%%meson_test
 
 %files
-%config(noreplace) %{_sysconfdir}/pam.d/weston-remote-access
+
 %license COPYING
 %doc README.md
 %{_bindir}/weston
@@ -170,7 +169,7 @@ Common headers for weston
 %{_libdir}/libweston-%{apiver}/pipewire-plugin.so
 %{_libdir}/libweston-%{apiver}/remoting-plugin.so
 %{_libdir}/libweston-%{apiver}/rdp-backend.so
-%{_libdir}/libweston-%{apiver}/vnc-backend.so
+
 %{_libdir}/libweston-%{apiver}/wayland-backend.so
 %{_libdir}/libweston-%{apiver}/x11-backend.so
 %{_libdir}/libweston-%{apiver}/xwayland.so
