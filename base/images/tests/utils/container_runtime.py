@@ -93,8 +93,13 @@ def _parse_loaded_images(load_stdout: str) -> list[str]:
     return refs
 
 
-def _get_image_reference(image_path: Path) -> str:
-    """Get container image reference from path or direct reference."""
+def resolve_image_reference(image_path: Path) -> str:
+    """Return a podman-usable image reference for *image_path*.
+
+    If *image_path* looks like an already-resolved image reference (contains
+    ``:``) the value is returned as-is.  Otherwise the file is loaded via
+    ``podman load`` and the reference reported by podman is returned.
+    """
     image_str = str(image_path)
 
     # If it's already a container reference (contains :), use directly
@@ -135,7 +140,6 @@ def _get_image_reference(image_path: Path) -> str:
 
 def create_container_with_exec(
     image_path: Path,
-    workdir: Path,
     container_name: str | None = None,
     image_name: str | None = None,
     image_ref: str | None = None,
@@ -143,10 +147,10 @@ def create_container_with_exec(
     """Create a running container with podman exec access.
 
     Args:
-        image_path: Path to image file or image reference
-        workdir: Working directory (unused but kept for compatibility)
-        container_name: Container name (auto-generated if None)
-        image_name: Image name for logging (derived if None)
+        image_path: Path to image file or image reference. Ignored when
+            *image_ref* is provided.
+        container_name: Container name (auto-generated if ``None``).
+        image_name: Human-readable image name used in log messages.
         image_ref: Pre-resolved image reference (skips ``podman load``).
             When provided, ``image_path`` is not touched. Use this to
             amortize the ~10s tarball load across many container creates.
@@ -162,8 +166,12 @@ def create_container_with_exec(
     # Get image reference (load if needed) — but skip if caller already
     # resolved one for us (e.g. session-scoped fixture).
     if image_ref is None:
-        image_ref = _get_image_reference(image_path)
-    logger.info("Creating exec container %s from image %s", container_name, image_ref)
+        image_ref = resolve_image_reference(image_path)
+    logger.info(
+        "Creating exec container %s from image %s%s",
+        container_name, image_ref,
+        f" ({image_name})" if image_name else "",
+    )
     
     # Create and start container
     run_cmd = [

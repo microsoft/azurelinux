@@ -6,6 +6,8 @@ import os
 import re
 from pathlib import Path
 
+import pytest
+
 # Default upper-bound for the unpacked container rootfs (MiB).
 # Ported from the legacy "Memory Usage Check" / "Container Size Max Check"
 # in the CBL-Mariner ContainerBase BVT. Override via env var
@@ -107,7 +109,14 @@ def test_container_rootfs_size(rootfs: Path) -> None:
     "Container Size Max Check": walks the extracted rootfs and asserts
     the total on-disk size is under AZL_CONTAINER_MAX_SIZE_MB (MiB).
     """
-    max_mb = int(os.environ.get("AZL_CONTAINER_MAX_SIZE_MB", _DEFAULT_MAX_ROOTFS_MB))
+    raw = os.environ.get("AZL_CONTAINER_MAX_SIZE_MB", str(_DEFAULT_MAX_ROOTFS_MB))
+    try:
+        max_mb = int(raw)
+    except ValueError:
+        pytest.fail(
+            f"AZL_CONTAINER_MAX_SIZE_MB must be an integer (got {raw!r}). "
+            "Set it to the maximum allowed rootfs size in MiB."
+        )
 
     total_bytes = 0
     for dirpath, _dirnames, filenames in os.walk(rootfs, followlinks=False):

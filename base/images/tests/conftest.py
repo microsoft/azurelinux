@@ -28,7 +28,7 @@ from utils.container_runtime import (
     ContainerExecInstance, 
     create_container_with_exec,
     destroy_exec_container,
-    _get_image_reference,
+    resolve_image_reference,
 )
 from utils.pytest_plugin import (
     derive_image_type_from_capabilities,
@@ -231,7 +231,7 @@ def _container_image_ref(image_path: Path, image_type: str) -> str | None:
     """
     if image_type != "container":
         return None
-    return _get_image_reference(image_path)
+    return resolve_image_reference(image_path)
 
 
 @pytest.fixture
@@ -239,7 +239,7 @@ def running_container(
     image_path: Path, image_type: str, image_name: str | None, workdir: Path,
     _container_image_ref: str | None,
     request: pytest.FixtureRequest
-) -> ContainerExecInstance | None:
+) -> ContainerExecInstance:
     """Fresh container per test, with exec access and guaranteed teardown.
 
     A new container is started for every test that requests this
@@ -261,7 +261,6 @@ def running_container(
     logger.info("Creating fresh container for test %s", request.node.name)
     container = create_container_with_exec(
         image_path,
-        workdir,
         container_name=None,  # auto-generate a unique name per test
         image_name=image_name,
         image_ref=_container_image_ref,  # pre-loaded once per session; avoids repeated podman load
@@ -284,7 +283,7 @@ def container_exec(running_container: ContainerExecInstance):
     The container starts as-shipped, but tests can opt-in to dependency
     installation by declaring ``@pytest.mark.requires_pkg("pkg", ...)``
     on the test function. The autouse ``_apply_requires_pkg`` fixture
-    (below) installs those packages via ``dnf install -y`` in this same
+    (below) installs those packages via ``tdnf`` or ``dnf`` in this same
     container before the test body runs, and skips the test if the
     install fails. Tests with no ``requires_pkg`` marker see the image
     exactly as shipped — the container is never mutated implicitly.
@@ -305,8 +304,9 @@ def _apply_requires_pkg(request: pytest.FixtureRequest) -> None:
     """Honor ``@pytest.mark.requires_pkg(...)`` on runtime tests.
 
     Collects all packages declared by ``requires_pkg`` markers on the
-    test (multiple markers stack), installs them once via ``dnf`` in
-    the live container, and skips the test on installation failure.
+    test (multiple markers stack), installs them once via ``tdnf``
+    (preferred) or ``dnf`` in the live container, and skips the test on
+    installation failure or when neither package manager is found.
 
     No-op for tests that don't carry the marker or don't request
     ``container_exec`` (e.g. static rootfs tests).
@@ -324,12 +324,27 @@ def _apply_requires_pkg(request: pytest.FixtureRequest) -> None:
         return
 
     container_exec = request.getfixturevalue("container_exec")
-    cmd = "dnf install -y " + " ".join(pkgs)
+
+    # Detect which package manager is available in this container.
+    # AZL images may ship tdnf, dnf, or both; prefer tdnf when present.
+    pkg_mgr: str | None = None
+    for candidate in ("tdnf", "dnf"):
+        probe = container_exec(f"command -v {candidate!s}", timeout=10)
+        if probe.returncode == 0:
+            pkg_mgr = candidate
+            break
+    if pkg_mgr is None:
+        pytest.skip(
+            f"requires_pkg: neither tdnf nor dnf found in container; "
+            f"cannot install {pkgs!r}"
+        )
+
+    cmd = f"{pkg_mgr} install -y " + " ".join(pkgs)
     logger.info("requires_pkg: installing %s", pkgs)
     result = container_exec(cmd, timeout=300)
     if result.returncode != 0:
         pytest.skip(
-            f"requires_pkg: failed to install {pkgs} (rc={result.returncode}): "
+            f"requires_pkg: failed to install {pkgs!r} (rc={result.returncode}): "
             f"{result.stderr.strip()[:200]}"
         )
 
