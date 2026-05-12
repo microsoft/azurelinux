@@ -2,8 +2,12 @@
 
 # OpenNI is an old (v1.5.7) Kinect/PrimeSense depth sensor library not available
 # in Azure Linux and not relevant for a cloud/server distro.
+#
+# Disable ffmpeg and xine support as part of removing ffmpeg/libav* from
+# Azure Linux. OpenCV's videoio module loses its FFmpeg and Xine video I/O
+# backends; gstreamer and v4l2 backends remain available.
 [components.opencv.build]
-without = ["openni"]
+without = ["openni", "ffmpeg", "xine"]
 
 # CVE-2025-53644 patch targets bundled 3rdparty/openjpeg, which Fedora's spec
 # deletes during %prep (it uses system openjpeg2-devel instead). The patch
