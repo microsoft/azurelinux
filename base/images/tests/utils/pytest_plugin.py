@@ -118,7 +118,8 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
     config.addinivalue_line(
         "markers",
         "runtime_container_tests: auto-applied to tests under cases/*/runtime/; "
-        "triggers a fresh container to be started for the test",
+        "used for -m runtime_container_tests filtering. Container startup is "
+        "driven by fixture usage (running_container), not by this marker.",
     )
 
     from utils.tools import check_tools

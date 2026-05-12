@@ -28,6 +28,7 @@ from utils.container_runtime import (
     ContainerExecInstance, 
     create_container_with_exec,
     destroy_exec_container,
+    _get_image_reference,
 )
 from utils.pytest_plugin import (
     derive_image_type_from_capabilities,
@@ -220,9 +221,24 @@ def partition_table(
 # ---------------------------------------------------------------------------
 
 
+@pytest.fixture(scope="session")
+def _container_image_ref(image_path: Path, image_type: str) -> str | None:
+    """Load the container image once per session and cache the reference.
+
+    This avoids calling ``podman load -i <archive>`` for every test when
+    ``--image-path`` points at an OCI tar archive.  For non-container
+    sessions the fixture returns ``None`` immediately (no podman call).
+    """
+    if image_type != "container":
+        return None
+    return _get_image_reference(image_path)
+
+
 @pytest.fixture
 def running_container(
-    image_path: Path, image_type: str, image_name: str | None, workdir: Path, request: pytest.FixtureRequest
+    image_path: Path, image_type: str, image_name: str | None, workdir: Path,
+    _container_image_ref: str | None,
+    request: pytest.FixtureRequest
 ) -> ContainerExecInstance | None:
     """Fresh container per test, with exec access and guaranteed teardown.
 
@@ -248,6 +264,7 @@ def running_container(
         workdir,
         container_name=None,  # auto-generate a unique name per test
         image_name=image_name,
+        image_ref=_container_image_ref,  # pre-loaded once per session; avoids repeated podman load
     )
 
     try:

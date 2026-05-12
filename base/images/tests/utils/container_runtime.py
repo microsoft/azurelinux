@@ -37,10 +37,17 @@ class ContainerRuntimeError(Exception):
     pass
 
 
-def _run_container_cmd(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
-    """Run container command with proper error handling."""
+def _run_container_cmd(cmd: list[str], timeout: int = 300, **kwargs: object) -> subprocess.CompletedProcess[str]:
+    """Run container command with proper error handling.
+
+    Args:
+        cmd: Command and arguments to run.
+        timeout: Maximum seconds to wait (default 300). Prevents operations
+            like ``podman load`` or ``podman run`` from hanging indefinitely
+            in CI when storage or network layers stall.
+    """
     logger.info("Container runtime: %s", " ".join(cmd))
-    result = subprocess.run(cmd, capture_output=True, text=True, **kwargs)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, **kwargs)
     if result.returncode != 0:
         logger.error(
             "Container command failed (rc=%d): %s\nstdout: %s\nstderr: %s",
