@@ -194,10 +194,8 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
 
         # Auto-apply `runtime_container_tests` marker to any test that
         # lives under a `runtime/` subdirectory anywhere below `cases/`.
-        # This keeps the runtime/static split a pure directory convention,
-        # so tests don't need to repeat the marker by hand. Runtime tests
-        # also implicitly require the `runtime-package-management` capability
-        # (they need to mutate the live container), so gate them on it here.
+        # This is purely for `-m runtime_container_tests` filtering; the
+        # `running_container` fixture itself triggers container startup
+        # on fixture usage, not on this marker.
         if "runtime" in parts[cases_idx:]:
             item.add_marker(pytest.mark.runtime_container_tests)
-            item.add_marker(pytest.mark.require_capability("runtime-package-management"))

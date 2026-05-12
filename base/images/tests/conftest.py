@@ -9,7 +9,6 @@ CLI options (``--image-path``, ``--image-name``, ``--image-type``,
 from __future__ import annotations
 
 import logging
-import os
 import shutil
 import subprocess
 import tempfile
@@ -227,17 +226,21 @@ def running_container(
 ) -> ContainerExecInstance | None:
     """Fresh container per test, with exec access and guaranteed teardown.
 
-    A new container is started for every runtime test and destroyed on
-    teardown so tests cannot leak state to one another (installed
-    packages, created users, processes, files). The container name is
-    auto-generated to avoid collisions when tests run in parallel.
+    A new container is started for every test that requests this
+    fixture (directly or via ``container_exec`` / ``container_info``)
+    and destroyed on teardown so tests cannot leak state to one another
+    (installed packages, created users, processes, files). The container
+    name is auto-generated to avoid collisions when tests run in
+    parallel.
+
+    Container startup is gated on **fixture usage**, not on a marker:
+    requesting the fixture is itself the signal that the test needs a
+    live container. The only hard gate is image type — for non-container
+    images the fixture skips so VM-only sessions don't try to start
+    podman.
     """
     if image_type != "container":
         pytest.skip("running_container only applicable to container images")
-
-    # Only spin up a container for tests that actually need one.
-    if not request.node.get_closest_marker("runtime_container_tests"):
-        pytest.skip("running_container only for runtime container tests")
 
     logger.info("Creating fresh container for test %s", request.node.name)
     container = create_container_with_exec(
@@ -259,10 +262,15 @@ def container_exec(running_container: ContainerExecInstance):
     """Execute a shell command in the running container via ``podman exec``.
 
     Returns a callable ``(command: str, timeout: int = 60) ->
-    subprocess.CompletedProcess[str]``. The framework does **not** install
-    packages or mutate the container in any way — tests see the image as
-    shipped. If a test needs a binary that the image does not ship, it
-    must declare the dependency itself (and either skip or fail loudly).
+    subprocess.CompletedProcess[str]``.
+
+    The container starts as-shipped, but tests can opt-in to dependency
+    installation by declaring ``@pytest.mark.requires_pkg("pkg", ...)``
+    on the test function. The autouse ``_apply_requires_pkg`` fixture
+    (below) installs those packages via ``dnf install -y`` in this same
+    container before the test body runs, and skips the test if the
+    install fails. Tests with no ``requires_pkg`` marker see the image
+    exactly as shipped — the container is never mutated implicitly.
     """
     from utils.container_runtime import exec_container_command_raw
 
