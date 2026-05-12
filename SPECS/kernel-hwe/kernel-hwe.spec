@@ -30,14 +30,14 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.89.1
+Version:        6.18.31.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        azurelinux-ca-20230216.pem
@@ -174,7 +174,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-azl3-hwe-%{version}
 make mrproper
 
 cp %{config_source} .config
@@ -403,6 +403,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_lib64dir}/libperf-jvmti.so
 %{_libdir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
+%{_sysconfdir}/cpupower-service.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
 %{_includedir}/powercap.h
@@ -416,8 +417,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
@@ -431,6 +430,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.31.1-1
+- Auto-upgrade to 6.18.31.1
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.89.1-1
 - Auto-upgrade to 6.12.89.1
 - Disable ESP-in-TCP encapsulation
