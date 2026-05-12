@@ -1,4 +1,9 @@
 [components.openssl]
+# Pin to Fedora f43 openssl-3.5.4-3 which includes CVE patches 0073–0079 fixing:
+# CVE-2026-31789 (Critical), CVE-2026-28387, CVE-2026-31790, CVE-2026-2673,
+# CVE-2026-28390, CVE-2026-28389, CVE-2026-28388 (all High).
+# Fedora commit: https://src.fedoraproject.org/rpms/openssl/c/0990e54a2f6b6b8e4f3e238175382505fff8be51
+spec = { type = "upstream", upstream-commit = "0990e54a2f6b6b8e4f3e238175382505fff8be51" }
 
 # AZL4 does not ship fips.so. Extend the existing RHEL fips.so-deletion
 # path to cover AZL4 so the module and its config are excluded from the package.

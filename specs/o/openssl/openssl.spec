@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 4%{?dist}
+Release: 6%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -120,6 +120,13 @@ Patch0069: 0069-CVE-2026-22795.patch
 Patch0070: 0070-CVE-2025-11187.patch
 Patch0071: 0071-Do-not-make-key-share-choice-in-tls1_set_groups.patch
 Patch0072: 0072-Fix-PPC-register-processing.patch
+Patch0073: 0073-CVE-2026-2673.patch
+Patch0074: 0074-CVE-2026-28387.patch
+Patch0075: 0075-CVE-2026-28388.patch
+Patch0076: 0076-CVE-2026-28389.patch
+Patch0077: 0077-CVE-2026-28390.patch
+Patch0078: 0078-CVE-2026-31789.patch
+Patch0079: 0079-CVE-2026-31790.patch
 
 
 License: Apache-2.0
@@ -492,6 +499,16 @@ ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysco
 %ldconfig_scriptlets libs
 
 %changelog
+* Mon Apr 20 2026 Pavol Žáčik <pzacik@redhat.com> - 1:3.5.4-3
+- Backport security patches from OpenSSL 3.5.6
+  Resolves: CVE-2026-2673
+  Resolves: CVE-2026-28387
+  Resolves: CVE-2026-28388
+  Resolves: CVE-2026-28389
+  Resolves: CVE-2026-28390
+  Resolves: CVE-2026-31789
+  Resolves: CVE-2026-31790
+
 * Tue Jan 27 2026 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.5.4-2
 - Resolves: CVE-2025-15467
 - Resolves: CVE-2025-15468
