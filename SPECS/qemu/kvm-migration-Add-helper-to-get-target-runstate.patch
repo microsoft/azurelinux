@@ -1,0 +1,84 @@
+From 21e971c2d7a8aee5cb95b7714c15374331add796 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:33 -0500
+Subject: [PATCH 02/23] migration: Add helper to get target runstate
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [1/22] d1b2ee0d6a878e71ad04ace9fd82d8aab2d5217b (kmwolf/centos-qemu-kvm)
+
+In 99% cases, after QEMU migrates to dest host, it tries to detect the
+target VM runstate using global_state_get_runstate().
+
+There's one outlier so far which is Xen that won't send global state.
+That's the major reason why global_state_received() check was always there
+together with global_state_get_runstate().
+
+However it's utterly confusing why global_state_received() has anything to
+do with "let's start VM or not".
+
+Provide a helper to explain it, then we have an unified entry for getting
+the target dest QEMU runstate after migration.
+
+Suggested-by: Fabiano Rosas <farosas@suse.de>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20241206230838.1111496-2-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit 7815f69867da92335055d4b5248430b0f122ce4e)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ migration/migration.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index 3dea06d577..c7a9e2e026 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -135,6 +135,21 @@ static bool migration_needs_multiple_sockets(void)
+     return migrate_multifd() || migrate_postcopy_preempt();
+ }
+ 
++static RunState migration_get_target_runstate(void)
++{
++    /*
++     * When the global state is not migrated, it means we don't know the
++     * runstate of the src QEMU.  We don't have much choice but assuming
++     * the VM is running.  NOTE: this is pretty rare case, so far only Xen
++     * uses it.
++     */
++    if (!global_state_received()) {
++        return RUN_STATE_RUNNING;
++    }
++
++    return global_state_get_runstate();
++}
++
+ static bool transport_supports_multi_channels(MigrationAddress *addr)
+ {
+     if (addr->transport == MIGRATION_ADDRESS_TYPE_SOCKET) {
+@@ -727,8 +742,7 @@ static void process_incoming_migration_bh(void *opaque)
+      * unless we really are starting the VM.
+      */
+     if (!migrate_late_block_activate() ||
+-         (autostart && (!global_state_received() ||
+-            runstate_is_live(global_state_get_runstate())))) {
++        (autostart && runstate_is_live(migration_get_target_runstate()))) {
+         /* Make sure all file formats throw away their mutable metadata.
+          * If we get an error here, just don't restart the VM yet. */
+         bdrv_activate_all(&local_err);
+@@ -751,8 +765,7 @@ static void process_incoming_migration_bh(void *opaque)
+ 
+     dirty_bitmap_mig_before_vm_start();
+ 
+-    if (!global_state_received() ||
+-        runstate_is_live(global_state_get_runstate())) {
++    if (runstate_is_live(migration_get_target_runstate())) {
+         if (autostart) {
+             vm_start();
+         } else {
+-- 
+2.48.1
+
