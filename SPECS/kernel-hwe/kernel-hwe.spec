@@ -30,14 +30,14 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.87.1
+Version:        6.18.29.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        azurelinux-ca-20230216.pem
@@ -174,7 +174,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-azl3-hwe-%{version}
 make mrproper
 
 cp %{config_source} .config
@@ -431,6 +431,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue May 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.29.1-1
+- Auto-upgrade to 6.18.29.1
+
 * Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.87.1-1
 - Auto-upgrade to 6.12.87.1
 
