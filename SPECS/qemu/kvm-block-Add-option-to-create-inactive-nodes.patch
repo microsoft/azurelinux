@@ -1,0 +1,102 @@
+From d44250363b08e627e06a9afe288d02a3d995afc0 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:58 +0100
+Subject: [PATCH 14/23] block: Add option to create inactive nodes
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [13/22] 45b01b9c09d5f12715e4977cab6140d2cac90714 (kmwolf/centos-qemu-kvm)
+
+In QEMU, nodes are automatically created inactive while expecting an
+incoming migration (i.e. RUN_STATE_INMIGRATE). In qemu-storage-daemon,
+the notion of runstates doesn't exist. It also wouldn't necessarily make
+sense to introduce it because a single daemon can serve multiple VMs
+that can be in different states.
+
+Therefore, allow the user to explicitly open images as inactive with a
+new option. The default is as before: Nodes are usually active, except
+when created during RUN_STATE_INMIGRATE.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-8-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit faecd16fe5c65a25b5b55b5edbe4322cec5a9d96)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c                      | 9 +++++++++
+ include/block/block-common.h | 1 +
+ qapi/block-core.json         | 6 ++++++
+ 3 files changed, 16 insertions(+)
+
+diff --git a/block.c b/block.c
+index bedd54deaa..fd2ac177ef 100644
+--- a/block.c
++++ b/block.c
+@@ -1573,6 +1573,10 @@ static void update_flags_from_options(int *flags, QemuOpts *opts)
+     if (qemu_opt_get_bool_del(opts, BDRV_OPT_AUTO_READ_ONLY, false)) {
+         *flags |= BDRV_O_AUTO_RDONLY;
+     }
++
++    if (!qemu_opt_get_bool_del(opts, BDRV_OPT_ACTIVE, true)) {
++        *flags |= BDRV_O_INACTIVE;
++    }
+ }
+ 
+ static void update_options_from_flags(QDict *options, int flags)
+@@ -1799,6 +1803,11 @@ QemuOptsList bdrv_runtime_opts = {
+             .type = QEMU_OPT_BOOL,
+             .help = "Ignore flush requests",
+         },
++        {
++            .name = BDRV_OPT_ACTIVE,
++            .type = QEMU_OPT_BOOL,
++            .help = "Node is activated",
++        },
+         {
+             .name = BDRV_OPT_READ_ONLY,
+             .type = QEMU_OPT_BOOL,
+diff --git a/include/block/block-common.h b/include/block/block-common.h
+index 338fe5ff7a..7030669f04 100644
+--- a/include/block/block-common.h
++++ b/include/block/block-common.h
+@@ -257,6 +257,7 @@ typedef enum {
+ #define BDRV_OPT_AUTO_READ_ONLY "auto-read-only"
+ #define BDRV_OPT_DISCARD        "discard"
+ #define BDRV_OPT_FORCE_SHARE    "force-share"
++#define BDRV_OPT_ACTIVE         "active"
+ 
+ 
+ #define BDRV_SECTOR_BITS   9
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 92af032744..6ec603aa6f 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4668,6 +4668,11 @@
+ #
+ # @cache: cache-related options
+ #
++# @active: whether the block node should be activated (default: true).
++#     Having inactive block nodes is useful primarily for migration because it
++#     allows opening an image on the destination while the source is still
++#     holding locks for it. (Since 10.0)
++#
+ # @read-only: whether the block device should be read-only (default:
+ #     false).  Note that some block drivers support only read-only
+ #     access, either generally or in certain configurations.  In this
+@@ -4694,6 +4699,7 @@
+             '*node-name': 'str',
+             '*discard': 'BlockdevDiscardOptions',
+             '*cache': 'BlockdevCacheOptions',
++            '*active': 'bool',
+             '*read-only': 'bool',
+             '*auto-read-only': 'bool',
+             '*force-share': 'bool',
+-- 
+2.48.1
+

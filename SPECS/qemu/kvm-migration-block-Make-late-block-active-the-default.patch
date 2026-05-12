@@ -1,0 +1,94 @@
+From 5a3017fbfb1081fc0a074ee53e1ad7ba8489c8c1 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 6 Dec 2024 18:08:35 -0500
+Subject: [PATCH 04/23] migration/block: Make late-block-active the default
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [3/22] 74d95ded9153bf0969ede7d7d2708e9452d7cd11 (kmwolf/centos-qemu-kvm)
+
+Migration capability 'late-block-active' controls when the block drives
+will be activated.  If enabled, block drives will only be activated until
+VM starts, either src runstate was "live" (RUNNING, or SUSPENDED), or it'll
+be postponed until qmp_cont().
+
+Let's do this unconditionally.  There's no harm to delay activation of
+block drives.  Meanwhile there's no ABI breakage if dest does it, because
+src QEMU has nothing to do with it, so it's no concern on ABI breakage.
+
+IIUC we could avoid introducing this cap when introducing it before, but
+now it's still not too late to just always do it.  Cap now prone to
+removal, but it'll be for later patches.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-Id: <20241206230838.1111496-4-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit fca9aef1c8d8fc4482cc541638dbfac76dc125d6)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ migration/migration.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index c7a9e2e026..8a262e01ff 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -735,24 +735,6 @@ static void process_incoming_migration_bh(void *opaque)
+ 
+     trace_vmstate_downtime_checkpoint("dst-precopy-bh-enter");
+ 
+-    /* If capability late_block_activate is set:
+-     * Only fire up the block code now if we're going to restart the
+-     * VM, else 'cont' will do it.
+-     * This causes file locking to happen; so we don't want it to happen
+-     * unless we really are starting the VM.
+-     */
+-    if (!migrate_late_block_activate() ||
+-        (autostart && runstate_is_live(migration_get_target_runstate()))) {
+-        /* Make sure all file formats throw away their mutable metadata.
+-         * If we get an error here, just don't restart the VM yet. */
+-        bdrv_activate_all(&local_err);
+-        if (local_err) {
+-            error_report_err(local_err);
+-            local_err = NULL;
+-            autostart = false;
+-        }
+-    }
+-
+     /*
+      * This must happen after all error conditions are dealt with and
+      * we're sure the VM is going to be running on this host.
+@@ -767,7 +749,25 @@ static void process_incoming_migration_bh(void *opaque)
+ 
+     if (runstate_is_live(migration_get_target_runstate())) {
+         if (autostart) {
+-            vm_start();
++            /*
++             * Block activation is always delayed until VM starts, either
++             * here (which means we need to start the dest VM right now..),
++             * or until qmp_cont() later.
++             *
++             * We used to have cap 'late-block-activate' but now we do this
++             * unconditionally, as it has no harm but only benefit.  E.g.,
++             * it's not part of migration ABI on the time of disk activation.
++             *
++             * Make sure all file formats throw away their mutable
++             * metadata.  If error, don't restart the VM yet.
++             */
++            bdrv_activate_all(&local_err);
++            if (local_err) {
++                error_report_err(local_err);
++                local_err = NULL;
++            } else {
++                vm_start();
++            }
+         } else {
+             runstate_set(RUN_STATE_PAUSED);
+         }
+-- 
+2.48.1
+

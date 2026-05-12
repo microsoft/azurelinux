@@ -1,7 +1,7 @@
 %global gdb_version 16.2
 Name:          crash
 Version:       9.0.0
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       kernel crash analysis utility for live systems, netdump, diskdump, kdump, LKCD or mcore dumpfiles
 Group:         Development/Tools
 Vendor:        Microsoft Corporation
@@ -22,6 +22,7 @@ Patch0:        lzo_snappy_zstd.patch
 # Patches for gdb sources
 Patch100:      CVE-2022-37434.patch
 Patch101:      CVE-2025-11082.patch
+Patch102:      CVE-2026-4647.patch
 
 License:       GPLv3+
 BuildRequires: binutils
@@ -121,6 +122,9 @@ cp -p defs.h %{buildroot}%{_includedir}/crash
 %endif
 
 %changelog
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.0.0-2
+- Patch for CVE-2026-4647
+
 * Thu Nov 20 2025 Chris Co <chrco@microsoft.com> - 9.0.0-1
 - Update to 9.0.0
 
