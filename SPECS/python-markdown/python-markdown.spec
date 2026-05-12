@@ -2,15 +2,15 @@
 %global pkgname markdown
 Summary:        Markdown implementation in Python
 Name:           python-%{pkgname}
-Version:        3.5.2
-Release:        3%{?dist}
-License:        BSD
+Version:        3.8.2
+Release:        1%{?dist}
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://python-markdown.github.io/
-Source0:        https://files.pythonhosted.org/packages/source/M/%{srcname}/%{srcname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
-Patch0:         0001-fix-htmlparser-incomplete-tags-and-comments.patch
+Source0:        https://github.com/Python-Markdown/markdown/releases/download/%{version}/%{pkgname}-%{version}.tar.gz#/python-%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
+Patch0:         0001-fix-pyproject-license-for-setuptools.patch
 
 %description
 This is a Python implementation of John Grubers Markdown. It is
@@ -36,7 +36,7 @@ almost completely compliant with the reference implementation, though
 there are a few known issues.
 
 %prep
-%autosetup -p1 -n %{srcname}-%{version}
+%autosetup -p1 -n %{pkgname}-%{version}
 
 %build
 %pyproject_wheel
@@ -62,8 +62,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{_bindir}/markdown_py
 
 %changelog
-* Fri May 08 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.2-3
-- Adjust HTML parser handling for incomplete start tags and unclosed comments
+* Fri May 08 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.8.2-1
+- Upgrade to 3.8.2 to fix the ptest error.
 
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  3.5.2-2
 - Use proper ptest command to run the test.
