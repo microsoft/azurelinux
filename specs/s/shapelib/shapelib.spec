@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/shapelib.azl.macros}
+
 #global pre RC1
 
 %if %{defined rhel} || %{defined flatpak}
@@ -11,7 +14,7 @@
 
 Name:          shapelib
 Version:       1.6.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:       C library for handling ESRI Shapefiles
 # The core library is dual-licensed LGPLv2 or MIT.
 # Some contributed files have different licenses:
@@ -27,6 +30,7 @@ Source0:       http://download.osgeo.org/shapelib/%{name}-%{version}%{?pre:%pre}
 # tar -czf shapelib-man.tar.gz man/
 # rm -r man
 Source1:       %{name}-man.tar.gz
+Source9999: shapelib.azl.macros
 
 BuildRequires: automake autoconf libtool
 BuildRequires: gcc-c++

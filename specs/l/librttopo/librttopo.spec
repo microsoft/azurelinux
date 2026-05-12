@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/librttopo.azl.macros}
+
 # MinGW ist x86_64 only in EPEL9+
 %if 0%{?rhel} >= 9
 %ifarch x86_64
@@ -14,12 +17,13 @@
 
 Name:           librttopo
 Version:        1.1.0
-Release: 18%{?dist}
+Release: 19%{?dist}
 Summary:        Create and manage SQL/MM topologies
 
 License:        GPL-2.0-or-later
 URL:            https://git.osgeo.org/gitea/rttopo/librttopo
 Source0:        https://git.osgeo.org/gitea/rttopo/librttopo/archive/%{name}-%{version}.tar.gz
+Source9999: librttopo.azl.macros
 # Use pkgconfig to find geos
 Patch0:        librttopo_geos.patch
 

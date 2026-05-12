@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/cereal.azl.macros}
+
 # Debuginfo packages are disabled to prevent rpmbuild from generating an empty
 # debuginfo package for the empty main package.
 %global debug_package %{nil}
@@ -8,7 +11,7 @@
 
 Name:           cereal
 Version:        1.3.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        A header-only C++11 serialization library
 # include/cereal/details/polymorphic_impl.hpp is BSL-1.0
 # include/cereal/external/base64.hpp is Zlib
@@ -17,6 +20,7 @@ Summary:        A header-only C++11 serialization library
 License:        BSD-3-Clause AND BSL-1.0 AND Zlib AND MIT AND (MIT OR BSL-1.0)
 Url:            http://uscilab.github.io/cereal/
 Source0:        https://github.com/USCiLab/cereal/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source9999: cereal.azl.macros
 
 BuildRequires:  gcc-c++
 BuildRequires:  boost-devel

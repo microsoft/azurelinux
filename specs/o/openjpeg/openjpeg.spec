@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/openjpeg.azl.macros}
+
 # Conformance tests disabled by default since it requires 1 GB of test data
 #global runcheck 1
 
@@ -17,7 +20,7 @@
 
 Name:           openjpeg
 Version:        2.5.4
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD
@@ -28,6 +31,7 @@ Source0:        https://github.com/uclouvain/openjpeg/archive/v%{version}/%{name
 # git clone git@github.com:uclouvain/openjpeg-data.git
 Source1:        data.tar.xz
 %endif
+Source9999: openjpeg.azl.macros
 
 
 BuildRequires:  cmake

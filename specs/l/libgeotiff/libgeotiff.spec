@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libgeotiff.azl.macros}
+
 %if 0%{?rhel} >= 9
 %bcond_with mingw
 %else
@@ -9,12 +12,13 @@
 
 Name:          libgeotiff
 Version:       1.7.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 Summary:       GeoTIFF format library
 License:       MIT
 URL:           http://trac.osgeo.org/geotiff/
 Source:        http://download.osgeo.org/geotiff/%{name}/%{name}-%{version}.tar.gz
+Source9999: libgeotiff.azl.macros
 
 # Add version suffix to mingw library
 Patch:         libgeotiff_cmake.patch

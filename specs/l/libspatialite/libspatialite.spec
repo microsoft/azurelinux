@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libspatialite.azl.macros}
+
 %if 0%{?rhel} >= 9
 %bcond_with mingw
 %else
@@ -9,12 +12,13 @@
 
 Name:          libspatialite
 Version:       5.1.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:       Enables SQLite to support spatial data
 
 License:       MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.0-or-later
 URL:           https://www.gaia-gis.it/fossil/libspatialite
 Source0:       http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-%{version}.tar.gz
+Source9999: libspatialite.azl.macros
 
 # Move private libs to Libs.private in pkg-config file (#1926868)
 Patch0:        libspatialite_pkgconfig.patch

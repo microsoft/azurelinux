@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libvirt-glib.azl.macros}
+
 # -*- rpm-spec -*-
 
 %global with_mingw 0
@@ -10,11 +13,12 @@
 
 Name: libvirt-glib
 Version: 5.0.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: libvirt glib integration for events
 License: LGPL-2.1-or-later
 URL: https://libvirt.org/
 Source0: https://libvirt.org/sources/glib/%{name}-%{version}.tar.xz
+Source9999: libvirt-glib.azl.macros
 
 BuildRequires: meson
 BuildRequires: glib2-devel

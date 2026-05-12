@@ -1,16 +1,20 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/enchant2.azl.macros}
+
 %bcond mingw %[%{undefined rhel} && %{undefined flatpak}]
 
 Name:          enchant2
 Version:       2.8.15
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:       An Enchanting Spell Checking Library
 
 License:       LGPL-2.0-or-later
 URL:           https://github.com/rrthomas/enchant
 Source0:       https://github.com/rrthomas/enchant/releases/download/v%{version}/enchant-%{version}.tar.gz
+Source9999: enchant2.azl.macros
 
 %if !0%{?rhel}
 # Look for aspell using pkg-config, instead of AC_CHECK_LIB which adds -laspell

@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/tesseract.azl.macros}
+
 #global pre beta.4
 
 %if 0%{?rhel}
@@ -11,12 +14,13 @@
 
 Name:          tesseract
 Version:       5.5.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:       Raw OCR Engine
 
 License:       Apache-2.0
 URL:           https://github.com/tesseract-ocr/%{name}
 Source0:       https://github.com/tesseract-ocr/tesseract/archive/%{version}%{?pre:-%pre}/%{name}-%{version}%{?pre:-%pre}.tar.gz
+Source9999: tesseract.azl.macros
 
 # Fix library name case
 # Build training libs statically

@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/geos.azl.macros}
+
 # When distributed in RHEL, EPEL shouldn't be used. Mingw shouldn't be in RHEL,
 # so it shouldn't be used anywhere, but in fedora.
 %if 0%{?fedora}
@@ -11,12 +14,13 @@
 
 Name:          geos
 Version:       3.14.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:       GEOS is a C++ port of the Java Topology Suite
 
 License:       LGPL-2.1-only
 URL:           http://trac.osgeo.org/geos/
 Source0:       http://download.osgeo.org/%{name}/%{name}-%{version}.tar.bz2
+Source9999: geos.azl.macros
 
 BuildRequires: cmake
 BuildRequires: doxygen

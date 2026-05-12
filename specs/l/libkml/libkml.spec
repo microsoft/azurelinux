@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libkml.azl.macros}
+
 # Parallel build broken
 %global _smp_mflags -j1
 
@@ -14,7 +17,7 @@
 
 Name:           libkml
 Version:        1.3.0
-Release: 57%{?dist}
+Release: 58%{?dist}
 Summary:        Reference implementation of OGC KML 2.2
 
 License:        BSD-3-Clause
@@ -23,6 +26,7 @@ Source0:        https://github.com/libkml/libkml/archive/%{version}/libkml-%{ver
 # TODO: Port to minizip-2.x, meanwhile bundle version 1.3.0
 # wget -O minizip-1.3.0.tar.gz http://sourceforge.net/projects/libkml-files/files/1.3.0/minizip.tar.gz/download
 Source1:        minizip-1.3.0.tar.gz
+Source9999: libkml.azl.macros
 
 ## See https://github.com/libkml/libkml/pull/239
 Patch0:         0001-Fix-build-failure-due-to-failure-to-convert-pointer-.patch

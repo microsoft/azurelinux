@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/uriparser.azl.macros}
+
 %if 0%{?fedora} || 0%{?epel} >= 9
 %bcond_without mingw
 %else
@@ -9,7 +12,7 @@
 
 Name:           uriparser
 Version:        1.0.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        URI parsing library - RFC 3986
 
 # main license is BSD-3-Clause
@@ -19,6 +22,7 @@ Summary:        URI parsing library - RFC 3986
 License:        BSD-3-Clause
 URL:            https://uriparser.github.io/
 Source0:        https://github.com/%{name}/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
+Source9999: uriparser.azl.macros
 
 BuildRequires:  cmake
 BuildRequires:  doxygen

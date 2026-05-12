@@ -1,16 +1,20 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/liblerc.azl.macros}
+
 %bcond_without mingw
 
 Name:           liblerc
 Version:        4.0.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Library for Limited Error Raster Compression
 
 License:        Apache-2.0
 URL:            https://github.com/Esri/lerc
 Source0:        https://github.com/Esri/lerc/archive/v%{version}/lerc-%{version}.tar.gz
+Source9999: liblerc.azl.macros
 # Add version suffix to mingw dll
 Patch0:         lerc-dllver.patch
 

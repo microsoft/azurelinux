@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libsodium.azl.macros}
+
 # Fedora spec file for libsodium
 #
 # License: MIT
@@ -19,7 +22,7 @@
 
 Name:           libsodium
 Version:        1.0.21
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        The Sodium crypto library
 # Most source code is ISC, except:
 # BSD-2-Clause:
@@ -39,6 +42,7 @@ Source0:        https://download.libsodium.org/libsodium/releases/%{name}-%{vers
 Source1:        https://download.libsodium.org/libsodium/releases/%{name}-%{version}.tar.gz.sig
 # https://doc.libsodium.org/installation#integrity-checking
 Source2:        %{name}.pubkey
+Source9999: libsodium.azl.macros
 
 Patch0:        upstream.patch
 

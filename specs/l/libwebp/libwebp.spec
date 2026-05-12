@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/libwebp.azl.macros}
+
 %global _hardened_build 1
 
 # Disable libwebp-java subpackage for RHEL builds
@@ -24,13 +27,14 @@
 
 Name:          libwebp
 Version:       1.6.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details
 License:       Apache-2.0 AND LicenseRef-scancode-google-patent-license-webm AND BSD-3-Clause AND FSFULLRWD
 Source0:       http://downloads.webmproject.org/releases/webp/%{name}-%{version}.tar.gz
 Source1:       libwebp_jni_example.java
+Source9999: libwebp.azl.macros
 # Fix build with freeglut
 Patch0:        libwebp-freeglut.patch
 # Add version suffix to mingw libraries

@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/leptonica.azl.macros}
+
 %if 0%{?rhel} >= 9
 %bcond_with gnuplot
 %else
@@ -15,12 +18,13 @@
 
 Name:          leptonica
 Version:       1.87.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:       C library for efficient image processing and image analysis operations
 
 License:       Leptonica
 URL:           https://github.com/danbloomberg/leptonica
 Source0:       https://github.com/DanBloomberg/leptonica/archive/%{version}/%{name}-%{version}.tar.gz
+Source9999: leptonica.azl.macros
 # Add soversion suffix on win32
 # Don't add _<CONFIG> suffix to pkgconfig filename
 Patch0:        leptonica_cmake.patch

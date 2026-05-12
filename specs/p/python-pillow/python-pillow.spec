@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/python-pillow.azl.macros}
+
 %global py3_incdir %(RPM_BUILD_ROOT= %{python3} -Ic 'import sysconfig; print(sysconfig.get_path("include"))')
 
 %global srcname pillow
@@ -21,13 +24,14 @@
 
 Name:           python-%{srcname}
 Version:        11.3.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
 License:        MIT
 URL:            http://python-pillow.github.io/
 Source0:        https://github.com/python-pillow/Pillow/archive/%{version}/Pillow-%{version}.tar.gz
+Source9999: python-pillow.azl.macros
 
 # MinGW build fixes
 Patch0:         pillow_mingw.patch

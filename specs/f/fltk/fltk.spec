@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/fltk.azl.macros}
+
 # trim changelog included in binary rpms
 %global _changelog_trimtime %(date +%s -d "1 year ago")
 
@@ -13,7 +16,7 @@
 
 Name:		    fltk
 Version:	    1.3.11
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	    C++ user interface toolkit
 
 # see COPYING (or http://www.fltk.org/COPYING.php ) for exceptions details
@@ -22,6 +25,7 @@ URL:            http://www.fltk.org/
 
 Source0:        https://github.com/%{name}/%{name}/releases/download/release-%{version}/%{name}-%{version}-source.tar.gz
 Source1:        fltk-config.sh
+Source9999: fltk.azl.macros
 
 Patch0:         fltk-cmake.patch
 # add lib64 support, drop extraneous libs (bug #708185) and ldflags (#1112930)

@@ -1,0 +1,57 @@
+# Components whose upstream specs have a mingw bcond that should be disabled.
+# Azure Linux does not ship mingw cross-compilation toolchains.
+#
+# Components listed here inherit build.without = ["mingw"] via the group's
+# default-component-config. If a component also has its own build.without
+# in a dedicated comp.toml, the lists are merged (appended).
+[component-groups.mingw-disabled]
+description = "Disable mingw cross-compilation bcond for components that support it"
+components = [
+    "cereal",
+    "check",
+    "dtc",
+    "eigen3",
+    "enchant2",
+    "flatbuffers",
+    "fltk",
+    "freexl",
+    "gcab",
+    "geos",
+    "gnutls",
+    "gtk-vnc",
+    "inih",
+    "json-c",
+    "leptonica",
+    "libgeotiff",
+    "libgsf",
+    "libkml",
+    "liblerc",
+    "libosinfo",
+    "librttopo",
+    "libsodium",
+    "libsoup3",
+    "libspatialite",
+    "libusb1",
+    "libvirt",
+    "libvirt-glib",
+    "libwebp",
+    "libxmlb",
+    "libyaml",
+    "nghttp2",
+    "openjpeg",
+    "opus",
+    "osinfo-db",
+    "osinfo-db-tools",
+    "p11-kit",
+    "proj",
+    "python-pillow",
+    "shapelib",
+    "taglib",
+    "tesseract",
+    "uriparser",
+    "wavpack",
+    "xerces-c",
+]
+
+[component-groups.mingw-disabled.default-component-config.build]
+without = ["mingw"]

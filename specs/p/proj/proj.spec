@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/proj.azl.macros}
+
 %if 0%{?fedora}
 %bcond_without mingw
 %else
@@ -11,13 +14,14 @@
 Name:           proj
 # Also check whether there is a new proj-data release when upgrading!
 Version:        9.6.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Cartographic projection software (PROJ)
 
 License:        MIT
 URL:            https://proj.org
 Source0:        https://download.osgeo.org/%{name}/%{name}-%{version}.tar.gz
 Source1:        https://download.osgeo.org/%{name}/%{name}-data-%{data_version}.tar.gz
+Source9999: proj.azl.macros
 
 
 BuildRequires:  cmake

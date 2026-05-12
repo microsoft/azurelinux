@@ -1,16 +1,20 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/inih.azl.macros}
+
 %bcond_without mingw
 
 Name:     inih
 Version:  62
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:  Simple INI file parser library
 
 License:  BSD-3-Clause
 URL:      https://github.com/benhoyt/inih
 Source0:  %{url}/archive/r%{version}/%{name}-r%{version}.tar.gz
+Source9999: inih.azl.macros
 
 BuildRequires: gcc
 BuildRequires: gcc-c++

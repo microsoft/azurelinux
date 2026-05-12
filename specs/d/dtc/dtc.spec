@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/dtc.azl.macros}
+
 %global with_mingw 0
 
 %if 0%{?fedora}
@@ -11,12 +14,13 @@
 
 Name:          dtc
 Version:       1.7.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:       Device Tree Compiler
 License:       GPL-2.0-or-later
 URL:           https://devicetree.org/
 
 Source0:       https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz
+Source9999: dtc.azl.macros
 Patch0001:     0001-build-fix-Dtools-false-build.patch
 
 BuildRequires: gcc make

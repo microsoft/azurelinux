@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/check.azl.macros}
+
 %bcond mingw %[0%{?fedora}]
 
 # Build without documentation for bootstrapping purposes
@@ -8,7 +11,7 @@
 
 Name:           check
 Version:        0.15.2
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary:        A unit test framework for C
 License:        LGPL-2.1-or-later
 URL:            https://libcheck.github.io/check/
@@ -20,6 +23,7 @@ VCS:            git:https://github.com/libcheck/check.git
 #    diff -r check-0.15.2 upstream-check-0.15.2
 # Source:       https://github.com/libcheck/check/archive/{version}/{name}-{version}.tar.gz
 Source:         %{name}-%{version}.tar.gz
+Source9999: check.azl.macros
 # Only needed for autotools in Fedora
 Patch0:         %{name}-0.11.0-info-in-builddir.patch
 # Fix a texinfo error due to a missing @end verbatim

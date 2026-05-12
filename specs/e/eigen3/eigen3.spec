@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/eigen3.azl.macros}
+
 # The (empty) main package is arch, to have the package built and tests run
 # on all arches, but the actual result package is the noarch -devel subpackge.
 # Debuginfo packages are disabled to prevent rpmbuild from generating an empty
@@ -25,7 +28,7 @@
 
 Name:           eigen3
 Version:        3.4.0
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary:        A lightweight C++ template library for vector and matrix math
 
 License:        Apache-2.0 AND MPL-2.0 AND LGPL-2.0-or-later AND BSD-3-Clause AND Minpack
@@ -33,6 +36,7 @@ URL:            http://eigen.tuxfamily.org/index.php?title=Main_Page
 Source0:        https://gitlab.com/libeigen/eigen/-/archive/%{version}/eigen-%{version}.tar.bz2
 # For mingw, read the comment in the file for details
 Source1:        mingw_TryRunResults.cmake
+Source9999: eigen3.azl.macros
 
 BuildRequires:  %{blaslib}-devel
 BuildRequires:  fftw-devel
