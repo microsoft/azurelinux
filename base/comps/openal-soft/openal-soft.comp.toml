@@ -1,0 +1,14 @@
+# Drop the BuildRequires on pkgconfig(libavcodec). libavcodec is used
+# only by the alffplay example program, which is not listed in %files
+# and is not shipped by any openal-soft subpackage. Upstream CMakeLists
+# gates alffplay on find_package(FFmpeg), so dropping the BR simply
+# skips that example.
+#
+# Part of the distro-wide effort to remove ffmpeg/libav*.
+[components.openal-soft]
+
+[[components.openal-soft.overlays]]
+description = "Drop BuildRequires on pkgconfig(libavcodec) — only used by uninstalled alffplay example"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavcodec)"

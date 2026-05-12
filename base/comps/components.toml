@@ -2301,7 +2301,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.onnxruntime]
 [components.open-sans-fonts]
 [components.open-vmdk]
-[components.openal-soft]
 [components.openblas-srpm-macros]
 [components.openbox]
 [components.opencl-filesystem]
