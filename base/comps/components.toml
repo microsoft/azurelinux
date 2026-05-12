@@ -4081,7 +4081,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-proto-plus]
 [components.python-psutil]
 [components.python-psycopg2]
-[components.python-psycopg3]
 [components.python-ptyprocess]
 [components.python-publicsuffix2]
 [components.python-pure-eval]

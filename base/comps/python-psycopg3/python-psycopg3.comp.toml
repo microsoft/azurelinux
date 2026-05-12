@@ -1,0 +1,7 @@
+[components.python-psycopg3]
+
+[components.python-psycopg3.build]
+# Disable the optional PyPy build of the C extension. Azure Linux does not
+# ship pypy, so we cannot satisfy the BuildRequires: pypy that the upstream
+# spec pulls in via the `%bcond_without pypy` default on Fedora.
+without = ["pypy"]
