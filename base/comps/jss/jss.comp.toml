@@ -11,3 +11,27 @@ release = { calculation = "manual" }
 # See: https://src.fedoraproject.org/rpms/jss/blob/rawhide/f/jss.spec (line ~28)
 [components.jss.build]
 defines = { enable_nss_version_pqc_def_flag = "-DENABLE_NSS_VERSION_PQC_DEF=ON" }
+
+# AZL ships only java-25-openjdk; there is no java-21-openjdk, so the
+# upstream %else branch (taken when %fedora is unset, as in AZL)
+# references unsatisfiable openjdk21 packages. Retarget each %define
+# line individually so we don't accidentally rewrite historical
+# %changelog entries (spec-search-replace cannot be scoped to the
+# preamble alone).
+[[components.jss.overlays]]
+description = "Retarget java_devel to java-25-openjdk-devel"
+type = "spec-search-replace"
+regex = '^%define java_devel java-21-openjdk-devel$'
+replacement = "%define java_devel java-25-openjdk-devel"
+
+[[components.jss.overlays]]
+description = "Retarget java_headless to java-25-openjdk-headless"
+type = "spec-search-replace"
+regex = '^%define java_headless java-21-openjdk-headless$'
+replacement = "%define java_headless java-25-openjdk-headless"
+
+[[components.jss.overlays]]
+description = "Retarget java_home to jre-25-openjdk"
+type = "spec-search-replace"
+regex = '^%define java_home %\{_jvmdir\}/jre-21-openjdk$'
+replacement = "%define java_home %{_jvmdir}/jre-25-openjdk"

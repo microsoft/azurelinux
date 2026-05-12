@@ -1,0 +1,16 @@
+[components.xbean]
+
+# AZL ships only java-25-openjdk; there is no java-21-openjdk, so the
+# upstream BuildRequires on maven-local-openjdk21 is unsatisfiable.
+# Retarget to the openjdk25 variant.
+[[components.xbean.overlays]]
+description = "Remove BuildRequires on maven-local-openjdk21 — AZL does not ship java-21-openjdk"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "maven-local-openjdk21"
+
+[[components.xbean.overlays]]
+description = "Add BuildRequires on maven-local-openjdk25 in place of maven-local-openjdk21"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "maven-local-openjdk25"

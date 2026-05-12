@@ -5,7 +5,7 @@
 
 Name:           xbean
 Version:        4.24
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Java plugin based web server
 License:        Apache-2.0
 URL:            https://geronimo.apache.org/xbean/
@@ -20,7 +20,6 @@ Patch2:         0002-Remove-dependency-on-log4j-and-commons-logging.patch
 %if %{with bootstrap}
 BuildRequires:  javapackages-bootstrap
 %else
-BuildRequires:  maven-local-openjdk21
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
 BuildRequires:  mvn(org.osgi:org.osgi.core)
@@ -29,6 +28,7 @@ BuildRequires:  mvn(org.ow2.asm:asm-commons)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 %endif
 
+BuildRequires: maven-local-openjdk25
 %description
 The goal of XBean project is to create a plugin based server
 analogous to Eclipse being a plugin based IDE. XBean will be able to

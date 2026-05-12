@@ -6,7 +6,7 @@
 
 Name:           resteasy
 Version:        3.0.26
-Release: 37%{?dist}
+Release: 38%{?dist}
 Summary:        Framework for RESTful Web services and Java applications
 License:        Apache-2.0
 URL:            http://resteasy.jboss.org/
@@ -25,7 +25,6 @@ ExclusiveArch:  %{java_arches} noarch
 BuildRequires:  tomcat-servlet-6.0-api
 BuildRequires:  tomcat-jakartaee-migration
 
-BuildRequires:  maven-local-openjdk21
 BuildRequires:  mvn(commons-io:commons-io)
 BuildRequires:  mvn(jakarta.activation:jakarta.activation-api)
 BuildRequires:  mvn(jakarta.xml.bind:jakarta.xml.bind-api)
@@ -47,6 +46,7 @@ BuildRequires:  mvn(javax.annotation:javax.annotation-api)
 BuildRequires:  mvn(org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.0_spec)
 BuildRequires:  mvn(org.slf4j:slf4j-api)
 
+BuildRequires: maven-local-openjdk25
 %description
 %global desc \
 RESTEasy contains a JBoss project that provides frameworks to help\

@@ -81,9 +81,9 @@ ExcludeArch: i686
 
 %else
 
-%define java_devel java-21-openjdk-devel
-%define java_headless java-21-openjdk-headless
-%define java_home %{_jvmdir}/jre-21-openjdk
+%define java_devel java-25-openjdk-devel
+%define java_headless java-25-openjdk-headless
+%define java_home %{_jvmdir}/jre-25-openjdk
 %define maven_local maven-local
 
 %endif

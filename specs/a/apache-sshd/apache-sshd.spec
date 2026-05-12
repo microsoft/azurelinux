@@ -7,7 +7,7 @@
 Epoch:          1
 Name:           apache-sshd
 Version:        2.11.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Apache SSHD
 
 # One file has ISC licensing:
@@ -21,7 +21,6 @@ Source0:        https://archive.apache.org/dist/mina/sshd/%{version}/apache-sshd
 # Avoid optional dep on tomcat native APR library
 Patch0:         0001-Avoid-optional-dependency-on-native-tomcat-APR-libra.patch
 
-BuildRequires:  maven-local-openjdk21
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(net.i2p.crypto:eddsa)
 BuildRequires:  mvn(org.apache:apache:pom:)
@@ -43,6 +42,7 @@ BuildArch:      noarch
 ExclusiveArch:  %{java_arches} noarch
 
 Patch1: add-maven-compiler-release.patch
+BuildRequires: maven-local-openjdk25
 %description
 Apache SSHD is a 100% pure java library to support the SSH protocols on both
 the client and server side.

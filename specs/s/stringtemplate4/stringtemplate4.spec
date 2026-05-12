@@ -5,7 +5,7 @@
 
 Name:           stringtemplate4
 Version:        4.3.4
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        A Java template engine
 License:        BSD-3-Clause
 URL:            http://www.stringtemplate.org/
@@ -19,7 +19,6 @@ Patch:          %{name}-java11.patch
 # Adapt tests to JDK 21
 Patch:          %{name}-java21.patch
 
-BuildRequires:  maven-local-openjdk21
 BuildRequires:  mesa-dri-drivers
 BuildRequires:  mutter
 BuildRequires:  mvn(junit:junit)
@@ -27,6 +26,7 @@ BuildRequires:  mvn(org.antlr:antlr-runtime) >= 3.5.2
 BuildRequires:  mvn(org.antlr:antlr3-maven-plugin) >= 3.5.2
 BuildRequires:  xwayland-run
 
+BuildRequires: maven-local-openjdk25
 %description
 StringTemplate is a java template engine (with ports for
 C# and Python) for generating source code, web pages,

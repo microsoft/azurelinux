@@ -10,7 +10,7 @@
 
 Name:           apache-%{jarname}
 Version:        2.5.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Java-based dependency manager
 License:        Apache-2.0
 URL:            https://ant.apache.org/ivy
@@ -27,7 +27,6 @@ Source2:        https://archive.apache.org/dist/ant/KEYS
 Source3:         00-global-settings.patch
 
 BuildRequires:  gnupg2
-BuildRequires:  ant-openjdk21
 BuildRequires:  ivy-local
 BuildRequires:  dos2unix
 BuildRequires:  mvn(org.apache.ant:ant)
@@ -56,6 +55,7 @@ Provides:       ivy = %{version}-%{release}
 
 Source4: IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch
 Source5: remove-Pack200Packing-java.patch
+BuildRequires: ant-openjdk25
 %description
 Apache Ivy is a tool for managing (recording, tracking, resolving and
 reporting) project dependencies.  It is designed as process agnostic and is
@@ -144,7 +144,7 @@ rm -rf asciidoc
 # create custom ant configuration
 mkdir -p ~/.ant
 cp /etc/ant.conf ~/.ant
-sed -i '$a JAVA_HOME=/usr/lib/jvm/java-21-openjdk' ~/.ant/ant.conf
+sed -i '$a JAVA_HOME=/usr/lib/jvm/java-25-openjdk' ~/.ant/ant.conf
 
 ant -Divy.mode=local \
     -f build-release.xml \
