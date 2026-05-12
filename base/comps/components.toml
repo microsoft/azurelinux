@@ -1574,7 +1574,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.kf6-kdesu]
 [components.kf6-kdnssd]
 [components.kf6-kdoctools]
-[components.kf6-kfilemetadata]
 [components.kf6-kglobalaccel]
 [components.kf6-kguiaddons]
 [components.kf6-kholidays]

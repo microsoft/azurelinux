@@ -1,0 +1,13 @@
+# Drop the ffmpeg-free-devel BuildRequires. Azure Linux is removing
+# ffmpeg/libav* from the distro entirely. The upstream find_package() for
+# FFmpeg is marked TYPE OPTIONAL in CMakeLists.txt, so kfilemetadata
+# simply skips building its `ffmpegextractor` plugin when FFmpeg headers
+# are absent; the rest of the package (and its taglib/poppler/exiv2 based
+# extractors) is unaffected.
+[components.kf6-kfilemetadata]
+
+[[components.kf6-kfilemetadata.overlays]]
+description = "Drop BuildRequires on ffmpeg-free-devel — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "ffmpeg-free-devel"
