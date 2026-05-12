@@ -1,0 +1,36 @@
+# Drop the ffmpeg / ffprobe BuildRequires and Suggests. Azure Linux is
+# removing ffmpeg/libav* from the distro; the rails ActiveStorage gem
+# uses these binaries only for optional video previews/analysis. The
+# gem builds, installs, and runs without them — applications that need
+# video previews would have had to install ffmpeg explicitly anyway.
+[components.rubygem-activestorage]
+
+[[components.rubygem-activestorage.overlays]]
+description = "Drop BuildRequires on %{_bindir}/ffmpeg — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "%{_bindir}/ffmpeg"
+
+[[components.rubygem-activestorage.overlays]]
+description = "Drop BuildRequires on %{_bindir}/ffprobe — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "%{_bindir}/ffprobe"
+
+[[components.rubygem-activestorage.overlays]]
+description = "Drop Suggests on %{_bindir}/ffmpeg — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "Suggests"
+value = "%{_bindir}/ffmpeg"
+
+[[components.rubygem-activestorage.overlays]]
+description = "Drop Suggests on %{_bindir}/ffprobe — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "Suggests"
+value = "%{_bindir}/ffprobe"
+
+[[components.rubygem-activestorage.overlays]]
+description = "Skip audio/video analyzer/previewer tests — they shell out to ffmpeg/ffprobe, which are no longer available"
+type = "spec-search-replace"
+regex = '^bundle exec ruby '
+replacement = "rm -f test/analyzer/audio_analyzer_test.rb test/analyzer/video_analyzer_test.rb test/previewer/video_previewer_test.rb\nbundle exec ruby "

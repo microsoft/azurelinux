@@ -16,7 +16,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Local and cloud file storage framework
 License: MIT
 URL: https://rubyonrails.org
@@ -44,8 +44,6 @@ BuildRequires: rubygem(sqlite3)
 # Required to pass some of the test/models/variant_test.rb
 # https://github.com/rails/rails/issues/44395
 BuildRequires: vips-magick
-BuildRequires: %{_bindir}/ffmpeg
-BuildRequires: %{_bindir}/ffprobe
 BuildRequires: %{_bindir}/mutool
 BuildRequires: %{_bindir}/pdftoppm
 %{?with_openh264:BuildRequires: openh264}
@@ -53,8 +51,6 @@ BuildRequires: %{_bindir}/pdftoppm
 # Used for creating file previews
 Suggests: %{_bindir}/mutool
 Suggests: %{_bindir}/pdftoppm
-Suggests: %{_bindir}/ffmpeg
-Suggests: %{_bindir}/ffprobe
 # Codec for video analysis
 Suggests: openh264
 
@@ -160,6 +156,7 @@ sed -i \
 export RUBYOPT="-I${PWD}/lib"
 export BUNDLE_GEMFILE=${PWD}/Gemfile
 
+rm -f test/analyzer/audio_analyzer_test.rb test/analyzer/video_analyzer_test.rb test/previewer/video_previewer_test.rb
 bundle exec ruby -Itest -ractive_storage/engine -e 'Dir.glob "./test/**/*_test.rb", &method(:require)'
 )
 

@@ -4610,7 +4610,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rubygem-activejob]
 [components.rubygem-activemodel]
 [components.rubygem-activerecord]
-[components.rubygem-activestorage]
 [components.rubygem-activesupport]
 [components.rubygem-addressable]
 [components.rubygem-afm]
