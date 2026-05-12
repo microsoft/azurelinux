@@ -4,7 +4,7 @@
          String expecting = "datetime: 7/5/05, 12:00 AM";
          if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
              expecting = "datetime: 7/5/05 12:00 AM";
-+        } else if (javaVersion.startsWith("21")) {
++        } else if (javaVersion.startsWith("2")) {
 +            expecting = "datetime: 7/5/05, 12:00\u202FAM";
          }
          String result = st.render();
@@ -13,7 +13,7 @@
          String expecting = " datetime: 7/5/05, 12:00 AM ";
          if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
              expecting = " datetime: 7/5/05 12:00 AM ";
-+        } else if ( javaVersion.startsWith("21") ) {
++        } else if ( javaVersion.startsWith("2") ) {
 +            expecting = " datetime: 7/5/05, 12:00\u202FAM ";
          }
          String result = st.render();
@@ -22,7 +22,7 @@
              String expecting = " datetime: Tuesday, July 5, 2005 at 12:00:00 AM Pacific Daylight Time ";
              if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
                  expecting = " datetime: Tuesday, July 5, 2005 12:00:00 AM PDT ";
-+            } else if (javaVersion.startsWith("21")) {
++            } else if (javaVersion.startsWith("2")) {
 +                expecting = " datetime: Tuesday, July 5, 2005, 12:00:00\u202FAM Pacific Daylight Time ";
              }
              String result = st.render();
@@ -31,7 +31,7 @@
          ST st = group.getInstanceOf("dateThing");
          st.add("created", new GregorianCalendar(2005, 7 - 1, 5));
          String expecting = " time: 12:00:00 AM ";
-+        if ( javaVersion.startsWith("21")) {
++        if ( javaVersion.startsWith("2")) {
 +            expecting = " time: 12:00:00\u202FAM ";
 +        }
          String result = st.render();
@@ -41,7 +41,7 @@
          String expected = "12 de junho de 2012";
          if ( javaVersion.startsWith("1.6") || javaVersion.startsWith("1.7") || javaVersion.startsWith("1.8") ) {
              expected = "12 de Junho de 2012";
-+        } else if ( javaVersion.startsWith("21") ) {
++        } else if ( javaVersion.startsWith("2") ) {
 +            expected = "12 de junho de 2012";
          }
          assertEquals(expected, st.render(new Locale("pt")));
