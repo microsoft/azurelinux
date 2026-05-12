@@ -21,7 +21,7 @@ Requires:       %{_bindir}/%{1}
 
 Name:           libzypp
 Version:        17.38.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        A package management library
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
@@ -40,7 +40,6 @@ Patch1001:      zypp-logic-squidproxy-path-check.patch
 BuildRequires:  %{_bindir}/asciidoctor
 BuildRequires:  %{_bindir}/xsltproc
 BuildRequires:  cmake >= 3.1
-BuildRequires:  cmake(Notcurses++)
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gcc-c++

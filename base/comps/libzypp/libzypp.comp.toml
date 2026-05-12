@@ -1,0 +1,11 @@
+# Drop the BuildRequires on cmake(Notcurses++). notcurses is only used
+# by the upstream `ENABLE_DEVTOOL_REPOMIRROR` option (default OFF), which
+# we do not enable. notcurses pulls in ffmpeg-free-devel, and we are
+# removing ffmpeg/libav* (and notcurses itself) from the distro.
+[components.libzypp]
+
+[[components.libzypp.overlays]]
+description = "Drop BuildRequires on cmake(Notcurses++) — only used by default-OFF DEVTOOL_REPOMIRROR; notcurses being removed"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "cmake(Notcurses++)"
