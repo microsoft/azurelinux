@@ -1,0 +1,88 @@
+From ac48e58ee5824062a320b81b4ef81e9b95dd9245 Mon Sep 17 00:00:00 2001
+From: Neil Horman <nhorman@openssl.org>
+Date: Tue, 7 Apr 2026 08:33:33 +0200
+Subject: [PATCH 05/11] Fix NULL deref in rsa_cms_decrypt
+
+Very simmilar to CVE-2026-28389, ensure that if we are missing
+parameters in RSA-OAEP SourceFunc in CMS KeyTransportRecipientInfo,
+we don't segfault when decrypting.
+
+Fixes: CVE-2026-28390
+Co-authored-by: Tomas Mraz <tomas@openssl.foundation>
+
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Tomas Mraz <tomas@openssl.foundation>
+MergeDate: Tue Apr  7 12:26:54 2026
+---
+ crypto/rsa/rsa_ameth.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
+
+diff --git a/crypto/rsa/rsa_ameth.c b/crypto/rsa/rsa_ameth.c
+index 00ed9820b0..b06b106ad1 100644
+--- a/crypto/rsa/rsa_ameth.c
++++ b/crypto/rsa/rsa_ameth.c
+@@ -922,10 +922,13 @@ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+     X509_ALGOR *cmsalg;
+     int nid;
+     int rv = -1;
+-    unsigned char *label = NULL;
++    const unsigned char *label = NULL;
+     int labellen = 0;
+     const EVP_MD *mgf1md = NULL, *md = NULL;
+     RSA_OAEP_PARAMS *oaep;
++    const ASN1_OBJECT *aoid;
++    const void *parameter = NULL;
++    int ptype = 0;
+ 
+     pkctx = CMS_RecipientInfo_get0_pkey_ctx(ri);
+     if (pkctx == NULL)
+@@ -955,21 +958,19 @@ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+         goto err;
+ 
+     if (oaep->pSourceFunc != NULL) {
+-        X509_ALGOR *plab = oaep->pSourceFunc;
++        X509_ALGOR_get0(&aoid, &ptype, &parameter, oaep->pSourceFunc);
+ 
+-        if (OBJ_obj2nid(plab->algorithm) != NID_pSpecified) {
++        if (OBJ_obj2nid(aoid) != NID_pSpecified) {
+             RSAerr(RSA_F_RSA_CMS_DECRYPT, RSA_R_UNSUPPORTED_LABEL_SOURCE);
+             goto err;
+         }
+-        if (plab->parameter->type != V_ASN1_OCTET_STRING) {
++        if (ptype != V_ASN1_OCTET_STRING) {
+             RSAerr(RSA_F_RSA_CMS_DECRYPT, RSA_R_INVALID_LABEL);
+             goto err;
+         }
+ 
+-        label = plab->parameter->value.octet_string->data;
+-        /* Stop label being freed when OAEP parameters are freed */
+-        plab->parameter->value.octet_string->data = NULL;
+-        labellen = plab->parameter->value.octet_string->length;
++        label = ASN1_STRING_get0_data(parameter);
++        labellen = ASN1_STRING_length(parameter);
+     }
+ 
+     if (EVP_PKEY_CTX_set_rsa_padding(pkctx, RSA_PKCS1_OAEP_PADDING) <= 0)
+@@ -978,8 +979,17 @@ static int rsa_cms_decrypt(CMS_RecipientInfo *ri)
+         goto err;
+     if (EVP_PKEY_CTX_set_rsa_mgf1_md(pkctx, mgf1md) <= 0)
+         goto err;
+-    if (EVP_PKEY_CTX_set0_rsa_oaep_label(pkctx, label, labellen) <= 0)
+-        goto err;
++    if (label != NULL) {
++        unsigned char *dup_label = OPENSSL_memdup(label, labellen);
++
++        if (dup_label == NULL)
++            goto err;
++
++        if (EVP_PKEY_CTX_set0_rsa_oaep_label(pkctx, dup_label, labellen) <= 0) {
++            OPENSSL_free(dup_label);
++            goto err;
++        }
++    }
+     /* Carry on */
+     rv = 1;
+ 
+-- 
+2.45.4
+

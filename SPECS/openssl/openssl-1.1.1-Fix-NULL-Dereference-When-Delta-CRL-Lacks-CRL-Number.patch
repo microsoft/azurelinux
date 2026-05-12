@@ -1,0 +1,33 @@
+From a1c1ce6a37d05e0a70d463667a199c2a9c772680 Mon Sep 17 00:00:00 2001
+From: Alexandr Nedvedicky <sashan@openssl.org>
+Date: Wed, 25 Mar 2026 11:15:05 +0100
+Subject: [PATCH 02/11] Fix NULL Dereference When Delta CRL Lacks CRL Number
+ Extension
+
+Fixes: CVE-2026-28388
+Resolves: https://github.com/openssl/srt/issues/77
+Co-Authored-by: Igor Morgenstern <igor.morgenstern@aisle.com>
+
+Reviewed-by: Eugene Syromiatnikov <esyr@openssl.org>
+Reviewed-by: Tomas Mraz <tomas@openssl.foundation>
+MergeDate: Tue Apr  7 12:13:20 2026
+---
+ crypto/x509/x509_vfy.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/x509/x509_vfy.c b/crypto/x509/x509_vfy.c
+index bc46ae8352..ea51bb28f5 100644
+--- a/crypto/x509/x509_vfy.c
++++ b/crypto/x509/x509_vfy.c
+@@ -1136,6 +1136,8 @@ static int check_delta_base(X509_CRL *delta, X509_CRL *base)
+     if (ASN1_INTEGER_cmp(delta->base_crl_number, base->crl_number) > 0)
+         return 0;
+     /* Delta CRL number must exceed full CRL number */
++    if (delta->crl_number == NULL)
++        return 0;
+     if (ASN1_INTEGER_cmp(delta->crl_number, base->crl_number) > 0)
+         return 1;
+     return 0;
+-- 
+2.45.4
+
