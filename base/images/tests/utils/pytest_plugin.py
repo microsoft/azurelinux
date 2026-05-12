@@ -113,6 +113,11 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
         "requires_pkg(*names): preinstall the named packages in the live container "
         "before the test runs; skip the test if installation fails",
     )
+    config.addinivalue_line(
+        "markers",
+        "runtime_container_tests: auto-applied to tests under cases/*/runtime/; "
+        "triggers a fresh container to be started for the test",
+    )
 
     from utils.tools import check_tools
 
@@ -145,9 +150,9 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     # require_capability: skip if image doesn't have the required capability.
     caps = parse_capabilities(item.config.getoption("--capabilities", default=None))
     for marker in item.iter_markers("require_capability"):
-        required = marker.args[0] if marker.args else None
-        if required and required not in caps:
-            pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
+        for required in marker.args:
+            if required and required not in caps:
+                pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
 
     # image: skip if --image-name doesn't match.
     image_name = item.config.getoption("--image-name", default=None)
@@ -182,3 +187,13 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
         if cases_idx + 2 < len(parts):
             image_dir = parts[cases_idx + 1]
             item.add_marker(pytest.mark.image(image_dir))
+
+        # Auto-apply `runtime_container_tests` marker to any test that
+        # lives under a `runtime/` subdirectory anywhere below `cases/`.
+        # This keeps the runtime/static split a pure directory convention,
+        # so tests don't need to repeat the marker by hand. Runtime tests
+        # also implicitly require the `runtime-package-management` capability
+        # (they need to mutate the live container), so gate them on it here.
+        if "runtime" in parts[cases_idx:]:
+            item.add_marker(pytest.mark.runtime_container_tests)
+            item.add_marker(pytest.mark.require_capability("runtime-package-management"))
