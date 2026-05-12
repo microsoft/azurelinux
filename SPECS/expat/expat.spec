@@ -18,6 +18,7 @@ Patch5:         CVE-2026-32776.patch
 Patch6:         CVE-2026-32777.patch
 Patch7:         CVE-2026-32778.patch
 Patch8:         CVE-2026-41080.patch
+Patch9:         CVE-2026-45186.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -75,8 +76,8 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
-* Mon May 04 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.6.4-7
-- Patch for CVE-2026-41080
+* Tue May 12 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.6.4-7
+- Patch for CVE-2026-41080 and CVE-2026-45186
 
 * Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-6
 - Patch for CVE-2026-32778, CVE-2026-32777, CVE-2026-32776
