@@ -254,6 +254,29 @@ jobs:
     outputs:
       patch-url: ${{ steps.upload-patch.outputs.artifact-url }}
     steps:
+      # Defense-in-depth: validate the SHA and repo inputs before they
+      # reach any `git`/`azldev` invocation inside the container. GitHub
+      # populates these from the pull_request event, but the reusable
+      # workflow is also callable directly so we don't assume the contract.
+      - name: Validate inputs
+        env:
+          PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
+          BASE_REPO: ${{ inputs.repo }}
+        run: |
+          set -euo pipefail
+          for v in PR_BASE_SHA PR_HEAD_SHA; do
+            sha="${!v}"
+            if ! [[ "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "::error::$v is not a 40-char lowercase hex SHA: '$sha'"
+              exit 1
+            fi
+          done
+          if ! [[ "$BASE_REPO" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
+            echo "::error::BASE_REPO is not a valid owner/repo: '$BASE_REPO'"
+            exit 1
+          fi
+
       # --- Trusted base branch (tools, scripts, container config) ---
       - name: Checkout base (trusted)
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -301,22 +324,111 @@ jobs:
         id: check
         env:
           WORKSPACE: ${{ github.workspace }}
+          PR_BASE_SHA: ${{ inputs.pr-base-sha }}
+          PR_HEAD_SHA: ${{ inputs.pr-head-sha }}
+          BASE_REPO: ${{ inputs.repo }}
         run: |
           set -euo pipefail
           mkdir -p "$WORKSPACE/render-output"
+          # The two script trees mount at sibling top-level in-container
+          # paths (/scripts-render and /scripts-components). They used to
+          # nest as /scripts and /scripts/components, but Docker cannot
+          # create the inner mountpoint inside a read-only outer mount
+          # whose source directory does not already contain that subdir.
           docker run --rm \
             --cap-add=SYS_ADMIN \
             --security-opt seccomp=unconfined \
             --security-opt apparmor=unconfined \
             -v "$WORKSPACE/pr-head:/workdir" \
             -v "$WORKSPACE/render-output:/output" \
-            -v "$WORKSPACE/.github/workflows/scripts/render-specs-check:/scripts:ro" \
+            -v "$WORKSPACE/.github/workflows/scripts/render-specs-check:/scripts-render:ro" \
+            -v "$WORKSPACE/.github/workflows/scripts/components:/scripts-components:ro" \
+            -e PR_BASE_SHA \
+            -e PR_HEAD_SHA \
+            -e BASE_REPO \
             localhost/azldev-runner \
             bash -eu -o pipefail -c '
-              azldev component render -q -a --clean-stale -O json \
-                > /output/render-output.json
+              # Stale forks may not have the upstream base SHA in their
+              # object store. Fetch it explicitly so `compute_changed.sh`
+              # can resolve `--from <base-sha>`. The base repo is public
+              # so no auth is needed; --depth=1 keeps the fetch cheap.
+              git -C /workdir remote add base "https://github.com/$BASE_REPO.git" 2>/dev/null || true
+              git -C /workdir fetch --no-tags --depth=1 base "$PR_BASE_SHA"
+
+              # Compute the render set (PR-touched components). Safe here
+              # because the locks gate has already run successfully -- input
+              # fingerprints used by `azldev component changed` reflect the
+              # current head.
+              /scripts-components/compute_change_set.sh \
+                --output-dir /output/change-set \
+                --source-commit "$PR_HEAD_SHA" \
+                --target-commit "$PR_BASE_SHA"
+
               SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
-              python3 /scripts/check_rendered_specs.py \
+
+              # Components removed in this PR no longer have a comp.toml, so
+              # `azldev component render` will not touch (or clean) their old
+              # specs directory. Delete `<specs>/<first-char>/<name>/` for
+              # each deleted component in the working tree so the missing
+              # files surface as drift in the existing
+              # `check_rendered_specs.py` report (and end up in the fix
+              # patch as deletions). This replaces the orphan-cleanup that
+              # `azldev component render -a --clean-stale` used to do for
+              # us; with a scoped render the deleted components are not in
+              # the render set, so nothing else cleans them.
+              #
+              # Scope caveat: this only catches components deleted IN THIS
+              # PR. Pre-existing orphans (stale spec dirs whose component
+              # was removed in an earlier PR without a matching render)
+              # are not caught here.
+              jq -r ".[] | select(.changeType == \"deleted\") | .component" \
+                /output/change-set/changed-components.json \
+                | while IFS= read -r name; do
+                    [ -n "$name" ] || continue
+                    # Defense-in-depth: refuse component names with path
+                    # metacharacters before constructing the rm -rf target.
+                    # `azldev` does not currently validate names against
+                    # this set, and `.comp.toml` quoted keys allow `/`,
+                    # `..`, etc.
+                    if [[ ! "$name" =~ ^[A-Za-z0-9][A-Za-z0-9._+-]*$ ]]; then
+                      echo "::warning::Refusing suspicious component name from changed-components.json: $name"
+                      continue
+                    fi
+                    # Spec bucket dirs are lowercase (specs/a/, specs/r/, ...)
+                    # while component names can be uppercase (e.g. `R`, `AMF`,
+                    # `CGAL`). Lowercase the first char so the path matches.
+                    first_char="${name:0:1}"
+                    first_char="${first_char,,}"
+                    orphan_dir="$SPECS_DIR/$first_char/$name"
+                    if [ -d "$orphan_dir" ]; then
+                      echo "Cleaning orphan specs dir for deleted component: $orphan_dir"
+                      rm -rf "$orphan_dir"
+                    fi
+                  done
+
+              if [ ! -s /output/change-set/render-set.txt ]; then
+                echo "No PR-scoped components -- skipping render."
+                # Synthesize an empty render-output.json so the artifact
+                # upload (if: always()) and downstream comment job have a
+                # well-formed payload.
+                echo "[]" > /output/render-output.json
+              else
+                # `-x` fails loudly if the arg list would split into multiple
+                # xargs invocations -- each batch after the first would
+                # overwrite the previous JSON output to render-output.json.
+                # Current component counts are well below ARG_MAX, but
+                # `-n 50000` gives `-x` teeth (without `-n`/`-L`, GNU xargs
+                # never splits). `--` ends azldev option parsing so component
+                # names beginning with `-` (none today) are unambiguous.
+                xargs -x -n 50000 -d "\n" azldev component render -q -O json -- \
+                  < /output/change-set/render-set.txt \
+                  > /output/render-output.json
+              fi
+
+              # check_rendered_specs.py diffs the working tree (now containing
+              # any scoped re-render output and any orphan-cleanup deletions)
+              # against HEAD and produces the user-facing patch.
+              python3 /scripts-render/check_rendered_specs.py \
                 --specs-dir "$SPECS_DIR" \
                 --report /output/render-check-report.json \
                 --patch /output/rendered-specs.patch
