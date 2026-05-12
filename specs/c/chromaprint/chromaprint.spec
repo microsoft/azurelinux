@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/chromaprint.azl.macros}
+
 # The presence of this macro ensures the disttag changes
 # when set in side tags
 %bcond_with bootstrap
@@ -16,13 +19,14 @@
 
 Name:           chromaprint
 Version:        1.6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Library implementing the AcoustID fingerprinting
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
 URL:            http://www.acoustid.org/chromaprint
 Source:         https://github.com/acoustid/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source9999: chromaprint.azl.macros
 
 BuildRequires:  cmake
 BuildRequires:  gcc

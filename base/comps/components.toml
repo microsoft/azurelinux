@@ -219,7 +219,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.checkpolicy]
 [components.checksec]
 [components.chkconfig]
-[components.chromaprint]
 [components.chrpath]
 [components.cifs-utils]
 [components.cim-schema]

@@ -1,0 +1,6 @@
+# Disable the optional `ffmpeg` build conditional. This drops the
+# ffmpeg-free-devel BuildRequires and skips building the CLI tools/examples
+# (fpcalc), which are the only artifacts that depend on ffmpeg. The
+# libchromaprint library itself does not need ffmpeg at runtime.
+[components.chromaprint]
+build.without = ["ffmpeg"]
