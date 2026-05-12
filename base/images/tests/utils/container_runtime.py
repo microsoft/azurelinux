@@ -22,7 +22,7 @@ PODMAN = NativeTool(
     name="podman",
     package_hint="podman",
     reason="create and manage test containers",
-    when="dynamic-container-tests",
+    when="container",
 )
 
 class ContainerExecInstance(NamedTuple):
@@ -56,31 +56,72 @@ def _run_container_cmd(cmd: list[str], **kwargs: object) -> subprocess.Completed
     return result
 
 
+def _parse_loaded_images(load_stdout: str) -> list[str]:
+    """Extract image references from ``podman load`` stdout.
+
+    podman/docker print one or more lines of the form::
+
+        Loaded image: localhost/foo:bar
+        Loaded image(s): localhost/foo:bar,localhost/baz:qux
+
+    We accept both forms, split comma-separated lists, and return the
+    references in the order they were reported. This is race-free —
+    unlike scanning ``podman images --sort created``, it cannot be
+    perturbed by other processes loading or pulling images concurrently.
+    """
+    refs: list[str] = []
+    for line in load_stdout.splitlines():
+        line = line.strip()
+        # Match "Loaded image:" and "Loaded image(s):" (case-insensitive).
+        lowered = line.lower()
+        for prefix in ("loaded image(s):", "loaded image:"):
+            if lowered.startswith(prefix):
+                payload = line[len(prefix):].strip()
+                # Some versions emit comma-separated lists on one line.
+                for ref in payload.split(","):
+                    ref = ref.strip()
+                    if ref:
+                        refs.append(ref)
+                break
+    return refs
+
+
 def _get_image_reference(image_path: Path) -> str:
     """Get container image reference from path or direct reference."""
     image_str = str(image_path)
-    
+
     # If it's already a container reference (contains :), use directly
     if ":" in image_str and not image_str.startswith("/"):
         return image_str
-    
+
     # If it's an OCI archive file, load it first
     if image_path.exists() and image_path.suffix in (".tar", ".gz", ".xz"):
         logger.info("Loading image archive: %s", image_path)
         load_cmd = [PODMAN.name, "load", "-i", str(image_path)]
         load_result = _run_container_cmd(load_cmd)
-        
-        # Get all images sorted by creation date (most recent first)
-        images_result = _run_container_cmd([
-            PODMAN.name, "images", "--format", "{{.Repository}}:{{.Tag}}", 
-            "--sort", "created"
-        ])
-        loaded_images = [line.strip() for line in images_result.stdout.strip().split('\n') if line.strip()]
-        if loaded_images:
-            return loaded_images[0]  # Use the most recently created image
-        else:
-            raise ContainerRuntimeError(f"No image loaded from {image_path}")
-    
+
+        # Parse the actual reference(s) reported by `podman load` rather
+        # than picking "the most recently created image", which is racy
+        # under parallel test runs or a busy dev machine where another
+        # process may have just pulled/loaded an image.
+        loaded_images = _parse_loaded_images(load_result.stdout)
+        if not loaded_images:
+            # Some podman versions write the "Loaded image:" line to
+            # stderr; fall back to that before giving up.
+            loaded_images = _parse_loaded_images(load_result.stderr)
+        if not loaded_images:
+            raise ContainerRuntimeError(
+                f"Could not determine image reference from `podman load` output "
+                f"for {image_path}.\nstdout: {load_result.stdout!r}\n"
+                f"stderr: {load_result.stderr!r}"
+            )
+        if len(loaded_images) > 1:
+            logger.info(
+                "Archive %s contained %d images; using the first: %s (others: %s)",
+                image_path, len(loaded_images), loaded_images[0], loaded_images[1:],
+            )
+        return loaded_images[0]
+
     # Assume it's a direct image reference
     return image_str
 
@@ -130,15 +171,44 @@ def create_container_with_exec(
     
     result = _run_container_cmd(run_cmd)
     container_id = result.stdout.strip()
-    
-    # Wait briefly for container to start
-    logger.info("Waiting for exec container %s to start...", container_name)
-    time.sleep(2)
-    
-    # Test basic exec access
-    test_result = exec_container_command_raw(container_name, ["echo", "container-ready"])
-    if test_result.returncode != 0 or "container-ready" not in test_result.stdout:
-        raise ContainerRuntimeError(f"Container exec test failed for {container_name}")
+
+    # Wait briefly for container to start, then verify exec access.
+    # If anything goes wrong from here on we MUST tear the container
+    # down — otherwise a flaky readiness probe leaks containers in CI
+    # and on dev machines, and subsequent runs fail with name conflicts
+    # or resource exhaustion.
+    try:
+        logger.info("Waiting for exec container %s to start...", container_name)
+        time.sleep(2)
+
+        test_result = exec_container_command_raw(
+            container_name, ["echo", "container-ready"]
+        )
+        if test_result.returncode != 0 or "container-ready" not in test_result.stdout:
+            raise ContainerRuntimeError(
+                f"Container exec test failed for {container_name} "
+                f"(rc={test_result.returncode}, stdout={test_result.stdout!r}, "
+                f"stderr={test_result.stderr!r})"
+            )
+    except BaseException:
+        # Best-effort cleanup; never let cleanup errors mask the original.
+        # BaseException covers KeyboardInterrupt / SystemExit too — we
+        # still want the container removed when the user Ctrl-C's mid-probe.
+        logger.warning(
+            "Readiness probe failed for %s; removing leaked container",
+            container_name,
+        )
+        try:
+            subprocess.run(
+                [PODMAN.name, "rm", "-f", container_name],
+                capture_output=True, text=True, timeout=30,
+            )
+        except Exception as cleanup_exc:  # pragma: no cover
+            logger.warning(
+                "Failed to remove leaked container %s: %s",
+                container_name, cleanup_exc,
+            )
+        raise
 
     logger.info(
         "Exec container ready: %s (ID: %s)",

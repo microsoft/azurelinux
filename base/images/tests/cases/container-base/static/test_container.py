@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import re
-import pytest
 from pathlib import Path
 
 # Default upper-bound for the unpacked container rootfs (MiB).

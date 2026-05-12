@@ -9,9 +9,6 @@ from __future__ import annotations
 import json
 import time
 
-import pytest
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -30,7 +27,8 @@ def _cmd_ok(container_exec, cmd: str, timeout: int = 10) -> tuple[bool, str]:
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("procps-ng", "gawk")
 def test_bvt_system_footprint(container_exec) -> None:
     """BVT: Memory, disk, CPU, and process footprint metrics."""
@@ -69,7 +67,8 @@ def test_bvt_system_footprint(container_exec) -> None:
         print("rpm not available — skipping package count")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("util-linux")
 def test_bvt_logging(container_exec) -> None:
     """BVT: System logging via logger and log file/journal access."""
@@ -129,7 +128,8 @@ def test_bvt_mathematical_computing(container_exec) -> None:
         print("python3 not available — skipping Python math test")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("iproute", "iputils", "hostname")
 def test_bvt_networking(container_exec) -> None:
     """BVT: Network interfaces, loopback ping, hostname, and routing."""
@@ -220,7 +220,8 @@ def test_bvt_filesystem_operations(container_exec) -> None:
     print("Filesystem operations verified")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("procps-ng")
 def test_bvt_process_management(container_exec) -> None:
     """BVT: Background process start, list, and kill."""
@@ -238,7 +239,8 @@ def test_bvt_process_management(container_exec) -> None:
     print("Process management verified")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("shadow-utils")
 def test_bvt_user_management(container_exec) -> None:
     """BVT: Create, verify, switch to, and delete a transient test user."""
@@ -262,7 +264,8 @@ def test_bvt_user_management(container_exec) -> None:
     print(f"User management verified for: {user}")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 def test_bvt_package_management(container_exec) -> None:
     """BVT: Package manager (tdnf/dnf) cache refresh, list, and info."""
     ok_tdnf, _ = _cmd_ok(container_exec, "which tdnf", timeout=5)
@@ -297,7 +300,8 @@ def test_bvt_environment_variables(container_exec, container_info: dict) -> None
     print(f"Container HOSTNAME: {out}")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("procps-ng")
 def test_bvt_container_health_summary(container_exec, container_info: dict) -> None:
     """BVT: Aggregated health summary — OS info, memory, processes, packages."""
@@ -356,7 +360,8 @@ def test_bvt_container_health_summary(container_exec, container_info: dict) -> N
 _PI_PREFIX_50 = "14159265358979323846264338327950288419716939937510"
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("python3")
 def test_bvt_pi_to_1000_places(container_exec) -> None:
     """BVT: High-precision pi to 1000 digits via python3 ``decimal``.
@@ -388,7 +393,8 @@ def test_bvt_pi_to_1000_places(container_exec) -> None:
     print(f"Pi to 1000 places verified (first 50 digits: {digits[:50]})")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("python3")
 def test_bvt_pi_repeated_iterations(container_exec) -> None:
     """BVT: Compute pi to 1000 places repeatedly (CPU stress + consistency).
@@ -422,7 +428,8 @@ def test_bvt_pi_repeated_iterations(container_exec) -> None:
     print(f"Pi to 1000 places consistent across 10 iterations: {sample[:52]}")
 
 
-@pytest.mark.require_capability("container", "runtime-package-management")
+@pytest.mark.require_capability("container")
+@pytest.mark.require_capability("runtime-package-management")
 @pytest.mark.requires_pkg("curl")
 def test_bvt_sustained_http_fetch(container_exec) -> None:
     """BVT: Sustained external HTTP — 50 sequential fetches, ≥90% success.

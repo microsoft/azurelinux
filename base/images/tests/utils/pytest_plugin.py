@@ -102,7 +102,9 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
     """Register markers and fail fast if required native tools are missing."""
     config.addinivalue_line(
         "markers",
-        "require_capability(name): skip test unless the image has the named capability",
+        "require_capability(name): skip test unless the image has the named "
+        "capability. Each marker takes exactly one capability; stack the "
+        "decorator to require several.",
     )
     config.addinivalue_line(
         "markers",
@@ -148,11 +150,13 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
 def pytest_runtest_setup(item: pytest.Item) -> None:
     """Skip tests whose marks are not satisfied."""
     # require_capability: skip if image doesn't have the required capability.
+    # Each marker takes exactly one capability name; stack the decorator
+    # multiple times to require several capabilities on a single test.
     caps = parse_capabilities(item.config.getoption("--capabilities", default=None))
     for marker in item.iter_markers("require_capability"):
-        for required in marker.args:
-            if required and required not in caps:
-                pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
+        required = marker.args[0] if marker.args else None
+        if required and required not in caps:
+            pytest.skip(f"requires capability '{required}' (not in: {sorted(caps)})")
 
     # image: skip if --image-name doesn't match.
     image_name = item.config.getoption("--image-name", default=None)

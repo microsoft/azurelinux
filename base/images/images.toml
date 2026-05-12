@@ -74,11 +74,10 @@ description = "Container BVT: runtime validation of system resources, networking
 [test-suites.container-bvt-tests.pytest]
 working-dir = "tests"
 install = "pyproject"
-test-paths = ["cases/container-base/test_container_bvt.py"]
+test-paths = ["cases/container-base/runtime/test_container_bvt.py"]
 extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
     "--capabilities", "{capabilities}",
-    "-m", "runtime_container_tests",
     "-v", "-s"
 ]
