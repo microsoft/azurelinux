@@ -110,16 +110,8 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
     )
     config.addinivalue_line(
         "markers",
-        "runtime_container_tests: test requires a live container via podman exec",
-    )
-    config.addinivalue_line(
-        "markers",
         "requires_pkg(*names): preinstall the named packages in the live container "
         "before the test runs; skip the test if installation fails",
-    )
-    config.addinivalue_line(
-        "markers",
-        "static_container_test: test inspects a mounted container rootfs (no live container)",
     )
 
     from utils.tools import check_tools
@@ -190,12 +182,3 @@ def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-unt
         if cases_idx + 2 < len(parts):
             image_dir = parts[cases_idx + 1]
             item.add_marker(pytest.mark.image(image_dir))
-
-        # Auto-apply runtime/static markers based on cases/<image>/<kind>/
-        # subdir so individual tests don't need to repeat the marker.
-        if cases_idx + 3 < len(parts):
-            kind = parts[cases_idx + 2]
-            if kind == "runtime":
-                item.add_marker(pytest.mark.runtime_container_tests)
-            elif kind == "static":
-                item.add_marker(pytest.mark.static_container_test)
