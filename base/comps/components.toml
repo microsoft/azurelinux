@@ -2146,7 +2146,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.mint-themes]
 [components.mintlocale]
 [components.miopen]
-[components.mjpegtools]
 [components.mkfontscale]
 [components.mksh]
 [components.mm-common]
