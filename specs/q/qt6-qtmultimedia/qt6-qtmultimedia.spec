@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/qt6-qtmultimedia.azl.macros}
+
 %global qt_module qtmultimedia
 
 %global gst 0.10
@@ -24,7 +27,7 @@
 Summary: Qt6 - Multimedia support
 Name:    qt6-%{qt_module}
 Version: 6.10.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
@@ -36,6 +39,7 @@ Source0: https://download.qt.io/development_releases/qt/%{majmin}/%{qt_version}/
 %else
 Source0: https://download.qt.io/official_releases/qt/%{majmin}/%{version}/submodules/%{qt_module}-everywhere-src-%{version}.tar.xz
 %endif
+Source9999: qt6-qtmultimedia.azl.macros
 
 Patch0:  qtmultimedia-fix-build-on-x86-arch.patch
 

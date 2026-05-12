@@ -1,0 +1,9 @@
+# Disable the optional `ffmpeg` build conditional. This drops the
+# ffmpeg-free-devel / libav*-free-devel BuildRequires and skips building
+# libffmpegmediaplugin.so / libQt6FFmpegMediaPluginImpl.{a,prl} plus the
+# corresponding headers. Qt Multimedia still builds with the GStreamer
+# media backend.
+#
+# Part of the distro-wide effort to remove ffmpeg/libav* from Azure Linux.
+[components.qt6-qtmultimedia]
+build.without = ["ffmpeg"]
