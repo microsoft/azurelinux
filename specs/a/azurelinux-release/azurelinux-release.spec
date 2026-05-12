@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -376,7 +376,7 @@ cat >> %{buildroot}%{_rpmconfigdir}/macros.d/macros.dist << EOF
 # dist macros.
 
 %%__bootstrap         ~bootstrap
-%%azurelinux          %{dist_version}
+%%azurelinux          %{dist_version_major}
 %%azl4                1
 %%fedora              %{upstream_fedora_version}
 %%distcore            .azl%{dist_version_major}
@@ -479,6 +479,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
+- Redefine azurelinux macro as major version.
+
 * Tue May 12 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-16
 - Add 50-permit-root-login.conf to explicitly set PermitRootLogin no
 
