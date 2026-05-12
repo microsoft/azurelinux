@@ -1,0 +1,14 @@
+# Drop the BuildRequires on kpipewire-devel. kpipewire pulls in
+# libavcodec/libavformat/libavfilter/libavutil; Azure Linux is removing
+# ffmpeg/libav* from the distro, so kpipewire is being removed too.
+#
+# Practical impact: Wayland screensharing portals and task-manager video
+# thumbnails routed through PipeWire's video pipeline lose their KDE
+# integration component.
+[components.plasma-workspace]
+
+[[components.plasma-workspace.overlays]]
+description = "Drop BuildRequires on kpipewire-devel — removing ffmpeg/libav* from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "kpipewire-devel"
