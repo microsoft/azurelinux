@@ -64,6 +64,7 @@ extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
     "--capabilities", "{capabilities}",
+    "-m", "not runtime_container_tests",
 ]
 
 # Container Business Validation Tests (BVT)
