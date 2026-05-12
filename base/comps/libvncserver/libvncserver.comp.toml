@@ -1,0 +1,32 @@
+# Drop the libavformat/libavcodec/libavutil/libswscale BuildRequires.
+# These are only used to compile a couple of example client binaries
+# (vnc2mpg, etc.) that the spec never installs — %files examples ships
+# only sample source in %{_datadir}/libvncserver. The library itself
+# (libvncclient/libvncserver) builds fine without libav*.
+#
+# Part of the distro-wide effort to remove ffmpeg/libav*.
+[components.libvncserver]
+
+[[components.libvncserver.overlays]]
+description = "Drop BuildRequires on libavformat — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavformat)"
+
+[[components.libvncserver.overlays]]
+description = "Drop BuildRequires on libavcodec — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavcodec)"
+
+[[components.libvncserver.overlays]]
+description = "Drop BuildRequires on libavutil — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavutil)"
+
+[[components.libvncserver.overlays]]
+description = "Drop BuildRequires on libswscale — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libswscale)"

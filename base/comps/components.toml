@@ -1975,7 +1975,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libvisio]
 [components.libvisual]
 [components.libvma]
-[components.libvncserver]
 [components.libvoikko]
 [components.libvorbis]
 [components.libvpl]

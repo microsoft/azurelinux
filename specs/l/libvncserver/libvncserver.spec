@@ -6,7 +6,7 @@
 Summary:    Library to make writing a VNC server easy
 Name:       libvncserver
 Version:    0.9.15
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # NOTE: --with-filetransfer => GPLv2
 License:    GPL-2.0-or-later
@@ -55,10 +55,6 @@ BuildRequires:  xorg-x11-xauth
 BuildRequires:  zlib-devel
 
 # For Examples
-BuildRequires:  pkgconfig(libavformat)
-BuildRequires:  pkgconfig(libavcodec)
-BuildRequires:  pkgconfig(libavutil)
-BuildRequires:  pkgconfig(libswscale)
 BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-keysyms)
 BuildRequires:  pkgconfig(sdl2)
