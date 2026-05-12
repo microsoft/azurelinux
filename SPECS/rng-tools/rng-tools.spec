@@ -35,7 +35,10 @@ mkdir -p %{buildroot}%{_libdir}/systemd/system
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 
 %check
-make  %{?_smp_mflags} check
+pushd tests
+./rngtestzero.sh
+./rngtesturandom.sh
+popd
 
 %post
 /sbin/ldconfig
