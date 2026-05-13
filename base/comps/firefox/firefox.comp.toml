@@ -20,8 +20,10 @@ release = { calculation = "manual" }
 #   1. 'feat: introduce deterministic commit resolution via Azure Linux
 #      lock file'
 #   2. 'fix(firefox): set manual release calculation'
-#   3. This change (introduces the azl_release counter mechanism)
-azl_release = "3"
+#   3. 'feat(firefox): add azl_release counter for independent rebuild
+#      tracking' (introduces the azl_release counter mechanism)
+#   4. This change (strip malware-flagged files from source tarball)
+azl_release = "4"
 
 # Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
 # without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
@@ -73,3 +75,36 @@ description = "Compose azl_release with upstream Release integer so AZL-only bum
 type = "spec-search-replace"
 regex = '^Release:\s+1%\{\?pre_tag\}%\{\?dist\}$'
 replacement = 'Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}'
+
+# The upstream Mozilla source tarball ships content flagged by the AZL RPM
+# signing pipeline as obfuscated / malware-like (e.g. an obfuscated Windows
+# binary used only by media-sniffer unit tests, crashtest HTML that trips
+# malware scanners). Such content blocks the SRPM from being published.
+# The authoritative list of stripped files lives in
+# base/comps/firefox/modify_source.sh (REMOVE_PATHS).
+#
+# We replace Source0 with a deterministically-repacked tarball that is
+# byte-identical to the upstream one except for the stripped files.
+# The repack is produced by base/comps/firefox/modify_source.sh, which
+# is reproducible — re-running it always yields the same SHA-512. We keep
+# the upstream filename (firefox-<version>.source.tar.xz) and use the
+# `replace-upstream` mechanism on the source-files entry below to swap it
+# in place in the Fedora `sources` manifest — no spec edit required.
+#
+# When bumping the firefox version (or changing REMOVE_PATHS):
+#   1. Edit VERSION and UPSTREAM_SHA512 in modify_source.sh.
+#   2. Re-run the script and copy the new SHA-512 into the source-files entry.
+#   3. Upload the new tarball to the modified-source lookaside (see script output).
+
+# Drop the upstream firefox-<version>.source.tar.xz entry from the Fedora
+# `sources` lookaside manifest so the build does not also try to fetch the
+# unmodified upstream tarball alongside our repacked one. This is handled
+# by `replace-upstream = true` on the source-files entry below.
+
+[[components.firefox.source-files]]
+filename = "firefox-148.0.source.tar.xz"
+hash = "c9c9f29fbd8f889bf3cf3d88776e1a62da7b2a65d386538d2bd048dd70caaaf8324adb5303a5fa9aa73c2cf6eb9f89cb4b34f9e67c4208d88636dd5376af90a9"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/firefox/firefox-148.0.source.tar.xz/sha512/c9c9f29fbd8f889bf3cf3d88776e1a62da7b2a65d386538d2bd048dd70caaaf8324adb5303a5fa9aa73c2cf6eb9f89cb4b34f9e67c4208d88636dd5376af90a9/firefox-148.0.source.tar.xz" }
+replace-upstream = true
+replace-reason = "AZL-repacked tarball with malware-flagged upstream test fixtures stripped (trips RPM signing pipeline); see modify_source.sh REMOVE_PATHS"
