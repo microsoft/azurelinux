@@ -123,7 +123,7 @@ fi
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
 - Patch for CVE-2025-58190, CVE-2025-47911
 
-* Tue Jan 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
+* Wed Jan 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
 - Backport fix for credential leak in CRI error logs
 
 * Mon Nov 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
