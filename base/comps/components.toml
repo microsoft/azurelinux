@@ -87,7 +87,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.apache-commons-codec]
 [components.apache-commons-collections]
 [components.apache-commons-collections4]
-[components.apache-commons-compress]
 [components.apache-commons-exec]
 [components.apache-commons-io]
 [components.apache-commons-jxpath]

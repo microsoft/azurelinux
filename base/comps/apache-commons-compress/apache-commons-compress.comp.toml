@@ -1,0 +1,41 @@
+[components.apache-commons-compress]
+
+# The upstream Apache Commons Compress source tarball ships test
+# fixtures flagged by anti-malware scanning on the AZL RPM signing pipeline
+# as suspicious / malware-like content:
+#   - src/test/resources/bla.encrypted.7z
+#   - src/test/resources/password-encrypted.zip
+#     (encrypted archive fixtures — generic malware heuristics)
+#   - src/test/resources/COMPRESS-256.7z
+#   - src/test/resources/zip64support.tar.bz2
+#     (crafted/edge-case archive fixtures — flagged as Trojan by an
+#     AV engine on the 2026-05-15 scan)
+# Such content blocks the SRPM from being published. None of these files
+# are used at runtime — they only feed the project's unit tests
+# (encrypted-archive read/write coverage and pack200 unpacking) — so
+# removing them has no effect on the shipped package. Affected tests
+# will be skipped/excluded at build time if they reference these
+# fixtures.
+#
+# We replace Source0 (effectively) with a deterministically-repacked
+# tarball that is byte-identical to upstream except for the stripped
+# files. The repack is produced by
+# base/comps/apache-commons-compress/modify_source.sh, which is
+# reproducible — re-running it always yields the same SHA-512. We keep
+# the upstream filename (commons-compress-1.27.1-src.tar.gz) and use the
+# `replace-upstream` mechanism on the source-files entry below to swap it
+# in place in the Fedora `sources` manifest — no spec edit required.
+#
+# When bumping the apache-commons-compress version (or changing
+# REMOVE_PATHS):
+#   1. Edit VERSION and UPSTREAM_SHA512 in modify_source.sh.
+#   2. Re-run the script and copy the new SHA-512 into the source-files entry.
+#   3. Upload the new tarball to the modified-source lookaside (see script output).
+
+[[components.apache-commons-compress.source-files]]
+filename = "commons-compress-1.27.1-src.tar.gz"
+hash = "aeecee8776c60a549cbca9fc3c0312c8c98a953d024db64e5c480c643357be7b270193df69fc2172632e472feb9b9221eedf3b40dd933997b881a398dfb3a02b"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/apache-commons-compress/commons-compress-1.27.1-src.tar.gz/sha512/aeecee8776c60a549cbca9fc3c0312c8c98a953d024db64e5c480c643357be7b270193df69fc2172632e472feb9b9221eedf3b40dd933997b881a398dfb3a02b/commons-compress-1.27.1-src.tar.gz" }
+replace-upstream = true
+replace-reason = "AZL-repacked tarball with scanner-flagged encrypted and crafted-archive test fixtures stripped; see modify_source.sh REMOVE_PATHS"
