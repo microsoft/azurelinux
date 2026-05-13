@@ -9,3 +9,17 @@ description = "Disable mingw cross-compilation targets — Azure Linux does not 
 type = "spec-search-replace"
 regex = '%global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'
 replacement = '#global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'
+
+[[components.rust.overlays]]
+description = "Use Azure Linux's compiler-rt runtime triple for Rust profiler_builtins; LLVM installs clang runtimes under %{_target_platform}, not redhat"
+type = "spec-search-replace"
+section = "%build"
+regex = '%define profiler %{clang_lib}/%{_arch}-redhat-linux-gnu/libclang_rt.profile.a'
+replacement = '%define profiler %{clang_lib}/%{_target_platform}/libclang_rt.profile.a'
+
+[[components.rust.overlays]]
+description = "Use Azure Linux's compiler-rt runtime triple for Rust optimized compiler builtins; LLVM installs clang runtimes under %{_target_platform}, not redhat"
+type = "spec-search-replace"
+section = "%build"
+regex = '%define optimized_builtins %{clang_lib}/%{_arch}-redhat-linux-gnu/libclang_rt.builtins.a'
+replacement = '%define optimized_builtins %{clang_lib}/%{_target_platform}/libclang_rt.builtins.a'
