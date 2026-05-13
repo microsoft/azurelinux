@@ -66,6 +66,7 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 # algorithms that are used in the speed tests. This patch skips those tests.
 # If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
+Patch83:  Allow-NULL-buffer-with-0-bsize.patch
 Patch100: CVE-2026-31791.patch
 
 License: Apache-2.0
