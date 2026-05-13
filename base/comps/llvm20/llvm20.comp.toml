@@ -9,3 +9,29 @@ description = "Use the Azure Linux GCC toolchain triple in clang20's default con
 type = "spec-search-replace"
 regex = '%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux'
 replacement = '%global cfg_file_content --gcc-triple=%{_target_cpu}-%{_vendor}-linux'
+
+# Strip embedded LLVM-bitcode / LTO companion sections from every
+# `libLLVM*.a` archive shipped by the `llvm20-static` sub-package.
+# See the matching overlay on `[components.llvm]` for the full
+# rationale -- this is the parallel companion-major build of LLVM
+# and exhibits the same FatLTO bloat on its static archives.
+[[components.llvm20.overlays]]
+description = "Strip embedded LLVM bitcode / LTO companion sections (.llvmbc, .llvmcmd, .llvm.lto, .gnu.lto_*, .gnu.debuglto_*) from every libLLVM*.a archive member at %install time. Shrinks the llvm20-static RPM payload by 30-60% so it fits within downstream decompression budgets; preserves every linker-visible symbol, relocation, and native section."
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "# Strip LLVM bitcode + LTO companion sections from libLLVM*.a archive",
+    "# members. See base/comps/llvm/llvm.comp.toml for the full rationale.",
+    "for _archive in %{buildroot}%{_libdir}/libLLVM*.a \\",
+    "                %{buildroot}%{install_libdir}/libLLVM*.a; do",
+    "    [ -f \"$_archive\" ] || continue",
+    "    %{__objcopy} \\",
+    "        --remove-section=.llvmbc \\",
+    "        --remove-section=.llvmcmd \\",
+    "        --remove-section=.llvm.lto \\",
+    "        --remove-section='.gnu.lto_*' \\",
+    "        --remove-section='.gnu.debuglto_*' \\",
+    "        \"$_archive\" 2>/dev/null || :",
+    "done",
+]
