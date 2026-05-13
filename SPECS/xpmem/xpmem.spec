@@ -23,7 +23,7 @@
 %{!?K_SRC: %global K_SRC /lib/modules/%{KVERSION}/build}
 # A separate variable _release is required because of the odd way the
 # script append_number_to_package_release.sh works:
-%global _release 1.2507097
+%global _release 1.2601100
 
 %bcond_with kernel_only
 
@@ -37,24 +37,34 @@
 
 %define need_firmware_dir 0%{?euleros} > 0
 
+%define __requires_exclude ^kernel\\(.*\\)$
+
 %if "%_vendor" == "openEuler"
 %global __find_requires %{nil}
 %endif
 
 Summary:	 Cross-partition memory
 Name:		 xpmem
-Version:	 2.7.4
-Release:	 23%{release_suffix}%{?dist}
+Version:	 2601.0.9
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
-BuildRequires:	 automake autoconf
+BuildRequires:	 automake autoconf libtool
 URL:		 https://github.com/openucx/xpmem
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
+Conflicts: knem
+Obsoletes: knem
+
+# Suppress auto-generated kmod() requires from modules-load.d on SUSE
+%if "%{_vendor}" == "suse"
+%global __requires_exclude kmod\\(xpmem\\.ko\\)|^kernel\\(.*\\)$
+Requires: (xpmem-kmp if kernel)
+%endif
 
 # name gets a different value in subpackages
 %global _name %{name}
@@ -133,6 +143,8 @@ EOF)
 # munge the release version here as well:
 Summary: XPMEM: kernel modules
 Group: System Environment/Libraries
+Conflicts: knem-modules
+Obsoletes: knem-modules
 
 Requires:       mlnx-ofa_kernel-modules = %{_mofed_full_version}
 Requires:       kernel = %{target_kernel_version_full}
@@ -187,6 +199,8 @@ This package includes the kernel module (non KMP version).
 
 %prep
 %setup -q
+# Update source version to match RPM version
+sed -i "s/AC_INIT(\[xpmem\], \[.*\]/AC_INIT([xpmem], [%{version}]/" configure.ac
 
 %build
 env=
@@ -276,6 +290,9 @@ fi
 %endif
 
 %changelog
+* Mon May 11 2026 Azure Linux Team - 2601.0.9-1
+- Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-23
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
 
