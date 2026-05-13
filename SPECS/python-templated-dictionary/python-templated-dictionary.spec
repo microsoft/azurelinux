@@ -6,8 +6,8 @@
 %endif
 
 Name:          python-%{srcname}
-Version:       1.4
-Release:       5%{?dist}
+Version:       1.6
+Release:       1%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 Summary:       Dictionary with Jinja2 expansion
@@ -18,8 +18,12 @@ Source0:       %{url}/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{v
 
 BuildArch:     noarch
 
+%if 0%{?rhel} > 10 || 0%{?fedora} > 42
+BuildRequires: python%{python3_pkgversion}-devel
+%else
 BuildRequires: python%{python3_pkgversion}-devel
 BuildRequires: python%{python3_pkgversion}-setuptools
+%endif
 Requires:      python%{python3_pkgversion}-jinja2
 
 %global _description\
@@ -34,23 +38,43 @@ Summary: %{summary}
 %description -n python3-%{srcname} %_description
 
 
+%if 0%{?rhel} > 10 || 0%{?fedora} > 42
+%generate_buildrequires
+%pyproject_buildrequires
+%endif
+
 %prep
 %setup -q -n %{srcname}-%{name}-%{version}-1
 
 
 %build
+%if 0%{?rhel} > 10 || 0%{?fedora} > 42
+version="%version" %pyproject_wheel
+%else
 version="%version" %py3_build
+%endif
 
 %install
+%if 0%{?rhel} > 10 || 0%{?fedora} > 42
+version=%version %pyproject_install
+%else
 version=%version %py3_install
+%endif
 
 
 %files -n python3-%{srcname}
 %license LICENSE
-%{python3_sitelib}/templated_dictionary-*.egg-info/
 %{python3_sitelib}/templated_dictionary/
+%if 0%{?rhel} > 10 || 0%{?fedora} > 42
+%{python3_sitelib}/*.dist-info
+%else
+%{python3_sitelib}/templated_dictionary-*.egg-info/
+%endif
 
 %changelog
+* Thu May 14 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.6-1
+- Upgraded to 1.6 and sync'd with Fedora spec.
+
 * Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 1.4-1
 - Upgraded to 1.4 and sync'd with Fedora spec.
 

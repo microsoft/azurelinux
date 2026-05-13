@@ -25273,8 +25273,8 @@
         "type": "other",
         "other": {
           "name": "python-templated-dictionary",
-          "version": "1.4",
-          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.4-1.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.6-1.tar.gz"
         }
       }
     },
