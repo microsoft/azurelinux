@@ -174,10 +174,10 @@ make test-unit
 %{_datadir}/%{name}/test
 
 %changelog
-* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.43.1-2
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 0:1.43.1-2
 - Bump to rebuild with updated glibc
 
-* Thu Mar 26 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.43.1-1
+* Thu Mar 26 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0:1.43.1-1
 - Upgrade to version 1.43.1
 - fixed ptests failures
 
