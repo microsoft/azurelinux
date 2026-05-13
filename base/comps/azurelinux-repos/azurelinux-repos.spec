@@ -102,10 +102,17 @@ render_repo() {
 # Render official .repo file pointing at packages.microsoft.com, signed,
 # longer metadata cache. The .main suffix will be removed thanks to
 # RemovePathPostfixes.
+#
+# NOTE: We presently set repo_gpgcheck=0. It would succeed against this
+# repository, but the "first use" experience with dnf5 blocks, presents
+# an error and requires a human to confirm import of the gpg keys into
+# the libdnf5 cache (separate from RPM database gpg key import). Because
+# of this and other issues reported upstream, we will hold off on enabling
+# this setting and revisit later.
 render_repo \
     "$RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo.main" \
     'https://packages.microsoft.com/azurelinux/$releasever/beta' \
-    1 1 '7d'
+    1 0 '7d'
 
 # Render .repo file pointing at daily dev repos, unsigned, shorter cache.
 # The .dev suffix will be removed thanks to RemovePathPostfixes.
@@ -132,8 +139,8 @@ if [ ! -f "$main_file" ]; then
     exit 1
 fi
 if [ "$(grep -c '^gpgcheck=1' "$main_file")" -ne 3 ] || \
-   [ "$(grep -c '^repo_gpgcheck=1' "$main_file")" -ne 3 ]; then
-    echo "ERROR: $main_file must enable gpgcheck and repo_gpgcheck on all 3 sections"
+   [ "$(grep -c '^repo_gpgcheck=0' "$main_file")" -ne 3 ]; then
+    echo "ERROR: $main_file must correctly configure gpgcheck and repo_gpgcheck"
     exit 1
 fi
 if [ "$(grep -c '^metadata_expire=7d' "$main_file")" -ne 3 ]; then
