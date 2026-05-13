@@ -28,7 +28,6 @@ logfile=/var/log/yum.log
 retries=20
 obsoletes=1
 gpgcheck=1
-repo_gpgcheck=1
 assumeyes=1
 syslog_ident=mock
 syslog_device=
@@ -43,14 +42,14 @@ user_agent={{ user_agent }}
 name=Azure Linux $releasever - $basearch - Base
 baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
 enabled=1
 
 [azurelinux-build-deps]
 name=Azure Linux $releasever - $basearch - Additional Build Dependencies
 baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
 gpgcheck=1
-gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
 enabled=1
 
 """
