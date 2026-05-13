@@ -21,6 +21,7 @@ Patch10:        CVE-2026-41256.patch
 Patch11:        CVE-2026-41257.patch
 Patch12:        CVE-2026-43895.patch
 Patch13:        CVE-2026-43896.patch
+Patch14:        CVE-2026-44777.patch
 Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -75,7 +76,7 @@ make check
 
 %changelog
 * Tue May 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-6
-- Patch for CVE-2026-43896, CVE-2026-43895, CVE-2026-41257, CVE-2026-41256, CVE-2026-40612
+- Patch for CVE-2026-43896, CVE-2026-43895, CVE-2026-41257, CVE-2026-41256, CVE-2026-40612, CVE-2026-44777
 
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
 - Patch for CVE-2026-40164, CVE-2026-39979, CVE-2026-39956, CVE-2026-33948, CVE-2026-33947, CVE-2026-32316
