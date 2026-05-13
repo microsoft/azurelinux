@@ -138,11 +138,31 @@ stages:
           - script: |
               set -euo pipefail
               json_file="$(Build.ArtifactStagingDirectory)/changed-components/changed-components.json"
+              # Publish the changed-components JSON for post-mortem triage on
+              # EVERY exit path, not just success -- if azldev hard-fails on a
+              # consistency tripwire the partial JSON is exactly what an
+              # operator needs to investigate.
+              publish_artifact() {
+                if [[ -s "$json_file" ]]; then
+                  mkdir -p "$(ob_outputDirectory)/changed-components"
+                  cp "$json_file" "$(ob_outputDirectory)/changed-components/" || true
+                fi
+              }
+              trap publish_artifact EXIT
+
+              echo "##[group]Computing changed components"
               .github/workflows/scripts/components/compute_changed.sh \
                 --output-file "$json_file" \
-                --publish-dir "$(ob_outputDirectory)" \
                 --source-commit "$(sourceCommit)" \
                 --target-commit "$(targetCommit)"
+              echo "##[endgroup]"
+
+              echo "##[group]Upload set (sourcesChange == true, changeType in {added, changed})"
+              upload_count=$(jq -r '[.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed")))] | length' "$json_file")
+              jq -r '.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed"))) | .component' "$json_file" | sort
+              echo "Total: $upload_count component(s) to upload."
+              echo "##[endgroup]"
+
               echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$json_file"
             displayName: "Compute changed components"
 
