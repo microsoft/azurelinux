@@ -1,0 +1,9 @@
+[components.exfatprogs]
+
+[[components.exfatprogs.source-files]]
+filename = "exfatprogs-1.3.1.tar.xz"
+hash = "ded26326feab2b0013c1031fda7add53100e0581711555b8a64e8036448775a51304e4c5c368049cb26633dbf02e814b6f97bd804cafff324921a8e6a3a975d0"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/exfatprogs/exfatprogs-1.3.1.tar.xz/sha512/ded26326feab2b0013c1031fda7add53100e0581711555b8a64e8036448775a51304e4c5c368049cb26633dbf02e814b6f97bd804cafff324921a8e6a3a975d0/exfatprogs-1.3.1.tar.xz" }
+replace-upstream = true
+replace-reason = "The upstream `tests/` tree ships 19 deliberately-corrupted exFAT filesystem images (e.g. bad_bitmap, bad_dentries, bs_bad_csum, loop_chain) whose malformed metadata sends the malware scanner into runaway behaviour on the crafted FAT/dentry structures -- the shell harness alongside them (tests/upcase_table/, test_fsck.sh) is not itself problematic; it is removed as collateral because it becomes unused once the images are gone. The `tests/` tree is EXTRA_DIST-only, never built or installed, and the spec has no %check, so stripping it is functionally inert. See modify_source.sh."
