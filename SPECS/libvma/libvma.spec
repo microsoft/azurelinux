@@ -8,7 +8,7 @@
 %global use_systemd 1
 
 Name:           libvma
-Version:        9.8.72
+Version:        9.8.84
 Release:        1%{?dist}
 Summary:        A library for boosting TCP and UDP traffic (over RDMA hardware)
 Group:          System Environment/Libraries
@@ -16,7 +16,10 @@ License:        GPLv2 or BSD
 Url:            https://github.com/Mellanox/%{name}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
+Source0:        %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 # libvma currently supports only the following architectures
 ExclusiveArch: x86_64 ppc64le ppc64 aarch64
@@ -131,6 +134,9 @@ install -m 755 ./%{name}-debug.so $RPM_BUILD_ROOT/%{_libdir}/%{name}-debug.so
 %{_mandir}/man8/vma_stats.*
 
 %changelog
+* Mon May 11 2026 Azure Linux Team - 9.8.84-1
+- Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 9.8.72-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
