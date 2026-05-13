@@ -2400,7 +2400,6 @@ components = [
     "sshpass",
     "sssd",
     "stalld",
-    "star",
     "startup-notification",
     "stax2-api",
     "stix-fonts",

@@ -1,0 +1,14 @@
+[components.cpio]
+
+[[components.cpio.overlays]]
+description = "Drop BR on 'rmt'. Mirroring Rawhide's https://src.fedoraproject.org/rpms/cpio/c/84d5a4fe965609681000fd3911b7246c2a6973fb?branch=rawhide. Required to remove the need for the `star` component (provider of `rmt`)."
+type = "spec-search-replace"
+regex = ',\s*rmt\b'
+replacement = ''
+
+[[components.cpio.overlays]]
+description = "Drop the `rm -f $RPM_BUILD_ROOT%{_libexecdir}/rmt` line from %install. cpio's build tree no longer ships its own `rmt` helper under `_libexecdir`, so the deletion is a stale leftover. Mirrors the same Fedora rawhide commit (84d5a4fe) referenced by the BR-drop overlay above."
+type = "spec-search-replace"
+section = "%install"
+regex = "rm -f \\$RPM_BUILD_ROOT%\\{_libexecdir\\}/rmt"
+replacement = ""
