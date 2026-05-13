@@ -179,7 +179,7 @@ Summary: The Linux kernel
 #  the --with-release option overrides this setting.)
 %define debugbuildsenabled 1
 # define buildid .local
-%define specrpmversion 6.18.5
+%define specrpmversion 6.18.29
 %define specversion %{specrpmversion}
 %define patchversion 6.18
 %define pkgrelease %{azl_pkgrelease}
@@ -2020,7 +2020,7 @@ ApplyOptionalPatch()
 
 %{log_msg "Untar kernel tarball"}
 %setup -q -n kernel-%{tarfile_release} -c
-mv CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specrpmversion}.%{kextraversion} linux-%{KVERREL}
+mv CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion} linux-%{KVERREL}
 
 cd linux-%{KVERREL}
 # cp -a %{SOURCE1} . (disabled for AzureLinux — Makefile.rhelver is Red Hat-specific)
@@ -2183,7 +2183,7 @@ for opt in %{clang_make_opts}; do
 done
 %endif
 %{log_msg "Generate redhat configs"}
-RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}
+echo "AZL: skipping Fedora process_configs.sh (re-run with AZL configs below)" # RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}
 
 # We may want to override files from the primary target in case of building
 # against a flavour of it (eg. centos not rhel), thus override it here if
@@ -2242,7 +2242,7 @@ cp %{SOURCE5001} %{name}-%{specrpmversion}-aarch64.config
 %endif
 # Re-run process_configs.sh to validate AZL configs (make olddefconfig + listnewconfig)
 OPTS="-w -n -c"
-RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}
+SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{specrpmversion}
 cd ../..
 %endif
 %build

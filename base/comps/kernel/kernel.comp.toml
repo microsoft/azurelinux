@@ -14,26 +14,26 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "18"
-# 4th version component from the AZL kernel source (6.18.5.1). Included in specrelease so it appears
-# in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.5-1.3.azl4.aarch64).
+azl_pkgrelease = "1"
+# 4th version component from the AZL kernel source (6.18.29.1). Included in specrelease so it appears
+# in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.29-1.1.azl4.aarch64).
 kextraversion = "1"
 # CBL-Mariner branch number (used in tarball path)
 azurelinux_version = "3"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
-filename = "kernel-6.18.5.1.tar.gz"
-hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
+filename = "kernel-6.18.29.1.tar.gz"
+hash = "9c71dec3ea3897107c176c89014134ab31aba0c3a669af549993e1134cf2896c7d6f6b751bbef5dbd260da514a7b8a2b1ad89067b748efc90cf6096e43e5b246"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.29.1.tar.gz" }
 
 # Insert version and release information from the component defines into the spec file, and update the source URL to match the AzureLinux kernel source structure
 [[components.kernel.overlays]]
-description = "Set specrpmversion to 6.18.5"
+description = "Set specrpmversion to 6.18.29"
 type = "spec-search-replace"
 regex = "%define specrpmversion .+"
-replacement = "%define specrpmversion 6.18.5"
+replacement = "%define specrpmversion 6.18.29"
 
 [[components.kernel.overlays]]
 description = "Derive specversion from specrpmversion. This becomes KVERREL which becomes the uname"
@@ -70,7 +70,16 @@ value = "kernel-%{specrpmversion}.%{kextraversion}.tar.gz"
 description = "Fix tarball extraction path for AzureLinux"
 type = "spec-search-replace"
 regex = "linux-%{tarfile_release}"
-replacement = "CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specrpmversion}.%{kextraversion}"
+replacement = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion}"
+
+# Skip the Fedora process_configs.sh run — Fedora f43 configs target 6.18.13 and lack
+# new config options in 6.18.29, causing -n (listnewconfig) to fail. Our AZL overlay at the
+# end of %prep replaces all configs and re-runs process_configs.sh with strict validation.
+[[components.kernel.overlays]]
+description = "Skip Fedora process_configs.sh — f43 configs are for 6.18.13 and fail against 6.18.29 kernel. AZL re-runs at end of %prep."
+type = "spec-search-replace"
+regex = 'RHJOBS=\$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%\{name\} \./process_configs\.sh \$OPTS %\{specrpmversion\}'
+replacement = 'echo "AZL: skipping Fedora process_configs.sh (re-run with AZL configs below)" # RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}'
 
 # Disable redhat-specific sources and patches since they are not applicable to AzureLinux
 [[components.kernel.overlays]]
@@ -153,7 +162,7 @@ lines = [
     "%endif",
     "# Re-run process_configs.sh to validate AZL configs (make olddefconfig + listnewconfig)",
     'OPTS="-w -n -c"',
-    "RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}",
+    "SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{specrpmversion}",
     "cd ../..",
     "%endif",
 ]
