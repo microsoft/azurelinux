@@ -138,7 +138,7 @@ stages:
           - script: |
               set -euo pipefail
               json_file="$(Build.ArtifactStagingDirectory)/changed-components/changed-components.json"
-              .github/workflows/scripts/control-tower/compute_changed.sh \
+              .github/workflows/scripts/components/compute_changed.sh \
                 --output-file "$json_file" \
                 --publish-dir "$(ob_outputDirectory)" \
                 --source-commit "$(sourceCommit)" \

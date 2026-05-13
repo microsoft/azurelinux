@@ -36,7 +36,7 @@ git diff --no-renames --name-only "$target_commit" "$source_commit" -- "$specs_d
 # Render set is the union of:
 #   - components flagged by 'azldev component changed' (inputs differ)
 #   - components whose spec tree was touched directly in the PR
-changed=$(python3 .github/workflows/scripts/control-tower/compute_render_set.py \
+changed=$(python3 .github/workflows/scripts/components/compute_render_set.py \
   --changed-components-file "$changed_components_file" \
   --specs-diff-file "$specs_diff_file" \
   --specs-dir "$specs_dir")
