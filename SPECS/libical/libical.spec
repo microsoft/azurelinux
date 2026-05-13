@@ -25,7 +25,6 @@ BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  tzdata
-Requires:       tzdata
 
 %description
 Reference implementation of the iCalendar data type and serialization format
