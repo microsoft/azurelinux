@@ -13,7 +13,7 @@
 
 Name:           python-%{pypi_name}
 Version:        6.10.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Python bindings for the Qt 6 cross-platform application and UI framework
 
 License:        LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
