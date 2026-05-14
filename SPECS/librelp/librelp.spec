@@ -8,7 +8,6 @@ Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/rsyslog/librelp
 Source0:        https://download.rsyslog.com/%{name}/%{name}-%{version}.tar.gz
-Patch0:         patch-for-valgrind-ptest-failure.patch
 BuildRequires:  autoconf
 BuildRequires:  autogen
 BuildRequires:  automake
@@ -46,6 +45,7 @@ autoreconf -fiv
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
+touch tests/known_issues.supp
 %make_build check
 
 %ldconfig_scriptlets
