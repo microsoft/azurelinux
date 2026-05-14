@@ -25,6 +25,7 @@ BuildRequires:  make
 BuildRequires:  pkgconfig
 %if 0%{?with_check}
 BuildRequires:  procps-ng
+BuildRequires:  coreutils
 %endif
 
 %description
@@ -103,18 +104,20 @@ chrpath --delete %{buildroot}%{_libdir}/orbit-2.0/Everything_module.so
 chrpath --delete %{buildroot}%{_bindir}/ior-decode-2
 chrpath --delete %{buildroot}%{_bindir}/typelib-dump
 
-
 %check
 cd test
 # Build + setup test binaries
 make check TESTS=""
-# Disable timeout.sh test as it causing the build to hang indefinitely.
-# Run only selected good tests (test-mem & test-corbaloc are failing with SIGABRT and SIGTRAP )
+# command 'killall' is not found in mariner; use 'pkill' instead to terminate the timeout-server test process
+sed 's/\(^.*\)killall\(.*$\)/\1pkill -9 lt-timeout-serv/' < timeout.sh > timeout.tmp.sh
+install -m 0777 timeout.tmp.sh timeout.sh
+# Bound timeout.sh to 120s to prevent indefinite hang
+timeout 120 bash timeout.sh
+# test-mem and test-corbaloc are failing with SIGABRT and SIGTRAP; run only known-good tests
 for t in test-dynany test-performance test-giop; do
     echo "Running $t..."
     ./$t || exit 1
 done
-
 
 %ldconfig_scriptlets
 
@@ -142,8 +145,9 @@ done
 
 %changelog
 * Thu Apr 30 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.14.19-31
-- Fix for ptest regression caused by timeout.sh test hanging indefinitely.
-- Run only selected good tests (test-mem & test-corbaloc are failing with SIGABRT and SIGTRAP )
+- Fix ptest regression: replace killall with pkill for timeout.sh compatibility.
+- Bound timeout.sh execution with 'timeout 120' to prevent indefinite hang.
+- Skip test-mem and test-corbaloc (failing with SIGABRT and SIGTRAP).
 
 * Wed Oct 26 2022 Sumedh Sharma <sumsharma@microsoft.com> - 2.14.19-30
 - Initial CBL-Mariner import from Fedora 37 (license: MIT).
