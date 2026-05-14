@@ -20,19 +20,32 @@ description: "[Skill] Refresh component lock files with `azldev comp update`. Us
 
 ## End-of-work refresh (the common case)
 
-For most component edits — overlays, build flags, metadata, descriptions — run `update` once at the end, then re-render *after committing* so the changelog and release reflect your new commit.
+For most component edits — overlays, build flags, metadata, descriptions — the canonical order is:
+
+1. Edit `comp.toml` (and any source-side files).
+2. `azldev comp update -p <name>` to refresh the lock.
+3. **Commit ALL working-tree changes** — `comp.toml`, `lock`, and any source-side scripts (e.g., `modify_source.sh`). No rendered spec yet. The commit between `update` and `render` is mandatory and must include the entire working tree, not just `comp.toml` + lock. Keep the commit message scoped to what's in the diff (rule 10 of [`copilot-instructions.md`](../../copilot-instructions.md)) — no investigation narrative for things that didn't produce a file change.
+4. `azldev comp render -p <name>` so `%changelog` / `Release:` track the just-made commit.
+5. Amend the rendered spec into the same commit (preferred), or commit it separately.
 
 ```bash
+# 1-2. Edit and refresh lock.
 azldev comp update -p <name>
-azldev comp render -p <name>
-git add base/comps/<name>/ locks/<name>.lock specs/<first-char>/<name>/
-git commit -m "fix(pkg): Fix <name> bug"
 
-# Now re-render and amend so %changelog / Release: track the new commit.
+# 3. Commit the input change (ALL working-tree changes — comp.toml,
+#    lock, and any source-side scripts like modify_source.sh) first.
+git add -A
+git commit -S -m "fix(pkg): Fix <name> bug"
+
+# 4. Render against the just-committed history.
 azldev comp render -p <name>
+
+# 5. Fold the rendered spec into the same commit.
 git add specs/<first-char>/<name>/
-git commit --amend --no-edit
+git commit --amend -S --no-edit
 ```
+
+Commit **all working-tree changes together first**, then render against that committed history, then amend in the rendered spec. If you skip the commit and run `render` with a dirty working tree, `azldev` treats the dirty state as a synthetic commit, the rendered `%changelog` adds a `- Local changes (uncommitted)` entry, and the `Release:` integer bumps by one extra — both of which diverge from the actual commit and fail the `Check Rendered Specs` CI check.
 
 ### Why the second render-and-amend?
 
@@ -102,6 +115,8 @@ update → render → iterate → commit lock → render → amend
 ## CI gotcha
 
 `Check Rendered Specs` and `Update Locks` both run against the **PR's committed state**, not the working tree. The end-of-work refresh (or the amend in step 6 of a pin bump) is what keeps both checks green together — without it, render check would flag a stale changelog or lock check would flag a stale fingerprint.
+
+**Drift-fix discipline:** When either check fails and posts a comment linking the `rendered-specs-patch` / `locks-patch` artifact, re-run `azldev comp render -p <name>` / `azldev comp update -p <name>` locally and amend with the local output. Do NOT `gh run download` the patch and `git apply` it — that skips local reproduction and hides any environment-skew bug between your `azldev` and the CI container. If the local render disagrees with CI, the fix is to upgrade your local toolchain (`go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@main`), not to bypass it. See rule 11 in [`copilot-instructions.md`](../../copilot-instructions.md#repository-hygiene-rules).
 
 ## When to use `-a`
 
