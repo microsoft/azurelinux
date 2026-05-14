@@ -1273,7 +1273,7 @@ components = [
     "openvswitch",
     "openwsman",
     "openxr",
-    "opus",
+
     "oqsprovider",
     "orangefs",
     "orc",
@@ -2650,7 +2650,6 @@ packages = [
     "mingw32-nuspell", # srpm: nuspell
     "mingw32-openjpeg", # srpm: openjpeg
     "mingw32-openjpeg-tools", # srpm: openjpeg
-    "mingw32-opus", # srpm: opus
     "mingw32-osinfo-db", # srpm: osinfo-db
     "mingw32-osinfo-db-tools", # srpm: osinfo-db-tools
     "mingw32-p11-kit", # srpm: p11-kit
@@ -2697,7 +2696,6 @@ packages = [
     "mingw64-nuspell", # srpm: nuspell
     "mingw64-openjpeg", # srpm: openjpeg
     "mingw64-openjpeg-tools", # srpm: openjpeg
-    "mingw64-opus", # srpm: opus
     "mingw64-osinfo-db", # srpm: osinfo-db
     "mingw64-osinfo-db-tools", # srpm: osinfo-db-tools
     "mingw64-p11-kit", # srpm: p11-kit

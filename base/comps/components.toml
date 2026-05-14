@@ -2324,8 +2324,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.openvswitch]
 [components.openwsman]
 [components.openxr]
-[components.opus]
-[components.opusfile]
 [components.oqsprovider]
 [components.orangefs]
 [components.orc]

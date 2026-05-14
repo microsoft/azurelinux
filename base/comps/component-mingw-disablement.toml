@@ -39,7 +39,6 @@ components = [
     "libyaml",
     "nghttp2",
     "openjpeg",
-    "opus",
     "osinfo-db",
     "osinfo-db-tools",
     "p11-kit",
