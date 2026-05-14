@@ -63,7 +63,7 @@ touch tests/known_issues.supp
 
 %changelog
 * Tue May 12 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.11.0-2
-- Added `tests/known_issues.supp` through patch to fix ptest failure
+- Added `tests/known_issues.supp` required for few tests.
 
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
 - Auto-upgrade to 1.11.0 - Azure Linux 3.0 - package upgrades
