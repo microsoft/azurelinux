@@ -1,0 +1,9 @@
+[components.mozjs128]
+
+[[components.mozjs128.source-files]]
+filename = "firefox-128.11.0esr.source.tar.xz"
+hash = "a79fe02e82493577e19d08a287415d2bbe94727dabd20cc162bc35c1e37d35da2eccfee81da50e8abefecadac5510f66cd28cf34466f53cbf23c56bf9020f5bc"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/mozjs128/firefox-128.11.0esr.source.tar.xz/sha512/a79fe02e82493577e19d08a287415d2bbe94727dabd20cc162bc35c1e37d35da2eccfee81da50e8abefecadac5510f66cd28cf34466f53cbf23c56bf9020f5bc/firefox-128.11.0esr.source.tar.xz" }
+replace-upstream = true
+replace-reason = "Serve a locally-modified `firefox-128.11.0esr.source.tar.xz` with Firefox-only subtrees stripped. Mozjs128 builds only `js/src/` from this tarball. Stripped subtrees' trip the automated package-signing pipeline's deep scanner. See modify_source.sh next to this file."
