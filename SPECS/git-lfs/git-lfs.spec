@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.6.1
-Release:       2%{?dist}
+Release:       3%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,7 +61,7 @@ install -D man/man1/*.1 %{buildroot}%{_mandir}/man1
 install -D man/man5/*.5 %{buildroot}%{_mandir}/man5
 
 %check
-go test -mod=vendor ./...
+GOEXPERIMENT= CGO_ENABLED=0 go test -mod=vendor ./...
 
 %post
 git lfs install --system
@@ -77,6 +77,9 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
+* Thu May 14 2026 Sumit Jena <sumitjena@microsoft.com> - 3.6.1-3
+- Fix ptests failures.
+
 * Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 3.6.1-2
 - Patch CVE-2025-22870
 
