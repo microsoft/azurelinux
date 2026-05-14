@@ -64,8 +64,8 @@ CGO_ENABLED=0 go test -mod=vendor
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE.txt README.md
+%license LICENSE NOTICE.txt
+%doc README.md
 %{_bindir}/azcopy
 
 %changelog
