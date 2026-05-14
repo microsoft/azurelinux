@@ -18,8 +18,6 @@ azl_pkgrelease = "1"
 # 4th version component from the AZL kernel source (6.18.29.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.29-1.1.azl4.aarch64).
 kextraversion = "1"
-# CBL-Mariner branch number (used in tarball path)
-azurelinux_version = "3"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]

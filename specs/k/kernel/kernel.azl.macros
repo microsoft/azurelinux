@@ -3,5 +3,4 @@
 %_without_debug 1
 %_without_selftests 1
 %azl_pkgrelease 1
-%azurelinux_version 3
 %kextraversion 1
