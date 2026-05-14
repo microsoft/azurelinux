@@ -1,7 +1,7 @@
 Summary:        Reference implementation of the iCalendar data type and serialization format
 Name:           libical
 Version:        3.0.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -78,7 +78,9 @@ Development files needed for building things which link against %{name}-glib.
 rm %{buildroot}/%{_libexecdir}/libical/ical-glib-src-generator
 
 %check
-make test ARGS="-V"
+# Exclude tests that require full timezone data not available in chroot
+#ctest --output-on-failure -E "regression|builtin_timezones|libical-glib-array|libical-glib-component|libical-glib-timezone"
+make test ARGS="-V" -C %{_target_platform}
 
 %ldconfig_scriptlets
 
@@ -124,6 +126,10 @@ make test ARGS="-V"
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.0.10-2
+- Run %%check via `make test -C %%{_target_platform}` so the test target
+  is invoked in the out-of-tree build directory.
+
 * Wed May 13 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.0.10-1
 - Update to 3.0.10 to fix ptest failure.
 

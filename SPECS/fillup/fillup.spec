@@ -18,7 +18,7 @@
 Summary:        Tool for Merging Config Files
 Name:           fillup
 Version:        1.42
-Release:        278%{?dist}
+Release:        279%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,7 +67,7 @@ install -d %{buildroot}/%{_mandir}/man8
 install -m 644 SGML/fillup.8.gz %{buildroot}/%{_mandir}/man8
 
 %check
-make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
+make test    OPTISPLUS="%{optflags}"
 
 %files
 %defattr(-,root,root)
@@ -75,6 +75,10 @@ make %{?_smp_mflags} test    OPTISPLUS="%{optflags}"
 %{_mandir}/man8/fillup*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.42-279
+- Drop `%%{?_smp_mflags}` from `make test` in %%check; the test target is
+  not parallel-safe.
+
 * Mon Mar 07 2022 Muhammad Falak <mwani@microsoft.com> - 1.42.278
 - Introduce patch to fix ptest
 

@@ -2,7 +2,7 @@
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
 Version:        22.10.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,10 +74,10 @@ ln -s cftp %{buildroot}/%{_bindir}/cftp3
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test pip3 install --upgrade pip
-sudo -u test pip3 install 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser
+# pin packaging==23.2 to avoid uninstall conflict with system RPM
+pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
+LANG=en_US.UTF-8 tox -e nocov-posix-alldeps --sitepackages
 
 %files -n python3-twisted
 %defattr(-,root,root)
@@ -102,6 +102,11 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/cftp3
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 22.10.0-6
+- Run tox as root without sudo (sudo is not available in the build
+  chroot); pin packaging==23.2 and switch to --sitepackages so tox
+  picks up the system-installed packages.
+
 * Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-5
 - Patch for CVE-2026-42304
 

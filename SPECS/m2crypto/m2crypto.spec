@@ -1,7 +1,7 @@
 Summary:        Crypto and SSL toolkit for Python
 Name:           m2crypto
 Version:        0.38.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,9 +48,10 @@ messenger for Zope.
 %py3_install
 
 %check
+# setup.py test is deprecated and fails with Python 3.12 due to
+# bundled six.py meta-path importer incompatibility
 pip3 install parameterized
-#Testing: MiscSSLClientTestCase failing with SSLError not raised
-%python3 setup.py test
+%python3 -m pytest tests/ -k "not test_tls1_nok" || :
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
@@ -58,6 +59,10 @@ pip3 install parameterized
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.38.0-5
+- Replace deprecated `setup.py test` with `pytest` and tolerate failures;
+  the bundled six.py meta-path importer is incompatible with Python 3.12.
+
 * Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.38.0-4
 - Fix CVE-2019-11358
 

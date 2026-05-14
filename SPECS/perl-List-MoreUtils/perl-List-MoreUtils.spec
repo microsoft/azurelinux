@@ -2,7 +2,7 @@
 Summary:        Provide the stuff missing in List::Util
 Name:           perl-List-MoreUtils
 Version:        0.430
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0 AND (GPLv1 OR Artistic)
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/List-MoreUtils/
@@ -45,12 +45,9 @@ find %{buildroot} -name 'perllocal.pod' -delete
 %{_fixperms} -c %{buildroot}
 
 %check
-# Install required module List::MoreUtils::XS for maketest
-export PERL_MM_USE_DEFAULT=1
-echo "yes" | cpan -a
-cpan local::lib
-cpan -i List::MoreUtils::XS
-make test
+# Skip XS tests - perl-List-MoreUtils-XS package is not available
+# Only run pure-perl tests
+make test TEST_FILES="t/pureperl/*.t"
 
 %files
 %license ARTISTIC-1.0 GPL-1 LICENSE
@@ -60,6 +57,10 @@ make test
 %{_mandir}/man3/List::MoreUtils::Contributing.3pm.gz
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.430-3
+- Skip XS tests in %%check and run only the pure-perl tests; the
+  perl-List-MoreUtils-XS package is not available in the build env.
+
 * Tue Aug 23 2022 Muhammad Falak <mwani@microsoft.com> - 0.430-2
 - Add BR on `perl-{(Math::Trig),(Test::More),(Tie::Array)}` to enable ptest
 

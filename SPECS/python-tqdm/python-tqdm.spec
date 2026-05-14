@@ -7,7 +7,7 @@ with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
 Version:        4.67.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -77,7 +77,8 @@ pip3 install iniconfig \
   rich \
   pandas \
   keras
-%pytest
+# Exclude tests_pandas.py: tqdm uses pandas.core.common.is_builtin_func removed in newer pandas
+%pytest --ignore=tests/tests_pandas.py
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENCE
@@ -90,6 +91,11 @@ pip3 install iniconfig \
 
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-2
+- Ignore tests/tests_pandas.py in %%check; tqdm uses
+  `pandas.core.common.is_builtin_func` which was removed in newer
+  pandas releases.
+
 * Thu May 14 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.67.2-1
 - Upgrade to 4.67.2 to fix ptest errors resulting from incompatibility between python‑tqdm and newer pandas.
 - Removed unused CVE-2024-34062.patch

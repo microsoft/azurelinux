@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
 Version:        6.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -42,8 +42,10 @@ export SKIP_PIP_INSTALL=1
 ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-tox -e py%{python3_version_nodots}
+# tox 3.x + virtualenv 21.x fails to editable-install due to setuptools isolation
+# Run tests directly with stestr instead
+pip3 install stestr testscenarios testresources six
+python3 -m stestr run --suppress-attachments
 
 %files -n python3-pbr
 %defattr(-,root,root)
@@ -55,6 +57,10 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/pbr
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 6.0.0-2
+- Replace tox-based testing with a direct stestr invocation; tox 3.x +
+  virtualenv 21.x fails to editable-install due to setuptools isolation.
+
 * Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 6.0.0-1
 - Upgrade to version 6.0.0
 
