@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.138.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -83,7 +83,6 @@ Conflicts:      kernel-64k
 Conflicts:      kernel-ipe
 Conflicts:      kernel-lpg-innovate
 Conflicts:      kernel-rt
-Conflicts:      kernel-hwe
 %{?grub2_configuration_requires}
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -440,6 +439,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 14 2026 Mitch Zhu <mitchzhu@microsoft.com> - 6.6.138.1-2
+- Remove Conflicts with kernel-hwe to allow dual-boot co-installation
+
 * Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.138.1-1
 - Auto-upgrade to 6.6.138.1
 
