@@ -21283,8 +21283,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.25.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
+          "version": "1.25.2",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.2/pgbouncer-1.25.2.tar.gz"
         }
       }
     },
@@ -21303,8 +21303,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.29",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.29.tar.xz"
+          "version": "8.3.31",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.31.tar.xz"
         }
       }
     },
@@ -29966,8 +29966,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.7",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.7.tar.gz"
+          "version": "8.0.9",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.9.tar.gz"
         }
       }
     },
@@ -30006,8 +30006,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0392",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0392.tar.gz"
+          "version": "9.2.0461",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0461.tar.gz"
         }
       }
     },
