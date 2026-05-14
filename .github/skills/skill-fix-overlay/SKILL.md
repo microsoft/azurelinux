@@ -55,6 +55,33 @@ The regex doesn't match anything in the spec. Causes:
 
 The spec section (`%prep`, `%build`, `%install`, etc.) doesn't exist or has different casing. Check the actual section names in `<pre-dir>/<name>.spec`.
 
+### `spec-append-lines` / `spec-prepend-lines`: lines land on the wrong section
+
+Multi-section types like `%files`, `%description`, `%package` appear MANY times in a typical spec (one per subpackage). An unscoped `section = "%files"` append silently lands on the FIRST `%files` (often the unnamed main `%files`) — not on the section you visually wrote it "next to". Always scope by `package = "<subpackage>"` (or `package = ""` for the unnamed/main section if that's what you really want) when targeting `%files` / `%description` / `%package`.
+
+Example — the wrong way (lands on the unnamed main `%files`):
+```toml
+{ type = "spec-append-lines", section = "%files", lines = ["%if %{have_libblkio}"] }
+```
+The right way (lands at the end of `%files common`, which is the desired anchor):
+```toml
+{ type = "spec-append-lines", section = "%files", package = "common", lines = ["%if %{have_libblkio}"] }
+```
+
+### `spec-remove-subpackage` / `spec-remove-section`: orphan `%endif` / vanished macros
+
+`spec-remove-subpackage` (and `spec-remove-section` for `%description` / `%files`) walks forward from the matched directive to the *next* section directive and deletes everything in between. The engine does NOT understand `%if` / `%else` / `%endif` as structural elements. Two failure modes follow:
+
+1. **Greedy consumption of `%if` guards.** If an `%if %{have_FOO}` line sits between the removed section and the next subpackage's directive (a common Fedora pattern where the next subpackage is gated on a bcond), that `%if` is swallowed too. The matching `%endif` further down is left orphaned and `rpmspec -P` fails with `%endif with no %if`.
+
+   Fix: re-append the `%if %{have_FOO}` line via `spec-append-lines` against the now-trailing section. Use `package = "..."` to anchor the append at the right `%description` / `%files` block (see the previous failure mode).
+
+2. **`%define` / `%global` inside the removed body vanishes.** If a macro is `%define`d inside the removed `%package` body but referenced from `%install` or `%build`, the reference becomes undefined after the removal. Hoist an equivalent declaration to the top of the spec via `spec-search-replace` (anchor on an existing `%global ...` line you can find).
+
+3. **Stray buildroot files.** If `%install` writes files that the removed `%files <subpackage>` used to claim, RPM fails with "Installed (but unpackaged) file(s)". Either edit `%install` to gate the writes (`spec-search-replace`) or append `rm -rf` / `rm -f` lines to `%install` (`spec-append-lines`) that delete the orphaned files from `%{buildroot}`.
+
+See `microsoft/azurelinux#17212` for a worked example that combines all three.
+
 ### `file-*`: file not found
 
 The file doesn't exist in the upstream sources. Check `ls <pre-dir>/` for actual filenames. Globs (`**/*`) are supported for `file-search-replace`.

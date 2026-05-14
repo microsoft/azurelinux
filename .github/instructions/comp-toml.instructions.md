@@ -148,6 +148,75 @@ Optional fields that apply to multiple types: `section` (target spec section), `
 - **Dedicated** (`<name>/<name>.comp.toml`): when overlays, build config, or local spec are needed
 - Rule of thumb: if it's more than `[components.<name>]`, give it a dedicated file
 - `components.toml` has `includes = ["**/*.comp.toml"]` — dedicated files are picked up automatically
+- **When moving a component out of inline `components.toml` into a dedicated `<name>.comp.toml` file, DELETE the inline entry.** Don't leave a "moved to X" pointer comment. Discovery is automatic via the `**/*.comp.toml` include glob.
+- **When removing a component outright, DELETE the inline entry.** No tombstone comments.
+
+## `replace-upstream` Source Override
+
+When a component must serve a **locally-modified** Source0 (or any other source) under the **same filename** as the upstream sources manifest declares, use a `[[components.<name>.source-files]]` block with `replace-upstream = true`. This swaps the same-named entry in the Fedora `sources` manifest **in place** during render — there is **no** separate `file-remove` overlay needed against the `sources` file, and no need to invent a new filename.
+
+```toml
+[[components.examplepkg.source-files]]
+filename = "examplepkg-1.2.3.tar.xz"
+hash = "<sha512 of LOCALLY-MODIFIED tarball>"
+hash-type = "SHA512"
+replace-upstream = true
+replace-reason = "Upstream tarball ships a vendored copy of a third-party library plus a 'tests/network' tree that trip an automated package-signing pipeline's deep scanner. Repacked under the same filename with those subtrees stripped via base/comps/examplepkg/modify_source.sh; the surviving bits are byte-identical to upstream so the build is unaffected."
+
+[components.examplepkg.source-files.origin]
+uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/examplepkg/examplepkg-1.2.3.tar.xz/sha512/<same-sha512-as-hash-field>/examplepkg-1.2.3.tar.xz"
+```
+
+### Required field semantics
+
+| Field | Notes |
+|-------|-------|
+| `filename` | Must match the upstream Source0/N filename exactly. That's how the override is keyed. |
+| `hash` | SHA-512 of the **locally-modified** tarball. Lowercase hex. |
+| `hash-type` | `"SHA512"`. |
+| `replace-upstream` | `true`. Tells render to swap the same-named entry in the upstream manifest instead of appending a new one. |
+| `replace-reason` | Single TOML string (basic or literal, not triple-quoted/multi-line). Must self-contain the full WHY so no TOML comment is needed in addition. See "`replace-reason` style" below. |
+| `origin.uri` | Lookaside URL. The `$hash` path segment MUST be the **same SHA-512** as the `hash` field. |
+
+### Lookaside URL pattern
+
+```
+https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/$pkg/$filename/$hashtype/$hash/$filename
+```
+
+- `$pkg` = component name (e.g., `examplepkg`)
+- `$filename` = upstream Source0 filename (appears twice)
+- `$hashtype` = `sha512` (lowercase in the URL even though the TOML field is `"SHA512"`)
+- `$hash` = same SHA-512 as `hash`. If they ever diverge, the upload at one URL won't be findable from the other.
+
+### `replace-reason` style
+
+- A **single-line TOML string** (basic `"..."` or literal `'...'`). No triple-quoted / multi-line strings.
+- Self-contained: must include *what* was changed and *why* clearly enough that no separate TOML comment is needed.
+- Use **neutral, public-safe wording** for the motivation. Phrases like "automated package-signing pipeline", "FS-aware deep scanner", "automated malware scan" are fine. Do **not** name specific internal Microsoft scanners, pipelines, CLIs, tenants, or wrappers. Describe the *shape* of the bad content (what subtrees / what scanner class flagged it), not the brand of the tool.
+- One short banner-style line at the very top of the `*.comp.toml` summarizing the override is fine. **Multi-paragraph header comments are not** — keep the explanation inside `replace-reason`.
+
+### What render emits
+
+Render emits an audit `WARN`-level log entry naming the override and the from/to SHA-512 pair. That is **expected and desired** — it makes overrides discoverable in render output.
+
+### How the modified tarball is produced
+
+Use a `modify_source.sh` script alongside the `*.comp.toml`. The script MUST be byte-deterministic (same input → same hash, across machines and re-runs), or the lookaside URL and the `hash` field will drift on every re-pack. The canonical pattern is documented in [`skill-modify-source`](../skills/skill-modify-source/SKILL.md).
+
+## Public-content hygiene
+
+In committed content — `*.comp.toml` files (overlay `description`, `replace-reason`, etc.), local `*.spec` files, `modify_source.sh` scripts, commit messages, PR descriptions — describe motivations **technically and neutrally**. Do not name specific Microsoft-internal infrastructure (signing services, scanner brand names, internal pipeline names, internal CLI wrappers, internal Azure tenants, etc.) by name.
+
+Use neutral phrasing instead:
+
+| Avoid | Prefer |
+|-------|--------|
+| Brand name of an internal signing service | "automated package-signing pipeline" |
+| Brand name of an internal malware scanner | "FS-aware deep scanner", "automated malware scan" |
+| Names of internal CI/CD pipelines or wrappers | "the build pipeline", or just `azldev` for tool references |
+
+The technical *what* (the shape of the content that's being changed, the class of scanner that flagged it, the nature of the false positive) belongs in the description. The internal *brand* does not.
 
 ## Build Configuration
 
@@ -164,6 +233,21 @@ with = ["feature_x"]
 [components.dnf5.build]
 without = ["plugin_rhsm"]
 ```
+
+### Build-flag overrides: don't duplicate distro-level disablement
+
+Several build flags are applied across many components via shared **disablement groups** rather than per-component `[components.<name>.build]` blocks. Before adding a `build.without` / `build.with` / `build.defines` override to a `*.comp.toml`, check whether the same flag is already applied at one of these layers — duplicating it in the per-component file is redundant and creates two sources of truth that can drift.
+
+Check these layers, in order:
+
+1. **`base/comps/component-mingw-disablement.toml`** — applies `build.without = ["mingw"]` to every component listed under `[component-groups.mingw-disabled]` via the group's `default-component-config.build` block. Azure Linux does not ship mingw cross-compilation toolchains; any component whose upstream spec has a `mingw` bcond should be added to that list, **not** carry its own `without = ["mingw"]`.
+2. **`base/comps/component-check-disablement.toml`** — applies `build.check = { skip = true, ... }` to components listed under `[component-groups.check-skip-initial-failures]` (initial-bringup `%check` failures). Don't duplicate the check skip in a per-component file.
+3. **Any other `component-*-disablement.toml`** under `base/comps/` — the pattern is `[component-groups.<group-name>.default-component-config.build]`.
+4. **`distro/azurelinux.distro.toml`** — `[distros.azurelinux.versions.'<ver>'.default-component-config]` blocks set distro-wide defaults that every component inherits unless explicitly overridden.
+
+If the desired build flag is already applied at any of those layers, **do not duplicate it in the per-component file**. If you're moving a component from an inline entry in `components.toml` into a dedicated `<name>.comp.toml` and the original inline entry had no `build` block, the dedicated file should also not have one — let the group / distro defaults apply.
+
+Conversely, only add a per-component `[components.<name>.build]` block when the flag genuinely diverges from what the disablement groups and distro defaults already provide (e.g., a `with` that isn't shared by other components, a `defines` specific to this package).
 
 ## Release Configuration
 
@@ -243,40 +327,59 @@ skip-file-filter = true
 
 `skip-file-filter` disables post-render file filtering. During rendering, `azldev` normally prunes source/patch files not referenced by the rendered spec. If a spec uses unexpandable macros in `Source` or `Patch` tags (e.g., `Source0: %{name}-%{version}%{?prerelease}.tar.gz`), the filter can't resolve the filename and may incorrectly remove needed files. Setting `skip-file-filter = true` keeps all files. The tool auto-detects unexpandable macros and handles them correctly in the vast majority of cases - this is an edge case escape hatch that should almost never be needed in practice.
 
-## Adding Description Comments
+## Descriptions over comments
 
-When adding or modifying fields in a `.comp.toml` file, check the schema (`external/schemas/azldev.schema.json`) for a `description` on that field. If the schema field **does not** have a `description` key (or equivalent, i.e. `skip_reason` for check skip), add a TOML comment above the field explaining what it does and why it's set to that value. This helps future readers (human and agent) understand fields that aren't self-documenting via the schema.
+Several `.comp.toml` fields carry a free-form rationale string per the schema (`external/schemas/azldev.schema.json`): overlays take `description`, `replace-upstream` takes `replace-reason`, check skips take `skip_reason`, and so on. **Prefer those structured fields over TOML comments** — they're schema-validated, greppable, and surfaced in render diagnostics.
 
-**BUT**... don't add pointless noise - if the change is self-explanatory and requires no additional context, a comment may not be necessary. Use your judgement, but when in doubt, add a comment.
+**Keep every rationale brief.** State *why* the change is needed in one short line. Do not narrate the implementation — the field body shows the *what*, the description supplies the *why*. A reviewer should be able to skim the description list and form a high-level picture of the divergence without reading code.
 
 DO:
 
 ```toml
-# Pin to Fedora rawhide since we need feature 'x' that is not in stable releases yet.
-# Re-align to a stable release once the feature is backported or a new release is available.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+[[components.mypackage.overlays]]
+type = "spec-remove-subpackage"
+description = "Drop -doc subpackage; conflicts with system docs."
+name = "doc"
 ```
-
-Offers important context about *why* the component is pinned to rawhide, which is not obvious from the TOML field alone. Future readers will understand the rationale and know to check for backports or new releases to remove the rawhide pin.
 
 DO NOT:
 
 ```toml
-# Need new stuff.
+[[components.mypackage.overlays]]
+type = "spec-remove-subpackage"
+description = "Remove the -doc subpackage using spec-remove-subpackage, which deletes the matching %package, %description and %files blocks; this is needed because the docs conflict with the system-wide ones."
+name = "doc"
+```
+
+### When TOML comments are appropriate
+
+Avoid TOML comments by default. They aren't schema-validated, aren't surfaced anywhere except in the raw file, and drift over time. Reach for them only when no schema field can carry the rationale — e.g., justifying a non-default `upstream-distro` pin, or attaching a URL to a one-off block. Keep them as brief as a description: one short line, plus an optional URL.
+
+DO:
+
+```toml
+# Pinned to rawhide — needs feature X (not yet in stable).
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
 ```
 
-This offers no real information beyond what the TOML field already says, and doesn't explain *why* the new stuff is needed, or what that new stuff is. It's just noise.
+DO NOT:
+
+```toml
+# This component depends on feature X from upstream which was added in rawhide
+# but has not yet been backported to a stable Fedora release. Once the feature
+# is available in a stable release (Fedora 42 or later expected), we should
+# re-align this pin.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+```
 
 ### References
 
-When making changes based on external information (e.g. a bug report, an upstream commit, a changelog entry, etc.), include a link to the relevant source in a comment (prefer full URL for ease of use). This provides valuable context for future readers to understand the reasoning behind the change and investigate further if needed. It also makes it easier to determine if the change is still relevant or if there have been updates since.
+When a change is driven by an external source (upstream bug, commit, changelog entry), include the URL — inside the `description` if it fits, otherwise as a single-line comment above the field. Prefer full URLs for clickability.
 
 ```toml
-# ...
 # Fixed upstream in my-package-1.2.3 (rawhide): https://src.fedoraproject.org/rpms/my-package/c/abcdef123456 (rhbz#1234567)
 [[components.mypackage.overlays]]
-description = "Fix build failure due to missing dependency that was added in my-package-1.2.3"
+description = "Fix build failure from missing dep added in my-package-1.2.3."
 ...
 ```
 
