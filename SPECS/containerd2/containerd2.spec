@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.1.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -22,6 +22,7 @@ Patch2:	fix-credential-leak-in-cri-errors.patch
 Patch3: CVE-2026-35469.patch
 Patch4: CVE-2026-34986.patch
 Patch5:	CVE-2026-39882.patch
+Patch6:	CVE-2026-33814.patch
 
 %{?systemd_requires}
 
@@ -98,6 +99,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
+- Patch for CVE-2026-33814
+
 * Mon Apr 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
 - Patch for CVE-2026-39882
 
@@ -119,7 +123,7 @@ fi
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-18
 - Patch for CVE-2025-58190, CVE-2025-47911
 
-* Tue Jan 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
+* Wed Jan 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.0.0-17
 - Backport fix for credential leak in CRI error logs
 
 * Mon Nov 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.0-16
