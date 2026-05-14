@@ -72,7 +72,8 @@ git lfs uninstall
 
 %files
 %defattr(-,root,root,-)
-%doc LICENSE.md README.md
+%license LICENSE.md
+%doc README.md
 %{_bindir}/git-lfs
 %{_mandir}/man1/*
 %{_mandir}/man5/*
