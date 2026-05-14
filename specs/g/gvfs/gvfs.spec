@@ -25,7 +25,7 @@
 
 Name:    gvfs
 Version: 1.58.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Backends for the gio framework in GLib
 
 License: LGPL-2.0-or-later AND GPL-3.0-only AND MPL-2.0 AND BSD-3-Clause-Sun
@@ -51,7 +51,6 @@ BuildRequires: pkgconfig(libsecret-1)
 BuildRequires: gettext-devel
 BuildRequires: pkgconfig(udisks2) >= %{udisks2_version}
 %if ! 0%{?rhel}
-BuildRequires: pkgconfig(libbluray)
 %endif
 BuildRequires: systemd-devel >= %{systemd_version}
 BuildRequires: pkgconfig(libxslt)
@@ -222,6 +221,7 @@ file services.
 %build
 %meson \
        -Dman=true \
+       -Dbluray=false \
 %ifarch s390 s390x
        -Dafc=false \
        -Dgphoto2=false \

@@ -1,0 +1,16 @@
+[components.gvfs]
+
+# AZL does not ship libbluray — Blu-Ray playback support is dropped from gvfs.
+
+[[components.gvfs.overlays]]
+description = "Drop BuildRequires: pkgconfig(libbluray) (libbluray not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libbluray)"
+
+[[components.gvfs.overlays]]
+description = "Pass -Dbluray=false to meson unconditionally (libbluray not available in AZL)"
+type = "spec-search-replace"
+section = "%build"
+regex = '-Dman=true \\'
+replacement = "-Dman=true \\\n       -Dbluray=false \\"
