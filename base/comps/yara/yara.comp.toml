@@ -1,0 +1,9 @@
+[components.yara]
+
+[[components.yara.source-files]]
+filename = "yara-4.5.4.tar.gz"
+hash = "efa88fec095d587164bafe30f143aa3f148aad57d41c257c96aa2fdc9ec8818b5ec510d89fe6166efd9f212f57304e08e62f045e51ebc996076c7f58a3e2c1b1"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/yara/yara-4.5.4.tar.gz/sha512/efa88fec095d587164bafe30f143aa3f148aad57d41c257c96aa2fdc9ec8818b5ec510d89fe6166efd9f212f57304e08e62f045e51ebc996076c7f58a3e2c1b1/yara-4.5.4.tar.gz" }
+replace-upstream = true
+replace-reason = "The upstream `yara-4.5.4.tar.gz` tarball ships deliberately obfuscated .NET binaries used as an input for YARA's own .NET parser fuzzer. The file is benign by intent, but it matches generic .NET-obfuscator detection heuristics by design and is rejected by the our automated malware scans."
