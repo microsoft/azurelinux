@@ -8,28 +8,31 @@ spec = { type = "upstream" }
 # Release: %{specrelease}
 release = { calculation = "manual" }
 
-# Version updates: Fedora -> Azure Linux 6.18.5.1
-# Uses 3-part version (6.18.5) + kextraversion (1) scheme matching kernel.
-[components.kernel-headers.build]
-defines = { "azurelinux_version" = "3", "kextraversion" = "1" }
+# Version updates: Fedora -> Azure Linux 6.18.29.1
+# Uses 3-part version (6.18.29) + kextraversion (1) scheme matching kernel.
+[components.kernel-headers.build.defines]
+# RPM release number for the Azure Linux kernel-headers package
+azl_pkgrelease = "1"
+# 4th version component from the AZL kernel source (6.18.29.1).
+kextraversion = "1"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 description = "Set specversion to 3-part version matching kernel's specrpmversion"
 regex = "%define specversion .+"
-replacement = "%define specversion 6.18.5"
+replacement = "%define specversion 6.18.29"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
 description = "Set tarfile_release to 3-part version (tarball name uses specversion.kextraversion)"
 regex = "%define tarfile_release .+"
-replacement = "%define tarfile_release 6.18.5"
+replacement = "%define tarfile_release 6.18.29"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
-description = "Set specrelease so kextraversion (4th version component) flows into Release, matching kernel convention"
+description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component and package release are explicit"
 regex = "%define specrelease .+"
-replacement = "%define specrelease %{kextraversion}.2%{?dist}"
+replacement = "%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?dist}"
 
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 [[components.kernel-headers.overlays]]
@@ -59,20 +62,22 @@ value = "rsync"
 # Source: use full Azure Linux kernel tarball instead of pre-built headers.
 [[components.kernel-headers.overlays]]
 type = "spec-update-tag"
+description = "Use the Azure Linux 6.18.29.1 kernel source tarball instead of Fedora's pre-built headers tarball"
 tag = "Source0"
-value = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-%{azurelinux_version}/%{specversion}.%{kextraversion}.tar.gz#/kernel-%{specversion}.%{kextraversion}.tar.gz"
+value = "kernel-%{specversion}.%{kextraversion}.tar.gz"
 
 [[components.kernel-headers.source-files]]
-filename = "kernel-6.18.5.1.tar.gz"
-hash = "0d8c755e02857704eb4c4396657ad30b22b474296233b8681365aeaa2fc16926afe31f551e80f565e0d73318f2b7941051ec44f85ccbabaa28ba5a56022f9f4a"
+filename = "kernel-6.18.29.1.tar.gz"
+hash = "9c71dec3ea3897107c176c89014134ab31aba0c3a669af549993e1134cf2896c7d6f6b751bbef5dbd260da514a7b8a2b1ad89067b748efc90cf6096e43e5b246"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.18.5.1.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.29.1.tar.gz" }
 
 # Prep: extract Azure Linux tarball.
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
+description = "Extract the Azure Linux 6.18.29.1 kernel source archive layout"
 regex = "%setup -q -c"
-replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-%{azurelinux_version}-%{specversion}.%{kextraversion}"
+replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specversion}.%{kextraversion}"
 
 # Build: generate native + cross headers from Azure Linux kernel source.
 # Uses make headers_install which produces properly sanitized userspace headers.
