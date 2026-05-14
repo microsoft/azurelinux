@@ -81,7 +81,7 @@ xz-libs-5.4.4-3.azl3.x86_64.rpm
 zstd-1.5.5-2.azl3.x86_64.rpm
 zstd-devel-1.5.5-2.azl3.x86_64.rpm
 zstd-libs-1.5.5-2.azl3.x86_64.rpm
-libtool-2.4.7-1.azl3.x86_64.rpm
+libtool-2.4.7-2.azl3.x86_64.rpm
 flex-2.6.4-7.azl3.x86_64.rpm
 flex-devel-2.6.4-7.azl3.x86_64.rpm
 bison-3.8.2-1.azl3.x86_64.rpm
@@ -177,7 +177,7 @@ openssl-perl-3.3.7-3.azl3.x86_64.rpm
 openssl-static-3.3.7-3.azl3.x86_64.rpm
 libcap-2.69-15.azl3.x86_64.rpm
 libcap-devel-2.69-15.azl3.x86_64.rpm
-debugedit-5.0-2.azl3.x86_64.rpm
+debugedit-5.0-3.azl3.x86_64.rpm
 libarchive-3.7.7-7.azl3.x86_64.rpm
 libarchive-devel-3.7.7-7.azl3.x86_64.rpm
 rpm-4.18.2-1.azl3.x86_64.rpm
@@ -209,8 +209,8 @@ docbook-dtd-xml-4.5-11.azl3.noarch.rpm
 docbook-style-xsl-1.79.1-14.azl3.noarch.rpm
 libsepol-3.6-2.azl3.x86_64.rpm
 glib-2.78.6-10.azl3.x86_64.rpm
-libltdl-2.4.7-1.azl3.x86_64.rpm
-libltdl-devel-2.4.7-1.azl3.x86_64.rpm
+libltdl-2.4.7-2.azl3.x86_64.rpm
+libltdl-devel-2.4.7-2.azl3.x86_64.rpm
 lua-5.4.6-1.azl3.x86_64.rpm
 lua-libs-5.4.6-1.azl3.x86_64.rpm
 azurelinux-rpm-macros-3.0-7.azl3.noarch.rpm

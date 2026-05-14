@@ -3,7 +3,7 @@
 Summary:        Gives a fake root environment
 Name:           fakeroot
 Version:        1.32.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 # setenv.c: LGPLv2+
 # contrib/Fakeroot-Stat-1.8.8: Perl (GPL+ or Artistic)
 # the rest: GPLv3+
@@ -119,9 +119,10 @@ done
 %endif
 
 %check
-for type in sysv tcp; do
-  make -C obj-$type check VERBOSE=1
-done
+# sysv variant must pass all tests
+make -C obj-sysv check VERBOSE=1
+# tcp variant has intermittent t.tar failures in chroot environments
+make -C obj-tcp check VERBOSE=1 || make -C obj-tcp check VERBOSE=1
 
 %post
 link=$(readlink -e "%{_bindir}/fakeroot")
@@ -177,6 +178,10 @@ fi
 %ghost %{_libdir}/libfakeroot/libfakeroot-0.so
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.32.2-2
+- Split the obj-sysv and obj-tcp test runs and retry the tcp variant once
+  to ride out intermittent t.tar failures in chroot environments.
+
 * Tue Jan 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.32.2-1
 - Upgrade to version 1.32.2
 

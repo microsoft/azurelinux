@@ -2,7 +2,7 @@
 Summary:        A utility library for mocking out the requests Python library.
 Name:           python-%{srcname}
 Version:        0.23.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,7 +44,8 @@ sed -i 's/^include test_responses\.py test_matchers\.py test_registries\.py$/rec
 %py3_install
 
 %check
-pip3 install tox
+# pin packaging==23.2 to avoid uninstall conflict with system RPM
+pip3 install packaging==23.2 tox
 tox -e py%{python3_version_nodots} --sitepackages
 
 %files -n python3-%{srcname}
@@ -54,6 +55,10 @@ tox -e py%{python3_version_nodots} --sitepackages
 %{python3_sitelib}/%{srcname}
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.23.3-2
+- Pin packaging==23.2 in %%check to avoid uninstall conflict with the
+  system RPM-managed packaging.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.23.3-1
 - Auto-upgrade to 0.23.3 - Azure Linux 3.0 - package upgrades
 
