@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.28
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,7 @@ Source1:        etcd.service
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2026-29181.patch
+Patch1:         CVE-2026-33814.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -72,6 +73,7 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+%patch 1 -p1
     patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
     go build \
         -o %{ETCD_OUT_DIR} \
@@ -147,6 +149,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.5.28-3
+- Patch for CVE-2026-33814
+
 * Mon May 04 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.5.28-2
 - Patch for CVE-2026-29181
 
