@@ -51,13 +51,15 @@ tar --no-same-owner -xf %{SOURCE1}
 
 %build
 export GOPATH=%{our_gopath}
-GOEXPERIMENT= CGO_ENABLED=0 go build -buildmode=pie -mod=vendor
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
+CGO_ENABLED=0 go build -buildmode=pie -mod=vendor
 
 %install
 install -D -m 0755 ./azure-storage-azcopy %{buildroot}%{_bindir}/azcopy
 
 %check
-GOEXPERIMENT= CGO_ENABLED=0 go test -mod=vendor
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
+CGO_ENABLED=0 go test -mod=vendor
 ./azure-storage-azcopy --version
 
 %files
