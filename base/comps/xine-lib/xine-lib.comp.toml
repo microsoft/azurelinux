@@ -1,3 +1,0 @@
-[components.xine-lib]
-# Release: 25%{?snapshot:.%{date}hg%{revision}}%{?dist}
-release = { calculation = "manual" }
