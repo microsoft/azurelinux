@@ -3,3 +3,4 @@
 %_without_dc1394 1
 %_without_extras 1
 %_without_onnx 1
+%_without_openh264 1

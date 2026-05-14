@@ -8,8 +8,11 @@
 # -zbar subpackages. The dc1394 and onnx plugins are built independently
 # (their bconds default ON on Fedora) but only packaged inside %files
 # extras, so we must disable them too to avoid "unpackaged file" failures.
+# AZL does not ship openh264. Set openh264 bcond off to prevent building
+# gstreamer1-plugin-openh264 subpackage.
+
 [components.gstreamer1-plugins-bad-free]
-build.without = ["extras", "dc1394", "onnx"]
+build.without = ["extras", "dc1394", "onnx", "openh264"]
 
 # AZL does not ship opus — disable the opus parse plugin and remove its BR.
 
