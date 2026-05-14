@@ -6,15 +6,15 @@ Instantly make your loops show a smart progress meter - just wrap any iterable\
 with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
-Version:        4.66.2
-Release:        2%{?dist}
+Version:        4.67.2
+Release:        1%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/tqdm/tqdm
 Source0:        %{pypi_source}
 BuildArch:      noarch
-Patch0:         CVE-2024-34062.patch
+
 %description %{_description}
 
 %package -n python3-%{srcname}
@@ -90,6 +90,10 @@ pip3 install iniconfig \
 
 
 %changelog
+* Thu May 14 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.67.2-1
+- Upgrade to 4.67.2 to fix ptest errors resulting from incompatibility between python‑tqdm and newer pandas.
+- This version also includes the fix for CVE-2024-34062.
+
 * Fri Feb 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.66.2-2
 - Patch CVE-2024-34062
 
