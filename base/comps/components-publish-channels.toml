@@ -733,7 +733,6 @@ components = [
     "koji-containerbuild",
     "koji-image-builder",
     "koji-osbuild",
-    "koji-tool",
     "krb5",
     "kronosnet",
     "ksc",
