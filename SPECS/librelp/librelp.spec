@@ -1,7 +1,7 @@
 Summary:        RELP Library
 Name:           librelp
 Version:        1.11.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,7 @@ The package contains libraries and header files for
 developing applications that use librelp.
 
 %prep
-%autosetup
+%autosetup -p1
 autoreconf -fiv
 
 %build
@@ -45,6 +45,7 @@ autoreconf -fiv
 find %{buildroot} -type f -name "*.la" -delete -print
 
 %check
+touch tests/known_issues.supp
 %make_build check
 
 %ldconfig_scriptlets
@@ -61,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/relp.pc
 
 %changelog
+* Tue May 12 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.11.0-2
+- Added `tests/known_issues.supp` required for few tests.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.0-1
 - Auto-upgrade to 1.11.0 - Azure Linux 3.0 - package upgrades
 
@@ -82,7 +86,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 - Merge the following releases from 1.0 to dev branch
 - anphel@microsoft.com, 1.2.17-7: Fix check tests.
 
-* Mon Sep 05 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.2.17-7
+* Mon Sep 07 2020 Emre Girgin <mrgirgin@microsoft.com> - 1.2.17-7
 - Remove the Valgrind workaround in the check section.
 
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.2.17-6
