@@ -1,0 +1,17 @@
+# AZL does not ship faad2 (AAC requires CELA review). Remove the faad2
+# BuildRequires and the lqt_faad2.so plugin from %files. The autotools
+# build system auto-detects that faad2 is absent and skips the AAC plugin.
+[components.libquicktime]
+
+[[components.libquicktime.overlays]]
+description = "Remove faad2-devel BuildRequires (AAC requires CELA review)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "faad2-devel"
+
+[[components.libquicktime.overlays]]
+description = "Remove lqt_faad2.so from %files (no longer built without faad2)"
+type = "spec-search-replace"
+section = "%files"
+regex = '%\{_libdir\}/%\{name\}/lqt_faad2\.so'
+replacement = ''
