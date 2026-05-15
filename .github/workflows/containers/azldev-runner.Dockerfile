@@ -35,12 +35,14 @@ RUN tdnf -y install \
     symcrypt-openssl \
     && tdnf clean all
 
-# TODO: pin to a tagged release once azure-linux-dev-tools cuts one.
-# `@main` is a moving target — fine while azldev is pre-1.0 and we want
-# CI to track upstream, but we should swap to `@vX.Y.Z` (and bump it
-# deliberately) once the tool stabilizes. ADO #18834
-RUN GOBIN=/usr/local/bin go install \
-    github.com/microsoft/azure-linux-dev-tools/cmd/azldev@main \
+# The version is passed in as a build arg from .azldev-version in the repo
+# root.  Callers (check-rendered-specs.yml, etc.) read the file and pass it
+# via --build-arg so the Dockerfile never needs repo-root build context.
+# No default — omitting --build-arg will fail the build loudly.
+ARG AZLDEV_VERSION
+RUN test -n "${AZLDEV_VERSION}" || { echo "ERROR: AZLDEV_VERSION build-arg is required (read from .azldev-version)" >&2; exit 1; } \
+    && GOBIN=/usr/local/bin go install \
+    "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}" \
     && rm -rf /root/go /root/.cache
 
 ARG UID=1000

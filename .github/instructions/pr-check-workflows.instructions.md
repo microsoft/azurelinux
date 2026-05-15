@@ -31,7 +31,7 @@ If the check builds, renders, or runs PR code, do the whole thing inside the bui
 
 The shared runner image is [`.github/workflows/containers/azldev-runner.Dockerfile`](../workflows/containers/azldev-runner.Dockerfile). It's a minimal Azure Linux base with `mock`, `git`, `python3`, `sudo`, and `azldev` itself (installed to `/usr/local/bin` during image build) — enough to run any `azldev` subcommand. Reuse it rather than building a per-check image; add extras via a derived `FROM localhost/azldev-runner` stage if a check genuinely needs more.
 
-`azldev` is baked in via `go install …/azldev@main` during image build. The pin lives in the Dockerfile so it can be reviewed and bumped deliberately. Image build context is `.github/workflows/containers/` only — keep it that way so the build can never see PR-controlled files.
+`azldev` is baked in via `go install` during image build. The version is pinned in `.azldev-version` at the repo root and passed to the Dockerfile as `--build-arg AZLDEV_VERSION=…`. All CI workflows (GH Actions, ADO, Dockerfile) read from the same file. Image build context is `.github/workflows/containers/` only — keep it that way so the build can never see PR-controlled files.
 
 Build it with the caller's UID so bind-mounted writes don't end up root-owned:
 
@@ -40,6 +40,7 @@ Build it with the caller's UID so bind-mounted writes don't end up root-owned:
   run: |
     docker build \
       --build-arg UID=$(id -u) \
+      --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
       -t localhost/azldev-runner \
       -f .github/workflows/containers/azldev-runner.Dockerfile \
       .github/workflows/containers/

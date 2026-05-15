@@ -7,7 +7,7 @@
 The [`azldev`](https://github.com/microsoft/azure-linux-dev-tools) CLI tool drives all component, image, and build workflows. Install it from source (requires Go):
 
 ```bash
-go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@main
+go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
 ```
 
 > **Note:** azldev is still in active development, using the latest commit from the `main` branch is recommended for the most up-to-date features and fixes.

@@ -101,8 +101,9 @@ stages:
               echo "##[endgroup]"
 
               echo "##[group]Azldev"
-              echo "Installing azldev@${AZLDEV_COMMIT}..."
-              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_COMMIT}"
+              AZLDEV_VERSION=$(cat .azldev-version)
+              echo "Installing azldev@${AZLDEV_VERSION}..."
+              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
 
               go_bin_path="$(go env GOPATH)/bin"
               echo "##vso[task.prependpath]$go_bin_path"
@@ -114,8 +115,6 @@ stages:
               pip install -r .github/workflows/scripts/control-tower/requirements.txt
               echo "##[endgroup]"
             displayName: "Install dependencies"
-            env:
-              AZLDEV_COMMIT: $(AzldevCommit)
 
           # Verify lock files are current. --check-only validates without
           # writing, exits nonzero if any lock would change.

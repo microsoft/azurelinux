@@ -77,6 +77,7 @@ jobs:
         run: |
           docker build \
             --build-arg UID=$(id -u) \
+            --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
             -t localhost/azldev-runner \
             -f .github/workflows/containers/azldev-runner.Dockerfile \
             .github/workflows/containers/
@@ -238,6 +239,7 @@ jobs:
         run: |
           docker build \
             --build-arg UID=$(id -u) \
+            --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
             -t localhost/azldev-runner \
             -f .github/workflows/containers/azldev-runner.Dockerfile \
             .github/workflows/containers/
