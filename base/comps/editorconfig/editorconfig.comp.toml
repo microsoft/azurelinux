@@ -1,0 +1,2 @@
+[components.editorconfig]
+spec = { type = "upstream", upstream-commit = "3ab0f2a201fc46bbaf06b0dd469f09d5e9c6b7c5" }

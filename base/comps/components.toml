@@ -379,7 +379,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.ecj]
 [components.ed]
 [components.ed25519-java]
-[components.editorconfig]
 [components.efi-rpm-macros]
 [components.efibootmgr]
 [components.efitools]
