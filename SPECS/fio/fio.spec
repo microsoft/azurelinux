@@ -1,13 +1,14 @@
 Summary:        Multithreaded IO generation tool
 Name:           fio
 Version:        3.37
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://git.kernel.dk/?p=fio.git;a=summary
 Source0:        https://github.com/axboe/%{name}/archive/refs/tags/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-10823.patch
+Patch1:         CVE-2026-30656.patch
 
 %bcond_without nbd
 %bcond_with rbd
@@ -221,6 +222,9 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 %endif
 
 %changelog
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.37-4
+- Patch for CVE-2026-30656
+
 * Wed Sep 24 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.37-3
 - Patch for CVE-2025-10823
 
@@ -231,7 +235,7 @@ EXTFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS" %make_build
 * Wed Apr 17 2024 Muhammad Falak <mwani@microsoft.com> - 3.37-1
 - Bump version to 3.37
 
-* Mon Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
+* Sat Mar 11 2023 Andrew Phelps <anphel@microsoft.com> - 3.30-3
 - Remove engine-pmemblk subpackage and BR on libpmemblk-devel
 
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 3.30-2
