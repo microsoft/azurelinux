@@ -16,7 +16,7 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.12
+%global general_version %{pybasever}.13
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
@@ -270,7 +270,6 @@ BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: python-rpm-macros
 BuildRequires: readline-devel
@@ -283,6 +282,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 # Perf support is only available on x86_64 and aarch64 right now
 %ifarch x86_64 aarch64
@@ -417,36 +420,6 @@ Patch462: 00462-fix-pyssl_seterror-handling-ssl_error_syscall.patch
 # hardware protections can be enabled without losing Perf unwinding.
 Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
 
-# 00471 # 37c05f26d11e8e24f2a760167015a267996b1d69
-# CVE-2025-12084
-#
-# * gh-142145: Remove quadratic behavior in node ID cache clearing (GH-142146)
-# * gh-142754: Ensure that Element & Attr instances have the ownerDocument attribute (GH-142794)
-Patch471: 00471-cve-2025-12084.patch
-
-# 00472 # 2ba215eaba508b2cdd7c3acfdf3b9a6e32872274
-# CVE-2025-13836
-#
-# [3.12] gh-119451: Fix a potential denial of service in http.client (GH-119454) (#142140)
-#
-# gh-119451: Fix a potential denial of service in http.client (GH-119454)
-#
-# Reading the whole body of the HTTP response could cause OOM if
-# the Content-Length value is too large even if the server does not send
-# a large amount of data. Now the HTTP client reads large data by chunks,
-# therefore the amount of consumed memory is proportional to the amount
-# of sent data.
-Patch472: 00472-cve-2025-13836.patch
-
-# 00473 # dd705786aa0c1ccfde913858598e34e1f196be2e
-# CVE-2026-0865
-#
-#  gh-143916: Reject control characters in wsgiref.headers.Headers  (GH-143917)
-#
-# * Add 'test.support' fixture for C0 control characters
-# * gh-143916: Reject control characters in wsgiref.headers.Headers
-Patch473: 00473-cve-2026-0865.patch
-
 # 00474 # 837ddca0372fa87ff9cee47142200caa21e77def
 # CVE-2025-15366
 #
@@ -462,6 +435,48 @@ Patch474: 00474-cve-2025-15366.patch
 #
 # (cherry-picked from commit b234a2b67539f787e191d2ef19a7cbdce32874e7)
 Patch475: 00475-cve-2025-15367.patch
+
+# 00478 # eb93352dc8e31f4d52546b84daad875e6ff7f29e
+# CVE-2026-4519
+#
+# Reject leading dashes in webbrowser URLs (GH-146360)
+Patch478: 00478-cve-2026-4519.patch
+
+# 00479 # 97404b2cf62e545c2d41be7ccfed4e74da9ee665
+# CVE-2026-1502
+#
+# Reject CR/LF in HTTP tunnel request headers
+Patch479: 00479-cve-2026-1502.patch
+
+# 00480 # 6f4eef3ba4d9818a53698e994550ee8db17a1e2e
+# CVE-2026-4786
+#
+# Fix webbrowser `%%action` substitution bypass of dash-prefix check
+Patch480: 00480-cve-2026-4786.patch
+
+# 00482 # 69f14bc306fc62400d45565faa980b77858b9151
+# CVE-2026-6100
+#
+# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
+Patch482: 00482-cve-2026-6100.patch
+
+# 00483 # 577c595137ce6ff92158ddaf2d7b7ea86437825d
+# CVE-2026-2297
+#
+# Logging Bypass in Legacy .pyc File Handling
+Patch483: 00483-cve-2026-2297.patch
+
+# 00484 # 8b5133c1ab17a060cd134bea2a4b6e1831c47fed
+# CVE-2026-3644
+#
+# Incomplete control character validation in http.cookies
+Patch484: 00484-cve-2026-3644.patch
+
+# 00485 # 12a5b206676927bcee131ab4f2bd6783d2f5914a
+# CVE-2026-4224
+#
+# Stack overflow parsing XML with deeply nested DTD content models
+Patch485: 00485-cve-2026-4224.patch
 
 # (New patches go here ^^^)
 #
@@ -626,8 +641,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -1795,6 +1814,16 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Apr 16 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.12.13-3
+- Security fixes for CVE-2026-1502, CVE-2026-4786, CVE-2026-6100, CVE-2026-2297, CVE-2026-3644, CVE-2026-4224
+Resolves: rhbz#2444705, rhbz#2448189, rhbz#2448205, rhbz#2457942, rhbz#2458014, rhbz#2458222
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.12.13-2
+- Security fix for CVE-2026-4519 (rhbz#2449728)
+
+* Tue Mar 03 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.12.13-1
+- Update to 3.12.13
+
 * Fri Feb 06 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.12.12-4
 - Security fixes for CVE-2026-0865, CVE-2025-15366 and CVE-2025-15367
 
