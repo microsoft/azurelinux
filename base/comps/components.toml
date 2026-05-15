@@ -3022,7 +3022,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.perl-Text-Balanced]
 [components.perl-Text-BibTeX]
 [components.perl-Text-CSV]
-[components.perl-Text-CSV_XS]
 [components.perl-Text-CharWidth]
 [components.perl-Text-Diff]
 [components.perl-Text-Glob]

@@ -1,0 +1,2 @@
+[components.perl-Text-CSV_XS]
+spec = { type = "upstream", upstream-commit = "257266a0bff90fb0036a76b473f812a4bd00eb8a" }
