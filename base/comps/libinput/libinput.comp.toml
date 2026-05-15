@@ -1,3 +1,4 @@
 [components.libinput]
 # Release: 1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 release = { calculation = "manual" }
+spec = { type = "upstream", upstream-commit = "e024be553aa6b7cacf91b0a73fbdbd9fef8948f1" }
