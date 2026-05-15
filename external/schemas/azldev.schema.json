@@ -865,6 +865,16 @@
         },
         "origin": {
           "$ref": "#/$defs/Origin"
+        },
+        "replace-upstream": {
+          "type": "boolean",
+          "title": "Replace upstream",
+          "description": "When true, intentionally replaces a same-named entry in the upstream 'sources' file. Requires 'replace-reason'."
+        },
+        "replace-reason": {
+          "type": "string",
+          "title": "Replace reason",
+          "description": "Required when 'replace-upstream' is true. Human-readable explanation for the replacement."
         }
       },
       "additionalProperties": false,
@@ -934,10 +944,11 @@
         "type": {
           "type": "string",
           "enum": [
-            "pytest"
+            "pytest",
+            "lisa"
           ],
           "title": "Type",
-          "description": "Type of test framework (pytest)"
+          "description": "Type of test framework (pytest or lisa)"
         },
         "pytest": {
           "$ref": "#/$defs/PytestConfig",
