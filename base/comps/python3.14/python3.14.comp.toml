@@ -1,4 +1,5 @@
 [components.'python3.14']
+spec = { type = "upstream", upstream-commit = "fc230a4cf121ce0218e4f307790abe727664c21f" }
 
 [components.'python3.14'.build]
 # Disable the experimental JIT compiler (PEP 744).
