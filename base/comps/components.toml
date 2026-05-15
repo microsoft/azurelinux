@@ -245,7 +245,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.cloud-utils]
 [components.clutter]
 [components.cmocka]
-[components.cockpit]
 [components.codec2]
 [components.cogl]
 [components.coin-or-Cgl]

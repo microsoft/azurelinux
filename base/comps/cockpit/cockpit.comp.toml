@@ -1,0 +1,2 @@
+[components.cockpit]
+spec = { type = "upstream", upstream-commit = "323bd07342db20f3ce4e552844d8c0f2bd823ee5" }
