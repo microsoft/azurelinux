@@ -20,7 +20,6 @@ azl_pkgrelease = "2"
 kextraversion = "1"
 # NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
 nvidia_open_version = "595.58.03"
-nvidia_open_branch = "595"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
