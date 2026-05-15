@@ -7010,7 +7010,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.xorg-x11-font-utils]
 [components.xorg-x11-fonts]
 [components.xorg-x11-proto-devel]
-[components.xorg-x11-server]
 [components.xorg-x11-util-macros]
 [components.xorg-x11-xauth]
 [components.xorg-x11-xbitmaps]

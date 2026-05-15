@@ -1,0 +1,2 @@
+[components.xorg-x11-server]
+spec = { type = "upstream", upstream-commit = "fe932cc6f2f0e193b8b351c00f9d3e90adde3f38" }
