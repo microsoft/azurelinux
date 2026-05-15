@@ -55,8 +55,26 @@ const (
 )
 
 var (
+	// HTTP 5xx errors emitted by tdnf are typically transient and worth retrying.
 	serverErrorsRegex    = regexp.MustCompile(`(?m)Error: (5\d{2}) when downloading`)
 	serverErrorCodeIndex = 1
+
+	// libcurl-derived exit codes that tdnf surfaces in its 'exit status N'
+	// when a download fails mid-transfer. These are all "the request never
+	// completed" failures, not "the server said no": worth a retry.
+	//
+	//   6  - couldn't resolve host (transient DNS)
+	//   7  - failed to connect (transient TCP)
+	//   21 - HTTP "weird server reply" (CDN edge node returned short body)
+	//   28 - operation timeout
+	//   35 - SSL connect / handshake failure
+	//   56 - failure receiving network data
+	//
+	// Match either the literal exit-status string from shell.Execute (e.g.
+	// 'exit status 21') or the tdnf-formatted error line
+	// (e.g. 'Error: 21 when downloading ...').
+	transientCurlExitStatusRegex = regexp.MustCompile(`exit status (6|7|21|28|35|56)\b`)
+	transientCurlTdnfErrorRegex  = regexp.MustCompile(`(?m)Error: (6|7|21|28|35|56) when downloading`)
 )
 
 // RpmRepoCloner represents an RPM repository cloner.
@@ -900,6 +918,25 @@ func tdnfDownload(args ...string) (err error, retriable bool) {
 		if len(serverErrorMatch) > serverErrorCodeIndex {
 			logger.Log.Debugf("Encountered possibly intermittent HTTP %s error.", serverErrorMatch[serverErrorCodeIndex])
 			retriable = true
+		}
+
+		// Even when tdnf is not the one reporting an HTTP error explicitly,
+		// it may exit with a libcurl-derived status code from a download
+		// that died mid-transfer. These are also worth retrying: they
+		// almost always reflect a transient network or CDN edge hiccup,
+		// not a missing-package condition (which we handled above via the
+		// 'No package X available' check on stdout).
+		//
+		// We inspect both shell.Execute's wrapper error ('exit status N')
+		// and tdnf's own stderr line ('Error: N when downloading ...').
+		if !retriable {
+			if match := transientCurlExitStatusRegex.FindStringSubmatch(err.Error()); len(match) > 1 {
+				logger.Log.Debugf("Encountered possibly intermittent libcurl exit code %s.", match[1])
+				retriable = true
+			} else if match := transientCurlTdnfErrorRegex.FindStringSubmatch(stderr); len(match) > 1 {
+				logger.Log.Debugf("Encountered possibly intermittent libcurl error %s reported by tdnf.", match[1])
+				retriable = true
+			}
 		}
 	}
 
