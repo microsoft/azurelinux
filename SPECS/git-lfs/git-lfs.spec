@@ -62,7 +62,7 @@ install -D man/man5/*.5 %{buildroot}%{_mandir}/man5
 
 %check
 export GOEXPERIMENT=ms_nocgo_opensslcrypto
-CGO_ENABLED=0 go test -mod=vendor ./...
+go test -mod=vendor ./...
 
 %post
 git lfs install --system
