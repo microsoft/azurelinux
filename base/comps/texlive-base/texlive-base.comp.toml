@@ -1,0 +1,874 @@
+[components.texlive-base]
+
+# Prune unused texlive-base subpackages — Azure Linux ships a minimal TeX distribution.
+# Note: context excluded (%if %{without bootstrap} in its %package block).
+# citation-style-language excluded (adjacent %if 0 block causes spec-remove-subpackage breakage).
+[[components.texlive-base.overlays]]
+description = "Remove texlive-a2ping"
+type = "spec-remove-subpackage"
+package = "%{shortname}-a2ping"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-accfonts"
+type = "spec-remove-subpackage"
+package = "%{shortname}-accfonts"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-adhocfilelist"
+type = "spec-remove-subpackage"
+package = "%{shortname}-adhocfilelist"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-afm2pl"
+type = "spec-remove-subpackage"
+package = "%{shortname}-afm2pl"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-albatross"
+type = "spec-remove-subpackage"
+package = "%{shortname}-albatross"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-amstex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-amstex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-arara"
+type = "spec-remove-subpackage"
+package = "%{shortname}-arara"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-authorindex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-authorindex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-autosp"
+type = "spec-remove-subpackage"
+package = "%{shortname}-autosp"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-axodraw2"
+type = "spec-remove-subpackage"
+package = "%{shortname}-axodraw2"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bib2gls"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bib2gls"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bibcop"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bibcop"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bibexport"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bibexport"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bibtex8"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bibtex8"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bibtexu"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bibtexu"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-bundledoc"
+type = "spec-remove-subpackage"
+package = "%{shortname}-bundledoc"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-cachepic"
+type = "spec-remove-subpackage"
+package = "%{shortname}-cachepic"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-checkcites"
+type = "spec-remove-subpackage"
+package = "%{shortname}-checkcites"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-checklistings"
+type = "spec-remove-subpackage"
+package = "%{shortname}-checklistings"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-chklref"
+type = "spec-remove-subpackage"
+package = "%{shortname}-chklref"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-chktex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-chktex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-cjkutils"
+type = "spec-remove-subpackage"
+package = "%{shortname}-cjkutils"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-clojure-pamphlet"
+type = "spec-remove-subpackage"
+package = "%{shortname}-clojure-pamphlet"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-cluttex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-cluttex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-context-doc"
+type = "spec-remove-subpackage"
+package = "%{shortname}-context-doc"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-convbkmk"
+type = "spec-remove-subpackage"
+package = "%{shortname}-convbkmk"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-crossrefware"
+type = "spec-remove-subpackage"
+package = "%{shortname}-crossrefware"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-cslatex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-cslatex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-csplain"
+type = "spec-remove-subpackage"
+package = "%{shortname}-csplain"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ctan-o-mat"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ctan-o-mat"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ctanbib"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ctanbib"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ctanify"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ctanify"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ctanupload"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ctanupload"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ctie"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ctie"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-cweb"
+type = "spec-remove-subpackage"
+package = "%{shortname}-cweb"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-de-macro"
+type = "spec-remove-subpackage"
+package = "%{shortname}-de-macro"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-detex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-detex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-diadia"
+type = "spec-remove-subpackage"
+package = "%{shortname}-diadia"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-digestif"
+type = "spec-remove-subpackage"
+package = "%{shortname}-digestif"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dosepsbin"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dosepsbin"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dtl"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dtl"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dtxgen"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dtxgen"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dvi2tty"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dvi2tty"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dviasm"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dviasm"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dvicopy"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dvicopy"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dvidvi"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dvidvi"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dviinfox"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dviinfox"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dviljk"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dviljk"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dviout-util"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dviout-util"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-dvipos"
+type = "spec-remove-subpackage"
+package = "%{shortname}-dvipos"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ebong"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ebong"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-epspdf"
+type = "spec-remove-subpackage"
+package = "%{shortname}-epspdf"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-exceltex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-exceltex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-fig4latex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-fig4latex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-findhyph"
+type = "spec-remove-subpackage"
+package = "%{shortname}-findhyph"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-fontinst"
+type = "spec-remove-subpackage"
+package = "%{shortname}-fontinst"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-fontools"
+type = "spec-remove-subpackage"
+package = "%{shortname}-fontools"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-fontware"
+type = "spec-remove-subpackage"
+package = "%{shortname}-fontware"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-fragmaster"
+type = "spec-remove-subpackage"
+package = "%{shortname}-fragmaster"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-getmap"
+type = "spec-remove-subpackage"
+package = "%{shortname}-getmap"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-git-latexdiff"
+type = "spec-remove-subpackage"
+package = "%{shortname}-git-latexdiff"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-glossaries"
+type = "spec-remove-subpackage"
+package = "%{shortname}-glossaries"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-gregoriotex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-gregoriotex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-hyperxmp"
+type = "spec-remove-subpackage"
+package = "%{shortname}-hyperxmp"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-installfont"
+type = "spec-remove-subpackage"
+package = "%{shortname}-installfont"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-jfmutil"
+type = "spec-remove-subpackage"
+package = "%{shortname}-jfmutil"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ketcindy"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ketcindy"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-kotex-utils"
+type = "spec-remove-subpackage"
+package = "%{shortname}-kotex-utils"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-l3build"
+type = "spec-remove-subpackage"
+package = "%{shortname}-l3build"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-lacheck"
+type = "spec-remove-subpackage"
+package = "%{shortname}-lacheck"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latex-git-log"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latex-git-log"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latex-papersize"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latex-papersize"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latex2nemeth"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latex2nemeth"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latexdiff"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latexdiff"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latexfileversion"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latexfileversion"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latexindent"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latexindent"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-latexpand"
+type = "spec-remove-subpackage"
+package = "%{shortname}-latexpand"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-lcdftypetools"
+type = "spec-remove-subpackage"
+package = "%{shortname}-lcdftypetools"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-light-latex-make"
+type = "spec-remove-subpackage"
+package = "%{shortname}-light-latex-make"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-lilyglyphs"
+type = "spec-remove-subpackage"
+package = "%{shortname}-lilyglyphs"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-listbib"
+type = "spec-remove-subpackage"
+package = "%{shortname}-listbib"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-listings-ext"
+type = "spec-remove-subpackage"
+package = "%{shortname}-listings-ext"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ltxfileinfo"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ltxfileinfo"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ltximg"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ltximg"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-luafindfont"
+type = "spec-remove-subpackage"
+package = "%{shortname}-luafindfont"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-luajittex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-luajittex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-lyluatex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-lyluatex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-m-tx"
+type = "spec-remove-subpackage"
+package = "%{shortname}-m-tx"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-make4ht"
+type = "spec-remove-subpackage"
+package = "%{shortname}-make4ht"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-makedtx"
+type = "spec-remove-subpackage"
+package = "%{shortname}-makedtx"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-match_parens"
+type = "spec-remove-subpackage"
+package = "%{shortname}-match_parens"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mathspic"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mathspic"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mf2pt1"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mf2pt1"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mflua"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mflua"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mkgrkindex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mkgrkindex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mkjobtexmf"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mkjobtexmf"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-mkpic"
+type = "spec-remove-subpackage"
+package = "%{shortname}-mkpic"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-multibibliography"
+type = "spec-remove-subpackage"
+package = "%{shortname}-multibibliography"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-musixtex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-musixtex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-musixtnt"
+type = "spec-remove-subpackage"
+package = "%{shortname}-musixtnt"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-optex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-optex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-optexcount"
+type = "spec-remove-subpackage"
+package = "%{shortname}-optexcount"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pagelayout"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pagelayout"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-patgen"
+type = "spec-remove-subpackage"
+package = "%{shortname}-patgen"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pax"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pax"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdfbook2"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdfbook2"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdfcrop"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdfcrop"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdfjam"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdfjam"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdflatexpicscale"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdflatexpicscale"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdftex-quiet"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdftex-quiet"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdftosrc"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdftosrc"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pdfxup"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pdfxup"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pedigree-perl"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pedigree-perl"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-perltex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-perltex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-petri-nets"
+type = "spec-remove-subpackage"
+package = "%{shortname}-petri-nets"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pfarrei"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pfarrei"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pkfix"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pkfix"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pkfix-helper"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pkfix-helper"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pmx"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pmx"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pmxchords"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pmxchords"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ps2eps"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ps2eps"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ps2pk"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ps2pk"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pst-pdf"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pst-pdf"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pst2pdf"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pst2pdf"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-psutils"
+type = "spec-remove-subpackage"
+package = "%{shortname}-psutils"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ptex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ptex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ptex-fontmaps"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ptex-fontmaps"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ptex2pdf"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ptex2pdf"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-purifyeps"
+type = "spec-remove-subpackage"
+package = "%{shortname}-purifyeps"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pygmentex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pygmentex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-pythontex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-pythontex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-rubik"
+type = "spec-remove-subpackage"
+package = "%{shortname}-rubik"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-seetexk"
+type = "spec-remove-subpackage"
+package = "%{shortname}-seetexk"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-spix"
+type = "spec-remove-subpackage"
+package = "%{shortname}-spix"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-splitindex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-splitindex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-srcredact"
+type = "spec-remove-subpackage"
+package = "%{shortname}-srcredact"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-sty2dtx"
+type = "spec-remove-subpackage"
+package = "%{shortname}-sty2dtx"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-svn-multi"
+type = "spec-remove-subpackage"
+package = "%{shortname}-svn-multi"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-synctex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-synctex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-tex4ebook"
+type = "spec-remove-subpackage"
+package = "%{shortname}-tex4ebook"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texaccents"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texaccents"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texcount"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texcount"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texdef"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texdef"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texdiff"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texdiff"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texdirflatten"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texdirflatten"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texdoc"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texdoc"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texdoctk"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texdoctk"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texfot"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texfot"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texliveonfly"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texliveonfly"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texloganalyser"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texloganalyser"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texlogfilter"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texlogfilter"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texlogsieve"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texlogsieve"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texosquery"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texosquery"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texplate"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texplate"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-texware"
+type = "spec-remove-subpackage"
+package = "%{shortname}-texware"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-tie"
+type = "spec-remove-subpackage"
+package = "%{shortname}-tie"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-tikztosvg"
+type = "spec-remove-subpackage"
+package = "%{shortname}-tikztosvg"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-tpic2pdftex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-tpic2pdftex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ttfutils"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ttfutils"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-typeoutfileinfo"
+type = "spec-remove-subpackage"
+package = "%{shortname}-typeoutfileinfo"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-ulqda"
+type = "spec-remove-subpackage"
+package = "%{shortname}-ulqda"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-upmendex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-upmendex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-uptex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-uptex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-urlbst"
+type = "spec-remove-subpackage"
+package = "%{shortname}-urlbst"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-velthuis"
+type = "spec-remove-subpackage"
+package = "%{shortname}-velthuis"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-vlna"
+type = "spec-remove-subpackage"
+package = "%{shortname}-vlna"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-vpe"
+type = "spec-remove-subpackage"
+package = "%{shortname}-vpe"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-web"
+type = "spec-remove-subpackage"
+package = "%{shortname}-web"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-webquiz"
+type = "spec-remove-subpackage"
+package = "%{shortname}-webquiz"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-wordcount"
+type = "spec-remove-subpackage"
+package = "%{shortname}-wordcount"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-xindex"
+type = "spec-remove-subpackage"
+package = "%{shortname}-xindex"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-xml2pmx"
+type = "spec-remove-subpackage"
+package = "%{shortname}-xml2pmx"
+
+[[components.texlive-base.overlays]]
+description = "Remove texlive-xpdfopen"
+type = "spec-remove-subpackage"
+package = "%{shortname}-xpdfopen"

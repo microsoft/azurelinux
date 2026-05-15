@@ -6827,8 +6827,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.testng]
 [components.texi2html]
 [components.texinfo]
-[components.texlive]
-[components.texlive-base]
 [components.tftp]
 [components.thermald]
 [components.thrift]
