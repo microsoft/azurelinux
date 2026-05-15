@@ -32,7 +32,11 @@ Patch3:         CVE-2025-58183.patch
 Patch4:         CVE-2025-47911.patch
 Patch5:         CVE-2025-58190.patch
 Patch6:         CVE-2026-32288.patch
+<<<<<<< HEAD
 Patch7:         CVE-2026-33814.patch
+=======
+Patch7:         CVE-2026-35469.patch
+>>>>>>> 5ddf5dab8e ([AutoPR- Security] Patch containerized-data-importer for CVE-2026-35469 [HIGH] (#17053))
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -227,8 +231,13 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+<<<<<<< HEAD
 * Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-4
 - Patch for CVE-2026-33814
+=======
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-4
+- Patch for CVE-2026-35469
+>>>>>>> 5ddf5dab8e ([AutoPR- Security] Patch containerized-data-importer for CVE-2026-35469 [HIGH] (#17053))
 
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-3
 - Patch for CVE-2026-32288
