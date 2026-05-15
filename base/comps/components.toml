@@ -1472,7 +1472,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.jomolhari-fonts]
 [components.jose]
 [components.jpegxl]
-[components.jq]
 [components.js-d3-flame-graph]
 [components.js-jquery]
 [components.jsch]

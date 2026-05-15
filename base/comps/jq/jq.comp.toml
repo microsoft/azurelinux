@@ -1,0 +1,2 @@
+[components.jq]
+spec = { type = "upstream", upstream-commit = "7013b20589fb858ffa0933e41f7d57ba0bc376df" }

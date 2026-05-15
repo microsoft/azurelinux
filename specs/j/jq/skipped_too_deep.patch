@@ -1,0 +1,52 @@
+From b29504b4e191a4b1028bd1c252aaab0c62fbdbfa Mon Sep 17 00:00:00 2001
+From: Ish Nagy <50555716+ishnagy@users.noreply.github.com>
+Date: Tue, 14 Oct 2025 07:12:57 +0200
+Subject: [PATCH] Increase the maximum printing depth from 256 to 10000 (fixes
+ #3413) (#3414)
+
+---
+ .github/workflows/ci.yml |  2 +-
+ src/jv_print.c           |  2 +-
+ tests/jq.test            | 19 +++++++++++++++++++
+ 3 files changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/src/jv_print.c b/src/jv_print.c
+index 791af1798b..f717d079e4 100644
+--- a/src/jv_print.c
++++ b/src/jv_print.c
+@@ -17,7 +17,7 @@
+ #include "jv_private.h"
+ 
+ #ifndef MAX_PRINT_DEPTH
+-#define MAX_PRINT_DEPTH (256)
++#define MAX_PRINT_DEPTH (10000)
+ #endif
+ 
+ #define ESC "\033"
+diff --git a/tests/jq.test b/tests/jq.test
+index 14d98ba169..2471379d0f 100644
+--- a/tests/jq.test
++++ b/tests/jq.test
+@@ -2515,3 +2515,22 @@ strflocaltime("" | ., @uri)
+ 0
+ ""
+ ""
++
++# regression tests for #3413
++# upper range bounds should be in sync with the constants defined at
++#   src/jv_parse.c:#define MAX_PARSING_DEPTH (N)
++#   src/jv_print.c:#define MAX_PRINT_DEPTH (N)
++# (N-1)
++reduce range(9999) as $_ ([];[.]) | tojson | fromjson | flatten
++null
++[]
++
++# (N)
++reduce range(10000) as $_ ([];[.]) | tojson | try (fromjson) catch . | (contains("<skipped: too deep>") | not) and contains("Exceeds depth limit for parsing")
++null
++true
++
++# (N+1)
++reduce range(10001) as $_ ([];[.]) | tojson | contains("<skipped: too deep>")
++null
++true
