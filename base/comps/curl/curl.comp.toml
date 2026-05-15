@@ -1,4 +1,5 @@
 [components.curl]
+spec = { type = "upstream", upstream-commit = "1538b200c175eeb234abb749c0246c11ebc4f0d1" }
 
 [[components.curl.overlays]]
 description = "Drop python3-impacket BuildRequires (only used by Fedora-gated upstream test 1451; python-impacket is not packaged for Azure Linux due to RPM-signing issues)"

@@ -10,7 +10,7 @@
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
 Version: 8.15.0
-Release: 7%{?dist}
+Release: 10%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
 Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
@@ -24,6 +24,21 @@ Patch001: 0001-curl-8.15.0-curl-tool_read_cb-fix-of-segfault.patch
 
 # fix broken TLS options for threaded LDAPS (CVE-2025-14017)
 Patch002: 0002-curl-8.15.0-CVE-2025-14017.patch
+
+# fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+Patch003: 0003-curl-8.15.0-CVE-2026-1965.patch
+
+# fix token leak with redirect and netrc (CVE-2026-3783)
+Patch004: 0004-curl-8.15.0-CVE-2026-3783.patch
+
+# fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+Patch005: 0005-curl-8.15.0-CVE-2026-3784.patch
+
+# fix use after free in SMB connection reuse (CVE-2026-3805)
+Patch006: 0006-curl-8.15.0-CVE-2026-3805.patch
+
+# fix Out of bounds read for cookie path (CVE-2025-9086)
+Patch007: 0007-curl-8.15.0-CVE-2025-9086.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
@@ -423,6 +438,15 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
+* Mon May 11 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-7
+- fix Out of bounds read for cookie path (CVE-2025-9086)
+
+* Mon Apr 13 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-6
+- fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+- fix token leak with redirect and netrc (CVE-2026-3783)
+- fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+- fix use after free in SMB connection reuse (CVE-2026-3805)
+
 * Mon Jan 19 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-5
 - fix broken TLS options for threaded LDAPS (CVE-2025-14017)
 
