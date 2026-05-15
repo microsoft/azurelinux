@@ -1,0 +1,2 @@
+[components.corosync]
+spec = { type = "upstream", upstream-commit = "63ea76e4bad12912d8e1202444b8fbc57b095903" }

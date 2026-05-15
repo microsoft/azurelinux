@@ -273,7 +273,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.containerd]
 [components.containers-common]
 [components.convmv]
-[components.corosync]
 [components.corosync-qdevice]
 [components.cpp-httplib]
 [components.cppcheck]
