@@ -1,3 +1,4 @@
 [components.bash]
-# Need build fixes in rawhide
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+# Pin to Fedora 44 dist-git head as of the AZL4 Public Preview cutoff.
+# F44 carries the build fixes we needed from rawhide; F43 does not.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "a6bcc6767229199f4f02b781d1d39df0835d894b" }
