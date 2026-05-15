@@ -1,0 +1,24 @@
+From 4f6e4ea64ac3e2ac50f48103a22601f4a40ee8be Mon Sep 17 00:00:00 2001
+From: Michal Ruprich <mruprich@redhat.com>
+Date: Mon, 8 Sep 2025 09:49:22 +0200
+Subject: [PATCH] Do not clean DISPLAY unconditionally
+
+---
+ main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/main.c b/main.c
+index 9d764e16b..ccad28a1e 100644
+--- a/main.c
++++ b/main.c
+@@ -1743,7 +1743,9 @@ int main(int argc,char *argv[])
+ 	our_gid = MY_GID();
+ 	am_root = our_uid == ROOT_UID;
+ 
+-	unset_env_var("DISPLAY");
++	// DISPLAY should not be emptied unconditionally
++	if (!getenv("SSH_ASKPASS"))
++		unset_env_var("DISPLAY");
+ 
+ #if defined USE_OPENSSL && defined SET_OPENSSL_CONF
+ #define TO_STR2(x) #x

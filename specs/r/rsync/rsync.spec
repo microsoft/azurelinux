@@ -3,16 +3,10 @@
 
 %global _hardened_build 1
 
-%define isprerelease 0
-
-%if %isprerelease
-%define prerelease pre3
-%endif
-
 Summary: A program for synchronizing files over a network
 Name: rsync
 Version: 3.4.1
-Release: 5%{?prerelease}%{?dist}
+Release: 6%{?dist}
 URL: https://rsync.samba.org/
 
 Source0: https://download.samba.org/pub/rsync/src/rsync-%{version}%{?prerelease}.tar.gz
@@ -49,6 +43,10 @@ Patch1: rsync-3.2.2-runtests.patch
 Patch2: rsync-3.4.1-rrsync-man.patch
 Patch3: rsync-3.4.1-gcc15-fixes.patch
 Patch4: rsync-3.4.1-cve-2025-10158.patch
+Patch5: rsync-3.4.1-cve-2026-41035.patch
+Patch6: rsync-3.4.1-correct-log-time.patch
+Patch7: rsync-3.4.1-ssh-askpass.patch
+Patch8: rsync-3.4.1-use-openat2.patch
 
 %description
 Rsync uses a reliable algorithm to bring remote and host files into
@@ -79,14 +77,8 @@ may be used to setup a restricted rsync users via ssh logins.
 
 %prep
 # TAG: for pre versions use
-
-%if %isprerelease
-%setup -q -n rsync-%{version}%{?prerelease}
-%setup -q -b 1 -n rsync-%{version}%{?prerelease}
-%else
 %setup -q
 %setup -q -b 1
-%endif
 
 %patch 1 -p1 -b .runtests
 %patch 2 -p1 -b .rrsync
@@ -96,6 +88,10 @@ patch -p1 -i patches/detect-renamed-lax.diff
 
 %patch 3 -p1 -b .gcc15
 %patch 4 -p1 -b .cve-2025-10158
+%patch 5 -p1 -b .cve-2026-41035
+%patch 6 -p1 -b .correct-log-time
+%patch 7 -p1 -b .ssh-askpass
+%patch 8 -p1 -b .use-openat2
 
 %build
 %configure \
@@ -153,6 +149,12 @@ install -D -m644 %{SOURCE6} $RPM_BUILD_ROOT/%{_unitdir}/rsyncd@.service
 %systemd_postun_with_restart rsyncd.service
 
 %changelog
+* Wed May 06 2026 Michal Ruprich <mruprich@redhat.com> - 3.4.1-6
+- Fix for CVE-2026-41035
+- Fixing bad time in rsync logs
+- Fixing regression from CVE-2024-12086 fix
+- Fixing improper clearing of DISPLAY env variable
+
 * Fri Feb 13 2026 Michal Ruprich <mruprich@redhat.com> - 3.4.1-5
 - Fix for CVE-2025-10158
 

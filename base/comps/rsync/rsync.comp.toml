@@ -1,3 +1,4 @@
 [components.rsync]
 # Release: 5%{?prerelease}%{?dist}
 release = { calculation = "manual" }
+spec = { type = "upstream", upstream-commit = "467418743d37c259c6a91ace77f6efec395a0ea7" }

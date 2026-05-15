@@ -1,0 +1,50 @@
+From 8e11f0c169226e6d166a111aa8f90881e77fe834 Mon Sep 17 00:00:00 2001
+From: Michal Ruprich <mruprich@redhat.com>
+Date: Fri, 31 Jan 2025 14:35:18 +0100
+Subject: [PATCH] Using a correct time in log file
+
+---
+ options.c | 2 +-
+ tls.c     | 2 +-
+ util1.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/options.c b/options.c
+index 74b39bf6a..58ed035fe 100644
+--- a/options.c
++++ b/options.c
+@@ -1159,7 +1159,7 @@ static time_t parse_time(const char *arg)
+ {
+ 	const char *cp;
+ 	time_t val, now = time(NULL);
+-	struct tm t, *today = localtime(&now);
++	struct tm t, tmp, *today = localtime_r(&now, &tmp);
+ 	int in_date, old_mday, n;
+ 
+ 	memset(&t, 0, sizeof t);
+diff --git a/tls.c b/tls.c
+index e311240af..e05f7ec23 100644
+--- a/tls.c
++++ b/tls.c
+@@ -127,7 +127,7 @@ static void storetime(char *dest, size_t destsize, time_t t, int nsecs)
+ {
+ 	if (t) {
+ 		int len;
+-		struct tm *mt = gmtime(&t);
++		struct tm tmp, *mt = gmtime_r(&t, &tmp);
+ 
+ 		len = snprintf(dest, destsize,
+ 			" %04d-%02d-%02d %02d:%02d:%02d",
+diff --git a/util1.c b/util1.c
+index e477759a4..25ac7c9b0 100644
+--- a/util1.c
++++ b/util1.c
+@@ -1393,7 +1393,7 @@ char *timestring(time_t t)
+ 	static int ndx = 0;
+ 	static char buffers[4][20]; /* We support 4 simultaneous timestring results. */
+ 	char *TimeBuf = buffers[ndx = (ndx + 1) % 4];
+-	struct tm *tm = localtime(&t);
++	struct tm tmp, *tm = localtime_r(&t, &tmp);
+ 	int len = snprintf(TimeBuf, sizeof buffers[0], "%4d/%02d/%02d %02d:%02d:%02d",
+ 		 (int)tm->tm_year + 1900, (int)tm->tm_mon + 1, (int)tm->tm_mday,
+ 		 (int)tm->tm_hour, (int)tm->tm_min, (int)tm->tm_sec);

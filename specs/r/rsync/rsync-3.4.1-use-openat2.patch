@@ -1,0 +1,386 @@
+From 4fa7156ccdb2ad34b034d18fe2fd6cd79adef8a1 Mon Sep 17 00:00:00 2001
+From: Andrew Tridgell <andrew@tridgell.net>
+Date: Thu, 30 Apr 2026 08:39:22 +1000
+Subject: [PATCH] syscall: use openat2(RESOLVE_BENEATH) on Linux for
+ secure_relative_open
+
+The CVE fix in commit c35e283 made secure_relative_open() walk every
+component of relpath with O_NOFOLLOW. That blocks every symlink in the
+path, which is stricter than the threat model required: legitimate
+directory symlinks within the destination tree (e.g. when using -K /
+--copy-dirlinks) are also rejected, breaking delta transfers with
+"failed verification -- update discarded".  See issue #715.
+
+On Linux 5.6+, openat2(RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS) gives
+us exactly what we want: the kernel rejects any resolution that would
+escape the starting directory (via "..", absolute paths, or symlinks
+pointing outside dirfd) while still following symlinks that resolve
+within it. /proc magic-links are blocked too.
+
+Use openat2 first; fall back to the existing per-component O_NOFOLLOW
+walk on ENOSYS (kernel < 5.6). The lexical "../" checks at the head
+of the function are kept as defense in depth. The Linux gate is
+plain #ifdef __linux__: the runtime ENOSYS fallback covers the only
+case that actually matters (header present + old kernel), and any
+Linux build environment without linux/openat2.h will fail with a
+clear "no such file" error rather than silently disabling the
+protection.
+
+Verified manually that openat2(RESOLVE_BENEATH) blocks all four
+escape patterns (absolute symlink, ../ symlink, lexical .., absolute
+path) while allowing direct and within-tree symlinks. The new
+testsuite/symlink-dirlink-basis.test (taken from PR #864 by Samuel
+Henrique) exercises the issue #715 regression and passes; full
+make check passes 47/47.
+
+Test: testsuite/symlink-dirlink-basis.test (8 scenarios)
+Fixes: https://github.com/RsyncProject/rsync/issues/715
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+---
+ syscall.c                            |  62 ++++++-
+ testsuite/symlink-dirlink-basis.test | 247 +++++++++++++++++++++++++++
+ 2 files changed, 304 insertions(+), 5 deletions(-)
+ create mode 100755 testsuite/symlink-dirlink-basis.test
+
+diff --git a/syscall.c b/syscall.c
+index ec0e0708a..66c6d29c7 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -33,6 +33,11 @@
+ #include <sys/syscall.h>
+ #endif
+ 
++#ifdef __linux__
++#include <sys/syscall.h>
++#include <linux/openat2.h>
++#endif
++
+ #include "ifuncs.h"
+ 
+ extern int dry_run;
+@@ -720,12 +725,49 @@ int do_open_nofollow(const char *pathname, int flags)
+ /*
+   open a file relative to a base directory. The basedir can be NULL,
+   in which case the current working directory is used. The relpath
+-  must be a relative path, and the relpath must not contain any
+-  elements in the path which follow symlinks (ie. like O_NOFOLLOW, but
+-  applies to all path components, not just the last component)
+-
+-  The relpath must also not contain any ../ elements in the path
++  must be a relative path. The kernel must guarantee that resolution
++  cannot escape basedir (or the cwd, when basedir is NULL): no ".."
++  jumps above the start, no symlinks pointing outside, no absolute
++  paths, no /proc magic-link tricks.
++
++  Symlinks *within* basedir are followed normally — earlier rsync
++  versions rejected every symlink with O_NOFOLLOW on each component,
++  which broke legitimate directory symlinks on the receiver side
++  (https://github.com/RsyncProject/rsync/issues/715). The escape
++  prevention is handled by the kernel via openat2(RESOLVE_BENEATH)
++  on Linux 5.6+; older systems fall back to the per-component
++  O_NOFOLLOW walk below.
++
++  The relpath must also not contain any ../ elements in the path.
+ */
++
++#ifdef __linux__
++static int secure_relative_open_linux(const char *basedir, const char *relpath, int flags, mode_t mode)
++{
++	struct open_how how;
++	int dirfd, retfd;
++
++	memset(&how, 0, sizeof how);
++	how.flags = flags;
++	how.mode = mode;
++	how.resolve = RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS;
++
++	if (basedir == NULL) {
++		dirfd = AT_FDCWD;
++	} else {
++		dirfd = openat(AT_FDCWD, basedir, O_RDONLY | O_DIRECTORY);
++		if (dirfd == -1)
++			return -1;
++	}
++
++	retfd = syscall(SYS_openat2, dirfd, relpath, &how, sizeof how);
++
++	if (dirfd != AT_FDCWD)
++		close(dirfd);
++	return retfd;
++}
++#endif
++
+ int secure_relative_open(const char *basedir, const char *relpath, int flags, mode_t mode)
+ {
+ 	if (!relpath || relpath[0] == '/') {
+@@ -739,6 +781,16 @@ int secure_relative_open(const char *basedir, const char *relpath, int flags, mo
+ 		return -1;
+ 	}
+ 
++#ifdef __linux__
++	{
++		int fd = secure_relative_open_linux(basedir, relpath, flags, mode);
++		/* ENOSYS = kernel < 5.6 doesn't have the syscall even though
++		 * glibc/kernel-headers do; fall through to the portable path. */
++		if (fd != -1 || errno != ENOSYS)
++			return fd;
++	}
++#endif
++
+ #if !defined(O_NOFOLLOW) || !defined(O_DIRECTORY) || !defined(AT_FDCWD)
+ 	// really old system, all we can do is live with the risks
+ 	if (!basedir) {
+diff --git a/testsuite/symlink-dirlink-basis.test b/testsuite/symlink-dirlink-basis.test
+new file mode 100755
+index 000000000..9065dd814
+--- /dev/null
++++ b/testsuite/symlink-dirlink-basis.test
+@@ -0,0 +1,247 @@
++#!/bin/sh
++
++# Test that updating a file through a directory symlink works when using
++# -K (--copy-dirlinks). This is a regression test for:
++#   https://github.com/RsyncProject/rsync/issues/715
++#
++# The CVE fix in commit c35e283 introduced secure_relative_open() which
++# uses O_NOFOLLOW on all path components, breaking legitimate directory
++# symlinks on the receiver side. The fix splits the path into basedir
++# (dirname, symlinks followed) and basename (O_NOFOLLOW) so that
++# directory symlinks are traversed while the final file component is
++# still protected.
++#
++# The regression only manifests when delta matching is triggered (i.e.,
++# the sender finds matching blocks in the old file). Small files with
++# completely different content are transferred in full and don't trigger
++# the bug. We use a large file with a small modification to ensure
++# delta transfer is used.
++#
++# In addition to the original regression, this test covers edge cases
++# in the fix itself:
++#   - --backup with directory symlinks (finish_transfer pointer identity)
++#   - --partial-dir with protocol < 29 (fnamecmp != partialptr guard)
++#   - --inplace with directory symlinks (updating_basis_or_equiv check)
++#   - Files without a dirname (top-level files, no split needed)
++
++. "$suitedir/rsync.fns"
++
++RSYNC_RSH="$scratchdir/src/support/lsh.sh"
++export RSYNC_RSH
++
++# $HOME is set to $scratchdir by rsync.fns
++# localhost: destination will cd to $HOME (i.e., $scratchdir)
++
++# Helper: create a large file suitable for delta transfers.
++# ~32KB is large enough for rsync's block matching to find matches.
++make_testfile() {
++    dd if=/dev/urandom of="$1" bs=1024 count=32 2>/dev/null \
++	|| test_fail "failed to create test file $1"
++}
++
++# Set up source tree
++srcbase="$tmpdir/src"
++
++######################################################################
++# Test 1: Basic directory symlink update (the original issue #715)
++######################################################################
++
++mkdir -p "$HOME/real-dir"
++ln -s real-dir "$HOME/dir"
++
++mkdir -p "$srcbase/dir"
++make_testfile "$srcbase/dir/file"
++
++# First transfer (initial): should create the file through the symlink
++(cd "$srcbase" && $RSYNC -KRlptv --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 1: initial transfer failed"
++
++if [ ! -f "$HOME/real-dir/file" ]; then
++    test_fail "test 1: initial transfer did not create file through symlink"
++fi
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 1: initial transfer content mismatch"
++
++# Small modification to trigger delta transfer
++echo "appended update" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++# Second transfer (update): was failing with "failed verification"
++(cd "$srcbase" && $RSYNC -KRlptv --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 1: update through directory symlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 1: update transfer content mismatch"
++
++######################################################################
++# Test 2: Compression (-z) as in the original reproducer
++######################################################################
++
++echo "another line" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptzv --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 2: compressed update through directory symlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 2: compressed update content mismatch"
++
++######################################################################
++# Test 3: Nested directory symlinks (nested/sub/data.txt where
++#          "nested" is a symlink to "nested_real")
++######################################################################
++
++mkdir -p "$HOME/nested_real/sub"
++ln -s nested_real "$HOME/nested"
++
++mkdir -p "$srcbase/nested/sub"
++make_testfile "$srcbase/nested/sub/data.txt"
++
++(cd "$srcbase" && $RSYNC -KRlptv --rsync-path="$RSYNC" nested/sub/data.txt localhost:) \
++    || test_fail "test 3: initial nested transfer failed"
++
++echo "appended nested" >> "$srcbase/nested/sub/data.txt"
++sleep 1
++touch "$srcbase/nested/sub/data.txt"
++
++(cd "$srcbase" && $RSYNC -KRlptv --rsync-path="$RSYNC" nested/sub/data.txt localhost:) \
++    || test_fail "test 3: update through nested directory symlink failed"
++
++diff "$srcbase/nested/sub/data.txt" "$HOME/nested_real/sub/data.txt" >/dev/null \
++    || test_fail "test 3: nested update content mismatch"
++
++######################################################################
++# Test 4: --backup with directory symlinks
++#
++# Exercises the finish_transfer() "fnamecmp == fname" pointer
++# comparison that determines whether to update fnamecmp to the
++# backup name. If broken, --backup would reference a renamed file
++# for xattr handling.
++######################################################################
++
++# Reset destination
++rm -f "$HOME/real-dir/file" "$HOME/real-dir/file~"
++
++make_testfile "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 4: initial transfer for backup test failed"
++
++echo "backup update" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --backup --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 4: update with --backup through directory symlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 4: backup update content mismatch"
++
++if [ ! -f "$HOME/real-dir/file~" ]; then
++    test_fail "test 4: backup file was not created"
++fi
++
++######################################################################
++# Test 5: --inplace with directory symlinks
++#
++# Exercises the updating_basis_or_equiv check which uses
++# "fnamecmp == fname". With --inplace, rsync writes directly to
++# the destination file instead of a temp file.
++######################################################################
++
++rm -f "$HOME/real-dir/file" "$HOME/real-dir/file~"
++
++make_testfile "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --inplace --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 5: initial inplace transfer failed"
++
++echo "inplace update" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --inplace --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 5: inplace update through directory symlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 5: inplace update content mismatch"
++
++######################################################################
++# Test 6: Top-level file (no dirname, no split needed)
++#
++# Ensures the dirname/basename split is not attempted for files
++# at the top level (file->dirname is NULL).
++######################################################################
++
++make_testfile "$srcbase/topfile"
++mkdir -p "$HOME"
++
++(cd "$srcbase" && $RSYNC -Rlptv --rsync-path="$RSYNC" topfile localhost:) \
++    || test_fail "test 6: initial top-level transfer failed"
++
++echo "toplevel update" >> "$srcbase/topfile"
++sleep 1
++touch "$srcbase/topfile"
++
++(cd "$srcbase" && $RSYNC -Rlptv --rsync-path="$RSYNC" topfile localhost:) \
++    || test_fail "test 6: top-level update failed"
++
++diff "$srcbase/topfile" "$HOME/topfile" >/dev/null \
++    || test_fail "test 6: top-level update content mismatch"
++
++######################################################################
++# Test 7: --partial-dir with protocol < 29
++#
++# For protocol < 29, fnamecmp_type stays FNAMECMP_FNAME even when
++# fnamecmp is set to partialptr. The dirname/basename split must
++# NOT trigger in this case (guarded by "fnamecmp == fname").
++######################################################################
++
++rm -f "$HOME/real-dir/file"
++make_testfile "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --protocol=28 --partial-dir=.rsync-partial \
++    --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 7: initial proto28 partial-dir transfer failed"
++
++echo "partial-dir update" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --protocol=28 --partial-dir=.rsync-partial \
++    --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 7: proto28 partial-dir update through dirlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 7: proto28 partial-dir update content mismatch"
++
++######################################################################
++# Test 8: Protocol < 29 basic directory symlink update
++#
++# Exercises the protocol < 29 code path and its fallback logic
++# (clearing basedir on retry).
++######################################################################
++
++rm -f "$HOME/real-dir/file"
++make_testfile "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --protocol=28 \
++    --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 8: initial proto28 transfer failed"
++
++echo "proto28 update" >> "$srcbase/dir/file"
++sleep 1
++touch "$srcbase/dir/file"
++
++(cd "$srcbase" && $RSYNC -KRlptv --protocol=28 \
++    --rsync-path="$RSYNC" dir/file localhost:) \
++    || test_fail "test 8: proto28 update through directory symlink failed"
++
++diff "$srcbase/dir/file" "$HOME/real-dir/file" >/dev/null \
++    || test_fail "test 8: proto28 update content mismatch"
++
++# The script would have aborted on error, so getting here means we've won.
++exit 0
