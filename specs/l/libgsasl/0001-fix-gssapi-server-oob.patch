@@ -1,0 +1,26 @@
+From: Simon Josefsson <simon@josefsson.org>
+Date: Fri, 15 Jul 2022 16:23:58 +0200
+Subject: [PATCH] GSSAPI server: Boundary check gss_wrap token (read OOB).
+Origin: upstream, https://gitlab.com/gsasl/gsasl/-/commit/796e4197f696261c1f872d7576371232330bcc30
+
+---
+ lib/gssapi/server.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/gssapi/server.c b/lib/gssapi/server.c
+index 5410360b..4ebfda47 100644
+--- a/lib/gssapi/server.c
++++ b/lib/gssapi/server.c
+@@ -218,6 +218,9 @@ _gsasl_gssapi_server_step (Gsasl_session * sctx,
+          FALSE, and responds with the generated output_message.  The
+          client can then consider the server authenticated. */
+ 
++      if (bufdesc2.length < 4)
++	return GSASL_AUTHENTICATION_ERROR;
++
+       if ((((char *) bufdesc2.value)[0] & GSASL_QOP_AUTH) == 0)
+ 	{
+ 	  /* Integrity or privacy unsupported */
+-- 
+2.30.2
+

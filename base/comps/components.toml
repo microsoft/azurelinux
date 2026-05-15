@@ -1776,7 +1776,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libgnomekbd]
 [components.libgpg-error]
 [components.libgphoto2]
-[components.libgsasl]
 [components.libgsf]
 [components.libgta]
 [components.libgtop2]

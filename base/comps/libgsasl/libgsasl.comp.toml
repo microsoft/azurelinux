@@ -1,0 +1,2 @@
+[components.libgsasl]
+spec = { type = "upstream", upstream-commit = "6c70668f2134da6302a6d72445fd7b6df979e929" }
