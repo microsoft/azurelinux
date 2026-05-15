@@ -1,0 +1,2 @@
+[components.python-pillow]
+spec = { type = "upstream", upstream-commit = "c3200ba28e89e4ccedcd26be3d73d36fd04b5be2" }

@@ -4020,7 +4020,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-phonenumbers]
 [components.python-pickleshare]
 [components.python-pid]
-[components.python-pillow]
 [components.python-pint]
 [components.python-pip]
 [components.python-pip-requirements-parser]

@@ -24,7 +24,7 @@
 
 Name:           python-%{srcname}
 Version:        11.3.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        Python image processing library
 
 # License: see http://www.pythonware.com/products/pil/license.htm
@@ -37,6 +37,8 @@ Source9999: python-pillow.azl.macros
 Patch0:         pillow_mingw.patch
 # Backport fix for CVE-2026-25990
 Patch1:         https://github.com/python-pillow/Pillow/commit/9000313cc5d4a31bdcdd6d7f0781101abab553aa.patch
+# Backport fix for CVE-2026-40192
+Patch2:         https://github.com/python-pillow/Pillow/commit/3cb854e8b2bab43f40e342e665f9340d861aa628.patch
 
 BuildRequires:  freetype-devel
 BuildRequires:  gcc
@@ -315,6 +317,9 @@ popd
 
 
 %changelog
+* Sat Apr 18 2026 Sandro Mani <manisandro@gmail.com> - 11.3.0-8
+- Backport fix for CVE-2026-40192
+
 * Sat Feb 14 2026 Sandro Mani <manisandro@gmail.com> - 11.1.0-7
 - Backport fix for CVE-2026-25990
 
