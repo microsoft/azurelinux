@@ -1,0 +1,2 @@
+[components.mod_md]
+spec = { type = "upstream", upstream-commit = "a463975c0f890ef461380990e3b11740936ef06a" }
