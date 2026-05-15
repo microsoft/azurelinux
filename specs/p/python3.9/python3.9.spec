@@ -20,8 +20,8 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 7%{?dist}
-License: Python
+Release: 11%{?dist}
+License: Python-2.0.1
 
 
 # ==================================
@@ -222,8 +222,7 @@ BuildRequires: bluez-libs-devel
 BuildRequires: bzip2
 BuildRequires: bzip2-devel
 BuildRequires: desktop-file-utils
-# See the runtime requirement in the -libs subpackage
-BuildRequires: expat-devel >= 2.6
+BuildRequires: expat-devel
 
 BuildRequires: findutils
 BuildRequires: gcc-c++
@@ -246,7 +245,6 @@ BuildRequires: libX11-devel
 BuildRequires: make
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: redhat-rpm-config >= 127
@@ -258,6 +256,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with valgrind}
 BuildRequires: valgrind-devel
@@ -444,6 +446,26 @@ Patch475: 00475-cve-2025-15367.patch
 # gh-144125: email: verify headers are sound in BytesGenerator
 Patch476: 00476-cve-2026-1299.patch
 
+# 00478 # 88bb1e37c971fd1d6bda82a68b5ad873ed099f08
+# CVE-2026-4519
+#
+# Reject leading dashes in webbrowser URLs (GH-143931) (GH-146359)
+#
+# Cherry-picked from Python 3.10: ad4d5ba32af4d80b0dfa2ba9d8203bfb219e60a5
+Patch478: 00478-cve-2026-4519.patch
+
+# 00480 # 9f4b1483ecfbc8c08117133c239fba544fcb42e7
+# CVE-2026-4786
+#
+# Fix webbrowser `%%action` substitution bypass of dash-prefix check
+Patch480: 00480-cve-2026-4786.patch
+
+# 00482 # 51e25e8a804257b707e2021655037d07dcfa9cd6
+# CVE-2026-6100
+#
+# Fix a possible UAF in {LZMA,BZ2,_Zlib}Decompressor
+Patch482: 00482-cve-2026-6100.patch
+
 # (New patches go here ^^^)
 #
 # When adding new patches to "python" and "python3" in Fedora, EL, etc.,
@@ -618,14 +640,6 @@ Recommends: (%{pkgname}-tkinter%{?_isa} = %{version}-%{release} if tk%{?_isa})
 
 # The zoneinfo module needs tzdata
 Requires: tzdata
-
-# The requirement on libexpat is generated, but we need to version it.
-# When built with expat >= 2.6, but installed with older expat, we get:
-#   ImportError: /usr/lib64/python3.X/lib-dynload/pyexpat.cpython-....so:
-#   undefined symbol: XML_SetReparseDeferralEnabled
-# This breaks many things, including python -m venv.
-# Other subpackages (like -debug) also need this, but they all depend on -libs.
-Requires: expat >= 2.6
 
 # https://fedoraproject.org/wiki/Changes/Move_usr_bin_python_into_separate_package
 # In Fedora 31, several "unversioned" files like /usr/bin/pydoc and all the
@@ -828,14 +842,6 @@ Provides: bundled(libmpdec) = %{libmpdec_version}
 
 # The zoneinfo module needs tzdata
 Requires: tzdata
-
-# The requirement on libexpat is generated, but we need to version it.
-# When built with expat >= 2.6, but installed with older expat, we get:
-#   ImportError: /usr/lib64/python3.X/lib-dynload/pyexpat.cpython-....so:
-#   undefined symbol: XML_SetReparseDeferralEnabled
-# This breaks many things, including python -m venv.
-# Other subpackages (like -debug) also need this, but they all depend on -libs.
-Requires: expat >= 2.6
 
 # Provides of the subpackages contained in flatpackage
 Provides: %{pkgname}-libs = %{version}-%{release}
@@ -1933,6 +1939,16 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Fri Apr 17 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.9.25-9
+- Security fixes for CVE-2026-4786 and CVE-2026-6100
+Resolves: rhbz#2458019, rhbz#2458227
+
+* Sat Apr 11 2026 Miro Hrončok <mhroncok@redhat.com> - 3.9.25-8
+- Explicitly build with OpenSSL 3
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.9.25-7
+- Security fix for CVE-2026-4519 (rhbz#2449735)
+
 * Tue Feb 10 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.9.25-6
 - Security fix for CVE-2026-1299
 

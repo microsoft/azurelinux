@@ -1,0 +1,2 @@
+[components.'python3.9']
+spec = { type = "upstream", upstream-commit = "5607d49a61a595e35de21f3323bff2602e938bb6" }

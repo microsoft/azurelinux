@@ -4439,7 +4439,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.'python3.11']
 [components.'python3.12']
 [components.'python3.6']
-[components.'python3.9']
 [components.pythoncapi-compat]
 [components.pythran]
 [components.pytz]
