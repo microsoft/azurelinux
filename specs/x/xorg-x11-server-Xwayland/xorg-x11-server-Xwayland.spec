@@ -11,8 +11,8 @@
 
 Summary:   Xwayland
 Name:      xorg-x11-server-Xwayland
-Version:   24.1.9
-Release:   2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
+Version:   24.1.11
+Release:   1%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
 
 URL:       http://www.x.org
 %if 0%{?gitdate}
@@ -136,6 +136,14 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/xwayland.pc
 
 %changelog
+* Mon Apr 27 2026 Olivier Fourdan <ofourdan@redhat.com> -  24.1.11-1
+- Update to xwayland 24.1.11
+
+* Tue Apr 14 2026 Olivier Fourdan <ofourdan@redhat.com> -  24.1.10-1
+- Update to xwayland 24.1.10
+- CVE fix for: CVE-2026-33999, CVE-2026-34000, CVE-2026-34001,
+               CVE-2026-34002, CVE-2026-34003
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 24.1.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

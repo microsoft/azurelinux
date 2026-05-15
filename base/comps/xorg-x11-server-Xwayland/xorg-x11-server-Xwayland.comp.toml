@@ -1,3 +1,4 @@
 [components.xorg-x11-server-Xwayland]
 # Release: 2%{?gitdate:.%{gitdate}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
+spec = { type = "upstream", upstream-commit = "13ea91c5dae6aaf4b0ee38a678d869f8de930401" }
