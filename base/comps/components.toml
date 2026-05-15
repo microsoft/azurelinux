@@ -6924,7 +6924,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.volume_key]
 [components.vsftpd]
 [components.vte291]
-[components.vtk]
 [components.vulkan-headers]
 [components.vulkan-loader]
 [components.waf]
