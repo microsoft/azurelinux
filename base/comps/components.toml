@@ -3074,7 +3074,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.perl-XML-LibXML-Simple]
 [components.perl-XML-LibXSLT]
 [components.perl-XML-NamespaceSupport]
-[components.perl-XML-Parser]
 [components.perl-XML-Parser-Lite]
 [components.perl-XML-RegExp]
 [components.perl-XML-SAX]

@@ -1,0 +1,2 @@
+[components.perl-XML-Parser]
+spec = { type = "upstream", upstream-commit = "f3a1a6b0b8da0637ef524777eaacea44fe5ce4d0" }
