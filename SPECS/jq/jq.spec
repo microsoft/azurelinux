@@ -48,7 +48,8 @@ Development files for jq
 
 %build
 %configure \
-    --disable-static
+    --disable-static \
+    --enable-maintainer-mode
 make %{?_smp_mflags}
 
 %install
