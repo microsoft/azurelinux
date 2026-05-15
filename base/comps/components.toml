@@ -6905,7 +6905,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.v4l-utils]
 [components.vala]
 [components.valgrind]
-[components.valkey]
 [components.vapoursynth]
 [components.varnish]
 [components.varnish-modules]

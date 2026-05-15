@@ -1,0 +1,2 @@
+[components.valkey]
+spec = { type = "upstream", upstream-commit = "cf8d9b3210d3e1cca8a41bac30834ca34c8762d5" }
