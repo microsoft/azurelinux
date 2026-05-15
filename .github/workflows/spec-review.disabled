@@ -1,5 +1,5 @@
 # Reusable spec review workflow — called by the stub on the default branch.
-# Lives on tomls/base/main so it picks up prompt/agent/script updates automatically.
+# Lives on 4.0 so it picks up prompt/agent/script updates automatically.
 #
 # See also: .github/workflows/spec-review-stub.yml (the pull_request_target stub)
 name: Spec Review (reusable)
@@ -24,10 +24,10 @@ on:
         required: true
         type: string
       scripts-ref:
-        description: 'Git ref to checkout for scripts/prompts/agents (default: tomls/base/main)'
+        description: 'Git ref to checkout for scripts/prompts/agents (default: 4.0)'
         required: false
         type: string
-        default: tomls/base/main
+        default: "4.0"
     secrets:
       COPILOT_TOKEN:
         description: 'GitHub App token for Copilot CLI authentication'

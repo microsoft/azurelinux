@@ -2,10 +2,10 @@ name: "Check workflows"
 on:
   # Only trigger for changes that touch workflow files.
   push:
-    branches: [ "tomls/base/main" ]
+    branches: [ "4.0" ]
     paths: [ ".github/workflows/**" ]
   pull_request:
-    branches: [ "tomls/base/main" ]
+    branches: [ "4.0" ]
     paths: [ ".github/workflows/**" ]
   workflow_dispatch:
   schedule:
