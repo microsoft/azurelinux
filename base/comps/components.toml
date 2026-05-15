@@ -2319,7 +2319,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.opensmtpd]
 [components.opensp]
 [components.openspecfun]
-[components.openssh]
 [components.openssl-pkcs11]
 [components.opentest4j]
 [components.openvswitch]

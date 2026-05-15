@@ -1,0 +1,15 @@
+diff --color -ruNp a/scp.c b/scp.c
+--- a/scp.c	2026-04-07 15:54:11.193730842 +0200
++++ b/scp.c	2026-04-07 15:55:52.529425481 +0200
+@@ -1705,8 +1705,10 @@ sink(int argc, char **argv, const char *
+ 
+ 	setimes = targisdir = 0;
+ 	mask = umask(0);
+-	if (!pflag)
++	if (!pflag) {
++		mask |= 07000;
+ 		(void) umask(mask);
++	}
+ 	if (argc != 1) {
+ 		run_err("ambiguous target");
+ 		exit(1);

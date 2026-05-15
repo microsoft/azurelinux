@@ -1,0 +1,2 @@
+[components.openssh]
+spec = { type = "upstream", upstream-commit = "d5a430007eb401a98bb1f0c9de5c62c5843c7847" }
