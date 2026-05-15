@@ -3,3 +3,4 @@
 # (default ON unless rhel >= 10); flip it off via build.without.
 [components.emacs]
 build.without = ["gpm"]
+spec = { type = "upstream", upstream-commit = "6a9977b04774cf129b8a12cfa8bbf162ac9485eb" }
