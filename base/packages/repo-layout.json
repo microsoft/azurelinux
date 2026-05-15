@@ -1,0 +1,13 @@
+{
+    "$schema": "./repo-layout.schema.json",
+    "version": 1,
+    "channels": ["base", "sdk"],
+    "subrepos": [
+        { "name": "base",           "channel": "base", "kind": "binary",    "per_arch": true,  "subpath": "base/$basearch" },
+        { "name": "base-debuginfo", "channel": "base", "kind": "debuginfo", "per_arch": true,  "subpath": "base/debuginfo/$basearch" },
+        { "name": "base-srpms",     "channel": "base", "kind": "srpm",      "per_arch": false, "subpath": "base/srpms" },
+        { "name": "sdk",            "channel": "sdk",  "kind": "binary",    "per_arch": true,  "subpath": "sdk/$basearch" },
+        { "name": "sdk-debuginfo",  "channel": "sdk",  "kind": "debuginfo", "per_arch": true,  "subpath": "sdk/debuginfo/$basearch" },
+        { "name": "sdk-srpms",      "channel": "sdk",  "kind": "srpm",      "per_arch": false, "subpath": "sdk/srpms" }
+    ]
+}

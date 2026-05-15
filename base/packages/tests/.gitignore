@@ -1,0 +1,7 @@
+.venv/
+.workdir/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+uv.lock

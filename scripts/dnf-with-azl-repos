@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+"""dnf-with-azl-repos -- invoke `dnf` against Azure Linux repos discovered
+under one or more URL prefixes that follow the Standard Azure Linux Repo
+Layout.
+
+For each --repo-prefix URL the conventional sub-repos described by
+``base/packages/repo-layout.json`` (loaded via the symlinked
+``_repo_layout`` module next to this script) are probed and added to
+the dnf invocation when reachable. 404s are silently skipped.
+
+The wrapper invokes dnf with `--disablerepo='*' --refresh` and one
+`--repofrompath <id>,<url> --enablerepo=<id>` pair per discovered
+repo, then appends any additional arguments verbatim.
+
+Usage:
+    dnf-with-azl-repos [--repo-prefix URL]... [--no-debuginfo] [--no-srpm]
+                       [--] <dnf-args>...
+
+Examples:
+    dnf-with-azl-repos --repo-prefix https://example.com/azl4 list available
+    dnf-with-azl-repos --repo-prefix https://example.com/azl4 install foo
+
+Notes:
+  * --repo-prefix is repeatable; each prefix yields its own repo IDs
+    (suffixed -1, -2, ... when more than one prefix is given so the
+    IDs stay unique).
+  * Probing uses the host arch (uname -m); URLs passed to dnf keep
+    `$basearch` so dnf performs its own substitution at use time.
+  * To pass --help (or any flag we'd otherwise intercept) through to
+    dnf, separate it with `--`, e.g.
+    `dnf-with-azl-repos --repo-prefix URL -- --help`.
+
+This is a Python rewrite of the previous bash implementation; the
+flag interface and per-repo log lines are preserved for muscle-memory
+compatibility. The Python rewrite also lets the conventional sub-repo
+layout be sourced from the same JSON the rest of the suite uses,
+rather than maintained as a hand-rolled bash array.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import platform
+import shutil
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+# The loader is a symlink next to this script that points at the
+# canonical implementation under base/packages/tests/utils/, so the
+# layout JSON has exactly one validator across the whole repo.
+#
+# Symlink fragility / portability:
+# * `git archive` produces a tarball that does NOT preserve symlinks
+#   for files outside the archive scope: the link is materialised as
+#   a regular file containing the relative path target. So a tarball
+#   built from `scripts/` only would leave `_repo_layout.py` as the
+#   3-line literal "../base/packages/tests/utils/repo_layout.py".
+# * Sparse checkouts that exclude `base/packages/tests/` see the
+#   symlink without its target.
+# * Filesystems / archives without symlink support (older Windows
+#   without developer mode, some FAT/exFAT removable media) likewise
+#   leave the link broken.
+#
+# In all of those cases the import below raises FileNotFoundError /
+# ModuleNotFoundError; catch it and re-raise with a clear pointer at
+# the actual cause so a user does not chase a phantom missing-module
+# bug.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from _repo_layout import load_repo_layout  # noqa: E402
+except (FileNotFoundError, ModuleNotFoundError) as _exc:
+    print(
+        f"{Path(sys.argv[0]).name}: failed to load _repo_layout helper "
+        f"({_exc!s}). The script depends on a symlink at "
+        f"scripts/_repo_layout.py pointing into base/packages/tests/"
+        f"utils/repo_layout.py; this needs a full git clone (with "
+        f"symlinks honoured) and the test-suite tree present. It is "
+        f"NOT usable from `git archive` tarballs of `scripts/` alone, "
+        f"from sparse checkouts that exclude `base/packages/`, or "
+        f"from filesystems without symlink support.",
+        file=sys.stderr,
+        flush=True,
+    )
+    raise
+
+PROG = Path(sys.argv[0]).name
+
+
+def die(msg: str, *, code: int = 2) -> "None":
+    print(f"{PROG}: {msg}", file=sys.stderr, flush=True)
+    sys.exit(code)
+
+
+def log(msg: str) -> None:
+    print(msg, file=sys.stderr, flush=True)
+
+
+def parse_args(argv: list[str]) -> tuple[list[str], list[str], set[str]]:
+    """Hand-roll the split between our own flags and the dnf passthrough.
+
+    We can't use argparse's ``--`` handling alone because we want
+    everything we don't recognize to pass through to dnf, including
+    flags like ``-y`` that argparse would otherwise reject.
+    """
+    parser = argparse.ArgumentParser(
+        prog=PROG,
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False,
+    )
+    parser.add_argument(
+        "--repo-prefix",
+        action="append",
+        default=[],
+        metavar="URL",
+        help=(
+            "URL prefix assumed to host the Standard Azure Linux Repo "
+            "Layout. Repeatable."
+        ),
+    )
+    parser.add_argument(
+        "--no-debuginfo",
+        action="store_true",
+        help="Do not enable debuginfo sub-repos from the discovered layout.",
+    )
+    parser.add_argument(
+        "--no-srpm",
+        action="store_true",
+        help="Do not enable srpm sub-repos from the discovered layout.",
+    )
+    parser.add_argument(
+        "--wrapper-help",
+        action="store_true",
+        help="Show this wrapper's help (use `-- --help` to forward to dnf).",
+    )
+
+    prefixes: list[str] = []
+    passthrough: list[str] = []
+    no_debuginfo = False
+    no_srpm = False
+    i = 0
+    show_help = False
+    while i < len(argv):
+        a = argv[i]
+        if a == "--":
+            passthrough.extend(argv[i + 1:])
+            break
+        if a == "--repo-prefix":
+            if i + 1 >= len(argv):
+                die("--repo-prefix requires a URL")
+            prefixes.append(argv[i + 1])
+            i += 2
+            continue
+        if a.startswith("--repo-prefix="):
+            prefixes.append(a.split("=", 1)[1])
+            i += 1
+            continue
+        if a == "--no-debuginfo":
+            no_debuginfo = True
+            i += 1
+            continue
+        if a == "--no-srpm":
+            no_srpm = True
+            i += 1
+            continue
+        if a == "--wrapper-help":
+            show_help = True
+            i += 1
+            continue
+        passthrough.append(a)
+        i += 1
+
+    if show_help:
+        parser.print_help(sys.stderr)
+        sys.exit(0)
+
+    if not prefixes:
+        die("at least one --repo-prefix URL is required (try --wrapper-help)")
+    excluded_kinds: set[str] = set()
+    if no_debuginfo:
+        excluded_kinds.add("debuginfo")
+    if no_srpm:
+        excluded_kinds.add("srpm")
+    return prefixes, passthrough, excluded_kinds
+
+
+def probe_repo(probe_url: str, *, timeout: float = 30.0) -> bool:
+    """Return True if ``<probe_url>/repodata/repomd.xml`` is HEAD-able.
+
+    Mirrors the bash version's `curl -fsSL --head` behaviour: any HTTP
+    error response (including 404) returns False; non-HTTP errors
+    (network unreachable, DNS failure, etc.) also return False so
+    a transient outage doesn't crash the wrapper before dnf can be
+    given the still-reachable repos.
+    """
+    url = f"{probe_url.rstrip('/')}/repodata/repomd.xml"
+    req = urllib.request.Request(url, method="HEAD")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            # ``resp.status`` is the HTTP status code for http(s)://
+            # responses; for ``file://`` (and other non-HTTP schemes)
+            # urllib's response carries no status -- a successful
+            # urlopen already proved the file exists. Treat that as
+            # success without comparing None to integers.
+            status = getattr(resp, "status", None)
+            if status is None:
+                return True
+            return 200 <= status < 300
+    except urllib.error.HTTPError:
+        return False
+    except (urllib.error.URLError, TimeoutError, OSError):
+        return False
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    prefixes, passthrough, excluded_kinds = parse_args(argv)
+
+    if shutil.which("dnf") is None:
+        die("dnf is required")
+
+    layout = load_repo_layout()
+    host_arch = platform.machine()
+
+    dnf_args: list[str] = ["--disablerepo=*", "--refresh"]
+    total_found = 0
+    for idx, prefix in enumerate(prefixes, start=1):
+        prefix_trim = prefix.rstrip("/")
+        multi_suffix = f"-{idx}" if len(prefixes) > 1 else ""
+
+        log(f"{PROG}: discovering repos under {prefix_trim}")
+        found_here = 0
+        for sub in layout.subrepos:
+            if sub.kind in excluded_kinds:
+                continue
+            probe_rel = sub.subpath.replace("$basearch", host_arch)
+            probe_full = f"{prefix_trim}/{probe_rel}"
+            dnf_full = f"{prefix_trim}/{sub.subpath}"
+            repo_id = f"azl-{sub.name}{multi_suffix}"
+            if probe_repo(probe_full):
+                log(f"  + {repo_id} <- {dnf_full}")
+                dnf_args.extend([
+                    "--repofrompath", f"{repo_id},{dnf_full}",
+                    f"--enablerepo={repo_id}",
+                ])
+                found_here += 1
+            else:
+                log(
+                    f"  - {repo_id} (no repodata at "
+                    f"{probe_full}/repodata/repomd.xml)"
+                )
+        if found_here == 0:
+            log(f"{PROG}: warning: no repos discovered under {prefix_trim}")
+        total_found += found_here
+
+    if total_found == 0:
+        die("no repos discovered under any --repo-prefix")
+
+    cmd = ["dnf", *dnf_args, *passthrough]
+    os.execvp(cmd[0], cmd)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/microsoft/azurelinux/base/packages/tests/cases/known-violations.schema.json",
+  "title": "Known Violations",
+  "description": "Per-test allowlist of tracked-but-tolerated violations. A cleanup nudge: every entry is reported as XFAIL on each run so it stays visible, and stale entries (consumer no longer failing, dep no longer missing) are surfaced as real failures so the file shrinks as gaps close.\n\nFor each logical section there are two top-level tables: `<section>` for entries that apply on every arch (value is an entry-value), and `<section>-arch-gated.<name>` for entries restricted to specific arches (sub-keys are arch names mapped to entry-values). A given <name> must appear in at most one of the two tables.\n\nEach entry-value may be either a bare array of allowlisted strings (the short form, used everywhere by default) or an inline table `{deps = [...], reason = '...', issue = '...'}` (the long form, used when a curator wants to attach human-readable rationale or a tracking link to a single entry without disturbing the bare-array shape of the rest of the section). The two forms are interchangeable -- pick whichever is clearer for the entry.\n\nSchema/loader contract: dispatch between the two table shapes is keyed on the literal `-arch-gated` suffix. The schema and the Python loader (`utils/known_violations.py`) agree on this key so the two cannot drift -- a flat-named section with arch-gated content (or vice versa) is rejected at validation time with a meaningful jsonschema message rather than misclassified at load time or surfaced as an opaque AttributeError later. Empty section objects are accepted so authors can scaffold a section header (e.g. `[runtime-missing]`) without having to pre-populate it.",
+  "type": "object",
+  "required": ["schema-version"],
+  "properties": {
+    "schema-version": {
+      "description": "Schema version the file was authored against. Must be 1.",
+      "type": "integer",
+      "const": 1
+    }
+  },
+  "patternProperties": {
+    "-arch-gated$": {
+      "$ref": "#/$defs/archGatedSection",
+      "description": "Arch-gated section: <name> -> { <arch>: <entryValue> } (applies only on listed arches). Conventionally named `<flat-section>-arch-gated`."
+    }
+  },
+  "additionalProperties": {
+    "$ref": "#/$defs/flatSection",
+    "description": "Flat section: <name> -> <entryValue> (applies on every arch)."
+  },
+  "$defs": {
+    "entryValue": {
+      "description": "One allowlist entry. Bare array (short form) or inline table with required `deps` plus optional `reason` (free-text rationale) and `issue` (tracking-link URL or shorthand like `AB#12345`). The two forms are interchangeable; pick whichever is clearer.",
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        {
+          "type": "object",
+          "required": ["deps"],
+          "additionalProperties": false,
+          "properties": {
+            "deps": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "type": "string", "minLength": 1 },
+              "uniqueItems": true
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Free-text rationale for why this entry is tolerated."
+            },
+            "issue": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Tracking link (URL or shorthand like `AB#12345`)."
+            }
+          }
+        }
+      ]
+    },
+    "flatSection": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/entryValue" }
+    },
+    "archGatedSection": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "minProperties": 1,
+        "additionalProperties": { "$ref": "#/$defs/entryValue" }
+      }
+    }
+  }
+}

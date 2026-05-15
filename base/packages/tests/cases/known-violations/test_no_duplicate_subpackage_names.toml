@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MIT
+schema-version = 1
+
+# Allowlist of known-duplicate subpackage names for the
+# test_no_duplicate_subpackage_names check. Each entry maps a
+# binary subpackage name to the set of SRPM names it is permitted
+# to be produced by. Same schema as the repoclosure files; see
+# cases/known-violations.schema.json.
+#
+# Today every entry is flat (no per-arch overrides) but the
+# arch-gated form is supported so we don't have to migrate the
+# file later when one becomes necessary.
+
+[duplicate-subpackages]
+rubygem-bundler = [
+    "ruby",
+    "rubygem-bundler",
+]
+rubygem-json = [
+    "ruby",
+    "rubygem-json",
+]
+rubygem-minitest = [
+    "ruby",
+    "rubygem-minitest",
+]
+rubygem-power_assert = [
+    "ruby",
+    "rubygem-power_assert",
+]
+rubygem-racc = [
+    "ruby",
+    "rubygem-racc",
+]
+rubygem-rake = [
+    "ruby",
+    "rubygem-rake",
+]
+rubygem-rdoc = [
+    "ruby",
+    "rubygem-rdoc",
+]
+rubygem-test-unit = [
+    "ruby",
+    "rubygem-test-unit",
+]
