@@ -14,12 +14,12 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "2"
+azl_pkgrelease = "5"
 # 4th version component from the AZL kernel source (6.18.29.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.29-1.2.azl4.aarch64).
 kextraversion = "1"
 # NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
-nvidia_open_version = "595.58.03"
+nvidia_open_version = "595.58.04"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
@@ -211,7 +211,7 @@ source = "kmod-nvidia-open-modprobe.conf"
 description = "Register NVIDIA open-gpu-kernel-modules tarball as Source6000"
 type = "spec-insert-tag"
 tag = "Source6000"
-value = "open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz"
+value = "open-gpu-kernel-modules-594.58.03.tar.gz"
 
 [[components.kernel.overlays]]
 description = "Register NVIDIA modprobe config as Source6001"
