@@ -1,0 +1,2 @@
+[components.python-cbor2]
+spec = { type = "upstream", upstream-commit = "575d0ec8472e3a80f5d59b5eed00fc1c87ad99e0" }

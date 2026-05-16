@@ -3594,7 +3594,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-cairosvg]
 [components.python-capturer]
 [components.python-cattrs]
-[components.python-cbor2]
 [components.python-certifi]
 [components.python-cffi]
 [components.python-cffsubr]
