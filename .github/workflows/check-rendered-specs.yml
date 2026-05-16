@@ -47,179 +47,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Render PR's specs + check for drift. Runs PR-derived data through the
-  # container; deliberately has NO pull-requests write (and no secrets beyond
-  # the default read-only token) so that even if the container somehow leaks
-  # into the host, it can't touch the PR. All output flows to the next job via
-  # artifacts + job outputs only.
-  render:
-    name: Render + drift check
-    # Gate render on a clean lock check. `azldev component changed` (used by
-    # the render-scope helper) reads input fingerprints that include lock
-    # content, so stale locks would steer it toward the wrong scope. Skip
-    # render and let the locks PR comment carry the fix instructions.
-    needs: update_locks
-    if: needs.update_locks.result == 'success'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    permissions:
-      contents: read
-    outputs:
-      patch-url: ${{ steps.upload-patch.outputs.artifact-url }}
-    steps:
-      # --- Trusted base branch (tools, scripts, container config) ---
-      - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: ${{ inputs.repo }}
-          ref: "4.0"
-          persist-credentials: false
-
-      # --- PR head (untrusted data — TOML configs, overlays, specs) ---
-      - name: Checkout PR head (data)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: ${{ inputs.pr-head-repo }}
-          ref: ${{ inputs.pr-head-sha }}
-          path: pr-head
-          fetch-depth: 0
-          persist-credentials: false
-
-      - name: Build azldev runner container
-        run: |
-          docker build \
-            --build-arg UID=$(id -u) \
-            --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
-            -t localhost/azldev-runner \
-            -f .github/workflows/containers/azldev-runner.Dockerfile \
-            .github/workflows/containers/
-
-      # Render + drift-check run entirely inside the container. The host never
-      # invokes git against PR data: all git operations happen in the sandboxed
-      # environment, and the host only reads trusted-shape outputs
-      # (report.json, rendered-specs.patch) from a dedicated output volume.
-      # This dodges the whole class of poisoned-.git/config attacks
-      # (diff.external, diff drivers, filter drivers, hooks, etc.).
-      #
-      # Sandbox knobs:
-      #   --cap-add=SYS_ADMIN      mock needs mount namespaces for chroot
-      #   seccomp=unconfined       mock uses syscalls filtered by the default profile
-      #   apparmor=unconfined      ubuntu-latest ships docker-default AppArmor which
-      #                            blocks `mount -t tmpfs` on paths under /var/lib/mock
-      #                            even with SYS_ADMIN granted
-      # We still avoid --privileged (broader blast radius).
-      # --security-opt no-new-privileges would be nice but mock's userhelper
-      # requires setuid, which that flag blocks.
-      - name: Render + check for drift
-        id: check
-        env:
-          WORKSPACE: ${{ github.workspace }}
-        run: |
-          set -euo pipefail
-          mkdir -p "$WORKSPACE/render-output"
-          docker run --rm \
-            --cap-add=SYS_ADMIN \
-            --security-opt seccomp=unconfined \
-            --security-opt apparmor=unconfined \
-            -v "$WORKSPACE/pr-head:/workdir" \
-            -v "$WORKSPACE/render-output:/output" \
-            -v "$WORKSPACE/.github/workflows/scripts/render-specs-check:/scripts:ro" \
-            localhost/azldev-runner \
-            bash -eu -o pipefail -c '
-              azldev component render -q -a --clean-stale -O json \
-                > /output/render-output.json
-              SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
-              python3 /scripts/check_rendered_specs.py \
-                --specs-dir "$SPECS_DIR" \
-                --report /output/render-check-report.json \
-                --patch /output/rendered-specs.patch
-            '
-
-      # Dual upload: `archive: false` (v7 feature) gives browser users a direct
-      # download of the raw patch (artifact name is derived from the filename,
-      # so `name:` is ignored here — that's why we need the second upload).
-      # The zipped `rendered-specs-patch` artifact is for `gh run download`,
-      # which only works with named artifacts.
-      - name: Upload fix patch (unzipped, for browser download)
-        id: upload-patch
-        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          path: render-output/rendered-specs.patch
-          archive: false
-
-      # See: https://github.com/cli/cli/issues/13012 for why this is needed.
-      - name: Upload fix patch (zipped, for gh run download)
-        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: rendered-specs-patch
-          path: render-output/rendered-specs.patch
-
-      - name: Upload render output
-        if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: render-output
-          path: |
-            render-output/render-output.json
-            render-output/render-check-report.json
-
-  # Post the PR comment. Runs in a separate job so the `pull-requests: write`
-  # token is only granted to a job that does NOT execute any PR-derived code:
-  # it only checks out the trusted base branch (for the poster script) and
-  # consumes the trusted-shape report artifact from the render job.
-  comment:
-    name: Post drift comment
-    needs: render
-    # When render is skipped (locks failed), there is no report artifact to
-    # post and the locks PR comment already carries the fix. The
-    # `!cancelled()` status function is required: a job-level `if:` that
-    # only references `needs.render.result` would never run when render
-    # has a non-success conclusion, because GitHub evaluates the implicit
-    # success-of-needs gate BEFORE the `if:` -- the function call is what
-    # tells GitHub to evaluate the `if:` anyway.
-    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: write # Post/update/delete drift comments on PRs
-    steps:
-      - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          repository: ${{ inputs.repo }}
-          ref: "4.0"
-          persist-credentials: false
-
-      - name: Set up Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with:
-          python-version: "3.12"
-
-      - name: Download render report
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
-        with:
-          name: render-output
-          path: render-output
-
-      - name: Post PR comment
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_REPO: ${{ inputs.repo }}
-          PR_NUMBER: ${{ inputs.pr-number }}
-          PATCH_URL: ${{ needs.render.outputs.patch-url }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          python .github/workflows/scripts/render-specs-check/post_render_comment.py \
-            --repo "$PR_REPO" \
-            --pr "$PR_NUMBER" \
-            --report render-output/render-check-report.json \
-            --artifacts-url "$PATCH_URL" \
-            --run-id "$RUN_ID"
-
   # Resolve lock files for PR's components and check for drift. Mirrors the
   # `render` job: same trusted-base + untrusted-PR-head split, same container,
   # same security posture (no pull-requests write here either). The drift
@@ -404,5 +231,178 @@ jobs:
             --repo "$PR_REPO" \
             --pr "$PR_NUMBER" \
             --update-output update-output/update-output.json \
+            --artifacts-url "$PATCH_URL" \
+            --run-id "$RUN_ID"
+
+  # Render PR's specs + check for drift. Runs PR-derived data through the
+  # container; deliberately has NO pull-requests write (and no secrets beyond
+  # the default read-only token) so that even if the container somehow leaks
+  # into the host, it can't touch the PR. All output flows to the next job via
+  # artifacts + job outputs only.
+  render:
+    name: Render + drift check
+    # Gate render on a clean lock check. `azldev component changed` (used by
+    # the render-scope helper) reads input fingerprints that include lock
+    # content, so stale locks would steer it toward the wrong scope. Skip
+    # render and let the locks PR comment carry the fix instructions.
+    needs: update_locks
+    if: needs.update_locks.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    outputs:
+      patch-url: ${{ steps.upload-patch.outputs.artifact-url }}
+    steps:
+      # --- Trusted base branch (tools, scripts, container config) ---
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: "4.0"
+          persist-credentials: false
+
+      # --- PR head (untrusted data — TOML configs, overlays, specs) ---
+      - name: Checkout PR head (data)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.pr-head-repo }}
+          ref: ${{ inputs.pr-head-sha }}
+          path: pr-head
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Build azldev runner container
+        run: |
+          docker build \
+            --build-arg UID=$(id -u) \
+            --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      # Render + drift-check run entirely inside the container. The host never
+      # invokes git against PR data: all git operations happen in the sandboxed
+      # environment, and the host only reads trusted-shape outputs
+      # (report.json, rendered-specs.patch) from a dedicated output volume.
+      # This dodges the whole class of poisoned-.git/config attacks
+      # (diff.external, diff drivers, filter drivers, hooks, etc.).
+      #
+      # Sandbox knobs:
+      #   --cap-add=SYS_ADMIN      mock needs mount namespaces for chroot
+      #   seccomp=unconfined       mock uses syscalls filtered by the default profile
+      #   apparmor=unconfined      ubuntu-latest ships docker-default AppArmor which
+      #                            blocks `mount -t tmpfs` on paths under /var/lib/mock
+      #                            even with SYS_ADMIN granted
+      # We still avoid --privileged (broader blast radius).
+      # --security-opt no-new-privileges would be nice but mock's userhelper
+      # requires setuid, which that flag blocks.
+      - name: Render + check for drift
+        id: check
+        env:
+          WORKSPACE: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$WORKSPACE/render-output"
+          docker run --rm \
+            --cap-add=SYS_ADMIN \
+            --security-opt seccomp=unconfined \
+            --security-opt apparmor=unconfined \
+            -v "$WORKSPACE/pr-head:/workdir" \
+            -v "$WORKSPACE/render-output:/output" \
+            -v "$WORKSPACE/.github/workflows/scripts/render-specs-check:/scripts:ro" \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              azldev component render -q -a --clean-stale -O json \
+                > /output/render-output.json
+              SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
+              python3 /scripts/check_rendered_specs.py \
+                --specs-dir "$SPECS_DIR" \
+                --report /output/render-check-report.json \
+                --patch /output/rendered-specs.patch
+            '
+
+      # Dual upload: `archive: false` (v7 feature) gives browser users a direct
+      # download of the raw patch (artifact name is derived from the filename,
+      # so `name:` is ignored here — that's why we need the second upload).
+      # The zipped `rendered-specs-patch` artifact is for `gh run download`,
+      # which only works with named artifacts.
+      - name: Upload fix patch (unzipped, for browser download)
+        id: upload-patch
+        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          path: render-output/rendered-specs.patch
+          archive: false
+
+      # See: https://github.com/cli/cli/issues/13012 for why this is needed.
+      - name: Upload fix patch (zipped, for gh run download)
+        if: always() && hashFiles('render-output/rendered-specs.patch') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: rendered-specs-patch
+          path: render-output/rendered-specs.patch
+
+      - name: Upload render output
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: render-output
+          path: |
+            render-output/render-output.json
+            render-output/render-check-report.json
+
+  # Post the PR comment. Runs in a separate job so the `pull-requests: write`
+  # token is only granted to a job that does NOT execute any PR-derived code:
+  # it only checks out the trusted base branch (for the poster script) and
+  # consumes the trusted-shape report artifact from the render job.
+  comment:
+    name: Post drift comment
+    needs: render
+    # When render is skipped (locks failed), there is no report artifact to
+    # post and the locks PR comment already carries the fix. The
+    # `!cancelled()` status function is required: a job-level `if:` that
+    # only references `needs.render.result` would never run when render
+    # has a non-success conclusion, because GitHub evaluates the implicit
+    # success-of-needs gate BEFORE the `if:` -- the function call is what
+    # tells GitHub to evaluate the `if:` anyway.
+    if: ${{ !cancelled() && needs.render.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # Post/update/delete drift comments on PRs
+    steps:
+      - name: Checkout base (trusted)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ inputs.repo }}
+          ref: "4.0"
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Download render report
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: render-output
+          path: render-output
+
+      - name: Post PR comment
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_REPO: ${{ inputs.repo }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+          PATCH_URL: ${{ needs.render.outputs.patch-url }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          python .github/workflows/scripts/render-specs-check/post_render_comment.py \
+            --repo "$PR_REPO" \
+            --pr "$PR_NUMBER" \
+            --report render-output/render-check-report.json \
             --artifacts-url "$PATCH_URL" \
             --run-id "$RUN_ID"
