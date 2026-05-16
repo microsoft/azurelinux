@@ -2468,7 +2468,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.perl-Crypt-PBKDF2]
 [components.perl-Crypt-Rijndael]
 [components.perl-Crypt-URandom]
-[components.perl-CryptX]
 [components.perl-Curses]
 [components.perl-Cwd-Guard]
 [components.perl-DBD-CSV]

@@ -1,0 +1,2 @@
+[components.perl-CryptX]
+spec = { type = "upstream", upstream-commit = "30af4729abe7c5759c322cdab86b31d244e479a6" }
