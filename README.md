@@ -26,16 +26,6 @@ The links below will help you get started with Azure Linux:
 | **Contribution guidelines** | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | **Report a security issue** | [SECURITY.md](SECURITY.md) |
 
-### ISO for Azure Linux 3.0
-
-To try Azure Linux Download the ISO here: [Azure Linux 3.0 x86_64 ISO](https://aka.ms/azurelinux-3.0-x86_64.iso) / [Azure Linux 3.0 aarch64 ISO](https://aka.ms/azurelinux-3.0-aarch64.iso)
-
-Before using a downloaded ISO, [verify the checksum and signature of the image](toolkit/docs/security/iso-image-verification.md).
-
-After downloading the ISO, use [the quickstart instructions](toolkit/docs/quick_start/quickstart.md) to install and use the image in a Hyper-V VM.
-
-Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/azurelinux/issues) or create a new feature request by clicking [here](https://github.com/microsoft/azurelinux/issues/new). For additional information refer to the [support.md](https://github.com/microsoft/azurelinux/blob/3.0/SUPPORT.md) file.
-
 ## Engagement & support
 
 - **Bugs and feature requests:** file a
