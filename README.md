@@ -1,6 +1,5 @@
 <h1>
-  <img src="assets/azurelinux-logo-48.png" alt="Azure Linux logo" align="left" height="44" /> &nbsp;
-  Azure Linux 4
+  <img src="assets/azurelinux-logo-48.png" alt="Azure Linux logo" align="left" height="44" /> Azure Linux 4
 </h1>
 
 **An open-source Linux distribution built and optimized for [Azure](https://azure.microsoft.com/), with sources derived from [Fedora Linux](https://fedoraproject.org/).** Azure Linux provides a secured, reliable operating system for virtual machines, containers, and bare-metal platforms.
