@@ -5,7 +5,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 # Please keep this list sorted alphabetically for readability.
 #
 
-[components.389-ds-base]
 [components.7zip]
 [components.AMF]
 [components.CGAL]

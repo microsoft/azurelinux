@@ -1,0 +1,2 @@
+[components.389-ds-base]
+spec = { type = "upstream", upstream-commit = "81c76bacdccf6227749cdae8f7b52a1532b610d0" }
