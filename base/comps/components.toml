@@ -1812,7 +1812,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libkeepalive]
 [components.libkexiv2]
 [components.libklvanc]
-[components.libkml]
 [components.libkrun]
 [components.libkrunfw]
 [components.libksba]

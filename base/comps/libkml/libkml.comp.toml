@@ -1,0 +1,9 @@
+[components.libkml]
+
+[[components.libkml.source-files]]
+filename = "libkml-1.3.0.tar.gz"
+hash = "6f93fcd390c6b21e307638df5d85b15dcb81af81c7409797a247b322df843fb1c36dc6c5eb7dc1346adbf228e09ec4ffdbf450dfe1f9b73cbc32e8803a098c58"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/libkml/libkml-1.3.0.tar.gz/sha512/6f93fcd390c6b21e307638df5d85b15dcb81af81c7409797a247b322df843fb1c36dc6c5eb7dc1346adbf228e09ec4ffdbf450dfe1f9b73cbc32e8803a098c58/libkml-1.3.0.tar.gz" }
+replace-upstream = true
+replace-reason = "Strips the scanner-flagged `testdata/kmz/bad-too-large.kmz` test fixture (a benign-by-intent crafted-malformed ZIP whose on-disk shape matches malicious-archive heuristics) and the matching `ZipFileTest.TestBadTooLarge` block from `tests/kml/base/zip_file_test.cc`. See `modify_source.sh` next to this file."
