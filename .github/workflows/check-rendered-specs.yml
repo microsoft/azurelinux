@@ -351,9 +351,9 @@ jobs:
               # Stale forks may not have the upstream base SHA in their
               # object store. Fetch it explicitly so `compute_changed.sh`
               # can resolve `--from <base-sha>`. The base repo is public
-              # so no auth is needed; --depth=1 keeps the fetch cheap.
+              # so no auth is needed.
               git -C /workdir remote add base "https://github.com/$BASE_REPO.git" 2>/dev/null || true
-              git -C /workdir fetch --no-tags --depth=1 base "$PR_BASE_SHA"
+              git -C /workdir fetch --no-tags base "$PR_BASE_SHA"
 
               # Compute the render set (PR-touched components). Safe here
               # because the locks gate has already run successfully -- input
