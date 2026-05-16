@@ -3094,7 +3094,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.perl-YAML]
 [components.perl-YAML-LibYAML]
 [components.perl-YAML-PP]
-[components.perl-YAML-Syck]
 [components.perl-YAML-Tiny]
 [components.perl-accessors]
 [components.perl-aliased]

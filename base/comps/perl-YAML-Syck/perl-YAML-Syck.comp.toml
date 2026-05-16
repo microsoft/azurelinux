@@ -1,0 +1,2 @@
+[components.perl-YAML-Syck]
+spec = { type = "upstream", upstream-commit = "9e913d7f451391313738fab7d43b1e22f4115c64" }
