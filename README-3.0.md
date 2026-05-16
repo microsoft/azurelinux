@@ -13,8 +13,6 @@ When security vulnerabilities arise, Azure Linux supports both a package-based u
 
 ## Getting Started with Azure Linux
 
-NOTE: Looking for CBL-Mariner 2.0 Source?  Click [here](https://github.com/microsoft/azurelinux/tree/2.0)
-
 ### Build
 
 Instructions for building Azure Linux 3.0 may be found here: [Toolkit Documentation](./toolkit/README.md).
