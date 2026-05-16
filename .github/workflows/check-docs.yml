@@ -1,0 +1,41 @@
+name: "Check docs"
+on:
+  push:
+    branches: [ 4.0 ]
+  pull_request:
+    branches: [ 4.0 ]
+  workflow_dispatch:
+  schedule:
+    # Run every night at 3:15am PST (11:15am UTC)
+    - cron: '15 11 * * *'
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+  CLICOLOR_FORCE: 1
+
+permissions:
+  contents: read
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Check links in docs
+  check-links:
+    name: "Check links"
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Check repo-local links
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          args: ". --offline --verbose --include-verbatim --include-fragments --no-progress"
+          fail: true

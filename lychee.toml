@@ -1,0 +1,4 @@
+exclude_path = [
+   # Exclude validation of links in rendered specs/content.
+   "(^|/)specs/" 
+]
