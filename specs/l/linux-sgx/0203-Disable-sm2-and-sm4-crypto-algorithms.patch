@@ -1,4 +1,4 @@
-From 1c3da2baf4cc84aecd2f6610777d28ac69a47039 Mon Sep 17 00:00:00 2001
+From 7ca8da21d6f4d5f6a0785dadd4b90547e3419609 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 1 Mar 2024 13:25:14 +0000
 Subject: [PATCH 203/203] Disable sm2 and sm4 crypto algorithms
@@ -17,7 +17,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  4 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
-index cf8394b..fea2232 100755
+index 007aea0..5b11130 100755
 --- a/Linux/build_openssl.sh
 +++ b/Linux/build_openssl.sh
 @@ -162,7 +162,7 @@ cp sgx_config.conf $OPENSSL_VERSION/ || exit 1
@@ -119,5 +119,5 @@ index a395ce8..f49e5b7 100644
  }
 +#endif
 -- 
-2.49.0
+2.53.0
 

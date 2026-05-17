@@ -1,7 +1,7 @@
-From e3c75970d5de401a80b8c7f97a31b0ad4cf7ed7d Mon Sep 17 00:00:00 2001
+From 0a09e36017a7851d91ce950f301b3d37f7fc8009 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 15 Jan 2026 12:48:19 +0000
-Subject: [PATCH 127/131] qgs: add compat for boost 1.89 which deprecated
+Subject: [PATCH 122/127] qgs: add compat for boost 1.89 which deprecated
  deadline_timer.hpp
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -16,9 +16,25 @@ include the deadline_timer.hpp
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
+ QuoteGeneration/quote_wrapper/qgs/Makefile     | 4 ++--
  QuoteGeneration/quote_wrapper/qgs/qgs_server.h | 1 +
- 1 file changed, 1 insertion(+)
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
+diff --git a/QuoteGeneration/quote_wrapper/qgs/Makefile b/QuoteGeneration/quote_wrapper/qgs/Makefile
+index fa1f6708..e3efaeb9 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/Makefile
++++ b/QuoteGeneration/quote_wrapper/qgs/Makefile
+@@ -16,8 +16,8 @@ QGS_INC = -I$(SGX_SDK)/include \
+ 		  -I$(TOP_DIR)/qpl/inc \
+ 		  -I$(TOP_DIR)/quote_wrapper/tdx_quote/inc \
+ 		  -I$(TOP_DIR)/quote_wrapper/qgs_msg_lib/inc
+-QGS_CFLAGS = -g -MMD -Werror $(CFLAGS) $(QGS_INC)
+-QGS_CXXFLAGS = -g -MMD -Werror $(CXXFLAGS) $(QGS_INC)
++QGS_CFLAGS = -g -MMD -Werror -Wno-deprecated-declarations $(CFLAGS) $(QGS_INC)
++QGS_CXXFLAGS = -g -MMD -Werror -Wno-deprecated-declarations $(CXXFLAGS) $(QGS_INC)
+ 
+ DEPENDS = ${QGS_OBJS test_client.o:.o=.d}
+ 
 diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h b/QuoteGeneration/quote_wrapper/qgs/qgs_server.h
 index 91eb41a4..b56b2633 100644
 --- a/QuoteGeneration/quote_wrapper/qgs/qgs_server.h

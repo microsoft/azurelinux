@@ -1,7 +1,7 @@
-From 6a559d65522af8509a72818d2ef330f68d26711e Mon Sep 17 00:00:00 2001
+From ea9950ebf08d3899c345176ab24d7b3b8b39067d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Tue, 18 Jun 2024 15:57:22 +0100
-Subject: [PATCH 05/17] disable openmp, protobuf & sample_crypto builds
+Subject: [PATCH 05/16] disable openmp, protobuf & sample_crypto builds
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -11,24 +11,18 @@ important, so skip them to reduce amount of bundled package code.
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- linux/installer/common/sdk/BOMs/sdk_base.txt  | 298 ------------------
+ linux/installer/common/sdk/BOMs/sdk_base.txt  | 296 ------------------
  .../common/sdk/BOMs/sdk_cve_2020_0551_cf.txt  |   2 -
  .../sdk/BOMs/sdk_cve_2020_0551_load.txt       |   2 -
  linux/installer/common/sdk/BOMs/sdk_x64.txt   |   3 -
  sdk/Makefile.source                           |  24 +-
- 5 files changed, 1 insertion(+), 328 deletions(-)
+ 5 files changed, 1 insertion(+), 326 deletions(-)
 
 diff --git a/linux/installer/common/sdk/BOMs/sdk_base.txt b/linux/installer/common/sdk/BOMs/sdk_base.txt
-index d26ee825..ed585066 100644
+index b9189f7b..858be8fd 100644
 --- a/linux/installer/common/sdk/BOMs/sdk_base.txt
 +++ b/linux/installer/common/sdk/BOMs/sdk_base.txt
-@@ -1,5 +1,4 @@
- DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
--<deliverydir>/build/linux/libsample_libcrypto.so	<installdir>/package/SampleCode/RemoteAttestation/sample_libcrypto/libsample_libcrypto.so	0	main	STP
- <deliverydir>/common/inc/sgx_attributes.h	<installdir>/package/include/sgx_attributes.h	0	main	STP
- <deliverydir>/common/inc/sgx_capable.h	<installdir>/package/include/sgx_capable.h	0	main	STP
- <deliverydir>/common/inc/sgx_cpuid.h	<installdir>/package/include/sgx_cpuid.h	0	main	STP
-@@ -391,16 +390,6 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+@@ -365,16 +365,6 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
  <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.cpp	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.cpp	0	N/A	N/A
  <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.edl	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.edl	0	N/A	N/A
  <deliverydir>/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.lds	<installdir>/package/SampleCode/SealUnseal/Enclave_Unseal/Enclave_Unseal.lds	0	N/A	N/A
@@ -45,15 +39,7 @@ index d26ee825..ed585066 100644
  <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.config.xml	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.config.xml	0	N/A	N/A
  <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.cpp	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.cpp	0	N/A	N/A
  <deliverydir>/SampleCode/SampleAEXNotify/Enclave/Enclave.edl	<installdir>/package/SampleCode/SampleAEXNotify/Enclave/Enclave.edl	0	N/A	N/A
-@@ -412,7 +401,6 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
- <deliverydir>/SampleCode/SampleAEXNotify/Makefile	<installdir>/package/SampleCode/SampleAEXNotify/Makefile	0	N/A	N/A
- <deliverydir>/SampleCode/SampleAEXNotify/README.txt	<installdir>/package/SampleCode/SampleAEXNotify/README.txt	0	N/A	N/A
- <deliverydir>/build/linux/gdb-sgx-plugin/sgx-gdb	<installdir>/package/bin/sgx-gdb	0	main	STP
--<deliverydir>/sdk/sample_libcrypto/sample_libcrypto.h	<installdir>/package/SampleCode/RemoteAttestation/sample_libcrypto/sample_libcrypto.h	0	main	STP
- <deliverydir>/sdk/tlibcxx/include/CMakeLists.txt	<installdir>/package/include/libcxx/CMakeLists.txt	0	main	STP
- <deliverydir>/sdk/tlibcxx/include/__availability	<installdir>/package/include/libcxx/__availability	0	main	STP
- <deliverydir>/sdk/tlibcxx/include/__bit_reference	<installdir>/package/include/libcxx/__bit_reference	0	main	STP
-@@ -597,290 +585,4 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+@@ -570,290 +560,4 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
  <deliverydir>/sdk/tlibcxx/include/variant	<installdir>/package/include/libcxx/variant	0	main	STP
  <deliverydir>/sdk/tlibcxx/include/vector	<installdir>/package/include/libcxx/vector	0	main	STP
  <deliverydir>/sdk/tlibcxx/include/version	<installdir>/package/include/libcxx/version	0	main	STP
@@ -345,10 +331,10 @@ index d26ee825..ed585066 100644
 -<deliverydir>/external/protobuf/protobuf_code/third_party/abseil-cpp/absl/utility/utility.h	<installdir>/package/include/tprotobuf/absl/utility/utility.h	0	main	STP
  <deliverydir>/common/buildenv.mk	<installdir>/package/buildenv.mk	0	main	STP
 diff --git a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
-index 65d9dca0..086992f9 100644
+index 7bd918da..144e2066 100644
 --- a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
 +++ b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_cf.txt
-@@ -10,9 +10,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+@@ -9,9 +9,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
  <deliverydir>/build/linuxCF/libsgx_tswitchless.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_tswitchless.a	0	main	STP
  <deliverydir>/build/linuxCF/libsgx_tprotected_fs.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_tprotected_fs.a	0	main	STP
  <deliverydir>/build/linuxCF/libsgx_pcl.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_pcl.a	0	main	STP
@@ -359,10 +345,10 @@ index 65d9dca0..086992f9 100644
  <deliverydir>/build/linuxCF/libtdx_tls.a	<installdir>/package/lib64/cve_2020_0551_cf/libtdx_tls.a	0	main	STP
  <deliverydir>/build/linuxCF/libsgx_utls.a	<installdir>/package/lib64/cve_2020_0551_cf/libsgx_utls.a	0	main	STP
 diff --git a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
-index 71684b38..c26c9e63 100644
+index 5491fa75..3f9f670b 100644
 --- a/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
 +++ b/linux/installer/common/sdk/BOMs/sdk_cve_2020_0551_load.txt
-@@ -10,9 +10,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+@@ -9,9 +9,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
  <deliverydir>/build/linuxLOAD/libsgx_tswitchless.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_tswitchless.a	0	main	STP
  <deliverydir>/build/linuxLOAD/libsgx_tprotected_fs.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_tprotected_fs.a	0	main	STP
  <deliverydir>/build/linuxLOAD/libsgx_pcl.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_pcl.a	0	main	STP
@@ -373,10 +359,10 @@ index 71684b38..c26c9e63 100644
  <deliverydir>/build/linuxLOAD/libtdx_tls.a	<installdir>/package/lib64/cve_2020_0551_load/libtdx_tls.a	0	main	STP
  <deliverydir>/build/linuxLOAD/libsgx_utls.a	<installdir>/package/lib64/cve_2020_0551_load/libsgx_utls.a	0	main	STP
 diff --git a/linux/installer/common/sdk/BOMs/sdk_x64.txt b/linux/installer/common/sdk/BOMs/sdk_x64.txt
-index d713050b..111070ee 100644
+index 4066ad1a..a8f07678 100644
 --- a/linux/installer/common/sdk/BOMs/sdk_x64.txt
 +++ b/linux/installer/common/sdk/BOMs/sdk_x64.txt
-@@ -40,10 +40,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+@@ -34,10 +34,7 @@ DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
  <deliverydir>/build/linux/sgx_edger8r	<installdir>/package/bin/x64/sgx_edger8r	0	main	STP
  <deliverydir>/build/linux/sgx_sign	<installdir>/package/bin/x64/sgx_sign	0	main	STP
  <deliverydir>/build/linux/sgx_encrypt	<installdir>/package/bin/x64/sgx_encrypt	0	main	STP
@@ -388,10 +374,10 @@ index d713050b..111070ee 100644
  <deliverydir>/build/linux/libtdx_tls.a	<installdir>/package/lib64/libtdx_tls.a	0	main	STP
  <deliverydir>/build/linux/libsgx_utls.a	<installdir>/package/lib64/libsgx_utls.a	0	main	STP
 diff --git a/sdk/Makefile.source b/sdk/Makefile.source
-index e3bac508..2d37b2d4 100644
+index 37fb7dc4..59c5f8ea 100644
 --- a/sdk/Makefile.source
 +++ b/sdk/Makefile.source
-@@ -41,14 +41,11 @@
+@@ -40,13 +40,10 @@
  #        - tprotected_fs: libsgx_tprotected_fs.a
  #        - tcmalloc:      libsgx_tcmalloc.a
  #        - sgx_pcl:       libsgx_pcl.a
@@ -399,23 +385,22 @@ index e3bac508..2d37b2d4 100644
 -#        - protobuf:      libsgx_protobuf.a
  #        - ttls:          libsgx_ttls.a
  #  - Untrtusted libraries
- #        - ukey_exchange: libsgx_ukey_exchange.a
  #        - uprotected_fs: libsgx_uprotected_fs.a
  #        - ptrace:        libsgx_ptrace.so, gdb-sgx-plugin
 -#        - sample_crypto: libsample_crypto.so (for sample code use)
  #        - utls:          libsgx_utls.a
  #  - Standalone, untrusted libraries
  #        - libcapable:    libsgx_capable.a libsgx_capable.so
-@@ -66,7 +63,7 @@ LIBTCXX    := $(BUILD_DIR)/libsgx_tcxx.a
+@@ -64,7 +61,7 @@ LIBTCXX    := $(BUILD_DIR)/libsgx_tcxx.a
  LIBTSE     := $(BUILD_DIR)/libsgx_tservice.a
  
  .PHONY: components
--components: tstdc tcxx tservice trts tcrypto tkey_exchange ukey_exchange tprotected_fs uprotected_fs ptrace sample_crypto libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread openmp protobuf ttls utls
-+components: tstdc tcxx tservice trts tcrypto tkey_exchange ukey_exchange tprotected_fs uprotected_fs ptrace libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread ttls utls
+-components: tstdc tcxx tservice trts tcrypto tprotected_fs uprotected_fs ptrace sample_crypto libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread openmp protobuf ttls utls
++components: tstdc tcxx tservice trts tcrypto tprotected_fs uprotected_fs ptrace libcapable simulation signtool edger8r tcmalloc sgx_pcl sgx_encrypt sgx_tswitchless sgx_uswitchless pthread ttls utls
  
  # ---------------------------------------------------
  #  tstdc
-@@ -220,18 +217,6 @@ tprotected_fs: edger8r
+@@ -214,18 +211,6 @@ tprotected_fs: edger8r
  sgx_pcl:
  	$(MAKE) -C protected_code_loader
  
@@ -434,7 +419,7 @@ index e3bac508..2d37b2d4 100644
  .PHONY: cbor_untrusted
  cbor_untrusted:
  	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/cbor cbor_untrusted
-@@ -255,10 +240,6 @@ uprotected_fs: edger8r
+@@ -250,10 +235,6 @@ uprotected_fs: edger8r
  ptrace:
  	$(MAKE) -C debugger_interface/linux/
  
@@ -445,7 +430,7 @@ index e3bac508..2d37b2d4 100644
  .PHONY: utls
  utls: cbor_untrusted
  	$(MAKE) -C utls
-@@ -328,7 +309,6 @@ clean:
+@@ -321,7 +302,6 @@ clean:
  	$(MAKE) -C protected_fs/sgx_tprotected_fs/     clean
  	$(MAKE) -C protected_fs/sgx_uprotected_fs/     clean
  	$(MAKE) -C debugger_interface/linux/           clean
@@ -453,15 +438,15 @@ index e3bac508..2d37b2d4 100644
  	$(MAKE) -C libcapable/linux/                   clean
  	$(MAKE) -C simulation/                         clean
  	$(MAKE) -C sign_tool/SignTool                  clean
-@@ -339,8 +319,6 @@ clean:
+@@ -332,8 +312,6 @@ clean:
  	$(MAKE) -C switchless/sgx_uswitchless          clean
  	$(MAKE) -C tmm_rsrv/                           clean
  	$(MAKE) -C pthread                             clean
 -	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/openmp        clean
 -	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/protobuf      clean
  	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/cbor          clean
+ 	$(MAKE) -C $(LINUX_EXTERNAL_DIR)/libcxxrt      clean
  	$(MAKE) -C ttls						           clean
- 	$(MAKE) -C utls						           clean
 -- 
-2.52.0
+2.53.0
 

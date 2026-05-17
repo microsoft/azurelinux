@@ -1,4 +1,4 @@
-From 97cfa1700287075f2d87905aa895d570122ec725 Mon Sep 17 00:00:00 2001
+From 5e85d8d7f98625bf42c75b2253b1cbe763d5a275 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Tue, 11 Feb 2025 14:58:58 +0000
 Subject: [PATCH] Disable inclusion of AESM in installer
@@ -11,30 +11,28 @@ CppMicroServices dependency
 
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- linux/installer/common/psw-dcap/Makefile | 27 +-----------------------
- psw/ae/Makefile                          |  4 ++--
- 2 files changed, 3 insertions(+), 28 deletions(-)
+ linux/installer/common/psw-dcap/Makefile | 25 +-----------------------
+ psw/ae/Makefile                          |  2 +-
+ 2 files changed, 2 insertions(+), 25 deletions(-)
 
 diff --git a/linux/installer/common/psw-dcap/Makefile b/linux/installer/common/psw-dcap/Makefile
-index a85c8b82..3ea22440 100644
+index 1ae7a292..1174622d 100644
 --- a/linux/installer/common/psw-dcap/Makefile
 +++ b/linux/installer/common/psw-dcap/Makefile
-@@ -150,13 +150,7 @@ post_$(1): $(1) | $(PACKAGE_ROOT_PATH)
+@@ -111,11 +111,7 @@ post_$(1): $(1) | $(PACKAGE_ROOT_PATH)
  	cp -fr $$|/$$</* $(DESTDIR)/$$< ) ||:
  endef
  
 -AESM_SERVICE_PKGS:= $(AESM_PCE_PACKAGE)      \
--                    $(AESM_EPID_PACKAGE)     \
 -                    $(AESM_ECDSA_PACKAGE)    \
--                    $(AESM_LAUNCH_PACKAGE)   \
 -                    $(AESM_QUOTE_EX_PACKAGE) \
 -                    $(AESM_SERVICE_PACKAGE)  \
 -                    $(QE3_LOGIC_PACKAGE)     \
 +AESM_SERVICE_PKGS:= $(QE3_LOGIC_PACKAGE)     \
                      $(PCE_LOGIC_PACKAGE)
  
- AE_PKGS:= $(AE_EPID_PACKAGE)                 \
-@@ -200,25 +194,6 @@ PHONY+=$(foreach PKG,$(ALL_PKGS),post_$(PKG))
+ AE_PKGS:= $(AE_IDE_PACKAGE)                  \
+@@ -153,25 +149,6 @@ PHONY+=$(foreach PKG,$(ALL_PKGS),post_$(PKG))
  
  PHONY+=install_$(AESM_SERVICE_PACKAGE)
  install_$(AESM_SERVICE_PACKAGE): $(foreach PKG,$(AESM_SERVICE_PKGS),post_$(PKG))
@@ -58,24 +56,21 @@ index a85c8b82..3ea22440 100644
 -	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_pce.signed.so)                                          && \
 -	ln -fs liburts_internal.so libsgx_urts.so.$(URTS_MAJOR_VER)
  
- PHONY+=install_$(DCAP_PCCS_PACKAGE)
- install_$(DCAP_PCCS_PACKAGE): pre_$(DCAP_PCCS_PACKAGE) | $(PACKAGE_ROOT_PATH)
+ PHONY+=$(RA_SERVICE_PACKAGE)
+ $(RA_SERVICE_PACKAGE): pre_$(RA_SERVICE_PACKAGE) | $(PACKAGE_ROOT_PATH)
 diff --git a/psw/ae/Makefile b/psw/ae/Makefile
-index a810d6b9..82a07af1 100644
+index 8853694d..3b4ff9f0 100644
 --- a/psw/ae/Makefile
 +++ b/psw/ae/Makefile
-@@ -46,9 +46,9 @@ endif
+@@ -45,7 +45,7 @@ CHECK_PREBUILT := prebuilt_check_fail
+ endif
  
  .PHONY: all
- ifeq ($(BUILD_REF_LE), 1)
--all: $(CMAKE_RESULT) AESM REF_LE COPY_AES| $(BUILD_DIR)
-+all: $(CMAKE_RESULT) REF_LE COPY_AES| $(BUILD_DIR)
- else
 -all: $(CMAKE_RESULT) AESM COPY_AES| $(BUILD_DIR)
 +all: $(CMAKE_RESULT) COPY_AES| $(BUILD_DIR)
- endif #($(BUILD_REF_LE), 1)
  
- # COPY_AES: currently copy le, qe, pve, pce, qe3
+ # COPY_AES: currently copy le, pce, qe3
+ .PHONY: COPY_AES
 -- 
-2.52.0
+2.53.0
 

@@ -1,7 +1,7 @@
-From cdb0cd3480f5ab6cac9df1e13bed78dd1088c7a1 Mon Sep 17 00:00:00 2001
+From 1055a7f1f6b9cb2f55784ae52d29677a828ca93c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 4 Dec 2025 13:31:54 +0000
-Subject: [PATCH 118/131] pcsclient: make 'keyring' module optional
+Subject: [PATCH 118/127] pcsclient: make 'keyring' module optional
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

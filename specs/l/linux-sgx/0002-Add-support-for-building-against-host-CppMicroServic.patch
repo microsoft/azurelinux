@@ -1,7 +1,7 @@
-From 52367555ba7ec1a3591dc0e6fb3b3cc4cef03517 Mon Sep 17 00:00:00 2001
+From b59cf0e4fb227486ba743f4d02b9cede4b2e08ec Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 13 Feb 2025 14:01:10 +0000
-Subject: [PATCH 02/17] Add support for building against host CppMicroServices
+Subject: [PATCH 02/16] Add support for building against host CppMicroServices
  lib
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -29,10 +29,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  3 files changed, 28 insertions(+), 11 deletions(-)
 
 diff --git a/buildenv.mk b/buildenv.mk
-index 6dac4028..915e2eb4 100644
+index 86d30af6..8aafa610 100644
 --- a/buildenv.mk
 +++ b/buildenv.mk
-@@ -398,3 +398,13 @@ TINYXML2_LDFLAGS =
+@@ -383,3 +383,13 @@ TINYXML2_LDFLAGS =
  TINYXML2_OBJ = tinyxml2.o
  TINYXML2_DIR = $(LINUX_EXTERNAL_DIR)/tinyxml2/
  endif
@@ -47,7 +47,7 @@ index 6dac4028..915e2eb4 100644
 +CPPMICROSERVICES_CMAKE_DIR = $(CPPMICROSERVICES_INSTALL_DIR)/share/cppmicroservices4/cmake
 +endif
 diff --git a/psw/ae/aesm_service/Makefile b/psw/ae/aesm_service/Makefile
-index bac84292..89a15875 100644
+index 24613afe..b469bffb 100644
 --- a/psw/ae/aesm_service/Makefile
 +++ b/psw/ae/aesm_service/Makefile
 @@ -32,10 +32,8 @@
@@ -62,7 +62,7 @@ index bac84292..89a15875 100644
  ifdef DEBUG
      AESM_CONFIG += -DCMAKE_BUILD_TYPE=Debug
  else
-@@ -48,6 +46,7 @@ endif
+@@ -44,6 +42,7 @@ endif
  
  AESM_CONFIG += -DOPENSSL_CRYPTO_CFLAGS=$(OPENSSL_CRYPTO_CFLAGS)
  AESM_CONFIG += -DOPENSSL_CRYPTO_LIBS=$(OPENSSL_CRYPTO_LIBS)
@@ -70,9 +70,9 @@ index bac84292..89a15875 100644
  
  ifeq ($(ARCH), x86)
      SQLITECFLAGS += -m32
-@@ -66,7 +65,9 @@ CFLAGS := $(filter-out -Werror, $(CFLAGS))
+@@ -61,7 +60,9 @@ CFLAGS += -fpie
+ CFLAGS := $(filter-out -Werror, $(CFLAGS))
  
- WHITE_LIST_FILE := $(LINUX_PSW_DIR)/ae/data/prebuilt/white_list_cert_to_be_verify.bin
  APPNAME         := source/build/bin/aesm_service
 -CPPMICROSERVICES:= $(CPPMICROSERVICES_DIR)/build/lib/libCppMicroServices.so.4.0.0
 +ifeq ($(USE_HOST_CPPMICROSERVICES), 0)
@@ -81,7 +81,7 @@ index bac84292..89a15875 100644
  RDRAND_LIBDIR :=$(LINUX_EXTERNAL_DIR)/rdrand/src
  RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
  
-@@ -80,21 +81,25 @@ copy_data_file:
+@@ -71,21 +72,25 @@ all: $(APPNAME) $(APPNAME_DEBUG) | $(BUILD_DIR)
  
  $(APPNAME): $(CPPMICROSERVICES) source/build/CMakeCache.txt urts RDRAND
  	$(MAKE) -C source/build
@@ -111,7 +111,7 @@ index bac84292..89a15875 100644
  endif
  
  source/build/CMakeCache.txt: $(CPPMICROSERVICES)
-@@ -124,8 +129,10 @@ $(BUILD_DIR):
+@@ -115,8 +120,10 @@ $(BUILD_DIR):
  .PHONY: clean
  clean:
  	@$(RM) -r source/build
@@ -125,7 +125,7 @@ index bac84292..89a15875 100644
  ifeq ($(RDRAND_MAKEFILE), $(wildcard $(RDRAND_MAKEFILE)))
  	@$(MAKE) distclean -C $(RDRAND_LIBDIR)
 diff --git a/psw/ae/aesm_service/source/CMakeLists.txt b/psw/ae/aesm_service/source/CMakeLists.txt
-index 5728e9b4..7f368a97 100644
+index 735c5fa5..065b7527 100644
 --- a/psw/ae/aesm_service/source/CMakeLists.txt
 +++ b/psw/ae/aesm_service/source/CMakeLists.txt
 @@ -46,7 +46,7 @@ else()
@@ -138,5 +138,5 @@ index 5728e9b4..7f368a97 100644
  cmake_minimum_required(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
  cmake_policy(VERSION ${US_CMAKE_MINIMUM_REQUIRED_VERSION})
 -- 
-2.52.0
+2.53.0
 

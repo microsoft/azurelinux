@@ -1,0 +1,33 @@
+From a4ebdc7940846aac60f589358bdae60559ccca34 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 25 Mar 2026 15:54:42 +0000
+Subject: [PATCH 126/127] ensure build terminates if prepare_sgxssl.sh fails
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The prepare_sgxssl.sh script ignores exit status from all
+commands it runs, so if 'make' fails to build the sgxssl
+code the caller will still assume all is well.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteVerification/prepare_sgxssl.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/QuoteVerification/prepare_sgxssl.sh b/QuoteVerification/prepare_sgxssl.sh
+index 19152d77..8195407f 100755
+--- a/QuoteVerification/prepare_sgxssl.sh
++++ b/QuoteVerification/prepare_sgxssl.sh
+@@ -5,6 +5,8 @@
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+ 
++set -e
++
+ ARG1=${1:-build}
+ top_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ sgxssl_dir=$top_dir/sgxssl
+-- 
+2.53.0
+

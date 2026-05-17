@@ -1,7 +1,7 @@
-From 4f4340cc0e4c06b06f6531c00254bdcb2d4adf9e Mon Sep 17 00:00:00 2001
+From 79bc4b56fd25fbf49927be31513556ec9d86e6ec Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 13 Feb 2025 14:01:10 +0000
-Subject: [PATCH 01/17] Add support for building against host tinyxml2 lib
+Subject: [PATCH 01/16] Add support for building against host tinyxml2 lib
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -22,10 +22,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  2 files changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/buildenv.mk b/buildenv.mk
-index acae2106..6dac4028 100644
+index b9f625cb..86d30af6 100644
 --- a/buildenv.mk
 +++ b/buildenv.mk
-@@ -384,3 +384,17 @@ OPENSSL_CRYPTO_CFLAGS = -I$(OPENSSL_CRYPTO_PREBUILT_DIR)/inc
+@@ -369,3 +369,17 @@ OPENSSL_CRYPTO_CFLAGS = -I$(OPENSSL_CRYPTO_PREBUILT_DIR)/inc
  OPENSSL_CRYPTO_LDFLAGS = -L$(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64 -lcrypto
  OPENSSL_CRYPTO_LIBS = $(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64/libcrypto.a
  endif
@@ -80,5 +80,5 @@ index ed177c86..1dcb6f51 100644
  
  sgx_sign: $(OBJS) enclaveparser
 -- 
-2.52.0
+2.53.0
 

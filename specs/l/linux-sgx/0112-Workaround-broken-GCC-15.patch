@@ -1,7 +1,7 @@
-From 67a818bc7d96d9df9b28be94ceecfdc10beced87 Mon Sep 17 00:00:00 2001
+From 5a18d8d08db1a051a810085427873922e3d9f92a Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 6 Feb 2025 20:08:59 +0000
-Subject: [PATCH 112/131] Workaround broken GCC 15
+Subject: [PATCH 112/127] Workaround broken GCC 15
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

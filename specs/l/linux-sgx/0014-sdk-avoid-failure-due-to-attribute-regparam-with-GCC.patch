@@ -1,7 +1,7 @@
-From b8d2a529940b6b56cac86a3a495e7731cff1e73d Mon Sep 17 00:00:00 2001
+From 4a12419da033bf88ded73ece3a80090c3d48c7ef Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Tue, 6 Jan 2026 18:31:32 +0000
-Subject: [PATCH 15/17] sdk: avoid failure due to attribute(regparam) with GCC
+Subject: [PATCH 14/16] sdk: avoid failure due to attribute(regparam) with GCC
  16
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -20,7 +20,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  4 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/psw/urts/linux/Makefile b/psw/urts/linux/Makefile
-index 3d08ee5c..1e76d8d5 100644
+index 275a9d45..94a0aacb 100644
 --- a/psw/urts/linux/Makefile
 +++ b/psw/urts/linux/Makefile
 @@ -36,10 +36,10 @@ CXXFLAGS += -DDISABLE_TRACE
@@ -52,7 +52,7 @@ index 16e2a96d..7e545c1a 100644
  
  SIM_DIR    := $(CUR_DIR)/../..
 diff --git a/sdk/simulation/urtssim/linux/Makefile b/sdk/simulation/urtssim/linux/Makefile
-index dd716f2b..5d64c8ac 100644
+index 78f53484..c99a50e5 100644
 --- a/sdk/simulation/urtssim/linux/Makefile
 +++ b/sdk/simulation/urtssim/linux/Makefile
 @@ -39,8 +39,8 @@ CXXFLAGS += -DDISABLE_TRACE
@@ -79,5 +79,5 @@ index 5750aece..4766ef51 100644
              -fno-rtti
  
 -- 
-2.52.0
+2.53.0
 

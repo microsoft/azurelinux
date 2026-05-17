@@ -1,7 +1,7 @@
-From a6333110e96533ad82de21ab1c269791cfc64655 Mon Sep 17 00:00:00 2001
+From b193dc9b0f715eb14044e1e848c2a0c4c40d1f55 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 3 Oct 2024 16:57:35 +0100
-Subject: [PATCH 109/131] qgs: add --debug parameter to control logging
+Subject: [PATCH 109/127] qgs: add --debug parameter to control logging
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -64,7 +64,7 @@ index 1d7fd747..05d41a44 100644
      void qgs_log_init_ex(bool nosyslog);
      void qgs_log_fini(void);
 diff --git a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
-index 1e97b586..db642f70 100644
+index 12c51596..ad49d888 100644
 --- a/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
 +++ b/QuoteGeneration/quote_wrapper/qgs/qgs_ql_logic.cpp
 @@ -113,8 +113,8 @@ namespace intel { namespace sgx { namespace dcap { namespace qgs {

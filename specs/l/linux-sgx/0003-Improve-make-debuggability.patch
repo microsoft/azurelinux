@@ -1,7 +1,7 @@
-From 18904b9f33fccdc9e1bc606ad266c8287131de19 Mon Sep 17 00:00:00 2001
+From 572c92dac5c5a27fa76d611703e25a341bb610aa Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 1 Mar 2024 12:53:26 +0000
-Subject: [PATCH 03/17] Improve make debuggability
+Subject: [PATCH 03/16] Improve make debuggability
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,10 +17,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/sdk/Makefile.source b/sdk/Makefile.source
-index 0a84726c..e3bac508 100644
+index 7dbbb09d..37fb7dc4 100644
 --- a/sdk/Makefile.source
 +++ b/sdk/Makefile.source
-@@ -77,7 +77,7 @@ tstdc: $(LIBTLIBC)
+@@ -75,7 +75,7 @@ tstdc: $(LIBTLIBC)
  
  ifndef SERVTD_ATTEST
  $(LIBTLIBC): tlibthread compiler-rt tsafecrt tsetjmp tmm_rsrv
@@ -29,7 +29,7 @@ index 0a84726c..e3bac508 100644
  	@$(MKDIR) $(BUILD_DIR)/.compiler-rt $(BUILD_DIR)/.tlibthread $(BUILD_DIR)/.tsafecrt $(BUILD_DIR)/.tsetjmp $(BUILD_DIR)/.tmm_rsrv
  	@$(RM) -f $(BUILD_DIR)/.compiler-rt/*   && cd $(BUILD_DIR)/.compiler-rt && $(AR) x $(LINUX_SDK_DIR)/compiler-rt/libcompiler-rt.a
  	@$(RM) -f $(BUILD_DIR)/.tlibthread/*    && cd $(BUILD_DIR)/.tlibthread && $(AR) x $(LINUX_SDK_DIR)/tlibthread/libtlibthread.a
-@@ -95,7 +95,7 @@ $(LIBTLIBC): tlibthread compiler-rt tsafecrt tsetjmp tmm_rsrv
+@@ -93,7 +93,7 @@ $(LIBTLIBC): tlibthread compiler-rt tsafecrt tsetjmp tmm_rsrv
  	@$(RM) -rf $(BUILD_DIR)/.tsetjmp $(BUILD_DIR)/.tmm_rsrv
  else
  $(LIBTLIBC): tlibthread tsafecrt tsetjmp tmm_rsrv
@@ -38,7 +38,7 @@ index 0a84726c..e3bac508 100644
  	@$(MKDIR) $(BUILD_DIR)/.tlibthread $(BUILD_DIR)/.tsafecrt $(BUILD_DIR)/.tsetjmp  $(BUILD_DIR)/.tmm_rsrv
  	@$(RM) -f $(BUILD_DIR)/.tlibthread/*    && cd $(BUILD_DIR)/.tlibthread && $(AR) x $(LINUX_SDK_DIR)/tlibthread/libtlibthread.a
  	@$(RM) -f $(BUILD_DIR)/.tsafecrt/*      && cd $(BUILD_DIR)/.tsafecrt   && $(AR) x $(LINUX_SDK_DIR)/tsafecrt/libsgx_tsafecrt.a
-@@ -118,7 +118,7 @@ tsafecrt:
+@@ -116,7 +116,7 @@ tsafecrt:
  
  .PHONY: compiler-rt
  compiler-rt:
@@ -47,7 +47,7 @@ index 0a84726c..e3bac508 100644
  
  .PHONY: tsetjmp
  tsetjmp:
-@@ -162,7 +162,7 @@ cpprt:
+@@ -160,7 +160,7 @@ cpprt: libcxxrt
  
  .PHONY: tlibcxx
  tlibcxx: $(BUILD_DIR)
@@ -57,18 +57,18 @@ index 0a84726c..e3bac508 100644
  
  # ---------------------------------------------------
 diff --git a/sdk/cpprt/Makefile b/sdk/cpprt/Makefile
-index d1ac38a1..5fb90c21 100644
+index 1d382c5b..91156a75 100644
 --- a/sdk/cpprt/Makefile
 +++ b/sdk/cpprt/Makefile
-@@ -83,7 +83,7 @@ $(CPPRT): $(OBJS) prepare-libunwind libunwind
+@@ -102,7 +102,7 @@ $(CPPRT): $(OBJS) $(LIBCXXRT_STAMP) prepare-libunwind libunwind
  libunwind:
  	cd $(LIBUNWIND_DIR)/ && \
  		( test -f Makefile || CFLAGS="$(CFLAGS)" ./autogen.sh ) && \
 -		$(MAKE) -j$(shell nproc)
 +		$(MAKE)
  
- 
  .PHONY: clean
+ clean:
 -- 
-2.52.0
+2.53.0
 

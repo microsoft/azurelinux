@@ -1,7 +1,7 @@
-From 307b0ff6d27b6788cdc4b4f4abac9e949129c19e Mon Sep 17 00:00:00 2001
+From 5368f45e784a42a837523916667d045b0680f23d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 4 Dec 2025 18:05:14 +0000
-Subject: [PATCH 124/131] pcsclient: ignore errors trying to clear the keyring
+Subject: [PATCH 120/127] pcsclient: ignore errors trying to clear the keyring
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,7 +17,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  1 file changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/tools/PcsClientTool/lib/intelsgx/pcs.py b/tools/PcsClientTool/lib/intelsgx/pcs.py
-index 1368b57b..dd4eba40 100644
+index 8fd28e2b..93f1132b 100644
 --- a/tools/PcsClientTool/lib/intelsgx/pcs.py
 +++ b/tools/PcsClientTool/lib/intelsgx/pcs.py
 @@ -404,7 +404,13 @@ class PCS:

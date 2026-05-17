@@ -1,0 +1,301 @@
+From 9291f1ccc657b814bcb4094633a911061726f8dc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Fri, 27 Jun 2025 11:37:26 +0100
+Subject: [PATCH 13/16] linux/installer: drop PCCS package from BOM
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PCCS will now be distributed as a standalone RPM package.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ .../psw-dcap/BOM_install/sgx-dcap-pccs.txt    | 74 -------------------
+ linux/installer/common/psw-dcap/Makefile      | 14 +---
+ linux/installer/common/psw-dcap/installConfig |  1 -
+ .../psw-tdx/BOM_install/sgx-dcap-pccs.txt     | 74 -------------------
+ linux/installer/common/psw-tdx/Makefile       | 14 +---
+ linux/installer/common/psw-tdx/installConfig  |  1 -
+ 6 files changed, 2 insertions(+), 176 deletions(-)
+ delete mode 100644 linux/installer/common/psw-dcap/BOM_install/sgx-dcap-pccs.txt
+ delete mode 100644 linux/installer/common/psw-tdx/BOM_install/sgx-dcap-pccs.txt
+
+diff --git a/linux/installer/common/psw-dcap/BOM_install/sgx-dcap-pccs.txt b/linux/installer/common/psw-dcap/BOM_install/sgx-dcap-pccs.txt
+deleted file mode 100644
+index 4d16e883..00000000
+--- a/linux/installer/common/psw-dcap/BOM_install/sgx-dcap-pccs.txt
++++ /dev/null
+@@ -1,74 +0,0 @@
+-DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/config/default.json	<installdir>/config/default.json	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/constants/index.js	<installdir>/constants/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/constants/pccs_status_code.js	<installdir>/constants/pccs_status_code.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/identityController.js	<installdir>/controllers/identityController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/index.js	<installdir>/controllers/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/pckcertController.js	<installdir>/controllers/pckcertController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/pckcrlController.js	<installdir>/controllers/pckcrlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/platformCollateralController.js	<installdir>/controllers/platformCollateralController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/platformsController.js	<installdir>/controllers/platformsController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/refreshController.js	<installdir>/controllers/refreshController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/rootcacrlController.js	<installdir>/controllers/rootcacrlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/tcbinfoController.js	<installdir>/controllers/tcbinfoController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/crlController.js	<installdir>/controllers/crlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/fmspc_tcbs.js	<installdir>/dao/models/fmspc_tcbs.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/index.js	<installdir>/dao/models/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_cert.js	<installdir>/dao/models/pck_cert.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_certchain.js	<installdir>/dao/models/pck_certchain.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_crl.js	<installdir>/dao/models/pck_crl.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pcs_certificates.js	<installdir>/dao/models/pcs_certificates.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pcs_version.js	<installdir>/dao/models/pcs_version.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platform_tcbs.js	<installdir>/dao/models/platform_tcbs.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platforms_registered.js	<installdir>/dao/models/platforms_registered.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platforms.js	<installdir>/dao/models/platforms.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/enclave_identities.js	<installdir>/dao/models/enclave_identities.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/crl_cache.js	<installdir>/dao/models/crl_cache.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/fmspcTcbDao.js	<installdir>/dao/fmspcTcbDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckCertchainDao.js	<installdir>/dao/pckCertchainDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckcertDao.js	<installdir>/dao/pckcertDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckcrlDao.js	<installdir>/dao/pckcrlDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pcsCertificatesDao.js	<installdir>/dao/pcsCertificatesDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pcsVersionDao.js	<installdir>/dao/pcsVersionDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformsDao.js	<installdir>/dao/platformsDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformsRegDao.js	<installdir>/dao/platformsRegDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformTcbsDao.js	<installdir>/dao/platformTcbsDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/enclaveIdentityDao.js	<installdir>/dao/enclaveIdentityDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/crlCacheDao.js	<installdir>/dao/crlCacheDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/tools/PCKCertSelection/out/libPCKCertSelection.so	<installdir>/lib/libPCKCertSelection.so	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/lib_wrapper/pcklib_wrapper.js	<installdir>/lib_wrapper/pcklib_wrapper.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/auth.js	<installdir>/middleware/auth.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/error.js	<installdir>/middleware/error.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/addRequestId.js	<installdir>/middleware/addRequestId.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/00_db_initialize.up.sql	<installdir>/migrations/00_db_initialize.up.sql	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/01_db_version_1.js	<installdir>/migrations/01_db_version_1.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/02_db_version_2.js	<installdir>/migrations/02_db_version_2.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pcs_client/pcs_client.js	<installdir>/pcs_client/pcs_client.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/routes/index.js	<installdir>/routes/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/identityService.js	<installdir>/services/identityService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/index.js	<installdir>/services/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pccs_schemas.js	<installdir>/services/pccs_schemas.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pckcertService.js	<installdir>/services/pckcertService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pckcrlService.js	<installdir>/services/pckcrlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformCollateralService.js	<installdir>/services/platformCollateralService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformsRegService.js	<installdir>/services/platformsRegService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformsService.js	<installdir>/services/platformsService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/refreshService.js	<installdir>/services/refreshService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/rootcacrlService.js	<installdir>/services/rootcacrlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/tcbinfoService.js	<installdir>/services/tcbinfoService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/crlService.js	<installdir>/services/crlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/caching_modes/cachingMode.js	<installdir>/services/caching_modes/cachingMode.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/caching_modes/cachingModeManager.js	<installdir>/services/caching_modes/cachingModeManager.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/logic/commonCacheLogic.js	<installdir>/services/logic/commonCacheLogic.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/logic/qvCollateralLogic.js	<installdir>/services/logic/qvCollateralLogic.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/Logger.js	<installdir>/utils/Logger.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/PccsError.js	<installdir>/utils/PccsError.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/apputil.js	<installdir>/utils/apputil.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/x509/x509.js	<installdir>/x509/x509.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/install.sh	<installdir>/install.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/package.json	<installdir>/package.json	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pccs_server.js	<installdir>/pccs_server.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pccs.service	<installdir>/pccs.service	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/startup.sh	<installdir>/startup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/README.md	<installdir>/README.md	0	main	STP
+diff --git a/linux/installer/common/psw-dcap/Makefile b/linux/installer/common/psw-dcap/Makefile
+index 9236de6a..1ae7a292 100644
+--- a/linux/installer/common/psw-dcap/Makefile
++++ b/linux/installer/common/psw-dcap/Makefile
+@@ -59,9 +59,6 @@ AESMD_CONF=aesmd.service
+ AESMD_CONF_DEL=aesmd.conf
+ AESMD_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+ 
+-PCCS_CONF=pccs.service
+-PCCS_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+-
+ RAD_CONF=mpa_registration_tool.service
+ RAD_CONF_DEL=mpa_registration_tool.conf
+ RAD_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+@@ -148,7 +145,7 @@ ALL_PKGS:= $(AESM_SERVICE_PKGS) $(AE_PKGS) $(DEV_LIB_PKGS)
+ 
+ $(foreach PKG,$(AESM_SERVICE_PKGS) $(AE_PKGS),$(eval $(call INSTALL_AESM_SERVICE_TEMPLATE,$(PKG))))
+ $(foreach PKG,$(DEV_LIB_PKGS),$(eval $(call INSTALL_DEV_LIB_TEMPLATE,$(PKG))))
+-$(foreach PKG,$(ALL_PKGS) $(DCAP_PCCS_PACKAGE) $(RA_SERVICE_PACKAGE) $(PCK_ID_RETRIEVAL_TOOL_PACKAGE),$(eval $(call PRE_INSTALL_TEMPLATE,$(PKG))))
++$(foreach PKG,$(ALL_PKGS) $(RA_SERVICE_PACKAGE) $(PCK_ID_RETRIEVAL_TOOL_PACKAGE),$(eval $(call PRE_INSTALL_TEMPLATE,$(PKG))))
+ 
+ PHONY+=$(ALL_PKGS)
+ PHONY+=$(foreach PKG,$(ALL_PKGS),pre_$(PKG))
+@@ -176,14 +173,6 @@ install_$(AESM_SERVICE_PACKAGE): $(foreach PKG,$(AESM_SERVICE_PKGS),post_$(PKG))
+ 	ln -fs $(shell readlink -m $(USR_LIB_PATH)/libsgx_pce.signed.so)                                          && \
+ 	ln -fs liburts_internal.so libsgx_urts.so.$(URTS_MAJOR_VER)
+ 
+-PHONY+=install_$(DCAP_PCCS_PACKAGE)
+-install_$(DCAP_PCCS_PACKAGE): pre_$(DCAP_PCCS_PACKAGE) | $(PACKAGE_ROOT_PATH)
+-	install -d $(shell readlink -m $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF_PATH))                        && \
+-	cp -f $|/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF) $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF_PATH)             && \
+-	rm -f $|/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF)
+-	install -d $(shell readlink -m $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(SGX_INSTALL_PATH)/$(DCAP_PCCS_PACKAGE)) && \
+-	cp -fr $|/$(DCAP_PCCS_PACKAGE)/* $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(SGX_INSTALL_PATH)/$(DCAP_PCCS_PACKAGE)
+-
+ PHONY+=$(RA_SERVICE_PACKAGE)
+ $(RA_SERVICE_PACKAGE): pre_$(RA_SERVICE_PACKAGE) | $(PACKAGE_ROOT_PATH)
+ 	install -d $(shell readlink -m $(DESTDIR)/$@/$(SGX_INSTALL_PATH)/$@) && \
+@@ -286,7 +275,6 @@ install_dev_lib: $(foreach PKG,$(DEV_LIB_PKGS),post_$(PKG))
+ 
+ PHONY+=install
+ install: install_$(AESM_SERVICE_PACKAGE)         \
+-	install_$(DCAP_PCCS_PACKAGE)             \
+ 	install_$(RA_SERVICE_PACKAGE)            \
+ 	install_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE) \
+ 	install_ae                               \
+diff --git a/linux/installer/common/psw-dcap/installConfig b/linux/installer/common/psw-dcap/installConfig
+index 5ef949cd..7145f148 100644
+--- a/linux/installer/common/psw-dcap/installConfig
++++ b/linux/installer/common/psw-dcap/installConfig
+@@ -22,7 +22,6 @@ DCAP_QL_PACKAGE=libsgx-dcap-ql
+ DCAP_QL_DEV_PACKAGE=libsgx-dcap-ql-devel
+ DCAP_QVL_PACKAGE=libsgx-dcap-quote-verify
+ DCAP_QVL_DEV_PACKAGE=libsgx-dcap-quote-verify-devel
+-DCAP_PCCS_PACKAGE=sgx-dcap-pccs
+ 
+ PCK_ID_RETRIEVAL_TOOL_PACKAGE=sgx-pck-id-retrieval-tool
+ RA_NETWORK_PACKAGE=libsgx-ra-network
+diff --git a/linux/installer/common/psw-tdx/BOM_install/sgx-dcap-pccs.txt b/linux/installer/common/psw-tdx/BOM_install/sgx-dcap-pccs.txt
+deleted file mode 100644
+index 4d16e883..00000000
+--- a/linux/installer/common/psw-tdx/BOM_install/sgx-dcap-pccs.txt
++++ /dev/null
+@@ -1,74 +0,0 @@
+-DeliveryName	InstallName	FileCheckSum	FileFeature	FileOwner
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/config/default.json	<installdir>/config/default.json	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/constants/index.js	<installdir>/constants/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/constants/pccs_status_code.js	<installdir>/constants/pccs_status_code.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/identityController.js	<installdir>/controllers/identityController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/index.js	<installdir>/controllers/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/pckcertController.js	<installdir>/controllers/pckcertController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/pckcrlController.js	<installdir>/controllers/pckcrlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/platformCollateralController.js	<installdir>/controllers/platformCollateralController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/platformsController.js	<installdir>/controllers/platformsController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/refreshController.js	<installdir>/controllers/refreshController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/rootcacrlController.js	<installdir>/controllers/rootcacrlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/tcbinfoController.js	<installdir>/controllers/tcbinfoController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/controllers/crlController.js	<installdir>/controllers/crlController.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/fmspc_tcbs.js	<installdir>/dao/models/fmspc_tcbs.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/index.js	<installdir>/dao/models/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_cert.js	<installdir>/dao/models/pck_cert.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_certchain.js	<installdir>/dao/models/pck_certchain.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pck_crl.js	<installdir>/dao/models/pck_crl.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pcs_certificates.js	<installdir>/dao/models/pcs_certificates.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/pcs_version.js	<installdir>/dao/models/pcs_version.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platform_tcbs.js	<installdir>/dao/models/platform_tcbs.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platforms_registered.js	<installdir>/dao/models/platforms_registered.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/platforms.js	<installdir>/dao/models/platforms.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/enclave_identities.js	<installdir>/dao/models/enclave_identities.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/models/crl_cache.js	<installdir>/dao/models/crl_cache.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/fmspcTcbDao.js	<installdir>/dao/fmspcTcbDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckCertchainDao.js	<installdir>/dao/pckCertchainDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckcertDao.js	<installdir>/dao/pckcertDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pckcrlDao.js	<installdir>/dao/pckcrlDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pcsCertificatesDao.js	<installdir>/dao/pcsCertificatesDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/pcsVersionDao.js	<installdir>/dao/pcsVersionDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformsDao.js	<installdir>/dao/platformsDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformsRegDao.js	<installdir>/dao/platformsRegDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/platformTcbsDao.js	<installdir>/dao/platformTcbsDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/enclaveIdentityDao.js	<installdir>/dao/enclaveIdentityDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/dao/crlCacheDao.js	<installdir>/dao/crlCacheDao.js	0	main	STP
+-<deliverydir>/external/dcap_source/tools/PCKCertSelection/out/libPCKCertSelection.so	<installdir>/lib/libPCKCertSelection.so	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/lib_wrapper/pcklib_wrapper.js	<installdir>/lib_wrapper/pcklib_wrapper.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/auth.js	<installdir>/middleware/auth.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/error.js	<installdir>/middleware/error.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/middleware/addRequestId.js	<installdir>/middleware/addRequestId.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/00_db_initialize.up.sql	<installdir>/migrations/00_db_initialize.up.sql	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/01_db_version_1.js	<installdir>/migrations/01_db_version_1.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/migrations/02_db_version_2.js	<installdir>/migrations/02_db_version_2.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pcs_client/pcs_client.js	<installdir>/pcs_client/pcs_client.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/routes/index.js	<installdir>/routes/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/identityService.js	<installdir>/services/identityService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/index.js	<installdir>/services/index.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pccs_schemas.js	<installdir>/services/pccs_schemas.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pckcertService.js	<installdir>/services/pckcertService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/pckcrlService.js	<installdir>/services/pckcrlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformCollateralService.js	<installdir>/services/platformCollateralService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformsRegService.js	<installdir>/services/platformsRegService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/platformsService.js	<installdir>/services/platformsService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/refreshService.js	<installdir>/services/refreshService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/rootcacrlService.js	<installdir>/services/rootcacrlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/tcbinfoService.js	<installdir>/services/tcbinfoService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/crlService.js	<installdir>/services/crlService.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/caching_modes/cachingMode.js	<installdir>/services/caching_modes/cachingMode.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/caching_modes/cachingModeManager.js	<installdir>/services/caching_modes/cachingModeManager.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/logic/commonCacheLogic.js	<installdir>/services/logic/commonCacheLogic.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/services/logic/qvCollateralLogic.js	<installdir>/services/logic/qvCollateralLogic.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/Logger.js	<installdir>/utils/Logger.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/PccsError.js	<installdir>/utils/PccsError.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/utils/apputil.js	<installdir>/utils/apputil.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/x509/x509.js	<installdir>/x509/x509.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/install.sh	<installdir>/install.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/package.json	<installdir>/package.json	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pccs_server.js	<installdir>/pccs_server.js	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/pccs.service	<installdir>/pccs.service	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/startup.sh	<installdir>/startup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
+-<deliverydir>/external/dcap_source/QuoteGeneration/pccs/service/README.md	<installdir>/README.md	0	main	STP
+diff --git a/linux/installer/common/psw-tdx/Makefile b/linux/installer/common/psw-tdx/Makefile
+index 4f50ee49..0e8cb3e7 100644
+--- a/linux/installer/common/psw-tdx/Makefile
++++ b/linux/installer/common/psw-tdx/Makefile
+@@ -80,9 +80,6 @@ QGSD_CONF=qgsd.service
+ QGSD_CONF_DEL=qgsd.conf
+ QGSD_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+ 
+-PCCS_CONF=pccs.service
+-PCCS_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+-
+ RAD_CONF=mpa_registration_tool.service
+ RAD_CONF_DEL=mpa_registration_tool.conf
+ RAD_CONF_PATH=$(if $(wildcard /lib/systemd/system/.),/lib/systemd/system,/usr/lib/systemd/system)
+@@ -160,7 +157,7 @@ ALL_PKGS:= $(TDX_QGS_PKGS) $(AE_PKGS) $(DEV_LIB_PKGS)
+ 
+ $(foreach PKG,$(TDX_QGS_PKGS) $(AE_PKGS),$(eval $(call INSTALL_AESM_SERVICE_TEMPLATE,$(PKG))))
+ $(foreach PKG,$(DEV_LIB_PKGS),$(eval $(call INSTALL_DEV_LIB_TEMPLATE,$(PKG))))
+-$(foreach PKG,$(ALL_PKGS) $(DCAP_PCCS_PACKAGE) $(RA_SERVICE_PACKAGE) $(PCK_ID_RETRIEVAL_TOOL_PACKAGE),$(eval $(call PRE_INSTALL_TEMPLATE,$(PKG))))
++$(foreach PKG,$(ALL_PKGS) $(RA_SERVICE_PACKAGE) $(PCK_ID_RETRIEVAL_TOOL_PACKAGE),$(eval $(call PRE_INSTALL_TEMPLATE,$(PKG))))
+ 
+ PHONY+=$(ALL_PKGS)
+ PHONY+=$(foreach PKG,$(ALL_PKGS),pre_$(PKG))
+@@ -184,14 +181,6 @@ install_$(TDX_QGS_PACKAGE): $(foreach PKG,$(TDX_QGS_PKGS),post_$(PKG))
+ 				$(DESTDIR)/$(TDX_QGS_PACKAGE)/$(ETC_DIR) &&                                                         \
+ 		rm -fr $(DESTDIR)/$(TDX_QGS_PACKAGE)/$(SGX_INSTALL_PATH)/$(TDX_QGS_PACKAGE)/conf))
+ 
+-PHONY+=install_$(DCAP_PCCS_PACKAGE)
+-install_$(DCAP_PCCS_PACKAGE): pre_$(DCAP_PCCS_PACKAGE) | $(PACKAGE_ROOT_PATH)
+-	install -d $(shell readlink -m $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF_PATH))                        && \
+-	cp -f $|/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF) $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF_PATH)             && \
+-	rm -f $|/$(DCAP_PCCS_PACKAGE)/$(PCCS_CONF)
+-	install -d $(shell readlink -m $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(SGX_INSTALL_PATH)/$(DCAP_PCCS_PACKAGE)) && \
+-	cp -fr $|/$(DCAP_PCCS_PACKAGE)/* $(DESTDIR)/$(DCAP_PCCS_PACKAGE)/$(SGX_INSTALL_PATH)/$(DCAP_PCCS_PACKAGE)
+-
+ PHONY+=$(RA_SERVICE_PACKAGE)
+ $(RA_SERVICE_PACKAGE): pre_$(RA_SERVICE_PACKAGE) | $(PACKAGE_ROOT_PATH)
+ 	install -d $(shell readlink -m $(DESTDIR)/$@/$(SGX_INSTALL_PATH)/$@) && \
+@@ -291,7 +280,6 @@ install_dev_lib: $(foreach PKG,$(DEV_LIB_PKGS),post_$(PKG))
+ 
+ PHONY+=install
+ install: install_$(TDX_QGS_PACKAGE)          \
+-	install_$(DCAP_PCCS_PACKAGE)             \
+ 	install_$(RA_SERVICE_PACKAGE)            \
+ 	install_$(PCK_ID_RETRIEVAL_TOOL_PACKAGE) \
+ 	install_ae                               \
+diff --git a/linux/installer/common/psw-tdx/installConfig b/linux/installer/common/psw-tdx/installConfig
+index 7129b71d..c55a8ada 100644
+--- a/linux/installer/common/psw-tdx/installConfig
++++ b/linux/installer/common/psw-tdx/installConfig
+@@ -16,7 +16,6 @@ TDX_ATTEST_PACKAGE=libtdx-attest
+ TDX_ATTEST_DEV_PACKAGE=libtdx-attest-devel
+ DCAP_QVL_PACKAGE=libsgx-dcap-quote-verify
+ DCAP_QVL_DEV_PACKAGE=libsgx-dcap-quote-verify-devel
+-DCAP_PCCS_PACKAGE=sgx-dcap-pccs
+ PCK_ID_RETRIEVAL_TOOL_PACKAGE=sgx-pck-id-retrieval-tool
+ RA_NETWORK_PACKAGE=libsgx-ra-network
+ RA_NETWORK_DEV_PACKAGE=libsgx-ra-network-devel
+-- 
+2.53.0
+

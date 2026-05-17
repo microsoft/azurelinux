@@ -1,7 +1,7 @@
-From 1cd5674ab9d90d663b4aada9c02cd1a2115c0b24 Mon Sep 17 00:00:00 2001
+From f3d15471fc97351df73b6d7af95561c9ecfa3a6c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 13 Feb 2025 14:12:38 +0000
-Subject: [PATCH 00/17] Add support for building against host openssl crypto
+Subject: [PATCH 00/16] Add support for building against host openssl crypto
  lib
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -28,10 +28,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  7 files changed, 27 insertions(+), 22 deletions(-)
 
 diff --git a/buildenv.mk b/buildenv.mk
-index 4689c603..acae2106 100644
+index 379b87ce..b9f625cb 100644
 --- a/buildenv.mk
 +++ b/buildenv.mk
-@@ -371,3 +371,16 @@ else
+@@ -356,3 +356,16 @@ else
      SGX_LIB_DIR := $(SGX_SDK)/lib64/$(MITIGATION_LIB_PATH)
      SGX_BIN_DIR := $(SGX_SDK)/bin/x64
  endif
@@ -49,11 +49,11 @@ index 4689c603..acae2106 100644
 +OPENSSL_CRYPTO_LIBS = $(OPENSSL_CRYPTO_PREBUILT_DIR)/lib/linux64/libcrypto.a
 +endif
 diff --git a/psw/ae/aesm_service/Makefile b/psw/ae/aesm_service/Makefile
-index 498d6e2f..bac84292 100644
+index 350addeb..24613afe 100644
 --- a/psw/ae/aesm_service/Makefile
 +++ b/psw/ae/aesm_service/Makefile
-@@ -46,6 +46,9 @@ ifeq ($(BUILD_REF_LE), 1)
-      AESM_CONFIG += -DREF_LE=ON
+@@ -42,6 +42,9 @@ else
+      AESM_CONFIG += -DCMAKE_BUILD_TYPE=Release
  endif
  
 +AESM_CONFIG += -DOPENSSL_CRYPTO_CFLAGS=$(OPENSSL_CRYPTO_CFLAGS)
@@ -63,11 +63,11 @@ index 498d6e2f..bac84292 100644
      SQLITECFLAGS += -m32
  else
 diff --git a/psw/ae/aesm_service/source/utils/CMakeLists.txt b/psw/ae/aesm_service/source/utils/CMakeLists.txt
-index a3843bdf..2c9c87b3 100644
+index a4b3d1af..f8003e42 100644
 --- a/psw/ae/aesm_service/source/utils/CMakeLists.txt
 +++ b/psw/ae/aesm_service/source/utils/CMakeLists.txt
-@@ -45,7 +45,7 @@ target_include_directories(utils PRIVATE
-     ${PROJECT_SOURCE_DIR}/../../../../external/epid-sdk
+@@ -44,7 +44,7 @@ target_include_directories(utils PRIVATE
+     ${PROJECT_SOURCE_DIR}/../../../../common/inc/internal
      ${PROJECT_SOURCE_DIR}/../../../../external/rdrand
      ${PROJECT_SOURCE_DIR}/../../data/constants/linux
 -    ${PROJECT_SOURCE_DIR}/../../../../external/dcap_source/prebuilt/openssl/inc
@@ -75,7 +75,7 @@ index a3843bdf..2c9c87b3 100644
  )
  
  target_compile_definitions(utils PRIVATE
-@@ -55,7 +55,7 @@ target_compile_definitions(utils PRIVATE
+@@ -54,7 +54,7 @@ target_compile_definitions(utils PRIVATE
  set_property(TARGET utils APPEND_STRING PROPERTY LINK_FLAGS " -Wl,-z,defs")
  
  target_link_libraries(utils
@@ -85,7 +85,7 @@ index a3843bdf..2c9c87b3 100644
      ${CMAKE_SOURCE_DIR}/../../../../external/rdrand/src/librdrand.a
  )
 diff --git a/psw/urts/linux/Makefile b/psw/urts/linux/Makefile
-index 7e0b6a08..3d08ee5c 100644
+index 2e291857..275a9d45 100644
 --- a/psw/urts/linux/Makefile
 +++ b/psw/urts/linux/Makefile
 @@ -43,8 +43,6 @@ CFLAGS += -fPIC -Werror -g
@@ -148,7 +148,7 @@ index 1ed9f286..ed177c86 100644
  
  sgx_sign: $(OBJS) enclaveparser
 diff --git a/sdk/simulation/uae_service_sim/linux/Makefile b/sdk/simulation/uae_service_sim/linux/Makefile
-index c66beed2..45ddb576 100644
+index d80a3d06..3d5b5628 100644
 --- a/sdk/simulation/uae_service_sim/linux/Makefile
 +++ b/sdk/simulation/uae_service_sim/linux/Makefile
 @@ -34,9 +34,6 @@ include $(TOP_DIR)/buildenv.mk
@@ -158,19 +158,19 @@ index c66beed2..45ddb576 100644
 -PREBUILT_OPENSSL_DIR := $(LINUX_EXTERNAL_DIR)/dcap_source/prebuilt/openssl
 -CRYPTO_LIB := -L$(PREBUILT_OPENSSL_DIR)/lib/linux64 -lcrypto
 -
- INCLUDES := -I..                                            \
-             -I$(COMMON_DIR)/inc                             \
-             -I$(COMMON_DIR)/inc/internal                    \
-@@ -48,7 +45,7 @@ INCLUDES := -I..                                            \
-             -I$(LINUX_PSW_DIR)/ae/inc                       \
-             -I$(LINUX_PSW_DIR)/ae/inc/internal              \
-             -I$(LINUX_PSW_DIR)/ae/common                    \
--            -I$(PREBUILT_OPENSSL_DIR)/inc
-+            $(OPENSSL_CRYPTO_CFLAGS)
+ INCLUDES := -I..                                                   \
+             -I$(COMMON_DIR)/inc                                    \
+             -I$(COMMON_DIR)/inc/internal                           \
+@@ -47,7 +44,7 @@ INCLUDES := -I..                                                   \
+             -I$(LINUX_PSW_DIR)/ae/inc                              \
+             -I$(LINUX_PSW_DIR)/ae/inc/internal                     \
+             -I$(LINUX_PSW_DIR)/ae/common                           \
+-            -I$(PREBUILT_OPENSSL_DIR)/inc                          \
++            $(OPENSSL_CRYPTO_CFLAGS)                               \
+             -I$(DCAP_DIR)/QuoteGeneration/quote_wrapper/common/inc \
+             -I$(DCAP_DIR)/QuoteGeneration/pce_wrapper/inc
  
- 
- CXXFLAGS += -Wall -fPIC $(INCLUDES) -Werror -g $(CET_FLAGS)
-@@ -60,7 +57,7 @@ RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
+@@ -61,7 +58,7 @@ RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
  
  EXTERNAL_LIB += -L$(RDRAND_LIBDIR) -lrdrand
  EXTERNAL_LIB += -L$(RDRAND_LIBDIR) -lrt
@@ -180,7 +180,7 @@ index c66beed2..45ddb576 100644
  vpath %.cpp $(LINUX_PSW_DIR)/ae/common \
              $(LINUX_SDK_DIR)/simulation/urtssim \
 diff --git a/sdk/simulation/urtssim/linux/Makefile b/sdk/simulation/urtssim/linux/Makefile
-index e756d468..ea8ca78c 100644
+index 79f20a2b..8af19905 100644
 --- a/sdk/simulation/urtssim/linux/Makefile
 +++ b/sdk/simulation/urtssim/linux/Makefile
 @@ -42,9 +42,6 @@ endif
@@ -202,7 +202,7 @@ index e756d468..ea8ca78c 100644
  
  CPPFLAGS += -I$(COMMON_DIR)/inc/internal      \
              -I$(LINUX_PSW_DIR)/urts/linux     \
-@@ -128,7 +125,7 @@ LDFLAGS += $(COMMON_LDFLAGS) -Wl,--version-script=$(LINUX_PSW_DIR)/urts/linux/ur
+@@ -127,7 +124,7 @@ LDFLAGS += $(COMMON_LDFLAGS) -Wl,--version-script=$(LINUX_PSW_DIR)/urts/linux/ur
  LIBURTSSIM_SHARED := libsgx_urts_sim.so
  LIBURTS_DEPLOY := libsgx_urts_deploy.so
  
@@ -212,5 +212,5 @@ index e756d468..ea8ca78c 100644
  
  .PHONY: all
 -- 
-2.52.0
+2.53.0
 

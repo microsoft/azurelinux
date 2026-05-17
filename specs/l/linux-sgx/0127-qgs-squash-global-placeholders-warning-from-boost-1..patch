@@ -1,0 +1,41 @@
+From 8670f057f4558fd250db375d91bdc52db502a076 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 25 Mar 2026 16:46:52 +0000
+Subject: [PATCH 127/127] qgs: squash global placeholders warning from boost
+ 1.90
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Latest boost 1.90 warns:
+
+  /usr/include/boost/bind.hpp:36:1: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+
+Squash this warning using the suggested define so the build
+does not break under -Werror.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ QuoteGeneration/quote_wrapper/qgs/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/QuoteGeneration/quote_wrapper/qgs/Makefile b/QuoteGeneration/quote_wrapper/qgs/Makefile
+index e3efaeb9..8446b194 100644
+--- a/QuoteGeneration/quote_wrapper/qgs/Makefile
++++ b/QuoteGeneration/quote_wrapper/qgs/Makefile
+@@ -16,8 +16,8 @@ QGS_INC = -I$(SGX_SDK)/include \
+ 		  -I$(TOP_DIR)/qpl/inc \
+ 		  -I$(TOP_DIR)/quote_wrapper/tdx_quote/inc \
+ 		  -I$(TOP_DIR)/quote_wrapper/qgs_msg_lib/inc
+-QGS_CFLAGS = -g -MMD -Werror -Wno-deprecated-declarations $(CFLAGS) $(QGS_INC)
+-QGS_CXXFLAGS = -g -MMD -Werror -Wno-deprecated-declarations $(CXXFLAGS) $(QGS_INC)
++QGS_CFLAGS = -g -MMD -Werror -Wno-deprecated-declarations -DBOOST_BIND_GLOBAL_PLACEHOLDERS $(CFLAGS) $(QGS_INC)
++QGS_CXXFLAGS = -g -MMD -Werror -Wno-deprecated-declarations -DBOOST_BIND_GLOBAL_PLACEHOLDERS $(CXXFLAGS) $(QGS_INC)
+ 
+ DEPENDS = ${QGS_OBJS test_client.o:.o=.d}
+ 
+-- 
+2.53.0
+

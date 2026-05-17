@@ -1,7 +1,7 @@
-From 96c2b15fc4a5b350d66950041e058d007004ce8e Mon Sep 17 00:00:00 2001
+From 38880d491208012697daa55555ec7d0b5716da57 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Tue, 27 Feb 2024 15:46:41 +0000
-Subject: [PATCH 103/131] Look for versioned sgx_urts library in
+Subject: [PATCH 103/127] Look for versioned sgx_urts library in
  PCKRetrievalTool
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

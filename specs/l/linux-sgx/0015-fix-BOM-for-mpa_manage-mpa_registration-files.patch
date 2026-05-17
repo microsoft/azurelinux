@@ -1,7 +1,7 @@
-From 501e90724f57fdb76999dd518876d47212d29853 Mon Sep 17 00:00:00 2001
+From 9fa76f92c2dd7430b5b873cf0b93810d9fb80a8f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Mon, 2 Feb 2026 19:01:24 +0000
-Subject: [PATCH 17/17] fix BOM for mpa_manage/mpa_registration files
+Subject: [PATCH 15/16] fix BOM for mpa_manage/mpa_registration files
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -94,5 +94,5 @@ index 3521a03f..6fea3137 100644
 +<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/startup.sh	<installdir>/startup.sh	0	main	STP
 +<deliverydir>/external/dcap_source/tools/SGXPlatformRegistration/src/mpa_registration/cleanup.sh	<installdir>/cleanup.sh	0	main	STP
 -- 
-2.52.0
+2.53.0
 

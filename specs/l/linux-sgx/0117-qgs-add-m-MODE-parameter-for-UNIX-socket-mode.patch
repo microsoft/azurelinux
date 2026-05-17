@@ -1,7 +1,7 @@
-From 5ed781b8277921e4d6061744df198d4ec5ca6aae Mon Sep 17 00:00:00 2001
+From b9104a5ce6234ff22c802e333224fcbbaf70fea6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 2 May 2025 14:48:24 +0100
-Subject: [PATCH 117/131] qgs: add -m=MODE parameter for UNIX socket mode
+Subject: [PATCH 117/127] qgs: add -m=MODE parameter for UNIX socket mode
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -16,7 +16,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
-index 62764d04..762bc998 100644
+index 62764d04..bef9e0ec 100644
 --- a/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
 +++ b/QuoteGeneration/quote_wrapper/qgs/server_main.cpp
 @@ -83,9 +83,10 @@ int main(int argc, const char* argv[])
@@ -84,7 +84,7 @@ index 62764d04..762bc998 100644
 +             * overriding only if an explicit mode is requested
 +             */
 +            if (socket_based_communication && mode != 0) {
-+                chmod(QGS_UNIX_SOCKET_FILE, mode);
++                chmod(QGS_UNIX_SOCKET_FILE, (mode_t)mode);
 +            }
              QGS_LOG_INFO("About to start main loop\n");
              io_service.run();

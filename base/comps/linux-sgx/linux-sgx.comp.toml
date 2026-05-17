@@ -1,0 +1,4 @@
+[components.linux-sgx]
+# Pin past the default snapshot to correct a previously selected
+# non-first-parent commit on the f43 branch.
+spec = { type = "upstream", upstream-commit = "2049ba7b4df26e7a7ed754336c72b9082f5ee0c9" }

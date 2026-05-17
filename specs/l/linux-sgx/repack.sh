@@ -35,9 +35,9 @@ dcap_version=$(grep dcap_version linux-sgx*spec | head -1 | awk '{print $3}')
 
 repack prebuilt_dcap_${dcap_version} \
        libcrypto.a \
-       policy.wasm \
        libsgx_pce.signed.so \
        libsgx_id_enclave.signed.so \
+       libsgx_qae.signed.so \
        libsgx_qe3.signed.so \
        libsgx_tdqe.signed.so \
        libsgx_qve.signed.so

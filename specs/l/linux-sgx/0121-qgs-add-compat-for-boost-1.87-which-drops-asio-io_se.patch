@@ -1,7 +1,7 @@
-From 950898fa0ce1e473e774b4e809bc9570867bd599 Mon Sep 17 00:00:00 2001
+From 089c7a2e1e8fa6cb7b18a0e3ed2f5ca5870d8db9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 15 Jan 2026 11:23:35 +0000
-Subject: [PATCH 126/131] qgs: add compat for boost 1.87 which drops
+Subject: [PATCH 121/127] qgs: add compat for boost 1.87 which drops
  asio::io_service
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

@@ -1,7 +1,7 @@
-From 6c821fbce7dc41a7020740ea05cb664009d70fdc Mon Sep 17 00:00:00 2001
+From 258dfa3df79b8286549856003e8234975434fbb3 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Wed, 2 Apr 2025 17:11:25 +0100
-Subject: [PATCH 13/17] Add wrapper for nasm to fix cmake compat
+Subject: [PATCH 12/16] Add wrapper for nasm to fix cmake compat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -20,7 +20,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 
 diff --git a/build-scripts/sgx-nasm.sh b/build-scripts/sgx-nasm.sh
 new file mode 100755
-index 00000000..4ad75f73
+index 00000000..a2c3fd74
 --- /dev/null
 +++ b/build-scripts/sgx-nasm.sh
 @@ -0,0 +1,12 @@
@@ -33,8 +33,8 @@ index 00000000..4ad75f73
 +    exec nasm -v
 +else
 +    here=$(dirname $0)
-+    echo python ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
-+    exec python ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
++    echo python3 ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
++    exec python3 ${here}/sgx-asm-pp.py --assembler=nasm --MITIGATION-CVE-2020-0551=${MITIGATION} "$@"
 +fi
 diff --git a/external/ippcp_internal/Makefile b/external/ippcp_internal/Makefile
 index d78ba90e..71a40247 100644
@@ -65,5 +65,5 @@ index d78ba90e..71a40247 100644
  $(IPP_SOURCE)/build:
  ifeq ($(IPP_USE_GIT), 1)
 -- 
-2.52.0
+2.53.0
 

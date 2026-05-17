@@ -1,7 +1,7 @@
-From 456990090bfc0e229abf09e7e43ba544e990de43 Mon Sep 17 00:00:00 2001
+From 56e82b013fb62af8d5805da1993f05cadf401350 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 3 Oct 2024 14:42:29 +0100
-Subject: [PATCH 107/131] qgs: add space between program name & first arg in
+Subject: [PATCH 107/127] qgs: add space between program name & first arg in
  usage
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

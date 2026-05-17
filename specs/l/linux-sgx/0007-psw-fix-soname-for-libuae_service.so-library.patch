@@ -1,7 +1,7 @@
-From 83d0388400f5acd63f5cdad1a3d7da26fb6d4d17 Mon Sep 17 00:00:00 2001
+From e39bf7eef92faee1f6096d4ca7da0e2571a94cba Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 17 Jan 2025 15:38:56 +0000
-Subject: [PATCH 08/17] psw: fix soname for libuae_service.so library
+Subject: [PATCH 07/16] psw: fix soname for libuae_service.so library
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -12,10 +12,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/psw/uae_service/linux/Makefile b/psw/uae_service/linux/Makefile
-index bffbdc5b..81f5c4b7 100644
+index 0de5ab7c..3d9a1408 100644
 --- a/psw/uae_service/linux/Makefile
 +++ b/psw/uae_service/linux/Makefile
-@@ -143,7 +143,7 @@ libsgx_%.so: $(OBJ) %_version.o
+@@ -120,7 +120,7 @@ libsgx_%.so: $(OBJ) %_version.o
  	$(CXX) $(CXXFLAGS) $^ -shared $(LDUFLAGS) -Wl,--version-script=$(@:.so=.lds) -Wl,--gc-sections $(EXTERNAL_LIB) -Wl,-soname=$@.$(call get_major_version,$(call get_version_name,$@)) -o $@
  
  $(LEGACY_LIBNAME): $(LEGACY_OBJ)
@@ -25,5 +25,5 @@ index bffbdc5b..81f5c4b7 100644
  $(IPC_SRC:.cpp=.o) : $(IPC_COMMON_PROTO_DIR)/messages.pb.cc
  AEServicesImpl.o : $(IPC_COMMON_PROTO_DIR)/messages.pb.cc
 -- 
-2.52.0
+2.53.0
 

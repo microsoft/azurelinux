@@ -1,4 +1,4 @@
-From 89d2bacc8b67eca8decae7b7508080582fc2c60d Mon Sep 17 00:00:00 2001
+From 726612218a56c0f5f3d219e2fbacb6c1e2f7153c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 29 Aug 2024 12:23:30 +0100
 Subject: [PATCH 200/203] Enable pointing sgxssl build to alternative glibc
@@ -20,7 +20,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
-index 0a99917..4e4a81e 100755
+index ea47407..1a8ea2c 100755
 --- a/Linux/build_openssl.sh
 +++ b/Linux/build_openssl.sh
 @@ -89,6 +89,7 @@ fi
@@ -60,10 +60,10 @@ index 0a99917..4e4a81e 100755
  sed -i 's/ENGINE_set_default_RAND/dummy_ENGINE_set_default_RAND/' crypto/engine/tb_rand.c || exit 1
  sed -i 's/return RUN_ONCE(&locale_base, ossl_init_locale_base);/return 1;/' crypto/ctype.c || exit 1
 diff --git a/Linux/sgx/Makefile b/Linux/sgx/Makefile
-index e4f3f92..ec1a0c3 100644
+index ed8456d..bea3463 100644
 --- a/Linux/sgx/Makefile
 +++ b/Linux/sgx/Makefile
-@@ -85,7 +85,7 @@ endif
+@@ -84,7 +84,7 @@ endif
  endif
  
  $(PACKAGE_LIB)/$(OPENSSL_LIB):
@@ -73,5 +73,5 @@ index e4f3f92..ec1a0c3 100644
  clean:	
  	$(MAKE) -C $(TRUSTED_LIB_DIR) clean
 -- 
-2.49.0
+2.53.0
 

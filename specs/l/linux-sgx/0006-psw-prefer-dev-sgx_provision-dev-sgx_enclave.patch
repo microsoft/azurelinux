@@ -1,7 +1,7 @@
-From e70a6cf01361e773c361cdb8debf1be2859e0b09 Mon Sep 17 00:00:00 2001
+From b6781ffdf7993718ddc232b27a0eac4d2ef2dddf Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 4 Oct 2024 16:33:20 +0100
-Subject: [PATCH 07/17] psw: prefer /dev/sgx_provision & /dev/sgx_enclave
+Subject: [PATCH 06/16] psw: prefer /dev/sgx_provision & /dev/sgx_enclave
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -21,10 +21,10 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/psw/enclave_common/sgx_enclave_common.cpp b/psw/enclave_common/sgx_enclave_common.cpp
-index 399d63b2..f63149a0 100644
+index 19cc998b..1ea3d04c 100644
 --- a/psw/enclave_common/sgx_enclave_common.cpp
 +++ b/psw/enclave_common/sgx_enclave_common.cpp
-@@ -481,11 +481,11 @@ static void enclave_set_provision_access(int hdevice, void* enclave_base)
+@@ -409,11 +409,11 @@ static void enclave_set_provision_access(int hdevice, void* enclave_base)
      
      if (s_driver_type == SGX_DRIVER_IN_KERNEL)
      {
@@ -40,7 +40,7 @@ index 399d63b2..f63149a0 100644
          if (-1 == hdev_prov)
          {
 diff --git a/psw/urts/linux/edmm_utility.cpp b/psw/urts/linux/edmm_utility.cpp
-index 49f2b9aa..fc537a84 100644
+index 9406ee64..5eea4ecd 100644
 --- a/psw/urts/linux/edmm_utility.cpp
 +++ b/psw/urts/linux/edmm_utility.cpp
 @@ -99,11 +99,11 @@ bool get_driver_type(int *driver_type)
@@ -58,7 +58,7 @@ index 49f2b9aa..fc537a84 100644
      }
      if (-1 == hdev)
      {
-@@ -154,11 +154,11 @@ extern "C" bool open_se_device(int driver_type, int *hdevice)
+@@ -155,11 +155,11 @@ extern "C" bool open_se_device(int driver_type, int *hdevice)
      *hdevice = -1;
      if (driver_type == SGX_DRIVER_IN_KERNEL)
      {
@@ -74,5 +74,5 @@ index 49f2b9aa..fc537a84 100644
      }
      else if (driver_type == SGX_DRIVER_DCAP)
 -- 
-2.52.0
+2.53.0
 

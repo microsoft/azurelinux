@@ -2000,7 +2000,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.linkchecker]
 [components.linux-atm]
 [components.linux-firmware]
-[components.linux-sgx]
 [components.linux-sgx-enclaves-prebuilt]
 [components.linux-system-roles]
 [components.linuxconsoletools]

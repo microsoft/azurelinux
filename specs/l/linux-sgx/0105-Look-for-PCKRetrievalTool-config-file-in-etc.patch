@@ -1,7 +1,7 @@
-From a7e0d0095ff19aee8b32d25ccc52593c09112c56 Mon Sep 17 00:00:00 2001
+From ae8dae8f9a342190cf3218ca9549eef86531c327 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 29 Feb 2024 14:21:36 +0000
-Subject: [PATCH 105/131] Look for PCKRetrievalTool config file in /etc/
+Subject: [PATCH 105/127] Look for PCKRetrievalTool config file in /etc/
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

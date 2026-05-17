@@ -1,0 +1,37 @@
+From ce1ad3fba7d14ff037b40ffeab2dccbfa7ccdbc5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 25 Mar 2026 12:15:12 +0000
+Subject: [PATCH 16/16] fix missing def of uncaught_exception
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This needs to be unconditionally present, not restricted to
+old C++ standards. This fixes an error seen with GCC 16:
+
+linux-sgx-2.28-build/confidential-computing.sgx-sgx_2.28/sdk/tlibcxx/include/ostream:280:27: error: there are no arguments to ‘uncaught_exception’ that depend on a template parameter, so a declaration of ‘uncaught_exception’ must be available [-Wtemplate-body]
+  280 |                       && !uncaught_exception())
+      |                           ^~~~~~~~~~~~~~~~~~
+linux-sgx-2.28-build/confidential-computing.sgx-sgx_2.28/sdk/tlibcxx/include/ostream:280:27: note: (if you use ‘-fpermissive’, G++ will accept your code, but allowing the use of an undeclared name is deprecated)
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ common/inc/stdc++/linux/exception | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/inc/stdc++/linux/exception b/common/inc/stdc++/linux/exception
+index a3c81106..b81f2d0c 100644
+--- a/common/inc/stdc++/linux/exception
++++ b/common/inc/stdc++/linux/exception
+@@ -63,7 +63,7 @@ namespace std
+ 
+ #  if  __cplusplus < 201103L
+     bool uncaught_exception() throw();
+-#  elif __cplusplus <= 201703L
++#  else
+     bool uncaught_exception() noexcept;
+ #  endif
+ 
+-- 
+2.53.0
+

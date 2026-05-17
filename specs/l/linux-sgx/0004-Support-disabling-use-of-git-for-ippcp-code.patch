@@ -1,7 +1,7 @@
-From 42a8e6203754527a76752d3aef2045c7b08a8e71 Mon Sep 17 00:00:00 2001
+From f11e29272736b152f7365febf8e157a410d4818b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 13 Feb 2025 14:37:24 +0000
-Subject: [PATCH 04/17] Support disabling use of git for ippcp code
+Subject: [PATCH 04/16] Support disabling use of git for ippcp code
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -45,5 +45,5 @@ index a57c22a9..d78ba90e 100644
  
  .PHONY: clean
 -- 
-2.52.0
+2.53.0
 

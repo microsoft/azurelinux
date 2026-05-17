@@ -1,4 +1,4 @@
-From 3aea585cfbe4691fea3c584981e36ee06d945bf4 Mon Sep 17 00:00:00 2001
+From dba682aa959d913aa316d0102b064ef8415b6987 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Fri, 1 Mar 2024 13:24:26 +0000
 Subject: [PATCH 202/203] Disable various EC crypto features
@@ -20,7 +20,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  create mode 100644 openssl_source/0012-Disable-explicit-ec.patch
 
 diff --git a/Linux/build_openssl.sh b/Linux/build_openssl.sh
-index d0518e5..cf8394b 100755
+index 44bfa7b..007aea0 100755
 --- a/Linux/build_openssl.sh
 +++ b/Linux/build_openssl.sh
 @@ -54,6 +54,17 @@ cd $SGXSSL_ROOT/../openssl_source || exit 1
@@ -1631,5 +1631,5 @@ index 0000000..0cae2fa
 + 
 +  err:
 -- 
-2.49.0
+2.53.0
 

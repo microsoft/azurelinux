@@ -1,7 +1,7 @@
-From 1fb91bd063bff1b9f6eae57f4facc0355b311d42 Mon Sep 17 00:00:00 2001
+From 6b23d61924f49afc6a9264a5b46a23a34e39829b Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Wed, 16 Apr 2025 11:48:52 +0100
-Subject: [PATCH 116/131] Don't stomp on "VERBOSE" variable
+Subject: [PATCH 116/127] Don't stomp on "VERBOSE" variable
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

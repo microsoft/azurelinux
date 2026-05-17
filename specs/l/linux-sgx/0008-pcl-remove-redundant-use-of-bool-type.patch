@@ -1,7 +1,7 @@
-From eb3056a11ffe6359acc5c7a8957ede654e7b2d90 Mon Sep 17 00:00:00 2001
+From 30c235fb42a26be114a50bc07b82a4700747df25 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 6 Feb 2025 09:54:33 +0000
-Subject: [PATCH 09/17] pcl: remove redundant use of 'bool' type
+Subject: [PATCH 08/16] pcl: remove redundant use of 'bool' type
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -45,5 +45,5 @@ index 5ad6efde..b78ca907 100644
  #endif // #ifdef SE_SIM 
  
 -- 
-2.52.0
+2.53.0
 

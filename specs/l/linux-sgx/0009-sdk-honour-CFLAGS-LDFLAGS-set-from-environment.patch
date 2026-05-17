@@ -1,7 +1,7 @@
-From 8e12ec0045bf6ac4f94f287cdbf87e69e734647a Mon Sep 17 00:00:00 2001
+From f5703f8320b8fb6f4a5f227bb522ea8e1d7721e9 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Date: Thu, 27 Mar 2025 14:17:01 +0000
-Subject: [PATCH 10/17] sdk: honour CFLAGS/LDFLAGS set from environment
+Subject: [PATCH 09/16] sdk: honour CFLAGS/LDFLAGS set from environment
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -17,7 +17,7 @@ Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
  6 files changed, 9 insertions(+), 12 deletions(-)
 
 diff --git a/sdk/debugger_interface/linux/Makefile b/sdk/debugger_interface/linux/Makefile
-index 8f2847da..808e093f 100644
+index 018b8a31..a86b6085 100644
 --- a/sdk/debugger_interface/linux/Makefile
 +++ b/sdk/debugger_interface/linux/Makefile
 @@ -31,13 +31,10 @@
@@ -30,11 +30,11 @@ index 8f2847da..808e093f 100644
  CPPFLAGS += -I$(COMMON_DIR)/inc/           \
              -I$(COMMON_DIR)/inc/internal/
  
--CFLAGS += -W -Wall -Werror -D_GNU_SOURCE -fpic
-+CFLAGS += -W -Wall -Werror -D_GNU_SOURCE -fpic -Wno-conversion -Wno-redundant-decls
- ifeq ($(CC_BELOW_4_9), 1)
- 	CFLAGS += -fstack-protector
- else
+-CFLAGS += -W -Wall -Werror -D_GNU_SOURCE -fpic -fstack-protector-strong
++CFLAGS += -W -Wall -Werror -D_GNU_SOURCE -fpic -fstack-protector-strong -Wno-conversion -Wno-redundant-decls
+ LDLIBS += -ldl
+ 
+ ifdef DEBUG
 diff --git a/sdk/encrypt_enclave/Makefile b/sdk/encrypt_enclave/Makefile
 index d388dc1d..867de978 100644
 --- a/sdk/encrypt_enclave/Makefile
@@ -75,10 +75,10 @@ index fce3a59e..5fd8548e 100644
  LDFLAGS += -pie $(COMMON_LDFLAGS)
  LDLIBS  := -lwrapper
 diff --git a/sdk/simulation/uae_service_sim/linux/Makefile b/sdk/simulation/uae_service_sim/linux/Makefile
-index 45ddb576..865d5556 100644
+index 3d5b5628..6a50f7eb 100644
 --- a/sdk/simulation/uae_service_sim/linux/Makefile
 +++ b/sdk/simulation/uae_service_sim/linux/Makefile
-@@ -50,7 +50,7 @@ INCLUDES := -I..                                            \
+@@ -51,7 +51,7 @@ INCLUDES := -I..                                                   \
  
  CXXFLAGS += -Wall -fPIC $(INCLUDES) -Werror -g $(CET_FLAGS)
  CFLAGS := $(filter-out -fPIC -Werror, $(CFLAGS)) -Wall $(INCLUDES) $(CET_FLAGS)
@@ -88,7 +88,7 @@ index 45ddb576..865d5556 100644
  RDRAND_LIBDIR := $(LINUX_EXTERNAL_DIR)/rdrand/src
  RDRAND_MAKEFILE := $(RDRAND_LIBDIR)/Makefile
 diff --git a/sdk/simulation/urtssim/linux/Makefile b/sdk/simulation/urtssim/linux/Makefile
-index ea8ca78c..dd716f2b 100644
+index 8af19905..78f53484 100644
 --- a/sdk/simulation/urtssim/linux/Makefile
 +++ b/sdk/simulation/urtssim/linux/Makefile
 @@ -65,9 +65,9 @@ DIR5 := $(LINUX_PSW_DIR)/../common/src/linux
@@ -103,7 +103,7 @@ index ea8ca78c..dd716f2b 100644
  
  OBJ1 := enclave.o         \
          tcs.o             \
-@@ -120,7 +120,7 @@ vpath %.cpp .:$(DIR1):$(DIR2):$(DIR3):$(DIR4):$(DIR6)
+@@ -119,7 +119,7 @@ vpath %.cpp .:$(DIR1):$(DIR2):$(DIR3):$(DIR4):$(DIR6)
  vpath %.S   .:$(DIR2):$(DIR5)
  vpath %.c .:$(DIR6)
  
@@ -112,7 +112,7 @@ index ea8ca78c..dd716f2b 100644
  
  LIBURTSSIM_SHARED := libsgx_urts_sim.so
  LIBURTS_DEPLOY := libsgx_urts_deploy.so
-@@ -134,7 +134,7 @@ all: $(LIBURTSSIM_SHARED) $(LIBURTS_DEPLOY)| $(BUILD_DIR)
+@@ -133,7 +133,7 @@ all: $(LIBURTSSIM_SHARED) $(LIBURTS_DEPLOY)| $(BUILD_DIR)
  	$(CP) $(LIBURTS_DEPLOY) $|
  
  $(LIBURTSSIM_SHARED): simasm uinst driver_api wrapper uae_service_sim $(OBJ) $(OBJ6) ittnotify
@@ -122,5 +122,5 @@ index ea8ca78c..dd716f2b 100644
  $(BUILD_DIR):
  	@$(MKDIR) $@
 -- 
-2.52.0
+2.53.0
 
