@@ -14,3 +14,19 @@ type = "spec-search-replace"
 section = "%build"
 regex = '-DWITH_OPUS=ON \\'
 replacement = '-DWITH_OPUS=OFF \'
+
+# AZL does not ship fdk-aac-free — disable AAC audio support in FreeRDP.
+# Update regex on Fedora rebase; do NOT remove the overlays.
+
+[[components.freerdp.overlays]]
+description = "Drop BuildRequires: pkgconfig(fdk-aac) (fdk-aac-free not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(fdk-aac)"
+
+[[components.freerdp.overlays]]
+description = "Disable AAC audio codec in FreeRDP (-DWITH_FDK_AAC=OFF)"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DWITH_FDK_AAC=ON \\'
+replacement = '-DWITH_FDK_AAC=OFF \'

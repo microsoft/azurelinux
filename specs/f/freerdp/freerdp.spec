@@ -33,7 +33,7 @@
 Name:           freerdp
 Epoch:          2
 Version:        3.22.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Free implementation of the Remote Desktop Protocol (RDP)
 
 # The effective license is Apache-2.0 but:
@@ -85,7 +85,6 @@ BuildRequires:  cmake(json-c)
 
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(krb5)
-BuildRequires:  pkgconfig(fdk-aac)
 BuildRequires:  pkgconfig(fuse3)
 BuildRequires:  pkgconfig(libpcsclite)
 BuildRequires:  pkgconfig(libpulse)
@@ -197,7 +196,7 @@ find . -name "*.c" -exec chmod 664 {} \;
     -DWITH_CLIENT_SDL=%{?_with_sdl_client:ON}%{?!_with_sdl_client:OFF} \
     -DWITH_SDL_IMAGE_DIALOGS=%{?_with_sdl_client:ON}%{?!_with_sdl_client:OFF} \
     -DWITH_DSP_FFMPEG=%{?_with_ffmpeg:ON}%{?!_with_ffmpeg:OFF} \
-    -DWITH_FDK_AAC=ON \
+    -DWITH_FDK_AAC=OFF \
     -DWITH_FFMPEG=%{?_with_ffmpeg:ON}%{?!_with_ffmpeg:OFF} \
     -DWITH_FUSE=ON \
     -DWITH_GSM=ON \
