@@ -22,8 +22,9 @@ release = { calculation = "manual" }
 #   2. 'fix(firefox): set manual release calculation'
 #   3. 'feat(firefox): add azl_release counter for independent rebuild
 #      tracking' (introduces the azl_release counter mechanism)
-#   4. This change (strip malware-flagged files from source tarball)
-azl_release = "4"
+#   4. 'feat(firefox): strip malware-flagged files from source tarball'
+#   5. 'fix(firefox): drop fdk-aac-free-devel and Fedora fdk-aac patch'
+azl_release = "5"
 
 # Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
 # without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
@@ -54,6 +55,65 @@ description = "Disable crash reporter to avoid GCC 15 breakpad compilation error
 type = "spec-search-replace"
 regex = '%global enable_mozilla_crashreporter 1'
 replacement = '%global enable_mozilla_crashreporter 0'
+
+# AZL does not ship fdk-aac-free. Four coordinated overlays are
+# required: simply dropping the BR causes ./mach configure to hard-fail.
+#
+# Mechanism: the Fedora firefox-mozconfig (Source10) ships
+# `ac_add_options --with-system-fdk-aac` unconditionally, and Fedora's
+# mozilla-1667096.patch (Patch401) wires that into
+# `pkg_check_modules('MOZ_FDK_AAC', 'fdk-aac', when='--with-system-fdk-aac')`
+# in toolkit/moz.configure. Mozilla's pkg_check_modules defaults to
+# `allow_missing=False`, so configure exits 1 if fdk-aac.pc is not in
+# the buildroot — which it won't be once fdk-aac-free is dropped.
+#
+# Patch401 is fdk-aac-only — it touches exactly 4 files
+# (toolkit/moz.configure to add the `--with-system-fdk-aac` option +
+# pkg_check_modules; ffvpx moz.build / codec_list.c / libfdk-aacdec.c
+# to wire `ff_libfdk_aac_decoder` into the ffvpx codec table). Nothing
+# else depends on it.
+#
+# We therefore (a) skip the `%patch -P401` invocation in %prep, which
+# removes the `--with-system-fdk-aac` configure option entirely AND
+# removes the `ff_libfdk_aac_decoder` entry from ffvpx's codec table
+# (otherwise the link of libmozavcodec.so fails with `undefined
+# reference to ff_libfdk_aac_decoder` because the wrapper .c file isn't
+# compiled); (b) drop the `Patch401:` source declaration so the
+# now-unused mozilla-1667096.patch is also pruned from the rendered
+# SRPM by azldev's render filter; (c) drop the now-stale
+# `ac_add_options --with-system-fdk-aac` line from firefox-mozconfig
+# (Source10), because once Patch401 is gone that option is
+# unrecognized by ./mach configure and aborts the build; and (d) drop
+# the now-unnecessary fdk-aac-free-devel BR.
+#
+# Update regexes on Fedora rebase if upstream renames Patch401 or
+# reflows firefox-mozconfig; do NOT remove the overlays.
+
+[[components.firefox.overlays]]
+description = "Skip Fedora's mozilla-1667096.patch (Patch401) in %prep. The patch is fdk-aac-only and (i) adds the `--with-system-fdk-aac` configure option and (ii) registers `ff_libfdk_aac_decoder` in ffvpx's codec_list.c. Without the wrapper .c file (libfdk-aacdec.c, also added by the patch) compiled in, that codec-table entry produces `undefined reference to ff_libfdk_aac_decoder` when linking libmozavcodec.so."
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P401 -p1 -b \.1667096$'
+replacement = '# AZL: mozilla-1667096.patch (Patch401) skipped — adds fdk-aac support; see firefox.comp.toml'
+
+[[components.firefox.overlays]]
+description = "Drop the Patch401 source declaration for the now-unused mozilla-1667096.patch. azldev's render filter prunes patch files not referenced in the rendered spec, so removing the declaration also retires the ~21KB .patch file from the SRPM."
+type = "spec-remove-tag"
+tag = "Patch401"
+value = "mozilla-1667096.patch"
+
+[[components.firefox.overlays]]
+description = "Drop the `ac_add_options --with-system-fdk-aac` line from firefox-mozconfig (Source10). Once Patch401 is skipped, toolkit/moz.configure no longer declares `--with-system-fdk-aac`, so leaving the mozconfig line in (or flipping it to `--without-`) aborts ./mach configure with 'unknown option'."
+type = "file-search-replace"
+file = "firefox-mozconfig"
+regex = 'ac_add_options --with-system-fdk-aac'
+replacement = ''
+
+[[components.firefox.overlays]]
+description = "Drop BuildRequires: fdk-aac-free-devel (no longer needed once the mozconfig override above disables MOZ_FDK_AAC; fdk-aac-free is being removed from AZL anyway)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "fdk-aac-free-devel"
 
 # Compose AZL release counter with upstream's Release integer. Uses RPM's
 # `%[ ... ]` expression syntax so the final Release tag stays a single

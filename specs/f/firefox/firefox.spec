@@ -279,7 +279,6 @@ Patch242:        0026-Add-KDE-integration-to-Firefox.patch
 
 # Upstream patches
 Patch400:        mozilla-1196777.patch
-Patch401:        mozilla-1667096.patch
 # Bug 1999029 - Wayland buffer transaction locking
 Patch402:        D278446.patch
 Patch403:        D278447.patch
@@ -413,7 +412,6 @@ BuildRequires:  libasan
 BuildRequires:  libasan-static
 %endif
 BuildRequires:  perl-interpreter
-BuildRequires:  fdk-aac-free-devel
 %if 0%{?launch_wayland_compositor}
 BuildRequires:  mutter
 BuildRequires:  gsettings-desktop-schemas
@@ -606,7 +604,7 @@ cat %{SOURCE49} | sed -e "s|LIBCLANG_RT_PLACEHOLDER|`pwd`/wasi-sdk-25/build/sysr
 %patch -P231 -p1 -b .fedora-customization
 
 %patch -P400 -p1 -b .1196777
-%patch -P401 -p1 -b .1667096
+# AZL: mozilla-1667096.patch (Patch401) skipped — adds fdk-aac support; see firefox.comp.toml
 # Bug 1999029 - Wayland buffer transaction locking
 %patch -P402 -p1 -b .1999029-1
 %patch -P403 -p1 -b .1999029-2
