@@ -94,7 +94,7 @@ Note: `copilot` supports fully autonomous operation (no interactive mode) with `
 
 #### Using as a plugin (cross-repo access)
 
-This repo includes a [Copilot plugin manifest](.claude-plugin/plugin.json) that makes its skills available from **any** working directory — not just the repo root. This is useful when you're working in another repo but want access to azurelinux skills (component builds, overlay debugging, Koji triage, etc.).
+This repo includes a [Copilot plugin manifest](.github/plugin/plugin.json) that makes its skills available from **any** working directory — not just the repo root. This is useful when you're working in another repo but want access to azurelinux skills (component builds, overlay debugging, Koji triage, etc.).
 
 **Install as a plugin (local clone):**
 
