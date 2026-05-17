@@ -4883,7 +4883,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rust-av-data]
 [components.rust-av-metrics]
 [components.rust-av-scenechange]
-[components.rust-av1-grain]
 [components.rust-average]
 [components.rust-avif-parse]
 [components.rust-avif-serialize]
