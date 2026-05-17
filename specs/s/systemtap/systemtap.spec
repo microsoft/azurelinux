@@ -101,23 +101,23 @@ g     stapusr  156\
 g     stapsys  157\
 g     stapdev  158\
 g     stapunpriv 159\
-u     stapunpriv 159      "systemtap unprivileged user"   /var/lib/stapunpriv   /sbin/nologin\
+u     stapunpriv 159      "systemtap unprivileged user"\
 m     stapunpriv stapunpriv
 
 %define _systemtap_server_preinstall \
 # See systemd-sysusers(8) sysusers.d(5)\
 \
 g     stap-server  -\
-u     stap-server  -      "systemtap compiler server"   /var/lib/stap-server   /sbin/nologin\
+u     stap-server  -      "systemtap compiler server"   /var/lib/stap-server\
 m     stap-server stap-server
 
 
 %define _systemtap_testsuite_preinstall \
 # See systemd-sysusers(8) sysusers.d(5)\
 \
-u     stapusr  -          "systemtap testsuite user"    /   /sbin/nologin\
-u     stapsys  -          "systemtap testsuite user"    /   /sbin/nologin\
-u     stapdev  -          "systemtap testsuite user"    /   /sbin/nologin\
+u     stapusr  -          "systemtap testsuite user"\
+u     stapsys  -          "systemtap testsuite user"\
+u     stapdev  -          "systemtap testsuite user"\
 m     stapusr  stapusr\
 m     stapsys  stapusr\
 m     stapsys  stapsys\
@@ -133,8 +133,8 @@ f /var/log/stap-server/log 0644 stap-server stap-server -
 
 Name: systemtap
 # PRERELEASE
-Version: 5.4
-Release: 3%{?release_override}%{?dist}
+Version: 5.5
+Release: 1%{?release_override}%{?dist}
 # for version, see also configure.ac
 
 
@@ -171,7 +171,6 @@ Summary: Programmable system-wide instrumentation system
 License: GPL-2.0-or-later
 URL: https://sourceware.org/systemtap/
 Source: ftp://sourceware.org/pub/systemtap/releases/systemtap-%{version}.tar.gz
-Patch0: systemtap-gcc16.patch
 
 # Build*
 BuildRequires: make
@@ -340,6 +339,9 @@ Summary: Programmable system-wide instrumentation system - runtime
 License: GPL-2.0-or-later
 URL: https://sourceware.org/systemtap/
 Requires(pre): shadow-utils
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 11
+Recommends: yama-ptrace-enable
+%endif
 Conflicts: systemtap-devel < %{version}-%{release}
 Conflicts: systemtap-server < %{version}-%{release}
 Conflicts: systemtap-client < %{version}-%{release}
@@ -452,10 +454,12 @@ Conflicts: systemtap-testsuite = %{version}-%{release}.x86_64
 Requires: gcc gcc-c++ make glibc-devel
 # testsuite/systemtap.base/ptrace.exp needs strace
 Requires: strace
-# testsuite/systemtap.base/ipaddr.exp needs nc. Unfortunately, the rpm
+# testsuite/systemtap.base/ipaddr.exp needs nc or ncat. Unfortunately, the rpm
 # that provides nc has changed over time (from 'nc' to
-# 'nmap-ncat'). So, we'll do a file-based require.
-Requires: /usr/bin/nc
+# 'nmap-ncat'). So, we'll do a file-based recommend.
+Recommends: /usr/bin/nc
+# Suggest nmap-ncat for /usr/bin/ncat
+Recommends: /usr/bin/ncat
 %ifnarch ia64 ppc64le aarch64
 %if 0%{?fedora} >= 21 || 0%{?rhel} >= 8
 # no prelink
@@ -617,7 +621,6 @@ or within a container.
 
 %prep
 %setup -q
-%patch 0 -p1
 
 %build
 
@@ -889,10 +892,17 @@ getent group stapusr >/dev/null || groupadd -f -g 156 -r stapusr
 getent group stapsys >/dev/null || groupadd -f -g 157 -r stapsys
 getent group stapdev >/dev/null || groupadd -f -g 158 -r stapdev
 getent passwd stapunpriv >/dev/null || \
-  useradd -c "Systemtap Unprivileged User" -u 159 -g stapunpriv -d %{_localstatedir}/lib/stapunpriv -r -s /sbin/nologin stapunpriv 2>/dev/null || \
-  useradd -c "Systemtap Unprivileged User" -g stapunpriv -d %{_localstatedir}/lib/stapunpriv -r -s /sbin/nologin stapunpriv
+  useradd -c "Systemtap Unprivileged User" -u 159 -g stapunpriv -d / -r -s /sbin/nologin stapunpriv 2>/dev/null || \
+  useradd -c "Systemtap Unprivileged User" -g stapunpriv -d / -r -s /sbin/nologin stapunpriv
 exit 0
 %endif
+
+%post runtime
+# stapunpriv is a system user not needing a homedir.  Previously, specfile did
+# set a homedir, but didn't create it.  Fresh installations now set "/" as the
+# homedir via _systemtap_runtime_preinstall, as SYSUSERS.D(5) recommends.  Fix
+# existing broken installations, keep upgrade path clean.  Related: RHEL-130244.
+getent passwd stapunpriv | cut -d: -f6 | grep -q '^/var/lib/stapunpriv$' && usermod -d / stapunpriv ||:
 
 %pre server
 %if %{with_sysusers}
@@ -1368,6 +1378,10 @@ exit 0
 
 # PRERELEASE
 %changelog
+* Fri May 01 2026 Frank Ch. Eigler <fche@redhat.com> - 5.5-1
+- Upstream release, see wiki page below for detailed notes.
+  https://sourceware.org/systemtap/wiki/SystemTapReleases
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

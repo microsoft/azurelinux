@@ -1,3 +1,6 @@
 [components.systemtap]
+# Pin past the default snapshot to correct a previously selected
+# non-first-parent commit on the f43 branch.
+spec = { type = "upstream", upstream-commit = "d06e77cc8d15d8f0fc861c82cde5af7f7a12beb1" }
 # Release: 1%{?release_override}%{?dist}
 release = { calculation = "manual" }
