@@ -5,6 +5,15 @@ build.without = ["rdp"]
 # enabled, so disable the RDP backend via build.without and remove
 # RDP-only file entries so %files doesn't list missing files.
 
+# Drop pkgconfig(ffnvcodec) BuildRequires — nv-codec-headers is not
+# shipped in AZL and is only needed for the (disabled) RDP backend's
+# NVENC hardware-encode path.
+[[components.gnome-remote-desktop.overlays]]
+description = "Drop unconditional pkgconfig(ffnvcodec) BR; nv-codec-headers is not in AZL and is only used by the disabled RDP backend"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(ffnvcodec)"
+
 # Remove RDP-only libexec entries from %files
 [[components.gnome-remote-desktop.overlays]]
 description = "Remove RDP-only enable-service from %files"
