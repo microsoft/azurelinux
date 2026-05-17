@@ -123,9 +123,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
-BuildRequires:  pkgconfig(webrtc-audio-processing-1)
 %else
-BuildRequires:  pkgconfig(webrtc-audio-processing) >= 0.2
 %endif
 BuildRequires:  libusb1-devel
 BuildRequires:  readline-devel
@@ -453,6 +451,7 @@ cp %{SOURCE1} subprojects/packagefiles/
 %build
 %meson \
     -D opus=disabled -D bluez5-codec-opus=disabled \
+    -D echo-cancel-webrtc=disabled \
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
     -D sdl2=disabled 								\
     -D audiotestsrc=disabled -D videotestsrc=disabled				\

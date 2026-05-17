@@ -10,7 +10,8 @@ release = { calculation = "manual" }
 #   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
 #   2 - introduce azl_release for pipewire
 #   3 - disable opus codec support
-azl_release = "3"
+#   4 - drop webrtc-audio-processing BR
+azl_release = "4"
 
 [[components.pipewire.overlays]]
 description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
@@ -19,9 +20,50 @@ regex = '^Release:\s+%\{baserelease\}%\{\?snapdate:\.%\{snapdate\}git%\{shortcom
 replacement = 'Release:        %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}'
 
 [[components.pipewire.overlays]]
-description = "Disable opus codec support — opus is not shipped in AZL"
+description = """
+Force-disable meson features whose dependencies are not shipped in AZL.
+Required because Fedora's %meson macro always passes --auto-features=enabled,
+which flips every auto-default feature to mandatory and would otherwise turn
+these missing deps into hard build failures:
+  - opus / bluez5-codec-opus: opus codec library not shipped in AZL
+  - echo-cancel-webrtc: webrtc-audio-processing not shipped in AZL
+    (see the component removal and BR-drop overlays below)
+The modules themselves still build; only the codec/backend implementations
+that need the unavailable libraries are skipped.
+"""
 type = "spec-search-replace"
 section = "%build"
 regex = '%meson \\'
 replacement = '''%meson \
-    -D opus=disabled -D bluez5-codec-opus=disabled \'''
+    -D opus=disabled -D bluez5-codec-opus=disabled \
+    -D echo-cancel-webrtc=disabled \'''
+
+# Drop the webrtc-audio-processing BuildRequires lines. The library is not
+# shipped in AZL (Google-derived AEC code that is significantly behind upstream
+# and carries downstream-only patches just to keep building); see the matching
+# component removal in this PR.
+#
+# The BR is gated only by an unconditional `%if 0%{?fedora} >= 40 || ...`
+# block — there is no upstream %bcond, so `build.without` cannot reach it and
+# spec-remove-tag is the only path. The matching -D echo-cancel-webrtc=disabled
+# meson flag is injected by the combined opus/echo-cancel-webrtc overlay above
+# (required because Fedora's %meson uses --auto-features=enabled).
+#
+# libpipewire-module-echo-cancel.so still ships (with the speex / null
+# backends); only the WebRTC backend (libspa-aec-webrtc.so) is dropped.
+#
+# If a spec-remove-tag eventually stops matching after a Fedora rebase,
+# update the value to the new BR spelling — do NOT remove the overlay; the
+# constraint is permanent (webrtc-audio-processing is not shipped in AZL).
+
+[[components.pipewire.overlays]]
+description = "Drop webrtc-audio-processing-1 BR (fedora>=40 / rhel>=10 branch); library not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(webrtc-audio-processing-1)"
+
+[[components.pipewire.overlays]]
+description = "Drop legacy webrtc-audio-processing BR (else branch, EL<10 / F<40); library not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(webrtc-audio-processing) >= 0.2"
