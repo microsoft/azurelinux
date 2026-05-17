@@ -2300,7 +2300,6 @@ components = [
     "rust-imagequant-sys",
     "rust-podman-sequoia",
     "rust-prefixdevname",
-    "rust-rav1e",
     "rust-ripgrep",
     "rust-rpm-sequoia",
     "rust-sequoia-sq",
@@ -2988,40 +2987,6 @@ packages = [
     # rust-zram-generator crate-source -devel sub-packages (noarch Rust sources, no compiled binary); zram-generator service binary + defaults stay in base. Kept in sdk for downstream Rust builds.
     "rust-zram-generator+default-devel", # srpm: rust-zram-generator
     "rust-zram-generator-devel", # srpm: rust-zram-generator
-    # rust-rav1e crate-source -devel sub-packages (noarch Rust sources, no compiled binary); rav1e CLI + rav1e-libs + rav1e-devel (compiled C-API library) stay in base. Kept in sdk for downstream Rust builds.
-    "rust-rav1e+asm-devel", # srpm: rust-rav1e
-    "rust-rav1e+av-metrics-devel", # srpm: rust-rav1e
-    "rust-rav1e+backtrace-devel", # srpm: rust-rav1e
-    "rust-rav1e+binaries-devel", # srpm: rust-rav1e
-    "rust-rav1e+capi-devel", # srpm: rust-rav1e
-    "rust-rav1e+cc-devel", # srpm: rust-rav1e
-    "rust-rav1e+channel-api-devel", # srpm: rust-rav1e
-    "rust-rav1e+check_asm-devel", # srpm: rust-rav1e
-    "rust-rav1e+clap-devel", # srpm: rust-rav1e
-    "rust-rav1e+clap_complete-devel", # srpm: rust-rav1e
-    "rust-rav1e+console-devel", # srpm: rust-rav1e
-    "rust-rav1e+crossbeam-devel", # srpm: rust-rav1e
-    "rust-rav1e+dav1d-sys-devel", # srpm: rust-rav1e
-    "rust-rav1e+decode_test_dav1d-devel", # srpm: rust-rav1e
-    "rust-rav1e+default-devel", # srpm: rust-rav1e
-    "rust-rav1e+desync_finder-devel", # srpm: rust-rav1e
-    "rust-rav1e+dump_ivf-devel", # srpm: rust-rav1e
-    "rust-rav1e+fern-devel", # srpm: rust-rav1e
-    "rust-rav1e+ivf-devel", # srpm: rust-rav1e
-    "rust-rav1e+nasm-rs-devel", # srpm: rust-rav1e
-    "rust-rav1e+nom-devel", # srpm: rust-rav1e
-    "rust-rav1e+quick_test-devel", # srpm: rust-rav1e
-    "rust-rav1e+scan_fmt-devel", # srpm: rust-rav1e
-    "rust-rav1e+serde-big-array-devel", # srpm: rust-rav1e
-    "rust-rav1e+serde-devel", # srpm: rust-rav1e
-    "rust-rav1e+serialize-devel", # srpm: rust-rav1e
-    "rust-rav1e+signal-hook-devel", # srpm: rust-rav1e
-    "rust-rav1e+signal_support-devel", # srpm: rust-rav1e
-    "rust-rav1e+threading-devel", # srpm: rust-rav1e
-    "rust-rav1e+toml-devel", # srpm: rust-rav1e
-    "rust-rav1e+unstable-devel", # srpm: rust-rav1e
-    "rust-rav1e+y4m-devel", # srpm: rust-rav1e
-    "rust-rav1e-devel", # srpm: rust-rav1e
     # cargo-rpm-macros: build-time RPM macros for packaging cargo crates; not needed at base runtime, used by SDK packagers.
     "cargo-rpm-macros", # srpm: cargo-rpm-macros
 ]

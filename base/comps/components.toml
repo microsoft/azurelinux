@@ -6026,7 +6026,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rust-range_map_vec]
 [components.rust-rangemap]
 [components.'rust-ratatui0.26']
-[components.rust-rav1e]
 [components.rust-ravif]
 [components.rust-raw-cpuid]
 [components.rust-raw-window-handle]
