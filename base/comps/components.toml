@@ -45,7 +45,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.Thunar]
 [components.WALinuxAgent]
 [components.Xaw3d]
-[components.a52dec]
 [components.aardvark-dns]
 [components.abattis-cantarell-fonts]
 [components.abseil-cpp]

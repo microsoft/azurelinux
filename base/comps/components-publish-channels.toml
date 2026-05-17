@@ -19,7 +19,6 @@ default-component-config.publish.rpm-channel = "rpm-base"
 default-component-config.publish.debuginfo-channel = "rpm-base-debuginfo"
 components = [
     "389-ds-base",
-    "a52dec",
     "aardvark-dns",
     "abattis-cantarell-fonts",
     "abseil-cpp",
