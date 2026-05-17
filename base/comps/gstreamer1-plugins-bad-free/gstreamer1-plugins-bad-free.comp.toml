@@ -10,9 +10,25 @@
 # extras, so we must disable them too to avoid "unpackaged file" failures.
 # AZL does not ship openh264. Set openh264 bcond off to prevent building
 # gstreamer1-plugin-openh264 subpackage.
+#
+# AZL does not ship webrtc-audio-processing (Google-derived AEC library,
+# significantly behind upstream, downstream-maintenance burden — see PR
+# #17329). Disabling the `webrtc` bcond drops BuildRequires on
+# pkgconfig(webrtc-audio-coding-1) and pkgconfig(webrtc-audio-processing-1).
+# `webrtc1` cascades off automatically because its bcond expression chains
+# on `%{with webrtc}`. This also removes two plugins from the main
+# gstreamer1-plugins-bad-free RPM that have no in-tree replacement:
+#   - libgstwebrtcdsp.so  (WebRTC echo-cancel / AGC / noise-suppression
+#                          GStreamer element; %files gated on `with webrtc`)
+#   - libgstisac.so       (ISAC voice codec; %files gated on `with webrtc1`)
+# Pipelines that reference `webrtcdsp` or `isac` will fail with
+# "no such element" — there is no fallback. The unrelated GStreamer
+# WebRTC API plugins (libgstwebrtc-1.0.so, libgstwebrtcnice-1.0.so,
+# libgstwebrtc.so) are NOT affected; they come from a different source
+# tree and do not depend on webrtc-audio-processing.
 
 [components.gstreamer1-plugins-bad-free]
-build.without = ["extras", "dc1394", "onnx", "openh264"]
+build.without = ["extras", "dc1394", "onnx", "openh264", "webrtc"]
 
 # AZL does not ship opus — disable the opus parse plugin and remove its BR.
 

@@ -36,7 +36,7 @@
 
 Name:           gstreamer1-plugins-bad-free
 Version:        1.26.10
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        GStreamer streaming media framework "bad" plugins
 
 # Automatically converted from old format: LGPLv2+ and LGPLv2 - review is highly recommended.
