@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/firefox.azl.macros}
+
 # Produce a build suitable for release, i.e. use PGO/LTO. You can turn it off
 # when building locally to reduce build time.
 %global release_build     1
@@ -203,7 +206,7 @@ ExcludeArch: i686
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        148.0
-Release:        1%{?pre_tag}%{?dist}
+Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 # Automatically converted from old format: MPLv1.1 or GPLv2+ or LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-MPLv1.1 OR GPL-2.0-or-later OR LicenseRef-Callaway-LGPLv2+
@@ -248,6 +251,7 @@ Source49:       wasi.patch.template
 # git clone --recursive https://github.com/WebAssembly/wasi-sdk.git
 # cd wasi-sdk && git-archive-all --force-submodules wasi-sdk-25.tar.gz
 Source50:       wasi-sdk-25.tar.gz
+Source9999: firefox.azl.macros
 
 # Build patches
 Patch40:        build-aarch64-skia.patch

@@ -1,6 +1,27 @@
 [components.firefox]
-# Release: 1%{?pre_tag}%{?dist}
+# Upstream Fedora ships `Release: 1%{?pre_tag}%{?dist}`. We rewrite that line
+# (see overlay below) to `Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}`
+# so the AZL release counter is composed with — rather than replacing —
+# upstream's value. That way the only knob to turn for an AZL-only rebuild
+# is `azl_release` in build.defines below.
 release = { calculation = "manual" }
+
+[components.firefox.build.defines]
+# AZL-only release counter. Added to upstream's leading Release integer (1
+# at the pinned f43 commit) via the overlay below, keeping a single-number
+# Fedora-style Release schema. Bump whenever an AZL-only change requires a
+# new RPM (e.g. new overlay, build-flag change) WITHOUT moving the upstream
+# pin. Reset to "1" when bumping the upstream pin (so the first AZL build
+# on a new upstream is always Release == N+1 where N is whatever the new
+# upstream pin ships).
+#
+# Current value accounts for prior AZL changes already updating this
+# component's input fingerprint:
+#   1. 'feat: introduce deterministic commit resolution via Azure Linux
+#      lock file'
+#   2. 'fix(firefox): set manual release calculation'
+#   3. This change (introduces the azl_release counter mechanism)
+azl_release = "3"
 
 # Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
 # without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
@@ -31,3 +52,24 @@ description = "Disable crash reporter to avoid GCC 15 breakpad compilation error
 type = "spec-search-replace"
 regex = '%global enable_mozilla_crashreporter 1'
 replacement = '%global enable_mozilla_crashreporter 0'
+
+# Compose AZL release counter with upstream's Release integer. Uses RPM's
+# `%[ ... ]` expression syntax so the final Release tag stays a single
+# integer (Fedora-style). The literal "1" in the replacement MIRRORS the
+# upstream Release integer at the pinned f43 commit — when bumping the
+# `upstream-commit` pin, re-render and update this literal if upstream
+# bumped its own Release (e.g. to "2"). The regex is anchored to the full
+# upstream line, so if upstream changes the Release format (e.g. drops
+# `%{?pre_tag}` or bumps the leading integer), `azldev comp render` will
+# report `STATUS=error` for this component and leave the rendered spec
+# unchanged — caught at PR time by the `Check Rendered Specs` CI job.
+#
+# AZL-only rebuild (no upstream pin change): bump `azl_release` only.
+# Upstream pin bump: update upstream-commit, re-render, update the
+# literal here to match the new upstream Release integer, and reset
+# `azl_release = "1"`.
+[[components.firefox.overlays]]
+description = "Compose azl_release with upstream Release integer so AZL-only bumps are tracked independently of upstream Fedora's Release counter"
+type = "spec-search-replace"
+regex = '^Release:\s+1%\{\?pre_tag\}%\{\?dist\}$'
+replacement = 'Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}'
