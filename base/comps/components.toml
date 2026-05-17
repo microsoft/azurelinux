@@ -1690,7 +1690,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libatasmart]
 [components.libatomic_ops]
 [components.libavc1394]
-[components.libavif]
 [components.libavtp]
 [components.libb2]
 [components.libblkio]
