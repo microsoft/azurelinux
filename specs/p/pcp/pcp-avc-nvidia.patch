@@ -1,0 +1,30 @@
+commit e84ee24823548ce92c1e222d034e5600f4d3a10a
+Author: William Cohen <wcohen@redhat.com>
+Date:   Tue Feb 10 04:00:26 2026 +0000
+
+    selinux: Update nvidia pmda policy
+    
+    RHEL-133519
+
+diff --git a/src/selinux/pcp.te b/src/selinux/pcp.te
+index 54f4e96877..69ee2b2957 100644
+--- a/src/selinux/pcp.te
++++ b/src/selinux/pcp.te
+@@ -1051,7 +1051,7 @@ optional_policy(`
+ # type=AVC msg=audit(N): avc: denied { read } for pid=PID comm="pmdanvidia" name="nvidia-cap2" dev="devtmpfs" ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=unconfined_u:object_r:device_t:s0 tclass=chr_file permissive=0
+ #RHEL-83594
+ allow pcp_pmcd_t default_t:file { execute };
+-allow pcp_pmcd_t device_t:chr_file { create open read setattr write };
++allow pcp_pmcd_t device_t:chr_file { create ioctl open read setattr write };
+ allow pcp_pmcd_t device_t:dir { add_name remove_name write };
+ allow pcp_pmcd_t device_t:lnk_file { create unlink };
+ allow pcp_pmcd_t self:capability mknod;
+@@ -1059,7 +1059,7 @@ allow pcp_pmcd_t dri_device_t:chr_file { ioctl open read write };
+ allow pcp_pmcd_t device_t:dir write;
+ allow pcp_pmcd_t device_t:dir { create setattr };
+ allow pcp_pmcd_t sysctl_vm_t:file read;
+-allow pcp_pmcd_t xserver_misc_device_t:chr_file { ioctl open read write };
++allow pcp_pmcd_t xserver_misc_device_t:chr_file { ioctl map open read write };
+ 
+ # type=AVC msg=audit(N): avc: denied { sys_rawio } for pid=PID comm="pmdaX" name="/" dev="tracefs" ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=system_u:object_r:pcp_pmcd_t:s0 tclass=capability permissive=0
+ allow pcp_pmcd_t self:capability sys_rawio;

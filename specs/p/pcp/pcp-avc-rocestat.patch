@@ -1,0 +1,29 @@
+commit 082ff6beb14420c04af74f37d2ae8c1628182ae2
+Author: William Cohen <wcohen@redhat.com>
+Date:   Tue Feb 10 02:19:21 2026 +0000
+
+    selinux: AVC denial fix for rocestat pmda
+    
+    Resolves: RHEL-132402
+
+diff --git a/src/selinux/pcp.te b/src/selinux/pcp.te
+index 59cf1fb630..54f4e96877 100644
+--- a/src/selinux/pcp.te
++++ b/src/selinux/pcp.te
+@@ -1036,6 +1036,16 @@ allow pcp_pmproxy_t pcp_log_t:lnk_file read;
+ allow pcp_pmcd_t fsadm_exec_t:file { execute execute_no_trans getattr open read };
+ allow pcp_pmcd_t fixed_disk_device_t:blk_file { open read ioctl };
+ 
++#============= pmda-rocestat ==============
++optional_policy(`
++    require {
++	type ifconfig_exec_t;
++    }
++   # type=AVC msg=audit(N): avc:  denied  { execute_no_trans } for  pid=PID comm="python3" path="/usr/sbin/ethtool" dev=DEV ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=system_u:object_r:ifconfig_exec_t:s0 tclass=file permissive=0
++   # RHEL-132402
++   allow pcp_pmcd_t ifconfig_exec_t:file { execute execute_no_trans };
++')
++
+ #============= pmda-nvidia ==============
+ # type=AVC msg=audit(N): avc: denied { execute } for pid=PID comm="pmdanvidia" path="/usr/lib64/libnvidia-ml.so" dev="dm-2" ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=unconfined_u:object_r:default_t:s0 tclass=file permissive=0
+ # type=AVC msg=audit(N): avc: denied { read } for pid=PID comm="pmdanvidia" name="nvidia-cap2" dev="devtmpfs" ino=INO scontext=system_u:system_r:pcp_pmcd_t:s0 tcontext=unconfined_u:object_r:device_t:s0 tclass=chr_file permissive=0

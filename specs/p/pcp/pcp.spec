@@ -3,7 +3,7 @@
 
 Name:    pcp
 Version: 7.1.0
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary: System-level performance monitoring and performance management
 License: GPL-2.0-or-later AND LGPL-2.1-or-later AND CC-BY-3.0
 URL:     https://pcp.io
@@ -16,6 +16,8 @@ ExcludeArch: %{ix86}
 Patch1: pcp-selinux.patch
 Patch2: pcp-qa-avc-check.patch
 Patch3: pcp-selinux2.patch
+Patch4: pcp-avc-rocestat.patch
+Patch5: pcp-avc-nvidia.patch
 
 # The additional linker flags break out-of-tree PMDAs.
 # https://bugzilla.redhat.com/show_bug.cgi?id=2043092
@@ -3451,6 +3453,9 @@ fi
 %files zeroconf -f pcp-zeroconf-files.rpm
 
 %changelog
+* Sun Mar 15 2026 William Cohen <wcohen@redhat.com> - 7.1.0-6
+- Add selinux fixes for rocestat and nvidia pmdas.
+
 * Sun Feb 15 2026 William Cohen <wcohen@redhat.com> - 7.1.0-5
 - Bump and include additional selinux fixup.
 

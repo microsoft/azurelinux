@@ -1,0 +1,4 @@
+[components.pcp]
+# Pin past the default snapshot to correct a previously selected
+# non-first-parent commit on the f43 branch.
+spec = { type = "upstream", upstream-commit = "ca70e01ed8f01b26cf221bfcdd816d2ae71cb87e" }

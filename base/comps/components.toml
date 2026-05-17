@@ -2367,7 +2367,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.pcg-cpp]
 [components.pciutils]
 [components.pcm]
-[components.pcp]
 [components.pcs]
 [components.pcsc-lite]
 [components.pcsc-lite-ccid]
