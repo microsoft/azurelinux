@@ -15,7 +15,7 @@
 
 Name:           yarnpkg
 Version:        1.22.22
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary:        Fast, reliable, and secure dependency management.
 License:        BSD-2-Clause
 URL:            https://github.com/yarnpkg/yarn
@@ -40,7 +40,7 @@ ExclusiveArch:  %{nodejs_arches}
 
 BuildRequires:  nodejs-packaging
 %if 0%{?fedora}
-BuildRequires:  %{_bindir}/npm
+BuildRequires:  nodejs-npm
 %else
 BuildRequires:  npm
 %endif
@@ -102,10 +102,10 @@ if [[ $(%{buildroot}%{_bindir}/yarn --version) == %{version} ]] ; then echo PASS
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Wed Dec 03 2025 Sandro Mani <manisandro@gmail.com> - 1.22.22-14
-- Bump release
-
-* Wed Dec 03 2025 Sandro Mani <manisandro@gmail.com> - 1.22.22-13
 - Refresh bundle, fixes CVE-2025-64756
+
+* Tue Nov 11 2025 Tomas Juhasz <tjuhasz@redhat.com> - 1.22.22-13
+- Rebuilt for nodejs-packaging
 
 * Tue Sep 30 2025 Sandro Mani <manisandro@gmail.com> - 1.22.22-12
 - Regenerate bundle, fixes CVE-2025-59343
