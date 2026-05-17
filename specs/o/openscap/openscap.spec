@@ -5,7 +5,7 @@
 %{load:%{_sourcedir}/openscap.azl.macros}
 
 Name:           openscap
-Version:        1.4.3
+Version:        1.4.4
 Release: 4%{?dist}
 Epoch:          1
 Summary:        Set of open source libraries enabling integration of the SCAP line of standards
@@ -326,6 +326,9 @@ pathfix.py -i %{__python3} -p -n %{buildroot}%{_bindir}/scap-as-rpm
 %{_mandir}/man8/oscap-podman.8*
 
 %changelog
+* Thu Apr 09 2026 Matthew Burket <mburket@redhat.com> - 1:1.4.4-1
+- Upgrade to the latest upstream release
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.4.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
