@@ -107,7 +107,6 @@ BuildRequires:  pkgconfig(gstreamer-allocators-1.0) >= 1.10.0
 BuildRequires:  pkgconfig(ldacBT-enc)
 BuildRequires:  pkgconfig(ldacBT-abr)
 %endif
-BuildRequires:  pkgconfig(fdk-aac)
 BuildRequires:  pkgconfig(bluez)
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
@@ -455,7 +454,7 @@ cp %{SOURCE1} subprojects/packagefiles/
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
     -D sdl2=disabled 								\
     -D audiotestsrc=disabled -D videotestsrc=disabled				\
-    -D volume=disabled -D bluez5-codec-aptx=disabled 		  		\
+    -D volume=disabled -D bluez5-codec-aac=disabled -D bluez5-codec-aptx=disabled 		  		\
     -D bluez5-codec-lc3plus=disabled -D bluez5-codec-lc3=enabled		\
 %ifarch s390x
     -D bluez5-codec-ldac=disabled						\

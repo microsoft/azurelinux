@@ -2,4 +2,4 @@
 # Do not edit manually; changes will be overwritten.
 %_without_roc 1
 %_without_v4l2 1
-%azl_release 6
+%azl_release 7
