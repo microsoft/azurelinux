@@ -6925,7 +6925,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.wayland-protocols]
 [components.web-assets]
 [components.webkitgtk]
-[components.webrtc-audio-processing]
 [components.websocketpp]
 [components.weldr-client]
 [components.wget1]

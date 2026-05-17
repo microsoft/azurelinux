@@ -2519,7 +2519,6 @@ components = [
     "watchdog",
     "wayland",
     "web-assets",
-    "webrtc-audio-processing",
     "weldr-client",
     "wget2",
     "which",
