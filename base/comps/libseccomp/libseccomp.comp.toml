@@ -1,3 +1,5 @@
 [components.libseccomp]
-# Need build fixes in rawhide
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" } }
+# Pin to fedora 44 to minimize drift from what we're currently building
+# (the AZL4 default is fedora 43 @ snapshot, but rawhide -> f44 branched
+# at commit fa5ec89, which is what we have been shipping).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "fa5ec89b71f49dbb6fb2136df5b74a6518f5f6d0" }
