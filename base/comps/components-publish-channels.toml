@@ -297,7 +297,6 @@ components = [
     "fakeroot",
     "fapolicyd",
     "fcoe-utils",
-    "fdk-aac-free",
     "felix-parent",
     "felix-utils",
     "fence-agents",
