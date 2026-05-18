@@ -442,7 +442,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.felix-parent]
 [components.felix-utils]
 [components.festival]
-[components.festival-freebsoft-utils]
 [components.ffcall]
 [components.fftw]
 [components.fido-device-onboard]
