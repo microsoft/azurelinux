@@ -1,6 +1,30 @@
 [components.pulseaudio]
-# Release: 9%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+# Release: %[9 + %{azl_release}]%{?snap:.%{snap}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
+
+[components.pulseaudio.build.defines]
+# AZL-only release counter. Added to upstream's hardcoded Release number (9)
+# so the final Release tag is a single number (Fedora-style schema) that
+# bumps independently of upstream. Increment when shipping new AZL-only
+# changes on top of the pinned upstream commit.
+#   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
+#   2 - 7c5a4c7e86 fix(pulseaudio): set manual release calculation
+#   3 - f9e776358e fix(pulseaudio): disable gdm-hooks subpackage
+#   4 - introduce azl_release for pulseaudio
+azl_release = "4"
+
+# Add azl_release to upstream's hardcoded Release (9) so we can bump release
+# independently of upstream while keeping a single-number Fedora-style Release
+# schema. The regex matches the current upstream Release verbatim and acts as
+# a tripwire: if Fedora bumps the upstream number (e.g. 9 → 10), the regex
+# will stop matching and force a conscious re-evaluation of the baseline.
+# When that happens, update the regex *and* the baseline number in the
+# replacement to the new upstream value, and reset azl_release to "1".
+[[components.pulseaudio.overlays]]
+description = "Add azl_release to upstream Release so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = '^Release:\s+9%\{\?snap:\.%\{snap\}git%\{shortcommit\}\}%\{\?dist\}$'
+replacement = 'Release:        %[9 + %{azl_release}]%{?snap:.%{snap}git%{shortcommit}}%{?dist}'
 
 # The gdm-hooks subpackage was moved to gdm packaging in Fedora 28+,
 # so this subpackage should not be built. The upstream conditional mis-fires
