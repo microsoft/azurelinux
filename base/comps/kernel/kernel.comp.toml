@@ -211,7 +211,7 @@ source = "kmod-nvidia-open-modprobe.conf"
 description = "Register NVIDIA open-gpu-kernel-modules tarball as Source6000"
 type = "spec-insert-tag"
 tag = "Source6000"
-value = "open-gpu-kernel-modules-594.58.03.tar.gz"
+value = "open-gpu-kernel-modules-595.58.03.tar.gz"
 
 [[components.kernel.overlays]]
 description = "Register NVIDIA modprobe config as Source6001"
