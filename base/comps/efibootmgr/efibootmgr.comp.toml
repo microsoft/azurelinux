@@ -1,0 +1,15 @@
+# efibootmgr — moved from inline components.toml entry to dedicated file so we
+# can pin a new Release. efibootmgr bakes %{efi_vendor} into the binary via
+# `git config --local --add efibootmgr.efidir %{efi_vendor}` in %prep, and
+# the new efi-rpm-macros sets _efi_vendor_ to azurelinux (was inherited
+# 'redhat'). The RPM contents therefore change with the macro, so a fresh
+# NEVR is required to get Koji to publish a new build (it rejects duplicate
+# NEVRs, and rpmautospec is not invoked during local renders so Release does
+# not auto-bump).
+[components.efibootmgr]
+
+[[components.efibootmgr.overlays]]
+description = "Bump Release to force Koji rebuild against new efi-rpm-macros (azurelinux ESP layout)"
+type = "spec-update-tag"
+tag = "Release"
+value = "12%{?dist}"
