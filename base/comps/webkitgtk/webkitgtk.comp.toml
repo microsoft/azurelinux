@@ -1,0 +1,19 @@
+# AZL does not ship libavif — disable avif support in WebKitGTK.
+# No bcond exists; remove the BR and pass -DUSE_AVIF=OFF to cmake.
+# WebKitGTK has two cmake builds (GTK4 + GTK3); the flag applies globally.
+
+[components.webkitgtk]
+
+[[components.webkitgtk.overlays]]
+description = "Remove libavif BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavif)"
+
+[[components.webkitgtk.overlays]]
+description = "Disable avif support in WebKitGTK cmake builds"
+type = "spec-search-replace"
+section = "%build"
+regex = '%cmake \\'
+replacement = '''%cmake \
+  -DUSE_AVIF=OFF \'''
