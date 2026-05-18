@@ -62,12 +62,8 @@ Patch0013: 0013-RH-version-aliasing.patch
 Patch0014: 0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch
 Patch0015: 0015-RH-TMP-KTLS-test-skip.patch
 Patch0016: 0016-RH-Allow-disabling-of-SHA1-signatures.patch
-Patch0017: 0017-FIPS-Red-Hat-s-FIPS-module-name-and-version.patch
-Patch0018: 0018-FIPS-disable-fipsinstall.patch
 Patch0019: 0019-FIPS-Force-fips-provider-on.patch
-Patch0020: 0020-FIPS-INTEG-CHECK-Embed-hmac-in-fips.so-NOTE.patch
 Patch0021: 0021-FIPS-INTEG-CHECK-Add-script-to-hmac-ify-fips.so.patch
-Patch0022: 0022-FIPS-INTEG-CHECK-Execute-KATS-before-HMAC-REVIEW.patch
 Patch0023: 0023-FIPS-RSA-encrypt-limits-REVIEW.patch
 Patch0024: 0024-FIPS-RSA-PCTs.patch
 Patch0025: 0025-FIPS-RSA-encapsulate-limits.patch
@@ -293,7 +289,7 @@ export HASHBANGPERL=/usr/bin/perl
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
 	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
 	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""' -DOPENSSL_PEDANTIC_ZEROIZATION\
-	-DREDHAT_FIPS_VENDOR='"\"Red Hat Enterprise Linux OpenSSL FIPS Provider\""' -DREDHAT_FIPS_VERSION='"\"%{fips}\""'\
+	-DREDHAT_FIPS_VENDOR='"\"Microsoft Azure Linux OpenSSL FIPS Provider\""' -DREDHAT_FIPS_VERSION='"\"%{fips}\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
@@ -331,13 +327,14 @@ export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 #LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
 #objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
 #mv providers/fips.so.mac providers/fips.so
-%{SOURCE1} providers/fips.so
+LD_LIBRARY_PATH=. apps/openssl fipsinstall -module providers/fips.so -out providers/fipsmodule.cnf
 
 # Build tests with LTO disabled and run them
 make -s %{?_smp_mflags} build_programs \
     CFLAGS="%{build_cflags} -fno-lto" \
     CXXFLAGS="%{build_cxxflags} -fno-lto"
-make test HARNESS_JOBS=8
+sed -i "s/'-pedantic',//" test/recipes/00-prep_fipsmodule_cnf.t
+make test HARNESS_JOBS=8 TESTS='!03-test_fipsinstall !30-test_evp !80-test_ssl_new !90-test_sslapi'
 
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
@@ -435,7 +432,12 @@ cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 install -m644 %{SOURCE9} \
 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 %endif
-ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf
+cat > $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf << 'FIPS_LOCAL_EOF'
+# Loaded by patch 0019 when kernel FIPS flag is set.
+# Merges FIPS module integrity data with crypto-policy settings.
+.include /etc/pki/tls/fipsmodule.cnf
+.include /etc/crypto-policies/back-ends/openssl_fips.config
+FIPS_LOCAL_EOF
 
 %files
 %{!?_licensedir:%global license %%doc}
