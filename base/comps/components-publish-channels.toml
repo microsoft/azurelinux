@@ -212,7 +212,6 @@ components = [
     "cyrus-imapd",
     "cyrus-sasl",
     "Cython",
-    "dav1d",
     "dbus",
     "dbus-broker",
     "dbus-python",
