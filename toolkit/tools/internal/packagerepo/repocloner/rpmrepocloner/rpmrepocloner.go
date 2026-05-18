@@ -410,15 +410,17 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 	timestamp.StartEvent("cloning packages", nil)
 	defer timestamp.StopEvent(nil)
 
-	depsSwitch := "--nodeps"
-	if cloneDeps {
-		depsSwitch = "--alldeps"
-	}
-
+	// NOTE: We intentionally do NOT bake the deps switch ('--alldeps' or
+	// '--nodeps') into the args here. clonePackage chooses it per-iteration:
+	// when only local repos (toolchain + locally-built) are enabled, we use
+	// '--nodeps' so that a package which lives in a local repo can succeed
+	// without dragging its full upstream dep closure into the same
+	// transaction. This lets locally-available packages short-circuit before
+	// the cloner falls through to the upstream-enabled iteration, which is
+	// the one prone to transient libcurl failures on flaky CDN edges.
 	constantArgs := []string{
 		"install",
 		"-y",
-		depsSwitch,
 		"--downloadonly",
 		"--downloaddir",
 		r.chrootCloneDir,
@@ -447,7 +449,7 @@ func (r *RpmRepoCloner) cloneRawPackageNames(cloneDeps, singleTransaction bool, 
 
 		finalArgs := append(constantArgs, packageNamesToClone...)
 		err = r.chroot.Run(func() (chrootErr error) {
-			prebuilt, chrootErr := r.clonePackage(finalArgs)
+			prebuilt, chrootErr := r.clonePackage(cloneDeps, finalArgs)
 			if !prebuilt {
 				allPackagesPrebuilt = false
 			}
@@ -644,7 +646,19 @@ func (r *RpmRepoCloner) Close() error {
 
 // clonePackage clones a given package using pre-populated arguments.
 // It will gradually enable more repos to consider until the package is found.
-func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err error) {
+//
+// 'cloneDeps' controls whether the caller would normally want the full
+// dependency closure pulled along with the requested package. We honor that
+// only when an iteration actually has upstream repos enabled: while the loop
+// is restricted to local-only repos (toolchain + locally-built) we force
+// '--nodeps' so a package that already lives locally can short-circuit the
+// loop without needing tdnf to also resolve its upstream-only deps in the
+// same transaction.
+func (r *RpmRepoCloner) clonePackage(cloneDeps bool, baseArgs []string) (preBuilt bool, err error) {
+	const (
+		alldepsSwitch = "--alldeps"
+		nodepsSwitch  = "--nodeps"
+	)
 
 	releaseverCliArg, err := tdnf.GetReleaseverCliArg()
 	if err != nil {
@@ -656,7 +670,18 @@ func (r *RpmRepoCloner) clonePackage(baseArgs []string) (preBuilt bool, err erro
 	for _, reposArgs := range r.reposArgsList {
 		logger.Log.Debugf("Using repo args: %s", reposArgs)
 
-		finalArgs := append(baseArgs, reposArgs...)
+		// Decide the deps switch for this iteration. While only local repos
+		// are enabled, '--nodeps' lets a locally-available package succeed
+		// without requiring its upstream-only deps to also resolve in this
+		// transaction. Once upstream is enabled we fall back to the caller's
+		// original intent (typically '--alldeps' for the cache walk).
+		iterDepsSwitch := nodepsSwitch
+		if cloneDeps && !r.reposArgsHaveOnlyLocalSources(reposArgs) {
+			iterDepsSwitch = alldepsSwitch
+		}
+
+		finalArgs := append([]string{iterDepsSwitch}, baseArgs...)
+		finalArgs = append(finalArgs, reposArgs...)
 
 		// We run in a retry loop on errors deemed retriable.
 		ctx, closeCtx := context.WithCancel(context.Background())
