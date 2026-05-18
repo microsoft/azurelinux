@@ -4,7 +4,7 @@
 Summary: Common RPM Macros for building EFI-related packages
 Name: efi-rpm-macros
 Version: 6
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPL-3.0-or-later
 URL: https://github.com/rhboot/%{name}/
 BuildRequires: git sed
@@ -18,7 +18,7 @@ Patch0001: 0001-add-riscv64-support.patch
 Patch0002: 0002-Re-enable-ia32-as-an-alt-for-x86_64.patch
 
 %global debug_package %{nil}
-%global _efi_vendor_ %(eval echo $(sed -n -e 's/rhel/redhat/' -e 's/^ID=//p' /etc/os-release))
+%global _efi_vendor_ azurelinux
 
 %description
 %{name} provides a set of RPM macros for use in EFI-related packages.

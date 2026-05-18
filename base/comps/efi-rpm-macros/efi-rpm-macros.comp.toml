@@ -1,0 +1,14 @@
+[components.efi-rpm-macros]
+
+# Lock the EFI vendor name to "azurelinux" so that the EFI ESP layout
+# (/boot/efi/EFI/<vendor>/) is deterministic and does not depend on the
+# /etc/os-release of the build chroot. Upstream derives `_efi_vendor_`
+# from `ID=` in /etc/os-release; if the build runs in a chroot whose
+# os-release isn't yet rebranded (e.g. early bootstrap, or a Fedora
+# stage), the macros bake in `fedora` and every downstream consumer
+# (efi-filesystem, shim, grub2, ...) installs to /boot/efi/EFI/fedora/.
+[[components.efi-rpm-macros.overlays]]
+description = "Lock _efi_vendor_ to 'azurelinux' so the EFI ESP layout (/boot/efi/EFI/<vendor>/) is deterministic, independent of the build chroot's /etc/os-release"
+type = "spec-search-replace"
+regex = '^%global _efi_vendor_ %\(eval echo \$\(sed -n -e .*\)\)$'
+replacement = '%global _efi_vendor_ azurelinux'
