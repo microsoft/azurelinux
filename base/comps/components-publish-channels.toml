@@ -91,6 +91,7 @@ components = [
     "avahi",
     "azure-cli",
     "azure-vm-utils",
+    "azurelinux-logos",
     "azurelinux-release",
     "azurelinux-repos",
     "azurelinux-rpm-config",
