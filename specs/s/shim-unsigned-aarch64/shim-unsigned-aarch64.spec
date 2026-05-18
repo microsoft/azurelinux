@@ -12,7 +12,7 @@
 %global zdpd 0%{dotpre}.
 %endif
 
-%global efidir %(eval echo $(grep ^ID= /etc/os-release | sed -e 's/^ID=//' -e 's/rhel/redhat/'))
+%global efidir azurelinux
 %global shimrootdir %{_datadir}/shim/
 %global shimversiondir %{shimrootdir}/%{version}-%{release}
 %global efiarch aa64
@@ -29,7 +29,7 @@
 
 Name:		shim-unsigned-aarch64
 Version:	15.8
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	aarch64
 License:	BSD-2-Clause AND OpenSSL

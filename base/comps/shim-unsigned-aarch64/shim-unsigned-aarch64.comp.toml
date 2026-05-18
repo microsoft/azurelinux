@@ -8,5 +8,13 @@ overlays = [
 
     # Workaround: create a compat symlink that does not include the dist tag.
     { type = "spec-append-lines", section = "%install", lines = ["ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2"] },
-    { type = "spec-append-lines", section = "%files", lines = ["%{_datadir}/shim/%{version}-2"] }
+    { type = "spec-append-lines", section = "%files", lines = ["%{_datadir}/shim/%{version}-2"] },
+
+    # Lock EFIDIR to "azurelinux" so the unsigned shim binaries embed the
+    # correct ESP subdirectory regardless of the build chroot's
+    # /etc/os-release. Upstream derives `efidir` from `ID=` in os-release;
+    # in any chroot where that isn't yet `azurelinux` (Fedora bootstrap,
+    # etc.) the binary bakes in `fedora` and end
+    # users see /boot/efi/EFI/fedora/ instead of /boot/efi/EFI/azurelinux/.
+    { description = "Lock efidir to 'azurelinux' so the unsigned shim binaries embed the correct ESP subdirectory regardless of the build chroot's /etc/os-release", type = "spec-search-replace", regex = '^%global efidir %\(eval echo \$\(grep .*\)\)$', replacement = '%global efidir azurelinux' },
 ]
