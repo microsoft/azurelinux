@@ -452,6 +452,7 @@ cp %{SOURCE1} subprojects/packagefiles/
 
 %build
 %meson \
+    -D opus=disabled -D bluez5-codec-opus=disabled \
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
     -D sdl2=disabled 								\
     -D audiotestsrc=disabled -D videotestsrc=disabled				\

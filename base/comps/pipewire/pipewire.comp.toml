@@ -9,10 +9,19 @@ release = { calculation = "manual" }
 # pinned upstream commit.
 #   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
 #   2 - introduce azl_release for pipewire
-azl_release = "2"
+#   3 - disable opus codec support
+azl_release = "3"
 
 [[components.pipewire.overlays]]
 description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
 type = "spec-search-replace"
 regex = '^Release:\s+%\{baserelease\}%\{\?snapdate:\.%\{snapdate\}git%\{shortcommit\}\}%\{\?dist\}$'
 replacement = 'Release:        %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}'
+
+[[components.pipewire.overlays]]
+description = "Disable opus codec support — opus is not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson \\'
+replacement = '''%meson \
+    -D opus=disabled -D bluez5-codec-opus=disabled \'''
