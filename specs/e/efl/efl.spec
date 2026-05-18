@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/efl.azl.macros}
+
 %global has_luajit 1
 
 %ifarch ppc64le s390x riscv64
@@ -17,12 +20,13 @@
 
 Name:		efl
 Version:	1.28.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	Collection of Enlightenment libraries
 # Automatically converted from old format: BSD and LGPLv2+ and GPLv2 and zlib - review is highly recommended.
 License:	LicenseRef-Callaway-BSD AND LicenseRef-Callaway-LGPLv2+ AND GPL-2.0-only AND Zlib
 URL:		http://enlightenment.org/
 Source0:	http://download.enlightenment.org/rel/libs/efl/efl-%{version}.tar.xz
+Source9999: efl.azl.macros
 # This is hacky, but it gets us building in rawhide again.
 # Upstream efl probably needs to rework how they use check in their C tests
 Patch1:		efl-1.25.0-check-fix.patch

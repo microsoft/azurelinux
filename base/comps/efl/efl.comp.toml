@@ -1,0 +1,4 @@
+# AZL does not ship libavif — disable avif evas loader.
+# The avif bcond defaults ON in Fedora builds.
+[components.efl]
+build.without = ["avif"]
