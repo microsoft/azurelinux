@@ -1,7 +1,7 @@
 [components.pipewire]
 # Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
-build.without = ["v4l2"]
+build.without = ["v4l2", "roc"]
 
 [components.pipewire.build.defines]
 # AZL-only release counter. Added to upstream's %{baserelease} so the final
@@ -13,7 +13,8 @@ build.without = ["v4l2"]
 #   3 - disable opus codec support
 #   4 - drop webrtc-audio-processing BR
 #   5 - disable v4l2 support
-azl_release = "5"
+#   6 - disable roc support
+azl_release = "6"
 
 [[components.pipewire.overlays]]
 description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
