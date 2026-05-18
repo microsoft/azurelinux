@@ -1,0 +1,38 @@
+
+From 8ef4c35 Mon Sep 17 00:00:00 2001
+From: Akarsh Chaudhary <akarsh@example.com>
+Date: Thu, 8 Jan 2026 14:35:00 +0530
+Subject: [PATCH] Fix pyproject license field for PEP621 compliance
+
+PEP 621 does NOT allow a raw string for the `license` field.  
+It must be either:
+
+  license = { text = "…" }
+  OR
+  license = { file = "…" }
+
+Azure Linux enforces strict setuptools validation, causing metadata
+generation to fail.
+
+This patch converts the invalid string license to a correct table format.
+
+---
+ pyproject.toml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 1234567..abcdef0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -12,7 +12,8 @@ maintainers = [{name = "Breezy Developers", email = "team@breezy-vcs.org"}]
+ description = "Friendly distributed version control system"
+ readme = "README.rst"
+-license = "GPL-2.0-or-later"
++# PEP621 requires license to be a table, not a string
++license = { text = "GPL-2.0-or-later" }
+
+ classifiers = [
+     "Development Status :: 6 - Mature",
+
+-- 
+2.34.1
