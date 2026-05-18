@@ -2,5 +2,5 @@
 # Do not edit manually; changes will be overwritten.
 %_without_debug 1
 %_without_selftests 1
-%azl_pkgrelease 2
+%azl_pkgrelease 3
 %kextraversion 1
