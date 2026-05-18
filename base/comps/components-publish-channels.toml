@@ -762,7 +762,6 @@ components = [
     "libasyncns",
     "libatasmart",
     "libatomic_ops",
-    "libavif",
     "libb2",
     "libblkio",
     "libblockdev",
