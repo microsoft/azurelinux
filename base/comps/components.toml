@@ -4529,7 +4529,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rit-rachana-fonts]
 [components.rlottie]
 [components.rng-tools]
-[components.roc-toolkit]
 [components.rocal]
 [components.rocalution]
 [components.rocblas]
