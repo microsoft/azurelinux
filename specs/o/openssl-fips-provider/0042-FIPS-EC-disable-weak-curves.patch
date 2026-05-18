@@ -1,0 +1,31 @@
+From 134cd6169b6dcbc1e395a38d7e5af0f9691e772b Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Fri, 7 Mar 2025 18:06:36 -0500
+Subject: [PATCH 42/59] FIPS: EC: disable weak curves
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ apps/ecparam.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/apps/ecparam.c b/apps/ecparam.c
+index f0879dfb11..a6042e7d2a 100644
+--- a/apps/ecparam.c
++++ b/apps/ecparam.c
+@@ -77,6 +77,13 @@ static int list_builtin_curves(BIO *out)
+         const char *comment = curves[n].comment;
+         const char *sname = OBJ_nid2sn(curves[n].nid);
+ 
++        if (((curves[n].nid == NID_secp256k1) || (curves[n].nid == NID_brainpoolP256r1)
++            || (curves[n].nid == NID_brainpoolP256t1) || (curves[n].nid == NID_brainpoolP320r1)
++            || (curves[n].nid == NID_brainpoolP320t1) || (curves[n].nid == NID_brainpoolP384r1)
++            || (curves[n].nid == NID_brainpoolP384t1) || (curves[n].nid == NID_brainpoolP512r1)
++            || (curves[n].nid == NID_brainpoolP512t1)) && EVP_default_properties_is_fips_enabled(NULL))
++            continue;
++
+         if (comment == NULL)
+             comment = "CURVE DESCRIPTION NOT AVAILABLE";
+         if (sname == NULL)
+-- 
+2.51.0
+
