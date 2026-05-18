@@ -12,7 +12,7 @@
 #global gitcommit  f5d3606fe76302c7dbdb0f6a80400df829a5f846
 #global shortcommit %%(c=%%{gitcommit}; echo ${c:0:5})
 
-%global with_webrtc 1
+%undefine with_webrtc
 
 %if 0%{?fedora}
 %global enable_daemon 1

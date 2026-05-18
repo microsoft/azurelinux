@@ -11,7 +11,8 @@ release = { calculation = "manual" }
 #   2 - 7c5a4c7e86 fix(pulseaudio): set manual release calculation
 #   3 - f9e776358e fix(pulseaudio): disable gdm-hooks subpackage
 #   4 - introduce azl_release for pulseaudio
-azl_release = "4"
+#   5 - disable WebRTC AEC backend
+azl_release = "5"
 
 # Add azl_release to upstream's hardcoded Release (9) so we can bump release
 # independently of upstream while keeping a single-number Fedora-style Release
@@ -35,3 +36,29 @@ description = "Disable gdm-hooks subpackage (moved to gdm packaging in Fedora 28
 type = "spec-search-replace"
 regex = "%global gdm_hooks 1"
 replacement = "%global gdm_hooks 0"
+
+# Disable WebRTC-based acoustic echo cancellation. AZL does not ship the
+# webrtc-audio-processing component (Google-derived code that is significantly
+# behind upstream and carries downstream patches just to keep building), so
+# PulseAudio's module-echo-cancel falls back to its other AEC implementations
+# (speex, null). Drops the BuildRequires on pkgconfig(webrtc-audio-processing-1)
+# and the module-echo-cancel webrtc backend (libwebrtc-util.so). See PR #17329.
+#
+# Note: we %undefine (rather than set to 0) because the spec also uses
+# `%{?with_webrtc:enabled}%{!?with_webrtc:disabled}` to compute the meson
+# `-D webrtc-aec=` flag — that conditional tests for *definition*, not
+# truthiness, so `%global with_webrtc 0` would still pass `enabled` to meson.
+# Leaving the macro undefined makes every `%if 0%{?with_webrtc}` and
+# `%{?with_webrtc:...}` evaluate to the disabled branch consistently.
+#
+# Regex is anchored to a full line (with optional trailing whitespace) to
+# guard against benign Fedora reformatting and to avoid accidentally
+# matching e.g. `%global with_webrtc 10` in some hypothetical future variant.
+# If this regex stops matching after a Fedora rebase, *update* it to the
+# new macro shape — do NOT remove the overlay; the constraint is permanent
+# (webrtc-audio-processing is not shipped in AZL).
+[[components.pulseaudio.overlays]]
+description = "Disable WebRTC AEC backend (webrtc-audio-processing not shipped in AZL)"
+type = "spec-search-replace"
+regex = '^%global with_webrtc 1\s*$'
+replacement = "%undefine with_webrtc"
