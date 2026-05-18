@@ -25,7 +25,6 @@ Patch1: 0002-Fix-flake8-and-unit-test.patch
  
 BuildArch: noarch
 Requires: python%{python3_pkgversion}-%{name} = %{version}-%{release}
-Requires: python%{python3_pkgversion}-libcomps
 Requires: python3-libcomps
 BuildRequires: systemd
 BuildRequires: pkgconfig
@@ -67,10 +66,8 @@ Summary: Koji XMLRPC interface
 License: LGPL-2.1-only
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-hub-code
-%if 0%{?fedora} || 0%{?rhel} > 7
 Suggests: python%{python3_pkgversion}-%{name}-hub
 Suggests: python%{python3_pkgversion}-%{name}-hub-plugins
-%endif
  
 %description hub
 koji-hub is the XMLRPC interface to the koji database
@@ -93,9 +90,7 @@ koji-hub is the XMLRPC interface to the koji database
 Summary: Koji hub plugins
 License: LGPL-2.1-only
 Requires: %{name}-hub-plugins-code = %{version}-%{release}
-%if 0%{?fedora} || 0%{?rhel} > 7
 Suggests: python%{python3_pkgversion}-%{name}-hub-plugins
-%endif
  
 %description hub-plugins
 Plugins to the koji XMLRPC interface
@@ -175,9 +170,7 @@ License: LGPL-2.1-only
 Requires: %{name} = %{version}-%{release}
 Requires: %{name}-web-code = %{version}-%{release}
 Requires: python%{python3_pkgversion}-cheetah
-%if 0%{?fedora} || 0%{?rhel} > 7
 Suggests: python%{python3_pkgversion}-%{name}-web
-%endif
  
 %description web
 koji-web is a web UI to the Koji system.
