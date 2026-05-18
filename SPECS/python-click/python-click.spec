@@ -8,12 +8,13 @@ comes with good defaults out of the box.
 Summary:        Simple wrapper around optparse for powerful command line utilities
 Name:           python-%{pypi_name}
 Version:        8.1.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/mitsuhiko/click
 Source0:        https://github.com/mitsuhiko/click/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-7246.patch
 BuildArch:      noarch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
@@ -50,6 +51,9 @@ pytest -v tests
 %{python3_sitelib}/%{pypi_name}-*.egg-info/
 
 %changelog
+* Mon May 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.1.7-3
+- Patch for CVE-2026-7246
+
 * Wed May 28 2025 Riken Maharjan <rmaharjan@microsoft.com> - 8.1.7-2
 - Fix Ptest by using ptest version above 7.4.0. Use system pytest.
 
