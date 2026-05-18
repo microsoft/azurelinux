@@ -40,6 +40,7 @@ Patch14:        CVE-2025-58190.patch
 Patch15:        CVE-2026-2303.patch
 Patch16:        CVE-2026-35469.patch
 Patch17:        CVE-2026-41889.patch
+
 BuildRequires:  golang >= 1.15
 
 %description
