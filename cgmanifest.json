@@ -2427,8 +2427,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.4.18",
-          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.18/cups-2.4.18-source.tar.gz"
+          "version": "2.4.19",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.19/cups-2.4.19-source.tar.gz"
         }
       }
     },
@@ -5480,8 +5480,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.66",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.66.tar.bz2"
+          "version": "2.4.67",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.67.tar.bz2"
         }
       }
     },
@@ -6650,8 +6650,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.138.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.138.1.tar.gz"
+          "version": "6.6.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.139.1.tar.gz"
         }
       }
     },
@@ -8331,8 +8331,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.138.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.138.1.tar.gz"
+          "version": "6.6.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.139.1.tar.gz"
         }
       }
     },
@@ -8341,8 +8341,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.138.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.138.1.tar.gz"
+          "version": "6.6.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.139.1.tar.gz"
         }
       }
     },
@@ -8351,8 +8351,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.138.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.138.1.tar.gz"
+          "version": "6.6.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.139.1.tar.gz"
         }
       }
     },
@@ -8361,8 +8361,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.87.1.tar.gz"
+          "version": "6.12.89.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
         }
       }
     },
@@ -8371,8 +8371,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.87.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.87.1.tar.gz"
+          "version": "6.12.89.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.138.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.138.1.tar.gz"
+          "version": "6.6.139.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.139.1.tar.gz"
         }
       }
     },
@@ -9911,8 +9911,8 @@
         "type": "other",
         "other": {
           "name": "libical",
-          "version": "3.0.9",
-          "downloadUrl": "https://github.com/libical/libical/archive/v3.0.9/libical-3.0.9.tar.gz"
+          "version": "3.0.10",
+          "downloadUrl": "https://github.com/libical/libical/archive/v3.0.10/libical-3.0.10.tar.gz"
         }
       }
     },
@@ -10911,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.57",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.57.tar.xz"
+          "version": "1.6.58",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.58.tar.xz"
         }
       }
     },
@@ -21283,8 +21283,8 @@
         "type": "other",
         "other": {
           "name": "pgbouncer",
-          "version": "1.25.1",
-          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.1/pgbouncer-1.25.1.tar.gz"
+          "version": "1.25.2",
+          "downloadUrl": "https://pgbouncer.github.io/downloads/files/1.25.2/pgbouncer-1.25.2.tar.gz"
         }
       }
     },
@@ -21303,8 +21303,8 @@
         "type": "other",
         "other": {
           "name": "php",
-          "version": "8.3.29",
-          "downloadUrl": "https://www.php.net/distributions/php-8.3.29.tar.xz"
+          "version": "8.3.31",
+          "downloadUrl": "https://www.php.net/distributions/php-8.3.31.tar.xz"
         }
       }
     },
@@ -21683,8 +21683,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.12",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.12/postgresql-16.12.tar.bz2"
+          "version": "16.14",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.14/postgresql-16.14.tar.bz2"
         }
       }
     },
@@ -23693,8 +23693,8 @@
         "type": "other",
         "other": {
           "name": "python-markdown",
-          "version": "3.5.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/M/Markdown/Markdown-3.5.2.tar.gz"
+          "version": "3.8.2",
+          "downloadUrl": "https://github.com/Python-Markdown/markdown/releases/download/3.8.2/markdown-3.8.2.tar.gz"
         }
       }
     },
@@ -23773,8 +23773,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "3.0.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.0.2.tar.gz"
+          "version": "3.2.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.2.1.tar.gz"
         }
       }
     },
@@ -29966,8 +29966,8 @@
         "type": "other",
         "other": {
           "name": "valkey",
-          "version": "8.0.7",
-          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.7.tar.gz"
+          "version": "8.0.9",
+          "downloadUrl": "https://github.com/valkey-io/valkey/archive/refs/tags/8.0.9.tar.gz"
         }
       }
     },
@@ -30006,8 +30006,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0392",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0392.tar.gz"
+          "version": "9.2.0461",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0461.tar.gz"
         }
       }
     },

@@ -75,7 +75,7 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 %{_bindir}/%{name}-admission-webhooks
 
 %changelog
-* Mon May 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-12
+* Mon May 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-13
 - Patch for CVE-2026-41889
 
 * Thu May 07 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.14.1-12
