@@ -1,0 +1,18 @@
+# AZL does not ship libavif — disable avif image loading support.
+# SDL2_image has no bcond for avif; remove the BR and change configure
+# flag from --disable-avif-shared to --disable-avif.
+
+[components.SDL2_image]
+
+[[components.SDL2_image.overlays]]
+description = "Remove libavif-devel BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libavif-devel"
+
+[[components.SDL2_image.overlays]]
+description = "Disable avif support entirely instead of just disabling shared linking"
+type = "spec-search-replace"
+section = "%build"
+regex = '--disable-avif-shared'
+replacement = '--disable-avif'

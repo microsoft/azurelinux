@@ -3,7 +3,7 @@
 
 Name:           SDL2_image
 Version:        2.8.8
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Image loading library for SDL
 
 # IMG_png.c is LGPLv2+ and zlib, rest is just zlib
@@ -17,7 +17,6 @@ Source0:        https://github.com/libsdl-org/SDL_image/releases/download/releas
 BuildRequires:  gcc
 BuildRequires:  automake
 BuildRequires:  SDL2-devel
-BuildRequires:  libavif-devel
 BuildRequires:  libjpeg-devel
 BuildRequires:  libjxl-devel
 BuildRequires:  libpng-devel
@@ -55,7 +54,7 @@ sed -i -e 's/\r//g' README.txt CHANGES.txt
            --disable-tif-shared \
            --disable-webp-shared \
            --disable-jxl-shared \
-           --disable-avif-shared \
+           --disable-avif \
            --disable-static
 sed -i -e 's! -shared ! -Wl,--as-needed\0!g' libtool
 %make_build
