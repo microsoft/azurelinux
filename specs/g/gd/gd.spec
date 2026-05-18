@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/gd.azl.macros}
+
 %if 0%{?rhel}
 %bcond_with liq
 %bcond_with raqm
@@ -21,7 +24,7 @@
 Summary:       A graphics library for quick creation of PNG or JPEG images
 Name:          gd
 Version:       2.3.3
-Release:       19%{?prever}%{?short}%{?dist}
+Release: 20%{?prever}%{?short}%{?dist}
 License:       GD
 URL:           http://libgd.github.io/
 %if 0%{?commit:1}
@@ -31,6 +34,7 @@ Source0:       libgd-%{version}-%{commit}.tgz
 %else
 Source0:       https://github.com/libgd/libgd/releases/download/gd-%{version}/libgd-%{version}.tar.xz
 %endif
+Source9999: gd.azl.macros
 
 # Needed by PHP see https://github.com/libgd/libgd/pull/766
 Patch0:        libgd-flip.patch
