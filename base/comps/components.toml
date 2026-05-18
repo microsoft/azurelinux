@@ -1899,7 +1899,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.librevenge]
 [components.librhsm]
 [components.librist]
-[components.librsvg2]
 [components.librttopo]
 [components.libsamplerate]
 [components.libsass]

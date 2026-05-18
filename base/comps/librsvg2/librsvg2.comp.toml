@@ -1,0 +1,8 @@
+[components.librsvg2]
+
+[[components.librsvg2.overlays]]
+description = "Disable AVIF support to remove dav1d dependency"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson %\{\?rhel:-Davif=disabled\} -Dpixbuf-loader=disabled'
+replacement = '%meson -Davif=disabled -Dpixbuf-loader=disabled'
