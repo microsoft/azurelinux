@@ -1,4 +1,15 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
-<title>404 Not Found</title>
-<h1>Not Found</h1>
-<p>The requested URL was not found on the server.  If you entered the URL manually please check your spelling and try again.</p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+	<dependencies>
+		<dependency>
+			<packageName>qpid-proton</packageName>
+			<version>0.40.0</version>
+			<licenses>
+				<license>
+					<name>Apache-2.0</name>
+					<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+				</license>
+			</licenses>
+		</dependency>
+	</dependencies>
+</licenseSummary>
