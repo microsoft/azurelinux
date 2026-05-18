@@ -16,3 +16,15 @@ type = "file-search-replace"
 file = "grub.macros"
 regex = '%global with_xen_pvh_arch 1'
 replacement = '%global with_xen_pvh_arch 0'
+
+# Force a Koji rebuild against the new efi-rpm-macros (efidir/_efi_vendor_
+# changed from inherited 'redhat' to 'azurelinux'). grub2 bakes %{efi_esp_dir}
+# (= /boot/efi/EFI/%{_efi_vendor_}) into its %post scripts and %files, so the
+# RPM contents change with the macro. Bump Release explicitly so Koji produces
+# a new NEVR; the rendered Release value is static (rpmautospec is not invoked
+# locally), and Koji rejects duplicate NEVRs.
+[[components.grub2.overlays]]
+description = "Bump Release to force Koji rebuild against new efi-rpm-macros (azurelinux ESP layout)"
+type = "spec-update-tag"
+tag = "Release"
+value = "42%{?dist}"
