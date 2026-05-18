@@ -8,7 +8,7 @@
 
 Name:		shim
 Version:	15.8
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:	First-stage UEFI bootloader
 License:	BSD-3-Clause
 URL:		https://github.com/rhboot/shim/
@@ -97,6 +97,14 @@ install -m 0700 %{shimefi} $RPM_BUILD_ROOT%{efi_esp_dir}/shim.efi
 %endif
 install -D -d -m 0755 $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d/
 install -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/dnf/protected.d/
+
+# Rewrite installed BOOT*.CSV (UTF-16LE) to label the boot entry as AzureLinux.
+for csv in $RPM_BUILD_ROOT%{efi_esp_dir}/BOOT*.CSV; do
+  [ -f "$csv" ] || continue
+  shim_name=$(basename "$csv" .CSV | sed -e 's/^BOOT/shim/' | tr '[:upper:]' '[:lower:]')
+  printf '\xff\xfe' > "$csv"
+  printf '%s.efi,AzureLinux,,This is the boot entry for AzureLinux\n' "$shim_name" | iconv -f UTF-8 -t UTF-16LE >> "$csv"
+done
 
 ( cd $RPM_BUILD_ROOT ; find .%{efi_esp_root} -type f ) \
   | sed -e 's/\./\^/' -e 's,^\\\./,.*/,' -e 's,$,$,' > %{__brp_mangle_shebangs_exclude_from_file}

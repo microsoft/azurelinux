@@ -16,4 +16,25 @@ overlays = [
     "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
     "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
   ] },
+
+  # Set the firmware boot-entry label to "AzureLinux".
+  # The BOOT*.CSV files (UTF-16LE) are consumed by fallback.efi to register
+  # a UEFI boot entry; the second field is the label shown in `efibootmgr -v`
+  # and most firmware boot menus. Rewriting the installed copy in %install
+  # avoids carrying binary CSV blobs in the comp directory and keeps the
+  # upstream Fedora sources untouched.
+  #
+  # Anchor on the `find ... brp_mangle` line because it sits inside the real
+  # %install body but before the `%define_files` macros (which expand to
+  # %files sections). spec-append-lines for %install would land *after*
+  # those expansions, putting our shell loop inside %files.
+  { description = "Set BOOT*.CSV boot-entry label to 'AzureLinux' so the firmware menu matches the distro", type = "spec-search-replace", section = "%install", regex = '^\( cd \$RPM_BUILD_ROOT ; find \.%\{efi_esp_root\} -type f \) \\$', replacement = '''# Rewrite installed BOOT*.CSV (UTF-16LE) to label the boot entry as AzureLinux.
+for csv in $RPM_BUILD_ROOT%{efi_esp_dir}/BOOT*.CSV; do
+  [ -f "$csv" ] || continue
+  shim_name=$(basename "$csv" .CSV | sed -e 's/^BOOT/shim/' | tr '[:upper:]' '[:lower:]')
+  printf '\xff\xfe' > "$csv"
+  printf '%s.efi,AzureLinux,,This is the boot entry for AzureLinux\n' "$shim_name" | iconv -f UTF-8 -t UTF-16LE >> "$csv"
+done
+
+( cd $RPM_BUILD_ROOT ; find .%{efi_esp_root} -type f ) \''' },
 ]
