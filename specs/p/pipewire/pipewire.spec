@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/pipewire.azl.macros}
+
 %global majorversion 1
 %global minorversion 4
 %global microversion 10
@@ -68,7 +71,7 @@
 Name:           pipewire
 Summary:        Media Sharing Server
 Version:        %{majorversion}.%{minorversion}.%{microversion}
-Release:        %{baserelease}%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+Release:        %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 License:        MIT
 URL:            https://pipewire.org/
 %if 0%{?snapdate}
@@ -77,6 +80,7 @@ Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{git
 Source0:        https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/%{version}/pipewire-%{version}.tar.gz
 %endif
 Source1:        pipewire.sysusers
+Source9999: pipewire.azl.macros
 
 ## upstream patches
 

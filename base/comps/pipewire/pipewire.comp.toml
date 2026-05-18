@@ -1,3 +1,18 @@
 [components.pipewire]
-# Release: %{baserelease}%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+# Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
+
+[components.pipewire.build.defines]
+# AZL-only release counter. Added to upstream's %{baserelease} so the final
+# Release tag is a single number (Fedora-style schema) that bumps independently
+# of upstream. Increment when shipping new AZL-only changes on top of the
+# pinned upstream commit.
+#   1 - 5d461a2449 feat: introduce deterministic commit resolution via Azure Linux lock file
+#   2 - introduce azl_release for pipewire
+azl_release = "2"
+
+[[components.pipewire.overlays]]
+description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = '^Release:\s+%\{baserelease\}%\{\?snapdate:\.%\{snapdate\}git%\{shortcommit\}\}%\{\?dist\}$'
+replacement = 'Release:        %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}'
