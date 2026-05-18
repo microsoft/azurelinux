@@ -1,0 +1,39 @@
+# Pin to f43 commit that adds BuildRequires: libpng-static.
+# libpng switched to cmake-native config which unconditionally declares a
+# PNG::png_static target referencing libpng16.a — cmake fails at configure
+# time if that file is absent.  The pinned commit already carries the fix
+# upstream (BuildRequires: libpng-static), so no additional overlay is needed.
+#
+# AZL does not ship libavif — disable avif image loading support.
+# SDL3_image uses cmake with explicit AVIF flags; remove the BR and
+# turn the flags OFF.
+
+[components.SDL3_image]
+spec = { type = "upstream", upstream-commit = "6b9cdf9cf3e3798c9443bf425017b152d78b9d65" }
+
+[[components.SDL3_image.overlays]]
+description = "Remove cmake(libavif) BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "cmake(libavif)"
+
+[[components.SDL3_image.overlays]]
+description = "Disable avif support in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DSDLIMAGE_AVIF=ON'
+replacement = '-DSDLIMAGE_AVIF=OFF'
+
+[[components.SDL3_image.overlays]]
+description = "Disable avif save support in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DSDLIMAGE_AVIF_SAVE=ON'
+replacement = '-DSDLIMAGE_AVIF_SAVE=OFF'
+
+[[components.SDL3_image.overlays]]
+description = "Disable avif shared linking in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = '-DSDLIMAGE_AVIF_SHARED=ON'
+replacement = '-DSDLIMAGE_AVIF_SHARED=OFF'
