@@ -2,7 +2,7 @@
 Summary:        Boost
 Name:           boost
 Version:        1.83.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Boost
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -80,7 +80,6 @@ conventional methods such as command-line and configuration file.
 
 %install
 ./b2 install threading=multi
-rm -rf %{buildroot}%{_libdir}/cmake
 
 %ldconfig_scriptlets
 
@@ -93,6 +92,7 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %defattr(-,root,root)
 %{_includedir}/boost/*
 %{_libdir}/libboost_*.so
+%{_libdir}/cmake/
 
 %files static
 %defattr(-,root,root)
@@ -115,6 +115,9 @@ rm -rf %{buildroot}%{_libdir}/cmake
 %{_libdir}/libboost_system.so.%{sonamever}
 
 %changelog
+* Mon May 18 2026 Wojciech Panfil <wojciech.panfil@intel.com> - 1.83.0-3
+- Install CMake config files as part of devel
+
 * Mon Apr 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.83.0-2
 - Adds boost-1.81-phoenix-multiple-defn.patch
 
