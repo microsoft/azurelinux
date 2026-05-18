@@ -1,0 +1,15 @@
+# gnu-efi — moved from an inline components.toml entry to a dedicated file so
+# the input-fingerprint changes, forcing a Koji rebuild against the new
+# efi-rpm-macros (efidir/_efi_vendor_ changed from inherited 'redhat' to
+# 'azurelinux'). gnu-efi installs
+# into %{efi_esp_dir}/%{efi_arch}/ which resolves to /boot/efi/EFI/<vendor>/<arch>/,
+# so the RPM payload paths change with the macro. Release is left unpinned;
+# rpmautospec derives the new NEVR from this commit during build.
+[components.gnu-efi]
+
+# Explicitly select autorelease (the spec already uses %autorelease). This is a
+# no-op behaviorally but makes the config semantically distinct from the
+# implicit-default form, so `azldev comp update` produces a fresh
+# input-fingerprint that signals downstream CI to rebuild the component.
+[components.gnu-efi.release]
+calculation = "autorelease"

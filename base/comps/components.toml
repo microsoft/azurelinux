@@ -750,7 +750,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.gnome-online-accounts]
 [components.gnome-settings-daemon]
 [components.gnome-shell-extension-no-overview]
-[components.gnu-efi]
 [components.gnulib-l10n]
 [components.gnupg2]
 [components.gnuplot]
