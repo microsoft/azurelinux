@@ -2161,7 +2161,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.mosh]
 [components.motif]
 [components.mozilla-filesystem]
-[components.mozjs128]
 [components.mozjs140]
 [components.mpdecimal]
 [components.mpfr]

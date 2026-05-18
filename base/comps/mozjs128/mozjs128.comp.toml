@@ -1,0 +1,9 @@
+[components.mozjs128]
+
+[[components.mozjs128.source-files]]
+filename = "firefox-128.11.0esr.source.tar.xz"
+hash = "39141838e0ead6918b267772486fbbfbacc0596b5baad279170d103d221550d58eb6a0cf5e811b59b7700eb492d743119412b4093dba09dab56a55ff4370db2d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/mozjs128/firefox-128.11.0esr.source.tar.xz/sha512/39141838e0ead6918b267772486fbbfbacc0596b5baad279170d103d221550d58eb6a0cf5e811b59b7700eb492d743119412b4093dba09dab56a55ff4370db2d/firefox-128.11.0esr.source.tar.xz" }
+replace-upstream = true
+replace-reason = "Serve a locally-modified `firefox-128.11.0esr.source.tar.xz` with the single file `firefox-128.11.0/third_party/rust/zip/tests/data/aes_archive.zip` removed. That file is an AES-encrypted ZIP fixture from the upstream Rust `zip` crate's test suite that trips an automated package-signing pipeline scanner with a benign encrypted-archive verdict. The file is never read at AZL build time (mozjs128 only consumes `js/src/` from this tarball; the cargo-vendored `zip` crate's test corpus is not exercised). See modify_source.sh next to this file."
