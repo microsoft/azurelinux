@@ -3,7 +3,7 @@
 
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
-Version:        6.12.85.1
+Version:        6.12.87.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -35,6 +35,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.87.1-1
+- Auto-upgrade to 6.12.87.1
+
 * Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.85.1-1
 - Auto-upgrade to 6.12.85.1
 
