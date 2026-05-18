@@ -4682,7 +4682,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rubygem-open4]
 [components.rubygem-pdf-core]
 [components.rubygem-pdf-inspector]
-[components.rubygem-pdf-reader]
 [components.rubygem-pg]
 [components.rubygem-power_assert]
 [components.rubygem-prawn]

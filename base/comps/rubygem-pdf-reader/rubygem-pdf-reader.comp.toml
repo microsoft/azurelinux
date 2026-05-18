@@ -1,0 +1,9 @@
+[components.rubygem-pdf-reader]
+
+[[components.rubygem-pdf-reader.source-files]]
+filename = "pdf-reader-2.4.2-spec.txz"
+hash = "49de5d0e3bb8067101624ecc00a6e5f646a6dbdb4200343b15b1b268776e2248071056e7c73432a3b038130d7e8d5f81e9911742bc016272335bee18c51fd708"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/rubygem-pdf-reader/pdf-reader-2.4.2-spec.txz/sha512/49de5d0e3bb8067101624ecc00a6e5f646a6dbdb4200343b15b1b268776e2248071056e7c73432a3b038130d7e8d5f81e9911742bc016272335bee18c51fd708/pdf-reader-2.4.2-spec.txz" }
+replace-upstream = true
+replace-reason = "Serve a locally-modified `pdf-reader-2.4.2-spec.txz` with 47 pathological PDF fixtures removed from `spec/data/` to avoid scan failures. All fixtures are benign upstream regression PDFs not consumed at AZL runtime. Companion patch in `modify_source.sh` makes `pdf_spec_file()` call rspec's `skip` only for the 47 removed filenames; it still raises `ArgumentError` for any other missing fixture."
