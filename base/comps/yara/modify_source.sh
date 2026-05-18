@@ -1,24 +1,34 @@
 #!/usr/bin/env bash
 #
-# yara — strip benign-but-scanner-tripping fixture from upstream tarball.
+# yara — strip benign-but-scanner-tripping fixtures from upstream tarball.
 #
 # Background
 # ----------
 # An automated malware scan in the package signing pipeline rejects
-# `tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated` inside the upstream
-# `yara-4.5.4.tar.gz` tarball.  The file is a deliberately obfuscated
-# .NET binary used as an oss-fuzz seed-corpus input for YARA's `.NET`
-# parser fuzzer; it is benign but matches generic .NET-obfuscator
-# heuristics by design.
+# multiple files inside the upstream `yara-4.5.4.tar.gz` tarball that
+# are benign by intent but match generic malware heuristics by design.
+# The full list lives in `STRIP_PATHS` below and falls into two
+# flavours:
 #
-# The `*_fuzzer.cc` oss-fuzz harnesses (and their `*_fuzzer_corpus/`
-# directories) are NOT referenced from upstream's `Makefile.am`, so the
-# autotools `make check` driver does not exercise them.  Removing
-# `tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated` (and, optionally,
-# the rest of the dotnet fuzzer corpus) does not affect the Azure Linux
-# build or `%check`.
+#   - `tests/oss-fuzz/*_fuzzer_corpus/*` seed-corpus inputs for the
+#     libFuzzer harnesses (`dex_fuzzer`, `dotnet_fuzzer`). The corpora
+#     directories are referenced only by `*_fuzzer.cc` libFuzzer
+#     wrappers; they are NOT in upstream's `Makefile.am`, so the
+#     autotools `make check` driver does not exercise them and
+#     stripping individual entries has no `%check` impact.
 #
-# This script repacks the upstream tarball with the offending file
+#   - Hash-named PE fixtures under `tests/data/` that are real malware
+#     samples used by `tests/test-pe.c` (PE-format parser test). The
+#     autotools `make check` driver DOES run `test-pe`, so stripping
+#     them alone would make it fail at runtime. The script therefore
+#     also drops the `test-pe` line from `Makefile.am`; autoreconf in
+#     %prep regenerates a Makefile without `test-pe` in the TESTS
+#     list. Loss: build-time PE-parser regression coverage from
+#     upstream's own test corpus. The runtime PE rule-scanning code
+#     path (the same one consumers exercise via the `yara` CLI) is
+#     unaffected.
+#
+# This script repacks the upstream tarball with the offending files
 # stripped, then prints the SHA512 of the modified artefact for use in
 # `base/comps/yara/yara.comp.toml`'s `source-files` block.  The
 # modified tarball must be uploaded to the Azure Linux modified-source
@@ -62,27 +72,39 @@ EXTRACTED_DIRNAME="yara-4.5.4"
 
 # Files to remove from the upstream tarball.
 #
-# `tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated` is a deliberately
-# obfuscated .NET binary used as an oss-fuzz seed-corpus input for
-# YARA's .NET parser fuzzer; it is referenced only by libFuzzer
-# harnesses (not by the autotools `make check` test suite).
+# Two flavours of fixture are stripped:
 #
-# The three SHA-256-named fixtures under `tests/data/` are real malware
-# samples used by `tests/test-pe.c` (PE-format parser test) — one is
-# UPX-packed. The autotools `make check` driver runs `test-pe`, which
-# references these files by name. Stripping the files alone would make
-# `test-pe` fail at runtime, so we also drop the `test-pe` line from
-# `Makefile.am` below (see the `Makefile.am` edit step), which causes
-# autoreconf in %prep to regenerate a Makefile without `test-pe` in
-# the TESTS list. Loss: build-time PE-parser regression coverage from
-# upstream's own test corpus. The runtime PE rule-scanning code path
-# (the same one consumers exercise via the `yara` CLI) is unaffected.
+# 1) `tests/oss-fuzz/*_fuzzer_corpus/*` -- seed-corpus inputs for the
+#    libFuzzer harnesses (`dex_fuzzer`, `dotnet_fuzzer`, ...). Some
+#    are deliberately obfuscated binaries (e.g. the `.NET` `obfuscated`
+#    sample), others are short binary blobs that exercise specific
+#    parser-rejection paths. The corpora directories are referenced
+#    only by `*_fuzzer.cc` libFuzzer wrappers; they are NOT in
+#    upstream's `Makefile.am`, so the autotools `make check` driver
+#    does not consume them and stripping individual entries has no
+#    `%check` impact.
+#
+# 2) Four hash-named fixtures under `tests/data/` (three SHA-256-named
+#    plus one `.upx`-suffixed sibling) are real malware samples used
+#    by `tests/test-pe.c` (PE-format parser test) -- the `.upx`-suffixed
+#    one is the UPX-packed variant. The autotools `make check` driver
+#    DOES run `test-pe`, which references these files by name.
+#    Stripping the files alone would make `test-pe` fail at runtime,
+#    so we also drop the `test-pe` line from `Makefile.am` below (see
+#    the `Makefile.am` edit step), which causes autoreconf in %prep
+#    to regenerate a Makefile without `test-pe` in the TESTS list.
+#    Loss: build-time PE-parser regression coverage from upstream's
+#    own test corpus. The runtime PE rule-scanning code path (the
+#    same one consumers exercise via the `yara` CLI) is unaffected.
 declare -a STRIP_PATHS=(
-    "${EXTRACTED_DIRNAME}/tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated"
     "${EXTRACTED_DIRNAME}/tests/data/05cd06e6a202e12be22a02700ed6f1604e803ca8867277d852e8971efded0650"
     "${EXTRACTED_DIRNAME}/tests/data/079a472d22290a94ebb212aa8015cdc8dd28a968c6b4d3b88acdd58ce2d3b885"
     "${EXTRACTED_DIRNAME}/tests/data/079a472d22290a94ebb212aa8015cdc8dd28a968c6b4d3b88acdd58ce2d3b885.upx"
     "${EXTRACTED_DIRNAME}/tests/data/e3d45a2865818756068757d7e319258fef40dad54532ee4355b86bc129f27345"
+    "${EXTRACTED_DIRNAME}/tests/oss-fuzz/dex_fuzzer_corpus/27fb31059503773723597edb875c937af971a6c15f91aac8c03c1fbdfa9e918c"
+    "${EXTRACTED_DIRNAME}/tests/oss-fuzz/dex_fuzzer_corpus/b343d1058063e6e4b652ccf0589f93d0dbb6b092960e4aebc3c3c58894831359"
+    "${EXTRACTED_DIRNAME}/tests/oss-fuzz/dotnet_fuzzer_corpus/buggy_stream_names"
+    "${EXTRACTED_DIRNAME}/tests/oss-fuzz/dotnet_fuzzer_corpus/obfuscated"
 )
 
 SCRIPT_DIR="$(cd "$(dirname "$(realpath "$0")")" && pwd)"
