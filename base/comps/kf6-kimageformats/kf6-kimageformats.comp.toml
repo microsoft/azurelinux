@@ -19,3 +19,12 @@ type = "spec-search-replace"
 section = "%build"
 regex = '-DKIMAGEFORMATS_HEIF:BOOL=ON'
 replacement = '-DKIMAGEFORMATS_HEIF:BOOL=OFF'
+
+# AZL does not ship libavif — remove the cmake(libavif) BR so the avif
+# plugin is not discovered or built.
+
+[[components.kf6-kimageformats.overlays]]
+description = "Remove libavif BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "cmake(libavif)"
