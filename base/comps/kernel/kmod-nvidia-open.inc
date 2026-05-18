@@ -65,7 +65,7 @@ cd -
 
 %ifarch x86_64 aarch64
 %{log_msg "Building NVIDIA open GPU kernel modules %{nvidia_open_version} for %{KVERREL}"}
-pushd %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}
+pushd %{_builddir}/open-gpu-kernel-modules-595.58.03
 # Unset LDFLAGS — NVIDIA kbuild invokes ld directly, not via gcc
 unset LDFLAGS
 # IGNORE_CC_MISMATCH=1: kmod is a kernel subpackage built in the same
