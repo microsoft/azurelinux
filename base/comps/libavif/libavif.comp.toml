@@ -1,8 +1,11 @@
 # Disable the optional `rav1e` build conditional. Azure Linux does not ship
 # the rust-rav1e component, so its `pkgconfig(rav1e)` BuildRequires and the
 # `-DAVIF_CODEC_RAV1E=SYSTEM` CMake flag cannot be satisfied.
+
+# AZL does not ship svt-av1 — disable svt-av1 codec support.
+# The svt bcond defaults ON in non-bootstrap builds.
 [components.libavif]
-build.without = ["rav1e"]
+build.without = ["rav1e", "svt"]
 
 [[components.libavif.overlays]]
 description = "Disable dav1d decoder - use aom instead"
