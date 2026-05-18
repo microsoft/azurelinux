@@ -4,7 +4,7 @@
 %bcond_with perl_libwww_perl_enables_internet_test
 
 Name:           perl-libwww-perl
-Version:        6.72
+Version:        6.83
 Release:        1%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL+ or Artistic
@@ -172,6 +172,9 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Mon May 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.83-1
+- Auto-upgrade to 6.83 - for CVE-2026-8368
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.72-1
 - Auto-upgrade to 6.72 - Azure Linux 3.0 - package upgrades
 
