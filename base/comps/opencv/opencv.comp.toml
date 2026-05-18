@@ -9,6 +9,23 @@
 [components.opencv.build]
 without = ["openni", "ffmpeg", "xine"]
 
+# AZL does not ship libavif — disable avif support in imgcodecs.
+# No bcond exists; need to remove the BR and pass -DWITH_AVIF=OFF.
+
+[[components.opencv.overlays]]
+description = "Remove libavif BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavif)"
+
+[[components.opencv.overlays]]
+description = "Disable avif support in opencv imgcodecs"
+type = "spec-search-replace"
+section = "%build"
+regex = '%cmake \\'
+replacement = '''%cmake \
+ -DWITH_AVIF=OFF \'''
+
 # CVE-2025-53644 patch targets bundled 3rdparty/openjpeg, which Fedora's spec
 # deletes during %prep (it uses system openjpeg2-devel instead). The patch
 # can't find the file and fails. Remove both the patch declaration and its

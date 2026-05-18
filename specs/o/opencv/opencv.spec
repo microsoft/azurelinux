@@ -81,7 +81,7 @@ Version:        4.11.0
 %global minorver %(foo=%{version}; a=(${foo//./ }); echo ${a[1]} )
 %global padding  %(digits=00; num=%{minorver}; echo ${digits:${#num}:${#digits}} )
 %global abiver   %(echo %{majorver}%{padding}%{minorver} )
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        Collection of algorithms for computer vision
 # This is normal three clause BSD.
 License:        BSD-3-Clause AND Apache-2.0 AND ISC
@@ -150,7 +150,6 @@ BuildRequires:  libdc1394-devel
 %endif
 %endif
 BuildRequires:  jasper-devel
-BuildRequires:  pkgconfig(libavif)
 BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libtiff-devel
@@ -472,6 +471,7 @@ install -pm 0644 %{S:4} .cache/ade/
 # disabling IPP because it is closed source library from intel
 
 %cmake \
+ -DWITH_AVIF=OFF \
 %if 0%{?fedora} > 38
  -DCMAKE_CXX_STANDARD=17 \
 %endif
