@@ -77,8 +77,10 @@ Source2: openssl-rhel-%{OPENSSL_COMMIT}.tar.xz
 Source3: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
 Source4: jansson-2.13.1.tar.bz2
 Source5: README.experimental
+%ifarch x86_64
 Source6: hvloader-%{HVLOADER_COMMIT}.tar.gz
 Source7: hvloader-target.txt
+%endif
 
 # json description files
 Source10: 50-edk2-aarch64-qcow2.json
@@ -330,6 +332,7 @@ This package provides tools that are needed to build EFI executables
 and ROMs using the GNU tools.  You do not need to install this package;
 you probably want to install edk2-tools only.
 
+%ifarch x86_64
 %package hvloader
 Summary:        Loader binary for loading type 1 hypervisors under Linux.
 Requires:       python3
@@ -342,7 +345,7 @@ calls it's entry point passing HvLoader.efi ImageHandle. This way the
 hypervisor loader binary has access to HvLoader.efi's command line options,
 and use those as configuration parameters. The first HvLoader.efi command line
 option is the path to hypervisor loader binary.
-
+%endif
 
 %prep
 # We needs some special git config options that %%autosetup won't give us.
@@ -396,9 +399,11 @@ cp -a -- \
    %{SOURCE90} %{SOURCE91} \
    .
 
+%ifarch x86_64
 # extract hvloader source into place
 tar -xf %{SOURCE6} --directory MdeModulePkg/Application
 sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
+%endif
 
 %build
 
@@ -525,8 +530,10 @@ done
 
 source ./edksetup.sh
 make -C BaseTools
+%ifarch x86_64
 cp %{SOURCE7} Conf/target.txt
 build -p MdeModulePkg/MdeModulePkg.dsc -m MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf -a %{edk2_arch}
+%endif
 
 %install
 
@@ -621,8 +628,10 @@ done
 %py_byte_compile %{python3} %{buildroot}%{_datadir}/edk2/Python
 %endif
 
+%ifarch x86_64
 mkdir -p %{buildroot}/boot/efi
 cp ./Build/MdeModule/RELEASE_GCC5/%{edk2_arch}/MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader/OUTPUT/HvLoader.efi %{buildroot}/boot/efi
+%endif
 
 %check
 for file in %{buildroot}%{_datadir}/%{name}/*/*VARS.secboot.fd; do
@@ -787,9 +796,11 @@ done
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/Python
 
+%ifarch x86_64
 %files hvloader
 %license MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/LICENSE
 /boot/efi/HvLoader.efi
+%endif
 
 %changelog
 * Wed May 06 2026 Sumedh Sharma <sumsharma@microsoft.com> - 20240524git3e722403cd16-17
@@ -797,6 +808,7 @@ done
 - Disable OVMF compilation on aarch64 hosts due to missing cross gcc-x86_64-linux-gnu
 - Remove 32bit arm compilation due to missing gcc compiler/cross-compiler
 - Add patch to increase default firmware size in ArmVirtPkg to 3Mb for debug package builds
+- Build hvloader only for x86_64
 
 * Wed Apr 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-16
 - Patch for CVE-2026-28390, CVE-2026-28389
