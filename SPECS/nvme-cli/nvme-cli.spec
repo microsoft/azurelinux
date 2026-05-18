@@ -1,6 +1,6 @@
 Summary:        NVM-Express user space tooling for Linux
 Name:           nvme-cli
-Version:        2.8
+Version:        2.16
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -65,6 +65,9 @@ if [ $1 -eq 1 ]; then # 1 : This package is being installed for the first time
 fi
 
 %changelog
+* Mon May 18 2026 Wojciech Panfil <wojciech.panfil@intel.com> - 2.16-1
+- Upgrade to version 2.16
+
 * Wed Feb 21 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.8-1
 - Auto-upgrade to 2.8
 
