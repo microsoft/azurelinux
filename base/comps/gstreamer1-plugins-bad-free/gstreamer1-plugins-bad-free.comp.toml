@@ -28,7 +28,10 @@
 # tree and do not depend on webrtc-audio-processing.
 
 [components.gstreamer1-plugins-bad-free]
-build.without = ["extras", "dc1394", "onnx", "openh264", "webrtc"]
+build.without = ["extras", "dc1394", "onnx", "openh264", "webrtc", "svtav1"]
+
+# AZL does not ship svt-av1 — disable the svtav1 gstreamer plugin.
+# The bcond defaults ON via %{defined fedora} which is true in the AZL build env.
 
 # AZL does not ship opus — disable the opus parse plugin and remove its BR.
 

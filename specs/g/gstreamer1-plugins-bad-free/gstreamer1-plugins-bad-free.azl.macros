@@ -4,4 +4,5 @@
 %_without_extras 1
 %_without_onnx 1
 %_without_openh264 1
+%_without_svtav1 1
 %_without_webrtc 1
