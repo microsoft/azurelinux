@@ -2406,7 +2406,6 @@ components = [
     "subversion",
     "sudo",
     "SuperLU",
-    "svt-av1",
     "swig",
     "swtpm",
     "symlinks",
