@@ -1,3 +1,10 @@
 [components.selinux-policy]
 # Pin to commit that has version 43.4, which was used in the 0405 stage 1 build.
 spec = { type = "upstream", upstream-commit = "332e840f1bfe14fc1638dc38dccdf3f701a54bfd" }
+
+[[components.selinux-policy.overlays]]
+description = "Remove tmpfiles write to /sys/fs/selinux/checkreqprot as it was deprecated in the kernel"
+type = "file-search-replace"
+file = "selinux-policy.conf"
+regex = 'w /sys/fs/selinux/checkreqprot - - - - 0\n'
+replacement = ""
