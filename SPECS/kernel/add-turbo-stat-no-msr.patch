@@ -1,0 +1,487 @@
+From 3e4048466c396cff52c6d435156dbcd0571e4381 Mon Sep 17 00:00:00 2001
+From: Patryk Wlazlyn <patryk.wlazlyn@linux.intel.com>
+Date: Thu, 11 Jan 2024 15:48:09 +0100
+Subject: [PATCH] tools/power turbostat: Add --no-msr option
+
+Backported for ICM 798734139. This may be removed if we update to 6.9 (when this
+patch was introduced).
+
+Add --no-msr option to allow users to run turbostat without
+accessing MSRs via the MSR driver.
+
+Signed-off-by: Patryk Wlazlyn <patryk.wlazlyn@linux.intel.com>
+Reviewed-by: Len Brown <len.brown@intel.com>
+Signed-off-by: Len Brown <len.brown@intel.com>
+---
+diff --git a/tools/power/x86/turbostat/turbostat.8 b/tools/power/x86/turbostat/turbostat.8
+index 1ba6340d3..28be452fb 100644
+--- a/tools/power/x86/turbostat/turbostat.8
++++ b/tools/power/x86/turbostat/turbostat.8
+@@ -67,6 +67,8 @@ The column name "all" can be used to enable all disabled-by-default built-in cou
+ .PP
+ \fB--quiet\fP Do not decode and print the system configuration header information.
+ .PP
+++\fB--no-msr\fP Disable all the uses of the MSR driver.
+++.PP
+ \fB--interval seconds\fP overrides the default 5.0 second measurement interval.
+ .PP
+ \fB--num_iterations num\fP number of the measurement iterations.
+diff --git a/tools/power/x86/turbostat/turbostat.c b/tools/power/x86/turbostat/turbostat.c
+index 6fad5fbfb..1e55ef2e6 100644
+--- a/tools/power/x86/turbostat/turbostat.c
++++ b/tools/power/x86/turbostat/turbostat.c
+@@ -36,6 +36,7 @@
+ #include <linux/perf_event.h>
+ #include <asm/unistd.h>
+ #include <stdbool.h>
++#include <assert.h>
+ 
+ #define UNUSED(x) (void)(x)
+ 
+@@ -285,6 +286,7 @@ unsigned int has_hwp_pkg;	/* IA32_HWP_REQUEST_PKG */
+ unsigned int has_misc_feature_control;
+ unsigned int first_counter_read = 1;
+ int ignore_stdin;
++bool no_msr;
+ 
+ #define RAPL_PKG		(1 << 0)
+ 					/* 0x610 MSR_PKG_POWER_LIMIT */
+@@ -648,13 +650,36 @@ int get_msr_fd(int cpu)
+ 	sprintf(pathname, "/dev/cpu/%d/msr", cpu);
+ 	fd = open(pathname, O_RDONLY);
+ 	if (fd < 0)
+-		err(-1, "%s open failed, try chown or chmod +r /dev/cpu/*/msr, or run as root", pathname);
++		err(-1, "%s open failed, try chown or chmod +r /dev/cpu/*/msr, "
++		    "or run with --no-msr, or run as root", pathname);
+ 
+ 	fd_percpu[cpu] = fd;
+ 
+ 	return fd;
+ }
+ 
++static void bic_disable_msr_access(void)
++{
++	const unsigned long bic_msrs =
++	    BIC_Avg_MHz |
++	    BIC_Busy |
++	    BIC_Bzy_MHz |
++	    BIC_SMI |
++	    BIC_CPU_c1 |
++	    BIC_CPU_c3 |
++	    BIC_CPU_c6 |
++	    BIC_CPU_c7 |
++	    BIC_Mod_c6 |
++	    BIC_CoreTmp |
++	    BIC_Totl_c0 |
++	    BIC_Any_c0 |
++	    BIC_GFX_c0 |
++	    BIC_CPUGFX |
++	    BIC_Pkgpc2 | BIC_Pkgpc3 | BIC_Pkgpc6 | BIC_Pkgpc7 | BIC_Pkgpc8 | BIC_Pkgpc9 | BIC_Pkgpc10 | BIC_PkgTmp;
++
++	bic_enabled &= ~bic_msrs;
++}
++
+ static long perf_event_open(struct perf_event_attr *hw_event, pid_t pid, int cpu, int group_fd, unsigned long flags)
+ {
+ 	return syscall(__NR_perf_event_open, hw_event, pid, cpu, group_fd, flags);
+@@ -694,6 +719,8 @@ int get_msr(int cpu, off_t offset, unsigned long long *msr)
+ {
+ 	ssize_t retval;
+ 
++	assert(!no_msr);
++
+ 	retval = pread(get_msr_fd(cpu), msr, sizeof(*msr), offset);
+ 
+ 	if (retval != sizeof *msr)
+@@ -737,6 +764,7 @@ void help(void)
+ 		"		Override default 5-second measurement interval\n"
+ 		"  -J, --Joules	displays energy in Joules instead of Watts\n"
+ 		"  -l, --list	list column headers only\n"
++		"  -M, --no-msr Disable all uses of the MSR driver\n"
+ 		"  -n, --num_iterations num\n"
+ 		"		number of the measurement iterations\n"
+ 		"  -N, --header_iterations num\n"
+@@ -1949,6 +1977,7 @@ unsigned long long snapshot_sysfs_counter(char *path)
+ int get_mp(int cpu, struct msr_counter *mp, unsigned long long *counterp)
+ {
+ 	if (mp->msr_num != 0) {
++		assert(!no_msr);
+ 		if (get_msr(cpu, mp->msr_num, counterp))
+ 			return -1;
+ 	} else {
+@@ -1998,6 +2027,9 @@ int get_epb(int cpu)
+ 	return epb;
+ 
+ msr_fallback:
++	if (no_msr)
++		return -1;
++
+ 	get_msr(cpu, MSR_IA32_ENERGY_PERF_BIAS, &msr);
+ 
+ 	return msr & 0xf;
+@@ -2216,7 +2248,7 @@ int get_counters(struct thread_data *t, struct core_data *c, struct pkg_data *p)
+ 	if (DO_BIC(BIC_CORE_THROT_CNT))
+ 		get_core_throt_cnt(cpu, &c->core_throt_cnt);
+ 
+-	if (do_rapl & RAPL_AMD_F17H) {
++	if ((do_rapl & RAPL_AMD_F17H) && !no_msr) {
+ 		if (get_msr(cpu, MSR_CORE_ENERGY_STAT, &msr))
+ 			return -14;
+ 		c->core_energy = msr & 0xFFFFFFFF;
+@@ -2281,40 +2313,42 @@ int get_counters(struct thread_data *t, struct core_data *c, struct pkg_data *p)
+ 	if (DO_BIC(BIC_SYS_LPI))
+ 		p->sys_lpi = cpuidle_cur_sys_lpi_us;
+ 
+-	if (do_rapl & RAPL_PKG) {
+-		if (get_msr_sum(cpu, MSR_PKG_ENERGY_STATUS, &msr))
+-			return -13;
+-		p->energy_pkg = msr;
+-	}
+-	if (do_rapl & RAPL_CORES_ENERGY_STATUS) {
+-		if (get_msr_sum(cpu, MSR_PP0_ENERGY_STATUS, &msr))
+-			return -14;
+-		p->energy_cores = msr;
+-	}
+-	if (do_rapl & RAPL_DRAM) {
+-		if (get_msr_sum(cpu, MSR_DRAM_ENERGY_STATUS, &msr))
+-			return -15;
+-		p->energy_dram = msr;
+-	}
+-	if (do_rapl & RAPL_GFX) {
+-		if (get_msr_sum(cpu, MSR_PP1_ENERGY_STATUS, &msr))
+-			return -16;
+-		p->energy_gfx = msr;
+-	}
+-	if (do_rapl & RAPL_PKG_PERF_STATUS) {
+-		if (get_msr_sum(cpu, MSR_PKG_PERF_STATUS, &msr))
+-			return -16;
+-		p->rapl_pkg_perf_status = msr;
+-	}
+-	if (do_rapl & RAPL_DRAM_PERF_STATUS) {
+-		if (get_msr_sum(cpu, MSR_DRAM_PERF_STATUS, &msr))
+-			return -16;
+-		p->rapl_dram_perf_status = msr;
+-	}
+-	if (do_rapl & RAPL_AMD_F17H) {
+-		if (get_msr_sum(cpu, MSR_PKG_ENERGY_STAT, &msr))
+-			return -13;
+-		p->energy_pkg = msr;
++	if (!no_msr) {
++		if (do_rapl & RAPL_PKG) {
++			if (get_msr_sum(cpu, MSR_PKG_ENERGY_STATUS, &msr))
++				return -13;
++			p->energy_pkg = msr;
++		}
++		if (do_rapl & RAPL_CORES_ENERGY_STATUS) {
++			if (get_msr_sum(cpu, MSR_PP0_ENERGY_STATUS, &msr))
++				return -14;
++			p->energy_cores = msr;
++		}
++		if (do_rapl & RAPL_DRAM) {
++			if (get_msr_sum(cpu, MSR_DRAM_ENERGY_STATUS, &msr))
++				return -15;
++			p->energy_dram = msr;
++		}
++		if (do_rapl & RAPL_GFX) {
++			if (get_msr_sum(cpu, MSR_PP1_ENERGY_STATUS, &msr))
++				return -16;
++			p->energy_gfx = msr;
++		}
++		if (do_rapl & RAPL_PKG_PERF_STATUS) {
++			if (get_msr_sum(cpu, MSR_PKG_PERF_STATUS, &msr))
++				return -16;
++			p->rapl_pkg_perf_status = msr;
++		}
++		if (do_rapl & RAPL_DRAM_PERF_STATUS) {
++			if (get_msr_sum(cpu, MSR_DRAM_PERF_STATUS, &msr))
++				return -16;
++			p->rapl_dram_perf_status = msr;
++		}
++		if (do_rapl & RAPL_AMD_F17H) {
++			if (get_msr_sum(cpu, MSR_PKG_ENERGY_STAT, &msr))
++				return -13;
++			p->energy_pkg = msr;
++		}
+ 	}
+ 	if (DO_BIC(BIC_PkgTmp)) {
+ 		if (get_msr(cpu, MSR_IA32_PACKAGE_THERM_STATUS, &msr))
+@@ -2734,6 +2768,9 @@ void print_irtl(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	get_msr(base_cpu, MSR_PKGC3_IRTL, &msr);
+ 	fprintf(outf, "cpu%d: MSR_PKGC3_IRTL: 0x%08llx (", base_cpu, msr);
+ 	fprintf(outf, "%svalid, %lld ns)\n", msr & (1 << 15) ? "" : "NOT",
+@@ -3398,6 +3435,8 @@ int get_msr_sum(int cpu, off_t offset, unsigned long long *msr)
+ 	int ret, idx;
+ 	unsigned long long msr_cur, msr_last;
+ 
++	assert(!no_msr);
++
+ 	if (!per_cpu_msr_sum)
+ 		return 1;
+ 
+@@ -3426,6 +3465,8 @@ static int update_msr_sum(struct thread_data *t, struct core_data *c, struct pkg
+ 	UNUSED(c);
+ 	UNUSED(p);
+ 
++	assert(!no_msr);
++
+ 	for (i = IDX_PKG_ENERGY; i < IDX_COUNT; i++) {
+ 		unsigned long long msr_cur, msr_last;
+ 		off_t offset;
+@@ -3666,7 +3707,7 @@ void check_permissions(void)
+ 	sprintf(pathname, "/dev/cpu/%d/msr", base_cpu);
+ 	if (euidaccess(pathname, R_OK)) {
+ 		do_exit++;
+-		warn("/dev/cpu/0/msr open failed, try chown or chmod +r /dev/cpu/*/msr");
++		warn("/dev/cpu/0/msr open failed, try chown or chmod +r /dev/cpu/*/msr, or run with --no-msr");
+ 	}
+ 
+ 	/* if all else fails, thell them to be root */
+@@ -3703,6 +3744,9 @@ int probe_nhm_msrs(unsigned int family, unsigned int model)
+ 	unsigned int base_ratio;
+ 	int *pkg_cstate_limits;
+ 
++	if (no_msr)
++		return 0;
++
+ 	if (!genuine_intel)
+ 		return 0;
+ 
+@@ -4045,6 +4089,9 @@ void check_tcc_offset(int model)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!genuine_intel)
+ 		return;
+ 
+@@ -4112,7 +4159,7 @@ static void dump_turbo_ratio_info(unsigned int family, unsigned int model)
+ 
+ static void dump_cstate_pstate_config_info(unsigned int family, unsigned int model)
+ {
+-	if (!do_nhm_platform_info)
++	if (!do_nhm_platform_info || no_msr)
+ 		return;
+ 
+ 	dump_nhm_platform_info();
+@@ -4357,6 +4404,9 @@ int print_hwp(struct thread_data *t, struct core_data *c, struct pkg_data *p)
+ 	UNUSED(c);
+ 	UNUSED(p);
+ 
++	if (no_msr)
++		return 0;
++
+ 	if (!has_hwp)
+ 		return 0;
+ 
+@@ -4443,6 +4493,9 @@ int print_perf_limit(struct thread_data *t, struct core_data *c, struct pkg_data
+ 	UNUSED(c);
+ 	UNUSED(p);
+ 
++	if (no_msr)
++		return 0;
++
+ 	cpu = t->cpu_id;
+ 
+ 	/* per-package */
+@@ -4793,6 +4846,9 @@ void rapl_probe_amd(unsigned int family, unsigned int model)
+  */
+ void rapl_probe(unsigned int family, unsigned int model)
+ {
++	if (no_msr)
++		return;
++
+ 	if (genuine_intel)
+ 		rapl_probe_intel(family, model);
+ 	if (authentic_amd || hygon_genuine)
+@@ -4848,6 +4904,9 @@ int print_thermal(struct thread_data *t, struct core_data *c, struct pkg_data *p
+ 	UNUSED(c);
+ 	UNUSED(p);
+ 
++	if (no_msr)
++		return 0;
++
+ 	if (!(do_dts || do_ptm))
+ 		return 0;
+ 
+@@ -4922,6 +4981,9 @@ int print_rapl(struct thread_data *t, struct core_data *c, struct pkg_data *p)
+ 	UNUSED(c);
+ 	UNUSED(p);
+ 
++	if (no_msr)
++		return 0;
++
+ 	if (!do_rapl)
+ 		return 0;
+ 
+@@ -5332,6 +5394,9 @@ void decode_feature_control_msr(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!get_msr(base_cpu, MSR_IA32_FEAT_CTL, &msr))
+ 		fprintf(outf, "cpu%d: MSR_IA32_FEATURE_CONTROL: 0x%08llx (%sLocked %s)\n",
+ 			base_cpu, msr, msr & FEAT_CTL_LOCKED ? "" : "UN-", msr & (1 << 18) ? "SGX" : "");
+@@ -5341,6 +5406,9 @@ void decode_misc_enable_msr(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!genuine_intel)
+ 		return;
+ 
+@@ -5358,6 +5426,9 @@ void decode_misc_feature_control(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!has_misc_feature_control)
+ 		return;
+ 
+@@ -5379,6 +5450,9 @@ void decode_misc_pwr_mgmt_msr(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!do_nhm_platform_info)
+ 		return;
+ 
+@@ -5401,6 +5475,9 @@ void decode_c6_demotion_policy_msr(void)
+ {
+ 	unsigned long long msr;
+ 
++	if (no_msr)
++		return;
++
+ 	if (!get_msr(base_cpu, MSR_CC6_DEMOTION_POLICY_CONFIG, &msr))
+ 		fprintf(outf, "cpu%d: MSR_CC6_DEMOTION_POLICY_CONFIG: 0x%08llx (%sable-CC6-Demotion)\n",
+ 			base_cpu, msr, msr & (1 << 0) ? "EN" : "DIS");
+@@ -5548,10 +5625,12 @@ void process_cpuid()
+ 	ecx_flags = ecx;
+ 	edx_flags = edx;
+ 
+-	if (get_msr(sched_getcpu(), MSR_IA32_UCODE_REV, &ucode_patch))
+-		warnx("get_msr(UCODE)");
+-	else
+-		ucode_patch_valid = true;
++	if (!no_msr) {
++		if (get_msr(sched_getcpu(), MSR_IA32_UCODE_REV, &ucode_patch))
++			warnx("get_msr(UCODE)");
++		else
++			ucode_patch_valid = true;
++	}
+ 
+ 	/*
+ 	 * check max extended function levels of CPUID.
+@@ -5816,7 +5895,7 @@ void process_cpuid()
+ 	if (!quiet)
+ 		dump_sysfs_pstate_config();
+ 
+-	if (has_skl_msrs(family, model) || is_ehl(family, model))
++	if (!no_msr && (has_skl_msrs(family, model) || is_ehl(family, model)))
+ 		calculate_tsc_tweak();
+ 
+ 	if (!access("/sys/class/drm/card0/power/rc6_residency_ms", R_OK))
+@@ -6129,9 +6208,13 @@ void turbostat_init()
+ {
+ 	setup_all_buffers();
+ 	set_base_cpu();
+-	check_dev_msr();
+-	check_permissions();
++	if (!no_msr) {
++		check_dev_msr();
++		check_permissions();
++	}
+ 	process_cpuid();
++	if (no_msr)
++		bic_disable_msr_access();
+ 	linux_perf_init();
+ 
+ 	if (!quiet)
+@@ -6268,6 +6351,9 @@ int add_counter(unsigned int msr_num, char *path, char *name,
+ {
+ 	struct msr_counter *msrp;
+ 
++	if (no_msr && msr_num)
++		errx(1, "Requested MSR counter 0x%x, but in --no-msr mode", msr_num);
++
+ 	msrp = calloc(1, sizeof(struct msr_counter));
+ 	if (msrp == NULL) {
+ 		perror("calloc");
+@@ -6619,6 +6705,7 @@ void cmdline(int argc, char **argv)
+ 		{ "list", no_argument, 0, 'l' },
+ 		{ "out", required_argument, 0, 'o' },
+ 		{ "quiet", no_argument, 0, 'q' },
++		{ "no-msr", no_argument, 0, 'M' },
+ 		{ "show", required_argument, 0, 's' },
+ 		{ "Summary", no_argument, 0, 'S' },
+ 		{ "TCC", required_argument, 0, 'T' },
+@@ -6628,7 +6715,22 @@ void cmdline(int argc, char **argv)
+ 
+ 	progname = argv[0];
+ 
+-	while ((opt = getopt_long_only(argc, argv, "+C:c:Dde:hi:Jn:o:qST:v", long_options, &option_index)) != -1) {
++	/*
++	 * Parse some options early, because they may make other options invalid,
++	 * like adding the MSR counter with --add and at the same time using --no-msr.
++	 */
++	while ((opt = getopt_long_only(argc, argv, "M", long_options, &option_index)) != -1) {
++		switch (opt) {
++		case 'M':
++			no_msr = 1;
++			break;
++		default:
++			break;
++		}
++	}
++	optind = 0;
++
++	while ((opt = getopt_long_only(argc, argv, "+C:c:Dde:hi:Jn:o:qMST:v", long_options, &option_index)) != -1) {
+ 		switch (opt) {
+ 		case 'a':
+ 			parse_add_command(optarg);
+@@ -6686,6 +6788,9 @@ void cmdline(int argc, char **argv)
+ 		case 'q':
+ 			quiet = 1;
+ 			break;
++		case 'M':
++			/* Parsed earlier */
++			break;
+ 		case 'n':
+ 			num_iterations = strtod(optarg, NULL);
+ 
+@@ -6749,6 +6854,9 @@ int main(int argc, char **argv)
+ 	outf = stderr;
+ 	cmdline(argc, argv);
+ 
++	if (no_msr)
++		bic_disable_msr_access();
++
+ 	if (!quiet) {
+ 		print_version();
+ 		print_bootcmd();
+@@ -6761,7 +6869,8 @@ int main(int argc, char **argv)
+ 
+ 	turbostat_init();
+ 
+-	msr_sum_record();
++	if (!no_msr)
++		msr_sum_record();
+ 
+ 	/* dump counters and exit */
+ 	if (dump_only)
