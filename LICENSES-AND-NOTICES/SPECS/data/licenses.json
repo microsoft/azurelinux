@@ -258,6 +258,7 @@
                 "fxload",
                 "gavl",
                 "gbenchmark",
+                "gcab",
                 "gconf-editor",
                 "GConf2",
                 "gcovr",

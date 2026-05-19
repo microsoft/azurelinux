@@ -4169,6 +4169,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "gcab",
+          "version": "1.6",
+          "downloadUrl": "https://download.gnome.org/sources/gcab/1.6/gcab-1.6.tar.xz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "gconf-editor",
           "version": "3.0.1",
           "downloadUrl": "http://download.gnome.org/sources/gconf-editor/3.0/gconf-editor-3.0.1.tar.xz"
