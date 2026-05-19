@@ -1,18 +1,15 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/gcab.azl.macros}
-
 %global with_mingw 0
 
 %if 0%{?fedora}
-%global with_mingw 1
+%global with_mingw 0
 %endif
 
 Name:           gcab
 Version:        1.6
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        Cabinet file library and tool
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
@@ -20,7 +17,6 @@ License:        LicenseRef-Callaway-LGPLv2+
 #VCS:           git:git://git.gnome.org/gcab
 URL:            http://ftp.gnome.org/pub/GNOME/sources/gcab
 Source0:        http://ftp.gnome.org/pub/GNOME/sources/gcab/%{version}/%{name}-%{version}.tar.xz
-Source9999: gcab.azl.macros
 
 BuildRequires:  git-core
 BuildRequires:  gettext

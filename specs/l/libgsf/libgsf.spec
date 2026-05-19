@@ -1,24 +1,20 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/libgsf.azl.macros}
-
 %global with_mingw 0
 
 %if 0%{?fedora} && !0%{?flatpak}
-%global with_mingw 1
+%global with_mingw 0
 %endif
 
 Name: libgsf
 Version: 1.14.55
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: GNOME Structured File library
 
 License: LGPL-2.1-only
 URL:     https://gitlab.gnome.org/GNOME/libgsf/
 Source:  https://download.gnome.org/sources/%{name}/1.14/%{name}-%{version}.tar.xz
-Source9999: libgsf.azl.macros
 
 BuildRequires: bzip2-devel
 BuildRequires: chrpath

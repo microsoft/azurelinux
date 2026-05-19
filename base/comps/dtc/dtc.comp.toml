@@ -1,0 +1,12 @@
+[components.dtc]
+
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# The upstream spec hard-codes `%global with_mingw 1` whenever %fedora is
+# defined (true in our build environment) rather than gating on a %bcond, so
+# the standard `build.without = ["mingw"]` mechanism has no effect. Force it
+# off via spec overlay.
+[[components.dtc.overlays]]
+description = "Disable mingw sub-packages — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = '%global with_mingw 1'
+replacement = '%global with_mingw 0'

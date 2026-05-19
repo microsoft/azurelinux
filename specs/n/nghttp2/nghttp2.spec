@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/nghttp2.azl.macros}
-
 %global with_mingw 0
 
 %if 0%{?fedora}
@@ -13,7 +10,7 @@
 Summary: Experimental HTTP/2 client, server and proxy
 Name: nghttp2
 Version: 1.66.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 # Parts of ruby bindings are additionally under GPL-2.0-or-later, MIT and
 # HPND-Kevlin-Henney but they are NOT shipped.
@@ -23,7 +20,6 @@ URL: https://nghttp2.org/
 Source0: https://github.com/tatsuhiro-t/nghttp2/releases/download/v%{version}/nghttp2-%{version}.tar.xz
 Source1: https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
 Source2: tatsuhiro-t.pgp
-Source9999: nghttp2.azl.macros
 
 BuildRequires: CUnit-devel
 BuildRequires: c-ares-devel

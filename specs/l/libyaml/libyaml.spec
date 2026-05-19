@@ -1,25 +1,21 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/libyaml.azl.macros}
-
 %global with_mingw 0
 
 %if 0%{?fedora}
-%global with_mingw 1
+%global with_mingw 0
 %endif
 
 Name:       libyaml
 Version:    0.2.5
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary:    YAML 1.1 parser and emitter written in C
 
 # SPDX
 License:    MIT
 URL:        https://github.com/yaml/libyaml
 Source0:    https://github.com/yaml/libyaml/releases/download/%{version}/yaml-%{version}.tar.gz
-Source9999: libyaml.azl.macros
 
 BuildRequires:  autoconf
 BuildRequires:  automake
