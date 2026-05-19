@@ -1,0 +1,734 @@
+# Comprehensive Azure Linux Component Test Workflows
+# Auto-generated mapping for all components under ~/azurelinux/base/comps
+
+[metadata]
+version = "3.0.0"
+description = "Comprehensive Azure Linux component test workflows with static/dynamic distinction"
+author = "Azure Linux Team"
+generated_date = "2026-05-06"
+component_count = 450
+
+# =============================================================================
+# KERNEL AND SYSTEM COMPONENTS
+# =============================================================================
+
+[kernel_and_system]
+
+[kernel_and_system.kernel]
+components = ["kernel", "kernel-headers"]
+static_tests = {
+    description = "Kernel configuration and module validation"
+    infra_provisioning = false
+    test_files = ["cases/test_kernel_config.py", "cases/test_kmod_dependencies.py", "cases/test_kernel_security.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=5"]
+    max_timeout_minutes = 15
+    retry_count = 1
+    timeout_overrides = {
+        "test_kernel_config" = 300,
+        "test_kmod_dependencies" = 600,
+        "test_kernel_security" = 300
+    }
+}
+dynamic_tests = {
+    description = "Kernel runtime functionality and module loading"
+    framework_labels = ["kmod_load", "kernel_integration", "boot_validation", "syscall_tests"]
+    vm_deploy = true
+    requires_privileges = true
+}
+
+[kernel_and_system.bootloader]
+components = ["grub2", "shim", "shim-unsigned-aarch64", "shim-unsigned-x64", "syslinux", "uboot-tools", "edk2"]
+static_tests = {
+    description = "Bootloader configuration and signature validation"
+    infra_provisioning = false
+    test_files = ["cases/test_grub_config.py", "cases/test_secure_boot.py", "cases/test_bootloader_signatures.py"]
+    pytest_args = ["-v", "--tb=short"]
+    max_timeout_minutes = 10
+    retry_count = 1
+    timeout_overrides = {
+        "test_grub_config" = 180,
+        "test_secure_boot" = 300,
+        "test_bootloader_signatures" = 120
+    }
+}
+dynamic_tests = {
+    description = "Boot process integration and UEFI compatibility"
+    framework_labels = ["boot_integration", "uefi_compatibility", "secure_boot_validation"]
+    max_timeout_minutes = 30
+    vm_deploy = true
+    requires_uefi = true
+}
+
+[kernel_and_system.firmware]
+components = ["microcode_ctl", "ipxe", "openbios", "SLOF", "fcode-utils"]
+static_tests = {
+    description = "Firmware image validation and integrity checks"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "Firmware loading and hardware compatibility"
+    framework_labels = ["firmware_loading", "hardware_compatibility", "microcode_update"]
+    max_timeout_minutes = 25
+    vm_deploy = true
+}
+
+# =============================================================================
+# SYSTEM SERVICES AND DAEMONS  
+# =============================================================================
+
+[system_services]
+
+[system_services.systemd_core]
+components = ["systemd"]
+static_tests = {
+    description = "SystemD unit file validation and dependency analysis"
+    infra_provisioning = false
+    test_files = ["cases/test_systemd_units.py", "cases/test_service_dependencies.py", "cases/test_systemd_config.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=3"]
+    max_timeout_minutes = 12
+    retry_count = 1
+    timeout_overrides = {
+        "test_systemd_units" = 360,
+        "test_service_dependencies" = 300,
+        "test_systemd_config" = 180
+    }
+}
+dynamic_tests = {
+    description = "SystemD lifecycle and service management"
+    framework_labels = ["systemd_lifecycle", "service_management", "systemd_integration", "journal_validation"]
+    max_timeout_minutes = 35
+    vm_deploy = true
+    requires_privileges = true
+}
+
+[system_services.network_services]
+components = ["NetworkManager", "NetworkManager-libreswan", "chrony", "dnsmasq", "firewalld", "sssd"]
+static_tests = {
+    description = "Network service configuration validation"
+    infra_provisioning = false
+    test_files = ["cases/test_network_config.py", "cases/test_service_config.py", "cases/test_security_policies.py"]
+    pytest_args = ["-v", "--tb=short"]
+    max_timeout_minutes = 10
+    retry_count = 1
+    timeout_overrides = {
+        "test_network_config" = 300,
+        "test_service_config" = 240,
+        "test_security_policies" = 180
+    }
+}
+dynamic_tests = {
+    description = "Network service functionality and integration"
+    framework_labels = ["network_service_integration", "connectivity_validation", "service_lifecycle"]
+    max_timeout_minutes = 40
+    vm_deploy = true
+    requires_network = true
+}
+
+[system_services.security_services]
+components = ["selinux-policy", "crypto-policies", "softhsm", "tpm2-tools", "tpm2-tss", "tpm2-pkcs11", "tpm2-openssl"]
+static_tests = {
+    description = "Security policy and cryptographic configuration validation"
+    infra_provisioning = false
+    test_files = ["cases/test_selinux_policy.py", "cases/test_crypto_config.py", "cases/test_security_analysis.py"]
+    pytest_args = ["-v", "--tb=long", "--maxfail=2"]
+    max_timeout_minutes = 15
+    retry_count = 1
+    timeout_overrides = {
+        "test_selinux_policy" = 540,
+        "test_crypto_config" = 360,
+        "test_security_analysis" = 300
+    }
+}
+dynamic_tests = {
+    description = "Security service functionality and TPM integration"
+    framework_labels = ["selinux_enforcement", "tpm_functionality", "crypto_operations", "security_integration"]
+    max_timeout_minutes = 50
+    vm_deploy = true
+    requires_tpm = true
+}
+
+[system_services.storage_services]
+components = ["device-mapper-persistent-data", "cachefilesd", "nfs-ganesha", "glusterfs", "iscsi-initiator-utils"]
+static_tests = {
+    description = "Storage service configuration validation"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "Storage service functionality and filesystem operations"
+    framework_labels = ["storage_integration", "filesystem_operations", "device_management"]
+    max_timeout_minutes = 45
+    vm_deploy = true
+    requires_storage = true
+}
+
+# =============================================================================
+# PROGRAMMING LANGUAGES AND RUNTIMES
+# =============================================================================
+
+[programming_languages]
+
+[programming_languages.c_cpp_toolchain]
+components = ["gcc", "cross-gcc", "llvm", "glibc", "gnutls"]
+static_tests = {
+    description = "C/C++ compiler and toolchain validation"
+    infra_provisioning = false
+    test_files = ["cases/test_gcc_static.py", "cases/test_compiler_validation.py", "cases/test_glibc_abi.py", "cases/test_toolchain_integrity.py"]
+    pytest_args = ["-v", "--tb=long", "--maxfail=2"]
+    max_timeout_minutes = 20
+    retry_count = 1
+    timeout_overrides = {
+        "test_gcc_static" = 600,
+        "test_compiler_validation" = 480,
+        "test_glibc_abi" = 300,
+        "test_toolchain_integrity" = 420
+    }
+}
+dynamic_tests = {
+    description = "C/C++ runtime functionality and cross-compilation"
+    framework_labels = ["compiler_runtime_tests", "cross_compile_validation", "glibc_functionality"]
+    max_timeout_minutes = 60
+    container_deploy = true
+}
+
+[programming_languages.python_stack]
+components = ["python3.13", "python3.14", "python-cryptography", "pyOpenSSL", "python-pyside6"]
+static_tests = {
+    description = "Python static analysis and package validation"
+    infra_provisioning = false
+    test_files = ["cases/test_python_lint.py", "cases/test_python_packages.py", "cases/test_python_imports.py", "cases/test_python_syntax.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=5"]
+    max_timeout_minutes = 15
+    retry_count = 1
+    timeout_overrides = {
+        "test_python_lint" = 480,
+        "test_python_packages" = 360,
+        "test_python_imports" = 180,
+        "test_python_syntax" = 120
+    }
+}
+dynamic_tests = {
+    description = "Python runtime functionality and module integration"
+    framework_labels = ["python_runtime_tests", "python_module_integration", "python_package_functionality"]
+    max_timeout_minutes = 40
+    container_deploy = true
+}
+
+[programming_languages.rust_ecosystem]
+components = ["rust", "rust-asn1", "rust-clap", "rust-nix", "rust-syn", "rust-zerocopy"]
+static_tests = {
+    description = "Rust static analysis and cargo validation"
+    infra_provisioning = false
+    test_files = ["cases/test_rust_clippy.py", "cases/test_cargo_validation.py", "cases/test_rust_security.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=3"]
+    max_timeout_minutes = 25
+    retry_count = 1
+    timeout_overrides = {
+        "test_rust_clippy" = 900,
+        "test_cargo_validation" = 600,
+        "test_rust_security" = 480
+    }
+}
+dynamic_tests = {
+    description = "Rust runtime functionality and crate integration"
+    framework_labels = ["rust_runtime_tests", "cargo_test", "rust_integration", "rust_performance"]
+    max_timeout_minutes = 50
+    container_deploy = true
+}
+
+[programming_languages.golang_stack]
+components = ["golang", "golang-mongodb-mongo-driver", "golang-github-prometheus-common"]
+static_tests = {
+    description = "Go static analysis and module validation"
+    infra_provisioning = false
+    test_files = ["cases/test_go_vet.py", "cases/test_go_lint.py", "cases/test_go_modules.py", "cases/test_go_security.py"]
+    pytest_args = ["-v", "--tb=short"]
+    max_timeout_minutes = 12
+    retry_count = 1
+    timeout_overrides = {
+        "test_go_vet" = 240,
+        "test_go_lint" = 180,
+        "test_go_modules" = 300,
+        "test_go_security" = 240
+    }
+}
+dynamic_tests = {
+    description = "Go runtime functionality and module integration"
+    framework_labels = ["go_test", "go_integration", "go_performance", "go_race_detection"]
+    max_timeout_minutes = 35
+    container_deploy = true
+}
+
+[programming_languages.java_platform]
+components = ["java-25-openjdk", "java-25-openjdk-portable", "maven", "maven4", "ant"]
+static_tests = {
+    description = "Java platform validation and build tool analysis"
+    max_timeout_minutes = 18
+}
+dynamic_tests = {
+    description = "Java runtime functionality and application testing"
+    framework_labels = ["java_runtime_tests", "maven_integration", "java_application_tests"]  
+    max_timeout_minutes = 55
+    container_deploy = true
+}
+
+[programming_languages.nodejs_stack]
+components = ["nodejs22", "nodejs24"]
+static_tests = {
+    description = "Node.js static analysis and package validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "Node.js runtime functionality and module testing"
+    framework_labels = ["nodejs_runtime_tests", "npm_integration", "nodejs_performance"]
+    max_timeout_minutes = 30
+    container_deploy = true
+}
+
+# =============================================================================
+# SYSTEM LIBRARIES AND FRAMEWORKS
+# =============================================================================
+
+[system_libraries]
+
+[system_libraries.core_system_libs]
+components = ["ncurses", "pcre", "pcre2", "libseccomp", "libedit", "keyutils"]
+static_tests = {
+    description = "Core system library ABI and API validation"
+    infra_provisioning = false
+    test_files = ["cases/test_abi_compatibility.py", "cases/test_api_signatures.py", "cases/test_library_symbols.py"]
+    pytest_args = ["-v", "--tb=short"]
+    max_timeout_minutes = 12
+    retry_count = 1
+    timeout_overrides = {
+        "test_abi_compatibility" = 420,
+        "test_api_signatures" = 300,
+        "test_library_symbols" = 180
+    }
+}
+dynamic_tests = {
+    description = "Core library runtime functionality and integration"
+    framework_labels = ["library_runtime_tests", "symbol_resolution", "library_integration"]
+    max_timeout_minutes = 25
+    container_deploy = true
+}
+
+[system_libraries.graphics_multimedia]
+components = ["mesa", "opencv", "openexr", "aalib", "libcaca", "ImageMagick", "GraphicsMagick"]
+static_tests = {
+    description = "Graphics library validation and API analysis"
+    max_timeout_minutes = 15
+}
+dynamic_tests = {
+    description = "Graphics and multimedia functionality testing"
+    framework_labels = ["graphics_rendering", "multimedia_processing", "graphics_performance"]
+    max_timeout_minutes = 45
+    vm_deploy = true
+    requires_graphics = true
+}
+
+[system_libraries.network_libs]
+components = ["libfabric", "nghttp2", "net-tools", "wget2"]
+static_tests = {
+    description = "Network library configuration and protocol validation"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "Network library functionality and protocol testing"
+    framework_labels = ["network_protocol_tests", "network_performance", "network_integration"]
+    max_timeout_minutes = 35
+    vm_deploy = true
+    requires_network = true
+}
+
+# =============================================================================
+# DATABASE SYSTEMS
+# =============================================================================
+
+[database_systems]
+
+[database_systems.mariadb]
+components = ["mariadb10.11", "mariadb-connector-c", "mariadb-connector-odbc"]
+static_tests = {
+    description = "MariaDB configuration and schema validation"
+    infra_provisioning = false
+    test_files = ["cases/test_mariadb_config.py", "cases/test_sql_schema.py", "cases/test_database_security.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=3"]
+    max_timeout_minutes = 12
+    retry_count = 1
+    timeout_overrides = {
+        "test_mariadb_config" = 360,
+        "test_sql_schema" = 300,
+        "test_database_security" = 240
+    }
+}
+dynamic_tests = {
+    description = "MariaDB functionality and performance testing"
+    framework_labels = ["mariadb_functionality", "database_performance", "mariadb_replication"]
+    max_timeout_minutes = 60
+    vm_deploy = true
+    requires_storage = true
+}
+
+[database_systems.mysql]
+components = ["mysql8.4"]
+static_tests = {
+    description = "MySQL configuration and security validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "MySQL functionality and clustering tests"
+    framework_labels = ["mysql_functionality", "mysql_clustering", "mysql_performance"]
+    max_timeout_minutes = 55
+    vm_deploy = true
+}
+
+[database_systems.postgresql]
+components = ["postgresql18-decoderbufs"]
+static_tests = {
+    description = "PostgreSQL extension validation"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "PostgreSQL extension functionality"
+    framework_labels = ["postgresql_extension_tests", "postgresql_integration"]
+    max_timeout_minutes = 40
+    vm_deploy = true
+}
+
+# =============================================================================
+# CONTAINER AND VIRTUALIZATION
+# =============================================================================
+
+[virtualization]
+
+[virtualization.container_runtime]
+components = ["kata-containers", "rootlesskit", "runc"]
+static_tests = {
+    description = "Container runtime configuration validation"
+    infra_provisioning = false
+    test_files = ["cases/test_container_config.py", "cases/test_container_security.py", "cases/test_oci_compliance.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=2"]
+    max_timeout_minutes = 15
+    retry_count = 1
+    timeout_overrides = {
+        "test_container_config" = 480,
+        "test_container_security" = 420,
+        "test_oci_compliance" = 360
+    }
+}
+dynamic_tests = {
+    description = "Container runtime functionality and orchestration"
+    framework_labels = ["container_lifecycle", "container_networking", "container_security", "oci_runtime_tests"]
+    max_timeout_minutes = 50
+    vm_deploy = true
+    requires_container_runtime = true
+}
+
+[virtualization.hypervisor]
+components = ["qemu", "libvirt", "open-vm-tools"]
+static_tests = {
+    description = "Hypervisor configuration and VM template validation"
+    max_timeout_minutes = 12
+}
+dynamic_tests = {
+    description = "Hypervisor functionality and VM management"
+    framework_labels = ["vm_lifecycle", "hypervisor_performance", "vm_migration", "libvirt_integration"]
+    max_timeout_minutes = 75
+    vm_deploy = true
+    requires_nested_virtualization = true
+}
+
+# =============================================================================
+# DEVELOPMENT TOOLS AND BUILD SYSTEMS
+# =============================================================================
+
+[development_tools]
+
+[development_tools.build_systems]
+components = ["cmake", "meson", "automake", "gyp"]
+static_tests = {
+    description = "Build system configuration and script validation"
+    infra_provisioning = false
+    test_files = ["cases/test_build_scripts.py", "cases/test_cmake_lint.py", "cases/test_meson_validation.py", "cases/test_build_deps.py"]
+    pytest_args = ["-v", "--tb=short"]
+    max_timeout_minutes = 8
+    retry_count = 1
+    timeout_overrides = {
+        "test_build_scripts" = 180,
+        "test_cmake_lint" = 120,
+        "test_meson_validation" = 150,
+        "test_build_deps" = 210
+    }
+}
+dynamic_tests = {
+    description = "Build system functionality and cross-platform building"
+    framework_labels = ["build_system_tests", "cross_platform_build", "build_performance"]
+    max_timeout_minutes = 40
+    container_deploy = true
+}
+
+[development_tools.version_control]
+components = ["GitPython", "cvsps", "subunit"]
+static_tests = {
+    description = "Version control tool validation and repository analysis"
+    max_timeout_minutes = 6
+}
+dynamic_tests = {
+    description = "Version control functionality and integration"
+    framework_labels = ["vcs_operations", "vcs_performance", "vcs_integration"]
+    max_timeout_minutes = 25
+    container_deploy = true
+}
+
+[development_tools.debugging_profiling]
+components = ["gdb", "systemtap", "tuna", "tuned"]
+static_tests = {
+    description = "Debugging tool configuration validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "Debugging and profiling functionality"
+    framework_labels = ["debugger_functionality", "profiler_tests", "performance_tuning"]
+    max_timeout_minutes = 45
+    vm_deploy = true
+}
+
+# =============================================================================
+# DESKTOP AND GUI APPLICATIONS
+# =============================================================================
+
+[desktop_applications]
+
+[desktop_applications.gui_frameworks]
+components = ["gtk4", "qt5-qtwebkit", "qt6-qtwebengine", "qt-mobility"]
+static_tests = {
+    description = "GUI framework validation and theme compatibility"
+    max_timeout_minutes = 12
+}
+dynamic_tests = {
+    description = "GUI framework functionality and rendering"
+    framework_labels = ["gui_rendering", "gui_interaction", "gui_performance"]
+    max_timeout_minutes = 35
+    vm_deploy = true
+    requires_display = true
+}
+
+[desktop_applications.multimedia_apps]
+components = ["firefox", "pipewire", "pulseaudio", "fluidsynth"]
+static_tests = {
+    description = "Multimedia application configuration validation"
+    max_timeout_minutes = 15
+}
+dynamic_tests = {
+    description = "Multimedia functionality and audio/video processing"
+    framework_labels = ["multimedia_playback", "audio_processing", "multimedia_performance"]
+    max_timeout_minutes = 50
+    vm_deploy = true
+    requires_audio = true
+}
+
+[desktop_applications.office_productivity]
+components = ["emacs", "vim", "mc", "dialog"]
+static_tests = {
+    description = "Productivity application configuration validation"
+    max_timeout_minutes = 6
+}
+dynamic_tests = {
+    description = "Productivity application functionality"
+    framework_labels = ["text_editor_functionality", "file_manager_tests", "productivity_integration"]
+    max_timeout_minutes = 20
+    container_deploy = true
+}
+
+# =============================================================================
+# NETWORKING AND WEB SERVICES
+# =============================================================================
+
+[web_services]
+
+[web_services.web_servers]
+components = ["mod_proxy_cluster", "civetweb"]
+static_tests = {
+    description = "Web server configuration and module validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "Web server functionality and load handling"
+    framework_labels = ["web_server_functionality", "http_load_tests", "web_performance"]
+    max_timeout_minutes = 45
+    vm_deploy = true
+    requires_network = true
+}
+
+[web_services.network_utilities]
+components = ["rsync", "wget2", "w3m", "urlview"]
+static_tests = {
+    description = "Network utility configuration validation"
+    max_timeout_minutes = 5
+}
+dynamic_tests = {
+    description = "Network utility functionality and protocol testing"
+    framework_labels = ["network_tool_functionality", "protocol_tests", "network_performance"]
+    max_timeout_minutes = 30
+    vm_deploy = true
+    requires_network = true
+}
+
+# =============================================================================
+# SECURITY AND CRYPTOGRAPHIC COMPONENTS  
+# =============================================================================
+
+[security_components]
+
+[security_components.authentication]
+components = ["realmd", "krb5", "sssd", "freeipa"]
+static_tests = {
+    description = "Authentication system configuration validation"
+    infra_provisioning = false
+    test_files = ["cases/test_auth_config.py", "cases/test_kerberos_config.py", "cases/test_ldap_schema.py"]
+    pytest_args = ["-v", "--tb=short", "--maxfail=2"]
+    max_timeout_minutes = 12
+    retry_count = 1
+    timeout_overrides = {
+        "test_auth_config" = 360,
+        "test_kerberos_config" = 300,
+        "test_ldap_schema" = 240
+    }
+}
+dynamic_tests = {
+    description = "Authentication functionality and integration"
+    framework_labels = ["auth_integration", "kerberos_functionality", "ldap_operations"]
+    max_timeout_minutes = 50
+    vm_deploy = true
+    requires_network = true
+}
+
+[security_components.encryption]
+components = ["nss", "openscap", "xmlsec1", "openpace"]
+static_tests = {
+    description = "Cryptographic library and certificate validation"
+    max_timeout_minutes = 15
+}
+dynamic_tests = {
+    description = "Cryptographic functionality and compliance testing"
+    framework_labels = ["crypto_functionality", "encryption_tests", "compliance_validation"]
+    max_timeout_minutes = 40
+    vm_deploy = true
+}
+
+# =============================================================================
+# MONITORING AND SYSTEM MANAGEMENT
+# =============================================================================
+
+[system_management]
+
+[system_management.monitoring]
+components = ["sos", "rsyslog", "chkrootkit"]
+static_tests = {
+    description = "Monitoring tool configuration validation"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "Monitoring functionality and log processing"
+    framework_labels = ["monitoring_functionality", "log_processing", "security_monitoring"]
+    max_timeout_minutes = 35
+    vm_deploy = true
+}
+
+[system_management.package_management]
+components = ["rpm", "dnf5", "PackageKit", "PackageKit-Qt"]
+static_tests = {
+    description = "Package management configuration and metadata validation"
+    max_timeout_minutes = 12
+}
+dynamic_tests = {
+    description = "Package management functionality and repository operations"
+    framework_labels = ["package_operations", "repository_management", "package_dependency_resolution"]
+    max_timeout_minutes = 50
+    vm_deploy = true
+}
+
+# =============================================================================
+# STORAGE AND FILESYSTEM COMPONENTS
+# =============================================================================
+
+[storage_systems]
+
+[storage_systems.filesystems]
+components = ["squashfs-tools", "ostree", "fuse3"]
+static_tests = {
+    description = "Filesystem tool configuration validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "Filesystem functionality and operations"
+    framework_labels = ["filesystem_operations", "fs_performance", "fs_integrity_tests"]
+    max_timeout_minutes = 45
+    vm_deploy = true
+    requires_storage = true
+}
+
+[storage_systems.backup_archive]
+components = ["7zip", "p7zip", "rsync"]
+static_tests = {
+    description = "Archive tool validation and format compatibility"
+    max_timeout_minutes = 6
+}
+dynamic_tests = {
+    description = "Archive tool functionality and performance"
+    framework_labels = ["archive_operations", "compression_performance", "backup_functionality"]
+    max_timeout_minutes = 30
+    container_deploy = true
+}
+
+# =============================================================================
+# TESTING AND QUALITY ASSURANCE
+# =============================================================================
+
+[testing_frameworks]
+
+[testing_frameworks.unit_testing]
+components = ["CUnit", "JUnitParams", "subunit"]
+static_tests = {
+    description = "Testing framework configuration validation"
+    max_timeout_minutes = 5
+}
+dynamic_tests = {
+    description = "Testing framework functionality and execution"
+    framework_labels = ["test_execution", "test_framework_integration", "test_reporting"]
+    max_timeout_minutes = 25
+    container_deploy = true
+}
+
+# =============================================================================
+# INTERNATIONALIZATION AND LOCALIZATION
+# =============================================================================
+
+[internationalization]
+
+[internationalization.fonts_text]
+components = ["google-roboto-slab-fonts", "glyphicons-halflings-fonts", "paktype-naskh-basic-fonts"]
+static_tests = {
+    description = "Font validation and character encoding analysis"
+    max_timeout_minutes = 8
+}
+dynamic_tests = {
+    description = "Font rendering and text processing"
+    framework_labels = ["font_rendering", "text_processing", "internationalization_tests"]
+    max_timeout_minutes = 20
+    vm_deploy = true
+    requires_display = true
+}
+
+[internationalization.text_processing]
+components = ["hunspell-se", "hunspell-smj", "m17n-lib", "foma", "mecab"]
+static_tests = {
+    description = "Text processing library validation"
+    max_timeout_minutes = 10
+}
+dynamic_tests = {
+    description = "Text processing functionality and language support"
+    framework_labels = ["text_processing_functionality", "spell_check_tests", "language_processing"]
+    max_timeout_minutes = 30
+    container_deploy = true
+}

@@ -1,0 +1,150 @@
+# Azure Linux Test Workflows Configuration - Capability-Aware Tests selection
+#
+
+[metadata]
+version = "1.0.0"
+description = "Azure Linux unified test workflows with capability awareness"
+author = "Azure Linux Team"
+
+# =============================================================================
+# CAPABILITY-AWARE TEST WORKFLOWS
+# =============================================================================
+
+[pr_validation]
+# Fast validation for pull request gates - capability filtered
+description = "Fast validation workflows for pull request gates with capability-aware test selection"
+pr_vm_smoke = {
+    description = "VM smoke tests for PR validation"
+    framework_labels = ["openqa_install_smoke", "quick_smoke_tests"]
+    required_capabilities = ["machine-bootable"]
+    retry_count = 2
+    min_version = "4.0.0"
+    disabled_for_versions = ["5.0.0-preview"]
+    version_family = "azurelinux"
+    #max_timeout_minutes = 15
+}
+
+pr_container_smoke = {
+    description = "Container smoke tests for PR validation"
+    framework_labels = ["container_smoke", "base_container_validation"]
+    required_capabilities = ["container"]
+    retry_count = 2
+    min_version = "2.0.0"
+    enabled_for_versions = ["2.0.*", "3.0.*"]
+}
+
+[nightly_validation]
+# Comprehensive nightly testing - capability filtered
+description = "Comprehensive nightly testing workflows with extensive capability validation"
+
+nightly_full_system = {
+    description = "Full system validation with all capabilities"
+    framework_labels = ["tmt_tier2", "lisa_priority2", "comprehensive_tests"]
+    required_capabilities = ["machine-bootable", "systemd", "runtime-package-management"]
+    retry_count = 1
+    min_version = "2.0.0"
+    max_version = "4.0.0"
+    disabled_for_versions = ["3.0.0-beta", "3.0.0-rc1"]
+}
+
+nightly_vm_basic = {
+    description = "VM validation without package management"
+    framework_labels = ["tmt_tier2", "lisa_priority2", "vm_basic_tests"]
+    required_capabilities = ["machine-bootable"]
+    retry_count = 1
+    min_version = "1.0.0"
+    enabled_for_versions = ["1.*", "2.*", "3.0.0"]
+    version_family = "azurelinux"
+}
+
+nightly_container_comprehensive = {
+    description = "Comprehensive container testing"
+    framework_labels = ["container_runtime_full", "oci_compliance", "registry_integration"]
+    required_capabilities = ["container"]
+    retry_count = 1
+    min_version = "2.0.0"
+    disabled_for_versions = ["2.0.0-preview"]
+    version_family = "azurelinux"
+}
+
+[release_validation]
+# Complete testing before release - capability filtered
+description = "Complete release validation workflows with thorough testing for production readiness"
+
+release_full_validation = {
+    description = "Complete validation for full-featured images"
+    framework_labels = ["full_validation", "security_tests", "compatibility_tests"]
+    required_capabilities = ["machine-bootable", "systemd"]
+    retry_count = 2
+    min_version = "2.0.0"
+    enabled_for_versions = ["*.0", "*.*.*-rc*"]
+    disabled_for_versions = ["*-alpha", "*-beta"]
+}
+
+release_container_validation = {
+    description = "Complete container validation for release"
+    framework_labels = ["container_security_scan", "oci_security", "distroless_validation"]
+    required_capabilities = ["container"]
+    retry_count = 2
+    min_version = "2.0.0"
+}
+
+release_minimal_validation = {
+    description = "Minimal image validation for release"
+    framework_labels = ["minimal_surface_tests", "security_surface", "static_analysis"]
+    required_capabilities = ["container"]
+    excluded_capabilities = ["systemd", "runtime-package-management"]
+    retry_count = 2
+    min_version = "2.0.0"
+    enabled_for_versions = ["2.*", "3.*"]
+}
+
+example_merge_validation = {
+    description = "Example test spec using azldev-compatible timeout configuration"
+    framework_labels = ["merge_smoke", "integration_basic"]
+    required_capabilities = ["machine-bootable"]
+    retry_count = 1
+}
+
+# =============================================================================
+# STATIC WORKFLOWS (preserved for filesystem-based testing)
+# =============================================================================
+
+[workflows.nightly_validation_static]
+test_type = pytest
+infra_provisioning = false
+description = "Comprehensive static validation - nightly execution"
+test_files = ["cases/**/*.py"]
+pytest_args = [
+    "-v", 
+    "--tb=long", 
+    "--durations=10",
+    "-m", "static_container_test",
+    "-m", "runtime_container_tests",
+    "--image-path", "{image_path}",
+    "--image-name", "{image_name}",
+]
+max_timeout_minutes = 120
+collect_coverage = false
+retry_count = 1
+#markers_required = ["static_container_test", "runtime_container_tests"]
+
+[workflows.release_validation_static]
+test_type = pytest
+infra_provisioning = false
+description = "Complete static validation for release readiness"
+pytest_args = [
+    "-v", 
+    "--tb=long", 
+    "--durations=20",
+    "--strict-markers",
+    "-m", "static_container_test",
+    "--image-path", "{image_path}",
+    "--image-name", "{image_name}",
+    "--cov=base/images/tests/cases",
+    "--cov-report=term-missing",
+]
+max_timeout_minutes = 90
+collect_coverage = true
+coverage_threshold = 85
+retry_count = 2
