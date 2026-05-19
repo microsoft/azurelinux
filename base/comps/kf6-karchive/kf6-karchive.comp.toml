@@ -1,0 +1,27 @@
+# The upstream KDE `karchive-6.23.0.tar.xz` ships several autotest fixtures
+# that trip anti-malware scanning on the AZL RPM-signing pipeline, which
+# rejects encrypted / unscannable payloads inside SRPMs:
+#
+#   - autotests/data/password_protected.7z
+#       Deliberately password-protected 7-Zip archive.
+#   - autotests/data/zip64_extra_zip64_size_first.zip.gz
+#       Gzipped ZIP64 edge-case fixture; the scanner decompresses the .gz
+#       wrapper and the inner .zip trips its detector.
+#
+# karchive's autotests are not built or run in our spec (no %check, and
+# upstream's CMake gates them on BUILD_TESTING=ON, which we don't set), so
+# stripping these test fixtures is functionally inert.
+#
+# Replace upstream Source0 with a deterministically-repacked tarball produced
+# by base/comps/kf6-karchive/modify_source.sh. The upstream filename is
+# preserved so `replace-upstream = true` swaps the entry in place in the
+# Fedora `sources` manifest -- no spec edit required.
+[components.kf6-karchive]
+
+[[components.kf6-karchive.source-files]]
+filename = "karchive-6.23.0.tar.xz"
+hash = "dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/kf6-karchive/karchive-6.23.0.tar.xz/sha512/dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a/karchive-6.23.0.tar.xz" }
+replace-upstream = true
+replace-reason = "AZL-repacked tarball with autotest fixtures stripped that trip anti-malware scanning on the AZL RPM-signing pipeline: autotests/data/password_protected.7z (password-protected 7-Zip) and autotests/data/zip64_extra_zip64_size_first.zip.gz (ZIP64 edge-case fixture whose inner .zip the scanner rejects after decompressing the .gz wrapper). The autotests are not built or run in our spec (no %check, BUILD_TESTING is off), so removing these test fixtures is functionally inert. See modify_source.sh."

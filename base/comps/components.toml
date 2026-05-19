@@ -1552,7 +1552,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.kf6-attica]
 [components.kf6-baloo]
 [components.kf6-frameworkintegration]
-[components.kf6-karchive]
 [components.kf6-kauth]
 [components.kf6-kbookmarks]
 [components.kf6-kcmutils]
