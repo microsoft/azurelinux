@@ -150,6 +150,9 @@ use and even classes that help you implement simple HTTP servers.
 rm t/leak/no_leak.t t/redirect.t
 perl -i -ne 'print $_ unless m{^(?:t/leak/no_leak\.t|t/redirect\.t)}' MANIFEST
 %endif
+# Remove test that requires perl(HTTP::CookieJar::LWP) not available in Azure Linux
+rm t/local/cookie_jar.t
+perl -i -ne 'print $_ unless m{^t/local/cookie_jar\.t}' MANIFEST
 
 %build
 # Install the aliases by default
