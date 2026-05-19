@@ -419,7 +419,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.esc]
 [components.esmtp]
 [components.espeak]
-[components.espeak-ng]
 [components.ethtool]
 [components.evolution-data-server]
 [components.exec-maven-plugin]

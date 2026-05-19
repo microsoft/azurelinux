@@ -1,0 +1,27 @@
+# The upstream `espeak-ng-1.51.1.tar.gz` ships a demo asset that trips
+# anti-malware scanning on the AZL RPM-signing pipeline, which rejects
+# webshell-class payloads inside SRPMs:
+#
+#   - chromium_extension/index.php
+#       A 10-line demo PHP shim for the sample Chromium extension that
+#       forwards POST-ed shell commands via `passthru($_POST["espeakng"])`.
+#       AV scanners flag it as PHP/Webshell.NWM trojan (correctly: by design
+#       it executes arbitrary attacker-supplied shell input).
+#
+# The `chromium_extension/` directory is a sample browser-extension demo;
+# our spec does not reference it or ship it in any binary RPM, so stripping
+# this file is functionally inert.
+#
+# Replace upstream Source0 with a deterministically-repacked tarball produced
+# by base/comps/espeak-ng/modify_source.sh. The upstream filename is preserved
+# so `replace-upstream = true` swaps the entry in place in the Fedora `sources`
+# manifest without requiring a `Source0`/filename change.
+[components.espeak-ng]
+
+[[components.espeak-ng.source-files]]
+filename = "espeak-ng-1.51.1.tar.gz"
+hash = "84685a24e93e743c4f0be73dd9d553a96ed95bc8c2c0c683d84935183e517ae039066de93e3f83617b2114b27b427ec18ff8169972188d2a81b55f839c7c726f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/espeak-ng/espeak-ng-1.51.1.tar.gz/sha512/84685a24e93e743c4f0be73dd9d553a96ed95bc8c2c0c683d84935183e517ae039066de93e3f83617b2114b27b427ec18ff8169972188d2a81b55f839c7c726f/espeak-ng-1.51.1.tar.gz" }
+replace-upstream = true
+replace-reason = "Strips the `chromium_extension/index.php` demo file flagged as PHP/Webshell.NWM by anti-malware scanners on the AZL RPM-signing pipeline. See `modify_source.sh` next to this file."
