@@ -672,7 +672,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-19%{?dist}
+BuildRequires: glibc-static >= 2.38-20%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-devel-static
 %endif
@@ -3521,12 +3521,17 @@ fi
 
 
 %changelog
+<<<<<<< HEAD
 * Tue Apr 14 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-6
 - Enable user_static builds for qemu
 - configure user_static with 'enable-pie'
 - manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
 - add conflicts between qemu-user-static and qemu-user-binfmt as both
   provide binfmt rules
+=======
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 9.1.0-6
+- Bump to rebuild with updated glibc
+>>>>>>> 1def8740d9 ([HIGH] Patch `glibc` for CVE-2026-4046 (#17075))
 
 * Sun Apr 05 2026 Woojoong Kim <woojoongkim@microsoft.com> - 9.1.0-5
 - Add 23 QEMU patches from RHEL qemu-kvm 9.1.0-20 for KubeVirt live migration

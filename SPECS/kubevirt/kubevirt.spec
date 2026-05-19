@@ -34,7 +34,7 @@ Patch2:         CVE-2026-33814.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-19%{?dist}
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:  golang >= 1.24
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -267,8 +267,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+<<<<<<< HEAD
 * Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-4
 - Patch for CVE-2026-33814
+=======
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-4
+- Bump to rebuild with updated glibc
+>>>>>>> 1def8740d9 ([HIGH] Patch `glibc` for CVE-2026-4046 (#17075))
 
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-3
 - Patch for CVE-2026-35469
