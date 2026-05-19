@@ -2,7 +2,7 @@
 # Do not edit manually; changes will be overwritten.
 %_without_debug 1
 %_without_selftests 1
-%azl_pkgrelease 10
+%azl_pkgrelease 11
 %kextraversion 1
 %nvidia_open_branch 595
 %nvidia_open_version 595.58.03

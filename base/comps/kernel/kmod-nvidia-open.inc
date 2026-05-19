@@ -14,7 +14,7 @@
 %if "%{_kmod_phase}" == "package" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%package -n kmod-%{_kmod_name}-%{nvidia_open_branch}
+%package -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 Summary:        NVIDIA open GPU kernel modules (driver %{nvidia_open_version})
 AutoReq:        no
 # NOTE: Version is inherited from kernel (%{version}), NOT nvidia_open_version.
@@ -27,7 +27,7 @@ Requires(post): kmod
 Requires(postun): kmod
 Conflicts:      nvidia-closed-kmod
 
-%description -n kmod-%{_kmod_name}-%{nvidia_open_branch}
+%description -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 Open-source NVIDIA GPU kernel modules (driver version %{nvidia_open_version})
 built from the official NVIDIA/open-gpu-kernel-modules repository for
 kernel %{KVERREL}.
@@ -129,13 +129,13 @@ install -D -m 0644 %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/C
 %if "%{_kmod_phase}" == "files" && %{with_up_base}
 
 %ifarch x86_64 aarch64
-%post -n kmod-%{_kmod_name}-%{nvidia_open_branch}
+%post -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%postun -n kmod-%{_kmod_name}-%{nvidia_open_branch}
+%postun -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 %{_sbindir}/depmod -a %{KVERREL} || :
 
-%files -n kmod-%{_kmod_name}-%{nvidia_open_branch}
+%files -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 %license %{_datadir}/licenses/kmod-%{_kmod_name}-%{nvidia_open_branch}/COPYING
 /lib/modules/%{KVERREL}/extra/nvidia/nvidia.ko.%{compext}
 /lib/modules/%{KVERREL}/extra/nvidia/nvidia-modeset.ko.%{compext}
