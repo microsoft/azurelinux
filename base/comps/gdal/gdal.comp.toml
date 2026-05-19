@@ -1,4 +1,30 @@
+# The upstream GDAL autotest tarball `gdalautotest-3.11.5.tar.gz` (Source1)
+# ships a fixture that trips anti-malware scanning on the AZL RPM-signing
+# pipeline, which rejects encrypted / unscannable payloads inside SRPMs:
+#
+#   - gcore/data/zero_5GB_sozip_of_sozip.zip
+#       A SOZip-of-SOZip test fixture: a ZIP containing zero_5GB.bin.zip,
+#       which wraps a sparse 5 GiB all-zero file. AV scanners flag the
+#       nested archive (and the layered re-decompressions of the outer
+#       .tar.gz wrapper) as a Trojan.
+#
+# The autotest tarball is extracted in %prep but our %check section is a
+# no-op (exits 0; gcore tests were OOM-killing the build POD), so stripping
+# this fixture is functionally inert.
+#
+# Replace upstream Source1 with a deterministically-repacked tarball produced
+# by base/comps/gdal/modify_source.sh. The upstream filename is preserved so
+# `replace-upstream = true` swaps the entry in place in the Fedora `sources`
+# manifest -- no spec edit required.
 [components.gdal]
+
+[[components.gdal.source-files]]
+filename = "gdalautotest-3.11.5.tar.gz"
+hash = "a39cc826885a2336c80545203947c4693851aae3de02b980be25b4b579658e6314e058dc228660294b2370242df8f298c4fe64c6d3b1cd0bf5adf56b3e321b77"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/gdal/gdalautotest-3.11.5.tar.gz/sha512/a39cc826885a2336c80545203947c4693851aae3de02b980be25b4b579658e6314e058dc228660294b2370242df8f298c4fe64c6d3b1cd0bf5adf56b3e321b77/gdalautotest-3.11.5.tar.gz" }
+replace-upstream = true
+replace-reason = "Repacked source tarball without gcore/data/zero_5GB_sozip_of_sozip.zip which was flagged as a Trojan. See modify_source.sh."
 
 [components.gdal.build]
 # Azure Linux does not support MinGW cross-compilation.
