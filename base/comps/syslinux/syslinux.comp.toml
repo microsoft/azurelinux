@@ -1,10 +1,21 @@
 [components.syslinux]
-# Release: 0.33%{?dist}
+# Release: 0.34%{?dist}
 release = { calculation = "manual" }
 
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # The mingw-gcc BuildRequires are used to cross-compile syslinux.exe/syslinux64.exe
 # (Windows tools for installing syslinux from Windows), which are not needed on AZL.
+
+# Bump upstream Release 0.33 → 0.34 to force a rebuild that picks up the
+# mingw-disabling overlays below. Without this, the previously-published SRPM
+# (built before the overlays landed) would continue to advertise mingw
+# BuildRequires and break build-dep closure for the AZL repo. Drop this
+# overlay the next time the upstream Release bumps past 0.33.
+[[components.syslinux.overlays]]
+description = "Bump Release 0.33 → 0.34 to force a rebuild that drops stale mingw BRs"
+type = "spec-search-replace"
+regex = '^Release: 0\.33%\{\?dist\}$'
+replacement = 'Release: 0.34%{?dist}'
 
 [[components.syslinux.overlays]]
 description = "Remove mingw32-gcc BuildRequires (ix86) — Azure Linux does not ship mingw toolchains"
