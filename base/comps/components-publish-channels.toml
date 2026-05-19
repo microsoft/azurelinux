@@ -1926,6 +1926,7 @@ components = [
     "python-fuse",
     "python-genshi",
     "python-gitdb",
+    "python-gmpy2",
     "python-google-auth",
     "python-googleapis-common-protos",
     "python-greenlet",
