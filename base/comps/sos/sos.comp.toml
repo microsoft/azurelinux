@@ -23,3 +23,9 @@ description = "Add dnf5 support in dnf plugin"
 type = "patch-add"
 file = "dnf-initial-dnf5-support-in-dnf-plugin.patch"
 source = "dnf-initial-dnf5-support-in-dnf-plugin.patch"
+
+[[components.sos.overlays]]
+description = "Refactor Azure IMDS collection to use Python urllib with pretty-printed JSON output and bump API version to 2025-04-07 (upstream PR sosreport/sos#4322)"
+type = "patch-add"
+file = "azure-refactor-IMDS-collection-with-pretty-printed-JSON.patch"
+source = "azure-refactor-IMDS-collection-with-pretty-printed-JSON.patch"
