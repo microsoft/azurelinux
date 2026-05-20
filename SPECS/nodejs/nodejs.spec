@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 11.6.2
+%define npm_version 11.11.0
 
 %global nodejs_datadir %{_datarootdir}/nodejs
 
