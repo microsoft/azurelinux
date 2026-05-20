@@ -3,8 +3,8 @@
 <image schemaversion="8.3" name="azl4-container-base">
     <description type="system">
         <author>Azure Linux</author>
-        <contact>user@example.com</contact>
-        <specification>Azure Linux Container Image Example</specification>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux Container Base Image</specification>
     </description>
     <!--
         Profile axes

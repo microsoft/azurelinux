@@ -3,8 +3,8 @@
 <image schemaversion="8.3" name="azl4-vm-base">
     <description type="system">
         <author>Azure Linux</author>
-        <contact>user@example.com</contact>
-        <specification>Azure Linux VM Image Example</specification>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux VM Base Image</specification>
     </description>
     <!--
         Two build profiles control which `azurelinux-repos*` package is
