@@ -7,7 +7,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/CESNET/libyang
 Source:         https://github.com/CESNET/libyang/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:          CVE-2026-44673.patch
+Patch0:         CVE-2026-44673.patch
 BuildRequires:  cmake
 BuildRequires:  doxygen
 BuildRequires:  gcc
