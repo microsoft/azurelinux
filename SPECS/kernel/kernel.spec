@@ -32,7 +32,14 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.139.1
-Release:        1%{?dist}
+# Release prefix '99' is intentionally high so this RPM outranks any upstream
+# Azure Linux 3.0 patch release at the same Version (stock builds use 1-N where
+# N has historically stayed in single digits). The 'osguard1' tag is
+# runtime-detectable via `uname -r | grep -q osguard`. If upstream ever bumps
+# Version (e.g. 6.6.140.1), version compare wins regardless of Release; pair
+# this with installing the RPM by file path in the packer build to avoid repo
+# resolution picking a newer Version.
+Release:        99.osguard1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +52,10 @@ Source3:        sha512hmac-openssl.sh
 Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
+# OS Guard CA: trust anchor for dm-verity / module / kexec signature verification
+# on AKS OS Guard prototype VHDs. Public X.509 CA cert (no private key).
+# Private signing key lives in Azure Key Vault; signatures are produced via notation.
+Source7:        osguard-signer-ca.pem
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -188,9 +199,17 @@ make mrproper
 
 cp %{config_source} .config
 
-# Add CBL-Mariner cert into kernel's trusted keyring
-cp %{SOURCE4} certs/mariner.pem
-sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/mariner.pem"#' .config
+# Build the kernel's compiled-in trust anchor bundle (loaded into
+# .builtin_trusted_keys at boot). CONFIG_SYSTEM_TRUSTED_KEYS only accepts a
+# single PEM path, so multiple CA certs must be concatenated into one bundle
+# file. Contents, in order:
+#   1. azurelinux-ca-20230216.pem  - Azure Linux distro CA (kernel modules / kexec).
+#   2. osguard-signer-ca.pem       - OS Guard signer CA (dm-verity roothash sigs
+#                                    and container layer sigs, issued via
+#                                    notation + Azure Key Vault).
+cp %{SOURCE4} certs/trusted-bundle.pem
+cat %{SOURCE7} >> certs/trusted-bundle.pem
+sed -i 's#CONFIG_SYSTEM_TRUSTED_KEYS=""#CONFIG_SYSTEM_TRUSTED_KEYS="certs/trusted-bundle.pem"#' .config
 
 cp .config current_config
 sed -i 's/CONFIG_LOCALVERSION=""/CONFIG_LOCALVERSION="-%{release}"/' .config
@@ -440,6 +459,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 20 2026 Dallas Delane <dadelan@microsoft.com> - 6.6.139.1-99.osguard1
+- Add OS Guard CA (osguard-signer-ca.pem) to CONFIG_SYSTEM_TRUSTED_KEYS bundle
+  so dm-verity / module / kexec signatures issued by the OS Guard signer chain
+  are accepted out of .builtin_trusted_keys without runtime keyring enrollment.
+- Concatenate distro CA + OS Guard CA into certs/trusted-bundle.pem (single
+  PEM bundle is the only multi-CA mechanism CONFIG_SYSTEM_TRUSTED_KEYS supports).
+- Release prefix bumped to 99 so this build outranks any upstream patch release
+  at the same Version. Runtime detection: `uname -r | grep -q osguard`.
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 
