@@ -81,7 +81,7 @@ Version:        4.11.0
 %global minorver %(foo=%{version}; a=(${foo//./ }); echo ${a[1]} )
 %global padding  %(digits=00; num=%{minorver}; echo ${digits:${#num}:${#digits}} )
 %global abiver   %(echo %{majorver}%{padding}%{minorver} )
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:        Collection of algorithms for computer vision
 # This is normal three clause BSD.
 License:        BSD-3-Clause AND Apache-2.0 AND ISC
@@ -154,7 +154,6 @@ BuildRequires:  libjpeg-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libtiff-devel
 BuildRequires:  libGL-devel
-BuildRequires:  libv4l-devel
 %{?with_openexr:
 BuildRequires:  OpenEXR-devel
 }
@@ -526,7 +525,7 @@ install -pm 0644 %{S:4} .cache/ade/
 %{?with_opencl: -DOPENCL_INCLUDE_DIR=%{_includedir}/CL -DOPENCV_DNN_OPENCL=ON} \
 %{!?with_opencl: -DWITH_OPENCL=OFF } \
  -DOPENCV_EXTRA_MODULES_PATH=opencv_contrib-%{version}/modules \
- -DWITH_LIBV4L=ON \
+ -DWITH_LIBV4L=OFF \
  -DWITH_OPENMP=ON \
  -DOPENCV_CONFIG_INSTALL_PATH=%{_lib}/cmake/OpenCV \
  -DOPENCV_GENERATE_PKGCONFIG=ON \
