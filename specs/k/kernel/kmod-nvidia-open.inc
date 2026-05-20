@@ -22,10 +22,19 @@ AutoReq:        no
 Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
 provides:       nvidia-kmod = %{nvidia_open_version}
 Provides:       kmod-%{_kmod_name} = %{version}-%{release}
+# Mark this kmod as install-only so multiple versions can coexist alongside
+# their matching kernels (dnf/dnf5 default installonlypkgs includes the
+# 'installonlypkg(kernel-module)' token).
+Provides:       installonlypkg(kernel-module)
 Requires:       %{name}-core-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 Conflicts:      nvidia-closed-kmod
+# Auto-pull this kmod when the matching kernel is installed AND any
+# nvidia-open kmod is already present on the system. This makes kernel
+# upgrades carry the NVIDIA modules forward without forcing them on
+# systems that never had nvidia installed.
+Supplements:    (kmod-%{_kmod_name} and %{name}-core-uname-r = %{KVERREL})
 
 %description -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 Open-source NVIDIA GPU kernel modules (driver version %{nvidia_open_version})
