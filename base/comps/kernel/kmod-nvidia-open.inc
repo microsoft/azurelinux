@@ -11,7 +11,7 @@
 # =========================================================================
 # Phase: package — subpackage declaration
 # =========================================================================
-%if "%{_kmod_phase}" == "package" && %{with_up_base}
+%if "%{_kmod_phase}" == "package"
 
 %ifarch x86_64 aarch64
 %package -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
@@ -57,7 +57,7 @@ specific NVIDIA driver version, or 'Requires: kmod-nvidia-open' for any version.
 # =========================================================================
 # Phase: prep — extract NVIDIA source tarball
 # =========================================================================
-%if "%{_kmod_phase}" == "prep" && %{with_up_base}
+%if "%{_kmod_phase}" == "prep"
 
 %ifarch x86_64 aarch64
 cd %{_builddir}
@@ -70,7 +70,7 @@ cd -
 # =========================================================================
 # Phase: build — compile NVIDIA kernel modules
 # =========================================================================
-%if "%{_kmod_phase}" == "build" && %{with_up_base}
+%if "%{_kmod_phase}" == "build"
 
 %ifarch x86_64 aarch64
 %{log_msg "Building NVIDIA open GPU kernel modules %{nvidia_open_version} for %{KVERREL}"}
@@ -105,7 +105,7 @@ popd
 # =========================================================================
 # Phase: install — install modules, config, and license
 # =========================================================================
-%if "%{_kmod_phase}" == "install" && %{with_up_base}
+%if "%{_kmod_phase}" == "install"
 
 %ifarch x86_64 aarch64
 %{log_msg "Installing NVIDIA open GPU kernel modules for %{KVERREL}"}
@@ -135,7 +135,7 @@ install -D -m 0644 %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/C
 # =========================================================================
 # Phase: files — scriptlets and file list
 # =========================================================================
-%if "%{_kmod_phase}" == "files" && %{with_up_base}
+%if "%{_kmod_phase}" == "files"
 
 %ifarch x86_64 aarch64
 %post -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
