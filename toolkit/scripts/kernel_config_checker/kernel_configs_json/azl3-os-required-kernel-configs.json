@@ -3193,10 +3193,10 @@
           "values": [
             {
               "architecture": "arm64",
-              "value": "y"
+              "value": "m"
             }
           ],
-          "justification": "Pre-existing drift on 3.0-dev unrelated to RDS PR; kernel-hwe builds NFT_DUP_NETDEV as builtin. Tracking separately."
+          "justification": "Pre-existing drift on 3.0-dev unrelated to RDS PR; kernel-hwe builds NFT_DUP_NETDEV as module. Tracking separately."
         },
         {
           "name": "CONFIG_NFT_FWD_NETDEV",
@@ -3253,10 +3253,10 @@
           "values": [
             {
               "architecture": "arm64",
-              "value": "m"
+              "value": "y"
             }
           ],
-          "justification": "Pre-existing drift on 3.0-dev unrelated to RDS PR; kernel-hwe builds VIRTIO_CONSOLE as module. Tracking separately."
+          "justification": "Pre-existing drift on 3.0-dev unrelated to RDS PR; kernel-hwe builds VIRTIO_CONSOLE as builtin. Tracking separately."
         }
       ]
     }
