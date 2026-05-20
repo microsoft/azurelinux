@@ -6876,7 +6876,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.uthash]
 [components.util-linux]
 [components.uuid]
-[components.v4l-utils]
 [components.vala]
 [components.valgrind]
 [components.valkey]
