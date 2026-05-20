@@ -45,6 +45,7 @@ Git LFS is a command line extension and specification for managing large files w
 %autosetup -p1 -a1
 
 %build
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 export GOPATH=%{our_gopath}
 export GOFLAGS="-buildmode=pie -trimpath -mod=vendor -modcacherw -ldflags=-linkmode=external"
 go generate ./commands
