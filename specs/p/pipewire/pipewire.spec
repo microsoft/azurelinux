@@ -112,7 +112,6 @@ BuildRequires:  pkgconfig(bluez)
 BuildRequires:  systemd
 BuildRequires:  systemd-devel
 BuildRequires:  alsa-lib-devel
-BuildRequires:  libv4l-devel
 BuildRequires:  doxygen
 BuildRequires:  python-docutils
 BuildRequires:  graphviz
@@ -452,6 +451,7 @@ cp %{SOURCE1} subprojects/packagefiles/
 %meson \
     -D opus=disabled -D bluez5-codec-opus=disabled \
     -D echo-cancel-webrtc=disabled \
+    -D v4l2=disabled -D pipewire-v4l2=disabled \
     -D docs=enabled -D man=enabled -D gstreamer=enabled -D systemd=enabled	\
     -D sdl2=disabled 								\
     -D audiotestsrc=disabled -D videotestsrc=disabled				\
@@ -533,6 +533,8 @@ ln -s ../pipewire.conf.avail/50-raop.conf \
 
 %find_lang %{name}
 
+# Remove pw-v4l2 man page (generated even with -D pipewire-v4l2=disabled)
+rm -f %{buildroot}%{_mandir}/man1/pw-v4l2.1*
 %check
 %meson_test || TESTS_ERROR=$?
 if [ "${TESTS_ERROR}" != "" ]; then
@@ -646,7 +648,7 @@ systemctl --no-reload preset --global pipewire.socket >/dev/null 2>&1 || :
 %{_libdir}/spa-%{spaversion}/filter-graph/libspa-filter-graph-plugin-ebur128.so
 %{_libdir}/spa-%{spaversion}/filter-graph/libspa-filter-graph-plugin-ladspa.so
 %{_libdir}/spa-%{spaversion}/support/
-%{_libdir}/spa-%{spaversion}/v4l2/
+
 %{_libdir}/spa-%{spaversion}/videoconvert/
 %{_libdir}/spa-%{spaversion}/libspa.so
 %{_datadir}/pipewire/client.conf

@@ -1,6 +1,7 @@
 [components.pipewire]
 # Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
 release = { calculation = "manual" }
+build.without = ["v4l2"]
 
 [components.pipewire.build.defines]
 # AZL-only release counter. Added to upstream's %{baserelease} so the final
@@ -28,6 +29,7 @@ these missing deps into hard build failures:
   - opus / bluez5-codec-opus: opus codec library not shipped in AZL
   - echo-cancel-webrtc: webrtc-audio-processing not shipped in AZL
     (see the component removal and BR-drop overlays below)
+  - v4l2 / pipewire-v4l2: v4l-utils not shipped in AZL
 The modules themselves still build; only the codec/backend implementations
 that need the unavailable libraries are skipped.
 """
@@ -36,7 +38,8 @@ section = "%build"
 regex = '%meson \\'
 replacement = '''%meson \
     -D opus=disabled -D bluez5-codec-opus=disabled \
-    -D echo-cancel-webrtc=disabled \'''
+    -D echo-cancel-webrtc=disabled \
+    -D v4l2=disabled -D pipewire-v4l2=disabled \'''
 
 # Drop the webrtc-audio-processing BuildRequires lines. The library is not
 # shipped in AZL (Google-derived AEC code that is significantly behind upstream
@@ -67,3 +70,25 @@ description = "Drop legacy webrtc-audio-processing BR (else branch, EL<10 / F<40
 type = "spec-remove-tag"
 tag = "BuildRequires"
 value = "pkgconfig(webrtc-audio-processing) >= 0.2"
+
+[[components.pipewire.overlays]]
+description = "Remove SPA v4l2 plugin from %files (disabled at meson level)"
+type = "spec-search-replace"
+section = "%files"
+regex = '%{_libdir}/spa-%{spaversion}/v4l2/'
+replacement = ""
+
+[[components.pipewire.overlays]]
+description = "Drop libv4l-devel BR (v4l-utils not shipped in AZL); not gated by the v4l2 bcond"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[components.pipewire.overlays]]
+description = "Remove pw-v4l2 man page in %install (meson generates it even with -D pipewire-v4l2=disabled)"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "# Remove pw-v4l2 man page (generated even with -D pipewire-v4l2=disabled)",
+    "rm -f %{buildroot}%{_mandir}/man1/pw-v4l2.1*",
+]
