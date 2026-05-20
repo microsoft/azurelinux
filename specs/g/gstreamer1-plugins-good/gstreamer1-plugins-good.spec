@@ -38,7 +38,7 @@
 
 Name:           gstreamer1-plugins-good
 Version:        1.26.10
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        GStreamer plugins with good code and licensing
 
 License:        CC0-1.0 AND GPL-2.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND xlock AND MIT AND BSD-3-Clause AND CC-BY-3.0 
@@ -81,7 +81,6 @@ BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  speex-devel
 BuildRequires:  taglib-devel
 BuildRequires:  wavpack-devel
-BuildRequires:  libv4l-devel
 BuildRequires:  libvpx-devel >= 1.1.0
 BuildRequires:  gtk3-devel >= 3.4
 BuildRequires:  mesa-libGL-devel
@@ -222,6 +221,7 @@ to be installed.
 
 %build
 %meson \
+  -D v4l2=disabled \
   -D package-name='Fedora GStreamer-plugins-good package' \
   -D package-origin='http://download.fedoraproject.org' \
   -D doc=disabled \
@@ -337,7 +337,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -fv {} ';'
 %{_libdir}/gstreamer-%{majorminor}/libgstsoup.so
 %{_libdir}/gstreamer-%{majorminor}/libgstspeex.so
 %{_libdir}/gstreamer-%{majorminor}/libgsttaglib.so
-%{_libdir}/gstreamer-%{majorminor}/libgstvideo4linux2.so
+
 %{_libdir}/gstreamer-%{majorminor}/libgstvpx.so
 %{_libdir}/gstreamer-%{majorminor}/libgstwavpack.so
 %{_libdir}/gstreamer-%{majorminor}/libgstlame.so

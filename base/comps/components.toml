@@ -1131,7 +1131,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.gssntlmssp]
 [components.gssproxy]
 [components.gstreamer1]
-[components.gstreamer1-plugins-good]
 [components.gtest]
 [components.gtk-doc]
 [components.gtk-layer-shell]

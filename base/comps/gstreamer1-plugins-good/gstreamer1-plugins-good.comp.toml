@@ -1,0 +1,24 @@
+[components.gstreamer1-plugins-good]
+
+# v4l-utils/libv4l not shipped in AZL — disable the v4l2 GStreamer plugin.
+
+[[components.gstreamer1-plugins-good.overlays]]
+description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[components.gstreamer1-plugins-good.overlays]]
+description = "Disable v4l2 meson option — libv4l not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson \\'
+replacement = '''%meson \
+  -D v4l2=disabled \'''
+
+[[components.gstreamer1-plugins-good.overlays]]
+description = "Remove libgstvideo4linux2.so from %files — v4l2 plugin disabled"
+type = "spec-search-replace"
+section = "%files"
+regex = '.*libgstvideo4linux2.*'
+replacement = ""
