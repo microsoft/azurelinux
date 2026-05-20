@@ -9,7 +9,7 @@
 
 Name:		zbar
 Version:	0.23.93
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:	Bar code reader
 
 License:	LGPL-2.1-or-later
@@ -26,7 +26,6 @@ BuildRequires:	GraphicsMagick-devel
 BuildRequires:	gtk3-devel
 BuildRequires:	libSM-devel
 BuildRequires:	libtool
-BuildRequires:	libv4l-devel
 BuildRequires:	libXv-devel
 BuildRequires:	make
 BuildRequires:	python3-gobject-devel
@@ -126,7 +125,7 @@ on Java Native Interface (JNI) applications using ZBar.
 
 %build
 autoreconf -fiv
-%configure --with-python=python3 --with-gtk=auto --with-dbusconfdir=%{_sysconfdir} --docdir=%{_docdir}/%{name}-%{version} --with-graphicsmagick --without-xshm --without-xv --enable-codes=ean,databar,code128,code93,code39,codabar,i25,qrcode,sqcode,pdf417
+%configure --without-video --with-python=python3 --with-gtk=auto --with-dbusconfdir=%{_sysconfdir} --docdir=%{_docdir}/%{name}-%{version} --with-graphicsmagick --without-xshm --without-xv --enable-codes=ean,databar,code128,code93,code39,codabar,i25,qrcode,sqcode,pdf417
 
 # rpath
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool

@@ -24,3 +24,18 @@ section = "%files"
 package = "gtk-devel"
 regex = '%.*gir-1\.0.*'
 replacement = ""
+
+# v4l-utils/libv4l not shipped in AZL — disable video capture support.
+
+[[components.zbar.overlays]]
+description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[components.zbar.overlays]]
+description = "Disable video capture support — libv4l not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = '%configure '
+replacement = '%configure --without-video '
