@@ -4,7 +4,7 @@
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
 Version:        6.12.89.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
