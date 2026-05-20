@@ -57,7 +57,7 @@ chmod 755 %{buildroot}/%{python3_sitearch}/*.so
 %{python3_sitearch}/_pyiso9660.cpython-*linux-gnu.so
  
 %changelog
-* Sat Apr 4 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.1.1-9
+* Sat Apr 4 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.1.1-11
 - Initial CBL-Mariner import from Fedora 44 (license: MIT).
 - License verified
 
