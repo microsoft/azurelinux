@@ -41,7 +41,6 @@ Patch16:        CVE-2026-0994.patch
 Patch17:        CVE-2026-34445.patch
 Patch18:        CVE-2026-34446.patch
 Patch19:        CVE-2025-51480.patch
-Patch20:        0001-test-patch.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
