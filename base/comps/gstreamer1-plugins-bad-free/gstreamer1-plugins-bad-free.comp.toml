@@ -26,9 +26,17 @@
 # WebRTC API plugins (libgstwebrtc-1.0.so, libgstwebrtcnice-1.0.so,
 # libgstwebrtc.so) are NOT affected; they come from a different source
 # tree and do not depend on webrtc-audio-processing.
+#
+# AZL is dropping the `aom` component (AV1 reference encoder/decoder) — it
+# is a niche multimedia codec not required by anything else in the distro.
+# Disabling the `aom` bcond drops the BuildRequires on pkgconfig(aom) and
+# the libgstaom.so AV1 GStreamer plugin (gated by `%if %{with aom}` in
+# %files). Pipelines that reference `aomenc` / `aomdec` GStreamer elements
+# will fail with "no such element" — there is no in-tree fallback. The
+# bcond defaults ON via %{defined fedora} which is true in the AZL build env.
 
 [components.gstreamer1-plugins-bad-free]
-build.without = ["extras", "dc1394", "onnx", "openh264", "webrtc", "svtav1"]
+build.without = ["extras", "dc1394", "onnx", "openh264", "webrtc", "svtav1", "aom"]
 
 # AZL does not ship svt-av1 — disable the svtav1 gstreamer plugin.
 # The bcond defaults ON via %{defined fedora} which is true in the AZL build env.
