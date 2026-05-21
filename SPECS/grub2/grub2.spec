@@ -31,6 +31,7 @@ Patch0037:      0037-Replace-a-lot-of-man-pages-with-slightly-nicer-ones.patch
 Patch0052:      0052-Make-our-info-pages-say-grub2-where-appropriate.patch
 # General fix
 Patch0069:      0069-Make-pmtimer-tsc-calibration-not-take-51-seconds-to-.patch
+Patch0071:		0071-net-read-bracketed-ipv6-addrs-and-port-numbers.patch
 # ARM64 build patch
 Patch0104:      0104-Rework-how-the-fdt-command-builds.patch
 # General fixes (> 4GB DMA, TPM measurements, etc)
