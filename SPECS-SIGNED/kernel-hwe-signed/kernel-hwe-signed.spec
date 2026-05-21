@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
 Version:        6.12.89.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -108,6 +108,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Tue May 19 2026 Deepu Thomas <dethoma@microsoft.com> - 6.12.89.1-2
+- Bump release for entanglement with kernel-hwe (disable CONFIG_RDS on aarch64)
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.89.1-1
 - Auto-upgrade to 6.12.89.1
 

@@ -27,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.139.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -380,6 +380,13 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue May 19 2026 Deepu Thomas <dethoma@microsoft.com> - 6.6.139.1-2
+- Disable Reliable Datagram Sockets protocol (CONFIG_RDS) on aarch64 to
+  match x86_64 and align with the same change in the base kernel spec.
+  Closes a long-standing config divergence and mitigates exposure to
+  RDS-specific LPEs such as PinTheft (rds_message_zcopy_from_user
+  double-free, oss-security 2026/05/19).
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 

@@ -10,7 +10,7 @@
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
 Version:        6.6.137.mshv1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -140,6 +140,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Tue May 19 2026 Deepu Thomas <dethoma@microsoft.com> - 6.6.137.mshv1-2
+- Bump release for entanglement with kernel-mshv (disable CONFIG_RDS on aarch64)
 * Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
 - Upgrade to 6.6.137.mshv1
 
