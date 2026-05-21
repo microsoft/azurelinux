@@ -16,3 +16,36 @@ type = "file-search-replace"
 file = "grub.macros"
 regex = '%global with_xen_pvh_arch 1'
 replacement = '%global with_xen_pvh_arch 0'
+
+# Drop the two Fedora revert patches that re-enable the os-prober-by-default
+# behavior in grub-mkconfig. os-prober has been disabled by default for security
+# reason in grub2 (2.06+), and previous versions of Azure Linux have
+# historically followed suite.
+#
+# `patch-remove` can't be used: grub2.spec pulls its patch list from
+# `grub.patches` via `%include %{SOURCE11}`, and azldev only scans inline
+# `PatchN:` / `%patchlist` tags. Edit `grub.patches` and delete the files
+# directly instead.
+[[components.grub2.overlays]]
+description = "Drop Fedora os-prober revert (properly disable) from grub.patches"
+type = "file-search-replace"
+file = "grub.patches"
+regex = 'Patch0002: 0002-Revert-templates-Properly-disable-the-os-prober-by-d\.patch\n'
+replacement = ""
+
+[[components.grub2.overlays]]
+description = "Drop Fedora os-prober revert (disable by default) from grub.patches"
+type = "file-search-replace"
+file = "grub.patches"
+regex = 'Patch0003: 0003-Revert-templates-Disable-the-os-prober-by-default\.patch\n'
+replacement = ""
+
+[[components.grub2.overlays]]
+description = "Remove Fedora os-prober revert patch file (properly disable)"
+type = "file-remove"
+file = "0002-Revert-templates-Properly-disable-the-os-prober-by-d.patch"
+
+[[components.grub2.overlays]]
+description = "Remove Fedora os-prober revert patch file (disable by default)"
+type = "file-remove"
+file = "0003-Revert-templates-Disable-the-os-prober-by-default.patch"
