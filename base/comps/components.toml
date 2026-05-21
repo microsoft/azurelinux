@@ -1381,7 +1381,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.intel-ipp-crypto-mb]
 [components.intel-ipsec-mb]
 [components.intel-lpmd]
-[components.intel-qpl]
 [components.intltool]
 [components.iotop-c]
 [components.ipcalc]

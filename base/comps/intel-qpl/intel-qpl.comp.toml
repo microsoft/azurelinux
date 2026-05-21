@@ -1,0 +1,22 @@
+[components.intel-qpl]
+
+# Drop -DSANITIZE_THREADS=ON from the cmake invocation. Enabling
+# ThreadSanitizer in a release build adds 2x-10x runtime overhead and
+# 5x-20x memory overhead per the LLVM TSan documentation
+# (https://clang.llvm.org/docs/ThreadSanitizer.html), so it has no
+# business being on in shipped binaries.
+#
+# It also breaks at load time in many container configurations: the TSan
+# runtime re-execs the process with personality(ADDR_NO_RANDOMIZE) to
+# disable ASLR (see compiler-rt/lib/sanitizer_common/sanitizer_linux.cpp
+# in llvm/llvm-project), and the personality(2) syscall is blocked by
+# Docker's default seccomp profile. The resulting failures show up as
+# "FATAL: ThreadSanitizer: unexpected memory mapping ..." aborts (e.g.
+# google/sanitizers#1716) when libqpl is loaded inside an unprivileged
+# container. Upstream made the same change in
+# https://src.fedoraproject.org/rpms/intel-qpl/c/7a433cf7338f7922f90b8819bcfd3b9fb9d4cb35
+[[components.intel-qpl.overlays]]
+description = "Disable ThreadSanitizer in release build (perf overhead + breaks under Docker seccomp)."
+type = "spec-search-replace"
+regex = '-DSANITIZE_THREADS=ON'
+replacement = "-DSANITIZE_THREADS=OFF"
