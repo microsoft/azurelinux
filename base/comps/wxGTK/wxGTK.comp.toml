@@ -1,6 +1,38 @@
+# gstreamer1-plugins-bad-free is not shipped in AZL.  wxGTK's wxMediaCtrl
+# implementation uses GstPlayer from gstreamer1-plugins-bad-free-devel.
+# Disable mediactrl at configure time, drop the BR, remove the runtime
+# Requires from wxGTK-devel, and remove the -media subpackage entirely.
+
 [components.wxGTK]
 
 [components.wxGTK.build]
 without = [
     "tests"
 ]
+
+[[components.wxGTK.overlays]]
+description = "Remove gstreamer1-plugins-bad-free-devel BuildRequires — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "gstreamer1-plugins-bad-free-devel"
+
+[[components.wxGTK.overlays]]
+description = "Disable wxMediaCtrl at configure time — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = '%configure \\'
+replacement = '''%configure \
+  --disable-mediactrl \'''
+
+[[components.wxGTK.overlays]]
+description = "Remove wxGTK-devel Requires on wxGTK-media — media subpackage is empty (mediactrl disabled)"
+type = "spec-remove-tag"
+section = "%package"
+package = "devel"
+tag = "Requires"
+value = "%{name}-media = %{version}-%{release}"
+
+[[components.wxGTK.overlays]]
+description = "Remove wxGTK-media subpackage — mediactrl is disabled and no media library is built"
+type = "spec-remove-subpackage"
+package = "media"

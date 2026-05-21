@@ -12,7 +12,7 @@
 
 Name:           wxGTK
 Version:        3.2.8
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        GTK port of the wxWidgets GUI library
 License:        LGPL-2.0-or-later WITH WxWindows-exception-3.1
 URL:            https://www.wxwidgets.org/
@@ -39,7 +39,6 @@ BuildRequires:  expat-devel
 BuildRequires:  SDL2-devel
 BuildRequires:  libGLU-devel
 BuildRequires:  libSM-devel
-BuildRequires:  gstreamer1-plugins-bad-free-devel
 BuildRequires:  gettext
 BuildRequires:  cppunit-devel
 BuildRequires:  libmspack-devel
@@ -103,7 +102,6 @@ ranging from networking to HTML display and image manipulation.
 Summary:        Development files for the wxGTK library
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-gl = %{version}-%{release}
-Requires:       %{name}-media = %{version}-%{release}
 Requires:       %{name}-webview = %{version}-%{release}
 Requires:       %{wxbasename} = %{version}-%{release}
 Requires:       %{wxbasename}-devel%{?_isa} = %{version}-%{release}
@@ -137,18 +135,6 @@ BuildArch:      noarch
 
 %description i18n
 i18n message catalogs for the wxWidgets library.
-wxWidgets is the GTK port of the C++ cross-platform wxWidgets
-GUI library, offering classes for all common GUI controls as well as a
-comprehensive set of helper classes for most common application tasks,
-ranging from networking to HTML display and image manipulation.
-
-
-%package        media
-Summary:        Multimedia add-on for the wxWidgets library
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description media
-Multimedia add-on for the wxWidgets library.
 wxWidgets is the GTK port of the C++ cross-platform wxWidgets
 GUI library, offering classes for all common GUI controls as well as a
 comprehensive set of helper classes for most common application tasks,
@@ -209,6 +195,7 @@ rm -f configure
 mkdir %{gtk3dir}
 pushd %{gtk3dir}
 %configure \
+  --disable-mediactrl \
   --with-gtk=3 \
   --with-opengl \
   --with-sdl \
@@ -336,9 +323,6 @@ fi
 %{_libdir}/libwx_gtk3u_gl-*.so.%{sover}*
 
 %files i18n -f wxstd-3.2.lang
-
-%files media
-%{_libdir}/libwx_gtk3u_media-*.so.%{sover}*
 
 %files webview
 %{_libdir}/libwx_gtk3u_webview-*.so.%{sover}*
