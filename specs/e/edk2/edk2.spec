@@ -813,6 +813,9 @@ done
 %{_datadir}/%{name}/experimental/*.raw
 %endif
 
+%endif
+
+%if %{build_riscv64}
 %files riscv64
 %common_files
 %dir %{_datadir}/%{name}/riscv

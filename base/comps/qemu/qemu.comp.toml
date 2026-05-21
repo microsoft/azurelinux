@@ -86,12 +86,6 @@ overlays = [
     # Azure Linux image, so we drop it entirely.
     #
     # Implementation notes:
-    # * The upstream spec sandwiches `%if %{have_libblkio}` between the tests
-    #   subpackage's `%description` and `%package block-blkio`, and again
-    #   between `%files tests` and `%files block-blkio`. `spec-remove-subpackage`
-    #   greedily consumes the trailing `%if` lines (per its documented
-    #   limitation), so we re-append `%if %{have_libblkio}` to the end of the
-    #   preceding sections to keep the block-blkio guards balanced.
     # * `%define testsdir` lives inside the removed `%package tests` block but
     #   is referenced from `%install`; we re-hoist it via `%define` (lazy
     #   expansion of `%{name}` / `%{_libdir}`) near the other top-of-spec
@@ -101,7 +95,5 @@ overlays = [
     #   after install to avoid "Installed (but unpackaged)" errors.
     { description = "Hoist `%define testsdir` so %install expands correctly after %package tests is removed",                                                     type = "spec-search-replace",      regex = '^%global enable_werror 0$', replacement = "%global enable_werror 0\n%define testsdir %{_libdir}/%{name}/tests-src" },
     { description = "Remove qemu-tests subpackage (test-only payload trips signing-pipeline deep scanner; not shipped in any Azure Linux image)",                  type = "spec-remove-subpackage",   package = "tests" },
-    { description = "Restore `%if %{have_libblkio}` ahead of %package block-blkio (consumed when the preceding tests subpackage was removed)",                     type = "spec-append-lines",        section = "%description", package = "qemu-pr-helper", lines = ["%if %{have_libblkio}"] },
-    { description = "Restore `%if %{have_libblkio}` ahead of %files block-blkio (consumed when the preceding %files tests section was removed)",                   type = "spec-append-lines",        section = "%files",       package = "common", lines = ["%if %{have_libblkio}"] },
     { description = "Drop test artefacts from buildroot after install (paired with qemu-tests subpackage removal)",                                                type = "spec-append-lines",        section = "%install",                                lines = ["# Azure Linux: qemu-tests subpackage removed; drop its payload from buildroot.", "rm -rf %{buildroot}%{testsdir}", "rm -f %{buildroot}%{_libdir}/%{name}/accel-qtest-*.so"] },
 ]
