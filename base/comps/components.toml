@@ -2161,6 +2161,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.msgpack]
 [components.msgraph]
 [components.msmtp]
+[components.msr-tools]
 [components.mstflint]
 [components.msv]
 [components.mt-st]

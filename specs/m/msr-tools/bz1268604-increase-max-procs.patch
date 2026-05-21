@@ -1,0 +1,36 @@
+diff -uNr msr-tools-master/cpuid.c msr-tools/cpuid.c
+--- msr-tools-master/cpuid.c	2013-09-09 19:49:29.000000000 -0700
++++ msr-tools/cpuid.c	2015-10-09 23:00:37.788754838 -0700
+@@ -184,7 +184,7 @@
+ 		exit(127);
+ 	} else if (argc == 2) {
+ 		cpu = strtoul(argv[1], &endptr, 0);
+-		if (*endptr || cpu > 255) {
++		if (*endptr || cpu > 65535) {
+ 			usage();
+ 			exit(127);
+ 		}
+diff -uNr msr-tools-master/rdmsr.c msr-tools/rdmsr.c
+--- msr-tools-master/rdmsr.c	2013-09-09 19:49:29.000000000 -0700
++++ msr-tools/rdmsr.c	2015-10-09 23:00:44.301570291 -0700
+@@ -168,7 +168,7 @@
+ 			break;
+ 		case 'p':
+ 			arg = strtoul(optarg, &endarg, 0);
+-			if (*endarg || arg > 255) {
++			if (*endarg || arg > 65535) {
+ 				usage();
+ 				exit(127);
+ 			}
+diff -uNr msr-tools-master/wrmsr.c msr-tools/wrmsr.c
+--- msr-tools-master/wrmsr.c	2013-09-09 19:49:29.000000000 -0700
++++ msr-tools/wrmsr.c	2015-10-09 23:00:52.589335391 -0700
+@@ -102,7 +102,7 @@
+ 			break;
+ 		case 'p':
+ 			arg = strtoul(optarg, &endarg, 0);
+-			if (*endarg || arg > 255) {
++			if (*endarg || arg > 65535) {
+ 				usage();
+ 				exit(127);
+ 			}
