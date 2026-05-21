@@ -2,6 +2,10 @@
 # No bcond exists; remove the BR and pass -DUSE_AVIF=OFF to cmake.
 # WebKitGTK has two cmake builds (GTK4 + GTK3); the flag applies globally.
 
+# gstreamer1-plugins-bad-free is not shipped in AZL.  WebKitGTK only
+# soft-recommends it for optional codec support; removing the Recommends
+# prevents package managers from trying to pull in a non-existent package.
+
 [components.webkitgtk]
 
 [[components.webkitgtk.overlays]]
@@ -17,3 +21,19 @@ section = "%build"
 regex = '%cmake \\'
 replacement = '''%cmake \
   -DUSE_AVIF=OFF \'''
+
+[[components.webkitgtk.overlays]]
+description = "Remove Recommends on gstreamer1-plugins-bad-free from webkitgtk6.0 package — not shipped in AZL"
+type = "spec-remove-tag"
+section = "%package"
+package = "webkitgtk6.0"
+tag = "Recommends"
+value = "gstreamer1-plugins-bad-free"
+
+[[components.webkitgtk.overlays]]
+description = "Remove Recommends on gstreamer1-plugins-bad-free from webkit2gtk4.1 package — not shipped in AZL"
+type = "spec-remove-tag"
+section = "%package"
+package = "webkit2gtk4.1"
+tag = "Recommends"
+value = "gstreamer1-plugins-bad-free"
