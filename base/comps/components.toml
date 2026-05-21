@@ -77,7 +77,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.anthy-unicode]
 [components.antlr]
 [components.antlr4-project]
-[components.aom]
 [components.aopalliance]
 [components.apache-commons-beanutils]
 [components.apache-commons-cli]

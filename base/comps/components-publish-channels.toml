@@ -47,7 +47,6 @@ components = [
     "ansible-pcp",
     "ant",
     "antlr",
-    "aom",
     "aopalliance",
     "apache-commons-beanutils",
     "apache-commons-cli",
