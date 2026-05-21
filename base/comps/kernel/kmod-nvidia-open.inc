@@ -34,7 +34,6 @@ Conflicts:      nvidia-closed-kmod
 # nvidia-open kmod is already present on the system. This makes kernel
 # upgrades carry the NVIDIA modules forward without forcing them on
 # systems that never had nvidia installed.
-Supplements:    (kmod-%{_kmod_name} and %{name}-core-uname-r = %{KVERREL})
 
 %description -n kernel-modules-%{_kmod_name}-%{nvidia_open_branch}
 Open-source NVIDIA GPU kernel modules (driver version %{nvidia_open_version})
