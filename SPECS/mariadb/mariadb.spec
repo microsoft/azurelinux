@@ -1474,7 +1474,6 @@ fi
  
 %if %{with galera}
 %files -n %{pkgname}-server-galera
-%doc Docs/README-wsrep
 %license LICENSE.clustercheck
 %{_bindir}/clustercheck
 %{_bindir}/galera_new_cluster
