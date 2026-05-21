@@ -10,3 +10,28 @@ description = "Add missing libdrm BuildRequires (gtk4 4.20+ meson requirement)"
 type = "spec-add-tag"
 tag = "BuildRequires"
 value = "pkgconfig(libdrm)"
+
+# gstreamer1-plugins-bad-free is not shipped in AZL.  Disable GTK4's
+# GStreamer media backend so the build and runtime do not depend on it.
+# GstPlayer (gstreamer-player-1.0) lives in gstreamer1-plugins-bad-free-libs,
+# which is the source of both the BuildRequires and the runtime Requires below.
+
+[[components.gtk4.overlays]]
+description = "Remove gstreamer-player-1.0 BuildRequires — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-player-1.0) >= %{gstreamer_version}"
+
+[[components.gtk4.overlays]]
+description = "Disable gstreamer media backend at meson configure time"
+type = "spec-search-replace"
+section = "%build"
+regex = '%meson \\'
+replacement = '''%meson \
+        -Dmedia-gstreamer=disabled \'''
+
+[[components.gtk4.overlays]]
+description = "Remove runtime Requires on gstreamer1-plugins-bad-free-libs (gstreamer media backend disabled)"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "gstreamer1-plugins-bad-free-libs%{?_isa} >= %{gstreamer_version}"
