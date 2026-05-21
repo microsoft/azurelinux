@@ -16,4 +16,7 @@ overlays = [
     "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
     "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
   ] },
+
+  # BOOT*.CSV files are UTF-16LE, so regex/replacement include explicit NUL bytes.
+  { description = "Set BOOT*.CSV boot-entry label from Fedora to AzureLinux", type = "file-search-replace", file = "BOOT*.CSV", regex = "F\u0000e\u0000d\u0000o\u0000r\u0000a\u0000", replacement = "A\u0000z\u0000u\u0000r\u0000e\u0000L\u0000i\u0000n\u0000u\u0000x\u0000" },
 ]

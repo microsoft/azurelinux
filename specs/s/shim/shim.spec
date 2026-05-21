@@ -8,7 +8,7 @@
 
 Name:		shim
 Version:	15.8
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:	First-stage UEFI bootloader
 License:	BSD-3-Clause
 URL:		https://github.com/rhboot/shim/
