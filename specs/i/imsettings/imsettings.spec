@@ -3,7 +3,7 @@
 
 Name:		imsettings
 Version:	1.8.10
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:	LGPL-2.0-or-later
 URL:		https://gitlab.com/tagoh/%{name}/
 BuildRequires:	desktop-file-utils
@@ -187,22 +187,6 @@ or the desktop.
 
 This package contains a module to get this working on LXDE.
 
-%package	cinnamon
-Summary:	Cinnamon support on imsettings
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-# need to keep more deps for similar reason to https://bugzilla.redhat.com/show_bug.cgi?id=693809
-Requires:	cinnamon
-Requires:	cinnamon-session
-Requires:	im-chooser
-Provides:	imsettings-desktop-module%{?_isa} = %{version}-%{release}
-
-%description	cinnamon
-IMSettings is a framework that delivers Input Method
-settings and applies the changes so they take effect
-immediately without any need to restart applications
-or the desktop.
-
-This package contains a module to get this working on Cinnamon.
 %endif
 
 %prep
@@ -246,6 +230,7 @@ desktop-file-validate $RPM_BUILD_ROOT%{_sysconfdir}/xdg/autostart/imsettings-sta
 ## Disable it because it requires DBus session
 # make check
 
+rm -f %{buildroot}%{_libdir}/imsettings/libimsettings-cinnamon-gsettings.so
 %post
 alternatives --install %{_sysconfdir}/X11/xinit/xinputrc xinputrc %{_sysconfdir}/X11/xinit/xinput.d/none.conf 10
 alternatives --install %{_sysconfdir}/X11/xinit/xinputrc xinputrc %{_sysconfdir}/X11/xinit/xinput.d/xcompose.conf 20
@@ -334,10 +319,6 @@ fi
 %doc AUTHORS ChangeLog NEWS README
 %{_libdir}/imsettings/libimsettings-lxde.so
 
-%files cinnamon
-%license COPYING
-%doc AUTHORS ChangeLog NEWS README
-%{_libdir}/imsettings/libimsettings-cinnamon-gsettings.so
 %endif
 
 %changelog

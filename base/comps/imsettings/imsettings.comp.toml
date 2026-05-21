@@ -1,0 +1,12 @@
+[components.imsettings]
+
+[[components.imsettings.overlays]]
+description = "Drop -cinnamon subpackage; Cinnamon DE not shipped on Azure Linux 4.0."
+type = "spec-remove-subpackage"
+package = "cinnamon"
+
+[[components.imsettings.overlays]]
+description = "Delete orphaned libimsettings-cinnamon-gsettings.so from buildroot."
+type = "spec-append-lines"
+section = "%install"
+lines = ["rm -f %{buildroot}%{_libdir}/imsettings/libimsettings-cinnamon-gsettings.so"]
