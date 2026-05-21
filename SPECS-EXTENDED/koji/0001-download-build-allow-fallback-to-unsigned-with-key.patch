@@ -1,0 +1,103 @@
+From 73b4f34bea6613e9bcc9acfe46761073cceaff5a Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Fri, 14 Mar 2025 16:04:21 -0700
+Subject: [PATCH 1/2] download-build: allow fallback to unsigned with --key
+
+If you pass --key to download-build and signed packages aren't
+available, Koji will skip the unsigned package, or error out.
+This adds a modified behavior controlled by the new
+--fallback-unsigned arg. If this is passed with --key, unsigned
+copies will be downloaded for packages for which no signed copy
+can be found.
+
+This is primarily intended to work with a proposed Bodhi feature:
+https://github.com/fedora-infra/bodhi/pull/5859 . That would
+make Bodhi's `bodhi updates download` command automatically try
+to download signed copies, but I think it would be best if it
+falls back to getting unsigned copies if that doesn't work. Just
+failing out entirely seems wrong for that case. Implementing the
+fallback in Bodhi itself is more awkward and messy than adding it
+in Koji, and it may be useful for others in Koji I guess.
+
+Note there are two distinct 'no signed copies' cases. In the
+simple one, queryRPMSigs tells us Koji has no record of the
+package ever being signed with the key in question. In this case
+we don't bother trying to download a signed copy. In the other
+case, queryRPMSigs tells us the package *has* been signed with
+the key, but it turns out that signed copy has been garbage-
+collected and we can no longer download it. In this case we have
+to catch the failure on the download attempt and retry the
+download with sigkey set to None.
+
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ cli/koji_cli/commands.py | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/cli/koji_cli/commands.py b/cli/koji_cli/commands.py
+index 29b6e0a6..73c586fc 100644
+--- a/cli/koji_cli/commands.py
++++ b/cli/koji_cli/commands.py
+@@ -19,6 +19,7 @@ from datetime import datetime
+ from dateutil.tz import tzutc
+ from optparse import SUPPRESS_HELP, OptionParser
+ 
++from requests.exceptions import HTTPError
+ import six
+ import six.moves.xmlrpc_client
+ from six.moves import filter, map, range, zip
+@@ -6830,6 +6831,8 @@ def anon_handle_download_build(options, session, args):
+     parser.add_option("--task-id", action="store_true", help="Interperet id as a task id")
+     parser.add_option("--rpm", action="store_true", help="Download the given rpm")
+     parser.add_option("--key", help="Download rpms signed with the given key")
++    parser.add_option("--fallback-unsigned", action="store_true",
++                      help="When used with --key: download unsigned if signed packages not found")
+     parser.add_option("--topurl", metavar="URL", default=options.topurl,
+                       help="URL under which Koji files are accessible")
+     parser.add_option("--noprogress", action="store_true", help="Do not display progress meter")
+@@ -6912,6 +6915,7 @@ def anon_handle_download_build(options, session, args):
+                 continue
+             rpms.append(rpm)
+ 
++    unsigned = []
+     if suboptions.key:
+         with session.multicall() as m:
+             results = [m.queryRPMSigs(rpm_id=r['id'], sigkey=suboptions.key) for r in rpms]
+@@ -6921,14 +6925,32 @@ def anon_handle_download_build(options, session, args):
+                 nvra = "%(nvr)s-%(arch)s.rpm" % rpm
+                 warn("No such sigkey %s for rpm %s" % (suboptions.key, nvra))
+                 rpms.remove(rpm)
++                if suboptions.fallback_unsigned:
++                    unsigned.append(rpm)
+ 
+-    size = len(rpms) + len(archives)
++    size = len(rpms) + len(unsigned) + len(archives)
+     number = 0
+ 
+     # run the download
+     for rpm in rpms:
+         number += 1
+-        download_rpm(info, rpm, suboptions.topurl, sigkey=suboptions.key, quiet=suboptions.quiet,
++        try:
++            download_rpm(info, rpm, suboptions.topurl, sigkey=suboptions.key, quiet=suboptions.quiet,
++                         noprogress=suboptions.noprogress, num=number, size=size)
++        except HTTPError as err:
++            # this is necessary even with the 'unsigned' handling above
++            # because sometimes queryRPMSigs will still tell us a
++            # package was signed with a given key, but the signed copy
++            # has been garbage-collected
++            if suboptions.key and suboptions.fallback_unsigned and err.response.status_code == 404:
++                warn("Signed copy not present, will download unsigned copy")
++                download_rpm(info, rpm, suboptions.topurl, sigkey=None, quiet=suboptions.quiet,
++                             noprogress=suboptions.noprogress, num=number, size=size)
++            else:
++                raise
++    for rpm in unsigned:
++        number += 1
++        download_rpm(info, rpm, suboptions.topurl, sigkey=None, quiet=suboptions.quiet,
+                      noprogress=suboptions.noprogress, num=number, size=size)
+     for archive in archives:
+         number += 1
+-- 
+2.52.0
+
