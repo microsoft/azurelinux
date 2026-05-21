@@ -26,7 +26,7 @@ Provides:       kmod-%{_kmod_name} = %{version}-%{release}
 # their matching kernels (dnf/dnf5 default installonlypkgs includes the
 # 'installonlypkg(kernel-module)' token).
 Provides:       installonlypkg(kernel-module)
-Requires:       %{name}-core-uname-r = %{KVERREL}
+Requires:       %{name}-uname-r = %{KVERREL}
 Requires(post): kmod
 Requires(postun): kmod
 Conflicts:      nvidia-closed-kmod
