@@ -7,7 +7,7 @@
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
 Version:        1.6.27
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,6 +18,7 @@ Patch0:         memcached-unit.patch
 Patch1:         CVE-2021-43519.patch
 Patch2:         CVE-2021-44647.patch
 Patch3:         CVE-2026-24809.patch
+Patch4:         CVE-2026-47783.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -132,6 +133,9 @@ exit 0
 %{_unitdir}/memcached.service
 
 %changelog
+* Thu May 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.27-5
+- Patch for CVE-2026-47783
+
 * Thu Jan 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.27-4
 - Patch for CVE-2026-24809
 
