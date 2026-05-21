@@ -12,7 +12,8 @@ build.without = ["v4l2"]
 #   2 - introduce azl_release for pipewire
 #   3 - disable opus codec support
 #   4 - drop webrtc-audio-processing BR
-azl_release = "4"
+#   5 - disable v4l2 support
+azl_release = "5"
 
 [[components.pipewire.overlays]]
 description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
