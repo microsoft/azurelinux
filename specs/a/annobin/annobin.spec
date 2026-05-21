@@ -5,7 +5,7 @@
 Name:    annobin
 Summary: Annotate and examine compiled binary files
 Version: 12.99
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
 URL: https://sourceware.org/annobin/
 # Maintainer: nickc@redhat.com
