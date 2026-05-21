@@ -96,6 +96,8 @@ Any Linux distribution, including Azure Linux, benefits from contributions by th
 
 We specifically want to thank [the Fedora Project](https://start.fedoraproject.org/) for providing us with a strong foundation across components, spec files, tools, services, and community. We are proud to participate and contribute to this community.
 
+The Azure Linux penguin icon is inspired by the Linux mascot ("Tux"), created by Larry Ewing.
+
 ## License
 
 Unless otherwise specified, the content of the Azure Linux distribution and this repository are distributed under an [MIT license](LICENSE).
