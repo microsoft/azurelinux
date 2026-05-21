@@ -9,8 +9,6 @@ Group:          System/Servers
 URL:            https://nlnetlabs.nl/projects/unbound/about/
 Source0:        https://github.com/NLnetLabs/%{name}/archive/release-%{version}.tar.gz#/%{name}-release-%{version}.tar.gz
 Source1:        %{name}.service
-Patch0:         CVE-2024-43168.patch
-Patch4:         CVE-2025-11411.patch
 BuildRequires:  expat-devel
 BuildRequires:  libevent-devel
 BuildRequires:  python3-devel
