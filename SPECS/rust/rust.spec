@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,7 +74,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-19%{?dist}
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -194,6 +194,9 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.90.0-8
+- Bump to rebuild with updated glibc
+
 * Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-7
 - Patch for CVE-2026-2006, CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
 

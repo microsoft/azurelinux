@@ -915,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.2.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.2.0.tar.gz"
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.3.0.tar.gz"
         }
       }
     },
@@ -2427,8 +2427,8 @@
         "type": "other",
         "other": {
           "name": "cups",
-          "version": "2.4.18",
-          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.18/cups-2.4.18-source.tar.gz"
+          "version": "2.4.19",
+          "downloadUrl": "https://github.com/OpenPrinting/cups/releases/download/v2.4.19/cups-2.4.19-source.tar.gz"
         }
       }
     },
@@ -4000,8 +4000,8 @@
         "type": "other",
         "other": {
           "name": "frr",
-          "version": "10.5.0",
-          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.0.tar.gz"
+          "version": "10.5.4",
+          "downloadUrl": "https://github.com/FRRouting/frr/archive/refs/tags/frr-10.5.4.tar.gz"
         }
       }
     },
@@ -4730,8 +4730,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.2",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.2-1/go1.26.2-20260407.2.src.tar.gz"
+          "version": "1.26.3",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.3-1/go1.26.3-20260508.1.src.tar.gz"
         }
       }
     },
@@ -4740,8 +4740,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.9",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.9-1/go1.25.9-20260407.1.src.tar.gz"
+          "version": "1.25.10",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.10-1/go1.25.10-20260507.2.src.tar.gz"
         }
       }
     },
@@ -5480,8 +5480,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.66",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.66.tar.bz2"
+          "version": "2.4.67",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.67.tar.bz2"
         }
       }
     },
@@ -8401,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.135.mshv2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.135.mshv2.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv1.tar.gz"
         }
       }
     },
@@ -8431,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-uvm",
-          "version": "6.6.130.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.130.mshv1.tar.gz"
+          "version": "6.6.137.mshv1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata-uvm/6.6.137.mshv1.tar.gz"
         }
       }
     },
@@ -10911,8 +10911,8 @@
         "type": "other",
         "other": {
           "name": "libpng",
-          "version": "1.6.57",
-          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.57.tar.xz"
+          "version": "1.6.58",
+          "downloadUrl": "https://downloads.sourceforge.net/libpng/libpng-1.6.58.tar.xz"
         }
       }
     },
@@ -13071,8 +13071,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.16",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.16/source/mariadb-10.11.16.tar.gz"
+          "version": "10.11.17",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.17/source/mariadb-10.11.17.tar.gz"
         }
       }
     },
@@ -21683,8 +21683,8 @@
         "type": "other",
         "other": {
           "name": "postgresql",
-          "version": "16.12",
-          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.12/postgresql-16.12.tar.bz2"
+          "version": "16.14",
+          "downloadUrl": "https://ftp.postgresql.org/pub/source/v16.14/postgresql-16.14.tar.bz2"
         }
       }
     },
@@ -23773,8 +23773,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "3.0.2",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.0.2.tar.gz"
+          "version": "3.2.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.2.1.tar.gz"
         }
       }
     },
