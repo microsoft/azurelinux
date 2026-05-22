@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.28.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,7 @@ Patch7:         CVE-2026-40701.patch
 Patch8:         CVE-2026-42934.patch
 Patch9:         CVE-2026-42945.patch
 Patch10:        CVE-2026-42946.patch
+Patch11:        0006-performance-tuning-nginx-conf.patch
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -80,6 +81,9 @@ tar -C nginx-njs -xf %{SOURCE2}
 
 %build
 sh configure \
+    --with-cc-opt='-O2 -flto=auto -ffat-lto-objects' \
+    --with-ld-opt='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -Wl,-z,relro -Wl,-z,now' \
+    --with-threads \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
@@ -172,6 +176,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Fri May 22 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.28.3-3
+- Performance tuning: set worker_processes auto with CPU affinity, enable tcp_nopush
+
 * Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-2
 - Patch for CVE-2026-42946, CVE-2026-42945, CVE-2026-42934, CVE-2026-40701, CVE-2026-40460
 
@@ -239,7 +246,7 @@ rm -rf nginx-tests
 - Enable http2 support
 
 * Fri Oct 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-1
-- Move to stable release 
+- Move to stable release
 
 * Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.2-1
 - Upgrade to 1.23.2 (fixes CVE-2022-41741 and CVE-2022-41742)
