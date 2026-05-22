@@ -21673,8 +21673,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.9.10",
-          "downloadUrl": "https://mirror.reverse.net/pub/postfix-release/official/postfix-3.9.10.tar.gz"
+          "version": "3.9.11",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/postfix-3.9.11.tar.gz"
         }
       }
     },
