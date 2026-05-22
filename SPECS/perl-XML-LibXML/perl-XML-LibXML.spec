@@ -115,10 +115,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n XML-LibXML-%{version}
-%patch 2 -p1
-%patch 0 -p1
-%patch 1 -p1
+%autosetup -p1 -n XML-LibXML-%{version}
 chmod -x *.c
 for i in Changes; do
   /usr/bin/iconv -f iso8859-1 -t utf-8 $i > $i.conv && /bin/mv -f $i.conv $i
