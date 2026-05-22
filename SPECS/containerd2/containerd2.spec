@@ -1,11 +1,11 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash c74fd8780002eb26bd5940ae339d690d891221c2
+%define commit_hash 193637f7ee8ae5f5aa5248f49e7baa3e6164966e
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.1.6
-Release: 4%{?dist}
+Version: 2.2.4
+Release: 1%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -18,11 +18,9 @@ Source2: containerd.toml
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
-Patch2:	fix-credential-leak-in-cri-errors.patch
-Patch3: CVE-2026-35469.patch
-Patch4: CVE-2026-34986.patch
-Patch5:	CVE-2026-39882.patch
-Patch6:	CVE-2026-33814.patch
+Patch2:	CVE-2026-39882.patch
+Patch3:	CVE-2026-33814.patch
+Patch4:	fix-TestCgroupNamespace-cgroupv1.patch
 
 %{?systemd_requires}
 
@@ -99,6 +97,17 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu May 21 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
+- Upgrade to 2.2.4
+- Pulls in CVE-2026-46680 fix (PR #13448 / 0a8f65bef)
+- Remove CVE-2026-34986.patch (in v2.2.4: go-jose/v4 v4.1.4, PR #13292 / 4413816ce)
+- Remove CVE-2026-35469.patch (in v2.2.3: spdystream v0.5.1 / 31bd34a06)
+- Remove fix-credential-leak-in-cri-errors.patch (in v2.2.2: PR #12491 / cb3ae2119)
+- Retain CVE-2026-39882.patch (otel v1.35.0 lacks PR #8108)
+- Retain CVE-2026-33814.patch (x/net v0.47.0 lacks 1e71bd86e)
+- Add fix-TestCgroupNamespace-cgroupv1.patch (PR #13240; allows %check on cgroup-v1 build hosts)
+- Regenerate multi-snapshotters-support.patch against v2.2.4 (upstream absorbed runtimeHandler plumbing in v2.2.3)
+
 * Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
 - Patch for CVE-2026-33814
 
