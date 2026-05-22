@@ -42,6 +42,8 @@ This applies to **every** commit that touches a component or its lock -- pin bum
 
 During iterative work (before any commit) the changelog/release fields are not expected to track the working tree. Only worry about the post-commit re-render once you're finalizing for a PR.
 
+> **Manual release components:** Keep the same post-commit re-render/amend workflow when finalizing, because rpmautospec-generated `%changelog` can still drift after you commit. The difference is that components with `release = { calculation = "manual" }` do **not** get their `Release:` value bumped automatically by that cycle. When modifying such a component, you must **manually increment** its release counter in the same change (for example via an `azl_release` define or a `spec-set-tag` overlay value). Check the component's `release.calculation` field before finalizing — if it's `manual`, do the re-render/amend step and bump the release counter yourself.
+
 ## Bumping an upstream commit pin
 
 Pin bumps follow the same rule as every other change: the changelog/release fields are derived from `git log`, so you need a post-commit re-render. The pin-bump variant just splits the work across two commits (lock first, then iterate, then amend), and adds an *extra* up-front `update` to move the pin.

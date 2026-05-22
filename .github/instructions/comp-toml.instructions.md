@@ -232,6 +232,8 @@ value = "1%{?dist}"
 
 **When using `manual`:** You take ownership of bumping the Release value when needed (e.g., rebuild without a version change). The auto-calculator will not touch it.
 
+> **Pitfall — modifying a component with manual release:** Unlike `auto`/`static`/`autorelease` modes, `manual` release components do NOT get their Release bumped by the commit-render-amend cycle. When you change a manual-release component (add/remove build flags, modify overlays, etc.), you **must** also increment the release counter in the same change — typically an `azl_release` define in `[components.<name>.build.defines]` or the `value` in a `spec-set-tag` overlay for `Release`.
+
 ## Render Configuration
 
 The `render` section controls spec rendering behavior. Currently has one field:

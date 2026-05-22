@@ -90,6 +90,7 @@ grep -rn "<name>" --include="*.kiwi" .                  # should return nothing
 ## Notes
 
 - **Check for reverse dependencies** before removing a component. If other components depend on it (via `BuildRequires` or `Requires`), removing it will break their builds.
+- **When modifying dependants, check their release calculation.** If you disable a feature or remove a `BuildRequires` from a dependant component that uses `release = { calculation = "manual" }`, you must also bump its release counter (e.g., increment the `azl_release` define). Components with automatic release calculation (`auto`, `static`, `autorelease`) handle this via the commit-render-amend cycle, but manual-release components do not.
 - **Publishing is component-scoped, exceptions are binary-scoped.** The `base-packages` group lists *component* names; the `exceptions-packages` group lists *binary RPM* names with `# srpm: <name>` comments. Always search by `# srpm:` comment rather than guessing suffix patterns.
 - **This is a metadata-only change.** No builds or tests are needed — the component is simply being dropped from the distro definition.
 - **When removing a component and its exclusive dependencies** (packages only needed by the component being removed), remove them all in the same change to keep the tree consistent.
