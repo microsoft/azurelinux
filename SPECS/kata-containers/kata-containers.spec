@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           kata-containers
-Version:        3.19.1.kata3
+Version:        3.19.1.kata3.sprt2
 Release:        1%{?dist}
 
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
@@ -116,6 +116,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3.sprt2-1
+- Auto-upgrade to 3.19.1.kata3.sprt2
+
 * Mon Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
 - Auto-upgrade to 3.19.1.kata3
 - Remove CVE-2025-65637.patch that no longer applies
