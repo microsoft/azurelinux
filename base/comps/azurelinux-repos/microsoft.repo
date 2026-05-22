@@ -1,0 +1,11 @@
+[azurelinux-microsoft]
+name=Azure Linux $releasever - $basearch - Microsoft
+baseurl=https://packages.microsoft.com/azurelinux/$releasever/beta/microsoft/$basearch
+enabled=1
+countme=1
+metadata_expire=7d
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=False

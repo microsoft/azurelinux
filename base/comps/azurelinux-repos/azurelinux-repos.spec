@@ -12,6 +12,7 @@ BuildRequires:  gnupg sed rpm
 
 Source1:        archmap
 Source2:        azurelinux.repo.in
+Source3:        microsoft.repo
 
 Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
 
@@ -121,6 +122,16 @@ render_repo \
     'https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev' \
     0 0 '6h'
 
+# Install the Microsoft subrepo in both subpackages. The URL is fixed to
+# packages.microsoft.com (the Microsoft-curated content lives there
+# regardless of which Azure Linux base repo a system is pointed at), so the
+# same file is shipped to both variants. The .main / .dev suffixes are
+# stripped by RemovePathPostfixes.
+install -m 644 %{SOURCE3} \
+    "$RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.main"
+install -m 644 %{SOURCE3} \
+    "$RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.dev"
+
 %check
 # Make sure all repo variables were substituted
 for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/*.repo.*; do
@@ -172,6 +183,26 @@ for repo in "$main_file" "$dev_file"; do
     fi
 done
 
+# Microsoft subrepo: shipped in both subpackages. Must exist, be enabled by
+# default, GPG-signed, and point at packages.microsoft.com.
+for microsoft_file in \
+    $RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.main \
+    $RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.dev; do
+    if [ ! -f "$microsoft_file" ]; then
+        echo "ERROR: missing $microsoft_file"
+        exit 1
+    fi
+    if ! grep -q '^baseurl=https://packages.microsoft.com/azurelinux/\$releasever/beta/microsoft/\$basearch$' "$microsoft_file"; then
+        echo "ERROR: $microsoft_file must point at packages.microsoft.com microsoft subrepo"
+        exit 1
+    fi
+    if [ "$(grep -c '^enabled=1' "$microsoft_file")" -ne 1 ] || \
+       [ "$(grep -c '^gpgcheck=1' "$microsoft_file")" -ne 1 ]; then
+        echo "ERROR: $microsoft_file must be enabled=1 and gpgcheck=1"
+        exit 1
+    fi
+done
+
 # Check arch keys exists on supported architectures, and RPM considers
 # them valid
 TMPRING=$(mktemp)
@@ -190,10 +221,12 @@ rm -f "$TMPRING"
 %files
 %dir /etc/yum.repos.d
 %config(noreplace) /etc/yum.repos.d/azurelinux.repo.main
+%config(noreplace) /etc/yum.repos.d/microsoft.repo.main
 
 %files dev
 %dir /etc/yum.repos.d
 %config(noreplace) /etc/yum.repos.d/azurelinux.repo.dev
+%config(noreplace) /etc/yum.repos.d/microsoft.repo.dev
 
 %files -n azurelinux-gpg-keys
 %dir /etc/pki/rpm-gpg
