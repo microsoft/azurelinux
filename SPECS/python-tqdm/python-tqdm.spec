@@ -27,7 +27,7 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-wheel
 BuildRequires:  python3-packaging
 BuildRequires:  python3-setuptools_scm
-%if 0%{with_check}
+%if 0%{?with_check}
 BuildRequires:  python3-pytest
 %ifarch x86_64
 BuildRequires:  python3-tensorflow
@@ -92,7 +92,6 @@ pip3 install iniconfig \
 %changelog
 * Thu May 14 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.67.2-1
 - Upgrade to 4.67.2 to fix ptest errors resulting from incompatibility between python‑tqdm and newer pandas.
-- This version also includes the fix for CVE-2024-34062.
 
 * Fri Feb 07 2025 Kanishk Bansal <kanbansal@microsoft.com> - 4.66.2-2
 - Patch CVE-2024-34062
