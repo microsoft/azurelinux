@@ -1,0 +1,40 @@
+From 54b69dc8fc0e39d49b23b1b3478299efe66ec4fa Mon Sep 17 00:00:00 2001
+From: Ratiranjan Behera <v-ratbehera@microsoft.com>
+Date: Thu, 21 May 2026 10:38:18 +0000
+Subject: [PATCH] http-return-timedout-when-retry-deadline-is-exhausted
+
+---
+ crates/trident/src/io_utils/http/mod.rs | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/crates/trident/src/io_utils/http/mod.rs b/crates/trident/src/io_utils/http/mod.rs
+index e861bbc..6f782c6 100644
+--- a/crates/trident/src/io_utils/http/mod.rs
++++ b/crates/trident/src/io_utils/http/mod.rs
+@@ -96,14 +96,21 @@ where
+                 if response.status().is_success() {
+                     return Ok(response);
+                 } else if Instant::now() > timeout_time {
+-                    return response.error_for_status().map_err(http_to_io_err);
++                   let status = response.status();
++                   return Err(IoError::new(
++                       IoErrorKind::TimedOut,
++                       format!("HTTP request timed out after retries; last status: {status}"),
++                   ));
+                 } else {
+                     warn!("HTTP request failed with status: {}", response.status());
+                 }
+             }
+             Err(e) => {
+                 if Instant::now() > timeout_time {
+-                    return Err(http_to_io_err(e));
++                    return Err(IoError::new(
++                        IoErrorKind::TimedOut,
++                        format!("HTTP request timed out after retries: {e}"),
++                    ));
+                 }
+                 warn!("HTTP request failed: {e}");
+             }
+-- 
+2.45.4
+

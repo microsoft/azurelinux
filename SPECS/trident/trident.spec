@@ -10,7 +10,7 @@ Summary:        Declarative, security-first OS lifecycle agent designed primaril
 Name:           trident
 # Use hard-coded versions for distro build
 Version:        0.22.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Group:          Applications/System
@@ -33,6 +33,7 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Source1:        osmodifier
 %endif
 
+Patch0:         0001-http-return-timedout-when-retry-deadline-is-exhauste.patch
 BuildRequires:  openssl-devel
 BuildRequires:  protobuf-compiler
 BuildRequires:  protobuf-devel
@@ -300,6 +301,9 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Fri May 22 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> 0.22.0-2
+- Fix ptests failures.
+
 * Thu Mar 26 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.22.0-1
 - Upgrade to version 0.22.0
 
