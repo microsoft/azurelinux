@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.28.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,7 @@ URL:            https://nginx.org/
 Source0:        https://nginx.org/download/%{name}-%{version}.tar.gz
 Source1:        nginx.service
 Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.tar.gz#/%{name}-njs-%{njs_version}.tar.gz
+Source4:        nginx.conf
 
 %if 0%{?with_check}
 Source3:        nginx-tests.tgz
@@ -80,6 +81,7 @@ tar -C nginx-njs -xf %{SOURCE2}
 
 %build
 sh configure \
+    --with-threads \
     --add-module=../nginx-njs/njs-%{njs_version}/nginx   \
     --conf-path=%{_sysconfdir}/nginx/nginx.conf    \
     --error-log-path=%{_var}/log/nginx/error.log   \
@@ -114,6 +116,9 @@ install -vdm755 %{buildroot}%{_var}/log
 install -vdm755 %{buildroot}%{_var}/opt/nginx/log
 ln -sfv %{_var}/opt/nginx/log %{buildroot}%{_var}/log/nginx
 install -p -m 0644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/nginx.service
+
+# Override the upstream default nginx.conf with the Azure Linux custom configuration.
+install -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/%{name}/nginx.conf
 
 # Using the ones provided through the "nginx-mimetype" package.
 rm -f %{buildroot}%{_sysconfdir}/%{name}/mime.types
@@ -172,6 +177,10 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Jun 01 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.28.3-3
+- Ship custom nginx.conf as %{SOURCE4}, overriding the upstream default.
+- Drop 0006-performance-tuning-nginx-conf.patch (superseded by custom nginx.conf).
+
 * Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-2
 - Patch for CVE-2026-42946, CVE-2026-42945, CVE-2026-42934, CVE-2026-40701, CVE-2026-40460
 
@@ -239,7 +248,7 @@ rm -rf nginx-tests
 - Enable http2 support
 
 * Fri Oct 28 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.22.1-1
-- Move to stable release 
+- Move to stable release
 
 * Tue Oct 25 2022 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.23.2-1
 - Upgrade to 1.23.2 (fixes CVE-2022-41741 and CVE-2022-41742)
