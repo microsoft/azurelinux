@@ -1,0 +1,42 @@
+From 4db79a322db8c97f7b73b8a347395ef4d685eb40 Mon Sep 17 00:00:00 2001
+From: Sabrina Dubroca <sd@queasysnail.net>
+Date: Wed, 20 May 2026 22:44:42 +0200
+Subject: [PATCH] net: gro: don't merge zcopy skbs
+
+skb_gro_receive() can currently copy frags between the source and GRO
+skb, without checking the zerocopy status, and in particular the
+SKBFL_MANAGED_FRAG_REFS flag.
+
+When SKBFL_MANAGED_FRAG_REFS is set, the skb doesn't hold a reference
+on the pages in shinfo->frags. Appending those frags to another skb's
+frags without fixing up the page refcount can lead to UAF.
+
+When either the last skb in the GRO chain (the one we would append
+frags to) or the source skb is zerocopy, don't merge the skbs.
+
+Fixes: 753f1ca4e1e5 ("net: introduce managed frags infrastructure")
+Reported-by: Huzaifa Sidhpurwala <huzaifas@redhat.com>
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Link: https://patch.msgid.link/c3b7f906bbfcbdfd7b4fa9d6c18a438870df85be.1779307748.git.sd@queasysnail.net
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/core/gro.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 9f8960789b2cf..a847539834679 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -109,6 +109,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
+ 	if (p->pp_recycle != skb->pp_recycle)
+ 		return -ETOOMANYREFS;
+ 
++	if (skb_zcopy(p) || skb_zcopy(skb))
++		return -ETOOMANYREFS;
++
+ 	if (unlikely(p->len + len >= netif_get_gro_max_size(p->dev, p) ||
+ 		     NAPI_GRO_CB(skb)->flush))
+ 		return -E2BIG;
+-- 
+2.34.1
