@@ -5,7 +5,7 @@
 
 Name:           python-%{pkg_name}
 Version:        2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Python 3 implementation of geographiclib
 
 License:        MIT
@@ -43,8 +43,8 @@ A translation of the GeographicLib::Geodesic class to Python.
 # Native build
 %pyproject_wheel
 # MinGW build
-
-
+:
+:
 
 
 %install
@@ -53,10 +53,10 @@ A translation of the GeographicLib::Geodesic class to Python.
 %pyproject_save_files -l geographiclib
 # MinGW build
 (
-
-
+:
+:
 )
-
+:
 
 
 %check
