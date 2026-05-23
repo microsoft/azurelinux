@@ -1,5 +1,11 @@
 {
   "Signatures": {
+    "0001-crypto-scatterwalk-Backport-memcpy_sglist.patch": "33d2671511ddda7673f399cc3ac95f0687c9912060a9c5ad045bb409bc2e64d3",
+    "0002-crypto-algif_aead-use-memcpy_sglist-instead-of-null-skcipher.patch": "5cf1d47129b8c638e676f6990709877f76b0d5b908694ee88b94dad58c4f1495",
+    "0003-crypto-algif_aead-Revert-to-operating-out-of-place.patch": "e27d40154c3e8d3d8a03543cefac049d3422eeedfa335e41c0ca7774e7e1a7f5",
+    "0004-crypto-algif_aead-snapshot-IV-for-async-AEAD-requests.patch": "7b75f5397cbdafae33def95c6297cfa9669ad2cea8fccd439c950823de28c3ce",
+    "0005-crypto-algif_aead-Fix-minimum-RX-size-check-for-decryption.patch": "38e7f1433c15460635d543338a6234596042711eb76f2fb9408b93a7ac6543c4",
+    "0006-crypto-authenc-use-memcpy_sglist-instead-of-null-skcipher.patch": "03272af39d89e767a24ac442ba04ae2e9d3f2484c75f9dc2cdf780a9d6098acd",
     "cbl-mariner-ca-20211013-20230216.pem": "228046d92ccb7d268cf4f195425c0f990afa00a968cc940fb1df4629fb7a6765",
     "config": "2c72d5eb716de25bccbb65c7d38a14d285e309f6d328f3475d2385019f5ecfff",
     "config_aarch64": "7f94b2221de7195b2f2b35332f080c56371fcbd31fbc65b1683cf2a75ee90c78",

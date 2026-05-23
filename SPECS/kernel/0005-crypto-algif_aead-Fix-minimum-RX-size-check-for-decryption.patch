@@ -1,0 +1,37 @@
+From fd427dd84f224309afbcc2cb67c7bb770a01265c Mon Sep 17 00:00:00 2001
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 29 Apr 2026 23:36:04 -0700
+Subject: [PATCH] crypto: algif_aead - Fix minimum RX size check for decryption
+
+commit 3d14bd48e3a77091cbce637a12c2ae31b4a1687c upstream.
+
+The check for the minimum receive buffer size did not take the
+tag size into account during decryption.  Fix this by adding the
+required extra length.
+
+Reported-by: syzbot+aa11561819dc42ebbc7c@syzkaller.appspotmail.com
+Reported-by: Daniel Pouzzner <douzzer@mega.nu>
+Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ crypto/algif_aead.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 24e77f496..4a285994d 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -150,7 +150,7 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	if (usedpages < outlen) {
+ 		size_t less = outlen - usedpages;
+ 
+-		if (used < less) {
++		if (used < less + (ctx->enc ? 0 : as)) {
+ 			err = -EINVAL;
+ 			goto free;
+ 		}
+-- 
+2.50.1 (Apple Git-155)
+

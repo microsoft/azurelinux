@@ -28,7 +28,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        5.15.202.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Mariner
@@ -40,6 +40,14 @@ Source2:        config_aarch64
 Source3:        sha512hmac-openssl.sh
 Source4:        cbl-mariner-ca-20211013-20230216.pem
 Patch0:         nvme_multipath_default_false.patch
+# CVE-2026-31431 backport: linux-stable v5.15.204 fix series for the
+# crypto/algif_aead "copy.fail" page-cache write primitive.
+Patch1:         0001-crypto-scatterwalk-Backport-memcpy_sglist.patch
+Patch2:         0002-crypto-algif_aead-use-memcpy_sglist-instead-of-null-skcipher.patch
+Patch3:         0003-crypto-algif_aead-Revert-to-operating-out-of-place.patch
+Patch4:         0004-crypto-algif_aead-snapshot-IV-for-async-AEAD-requests.patch
+Patch5:         0005-crypto-algif_aead-Fix-minimum-RX-size-check-for-decryption.patch
+Patch6:         0006-crypto-authenc-use-memcpy_sglist-instead-of-null-skcipher.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -163,6 +171,12 @@ manipulation of eBPF programs and maps.
 %prep
 %setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-mariner-2-%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
 make mrproper
 
@@ -426,6 +440,22 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri May 23 2026 Omkhar Arasaratnam <omkhar@linkedin.com> - 5.15.202.1-2
+- Backport upstream fix for CVE-2026-31431 ("copy.fail") — page-cache write
+  primitive in crypto/algif_aead's authencesn AF_ALG splice path. Six commits
+  cherry-picked verbatim from linux-stable linux-5.15.y (first released in
+  v5.15.204):
+    - 36435a56cd6b crypto: scatterwalk - Backport memcpy_sglist()
+    - 17774d99bb43 crypto: algif_aead - use memcpy_sglist() instead of null skcipher
+    - 19d43105a97b crypto: algif_aead - Revert to operating out-of-place
+      (upstream a664bf3d603d, load-bearing fix; Reported-by: Taeyang Lee
+      <0wn@theori.io>, Signed-off-by: Herbert Xu)
+    - a920cabdb0b7 crypto: algif_aead - snapshot IV for async AEAD requests
+      (upstream 5aa58c3a572b)
+    - fd427dd84f22 crypto: algif_aead - Fix minimum RX size check for decryption
+      (upstream 3d14bd48e3a7)
+    - e416c41a96c8 crypto: authenc - use memcpy_sglist() instead of null skcipher
+
 * Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.15.202.1-1
 - Auto-upgrade to 5.15.202.1
 
