@@ -1,4 +1,6 @@
 Patch0001: 0001-Revert-templates-Fix-user-facing-typo-with-an-incorr.patch
+Patch0002: 0002-Revert-templates-Properly-disable-the-os-prober-by-d.patch
+Patch0003: 0003-Revert-templates-Disable-the-os-prober-by-default.patch
 Patch0004: 0004-Rework-linux-command.patch
 Patch0005: 0005-Rework-linux16-command.patch
 Patch0006: 0006-re-write-.gitignore.patch
