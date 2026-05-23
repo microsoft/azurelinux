@@ -2,7 +2,7 @@
 
 Summary:        A Linux entropy source using the HAVEGE algorithm
 Name:           haveged
-Version:        1.9.17
+Version:        1.9.22
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -102,6 +102,9 @@ rm -rf %{buildroot}%{_libdir}/libhavege.*a
 
 
 %changelog
+* Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.22-1
+- Auto-upgrade to 1.9.22 - for CVE-2026-41054
+
 * Thu Feb 17 2022 Cameron Baird <cameronbaird@microsoft.com> - 1.9.17-1
 - Update to v1.9.17
 - Configure build to run with additional tests
