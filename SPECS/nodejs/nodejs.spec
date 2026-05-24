@@ -72,6 +72,7 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       brotli-devel
 Requires:       openssl-devel >= 1.1.1
 Requires:       zlib-devel
+Obsoletes:      nodejs-devel < %{version}-%{release}
 
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
@@ -89,11 +90,11 @@ package to save space if non-English locales are not needed.
 Summary:        Node.js Package Manager
 Group:          System Environment/Base
 Requires:       %{name} = %{version}-%{release}
+Provides:       npm = %{npm_version}.%{version}-%{release}
 Provides:       nodejs-npm = %{version}-%{release}
 Provides:       nodejs24-npm = %{version}-%{release}
 Obsoletes:      nodejs24-npm < %{version}-%{release}
 Obsoletes:      nodejs-npm < %{version}-%{release}
-Conflicts:      npm
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
