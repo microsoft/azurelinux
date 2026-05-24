@@ -5,6 +5,14 @@
 # gstreamer1-plugins-bad-free is not shipped in AZL.  WebKitGTK only
 # soft-recommends it for optional codec support; removing the Recommends
 # prevents package managers from trying to pull in a non-existent package.
+# The hard BuildRequires on pkgconfig(gstreamer-plugins-bad-1.0) in the
+# Fedora spec is vestigial — under default cmake options the WebKitGTK
+# 2.50 sources do not actually #include any gst-plugins-bad headers
+# (gst-bad is only reached via GSTREAMER_MPEGTS / GSTREAMER_WEBRTC /
+# LIBWEBRTC code paths, all of which default OFF for the GTK port).
+# Removing just the BR is therefore sufficient to unblock the build
+# without changing any runtime feature surface (MSE/EME stay at their
+# upstream defaults).
 
 [components.webkitgtk]
 
@@ -15,7 +23,13 @@ tag = "BuildRequires"
 value = "pkgconfig(libavif)"
 
 [[components.webkitgtk.overlays]]
-description = "Disable avif support in WebKitGTK cmake builds"
+description = "Remove gstreamer-plugins-bad-1.0 BuildRequires (gstreamer1-plugins-bad-free not shipped in AZL; vestigial in upstream spec, no gst-bad headers are #included under default cmake options)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-plugins-bad-1.0)"
+
+[[components.webkitgtk.overlays]]
+description = "Disable avif support in WebKitGTK cmake builds (libavif not available in AZL)"
 type = "spec-search-replace"
 section = "%build"
 regex = '%cmake \\'
