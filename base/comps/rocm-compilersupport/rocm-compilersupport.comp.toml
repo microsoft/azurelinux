@@ -1,3 +1,36 @@
 [components.rocm-compilersupport]
-# Release: 15.rocm%{rocm_version}%{?dist}
+# Release is composed in the overlay below as
+#   Release: %[15 + %{azl_release}].rocm%{rocm_version}%{?dist}
+# The "15 +" base anchors the formula at the last hard-coded Release
+# value before the counter was introduced; %{azl_release} then adds the
+# number of AZL-only rebuilds on top of that, ensuring Release stays
+# monotonic across the switchover.
 release = { calculation = "manual" }
+
+[components.rocm-compilersupport.build.defines]
+# AZL-only release counter. Composed with the "15." base via the overlay
+# below (Release: %[15 + %{azl_release}].rocm...), keeping a monotonically
+# increasing single-number Release schema. Bump whenever an AZL-only
+# change requires a new RPM (new overlay, build-flag change, rebuild
+# against new dependency) WITHOUT moving the upstream pin.
+#
+# Current value matches the number of times the lock file's
+# input-fingerprint has changed. Each commit that touches a tracked
+# input (overlay edit, build-define change, lock pin refresh, etc.)
+# advances the counter by one in the same PR.
+#
+# Commits that have bumped this counter (newest last):
+#   1. feat: introduce deterministic commit resolution via Azure Linux lock file
+#   2. fix(rocm-compilersupport): set manual release calculation
+#   3. fix(rocm-compilersupport): introduce azl_release counter
+azl_release = "3"
+
+[[components.rocm-compilersupport.overlays]]
+# spec-set-tag is the documented form for manual-release components and is
+# anchor-free, so this survives upstream Release-line restructures (e.g.
+# Fedora's rocm-7.x preview branch wraps Release in %if/%endif which would
+# break a literal spec-search-replace anchor).
+description = "Set Release to %{azl_release}-driven formula so AZL-only rebuilds bump cleanly without manual edits"
+type = "spec-set-tag"
+tag = "Release"
+value = "%[15 + %{azl_release}].rocm%{rocm_version}%{?dist}"
