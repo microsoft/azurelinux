@@ -463,6 +463,12 @@ popd
 
 build_stage1=$p/build-llvm
 
+# AZL: drop the per-triple clang config inside the stage-1 build tree so
+# every subsequent stage (stage-2 llvm, device-libs, comgr, hipcc) compiled
+# by this clang finds the Azure Linux GCC toolchain at
+# /usr/lib/gcc/%{_target_cpu}-%{_vendor}-linux/.
+echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > $build_stage1/bin/%{llvm_triple}.cfg
+
 %global llvmrocm_stage1_config \\\
     -DCMAKE_AR=$build_stage1/bin/llvm-ar \\\
     -DCMAKE_C_COMPILER=$build_stage1/bin/clang \\\
@@ -501,6 +507,12 @@ export LD_LIBRARY_PATH=$PWD/build-llvm-2/lib
        -DLLVM_TOOL_LIBCXX_BUILD=ON \
        -DLLVM_ENABLE_PROJECTS=%{llvm_projects} \
        -DLLVM_ENABLE_RUNTIMES=%{llvm_runtimes}
+
+# AZL: pre-stage the per-triple clang config inside build-llvm-2/bin so
+# the LLVM runtimes sub-build can locate the Azure Linux GCC toolchain.
+# The .cfg only needs to exist by the time clang is invoked.
+mkdir -p $PWD/build-llvm-2/bin
+echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > $PWD/build-llvm-2/bin/%{llvm_triple}.cfg
        
 %cmake_build -j ${JOBS}
 popd
@@ -730,6 +742,13 @@ rm %{buildroot}%{_bindir}/hip*.pl
 %fdupes %{buildroot}%{_prefix}
 %endif
 
+
+# AZL: drop a per-triple clang config file next to the shipped rocm-llvm
+# binaries so every clang/clang++/flang/clang-cl/clang-dxc invocation that
+# uses the default (AZL) target triple can locate the GCC toolchain at
+# /usr/lib/gcc/%{_target_cpu}-%{_vendor}-linux/. Cross-target invocations
+# (--target=<other>) do not match this filename and are unaffected.
+echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > %{buildroot}%{bundle_prefix}/bin/%{llvm_triple}.cfg
 %files macros
 %{_rpmmacrodir}/macros.rocmcompiler
 
@@ -982,6 +1001,7 @@ rm %{buildroot}%{_bindir}/hip*.pl
 %{bundle_prefix}/share/clang/*
 %{bundle_prefix}/share/clang-doc
 
+%{bundle_prefix}/bin/%{llvm_triple}.cfg
 %files -n rocm-clang-devel
 %license clang/LICENSE.TXT
 %{bundle_prefix}/include/clang/*
