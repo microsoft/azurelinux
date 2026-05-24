@@ -72,6 +72,9 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       brotli-devel
 Requires:       openssl-devel >= 1.1.1
 Requires:       zlib-devel
+Provides:       nodejs-devel = %{version}-%{release}
+Provides:       nodejs24-devel = %{version}-%{release}
+Obsoletes:      nodejs24-devel < %{version}-%{release}
 Obsoletes:      nodejs-devel < %{version}-%{release}
 
 %description    devel
@@ -95,6 +98,7 @@ Provides:       nodejs-npm = %{version}-%{release}
 Provides:       nodejs24-npm = %{version}-%{release}
 Obsoletes:      nodejs24-npm < %{version}-%{release}
 Obsoletes:      nodejs-npm < %{version}-%{release}
+Obsoletes:      npm < %{version}-%{release}
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
