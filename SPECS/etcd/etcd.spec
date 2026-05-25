@@ -2,8 +2,8 @@
 
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.28
-Release:        2%{?dist}
+Version:        3.5.30
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -149,6 +149,11 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
+- Upgrade to version 3.5.30 (fixes CVE-2026-44283).
+
+* Mon May 04 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.5.28-2
+- Patch for CVE-2026-29181
 
 * Fri Mar 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.28-1
 - Upgrade to version 3.5.28 (fixes CVE-2026-33413 and CVE-2026-33343).
