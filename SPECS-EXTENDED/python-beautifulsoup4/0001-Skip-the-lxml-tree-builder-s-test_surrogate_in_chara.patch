@@ -1,0 +1,83 @@
+From ec4a722af07341c4aa3fe604b077a1f773c6fdd2 Mon Sep 17 00:00:00 2001
+From: Leonard Richardson <leonardr@segfault.org>
+Date: Sun, 7 Dec 2025 13:10:42 -0500
+Subject: [PATCH] * Skip the lxml tree builder's
+ test_surrogate_in_character_reference test   if the libxml2 version is less
+ than 2.13.0. Prior versions of libxml2   don't issue the REPLACEMENT
+ CHARACTER we're expecting. [bug=2134346]
+
+---
+ CHANGELOG              |  6 ++++++
+ bs4/tests/test_lxml.py | 14 +++++++++++++-
+ tox.ini                |  2 +-
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/CHANGELOG b/CHANGELOG
+index 544f128..f61b7e9 100644
+--- a/CHANGELOG
++++ b/CHANGELOG
+@@ -1,3 +1,9 @@
++= Unreleased
++
++* Skip the lxml tree builder's test_surrogate_in_character_reference test
++  if the libxml2 version is less than 2.13.0. Prior versions of libxml2
++  don't issue the REPLACEMENT CHARACTER we're expecting. [bug=2134346]
++
+ = 4.14.3 (20251130)
+ 
+ * When using one of the lxml tree builders, you can pass in
+diff --git a/bs4/tests/test_lxml.py b/bs4/tests/test_lxml.py
+index 0b69956..aa82143 100644
+--- a/bs4/tests/test_lxml.py
++++ b/bs4/tests/test_lxml.py
+@@ -7,6 +7,7 @@ from . import LXML_PRESENT, LXML_VERSION
+ 
+ if LXML_PRESENT:
+     from bs4.builder._lxml import LXMLTreeBuilder, LXMLTreeBuilderForXML
++    from lxml import etree
+ 
+ from bs4 import (
+     BeautifulStoneSoup,
+@@ -47,7 +48,6 @@ class TestLXMLTreeBuilder(HTMLTreeBuilderSmokeTest):
+ 
+     # In lxml < 2.3.5, an empty doctype causes a segfault. Skip this
+     # test if an old version of lxml is installed.
+-
+     @pytest.mark.skipif(
+         not LXML_PRESENT or LXML_VERSION < (2, 3, 5, 0),
+         reason="Skipping doctype test for old version of lxml to avoid segfault.",
+@@ -57,6 +57,18 @@ class TestLXMLTreeBuilder(HTMLTreeBuilderSmokeTest):
+         doctype = soup.contents[0]
+         assert "" == doctype.strip()
+ 
++    # This is a copy of the HTMLTreeBuilderSmokeTest implementation.
++    # For lxml only, we need to skip the test if the libxml2 version doesn't
++    # have the fix from https://gitlab.gnome.org/GNOME/libxml2/-/commit/4dcc2d743eb83b8aaec0d91660d615fdb024dad0. That means any pre-2.13 version.
++    @pytest.mark.skipif(
++        "etree.LIBXML_VERSION < (2, 13, 0)",
++        reason="libxml version doesn't issue REPLACEMENT CHARACTER",
++    )
++    def test_surrogate_in_character_reference(self):
++        # These character references are invalid and should be replaced with REPLACEMENT CHARACTER.
++        soup = self.soup("<html><body>&#55357;&#56551;</body></html>")
++        assert soup.body.contents == ['��']
++
+     def test_beautifulstonesoup_is_xml_parser(self):
+         # Make sure that the deprecated BSS class uses an xml builder
+         # if one is installed.
+diff --git a/tox.ini b/tox.ini
+index c53e4d8..c60c3e7 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -2,7 +2,7 @@
+ # encoding autodetection libraries: cchardet, chardet, and charset-normalizer
+ [tox]
+ env_list =
+-    py{37, 38, 39, 310, 311, 312, 313},bare,docs
++    py{37, 38, 39, 310, 311, 312, 313, 314},bare,docs
+ minversion = 3.28.0
+ skip_missing_interpreters = true
+ 
+-- 
+2.52.0
+
