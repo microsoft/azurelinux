@@ -1,0 +1,50 @@
+Drop test-abidiff-exit entries that reference the PR30329 fixture set
+
+The two `InOutSpec in_out_specs[]` entries referencing
+`tests/data/test-abidiff-exit/PR30329/` are dropped here because the
+AZL-repacked source tarball strips the PR30329 fixture directory
+(`base/comps/libabigail/modify_source.sh`). The PR30329 fixture's two
+separated-debuginfo files (`libsqlite3.so.0.8.6.debug`) trip the
+anti-malware scanner on the AZL RPM-signing pipeline as
+`packer_high_entropy:eod`. Without this patch `make check` would fail
+trying to open the missing fixture files.
+
+--- a/tests/test-abidiff-exit.cc
++++ b/tests/test-abidiff-exit.cc
+@@ -983,36 +983,6 @@
+     "output/test-abidiff-exit/ada-subrange/test2-ada-subrange-redundant/test2-ada-subrange-redundant-report-2.txt"
+   },
+   {
+-    "data/test-abidiff-exit/PR30329/old-image/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+-    "data/test-abidiff-exit/PR30329/new-image/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+-    "",
+-    "",
+-    "",
+-    "data/test-abidiff-exit/PR30329/old-image/usr/lib/debug",
+-    "data/test-abidiff-exit/PR30329/new-image/usr/lib/debug",
+-    "",
+-    "",
+-    "--no-default-suppression",
+-    abigail::tools_utils::ABIDIFF_ABI_CHANGE,
+-    "data/test-abidiff-exit/PR30329/PR30329-report-1.txt",
+-    "output/test-abidiff-exit/PR30329/PR30329-report-1.txt"
+-  },
+-  {
+-    "data/test-abidiff-exit/PR30329/old-image/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+-    "data/test-abidiff-exit/PR30329/new-image/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+-    "",
+-    "",
+-    "",
+-    "data/test-abidiff-exit/PR30329/old-image/usr/lib/debug,data/test-abidiff-exit/PR30329/old-image/usr/lib/debug/dwz/components/sqlite.bst",
+-    "data/test-abidiff-exit/PR30329/new-image/usr/lib/debug,data/test-abidiff-exit/PR30329/old-image/usr/lib/debug/dwz/components/sqlite.bst",
+-    "",
+-    "",
+-    "--no-default-suppression",
+-    abigail::tools_utils::ABIDIFF_ABI_CHANGE,
+-    "data/test-abidiff-exit/PR30329/PR30329-report-1.txt",
+-    "output/test-abidiff-exit/PR30329/PR30329-report-1.txt"
+-  },
+-  {
+     "data/test-abidiff-exit/PR30503/libsdl/1.2.60/lib64/libSDL-1.2.so.1.2.60",
+     "data/test-abidiff-exit/PR30503/libsdl/1.2.64/lib64/libSDL-1.2.so.1.2.64",
+     "",

@@ -1647,7 +1647,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libXp]
 [components.libXpm]
 [components.libXpresent]
-[components.libabigail]
 [components.libaccounts-glib]
 [components.libaccounts-qt]
 [components.libadwaita]
