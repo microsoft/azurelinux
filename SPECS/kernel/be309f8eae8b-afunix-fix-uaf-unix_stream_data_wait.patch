@@ -1,0 +1,99 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jann Horn <jannh@google.com>
+Date: Mon, 18 May 2026 18:51:30 +0200
+Subject: [PATCH] af_unix: Fix UAF read of tail->len in unix_stream_data_wait()
+ [CBL-Mariner 2.0 custom backport]
+
+Upstream commit: be309f8eae8b474a4a617eaae01324da996fc719 (linus, 2026-05).
+Upstream commit body verbatim (excerpts):
+
+  unix_stream_data_wait() does skb_peek_tail(&sk->sk_receive_queue) without
+  holding any lock that prevents SKBs on that queue from being dequeued and
+  freed.  This has been the case since commit 79f632c71bea ("unix/stream:
+  fix peeking with an offset larger than data in queue").
+  ...
+  Fix the UAF by removing the read of tail->len; checking tail->len would
+  only make sense if SKBs in the receive queue of a UNIX socket could grow,
+  which can no longer happen.
+  ...
+  Kuniyuki explained:
+  > When commit 869e7c62486e ("net: af_unix: implement stream sendpage
+  > support") added sendpage() support, data could be appended to the last
+  > skb in the receiver's queue.
+  > However, commit a0dbf5f818f9 ("af_unix: Support MSG_SPLICE_PAGES") and
+  > commit 57d44a354a43 ("unix: Convert unix_stream_sendpage() to use
+  > MSG_SPLICE_PAGES") refactored sendmsg(), and now data is always added
+  > to a new skb.
+  That means this fix is not suitable for kernels before 6.5.
+  Fixes: 2b514574f7e8 ("net: af_unix: implement splice for stream af_unix sockets")
+  Cc: stable@vger.kernel.org # 6.5.x
+
+--- CBL-Mariner 2.0 (kernel 5.15.202.1) deviation from upstream ---
+
+The upstream patch removes both the `last_len` parameter and the
+`tail->len != last_len` check from unix_stream_data_wait().  On 5.15.y the
+length-grow race is still real because unix_stream_sendpage() in 5.15
+appends data to the receiver's existing tail skb (the MSG_SPLICE_PAGES
+refactor that removes that path is v6.5+; see Kuniyuki's analysis above).
+Removing the length-check verbatim would re-introduce the original
+sendpage(...->grow last skb) race the check was added to plug.
+
+The minimal correct backport for 5.15.y therefore KEEPS the existing
+check and its `last_len` parameter, and only closes the actual UAF: it
+serializes the skb_peek_tail() + tail->len read against concurrent
+__skb_unlink -> consume_skb on the same queue by taking
+sk->sk_receive_queue.lock around exactly that read.
+sk_receive_queue.lock is the lock concurrent dequeue paths
+(skb_dequeue / __skb_unlink) hold while unlinking + freeing skbs from
+this queue, so taking it for the peek-tail + len read closes the race
+window described in the upstream UAF reproducer.  unix_state_lock(sk)
+(the per-socket spinlock already held here) protects socket state but
+does not serialize against sk_receive_queue.lock holders, which is why
+the bug exists.
+
+The non-_bh spinlock variant is correct: unix_stream_data_wait() runs in
+process context, and dequeue from sk_receive_queue happens from process
+context too (the racing unix_stream_read_generic path).  No softirq takes
+this lock for UNIX sockets.  Holding the inner spinlock around two
+already-non-sleeping operations does not introduce a new sleep-in-atomic.
+
+Lock nesting: unix_state_lock(sk) [outer, already held] then
+sk->sk_receive_queue.lock [inner] -- matches the order used elsewhere in
+net/unix/af_unix.c.
+
+Diff size: +5 / -2 lines, contained entirely in unix_stream_data_wait().
+
+Signed-off-by: Jann Horn <jannh@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Link: https://patch.msgid.link/20260518-b4-unix-recv-wait-hotfix-v2-1-83e29ce8ad31@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[backport: keep last_len check; serialize tail-deref with sk_receive_queue.lock for 5.15.y]
+---
+ net/unix/af_unix.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 1cbf36ea043b..dc71ed79be4a 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2462,14 +2462,18 @@ static long unix_stream_data_wait(struct sock *sk, long timeo,
+ 	for (;;) {
+ 		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
+ 
+-		tail = skb_peek_tail(&sk->sk_receive_queue);
++		spin_lock(&sk->sk_receive_queue.lock);
++		tail = skb_peek_tail(&sk->sk_receive_queue);
+ 		if (tail != last ||
+ 		    (tail && tail->len != last_len) ||
+ 		    sk->sk_err ||
+ 		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+ 		    signal_pending(current) ||
+-		    !timeo)
++		    !timeo) {
++			spin_unlock(&sk->sk_receive_queue.lock);
+ 			break;
++		}
++		spin_unlock(&sk->sk_receive_queue.lock);
+ 
+ 		sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+ 		unix_state_unlock(sk);
