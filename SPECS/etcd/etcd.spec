@@ -73,8 +73,8 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
-%patch 1 -p1
     patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
