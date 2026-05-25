@@ -1,3 +1,5 @@
+Patch Reference: https://src.fedoraproject.org/rpms/python-beautifulsoup4/blob/rawhide/f/beautifulsoup4-4.14-disable-soupsieve.patch
+---
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -31,7 +31,6 @@ classifiers = [

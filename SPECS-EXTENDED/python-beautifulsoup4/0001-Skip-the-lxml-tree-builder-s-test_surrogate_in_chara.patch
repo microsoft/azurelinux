@@ -6,6 +6,8 @@ Subject: [PATCH] * Skip the lxml tree builder's
  than 2.13.0. Prior versions of libxml2   don't issue the REPLACEMENT
  CHARACTER we're expecting. [bug=2134346]
 
+Patch Reference: https://src.fedoraproject.org/rpms/python-beautifulsoup4/blob/rawhide/f/0001-Skip-the-lxml-tree-builder-s-test_surrogate_in_chara.patch
+
 ---
  CHANGELOG              |  6 ++++++
  bs4/tests/test_lxml.py | 14 +++++++++++++-

@@ -5,6 +5,9 @@ Subject: [PATCH] * Change the html.parser tree builder's code for handling
  numeric   character references, to avoid a crash when using Python versions  
  that include the fix to Python issue https://bugs.python.org/issue13633  
  (e.g. Python 3.11.13). [bug=2134393]
+- This version also includes the fix for CVE-2024-34062.
+
+Patch Reference: https://src.fedoraproject.org/rpms/python-beautifulsoup4/blob/rawhide/f/0001-Change-the-html.parser-tree-builder-s-code-for-handl.patch
 
 ---
  CHANGELOG                    |  5 +++

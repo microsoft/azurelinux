@@ -4,7 +4,7 @@
 
 Name:           python-beautifulsoup4
 Version:        4.14.3
-Release:        3%{?dist}
+Release:        1%{?dist}
 Summary:        HTML/XML parser for quick-turnaround applications like screen-scraping
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -104,8 +104,9 @@ python3 -m tox -q --recreate -e py312
 %{python3_sitelib}/bs4
 
 %changelog
-* Fri May 22 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.14.3-3
+* Mon May 25 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.14.3-1
 - Upgrade to 4.14.3 to fix ptest errors.
+- License verified.
 
 * Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.12.3-8
 - Initial Azure Linux import from Fedora 41 (license: MIT).
