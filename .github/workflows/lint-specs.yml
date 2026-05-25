@@ -13,6 +13,9 @@ on:
       - '**.spec'
     branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
+permissions:
+  contents: read
+
 jobs:
   spec-lint:
     name: Spec Linting
