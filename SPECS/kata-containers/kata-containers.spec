@@ -124,7 +124,7 @@ popd
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata3-2
 - Patch for CVE-2026-41602
 
-* Mon Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
+* Thu Apr 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.19.1.kata3-1
 - Auto-upgrade to 3.19.1.kata3
 - Remove CVE-2025-65637.patch that no longer applies
 
@@ -140,7 +140,7 @@ popd
 * Mon Feb 23 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.19.1.kata2-5
 - Patch CVE-2026-24834, CVE-2026-25727, CVE-2026-25541, CVE-2025-65637 and CVE-2025-11065
 
-* Fri Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
+* Thu Jan 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata2-4
 - Bump release to rebuild with rust
 - Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
 
