@@ -74,10 +74,10 @@ ln -s cftp %{buildroot}/%{_bindir}/cftp3
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-# pin packaging==23.2 to avoid uninstall conflict with system RPM
-pip3 install packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
+sudo -u test pip3 install --upgrade pip
+sudo -u test pip3 install 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser
 chmod g+w . -R
-LANG=en_US.UTF-8 tox -e nocov-posix-alldeps --sitepackages
+LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
 %files -n python3-twisted
 %defattr(-,root,root)
