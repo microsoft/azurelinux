@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,6 +15,8 @@ Patch3:         CVE-2025-7546.patch
 Patch4:         CVE-2025-11082.patch
 Patch5:         CVE-2026-4647.patch
 Patch6:         CVE-2026-6846.patch
+Patch7:         CVE-2025-1178.patch
+Patch8:         CVE-2025-1176.patch
 
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
@@ -109,6 +111,9 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Tue May 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-9
+- Patch for CVE-2025-1178, CVE-2025-1176
+
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-8
 - Patch for CVE-2026-6846
 
