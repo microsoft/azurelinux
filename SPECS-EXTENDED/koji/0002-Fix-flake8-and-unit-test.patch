@@ -1,0 +1,42 @@
+From 7c0ec989b49a479309e2c1dff20621e037f9dd4c Mon Sep 17 00:00:00 2001
+From: Tomas Kopecek <tkopecek@redhat.com>
+Date: Tue, 29 Apr 2025 16:27:29 +0200
+Subject: [PATCH 2/2] Fix flake8 and unit test
+
+---
+ cli/koji_cli/commands.py              | 5 +++--
+ tests/test_cli/test_download_build.py | 2 ++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/cli/koji_cli/commands.py b/cli/koji_cli/commands.py
+index 73c586fc..c072ed43 100644
+--- a/cli/koji_cli/commands.py
++++ b/cli/koji_cli/commands.py
+@@ -6935,8 +6935,9 @@ def anon_handle_download_build(options, session, args):
+     for rpm in rpms:
+         number += 1
+         try:
+-            download_rpm(info, rpm, suboptions.topurl, sigkey=suboptions.key, quiet=suboptions.quiet,
+-                         noprogress=suboptions.noprogress, num=number, size=size)
++            download_rpm(info, rpm, suboptions.topurl, sigkey=suboptions.key,
++                         quiet=suboptions.quiet, noprogress=suboptions.noprogress, num=number,
++                         size=size)
+         except HTTPError as err:
+             # this is necessary even with the 'unsigned' handling above
+             # because sometimes queryRPMSigs will still tell us a
+diff --git a/tests/test_cli/test_download_build.py b/tests/test_cli/test_download_build.py
+index 4c90aa9c..2495b189 100644
+--- a/tests/test_cli/test_download_build.py
++++ b/tests/test_cli/test_download_build.py
+@@ -297,6 +297,8 @@ Options:
+   --task-id             Interperet id as a task id
+   --rpm                 Download the given rpm
+   --key=KEY             Download rpms signed with the given key
++  --fallback-unsigned   When used with --key: download unsigned if signed
++                        packages not found
+   --topurl=URL          URL under which Koji files are accessible
+   --noprogress          Do not display progress meter
+   -q, --quiet           Suppress output
+-- 
+2.52.0
+
