@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.139.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         CVE-2026-43465-mlx5e-fix-xdp-multibuf-striding-rq.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -440,6 +441,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon May 25 2026 omkhar <omkhar@linkedin.com> - 6.6.139.1-2
+- Forward-port of upstream CVE-2026-43465 fix (mlx5e XDP multi-buf frag counting for striding RQ) from v7.0/db25c42c via 6.18.19 backport 7d7342a18fad, reverted xdp_update_skb_frags_info() → xdp_update_skb_shared_info() for 6.6 API.
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 
