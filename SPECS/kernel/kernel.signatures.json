@@ -1,9 +1,10 @@
 {
   "Signatures": {
+    "ab1513597c6c-l2cap-fix-uaf-cleanup-listen.patch": "9fa2dd72c435aadf7b96beaa9aaa0218d006d49cb0a95b32773d0ea86ffd7fd2",
     "cbl-mariner-ca-20211013-20230216.pem": "228046d92ccb7d268cf4f195425c0f990afa00a968cc940fb1df4629fb7a6765",
     "config": "2c72d5eb716de25bccbb65c7d38a14d285e309f6d328f3475d2385019f5ecfff",
     "config_aarch64": "7f94b2221de7195b2f2b35332f080c56371fcbd31fbc65b1683cf2a75ee90c78",
-    "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f",
-    "kernel-5.15.202.1.tar.gz": "7c3540ec0dd00ef161076195e50c3b5d0d52799795c36e0701c76d3456f7f704"
+    "kernel-5.15.202.1.tar.gz": "7c3540ec0dd00ef161076195e50c3b5d0d52799795c36e0701c76d3456f7f704",
+    "sha512hmac-openssl.sh": "02ab91329c4be09ee66d759e4d23ac875037c3b56e5a598e32fd1206da06a27f"
   }
 }
