@@ -1,7 +1,7 @@
 Summary:        A fast malloc tool for threads
 Name:           gperftools
 Version:        2.12
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        BSD
 URL:            https://github.com/gperftools/gperftools
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -61,6 +61,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 
 %check
+export LD_LIBRARY_PATH="$PWD/.libs:$PWD/src/.libs${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 TCMALLOC_SAMPLE_PARAMETER=128 && make check
 
 %ldconfig_scriptlets libs
@@ -88,6 +89,9 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %{_libdir}/*.so.*
 
 %changelog
+* Mon May 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.12-3
+- Added runtime library path in %check to fix ptests.
+
 * Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
 - Update build step from fedora and add libs package
 
