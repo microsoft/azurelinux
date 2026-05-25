@@ -34,10 +34,237 @@ replacement = '%global __with_wxwidgets 0'
 # only targets these unconditional Requires; equivalent lines elsewhere in
 # the spec are already inside `%if %{__with_wxwidgets}` blocks and are
 # dead code under the toggle, so they stay untouched.
+#
+# common_test and dialyzer are intentionally excluded from this strip —
+# they are re-enabled below (they are pure Erlang libraries that do not
+# actually link against wxGTK; upstream only grouped them under the same
+# __with_wxwidgets toggle because their *runtime* Requires reference the
+# wx-using subpackages debugger/observer/wx, which we drop separately).
+#
+# One spec-remove-tag overlay per dropped subpackage — literal `value`,
+# no regex needed.
 [[components.erlang.overlays]]
-description = "Drop unconditional Requires for wxwidgets-gated sub-packages from erlang-src (paired with __with_wxwidgets=0 above)"
-type = "spec-search-replace"
+description = "Drop Requires: erlang-debugger from erlang-src (debugger subpackage is wx-gated and not built)"
+type = "spec-remove-tag"
 section = "%package"
 package = "src"
-regex = '^Requires: %\{name\}-(common_test|debugger|dialyzer|et|megaco|observer|reltool|wx)%\{\?_isa\} = %\{version\}-%\{release\}$'
+tag = "Requires"
+value = "%{name}-debugger%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-et from erlang-src (et subpackage is wx-gated and not built)"
+type = "spec-remove-tag"
+section = "%package"
+package = "src"
+tag = "Requires"
+value = "%{name}-et%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-megaco from erlang-src (megaco subpackage is wx-gated and not built)"
+type = "spec-remove-tag"
+section = "%package"
+package = "src"
+tag = "Requires"
+value = "%{name}-megaco%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-observer from erlang-src (observer subpackage is wx-gated and not built)"
+type = "spec-remove-tag"
+section = "%package"
+package = "src"
+tag = "Requires"
+value = "%{name}-observer%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-reltool from erlang-src (reltool subpackage is wx-gated and not built)"
+type = "spec-remove-tag"
+section = "%package"
+package = "src"
+tag = "Requires"
+value = "%{name}-reltool%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-wx from erlang-src (wx subpackage is not built)"
+type = "spec-remove-tag"
+section = "%package"
+package = "src"
+tag = "Requires"
+value = "%{name}-wx%{?_isa} = %{version}-%{release}"
+
+# erlang-common_test and erlang-dialyzer are required by erlang-rebar3 (and
+# transitively by ~20 other Erlang/Elixir consumers). The upstream Fedora
+# spec puts both `%package common_test` and `%package dialyzer` behind
+# `%if %{__with_wxwidgets}` and also passes `--without-common_test` /
+# `--without-dialyzer` to ./configure when wxwidgets is disabled — even
+# though neither library links against wxGTK. They were lumped in only
+# because their *runtime* Requires list points at wx-using subpackages
+# (common_test → debugger/observer; dialyzer → wx) for optional GUI modes
+# (`ct:run_test/1` GUI launcher, `dialyzer:gui/0`). In AZL we don't need
+# those GUI features — rebar3 invokes both purely as CLI tools — so we
+# build the libraries, ship them as subpackages, and strip the wx-only
+# runtime Requires.
+#
+# Step 1: stop passing `--without-common_test` / `--without-dialyzer` to
+# ./configure so the OTP build compiles these two applications. The
+# remaining --without-* flags (debugger, et, megaco, observer, reltool, wx)
+# stay in place so we don't accidentally pull in wxGTK.
+#
+# The replacement is "\t\\" — a tab followed by a single backslash —
+# rather than an empty string. Each upstream line is a continuation line
+# in a `%configure ... \` chain; replacing with the empty string would
+# leave a blank line in the middle of the continuation, which terminates
+# the shell `\<newline>` join early and makes the following
+# `--without-*` lines run as standalone (failing) commands.
+# Replacing with "\t\\" keeps the continuation intact as a no-op line.
+[[components.erlang.overlays]]
+description = "Build common_test (paired with __with_wxwidgets=0): drop --without-common_test from ./configure so the OTP build produces lib/common_test/"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\t--without-common_test \\$'
+replacement = "\t\\"
+
+[[components.erlang.overlays]]
+description = "Build dialyzer (paired with __with_wxwidgets=0): drop --without-dialyzer from ./configure so the OTP build produces lib/dialyzer/"
+type = "spec-search-replace"
+section = "%build"
+regex = '^\t--without-dialyzer \\$'
+replacement = "\t\\"
+
+# Step 2: un-gate the `%package`/`%description` and `%files` blocks for
+# common_test and dialyzer. The upstream gate looks like:
+#
+#     %if %{__with_wxwidgets}        <- gate G1 (= 0, block skipped)
+#     %package common_test
+#     ...
+#     %description common_test
+#     ...
+#     %endif # __with_wxwidgets      <- closes G1
+#
+# The overlay engine treats text between two `%package` / `%description` /
+# `%files` directives as the body of the *preceding* one. So the
+# `%if %{__with_wxwidgets}` line that opens each gate above belongs to the
+# section that precedes it: the common_test gates sit at the tail of asn1's
+# `%description` / `%files`, and the dialyzer gates sit at the tail of
+# debugger's `%description` / `%files`. (debugger is itself wxwidgets-gated
+# and so contributes no output — we only borrow it as a section anchor.)
+#
+# Within each of those scopes the `%if %{__with_wxwidgets}` line is unique,
+# so a single-line regex pinpoints it without needing multi-line matching
+# or unique-context tricks. Flipping it to `%if 1` un-gates the block; the
+# trailing `%endif # __with_wxwidgets` keeps its (now mis-named, harmless)
+# comment and closes our new always-true gate.
+[[components.erlang.overlays]]
+description = "Un-gate %package common_test from __with_wxwidgets — common_test is a pure Erlang library with no compile-time wx dependency"
+type = "spec-search-replace"
+section = "%description"
+package = "asn1"
+regex = '^%if %\{__with_wxwidgets\}$'
+replacement = '%if 1'
+
+[[components.erlang.overlays]]
+description = "Un-gate %files common_test from __with_wxwidgets"
+type = "spec-search-replace"
+section = "%files"
+package = "asn1"
+regex = '^%if %\{__with_wxwidgets\}$'
+replacement = '%if 1'
+
+[[components.erlang.overlays]]
+description = "Un-gate %package dialyzer from __with_wxwidgets — dialyzer's CLI (used by rebar3) does not need wx; the dialyzer:gui/0 entry point is the only wx consumer and is unused in AZL"
+type = "spec-search-replace"
+section = "%description"
+package = "debugger"
+regex = '^%if %\{__with_wxwidgets\}$'
+replacement = '%if 1'
+
+[[components.erlang.overlays]]
+description = "Un-gate %files dialyzer from __with_wxwidgets"
+type = "spec-search-replace"
+section = "%files"
+package = "debugger"
+regex = '^%if %\{__with_wxwidgets\}$'
+replacement = '%if 1'
+
+# Step 3: strip Requires lines in the common_test / dialyzer preambles
+# that reference subpackages we don't build (debugger, observer, wx).
+# Without this, dnf would refuse to install common_test or dialyzer.
+# These use `spec-remove-tag` with a literal `value` (no regex) since
+# they target whole well-formed `Requires:` tags.
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-debugger from common_test preamble (debugger subpackage is wx-gated and not built in AZL)"
+type = "spec-remove-tag"
+section = "%package"
+package = "common_test"
+tag = "Requires"
+value = "%{name}-debugger%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-observer from common_test preamble (observer subpackage is wx-gated and not built in AZL)"
+type = "spec-remove-tag"
+section = "%package"
+package = "common_test"
+tag = "Requires"
+value = "%{name}-observer%{?_isa} = %{version}-%{release}"
+
+[[components.erlang.overlays]]
+description = "Drop Requires: erlang-wx from dialyzer preamble (wx subpackage is not built in AZL; dialyzer's CLI does not need it)"
+type = "spec-remove-tag"
+section = "%package"
+package = "dialyzer"
+tag = "Requires"
+value = "%{name}-wx%{?_isa} = %{version}-%{release}"
+
+# Step 4: fix the `%install` cleanup loop that deletes the wrapper scripts
+# when wxwidgets is off. Upstream has:
+#
+#     %else
+#     # FIXME workaround for broken Erlang install procedure
+#     echo "Removing scripts which won't work w/o wxWidgets anyway"
+#     for exe in ct_run dialyzer typer
+#     do
+#         rm -f $RPM_BUILD_ROOT/%{_bindir}/${exe}
+#         rm -f $RPM_BUILD_ROOT/%{_libdir}/erlang/bin/${exe}
+#         rm -f $RPM_BUILD_ROOT/%{_libdir}/erlang/erts-*/bin/${exe}
+#     done
+#     %endif # __with_wxwidgets
+#
+# Now that we ship common_test and dialyzer, ct_run and dialyzer must
+# survive this cleanup. typer is a sibling tool from dialyzer that
+# `%files dialyzer` ALSO lists — but its `%{_bindir}/typer` entry points
+# at the *renamed* path `%{_bindir}/erlang-typer` (to avoid a file conflict
+# with python3-typer-cli's /usr/bin/typer; see rhbz#2359567). The
+# wxwidgets-on branch performs that rename earlier in `%install`; we must
+# do the same here.
+#
+# Concretely we (a) shrink the loop iteration set to just `typer` so
+# ct_run and dialyzer are no longer deleted, (b) drop the libdir/erts
+# removals (`%files dialyzer` ships the in-tree `typer` copies under
+# `%{_libdir}/erlang/bin/` and `%{_libdir}/erlang/erts-*/bin/`), and
+# (c) swap the bindir `rm` for a `mv` that produces `erlang-typer`.
+[[components.erlang.overlays]]
+description = "Shrink the wxwidgets-off cleanup loop to only iterate on typer — ct_run and dialyzer must survive now that common_test/dialyzer are built"
+type = "spec-search-replace"
+section = "%install"
+regex = '^for exe in ct_run dialyzer typer$'
+replacement = 'for exe in typer'
+
+[[components.erlang.overlays]]
+description = "Rename bindir's typer to erlang-typer (instead of deleting it) — matches the wxwidgets-on branch's rename and satisfies %files dialyzer's %{_bindir}/erlang-typer entry; avoids file-conflict with python3-typer-cli (rhbz#2359567)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\trm -f \$RPM_BUILD_ROOT/%\{_bindir\}/\$\{exe\}$'
+replacement = "\tmv $RPM_BUILD_ROOT/%{_bindir}/${exe} $RPM_BUILD_ROOT/%{_bindir}/erlang-${exe}"
+
+[[components.erlang.overlays]]
+description = "Stop deleting %{_libdir}/erlang/bin/typer — it is listed by %files dialyzer"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\trm -f \$RPM_BUILD_ROOT/%\{_libdir\}/erlang/bin/\$\{exe\}$'
+replacement = ''
+
+[[components.erlang.overlays]]
+description = "Stop deleting %{_libdir}/erlang/erts-*/bin/typer — it is listed by %files dialyzer"
+type = "spec-search-replace"
+section = "%install"
+regex = '^\trm -f \$RPM_BUILD_ROOT/%\{_libdir\}/erlang/erts-\*/bin/\$\{exe\}$'
 replacement = ''

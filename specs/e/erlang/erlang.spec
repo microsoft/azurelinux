@@ -75,7 +75,7 @@
 
 Name:		erlang
 Version:	26.2.5.17
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
 License:	Apache-2.0
@@ -213,16 +213,14 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 %description asn1
 Provides support for Abstract Syntax Notation One.
 
-%if %{__with_wxwidgets}
+%if 1
 %package common_test
 Summary: A portable framework for automatic testing
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
-Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-observer%{?_isa} = %{version}-%{release}
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
 Requires: %{name}-snmp%{?_isa} = %{version}-%{release}
@@ -273,7 +271,7 @@ Requires: %{name}-wx%{?_isa} = %{version}-%{release}
 A debugger for debugging and testing of Erlang programs.
 %endif # __with_wxwidgets
 
-%if %{__with_wxwidgets}
+%if 1
 %package dialyzer
 Summary: A DIscrepancy AnaLYZer for ERlang programs
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
@@ -281,7 +279,6 @@ Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
 Requires: graphviz
 Obsoletes: erlang-typer
 
@@ -613,29 +610,24 @@ MIB compiler and tools for creating SNMP agents.
 %package src
 Summary: Erlang sources
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
-
+Requires: %{name}-common_test%{?_isa} = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
-
-
+Requires: %{name}-dialyzer%{?_isa} = %{version}-%{release}
 Requires: %{name}-diameter%{?_isa} = %{version}-%{release}
 Requires: %{name}-edoc%{?_isa} = %{version}-%{release}
 Requires: %{name}-eldap%{?_isa} = %{version}-%{release}
 Requires: %{name}-erl_docgen%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-
 Requires: %{name}-eunit%{?_isa} = %{version}-%{release}
 Requires: %{name}-ftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
-
 Requires: %{name}-odbc%{?_isa} = %{version}-%{release}
 Requires: %{name}-os_mon%{?_isa} = %{version}-%{release}
 Requires: %{name}-parsetools%{?_isa} = %{version}-%{release}
 Requires: %{name}-public_key%{?_isa} = %{version}-%{release}
-
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
 Requires: %{name}-snmp%{?_isa} = %{version}-%{release}
@@ -645,7 +637,6 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-tftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-tools%{?_isa} = %{version}-%{release}
-
 Requires: %{name}-xmerl%{?_isa} = %{version}-%{release}
 
 %description src
@@ -794,9 +785,9 @@ CFLAGS="${ERL_FLAGS}" CXXFLAGS="${ERL_FLAGS}" %configure --enable-shared-zlib --
 %if %{__with_wxwidgets}
 	--with-wx-config=/usr/bin/wx-config
 %else
-	--without-common_test \
+	\
 	--without-debugger \
-	--without-dialyzer \
+	\
 	--without-et \
 	--without-megaco \
 	--without-observer \
@@ -974,11 +965,11 @@ sed -r -i 's/^(\.TH[[:blank:]]+)?(typer)\b/\1erlang-\2/' \
 %else
 # FIXME workaround for broken Erlang install procedure
 echo "Removing scripts which won't work w/o wxWidgets anyway"
-for exe in ct_run dialyzer typer
+for exe in typer
 do
-	rm -f $RPM_BUILD_ROOT/%{_bindir}/${exe}
-	rm -f $RPM_BUILD_ROOT/%{_libdir}/erlang/bin/${exe}
-	rm -f $RPM_BUILD_ROOT/%{_libdir}/erlang/erts-*/bin/${exe}
+	mv $RPM_BUILD_ROOT/%{_bindir}/${exe} $RPM_BUILD_ROOT/%{_bindir}/erlang-${exe}
+
+
 done
 %endif # __with_wxwidgets
 
@@ -1021,7 +1012,7 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %{_mandir}/man3/asn1ct.*
 %endif
 
-%if %{__with_wxwidgets}
+%if 1
 %files common_test
 %{_bindir}/ct_run
 %{_libdir}/erlang/bin/ct_run
@@ -1074,7 +1065,7 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif
 %endif # __with_wxwidgets
 
-%if %{__with_wxwidgets}
+%if 1
 %files dialyzer
 %{_bindir}/dialyzer
 # FIXME FIXME FIXME this must be installed properly!!!!!!
