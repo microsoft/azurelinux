@@ -81,7 +81,7 @@ mkdir -p ../nginx-njs
 tar -C ../nginx-njs -xf %{SOURCE2}
 
 pushd ../nginx-njs/njs-%{njs_version}
-%patch11 -p1
+%patch 11 -p1
 popd
 
 
