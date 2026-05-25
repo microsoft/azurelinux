@@ -74,10 +74,16 @@ Requires:       opentelemetry-cpp
 The OpenTelemetry module for Nginx
 
 %prep
-%autosetup -p1
-pushd ../
-mkdir -p nginx-njs
-tar -C nginx-njs -xf %{SOURCE2}
+%autosetup -N
+%autopatch -p1 -M 10
+
+mkdir -p ../nginx-njs
+tar -C ../nginx-njs -xf %{SOURCE2}
+
+pushd ../nginx-njs/njs-%{njs_version}
+%patch11 -p1
+popd
+
 
 %build
 sh configure \
