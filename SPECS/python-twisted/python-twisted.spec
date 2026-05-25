@@ -104,7 +104,6 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %changelog
 * Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-5
 - Patch for CVE-2026-42304
-- Updated check section to execute ptest
 
 * Mon Feb 03 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 22.10.0-4
 - Fix CVE-2023-46137
