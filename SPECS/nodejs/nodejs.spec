@@ -56,6 +56,8 @@ Provides:       nodejs
 Provides:       nodejs24
 Obsoletes:      nodejs < %{version}-%{release}
 Obsoletes:      nodejs24 < %{version}-%{release}
+Conflicts:      nodejs < %{version}-%{release}
+Conflicts:      nodejs24 < %{version}-%{release}
 
 Recommends: nodejs-full-i18n = %{version}-%{release}
 Provides: bundled(icu) = %{icu_version}
@@ -76,6 +78,8 @@ Provides:       nodejs-devel = %{version}-%{release}
 Provides:       nodejs24-devel = %{version}-%{release}
 Obsoletes:      nodejs24-devel < %{version}-%{release}
 Obsoletes:      nodejs-devel < %{version}-%{release}
+Conflicts:      nodejs-devel < %{version}-%{release}
+Conflicts:      nodejs24-devel < %{version}-%{release}
 
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
@@ -84,6 +88,7 @@ for developing applications that use nodejs.
 %package full-i18n
 Summary: Non-English locale data for Node.js
 Requires: %{name} = %{version}-%{release}
+Conflicts: nodejs-full-i18n < %{version}-%{release}
 
 %description full-i18n
 Optional data files to provide full-icu support for Node.js. Remove this
@@ -99,6 +104,9 @@ Provides:       nodejs24-npm = %{version}-%{release}
 Obsoletes:      nodejs24-npm < %{version}-%{release}
 Obsoletes:      nodejs-npm < %{version}-%{release}
 Obsoletes:      npm < %{version}-%{release}
+Conflicts:      nodejs-npm < %{version}-%{release}
+Conflicts:      nodejs24-npm < %{version}-%{release}
+Conflicts:      npm < %{version}-%{release}
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
