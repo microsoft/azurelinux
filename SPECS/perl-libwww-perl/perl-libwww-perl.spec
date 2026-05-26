@@ -147,16 +147,12 @@ use and even classes that help you implement simple HTTP servers.
 %setup -q -n libwww-perl-%{version} 
 %patch 0 -p1
 %if !%{with perl_libwww_perl_enables_internet_test}
-rm t/leak/no_leak.t t/redirect.t
-perl -i -ne 'print $_ unless m{^(?:t/leak/no_leak\.t|t/redirect\.t)}' MANIFEST
-%endif
 # Remove test that requires perl(HTTP::CookieJar::LWP) not available in Azure Linux
 # Skip default_content_type test because it fails against Azure Linux's older HTTP::Message/Request/Response
 # stack despite functionally correct request generation.
-rm t/local/cookie_jar.t
-perl -i -ne 'print $_ unless m{^t/local/cookie_jar\.t}' MANIFEST
-rm t/leak/no_leak.t t/redirect.t t/base/default_content_type.t t/local/cookie_jar.t
+rm -f t/leak/no_leak.t t/redirect.t t/base/default_content_type.t t/local/cookie_jar.t
 perl -i -ne 'print $_ unless m{^(?:t/leak/no_leak\.t|t/redirect\.t|t/base/default_content_type\.t|t/local/cookie_jar\.t)}' MANIFEST
+%endif
 
 %build
 # Install the aliases by default
