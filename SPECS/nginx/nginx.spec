@@ -77,8 +77,7 @@ Requires:       opentelemetry-cpp
 The OpenTelemetry module for Nginx
 
 %prep
-%autosetup -N
-%autopatch -p1 -M 1000
+%autosetup -N -p1 -M 1000
 
 mkdir -p ../nginx-njs
 tar -C ../nginx-njs -xf %{SOURCE2}
