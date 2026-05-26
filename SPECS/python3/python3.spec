@@ -33,6 +33,7 @@ Patch13:        CVE-2026-1299.patch
 Patch14:        CVE-2026-4519.patch
 Patch15:        CVE-2026-1502.patch
 Patch16:        CVE-2025-13462.patch
+Patch17:        CVE-2026-8328.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -256,7 +257,7 @@ rm -rf %{buildroot}%{_bindir}/__pycache__
 
 %changelog
 * Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-12
-- Patch for CVE-2025-13462
+- Patch for CVE-2025-13462, CVE-2026-8328
 
 * Fri May 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.9-11
 - Patch for CVE-2026-1502
