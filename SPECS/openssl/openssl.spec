@@ -51,7 +51,7 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 Patch24:  0024-load-legacy-prov.patch
 # # Load SymCrypt provider by default if present in non-FIPS mode,
 # # and always load it or the openssl fips provider in FIPS mode.
-Patch32: 0032-Force-fips-symcrypt-or-fips-3.3.5-AZL3.patch
+Patch32: 0032-Force-fips-symcrypt-or-fips-AZL3.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
