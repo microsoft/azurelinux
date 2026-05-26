@@ -50,6 +50,7 @@ mono_crash.*
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+!release-repo-snapshot/releases/
 x64/
 x86/
 [Aa][Rr][Mm]/
