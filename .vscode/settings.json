@@ -3,7 +3,8 @@
     // These files should not be manually edited — modify the TOML sources instead.
     // Prevent accidental edits to rendered specs.
     "files.readonlyInclude": {
-        "specs/**": true
+        "specs/**": true,
+        "locks/**": true
     },
     // Suppress diagnostics from rendered specs — they are not source files.
     // Unfortunately, vscode does not provide a way to exclude all problem
@@ -13,16 +14,35 @@
     "shellcheck.ignorePatterns": {
         "specs/**": true
     },
-    "python.analysis.exclude": [
-        "specs",
-        "**/node_modules",
-        "**/__pycache__",
-        "**/.*"
-    ],
     // Using Azure Pipelines schema for validation of ADO YAMLs.
     "azure-pipelines.1ESPipelineTemplatesSchemaFile": true,
     // Associate ADO pipelines with the "azure-pipelines" type instead of GitHub Actions.
     "files.associations": {
         "**/.github/workflows/ado/**/*.yml": "azure-pipelines"
-    }
+    },
+    // General lint rules
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.markdownlint": "explicit",
+        "source.fixAll.shellcheck": "explicit"
+    },
+    "shellcheck.enable": true,
+    "shellcheck.enableQuickFix": true,
+    // Lint rules for python
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit",
+            "source.fixAll": "explicit",
+            "source.fixAll.pylance": "explicit"
+        }
+    },
+    "python.analysis.diagnosticsSource": "Pylance",
+    "python.missingPackage.severity": "Error",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "ruff.configuration": "${workspaceFolder}/ruff.toml",
+    "ruff.lint.enable": true
 }

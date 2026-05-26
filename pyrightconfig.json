@@ -1,0 +1,19 @@
+{
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/.venv",
+        "**/venv",
+        "base/build",
+        "base/out",
+        "specs"
+    ],
+    "typeCheckingMode": "standard",
+    "pythonVersion": "3.12",
+    "pythonPlatform": "Linux",
+    "reportUntypedFunctionDecorator": "error",
+    "reportMissingTypeStubs": "warning",
+    "reportMissingParameterType": "error",
+    "reportMissingTypeArgument": "error",
+    "reportUnknownParameterType": "error"
+}

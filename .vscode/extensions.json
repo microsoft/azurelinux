@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "charliermarsh.ruff",
+        "editorconfig.editorconfig",
+        "DavidAnson.vscode-markdownlint",
+        "timonwong.shellcheck",
+        "ms-python.vscode-pylance"
+    ]
+}

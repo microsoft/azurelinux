@@ -1,0 +1,26 @@
+extend-exclude = ["base/build", "base/out", "specs"]
+
+line-length = 120
+
+target-version = "py312"
+
+[lint]
+select = ["ALL"] # Everything
+ignore = [
+    "COM812", # Conflicts with formatter.
+    "S603",   # Check for validation of input to subprocess calls, almost always a false positive
+    "S607",   # Requiring abspath for all binaries used is very restrictive
+    "T201",   # These scripts are fine to use `print` for output
+]
+
+# We want D401 still, even though google style omits it.
+extend-select = ["D401"]
+
+fixable = ["ALL"]
+
+[lint.isort]
+# Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't
+required-imports = ["from __future__ import annotations"]
+
+[lint.pydocstyle]
+convention = "google"
