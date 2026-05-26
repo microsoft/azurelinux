@@ -42,8 +42,4 @@ def test_config_lsm_matches_upstream(rootfs: Path) -> None:
     """
     expected = "lockdown,yama,integrity,selinux,bpf,landlock,ipe"
     actual = _parse_config_lsm(rootfs)
-    assert actual == expected, (
-        f"CONFIG_LSM does not match upstream.\n"
-        f"  Expected: {expected}\n"
-        f"  Actual:   {actual}"
-    )
+    assert actual == expected, f"CONFIG_LSM does not match upstream.\n  Expected: {expected}\n  Actual:   {actual}"

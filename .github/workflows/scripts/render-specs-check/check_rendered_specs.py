@@ -128,9 +128,7 @@ def classify_changes(specs_dir: Path) -> tuple[list[str], list[str], list[str]]:
     missing = _git_lines_z("ls-files", "-z", "--deleted", "--", sd)
     # Filter out .gitignore / .gitattributes anywhere under specs_dir — they
     # shouldn't be in rendered output and shouldn't influence our enumeration.
-    extra = [
-        p for p in extra_raw if Path(p).name not in (".gitignore", ".gitattributes")
-    ]
+    extra = [p for p in extra_raw if Path(p).name not in (".gitignore", ".gitattributes")]
     return changed, extra, missing
 
 
@@ -172,8 +170,7 @@ def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]
         sha = head_blobs.get(path_str, "")
         if not sha:
             print(
-                f"::warning::could not resolve HEAD blob for {path_str}; "
-                "treating as drift",
+                f"::warning::could not resolve HEAD blob for {path_str}; treating as drift",
                 file=sys.stderr,
             )
             real_diffs.append(
@@ -188,8 +185,7 @@ def build_content_diffs(changed_files: list[str], specs_dir: Path) -> list[dict]
             committed_bytes = _git_bytes("cat-file", "blob", sha)
         except subprocess.CalledProcessError as exc:
             print(
-                f"::warning::git cat-file blob {sha} ({path_str}) failed: {exc}; "
-                "treating as drift",
+                f"::warning::git cat-file blob {sha} ({path_str}) failed: {exc}; treating as drift",
                 file=sys.stderr,
             )
             real_diffs.append(
@@ -273,14 +269,8 @@ def build_report(
     """Build the JSON-serialisable report."""
     return {
         "content_diffs": content_diffs,
-        "extra_files": [
-            {"path": p, "component": component_from_path(p, specs_dir)}
-            for p in extra_files
-        ],
-        "missing_files": [
-            {"path": p, "component": component_from_path(p, specs_dir)}
-            for p in missing_files
-        ],
+        "extra_files": [{"path": p, "component": component_from_path(p, specs_dir)} for p in extra_files],
+        "missing_files": [{"path": p, "component": component_from_path(p, specs_dir)} for p in missing_files],
     }
 
 
@@ -340,11 +330,7 @@ def generate_patch(
         return b""
 
     # NUL-separated stdin for --pathspec-file-nul. See docstring for why.
-    extra_stdin = (
-        b"\x00".join(p.encode("utf-8") for p in extra_files) + b"\x00"
-        if extra_files
-        else b""
-    )
+    extra_stdin = b"\x00".join(p.encode("utf-8") for p in extra_files) + b"\x00" if extra_files else b""
 
     # Mark untracked files as intent-to-add so `git diff` picks them up as
     # "new file" entries instead of silently skipping them.
@@ -380,8 +366,7 @@ def generate_patch(
         except subprocess.CalledProcessError as exc:
             stderr = (exc.stderr or b"").decode("utf-8", errors="replace").strip()
             print(
-                f"::warning::git diff failed while generating patch: "
-                f"exit={exc.returncode}: {stderr}",
+                f"::warning::git diff failed while generating patch: exit={exc.returncode}: {stderr}",
                 file=sys.stderr,
             )
             patch = b""
@@ -403,8 +388,7 @@ def generate_patch(
             except subprocess.CalledProcessError as exc:
                 stderr = (exc.stderr or b"").decode("utf-8", errors="replace").strip()
                 print(
-                    f"::warning::git reset (undo intent-to-add) failed: "
-                    f"exit={exc.returncode}: {stderr}",
+                    f"::warning::git reset (undo intent-to-add) failed: exit={exc.returncode}: {stderr}",
                     file=sys.stderr,
                 )
 
@@ -444,9 +428,7 @@ def main() -> int:
 
     # 1. Classify changes
     changed, extra, missing = classify_changes(specs_dir)
-    print(
-        f"Raw counts: changed={len(changed)} extra={len(extra)} missing={len(missing)}"
-    )
+    print(f"Raw counts: changed={len(changed)} extra={len(extra)} missing={len(missing)}")
 
     # 2. Build content diffs
     content_diffs = build_content_diffs(changed, specs_dir)
@@ -476,16 +458,8 @@ def main() -> int:
         print("All rendered specs are up to date.")
         return 0
 
-    print(
-        f"::error::{len(content_diffs)} content diff(s), "
-        f"{len(extra)} extra file(s), {len(missing)} missing file(s)"
-    )
-    all_comps = sorted(
-        set(
-            _unique_components(content_diffs)
-            + _unique_components(report.get("extra_files", []))
-        )
-    )
+    print(f"::error::{len(content_diffs)} content diff(s), {len(extra)} extra file(s), {len(missing)} missing file(s)")
+    all_comps = sorted(set(_unique_components(content_diffs) + _unique_components(report.get("extra_files", []))))
     if missing:
         print(f"Remediation: {_render_command([], use_all=True)}")
     elif all_comps:

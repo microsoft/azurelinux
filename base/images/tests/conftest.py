@@ -68,7 +68,9 @@ def image_path(request: pytest.FixtureRequest) -> Path:
 
 @pytest.fixture(scope="session")
 def image_type(
-    request: pytest.FixtureRequest, capabilities: set[str], image_path: Path,
+    request: pytest.FixtureRequest,
+    capabilities: set[str],
+    image_path: Path,
 ) -> str:
     """``'vm'`` or ``'container'`` — from ``--image-type``, capabilities, or file extension."""
     explicit = request.config.getoption("--image-type")
@@ -197,14 +199,18 @@ def installed_packages(rootfs: Path) -> set[str]:
 
 
 @pytest.fixture(scope="session")
-def partition_table(
-    disk_info: DiskInfo | None, image_type: str
-) -> list[PartitionInfo]:
+def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[PartitionInfo]:
     """Partition metadata — auto-skips for container images."""
     if image_type != "vm":
         pytest.skip("partition_table not applicable to container images")
     assert disk_info is not None
     logger.info("Partition table: %d partitions", len(disk_info.partitions))
     for p in disk_info.partitions:
-        logger.debug("  %s: type=%s mount=%s size=%d", p.device, p.type, p.mountpoint, p.size_bytes)
+        logger.debug(
+            "  %s: type=%s mount=%s size=%d",
+            p.device,
+            p.type,
+            p.mountpoint,
+            p.size_bytes,
+        )
     return disk_info.partitions

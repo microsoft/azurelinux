@@ -73,6 +73,7 @@ def _run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
 
 # -- VM image mounting (libguestfs FUSE) ------------------------------------
 
+
 def _guestfs_env() -> dict[str, str]:
     """Build environment with direct libguestfs backend."""
     return {**os.environ, "LIBGUESTFS_BACKEND": "direct"}
@@ -90,15 +91,23 @@ def mount_vm_image(image_path: Path, mountpoint: Path) -> Path:
     cmd = [
         GUESTMOUNT.name,
         "--ro",
-        "-a", str(image_path),
-        "-i", str(mountpoint),
+        "-a",
+        str(image_path),
+        "-i",
+        str(mountpoint),
         # Aggressive caching — safe because the mount is read-only.
-        "-o", "kernel_cache",
-        "-o", "entry_timeout=3600",
-        "-o", "attr_timeout=3600",
-        "-o", "negative_timeout=3600",
-        "-o", "noforget",
-        "--dir-cache-timeout", "3600",
+        "-o",
+        "kernel_cache",
+        "-o",
+        "entry_timeout=3600",
+        "-o",
+        "attr_timeout=3600",
+        "-o",
+        "negative_timeout=3600",
+        "-o",
+        "noforget",
+        "--dir-cache-timeout",
+        "3600",
     ]
     _run(cmd, env=_guestfs_env())
     return mountpoint
@@ -122,7 +131,9 @@ def unmount_vm_image(mountpoint: Path) -> None:
     if result.returncode != 0:
         logger.warning(
             "guestunmount failed for %s (rc=%d): %s",
-            mountpoint, result.returncode, result.stderr.strip(),
+            mountpoint,
+            result.returncode,
+            result.stderr.strip(),
         )
 
 
@@ -143,19 +154,27 @@ def mount_container_image(image_path: Path, extract_dir: Path) -> Path:
 
     # Convert OCI archive → OCI layout
     logger.info("Converting OCI archive to layout: %s", image_path)
-    _run([
-        SKOPEO.name, "copy",
-        f"oci-archive:{image_path}",
-        f"oci:{oci_layout}:latest",
-    ])
+    _run(
+        [
+            SKOPEO.name,
+            "copy",
+            f"oci-archive:{image_path}",
+            f"oci:{oci_layout}:latest",
+        ]
+    )
 
     # Unpack into an OCI runtime bundle (rootless, no user-ns required)
     logger.info("Unpacking OCI layout to bundle: %s", bundle)
-    _run([
-        UMOCI.name, "unpack", "--rootless",
-        "--image", f"{oci_layout}:latest",
-        str(bundle),
-    ])
+    _run(
+        [
+            UMOCI.name,
+            "unpack",
+            "--rootless",
+            "--image",
+            f"{oci_layout}:latest",
+            str(bundle),
+        ]
+    )
 
     rootfs = bundle / "rootfs"
     logger.info("Container rootfs at %s", rootfs)
@@ -179,5 +198,7 @@ def unmount_container_image(extract_dir: Path) -> None:
     if result.returncode != 0:
         logger.warning(
             "buildah unshare rm failed for %s (rc=%d): %s",
-            extract_dir, result.returncode, result.stderr.strip(),
+            extract_dir,
+            result.returncode,
+            result.stderr.strip(),
         )

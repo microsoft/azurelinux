@@ -73,10 +73,7 @@ def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
         "--image-type",
         choices=("vm", "container"),
         default=None,
-        help=(
-            "Image type: 'vm' or 'container'. "
-            "If omitted, derived from --capabilities or --image-path extension."
-        ),
+        help=("Image type: 'vm' or 'container'. If omitted, derived from --capabilities or --image-path extension."),
     )
     group.addoption(
         "--capabilities",
@@ -91,10 +88,7 @@ def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
     group.addoption(
         "--workdir",
         default=None,
-        help=(
-            "Working directory for temporary files (mounts, extractions). "
-            "Defaults to a temporary directory."
-        ),
+        help=("Working directory for temporary files (mounts, extractions). Defaults to a temporary directory."),
     )
 
 
@@ -127,10 +121,7 @@ def pytest_configure(config) -> None:  # type: ignore[no-untyped-def]
     missing = check_tools(when=image_type)
     if missing:
         names = ", ".join(t.name for t in missing)
-        hints = "\n".join(
-            f"  - {t.name}: {t.reason} (install: {t.package_hint})"
-            for t in missing
-        )
+        hints = "\n".join(f"  - {t.name}: {t.reason} (install: {t.package_hint})" for t in missing)
         raise pytest.UsageError(
             f"Missing required native tool(s): {names}\n{hints}\n\n"
             "Run 'uv run python -m utils.tools' for a full status check."
@@ -161,10 +152,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
             continue
         if image_name and image_name.startswith(expected + "-"):
             continue
-        pytest.skip(
-            f"test is specific to image family '{expected}' "
-            f"(running: '{image_name}')"
-        )
+        pytest.skip(f"test is specific to image family '{expected}' (running: '{image_name}')")
 
 
 def pytest_collection_modifyitems(config, items) -> None:  # type: ignore[no-untyped-def]

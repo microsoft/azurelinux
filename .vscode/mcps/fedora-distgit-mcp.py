@@ -50,9 +50,7 @@ load_env()
 _DEFAULT_BASE_URL = "https://src.fedoraproject.org"
 _base_url: str = _DEFAULT_BASE_URL
 
-_scratch_dir: str = os.path.join(
-    os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "distgit"
-)
+_scratch_dir: str = os.path.join(os.environ.get("AZLDEV_WORK_DIR", "base/build/work"), "scratch", "distgit")
 _repos_dir: str = os.path.join(_scratch_dir, "repos")
 _fetch_dir: str = os.path.join(_scratch_dir, "fetched")
 
@@ -199,6 +197,7 @@ def _ensure_repo(package: str, auto_clean: bool, base_url: str) -> tuple[str, st
 # Tools
 # ---------------------------------------------------------------------------
 
+
 @mcp.tool()
 def distgit_status() -> StatusDict:
     """Return current MCP server state.
@@ -340,8 +339,12 @@ def distgit_search(
     if mode == "pickaxe":
         ref_args = ["--all"] if ref == "--all" else [ref]
         cmd = [
-            "git", "--git-dir", git_dir, "log",
-            "--oneline", "-20",
+            "git",
+            "--git-dir",
+            git_dir,
+            "log",
+            "--oneline",
+            "-20",
             f"-S{query}",
             *ref_args,
             "--",
@@ -353,21 +356,36 @@ def distgit_search(
                 full=False,
             )
         cmd = [
-            "git", "--git-dir", git_dir, "grep",
-            "-n", "-i", "-e", query, ref, "--",
+            "git",
+            "--git-dir",
+            git_dir,
+            "grep",
+            "-n",
+            "-i",
+            "-e",
+            query,
+            ref,
+            "--",
         ]
     elif mode == "log-grep":
         ref_args = ["--all"] if ref == "--all" else [ref]
         cmd = [
-            "git", "--git-dir", git_dir, "log",
-            "--oneline", "-20",
+            "git",
+            "--git-dir",
+            git_dir,
+            "log",
+            "--oneline",
+            "-20",
             f"--grep={query}",
             *ref_args,
         ]
 
     try:
         result = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=30,
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
     except subprocess.TimeoutExpired:
         return _add_status({"error": "Search timed out after 30s."}, full=False)
@@ -387,7 +405,10 @@ def distgit_search(
 
     if not output.strip():
         return _add_status(
-            {"output": f"No matches found for {query!r} in {package} ({mode} on {ref}).", "repo_dir": repo_dir},
+            {
+                "output": f"No matches found for {query!r} in {package} ({mode} on {ref}).",
+                "repo_dir": repo_dir,
+            },
             full=False,
         )
 
@@ -441,7 +462,9 @@ def distgit_show(
     try:
         result = subprocess.run(
             ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
-            capture_output=True, text=True, timeout=30,
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
     except subprocess.TimeoutExpired:
         return _add_status({"error": "git show timed out after 30s."}, full=False)
@@ -450,7 +473,10 @@ def distgit_show(
 
     if result.returncode != 0:
         stderr = result.stderr.strip()
-        return _add_status({"error": f"git show failed (exit {result.returncode}): {stderr}"}, full=False)
+        return _add_status(
+            {"error": f"git show failed (exit {result.returncode}): {stderr}"},
+            full=False,
+        )
 
     output = result.stdout
 

@@ -18,9 +18,9 @@ from _common import get_repo_relative_path
 
 # Mapping from finding category to (workflow command level, checks API level, checks API title)
 _SEVERITY_MAP = {
-    "errors":      ("error",   "failure", "Spec Error"),
-    "warnings":    ("warning", "warning", "Spec Warning"),
-    "suggestions": ("notice",  "notice",  "Suggestion"),
+    "errors": ("error", "failure", "Spec Error"),
+    "warnings": ("warning", "warning", "Spec Warning"),
+    "suggestions": ("notice", "notice", "Suggestion"),
 }
 
 
@@ -52,13 +52,7 @@ def escape_workflow_command(s: str) -> str:
     See https://github.com/actions/toolkit/issues/193
     Order matters: % must be escaped first to avoid double-escaping.
     """
-    return (
-        s.replace("%", "%25")
-        .replace("\r", "%0D")
-        .replace("\n", "%0A")
-        .replace(":", "%3A")
-        .replace(",", "%2C")
-    )
+    return s.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A").replace(":", "%3A").replace(",", "%2C")
 
 
 def generate_workflow_commands(report: dict, repo_root: Optional[Path] = None) -> list[str]:
@@ -80,26 +74,34 @@ def generate_check_annotations(report: dict, repo_root: Optional[Path] = None) -
         _, api_level, title = _SEVERITY_MAP[category]
         line = finding.get("line") or 1
         msg = _format_message(finding)
-        annotations.append({
-            "path": spec_file,
-            "start_line": line,
-            "end_line": line,
-            "annotation_level": api_level,
-            "message": msg,
-            "title": title,
-        })
+        annotations.append(
+            {
+                "path": spec_file,
+                "start_line": line,
+                "end_line": line,
+                "annotation_level": api_level,
+                "message": msg,
+                "title": title,
+            }
+        )
     return annotations
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate check annotations from spec review")
     parser.add_argument("file", type=Path, help="Path to report JSON")
-    parser.add_argument("--workflow-commands", action="store_true",
-                        help="Output GitHub Actions workflow commands")
-    parser.add_argument("--json", action="store_true",
-                        help="Output annotations as JSON for Checks API")
-    parser.add_argument("--repo-root", type=Path, default=None,
-                        help="Repository root for converting absolute paths to relative (default: auto-detect via git)")
+    parser.add_argument(
+        "--workflow-commands",
+        action="store_true",
+        help="Output GitHub Actions workflow commands",
+    )
+    parser.add_argument("--json", action="store_true", help="Output annotations as JSON for Checks API")
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help="Repository root for converting absolute paths to relative (default: auto-detect via git)",
+    )
     args = parser.parse_args()
 
     try:

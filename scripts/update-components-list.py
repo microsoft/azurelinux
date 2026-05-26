@@ -51,11 +51,7 @@ def component_name_from_header(line: str) -> str:
 
 def resolve_source_packages(packages_file: Path) -> set[str]:
     """Map binary package names from a .packages file to source package names."""
-    names = [
-        l.split("|")[0].strip()
-        for l in packages_file.read_text().splitlines()
-        if l.strip()
-    ]
+    names = [l.split("|")[0].strip() for l in packages_file.read_text().splitlines() if l.strip()]
     r = subprocess.run(
         [
             "xargs",
@@ -144,9 +140,7 @@ def add_and_sort_components(components_toml: Path, new: list[str]) -> None:
 def cmd_add_missing(args: argparse.Namespace) -> int:
     """Handler for the ``add-missing`` subcommand."""
     repo_root = args.repo_root.resolve()
-    components_toml = (
-        args.components_toml or repo_root / "base" / "comps" / "components.toml"
-    ).resolve()
+    components_toml = (args.components_toml or repo_root / "base" / "comps" / "components.toml").resolve()
 
     if not args.packages_file.is_file():
         sys.exit(f"Error: Packages file not found: {args.packages_file}")
@@ -154,9 +148,7 @@ def cmd_add_missing(args: argparse.Namespace) -> int:
         sys.exit(f"Error: components.toml not found: {components_toml}")
 
     print("Finding missing components...")
-    missing = sorted(
-        resolve_source_packages(args.packages_file) - get_existing_components()
-    )
+    missing = sorted(resolve_source_packages(args.packages_file) - get_existing_components())
 
     if not missing:
         print("No missing components found!")
@@ -241,10 +233,7 @@ def cmd_update(args: argparse.Namespace) -> int:
                     shutil.rmtree(comp_dir)
 
         if kept:
-            print(
-                f"\nKept {len(kept)} dedicated component dir(s) "
-                f"(present in sources list)"
-            )
+            print(f"\nKept {len(kept)} dedicated component dir(s) (present in sources list)")
         if removed:
             verb = "Would remove" if args.dry_run else "Removed"
             print(f"\n{verb} {len(removed)} stale dedicated component dir(s):")
@@ -297,8 +286,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--packages-file",
         type=Path,
         required=True,
-        help="Path to the .packages file "
-        "(e.g. ./base/out/images/vm-base-dev/azl4-vm-base.x86_64-0.1.packages)",
+        help="Path to the .packages file (e.g. ./base/out/images/vm-base-dev/azl4-vm-base.x86_64-0.1.packages)",
     )
     add_missing.add_argument(
         "-r",
@@ -343,8 +331,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--components-root",
         type=Path,
         default=None,
-        help="Path to the folder containing component definitions "
-        "(default: <repo-root>/base/comps)",
+        help="Path to the folder containing component definitions (default: <repo-root>/base/comps)",
     )
     update.add_argument(
         "-o",

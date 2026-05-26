@@ -28,9 +28,7 @@ from urllib3.util.retry import Retry
 # (azl-ControlTower/ControlTower/Shared/Models/Jobs/JobStatus.cs).
 NON_TERMINAL_STATUSES = frozenset({"Queued", "Pending", "Running"})
 SUCCESS_STATUS = "Completed"
-TERMINAL_FAILURE_STATUSES = frozenset(
-    {"Failed", "Cancelled", "CancelledByAdmin", "Unknown", "TimedOut"}
-)
+TERMINAL_FAILURE_STATUSES = frozenset({"Failed", "Cancelled", "CancelledByAdmin", "Unknown", "TimedOut"})
 
 
 @dataclass
@@ -86,9 +84,7 @@ def format_error(response: requests.Response) -> str:
       * ASP.NET validation: ``{"title", "errors": {field: [msg, ...]}}``
     """
     method = response.request.method if response.request is not None else "?"
-    lines: list[str] = [
-        f"HTTP {response.status_code} {response.reason} from {method} {response.url}"
-    ]
+    lines: list[str] = [f"HTTP {response.status_code} {response.reason} from {method} {response.url}"]
 
     body: Any
     try:
@@ -178,8 +174,7 @@ def _parse_json_object(response: requests.Response, context: str) -> dict:
         body = response.json()
     except ValueError as exc:
         raise RuntimeError(
-            f"{context} returned HTTP {response.status_code} "
-            f"but the body was not valid JSON:\n{response.text}"
+            f"{context} returned HTTP {response.status_code} but the body was not valid JSON:\n{response.text}"
         ) from exc
     if not isinstance(body, dict):
         raise RuntimeError(
@@ -219,9 +214,7 @@ def post_scenario(
         json_payload=payload,
     )
     if not response.ok:
-        raise RuntimeError(
-            f"Control Tower '{context}' request failed.\n" + format_error(response)
-        )
+        raise RuntimeError(f"Control Tower '{context}' request failed.\n" + format_error(response))
     return _parse_json_object(response, f"Control Tower '{context}'")
 
 
@@ -235,13 +228,9 @@ def get_job_status(
 ) -> dict:
     """GET the job status. Refreshes the bearer token on 401 and retries once."""
     url = f"{base_url}/api/Workflow/jobs/status/{job_id}"
-    response = _request_with_refresh(
-        session, "GET", url, credential, audience, token_holder
-    )
+    response = _request_with_refresh(session, "GET", url, credential, audience, token_holder)
     if not response.ok:
-        raise RuntimeError(
-            "Control Tower job status request failed.\n" + format_error(response)
-        )
+        raise RuntimeError("Control Tower job status request failed.\n" + format_error(response))
     return _parse_json_object(response, "Control Tower job status")
 
 
@@ -284,19 +273,13 @@ def poll_until_terminal(
     job_status_object: dict = {}
 
     while True:
-        job_status_object = get_job_status(
-            session, base_url, credential, audience, token_holder, job_id
-        )
+        job_status_object = get_job_status(session, base_url, credential, audience, token_holder, job_id)
         current_status = job_status_object.get("status", "Unknown")
         elapsed = int(time.monotonic() - start)
 
         if current_status != previous_status:
             task_summary = _summarize_tasks(job_status_object.get("tasks"))
-            transition = (
-                f"{previous_status} -> {current_status}"
-                if previous_status is not None
-                else current_status
-            )
+            transition = f"{previous_status} -> {current_status}" if previous_status is not None else current_status
             suffix = f" | {task_summary}" if task_summary else ""
             print(
                 f"Job {job_id} status: {transition} (elapsed {elapsed}s){suffix}",
@@ -342,14 +325,7 @@ def report_failure(final: dict) -> None:
 
     tasks = final.get("tasks")
     if isinstance(tasks, list):
-        failed = [
-            t
-            for t in tasks
-            if isinstance(t, dict) and t.get("status") in TERMINAL_FAILURE_STATUSES
-        ]
+        failed = [t for t in tasks if isinstance(t, dict) and t.get("status") in TERMINAL_FAILURE_STATUSES]
         for task in failed:
             name = task.get("taskName") or task.get("taskId")
-            print(
-                f"##[error]task '{name}' status={task.get('status')} "
-                f"attempt={task.get('attemptNumber')}"
-            )
+            print(f"##[error]task '{name}' status={task.get('status')} attempt={task.get('attemptNumber')}")

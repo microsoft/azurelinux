@@ -75,7 +75,9 @@ class SpecReviewReport(BaseModel):
     def print_summary(self):
         status = "ERRORS FOUND" if self.has_errors else "No errors"
         print(f"{status}")
-        print(f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}")
+        print(
+            f"Specs: {len(self.spec_reviews)} | Errors: {self.total_errors} | Warnings: {self.total_warnings} | Suggestions: {self.total_suggestions}"
+        )
 
     def print_errors(self):
         for review in self.spec_reviews:
@@ -145,8 +147,14 @@ def compare_reports(
     print(f"┌─{'─' * col_w}─┬────────┬──────────┬─────────────┐")
     print(f"│ {'Model':<{col_w}} │ Errors │ Warnings │ Suggestions │")
     print(f"├─{'─' * col_w}─┼────────┼──────────┼─────────────┤")
-    for label, report in [(label_a, report_a), (label_b, report_b), (label_final, report_final)]:
-        print(f"│ {label:<{col_w}} │ {report.total_errors:>6} │ {report.total_warnings:>8} │ {report.total_suggestions:>11} │")
+    for label, report in [
+        (label_a, report_a),
+        (label_b, report_b),
+        (label_final, report_final),
+    ]:
+        print(
+            f"│ {label:<{col_w}} │ {report.total_errors:>6} │ {report.total_warnings:>8} │ {report.total_suggestions:>11} │"
+        )
     print(f"└─{'─' * col_w}─┴────────┴──────────┴─────────────┘")
     print()
 
@@ -206,7 +214,11 @@ def main() -> int:
         parser.add_argument("report_final", type=Path, help="Final synthesized report")
         parser.add_argument("--label-a", default="Reviewer A", help="Display label for reviewer A")
         parser.add_argument("--label-b", default="Reviewer B", help="Display label for reviewer B")
-        parser.add_argument("--label-final", default="Synthesized", help="Display label for final report")
+        parser.add_argument(
+            "--label-final",
+            default="Synthesized",
+            help="Display label for final report",
+        )
         args = parser.parse_args()
 
         try:

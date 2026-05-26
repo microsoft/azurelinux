@@ -74,10 +74,12 @@ def main() -> None:
     # changed list AND with hand-edited specs would otherwise print twice,
     # and a component with N modified spec files would print N times.
     # dict.fromkeys preserves first-seen order.
-    names = dict.fromkeys([
-        *from_changed(entries),
-        *from_specs_diff(args.specs_diff_file, args.specs_dir, renderable),
-    ])
+    names = dict.fromkeys(
+        [
+            *from_changed(entries),
+            *from_specs_diff(args.specs_diff_file, args.specs_dir, renderable),
+        ]
+    )
     for name in names:
         print(name)
 

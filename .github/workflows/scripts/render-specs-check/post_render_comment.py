@@ -116,9 +116,7 @@ def format_comment(
     n_extra = len(extra_files)
     n_missing = len(missing_files)
 
-    all_comps: list[str] = sorted(
-        {item["component"] for item in content_diffs + extra_files}
-    )
+    all_comps: list[str] = sorted({item["component"] for item in content_diffs + extra_files})
     # Missing files (in HEAD but not produced by render) are orphans that
     # need `--clean-stale`, which only works with `-a`. Extras (produced by
     # render but not committed) are handled fine by a per-component render.
@@ -187,10 +185,7 @@ def format_comment(
         for item in content_diffs:
             if shown >= MAX_INLINE_DIFFS:
                 remaining = n_diff - shown
-                lines.append(
-                    f"*… and {remaining} more file(s). "
-                    "Run the remediation command above to see all changes.*"
-                )
+                lines.append(f"*… and {remaining} more file(s). Run the remediation command above to see all changes.*")
                 lines.append("")
                 break
             path = _safe_path(item["path"])
@@ -201,12 +196,7 @@ def format_comment(
             # code formatting: the path is rendered as code in the summary, and
             # the diff body is inside a dynamically chosen fence longer than any
             # backtick run in the diff text.
-            block = (
-                "<details>\n"
-                f"<summary>`{path}`</summary>\n\n"
-                f"{fence}diff\n{diff_text}\n{fence}\n\n"
-                "</details>\n"
-            )
+            block = f"<details>\n<summary>`{path}`</summary>\n\n{fence}diff\n{diff_text}\n{fence}\n\n</details>\n"
             if body_so_far + len(block) > budget_cap:
                 remaining = n_diff - shown
                 lines.append(
@@ -266,16 +256,14 @@ def format_comment(
     if extra_files:
         _append_file_list(
             "### Files to add",
-            "These files are produced by `azldev component render` but are "
-            "missing from your branch. Add them.",
+            "These files are produced by `azldev component render` but are missing from your branch. Add them.",
             extra_files,
         )
 
     if missing_files:
         _append_file_list(
             "### Files to remove",
-            "These files are in your branch but are not produced by render. "
-            "Remove them.",
+            "These files are in your branch but are not produced by render. Remove them.",
             missing_files,
         )
 
@@ -288,9 +276,7 @@ def format_comment(
 
 
 def _gh(*args: str) -> str:
-    return subprocess.run(
-        ["gh", *args], capture_output=True, text=True, check=True
-    ).stdout.strip()
+    return subprocess.run(["gh", *args], capture_output=True, text=True, check=True).stdout.strip()
 
 
 def find_existing_comments(repo: str, pr: str) -> list[str]:
@@ -307,11 +293,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
             "--paginate",
             f"/repos/{repo}/issues/{pr}/comments",
             "--jq",
-            (
-                f'.[] | select(.user.login == "{BOT_AUTHOR}") '
-                f'| select(.body | contains("{COMMENT_MARKER}")) '
-                "| .id"
-            ),
+            (f'.[] | select(.user.login == "{BOT_AUTHOR}") | select(.body | contains("{COMMENT_MARKER}")) | .id'),
         )
     except subprocess.CalledProcessError:
         return []
@@ -382,9 +364,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Post rendered-spec drift results as a PR comment."
-    )
+    parser = argparse.ArgumentParser(description="Post rendered-spec drift results as a PR comment.")
     parser.add_argument(
         "--report",
         type=Path,
@@ -393,9 +373,7 @@ def main() -> int:
     )
     parser.add_argument("--repo", required=True, help="GitHub repo (owner/repo)")
     parser.add_argument("--pr", required=True, help="PR number")
-    parser.add_argument(
-        "--artifacts-url", default=None, help="Direct URL to patch artifact"
-    )
+    parser.add_argument("--artifacts-url", default=None, help="Direct URL to patch artifact")
     parser.add_argument("--run-id", default=None, help="GitHub Actions run ID")
     args = parser.parse_args()
 
@@ -407,9 +385,7 @@ def main() -> int:
         return 1
 
     total = (
-        len(report.get("content_diffs", []))
-        + len(report.get("extra_files", []))
-        + len(report.get("missing_files", []))
+        len(report.get("content_diffs", [])) + len(report.get("extra_files", [])) + len(report.get("missing_files", []))
     )
 
     body: str | None = None

@@ -117,19 +117,12 @@ def parse_update_output(path: Path) -> list[dict]:
 
     if not isinstance(data, list):
         raise SystemExit(
-            f"Error: update output has unexpected shape (expected null or list, "
-            f"got {type(data).__name__})"
+            f"Error: update output has unexpected shape (expected null or list, got {type(data).__name__})"
         )
 
     for entry in data:
-        if (
-            not isinstance(entry, dict)
-            or "component" not in entry
-            or "changed" not in entry
-        ):
-            raise SystemExit(
-                f"Error: update output entry has unexpected shape: {entry!r}"
-            )
+        if not isinstance(entry, dict) or "component" not in entry or "changed" not in entry:
+            raise SystemExit(f"Error: update output entry has unexpected shape: {entry!r}")
 
     return [entry for entry in data if entry["changed"] is True]
 
@@ -160,9 +153,7 @@ def format_comment(
     # inject arbitrary commands into a maintainer's terminal. Fall back to
     # `-a` if any name fails the same regex used for display so the
     # printed command is always safe to run as-is.
-    use_all = n_changed > 30 or any(
-        not _SAFE_NAME_RE.match(name) for name in comp_names
-    )
+    use_all = n_changed > 30 or any(not _SAFE_NAME_RE.match(name) for name in comp_names)
     remediation_cmd = _update_command([] if use_all else comp_names, use_all=use_all)
 
     lines: list[str] = [
@@ -248,9 +239,7 @@ def format_comment(
 
 
 def _gh(*args: str) -> str:
-    return subprocess.run(
-        ["gh", *args], capture_output=True, text=True, check=True
-    ).stdout.strip()
+    return subprocess.run(["gh", *args], capture_output=True, text=True, check=True).stdout.strip()
 
 
 def find_existing_comments(repo: str, pr: str) -> list[str]:
@@ -267,11 +256,7 @@ def find_existing_comments(repo: str, pr: str) -> list[str]:
             "--paginate",
             f"/repos/{repo}/issues/{pr}/comments",
             "--jq",
-            (
-                f'.[] | select(.user.login == "{BOT_AUTHOR}") '
-                f'| select(.body | contains("{COMMENT_MARKER}")) '
-                "| .id"
-            ),
+            (f'.[] | select(.user.login == "{BOT_AUTHOR}") | select(.body | contains("{COMMENT_MARKER}")) | .id'),
         )
     except subprocess.CalledProcessError:
         return []
@@ -342,9 +327,7 @@ def delete_comment_if_exists(repo: str, pr: str) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Post `azldev component update` drift as a PR comment."
-    )
+    parser = argparse.ArgumentParser(description="Post `azldev component update` drift as a PR comment.")
     parser.add_argument(
         "--update-output",
         type=Path,
@@ -353,9 +336,7 @@ def main() -> int:
     )
     parser.add_argument("--repo", required=True, help="GitHub repo (owner/repo)")
     parser.add_argument("--pr", required=True, help="PR number")
-    parser.add_argument(
-        "--artifacts-url", default=None, help="Direct URL to patch artifact"
-    )
+    parser.add_argument("--artifacts-url", default=None, help="Direct URL to patch artifact")
     parser.add_argument("--run-id", default=None, help="GitHub Actions run ID")
     args = parser.parse_args()
 

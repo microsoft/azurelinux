@@ -69,9 +69,11 @@ def load_env(env_path: str | Path | None = None) -> None:
             print(f"[mcp] Loaded .env from {c}", file=sys.stderr)
             return
 
-    print("[mcp] No .env file found (checked: "
-          + ", ".join(str(p) for p in candidates) + ")",
-          file=sys.stderr)
+    print(
+        "[mcp] No .env file found (checked: " + ", ".join(str(p) for p in candidates) + ")",
+        file=sys.stderr,
+    )
+
 
 # Valid RPM package name characters: starts with alphanumeric, then
 # alphanumerics plus . _ + -
@@ -118,11 +120,7 @@ def check_ssrf(base_url: str, constructed_url: str) -> str | None:
     base_port = effective_port(parsed_base)
     url_port = effective_port(parsed_url)
 
-    if (
-        parsed_url.hostname != parsed_base.hostname
-        or parsed_url.scheme != parsed_base.scheme
-        or url_port != base_port
-    ):
+    if parsed_url.hostname != parsed_base.hostname or parsed_url.scheme != parsed_base.scheme or url_port != base_port:
         return (
             "Constructed URL does not match the configured endpoint "
             f"(scheme/host/port mismatch: {parsed_url.scheme!r}://{parsed_url.hostname!r}:{url_port!r} "

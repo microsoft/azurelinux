@@ -64,9 +64,15 @@ if _base_url:
     _flags = []
     if _base_url in _insecure_urls:
         _flags.append("insecure=yes")
-    print(f"[koji-mcp] Base URL: {_base_url}" + (f" ({', '.join(_flags)})" if _flags else ""), file=sys.stderr)
+    print(
+        f"[koji-mcp] Base URL: {_base_url}" + (f" ({', '.join(_flags)})" if _flags else ""),
+        file=sys.stderr,
+    )
 if _insecure_urls:
-    print(f"[koji-mcp] Pre-approved insecure URLs: {', '.join(sorted(_insecure_urls))}", file=sys.stderr)
+    print(
+        f"[koji-mcp] Pre-approved insecure URLs: {', '.join(sorted(_insecure_urls))}",
+        file=sys.stderr,
+    )
 
 
 def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
@@ -140,7 +146,8 @@ def koji_allow_insecure(override_base_url: str | None = None) -> StatusDict:
 
     if not url:
         return _add_status(
-            {"error": "No Koji URL available. Pass override_base_url or call set_koji_url first."}, full=False
+            {"error": "No Koji URL available. Pass override_base_url or call set_koji_url first."},
+            full=False,
         )
 
     if url not in _ssl_errors_seen:
@@ -182,7 +189,8 @@ def koji_fetch(path: str, override_base_url: str | None = None) -> StatusDict:
 
     if not base:
         return _add_status(
-            {"error": "No Koji URL available. Pass override_base_url or call set_koji_url first."}, full=False
+            {"error": "No Koji URL available. Pass override_base_url or call set_koji_url first."},
+            full=False,
         )
 
     if not path.startswith("/"):

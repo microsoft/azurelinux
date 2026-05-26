@@ -74,7 +74,11 @@ def _parse_virt_inspector(xml_output: str) -> DiskInfo:
 
         logger.debug(
             "Partition: dev=%s type=%s label=%s mount=%s size=%d",
-            device, fs_type, label, mountpoint, size,
+            device,
+            fs_type,
+            label,
+            mountpoint,
+            size,
         )
 
         partitions.append(

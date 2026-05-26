@@ -118,8 +118,12 @@ def main() -> int:
     parser.add_argument("file", type=Path, help="Path to report JSON")
     parser.add_argument("--repo", required=True, help="GitHub repo (owner/repo)")
     parser.add_argument("--sha", required=True, help="Commit SHA for file links")
-    parser.add_argument("--repo-root", type=Path, default=None,
-                        help="Repository root for converting absolute paths to relative")
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help="Repository root for converting absolute paths to relative",
+    )
     args = parser.parse_args()
 
     try:

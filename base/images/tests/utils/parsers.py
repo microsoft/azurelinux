@@ -56,9 +56,7 @@ def query_rpm_packages(rootfs: Path) -> set[str]:
         check=False,
     )
     if result.returncode != 0:
-        raise RuntimeError(
-            f"rpm query failed (rc={result.returncode}): {result.stderr.strip()}"
-        )
+        raise RuntimeError(f"rpm query failed (rc={result.returncode}): {result.stderr.strip()}")
     pkgs = {line.strip() for line in result.stdout.splitlines() if line.strip()}
     logger.debug("rpm query returned %d packages", len(pkgs))
     return pkgs

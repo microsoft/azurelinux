@@ -49,16 +49,12 @@ def _load_components_from_file(path: Path) -> list[str]:
     try:
         raw = path.read_text(encoding="utf-8")
     except OSError as exc:
-        raise SystemExit(
-            f"##[error]Failed to read --changed-components-file {path!s}: {exc}"
-        ) from exc
+        raise SystemExit(f"##[error]Failed to read --changed-components-file {path!s}: {exc}") from exc
 
     try:
         entries = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise SystemExit(
-            f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}"
-        ) from exc
+        raise SystemExit(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}") from exc
 
     if not isinstance(entries, list):
         raise SystemExit(
@@ -89,9 +85,7 @@ def _parse_args() -> argparse.Namespace:
         required=True,
         help="Entra ID audience URI (e.g. api://<client-id>)",
     )
-    parser.add_argument(
-        "--api-base-url", required=True, help="Base URL of the Control Tower service"
-    )
+    parser.add_argument("--api-base-url", required=True, help="Base URL of the Control Tower service")
     parser.add_argument(
         "--build-reason",
         required=True,
@@ -182,16 +176,11 @@ def main() -> None:
     print(json.dumps(payload, indent=2))
 
     if args.build_reason == "PullRequest":
-        print(
-            "Skipping Control Tower call - pull request triggers are not supported, yet."
-        )
+        print("Skipping Control Tower call - pull request triggers are not supported, yet.")
         return
 
     if not components:
-        print(
-            "No affected components detected between source and target commits; "
-            "skipping Control Tower call."
-        )
+        print("No affected components detected between source and target commits; skipping Control Tower call.")
         return
 
     # ── Acquire bearer token ─────────────────────────────────────────
@@ -221,17 +210,11 @@ def main() -> None:
 
     job_id = prcheck_response.get("jobId")
     if not job_id:
-        print(
-            "##[error]Control Tower 'prcheck' response did not include a 'jobId'. "
-            "Cannot poll for job status."
-        )
+        print("##[error]Control Tower 'prcheck' response did not include a 'jobId'. Cannot poll for job status.")
         sys.exit(1)
 
     # ── Poll for job completion ──────────────────────────────────────
-    print(
-        f"Polling job {job_id} every {args.poll_interval_seconds}s "
-        f"(timeout {args.poll_timeout_seconds}s)..."
-    )
+    print(f"Polling job {job_id} every {args.poll_interval_seconds}s (timeout {args.poll_timeout_seconds}s)...")
     try:
         final, timed_out = ct.poll_until_terminal(
             session,

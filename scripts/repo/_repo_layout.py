@@ -28,20 +28,20 @@ ALL_KINDS: tuple[str, ...] = (KIND_MAIN, KIND_DEBUGINFO, KIND_SRPMS)
 class SubrepoSpec:
     """One sub-repo in the standard layout."""
 
-    name: str           # stable short identifier (e.g. "base", "sdk-srpms")
-    channel: str        # one of CHANNELS
-    kind: str           # one of ALL_KINDS
-    per_arch: bool      # True iff `subpath` contains $basearch
-    subpath: str        # path under a layout prefix
+    name: str  # stable short identifier (e.g. "base", "sdk-srpms")
+    channel: str  # one of CHANNELS
+    kind: str  # one of ALL_KINDS
+    per_arch: bool  # True iff `subpath` contains $basearch
+    subpath: str  # path under a layout prefix
 
 
 SUBREPOS: tuple[SubrepoSpec, ...] = (
-    SubrepoSpec("base",           "base", KIND_MAIN,      True,  "base/$basearch"),
-    SubrepoSpec("base-debuginfo", "base", KIND_DEBUGINFO, True,  "base/debuginfo/$basearch"),
-    SubrepoSpec("base-srpms",     "base", KIND_SRPMS,     False, "base/srpms"),
-    SubrepoSpec("sdk",            "sdk",  KIND_MAIN,      True,  "sdk/$basearch"),
-    SubrepoSpec("sdk-debuginfo",  "sdk",  KIND_DEBUGINFO, True,  "sdk/debuginfo/$basearch"),
-    SubrepoSpec("sdk-srpms",      "sdk",  KIND_SRPMS,     False, "sdk/srpms"),
+    SubrepoSpec("base", "base", KIND_MAIN, True, "base/$basearch"),
+    SubrepoSpec("base-debuginfo", "base", KIND_DEBUGINFO, True, "base/debuginfo/$basearch"),
+    SubrepoSpec("base-srpms", "base", KIND_SRPMS, False, "base/srpms"),
+    SubrepoSpec("sdk", "sdk", KIND_MAIN, True, "sdk/$basearch"),
+    SubrepoSpec("sdk-debuginfo", "sdk", KIND_DEBUGINFO, True, "sdk/debuginfo/$basearch"),
+    SubrepoSpec("sdk-srpms", "sdk", KIND_SRPMS, False, "sdk/srpms"),
 )
 
 

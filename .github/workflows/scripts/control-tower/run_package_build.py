@@ -39,16 +39,12 @@ def _load_build_components(path: Path) -> list[str]:
     try:
         raw = path.read_text(encoding="utf-8")
     except OSError as exc:
-        raise SystemExit(
-            f"##[error]Failed to read --changed-components-file {path!s}: {exc}"
-        ) from exc
+        raise SystemExit(f"##[error]Failed to read --changed-components-file {path!s}: {exc}") from exc
 
     try:
         entries = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise SystemExit(
-            f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}"
-        ) from exc
+        raise SystemExit(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}") from exc
 
     if not isinstance(entries, list):
         raise SystemExit(
@@ -212,10 +208,7 @@ def main() -> None:
 
     job_id = build_response.get("jobId")
     if not job_id:
-        print(
-            "##[error]Control Tower 'package' response did not include a 'jobId'. "
-            "Cannot confirm job acceptance."
-        )
+        print("##[error]Control Tower 'package' response did not include a 'jobId'. Cannot confirm job acceptance.")
         sys.exit(1)
 
     # ── Brief poll — just confirm the job was accepted ───────────────
