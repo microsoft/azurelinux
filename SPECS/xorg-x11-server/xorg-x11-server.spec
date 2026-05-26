@@ -83,7 +83,8 @@ Patch33:        CVE-2025-49176.patch
 Patch34:        CVE-2025-49178.patch
 Patch35:        CVE-2025-49179.patch
 Patch36:        CVE-2025-49180.patch
-Patch37:        CVE-2026-34001.patch
+Patch37:       CVE-2024-0408.patch
+Patch38:        CVE-2026-34001.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -111,9 +112,6 @@ Patch522:       0022-xwayland-Call-xwl_window_check_resolution_change_emu.patch
 Patch523:       0023-xwayland-Fix-setting-of-_XWAYLAND_RANDR_EMU_MONITOR_.patch
 Patch524:       0024-xwayland-Remove-unnecessary-xwl_window_is_toplevel-c.patch
 Patch525:       0025-xwayland-Make-window_get_client_toplevel-non-recursi.patch
-
-# a flaw was founnd in the x.org server in GLX PBuffer
-Patch601:       CVE-2024-0408.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
