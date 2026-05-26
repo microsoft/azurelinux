@@ -21674,7 +21674,7 @@
         "other": {
           "name": "postfix",
           "version": "3.9.11",
-          "downloadUrl": "http://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.9.11.tar.gz"
+          "downloadUrl": "https://archive.mgm51.com/mirrors/postfix-source/official/postfix-3.9.11.tar.gz"
         }
       }
     },
