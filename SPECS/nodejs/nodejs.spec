@@ -45,6 +45,7 @@ BuildRequires:  make
 BuildRequires:  ninja-build
 BuildRequires:  openssl-devel >= 1.1.1
 BuildRequires:  python3
+BuildRequires:  unzip
 BuildRequires:  which
 BuildRequires:  zlib-devel
 BuildRequires:  perl-WWW-Curl
