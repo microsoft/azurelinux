@@ -24,6 +24,7 @@ Patch11:        CVE-2026-33845.patch
 Patch12:        CVE-2026-33846.patch
 Patch13:        CVE-2026-3832.patch
 Patch14:        CVE-2026-42010.patch
+
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
