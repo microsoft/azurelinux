@@ -30,7 +30,10 @@ Patch7:         CVE-2026-40701.patch
 Patch8:         CVE-2026-42934.patch
 Patch9:         CVE-2026-42945.patch
 Patch10:        CVE-2026-42946.patch
-Patch11:        CVE-2026-8711.patch
+
+# njs patches start at 1001 to keep them separate from nginx patches
+Patch1001:        CVE-2026-8711.patch
+
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -75,13 +78,13 @@ The OpenTelemetry module for Nginx
 
 %prep
 %autosetup -N
-%autopatch -p1 -M 10
+%autopatch -p1 -M 1000
 
 mkdir -p ../nginx-njs
 tar -C ../nginx-njs -xf %{SOURCE2}
 
 pushd ../nginx-njs/njs-%{njs_version}
-%patch 11 -p1
+%autopatch -p1 -m 1001
 popd
 
 
