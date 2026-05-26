@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Thu, 22 May 2026 00:00:00 +0000
+Subject: [PATCH] conf: performance tuning for nginx.conf
+
+Set worker_processes to auto with CPU affinity and enable tcp_nopush
+for improved performance.
+
+---
+ conf/nginx.conf | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/conf/nginx.conf b/conf/nginx.conf
+index 29bc085..a1b2c3d 100644
+--- a/conf/nginx.conf
++++ b/conf/nginx.conf
+@@ -1,6 +1,7 @@
+
+ #user  nobody;
+-worker_processes  1;
++worker_processes auto;
++worker_cpu_affinity auto;
+
+ #error_log  logs/error.log;
+ #error_log  logs/error.log  notice;
+@@ -25,7 +26,7 @@
+     #access_log  logs/access.log  main;
+
+     sendfile        on;
+-    #tcp_nopush     on;
++    tcp_nopush on;
+
+     #keepalive_timeout  0;
+     keepalive_timeout  65;
