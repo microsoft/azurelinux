@@ -102,7 +102,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 25.07
-Release:	 8%{release_suffix}%{?dist}
+Release:	 9%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -110,6 +110,14 @@ Group:		 System Environment/Base
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
 # https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
 Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
+
+# Re-export the IB peer-memory client API as GPL-only symbols so that
+# GPL out-of-tree drivers (amdgpu, NVIDIA open-source GPU driver, ...)
+# can consume them at runtime via symbol resolution instead of needing
+# a build-time dependency on mlnx-ofa_kernel-hwe. This breaks the diamond
+# build-time dependency between an OOT GPU driver and multiple OOT NIC
+# drivers that all consume the same peermem API.
+Patch0:          0001-peer_mem-export-symbols-as-GPL.patch
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -283,6 +291,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/
 
 %prep
 %setup -n mlnx-ofa_kernel-%{_version}
+%patch 0 -p1
 
 set -- *
 mkdir source
@@ -449,6 +458,11 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Tue May 26 2026 Zheyu Shen <zheyushen@microsoft.com> - 25.07-9_6.12.57.1.6
+- Re-export IB peer-memory client API as EXPORT_SYMBOL_GPL to allow OOT
+  GPU drivers (amdgpu, NVIDIA open-source) to resolve peermem symbols at
+  module load time, removing the build-time dependency on mlnx-ofa_kernel-hwe.
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
 - Tweak specs to use dynamic versioning for kernel
 
