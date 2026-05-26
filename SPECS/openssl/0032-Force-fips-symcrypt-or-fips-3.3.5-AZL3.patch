@@ -60,7 +60,7 @@ index 70c9729..5b39131 100644
 +
 +        NCONF_free(prov_conf);
 +
-+        // We successfully loaded the SymCrypt provider.
++        // We successfully loaded the provider via config.
 +        return 1;
 +    } else if (try_load_if_no_config != 0) {
 +        // If requested by the caller, fall back to just loading by name.
@@ -122,7 +122,7 @@ index 70c9729..5b39131 100644
 +    // Get the kernel FIPS mode. This also takes into account the FIPS override variable OPENSSL_FORCE_FIPS_MODE.
 +    int kernel_fips_mode = ossl_get_kernel_fips_flag();
 +
-+    // We only need to do anything special if neither FIPS-certified providers.
++    // We only need to do anything special if neither FIPS-certified provider is activated.
 +    if (symcrypt_prov_activated == 0 && fips_prov_activated == 0) {
 +        if (kernel_fips_mode == 0) {
 +            // If the system is in NON-FIPS mode, try to load the SymCrypt provider.

@@ -123,6 +123,7 @@ OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
 export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 # Generate fipsmodule.cnf for the unstripped test fips.so
 OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall \
+    -pedantic \
     -module providers/fips.so \
     -out test/fipsmodule.cnf
 # Run tests
@@ -134,7 +135,7 @@ make test HARNESS_JOBS=8
     %{__arch_install_post} \
     %{__os_install_post} \
     mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls \
-    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall -module $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf \
+    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall -pedantic -module $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf \
 %{nil}
 
 %define __provides_exclude_from %{_libdir}/openssl
