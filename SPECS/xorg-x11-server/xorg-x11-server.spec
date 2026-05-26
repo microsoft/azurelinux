@@ -83,6 +83,7 @@ Patch33:        CVE-2025-49176.patch
 Patch34:        CVE-2025-49178.patch
 Patch35:        CVE-2025-49179.patch
 Patch36:        CVE-2025-49180.patch
+Patch37:        CVE-2026-34001.patch
 
 # Backported Xwayland randr resolution change emulation support
 Patch501:       0001-dix-Add-GetCurrentClient-helper.patch
@@ -113,7 +114,6 @@ Patch525:       0025-xwayland-Make-window_get_client_toplevel-non-recursi.patch
 
 # a flaw was founnd in the x.org server in GLX PBuffer
 Patch601:       CVE-2024-0408.patch
-Patch602:       CVE-2026-34001.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
