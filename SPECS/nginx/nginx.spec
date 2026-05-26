@@ -32,7 +32,7 @@ Patch9:         CVE-2026-42945.patch
 Patch10:        CVE-2026-42946.patch
 
 # njs patches start at 1001 to keep them separate from nginx patches
-Patch1001:        CVE-2026-8711.patch
+Patch1001:      CVE-2026-8711.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
