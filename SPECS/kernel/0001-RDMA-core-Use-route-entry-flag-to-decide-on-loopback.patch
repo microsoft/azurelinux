@@ -1,0 +1,131 @@
+From cf6b689997b039f1f274d588b7b7011be43e8fcd Mon Sep 17 00:00:00 2001
+From: Andreas Zaugg <azaugg@linkedin.com>
+Date: Tue, 26 May 2026 18:18:35 -0400
+Subject: [PATCH] RDMA/core: Use route entry flag to decide on loopback traffic
+
+addr_resolve() considers a destination to be local if the next-hop
+device of the resolved route for the destination is the loopback
+netdevice.
+
+This fails when the source and destination IP addresses belong to
+a netdev enslaved to a VRF netdev. In this case the next-hop device
+is the VRF itself:
+
+ $ ip link add name myvrf up type vrf table 100
+ $ ip link set ens2f0np0 master myvrf up
+ $ ip addr add 192.168.1.1/24 dev ens2f0np0
+ $ ip route get 192.168.1.1 oif myvrf
+ local 192.168.1.1 dev myvrf table 100 src 192.168.1.1 uid 0
+    cache <local>
+
+This results in packets being generated with an incorrect destination
+MAC of the VRF netdevice and ib_write_bw failing with timeout.
+
+Solve this by determining if a destination is local or not based on
+the resolved route's type rather than based on its next-hop netdevice
+loopback flag.
+
+This enables to resolve loopback traffic with and without VRF
+configurations in a uniform way.
+
+Backported from upstream commit c31e4038c97f (mainline) to 6.6 LTS.
+dst_rtable() helper is not available in 6.6, replaced with a direct
+cast to (const struct rtable *).
+
+Signed-off-by: Parav Pandit <parav@nvidia.com>
+Reviewed-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+Signed-off-by: Edward Srouji <edwards@nvidia.com>
+Link: https://patch.msgid.link/20250916111103.84069-4-edwards@nvidia.com
+Signed-off-by: Leon Romanovsky <leon@kernel.org>
+---
+ drivers/infiniband/core/addr.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/infiniband/core/addr.c b/drivers/infiniband/core/addr.c
+index e95745710610..3895a7aa5ec0 100644
+--- a/drivers/infiniband/core/addr.c
++++ b/drivers/infiniband/core/addr.c
+@@ -439,19 +439,30 @@ static int addr6_resolve(struct sockaddr *src_sock,
+ }
+ #endif
+ 
++static bool is_dst_local(const struct dst_entry *dst)
++{
++	if (dst->ops->family == AF_INET)
++		return !!(((const struct rtable *)dst)->rt_type & RTN_LOCAL);
++	else if (dst->ops->family == AF_INET6)
++		return !!(dst_rt6_info(dst)->rt6i_flags & RTF_LOCAL);
++	else
++		return false;
++}
++
+ static int addr_resolve_neigh(const struct dst_entry *dst,
+ 			      const struct sockaddr *dst_in,
+ 			      struct rdma_dev_addr *addr,
+-			      unsigned int ndev_flags,
+ 			      u32 seq)
+ {
+-	int ret = 0;
+-
+-	if (ndev_flags & IFF_LOOPBACK)
++	if (is_dst_local(dst)) {
++		/* When the destination is local entry, source and destination
++		 * are same. Skip the neighbour lookup.
++		 */
+ 		memcpy(addr->dst_dev_addr, addr->src_dev_addr, MAX_ADDR_LEN);
+-	else
+-		ret = fetch_ha(dst, addr, dst_in, seq);
+-	return ret;
++		return 0;
++	}
++
++	return fetch_ha(dst, addr, dst_in, seq);
+ }
+ 
+ static int copy_src_l2_addr(struct rdma_dev_addr *dev_addr,
+@@ -483,15 +494,13 @@ static int copy_src_l2_addr(struct rdma_dev_addr *dev_addr,
+ }
+ 
+ static int rdma_set_src_addr_rcu(struct rdma_dev_addr *dev_addr,
+-				 unsigned int *ndev_flags,
+ 				 const struct sockaddr *dst_in,
+ 				 const struct dst_entry *dst)
+ {
+ 	struct net_device *ndev = READ_ONCE(dst->dev);
+ 
+-	*ndev_flags = ndev->flags;
+ 	/* A physical device must be the RDMA device to use */
+-	if (ndev->flags & IFF_LOOPBACK) {
++	if (is_dst_local(dst)) {
+ 		/*
+ 		 * RDMA (IB/RoCE, iWarp) doesn't run on lo interface or
+ 		 * loopback IP address. So if route is resolved to loopback
+@@ -540,7 +549,6 @@ static int addr_resolve(struct sockaddr *src_in,
+ 			u32 seq)
+ {
+ 	struct dst_entry *dst = NULL;
+-	unsigned int ndev_flags = 0;
+ 	struct rtable *rt = NULL;
+ 	int ret;
+ 
+@@ -577,7 +585,7 @@ static int addr_resolve(struct sockaddr *src_in,
+ 		rcu_read_unlock();
+ 		goto done;
+ 	}
+-	ret = rdma_set_src_addr_rcu(addr, &ndev_flags, dst_in, dst);
++	ret = rdma_set_src_addr_rcu(addr, dst_in, dst);
+ 	rcu_read_unlock();
+ 
+ 	/*
+@@ -585,7 +593,7 @@ static int addr_resolve(struct sockaddr *src_in,
+ 	 * only if src addr translation didn't fail.
+ 	 */
+ 	if (!ret && resolve_neigh)
+-		ret = addr_resolve_neigh(dst, dst_in, addr, ndev_flags, seq);
++		ret = addr_resolve_neigh(dst, dst_in, addr, seq);
+ 
+ 	if (src_in->sa_family == AF_INET)
+ 		ip_rt_put(rt);
+-- 
+2.50.1 (Apple Git-155)
+

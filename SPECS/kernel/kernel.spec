@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.139.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,7 @@ Source4:        azurelinux-ca-20230216.pem
 Source5:        cpupower
 Source6:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
+Patch1:         0001-RDMA-core-Use-route-entry-flag-to-decide-on-loopback.patch
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -440,6 +441,12 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Wed May 27 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.6.139.1-2
+- Backport upstream commit c31e4038c97f from mainline:
+  RDMA/core: Use route entry flag to decide on loopback traffic.
+  dst_rtable() helper is not available in 6.6, replaced with a direct
+  cast to (const struct rtable *).
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 
