@@ -4578,6 +4578,63 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Wed May 27 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.31-1.5
+- feat(kernel): add hand-curated changelog entry
+
+* Wed May 27 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.4
+- feat(kernel): add kmod-nvidia-open subpackage framework
+
+* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.3
+- feat(kernel): disable CONFIG_AF_RXRPC and CONFIG_AFS_FS
+
+* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.2
+- feat(kernel): disable CONFIG_INET_ESPINTCP, CONFIG_INET6_ESPINTCP, CONFIG_XFRM_ESPINTCP
+
+* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.1
+- feat(kernel): update kernel and kernel-headers to 6.18.31.1
+
+* Thu May 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.29-1.2
+- chore(kernel): remove unused azurelinux_version macro
+
+* Wed May 13 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.29-1.1
+- feat(kernel): update source to 6.18.29.1 (rolling-lts/azl4)
+
+* Wed May 13 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.13-1.12
+- chore(locks): update kernel locks to work with azldev 9696597 (allow file replacement)
+
+* Mon May 11 2026 Tobias Brick <tobiasb@microsoft.com> - 6.18.13-1.11
+- kernel: Add bpf and ipe to CONFIG_LSM
+
+* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.10
+- fix(kernel): enable CONFIG_MITIGATION_GDS
+
+* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.9
+- fix(kernel): enable CONFIG_IO_STRICT_DEVMEM
+
+* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.8
+- fix(kernel): drop CONFIG_MODIFY_LDT_SYSCALL
+
+* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.7
+- fix(kernel): disable CONFIG_LDISC_AUTOLOAD
+
+* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.6
+- security(kernel): harden memory mapping and IOMMU defaults
+
+* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.5
+- security(kernel): enable CET/IBT and remove legacy vsyscall on x86_64
+
+* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.4
+- security(kernel): disable slab cache merging to prevent cross-cache attacks
+
+* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.3
+- security(kernel): restore data structure integrity hardening
+
+* Tue May 05 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.2
+- fix(kernel): skip selftests package build
+
+* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.13-1.1
+- feat: introduce deterministic commit resolution via Azure Linux lock file
+
 * Thu Feb 19 2026 Augusto Caringi <acaringi@redhat.com> [6.18.13-0]
 - Linux v6.18.13
 

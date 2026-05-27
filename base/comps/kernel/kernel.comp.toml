@@ -14,7 +14,7 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "4"
+azl_pkgrelease = "5"
 # 4th version component from the AZL kernel source (6.18.31.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.31-1.1.azl4.aarch64).
 kextraversion = "1"
@@ -339,3 +339,82 @@ replacement = """# AZL: kmod subpackage file lists and scriptlets (nvidia-open)
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-FILES-ANCHOR"""
+
+# Prepend AZL changelog entries to the top of %changelog. The kernel uses
+# `release.calculation = "manual"` (no rpmautospec), so changelog entries are
+# hand-curated here rather than derived from `git log`. Convention: one entry
+# per lock-fingerprint change, mirroring what synthetic distgit / rpmautospec
+# emit. When the lock fingerprint changes (edit to comp.toml, overlays, etc.),
+# prepend a new entry here with the next release number.
+#
+# We intentionally do not use rpmautospec for changelog generation here since
+# the kernel spec file is so complicated the tool struggles to parse it (it can
+# take on the order of hours to run). Until we have a more robust solution for
+# this a manual process will be used.
+#
+# NOTE: This changelog is best-effort, as upstream changes are integrated into
+# the spec the logical ordering will deteriorate, the azl specific entries
+# will always be at the top, resulting in a jumbled history.
+[[components.kernel.overlays]]
+description = "Prepend AZL changelog entries (one per lock-fingerprint change) above the inherited Fedora history. Release is manual, so rpmautospec does not generate these; convention mirrors synthetic distgit output."
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Wed May 27 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.31-1.5",
+    "- feat(kernel): add hand-curated changelog entry",
+    "",
+    "* Wed May 27 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.4",
+    "- feat(kernel): add kmod-nvidia-open subpackage framework",
+    "",
+    "* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.3",
+    "- feat(kernel): disable CONFIG_AF_RXRPC and CONFIG_AFS_FS",
+    "",
+    "* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.2",
+    "- feat(kernel): disable CONFIG_INET_ESPINTCP, CONFIG_INET6_ESPINTCP, CONFIG_XFRM_ESPINTCP",
+    "",
+    "* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.1",
+    "- feat(kernel): update kernel and kernel-headers to 6.18.31.1",
+    "",
+    "* Thu May 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.29-1.2",
+    "- chore(kernel): remove unused azurelinux_version macro",
+    "",
+    "* Wed May 13 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.29-1.1",
+    "- feat(kernel): update source to 6.18.29.1 (rolling-lts/azl4)",
+    "",
+    "* Wed May 13 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.13-1.12",
+    "- chore(locks): update kernel locks to work with azldev 9696597 (allow file replacement)",
+    "",
+    "* Mon May 11 2026 Tobias Brick <tobiasb@microsoft.com> - 6.18.13-1.11",
+    "- kernel: Add bpf and ipe to CONFIG_LSM",
+    "",
+    "* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.10",
+    "- fix(kernel): enable CONFIG_MITIGATION_GDS",
+    "",
+    "* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.9",
+    "- fix(kernel): enable CONFIG_IO_STRICT_DEVMEM",
+    "",
+    "* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.8",
+    "- fix(kernel): drop CONFIG_MODIFY_LDT_SYSCALL",
+    "",
+    "* Mon May 11 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.7",
+    "- fix(kernel): disable CONFIG_LDISC_AUTOLOAD",
+    "",
+    "* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.6",
+    "- security(kernel): harden memory mapping and IOMMU defaults",
+    "",
+    "* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.5",
+    "- security(kernel): enable CET/IBT and remove legacy vsyscall on x86_64",
+    "",
+    "* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.4",
+    "- security(kernel): disable slab cache merging to prevent cross-cache attacks",
+    "",
+    "* Fri May 08 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.3",
+    "- security(kernel): restore data structure integrity hardening",
+    "",
+    "* Tue May 05 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.13-1.2",
+    "- fix(kernel): skip selftests package build",
+    "",
+    "* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.13-1.1",
+    "- feat: introduce deterministic commit resolution via Azure Linux lock file",
+    "",
+]
