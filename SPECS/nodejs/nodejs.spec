@@ -57,10 +57,6 @@ Provides:       nodejs
 Provides:       nodejs24
 Obsoletes:      nodejs < %{version}-%{release}
 Obsoletes:      nodejs24 < %{version}-%{release}
-Conflicts:      nodejs < %{version}-%{release}
-Conflicts:      nodejs.%{_arch} < %{version}-%{release}
-Conflicts:      nodejs24 < %{version}-%{release}
-Conflicts:      nodejs24.%{_arch} < %{version}-%{release}
 
 Recommends: nodejs-full-i18n = %{version}-%{release}
 Provides: bundled(icu) = %{icu_version}
@@ -79,12 +75,8 @@ Requires:       openssl-devel >= 1.1.1
 Requires:       zlib-devel
 Provides:       nodejs-devel = %{version}-%{release}
 Provides:       nodejs24-devel = %{version}-%{release}
-Obsoletes:      nodejs24-devel < %{version}-%{release}
 Obsoletes:      nodejs-devel < %{version}-%{release}
-Conflicts:      nodejs-devel < %{version}-%{release}
-Conflicts:      nodejs-devel.%{_arch} < %{version}-%{release}
-Conflicts:      nodejs24-devel < %{version}-%{release}
-Conflicts:      nodejs24-devel.%{_arch} < %{version}-%{release}
+Obsoletes:      nodejs24-devel < %{version}-%{release}
 
 %description    devel
 The nodejs-devel package contains libraries, header files and documentation
@@ -106,15 +98,10 @@ Requires:       %{name} = %{version}-%{release}
 Provides:       npm = %{npm_version}.%{version}-%{release}
 Provides:       nodejs-npm = %{version}-%{release}
 Provides:       nodejs24-npm = %{version}-%{release}
-Obsoletes:      nodejs24-npm < %{version}-%{release}
-Obsoletes:      nodejs-npm < %{version}-%{release}
 Obsoletes:      npm < %{version}-%{release}
-Conflicts:      nodejs-npm < %{version}-%{release}
-Conflicts:      nodejs-npm.%{_arch} < %{version}-%{release}
-Conflicts:      nodejs24-npm < %{version}-%{release}
-Conflicts:      nodejs24-npm.%{_arch} < %{version}-%{release}
-Conflicts:      npm < %{version}-%{release}
-Conflicts:      npm.%{_arch} < %{version}-%{release}
+Obsoletes:      nodejs-npm < %{version}-%{release}
+Obsoletes:      nodejs24-npm < %{version}-%{release}
+
 
 %description npm
 npm is a package manager for node.js. You can use it to install and publish
@@ -192,6 +179,8 @@ make cctest
 %defattr(-,root,root)
 %{_includedir}/*
 %{_docdir}/*
+%exclude %{_docdir}/nodejs/CHANGELOG.md
+%exclude %{_docdir}/nodejs/README.md
 
 %files full-i18n
 %dir %{icudatadir}
