@@ -14,6 +14,7 @@ Patch2:         CVE-2025-22872.patch
 Patch3:         CVE-2025-47911.patch
 Patch4:         CVE-2025-58190.patch
 Patch5:         CVE-2026-42506.patch
+Patch6:         CVE-2026-27136.patch
 BuildRequires:  golang >= 1.22
 
 %description
@@ -48,7 +49,7 @@ go test ./...
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.8.1-4
-- Patch for CVE-2026-42506
+- Patch for CVE-2026-42506, CVE-2026-27136
 
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.8.1-3
 - Patch for CVE-2025-58190, CVE-2025-47911
