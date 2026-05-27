@@ -8,7 +8,7 @@ Name:           perl-XML-LibXML
 # it might not be needed anymore
 # this module is maintained, the other is not
 Version:        2.0209
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Perl interface to the libxml2 library
 License:        (GPL+ or Artistic) and MIT
 URL:            https://metacpan.org/release/XML-LibXML
@@ -20,6 +20,7 @@ Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-%{v
 Patch0:         XML-LibXML-2.0202-Parse-an-ampersand-entity-in-SAX-interface.patch
 # To reduce dependencies replace Alien::Libxml2 with pkg-config
 Patch1:         XML-LibXML-2.0208-Use-pkgconfig-instead-of-Alien-Libxml2.patch
+Patch2:         CVE-2026-8177.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  glibc-common
@@ -114,9 +115,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n XML-LibXML-%{version}
-%patch 0 -p1
-%patch 1 -p1
+%autosetup -p1 -n XML-LibXML-%{version}
 chmod -x *.c
 for i in Changes; do
   /usr/bin/iconv -f iso8859-1 -t utf-8 $i > $i.conv && /bin/mv -f $i.conv $i
@@ -185,6 +184,9 @@ fi
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri May 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0209-3
+- Patch for CVE-2026-8177
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 2.0209-2
 - Add missing Vendor and Distribution tags.
 

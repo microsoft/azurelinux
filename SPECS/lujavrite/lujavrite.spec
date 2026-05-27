@@ -1,6 +1,6 @@
 Name:           lujavrite
 Version:        1.0.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Lua library for calling Java code
 License:        Apache-2.0
 URL:            https://github.com/mizdebsk/lujavrite
@@ -30,6 +30,7 @@ export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 install -D -p -m 0755 lujavrite.so %{buildroot}%{lua_libdir}/%{name}.so
 
 %check
+export JAVA_HOME=$(find %{_libdir}/jvm -name "msopenjdk*")
 lua test.lua
 
 %files
@@ -38,6 +39,9 @@ lua test.lua
 %doc README.md
 
 %changelog
+* Wed May 13 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.0.2-7
+- Resolved ptest failure by exporting JAVA_HOME in check section.
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.2-6
 - Add missing Vendor and Distribution tags.
 

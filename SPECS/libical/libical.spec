@@ -1,7 +1,7 @@
 Summary:        Reference implementation of the iCalendar data type and serialization format
 Name:           libical
-Version:        3.0.9
-Release:        5%{?dist}
+Version:        3.0.10
+Release:        1%{?dist}
 License:        LGPLv2 OR MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,7 @@ BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  pkgconfig(libxml-2.0)
+BuildRequires:  tzdata
 Requires:       tzdata
 
 %description
@@ -77,7 +78,7 @@ Development files needed for building things which link against %{name}-glib.
 rm %{buildroot}/%{_libexecdir}/libical/ical-glib-src-generator
 
 %check
-make test ARGS="-V" -C %{_target_platform}
+make test ARGS="-V"
 
 %ldconfig_scriptlets
 
@@ -123,6 +124,9 @@ make test ARGS="-V" -C %{_target_platform}
 %{_datadir}/vala/vapi/libical-glib.vapi
 
 %changelog
+* Wed May 13 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.0.10-1
+- Update to 3.0.10 to fix ptest failure.
+
 * Wed Jul 13 2022 Dallas Delaney <dadelan@microsoft.com> - 3.0.9-5
 - Promote to Mariner base repo
 - Lint spec
