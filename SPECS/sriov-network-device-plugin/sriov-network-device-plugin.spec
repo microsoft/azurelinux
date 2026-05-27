@@ -15,6 +15,7 @@ Patch3:         CVE-2025-47911.patch
 Patch4:         CVE-2025-58190.patch
 Patch5:         CVE-2026-39821.patch
 Patch6:         CVE-2026-42506.patch
+Patch7:         CVE-2026-27136.patch
 BuildRequires:  golang
 Requires:       gawk
 Requires:       hwdata
@@ -43,7 +44,7 @@ install -D -m0755 images/ddptool-1.0.1.12.tar.gz %{buildroot}%{_datadir}/%{name}
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-6
-- Patch for CVE-2026-42506, CVE-2026-39821
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.0-5
 - Patch for CVE-2025-47911, CVE-2025-58190
