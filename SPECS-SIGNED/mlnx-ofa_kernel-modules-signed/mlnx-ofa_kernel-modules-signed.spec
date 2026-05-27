@@ -43,7 +43,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 25.07
-Release:	 2%{release_suffix}%{?dist}
+Release:	 3%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -198,6 +198,10 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Tue May 26 2026 Zheyu Shen <zheyushen@microsoft.com> - 25.07-3
+- Bump release to repackage signed modules against the GPL-export rebuild
+  of mlnx-ofa_kernel-25.07-3.
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
 - Tweak specs to use dynamic versioning for kernel versions.
 
