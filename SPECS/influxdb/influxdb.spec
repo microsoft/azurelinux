@@ -76,6 +76,7 @@ Patch17:        CVE-2025-58190.patch
 Patch18:        CVE-2026-41602.patch
 Patch19:        CVE-2026-39821.patch
 Patch20:        CVE-2026-42506.patch
+Patch21:        CVE-2026-27136.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -166,7 +167,7 @@ go test ./...
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-17
-- Patch for CVE-2026-42506, CVE-2026-39821
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-16
 - Patch for CVE-2026-41602
