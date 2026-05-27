@@ -27,6 +27,7 @@ Patch4:        CVE-2025-47911.patch
 Patch5:        CVE-2025-58190.patch
 Patch6:        CVE-2026-39821.patch
 Patch7:        CVE-2026-42506.patch
+Patch8:        CVE-2026-27136.patch
 
 BuildRequires: golang >= 1.22
 
@@ -48,7 +49,7 @@ install kube-vip-cloud-provider %{buildroot}%{_bindir}/kube-vip-cloud-provider
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-6
-- Patch for CVE-2026-42506, CVE-2026-39821
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Wed Feb 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.0.10-5
 - Patch for CVE-2025-58190, CVE-2025-47911
