@@ -48,6 +48,7 @@ Patch31:        CVE-2026-39834.patch
 Patch32:        CVE-2026-42506.patch
 Patch33:        CVE-2026-42508.patch
 Patch34:        CVE-2026-46597.patch
+Patch35:        CVE-2026-27136.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -113,7 +114,7 @@ fi
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-21
-- Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821
+- Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
 
 * Sat May 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-20
 - Patch for CVE-2026-41602, CVE-2026-42154
