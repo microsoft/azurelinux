@@ -8,19 +8,21 @@ historically exported with EXPORT_SYMBOL. That dates back to a time when
 the consumer was the NVIDIA closed-source GPU driver, which could not
 link against EXPORT_SYMBOL_GPL symbols.
 
-Today the consumers are GPL kernel modules (NVIDIA open-source driver,
-AMDGPU + nvidia_peermem replacements, etc.). Exposing the peer-memory
-client registration API as EXPORT_SYMBOL_GPL more accurately reflects
-the GPL licensing of mlnx-ofa_kernel and matches the kernel's modern
-expectations around in-kernel API surfaces.
+Today the consumers are GPL kernel modules (AMDGPU, NVIDIA open-source
+driver). Exposing the peer-memory client registration API as
+EXPORT_SYMBOL_GPL more accurately reflects the GPL licensing of
+mlnx-ofa_kernel and matches the kernel's modern expectations around
+in-kernel API surfaces.
 
 In addition, switching to EXPORT_SYMBOL_GPL allows out-of-tree drivers
-(amdgpu, NVIDIA open-source GPU driver, AMD Vulcano NIC stack, ...) to
-discover the peer-memory client API via module symbol resolution at
-runtime instead of having to hard-link against the mlnx-ofa_kernel
-build, which is required to break the diamond build-time dependency
-between an OOT GPU driver and multiple OOT NIC drivers that all consume
-the same API.
+(AMDGPU, NVIDIA open-source GPU driver) to discover the peer-memory
+client API via module symbol resolution at runtime instead of having
+to hard-link against the mlnx-ofa_kernel build, which is required to
+break the diamond build-time dependency between an OOT GPU driver and
+multiple OOT NIC drivers that all consume the same API, which is the
+situation we are facing with AMD GPU (MI300X works with Mellanox while
+MI455X comes with Vulcano NIC, and we would like the same kmod to be
+able to work with both hardware).
 
 Signed-off-by: Zheyu Shen <zheyushen@microsoft.com>
 ---
