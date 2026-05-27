@@ -65,10 +65,11 @@ done
 
 # --- Find or create EFI vendor directory ---
 EFI_VENDOR=""
-for d in "$SYSROOT/boot/efi/EFI/fedora" "$SYSROOT/boot/efi/EFI/azurelinux"; do
+for d in "$SYSROOT/boot/efi/EFI/azurelinux" "$SYSROOT/boot/efi/EFI/fedora"; do
     [ -d "$d" ] && { EFI_VENDOR="$d"; break; }
 done
-[ -z "$EFI_VENDOR" ] && { EFI_VENDOR="$SYSROOT/boot/efi/EFI/fedora"; mkdir -p "$EFI_VENDOR"; }
+[ -z "$EFI_VENDOR" ] && { EFI_VENDOR="$SYSROOT/boot/efi/EFI/azurelinux"; mkdir -p "$EFI_VENDOR"; }
+EFI_VENDOR_NAME=$(basename "$EFI_VENDOR")
 echo "EFI vendor dir: $EFI_VENDOR"
 ls -la "$EFI_VENDOR/" 2>/dev/null
 
@@ -143,14 +144,15 @@ if [ -n "$ESP_DEV" ]; then
 
     echo "=== Current UEFI boot entries ==="
     efibootmgr 2>/dev/null
-    for bootnum in $(efibootmgr 2>/dev/null | grep -i 'default\\\|anaconda\|fedora' | sed 's/Boot\([0-9A-Fa-f]*\).*/\1/'); do
+    for bootnum in $(efibootmgr 2>/dev/null | grep -i 'default\\\|anaconda\|fedora\|azurelinux' | sed 's/Boot\([0-9A-Fa-f]*\).*/\1/'); do
         echo "Removing stale entry Boot$bootnum"
         efibootmgr -b "$bootnum" -B 2>/dev/null || true
     done
 
+    EFI_NVRAM_PATH="\\EFI\\${EFI_VENDOR_NAME}\\${SHIM_EFI}"
     efibootmgr -c -d "$ESP_DISK" -p "$ESP_PART" \
-        -L "Azure Linux" -l "\\EFI\\fedora\\$SHIM_EFI" 2>/dev/null && \
-        echo "Created UEFI boot entry: Azure Linux -> \\EFI\\fedora\\$SHIM_EFI" || \
+        -L "Azure Linux" -l "$EFI_NVRAM_PATH" 2>/dev/null && \
+        echo "Created UEFI boot entry: Azure Linux -> $EFI_NVRAM_PATH" || \
         echo "WARNING: efibootmgr -c failed"
 
     echo "=== Updated UEFI boot entries ==="

@@ -66,6 +66,7 @@
         <package name="systemd-resolved" />
         <package name="tar" />
         <package name="util-linux" />
+        <package name="vim-minimal" />
         <file
             name="20-wired-dhcp.network"
             target="/etc/systemd/network/20-wired-dhcp.network"
