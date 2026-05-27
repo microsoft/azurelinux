@@ -1,24 +1,15 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.6.4
-Release:        7%{?dist}
+Version:        2.8.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
-Patch0:         CVE-2024-8176.patch
-Patch1:         CVE-2025-59375.patch
-Patch2:         CVE-2026-24515.patch
-Patch3:         CVE-2026-25210.patch
-Patch4:         Stop-updating-event-pointer-on-exit-for-reentry.patch
-Patch5:         CVE-2026-32776.patch
-Patch6:         CVE-2026-32777.patch
-Patch7:         CVE-2026-32778.patch
-Patch8:         CVE-2026-41080.patch
-Patch9:         CVE-2026-45186.patch
+Patch0:         CVE-2026-45186.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -76,6 +67,9 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Thu May 28 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.8.0-1
+- Upgrade to 2.8.0 to fix CVE-2026-7210
+
 * Tue May 12 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 2.6.4-7
 - Patch for CVE-2026-41080 and CVE-2026-45186
 
