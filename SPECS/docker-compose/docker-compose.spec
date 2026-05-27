@@ -30,6 +30,7 @@ Patch14:        CVE-2026-39832.patch
 Patch15:        CVE-2026-39834.patch
 Patch16:        CVE-2026-42506.patch
 Patch17:        CVE-2026-46597.patch
+Patch18:        CVE-2026-27136.patch
 
 BuildRequires:  golang
 Requires:       docker-cli
@@ -64,7 +65,7 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-11
-- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
 
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-10
 - Patch for CVE-2026-35469
