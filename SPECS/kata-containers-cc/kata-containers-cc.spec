@@ -13,7 +13,11 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{v
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
 Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
+<<<<<<< HEAD
 Patch2:       CVE-2026-33814.patch
+=======
+Patch2:       CVE-2026-39821.patch
+>>>>>>> 3e104b30b3 ([AutoPR- Security] Patch kata-containers-cc for CVE-2026-39821 [CRITICAL] (#17472))
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -152,8 +156,13 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+<<<<<<< HEAD
 * Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-11
 - Patch for CVE-2026-33814
+=======
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-11
+- Patch for CVE-2026-39821
+>>>>>>> 3e104b30b3 ([AutoPR- Security] Patch kata-containers-cc for CVE-2026-39821 [CRITICAL] (#17472))
 
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-10
 - Patch for CVE-2026-41602
