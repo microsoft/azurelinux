@@ -1,7 +1,7 @@
 Summary:        Automatically provision and manage TLS certificates in Kubernetes
 Name:           cert-manager
 Version:        1.12.15
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,14 +23,8 @@ Patch6:         CVE-2025-22872.patch
 Patch7:         CVE-2025-11065.patch
 Patch8:         CVE-2025-47911.patch
 Patch9:         CVE-2025-58190.patch
-<<<<<<< HEAD
-Patch10:        CVE-2026-33814.patch
-=======
 Patch10:        CVE-2026-35469.patch
->>>>>>> b499660812 ([High] patch cert-manager for CVE-2026-35469 (#17073))
-
-BuildRequires:  golang
-Requires:       %{name}-acmesolver
+Patch11:        CVE-2026-33814.patch
 Requires:       %{name}-cainjector
 Requires:       %{name}-cmctl
 Requires:       %{name}-controller
@@ -119,16 +113,17 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
-<<<<<<< HEAD
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-7
+* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-8
 - Patch for CVE-2026-33814
-=======
+
 * Thu May 07 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.12.15-7
 - Patch for CVE-2026-35469
->>>>>>> b499660812 ([High] patch cert-manager for CVE-2026-35469 (#17073))
 
 * Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-6
 - Patch for CVE-2025-58190, CVE-2025-47911
+
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-5
+- Patch for CVE-2025-11065
 
 * Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-5
 - Patch for CVE-2025-11065
