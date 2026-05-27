@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,8 @@ Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-47911.patch
 Patch3:         CVE-2025-58190.patch
 Patch4:         CVE-2026-35469.patch
+Patch5:         CVE-2026-39821.patch
+Patch6:         CVE-2026-42506.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang < 1.25
@@ -49,6 +51,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-6
+- Patch for CVE-2026-42506, CVE-2026-39821
+
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-5
 - Patch for CVE-2026-35469
 
