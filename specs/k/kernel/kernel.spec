@@ -1174,6 +1174,9 @@ Source9999: kernel.azl.macros
 Source5000: 6.18-x86_64-azl.config
 Source5001: 6.18-aarch64-azl.config
 Source5002: azurelinux-ca-20230216.pem
+Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
+Source6001: kmod-nvidia-open-modprobe.conf
+Source6002: kmod-nvidia-open.inc
 
 ## Patches needed for building this package
 
@@ -1224,6 +1227,13 @@ AutoProv: yes\
 %{nil}
 
 
+
+# AZL: kmod subpackage declarations (nvidia-open)
+%global _kmod_phase package
+%global _kmod_name nvidia-open
+%include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
 Summary: Various documentation bits found in the kernel source
 Group: Documentation
@@ -2245,6 +2255,13 @@ OPTS="-w -n -c"
 SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{specrpmversion}
 cd ../..
 %endif
+
+# AZL: Prepare kmod subpackage sources (nvidia-open)
+%global _kmod_phase prep
+%global _kmod_name nvidia-open
+%include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
 %{log_msg "Start of build stage"}
 
@@ -3377,6 +3394,13 @@ find Documentation -type d | xargs chmod u+w
 %{log_msg "end install docs"}
 %endif
 
+# AZL: Build kmod subpackage modules (nvidia-open)
+%global _kmod_phase build
+%global _kmod_name nvidia-open
+%include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
+
 # Module signing (modsign)
 #
 # This must be run _after_ find-debuginfo.sh runs, otherwise that will strip
@@ -3876,6 +3900,14 @@ find -type f -executable -exec install -D -m755 {} %{buildroot}%{_libexecdir}/ks
 find -type f ! -executable -exec install -D -m644 {} %{buildroot}%{_libexecdir}/kselftests/vDSO/{} \;
 popd
 %endif
+
+###
+# AZL: Install kmod subpackage files (nvidia-open)
+%global _kmod_phase install
+%global _kmod_name nvidia-open
+%include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
 ###
 ### clean
@@ -4538,6 +4570,13 @@ fi\
 # and build.
 #
 #
+
+# AZL: kmod subpackage file lists and scriptlets (nvidia-open)
+%global _kmod_phase files
+%global _kmod_name nvidia-open
+%include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
 * Thu Feb 19 2026 Augusto Caringi <acaringi@redhat.com> [6.18.13-0]
 - Linux v6.18.13
