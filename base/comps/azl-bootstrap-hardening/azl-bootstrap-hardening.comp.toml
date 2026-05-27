@@ -1,0 +1,14 @@
+# Tiny local-spec package that ships a macros.d drop-in to enable
+# distro-wide hardening flags for stage1 builds. Mechanism mirrors how
+# azurelinux-rpm-config layers on top of redhat-rpm-config — this pkg
+# just adds the hardening macros without touching redhat-rpm-config.
+#
+# Intent: any spec that BuildRequires this package (or any buildroot that
+# pre-installs it) gets %_hardened_build=1 plus appended global compiler
+# and linker flags before %set_build_flags composes CFLAGS/LDFLAGS.
+#
+# Used to A/B against Option A (per-component build.defines) on the
+# dracut pilot. See base/comps/dracut/dracut.comp.toml.
+[components.azl-bootstrap-hardening]
+spec = { type = "local", path = "azl-bootstrap-hardening.spec" }
+release = { calculation = "manual" }

@@ -11,7 +11,7 @@
 
 Name: dracut
 Version: 107
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 Summary: Initramfs generator using udev
 
@@ -124,6 +124,7 @@ Requires: procps-ng
 
 Requires: libkcapi-hmaccalc
 
+BuildRequires: azl-bootstrap-hardening
 %description
 dracut contains tools to create bootable initramfses for the Linux
 kernel. Unlike other implementations, dracut hard-codes as little

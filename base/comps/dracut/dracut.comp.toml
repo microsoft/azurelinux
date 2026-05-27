@@ -1,0 +1,38 @@
+# dracut — used as a pilot package for evaluating stage1 BinSkim-hardening
+# remediation options. We failed 802 packages in azl4-bootstrap-compliance with
+# BA3001 (PIE), BA3003 (stack protector), BA3011 (RELRO). This file stages two
+# mechanisms for injecting the hardening flags so we can A/B them.
+#
+# Pick ONE of the two options below by commenting/uncommenting. Do not enable
+# both simultaneously (they would apply the same flags twice).
+#
+# ──────────────────────────────────────────────────────────────────────
+# Option A (DISABLED) - per-component build.defines.
+#   Pros: zero new packages, scoped to just dracut, trivial to revert,
+#         lets us validate the flag list against a real build before
+#         committing to a distro-wide rollout.
+#   Cons: per-spec mechanism - not how we'd ship this distro-wide.
+#
+# Option B (ACTIVE) - pull in a new "azl-bootstrap-hardening" RPM that
+#   drops a macros.d file into the buildroot. Same flags, but delivered
+#   the way we'd eventually ship them for the whole distro.
+#   See base/comps/azl-bootstrap-hardening/.
+# ──────────────────────────────────────────────────────────────────────
+
+[components.dracut]
+
+# -- Option A (DISABLED): macro overrides via build.defines ------------
+# Kept commented as a per-package escape hatch for bisecting flag changes
+# without touching the distro-wide macros file.
+# [components.dracut.build.defines]
+# _hardened_build = "1"
+# __global_compiler_flags = "-O2 -g -fstack-protector-strong -fstack-clash-protection -fPIE -D_FORTIFY_SOURCE=3"
+# __global_ldflags = "-Wl,-z,relro,-z,now -Wl,-z,noexecstack -pie"
+
+# -- Option B (ACTIVE): macros package via BuildRequires ---------------
+# Pulls in azl-bootstrap-hardening, which ships a macros.d drop-in that
+# sets %_hardened_build and appends the global compiler/ld flags. Same
+# delivery mechanism we want for the distro-wide rollout.
+overlays = [
+    { type = "spec-add-tag", tag = "BuildRequires", value = "azl-bootstrap-hardening", description = "Inject AzL stage1/2 hardening macros (PIE, RELRO, stack protector, FORTIFY) via the azl-bootstrap-hardening macros.d drop-in. Pilot for the broader azl4-bootstrap-compliance BinSkim remediation." },
+]

@@ -1,0 +1,27 @@
+# macros.azl-bootstrap-hardening
+#
+# Distro-wide hardening defaults for stage1 builds. Layered ON TOP of
+# Fedora's redhat-rpm-config via macros.d drop-in priority — does not
+# fork or replace any redhat-rpm-config file.
+#
+# Effect: when this package is installed in the buildroot, any spec that
+# uses %configure / %cmake / %meson / %make_build / %set_build_flags
+# picks up these flags. Build systems that bypass those macros and call
+# the compiler directly will still need per-spec fixes.
+#
+# Pilot scope: dracut (see base/comps/dracut/dracut.comp.toml).
+# Distro-wide rollout will inject this package into the stage1 mock
+# chroot_setup_cmd once the pilot results are good.
+
+# Toggle Fedora's redhat-hardened-cc1 / redhat-hardened-ld spec files.
+# Covers PIE, RELRO+now, stack protector, fortify on packages that
+# honor Fedora's hardening hooks.
+%_hardened_build 1
+
+# Explicit appends for build systems that override %optflags / LDFLAGS
+# but still respect %__global_compiler_flags / %__global_ldflags via
+# %set_build_flags. Arch-guard CET (only meaningful on x86_64).
+%__global_compiler_flags %{__global_compiler_flags} -fstack-protector-strong -fstack-clash-protection -fPIE -D_FORTIFY_SOURCE=3 %{?_cet_flag}
+%__global_ldflags %{__global_ldflags} -Wl,-z,relro,-z,now -Wl,-z,noexecstack -pie
+
+%_cet_flag %{lua: if rpm.expand("%{_target_cpu}") == "x86_64" then print("-fcf-protection=full") end}

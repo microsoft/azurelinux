@@ -348,7 +348,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.doxygen]
 [components.dpdk]
 [components.dpkg]
-[components.dracut]
+# dracut: see base/comps/dracut/dracut.comp.toml (hardening-flag evaluation)
 [components.driverctl]
 [components.drpm]
 [components.duktape]
