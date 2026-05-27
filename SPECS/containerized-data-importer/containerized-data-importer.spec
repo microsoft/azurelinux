@@ -35,6 +35,7 @@ Patch6:         CVE-2026-32288.patch
 Patch7:         CVE-2026-35469.patch
 Patch8:         CVE-2026-39821.patch
 Patch9:         CVE-2026-42506.patch
+Patch10:        CVE-2026-27136.patch
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -230,7 +231,7 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-5
-- Patch for CVE-2026-42506, CVE-2026-39821
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-4
 - Patch for CVE-2026-35469
