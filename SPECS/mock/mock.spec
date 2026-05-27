@@ -49,7 +49,7 @@ Suggests:      mock-core-configs
 %endif
 
 Requires:      systemd
-%if 0%{?fedora} || 0%{?rhel}
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel}
 Requires:      systemd-container
 %endif
 Requires:      coreutils
@@ -109,7 +109,7 @@ BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-templated-dictionary
 %endif
 
-%if 0%{?fedora} || 0%{?rhel}
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel}
 BuildRequires: perl-interpreter
 %else
 BuildRequires: perl
@@ -127,13 +127,17 @@ Mock takes an SRPM and builds it in a chroot.
 %package scm
 Summary: Mock SCM integration module
 Requires: %{name} = %{version}-%{release}
+%if ! 0%{?azl}
 Recommends: cvs
+%endif
 Recommends: git
 Recommends: subversion
 Recommends: tar
 
+%if ! 0%{?azl}
 # We could migrate to 'copr-distgit-client'
 Recommends: rpkg
+%endif
 
 %description scm
 Mock SCM integration module.
@@ -191,7 +195,9 @@ for i in docs/site-defaults.cfg py/mockbuild/config.py; do
 done
 %endif
 
+%if ! 0%{?azl}
 ./precompile-bash-completion "mock.complete" || cp -a ./etc/bash_completion.d/mock ./mock.complete
+%endif
 
 argparse-manpage --pyfile ./py/mock-hermetic-repo.py --function _argparser > mock-hermetic-repo.1
 
@@ -219,7 +225,9 @@ cp -a etc/consolehelper/mock %{buildroot}%{_sysconfdir}/security/console.apps/%{
 
 install -d %{buildroot}%{_datadir}/bash-completion/completions/
 cp -a etc/bash_completion.d/* %{buildroot}%{_datadir}/bash-completion/completions/
+%if ! 0%{?azl}
 cp -a mock.complete %{buildroot}%{_datadir}/bash-completion/completions/mock
+%endif
 ln -s mock %{buildroot}%{_datadir}/bash-completion/completions/mock-parse-buildlog
 
 install -d %{buildroot}%{_sysconfdir}/pki/mock
