@@ -41,6 +41,7 @@ Patch15:        CVE-2026-2303.patch
 Patch16:        CVE-2026-35469.patch
 Patch17:        CVE-2026-39821.patch
 Patch18:        CVE-2026-42506.patch
+Patch19:        CVE-2026-27136.patch
 
 BuildRequires:  golang >= 1.15
 
@@ -78,7 +79,7 @@ cp ./bin/keda-admission-webhooks %{buildroot}%{_bindir}
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.14.1-13
-- Patch for CVE-2026-42506, CVE-2026-39821
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Thu May 07 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.14.1-12
 - Patch CVE-2026-34569
