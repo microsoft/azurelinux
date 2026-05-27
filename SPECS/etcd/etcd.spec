@@ -150,7 +150,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Mon May 25 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 3.5.30-2
+* Wed May 27 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 3.5.30-2
 - Patch CVE-2026-33814
 
 * Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
