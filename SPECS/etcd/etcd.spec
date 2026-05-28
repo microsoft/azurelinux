@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.28
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,8 @@ Source1:        etcd.service
 Source2:        %{name}-%{version}-vendor.tar.gz
 BuildRequires:  golang >= 1.16
 
+Patch1001:      CVE-2026-39821.patch
+
 %description
 A highly-available key value store for shared configuration and service discovery.
 
@@ -71,6 +73,7 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1001}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -84,6 +87,7 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1001}
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
