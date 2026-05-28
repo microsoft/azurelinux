@@ -42,6 +42,11 @@ Patch20:        CVE-2026-39834.patch
 Patch21:        CVE-2026-42506.patch
 Patch22:        CVE-2026-46597.patch
 Patch23:        CVE-2026-27136.patch
+Patch24:        CVE-2026-25680.patch
+Patch25:        CVE-2026-25681.patch
+Patch26:        CVE-2026-39827.patch
+Patch27:        CVE-2026-39835.patch
+Patch28:        CVE-2026-42502.patch
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-20%{?dist}
@@ -295,7 +300,7 @@ fi
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-25
-- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.30.10-24
 - Bump to rebuild with updated glibc
