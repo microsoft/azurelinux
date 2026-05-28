@@ -22,6 +22,9 @@ Patch4:         CVE-2026-35469.patch
 Patch5:         CVE-2026-39821.patch
 Patch6:         CVE-2026-42506.patch
 Patch7:         CVE-2026-27136.patch
+Patch8:         CVE-2026-25680.patch
+Patch9:         CVE-2026-25681.patch
+Patch10:        CVE-2026-42502.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
 BuildRequires:  golang < 1.25
@@ -53,7 +56,7 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-6
-- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-5
 - Patch for CVE-2026-35469
