@@ -60,4 +60,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %changelog
 * Mon May 11 2026 Azure Linux Team - 6.0.0-1
+- Initial Azure Linux import from NVIDIA (license: BSD)
+- License verified
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
