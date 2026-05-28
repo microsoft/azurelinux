@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.1.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -21,6 +21,9 @@ Patch1:	tardev-support.patch
 Patch2:	fix-credential-leak-in-cri-errors.patch
 Patch3: CVE-2026-35469.patch
 Patch4: CVE-2026-34986.patch
+Patch5: CVE-2026-39821.patch
+Patch6: CVE-2026-42506.patch
+Patch7: CVE-2026-27136.patch
 
 %{?systemd_requires}
 
@@ -97,6 +100,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
+
 * Thu Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
 - Modify CVE-2026-35469 patch for 2.1.6
 - Patch for CVE-2026-34986
