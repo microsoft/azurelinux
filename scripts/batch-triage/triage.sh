@@ -78,7 +78,7 @@ REPO_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 
 # Always build — layer caching makes this fast when nothing changed
 # Copy requirements.txt into the build context (COPY can't reach outside it)
-cp "${REPO_ROOT}/.vscode/mcps/requirements.txt" "${SCRIPT_DIR}/requirements.txt"
+cp "${REPO_ROOT}/scripts/mcps/requirements.txt" "${SCRIPT_DIR}/requirements.txt"
 # Trap will not fire for exec, but will cover cleanup if the build step fails
 trap 'rm -f "${SCRIPT_DIR}/requirements.txt"' EXIT
 
@@ -103,13 +103,16 @@ DOCKER_ARGS+=( -u "$(id -u):$(id -g)" )
 
 # Require a .env file for MCP server config (Koji URL, auth, etc.)
 ENV_FILE=""
-if [[ -f "${REPO_ROOT}/.vscode/mcps/.env" ]]; then
-    ENV_FILE="${REPO_ROOT}/.vscode/mcps/.env"
-elif [[ -f "${REPO_ROOT}/.env" ]]; then
+if [[ -f "${REPO_ROOT}/.env" ]]; then
     ENV_FILE="${REPO_ROOT}/.env"
+elif [[ -f "${REPO_ROOT}/scripts/mcps/.env" ]]; then
+    ENV_FILE="${REPO_ROOT}/scripts/mcps/.env"
+elif [[ -f "${REPO_ROOT}/.vscode/mcps/.env" ]]; then
+    # Legacy location from when MCP scripts lived under .vscode/mcps/
+    ENV_FILE="${REPO_ROOT}/.vscode/mcps/.env"
 else
-    echo "Error: No .env file found. Create one at .env in the repo root or .vscode/mcps/.env" >&2
-    echo "See .vscode/mcps/.env.example for required variables." >&2
+    echo "Error: No .env file found. Create one at .env in the repo root or scripts/mcps/.env" >&2
+    echo "See scripts/mcps/.env.example for required variables." >&2
     echo "Koji MCP will not auto-configure without this file." >&2
     exit 1
 fi

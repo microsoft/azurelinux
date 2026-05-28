@@ -34,10 +34,10 @@ The `azl-diagnose` agent and Koji-related tools require:
 
 1. **MCP Python packages** — the MCP servers won't start without them:
    ```bash
-   pip3 install --user -r .vscode/mcps/requirements.txt
+   pip3 install --user -r scripts/mcps/requirements.txt
    ```
 2. **Network access to the internal Koji instance** — The internal Koji is only accessible via VPN or the corporate network. If the agent reports connection errors, verify you are connected before retrying.
-3. **(Optional) `.env` configuration** — Create a `.env` file (in the workspace root or `.vscode/mcps/`) to pre-configure MCP server settings like the Koji base URL and pre-approved insecure URLs. This avoids the agent having to set the URL or approve self-signed certificates every session. See [.vscode/mcps/.env.example](.vscode/mcps/.env.example) for available variables.
+3. **(Optional) `.env` configuration** — Create a `.env` file (in the workspace root or `scripts/mcps/`) to pre-configure MCP server settings like the Koji base URL and pre-approved insecure URLs. This avoids the agent having to set the URL or approve self-signed certificates every session. See [scripts/mcps/.env.example](scripts/mcps/.env.example) for available variables.
 
 Ask Copilot about any aspect of the project — it can reference the instructions and skills to provide detailed, actionable answers or perform tasks. For example:
 

@@ -75,7 +75,7 @@ if _insecure_urls:
     )
 
 
-def _add_status(result: StatusDict, *, full: bool) -> StatusDict:
+def _add_status(result: StatusDict, full: bool) -> StatusDict:
     """Build a snapshot of the MCP server's current state."""
     status = {
         "default_base_url": _base_url,

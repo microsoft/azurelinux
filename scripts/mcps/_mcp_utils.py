@@ -1,5 +1,4 @@
-"""
-Shared utilities for Azure Linux MCP servers.
+"""Shared utilities for Azure Linux MCP servers.
 
 Provides common helpers for URL validation, SSRF guards, output handling,
 and .env file loading so individual MCP servers stay DRY.
@@ -18,7 +17,7 @@ from urllib.parse import urlparse
 # Return type for all MCP tools — values may be str, int, list, or None.
 StatusDict = dict[str, Any]
 
-_INSTALL_HINT = "Install with:  pip3 install --user -r .vscode/mcps/requirements.txt"
+_INSTALL_HINT = "Install with:  pip3 install --user -r scripts/mcps/requirements.txt"
 
 try:
     from dotenv import load_dotenv
@@ -50,8 +49,9 @@ def load_env(env_path: str | Path | None = None) -> None:
       1. Explicit ``env_path`` argument
       2. ``.env`` in the current working directory
       3. ``.env`` in the workspace root (two dirs up from this source file)
-      4. ``.vscode/mcps/.env`` relative to the working directory
-      5. ``.vscode/mcps/.env`` next to this source file
+      4. ``scripts/mcps/.env`` next to this source file
+      5. ``.vscode/mcps/.env`` relative to the working directory (legacy)
+      6. ``.vscode/mcps/.env`` in the workspace root (legacy)
 
     Uses python-dotenv for parsing. Existing env vars are NOT overridden.
     """
@@ -60,8 +60,10 @@ def load_env(env_path: str | Path | None = None) -> None:
         candidates.append(Path(env_path))
     candidates.append(Path.cwd() / ".env")
     candidates.append(Path(__file__).resolve().parent.parent.parent / ".env")
-    candidates.append(Path.cwd() / ".vscode" / "mcps" / ".env")
     candidates.append(Path(__file__).resolve().parent / ".env")
+    # Legacy locations from when MCP scripts lived under .vscode/mcps/
+    candidates.append(Path.cwd() / ".vscode" / "mcps" / ".env")
+    candidates.append(Path(__file__).resolve().parent.parent.parent / ".vscode" / "mcps" / ".env")
 
     for c in candidates:
         if c.is_file():
