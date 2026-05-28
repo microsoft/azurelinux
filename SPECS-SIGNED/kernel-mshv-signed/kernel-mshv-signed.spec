@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed MSHV-enabled Linux Kernel for %{buildarch} systems
 Name:           kernel-mshv-signed-%{buildarch}
-Version:        6.6.135.mshv2
+Version:        6.6.137.mshv1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -140,6 +140,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /lib/modules/%{uname_r}/build
 
 %changelog
+* Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
+- Upgrade to 6.6.137.mshv1
+
 * Mon Apr 27 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.135.mshv2-1
 - Upgrade to 6.6.135.mshv2
 
