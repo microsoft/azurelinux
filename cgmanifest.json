@@ -8381,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.18.29.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.29.1.tar.gz"
+          "version": "6.18.31.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.31.1.tar.gz"
         }
       }
     },
@@ -8391,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.18.29.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.29.1.tar.gz"
+          "version": "6.18.31.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.31.1.tar.gz"
         }
       }
     },
