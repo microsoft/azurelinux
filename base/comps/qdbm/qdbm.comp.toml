@@ -1,0 +1,5 @@
+# AZL does not ship java21-openjdk — disable Java bindings.
+# The spec gates all Java support on %ifarch %java_arches, so redefining
+# that macro to an impossible arch disables it cleanly.
+[components.qdbm]
+build.defines = { java_arches = "noarch" }
