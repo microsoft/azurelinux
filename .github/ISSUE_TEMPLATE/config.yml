@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & feedback
+    url: https://github.com/microsoft/azurelinux/discussions
+    about: Ask questions or share feedback in GitHub Discussions instead of opening an issue.
+  - name: Azure Linux documentation
+    url: https://aka.ms/azurelinux
+    about: Product documentation and guides for Azure Linux.
+  - name: Support options
+    url: https://aka.ms/azurelinux-help
+    about: How to get help with Azure Linux — community and Microsoft support options.
+  - name: Report a security vulnerability
+    url: https://github.com/microsoft/azurelinux/blob/4.0/SECURITY.md
+    about: Do NOT open a public issue. Report privately to the Microsoft Security Response Center.

@@ -18,12 +18,8 @@ Use Azure Support for production issues such as:
 - Security baseline guidance for a deployed environment.
 - Image and deployment troubleshooting in production.
 
-For bugs, documentation problems, feature requests, and general questions, use GitHub instead.
-
 ## Bugs, docs, and feature requests
 
-This project uses [GitHub issues][gh-issue] to [track bugs][gh-bug] and [feature requests][gh-feature]. For guidance, see [how to report issues](https://aka.ms/azurelinux-reportissues).
+Use [GitHub issues](https://github.com/microsoft/azurelinux/issues) to report bugs, documentation problems, and feature requests. Pick the matching template when you open an issue. For guidance, see [how to report issues](https://aka.ms/azurelinux-reportissues).
 
-## Questions
-
-For questions about using this project, please look at our [Contributor's Guide][CONTRIBUTING.md].
+For general questions and feedback, use [GitHub Discussions](https://github.com/microsoft/azurelinux/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
