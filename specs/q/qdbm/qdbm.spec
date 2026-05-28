@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/qdbm.azl.macros}
+
 %define set_javaver() \
 %if 	0%{?fedora}%{?rhel} == %1 \
 BuildRequires:	java-%2-openjdk-devel \
@@ -12,12 +15,13 @@ BuildRequires:	javapackages-local-openjdk%2 \
 
 Name:		qdbm
 Version:	1.8.78
-Release: 72%{?dist}
+Release: 73%{?dist}
 # SPDX confirmed
 License:	LGPL-2.1-or-later
 
 URL:		http://fallabs.com/qdbm/
 Source0:	http://fallabs.com/qdbm/%{name}-%{version}.tar.gz
+Source9999: qdbm.azl.macros
 # Copied from Debian package
 Patch0:		qdbm-ruby-1.9-compat.patch
 # Java 13 introduced yield keyword and the original yield()
