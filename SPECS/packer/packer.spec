@@ -57,6 +57,13 @@ Patch22:        CVE-2026-42506.patch
 Patch23:        CVE-2026-42508.patch
 Patch24:        CVE-2026-46597.patch
 Patch25:        CVE-2026-27136.patch
+Patch26:        CVE-2026-25680.patch
+Patch27:        CVE-2026-25681.patch
+Patch28:        CVE-2026-39827.patch
+Patch29:        CVE-2026-39828.patch
+Patch30:        CVE-2026-39835.patch
+Patch31:        CVE-2026-42502.patch
+Patch32:        CVE-2026-46598.patch
 
 BuildRequires:  golang >= 1.21
 BuildRequires:  kernel-headers
@@ -89,7 +96,7 @@ go test -mod=vendor
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-14
-- Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+- Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
 * Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-13
 - Patch for CVE-2025-58190, CVE-2025-47911
