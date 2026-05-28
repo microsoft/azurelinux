@@ -6,7 +6,7 @@
 
 Name: grubby
 Version: 8.40
-Release: 86%{?dist}
+Release: 88%{?dist}
 Summary: Command line tool for updating bootloader configs
 License: GPL-2.0-or-later
 Source1: grubby-bls
@@ -15,6 +15,7 @@ Source3: COPYING
 Source5: 95-kernel-hooks.install
 Source6: 10-devicetree.install
 Source7: grubby.8
+Source8: kernel.sysconfig
 
 BuildRequires: gcc
 BuildRequires: glib2-devel
@@ -62,6 +63,9 @@ install -D -m 0755 -t %{buildroot}%{_prefix}/lib/kernel/install.d/ %{SOURCE6}
 mkdir -p %{buildroot}%{_mandir}/man8
 install -m 0644 %{SOURCE7} %{buildroot}%{_mandir}/man8/
 
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig
+install -m 0644 %{SOURCE8} %{buildroot}%{_sysconfdir}/sysconfig/kernel
+
 %post
 if [ "$1" = 2 ]; then
     arch=$(uname -m)
@@ -75,8 +79,12 @@ fi
 %attr(0755,root,root) %{_prefix}/lib/kernel/install.d/10-devicetree.install
 %attr(0755,root,root) %{_prefix}/lib/kernel/install.d/95-kernel-hooks.install
 %{_mandir}/man8/grubby.8*
+%config(noreplace) %{_sysconfdir}/sysconfig/kernel
 
 %changelog
+* Wed Dec 10 2025 Simon de Vlieger <cmdr@supakeen.com> - 8.40-86
+- Own `/etc/sysconfig/kernel` which is used for `grubby` configuration
+
 * Wed Jul 30 2025 Leo Sandoval <lsandova@redhat.com> - 8.40-85
 - Update cfg when setting a default kernel
 
