@@ -34,9 +34,15 @@ Many kernel module packages have a corresponding **HWE variant** that lives in `
 - **Shared source tarball**: HWE packages use `%{_distro_sources_url}` to reference the **same tarball** as the non-HWE package — they do NOT have their own copy of the tarball. The `signatures.json` references the same tarball filename and hash.
 - **Minimal packaging**: HWE packages typically only ship kernel modules (no userspace tools, scripts, or library subpackages)
 
-Known HWE packages: `mlnx-ofa_kernel-hwe`, `iser-hwe`, `isert-hwe`, `knem-hwe`, `mft_kernel-hwe`, `mlnx-nfsrdma-hwe`, `srp-hwe`, `xpmem-hwe`
+Known HWE packages: `mlnx-ofa_kernel-hwe`, `iser-hwe`, `isert-hwe`, `mft_kernel-hwe`, `mlnx-nfsrdma-hwe`, `srp-hwe`, `xpmem-hwe`
 
 **When upgrading a kernel module package, ALWAYS also upgrade its `-hwe` variant if one exists.** Use the already-upgraded non-HWE SPEC as a reference for what the final result should look like — then adapt the HWE SPEC with the HWE-specific differences listed above.
+
+## Signed Spec Counterparts (`SPECS-SIGNED/`)
+
+Many kernel module packages have a **signed-spec counterpart** under `SPECS-SIGNED/<pkg>-signed/` (or `SPECS-SIGNED/<pkg>-modules-signed/` for some) that re-packages the signed `.ko` file. These specs are entangled with the unsigned spec — `toolkit/scripts/check_entangled_specs.py` enforces that `Version` and `Release` match **exactly** between `SPECS/<pkg>/<pkg>.spec` and `SPECS-SIGNED/<dir>/<dir>.spec`.
+
+**Implication for upgrades**: Whenever you upgrade `SPECS/<pkg>/<pkg>.spec` for a kernel module, you MUST also bump the matching signed spec to the same `Version` and `Release` (and remove the matching signed dir if you removed the unsigned one). See **Phase 4d: Sync SPECS-SIGNED counterparts** for the procedure and the full mapping table.
 
 ## Upgrade Workflow
 
@@ -272,6 +278,10 @@ For packages in the new tarball but with no `SPECS/<pkg>/` directory:
      - License verified
      ```
 
+   The two changelog lines above are **required** by `toolkit/scripts/check_spec_guidelines.py` for every brand-new spec. The exact text must match its regex:
+   - Source attribution: `- Initial Azure Linux import from NVIDIA (license: ASL 2.0|GPLv2|BSD)` — `<license>` MUST be one of `ASL 2.0`, `GPLv2`, or `BSD` (this is what the regex accepts), even if the spec's `License:` tag is a more specific SPDX expression like `BSD2+GPL2`. Pick the closest match.
+   - License verification: a line containing `License verified` or `Verified license`. These two lines may be combined with a normal upgrade entry under the same `* <date> Azure Linux Team - <version>-1` header.
+
    **Additional for kernel module packages** (iser, isert, srp, knem, mlnx-nfsrdma, mlnx-nvme, virtiofs, and any package building `.ko` files):
    - Add the `%if 0%{azl}` kernel version macros block
    - Add `BuildRequires: kernel-devel = %{target_kernel_version_full}`, `kernel-headers`
@@ -289,8 +299,102 @@ For packages in the old tarball but absent from the new:
 1. **Confirm with the user** before deleting:
    > The following packages are no longer in DOCA <new_version>: xpmem-lib, mpitests. Remove their SPECS directories?
 2. If confirmed, delete `SPECS/<pkg>/` directories.
+3. **Also delete the matching `SPECS-SIGNED/<pkg>-signed/` (or `SPECS-SIGNED/<pkg>-modules-signed/`) directory** if it exists — orphan signed specs cause the CI `check_entangled_specs.py` check to crash with `FileNotFoundError`.
+4. **Remove the `frozenset(...)` entry** for the deleted pair from `toolkit/scripts/check_entangled_specs.py` (under `version_release_matching_groups`).
 
-### Phase 4d: Handle Edge Cases (batch upgrade only)
+### Phase 4d: Sync SPECS-SIGNED counterparts (kernel modules)
+
+DOCA kernel module packages have signed-spec counterparts under `SPECS-SIGNED/` that re-package the signed kernel module. These are entangled with the unsigned spec by `toolkit/scripts/check_entangled_specs.py`, which requires `Version` and `Release` to **match exactly** (epoch, version, and release with macros expanded).
+
+Mapping (`SPECS/<pkg>` → `SPECS-SIGNED/<dir>`):
+| Unsigned (`SPECS/`) | Signed (`SPECS-SIGNED/`) |
+|---|---|
+| `mlnx-ofa_kernel` | `mlnx-ofa_kernel-modules-signed` |
+| `mlnx-ofa_kernel-hwe` | `mlnx-ofa_kernel-hwe-modules-signed` |
+| `iser` | `iser-signed` |
+| `iser-hwe` | `iser-hwe-signed` |
+| `isert` | `isert-signed` |
+| `isert-hwe` | `isert-hwe-signed` |
+| `srp` | `srp-signed` |
+| `srp-hwe` | `srp-hwe-signed` |
+| `mlnx-nfsrdma` | `mlnx-nfsrdma-signed` |
+| `mlnx-nfsrdma-hwe` | `mlnx-nfsrdma-hwe-signed` |
+| `mft_kernel` | `mft_kernel-signed` |
+| `mft_kernel-hwe` | `mft_kernel-hwe-signed` |
+| `xpmem` | `xpmem-modules-signed` |
+| `xpmem-hwe` | `xpmem-hwe-modules-signed` |
+
+For **every** signed spec whose unsigned counterpart was upgraded:
+
+1. Update `Version:` to **exactly** match the unsigned spec.
+2. Update `Release:` to **exactly** match the unsigned spec (e.g., `1%{release_suffix}%{?dist}` — reset the numeric prefix to `1`, do NOT keep the previous release number like `2` or `8`; the check rejects any difference).
+3. Add a changelog entry mirroring the unsigned spec's upgrade entry.
+4. Do NOT touch `Source0:` — it uses `%{_name}-%{version}-%{release}.%{_arch}.rpm` which auto-tracks the new values. There is no source tarball or `signatures.json` to update in `SPECS-SIGNED/<pkg>-signed/`.
+
+After updating, verify with:
+```bash
+for pkg in <list>; do
+  u=$(grep -E '^(Version|Release):' SPECS/$pkg/$pkg.spec | head -2 | awk '{print $2}' | tr '\n' '/')
+  s=$(grep -E '^(Version|Release):' SPECS-SIGNED/<signed-dir>/<signed-dir>.spec | head -2 | awk '{print $2}' | tr '\n' '/')
+  [ "$u" = "$s" ] && echo "$pkg OK" || echo "$pkg MISMATCH unsigned=$u signed=$s"
+done
+```
+
+The CI runs `python3 toolkit/scripts/check_entangled_specs.py .`; if you can install `python-rpm-spec` locally, run it before pushing.
+
+### Phase 4e: Sync `cgmanifest.json`
+
+Every `SPECS/<pkg>/<pkg>.spec` whose `Name`+`Version`+`Source0` produces a new tarball reference **must** have a matching entry in the top-level [cgmanifest.json](cgmanifest.json). The CI gate is `.github/workflows/validate-cg-manifest.sh`, which for each spec:
+
+1. Parses `<name>` and `<version>` from the spec.
+2. Queries the manifest with
+   `jq --raw-output ".Registrations[].component.other | select(.name==\"$name\" and .version==\"$version\") | .downloadUrl" cgmanifest.json`
+   and requires exactly one match.
+3. Compares that `downloadUrl` to the fully-expanded `Source0:` URL. They must be **byte-for-byte identical**.
+4. Alternate URL: if the spec contains a `#Source0: <url>` comment line, the validator also accepts that URL.
+5. Signed-spec counterparts under `SPECS-SIGNED/` are skipped, so **do not** add cgmanifest entries for them.
+
+Two failure modes to watch for on a DOCA upgrade:
+
+- **Stale version**: the manifest has `<name>-<old_version>` (e.g. `iser-25.07`); update the row's `version` and `downloadUrl` in place to the new version/tarball.
+- **Stale URL only**: the version is unchanged but the tarball filename gained or lost a suffix like `_doca-3.3.0` (common for `ibsim`, `mlx-steering-dump`, `multiperf`, `sockperf`, `ucx`). Update only the `downloadUrl`.
+- **Brand-new package**: insert a new entry (alphabetical by name preferred but not required by the validator). New in DOCA 3.3.0: `ibdump`.
+
+For each affected package, the expanded `Source0:` is `%{_distro_sources_url}/<tarball-as-listed-in-signatures.json>` where `%{_distro_sources_url}` = `https://azurelinuxsrcstorage.blob.core.windows.net/sources/core` (defined in [SPECS/azurelinux-rpm-macros/macros](SPECS/azurelinux-rpm-macros/macros#L265)). Read the spec's `<pkg>.signatures.json` for the exact tarball filename to avoid macro-expansion surprises (e.g., `mft_kernel` ships as `kernel-mft-<ver>.tgz`; `perftest` uses `%{extended_release}` to produce `perftest-<ver>-1.tar.gz`).
+
+**Preferred tool**: `toolkit/scripts/update_cgmanifest.py last cgmanifest.json SPECS/<pkg>/<pkg>.spec ...` (requires `python3-rpm` and `python3-validators`; it queries the URL to also verify the tarball exists). When those deps are unavailable, edit `cgmanifest.json` directly via a small script that loads the JSON, updates rows by name, and writes back with `json.dump(data, f, indent=2)` + trailing newline. Do **not** globally re-sort the file — the existing order is not strictly alphabetical and a re-sort produces a huge unrelated diff.
+
+Verify each entry after editing:
+```bash
+for n in iser iser-hwe isert isert-hwe srp srp-hwe ofed-scripts ...; do
+  v=$(rpmspec --srpm -q --qf '%{version}\n' SPECS/$n/$n.spec 2>/dev/null | head -1)
+  jq --raw-output --arg n "$n" --arg v "$v" \
+    '.Registrations[].component.other | select(.name==$n and .version==$v) | .downloadUrl' \
+    cgmanifest.json
+done
+```
+Each line should print the spec's expanded `Source0:` URL.
+
+### Phase 4f: Sync `LICENSES-AND-NOTICES/SPECS/`
+
+The CI also runs `toolkit/scripts/license_map.py` (under `.github/workflows/check-license-map.yml`), which cross-checks every `*.spec` under `SPECS/`, `SPECS-EXTENDED/`, and `SPECS-SIGNED/` against [LICENSES-AND-NOTICES/SPECS/data/licenses.json](LICENSES-AND-NOTICES/SPECS/data/licenses.json). The script:
+
+1. Reads each spec's `%changelog` and matches it to a known origin via the regexes in `toolkit/scripts/spec_source_attributions.py` (same regex `check_spec_guidelines.py` enforces).
+2. Errors if a spec exists but is not listed under any origin → **"Specs from unknown distributions"** (means the spec lacks a matching source-attribution changelog line).
+3. Errors if an origin lists a spec name that no longer has a matching `<name>.spec` file on disk → **"Specs present in the JSON file that are not present in the spec files"** (means a removed package was left in `licenses.json`).
+4. Errors if the generated markdown differs from [LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md](LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md).
+
+**On every DOCA upgrade**, update `licenses.json` so that:
+
+- For each **new** SPECS dir (Phase 4b): add its `<name>` to the appropriate origin's `specs` list (almost always `"NVIDIA"` for DOCA packages).
+- For each **removed** SPECS dir (Phase 4c): remove its `<name>` and every related signed-counterpart name (`<name>-signed`, `<name>-modules-signed`, `<name>-hwe`, `<name>-hwe-signed`, `<name>-hwe-modules-signed`) from the origin's `specs` list.
+- Then regenerate `LICENSES-MAP.md` from the updated JSON.
+
+**Preferred tool**: `python3 ./toolkit/scripts/license_map.py --no_check --update --remove_missing LICENSES-AND-NOTICES/SPECS/data/licenses.json LICENSES-AND-NOTICES/SPECS/LICENSES-MAP.md SPECS SPECS-EXTENDED SPECS-SIGNED` (requires `pyrpm.spec` from `python-rpm-spec` via pip).
+
+When pip is unavailable, do the same work directly with a small Python snippet that (1) edits the `specs` lists under `lc["licenses"]["NVIDIA"]["specs"]`, (2) sorts each list with `key=str.lower`, (3) sorts the top-level `licenses` ordered-dict by origin name (case-insensitive), (4) writes JSON with `json.dump(..., indent=4)` + trailing newline, and (5) regenerates the markdown using exactly the same logic as `generate_markdown()` in `license_map.py` (a `| <origin> | <license> | <space-br-space-joined specs> |` table row per origin).
+
+### Phase 4g: Handle Edge Cases (batch upgrade only)
 
 - **Packages in repo but NOT from DOCA OFED**: Some packages (e.g., `opensm`, `rdma-core`) may exist in the repo independently. If a package exists in the repo but was NOT in the old DOCA tarball, do NOT touch it unless it also appears in the new tarball — ask the user whether to upgrade from DOCA or keep the existing version.
 - **Package name mismatches**: Some SRPMs have names that don't match the `SPECS/` directory name exactly. Always verify with `ls SPECS/ | grep <pkg>`.
