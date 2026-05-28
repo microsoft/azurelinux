@@ -38,6 +38,8 @@ Patch19: CVE-2026-39829.patch
 Patch20: CVE-2026-39830.patch
 Patch21: CVE-2026-39834.patch
 Patch22: CVE-2026-46597.patch
+Patch23: CVE-2026-39827.patch
+Patch24: CVE-2026-39835.patch
 
 %{?systemd_requires}
 
@@ -134,7 +136,7 @@ fi
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-18
-- Patch for CVE-2026-46597, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821
+- Patch for CVE-2026-46597, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-39835, CVE-2026-39827
 
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-17
 - Patch for CVE-2026-32288
