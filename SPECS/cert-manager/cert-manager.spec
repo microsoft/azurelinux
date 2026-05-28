@@ -24,7 +24,23 @@ Patch7:         CVE-2025-11065.patch
 Patch8:         CVE-2025-47911.patch
 Patch9:         CVE-2025-58190.patch
 Patch10:        CVE-2026-35469.patch
+<<<<<<< HEAD
 Patch11:        CVE-2026-33814.patch
+=======
+Patch11:        CVE-2026-27136.patch
+Patch12:        CVE-2026-39829.patch
+Patch13:        CVE-2026-39830.patch
+Patch14:        CVE-2026-39834.patch
+Patch15:        CVE-2026-42506.patch
+Patch16:        CVE-2026-46597.patch
+Patch17:        CVE-2026-39821.patch
+Patch18:        CVE-2026-25680.patch
+Patch19:        CVE-2026-25681.patch
+Patch20:        CVE-2026-39827.patch
+Patch21:        CVE-2026-39828.patch
+Patch22:        CVE-2026-39835.patch
+Patch23:        CVE-2026-42502.patch
+>>>>>>> 3043c8077e ([AutoPR- Security] Patch cert-manager for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [HIGH] (#17460))
 
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
@@ -116,8 +132,13 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+<<<<<<< HEAD
 * Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-8
 - Patch for CVE-2026-33814
+=======
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-8
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+>>>>>>> 3043c8077e ([AutoPR- Security] Patch cert-manager for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [HIGH] (#17460))
 
 * Thu May 07 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.12.15-7
 - Patch for CVE-2026-35469
