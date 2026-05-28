@@ -1107,7 +1107,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.grep]
 [components.groff]
 [components.grpc]
-[components.grubby]
 [components.gsettings-desktop-schemas]
 [components.gsl]
 [components.gsm]

@@ -1,0 +1,30 @@
+[components.grubby]
+
+[[components.grubby.overlays]]
+description = "Provide /etc/sysconfig/kernel file"
+type = "file-add"
+file = "kernel.sysconfig"
+source = "kernel.sysconfig"
+
+[[components.grubby.overlays]]
+description = "Provide /etc/sysconfig/kernel file"
+type = "spec-add-tag"
+tag = "Source999"
+value = "kernel.sysconfig"
+
+[[components.grubby.overlays]]
+description = "Provide /etc/sysconfig/kernel file"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+  "mkdir -p %{buildroot}%{_sysconfdir}/sysconfig",
+  "install -m 0644 %{SOURCE999} %{buildroot}%{_sysconfdir}/sysconfig/kernel",
+]
+
+[[components.grubby.overlays]]
+description = "Provide /etc/sysconfig/kernel file"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+  "%config(noreplace) %{_sysconfdir}/sysconfig/kernel",
+]
