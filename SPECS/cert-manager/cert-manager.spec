@@ -30,6 +30,7 @@ Patch13:        CVE-2026-39830.patch
 Patch14:        CVE-2026-39834.patch
 Patch15:        CVE-2026-42506.patch
 Patch16:        CVE-2026-46597.patch
+Patch17:        CVE-2026-39821.patch
 
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
