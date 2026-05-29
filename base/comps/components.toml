@@ -3546,7 +3546,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-botocore]
 [components.python-breathe]
 [components.python-bsddb3]
-[components.python-build]
 [components.python-cached_property]
 [components.python-cachetools]
 [components.python-cairocffi]

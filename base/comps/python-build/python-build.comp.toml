@@ -1,0 +1,14 @@
+# The extras bcond (default ON via %{undefined rhel}) pulls uv into BuildRequires
+# via %pyproject_buildrequires -x virtualenv,uv. Although AZL4 ships python3-uv,
+# the uv package currently fails to build, causing BR-unresolvable failures.
+# Extras are disabled until the uv build issue is resolved.
+#
+# Tests are disabled because the dynamic test BRs (via %pyproject_buildrequires -g test)
+# are not statically declared in the spec — they are discovered at build time from
+# upstream metadata. The Koji nightly build scheduler cannot see these implicit
+# dependencies when planning build order, so if python-build is scheduled before
+# its test deps (filelock, pytest-mock) are tagged in, the build fails
+# non-deterministically.
+# %pyproject_check_import still runs as a basic sanity check.
+[components.python-build]
+build.without = ["extras", "tests"]
