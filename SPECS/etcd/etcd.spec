@@ -50,8 +50,6 @@ Patch2:         CVE-2026-33814.patch
 
 BuildRequires:  golang >= 1.16
 
-
-
 %description
 A highly-available key value store for shared configuration and service discovery.
 
