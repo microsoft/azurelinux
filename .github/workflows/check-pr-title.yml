@@ -12,6 +12,11 @@ name: "Check PR Title"
 
 on:
   pull_request_target: # zizmor: ignore[dangerous-triggers]
+    # Only run on PRs targeting 4.0. pull_request_target always uses the workflow
+    # from the default branch. This PR does not require any untrusted scripts from
+    # the PR branch, so it is safe to use pull_request_target.
+    branches:
+      - "4.0"
     types:
       - opened
       - edited
@@ -27,6 +32,8 @@ permissions: {}
 jobs:
   main:
     name: Validate PR title
+    # Prevent forks from running a stale/vulnerable copy of this workflow with Actions enabled
+    if: github.repository == 'microsoft/azurelinux'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write # Needed to post comments on PR
