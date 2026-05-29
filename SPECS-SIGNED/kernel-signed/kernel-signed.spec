@@ -10,7 +10,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-signed-%{buildarch}
 Version:        6.6.139.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -145,6 +145,8 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Thu May 29 2026 AZaugg <azaugg@linkedin.com> - 6.6.139.1-2
+- Enable USB_NET_RNDIS_HOST as module
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 
