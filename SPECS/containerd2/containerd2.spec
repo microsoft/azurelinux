@@ -5,11 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.1.6
-<<<<<<< HEAD
-Release: 4%{?dist}
-=======
-Release: 3%{?dist}
->>>>>>> f158b7063e ([AutoPR- Security] Patch containerd2 for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 [CRITICAL] (#17454))
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -25,14 +21,11 @@ Patch1:	tardev-support.patch
 Patch2:	fix-credential-leak-in-cri-errors.patch
 Patch3: CVE-2026-35469.patch
 Patch4: CVE-2026-34986.patch
-<<<<<<< HEAD
-Patch5:	CVE-2026-39882.patch
-Patch6:	CVE-2026-33814.patch
-=======
 Patch5: CVE-2026-39821.patch
 Patch6: CVE-2026-42506.patch
 Patch7: CVE-2026-27136.patch
->>>>>>> f158b7063e ([AutoPR- Security] Patch containerd2 for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 [CRITICAL] (#17454))
+Patch8:	CVE-2026-39882.patch
+Patch9:	CVE-2026-33814.patch
 
 %{?systemd_requires}
 
@@ -109,20 +102,16 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
-<<<<<<< HEAD
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-5
 - Patch for CVE-2026-33814
 
-* Mon Apr 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
 - Patch for CVE-2026-39882
 
-* Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
-=======
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
 - Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
-* Thu Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
->>>>>>> f158b7063e ([AutoPR- Security] Patch containerd2 for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 [CRITICAL] (#17454))
+* Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
 - Modify CVE-2026-35469 patch for 2.1.6
 - Patch for CVE-2026-34986
 
