@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.28.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,6 +30,11 @@ Patch7:         CVE-2026-40701.patch
 Patch8:         CVE-2026-42934.patch
 Patch9:         CVE-2026-42945.patch
 Patch10:        CVE-2026-42946.patch
+Patch11:        CVE-2026-9256.patch
+
+# njs patches start at 1001 to keep them separate from nginx patches
+Patch1001:      CVE-2026-8711.patch
+
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -73,10 +78,16 @@ Requires:       opentelemetry-cpp
 The OpenTelemetry module for Nginx
 
 %prep
-%autosetup -p1
-pushd ../
-mkdir -p nginx-njs
-tar -C nginx-njs -xf %{SOURCE2}
+%autosetup -N
+%autopatch -p1 -M 1000
+
+mkdir -p ../nginx-njs
+tar -C ../nginx-njs -xf %{SOURCE2}
+
+pushd ../nginx-njs/njs-%{njs_version}
+%autopatch -p1 -m 1001
+popd
+
 
 %build
 sh configure \
@@ -172,6 +183,12 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-4
+- Patch for CVE-2026-9256
+
+* Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-3
+- Patch for CVE-2026-8711
+
 * Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-2
 - Patch for CVE-2026-42946, CVE-2026-42945, CVE-2026-42934, CVE-2026-40701, CVE-2026-40460
 

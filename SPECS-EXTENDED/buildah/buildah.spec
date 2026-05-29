@@ -30,7 +30,7 @@ Epoch: 0
 Version: 1.43.1
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 ExclusiveArch: aarch64 ppc64le s390x x86_64
@@ -44,7 +44,7 @@ BuildRequires: device-mapper-devel
 BuildRequires: git-core
 BuildRequires: golang >= 1.25.0
 BuildRequires: glib2-devel
-BuildRequires: glibc-static >= 2.38-19%{?dist}
+BuildRequires: glibc-static >= 2.38-20%{?dist}
 %if !%{defined gobuild}
 BuildRequires: go-rpm-macros
 %endif
@@ -174,9 +174,15 @@ make test-unit
 %{_datadir}/%{name}/test
 
 %changelog
-* Wed Mar 18 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.43.1-1
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 0:1.43.1-2
+- Bump to rebuild with updated glibc
+
+* Thu Mar 26 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0:1.43.1-1
 - Upgrade to version 1.43.1
 - fixed ptests failures
+
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 0:1.41.4-7
+- Bump to rebuild with updated glibc
 
 * Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0:1.41.4-6
 - Bump to rebuild with updated glibc
