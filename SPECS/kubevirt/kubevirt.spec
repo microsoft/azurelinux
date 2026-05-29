@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.7.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,9 +29,6 @@ URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-11065.patch
 Patch1:         CVE-2026-35469.patch
-<<<<<<< HEAD
-Patch2:         CVE-2026-33814.patch
-=======
 Patch2:         CVE-2026-39829.patch
 Patch3:         CVE-2026-42506.patch
 Patch4:         CVE-2026-46597.patch
@@ -45,7 +42,7 @@ Patch11:        CVE-2026-39827.patch
 Patch12:        CVE-2026-39828.patch
 Patch13:        CVE-2026-39835.patch
 Patch14:        CVE-2026-42502.patch
->>>>>>> 48ebe3f5c8 ([AutoPR- Security] Patch kubevirt for CVE-2026-46597, CVE-2026-42506, CVE-2026-39829, CVE-2026-39834, CVE-2026-39830, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [CRITICAL] (#17475))
+Patch15:        CVE-2026-33814.patch
 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -283,13 +280,11 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
-<<<<<<< HEAD
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-6
 - Patch for CVE-2026-33814
-=======
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
 - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39829, CVE-2026-39834, CVE-2026-39830, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
->>>>>>> 48ebe3f5c8 ([AutoPR- Security] Patch kubevirt for CVE-2026-46597, CVE-2026-42506, CVE-2026-39829, CVE-2026-39834, CVE-2026-39830, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [CRITICAL] (#17475))
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-4
 - Bump to rebuild with updated glibc
