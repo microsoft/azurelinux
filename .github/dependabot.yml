@@ -1,0 +1,31 @@
+version: 2
+
+updates:
+  # Python tooling dependencies — keep pip-installed scripts patched.
+  # `directories` (plural) supports globbing, so new requirements.txt files
+  # under these paths are picked up automatically without editing this file.
+  # `directory` (singular) does NOT support globbing.
+  - package-ecosystem: pip
+    directories:
+      - /.github/workflows/scripts/*
+      - /scripts/*
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - python
+
+  # GitHub Actions used by PR-check workflows.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions:
+        patterns:
+          - "*"
