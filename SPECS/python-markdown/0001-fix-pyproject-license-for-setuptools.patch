@@ -1,0 +1,23 @@
+From 5b625838fe7ab26b18b37844a172fa133105bd80 Mon Sep 17 00:00:00 2001
+From: Durga Jagadeesh Palli <v-dpalli@microsoft.com>
+Date: Tue, 12 May 2026 04:50:37 +0000
+Subject: [PATCH] fix license issue
+Summary: rewriting the pyproject.toml license metadata from the newer format into an older setuptools-compatible format.
+
+diff --git a/pyproject.toml b/pyproject.toml
+index e350a23..556dfbb 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -17,8 +17,7 @@ maintainers = [
+     {name = 'Waylan Limberg', email = 'python.markdown@gmail.com'},
+     {name = 'Isaac Muse'}
+ ]
+-license = "BSD-3-Clause"
+-license-files = ["LICENSE.md"]
++license = {text = "BSD-3-Clause"}
+ requires-python = '>=3.9'
+ dependencies = [
+     "importlib-metadata>=4.4;python_version<'3.10'"
+-- 
+2.45.4
+

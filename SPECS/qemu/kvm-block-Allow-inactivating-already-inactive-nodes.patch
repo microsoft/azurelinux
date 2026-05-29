@@ -1,0 +1,80 @@
+From f7f73025679c5d001256d87bc47566d1db4e98c7 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:53 +0100
+Subject: [PATCH 09/23] block: Allow inactivating already inactive nodes
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [8/22] 781a749ae61e038b5b562407b01d53a1bfba598c (kmwolf/centos-qemu-kvm)
+
+What we wanted to catch with the assertion is cases where the recursion
+finds that a child was inactive before its parent. This should never
+happen. But if the user tries to inactivate an image that is already
+inactive, that's harmless and we don't want to fail the assertion.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-3-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit a6490ec9d56b9e95a13918813585a3a9891710bc)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/block.c b/block.c
+index c94d78eefd..a2aa454312 100644
+--- a/block.c
++++ b/block.c
+@@ -6959,7 +6959,8 @@ bdrv_has_bds_parent(BlockDriverState *bs, bool only_active)
+     return false;
+ }
+ 
+-static int GRAPH_RDLOCK bdrv_inactivate_recurse(BlockDriverState *bs)
++static int GRAPH_RDLOCK
++bdrv_inactivate_recurse(BlockDriverState *bs, bool top_level)
+ {
+     BdrvChild *child, *parent;
+     int ret;
+@@ -6977,7 +6978,14 @@ static int GRAPH_RDLOCK bdrv_inactivate_recurse(BlockDriverState *bs)
+         return 0;
+     }
+ 
+-    assert(!(bs->open_flags & BDRV_O_INACTIVE));
++    /*
++     * Inactivating an already inactive node on user request is harmless, but if
++     * a child is already inactive before its parent, that's bad.
++     */
++    if (bs->open_flags & BDRV_O_INACTIVE) {
++        assert(top_level);
++        return 0;
++    }
+ 
+     /* Inactivate this node */
+     if (bs->drv->bdrv_inactivate) {
+@@ -7014,7 +7022,7 @@ static int GRAPH_RDLOCK bdrv_inactivate_recurse(BlockDriverState *bs)
+ 
+     /* Recursively inactivate children */
+     QLIST_FOREACH(child, &bs->children, next) {
+-        ret = bdrv_inactivate_recurse(child->bs);
++        ret = bdrv_inactivate_recurse(child->bs, false);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -7039,7 +7047,7 @@ int bdrv_inactivate_all(void)
+         if (bdrv_has_bds_parent(bs, false)) {
+             continue;
+         }
+-        ret = bdrv_inactivate_recurse(bs);
++        ret = bdrv_inactivate_recurse(bs, true);
+         if (ret < 0) {
+             bdrv_next_cleanup(&it);
+             break;
+-- 
+2.48.1
+

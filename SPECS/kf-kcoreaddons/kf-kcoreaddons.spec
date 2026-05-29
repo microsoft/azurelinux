@@ -1,6 +1,6 @@
 Name:         kf-kcoreaddons
 Version:      5.249.0
-Release:      1%{?dist}
+Release:      2%{?dist}
 Summary:      KDE Frameworks 6 Tier 1 addon with various classes on top of QtCore
 Vendor:       Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:     https://cgit.kde.org/kcoreaddons.git
 %global framework kcoreaddons
 
 Source0: https://invent.kde.org/frameworks/%{framework}/-/archive/v%{version}/%{framework}-v%{version}.tar.gz#/%{framework}-%{version}.tar.gz
+Patch0:  CVE-2026-41526.patch
 
 ## upstream patches
 
@@ -42,7 +43,7 @@ developing applications that use %{name}.
 
 
 %prep
-%autosetup -n kcoreaddons-v%{version}
+%autosetup -p1 -n kcoreaddons-v%{version} 
 
 %build
 %cmake_kf
@@ -81,6 +82,9 @@ time \
 %{_kf_libdir}/libKF6CoreAddons.so
 
 %changelog
+* Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.249.0-2
+- Patch for CVE-2026-41526
+
 * Fri Feb 02 2024 Sam Meluch <sammeluch@microsoft.com> - 5.249.0-1
 - Upgrade for Azure Linux 3.0
 

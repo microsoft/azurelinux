@@ -52,6 +52,14 @@
             "IgnoredFilesRegexList": [
                 "^/usr/share/doc/libvirt-docs/html/fonts/LICENSE\\.rst$"
             ]
+        },
+        {
+            "_comment1": "SD_NOTICE is a logging-priority macro defined in <systemd/sd-daemon.h> (one of SD_EMERG..SD_DEBUG).",
+            "_comment2": "The man page documents the API macro and is not an actual license/notice file.",
+            "PackageName": "systemd-devel",
+            "IgnoredFilesRegexList": [
+                "^/usr/share/man/man3/SD_NOTICE\\.3\\.gz$"
+            ]
         }
     ],
     "GlobalExceptionsRegexList": [

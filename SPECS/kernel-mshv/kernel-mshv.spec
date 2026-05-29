@@ -17,7 +17,7 @@
 
 Summary:        Mariner kernel that has MSHV Host support
 Name:           kernel-mshv
-Version:        6.6.121.mshv1
+Version:        6.6.137.mshv1
 Release:        2%{?dist}
 License:        GPLv2
 Group:          Development/Tools
@@ -267,6 +267,15 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_includedir}/perf/perf_dlfilter.h
 
 %changelog
+* Wed May 13 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-2
+- Enable missing configs per customer request
+
+* Tue May 05 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.137.mshv1-1
+- Upgrade to 6.6.137.mshv1
+
+* Fri Apr 24 2026 Saul Paredes <saulparedes@microsoft.com> - 6.6.135.mshv2-1
+- Upgrade to 6.6.135.mshv2
+
 * Mon Mar 30 2026 Cameron Baird <cameronbaird@microsoft.com> - 6.6.121.mshv1-2
 - Enable CONFIG_WIREGUARD in kernel config
 
