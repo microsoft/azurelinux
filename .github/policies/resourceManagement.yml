@@ -1,0 +1,163 @@
+# =============================================================================
+# Resource Management policy (GitHub "Policy Service" / GitOps).
+#
+# This file is consumed by Microsoft's GitOps Policy Service, NOT by GitHub
+# Actions. The service watches the repo and reconciles behavior against the
+# rules below.
+#
+# IMPORTANT SCOPING FACTS:
+#   * The service reads .github/policies/* ONLY from the repository's DEFAULT
+#     branch (currently `4.0`) and then applies the rules to PRs/issues
+#     targeting ANY branch. You therefore cannot keep "3.0 rules" on the 3.0
+#     branch and "4.0 rules" on 4.0 -- everything lives here, on the default
+#     branch, and is discriminated by CONDITIONS (e.g. `targetsBranch`).
+#   * There is NO file- or group-level branch scope. Filenames are purely
+#     organizational. To scope a SET of rules to a branch, put a single
+#     `targetsBranch` guard in a parent task's top-level `if:` and nest the
+#     rules under its `then:` -- the top-level `if:` is ANDed, so every nested
+#     child inherits the guard (see the classic 3.0 group below).
+#   * The repo layout differs by era and uses DISJOINT top-level paths, so the
+#     area-label groups never collide:
+#       - classic (3.0/3.0-dev): SPECS*/, toolkit/
+#       - azldev  (4.0):         base/, specs/, distro/, locks/, external/, ...
+#
+# Within a task, `if:` is a list of ANDed conditions and `then:` is a list of
+# actions; both can be nested arbitrarily.
+# =============================================================================
+
+# Top-level scalars below are part of the primitive's template and intentionally
+# left empty. `id` is managed by the Policy Service; `owner`/`where`/`onFailure`/
+# `onSuccess` are optional and unused. (`where:` selects which REPOS an
+# org-distributed policy targets -- it is NOT a branch/PR filter.)
+id:
+name: GitOps.PullRequestIssueManagement
+description: GitOps.PullRequestIssueManagement primitive
+owner:
+resource: repository
+disabled: false
+where:
+onFailure:
+onSuccess:
+configuration:
+  resourceManagementConfiguration:
+    scheduledSearches: []
+    eventResponderTasks:
+      # =======================================================================
+      # GROUP: 4.0+ area labels (GATED to the 4.0 branch).
+      # The single `or(targetsBranch ...)` guard scopes the ENTIRE group; every
+      # nested `if/then` inherits it.
+      # =======================================================================
+      - description: Area labels for PRs that target 4.0
+        if:
+          - payloadType: Pull_Request
+          - or:
+              - targetsBranch:
+                  branch: "4.0"
+        then:
+          # Component definitions, rendered specs, and lock files -> Packaging.
+          - if:
+              - filesMatchPattern:
+                  pattern: "^(base/comps|specs|locks)/"
+                  matchAny: true   # true = label if ANY changed file matches
+            then:
+              - addLabel:
+                  label: Packaging
+          # Documentation
+          - if:
+              - filesMatchPattern:
+                  pattern: "^docs/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: documentation
+          # Branch-name label. The group is already gated to 4.0, so every PR
+          # reaching here targets 4.0 -- no nested condition needed.
+          - addLabel:
+              label: "4.0"
+
+      # =======================================================================
+      # GROUP: 3.0-era area labels (GATED to the 3.0 branches).
+      # The single `or(targetsBranch ...)` guard in this parent `if:` scopes the
+      # ENTIRE group; every nested `if/then` below inherits it. To stop labeling
+      # a retired branch, just remove its line from the `or:` list.
+      # =======================================================================
+      - description: Area labels for the classic (SPECS/toolkit) layout, 3.0 only
+        if:
+          - payloadType: Pull_Request
+          - or:
+              - targetsBranch:
+                  branch: "3.0"
+              - targetsBranch:
+                  branch: "3.0-dev"
+              - targetsBranch:
+                  branch: "fasttrack/3.0"
+        then:
+          - if:
+              - filesMatchPattern:
+                  pattern: "^(SPECS|SPECS-EXTENDED|SPECS-SIGNED)/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: Packaging
+          - if:
+              - filesMatchPattern:
+                  pattern: "^SPECS-EXTENDED/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: specs-extended
+          - if:
+              - filesMatchPattern:
+                  pattern: "^toolkit/docs/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: documentation
+          - if:
+              - filesMatchPattern:
+                  pattern: "^toolkit/(tools|scripts)/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: Tools
+          - if:
+              - filesMatchPattern:
+                  pattern: "^toolkit/(imageconfigs|tools/imagegen/configuration)/"
+                  matchAny: true
+            then:
+              - addLabel:
+                  label: Schema
+    
+          # Branch-name labels. We always add the '3.0' label for any PR targeting a
+          # 3.0 branch, and *also* add a "fasttrack/3.0" label for PRs targeting the
+          # fasttrack branch.
+          - addLabel:
+              label: "3.0"
+          - if:
+              - targetsBranch:
+                  branch: "fasttrack/3.0"
+            then:
+              - addLabel:
+                  label: "fasttrack/3.0"
+
+      # =======================================================================
+      # Era-independent: label PRs opened by an automation bot account.
+      # `issueAuthor: false` -> match when the BOT is the activity sender.
+      # The `or:` block matches when EITHER known automation account opened the
+      # PR; add more accounts here as they appear.
+      # =======================================================================
+      - description: Label automated PRs opened by a bot account
+        if:
+          - payloadType: Pull_Request
+          - isAction:
+              action: Opened
+          - or:
+              - isActivitySender:
+                  user: CBL-Mariner-Bot
+                  issueAuthor: false
+              - isActivitySender:
+                  user: azurelinux-security
+                  issueAuthor: false
+        then:
+          - addLabel:
+              label: Automatic PR
