@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.26.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -169,6 +169,10 @@ fi
 %{_bindir}/*
 
 %changelog
+
+* Fri May 29 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.2-2
+- Remove the remaining bootstrap04 component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
 * Wed Apr 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.2-1
 - Bump version to 1.26.2-1
 
