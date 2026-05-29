@@ -100,7 +100,7 @@ rm -f  %{gopath}/src/runtime/*.c
 )
 
 # Nuke the final bootstrapper 04. Note: It is not used in any step under install, post, postrun
-  rm -rf %{_libdir}/golang
+rm -rf %{_libdir}/golang
 
 
 %install
