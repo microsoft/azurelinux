@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -48,9 +48,6 @@ Patch13:        CVE-2025-47913.patch
 Patch14:        CVE-2025-11065.patch
 Patch15:        CVE-2025-47911.patch
 Patch16:        CVE-2025-58190.patch
-<<<<<<< HEAD
-Patch17:        CVE-2026-33814.patch
-=======
 Patch17:        CVE-2026-39821.patch
 Patch18:        CVE-2026-39829.patch
 Patch19:        CVE-2026-39830.patch
@@ -67,7 +64,7 @@ Patch29:        CVE-2026-39828.patch
 Patch30:        CVE-2026-39835.patch
 Patch31:        CVE-2026-42502.patch
 Patch32:        CVE-2026-46598.patch
->>>>>>> 654645d86b ([AutoPR- Security] Patch packer for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [CRITICAL] (#17479))
+Patch33:        CVE-2026-33814.patch
 
 BuildRequires:  golang >= 1.21
 BuildRequires:  kernel-headers
@@ -99,13 +96,11 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
-<<<<<<< HEAD
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-14
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-15
 - Patch for CVE-2026-33814
-=======
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-14
 - Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
->>>>>>> 654645d86b ([AutoPR- Security] Patch packer for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680 [CRITICAL] (#17479))
 
 * Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-13
 - Patch for CVE-2025-58190, CVE-2025-47911
