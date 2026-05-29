@@ -2299,7 +2299,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.osinfo-db]
 [components.osinfo-db-tools]
 [components.p11-kit]
-[components.package-notes]
 [components.pam]
 [components.pam_wrapper]
 [components.pandoc]

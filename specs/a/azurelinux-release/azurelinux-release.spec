@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -298,7 +298,7 @@ VERSION_CODENAME=""
 PRETTY_NAME="Azure Linux %{dist_version} (%{release_name}%{?prerelease})"
 ANSI_COLOR="0;38;2;60;110;180"
 LOGO=azurelinux-logo-icon
-CPE_NAME="cpe:/o:azurelinuxproject:azurelinux:%{dist_version}"
+CPE_NAME="cpe:/o:microsoft:azurelinux:%{dist_version}"
 DEFAULT_HOSTNAME="azurelinux"
 HOME_URL="%{dist_home_url}"
 DOCUMENTATION_URL="https://aka.ms/azurelinux"
@@ -479,6 +479,12 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu May 29 2026 Drew Phelps <anphel@microsoft.com> - 4.0-18
+- Fix CPE_NAME in os-release to use 'microsoft' vendor, matching
+  /usr/lib/system-release-cpe and the AZL 3.0 precedent. This also
+  fixes the osCpe field embedded in ELF .note.package metadata for
+  packages built against an updated buildroot.
+
 * Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
 - Redefine azurelinux macro as major version.
 

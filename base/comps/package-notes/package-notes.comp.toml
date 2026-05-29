@@ -1,0 +1,15 @@
+[components.package-notes]
+
+# The upstream %build step injects the OSCPE by reading
+# /usr/lib/system-release-cpe from the buildroot. In the Azure Linux build
+# environment that file is supplied by the Fedora buildroot (fedora-release),
+# producing 'cpe:/o:fedoraproject:fedora:43' in the .note.package ELF section
+# of every package built with these LDFLAGS. Hardcode the Azure Linux CPE
+# so emitted binaries advertise the correct distro identity, matching
+# /usr/lib/system-release-cpe from azurelinux-release.
+[[components.package-notes.overlays]]
+description = "Embed Azure Linux CPE in .note.package metadata instead of inheriting the buildroot's (Fedora) system-release-cpe"
+type = "spec-search-replace"
+section = "%build"
+regex = '\$\(cat /usr/lib/system-release-cpe\)'
+replacement = "cpe:/o:microsoft:azurelinux:4.0"
