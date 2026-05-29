@@ -24,11 +24,7 @@ Version:                2.22.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition-flatcar
-<<<<<<< HEAD
-Release:        4%{?dist}
-=======
-Release:        3%{?dist}
->>>>>>> 19b40b344a ([AutoPR- Security] Patch ignition-flatcar for CVE-2026-39821 [CRITICAL] (#17468))
+Release:        5%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Summary:        First boot installer and configuration tool
@@ -58,12 +54,9 @@ Patch17:        0018-docs-Add-re-added-platforms-to-docs-to-pass-tests.patch
 Patch18:        0019-usr-share-oem-oem.patch
 Patch19:        0020-internal-exec-stages-mount-Mount-oem.patch
 Patch20:        CVE-2026-27141.patch
-<<<<<<< HEAD
-Patch21:        CVE-2026-29181.patch
-Patch22:        CVE-2026-33814.patch
-=======
 Patch21:        CVE-2026-39821.patch
->>>>>>> 19b40b344a ([AutoPR- Security] Patch ignition-flatcar for CVE-2026-39821 [CRITICAL] (#17468))
+Patch22:        CVE-2026-29181.patch
+Patch23:        CVE-2026-33814.patch
 
 BuildRequires: libblkid-devel
 BuildRequires: systemd-rpm-macros
@@ -212,16 +205,14 @@ VERSION=%{version} GOARCH=%{goarch} ./test
 %endif
 
 %changelog
-<<<<<<< HEAD
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-4
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-5
 - Patch for CVE-2026-33814
 
-* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-3
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-4
 - Patch for CVE-2026-29181
-=======
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-3
 - Patch for CVE-2026-39821
->>>>>>> 19b40b344a ([AutoPR- Security] Patch ignition-flatcar for CVE-2026-39821 [CRITICAL] (#17468))
 
 * Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.22.0-2
 - Patch for CVE-2026-27141
