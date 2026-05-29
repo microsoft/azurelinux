@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        14%{?dist}
+Release:        17%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -46,6 +46,13 @@ Patch7:         CVE-2025-59530.patch
 Patch8:         CVE-2025-68156.patch
 Patch9:         CVE-2025-68151.patch
 Patch10:        CVE-2025-11065.patch
+Patch11:        CVE-2026-26017.patch
+Patch12:        CVE-2026-26018.patch
+Patch13:        CVE-2026-32934.patch
+Patch14:        CVE-2026-32936.patch
+Patch15:        CVE-2026-33489.patch
+Patch16:        CVE-2026-33190.patch
+Patch17:        CVE-2026-39821.patch
 
 BuildRequires:  golang < 1.25
 
@@ -87,6 +94,15 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-17
+- Patch for CVE-2026-39821
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-16
+- Patch for CVE-2026-32936, CVE-2026-32934, CVE-2026-33489, CVE-2026-33190
+
+* Mon Mar 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-15
+- Patch for CVE-2026-26018, CVE-2026-26017
+
 * Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-14
 - Patch for CVE-2025-11065
 

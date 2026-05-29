@@ -1,0 +1,82 @@
+From ba42b9bf3f193bbc7f47d494bdc888e881539f4b Mon Sep 17 00:00:00 2001
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Fri, 17 Jan 2025 12:17:08 +0100
+Subject: [PATCH 01/23] net: Fix announce_self
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RH-Author: Laurent Vivier <lvivier@redhat.com>
+RH-MergeRequest: 338: net: Fix announce_self
+RH-Jira: RHEL-73891
+RH-Acked-by: Eugenio Pérez <eperezma@redhat.com>
+RH-Acked-by: Cindy Lu <lulu@redhat.com>
+RH-Commit: [1/1] dfee696c1c444af0ba2b2d3d8c7012385e84885c (lvivier/qemu-kvm-centos)
+
+JIRA: https://issues.redhat.com/browse/RHEL-73891
+
+b9ad513e1876 ("net: Remove receive_raw()") adds an iovec entry
+in qemu_deliver_packet_iov() to add the virtio-net header
+in the data when QEMU_NET_PACKET_FLAG_RAW is set but forgets
+to increase the number of iovec entries in the array, so
+receive_iov() will only send the first entry (the virtio-net
+entry, full of 0) and no data. The packet will be discarded.
+
+The only user of QEMU_NET_PACKET_FLAG_RAW is announce_self.
+
+We can see the problem with tcpdump:
+
+- QEMU parameters:
+
+  .. -monitor stdio \
+     -netdev bridge,id=netdev0,br=virbr0 \
+     -device virtio-net,mac=9a:2b:2c:2d:2e:2f,netdev=netdev0 \
+
+- HMP command:
+
+  (qemu) announce_self
+
+- TCP dump:
+
+  $ sudo tcpdump -nxi virbr0
+
+  without the fix:
+
+    <nothing>
+
+  with the fix:
+
+   ARP, Reverse Request who-is 9a:2b:2c:2d:2e:2f tell 9a:2b:2c:2d:2e:2f, length 46
+        0x0000:  0001 0800 0604 0003 9a2b 2c2d 2e2f 0000
+        0x0010:  0000 9a2b 2c2d 2e2f 0000 0000 0000 0000
+        0x0020:  0000 0000 0000 0000 0000 0000 0000
+
+Reported-by: Xiaohui Li <xiaohli@redhat.com>
+Bug: https://issues.redhat.com/browse/RHEL-73891
+Fixes: b9ad513e1876 ("net: Remove receive_raw()")
+Cc: akihiko.odaki@daynix.com
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Reviewed-by: Michael Tokarev <mjt@tls.msk.ru>
+Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
+(cherry picked from commit 84dfdcbff33fff185528501be408c25c44499f32)
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ net/net.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/net.c b/net/net.c
+index fc1125111c..94f51b6e5f 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -828,6 +828,7 @@ static ssize_t qemu_deliver_packet_iov(NetClientState *sender,
+         iov_copy[0].iov_len =  nc->vnet_hdr_len;
+         memcpy(&iov_copy[1], iov, iovcnt * sizeof(*iov));
+         iov = iov_copy;
++        iovcnt++;
+     }
+ 
+     if (nc->info->receive_iov) {
+-- 
+2.48.1
+

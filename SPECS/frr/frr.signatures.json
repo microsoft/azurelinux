@@ -1,6 +1,6 @@
 {
  "Signatures": {
-  "frr-9.1.1.tar.gz": "6eb254c72dca867fefffd5ded80a6c2d5ce8df223ce93263302db4b8bfbb19c4",
+  "frr-10.5.4.tar.gz": "1e8401e1bfcbb9b0dfefc9b335013733a3c77cdf85c79ff66d9e65167d9cfb1e",
   "frr-sysusers.conf": "c6f5a54402aa5f11e21dac3bd0e6cdeadfbf7937e9b34775b5fd368a9ca96fa4",
   "frr-tmpfiles.conf": "edd7b01b11f2be66bb6b4531496d1eaf6536add9f4b549c659b27f5a32cdc512"
  }

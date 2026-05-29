@@ -12,7 +12,7 @@
 
 Name:           strongswan
 Version:        5.9.14
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        An OpenSource IPsec-based VPN and TNC solution
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
@@ -32,6 +32,7 @@ Patch3:         strongswan-6.0.1-gcc15.patch
 Patch4:         strongswan-fix-make-check.patch
 Patch5:         0001-Extending-timeout-for-test-cases-with-multiple-read-.patch
 Patch6:         CVE-2025-62291.patch
+Patch7:         CVE-2026-25075.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -426,6 +427,9 @@ install -D -m 0644 %{SOURCE3} %{buildroot}/%{_tmpfilesdir}/strongswan-starter.co
 %endif
 
 %changelog
+* Tue Mar 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.14-9
+- Patch for CVE-2026-25075
+
 * Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.9.14-8
 - Patch for CVE-2025-62291
 

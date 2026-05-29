@@ -26,6 +26,7 @@ extends:
   template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
+      use1esentry: false # this disables 1es entrypoint which is a workaround for issues from IcM https://portal.microsofticm.com/imp/v5/incidents/details/743308145/summary
       LinuxHostVersion:
         Network: R1
     globalSdl:

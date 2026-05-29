@@ -1,0 +1,32 @@
+From d5fdae993da87ef29f37af71db1e0d7e5c124e6c Mon Sep 17 00:00:00 2001
+From: Aninda <v-anipradhan@microsoft.com>
+Date: Thu, 2 Apr 2026 16:34:19 -0400
+Subject: [PATCH] One of the ptest was failing for python-google-auth-oauthlib for arm64 architecture
+Failure Description: socket.gaierror: [Errno -2] Name or service not known when resolving socket.gethostbyname(socket.gethostname()).
+Fix for host name resolution for local IP issue on core-arm64 during ptest
+
+---
+ tests/unit/test_flow.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tests/unit/test_flow.py b/tests/unit/test_flow.py
+index d9c9f8b..9df45e0 100644
+--- a/tests/unit/test_flow.py
++++ b/tests/unit/test_flow.py
+@@ -380,8 +380,12 @@ class TestInstalledAppFlow(object):
+             return mock.Mock()
+ 
+         make_server_mock.side_effect = assign_last_request_uri
++        
++        try:
++            my_ip = socket.gethostbyname(socket.gethostname())
++        except socket.gaierror:
++            my_ip = "127.0.0.1"
+ 
+-        my_ip = socket.gethostbyname(socket.gethostname())
+         instance.run_local_server(bind_addr=my_ip, host="localhost")
+ 
+         assert webbrowser_mock.open.called
+-- 
+2.34.1
+

@@ -1,0 +1,46 @@
+From 0f0968badaa11f4ac56f8ee93cbe11f9a6d5fc95 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:56 +0100
+Subject: [PATCH 12/23] block: Don't attach inactive child to active node
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [11/22] 1ca560728b97bd1d5f7498a7e5d23e2d8bb0808d (kmwolf/centos-qemu-kvm)
+
+An active node makes unrestricted use of its children and would possibly
+run into assertion failures when it operates on an inactive child node.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-6-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 9b81361aedcc47905de5e91f68221de89c6f5467)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block.c b/block.c
+index a2aa454312..41e72e6965 100644
+--- a/block.c
++++ b/block.c
+@@ -3183,6 +3183,11 @@ bdrv_attach_child_noperm(BlockDriverState *parent_bs,
+                    child_bs->node_name, child_name, parent_bs->node_name);
+         return NULL;
+     }
++    if (bdrv_is_inactive(child_bs) && !bdrv_is_inactive(parent_bs)) {
++        error_setg(errp, "Inactive '%s' can't be a %s child of active '%s'",
++                   child_bs->node_name, child_name, parent_bs->node_name);
++        return NULL;
++    }
+ 
+     bdrv_get_cumulative_perm(parent_bs, &perm, &shared_perm);
+     bdrv_child_perm(parent_bs, child_bs, NULL, child_role, NULL,
+-- 
+2.48.1
+

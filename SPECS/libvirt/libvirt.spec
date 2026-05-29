@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.10.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -198,6 +198,9 @@ Source:         https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.
 Patch0:         libvirt-conf.patch
 Patch1:         CVE-2025-13193.patch
 Patch2:         CVE-2025-12748.patch
+Patch3:         libvirt-qemu-tpm-do-not-update-profile-name-for-transient-domains.patch
+Patch4:         libvirt-qemu-Rename-outgoingMigration-parameter-in-various-TPM-functions.patch
+Patch5:         libvirt-qemu-Properly-propagate-migration-state-to-TPM-cleanup-code.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2194,6 +2197,10 @@ exit 0
 %endif
 
 %changelog
+* Tue Mar 24 2026 Harshit Gupta <guptaharshit@microsoft.com> - 10.10.0-2
+- Add patches from https://gitlab.com/redhat/centos-stream/rpms/libvirt
+  to fix TPM handling in QEMU migrations.
+
 * Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 10.10.0-1
 - Upgrade to 10.10.0
 - Add new files introduced in 10.10.0: network.conf, libvirtd_network.aug,

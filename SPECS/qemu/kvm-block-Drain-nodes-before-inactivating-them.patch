@@ -1,0 +1,52 @@
+From bc9b651ce0f36da5a5b6eb8631e7040e59ea2493 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:14:02 +0100
+Subject: [PATCH 18/23] block: Drain nodes before inactivating them
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [17/22] f0fec0f51ed033038b565297a7217cbf61ab70f7 (kmwolf/centos-qemu-kvm)
+
+So far the assumption has always been that if we try to inactivate a
+node, it is already idle. This doesn't hold true any more if we allow
+inactivating exported nodes because we can't know when new external
+requests come in.
+
+Drain the node around setting BDRV_O_INACTIVE so that requests can't
+start operating on an active node and then in the middle it suddenly
+becomes inactive. With this change, it's enough for exports to check
+for new requests that they operate on an active node (or, like reads,
+are allowed even on an inactive node).
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Message-ID: <20250204211407.381505-12-kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 2849092a0024405e74c96f0a5ec41bb182ec8538)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block.c b/block.c
+index 2140a5d3b7..38cb8481a8 100644
+--- a/block.c
++++ b/block.c
+@@ -7032,7 +7032,9 @@ bdrv_inactivate_recurse(BlockDriverState *bs, bool top_level)
+         return -EPERM;
+     }
+ 
++    bdrv_drained_begin(bs);
+     bs->open_flags |= BDRV_O_INACTIVE;
++    bdrv_drained_end(bs);
+ 
+     /*
+      * Update permissions, they may differ for inactive nodes.
+-- 
+2.48.1
+

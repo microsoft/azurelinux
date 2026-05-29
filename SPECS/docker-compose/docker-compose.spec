@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        8%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,17 @@ Patch5:         CVE-2025-47913.patch
 Patch6:         CVE-2025-11065.patch
 Patch7:         CVE-2025-47911.patch
 Patch8:         CVE-2025-58190.patch
+Patch9:         CVE-2026-39882.patch
+Patch10:        CVE-2026-35469.patch
+Patch11:        CVE-2026-39821.patch
+Patch12:        CVE-2026-39829.patch
+Patch13:        CVE-2026-39830.patch
+Patch14:        CVE-2026-39832.patch
+Patch15:        CVE-2026-39834.patch
+Patch16:        CVE-2026-42506.patch
+Patch17:        CVE-2026-46597.patch
+Patch18:        CVE-2026-27136.patch
+
 BuildRequires:  golang
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
@@ -53,6 +64,15 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-11
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-10
+- Patch for CVE-2026-35469
+
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-9
+- Patch for CVE-2026-39882
+
 * Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-8
 - Patch for CVE-2025-58190, CVE-2025-47911
 

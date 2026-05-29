@@ -3,7 +3,7 @@
 Summary: The open-source application container engine
 Name:    moby-engine
 Version: 25.0.3
-Release: 14%{?dist}
+Release: 17%{?dist}
 License: ASL 2.0
 Group:   Tools/Container
 URL: https://mobyproject.org
@@ -29,6 +29,10 @@ Patch11: CVE-2025-22869.patch
 Patch12: CVE-2025-30204.patch
 Patch13: CVE-2024-51744.patch
 Patch14: CVE-2025-58183.patch
+#This can be removed when upgraded to v25.0.15
+Patch15: fix-multiarch-image-push-tag.patch
+Patch16: CVE-2026-39882.patch
+Patch17: CVE-2026-32288.patch
 
 %{?systemd_requires}
 
@@ -124,6 +128,15 @@ fi
 %{_unitdir}/*
 
 %changelog
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-17
+- Patch for CVE-2026-32288
+
+* Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-16
+- Patch for CVE-2026-39882
+
+* Tue Jan 21 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 25.0.3-15
+- Fix multiarch image push tag
+
 * Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 25.0.3-14
 - Patch for CVE-2025-58183
 
