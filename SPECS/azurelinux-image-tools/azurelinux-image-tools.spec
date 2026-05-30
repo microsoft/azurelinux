@@ -1,5 +1,6 @@
 %define our_gopath %{_topdir}/.gopath
 
+Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
 Version:        1.4.0
 Release:        2%{?dist}
