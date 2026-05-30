@@ -1,17 +1,6 @@
 %define our_gopath %{_topdir}/.gopath
-
-Summary:        Azure Linux Image Tools
-Name:           azurelinux-image-tools
-<<<<<<< HEAD
-Version:        1.3.0
-Release:        3%{?dist}
-=======
 Version:        1.4.0
-Release:        1%{?dist}
->>>>>>> 951232279b (Upgrade azurelinux-image-tools to version 1.4.0 (fasttrack) (#17558))
-License:        MIT
-URL:            https://github.com/microsoft/azure-linux-image-tools/
-Group:          Applications/System
+Release:        2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -116,19 +105,17 @@ go test -C toolkit/tools ./...
 
 %files osmodifier
 %license LICENSE
-%{_bindir}/osmodifier
-
-%changelog
-<<<<<<< HEAD
-* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-3
+* Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2
 - Patch for CVE-2026-33814
-=======
+
 * Fri May 29 2026 Vince Perri <viperri@microsoft.com> - 1.4.0-1
 - Upgrade to version 1.4.0
->>>>>>> 951232279b (Upgrade azurelinux-image-tools to version 1.4.0 (fasttrack) (#17558))
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
 - Patch for CVE-2026-39821
+
+* Thu Mar 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-2
+- Patch for CVE-2026-27141
 
 * Tue Apr 28 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.3.0-1
 - Upgrade to version 1.3.0 which includes fixes for CVE-2026-27141, CVE-2026-29181 and CVE-2026-39882
