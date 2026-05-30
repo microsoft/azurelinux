@@ -1,8 +1,13 @@
 [components.gdb]
 
+# NOTE: This overlay uses spec-search-replace instead of spec-remove-tag
+# because the %package headless section header is inside a %if wrapper but
+# the Recommends tag is outside the %endif. The tree parser cannot associate
+# post-%endif content with the headless section, so spec-remove-tag with
+# package = "headless" cannot find the tag. The regex is anchored to avoid
+# matching the changelog entry that also mentions default-yama-scope.
 [[components.gdb.overlays]]
-description = "Remove recommends: default-yama-scope"
-type = "spec-remove-tag"
-package = "headless"
-tag = "Recommends"
-value = "default-yama-scope"
+description = "Remove Recommends: default-yama-scope from headless subpackage"
+type = "spec-search-replace"
+regex = "^Recommends: default-yama-scope$"
+replacement = "# Recommends: default-yama-scope (disabled for AzureLinux)"
