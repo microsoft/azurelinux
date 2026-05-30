@@ -123,9 +123,6 @@ go test -C toolkit/tools ./...
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
 - Patch for CVE-2026-39821
 
-* Thu Mar 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-2
-- Patch for CVE-2026-27141
-
 * Tue Apr 28 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.3.0-1
 - Upgrade to version 1.3.0 which includes fixes for CVE-2026-27141, CVE-2026-29181 and CVE-2026-39882
 
