@@ -40,7 +40,6 @@
 %endif
 %if %{with_dm} != 1
 %define dm_copts --without-dm
-%else
 %endif
 %if %{with_loop} != 1
 %define loop_copts --without-loop

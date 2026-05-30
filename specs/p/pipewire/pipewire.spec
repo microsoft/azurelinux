@@ -121,7 +121,6 @@ BuildRequires:  ncurses-devel
 BuildRequires:  pulseaudio-libs-devel
 BuildRequires:  avahi-devel
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
-%else
 %endif
 BuildRequires:  libusb1-devel
 BuildRequires:  readline-devel

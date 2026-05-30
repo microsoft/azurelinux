@@ -818,6 +818,7 @@ This package provides the qemu-pr-helper utility that is required for certain
 SCSI features.
 
 
+%define testsdir %{_libdir}/%{name}/tests-src
 %if %{have_libblkio}
 %package  block-blkio
 Summary: QEMU blkio block driver

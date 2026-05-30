@@ -159,9 +159,6 @@ ln -s ../tests/ ../pytest.ini ./
 
 
 %check -a
-# Check section disabled: Disabling checks for initial set of failures.
-exit 0
-
 # With Python 3.14, in test_process_teardown, while spawning the multiprocess
 # forkserver child:
 #   ModuleNotFoundError: No module named 'tests'
