@@ -18,7 +18,7 @@ Control Tower integration pipeline
   upload the output dir as they see fit.
 - **azldev as root.** All `azldev` invocations use an inline
   `AZLDEV_ALLOW_ROOT=1` prefix per
-  [`ado-pipeline.instructions.md`](../../../instructions/ado-pipeline.instructions.md).
+  [`ado-pipeline.instructions.md`](../../../.github/instructions/ado-pipeline.instructions.md).
   Callers do **not** set this at step scope.
 - **Single source of truth.** Both pipelines should call these scripts
   rather than re-implementing the change-set computation. A regression

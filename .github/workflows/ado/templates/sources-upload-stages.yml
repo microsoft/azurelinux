@@ -112,7 +112,7 @@ stages:
               echo "##[endgroup]"
 
               echo "##[group]Python dependencies"
-              pip install -r .github/workflows/scripts/control-tower/requirements.txt
+              pip install -r scripts/ci/control-tower/requirements.txt
               echo "##[endgroup]"
             displayName: "Install dependencies"
 
@@ -120,7 +120,7 @@ stages:
           # writing, exits nonzero if any lock would change.
           - script: |
               set -euo pipefail
-              .github/workflows/scripts/control-tower/verify_locks.sh \
+              scripts/ci/control-tower/verify_locks.sh \
                 --output-file "$(Build.ArtifactStagingDirectory)/lock-update.json" \
                 --publish-dir "$(ob_outputDirectory)"
             displayName: "Verify lock files are up to date"
@@ -168,7 +168,7 @@ stages:
               trap publish_artifact EXIT
 
               echo "##[group]Preparing change set"
-              .github/workflows/scripts/components/compute_change_set.sh \
+              scripts/ci/components/compute_change_set.sh \
                 --output-dir "$change_set_dir" \
                 --source-commit "$(sourceCommit)" \
                 --target-commit "$(targetCommit)"
@@ -232,7 +232,7 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 .github/workflows/scripts/control-tower/run_prcheck.py \
+                python3 scripts/ci/control-tower/run_prcheck.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
@@ -259,7 +259,7 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 .github/workflows/scripts/control-tower/run_package_build.py \
+                python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
