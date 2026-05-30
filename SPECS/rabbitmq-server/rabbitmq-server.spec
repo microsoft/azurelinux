@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.13.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,12 +11,9 @@ URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:			CVE-2025-30219.patch
 Patch1:			CVE-2025-50200.patch
-<<<<<<< HEAD
-Patch2:			CVE-2026-43968.patch
-Patch3:			CVE-2026-7790.patch
-=======
 Patch2:			CVE-2026-8466.patch
->>>>>>> 455f6491fd ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-8466 [HIGH] (#17452))
+Patch3:			CVE-2026-43968.patch
+Patch4:			CVE-2026-7790.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -73,16 +70,14 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
-<<<<<<< HEAD
-* Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-4
-- Patch for CVE-2026-7790, CVE-2026-43968
-=======
+* Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-5
+ - Patch for CVE-2026-7790, CVE-2026-43968
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-4
-- Patch for CVE-2026-8466
->>>>>>> 455f6491fd ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-8466 [HIGH] (#17452))
+ - Patch for CVE-2026-8466
 
 * Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-3
-- Patch for CVE-2025-50200
+ - Patch for CVE-2025-50200
 
 * Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.13.7-2
 - Address CVE-2025-30219 with a patch
