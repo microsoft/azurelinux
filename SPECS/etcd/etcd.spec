@@ -3,11 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.30
-<<<<<<< HEAD
-Release:        1%{?dist}
-=======
 Release:        2%{?dist}
->>>>>>> a4f5fae340 ([CRITICAL] Patch etcd for CVE-2026-39821 (#17529))
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,12 +45,8 @@ Source1:        etcd.service
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2026-29181.patch
-<<<<<<< HEAD
-=======
 Patch1:         CVE-2026-39821.patch
 Patch2:         CVE-2026-33814.patch
-
->>>>>>> a4f5fae340 ([CRITICAL] Patch etcd for CVE-2026-39821 (#17529))
 BuildRequires:  golang >= 1.16
 
 %description
@@ -164,12 +156,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-<<<<<<< HEAD
-=======
-* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.28-2
+* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.30-2
 - Patch CVE-2026-39821, CVE-2026-33814
 
->>>>>>> a4f5fae340 ([CRITICAL] Patch etcd for CVE-2026-39821 (#17529))
 * Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
 - Upgrade to version 3.5.30 (fixes CVE-2026-44283).
 
