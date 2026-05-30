@@ -111,6 +111,9 @@ go test -C toolkit/tools ./...
 
 %files osmodifier
 %license LICENSE
+%{_bindir}/osmodifier
+
+%changelog
 * Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2
 - Patch for CVE-2026-33814
 
