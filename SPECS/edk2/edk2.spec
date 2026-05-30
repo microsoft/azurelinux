@@ -20,10 +20,6 @@ Distribution:   Azure Linux
 # in theory should build everywhere without much trouble, but
 # in practice the edk2 build system barfs on archs it doesn't know
 # (such as ppc), so lets limit things to the known-good ones.
-#
-# Can't build aarch64 due to a dependency on "nasm", which doesn't
-# officially support the ARM64 architecture. See here:
-# https://github.com/netwide-assembler/nasm/pull/3
 
 # edk2-stable202402
 %define GITDATE        20240524
@@ -54,8 +50,6 @@ Distribution:   Azure Linux
 
 # Undefine this to get *HUGE* (50MB+) verbose build logs
 %define silent --silent
-
-%global softfloat_version 20180726-gitb64af41
 
 %define disable_werror 1
 
