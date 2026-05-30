@@ -2,8 +2,13 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
+<<<<<<< HEAD
 Version:        1.3.0
 Release:        3%{?dist}
+=======
+Version:        1.4.0
+Release:        1%{?dist}
+>>>>>>> 951232279b (Upgrade azurelinux-image-tools to version 1.4.0 (fasttrack) (#17558))
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -114,8 +119,13 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+<<<<<<< HEAD
 * Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-3
 - Patch for CVE-2026-33814
+=======
+* Fri May 29 2026 Vince Perri <viperri@microsoft.com> - 1.4.0-1
+- Upgrade to version 1.4.0
+>>>>>>> 951232279b (Upgrade azurelinux-image-tools to version 1.4.0 (fasttrack) (#17558))
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
 - Patch for CVE-2026-39821
