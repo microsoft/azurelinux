@@ -1,0 +1,74 @@
+name: "Dependency Smoke Test"
+
+# Sanity-check that the pip-installed helper scripts still install and import
+# after a dependency bump. Primarily a guard for Dependabot PRs that touch a
+# requirements.txt, but also runs on any edit to the scripts themselves.
+on:
+  pull_request:
+    paths:
+      - "scripts/**/requirements.txt"
+      - "scripts/**/*.py"
+      - ".github/workflows/dependency-smoke.yml"
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: "Smoke: ${{ matrix.dir }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - scripts/ci/control-tower
+          - scripts/ci/spec-review
+          - scripts/mcps
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install and smoke-test
+        env:
+          DIR: ${{ matrix.dir }}
+        run: |
+          set -euo pipefail
+          cd "$DIR"
+
+          # A clean venv ensures we exercise exactly the pinned requirements.
+          python3 -m venv .smoke-venv
+          # shellcheck disable=SC1091
+          . .smoke-venv/bin/activate
+          python -m pip install --quiet --upgrade pip
+          pip install --quiet -r requirements.txt
+
+          shopt -s nullglob
+          scripts=( *.py )
+          if (( ${#scripts[@]} == 0 )); then
+            echo "No python scripts in $DIR; install-only smoke passed."
+            exit 0
+          fi
+
+          # Syntax-compile every script (works regardless of filename).
+          python -m py_compile "${scripts[@]}"
+
+          # Import each importable module to exercise the bumped dependencies.
+          # Skip files whose name is not a valid module identifier (e.g. hyphenated).
+          for f in "${scripts[@]}"; do
+            mod="${f%.py}"
+            case "$mod" in
+              *[!a-zA-Z0-9_]*)
+                echo "skip import: $f (filename is not a valid module name)"
+                continue
+                ;;
+            esac
+            echo "import $mod"
+            python -c "import $mod"
+          done
