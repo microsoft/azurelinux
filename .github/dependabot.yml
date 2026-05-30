@@ -7,14 +7,23 @@ updates:
   # `directory` (singular) does NOT support globbing.
   - package-ecosystem: pip
     directories:
-      - /.github/workflows/scripts/*
-      - /scripts/*
+      - /scripts/**
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     labels:
       - dependencies
       - python
+    # Wait until a release has been public for a few days before opening a PR,
+    # so yanked/broken releases get caught upstream first. Majors wait longer.
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+    # Bundle all python tooling bumps into a single PR per run.
+    groups:
+      python:
+        patterns:
+          - "*"
 
   # GitHub Actions used by PR-check workflows.
   - package-ecosystem: github-actions
@@ -25,6 +34,9 @@ updates:
     labels:
       - dependencies
       - github-actions
+    # github-actions cooldown only supports a flat default-days (no semver granularity).
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns:

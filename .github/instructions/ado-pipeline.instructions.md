@@ -1,16 +1,16 @@
 ---
-applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,.github/workflows/scripts/**"
-description: "Authoring and maintenance rules for Azure DevOps YAML pipelines under .github/workflows/ado/ (wrappers + raw stage templates under templates/) and their helper scripts under .github/workflows/scripts/ that run as GitHub PR checks or in the merge queue. Apply when creating or modifying any pipeline in that folder, or any script invoked by one — covers the wrapper/raw split, required OneBranch templates (Official vs NonOfficial), Workload Identity Federation service connections, Control Tower audience URIs, internal-only dependency sources (Go / Python / container images), Python-over-shell scripting, and security hardening."
+applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,scripts/ci/**"
+description: "Authoring and maintenance rules for Azure DevOps YAML pipelines under .github/workflows/ado/ (wrappers + raw stage templates under templates/) and their helper scripts under scripts/ci/ that run as GitHub PR checks or in the merge queue. Apply when creating or modifying any pipeline in that folder, or any script invoked by one — covers the wrapper/raw split, required OneBranch templates (Official vs NonOfficial), Workload Identity Federation service connections, Control Tower audience URIs, internal-only dependency sources (Go / Python / container images), Python-over-shell scripting, and security hardening."
 ---
 
 # Azure DevOps Pipelines (PR check & merge queue)
 
-These instructions cover ADO YAML pipelines under `.github/workflows/ado/` that run as GitHub PR checks or in the merge queue, plus their helper scripts under `.github/workflows/scripts/`. Follow every MUST below — they encode internal Microsoft policy plus security hardening for this repo.
+These instructions cover ADO YAML pipelines under `.github/workflows/ado/` that run as GitHub PR checks or in the merge queue, plus their helper scripts under `scripts/ci/`. Follow every MUST below — they encode internal Microsoft policy plus security hardening for this repo.
 
-Helper scripts invoked from these pipelines MUST live under `.github/workflows/scripts/<area>/`. Two layouts are supported:
+Helper scripts invoked from these pipelines MUST live under `scripts/ci/<area>/`. Two layouts are supported:
 
 1. **Per-pipeline** — `<area>/` is a logical area or pipeline name (e.g. `control-tower/`, `render-specs-check/`). The default.
-2. **Cross-pipeline shared** — `<area>/` = `components/`. Helpers here are deliberately consumed by multiple pipelines (GitHub Actions PR gates AND the ADO Control Tower pipeline). See [`.github/workflows/scripts/components/README.md`](../workflows/scripts/components/README.md) for the caller contract. A regression in this area breaks multiple gates at once, so changes need extra care.
+2. **Cross-pipeline shared** — `<area>/` = `components/`. Helpers here are deliberately consumed by multiple pipelines (GitHub Actions PR gates AND the ADO Control Tower pipeline). See [`scripts/ci/components/README.md`](../../scripts/ci/components/README.md) for the caller contract. A regression in this area breaks multiple gates at once, so changes need extra care.
 
 In either case, keep helpers self-contained and follow the same security hardening rules as the pipeline YAML itself.
 
@@ -159,7 +159,7 @@ The authoritative list and rules live at https://eng.ms/docs/more/containers-sec
 
 ## Scripting
 
-Avoid shell scripts beyond the smallest possible wiring (env exports, `##vso[...]` log commands, single-command tool invocations). For anything more complex — argument parsing, control flow, JSON/YAML handling, HTTP, branch-name/SHA parsing — write a **Python script** under `.github/workflows/scripts/<area>/` and invoke it from the pipeline:
+Avoid shell scripts beyond the smallest possible wiring (env exports, `##vso[...]` log commands, single-command tool invocations). For anything more complex — argument parsing, control flow, JSON/YAML handling, HTTP, branch-name/SHA parsing — write a **Python script** under `scripts/ci/<area>/` and invoke it from the pipeline:
 
 ```yaml
 - task: AzureCLI@2
@@ -170,7 +170,7 @@ Avoid shell scripts beyond the smallest possible wiring (env exports, `##vso[...
     scriptLocation: inlineScript
     inlineScript: |
       set -euo pipefail
-      python3 .github/workflows/scripts/<area>/<script>.py \
+      python3 scripts/ci/<area>/<script>.py \
         --api-audience "$API_AUDIENCE" \
         --api-base-url "$API_BASE_URL"
   env:
@@ -291,7 +291,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -euo pipefail
-                python3 .github/workflows/scripts/<area>/<script>.py \
+                python3 scripts/ci/<area>/<script>.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL"
             env:
@@ -314,6 +314,6 @@ Run through this list whenever you add or modify a pipeline in `.github/workflow
 - [ ] All Azure / Control Tower access goes through `AzureCLI@2` with a least-privilege Service Connection (WIF/OIDC). No PATs or password logins.
 - [ ] Control Tower calls use the correct **per-environment audience URI** sourced from a variable group; nothing hardcoded.
 - [ ] No upstream dependency pulls: Go uses `internalModuleProxy`, Python uses `PipAuthenticate@1`, container images come from `mcr.microsoft.com`.
-- [ ] Any non-trivial logic lives in a Python script under `.github/workflows/scripts/`, not inline bash.
+- [ ] Any non-trivial logic lives in a Python script under `scripts/ci/`, not inline bash.
 - [ ] Secrets passed via `env:` (never inline `$(...)`); `set -euo pipefail` in shell blocks; tool versions pinned (only `GovernedTemplates@main` exempted).
 - [ ] Explicit `timeoutInMinutes` on each job; PR-supplied inputs validated with strict regex.

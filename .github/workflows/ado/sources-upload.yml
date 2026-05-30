@@ -13,8 +13,8 @@
 #      from the merge queue, not here.
 #   2. Submit scratch package builds for changed components.
 #
-# Helper scripts live under .github/workflows/scripts/control-tower/
-# (Control Tower-specific) and .github/workflows/scripts/components/
+# Helper scripts live under scripts/ci/control-tower/
+# (Control Tower-specific) and scripts/ci/components/
 # (cross-pipeline azldev helpers shared with the GH Actions PR gates).
 #
 # Prerequisites (ADO / Azure Portal):
