@@ -4564,6 +4564,7 @@ fi\
 
 %ifnarch noarch %{nobuildarches}
 %files modules-extra-matched
+%endif
 
 # AZL: kmod subpackage file lists and scriptlets (nvidia-open)
 %global _kmod_phase files
@@ -4571,7 +4572,6 @@ fi\
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
-%endif
 
 # plz don't put in a version string unless you're going to tag
 # and build.

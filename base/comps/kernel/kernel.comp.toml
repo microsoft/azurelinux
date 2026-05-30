@@ -268,13 +268,11 @@ replacement = """# AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chai
 
 [[components.kernel.overlays]]
 description = "Insert kmod files anchor after %files modules-extra-matched — unconditional location for kmod file lists"
-type = "spec-append-lines"
-section = "%files"
-package = "modules-extra-matched"
-lines = [
-    "",
-    "# AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)",
-]
+type = "spec-search-replace"
+regex = "# plz don't put in a version string unless you're going to tag"
+replacement = """# AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
+
+# plz don't put in a version string unless you're going to tag"""
 
 # --- kmod-nvidia-open: phase injection ---
 # RPM %include is a preprocessor directive — it must appear directly in the spec
