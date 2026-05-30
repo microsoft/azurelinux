@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -100,6 +100,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Sat May 30 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.2.4-2
+- Resolve merge from fasttrack, bring patches for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 forward to 2.2.4 version of containerd2.
+
 * Thu May 28 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
 - Upgrade to 2.2.4
 - Pulls in CVE-2026-46680 fix (PR #13448 / 0a8f65bef)
