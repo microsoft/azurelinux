@@ -1,6 +1,11 @@
 %define our_gopath %{_topdir}/.gopath
+
+Name:           azurelinux-image-tools
 Version:        1.4.0
 Release:        2%{?dist}
+License:        MIT
+URL:            https://github.com/microsoft/azure-linux-image-tools/
+Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
