@@ -71,13 +71,13 @@ done
 
 %changelog
 * Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-5
- - Patch for CVE-2026-7790, CVE-2026-43968
+- Patch for CVE-2026-7790, CVE-2026-43968
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-4
- - Patch for CVE-2026-8466
+- Patch for CVE-2026-8466
 
 * Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-3
- - Patch for CVE-2025-50200
+- Patch for CVE-2025-50200
 
 * Mon Mar 31 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.13.7-2
 - Address CVE-2025-30219 with a patch
