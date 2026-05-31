@@ -14,7 +14,7 @@ config_opts['extra_chroot_dirs'] = [ '/run/lock', ]
 # Bootstrap from the published Azure Linux 4.0 base/core container image.
 config_opts['use_bootstrap'] = True
 config_opts['use_bootstrap_image'] = True
-config_opts['bootstrap_image'] = 'azlpubstagingacroxz2o4gw.azurecr.io/azurelinux/base/core:4.0'
+config_opts['bootstrap_image'] = 'mcr.microsoft.com/azurelinux-beta/base/core:4.0'
 # The image ships dnf5 but not dnf5-plugins, so mark it as not "ready" and
 # let mock install the rest of the bootstrap packages itself.
 config_opts['bootstrap_image_ready'] = False
