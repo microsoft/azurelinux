@@ -1,7 +1,7 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
-Version:        3.8.3
-Release:        11%{?dist}
+Version:        3.8.13
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,22 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
 # Patch taken from 3.8.4 release
-Patch1:         CVE-2024-28834.patch
 # Patch taken from 3.8.4 release
-Patch2:         CVE-2024-28835.patch
-Patch3:         CVE-2024-12133.patch
-Patch4:         CVE-2024-12243.patch
-Patch5:         CVE-2025-32990.patch
-Patch6:         CVE-2025-32989.patch
-Patch7:         CVE-2025-32988.patch
-Patch8:         CVE-2025-6395.patch
-Patch9:         CVE-2025-13151.patch
-Patch10:        CVE-2025-9820.patch
-Patch11:        CVE-2026-33845.patch
-Patch12:        CVE-2026-33846.patch
-Patch13:        CVE-2026-3832.patch
-Patch14:        CVE-2026-42010.patch
-Patch15:        CVE-2026-42009.patch
 
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
@@ -107,6 +92,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jun 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.13-1
+- Auto-upgrade to 3.8.13 - for CVE-2026-42012, CVE-2026-42013
+
 * Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-11
 - Patch for CVE-2026-42009
 
