@@ -1,7 +1,0 @@
-{
-    "packages": [
-        "dnf",
-        "vim",
-        "wget"
-    ]
-}

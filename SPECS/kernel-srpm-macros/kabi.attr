@@ -1,2 +1,0 @@
-%__kabi_provides	%{_rpmconfigdir}/kabi.sh
-%__kabi_path            ^(/boot/symvers-.*|/lib/modules/[1-9].*/symvers)\.(gz|xz)$

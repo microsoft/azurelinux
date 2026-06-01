@@ -1,3 +1,0 @@
-os:
-  selinux:
-    mode: enforcing

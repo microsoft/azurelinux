@@ -1,8 +1,0 @@
---- bin/treescan
-+++ bin/treescan
-@@ -1,4 +1,4 @@
--#!/opt/bin/perl
-+#!/usr/bin/perl
- 
- # inspired by treescan by Jamie Lokier <jamie@imbolc.ucc.ie>
- # about 40% faster than the original version (on my fs and raid :)

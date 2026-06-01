@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "Rhino1_7_15_1_Release.tar.gz": "729c4ffc0405fad09b22190c2dd95da8c6a79fe353d667dc852352464bfe5955",
-  "rhino-1.7.15.1.pom": "b40decfa0e24c80bfd957ba3adfac7f6e3eed7730a06b551c01493faa2e76883",
-  "rhino-build.xml": "db62671eb039c402b203b08d7ecb6dfcfc575be75c7828e01013733727fa4531",
-  "rhino-engine-1.7.15.1.pom": "2794a4adbecd9837b5e406c0f4a7e40d8620105a44ff11ccd3cae1a2de4615aa",
-  "rhino-runtime-1.7.15.1.pom": "f96738c51ba7b081ebebec9fa298e950b18b2ed8acf4099cf7c54ec16b8ec493"
- }
-}

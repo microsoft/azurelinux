@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "orangefs-2.9.8.tar.gz": "589f7b6c4c8ea9b96b61427f9005ad0be258cb43702b47d9f304c8128ca25e30",
-  "orangefs-client.service": "2dee68cafa712781386cd24cc254664b2bb60e5011e59683e11d0be7f979804e",
-  "orangefs-server.service": "5d605129e4dcf7619b0a211d3405ac54404e8cb855d99416125103daf41fcf91",
-  "orangefs.conf": "7de9fac0aac82100be2a2275706f311b1904b2ceec1d66a6f2ad7ff5354b231b",
-  "pvfs2tab": "ee587be720866b64b7610a9a0c6c0a35e8c63acce8dceb758d7e69416401eed9"
- }
-}

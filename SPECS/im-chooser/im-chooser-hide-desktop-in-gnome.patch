@@ -1,9 +1,0 @@
-diff -pruN im-chooser-1.7.2.orig/src/app/im-chooser.desktop.in.in im-chooser-1.7.2/src/app/im-chooser.desktop.in.in
---- im-chooser-1.7.2.orig/src/app/im-chooser.desktop.in.in	2019-02-19 06:46:15.000000000 +0000
-+++ im-chooser-1.7.2/src/app/im-chooser.desktop.in.in	2019-02-19 06:51:20.195517030 +0000
-@@ -8,4 +8,4 @@ Terminal=false
- Type=Application
- StartupNotify=true
- Categories=Applications;Settings;X-GNOME-PersonalSettings;
--NotShowIn=XFCE;
-+NotShowIn=XFCE;GNOME;

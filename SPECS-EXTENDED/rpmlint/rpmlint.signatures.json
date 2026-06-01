@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "rpmlint-1.11.tar.gz": "2ea1f4726382bcf24652ea710b4e98fdfd7f83a7c44a7ee2f5eaf5b201be9ac3",
-  "rpmlint-etc.config": "a67ac4b60d488a3f6c9b90a5c51ea3889b57201cef8f72862ba82a35e8cb7b96",
-  "rpmlint.config": "228c2598e5a25677245acede3ad790a209aa4e67aeca9ddc2f218b34588d43e0"
- }
-}

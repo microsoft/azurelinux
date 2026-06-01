@@ -1,5 +1,0 @@
-azurelinux-rpm-macros
-cmake
-lua
-rpm
-rpm-libs

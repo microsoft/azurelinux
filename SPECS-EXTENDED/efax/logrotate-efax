@@ -1,5 +1,0 @@
-/var/log/fax/* {
-    weekly
-    notifempty
-    missingok
-}

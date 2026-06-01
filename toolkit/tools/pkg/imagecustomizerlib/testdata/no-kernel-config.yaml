@@ -1,4 +1,0 @@
-os:
-  packages:
-    remove:
-    - kernel

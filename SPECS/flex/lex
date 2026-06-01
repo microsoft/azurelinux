@@ -1,6 +1,0 @@
-#!/bin/sh
-# Begin /usr/bin/lex
-
-	exec /usr/bin/flex -l "$@"
-
-# End /usr/bin/lex

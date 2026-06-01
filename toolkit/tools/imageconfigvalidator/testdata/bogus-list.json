@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "bad package = bad < version"
-    ]
-}

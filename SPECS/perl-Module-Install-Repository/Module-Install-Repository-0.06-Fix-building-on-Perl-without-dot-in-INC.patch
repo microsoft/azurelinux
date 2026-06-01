@@ -1,9 +1,0 @@
-diff -up Module-Install-Repository-0.06/Makefile.PL.orig Module-Install-Repository-0.06/Makefile.PL
---- Module-Install-Repository-0.06/Makefile.PL.orig	2017-05-17 17:11:39.366103327 +0200
-+++ Module-Install-Repository-0.06/Makefile.PL	2017-05-17 17:11:51.591054522 +0200
-@@ -1,3 +1,5 @@
-+BEGIN { push @INC, '.'; }
-+
- use inc::Module::Install;
- name 'Module-Install-Repository';
- all_from 'lib/Module/Install/Repository.pm';

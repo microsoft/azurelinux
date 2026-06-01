@@ -1,8 +1,0 @@
-[fetcher-cloned-repo]
-name=Fetcher Cloned Repository
-baseurl=file:///outputrpms
-gpgcheck=0
-skip_if_unavailable=False
-sslverify=0
-#disabled by default, will be enabled by tooling as it is needed
-enabled=0

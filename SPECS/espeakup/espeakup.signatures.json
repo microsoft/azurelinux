@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "espeakup-0.90.tar.gz": "c708a0c3889466a7aa14a52687af8f49abb4dfb01fb9afbeb1e2507247494432",
-  "espeakup.conf": "ba35728af4a472f8abf727efb8efc080f89ac358da49a68071fd407379f319c4",
-  "espeakup.service": "298c8fcef28ca639c6d32c860e9e5cf088a993028242f21042792bd2ec7a2a4b"
- }
-}

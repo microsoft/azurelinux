@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "php-pecl-apcu-5.1.23.tgz": "67ee7464ccad2335c3fa4aeb0b8edbcf6d8344feea7922620c6a13015d604482",
-  "apcu-panel.conf": "243df3ba157ee9c219410bb58536ae38cc06f49e97c0c97b4215930ac455a229",
-  "apcu.conf.php": "6e951a5ec91cf4d8e7ef4edee81abde1ce2c8d5f55f7c266e4b76b56d97cf176",
-  "apcu.ini": "17a905e6d91f998a280aefd8ca4a6558ddb86aa34f7dbf5941dc0b963615fa30"
- }
-}

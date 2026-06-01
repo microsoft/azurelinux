@@ -1,9 +1,0 @@
-[Unit]
-Description=Periodic DNS SRV lookup of %I for chrony
-
-[Timer]
-OnActiveSec=0
-OnUnitInactiveSec=1h
-
-[Install]
-WantedBy=timers.target

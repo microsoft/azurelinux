@@ -1,9 +1,0 @@
---- wordlist/scowl/README.in	2014-10-08 14:00:05.682971887 +0100
-+++ wordlist/scowl/README.in	2014-10-08 14:00:12.369050485 +0100
-@@ -1,6 +1,4 @@
- Spell Checking Oriented Word Lists (SCOWL)
--@`if [ "$SCOWL_VERSION" ]; then echo -n "Version $SCOWL_VERSION"; fi`
--@`git log --pretty=format:'%cd [%h]' -n 1 --`
- by Kevin Atkinson (kevina@gnu.org)
- 
- The SCOWL is a collection of word lists split up in various sizes, and

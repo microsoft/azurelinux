@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=x3270
-GenericName=Terminal emulator
-Type=Application
-Comment=3270 terminal emulator
-Exec=x3270
-Icon=x3270
-StartupNotify=true
-Categories=System;Utility;TerminalEmulator;

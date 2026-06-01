@@ -1,9 +1,0 @@
-[Unit]
-Description=Run tdnf-cache-updateinfo.service daily
-
-[Timer]
-OnCalendar=*-*-* 0,6,12,18:00
-RandomizedDelaySec=6h
-
-[Install]
-WantedBy=multi-user.target

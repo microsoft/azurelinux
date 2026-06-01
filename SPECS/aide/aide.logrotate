@@ -1,9 +1,0 @@
-/var/log/aide/*.log {
-        weekly
-        missingok
-        rotate 4
-        compress
-        delaycompress
-        copytruncate
-        minsize 100k
-}

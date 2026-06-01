@@ -1,4 +1,0 @@
-[Desktop Entry]
-Name=User script
-Comment=This session runs ~/.xsession or ~/.Xclients if available
-Exec=/usr/libexec/xinit-compat

@@ -1,7 +1,0 @@
-alias kinit="/usr/bin/kinit.heimdal"
-alias kdestroy="/usr/bin/kdestroy.heimdal"
-alias klist="/usr/bin/klist.heimdal"
-alias kpasswd="/usr/bin/kpasswd.heimdal"
-alias kadmin="/usr/sbin/kadmin.heimdal"
-alias krb5-config="/usr/bin/krb5-config.heimdal"
-alias ktutil="/usr/sbin/ktutil.heimdal"

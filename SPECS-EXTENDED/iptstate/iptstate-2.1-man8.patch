@@ -1,9 +1,0 @@
---- iptstate-2.1/Makefile.man8	2006-10-06 07:49:11.000000000 +0200
-+++ iptstate-2.1/Makefile	2006-10-06 17:43:16.000000000 +0200
-@@ -68,6 +68,5 @@
- 
- uninstall:
- 	/bin/rm -rf $(SBIN)/iptstate
--	/bin/rm -rf $(MAN)/man1/iptstate.1
- 	/bin/rm -rf $(MAN)/man8/iptstate.8
- 

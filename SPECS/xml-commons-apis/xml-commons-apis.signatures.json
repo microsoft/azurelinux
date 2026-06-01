@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "xml-apis-2.0.2.pom": "a902d962402c02f4c1a57c5a2303a608a8ac3aef5cd145e1980563447603d606",
-  "xml-apis-ext-1.3.04.pom": "1b5939a9310a59c0df0c03726721d5fc9521e87d6c203bfa7220bae82a30d9e8",
-  "xml-commons-apis-1.4.01.tar.gz": "733451afc78f7de7ff147330278fa8991d687255014ba37e4397592ac5f23c07",
-  "xml-commons-apis-MANIFEST.MF": "0e6f58c302c1918472404ae561302522c8eb80ec2c3be4430ee3904695564b01",
-  "xml-commons-apis-ext-MANIFEST.MF": "3e0acbc9897f8ae4b3aaff08ce2140bcd203ffaed37fd3d4444e2f64bc87e01a"
- }
-}

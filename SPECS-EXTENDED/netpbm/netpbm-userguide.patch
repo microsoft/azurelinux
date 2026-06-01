@@ -1,9 +1,0 @@
-diff --git a/userguide/pammixmulti.html b/userguide/pammixmulti.html
-index c5854c3..a18fa14 100755
---- a/userguide/pammixmulti.html
-+++ b/userguide/pammixmulti.html
-@@ -1,4 +1,3 @@
--<?xml version="1.0"?>
- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
- <html>
- <head>

@@ -1,9 +1,0 @@
-#cloud-config
-users:
-- name: test
-  shell: /bin/bash
-  sudo:
-  - "ALL=(ALL) NOPASSWD:ALL"
-  groups:
-  - sudo
-  - docker

@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "MANIFEST.MF": "b0a4a30dfa52627b74f8797edda29471995b8d29ea25fd053722ef106edee246",
-  "ecj-3.18.0.pom": "7ac967720a37bdd73d4fcbd6c024df7b9b3cbae5a1e7f60092362d111db8d570",
-  "ecjsrc-4.12.jar": "d42c8ae16f590cbade9700525263b31cb723f278ee22dbf72d1c5e3c4d48db71",
-  "java10api-src.tar.xz": "913cc3561273af7e22e0f3e39aad33581a315f35a225cff1cab874784d8ddb9f",
-  "java10api.pom": "9bdf5b39972653eb3939aa04e142e919afa5fb21de3855c479889d4a67f7f2b3"
- }
-}

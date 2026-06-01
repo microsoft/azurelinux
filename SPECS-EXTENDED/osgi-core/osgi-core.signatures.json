@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "LICENSE-2.0": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-  "osgi-core-build.xml": "476eb29bb6b1fb401bc4da55d5725c07678a377e843c8d4820287a91da84bdac",
-  "osgi.core-8.0.0-sources.jar": "df92374f65300db3b22927ef5d0cb654db2ba0cfba459c45917bf8735920b280",
-  "osgi.core-8.0.0.pom": "651f76ba29bb4392d36aea56f7d0b0c82fc4917024d9e6a843774bba5015eb53"
- }
-}

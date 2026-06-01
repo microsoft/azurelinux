@@ -1,7 +1,0 @@
-[Unit]
-Description=Hyper-V VSS daemon
-BindsTo=sys-devices-virtual-misc-vmbus\x21hv_vss.device
-IgnoreOnIsolate=1
-
-[Service]
-ExecStart=/usr/sbin/hypervvssd -n

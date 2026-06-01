@@ -1,7 +1,0 @@
-[Unit]
-Description=NFS server and client services
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-ExecStart=/bin/true

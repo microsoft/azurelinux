@@ -1,7 +1,0 @@
-{
-    "Signatures": {
-        "client.cnf": "5c65d419b0ab8a18ae14a14d54046a5cffb2f1966ec9cb5a88ecffc02503648f",
-        "mariadb-connector-c-3.3.8-src.tar.gz": "f9f076b4aa9fb22cc94b24f82c80f9ef063805ecd6533a2eb5d5060cf93833e8",
-        "my.cnf": "a9b0e47fe38285d519b98f684a5255c7482229f1dbc1e1e16b5066a042f987f7"
-    }
-}

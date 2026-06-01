@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "dmraid-1.0.0.rc16.tar.bz2": "4022560e84b42a4b026c2a9f3d92e19f7bb4cb575f435dfa4ca30743e86a7161",
-  "dmraid-activation.service": "fd4cfb16e10e5fa00f3804fb2844359a2dbd3f0db47918c645c9b6e025835b37",
-  "fedora-dmraid-activation": "d05dcab92a2a05becafa2cfd75229eba91b6199a2db183aca905c258a4ae73d5"
- }
-}

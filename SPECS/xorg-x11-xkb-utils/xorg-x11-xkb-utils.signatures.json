@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "setxkbmap-1.3.4.tar.xz": "be8d8554d40e981d1b93b5ff82497c9ad2259f59f675b38f1b5e84624c07fade",
-  "xkbcomp-1.4.7.tar.xz": "0a288114e5f44e31987042c79aecff1ffad53a8154b8ec971c24a69a80f81f77",
-  "xkbevd-1.1.5.tar.xz": "38357b702de9d3457c4ff75053390f457b84c4accc7f088101255c37c684926b",
-  "xkbprint-1.0.6.tar.xz": "99cc9404f7b90289ae04944c0d98a208cc8b158492ad6481386e31d4d09aa7b0",
-  "xkbutils-1.0.6.tar.xz": "31a2bbee1e09ccba01de92897b8f540b545de812f318d31de07bd3a5a75ee25e"
- }
-}

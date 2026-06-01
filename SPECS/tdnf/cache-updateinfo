@@ -1,7 +1,0 @@
-#!/bin/bash
-
-exec > /var/cache/tdnf/cached-updateinfo.txt
-
-tdnf -q --refresh updateinfo | grep -vE '^Refreshing|^Disabling'
-
-exit ${PIPESTATUS[0]}

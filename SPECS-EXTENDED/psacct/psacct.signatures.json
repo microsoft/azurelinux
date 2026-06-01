@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "acct-6.6.4.tar.gz": "4c15bf2b58b16378bcc83f70e77d4d40ab0b194acf2ebeefdb507f151faa663f",
-  "accton-create": "8414911a5c30e60317f37ada27405dd5237dfcf722df6f107429f524197d12e3",
-  "psacct-logrotate.in": "0be70fbb9580cc36ca2a602fcdea29f65459bd5af79b90b236e0b44640751885",
-  "psacct.service": "3b68ae33e0c483ccb00e6cf0158a4d7c645a3de1a0bc1238437bec00542de858"
- }
-}

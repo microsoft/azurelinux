@@ -1,5 +1,0 @@
-%_httpd_apxs %{_bindir}/apxs
-%_httpd_modconfdir %{_sysconfdir}/httpd/conf.modules.d
-%_httpd_confdir %{_sysconfdir}/httpd/conf.d
-%_httpd_contentdir %{_sysconfdir}/httpd
-%_httpd_moddir %{_libdir}/httpd/modules

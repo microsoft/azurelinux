@@ -1,9 +1,0 @@
-[Unit]
-Description=Small Footprint CIM Broker Service
-After=syslog.target
-
-[Service]
-ExecStart=/usr/sbin/sfcbd
-
-[Install]
-WantedBy=multi-user.target
