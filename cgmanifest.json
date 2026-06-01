@@ -915,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.4.0.tar.gz"
         }
       }
     },
@@ -2067,8 +2067,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.1.6",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.1.6.tar.gz"
+          "version": "2.2.4",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.2.4.tar.gz"
         }
       }
     },
@@ -2818,8 +2818,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.90",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.90.tar.xz"
+          "version": "2.92",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.92.tar.xz"
         }
       }
     },
@@ -13091,8 +13091,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.17",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.17/source/mariadb-10.11.17.tar.gz"
+          "version": "10.11.18",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.18/source/mariadb-10.11.18.tar.gz"
         }
       }
     },
@@ -14562,16 +14562,6 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "20.14.0",
-          "downloadUrl": "https://nodejs.org/download/release/v20.14.0/node-v20.14.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nodejs24",
           "version": "24.14.1",
           "downloadUrl": "https://nodejs.org/download/release/v24.14.1/node-v24.14.1.tar.xz"
         }

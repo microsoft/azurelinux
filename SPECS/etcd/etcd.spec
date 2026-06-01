@@ -3,7 +3,7 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
 Version:        3.5.30
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,8 @@ Source1:        etcd.service
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2026-29181.patch
+Patch1:         CVE-2026-39821.patch
+Patch2:         CVE-2026-33814.patch
 BuildRequires:  golang >= 1.16
 
 %description
@@ -73,6 +75,8 @@ for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
     patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH2}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -86,6 +90,8 @@ mkdir -p %{ETCD_TOOLS_OUT_DIR}
 for component in etcd-dump-db etcd-dump-logs; do
     pushd tools/$component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH1}
+    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH2}
     go build \
         -o %{ETCD_TOOLS_OUT_DIR}
     popd
@@ -147,6 +153,9 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.30-2
+- Patch CVE-2026-39821, CVE-2026-33814
+
 * Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
 - Upgrade to version 3.5.30 (fixes CVE-2026-44283).
 
