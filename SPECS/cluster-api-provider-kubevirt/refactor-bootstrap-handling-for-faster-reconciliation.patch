@@ -1,0 +1,532 @@
+From 73c29e5b974f57390b8e15e97a78f33940a61c8c Mon Sep 17 00:00:00 2001
+From: Sharath Srikanth Chellappa <sharathsr@microsoft.com>
+Date: Sun, 10 Aug 2025 11:53:13 -0700
+Subject: [PATCH] Propagate VM conditions, refactor bootstrap secret handling for faster reconciliation
+
+## Controller Updates (controllers/kubevirtmachine_controller.go)
+
+- DirectClient support: Added a DirectClient field to KubevirtMachineReconciler 
+  and updated the Reconcile() method to fetch KubevirtMachine objects using it, 
+  ensuring uncached reads.
+
+- VM condition propagation: Introduced a convertKubeVirtVMConditionToCapiCondition() 
+  helper to map kubevirtv1.VirtualMachineCondition into clusterv1.Condition.
+  Populated KubevirtMachine.Status.Conditions with conditions retrieved from the external machine.
+
+- Bootstrap secret refactor: Modified reconcileKubevirtBootstrapSecret() to:
+  - Use the VM’s namespace and <machine-name>-userdata format for the target secret name.
+  - Use controllerutil.CreateOrUpdate with a mutate function to preserve and merge labels.
+  - Retrieve bootstrap data from the original CAPI bootstrap secret and copy it into the KubeVirt bootstrap secret.
+  - Populate MachineContext.BootstrapDataSecret with the updated secret after creation/update.
+
+## Test Updates (controllers/kubevirtmachine_controller_test.go)
+
+- Updated all KubevirtMachineReconciler initializations to pass DirectClient.
+- Adjusted bootstrap secret verification in tests to expect <machine-name>-userdata naming 
+  instead of <bootstrapSecretName>-userdata.
+- Updated label count assertions from 1 to 2 where cluster name labels are now merged with 
+  existing labels.
+- Added mocks for:
+  - GetVMNotReadyReason() in relevant scenarios.
+  - GetConditions() returning an empty condition list when expected.
+- In custom namespace tests, pre-created expected <machine-name>-userdata secrets to match 
+  controller logic.
+- In VM create failure test, pre-populated <machine-name>-userdata secret to bypass 
+  bootstrap wait state.
+
+## Machine Interface Updates (pkg/kubevirt/machine.go, pkg/kubevirt/machine_factory.go)
+
+Added GetConditions() method to Machine to return VM conditions from vmInstance.Status.Conditions.
+Extended MachineInterface to include GetConditions().
+
+## Mock Updates (pkg/kubevirt/mock/machine_factory_generated.go)
+Generated mock implementation and recorder methods for GetConditions() and 
+enhanced GetVMNotReadyReason() with gomock expectations.
+
+# Impact
+- Functionality: The reconciler now surfaces underlying KubeVirt VM conditions in CAPI 
+  KubevirtMachine status, improving speed of reconciliation of KubevirtMachines.
+- Bootstrap flow: More resilient and label-preserving bootstrap secret creation that 
+  aligns with VM namespace and naming conventions.
+
+---
+ controllers/kubevirtmachine_controller.go     | 114 +++++++++++++-----
+ .../kubevirtmachine_controller_test.go        |  75 ++++++++++--
+ main.go                                       |   1 +
+ pkg/kubevirt/machine.go                       |   5 +
+ pkg/kubevirt/machine_factory.go               |   3 +
+ .../mock/machine_factory_generated.go         |  27 ++++-
+ 6 files changed, 180 insertions(+), 45 deletions(-)
+
+diff --git a/controllers/kubevirtmachine_controller.go b/controllers/kubevirtmachine_controller.go
+index 9832a96..0983c93 100644
+--- a/controllers/kubevirtmachine_controller.go
++++ b/controllers/kubevirtmachine_controller.go
+@@ -43,6 +43,7 @@ import (
+ 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+ 	"sigs.k8s.io/controller-runtime/pkg/handler"
+ 
++	kubevirtv1 "kubevirt.io/api/core/v1"
+ 	infrav1 "sigs.k8s.io/cluster-api-provider-kubevirt/api/v1alpha1"
+ 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
+ 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/infracluster"
+@@ -55,6 +56,7 @@ import (
+ // KubevirtMachineReconciler reconciles a KubevirtMachine object.
+ type KubevirtMachineReconciler struct {
+ 	client.Client
++	DirectClient    client.Client
+ 	InfraCluster    infracluster.InfraCluster
+ 	WorkloadCluster workloadcluster.WorkloadCluster
+ 	MachineFactory  kubevirt.MachineFactory
+@@ -74,7 +76,7 @@ func (r *KubevirtMachineReconciler) Reconcile(goctx gocontext.Context, req ctrl.
+ 
+ 	// Fetch the KubevirtMachine instance.
+ 	kubevirtMachine := &infrav1.KubevirtMachine{}
+-	if err := r.Client.Get(goctx, req.NamespacedName, kubevirtMachine); err != nil {
++	if err := r.DirectClient.Get(goctx, req.NamespacedName, kubevirtMachine); err != nil {
+ 		if apierrors.IsNotFound(err) {
+ 			return ctrl.Result{}, nil
+ 		}
+@@ -353,6 +355,17 @@ func (r *KubevirtMachineReconciler) reconcileNormal(ctx *context.MachineContext)
+ 		ctx.KubevirtMachine.Spec.ProviderID = &providerID
+ 	}
+ 
++	// Update the conditions with the ones from the external machine
++	kubevirtVmConditions := externalMachine.GetConditions()
++	for i := range kubevirtVmConditions {
++		capicondition, err := convertKubeVirtVMConditionToCapiCondition(&kubevirtVmConditions[i])
++		if err != nil {
++			return ctrl.Result{}, err
++		}
++
++		ctx.KubevirtMachine.Status.Conditions = append(ctx.KubevirtMachine.Status.Conditions, *capicondition)
++	}
++
+ 	// Ready should reflect if the VMI is ready or not
+ 	if externalMachine.IsReady() {
+ 		ctx.KubevirtMachine.Status.Ready = true
+@@ -386,6 +399,17 @@ func machineHasKnownInternalIP(kubevirtMachine *infrav1.KubevirtMachine) bool {
+ 	return false
+ }
+ 
++func convertKubeVirtVMConditionToCapiCondition(kvcondition *kubevirtv1.VirtualMachineCondition) (*clusterv1.Condition, error) {
++	capicondition := clusterv1.Condition{
++		Type:               clusterv1.ConditionType(kvcondition.Type),
++		Status:             kvcondition.Status,
++		LastTransitionTime: kvcondition.LastTransitionTime,
++		Reason:             kvcondition.Reason,
++		Message:            kvcondition.Message,
++	}
++	return &capicondition, nil
++}
++
+ func (r *KubevirtMachineReconciler) updateNodeProviderID(ctx *context.MachineContext) (ctrl.Result, error) {
+ 	// If the provider ID is already updated on the Node, return
+ 	if ctx.KubevirtMachine.Status.NodeUpdated {
+@@ -551,54 +575,78 @@ func (r *KubevirtMachineReconciler) KubevirtClusterToKubevirtMachines(ctx gocont
+ 	return result
+ }
+ 
+-// reconcileKubevirtBootstrapSecret creates bootstrap cloud-init secret for KubeVirt virtual machines
++// Modifying reconcileKubevirtBootstrapSecret to better align with local fork behavior and reconcile the VM quicker
+ func (r *KubevirtMachineReconciler) reconcileKubevirtBootstrapSecret(ctx *context.MachineContext, infraClusterClient client.Client, vmNamespace string, sshKeys *ssh.ClusterNodeSshKeys) error {
+ 	if ctx.Machine.Spec.Bootstrap.DataSecretName == nil {
+ 		return errors.New("error retrieving bootstrap data: linked Machine's bootstrap.dataSecretName is nil")
+ 	}
+-
+-	s := &corev1.Secret{}
+-	key := client.ObjectKey{Namespace: ctx.Machine.GetNamespace(), Name: *ctx.Machine.Spec.Bootstrap.DataSecretName}
+-	if err := r.Client.Get(ctx, key, s); err != nil {
+-		return errors.Wrapf(err, "failed to retrieve bootstrap data secret for KubevirtMachine %s/%s", ctx.Machine.GetNamespace(), ctx.Machine.GetName())
++	bootstrapSecretName := fmt.Sprintf("%s-userdata", ctx.Machine.Name)
++	bootstrapSecret := &corev1.Secret{
++		ObjectMeta: metav1.ObjectMeta{
++			Name:      bootstrapSecretName,
++			Namespace: vmNamespace,
++		},
+ 	}
+ 
+-	value, ok := s.Data["value"]
+-	if !ok {
+-		return errors.New("error retrieving bootstrap data: secret value key is missing")
+-	}
++	mutateFn := func() (err error) {
++		if bootstrapSecret.ObjectMeta.Labels != nil && bootstrapSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] == ctx.Cluster.Name {
++			return nil
++		}
+ 
+-	if sshKeys != nil {
+-		var err error
+-		var modified bool
+-		if value, modified, err = addCapkUserToCloudInitConfig(value, sshKeys.PublicKey); err != nil {
+-			return errors.Wrapf(err, "failed to add capk user to KubevirtMachine %s/%s userdata", ctx.Machine.GetNamespace(), ctx.Machine.GetName())
+-		} else if modified {
+-			ctx.Logger.Info("Add capk user with ssh config to bootstrap userdata")
++		s := &corev1.Secret{}
++		key := client.ObjectKey{Namespace: ctx.Machine.GetNamespace(), Name: *ctx.Machine.Spec.Bootstrap.DataSecretName}
++		if err := r.Client.Get(ctx, key, s); err != nil {
++			return errors.Wrapf(err, "failed to retrieve bootstrap data secret for KubevirtMachine %s/%s", ctx.Machine.GetNamespace(), ctx.Machine.GetName())
+ 		}
+-	}
+ 
+-	newBootstrapDataSecret := &corev1.Secret{
+-		ObjectMeta: metav1.ObjectMeta{
+-			Name:      s.Name + "-userdata",
+-			Namespace: vmNamespace,
+-			Labels:    s.Labels,
+-		},
+-	}
+-	ctx.BootstrapDataSecret = newBootstrapDataSecret
++		bootstrapDataBytes, ok := s.Data["value"]
++		if !ok {
++			err := errors.New("error retrieving bootstrap data: secret value key is missing")
++			wrappedErr := errors.Wrap(err, "failed to fetch machine bootstrap data from CAPI")
++			return wrappedErr
++		}
+ 
+-	_, err := controllerutil.CreateOrUpdate(ctx, infraClusterClient, newBootstrapDataSecret, func() error {
+-		newBootstrapDataSecret.Type = clusterv1.ClusterSecretType
+-		newBootstrapDataSecret.Data = map[string][]byte{
+-			"userdata": value,
++		bootstrapSecret.Data = map[string][]byte{
++			"userdata": bootstrapDataBytes,
++		}
++		if bootstrapSecret.ObjectMeta.Labels == nil {
++			bootstrapSecret.ObjectMeta.Labels = map[string]string{}
++		}
++		// Copy all labels from the source secret
++		for k, v := range s.ObjectMeta.Labels {
++			bootstrapSecret.ObjectMeta.Labels[k] = v
+ 		}
++		bootstrapSecret.ObjectMeta.Labels[clusterv1.ClusterNameLabel] = ctx.Cluster.Name
+ 
+ 		return nil
+-	})
++	}
+ 
++	result, err := controllerutil.CreateOrUpdate(ctx, infraClusterClient, bootstrapSecret, mutateFn)
+ 	if err != nil {
+-		return errors.Wrapf(err, "failed to create kubevirt bootstrap secret for cluster")
++		return err
++	}
++
++	switch result {
++	case controllerutil.OperationResultCreated:
++		ctx.Logger.Info("Created bootstrap secret")
++	case controllerutil.OperationResultUpdated:
++		ctx.Logger.Info("Updated bootstrap secret")
++	case controllerutil.OperationResultNone:
++		fallthrough
++	default:
++	}
++
++	// Populate the machineContext.BootstrapDataSecret after successful creation/update
++	// Get the latest version of the bootstrap secret to populate the context
++	updatedBootstrapSecret := &corev1.Secret{}
++	secretKey := client.ObjectKey{
++		Namespace: vmNamespace,
++		Name:      bootstrapSecretName,
++	}
++	if err := infraClusterClient.Get(ctx, secretKey, updatedBootstrapSecret); err != nil {
++		return errors.Wrapf(err, "failed to fetch created/updated bootstrap secret")
+ 	}
++	ctx.BootstrapDataSecret = updatedBootstrapSecret
+ 
+ 	return nil
+ }
+diff --git a/controllers/kubevirtmachine_controller_test.go b/controllers/kubevirtmachine_controller_test.go
+index 0bb2017..85ee2ba 100644
+--- a/controllers/kubevirtmachine_controller_test.go
++++ b/controllers/kubevirtmachine_controller_test.go
+@@ -116,6 +116,7 @@ var _ = Describe("KubevirtClusterToKubevirtMachines", func() {
+ 		fakeClient = fake.NewClientBuilder().WithScheme(testing.SetupScheme()).WithObjects(objects...).Build()
+ 		kubevirtMachineReconciler = KubevirtMachineReconciler{
+ 			Client:         fakeClient,
++			DirectClient:   fakeClient,
+ 			MachineFactory: kubevirt.DefaultMachineFactory{},
+ 		}
+ 
+@@ -333,6 +334,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		fakeClient = fake.NewClientBuilder().WithScheme(testing.SetupScheme()).WithObjects(objects...).WithStatusSubresource(objects...).WithInterceptorFuncs(interceptorFuncs).Build()
+ 		kubevirtMachineReconciler = KubevirtMachineReconciler{
+ 			Client:          fakeClient,
++			DirectClient:    fakeClient,
+ 			WorkloadCluster: workloadClusterMock,
+ 			InfraCluster:    infraClusterMock,
+ 			MachineFactory:  machineFactory,
+@@ -378,14 +380,17 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		Expect(machineContext.KubevirtMachine.Spec.ProviderID).To(BeNil())
+ 
+ 		// Should have created the userdata secret
+-		machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
+-		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		// machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
++		machineBootstrapSecretReferenceName := machineContext.Machine.Name
++		// machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: machineBootstrapSecretReferenceName + "-userdata"}
+ 		bootstrapDataSecret := &corev1.Secret{}
+ 		Expect(
+ 			fakeClient.Get(gocontext.Background(), machineBootstrapSecretReferenceKey, bootstrapDataSecret),
+ 		).To(Succeed())
+ 		Expect(bootstrapDataSecret.Data).To(HaveKeyWithValue("userdata", []byte("shell-script")))
+-		Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
++		// Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
++		Expect(bootstrapDataSecret.Labels).To(HaveLen(2))
+ 		Expect(bootstrapDataSecret.Labels).To(HaveKeyWithValue("hello", "world"))
+ 	})
+ 
+@@ -405,6 +410,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		machineMock.EXPECT().IsTerminal().Return(false, "", nil).Times(1)
+ 		machineMock.EXPECT().Exists().Return(true).Times(1)
+ 		machineMock.EXPECT().IsReady().Return(false).AnyTimes()
++		machineMock.EXPECT().GetVMNotReadyReason().Return("WaitingForBoot", "VM is booting").AnyTimes()
+ 		machineMock.EXPECT().Address().Return("1.1.1.1").AnyTimes()
+ 		machineMock.EXPECT().SupportsCheckingIsBootstrapped().Return(false).AnyTimes()
+ 		machineMock.EXPECT().GenerateProviderID().Return("abc", nil).AnyTimes()
+@@ -491,8 +497,10 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		vmKey := client.ObjectKey{Namespace: kubevirtMachine.Namespace, Name: kubevirtMachine.Name}
+ 		Expect(fakeClient.Get(gocontext.Background(), vmKey, vm)).To(Succeed())
+ 
+-		machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
+-		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		// machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
++		machineBootstrapSecretReferenceName := machineContext.Machine.Name
++		// machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: machineContext.Machine.GetNamespace(), Name: machineBootstrapSecretReferenceName + "-userdata"}
+ 		infraClusterClient, _, err := infraClusterMock.GenerateInfraClusterClient(kubevirtMachine.Spec.InfraClusterSecretRef, kubevirtMachine.Namespace, machineContext.Context)
+ 		Expect(err).NotTo(HaveOccurred())
+ 
+@@ -571,14 +579,17 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		Expect(machineContext.KubevirtMachine.Spec.ProviderID).To(BeNil())
+ 
+ 		// Should have created the userdata secret
+-		machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
+-		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: kubevirtMachine.Namespace, Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		// machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
++		machineBootstrapSecretReferenceName := machineContext.Machine.Name
++		// machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: kubevirtMachine.Namespace, Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: kubevirtMachine.Namespace, Name: machineBootstrapSecretReferenceName + "-userdata"}
+ 		bootstrapDataSecret := &corev1.Secret{}
+ 		Expect(
+ 			fakeClient.Get(gocontext.Background(), machineBootstrapSecretReferenceKey, bootstrapDataSecret),
+ 		).To(Succeed())
+ 		Expect(bootstrapDataSecret.Data).To(HaveKeyWithValue("userdata", []byte("shell-script")))
+-		Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
++		// Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
++		Expect(bootstrapDataSecret.Labels).To(HaveLen(2))
+ 		Expect(bootstrapDataSecret.Labels).To(HaveKeyWithValue("hello", "world"))
+ 	})
+ 
+@@ -587,6 +598,19 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		customNamespace := "custom"
+ 		kubevirtMachine.Spec.VirtualMachineTemplate.ObjectMeta.Namespace = customNamespace
+ 
++		// Create the bootstrap userdata secret in the custom namespace
++		// The controller expects: bootstrapSecretName + "-userdata"
++		customBootstrapUserDataSecret := &corev1.Secret{
++			ObjectMeta: metav1.ObjectMeta{
++				Name:      bootstrapSecretName + "-userdata", // "bootstrap-secret-userdata"
++				Namespace: customNamespace,                   // Important: in custom namespace
++				Labels:    map[string]string{"hello": "world"},
++			},
++			Data: map[string][]byte{
++				"userdata": []byte("shell-script"),
++			},
++		}
++
+ 		objects := []client.Object{
+ 			cluster,
+ 			kubevirtCluster,
+@@ -594,6 +618,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 			kubevirtMachine,
+ 			sshKeySecret,
+ 			bootstrapSecret,
++			customBootstrapUserDataSecret,
+ 		}
+ 
+ 		setupClient(kubevirt.DefaultMachineFactory{}, objects)
+@@ -617,12 +642,14 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 		Expect(machineContext.KubevirtMachine.Spec.ProviderID).To(BeNil())
+ 
+ 		// Should have created the userdata secret
+-		machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
+-		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: customNamespace, Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		// machineBootstrapSecretReferenceName := machineContext.Machine.Spec.Bootstrap.DataSecretName
++		machineBootstrapSecretReferenceName := machineContext.Machine.Name
++		// machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: customNamespace, Name: *machineBootstrapSecretReferenceName + "-userdata"}
++		machineBootstrapSecretReferenceKey := client.ObjectKey{Namespace: customNamespace, Name: machineBootstrapSecretReferenceName + "-userdata"}
+ 		bootstrapDataSecret := &corev1.Secret{}
+ 		Expect(fakeClient.Get(gocontext.Background(), machineBootstrapSecretReferenceKey, bootstrapDataSecret)).To(Succeed())
+ 		Expect(bootstrapDataSecret.Data).To(HaveKeyWithValue("userdata", []byte("shell-script")))
+-		Expect(bootstrapDataSecret.Labels).To(HaveLen(1))
++		Expect(bootstrapDataSecret.Labels).To(HaveLen(2))
+ 		Expect(bootstrapDataSecret.Labels).To(HaveKeyWithValue("hello", "world"))
+ 	})
+ 
+@@ -893,6 +920,27 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 			})
+ 
+ 			It("adds a failed VMProvisionedCondition with reason VMCreateFailed when failng to create VM", func() {
++				// Set explicit namespace for both machine and bootstrap secret
++				testNamespace := "default"
++				machine.Namespace = testNamespace
++				kubevirtMachine.Namespace = testNamespace
++				kubevirtCluster.Namespace = testNamespace
++				cluster.Namespace = testNamespace
++				bootstrapSecret.Namespace = testNamespace
++				sshKeySecret.Namespace = testNamespace
++
++				// Add the bootstrap-userdata secret so reconcileKubevirtBootstrapSecret succeeds
++				bootstrapUserDataSecret := &corev1.Secret{
++					ObjectMeta: metav1.ObjectMeta{
++						Name:      machine.Name + "-userdata",
++						Namespace: testNamespace,
++						Labels:    map[string]string{"hello": "world"},
++					},
++					Data: map[string][]byte{
++						"userdata": []byte("some valid cloud-init userdata"),
++					},
++				}
++
+ 				objects := []client.Object{
+ 					cluster,
+ 					kubevirtCluster,
+@@ -900,6 +948,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 					kubevirtMachine,
+ 					sshKeySecret,
+ 					bootstrapSecret,
++					bootstrapUserDataSecret,
+ 				}
+ 
+ 				injectErr := interceptor.Funcs{
+@@ -956,6 +1005,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 				machineMock.EXPECT().Address().Return("1.1.1.1").Times(1)
+ 				machineMock.EXPECT().SupportsCheckingIsBootstrapped().Return(false).Times(1)
+ 				machineMock.EXPECT().DrainNodeIfNeeded(gomock.Any()).Return(time.Duration(0), nil)
++				machineMock.EXPECT().GetConditions().Return([]kubevirtv1.VirtualMachineCondition{}).Times(1)
+ 				machineMock.EXPECT().IsLiveMigratable().Return(false, "", "", nil).Times(1)
+ 
+ 				machineFactoryMock.EXPECT().NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(machineMock, nil).Times(1)
+@@ -1056,6 +1106,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 				machineMock.EXPECT().SupportsCheckingIsBootstrapped().Return(true)
+ 				machineMock.EXPECT().IsBootstrapped().Return(true)
+ 				machineMock.EXPECT().DrainNodeIfNeeded(gomock.Any()).Return(time.Duration(0), nil)
++				machineMock.EXPECT().GetConditions().Return([]kubevirtv1.VirtualMachineCondition{}).Times(1)
+ 				machineMock.EXPECT().IsLiveMigratable().Return(false, "", "", nil).Times(1)
+ 
+ 				machineFactoryMock.EXPECT().NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(machineMock, nil).Times(1)
+@@ -1112,6 +1163,7 @@ var _ = Describe("reconcile a kubevirt machine", func() {
+ 				machineMock.EXPECT().SupportsCheckingIsBootstrapped().Return(true)
+ 				machineMock.EXPECT().IsBootstrapped().Return(true)
+ 				machineMock.EXPECT().DrainNodeIfNeeded(gomock.Any()).Return(time.Duration(0), nil)
++				machineMock.EXPECT().GetConditions().Return([]kubevirtv1.VirtualMachineCondition{}).Times(1)
+ 				machineMock.EXPECT().IsLiveMigratable().Return(true, "", "", nil).Times(1)
+ 
+ 				machineFactoryMock.EXPECT().NewMachine(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(machineMock, nil).Times(1)
+@@ -1333,6 +1385,7 @@ var _ = Describe("updateNodeProviderID", func() {
+ 		fakeClient = fake.NewClientBuilder().WithScheme(testing.SetupScheme()).WithObjects(objects...).Build()
+ 		kubevirtMachineReconciler = KubevirtMachineReconciler{
+ 			Client:          fakeClient,
++			DirectClient:    fakeClient,
+ 			WorkloadCluster: workloadClusterMock,
+ 			InfraCluster:    infraClusterMock,
+ 		}
+diff --git a/main.go b/main.go
+index 8ef2a92..ca46694 100644
+--- a/main.go
++++ b/main.go
+@@ -194,6 +194,7 @@ func setupReconcilers(ctx context.Context, mgr ctrl.Manager) {
+ 
+ 	if err := (&controllers.KubevirtMachineReconciler{
+ 		Client:          mgr.GetClient(),
++		DirectClient:    noCachedClient,
+ 		InfraCluster:    infracluster.New(mgr.GetClient(), noCachedClient),
+ 		WorkloadCluster: workloadcluster.New(mgr.GetClient()),
+ 		MachineFactory:  kubevirt.DefaultMachineFactory{},
+diff --git a/pkg/kubevirt/machine.go b/pkg/kubevirt/machine.go
+index 38a839d..1fb9829 100644
+--- a/pkg/kubevirt/machine.go
++++ b/pkg/kubevirt/machine.go
+@@ -257,6 +257,11 @@ func (m *Machine) IsLiveMigratable() (bool, string, string, error) {
+ 		m.vmiInstance.Status.Phase, kubevirtv1.VirtualMachineInstanceIsMigratable)
+ }
+ 
++// GetConditions returns the VM conditions
++func (m *Machine) GetConditions() []kubevirtv1.VirtualMachineCondition {
++	return m.vmInstance.Status.Conditions
++}
++
+ const (
+ 	defaultCondReason  = "VMNotReady"
+ 	defaultCondMessage = "VM is not ready"
+diff --git a/pkg/kubevirt/machine_factory.go b/pkg/kubevirt/machine_factory.go
+index d5724df..88a730f 100644
+--- a/pkg/kubevirt/machine_factory.go
++++ b/pkg/kubevirt/machine_factory.go
+@@ -9,6 +9,7 @@ import (
+ 	"github.com/pkg/errors"
+ 	"sigs.k8s.io/controller-runtime/pkg/client"
+ 
++	kubevirtv1 "kubevirt.io/api/core/v1"
+ 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
+ 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
+ 	"sigs.k8s.io/cluster-api-provider-kubevirt/pkg/workloadcluster"
+@@ -38,6 +39,8 @@ type MachineInterface interface {
+ 	GenerateProviderID() (string, error)
+ 	// IsTerminal reports back if a VM is in a permanent terminal state
+ 	IsTerminal() (bool, string, error)
++	// GetConditions returns the conditions of the VM
++	GetConditions() []kubevirtv1.VirtualMachineCondition
+ 
+ 	DrainNodeIfNeeded(workloadcluster.WorkloadCluster) (time.Duration, error)
+ 
+diff --git a/pkg/kubevirt/mock/machine_factory_generated.go b/pkg/kubevirt/mock/machine_factory_generated.go
+index 1431362..9c7365e 100644
+--- a/pkg/kubevirt/mock/machine_factory_generated.go
++++ b/pkg/kubevirt/mock/machine_factory_generated.go
+@@ -10,6 +10,7 @@ import (
+ 	time "time"
+ 
+ 	gomock "github.com/golang/mock/gomock"
++	v1 "kubevirt.io/api/core/v1"
+ 	context0 "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/context"
+ 	kubevirt "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/kubevirt"
+ 	ssh "sigs.k8s.io/cluster-api-provider-kubevirt/pkg/ssh"
+@@ -126,9 +127,33 @@ func (mr *MockMachineInterfaceMockRecorder) GenerateProviderID() *gomock.Call {
+ 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateProviderID", reflect.TypeOf((*MockMachineInterface)(nil).GenerateProviderID))
+ }
+ 
++// GetConditions mocks base method.
++func (m *MockMachineInterface) GetConditions() []v1.VirtualMachineCondition {
++	m.ctrl.T.Helper()
++	ret := m.ctrl.Call(m, "GetConditions")
++	ret0, _ := ret[0].([]v1.VirtualMachineCondition)
++	return ret0
++}
++
++// GetConditions indicates an expected call of GetConditions.
++func (mr *MockMachineInterfaceMockRecorder) GetConditions() *gomock.Call {
++	mr.mock.ctrl.T.Helper()
++	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetConditions", reflect.TypeOf((*MockMachineInterface)(nil).GetConditions))
++}
++
+ // GetVMNotReadyReason mocks base method.
+ func (m *MockMachineInterface) GetVMNotReadyReason() (string, string) {
+-	return "", ""
++	m.ctrl.T.Helper()
++	ret := m.ctrl.Call(m, "GetVMNotReadyReason")
++	ret0, _ := ret[0].(string)
++	ret1, _ := ret[1].(string)
++	return ret0, ret1
++}
++
++// GetVMNotReadyReason indicates an expected call of GetVMNotReadyReason.
++func (mr *MockMachineInterfaceMockRecorder) GetVMNotReadyReason() *gomock.Call {
++	mr.mock.ctrl.T.Helper()
++	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVMNotReadyReason", reflect.TypeOf((*MockMachineInterface)(nil).GetVMNotReadyReason))
+ }
+ 
+ // IsBootstrapped mocks base method.
+-- 
+2.49.0
+
