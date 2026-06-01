@@ -98,6 +98,7 @@ go test -mod=vendor
 
 %changelog
 * Mon Jun 08 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.9.5-16
+- Fix patch for CVE-2026-39832
 - Patch for CVE-2026-39833
 
 * Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.9.5-15
