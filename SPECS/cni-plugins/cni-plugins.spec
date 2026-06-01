@@ -19,6 +19,7 @@ Patch5:         CVE-2026-27136.patch
 Patch6:         CVE-2026-42506.patch
 Patch7:         CVE-2026-25681.patch
 Patch8:         CVE-2026-42502.patch
+Patch9:         CVE-2026-25680.patch
 
 %define _default_cni_plugins_dir /opt/cni/bin
 BuildRequires:  golang >= 1.5
@@ -50,7 +51,7 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %changelog
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-6
-- Patch for CVE-2026-42506, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681
+- Patch for CVE-2026-42506, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-5
 - Patch for CVE-2025-47911, CVE-2025-58190
