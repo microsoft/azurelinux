@@ -3,6 +3,9 @@ contact_links:
   - name: Questions & feedback
     url: https://github.com/microsoft/azurelinux/discussions
     about: Ask questions or share feedback in GitHub Discussions instead of opening an issue.
+  - name: Azure Container Linux (ACL) issues
+    url: https://github.com/microsoft/azure-container-linux/issues
+    about: For issues related to Azure Container Linux (ACL), please open them in the ACL repository.
   - name: Azure Linux documentation
     url: https://aka.ms/azurelinux
     about: Product documentation and guides for Azure Linux.
