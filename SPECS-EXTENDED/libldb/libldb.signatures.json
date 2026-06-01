@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "ldb-2.7.2.tar.asc": "b5d4d98f3aef9fd7c22a6962af775269d819643cbf1c9fd3a8c2885a2e61f464",
-  "ldb-2.7.2.tar.gz": "26ee72d647854e662d99643eb2b2d341655abf31f4990838d6650fb5cf9209c8",
-  "ldb.keyring": "9c5722acdd291bcc20a6b6d314b32d9cef30dcaeef59ef0d39635575e20167f1",
-  "libldb-LICENSE.txt": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118"
- }
-}

@@ -1,6 +1,0 @@
-{
-  "Signatures": {
-    "docker-cli-25.0.7.tar.gz": "95b57af62273f9c069141b78360f0e39c5662447d63de2a6a257d59750b8d5ac",
-    "docker-cli-25.0.7-govendor-v1.tar.gz": "41a6f00be23ee3d6a3f32c59b1cb9f2472ced402b9c994a6291cb371a13ad755"
-  }
-}

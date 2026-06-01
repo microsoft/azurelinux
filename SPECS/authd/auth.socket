@@ -1,9 +1,0 @@
-[Unit]
-Description=Authd Activation Socket
-
-[Socket]
-ListenStream=113
-Accept=true
-
-[Install]
-WantedBy=sockets.target

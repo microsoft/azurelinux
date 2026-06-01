@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "389-ds-base-3.1.1.tar.bz2": "e111c4bc3ad2efa5d73a7d7a18d03ff84ee53afa25b631a8a31cd19cb0fe854b",
-  "389-ds-base-devel.README": "f69e816db24e12423e921ea6a1b3d6cd326715eae9079646358143018fff75fe",
-  "389-ds-base.sysusers": "c710a2b07565c29e5293d42cab8519cc0351a0d772e0e13693be0ed4ea6a19bf",
-  "jemalloc-5.3.0.tar.bz2": "2db82d1e7119df3e71b7640219b6dfe84789bc0537983c3b7ac4f7189aecfeaa"
- }
-}

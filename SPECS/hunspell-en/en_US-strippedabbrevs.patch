@@ -1,8 +1,0 @@
---- scowl/speller/en.dic.supp.orig	2008-11-28 10:10:01.000000000 +0000
-+++ scowl/speller/en.dic.supp	2008-11-28 10:10:10.000000000 +0000
-@@ -21,3 +21,5 @@
- 7th/pt
- 8th/pt
- 9th/pt
-+e.g.
-+i.e.

@@ -1,6 +1,0 @@
-QMessageBox, QDialog {
-  background-color: ghostwhite;
-  border-width: 1px;
-  border-style: solid;
-  border-color: black;
-}

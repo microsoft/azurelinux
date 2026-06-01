@@ -1,7 +1,0 @@
-{
- "Signatures": {
-  "tbb-2021.13.0.tar.gz": "3ad5dd08954b39d113dc5b3f8a8dc6dc1fd5250032b7c491eb07aed5c94133e1",
-  "tbbmalloc.pc": "d424f8851b7a998b4b0e47626f03c43437e059788ac1692e78c41751b37d3270",
-  "tbbmalloc_proxy.pc": "b2c80fcd0c2b33690c18319802735d9d5a77b5fee50bbab6847f76280dd4d9c9"
-  }
-}

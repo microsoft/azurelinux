@@ -1,8 +1,0 @@
-web-assets-devel contains the RPM macros that implement the Fedora Web Assets
-and JavaScript packaging policies.
-
-For more information on packaging Web Assets, see:
-https://fedoraproject.org/wiki/Packaging:Web_Assets
-
-For more information on packaging JavaScript, see:
-https://fedoraproject.org/wiki/Packaging:JavaScript

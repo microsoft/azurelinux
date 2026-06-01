@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "zfs-fuse-0.7.2.2.tar.gz": "b676985a42f17fc8a4af42a7d389712460b6735377d2dbc20c810239ac68f86c",
-  "zfs-fuse-helper": "78cf8ca945933c32cb801fdda1b3467e078bd4fd062e39874b7956e90a7954fe",
-  "zfs-fuse.scrub": "e0dfe4736de1259dc334acc5f78cbf5a56af856865311e91230a9c8906cfc15c",
-  "zfs-fuse.service": "645da8b905a82044d127225574ca80dc758222226903a66209000896ab15b360",
-  "zfs-fuse.sysconfig": "3844b75700258b1c4842c0b1705d177c96aaae186daeb021bc45d56a6654f1bc"
- }
-}

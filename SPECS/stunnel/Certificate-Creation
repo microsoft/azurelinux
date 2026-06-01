@@ -1,9 +1,0 @@
-To generate a key and self signed certificate, execute the following commands:
-
-cd /etc/pki/tls/certs
-make stunnel.pem
-
-Note that by default, the file containing the key and certificate has its
-permissions set to 0600, which means that any service using it needs to be
-started as root in order to read it.  Such a service should be configured
-to switch UIDs using stunnel's "-s" flag.

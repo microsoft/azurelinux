@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "netkit-telnet-0.17.tar.gz": "9c80d5c7838361a328fb6b60016d503def9ce53ad3c589f3b08ff71a2bb88e00",
-  "telnet-client.tar.gz": "fef13d44c600f7c8defc57b8b82d6edd312a39c960eebdbbeda6d01716e77a51",
-  "telnet.socket": "7f84e6a9ad2d28ddc440aab95359c14c633deb5e9bb7a0df7a46a3d54c1aefc5",
-  "telnet.wmconfig": "92bdf71e8a2df438a66d2c1d6de6f27e333ad6a98b44b0470c898eb6f699c5f5",
-  "telnet@.service": "9bfd4eb2ed1fab8eac0f2b01347ba09228d6688858f3fa2ec1ec287dadd28933"
- }
-}

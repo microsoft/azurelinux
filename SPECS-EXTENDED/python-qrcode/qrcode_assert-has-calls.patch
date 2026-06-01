@@ -1,9 +1,0 @@
-diff -rupN --no-dereference qrcode-7.4.2/qrcode/tests/test_release.py qrcode-7.4.2-new/qrcode/tests/test_release.py
---- qrcode-7.4.2/qrcode/tests/test_release.py	2023-02-05 23:11:38.000000000 +0100
-+++ qrcode-7.4.2-new/qrcode/tests/test_release.py	2023-05-12 13:59:22.069372313 +0200
-@@ -37,4 +37,4 @@ class UpdateManpageTests(unittest.TestCa
-             .replace("version", "3.11")
-             .replace("date", datetime.datetime.now().strftime("%-d %b %Y"))
-         )
--        mock_file().write.has_calls([mock.call(line) for line in expected])
-+        mock_file().write.assert_has_calls([mock.call(line) for line in expected if line])

@@ -1,5 +1,0 @@
-# Set wireless regulatory domain at device creation
-# For more information:
-# 	man setregdomain
-
-SUBSYSTEM=="ieee80211", ACTION=="add", RUN+="/usr/sbin/setregdomain"

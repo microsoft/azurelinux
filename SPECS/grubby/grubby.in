@@ -1,8 +1,0 @@
-#!/bin/bash
-if [[ -x @@LIBEXECDIR@@/grubby ]] ; then
-	exec @@LIBEXECDIR@@/grubby "${@}"
-elif [[ -x @@LIBEXECDIR@@/grubby-bls ]] ; then
-	exec @@LIBEXECDIR@@/grubby-bls "${@}"
-fi
-echo "Grubby is not installed correctly." >>/dev/stderr
-exit 1

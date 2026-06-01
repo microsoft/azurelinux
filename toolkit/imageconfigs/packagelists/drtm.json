@@ -1,7 +1,0 @@
-{
-    "packages": [
-        "tboot",
-        "tpm2-tools",
-        "tpm2-tss"
-    ]
-}

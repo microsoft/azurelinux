@@ -1,21 +1,5 @@
-# For stable release branches, ensure stable release maintainers are added as code reviewers
+# All changes require stable release maintainer review.
 * @microsoft/cbl-mariner-stable-maintainers
 
-# Modification to this file require admin approval.
+# Modifications to this file require admin approval.
 /.github/CODEOWNERS @microsoft/cbl-mariner-admins
-
-# Modifications to the build pipelines require admin approval.
-/.pipelines/* @microsoft/cbl-mariner-admins
-
-# Modifications to the CredScan exceptions require admin approval.
-/.config/CredScanSuppressions.json @microsoft/cbl-mariner-admins
-
-/SPECS-EXTENDED/ @microsoft/cbl-mariner-devs
-
-# Image Customizer
-/toolkit/tools/imagecustomizer/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/imagecustomizerapi/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/osmodifier @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/imagecustomizerlib/ @microsoft/cbl-mariner-imagecustomizer
-/toolkit/tools/pkg/osmodifierlib @microsoft/cbl-mariner-imagecustomizer
-/toolkit/scripts/build_tag_imagecustomizer.mk @microsoft/cbl-mariner-imagecustomizer

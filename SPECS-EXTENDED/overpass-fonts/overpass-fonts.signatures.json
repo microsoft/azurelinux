@@ -1,9 +1,0 @@
-{
- "Signatures": {
-  "overpass-fonts-3.0.4.tar.gz": "07600d6745f5199ad210c7f39e934dcd9716b54615e44ccf1f830001a0da3597",
-  "overpass-fonts-fontconfig.conf": "68077be5d99153b16446c190061f79f0d4c69210b49711dfd97dc07cb224fb52",
-  "overpass-mono-fonts-fontconfig.conf": "22e6dc8b393b92443433674c02e9c5b59412f2031e539203d513fdaa1b2b612a",
-  "overpass-mono.metainfo.xml": "169fefe3bff2756b529434b22ea327c93ee43fadfa465c3123948b9c4eca033e",
-  "overpass.metainfo.xml": "eacf74ce3834e3ab1da058f0b4d8475e2df3b1078e03144efb7057cd5a3b2146"
- }
-}

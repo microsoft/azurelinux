@@ -1,7 +1,0 @@
-[Unit]
-Description=Checks if system needs to be restarted due to recent version updates
-Wants=check-restart.timer
-
-[Service]
-Type=oneshot
-ExecStart=/bin/bash /usr/bin/check-restart.sh

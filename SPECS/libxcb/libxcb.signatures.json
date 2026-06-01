@@ -1,6 +1,0 @@
-{
- "Signatures": {
-  "libxcb-1.16.tar.gz": "bc0f75f84b28e6496a19a1d094d7e47def861a50cb7cce5b23b62eecdc2a4479",
-  "pthread-stubs.pc.in": "0c068f4df2e355f0575025863f6e1ecc6f16ad105213d5cd08261b8e36c375a2"
- }
-}

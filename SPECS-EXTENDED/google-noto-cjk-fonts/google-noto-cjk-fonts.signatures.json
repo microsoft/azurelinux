@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "65-google-noto-cjk-fonts.conf": "3920efac92f15d0715160654824e5aca60a1e52b717680c7b0aa0165cc095bb4",
-  "genfontconf.py": "eb0f09f49b5758e0c390e6d126d7b550a0072533d4faf2bd7289c9b569a861dc",
-  "genfontconf.sh": "a7ba5fdc0bf6646b1eaae1a9656c4b1f8a002a6ae361c721ba0228bff30fe787",
-  "noto-cjk-be6c059.tar.gz": "2ad7fe638b1e99255c3d873dc7e0b8434a896f571abdec1a0698cfab3ef618fe"
- }
-}

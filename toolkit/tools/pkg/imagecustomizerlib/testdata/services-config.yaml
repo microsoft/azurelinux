@@ -1,6 +1,0 @@
-os:
-  services:
-    enable:
-    - console-getty
-    disable:
-    - chronyd

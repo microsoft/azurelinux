@@ -1,3 +1,0 @@
-#Type  Name       ID            GECOS           Home directory      Shell
-g      haclient   189
-u      hacluster  189:haclient  "cluster user"  /var/lib/pacemaker  /sbin/nologin

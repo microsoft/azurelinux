@@ -1,9 +1,0 @@
-diff -urNp old/buildtools/makeman new/buildtools/makeman
---- old/buildtools/makeman	2018-01-03 12:15:55.000000000 +0100
-+++ new/buildtools/makeman	2018-02-26 14:18:39.993760106 +0100
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/python3
- #
- # makeman -- compile netpbm's stereotyped HTML to troff markup
- #

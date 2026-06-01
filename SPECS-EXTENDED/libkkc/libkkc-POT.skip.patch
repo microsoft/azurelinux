@@ -1,6 +1,0 @@
---- libkkc-0.3.5/po/POTFILES.skip~	2014-12-19 11:40:01.000000000 +0900
-+++ libkkc-0.3.5/po/POTFILES.skip	2017-12-13 19:22:46.016914774 +0900
-@@ -1,2 +1,3 @@
-+libkkc/keymap.c
- tools/kkc.c
- tools/server.c

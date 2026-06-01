@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "macros.lua": "351922c517a5582891bcacc1586b9c3c799a0554e14c805f03fc01f512300980",
-  "lua.attr": "85e7af1a34b3903f4c371bc7c79fb189949b56b0864e7edd174e740cd89cdd06",
-  "LICENSE": "9697928f73693a3d3209147f81f3da021decbc7bb13776ab28342cfd1d7bfcaf",
-  "macros.lua-srpm": "82d5f40c13e83df3f9b7270b1d3fcba4630a300e93c863d7f72b1945b97db9a6"
- }
-}

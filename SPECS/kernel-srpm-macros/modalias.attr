@@ -1,2 +1,0 @@
-%__modalias_provides	/usr/lib/rpm/redhat/find-provides.d/modalias.prov
-%__modalias_path        .*\.(ko|ko\.gz|ko\.bz2|ko\.xz|ko\.zst)$

@@ -1,8 +1,0 @@
-{
- "Signatures": {
-  "mmaa64.efi": "f4e65a70ca294857211a50e05bccbb73b3126b19bc0f3a2c78e9dc7f6131284d",
-  "mmx64.efi": "eb5f6a8a70efbc8fceeb490c7dd2d6f907870069c9045bc2f6dc562f3da1b3cb",
-  "shimaa64.efi": "7d6793523bfcc2bc0ad1042a12ffa9de130e279df06f61e2d30ece914d1d60b6",
-  "shimx64.efi": "1c36d3ce913dfae1a5cadac1d3721092855a5cd3b453100381930001dee715cb"
- }
-}

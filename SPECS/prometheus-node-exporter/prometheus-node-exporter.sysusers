@@ -1,2 +1,0 @@
-#Type Name         ID  GECOS                        Home directory        Shell
-u     prometheus   -   "Prometheus user account"    /var/lib/prometheus   /sbin/nologin
