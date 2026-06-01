@@ -61,7 +61,7 @@ BuildRequires:  perl(LWP::MediaTypes) >= 6
 # Mail::Internet not needed
 BuildRequires:  perl(MIME::Base64) >= 2.1
 # Net::FTP 2.58 not used at tests
-BuildRequires:  perl-Net-HTTP >= 6.18
+BuildRequires:  perl(Net::HTTP) >= 6.18
 # Net::NNTP not used at tests
 BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
@@ -123,7 +123,7 @@ Requires:       perl(LWP::MediaTypes) >= 6
 Suggests:       perl(LWP::Protocol::https) >= 6.02
 Requires:       perl(MIME::Base64) >= 2.1
 Requires:       perl(Net::FTP) >= 2.58
-Requires:       perl-Net-HTTP >= 6.18
+Requires:       perl(Net::HTTP) >= 6.18
 Requires:       perl(URI) >= 1.10
 Requires:       perl(URI::Escape)
 Requires:       perl(WWW::RobotRules) >= 6
