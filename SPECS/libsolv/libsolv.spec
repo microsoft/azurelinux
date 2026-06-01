@@ -41,7 +41,7 @@ Requires:       xz
 %{summary}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %cmake \
