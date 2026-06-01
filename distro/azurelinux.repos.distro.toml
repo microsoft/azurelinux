@@ -1,0 +1,90 @@
+# Azure Linux RPM repo wiring.
+#
+# This file maps Azure Linux's published RPM trees onto azldev's
+# repo-set / distro-inputs model. See
+# https://github.com/microsoft/azure-linux-dev-tools/blob/main/docs/user/explanation/repos.md
+# for background on `rpm-repo-sets`, `rpm-repo-set-templates`, and the
+# per-version `inputs` block.
+#
+# The `azl-standard` template (base/sdk x binary/debug/source) is shipped
+# by azldev itself, so we only need to instantiate it per published tree.
+# Inspect the fully resolved configuration with:
+#
+#   azldev config dump -q -f json | jq '.resources, .distros.azurelinux.versions["4.0-stage2"].inputs'
+#
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Published Azure Linux trees
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Production AzL 4.0 build inputs. Take only the binary + source sub-repos.
+[resources.rpm-repo-sets.azl4-beta]
+description = "Azure Linux 4.0 beta"
+template    = "azl-standard"
+base-uri    = "https://packages.microsoft.com/azurelinux/4.0/beta"
+name-prefix = "azl4-beta-"
+gpg-key     = "https://packages.microsoft.com/keys/microsoft.asc"
+subrepos    = ["base", "base-src", "sdk", "sdk-src"]
+
+# Azure Linux 4.0 dev.
+[resources.rpm-repo-sets.azl4-dev]
+description = "Azure Linux 4.0 dev"
+template    = "azl-standard"
+base-uri    = "https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev"
+name-prefix = "azl4-dev-"
+disable-gpg-check = true
+subrepos    = ["base", "base-src", "sdk", "sdk-src"]
+
+# A Koji dist-repo.
+[resources.rpm-repo-sets.koji-build-deps]
+description = "Build deps from the latest dist-repo"
+template    = "koji-dist-repo"
+base-uri    = "https://kojipkgs.example.com/repos/dist-azl4-build/latest"
+name-prefix = "koji-build-deps-"
+disable-gpg-check = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Standalone upstream repos (Fedora 43 — pinned to match the snapshot used
+# by `4.0-stage1` / `4.0-stage2` in azurelinux.distro.toml).
+# ─────────────────────────────────────────────────────────────────────────────
+
+[resources.rpm-repos.fedora-43-everything]
+description = "Fedora 43 Everything (binary)"
+base-uri    = "https://dl.fedoraproject.org/pub/fedora/linux/releases/43/Everything/$basearch/os/"
+gpg-key     = "https://getfedora.org/static/fedora.gpg"
+
+[resources.rpm-repos.fedora-43-updates]
+description = "Fedora 43 Updates (binary)"
+base-uri    = "https://dl.fedoraproject.org/pub/fedora/linux/updates/43/Everything/$basearch/"
+gpg-key     = "https://getfedora.org/static/fedora.gpg"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Wire repos into each distro version's use-cases.
+#
+# Stage1: Fedora-only buildroot + build deps (no AzL inputs by design).
+# Stage2: layer the just-published AzL 4.0 beta tree on top of Fedora 43.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[distros.azurelinux.versions.'4.0-stage1'.inputs]
+rpm-build = [
+    { repo = "fedora-43-everything" },
+    { repo = "fedora-43-updates" },
+    { set  = "koji-build-deps" },
+]
+image-build = [
+    { repo = "fedora-43-everything" },
+    { repo = "fedora-43-updates" },
+    { set  = "koji-build-deps" },
+]
+
+[distros.azurelinux.versions.'4.0-stage2'.inputs]
+rpm-build = [
+    { repo = "fedora-43-everything" },
+    { repo = "fedora-43-updates" },
+    { set  = "azl4-beta" },
+]
+image-build = [
+    { repo = "fedora-43-everything" },
+    { repo = "fedora-43-updates" },
+    { set  = "azl4-beta" },
+]
