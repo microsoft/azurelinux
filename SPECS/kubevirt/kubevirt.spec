@@ -39,14 +39,14 @@ Patch8:         CVE-2026-27136.patch
 Patch9:         CVE-2026-25680.patch
 Patch10:        CVE-2026-25681.patch
 Patch11:        CVE-2026-39827.patch
- Patch12:        CVE-2026-39828.patch
- Patch13:        CVE-2026-39835.patch
- Patch14:        CVE-2026-42502.patch
- Patch15:        CVE-2026-7374.patch
- Patch16:        CVE-2026-33814.patch
+Patch12:        CVE-2026-39828.patch
+Patch13:        CVE-2026-39835.patch
+Patch14:        CVE-2026-42502.patch
+Patch15:        CVE-2026-7374.patch
+Patch16:        CVE-2026-33814.patch
  
- %global debug_package %{nil}
- BuildRequires:  swtpm-tools
+%global debug_package %{nil}
+BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
 BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:  golang >= 1.24
@@ -289,14 +289,6 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
 - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39829, CVE-2026-39834, CVE-2026-39830, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
-
-* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-2
-- Patch for CVE-2025-11065
-
-* Tue Feb 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.7.0-1
-- Upgrade to 1.7.0
-- Remove CVE-2025-47913.patch - vulnerable ssh/agent package no longer vendored in 1.7.0
-- Remove CVE-2025-64435.patch - fixed upstream via PR#15680 (controller_ref.go removed)
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-4
 - Bump to rebuild with updated glibc
