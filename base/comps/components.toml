@@ -4524,7 +4524,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rocm-bandwidth-test]
 [components.rocm-cmake]
 [components.rocm-core]
-[components.rocm-examples]
+# rocm-examples is defined in base/comps/rocm-examples/rocm-examples.comp.toml
 [components.rocm-omp]
 [components.rocm-rpm-macros]
 [components.rocm-rpp]

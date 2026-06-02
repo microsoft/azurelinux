@@ -1,0 +1,13 @@
+[components.rocm-examples]
+
+[[components.rocm-examples.overlays]]
+description = "Drop the upstream FetchContent fallback that git-clones https://github.com/google/benchmark when the system google-benchmark CMake config is not picked up. google-benchmark-devel is already a BuildRequires, so requiring the system package matches the spec's intent and lets the build succeed under network isolation."
+type = "patch-add"
+file = "rocm-examples-no-fetchcontent-benchmark.patch"
+source = "rocm-examples-no-fetchcontent-benchmark.patch"
+
+[[components.rocm-examples.overlays]]
+description = "Add libpfm-devel to BuildRequires. The system google-benchmark in Azure Linux is built with libpfm support, so /usr/lib64/cmake/benchmark/benchmarkConfig.cmake does find_dependency(PFM). Without libpfm-devel in the chroot, configure fails with 'Could NOT find PFM (missing: PFM_LIBRARY PFM_INCLUDE_DIR)'."
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "libpfm-devel"

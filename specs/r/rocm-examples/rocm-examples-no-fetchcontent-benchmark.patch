@@ -1,0 +1,36 @@
+--- a/Tutorials/reduction/benchmark/CMakeLists.txt
++++ b/Tutorials/reduction/benchmark/CMakeLists.txt
+@@ -118,28 +118,11 @@
+     find_package(TBB REQUIRED)
+ endif()
+ 
+-find_package(benchmark CONFIG QUIET)
+-if(NOT TARGET benchmark::benchmark)
+-    message(STATUS "Google Benchmark not found. Fetching...")
+-    option(
+-        BENCHMARK_ENABLE_TESTING
+-        "Enable testing of the benchmark library."
+-        OFF
+-    )
+-    option(BENCHMARK_ENABLE_INSTALL "Enable installation of benchmark." OFF)
+-    include(FetchContent)
+-    FetchContent_Declare(
+-        googlebench
+-        GIT_REPOSITORY https://github.com/google/benchmark.git
+-        GIT_TAG v1.6.1
+-    )
+-    FetchContent_MakeAvailable(googlebench)
+-    if(NOT TARGET benchmark::benchmark)
+-        add_library(benchmark::benchmark ALIAS benchmark)
+-    endif()
+-else()
+-    find_package(benchmark CONFIG REQUIRED)
+-endif()
++# AzL: Google Benchmark must come from the system package
++# (google-benchmark-devel is in BuildRequires). The upstream fallback that
++# fetches https://github.com/google/benchmark via FetchContent is removed
++# so the build does not require network access.
++find_package(benchmark CONFIG REQUIRED)
+ 
+ foreach(VER RANGE 0 10)
+     set(Sources v${VER}.hip)
