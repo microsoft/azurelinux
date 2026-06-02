@@ -49,7 +49,7 @@ To try Azure Linux in a local VM, please download the ISO Installer: [x86_64](ht
 
 Before using a downloaded ISO, [verify the checksum and signature of the ISO](./docs/verify-iso-signature-and-checksum.md).
 
-After downloading and verifying the ISO, follow the [ISO installer instructions](./docs/iso-installer-in-local-vm.md) to install and use Azure Linux in a local Hyper-V VM.
+After downloading and verifying the ISO, follow the [ISO installer instructions](./docs/iso-installer-in-local-vm.md) to install and use Azure Linux in a local VM (Hyper-V on Windows or QEMU/KVM on Linux). The ISO runs the [Anaconda](https://anaconda-installer.readthedocs.io/) installer.
 
 _Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/azurelinux/issues). For additional information, refer to the [SUPPORT.md](./SUPPORT.md) file._
 
