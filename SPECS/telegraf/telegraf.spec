@@ -49,15 +49,15 @@ Patch32:        CVE-2026-42506.patch
 Patch33:        CVE-2026-42508.patch
 Patch34:        CVE-2026-46597.patch
 Patch35:        CVE-2026-27136.patch
-Patch36:        CVE-2026-25680.patch
-Patch37:        CVE-2026-25681.patch
-Patch38:        CVE-2026-39827.patch
-Patch39:        CVE-2026-39828.patch
-Patch40:        CVE-2026-39835.patch
-Patch41:        CVE-2026-42502.patch
-Patch42:        CVE-2026-46598.patch
-Patch43:        CVE-2026-41889.patch
-Patch44:        CVE-2026-42151.patch
+Patch36:        CVE-2026-41889.patch
+Patch37:        CVE-2026-42151.patch
+Patch38:        CVE-2026-25680.patch
+Patch39:        CVE-2026-25681.patch
+Patch40:        CVE-2026-39827.patch
+Patch41:        CVE-2026-39828.patch
+Patch43:        CVE-2026-39835.patch
+Patch44:        CVE-2026-42502.patch
+Patch45:        CVE-2026-46598.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -122,7 +122,7 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
+* Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
 * Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
