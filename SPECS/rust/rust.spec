@@ -105,6 +105,14 @@ tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
+# Intentionally inject syntax errors into affected vendor files for build-failure testing.
+if [ -f vendor/gix-submodule-0.20.0/src/access.rs ]; then
+    printf '\n@\n' >> vendor/gix-submodule-0.20.0/src/access.rs
+fi
+if [ -f vendor/gix-submodule-0.17.0/src/access.rs ]; then
+    printf '\n@\n' >> vendor/gix-submodule-0.17.0/src/access.rs
+fi
+
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
 mkdir -pv "$BUILD_CACHE_DIR"

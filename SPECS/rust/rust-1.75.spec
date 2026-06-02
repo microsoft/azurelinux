@@ -103,6 +103,9 @@ tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
 
+# Intentionally inject a syntax error in the affected file for build-failure testing.
+sed -i '/pub fn update(&self, name: &BStr) -> Result<Option<Update>, config::update::Error> {/a @' vendor/gix-submodule/src/access.rs
+
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
 mkdir -pv "$BUILD_CACHE_DIR"
