@@ -1,0 +1,202 @@
+Notes on fixing ELF headers in AZL4 on topic branch anphel/fix-elf-headers
+============================================================================
+
+CURRENT STATE
+-------------
+AZL4 already emits an ELF .note.package section in every dynamically-linked
+binary built from a spec that consumes the default LDFLAGS. The note is a
+JSON blob keyed under FDO / FDO_PACKAGING_METADATA, e.g.:
+
+  Displaying notes found in: .note.package
+    Owner                Data size    Description
+    FDO                  0x0000007c   FDO_PACKAGING_METADATA
+      Packaging Metadata: {
+        "type":"rpm",
+        "name":"cronie",
+        "version":"1.7.2-13.azl4",
+        "architecture":"x86_64",
+        "osCpe":"cpe:/o:fedoraproject:fedora:43"   <-- WRONG
+      }
+
+Two problems with the baseline output:
+  1. osCpe advertises Fedora 43 because the field is read from
+     /usr/lib/system-release-cpe, which in our build chroot comes from
+     the Fedora fedora-release package (we build on a Fedora-based mock
+     buildroot).
+  2. Debuggers (crash telemetry / module-version tracking) expect a
+     "moduleVersion" key with a 4-part version number (e.g. "1.7.2.0").
+     This key is not present at all today.
+
+WHAT THIS BRANCH CHANGES
+------------------------
+Both fixes live in the package-notes component:
+
+  base/comps/package-notes/package-notes.comp.toml   (new dedicated file)
+
+Three overlays in total:
+
+  (a) spec-search-replace in package-notes.spec %build:
+      replaces  $(cat /usr/lib/system-release-cpe)
+      with     cpe:/o:microsoft:azurelinux:4.0
+      -> fixes osCpe so emitted binaries say
+         "osCpe":"cpe:/o:microsoft:azurelinux:4.0"
+
+  (b) file-search-replace in macros.package-notes-srpm:
+      redefines  %_generate_package_note_file  (default: %{nil})
+      to an awk one-liner that exports RPM_MODULE_VERSION, parsing
+      RPM_PACKAGE_VERSION into 4 numeric fields, stripping non-digits
+      per field, and zero-padding short versions:
+         1.6.1       -> 1.6.1.0
+         1.2.3~rc1   -> 1.2.3.0
+         2024.05.29  -> 2024.5.29.0
+
+  (c) file-search-replace in redhat-package-notes.in:
+      appends  ,"moduleVersion":"%:getenv(RPM_MODULE_VERSION )"
+      to the JSON payload in the GCC linker spec fragment, bumping the
+      trailing ')' count from 4 to 5 to keep the macro nesting balanced.
+
+End result, after a downstream package (cronie, bash, etc.) is rebuilt:
+  Packaging Metadata: {
+    "type":"rpm",
+    "name":"cronie",
+    "version":"1.7.2-13.azl4",
+    "architecture":"x86_64",
+    "osCpe":"cpe:/o:microsoft:azurelinux:4.0",
+    "moduleVersion":"1.7.2.0"
+  }
+
+KEY MACRO MECHANICS  (so future-you doesn't fall in the same trap)
+------------------------------------------------------------------
+The injection point is the macro %_generate_package_note_file. The Azure
+Linux RPM macros file (/usr/lib/rpm/azurelinux/macros, shipped by
+azurelinux-rpm-config) already expands this hook inside %__spec_build_pre,
+which RPM runs at the top of every %build (and %check) shell:
+
+    %__spec_build_pre %{___build_pre} \
+      %{?_auto_set_build_flags:%{set_build_flags}} \
+      %{?_generate_package_note_file}
+
+By default macros.package-notes-srpm ships %_generate_package_note_file as
+%{nil}; we overwrite that single line.
+
+DO NOT try to override %__spec_build_pre directly from any file under
+/usr/lib/rpm/macros.d/ -- the macro load order is:
+
+    /usr/lib/rpm/macros
+    /usr/lib/rpm/macros.d/macros.*           <- our file lives here
+    /usr/lib/rpm/platform/.../macros
+    /usr/lib/rpm/fileattrs/*.attr
+    /usr/lib/rpm/azurelinux/macros           <- loads LATER, clobbers
+    /etc/rpm/...
+
+So azurelinux/macros wins and silently undoes any earlier override of
+%__spec_build_pre. The %_generate_package_note_file hook is the right
+seam.
+
+CONSUMER SIDE (linker spec fragment)
+------------------------------------
+The .note.package JSON itself comes from
+/usr/lib/rpm/redhat/redhat-package-notes, a GCC spec file fragment that
+adds  --package-metadata=...  to every link invocation. Fields are
+substituted at link time via %:getenv(RPM_PACKAGE_NAME ...) etc., reading
+env vars exported by rpmbuild. Our exporter (b) and our key (c) together
+make sure RPM_MODULE_VERSION is in scope when the linker reads the spec.
+
+WHY THIS MUST LAND BEFORE STAGE 1
+---------------------------------
+AZL4 builds in two stages:
+
+  Stage 1: bootstrap toolchain + base buildroot packages built against the
+           Fedora-based seed buildroot. These Stage 1 RPMs become the
+           buildroot for everything else.
+  Stage 2: every other package built against the Stage 1 buildroot. The
+           macros and linker spec that Stage 2 packages link with come
+           from the package-notes-srpm-macros + azurelinux-rpm-config
+           RPMs installed into that Stage 2 chroot.
+
+If we ship Stage 1 with the old package-notes-srpm-macros, then every
+Stage 2 package gets compiled against a linker spec that lacks
+moduleVersion and bakes the wrong osCpe -- and you only see the bad
+metadata in the final binaries, long after Stage 1 was sealed. To get
+clean ELF metadata across the distro in one mass rebuild, the fixes
+must be in the Stage 1 set so they end up in the Stage 2 buildroot
+from the very first package onward.
+
+Practical implication: re-cut Stage 1 (or at minimum re-publish
+package-notes-srpm-macros and re-trigger a full Stage 2 rebuild) once
+this branch lands.
+
+VALIDATION NOTES
+----------------
+- After modifying package-notes.comp.toml you must:
+    azldev comp render -p package-notes
+    azldev comp update -p package-notes
+    azldev comp build  --local-repo-with-publish ./base/out  -p package-notes  -p <downstream>
+- Mock's root_cache (/var/cache/mock/azl-4.0-stage2-x86_64/root_cache/
+  cache.tar.gz) is sticky: it will keep extracting the OLD
+  package-notes-srpm-macros at the SAME NVR even after you rebuild and
+  republish locally. To force a refresh during inner-loop testing:
+    sudo rm -f /var/cache/mock/azl-4.0-stage2-x86_64/root_cache/cache.tar.gz
+  --mock-config-opt "plugin_conf['root_cache_enable']=False" was NOT
+  effective in testing; cache deletion is the reliable path.
+- Verify a built binary with:
+    readelf -p .note.package /path/to/binary
+
+RUST BINARIES
+-------------
+The redhat-package-notes GCC spec only affects link invocations that go
+through gcc/clang via cc1's spec mechanism. Rust binaries built with
+rustc/cargo do NOT pick it up unless the spec is forwarded explicitly
+(e.g. RUSTFLAGS containing -Clink-arg=-specs=/usr/lib/rpm/redhat/redhat-package-notes,
+which the Azure Linux build-flags macros already inject).
+
+For Rust crates that want to emit their own .note.package or equivalent
+module-version notes independently of the linker spec, see the upstream
+crate:
+    https://crates.io/crates/module-info
+This is useful for Rust binaries built outside the RPM build flow (cargo
+install, vendored builds, etc.) where rpmbuild's env vars are not set.
+Inside our RPM build path it should not be needed -- RUSTFLAGS picks up
+the spec file and the .note.package section is emitted by the linker the
+same way as for C/C++ binaries.
+
+KEY TECHNICAL FINDING (also saved to /memories/repo/rpm-macros.md)
+------------------------------------------------------------------
+The macro path on AZL (from `rpm --showrc`) is:
+
+    /usr/lib/rpm/macros
+    /usr/lib/rpm/macros.d/macros.*
+    /usr/lib/rpm/platform/.../macros
+    /usr/lib/rpm/fileattrs/*.attr
+    /usr/lib/rpm/azurelinux/macros          <-- LATE, clobbers earlier defs
+    /etc/rpm/macros.*
+    /etc/rpm/macros
+    ~/.rpmmacros
+
+/usr/lib/rpm/azurelinux/macros is shipped by azurelinux-rpm-config and is
+byte-identical (md5-equal) to /usr/lib/rpm/redhat/macros. It loads AFTER
+macros.d/ and overrides %__spec_build_pre, so:
+
+  You CANNOT override %__spec_build_pre from any file in macros.d/.
+
+The supported hooks are the ones %__spec_build_pre expands at the tail
+end (defined in /usr/lib/rpm/azurelinux/macros):
+
+    %__spec_build_pre %{___build_pre} \
+      %{?_auto_set_build_flags:%{set_build_flags}} \
+      %{?_generate_package_note_file}
+
+That is why this branch redefines %_generate_package_note_file (was
+%{nil}) rather than trying to redefine %__spec_build_pre.
+
+Two facts captured to repo memory (/memories/repo/rpm-macros.md) for
+future agents:
+
+  1. Macro override trap -- /usr/lib/rpm/azurelinux/macros loads after
+     macros.d/* and clobbers %__spec_build_pre. Use the
+     %_generate_package_note_file (or %set_build_flags) hooks instead.
+
+  2. Mock root_cache stickiness -- buildroot RPMs at the same NVR are
+     not refreshed from the local repo; cache.tar.gz must be deleted
+     to test in-place rebuilds.
+
