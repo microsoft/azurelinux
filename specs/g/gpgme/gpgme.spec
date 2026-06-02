@@ -1,3 +1,13 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.3)
+## RPMAUTOSPEC: autorelease
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 8;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
@@ -15,7 +25,7 @@
 Name:           gpgme
 Summary:        GnuPG Made Easy - high level crypto API
 Version:        1.24.3
-Release: 7%{?dist}
+Release: %autorelease
 
 # MIT: src/cJSON.{c,h} (used by gpgme-json)
 License:        LGPL-2.1-or-later AND MIT

@@ -1,0 +1,87 @@
+* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jul 11 2024 Akira TAGOH <tagoh@redhat.com> - 20200215-20
+- Fix missing config files
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sat Jan 20 2024 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Aug 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Fri Jul 28 2023 Akira TAGOH <tagoh@redhat.com> - 20200215-16
+- Convert License tag to SPDX.
+
+* Wed May 10 2023 Akira TAGOH <tagoh@redhat.com> - 20200215-15
+- Drop the font unification which causes a lot of problems.
+  Resolves: rhbz#2186711, rhbz#2144373, rhbz#2096153, rhbz#517789
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Fri Jan 28 2022 Akira TAGOH <tagoh@redhat.com> - 20200215-12
+- Adjust a number of the priority for fontconfig config.
+  because 65 is supposed to be the default fonts for non-Latin languages.
+  Resolves: rhbz#1938205, rhbz#1571522
+- Drop fallback config for Noto Sans.
+  This breaks some languages which Droid Sans Fallback can covers.
+  This is also required for https://fedoraproject.org/wiki/Changes/DefaultToNotoFonts
+  Resolves: rhbz#1820166
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 20200215-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Sep 11 2020 Parag Nemade <pnemade AT redhat DOT com>
+- 20200215-8
+- Fix this spec file to build for F33+
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Apr 27 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-6
+🐞 Workaround Fedora problems created by rpm commit 93604e2
+
+* Thu Apr 02 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-5
+💥 Actually rebuild with fonts-rpm-macros 2.0.4 to make sure fontconfig files are
+  valid
+
+* Thu Apr 02 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-4
+👻 Rebuild with fonts-rpm-macros 2.0.4 to make sure fontconfig files are valid
+
+* Mon Mar 02 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-3
+✅ Lint, lint, lint and lint again
+
+* Sat Feb 22 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-2
+✅ Rebuild with fonts-rpm-macros 2.0.2
+
+* Sat Feb 15 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 20200215-1
+✅ Convert to fonts-rpm-macros use
+
+* Sun Nov 23 2008 Nicolas Mailhot <nim@fedoraproject.org>
+- 1.0.107-1
+✅ Initial packaging
