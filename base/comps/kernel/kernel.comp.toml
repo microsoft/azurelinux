@@ -1,8 +1,19 @@
 [components.kernel]
 
-# Manual release calculation required because the spec uses %{specrelease} macro
-# Release: %{pkg_release}
-autospec = { release-calculation = "manual", changelog-calculation = "manual" }
+# release-calculation = autorelease: the RPM release counter comes from rpmautospec's
+#   %autorelease, which the specrelease overlay below embeds into the kernel's release macro
+#   (Release: %{pkg_release} -> %{specrelease} -> %{kextraversion}.%autorelease). In autorelease
+#   mode azldev does NOT rewrite the Release tag; it trusts the spec to produce %autorelease via
+#   this macro indirection. kextraversion stays as the 4th version component in Release:, uname -r,
+#   and the /lib/modules path.
+# changelog-calculation = static: keep the spec's static %changelog (do not inject %autochangelog).
+# truncate-upstream-history: rpmautospec hangs/fails walking the full kernel history
+#   (the %define specrpmversion macro trips its spec parser on every walked commit), so
+#   cut the synthetic seed commit off from its upstream parents and walk only our
+#   synthetic commits. Compensate with lock-file bumps to keep Release monotonic.
+# replay-historical-overlays: the kernel version lives in overlays (%define specrpmversion),
+#   so re-apply each synthetic commit's overlays to attribute the right version per commit.
+autospec = { release-calculation = "autorelease", changelog-calculation = "static", truncate-upstream-history = true, replay-historical-overlays = true }
 
 # Skip debug kernel variant to reduce build time, and skip selftests as a
 # temporary mitigation while kselftests packaging is fixed separately.
@@ -52,10 +63,10 @@ regex = "%define pkgrelease .+"
 replacement = "%define pkgrelease %{azl_pkgrelease}"
 
 [[components.kernel.overlays]]
-description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component flows into Release:, uname -r, and /lib/modules/ path"
+description = "Set specrelease to kextraversion.%autorelease so the 4th version component flows into Release:, uname -r, and the /lib/modules path, while the RPM release counter comes from rpmautospec (release-calculation = autorelease)"
 type = "spec-search-replace"
 regex = "%define specrelease .+"
-replacement = "%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?buildid}%{?dist}"
+replacement = "%define specrelease %{kextraversion}.%autorelease"
 
 # Use the AzureLinux kernel source
 [[components.kernel.overlays]]

@@ -4,9 +4,17 @@
 # use Azure Linux kernel source and generate headers during build.
 spec = { type = "upstream" }
 
-# Manual release calculation required because the spec uses %{specrelease} macro
-# Release: %{specrelease}
-autospec = { release-calculation = "manual", changelog-calculation = "manual" }
+# release-calculation = autorelease: the RPM release counter comes from rpmautospec's
+#   %autorelease, which the specrelease overlay below embeds into the kernel-headers release
+#   macro (Release: %{specrelease} -> %{kextraversion}.%autorelease). In autorelease mode
+#   azldev trusts the spec to emit %autorelease itself (here via the specrelease macro).
+# changelog-calculation = autochangelog: the Fedora kernel-headers spec body uses
+#   %autochangelog, so let rpmautospec generate the changelog (unlike the full kernel,
+#   whose %changelog body is static).
+# replay-historical-overlays: the kernel-headers version lives in overlays (%define), so
+#   re-apply each synthetic commit's overlays to attribute the right version per commit.
+#   (No truncate-upstream-history here — only the full kernel trips rpmautospec's parser.)
+autospec = { release-calculation = "autorelease", changelog-calculation = "autochangelog", replay-historical-overlays = true }
 
 # Version updates: Fedora -> Azure Linux 6.18.29.1
 # Uses 3-part version (6.18.29) + kextraversion (1) scheme matching kernel.
@@ -30,9 +38,9 @@ replacement = "%define tarfile_release 6.18.29"
 
 [[components.kernel-headers.overlays]]
 type = "spec-search-replace"
-description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component and package release are explicit"
+description = "Set specrelease to kextraversion.%autorelease so the 4th version component flows into Release: while the RPM release counter comes from rpmautospec (release-calculation = autorelease)"
 regex = "%define specrelease .+"
-replacement = "%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?dist}"
+replacement = "%define specrelease %{kextraversion}.%autorelease"
 
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 [[components.kernel-headers.overlays]]
