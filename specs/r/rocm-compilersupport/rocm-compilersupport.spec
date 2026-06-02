@@ -101,6 +101,7 @@ ExclusiveArch:  x86_64
 %endif
 %endif
 
+Patch9: 0001-Clang-Add-azurelinux-to-fallback-triples.patch
 %description
 %{summary}
 
