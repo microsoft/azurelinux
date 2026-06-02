@@ -1,93 +1,8 @@
-From 0f2796ec1a66851ebff12a05aa4189acb94dd22c Mon Sep 17 00:00:00 2001
-From: Aadhar Agarwal <aadagarwal@microsoft.com>
-Date: Mon, 1 Jun 2026 16:30:59 -0700
-Subject: [PATCH 4/5] snapshotters/erofs: add dm-verity formatting and
- signature verification
-
-Add dm-verity hash formatting to the erofs snapshotter, the per-layer
-signature verification path that consumes OCI referrers signed via
-notary/notation, and the transfer-local OCI import wiring that hands
-signed images off to the snapshotter.
-
-Together this gives the erofs snapshotter end-to-end dm-verity support:
-each layer is hashed at unpack, the corresponding signed root-hash is
-verified against the in-kernel keyring, and the result is persisted as
-.dmverity + .sig sidecars beside the layer image.
-
-Squashes the original dm-verity development series:
-  - Add dmverity support to the erofs snapshotter using veritysetup-go
-  - Add signature support
-  - erofs-differ: matching UUID append style across tar index/conversion
-  - pkg/snapshotters: align dm-verity label and annotation namespaces
-  - snapshotters,transfer/local: wire dm-verity sig handler into
-    OCI-layout import
-
-Co-authored-by: Dallas Delaney <dadelan@microsoft.com>
----
- .github/workflows/ci.yml                      |   4 +
- core/transfer/local/import.go                 |  14 +
- core/transfer/local/pull.go                   |   3 +
- docs/snapshotters/erofs.md                    |  71 ++-
- go.mod                                        |   1 +
- go.sum                                        |   2 +
- internal/cri/server/images/image_pull.go      |   5 +
- internal/dmverity/dmverity.go                 | 109 ++++
- internal/dmverity/dmverity_linux.go           | 216 ++++++++
- internal/dmverity/dmverity_other.go           |  47 ++
- internal/dmverity/dmverity_test.go            | 387 +++++++++++++
- internal/erofsutils/mount.go                  |   5 +-
- pkg/snapshotters/contentstore_fetcher.go      | 165 ++++++
- pkg/snapshotters/contentstore_fetcher_test.go | 200 +++++++
- pkg/snapshotters/signatures.go                | 258 +++++++++
- plugins/diff/erofs/differ.go                  |  33 +-
- plugins/diff/erofs/dmverity_linux.go          | 136 +++++
- plugins/diff/erofs/dmverity_linux_test.go     | 128 +++++
- plugins/diff/erofs/dmverity_other.go          |  28 +
- plugins/diff/erofs/plugin/plugin.go           |  16 +
- plugins/mount/erofs/plugin_linux.go           | 146 ++++-
- plugins/snapshots/erofs/erofs.go              | 114 +++-
- plugins/snapshots/erofs/erofs_linux_test.go   | 357 +++++++++++-
- plugins/snapshots/erofs/plugin/plugin.go      |   8 +
- .../github.com/containerd/go-dmverity/LICENSE | 201 +++++++
- .../containerd/go-dmverity/pkg/dm/dm_linux.go | 402 ++++++++++++++
- .../containerd/go-dmverity/pkg/dm/target.go   | 101 ++++
- .../go-dmverity/pkg/keyring/keyring_linux.go  |  51 ++
- .../go-dmverity/pkg/utils/losetup.go          | 230 ++++++++
- .../go-dmverity/pkg/utils/test_util.go        | 293 ++++++++++
- .../containerd/go-dmverity/pkg/utils/utils.go | 229 ++++++++
- .../go-dmverity/pkg/verity/merkle.go          | 435 +++++++++++++++
- .../go-dmverity/pkg/verity/params.go          |  51 ++
- .../go-dmverity/pkg/verity/superblock.go      | 329 +++++++++++
- .../go-dmverity/pkg/verity/verity.go          | 517 ++++++++++++++++++
- vendor/modules.txt                            |   6 +
- 36 files changed, 5249 insertions(+), 49 deletions(-)
- create mode 100644 internal/dmverity/dmverity.go
- create mode 100644 internal/dmverity/dmverity_linux.go
- create mode 100644 internal/dmverity/dmverity_other.go
- create mode 100644 internal/dmverity/dmverity_test.go
- create mode 100644 pkg/snapshotters/contentstore_fetcher.go
- create mode 100644 pkg/snapshotters/contentstore_fetcher_test.go
- create mode 100644 pkg/snapshotters/signatures.go
- create mode 100644 plugins/diff/erofs/dmverity_linux.go
- create mode 100644 plugins/diff/erofs/dmverity_linux_test.go
- create mode 100644 plugins/diff/erofs/dmverity_other.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/LICENSE
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/dm/dm_linux.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/dm/target.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/keyring/keyring_linux.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/utils/losetup.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/utils/test_util.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/utils/utils.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/verity/merkle.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/verity/params.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/verity/superblock.go
- create mode 100644 vendor/github.com/containerd/go-dmverity/pkg/verity/verity.go
-
 diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
-index fa9898a..9807979 100644
+index 62254cd..8286657 100644
 --- a/.github/workflows/ci.yml
 +++ b/.github/workflows/ci.yml
-@@ -450,6 +450,10 @@ jobs:
+@@ -456,6 +456,10 @@ jobs:
          run: |
            sudo modprobe erofs
  
@@ -145,7 +60,7 @@ index 712e81e..d884d79 100644
  			unpacker, err = unpack.NewUnpacker(ctx, ts.content, uopts...)
  			if err != nil {
 diff --git a/docs/snapshotters/erofs.md b/docs/snapshotters/erofs.md
-index 6b509be..021483c 100644
+index b42a847..6ca2baf 100644
 --- a/docs/snapshotters/erofs.md
 +++ b/docs/snapshotters/erofs.md
 @@ -148,7 +148,7 @@ quota.  The `default_size` option can be used in the containerd configuration:
@@ -237,18 +152,14 @@ index 6b509be..021483c 100644
  
  If other differs (not the EROFS differ) are used, the EROFS snapshotter will
  convert the flat directory into an EROFS layer blob on Commit instead.
-@@ -236,8 +298,3 @@ For the EROFS differ:
- [plugins."io.containerd.differ.v1.erofs"]
-   enable_tar_index = true
- ```
--
--## TODO
--
+@@ -242,5 +304,3 @@ For the EROFS differ:
+  - EROFS Flatten filesystem support (EROFS fsmerge feature);
+ 
+  - ID-mapped mount spport;
 -
 - - DMVerity support.
-\ No newline at end of file
 diff --git a/go.mod b/go.mod
-index 959e33f..b71fa69 100644
+index 0eb1882..f1e9e8f 100644
 --- a/go.mod
 +++ b/go.mod
 @@ -18,6 +18,7 @@ require (
@@ -257,10 +168,10 @@ index 959e33f..b71fa69 100644
  	github.com/containerd/go-cni v1.1.13
 +	github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33
  	github.com/containerd/go-runc v1.1.0
- 	github.com/containerd/imgcrypt/v2 v2.0.2
+ 	github.com/containerd/imgcrypt/v2 v2.0.1
  	github.com/containerd/log v0.1.0
 diff --git a/go.sum b/go.sum
-index 6a1ab29..72bec4d 100644
+index 27c7654..a5e7cfd 100644
 --- a/go.sum
 +++ b/go.sum
 @@ -53,6 +53,8 @@ github.com/containerd/fifo v1.1.0 h1:4I2mbh5stb1u6ycIABlBw9zgtlK8viPI9QkQNRQEEmY
@@ -271,12 +182,12 @@ index 6a1ab29..72bec4d 100644
 +github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33/go.mod h1:Su0PfhcZ1JsxHWSk8lTncpzC28QO2W6cvaWx7WkjQuo=
  github.com/containerd/go-runc v1.1.0 h1:OX4f+/i2y5sUT7LhmcJH7GYrjjhHa1QI4e8yO0gGleA=
  github.com/containerd/go-runc v1.1.0/go.mod h1:xJv2hFF7GvHtTJd9JqTS2UVxMkULUYw4JN5XAUZqH5U=
- github.com/containerd/imgcrypt/v2 v2.0.2 h1:WOEaE33CaSxzuRF8YLfAjHWuu1Xh27aPPQtqtALqfuM=
+ github.com/containerd/imgcrypt/v2 v2.0.1 h1:gQcmeCKA97fAl0wlpq0itSY/PagFBsn4/mlKUy6kOio=
 diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
-index d94b47b..495a7a4 100644
+index c04a265..6a0d50a 100644
 --- a/internal/cri/server/images/image_pull.go
 +++ b/internal/cri/server/images/image_pull.go
-@@ -268,6 +268,10 @@ func (c *CRIImageService) pullImageWithLocalPull(
+@@ -272,6 +272,10 @@ func (c *CRIImageService) pullImageWithLocalPull(
  		pullOpts = append(pullOpts,
  			containerd.WithImageHandlerWrapper(snpkg.AppendInfoHandlerWrapper(ref)))
  	}
@@ -287,7 +198,7 @@ index d94b47b..495a7a4 100644
  
  	if c.config.DiscardUnpackedLayers {
  		// Allows GC to clean layers up from the content store after unpacking
-@@ -281,6 +285,7 @@ func (c *CRIImageService) pullImageWithLocalPull(
+@@ -285,6 +289,7 @@ func (c *CRIImageService) pullImageWithLocalPull(
  	if err != nil {
  		return nil, fmt.Errorf("failed to pull and unpack image %q: %w", ref, err)
  	}
@@ -1480,10 +1391,10 @@ index 0000000..101e946
 +}
 diff --git a/pkg/snapshotters/signatures.go b/pkg/snapshotters/signatures.go
 new file mode 100644
-index 0000000..b274733
+index 0000000..d398efb
 --- /dev/null
 +++ b/pkg/snapshotters/signatures.go
-@@ -0,0 +1,258 @@
+@@ -0,0 +1,267 @@
 +/*
 +   Copyright The containerd Authors.
 +
@@ -1518,11 +1429,20 @@ index 0000000..b274733
 +)
 +
 +const (
-+	// TargetLayerSignatureLabel contains the base64-encoded signature for dm-verity verification
-+	TargetLayerSignatureLabel = "containerd.io/snapshot/dmverity.layer-signature"
++	// TargetLayerSignatureLabel carries the base64-encoded PKCS#7 signature for dm-verity
++	// verification as a *descriptor annotation* between the signature handler and the
++	// erofs differ. It MUST NOT use the "containerd.io/snapshot/" prefix: that prefix is
++	// matched by snapshots.FilterInheritedLabels and would auto-promote the value into a
++	// snapshotter Info.Labels entry, where boltdb enforces a 4096-byte per-label cap.
++	// Full enterprise PKCS#7 envelopes (RSA-4096 leaf + intermediates + root + RFC3161
++	// timestamp counter-signature) routinely exceed 4 KiB; auto-promotion would reject
++	// the pull with InvalidArgument.
++	TargetLayerSignatureLabel = "containerd.io/dmverity/layer-signature"
 +
-+	// TargetLayerRootHashLabel contains the dm-verity root hash for the layer
-+	TargetLayerRootHashLabel = "containerd.io/snapshot/dmverity.layer-roothash"
++	// TargetLayerRootHashLabel carries the dm-verity root hash as a descriptor annotation.
++	// Kept under the same "containerd.io/dmverity/" prefix as the signature for symmetry,
++	// so neither value is auto-promoted into snapshot labels.
++	TargetLayerRootHashLabel = "containerd.io/dmverity/layer-roothash"
 +
 +	// Annotation keys used in signature manifest layers
 +	sigLayerDigestAnnotation    = "io.cncf.notary.dmverity.layer-digest"
@@ -1743,7 +1663,7 @@ index 0000000..b274733
 +	})
 +}
 diff --git a/plugins/diff/erofs/differ.go b/plugins/diff/erofs/differ.go
-index b4bccbe..80009f3 100644
+index a3a1b6d..8f4ba15 100644
 --- a/plugins/diff/erofs/differ.go
 +++ b/plugins/diff/erofs/differ.go
 @@ -34,7 +34,9 @@ import (
@@ -1779,7 +1699,7 @@ index b4bccbe..80009f3 100644
  // NewErofsDiffer creates a new EROFS differ with the provided options
  func NewErofsDiffer(store content.Store, opts ...DifferOpt) differ {
  	d := &erofsDiff{
-@@ -174,16 +185,17 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+@@ -176,16 +187,17 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
  	}
  
  	// Choose between tar index or tar conversion mode
@@ -1799,7 +1719,7 @@ index b4bccbe..80009f3 100644
  		err = erofsutils.ConvertTarErofs(ctx, rc, layerBlobPath, u.String(), s.mkfsExtraOpts)
  		if err != nil {
  			return emptyDesc, fmt.Errorf("failed to convert tar to erofs: %w", err)
-@@ -196,6 +208,23 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+@@ -198,6 +210,23 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
  		return emptyDesc, err
  	}
  
@@ -2401,27 +2321,27 @@ index 1de4af7..fc72fe9 100644
  	})
  }
 diff --git a/plugins/snapshots/erofs/erofs.go b/plugins/snapshots/erofs/erofs.go
-index 2ef5553..45068ed 100644
+index 292f1df..4c5919c 100644
 --- a/plugins/snapshots/erofs/erofs.go
 +++ b/plugins/snapshots/erofs/erofs.go
-@@ -33,6 +33,7 @@ import (
+@@ -30,6 +30,7 @@ import (
  	"github.com/containerd/containerd/v2/core/mount"
  	"github.com/containerd/containerd/v2/core/snapshots"
  	"github.com/containerd/containerd/v2/core/snapshots/storage"
 +	"github.com/containerd/containerd/v2/internal/dmverity"
  	"github.com/containerd/containerd/v2/internal/fsverity"
- 	"github.com/containerd/containerd/v2/internal/userns"
  )
-@@ -50,6 +51,8 @@ type SnapshotterConfig struct {
- 	// fsMergeThreshold (>0) enables fsmerge when the number of image layers exceeds this value
- 	fsMergeThreshold uint
- 	remapIDs         bool
+ 
+@@ -43,6 +44,8 @@ type SnapshotterConfig struct {
+ 	setImmutable bool
+ 	// defaultSize creates a default size writable layer for active snapshots
+ 	defaultSize int64
 +	// dmverityMode controls dm-verity behavior: "auto" (use if .dmverity exists), "on" (require .dmverity), "off" (disable)
 +	dmverityMode string
  }
  
  // Opt is an option to configure the erofs snapshotter
-@@ -76,6 +79,13 @@ func WithImmutable() Opt {
+@@ -69,6 +72,13 @@ func WithImmutable() Opt {
  	}
  }
  
@@ -2435,15 +2355,15 @@ index 2ef5553..45068ed 100644
  // WithDefaultSize creates a default size writable layer for active snapshots
  func WithDefaultSize(size int64) Opt {
  	return func(config *SnapshotterConfig) {
-@@ -113,6 +123,7 @@ type snapshotter struct {
- 	blockMode        bool
- 	fsMergeThreshold uint
- 	remapIDs         bool
-+	dmverityMode     string
+@@ -90,6 +100,7 @@ type snapshotter struct {
+ 	setImmutable    bool
+ 	defaultWritable int64
+ 	blockMode       bool
++	dmverityMode    string
  }
  
  // NewSnapshotter returns a Snapshotter which uses EROFS+OverlayFS. The layers
-@@ -125,6 +136,24 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+@@ -102,6 +113,24 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
  		opt(&config)
  	}
  
@@ -2468,19 +2388,19 @@ index 2ef5553..45068ed 100644
  	if err := os.MkdirAll(root, 0700); err != nil {
  		return nil, err
  	}
-@@ -171,6 +200,7 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
- 		blockMode:        config.defaultSize > 0,
- 		fsMergeThreshold: config.fsMergeThreshold,
- 		remapIDs:         config.remapIDs,
-+		dmverityMode:     config.dmverityMode,
+@@ -146,6 +175,7 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		setImmutable:    config.setImmutable,
+ 		defaultWritable: config.defaultSize,
+ 		blockMode:       config.defaultSize > 0,
++		dmverityMode:    config.dmverityMode,
  	}, nil
  }
  
-@@ -252,7 +282,48 @@ func (s *snapshotter) mountFsMeta(snap storage.Snapshot, id int) (mount.Mount, b
- 	return m, true
+@@ -205,7 +235,48 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+ 	return td, nil
  }
  
--func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
+-func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.Mount, error) {
 +// applyDmverityPolicy validates and applies dm-verity policy for a layer.
 +// Returns the X-containerd.dmverity option if needed, or empty string otherwise.
 +func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
@@ -2526,7 +2446,7 @@ index 2ef5553..45068ed 100644
  	var options []string
  
  	if len(snap.ParentIDs) == 0 {
-@@ -265,13 +336,11 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -218,13 +289,11 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
  					return nil, err
  				}
  			}
@@ -2545,7 +2465,7 @@ index 2ef5553..45068ed 100644
  		}
  		// if we only have one layer/no parents then just return a bind mount as overlay
  		// will not work
-@@ -349,13 +418,12 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -302,13 +371,12 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
  		if err != nil {
  			return nil, err
  		}
@@ -2565,7 +2485,7 @@ index 2ef5553..45068ed 100644
  	}
  
  	first := len(mounts)
-@@ -375,10 +443,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, info snapshots.Info) ([]moun
+@@ -318,10 +386,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
  			return nil, err
  		}
  
@@ -2579,16 +2499,16 @@ index 2ef5553..45068ed 100644
  		}
  
  		mounts = append(mounts, m)
-@@ -507,7 +574,7 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
- 	if !strings.Contains(key, snapshots.UnpackKeyPrefix) {
- 		s.generateFsMeta(ctx, snap.ParentIDs)
+@@ -397,7 +464,7 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
+ 	}); err != nil {
+ 		return nil, err
  	}
 -	return s.mounts(snap, info)
 +	return s.mounts(ctx, snap, info)
  }
  
  func (s *snapshotter) Prepare(ctx context.Context, key, parent string, opts ...snapshots.Opt) ([]mount.Mount, error) {
-@@ -640,6 +707,8 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -489,6 +556,8 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  		}
  	}
  
@@ -2597,7 +2517,7 @@ index 2ef5553..45068ed 100644
  	return s.ms.WithTransaction(ctx, true, func(ctx context.Context) error {
  		if _, err := os.Stat(layerBlob); err != nil {
  			return fmt.Errorf("failed to get the converted erofs blob: %w", err)
-@@ -673,7 +742,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
+@@ -522,7 +591,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
  	}); err != nil {
  		return nil, err
  	}
@@ -2606,7 +2526,7 @@ index 2ef5553..45068ed 100644
  }
  
  func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, error) {
-@@ -720,6 +789,9 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+@@ -569,6 +638,9 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
  				log.G(ctx).WithError(err).WithField("id", id).Warnf("failed to cleanup upperdir")
  			}
  
@@ -2617,7 +2537,7 @@ index 2ef5553..45068ed 100644
  				if err := os.RemoveAll(dir); err != nil {
  					log.G(ctx).WithError(err).WithField("path", dir).Warn("failed to remove directory")
 diff --git a/plugins/snapshots/erofs/erofs_linux_test.go b/plugins/snapshots/erofs/erofs_linux_test.go
-index b4b555b..0f3c0c9 100644
+index b55f0b8..d9bd86f 100644
 --- a/plugins/snapshots/erofs/erofs_linux_test.go
 +++ b/plugins/snapshots/erofs/erofs_linux_test.go
 @@ -26,17 +26,25 @@ import (
@@ -2657,7 +2577,7 @@ index b4b555b..0f3c0c9 100644
  )
  
  func newSnapshotter(t *testing.T, opts ...Opt) func(ctx context.Context, root string) (snapshots.Snapshotter, func() error, error) {
-@@ -204,10 +216,8 @@ func TestErofsDifferWithTarIndexMode(t *testing.T) {
+@@ -209,10 +221,8 @@ func TestErofsDifferWithTarIndexMode(t *testing.T) {
  	// Create EROFS snapshotter
  	snapshotRoot := filepath.Join(tempDir, "snapshots")
  	s, err := NewSnapshotter(snapshotRoot)
@@ -2670,7 +2590,7 @@ index b4b555b..0f3c0c9 100644
  
  	// Create test tar content
  	tarReader := createTestTarContent()
-@@ -349,3 +359,342 @@ func createTestTarContent() io.ReadCloser {
+@@ -354,3 +364,342 @@ func createTestTarContent() io.ReadCloser {
  	// Return the tar as a ReadCloser
  	return tartest.TarFromWriterTo(tarWriter)
  }
@@ -3014,13 +2934,13 @@ index b4b555b..0f3c0c9 100644
 +	})
 +}
 diff --git a/plugins/snapshots/erofs/plugin/plugin.go b/plugins/snapshots/erofs/plugin/plugin.go
-index 7af5041..7db2336 100644
+index 6e734e8..3a3d35b 100644
 --- a/plugins/snapshots/erofs/plugin/plugin.go
 +++ b/plugins/snapshots/erofs/plugin/plugin.go
-@@ -54,6 +54,10 @@ type Config struct {
+@@ -46,6 +46,10 @@ type Config struct {
  
- 	// MaxUnmergedLayers (>0) enables fsmerge when the number of image layers exceeds this value.
- 	MaxUnmergedLayers uint `toml:"max_unmerged_layers"`
+ 	// DefaultSize is the default size of a writable layer in string
+ 	DefaultSize string `toml:"default_size"`
 +
 +	// DmverityMode controls dm-verity behavior: "auto" (use if available), "on" (require), "off" (disable)
 +	// Linux only
@@ -3028,17 +2948,17 @@ index 7af5041..7db2336 100644
  }
  
  func init() {
-@@ -99,6 +103,10 @@ func init() {
- 				opts = append(opts, erofs.WithFsMergeThreshold(config.MaxUnmergedLayers))
+@@ -87,6 +91,10 @@ func init() {
+ 				opts = append(opts, erofs.WithDefaultSize(size))
  			}
  
 +			if config.DmverityMode != "" {
 +				opts = append(opts, erofs.WithDmverityMode(config.DmverityMode))
 +			}
 +
- 			// Don't bother supporting overlay's slow_chown, only RemapIDs
- 			ic.Meta.Capabilities = append(ic.Meta.Capabilities, capaOnlyRemapIDs)
- 			if ok, err := supportsIDMappedMounts(); err == nil && ok {
+ 			ic.Meta.Exports[plugins.SnapshotterRootDir] = root
+ 			ic.Meta.Capabilities = append(ic.Meta.Capabilities, "rebase")
+ 			return erofs.NewSnapshotter(root, opts...)
 diff --git a/vendor/github.com/containerd/go-dmverity/LICENSE b/vendor/github.com/containerd/go-dmverity/LICENSE
 new file mode 100644
 index 0000000..261eeb9
@@ -5945,7 +5865,7 @@ index 0000000..eaf80d8
 +	return true
 +}
 diff --git a/vendor/modules.txt b/vendor/modules.txt
-index 3201cf7..f461a94 100644
+index 56fe379..d33c142 100644
 --- a/vendor/modules.txt
 +++ b/vendor/modules.txt
 @@ -161,6 +161,12 @@ github.com/containerd/fifo
@@ -5961,6 +5881,3 @@ index 3201cf7..f461a94 100644
  # github.com/containerd/go-runc v1.1.0
  ## explicit; go 1.18
  github.com/containerd/go-runc
--- 
-2.43.0
-

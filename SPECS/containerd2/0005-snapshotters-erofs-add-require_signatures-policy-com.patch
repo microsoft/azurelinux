@@ -1,38 +1,3 @@
-From 1d3f3621a345b576fb81d60a91c5970ea784d1bf Mon Sep 17 00:00:00 2001
-From: Dallas Delaney <dadelan@microsoft.com>
-Date: Mon, 1 Jun 2026 16:31:17 -0700
-Subject: [PATCH 5/5] snapshotters/erofs: add require_signatures policy,
- commitBlock parity, and structured logs
-
-Three follow-on changes to the dm-verity erofs snapshotter:
-
-  1. require_signatures config knob (off by default). When enabled,
-     pulls of unsigned images are rejected at differ.Apply time rather
-     than at mount; the root hash from the layer signature must match
-     the hash computed during format.
-
-  2. commitBlock-path parity. The differ.Apply path already formatted
-     and signed each layer; the commitBlock path (used when layers are
-     committed by snapshotter clients other than the differ) did not.
-     This patch routes commitBlock through the same formatter so both
-     code paths produce identical .dmverity + .sig sidecars.
-
-  3. Structured dmverity_format debug logs. Tagged log entries on the
-     enter/success/error boundaries of FormatLayerBlob, so the
-     end-to-end dm-verity flow is traceable from a single journalctl
-     filter (tag=dmverity_format).
-
-Co-authored-by: Aadhar Agarwal <aadagarwal@microsoft.com>
----
- internal/dmverity/dmverity_linux.go       | 157 ++++++++++++++++++++++
- plugins/diff/erofs/differ.go              |  32 ++++-
- plugins/diff/erofs/dmverity_linux.go      | 122 +++--------------
- plugins/diff/erofs/dmverity_linux_test.go |  41 +++---
- plugins/diff/erofs/dmverity_other.go      |   4 +-
- plugins/diff/erofs/plugin/plugin.go       |   9 ++
- plugins/snapshots/erofs/erofs.go          | 102 +++++++++++++-
- 7 files changed, 328 insertions(+), 139 deletions(-)
-
 diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
 index 04b5a55..e3b3c2e 100644
 --- a/internal/dmverity/dmverity_linux.go
@@ -215,7 +180,7 @@ index 04b5a55..e3b3c2e 100644
  func VerifyDevice(name string, rootHash string) error {
  	rootDigest, err := utils.ParseRootHash(rootHash)
 diff --git a/plugins/diff/erofs/differ.go b/plugins/diff/erofs/differ.go
-index 80009f3..f0202e2 100644
+index 8f4ba15..1f7f8a1 100644
 --- a/plugins/diff/erofs/differ.go
 +++ b/plugins/diff/erofs/differ.go
 @@ -57,6 +57,9 @@ type erofsDiff struct {
@@ -243,7 +208,7 @@ index 80009f3..f0202e2 100644
  // NewErofsDiffer creates a new EROFS differ with the provided options
  func NewErofsDiffer(store content.Store, opts ...DifferOpt) differ {
  	d := &erofsDiff{
-@@ -210,14 +221,25 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+@@ -212,14 +223,25 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
  
  	// Format with dm-verity if enabled
  	if s.enableDmverity {
@@ -551,10 +516,18 @@ index 0a25359..c8baa12 100644
  
  			return erofs.NewErofsDiffer(cs, opts...), nil
 diff --git a/plugins/snapshots/erofs/erofs.go b/plugins/snapshots/erofs/erofs.go
-index 45068ed..89e87d7 100644
+index 4c5919c..cc4e375 100644
 --- a/plugins/snapshots/erofs/erofs.go
 +++ b/plugins/snapshots/erofs/erofs.go
-@@ -291,6 +291,22 @@ func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
+@@ -22,6 +22,7 @@ import (
+ 	"os"
+ 	"path/filepath"
+ 	"runtime"
++	"time"
+ 
+ 	"github.com/containerd/continuity/fs"
+ 	"github.com/containerd/errdefs"
+@@ -244,6 +245,22 @@ func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
  
  	// Validate dmverityMode policy: mode "on" requires .dmverity metadata to exist
  	if s.dmverityMode == "on" && !metadataExists {
@@ -577,7 +550,7 @@ index 45068ed..89e87d7 100644
  		return "", fmt.Errorf("dm-verity mode is 'on' but .dmverity metadata not found for layer %s", layerBlob)
  	}
  
-@@ -586,6 +602,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
+@@ -476,6 +493,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
  }
  
  func (s *snapshotter) commitBlock(ctx context.Context, layerBlob string, id string) error {
@@ -591,7 +564,7 @@ index 45068ed..89e87d7 100644
  	layer := s.writablePath(id)
  	if _, err := os.Stat(layer); err != nil {
  		if os.IsNotExist(err) {
-@@ -685,12 +708,86 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -534,12 +558,86 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  	// the EROFS differ (possibly the walking differ), convert the upperdir instead.
  	layerBlob = s.layerBlobPath(id)
  	if _, err := os.Stat(layerBlob); err != nil {
@@ -678,7 +651,7 @@ index 45068ed..89e87d7 100644
  	}
  
  	// Enable fsverity on the EROFS layer if configured
-@@ -707,7 +804,10 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+@@ -556,7 +654,10 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
  		}
  	}
  
@@ -690,6 +663,3 @@ index 45068ed..89e87d7 100644
  
  	return s.ms.WithTransaction(ctx, true, func(ctx context.Context) error {
  		if _, err := os.Stat(layerBlob); err != nil {
--- 
-2.43.0
-
