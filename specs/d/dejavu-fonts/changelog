@@ -1,0 +1,68 @@
+* Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Thu Jan 16 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Wed Jul 17 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-24
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jan 24 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Thu Oct 12 2023 Akira TAGOH <tagoh@redhat.com> - 2.37-21
+- Convert License tag to SPDX.
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Sep 04 2020 Parag Nemade <pnemade AT redhat DOT com>
+- 2.37-15
+- Fix this spec file to build for F33+
+
+* Mon Jul 27 2020 Fedora Release Engineering <releng@fedoraproject.org>
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Mon Apr 27 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.37-13
+🐞 Workaround Fedora problems created by rpm commit 93604e2
+
+* Thu Apr 02 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.37-12
+👻 Rebuild with fonts-rpm-macros 2.0.4 to make sure fontconfig files are valid
+
+* Mon Mar 09 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.37-7
+✅ Remove F32 compatibility packages
+
+* Mon Mar 02 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.37-6
+✅ Lint, lint, lint and lint again
+
+* Sat Feb 22 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.37-5
+✅ Rebuild with fonts-rpm-macros 2.0.2
+
+* Sat Feb 15 2020 Nicolas Mailhot <nim@fedoraproject.org>
+- 2.27-4
+✅ Convert to fonts-rpm-macros use
+✅ Merge math extension into serif
+
+* Sat Feb 19 2005 Nicolas Mailhot <nim@fedoraproject.org>
+- 1.7-1
+✅ initial build – using vera as template
