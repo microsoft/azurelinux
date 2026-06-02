@@ -1,6 +1,6 @@
 [components.syslinux]
 # Release: 0.33%{?dist}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # The mingw-gcc BuildRequires are used to cross-compile syslinux.exe/syslinux64.exe

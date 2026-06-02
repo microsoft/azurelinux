@@ -2,7 +2,7 @@
 
 # Manual release calculation required because the spec uses %{specrelease} macro
 # Release: %{pkg_release}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # Skip debug kernel variant to reduce build time, and skip selftests as a
 # temporary mitigation while kselftests packaging is fixed separately.

@@ -6,7 +6,7 @@ spec = { type = "upstream" }
 
 # Manual release calculation required because the spec uses %{specrelease} macro
 # Release: %{specrelease}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # Version updates: Fedora -> Azure Linux 6.18.29.1
 # Uses 3-part version (6.18.29) + kextraversion (1) scheme matching kernel.

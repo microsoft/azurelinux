@@ -1,6 +1,6 @@
 [components.rpm]
 # Release: %{?snapver:0.%{snapver}.}%{baserelease}%{?dist}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # Update vendor macro.
 [[components.rpm.overlays]]

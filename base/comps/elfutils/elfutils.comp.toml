@@ -1,6 +1,6 @@
 [components.elfutils]
 # Release: %{baserelease}%{?dist}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 [[components.elfutils.overlays]]
 description = "Remove elfutils-default-yama-scope package"

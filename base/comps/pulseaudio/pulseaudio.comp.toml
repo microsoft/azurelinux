@@ -1,6 +1,6 @@
 [components.pulseaudio]
 # Release: 9%{?snap:.%{snap}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # The gdm-hooks subpackage was moved to gdm packaging in Fedora 28+,
 # so this subpackage should not be built. The upstream conditional mis-fires

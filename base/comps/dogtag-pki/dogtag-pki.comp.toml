@@ -1,6 +1,6 @@
 [components.dogtag-pki]
 # Release: %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
-release = { calculation = "manual" }
+autospec = { release-calculation = "manual", changelog-calculation = "manual" }
 
 # AZL ships only java-25-openjdk; there is no java-21-openjdk, so the
 # upstream %else branch (taken when %fedora and %rhel are both unset, as

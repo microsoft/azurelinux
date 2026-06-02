@@ -1,6 +1,6 @@
 [components.samba]
 # Release: %{samba_release}
-release = { calculation = "autorelease" }
+autospec = { release-calculation = "autorelease" }
 
 # Drop the optional `samba-winexe` subpackage. The winexe binaries are
 # rejected by the automated malware scan in our package signing pipeline.
