@@ -12,7 +12,6 @@ usage() {
     echo "Options:"
     echo "  --configure-docker    Enable Docker service and add current user to docker group"
     echo "  --no-install-prereqs  Skip installation of prerequisite packages"
-    echo "  --use-msft-golang     Use msft-golang-1.24.1 instead of golang-1.24.3"
     echo "  --help                Display this help message"
     exit 1
 }
@@ -20,7 +19,6 @@ usage() {
 # Initialize option flags
 CONFIGURE_DOCKER=false
 INSTALL_PREREQS=true
-USE_MSFT_GOLANG=false
 
 # Parse command line arguments
 while [ $# -gt 0 ]; do
@@ -30,9 +28,6 @@ while [ $# -gt 0 ]; do
             ;;
         --no-install-prereqs)
             INSTALL_PREREQS=false
-            ;;
-        --use-msft-golang)
-            USE_MSFT_GOLANG=true
             ;;
         --help)
             usage
@@ -46,28 +41,8 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using the following golang versions:
-# - msft-golang-1.24.1 for Mariner 2.0
-# - golang-1.24.3 for Mariner 3.0
-# When making a breaking change to the toolkit which requires a newer golang version, update this version.
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
-    
-    # Determine which golang package to use based on the option
-    if [ "$USE_MSFT_GOLANG" = true ]; then
-        # golang will conflict with msft-golang, so we need to remove it if it exists
-        if rpm -q golang >/dev/null 2>&1; then
-            echo "Installed golang conflicts with required msft-golang. Removing existing golang package..."
-            tdnf -y remove golang
-        fi
-
-        GOLANG_PKG="msft-golang-1.24.1"
-        echo "Using Microsoft Go version: $GOLANG_PKG"
-    else
-        GOLANG_PKG="golang-1.24.3"
-        echo "Using standard Go version: $GOLANG_PKG"
-    fi
-    
     tdnf -y install \
     acl \
     binutils \
@@ -75,11 +50,12 @@ if [ "$INSTALL_PREREQS" = true ]; then
     curl \
     diffutils \
     dosfstools \
+    gcc \
     gawk \
     genisoimage \
     git \
     glibc-devel \
-    $GOLANG_PKG \
+    golang \
     jq \
     kernel-headers \
     make \
@@ -92,6 +68,8 @@ if [ "$INSTALL_PREREQS" = true ]; then
     rpm \
     rpm-build \
     sudo \
+    SymCrypt \
+    SymCrypt-OpenSSL \
     systemd \
     tar \
     wget \
@@ -105,10 +83,10 @@ fi
 if [ "$CONFIGURE_DOCKER" = true ]; then
     echo "Enabling Docker service..."
     systemctl enable --now docker.service
-    
+
     echo "Adding current user to 'docker' group..."
     usermod -aG docker $USER
-    
+
     echo "*** NOTE: You will need to log out and log back in for user changes to take effect. ***"
 fi
 
