@@ -1,5 +1,4 @@
 [components.llvm]
-
 # Workaround: Disable MLIR until python-nanobind (and its dep robin-map)
 # are imported into Azure Linux. MLIR is gated on %{with mlir} in the
 # upstream spec and pulls in python3-nanobind-devel which doesn't exist yet.
@@ -12,3 +11,16 @@ description = "Use the Azure Linux GCC toolchain triple in clang's default confi
 type = "spec-search-replace"
 regex = '%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux'
 replacement = '%global cfg_file_content --gcc-triple=%{_target_cpu}-%{_vendor}-linux'
+
+# Patch the fallback triples to include azurelinux.
+# When clang's config files are not present, it will fall back to a set of hardcoded triples, which don't include azurelinux.
+[[components.llvm.overlays]]
+description = "Patch fallback triples to include azurelinux."
+type = "patch-add"
+source = "0001-Clang-Add-azurelinux-to-fallback-triples.patch"
+
+[[components.llvm.overlays]]
+description = "Manually add above patch, because llvm uses some advanced %autopatch and doesn't pick this up automatically."
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -p1 -P2202"]
