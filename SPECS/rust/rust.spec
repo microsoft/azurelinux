@@ -104,7 +104,7 @@ mkdir -p $HOME
 pushd $HOME
 tar -xf %{SOURCE1} --no-same-owner
 popd
-%autosetup -p1 -n rustc-%{version}-src
+%autosetup -S git -p1 -n rustc-%{version}-src
 
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"

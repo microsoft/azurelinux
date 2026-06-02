@@ -8,6 +8,12 @@
          let value: Update = match self.config.string(format!("submodule.{name}.update")) {
              Some(v) => v.as_ref().try_into().map_err(|()| config::update::Error::Invalid {
                  submodule: name.to_owned(),
+--- a/vendor/gix-submodule-0.20.0/.cargo-checksum.json
++++ b/vendor/gix-submodule-0.20.0/.cargo-checksum.json
+@@ -1 +1 @@
+-{"files":{".cargo_vcs_info.json":"e5bf5de8bdb21a0b2b614540a4663716c6d478ca0f6b98bee0f4b74c1131ae47","Cargo.lock":"6153c19206300561c1ccb850eb55d74da9c47e4d3379182dff477b3b95356d52","Cargo.toml":"c8cfcb2e1dc52ec08aac03b624ccb8bebfbfa9466281aad5cf8ac40a05df00b4","Cargo.toml.orig":"ce89fc89563f177913bd57e0880d6913374e776f94c9b8b331ecdd580991568a","LICENSE-APACHE":"0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594","LICENSE-MIT":"f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d","src/access.rs":"d62e97f0b3809cf215934484b43997fd5e5539d93e1623ac5bdd8c592b465858","src/config.rs":"c79da16fabb8b9a9420324c680fefb43a45a2f91f7bd013e8a162bea9a2661c3","src/is_active_platform.rs":"ee956af6a52f418b0ef2ef8533f06877f08d7f38b73f1728465eff90a0a8b2c1","src/lib.rs":"8a97de59b418727e22e194761faf6ffa0c40956ca301285e8ec51771c795c78c"},"package":"657cc5dd43cbc7a14d9c5aaf02cfbe9c2a15d077cded3f304adb30ef78852d3e"}
+\ No newline at end of file
++{"files":{".cargo_vcs_info.json":"e5bf5de8bdb21a0b2b614540a4663716c6d478ca0f6b98bee0f4b74c1131ae47","Cargo.lock":"6153c19206300561c1ccb850eb55d74da9c47e4d3379182dff477b3b95356d52","Cargo.toml":"c8cfcb2e1dc52ec08aac03b624ccb8bebfbfa9466281aad5cf8ac40a05df00b4","Cargo.toml.orig":"ce89fc89563f177913bd57e0880d6913374e776f94c9b8b331ecdd580991568a","LICENSE-APACHE":"0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594","LICENSE-MIT":"f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d","src/access.rs":"89e4a2a40382ddb515df90488caa82ff915f4ccf088b27ecb1f3c89aaeb5637a","src/config.rs":"c79da16fabb8b9a9420324c680fefb43a45a2f91f7bd013e8a162bea9a2661c3","src/is_active_platform.rs":"ee956af6a52f418b0ef2ef8533f06877f08d7f38b73f1728465eff90a0a8b2c1","src/lib.rs":"8a97de59b418727e22e194761faf6ffa0c40956ca301285e8ec51771c795c78c"},"package":"657cc5dd43cbc7a14d9c5aaf02cfbe9c2a15d077cded3f304adb30ef78852d3e"}
 --- a/vendor/gix-submodule-0.17.0/src/access.rs
 +++ b/vendor/gix-submodule-0.17.0/src/access.rs
 @@ -166,6 +166,7 @@
@@ -18,3 +24,9 @@
          let value: Update = match self.config.string(format!("submodule.{name}.update")) {
              Some(v) => v.as_ref().try_into().map_err(|()| config::update::Error::Invalid {
                  submodule: name.to_owned(),
+--- a/vendor/gix-submodule-0.17.0/.cargo-checksum.json
++++ b/vendor/gix-submodule-0.17.0/.cargo-checksum.json
+@@ -1 +1 @@
+-{"files":{".cargo_vcs_info.json":"ab3ec1abaf6a9268e93545baf49803608a05d0b6d91b07e5ebc1350c97a268c7","Cargo.toml":"ed2807eec51202824aada3584dae26df93dc08b4f63ec83101b5a3eacf7f77ff","Cargo.toml.orig":"9b2c32c1baec946ba0053804d85ec8798795b8a5ac05a9a1749239c4f04f89c7","LICENSE-APACHE":"ee54e469a7971f7c331e03e5530db15c897417116e2ee4f1b802a02f683f5dba","LICENSE-MIT":"f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d","src/access.rs":"0d8dc84318f7f40e83bddf2c385b164398a034be4d499597275c6d06ee4198e4","src/config.rs":"c79da16fabb8b9a9420324c680fefb43a45a2f91f7bd013e8a162bea9a2661c3","src/is_active_platform.rs":"f557a1b194b4e332f64dab6877cf2950eae14c482452975cd1e17b6ca98a8db1","src/lib.rs":"8a97de59b418727e22e194761faf6ffa0c40956ca301285e8ec51771c795c78c"},"package":"74972fe8d46ac8a09490ae1e843b4caf221c5b157c5ac17057e8e1c38417a3ac"}
+\ No newline at end of file
++{"files":{".cargo_vcs_info.json":"ab3ec1abaf6a9268e93545baf49803608a05d0b6d91b07e5ebc1350c97a268c7","Cargo.toml":"ed2807eec51202824aada3584dae26df93dc08b4f63ec83101b5a3eacf7f77ff","Cargo.toml.orig":"9b2c32c1baec946ba0053804d85ec8798795b8a5ac05a9a1749239c4f04f89c7","LICENSE-APACHE":"ee54e469a7971f7c331e03e5530db15c897417116e2ee4f1b802a02f683f5dba","LICENSE-MIT":"f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d","src/access.rs":"f423e6544977d339233fe2f4945c897801dbcccad7f4751e7aa29e740ec7d06b","src/config.rs":"c79da16fabb8b9a9420324c680fefb43a45a2f91f7bd013e8a162bea9a2661c3","src/is_active_platform.rs":"f557a1b194b4e332f64dab6877cf2950eae14c482452975cd1e17b6ca98a8db1","src/lib.rs":"8a97de59b418727e22e194761faf6ffa0c40956ca301285e8ec51771c795c78c"},"package":"74972fe8d46ac8a09490ae1e843b4caf221c5b157c5ac17057e8e1c38417a3ac"}
