@@ -109,9 +109,6 @@ BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-# Coordinate with the fipsmodule.cnf rename: patch 0032 in this release
-# reads /etc/pki/tls/fipsmodule.cnf, which only openssl-fips-provider >= 3.1.2-2 ships.
-Conflicts: openssl-fips-provider < 3.1.2-2
 
 %description
 The OpenSSL toolkit provides support for secure communications between
@@ -123,6 +120,9 @@ protocols.
 Summary: A general purpose cryptography library with TLS implementation
 Recommends: SymCrypt
 Recommends: SymCrypt-OpenSSL
+# Coordinate with the fipsmodule.cnf rename: patch 0032 in this release
+# reads /etc/pki/tls/fipsmodule.cnf, which only openssl-fips-provider >= 3.1.2-2 ships.
+Conflicts: openssl-fips-provider < 3.1.2-2
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs

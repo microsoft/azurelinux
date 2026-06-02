@@ -36,7 +36,7 @@ BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
 
-Requires: openssl >= 3.3.5-6
+Requires: openssl-libs%{?_isa} >= 3.3.5-6
 Conflicts: SymCrypt-OpenSSL
 
 %description
