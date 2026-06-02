@@ -21,13 +21,17 @@ Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 # Tracks the AzureLinux 3.0-dev containerd2 baseline at Version 2.2.4.
 Version: 2.2.4
-# Release range 5xxx distinguishes this 2.2.4 port from the 4xxx 2.2.0
-# patch-based builds and earlier 3xxx fork-tarball builds. No .commit_hash
-# tag since the upstream is an immutable release tag.
+# Release "6000.verity" distinguishes this dadelan fork build from any
+# future official AzureLinux containerd2-2.2.4-N release (which start at
+# Release: 1, 2, ...). The 6xxx range succeeds the prior 5xxx steamboat
+# RPM stream and the 4xxx 2.2.0-patch-based / 3xxx fork-tarball builds.
+# The ".verity" suffix marks the dm-verity erofs snapshotter patch set
+# (Patch8-9 of PATCHES.md). No .commit_hash tag since the upstream is an
+# immutable release tag.
 # IMPORTANT: any future official AzureLinux containerd2-2.2.4-N release
 # will be considered OLDER than this; bump Epoch or pin to a higher Version
 # if you ever need to deprecate this stream.
-Release: 5000%{?dist}
+Release: 6000.verity%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
