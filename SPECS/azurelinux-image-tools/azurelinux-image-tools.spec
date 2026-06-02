@@ -2,7 +2,7 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.2.0
+Version:        1.4.0
 Release:        2%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
@@ -15,8 +15,9 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2026-27141.patch
-BuildRequires: golang < 1.25
+Patch0:         CVE-2026-39821.patch
+Patch1:         CVE-2026-33814.patch
+BuildRequires: golang >= 1.25
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
 
@@ -74,6 +75,7 @@ The Azure Linux OS Modifier is a tool that can modify an OS.
 %build
 export GOPATH=%{our_gopath}
 export GOFLAGS="-mod=vendor"
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make -C toolkit go-imagecustomizer REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y IMAGE_CUSTOMIZER_VERSION_PREVIEW=
 make -C toolkit go-osmodifier REBUILD_TOOLS=y SKIP_LICENSE_SCAN=y
 
@@ -112,6 +114,18 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2
+- Patch for CVE-2026-33814
+
+* Fri May 29 2026 Vince Perri <viperri@microsoft.com> - 1.4.0-1
+- Upgrade to version 1.4.0
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
+- Patch for CVE-2026-39821
+
+* Tue Apr 28 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.3.0-1
+- Upgrade to version 1.3.0 which includes fixes for CVE-2026-27141, CVE-2026-29181 and CVE-2026-39882
+
 * Thu Mar 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.2.0-2
 - Patch for CVE-2026-27141
 

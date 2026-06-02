@@ -241,21 +241,6 @@ dest = Fedora/ovmf-ia32
 cpy1 = FV/OVMF_CODE.fd OVMF_CODE.secboot.fd
 cpy2 = IA32/EnrollDefaultKeys.efi
 
-[build.armvirt.arm]
-desc = ArmVirt build for qemu, 32-bit (arm v7)
-conf = ArmVirtPkg/ArmVirtQemu.dsc
-arch = ARM
-opts = ovmf.common
-pcds = nx.broken.shim.grub
-plat = ArmVirtQemu-ARM
-dest = Fedora/arm
-cpy1 = FV/QEMU_EFI.fd
-cpy2 = FV/QEMU_VARS.fd
-cpy3 = FV/QEMU_EFI.fd  QEMU_EFI-pflash.raw
-cpy4 = FV/QEMU_VARS.fd vars-template-pflash.raw
-pad3 = QEMU_EFI-pflash.raw      64m
-pad4 = vars-template-pflash.raw 64m
-
 
 #####################################################################
 # experimental builds

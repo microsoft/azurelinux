@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        19%{?dist}
+Release:        22%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,6 +38,19 @@ Patch21:        cisco_telegraf_bug61041768.patch
 Patch22:        CVE-2026-29785.patch
 Patch23:        CVE-2026-33216.patch
 Patch24:        CVE-2026-5160.patch
+Patch25:        CVE-2026-41602.patch
+Patch26:        CVE-2026-42154.patch
+Patch27:        CVE-2026-39821.patch
+Patch28:        CVE-2026-39829.patch
+Patch29:        CVE-2026-39830.patch
+Patch30:        CVE-2026-39832.patch
+Patch31:        CVE-2026-39834.patch
+Patch32:        CVE-2026-42506.patch
+Patch33:        CVE-2026-42508.patch
+Patch34:        CVE-2026-46597.patch
+Patch35:        CVE-2026-27136.patch
+Patch36:        CVE-2026-41889.patch
+Patch37:        CVE-2026-42151.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -102,6 +115,15 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
+- Patch for CVE-2026-41889, CVE-2026-42151
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-21
+- Patch for CVE-2026-46597, CVE-2026-42508, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Sat May 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-20
+- Patch for CVE-2026-41602, CVE-2026-42154
+
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-19
 - Patch for CVE-2026-5160
 
