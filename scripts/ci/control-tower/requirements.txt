@@ -1,2 +1,2 @@
-azure-identity==1.17.0
-requests==2.33.0
+azure-identity==1.25.3
+requests==2.34.2
