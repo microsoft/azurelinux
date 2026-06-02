@@ -13,3 +13,36 @@ type = "spec-search-replace"
 section = "%build"
 regex = '\$\(cat /usr/lib/system-release-cpe\)'
 replacement = "cpe:/o:microsoft:azurelinux:4.0"
+
+# Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
+# into every %build shell. We hook into the %_generate_package_note_file
+# macro, which the Azure Linux RPM macros (/usr/lib/rpm/azurelinux/macros)
+# already expand inside %__spec_build_pre. The package-notes-srpm-macros
+# file ships this macro as %{nil} by default; we redefine it to our export.
+# (Overriding %__spec_build_pre directly does not work — azurelinux/macros
+# loads later in the macro path and clobbers any earlier definition.)
+# Non-numeric characters are stripped per field and missing fields are
+# zero-padded so e.g.
+#   1.6.1       -> 1.6.1.0
+#   1.2.3~rc1   -> 1.2.3.0
+#   2024.05.29  -> 2024.5.29.0
+# The value is consumed by the linker-script template (overlay below) via
+# %:getenv(RPM_MODULE_VERSION ) and emitted as the moduleVersion key in
+# .note.package.
+[[components.package-notes.overlays]]
+description = "Hook %_generate_package_note_file to export 4-part RPM_MODULE_VERSION for every package build, consumed by the .note.package moduleVersion field"
+type = "file-search-replace"
+file = "macros.package-notes-srpm"
+regex = '%_generate_package_note_file %\{nil\}'
+replacement = '''%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; gsub(/[^0-9]/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')'''
+
+# Add the moduleVersion key to the JSON payload emitted into .note.package.
+# The template is a GCC spec file fragment; embedded quotes are escaped as \".
+# Adding one more %:getenv(...) requires bumping the trailing ')' count by one
+# (from 4 to 5) to keep the macro nesting balanced.
+[[components.package-notes.overlays]]
+description = "Add moduleVersion key (sourced from RPM_MODULE_VERSION) to the .note.package JSON payload"
+type = "file-search-replace"
+file = "redhat-package-notes.in"
+regex = '\\"osCpe\\":\\"@OSCPE@\\"\}\)\)\)\)\}'
+replacement = '\"osCpe\":\"@OSCPE@\",\"moduleVersion\":\"%:getenv(RPM_MODULE_VERSION \"})))))}'
