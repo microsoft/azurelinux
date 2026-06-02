@@ -2469,6 +2469,7 @@
                 "vala",
                 "valkey",
                 "vnstat",
+                "walinuxagent-acl-config",
                 "zstd"
             ]
         },
