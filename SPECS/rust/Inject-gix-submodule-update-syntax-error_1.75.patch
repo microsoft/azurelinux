@@ -1,0 +1,10 @@
+--- a/vendor/gix-submodule/src/access.rs
++++ b/vendor/gix-submodule/src/access.rs
+@@ -166,6 +166,7 @@
+ 
+     /// Retrieve the `update` field of the submodule named `name`, if present.
+     pub fn update(&self, name: &BStr) -> Result<Option<Update>, config::update::Error> {
++@
+         let value: Update = match self.config.string("submodule", Some(name), "update") {
+             Some(v) => v.as_ref().try_into().map_err(|()| config::update::Error::Invalid {
+                 submodule: name.to_owned(),

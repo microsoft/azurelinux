@@ -1,0 +1,20 @@
+--- a/vendor/gix-submodule-0.20.0/src/access.rs
++++ b/vendor/gix-submodule-0.20.0/src/access.rs
+@@ -166,6 +166,7 @@
+ 
+     /// Retrieve the `update` field of the submodule named `name`, if present.
+     pub fn update(&self, name: &BStr) -> Result<Option<Update>, config::update::Error> {
++@
+         let value: Update = match self.config.string(format!("submodule.{name}.update")) {
+             Some(v) => v.as_ref().try_into().map_err(|()| config::update::Error::Invalid {
+                 submodule: name.to_owned(),
+--- a/vendor/gix-submodule-0.17.0/src/access.rs
++++ b/vendor/gix-submodule-0.17.0/src/access.rs
+@@ -166,6 +166,7 @@
+ 
+     /// Retrieve the `update` field of the submodule named `name`, if present.
+     pub fn update(&self, name: &BStr) -> Result<Option<Update>, config::update::Error> {
++@
+         let value: Update = match self.config.string(format!("submodule.{name}.update")) {
+             Some(v) => v.as_ref().try_into().map_err(|()| config::update::Error::Invalid {
+                 submodule: name.to_owned(),

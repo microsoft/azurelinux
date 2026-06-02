@@ -57,6 +57,7 @@ Patch12:        CVE-2026-2006.patch
 Patch13:        CVE-2026-33056.patch
 Patch14:        CVE-2026-33055.patch
 Patch15:        CVE-2026-34743.patch
+Patch16:        Inject-gix-submodule-update-syntax-error.patch
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -104,14 +105,6 @@ pushd $HOME
 tar -xf %{SOURCE1} --no-same-owner
 popd
 %autosetup -p1 -n rustc-%{version}-src
-
-# Intentionally inject syntax errors into affected vendor files for build-failure testing.
-if [ -f vendor/gix-submodule-0.20.0/src/access.rs ]; then
-    printf '\n@\n' >> vendor/gix-submodule-0.20.0/src/access.rs
-fi
-if [ -f vendor/gix-submodule-0.17.0/src/access.rs ]; then
-    printf '\n@\n' >> vendor/gix-submodule-0.17.0/src/access.rs
-fi
 
 # Setup build/cache directory
 BUILD_CACHE_DIR="build/cache/%{release_date}"
