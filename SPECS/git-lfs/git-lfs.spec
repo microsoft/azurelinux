@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.6.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
@@ -81,13 +81,11 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
-<<<<<<< HEAD
-* Thu May 14 2026 Sumit Jena <sumitjena@microsoft.com> - 3.6.1-3
+* Mon Jun 01 2026 Sumit Jena <sumitjena@microsoft.com> - 3.6.1-4
 - Fix ptests failures.
-=======
+
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.6.1-3
 - Patch for CVE-2026-39821
->>>>>>> c616ed6705 ([AutoPR- Security] Patch git-lfs for CVE-2026-39821 [CRITICAL] (#17582))
 
 * Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 3.6.1-2
 - Patch CVE-2025-22870
