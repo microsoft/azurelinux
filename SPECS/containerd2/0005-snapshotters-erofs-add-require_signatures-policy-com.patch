@@ -1,0 +1,695 @@
+From 1d3f3621a345b576fb81d60a91c5970ea784d1bf Mon Sep 17 00:00:00 2001
+From: Dallas Delaney <dadelan@microsoft.com>
+Date: Mon, 1 Jun 2026 16:31:17 -0700
+Subject: [PATCH 5/5] snapshotters/erofs: add require_signatures policy,
+ commitBlock parity, and structured logs
+
+Three follow-on changes to the dm-verity erofs snapshotter:
+
+  1. require_signatures config knob (off by default). When enabled,
+     pulls of unsigned images are rejected at differ.Apply time rather
+     than at mount; the root hash from the layer signature must match
+     the hash computed during format.
+
+  2. commitBlock-path parity. The differ.Apply path already formatted
+     and signed each layer; the commitBlock path (used when layers are
+     committed by snapshotter clients other than the differ) did not.
+     This patch routes commitBlock through the same formatter so both
+     code paths produce identical .dmverity + .sig sidecars.
+
+  3. Structured dmverity_format debug logs. Tagged log entries on the
+     enter/success/error boundaries of FormatLayerBlob, so the
+     end-to-end dm-verity flow is traceable from a single journalctl
+     filter (tag=dmverity_format).
+
+Co-authored-by: Aadhar Agarwal <aadagarwal@microsoft.com>
+---
+ internal/dmverity/dmverity_linux.go       | 157 ++++++++++++++++++++++
+ plugins/diff/erofs/differ.go              |  32 ++++-
+ plugins/diff/erofs/dmverity_linux.go      | 122 +++--------------
+ plugins/diff/erofs/dmverity_linux_test.go |  41 +++---
+ plugins/diff/erofs/dmverity_other.go      |   4 +-
+ plugins/diff/erofs/plugin/plugin.go       |   9 ++
+ plugins/snapshots/erofs/erofs.go          | 102 +++++++++++++-
+ 7 files changed, 328 insertions(+), 139 deletions(-)
+
+diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
+index 04b5a55..e3b3c2e 100644
+--- a/internal/dmverity/dmverity_linux.go
++++ b/internal/dmverity/dmverity_linux.go
+@@ -18,12 +18,17 @@ package dmverity
+ 
+ import (
+ 	"bytes"
++	"context"
++	"encoding/json"
+ 	"fmt"
+ 	"os"
++	"time"
+ 
+ 	"github.com/containerd/containerd/v2/core/mount"
+ 	"github.com/containerd/go-dmverity/pkg/utils"
+ 	"github.com/containerd/go-dmverity/pkg/verity"
++	"github.com/containerd/log"
++	"github.com/google/uuid"
+ )
+ 
+ func IsSupported() (bool, error) {
+@@ -200,6 +205,158 @@ func Close(name string) error {
+ 	return nil
+ }
+ 
++// FormatLayerBlob formats an existing EROFS layer blob with a dm-verity hash tree
++// in-place (appended after the data) and writes the .dmverity sidecar.
++// Returns the computed root hash.
++//
++// Idempotent: if a .dmverity sidecar already exists at MetadataPath(layerBlobPath)
++// the cached root hash is returned and no re-formatting is done.
++//
++// On error after the in-place truncate, the helper restores the original blob
++// size and removes any stale .dmverity sidecar — leaving the layer in the
++// pre-call state so the caller can clean up the bare blob via its normal
++// orphan-handling path.
++//
++// blockSize must match the EROFS image's logical block size:
++//   - tar-index mode requires 512 (mkfs.erofs --tar=i uses 512-byte metadata blocks)
++//   - all other modes use 4096 (standard page size)
++func FormatLayerBlob(ctx context.Context, layerBlobPath string, blockSize uint32) (string, error) {
++	startedAt := time.Now()
++	metadataPath := MetadataPath(layerBlobPath)
++	if _, err := os.Stat(metadataPath); err == nil {
++		metadata, err := ReadMetadata(layerBlobPath)
++		if err != nil {
++			log.G(ctx).WithError(err).WithFields(log.Fields{
++				"tag":          "dmverity_format",
++				"event":        "idempotent_read_failed",
++				"path":         layerBlobPath,
++				"metadataPath": metadataPath,
++			}).Warn("dmverity_format: failed to read existing .dmverity sidecar during idempotency check")
++			return "", fmt.Errorf("failed to read existing dm-verity metadata: %w", err)
++		}
++		log.G(ctx).WithFields(log.Fields{
++			"tag":      "dmverity_format",
++			"event":    "idempotent_hit",
++			"path":     layerBlobPath,
++			"rootHash": metadata.RootHash,
++		}).Info("dmverity_format: layer already formatted (.dmverity sidecar present), returning cached root hash")
++		return metadata.RootHash, nil
++	}
++
++	fileInfo, err := os.Stat(layerBlobPath)
++	if err != nil {
++		return "", fmt.Errorf("failed to stat layer blob: %w", err)
++	}
++	originalSize := fileInfo.Size()
++
++	log.G(ctx).WithFields(log.Fields{
++		"tag":          "dmverity_format",
++		"event":        "enter",
++		"path":         layerBlobPath,
++		"originalSize": originalSize,
++		"blockSize":    blockSize,
++	}).Info("dmverity_format: ENTER FormatLayerBlob")
++
++	opts := DefaultDmverityOptions()
++	if blockSize > 0 {
++		opts.DataBlockSize = blockSize
++		opts.HashBlockSize = blockSize
++	}
++
++	dataBlocks := (originalSize + int64(opts.DataBlockSize) - 1) / int64(opts.DataBlockSize)
++	hashOffset := uint64(dataBlocks * int64(opts.DataBlockSize))
++
++	opts.HashOffset = hashOffset
++	opts.DataBlocks = uint64(dataBlocks)
++
++	hashTreeSize, err := verity.GetHashTreeSize(&verity.Params{
++		HashName:      opts.HashAlgorithm,
++		DataBlockSize: opts.DataBlockSize,
++		HashBlockSize: opts.HashBlockSize,
++		DataBlocks:    opts.DataBlocks,
++		HashType:      opts.HashType,
++	})
++	if err != nil {
++		return "", fmt.Errorf("failed to calculate hash tree size: %w", err)
++	}
++
++	superblockSize := uint64(0)
++	if !opts.NoSuperblock {
++		superblockSize = utils.AlignUp(uint64(verity.SuperblockSize), uint64(opts.HashBlockSize))
++	}
++	requiredSize := hashOffset + superblockSize + hashTreeSize
++	if err := os.Truncate(layerBlobPath, int64(requiredSize)); err != nil {
++		return "", fmt.Errorf("failed to pre-allocate space for hash tree: %w", err)
++	}
++
++	// Rollback: if we fail after the truncate, restore the original blob size
++	// and remove any partial .dmverity sidecar so the caller sees the same
++	// pre-call state (bare layer.erofs, no .dmverity). This lets the caller's
++	// orphan-handling path treat the layer uniformly.
++	formatted := false
++	defer func() {
++		if formatted {
++			return
++		}
++		log.G(ctx).WithFields(log.Fields{
++			"tag":          "dmverity_format",
++			"event":        "rollback",
++			"path":         layerBlobPath,
++			"originalSize": originalSize,
++			"elapsedMs":    time.Since(startedAt).Milliseconds(),
++		}).Warn("dmverity_format: ROLLBACK — format failed after pre-allocation; restoring blob and removing partial sidecar")
++		if terr := os.Truncate(layerBlobPath, originalSize); terr != nil {
++			log.G(ctx).WithError(terr).WithField("path", layerBlobPath).Warn("FormatLayerBlob rollback: failed to restore original blob size")
++		}
++		if rerr := os.Remove(metadataPath); rerr != nil && !os.IsNotExist(rerr) {
++			log.G(ctx).WithError(rerr).WithField("path", metadataPath).Warn("FormatLayerBlob rollback: failed to remove stale .dmverity sidecar")
++		}
++	}()
++
++	if opts.UUID == "" {
++		opts.UUID = uuid.New().String()
++	}
++
++	rootHash, err := Format(layerBlobPath, layerBlobPath, opts)
++	if err != nil {
++		return "", fmt.Errorf("failed to format dm-verity: %w", err)
++	}
++
++	metadata := DmverityMetadata{
++		RootHash:   rootHash,
++		HashOffset: hashOffset,
++	}
++	metadataBytes, err := json.MarshalIndent(metadata, "", "  ")
++	if err != nil {
++		return "", fmt.Errorf("failed to marshal dm-verity metadata: %w", err)
++	}
++	if err := os.WriteFile(metadataPath, metadataBytes, 0644); err != nil {
++		return "", fmt.Errorf("failed to write dm-verity metadata: %w", err)
++	}
++
++	formatted = true
++
++	finalInfo, statErr := os.Stat(layerBlobPath)
++	finalSize := int64(-1)
++	if statErr == nil {
++		finalSize = finalInfo.Size()
++	}
++
++	log.G(ctx).WithFields(log.Fields{
++		"tag":          "dmverity_format",
++		"event":        "success",
++		"path":         layerBlobPath,
++		"originalSize": originalSize,
++		"finalSize":    finalSize,
++		"blockSize":    opts.DataBlockSize,
++		"hashOffset":   hashOffset,
++		"rootHash":     rootHash,
++		"elapsedMs":    time.Since(startedAt).Milliseconds(),
++	}).Info("dmverity_format: SUCCESS — layer formatted, .dmverity sidecar written")
++
++	return rootHash, nil
++}
++
+ // VerifyDevice ensures an existing dm-verity device matches the expected metadata and is healthy.
+ func VerifyDevice(name string, rootHash string) error {
+ 	rootDigest, err := utils.ParseRootHash(rootHash)
+diff --git a/plugins/diff/erofs/differ.go b/plugins/diff/erofs/differ.go
+index 80009f3..f0202e2 100644
+--- a/plugins/diff/erofs/differ.go
++++ b/plugins/diff/erofs/differ.go
+@@ -57,6 +57,9 @@ type erofsDiff struct {
+ 	enableTarIndex bool
+ 	// enableDmverity enables formatting layers with dm-verity after creation
+ 	enableDmverity bool
++	// requireSignatures requires dm-verity signatures to be present on layers
++	// when dm-verity is enabled. If true, Apply will fail if a layer lacks a signature.
++	requireSignatures bool
+ }
+ 
+ // DifferOpt is an option for configuring the erofs differ
+@@ -83,6 +86,14 @@ func WithDmverity() DifferOpt {
+ 	}
+ }
+ 
++// WithRequireSignatures requires dm-verity signatures to be present on layers.
++// This option only has effect when dm-verity is enabled.
++func WithRequireSignatures() DifferOpt {
++	return func(d *erofsDiff) {
++		d.requireSignatures = true
++	}
++}
++
+ // NewErofsDiffer creates a new EROFS differ with the provided options
+ func NewErofsDiffer(store content.Store, opts ...DifferOpt) differ {
+ 	d := &erofsDiff{
+@@ -210,14 +221,25 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 
+ 	// Format with dm-verity if enabled
+ 	if s.enableDmverity {
+-		if err := s.formatDmverityLayer(ctx, layerBlobPath); err != nil {
++		rootHash, err := s.formatDmverityLayer(ctx, layerBlobPath)
++		if err != nil {
+ 			return emptyDesc, fmt.Errorf("failed to format dm-verity layer: %w", err)
+ 		}
+ 
+-		// Write signature file if signature annotation is present on the layer descriptor
+-		// TODO: Check if the roothash calculated on the node matches that from the registry
+-		// TODO: Need a config to check for signature presence and fail if missing here
+-		if sig := desc.Annotations[snpkg.TargetLayerSignatureLabel]; sig != "" {
++		if s.requireSignatures {
++			sig := desc.Annotations[snpkg.TargetLayerSignatureLabel]
++			if sig == "" {
++				return emptyDesc, fmt.Errorf("dm-verity signature required but not present on layer %s", desc.Digest)
++			}
++
++			expectedRootHash := desc.Annotations[snpkg.TargetLayerRootHashLabel]
++			if expectedRootHash == "" {
++				return emptyDesc, fmt.Errorf("dm-verity signature present but missing expected root hash for layer %s", desc.Digest)
++			}
++			if rootHash != expectedRootHash {
++				return emptyDesc, fmt.Errorf("dm-verity root hash mismatch for layer %s: computed %q, expected %q", desc.Digest, rootHash, expectedRootHash)
++			}
++
+ 			if err := dmverity.WriteSignature(layerBlobPath, sig); err != nil {
+ 				return emptyDesc, err
+ 			}
+diff --git a/plugins/diff/erofs/dmverity_linux.go b/plugins/diff/erofs/dmverity_linux.go
+index f59c309..813f725 100644
+--- a/plugins/diff/erofs/dmverity_linux.go
++++ b/plugins/diff/erofs/dmverity_linux.go
+@@ -20,117 +20,27 @@ package erofs
+ 
+ import (
+ 	"context"
+-	"encoding/json"
+-	"fmt"
+-	"os"
+-
+-	"github.com/containerd/go-dmverity/pkg/utils"
+-	"github.com/containerd/go-dmverity/pkg/verity"
+-	"github.com/containerd/log"
+-	"github.com/google/uuid"
+ 
+ 	"github.com/containerd/containerd/v2/internal/dmverity"
++	"github.com/containerd/log"
+ )
+ 
+-// getDmverityOptions returns dm-verity options configured for this differ instance.
+-// The block size is determined by the differ's mode:
+-// - Tar index mode requires 512-byte blocks to match EROFS and dm-verity constraints
+-// - Regular mode uses 4096-byte blocks (standard page size)
+-func (s *erofsDiff) getDmverityOptions() *dmverity.DmverityOptions {
+-	opts := dmverity.DefaultDmverityOptions()
+-
+-	// Tar index mode requires 512-byte blocks because:
+-	// 1. EROFS tar index mode uses 512-byte metadata blocks (mkfs.erofs --tar=i)
+-	// 2. dm-verity sets the virtual block device logical_block_size to match the data block size
+-	// 3. EROFS requires its block size (512) to be >= the underlying block device's logical_block_size
+-	// Using 4096-byte dm-verity blocks would set logical_block_size=4096, causing EROFS sb_set_blocksize(512) to fail
++// formatDmverityLayer delegates to the shared internal/dmverity.FormatLayerBlob
++// helper. Block size is determined by differ mode:
++//   - Tar index mode requires 512-byte blocks because mkfs.erofs --tar=i uses
++//     512-byte metadata blocks and dm-verity logical_block_size must match.
++//   - Regular tar conversion mode uses the standard 4096-byte page size.
++func (s *erofsDiff) formatDmverityLayer(ctx context.Context, layerBlobPath string) (string, error) {
++	blockSize := uint32(4096)
+ 	if s.enableTarIndex {
+-		opts.DataBlockSize = 512
+-		opts.HashBlockSize = 512
+-	}
+-	// Regular mode uses the default 4096-byte blocks (standard page size)
+-
+-	return opts
+-}
+-
+-// formatDmverityLayer formats an EROFS layer with dm-verity hash tree
+-func (s *erofsDiff) formatDmverityLayer(ctx context.Context, layerBlobPath string) error {
+-	metadataPath := dmverity.MetadataPath(layerBlobPath)
+-	if _, err := os.Stat(metadataPath); err == nil {
+-		log.G(ctx).WithField("path", layerBlobPath).Debug("Layer already formatted with dm-verity, skipping")
+-		return nil
+-	}
+-
+-	fileInfo, err := os.Stat(layerBlobPath)
+-	if err != nil {
+-		return fmt.Errorf("failed to stat layer blob: %w", err)
+-	}
+-
+-	opts := s.getDmverityOptions()
+-	blockSize := int64(opts.DataBlockSize)
+-	fileSize := fileInfo.Size()
+-
+-	// dm-verity requires the hash area to start at a block-aligned offset
+-	dataBlocks := (fileSize + blockSize - 1) / blockSize
+-	hashOffset := uint64(dataBlocks * blockSize)
+-
+-	opts.HashOffset = hashOffset
+-	opts.DataBlocks = uint64(dataBlocks)
+-
+-	hashTreeSize, err := verity.GetHashTreeSize(&verity.Params{
+-		HashName:      opts.HashAlgorithm,
+-		DataBlockSize: opts.DataBlockSize,
+-		HashBlockSize: opts.HashBlockSize,
+-		DataBlocks:    opts.DataBlocks,
+-		HashType:      opts.HashType,
+-	})
+-	if err != nil {
+-		return fmt.Errorf("failed to calculate hash tree size: %w", err)
+-	}
+-
+-	// In superblock mode, Format() stores the superblock at hashOffset and the hash tree after it
+-	superblockSize := uint64(0)
+-	if !opts.NoSuperblock {
+-		superblockSize = utils.AlignUp(uint64(verity.SuperblockSize), uint64(opts.HashBlockSize))
+-	}
+-	requiredSize := hashOffset + superblockSize + hashTreeSize
+-	if err := os.Truncate(layerBlobPath, int64(requiredSize)); err != nil {
+-		return fmt.Errorf("failed to pre-allocate space for hash tree: %w", err)
+-	}
+-
+-	// Generate a random UUID for the superblock (required for superblock mode)
+-	// The library's ReadSuperblock() validates that UUID is not nil/empty
+-	if opts.UUID == "" {
+-		opts.UUID = uuid.New().String()
+-	}
+-
+-	rootHash, err := dmverity.Format(layerBlobPath, layerBlobPath, opts)
+-	if err != nil {
+-		return fmt.Errorf("failed to format dm-verity: %w", err)
+-	}
+-
+-	// Important: Save the ORIGINAL hashOffset (where superblock is located),
+-	// not result.HashOffset (which points to where the hash tree starts after the superblock).
+-	// Open() needs the superblock location to read device parameters.
+-	metadata := dmverity.DmverityMetadata{
+-		RootHash:   rootHash,
+-		HashOffset: hashOffset,
+-	}
+-	metadataBytes, err := json.MarshalIndent(metadata, "", "  ")
+-	if err != nil {
+-		return fmt.Errorf("failed to marshal dm-verity metadata: %w", err)
++		blockSize = 512
+ 	}
+-	if err := os.WriteFile(metadataPath, metadataBytes, 0644); err != nil {
+-		return fmt.Errorf("failed to write dm-verity metadata: %w", err)
+-	}
+-
+ 	log.G(ctx).WithFields(log.Fields{
+-		"path":       layerBlobPath,
+-		"size":       fileSize,
+-		"blockSize":  opts.DataBlockSize,
+-		"hashOffset": hashOffset,
+-		"rootHash":   rootHash,
+-	}).Info("Successfully formatted dm-verity layer")
+-
+-	return nil
++		"tag":            "dmverity_format",
++		"event":          "differ_invoke",
++		"path":           layerBlobPath,
++		"blockSize":      blockSize,
++		"enableTarIndex": s.enableTarIndex,
++	}).Info("dmverity_format: differ.Apply invoking FormatLayerBlob (tar-stream path)")
++	return dmverity.FormatLayerBlob(ctx, layerBlobPath, blockSize)
+ }
+diff --git a/plugins/diff/erofs/dmverity_linux_test.go b/plugins/diff/erofs/dmverity_linux_test.go
+index d42ff29..def2573 100644
+--- a/plugins/diff/erofs/dmverity_linux_test.go
++++ b/plugins/diff/erofs/dmverity_linux_test.go
+@@ -31,19 +31,6 @@ import (
+ 	"github.com/containerd/containerd/v2/internal/dmverity"
+ )
+ 
+-// TestGetDmverityOptions tests the block size configuration
+-func TestGetDmverityOptions(t *testing.T) {
+-	// tar-index mode uses 512-byte blocks
+-	opts := (&erofsDiff{enableTarIndex: true, enableDmverity: true}).getDmverityOptions()
+-	assert.Equal(t, uint32(512), opts.DataBlockSize)
+-	assert.Equal(t, uint32(512), opts.HashBlockSize)
+-
+-	// regular mode uses 4096-byte blocks
+-	opts = (&erofsDiff{enableTarIndex: false, enableDmverity: true}).getDmverityOptions()
+-	assert.Equal(t, uint32(4096), opts.DataBlockSize)
+-	assert.Equal(t, uint32(4096), opts.HashBlockSize)
+-}
+-
+ // TestFormatDmverityLayer tests the layer formatting logic
+ func TestFormatDmverityLayer(t *testing.T) {
+ 	supported, err := dmverity.IsSupported()
+@@ -59,11 +46,13 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 		layerPath := filepath.Join(tmpDir, "layer.erofs")
+ 		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
+ 
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
++		rootHash, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++		assert.NotEmpty(t, rootHash)
+ 
+ 		metadata, err := dmverity.ReadMetadata(layerPath)
+ 		require.NoError(t, err)
+-		assert.NotEmpty(t, metadata.RootHash)
++		assert.Equal(t, rootHash, metadata.RootHash)
+ 		assert.Greater(t, metadata.HashOffset, uint64(0))
+ 		assert.Equal(t, uint64(8192), metadata.HashOffset)
+ 	})
+@@ -74,13 +63,12 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
+ 
+ 		// First format
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
+-		metadata1, _ := dmverity.ReadMetadata(layerPath)
+-		origHash := metadata1.RootHash
++		rootHash1, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
+ 
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
+-		metadata2, _ := dmverity.ReadMetadata(layerPath)
+-		assert.Equal(t, origHash, metadata2.RootHash)
++		rootHash2, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++		assert.Equal(t, rootHash1, rootHash2)
+ 	})
+ 
+ 	t.Run("uses 4096-byte blocks in regular mode", func(t *testing.T) {
+@@ -88,7 +76,8 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 		layerPath := filepath.Join(tmpDir, "layer-4k.erofs")
+ 		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
+ 
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
+ 
+ 		metadata, _ := dmverity.ReadMetadata(layerPath)
+ 		assert.Equal(t, uint64(8192), metadata.HashOffset)
+@@ -99,7 +88,8 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 		layerPath := filepath.Join(tmpDir, "layer-512.erofs")
+ 		require.NoError(t, os.WriteFile(layerPath, make([]byte, 1024), 0644))
+ 
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
+ 
+ 		metadata, _ := dmverity.ReadMetadata(layerPath)
+ 		assert.Equal(t, uint64(1024), metadata.HashOffset)
+@@ -107,7 +97,7 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 
+ 	t.Run("returns error for non-existent file", func(t *testing.T) {
+ 		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
+-		err := d.formatDmverityLayer(ctx, filepath.Join(tmpDir, "missing.erofs"))
++		_, err := d.formatDmverityLayer(ctx, filepath.Join(tmpDir, "missing.erofs"))
+ 		require.Error(t, err)
+ 		assert.Contains(t, err.Error(), "failed to stat layer blob")
+ 	})
+@@ -118,7 +108,8 @@ func TestFormatDmverityLayer(t *testing.T) {
+ 		// Write 5000 bytes (not aligned to 4096), should round up to 8192
+ 		require.NoError(t, os.WriteFile(layerPath, make([]byte, 5000), 0644))
+ 
+-		require.NoError(t, d.formatDmverityLayer(ctx, layerPath))
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
+ 
+ 		metadata, err := dmverity.ReadMetadata(layerPath)
+ 		require.NoError(t, err)
+diff --git a/plugins/diff/erofs/dmverity_other.go b/plugins/diff/erofs/dmverity_other.go
+index 909e13d..c3ea681 100644
+--- a/plugins/diff/erofs/dmverity_other.go
++++ b/plugins/diff/erofs/dmverity_other.go
+@@ -23,6 +23,6 @@ import (
+ 	"fmt"
+ )
+ 
+-func (s *erofsDiff) formatDmverityLayer(_ context.Context, _ string) error {
+-	return fmt.Errorf("dm-verity formatting is only supported on Linux systems")
++func (s *erofsDiff) formatDmverityLayer(_ context.Context, _ string) (string, error) {
++	return "", fmt.Errorf("dm-verity formatting is only supported on Linux systems")
+ }
+diff --git a/plugins/diff/erofs/plugin/plugin.go b/plugins/diff/erofs/plugin/plugin.go
+index 0a25359..c8baa12 100644
+--- a/plugins/diff/erofs/plugin/plugin.go
++++ b/plugins/diff/erofs/plugin/plugin.go
+@@ -42,6 +42,11 @@ type Config struct {
+ 	// EnableDmverity enables dm-verity formatting for EROFS layers
+ 	// Linux only
+ 	EnableDmverity bool `toml:"enable_dmverity"`
++
++	// RequireSignatures requires dm-verity signatures to be present on all layers.
++	// When enabled, layer application will fail if a signature is not present.
++	// Only has effect when EnableDmverity is true.
++	RequireSignatures bool `toml:"require_signatures"`
+ }
+ 
+ func init() {
+@@ -91,6 +96,10 @@ func init() {
+ 					return nil, fmt.Errorf("dm-verity is not supported on this system (dm_verity module not loaded): %w", plugin.ErrSkipPlugin)
+ 				}
+ 				opts = append(opts, erofs.WithDmverity())
++
++				if config.RequireSignatures {
++					opts = append(opts, erofs.WithRequireSignatures())
++				}
+ 			}
+ 
+ 			return erofs.NewErofsDiffer(cs, opts...), nil
+diff --git a/plugins/snapshots/erofs/erofs.go b/plugins/snapshots/erofs/erofs.go
+index 45068ed..89e87d7 100644
+--- a/plugins/snapshots/erofs/erofs.go
++++ b/plugins/snapshots/erofs/erofs.go
+@@ -291,6 +291,22 @@ func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
+ 
+ 	// Validate dmverityMode policy: mode "on" requires .dmverity metadata to exist
+ 	if s.dmverityMode == "on" && !metadataExists {
++		blobSize := int64(-1)
++		blobMtime := "unknown"
++		if bi, berr := os.Stat(layerBlob); berr == nil {
++			blobSize = bi.Size()
++			blobMtime = bi.ModTime().UTC().Format(time.RFC3339Nano)
++		}
++		log.L.WithFields(log.Fields{
++			"tag":            "dmverity_format",
++			"event":          "policy_reject",
++			"layerBlob":      layerBlob,
++			"metadataPath":   metadataPath,
++			"metadataExists": metadataExists,
++			"mode":           s.dmverityMode,
++			"blobSize":       blobSize,
++			"blobMtime":      blobMtime,
++		}).Error("dmverity_format: REJECTING mount — mode=on but .dmverity sidecar missing for layer blob")
+ 		return "", fmt.Errorf("dm-verity mode is 'on' but .dmverity metadata not found for layer %s", layerBlob)
+ 	}
+ 
+@@ -586,6 +602,13 @@ func (s *snapshotter) View(ctx context.Context, key, parent string, opts ...snap
+ }
+ 
+ func (s *snapshotter) commitBlock(ctx context.Context, layerBlob string, id string) error {
++	log.G(ctx).WithFields(log.Fields{
++		"tag":       "dmverity_format",
++		"event":     "commitblock_enter",
++		"snap":      id,
++		"layerBlob": layerBlob,
++		"upper":     s.upperPath(id),
++	}).Info("dmverity_format: commitBlock ENTER (walking-differ path — building layer.erofs from upperdir)")
+ 	layer := s.writablePath(id)
+ 	if _, err := os.Stat(layer); err != nil {
+ 		if os.IsNotExist(err) {
+@@ -685,12 +708,86 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 	// the EROFS differ (possibly the walking differ), convert the upperdir instead.
+ 	layerBlob = s.layerBlobPath(id)
+ 	if _, err := os.Stat(layerBlob); err != nil {
++		log.G(ctx).WithFields(log.Fields{
++			"tag":       "dmverity_format",
++			"event":     "commit_format_path",
++			"snap":      id,
++			"layerBlob": layerBlob,
++			"mode":      s.dmverityMode,
++		}).Info("dmverity_format: Commit taking commitBlock+format path (layer.erofs missing — differ did not write it)")
++
+ 		if cerr := s.commitBlock(ctx, layerBlob, id); cerr != nil {
+ 			if errdefs.IsNotImplemented(cerr) {
+ 				return err
+ 			}
+ 			return cerr
+ 		}
++
++		blobInfo, statErr := os.Stat(layerBlob)
++		blobSize := int64(-1)
++		if statErr == nil {
++			blobSize = blobInfo.Size()
++		}
++		log.G(ctx).WithFields(log.Fields{
++			"tag":       "dmverity_format",
++			"event":     "commitblock_done",
++			"snap":      id,
++			"layerBlob": layerBlob,
++			"blobSize":  blobSize,
++			"mode":      s.dmverityMode,
++		}).Info("dmverity_format: commitBlock produced layer.erofs; entering dm-verity format switch")
++
++		// Format the freshly-created layer.erofs with dm-verity so the
++		// snapshotter-built blob carries the same .dmverity sidecar that
++		// the EROFS differ produces. Without this the snapshotter mount
++		// path rejects the layer at applyDmverityPolicy time (orphan
++		// layer.erofs). Block size 4096 — commitBlock never produces a
++		// tar-index layer.
++		switch s.dmverityMode {
++		case "off":
++			log.G(ctx).WithFields(log.Fields{
++				"tag":  "dmverity_format",
++				"event": "commit_skip_off",
++				"snap": id,
++			}).Info("dmverity_format: dmverityMode=off — skipping format for commitBlock-built layer")
++		case "auto":
++			if _, ferr := dmverity.FormatLayerBlob(ctx, layerBlob, 4096); ferr != nil {
++				log.G(ctx).WithError(ferr).WithFields(log.Fields{
++					"tag":       "dmverity_format",
++					"event":     "commit_format_failed_auto",
++					"snap":      id,
++					"layerBlob": layerBlob,
++				}).Warn("dmverity_format: format failed under mode=auto, continuing without sidecar (orphan layer)")
++			}
++		case "on":
++			if _, ferr := dmverity.FormatLayerBlob(ctx, layerBlob, 4096); ferr != nil {
++				// FormatLayerBlob's internal rollback has already restored
++				// the original blob size and removed any partial sidecar,
++				// so the orphan-guard below will treat this uniformly.
++				log.G(ctx).WithError(ferr).WithFields(log.Fields{
++					"tag":       "dmverity_format",
++					"event":     "commit_format_failed_on",
++					"snap":      id,
++					"layerBlob": layerBlob,
++				}).Error("dmverity_format: format failed under mode=on — returning error to caller")
++				return fmt.Errorf("failed to format dm-verity for snapshotter-built layer: %w", ferr)
++			}
++		default:
++			log.G(ctx).WithFields(log.Fields{
++				"tag":  "dmverity_format",
++				"event": "commit_unknown_mode",
++				"snap": id,
++				"mode": s.dmverityMode,
++			}).Warn("dmverity_format: unknown dmverityMode — skipping format")
++		}
++	} else {
++		log.G(ctx).WithFields(log.Fields{
++			"tag":       "dmverity_format",
++			"event":     "commit_differ_path",
++			"snap":      id,
++			"layerBlob": layerBlob,
++			"mode":      s.dmverityMode,
++		}).Debug("dmverity_format: Commit found layer.erofs already present (differ-Apply path) — no commitBlock format")
+ 	}
+ 
+ 	// Enable fsverity on the EROFS layer if configured
+@@ -707,7 +804,10 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 		}
+ 	}
+ 
+-	// Note: dm-verity formatting is handled by the EROFS differ, not here
++	// dm-verity formatting is done above — by the differ when layer.erofs
++	// came from a tar stream, or in the commitBlock branch above when we
++	// built layer.erofs from the overlay upperdir. The 3010 orphan-guard
++	// below catches pre-existing orphans from older snapshotter versions.
+ 
+ 	return s.ms.WithTransaction(ctx, true, func(ctx context.Context) error {
+ 		if _, err := os.Stat(layerBlob); err != nil {
+-- 
+2.43.0
+

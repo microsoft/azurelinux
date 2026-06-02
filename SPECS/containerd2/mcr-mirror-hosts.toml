@@ -1,0 +1,36 @@
+# /etc/containerd/certs.d/mcr.microsoft.com/hosts.toml
+# Installed by the containerd2 RPM (>=2.0.1-3012).
+#
+# Transparently redirects mcr.microsoft.com pulls (manifests, blobs, AND the
+# OCI referrers API) to notaryaksegistry.azurecr.io, where the dm-verity
+# notation referrers live. Kubelet/CRI image refs don't change — any
+# "mcr.microsoft.com/x/y:tag" still resolves transparently.
+#
+# Why this is in the RPM (not in AgentBaker install.sh):
+#   The dm-verity-aware config + erofs differ ship in this same RPM; the
+#   mirror they depend on is part of the same atomic unit. AKS CSE only
+#   writes this file when BootstrapProfile.ContainerRegistryID is set, and
+#   that field is rejected on default-VNET clusters
+#   ("BYO container registry is only allowed when VNET is custom"), so
+#   without this RPM-shipped file most prototype clusters have no mirror.
+#
+# Why capabilities includes "referrers":
+#   Without it containerd routes blob+manifest pulls via the mirror but
+#   falls back to MCR for OCI referrers — where the dm-verity signature
+#   lives. MCR has no notation referrers, so the layer rejection fires at
+#   unpack and looks spurious (blob from mirror, but rejected as unsigned).
+#
+# Why override_path = true and top-level server:
+#   Forces strict routing to notaryaksegistry. Failure-closed — anything
+#   not present in the mirror is an intentional reject (the prototype's
+#   whole point is to reject unsigned images).
+#
+# Auth: notaryaksegistry lives in EdgeOS_Mariner_Platform_AKS_test (same
+# sub as aks-rp e2e clusters). Kubelet's azure-cred-provider issues an ACR
+# token using the cluster kubelet identity, which has AcrPull on this
+# registry. No cross-sub RBAC plumbing.
+server = "https://notaryaksegistry.azurecr.io"
+
+[host."https://notaryaksegistry.azurecr.io"]
+  capabilities = ["pull", "resolve", "referrers"]
+  override_path = true

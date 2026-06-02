@@ -1,26 +1,67 @@
 %global debug_package %{nil}
 %define upstream_name containerd
-%define commit_hash c74fd8780002eb26bd5940ae339d690d891221c2
+
+# Source pin: upstream containerd/containerd at commit cb15e731a (Jan 14 2026
+# main, descendant of v2.2.0 tag). Chosen as the true branch point of the
+# fork dadelan/snapshotter-dmverity-format so that all dm-verity fork
+# commits apply as patches on top with ZERO conflicts. See PATCHES.md.
+%global github_owner containerd
+%global github_repo  containerd
+%global branch_name  cb15e731a101d3cfdb94e4c905e43318929104aa
+# GitHub commit archives extract to: <repo>-<full-sha>
+%global extracted_dir %{github_repo}-%{branch_name}
+
+%define commit_hash cb15e731a101d3cfdb94e4c905e43318929104aa
 
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
-Version: 2.1.6
-Release: 2%{?dist}
+# Version pinned to v2.2.0 because cb15e731a is a post-v2.2.0 mainline commit
+# (descendant of the v2.2.0 tag, predecessor of v2.3.0-beta.0). Vanilla v2.2.0
+# is the closest stable upstream tag in this commit's ancestry; the actual
+# tree content is "v2.2.0 + 238 upstream commits + 5 patches".
+Version: 2.2.0
+# Release range 4xxx distinguishes this patch-based ADO-friendly build from
+# the prior steamboat 3xxx fork-tarball builds. The .cb15e731a tag carries
+# the source commit so 'rpm -qi containerd2' shows what's installed.
+Release: 4000.cb15e731a%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
 Vendor: Microsoft Corporation
 Distribution: Azure Linux
 
-Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
+# GitHub serves an immutable archive for any commit SHA; saved locally as
+# containerd-2.2.0.tar.gz (signature pinned in containerd2.signatures.json).
+Source0: https://github.com/%{github_owner}/%{github_repo}/archive/%{branch_name}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
-Source2: containerd.toml
+# dm-verity-aware containerd config (enables erofs snapshotter + differ).
+Source2: containerd-config-dmverity.toml
+# systemd-modules-load.d entry: erofs + dm_verity must be loaded before
+# containerd.service starts (differ asserts dm_verity at init).
+Source3: aks-dmverity-modules.conf
+# containerd.service.d drop-in: ExecStartPre re-overlays Source2 onto
+# /etc/containerd/config.toml on every start, so AKS CSE's bootstrap-time
+# clobber gets undone before containerd reads the config.
+Source4: containerd-dmverity-overlay.conf
+# Registry mirror: mcr.microsoft.com -> notaryaksegistry.azurecr.io, where
+# the dm-verity notation referrers live.
+Source5: mcr-mirror-hosts.toml
 
-Patch0:	multi-snapshotters-support.patch
-Patch1:	tardev-support.patch
-Patch2:	fix-credential-leak-in-cri-errors.patch
-Patch3: CVE-2026-35469.patch
-Patch4: CVE-2026-34986.patch
+# ============================================================================
+# Patches
+# ============================================================================
+# 0001-0003: AzureLinux-baseline carry-patches (see PATCHES.md for provenance).
+# 0004-0005: dm-verity fork work, squashed for upstreaming readability. The
+#            split is "core dm-verity (format + per-layer signature verify)"
+#            then "require_signatures policy + commitBlock parity + logs".
+#            See PATCHES.md for the mapping back to the original 10 commits.
+# ============================================================================
+
+Patch0001: 0001-diff-walking-enable-mount-manager.patch
+Patch0002: 0002-tardev-support.patch
+Patch0003: 0003-fix-credential-leak-in-cri-errors.patch
+Patch0004: 0004-snapshotters-erofs-add-dm-verity-formatting-and-sign.patch
+Patch0005: 0005-snapshotters-erofs-add-require_signatures-policy-com.patch
 
 %{?systemd_requires}
 
@@ -30,6 +71,13 @@ BuildRequires: make
 BuildRequires: systemd-rpm-macros
 
 Requires: runc >= 1.2.2
+# Runtime dependencies for the dm-verity erofs differ:
+#   erofs-utils  - provides mkfs.erofs, called by the differ to convert tar
+#                  layers into erofs filesystems before verity hashing.
+#   veritysetup  - standalone on Azure Linux (NOT bundled with cryptsetup);
+#                  formats each erofs layer with a dm-verity hash tree.
+Requires: erofs-utils
+Requires: veritysetup
 
 # This package replaces the old name of containerd
 Provides: containerd = %{version}-%{release}
@@ -54,7 +102,7 @@ containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
 %prep
-%autosetup -p1 -n %{upstream_name}-%{version}
+%autosetup -p1 -n %{extracted_dir}
 
 %build
 export BUILDTAGS="-mod=vendor"
@@ -69,8 +117,21 @@ make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFI
 
 mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
-install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
 install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
+
+# dm-verity-aware containerd config at the canonical path.
+# %config(noreplace) preserves operator edits across RPM upgrades.
+install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
+
+# Stash the same config under /usr/share/containerd2 so the systemd drop-in
+# (Source4) can re-overlay it after AKS CSE rewrites /etc/containerd/config.toml
+# at bootstrap. Single source of truth - any change to Source2 propagates to
+# both standalone and AKS consumers.
+install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_datadir}/containerd2/config.toml
+
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/modules-load.d/aks-dmverity.conf
+install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
+install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
 
 %post
 %systemd_post containerd.service
@@ -92,11 +153,27 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
+%{_datadir}/containerd2/config.toml
+%{_sysconfdir}/modules-load.d/aks-dmverity.conf
+%{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
+%config(noreplace) %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
+%dir %{_sysconfdir}/containerd
+%dir %{_sysconfdir}/containerd/certs.d
+%dir %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com
+%dir %{_sysconfdir}/systemd/system/containerd.service.d
+%dir %{_datadir}/containerd2
 %dir /opt/containerd
 %dir /opt/containerd/bin
 %dir /opt/containerd/lib
 
 %changelog
+* Sun Jun 01 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.0-4000.cb15e731a
+- Bump to containerd 2.2.0 pinned at upstream commit cb15e731a.
+- Add dm-verity erofs snapshotter signing/verification (patches 0004-0005).
+- Add dm-verity-aware config + systemd drop-in + mcr-mirror hosts.toml.
+- Drop CVE-2026-34986/CVE-2026-35469/multi-snapshotters-support: do not apply
+  cleanly to 2.2.0 tree; rebase as separate work if Security still flags.
+
 * Thu Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 2.1.6-2
 - Modify CVE-2026-35469 patch for 2.1.6
 - Patch for CVE-2026-34986

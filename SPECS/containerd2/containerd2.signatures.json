@@ -1,7 +1,10 @@
 {
  "Signatures": {
+  "aks-dmverity-modules.conf": "f9f8941d6b8ff412267a4aa2cb855f1c0d3dea060560d0340794818078e414a1",
+  "containerd-2.2.0.tar.gz": "64e3d1fefb3adb5865c323c2e959356d45ced50ad62f62775d0417191c7e4d2b",
+  "containerd-config-dmverity.toml": "f7327e1abd2d70492c7ebb9e8baa13d2ba39e05ca5ff3a9eb14b528ee14dc7e5",
+  "containerd-dmverity-overlay.conf": "c0b001896653180d9793d1f6941869e5d92018cac7bbb10fc3095a1df5a4d9c2",
   "containerd.service": "a07bfcf412669b06673190b0779f48e652c9adcf1758289e849a00802804eec8",
-  "containerd.toml": "5b3821236f09b4c858e0e098bbe1400f4dbbb47d360e39d21c61858b088c2896",
-  "containerd-2.1.6.tar.gz": "9b13537e5d61b9cf301295a807751447cc7c86fd79bb37ac5630455013d353a5"
+  "mcr-mirror-hosts.toml": "456da80237b61e2af341c9ab72f7eb9cfbfd8d9c2603fa003a0f4e1a48723ca5"
  }
 }

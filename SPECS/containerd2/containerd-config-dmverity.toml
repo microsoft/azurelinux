@@ -1,0 +1,103 @@
+# /etc/containerd/config.toml — installed by the containerd2 RPM.
+#
+# Without this config the patched containerd silently falls back to overlayfs
+# and skips the erofs differ where dm-verity referrer-fetch + per-layer
+# signature verification happen.
+#
+# End-to-end flow:
+#   crictl pull
+#     -> CRI image_pull.go -> AppendSignatureHandlerWrapper
+#                              (fetches OCI referrer of type
+#                               application/vnd.cncf.notary.dmverity.v1)
+#     -> erofs differ Apply()  (mkfs.erofs + veritysetup format
+#                               + writes <layer>.dmverity + <layer>.sig)
+#     -> erofs snapshotter Mount() (verity.Open w/ signature_file
+#                                   -> kernel dm-verity verify)
+
+version = 3
+
+# CRI snapshotter selection. In containerd 2.x the CRI plugin was split
+# (images handles PullImage, runtime handles RunPodSandbox/CreateContainer);
+# both must point at erofs or pulls fall back to overlayfs OR pod creation
+# tries to mount an erofs snapshot via the overlayfs snapshotter.
+[plugins."io.containerd.cri.v1.images"]
+  snapshotter = "erofs"
+
+# Pinned sandbox image. With require_signatures=true the differ rejects any
+# layer without a notation dm-verity referrer — including kubelet's default
+# registry.k8s.io/pause. The mirrored+signed pause lives at:
+#   notaryaksegistry.azurecr.io/oss/v2/kubernetes/pause:3.6
+# notaryaksegistry is in EdgeOS_Mariner_Platform_AKS_test (same sub as aks-rp
+# e2e clusters) so kubelet MSI gets AcrPull via AKS attach — no cross-sub
+# RBAC. Mirror is fed by scripts/07-mirror-sign-aksegistry.sh.
+[plugins."io.containerd.cri.v1.images".pinned_images]
+  sandbox = "notaryaksegistry.azurecr.io/oss/v2/kubernetes/pause:3.6"
+
+# Single-path config_path WORKAROUND for upstream containerd bug:
+#   pullImageWithTransferService passes the raw config_path string to
+#   registry.WithHostDir(), which hands it to HostDirFromRoot expecting a
+#   single dir. The default config_path is the colon-separated list
+#   "/etc/containerd/certs.d:/etc/docker/certs.d", so the os.Stat lookup
+#   never finds <host>, hosts.toml is never loaded, and all requests
+#   (including OCI referrers) fall back to the implicit MCR endpoint —
+#   silently breaking dm-verity signature fetch.
+# The local-pull code path splits correctly via filepath.SplitList; only
+# the transfer service path is buggy, and use_local_image_pull=false is
+# the 2.x default, so every CRI pull hits the bug. Setting a single path
+# bypasses it.
+# TODO upstream: split + multi-path HostDir in pullImageWithTransferService,
+# or accept a colon-separated list in core/transfer/registry/registry.go.
+[plugins."io.containerd.cri.v1.images".registry]
+  config_path = "/etc/containerd/certs.d"
+
+[plugins."io.containerd.cri.v1.runtime"]
+  snapshotter = "erofs"
+
+# Transfer service unpack whitelist. Defaults exclude erofs, so without this
+# entry every transfer-service pull (the CRI default in 2.x) logs "Unpack
+# configuration not supported, skipping" and the erofs differ never runs.
+[[plugins."io.containerd.transfer.v1.local".unpack_config]]
+  platform = "linux/amd64"
+  snapshotter = "erofs"
+  differ = "erofs"
+
+# erofs snapshotter: "on" is hard enforcement — refuses to mount any layer
+# without a .dmverity sidecar. Set to "auto" to mount unsigned layers as
+# plain erofs and only verify when a signature referrer is present.
+[plugins."io.containerd.snapshotter.v1.erofs"]
+  dmverity_mode = "on"
+
+# erofs differ:
+#   enable_dmverity        — gates `veritysetup format` per layer. Without
+#                            this the differ writes plain erofs and the
+#                            snapshotter has nothing to mount with dm-verity
+#                            regardless of dmverity_mode.
+#   require_signatures     — hard enforcement at unpack. Pairs with
+#                            dmverity_mode="on" to reject layers missing a
+#                            notation referrer at both unpack and mount.
+#                            Cluster only comes up if every image kubelet
+#                            pulls has been mirrored + signed (see
+#                            scripts/05-mirror-sign-tier1.sh).
+#   enable_tar_index +
+#   mkfs_options           — MUST match the signer's mkfs.erofs invocation
+#                            exactly. If the on-disk bytes differ, the
+#                            runtime root hash won't match the signed root
+#                            hash. Signer reference (don't edit one side
+#                            without the other):
+#                              notation/internal/erofs/converter.go
+#                                buildEROFSImage()
+#                              mkfs.erofs --tar=i -T 0 --mkfs-time \
+#                                -U c1b9d5a2-f162-11cf-9ece-0020afc76f16 \
+#                                --aufs --quiet
+[plugins."io.containerd.differ.v1.erofs"]
+  enable_dmverity = true
+  enable_tar_index = true
+  require_signatures = true
+  mkfs_options = ["--sort=none", "-T", "0", "--mkfs-time", "-Uc1b9d5a2-f162-11cf-9ece-0020afc76f16"]
+
+# Debug log level so the patched snapshotter/differ DMVERITY_TRIAGE Warn
+# lines land alongside the rest of the pull pipeline (mkfs.erofs / veritysetup
+# exec, snapshotter Prepare/Commit). Drop to "info" for production.
+[debug]
+  level = "debug"
+  format = "text"
