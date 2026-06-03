@@ -109,7 +109,7 @@ fi
 * Sat May 30 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.2.4-2
 - Resolve merge from fasttrack, bring patches for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 forward to 2.2.4 version of containerd2.
 
-* Thu May 28 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
+* Fri May 29 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
 - Upgrade to 2.2.4
 - Pulls in CVE-2026-46680 fix (PR #13448 / 0a8f65bef)
 - Remove CVE-2026-34986.patch (in v2.2.4: go-jose/v4 v4.1.4, PR #13292 / 4413816ce)
@@ -120,10 +120,10 @@ fi
 - Add fix-TestCgroupNamespace-cgroupv1.patch (PR #13240; allows %check on cgroup-v1 build hosts)
 - Regenerate multi-snapshotters-support.patch against v2.2.4 (upstream absorbed runtimeHandler plumbing in v2.2.3)
 
-* Wed May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-5
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-5
 - Patch for CVE-2026-33814
 
-* Mon May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
+* Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
 - Patch for CVE-2026-39882
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
