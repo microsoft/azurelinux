@@ -1,35 +1,18 @@
 Summary:        The GnuTLS Transport Layer Security Library
 Name:           gnutls
-Version:        3.8.3
-Release:        11%{?dist}
+Version:        3.8.13
+Release:        1%{?dist}
 License:        GPLv3+ AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://www.gnutls.org
 Source0:        https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/%{name}-%{version}.tar.xz
-# Patch taken from 3.8.4 release
-Patch1:         CVE-2024-28834.patch
-# Patch taken from 3.8.4 release
-Patch2:         CVE-2024-28835.patch
-Patch3:         CVE-2024-12133.patch
-Patch4:         CVE-2024-12243.patch
-Patch5:         CVE-2025-32990.patch
-Patch6:         CVE-2025-32989.patch
-Patch7:         CVE-2025-32988.patch
-Patch8:         CVE-2025-6395.patch
-Patch9:         CVE-2025-13151.patch
-Patch10:        CVE-2025-9820.patch
-Patch11:        CVE-2026-33845.patch
-Patch12:        CVE-2026-33846.patch
-Patch13:        CVE-2026-3832.patch
-Patch14:        CVE-2026-42010.patch
-Patch15:        CVE-2026-42009.patch
-
+Patch0:         CVE-2025-13151.patch
 BuildRequires:  autogen-libopts-devel
 BuildRequires:  gc-devel
 BuildRequires:  libtasn1-devel
-BuildRequires:  nettle-devel >= 3.7.2
+BuildRequires:  nettle-devel >= 3.10
 BuildRequires:  openssl-devel
 BuildRequires:  p11-kit-devel
 %if 0%{?with_check}
@@ -40,7 +23,7 @@ Requires:       autogen-libopts
 Requires:       gc
 Requires:       gmp
 Requires:       libtasn1
-Requires:       nettle >= 3.7.2
+Requires:       nettle >= 3.10
 Requires:       openssl
 Provides:       %{name}-utils = %{version}-%{release}
 Provides:       %{name}-c++ = %{version}-%{release}
@@ -82,16 +65,17 @@ SYSTEM=NONE:!VERS-SSL3.0:!VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2:+AES-128-CBC:+RS
 EOF
 
 %check
-# Disable test-ciphers-openssl.sh test, which relies on ciphers our openssl.spec has disabled.
-#     Observed error: "cipher_test:50: EVP_get_cipherbyname failed for chacha20-poly1305"
-sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
-%make_build check
+%if 0%{?with_check}
+# Skip test that requires chacha20-poly1305 (disabled in our openssl)
+echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
+%make_build check GNUTLS_SYSTEM_PRIORITY_FILE=/dev/null || { cat tests/test-suite.log tests/cert-tests/test-suite.log tests/slow/test-suite.log src/gl/tests/test-suite.log; exit 1; }
+%endif
 
 %ldconfig_scriptlets
 
 %files
 %defattr(-,root,root)
-%license LICENSE
+%license COPYING COPYING.LESSERv2
 %{_libdir}/*.so.*
 %{_bindir}/*
 %{_mandir}/man1/*
@@ -107,6 +91,9 @@ sed -i 's/TESTS += test-ciphers-openssl.sh//'  tests/slow/Makefile.am
 %{_mandir}/man3/*
 
 %changelog
+* Tue Jun 02 2026 Ratiranjan Behera <v-ratbehera@microsoft.com>- 3.8.13-1
+- Update to version 3.8.13 to fix CVE-2026-42012 and CVE-2026-42013
+
 * Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-11
 - Patch for CVE-2026-42009
 
