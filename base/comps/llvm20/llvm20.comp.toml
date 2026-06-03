@@ -1,5 +1,8 @@
 [components.llvm20]
 
+# Uses conditional logic to determine if autorelease is on (%if 0%{?rhel} == 8). Just force autorelease mode.
+autospec = { release-calculation = "autorelease" }
+
 # Workaround: OpenMP tests fail in systemd-nspawn mock (95% failure rate)
 # due to missing /proc/sys/kernel tunables and cgroup support for threads/forks.
 build.without = ["mlir", "check"]
