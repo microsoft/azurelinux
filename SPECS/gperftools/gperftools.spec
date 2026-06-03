@@ -83,6 +83,7 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 
 %files docs
 %{_docdir}/%{name}-%{version}/*
+%exclude %{_docdir}/%{name}-%{version}/COPYING
 %{_mandir}/man1/*
 
 %files libs
@@ -90,7 +91,8 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 
 %changelog
 * Wed Jun 03 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.12-3
-- Added runtime library path in %check to fix ptests.
+- Added runtime library path in %check to fix ptests
+- Fix license warning
 
 * Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
 - Update build step from fedora and add libs package
