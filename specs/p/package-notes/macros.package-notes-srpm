@@ -16,7 +16,7 @@
 
 # These are defined for backwards compatibility. Do not use.
 %_package_note_file     1
-%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; gsub(/[^0-9]/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')
+%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; sub(/[^0-9].*/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')
 
 # Overall status: 1 if looks like we can insert the note, 0 otherwise
 # Unfortunately "clang" does not support specs files so the note insertion is disabled when using it.

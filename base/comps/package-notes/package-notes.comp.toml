@@ -21,11 +21,15 @@ replacement = "cpe:/o:microsoft:azurelinux:4.0"
 # file ships this macro as %{nil} by default; we redefine it to our export.
 # (Overriding %__spec_build_pre directly does not work — azurelinux/macros
 # loads later in the macro path and clobbers any earlier definition.)
-# Non-numeric characters are stripped per field and missing fields are
-# zero-padded so e.g.
-#   1.6.1       -> 1.6.1.0
-#   1.2.3~rc1   -> 1.2.3.0
-#   2024.05.29  -> 2024.5.29.0
+# Per field: truncate at the first non-digit (so a tilde-prerelease or git
+# suffix is stripped, not folded into the numeric value) and zero-pad
+# missing trailing fields:
+#   1.6.1                -> 1.6.1.0
+#   1.2.3~rc1            -> 1.2.3.0
+#   0.9~rc2              -> 0.9.0.0
+#   2024.05.29           -> 2024.5.29.0
+#   0^20260120.g386b5f5  -> 20260120.0.0.0    (^ truncates field 1 to "0",
+#                                              g... truncates field 2 to "")
 # The value is consumed by the linker-script template (overlay below) via
 # %:getenv(RPM_MODULE_VERSION ) and emitted as the moduleVersion key in
 # .note.package.
@@ -34,12 +38,19 @@ description = "Hook %_generate_package_note_file to export 4-part RPM_MODULE_VER
 type = "file-search-replace"
 file = "macros.package-notes-srpm"
 regex = '%_generate_package_note_file %\{nil\}'
-replacement = '''%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; gsub(/[^0-9]/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')'''
+replacement = '''%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; sub(/[^0-9].*/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')'''
 
 # Add the moduleVersion key to the JSON payload emitted into .note.package.
 # The template is a GCC spec file fragment; embedded quotes are escaped as \".
 # Adding one more %:getenv(...) requires bumping the trailing ')' count by one
 # (from 4 to 5) to keep the macro nesting balanced.
+#
+# Note: this introduces a runtime dependency on RPM_MODULE_VERSION being
+# exported during every rpmbuild phase that may invoke the linker. The
+# azurelinux-rpm-config component carries a companion overlay that adds
+# %{?_generate_package_note_file} to %__spec_install_pre — without that,
+# packages that relink during %install (e.g. avahi's libtool --relink for
+# PIE libraries) fail because GCC's %:getenv() is a strict lookup.
 [[components.package-notes.overlays]]
 description = "Add moduleVersion key (sourced from RPM_MODULE_VERSION) to the .note.package JSON payload"
 type = "file-search-replace"
