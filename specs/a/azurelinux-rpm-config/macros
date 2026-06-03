@@ -251,6 +251,7 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
     mkdir -p "`dirname "$RPM_BUILD_ROOT"`"\
     mkdir "$RPM_BUILD_ROOT"\
     %{?_auto_set_build_flags:%{set_build_flags}}\
+    %{?_generate_package_note_file}\
 %{nil}
 
 #---------------------------------------------------------------------
