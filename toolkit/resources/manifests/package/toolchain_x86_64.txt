@@ -38,10 +38,10 @@ binutils-debuginfo-2.41-13.azl3.x86_64.rpm
 binutils-devel-2.41-13.azl3.x86_64.rpm
 bison-3.8.2-1.azl3.x86_64.rpm
 bison-debuginfo-3.8.2-1.azl3.x86_64.rpm
-bzip2-1.0.8-1.azl3.x86_64.rpm
-bzip2-debuginfo-1.0.8-1.azl3.x86_64.rpm
-bzip2-devel-1.0.8-1.azl3.x86_64.rpm
-bzip2-libs-1.0.8-1.azl3.x86_64.rpm
+bzip2-1.0.8-2.azl3.x86_64.rpm
+bzip2-debuginfo-1.0.8-2.azl3.x86_64.rpm
+bzip2-devel-1.0.8-2.azl3.x86_64.rpm
+bzip2-libs-1.0.8-2.azl3.x86_64.rpm
 ca-certificates-3.0.0-14.azl3.noarch.rpm
 ca-certificates-base-3.0.0-14.azl3.noarch.rpm
 ca-certificates-legacy-3.0.0-14.azl3.noarch.rpm

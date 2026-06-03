@@ -49,9 +49,9 @@ coreutils-lang-9.4-6.azl3.x86_64.rpm
 bash-5.2.15-3.azl3.x86_64.rpm
 bash-devel-5.2.15-3.azl3.x86_64.rpm
 bash-lang-5.2.15-3.azl3.x86_64.rpm
-bzip2-1.0.8-1.azl3.x86_64.rpm
-bzip2-devel-1.0.8-1.azl3.x86_64.rpm
-bzip2-libs-1.0.8-1.azl3.x86_64.rpm
+bzip2-1.0.8-2.azl3.x86_64.rpm
+bzip2-devel-1.0.8-2.azl3.x86_64.rpm
+bzip2-libs-1.0.8-2.azl3.x86_64.rpm
 sed-4.9-2.azl3.x86_64.rpm
 sed-lang-4.9-2.azl3.x86_64.rpm
 procps-ng-4.0.4-1.azl3.x86_64.rpm
