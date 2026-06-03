@@ -1,0 +1,4 @@
+[components.python-rpmautospec]
+
+# Uses conditional logic to determine if autorelease is on (%if %{without bootstrap}). Just force autorelease mode.
+autospec = { release-calculation = "autorelease" }

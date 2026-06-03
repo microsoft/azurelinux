@@ -4188,7 +4188,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-rpds-py]
 [components.python-rpm-generators]
 [components.python-rpm-macros]
-[components.python-rpmautospec]
 [components.python-rpmautospec-core]
 [components.python-rsa]
 [components.python-rst-linker]

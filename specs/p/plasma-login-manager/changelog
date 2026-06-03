@@ -1,0 +1,43 @@
+* Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.6.0-1
+- 6.6.0
+
+* Fri Jan 30 2026 Adam Williamson <awilliam@redhat.com> - 6.5.91-2
+- Backport MR #102 to fix idle timeout issues
+
+* Tue Jan 27 2026 Steve Cossette <farchord@gmail.com> - 6.5.91-1
+- 6.5.91
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.5.90-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Steve Cossette <farchord@gmail.com> - 6.5.90-1
+- 6.5.90
+
+* Tue Jan 13 2026 farchord@gmail.com
+- 6.5.90
+
+* Mon Jan 12 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20260112.c96b194-3
+- Add WIP fix to avoid KCM breaking wallpaper settings
+
+* Mon Jan 12 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20260112.c96b194-2
+- Fix install path for main config file
+
+* Mon Jan 12 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20260112.c96b194-1
+- Bump to new git snapshot
+- Drop merged patch
+
+* Sun Jan 11 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20260111.99ded95-2
+- Add patch to read default wallpaper settings
+
+* Sun Jan 11 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20260111.99ded95-1
+- Bump to new git snapshot
+
+* Wed Dec 03 2025 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20251203.68b0122-1
+- Bump to new git snapshot
+- Add sample plasmalogin.conf
+
+* Fri Nov 28 2025 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20251128.146250b-1
+- Bump to new git snapshot
+
+* Tue Nov 25 2025 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0~git1.20251125.6972b55-1
+- Initial package (partly forked from sddm)

@@ -2,5 +2,9 @@
 version = 1
 import-commit = 'a7369abfd777dea3c675e4fe68f09abaaebbcd70'
 upstream-commit = 'a7369abfd777dea3c675e4fe68f09abaaebbcd70'
-input-fingerprint = 'sha256:a71bd1e57858a09545ee33e51e1d616d85e80dabec41596b94f9db384bb17a26'
+input-fingerprint = 'sha256:865a8a7c8c4812e2763053601057153c1890e24f2b68cb10e7892bc33e4a0332'
 resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'
+
+[bumps]
+# Migration: static Release 521 -> %autorelease (base 4) at upstream commit a7369abfd777. Bump = 518 (new release = 522, > old).
+a7369abfd777dea3c675e4fe68f09abaaebbcd70 = 518

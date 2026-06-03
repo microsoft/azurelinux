@@ -1,0 +1,24 @@
+* Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 1:6.6.0-1
+- 6.6.0
+
+* Tue Jan 27 2026 Steve Cossette <farchord@gmail.com> - 1:6.5.91-1
+- 6.5.91
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:6.5.90-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 farchord@gmail.com - 1:6.5.90-1
+- 6.5.90
+
+* Sun Dec 21 2025 Alessandro Astone <ales.astone@gmail.com> - 1:0.1.0-2
+- Requires kcm if systemsettings is installed
+
+* Tue Nov 11 2025 Alessandro Astone <ales.astone@gmail.com> - 1:0.1.0-1
+- First official release 0.1.0
+- Bump epoch
+
+* Thu Oct 02 2025 Jan Grulich <jgrulich@redhat.com> - 1.0~20250824.094649.6bf37e5-2
+- Rebuild (qt6)
+
+* Sat Feb 15 2025 Steve Cossette <farchord@gmail.com> - 1.0~20250824.094649.6bf37e5-1
+- Initial
