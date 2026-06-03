@@ -119,7 +119,11 @@ dot -Tpng -o visualized.png < graph.dot
 
 ### Dynamic versioning
 We have a versionsprocessor tool that iterates over all Specs and writes their release and versions into a macro file in a format of
-`azl_<package_name>_release`, `azl_<package_name>_version`, note that the `<package_name>` needs any `-` replaced with `_` due to macros not allowing `-`.
+`azl_<package_name>_release`, `azl_<package_name>_version` (and `azl_<package_name>_epoch` when the package's epoch is non-zero).
+The `<package_name>` is the name of the **built RPM** (not the spec file's base name), so a single spec contributes one set of macros per
+binary RPM it builds. Any character in the package name that is not allowed in an RPM macro identifier (i.e., anything outside
+`[A-Za-z0-9_]`) is replaced with `_`. For example, the `gcc-c++` subpackage of the `gcc` spec is exposed as
+`%azl_gcc_c___version` / `%azl_gcc_c___release`.
 
 ### Stage 1: Grapher
 

@@ -725,3 +725,118 @@ func TestStripEpochFromPackageFullQualifiedNameWithInvalidInput(t *testing.T) {
 		})
 	}
 }
+
+func TestRpmSpecBuiltRPMRegexBasic(t *testing.T) {
+	input := "pkg-1.2.3-1.azl3.x86_64"
+	expectedResults := []string{"pkg", "", "1.2.3", "1", "azl3", "x86_64"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}
+
+func TestRpmSpecBuiltRPMRegexUnderscore(t *testing.T) {
+	input := "pkg-1.2.3-1_2.3.azl3.x86_64"
+	expectedResults := []string{"pkg", "", "1.2.3", "1_2.3", "azl3", "x86_64"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}
+
+func TestRpmSpecBuiltRPMRegexEpoch(t *testing.T) {
+	input := "ca-certificates-1:3.0.0-14.azl3.noarch"
+	expectedResults := []string{"ca-certificates", "1", "3.0.0", "14", "azl3", "noarch"}
+
+	matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(input)
+	assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+	assert.Equal(t, expectedResults[0], matches[RpmSpecBuiltRPMRegexNameIndex])
+	assert.Equal(t, expectedResults[1], matches[RpmSpecBuiltRPMRegexEpochIndex])
+	assert.Equal(t, expectedResults[2], matches[RpmSpecBuiltRPMRegexVersionIndex])
+	assert.Equal(t, expectedResults[3], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+	assert.Equal(t, expectedResults[4], matches[RpmSpecBuiltRPMRegexDistributionIndex])
+	assert.Equal(t, expectedResults[5], matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+}
+
+// TestRpmSpecBuiltRPMRegexSpecialCharsInName confirms that package names containing
+// characters allowed by RPM (such as '+' or '.') are still parsed correctly. The
+// version and release fields anchor the split, so the name capture group can
+// safely absorb these characters.
+func TestRpmSpecBuiltRPMRegexSpecialCharsInName(t *testing.T) {
+	tests := []struct {
+		caseName     string
+		input        string
+		expectedName string
+		expectedEVR  []string // epoch, version, release
+		expectedDist string
+		expectedArch string
+	}{
+		{
+			caseName:     "name with plus signs",
+			input:        "libsigc++30-3.0.7-1.azl3.x86_64",
+			expectedName: "libsigc++30",
+			expectedEVR:  []string{"", "3.0.7", "1"},
+			expectedDist: "azl3",
+			expectedArch: "x86_64",
+		},
+		{
+			caseName:     "name with hyphens and plus signs",
+			input:        "gcc-c++-13.0.1-1.azl3.x86_64",
+			expectedName: "gcc-c++",
+			expectedEVR:  []string{"", "13.0.1", "1"},
+			expectedDist: "azl3",
+			expectedArch: "x86_64",
+		},
+		{
+			caseName:     "name with a dot",
+			input:        "rubygem-cool.io-1.2.3-4.azl3.x86_64",
+			expectedName: "rubygem-cool.io",
+			expectedEVR:  []string{"", "1.2.3", "4"},
+			expectedDist: "azl3",
+			expectedArch: "x86_64",
+		},
+		{
+			caseName:     "name containing a digit-and-dot pattern resembling a version",
+			input:        "jboss-interceptors-1.2-api-1.0.0-1.azl3.noarch",
+			expectedName: "jboss-interceptors-1.2-api",
+			expectedEVR:  []string{"", "1.0.0", "1"},
+			expectedDist: "azl3",
+			expectedArch: "noarch",
+		},
+		{
+			caseName:     "name with mixed special chars",
+			input:        "python3-prometheus_client+twisted-0.21.1-2.azl3.noarch",
+			expectedName: "python3-prometheus_client+twisted",
+			expectedEVR:  []string{"", "0.21.1", "2"},
+			expectedDist: "azl3",
+			expectedArch: "noarch",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.caseName, func(t *testing.T) {
+			matches := RpmSpecBuiltRPMRegex.FindStringSubmatch(tt.input)
+			assert.Equal(t, RpmSpecBuiltRPMRegexMatchesCount, len(matches))
+
+			assert.Equal(t, tt.expectedName, matches[RpmSpecBuiltRPMRegexNameIndex])
+			assert.Equal(t, tt.expectedEVR[0], matches[RpmSpecBuiltRPMRegexEpochIndex])
+			assert.Equal(t, tt.expectedEVR[1], matches[RpmSpecBuiltRPMRegexVersionIndex])
+			assert.Equal(t, tt.expectedEVR[2], matches[RpmSpecBuiltRPMRegexReleaseIndex])
+			assert.Equal(t, tt.expectedDist, matches[RpmSpecBuiltRPMRegexDistributionIndex])
+			assert.Equal(t, tt.expectedArch, matches[RpmSpecBuiltRPMRegexArchitectureIndex])
+		})
+	}
+}

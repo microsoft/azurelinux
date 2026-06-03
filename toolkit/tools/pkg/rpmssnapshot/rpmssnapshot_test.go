@@ -9,41 +9,15 @@ import (
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/packagerepo/repocloner"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestRegexBasic(t *testing.T) {
-	input := "pkg-1.2.3-1.azl3.x86_64"
-	expectedResults := []string{"pkg", "1.2.3-1", "azl3", "x86_64"}
-	expectedMatchNumber := 5
-
-	matches := rpmSpecBuiltRPMRegex.FindStringSubmatch(input)
-	assert.Equal(t, expectedMatchNumber, len(matches))
-
-	assert.Equal(t, expectedResults[0], matches[rpmSpecBuiltRPMRegexNameIndex])
-	assert.Equal(t, expectedResults[1], matches[rpmSpecBuiltRPMRegexVersionIndex])
-	assert.Equal(t, expectedResults[2], matches[rpmSpecBuiltRPMRegexDistributionIndex])
-	assert.Equal(t, expectedResults[3], matches[rpmSpecBuiltRPMRegexArchitectureIndex])
-}
-
-func TestRegexUnderscore(t *testing.T) {
-	input := "pkg-1.2.3-1_2.3.azl3.x86_64"
-	expectedResults := []string{"pkg", "1.2.3-1_2.3", "azl3", "x86_64"}
-	expectedMatchNumber := 5
-
-	matches := rpmSpecBuiltRPMRegex.FindStringSubmatch(input)
-	assert.Equal(t, expectedMatchNumber, len(matches))
-
-	assert.Equal(t, expectedResults[0], matches[rpmSpecBuiltRPMRegexNameIndex])
-	assert.Equal(t, expectedResults[1], matches[rpmSpecBuiltRPMRegexVersionIndex])
-	assert.Equal(t, expectedResults[2], matches[rpmSpecBuiltRPMRegexDistributionIndex])
-	assert.Equal(t, expectedResults[3], matches[rpmSpecBuiltRPMRegexArchitectureIndex])
-}
 
 func TestGenerateResults(t *testing.T) {
 	input := []string{
 		"pkg-1.2.3-1_2.3.azl3.x86_64",
 		"other-pkg-1.2.3-1_2.3.azl3.x86_64",
+		"ca-certificates-1:3.0.0-14.azl3.noarch",
 	}
 	expectedResults := repocloner.RepoContents{
 		Repo: []*repocloner.RepoPackage{
@@ -59,6 +33,12 @@ func TestGenerateResults(t *testing.T) {
 				Distribution: "azl3",
 				Architecture: "x86_64",
 			},
+			{
+				Name:         "ca-certificates",
+				Version:      "1:3.0.0-14",
+				Distribution: "azl3",
+				Architecture: "noarch",
+			},
 		},
 	}
 	emptySnapshotGenerator := SnapshotGenerator{}
@@ -73,5 +53,5 @@ func TestGenerateInvalidInput(t *testing.T) {
 	}
 	emptySnapshotGenerator := SnapshotGenerator{}
 	_, err := emptySnapshotGenerator.convertResultsToRepoContents(input)
-	assert.EqualError(t, err, "RPM package name ("+input[0]+") doesn't match the regular expression ("+rpmSpecBuiltRPMRegex.String()+")")
+	assert.EqualError(t, err, "RPM package name ("+input[0]+") doesn't match the regular expression ("+rpm.RpmSpecBuiltRPMRegex.String()+")")
 }
