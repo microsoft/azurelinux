@@ -89,7 +89,7 @@ TCMALLOC_SAMPLE_PARAMETER=128 && make check
 %{_libdir}/*.so.*
 
 %changelog
-* Mon May 25 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.12-3
+* Wed Jun 03 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.12-3
 - Added runtime library path in %check to fix ptests.
 
 * Wed Mar 13 2024 Himaja Kesari <himajakesari@microsoft.com> 
