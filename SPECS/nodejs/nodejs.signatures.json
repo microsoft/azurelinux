@@ -1,8 +1,8 @@
 {
  "Signatures": {
   "btest402.js": "fabaf4dacc13e93d54f825b87ffde18573214b149388a5f96176236dd31d7768",
-  "icu4c-77_1-data-bin-b.zip": "d8be12e03f782da350508b15354738ed97a3289008a787b6bd2a85434374bff4",
-  "icu4c-77_1-data-bin-l.zip": "0913674ff673c585f8bc08370916b6a6ccc30ffb6408a5c1bc3edbf5a687fd96",
+  "icu4c-78.2-data-bin-b.zip": "86c22b4fe9db681ea9cbf5975157c53f0f965b5a6b0b3c70558f0c5c78bfc04a",
+  "icu4c-78.2-data-bin-l.zip": "6fc51a8818242bfd83207ab89551166ac2fb4bf502d01e41cddc8cb6a0ba4cda",
   "node-v24.14.1.tar.xz": "7822507713f202cf2a551899d250259643f477b671706db421a6fb55c4aa0991"
  }
 }
