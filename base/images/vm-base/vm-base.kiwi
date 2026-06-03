@@ -141,6 +141,7 @@
         <package name="nvme-cli" />
         <package name="openssh-clients" />
         <package name="openssh-server" />
+        <package name="rootfiles" />
         <package name="rsync" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
