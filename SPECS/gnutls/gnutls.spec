@@ -67,6 +67,7 @@ EOF
 %check
 %if 0%{?with_check}
 # Skip test that requires chacha20-poly1305 (disabled in our openssl)
+# Observed error: "cipher_test:50: EVP_get_cipherbyname failed for chacha20-poly1305"
 echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
 %make_build check GNUTLS_SYSTEM_PRIORITY_FILE=/dev/null || { cat tests/test-suite.log tests/cert-tests/test-suite.log tests/slow/test-suite.log src/gl/tests/test-suite.log; exit 1; }
 %endif
