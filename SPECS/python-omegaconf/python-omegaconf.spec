@@ -54,7 +54,7 @@ PYTHONPATH=$PWD/.pytest-deps${PYTHONPATH:+:$PYTHONPATH} \
 %{python3_sitelib}/*
 
 %changelog
-* Mon May 18 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.3.0-2
+* Wed Jun 03 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.3.0-2
 - Added and fixed ptest.
 
 * Fri May 10 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.3.0-1
