@@ -12,7 +12,7 @@ description = "Embed Azure Linux CPE in .note.package metadata instead of inheri
 type = "spec-search-replace"
 section = "%build"
 regex = '\$\(cat /usr/lib/system-release-cpe\)'
-replacement = "cpe:/o:microsoft:azurelinux:4.0"
+replacement = "cpe:/o:microsoft:azure_linux:4.0"
 
 # Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
 # into every %build shell. We hook into the %_generate_package_note_file

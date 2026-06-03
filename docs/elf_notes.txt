@@ -37,9 +37,9 @@ Three overlays in total:
 
   (a) spec-search-replace in package-notes.spec %build:
       replaces  $(cat /usr/lib/system-release-cpe)
-      with     cpe:/o:microsoft:azurelinux:4.0
+      with     cpe:/o:microsoft:azure_linux:4.0
       -> fixes osCpe so emitted binaries say
-         "osCpe":"cpe:/o:microsoft:azurelinux:4.0"
+         "osCpe":"cpe:/o:microsoft:azure_linux:4.0"
 
   (b) file-search-replace in macros.package-notes-srpm:
       redefines  %_generate_package_note_file  (default: %{nil})
@@ -61,7 +61,7 @@ End result, after a downstream package (cronie, bash, etc.) is rebuilt:
     "name":"cronie",
     "version":"1.7.2-13.azl4",
     "architecture":"x86_64",
-    "osCpe":"cpe:/o:microsoft:azurelinux:4.0",
+    "osCpe":"cpe:/o:microsoft:azure_linux:4.0",
     "moduleVersion":"1.7.2.0"
   }
 
