@@ -66,7 +66,7 @@ License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.postfix.org
-Source0:        https://archive.mgm51.com/mirrors/postfix-source/official/%{name}-%{version}.tar.gz
+Source0:        https://archive.mgm51.com/mirrors/postfix-source/official/%{name}-%{version}.tar.gz#/%{name}-%{version}-https.tar.gz
 Source1:        postfix-etc-init.d-postfix
 Source2:        postfix.service
 Source3:        README-Postfix-SASL-RedHat.txt
