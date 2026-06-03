@@ -85,7 +85,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.7.28-4
 - Patch for CVE-2026-9150, CVE-2026-9149
 
-* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.7.28-3
+* Fri Apr 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.7.28-3
 - Enable conda support.
 
 * Wed Sep 04 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.7.28-2
