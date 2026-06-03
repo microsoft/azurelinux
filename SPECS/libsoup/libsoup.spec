@@ -80,6 +80,7 @@ Patch30:         CVE-2026-2443.patch
 Patch31:         CVE-2026-2369.patch
 Patch32:         CVE-2026-2436.patch
 Patch33:         CVE-2026-2708.patch
+Patch34:         CVE-2026-6324.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -156,7 +157,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-16
-- Patch for CVE-2026-2708
+- Patch for CVE-2026-2708, CVE-2026-6324
 
 * Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-15
 - Patch for CVE-2026-2436
