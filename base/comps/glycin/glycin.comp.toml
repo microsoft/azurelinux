@@ -6,3 +6,22 @@
 # so flipping the bcond is sufficient.
 [components.glycin.build]
 without = ["heif"]
+
+
+# Ensure dynamic Rust BR generation cannot discover HEIF crates when HEIF is disabled.
+[[components.glycin.overlays]]
+description = "Remove glycin-heif crate in %prep when HEIF bcond is disabled to avoid libheif-rs buildrequires"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "%if %{without heif}",
+    "rm -r glycin-loaders/glycin-heif",
+    "%endif",
+]
+
+# Cargo build for libglycin resolves workspace crates offline and needs tokio-stream in the crate registry.
+[[components.glycin.overlays]]
+description = "Add explicit tokio-stream crate BuildRequires to satisfy offline cargo build in mock"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "crate(tokio-stream)"
