@@ -26,7 +26,7 @@ Patch6:	CVE-2026-42506.patch
 Patch7:	CVE-2026-27136.patch
 Patch8:	CVE-2026-25680.patch
 Patch9:	CVE-2026-25681.patch
-Patch10:	CVE-2026-42502.patch
+Patch10: CVE-2026-42502.patch
 
 %{?systemd_requires}
 
