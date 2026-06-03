@@ -58,7 +58,6 @@
                 name="microsoft/azurelinux/base/core"
                 tag="4.0"
                 additionalnames=":latest"
-                user="root"
                 workingdir="/">
                 <subcommand execute="/bin/bash"/>
             </containerconfig>
@@ -69,7 +68,6 @@
             <containerconfig
                 name="microsoft/azurelinux/base/core"
                 tag="4.0-dev"
-                user="root"
                 workingdir="/">
                 <subcommand execute="/bin/bash"/>
             </containerconfig>
@@ -81,7 +79,6 @@
                 name="microsoft/azurelinux/distroless/minimal"
                 tag="4.0"
                 additionalnames=":latest"
-                user="root"
                 workingdir="/">
                 <subcommand clear="true"/>
             </containerconfig>
@@ -93,7 +90,6 @@
                 name="microsoft/azurelinux/distroless/base"
                 tag="4.0"
                 additionalnames=":latest"
-                user="root"
                 workingdir="/">
                 <subcommand clear="true"/>
             </containerconfig>
@@ -105,7 +101,6 @@
                 name="microsoft/azurelinux/distroless/debug"
                 tag="4.0"
                 additionalnames=":latest"
-                user="root"
                 workingdir="/">
                 <subcommand clear="true"/>
             </containerconfig>
