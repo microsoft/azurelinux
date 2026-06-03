@@ -63,6 +63,7 @@ value = "%[15 + %{azl_release}].rocm%{rocm_version}%{?dist}"
 #      sees the right toolchain triple without needing any change of its own.
 description = "Drop %{llvm_triple}.cfg next to the in-tree stage-1 clang so later build stages can locate the Azure Linux GCC toolchain"
 type = "spec-search-replace"
+section = "%build"
 regex = '''build_stage1=\$p/build-llvm'''
 replacement = '''build_stage1=$p/build-llvm
 
@@ -82,6 +83,7 @@ echo "--gcc-triple=%{_target_cpu}-%{_vendor}-linux" > $build_stage1/bin/%{llvm_t
 # is built and is picked up automatically on first invocation.
 description = "Drop %{llvm_triple}.cfg into the stage-2 build tree so the LLVM runtimes sub-build can find the Azure Linux GCC toolchain"
 type = "spec-search-replace"
+section = "%build"
 regex = '''-DLLVM_ENABLE_RUNTIMES=%\{llvm_runtimes\}'''
 replacement = '''-DLLVM_ENABLE_RUNTIMES=%{llvm_runtimes}
 
