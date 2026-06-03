@@ -1,3 +1,7 @@
 [components.mariadb-connector-odbc]
-# Release: 2%{?with_debug:.debug}%{?dist}
-autospec = { release-calculation = "manual", changelog-calculation = "manual" }
+
+[[components.mariadb-connector-odbc.overlays]]
+description = "Switch Release to %autorelease while keeping the with_debug suffix before dist"
+type = "spec-set-tag"
+tag = "Release"
+value = "%autorelease %{?with_debug:-e debug}"
