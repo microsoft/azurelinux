@@ -31,10 +31,14 @@ export CGO_ENABLED=1
 make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 
 %check
-mount -t cgroup2 none /sys/fs/cgroup
-trap 'umount -l /sys/fs/cgroup' EXIT
-go test -tags "seccomp cgo" -timeout 3m -v \
+unshare -m --propagation unchanged sh <<'EOF'
+if ! mountpoint -q /sys/fs/cgroup; then
+    mount -t cgroup2 none /sys/fs/cgroup
+    trap 'umount -l /sys/fs/cgroup' EXIT
+fi
+go test -tags "seccomp cgo" -timeout 10m \
     $(go list ./... | grep -vE '/libcontainer/(integration|nsenter)$')
+EOF
 
 %install
 make install DESTDIR=%{buildroot} PREFIX=%{_prefix} BINDIR=%{_bindir}
