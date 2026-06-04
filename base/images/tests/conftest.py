@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MIT
 """Root conftest — fixtures for image validation.
 
-CLI options (``--image-path``, ``--image-name``, ``--image-type``,
-``--capabilities``, ``--workdir``) are registered in
-:mod:`utils.pytest_plugin` (loaded early via entry point).
+CLI options (``--image-path``, ``--image-ref``, ``--image-name``,
+``--image-type``, ``--capabilities``, ``--workdir``) are registered
+in :mod:`utils.pytest_plugin` (loaded early via entry point).
 """
 
 from __future__ import annotations
@@ -22,6 +22,15 @@ from utils.extract import (
     mount_vm_image,
     unmount_container_image,
     unmount_vm_image,
+)
+from utils.container_runtime import (
+    build_image,
+    cleanup_test_images,
+    create_container,
+    destroy_container,
+    exec_in_container,
+    get_podman_client,
+    resolve_image_reference,
 )
 from utils.parsers import parse_os_release, query_rpm_packages
 from utils.pytest_plugin import (
@@ -57,8 +66,12 @@ def capabilities(request: pytest.FixtureRequest) -> set[str]:
 
 
 @pytest.fixture(scope="session")
-def image_path(request: pytest.FixtureRequest) -> Path:
-    p = Path(request.config.getoption("--image-path")).resolve()
+def image_path(request: pytest.FixtureRequest) -> Path | None:
+    """Path to image artifact from ``--image-path``, or None if ``--image-ref`` is used."""
+    raw = request.config.getoption("--image-path")
+    if not raw:
+        return None
+    p = Path(raw).resolve()
     logger.info("Image path: %s", p)
     if not p.exists():
         pytest.fail(f"Image file does not exist: {p}")
@@ -67,10 +80,19 @@ def image_path(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
+def image_ref(request: pytest.FixtureRequest) -> str | None:
+    """Image reference from ``--image-ref``, or None if ``--image-path`` is used."""
+    ref = request.config.getoption("--image-ref")
+    if ref:
+        logger.info("Image ref: %s", ref)
+    return ref
+
+
+@pytest.fixture(scope="session")
 def image_type(
     request: pytest.FixtureRequest,
     capabilities: set[str],
-    image_path: Path,
+    image_path: Path | None, image_ref: str | None,
 ) -> str:
     """``'vm'`` or ``'container'`` — from ``--image-type``, capabilities, or file extension."""
     explicit = request.config.getoption("--image-type")
@@ -83,14 +105,21 @@ def image_type(
         logger.info("Image type (from capabilities): %s", from_caps)
         return from_caps
 
-    detected = detect_image_type(str(image_path))
-    if detected is None:
-        pytest.fail(
-            f"Cannot detect image type from extension of {image_path.name}. "
-            "Pass --image-type or --capabilities explicitly."
-        )
-    logger.info("Image type (auto-detected from extension): %s", detected)
-    return detected
+    # --image-ref implies container.
+    if image_ref:
+        logger.info("Image type (from --image-ref): container")
+        return "container"
+
+    if image_path:
+        detected = detect_image_type(str(image_path))
+        if detected is not None:
+            logger.info("Image type (auto-detected from extension): %s", detected)
+            return detected
+
+    pytest.fail(
+        "Cannot detect image type. "
+        "Pass --image-type or --capabilities explicitly."
+    )
 
 
 @pytest.fixture(scope="session")
@@ -140,8 +169,14 @@ def workdir(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
-def rootfs(image_path: Path, image_type: str, workdir: Path) -> Path:
-    """Mounted rootfs — session yield-fixture with cleanup."""
+def rootfs(image_path: Path | None, image_type: str, workdir: Path) -> Path:
+    """Mounted rootfs — session yield-fixture with cleanup.
+
+    Requires ``--image-path`` (not ``--image-ref``); skips otherwise.
+    """
+    if image_path is None:
+        pytest.skip("rootfs requires --image-path (not available with --image-ref)")
+
     if image_type == "vm":
         mountpoint = workdir / "vm-rootfs"
         mountpoint.mkdir(parents=True, exist_ok=True)
@@ -161,11 +196,13 @@ def rootfs(image_path: Path, image_type: str, workdir: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
-def disk_info(image_path: Path, image_type: str) -> DiskInfo | None:
+def disk_info(image_path: Path | None, image_type: str) -> DiskInfo | None:
     """Partition/filesystem info — ``None`` for container images."""
     if image_type != "vm":
         logger.debug("Skipping disk inspection (not a VM image)")
         return None
+    if image_path is None:
+        pytest.skip("disk_info requires --image-path")
     logger.info("Inspecting disk: %s", image_path)
     return inspect_disk(image_path)
 
@@ -214,3 +251,126 @@ def partition_table(disk_info: DiskInfo | None, image_type: str) -> list[Partiti
             p.size_bytes,
         )
     return disk_info.partitions
+
+
+# ---------------------------------------------------------------------------
+# Container runtime fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")
+def podman_client(image_type: str):
+    """Session-scoped python-on-whales Podman client; skips for non-container images."""
+    if image_type != "container":
+        yield None
+        return
+
+    client = get_podman_client()
+    try:
+        yield client
+    finally:
+        cleanup_test_images(client)
+
+
+@pytest.fixture(scope="session")
+def container_image_ref(
+    podman_client, image_path: Path | None, image_ref: str | None,
+    image_type: str,
+) -> str | None:
+    """Resolve the container image once per session and cache the reference.
+
+    - If ``--image-ref`` was given, returns it directly.
+    - If ``--image-path`` was given, loads the archive via ``podman load``
+      and returns the resulting image ID.
+    - Returns ``None`` for non-container sessions.
+    """
+    if image_type != "container":
+        return None
+
+    return resolve_image_reference(podman_client, image_path=image_path, image_ref=image_ref)
+
+
+@pytest.fixture
+def running_container(
+    podman_client, image_type: str,
+    container_image_ref: str | None, request: pytest.FixtureRequest,
+):
+    """Fresh container per test with guaranteed teardown.
+
+    If marked with ``@pytest.mark.dockerfile()``, builds a custom
+    image from the specified Dockerfile first. Skips for non-container
+    images.
+    """
+    if image_type != "container":
+        pytest.skip("running_container only applicable to container images")
+    if container_image_ref is None:
+        pytest.fail("container_image_ref was not resolved for a container image")
+
+    # Check for @pytest.mark.dockerfile() marker.
+    effective_image = container_image_ref
+    dockerfile_marker = request.node.get_closest_marker("dockerfile")
+    if dockerfile_marker is not None:
+        test_dir = Path(request.fspath).parent
+        if dockerfile_marker.args:
+            dockerfile_path = (test_dir / dockerfile_marker.args[0]).resolve()
+        else:
+            dockerfile_path = (test_dir / "Dockerfile").resolve()
+
+        if not dockerfile_path.exists():
+            pytest.fail(
+                f"Dockerfile not found: {dockerfile_path} "
+                f"(from @pytest.mark.dockerfile on {request.node.name})"
+            )
+
+        effective_image = build_image(
+            podman_client, dockerfile_path, container_image_ref,
+        )
+
+    logger.info("Creating container for test %s", request.node.name)
+    instance = create_container(podman_client, effective_image)
+
+    try:
+        yield instance
+    finally:
+        logger.info("Destroying container for test %s", request.node.name)
+        destroy_container(podman_client, instance.container_name)
+
+
+@pytest.fixture
+def container_exec(podman_client, running_container):
+    """Callable to execute commands in the running test container.
+
+    Usage::
+
+        def test_example(container_exec):
+            result = container_exec(["echo", "hello"])
+            assert result.exit_code == 0
+            assert "hello" in result.output
+    """
+    def _exec(command: list[str]):
+        return exec_in_container(
+            podman_client,
+            running_container.container_name,
+            command,
+        )
+    return _exec
+
+
+@pytest.fixture
+def container_exec_shell(podman_client, running_container):
+    """Callable to execute shell commands in the running test container.
+
+    Usage::
+
+        def test_example(container_exec_shell):
+            result = container_exec_shell("echo hello")
+            assert result.exit_code == 0
+            assert "hello" in result.output
+    """
+    def _exec_shell(command: str, *, shell: str = "bash"):
+        return exec_in_container(
+            podman_client,
+            running_container.container_name,
+            [shell, "-c", command],
+        )
+    return _exec_shell

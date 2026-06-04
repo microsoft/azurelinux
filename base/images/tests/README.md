@@ -1,13 +1,13 @@
 # Azure Linux Image Tests
 
-Static validation framework for built Azure Linux images (VM and container).
-Mounts images read-only and runs pytest tests against the filesystem
-without booting.
+Validation framework for built Azure Linux images (VM and container).
+Includes both static (offline filesystem) and runtime (live container)
+tests, all driven by pytest.
 
 ## How it gets invoked
 
-These tests are wired into `azldev` via the `[test-suites.static-image-checks]`
-table in `base/images/images.toml`, and referenced by each image's
+These tests are wired into `azldev` via the `[test-suites.*]` tables
+in `base/images/images.toml`, and referenced by each image's
 `tests.test-suites`. The standard entry point is:
 
 ```bash
@@ -30,20 +30,39 @@ where present — to validate the dev variant.)
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
 `--image-name`, and `--capabilities` arguments.
 
+## Test suites
+
+| Suite | Description | Runs for |
+|-------|-------------|----------|
+| `static-image-checks` | Offline filesystem validation — mounts images read-only | All images |
+| `runtime-container-tests` | Live container tests via `podman exec` | Container images |
+
 ## Direct (manual) invocation
 
 ```bash
 cd base/images/tests
 
-# VM image — shared + VM-specific tests
-uv run pytest cases/ \
+# Static tests — VM image
+uv run pytest cases/static/ \
     --image-path /path/to/image.raw \
     --image-name vm-base \
     --capabilities machine-bootable,systemd,runtime-package-management
 
-# Container image — shared + container-specific tests
-uv run pytest cases/ \
+# Static tests — Container image
+uv run pytest cases/static/ \
     --image-path /path/to/image.oci.tar.xz \
+    --image-name container-base \
+    --capabilities container,runtime-package-management
+
+# Runtime tests — Container image (requires podman)
+uv run pytest cases/runtime/ \
+    --image-path /path/to/image.oci.tar.xz \
+    --image-name container-base \
+    --capabilities container,runtime-package-management
+
+# Runtime tests — from a registry reference
+uv run pytest cases/runtime/ \
+    --image-ref mcr.microsoft.com/azurelinux/base/core:4.0 \
     --image-name container-base \
     --capabilities container,runtime-package-management
 ```
@@ -67,11 +86,15 @@ System packages (not pip-installable):
 
 - **`libguestfs-tools`** + **`guestfs-tools`** — `guestmount`,
   `guestunmount`, `virt-inspector` (VM images)
-- **`skopeo`** — OCI archive conversion (container images)
-- **`umoci`** — OCI image unpacking (container images)
-- **`buildah`** — cleanup of rootless umoci extracts (container images)
+- **`skopeo`** — OCI archive conversion (container images, static tests)
+- **`umoci`** — OCI image unpacking (container images, static tests)
+- **`buildah`** — cleanup of rootless umoci extracts (container images, static tests)
+- **`podman`** — container runtime for live tests (container images, runtime tests)
 - **`rpm`** — for `rpm --root` package queries
 - **`uv`** — Python project/package manager
+
+Runtime tests use `python-on-whales` to drive the Podman CLI directly;
+the Podman REST API socket is not required.
 
 `pytest_configure` does a preflight check and fails fast if any tool
 needed for the current `--image-type` is missing.
@@ -82,30 +105,40 @@ needed for the current `--image-type` is missing.
 base/images/
 ├── images.toml                          # Image registry + test-suite wiring
 └── tests/
-    ├── pyproject.toml                   # uv project: pytest, plugin entry point
-    ├── conftest.py                      # Session fixtures
+    ├── pyproject.toml                   # uv project: pytest + python-on-whales deps
+    ├── conftest.py                      # Session fixtures (static + runtime)
     ├── utils/                           # Helper package (not test-collected)
     │   ├── pytest_plugin.py             # CLI options, markers, tool preflight
+    │   ├── container_runtime.py         # python-on-whales based container orchestration
     │   ├── extract.py                   # Image mounting / extraction
     │   ├── disk.py                      # virt-inspector → DiskInfo
     │   ├── parsers.py                   # File content parsers
     │   ├── types.py                     # Dataclasses
     │   └── tools.py                     # Native-tool registry
     └── cases/                           # Test cases
-        ├── test_os_release.py           # Shared: /etc/os-release
-        ├── test_packages.py             # Shared: rpm-db checks (capability-gated)
-        ├── vm-base/                     # VM-specific tests (auto-restricted to the vm-base family — vm-base, vm-base-dev)
-        │   ├── test_kernel.py
-        │   └── test_partitions.py
-        └── container-base/              # Container-specific tests (auto-restricted to the container-base family)
-            └── test_container.py
+        ├── static/                      # Offline filesystem tests
+        │   ├── test_os_release.py       # Shared: /etc/os-release
+        │   ├── test_packages.py         # Shared: rpm-db checks (capability-gated)
+        │   ├── vm-base/                 # VM-specific static tests
+        │   │   ├── test_kernel.py
+        │   │   └── test_partitions.py
+        │   └── container-base/          # Container-specific static tests
+        │       └── test_container.py
+        └── runtime/                     # Live container tests (via podman exec)
+            └── container-base/
+                ├── test_basic.py        # Basic: shell access, DNS resolution
+                └── test_nginx/          # Dockerfile test example
+                    ├── test_nginx.py    # Test logic
+                    ├── Dockerfile       # Custom image (ARG BASE_IMAGE)
+                    └── nginx.conf       # Supporting files
 ```
 
 ## Available fixtures
 
 | Fixture | Scope | Type | Description |
 |---------|-------|------|-------------|
-| `image_path` | session | `Path` | From `--image-path` |
+| `image_path` | session | `Path \| None` | From `--image-path` (None when `--image-ref` used) |
+| `image_ref` | session | `str \| None` | From `--image-ref` (None when `--image-path` used) |
 | `image_name` | session | `str \| None` | From `--image-name` |
 | `image_type` | session | `str` | `"vm"` or `"container"` (explicit / capabilities / extension) |
 | `capabilities` | session | `set[str]` | Parsed `--capabilities` |
@@ -115,20 +148,84 @@ base/images/
 | `installed_packages` | session | `set[str]` | Installed RPM names (`rpm --root`) |
 | `disk_info` | session | `DiskInfo \| None` | VM only |
 | `partition_table` | session | `list[PartitionInfo]` | VM only — auto-skips on containers |
+| `podman_client` | session | `DockerClient \| None` | python-on-whales Podman client; None for non-container images |
+| `container_image_ref` | session | `str \| None` | Loaded image ID (cached); None for non-container |
+| `running_container` | function | `ContainerInstance` | Fresh container per test — auto-skips on VMs |
+| `container_exec_shell` | function | callable | `(cmd, shell="bash") → ContainerExecResult` |
+| `container_exec` | function | callable | `(args) → ContainerExecResult` |
 
 ## Adding tests
 
-- **Shared (every image):** add a `cases/test_<topic>.py`. Use
-  `@pytest.mark.require_capability("…")` if the test only applies to
-  images with a given capability.
-- **Image-specific:** add `cases/<image-family>/test_<topic>.py`. Tests
-  in such subdirectories are **automatically** restricted to that
-  image family (the plugin applies `@pytest.mark.image("<dir>")`
-  during collection — no boilerplate per file or per subdir). The
-  directory name is treated as a *family*: an `--image-name` matches
-  the family if it equals the family exactly OR has the form
-  `<family>-<variant>` (so `cases/vm-base/` runs for both `vm-base`
-  and `vm-base-dev`).
+- **Shared static (every image):** add a `cases/static/test_<topic>.py`. Use
+    `@pytest.mark.require_capability("…")` if the test only applies to
+    images with a given capability.
+- **Image-specific static:** add `cases/static/<image-family>/test_<topic>.py`.
+    Tests in such subdirectories are **automatically** restricted to that
+    image family (the plugin applies `@pytest.mark.image("<dir>")`
+    during collection — no boilerplate per file or per subdir). The
+    directory name is treated as a *family*: an `--image-name` matches
+    the family if it equals the family exactly OR has the form
+    `<family>-<variant>` (so `cases/static/vm-base/` runs for both
+    `vm-base` and `vm-base-dev`).
+- **Shared runtime (every container):** add a `cases/runtime/test_<topic>.py`.
+    Use `container_exec_shell("...")` for normal runtime tests. Use
+    `container_exec([...])` only when the test must avoid a shell, such as
+    distroless or minimal images. Tests are auto-marked with
+    `@pytest.mark.runtime`.
+- **Image-specific runtime:** add `cases/runtime/<image-family>/test_<topic>.py`.
+
+### Dockerfile-based runtime tests
+
+When a runtime test needs packages or config beyond what the base image
+ships, give it its own directory with a `Dockerfile`:
+
+```
+cases/runtime/container-base/test_nginx/
+    test_nginx.py       # test logic
+    Dockerfile          # builds on top of the image-under-test
+    nginx.conf          # supporting files (COPY'd in Dockerfile)
+```
+
+The Dockerfile must use `ARG BASE_IMAGE` / `FROM ${BASE_IMAGE}` — the
+framework injects the image-under-test automatically:
+
+```dockerfile
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+RUN dnf install -y nginx && dnf clean all
+COPY nginx.conf /etc/nginx/nginx.conf
+```
+
+Mark tests with `@pytest.mark.dockerfile()` to trigger the build. The
+marker optionally accepts a path relative to the test file's directory
+(defaults to `Dockerfile` in the same directory):
+
+```python
+# Auto-discovers Dockerfile in the same directory
+@pytest.mark.dockerfile()
+def test_nginx_config(container_exec_shell):
+    result = container_exec_shell("nginx -t")
+    assert result.exit_code == 0
+
+# Explicit path to a different Dockerfile
+@pytest.mark.dockerfile("alt/Dockerfile.debug")
+def test_debug_variant(container_exec_shell):
+    ...
+```
+
+Built images are cached per session — multiple tests sharing the same
+Dockerfile only trigger one build.
+
+> **Note:** All containers (plain and Dockerfile-based) run with
+> `sleep infinity` as PID 1 — the Dockerfile's `CMD`/`ENTRYPOINT` is
+> overridden. Tests that need a service should start it explicitly via
+> `container_exec_shell("nginx")`. This keeps behaviour predictable and
+> ensures each test controls exactly what runs.
+
+For service tests, poll readiness with a short bounded loop before asserting on
+responses; do not assume the service binds synchronously. Foreground services
+should be backgrounded explicitly, for example
+`container_exec_shell("nohup my-service > /tmp/my-service.log 2>&1 &")`.
 
 ## Adding a native-tool dependency
 
