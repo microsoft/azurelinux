@@ -25,17 +25,17 @@ Patch7:         CVE-2023-44487.patch
 # Utilities/cmnghttp2/lib/includes/nghttp2/nghttp2ver.h. Manual inspection is
 # required to determine what upstream patches are included.
 Patch8:         CVE-2023-35945.patch
-Patch9:		CVE-2024-48615.patch
-Patch10:	CVE-2025-4947.patch
-Patch11:	CVE-2025-5916.patch
-Patch12:	CVE-2025-5917.patch
-Patch13:	CVE-2025-5918.patch
-Patch14:	CVE-2025-9301.patch
-Patch15:	CVE-2025-10148.patch
-Patch16:	CVE-2025-14017.patch
-Patch17:	CVE-2025-10966.patch
-Patch18:	CVE-2025-14524.patch
-Patch19:	CVE-2026-27135.patch
+Patch9:         CVE-2024-48615.patch
+Patch10:        CVE-2025-4947.patch
+Patch11:        CVE-2025-5916.patch
+Patch12:        CVE-2025-5917.patch
+Patch13:        CVE-2025-5918.patch
+Patch14:        CVE-2025-9301.patch
+Patch15:        CVE-2025-10148.patch
+Patch16:        CVE-2025-14017.patch
+Patch17:        CVE-2025-10966.patch
+Patch18:        CVE-2025-14524.patch
+Patch19:        CVE-2026-27135.patch
 Patch20:        CVE-2026-4873.patch
 Patch21:        CVE-2026-6276.patch
 Patch22:        CVE-2026-6253.patch
