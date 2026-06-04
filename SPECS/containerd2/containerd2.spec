@@ -31,7 +31,7 @@ Version: 2.2.4
 # IMPORTANT: any future official AzureLinux containerd2-2.2.4-N release
 # will be considered OLDER than this; bump Epoch or pin to a higher Version
 # if you ever need to deprecate this stream.
-Release: 6000.verity%{?dist}
+Release: 6001.verity%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -154,6 +154,14 @@ install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/modules-load.d/aks-d
 install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
 install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
 
+# Stash the same hosts.toml under /usr/share/containerd2 so AgentBaker's
+# cse_config.sh can re-overlay it at node bootstrap. ACL's immutable-OS
+# image bake strips everything under /etc/* from RPM contributions (only
+# /usr/* survives extraction), so the /etc/-shipped copy above never
+# lands on ACL nodes. /usr/share survives -> CSE re-creates the /etc
+# path. Single source of truth (Source5) propagates to both consumers.
+install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_datadir}/containerd2/certs.d/mcr.microsoft.com/hosts.toml
+
 %post
 %systemd_post containerd.service
 
@@ -175,6 +183,7 @@ fi
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 %{_datadir}/containerd2/config.toml
+%{_datadir}/containerd2/certs.d/mcr.microsoft.com/hosts.toml
 %{_sysconfdir}/modules-load.d/aks-dmverity.conf
 %{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
 %config(noreplace) %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
@@ -183,11 +192,30 @@ fi
 %dir %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com
 %dir %{_sysconfdir}/systemd/system/containerd.service.d
 %dir %{_datadir}/containerd2
+%dir %{_datadir}/containerd2/certs.d
+%dir %{_datadir}/containerd2/certs.d/mcr.microsoft.com
 %dir /opt/containerd
 %dir /opt/containerd/bin
 %dir /opt/containerd/lib
 
 %changelog
+* Wed Jun 04 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.4-6001.verity
+- Also stash hosts.toml under /usr/share/containerd2/certs.d/mcr.microsoft.com/.
+- ACL's immutable-OS image bake strips every /etc/* path contributed by
+  RPMs (only /usr/* survives extraction), which silently dropped the
+  /etc/containerd/certs.d/mcr.microsoft.com/hosts.toml introduced in
+  2.0.1-3012. Without the redirect, kubelet pulls go straight to MCR which
+  has no dm-verity referrers, so every signed-image pull fails with
+  "dm-verity signature required but not present on layer ...". The
+  /usr/share/ copy mirrors the existing /usr/share/containerd2/config.toml
+  pattern so AgentBaker's cse_config.sh can re-overlay it onto /etc at
+  every bootstrap. No-op on standard AzureLinux V3 VHDs where /etc/* is
+  preserved -- the cse_config.sh overlay is idempotent there.
+  Validated end-to-end on dadelan-acl-test (ACL VHD 1.1780543260.12214)
+  2026-06-04: manual hosts.toml deploy + containerd restart took the
+  cluster from "every kube-system pod ImagePullBackOff with dm-verity
+  signature required" to all pods Running with zero rejections.
+
 * Tue Jun 02 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.4-5000
 - Port to upstream containerd v2.2.4 + AzureLinux 3.0-dev baseline.
 - Drop 0001 (diff-walking mount-manager): merged upstream in v2.2.2
