@@ -69,7 +69,10 @@ runtime-package-management = true
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.test-suites = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
 
 [images.container-base.capabilities]
 machine-bootable = false
@@ -80,7 +83,10 @@ runtime-package-management = true
 [images.container-base-dev]
 description = "Container Base Image (dev)"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core-dev" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.test-suites = [
+    { name = "static-image-checks" },
+    { name = "runtime-container-tests" },
+]
 
 [images.container-base-dev.capabilities]
 machine-bootable = false
@@ -160,13 +166,28 @@ description = "Offline image validation (shared + image-specific tests)"
 [test-suites.static-image-checks.pytest]
 working-dir = "tests"
 install = "pyproject"
-test-paths = ["cases/"]
+test-paths = ["cases/static/"]
 # {capabilities} is substituted by azldev as a comma-separated list of
 # the names of capabilities set to `true` for the image (e.g.
 # "machine-bootable,systemd,runtime-package-management"). Names use
 # the same dash-case form declared above. The pytest plugin parses
 # this string into a set; @pytest.mark.require_capability("...") tests
 # that don't match are skipped.
+extra-args = [
+    "--image-path", "{image-path}",
+    "--image-name", "{image-name}",
+    "--capabilities", "{capabilities}",
+]
+
+# Runtime container tests — validate live container behavior via podman.
+[test-suites.runtime-container-tests]
+type = "pytest"
+description = "Runtime container validation (exec into live containers)"
+
+[test-suites.runtime-container-tests.pytest]
+working-dir = "tests"
+install = "pyproject"
+test-paths = ["cases/runtime/"]
 extra-args = [
     "--image-path", "{image-path}",
     "--image-name", "{image-name}",
