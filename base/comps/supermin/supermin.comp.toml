@@ -1,0 +1,14 @@
+[components.supermin]
+
+# supermin's package-manager auto-detection (src/ph_rpm.ml) only inspects the
+# os-release ID field against a hard-coded allow-list and does not consider
+# ID_LIKE. Azure Linux sets ID=azurelinux (ID_LIKE=fedora) and ships no
+# /etc/redhat-release marker, so without this patch supermin aborts with
+# "could not detect package manager used by this system or distro" — which
+# also breaks the libguestfs appliance build. The patch adds "azurelinux" to
+# the recognized rpm/dnf distro list. Should be submitted upstream:
+# https://github.com/libguestfs/supermin
+[[components.supermin.overlays]]
+description = "Teach supermin to recognize Azure Linux (ID=azurelinux) as an rpm/dnf distro so the package-manager detection used by --build/--prepare and the libguestfs appliance works."
+type = "patch-add"
+source = "0001-Recognize-Azure-Linux-as-an-rpm-dnf-distro.patch"
