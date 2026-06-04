@@ -2,7 +2,7 @@
 Summary:       Git extension for versioning large files
 Name:          git-lfs
 Version:       3.6.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Group:         System Environment/Programming
 Vendor:        Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,6 +29,7 @@ Source0:       https://github.com/git-lfs/git-lfs/archive/v%{version}.tar.gz#/%{
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:       %{name}-%{version}-vendor.tar.gz
 Patch0:        CVE-2025-22870.patch
+Patch1:        CVE-2026-39821.patch
 
 BuildRequires: golang
 BuildRequires: which
@@ -80,8 +81,11 @@ git lfs uninstall
 %{_mandir}/man5/*
 
 %changelog
-* Thu May 14 2026 Sumit Jena <sumitjena@microsoft.com> - 3.6.1-3
+* Mon Jun 01 2026 Sumit Jena <sumitjena@microsoft.com> - 3.6.1-4
 - Fix ptests failures.
+
+* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.6.1-3
+- Patch for CVE-2026-39821
 
 * Tue Apr 08 2025 Rohit Rawat <rohitrawat@microsoft.com> - 3.6.1-2
 - Patch CVE-2025-22870

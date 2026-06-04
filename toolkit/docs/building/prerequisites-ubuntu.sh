@@ -47,7 +47,7 @@ done
 
 # Install prerequisites if not disabled
 # golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.23.1 on Ubuntu 22.04 since it is the most recent release available.
-# When making a breaking change to the toolkit which requires a newer golang version, update this version if needed. 
+# When making a breaking change to the toolkit which requires a newer golang version, update this version if needed.
 # If no newer version is available, suggest moving to a newer Ubuntu LTS version
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
@@ -59,7 +59,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     gawk \
     genisoimage \
     git \
-    golang-1.23-go \
+    golang-1.24-go \
     jq \
     make \
     openssl \
@@ -76,11 +76,11 @@ else
     echo "Skipping installation of prerequisite packages..."
 fi
 
-# Fix go 1.23 links if requested
+# Fix go 1.24 links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
     echo "Creating Go symlinks..."
-    ln -vsf /usr/lib/go-1.23/bin/go /usr/bin/go
-    ln -vsf /usr/lib/go-1.23/bin/gofmt /usr/bin/gofmt
+    ln -vsf /usr/lib/go-1.24/bin/go /usr/bin/go
+    ln -vsf /usr/lib/go-1.24/bin/gofmt /usr/bin/gofmt
 fi
 
 # Install and configure Docker if requested
@@ -88,10 +88,10 @@ if [ "$INSTALL_DOCKER" = true ]; then
     echo "Installing Docker..."
     curl -fsSL https://get.docker.com -o get-docker.sh
     sh get-docker.sh
-    
+
     echo "Adding current user to 'docker' group..."
     usermod -aG docker $USER
-    
+
     echo "*** NOTE: You will need to log out and log back in for user changes to take effect. ***"
 fi
 

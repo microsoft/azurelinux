@@ -915,8 +915,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.3.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.3.0.tar.gz"
+          "version": "1.4.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.4.0.tar.gz"
         }
       }
     },
@@ -2067,8 +2067,8 @@
         "type": "other",
         "other": {
           "name": "containerd2",
-          "version": "2.1.6",
-          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.1.6.tar.gz"
+          "version": "2.2.4",
+          "downloadUrl": "https://github.com/containerd/containerd/archive/v2.2.4.tar.gz"
         }
       }
     },
@@ -4740,8 +4740,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.3",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.3-1/go1.26.3-20260508.1.src.tar.gz"
+          "version": "1.26.4",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.4-1/go1.26.4-20260602.8.src.tar.gz"
         }
       }
     },
@@ -4750,8 +4750,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.25.10",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.10-1/go1.25.10-20260507.2.src.tar.gz"
+          "version": "1.25.11",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.25.11-1/go1.25.11-20260602.7.src.tar.gz"
         }
       }
     },
@@ -13091,8 +13091,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.17",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.17/source/mariadb-10.11.17.tar.gz"
+          "version": "10.11.18",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.18/source/mariadb-10.11.18.tar.gz"
         }
       }
     },
@@ -14562,16 +14562,6 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "20.14.0",
-          "downloadUrl": "https://nodejs.org/download/release/v20.14.0/node-v20.14.0.tar.xz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "nodejs24",
           "version": "24.14.1",
           "downloadUrl": "https://nodejs.org/download/release/v24.14.1/node-v24.14.1.tar.xz"
         }
@@ -18503,8 +18493,8 @@
         "type": "other",
         "other": {
           "name": "perl-libwww-perl",
-          "version": "6.72",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.72.tar.gz"
+          "version": "6.83",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/libwww-perl-6.83.tar.gz"
         }
       }
     },
@@ -21693,8 +21683,8 @@
         "type": "other",
         "other": {
           "name": "postfix",
-          "version": "3.9.0",
-          "downloadUrl": "ftp://ftp.porcupine.org/mirrors/postfix-release/official/postfix-3.9.0.tar.gz"
+          "version": "3.9.11",
+          "downloadUrl": "https://archive.mgm51.com/mirrors/postfix-source/official/postfix-3.9.11.tar.gz"
         }
       }
     },
@@ -31651,6 +31641,16 @@
           "name": "zziplib",
           "version": "0.13.74",
           "downloadUrl": "https://github.com/gdraheim/zziplib/archive/v0.13.74.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "walinuxagent-acl-config",
+          "version": "1.0.1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/walinuxagent-acl-config-1.0.1.tar.gz"
         }
       }
     }

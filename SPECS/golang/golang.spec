@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.3-20260508.1.src.tar.gz
+%global ms_go_filename  go1.26.4-20260602.8.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.3
+Version:        1.26.4
 Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -169,8 +169,11 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.3-2
+* Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-2
 - Remove the remaining bootstrap04 component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
+* Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
+- Bump version to 1.26.4-1
 
 * Fri May 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.3-1
 - Bump version to 1.26.3-1
