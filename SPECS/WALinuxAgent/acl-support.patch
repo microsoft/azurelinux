@@ -10,21 +10,22 @@ Subject: [PATCH] add support for Azure Container Linux
 - Add retry logic in mount_resource_disk() for VMBus storage race.
 - Add ACL-specific waagent.conf, waagent.service, and sysext drop-in.
 - Document the sysext drop-in (10-waagent-sysext.conf).
-- Patch persist_firewall_rules.py service template to add After=systemd-sysext.service
-  so the dynamically-created waagent-network-setup.service waits for sysext merge.
+- Patch persist_firewall_rules.py __set_service_unit_file() to conditionally add
+  After=systemd-sysext.service for ACL so the dynamically-created
+  waagent-network-setup.service waits for sysext merge.
 - Add ACL owner entry in CODEOWNERS.
 ---
  CODEOWNERS                               |  7 +++
- azurelinuxagent/common/osutil/acl.py     | 79 ++++++++++++++++++++++++
+ azurelinuxagent/common/osutil/acl.py     | 98 ++++++++++++++++++++++++++++
  azurelinuxagent/common/osutil/factory.py |  4 ++
  azurelinuxagent/common/version.py        |  8 +++
- azurelinuxagent/ga/persist_firewall_rules.py |  1 +
+ azurelinuxagent/ga/persist_firewall_rules.py | 19 +++++++++++++------
  config/acl/waagent.conf                  | 37 +++++++++++
  init/acl/10-waagent-sysext.conf          | 13 ++++
  init/acl/waagent.service                 | 18 ++++++
  setup.py                                 | 10 +++
  tests/common/osutil/test_factory.py      |  9 +++
- 10 files changed, 176 insertions(+)
+ 10 files changed, 202 insertions(+), 4 deletions(-)
  create mode 100644 azurelinuxagent/common/osutil/acl.py
  create mode 100644 config/acl/waagent.conf
  create mode 100644 init/acl/10-waagent-sysext.conf
@@ -53,7 +54,7 @@ new file mode 100644
 index 0000000..9da215b
 --- /dev/null
 +++ b/azurelinuxagent/common/osutil/acl.py
-@@ -0,0 +1,79 @@
+@@ -0,0 +1,98 @@
 +#
 +# Copyright 2018 Microsoft Corporation
 +#
@@ -77,7 +78,12 @@ index 0000000..9da215b
 +# inadvertently affect the immutable ACL image.
 +#
 +
++import time
++
++import azurelinuxagent.common.logger as logger
++import azurelinuxagent.common.utils.shellutil as shellutil
 +from azurelinuxagent.common.osutil.default import DefaultOSUtil
++from azurelinuxagent.common.utils.shellutil import CommandError
 +
 +
 +class AclOSUtil(DefaultOSUtil):
@@ -101,8 +107,22 @@ index 0000000..9da215b
 +    def start_network(self):
 +        self._run_command_without_raising(["systemctl", "start", "systemd-networkd"], log_error=False)
 +
-+    def restart_if(self, ifname=None, retries=None, wait=None):
-+        self._run_command_without_raising(["systemctl", "restart", "systemd-networkd"])
++    def restart_if(self, ifname, retries=3, wait=5):
++        """
++        Restart an interface by bouncing the link. systemd-networkd observes
++        this event, and forces a renew of DHCP.
++        """
++        for attempt in range(1, retries + 1):
++            try:
++                shellutil.run_command(["ip", "link", "set", ifname, "down"])
++                shellutil.run_command(["ip", "link", "set", ifname, "up"])
++                return
++            except CommandError as e:
++                logger.warn("failed to restart {0}: {1}".format(ifname, e))
++                if attempt < retries:
++                    logger.info("retrying in {0} seconds".format(wait))
++                    time.sleep(wait)
++        logger.warn("exceeded restart retries for {0}".format(ifname))
 +
 +    def restart_ssh_service(self):
 +        # ACL uses sshd.socket for socket-activated SSH (similar to
@@ -178,13 +198,51 @@ diff --git a/azurelinuxagent/ga/persist_firewall_rules.py b/azurelinuxagent/ga/p
 index e7c8373..d93c984 100644
 --- a/azurelinuxagent/ga/persist_firewall_rules.py
 +++ b/azurelinuxagent/ga/persist_firewall_rules.py
-@@ -36,5 +36,6 @@ class PersistFirewallRulesHandler(object):
+@@ -25,6 +25,7 @@ from azurelinuxagent.common.osutil import get_osutil, systemd
+ from azurelinuxagent.common.utils import shellutil, fileutil, textutil
+ from azurelinuxagent.common.utils.networkutil import AddFirewallRules
+ from azurelinuxagent.common.utils.shellutil import CommandError
++from azurelinuxagent.common.version import get_distro
+ 
+ 
+ class PersistFirewallRulesHandler(object):
+@@ -36,5 +37,6 @@ class PersistFirewallRulesHandler(object):
  [Unit]
  Description=Setup network rules for WALinuxAgent 
-+After=systemd-sysext.service
++After={after_dependencies}
  Before=network-pre.target
  Wants=network-pre.target
  DefaultDependencies=no
+@@ -70,6 +72,6 @@ class PersistFirewallRulesHandler(object):
+     # The current version of the unit file; Update it whenever the unit file is modified to ensure Agent can dynamically
+     # modify the unit file on VM too
+-    _UNIT_VERSION = "1.3"
++    _UNIT_VERSION = "1.4"
+ 
+     @staticmethod
+     def get_service_file_path():
+@@ -232,10 +234,17 @@ if __name__ == '__main__':
+         service_unit_file = self.get_service_file_path()
+         binary_path = os.path.join(conf.get_lib_dir(), self.BINARY_FILE_NAME)
+         try:
+-            fileutil.write_file(service_unit_file,
+-                                self.__SERVICE_FILE_CONTENT.format(binary_path=binary_path,
+-                                                                   py_path=sys.executable,
+-                                                                   version=self._UNIT_VERSION))
++            # On Azure Container Linux, Python lives inside a sysext overlay that is only available after
++            # systemd-sysext.service merges it. Add an explicit ordering dependency so the service waits.
++            after_dependencies = "local-fs.target"
++            if get_distro()[0] == "azurecontainerlinux":
++                after_dependencies = "local-fs.target systemd-sysext.service"
++
++            service_content = self.__SERVICE_FILE_CONTENT.format(binary_path=binary_path,
++                                                                 py_path=sys.executable,
++                                                                 version=self._UNIT_VERSION,
++                                                                 after_dependencies=after_dependencies)
++            fileutil.write_file(service_unit_file, service_content)
+             fileutil.chmod(service_unit_file, 0o644)
+ 
+             # Finally enable the service. This is needed to ensure the service is started on system boot
 diff --git a/config/acl/waagent.conf b/config/acl/waagent.conf
 new file mode 100644
 index 0000000..497bd43
