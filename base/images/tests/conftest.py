@@ -18,6 +18,7 @@ import pytest
 
 from utils.disk import inspect_disk
 from utils.extract import (
+    inspect_oci_config,
     mount_container_image,
     mount_vm_image,
     unmount_container_image,
@@ -193,6 +194,21 @@ def rootfs(image_path: Path | None, image_type: str, workdir: Path) -> Path:
         yield rootfs_path
         logger.info("Cleaning up container extract at %s", container_dir)
         unmount_container_image(container_dir)
+
+
+@pytest.fixture(scope="session")
+def oci_image_config(image_path: Path | None) -> dict[str, object]:
+    """Return the parsed OCI image config.
+
+    Only meaningful for container images; tests using this fixture gate on
+    the ``container`` capability via
+    ``@pytest.mark.require_capability("container")``.
+    """
+    if image_path is None:
+        pytest.skip("oci_image_config requires --image-path")
+    config = inspect_oci_config(image_path)
+    logger.info("OCI image config.config keys: %s", sorted(config.get("config", {})))
+    return config
 
 
 @pytest.fixture(scope="session")

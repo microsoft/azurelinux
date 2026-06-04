@@ -118,6 +118,7 @@ base/images/
     └── cases/                           # Test cases
         ├── static/                      # Offline filesystem tests
         │   ├── test_os_release.py       # Shared: /etc/os-release
+        │   ├── test_oci_config.py       # Shared (container): OCI Config.User unset
         │   ├── test_packages.py         # Shared: rpm-db checks (capability-gated)
         │   ├── vm-base/                 # VM-specific static tests
         │   │   ├── test_kernel.py
@@ -144,6 +145,7 @@ base/images/
 | `capabilities` | session | `set[str]` | Parsed `--capabilities` |
 | `workdir` | session | `Path` | Working directory for mounts/extractions |
 | `rootfs` | session | `Path` | Mounted/extracted root filesystem |
+| `oci_image_config` | session | `dict[str, object]` | Parsed `skopeo inspect --config` output (use with `@pytest.mark.require_capability("container")`) |
 | `os_release` | session | `dict[str, str]` | Parsed `/etc/os-release` |
 | `installed_packages` | session | `set[str]` | Installed RPM names (`rpm --root`) |
 | `disk_info` | session | `DiskInfo \| None` | VM only |
