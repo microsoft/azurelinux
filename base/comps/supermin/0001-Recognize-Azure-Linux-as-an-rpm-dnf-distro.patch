@@ -1,0 +1,34 @@
+From: Azure Linux <azurelinux@microsoft.com>
+Date: Thu, 4 Jun 2026 00:00:00 +0000
+Subject: [PATCH] Recognize Azure Linux as an rpm/dnf distro
+
+Azure Linux sets ID=azurelinux (with ID_LIKE=fedora) in
+/etc/os-release and does not ship an /etc/redhat-release or
+/etc/fedora-release marker file. supermin's os-release parser only
+inspects the ID field, so fedora_detect() fails to recognize Azure
+Linux and supermin aborts with "could not detect package manager used
+by this system or distro".
+
+Add "azurelinux" to the list of recognized rpm/dnf distro IDs so that
+supermin (and libguestfs, which uses supermin to build its appliance)
+works on Azure Linux.
+
+This should be submitted upstream:
+https://github.com/libguestfs/supermin
+---
+ src/ph_rpm.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ph_rpm.ml b/src/ph_rpm.ml
+index 5061d32..db82819 100644
+--- a/src/ph_rpm.ml
++++ b/src/ph_rpm.ml
+@@ -32,7 +32,7 @@ let stringset_of_list pkgs =
+ let fedora_detect () =
+   Config.rpm <> "no" && Config.rpm2cpio <> "no" && rpm_is_available () &&
+     (Config.yumdownloader <> "no" || Config.dnf <> "no") &&
+-    (List.mem (Os_release.get_id ()) [ "fedora"; "rhel"; "centos"; "openEuler"; "anolis"; "KylinSecOS" ] ||
++    (List.mem (Os_release.get_id ()) [ "azurelinux"; "fedora"; "rhel"; "centos"; "openEuler"; "anolis"; "KylinSecOS" ] ||
+      try
+        (stat "/etc/redhat-release").st_kind = S_REG ||
+        (stat "/etc/fedora-release").st_kind = S_REG ||
