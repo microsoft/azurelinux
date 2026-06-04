@@ -101,14 +101,35 @@ runtime-package-management = true
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-minimal" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.container-distroless-minimal.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
 
 [images.container-distroless-base]
 description = "Container Distroless Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-base" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.container-distroless-base.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
 
 [images.container-distroless-debug]
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.container-distroless-debug.capabilities]
+machine-bootable = false
+container = true
+systemd = false
+runtime-package-management = false
 
 # ---- wsl ---------------------------------------------------------------
 

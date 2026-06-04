@@ -7,10 +7,12 @@ system site-packages dependencies.
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import subprocess
 from pathlib import Path
+from typing import Any
 
 from .tools import NativeTool
 
@@ -202,3 +204,24 @@ def unmount_container_image(extract_dir: Path) -> None:
             result.returncode,
             result.stderr.strip(),
         )
+
+
+def inspect_oci_config(image_path: Path) -> dict[str, Any]:
+    """Return the OCI image configuration for a container archive.
+
+    Runs ``skopeo inspect --config`` against the OCI archive and parses
+    the resulting JSON (the OCI image config, which carries the
+    ``config`` object with ``User``, ``Cmd``, ``WorkingDir``, etc.).
+    Unlike rootfs extraction this needs only ``skopeo`` — no umoci unpack.
+    """
+    image_path = image_path.resolve()
+    logger.info("Inspecting OCI image config: %s", image_path)
+    result = _run(
+        [
+            SKOPEO.name,
+            "inspect",
+            "--config",
+            f"oci-archive:{image_path}",
+        ]
+    )
+    return json.loads(result.stdout)
