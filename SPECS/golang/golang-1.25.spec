@@ -105,7 +105,7 @@ rm -f  %{gopath}/src/runtime/*.c
   ./make.bash --no-clean
 )
 
-# Nuke the final bootstrapper 04. Note: It is not used in any step under install, post, postrun
+# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
 rm -rf %{_libdir}/golang
 
 
