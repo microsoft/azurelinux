@@ -7,12 +7,18 @@
 # of every package built with these LDFLAGS. Hardcode the Azure Linux CPE
 # so emitted binaries advertise the correct distro identity, matching
 # /usr/lib/system-release-cpe from azurelinux-release.
+#
+# We also substitute @OS@ and @OSVERSION@ placeholders here (added to the
+# linker-script template by the overlay below) so that .note.package
+# emits structured 'os' and 'osVersion' fields matching /etc/os-release's
+# ID and VERSION_ID. These give SBOM and crash-analysis tools a parsed
+# view of the OS without having to crack the CPE string.
 [[components.package-notes.overlays]]
-description = "Embed Azure Linux CPE in .note.package metadata instead of inheriting the buildroot's (Fedora) system-release-cpe"
+description = "Embed Azure Linux CPE / os / osVersion in .note.package metadata instead of inheriting the buildroot's (Fedora) system-release-cpe"
 type = "spec-search-replace"
 section = "%build"
-regex = '\$\(cat /usr/lib/system-release-cpe\)'
-replacement = "cpe:/o:microsoft:azure_linux:4.0"
+regex = 'sed "s\|@OSCPE@\|\$\(cat /usr/lib/system-release-cpe\)\|" %\{SOURCE0\} >redhat-package-notes'
+replacement = '''sed -e "s|@OSCPE@|cpe:/o:microsoft:azure_linux:4.0|" -e "s|@OS@|azure_linux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes'''
 
 # Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
 # into every %build shell. We hook into the %_generate_package_note_file
@@ -52,8 +58,8 @@ replacement = '''%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "
 # packages that relink during %install (e.g. avahi's libtool --relink for
 # PIE libraries) fail because GCC's %:getenv() is a strict lookup.
 [[components.package-notes.overlays]]
-description = "Add moduleVersion key (sourced from RPM_MODULE_VERSION) to the .note.package JSON payload"
+description = "Add os, osVersion, and moduleVersion keys to the .note.package JSON payload"
 type = "file-search-replace"
 file = "redhat-package-notes.in"
 regex = '\\"osCpe\\":\\"@OSCPE@\\"\}\)\)\)\)\}'
-replacement = '\"osCpe\":\"@OSCPE@\",\"moduleVersion\":\"%:getenv(RPM_MODULE_VERSION \"})))))}'
+replacement = '\"osCpe\":\"@OSCPE@\",\"os\":\"@OS@\",\"osVersion\":\"@OSVERSION@\",\"moduleVersion\":\"%:getenv(RPM_MODULE_VERSION \"})))))}'
