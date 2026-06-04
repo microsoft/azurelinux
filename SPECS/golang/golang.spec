@@ -170,7 +170,7 @@ fi
 
 %changelog
 
-* Fri May 29 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.2-2
+* Fri May 29 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-2
 - Remove the remaining bootstrap04 component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
 
 * Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
