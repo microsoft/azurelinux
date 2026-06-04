@@ -2,7 +2,7 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.12
+Version:        16.14
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -243,6 +243,9 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.14-1
+- Auto-upgrade to 16.14 - for CVE-2026-6473, CVE-2026-6479, CVE-2026-6638, CVE-2026-6474, CVE-2026-6475, CVE-2026-6477, CVE-2026-6478, CVE-2026-6472, CVE-2026-6637
+
 * Fri Feb 13 2026 Kanishk Bansal <kanbansal@microsoft.com> - 16.12-1
 - Upgrade to 16.12 - for CVE-2026-2003, CVE-2026-2004, CVE-2026-2005, 
   CVE-2026-2006, CVE-2026-2007

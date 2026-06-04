@@ -93,7 +93,7 @@ func buildNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildSta
 			err = fmt.Errorf("unexpected duplicate build for (%s)", defaultNode.SRPMFileName())
 			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
 			// restored later once the underlying cause of this error is fixed.
-			logger.Log.Warnf(err.Error())
+			logger.Log.Warn(err.Error())
 			err = nil
 			continue
 		}
@@ -186,7 +186,7 @@ func testNodesToRequests(pkgGraph *pkggraph.PkgGraph, buildState *GraphBuildStat
 			err = fmt.Errorf("unexpected duplicate test for (%s)", srpmFileName)
 			// Temporarily ignore the error, this state is unexpected but not fatal. Error return will be
 			// restored later once the underlying cause of this error is fixed.
-			logger.Log.Warnf(err.Error())
+			logger.Log.Warn(err.Error())
 			err = nil
 			continue
 		}

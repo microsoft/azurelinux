@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86_64 6.6.130.mshv1 Kernel Configuration
+# Linux/x86_64 6.6.137.mshv1 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (GCC) 13.2.0"
 CONFIG_CC_IS_GCC=y
@@ -2396,6 +2396,7 @@ CONFIG_VIRTIO_MEM=y
 # CONFIG_VIRTIO_INPUT is not set
 CONFIG_VIRTIO_MMIO=y
 CONFIG_VIRTIO_MMIO_CMDLINE_DEVICES=y
+# CONFIG_VIRTIO_RTC is not set
 # CONFIG_VDPA is not set
 # CONFIG_VHOST_MENU is not set
 

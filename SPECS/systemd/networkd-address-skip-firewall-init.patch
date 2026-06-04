@@ -1,0 +1,30 @@
+From 0d7bbcef27b8f435640427ae1f28627e46fe514d Mon Sep 17 00:00:00 2001
+From: Topi Miettinen <toiwoton@gmail.com>
+Date: Mon, 4 Dec 2023 21:49:12 +0200
+Subject: [PATCH] network/networkd-address: don't set up firewall rules here
+
+Don't set up firewall rules when we're just initializing the firewall context
+for NFT sets.
+
+Fixes: #30257
+(cherry picked from commit 58c6e75f263a1562f5550221af1ec1a9b6046143)
+---
+ src/network/networkd-address.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/network/networkd-address.c b/src/network/networkd-address.c
+index c1a8cd884a..7071137676 100644
+--- a/src/network/networkd-address.c
++++ b/src/network/networkd-address.c
+@@ -645,7 +645,7 @@ static void address_modify_nft_set_context(Address *address, bool add, NFTSetCon
+         assert(nft_set_context);
+ 
+         if (!address->link->manager->fw_ctx) {
+-                r = fw_ctx_new(&address->link->manager->fw_ctx);
++                r = fw_ctx_new_full(&address->link->manager->fw_ctx, /* init_tables= */ false);
+                 if (r < 0)
+                         return;
+         }
+-- 
+2.45.4
+
