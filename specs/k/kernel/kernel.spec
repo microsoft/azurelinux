@@ -4578,6 +4578,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Jun 04 2026 Henry Beberman <henry.beberman@microsoft.com> - 6.18.31-1.6
+- feat(kernel): enable CONFIG_KASAN
+
 * Wed May 27 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.31-1.5
 - feat(kernel): add hand-curated changelog entry
 
