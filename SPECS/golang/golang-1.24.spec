@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.24.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,6 +105,9 @@ rm -f  %{gopath}/src/runtime/*.c
   ./make.bash --no-clean
 )
 
+# Nuke the final bootstrapper 04. Note: It is not used in any step under install, post, postrun
+rm -rf %{_libdir}/golang
+
 %install
 
 mkdir -p %{buildroot}%{_bindir}
@@ -160,6 +163,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.24.13-2
+- Remove the remaining bootstrap04 component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
 * Thu Feb 05 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.24.13-1
 - Bump version to 1.24.13-1
 
