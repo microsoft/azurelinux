@@ -1743,6 +1743,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libgee]
 [components.libgeotiff]
 [components.libgexiv2]
+[components.libguestfs]
 [components.libgit2]
 [components.libglade2]
 [components.libglib-testing]
