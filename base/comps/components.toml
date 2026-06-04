@@ -1165,6 +1165,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.hipsparse]
 [components.hipsparselt]
 [components.hiredis]
+[components.hivex]
 [components.hostname]
 [components.hspell]
 [components.httpcomponents-client]
