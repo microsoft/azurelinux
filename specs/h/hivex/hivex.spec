@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/hivex.azl.macros}
-
 # Conditionalize Ocaml support.  This looks ass-backwards, but it's not.
 %ifarch %{ix86}
 %bcond_with ocaml
@@ -16,7 +13,7 @@
 
 Name:           hivex
 Version:        1.3.24
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        Read and write Windows Registry binary hive files
 
 License:        LGPL-2.1-only AND LGPL-2.0-or-later AND GPL-2.0-or-later
@@ -31,7 +28,6 @@ Source1:        http://libguestfs.org/download/hivex/%{name}-%{version}.tar.gz.s
 %if 0%{verify_tarball_signature}
 Source2:       libguestfs.keyring
 %endif
-Source9999: hivex.azl.macros
 
 BuildRequires:  make
 BuildRequires:  autoconf, automake, libtool, gettext-devel
