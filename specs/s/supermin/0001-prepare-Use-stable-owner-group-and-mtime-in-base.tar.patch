@@ -1,0 +1,33 @@
+From 7a80a6eec799841b828ba7f617709562d8061435 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 21 Oct 2024 11:55:53 +0100
+Subject: [PATCH] prepare: Use stable owner, group and mtime in base.tar.gz
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=2320025
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+---
+ src/mode_prepare.ml | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/mode_prepare.ml b/src/mode_prepare.ml
+index 70f9dd4..6af47b1 100644
+--- a/src/mode_prepare.ml
++++ b/src/mode_prepare.ml
+@@ -166,9 +166,12 @@ let prepare debug (copy_kernel, format, host_cpu,
+     let base = outputdir // "base.tar.gz" in
+     if debug >= 1 then printf "supermin: writing %s\n%!" base;
+     let cmd =
+-      sprintf "tar%s -C %s -zcf %s -T %s"
++      let mtime =
++        try sprintf "--mtime=@%s" (quote (Sys.getenv "SOURCE_DATE_EPOCH"))
++        with Not_found -> "" in
++      sprintf "tar%s -C %s -z --owner=0 --group=0 %s -cf %s -T %s"
+               (if debug >=1 then " -v" else "")
+-              (quote dir) (quote base) (quote files_from) in
++              (quote dir) mtime (quote base) (quote files_from) in
+     run_command cmd;
+   )
+   else (
+-- 
+2.46.0
+
