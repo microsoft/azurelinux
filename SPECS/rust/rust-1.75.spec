@@ -192,7 +192,7 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-30
-- Add patch for CVE-2026-5222,CVE-2026-5223 & CVE-2026-40034
+- Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.75.0-29
 - Bump to rebuild with updated glibc
