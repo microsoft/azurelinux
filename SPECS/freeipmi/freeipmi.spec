@@ -4,7 +4,7 @@ Distribution:   Azure Linux
 # Copyright (c) 2003 FreeIPMI Core Team
 
 Name:             freeipmi
-Version:          1.6.11
+Version:          1.6.17
 Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
@@ -78,6 +78,9 @@ install -pm644 %SOURCE1 %SOURCE2 %SOURCE3 %{buildroot}%{_unitdir}/
 # Remove initscripts
 rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 
+# Remove COPYING files from doc dir; they will be installed via %%license
+rm -f %{buildroot}%{_datadir}/doc/%{name}/COPYING*
+
 %post bmc-watchdog
 %systemd_post bmc-watchdog.service
 
@@ -133,7 +136,7 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %attr(0644,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/freeipmi_interpret_sensor.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/libipmiconsole.conf
 %doc %{_datadir}/doc/%{name}/AUTHORS
-%doc %{_datadir}/doc/%{name}/COPYING
+%license COPYING
 %doc %{_datadir}/doc/%{name}/ChangeLog
 %doc %{_datadir}/doc/%{name}/ChangeLog.0
 %doc %{_datadir}/doc/%{name}/INSTALL
@@ -144,16 +147,16 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %doc %{_datadir}/doc/%{name}/README.openipmi
 %doc %{_datadir}/doc/%{name}/TODO
 %doc %{_infodir}/*
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiping
-%doc %{_datadir}/doc/%{name}/COPYING.ipmipower
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiconsole
-%doc %{_datadir}/doc/%{name}/COPYING.ipmimonitoring
-%doc %{_datadir}/doc/%{name}/COPYING.pstdout
-%doc %{_datadir}/doc/%{name}/COPYING.ipmidetect
-%doc %{_datadir}/doc/%{name}/COPYING.ipmi-fru
-%doc %{_datadir}/doc/%{name}/COPYING.ipmi-dcmi
-%doc %{_datadir}/doc/%{name}/COPYING.sunbmc
-%doc %{_datadir}/doc/%{name}/COPYING.ZRESEARCH
+%license COPYING.ipmiping
+%license COPYING.ipmipower
+%license COPYING.ipmiconsole
+%license COPYING.ipmimonitoring
+%license COPYING.pstdout
+%license COPYING.ipmidetect
+%license COPYING.ipmi-fru
+%license COPYING.ipmi-dcmi
+%license COPYING.sunbmc
+%license COPYING.ZRESEARCH
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiping
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmipower
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiconsole
@@ -319,7 +322,7 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %{_libdir}/pkgconfig/*
 
 %files bmc-watchdog
-%doc %{_datadir}/doc/%{name}/COPYING.bmc-watchdog
+%license COPYING.bmc-watchdog
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.bmc-watchdog
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.bmc-watchdog.UC
 %config(noreplace) %{_sysconfdir}/sysconfig/bmc-watchdog
@@ -335,7 +338,7 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %{_unitdir}/ipmidetectd.service
 
 %files ipmiseld
-%doc %{_datadir}/doc/%{name}/COPYING.ipmiseld
+%license COPYING.ipmiseld
 %doc %{_datadir}/doc/%{name}/DISCLAIMER.ipmiseld
 %{_unitdir}/ipmiseld.service
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/freeipmi/ipmiseld.conf
@@ -345,6 +348,9 @@ rm -frv %{buildroot}%{_initrddir} %{buildroot}%{_sysconfdir}/init.d
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Thu Apr 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.17-1
+- Auto-upgrade to 1.6.17 - for CVE-2026-33554
+
 * Thu Jan 11 2024 Xiaohong Deng <xiaohongdeng@microsoft.com> 1.6.11-1
 - Upgrade for Mariner 3.0
 

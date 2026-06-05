@@ -2,14 +2,14 @@
 
 Summary:        MySQL.
 Name:           mysql
-Version:        8.0.45
-Release:        2%{?dist}
+Version:        8.0.46
+Release:        1%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.mysql.com
-Source0:        https://dev.mysql.com/get/Downloads/MySQL-%{majmin}/%{name}-boost-%{version}.tar.gz
+Source0:        https://cdn.mysql.com/Downloads/MySQL-%{majmin}/%{name}-boost-%{version}.tar.gz
 # AZL's OpenSSL builds with the "no-chacha" option making all ChaCha
 # ciphers unavailable.
 Patch1:         fix-tests-for-unsupported-chacha-ciphers.patch
@@ -115,6 +115,12 @@ sudo -u test ctest --exclude-regex merge_large_tests || { cat Testing/Temporary/
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Wed Apr 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.46-1
+- Upgrade to fix CVE-2026-6409, CVE-2026-34278, CVE-2026-35239, CVE-2026-21998, CVE-2026-35237,
+  CVE-2026-22009, CVE-2026-34270, CVE-2026-34293, CVE-2026-34271, CVE-2026-22002, CVE-2026-22017,
+  CVE-2026-35238, CVE-2026-34267, CVE-2026-34303, CVE-2026-34308, CVE-2026-34304, CVE-2026-34276,
+  CVE-2026-22001, CVE-2026-22004, CVE-2026-22005, CVE-2026-35240, CVE-2026-35236, CVE-2026-22015
+
 * Mon Feb 16 2026 Aditya Singh <v-aditysing@microsoft.com> - 8.0.45-2
 - Patch for CVE-2025-0838
 - Exclude merge_large_tests in package test.

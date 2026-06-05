@@ -258,6 +258,7 @@
                 "fxload",
                 "gavl",
                 "gbenchmark",
+                "gcab",
                 "gconf-editor",
                 "GConf2",
                 "gcovr",
@@ -547,6 +548,7 @@
                 "Judy",
                 "jurand",
                 "kata-containers",
+                "kata-containers-preview",
                 "kde-filesystem",
                 "kde-settings",
                 "kernel-srpm-macros",
@@ -558,6 +560,7 @@
                 "kf-kcoreaddons",
                 "kf-ki18n",
                 "kf-kwidgetsaddons",
+                "koji",
                 "kpmcore",
                 "kronosnet",
                 "ksh",
@@ -1660,6 +1663,7 @@
                 "python-blivet",
                 "python-boltons",
                 "python-breathe",
+                "python-build",
                 "python-cached_property",
                 "python-cbor2",
                 "python-charset-normalizer",
@@ -1762,6 +1766,7 @@
                 "python-mpmath",
                 "python-msal",
                 "python-msrestazure",
+                "python-multilib",
                 "python-mutagen",
                 "python-networkx",
                 "python-nose2",
@@ -1784,12 +1789,14 @@
                 "python-productmd",
                 "python-prometheus_client",
                 "python-ptyprocess",
+                "python-pycdio",
                 "python-pycosat",
                 "python-pydbus",
                 "python-pymongo",
                 "python-PyMySQL",
                 "python-pyperclip",
                 "python-pyproject-api",
+                "python-pyproject-hooks",
                 "python-pyproject-metadata",
                 "python-pyroute2",
                 "python-pyrsistent",
@@ -1910,6 +1917,7 @@
                 "qhull",
                 "qpdf",
                 "qperf",
+                "qpid-proton",
                 "qr-code-generator",
                 "qt-rpm-macros",
                 "qt6-qtconnectivity",
@@ -2127,6 +2135,7 @@
                 "vhostmd",
                 "vino",
                 "virglrenderer",
+                "virt-manager",
                 "virt-p2v",
                 "virt-top",
                 "virt-what",
@@ -2226,6 +2235,7 @@
         "Fedora (ISC)": {
             "license": "[ISC License](https://github.com/sarugaku/resolvelib/blob/main/LICENSE)",
             "specs": [
+                "python-requests-gssapi",
                 "python-resolvelib"
             ]
         },
@@ -2459,6 +2469,7 @@
                 "vala",
                 "valkey",
                 "vnstat",
+                "walinuxagent-acl-config",
                 "zstd"
             ]
         },
@@ -2837,6 +2848,7 @@
                 "kernel-mshv",
                 "kernel-rt",
                 "kernel-uvm",
+                "kernel-uvm-micro",
                 "keyutils",
                 "kmod",
                 "krb5",
@@ -2950,7 +2962,6 @@
                 "nginx",
                 "ninja-build",
                 "nodejs",
-                "nodejs24",
                 "npth",
                 "nspr",
                 "nss",
@@ -3170,7 +3181,14 @@
         "Source project": {
             "license": "Same as the source project.",
             "specs": [
-                "python-nocaselist"
+                "azure-vm-utils",
+                "bootengine",
+                "coreos-cloudinit",
+                "coreos-init",
+                "ignition-flatcar",
+                "python-nocaselist",
+                "rust-afterburn",
+                "update-ssh-keys"
             ]
         },
         "Sysbench source": {

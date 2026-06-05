@@ -3,7 +3,7 @@
 Summary:        A firewall daemon with D-Bus interface providing a dynamic firewall
 Name:           firewalld
 Version:        2.0.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,7 @@ Source1:        FedoraServer.xml
 Source2:        FedoraWorkstation.xml
 Patch0:         firewalld-only-MDNS-default.patch
 Patch1:         firewalld_fix_testsuite.patch
+Patch2:         CVE-2026-4948.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -309,6 +310,9 @@ fi
 %{_mandir}/man1/firewall-config*.1*
 
 %changelog
+* Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.2-4
+- Patch for CVE-2026-4948
+
 * Mon Jun 16 2025 Sumedh Sharma <sumsharma@microsoft.com> - 2.0.2-3
 - disable ipv6_rpfilter in configuration
 - fix testsuite provided by firewalld-test sub-package

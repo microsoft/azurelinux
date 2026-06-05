@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.5
-Release: 4%{?dist}
+Release: 6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -51,7 +51,7 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 Patch24:  0024-load-legacy-prov.patch
 # # Load SymCrypt provider by default if present in non-FIPS mode,
 # # and always load it or the openssl fips provider in FIPS mode.
-Patch32: 0032-Force-fips-symcrypt-or-fips-3.3.5-AZL3.patch
+Patch32: 0032-Force-fips-symcrypt-or-fips-AZL3.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -77,6 +77,12 @@ Patch107: 0001-Verify-ASN1-object-s-types-before-attempting-to-acce.patch
 Patch108: 0001-Add-NULL-check-to-PKCS12_item_decrypt_d2i_ex.patch
 Patch109: CVE-2025-69419.patch
 Patch110: CVE-2026-22796.patch
+Patch111: CVE-2026-31789.patch
+Patch112: CVE-2026-28389.patch
+Patch113: CVE-2026-28390.patch
+Patch114: CVE-2026-28388.patch
+Patch115: CVE-2026-31791.patch
+Patch116: CVE-2026-31790.patch
 
 
 License: Apache-2.0
@@ -114,6 +120,9 @@ protocols.
 Summary: A general purpose cryptography library with TLS implementation
 Recommends: SymCrypt
 Recommends: SymCrypt-OpenSSL
+# Coordinate with the fipsmodule.cnf rename: patch 0032 in this release
+# reads /etc/pki/tls/fipsmodule.cnf, which only openssl-fips-provider >= 3.1.2-2 ships.
+Conflicts: openssl-fips-provider < 3.1.2-2
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -371,6 +380,12 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-6
+- Rename FIPS provider config from fips_prov.cnf to fipsmodule.cnf to align with upstream OpenSSL.
+
+* Tue Mar 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-5
+- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-28390, CVE-2026-31789, CVE-2026-31790, CVE-2026-31791
+
 * Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
 - Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
 - Patch OpenSSL speed to skip algorithms not supported by the selected FIPS provider.

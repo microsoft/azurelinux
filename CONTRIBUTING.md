@@ -95,7 +95,7 @@ We welcome documentation improvements. See [toolkit/docs](toolkit/docs) for the 
 
 ## Pull Request Guidelines
 
-Please direct pull requests to the desired development branch. Development changes to `3.0` should target `3.0-dev`. Development changes to `2.0` should target `main`. `1.0` is deprecated and should not be used.
+Please direct pull requests to the desired development branch. Development changes to `3.0` should target `3.0-dev`. `2.0` and `1.0` are deprecated and should not be used.
 
 ### Branch structure
 
@@ -107,13 +107,6 @@ An overview of how the branches are structured can be seen below
 |3.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
 |3.0-preview   |Tag           |No       |No         | Publishing in progress
 |3.0-stable    |Tag           |No       |Yes        | Last published release
-
-| Git Ref      | Branch / Tag | For PRs | Published | Notes
-|:-------------|:-------------|:--------|:----------|:------------
-|main          |Branch        |Yes      |No         | **Primary development branch**
-|2.0           |Branch        |No       |Yes - eventually | Staging branch for publishing
-|2.0-preview   |Tag           |No       |No         | Publishing in progress
-|2.0-stable    |Tag           |No       |Yes        | Last published release
 
 ### PR Titles
 
@@ -134,7 +127,7 @@ Please avoid titles such as
 ```bash
 - package: <whatever you did to the package>
 - CVE-XXXX-YYYY (leaving off what package was patched or upgraded)
-- [2.0] (prefixing with branch or other information)
+- [3.0] (prefixing with branch or other information)
 ```
 
 ### PR Checklist

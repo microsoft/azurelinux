@@ -1,89 +1,117 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global modname argcomplete
 
 %bcond_without check
+# Enable all tests when %%check is enabled.
+%bcond all_tests 1
 
-Name:          python-%{modname}
-Summary:       Bash tab completion for argparse
-Version:       1.10.0
-Release:       7%{?dist}
-License:       ASL 2.0
-URL:           https://github.com/kislyuk/argcomplete
-Source0:       %pypi_source argcomplete
+Name:           python-argcomplete
+Summary:        Bash tab completion for argparse
+Version:        3.6.3
+Release:        1%{?dist}
+License:        Apache-2.0
+URL:            https://github.com/kislyuk/argcomplete
+Source0:        %pypi_source argcomplete
 
-%if %{with check}
-BuildRequires: tcsh
-#BuildRequires: fish
-%endif
-
-BuildArch:     noarch
-
-%global _description \
-Argcomplete provides easy, extensible command line tab completion of\
-arguments for your Python script.\
-\
-It makes two assumptions:\
-\
- * You are using bash as your shell\
- * You are using argparse to manage your command line arguments/options\
-\
-Argcomplete is particularly useful if your program has lots of\
-options or subparsers, and if your program can dynamically suggest\
-completions for your argument/option values (for example, if the user\
-is browsing resources over the network).
-
-%description %{_description}
-
-%package -n python3-%{modname}
-Summary:        %{summary}
-%{?python_provide:%python_provide python3-%{modname}}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%if %{with check}
+BuildRequires:  python3-wheel
+BuildRequires:  python3-pip
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-vcs
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-setuptools_scm
+BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pexpect
+
+%if %{with check}
+BuildRequires:  tcsh
+#BuildRequires:  fish
+BuildRequires:  zsh
 %endif
-# pkg_resources module is used from python-argcomplete-check-easy-install-script
-Requires:       python3-setuptools
 
-%description -n python3-%{modname} %{_description}
+BuildArch:      noarch
 
-Python 3 version.
+%global _description %{expand:
+Tab complete all the things!
+
+Argcomplete provides easy, extensible command line tab completion of
+arguments for your Python application.
+
+It makes two assumptions:
+
+ - You're using bash or zsh as your shell
+ - You're using argparse to manage your command line arguments/options
+
+Argcomplete is particularly useful if your program has lots of options
+or subparsers, and if your program can dynamically suggest completions
+for your argument/option values (for example, if the user is browsing
+resources over the network).}
+
+%description %_description
+
+%package -n python3-argcomplete
+Summary:        %{summary}
+%description -n python3-argcomplete %_description
 
 %prep
-%autosetup -n %{modname}-%{version}
-# Remove useless BRs
-sed -i -r -e '/tests_require = /s/"(coverage|flake8|wheel)"[, ]*//g' setup.py
+%autosetup -p1 -n argcomplete-%{version}
+# Remove useless BRs (linters)
+sed -i -r -e '/test = /s/"(coverage|ruff|mypy)"[, ]*//g' pyproject.toml
+
 # https://github.com/kislyuk/argcomplete/issues/255
 # https://github.com/kislyuk/argcomplete/issues/256
-sed -i -e "1s|#!.*python.*|#!%{__python3}|" test/prog scripts/*
+sed -i -e "1s|#!.*python.*|#!%{__python3}|" test/prog argcomplete/scripts/*
 sed -i -e "s|python |python3 |" test/test.py
 
+# Remove shebang from installed scripts
+sed -i '/^#!/d' argcomplete/scripts/*.py
+
+%generate_buildrequires
+%pyproject_buildrequires %{?with_check:-x test}
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-mkdir -p %{buildroot}%{_sysconfdir}/bash_completion.d/
-install -p -m0644 %{buildroot}%{python3_sitelib}/%{modname}/bash_completion.d/python-argcomplete.sh %{buildroot}%{_sysconfdir}/bash_completion.d/
+%pyproject_install
+%pyproject_save_files argcomplete
+
+# Do not install to %%bash_completions_dir, see rhbz#2211862
+install -Dp -m0644 argcomplete/bash_completion.d/_%{name} %{buildroot}%{_sysconfdir}/bash_completion.d/_%{name}
 
 %if %{with check}
 %check
-%{__python3} setup.py test
+# Disable pip build isolation to make tests work in offline environment.
+# Fixes rhbz#2417961
+export PIP_NO_BUILD_ISOLATION=0
+
+%if %{with all_tests}
+%{py3_test_envvars} %{python3} test/test.py -v
+%else
+# Disable zsh tests. They fail for mysterious reasons.
+# https://github.com/kislyuk/argcomplete/issues/447
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestArgcomplete"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestBash"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestCheckModule"
+%{py3_test_envvars} %{python3} test/test.py -v -k "TestSplitLine"
+%endif
 %endif
 
-%files -n python3-%{modname}
+%files -n python3-argcomplete -f %{pyproject_files}
 %license LICENSE.rst
+%license %{python3_sitelib}/argcomplete-*.dist-info/licenses/LICENSE.rst
+%license %{python3_sitelib}/argcomplete-*.dist-info/licenses/NOTICE
 %doc README.rst
-%{python3_sitelib}/%{modname}-*.egg-info/
-%{python3_sitelib}/%{modname}/
 %{_bindir}/activate-global-python-argcomplete
 %{_bindir}/python-argcomplete-check-easy-install-script
-%{_bindir}/python-argcomplete-tcsh
 %{_bindir}/register-python-argcomplete
-%{_sysconfdir}/bash_completion.d/python-argcomplete.sh
+%{_sysconfdir}/bash_completion.d/_%{name}
 
 %changelog
+* Thu Apr 09 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.6.3-1
+- Upgrade to version 3.6.3 .
+
 * Wed Sep 25 2024 Muhammad Falak <mwani@microsoft.com> - 1.10.0-7
 - Drop BR on fish to enable build
 

@@ -2,7 +2,7 @@
 
 Summary:        Routing daemon
 Name:           frr
-Version:        10.5.0
+Version:        10.5.4
 Release:        1%{?dist}
 License:        GPL-2.0-or-later
 Vendor:         Microsoft Corporation
@@ -17,9 +17,6 @@ Patch2:         0002-disable-eigrp-crypto.patch
 Patch3:         0003-fips-mode.patch
 Patch4:         0004-remove-grpc-test.patch
 Patch5:         0001-Fix-frr-c90-complaint-error.patch
-# Following CVE-2025-61099 fixes CVE-2025-61100, CVE-2025-61101, CVE-2025-61102,
-# CVE-2025-61103, CVE-2025-61104, CVE-2025-61105, CVE-2025-61106 and CVE-2025-61107.
-Patch6:         CVE-2025-61099.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
@@ -199,6 +196,15 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
+* Mon May 04 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.5.4-1
+- Upgrade to 10.5.4 for CVE-2026-37457
+
+* Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.0-3
+- Patch for CVE-2026-28532
+
+* Tue Mar 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.5.0-2
+- Patch for CVE-2026-5107
+
 * Tue Feb 17 2026 Sudipta Pandit <sudpandit@microsoft.com> - 10.5.0-1
 - Upgrade to version 10.5.0
 - Remove CVE-2024-44070.patch (fixed upstream in 10.5.0)

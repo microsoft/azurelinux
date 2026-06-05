@@ -66,7 +66,7 @@
 Summary: Software framework for cross-language services development
 Name:    thrift
 Version: 0.15.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # Parts of the source are used under the BSD and zlib licenses, but
 # these are OK for inclusion in an Apache 2.0-licensed whole:
@@ -87,6 +87,11 @@ Source2: https://raw.github.com/apache/%{name}/%{version}/bootstrap.sh
  
 # fix configure.ac insistence on using /usr/local/lib for JAVA_PREFIX
 Patch1: configure-java-prefix.patch
+Patch2: CVE-2025-48431.patch
+Patch3: CVE-2026-41602.patch
+Patch4: CVE-2026-41603.patch
+Patch5: CVE-2026-41605.patch
+Patch6: CVE-2026-41636.patch
  
  
 # BuildRequires for language-specific bindings are listed under these
@@ -406,6 +411,9 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.15.0-6
+- Patch for CVE-2026-41636, CVE-2026-41605, CVE-2026-41603, CVE-2026-41602, CVE-2025-48431
+
 * Tue Mar 19 2024 Himaja Kesari <himajakesari@microsoft.com> - 0.15.0-5
 - Initial CBL-Mariner import from Fedora 40 (license: MIT).
 - License verified.
@@ -688,4 +696,3 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
  
 * Mon Jul 1 2013 willb <willb@redhat> - 0.9.0-1
 - Initial package
-

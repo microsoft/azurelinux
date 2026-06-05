@@ -1,0 +1,92 @@
+From 91f67a47a3fd31be578988d7ac11bb814314ec5a Mon Sep 17 00:00:00 2001
+From: Hanna Czenczek <hreitz@redhat.com>
+Date: Tue, 15 Oct 2024 19:04:37 +0200
+Subject: [PATCH] migration: Ensure vmstate_save() sets errp
+
+RH-Author: Hanna Czenczek <hreitz@redhat.com>
+RH-MergeRequest: 295: migration: Ensure vmstate_save() sets errp
+RH-Jira: RHEL-67844
+RH-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+RH-Acked-by: Jon Maloy <jmaloy@redhat.com>
+RH-Commit: [1/1] df65f254fa6bf241b1fd4f4d2101f137d2a6e44b (hreitz/qemu-kvm-c-9-s)
+
+migration/savevm.c contains some calls to vmstate_save() that are
+followed by migrate_set_error() if the integer return value indicates an
+error.  migrate_set_error() requires that the `Error *` object passed to
+it is set.  Therefore, vmstate_save() is assumed to always set *errp on
+error.
+
+Right now, that assumption is not met: vmstate_save_state_v() (called
+internally by vmstate_save()) will not set *errp if
+vmstate_subsection_save() or vmsd->post_save() fail.  Fix that by adding
+an *errp parameter to vmstate_subsection_save(), and by generating a
+generic error in case post_save() fails (as is already done for
+pre_save()).
+
+Without this patch, qemu will crash after vmstate_subsection_save() or
+post_save() have failed inside of a vmstate_save() call (unless
+migrate_set_error() then happen to discard the new error because
+s->error is already set).  This happens e.g. when receiving the state
+from a virtio-fs back-end (virtiofsd) fails.
+
+Signed-off-by: Hanna Czenczek <hreitz@redhat.com>
+Link: https://lore.kernel.org/r/20241015170437.310358-1-hreitz@redhat.com
+Signed-off-by: Peter Xu <peterx@redhat.com>
+(cherry picked from commit 37dfcba1a04989830c706f9cbc00450e5d3a7447)
+Signed-off-by: Hanna Czenczek <hreitz@redhat.com>
+---
+ migration/vmstate.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index ef26f26ccd..d19b42630a 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -22,7 +22,8 @@
+ #include "trace.h"
+ 
+ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+-                                   void *opaque, JSONWriter *vmdesc);
++                                   void *opaque, JSONWriter *vmdesc,
++                                   Error **errp);
+ static int vmstate_subsection_load(QEMUFile *f, const VMStateDescription *vmsd,
+                                    void *opaque);
+ 
+@@ -440,12 +441,13 @@ int vmstate_save_state_v(QEMUFile *f, const VMStateDescription *vmsd,
+         json_writer_end_array(vmdesc);
+     }
+ 
+-    ret = vmstate_subsection_save(f, vmsd, opaque, vmdesc);
++    ret = vmstate_subsection_save(f, vmsd, opaque, vmdesc, errp);
+ 
+     if (vmsd->post_save) {
+         int ps_ret = vmsd->post_save(opaque);
+-        if (!ret) {
++        if (!ret && ps_ret) {
+             ret = ps_ret;
++            error_setg(errp, "post-save failed: %s", vmsd->name);
+         }
+     }
+     return ret;
+@@ -517,7 +519,8 @@ static int vmstate_subsection_load(QEMUFile *f, const VMStateDescription *vmsd,
+ }
+ 
+ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+-                                   void *opaque, JSONWriter *vmdesc)
++                                   void *opaque, JSONWriter *vmdesc,
++                                   Error **errp)
+ {
+     const VMStateDescription * const *sub = vmsd->subsections;
+     bool vmdesc_has_subsections = false;
+@@ -545,7 +548,7 @@ static int vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+             qemu_put_byte(f, len);
+             qemu_put_buffer(f, (uint8_t *)vmsdsub->name, len);
+             qemu_put_be32(f, vmsdsub->version_id);
+-            ret = vmstate_save_state(f, vmsdsub, opaque, vmdesc);
++            ret = vmstate_save_state_with_err(f, vmsdsub, opaque, vmdesc, errp);
+             if (ret) {
+                 return ret;
+             }
+-- 
+2.45.1
+

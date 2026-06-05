@@ -1,7 +1,7 @@
 Summary:        Awesome Python HTTP Library That's Actually Usable
 Name:           python-requests
 Version:        2.31.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            http://python-requests.org
 Source0:        https://github.com/requests/requests/archive/v%{version}/requests-v%{version}.tar.gz#/requests-%{version}.tar.gz
 Patch0:         CVE-2024-35195.patch
 Patch1:         CVE-2024-47081.patch
+Patch2:         CVE-2026-25645.patch
 BuildArch:      noarch
 
 %description
@@ -60,11 +61,11 @@ perform the simplest of tasks.
 %py3_install
 
 %check
-pip3 install tox
+pip3 install --ignore-installed tox
 # 2.1.0+ versions of "markupsafe" make test fail.
 # No fix from upstream in version 2.28.1: https://github.com/psf/requests/commit/3ed60078e2376c847ba0b0c9d564af522623c5ba
 sed -i "/wheel/amarkupsafe==2.0.1" requirements-dev.txt
-LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
+LANG=en_US.UTF-8 python3 -m tox -e py%{python3_version_nodots}
 
 %files -n python3-requests
 %defattr(-,root,root)
@@ -73,6 +74,9 @@ LANG=en_US.UTF-8 tox -e py%{python3_version_nodots}
 %{python3_sitelib}/*
 
 %changelog
+* Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.31.0-4
+- Patch for CVE-2026-25645
+
 * Tue Jun 17 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.31.0-3
 - Add patch for CVE-2024-47081
 

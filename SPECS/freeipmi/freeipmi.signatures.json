@@ -1,8 +1,8 @@
 {
- "Signatures": {
-  "bmc-watchdog.service": "8fe627d5fe40ae7dee4437c9f136e76397166ebdd90487eb8a4852ce1d22bf12",
-  "freeipmi-1.6.11.tar.gz": "65fbd6910fc010457748695414f27c5755b4e8d75734221221f3858c6230a897",
-  "ipmidetectd.service": "a0d9af1447e72c449bbec5cc1fedd447673eaf6cca93e5c4644517d853b39e20",
-  "ipmiseld.service": "58b467e507eb805414697180dc94f7bb128bd61d520f3b4cb36e084dbdd5835c"
- }
+  "Signatures": {
+    "bmc-watchdog.service": "8fe627d5fe40ae7dee4437c9f136e76397166ebdd90487eb8a4852ce1d22bf12",
+    "ipmidetectd.service": "a0d9af1447e72c449bbec5cc1fedd447673eaf6cca93e5c4644517d853b39e20",
+    "ipmiseld.service": "58b467e507eb805414697180dc94f7bb128bd61d520f3b4cb36e084dbdd5835c",
+    "freeipmi-1.6.17.tar.gz": "16783d10faa28847a795cce0bf86deeaa72b8fbe71d1f0dc1101d13a6b501ec1"
+  }
 }
