@@ -158,7 +158,7 @@ fi
 
 %changelog
 * Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.23.12-2
-- Remove the remaining bootstrap04 component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+- Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
 
 * Wed Aug 06 2025 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.23.12-1
 - Bump version to 1.23.12-1
