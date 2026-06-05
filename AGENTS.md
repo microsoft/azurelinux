@@ -60,6 +60,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Diagnose and fix overlay issues | [`skill-fix-overlay`](.github/skills/skill-fix-overlay/SKILL.md) |
 | Test and inspect packages in mock chroot | [`skill-mock`](.github/skills/skill-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
+| Classify overlays by type and purpose | [`skill-classify-overlays`](.github/skills/skill-classify-overlays/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.github/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.github/skills/skill-mass-triage/SKILL.md) |
 | Inspect Koji AKS cluster health and node pools | [`skill-aks-health`](.github/skills/skill-aks-health/SKILL.md) |
