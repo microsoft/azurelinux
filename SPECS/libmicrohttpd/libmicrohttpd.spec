@@ -2,7 +2,7 @@ Name:           libmicrohttpd
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Version:        0.9.77
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Lightweight library for embedding a webserver in applications
 
 # * COPYING says that some main sources are only under LGPL-2.1-or-later
@@ -66,6 +66,14 @@ Doxygen documentation for libmicrohttpd and some example source code
 make -C doc/doxygen fast
 
 %check
+# Override the system crypto policy during tests. The @SYSTEM GnuTLS priority
+# (from gnutls-utilize-system-crypto-policy.patch) may be too restrictive for
+# the self-signed test certificates used by the HTTPS test suite.
+cat > /tmp/gnutls-test-priorities.conf << EOF
+[priorities]
+SYSTEM = NORMAL
+EOF
+export GNUTLS_SYSTEM_PRIORITY_FILE=/tmp/gnutls-test-priorities.conf
 %make_build check
 
 %install
@@ -112,6 +120,9 @@ fi
 %doc html
 
 %changelog
+* Mon Apr 27 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 0.9.77-5
+- Fix for https test failures due to TLS runtime issues
+
 * Thu Nov 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.9.77-4
 - Patch for CVE-2025-59777
 

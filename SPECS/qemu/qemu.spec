@@ -66,9 +66,6 @@ Distribution:   Azure Linux
 
 
 %global user_static 1
-%if 0%{?azl}
-%global user_static 0
-%endif
 
 %global have_kvm 0
 %if 0%{?kvm_package:1}
@@ -435,7 +432,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -677,7 +674,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %if %{user_static}
 BuildRequires: glibc-static >= 2.38-20%{?dist}
 BuildRequires: glib2-static zlib-static
-BuildRequires: pcre2-static
+BuildRequires: pcre2-devel-static
 %endif
 
 # Requires for the Fedora 'qemu' metapackage
@@ -1173,10 +1170,8 @@ Requires: %{name}-user = %{version}-%{release}
 Requires(post): systemd-units
 Requires(postun): systemd-units
 # qemu-user-binfmt + qemu-user-static both provide binfmt rules
-# Temporarily disable to get fedora CI working. Re-enable
-# once this CI issue let's us deal with subpackage conflicts:
-# https://pagure.io/fedora-ci/general/issue/184
-#Conflicts: qemu-user-static
+# introduce conflicts to not install both binfmt rules.
+Conflicts: qemu-user-static
 %description user-binfmt
 This package provides the user mode emulation of qemu targets
 
@@ -1194,11 +1189,9 @@ Summary: QEMU user mode emulation of qemu targets static build
 Requires(post): systemd-units
 Requires(postun): systemd-units
 # qemu-user-binfmt + qemu-user-static both provide binfmt rules
-# Temporarily disable to get fedora CI working. Re-enable
-# once this CI issue let's us deal with subpackage conflicts:
-# https://pagure.io/fedora-ci/general/issue/184
-#Conflicts: qemu-user-binfmt
-#Provides: qemu-user-binfmt
+# introduce conflicts to not install both binfmt rules.
+Conflicts: qemu-user-binfmt
+Provides: qemu-user-binfmt
 Requires: qemu-user-static-aarch64
 Requires: qemu-user-static-alpha
 Requires: qemu-user-static-arm
@@ -1311,7 +1304,6 @@ Summary: QEMU user mode emulation of sh4 qemu targets static build
 %description user-static-sh4
 This package provides the sh4 user mode emulation of qemu targets built as
 static binaries
-%endif
 
 %package user-static-sparc
 Summary: QEMU user mode emulation of sparc qemu targets static build
@@ -1331,6 +1323,7 @@ Summary: QEMU user mode emulation of xtensa qemu targets static build
 This package provides the xtensa user mode emulation of qemu targets built as
 static binaries
 
+%endif
 
 %package system-aarch64
 Summary: QEMU system emulator for AArch64
@@ -2045,6 +2038,7 @@ pushd %{static_builddir}
 run_configure \
   --enable-attr \
   --enable-linux-user \
+  --enable-pie \
   --enable-tcg \
   --disable-install-blobs \
   --static
@@ -2384,96 +2378,191 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 /bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
 
 %if %{user_static}
+# marker to run systemd-binfmt service only once when installing the meta package qemu-user-static
+%define setbinfmtonce %{_localstatedir}/lib/rpm-state/qemu-user-static-binfmt
+
+%define try_run_systemd_binfmt() \
+if ! /bin/systemctl is-active --quiet systemd-binfmt.service; then \
+    /bin/systemctl --system restart systemd-binfmt.service &>/dev/null || : \
+else \
+    /bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || : \
+fi \
+%{nil}
+
+%pretrans user-static
+mkdir -p %{_localstatedir}/lib/rpm-state/
+touch %{setbinfmtonce}
+exit 0
+
+%posttrans user-static
+%try_run_systemd_binfmt
+rm -f %{setbinfmtonce}
+exit 0
+
 %post user-static-aarch64
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-aarch64
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-alpha
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-alpha
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-arm
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-arm
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-cris
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-cris
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-hexagon
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-hexagon
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-hppa
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-hppa
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-loongarch64
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-loongarch64
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-m68k
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-m68k
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-microblaze
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-microblaze
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-mips
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-mips
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-or1k
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-or1k
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-ppc
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-ppc
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-riscv
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-riscv
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-s390x
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-s390x
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-sh4
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-sh4
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
-%endif
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-sparc
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-sparc
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-x86
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-x86
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 
 %post user-static-xtensa
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
 %postun user-static-xtensa
-/bin/systemctl --system try-restart systemd-binfmt.service &>/dev/null || :
+if [ ! -f %{setbinfmtonce} ];then
+    %try_run_systemd_binfmt
+fi
+
+# endif user-static
+%endif
 
 # endif !tools_only
 %endif
@@ -3432,6 +3521,13 @@ useradd -r -u 107 -g qemu -G kvm -d / -s /sbin/nologin \
 
 
 %changelog
+* Tue May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
+- Enable user_static builds for qemu
+- configure user_static with 'enable-pie'
+- manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
+- add conflicts between qemu-user-static and qemu-user-binfmt as both
+  provide binfmt rules
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 9.1.0-6
 - Bump to rebuild with updated glibc
 

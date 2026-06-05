@@ -1,0 +1,38 @@
+From 84e7054790d128c7c9b2dd9d8059ccf54066c70c Mon Sep 17 00:00:00 2001
+From: Mike Beaton <mjsbeaton@gmail.com>
+Date: Thu, 11 Dec 2025 19:36:43 +0000
+Subject: [PATCH] ArmVirtPkg: Increase firmware size
+
+Although almost all tool chain plus package combinations currently stay
+under the 2MB firmware size, except for NOOPT builds, ArmVirtQemu DEBUG
+built with CLANGDWARF now sneaks over.
+
+Noting that images will be padded to 64MB for before use anyway, we now
+choose 3MB as the default for all. But keep the 2MB vs. 3MB code which
+checks FD_SIZE_IN_MB, in this and other files, available for reference
+the next time a size change is needed.
+
+Signed-off-by: Mike Beaton <mjsbeaton@gmail.com>
+---
+ ArmVirtPkg/ArmVirt.dsc.inc | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/ArmVirtPkg/ArmVirt.dsc.inc b/ArmVirtPkg/ArmVirt.dsc.inc
+index 7044790..30aa81c 100644
+--- a/ArmVirtPkg/ArmVirt.dsc.inc
++++ b/ArmVirtPkg/ArmVirt.dsc.inc
+@@ -11,11 +11,8 @@
+ [Defines]
+   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
+ 
+-!if $(TARGET) != NOOPT
+-  DEFINE FD_SIZE_IN_MB    = 2
+-!else
+-  DEFINE FD_SIZE_IN_MB    = 3
+-!endif
++# Various builds now exceed 2MB so choose 3MB as the default.
++DEFINE FD_SIZE_IN_MB    = 3
+ 
+ !if $(FD_SIZE_IN_MB) == 2
+   DEFINE FD_SIZE          = 0x200000
+-- 

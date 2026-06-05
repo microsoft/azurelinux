@@ -7,7 +7,7 @@
 
 Name:           rust-%{crate}
 Version:        5.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Simple cloud provider agent
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ Source3:        coreos-metadata.service
 Patch0:         0001-Revert-remove-cl-legacy-feature.patch
 Patch1:         0002-util-cmdline-Handle-the-cmdline-flags-as-list-of-sup.patch
 Patch2:         0003-Cargo-reduce-binary-size-for-release-profile.patch
+Patch3:         CVE-2026-25541.patch
 
 ExcludeArch:    %{ix86}
 
@@ -71,11 +72,8 @@ Dracut module that enables afterburn and corresponding services
 to run in the initramfs on boot.
 
 %prep
-%autosetup -n %{crate}-%{version} -p1
-# Do vendor expansion here manually by
-# calling `tar x` and setting up
-# .cargo/config to use it.
-tar fx %{SOURCE1}
+%autosetup -p1 -n %{crate}-%{version} -a1
+# setting up .cargo/config to use it.
 mkdir -p .cargo
 
 cat >.cargo/config << EOF
@@ -135,6 +133,9 @@ make test
 %{dracutmodulesdir}/30afterburn/
 
 %changelog
+* Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.8.2-2
+- Patch for CVE-2026-25541
+
 * Thu Jan 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.8.2-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.

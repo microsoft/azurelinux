@@ -47,7 +47,6 @@ Source2:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2026-29181.patch
 Patch1:         CVE-2026-39821.patch
 Patch2:         CVE-2026-33814.patch
-
 BuildRequires:  golang >= 1.16
 
 %description
@@ -154,7 +153,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
-* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.28-2
+* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.30-2
 - Patch CVE-2026-39821, CVE-2026-33814
 
 * Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
