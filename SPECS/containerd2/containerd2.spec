@@ -31,7 +31,7 @@ Version: 2.2.4
 # IMPORTANT: any future official AzureLinux containerd2-2.2.4-N release
 # will be considered OLDER than this; bump Epoch or pin to a higher Version
 # if you ever need to deprecate this stream.
-Release: 6001.verity%{?dist}
+Release: 6002.verity%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -151,7 +151,17 @@ install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.to
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_datadir}/containerd2/config.toml
 
 install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/modules-load.d/aks-dmverity.conf
-install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
+# ACL-safety: also ship modules-load under /usr/lib so erofs + dm_verity
+# still auto-load on ACL, where the /etc copy above is stripped by the
+# immutable-OS bake. systemd-modules-load reads both paths; on standard
+# AzureLinux this is a redundant, harmless duplicate.
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_prefix}/lib/modules-load.d/aks-dmverity.conf
+# Ship the overlay drop-in under %{_unitdir} (/usr/lib/systemd/system),
+# NOT /etc/systemd/system: the /etc copy is stripped by the ACL
+# immutable-OS bake, so on ACL it never runs and the dm-verity config +
+# redirect are never restored before first-boot image pulls. systemd
+# reads drop-ins from %{_unitdir}/<unit>.d as well as /etc.
+install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_unitdir}/containerd.service.d/dmverity-overlay.conf
 install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
 
 # Stash the same hosts.toml under /usr/share/containerd2 so AgentBaker's
@@ -185,12 +195,13 @@ fi
 %{_datadir}/containerd2/config.toml
 %{_datadir}/containerd2/certs.d/mcr.microsoft.com/hosts.toml
 %{_sysconfdir}/modules-load.d/aks-dmverity.conf
-%{_sysconfdir}/systemd/system/containerd.service.d/dmverity-overlay.conf
+%{_prefix}/lib/modules-load.d/aks-dmverity.conf
+%{_unitdir}/containerd.service.d/dmverity-overlay.conf
 %config(noreplace) %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com/hosts.toml
 %dir %{_sysconfdir}/containerd
 %dir %{_sysconfdir}/containerd/certs.d
 %dir %{_sysconfdir}/containerd/certs.d/mcr.microsoft.com
-%dir %{_sysconfdir}/systemd/system/containerd.service.d
+%dir %{_unitdir}/containerd.service.d
 %dir %{_datadir}/containerd2
 %dir %{_datadir}/containerd2/certs.d
 %dir %{_datadir}/containerd2/certs.d/mcr.microsoft.com
@@ -199,6 +210,24 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri Jun 05 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.4-6002.verity
+- Make the dm-verity config + mcr->notaryaksegistry redirect active on
+  ACL at FIRST BOOT, before any image is pulled, instead of only after
+  AKS CSE runs.
+- Move the containerd.service.d/dmverity-overlay.conf drop-in from
+  /etc/systemd/system to %{_unitdir} (/usr/lib/systemd/system). The /etc
+  copy is stripped by the ACL immutable-OS bake, so on ACL the drop-in
+  never ran and config.toml/hosts.toml were only restored by CSE at
+  provisioning time -- AFTER first-boot prefetch had already cached
+  unsigned layers pulled straight from MCR. The /usr/lib drop-in survives
+  the bake and runs ExecStartPre on every containerd start.
+- Extend the drop-in to also restore certs.d/mcr.microsoft.com/hosts.toml
+  (not just config.toml) from the /usr/share/containerd2 stash, so the
+  redirect is in place the instant containerd starts.
+- Also ship modules-load.d/aks-dmverity.conf under /usr/lib so erofs +
+  dm_verity still auto-load on ACL. Both no-ops on standard AzureLinux V3
+  where /etc/* is preserved.
+
 * Wed Jun 04 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.4-6001.verity
 - Also stash hosts.toml under /usr/share/containerd2/certs.d/mcr.microsoft.com/.
 - ACL's immutable-OS image bake strips every /etc/* path contributed by
