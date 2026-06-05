@@ -1,5 +1,19 @@
 [components.librsvg2]
 
+# Use vendored Rust dependencies (like RHEL) to avoid dynamic cargo BR generation
+# which pulls in rust-image+avif-native → dav1d, a crate not available in AZL.
+[[components.librsvg2.overlays]]
+description = "Enable bundled Rust dependencies — AZL does not ship dav1d crate needed by rust-image+avif-native"
+type = "spec-search-replace"
+regex = '%global\s+bundled_rust_deps\s+0'
+replacement = '%global bundled_rust_deps 1'
+
+[[components.librsvg2.overlays]]
+description = "Replace rust-toolset BR with cargo-rpm-macros — AZL does not ship rust-toolset metapackage"
+type = "spec-search-replace"
+regex = 'BuildRequires:\s+rust-toolset'
+replacement = 'BuildRequires:  cargo-rpm-macros'
+
 [[components.librsvg2.overlays]]
 description = "Disable AVIF support to remove dav1d dependency"
 type = "spec-search-replace"
