@@ -1,7 +1,7 @@
 Summary:        The new Azure Storage data transfer utility - AzCopy v10
 Name:           azcopy
 Version:        10.25.1
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -52,22 +52,27 @@ tar --no-same-owner -xf %{SOURCE1}
 
 %build
 export GOPATH=%{our_gopath}
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 go build -buildmode=pie -mod=vendor
 
 %install
 install -D -m 0755 ./azure-storage-azcopy %{buildroot}%{_bindir}/azcopy
 
 %check
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 go test -mod=vendor
 ./azure-storage-azcopy --version
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE.txt README.md
+%license LICENSE NOTICE.txt
+%doc README.md
 %{_bindir}/azcopy
 
 %changelog
+* Fri May 29 2026 Sumit Jena <sumitjena@microsoft.com> - 10.25.1-6
+- Fix ptests failures.
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.25.1-5
 - Patch for CVE-2026-39821
 
