@@ -3139,14 +3139,14 @@
           "justification": "kernel-hwe 6.12 does not enable ICE_SWITCHDEV on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
         },
         {
-          "name": "CONFIG_PLDMFW",
+          "name": "CONFIG_CRYPTO_DH",
           "values": [
             {
               "architecture": "arm64",
-              "value": "n"
+              "value": "y"
             }
           ],
-          "justification": "kernel-hwe 6.12 does not enable PLDMFW on arm64 - PR: https://github.com/microsoft/azurelinux/pull/10960"
+          "justification": "kernel-hwe 6.12 builds CRYPTO_DH as builtin on arm64 (selected by other built-in components)"
         }
       ]
     }
