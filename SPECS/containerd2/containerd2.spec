@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -103,6 +103,12 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Fri Jun 05 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-4
+- Add Type=notify to containerd.service so systemd considers the unit started
+  only after the gRPC services (including tasks) are ready, preventing the
+  "containerd.services.tasks.v1.Tasks: not implemented" race when dependent
+  units (e.g. docker) start before containerd finishes plugin init.
+
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-3
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
 
