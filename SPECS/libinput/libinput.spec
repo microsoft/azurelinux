@@ -49,7 +49,7 @@ The %{name}-test package contains the libinput test suite. It is not
 intended to be run by users.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson -Ddebug-gui=false \
