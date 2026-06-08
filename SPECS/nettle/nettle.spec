@@ -62,7 +62,7 @@ make %{?_smp_mflags} check
 
 %changelog
 * Tue Jun 02 2026 Ratiranjan Behera <v-ratbehera@microsoft.com>- 3.10-1
-- Updgrading to 3.10
+- Updgrade to version 3.10
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.9.1-1
 - Auto-upgrade to 3.9.1 - Azure Linux 3.0 - package upgrades

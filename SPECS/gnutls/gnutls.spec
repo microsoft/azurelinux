@@ -92,8 +92,9 @@ echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
 
 %changelog
 * Tue Jun 02 2026 Ratiranjan Behera <v-ratbehera@microsoft.com>- 3.8.13-1
-- Update to version 3.8.13 to fix CVE-2026-42012 and CVE-2026-42013
-- Remove CVE patches fixed in upstream: CVE-2024-28834.patch, CVE-2024-28835.patch, CVE-2024-12133.patch, CVE-2024-12243.patch, CVE-2025-32990.patch, CVE-2025-32989.patch, CVE-2025-32988.patch, CVE-2025-6395.patch, CVE-2025-9820.patch, CVE-2026-33845.patch, CVE-2026-33846.patch, CVE-2026-3832.patch, CVE-2026-42010.patch, CVE-2026-42009.patch
+- Upgrade to version 3.8.13 to fix CVE-2026-42012 and CVE-2026-42013
+- Remove CVE patches fixed in upstream: CVE-2024-28834.patch, CVE-2024-28835.patch, CVE-2024-12133.patch, CVE-2024-12243.patch, CVE-2025-32990.patch, CVE-2025-32989.patch,
+  CVE-2025-32988.patch, CVE-2025-6395.patch, CVE-2025-9820.patch, CVE-2026-33845.patch, CVE-2026-33846.patch, CVE-2026-3832.patch, CVE-2026-42010.patch, CVE-2026-42009.patch
 
 * Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-11
 - Patch for CVE-2026-42009
