@@ -56,7 +56,7 @@ Patch11:        CVE-2026-33055_1.75.patch
 Patch12:        CVE-2026-34743_1.75.patch
 Patch13:        CVE-2026-5222_1.75.patch
 Patch14:        CVE-2026-5223_1.75.patch
-Patch15:        CVE-2026-40034_1.75.patch
+Patch15:        0001-Backport-CVE-2026-40034.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -192,7 +192,8 @@ rm %{buildroot}%{_bindir}/*.old
 
 %changelog
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-30
-- Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
+- Add patch for CVE-2026-5222, CVE-2026-5223
+- Backport patch for CVE-2026-40034
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.75.0-29
 - Bump to rebuild with updated glibc
