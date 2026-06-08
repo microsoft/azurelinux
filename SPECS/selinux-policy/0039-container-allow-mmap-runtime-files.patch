@@ -1,0 +1,46 @@
+From ba2452a126593a2c65ef08e2b24cf3870537e9a2 Mon Sep 17 00:00:00 2001
+From: Kenton Groombridge <concord@gentoo.org>
+Date: Mon, 6 May 2024 16:38:43 -0400
+Subject: [PATCH] container: allow system container engines to mmap runtime
+ files
+
+Backport of upstream refpolicy commit 7876e515103f9e13b861132bb26c72e0a2821159:
+https://github.com/SELinuxProject/refpolicy/commit/7876e515103f9e13b861132bb26c72e0a2821159
+
+containerd 2.2 introduces a MountManager plugin that opens a bbolt
+database under /run/containerd/ (labeled container_runtime_t). bbolt
+uses mmap() to memory-map the database file. The current policy only
+grants manage_file_perms for container_runtime_t:file, which does not
+include the map permission required for mmap().
+
+Without this fix, SELinux denies the mmap call, causing MountManager
+plugin initialization to fail. This cascades through the plugin
+dependency chain (MountManager -> TaskManager -> Tasks service),
+resulting in the Tasks gRPC service never being registered. Docker
+then fails with:
+  "unknown service containerd.services.tasks.v1.Tasks: not implemented"
+
+Change manage_file_perms to mmap_manage_file_perms, which adds the
+map permission needed for mmap() operations on runtime files.
+
+Signed-off-by: Kenton Groombridge <concord@gentoo.org>
+---
+ policy/modules/services/container.te | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/policy/modules/services/container.te b/policy/modules/services/container.te
+index 096d6c2..9699ac3 100644
+--- a/policy/modules/services/container.te
++++ b/policy/modules/services/container.te
+@@ -866,7 +866,7 @@ filetrans_pattern(container_engine_system_domain, container_var_lib_t, container
+ filetrans_pattern(container_engine_system_domain, container_var_lib_t, container_file_t, dir, "volumes")
+ 
+ allow container_engine_system_domain container_runtime_t:dir { manage_dir_perms relabel_dir_perms watch };
+-allow container_engine_system_domain container_runtime_t:file { manage_file_perms relabel_file_perms watch };
++allow container_engine_system_domain container_runtime_t:file { mmap_manage_file_perms relabel_file_perms watch };
+ allow container_engine_system_domain container_runtime_t:fifo_file { manage_fifo_file_perms relabel_fifo_file_perms };
+ allow container_engine_system_domain container_runtime_t:lnk_file { manage_lnk_file_perms relabel_lnk_file_perms };
+ allow container_engine_system_domain container_runtime_t:sock_file { manage_sock_file_perms relabel_sock_file_perms };
+-- 
+2.43.0
+
