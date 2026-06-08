@@ -1,11 +1,12 @@
 Name:           perl-HTML-Parser
 Summary:        Perl module for parsing HTML
 Version:        3.82
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTML-Parser-%{version}.tar.gz#/perl-HTML-Parser-%{version}.tar.gz
+Patch0:         CVE-2026-8829.patch
 URL:            https://metacpan.org/release/HTML-Parser
 BuildRequires:  coreutils
 BuildRequires:  findutils
@@ -56,6 +57,7 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n HTML-Parser-%{version}
+%patch 0 -p1
 chmod -c a-x eg/*
 
 %build
@@ -103,6 +105,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Jun 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.82-2
+- Patch for CVE-2026-8829
+
 * Tue Mar 26 2024 Sam Meluch <sammeluch@microsoft.com> - 3.82-1
 - Upgrade to version 3.82
 - Add tests package
