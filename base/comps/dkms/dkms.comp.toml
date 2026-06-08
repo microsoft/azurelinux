@@ -1,0 +1,5 @@
+# Pin to Fedora f43 commit that ships dkms 3.4.1 (newer than the global
+# Fedora snapshot, which still resolves to 3.3.0).
+# Source: https://src.fedoraproject.org/rpms/dkms/c/28b729e0aa8b5f3aad436d3a66b2fe8b309b7624
+[components.dkms]
+spec = { type = "upstream", upstream-commit = "28b729e0aa8b5f3aad436d3a66b2fe8b309b7624" }
