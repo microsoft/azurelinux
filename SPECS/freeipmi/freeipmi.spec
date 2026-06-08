@@ -4,12 +4,12 @@ Distribution:   Azure Linux
 # Copyright (c) 2003 FreeIPMI Core Team
 
 Name:             freeipmi
-Version:          1.6.17
+Version:          1.6.18
 Release:          1%{?dist}
 Summary:          IPMI remote console and system management software
 License:          GPLv3+
-URL:              http://www.gnu.org/software/freeipmi/
-Source0:          http://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+URL:              https://www.gnu.org/software/freeipmi/
+Source0:          https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
 Source1:          bmc-watchdog.service
 Source2:          ipmidetectd.service
 Source3:          ipmiseld.service
@@ -348,6 +348,9 @@ rm -f %{buildroot}%{_datadir}/doc/%{name}/COPYING*
 %dir %{_localstatedir}/cache/ipmiseld
 
 %changelog
+* Thu Jun 04 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.18-1
+- Auto-upgrade to 1.6.18 - for CVE-2026-50031
+
 * Thu Apr 02 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.6.17-1
 - Auto-upgrade to 1.6.17 - for CVE-2026-33554
 
