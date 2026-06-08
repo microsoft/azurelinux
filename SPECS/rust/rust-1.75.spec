@@ -56,7 +56,7 @@ Patch11:        CVE-2026-33055_1.75.patch
 Patch12:        CVE-2026-34743_1.75.patch
 Patch13:        CVE-2026-5222_1.75.patch
 Patch14:        CVE-2026-5223_1.75.patch
-Patch15:        0001-Backport-CVE-2026-40034.patch
+Patch15:        CVE-2026-40034_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
