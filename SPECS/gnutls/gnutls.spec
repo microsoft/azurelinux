@@ -65,12 +65,10 @@ SYSTEM=NONE:!VERS-SSL3.0:!VERS-TLS1.0:+VERS-TLS1.1:+VERS-TLS1.2:+AES-128-CBC:+RS
 EOF
 
 %check
-%if 0%{?with_check}
 # Skip test that requires chacha20-poly1305 (disabled in our openssl)
 # Observed error: "cipher_test:50: EVP_get_cipherbyname failed for chacha20-poly1305"
 echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
-%make_build check GNUTLS_SYSTEM_PRIORITY_FILE=/dev/null || { cat tests/test-suite.log tests/cert-tests/test-suite.log tests/slow/test-suite.log src/gl/tests/test-suite.log; exit 1; }
-%endif
+%make_build check
 
 %ldconfig_scriptlets
 
@@ -94,6 +92,8 @@ echo 'exit 77' > tests/slow/test-ciphers-openssl.sh
 %changelog
 * Tue Jun 02 2026 Ratiranjan Behera <v-ratbehera@microsoft.com>- 3.8.13-1
 - Update to version 3.8.13 to fix CVE-2026-42012 and CVE-2026-42013
+- Remove CVE patches fixed in upstream: CVE-2024-28834.patch, CVE-2024-28835.patch, CVE-2024-12133.patch, CVE-2024-12243.patch, CVE-2025-32990.patch, CVE-2025-32989.patch,
+  CVE-2025-32988.patch, CVE-2025-6395.patch, CVE-2025-9820.patch, CVE-2026-33845.patch, CVE-2026-33846.patch, CVE-2026-3832.patch, CVE-2026-42010.patch, CVE-2026-42009.patch
 
 * Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.3-11
 - Patch for CVE-2026-42009
