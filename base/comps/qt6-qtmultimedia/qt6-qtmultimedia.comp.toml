@@ -7,3 +7,32 @@
 # Part of the distro-wide effort to remove ffmpeg/libav* from Azure Linux.
 [components.qt6-qtmultimedia]
 build.without = ["ffmpeg"]
+
+# gstreamer1-plugins-bad-free is not shipped in AZL4. Remove the BR to avoid
+# linking against libgstplay/libgstphotography (unresolved runtime deps that
+# break all transitive consumers up to libplasma).
+[[components.qt6-qtmultimedia.overlays]]
+description = "Remove gstreamer-plugins-bad BR — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-plugins-bad-%{gst})"
+
+# Without gstreamer-plugins-bad headers, the GStreamer media plugin
+# (libgstreamermediaplugin.so) is not built. Remove it from %files
+# along with the empty multimedia plugin directory.
+# Note: replacement leaves blank lines — the tool operates per-line and
+# cannot delete lines entirely. This is cosmetic only; RPM ignores blanks
+# in %files.
+[[components.qt6-qtmultimedia.overlays]]
+description = "Remove empty multimedia plugin dir from %files — no plugins install here (gst-bad disabled, ffmpeg gated by bcond), so %dir would fail the build"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%dir %\{_qt6_plugindir\}/multimedia$'
+replacement = ''
+
+[[components.qt6-qtmultimedia.overlays]]
+description = "Remove libgstreamermediaplugin.so from %files (not built without gstreamer-plugins-bad)"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{_qt6_plugindir\}/multimedia/libgstreamermediaplugin\.so$'
+replacement = ''
