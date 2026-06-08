@@ -34,7 +34,17 @@ def _build_text_fields(entry: dict[str, Any]) -> dict[str, str]:
     commit_header = str(git.get("commit_header", "")) if isinstance(git, dict) else ""
     commit_body = str(git.get("commit_body", "")) if isinstance(git, dict) else ""
 
-    all_text = f"{description}\n{comments}\n{group_desc}\n{commit_header}\n{commit_body}"
+    # Include patch metadata in the text corpus
+    patch_meta = entry.get("patch_metadata", {})
+    patch_subject = str(patch_meta.get("patch_subject", "")) if isinstance(patch_meta, dict) else ""
+    patch_pr_urls = " ".join(patch_meta.get("pr_urls", [])) if isinstance(patch_meta, dict) else ""
+    patch_bug_ids = " ".join(patch_meta.get("bug_ids", [])) if isinstance(patch_meta, dict) else ""
+    patch_close_refs = " ".join(patch_meta.get("close_refs", [])) if isinstance(patch_meta, dict) else ""
+
+    all_text = (
+        f"{description}\n{comments}\n{group_desc}\n{commit_header}\n{commit_body}"
+        f"\n{patch_subject}\n{patch_pr_urls}\n{patch_bug_ids}\n{patch_close_refs}"
+    )
 
     # Also expose overlay-specific fields for pattern matching
     overlay_type = str(entry.get("type", ""))
@@ -78,6 +88,26 @@ def _register_check(name: str):  # noqa: ANN202
 @_register_check("patch_add_without_fedora_url")
 def _check_patch_add(_entry: dict[str, Any], text_fields: dict[str, str], _ctx: dict[str, Any]) -> bool:
     return text_fields["overlay_type"] == "patch-add" and "src.fedoraproject.org" not in text_fields["all_text"]
+
+
+@_register_check("patch_from_upstream_author")
+def _check_patch_upstream_author(entry: dict[str, Any], text_fields: dict[str, str], _ctx: dict[str, Any]) -> bool:
+    """Check if patch comes from an upstream (non-Microsoft/non-AZL) author or text says 'from upstream'."""
+    if text_fields["overlay_type"] not in ("patch-add", "file-add"):
+        return False
+    # Check for "from upstream" in text
+    all_lower = text_fields["all_text"].lower()
+    if "from upstream" in all_lower or "patch from upstream" in all_lower:
+        return True
+    # Check patch author is non-Microsoft/non-AZL
+    pm = entry.get("patch_metadata", {})
+    if not isinstance(pm, dict):
+        return False
+    author = str(pm.get("patch_author", "")).lower()
+    if not author:
+        return False
+    azl_domains = ("@microsoft.com", "@linux.microsoft.com")
+    return not any(domain in author for domain in azl_domains)
 
 
 @_register_check("fix_header_without_azl_keywords")
@@ -205,7 +235,18 @@ def classify_entry(
     matched: list[tuple[Rule, str]] = []
 
     for rule in RULES:
-        matched.extend((rule, signal.name) for signal in rule.signals if _evaluate_signal(signal, entry, text_fields))
+        if rule.require_all:
+            # AND logic: all signals must match
+            signal_matches = [s for s in rule.signals if _evaluate_signal(s, entry, text_fields)]
+            if len(signal_matches) == len(rule.signals):
+                matched.extend((rule, s.name) for s in signal_matches)
+        else:
+            # OR logic: any signal match fires the rule
+            matched.extend(
+                (rule, signal.name)
+                for signal in rule.signals
+                if _evaluate_signal(signal, entry, text_fields)
+            )
 
     if not matched:
         return {
@@ -223,7 +264,8 @@ def classify_entry(
 
     # Determine confidence (3-tier):
     #   high — single top-level + single (or no) sub-category
-    #   medium — single top-level but conflicting sub-categories
+    #   medium — single top-level but conflicting sub-categories,
+    #            OR sub-category is Upstreamable (needs LLM verification)
     #   low — conflicting top-level signals
     top_levels = {r.top_level for r, _ in matched}
     if len(top_levels) > 1:
@@ -233,6 +275,16 @@ def classify_entry(
     else:
         sub_cats = {r.sub_category for r, _ in matched if r.sub_category}
         confidence = "medium" if len(sub_cats) > 1 else "high"
+
+    # Cap Upstreamable at medium — the heuristic can't reliably distinguish
+    # "self-created fix to push upstream" from "upstream fix applied locally".
+    # The LLM pass verifies by checking patch authorship, PR status, and intent.
+    if (
+        best_rule.sub_category is not None
+        and best_rule.sub_category.value == "Upstreamable"
+        and confidence == "high"
+    ):
+        confidence = "medium"
 
     result: dict[str, Any] = {
         "top_level": best_rule.top_level.value,

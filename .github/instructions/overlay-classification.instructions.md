@@ -19,17 +19,27 @@ Azure Linux imports RPM specs from upstream Fedora and customizes them via overl
 
 ### Backport-fedora
 
-A patch or config change that already exists in a newer Fedora branch or commit, cherry-picked into AZL's current pinned snapshot. These are **self-resolving** — they will be removed automatically when AZL's upstream snapshot advances past the commit that includes the fix.
+A patch or fix that is **already available in Fedora** (any Fedora branch/version), backported or cherry-picked into AZL because AZL pins an older version or snapshot. These are **self-resolving** — they will be removed when AZL bumps its upstream pin or Fedora branch to include the fix. Should be accompanied by upstream commit URLs or an indication of which Fedora version/release contains the fix.
 
 **Indicators:**
 - TOML comments or commit body contain `src.fedoraproject.org/rpms/*/c/` URLs
 - Description or commit message mentions "backport", "cherry-pick", "backported"
 - Description says "Temporary: ... Remove when snapshot includes ..."
 - Description mentions "fixed upstream in f4x", "fixed in fedora", "landed in rawhide"
+- The actual upstream fix is applied as a patch (not a workaround)
 
 ### Upstream-fix
 
-A fix for a real bug (build failure, CVE, runtime issue) that upstream Fedora hasn't merged yet. These are **candidates for upstreaming** — the team should track whether the fix has been submitted to Fedora.
+A fix for a real bug (build failure, CVE, runtime issue) that **is not yet in any Fedora branch**. These are **candidates for upstreaming** — the team should track whether the fix has been submitted upstream or to Fedora. Should indicate relevant links to bugs or in-progress PRs if upstreaming is underway. If a fix was rejected upstream, note that in the rationale.
+
+**Note:** If a fix exists in the upstream project repo but Fedora hasn't picked it up in any branch, it's still Upstream-fix. It only becomes Backport-fedora once Fedora ships it.
+
+#### Upstream-fix Sub-Categories
+
+| Sub-category | Description |
+|---|---|
+| **Upstreamable** | Self-created fix that should be pushed upstream. No upstream PR/bug link exists yet (e.g., openpace Makefile fix with "TODO: push to upstream"). |
+| **Waiting-for-fedora** | Fix is merged or in-progress upstream (has PR URLs, bug IDs, commit links, or CVE refs). Waiting for upstream to release and/or Fedora to pick up the new version (e.g., vamp-plugin-sdk with merged commit not yet in a release). |
 
 **Indicators:**
 - CVE reference (e.g., `CVE-2024-12345`)
@@ -41,7 +51,7 @@ A fix for a real bug (build failure, CVE, runtime issue) that upstream Fedora ha
 
 ### AZL-customization
 
-An intentional deviation from Fedora specific to Azure Linux's requirements. These are **not expected to be upstreamed** and represent the AZL-specific value-add or necessary adaptation.
+An intentional deviation from Fedora specific to Azure Linux's requirements. These are **not expected to be upstreamed** and represent AZL-specific adaptation. This includes workarounds for missing dependencies or version gaps in AZL's tracked Fedora branch — if the overlay works around a problem (e.g., disables a feature) rather than applying the actual fix, it's a customization even if the fix exists in Fedora.
 
 ## AZL-customization Sub-Categories
 

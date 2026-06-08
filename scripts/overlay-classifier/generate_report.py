@@ -89,18 +89,94 @@ def generate_report(data: dict[str, Any]) -> str:  # noqa: C901, PLR0912, PLR091
         )
         lines.append("")
 
+        # Fedora fix version table (if enriched data is available)
+        enriched = [e for e in backports if e.get("fedora_fix_info")]
+        if enriched:
+            # Deduplicate by component (multiple overlays per component share the same fix info)
+            seen_components: set[str] = set()
+            unique_entries: list[dict[str, Any]] = []
+            for entry in sorted(enriched, key=lambda e: e.get("component", "")):
+                comp = entry.get("component", "")
+                if comp not in seen_components:
+                    seen_components.add(comp)
+                    unique_entries.append(entry)
+
+            lines.append("### Fedora Fix Versions (when can overlays be removed?)")
+            lines.append("")
+            lines.append("| Package | AZL tracks | Fix available in | Action |")
+            lines.append("|---|---|---|---|")
+            for entry in unique_entries:
+                fi = entry["fedora_fix_info"]
+                pkg = fi.get("package", "?")
+                azl_nvr = fi.get("azl_nvr") or "not found"
+                fix_nvr = fi.get("fix_nvr")
+                fix_tag = fi.get("fix_tag", "")
+                if fix_nvr:
+                    action = f"Remove overlay when bumping to `{fix_tag}`+"
+                    lines.append(f"| `{pkg}` | `{azl_nvr}` | `{fix_nvr}` | {action} |")
+                else:
+                    lines.append(f"| `{pkg}` | `{azl_nvr}` | _(not found)_ | Manual verification needed |")
+            lines.append("")
+
     # --- Upstream-fix section ---
-    upstream_fixes = [e for e in overlays if (e.get("classification", {}).get("top_level") == "Upstream-fix")]
-    if upstream_fixes:
-        lines.append(f"## Upstream-fix ({len(upstream_fixes)})")
+    upstream_overlays = [e for e in overlays if (e.get("classification", {}).get("top_level") == "Upstream-fix")]
+    upstream_groups = [e for e in group_entries if (e.get("classification", {}).get("top_level") == "Upstream-fix")]
+    upstream_total = len(upstream_overlays) + len(upstream_groups)
+
+    if upstream_total > 0:
+        lines.append(f"## Upstream-fix ({upstream_total})")
         lines.append("")
-        lines.append("| component | file | idx | confidence | description |")
-        lines.append("|---|---|---|---|---|")
-        lines.extend(
-            _render_overlay_row(entry)
-            for entry in sorted(upstream_fixes, key=lambda e: (e.get("component", ""), e.get("overlay_index", 0)))
-        )
+
+        # Sub-category frequencies
+        uf_sub_counts: dict[str, int] = {}
+        for entry in upstream_overlays + upstream_groups:
+            cl = entry.get("classification", {})
+            sc = cl.get("sub_category") or "uncategorized"
+            uf_sub_counts[sc] = uf_sub_counts.get(sc, 0) + 1
+
+        lines.append("### Sub-category frequencies")
         lines.append("")
+        lines.append("| Sub-category | Count |")
+        lines.append("|---|---:|")
+        for cat, count in sorted(uf_sub_counts.items(), key=lambda x: -x[1]):
+            lines.append(f"| `{cat}` | {count} |")
+        lines.append("")
+
+        # Per sub-category sections
+        for cat, _count in sorted(uf_sub_counts.items(), key=lambda x: -x[1]):
+            cat_overlays = [
+                e
+                for e in upstream_overlays
+                if (e.get("classification", {}).get("sub_category") or "uncategorized") == cat
+            ]
+            cat_groups = [
+                e
+                for e in upstream_groups
+                if (e.get("classification", {}).get("sub_category") or "uncategorized") == cat
+            ]
+
+            cat_total = len(cat_overlays) + len(cat_groups)
+            lines.append(f"### {cat} ({cat_total})")
+            lines.append("")
+
+            if cat_overlays:
+                lines.append("| component | file | idx | confidence | description |")
+                lines.append("|---|---|---|---|---|")
+                lines.extend(
+                    _render_overlay_row(entry)
+                    for entry in sorted(cat_overlays, key=lambda e: (e.get("component", ""), e.get("overlay_index", 0)))
+                )
+                lines.append("")
+
+            if cat_groups:
+                lines.append("**Group entries:**")
+                lines.append("")
+                lines.append("| component | file | group | confidence | group description |")
+                lines.append("|---|---|---|---|---|")
+                lines.extend(
+                    _render_group_row(entry) for entry in sorted(cat_groups, key=lambda e: e.get("component", ""))
+                )
+                lines.append("")
 
     # --- AZL-customization section ---
     azl_overlays = [e for e in overlays if (e.get("classification", {}).get("top_level") == "AZL-customization")]

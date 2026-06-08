@@ -34,8 +34,13 @@ class TopLevel(Enum):
 
 
 class SubCategory(Enum):
-    """AZL-customization sub-categories."""
+    """Sub-categories for AZL-customization and Upstream-fix."""
 
+    # Upstream-fix sub-categories
+    UPSTREAMABLE = "Upstreamable"
+    WAITING_FOR_FEDORA = "Waiting-for-fedora"
+
+    # AZL-customization sub-categories
     DEPENDENCY_PRUNING = "Dependency-pruning"
     FEATURE_DISABLEMENT = "Feature-disablement"
     BRANDING = "Branding"
@@ -77,6 +82,9 @@ class Rule:
     signals: Sequence[Signal] = field(default_factory=list)
     priority: int = 0
     """Higher priority rules are evaluated first. Ties broken by definition order."""
+    require_all: bool = False
+    """When True, ALL signals must match for the rule to fire (AND logic).
+    Default False means ANY signal match fires the rule (OR logic)."""
 
 
 # ---------------------------------------------------------------------------
@@ -94,7 +102,7 @@ _SIG_FEDORA_COMMIT_URL = Signal(
 _SIG_BACKPORT_KEYWORD = Signal(
     name="backport-keyword",
     fields=["all_text"],
-    pattern=re.compile(r"\b(?:backport|cherry[- ]?pick|backported)\b", re.IGNORECASE),
+    pattern=re.compile(r"\b(?:backport\w*|cherry[- ]?pick\w*)\b", re.IGNORECASE),
 )
 
 _SIG_TEMPORARY_SNAPSHOT = Signal(
@@ -110,12 +118,6 @@ _SIG_FIXED_UPSTREAM_FEDORA = Signal(
         r"(?:fixed (?:upstream )?in f4\d|fixed in fedora|landed in rawhide)",
         re.IGNORECASE,
     ),
-)
-
-_SIG_COMMIT_HEADER_BACKPORT = Signal(
-    name="commit-header-backport",
-    fields=["commit_header"],
-    pattern=re.compile(r"\bbackport\b", re.IGNORECASE),
 )
 
 # -- Upstream-fix signals --
@@ -144,10 +146,33 @@ _SIG_UPSTREAM_COMMIT_URL = Signal(
     ),
 )
 
+_SIG_UPSTREAM_PR_URL = Signal(
+    name="upstream-pr-url",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"github\.com/[^\s/]+/[^\s/]+/pull/\d+",
+        re.IGNORECASE,
+    ),
+)
+
+_SIG_UPSTREAM_BUG_ID = Signal(
+    name="upstream-bug-id",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"\b(?:[A-Z]{2,10}-\d+|GH-\d+)\b",
+    ),
+)
+
 _SIG_PATCH_ADD_NO_FEDORA = Signal(
     name="patch-add-no-fedora-url",
     fields=[],
     structural_check="patch_add_without_fedora_url",
+)
+
+_SIG_PATCH_FROM_UPSTREAM_AUTHOR = Signal(
+    name="patch-from-upstream-author",
+    fields=[],
+    structural_check="patch_from_upstream_author",
 )
 
 _SIG_FIX_COMMIT_HEADER = Signal(
@@ -160,6 +185,17 @@ _SIG_UPSTREAM_FIX_KEYWORD = Signal(
     name="upstream-fix-keyword",
     fields=["all_text"],
     pattern=re.compile(r"(?:fix for upstream|upstream bug|upstream regression)", re.IGNORECASE),
+)
+
+# -- Workaround signal (overrides upstream-fix when overlay is a workaround, not the fix) --
+
+_SIG_WORKAROUND_KEYWORD = Signal(
+    name="workaround-keyword",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"\b(?:work[- ]?around|workaround|until (?:the )?(?:upstream|fix)|for now[,:]?\s+disable)\b",
+        re.IGNORECASE,
+    ),
 )
 
 # -- AZL-customization / Dependency-pruning --
@@ -400,12 +436,6 @@ RULES: list[Rule] = [
         priority=95,
     ),
     Rule(
-        name="backport-commit-header",
-        top_level=TopLevel.BACKPORT_FEDORA,
-        signals=[_SIG_COMMIT_HEADER_BACKPORT],
-        priority=95,
-    ),
-    Rule(
         name="backport-temporary-snapshot",
         top_level=TopLevel.BACKPORT_FEDORA,
         signals=[_SIG_TEMPORARY_SNAPSHOT],
@@ -417,40 +447,79 @@ RULES: list[Rule] = [
         signals=[_SIG_FIXED_UPSTREAM_FEDORA],
         priority=90,
     ),
-    # -- Upstream-fix (priority 80) --
+    # -- Workaround override (priority 85) --
+    # When an overlay explicitly says "workaround" or "until upstream fix" AND
+    # disables a feature, it's AZL-customization even if upstream URLs are present.
+    Rule(
+        name="azl-workaround-feature-disable",
+        top_level=TopLevel.AZL_CUSTOMIZATION,
+        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        signals=[_SIG_WORKAROUND_KEYWORD, _SIG_DISABLE_KEYWORD],
+        priority=85,
+        require_all=True,
+    ),
+    # -- Upstream-fix / Waiting-for-fedora (has upstream refs) --
     Rule(
         name="upstream-fix-cve",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
         signals=[_SIG_CVE],
         priority=80,
     ),
     Rule(
         name="upstream-fix-bug-url",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
         signals=[_SIG_UPSTREAM_BUG_URL],
         priority=75,
     ),
     Rule(
         name="upstream-fix-commit-url",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
         signals=[_SIG_UPSTREAM_COMMIT_URL],
         priority=75,
     ),
     Rule(
+        name="upstream-fix-pr-url",
+        top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        signals=[_SIG_UPSTREAM_PR_URL],
+        priority=75,
+    ),
+    Rule(
+        name="upstream-fix-bug-id",
+        top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        signals=[_SIG_UPSTREAM_BUG_ID],
+        priority=70,
+    ),
+    # -- Upstream-fix / Upstreamable (no upstream refs yet) --
+    Rule(
+        name="upstream-fix-patch-from-upstream",
+        top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        signals=[_SIG_PATCH_FROM_UPSTREAM_AUTHOR],
+        priority=72,
+    ),
+    Rule(
         name="upstream-fix-patch-add",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.UPSTREAMABLE,
         signals=[_SIG_PATCH_ADD_NO_FEDORA],
         priority=70,
     ),
     Rule(
         name="upstream-fix-commit-header",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.UPSTREAMABLE,
         signals=[_SIG_FIX_COMMIT_HEADER],
         priority=65,
     ),
     Rule(
         name="upstream-fix-keyword",
         top_level=TopLevel.UPSTREAM_FIX,
+        sub_category=SubCategory.UPSTREAMABLE,
         signals=[_SIG_UPSTREAM_FIX_KEYWORD],
         priority=65,
     ),

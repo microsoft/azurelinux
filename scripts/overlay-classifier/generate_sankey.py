@@ -4,7 +4,7 @@
 Reads classified_overlays.json and produces a standalone HTML file with
 a Plotly Sankey diagram showing the flow:
 
-    Overlay Type → Top-level Label → Sub-category (AZL-customization only)
+    Overlay Type → Top-level Label → Sub-category (AZL-customization + Upstream-fix)
 
 Usage:
     python generate_sankey.py -i classified_overlays.json -o sankey.html
@@ -28,6 +28,10 @@ TOP_LEVEL_COLORS = {
 }
 
 SUB_CATEGORY_COLORS = {
+    # Upstream-fix sub-categories
+    "Upstreamable": "rgba(255, 187, 120, 0.7)",
+    "Waiting-for-fedora": "rgba(255, 152, 48, 0.7)",
+    # AZL-customization sub-categories
     "Feature-disablement": "rgba(77, 175, 74, 0.7)",
     "Test-disablement": "rgba(152, 78, 163, 0.7)",
     "Dependency-pruning": "rgba(255, 127, 0, 0.7)",
@@ -55,11 +59,14 @@ def _build_sankey_data(
     """Build Plotly Sankey node/link structures from classified data.
 
     Three-layer flow:
-        All Overlays → Top-level Label → Sub-category (AZL-customization only)
+        All Overlays → Top-level Label → Sub-category (AZL-customization + Upstream-fix)
     """
     overlays: list[dict[str, Any]] = data.get("overlays", [])
     groups: list[dict[str, Any]] = data.get("group_entries", [])
     total = len(overlays) + len(groups)
+
+    # Top-level labels that have sub-categories
+    labels_with_subcats = {"AZL-customization", "Upstream-fix"}
 
     # --- Count flows ---
     top_counts: Counter[str] = Counter()
@@ -71,7 +78,7 @@ def _build_sankey_data(
         sub = cl.get("sub_category") or "uncategorized"
 
         top_counts[top] += 1
-        if top == "AZL-customization":
+        if top in labels_with_subcats:
             top_to_sub[(top, sub)] += 1
 
     # --- Build node list ---

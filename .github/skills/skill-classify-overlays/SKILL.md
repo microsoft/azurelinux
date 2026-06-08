@@ -64,14 +64,56 @@ Q0: Is this a companion overlay that supports another overlay in the SAME compon
     → NO: continue
 
 Q1: Does any text reference a Fedora dist-git commit URL (src.fedoraproject.org/rpms/*/c/)?
-    OR mention "backport", "cherry-pick", or "fixed in f4x/rawhide"?
+    OR mention "backport", "backports", "cherry-pick", or "fixed in f4x/rawhide"?
     → YES: Backport-fedora
     → NO: continue
 
-Q2: Does any text reference a CVE, upstream bug tracker URL, or upstream commit URL
-    (github.com/*/commit/, github.com/*/issues/)?
-    AND the fix is NOT yet in the Fedora branch AZL tracks?
-    → YES: Upstream-fix
+Q1b: Does the overlay add or reference a patch with an upstream PR URL or bug ID?
+     If YES, determine whether the fix is in Fedora's current version:
+
+     Step 1 — Get AZL's pinned version:
+       azldev comp query -p <component> -q -O json | jq '.version'
+
+     Step 2 — Get Fedora's current version (for AZL's tracked branch):
+       # Check what version is in AZL's tracked Fedora branch (see default-version
+       # in distro/fedora.distro.toml, currently F43):
+       curl -s "https://src.fedoraproject.org/api/0/rpms/<component>?namespace=rpms" \
+         | jq '.full_url'
+       # or: koji latest-pkg f43 <component>
+
+     Step 3 — Check if the PR/commit is in a released version:
+       # If patch_metadata has pr_urls, check the upstream repo:
+       gh pr view <owner>/<repo>#<number> --json mergedAt,mergeCommit
+       # Then check if mergeCommit is in the version tag Fedora ships:
+       gh api repos/<owner>/<repo>/compare/<fedora-version-tag>...HEAD \
+         --jq '.commits[].sha' | grep <merge-commit-sha>
+
+     Step 4 — Distinguish fix vs workaround:
+       Before classifying, determine whether the overlay APPLIES the actual fix
+       or merely WORKS AROUND the problem:
+       # Example: python-heatclient disables doc generation because python-cliff
+       #   has a sphinxext bug (fixed in cliff 4.14.0, available in F45).
+       #   → The overlay does NOT apply the cliff fix — it disables docs.
+       #   → This is AZL-customization (Missing-dependency-workaround), not
+       #     Backport-fedora, because the overlay itself isn't upstreamable.
+       #
+       # Contrast: sos/Policy-Fix-os_release_name-value.patch backports the
+       #   actual upstream fix from sos 4.11.1 (which Fedora ships).
+       #   → The overlay APPLIES the fix → Backport-fedora.
+
+     → Overlay applies the actual fix AND fix is in Fedora (any branch):
+       Backport-fedora (self-resolves when AZL bumps upstream pin)
+     → Overlay applies the actual fix AND fix is NOT in any Fedora:
+       Upstream-fix (candidate for upstreaming)
+     → Overlay works around the problem (disables feature, skips test, etc.):
+       AZL-customization (even if the real fix exists in Fedora)
+     → Cannot determine (API error, no version tags): classify based on other
+       signals and note uncertainty in rationale
+
+Q2: Does any text reference a CVE, upstream bug tracker URL, upstream commit URL,
+    or upstream PR URL (github.com/*/commit/, github.com/*/pull/, github.com/*/issues/)?
+    AND the fix is NOT yet in any Fedora branch?
+    → YES: Upstream-fix / Waiting-for-fedora
     → NO: continue
 
 Q3: Is this a file-add overlay adding a patch (.patch/.diff)?
@@ -81,7 +123,9 @@ Q3: Is this a file-add overlay adding a patch (.patch/.diff)?
        (e.g., IVY-1652, bz#NNNN, GH-NNN) or fix a compatibility issue with a newer
        toolchain/runtime (e.g., Java 14+, GCC 15, Python 3.13)?
     c) Does the patch come from the upstream project's own repo (not an AZL-specific change)?
-    → If (a) OR (b) OR (c): Upstream-fix
+    → If (a) OR (b) OR (c):
+      - Has upstream PR/bug/commit links? → Upstream-fix / Waiting-for-fedora
+      - No upstream tracking yet? → Upstream-fix / Upstreamable
     → Otherwise: continue
 
 Q4: This is an AZL-customization. Which sub-category?
@@ -104,9 +148,29 @@ Q4: This is an AZL-customization. Which sub-category?
 > **Key principle 2:** Overlays often come in groups (e.g., file-add + spec-add-tag +
 > spec-search-replace to apply a patch). Companion overlays that serve the same purpose
 > should share the same classification as the primary overlay they support.
+>
+> **Key principle 3:** When a patch has a PR URL or bug reference, always verify whether
+> the fix is included in the version Fedora currently ships. A merged PR does NOT
+> automatically mean it's in Fedora — it must be in a released version that Fedora
+> packages. Use `gh` and Fedora APIs to check programmatically.
+>
+> **Key principle 4:** "In Fedora" means available in **any** Fedora branch, not just
+> AZL's tracked branch. If the actual fix is in Fedora F45 but AZL tracks F43, and
+> the overlay **applies the upstream fix** (backports it), that's Backport-fedora.
+> But if the overlay **works around** the problem (e.g., disables a feature because
+> a dependency is too old), that's AZL-customization — the overlay itself isn't
+> upstreamable even though the underlying fix exists somewhere.
 
 3. For **low-confidence entries**: assign `top_level`, `sub_category`, set `confidence` to "high", and `classified_by` to "llm".
 4. For **medium-confidence entries**: verify the `top_level`, pick the correct `sub_category`, upgrade `confidence` to "high", and set `classified_by` to "llm".
+   - **Upstreamable entries are always medium** — the heuristic cannot reliably distinguish
+     "self-created fix to push upstream" from "upstream fix applied locally". For each:
+     a) Check patch authorship — is the author from the upstream project or from AZL/Microsoft?
+     b) Check if referenced PRs/commits are merged upstream (`gh pr view`, `gh api`)
+     c) Read the description intent — does it say "TODO: push change to upstream" (Upstreamable) or
+        "patch from upstream" / "fix from upstream commit" (Waiting-for-fedora)?
+     d) If the fix exists upstream but isn't in any Fedora branch yet → Waiting-for-fedora
+     e) If the fix is AZL-created and no upstream PR exists → Upstreamable
 5. For **high-confidence heuristic entries**: spot-check ~10% to validate accuracy. Override any misclassifications.
 
 ### Step 4 — Write final report
@@ -115,6 +179,28 @@ Write the completed report to:
 ```
 base/build/work/scratch/overlay-classifier/final_report.json
 ```
+
+### Step 4.5 — Resolve Fedora fix versions for Backport-fedora overlays
+
+For each Backport-fedora overlay, query Fedora Koji to determine which Fedora
+package version contains the backported fix. This tells the team when overlays
+can be safely removed (i.e., when AZL bumps its upstream pin).
+
+```bash
+python scripts/overlay-classifier/resolve_fedora_versions.py \
+  -i base/build/work/scratch/overlay-classifier/final_report.json \
+  -o base/build/work/scratch/overlay-classifier/final_report.json \
+  --azl-fedora-version 43
+```
+
+> The `--azl-fedora-version` should match `default-version` in
+> `distro/fedora.distro.toml` (currently `43`).
+
+Each Backport-fedora entry gets a `fedora_fix_info` field:
+- `azl_tag` / `azl_nvr` — Fedora tag and NVR that AZL currently tracks
+- `fix_tag` / `fix_nvr` — Earliest newer Fedora tag that has a different (fixed) NVR
+- `removable_when` — Human-readable guidance (e.g., "Remove overlay when bumping to f44+")
+- `fedora_commits` — Any Fedora dist-git commit hashes referenced in overlay text
 
 ### Step 5 — Update cache
 
@@ -141,7 +227,7 @@ python scripts/overlay-classifier/generate_sankey.py \
 ```
 
 **Outputs:**
-- `overlay_report.md` — Markdown tables grouped by top-level label and sub-category, with per-entry details and summary statistics.
+- `overlay_report.md` — Markdown tables grouped by top-level label and sub-category, with per-entry details and summary statistics. Backport-fedora section includes a **Fedora Fix Versions** table showing the AZL-tracked NVR, the fixed NVR, and when overlays can be removed.
 - `sankey.html` — Interactive Plotly Sankey diagram showing the flow: All Overlays → Top-level Label → Sub-category (open in a browser).
 
 ### Step 7 — Summary

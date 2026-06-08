@@ -23,9 +23,16 @@ python classify_overlays.py \
 #   cp ../../base/build/work/scratch/overlay-classifier/classified_overlays.json \
 #      ../../base/build/work/scratch/overlay-classifier/final_report.json
 
-# Step 4: Generate markdown report and Sankey diagram from final_report.json
-# NOTE: Always use final_report.json (LLM-refined) rather than classified_overlays.json
-#        (heuristic-only) to include the most accurate classifications.
+# Step 4: Resolve Fedora fix versions for Backport-fedora overlays
+# Queries Fedora Koji to find which version has the fix (tells you when overlays can be removed)
+python resolve_fedora_versions.py \
+  -i ../../base/build/work/scratch/overlay-classifier/final_report.json \
+  -o ../../base/build/work/scratch/overlay-classifier/final_report.json \
+  --azl-fedora-version 43
+
+# Step 5: Generate markdown report and Sankey diagram from final_report.json
+# NOTE: Always use final_report.json (LLM-refined + enriched) rather than
+#        classified_overlays.json (heuristic-only) to include the most accurate data.
 python generate_report.py \
   -i ../../base/build/work/scratch/overlay-classifier/final_report.json \
   -o ../../base/build/work/scratch/overlay-classifier/overlay_report.md
@@ -48,11 +55,21 @@ Phase 1 (Deterministic)     Phase 2 (Deterministic)     Phase 3 (Non-determinist
 │ • Fetch commits    │      │ • Read/write cache  │      │ • Write final JSON │
 └────────────────────┘      └────────────────────┘      └──────────┬─────────┘
                                                                    │
+                            Phase 3.5 (Deterministic)              ▼
+                            ┌────────────────────────────────────────┐
+                            │ resolve_fedora_versions.py             │
+                            │                                        │
+                            │ • Query Fedora Koji for Backport-fedora│
+                            │ • Find fix NVR + earliest Fedora tag   │
+                            │ • Add removable_when guidance          │
+                            └──────────────────┬─────────────────────┘
+                                               │
                             Phase 4 (Deterministic)                ▼
                             ┌────────────────────────────────────────┐
                             │ generate_report.py / generate_sankey.py│
                             │                                        │
                             │ • Markdown report (overlay_report.md)  │
+                            │ • Fedora Fix Versions table            │
                             │ • Interactive Sankey diagram (HTML)     │
                             └────────────────────────────────────────┘
 ```
@@ -63,9 +80,20 @@ Phase 1 (Deterministic)     Phase 2 (Deterministic)     Phase 3 (Non-determinist
 
 | Label | Description |
 |-------|-------------|
-| **Backport-fedora** | Already in newer Fedora; self-resolves when snapshot advances |
-| **Upstream-fix** | Bug fix not yet in Fedora; candidate for upstreaming |
-| **AZL-customization** | Intentional AZL-specific deviation |
+| **Backport-fedora** | Fix IS in Fedora (any branch). Overlay applies the actual fix. Self-resolves when AZL bumps its upstream pin. |
+| **Upstream-fix** | Fix is NOT in any Fedora branch. Overlay is a candidate for upstreaming. |
+| **AZL-customization** | Intentional AZL-specific deviation. Includes workarounds even if the real fix exists in Fedora. |
+
+> **Key distinction — fix vs. workaround:** If an overlay **applies the upstream fix** →
+> Backport-fedora or Upstream-fix. If it **works around** the problem (disables a feature,
+> skips a test) → AZL-customization, even if the fix exists upstream.
+
+### Upstream-fix sub-categories (2 buckets)
+
+| Sub-category | Description | Example |
+|-------------|-------------|---------|
+| **Upstreamable** | Self-created fix with no upstream PR/bug link yet. Should be pushed upstream. | openpace Makefile fix ("TODO: push to upstream") |
+| **Waiting-for-fedora** | Fix exists upstream (has PR URLs, bug IDs, commit links, CVE refs). Waiting for upstream to release and/or Fedora to pick it up. | vamp-plugin-sdk (merged commit not in a release yet) |
 
 ### AZL-customization sub-categories (10 buckets)
 
@@ -84,11 +112,12 @@ Phase 1 (Deterministic)     Phase 2 (Deterministic)     Phase 3 (Non-determinist
 
 ## Data Sources
 
-Each overlay is analyzed using three data sources:
+Each overlay is analyzed using four data sources:
 
 1. **TOML fields** — parsed `type`, `description`, `tag`, `value`, `regex`, `replacement`, etc.
 2. **TOML comments** — raw comment lines above each overlay block
-3. **Git commit history** — `git blame` SHA → `git log` commit header + body
+3. **Git commit history** — `git blame` SHA → `git log` commit header + body + author
+4. **Patch file headers** — first 4KB of `.patch`/`.diff` files: author, subject, PR URLs, bug IDs, close refs
 
 ## Cache / Consistency
 
@@ -150,9 +179,10 @@ Human reviewers can edit the cache to correct misclassifications — corrections
 
 | File | Role | Deterministic? |
 |------|------|---------------|
-| `extract_overlays.py` | TOML parser + git blame enrichment | ✅ |
+| `extract_overlays.py` | TOML parser + git blame + patch header enrichment | ✅ |
 | `classify_overlays.py` | Heuristic rule engine + cache | ✅ |
-| `taxonomy.py` | Label definitions + signal patterns | ✅ |
+| `taxonomy.py` | Label definitions + signal patterns + 44 rules | ✅ |
+| `resolve_fedora_versions.py` | Koji queries for Backport-fedora fix NVRs | ✅ (network-dependent) |
 | `generate_report.py` | Markdown report generator | ✅ |
 | `generate_sankey.py` | Interactive Sankey diagram (HTML) | ✅ |
 | `classifications_cache.json` | Pinned results for consistency | ✅ |
@@ -163,23 +193,25 @@ Human reviewers can edit the cache to correct misclassifications — corrections
 ### Pipeline Overview
 
 ```
-Phase 1: Extract          Phase 2: Heuristic         Phase 3: LLM           Phase 4: Report
-TOML parse + git blame → 41 regex rules by priority → Decision tree (Q0-Q4) → MD + Sankey HTML
+Phase 1: Extract          Phase 2: Heuristic         Phase 3: LLM           Phase 3.5: Koji     Phase 4: Report
+TOML + git + patch hdrs → 44 rules by priority      → Decision tree (Q0-Q4)→ Fix version lookup → MD + Sankey HTML
                           ↕ cache (fingerprint-keyed)
 ```
 
 ### Heuristic Engine (Phase 2)
 
-- **41 rules** sorted by descending priority:
-  - Backport-fedora (priority 100→90)
-  - Upstream-fix (priority 80→65)
-  - AZL sub-categories (priority 55→35)
-- Each rule has signal patterns (compiled regexes) that match against specific overlay
-  fields or `all_text` (description + comments + commit header + commit body).
-- **Winner:** highest-priority matching rule.
+- **44 rules** sorted by descending priority:
+  - Workaround override (priority 85) — requires BOTH workaround + disable keywords (AND logic)
+  - Backport-fedora (priority 100→90) — Fedora dist-git URLs, backport/cherry-pick keywords
+  - Upstream-fix / Waiting-for-fedora (priority 80→70) — CVE, upstream URLs, PRs, bug IDs, upstream patch authors
+  - Upstream-fix / Upstreamable (priority 70→65) — patch-add without Fedora URL, fix commit headers
+  - AZL sub-categories (priority 55→35) — feature/test disablement, dependency pruning, branding, etc.
+- **Signal types:** compiled regexes matching against text fields, OR structural checks (overlay type, build config, patch author domain)
+- **Rule logic:** Most rules use OR (any signal fires the rule). The workaround rule uses AND (`require_all=True` — both signals must match).
+- **Winner:** highest-priority matching rule determines top-level + sub-category.
 - **3-tier confidence:**
   - `high` — single top-level + single sub-category matched
-  - `medium` — same top-level, conflicting sub-categories
+  - `medium` — same top-level but conflicting sub-categories, OR sub-category is Upstreamable (always needs LLM review)
   - `low` — conflicting top-levels or no rules matched at all
 
 ### LLM Decision Tree (Phase 3)
@@ -190,16 +222,22 @@ Q0: Companion overlay? (same component, supports a sibling overlay)
     → NO: continue
 
 Q1: Fedora backport signals? (dist-git URL, "backport", "cherry-pick", "rawhide")
-    → YES: Backport-fedora
+    → YES: verify fix vs. workaround
+    Q1b: Check if fix is in Fedora (azldev query → Fedora API → gh CLI)
+      → Overlay applies the actual fix AND fix is in Fedora → Backport-fedora
+      → Overlay applies the actual fix AND fix is NOT in Fedora → Upstream-fix
+      → Overlay works around the problem → AZL-customization
     → NO: continue
 
-Q2: CVE / upstream URL / bug tracker reference?
-    → YES: Upstream-fix
+Q2: CVE / upstream URL / PR URL / bug tracker reference?
+    AND the fix is NOT yet in any Fedora branch?
+    → YES: Upstream-fix / Waiting-for-fedora
     → NO: continue
 
 Q3: file-add adding a .patch from upstream author / upstream bug ID / toolchain compat?
-    → YES: Upstream-fix
-    → NO: continue
+    → If upstream PR/bug/commit links exist → Upstream-fix / Waiting-for-fedora
+    → If no upstream tracking yet → Upstream-fix / Upstreamable
+    → Otherwise: continue
 
 Q4: AZL-customization → pick from 10 sub-categories
 ```
@@ -208,12 +246,19 @@ Q4: AZL-customization → pick from 10 sub-categories
 1. Always check patch authorship and origin before defaulting to AZL-customization.
 2. Companion overlays (file-add + spec-add-tag + spec-search-replace serving the same
    purpose) should share the same classification.
+3. When a patch has a PR URL or bug reference, verify whether the fix is included in
+   the version Fedora currently ships. A merged PR does NOT mean it's in Fedora.
+4. "In Fedora" means available in **any** Fedora branch, not just AZL's tracked branch.
+   If the overlay applies the upstream fix → Backport-fedora. If it works around the
+   problem → AZL-customization.
+5. All Upstreamable classifications are capped at medium confidence — the LLM verifies
+   by checking patch authorship, PR status, and description intent.
 
 ## Difficulties & Limitations
 
 ### Missing Metadata
 
-~95 overlays have no description, no comments, and no git blame data (inline syntax
+~144 overlays have no description, no comments, and no git blame data (inline syntax
 in `components.toml`). Heuristics have nothing to match against — these always fall
 to low confidence and require LLM review.
 
@@ -226,51 +271,67 @@ handles grouping by checking sibling overlays and shared `commit_sha`.
 
 ### Ambiguous Sub-categories
 
-306 overlays match multiple sub-categories (e.g., removing a `BuildRequires` could be
+~315 overlays match multiple sub-categories (e.g., removing a `BuildRequires` could be
 Dependency-pruning OR Feature-disablement). Priority ordering resolves the conflict
 deterministically but may not always pick the most appropriate sub-category.
+
+### Upstreamable vs. Waiting-for-fedora
+
+The heuristic uses patch author email domain and "from upstream" text to distinguish
+self-created fixes (Upstreamable) from upstream patches applied locally (Waiting-for-fedora).
+This is inherently fragile:
+- Microsoft employees can submit upstream PRs — their patches are still "upstream"
+- Upstream contributors can author AZL-specific patches
+- Commit messages like "workaround" can be misnomers (e.g., vamp-plugin-sdk uses
+  "workaround" in the commit header but applies an actual upstream fix)
+- The heuristic cannot follow PR URLs to verify merge status
+
+All Upstreamable entries are capped at **medium confidence** so the LLM always reviews
+them with full context (patch content, PR status, author intent).
+
+### Fix vs. Workaround Distinction
+
+The classifier must distinguish overlays that **apply the actual fix** (Backport-fedora
+or Upstream-fix) from those that **work around** the problem (AZL-customization). This
+requires understanding semantic intent, not just pattern matching:
+- "Disable doc generation to work around cliff incompatibility" → workaround → AZL-customization
+- "Add patch to fix Makefile race from upstream" → actual fix → Upstream-fix
+
+The `require_all` AND-logic on the workaround rule (`workaround-keyword` + `disable-keyword`)
+helps but doesn't cover all cases. The LLM is significantly more precise here.
 
 ### Upstream vs. AZL-specific Patches
 
 A `file-add` patch with no description requires reading the actual `.patch` file content
-to determine authorship and origin. The heuristic engine only sees the filename; the LLM
-must inspect the file itself (Q3 in the decision tree).
+to determine authorship and origin. The heuristic reads the first 4KB of patch headers
+for author/subject/PR URLs, but cannot follow URLs to verify PR merge status or check
+which upstream release contains the fix.
 
 ### Temporal Context
 
 Distinguishing "Backport-fedora" from "Upstream-fix" depends on whether a fix has landed
-in Fedora's tracked branch *at classification time*. This is not checked programmatically
-— it relies on description text containing phrases like "fixed in rawhide" or Fedora
-dist-git URLs.
+in Fedora *at classification time*. The `resolve_fedora_versions.py` script queries Koji
+to find fix NVRs for Backport-fedora entries, but the initial classification still relies
+on description text containing phrases like "fixed in rawhide" or Fedora dist-git URLs.
+
+### Cache Contamination
+
+The fingerprint-keyed cache can accumulate stale LLM overrides from `final_report.json`.
+If the heuristic rules change, the cache must be **fully deleted** before re-running —
+`--force` alone is not sufficient because it reclassifies but writes results back into
+the same cache file. Always `rm -f classifications_cache.json` before a clean re-run
+after taxonomy or rule changes.
 
 ### LLM Non-determinism
 
 Phase 3 classifications may vary between runs. Mitigated by the fingerprint-keyed cache
 (pinned after first classification), but the initial LLM pass needs manual spot-checking.
-The apache-ivy case showed the LLM misclassifying upstream patches as Feature-disablement.
+Past cases of LLM misclassification include:
+- apache-ivy: upstream patches misclassified as Feature-disablement
+- vamp-plugin-sdk: upstream fix misclassified as AZL-customization (misleading commit header)
 
 ### No Spec Content Analysis
 
 The classifier does not read the rendered spec or upstream spec — it only sees overlay
 fields (regex, replacement, tag, value). Context like "what spec section this overlay
 modifies" is inferred from patterns, not parsed from the actual spec file.
-
-### Group Entry Granularity
-
-The 218 entries from `component-check-disablement.toml` and
-`component-mingw-disablement.toml` are bulk-classified by group description. Individual
-component context is lost — all entries in a group share the same classification.
-
-### Cache Staleness
-
-Cache keys include `commit_sha`. If an overlay is re-committed (amended/rebased), the
-fingerprint changes and it needs re-classification, even if the overlay content is
-identical.
-
-## Accuracy Estimates
-
-| Tier | Count | Estimated Accuracy | Notes |
-|------|------:|-------------------:|-------|
-| High confidence (heuristic) | 305 | ~95% | Single consistent signal |
-| Medium confidence (heuristic) | 306 | ~85% | Top-level correct, sub-category may be wrong |
-| Low / LLM-classified | 191 | ~75% | Needs spot-checking (e.g., apache-ivy misclassification) |

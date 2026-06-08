@@ -226,6 +226,100 @@ def _extract_overlay_fields(overlay: dict[str, object]) -> dict[str, object]:
     return fields
 
 
+# ---------------------------------------------------------------------------
+# Patch file header parsing
+# ---------------------------------------------------------------------------
+
+# Patterns for extracting metadata from patch file headers
+_RE_PR_URL = re.compile(
+    r"https?://github\.com/[^\s/]+/[^\s/]+/(?:pull|issues)/\d+",
+)
+_RE_CLOSES_REF = re.compile(
+    r"(?:closes|fixes|resolves|refs?)[:\s]*#?(\d+)",
+    re.IGNORECASE,
+)
+_RE_BUG_ID = re.compile(
+    r"\b(?:[A-Z]{2,10}-\d+|bz#?\d+|GH-\d+|rhbz#?\d+)\b",
+)
+_RE_PATCH_AUTHOR = re.compile(r"^From:\s*(.+?)(?:\s*<[^>]+>)?\s*$", re.MULTILINE)
+_RE_PATCH_SUBJECT = re.compile(
+    r"^Subject:\s*(?:\[PATCH[^\]]*\]\s*)?(.+?)(?:\n\s+(.+))*$",
+    re.MULTILINE,
+)
+
+# How many bytes of a patch file to read (header + commit message are at the top)
+_PATCH_HEADER_BYTES = 4096
+
+
+def _parse_patch_header(patch_path: Path) -> dict[str, object] | None:
+    """Parse a .patch/.diff file header and extract metadata.
+
+    Returns a dict with author, subject, pr_urls, bug_ids, and close_refs,
+    or None if the file cannot be read or is not a git-format patch.
+    """
+    if not patch_path.exists():
+        return None
+
+    suffix = patch_path.suffix.lower()
+    if suffix not in (".patch", ".diff"):
+        return None
+
+    try:
+        header = patch_path.read_bytes()[:_PATCH_HEADER_BYTES].decode("utf-8", errors="replace")
+    except OSError:
+        return None
+
+    result: dict[str, object] = {}
+
+    author_match = _RE_PATCH_AUTHOR.search(header)
+    if author_match:
+        result["patch_author"] = author_match.group(1).strip()
+
+    subject_match = _RE_PATCH_SUBJECT.search(header)
+    if subject_match:
+        subject = subject_match.group(1).strip()
+        # Multi-line subjects have continuation lines
+        if subject_match.group(2):
+            subject += " " + subject_match.group(2).strip()
+        result["patch_subject"] = subject
+
+    pr_urls = _RE_PR_URL.findall(header)
+    if pr_urls:
+        result["pr_urls"] = list(dict.fromkeys(pr_urls))  # dedupe, preserve order
+
+    bug_ids = _RE_BUG_ID.findall(header)
+    if bug_ids:
+        result["bug_ids"] = list(dict.fromkeys(bug_ids))
+
+    close_refs = _RE_CLOSES_REF.findall(header)
+    if close_refs:
+        result["close_refs"] = [f"#{ref}" for ref in dict.fromkeys(close_refs)]
+
+    return result or None
+
+
+def _enrich_with_patch_metadata(
+    entry: dict[str, object],
+    comp_dir: Path,
+) -> None:
+    """If entry is a file-add/patch-add for a .patch/.diff, parse its header."""
+    overlay_type = entry.get("type", "")
+    if overlay_type not in ("file-add", "patch-add"):
+        return
+
+    source = entry.get("source")
+    if not isinstance(source, str):
+        return
+
+    if not source.lower().endswith((".patch", ".diff")):
+        return
+
+    patch_path = comp_dir / source
+    metadata = _parse_patch_header(patch_path)
+    if metadata:
+        entry["patch_metadata"] = metadata
+
+
 def extract_overlays(comps_dir: Path, repo_root: Path) -> dict[str, object]:  # noqa: C901, PLR0912, PLR0915
     """Extract all overlays from comp.toml and group files.
 
@@ -298,6 +392,9 @@ def extract_overlays(comps_dir: Path, repo_root: Path) -> dict[str, object]:  # 
                 else:
                     entry["context_comments"] = ""
 
+                # Parse patch file headers for file-add/patch-add overlays
+                _enrich_with_patch_metadata(entry, toml_file.parent)
+
                 all_overlays.append(entry)
 
     # -- Also scan inline overlays in components.toml --
@@ -344,6 +441,11 @@ def extract_overlays(comps_dir: Path, repo_root: Path) -> dict[str, object]:  # 
                                     all_shas.add(sha)
                         else:
                             entry["context_comments"] = ""
+
+                        # Parse patch file headers for file-add/patch-add overlays
+                        # Inline overlays: patch files are in base/comps/<comp_name>/
+                        _enrich_with_patch_metadata(entry, comps_dir / comp_name)
+
                         all_overlays.append(entry)
 
     # -- Group overlays --
