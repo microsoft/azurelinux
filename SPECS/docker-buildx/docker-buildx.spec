@@ -4,7 +4,11 @@ Summary:        A Docker CLI plugin for extended build capabilities with BuildKi
 Name:           docker-buildx
 # update "commit_hash" above when upgrading version
 Version:        0.14.0
+<<<<<<< HEAD
 Release:        14%{?dist}
+=======
+Release:        15%{?dist}
+>>>>>>> a98309336c ([High] Patch docker-buildx for CVE-2026-39833 (#17590))
 License:        ASL 2.0
 Group:          Tools/Container
 Vendor:         Microsoft Corporation
@@ -36,6 +40,10 @@ Patch21:        CVE-2026-39827.patch
 Patch22:        CVE-2026-39835.patch
 Patch23:        CVE-2026-42502.patch
 Patch24:        CVE-2026-46598.patch
+<<<<<<< HEAD
+=======
+Patch25:        CVE-2026-39833.patch
+>>>>>>> a98309336c ([High] Patch docker-buildx for CVE-2026-39833 (#17590))
 
 BuildRequires: bash
 BuildRequires: golang < 1.25
@@ -69,6 +77,12 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 %{_libexecdir}/docker/cli-plugins/docker-buildx
 
 %changelog
+<<<<<<< HEAD
+=======
+* Mon Jun 01 2026 Akhila Guruju <v-guakhila@microsoft.com> - 0.14.0-15
+- Patch CVE-2026-39833 and fix patch for CVE-2026-39832
+
+>>>>>>> a98309336c ([High] Patch docker-buildx for CVE-2026-39833 (#17590))
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-14
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
