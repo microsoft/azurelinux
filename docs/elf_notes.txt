@@ -142,6 +142,120 @@ VALIDATION NOTES
 - Verify a built binary with:
     readelf -p .note.package /path/to/binary
 
+FULL BUILD / VERIFY CYCLE
+-------------------------
+The canonical inner-loop recipe for iterating on these overlays. Use
+tree-pkg as the downstream smoke-test target -- it's small, fast to
+build, and ships a single dynamically-linked ELF (/usr/bin/tree) that
+makes the .note.package section trivial to inspect.
+
+  cd /home/drew/repos/april/azurelinux
+
+  # 1. Edit the source of truth (NOT the rendered spec/.in).
+  #    For every change you make under base/comps/package-notes/,
+  #    the rendered files under specs/p/package-notes/ are
+  #    regenerated -- direct edits there are silently lost.
+  $EDITOR base/comps/package-notes/package-notes.comp.toml
+
+  # 2. Re-render and refresh locks. rpmautospec walks `git log` on
+  #    the component dir to compute Release: + %changelog, so commit
+  #    BEFORE rendering if you want the bump to reflect this change.
+  azldev comp render -p package-notes
+  azldev comp update -p package-notes
+
+  # 3. Sanity-check the rendered output matches the overlay intent.
+  grep -E "^release_number|^\* " specs/p/package-notes/package-notes.spec | head -3
+  cat   specs/p/package-notes/redhat-package-notes.in
+  sed -n '/^%build/,/^%install/p' specs/p/package-notes/package-notes.spec
+
+  # 4. Build package-notes AND the downstream target in one invocation.
+  #    The -p ordering matters: package-notes is published to the
+  #    local repo before tree-pkg starts, so tree-pkg's chroot can
+  #    resolve the new package-notes-srpm-macros NVR.
+  azldev comp build --local-repo-with-publish ./base/out \
+      -p package-notes -p tree-pkg -q
+
+  # 5. Confirm the expected NVR landed (release should match step 3).
+  ls -lt base/out/package-notes-srpm-macros-*.noarch.rpm | head -3
+
+  # 6. Bust the mock root_cache so the downstream rebuild actually
+  #    pulls the just-built package-notes-srpm-macros from the local
+  #    repo instead of the cached chroot tarball (see VALIDATION
+  #    NOTES above for why this is required).
+  sudo rm -f /var/cache/mock/azl-4.0-stage2-x86_64/root_cache/cache.tar.gz
+
+  # 7. Rebuild tree-pkg ONLY against the fresh chroot. This is the
+  #    build whose ELF output you'll actually inspect.
+  azldev comp build --local-repo-with-publish ./base/out -p tree-pkg -q
+
+  # 8. Inspect the resulting binary. Extract the RPM into a scratch
+  #    dir (don't install -- it targets AZL, not your dev host).
+  mkdir -p scratch && cd scratch
+  rm -rf usr etc var 2>/dev/null
+  TREE_RPM=$(ls -t ../base/out/rpms/rpm-base/tree-[0-9]*.rpm | head -1)
+  echo "Inspecting: $TREE_RPM"
+  rpm2cpio "$TREE_RPM" | cpio -idm
+  readelf -n ./usr/bin/tree | sed -n 's/.*Packaging Metadata: //p' | jq
+
+  # Expected output (all four metadata fields populated, no Fedora CPE):
+  # {
+  #   "type": "rpm",
+  #   "name": "tree-pkg",
+  #   "version": "2.2.1-3.azl4",
+  #   "architecture": "x86_64",
+  #   "osCpe": "cpe:/o:microsoft:azure_linux:4.0",
+  #   "os": "azure_linux",
+  #   "osVersion": "4.0",
+  #   "moduleVersion": "2.2.1.0"
+  # }
+
+Common failure modes and how to spot them in the JSON:
+
+  Missing "os" / "osVersion" fields
+    -> The redhat-package-notes.in overlay didn't apply, OR the
+       downstream package was built against an older package-notes
+       (cache wasn't busted, step 6 skipped).
+
+  "osCpe": "cpe:/o:fedoraproject:fedora:43"
+    -> Overlay (a) didn't apply, OR downstream package was built in a
+       Stage 1 / bootstrap chroot that still had the original
+       package-notes (the Fedora value comes from cat'ing the Fedora
+       buildroot's /usr/lib/system-release-cpe).
+
+  "osCpe": "cpe:/o:microsoft:azurelinux:4.0"  (no underscore)
+    -> Predates the azure_linux rename (pre 0.5-20). Confirms an old
+       package-notes was used; check buildroot resolution.
+
+  Missing "moduleVersion" or value of "0.0.0.0"
+    -> Overlay (b) didn't fire (RPM_MODULE_VERSION not exported), OR
+       the downstream package relinks during %install (e.g. avahi
+       libtool --relink for PIE libs) and azurelinux-rpm-config's
+       companion overlay adding %{?_generate_package_note_file} to
+       %__spec_install_pre is missing. Check that companion overlay.
+
+Distro-wide spot check (run on a built/booted AZL4 image):
+
+  # Tally osCpe values across /usr/bin to estimate how much of the
+  # distro has been rebuilt against the new package-notes vs. is
+  # still carrying the stale Fedora CPE.
+  readelf -n /usr/bin/* 2>/dev/null \
+    | sed -n 's/.*"osCpe":"\([^"]*\)".*/\1/p' \
+    | sort | uniq -c | sort -rn
+
+  # Just vendor (microsoft vs fedoraproject):
+  readelf -n /usr/bin/* 2>/dev/null \
+    | sed -n 's|.*"osCpe":"cpe:/o:\([^:]*\):.*|\1|p' \
+    | sort | uniq -c | sort -rn
+
+  # Find binaries missing the note entirely (built before any
+  # package-notes linker spec was in place -- usually Rust binaries
+  # built outside the RPM build flow, or pre-overlay legacy RPMs):
+  for f in /usr/bin/*; do
+    [[ -f $f ]] || continue
+    readelf -n "$f" 2>/dev/null | grep -q "Packaging Metadata:" \
+      || echo "MISSING: $f"
+  done
+
 RUST BINARIES
 -------------
 The redhat-package-notes GCC spec only affects link invocations that go
