@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.3-20260508.1.src.tar.gz
+%global ms_go_filename  go1.26.4-20260602.8.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.3
+Version:        1.26.4
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -166,6 +166,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
+- Bump version to 1.26.4-1
+
 * Fri May 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.3-1
 - Bump version to 1.26.3-1
 

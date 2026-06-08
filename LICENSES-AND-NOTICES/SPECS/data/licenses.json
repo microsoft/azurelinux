@@ -2469,6 +2469,7 @@
                 "vala",
                 "valkey",
                 "vnstat",
+                "walinuxagent-acl-config",
                 "zstd"
             ]
         },
@@ -2961,7 +2962,6 @@
                 "nginx",
                 "ninja-build",
                 "nodejs",
-                "nodejs24",
                 "npth",
                 "nspr",
                 "nss",
