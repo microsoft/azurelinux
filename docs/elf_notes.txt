@@ -37,9 +37,9 @@ Three overlays in total:
 
   (a) spec-search-replace in package-notes.spec %build:
       replaces  $(cat /usr/lib/system-release-cpe)
-      with     cpe:/o:microsoft:azure_linux:4.0
+      with     cpe:/o:microsoft:azurelinux:4.0
       -> fixes osCpe so emitted binaries say
-         "osCpe":"cpe:/o:microsoft:azure_linux:4.0"
+         "osCpe":"cpe:/o:microsoft:azurelinux:4.0"
 
   (b) file-search-replace in macros.package-notes-srpm:
       redefines  %_generate_package_note_file  (default: %{nil})
@@ -61,7 +61,7 @@ End result, after a downstream package (cronie, bash, etc.) is rebuilt:
     "name":"cronie",
     "version":"1.7.2-13.azl4",
     "architecture":"x86_64",
-    "osCpe":"cpe:/o:microsoft:azure_linux:4.0",
+    "osCpe":"cpe:/o:microsoft:azurelinux:4.0",
     "moduleVersion":"1.7.2.0"
   }
 
@@ -203,8 +203,8 @@ makes the .note.package section trivial to inspect.
   #   "name": "tree-pkg",
   #   "version": "2.2.1-3.azl4",
   #   "architecture": "x86_64",
-  #   "osCpe": "cpe:/o:microsoft:azure_linux:4.0",
-  #   "os": "azure_linux",
+  #   "osCpe": "cpe:/o:microsoft:azurelinux:4.0",
+  #   "os": "azurelinux",
   #   "osVersion": "4.0",
   #   "moduleVersion": "2.2.1.0"
   # }
@@ -222,9 +222,10 @@ Common failure modes and how to spot them in the JSON:
        package-notes (the Fedora value comes from cat'ing the Fedora
        buildroot's /usr/lib/system-release-cpe).
 
-  "osCpe": "cpe:/o:microsoft:azurelinux:4.0"  (no underscore)
-    -> Predates the azure_linux rename (pre 0.5-20). Confirms an old
-       package-notes was used; check buildroot resolution.
+  "osCpe": "cpe:/o:microsoft:azure_linux:4.0"  (with underscore)
+    -> Indicates an old package-notes from the (now reverted) azure_linux
+       attempt was used. Rebuild the downstream package against current
+       package-notes-srpm-macros.
 
   Missing "moduleVersion" or value of "0.0.0.0"
     -> Overlay (b) didn't fire (RPM_MODULE_VERSION not exported), OR

@@ -18,7 +18,7 @@ description = "Embed Azure Linux CPE / os / osVersion in .note.package metadata 
 type = "spec-search-replace"
 section = "%build"
 regex = 'sed "s\|@OSCPE@\|\$\(cat /usr/lib/system-release-cpe\)\|" %\{SOURCE0\} >redhat-package-notes'
-replacement = '''sed -e "s|@OSCPE@|cpe:/o:microsoft:azure_linux:4.0|" -e "s|@OS@|azure_linux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes'''
+replacement = '''sed -e "s|@OSCPE@|cpe:/o:microsoft:azurelinux:4.0|" -e "s|@OS@|azurelinux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes'''
 
 # Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
 # into every %build shell. We hook into the %_generate_package_note_file

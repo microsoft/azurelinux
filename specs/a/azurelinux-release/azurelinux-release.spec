@@ -236,7 +236,7 @@ mkdir -p licenses
 %install
 install -d %{buildroot}%{_prefix}/lib
 echo "Azure Linux release %{version} (%{release_name})" > %{buildroot}%{_prefix}/lib/azurelinux-release
-echo "cpe:/o:microsoft:azure_linux:%{version}" > %{buildroot}%{_prefix}/lib/system-release-cpe
+echo "cpe:/o:microsoft:azurelinux:%{version}" > %{buildroot}%{_prefix}/lib/system-release-cpe
 
 # Symlink the -release files
 install -d %{buildroot}%{_sysconfdir}
@@ -298,7 +298,7 @@ VERSION_CODENAME=""
 PRETTY_NAME="Azure Linux %{dist_version} (%{release_name}%{?prerelease})"
 ANSI_COLOR="0;38;2;60;110;180"
 LOGO=azurelinux-logo-icon
-CPE_NAME="cpe:/o:microsoft:azure_linux:%{dist_version}"
+CPE_NAME="cpe:/o:microsoft:azurelinux:%{dist_version}"
 DEFAULT_HOSTNAME="azurelinux"
 HOME_URL="%{dist_home_url}"
 DOCUMENTATION_URL="https://aka.ms/azurelinux"
@@ -480,12 +480,10 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 %changelog
 * Wed Jun 03 2026 Andrew Phelps <anphel@microsoft.com> - 4.0-18
-- Switch CPE_NAME / system-release-cpe to 'cpe:/o:microsoft:azure_linux:4.0'.
-  Replaces both the legacy 'cpe:/o:azurelinuxproject:azurelinux' value in
-  os-release (CPE_NAME) and the 'cpe:/o:microsoft:azurelinux' value in
-  /usr/lib/system-release-cpe with the canonical underscored project name
-  ('azure_linux'). Aligns with the .note.package osCpe field emitted by
-  package-notes-srpm-macros and the cloud-init test fixture.
+- Set CPE_NAME in /etc/os-release to 'cpe:/o:microsoft:azurelinux:4.0',
+  replacing the legacy 'cpe:/o:azurelinuxproject:azurelinux' value.
+  Aligns with /usr/lib/system-release-cpe (already 'microsoft:azurelinux')
+  and the .note.package osCpe field emitted by package-notes-srpm-macros.
 
 * Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
 - Redefine azurelinux macro as major version.
