@@ -320,7 +320,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.disruptor]
 [components.distribution-gpg-keys]
 [components.djvulibre]
-[components.dkms]
 [components.dlm]
 [components.dmidecode]
 [components.dnf]
