@@ -14,11 +14,25 @@
 # ID and VERSION_ID. These give SBOM and crash-analysis tools a parsed
 # view of the OS without having to crack the CPE string.
 [[components.package-notes.overlays]]
-description = "Embed Azure Linux CPE / os / osVersion in .note.package metadata instead of inheriting the buildroot's (Fedora) system-release-cpe"
+description = "Embed Azure Linux CPE / os / osVersion in .note.package metadata (instead of inheriting the buildroot's Fedora system-release-cpe), then self-test that the overlays applied"
 type = "spec-search-replace"
 section = "%build"
 regex = 'sed "s\|@OSCPE@\|\$\(cat /usr/lib/system-release-cpe\)\|" %\{SOURCE0\} >redhat-package-notes'
-replacement = '''sed -e "s|@OSCPE@|cpe:/o:microsoft:azurelinux:4.0|" -e "s|@OS@|azurelinux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes'''
+replacement = '''sed -e "s|@OSCPE@|cpe:/o:microsoft:azurelinux:4.0|" -e "s|@OS@|azurelinux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes
+
+# Self-test: fail the build loudly if these overlays did not inject the
+# expected .note.package fields into the generated linker spec, rather than
+# silently shipping binaries with missing OS / moduleVersion metadata. The
+# bare "os" field is added by the same overlay as osVersion and moduleVersion,
+# so verifying these three covers it.
+for field in osCpe osVersion moduleVersion; do
+    grep -qF "$field" redhat-package-notes || { echo "ERROR: generated redhat-package-notes is missing the '$field' field -- package-notes overlay regression" >&2; exit 1; }
+done
+# moduleVersion's value comes from RPM_MODULE_VERSION, exported by the
+# %_generate_package_note_file hook in macros.package-notes-srpm. If a future
+# rebase reverts that macro to the upstream %{nil}, moduleVersion would
+# silently become empty in every downstream binary -- fail now instead.
+grep -q RPM_MODULE_VERSION %{SOURCE1} || { echo "ERROR: macros.package-notes-srpm no longer exports RPM_MODULE_VERSION -- the _generate_package_note_file hook was removed" >&2; exit 1; }'''
 
 # Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
 # into every %build shell. We hook into the %_generate_package_note_file
