@@ -17,7 +17,7 @@ Name: azurelinux-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 1004
-Release: 5%{?dist}
+Release: 6%{?dist}
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://aka.ms/azurelinux
@@ -222,6 +222,12 @@ install -p -m 644 -t %{buildroot}%{_rpmluadir}/fedora common.lua
 # Hence it is necessary to trigger on both gcc and gcc-plugin-annobin.
 
 ln -sf fedora %{buildroot}%{_rpmluadir}/azurelinux
+# Guard: ensure the package-notes moduleVersion hook is still wired in (see comp overlay).
+note_hooks=$(grep -c '_generate_package_note_file' macros || true)
+if [ "$note_hooks" -lt 3 ]; then
+    echo "ERROR: macros has $note_hooks '_generate_package_note_file' hook expansion(s), expected >= 3 (build/check/install _pre). A redhat-rpm-config rebase may have dropped the .note.package moduleVersion hook." >&2
+    exit 1
+fi
 %triggerin -- annobin-plugin-gcc gcc-plugin-annobin gcc
 %{rrcdir}/redhat-annobin-plugin-select.sh
 %end

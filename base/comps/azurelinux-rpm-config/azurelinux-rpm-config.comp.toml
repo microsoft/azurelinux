@@ -70,4 +70,27 @@ overlays = [
     # — the other two callers use 2-space indent and " \" at end of line.
     { type = "file-search-replace", file = "macros", regex = '''    %\{\?_auto_set_build_flags:%\{set_build_flags\}\}\\''', replacement = '''    %{?_auto_set_build_flags:%{set_build_flags}}\
     %{?_generate_package_note_file}\''' },
+
+    # Self-test: the .note.package moduleVersion mechanism depends on the
+    # %_generate_package_note_file hook remaining expanded in all three
+    # %__spec_*_pre macros (build / check / install). package-notes-srpm-macros
+    # redefines that hook to export RPM_MODULE_VERSION; if a future rebase of
+    # redhat-rpm-config drops these expansions, the export silently stops and
+    # every downstream binary loses its moduleVersion (and %install-time
+    # relinks such as avahi's libtool --relink would break on the strict
+    # %:getenv lookup). Fail this build loudly instead of regressing silently.
+    #
+    # NB: we grep for the bare macro NAME '_generate_package_note_file', not the
+    # '%{?_generate_package_note_file}' expansion — RPM would expand the latter
+    # in the spec before the shell runs, and the macro is undefined during this
+    # package's own build (it ships in package-notes-srpm-macros), so the
+    # pattern would collapse to empty and match everything.
+    { type = "spec-append-lines", section = "%install", lines = [
+        "# Guard: ensure the package-notes moduleVersion hook is still wired in (see comp overlay).",
+        "note_hooks=$(grep -c '_generate_package_note_file' macros || true)",
+        "if [ \"$note_hooks\" -lt 3 ]; then",
+        "    echo \"ERROR: macros has $note_hooks '_generate_package_note_file' hook expansion(s), expected >= 3 (build/check/install _pre). A redhat-rpm-config rebase may have dropped the .note.package moduleVersion hook.\" >&2",
+        "    exit 1",
+        "fi",
+    ] },
 ]
