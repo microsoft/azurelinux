@@ -27,7 +27,7 @@
 Summary: Qt6 - Multimedia support
 Name:    qt6-%{qt_module}
 Version: 6.10.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
@@ -68,7 +68,6 @@ BuildRequires: pkgconfig(gstreamer-app-%{gst})
 BuildRequires: pkgconfig(gstreamer-audio-%{gst})
 BuildRequires: pkgconfig(gstreamer-base-%{gst})
 BuildRequires: pkgconfig(gstreamer-pbutils-%{gst})
-BuildRequires: pkgconfig(gstreamer-plugins-bad-%{gst})
 BuildRequires: pkgconfig(gstreamer-video-%{gst})
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if %{with ffmpeg}
@@ -161,8 +160,8 @@ rm -r %{buildroot}%{_qt6_archdatadir}/mkspecs/features/ios/add_ios_ffmpeg_librar
 %{_qt6_archdatadir}/qml/QtMultimedia/
 %dir %{_qt6_archdatadir}/qml/QtQuick3D/SpatialAudio
 %{_qt6_archdatadir}/qml/QtQuick3D/SpatialAudio/
-%dir %{_qt6_plugindir}/multimedia
-%{_qt6_plugindir}/multimedia/libgstreamermediaplugin.so
+
+
 %if %{with ffmpeg}
 %{_qt6_plugindir}/multimedia/libffmpegmediaplugin.so
 %endif
