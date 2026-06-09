@@ -22172,6 +22172,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-antlr4-runtime",
+          "version": "4.9.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/antlr4-python3-runtime/antlr4-python3-runtime-4.9.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-appdirs",
           "version": "1.4.4",
           "downloadUrl": "https://github.com/ActiveState/appdirs/archive/refs/tags/1.4.4.tar.gz"
@@ -22532,6 +22542,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-colorlog",
+          "version": "6.10.1",
+          "downloadUrl": "https://github.com/borntyping/python-colorlog/archive/refs/tags/v6.10.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-CommonMark",
           "version": "0.9.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/60/48/a60f593447e8f0894ebb7f6e6c1f25dafc5e89c5879fdc9360ae93ff83f0/commonmark-0.9.1.tar.gz"
@@ -22602,9 +22622,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-contourpy",
+          "version": "1.2.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/8d/9e/e4786569b319847ffd98a8326802d5cf8a5500860dbfc2df1f0f4883ed99/contourpy-1.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-coverage",
           "version": "7.4.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/c/coverage/coverage-7.4.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-cppy",
+          "version": "1.3.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/45/ed/b35645a1b285bce356f30cc0fe77a042375c385660ccd61e0cdc4c1f7c44/cppy-1.3.1.tar.gz"
         }
       }
     },
@@ -22655,6 +22695,16 @@
           "name": "python-curio",
           "version": "1.6^1.1484546",
           "downloadUrl": "https://github.com/dabeaz/curio/archive/148454621f9bd8dd843f591e87715415431f6979/curio-1484546.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-cycler",
+          "version": "0.12.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a9/95/a3dbbb5028f35eafb79008e7522a75244477d2838f38cbb722248dabc2a8/cycler-0.12.1.tar.gz"
         }
       }
     },
@@ -23062,6 +23112,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-fonttools",
+          "version": "4.63.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/84/69/c97f2c18e0db87d2c7b15da1974dace76ae938f1cfa22e2727a648b7ed43/fonttools-4.63.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-frozendict",
           "version": "2.3.8",
           "downloadUrl": "https://github.com/Marco-Sulla/python-frozendict/releases/download/v2.3.8/frozendict-2.3.8.tar.gz"
@@ -23442,6 +23502,26 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-joblib",
+          "version": "1.5.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/41/f2/d34e8b3a08a9cc79a50b2208a93dce981fe615b64d5a4d4abee421d898df/joblib-1.5.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-jsonlines",
+          "version": "4.0.0",
+          "downloadUrl": "https://github.com/wbolster/jsonlines/archive/refs/tags/4.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-jsonpatch",
           "version": "1.33",
           "downloadUrl": "https://github.com/stefankoegl/python-json-patch/archive/refs/tags/v1.33.tar.gz"
@@ -23562,9 +23642,29 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-kiwisolver",
+          "version": "1.5.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/d0/67/9c61eccb13f0bdca9307614e782fec49ffdde0f7a2314935d489fa93cd9c/kiwisolver-1.5.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kmod",
           "version": "0.9.2",
           "downloadUrl": "https://github.com/maurizio-lombardi/python-kmod/archive/refs/tags/v0.9.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-knack",
+          "version": "0.14.0",
+          "downloadUrl": "https://github.com/microsoft/knack/archive/refs/tags/v0.14.0.tar.gz"
         }
       }
     },
@@ -23742,6 +23842,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-matplotlib",
+          "version": "3.9.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/df/17/1747b4154034befd0ed33b52538f5eb7752d05bb51c5e2a31470c3bc7d52/matplotlib-3.9.4.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-mccabe",
           "version": "0.6.1",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mccabe/mccabe-0.6.1.tar.gz"
@@ -23775,6 +23885,16 @@
           "name": "python-menuinst",
           "version": "2.2.0",
           "downloadUrl": "https://github.com/conda/menuinst/archive/2.2.0/menuinst-2.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-meson-python",
+          "version": "0.19.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/32/98/7fe5d1bf741c03c6eea04b6245737dbd79657d4f9200e82fcbb4cc12637b/meson_python-0.19.0.tar.gz"
         }
       }
     },
@@ -23905,6 +24025,16 @@
           "name": "python-namex",
           "version": "0.0.7",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/n/namex/namex-0.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-natsort",
+          "version": "8.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/e2/a9/a0c57aee75f77794adaf35322f8b6404cbd0f89ad45c87197a937764b7d0/natsort-8.4.0.tar.gz"
         }
       }
     },
@@ -24112,6 +24242,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-pandas",
+          "version": "2.2.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/9c/d6/9f8431bacc2e19dca897724cd097b1bb224a6ad5433784a44b587c7c13af/pandas-2.2.3.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-paramiko",
           "version": "2.12.0",
           "downloadUrl": "https://github.com/paramiko/paramiko/archive/2.12.0/paramiko-2.12.0.tar.gz"
@@ -24165,6 +24305,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pillow",
+          "version": "10.4.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/cd/74/ad3d526f3bf7b6d3f408b73fde271ec69dfac8b81341a318ce825f2b3812/pillow-10.4.0.tar.gz"
         }
       }
     },
@@ -24962,6 +25112,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-seaborn",
+          "version": "0.13.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/86/59/a451d7420a77ab0b98f7affa3a1d78a313d2f7281a57afb1a34bae8ab412/seaborn-0.13.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-semantic_version",
           "version": "2.10.0",
           "downloadUrl": "https://github.com/rbarrois/python-semanticversion/archive/2.10.0/python-semanticversion-2.10.0.tar.gz"
@@ -25302,9 +25462,39 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-superbench",
+          "version": "0.12.0",
+          "downloadUrl": "https://github.com/microsoft/superbenchmark/archive/refs/tags/v0.12.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-systemd",
           "version": "234",
           "downloadUrl": "https://github.com/systemd/python-systemd/archive/v234.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tabulate",
+          "version": "0.10.0",
+          "downloadUrl": "https://github.com/astanin/python-tabulate/archive/refs/tags/v0.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-tcping",
+          "version": "0.1.1rc1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/2a/a1/7e8ac7d81a1a89b1cdb8200fee2c0779410a63743806213cb9289ab6ee94/tcping-0.1.1rc1.tar.gz"
         }
       }
     },
@@ -25515,6 +25705,16 @@
           "name": "python-twisted",
           "version": "22.10.0",
           "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-types-requests",
+          "version": "2.33.0.20260518",
+          "downloadUrl": "https://files.pythonhosted.org/packages/e0/01/c5a19253fe1ac159159ddf9a3a07cec8bb5e486ec4d9002ad2821da0e5d2/types_requests-2.33.0.20260518.tar.gz"
         }
       }
     },
