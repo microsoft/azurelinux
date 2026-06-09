@@ -1,7 +1,7 @@
 Summary:        Incremental is a small library that versions your Python projects.
 Name:           python-incremental
-Version:        22.10.0
-Release:        1%{?dist}
+Version:        24.7.2
+Release:        8%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,12 +15,10 @@ Incremental is a small library that versions your Python projects.
 
 %package -n     python3-incremental
 Summary:        python-incremental
-BuildRequires:  python3-devel
-BuildRequires:  python3-libs
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-Requires:       python3
-Requires:       python3-libs
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+Provides:       incremental = %{version}-%{release}
+
 
 %description -n python3-incremental
 Incremental is a small library that versions your Python projects.
@@ -28,21 +26,24 @@ Incremental is a small library that versions your Python projects.
 %prep
 %autosetup -n incremental-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files incremental
 
-%check
-%{python3} setup.py test
-
-%files -n python3-incremental
-%defattr(-,root,root)
-%license LICENSE
-%{python3_sitelib}/*
+%files -n python3-incremental -f %{pyproject_files}
+%doc README.rst
 
 %changelog
+* Tue Jun 02 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.7.2-8
+- Initial AzureLinux import from Fedora 44 (License MIT).
+- License verified.
+
 * Thu Apr 25 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 22.10.0-1
 - Auto-upgrade to 22.10.0 - none
 

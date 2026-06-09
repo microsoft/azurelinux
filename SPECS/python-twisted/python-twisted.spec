@@ -1,107 +1,119 @@
-%global debug_package %{nil}
-Summary:        An asynchronous networking framework written in Python
+%global common_description %{expand:
+Twisted is a networking engine written in Python, supporting numerous protocols.
+It contains a web server, numerous chat clients, chat servers, mail servers
+and more.}
+
+Summary:        Twisted is a networking engine written in Python
 Name:           python-twisted
-Version:        22.10.0
-Release:        5%{?dist}
+Version:        24.11.0
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
-URL:            https://twistedmatrix.com
-Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.tar.gz
-# Disabling UDP multicast test, which failes in container environments.
-# For more details, see: https://twistedmatrix.com/trac/ticket/7494
-Patch0:         disable_multicast_test.patch
-Patch1:         CVE-2024-41671.patch
-# Patch2 is required for both CVE-2024-41671 and CVE-2024-41810
-Patch2:         CVE-2024-41810.patch
-Patch3:         CVE-2023-46137.patch
-Patch4:         CVE-2026-42304.patch
-BuildRequires:  python3-devel
-BuildRequires:  python3-incremental
+URL:            https://twisted.org/
+Source0:        https://github.com/twisted/twisted/archive/refs/tags/twisted-%{version}.tar.gz#/twisted-%{version}.tar.gz
+# Disable tests that fail in the AzureLinux build system
+Patch0:         Disable-multicast-and-ssl-tests.patch
+Patch1:         CVE-2026-42304.patch
+
+BuildArch:      noarch
+
+%description %{common_description}
+
+%package -n python3-twisted
+Summary:        %{summary}
+
+BuildRequires:  git-core
+BuildRequires:  python3-devel >= 3.8
+BuildRequires:  python3-bcrypt
+BuildRequires:  python3-cryptography
+BuildRequires:  python3-hypothesis
+BuildRequires:  python3-pyasn1-modules
 BuildRequires:  python3-pyOpenSSL
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-BuildRequires:  python3-zope-interface
-%if 0%{?with_check}
+BuildRequires:  python3-pynacl
+BuildRequires:  python3-subunit
+
 BuildRequires:  python3-pip
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-fancy-pypi-readme
+BuildRequires:  python3-incremental
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-trove-classifiers
+BuildRequires:  shadow-utils
 BuildRequires:  net-tools
 BuildRequires:  sudo
 BuildRequires:  tzdata
-BuildRequires:  git
-%endif
+Recommends:     python3-twisted+tls
 
-AutoReqProv:    no
+%description -n python3-twisted %{common_description}
 
-%description
-An asynchronous networking framework written in Python
-
-%package -n     python3-twisted
-Summary:        An asynchronous networking framework written in Python
-Requires:       python3
-Requires:       python3-attrs
-Requires:       python3-constantly
-Requires:       python3-hyperlink
-Requires:       python3-incremental
-Requires:       python3-netaddr
-Requires:       python3-zope-interface
-AutoReqProv:    no
-Provides:       python3dist(twisted) = %{version}-%{release}
-Provides:       python3.7dist(twisted) = %{version}-%{release}
-
-%description -n python3-twisted
-Twisted is an event-driven networking engine written in Python and licensed under the open source ​MIT license. Twisted runs on Python 3.6 and above.
-Twisted also supports many common network protocols, including SMTP, POP3, IMAP, SSHv2, and DNS.
+%pyproject_extras_subpkg -n python3-twisted tls
 
 %prep
 %autosetup -p 1 -n twisted-twisted-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-ln -s twistd %{buildroot}/%{_bindir}/twistd3
-ln -s trial %{buildroot}/%{_bindir}/trial3
-ln -s tkconch %{buildroot}/%{_bindir}/tkconch3
-ln -s pyhtmlizer %{buildroot}/%{_bindir}/pyhtmlizer3
-ln -s twist %{buildroot}/%{_bindir}/twist3
-ln -s conch %{buildroot}/%{_bindir}/conch3
-ln -s ckeygen %{buildroot}/%{_bindir}/ckeygen3
-ln -s cftp %{buildroot}/%{_bindir}/cftp3
+%pyproject_install
+mkdir -p %{buildroot}%{_mandir}/man1/
+for s in conch core mail; do
+  cp -a docs/$s/man/*.1 %{buildroot}%{_mandir}/man1/
+done
+
+mkdir -p %{buildroot}%{python3_sitelib}/twisted/plugins
+
+ln -s ./trial  %{buildroot}%{_bindir}/trial-3
+ln -s ./twistd %{buildroot}%{_bindir}/twistd-3
+
+%pyproject_save_files twisted 
+echo "%ghost %{python3_sitelib}/twisted/plugins/dropin.cache" >> %{pyproject_files}
 
 %check
+export TZ=UTC
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test pip3 install --upgrade pip
-sudo -u test pip3 install 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser
+sudo -u test pip3 install --user --upgrade pip
+sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
 chmod g+w . -R
 LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
-%files -n python3-twisted
-%defattr(-,root,root)
+%files -n python3-twisted -f %{pyproject_files}
+%doc NEWS.rst README.rst
 %license LICENSE
-%{python3_sitelib}/*
-%{_bindir}/twistd
-%{_bindir}/trial
-%{_bindir}/tkconch
-%{_bindir}/pyhtmlizer
-%{_bindir}/twist
-%{_bindir}/mailmail
-%{_bindir}/conch
-%{_bindir}/ckeygen
 %{_bindir}/cftp
-%{_bindir}/twistd3
-%{_bindir}/trial3
-%{_bindir}/tkconch3
-%{_bindir}/pyhtmlizer3
-%{_bindir}/twist3
-%{_bindir}/conch3
-%{_bindir}/ckeygen3
-%{_bindir}/cftp3
+%{_bindir}/ckeygen
+%{_bindir}/conch
+%{_bindir}/mailmail
+%{_bindir}/pyhtmlizer
+%{_bindir}/tkconch
+%{_bindir}/trial
+%{_bindir}/twist
+%{_bindir}/twistd
+%{_bindir}/trial-3
+%{_bindir}/twistd-3
+%{_mandir}/man1/cftp.1*
+%{_mandir}/man1/ckeygen.1*
+%{_mandir}/man1/conch.1*
+%{_mandir}/man1/mailmail.1*
+%{_mandir}/man1/pyhtmlizer.1*
+%{_mandir}/man1/tkconch.1*
+%{_mandir}/man1/trial.1*
+%{_mandir}/man1/twistd.1*
 
 %changelog
+* Tue Jun 02 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.11.0-3
+- Initial AzureLinux import from Fedora (License MIT).
+- License verified.
+- Patch for  CVE-2026-42304
+
 * Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-5
 - Patch for CVE-2026-42304
 

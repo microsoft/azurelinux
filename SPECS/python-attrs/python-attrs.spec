@@ -1,15 +1,13 @@
 Summary:        Attributes without boilerplate.
 Name:           python-attrs
-Version:        21.4.0
-Release:        6%{?dist}
+Version:        22.2.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/attrs
 Source0:        https://github.com/%{name}/attrs/archive/refs/tags/%{version}.tar.gz#/attrs-%{version}.tar.gz
-Patch0:	        0001-add-version-limits.patch
-Patch1:         0001-Add-version-limit-to-pytest-dep.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 %if 0%{?with_check}
@@ -45,7 +43,7 @@ pip3 install tox packaging==23.2
 
 # Skip tests which fail due to python version changes from 3.9 to 3.12. These can be
 # removed when the package is updated to allow them to succeed.
-LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and not test_auto_attribs and not test_annotations_strings and not test_init_subclass_vanilla and not test_detects_setstate_getstate and not test_closure_cell_rewriting and not test_cls_static and not test_slots_super_property_get_shurtcut and not test_inheritance and not test_no_getstate_setstate'
+LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots}
 
 %files -n python3-attrs
 %defattr(-,root,root,-)
@@ -53,6 +51,10 @@ LANG=en_US.UTF-8 tox -v -e py%{python3_version_nodots} -- -k 'not test_mypy and 
 %{python3_sitelib}/*
 
 %changelog
+* Thu Jun 04 2026 Aditya Singh <v-aditysing@microsoft.com> - 22.2.0-1
+- Upgrade to version 22.2.0.
+- License verified.
+
 * Tue Jul 02 2024 Sam Meluch <sammeluch@microsoft.com> - 21.4.0-6
 - add python-packaging requires to fix ptest
 

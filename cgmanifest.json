@@ -22263,8 +22263,8 @@
         "type": "other",
         "other": {
           "name": "python-attrs",
-          "version": "21.4.0",
-          "downloadUrl": "https://github.com/python-attrs/attrs/archive/refs/tags/21.4.0.tar.gz"
+          "version": "22.2.0",
+          "downloadUrl": "https://github.com/python-attrs/attrs/archive/refs/tags/22.2.0.tar.gz"
         }
       }
     },
@@ -23313,8 +23313,8 @@
         "type": "other",
         "other": {
           "name": "python-incremental",
-          "version": "22.10.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-22.10.0.tar.gz"
+          "version": "24.7.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/i/incremental/incremental-24.7.2.tar.gz"
         }
       }
     },
@@ -25513,8 +25513,8 @@
         "type": "other",
         "other": {
           "name": "python-twisted",
-          "version": "22.10.0",
-          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-22.10.0.tar.gz"
+          "version": "24.11.0",
+          "downloadUrl": "https://github.com/twisted/twisted/archive/twisted-24.11.0.tar.gz"
         }
       }
     },
