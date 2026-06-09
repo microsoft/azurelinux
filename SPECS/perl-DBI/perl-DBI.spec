@@ -107,7 +107,7 @@ functions, variables and conventions that provide a consistent
 database interface independent of the actual database being used.
 
 %prep
-%autosetup -q -n DBI-%{version} -p1
+%autosetup -n DBI-%{version} -p1
 
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
