@@ -6,16 +6,19 @@
 # raw stages template at:
 #   .github/workflows/ado/templates/sources-upload-stages.yml
 #
-# Authenticates via Workload Identity Federation (OIDC) and calls the Control
-# Tower APIs to:
-#   1. Validate that the rendered sources of every changed component can be
-#      fetched from the lookaside (prcheck). The actual upload happens later
-#      from the merge queue, not here.
-#   2. Submit scratch package builds for changed components.
+# v1 post-merge build (stopgap until source upload is reworked):
+#   1. Resolve the (target, source) commit range for this push from the
+#      previous CI build (ADO Builds REST API).
+#   2. Submit official package builds for the components that changed across
+#      that range, via Workload Identity Federation (OIDC) to Control Tower.
 #
-# Helper scripts live under scripts/ci/control-tower/
-# (Control Tower-specific) and scripts/ci/components/
-# (cross-pipeline azldev helpers shared with the GH Actions PR gates).
+# The "source upload" (prcheck) step is DISABLED in the stages template — the
+# run_prcheck.py script is retained for when source upload returns.
+#
+# Helper scripts live under scripts/ci/ado/ (ADO REST: commit-range
+# detection), scripts/ci/control-tower/ (Control Tower-specific), and
+# scripts/ci/components/ (cross-pipeline azldev helpers shared with the GH
+# Actions PR gates).
 #
 # Prerequisites (ADO / Azure Portal):
 #   1. Entra ID App Registration with audience URI
@@ -25,7 +28,8 @@
 #      subject: sc://<org>/<project>/<service-connection-name>).
 #   3. ARM service connection in ADO project settings using Workload Identity
 #      Federation (manual).
-#   4. ADO branch policy or pipeline PR trigger configured to fire on PRs.
+#   4. CI trigger configured (in ADO pipeline settings) to fire on pushes to
+#      the target branch.
 #
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
@@ -74,6 +78,8 @@ extends:
           poolType: linux
           serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           variableGroup: ControlTower-PRCheck
-          # Must exceed the script's --poll-timeout-seconds (default 7200s = 120m)
-          # with enough headroom for setup steps and the final API call.
-          timeoutInMinutes: 150
+          # v1 build-only pipeline: covers setup + change-set/render + the
+          # package-build acceptance poll (run_package_build.py, ~600s). The
+          # long prcheck (source-upload) poll is disabled, so the previous
+          # 150-minute budget is no longer needed.
+          timeoutInMinutes: 60
