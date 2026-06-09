@@ -1817,8 +1817,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.56",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.56.tar.gz"
+          "version": "51.1.101",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
         }
       }
     },
