@@ -18,6 +18,12 @@ extend-select = ["D401"]
 
 fixable = ["ALL"]
 
+[lint.per-file-ignores]
+# Helpers under scripts/ci/ are executed directly (python3 path/to/script.py)
+# with sibling-module imports, not imported as a package, so they intentionally
+# have no __init__.py. Silence the implicit-namespace-package rule for that tree.
+"scripts/ci/**/*.py" = ["INP001"]
+
 [lint.isort]
 # Just force this, its better than dealing with a mishmash of modules that have annotations and those that don't
 required-imports = ["from __future__ import annotations"]
