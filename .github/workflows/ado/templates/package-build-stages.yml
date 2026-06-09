@@ -1,18 +1,13 @@
 # Microsoft Corporation
 #
-# Raw stages template for the source-upload pipeline (Control Tower prcheck).
-# OneBranch-agnostic: declares the stages/jobs/steps and exposes the
+# Raw stages template for the package-build pipeline (v1 post-merge delta
+# build). OneBranch-agnostic: declares the stages/jobs/steps and exposes the
 # OneBranch-coupled knobs as parameters. The wrapper at
-# .github/workflows/ado/sources-upload.yml supplies concrete values.
+# .github/workflows/ado/package-build.yml supplies concrete values.
 #
 # The setup + change-detection + validation steps are shared with the
-# package-build pipeline via templates/steps/common-steps.yml; this template
-# appends only the source-upload-specific Control Tower call (prcheck).
-#
-# NOTE: source upload is the original Control Tower flow. It runs prcheck, which
-# returns early (no upload) on pull-request triggers -- unmerged code should not
-# consume capacity. This pipeline is retained for when source upload returns to
-# active duty; the v1 stopgap runs builds via package-build.yml instead.
+# source-upload pipeline via templates/steps/common-steps.yml; this template
+# appends only the package-build-specific Control Tower call.
 
 parameters:
   - name: outputDirectory
@@ -30,22 +25,24 @@ parameters:
     type: string
   - name: timeoutInMinutes
     type: number
+  # Control Tower package target for builds submitted from this pipeline
+  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0). Bound per-branch by the
+  # wrapper so a branch's builds land in the correct target.
+  - name: packageTarget
+    type: string
 
 stages:
-  - stage: SourceUpload
+  - stage: PackageBuild
     jobs:
-      - job: SourceUpload
-        # Non-blocking PR check: failing steps still render red error annotations
-        # and surface in the build-issues view, but the job resolves to
-        # SucceededWithIssues and the run to PartiallySucceeded, which the Azure
-        # Pipelines GitHub integration reports as success to GitHub PR checks and
-        # the merge queue. Errors and warnings remain visible to the user.
-        # TODO: Remove `continueOnError` once the pipeline is stable so failures
-        #       block PRs and the merge queue.
-        # ADO task: 19179
-        continueOnError: true
-        # Must exceed the script's --poll-timeout-seconds (run_prcheck.py default
-        # 7200s = 120m) with enough headroom for setup steps and the final API call.
+      - job: PackageBuild
+        # This is a post-merge build: code has already merged, so there is no PR
+        # or merge queue to gate. The job fails loud -- any failing step turns
+        # the run red so submission/validation breakage is visible and alertable
+        # rather than masked as a partial success. The build itself runs
+        # asynchronously in Control Tower/Koji; this pipeline only submits it and
+        # confirms acceptance (see run_package_build.py).
+        # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)
+        # with enough headroom for setup steps and the final API call.
         timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
         pool:
           type: ${{ parameters.poolType }}
@@ -61,11 +58,11 @@ stages:
           # Shared setup + change detection + validation (PipAuthenticate,
           # install deps, determine commit range, verify locks, prepare change
           # set, verify rendered specs). Produces the job-scope variables and
-          # change-set files the prcheck step below consumes.
+          # change-set files the submit step below consumes.
           - template: steps/common-steps.yml
 
           - task: AzureCLI@2
-            displayName: "Call Control Tower 'prcheck' API"
+            displayName: "Submit package build to Control Tower"
             inputs:
               azureSubscription: ${{ parameters.serviceConnection }}
               scriptType: bash
@@ -73,12 +70,14 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_prcheck.py \
+                python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$CT_BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --source-commit "$SOURCE_COMMIT" \
+                  --package-target "${{ parameters.packageTarget }}" \
+                  --official-build \
+                  --commit-sha "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
               API_AUDIENCE: $(ApiAudience)
@@ -87,7 +86,4 @@ stages:
               CT_BUILD_REASON: $(Build.Reason)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
-              # TODO: Target commit is not used. Will be needed once we move detection of affected components to CT.
-              # ADO task: 18816
-              TARGET_COMMIT: $(targetCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
