@@ -32,15 +32,45 @@ tooling to aggregate, analyze, and visualize the results.}
 %package -n python3-%{srcname}
 Summary:        %{summary}
 %{?python_provide:%python_provide python3-%{srcname}}
+Requires:       python3-knack
+Requires:       python3-argcomplete
+Requires:       python3-omegaconf
+Requires:       python3-importlib-metadata
+Requires:       python3-colorlog
+Requires:       python3-networkx
+Requires:       python3-jsonlines
+Requires:       python3-jinja2
+Requires:       python3-joblib
+Requires:       python3-markdown
+Requires:       python3-matplotlib
+Requires:       python3-natsort
+Requires:       python3-numpy
+Requires:       python3-openpyxl
+Requires:       python3-packaging
+Requires:       python3-pandas
+Requires:       python3-protobuf
+Requires:       python3-pyyaml
+Requires:       python3-requests
+Requires:       python3-seaborn
+Requires:       python3-tcping
+Requires:       python3-types-requests
+Requires:       python3-urllib3
+Requires:       python3-xlrd
+Requires:       python3-xlsxwriter
+Requires:       python3-xmltodict
 
 %description -n python3-%{srcname} %_description
 
 %prep
 %autosetup -n %{gitname}-%{version}
 
-# Drop the non-PyPI git dependency (pssh @ git+https://...) which cannot be
-# resolved from the distro and is only needed for the multi-node SSH runner.
+# Drop the remote/multi-node runner dependencies. The Ansible-based runner
+# (superbench/runner) and the pssh-based topology-aware traffic helper are only
+# used to orchestrate benchmarks across remote nodes; this package targets
+# local execution, so these are removed to avoid pulling Ansible and an
+# unresolvable git dependency.
 sed -i '/pssh @ git+https/d' setup.py
+sed -i '/ansible/d' setup.py
 
 %generate_buildrequires
 export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
