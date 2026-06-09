@@ -32,6 +32,7 @@
     <packages type="image" patternType="plusRecommended">
         <package name="attr"/>
         <package name="acl"/>
+        <package name="azure-cli"/>
         <package name="bash-color-prompt"/>
         <package name="bash-completion"/>
         <package name="bind-utils"/>
