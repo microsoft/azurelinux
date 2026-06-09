@@ -1,5 +1,5 @@
 ---
-applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,scripts/ci/**"
+applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/**/*.yml,scripts/ci/**"
 description: "Authoring and maintenance rules for Azure DevOps YAML pipelines under .github/workflows/ado/ (wrappers + raw stage templates under templates/) and their helper scripts under scripts/ci/ that run as GitHub PR checks or in the merge queue. Apply when creating or modifying any pipeline in that folder, or any script invoked by one — covers the wrapper/raw split, required OneBranch templates (Official vs NonOfficial), Workload Identity Federation service connections, Control Tower audience URIs, internal-only dependency sources (Go / Python / container images), Python-over-shell scripting, and security hardening."
 ---
 
@@ -38,6 +38,8 @@ Every ADO pipeline in this repo is split into **two YAML files**:
 File-pairing convention: a wrapper at `.github/workflows/ado/<name>.yml` pairs with a raw stages template at `.github/workflows/ado/templates/<stem>-stages.yml`. **Multiple wrappers MAY share a single raw stages template** — that is in fact a primary motivation for the split: define several ADO pipelines (e.g. a DEV NonOfficial wrapper and a PROD Official wrapper, or per-environment variants) that all run the same stages/jobs/steps but differ in OneBranch variant, `featureFlags`, service connection, variable group, container image, etc. When wrappers share a raw template, name them so the relationship is obvious (e.g. `sources-upload-dev.yml` + `sources-upload-prod.yml` both pointing at `templates/sources-upload-stages.yml`). The variant choice cannot be hoisted into a shared sub-template because ADO requires `extends:` at the root of the entry pipeline — that is exactly why each wrapper exists.
 
 See [.github/workflows/ado/sources-upload.yml](.github/workflows/ado/sources-upload.yml) and [.github/workflows/ado/templates/sources-upload-stages.yml](.github/workflows/ado/templates/sources-upload-stages.yml) for the canonical example.
+
+Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See [.github/workflows/ado/templates/steps/common-steps.yml](.github/workflows/ado/templates/steps/common-steps.yml), shared by the `package-build` and `sources-upload` pipelines.
 
 ## OneBranch templates (MANDATORY — wrapper only)
 
@@ -180,6 +182,8 @@ Avoid shell scripts beyond the smallest possible wiring (env exports, `##vso[...
 
 Python scripts are easier to test locally, easier to review, and avoid the foot-guns of bash quoting / globbing.
 
+**Reference pipeline variables in bash via the `env:` block** (as in the example above: `env: FOO: $(foo)`, then `"$FOO"` in the script) — never inline `$(foo)` in a script body. An inline macro that resolves empty is left as the literal string `$(foo)`, which bash then evaluates as command substitution; an `env:` value is inert text, so an unset variable fails loud instead of silently running a command.
+
 ### `azldev` in OneBranch
 
 OneBranch runs all steps as `root`. `azldev` refuses to run many commands as root by default (a safety measure for developer workstations). To allow it in CI, set `AZLDEV_ALLOW_ROOT=1` -- but **set it inline as a prefix on each `azldev` invocation**, not at the step level. Inline scoping makes it obvious which calls actually need the override and avoids leaking the flag to unrelated commands in the same step.
@@ -191,6 +195,25 @@ AZLDEV_ALLOW_ROOT=1 azldev component update --check-only -a -q
 Symptom that you need this: `ERR Error: this command may not be run as root`.
 
 This is NOT safe for general use, only for disposable CI environments.
+
+### Reading ADO build metadata (control plane)
+
+To read the pipeline's own control-plane data (build history, definitions) from a helper script, use the official [`azure-devops`](https://github.com/microsoft/azure-devops-python-api) SDK rather than a hand-rolled REST client. Pin it in the area's `requirements.txt` and install it through the standard `PipAuthenticate@1` + `pip install` step.
+
+Authenticate with the pipeline's `System.AccessToken`, which the ADO REST API accepts as a PAT-equivalent credential via the SDK's documented `BasicAuthentication` pattern:
+
+```python
+from azure.devops.connection import Connection
+from msrest.authentication import BasicAuthentication
+
+connection = Connection(base_url=collection_uri, creds=BasicAuthentication("", access_token))
+build_client = connection.clients.get_build_client()
+```
+
+- This is the ADO **control plane** (the pipeline's own builds/repos), **not** Azure Resource Manager or Control Tower — so the Workload Identity Federation service-connection rule does **not** apply. The build identity is the correct least-privilege caller.
+- Map the token in via the step `env:` block (`SYSTEM_ACCESSTOKEN: $(System.AccessToken)`), never on the command line. In a **YAML** pipeline there is no "Allow scripts to access the OAuth token" toggle (that is Classic-only) — the `env:` mapping is all that is needed.
+- Reading builds of the pipeline's **own** definition in the same project is covered by the default **project** job-authorization scope and the `{Project} Build Service ({Org})` identity's default build-read permission. Only revisit if your org has tightened the defaults.
+- Because the SDK is a pip dependency (not stdlib), any step that imports it MUST run **after** the dependency-install step (which itself follows `PipAuthenticate@1`).
 
 ## Security hardening
 

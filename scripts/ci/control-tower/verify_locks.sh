@@ -21,12 +21,10 @@ done
 # The config key may not be present on every agent image, so tolerate its absence.
 git config --unset extensions.worktreeConfig || true
 
-# Full history is needed for lock resolution and spec rendering.
-if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-  echo "##[group]Fetching full git history"
-  git fetch --unshallow
-  echo "##[endgroup]"
-fi
+# NOTE: full git history (needed for lock resolution and rpmautospec Release
+# calculation) is ensured ONCE by the pipeline's "Ensure full git history" step
+# (.github/workflows/ado/templates/steps/common-steps.yml) before this script
+# runs. This script assumes it is present and does not fetch.
 
 mkdir -p "$(dirname "$output_file")"
 
