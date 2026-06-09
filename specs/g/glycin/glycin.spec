@@ -186,9 +186,9 @@ rm -rf vendor
 %endif
 
 # drop glycin-raw loader (missing dependencies, not enabled by default)
-rm -r glycin-loaders/glycin-raw
+rm -rf glycin-loaders/glycin-raw
 # drop glycin-jpeg2000 loader (missing dependencies, not enabled by default)
-rm -r glycin-loaders/glycin-jpeg2000
+rm -rf glycin-loaders/glycin-jpeg2000
 
 
 %if %{without bundled_rust_deps}
