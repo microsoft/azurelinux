@@ -1,5 +1,17 @@
 [components.package-notes]
 
+# Use manual release/changelog management rather than rpmautospec. The
+# upstream spec uses %autorelease (which derives the Release number from
+# the component's git commit count) plus autochangelog (one %changelog
+# entry per commit). On this branch that produced a noisy multi-entry
+# changelog at a high release number. We pin a single hand-written
+# changelog entry and an explicit Release here instead.
+#
+# NB: with manual mode, azldev no longer bumps Release on commit -- when
+# you change this component you MUST hand-bump the Release value in the
+# spec-set-tag overlay below and update the %changelog overlay.
+release = { calculation = "manual" }
+
 # The upstream %build step injects the OSCPE by reading
 # /usr/lib/system-release-cpe from the buildroot. In the Azure Linux build
 # environment that file is supplied by the Fedora buildroot (fedora-release),
@@ -77,3 +89,22 @@ type = "file-search-replace"
 file = "redhat-package-notes.in"
 regex = '\\"osCpe\\":\\"@OSCPE@\\"\}\)\)\)\)\}'
 replacement = '\"osCpe\":\"@OSCPE@\",\"os\":\"@OS@\",\"osVersion\":\"@OSVERSION@\",\"moduleVersion\":\"%:getenv(RPM_MODULE_VERSION \"})))))}'
+
+# Replace the upstream %autorelease with an explicit Release (manual mode,
+# set above). Hand-bump this value when rebuilding without a version change.
+[[components.package-notes.overlays]]
+description = "Pin an explicit Release (manual release mode; replaces upstream %autorelease)"
+type = "spec-set-tag"
+tag = "Release"
+value = "17%{?dist}"
+
+# Replace the upstream %autochangelog with a single hand-written entry,
+# rather than the per-commit autochangelog expansion.
+[[components.package-notes.overlays]]
+description = "Replace %autochangelog with a single manual changelog entry"
+type = "spec-search-replace"
+section = "%changelog"
+regex = '%autochangelog'
+replacement = '''* Tue Jun 09 2026 Andrew Phelps <anphel@microsoft.com> - 0.5-17
+- Embed Azure Linux osCpe, os, osVersion, and 4-part moduleVersion fields in
+  the .note.package ELF metadata, and self-test that the overlays applied'''
