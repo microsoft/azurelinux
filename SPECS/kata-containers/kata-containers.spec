@@ -19,8 +19,8 @@ Patch5:         CVE-2025-11065.patch
 Patch6:         CVE-2026-41602.patch
 Patch7:         CVE-2026-39821.patch
 Patch8:         CVE-2026-33814.patch
-#Patch9:         CVE-2025-58160.patch
-#Patch10:        CVE-2026-27171.patch
+Patch9:         CVE-2025-58160.patch
+Patch10:        CVE-2026-27171.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
