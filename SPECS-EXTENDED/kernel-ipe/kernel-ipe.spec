@@ -32,7 +32,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel-ipe
-Version:        6.6.139.1
+Version:        6.6.141.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -460,6 +460,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Tue June 16 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.6.141.1-1
+- Upgrade to 6.6.141.1
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.139.1-1
 - Auto-upgrade to 6.6.139.1
 
