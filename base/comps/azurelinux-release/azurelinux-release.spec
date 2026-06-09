@@ -477,10 +477,7 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 %changelog
 * Wed Jun 03 2026 Andrew Phelps <anphel@microsoft.com> - 4.0-18
-- Set CPE_NAME in /etc/os-release to 'cpe:/o:microsoft:azurelinux:4.0',
-  replacing the legacy 'cpe:/o:azurelinuxproject:azurelinux' value.
-  Aligns with /usr/lib/system-release-cpe (already 'microsoft:azurelinux')
-  and the .note.package osCpe field emitted by package-notes-srpm-macros.
+- Set CPE_NAME in /etc/os-release to 'cpe:/o:microsoft:azurelinux:4.0'
 
 * Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
 - Redefine azurelinux macro as major version.
