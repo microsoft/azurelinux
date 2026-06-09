@@ -215,6 +215,7 @@ components = [
     "dbus",
     "dbus-broker",
     "dbus-python",
+    "debootstrap",
     "dconf",
     "ddiskit",
     "debugedit",
