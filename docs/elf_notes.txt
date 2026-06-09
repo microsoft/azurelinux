@@ -396,3 +396,37 @@ future agents:
      not refreshed from the local repo; cache.tar.gz must be deleted
      to test in-place rebuilds.
 
+KNOWN GAPS (packages that do NOT emit .note.package)
+----------------------------------------------------
+The FDO .note.package section is only inserted when the linker is invoked
+with -specs=/usr/lib/rpm/redhat/redhat-package-notes, which reaches the
+link step via the distro LDFLAGS (%{build_ldflags}, which includes
+%{?_package_note_flags}). Any package whose build does not pass the distro
+LDFLAGS through to its link commands will silently ship binaries with NO
+.note.package -- this is independent of the package-notes overlays and
+cannot be fixed from the package-notes component.
+
+  - 7zip (7zip-25.01-2.azl4): /usr/bin/7z and /usr/libexec/7zip/7z.so have
+    NO .note.package (only .note.gnu.build-id / .note.gnu.property /
+    .note.ABI-tag). Confirmed NOT a regression from this branch -- the
+    published 4.0 beta RPM
+    (packages.microsoft.com/azurelinux/4.0/beta/sdk/x86_64/Packages/7/
+    7zip-25.01-2.azl4.x86_64.rpm) is equally noteless.
+
+    Root cause: 7zip's %build drives upstream's hand-rolled makefiles and
+    passes only LOCAL_FLAGS="%{optflags}" (that's CFLAGS, not LDFLAGS), so
+    %{?_package_note_flags} never reaches the linker. Each 7zip bundle
+    (Format7zF, UI/Console, Bundles/Alone*) has its own makefile invoked by
+    a separate %make_build line.
+
+    Potential fix (NOT done -- filed as known gap): add an overlay that
+    passes LDFLAGS="%{build_ldflags}" to each %make_build line in 7zip's
+    %build, after verifying each bundle's makefile appends $(LDFLAGS) to
+    its link rule. Bonus: this would also add the standard hardening
+    LDFLAGS that are currently missing for the same reason.
+
+  General detection: the distro-wide "binaries missing the note entirely"
+  loop under FULL BUILD / VERIFY CYCLE finds all such packages. Rust
+  binaries built outside the RPM link path are the other common case.
+
+
