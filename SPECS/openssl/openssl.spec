@@ -366,7 +366,7 @@ install -m644 %{SOURCE9} \
 %changelog
 * Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7-1
 - Upgrade to 3.3.7
-- remove unused patches
+- Remove unused patches
 
 * Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-6
 - Rename FIPS provider config from fips_prov.cnf to fipsmodule.cnf to align with upstream OpenSSL.
