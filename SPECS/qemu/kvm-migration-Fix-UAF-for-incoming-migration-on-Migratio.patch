@@ -1,0 +1,180 @@
+From 5d7d7a2ec6301f4d0b0dbea4fbdcab4e41a9cf07 Mon Sep 17 00:00:00 2001
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 20 Feb 2025 08:24:59 -0500
+Subject: [PATCH 7/9] migration: Fix UAF for incoming migration on
+ MigrationState
+
+RH-Author: Peter Xu <peterx@redhat.com>
+RH-MergeRequest: 344: migration: Fix UAF for incoming migration on MigrationState
+RH-Jira: RHEL-69775
+RH-Acked-by: Juraj Marcin <None>
+RH-Acked-by: Jon Maloy <jmaloy@redhat.com>
+RH-Commit: [1/1] 106e2b4c1c461202c912b5e3ea7e586c4ab05d8c (peterx/qemu-kvm)
+
+On the incoming migration side, QEMU uses a coroutine to load all the VM
+states.  Inside, it may reference MigrationState on global states like
+migration capabilities, parameters, error state, shared mutexes and more.
+
+However there's nothing yet to make sure MigrationState won't get
+destroyed (e.g. after migration_shutdown()).  Meanwhile there's also no API
+available to remove the incoming coroutine in migration_shutdown(),
+avoiding it to access the freed elements.
+
+There's a bug report showing this can happen and crash dest QEMU when
+migration is cancelled on source.
+
+When it happens, the dest main thread is trying to cleanup everything:
+
+  #0  qemu_aio_coroutine_enter
+  #1  aio_dispatch_handler
+  #2  aio_poll
+  #3  monitor_cleanup
+  #4  qemu_cleanup
+  #5  qemu_default_main
+
+Then it found the migration incoming coroutine, schedule it (even after
+migration_shutdown()), causing crash:
+
+  #0  __pthread_kill_implementation
+  #1  __pthread_kill_internal
+  #2  __GI_raise
+  #3  __GI_abort
+  #4  __assert_fail_base
+  #5  __assert_fail
+  #6  qemu_mutex_lock_impl
+  #7  qemu_lockable_mutex_lock
+  #8  qemu_lockable_lock
+  #9  qemu_lockable_auto_lock
+  #10 migrate_set_error
+  #11 process_incoming_migration_co
+  #12 coroutine_trampoline
+
+To fix it, take a refcount after an incoming setup is properly done when
+qmp_migrate_incoming() succeeded the 1st time.  As it's during a QMP
+handler which needs BQL, it means the main loop is still alive (without
+going into cleanups, which also needs BQL).
+
+Releasing the refcount now only until the incoming migration coroutine
+finished or failed.  Hence the refcount is valid for both (1) setup phase
+of incoming ports, mostly IO watches (e.g. qio_channel_add_watch_full()),
+and (2) the incoming coroutine itself (process_incoming_migration_co()).
+
+Note that we can't unref in migration_incoming_state_destroy(), because
+both qmp_xen_load_devices_state() and load_snapshot() will use it without
+an incoming migration.  Those hold BQL so they're not prone to this issue.
+
+PS: I suspect nobody uses Xen's command at all, as it didn't register yank,
+hence AFAIU the command should crash on master when trying to unregister
+yank in migration_incoming_state_destroy()..  but that's another story.
+
+Also note that in some incoming failure cases we may not always unref the
+MigrationState refcount, which is a trade-off to keep things simple.  We
+could make it accurate, but it can be an overkill.  Some examples:
+
+  - Unlike most of the rest protocols, socket_start_incoming_migration()
+    may create net listener after incoming port setup sucessfully.
+    It means we can't unref in migration_channel_process_incoming() as a
+    generic path because socket protocol might keep using MigrationState.
+
+  - For either socket or file, multiple IO watches might be created, it
+    means logically each IO watch needs to take one refcount for
+    MigrationState so as to be 100% accurate on ownership of refcount taken.
+
+In general, we at least need per-protocol handling to make it accurate,
+which can be an overkill if we know incoming failed after all.  Add a short
+comment to explain that when taking the refcount in qmp_migrate_incoming().
+
+Bugzilla: https://issues.redhat.com/browse/RHEL-69775
+Tested-by: Yan Fu <yafu@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fabiano Rosas <farosas@suse.de>
+Message-ID: <20250220132459.512610-1-peterx@redhat.com>
+Signed-off-by: Fabiano Rosas <farosas@suse.de>
+(cherry picked from commit d657a14de5d597bbfe7b54e4c4f0646f440e98ad)
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/migration.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/migration/migration.c b/migration/migration.c
+index 999d4cac54..aabdc45c16 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -115,6 +115,27 @@ static void migration_downtime_start(MigrationState *s)
+     s->downtime_start = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+ }
+ 
++/*
++ * This is unfortunate: incoming migration actually needs the outgoing
++ * migration state (MigrationState) to be there too, e.g. to query
++ * capabilities, parameters, using locks, setup errors, etc.
++ *
++ * NOTE: when calling this, making sure current_migration exists and not
++ * been freed yet!  Otherwise trying to access the refcount is already
++ * an use-after-free itself..
++ *
++ * TODO: Move shared part of incoming / outgoing out into separate object.
++ * Then this is not needed.
++ */
++static void migrate_incoming_ref_outgoing_state(void)
++{
++    object_ref(migrate_get_current());
++}
++static void migrate_incoming_unref_outgoing_state(void)
++{
++    object_unref(migrate_get_current());
++}
++
+ static void migration_downtime_end(MigrationState *s)
+ {
+     int64_t now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+@@ -821,7 +842,7 @@ process_incoming_migration_co(void *opaque)
+              * postcopy thread.
+              */
+             trace_process_incoming_migration_co_postcopy_end_main();
+-            return;
++            goto out;
+         }
+         /* Else if something went wrong then just fall out of the normal exit */
+     }
+@@ -837,7 +858,8 @@ process_incoming_migration_co(void *opaque)
+     }
+ 
+     migration_bh_schedule(process_incoming_migration_bh, mis);
+-    return;
++    goto out;
++
+ fail:
+     migrate_set_state(&mis->state, MIGRATION_STATUS_ACTIVE,
+                       MIGRATION_STATUS_FAILED);
+@@ -854,6 +876,9 @@ fail:
+ 
+         exit(EXIT_FAILURE);
+     }
++out:
++    /* Pairs with the refcount taken in qmp_migrate_incoming() */
++    migrate_incoming_unref_outgoing_state();
+ }
+ 
+ /**
+@@ -1875,6 +1900,17 @@ void qmp_migrate_incoming(const char *uri, bool has_channels,
+         return;
+     }
+ 
++    /*
++     * Making sure MigrationState is available until incoming migration
++     * completes.
++     *
++     * NOTE: QEMU _might_ leak this refcount in some failure paths, but
++     * that's OK.  This is the minimum change we need to at least making
++     * sure success case is clean on the refcount.  We can try harder to
++     * make it accurate for any kind of failures, but it might be an
++     * overkill and doesn't bring us much benefit.
++     */
++    migrate_incoming_ref_outgoing_state();
+     once = false;
+ }
+ 
+-- 
+2.48.1
+

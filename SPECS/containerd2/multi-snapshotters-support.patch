@@ -1,25 +1,66 @@
-From 5b8c263396b67acc8ea67e22d532e69e04085b35 Mon Sep 17 00:00:00 2001
+From 52b80f75572e3f3aca08a1feac59e3a5f9cfe2c5 Mon Sep 17 00:00:00 2001
 From: Mitch Zhu <mitchzhu@microsoft.com>
 Date: Thu, 22 May 2025 23:55:57 +0000
 Subject: [PATCH] Add multi-snapshotter support
 
+Upstream v2.2.3+ already adopted the runtimeHandler parameter for
+snapshotterFromPodSandboxConfig and the local snapshotter variable in
+sandbox_run.go (with a different code path that resolves snapshotter via
+RuntimeSnapshotter(ociRuntime)); the only Azure Linux additions retained
+here are:
+  - Plumbing a snapshotter override through CRIImageService.PullImage so
+    sandbox_run can request an image be pulled into a specific snapshotter.
+  - The Snapshotters set on the in-memory Image so ensureImageExists can
+    avoid pulling when the image is already present in the desired
+    snapshotter.
 ---
+ integration/image_pull_timeout_test.go        |  6 ++--
  internal/cri/server/container_status_test.go  |  2 +-
- internal/cri/server/images/image_pull.go      | 37 +++++++++++--------
- internal/cri/server/images/image_pull_test.go |  2 +-
+ internal/cri/server/images/image_pull.go      | 18 ++++++-----
  internal/cri/server/podsandbox/controller.go  |  2 +-
- internal/cri/server/podsandbox/sandbox_run.go | 30 ++++++++-------
+ internal/cri/server/podsandbox/sandbox_run.go | 30 +++++++++++--------
  internal/cri/server/service.go                |  2 +-
- internal/cri/store/image/image.go             | 29 ++++++++++++---
- 7 files changed, 66 insertions(+), 38 deletions(-)
+ internal/cri/store/image/image.go             | 29 ++++++++++++++----
+ 7 files changed, 57 insertions(+), 32 deletions(-)
 
+diff --git a/integration/image_pull_timeout_test.go b/integration/image_pull_timeout_test.go
+index c70fa9717..5c24033d1 100644
+--- a/integration/image_pull_timeout_test.go
++++ b/integration/image_pull_timeout_test.go
+@@ -93,7 +93,7 @@ func testCRIImagePullTimeoutBySlowCommitWriter(t *testing.T, useLocal bool) {
+ 
+ 	ctx := namespaces.WithNamespace(logtest.WithT(context.Background(), t), k8sNamespace)
+ 
+-	_, err = criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "")
++	_, err = criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "", "")
+ 	assert.NoError(t, err)
+ }
+ 
+@@ -220,7 +220,7 @@ func testCRIImagePullTimeoutByHoldingContentOpenWriter(t *testing.T, useLocal bo
+ 	go func() {
+ 		defer close(errCh)
+ 
+-		_, err := criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "")
++		_, err := criService.PullImage(ctx, pullProgressTestImageName, nil, nil, "", "")
+ 		errCh <- err
+ 	}()
+ 
+@@ -316,7 +316,7 @@ func testCRIImagePullTimeoutByNoDataTransferred(t *testing.T, useLocal bool) {
+ 		dctx, _, err := cli.WithLease(ctx)
+ 		assert.NoError(t, err)
+ 
+-		_, err = criService.PullImage(dctx, fmt.Sprintf("%s/%s", mirrorURL.Host, "containerd/volume-ownership:2.1"), nil, nil, "")
++		_, err = criService.PullImage(dctx, fmt.Sprintf("%s/%s", mirrorURL.Host, "containerd/volume-ownership:2.1"), nil, nil, "", "")
+ 
+ 		assert.Equal(t, context.Canceled, errors.Unwrap(err), "[%v] expected canceled error, but got (%v)", idx, err)
+ 		assert.True(t, mirrorSrv.limiter.clearHitCircuitBreaker(), "[%v] expected to hit circuit breaker", idx)
 diff --git a/internal/cri/server/container_status_test.go b/internal/cri/server/container_status_test.go
-index 05b1650..71dcc10 100644
+index aad56f56a..13ec46e8e 100644
 --- a/internal/cri/server/container_status_test.go
 +++ b/internal/cri/server/container_status_test.go
-@@ -302,7 +302,7 @@ func (s *fakeImageService) LocalResolve(refOrID string) (imagestore.Image, error
+@@ -302,7 +302,7 @@ func (s *fakeImageService) ImageFSPaths() map[string]string { return make(map[st
  
- func (s *fakeImageService) ImageFSPaths() map[string]string { return make(map[string]string) }
+ func (s *fakeImageService) DisableSnapshotAnnotations() bool { return false }
  
 -func (s *fakeImageService) PullImage(context.Context, string, func(string) (string, string, error), *runtime.PodSandboxConfig, string) (string, error) {
 +func (s *fakeImageService) PullImage(context.Context, string, func(string) (string, string, error), *runtime.PodSandboxConfig, string, string) (string, error) {
@@ -27,10 +68,10 @@ index 05b1650..71dcc10 100644
  }
  
 diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
-index e59b88b..f9c90b7 100644
+index d94b47be7..c04a2652e 100644
 --- a/internal/cri/server/images/image_pull.go
 +++ b/internal/cri/server/images/image_pull.go
-@@ -96,6 +96,15 @@ import (
+@@ -99,6 +99,15 @@ import (
  
  // PullImage pulls an image with authentication config.
  func (c *GRPCCRIImageService) PullImage(ctx context.Context, r *runtime.PullImageRequest) (_ *runtime.PullImageResponse, err error) {
@@ -46,7 +87,7 @@ index e59b88b..f9c90b7 100644
  
  	imageRef := r.GetImage().GetImage()
  
-@@ -110,14 +119,14 @@ func (c *GRPCCRIImageService) PullImage(ctx context.Context, r *runtime.PullImag
+@@ -113,14 +122,14 @@ func (c *GRPCCRIImageService) PullImage(ctx context.Context, r *runtime.PullImag
  		return ParseAuth(hostauth, host)
  	}
  
@@ -63,64 +104,23 @@ index e59b88b..f9c90b7 100644
  	span := tracing.SpanFromContext(ctx)
  	defer func() {
  		// TODO: add domain label for imagePulls metrics, and we may need to provide a mechanism
-@@ -167,10 +176,6 @@ func (c *CRIImageService) PullImage(ctx context.Context, name string, credential
- 	)
+@@ -165,11 +174,6 @@ func (c *CRIImageService) PullImage(ctx context.Context, name string, credential
+ 		return "", fmt.Errorf("failed to parse image_pull_progress_timeout %q: %w", c.config.ImagePullProgressTimeout, err)
+ 	}
  
- 	defer pcancel()
--	snapshotter, err := c.snapshotterFromPodSandboxConfig(ctx, ref, sandboxConfig)
+-	snapshotter, err := c.snapshotterFromPodSandboxConfig(ctx, ref, sandboxConfig, runtimeHandler)
 -	if err != nil {
 -		return "", err
 -	}
- 	log.G(ctx).Debugf("PullImage %q with snapshotter %s", ref, snapshotter)
+-
  	span.SetAttributes(
  		tracing.Attribute("image.ref", ref),
-@@ -761,17 +766,19 @@ func (rt *pullRequestReporterRoundTripper) RoundTrip(req *http.Request) (*http.R
- // Once we know the runtime, try to override default snapshotter if it is set for this runtime.
- // See https://github.com/containerd/containerd/issues/6657
- func (c *CRIImageService) snapshotterFromPodSandboxConfig(ctx context.Context, imageRef string,
--	s *runtime.PodSandboxConfig) (string, error) {
-+	s *runtime.PodSandboxConfig, runtimeHandler string) (string, error) {
- 	snapshotter := c.config.Snapshotter
--	if s == nil || s.Annotations == nil {
--		return snapshotter, nil
--	}
- 
--	// TODO(kiashok): honor the new CRI runtime handler field added to v0.29.0
--	// for image pull per runtime class support.
--	runtimeHandler, ok := s.Annotations[annotations.RuntimeHandler]
--	if !ok {
--		return snapshotter, nil
-+	if runtimeHandler == "" {
-+		if s == nil || s.Annotations == nil {
-+			return snapshotter, nil
-+		} else {
-+			ok := false
-+			runtimeHandler, ok = s.Annotations[annotations.RuntimeHandler]
-+			if !ok {
-+				return snapshotter, nil
-+			}
-+		}
- 	}
- 
- 	// TODO: Ensure error is returned if runtime not found?
-diff --git a/internal/cri/server/images/image_pull_test.go b/internal/cri/server/images/image_pull_test.go
-index bc79e35..af6a451 100644
---- a/internal/cri/server/images/image_pull_test.go
-+++ b/internal/cri/server/images/image_pull_test.go
-@@ -429,7 +429,7 @@ func TestSnapshotterFromPodSandboxConfig(t *testing.T) {
- 				Platform:    platforms.DefaultSpec(),
- 				Snapshotter: runtimeSnapshotter,
- 			}
--			snapshotter, err := cri.snapshotterFromPodSandboxConfig(context.Background(), "test-image", tt.podSandboxConfig)
-+			snapshotter, err := cri.snapshotterFromPodSandboxConfig(context.Background(), "test-image", tt.podSandboxConfig, "")
- 			assert.Equal(t, tt.expectedSnapshotter, snapshotter)
- 			if tt.expectedErr {
- 				assert.Error(t, err)
+ 		tracing.Attribute("snapshotter.name", snapshotter),
 diff --git a/internal/cri/server/podsandbox/controller.go b/internal/cri/server/podsandbox/controller.go
-index a185a4c..8fd032b 100644
+index e3828bc0b..9a50e8081 100644
 --- a/internal/cri/server/podsandbox/controller.go
 +++ b/internal/cri/server/podsandbox/controller.go
-@@ -110,7 +110,7 @@ type RuntimeService interface {
+@@ -121,7 +121,7 @@ type RuntimeService interface {
  type ImageService interface {
  	LocalResolve(refOrID string) (imagestore.Image, error)
  	GetImage(id string) (imagestore.Image, error)
@@ -128,12 +128,12 @@ index a185a4c..8fd032b 100644
 +	PullImage(ctx context.Context, name string, creds func(string) (string, string, error), sc *runtime.PodSandboxConfig, runtimeHandler string, snapshotter string) (string, error)
  	RuntimeSnapshotter(ctx context.Context, ociRuntime criconfig.Runtime) string
  	PinnedImage(string) string
- }
+ 	DisableSnapshotAnnotations() bool
 diff --git a/internal/cri/server/podsandbox/sandbox_run.go b/internal/cri/server/podsandbox/sandbox_run.go
-index 53d949f..35e0075 100644
+index 15fd3398f..51ca7725f 100644
 --- a/internal/cri/server/podsandbox/sandbox_run.go
 +++ b/internal/cri/server/podsandbox/sandbox_run.go
-@@ -77,23 +77,25 @@ func (c *Controller) Start(ctx context.Context, id string) (cin sandbox.Controll
+@@ -80,23 +80,25 @@ func (c *Controller) Start(ctx context.Context, id string) (cin sandbox.Controll
  
  	sandboxImage := c.getSandboxImageName()
  	// Ensure sandbox container image snapshot.
@@ -168,16 +168,16 @@ index 53d949f..35e0075 100644
  
  	// Create sandbox container root directories.
  	sandboxRootDir := c.getSandboxRootDir(id)
-@@ -173,7 +175,7 @@ func (c *Controller) Start(ctx context.Context, id string) (cin sandbox.Controll
+@@ -189,7 +191,7 @@ func (c *Controller) Start(ctx context.Context, id string) (cin sandbox.Controll
  	snapshotterOpt = append(snapshotterOpt, extraSOpts...)
  
  	opts := []containerd.NewContainerOpts{
 -		containerd.WithSnapshotter(c.imageService.RuntimeSnapshotter(ctx, ociRuntime)),
 +		containerd.WithSnapshotter(snapshotter),
- 		customopts.WithNewSnapshot(id, containerdImage, snapshotterOpt...),
+ 		customopts.WithNewSnapshot(id, containerdImage, !c.imageService.DisableSnapshotAnnotations(), snapshotterOpt...),
  		containerd.WithSpec(spec, specOpts...),
  		containerd.WithContainerLabels(sandboxLabels),
-@@ -299,17 +301,19 @@ func (c *Controller) Create(_ctx context.Context, info sandbox.Sandbox, opts ...
+@@ -321,17 +323,19 @@ func (c *Controller) Create(_ctx context.Context, info sandbox.Sandbox, opts ...
  	return c.store.Save(podSandbox)
  }
  
@@ -201,10 +201,10 @@ index 53d949f..35e0075 100644
  		return nil, fmt.Errorf("failed to pull image %q: %w", ref, err)
  	}
 diff --git a/internal/cri/server/service.go b/internal/cri/server/service.go
-index 37d66f0..5d1546e 100644
+index 87eb02e42..e5cfd6f00 100644
 --- a/internal/cri/server/service.go
 +++ b/internal/cri/server/service.go
-@@ -97,7 +97,7 @@ type RuntimeService interface {
+@@ -96,7 +96,7 @@ type RuntimeService interface {
  type ImageService interface {
  	RuntimeSnapshotter(ctx context.Context, ociRuntime criconfig.Runtime) string
  
@@ -214,7 +214,7 @@ index 37d66f0..5d1546e 100644
  
  	CheckImages(ctx context.Context) error
 diff --git a/internal/cri/store/image/image.go b/internal/cri/store/image/image.go
-index 5887e75..43ecf0d 100644
+index fc0ade22d..a42108d9e 100644
 --- a/internal/cri/store/image/image.go
 +++ b/internal/cri/store/image/image.go
 @@ -20,6 +20,7 @@ import (
@@ -274,6 +274,3 @@ index 5887e75..43ecf0d 100644
  	}, nil
  
  }
--- 
-2.34.1
-

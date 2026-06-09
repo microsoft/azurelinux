@@ -1,0 +1,65 @@
+diff -rc qpid-proton-0.40.0.orig/CMakeLists.txt qpid-proton-0.40.0/CMakeLists.txt
+*** qpid-proton-0.40.0.orig/CMakeLists.txt	Fri Nov 29 12:08:10 2024
+--- qpid-proton-0.40.0/CMakeLists.txt	Fri Nov 29 12:08:31 2024
+***************
+*** 42,48 ****
+  if (NOT DEFINED Python_FIND_FRAMEWORK)
+    set(Python_FIND_FRAMEWORK "LAST")
+  endif ()
+! find_package(Python 3.9
+          REQUIRED COMPONENTS Interpreter
+          OPTIONAL_COMPONENTS Development)
+  
+--- 42,48 ----
+  if (NOT DEFINED Python_FIND_FRAMEWORK)
+    set(Python_FIND_FRAMEWORK "LAST")
+  endif ()
+! find_package(Python 3.13
+          REQUIRED COMPONENTS Interpreter
+          OPTIONAL_COMPONENTS Development)
+
+diff -c qpid-proton-0.40.0/cpp/src/ssl_options.cpp.orig qpid-proton-0.40.0/cpp/src/ssl_options.cpp
+*** qpid-proton-0.40.0/cpp/src/ssl_options.cpp.orig	Fri Jan 24 08:53:42 2025
+--- qpid-proton-0.40.0/cpp/src/ssl_options.cpp	Fri Jan 24 08:53:03 2025
+***************
+*** 22,28 ****
+  #include "ssl_options_impl.hpp"
+  
+  // https://stackoverflow.com/questions/31657499/how-to-detect-stdlib-libc-in-the-preprocessor
+! #include <ciso646>
+  
+  #include "proton/ssl.hpp"
+  #include "proton/error.hpp"
+--- 22,32 ----
+  #include "ssl_options_impl.hpp"
+  
+  // https://stackoverflow.com/questions/31657499/how-to-detect-stdlib-libc-in-the-preprocessor
+! #if (__cplusplus >= 201103L)
+! #  include <version>
+! #else
+! #  include <ciso646>
+! #endif
+  
+  #include "proton/ssl.hpp"
+  #include "proton/error.hpp"
+
+diff -rc qpid-proton-0.40.0.orig/python/CMakeLists.txt qpid-proton-0.40.0/python/CMakeLists.txt
+*** qpid-proton-0.40.0.orig/python/CMakeLists.txt	Fri Nov 29 12:08:10 2024
+--- qpid-proton-0.40.0/python/CMakeLists.txt	Fri Nov 29 12:09:04 2024
+***************
+*** 74,80 ****
+          COMMAND ${PN_ENV_SCRIPT} --
+          PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}
+          LD_LIBRARY_PATH="${CMAKE_CURRENT_BINARY_DIR}/c"
+!         ${Python_EXECUTABLE} -m sphinx "${CMAKE_CURRENT_SOURCE_DIR}/docs" "${CMAKE_CURRENT_BINARY_DIR}/docs")
+      add_dependencies(docs docs-py)
+      install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs/"
+              DESTINATION "${PROTON_SHARE}/docs/api-py"
+--- 74,80 ----
+          COMMAND ${PN_ENV_SCRIPT} --
+          PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}
+          LD_LIBRARY_PATH="${CMAKE_CURRENT_BINARY_DIR}/c"
+!         sphinx-build "${CMAKE_CURRENT_SOURCE_DIR}/docs" "${CMAKE_CURRENT_BINARY_DIR}/docs")
+      add_dependencies(docs docs-py)
+      install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/docs/"
+              DESTINATION "${PROTON_SHARE}/docs/api-py"

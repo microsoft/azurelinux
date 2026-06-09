@@ -3,13 +3,14 @@
 Summary:        libssh2 is a library implementing the SSH2 protocol.
 Name:           libssh2
 Version:        1.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://www.libssh2.org/
 Group:          System Environment/NetworkingLibraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.libssh2.org/download/libssh2-%{version}.tar.gz
+Patch0:         CVE-2026-7598.patch
 BuildRequires:  openssl-devel
 BuildRequires:  zlib-devel
 
@@ -57,6 +58,9 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 %{_mandir}/man3/*
 
 %changelog
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.1-2
+- Patch for CVE-2026-7598
+
 * Fri Apr 04 2025 Sumedh Sharma <sumsharma@microsoft.com> - 1.11.1-1
 - Bump patch version to fix CVE-2023-48795.
 
