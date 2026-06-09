@@ -1,0 +1,16 @@
+--- ./Makefile.orig	2025-03-03 05:51:23.416690921 +0000
++++ ./Makefile	2025-03-03 05:52:16.516075663 +0000
+@@ -8,10 +8,10 @@ clean:
+ DSDIR=$(DESTDIR)/usr/share/debootstrap
+ install:
+ 	mkdir -p $(DSDIR)/scripts
+-	mkdir -p $(DESTDIR)/usr/sbin
++	mkdir -p $(DESTDIR)$(SBINDIR)
+ 
+ 	cp -a scripts/* $(DSDIR)/scripts/
+ 	install -m 0644 functions $(DSDIR)/
+ 
+-	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)/usr/sbin/debootstrap
+-	chmod 0755 $(DESTDIR)/usr/sbin/debootstrap
++	sed 's/@VERSION@/$(VERSION)/g' debootstrap >$(DESTDIR)$(SBINDIR)/debootstrap
++	chmod 0755 $(DESTDIR)$(SBINDIR)/debootstrap
