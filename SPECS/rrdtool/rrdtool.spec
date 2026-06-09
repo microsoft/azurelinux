@@ -79,20 +79,19 @@ Requires:       lua(abi) = %{luaver}
 The %{name}-lua package includes RRDtool bindings for Lua.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 ./configure \
 	--prefix=%{_prefix}	\
 	--enable-tcl-site \
-    --with-tcllib=%{_libdir} \
+	--with-tcllib=%{_libdir} \
 	--enable-python 	\
 	--enable-ruby \
 	--disable-perl		\
 	--disable-examples	\
-        --with-systemdsystemunitdir=%{_unitdir} \
-        --disable-docs 		\
+	--with-systemdsystemunitdir=%{_unitdir} \
+	--disable-docs 		\
 	--disable-static
 
 perl -pi.orig -e 's|-Wl,--rpath -Wl,\$\(EPREFIX\)/lib||g' \
