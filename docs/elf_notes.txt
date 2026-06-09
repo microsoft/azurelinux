@@ -51,9 +51,14 @@ Three overlays in total:
          2024.05.29  -> 2024.5.29.0
 
   (c) file-search-replace in redhat-package-notes.in:
-      appends  ,"moduleVersion":"%:getenv(RPM_MODULE_VERSION )"
+      appends  ,"os":"@OS@","osVersion":"@OSVERSION@","moduleVersion":"%:getenv(RPM_MODULE_VERSION )"
       to the JSON payload in the GCC linker spec fragment, bumping the
       trailing ')' count from 4 to 5 to keep the macro nesting balanced.
+      The @OS@ / @OSVERSION@ placeholders are substituted in %build by
+      overlay (a)'s sed (alongside @OSCPE@), so 'os' and 'osVersion' are
+      static strings ('azurelinux' / '4.0') matching the ID and
+      VERSION_ID fields of /etc/os-release; only moduleVersion is read
+      from the environment at link time.
 
 End result, after a downstream package (cronie, bash, etc.) is rebuilt:
   Packaging Metadata: {
@@ -62,6 +67,8 @@ End result, after a downstream package (cronie, bash, etc.) is rebuilt:
     "version":"1.7.2-13.azl4",
     "architecture":"x86_64",
     "osCpe":"cpe:/o:microsoft:azurelinux:4.0",
+    "os":"azurelinux",
+    "osVersion":"4.0",
     "moduleVersion":"1.7.2.0"
   }
 
@@ -125,6 +132,80 @@ from the very first package onward.
 Practical implication: re-cut Stage 1 (or at minimum re-publish
 package-notes-srpm-macros and re-trigger a full Stage 2 rebuild) once
 this branch lands.
+
+Empirical confirmation (Koji): bash-5.3.9-4.azl4 (built 2026-05-05) had
+osCpe = cpe:/o:fedoraproject:fedora:43 in its ELF notes; its buildroot
+listed package-notes-srpm-macros-0.5-1.azl4~bootstrap.20260405 -- i.e.
+the Fedora-seeded bootstrap build. package-notes-0.5-16 was rebuilt
+natively at 2026-05-06 02:21, and bash-5.3.9-5 (built 2026-05-16) then
+picked up osCpe = cpe:/o:microsoft:azurelinux:4.0. So the cutover is
+strictly "was this package built before or after package-notes was
+rebuilt in a non-bootstrap chroot." Any NVR whose buildroot still lists
+a package-notes-srpm-macros-*~bootstrap.* component is stale and needs a
+rebuild.
+
+CPE NAMING DECISION (azurelinux vs azure_linux)
+-----------------------------------------------
+The canonical CPE project-name convention is the underscored form
+'azure_linux' (i.e. cpe:/o:microsoft:azure_linux:4.0). An earlier pass
+on this branch switched everything to the underscore form, but it was
+REVERTED back to the unspaced 'azurelinux' pending team sign-off,
+because the value is parsed by multiple downstream consumers (vuln
+scanners, telemetry pipelines, SBOM tooling) that would all need a
+coordinated flip. Until that alignment happens, keep ALL of these in
+sync on the unspaced form:
+
+  - azurelinux-release: /usr/lib/system-release-cpe        (microsoft:azurelinux)
+  - azurelinux-release: CPE_NAME in /etc/os-release        (microsoft:azurelinux)
+  - package-notes overlay: osCpe baked into .note.package  (microsoft:azurelinux)
+
+Note CPE_NAME in /etc/os-release and /usr/lib/system-release-cpe are
+TWO SEPARATE values that historically drifted (os-release used the
+legacy 'azurelinuxproject:azurelinux'); both now read
+'cpe:/o:microsoft:azurelinux:4.0'. If you ever do land the azure_linux
+rename, flip all three sites together and coordinate with consumers.
+
+BUILD-TIME SELF-TESTS (regression guards)
+-----------------------------------------
+Two guards fail the build loudly rather than silently shipping degraded
+ELF metadata. Both live in comp.toml overlays (so they survive render):
+
+  1. package-notes %build self-test: greps the generated
+     redhat-package-notes for osCpe / osVersion / moduleVersion, and
+     greps macros.package-notes-srpm for RPM_MODULE_VERSION. Catches a
+     regression in overlay (b) or (c).
+
+  2. azurelinux-rpm-config %install guard: greps the rendered macros
+     file for >= 3 occurrences of the bare name
+     _generate_package_note_file (the build/check/install _pre hooks).
+     Catches a redhat-rpm-config rebase that drops the hook expansions,
+     which would silently stop RPM_MODULE_VERSION from being exported.
+
+     IMPORTANT: grep the bare macro NAME, not the %{?...} expansion --
+     RPM expands %{?_generate_package_note_file} in the spec before the
+     shell runs, and the macro is undefined during these packages' own
+     builds (it ships in package-notes-srpm-macros), so the %{?...} form
+     collapses to empty and matches everything.
+
+  What these guards DON'T cover: if azurelinux-rpm-config drops the hook
+  AND is not itself rebuilt, the guard won't fire (it only runs when
+  that package builds). The distro-wide moduleVersion spot-check below
+  is the backstop.
+
+RELEASE MANAGEMENT (package-notes is manual mode)
+-------------------------------------------------
+package-notes upstream uses %autorelease + %autochangelog, so the
+rendered Release number tracked this branch's per-component commit
+count and the %changelog accumulated one entry per commit. The
+component was switched to manual release mode
+(release.calculation = "manual") with a spec-set-tag overlay pinning
+Release and a spec-search-replace overlay replacing %autochangelog with
+a single hand-written entry.
+
+CONSEQUENCE: package-notes no longer auto-bumps on commit (same as
+azurelinux-release). When you change it you MUST hand-bump the Release
+value in the spec-set-tag overlay and update the %changelog overlay in
+package-notes.comp.toml, or the rebuild ships at a stale NVR.
 
 VALIDATION NOTES
 ----------------
