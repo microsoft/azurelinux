@@ -275,19 +275,39 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
+                # >>> TEST HACK (branch: test_delta_v1) >>>
+                # Submit SCRATCH builds while testing this pipeline, instead of
+                # official/persisted builds. run_package_build.py treats the
+                # ABSENCE of --official-build as a scratch build
+                # (isScratchBuild = not --official-build), which keeps test runs
+                # out of the real package feed and avoids NEVR collisions with
+                # production builds.
+                # DO NOT MERGE this into the v1 pipeline PR — restore the
+                # `--official-build \` line below for the real pipeline.
+                # <<< TEST HACK <<<
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
                   --package-target azl4 \
-                  --official-build \
                   --commit-sha "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
               API_AUDIENCE: $(ApiAudience)
               API_BASE_URL: $(ApiBaseDirectUrl)
-              BUILD_REASON: $(Build.Reason)
+              # >>> TEST HACK (branch: test_delta_v1) >>>
+              # Force a non-PullRequest reason so run_package_build.py does NOT
+              # skip submission on PR-triggered test runs (it returns early when
+              # reason == PullRequest: "unmerged code should not consume build
+              # capacity"). The determine-range step is unaffected and still uses
+              # the real PR context -- on a PR build Build.SourceVersion is the
+              # merge commit, so its fallback source^1..source is exactly the
+              # PR's diff, which is a convenient test range.
+              # DO NOT MERGE -- restore `BUILD_REASON: $(Build.Reason)` for the
+              # real pipeline.
+              BUILD_REASON: IndividualCI
+              # <<< TEST HACK <<<
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
