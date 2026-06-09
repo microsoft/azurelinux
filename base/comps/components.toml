@@ -297,6 +297,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.dbus-glib]
 [components.dbus-python]
 [components.dbus-test-runner]
+[components.debootstrap]
 [components.dcmtk]
 [components.dconf]
 [components.ddcutil]
