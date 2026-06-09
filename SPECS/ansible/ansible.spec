@@ -1,13 +1,14 @@
 Summary:        Configuration-management, application deployment, cloud provisioning system
 Name:           ansible
 Version:        2.17.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Libraries
 URL:            https://www.ansible.com
 Source0:        https://github.com/ansible/ansible/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-11332.patch
 BuildRequires:  python3
 BuildRequires:  python3-libs
 BuildRequires:  python3-setuptools
@@ -29,6 +30,7 @@ Ansible is a radically simple IT automation system. It handles configuration-man
 
 %prep
 %setup -q
+%patch 0 -p1
 
 %build
 python3 setup.py build
@@ -47,6 +49,9 @@ python3 setup.py test
 %{python3_sitelib}/*
 
 %changelog
+* Tue Jun 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.17.11-2
+- Patch for CVE-2026-11332
+
 * Thu May 08 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.17.11-1
 - Auto-upgrade to 2.17.11 - CVE-2024-8775 and CVE-2024-9902
 
