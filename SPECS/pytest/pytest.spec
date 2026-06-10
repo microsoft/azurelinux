@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        7.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,7 +20,6 @@ BuildRequires:  python3-hypothesis
 BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-twisted
 BuildRequires:  python3-xml
 Requires:       python3
 Requires:       python3-setuptools
@@ -66,6 +65,10 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 10 2026 Aditya Singh <v-aditysing@microsoft.com> - 7.4.0-3
+- Removed BuildRequires python3-twisted to break a build-time dependency introduced
+  by python-twisted 23.10.0 needing python3-hatch-fancy-pypi-readme (which transitively BRs pytest).
+
 * Mon Oct 07 2024 Devin Anderson <danderson@microsoft.com> - 7.4.0-2
 - Add missing runtime dependency on 'iniconfig' package.
 
