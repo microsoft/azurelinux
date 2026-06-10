@@ -1,5 +1,12 @@
 [components.dtc]
 
+# >>> TEST CHANGE (branch: test_delta_v1) -- discard before merge >>>
+# Forces this component into the post-merge delta BUILD set by changing its
+# config fingerprint (changeType -> "changed"). The macro is unreferenced, so
+# the actual RPM build is unaffected. DO NOT MERGE.
+build.defines = { azl_test_delta_marker = "20260609-1" }
+# <<< TEST CHANGE <<<
+
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # The upstream spec hard-codes `%global with_mingw 1` whenever %fedora is
 # defined (true in our build environment) rather than gating on a %bcond, so

@@ -1,10 +1,13 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/cpio.azl.macros}
+
 Summary: A GNU archiving program
 Name: cpio
 Version: 2.15
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/cpio/
 Source0: https://ftp.gnu.org/gnu/cpio/cpio-%{version}.tar.bz2
@@ -16,6 +19,7 @@ Source2: https://ftp.gnu.org/gnu/cpio/cpio-%{version}.tar.bz2.sig
 # https://savannah.gnu.org/projects/cpio/ lists one maintainer, gray
 # and their GPG key is https://savannah.gnu.org/people/viewgpg.php?user_id=311
 Source3: gray-key.gpg
+Source9999: cpio.azl.macros
 
 # We use SVR4 portable format as default.
 Patch1: cpio-2.14-rh.patch

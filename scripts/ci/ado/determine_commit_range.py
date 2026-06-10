@@ -45,6 +45,16 @@ import ado_rest
 # build (which would skip everything in between).
 _BASELINE_REASONS = frozenset({"individualCI", "batchedCI"})
 
+# >>> TEST HACK (branch: test_delta_v1) >>>
+# Allow 'manual' builds to act as a baseline so PR-triggered test runs can
+# exercise the previous-build selection path. PR builds normally only reach the
+# source^1 fallback (their refs/pull/N/merge branch has no prior builds), and
+# the test pipeline only has MANUAL builds on refs/heads/4.0. Paired with the
+# YAML hack that forces the query branch to refs/heads/4.0.
+# DO NOT MERGE -- delete this block to restore production behavior.
+_BASELINE_REASONS = _BASELINE_REASONS | {"manual"}
+# <<< TEST HACK <<<
+
 _SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -123,16 +133,33 @@ def _select_baseline(builds: list[object], current_build_id: int) -> str | None:
         if not isinstance(build, dict):
             continue
         build_id = build.get("id")
+        reason = build.get("reason")
+        source_version = build.get("sourceVersion")
+        source_branch = build.get("sourceBranch")
+        # >>> DEBUG (branch: test_delta_v1) -- discard before merge >>>
+        _log(
+            f"DEBUG: candidate? id={build_id!r} reason={reason!r} "
+            f"sourceBranch={source_branch!r} sourceVersion={str(source_version)[:12]!r}"
+        )
+        # <<< DEBUG <<<
         if not isinstance(build_id, int) or build_id >= current_build_id:
             continue
-        if build.get("reason") not in _BASELINE_REASONS:
+        if reason not in _BASELINE_REASONS:
             continue
-        source_version = build.get("sourceVersion")
         if isinstance(source_version, str) and _SHA_RE.match(source_version.lower()):
             candidates.append((build_id, source_version.lower()))
     if not candidates:
         return None
-    return max(candidates, key=lambda item: item[0])[1]
+    chosen = max(candidates, key=lambda item: item[0])
+    # >>> TEST HACK (branch: test_delta_v1) >>>
+    # Prove the baseline-selection path ran on real ADO build data. DO NOT MERGE.
+    _log(
+        f"TEST: {len(candidates)} baseline candidate(s) (id, sourceVersion) = "
+        f"{sorted(candidates, reverse=True)}; selected previous build "
+        f"id={chosen[0]} sourceVersion={chosen[1]}"
+    )
+    # <<< TEST HACK <<<
+    return chosen[1]
 
 
 def _parse_args() -> argparse.Namespace:
@@ -161,12 +188,22 @@ def main() -> int:
 
     try:
         conn = ado_rest.AdoConnection.from_env()
+        # >>> DEBUG (branch: test_delta_v1) -- discard before merge >>>
+        _log(
+            f"DEBUG: querying builds: definition_id={args.definition_id} "
+            f"branch={args.branch!r} current_build_id={args.current_build_id} top={args.top} "
+            f"baseline_reasons={sorted(_BASELINE_REASONS)}"
+        )
+        # <<< DEBUG <<<
         builds = ado_rest.list_builds(
             conn,
             definition_id=args.definition_id,
             branch_name=args.branch,
             top=args.top,
         )
+        # >>> DEBUG (branch: test_delta_v1) -- discard before merge >>>
+        _log(f"DEBUG: list_builds returned {len(builds)} build(s) for branch {args.branch!r}")
+        # <<< DEBUG <<<
         target_commit = _select_baseline(builds, args.current_build_id)
     except ado_rest.AdoRestError as exc:
         _log(f"WARNING: Could not query previous builds ({exc}); falling back to source^1.")
