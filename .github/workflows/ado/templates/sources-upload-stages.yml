@@ -53,14 +53,44 @@ stages:
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
         steps:
+          - task: PipAuthenticate@1
+            displayName: "Authenticate pip"
+            inputs:
+              artifactFeeds: "azl/ControlTowerFeed"
+
+          - script: |
+              set -euo pipefail
+
+              echo "##[group]Mock"
+              tdnf install -y mock mock-rpmautospec python3-chardet
+              sudo usermod -aG mock "$(whoami)"
+              echo "##[endgroup]"
+
+              echo "##[group]Azldev"
+              AZLDEV_VERSION=$(cat .azldev-version)
+              echo "Installing azldev@${AZLDEV_VERSION}..."
+              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
+
+              go_bin_path="$(go env GOPATH)/bin"
+              echo "##vso[task.prependpath]$go_bin_path"
+
+              "$go_bin_path/azldev" --version
+              echo "##[endgroup]"
+
+              echo "##[group]Python dependencies"
+              pip install -r scripts/ci/control-tower/requirements.txt
+              pip install -r scripts/ci/ado/requirements.txt
+              echo "##[endgroup]"
+            displayName: "Install dependencies"
+
           # Resolve the (target, source) commit range for this post-merge build:
           #   source = the commit that triggered this run (Build.SourceVersion).
           #   target = the previous CI build's commit on this branch, looked up
-          #            via the ADO Builds REST API. Pairing each build with the
+          #            via the ADO Builds API. Pairing each build with the
           #            one immediately before it keeps concurrent runs from
           #            overlapping and captures every commit a rebase merge
-          #            appends. The helper is stdlib-only, so it runs here before
-          #            the dependency-install step. See
+          #            appends. Runs after the dependency-install step because
+          #            it imports the azure-devops SDK. See
           #            scripts/ci/ado/determine_commit_range.py for the full
           #            rationale and the first-run (source^1) fallback.
           - script: |
@@ -98,35 +128,6 @@ stages:
               BUILD_SOURCEVERSION: $(Build.SourceVersion)
               BUILD_REPOSITORY_URI: $(Build.Repository.Uri)
             displayName: "Determine source and target commit range"
-
-          - task: PipAuthenticate@1
-            displayName: "Authenticate pip"
-            inputs:
-              artifactFeeds: "azl/ControlTowerFeed"
-
-          - script: |
-              set -euo pipefail
-
-              echo "##[group]Mock"
-              tdnf install -y mock mock-rpmautospec python3-chardet
-              sudo usermod -aG mock "$(whoami)"
-              echo "##[endgroup]"
-
-              echo "##[group]Azldev"
-              AZLDEV_VERSION=$(cat .azldev-version)
-              echo "Installing azldev@${AZLDEV_VERSION}..."
-              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
-
-              go_bin_path="$(go env GOPATH)/bin"
-              echo "##vso[task.prependpath]$go_bin_path"
-
-              "$go_bin_path/azldev" --version
-              echo "##[endgroup]"
-
-              echo "##[group]Python dependencies"
-              pip install -r scripts/ci/control-tower/requirements.txt
-              echo "##[endgroup]"
-            displayName: "Install dependencies"
 
           # Verify lock files are current. --check-only validates without
           # writing, exits nonzero if any lock would change.

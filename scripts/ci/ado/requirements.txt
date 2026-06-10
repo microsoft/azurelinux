@@ -1,0 +1,2 @@
+# azure-devops ships beta-only; b4 is the latest 7.1 release (not a typo).
+azure-devops==7.1.0b4

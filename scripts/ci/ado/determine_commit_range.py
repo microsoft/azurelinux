@@ -33,11 +33,20 @@ diagnostic output goes to stderr to keep stdout machine-readable.
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
 
-import ado_rest
+from azure.devops.connection import Connection  # pyright: ignore[reportMissingTypeStubs]
+from azure.devops.exceptions import ClientException  # pyright: ignore[reportMissingTypeStubs]
+from msrest.authentication import BasicAuthentication
+
+# ADO predefined variables required to reach the control-plane REST API, read
+# from the step environment.
+_ENV_COLLECTION_URI = "SYSTEM_COLLECTIONURI"
+_ENV_PROJECT = "SYSTEM_TEAMPROJECT"
+_ENV_TOKEN = "SYSTEM_ACCESSTOKEN"  # noqa: S105 - env var NAME, not a secret value
 
 # A build is eligible as a baseline only if it was itself a CI build of the
 # branch. Manual / PR / scheduled runs are excluded so that a one-off manual
@@ -108,26 +117,61 @@ def _parent_commit(commit: str, repo_uri: str) -> str | None:
     return parent
 
 
+def _fetch_recent_builds(*, definition_id: int, branch: str, top: int) -> list[object]:
+    """Return recent builds for ``definition_id`` on ``branch`` via the ADO SDK.
+
+    Authenticates with the pipeline's ``System.AccessToken`` (read from the
+    environment) using the SDK's documented ``BasicAuthentication`` pattern; the
+    Azure DevOps REST API accepts the job access token as a PAT-equivalent
+    credential. This reads the pipeline's own build history on the ADO control
+    plane, so the default project job-authorization scope is sufficient and the
+    Workload Identity Federation service-connection rule does not apply.
+
+    Args:
+        definition_id: Build definition (pipeline) id to filter by.
+        branch: Full source branch ref, e.g. ``refs/heads/4.0``.
+        top: Maximum number of builds to return (most recent first).
+
+    Returns:
+        The list of ``Build`` objects returned by the SDK.
+
+    Raises:
+        RuntimeError: If a required environment variable is missing or empty.
+    """
+    missing = [name for name in (_ENV_COLLECTION_URI, _ENV_PROJECT, _ENV_TOKEN) if not os.environ.get(name)]
+    if missing:
+        msg = f"Missing required ADO environment variable(s): {', '.join(missing)}."
+        raise RuntimeError(msg)
+    credentials = BasicAuthentication("", os.environ[_ENV_TOKEN])
+    connection = Connection(base_url=os.environ[_ENV_COLLECTION_URI], creds=credentials)
+    build_client = connection.clients.get_build_client()
+    return build_client.get_builds(
+        os.environ[_ENV_PROJECT],
+        definitions=[definition_id],
+        branch_name=branch,
+        top=top,
+        query_order="queueTimeDescending",
+    )
+
+
 def _select_baseline(builds: list[object], current_build_id: int) -> str | None:
     """Pick the source commit of the immediately-preceding eligible CI build.
 
     Args:
-        builds: Raw build objects from ``ado_rest.list_builds``.
+        builds: ``Build`` objects from :func:`_fetch_recent_builds`.
         current_build_id: Id of the running build; only earlier builds qualify.
 
     Returns:
-        The ``sourceVersion`` of the highest-id eligible build, or None.
+        The ``source_version`` of the highest-id eligible build, or None.
     """
     candidates: list[tuple[int, str]] = []
     for build in builds:
-        if not isinstance(build, dict):
-            continue
-        build_id = build.get("id")
+        build_id = getattr(build, "id", None)
         if not isinstance(build_id, int) or build_id >= current_build_id:
             continue
-        if build.get("reason") not in _BASELINE_REASONS:
+        if getattr(build, "reason", None) not in _BASELINE_REASONS:
             continue
-        source_version = build.get("sourceVersion")
+        source_version = getattr(build, "source_version", None)
         if isinstance(source_version, str) and _SHA_RE.match(source_version.lower()):
             candidates.append((build_id, source_version.lower()))
     if not candidates:
@@ -160,15 +204,13 @@ def main() -> int:
     target_commit: str | None = None
 
     try:
-        conn = ado_rest.AdoConnection.from_env()
-        builds = ado_rest.list_builds(
-            conn,
+        builds = _fetch_recent_builds(
             definition_id=args.definition_id,
-            branch_name=args.branch,
+            branch=args.branch,
             top=args.top,
         )
         target_commit = _select_baseline(builds, args.current_build_id)
-    except ado_rest.AdoRestError as exc:
+    except (ClientException, OSError, RuntimeError) as exc:
         _log(f"WARNING: Could not query previous builds ({exc}); falling back to source^1.")
 
     if target_commit is None:
