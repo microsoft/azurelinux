@@ -91,7 +91,7 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
-* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 4.35.0-1
+* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 4.35.0-1_6.18.31.1.1
 - Bump to match upgrade to DOCA 3.3.0 (mft 4.35.0).
 
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-8_6.12.57.1.6

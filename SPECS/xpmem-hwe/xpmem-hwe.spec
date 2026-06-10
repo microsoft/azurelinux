@@ -213,7 +213,7 @@ fi
 %endif
 
 %changelog
-* Mon May 11 2026 Azure Linux Team - 2601.0.9-1
+* Mon May 11 2026 Azure Linux Team - 2601.0.9-1_6.18.31.1.1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-32_6.12.57.1.6

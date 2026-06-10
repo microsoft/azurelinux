@@ -213,7 +213,7 @@ find %{buildroot} -type f -name \*.ko -exec %{__strip} -p --strip-debug --discar
 %endif
 
 %changelog
-* Mon May 11 2026 Azure Linux Team - 4.35.0-1
+* Mon May 11 2026 Azure Linux Team - 4.35.0-1_6.18.31.1.1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-8_6.12.57.1.6

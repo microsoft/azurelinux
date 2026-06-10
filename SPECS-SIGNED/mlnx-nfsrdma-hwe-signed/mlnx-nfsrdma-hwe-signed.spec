@@ -119,7 +119,7 @@ fi
 %config(noreplace) %{_sysconfdir}/depmod.d/zz02-mlnx-nfsrdma-*.conf
 
 %changelog
-* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 26.01-1
+* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 26.01-1_6.18.31.1.1
 - Bump to match upgrade to DOCA 3.3.0 (OFED 26.01).
 
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
