@@ -33,8 +33,9 @@ make %{?_smp_mflags} BUILDTAGS="seccomp" COMMIT="%{commit_hash}" man runc
 %check
 unshare -m --propagation unchanged sh <<'EOF'
 if ! mountpoint -q /sys/fs/cgroup; then
-    mount -t cgroup2 none /sys/fs/cgroup || exit 1
-    trap 'umount -l /sys/fs/cgroup' EXIT
+    if mount -t cgroup2 none /sys/fs/cgroup; then
+        trap 'umount -l /sys/fs/cgroup' EXIT
+    fi
 fi
 go test -tags "seccomp cgo" -timeout 10m \
     $(go list ./... | grep -vE '/libcontainer/(integration|nsenter)$')
