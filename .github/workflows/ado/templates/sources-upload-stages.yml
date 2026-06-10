@@ -76,7 +76,7 @@ stages:
               range_output="$(python3 scripts/ci/ado/determine_commit_range.py \
                 --definition-id "$SYSTEM_DEFINITIONID" \
                 --current-build-id "$BUILD_BUILDID" \
-                --branch "$BUILD_SOURCEBRANCH" \
+                --branch "$DELTA_QUERY_BRANCH" \
                 --source-commit "$BUILD_SOURCEVERSION" \
                 --repo-uri "$BUILD_REPOSITORY_URI")"
               echo "$range_output"
@@ -96,7 +96,7 @@ stages:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               SYSTEM_DEFINITIONID: $(System.DefinitionId)
               BUILD_BUILDID: $(Build.BuildId)
-              BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+              DELTA_QUERY_BRANCH: $(Build.SourceBranch)
               BUILD_SOURCEVERSION: $(Build.SourceVersion)
               BUILD_REPOSITORY_URI: $(Build.Repository.Uri)
             displayName: "Determine source and target commit range"
@@ -278,7 +278,7 @@ stages:
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$BUILD_REASON" \
+                  --build-reason "$CT_BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
                   --package-target azl4 \
                   --official-build \
@@ -287,7 +287,7 @@ stages:
             env:
               API_AUDIENCE: $(ApiAudience)
               API_BASE_URL: $(ApiBaseDirectUrl)
-              BUILD_REASON: $(Build.Reason)
+              CT_BUILD_REASON: $(Build.Reason)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
