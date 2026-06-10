@@ -1,3 +1,7 @@
+# CHANGE FROM 3.0: DISABLE DEBUG PACKAGE
+# The custom way we were generating debuginfo broke hmac verification.
+# You can decide whether or not it's worth it to re-enable it.
+%define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
 Version:        103.8.0
@@ -9,7 +13,9 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt
 Source0:        https://github.com/microsoft/SymCrypt/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz#/jitterentropy-library-3.3.1.tar.gz
-Source2:        find-debuginfo
+# CHANGE FROM 3.0: DISABLE DEBUG PACKAGE
+# No longer needed for generating debuginfo. See above.
+# Source2:        find-debuginfo
 # Use ./generate-env-file.sh --release-tag <git-version-tag> to generate this. For example:
 #   ./generate-env-file.sh --release-tag v103.5.1
 Source3:        symcrypt-build-environment-variables-v%{version}.sh
@@ -18,6 +24,10 @@ BuildRequires:  cmake
 BuildRequires:  clang >= 12.0.1-4
 %endif
 BuildRequires:  gcc
+# CHANGE FROM 3.0: ADD BUILD REQUIREMENTS
+# The build chroot in 3.0 already had gcc-c++ and libatomic, so they we got buy without listing them, but we need them now.
+BuildRequires:  gcc-c++
+BuildRequires:  libatomic
 BuildRequires:  make
 BuildRequires:  python3
 BuildRequires:  python3-pyelftools
@@ -49,41 +59,68 @@ rm -rf 3rdparty/jitterentropy-library
 ln -s ../jitterentropy-library-3.3.1 3rdparty/jitterentropy-library
 
 %build
+# CHANGE FROM 3.0: REMOVE -z pack-relative-relocs
+# AZL4's default LDFLAGS include -Wl,-z,pack-relative-relocs, which makes the
+# linker emit R_X86_64_RELATIVE entries in DT_RELR format instead of SHT_RELA.
+# SymCrypt's FIPS post-processor (process_fips_module.py) only walks SHT_RELA,
+# so RELR-packed relocations are not zeroed before the integrity HMAC is
+# computed. The dynamic loader still applies them at load time, so in-memory
+# bytes diverge from the hashed bytes and the FIPS self-test fails. Combined
+# with -z now, the failure surfaces as a SIGSEGV the instant libsymcrypt.so
+# is mapped (e.g. any LD_PRELOAD or DT_NEEDED user crashes immediately).
+# Remove until process_fips_module.py learns about DT_RELR.
+export LDFLAGS="${LDFLAGS//-Wl,-z,pack-relative-relocs/}"
+
 source %{SOURCE3}
+# CHANGE FROM 3.0: DISABLE DEBUG PACKAGE
+# Change some cmake flags that were used for debug info generation.
+# Originals here:
+# cmake   -S . -B bin \
+#         -DSYMCRYPT_TARGET_ARCH=%%{symcrypt_arch} \
+#         -DSYMCRYPT_STRIP_BINARY=OFF \
+#         -DSYMCRYPT_FIPS_POSTPROCESS=OFF \
+#         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+#         -DCMAKE_C_COMPILER=%%{symcrypt_cc} \
+#         -DCMAKE_CXX_COMPILER=%%{symcrypt_cxx} \
+#         -DCMAKE_C_FLAGS="%%{symcrypt_c_flags}" \
+#         -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
+
 cmake   -S . -B bin \
         -DSYMCRYPT_TARGET_ARCH=%{symcrypt_arch} \
-        -DSYMCRYPT_STRIP_BINARY=OFF \
-        -DSYMCRYPT_FIPS_POSTPROCESS=OFF \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_C_COMPILER=%{symcrypt_cc} \
         -DCMAKE_CXX_COMPILER=%{symcrypt_cxx} \
         -DCMAKE_C_FLAGS="%{symcrypt_c_flags}" \
         -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable"
 
-cmake --build bin
+# CHANGE FROM 3.0: Parallelize build
+# Note actually necessary, but makes iteration faster.
+cmake --build bin -j $(nproc)
 
+# CHANGE FROM 3.0: DISABLE DEBUG PACKAGE
+# This was all in service of generating debug info. See notes above.
 # Override the default find-debuginfo script to our own custom one, which is modified
 # to allow us to keep symbols.
 # Also add custom options to the call to find-debuginfo.
-%define __find_debuginfo %{SOURCE2}
-%define _find_debuginfo_opts \\\
-    --keep-symbol SymCryptVolatileFipsHmacKey \\\
-    --keep-symbol SymCryptVolatileFipsHmacKeyRva \\\
-    --keep-symbol SymCryptVolatileFipsBoundaryOffset \\\
-    --keep-symbol SymCryptVolatileFipsHmacDigest \\\
-    %{nil}
+# %%define __find_debuginfo %%{SOURCE2}
+# %%define _find_debuginfo_opts \\\
+#     --keep-symbol SymCryptVolatileFipsHmacKey \\\
+#     --keep-symbol SymCryptVolatileFipsHmacKeyRva \\\
+#     --keep-symbol SymCryptVolatileFipsBoundaryOffset \\\
+#     --keep-symbol SymCryptVolatileFipsHmacDigest \\\
+#     %%{nil}
 
-# Override the default to allow us to do custom fips post-processing after debug info/stripping is done.
-# The post-processing script writes the modified file to the same location as the original file, which
-# is subject to default permissions, so we need to set permissions manually after the script.
-%define __spec_install_post \
-    %{?__debug_package:%{__debug_install_post}} \
-    %{__arch_install_post} \
-    %{__os_install_post} \
-    mkdir -p "bin/module/generic/processing" \
-    python3 "scripts/process_fips_module.py" "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" --processing-dir "bin/module/generic/processing" --debug \
-    chmod 755 "%{buildroot}%{_libdir}/libsymcrypt.so.%{version}" \
-%{nil}
+# # Override the default to allow us to do custom fips post-processing after debug info/stripping is done.
+# # The post-processing script writes the modified file to the same location as the original file, which
+# # is subject to default permissions, so we need to set permissions manually after the script.
+# %%define __spec_install_post \
+#     %%{?__debug_package:%%{__debug_install_post}} \
+#     %%{__arch_install_post} \
+#     %%{__os_install_post} \
+#     mkdir -p "bin/module/generic/processing" \
+#     python3 "scripts/process_fips_module.py" "%%{buildroot}%%{_libdir}/libsymcrypt.so.%%{version}" --processing-dir "bin/module/generic/processing" --debug \
+#     chmod 755 "%%{buildroot}%%{_libdir}/libsymcrypt.so.%%{version}" \
+# %%{nil}
 
 %install
 mkdir -p %{buildroot}%{_libdir}
