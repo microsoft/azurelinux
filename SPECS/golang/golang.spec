@@ -169,7 +169,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu Jun 04 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
 - Patch for CVE-2026-39821
 
 * Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
