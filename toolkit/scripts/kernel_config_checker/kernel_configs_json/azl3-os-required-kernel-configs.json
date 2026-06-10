@@ -3146,7 +3146,7 @@
               "value": "y"
             }
           ],
-          "justification": "kernel-hwe 6.12 builds CRYPTO_DH as builtin on arm64 (selected by other built-in components)"
+          "justification": "kernel-hwe 6.18 builds CRYPTO_DH as builtin on arm64 (selected by other built-in components)"
         }
       ]
     }
