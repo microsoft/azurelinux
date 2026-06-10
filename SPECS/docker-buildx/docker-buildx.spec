@@ -1,7 +1,13 @@
 %define         commit_hash 30feaa1a915b869ebc2eea6328624b49facd4bfb
 
 Summary:        A Docker CLI plugin for extended build capabilities with BuildKit
+Name:           docker-buildx
+# update "commit_hash" above when upgrading version
+Version:        0.14.0
 Release:        15%{?dist}
+License:        ASL 2.0
+Group:          Tools/Container
+Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.github.com/docker/buildx
 Source0:        https://github.com/docker/buildx/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -31,6 +37,9 @@ Patch22:        CVE-2026-39835.patch
 Patch23:        CVE-2026-42502.patch
 Patch24:        CVE-2026-46598.patch
 Patch25:        CVE-2026-39833.patch
+
+BuildRequires: bash
+BuildRequires: golang < 1.25
 
 # conflicting packages
 Conflicts: docker-ce
@@ -67,8 +76,6 @@ install -m 755 buildx "%{buildroot}%{_libexecdir}/docker/cli-plugins/docker-buil
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-14
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
-* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-11
-- Patch for CVE-2026-39882
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.14.0-13
 - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
 
