@@ -1,0 +1,83 @@
+# Smoke-test the azldev version pinned in .azldev-version.
+#
+# When a PR bumps .azldev-version (or touches the runner image / this workflow),
+# build the runner container with that exact pin and confirm the resulting
+# binary can (a) run and (b) parse every component definition in the repo via
+# `azldev component list`. This catches the two failure modes of a version bump:
+# the pin doesn't `go install`, or the new version breaks on the repo's TOMLs.
+name: "azldev Smoke Test"
+
+on:
+  pull_request:
+    branches: ["4.0"]
+    paths:
+      - ".azldev-version"
+      - ".github/workflows/containers/azldev-runner.Dockerfile"
+      - ".github/workflows/azldev-smoke.yml"
+  workflow_dispatch:
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  smoke:
+    name: "comp list"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Build azldev runner container
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\n' < .azldev-version)"
+          if [ -z "$version" ]; then
+            echo "::error::.azldev-version is empty"
+            exit 1
+          fi
+          # Restrict to the charset Go module versions use (commit SHAs, tags,
+          # pseudo-versions). This blocks shell metacharacters so the value is
+          # safe to pass straight through to `docker build --build-arg` below.
+          if ! printf '%s' "$version" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
+            echo "::error::.azldev-version contains unexpected characters: '$version'"
+            exit 1
+          fi
+          echo "azldev version pin: $version"
+          docker build \
+            --build-arg UID="$(id -u)" \
+            --build-arg AZLDEV_VERSION="$version" \
+            -t localhost/azldev-runner \
+            -f .github/workflows/containers/azldev-runner.Dockerfile \
+            .github/workflows/containers/
+
+      # `component list` only parses TOML, so no mock sandbox flags are needed
+      # here (contrast with the render/build checks). Mount the checkout rw to
+      # match the documented /workdir convention and avoid surprises if azldev
+      # writes a cache.
+      - name: Smoke-test azldev
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workdir" \
+            localhost/azldev-runner \
+            bash -eu -o pipefail -c '
+              echo "=== azldev version ==="
+              azldev --version
+              echo "=== azldev component list ==="
+              azldev component list -a -q -O json > /tmp/component-list.json
+              count=$(jq -e "if type == \"array\" then length else error(\"component list did not return a JSON array\") end" /tmp/component-list.json)
+              echo "azldev resolved ${count} component(s)"
+              if ! [[ "${count}" =~ ^[0-9]+$ ]] || [ "${count}" -le 0 ]; then
+                echo "::error::azldev component list returned no components (count=${count})"
+                exit 1
+              fi
+            '
