@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/gengetopt.azl.macros}
+
 Name:             gengetopt
 Version:          2.23
 Release:          16%{dist}
@@ -9,6 +12,7 @@ Summary:          Tool to write command line option parsing code for C programs
 License:          GPL-3.0-or-later
 URL:              http://www.gnu.org/software/gengetopt/
 Source0:          ftp://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Source9999: gengetopt.azl.macros
 
 BuildRequires:  gcc-c++
 BuildRequires:  gcc

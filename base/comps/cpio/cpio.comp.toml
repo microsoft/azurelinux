@@ -1,5 +1,12 @@
 [components.cpio]
 
+# >>> TEST CHANGE (branch: test_delta_v1) -- discard before merge >>>
+# Forces this component into the post-merge delta BUILD set by changing its
+# config fingerprint (changeType -> "changed"). The macro is unreferenced, so
+# the actual RPM build is unaffected. DO NOT MERGE.
+build.defines = { azl_test_delta_marker = "20260609-1" }
+# <<< TEST CHANGE <<<
+
 [[components.cpio.overlays]]
 description = "Drop BR on 'rmt'. Mirroring Rawhide's https://src.fedoraproject.org/rpms/cpio/c/84d5a4fe965609681000fd3911b7246c2a6973fb?branch=rawhide. Required to remove the need for the `star` component (provider of `rmt`)."
 type = "spec-search-replace"
