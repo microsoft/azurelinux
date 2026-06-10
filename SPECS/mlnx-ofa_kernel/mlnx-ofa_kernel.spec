@@ -83,10 +83,6 @@
 %global _frame_pointers_cflags	 -fno-exceptions %{?_include_frame_pointers:-fno-omit-frame-pointer}
 %endif
 
-%if "%{_vendor}" == "mariner"
-# Disable hardened_cflags, while sneaking fno-exceptions to the command line
-%global _hardened_cflags	-fno-exceptions
-%endif
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
