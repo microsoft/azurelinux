@@ -1817,8 +1817,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.56",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.56.tar.gz"
+          "version": "51.1.101",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
         }
       }
     },
@@ -5490,8 +5490,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.67",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.67.tar.bz2"
+          "version": "2.4.68",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.68.tar.bz2"
         }
       }
     },
@@ -8411,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.137.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv1.tar.gz"
+          "version": "6.6.137.mshv2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv2.tar.gz"
         }
       }
     },
