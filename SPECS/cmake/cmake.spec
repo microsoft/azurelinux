@@ -121,7 +121,7 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
-* Tue May 26 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-14
+* Wed May 27 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-14
 - Patch for CVE-2026-4873, CVE-2026-6276, CVE-2026-6253, CVE-2026-6429, CVE-2026-5545
 
 * Fri Mar 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-13
