@@ -125,3 +125,21 @@ type = "spec-search-replace"
 regex = 'ln -s /etc/crypto-policies/back-ends/openssl_fips\.config \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/fips_local\.cnf'
 replacement = "cat > $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf << 'FIPS_LOCAL_EOF'\n# Loaded by patch 0019 when kernel FIPS flag is set.\n# Merges FIPS module integrity data with crypto-policy settings.\n.include /etc/pki/tls/fipsmodule.cnf\n.include /etc/crypto-policies/back-ends/openssl_fips.config\nFIPS_LOCAL_EOF"
 description = "Replace fips_local.cnf symlink with real file using .include directives"
+
+
+[[components.openssl.overlays]]
+type = "file-add"
+file = "0019-FIPS-Require-fips-capable-provider.patch"
+source = "0019-FIPS-Require-fips-capable-provider.patch"
+
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+regex = "0019-FIPS-Force-fips-provider-on"
+replacement = "0019-FIPS-Require-fips-capable-provider"
+description = "Replace FIPS provider with drop-in replacement on Azure Linux (not supported for public preview)"
+
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+regex = "enable-camellia"
+replacement = "enable-camellia enable-trace"
+description = "TRACE!!!"

@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -62,7 +62,7 @@ Patch0013: 0013-RH-version-aliasing.patch
 Patch0014: 0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch
 Patch0015: 0015-RH-TMP-KTLS-test-skip.patch
 Patch0016: 0016-RH-Allow-disabling-of-SHA1-signatures.patch
-Patch0019: 0019-FIPS-Force-fips-provider-on.patch
+Patch0019: 0019-FIPS-Require-fips-capable-provider.patch
 Patch0021: 0021-FIPS-INTEG-CHECK-Add-script-to-hmac-ify-fips.so.patch
 Patch0023: 0023-FIPS-RSA-encrypt-limits-REVIEW.patch
 Patch0024: 0024-FIPS-RSA-PCTs.patch
@@ -94,7 +94,7 @@ Patch0049: 0049-FIPS-fix-disallowed-digests-tests.patch
 Patch0050: 0050-Make-openssl-speed-run-in-FIPS-mode.patch
 Patch0051: 0051-Backport-upstream-27483-for-PKCS11-needs.patch
 Patch0052: 0052-Red-Hat-9-FIPS-indicator-defines.patch
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || 0%{?azl4}
 Patch0053: 0053-Allow-hybrid-MLKEM-in-FIPS-mode.patch
 %endif
 Patch0054: 0054-Temporarily-disable-SLH-DSA-FIPS-self-tests.patch
@@ -154,7 +154,8 @@ Summary: A general purpose cryptography library with TLS implementation
 Requires: ca-certificates >= 2008-5
 Requires: crypto-policies >= 20180730
 Recommends: pkcs11-provider%{?_isa}
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || 0%{?azl4}
+Requires: openssl-fips-provider
 %endif
 
 %description libs
@@ -285,7 +286,7 @@ export HASHBANGPERL=/usr/bin/perl
         --libdir=%{_lib} \
 %endif
 	--system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config \
-	zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
+	zlib enable-camellia enable-trace enable-seed enable-rfc3779 enable-sctp \
 	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
 	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
 	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""' -DOPENSSL_PEDANTIC_ZEROIZATION\
@@ -339,7 +340,7 @@ make test HARNESS_JOBS=8 TESTS='!03-test_fipsinstall !30-test_evp !80-test_ssl_n
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
 # and add hmac calculation/embedding to fips.so
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || 0%{?azl4}
 %define __spec_install_post \
     rm -rf $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so \
     %{?__debug_package:%{__debug_install_post}} \
@@ -369,6 +370,12 @@ for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
 	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
 done
 mv rh-openssl.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
+# Wire FIPS provider config so `-provider fips` works without manual editing.
+# 1. Include fipsmodule.cnf (provides [fips_sect] with module-mac) near the top
+sed -i '/^openssl_conf = openssl_init$/a \
+# Include FIPS module integrity data (module-mac) so the provider can self-test.\n.include /etc/pki/tls/fipsmodule.cnf' $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
+# 2. Register fips provider in [provider_sect] (not activated by default)
+sed -i '/^default = default_sect$/a fips = fips_sect' $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
 
 # Remove static libraries
 for lib in $RPM_BUILD_ROOT%{_libdir}/*.a ; do

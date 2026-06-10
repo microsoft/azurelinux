@@ -1,0 +1,231 @@
+From 58816d055139c91486bc22e6f20ec60a231819db Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 5 Jun 2026 12:57:36 -0700
+Subject: [PATCH] FIPS: Require fips-capable provider
+
+---
+ crypto/provider_conf.c | 173 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 172 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
+index 9649517..4d9d876 100644
+--- a/crypto/provider_conf.c
++++ b/crypto/provider_conf.c
+@@ -10,6 +10,8 @@
+ #include <string.h>
+ #include <openssl/trace.h>
+ #include <openssl/err.h>
++#include <openssl/evp.h>
++#include <unistd.h>
+ #include <openssl/conf.h>
+ #include <openssl/safestack.h>
+ #include <openssl/provider.h>
+@@ -17,6 +19,8 @@
+ #include "internal/cryptlib.h"
+ #include "provider_local.h"
+ #include "crypto/context.h"
++#include <sys/types.h>
++#include <dirent.h>
+ 
+ DEFINE_STACK_OF(OSSL_PROVIDER)
+ 
+@@ -237,7 +241,7 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
+         if (path != NULL)
+             ossl_provider_set_module_path(prov, path);
+ 
+-        ok = provider_conf_params(prov, NULL, NULL, value, cnf);
++        ok = cnf ? provider_conf_params(prov, NULL, NULL, value, cnf) : 1;
+ 
+         if (ok == 1) {
+             if (!ossl_provider_activate(prov, 1, 0)) {
+@@ -266,6 +270,8 @@ static int provider_conf_activate(OSSL_LIB_CTX *libctx, const char *name,
+ 
+         if (ok <= 0)
+             ossl_provider_free(prov);
++    } else {
++        ok = 1;
+     }
+     CRYPTO_THREAD_unlock(pcgbl->lock);
+ 
+@@ -396,6 +402,131 @@ static int provider_conf_load(OSSL_LIB_CTX *libctx, const char *name,
+     return ok >= 0;
+ }
+ 
++#define FIPS_PROVIDER_DIR       OPENSSLDIR "/providers.d"
++#define FIPS_PROVIDER_SECTION   "fips_provider"
++
++static int load_fips_provider_from_dropin(OSSL_LIB_CTX *libctx)
++{
++    DIR *dir = NULL;
++    struct dirent *entry;
++    char path[PATH_MAX];
++    CONF *prov_conf = NULL;
++    STACK_OF(CONF_VALUE) *provlist;
++    int loaded = 0, ret = 0;
++
++    OSSL_TRACE(CONF, "Attempting to load FIPS provider from drop-in config\n");
++
++    /* Open the provider directory. */
++    dir = opendir(FIPS_PROVIDER_DIR);
++    if (dir == NULL) {
++        OSSL_TRACE1(CONF, "Failed to open provider directory %s\n", FIPS_PROVIDER_DIR);
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS mode active but cannot open provider directory: %s",
++                       FIPS_PROVIDER_DIR);
++        return 0;
++    }
++
++    /* Find the first valid .cnf. */
++    while ((entry = readdir(dir)) != NULL) {
++        const char *name = entry->d_name;
++        size_t len = strlen(name);
++        OSSL_TRACE2(CONF, "Examining provider config file: %s/%s\n", FIPS_PROVIDER_DIR, name);
++
++        /* Only look at .cnf files. */
++        if (len < 5 || strcmp(name + len - 4, ".cnf") != 0) {
++            continue;
++        }
++
++        /* Construct the full path to the .cnf file. */
++        snprintf(path, sizeof(path), FIPS_PROVIDER_DIR "/%s", name);
++
++        /* Parse the drop-in config file. */
++        prov_conf = NCONF_new_ex(libctx, NCONF_default());
++        if (prov_conf == NULL) {
++            OSSL_TRACE1(CONF, "Failed to create CONF object for %s\n", path);
++            goto end;
++        }
++
++        if (NCONF_load(prov_conf, path, NULL) <= 0) {
++            OSSL_TRACE1(CONF, "Failed to load provider config file %s\n", path);
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "FIPS drop-in: failed to parse %s", path);
++            goto end;
++        }
++
++        /* Look for the [fips_provider] section. If it doesn't exist, skip this file. */
++        provlist = NCONF_get_section(prov_conf, FIPS_PROVIDER_SECTION);
++        if (provlist == NULL || sk_CONF_VALUE_num(provlist) == 0) {
++            OSSL_TRACE1(CONF, "No [fips_provider] section found in %s\n", path);
++            NCONF_free(prov_conf);
++            prov_conf = NULL;
++            continue;
++        }
++
++        /*
++         * Each entry in [fips_provider] declares a provider to load.
++         * Key = provider name, Value = config section in this file.
++         * There must be exactly one entry.
++         */
++        if (sk_CONF_VALUE_num(provlist) != 1) {
++            OSSL_TRACE2(CONF, "Invalid number of providers declared in %s: %d\n",
++                        path, sk_CONF_VALUE_num(provlist));
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "FIPS drop-in: expected exactly one provider in "
++                           "[fips_provider] section of %s, found %d", path, sk_CONF_VALUE_num(provlist));
++            goto end;
++        }
++
++        CONF_VALUE *pval = sk_CONF_VALUE_value(provlist, 0);
++        OSSL_TRACE3(CONF, "Found provider '%s' with config section '%s' in %s\n",
++                    pval->name, pval->value, path);
++
++        /* Attempt to load the provider. Note that this can "succeed" even if the provider
++         * is not functional so we need to activate it as well.
++         */
++        if (provider_conf_load(libctx, pval->name, pval->value, prov_conf) != 1) {
++            OSSL_TRACE2(CONF, "Failed to load provider '%s' from %s\n", pval->name, path);
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "FIPS drop-in: failed to load provider '%s' from %s", pval->name, path);
++            goto end;
++        }
++
++        if (!OSSL_PROVIDER_available(libctx, pval->name)) {
++            OSSL_TRACE2(CONF, "Provider '%s' from %s is not available after loading\n", pval->name, path);
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "FIPS drop-in: provider '%s' from %s failed to activate "
++                           "(module missing or integrity check failed)", pval->name, path);
++            goto end;
++        }
++
++        loaded = 1;
++        break;
++    }
++
++    if (!loaded) {
++        OSSL_TRACE1(CONF, "FIPS mode active but no FIPS provider configured in %s/\n", FIPS_PROVIDER_DIR);
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS mode active but no FIPS provider configured in %s/", FIPS_PROVIDER_DIR);
++        goto end;
++    }
++
++    ret = 1;
++
++end:
++    if (prov_conf != NULL) {
++        NCONF_free(prov_conf);
++    }
++    if (dir != NULL) {
++        closedir(dir);
++    }
++
++    if (ret != 1) {
++        ERR_print_errors_fp(stderr);
++    }
++
++    return ret;
++}
++
+ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+ {
+     STACK_OF(CONF_VALUE) *elist;
+@@ -420,6 +551,46 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+             return 0;
+     }
+ 
++    if (ossl_get_kernel_fips_flag() != 0) {
++        OSSL_TRACE(CONF, "Kernel FIPS flag is set, activating a FIPS provider\n");
++        OSSL_LIB_CTX * libctx = NCONF_get0_libctx((CONF *)cnf);
++
++        if (!load_fips_provider_from_dropin(libctx)) {
++            return 0;
++        }
++
++        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1) {
++            return 0;
++        }
++        if (EVP_default_properties_enable_fips(libctx, 1) != 1) {
++            return 0;
++        }
++    }
++
++//     if (ossl_get_kernel_fips_flag() != 0) { /* XXX from provider_conf_load */
++//         OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
++// #  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
++
++//         if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
++//             CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
++//             if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
++//                 return 0;
++
++//             if (provider_conf_load(libctx, "fips", "fips_sect", fips_conf) != 1) {
++//                 NCONF_free(fips_conf);
++//                 return 0;
++//             }
++//             NCONF_free(fips_conf);
++//         } else {
++//             if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
++//                 return 0;
++//         }
++//         if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
++//             return 0;
++//         if (EVP_default_properties_enable_fips(libctx, 1) != 1)
++//             return 0;
++//     }
++
+     return 1;
+ }
+ 
+-- 
+2.53.0
+
