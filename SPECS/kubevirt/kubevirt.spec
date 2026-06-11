@@ -45,6 +45,8 @@ Patch14:        CVE-2026-42502.patch
 Patch15:        CVE-2026-7374.patch
 Patch16:        CVE-2026-33814.patch
 Patch17:        0001-Fix-VM-with-PCI-hostdev-failing-to-restart-after-hot.patch
+Patch18:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
+Patch19:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -298,6 +300,11 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Jun 25 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-8
+- Patch for GPU passthrough
+- Add Sidecar
+- Patch kubevirt with hotplug detach deadlock and PCI passthrough fixes (Max Weiss <maxweiss@microsoft.com>)
+
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-7
 - Patch for CVE-2026-33814
 
