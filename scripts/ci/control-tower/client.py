@@ -14,10 +14,12 @@ Authentication:
     ``DefaultAzureCredential`` discovers the session automatically.
 """
 
+from __future__ import annotations
+
 import json
 import time
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 import requests
 from azure.identity import DefaultAzureCredential
@@ -29,6 +31,14 @@ from urllib3.util.retry import Retry
 NON_TERMINAL_STATUSES = frozenset({"Queued", "Pending", "Running"})
 SUCCESS_STATUS = "Completed"
 TERMINAL_FAILURE_STATUSES = frozenset({"Failed", "Cancelled", "CancelledByAdmin", "Unknown", "TimedOut"})
+# Statuses that END the poll. The poll exits ONLY on a status in this set;
+# anything else is treated as still in progress (keep polling until a known
+# terminal status or the local timeout). This way a newly-introduced Control
+# Tower intermediate status (e.g. a future "Validating") is not misread as
+# terminal and used to fail a build that is actually still starting. "Unknown"
+# stays terminal on purpose: a missing/blank status is a real problem, not an
+# unrecognized-but-valid new state.
+TERMINAL_STATUSES = TERMINAL_FAILURE_STATUSES | {SUCCESS_STATUS}
 
 
 @dataclass
@@ -41,17 +51,16 @@ class TokenHolder:
 def make_session() -> requests.Session:
     """Create a ``requests.Session`` with retries for idempotent GETs only.
 
-    Retry budget is tuned to complete quickly relative to the 10s default poll
-    interval: worst case ~7s of backoff (0.5 + 1 + 2 + 4s capped) across 3
-    attempts on 429/5xx.
+    6 retries with exponential backoff (0+4+8+16+32+64 = ~124 s, ~2 min worst
+    case; Retry-After honored).
     """
     session = requests.Session()
     retry = Retry(
-        total=3,
-        connect=3,
-        read=3,
-        status=3,
-        backoff_factor=0.5,
+        total=6,
+        connect=6,
+        read=6,
+        status=6,
+        backoff_factor=2.0,
         status_forcelist=(429, 500, 502, 503, 504),
         allowed_methods=frozenset({"GET"}),
         raise_on_status=False,
@@ -142,7 +151,7 @@ def _request_with_refresh(
     audience: str,
     token_holder: TokenHolder,
     *,
-    json_payload: Optional[dict] = None,
+    json_payload: dict | None = None,
 ) -> requests.Response:
     """Issue a request. On a 401, refresh the bearer token once and retry."""
     response = session.request(
@@ -248,6 +257,26 @@ def _summarize_tasks(tasks: Any) -> str:
     return f"{total} tasks ({parts})"
 
 
+# Adaptive poll cadence: (elapsed-seconds threshold, interval-seconds). Tight
+# early so short jobs stay responsive; backs off for long builds so a multi-hour
+# build does not flood the logs with heartbeats (a fixed 10s interval would be
+# ~2160 polls over 6h). Beyond the last threshold, _POLL_MAX_INTERVAL_SECONDS.
+_POLL_SCHEDULE: tuple[tuple[int, int], ...] = (
+    (600, 10),  # first 10 min: every 10s
+    (1200, 30),  # 10-20 min: every 30s
+    (3600, 60),  # 20-60 min: every 60s
+)
+_POLL_MAX_INTERVAL_SECONDS = 120  # beyond 1 h: every 2 min
+
+
+def _poll_interval_seconds(elapsed_seconds: float) -> int:
+    """Return the poll interval for the given elapsed time (adaptive backoff)."""
+    for threshold_seconds, interval_seconds in _POLL_SCHEDULE:
+        if elapsed_seconds < threshold_seconds:
+            return interval_seconds
+    return _POLL_MAX_INTERVAL_SECONDS
+
+
 def poll_until_terminal(
     session: requests.Session,
     base_url: str,
@@ -255,7 +284,6 @@ def poll_until_terminal(
     audience: str,
     token_holder: TokenHolder,
     job_id: str,
-    poll_interval_seconds: int,
     poll_timeout_seconds: int,
 ) -> tuple[dict, bool]:
     """Poll the job status until it reaches a terminal state or the timeout expires.
@@ -269,7 +297,7 @@ def poll_until_terminal(
     """
     start = time.monotonic()
     deadline = start + poll_timeout_seconds
-    previous_status: Optional[str] = None
+    previous_status: str | None = None
     job_status_object: dict = {}
 
     while True:
@@ -285,6 +313,18 @@ def poll_until_terminal(
                 f"Job {job_id} status: {transition} (elapsed {elapsed}s){suffix}",
                 flush=True,
             )
+            # Surface schema drift: a status that is neither known-terminal nor
+            # known-non-terminal means Control Tower introduced a state this
+            # script doesn't know about. We keep polling (treat it as
+            # non-terminal) so an in-flight build isn't failed, but warn so the
+            # gap gets closed.
+            if current_status not in TERMINAL_STATUSES and current_status not in NON_TERMINAL_STATUSES:
+                print(
+                    f"##[warning]Unrecognized job status '{current_status}' for job {job_id}; "
+                    "treating it as non-terminal and continuing to poll. If Control Tower added a "
+                    "new status, update NON_TERMINAL_STATUSES / TERMINAL_* in client.py.",
+                    flush=True,
+                )
             previous_status = current_status
         else:
             # Heartbeat so the user can see the script is alive and still polling.
@@ -293,7 +333,11 @@ def poll_until_terminal(
                 flush=True,
             )
 
-        if current_status not in NON_TERMINAL_STATUSES:
+        # Exit ONLY on a known terminal status. An unrecognized status falls
+        # through and keeps polling (bounded by the timeout) rather than being
+        # misread as terminal -- which previously turned a still-starting build
+        # red the moment Control Tower reported a status we didn't enumerate.
+        if current_status in TERMINAL_STATUSES:
             return job_status_object, False
 
         remaining = deadline - time.monotonic()
@@ -304,7 +348,8 @@ def poll_until_terminal(
             )
             return job_status_object, True
 
-        time.sleep(min(poll_interval_seconds, max(1, int(remaining))))
+        interval_seconds = _poll_interval_seconds(elapsed)
+        time.sleep(min(interval_seconds, max(1, int(remaining))))
 
 
 def print_final_status(final: dict) -> None:

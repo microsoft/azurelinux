@@ -18,14 +18,15 @@ Component selection:
     lookaside tarballs need to be (re-)uploaded.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import sys
 from pathlib import Path
 
-from azure.identity import DefaultAzureCredential
-
 import client as ct
+from azure.identity import DefaultAzureCredential
 
 
 def _parse_components(value: str) -> list[str]:
@@ -122,12 +123,6 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--repo-uri", required=True, help="Upstream repository URI")
     parser.add_argument(
-        "--poll-interval-seconds",
-        type=int,
-        default=10,
-        help="How often to poll the job status endpoint (default: 10).",
-    )
-    parser.add_argument(
         "--poll-timeout-seconds",
         type=int,
         default=7200,
@@ -139,9 +134,6 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     args = _parse_args()
 
-    if args.poll_interval_seconds <= 0:
-        print("##[error]--poll-interval-seconds must be a positive integer.")
-        sys.exit(2)
     if args.poll_timeout_seconds <= 0:
         print("##[error]--poll-timeout-seconds must be a positive integer.")
         sys.exit(2)
@@ -214,7 +206,7 @@ def main() -> None:
         sys.exit(1)
 
     # ── Poll for job completion ──────────────────────────────────────
-    print(f"Polling job {job_id} every {args.poll_interval_seconds}s (timeout {args.poll_timeout_seconds}s)...")
+    print(f"Polling job {job_id} for up to {args.poll_timeout_seconds}s for a terminal status...")
     try:
         final, timed_out = ct.poll_until_terminal(
             session,
@@ -223,7 +215,6 @@ def main() -> None:
             args.api_audience,
             token_holder,
             job_id,
-            args.poll_interval_seconds,
             args.poll_timeout_seconds,
         )
     except RuntimeError as exc:

@@ -1,66 +1,81 @@
 """Submit a package-build job to the Control Tower service and wait briefly.
 
 Flow:
-    1. Read the changed-components JSON.
+    1. Read the changed-components JSON; an unrecognized ``changeType`` fails
+       the check closed.
     2. Filter to the build set: ``changeType in {added, changed}`` -- any
        component whose inputs changed needs a rebuild, regardless of whether
        its ``sourcesChange`` flag is set.
     3. POST ``/api/Scenario/package`` with the build request.
-    4. Poll briefly (default 5 min) until the job reaches a terminal state
-       (success or failure) or the local timeout expires. The goal is to
-       catch jobs that fail immediately on submission, not to wait for the
-       full build -- a non-terminal status at timeout is treated as
-       acceptance and the build continues async.
-    5. Exit 0 if the job started (or completed). Exit 1 only on submission
-       failure or immediate terminal failure.
+    4. Poll until the job reaches a terminal state (success or failure) or the
+       poll timeout expires. Two modes:
+         * default (acceptance): poll briefly just to catch jobs that fail on
+           submission; a non-terminal status at timeout is treated as
+           acceptance and the build continues asynchronously.
+         * --wait-for-completion: poll for the full build; a non-terminal
+           status at timeout is a failure (for gating checks that must see the
+           build verdict before passing).
+    5. Exit 0 on success (or acceptance in the default mode); exit 1 on
+       submission failure, terminal build failure, or -- with
+       --wait-for-completion -- if the build does not finish within the timeout.
 """
+
+from __future__ import annotations
 
 import argparse
 import json
 import sys
 from pathlib import Path
 
-from azure.identity import DefaultAzureCredential
-
 import client as ct
+from azure.identity import DefaultAzureCredential
 
 
 def _load_build_components(path: Path) -> list[str]:
     """Filter the ``azldev component changed`` JSON to the build set.
 
     The build set is every component with ``changeType`` in ``{added, changed}``
-    — these are the components whose inputs differ between source and target
+    -- these are the components whose inputs differ between source and target
     and therefore need a rebuild. Unlike the upload set, we do NOT filter on
     ``sourcesChange`` here: a component can need a rebuild even if its source
     tarballs didn't change (e.g. an overlay or build-config change).
 
     Deleted components are excluded — there is nothing to build.
     """
+    known_change_types = {"added", "changed", "unchanged", "deleted"}
+    build_change_types = {"added", "changed"}
+
     try:
         raw = path.read_text(encoding="utf-8")
     except OSError as exc:
-        raise SystemExit(f"##[error]Failed to read --changed-components-file {path!s}: {exc}") from exc
+        print(f"##[error]Failed to read --changed-components-file {path!s}: {exc}")
+        raise SystemExit(1) from exc
 
     try:
         entries = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}") from exc
+        print(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}")
+        raise SystemExit(1) from exc
 
     if not isinstance(entries, list):
-        raise SystemExit(
+        print(
             f"##[error]--changed-components-file {path!s} top-level value "
             f"must be a JSON array (got {type(entries).__name__})."
         )
+        raise SystemExit(1)
 
-    build_change_types = {"added", "changed"}
     components: list[str] = []
     for entry in entries:
-        if not isinstance(entry, dict):
-            continue
-        if entry.get("changeType") in build_change_types:
-            name = entry.get("component")
-            if isinstance(name, str) and name:
-                components.append(name)
+        change_type = entry.get("changeType")
+        if change_type not in known_change_types:
+            print(
+                f"##[error]--changed-components-file {path!s} has an unrecognized "
+                f"changeType {change_type!r} (known: {sorted(known_change_types)}); "
+                "refusing to guess the build set."
+            )
+            raise SystemExit(1)
+        if change_type in build_change_types:
+            components.append(entry["component"])
 
     return sorted(set(components))
 
@@ -82,8 +97,9 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--build-reason",
         required=True,
-        help="ADO build reason (PullRequest, IndividualCI, ...). Used for the "
-        "local skip guard -- package builds are not submitted for PR triggers.",
+        help="ADO build reason (PullRequest, IndividualCI, ...). A PullRequest "
+        "may submit a SCRATCH build, but an official (persisted) build is "
+        "refused for a PullRequest.",
     )
     parser.add_argument(
         "--changed-components-file",
@@ -117,13 +133,8 @@ def _parse_args() -> argparse.Namespace:
         default=False,
         help="Submit as a non-scratch (official, persisted) build. The default "
         "is to submit a scratch build -- official is opt-in so the caller has "
-        "to explicitly say they want a persisted artifact.",
-    )
-    parser.add_argument(
-        "--poll-interval-seconds",
-        type=int,
-        default=10,
-        help="How often to poll the job status endpoint (default: 10).",
+        "to explicitly say they want a persisted artifact. Official builds are "
+        "rejected for PullRequest triggers (unmerged code must never persist).",
     )
     parser.add_argument(
         "--poll-timeout-seconds",
@@ -131,41 +142,28 @@ def _parse_args() -> argparse.Namespace:
         default=600,
         help=(
             "Maximum time to wait for the job to reach a terminal state "
-            "(default: 600 = 10 min). This is NOT the build timeout -- we "
-            "just want to catch jobs that fail immediately on submission. "
-            "A non-terminal status at timeout is treated as acceptance."
+            "(default: 600 = 10 min). In the default acceptance mode this just "
+            "catches jobs that fail immediately on submission. With "
+            "--wait-for-completion, set this to the full build budget -- a "
+            "non-terminal status at timeout then fails the run."
         ),
+    )
+    parser.add_argument(
+        "--wait-for-completion",
+        action="store_true",
+        default=False,
+        help="Block until the build reaches a terminal state (success or "
+        "failure) and exit accordingly; a non-terminal status at "
+        "--poll-timeout-seconds becomes a failure. Used by gating checks (the "
+        "PR package-build pipeline). The default fire-and-forget mode instead "
+        "treats a timeout as acceptance.",
     )
     return parser.parse_args()
 
 
-def main() -> None:
-    args = _parse_args()
-
-    if args.poll_interval_seconds <= 0:
-        print("##[error]--poll-interval-seconds must be a positive integer.")
-        sys.exit(2)
-    if args.poll_timeout_seconds <= 0:
-        print("##[error]--poll-timeout-seconds must be a positive integer.")
-        sys.exit(2)
-
-    components = _load_build_components(args.changed_components_file)
-
-    base_url = args.api_base_url.rstrip("/")
-
-    if args.build_reason == "PullRequest":
-        print(
-            "Skipping Control Tower call -- pull request triggers do not submit "
-            "package builds (unmerged code should not consume build capacity)."
-        )
-        return
-
-    if not components:
-        print("No components need a rebuild -- skipping package-build submission.")
-        return
-
-    # ── Build payload ────────────────────────────────────────────────
-    payload: dict = {
+def _build_payload(args: argparse.Namespace, components: list[str]) -> dict[str, object]:
+    """Assemble the Control Tower ``package`` scenario request body."""
+    payload: dict[str, object] = {
         "repoUri": args.repo_uri,
         "packageTarget": args.package_target,
         "packages": components,
@@ -176,6 +174,59 @@ def main() -> None:
         payload["commitSha"] = args.commit_sha
     if args.branch is not None:
         payload["branch"] = args.branch
+    return payload
+
+
+def _handle_non_terminal(args: argparse.Namespace, job_id: str, final: dict[str, object]) -> None:
+    """Handle a poll that ended before the job reached a terminal state.
+
+    With --wait-for-completion this is a failure (a gating run must see the
+    build verdict); otherwise the non-terminal status is treated as acceptance
+    and the build continues asynchronously.
+    """
+    last_status = final.get("status", "Unknown")
+    if args.wait_for_completion:
+        print(
+            f"##[error]Job {job_id} did not reach a terminal state within "
+            f"{args.poll_timeout_seconds}s (last status '{last_status}') -- failing the check."
+        )
+        sys.exit(1)
+    print(
+        f"Job {job_id} still in non-terminal status '{last_status}' "
+        f"after {args.poll_timeout_seconds}s -- build accepted. "
+        f"Monitor progress in the Control Tower UI."
+    )
+
+
+def main() -> None:
+    """Submit a package build to Control Tower and (optionally) wait for the verdict."""
+    args = _parse_args()
+
+    if args.poll_timeout_seconds <= 0:
+        print("##[error]--poll-timeout-seconds must be a positive integer.")
+        sys.exit(2)
+
+    components = _load_build_components(args.changed_components_file)
+
+    base_url = args.api_base_url.rstrip("/")
+
+    # Unmerged PR code may only produce a throwaway scratch build; an official
+    # (persisted) build of a pull request must never happen. Scratch PR builds
+    # ARE allowed -- the PR package-build check relies on them, and capacity is
+    # bounded by the reviewer-gated pipeline trigger, not here.
+    if args.build_reason == "PullRequest" and args.official_build:
+        print(
+            "##[error]Refusing to submit an official (persisted) build for a "
+            "pull request -- unmerged code must never produce official artifacts."
+        )
+        sys.exit(1)
+
+    if not components:
+        print("No components need a rebuild -- skipping package-build submission.")
+        return
+
+    # ── Build payload ────────────────────────────────────────────────
+    payload = _build_payload(args, components)
 
     print("Calling Control Tower 'package' endpoint...")
     print("Payload:")
@@ -211,11 +262,8 @@ def main() -> None:
         print("##[error]Control Tower 'package' response did not include a 'jobId'. Cannot confirm job acceptance.")
         sys.exit(1)
 
-    # ── Brief poll — just confirm the job was accepted ───────────────
-    print(
-        f"Polling job {job_id} for up to {args.poll_timeout_seconds}s to confirm "
-        f"acceptance (not waiting for full build completion)..."
-    )
+    # ── Poll for a terminal status ─────────────────────────────────
+    print(f"Polling job {job_id} for up to {args.poll_timeout_seconds}s for a terminal status...")
     try:
         final, timed_out = ct.poll_until_terminal(
             session,
@@ -224,7 +272,6 @@ def main() -> None:
             args.api_audience,
             token_holder,
             job_id,
-            args.poll_interval_seconds,
             args.poll_timeout_seconds,
         )
     except RuntimeError as exc:
@@ -232,16 +279,7 @@ def main() -> None:
         sys.exit(1)
 
     if timed_out:
-        # We don't wait for full build completion -- the goal of this poll
-        # is just to surface a fast-failing job. A non-terminal status at
-        # the timeout is acceptance enough; the build continues async and
-        # is monitored in the Control Tower UI.
-        last_status = final.get("status", "Unknown")
-        print(
-            f"Job {job_id} still in non-terminal status '{last_status}' "
-            f"after {args.poll_timeout_seconds}s -- build accepted. "
-            f"Monitor progress in the Control Tower UI."
-        )
+        _handle_non_terminal(args, job_id, final)
         return
 
     ct.print_final_status(final)
