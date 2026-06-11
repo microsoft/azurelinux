@@ -31,7 +31,7 @@
 Summary:        Low-level DNS(SEC) library with API
 Name:           ldns
 Version:        1.8.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,7 @@ Source0:        http://www.nlnetlabs.nl/downloads/%{name}/%{name}-%{version}.tar
 
 Patch1:         ldns-swig-4.2.patch
 Patch2:         fix-intermittent-build-failure-with-milti-job-build.patch
+Patch3:         CVE-2026-10846.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -279,6 +280,9 @@ rm -rf doc/man
 %doc doc
 
 %changelog
+* Thu Jun 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.3-3
+- Patch for CVE-2026-10846
+
 * Tue Feb 25 2025 Tobias Brick <tobiasb@microsoft.com> - 1.8.3-2
 - Patch to fix multi-job builds.
 - Also removed comment that caused rpmbuild warning.
