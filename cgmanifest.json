@@ -7120,8 +7120,18 @@
         "type": "other",
         "other": {
           "name": "ibarr",
-          "version": "0.1.5",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-0.1.5.tar.gz"
+          "version": "2601.0.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-2601.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ibdump",
+          "version": "6.0.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibdump-6.0.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -7131,7 +7141,7 @@
         "other": {
           "name": "ibsim",
           "version": "0.12.1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibsim-0.12.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibsim-0.12.1_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -7671,8 +7681,8 @@
         "type": "other",
         "other": {
           "name": "iser",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-26.01.tgz"
         }
       }
     },
@@ -7681,8 +7691,8 @@
         "type": "other",
         "other": {
           "name": "iser-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-26.01.tgz"
         }
       }
     },
@@ -7691,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "isert",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-26.01.tgz"
         }
       }
     },
@@ -7701,8 +7711,8 @@
         "type": "other",
         "other": {
           "name": "isert-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-26.01.tgz"
         }
       }
     },
@@ -8371,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.89.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
+          "version": "6.18.31.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.31.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.89.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
+          "version": "6.18.31.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.31.1.tar.gz"
         }
       }
     },
@@ -11851,8 +11861,8 @@
         "type": "other",
         "other": {
           "name": "libvma",
-          "version": "9.8.72",
-          "downloadUrl": "https://github.com/Mellanox/libvma/archive/9.8.72/libvma-9.8.72.tar.gz"
+          "version": "9.8.84",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/libvma-9.8.84.tar.gz"
         }
       }
     },
@@ -13401,8 +13411,8 @@
         "type": "other",
         "other": {
           "name": "mft_kernel",
-          "version": "4.33.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.33.0.tgz"
+          "version": "4.35.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.35.0.tgz"
         }
       }
     },
@@ -13411,8 +13421,8 @@
         "type": "other",
         "other": {
           "name": "mft_kernel-hwe",
-          "version": "4.33.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.33.0.tgz"
+          "version": "4.35.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.35.0.tgz"
         }
       }
     },
@@ -13502,8 +13512,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ethtool",
-          "version": "6.14",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ethtool-6.14.tar.gz"
+          "version": "2601.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ethtool-2601.0.2.tar.gz"
         }
       }
     },
@@ -13512,8 +13522,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-iproute2",
-          "version": "6.15.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-iproute2-6.15.0.tar.gz"
+          "version": "2601.0.6",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-iproute2-2601.0.6.tar.gz"
         }
       }
     },
@@ -13522,8 +13532,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-nfsrdma",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-26.01.tgz"
         }
       }
     },
@@ -13532,8 +13542,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-nfsrdma-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-26.01.tgz"
         }
       }
     },
@@ -13542,8 +13552,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ofa_kernel",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-26.01.tgz"
         }
       }
     },
@@ -13552,8 +13562,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ofa_kernel-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-26.01.tgz"
         }
       }
     },
@@ -13562,8 +13572,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-tools",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-tools-25.07.tar.gz"
+          "version": "2601.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-tools-2601.0.2.tar.gz"
         }
       }
     },
@@ -13593,7 +13603,7 @@
         "other": {
           "name": "mlx-steering-dump",
           "version": "1.0.0",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlx-steering-dump-1.0.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -13943,7 +13953,7 @@
         "other": {
           "name": "multiperf",
           "version": "3.0",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/multiperf-3.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -15413,8 +15423,8 @@
         "type": "other",
         "other": {
           "name": "ofed-docs",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-docs-25.07.tar.gz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-docs-26.01.tar.gz"
         }
       }
     },
@@ -15423,8 +15433,8 @@
         "type": "other",
         "other": {
           "name": "ofed-scripts",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-scripts-25.07.tar.gz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-scripts-26.01.tar.gz"
         }
       }
     },
@@ -15603,8 +15613,8 @@
         "type": "other",
         "other": {
           "name": "openmpi",
-          "version": "4.1.7",
-          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.7.tar.bz2"
+          "version": "4.1.9a1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/openmpi-4.1.9a1.tar.bz2"
         }
       }
     },
@@ -15753,8 +15763,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "3.3.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-3.3.0.tar.gz"
+          "version": "3.3.0040",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/openvswitch-3.3.0040.tar.gz"
         }
       }
     },
@@ -16193,8 +16203,8 @@
         "type": "other",
         "other": {
           "name": "perftest",
-          "version": "25.07.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perftest-25.07.0-0.104.g0c03534.tar.gz"
+          "version": "26.01.5",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perftest-26.01.5-1.tar.gz"
         }
       }
     },
@@ -26272,6 +26282,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "rdma-core",
+          "version": "2601.0.7",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rdma-core-2601.0.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "re2",
           "version": "20240201",
           "downloadUrl": "https://github.com/google/re2/archive/refs/tags/2024-02-01.tar.gz"
@@ -26574,8 +26594,8 @@
         "type": "other",
         "other": {
           "name": "rshim",
-          "version": "2.4.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rshim-2.4.4.tar.gz"
+          "version": "2.6.6",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rshim-2.6.6.tar.gz"
         }
       }
     },
@@ -28456,8 +28476,8 @@
         "type": "other",
         "other": {
           "name": "sockperf",
-          "version": "3.10",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/sockperf-3.10.tar.gz"
+          "version": "3.1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sockperf-3.1_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -28706,8 +28726,8 @@
         "type": "other",
         "other": {
           "name": "srp",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-26.01.tgz"
         }
       }
     },
@@ -28716,8 +28736,8 @@
         "type": "other",
         "other": {
           "name": "srp-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-26.01.tgz"
         }
       }
     },
@@ -29648,6 +29668,16 @@
           "name": "ucx",
           "version": "1.19.0",
           "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.19.0/ucx-1.19.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ucx",
+          "version": "1.20.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ucx-1.20.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -31178,8 +31208,8 @@
         "type": "other",
         "other": {
           "name": "xpmem",
-          "version": "2.7.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
+          "version": "2601.0.9",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2601.0.9.tar.gz"
         }
       }
     },
@@ -31188,8 +31218,8 @@
         "type": "other",
         "other": {
           "name": "xpmem-hwe",
-          "version": "2.7.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
+          "version": "2601.0.9",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2601.0.9.tar.gz"
         }
       }
     },

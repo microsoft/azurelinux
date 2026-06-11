@@ -2489,6 +2489,7 @@
             "license": "[ASL 2.0 License and spec specific licenses](http://www.apache.org/licenses/LICENSE-2.0)",
             "specs": [
                 "ibarr",
+                "ibdump",
                 "ibsim",
                 "iser",
                 "iser-hwe",
@@ -2498,10 +2499,6 @@
                 "isert-hwe",
                 "isert-hwe-signed",
                 "isert-signed",
-                "knem",
-                "knem-hwe",
-                "knem-hwe-modules-signed",
-                "knem-modules-signed",
                 "libnvidia-container",
                 "libvma",
                 "mft_kernel",
@@ -2535,7 +2532,6 @@
                 "xpmem",
                 "xpmem-hwe",
                 "xpmem-hwe-modules-signed",
-                "xpmem-lib",
                 "xpmem-modules-signed"
             ]
         },
