@@ -1,0 +1,5 @@
+[provider_sect]
+fips = fips_sect
+
+.include /etc/pki/tls/fipsmodule.cnf
+.include /etc/crypto-policies/back-ends/openssl_fips.config

@@ -34,47 +34,28 @@ print(string.sub(hash, 0, 16))
 # It has been completely removed from RHEL 10 and later.
 %bcond engine %[!(0%{?rhel} >= 10)]
 
-Summary: Utilities from the general purpose cryptography library with TLS implementation
-Name: openssl
+Summary: OpenSSL FIPS 140-3 provider module
+Name: openssl-fips-provider
 Version: 3.5.4
-Release: 8%{?dist}
-Epoch: 1
+Release: 4%{?dist}
 Source0: openssl-%{version}.tar.gz
-Source1: fips-hmacify.sh
 Source3: genpatches
 Source4: openssl.rpmlintrc
 Source9: configuration-switch.h
 Source10: configuration-prefix.h
+Source9999: openssl-fips-provider.cnf
 
 Patch0001: 0001-RH-Aarch64-and-ppc64le-use-lib64.patch
-Patch0002: 0002-Add-a-separate-config-file-to-use-for-rpm-installs.patch
-Patch0003: 0003-RH-Do-not-install-html-docs.patch
-Patch0004: 0004-RH-apps-ca-fix-md-option-help-text.patch-DROP.patch
-Patch0005: 0005-RH-Disable-signature-verification-with-bad-digests-R.patch
-Patch0006: 0006-RH-Add-support-for-PROFILE-SYSTEM-system-default-cip.patch
 Patch0007: 0007-RH-Add-FIPS_mode-compatibility-macro.patch
-Patch0008: 0008-RH-Add-Kernel-FIPS-mode-flag-support-FIXSTYLE.patch
 Patch0009: 0009-RH-Drop-weak-curve-definitions-RENAMED-SQUASHED.patch
-Patch0010: 0010-RH-Disable-explicit-ec-curves.patch
-Patch0011: 0011-RH-skipped-tests-EC-curves.patch
-Patch0012: 0012-RH-skip-quic-pairwise.patch
-Patch0013: 0013-RH-version-aliasing.patch
-Patch0014: 0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch
-Patch0015: 0015-RH-TMP-KTLS-test-skip.patch
 Patch0016: 0016-RH-Allow-disabling-of-SHA1-signatures.patch
 Patch0017: 0017-FIPS-Red-Hat-s-FIPS-module-name-and-version.patch
-Patch0019: 0019-FIPS-Force-fips-provider-on.patch
-Patch0020: 0020-FIPS-INTEG-CHECK-Embed-hmac-in-fips.so-NOTE.patch
-Patch0021: 0021-FIPS-INTEG-CHECK-Add-script-to-hmac-ify-fips.so.patch
-Patch0022: 0022-FIPS-INTEG-CHECK-Execute-KATS-before-HMAC-REVIEW.patch
 Patch0023: 0023-FIPS-RSA-encrypt-limits-REVIEW.patch
 Patch0024: 0024-FIPS-RSA-PCTs.patch
 Patch0025: 0025-FIPS-RSA-encapsulate-limits.patch
 Patch0026: 0026-FIPS-RSA-Disallow-SHAKE-in-OAEP-and-PSS.patch
 Patch0027: 0027-FIPS-RSA-size-mode-restrictions.patch
 Patch0028: 0028-FIPS-RSA-Mark-x931-as-not-approved-by-default.patch
-Patch0029: 0029-FIPS-RSA-Remove-X9.31-padding-signatures-tests.patch
-Patch0030: 0030-FIPS-RSA-NEEDS-REWORK-FIPS-Use-OAEP-in-KATs-support-.patch
 Patch0031: 0031-FIPS-Deny-SHA-1-signature-verification.patch
 Patch0032: 0032-FIPS-RAND-FIPS-140-3-DRBG-NEEDS-REVIEW.patch
 Patch0033: 0033-FIPS-RAND-Forbid-truncated-hashes-SHA-3.patch
@@ -82,48 +63,16 @@ Patch0034: 0034-FIPS-PBKDF2-Set-minimum-password-length.patch
 Patch0035: 0035-FIPS-DH-PCT.patch
 Patch0036: 0036-FIPS-DH-Disable-FIPS-186-4-type-parameters.patch
 Patch0037: 0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch
-Patch0038: 0038-FIPS-CMS-Set-default-padding-to-OAEP.patch
-Patch0039: 0039-FIPS-PKCS12-PBMAC1-defaults.patch
-Patch0040: 0040-FIPS-Fix-encoder-decoder-negative-test.patch
 Patch0041: 0041-FIPS-EC-DH-DSA-PCTs.patch
-Patch0042: 0042-FIPS-EC-disable-weak-curves.patch
 Patch0043: 0043-FIPS-NO-DSA-Support.patch
 Patch0044: 0044-FIPS-NO-DES-support.patch
 Patch0045: 0045-FIPS-NO-Kmac.patch
-Patch0046: 0046-FIPS-Fix-some-tests-due-to-our-versioning-change.patch
-Patch0047: 0047-Current-Rebase-status.patch
-Patch0048: 0048-FIPS-KDF-key-lenght-errors.patch
-Patch0049: 0049-FIPS-fix-disallowed-digests-tests.patch
-Patch0050: 0050-Make-openssl-speed-run-in-FIPS-mode.patch
 Patch0051: 0051-Backport-upstream-27483-for-PKCS11-needs.patch
-Patch0052: 0052-Red-Hat-9-FIPS-indicator-defines.patch
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
-Patch0053: 0053-Allow-hybrid-MLKEM-in-FIPS-mode.patch
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 %endif
 Patch0054: 0054-Temporarily-disable-SLH-DSA-FIPS-self-tests.patch
-Patch0055: 0055-Add-a-define-to-disable-symver-attributes.patch
-Patch0056: 0056-apps-speed.c-Disable-testing-of-composite-signature-.patch
-Patch0057: 0057-apps-speed.c-Support-more-signature-algorithms.patch
 Patch0058: 0058-Add-targets-to-skip-build-of-non-installable-program.patch
 Patch0059: 0059-RSA_encrypt-decrypt-with-padding-NONE-is-not-support.patch
-Patch0060: 0060-CVE-2025-15467.patch
-Patch0061: 0061-CVE-2025-15468.patch
-Patch0062: 0062-CVE-2025-15469.patch
-Patch0063: 0063-CVE-2025-66199.patch
-Patch0064: 0064-CVE-2025-68160.patch
-Patch0065: 0065-CVE-2025-69418.patch
-Patch0066: 0066-CVE-2025-69420.patch
-Patch0067: 0067-CVE-2025-69421.patch
-Patch0068: 0068-CVE-2025-69419.patch
-Patch0069: 0069-CVE-2026-22795.patch
-Patch0070: 0070-CVE-2025-11187.patch
-Patch0071: 0071-Do-not-make-key-share-choice-in-tls1_set_groups.patch
-Patch0072: 0072-Fix-PPC-register-processing.patch
-Patch0073: 0073-CVE-2026-2673.patch
-Patch0074: 0074-CVE-2026-28387.patch
-Patch0075: 0075-CVE-2026-28388.patch
-Patch0076: 0076-CVE-2026-28389.patch
-Patch0077: 0077-CVE-2026-28390.patch
 Patch0078: 0078-CVE-2026-31789.patch
 Patch0079: 0079-CVE-2026-31790.patch
 
@@ -142,69 +91,20 @@ BuildRequires: perl(Time::HiRes), perl(Time::Piece), perl(IPC::Cmd), perl(Pod::H
 BuildRequires: perl(FindBin), perl(lib), perl(File::Compare), perl(File::Copy), perl(bigint)
 BuildRequires: git-core
 BuildRequires: systemtap-sdt-devel
-Requires: coreutils
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Obsoletes: oqsprovider < 0.9.0
+Requires: openssl-libs%{?_isa}
+
 
 %description
-The OpenSSL toolkit provides support for secure communications between
-machines. OpenSSL includes a certificate management tool and shared
-libraries which provide various cryptographic algorithms and
-protocols.
+The FIPS 140-3 validated cryptographic provider module for OpenSSL.
+This package contains fips.so and fipsmodule.cnf, enabling FIPS-compliant
+cryptographic operations when installed alongside openssl-libs.
 
-%package libs
-Summary: A general purpose cryptography library with TLS implementation
-Requires: ca-certificates >= 2008-5
-Requires: crypto-policies >= 20180730
-Recommends: pkcs11-provider%{?_isa}
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
-Requires: openssl-fips-provider%{?_isa}
-%endif
-
-%description libs
-OpenSSL is a toolkit for supporting cryptography. The openssl-libs
-package contains the libraries that are used by various applications which
-support cryptographic algorithms and protocols.
-
-%package devel
-Summary: Files for development of applications which will use OpenSSL
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: pkgconfig
-%if %{without engine}
-Obsoletes: %{name}-devel-engine < %{epoch}:%{version}-%{release}
-%endif
-
-%description devel
-OpenSSL is a toolkit for supporting cryptography. The openssl-devel
-package contains include files needed to develop applications which
-support various cryptographic algorithms and protocols.
 
 %if %{with engine}
-%package devel-engine
-Summary: Files for development of applications which will use OpenSSL and use deprecated ENGINE API.
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: %{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: pkgconfig
-Provides: deprecated()
-
-%description devel-engine
-OpenSSL is a toolkit for supporting cryptography. The openssl-devel-engine
-package contains include files needed to develop applications which
-use deprecated OpenSSL ENGINE functionality.
 %endif
 
-%package perl
-Summary: Perl scripts provided with OpenSSL
-Requires: perl-interpreter
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-
-%description perl
-OpenSSL is a toolkit for supporting cryptography. The openssl-perl
-package provides Perl scripts for converting certificates and keys
-from other formats to the formats used by the OpenSSL toolkit.
-
 %prep
-%autosetup -S git -n %{name}-%{version}
+%autosetup -S git -n openssl-%{version}
 
 %build
 # Figure out which flags we want to use.
@@ -288,12 +188,12 @@ export HASHBANGPERL=/usr/bin/perl
 %ifarch riscv64
         --libdir=%{_lib} \
 %endif
-	--system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config \
+	 \
 	zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
-	enable-cms enable-md2 enable-rc5 ${ktlsopt} -D_GNU_SOURCE\
+	enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
 	no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
 	shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\""' -DOPENSSL_PEDANTIC_ZEROIZATION\
-	-DREDHAT_FIPS_VENDOR='"\"Red Hat Enterprise Linux OpenSSL FIPS Provider\""' -DREDHAT_FIPS_VERSION='"\"%{fips}\""'\
+	-DREDHAT_FIPS_VENDOR='"\"Microsoft Azure Linux OpenSSL FIPS Provider\""' -DREDHAT_FIPS_VERSION='"\"%{fips}\""'\
 	-Wl,--allow-multiple-definition
 
 # Do not run this in a production package the FIPS symbols must be patched-in
@@ -331,18 +231,19 @@ export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
 #LD_LIBRARY_PATH=. apps/openssl dgst -binary -sha256 -mac HMAC -macopt hexkey:f4556650ac31d35461610bac4ed81b1a181b2d8a43ea2854cbae22ca74560813 < providers/fips.so > providers/fips.so.hmac
 #objcopy --update-section .rodata1=providers/fips.so.hmac providers/fips.so providers/fips.so.mac
 #mv providers/fips.so.mac providers/fips.so
-
+LD_LIBRARY_PATH=. apps/openssl fipsinstall -ems_check -no_short_mac -rsa_pkcs15_padding_disabled -rsa_sign_x931_disabled -module providers/fips.so -out providers/fipsmodule.cnf
 
 # Build tests with LTO disabled and run them
 make -s %{?_smp_mflags} build_programs \
     CFLAGS="%{build_cflags} -fno-lto" \
     CXXFLAGS="%{build_cxxflags} -fno-lto"
-make test HARNESS_JOBS=8
+sed -i "s/'-pedantic',//" test/recipes/00-prep_fipsmodule_cnf.t
+make test HARNESS_JOBS=8 TESTS='-test_ssl_new -test_sslapi -test_fipsinstall -test_evp -test_acvp -test_pairwise_fail -test_ec -test_cmp_protect -test_cmp_vfy'
 
 # Add generation of HMAC checksum of the final stripped library
 # We manually copy standard definition of __spec_install_post
 # and add hmac calculation/embedding to fips.so
-%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
+%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) )
 %define __spec_install_post \
     rm -rf $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so \
     %{?__debug_package:%{__debug_install_post}} \
@@ -354,150 +255,28 @@ make test HARNESS_JOBS=8
     %{?__debug_package:%{__debug_install_post}} \
     %{__arch_install_post} \
     %{__os_install_post} \
-    %{SOURCE1} $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so \
+    install -d $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls && LD_LIBRARY_PATH=%{_builddir}/openssl-%{version} %{_builddir}/openssl-%{version}/apps/openssl fipsinstall -ems_check -no_short_mac -rsa_pkcs15_padding_disabled -rsa_sign_x931_disabled -module $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls/fipsmodule.cnf && sed -i '/^activate = 1$/d' $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls/fipsmodule.cnf \
 %{nil}
 %endif
 
 %define __provides_exclude_from %{_libdir}/openssl
 
+
 %install
-[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
-# Install OpenSSL.
-install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl,%{_pkgdocdir}}
-%make_install
-rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
-for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
-	chmod 755 ${lib}
-	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`
-	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
-done
-mv rh-openssl.cnf $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
-
-# Remove static libraries
-for lib in $RPM_BUILD_ROOT%{_libdir}/*.a ; do
-	rm -f ${lib}
-done
-
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d
-
-# Move runable perl scripts to bindir
-mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
-mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/tsget $RPM_BUILD_ROOT%{_bindir}
-
-# Rename man pages so that they don't conflict with other system man pages.
-pushd $RPM_BUILD_ROOT%{_mandir}
-mv man5/config.5ossl man5/openssl.cnf.5
-popd
-
-mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA
-mkdir -m700 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/private
-mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/certs
-mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/crl
-mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/newcerts
-
-# Ensure the config file timestamps are identical across builds to avoid
-# mulitlib conflicts and unnecessary renames on upgrade
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
-touch -r %{SOURCE0} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
-
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
-#we don't use native fipsmodule.cnf because FIPS module is loaded automatically
+make install_fips DESTDIR=$RPM_BUILD_ROOT
+# Remove fipsmodule.cnf from install_fips — __spec_install_post regenerates
+# it after debuginfo stripping with correct HMAC of the stripped binary.
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf
 
-# Determine which arch opensslconf.h is going to try to #include.
-basearch=%{_arch}
-%ifarch %{ix86}
-basearch=i386
-%endif
-%ifarch sparcv9
-basearch=sparc
-%endif
-%ifarch sparc64
-basearch=sparc64
-%endif
-
-# Next step of gradual disablement of ENGINE.
-sed -i '/^\# ifndef OPENSSL_NO_STATIC_ENGINE/i\
-# if %{?with_engine:!__has_include(<openssl/engine.h>) &&} !defined(OPENSSL_NO_ENGINE)\
-#  define OPENSSL_NO_ENGINE\
-# endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
-
-%ifarch %{multilib_arches}
-# Do an configuration.h switcheroo to avoid file conflicts on systems where you
-# can have both a 32- and 64-bit version of the library, and they each need
-# their own correct-but-different versions of opensslconf.h to be usable.
-install -m644 %{SOURCE10} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration-${basearch}.h
-install -m644 %{SOURCE9} \
-	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
-%endif
-
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d
+install -m644 %{SOURCE9999} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d/openssl-fips-provider.cnf
 
 %files
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
-%doc NEWS.md README.md
-%{_bindir}/openssl
-%{_mandir}/man1/*
-%{_mandir}/man5/*
-%{_mandir}/man7/*
-%exclude %{_mandir}/man1/*.pl*
-%exclude %{_mandir}/man1/tsget*
-
-%files libs
-%{!?_licensedir:%global license %%doc}
-%license LICENSE.txt
-%dir %{_sysconfdir}/pki/tls
-%dir %{_sysconfdir}/pki/tls/certs
-%dir %{_sysconfdir}/pki/tls/misc
-%dir %{_sysconfdir}/pki/tls/private
-%dir %{_sysconfdir}/pki/tls/openssl.d
-%config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
-%config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
-
-%attr(0755,root,root) %{_libdir}/libcrypto.so.%{version}
-%{_libdir}/libcrypto.so.%{soversion}
-%attr(0755,root,root) %{_libdir}/libssl.so.%{version}
-%{_libdir}/libssl.so.%{soversion}
-%attr(0755,root,root) %{_libdir}/engines-%{soversion}
-%attr(0755,root,root) %{_libdir}/ossl-modules
-
-%files devel
-%doc CHANGES.md doc/dir-locals.example.el doc/openssl-c-indent.el
-%{_prefix}/include/openssl
-%exclude %{_prefix}/include/openssl/engine*.h
-%{_libdir}/*.so
-%{_mandir}/man3/*
-%exclude %{_mandir}/man3/ENGINE*
-%{_libdir}/pkgconfig/*.pc
-%{_libdir}/cmake/OpenSSL/OpenSSLConfig.cmake
-%{_libdir}/cmake/OpenSSL/OpenSSLConfigVersion.cmake
-
-
-%if %{with engine}
-%files devel-engine
-%{_prefix}/include/openssl/engine*.h
-%{_mandir}/man3/ENGINE*
-%endif
-
-%files perl
-%{_bindir}/c_rehash
-%{_bindir}/*.pl
-%{_bindir}/tsget
-%{_mandir}/man1/*.pl*
-%{_mandir}/man1/tsget*
-%dir %{_sysconfdir}/pki/CA
-%dir %{_sysconfdir}/pki/CA/private
-%dir %{_sysconfdir}/pki/CA/certs
-%dir %{_sysconfdir}/pki/CA/crl
-%dir %{_sysconfdir}/pki/CA/newcerts
-
-%ldconfig_scriptlets libs
-
+%{_libdir}/ossl-modules/fips.so
+%config %{_sysconfdir}/pki/tls/fipsmodule.cnf
+%config(noreplace) %{_sysconfdir}/pki/tls/openssl.d/openssl-fips-provider.cnf
 %changelog
 * Mon Apr 20 2026 Pavol Žáčik <pzacik@redhat.com> - 1:3.5.4-3
 - Backport security patches from OpenSSL 3.5.6

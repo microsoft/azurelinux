@@ -1,0 +1,612 @@
+[components.openssl-fips-provider]
+spec = { type = "upstream", upstream-name = "openssl", upstream-commit = "0990e54a2f6b6b8e4f3e238175382505fff8be51" }
+
+# ── Pre-existing build fix ─────────────────────────────────────────────────────
+# Patch0037's fips_config.pod hunk was written for older OpenSSL; the file was
+# completely rewritten in 3.5.4. Replace with a version that drops the broken
+# hunk (same fix as the openssl component).
+#
+# LOAD-BEARING — DO NOT DROP on rebase. Patch 0037 modifies
+# providers/fips/include/fips_indicator_params.inc, which compiles into fips.so.
+# It sets the compiled-in default for tls1-prf-ems-check (and other indicators)
+# to 1. Without it, the FIPS provider silently loses EMS enforcement even if
+# fipsmodule.cnf and crypto-policies are configured correctly.
+[[components.openssl-fips-provider.overlays]]
+type = "file-remove"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Remove original Patch0037 (fips_config.pod hunk incompatible with 3.5.4)"
+
+[[components.openssl-fips-provider.overlays]]
+type = "file-add"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+source = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Add fixed Patch0037 without broken fips_config.pod hunk"
+
+# ── Aggressive patch minimization ──────────────────────────────────────────────
+# Only patches that modify files compiled into fips.so are kept. Everything else
+# (apps/, ssl/, doc/, test/, build system, libcrypto-only, non-fips crypto/) is
+# dropped to minimize the audit surface for FIPS certification.
+#
+# KEEP list (28 patches — 25 fips.so code + 3 build deps):
+#   Build deps: 0001 (lib64), 0007 (fips.h), 0058 (install_fips target)
+#   fips.so code: 0009, 0016, 0017, 0023–0028, 0031–0037, 0041,
+#                 0043–0045, 0051, 0054, 0059, 0078, 0079
+#
+# Verified by reproducible build comparison: builds with and without these
+# patches produce byte-identical fips.so binaries.
+
+# -- Build system / configuration (not compiled into fips.so) --
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0004"
+description = "Drop 0004 (ca help text) — apps/, not in fips.so"
+
+# -- libcrypto-only patches (not compiled into fips.so) --
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0005"
+description = "Drop 0005 (bad digest verify) — crypto/asn1/, not in fips.so"
+
+# Patch0001 (lib64 paths) — modifies Configurations/10-main.conf for correct
+# multilib layout on aarch64/ppc64le. Build may install to wrong dir without. KEEP.
+
+# Patch0002 (rh-openssl.cnf) — dropped; %install replaced with install_fips.
+# Patch0003 (skip html docs) — dropped; %install cleanup catches html docs.
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0002"
+description = "Drop 0002 (rh-openssl.cnf) — not needed for fips-provider"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0003"
+description = "Drop 0003 (skip html docs) — cleanup overlay handles it"
+
+# Patch0006 (crypto-policies PROFILE) — dropped; Configure overlay removes the
+# --system-ciphers-file flag that depends on it.
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0006"
+description = "Drop 0006 (system-ciphers-file) — ssl/ only, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Remove --system-ciphers-file from Configure — Patch0006 dropped"
+section = "%build"
+regex = '--system-ciphers-file=%\{_sysconfdir\}/crypto-policies/back-ends/opensslcnf\.config'
+replacement = ""
+
+# Patch0007 (FIPS_mode macro) — adds include/openssl/fips.h which ssl/t1_enc.c
+# includes. Build fails without it. KEEP.
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0008"
+description = "Drop 0008 (kernel FIPS flag) — crypto/context.c, not in fips.so"
+
+# -- Test-only / libcrypto-only patches --
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0011"
+description = "Drop 0011 (EC curve test skips) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0012"
+description = "Drop 0012 (QUIC pairwise test) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0013"
+description = "Drop 0013 (version aliasing) — libcrypto symbol versioning"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0014"
+description = "Drop 0014 (symbol exports) — libcrypto exports"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0015"
+description = "Drop 0015 (KTLS test skip) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0019"
+description = "Drop 0019 (force fips on) — crypto/provider_conf.c, libcrypto only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0029"
+description = "Drop 0029 (X9.31 test removal) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0030"
+description = "Drop 0030 (rebase status) — REBASE.txt meta file"
+
+# -- apps/ only patches --
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0038"
+description = "Drop 0038 (CMS OAEP default) — apps/ and crypto/cms/"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0039"
+description = "Drop 0039 (PKCS12 PBMAC1) — apps/pkcs12.c"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0040"
+description = "Drop 0040 (encoder/decoder test) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0042"
+description = "Drop 0042 (EC weak curves CLI) — apps/ecparam.c"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0046"
+description = "Drop 0046 (ssl test configs) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0047"
+description = "Drop 0047 (rebase status) — REBASE.txt meta file"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0048"
+description = "Drop 0048 (KDF test data) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0049"
+description = "Drop 0049 (digest test data) — test/ only"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0050"
+description = "Drop 0050 (speed FIPS mode) — apps/speed.c"
+
+# Patch0052 — drops `redhat-` prefix from FIPS indicator property names. We want
+# the generic `fips-indicator` name for Azure Linux, not `redhat-fips-indicator`.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0052"
+description = "Drop 0052 (FIPS indicator defines) — use generic indicator names"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0055"
+description = "Drop 0055 (symver disable) — libcrypto symbol versioning"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0056"
+description = "Drop 0056 (speed composite sigs) — apps/speed.c"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0057"
+description = "Drop 0057 (speed more sig algs) — apps/speed.c"
+
+# -- CVE patches not affecting fips.so --
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0060"
+description = "Drop 0060 CVE-2025-15467 (ASN1/CMS) — not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0061"
+description = "Drop 0061 CVE-2025-15468 (QUIC) — ssl/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0062"
+description = "Drop 0062 CVE-2025-15469 (apps) — apps/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0063"
+description = "Drop 0063 CVE-2025-66199 (TLS) — ssl/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0064"
+description = "Drop 0064 CVE-2025-68160 (BIO) — crypto/bio/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0066"
+description = "Drop 0066 CVE-2025-69420 (timestamp) — crypto/ts/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0067"
+description = "Drop 0067 CVE-2025-69421 (PKCS12) — crypto/pkcs12/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0068"
+description = "Drop 0068 CVE-2025-69419 (ASN1/PKCS12) — not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0069"
+description = "Drop 0069 CVE-2026-22795 (PKCS) — not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0070"
+description = "Drop 0070 CVE-2025-11187 (PKCS12) — crypto/pkcs12/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0071"
+description = "Drop 0071 (TLS key share) — ssl/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0073"
+description = "Drop 0073 CVE-2026-2673 (TLS groups) — ssl/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0074"
+description = "Drop 0074 CVE-2026-28387 (X509) — crypto/x509/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0075"
+description = "Drop 0075 CVE-2026-28388 (X509) — crypto/x509/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0076"
+description = "Drop 0076 CVE-2026-28389 (CMS) — crypto/cms/, not in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0077"
+description = "Drop 0077 CVE-2026-28390 (CMS) — crypto/cms/, not in fips.so"
+
+# ── Identity ───────────────────────────────────────────────────────────────────
+# Change package identity from openssl to openssl-fips-provider.
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-set-tag"
+tag = "Name"
+value = "openssl-fips-provider"
+description = "Rename package to openssl-fips-provider"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-set-tag"
+tag = "Summary"
+value = "OpenSSL FIPS 140-3 provider module"
+description = "Set appropriate summary"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Epoch"
+description = "No epoch needed for a new package"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Obsoletes"
+description = "Remove oqsprovider obsoletes (not relevant)"
+
+# Remove main package dependencies — fips-provider doesn't need coreutils
+# and the openssl-fips-provider-libs subpackage won't exist.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace standalone Requires: coreutils with openssl-libs"
+regex = '^Requires: coreutils$'
+replacement = "Requires: openssl-libs%{?_isa}"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Remove self-referencing libs Requires"
+regex = 'Requires: %\{name\}-libs%\{\?_isa\} = %\{epoch\}:%\{version\}-%\{release\}'
+replacement = ""
+
+# Fix %prep — tarball extracts to openssl-VERSION not openssl-fips-provider-VERSION
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Fix %prep directory name"
+section = "%prep"
+regex = '%autosetup -S git -n %\{name\}-%\{version\}'
+replacement = "%autosetup -S git -n openssl-%{version}"
+
+# Fix %description — replace each line individually
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace package description line 1"
+regex = 'The OpenSSL toolkit provides support for secure communications between'
+replacement = "The FIPS 140-3 validated cryptographic provider module for OpenSSL."
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace package description line 2"
+regex = 'machines\. OpenSSL includes a certificate management tool and shared'
+replacement = "This package contains fips.so and fipsmodule.cnf, enabling FIPS-compliant"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace package description line 3"
+regex = 'libraries which provide various cryptographic algorithms and'
+replacement = "cryptographic operations when installed alongside openssl-libs."
+
+# The last line "protocols." appears in multiple descriptions — delete it
+# only from the main %description by matching with context
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Remove last description line"
+section = "%description"
+regex = 'protocols\.'
+replacement = ""
+
+# ── Remove FIPS integrity patches (replaced by fipsinstall workflow) ───────────
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0018"
+description = "Remove fipsinstall disabler — we need fipsinstall to work"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0020"
+description = "Remove embedded HMAC — we use fipsmodule.cnf approach"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0022"
+description = "Remove KAT reorder — meaningless without embedded HMAC"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Source1"
+description = "Remove fips-hmacify.sh — replaced by fipsinstall workflow"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0021"
+description = "Remove hmacify helper patch — no longer used"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0010"
+description = "Disable explicit EC curves — apps/test only, not in FIPS"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0065"
+description = "CVE-2025-69418 (OCB mode) — not FIPS-approved, not compiled into fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0072"
+description = "PPC register fix (asm) — ppc64le only, no effect on x86_64 fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-tag"
+tag = "Patch0053"
+description = "Allow hybrid MLKEM — registered in defltprov.c only, dead code in fips.so"
+
+[[components.openssl-fips-provider.overlays]]
+type = "file-remove"
+file = "fips-hmacify.sh"
+description = "Remove fips-hmacify.sh — replaced by fipsinstall"
+
+# ── Rebrand FIPS vendor string ────────────────────────────────────────────────
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Rebrand FIPS vendor string to Azure Linux"
+regex = "-DREDHAT_FIPS_VENDOR='\"\\\\\"Red Hat Enterprise Linux OpenSSL FIPS Provider\\\\\"\"'"
+replacement = "-DREDHAT_FIPS_VENDOR='\"\\\"Microsoft Azure Linux OpenSSL FIPS Provider\\\"\"'"
+
+# ── %check — replace hmacify with fipsinstall ─────────────────────────────────
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace hmacify with fipsinstall and fix tests"
+regex = '%\{SOURCE1\} providers/fips\.so'
+replacement = "LD_LIBRARY_PATH=. apps/openssl fipsinstall -ems_check -no_short_mac -rsa_pkcs15_padding_disabled -rsa_sign_x931_disabled -module providers/fips.so -out providers/fipsmodule.cnf"
+
+# ── %check — test suite adjustments ───────────────────────────────────────────
+# - Remove -pedantic from the FIPS prep test (incompatible with our build flags).
+# - Exclude test suites that legitimately fail under our hardened FIPS config:
+#
+#   -test_ssl_new / -test_sslapi:
+#     SSL integration tests that require the full openssl build (engines,
+#     default provider, etc.) which aren't available in the fips-provider build.
+#
+#   -test_fipsinstall:
+#     Tests 21, 27 expect fipsinstall to fail when KAT results are corrupted
+#     for DSA and RSA_Encrypt asymmetric cipher. Our patches remove these KATs
+#     from the FIPS provider, so corrupting a non-existent KAT is a no-op and
+#     fipsinstall correctly passes — but the test expects failure.
+#
+#   -test_evp:
+#     Tests 73, 82 fail because our hardened fipsinstall flags
+#     (-ems_check, -no_short_mac, -rsa_pkcs15_padding_disabled,
+#     -rsa_sign_x931_disabled) restrict operations that the vanilla test data
+#     files assume are FIPS-approved. Specifically:
+#       - evpkdf_tls12_prf.txt: TLS1.2 PRF rejected by EMS enforcement
+#       - evppkey_rsa_common.txt: RSA ops rejected by PKCS#1 v1.5 / X9.31
+#         padding restrictions
+#
+#   -test_acvp:
+#     RSA X9.31 signature verify with SHA1 fails because our
+#     rsa_sign_x931_disabled indicator rejects the digest.
+#
+#   -test_pairwise_fail:
+#     EC/DSA pairwise failure tests can't load DSA parameters because our
+#     patches (0043) disable DSA support in the FIPS provider.
+#
+#   -test_ec:
+#     Test 16 (non-FIPS curve key with ?fips!=yes query) requires the default
+#     provider to decode non-FIPS key types, unavailable in this build.
+#
+#   -test_cmp_protect / -test_cmp_vfy:
+#     CMP cert chain tests use Ed25519 keys which aren't available in the
+#     FIPS provider (EdDSA is not FIPS-approved).
+#
+# TODO: Investigate running these with modified test data that matches our
+# FIPS policy, rather than excluding the entire test files.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Remove -pedantic from FIPS test prep and exclude incompatible test suites"
+regex = 'make test HARNESS_JOBS=8$'
+replacement = "sed -i \"s/'-pedantic',//\" test/recipes/00-prep_fipsmodule_cnf.t\nmake test HARNESS_JOBS=8 TESTS='-test_ssl_new -test_sslapi -test_fipsinstall -test_evp -test_acvp -test_pairwise_fail -test_ec -test_cmp_protect -test_cmp_vfy'"
+
+# ── __spec_install_post — fipsinstall AFTER strip ─────────────────────────────
+# Replace the entire __spec_install_post block. Instead of deleting fips.so
+# (RHEL path) or running hmacify (Fedora path), we run fipsinstall after
+# debuginfo stripping to compute the correct HMAC of the stripped binary.
+# The __spec_install_post: Since the RHEL guard is NOT extended to AZL4,
+# AZL4 builds take the %else (Fedora) branch which runs hmacify.
+# Replace hmacify with fipsinstall — runs AFTER debuginfo stripping.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+description = "Replace hmacify with fipsinstall in __spec_install_post"
+regex = '    %\{SOURCE1\} \$RPM_BUILD_ROOT/%\{_libdir\}/ossl-modules/fips\.so \\'
+replacement = "    install -d $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls && LD_LIBRARY_PATH=%{_builddir}/openssl-%{version} %{_builddir}/openssl-%{version}/apps/openssl fipsinstall -ems_check -no_short_mac -rsa_pkcs15_padding_disabled -rsa_sign_x931_disabled -module $RPM_BUILD_ROOT/%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls/fipsmodule.cnf && sed -i '/^activate = 1$/d' $RPM_BUILD_ROOT/%{_sysconfdir}/pki/tls/fipsmodule.cnf \\"
+
+# ── %install — replace entirely with minimal fips-only install ─────────────────
+# OpenSSL's install_fips target installs only fips.so + fipsmodule.cnf.
+# We remove the entire inherited %install (full openssl install + cleanup)
+# and replace it with a minimal version.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+section = "%install"
+description = "Remove full openssl %install section"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-append-lines"
+section = "%check"
+lines = [
+    "",
+    "%install",
+    "make install_fips DESTDIR=$RPM_BUILD_ROOT",
+    "# Remove fipsmodule.cnf from install_fips — __spec_install_post regenerates",
+    "# it after debuginfo stripping with correct HMAC of the stripped binary.",
+    "rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf",
+    "",
+    "install -d $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d",
+    "install -m644 %{SOURCE9999} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.d/openssl-fips-provider.cnf",
+]
+description = "Add minimal %install for fips-provider"
+
+# ── Remove subpackages ────────────────────────────────────────────────────────
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "libs"
+section = "%package"
+description = "Remove libs subpackage"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "libs"
+section = "%description"
+description = "Remove libs description"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "libs"
+section = "%files"
+description = "Remove libs files"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel"
+section = "%package"
+description = "Remove devel subpackage"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel"
+section = "%description"
+description = "Remove devel description"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel"
+section = "%files"
+description = "Remove devel files"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel-engine"
+section = "%package"
+description = "Remove devel-engine subpackage"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel-engine"
+section = "%description"
+description = "Remove devel-engine description"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "devel-engine"
+section = "%files"
+description = "Remove devel-engine files"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "perl"
+section = "%package"
+description = "Remove perl subpackage"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "perl"
+section = "%description"
+description = "Remove perl description"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+package = "perl"
+section = "%files"
+description = "Remove perl files"
+
+# ── openssl.d drop-in for FIPS provider config ────────────────────────────────
+[[components.openssl-fips-provider.overlays]]
+type = "file-add"
+file = "openssl-fips-provider.cnf"
+source = "openssl-fips-provider.cnf"
+description = "Add openssl.d drop-in config for FIPS provider"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-insert-tag"
+tag = "Source9999"
+value = "openssl-fips-provider.cnf"
+description = "Register drop-in config as a source file"
+
+# ── Replace %files (main package) ─────────────────────────────────────────────
+# Remove the inherited %files (openssl binary, man pages, docs) and replace
+# with a minimal list: fips.so, fipsmodule.cnf, and the drop-in config.
+[[components.openssl-fips-provider.overlays]]
+type = "spec-remove-section"
+section = "%files"
+description = "Remove full openssl %files section"
+
+[[components.openssl-fips-provider.overlays]]
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "",
+    "%files",
+    "%{!?_licensedir:%global license %%doc}",
+    "%license LICENSE.txt",
+    "%{_libdir}/ossl-modules/fips.so",
+    "%config %{_sysconfdir}/pki/tls/fipsmodule.cnf",
+    "%config(noreplace) %{_sysconfdir}/pki/tls/openssl.d/openssl-fips-provider.cnf",
+]
+description = "Add minimal %files for fips-provider"

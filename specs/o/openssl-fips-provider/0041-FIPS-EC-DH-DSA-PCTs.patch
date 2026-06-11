@@ -1,0 +1,180 @@
+From 12871a0a0aaae3ce0dcae0b14a52283b3a4a4808 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 24 Mar 2025 10:50:06 -0400
+Subject: [PATCH 41/59] FIPS: EC: DH/DSA PCTs
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ .../implementations/exchange/ecdh_exch.c      | 19 ++++++++++
+ providers/implementations/keymgmt/ec_kmgmt.c  | 24 +++++++++++-
+ .../implementations/signature/ecdsa_sig.c     | 37 +++++++++++++++++--
+ 3 files changed, 75 insertions(+), 5 deletions(-)
+
+diff --git a/providers/implementations/exchange/ecdh_exch.c b/providers/implementations/exchange/ecdh_exch.c
+index 58fbc7bc09..98d4354f3e 100644
+--- a/providers/implementations/exchange/ecdh_exch.c
++++ b/providers/implementations/exchange/ecdh_exch.c
+@@ -560,6 +560,25 @@ int ecdh_plain_derive(void *vpecdhctx, unsigned char *secret,
+ #endif
+ 
+     ppubkey = EC_KEY_get0_public_key(pecdhctx->peerk);
++#ifdef FIPS_MODULE
++    {
++        BN_CTX *bn_ctx = BN_CTX_new_ex(ossl_ec_key_get_libctx(privk));
++        int check = 0;
++
++        if (bn_ctx == NULL) {
++            ERR_raise(ERR_LIB_PROV, ERR_R_MALLOC_FAILURE);
++            goto end;
++        }
++
++        check = ossl_ec_key_public_check(pecdhctx->peerk, bn_ctx);
++        BN_CTX_free(bn_ctx);
++
++        if (check <= 0) {
++            ERR_raise(ERR_LIB_PROV, EC_R_INVALID_PEER_KEY);
++            goto end;
++        }
++    }
++#endif
+ 
+     retlen = ECDH_compute_key(secret, size, ppubkey, privk, NULL);
+ 
+diff --git a/providers/implementations/keymgmt/ec_kmgmt.c b/providers/implementations/keymgmt/ec_kmgmt.c
+index a1d04bc3fd..c9a5b19cfc 100644
+--- a/providers/implementations/keymgmt/ec_kmgmt.c
++++ b/providers/implementations/keymgmt/ec_kmgmt.c
+@@ -995,9 +995,18 @@ struct ec_gen_ctx {
+     EC_GROUP *gen_group;
+     unsigned char *dhkem_ikm;
+     size_t dhkem_ikmlen;
++#ifdef FIPS_MODULE
++    void *ecdsa_sig_ctx;
++#endif
+     OSSL_FIPS_IND_DECLARE
+ };
+ 
++#ifdef FIPS_MODULE
++void *ecdsa_newctx(void *provctx, const char *propq);
++void ecdsa_freectx(void *vctx);
++int do_ec_pct(void *, const char *, void *);
++#endif
++
+ static void *ec_gen_init(void *provctx, int selection,
+                          const OSSL_PARAM params[])
+ {
+@@ -1017,6 +1026,10 @@ static void *ec_gen_init(void *provctx, int selection,
+             gctx = NULL;
+         }
+     }
++#ifdef FIPS_MODULE
++    if (gctx != NULL)
++        gctx->ecdsa_sig_ctx = ecdsa_newctx(provctx, NULL);
++#endif
+     return gctx;
+ }
+ 
+@@ -1328,6 +1341,12 @@ static void *ec_gen(void *genctx, OSSL_CALLBACK *osslcb, void *cbarg)
+ 
+     if (gctx->ecdh_mode != -1)
+         ret = ret && ossl_ec_set_ecdh_cofactor_mode(ec, gctx->ecdh_mode);
++#ifdef FIPS_MODULE
++    /* Pairwise consistency test */
++    if ((gctx->selection & OSSL_KEYMGMT_SELECT_KEYPAIR) != 0
++        && do_ec_pct(gctx->ecdsa_sig_ctx, "sha256", ec) != 1)
++        abort();
++#endif
+ 
+     if (gctx->group_check != NULL)
+         ret = ret && ossl_ec_set_check_group_type_from_name(ec,
+@@ -1413,7 +1432,10 @@ static void ec_gen_cleanup(void *genctx)
+ 
+     if (gctx == NULL)
+         return;
+-
++#ifdef FIPS_MODULE
++    ecdsa_freectx(gctx->ecdsa_sig_ctx);
++    gctx->ecdsa_sig_ctx = NULL;
++#endif
+     OPENSSL_clear_free(gctx->dhkem_ikm, gctx->dhkem_ikmlen);
+     EC_GROUP_free(gctx->gen_group);
+     BN_free(gctx->p);
+diff --git a/providers/implementations/signature/ecdsa_sig.c b/providers/implementations/signature/ecdsa_sig.c
+index 01b3023891..ad595d531c 100644
+--- a/providers/implementations/signature/ecdsa_sig.c
++++ b/providers/implementations/signature/ecdsa_sig.c
+@@ -33,7 +33,7 @@
+ #include "prov/der_ec.h"
+ #include "crypto/ec.h"
+ 
+-static OSSL_FUNC_signature_newctx_fn ecdsa_newctx;
++OSSL_FUNC_signature_newctx_fn ecdsa_newctx;
+ static OSSL_FUNC_signature_sign_init_fn ecdsa_sign_init;
+ static OSSL_FUNC_signature_verify_init_fn ecdsa_verify_init;
+ static OSSL_FUNC_signature_sign_fn ecdsa_sign;
+@@ -48,7 +48,7 @@ static OSSL_FUNC_signature_digest_sign_final_fn ecdsa_digest_sign_final;
+ static OSSL_FUNC_signature_digest_verify_init_fn ecdsa_digest_verify_init;
+ static OSSL_FUNC_signature_digest_verify_update_fn ecdsa_digest_signverify_update;
+ static OSSL_FUNC_signature_digest_verify_final_fn ecdsa_digest_verify_final;
+-static OSSL_FUNC_signature_freectx_fn ecdsa_freectx;
++OSSL_FUNC_signature_freectx_fn ecdsa_freectx;
+ static OSSL_FUNC_signature_dupctx_fn ecdsa_dupctx;
+ static OSSL_FUNC_signature_query_key_types_fn ecdsa_sigalg_query_key_types;
+ static OSSL_FUNC_signature_get_ctx_params_fn ecdsa_get_ctx_params;
+@@ -139,7 +139,7 @@ typedef struct {
+     OSSL_FIPS_IND_DECLARE
+ } PROV_ECDSA_CTX;
+ 
+-static void *ecdsa_newctx(void *provctx, const char *propq)
++void *ecdsa_newctx(void *provctx, const char *propq)
+ {
+     PROV_ECDSA_CTX *ctx;
+ 
+@@ -612,7 +612,7 @@ int ecdsa_digest_verify_final(void *vctx, const unsigned char *sig,
+     return ok;
+ }
+ 
+-static void ecdsa_freectx(void *vctx)
++void ecdsa_freectx(void *vctx)
+ {
+     PROV_ECDSA_CTX *ctx = (PROV_ECDSA_CTX *)vctx;
+ 
+@@ -861,6 +861,35 @@ static const OSSL_PARAM *ecdsa_settable_ctx_md_params(void *vctx)
+     return EVP_MD_settable_ctx_params(ctx->md);
+ }
+ 
++#ifdef FIPS_MODULE
++int do_ec_pct(void *vctx, const char *mdname, void *ec)
++{
++    static const unsigned char data[32];
++    unsigned char sigbuf[256];
++    size_t siglen = sizeof(sigbuf);
++
++    if (ecdsa_digest_sign_init(vctx, mdname, ec, NULL) <= 0)
++        return 0;
++
++    if (ecdsa_digest_signverify_update(vctx, data, sizeof(data)) <= 0)
++        return 0;
++
++    if (ecdsa_digest_sign_final(vctx, sigbuf, &siglen, sizeof(sigbuf)) <= 0)
++        return 0;
++
++    if (ecdsa_digest_verify_init(vctx, mdname, ec, NULL) <= 0)
++        return 0;
++
++    if (ecdsa_digest_signverify_update(vctx, data, sizeof(data)) <= 0)
++        return 0;
++
++    if (ecdsa_digest_verify_final(vctx, sigbuf, siglen) <= 0)
++        return 0;
++
++    return 1;
++}
++#endif
++
+ const OSSL_DISPATCH ossl_ecdsa_signature_functions[] = {
+     { OSSL_FUNC_SIGNATURE_NEWCTX, (void (*)(void))ecdsa_newctx },
+     { OSSL_FUNC_SIGNATURE_SIGN_INIT, (void (*)(void))ecdsa_sign_init },
+-- 
+2.51.0
+

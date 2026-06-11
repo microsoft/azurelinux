@@ -1,0 +1,400 @@
+From 5679937e93d2f072cf4f56b27dc6bcce251f6def Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Fri, 7 Mar 2025 18:10:52 -0500
+Subject: [PATCH 43/59] FIPS: NO DSA Support
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ providers/fips/fipsprov.c                     |  8 +++++---
+ providers/fips/self_test_data.inc             |  6 +++++-
+ test/acvp_test.c                              |  2 ++
+ test/endecode_test.c                          |  2 ++
+ test/recipes/15-test_gendsa.t                 |  2 +-
+ test/recipes/20-test_cli_fips.t               |  3 +--
+ test/recipes/30-test_evp.t                    |  7 ++-----
+ test/recipes/30-test_evp_data/evppkey_dsa.txt | 18 ++++++++++++++++-
+ test/recipes/80-test_cms.t                    | 20 +++++++++----------
+ 9 files changed, 45 insertions(+), 23 deletions(-)
+ mode change 100644 => 100755 test/recipes/30-test_evp.t
+
+diff --git a/providers/fips/fipsprov.c b/providers/fips/fipsprov.c
+index e5d798fd54..a807c76fd8 100644
+--- a/providers/fips/fipsprov.c
++++ b/providers/fips/fipsprov.c
+@@ -432,7 +432,8 @@ static const OSSL_ALGORITHM fips_keyexch[] = {
+ };
+ 
+ static const OSSL_ALGORITHM fips_signature[] = {
+-#ifndef OPENSSL_NO_DSA
++/* We don't certify DSA in our FIPS provider */
++#if 0 /* #ifndef OPENSSL_NO_DSA */
+     { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_signature_functions },
+     { PROV_NAMES_DSA_SHA1, FIPS_DEFAULT_PROPERTIES, ossl_dsa_sha1_signature_functions },
+     { PROV_NAMES_DSA_SHA224, FIPS_DEFAULT_PROPERTIES, ossl_dsa_sha224_signature_functions },
+@@ -562,8 +563,9 @@ static const OSSL_ALGORITHM fips_keymgmt[] = {
+       PROV_DESCS_DHX },
+ #endif
+ #ifndef OPENSSL_NO_DSA
+-    { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_keymgmt_functions,
+-      PROV_DESCS_DSA },
++    /* We don't certify DSA in our FIPS provider */
++    /* { PROV_NAMES_DSA, FIPS_DEFAULT_PROPERTIES, ossl_dsa_keymgmt_functions,
++      PROV_DESCS_DSA }, */
+ #endif
+     { PROV_NAMES_RSA, FIPS_DEFAULT_PROPERTIES, ossl_rsa_keymgmt_functions,
+       PROV_DESCS_RSA },
+diff --git a/providers/fips/self_test_data.inc b/providers/fips/self_test_data.inc
+index 6abab0a7a1..a7d7684d96 100644
+--- a/providers/fips/self_test_data.inc
++++ b/providers/fips/self_test_data.inc
+@@ -1547,8 +1547,9 @@ static const unsigned char ed448_expected_sig[] = {
+ # endif /* OPENSSL_NO_ECX */
+ #endif /* OPENSSL_NO_EC */
+ 
+-#ifndef OPENSSL_NO_DSA
+ /* dsa 2048 */
++#if 0
++#ifndef OPENSSL_NO_DSA
+ static const unsigned char dsa_p[] = {
+     0xa2, 0x9b, 0x88, 0x72, 0xce, 0x8b, 0x84, 0x23,
+     0xb7, 0xd5, 0xd2, 0x1d, 0x4b, 0x02, 0xf5, 0x7e,
+@@ -1676,6 +1677,7 @@ static const ST_KAT_PARAM dsa_key[] = {
+     ST_KAT_PARAM_END()
+ };
+ #endif /* OPENSSL_NO_DSA */
++#endif
+ 
+ #ifndef OPENSSL_NO_ML_DSA
+ static const unsigned char ml_dsa_65_pub_key[] = {
+@@ -3038,6 +3040,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
+     },
+ # endif /* OPENSSL_NO_ECX */
+ #endif /* OPENSSL_NO_EC */
++#if 0
+ #ifndef OPENSSL_NO_DSA
+     {
+         OSSL_SELF_TEST_DESC_SIGN_DSA,
+@@ -3050,6 +3053,7 @@ static const ST_KAT_SIGN st_kat_sign_tests[] = {
+         ITM(dsa_expected_sig)
+     },
+ #endif /* OPENSSL_NO_DSA */
++#endif
+ 
+ #ifndef OPENSSL_NO_ML_DSA
+     {
+diff --git a/test/acvp_test.c b/test/acvp_test.c
+index 2bcc886fd2..db0282d043 100644
+--- a/test/acvp_test.c
++++ b/test/acvp_test.c
+@@ -1735,6 +1735,7 @@ int setup_tests(void)
+                   OSSL_NELEM(dh_safe_prime_keyver_data));
+ #endif /* OPENSSL_NO_DH */
+ 
++#if 0 /* Red Hat FIPS provider doesn't have fips=yes property on DSA */
+ #ifndef OPENSSL_NO_DSA
+     dsasign_allowed = fips_provider_version_lt(libctx, 3, 4, 0);
+     ADD_ALL_TESTS(dsa_keygen_test, OSSL_NELEM(dsa_keygen_data));
+@@ -1743,6 +1744,7 @@ int setup_tests(void)
+     ADD_ALL_TESTS(dsa_siggen_test, OSSL_NELEM(dsa_siggen_data));
+     ADD_ALL_TESTS(dsa_sigver_test, OSSL_NELEM(dsa_sigver_data));
+ #endif /* OPENSSL_NO_DSA */
++#endif
+ 
+ #ifndef OPENSSL_NO_EC
+     ec_cofactors = fips_provider_version_ge(libctx, 3, 4, 0);
+diff --git a/test/endecode_test.c b/test/endecode_test.c
+index d2ff9e6eb6..dfd5e92f7e 100644
+--- a/test/endecode_test.c
++++ b/test/endecode_test.c
+@@ -1536,6 +1536,7 @@ int setup_tests(void)
+          * so no legacy tests.
+          */
+ #endif
++    if (is_fips == 0) {
+ #ifndef OPENSSL_NO_DSA
+         ADD_TEST_SUITE(DSA);
+         ADD_TEST_SUITE_PARAMS(DSA);
+@@ -1546,6 +1547,7 @@ int setup_tests(void)
+         ADD_TEST_SUITE_PROTECTED_PVK(DSA);
+ # endif
+ #endif
++    }
+ #ifndef OPENSSL_NO_EC
+         ADD_TEST(ec_encode_to_data_multi);
+         ADD_TEST_SUITE(EC);
+diff --git a/test/recipes/15-test_gendsa.t b/test/recipes/15-test_gendsa.t
+index cd331c4cfc..e21d6acda4 100644
+--- a/test/recipes/15-test_gendsa.t
++++ b/test/recipes/15-test_gendsa.t
+@@ -24,7 +24,7 @@ use lib bldtop_dir('.');
+ plan skip_all => "This test is unsupported in a no-dsa build"
+     if disabled("dsa");
+ 
+-my $no_fips = disabled('fips') || ($ENV{NO_FIPS} // 0);
++my $no_fips = 1;
+ 
+ plan tests =>
+     ($no_fips ? 0 : 2)          # FIPS related tests
+diff --git a/test/recipes/20-test_cli_fips.t b/test/recipes/20-test_cli_fips.t
+index 2abc4d2434..9a6875b3ec 100644
+--- a/test/recipes/20-test_cli_fips.t
++++ b/test/recipes/20-test_cli_fips.t
+@@ -283,8 +283,7 @@ SKIP: {
+ }
+ 
+ SKIP : {
+-    skip "FIPS DSA tests because of no dsa in this build", 1
+-        if disabled("dsa") || $dsasignpass == '0';
++    skip "FIPS DSA tests because of no dsa in this build", 1;
+ 
+     subtest DSA => sub {
+         my $testtext_prefix = 'DSA';
+diff --git a/test/recipes/30-test_evp.t b/test/recipes/30-test_evp.t
+old mode 100644
+new mode 100755
+index a86456157b..05a61c8abe
+--- a/test/recipes/30-test_evp.t
++++ b/test/recipes/30-test_evp.t
+@@ -83,10 +83,6 @@ push @files, qw(
+                 evppkey_slh_dsa_siggen.txt
+                 evppkey_slh_dsa_sigver.txt
+                ) unless $no_slh_dsa;
+-push @files, qw(
+-                evppkey_dsa.txt
+-                evppkey_dsa_sigalg.txt
+-               ) unless $no_dsa;
+ push @files, qw(
+                 evppkey_ecx.txt
+                 evppkey_ecx_sigalg.txt
+@@ -166,11 +162,12 @@ my @defltfiles = qw(
+ push @defltfiles, qw(evppkey_brainpool.txt) unless $no_ec;
+ push @defltfiles, qw(evppkey_ecdsa_rfc6979.txt) unless $no_ec;
+ push @defltfiles, qw(evppkey_ecx_kem.txt) unless $no_ecx;
+-push @defltfiles, qw(evppkey_dsa_rfc6979.txt) unless $no_dsa;
+ push @defltfiles, qw(evppkey_sm2.txt) unless $no_sm2;
+ push @defltfiles, qw(evpciph_aes_gcm_siv.txt) unless $no_siv;
+ push @defltfiles, qw(evpciph_aes_siv.txt) unless $no_siv;
+ push @defltfiles, qw(evpkdf_argon2.txt) unless $no_argon2;
++push @defltfiles, qw(evppkey_dsa.txt
++                     evppkey_dsa_sigalg.txt) unless $no_dsa;
+ 
+ plan tests =>
+     + (scalar(@configs) * scalar(@files))
+diff --git a/test/recipes/30-test_evp_data/evppkey_dsa.txt b/test/recipes/30-test_evp_data/evppkey_dsa.txt
+index 5e5315a5b9..660d1db149 100644
+--- a/test/recipes/30-test_evp_data/evppkey_dsa.txt
++++ b/test/recipes/30-test_evp_data/evppkey_dsa.txt
+@@ -44,17 +44,22 @@ PrivPubKeyPair = DSA-1024:DSA-1024-PUBLIC
+ 
+ Title = DSA tests
+ 
++## Red Hat all SHA1 tests are unavailable
++
++Availablein = none
+ Verify = DSA-1024
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF1234"
+ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+ 
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF1234"
+ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d87
+ 
+ # Modified signature
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF1234"
+@@ -62,6 +67,7 @@ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f239
+ Result = VERIFY_ERROR
+ 
+ # Digest too short
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF123"
+@@ -69,6 +75,7 @@ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f239
+ Result = VERIFY_ERROR
+ 
+ # Digest too long
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF12345"
+@@ -76,12 +83,14 @@ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f239
+ Result = VERIFY_ERROR
+ 
+ # Garbage after signature
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Input = "0123456789ABCDEF1234"
+ Output = 302d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f2397f63c9fc8790e1a6cde5d8700
+ Result = VERIFY_ERROR
+ 
+ # Invalid tag
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF1234"
+@@ -89,6 +98,7 @@ Output = 312d021500942b8c5850e05b59e24495116b1e8559e51b610e0214237aedf272d91f239
+ Result = VERIFY_ERROR
+ 
+ # BER signature
++Availablein = none
+ Verify = DSA-1024-PUBLIC
+ Ctrl = digest:SHA1
+ Input = "0123456789ABCDEF1234"
+@@ -277,6 +287,7 @@ Output = 00
+ Result = DIGESTSIGNINIT_ERROR
+ 
+ # Test sign with a 2048 bit key with N == 224 is allowed in fips mode
++Availablein = none
+ FIPSversion = <3.4.0
+ DigestSign = SHA256
+ Key = DSA-2048-224
+@@ -285,6 +296,7 @@ Output = 00
+ Result = SIGNATURE_MISMATCH
+ 
+ # Test sign with a 2048 bit key with N == 256 is allowed in fips mode
++Availablein = none
+ FIPSversion = <3.4.0
+ DigestSign = SHA256
+ Key = DSA-2048-256
+@@ -292,6 +304,7 @@ Input = "Hello"
+ Result = SIGNATURE_MISMATCH
+ 
+ # Test sign with a 3072 bit key with N == 256 is allowed in fips mode
++Availablein = none
+ FIPSversion = <3.4.0
+ DigestSign = SHA256
+ Key = DSA-3072-256
+@@ -299,6 +312,7 @@ Input = "Hello"
+ Result = SIGNATURE_MISMATCH
+ 
+ # Test sign with a 2048 bit SHA3 is allowed in fips mode
++Availablein = none
+ FIPSversion = <3.4.0
+ DigestSign = SHA3-224
+ Key = DSA-2048-256
+@@ -306,19 +320,21 @@ Input = "Hello"
+ Result = SIGNATURE_MISMATCH
+ 
+ # Test verify with a 1024 bit key is allowed in fips mode
++Availablein = default
+ DigestVerify = SHA256
+ Key = DSA-1024
+ Input = "Hello "
+ Output = 302c02142e32c8a5b0bd19b2ba33fd9c78aad3729dcb1b9e02142c006f7726a9d6833d414865b95167ea5f4f7713
+ 
+ # Test verify with SHA1 is allowed in fips mode
++Availablein = none
+ DigestVerify = SHA1
+ Key = DSA-1024
+ Input = "Hello "
+ Output = 302c0214602d21ed37e46051bb3d06cc002adddeb4cdb3bd02144f39f75587b286588862d06366b2f29bddaf8cf6
+ 
+ # Test verify with a 2048/160 bit key is allowed in fips mode
+-FIPSversion = >3.1.1
++Availablein = default
+ DigestVerify = SHA256
+ Key = DSA-2048-160
+ Input = "Hello"
+diff --git a/test/recipes/80-test_cms.t b/test/recipes/80-test_cms.t
+index cf4541449b..7350baa921 100644
+--- a/test/recipes/80-test_cms.t
++++ b/test/recipes/80-test_cms.t
+@@ -116,7 +116,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content DER format, DSA key",
++    [ "signed content DER format, DSA key, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER", "-nodetach",
+         "-signer", catfile($smdir, "smdsa1.pem"), "-out", "{output}.cms" ],
+       [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+@@ -124,7 +124,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed detached content DER format, DSA key",
++    [ "signed detached content DER format, DSA key, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-signer", catfile($smdir, "smdsa1.pem"), "-out", "{output}.cms" ],
+       [ "{cmd2}", @prov, "-verify", "-in", "{output}.cms", "-inform", "DER",
+@@ -133,7 +133,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed detached content DER format, add RSA signer (with DSA existing)",
++    [ "signed detached content DER format, add RSA signer (with DSA existing), no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-signer", catfile($smdir, "smdsa1.pem"), "-out", "{output}.cms" ],
+       [ "{cmd1}", @prov, "-resign", "-in", "{output}.cms", "-inform", "DER", "-outform", "DER",
+@@ -144,7 +144,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content test streaming BER format, DSA key",
++    [ "signed content test streaming BER format, DSA key, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-nodetach", "-stream",
+         "-signer", catfile($smdir, "smdsa1.pem"), "-out", "{output}.cms" ],
+@@ -153,7 +153,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys",
++    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-nodetach", "-stream",
+         "-signer", $smrsa1,
+@@ -166,7 +166,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, no attributes",
++    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, no attributes, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-noattr", "-nodetach", "-stream",
+         "-signer", $smrsa1,
+@@ -196,7 +196,7 @@ my @smime_pkcs7_tests = (
+       \&zero_compare
+     ],
+ 
+-    [ "signed content test streaming S/MIME format, 2 DSA and 2 RSA keys",
++    [ "signed content test streaming S/MIME format, 2 DSA and 2 RSA keys, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-nodetach",
+         "-signer", $smrsa1,
+         "-signer", catfile($smdir, "smrsa2.pem"),
+@@ -208,7 +208,7 @@ my @smime_pkcs7_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content test streaming multipart S/MIME format, 2 DSA and 2 RSA keys",
++    [ "signed content test streaming multipart S/MIME format, 2 DSA and 2 RSA keys, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont,
+         "-signer", $smrsa1,
+         "-signer", catfile($smdir, "smrsa2.pem"),
+@@ -282,7 +282,7 @@ if ($no_fips || $old_fips) {
+ 
+ my @smime_cms_tests = (
+ 
+-    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, keyid",
++    [ "signed content test streaming BER format, 2 DSA and 2 RSA keys, keyid, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "DER",
+         "-nodetach", "-keyid",
+         "-signer", $smrsa1,
+@@ -295,7 +295,7 @@ my @smime_cms_tests = (
+       \&final_compare
+     ],
+ 
+-    [ "signed content test streaming PEM format, 2 DSA and 2 RSA keys",
++    [ "signed content test streaming PEM format, 2 DSA and 2 RSA keys, no Red Hat FIPS",
+       [ "{cmd1}", @prov, "-sign", "-in", $smcont, "-outform", "PEM", "-nodetach",
+         "-signer", $smrsa1,
+         "-signer", catfile($smdir, "smrsa2.pem"),
+-- 
+2.51.0
+
