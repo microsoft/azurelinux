@@ -1,0 +1,79 @@
+# Microsoft Corporation
+#
+# *** TEMPORARY / STOPGAP PIPELINE ***
+#
+# Wrapper pipeline — passed to ADO as the entry point for the PR package-build
+# check. It builds the components a pull request changes, directly on the agent
+# via `azldev component build`, and fails the check if any build fails.
+#
+# WHY THIS EXISTS: we cannot yet trigger Control Tower builds safely from PRs,
+# and GitHub-hosted PR checks impose job timeouts that are too short for our
+# slowest packages (some build for >5h). Running azldev inside an ADO pipeline
+# lifts that timeout ceiling. Retire this pipeline once Control Tower supports
+# PR-triggered builds.
+#
+# This file owns all OneBranch-specific wiring (governed templates repo,
+# NonOfficial variant, featureFlags) and delegates the actual stages/jobs/steps
+# to the raw stages template at:
+#   .github/workflows/ado/templates/pr-package-build-stages.yml
+#
+# Unlike the package-build / sources-upload pipelines, this one does NOT call
+# Control Tower or any Azure resource: the build runs entirely on the agent. So
+# there is no service connection, variable group, or Azure access here — and
+# therefore no Entra app / federated-credential prerequisites either.
+#
+# NonOfficial: PR validation that only builds on the agent against dev/internal
+# package sources; it touches no production resources.
+#
+# Helper scripts live under:
+# - scripts/ci/components/ - cross-pipeline azldev change-set helpers (shared
+#   with the GitHub Actions PR gates and the Control Tower pipelines).
+#
+# Prerequisite (ADO): a branch policy / build-validation trigger on the target
+# branch wired to this pipeline (configured in ADO pipeline settings, not here).
+
+# Trigger controlled by ADO branch policy — not YAML triggers.
+trigger: none
+
+pr: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      golang:
+        internalModuleProxy:
+          enabled: true
+      LinuxHostVersion:
+        Network: R1
+      runOnHost: true
+      EnableCDPxPAT: false
+
+    # https://aka.ms/obpipelines/sdl
+    globalSdl:
+      disableLegacyManifest: true
+      sbom:
+        enabled: false
+      tsa:
+        enabled: false
+
+    stages:
+      - template: /.github/workflows/ado/templates/pr-package-build-stages.yml@self
+        parameters:
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
+          artifactBaseName: prpackagebuild
+          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          poolType: linux
+          # Generous on purpose: this pipeline exists precisely because some
+          # packages build for many hours (GitHub PR checks time out too soon).
+          # A single PR that touches several components builds them sequentially,
+          # so size for the sum, not the slowest one. This is the key knob —
+          # raise it if a legitimate PR build is being killed by the timeout.
+          timeoutInMinutes: 720

@@ -1,0 +1,214 @@
+# Microsoft Corporation
+#
+# *** TEMPORARY / STOPGAP PIPELINE ***
+#
+# Raw stages template for the PR package-build check. OneBranch-agnostic:
+# declares the stages/jobs/steps and exposes the OneBranch-coupled knobs as
+# parameters. The wrapper at .github/workflows/ado/pr-package-build.yml supplies
+# concrete values. See that wrapper for why this pipeline exists.
+#
+# What it does, per PR:
+#   1. Ensure full git history (rpmautospec + change detection need it).
+#   2. Install build tooling (mock + azldev).
+#   3. Resolve the PR commit range from the merge commit's parents
+#      (^1 = target-branch tip, ^2 = PR head).
+#   4. Compute the changed-component set (shared compute_change_set.sh).
+#   5. `azldev component build` those components, chain-publishing to a local
+#      repo so intra-set dependencies resolve. Any build failure fails the
+#      check; the per-component build logs are dumped on failure.
+#
+# It deliberately does NOT reuse templates/steps/common-steps.yml: that shared
+# step set resolves the commit range via the *previous CI build* (the
+# post-merge delta logic), which is wrong for a PR. A PR range comes from the
+# merge commit's parents, computed inline below. Reusing common-steps would
+# also pull in the lock/render verify steps (already covered by the GitHub
+# Actions PR gates) and force a refactor of a file shared by two production
+# pipelines — out of scope for a temporary stopgap.
+#
+# This pipeline calls no Azure resource and no Control Tower API, so it needs no
+# service connection and no variable group.
+
+parameters:
+  - name: outputDirectory
+    type: string
+  - name: artifactBaseName
+    type: string
+  - name: containerImage
+    type: string
+  - name: poolType
+    type: string
+    default: linux
+  - name: timeoutInMinutes
+    type: number
+
+stages:
+  - stage: PRPackageBuild
+    jobs:
+      - job: PRPackageBuild
+        # Fail-loud: any failing component build turns the PR check red.
+        timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+        pool:
+          type: ${{ parameters.poolType }}
+        variables:
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+        steps:
+          # Full history: `azldev component changed` tree-diffs two commits and
+          # rpmautospec derives Release/changelog from `git log`. The OneBranch
+          # checkout may be shallow (depth 1); unshallow once, up front. Never
+          # `git fetch --depth=N` afterwards — that re-shallows a full clone and
+          # silently corrupts the rpmautospec Release calculation.
+          - script: |
+              set -euo pipefail
+              if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+                echo "##[group]Fetching full git history"
+                git fetch --unshallow
+                echo "##[endgroup]"
+              fi
+            displayName: "Ensure full git history"
+
+          # azldev opens the repo with go-git, which rejects a config that
+          # declares the `worktreeconfig` extension while
+          # core.repositoryformatversion is still 0:
+          #   "core.repositoryformatversion does not support extension: worktreeconfig"
+          # Native git tolerates this, and the ADO agent checkout leaves the
+          # extension set, so strip it before any azldev invocation. Each CI run
+          # is a fresh checkout so this is safe and self-contained.
+          # TODO: remove this step once azldev no longer needs the workaround
+          # (go-git v6 fixes the underlying bug):
+          # https://github.com/microsoft/azure-linux-dev-tools/issues/241
+          - script: |
+              set -euo pipefail
+              if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
+                echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
+                git config --unset-all extensions.worktreeConfig || true
+              fi
+            displayName: "Normalize git config for azldev (go-git)"
+
+          - script: |
+              set -euo pipefail
+
+              echo "##[group]Mock"
+              tdnf install -y mock mock-rpmautospec python3-chardet
+              sudo usermod -aG mock "$(whoami)"
+              echo "##[endgroup]"
+
+              echo "##[group]Azldev"
+              AZLDEV_VERSION=$(cat .azldev-version)
+              echo "Installing azldev@${AZLDEV_VERSION}..."
+              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
+
+              go_bin_path="$(go env GOPATH)/bin"
+              echo "##vso[task.prependpath]$go_bin_path"
+
+              "$go_bin_path/azldev" --version
+              echo "##[endgroup]"
+            displayName: "Install dependencies"
+
+          # Resolve the PR commit range. A PR-policy build checks out the MERGE
+          # commit (Build.SourceVersion): parent ^1 is the target-branch tip,
+          # parent ^2 is the PR head. The diff ^1..^2 is exactly the PR's
+          # changes relative to the target branch. We read the range here and
+          # set pipeline variables so the wiring stays visible in the YAML.
+          - script: |
+              set -euo pipefail
+              if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
+                echo "##[error]HEAD is not a merge commit -- this pipeline must run as a PR build (Build.Reason=PullRequest)."
+                exit 1
+              fi
+              target_commit="$(git rev-parse HEAD^1)"
+              # Prefer ADO's explicit PR-head variable; fall back to the merge
+              # commit's second parent. System.PullRequest.* is only populated
+              # for branch-policy PR builds, hence the fallback.
+              source_commit="${PR_SOURCE_COMMIT:-$(git rev-parse HEAD^2)}"
+              # PR-supplied data is untrusted: validate both SHAs before use.
+              for sha in "$target_commit" "$source_commit"; do
+                if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+                  echo "##[error]invalid commit SHA: $sha"
+                  exit 1
+                fi
+              done
+              echo "Resolved range: target=$target_commit source=$source_commit"
+              echo "##vso[task.setvariable variable=sourceCommit]$source_commit"
+              echo "##vso[task.setvariable variable=targetCommit]$target_commit"
+            env:
+              # Non-reserved name: a step `env:` mapping cannot override a
+              # reserved Build.*/System.* var (the agent auto-export wins
+              # silently), so we read System.PullRequest.SourceCommitId under a
+              # neutral name.
+              PR_SOURCE_COMMIT: $(System.PullRequest.SourceCommitId)
+            displayName: "Determine PR commit range"
+
+          # Compute the changed-component set with the shared, cross-pipeline
+          # single-source-of-truth helper (also used by the GitHub Actions PR
+          # gates). render-set.txt = component names that changed or had
+          # hand-edited specs, minus deleted. compute_change_set.sh hard-fails
+          # on the supply-chain drift tripwire (sourcesChange without an
+          # identity change) -- a guard we want to keep on PRs. The script
+          # self-prefixes AZLDEV_ALLOW_ROOT=1 internally.
+          - script: |
+              set -euo pipefail
+              change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
+              echo "##[group]Preparing change set"
+              scripts/ci/components/compute_change_set.sh \
+                --output-dir "$change_set_dir" \
+                --source-commit "$(sourceCommit)" \
+                --target-commit "$(targetCommit)"
+              echo "##[endgroup]"
+              echo "##vso[task.setvariable variable=renderSetFile;isreadonly=true]$change_set_dir/render-set.txt"
+            displayName: "Prepare change set"
+
+          # Build the changed components. --local-repo-with-publish stages each
+          # built RPM into a local repo so later components in the set can
+          # resolve against earlier ones (intra-PR dependency chains). No -q, so
+          # build progress streams to the log; on failure we also dump the
+          # per-component build logs. AZLDEV_ALLOW_ROOT=1 is inline per
+          # .github/instructions/ado-pipeline.instructions.md (OneBranch runs as
+          # root).
+          - script: |
+              set -euo pipefail
+              render_set="$(renderSetFile)"
+              if [[ ! -s "$render_set" ]]; then
+                echo "No changed components -- nothing to build."
+                exit 0
+              fi
+
+              mapfile -t comps < "$render_set"
+              echo "##[group]Components to build (${#comps[@]})"
+              printf '  - %s\n' "${comps[@]}"
+              echo "##[endgroup]"
+
+              build_args=()
+              for c in "${comps[@]}"; do
+                build_args+=(-p "$c")
+              done
+
+              dump_logs() {
+                echo "##[group]Build logs (dumped on failure)"
+                find base/build/logs -type f -name '*.log' -print0 2>/dev/null \
+                  | sort -z \
+                  | while IFS= read -r -d '' log; do
+                      echo "##[group]$log"
+                      cat "$log"
+                      echo "##[endgroup]"
+                    done
+                echo "##[endgroup]"
+              }
+              on_exit() {
+                local rc=$?
+                if [[ $rc -ne 0 ]]; then
+                  dump_logs
+                fi
+              }
+              trap on_exit EXIT
+
+              echo "##[group]Building ${#comps[@]} component(s)"
+              AZLDEV_ALLOW_ROOT=1 azldev component build -v \
+                --local-repo-with-publish ./base/out \
+                "${build_args[@]}"
+              echo "##[endgroup]"
+            displayName: "Build changed components"
