@@ -9,7 +9,7 @@
 %define uname_r %{version}-%{release}
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-hwe-signed-%{buildarch}
-Version:        6.18.31.1
+Version:        6.18.34.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -108,6 +108,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Thu Jun 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.34.1-1
+- Auto-upgrade to 6.18.34.1
+
 * Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.31.1-1
 - Auto-upgrade to 6.18.31.1
 
