@@ -38,7 +38,8 @@ BuildRequires:  python3-twisted
 
 Requires:       python3-%{pkgname} = %{version}-%{release}
 
-%global _description Tools and APIs to make working with AMQP in Fedora easier.
+%global _description %{expand:
+Tools and APIs to make working with AMQP in Fedora easier.}
 
 %description %{_description}
 
