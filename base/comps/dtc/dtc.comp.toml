@@ -1,5 +1,6 @@
 [components.dtc]
-
+# Debug, add a build flag to force an update
+build.without = ["foo"]
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # The upstream spec hard-codes `%global with_mingw 1` whenever %fedora is
 # defined (true in our build environment) rather than gating on a %bcond, so
