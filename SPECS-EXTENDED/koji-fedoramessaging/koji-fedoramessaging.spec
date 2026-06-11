@@ -38,7 +38,8 @@ install -D -p -m 0644 koji-fedoramessaging/koji-fedoramessaging.py \
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.1.2-1
-- Initial Azure Linux import from upstream fedora-infra/koji-fedoramessaging (license: GPL-3.0-only). License verified.
+- Initial Azure Linux import from the source project (license: same as "License" tag).
+- License verified.
 
 * Mon Jun 12 2023 Aurelien Bompard <abompard@fedoraproject.org> - 1.1.2-1
 - The files_base_url is only relevant for build and task state changes

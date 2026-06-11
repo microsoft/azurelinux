@@ -60,4 +60,5 @@ Requires:       python3-fedora-messaging
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.3.0-1
-- Initial Azure Linux import from Fedora rawhide (license: GPL-3.0-or-later). License verified.
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.

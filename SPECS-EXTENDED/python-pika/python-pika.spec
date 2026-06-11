@@ -57,4 +57,5 @@ Summary:        %{summary}
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.3.2-1
-- Initial Azure Linux import from Fedora rawhide (license: BSD-3-Clause). License verified.
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.

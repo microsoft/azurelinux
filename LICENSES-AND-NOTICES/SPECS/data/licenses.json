@@ -562,7 +562,6 @@
                 "kf-ki18n",
                 "kf-kwidgetsaddons",
                 "koji",
-                "koji-fedoramessaging",
                 "kpmcore",
                 "kronosnet",
                 "ksh",
@@ -3188,6 +3187,7 @@
                 "coreos-cloudinit",
                 "coreos-init",
                 "ignition-flatcar",
+                "koji-fedoramessaging",
                 "python-nocaselist",
                 "rust-afterburn",
                 "update-ssh-keys"
