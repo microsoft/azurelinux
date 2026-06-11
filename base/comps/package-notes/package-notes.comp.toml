@@ -1,0 +1,83 @@
+[components.package-notes]
+
+# Add structured 'os' and 'osVersion' fields to the .note.package ELF section
+# emitted into every binary built with these LDFLAGS, alongside a parsed
+# 'moduleVersion'. These give SBOM and crash-analysis tools a parsed view of
+# the build's OS identity and package version without having to crack the CPE
+# string.
+#
+# osCpe is hardcoded to the canonical Azure Linux CPE 2.3 string rather than
+# read from /usr/lib/system-release-cpe in %build. During Stage 1 the buildroot
+# is populated from the Fedora seed package set, so that file reports the
+# Fedora CPE (e.g. cpe:/o:fedoraproject:fedora:43) and would bake the wrong
+# identity into every binary. Hardcoding guarantees correct metadata
+# regardless of which package set seeded the buildroot.
+#
+# @OSCPE@, @OS@ and @OSVERSION@ are placeholders added to the linker-script
+# template by the overlay below; we substitute them in %build. os/osVersion
+# mirror /etc/os-release's ID/VERSION_ID (using the underscored 'azure_linux'
+# CPE project name), and osCpe is the matching CPE 2.3 string.
+[[components.package-notes.overlays]]
+description = "Substitute @OSCPE@/@OS@/@OSVERSION@ placeholders in the .note.package linker spec, then self-test that the os/osVersion/moduleVersion overlays applied"
+type = "spec-search-replace"
+section = "%build"
+regex = 'sed "s\|@OSCPE@\|\$\(cat /usr/lib/system-release-cpe\)\|" %\{SOURCE0\} >redhat-package-notes'
+replacement = '''sed -e "s|@OSCPE@|cpe:2.3:o:microsoft:azure_linux:4.0:*:*:*:*:*:*:*|" -e "s|@OS@|azure_linux|" -e "s|@OSVERSION@|4.0|" %{SOURCE0} >redhat-package-notes
+
+# Self-test: fail the build loudly if these overlays did not inject the
+# expected .note.package fields into the generated linker spec, rather than
+# silently shipping binaries with missing OS / moduleVersion metadata. The
+# bare "os" field is added by the same overlay as osVersion and moduleVersion,
+# so verifying these three covers it.
+for field in osCpe osVersion moduleVersion; do
+    grep -qF "$field" redhat-package-notes || { echo "ERROR: generated redhat-package-notes is missing the '$field' field -- package-notes overlay regression" >&2; exit 1; }
+done
+# moduleVersion's value comes from RPM_MODULE_VERSION, exported by the
+# %_generate_package_note_file hook in macros.package-notes-srpm. If a future
+# rebase reverts that macro to the upstream %{nil}, moduleVersion would
+# silently become empty in every downstream binary -- fail now instead.
+grep -q RPM_MODULE_VERSION %{SOURCE1} || { echo "ERROR: macros.package-notes-srpm no longer exports RPM_MODULE_VERSION -- the _generate_package_note_file hook was removed" >&2; exit 1; }'''
+
+# Compute a 4-part RPM_MODULE_VERSION from RPM_PACKAGE_VERSION and export it
+# into every %build shell. We hook into the %_generate_package_note_file
+# macro, which the Azure Linux RPM macros (/usr/lib/rpm/azurelinux/macros)
+# already expand inside %__spec_build_pre. The package-notes-srpm-macros
+# file ships this macro as %{nil} by default; we redefine it to our export.
+# (Overriding %__spec_build_pre directly does not work -- azurelinux/macros
+# loads later in the macro path and clobbers any earlier definition.)
+# Per field: truncate at the first non-digit (so a tilde-prerelease or git
+# suffix is stripped, not folded into the numeric value) and zero-pad
+# missing trailing fields:
+#   1.6.1                -> 1.6.1.0
+#   1.2.3~rc1            -> 1.2.3.0
+#   0.9~rc2             -> 0.9.0.0
+#   2024.05.29           -> 2024.5.29.0
+#   0^20260120.g386b5f5  -> 20260120.0.0.0    (^ truncates field 1 to "0",
+#                                              g... truncates field 2 to "")
+# The value is consumed by the linker-script template (overlay below) via
+# %:getenv(RPM_MODULE_VERSION ) and emitted as the moduleVersion key in
+# .note.package.
+[[components.package-notes.overlays]]
+description = "Hook %_generate_package_note_file to export 4-part RPM_MODULE_VERSION for every package build, consumed by the .note.package moduleVersion field"
+type = "file-search-replace"
+file = "macros.package-notes-srpm"
+regex = '%_generate_package_note_file %\{nil\}'
+replacement = '''%_generate_package_note_file export RPM_MODULE_VERSION=$(echo "${RPM_PACKAGE_VERSION:-0}" | awk -F. '{for(i=1;i<=4;i++){v=$i; sub(/[^0-9].*/,"",v); a[i]=v+0}; print a[1]"."a[2]"."a[3]"."a[4]}')'''
+
+# Add the os, osVersion, and moduleVersion keys to the JSON payload emitted
+# into .note.package. The template is a GCC spec file fragment; embedded
+# quotes are escaped as \". Adding one more %:getenv(...) requires bumping the
+# trailing ')' count by one (from 4 to 5) to keep the macro nesting balanced.
+#
+# Note: this introduces a runtime dependency on RPM_MODULE_VERSION being
+# exported during every rpmbuild phase that may invoke the linker. The
+# azurelinux-rpm-config component carries a companion overlay that adds
+# %{?_generate_package_note_file} to %__spec_install_pre -- without that,
+# packages that relink during %install (e.g. avahi's libtool --relink for
+# PIE libraries) fail because GCC's %:getenv() is a strict lookup.
+[[components.package-notes.overlays]]
+description = "Add os, osVersion, and moduleVersion keys to the .note.package JSON payload"
+type = "file-search-replace"
+file = "redhat-package-notes.in"
+regex = '\\"osCpe\\":\\"@OSCPE@\\"\}\)\)\)\)\}'
+replacement = '\"osCpe\":\"@OSCPE@\",\"os\":\"@OS@\",\"osVersion\":\"@OSVERSION@\",\"moduleVersion\":\"%:getenv(RPM_MODULE_VERSION \"})))))}'

@@ -13,7 +13,7 @@ overlays = [
     { type = "spec-update-tag", tag = "Version", value = "1004" },
 
     # WORKAROUND: manually bump the Release value for Stage2 bring-up.
-    { type = "spec-update-tag", tag = "Release", value = "2%{?dist}" },
+    { type = "spec-update-tag", tag = "Release", value = "3%{?dist}" },
 
     # Provide compatibility with Fedora's upstream version.
     { type = "spec-add-tag", tag = "Provides", value = "redhat-rpm-config = %{version}-%{release}" },
@@ -55,4 +55,42 @@ overlays = [
     # Targeted adjustments in some macros files.
     { type = "file-search-replace", file = "macros.fedora-misc-srpm", regex = "/lib/swidtag/fedoraproject.org", replacement = "/lib/swidtag/microsoft.com" },
     { type = "file-search-replace", file = "macros.fedora-misc-srpm", regex = "[Ff]edora", replacement = "azurelinux" },
+
+    # Add the %{?_generate_package_note_file} hook to %__spec_install_pre so
+    # that RPM_MODULE_VERSION (set by package-notes-srpm-macros via that hook)
+    # is exported during %install as well as %build and %check. Required for
+    # packages that invoke the linker from %install (e.g. avahi's libtool
+    # --relink for PIE libraries), since the package-notes GCC linker spec
+    # uses a strict %:getenv(RPM_MODULE_VERSION ) lookup that aborts the
+    # link if the env var is unset. The hook is already present in
+    # %__spec_build_pre and %__spec_check_pre in this same file -- this
+    # overlay just extends the pattern to %__spec_install_pre. Anchored on
+    # the 4-space-indented variant of the line (with no trailing space before
+    # the line-continuation backslash), which is unique to %__spec_install_pre
+    # -- the other two callers use 2-space indent and " \" at end of line.
+    { type = "file-search-replace", file = "macros", regex = '''    %\{\?_auto_set_build_flags:%\{set_build_flags\}\}\\''', replacement = '''    %{?_auto_set_build_flags:%{set_build_flags}}\
+    %{?_generate_package_note_file}\''' },
+
+    # Self-test: the .note.package moduleVersion mechanism depends on the
+    # %_generate_package_note_file hook remaining expanded in all three
+    # %__spec_*_pre macros (build / check / install). package-notes-srpm-macros
+    # redefines that hook to export RPM_MODULE_VERSION; if a future rebase of
+    # redhat-rpm-config drops these expansions, the export silently stops and
+    # every downstream binary loses its moduleVersion (and %install-time
+    # relinks such as avahi's libtool --relink would break on the strict
+    # %:getenv lookup). Fail this build loudly instead of regressing silently.
+    #
+    # NB: we grep for the bare macro NAME '_generate_package_note_file', not the
+    # '%{?_generate_package_note_file}' expansion -- RPM would expand the latter
+    # in the spec before the shell runs, and the macro is undefined during this
+    # package's own build (it ships in package-notes-srpm-macros), so the
+    # pattern would collapse to empty and match everything.
+    { type = "spec-append-lines", section = "%install", lines = [
+        "# Guard: ensure the package-notes moduleVersion hook is still wired in (see comp overlay).",
+        "note_hooks=$(grep -c '_generate_package_note_file' macros 2>/dev/null || echo 0)",
+        "if [ \"$note_hooks\" -lt 3 ]; then",
+        "    echo \"ERROR: macros has $note_hooks '_generate_package_note_file' hook expansion(s), expected >= 3 (build/check/install _pre). A redhat-rpm-config rebase may have dropped the .note.package moduleVersion hook.\" >&2",
+        "    exit 1",
+        "fi",
+    ] },
 ]
