@@ -14,12 +14,68 @@ regex = '%if \( %\{defined rhel\} && \(! %\{defined centos\}\) && \(! %\{defined
 replacement = '%if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}'
 description = "Remove fips.so from openssl on Azure Linux (not supported for public preview)"
 
-# The above replacement also hits the Requires: openssl-fips-provider guard.
-# Suppress that dependency on Azure Linux — openssl-fips-provider is not
-# shipped for public preview.
+# fips.so is built by the separate openssl-fips-provider package.
+# Remove enable-fips so openssl doesn't build its own fips.so.
 [[components.openssl.overlays]]
-type = "spec-remove-tag"
-tag = "Requires"
-value = "openssl-fips-provider"
-package = "libs"
-description = "Don't require openssl-fips-provider on Azure Linux"
+type = "spec-search-replace"
+section = "%build"
+regex = 'enable-fips '
+replacement = ''
+description = "Don't build fips.so here — it comes from openssl-fips-provider"
+
+# Re-enable fipsinstall subcommand (upstream disables it for RHEL because
+# they embed HMAC; we use the fipsinstall approach instead).
+[[components.openssl.overlays]]
+type = "patch-remove"
+file = "0018-FIPS-disable-fipsinstall.patch"
+description = "Re-enable openssl fipsinstall for external FIPS provider workflow"
+
+# Simplify patch 0019: remove fips_local.cnf loading, rely on openssl.d drop-in
+# for provider config. Kernel FIPS mode just activates fips+base and sets properties.
+[[components.openssl.overlays]]
+type = "file-remove"
+file = "0019-FIPS-Force-fips-provider-on.patch"
+description = "Remove upstream 0019 — uses fips_local.cnf which conflicts with drop-in approach"
+
+[[components.openssl.overlays]]
+type = "file-add"
+file = "0019-FIPS-Force-fips-provider-on.patch"
+source = "0019-FIPS-Force-fips-provider-on.patch"
+description = "Simplified 0019: activate fips+base in kernel FIPS mode, rely on drop-in for config"
+
+# fips_local.cnf is no longer needed — drop-in in openssl.d provides config.
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+section = "%install"
+regex = '^ln -s /etc/crypto-policies/back-ends/openssl_fips.config \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/fips_local.cnf'
+replacement = ''
+description = "Remove fips_local.cnf symlink — no longer used with drop-in approach"
+
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+section = "%files"
+regex = '^%config %\{_sysconfdir\}/pki/tls/fips_local.cnf'
+replacement = ''
+description = "Remove fips_local.cnf from files list"
+
+# The hmac-ify call in %check references providers/fips.so which won't exist
+# without enable-fips.
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+section = "%check"
+regex = '^%\{SOURCE1\} providers/fips\.so'
+replacement = ''
+description = "Remove fips.so hmac-ify in check — no fips.so built in this package"
+
+# Patch 0037 has a hunk that depends on context from 0018 (which we removed).
+# Replace with a rebased version that applies against the full upstream fips_config.pod.
+[[components.openssl.overlays]]
+type = "file-remove"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Remove upstream 0037 — has merge conflict without patch 0018"
+
+[[components.openssl.overlays]]
+type = "file-add"
+file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+source = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
+description = "Add rebased 0037 that applies cleanly without patch 0018"

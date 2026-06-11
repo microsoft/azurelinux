@@ -1,0 +1,106 @@
+From 3ce272be66d6e8285e0fa0fddc0ae4b3c8c9e6da Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Wed, 12 Feb 2025 17:25:47 -0500
+Subject: [PATCH 47/59] Current Rebase status
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ REBASE.txt | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
+
+diff --git a/REBASE.txt b/REBASE.txt
+index 2833a383c1..c8f6c992a8 100644
+--- a/REBASE.txt
++++ b/REBASE.txt
+@@ -1,3 +1,6 @@
++REBASED on TOP of tagged openssl-3.5.0
++
++
+ 0028-0073-FIPS-Use-OAEP-in-KATs-support-fixed-OAEP-seed.p.patch
+ 
+ Some asym testing has been dropped upstream, unclear if this needs to survive,
+@@ -8,3 +11,81 @@ if so we may need to resurrect deleted code in upstream patch:
+     fips: remove redundant RSA encrypt/decrypt KAT
+ --
+ 
++This does not apply cleanly and I can't figure out the original intent exactly
++to modify the existing code correctly.
++
++--
++0030-0075-FIPS-Use-FFDHE2048-in-self-test.patch.patch
++
++Unnecessary, upstream aleady change to use ffsh2048
++
++--
++0032-0077-FIPS-140-3-zeroization.patch.patch
++
++Unnecessary, but MUST define OPENSSL_PEDANTIC_ZEROIZATION to do the same
++
++--
++0048-Spec-cleanup.patch
++
++Not applied as I did not get in the initial patch that imports into packit
++--
++0049-0117-ignore-unknown-sigalgorithms-groups.patch.patch
++
++Unnecessary, already included in 3.5
++
++--
++0050-0118-no-crl-memleak.patch.patch
++
++Unnecessary, already included in 3.5
++
++--
++0051-0119-provider-sigalgs-in-signaturealgorithms-conf.pa.patch
++
++Unnecessary, already included in 3.5
++
++--
++
++Recheck
++======
++
++- Dropped: openssl speed - skip unavailable dgst
++
++- Dropped: 0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signa.patch
++
++- Dropped patch to disable ECX algorihms
++
++Needed build/spec changes
++====================
++
++Add -DOPENSSL_PEDANTIC_ZEROIZATION to ./Configure line
++This is needed for zeroizations required for FIPS
++
++Add -DREDHAT_FIPS_VENDOR for the module name
++
++Drop 0025-for-tests.patch from dist-git
++We now use a separate config file for tests and for install
++Copy rh-openssl.cnf over the openssl default conf file in the install section.
++
++Testing
++=======
++./Configure \
++        --prefix=%{_prefix} --openssldir=%{_sysconfdir}/pki/tls ${sslflags} \
++        --system-ciphers-file=%{_sysconfdir}/crypto-policies/back-ends/opensslcnf.config \
++        zlib enable-camellia enable-seed enable-rfc3779 enable-sctp \
++        enable-cms enable-md2 enable-rc5 ${ktlsopt} enable-fips -D_GNU_SOURCE\
++        no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++\
++        shared  ${sslarch} $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DREDHAT_FIPS_VERSION="\"%{fips}\""'\
++        -Wl,--allow-multiple-definition
++
++prefix=$HOME/tmp/openssl-rebase
++sysconfigdir=$prefix/etc
++fips="Rebase Testing"
++sslarch=linux-x86_64
++sslflags=enable-ec_nistp_64_gcc_128
++ktlsopt=enable-ktls
++
++Example Testing
++===============
++
++./Configure --prefix=$HOME/tmp/openssl-rebase --openssldir=$HOME/tmp/openssl-rebase/etc/pki/tls enable-ec_nistp_64_gcc_128 --system-ciphers-file=$HOME/tmp/openssl-rebase/etc/crypto-policies/back-ends/opensslcnf.config zlib enable-camellia enable-seed enable-rfc3779 enable-sctp enable-cms enable-md2 enable-rc5 enable-ktls enable-fips no-mdc2 no-ec2m no-sm2 no-sm4 no-atexit enable-buildtest-c++ shared linux-x86_64 $RPM_OPT_FLAGS '-DDEVRANDOM="\"/dev/urandom\"" -DOPENSSL_PEDANTIC_ZEROIZATION -DREDHAT_FIPS_VENDOR="\"Red Hat Enterprise Linux OpenSSL FIPS Provider\"" -DREDHAT_FIPS_VERSION="\"3.5.0-4c714d97fd77d1a8\""' -Wl,--allow-multiple-definition
++
+-- 
+2.51.0
+

@@ -1266,6 +1266,7 @@ components = [
     "opensp",
     "openssh",
     "openssl",
+    "openssl-fips-provider",
     "openssl-pkcs11",
     "opentest4j",
     "openvswitch",

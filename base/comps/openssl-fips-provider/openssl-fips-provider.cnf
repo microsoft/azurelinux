@@ -1,0 +1,4 @@
+[provider_sect]
+fips = fips_sect
+
+.include /etc/pki/tls/fipsmodule.cnf

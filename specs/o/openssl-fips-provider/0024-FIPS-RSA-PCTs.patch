@@ -1,0 +1,157 @@
+From e19989c58ad6450428ee68fa4d81e022925872c1 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 24 Mar 2025 10:50:37 -0400
+Subject: [PATCH 24/59] FIPS: RSA: PCTs
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+---
+ providers/implementations/keymgmt/rsa_kmgmt.c | 18 +++++++
+ providers/implementations/signature/rsa_sig.c | 47 +++++++++++++++++--
+ 2 files changed, 61 insertions(+), 4 deletions(-)
+
+diff --git a/providers/implementations/keymgmt/rsa_kmgmt.c b/providers/implementations/keymgmt/rsa_kmgmt.c
+index cd74275d60..52087abff6 100644
+--- a/providers/implementations/keymgmt/rsa_kmgmt.c
++++ b/providers/implementations/keymgmt/rsa_kmgmt.c
+@@ -434,6 +434,7 @@ struct rsa_gen_ctx {
+ #if defined(FIPS_MODULE) && !defined(OPENSSL_NO_ACVP_TESTS)
+     /* ACVP test parameters */
+     OSSL_PARAM *acvp_test_params;
++    void *prov_rsa_ctx;
+ #endif
+ };
+ 
+@@ -447,6 +448,12 @@ static int rsa_gencb(int p, int n, BN_GENCB *cb)
+     return gctx->cb(params, gctx->cbarg);
+ }
+ 
++#ifdef FIPS_MODULE
++void *rsa_newctx(void *provctx, const char *propq);
++void rsa_freectx(void *vctx);
++int do_rsa_pct(void *, const char *, void *);
++#endif
++
+ static void *gen_init(void *provctx, int selection, int rsa_type,
+                       const OSSL_PARAM params[])
+ {
+@@ -474,6 +481,10 @@ static void *gen_init(void *provctx, int selection, int rsa_type,
+ 
+     if (!rsa_gen_set_params(gctx, params))
+         goto err;
++#ifdef FIPS_MODULE
++    if (gctx != NULL)
++        gctx->prov_rsa_ctx = rsa_newctx(provctx, NULL);
++#endif
+     return gctx;
+ 
+ err:
+@@ -630,6 +641,11 @@ static void *rsa_gen(void *genctx, OSSL_CALLBACK *osslcb, void *cbarg)
+ 
+     rsa = rsa_tmp;
+     rsa_tmp = NULL;
++#ifdef FIPS_MODULE
++    /* Pairwise consistency test */
++    if (do_rsa_pct(gctx->prov_rsa_ctx, "sha256", rsa) != 1)
++        abort();
++#endif
+  err:
+     BN_GENCB_free(gencb);
+     RSA_free(rsa_tmp);
+@@ -645,6 +661,8 @@ static void rsa_gen_cleanup(void *genctx)
+ #if defined(FIPS_MODULE) && !defined(OPENSSL_NO_ACVP_TESTS)
+     ossl_rsa_acvp_test_gen_params_free(gctx->acvp_test_params);
+     gctx->acvp_test_params = NULL;
++    rsa_freectx(gctx->prov_rsa_ctx);
++    gctx->prov_rsa_ctx = NULL;
+ #endif
+     BN_clear_free(gctx->pub_exp);
+     OPENSSL_free(gctx);
+diff --git a/providers/implementations/signature/rsa_sig.c b/providers/implementations/signature/rsa_sig.c
+index 29be5f5028..670125464e 100644
+--- a/providers/implementations/signature/rsa_sig.c
++++ b/providers/implementations/signature/rsa_sig.c
+@@ -37,7 +37,7 @@
+ #define RSA_DEFAULT_DIGEST_NAME OSSL_DIGEST_NAME_SHA1
+ #define RSA_DEFAULT_DIGEST_NAME_NONLEGACY OSSL_DIGEST_NAME_SHA2_256
+ 
+-static OSSL_FUNC_signature_newctx_fn rsa_newctx;
++OSSL_FUNC_signature_newctx_fn rsa_newctx;
+ static OSSL_FUNC_signature_sign_init_fn rsa_sign_init;
+ static OSSL_FUNC_signature_verify_init_fn rsa_verify_init;
+ static OSSL_FUNC_signature_verify_recover_init_fn rsa_verify_recover_init;
+@@ -54,7 +54,7 @@ static OSSL_FUNC_signature_digest_sign_final_fn rsa_digest_sign_final;
+ static OSSL_FUNC_signature_digest_verify_init_fn rsa_digest_verify_init;
+ static OSSL_FUNC_signature_digest_verify_update_fn rsa_digest_verify_update;
+ static OSSL_FUNC_signature_digest_verify_final_fn rsa_digest_verify_final;
+-static OSSL_FUNC_signature_freectx_fn rsa_freectx;
++OSSL_FUNC_signature_freectx_fn rsa_freectx;
+ static OSSL_FUNC_signature_dupctx_fn rsa_dupctx;
+ static OSSL_FUNC_signature_query_key_types_fn rsa_sigalg_query_key_types;
+ static OSSL_FUNC_signature_get_ctx_params_fn rsa_get_ctx_params;
+@@ -226,7 +226,7 @@ static int rsa_check_parameters(PROV_RSA_CTX *prsactx, int min_saltlen)
+     return 1;
+ }
+ 
+-static void *rsa_newctx(void *provctx, const char *propq)
++void *rsa_newctx(void *provctx, const char *propq)
+ {
+     PROV_RSA_CTX *prsactx = NULL;
+     char *propq_copy = NULL;
+@@ -1316,7 +1316,7 @@ int rsa_digest_verify_final(void *vprsactx, const unsigned char *sig,
+     return ok;
+ }
+ 
+-static void rsa_freectx(void *vprsactx)
++void rsa_freectx(void *vprsactx)
+ {
+     PROV_RSA_CTX *prsactx = (PROV_RSA_CTX *)vprsactx;
+ 
+@@ -1866,6 +1866,45 @@ static const OSSL_PARAM *rsa_settable_ctx_md_params(void *vprsactx)
+     return EVP_MD_settable_ctx_params(prsactx->md);
+ }
+ 
++#ifdef FIPS_MODULE
++int do_rsa_pct(void *vctx, const char *mdname, void *rsa)
++{
++    static const unsigned char data[32];
++    unsigned char *sigbuf = NULL;
++    size_t siglen = 0;
++    int ret = 0;
++
++    if (rsa_digest_sign_init(vctx, mdname, rsa, NULL) <= 0)
++        return 0;
++
++    if (rsa_digest_sign_update(vctx, data, sizeof(data)) <= 0)
++        return 0;
++
++    if (rsa_digest_sign_final(vctx, NULL, &siglen, 0) <= 0)
++        return 0;
++
++    if ((sigbuf = OPENSSL_malloc(siglen)) == NULL)
++        return 0;
++
++    if (rsa_digest_sign_final(vctx, sigbuf, &siglen, siglen) <= 0)
++        goto err;
++
++    if (rsa_digest_verify_init(vctx, mdname, rsa, NULL) <= 0)
++        goto err;
++
++    if (rsa_digest_verify_update(vctx, data, sizeof(data)) <= 0)
++        goto err;
++
++    if (rsa_digest_verify_final(vctx, sigbuf, siglen) <= 0)
++        goto err;
++    ret = 1;
++
++ err:
++    OPENSSL_free(sigbuf);
++    return ret;
++}
++#endif
++
+ const OSSL_DISPATCH ossl_rsa_signature_functions[] = {
+     { OSSL_FUNC_SIGNATURE_NEWCTX, (void (*)(void))rsa_newctx },
+     { OSSL_FUNC_SIGNATURE_SIGN_INIT, (void (*)(void))rsa_sign_init },
+-- 
+2.51.0
+
