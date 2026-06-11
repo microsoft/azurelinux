@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -236,7 +236,7 @@ mkdir -p licenses
 %install
 install -d %{buildroot}%{_prefix}/lib
 echo "Azure Linux release %{version} (%{release_name})" > %{buildroot}%{_prefix}/lib/azurelinux-release
-echo "cpe:/o:microsoft:azurelinux:%{version}" > %{buildroot}%{_prefix}/lib/system-release-cpe
+echo "cpe:2.3:o:microsoft:azure_linux:%{version}:*:*:*:*:*:*:*" > %{buildroot}%{_prefix}/lib/system-release-cpe
 
 # Symlink the -release files
 install -d %{buildroot}%{_sysconfdir}
@@ -298,7 +298,7 @@ VERSION_CODENAME=""
 PRETTY_NAME="Azure Linux %{dist_version} (%{release_name}%{?prerelease})"
 ANSI_COLOR="0;38;2;60;110;180"
 LOGO=azurelinux-logo-icon
-CPE_NAME="cpe:/o:azurelinuxproject:azurelinux:%{dist_version}"
+CPE_NAME="cpe:2.3:o:microsoft:azure_linux:%{dist_version}:*:*:*:*:*:*:*"
 DEFAULT_HOSTNAME="azurelinux"
 HOME_URL="%{dist_home_url}"
 DOCUMENTATION_URL="https://aka.ms/azurelinux"
@@ -479,6 +479,11 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Wed Jun 10 2026 Andrew Phelps <anphel@microsoft.com> - 4.0-18
+- Update CPE_NAME in os-release to a well-formed CPE 2.3 formatted string
+  (microsoft:azure_linux), replacing the legacy CPE 2.2 URI binding
+- Update system-release-cpe to the matching CPE 2.3 formatted string
+
 * Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
 - Redefine azurelinux macro as major version.
 
