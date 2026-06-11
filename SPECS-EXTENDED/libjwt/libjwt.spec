@@ -47,6 +47,9 @@ autoreconf -i
 %install
 %make_install
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
+# --without-examples does not actually disable example install in
+# libjwt 1.12.1; remove the example binaries explicitly.
+rm -f %{buildroot}%{_bindir}/jwtgen %{buildroot}%{_bindir}/jwtauth
 
 
 %ldconfig_scriptlets
@@ -66,7 +69,7 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
-* Tue Jun 10 2026 lakarri <lakarri@microsoft.com> - 1.12.1-1
+* Wed Jun 10 2026 lakarri <lakarri@microsoft.com> - 1.12.1-1
 - Initial Azure Linux import from Fedora rawhide (license: MPL-2.0).
 - Required by slurmrestd (Slurm REST API daemon) for JWT-based
   authentication. Tracked via ADO #61504121.
