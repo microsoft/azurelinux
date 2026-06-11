@@ -157,6 +157,7 @@ fi
 %files devel
 %{_includedir}/lldp-const.h
 %{_includedir}/lldpctl.h
+%{_includedir}/lldpctl.hpp
 %{_libdir}/liblldpctl.so
 %{_libdir}/pkgconfig/lldpctl.pc
 
