@@ -70,16 +70,12 @@ Requires:       python3-twisted
 %install
 %pyproject_install
 %pyproject_save_files %{srcname}
+# Azure Linux ships only the generic example config. The Fedora-specific
+# broker connection profiles (fedora.toml, fedora.stg.toml) and their
+# bundled certificate/key files are intentionally omitted: they point at
+# Fedora's public broker and are irrelevant to the Azure Linux Koji message
+# bus, which is configured for its own in-cluster broker via site config.
 install -D -p -m 0644 config.toml.example %{buildroot}%{_sysconfdir}/fedora-messaging/config.toml
-install -D -p -m 0644 configs/fedora.toml %{buildroot}%{_sysconfdir}/fedora-messaging/fedora.toml
-install -D -p -m 0644 configs/fedora.stg.toml %{buildroot}%{_sysconfdir}/fedora-messaging/fedora.stg.toml
-install -D -p -m 0644 configs/cacert.pem %{buildroot}%{_sysconfdir}/fedora-messaging/cacert.pem
-# This is intentionally world-readable; it is for public Fedora broker access.
-install -D -p -m 0644 configs/fedora-key.pem %{buildroot}%{_sysconfdir}/fedora-messaging/fedora-key.pem
-install -D -p -m 0644 configs/fedora-cert.pem %{buildroot}%{_sysconfdir}/fedora-messaging/fedora-cert.pem
-install -D -p -m 0644 configs/stg-cacert.pem %{buildroot}%{_sysconfdir}/fedora-messaging/stg-cacert.pem
-install -D -p -m 0644 configs/fedora.stg-key.pem %{buildroot}%{_sysconfdir}/fedora-messaging/fedora.stg-key.pem
-install -D -p -m 0644 configs/fedora.stg-cert.pem %{buildroot}%{_sysconfdir}/fedora-messaging/fedora.stg-cert.pem
 install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.service
 
 %check
@@ -99,14 +95,6 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 %doc README.rst
 %dir %{_sysconfdir}/fedora-messaging/
 %config(noreplace) %{_sysconfdir}/fedora-messaging/config.toml
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora.toml
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora.stg.toml
-%config(noreplace) %{_sysconfdir}/fedora-messaging/cacert.pem
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora-key.pem
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora-cert.pem
-%config(noreplace) %{_sysconfdir}/fedora-messaging/stg-cacert.pem
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora.stg-key.pem
-%config(noreplace) %{_sysconfdir}/fedora-messaging/fedora.stg-cert.pem
 %{_bindir}/fedora-messaging
 %{_unitdir}/fm-consumer@.service
 
@@ -116,3 +104,4 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-1
 - Initial Azure Linux import from Fedora rawhide (license: GPL-2.0-or-later). License verified.
+- Omit Fedora-specific broker profiles (fedora.toml, fedora.stg.toml) and bundled cert/key files; ship only the generic example config.
