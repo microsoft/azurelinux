@@ -1,9 +1,11 @@
 # Shared azldev component helpers
 
-Pipeline-agnostic shell + Python helpers consumed by both the GitHub Actions
-PR gates (`.github/workflows/check-rendered-specs.yml`) and the ADO
+Pipeline-agnostic shell + Python helpers consumed by the GitHub Actions
+PR gates (`.github/workflows/check-rendered-specs.yml`), the ADO
 Control Tower integration pipeline
-(`.github/workflows/ado/templates/sources-upload-stages.yml`).
+(`.github/workflows/ado/templates/sources-upload-stages.yml`), and the ADO
+PR package-build check
+(`.github/workflows/ado/templates/pr-package-build-stages.yml`).
 
 | Script | Purpose |
 | ------ | ------- |
@@ -28,3 +30,4 @@ Control Tower integration pipeline
 
 - `check-rendered-specs.yml` `render` job → `compute_change_set.sh`
 - `sources-upload-stages.yml` "Prepare change set" step → `compute_change_set.sh`
+- `pr-package-build-stages.yml` "Prepare change set" step → `compute_change_set.sh`
