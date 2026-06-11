@@ -65,7 +65,7 @@ jobs:
     steps:
       # --- Trusted base branch (tools, scripts, container config) ---
       - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.repo }}
           ref: "4.0"
@@ -73,7 +73,7 @@ jobs:
 
       # --- PR head (untrusted data — TOML configs, overlays, locks) ---
       - name: Checkout PR head (data)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.pr-head-repo }}
           ref: ${{ inputs.pr-head-sha }}
@@ -201,7 +201,7 @@ jobs:
       pull-requests: write # Post/update/delete drift comments on PRs
     steps:
       - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.repo }}
           ref: "4.0"
@@ -279,7 +279,7 @@ jobs:
 
       # --- Trusted base branch (tools, scripts, container config) ---
       - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.repo }}
           ref: "4.0"
@@ -287,7 +287,7 @@ jobs:
 
       # --- PR head (untrusted data — TOML configs, overlays, specs) ---
       - name: Checkout PR head (data)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.pr-head-repo }}
           ref: ${{ inputs.pr-head-sha }}
@@ -486,7 +486,7 @@ jobs:
       pull-requests: write # Post/update/delete drift comments on PRs
     steps:
       - name: Checkout base (trusted)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           repository: ${{ inputs.repo }}
           ref: "4.0"
