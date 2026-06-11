@@ -17,7 +17,7 @@ BuildRequires:  glibc-lang
 elixir programming language
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 export LANG="en_US.UTF-8"
