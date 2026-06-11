@@ -1,0 +1,129 @@
+From e3884eb262fc465ef815d8dff460d38053a9486b Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Mon, 12 May 2025 16:21:23 +0200
+Subject: [PATCH 52/59] Red Hat 9 FIPS indicator defines
+
+---
+ include/openssl/evp.h           | 15 +++++++++++++++
+ include/openssl/kdf.h           |  4 ++++
+ util/perl/OpenSSL/paramnames.pm |  7 +++++++
+ 3 files changed, 26 insertions(+)
+
+diff --git a/include/openssl/evp.h b/include/openssl/evp.h
+index e5da1e6415..3849c1779e 100644
+--- a/include/openssl/evp.h
++++ b/include/openssl/evp.h
+@@ -779,6 +779,10 @@ void EVP_CIPHER_CTX_set_flags(EVP_CIPHER_CTX *ctx, int flags);
+ void EVP_CIPHER_CTX_clear_flags(EVP_CIPHER_CTX *ctx, int flags);
+ int EVP_CIPHER_CTX_test_flags(const EVP_CIPHER_CTX *ctx, int flags);
+ 
++# define EVP_CIPHER_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_CIPHER_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_CIPHER_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
++
+ __owur int EVP_EncryptInit(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *cipher,
+                            const unsigned char *key, const unsigned char *iv);
+ __owur int EVP_EncryptInit_ex(EVP_CIPHER_CTX *ctx,
+@@ -850,6 +854,10 @@ __owur int EVP_CipherPipelineFinal(EVP_CIPHER_CTX *ctx,
+ __owur int EVP_CipherFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *outm,
+                               int *outl);
+ 
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_SIGNATURE_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
++
+ __owur int EVP_SignFinal(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+                          EVP_PKEY *pkey);
+ __owur int EVP_SignFinal_ex(EVP_MD_CTX *ctx, unsigned char *md, unsigned int *s,
+@@ -1249,6 +1257,9 @@ void EVP_MD_do_all_provided(OSSL_LIB_CTX *libctx,
+                             void *arg);
+ 
+ /* MAC stuff */
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_MAC_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
+ 
+ EVP_MAC *EVP_MAC_fetch(OSSL_LIB_CTX *libctx, const char *algorithm,
+                        const char *properties);
+@@ -1826,6 +1837,10 @@ OSSL_DEPRECATEDIN_3_0 size_t EVP_PKEY_meth_get_count(void);
+ OSSL_DEPRECATEDIN_3_0 const EVP_PKEY_METHOD *EVP_PKEY_meth_get0(size_t idx);
+ # endif
+ 
++# define EVP_PKEY_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_PKEY_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_PKEY_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
++
+ EVP_KEYMGMT *EVP_KEYMGMT_fetch(OSSL_LIB_CTX *ctx, const char *algorithm,
+                                const char *properties);
+ int EVP_KEYMGMT_up_ref(EVP_KEYMGMT *keymgmt);
+diff --git a/include/openssl/kdf.h b/include/openssl/kdf.h
+index 0983230a48..86171635ea 100644
+--- a/include/openssl/kdf.h
++++ b/include/openssl/kdf.h
+@@ -63,6 +63,10 @@ int EVP_KDF_names_do_all(const EVP_KDF *kdf,
+ # define EVP_KDF_HKDF_MODE_EXTRACT_ONLY        1
+ # define EVP_KDF_HKDF_MODE_EXPAND_ONLY         2
+ 
++# define EVP_KDF_REDHAT_FIPS_INDICATOR_UNDETERMINED 0
++# define EVP_KDF_REDHAT_FIPS_INDICATOR_APPROVED     1
++# define EVP_KDF_REDHAT_FIPS_INDICATOR_NOT_APPROVED 2
++
+ #define EVP_KDF_SSHKDF_TYPE_INITIAL_IV_CLI_TO_SRV     65
+ #define EVP_KDF_SSHKDF_TYPE_INITIAL_IV_SRV_TO_CLI     66
+ #define EVP_KDF_SSHKDF_TYPE_ENCRYPTION_KEY_CLI_TO_SRV 67
+diff --git a/util/perl/OpenSSL/paramnames.pm b/util/perl/OpenSSL/paramnames.pm
+index 059b489735..5a1864309d 100644
+--- a/util/perl/OpenSSL/paramnames.pm
++++ b/util/perl/OpenSSL/paramnames.pm
+@@ -143,6 +143,8 @@ my %params = (
+     'CIPHER_PARAM_FIPS_ENCRYPT_CHECK' =>   "encrypt-check", # int
+     'CIPHER_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
+     'CIPHER_PARAM_ALGORITHM_ID' =>         '*ALG_PARAM_ALGORITHM_ID',
++    #Old RedHat FIPS provider compatibility
++    'CIPHER_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator", # int
+     # Historically, CIPHER_PARAM_ALGORITHM_ID_PARAMS_OLD was used.  For the
+     # time being, the old libcrypto functions will use both, so old providers
+     # continue to work.
+@@ -190,6 +192,7 @@ my %params = (
+     'MAC_PARAM_SIZE' =>             "size",                     # size_t
+     'MAC_PARAM_BLOCK_SIZE' =>       "block-size",               # size_t
+     'MAC_PARAM_TLS_DATA_SIZE' =>    "tls-data-size",            # size_t
++    'MAC_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator",    # size_t
+     'MAC_PARAM_FIPS_NO_SHORT_MAC' =>'*PROV_PARAM_NO_SHORT_MAC',
+     'MAC_PARAM_FIPS_KEY_CHECK' =>   '*PKEY_PARAM_FIPS_KEY_CHECK',
+     'MAC_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
+@@ -234,6 +237,7 @@ my %params = (
+     'KDF_PARAM_X942_SUPP_PUBINFO' =>    "supp-pubinfo",
+     'KDF_PARAM_X942_SUPP_PRIVINFO' =>   "supp-privinfo",
+     'KDF_PARAM_X942_USE_KEYBITS' =>     "use-keybits",
++    'KDF_PARAM_REDHAT_FIPS_INDICATOR' =>     "redhat-fips-indicator",
+     'KDF_PARAM_HMACDRBG_ENTROPY' =>     "entropy",
+     'KDF_PARAM_HMACDRBG_NONCE' =>       "nonce",
+     'KDF_PARAM_THREADS' =>        "threads",                # uint32_t
+@@ -474,6 +478,7 @@ my %params = (
+     'SIGNATURE_PARAM_MGF1_DIGEST' =>          '*PKEY_PARAM_MGF1_DIGEST',
+     'SIGNATURE_PARAM_MGF1_PROPERTIES' =>      '*PKEY_PARAM_MGF1_PROPERTIES',
+     'SIGNATURE_PARAM_DIGEST_SIZE' =>          '*PKEY_PARAM_DIGEST_SIZE',
++    'SIGNATURE_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator",
+     'SIGNATURE_PARAM_NONCE_TYPE' =>           "nonce-type",
+     'SIGNATURE_PARAM_INSTANCE' =>             "instance",
+     'SIGNATURE_PARAM_CONTEXT_STRING' =>       "context-string",
+@@ -508,6 +513,7 @@ my %params = (
+     'ASYM_CIPHER_PARAM_FIPS_RSA_PKCS15_PAD_DISABLED' => '*PROV_PARAM_RSA_PKCS15_PAD_DISABLED',
+     'ASYM_CIPHER_PARAM_FIPS_KEY_CHECK' =>           '*PKEY_PARAM_FIPS_KEY_CHECK',
+     'ASYM_CIPHER_PARAM_FIPS_APPROVED_INDICATOR' =>  '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
++    'ASYM_CIPHER_PARAM_REDHAT_FIPS_INDICATOR' =>    "redhat-fips-indicator",
+ 
+ # Encoder / decoder parameters
+ 
+@@ -541,6 +547,7 @@ my %params = (
+ 
+ # KEM parameters
+     'KEM_PARAM_OPERATION' =>            "operation",
++    'KEM_PARAM_REDHAT_FIPS_INDICATOR' => "redhat-fips-indicator",
+     'KEM_PARAM_IKME' =>                 "ikme",
+     'KEM_PARAM_FIPS_KEY_CHECK' =>       '*PKEY_PARAM_FIPS_KEY_CHECK',
+     'KEM_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
+-- 
+2.51.0
+
