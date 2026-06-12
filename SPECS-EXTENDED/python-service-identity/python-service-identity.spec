@@ -26,6 +26,11 @@ BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
+# Runtime dependencies are needed in the build chroot for %%pyproject_check_import.
+BuildRequires:  python3-attrs
+BuildRequires:  python3-cryptography
+BuildRequires:  python3-pyasn1
+BuildRequires:  python3-pyasn1-modules
 
 %global common_description %{expand:
 Use this package to verify that a PyCA cryptography certificate is valid for a
@@ -62,7 +67,7 @@ Requires:       python3-pyasn1-modules
 %pyproject_check_import
 
 %files -n python3-service-identity -f %{pyproject_files}
-%license LICENSE
+%license %{python3_sitelib}/service_identity-%{version}.dist-info/licenses/LICENSE
 %doc README.md
 
 %changelog
