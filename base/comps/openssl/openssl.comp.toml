@@ -79,3 +79,11 @@ type = "file-add"
 file = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
 source = "0037-FIPS-TLS-Enforce-EMS-in-TLS-1.2-NOTE.patch"
 description = "Add rebased 0037 that applies cleanly without patch 0018"
+
+# Use virtual provide so openssl-libs is satisfied by any FIPS provider
+# (openssl-fips-provider or SymCrypt-OpenSSL).
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+regex = 'Requires: openssl-fips-provider'
+replacement = 'Requires: fips-provider(openssl)'
+description = "Depend on virtual fips-provider(openssl) instead of concrete package"

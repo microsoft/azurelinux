@@ -303,3 +303,10 @@ section = "%files"
 regex = '%config\(noreplace\) %\{_sysconfdir\}/pki/tls/fipsmodule\.cnf'
 replacement = "%config(noreplace) %{_sysconfdir}/pki/tls/fipsmodule.cnf\n%config(noreplace) %{_sysconfdir}/pki/tls/openssl.d/openssl-fips-provider.cnf"
 description = "Add drop-in config to %files"
+
+# Virtual provide for swappable FIPS providers (openssl-fips-provider vs SymCrypt-OpenSSL).
+[[components.openssl-fips-provider.overlays]]
+type = "spec-search-replace"
+regex = 'Requires: openssl-libs%\{\?_isa\}'
+replacement = "Requires: openssl-libs%{?_isa}\nProvides: fips-provider(openssl)\nConflicts: SymCrypt-OpenSSL"
+description = "Add virtual provide and conflict with SymCrypt-OpenSSL"
