@@ -15,6 +15,12 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-hatch-fancy-pypi-readme
 BuildRequires:  python3-hatch-vcs
 BuildRequires:  python3-hatchling
+# hatchling's runtime deps are not pulled into the minimal build chroot
+# automatically, so list them explicitly (matches other Azure Linux
+# hatchling-based packages, e.g. python-argcomplete, python-humanize).
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 

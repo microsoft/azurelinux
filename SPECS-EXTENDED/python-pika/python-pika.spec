@@ -48,7 +48,10 @@ Summary:        %{summary}
 
 %if %{with check}
 %check
-%pyproject_check_import
+# Exclude the optional gevent/tornado/twisted connection adapters: those
+# third-party libraries are not build dependencies, so importing those
+# adapter modules would fail. pika's core only needs the stdlib.
+%pyproject_check_import -e '*.gevent_connection' -e '*.tornado_connection' -e '*.twisted_connection'
 %endif
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}

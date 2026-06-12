@@ -64,7 +64,11 @@ sed -i -e 's/configparser.SafeConfigParser()/configparser.ConfigParser()/' \
 
 %if %{with check}
 %check
-%{py3_test_envvars} %{python3} -m unittest discover -v %{pypi_name}.tests
+# Upstream ships its unit tests inside the crochet.tests subpackage, but the
+# built wheel does not install that subpackage, so 'unittest discover
+# crochet.tests' is not importable in the build root. Fall back to verifying
+# the module imports cleanly with its real dependencies (Twisted, wrapt).
+%pyproject_check_import
 %endif
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
