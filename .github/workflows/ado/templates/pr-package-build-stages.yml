@@ -71,6 +71,21 @@ stages:
               fi
             displayName: "Ensure full git history"
 
+          # azldev opens the repo with go-git, which rejects a config that
+          # declares the `worktreeconfig` extension while
+          # core.repositoryformatversion is still 0:
+          #   "core.repositoryformatversion does not support extension: worktreeconfig"
+          # Native git tolerates this, and the ADO agent checkout leaves the
+          # extension set, so strip it before any azldev invocation. Each CI run
+          # is a fresh checkout so this is safe and self-contained.
+          - script: |
+              set -euo pipefail
+              if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
+                echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
+                git config --unset-all extensions.worktreeConfig || true
+              fi
+            displayName: "Normalize git config for azldev (go-git)"
+
           - script: |
               set -euo pipefail
 
