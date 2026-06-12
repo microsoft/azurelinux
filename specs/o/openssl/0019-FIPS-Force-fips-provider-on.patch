@@ -1,19 +1,31 @@
 From 65f1048b6ac45bf44316028aff9736167659ba43 Mon Sep 17 00:00:00 2001
 From: Tobias Brick <tobiasb@microsoft.com>
-Date: Thu, 11 Jun 2026 17:45:07 +0000
-Subject: [PATCH] FIPS: Force fips provider on
+Date: Thu, 12 Jun 2026 03:55:00 +0000
+Subject: [PATCH] FIPS: activate FIPS provider in kernel FIPS mode
 
-Activate fips and base providers when kernel FIPS mode is detected.
-Relies on openssl.d drop-in for provider config (fips_sect with
-module-mac) rather than loading fips_local.cnf directly.
+When /proc/sys/crypto/fips_enabled is set, look up the [fips_provider]
+section in the already-parsed openssl config. This section is supplied
+by whichever FIPS provider package is installed (e.g.,
+openssl-fips-provider or SymCrypt-OpenSSL) via an openssl.d/ drop-in.
+
+The [fips_provider] section must contain exactly one entry mapping a
+provider name to its config section. If zero or more than one entry is
+found, initialization fails hard.
+
+The provider is already configured (params, MAC, etc.) by the normal
+provider_sect processing that runs before this code. We just need to
+force-activate it and set fips=yes properties.
+
+After activating the FIPS provider, the base provider is activated and
+default properties are set to fips=yes.
 
 Patch-name: 0019-FIPS-Force-fips-provider-on.patch
 ---
- crypto/provider_conf.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ crypto/provider_conf.c | 49 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
-index 9649517..5eff4fe 100644
+index 9649517..b3e7c4a 100644
 --- a/crypto/provider_conf.c
 +++ b/crypto/provider_conf.c
 @@ -10,6 +10,7 @@
@@ -42,24 +54,57 @@ index 9649517..5eff4fe 100644
      }
      CRYPTO_THREAD_unlock(pcgbl->lock);
  
-@@ -420,6 +423,17 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -420,6 +423,51 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
-+
 +    if (ossl_get_kernel_fips_flag() != 0) {
 +        OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
++        STACK_OF(CONF_VALUE) *provlist;
++        CONF_VALUE *pval;
++        OSSL_PROVIDER *prov;
++        int n;
 +
-+        if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
++        OSSL_TRACE(CONF, "Kernel FIPS mode detected, looking for [fips_provider] config\n");
++
++        provlist = NCONF_get_section(cnf, "fips_provider");
++        if (provlist == NULL || sk_CONF_VALUE_num(provlist) == 0) {
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "Kernel FIPS mode is active but no [fips_provider] section "
++                           "found in OpenSSL configuration. Install a FIPS provider "
++                           "package (e.g., openssl-fips-provider or SymCrypt-OpenSSL).");
 +            return 0;
++        }
++
++        n = sk_CONF_VALUE_num(provlist);
++        if (n != 1) {
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "Kernel FIPS mode is active but [fips_provider] section "
++                           "declares %d providers (expected exactly 1). "
++                           "Only one FIPS provider may be installed.", n);
++            return 0;
++        }
++
++        pval = sk_CONF_VALUE_value(provlist, 0);
++        OSSL_TRACE1(CONF, "Activating FIPS provider '%s'\n", pval->name);
++
++        prov = OSSL_PROVIDER_load(libctx, pval->name);
++        if (prov == NULL) {
++            ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                           "Failed to activate FIPS provider '%s'. "
++                           "Module may be missing or integrity check failed.",
++                           pval->name);
++            return 0;
++        }
++
 +        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
 +            return 0;
 +        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
 +            return 0;
 +    }
++
      return 1;
  }
  
 -- 
 2.52.0
-

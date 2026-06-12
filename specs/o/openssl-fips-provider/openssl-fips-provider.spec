@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: OpenSSL FIPS 140-3 provider module
 Name: openssl-fips-provider
 Version: 3.5.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
 Source3: genpatches
