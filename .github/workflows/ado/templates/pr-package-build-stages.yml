@@ -78,6 +78,9 @@ stages:
           # Native git tolerates this, and the ADO agent checkout leaves the
           # extension set, so strip it before any azldev invocation. Each CI run
           # is a fresh checkout so this is safe and self-contained.
+          # TODO: remove this step once azldev no longer needs the workaround
+          # (go-git v6 fixes the underlying bug):
+          # https://github.com/microsoft/azure-linux-dev-tools/issues/241
           - script: |
               set -euo pipefail
               if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
@@ -204,7 +207,7 @@ stages:
               trap on_exit EXIT
 
               echo "##[group]Building ${#comps[@]} component(s)"
-              AZLDEV_ALLOW_ROOT=1 azldev component build \
+              AZLDEV_ALLOW_ROOT=1 azldev component build -v \
                 --local-repo-with-publish ./base/out \
                 "${build_args[@]}"
               echo "##[endgroup]"
