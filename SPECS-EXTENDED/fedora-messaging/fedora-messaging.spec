@@ -13,7 +13,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 License:        GPL-2.0-or-later
 URL:            https://github.com/fedora-infra/fedora-messaging
-Source0:        https://files.pythonhosted.org/packages/source/f/%{pkgname}/%{srcname}-%{version}.tar.gz
+Source0:        %{url}/releases/download/v%{version}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
 

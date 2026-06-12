@@ -3609,7 +3609,7 @@
         "other": {
           "name": "fedora-messaging",
           "version": "3.9.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/f/fedora-messaging/fedora_messaging-3.9.0.tar.gz"
+          "downloadUrl": "https://github.com/fedora-infra/fedora-messaging/releases/download/v3.9.0/fedora_messaging-3.9.0.tar.gz"
         }
       }
     },
