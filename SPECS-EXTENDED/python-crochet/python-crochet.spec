@@ -22,6 +22,10 @@ BuildRequires:  python3-wheel
 
 %if %{with check}
 BuildRequires:  python3-twisted
+# Twisted imports typing_extensions at runtime but python3-twisted does not
+# pull it into the minimal %%check chroot, so require it explicitly for the
+# import check.
+BuildRequires:  python3-typing-extensions
 BuildRequires:  python3-wrapt
 %endif
 

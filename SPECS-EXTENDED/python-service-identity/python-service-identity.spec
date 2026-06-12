@@ -18,8 +18,11 @@ BuildRequires:  python3-hatchling
 # hatchling's runtime deps are not pulled into the minimal build chroot
 # automatically, so list them explicitly (matches other Azure Linux
 # hatchling-based packages, e.g. python-argcomplete, python-humanize).
+# hatch-vcs resolves the version via setuptools_scm (read from the sdist
+# PKG-INFO), so it is required too.
 BuildRequires:  python3-pathspec
 BuildRequires:  python3-pluggy
+BuildRequires:  python3-setuptools_scm
 BuildRequires:  python3-trove-classifiers
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel

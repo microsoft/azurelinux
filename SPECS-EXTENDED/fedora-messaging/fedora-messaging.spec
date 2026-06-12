@@ -35,6 +35,10 @@ BuildRequires:  python3-requests
 BuildRequires:  python3-service-identity
 BuildRequires:  python3-tomli
 BuildRequires:  python3-twisted
+# Twisted imports typing_extensions but python3-twisted does not pull it into
+# the minimal %%check chroot; required for the offline unit tests that import
+# the package's Twisted-based modules.
+BuildRequires:  python3-typing-extensions
 
 Requires:       python3-%{pkgname} = %{version}-%{release}
 
