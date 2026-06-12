@@ -84,16 +84,18 @@ install -D -p -m 0644 config.toml.example %{buildroot}%{_sysconfdir}/fedora-mess
 install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.service
 
 %check
-%pyproject_check_import
-# Exclude broker/network integration tests and Twisted-reactor tests that are not
-# reliable in Azure Linux's network-isolated builders; keep pure offline units.
+%pyproject_check_import -e '*.api' -e '*.cli'
+# Only run the offline unit tests that do not import the Twisted reactor.
+# tests/unit/test_cli.py, test_example.py and test_testing.py pull in
+# fedora_messaging.api/cli, which import the Twisted reactor and therefore
+# require Automat -- a Twisted runtime dependency that is not available as an
+# RPM in the Azure Linux build environment (upstream Twisted pip-installs it
+# in its own test venv). The retained tests cover configuration parsing,
+# message schema/validation, and schema utilities.
 %pytest -vv \
-    tests/unit/test_cli.py \
     tests/unit/test_config.py \
-    tests/unit/test_example.py \
     tests/unit/test_message.py \
-    tests/unit/test_schema_utils.py \
-    tests/unit/test_testing.py
+    tests/unit/test_schema_utils.py
 
 %files
 %license LICENSES/GPL-2.0-or-later.txt
@@ -104,7 +106,7 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 %{_unitdir}/fm-consumer@.service
 
 %files -n python3-%{pkgname} -f %{pyproject_files}
-%license LICENSES/GPL-2.0-or-later.txt
+%license %{python3_sitelib}/%{srcname}-%{version}.dist-info/LICENSES/GPL-2.0-or-later.txt
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-1
