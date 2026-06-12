@@ -56,7 +56,7 @@ Requires:       python3-pyasn1-modules
 
 %install
 %pyproject_install
-%pyproject_save_files -l service_identity
+%pyproject_save_files service_identity
 
 %check
 %pyproject_check_import

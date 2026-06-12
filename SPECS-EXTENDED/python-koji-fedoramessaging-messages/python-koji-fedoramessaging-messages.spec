@@ -47,7 +47,7 @@ Requires:       python3-fedora-messaging
 
 %install
 %pyproject_install
-%pyproject_save_files -L %{modname}
+%pyproject_save_files %{modname}
 
 %if %{with check}
 %check

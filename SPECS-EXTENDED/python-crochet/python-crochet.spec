@@ -72,7 +72,9 @@ sed -i -e 's/configparser.SafeConfigParser()/configparser.ConfigParser()/' \
 # built wheel does not install that subpackage, so 'unittest discover
 # crochet.tests' is not importable in the build root. Fall back to verifying
 # the module imports cleanly with its real dependencies (Twisted, wrapt).
-%pyproject_check_import
+# Exclude crochet.mypy: it is an optional mypy type-checker plugin that
+# imports mypy, which is not a runtime dependency.
+%pyproject_check_import -e '*.mypy'
 %endif
 
 %files -n python3-%{pypi_name} -f %{pyproject_files}
