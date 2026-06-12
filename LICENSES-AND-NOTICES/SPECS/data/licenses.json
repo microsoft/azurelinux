@@ -55,6 +55,7 @@
                 "annobin",
                 "ansible-freeipa",
                 "archivemount",
+                "argparse-manpage",
                 "arptables",
                 "arpwatch",
                 "asio",
