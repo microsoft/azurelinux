@@ -544,6 +544,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "argparse-manpage",
+          "version": "4.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse_manpage/argparse_manpage-4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "args4j",
           "version": "2.33",
           "downloadUrl": "https://github.com/kohsuke/args4j/archive/args4j-site-2.33.tar.gz"
@@ -13642,8 +13652,8 @@
         "type": "other",
         "other": {
           "name": "mock",
-          "version": "5.6",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-5.6-1.tar.gz"
+          "version": "6.7",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-6.7-1.tar.gz"
         }
       }
     },
@@ -22204,7 +22214,7 @@
         "other": {
           "name": "python-argparse-manpage",
           "version": "1.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse-manpage/argparse-manpage-1.5.tar.gz"
+          "downloadUrl": "https://github.com/praiskup/argparse-manpage/archive/refs/tags/v4.7.tar.gz"
         }
       }
     },
@@ -25323,8 +25333,8 @@
         "type": "other",
         "other": {
           "name": "python-templated-dictionary",
-          "version": "1.4",
-          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.4-1.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.6-1.tar.gz"
         }
       }
     },
