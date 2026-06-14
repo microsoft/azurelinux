@@ -1,13 +1,14 @@
 Summary:        A hierarchical configuration system
 Name:           python-omegaconf
 Version:        2.3.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.org/project/omegaconf/
 Source0:        https://github.com/omry/omegaconf/archive/refs/tags/v%{version}.tar.gz#/%{name}-%version.tar.gz
+Patch0:         upstream-fix-for-ptests.patch
 %if 0%{?with_check}
 BuildRequires:  python3-pip
 %endif
@@ -28,7 +29,7 @@ OmegaConf is a hierarchical configuration system, with support for merging confi
 providing a consistent API regardless of hwo the configuration was created
 
 %prep
-%autosetup -n omegaconf-%{version}
+%autosetup -p1 -n omegaconf-%{version}
 
 %build
 %py3_build
@@ -37,14 +38,25 @@ providing a consistent API regardless of hwo the configuration was created
 %py3_install
 
 %check
-pip3 install mock wheel
-#%python3 setup.py test
+%{python3} -m pip install --disable-pip-version-check --no-cache-dir \
+    --target .pytest-deps \
+    -r requirements/base.txt \
+    "pytest<8" \
+    pytest-mock \
+    attrs \
+    pydevd
+
+PYTHONPATH=$PWD/.pytest-deps${PYTHONPATH:+:$PYTHONPATH} \
+    %{python3} -m pytest tests
 
 %files -n python3-omegaconf
 %license LICENSE
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 03 2026 Akhila Guruju <v-guakhila@microsoft.com> - 2.3.0-2
+- Added and fixed ptest.
+
 * Fri May 10 2024 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 2.3.0-1
 - Original version for Azure Linux.
 - license verified.
