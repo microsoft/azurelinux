@@ -219,7 +219,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.cim-schema]
 [components.cjose]
 [components.cjson]
-[components.clamav]
 [components.classloader-leak-test-framework]
 [components.cldr-emoji-annotation]
 [components.clevis]

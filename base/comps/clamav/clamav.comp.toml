@@ -1,0 +1,92 @@
+[components.clamav]
+
+# Fedora has not packaged ClamAV 1.5.x yet (still at 1.4.4). AZL requires
+# 1.5.2. We create a -norar tarball (stripped of GPL-incompatible unrar code)
+# from the upstream release and supply it via source-files. The tarball needs
+# to be hosted at a stable URL for CI — use the AZL staging lookaside.
+[[components.clamav.source-files]]
+filename = "clamav-1.5.2-norar.tar.xz"
+hash = "c71535e387eeef90695c3e743c4b241b05b1034351d13d48c248479b8c5a471c10f9452f25bf53ea4e081744aef822adc6619a4e96dee23def422d83db63819d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "http://localhost:18080/clamav-1.5.2-norar.tar.xz" }
+
+[[components.clamav.overlays]]
+description = "Update to ClamAV 1.5.2 (required feature not available in 1.4.x; Fedora has not packaged 1.5.x yet)"
+type = "spec-set-tag"
+tag = "Version"
+value = "1.5.2"
+
+[[components.clamav.overlays]]
+description = "Replace default_confs patch with version updated for 1.5.x (CONFDIR macros moved from platform.h.in to common/optparser.h)"
+type = "file-remove"
+file = "clamav-default_confs.patch"
+
+[[components.clamav.overlays]]
+description = "Add updated default_confs patch for 1.5.x"
+type = "file-add"
+source = "clamav-default_confs.patch"
+file = "clamav-default_confs.patch"
+
+[[components.clamav.overlays]]
+description = "Remove endian wrapper patch — upstreamed in ClamAV 1.5.x (uses EC32() with temp variables)"
+type = "spec-remove-tag"
+tag = "Patch7"
+
+[[components.clamav.overlays]]
+description = "Remove %patch -P7 application line (endian patch removed above)"
+type = "spec-search-replace"
+section = "%prep"
+regex = '%patch -P7 -p1 -b .big-endian'
+replacement = ""
+
+[[components.clamav.overlays]]
+description = "Remove rust dependency version patch — targets 1.4.3 Cargo.toml layout, not applicable to 1.5.2"
+type = "patch-remove"
+file = "clamav-rust-dependency-versions.patch"
+
+[[components.clamav.overlays]]
+description = "Remove %patch -P8 application line (rust dependency patch removed above)"
+type = "spec-search-replace"
+section = "%prep"
+regex = '%patch -P8 -p1 -b .rust-dependencies'
+replacement = ""
+
+# --- Rust dependency handling ---
+# ClamAV 1.5.2 ships vendored Rust crates in .cargo/vendor/ with a
+# .cargo/config.toml that redirects all sources to the vendored dir.
+# The AZL4 mock chroot defines %fedora=43, so the Fedora conditional
+# paths execute: %cargo_prep (overwrites .cargo/config.toml for system
+# crates) and %cargo_generate_buildrequires (emits dynamic BRs for
+# system Rust RPMs that don't all exist in AZL4).
+# We disable both so the build uses the upstream-vendored crates directly,
+# matching AZL3's approach.
+
+[[components.clamav.overlays]]
+description = "Disable cargo_prep block in %prep — use vendored .cargo/vendor from upstream source"
+type = "spec-search-replace"
+section = "%prep"
+regex = '%if 0%[{][?]fedora[}] [|][|] 0%[{][?]rhel[}] >= 9'
+replacement = "%if 0"
+
+[[components.clamav.overlays]]
+description = "Disable %cargo_generate_buildrequires to prevent dynamic Rust crate BRs"
+type = "spec-search-replace"
+section = "%generate_buildrequires"
+regex = '%cargo_generate_buildrequires'
+replacement = "# cargo_generate_buildrequires disabled — using vendored Rust deps"
+
+[[components.clamav.overlays]]
+description = "Update libfreshclam soname glob (3 -> 4) for ClamAV 1.5.x ABI bump"
+type = "spec-search-replace"
+section = "%files"
+package = "freshclam"
+regex = 'libfreshclam[.]so[.]3'
+replacement = "libfreshclam.so.4"
+
+[[components.clamav.overlays]]
+description = "Add /etc/certs/clamav.crt to %files (new in ClamAV 1.5.x)"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%{_sysconfdir}/certs/clamav.crt",
+]

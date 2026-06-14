@@ -28,8 +28,8 @@
 
 Summary:    End-user tools for the Clam Antivirus scanner
 Name:       clamav
-Version:    1.4.3
-Release: 7%{?dist}
+Version: 1.5.2
+Release: 8%{?dist}
 License:    %{?with_unrar:proprietary}%{!?with_unrar:GPL-2.0-only}
 URL:        https://www.clamav.net/
 %if %{with unrar}
@@ -77,13 +77,11 @@ Patch5:     clamav-clamonacc-service.patch
 # Allow freshclam service to run if cron.d file is present
 Patch6:     clamav-freshclam.service.patch
 # Debian patch to fix big-endian
-Patch7:     https://salsa.debian.org/clamav-team/clamav/-/raw/unstable/debian/patches/libclamav-pe-Use-endian-wrapper-in-more-places.patch
 # - Update the image crate dependency to 0.25, the current release,
 #   https://github.com/Cisco-Talos/clamav/pull/1366/commits/24d1341e8e34aa325ac03718121e33a3b4e5b75e,
 #   allowing 0.24 for backwards-compatibility with vendored dependencies in EPEL8
 # - Allow version 1.0 of the hex-literal crate dependency; not suitable for
 #   upstream yet due to MSRV
-Patch8:     clamav-rust-dependency-versions.patch
 
 BuildRequires:  cmake3
 BuildRequires:  gettext-devel
@@ -331,7 +329,7 @@ This package contains files which are needed to run the clamav-milter.
 
 %prep
 %setup -q -n %{name}-%{version}%{?prerelease}
-%if 0%{?fedora} || 0%{?rhel} >= 9
+%if 0
 # EL8 and earlier do not have the Rust cargo dependencies that are
 # defined by the generate_buildrequires stage in EL9 and later, so the
 # vendored packages included in the ClamAV sources suffice.
@@ -349,8 +347,8 @@ cd ..
 %patch -P2 -p1 -b .private
 %patch -P5 -p1 -b .clamonacc-service
 %patch -P6 -p1 -b .freshclam-service
-%patch -P7 -p1 -b .big-endian
-%patch -P8 -p1 -b .rust-dependencies
+
+
 
 install -p -m0644 %{SOURCE300} clamav-milter/
 
@@ -373,12 +371,12 @@ m clamilt virusgroup
 m clamilt clamscan
 EOF
 
-%if 0%{?fedora} || 0%{?rhel} >= 9
+%if 0
 %generate_buildrequires
 # The generate_buildrequires stage doesn't exist prior to EL9, so this
 # section is conditionally removed in these build environments.
 cd libclamav_rust
-%cargo_generate_buildrequires
+# cargo_generate_buildrequires disabled — using vendored Rust deps
 %endif
 
 %build
@@ -590,6 +588,7 @@ done
 %attr(0750,root,root) %dir %{quarantinedir}
 
 
+%{_sysconfdir}/certs/clamav.crt
 %files lib
 # Licenses for statically linked Rust dependencies in libclamav
 %license LICENSES.dependencies
@@ -631,7 +630,7 @@ done
 
 %files freshclam
 %{_bindir}/freshclam
-%{_libdir}/libfreshclam.so.3*
+%{_libdir}/libfreshclam.so.4*
 %{_mandir}/*/freshclam*
 %{_unitdir}/clamav-freshclam.service
 %{_unitdir}/clamav-freshclam-once.service
