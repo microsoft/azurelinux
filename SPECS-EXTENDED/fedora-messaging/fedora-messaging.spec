@@ -110,6 +110,6 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.
 - Omit Fedora-specific broker profiles (fedora.toml, fedora.stg.toml) and bundled cert/key files; ship only the generic example config.

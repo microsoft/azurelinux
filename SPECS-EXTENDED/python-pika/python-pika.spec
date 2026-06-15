@@ -60,5 +60,5 @@ Summary:        %{summary}
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.3.2-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.

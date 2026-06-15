@@ -2,7 +2,7 @@
 
 Name:           koji-fedoramessaging
 Version:        1.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Enable Koji to send Fedora Messaging messages
 License:        GPL-3.0-only
 Vendor:         Microsoft Corporation
@@ -36,7 +36,7 @@ install -D -p -m 0644 koji-fedoramessaging/koji-fedoramessaging.py \
 %doc README.md
 
 %changelog
-* Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.1.2-1
+* Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.1.2-2
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
 

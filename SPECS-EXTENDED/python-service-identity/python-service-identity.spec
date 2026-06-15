@@ -72,5 +72,5 @@ Requires:       python3-pyasn1-modules
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 24.2.0-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.

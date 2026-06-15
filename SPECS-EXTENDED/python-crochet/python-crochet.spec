@@ -83,5 +83,5 @@ sed -i -e 's/configparser.SafeConfigParser()/configparser.ConfigParser()/' \
 
 %changelog
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 2.1.1-1
-- Initial Azure Linux import from Fedora 41 (license: MIT).
+- Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.
