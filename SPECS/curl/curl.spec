@@ -22,7 +22,6 @@ Patch10:        CVE-2026-7168.patch
 Patch11:        CVE-2026-5545.patch
 Patch12:        CVE-2026-6253.patch
 Patch13:        CVE-2026-6429.patch
-BuildRequires:  cmake
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
