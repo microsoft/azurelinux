@@ -35,10 +35,10 @@ mkdir -p %{buildroot}%{_libdir}/systemd/system
 install -p -m 644 %{SOURCE1} %{buildroot}%{_libdir}/systemd/system/
 
 %check
-pushd tests
-./rngtestzero.sh
-./rngtesturandom.sh
-popd
+# rngtestjitter.sh is skipped: jitter entropy runtime source
+# (jitterentropy library) is unavailable in the AZL 3.0 build
+# environment. Re-enable once jitterentropy support is added.
+make %{?_smp_mflags} check TESTS="rngtestzero.sh rngtesturandom.sh"
 
 %post
 /sbin/ldconfig
