@@ -15,18 +15,17 @@ BuildRequires:  python3-devel
 
 Requires:       python3-koji-hub
 Requires:       python3-fedora-messaging
-# python3-koji-fedoramessaging-messages provides the rich JSON-schema message
-# classes. It is intentionally only Suggested (not Required) on Azure Linux 3.0:
-# its schemas use JSON Schema draft 2019-09 $anchor references, which the
-# python-jsonschema 2.6.0 shipped in AzL 3.0 cannot resolve. If the package is
-# installed, the hub plugin selects those rich schemas and fedora-messaging
-# validates them on publish -- raising RefResolutionError (not caught by the
-# plugin's ValidationError fallback) and silently dropping task-tree-bearing
-# events (build.state.change with subtasks, task.state.change, etc.). Without
-# it, the plugin falls back to the generic permissive Message schema and all
-# events publish fine. Install it (with python-jsonschema >= 4) on consumers
-# that want schema validation.
-Suggests:       python3-koji-fedoramessaging-messages
+# python3-koji-fedoramessaging-messages (the rich JSON-schema message classes)
+# is intentionally NOT a dependency on Azure Linux 3.0. Its schemas use JSON
+# Schema draft 2019-09 $anchor references, which the python-jsonschema 2.6.0
+# shipped in AzL 3.0 cannot resolve. If it were installed, the hub plugin would
+# select those rich schemas and fedora-messaging would validate them on publish
+# -- raising RefResolutionError (not caught by the plugin's ValidationError
+# fallback) and silently dropping task-tree-bearing events (build.state.change
+# with subtasks, task.state.change, etc.). Without it, the plugin falls back to
+# the generic permissive Message schema and all events publish fine. Consumers
+# that want schema validation can install the package explicitly on a platform
+# with python-jsonschema >= 4.
 
 %description
 Enable Koji to send Fedora Messaging messages.
@@ -51,7 +50,7 @@ install -D -p -m 0644 koji-fedoramessaging/koji-fedoramessaging.py \
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 1.1.2-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified.
-- Suggest (not Require) python3-koji-fedoramessaging-messages: its draft-2019-09
+- Do not depend on python-koji-fedoramessaging-messages: its draft-2019-09
   schemas are unresolvable by AzL 3.0's python-jsonschema 2.6.0.
 
 * Mon Jun 12 2023 Aurelien Bompard <abompard@fedoraproject.org> - 1.1.2-1
