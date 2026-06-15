@@ -1,3 +1,10 @@
 [components.csnappy]
 # Release: 32.20211216git%{shortcommit}%{?dist}
 release = { calculation = "manual" }
+
+# TEMPORARY — CI VALIDATION ONLY. REMOVE BEFORE MERGE.
+# Forces csnappy to rebuild so the ADO PR check has a second, small, fast,
+# GREEN component alongside cpio — proving multiple packages build in one run.
+# `foo` is not a real bcond, so `--without foo` is a harmless no-op (same debug
+# idiom used by dtc).
+build.without = ["foo"]

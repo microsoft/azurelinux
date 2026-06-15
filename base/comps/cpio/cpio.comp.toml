@@ -12,3 +12,20 @@ type = "spec-search-replace"
 section = "%install"
 regex = "rm -f \\$RPM_BUILD_ROOT%\\{_libexecdir\\}/rmt"
 replacement = ""
+
+# ---------------------------------------------------------------------------
+# TEMPORARY — CI VALIDATION ONLY. REMOVE BEFORE MERGE.
+# Intentionally fails the cpio build to validate that the ADO PR package-build
+# pipeline turns the check red and dumps the per-component build logs. This is
+# a deliberate failure, NOT a real change. Comment out this single overlay
+# block to make cpio build green again (e.g. to validate a clean multi-package
+# run alongside csnappy).
+# ---------------------------------------------------------------------------
+[[components.cpio.overlays]]
+description = "TEMP CI-only: intentionally fail the build to validate the ADO PR failure flow (REMOVE before merge)"
+type = "spec-prepend-lines"
+section = "%build"
+lines = [
+    "echo 'INTENTIONAL CI FAILURE: validating ADO PR build-failure detection'",
+    "exit 1",
+]

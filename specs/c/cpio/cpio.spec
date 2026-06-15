@@ -4,7 +4,7 @@
 Summary: A GNU archiving program
 Name: cpio
 Version: 2.15
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 URL: https://www.gnu.org/software/cpio/
 Source0: https://ftp.gnu.org/gnu/cpio/cpio-%{version}.tar.bz2
@@ -73,6 +73,8 @@ Install cpio if you need a program to manage file archives.
 
 
 %build
+echo 'INTENTIONAL CI FAILURE: validating ADO PR build-failure detection'
+exit 1
 autoreconf -fi
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=118112
 CFLAGS="$RPM_OPT_FLAGS -std=gnu17"

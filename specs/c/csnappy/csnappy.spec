@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/csnappy.azl.macros}
+
 # Run valgrind test
 # valgrind is available only on selected arches
 %ifarch %{valgrind_arches}
@@ -19,6 +22,7 @@ Summary:    Snappy compression library ported to C
 License:    BSD-3-Clause
 URL:        https://github.com/zeevt/%{name}
 Source0:    %{url}/archive/%{commit}/%{name}-%{commit}.tar.gz
+Source9999: csnappy.azl.macros
 # Fix parallel tests, <https://github.com/zeevt/csnappy/pull/40>
 Patch0:     csnappy-6c10c305e8dde193546e6b33cf8a785d5dc123e2-Fix-parallel-tests-by-only-testing-the-current-optim.patch
 
