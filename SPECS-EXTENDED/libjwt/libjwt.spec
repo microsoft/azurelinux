@@ -70,7 +70,7 @@ rm -f %{buildroot}%{_bindir}/jwtgen %{buildroot}%{_bindir}/jwtauth
 
 %changelog
 * Wed Jun 10 2026 lakarri <lakarri@microsoft.com> - 1.12.1-1
-- Initial Azure Linux import from Fedora rawhide (license: MPL-2.0).
+- Initial Azure Linux import from the source project (license: same as "License" tag).
 - Required by slurmrestd (Slurm REST API daemon) for JWT-based
   authentication. Tracked via ADO #61504121.
 - License verified.

@@ -3186,6 +3186,7 @@
                 "coreos-cloudinit",
                 "coreos-init",
                 "ignition-flatcar",
+                "libjwt",
                 "python-nocaselist",
                 "rust-afterburn",
                 "update-ssh-keys"
