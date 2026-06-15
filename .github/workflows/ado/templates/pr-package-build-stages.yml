@@ -9,13 +9,15 @@
 #
 # What it does, per PR:
 #   1. Ensure full git history (rpmautospec + change detection need it).
-#   2. Install build tooling (mock + azldev).
+#   2. Install azldev on the host (for change detection) and build the
+#      azldev-runner container (azldev + mock) used for the build itself.
 #   3. Resolve the PR commit range from the merge commit's parents
 #      (^1 = target-branch tip, ^2 = PR head).
 #   4. Compute the changed-component set (shared compute_change_set.sh).
-#   5. `azldev component build` those components, chain-publishing to a local
-#      repo so intra-set dependencies resolve. Any build failure fails the
-#      check; the per-component build logs are dumped on failure.
+#   5. `azldev component build` those components INSIDE the container (mock
+#      hangs when run directly on the OneBranch host), chain-publishing to a
+#      local repo so intra-set dependencies resolve. Any build failure fails
+#      the check; the per-component build logs are dumped on failure.
 #
 # It deliberately does NOT reuse templates/steps/common-steps.yml: that shared
 # step set resolves the commit range via the *previous CI build* (the
@@ -89,15 +91,14 @@ stages:
               fi
             displayName: "Normalize git config for azldev (go-git)"
 
+          # Host needs azldev only for the change-set computation below
+          # (`azldev component changed` + git diff -- no mock). mock is NOT
+          # installed on the host: it hangs when run directly on the OneBranch
+          # agent, so the actual build runs inside the azldev-runner container
+          # (built in the next step), mirroring the GitHub Actions render gate.
           - script: |
               set -euo pipefail
-
-              echo "##[group]Mock"
-              tdnf install -y mock mock-rpmautospec python3-chardet
-              sudo usermod -aG mock "$(whoami)"
-              echo "##[endgroup]"
-
-              echo "##[group]Azldev"
+              echo "##[group]Azldev (host, for change-set)"
               AZLDEV_VERSION=$(cat .azldev-version)
               echo "Installing azldev@${AZLDEV_VERSION}..."
               go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
@@ -107,7 +108,34 @@ stages:
 
               "$go_bin_path/azldev" --version
               echo "##[endgroup]"
-            displayName: "Install dependencies"
+            displayName: "Install host dependencies"
+
+          # Build the azldev-runner image (azldev + mock baked in, runs as the
+          # non-root `builduser`). Same image + Dockerfile the GitHub Actions
+          # render gate uses; mock runs reliably inside it once the privileged
+          # knobs are applied at `docker run` time (see the build step below).
+          # UID is left at the Dockerfile default (1000): the OneBranch agent
+          # runs as root, so we cannot pass `--build-arg UID=$(id -u)` (that is
+          # 0, and `useradd -u 0 builduser` collides with the existing root
+          # user); instead the build step chowns the writable dirs to 1000.
+          # The Dockerfile runs `go install azldev` at image-build time, so it
+          # needs Go module egress. Forward the host's GOPROXY into the image
+          # build: on OneBranch the `internalModuleProxy` feature flag points
+          # the host's Go at the internal proxy and `go env GOPROXY` surfaces
+          # it. Off OneBranch this is just the public default (harmless); an
+          # empty value is treated by Go as "use the default" (see Dockerfile).
+          - script: |
+              set -euo pipefail
+              echo "##[group]Build azldev-runner container"
+              docker build \
+                --build-arg UID=1000 \
+                --build-arg GOPROXY="$(go env GOPROXY)" \
+                --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
+                -t localhost/azldev-runner \
+                -f .github/workflows/containers/azldev-runner.Dockerfile \
+                .github/workflows/containers/
+              echo "##[endgroup]"
+            displayName: "Build azldev runner container"
 
           # Resolve the PR commit range. A PR-policy build checks out the MERGE
           # commit (Build.SourceVersion): parent ^1 is the target-branch tip,
@@ -162,13 +190,11 @@ stages:
               echo "##vso[task.setvariable variable=renderSetFile;isreadonly=true]$change_set_dir/render-set.txt"
             displayName: "Prepare change set"
 
-          # Build the changed components. --local-repo-with-publish stages each
-          # built RPM into a local repo so later components in the set can
-          # resolve against earlier ones (intra-PR dependency chains). No -q, so
-          # build progress streams to the log; on failure we also dump the
-          # per-component build logs. AZLDEV_ALLOW_ROOT=1 is inline per
-          # .github/instructions/ado-pipeline.instructions.md (OneBranch runs as
-          # root).
+          # Build the changed components INSIDE the azldev-runner container.
+          # --local-repo-with-publish stages each built RPM into a local repo so
+          # later components in the set resolve against earlier ones (intra-PR
+          # dependency chains). -v streams build progress; on failure we dump
+          # the per-component build logs from the host afterwards.
           - script: |
               set -euo pipefail
               render_set="$(renderSetFile)"
@@ -186,6 +212,16 @@ stages:
               for c in "${comps[@]}"; do
                 build_args+=(-p "$c")
               done
+
+              # base/out (local publish repo) and base/build (work + logs) are
+              # the only paths azldev writes during a build. The container runs
+              # as the non-root builduser (UID 1000); the OneBranch agent runs
+              # as root, so pre-create and hand those dirs to 1000 before the
+              # bind-mount, otherwise the in-container user cannot write to
+              # them. Everything else under the repo is read-only and
+              # world-readable (specs, comps, .git for rpmautospec).
+              mkdir -p base/out base/build
+              chown -R 1000:1000 base/out base/build
 
               dump_logs() {
                 echo "##[group]Build logs (dumped on failure)"
@@ -206,9 +242,26 @@ stages:
               }
               trap on_exit EXIT
 
+              # mock hangs on the OneBranch host directly; the container gives
+              # it the isolation knobs it needs (identical to the GitHub render
+              # gate):
+              #   --cap-add=SYS_ADMIN  mount namespaces for the build chroot
+              #   seccomp=unconfined   mock uses syscalls the default profile blocks
+              #   apparmor=unconfined  default profile blocks `mount -t tmpfs`
+              #                        under /var/lib/mock even with SYS_ADMIN
+              # We avoid --privileged (broader blast radius). Component names are
+              # passed as positional args ("$@"), never interpolated into the
+              # script body, so a hostile name cannot inject shell. No
+              # AZLDEV_ALLOW_ROOT inside -- builduser is non-root.
               echo "##[group]Building ${#comps[@]} component(s)"
-              AZLDEV_ALLOW_ROOT=1 azldev component build -v \
-                --local-repo-with-publish ./base/out \
-                "${build_args[@]}"
+              docker run --rm \
+                --cap-add=SYS_ADMIN \
+                --security-opt seccomp=unconfined \
+                --security-opt apparmor=unconfined \
+                -v "$PWD:/workdir" \
+                localhost/azldev-runner \
+                bash -eu -o pipefail -c '
+                  azldev component build -v --local-repo-with-publish ./base/out "$@"
+                ' bash "${build_args[@]}"
               echo "##[endgroup]"
-            displayName: "Build changed components"
+            displayName: "Build changed components (containerized)"

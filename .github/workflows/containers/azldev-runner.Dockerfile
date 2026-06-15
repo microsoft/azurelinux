@@ -39,6 +39,13 @@ RUN tdnf -y install \
 # root.  Callers (check-rendered-specs.yml, etc.) read the file and pass it
 # via --build-arg so the Dockerfile never needs repo-root build context.
 # No default — omitting --build-arg will fail the build loudly.
+# Optional Go module proxy for the `go install` below. Callers that build
+# behind an internal-only proxy forward it via --build-arg GOPROXY=...; Docker
+# exposes a declared ARG to the RUN environment, which `go install` reads.
+# Callers with public egress (e.g. the GitHub Actions render gate) omit it,
+# leaving it empty, which Go treats as "use the built-in default" — so this is a
+# no-op for them. The ADO/OneBranch PR build forwards the host's internal proxy.
+ARG GOPROXY
 ARG AZLDEV_VERSION
 RUN test -n "${AZLDEV_VERSION}" || { echo "ERROR: AZLDEV_VERSION build-arg is required (read from .azldev-version)" >&2; exit 1; } \
     && GOBIN=/usr/local/bin go install \
