@@ -14,9 +14,11 @@ import (
 	"time"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/buildpipeline"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/directory"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/file"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/logger"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/retry"
+	"github.com/microsoft/azurelinux/toolkit/tools/internal/rpm"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/shell"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/systemdependency"
 
@@ -160,6 +162,60 @@ func NewOverlayMountPoint(chrootDir, source, target, lowerDir, upperDir, workDir
 	return
 }
 
+func (c *Chroot) AddRPMMacrosFile(macrosFilePath string) error {
+	return AddRPMMacrosFile(c, macrosFilePath)
+}
+
+func AddRPMMacrosFile(c ChrootInterface, macrosFilePath string) (err error) {
+	var macroDir string
+
+	doGetMacroDir := func() error {
+		var macroErr error
+
+		macroDir, macroErr = rpm.GetMacroDir()
+		if macroErr != nil {
+			logger.Log.Errorf("Failed to get RPM macro directory: %s", macroErr)
+			return macroErr
+		}
+
+		return macroErr
+	}
+
+	c.Run(doGetMacroDir)
+
+	// Destination path inside the chroot (same path as on the host).
+	macrosDestDir := filepath.Join(c.RootDir(), macroDir)
+	macrosDestFile := filepath.Join(macrosDestDir, filepath.Base(macrosFilePath))
+
+	exists, existsErr := file.PathExists(macrosDestFile)
+	if existsErr != nil {
+		logger.Log.Errorf("Failed to check if macros file exists (%s): %s", macrosDestFile, existsErr)
+		return existsErr
+	}
+
+	if exists {
+		logger.Log.Warningf("Macros file (%s) already exists, skipping copy", macrosDestFile)
+		return nil
+	}
+
+	// Ensure destination directory exists and copy the file.
+	mkdirErr := directory.EnsureDirExists(macrosDestDir)
+	if mkdirErr != nil {
+		logger.Log.Errorf("Failed to create macros directory inside chroot (%s): %s", macrosDestDir, mkdirErr)
+		return mkdirErr
+	}
+
+	copyErr := file.Copy(macrosFilePath, macrosDestFile)
+	if copyErr != nil {
+		logger.Log.Errorf("Failed to copy release version macros file into chroot (%s -> %s): %s", macrosFilePath, macrosDestFile, copyErr)
+		return copyErr
+	}
+
+	logger.Log.Infof("Copied release version macros file into chroot (%s -> %s)", macrosFilePath, macrosDestFile)
+
+	return
+}
+
 // GetSource gets the source device of the mount.
 func (m *MountPoint) GetSource() string {
 	return m.source
@@ -209,7 +265,7 @@ func NewChroot(rootDir string, isExistingDir bool) *Chroot {
 // This call will block until the chroot initializes successfully.
 // Only one Chroot will initialize at a given time.
 func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMountPoints []*MountPoint,
-	includeDefaultMounts bool,
+	includeDefaultMounts bool, releaseVersionMacrosFile ...string,
 ) (err error) {
 	// On failed initialization, cleanup all chroot files
 	const leaveChrootOnDisk = false
@@ -317,6 +373,16 @@ func (c *Chroot) Initialize(tarPath string, extraDirectories []string, extraMoun
 		// Mark this chroot as initialized, allowing it to be cleaned up on SIGTERM
 		// if requested.
 		activeChroots = append(activeChroots, c)
+	}
+
+	// If a release version macros file is provided, copy it into the default RPM macros directory
+	// inside the chroot so rpmspec/rpmbuild pick it up automatically.
+	if len(releaseVersionMacrosFile) > 0 && releaseVersionMacrosFile[0] != "" {
+		err = c.AddRPMMacrosFile(releaseVersionMacrosFile[0])
+		if err != nil {
+			err = fmt.Errorf("failed to add release version macros file to chroot:\n%w", err)
+			return
+		}
 	}
 
 	return

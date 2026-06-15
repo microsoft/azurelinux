@@ -8,7 +8,7 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.5
+Version: 3.3.7
 Release: 1%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,9 +49,9 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
-# # Load the SymCrypt provider by default if present in non-FIPS mode,
-# # and always load it implicitly in FIPS mode
-Patch32:  0032-Force-fips.patch
+# # Load SymCrypt provider by default if present in non-FIPS mode,
+# # and always load it or the openssl fips provider in FIPS mode.
+Patch32: 0032-Force-fips-symcrypt-or-fips-AZL3.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -62,10 +62,12 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
-# The Symcrypt provider, which is our default, doesn't support some of the
+# The FIPS providers (SymCrypt and OpenSSL FIPS) don't support some of the
 # algorithms that are used in the speed tests. This patch skips those tests.
-# If SymCrypt adds support, we should change and eventually remove this patch.
-Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
+# If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
+Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
+Patch83:  Allow-NULL-buffer-with-0-bsize.patch
+Patch100: CVE-2026-31791.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -85,13 +87,10 @@ BuildRequires: perl(lib)
 BuildRequires: perl(Pod::Html)
 BuildRequires: perl(Text::Template)
 BuildRequires: sed
-
-%if 0%{?with_check}
 BuildRequires: perl(Math::BigInt)
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
 BuildRequires: perl(Time::Piece)
-%endif
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -105,6 +104,9 @@ protocols.
 Summary: A general purpose cryptography library with TLS implementation
 Recommends: SymCrypt
 Recommends: SymCrypt-OpenSSL
+# Coordinate with the fipsmodule.cnf rename: patch 0032 in this release
+# reads /etc/pki/tls/fipsmodule.cnf, which only openssl-fips-provider >= 3.1.2-2 ships.
+Conflicts: openssl-fips-provider < 3.1.2-2
 
 %description libs
 OpenSSL is a toolkit for supporting cryptography. The openssl-libs
@@ -362,6 +364,27 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7-1
+- Upgrade to 3.3.7
+- Remove unused patches
+
+* Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-6
+- Rename FIPS provider config from fips_prov.cnf to fipsmodule.cnf to align with upstream OpenSSL.
+
+* Tue Mar 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-5
+- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-28390, CVE-2026-31789, CVE-2026-31790, CVE-2026-31791
+
+* Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
+- Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
+- Patch OpenSSL speed to skip algorithms not supported by the selected FIPS provider.
+
+* Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-3
+- Patch CVE-2025-69419, CVE-2026-22795, and CVE-2026-22796
+
+* Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
+- Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160,
+  CVE-2025-69418, CVE-2025-69420, and CVE-2025-69421
+
 * Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
 - Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
 

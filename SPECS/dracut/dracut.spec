@@ -4,7 +4,7 @@
 Summary:        dracut to create initramfs
 Name:           dracut
 Version:        102
-Release:        12%{?dist}
+Release:        13%{?dist}
 # The entire source code is GPLv2+
 # except install/* which is LGPLv2+
 License:        GPLv2+ AND LGPLv2+
@@ -48,7 +48,6 @@ Patch:          allow-liveos-overlay-no-user-confirmation-prompt.patch
 # azl-liveos-artifacts-download.sh) - which are included as separate sources in
 # this package.
 Patch:          add-livenet-download-service.patch
-Patch:          0006-dracut.sh-validate-instmods-calls.patch
 Patch:          0011-Remove-reference-to-kernel-module-zlib-in-fips-module.patch
 Patch:          0012-fix-dracut-functions-avoid-awk-in-get_maj_min.patch
 Patch:          0013-revert-fix-crypt-unlock-encrypted-devices-by-default.patch
@@ -325,6 +324,9 @@ ln -srv %{buildroot}%{_bindir}/%{name} %{buildroot}%{_sbindir}/%{name}
 %dir %{_sharedstatedir}/%{name}/overlay
 
 %changelog
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 102-13
+- Remove old dracut-validate-instmods-calls patch to support both 6.6 and 6.12 versions.
+
 * Tue Mar 11 2025 Archana Choudhary <archana1@microsoft.com> - 102-12
 - Add fix for systemd-cryptsetup module to be included in initramfs when needed
 

@@ -1,13 +1,12 @@
 diff --git a/tests/lib/subdir.am b/tests/lib/subdir.am
-index 7b5eaa4..5c82f69 100644
+index ca74306..9b0980f 100644
 --- a/tests/lib/subdir.am
 +++ b/tests/lib/subdir.am
-@@ -18,18 +18,6 @@ tests_lib_test_frrscript_SOURCES = tests/lib/test_frrscript.c
- 	test -e tests/lib/script1.lua || \
+@@ -25,20 +25,6 @@ copy_script: tests/lib/script1.lua
  	$(INSTALL_SCRIPT) $< tests/lib/script1.lua
  
--##############################################################################
--GRPC_TESTS_LDADD = staticd/libstatic.a grpc/libfrrgrpc_pb.la -lgrpc++ -lprotobuf $(ALL_TESTS_LDADD) $(LIBYANG_LIBS) -lm
+ ##############################################################################
+-GRPC_TESTS_LDADD = mgmtd/libmgmt_be_nb.la staticd/libstatic.a grpc/libfrrgrpc_pb.la $(GRPC_LIBS) $(ALL_TESTS_LDADD) $(LIBYANG_LIBS) -lm
 -
 -if GRPC
 -check_PROGRAMS += tests/lib/test_grpc
@@ -16,8 +15,11 @@ index 7b5eaa4..5c82f69 100644
 -tests_lib_test_grpc_CPPFLAGS = $(TESTS_CPPFLAGS)
 -tests_lib_test_grpc_LDADD = $(GRPC_TESTS_LDADD)
 -tests_lib_test_grpc_SOURCES = tests/lib/test_grpc.cpp
+-nodist_tests_lib_test_grpc_SOURCES = \
+-	yang/frr-bfdd.yang.c \
+-	yang/frr-staticd.yang.c \
+-	# end
 -
--
+ 
  ##############################################################################
  if ZEROMQ
- check_PROGRAMS += tests/lib/test_zmq

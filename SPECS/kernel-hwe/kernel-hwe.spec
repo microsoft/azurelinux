@@ -1,4 +1,5 @@
 %global security_hardening none
+%global sha512hmac bash %{_sourcedir}/sha512hmac-openssl.sh
 %define uname_r %{version}-%{release}
 %define short_name hwe
 
@@ -29,19 +30,20 @@
 
 Summary:        Linux Kernel
 Name:           kernel-hwe
-Version:        6.12.57.1
-Release:        2%{?dist}
+Version:        6.18.31.1
+Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 Source1:        config
 Source2:        config_aarch64
 Source3:        azurelinux-ca-20230216.pem
 Source4:        cpupower
 Source5:        cpupower.service
+Source6:        sha512hmac-openssl.sh
 BuildRequires:  audit-devel
 BuildRequires:  bash
 BuildRequires:  bc
@@ -172,7 +174,7 @@ This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
 %prep
-%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
+%autosetup -p1 -n CBL-Mariner-Linux-Kernel-rolling-lts-azl3-hwe-%{version}
 make mrproper
 
 cp %{config_source} .config
@@ -259,6 +261,10 @@ cp -r Documentation/*        %{buildroot}%{_defaultdocdir}/linux-%{uname_r}
 install -vm 744 vmlinux %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux-%{uname_r}
 # `perf test vmlinux` needs it
 ln -s vmlinux-%{uname_r} %{buildroot}%{_libdir}/debug/lib/modules/%{uname_r}/vmlinux
+
+# hmac sign the kernel for FIPS
+%{sha512hmac} %{buildroot}/boot/vmlinuz-%{uname_r} | sed -e "s,$RPM_BUILD_ROOT,," > %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac
+cp %{buildroot}/boot/.vmlinuz-%{uname_r}.hmac %{buildroot}/lib/modules/%{uname_r}/.vmlinuz.hmac
 
 # Symlink /lib/modules/uname/vmlinuz to boot partition
 ln -s /boot/vmlinuz-%{uname_r} %{buildroot}/lib/modules/%{uname_r}/vmlinuz
@@ -349,8 +355,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 /boot/System.map-%{uname_r}
 /boot/config-%{uname_r}
 /boot/vmlinuz-%{uname_r}
+/boot/.vmlinuz-%{uname_r}.hmac
 %defattr(0644,root,root)
 /lib/modules/%{uname_r}/*
+/lib/modules/%{uname_r}/.vmlinuz.hmac
 %exclude /lib/modules/%{uname_r}/build
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accel
 %exclude /lib/modules/%{uname_r}/kernel/drivers/accessibility
@@ -395,6 +403,7 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_lib64dir}/libperf-jvmti.so
 %{_libdir}/libcpupower.so*
 %{_sysconfdir}/cpufreq-bench.conf
+%{_sysconfdir}/cpupower-service.conf
 %{_includedir}/cpuidle.h
 %{_includedir}/cpufreq.h
 %{_includedir}/powercap.h
@@ -408,8 +417,6 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %endif
 %{_bindir}
 %{_sysconfdir}/bash_completion.d/*
-%{_datadir}/perf-core/strace/groups/file
-%{_datadir}/perf-core/strace/groups/string
 %{_docdir}/*
 %{_includedir}/perf/perf_dlfilter.h
 %{_unitdir}/cpupower.service
@@ -423,6 +430,41 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.31.1-1
+- Auto-upgrade to 6.18.31.1
+
+* Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.89.1-1
+- Auto-upgrade to 6.12.89.1
+- Disable ESP-in-TCP encapsulation
+
+* Fri May 08 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.87.1-1
+- Auto-upgrade to 6.12.87.1
+
+* Thu Apr 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.85.1-1
+- Auto-upgrade to 6.12.85.1
+
+* Thu Apr 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.83.1-1
+- Auto-upgrade to 6.12.83.1
+
+* Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.78.2-1
+- Auto-upgrade to 6.12.78.2
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-6
+- Enable FIPS crypto configs CONFIG_CRYPTO_DH_RFC7919_GROUPS, CONFIG_CRYPTO_ECDSA,
+- CONFIG_CRYPTO_ARC4, CONFIG_CRYPTO_DEV_BCM_SPU and their dependencies for Arm64 arch
+
+* Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.12.57.1-5
+- Enable lwtunnel, lwtunnel-bpf, and sched_core
+
+* Fri Feb 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-4
+- Retain kernel config options similar to 6.6 in 6.12 for CONFIG_NET_VENDOR_AQUANTIA
+- CONFIG_AQTION, CONFIG_BLK_WBT, CONFIG_BLK_WBT_MQ, CONFIG_DM_CACHE,CONFIG_INET_DIAG_DESTROY
+- CONFIG_ XFRM_INTERFACE CONFIG_HSA_AMD_P2P, CONFIG_DMABUF_MOVE_NOTIFY
+- CONFIG_FW_CFG_SYSFS and CONFIG_SQUASHFS_ZSTD
+
+* Mon Feb 02 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-3
+- HMAC calc the kernel HWE for FIPS.
+
 * Mon Jan 19 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 6.12.57.1-2
 - Enable aarch64 kernel configs for performance improvements.
 

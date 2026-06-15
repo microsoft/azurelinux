@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
 Version:        4.2.8p17
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -197,6 +197,9 @@ fi
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Tue Mar 17 2026 Sudipta Pandit <sudpandit@microsoft.com> - 4.2.8p17-2
+- Fix ntpdate-wrapper to use /usr/bin/ntpdate
+
 * Wed Jan 31 2024 Karim Eldegwy <karimeldegwy@microsoft.com> - 4.2.8p17-1
 - Auto-upgrade to 4.2.8p17 - 3.0 - Upgrade
 - Remove not applicable patch

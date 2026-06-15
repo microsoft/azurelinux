@@ -62,6 +62,7 @@ go_tool_list = \
 	scheduler \
 	specarchchecker \
 	specreader \
+	versionsprocessor \
 	srpmpacker \
 	validatechroot \
 
@@ -124,7 +125,7 @@ else
 $(TOOL_BINS_DIR)/%: $(go_common_files)
 	cd $(TOOLS_DIR)/$* && \
 		go test -ldflags="$(go_ldflags)" -test.short -covermode=atomic -coverprofile=$(BUILD_DIR)/tools/$*.test_coverage ./... && \
-		CGO_ENABLED=0 go build \
+		go build \
 			-ldflags="$(go_ldflags)" \
 			$(if $(filter y,$(BUILD_TOOLS_NONPROD)),,-tags prod) \
 			-o $(TOOL_BINS_DIR)

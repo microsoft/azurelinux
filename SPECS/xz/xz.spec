@@ -1,7 +1,7 @@
 Summary:        Programs for compressing and decompressing files
 Name:           xz
 Version:        5.4.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 URL:            https://tukaani.org/xz
 License:        GPLv2+ and GPLv3+ and LGPLv2+
 Group:          Applications/File
@@ -9,6 +9,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://tukaani.org/xz/%{name}-%{version}.tar.xz
 Patch0:         CVE-2025-31115.patch
+Patch1:         CVE-2026-34743.patch
 Provides:       xz-lzma-compat = %{version}-%{release}
 Provides:       lzma = %{version}-%{release}
 Requires:       xz-libs = %{version}-%{release}
@@ -94,10 +95,13 @@ make  %{?_smp_mflags}  check
 %{_mandir}/uk/man1/*
 
 %files devel
+%license COPYING COPYING.GPLv2
 %{_includedir}/lzma.h
 %{_includedir}/lzma/*.h
 %{_libdir}/pkgconfig/liblzma.pc
 %{_libdir}/liblzma.so
+%exclude %{_defaultdocdir}/%{name}-%{version}/COPYING
+%exclude %{_defaultdocdir}/%{name}-%{version}/COPYING.GPLv2
 %{_defaultdocdir}/%{name}-%{version}/*
 
 %files libs
@@ -107,6 +111,9 @@ make  %{?_smp_mflags}  check
 %defattr(-,root,root)
 
 %changelog
+* Fri Apr 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.4.4-3
+- Patch for CVE-2026-34743
+
 * Tue Apr 1 2025 Jon Slobodzian <joslobo@microsoft.com> - 5.4.4-2
 - Patch for CVE-2025-31115
 

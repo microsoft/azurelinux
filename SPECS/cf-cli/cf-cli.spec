@@ -5,7 +5,7 @@ Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.11
-Release:        4%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,21 @@ Patch0:         CVE-2024-45337.patch
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-22869.patch
 Patch3:         CVE-2025-22872.patch
+Patch4:         CVE-2025-47911.patch
+Patch5:         CVE-2025-58190.patch
+Patch6:         CVE-2026-27136.patch
+Patch7:         CVE-2026-39821.patch
+Patch8:         CVE-2026-39829.patch
+Patch9:         CVE-2026-39830.patch
+Patch10:        CVE-2026-39834.patch
+Patch11:        CVE-2026-42506.patch
+Patch12:        CVE-2026-46597.patch
+Patch13:        CVE-2026-25680.patch
+Patch14:        CVE-2026-25681.patch
+Patch15:        CVE-2026-39827.patch
+Patch16:        CVE-2026-39828.patch
+Patch17:        CVE-2026-39835.patch
+Patch18:        CVE-2026-42502.patch
 
 BuildRequires:  golang < 1.25
 %global debug_package %{nil}
@@ -45,9 +60,7 @@ BuildRequires:  golang < 1.25
 The official command line client for Cloud Foundry.
 
 %prep
-%setup -q -n cli-%{version}
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
@@ -64,11 +77,20 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE README.md
+%license LICENSE NOTICE
+%doc README.md
 %{_bindir}/cf
 
 %changelog
+* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-7
+- Patch for CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-6
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-5
+- Patch for CVE-2025-47911, CVE-2025-58190
+
 * Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 8.7.11-4
 - Set BR for golang to < 1.25
 

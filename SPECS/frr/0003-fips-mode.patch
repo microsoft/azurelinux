@@ -1,12 +1,75 @@
+diff --git a/isisd/isis_circuit.c b/isisd/isis_circuit.c
+index 22ef39f..a31ccc5 100644
+--- a/isisd/isis_circuit.c
++++ b/isisd/isis_circuit.c
+@@ -13,6 +13,10 @@
+ #include <netinet/if_ether.h>
+ #endif
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/evp.h>
++#endif
++
+ #include "log.h"
+ #include "memory.h"
+ #include "vrf.h"
+@@ -1536,6 +1540,10 @@ ferr_r isis_circuit_passwd_set(struct isis_circuit *circuit,
+ 		return ferr_code_bug(
+ 			"circuit password too long (max 254 chars)");
+ 
++
++	//When in FIPS mode, the password never gets set in MD5
++	if((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && EVP_default_properties_is_fips_enabled(NULL))
++		return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
+ 	circuit->passwd.len = len;
+ 	strlcpy((char *)circuit->passwd.passwd, passwd,
+ 		sizeof(circuit->passwd.passwd));
+diff --git a/isisd/isisd.c b/isisd/isisd.c
+index 78fbbe1..b7cf6fb 100644
+--- a/isisd/isisd.c
++++ b/isisd/isisd.c
+@@ -9,6 +9,10 @@
+ 
+ #include <zebra.h>
+ 
++
++#ifdef CRYPTO_OPENSSL
++#include <openssl/evp.h>
++#endif
+ #include "frrevent.h"
+ #include "vty.h"
+ #include "command.h"
+@@ -3087,6 +3091,10 @@ static int isis_area_passwd_set(struct isis_area *area, int level,
+ 		if (len > 254)
+ 			return -1;
+ 
++
++		//When in FIPS mode, the password never get set in MD5
++		if ((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && (EVP_default_properties_is_fips_enabled(NULL)))
++			return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
+ 		modified.len = len;
+ 		strlcpy((char *)modified.passwd, passwd,
+ 			sizeof(modified.passwd));
 diff --git a/ospfd/ospf_vty.c b/ospfd/ospf_vty.c
-index 631465f..e084ff3 100644
+index 26b3949..f27e6b6 100644
 --- a/ospfd/ospf_vty.c
 +++ b/ospfd/ospf_vty.c
-@@ -1136,6 +1136,11 @@ DEFUN (ospf_area_vlink,
+@@ -7,6 +7,10 @@
+ #include <zebra.h>
+ #include <string.h>
+ 
++#ifdef CRYPTO_OPENSSL
++#include <openssl/evp.h>
++#endif
++
+ #include "printfrr.h"
+ #include "monotime.h"
+ #include "memory.h"
+@@ -1105,6 +1109,11 @@ DEFUN (ospf_area_vlink,
  		vl_config.keychain = argv[idx+1]->arg;
  	} else if (argv_find(argv, argc, "message-digest", &idx)) {
  		/* authentication message-digest */
-+		if(FIPS_mode())
++		if(EVP_default_properties_is_fips_enabled(NULL))
 +		{
 +			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
 +			return CMD_WARNING_CONFIG_FAILED;
@@ -14,27 +77,27 @@ index 631465f..e084ff3 100644
  		vl_config.auth_type = OSPF_AUTH_CRYPTOGRAPHIC;
  	} else if (argv_find(argv, argc, "null", &idx)) {
  		/* "authentication null" */
-@@ -1993,6 +1998,15 @@ DEFUN (ospf_area_authentication_message_digest,
+@@ -2024,6 +2033,15 @@ DEFUN (ospf_area_authentication_message_digest,
  				  ? OSPF_AUTH_NULL
  				  : OSPF_AUTH_CRYPTOGRAPHIC;
  
++
 +	if(area->auth_type == OSPF_AUTH_CRYPTOGRAPHIC)
 +	{
-+		if(FIPS_mode())
++		if(EVP_default_properties_is_fips_enabled(NULL))
 +		{
 +			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
 +			return CMD_WARNING_CONFIG_FAILED;
 +		}
 +	}
-+
  	return CMD_SUCCESS;
  }
  
-@@ -6665,6 +6679,11 @@ DEFUN (ip_ospf_authentication_args,
+@@ -7446,6 +7464,11 @@ DEFUN (ip_ospf_authentication_args,
  
  	/* Handle message-digest authentication */
  	if (argv[idx_encryption]->arg[0] == 'm') {
-+		if(FIPS_mode())
++		if(EVP_default_properties_is_fips_enabled(NULL))
 +		{
 +			vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
 +			return CMD_WARNING_CONFIG_FAILED;
@@ -42,11 +105,11 @@ index 631465f..e084ff3 100644
  		SET_IF_PARAM(params, auth_type);
  		params->auth_type = OSPF_AUTH_CRYPTOGRAPHIC;
  		UNSET_IF_PARAM(params, keychain_name);
-@@ -6971,6 +6990,11 @@ DEFUN (ip_ospf_message_digest_key,
+@@ -7776,6 +7799,11 @@ DEFUN (ip_ospf_message_digest_key,
         "The OSPF password (key)\n"
         "Address of interface\n")
  {
-+	if(FIPS_mode())
++	if(EVP_default_properties_is_fips_enabled(NULL))
 +	{
 +		vty_out(vty, "FIPS mode is enabled, md5 authentication is disabled\n");
 +		return CMD_WARNING_CONFIG_FAILED;
@@ -54,62 +117,31 @@ index 631465f..e084ff3 100644
  	VTY_DECLVAR_CONTEXT(interface, ifp);
  	struct crypt_key *ck;
  	uint8_t key_id;
-diff --git a/isisd/isis_circuit.c b/isisd/isis_circuit.c
-index 81b4b39..cce33d9 100644
---- a/isisd/isis_circuit.c
-+++ b/isisd/isis_circuit.c
-@@ -1318,6 +1318,10 @@ static int isis_circuit_passwd_set(struct isis_circuit *circuit,
- 		return ferr_code_bug(
- 			"circuit password too long (max 254 chars)");
- 
-+	//When in FIPS mode, the password never gets set in MD5
-+	if((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && FIPS_mode())
-+		return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
-+
- 	circuit->passwd.len = len;
- 	strlcpy((char *)circuit->passwd.passwd, passwd,
- 		sizeof(circuit->passwd.passwd));
-diff --git a/isisd/isisd.c b/isisd/isisd.c
-index 419127c..a6c36af 100644
---- a/isisd/isisd.c
-+++ b/isisd/isisd.c
-@@ -1638,6 +1638,10 @@ static int isis_area_passwd_set(struct isis_area *area, int level,
- 		if (len > 254)
- 			return -1;
- 
-+		//When in FIPS mode, the password never get set in MD5
-+		if ((passwd_type == ISIS_PASSWD_TYPE_HMAC_MD5) && (FIPS_mode()))
-+			return ferr_cfg_invalid("FIPS mode is enabled, md5 authentication is disabled");
-+
- 		modified.len = len;
- 		strlcpy((char *)modified.passwd, passwd,
- 			sizeof(modified.passwd));
 diff --git a/ripd/rip_cli.c b/ripd/rip_cli.c
-index 5bb81ef..02a09ef 100644
+index 7540f98..a010b64 100644
 --- a/ripd/rip_cli.c
 +++ b/ripd/rip_cli.c
-@@ -796,6 +796,12 @@ DEFPY (ip_rip_authentication_mode,
+@@ -7,6 +7,10 @@
+ 
+ #include <zebra.h>
+ 
++
++#ifdef CRYPTO_OPENSSL
++#include <openssl/evp.h>
++#endif
+ #include "if.h"
+ #include "if_rmap.h"
+ #include "vrf.h"
+@@ -903,6 +907,12 @@ DEFPY_YANG (ip_rip_authentication_mode,
  			value = "20";
  	}
  
-+	if(strmatch(mode, "md5") && FIPS_mode())
++
++	if(strmatch(mode, "md5") && EVP_default_properties_is_fips_enabled(NULL))
 +	{
 +		vty_out(vty, "FIPS mode is enabled, md5 authentication id disabled\n");
 +		return CMD_WARNING_CONFIG_FAILED;
 +	}
-+
  	nb_cli_enqueue_change(vty, "./authentication-scheme/mode", NB_OP_MODIFY,
  			      strmatch(mode, "md5") ? "md5" : "plain-text");
  	if (strmatch(mode, "md5"))
-diff --git a/lib/zebra.h b/lib/zebra.h
-index 53ae5b4..930307f 100644
---- a/lib/zebra.h
-+++ b/lib/zebra.h
-@@ -114,6 +114,7 @@
- #ifdef CRYPTO_OPENSSL
- #include <openssl/evp.h>
- #include <openssl/hmac.h>
-+#include <openssl/fips.h>
- #endif
-
- #include "openbsd-tree.h"

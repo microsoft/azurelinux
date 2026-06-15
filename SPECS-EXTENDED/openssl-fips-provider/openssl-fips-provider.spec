@@ -1,0 +1,410 @@
+%define soversion 3
+
+%global _performance_build 1
+
+Summary: Utilities from the general purpose cryptography library with TLS implementation
+Name: openssl-fips-provider
+Version: 3.1.2
+Release: 2%{?dist}
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
+Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
+Source2: Makefile.certificate
+Source14: 0025-for-tests.patch
+
+License: Apache-2.0
+URL: http://www.openssl.org/
+
+BuildRequires: %{_bindir}/cmp
+BuildRequires: %{_bindir}/pod2man
+BuildRequires: %{_bindir}/rename
+BuildRequires: coreutils
+BuildRequires: gcc
+BuildRequires: git-core
+BuildRequires: make
+BuildRequires: perl-core
+BuildRequires: perl(Digest::SHA)
+BuildRequires: perl(FindBin)
+BuildRequires: perl(IPC::Cmd)
+BuildRequires: perl(lib)
+BuildRequires: perl(Pod::Html)
+BuildRequires: perl(Text::Template)
+BuildRequires: sed
+
+BuildRequires: perl(Math::BigInt)
+BuildRequires: perl(Test::Harness)
+BuildRequires: perl(Test::More)
+BuildRequires: perl(Time::Piece)
+
+Requires: openssl-libs%{?_isa} >= 3.3.5-6
+Conflicts: SymCrypt-OpenSSL
+
+%description
+The OpenSSL toolkit provides support for secure communications between
+machines. This package provides the OpenSSL FIPS Provider module.
+
+%prep
+%autosetup -S git -n openssl-%{version}
+
+%build
+export HASHBANGPERL=/usr/bin/perl
+
+# Build the FIPS provider, keeping flags as close as possible to the CMVP-validated
+# build (FIPS 140-3 cert #4985, OpenSSL FIPS Provider 3.1.2: ./Configure enable-fips).
+#
+# Flags included:
+#   -Wa,--noexecstack             - Marks fips.so PT_GNU_STACK as non-executable.
+#                                   The assembler sources have no .note.GNU-stack
+#                                   markers; without this the linker defaults to RWE.
+#                                   ELF metadata only; does not affect cryptographic code.
+#   $RPM_LD_FLAGS                 - Applies -Wl,-z,relro -Wl,-z,now (RELRO/BIND_NOW).
+#                                   ELF segment permissions only; does not affect
+#                                   cryptographic code or the FIPS HMAC integrity check
+#                                   (fipsinstall regenerates the HMAC post-strip).
+#   -Wa,--generate-missing-build-notes=yes - Annobin/build-id audit metadata.
+#                                   ELF notes only; does not affect cryptographic code.
+#
+# Flags intentionally excluded (all change what executes inside the FIPS module):
+#   %{optflags} (includes -O2)    - OpenSSL Configure sets -O3 for release builds
+#                                   (Configurations/10-main.conf, picker()).
+#                                   Appending RPM optflags would downgrade to -O2
+#                                   (last -O wins in gcc), changing code generation
+#                                   across all cryptographic functions.
+#   -fstack-protector-strong      - Inserts canary code inside cryptographic functions.
+#   -D_FORTIFY_SOURCE=2           - Redirects libc calls to fortified variants.
+#
+# Flags also excluded but confirmed to have no effect on fips.so:
+#   -DPURIFY                      - No-op in 3.x. The #ifndef PURIFY guard in
+#                                   md_rand.c was removed in commit d8ca44ba
+#                                   (Emilia Kasper, 2016-01-29, "Always DPURIFY");
+#                                   PURIFY behavior became the default. The entire
+#                                   legacy RNG was later replaced by DRBG (75e2c877).
+#                                   Excluded for clarity, not correctness.
+#   -DDEVRANDOM                   - Only affects libcrypto (rand_unix.c), which
+#                                   is compiled into libdefault.a, not libfips.a.
+#                                   The FIPS provider receives entropy via a
+#                                   dispatch callback; it contains no seeding code.
+#                                   Even within libcrypto, DEVRANDOM is only the
+#                                   fallback path; the primary path uses the
+#                                   getrandom() syscall (kernel >= 3.17, Oct 2014).
+#                                   On Azure Linux (kernel 5.15+), the DEVRANDOM
+#                                   code path is never reached.
+#                                   Excluded for clarity, not correctness.
+./Configure \
+    --prefix=%{_prefix} \
+    --openssldir=%{_sysconfdir}/pki/tls \
+    --libdir=lib \
+    -Wa,--noexecstack \
+    -Wa,--generate-missing-build-notes=yes \
+    $RPM_LD_FLAGS \
+    shared \
+    enable-fips
+
+make -s %{?_smp_mflags} all
+
+# Clean up the .pc files
+for i in libcrypto.pc libssl.pc openssl.pc ; do
+  sed -i '/^Libs.private:/{s/-L[^ ]* //;s/-Wl[^ ]* //}' $i
+done
+
+%check
+# Verify that what was compiled actually works.
+
+#We must disable default provider before tests otherwise they will fail
+patch -p1 < %{SOURCE14}
+
+OPENSSL_ENABLE_MD5_VERIFY=
+export OPENSSL_ENABLE_MD5_VERIFY
+%if 0%{?rhel}
+OPENSSL_ENABLE_SHA1_SIGNATURES=
+export OPENSSL_ENABLE_SHA1_SIGNATURES
+%endif
+OPENSSL_SYSTEM_CIPHERS_OVERRIDE=xyz_nonexistent_file
+export OPENSSL_SYSTEM_CIPHERS_OVERRIDE
+# Generate fipsmodule.cnf for the unstripped test fips.so
+OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall \
+    -pedantic \
+    -module providers/fips.so \
+    -out test/fipsmodule.cnf
+# Run tests
+make test HARNESS_JOBS=8
+
+# Run fipsinstall against the stripped fips.so to generate fipsmodule.cnf
+%define __spec_install_post \
+    %{?__debug_package:%{__debug_install_post}} \
+    %{__arch_install_post} \
+    %{__os_install_post} \
+    mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls \
+    OPENSSL_CONF=/dev/null LD_LIBRARY_PATH=. apps/openssl fipsinstall -pedantic -module $RPM_BUILD_ROOT%{_libdir}/ossl-modules/fips.so -out $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fipsmodule.cnf \
+%{nil}
+
+%define __provides_exclude_from %{_libdir}/openssl
+
+%install
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+# Install OpenSSL.
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_includedir},%{_libdir},%{_mandir},%{_libdir}/openssl,%{_pkgdocdir}}
+%make_install
+rename so.%{soversion} so.%{version} $RPM_BUILD_ROOT%{_libdir}/*.so.%{soversion}
+for lib in $RPM_BUILD_ROOT%{_libdir}/*.so.%{version} ; do
+	chmod 755 ${lib}
+	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`
+	ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_libdir}/`basename ${lib} .%{version}`.%{soversion}
+done
+
+# Install a makefile for generating keys and self-signed certs, and a script
+# for generating them on the fly.
+mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/certs
+install -m644 %{SOURCE2} $RPM_BUILD_ROOT%{_pkgdocdir}/Makefile.certificate
+
+# Move runable perl scripts to bindir
+mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/*.pl $RPM_BUILD_ROOT%{_bindir}
+mv $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/misc/tsget $RPM_BUILD_ROOT%{_bindir}
+
+# Rename man pages so that they don't conflict with other system man pages.
+pushd $RPM_BUILD_ROOT%{_mandir}
+mv man5/config.5ossl man5/openssl.cnf.5
+popd
+
+mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA
+mkdir -m700 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/private
+mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/certs
+mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/crl
+mkdir -m755 $RPM_BUILD_ROOT%{_sysconfdir}/pki/CA/newcerts
+
+# Ensure the config file timestamps are identical across builds to avoid
+# mulitlib conflicts and unnecessary renames on upgrade
+touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf
+touch -r %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf
+
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/openssl.cnf.dist
+rm -f $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/ct_log_list.cnf.dist
+
+# Next step of gradual disablement of SSL3.
+# Make SSL3 disappear to newly built dependencies.
+sed -i '/^\#ifndef OPENSSL_NO_SSL_TRACE/i\
+#ifndef OPENSSL_NO_SSL3\
+# define OPENSSL_NO_SSL3\
+#endif' $RPM_BUILD_ROOT/%{_prefix}/include/openssl/opensslconf.h
+
+# Delete everything but fips.so, since that's all we ship.
+# To do this, we delete all files and links that aren't fips.so.
+find $RPM_BUILD_ROOT -type f ! -name fips.so -delete
+find $RPM_BUILD_ROOT -type l ! -name fips.so -delete
+
+# Clean up any empty directories left over from the deletions above.
+find $RPM_BUILD_ROOT -type d -empty -delete
+
+%files
+%attr(0755,root,root) %{_libdir}/ossl-modules
+%{_sysconfdir}/pki/tls/fipsmodule.cnf
+
+%changelog
+* Thu Apr 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.1.2-2
+- Remove all patches; build unmodified OpenSSL 3.1.2 FIPS provider.
+- Use upstream fipsinstall to generate fipsmodule.cnf instead of embedded HMAC.
+- Rename config to fipsmodule.cnf with [fips_sect] to align with upstream OpenSSL.
+- Require openssl >= 3.3.5-6 for matching config path change.
+
+* Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 3.1.2-1
+- Initial implementation of OpenSSL FIPS provider package for AZL.
+- Copied from Azure Linux 3's openssl.spec
+- Modified to only package the 140-3 certified FIPS provider and config file from OpenSSL 3.1.2.
+
+* Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
+- Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 3.3.3-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
+* Mon Mar 17 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-2
+- Patch to fix segfaults and errors in openssl speed.
+
+* Wed Feb 26 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-1
+- Auto-upgrade to 3.3.3 - none
+- Initially run through autoupgrader (CBL-Mariner Servicing Account <cblmargh@microsoft.com>)
+
+* Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-2
+- Move SymCrypt and SymCrypt-OpenSSL Recommends from main package to libs
+
+* Thu Sep 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.2-1
+- Upgrade to 3.3.2
+
+* Fri Jul 12 2024 Suresh Thelkar <sthelkar@microsoft.com> - 3.3.0-2
+- Patch CVE-2023-5535
+
+* Tue May 07 2024 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-1
+- Upgrade to 3.3.0
+
+* Fri Apr 26 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-9
+- Add recommends on SymCrypt and SymCrypt-OpenSSL
+
+* Tue Apr 23 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-8
+- Add FIPS_mode patch back for compatibility
+
+* Tue Apr 16 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-7
+- Change config to load symcrypt provider if present
+
+* Wed Apr 03 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-6
+- Add check build requirements
+- Modify patch to not force load default provider
+
+* Wed Mar 20 2024 Chris Co <chrco@microsoft.com> - 3.1.4-5
+- Remove make-dummy-cert and renew-dummy-cert scripts
+
+* Tue Mar 19 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-4
+- Remove runtime dependency on coreutils
+
+* Tue Mar 12 2024 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-3
+- Remove dependencies for the libs sub-package to realign with azure linux 2.0
+
+* Thu Feb 29 2024 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 3.1.4-2
+- Perl will be installed with openssl-perl sub-package and not needed as default runtime dependency.
+
+* Tue Nov 28 2023 Tobias Brick <tobiasb@microsoft.com> - 3.1.4-1
+- Upgrade to 3.1.4
+- Initial CBL-Mariner import from Fedora 39 (license: MIT).
+- License verified
+- Removed redhat-specific REDHAT_FIPS_VERSION and added/updated relevant patches
+- Remove handling of different architectures -- we always build on the target architecture
+- Align config options with Marinver version 2.0
+- Remove fips-related patches and config options
+- Add patches to load SymCrypt provider by default
+
+* Thu Oct 26 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.4-1
+- Rebase to upstream version 3.1.4
+
+* Thu Oct 19 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.3-1
+- Rebase to upstream version 3.1.3
+
+* Thu Aug 31 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-4
+- Drop duplicated patch and do some contamination
+
+* Tue Aug 22 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-3
+- Integrate FIPS patches from CentOS
+
+* Fri Aug 04 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.1.1-2
+- migrated to SPDX license
+
+* Thu Jul 27 2023 Sahana Prasad <sahana@redhat.com> - 1:3.1.1-1
+- Rebase to upstream version 3.1.1
+  Resolves: CVE-2023-0464
+  Resolves: CVE-2023-0465
+  Resolves: CVE-2023-0466
+  Resolves: CVE-2023-1255
+  Resolves: CVE-2023-2650
+
+* Thu Jul 27 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.8-4
+- Forbid custom EC more completely
+  Resolves: rhbz#2223953
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Mar 21 2023 Sahana Prasad <sahana@redhat.com> - 1:3.0.8-2
+- Upload new upstream sources without manually hobbling them.
+- Remove the hobbling script as it is redundant. It is now allowed to ship
+  the sources of patented EC curves, however it is still made unavailable to use
+  by compiling with the 'no-ec2m' Configure option. The additional forbidden
+  curves such as P-160, P-192, wap-tls curves are manually removed by updating
+  0011-Remove-EC-curves.patch.
+- Enable Brainpool curves.
+- Apply the changes to ec_curve.c and  ectest.c as a new patch
+  0010-Add-changes-to-ectest-and-eccurve.patch instead of replacing them.
+- Modify 0011-Remove-EC-curves.patch to allow Brainpool curves.
+- Modify 0011-Remove-EC-curves.patch to allow code under macro OPENSSL_NO_EC2M.
+  Resolves: rhbz#2130618, rhbz#2141672
+
+* Thu Feb 09 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.8-1
+- Rebase to upstream version 3.0.8
+  Resolves: CVE-2022-4203
+  Resolves: CVE-2022-4304
+  Resolves: CVE-2022-4450
+  Resolves: CVE-2023-0215
+  Resolves: CVE-2023-0216
+  Resolves: CVE-2023-0217
+  Resolves: CVE-2023-0286
+  Resolves: CVE-2023-0401
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Thu Jan 05 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-3
+- Backport implicit rejection for RSA PKCS#1 v1.5 encryption
+  Resolves: rhbz#2153470
+
+* Thu Jan 05 2023 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-2
+- Refactor embedded mac verification in FIPS module
+  Resolves: rhbz#2156045
+
+* Fri Dec 23 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.7-1
+- Rebase to upstream version 3.0.7
+- C99 compatibility in downstream-only 0032-Force-fips.patch
+  Resolves: rhbz#2152504
+- Adjusting include for the FIPS_mode macro
+  Resolves: rhbz#2083876
+
+* Wed Nov 16 2022 Simo sorce <simo@redhat.com> - 1:3.0.5-7
+- Backport patches to fix external providers compatibility issues
+
+* Tue Nov 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-6
+- CVE-2022-3602: X.509 Email Address Buffer Overflow
+- CVE-2022-3786: X.509 Email Address Buffer Overflow
+  Resolves: CVE-2022-3602
+  Resolves: CVE-2022-3786
+
+* Mon Sep 12 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-5
+- Update patches to make ELN build happy
+  Resolves: rhbz#2123755
+
+* Fri Sep 09 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.5-4
+- Fix AES-GCM on Power 8 CPUs
+  Resolves: rhbz#2124845
+
+* Thu Sep 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.5-3
+- Sync patches with RHEL
+  Related: rhbz#2123755
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue Jul 05 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.5-1
+- Rebase to upstream version 3.0.5
+  Related: rhbz#2099972, CVE-2022-2097
+
+* Wed Jun 01 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.3-1
+- Rebase to upstream version 3.0.3
+
+* Thu Apr 28 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-5
+- Instrument with USDT probes related to SHA-1 deprecation
+
+* Wed Apr 27 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-4
+- Support rsa_pkcs1_md5_sha1 in TLS 1.0/1.1 with rh-allow-sha1-signatures = yes
+  to restore TLS 1.0 and 1.1 support in LEGACY crypto-policy.
+  Related: rhbz#2069239
+
+* Tue Apr 26 2022 Alexander Sosedkin <asosedkin@redhat.com> - 1:3.0.2-4
+- Instrument with USDT probes related to SHA-1 deprecation
+
+* Wed Apr 20 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-3
+- Disable SHA-1 by default in ELN using the patches from CentOS
+- Fix a FIXME in the openssl.cnf(5) manpage
+
+* Thu Apr 07 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-2
+- Silence a few rpmlint false positives.
+
+* Thu Apr 07 2022 Clemens Lang <cllang@redhat.com> - 1:3.0.2-2
+- Allow disabling SHA1 signature creation and verification.
+  Set rh-allow-sha1-signatures = no to disable.
+  Allow SHA1 in TLS in SECLEVEL 1 if rh-allow-sha1-signatures = yes. This will
+  support SHA1 in TLS in the LEGACY crypto-policy.
+  Resolves: rhbz#2070977
+  Related: rhbz#2031742, rhbz#2062640
+
+* Fri Mar 18 2022 Dmitry Belyavskiy <dbelyavs@redhat.com> - 1:3.0.2-1
+- Rebase to upstream version 3.0.2
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Thu Sep 09 2021 Sahana Prasad <sahana@redhat.com> - 1:3.0.0-1
+- Rebase to upstream version 3.0.0

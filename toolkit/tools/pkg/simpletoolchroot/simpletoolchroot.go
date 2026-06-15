@@ -45,7 +45,7 @@ func (s *SimpleToolChroot) ChrootRelativeMountDir() string {
 //   - chrootName: The name of the chroot to create
 //   - workerTarPath: The path to the tar file containing the worker files
 //   - mountDirPath: The path to the directory to mount, will be mounted to s.ChrootRelativeMountDir() inside the chroot
-func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath, mountDirPath string) (err error) {
+func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath, mountDirPath, releaseVersionMacrosFile string) (err error) {
 	const (
 		existingDir = false
 	)
@@ -57,7 +57,7 @@ func (s *SimpleToolChroot) InitializeChroot(buildDir, chrootName, workerTarPath,
 	extraMountPoints := []*safechroot.MountPoint{
 		safechroot.NewMountPoint(mountDirPath, chrootMountDirPath, "", safechroot.BindMountPointFlags, ""),
 	}
-	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true)
+	err = s.chroot.Initialize(workerTarPath, extraDirectories, extraMountPoints, true, releaseVersionMacrosFile)
 	if err != nil {
 		err = fmt.Errorf("failed to initialize chroot (%s) inside (%s):\n%w", workerTarPath, chrootDirPath, err)
 		return

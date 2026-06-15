@@ -1,0 +1,230 @@
+From c28859cbaeac298adbe957956cf8442c9a6b7264 Mon Sep 17 00:00:00 2001
+Message-ID: <c28859cbaeac298adbe957956cf8442c9a6b7264.1744876588.git.jdenemar@redhat.com>
+From: Jiri Denemark <jdenemar@redhat.com>
+Date: Tue, 11 Mar 2025 10:05:28 +0100
+Subject: [PATCH] qemu: Rename outgoingMigration parameter in various TPM
+ functions
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The parameter is used to skip TPM state cleanup on outgoing migration
+with shared storage. But we also need to skip the cleanup after a failed
+incoming migration. Let's call the parameter "migration" to reflect its
+usage on both sides of migration.
+
+Signed-off-by: Jiri Denemark <jdenemar@redhat.com>
+Reviewed-by: Ján Tomko <jtomko@redhat.com>
+(cherry picked from commit a5e4ca6f02dc8250f84163a0d19b69300affde43)
+
+https://issues.redhat.com/browse/RHEL-86800
+Signed-off-by: Jiri Denemark <jdenemar@redhat.com>
+---
+ src/qemu/qemu_domain.c    |  8 ++++----
+ src/qemu/qemu_domain.h    |  2 +-
+ src/qemu/qemu_extdevice.c |  8 ++++----
+ src/qemu/qemu_extdevice.h |  4 ++--
+ src/qemu/qemu_tpm.c       | 19 +++++++++----------
+ src/qemu/qemu_tpm.h       |  4 ++--
+ 6 files changed, 22 insertions(+), 23 deletions(-)
+
+diff --git a/src/qemu/qemu_domain.c b/src/qemu/qemu_domain.c
+index 1ccaff90d9..89e1b50366 100644
+--- a/src/qemu/qemu_domain.c
++++ b/src/qemu/qemu_domain.c
+@@ -5749,7 +5749,7 @@ static void
+ qemuDomainRemoveInactiveCommon(virQEMUDriver *driver,
+                                virDomainObj *vm,
+                                virDomainUndefineFlagsValues flags,
+-                               bool outgoingMigration)
++                               bool migration)
+ {
+     g_autoptr(virQEMUDriverConfig) cfg = virQEMUDriverGetConfig(driver);
+     g_autofree char *snapDir = NULL;
+@@ -5775,7 +5775,7 @@ qemuDomainRemoveInactiveCommon(virQEMUDriver *driver,
+         if (rmdir(chkDir) < 0 && errno != ENOENT)
+             VIR_WARN("unable to remove checkpoint directory %s", chkDir);
+     }
+-    qemuExtDevicesCleanupHost(driver, vm->def, flags, outgoingMigration);
++    qemuExtDevicesCleanupHost(driver, vm->def, flags, migration);
+ }
+ 
+ 
+@@ -5788,14 +5788,14 @@ void
+ qemuDomainRemoveInactive(virQEMUDriver *driver,
+                          virDomainObj *vm,
+                          virDomainUndefineFlagsValues flags,
+-                         bool outgoingMigration)
++                         bool migration)
+ {
+     if (vm->persistent) {
+         /* Short-circuit, we don't want to remove a persistent domain */
+         return;
+     }
+ 
+-    qemuDomainRemoveInactiveCommon(driver, vm, flags, outgoingMigration);
++    qemuDomainRemoveInactiveCommon(driver, vm, flags, migration);
+ 
+     virDomainObjListRemove(driver->domains, vm);
+ }
+diff --git a/src/qemu/qemu_domain.h b/src/qemu/qemu_domain.h
+index e810f79599..6246988491 100644
+--- a/src/qemu/qemu_domain.h
++++ b/src/qemu/qemu_domain.h
+@@ -689,7 +689,7 @@ int qemuDomainMomentDiscardAll(void *payload,
+ void qemuDomainRemoveInactive(virQEMUDriver *driver,
+                               virDomainObj *vm,
+                               virDomainUndefineFlagsValues flags,
+-                              bool outgoingMigration);
++                              bool migration);
+ 
+ void
+ qemuDomainRemoveInactiveLocked(virQEMUDriver *driver,
+diff --git a/src/qemu/qemu_extdevice.c b/src/qemu/qemu_extdevice.c
+index 2384bab7a6..7451e0fa03 100644
+--- a/src/qemu/qemu_extdevice.c
++++ b/src/qemu/qemu_extdevice.c
+@@ -154,7 +154,7 @@ void
+ qemuExtDevicesCleanupHost(virQEMUDriver *driver,
+                           virDomainDef *def,
+                           virDomainUndefineFlagsValues flags,
+-                          bool outgoingMigration)
++                          bool migration)
+ {
+     size_t i;
+ 
+@@ -165,7 +165,7 @@ qemuExtDevicesCleanupHost(virQEMUDriver *driver,
+         virDomainTPMDef *tpm = def->tpms[i];
+ 
+         if (tpm->type == VIR_DOMAIN_TPM_TYPE_EMULATOR)
+-            qemuExtTPMCleanupHost(driver, tpm, flags, outgoingMigration);
++            qemuExtTPMCleanupHost(driver, tpm, flags, migration);
+     }
+ }
+ 
+@@ -266,7 +266,7 @@ qemuExtDevicesStart(virQEMUDriver *driver,
+ void
+ qemuExtDevicesStop(virQEMUDriver *driver,
+                    virDomainObj *vm,
+-                   bool outgoingMigration)
++                   bool migration)
+ {
+     virDomainDef *def = vm->def;
+     size_t i;
+@@ -283,7 +283,7 @@ qemuExtDevicesStop(virQEMUDriver *driver,
+ 
+     for (i = 0; i < def->ntpms; i++) {
+         if (def->tpms[i]->type == VIR_DOMAIN_TPM_TYPE_EMULATOR)
+-            qemuExtTPMStop(driver, vm, outgoingMigration);
++            qemuExtTPMStop(driver, vm, migration);
+     }
+ 
+     for (i = 0; i < def->nnets; i++) {
+diff --git a/src/qemu/qemu_extdevice.h b/src/qemu/qemu_extdevice.h
+index d4ac9f395c..36f7fb77a8 100644
+--- a/src/qemu/qemu_extdevice.h
++++ b/src/qemu/qemu_extdevice.h
+@@ -48,7 +48,7 @@ int qemuExtDevicesPrepareHost(virQEMUDriver *driver,
+ void qemuExtDevicesCleanupHost(virQEMUDriver *driver,
+                                virDomainDef *def,
+                                virDomainUndefineFlagsValues flags,
+-                               bool outgoingMigration)
++                               bool migration)
+     ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2);
+ 
+ int qemuExtDevicesStart(virQEMUDriver *driver,
+@@ -59,7 +59,7 @@ int qemuExtDevicesStart(virQEMUDriver *driver,
+ 
+ void qemuExtDevicesStop(virQEMUDriver *driver,
+                         virDomainObj *vm,
+-                        bool outgoingMigration)
++                        bool migration)
+     ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2);
+ 
+ bool qemuExtDevicesHasDevice(virDomainDef *def);
+diff --git a/src/qemu/qemu_tpm.c b/src/qemu/qemu_tpm.c
+index f5e0184e54..f910a26286 100644
+--- a/src/qemu/qemu_tpm.c
++++ b/src/qemu/qemu_tpm.c
+@@ -907,7 +907,8 @@ qemuTPMEmulatorInitPaths(virDomainTPMDef *tpm,
+  * @driver: QEMU driver
+  * @tpm: TPM definition
+  * @flags: flags indicating whether to keep or remove TPM persistent state
+- * @outgoingMigration: whether cleanup is due to an outgoing migration
++ * @migration: whether cleanup is due to a successful outgoing or failed
++ *      incoming migration
+  *
+  * Clean up persistent storage for the swtpm.
+  */
+@@ -915,14 +916,12 @@ static void
+ qemuTPMEmulatorCleanupHost(virQEMUDriver *driver,
+                            virDomainTPMDef *tpm,
+                            virDomainUndefineFlagsValues flags,
+-                           bool outgoingMigration)
++                           bool migration)
+ {
+     g_autoptr(virQEMUDriverConfig) cfg = virQEMUDriverGetConfig(driver);
+ 
+-    /* Never remove the state in case of outgoing migration with shared
+-     * storage.
+-     */
+-    if (outgoingMigration &&
++    /* Never remove the state in case of migration with shared storage. */
++    if (migration &&
+         virFileIsSharedFS(tpm->data.emulator.source_path, cfg->sharedFilesystems) == 1)
+         return;
+ 
+@@ -1293,9 +1292,9 @@ void
+ qemuExtTPMCleanupHost(virQEMUDriver *driver,
+                       virDomainTPMDef *tpm,
+                       virDomainUndefineFlagsValues flags,
+-                      bool outgoingMigration)
++                      bool migration)
+ {
+-    qemuTPMEmulatorCleanupHost(driver, tpm, flags, outgoingMigration);
++    qemuTPMEmulatorCleanupHost(driver, tpm, flags, migration);
+ }
+ 
+ 
+@@ -1319,7 +1318,7 @@ qemuExtTPMStart(virQEMUDriver *driver,
+ void
+ qemuExtTPMStop(virQEMUDriver *driver,
+                virDomainObj *vm,
+-               bool outgoingMigration)
++               bool migration)
+ {
+     g_autoptr(virQEMUDriverConfig) cfg = virQEMUDriverGetConfig(driver);
+     g_autofree char *shortName = virDomainDefGetShortName(vm->def);
+@@ -1329,7 +1328,7 @@ qemuExtTPMStop(virQEMUDriver *driver,
+         return;
+ 
+     qemuTPMEmulatorStop(cfg->swtpmStateDir, shortName);
+-    if (outgoingMigration && qemuTPMHasSharedStorage(driver, vm->def))
++    if (migration && qemuTPMHasSharedStorage(driver, vm->def))
+         restoreTPMStateLabel = false;
+ 
+     if (qemuSecurityRestoreTPMLabels(driver, vm, restoreTPMStateLabel, false) < 0)
+diff --git a/src/qemu/qemu_tpm.h b/src/qemu/qemu_tpm.h
+index 7096060a2a..37813087cf 100644
+--- a/src/qemu/qemu_tpm.h
++++ b/src/qemu/qemu_tpm.h
+@@ -38,7 +38,7 @@ int qemuExtTPMPrepareHost(virQEMUDriver *driver,
+ void qemuExtTPMCleanupHost(virQEMUDriver *driver,
+                            virDomainTPMDef *tpm,
+                            virDomainUndefineFlagsValues flags,
+-                           bool outgoingMigration)
++                           bool migration)
+     ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2);
+ 
+ int qemuExtTPMStart(virQEMUDriver *driver,
+@@ -52,7 +52,7 @@ int qemuExtTPMStart(virQEMUDriver *driver,
+ 
+ void qemuExtTPMStop(virQEMUDriver *driver,
+                     virDomainObj *vm,
+-                    bool outgoingMigration)
++                    bool migration)
+     ATTRIBUTE_NONNULL(1) ATTRIBUTE_NONNULL(2);
+ 
+ int qemuExtTPMSetupCgroup(virQEMUDriver *driver,
+-- 
+2.49.0

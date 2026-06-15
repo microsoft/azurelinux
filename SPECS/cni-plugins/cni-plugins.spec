@@ -1,7 +1,7 @@
 Summary:        Container Network Interface (CNI) plugins
 Name:           cni-plugins
 Version:        1.4.0
-Release:        4%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,13 @@ Source0:        %{name}-%{version}.tar.gz
 Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-65637.patch
+Patch3:         CVE-2025-47911.patch
+Patch4:         CVE-2025-58190.patch
+Patch5:         CVE-2026-27136.patch
+Patch6:         CVE-2026-42506.patch
+Patch7:         CVE-2026-25681.patch
+Patch8:         CVE-2026-42502.patch
+Patch9:         CVE-2026-25680.patch
 
 %define _default_cni_plugins_dir /opt/cni/bin
 BuildRequires:  golang >= 1.5
@@ -43,6 +50,12 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_default_cni_plugins_dir}/*
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-6
+- Patch for CVE-2026-42506, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-5
+- Patch for CVE-2025-47911, CVE-2025-58190
+
 * Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-4
 - Patch for CVE-2025-65637
 

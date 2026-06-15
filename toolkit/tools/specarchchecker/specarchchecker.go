@@ -26,9 +26,10 @@ var (
 	pkgsToBuild   = app.Flag("packages", "Space separated list of top-level packages that should be built. Omit this argument to build all packages.").String()
 	pkgsToRebuild = app.Flag("rebuild-packages", "Space separated list of base package names packages that should be rebuilt.").String()
 
-	buildDirPath = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
-	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
-	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
+	buildDirPath             = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
+	distTag                  = app.Flag("dist-tag", "The distribution tag.").Required().String()
+	workerTar                = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
+	releaseVersionMacrosFile = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while parsing specs.").ExistingFile()
 
 	testOnly = app.Flag("test-only", "Whether or not to run the filter out specs which don't run tests.").Bool()
 
@@ -48,7 +49,7 @@ func main() {
 		logger.Log.Fatalf("No specs were provided to filter.")
 	}
 
-	archChecker, err := specarchchecker.New(*buildDirPath, *workerTar, *specsDirPath)
+	archChecker, err := specarchchecker.New(*buildDirPath, *workerTar, *specsDirPath, *releaseVersionMacrosFile)
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize spec arch checker. Error:\n%s", err)
 	}

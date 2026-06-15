@@ -1,0 +1,56 @@
+From de81605b7c10de0c547edc5b919fc163560f9844 Mon Sep 17 00:00:00 2001
+From: Kai Lueke <kailuke@microsoft.com>
+Date: Sat, 13 Dec 2025 23:47:55 +0900
+Subject: [PATCH] systemd: Add noop sysupdate transfer config
+
+When the systemd-sysupdate.service runs it fails if there is no config.
+Since we don't use it, it's expected to do nothing but this failure is
+making problems when the service is started from the timer unit which
+is now enabled by default. This service is also used by the
+sysext-bakery update configs for drop-in steps that update sysupdate
+components. There we let users add a noop config to prevent this service
+failure.
+Since we run into this in Flatcar now and we anyway had users add this
+manually, let's just add it directly to Flatcar.
+
+Signed-off-by: Kai Lueke <kailuke@microsoft.com>
+---
+ Makefile                  | 2 ++
+ sysupdate.d/noop.conf | 8 ++++++++
+ 2 files changed, 10 insertions(+)
+ create mode 100644 sysupdate.d/noop.conf
+
+diff --git a/Makefile b/Makefile
+index 1b1495b..90d2a14 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,6 +16,7 @@ install:
+ 		$(DESTDIR)/usr/bin \
+ 		$(DESTDIR)/usr/sbin \
+ 		$(DESTDIR)/usr/lib/flatcar \
++		$(DESTDIR)/usr/lib/sysupdate.d \
+ 		$(DESTDIR)/usr/lib/systemd/system \
+ 		$(DESTDIR)/usr/lib/systemd/network \
+ 		$(DESTDIR)/usr/lib/systemd/system-generators \
+@@ -33,6 +34,7 @@ install:
+ 	install -m 644 configs/modules-load.d/* $(DESTDIR)/usr/lib/modules-load.d/
+ 	install -m 644 configs/tmpfiles.d/* $(DESTDIR)/usr/lib/tmpfiles.d/
+ 	cp -a systemd/* $(DESTDIR)/usr/lib/systemd/
++	cp -a sysupdate.d/* $(DESTDIR)/usr/lib/sysupdate.d/
+ 	chmod 755 $(DESTDIR)/usr/lib/systemd/system-generators/*
+ 	ln -sf ../run/issue $(DESTDIR)/etc/issue
+ 	ln -sfT flatcar $(DESTDIR)/usr/lib/coreos
+diff --git a/sysupdate.d/noop.conf b/sysupdate.d/noop.conf
+new file mode 100644
+index 0000000..a591a2e
+--- /dev/null
++++ b/sysupdate.d/noop.conf
+@@ -0,0 +1,8 @@
++[Source]
++Type=regular-file
++Path=/
++MatchPattern=invalid@v.raw
++[Target]
++Type=regular-file
++Path=/
++MatchPattern=invalid@v.raw

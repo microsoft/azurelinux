@@ -1,7 +1,7 @@
 Summary:        TensorFlow is an open source machine learning framework for everyone.
 Name:           tensorflow
 Version:        2.16.1
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Patch4:         CVE-2024-35195.patch
 Patch5:         CVE-2024-5569.patch
 Patch6:         CVE-2024-6923.patch
 Patch7:         CVE-2026-21441.patch
+Patch8:         CVE-2026-2492.patch
 BuildRequires:  bazel
 BuildRequires:  binutils
 BuildRequires:  build-essential
@@ -105,6 +106,8 @@ popd
 
 popd
 
+patch -p1 < %{PATCH8}
+
 export TF_PYTHON_VERSION=3.12
 ln -s %{_bindir}/python3 %{_bindir}/python
 
@@ -134,6 +137,9 @@ bazel --batch build  //tensorflow/tools/pip_package:build_pip_package
 %{_bindir}/toco_from_protos
 
 %changelog
+* Tue Feb 24 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.16.1-11
+- Patch for CVE-2026-2492
+
 * Tue Jan 13 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.16.1-10
 - Patch for CVE-2026-21441
 

@@ -37,7 +37,7 @@
 Summary:        First stage UEFI bootloader
 Name:           shim
 Version:        15.8
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -73,7 +73,12 @@ Provides:       shim-unsigned = %{version}-%{release}
 # This is when grub was updated to be signed with the newer Azure Linux certificate
 Conflicts:      grub2-efi-binary < 2.06-22
 
-BuildRequires:  shim-unsigned-%{efiarch} = %{version}-%{release}
+%ifarch x86_64
+BuildRequires:  shim-unsigned-x64 = %{version}
+%endif
+%ifarch aarch64
+BuildRequires:  shim-unsigned-aarch64 = %{version}
+%endif
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  efivar
@@ -187,6 +192,9 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
+* Mon Mar 02 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 15.8-6
+- Change BuildRequires to allow updating shim-unsigned separately
+
 * Thu Nov 28 2024 Chris Co <chrco@microsoft.com> - 15.8-5
 - Add Provides for shim-unsigned
 

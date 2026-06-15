@@ -1,0 +1,7 @@
+{
+ "Signatures": {
+  "0025-for-tests.patch": "449b4a52855275abbc26999a199ff24f35aa31e961650b45764dc138114383b9",
+  "Makefile.certificate": "fba3d7313fd8bdf2a585cd76795503584d6f3e1205dcd16a74c817842fda372b",
+  "openssl-3.1.2.tar.gz": "a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539"
+ }
+}

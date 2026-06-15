@@ -5,7 +5,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        %{dist_version}.0
-Release:        39%{?dist}
+Release:        45%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -118,6 +118,24 @@ install -Dm0644 %{SOURCE4} -t %{buildroot}%{_sysctldir}/
 %{_sysctldir}/*.conf
 
 %changelog
+* Mon May 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-45
+- Bump release for June 2026 Update
+
+* Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-44
+- Bump release for May Update 3
+
+* Sun May 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-43
+- Bump release for May 2026 Update 2
+
+* Wed Apr 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-42
+- Bump release for May Update
+
+* Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-41
+- Bump release for Apr 2026 Update
+
+* Tue Mar 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-40
+- Bump release for Mar 2026 Update
+
 * Mon Jan 19 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.0-39
 - Bump release for Feb 2026 Update
 

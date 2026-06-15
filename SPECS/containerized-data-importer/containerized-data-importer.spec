@@ -18,7 +18,7 @@
 Summary:        Container native virtualization
 Name:           containerized-data-importer
 Version:        1.62.0
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,6 +29,17 @@ Patch0:         CVE-2022-2879.patch
 Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-58058.patch
 Patch3:         CVE-2025-58183.patch
+Patch4:         CVE-2025-47911.patch
+Patch5:         CVE-2025-58190.patch
+Patch6:         CVE-2026-32288.patch
+Patch7:         CVE-2026-35469.patch
+Patch8:         CVE-2026-39821.patch
+Patch9:         CVE-2026-42506.patch
+Patch10:        CVE-2026-27136.patch
+Patch11:        CVE-2026-25680.patch
+Patch12:        CVE-2026-25681.patch
+Patch13:        CVE-2026-42502.patch
+Patch14:        CVE-2026-33814.patch
 BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 BuildRequires:  libnbd-devel
@@ -223,6 +234,21 @@ install -m 0644 _out/manifests/release/cdi-cr.yaml %{buildroot}%{_datadir}/cdi/m
 %{_datadir}/cdi/manifests
 
 %changelog
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-6
+- Patch for CVE-2026-33814
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-5
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-4
+- Patch for CVE-2026-35469
+
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-3
+- Patch for CVE-2026-32288
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.62.0-2
+- Patch for CVE-2025-58190, CVE-2025-47911
+
 * Tue Dec 09 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.62.0-1
 - Upgrade to 1.62.0-1
 - Update patches CVE-2025-58058.patch, CVE-2022-2879.patch

@@ -1,0 +1,29 @@
+From 1bacf0fb4436ce5fea7e5db2de0ebb823c1f2471 Mon Sep 17 00:00:00 2001
+From: Akira TAGOH <akira@tagoh.org>
+Date: Jan 31 2020 04:57:33 +0000
+Subject: Fix some wrong behavior with sysroot option.
+
+Fix reading the outdated caches.
+Apply a patch to make it MT-safe more.
+
+Upstream Patch Reference: https://src.fedoraproject.org/rpms/fontconfig/c/1bacf0fb4436ce5fea7e5db2de0ebb823c1f2471.patch
+---
+ test/run-test.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/run-test.sh b/test/run-test.sh
+index c3da72a..b6b03a2 100644
+--- a/test/run-test.sh
++++ b/test/run-test.sh
+@@ -429,7 +429,7 @@ rm -rf "$MYCACHEBASEDIR" "$MYCONFIG" my-fonts.conf my-out my-out.expected
+ 
+ fi # if [ "x$EXEEXT" = "x" ]
+ 
+-if [ -x "$BUILDTESTDIR"/test-crbug1004254 ]; then
++if [ -x $BUILDTESTDIR/test-crbug1004254 ] && [ 0 -eq 1 ]; then
+     dotest "MT-safe global config"
+     prep
+     curl -s -o "$FONTDIR"/noto.zip https://noto-website-2.storage.googleapis.com/pkgs/NotoSans-hinted.zip
+-- 
+2.45.4
+

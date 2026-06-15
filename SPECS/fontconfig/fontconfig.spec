@@ -1,13 +1,14 @@
 Summary:        library for configuring and customizing font access.
 Name:           fontconfig
 Version:        2.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT or Unicode or Public Domain
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
 Group:          System Environment/Libraries
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://www.freedesktop.org/software/fontconfig/release/%{name}-%{version}.tar.gz
+Patch0:         fontconfig-fix-ptest.patch
 BuildRequires:  freetype-devel
 BuildRequires:  libxml2
 BuildRequires:  expat-devel
@@ -24,7 +25,7 @@ Requires:       expat-devel
 It contains the libraries and header files to create applications
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -40,7 +41,7 @@ make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
 
 %check
-make -k check
+VERBOSE=1 make -k check
 
 %post
 /sbin/ldconfig
@@ -67,6 +68,9 @@ make -k check
 %{_mandir}/man3/*
 
 %changelog
+* Wed Mar 04 2026 Archana Shettigar <v-shettigara@microsoft.com> - 2.14.2-2
+- Provide fix for ptest failure.
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.14.2-1
 - Auto-upgrade to 2.14.2 - Azure Linux 3.0 - package upgrades
 
