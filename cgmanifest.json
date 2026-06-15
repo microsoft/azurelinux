@@ -10170,6 +10170,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libjwt",
+          "version": "1.12.1",
+          "downloadUrl": "https://github.com/benmcollins/libjwt/archive/v1.12.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "libkcapi",
           "version": "1.5.0",
           "downloadUrl": "https://www.chronox.de/libkcapi/releases/1.5.0/libkcapi-1.5.0.tar.xz"
