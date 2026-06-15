@@ -1,5 +1,7 @@
 {
  "Signatures": {
-  "python-debtcollector-1.22.0.tar.gz": "d1756440d25a50e3eca2fc399c9e5f1ca2f9e6b837570a80b9450999f4290525"
+  "0x2ef3fe0ec2b075ab7458b5f8b702b20b13df2318.txt": "a4f619daa6f2f0d47c611fabc489cf634e55d2386bb4f92d2929d2c8aafef53e",
+  "debtcollector-3.0.0.tar.gz": "2a8917d25b0e1f1d0d365d3c1c6ecfc7a522b1e9716e8a1a4a915126f7ccea6f",
+  "debtcollector-3.0.0.tar.gz.asc": "38e46360865e6584be6ed0745b292ab2a8457bd65ad2d53b39ad4496962232f9"
  }
 }

@@ -1,0 +1,161 @@
+# prchecks/CveSpecFilePRCheck/CveSpecFilePRCheck.yml
+# Trigger on PRs to fasttrack/3.0 when .spec or .patch files change
+# Uses the CBL-Mariner bot PAT from key vault to post PR comments on GitHub
+# Also performs anti-pattern detection and AI analysis of spec file changes
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 1) Reference your GitHub service connection here
+# ──────────────────────────────────────────────────────────────────────────────
+resources:
+  repositories:
+    - repository: self
+      type: github
+      name: microsoft/azurelinux   # <org>/<repo>
+      endpoint: microsoft          # <your service-connection name>
+
+trigger: none
+
+pr:
+  branches:
+    include:
+      - fasttrack/3.0
+  paths:
+    include:
+      - '**/*.spec'
+      - '**/*.patch'
+
+name: Automaton-OpenAI-PR-Check
+
+pool:
+  name: mariner-dev-build-1es-mariner2-amd64
+
+parameters:
+  - name: failOnWarnings
+    displayName: Fail pipeline on warnings
+    type: boolean
+    default: false
+  - name: useExitCodeSeverity
+    displayName: Use different exit codes based on severity
+    type: boolean
+    default: true
+  - name: postGitHubComments
+    displayName: Post analysis results as GitHub PR comments
+    type: boolean
+    default: true
+  - name: useGitHubChecks
+    displayName: Use GitHub Checks API for status updates
+    type: boolean
+    default: true
+
+variables:
+  FAIL_ON_WARNINGS:      ${{ parameters.failOnWarnings }}
+  USE_EXIT_CODE_SEVERITY: ${{ parameters.useExitCodeSeverity }}
+  POST_GITHUB_COMMENTS:  ${{ parameters.postGitHubComments }}
+  USE_GITHUB_CHECKS:     ${{ parameters.useGitHubChecks }}
+  # Explicitly set the GitHub PR number from Azure DevOps variables
+  GITHUB_PR_NUMBER:      $(System.PullRequest.PullRequestNumber)
+  GITHUB_REPOSITORY:     $(Build.Repository.Name)
+
+steps:
+  # 1) Clone the repo with OAuth token access
+  - checkout: self
+    fetchDepth: 2
+    persistCredentials: true
+
+  # 2) Debug GitHub Integration Settings
+  - task: Bash@3
+    displayName: 'Debug GitHub Integration Settings'
+    inputs:
+      targetType: inline
+      script: |
+        echo "Build.Repository.Name: $(Build.Repository.Name)"
+        echo "System.PullRequest.PullRequestNumber: $(System.PullRequest.PullRequestNumber)"
+        echo "System.AccessToken exists: $([[ ! -z "${SYSTEM_ACCESSTOKEN}" ]] && echo 'Yes' || echo 'No')"
+        echo "SYSTEM_ACCESSTOKEN prefix: ${SYSTEM_ACCESSTOKEN:0:4}..."
+        echo "Build.SourceBranch: $(Build.SourceBranch)"
+        echo "Build.SourceVersion: $(Build.SourceVersion)"
+        echo "System.TeamFoundationCollectionUri: $(System.TeamFoundationCollectionUri)"
+        echo "System.TeamProject: $(System.TeamProject)"
+
+  # 3) Apply OpenAI config via UMI-login script
+  - task: Bash@3
+    displayName: '⚙️  Apply OpenAI Config'
+    inputs:
+      targetType: inline
+      script: |
+        cd .pipelines/prchecks/CveSpecFilePRCheck
+        if [ ! -f apply-security-config.sh ]; then
+          echo "❌ Cannot find apply-security-config.sh in $(pwd)"
+          exit 1
+        fi
+        bash apply-security-config.sh --openaiModel=o3-mini
+
+  # 4) Verify and use system Python
+  - task: Bash@3
+    displayName: '🐍 Verify System Python'
+    inputs:
+      targetType: inline
+      script: |
+        python3 --version
+        which python3
+        echo "Using system Python instead of downloading version"
+
+  # 5) Run PR‐check analysis without GitHub commenting
+  - task: Bash@3
+    displayName: '🔍 Run PR Check Analysis'
+    env:
+      # Set the source branch and version
+      BUILD_SOURCEBRANCH: $(Build.SourceBranch)
+      SYSTEM_PULLREQUEST_SOURCECOMMITID: $(Build.SourceVersion)
+      # Set OpenAI environment variables explicitly
+      AZURE_OPENAI_ENDPOINT: $(AZURE_OPENAI_ENDPOINT)
+      AZURE_OPENAI_DEPLOYMENT_NAME: $(AZURE_OPENAI_DEPLOYMENT_NAME)
+      AZURE_OPENAI_MODEL_NAME: $(AZURE_OPENAI_MODEL_NAME)
+      AZURE_OPENAI_API_VERSION: $(AZURE_OPENAI_API_VERSION)
+      # GitHub integration environment variables
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      GITHUB_TOKEN: $(githubPrPat)
+      GITHUB_REPOSITORY: $(Build.Repository.Name)
+      GITHUB_PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+    inputs:
+      targetType: inline
+      script: |
+        echo "🔍 Running analysis of spec files with integrated GitHub posting"
+        
+        cd .pipelines/prchecks/CveSpecFilePRCheck
+        chmod +x run-pr-check.sh
+
+        # Build command with integrated GitHub functionality
+        CMD="./run-pr-check.sh --exit-code-severity"
+        if [ "$FAIL_ON_WARNINGS" = "True" ]; then CMD="$CMD --fail-on-warnings"; fi
+        if [ "$POST_GITHUB_COMMENTS" = "True" ]; then CMD="$CMD --post-github-comments"; fi
+        if [ "$USE_GITHUB_CHECKS" = "True" ]; then CMD="$CMD --use-github-checks"; fi
+        
+        echo "Running analysis command: $CMD"
+        $CMD
+        ANALYSIS_EXIT_CODE=$?
+        
+        # Save exit code to publish as pipeline variable
+        echo "##vso[task.setvariable variable=AnalysisExitCode]$ANALYSIS_EXIT_CODE"
+        
+        # Verify report file was created
+        if [ -f "spec_analysis_report.json" ]; then
+          echo "✅ Analysis report generated successfully"
+        else
+          echo "❌ Analysis report file not found"
+          exit 1
+        fi
+        
+        # Interpret exit code and fail the pipeline for ERROR or CRITICAL issues
+        # EXIT_SUCCESS=0, EXIT_CRITICAL=1, EXIT_ERROR=2, EXIT_WARNING=3, EXIT_FATAL=10
+        if [ $ANALYSIS_EXIT_CODE -eq 1 ] || [ $ANALYSIS_EXIT_CODE -eq 2 ] || [ $ANALYSIS_EXIT_CODE -eq 10 ]; then
+          echo "❌ Analysis found critical or error-level issues (exit code: $ANALYSIS_EXIT_CODE)"
+          exit $ANALYSIS_EXIT_CODE
+        elif [ $ANALYSIS_EXIT_CODE -eq 3 ] && [ "$FAIL_ON_WARNINGS" = "True" ]; then
+          echo "⚠️ Analysis found warnings and fail-on-warnings is enabled (exit code: $ANALYSIS_EXIT_CODE)"
+          exit $ANALYSIS_EXIT_CODE
+        elif [ $ANALYSIS_EXIT_CODE -eq 3 ]; then
+          echo "⚠️ Analysis found warnings but pipeline allowed to continue (exit code: $ANALYSIS_EXIT_CODE)"
+        else
+          echo "✅ Analysis completed successfully (exit code: $ANALYSIS_EXIT_CODE)"
+        fi

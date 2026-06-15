@@ -1,0 +1,30 @@
+commit cc34c978778adb40df1a200059a31c8d628b10ee
+Author: William Cohen <wcohen@redhat.com>
+Date:   Thu Jan 21 14:48:01 2021 -0500
+
+    Only check for libpfm.a if static libraries are being used.
+    
+    Even when static libraries are not be used papi was checking for
+    libpfm.a, this would cause a failure if libpfm.a wasn't installed.
+    Exclude checking for libpfm.a if no static libpfm library is needed.
+
+diff --git a/src/Rules.pfm4_pe b/src/Rules.pfm4_pe
+index 61eedc8a3..65a9635c6 100644
+--- a/src/Rules.pfm4_pe
++++ b/src/Rules.pfm4_pe
+@@ -32,6 +32,7 @@ ifeq (yes,$(MIC))
+ 	FORCE_PFM_ARCH="CONFIG_PFMLIB_ARCH_X86=y"
+ endif
+ 
++ifneq (,$(STATIC))
+ ifeq (,$(PFM_OBJS))
+ $(PFM_LIB_PATH)/libpfm.a:
+ ifneq (,${PFM_ROOT})
+@@ -49,6 +50,7 @@ else
+ endif
+ 	$(MAKE)
+ endif
++endif
+ 
+ include Makefile.inc
+ 

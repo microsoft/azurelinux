@@ -1,7 +1,7 @@
 %define debug_package %{nil}
 Summary:        Text editor
 Name:           vim
-Version:        9.1.1198
+Version:        9.2.0620
 Release:        1%{?dist}
 License:        Vim
 Vendor:         Microsoft Corporation
@@ -153,7 +153,6 @@ fi
 %{_datarootdir}/vim/vim*/lang/*.vim
 %doc %{_datarootdir}/vim/vim*/lang/*.txt
 %lang(af) %{_datarootdir}/vim/vim*/lang/af/LC_MESSAGES/vim.mo
-%lang(am) %{_datarootdir}/vim/vim*/lang/am/LC_MESSAGES/vim.mo
 %lang(ca) %{_datarootdir}/vim/vim*/lang/ca/LC_MESSAGES/vim.mo
 %lang(cs) %{_datarootdir}/vim/vim*/lang/cs/LC_MESSAGES/vim.mo
 %lang(de) %{_datarootdir}/vim/vim*/lang/de/LC_MESSAGES/vim.mo
@@ -164,6 +163,7 @@ fi
 %lang(fr) %{_datarootdir}/vim/vim*/lang/fr/LC_MESSAGES/vim.mo
 %lang(ga) %{_datarootdir}/vim/vim*/lang/ga/LC_MESSAGES/vim.mo
 %lang(hu) %{_datarootdir}/vim/vim*/lang/hu/LC_MESSAGES/vim.mo
+%lang(hy) %{_datarootdir}/vim/vim*/lang/hy/LC_MESSAGES/vim.mo
 %lang(it) %{_datarootdir}/vim/vim*/lang/it/LC_MESSAGES/vim.mo
 %lang(ja) %{_datarootdir}/vim/vim*/lang/ja/LC_MESSAGES/vim.mo
 %lang(ko.UTF-8) %{_datarootdir}/vim/vim*/lang/ko.UTF-8/LC_MESSAGES/vim.mo
@@ -179,6 +179,7 @@ fi
 %lang(da) %{_datarootdir}/vim/vim*/lang/da/LC_MESSAGES/vim.mo
 %lang(lv) %{_datarootdir}/vim/vim*/lang/lv/LC_MESSAGES/vim.mo
 %lang(sr) %{_datarootdir}/vim/vim*/lang/sr/LC_MESSAGES/vim.mo
+%lang(ta) %{_datarootdir}/vim/vim*/lang/ta/LC_MESSAGES/vim.mo
 %lang(tr) %{_datarootdir}/vim/vim*/lang/tr/LC_MESSAGES/vim.mo
 %lang(vi) %{_datarootdir}/vim/vim*/lang/vi/LC_MESSAGES/vim.mo
 %lang(zh_CN.UTF-8) %{_datarootdir}/vim/vim*/lang/zh_CN.UTF-8/LC_MESSAGES/vim.mo
@@ -205,6 +206,7 @@ fi
 %{_datarootdir}/vim/vim*/colors/lists/default.vim
 %{_datarootdir}/vim/vim*/defaults.vim
 %{_datarootdir}/vim/vim*/filetype.vim
+%{_datarootdir}/vim/vim*/xdg.vim
 %{_datarootdir}/vim/vim*/syntax/nosyntax.vim
 %{_datarootdir}/vim/vim*/autoload/dist/ft.vim
 %{_bindir}/ex
@@ -214,13 +216,52 @@ fi
 %{_bindir}/rview
 %{_bindir}/vim
 %{_bindir}/vimdiff
-%{_datarootdir}/vim/vim91/LICENSE
-%{_datarootdir}/vim/vim91/README.txt
+%{_datarootdir}/vim/vim*/LICENSE
+%{_datarootdir}/vim/vim*/README.txt
 
 %files rpm-macros
 %{_rpmconfigdir}/macros.d/macros.vim
 
 %changelog
+* Fri Jun 12 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0620-1
+- Auto-upgrade to 9.2.0620 - for CVE-2026-52858, CVE-2026-52859, CVE-2026-52860, CVE-2026-47162, CVE-2026-47167
+
+* Sat May 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0488-1
+- Auto-upgrade to 9.2.0488 - for CVE-2026-46483
+
+* Sat May 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0461-1
+- Auto-upgrade to 9.2.0461 - for CVE-2026-45130, CVE-2026-44656
+
+* Sun Apr 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0392-1
+- Auto-upgrade to 9.2.0392 - for CVE-2026-41411
+
+* Thu Apr 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0323-1
+- Auto-upgrade to 9.2.0323 - for CVE-2026-39881
+
+* Tue Apr 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0315-1
+- Auto-upgrade to 9.2.0315 - for CVE-2026-34714, CVE-2026-34982, CVE-2026-35177
+
+* Wed Mar 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0240-1
+- Auto-upgrade to 9.2.0240 - for CVE-2026-33412
+
+* Sun Mar 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0173-1
+- Auto-upgrade to 9.2.0173 - for CVE-2026-32249
+
+* Sun Mar 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.2.0088-1
+- Auto-upgrade to 9.2.0088 - for CVE-2026-28417, CVE-2026-28418, CVE-2026-28419, CVE-2026-28420, CVE-2026-28421, CVE-2026-28422
+
+* Mon Feb 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.2148-1
+- Auto-upgrade to 9.1.2148 - for CVE-2026-26269
+
+* Mon Feb 09 2026 BinduSri Adabala <v-badabala@microsoft.com> - 9.1.2132-1
+- Upgrade to 9.1.2132 for CVE-2026-25749
+
+* Tue Aug 26 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1616-1
+- Auto-upgrade to 9.1.1616 - for CVE-2025-9390
+
+* Wed Jul 16 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 9.1.1552-1
+- Upgrade to 9.1.1552 - for CVE-2025-53905 and CVE-2025-53906
+
 * Mon Mar 17 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.1.1198-1
 - Auto-upgrade to 9.1.1198 - for CVE-2025-29768
 

@@ -1,7 +1,7 @@
 %global __requires_exclude perl\\(.*\\)
 Summary:        Net-SNMP is a suite of applications used to implement SNMP v1, SNMP v2c and SNMP v3 using both IPv4 and IPv6.
 Name:           net-snmp
-Version:        5.9.4
+Version:        5.9.5.2
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -80,6 +80,7 @@ install -d %{buildroot}%{_localstatedir}/lib/net-snmp
 install -d %{buildroot}%{_localstatedir}/lib/net-snmp/mib_indexes
 install -d %{buildroot}%{_localstatedir}/lib/net-snmp/cert_indexes
 install -d %{buildroot}%{_localstatedir}/run/net-snmp
+rm -rf %{buildroot}/usr/share/licenses/net-snmp-devel
 
 %check
 pushd testing
@@ -102,6 +103,7 @@ popd
 /sbin/*
 
 %files devel
+%exclude /usr/share/licenses/net-snmp/COPYING
 %defattr(-,root,root)
 %{_datadir}/*
 %{_includedir}/*
@@ -109,24 +111,25 @@ popd
 %{perl_vendorarch}/*
 %{_libdir}/*.so
 %exclude %{_libdir}/perl5/perllocal.pod
+%exclude /usr/share/licenses/net-snmp/COPYING
 
 %files libs
 %license COPYING
 %doc README FAQ NEWS TODO
 %{_libdir}/*.so.*
-%{_datadir}/snmp
-%{_datadir}/snmp/mibs
 %{_datadir}/snmp/mibs/*
-%{_localstatedir}/lib/net-snmp
 %{_localstatedir}/lib/net-snmp/mib_indexes
 %{_localstatedir}/lib/net-snmp/cert_indexes
 %{_localstatedir}/run/net-snmp
 
 %changelog
+* Mon Dec 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 5.9.5.2-1
+- Auto-upgrade to 5.9.5.2 - for CVE-2025-68615
+
 * Wed Feb 14 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.9.4-1
 - Auto-upgrade to 5.9.4 - none
 
-* Fri Apr 07 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
+* Thu Apr 07 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-2
 - Add net-snmp-lib subpackage and UCD-SNMP
 
 * Fri Mar 04 2022 Minghe Ren <mingheren@microsoft.com> - 5.9.1-1

@@ -1,7 +1,7 @@
 Summary:        C debugger
 Name:           gdb
 Version:        13.2
-Release:        4%{?dist}
+Release:        9%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,13 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Patch0:         CVE-2023-39128.patch
 Patch1:         CVE-2023-39129.patch
 Patch2:         CVE-2023-39130.patch
+Patch3:         CVE-2025-7546.patch
+Patch4:         CVE-2025-11082.patch
+Patch5:         CVE-2026-4647.patch
+Patch6:         CVE-2026-6846.patch
+Patch7:         CVE-2025-1178.patch
+Patch8:         CVE-2025-1176.patch
+
 BuildRequires:  expat-devel
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
@@ -104,6 +111,21 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
+* Tue May 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-9
+- Patch for CVE-2025-1178, CVE-2025-1176
+
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-8
+- Patch for CVE-2026-6846
+
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-7
+- Patch for CVE-2026-4647
+
+* Fri Oct 03 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-6
+- Patch for CVE-2025-11082
+
+* Fri Jul 18 2025 Akhila Guruju <v-guakhila@microsoft.com> - 13.2-5
+- Patch CVE-2025-7546
+
 * Mon Feb 03 2025 Andrew Phelps <anphel@microsoft.com> - 13.2-4
 - Enable cross-debugging on all supported targets
 

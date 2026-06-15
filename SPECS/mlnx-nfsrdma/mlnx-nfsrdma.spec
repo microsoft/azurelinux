@@ -27,9 +27,11 @@
 #
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_version
+%global target_kernel_release %azl_kernel_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
@@ -40,9 +42,8 @@
 %global K_SRC /lib/modules/%{target_kernel_version_full}/build
 
 %{!?_name: %define _name mlnx-nfsrdma}
-%{!?_version: %define _version 24.10}
-%{!?_mofed_full_version: %define _mofed_full_version %{_version}-20%{release_suffix}%{?dist}}
-%{!?_release: %define _release OFED.24.10.0.6.7.1}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
+%{!?_release: %define _release OFED.25.07.0.9.7.1}
 
 # KMP is disabled by default
 %{!?KMP: %global KMP 0}
@@ -66,12 +67,15 @@
 
 Summary:	 %{_name} Driver
 Name:		 mlnx-nfsrdma
-Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
-Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlnx-nfsrdma-24.10.tgz#/%{_name}-%{_version}.tgz
+# DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
+# This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
+# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+Source0:         %{_distro_sources_url}/%{_name}-%{target_mlnx_ofa_kernel_version}.tgz
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -250,6 +254,16 @@ fi
 %endif
 
 %changelog
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+- Update source path
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Bump mofed release number
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 

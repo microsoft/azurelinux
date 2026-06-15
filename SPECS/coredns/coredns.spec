@@ -6,7 +6,7 @@
 Summary:        Fast and flexible DNS server
 Name:           coredns
 Version:        1.11.4
-Release:        7%{?dist}
+Release:        17%{?dist}
 License:        Apache License 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,8 +41,20 @@ Patch2:         CVE-2025-29786.patch
 Patch3:         CVE-2025-30204.patch
 Patch4:         CVE-2024-53259.patch
 Patch5:         CVE-2025-47950.patch
+Patch6:         CVE-2025-58063.patch
+Patch7:         CVE-2025-59530.patch
+Patch8:         CVE-2025-68156.patch
+Patch9:         CVE-2025-68151.patch
+Patch10:        CVE-2025-11065.patch
+Patch11:        CVE-2026-26017.patch
+Patch12:        CVE-2026-26018.patch
+Patch13:        CVE-2026-32934.patch
+Patch14:        CVE-2026-32936.patch
+Patch15:        CVE-2026-33489.patch
+Patch16:        CVE-2026-33190.patch
+Patch17:        CVE-2026-39821.patch
 
-BuildRequires:  golang >= 1.23
+BuildRequires:  golang < 1.25
 
 %description
 CoreDNS is a fast and flexible DNS server.
@@ -82,6 +94,36 @@ go install github.com/fatih/faillint@latest && \
 %{_bindir}/%{name}
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-17
+- Patch for CVE-2026-39821
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-16
+- Patch for CVE-2026-32936, CVE-2026-32934, CVE-2026-33489, CVE-2026-33190
+
+* Mon Mar 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-15
+- Patch for CVE-2026-26018, CVE-2026-26017
+
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-14
+- Patch for CVE-2025-11065
+
+* Thu Jan 15 2026 Aditya Singh <v-aditysingh@microsoft.com> - 1.11.4-13
+- Patch for CVE-2025-68151
+
+* Fri Dec 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-12
+- Patch for CVE-2025-68156
+
+* Mon Oct 27 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-11
+- Patch for CVE-2025-59530
+
+* Thu Sep 18 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.11.4-10
+- Changed patch order to resolve 'make' race condition.
+
+* Thu Sep 11 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-9
+- Patch for CVE-2025-58063
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.11.4-8
+- Set BR for golang to < 1.25
+
 * Tue Jun 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.11.4-7
 - Fix CVE-2025-47950 with an upstream patch
 
@@ -97,7 +139,7 @@ go install github.com/fatih/faillint@latest && \
 * Mon Mar 03 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.11.4-3
 - Fix CVE-2025-22868 with an upstream patch
 
-* Mon Feb 10 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.4-2
+* Mon Feb 17 2025 Sam Meluch <sammeluch@microsoft.com> - 1.11.4-2
 - readd check section from 2.0
 
 * Fri Feb 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.11.4-1

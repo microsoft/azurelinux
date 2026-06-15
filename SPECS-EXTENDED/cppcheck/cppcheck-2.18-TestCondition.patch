@@ -1,0 +1,32 @@
+From e5efd121ce1f1ae464758697eefc755aa8ab0747 Mon Sep 17 00:00:00 2001
+From: Andreas Schwab <schwab@linux-m68k.org>
+Date: Mon, 4 Aug 2025 16:15:36 +0200
+Subject: [PATCH] Fix expected output in TestCondition::alwaysTrue and
+ TestCondition::alwaysTrueContainer (#7709)
+ 
+---
+ test/testcondition.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+ 
+diff --git a/test/testcondition.cpp b/test/testcondition.cpp
+index 602561a60e0..1fa203ebafd 100644
+--- a/test/testcondition.cpp
++++ b/test/testcondition.cpp
+@@ -4583,7 +4583,7 @@ class TestCondition : public TestFixture {
+         if (std::numeric_limits<char>::is_signed) {
+             ASSERT_EQUALS("[test.cpp:6:18]: (style) Condition 'o[1]=='\\0'' is always false [knownConditionTrueFalse]\n", errout_str());
+         } else {
+-            ASSERT_EQUALS("[test.cpp:4] -> [test.cpp:6]: (style) Condition 'o[1]=='\\0'' is always false [knownConditionTrueFalse]\n", errout_str());
++            ASSERT_EQUALS("[test.cpp:4:25] -> [test.cpp:6:18]: (style) Condition 'o[1]=='\\0'' is always false [knownConditionTrueFalse]\n", errout_str());
+         }
+ 
+         check("void f(int x) {\n" // #11449
+@@ -5323,7 +5323,7 @@ class TestCondition : public TestFixture {
+         if (std::numeric_limits<char>::is_signed) {
+             ASSERT_EQUALS("[test.cpp:5:22]: (style) Condition 'buffer.back()=='\\0'' is always false [knownConditionTrueFalse]\n", errout_str());
+         } else {
+-            ASSERT_EQUALS("[test.cpp:3] -> [test.cpp:5]: (style) Condition 'buffer.back()=='\\0'' is always false\n", errout_str());
++            ASSERT_EQUALS("[test.cpp:3:22] -> [test.cpp:5:22]: (style) Condition 'buffer.back()=='\\0'' is always false [knownConditionTrueFalse]\n", errout_str());
+         }
+ 
+         // #9353

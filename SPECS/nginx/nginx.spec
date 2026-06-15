@@ -1,12 +1,12 @@
 %global nginx_user nginx
-%global njs_version 0.8.3
+%global njs_version 0.9.4
 
 Summary:        High-performance HTTP server and reverse proxy
 Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
-Version:        1.25.4
-Release:        4%{?dist}
+Version:        1.28.3
+Release:        5%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,8 +20,22 @@ Source2:        https://github.com/nginx/njs/archive/refs/tags/%{njs_version}.ta
 Source3:        nginx-tests.tgz
 %endif
 
-Patch0:         CVE-2024-7347.patch
-Patch1:         CVE-2025-23419.patch
+Patch1:         0001-remove-Werror-in-upstream-build-scripts.patch
+Patch2:         0002-fix-PIDFile-handling.patch
+Patch3:         0003-Add-SSL-passphrase-dialog.patch
+Patch4:         0004-Disable-ENGINE-support.patch
+Patch5:         0005-Compile-perl-module-with-O2.patch
+Patch6:         CVE-2026-40460.patch
+Patch7:         CVE-2026-40701.patch
+Patch8:         CVE-2026-42934.patch
+Patch9:         CVE-2026-42945.patch
+Patch10:        CVE-2026-42946.patch
+Patch11:        CVE-2026-9256.patch
+Patch12:        CVE-2026-49975.patch
+
+# njs patches start at 1001 to keep them separate from nginx patches
+Patch1001:      CVE-2026-8711.patch
+
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
 BuildRequires:  openssl-devel
@@ -65,10 +79,16 @@ Requires:       opentelemetry-cpp
 The OpenTelemetry module for Nginx
 
 %prep
-%autosetup -p1
-pushd ../
-mkdir -p nginx-njs
-tar -C nginx-njs -xf %{SOURCE2}
+%autosetup -N
+%autopatch -p1 -M 1000
+
+mkdir -p ../nginx-njs
+tar -C ../nginx-njs -xf %{SOURCE2}
+
+pushd ../nginx-njs/njs-%{njs_version}
+%autopatch -p1 -m 1001
+popd
+
 
 %build
 sh configure \
@@ -94,7 +114,8 @@ sh configure \
     --with-http_v2_module \
     --with-ipv6 \
     --with-stream \
-    --with-compat
+    --with-compat \
+    --with-stream_ssl_preread_module
 
 %make_build
 
@@ -163,12 +184,39 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Fri Jun 05 2026 Akhila Guruju <v-guakhila@microsoft.com> - 1.28.3-5
+- Patch for CVE-2026-49975
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-4
+- Patch for CVE-2026-9256
+
+* Mon May 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-3
+- Patch for CVE-2026-8711
+
+* Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-2
+- Patch for CVE-2026-42946, CVE-2026-42945, CVE-2026-42934, CVE-2026-40701, CVE-2026-40460
+
+* Thu Mar 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.28.3-1
+- Auto-upgrade to 1.28.3 - for CVE-2026-27654, CVE-2026-27784, CVE-2026-32647, CVE-2026-27651, CVE-2026-28753, CVE-2026-28755
+
+* Tue Feb 10 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.28.2-1
+- Upgrade to version 1.28.2 (fixes CVE-2026-1642).
+
+* Thu Oct 23 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.28.0-1
+- Upgrade to 1.28.0 Upstream Stable Version
+
+* Tue Sep 09 2025 Mayank Singh <mayansingh@microsoft.com> - 1.25.4-6
+- Enable stream ssl preread module
+
+* Tue Aug 19 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.25.4-5
+- Patch for CVE-2025-53859
+
 * Tue Mar 11 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.25.4-4
 - Enable webdav module
 - Added tests to verify nginx server and its supported modules
 
-* Tue Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
-- Fix CVE-2025-234419
+* Mon Feb 10 2025 Mitch Zhu <mitchzhu@microsoft.com> - 1.25.4-3
+- Fix CVE-2025-23419
 
 * Tue Aug 20 2024 Cameron Baird <cameronbaird@microsoft.com> - 1.25.4-2
 - Fix CVE-2024-7347

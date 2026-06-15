@@ -2,7 +2,7 @@
 Summary:        Container class boilerplate killer
 Name:           python-%{srcname}
 Version:        5.0.0
-Release:        10%{?dist}
+Release:        11%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,7 @@ URL:            https://github.com/ionelmc/python-fields
 Source0:        https://github.com/ionelmc/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 # Compatibility with python-sphinx >= 1.3, already applied upstream
 Patch0:         %{name}-5.0.0-sphinx-1.3.patch
+Patch1:         0001-fix-test-warnings.patch
 BuildArch:      noarch
 
 %description
@@ -94,6 +95,9 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/%{srcname}-%{version}-py%{python3_version}.egg-info/
 
 %changelog
+* Mon Mar 02 2026 Sumit Jena <v-sumitjena@microsoft.com> - 5.0.0-11
+- Added patch to avoid warnings while runnning ptests
+
 * Sun Feb 13 2022 Jon Slobodzian <joslobo@microsoft,.com> - 5.0.0-10
 - Add missing build requires on python-devel
 

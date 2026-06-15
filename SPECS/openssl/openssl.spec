@@ -8,8 +8,8 @@
 
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
-Version: 3.3.3
-Release: 2%{?dist}
+Version: 3.3.5
+Release: 5%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -29,7 +29,7 @@ Patch3:   0003-Do-not-install-html-docs.patch
 Patch5:   0005-apps-ca-fix-md-option-help-text.patch
 # # Disable signature verification with totally unsafe hash algorithms
 Patch6:   0006-Disable-signature-verification-with-totally-unsafe-h.patch
-# # Add FIPS_mode() compatibility macro
+# Add FIPS_mode() compatibility macro
 Patch8:   0008-Add-FIPS_mode-compatibility-macro.patch
 # # Add check to see if fips flag is enabled in kernel
 Patch9: 0009-Add-Kernel-FIPS-mode-flag-support.patch
@@ -49,9 +49,9 @@ Patch13:  0013-skipped-tests-EC-curves.patch
 # # Instructions to load legacy provider in openssl.cnf
 # AZL: NOTE: Had to change this patch because of cascading changes from previous AZL note(s)
 Patch24:  0024-load-legacy-prov.patch
-# # Load the SymCrypt provider by default if present in non-FIPS mode,
-# # and always load it implicitly in FIPS mode
-Patch32:  0032-Force-fips.patch
+# # Load SymCrypt provider by default if present in non-FIPS mode,
+# # and always load it or the openssl fips provider in FIPS mode.
+Patch32: 0032-Force-fips-symcrypt-or-fips-3.3.5-AZL3.patch
 # # Skip unavailable algorithms running `openssl speed`
 Patch35:  0035-speed-skip-unavailable-dgst.patch
 # # Selectively disallow SHA1 signatures rhbz#2070977
@@ -62,14 +62,28 @@ Patch52:  0052-Allow-SHA1-in-seclevel-1-if-rh-allow-sha1-signatures.patch
 # # See notes in the patch for details, but this patch will not be needed if
 # # the openssl issue https://github.com/openssl/openssl/issues/7048 is ever implemented and released.
 Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
-# Fix crashes in openssl speed with providers that don't refcount keys.
-# Upstream: https://github.com/openssl/openssl/pull/26976 has been merged into 3.3, so if we
-# upgrade to 3.3.4 when it comes out, we can remove this patch.
-Patch81:  Keep-the-provided-peer-EVP_PKEY-in-the-EVP_PKEY_CTX-too.patch
-# The Symcrypt provider, which is our default, doesn't support some of the
+# The FIPS providers (SymCrypt and OpenSSL FIPS) don't support some of the
 # algorithms that are used in the speed tests. This patch skips those tests.
-# If SymCrypt adds support, we should change and eventually remove this patch.
-Patch82:  prevent-unsupported-calls-into-symcrypt-in-speed.patch
+# If OpenSSL updates speed to be FIPS-tolerant, remove this patch.
+Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
+Patch100: 0001-Correct-handling-of-AEAD-encrypted-CMS-with-inadmiss.patch
+Patch101: 0002-Some-comments-to-clarify-functions-usage.patch
+Patch102: 0003-Test-for-handling-of-AEAD-encrypted-CMS-with-inadmis.patch
+Patch103: 0001-ossl_quic_get_cipher_by_char-Add-a-NULL-guard-before.patch
+Patch104: 0001-Check-the-received-uncompressed-certificate-length-t.patch
+Patch105: 0001-Fix-heap-buffer-overflow-in-BIO_f_linebuffer.patch
+Patch106: 0001-Fix-OCB-AES-NI-HW-stream-path-unauthenticated-unencr.patch
+Patch107: 0001-Verify-ASN1-object-s-types-before-attempting-to-acce.patch
+Patch108: 0001-Add-NULL-check-to-PKCS12_item_decrypt_d2i_ex.patch
+Patch109: CVE-2025-69419.patch
+Patch110: CVE-2026-22796.patch
+Patch111: CVE-2026-31789.patch
+Patch112: CVE-2026-28389.patch
+Patch113: CVE-2026-28390.patch
+Patch114: CVE-2026-28388.patch
+Patch115: CVE-2026-31791.patch
+Patch116: CVE-2026-31790.patch
+
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -89,12 +103,10 @@ BuildRequires: perl(lib)
 BuildRequires: perl(Pod::Html)
 BuildRequires: perl(Text::Template)
 BuildRequires: sed
-
-%if 0%{?with_check}
 BuildRequires: perl(Math::BigInt)
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
-%endif
+BuildRequires: perl(Time::Piece)
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
@@ -365,6 +377,26 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Tue Mar 31 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.5-5
+- Patch CVE-2026-28388, CVE-2026-28389, CVE-2026-28390, CVE-2026-31789, CVE-2026-31790, CVE-2026-31791
+
+* Tue Feb 3 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.5-4
+- Enable switching between SymCrypt-OpenSSL and openssl-fips-provider.
+- Patch OpenSSL speed to skip algorithms not supported by the selected FIPS provider.
+
+* Thu Jan 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-3
+- Patch CVE-2025-69419, CVE-2026-22795, and CVE-2026-22796
+
+* Tue Jan 27 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.5-2
+- Patch CVE-2025-15467, CVE-2025-15468, CVE-2025-66199, CVE-2025-68160,
+  CVE-2025-69418, CVE-2025-69420, and CVE-2025-69421
+
+* Thu Oct 02 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.5-1
+- Auto-upgrade to 3.3.5 for CVE-2025-9230 and CVE-2025-9232
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 3.3.3-3
+- Bump to rebuild with build-id fix from toolchain gcc
+
 * Mon Mar 17 2025 Tobias Brick <tobiasb@microsoft.com> - 3.3.3-2
 - Patch to fix segfaults and errors in openssl speed.
 

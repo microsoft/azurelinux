@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package xmldb-api
 #
-# Copyright (c) 2017 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -14,28 +14,24 @@ Distribution:   Azure Linux
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
-
 %define bname   xmldb
-%define cvs_version 20041010
+%global gh_version 1.7
 Name:           xmldb-api
-Version:        0.1
-Release:        29%{?dist}
+Version:        %{gh_version}.0
+Release:        1%{?dist}
 Summary:        XML:DB API for Java
 License:        Apache-1.1
-Url:            http://xmldb-org.sourceforge.net
-# cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org login
-# cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/xmldb-org export -D 2004-10-10 xapi
-Source0:        %{_distro_sources_url}/xmldb-xapi-%{cvs_version}-src.tar.bz2
-Patch0:         xmldb-api-java5-enum.patch
+Group:          Development/Libraries/Java
+URL:            https://github.com/xmldb-org/%{name}
+Source0:        %{url}/archive/%{name}-%{gh_version}.tar.gz
+Source1:        build.xml 
 BuildRequires:  ant >= 1.6
 BuildRequires:  javapackages-tools
-BuildRequires:  junit
 BuildRequires:  xalan-j2
 Requires:       xalan-j2
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 
 %description
@@ -67,17 +63,6 @@ test cases that can be used to help validate the driver while it is
 being developed. The test cases are still in development but there are
 enough tests currently to be useful.
 
-%package -n xmldb-common
-Summary:        XML:DB API for Java
-Group:          Development/Libraries/Java
-Requires:       %{name} = %{version}
-
-%description -n xmldb-common
-The API interfaces are what driver developers must implement when
-creating a new driver, and are the interfaces that applications are
-developed against. Along with the interfaces, a concrete DriverManager
-implementation is also provided.
-
 %package javadoc
 Summary:        Documentation for XML:DB API for Java
 Group:          Documentation/HTML
@@ -89,39 +74,33 @@ developed against. Along with the interfaces, a concrete DriverManager
 implementation is also provided.
 
 %prep
-%setup -q -n xapi
-%patch 0 -p1
-find . -name "*.jar" | xargs -t rm
-# FIXME: (dwalluck): These use org.apache.xalan.xpath
-rm src/common/org/xmldb/common/xml/queries/xalan/XPathQueryImpl.java
-rm src/common/org/xmldb/common/xml/queries/xalan/XObjectImpl.java
-rm src/common/org/xmldb/common/xml/queries/xalan/XPathQueryFactoryImpl.java
-rm src/common/org/xmldb/common/xml/queries/xt/XPathQueryImpl.java
-rm src/common/org/xmldb/common/xml/queries/xt/XPathQueryFactoryImpl.java
+%autosetup -n %{name}-%{name}-%{gh_version}
+cp -f %{SOURCE1} build.xml
 
 %build
-export CLASSPATH=$(build-classpath junit xalan-j2)
+export CLASSPATH=$(build-classpath xalan-j2)
 export OPT_JAR_LIST=:
 ant \
-    -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+    -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
     -Djarname=%{name} -Dsdk.jarname=%{name}-sdk \
-    dist
+    dist javadoc
 
 %install
 # jars
 install -d -m 755 %{buildroot}%{_javadir}
 install -m 644 dist/xmldb/%{name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
 install -m 644 dist/xmldb/%{name}-sdk.jar %{buildroot}%{_javadir}/%{name}-sdk-%{version}.jar
-install -m 644 dist/xmldb/%{bname}-common.jar %{buildroot}%{_javadir}/%{bname}-common-%{version}.jar
 (cd %{buildroot}%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} ${jar/-%{version}/}; done)
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %files
 %defattr(0644,root,root,0755)
-%license src/LICENSE
-%doc src/{AUTHORS,README,config.xml}
+%license LICENSE
+%doc {AUTHORS,README.adoc}
 %{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}.jar
 
@@ -130,16 +109,17 @@ cp -pr src/build/javadoc/full/* %{buildroot}%{_javadocdir}/%{name}
 %{_javadir}/%{name}-sdk-%{version}.jar
 %{_javadir}/%{name}-sdk.jar
 
-%files -n %{bname}-common
-%defattr(0644,root,root,0755)
-%{_javadir}/%{bname}-common-%{version}.jar
-%{_javadir}/%{bname}-common.jar
-
 %files javadoc
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}
+%license ADDITIONAL_LICENSE_INFO
+%license LICENSE
 
 %changelog
+* Fri Dec 12 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.7.0-1
+- Upgrade to version 1.7.0
+- License verified. 
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.1-29
 - Updating naming for 3.0 version of Azure Linux.
 

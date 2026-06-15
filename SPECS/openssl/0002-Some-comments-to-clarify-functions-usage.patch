@@ -1,0 +1,57 @@
+From 6fb47957bfb0aef2deaa7df7aebd4eb52ffe20ce Mon Sep 17 00:00:00 2001
+From: Igor Ustinov <igus68@gmail.com>
+Date: Mon, 12 Jan 2026 12:15:42 +0100
+Subject: [PATCH 2/3] Some comments to clarify functions usage
+
+---
+ crypto/asn1/evp_asn1.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/crypto/asn1/evp_asn1.c b/crypto/asn1/evp_asn1.c
+index 382576364b..e73bda64e3 100644
+--- a/crypto/asn1/evp_asn1.c
++++ b/crypto/asn1/evp_asn1.c
+@@ -60,6 +60,12 @@ static ossl_inline void asn1_type_init_oct(ASN1_OCTET_STRING *oct,
+     oct->flags = 0;
+ }
+ 
++/*
++ * This function copies 'anum' to 'num' and the data of 'oct' to 'data'.
++ * If the length of 'data' > 'max_len', copies only the first 'max_len'
++ * bytes, but returns the full length of 'oct'; this allows distinguishing
++ * whether all the data was copied.
++ */
+ static int asn1_type_get_int_oct(ASN1_OCTET_STRING *oct, int32_t anum,
+                                  long *num, unsigned char *data, int max_len)
+ {
+@@ -106,6 +112,13 @@ int ASN1_TYPE_set_int_octetstring(ASN1_TYPE *a, long num, unsigned char *data,
+     return 0;
+ }
+ 
++/*
++ * This function decodes an int-octet sequence and copies the integer to 'num'
++ * and the data of octet to 'data'.
++ * If the length of 'data' > 'max_len', copies only the first 'max_len'
++ * bytes, but returns the full length of 'oct'; this allows distinguishing
++ * whether all the data was copied.
++ */
+ int ASN1_TYPE_get_int_octetstring(const ASN1_TYPE *a, long *num,
+                                   unsigned char *data, int max_len)
+ {
+@@ -162,6 +175,13 @@ int ossl_asn1_type_set_octetstring_int(ASN1_TYPE *a, long num,
+     return 0;
+ }
+ 
++/*
++ * This function decodes an octet-int sequence and copies the data of octet
++ * to 'data' and the integer to 'num'.
++ * If the length of 'data' > 'max_len', copies only the first 'max_len'
++ * bytes, but returns the full length of 'oct'; this allows distinguishing
++ * whether all the data was copied.
++ */
+ int ossl_asn1_type_get_octetstring_int(const ASN1_TYPE *a, long *num,
+                                        unsigned char *data, int max_len)
+ {
+-- 
+2.52.0
+

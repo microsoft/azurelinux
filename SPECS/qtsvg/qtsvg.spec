@@ -4,13 +4,14 @@
 Summary:        Qt6 - Support for rendering and displaying SVG
 Name:           qtsvg
 Version:        6.6.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 # See LICENSE.GPL3-EXCEPT.txt, for exception details
 License:        GFDL AND GPLv2+ WITH exceptions AND LGPLv2.1+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.qt.io
 Source0:        https://download.qt.io/archive/qt/%{majmin}/%{version}/submodules/qtsvg-everywhere-src-%{version}.tar.xz
+Patch0:         CVE-2025-10729.patch
 %{?_qt5:Requires: %{_qt}%{?_isa} = %{_qt_version}}
 BuildRequires:  qtbase-devel >= %{version}
 BuildRequires:  qtbase-private-devel
@@ -89,6 +90,9 @@ popd
 
 
 %changelog
+* Tue Oct 07 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.6.1-3
+- Patch for CVE-2025-10729
+
 * Mon Apr 07 2025 Andrew Phelps <anphel@microsoft.com> - 6.6.1-2
 - Bump release to recompile with qtbase-devel-6.6.3
 

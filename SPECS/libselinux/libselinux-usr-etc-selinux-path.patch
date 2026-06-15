@@ -1,0 +1,85 @@
+diff --git a/libselinux/src/init.c b/libselinux/src/init.c
+index 542c979b..acba93f6 100644
+--- a/libselinux/src/init.c
++++ b/libselinux/src/init.c
+@@ -149,7 +149,7 @@ static void init_lib(void)
+ 	selinux_page_size = sysconf(_SC_PAGE_SIZE);
+ 	init_selinuxmnt();
+ #ifndef ANDROID
+-	has_selinux_config = (access(SELINUXCONFIG, F_OK) == 0);
++	has_selinux_config = (access(selinux_config_path(), F_OK) == 0);
+ #endif
+ }
+ 
+diff --git a/libselinux/src/selinux_config.c b/libselinux/src/selinux_config.c
+index 1d8cfb71..79deb6fc 100644
+--- a/libselinux/src/selinux_config.c
++++ b/libselinux/src/selinux_config.c
+@@ -89,7 +89,7 @@ static const uint16_t file_path_suffixes_idx[NEL] = {
+ int selinux_getenforcemode(int *enforce)
+ {
+ 	int ret = -1;
+-	FILE *cfg = fopen(SELINUXCONFIG, "re");
++	FILE *cfg = fopen(selinux_config_path(), "re");
+ 	if (cfg) {
+ 		char *buf;
+ 		char *tag;
+@@ -153,7 +153,6 @@ static int setpolicytype(const char *type)
+ }
+ 
+ static char *selinux_policyroot = NULL;
+-static const char *selinux_rootpath = SELINUXDIR;
+ 
+ static void init_selinux_config(void)
+ {
+@@ -166,7 +165,7 @@ static void init_selinux_config(void)
+ 	if (selinux_policyroot)
+ 		return;
+ 
+-	fp = fopen(SELINUXCONFIG, "re");
++	fp = fopen(selinux_config_path(), "re");
+ 	if (fp) {
+ 		__fsetlocking(fp, FSETLOCKING_BYCALLER);
+ 		while ((len = getline(&line_buf, &line_len, fp)) > 0) {
+@@ -228,7 +227,7 @@ static void init_selinux_config(void)
+ 	if (!selinux_policytype && setpolicytype(SELINUXDEFAULT) != 0)
+ 		return;
+ 
+-	if (asprintf(&selinux_policyroot, "%s%s", SELINUXDIR, selinux_policytype) == -1)
++	if (asprintf(&selinux_policyroot, "%s%s", selinux_path(), selinux_policytype) == -1)
+ 		return;
+ 
+ 	for (i = 0; i < NEL; i++)
+@@ -312,7 +311,13 @@ int selinux_set_policy_root(const char *path)
+ 
+ const char *selinux_path(void)
+ {
+-	return selinux_rootpath;
++	return access(SELINUXDIR_RO, F_OK) == 0 ? SELINUXDIR_RO : SELINUXDIR_RW;
++}
++
++
++const char *selinux_config_path(void)
++{
++	return access(SELINUXDIR_RO, F_OK) == 0 ? SELINUXCONFIG_RO : SELINUXCONFIG_RW;
+ }
+ 
+ 
+diff --git a/libselinux/src/selinux_internal.h b/libselinux/src/selinux_internal.h
+index af69ff04..0ff78e04 100644
+--- a/libselinux/src/selinux_internal.h
++++ b/libselinux/src/selinux_internal.h
+@@ -89,8 +89,11 @@ extern int selinux_page_size ;
+ 	pthread_cond_wait					\
+ )
+ 
+-#define SELINUXDIR "/etc/selinux/"
+-#define SELINUXCONFIG SELINUXDIR "config"
++#define SELINUXDIR_RW "/etc/selinux/"
++#define SELINUXDIR_RO "/usr/etc/selinux/"
++#define SELINUXCONFIG_RO SELINUXDIR_RO "config"
++#define SELINUXCONFIG_RW SELINUXDIR_RW "config"
++const char *selinux_config_path(void);
+ 
+ extern int has_selinux_config ;
+ 

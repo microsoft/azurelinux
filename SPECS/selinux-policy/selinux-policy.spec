@@ -9,7 +9,7 @@
 Summary:        SELinux policy
 Name:           selinux-policy
 Version:        %{refpolicy_major}.%{refpolicy_minor}
-Release:        11%{?dist}
+Release:        13%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,7 @@ Patch35:        0035-rpm-Run-systemd-sysctl-from-post.patch
 Patch36:        0036-fstools-Add-additional-perms-for-cloud-utils-growpar.patch
 Patch37:        0037-docker-Fix-dockerc-typo-in-container_engine_executab.patch
 Patch38:        0038-enable-liveos-iso-flow.patch
+Patch39:        0039-container-allow-mmap-runtime-files.patch
 Patch41:        0041-rpm-Allow-gpg-agent-run-in-rpm-scripts-to-watch-secr.patch
 BuildRequires:  bzip2
 BuildRequires:  checkpolicy >= %{CHECKPOLICYVER}
@@ -132,7 +133,7 @@ enforced by the kernel when running with SELinux enabled.
 %{_sharedstatedir}/selinux/%{policy_name}/active/seusers
 %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules_checksum
-%exclude %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
+%verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/policy.kern
 %verify(not md5 size mtime) %{_sharedstatedir}/selinux/%{policy_name}/active/file_contexts.homedirs
 %{_sharedstatedir}/selinux/%{policy_name}/active/modules/100/*
 
@@ -329,6 +330,14 @@ exit 0
 selinuxenabled && semodule -nB
 exit 0
 %changelog
+* Fri Jun 05 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.20240226-13
+- Backport upstream refpolicy fix to allow system container engines to mmap
+  runtime files (container_runtime_t:file map), fixing containerd 2.2
+  MountManager initialization failure under SELinux enforcing.
+
+* Thu Aug 18 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-12
+- Include policy.kern otherwise some semanage operations fail without it.
+
 * Fri Apr 04 2025 Chris PeBenito <chpebeni@microsoft.com> - 2.20240226-11
 - Add fix for gpg-agent use in rpm scripts for watching root's secrets dir.
 

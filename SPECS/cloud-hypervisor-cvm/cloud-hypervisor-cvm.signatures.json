@@ -1,7 +1,0 @@
-{
-  "Signatures": {
-    "config.toml": "06c9c9ca116704e883748cbed6fc4f080f68f649af8d759ecfbf3c36375c58d4",
-    "cloud-hypervisor-cvm-41.0.79.tar.gz": "d7b63ed05863ed24c2ed5c141d405347d41718abc47b1eda80f61f065cb58f40",
-    "cloud-hypervisor-cvm-41.0.79-vendor.tar.gz": "7c38df4bbf44a128a460fe380a6335ddf1b3ec77ed521078dfda851c988f5302"
-  }
-}

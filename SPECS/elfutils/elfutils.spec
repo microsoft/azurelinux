@@ -4,7 +4,7 @@
 Summary:        A collection of utilities and DSOs to handle compiled objects
 Name:           elfutils
 Version:        0.189
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv3+ AND (GPLv2+ OR LGPLv3+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Patch0:         CVE-2025-1372.patch
 Patch1:         CVE-2025-1376.patch
 Patch2:         CVE-2025-1377.patch
 Patch3:         CVE-2025-1352.patch
+Patch4:         CVE-2024-25260.patch
 
 BuildRequires:  bison >= 1.875
 BuildRequires:  bzip2-devel
@@ -283,6 +284,9 @@ fi
 %defattr(-,root,root)
 
 %changelog
+* Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.189-6
+- Patch for CVE-2024-25260
+
 * Wed Jan 15 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 0.189-5
 - add patch for CVE-2025-1352
 

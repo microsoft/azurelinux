@@ -7,7 +7,7 @@
 Summary:        CRI tools
 Name:           cri-tools
 Version:        1.32.0
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -15,9 +15,19 @@ Group:          Development/Tools
 URL:            https://github.com/kubernetes-sigs/cri-tools
 Source0:        https://github.com/kubernetes-sigs/cri-tools/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-45338.patch
+Patch1:         CVE-2025-22872.patch
+Patch2:         CVE-2025-47911.patch
+Patch3:         CVE-2025-58190.patch
+Patch4:         CVE-2026-35469.patch
+Patch5:         CVE-2026-39821.patch
+Patch6:         CVE-2026-42506.patch
+Patch7:         CVE-2026-27136.patch
+Patch8:         CVE-2026-25680.patch
+Patch9:         CVE-2026-25681.patch
+Patch10:        CVE-2026-42502.patch
 BuildRequires:  glib-devel
 BuildRequires:  glibc-devel
-BuildRequires:  golang
+BuildRequires:  golang < 1.25
 
 %description
 cri-tools aims to provide a series of debugging and validation tools for Kubelet CRI, which includes:
@@ -45,6 +55,21 @@ install -p -m 755 -t %{buildroot}%{_bindir} "${BUILD_FOLDER}/critest"
 %{_bindir}/critest
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-6
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-5
+- Patch for CVE-2026-35469
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.32.0-4
+- Patch for CVE-2025-58190, CVE-2025-47911
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 1.32.0-3
+- Set BR for golang to < 1.25
+
+* Thu May 22 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.32.0-2
+- Patch CVE-2025-22872
+
 * Thu Jan 16 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.32.0-1
 - Auto-upgrade to 1.32.0 - to sync up with the latest AKS version
 

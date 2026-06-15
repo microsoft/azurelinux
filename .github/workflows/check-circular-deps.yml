@@ -19,9 +19,25 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@v4
 
+      - name: Determine DAILY_BUILD_ID value
+        run: |
+          echo "GitHub 'base_ref': ${{ github.base_ref }}"
+          echo "GitHub 'ref': ${{ github.ref }}"
+
+          daily_build_id=
+          if [[ "${{ github.base_ref }}" == fasttrack/* || "${{ github.ref }}" == refs/heads/fasttrack/* ]]; then
+            echo "Building against a fast-track branch. Will use PMC RPM repo for reference."
+          else
+            echo "Not building against a fast-track branch. Will use daily build LKG RPM repo for reference."
+            daily_build_id=lkg
+          fi
+
+          echo "DAILY_BUILD_ID is set to '$daily_build_id'"
+          echo "daily_build_id=$daily_build_id" >> $GITHUB_ENV
+
       - name: Check for circular dependencies
         run: |
           echo "Checking for circular dependency loops..."
           # Setup the toolchain using the LKG daily build, and then make the full package graph.
           # This will fail if any circular dependency loops are detected in the core SPECs.
-          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID=lkg -j30
+          sudo make -C toolkit graph REBUILD_TOOLS=y DAILY_BUILD_ID="${{ env.daily_build_id }}" -j30

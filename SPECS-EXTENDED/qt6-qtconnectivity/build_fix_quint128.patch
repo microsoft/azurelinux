@@ -1,0 +1,888 @@
+From 2319f9574ad40c4e4f8d21c486aafc7bd29621e7 Mon Sep 17 00:00:00 2001
+From: Sandeep Karambelkar <skarambelkar@microsoft.com>
+Date: Mon, 1 Dec 2025 16:25:17 +0000
+Subject: [PATCH] Fix quint128 redefinition
+
+---
+ .../devicediscoverybroadcastreceiver.cpp      | 12 +++----
+ src/bluetooth/bluez/bluez_data_p.h            | 16 ++++-----
+ src/bluetooth/bluez/hcimanager.cpp            |  2 +-
+ src/bluetooth/bluez/hcimanager_p.h            |  2 +-
+ src/bluetooth/darwin/btcentralmanager.mm      |  2 +-
+ src/bluetooth/darwin/btledeviceinquiry.mm     |  2 +-
+ src/bluetooth/darwin/btutility.mm             |  6 ++--
+ src/bluetooth/lecmaccalculator.cpp            |  6 ++--
+ src/bluetooth/lecmaccalculator_p.h            |  6 ++--
+ .../qbluetoothdevicediscoveryagent_winrt.cpp  | 10 +++---
+ src/bluetooth/qbluetoothsocket_android.cpp    |  4 +--
+ src/bluetooth/qbluetoothuuid.cpp              |  6 ++--
+ src/bluetooth/qbluetoothuuid.h                |  6 ++--
+ src/bluetooth/qleadvertiser_bluez.cpp         |  8 ++---
+ src/bluetooth/qlowenergycontroller_bluez.cpp  | 36 +++++++++----------
+ src/bluetooth/qlowenergycontroller_bluez_p.h  |  6 ++--
+ .../QtBluetooth.5.10.0.linux-gcc-amd64.txt    |  4 +--
+ .../QtBluetooth.5.11.0.linux-gcc-amd64.txt    |  4 +--
+ .../QtBluetooth.5.12.0.linux-gcc-amd64.txt    |  4 +--
+ .../QtBluetooth.5.13.0.linux-gcc-amd64.txt    |  4 +--
+ .../QtBluetooth.5.14.0.linux-gcc-amd64.txt    |  4 +--
+ .../QtBluetooth.5.2.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.3.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.4.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.6.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.7.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.8.0.linux-gcc-amd64.txt     |  4 +--
+ .../QtBluetooth.5.9.0.linux-gcc-amd64.txt     |  4 +--
+ .../qbluetoothuuid/tst_qbluetoothuuid.cpp     | 20 +++++------
+ .../tst_qlowenergycontroller-gattserver.cpp   |  8 ++---
+ 30 files changed, 103 insertions(+), 103 deletions(-)
+
+diff --git a/src/bluetooth/android/devicediscoverybroadcastreceiver.cpp b/src/bluetooth/android/devicediscoverybroadcastreceiver.cpp
+index 67678c1..45e174f 100644
+--- a/src/bluetooth/android/devicediscoverybroadcastreceiver.cpp
++++ b/src/bluetooth/android/devicediscoverybroadcastreceiver.cpp
+@@ -221,10 +221,10 @@ enum ADType {
+     // .. more will be added when required
+ };
+ 
+-// Endianness conversion for quint128 doesn't exist in qtendian.h
+-inline quint128 qbswap(const quint128 src)
++// Endianness conversion for quint128_s doesn't exist in qtendian.h
++inline quint128_s qbswap(const quint128_s src)
+ {
+-    quint128 dst;
++    quint128_s dst;
+     for (int i = 0; i < 16; i++)
+         dst.data[i] = src.data[15 - i];
+     return dst;
+@@ -500,7 +500,7 @@ QBluetoothDeviceInfo DeviceDiscoveryBroadcastReceiver::retrieveDeviceInfo(const
+             case ADType128BitUuidIncomplete:
+             case ADType128BitUuidComplete:
+                 foundService =
+-                    QBluetoothUuid(qToBigEndian<quint128>(qFromLittleEndian<quint128>(dataPtr)));
++                    QBluetoothUuid(qToBigEndian<quint128_s>(qFromLittleEndian<quint128_s>(dataPtr)));
+                 break;
+             case ADTypeServiceData16Bit:
+                 if (nBytes >= 3) {
+@@ -516,8 +516,8 @@ QBluetoothDeviceInfo DeviceDiscoveryBroadcastReceiver::retrieveDeviceInfo(const
+                 break;
+             case ADTypeServiceData128Bit:
+                 if (nBytes >= 17) {
+-                    info.setServiceData(QBluetoothUuid(qToBigEndian<quint128>(
+-                                                qFromLittleEndian<quint128>(dataPtr))),
++                    info.setServiceData(QBluetoothUuid(qToBigEndian<quint128_s>(
++                                                qFromLittleEndian<quint128_s>(dataPtr))),
+                                         QByteArray(dataPtr + 16, nBytes - 17));
+                 }
+                 break;
+diff --git a/src/bluetooth/bluez/bluez_data_p.h b/src/bluetooth/bluez/bluez_data_p.h
+index f91f581..aa282fe 100644
+--- a/src/bluetooth/bluez/bluez_data_p.h
++++ b/src/bluetooth/bluez/bluez_data_p.h
+@@ -119,12 +119,12 @@ struct sockaddr_rc {
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 
+-static inline void btoh128(const quint128 *src, quint128 *dst)
++static inline void btoh128(const quint128_s *src, quint128_s *dst)
+ {
+-    memcpy(dst, src, sizeof(quint128));
++    memcpy(dst, src, sizeof(quint128_s));
+ }
+ 
+-static inline void ntoh128(const quint128 *src, quint128 *dst)
++static inline void ntoh128(const quint128_s *src, quint128_s *dst)
+ {
+     int i;
+ 
+@@ -134,7 +134,7 @@ static inline void ntoh128(const quint128 *src, quint128 *dst)
+ 
+ #elif __BYTE_ORDER == __BIG_ENDIAN
+ 
+-static inline void btoh128(const quint128 *src, quint128 *dst)
++static inline void btoh128(const quint128_s *src, quint128_s *dst)
+ {
+     int i;
+ 
+@@ -142,9 +142,9 @@ static inline void btoh128(const quint128 *src, quint128 *dst)
+         dst->data[15 - i] = src->data[i];
+ }
+ 
+-static inline void ntoh128(const quint128 *src, quint128 *dst)
++static inline void ntoh128(const quint128_s *src, quint128_s *dst)
+ {
+-    memcpy(dst, src, sizeof(quint128));
++    memcpy(dst, src, sizeof(quint128_s));
+ }
+ #else
+ #error "Unknown byte order"
+@@ -164,9 +164,9 @@ template<typename T> inline void putBtData(T src, void *dst)
+ {
+     qToLittleEndian(src, reinterpret_cast<uchar *>(dst));
+ }
+-template<> inline void putBtData(quint128 src, void *dst)
++template<> inline void putBtData(quint128_s src, void *dst)
+ {
+-    btoh128(&src, reinterpret_cast<quint128 *>(dst));
++    btoh128(&src, reinterpret_cast<quint128_s *>(dst));
+ }
+ 
+ #define hton128(x, y) ntoh128(x, y)
+diff --git a/src/bluetooth/bluez/hcimanager.cpp b/src/bluetooth/bluez/hcimanager.cpp
+index 65cbd80..c267c19 100644
+--- a/src/bluetooth/bluez/hcimanager.cpp
++++ b/src/bluetooth/bluez/hcimanager.cpp
+@@ -516,7 +516,7 @@ void HciManager::handleHciAclPacket(const quint8 *data, int size)
+         qCWarning(QT_BT_BLUEZ) << "Unexpected key size" << size << "in Signing Information packet";
+         return;
+     }
+-    quint128 csrk;
++    quint128_s csrk;
+     memcpy(&csrk, data + 1, sizeof csrk);
+     const bool isRemoteKey = aclData->pbFlag == 2;
+     emit signatureResolvingKeyReceived(aclData->handle, isRemoteKey, csrk);
+diff --git a/src/bluetooth/bluez/hcimanager_p.h b/src/bluetooth/bluez/hcimanager_p.h
+index 161675f..cef9f59 100644
+--- a/src/bluetooth/bluez/hcimanager_p.h
++++ b/src/bluetooth/bluez/hcimanager_p.h
+@@ -179,7 +179,7 @@ signals:
+     void commandCompleted(quint16 opCode, quint8 status, const QByteArray &data);
+     void connectionComplete(quint16 handle);
+     void connectionUpdate(quint16 handle, const QLowEnergyConnectionParameters &parameters);
+-    void signatureResolvingKeyReceived(quint16 connHandle, bool remoteKey, const quint128 &csrk);
++    void signatureResolvingKeyReceived(quint16 connHandle, bool remoteKey, const quint128_s &csrk);
+ 
+ private slots:
+     void _q_readNotify();
+diff --git a/src/bluetooth/darwin/btcentralmanager.mm b/src/bluetooth/darwin/btcentralmanager.mm
+index f64dbc3..2103880 100644
+--- a/src/bluetooth/darwin/btcentralmanager.mm
++++ b/src/bluetooth/darwin/btcentralmanager.mm
+@@ -341,7 +341,7 @@ using DiscoveryMode = QLowEnergyService::DiscoveryMode;
+     }
+ 
+ 
+-    const quint128 qtUuidData(deviceUuid.toUInt128());
++    const quint128_s qtUuidData(deviceUuid.toUInt128());
+     uuid_t uuidData = {};
+     std::copy(qtUuidData.data, qtUuidData.data + 16, uuidData);
+     const ObjCScopedPointer<NSUUID> nsUuid([[NSUUID alloc] initWithUUIDBytes:uuidData], RetainPolicy::noInitialRetain);
+diff --git a/src/bluetooth/darwin/btledeviceinquiry.mm b/src/bluetooth/darwin/btledeviceinquiry.mm
+index 52b4ddb..4fc3c8c 100644
+--- a/src/bluetooth/darwin/btledeviceinquiry.mm
++++ b/src/bluetooth/darwin/btledeviceinquiry.mm
+@@ -25,7 +25,7 @@ QBluetoothUuid qt_uuid(NSUUID *nsUuid)
+ 
+     uuid_t uuidData = {};
+     [nsUuid getUUIDBytes:uuidData];
+-    quint128 qtUuidData = {};
++    quint128_s qtUuidData = {};
+     std::copy(uuidData, uuidData + 16, qtUuidData.data);
+     return QBluetoothUuid(qtUuidData);
+ }
+diff --git a/src/bluetooth/darwin/btutility.mm b/src/bluetooth/darwin/btutility.mm
+index 91902ec..d8a4512 100644
+--- a/src/bluetooth/darwin/btutility.mm
++++ b/src/bluetooth/darwin/btutility.mm
+@@ -83,7 +83,7 @@ BluetoothDeviceAddress iobluetooth_address(const QBluetoothAddress &qAddress)
+ ObjCStrongReference<IOBluetoothSDPUUID> iobluetooth_uuid(const QBluetoothUuid &uuid)
+ {
+     const unsigned nBytes = 128 / std::numeric_limits<unsigned char>::digits;
+-    const quint128 intVal(uuid.toUInt128());
++    const quint128_s intVal(uuid.toUInt128());
+ 
+     const ObjCStrongReference<IOBluetoothSDPUUID> iobtUUID([IOBluetoothSDPUUID uuidWithBytes:intVal.data
+                                                            length:nBytes], RetainPolicy::doInitialRetain);
+@@ -97,7 +97,7 @@ QBluetoothUuid qt_uuid(IOBluetoothSDPUUID *uuid)
+         return qtUuid;
+ 
+     // TODO: ensure the correct byte-order!!!
+-    quint128 uuidVal = {};
++    quint128_s uuidVal = {};
+     const quint8 *const source = static_cast<const quint8 *>([uuid bytes]);
+     std::copy(source, source + 16, uuidVal.data);
+     return QBluetoothUuid(uuidVal);
+@@ -161,7 +161,7 @@ QBluetoothUuid qt_uuid(CBUUID *uuid)
+         const uchar *const src = static_cast<const uchar *>(uuid.data.bytes);
+         return QBluetoothUuid(qFromBigEndian<quint32>(src));
+     } else if (uuid.data.length == 16) {
+-        quint128 qtUuidData = {};
++        quint128_s qtUuidData = {};
+         const quint8 *const source = static_cast<const quint8 *>(uuid.data.bytes);
+         std::copy(source, source + 16, qtUuidData.data);
+ 
+diff --git a/src/bluetooth/lecmaccalculator.cpp b/src/bluetooth/lecmaccalculator.cpp
+index 95ead47..8020bd0 100644
+--- a/src/bluetooth/lecmaccalculator.cpp
++++ b/src/bluetooth/lecmaccalculator.cpp
+@@ -60,12 +60,12 @@ QByteArray LeCmacCalculator::createFullMessage(const QByteArray &message, quint3
+     return fullMessage;
+ }
+ 
+-quint64 LeCmacCalculator::calculateMac(const QByteArray &message, const quint128 &csrk) const
++quint64 LeCmacCalculator::calculateMac(const QByteArray &message, const quint128_s &csrk) const
+ {
+ #ifdef CONFIG_LINUX_CRYPTO_API
+     if (m_baseSocket == -1)
+         return false;
+-    quint128 csrkMsb;
++    quint128_s csrkMsb;
+     std::reverse_copy(std::begin(csrk.data), std::end(csrk.data), std::begin(csrkMsb.data));
+     qCDebug(QT_BT_BLUEZ) << "CSRK (MSB):" << QByteArray(reinterpret_cast<char *>(csrkMsb.data),
+                                                         sizeof csrkMsb).toHex();
+@@ -127,7 +127,7 @@ quint64 LeCmacCalculator::calculateMac(const QByteArray &message, const quint128
+ #endif
+ }
+ 
+-bool LeCmacCalculator::verify(const QByteArray &message, const quint128 &csrk,
++bool LeCmacCalculator::verify(const QByteArray &message, const quint128_s &csrk,
+                            quint64 expectedMac) const
+ {
+ #ifdef CONFIG_LINUX_CRYPTO_API
+diff --git a/src/bluetooth/lecmaccalculator_p.h b/src/bluetooth/lecmaccalculator_p.h
+index c60300b..9a96c4c 100644
+--- a/src/bluetooth/lecmaccalculator_p.h
++++ b/src/bluetooth/lecmaccalculator_p.h
+@@ -18,7 +18,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-struct quint128;
++struct quint128_s;
+ 
+ class Q_AUTOTEST_EXPORT LeCmacCalculator
+ {
+@@ -28,10 +28,10 @@ public:
+ 
+     static QByteArray createFullMessage(const QByteArray &message, quint32 signCounter);
+ 
+-    quint64 calculateMac(const QByteArray &message, const quint128 &csrk) const;
++    quint64 calculateMac(const QByteArray &message, const quint128_s &csrk) const;
+ 
+     // Convenience function.
+-    bool verify(const QByteArray &message, const quint128 &csrk, quint64 expectedMac) const;
++    bool verify(const QByteArray &message, const quint128_s &csrk, quint64 expectedMac) const;
+ 
+ private:
+     int m_baseSocket = -1;
+diff --git a/src/bluetooth/qbluetoothdevicediscoveryagent_winrt.cpp b/src/bluetooth/qbluetoothdevicediscoveryagent_winrt.cpp
+index a5dd6ab..8dfde47 100644
+--- a/src/bluetooth/qbluetoothdevicediscoveryagent_winrt.cpp
++++ b/src/bluetooth/qbluetoothdevicediscoveryagent_winrt.cpp
+@@ -38,10 +38,10 @@ QT_IMPL_METATYPE_EXTERN(ServiceData)
+ 
+ Q_DECLARE_LOGGING_CATEGORY(QT_BT_WINDOWS)
+ 
+-// Endianness conversion for quint128 doesn't exist in qtendian.h
+-inline quint128 qbswap(const quint128 src)
++// Endianness conversion for quint128_s doesn't exist in qtendian.h
++inline quint128_s qbswap(const quint128_s src)
+ {
+-    quint128 dst;
++    quint128_s dst;
+     for (int i = 0; i < 16; i++)
+         dst.data[i] = src.data[15 - i];
+     return dst;
+@@ -89,8 +89,8 @@ static ServiceData extractServiceData(const BluetoothLEAdvertisement &ad)
+                            bufferData + 4);
+             } else if (dataType == 0x21) {
+                 Q_ASSERT(bufferData.size() >= 16);
+-                ret.insert(QBluetoothUuid(qToBigEndian<quint128>(
+-                                   qFromLittleEndian<quint128>(bufferData.constData()))),
++                ret.insert(QBluetoothUuid(qToBigEndian<quint128_s>(
++                                   qFromLittleEndian<quint128_s>(bufferData.constData()))),
+                            bufferData + 16);
+             }
+         }
+diff --git a/src/bluetooth/qbluetoothsocket_android.cpp b/src/bluetooth/qbluetoothsocket_android.cpp
+index b48dd51..ca14f53 100644
+--- a/src/bluetooth/qbluetoothsocket_android.cpp
++++ b/src/bluetooth/qbluetoothsocket_android.cpp
+@@ -781,8 +781,8 @@ QBluetoothUuid QBluetoothSocketPrivateAndroid::reverseUuid(const QBluetoothUuid
+     if (isBaseUuid)
+         return serviceUuid;
+ 
+-    const quint128 original = serviceUuid.toUInt128();
+-    quint128 reversed;
++    const quint128_s original = serviceUuid.toUInt128();
++    quint128_s reversed;
+     for (int i = 0; i < 16; i++)
+         reversed.data[15-i] = original.data[i];
+     return QBluetoothUuid{reversed};
+diff --git a/src/bluetooth/qbluetoothuuid.cpp b/src/bluetooth/qbluetoothuuid.cpp
+index ebcde92..d55065d 100644
+--- a/src/bluetooth/qbluetoothuuid.cpp
++++ b/src/bluetooth/qbluetoothuuid.cpp
+@@ -529,7 +529,7 @@ Q_CONSTRUCTOR_FUNCTION(registerQBluetoothUuid)
+ 
+     Note that \a uuid must be in big endian order.
+ */
+-QBluetoothUuid::QBluetoothUuid(quint128 uuid)
++QBluetoothUuid::QBluetoothUuid(quint128_s uuid)
+ {
+ QT_WARNING_PUSH
+ QT_WARNING_DISABLE_GCC("-Wstrict-aliasing")
+@@ -630,9 +630,9 @@ quint32 QBluetoothUuid::toUInt32(bool *ok) const
+ /*!
+     Returns the 128 bit representation of this UUID.
+ */
+-quint128 QBluetoothUuid::toUInt128() const
++quint128_s QBluetoothUuid::toUInt128() const
+ {
+-    quint128 uuid;
++    quint128_s uuid;
+ 
+     quint32 tmp32 = qToBigEndian<quint32>(data1);
+     memcpy(&uuid.data[0], &tmp32, 4);
+diff --git a/src/bluetooth/qbluetoothuuid.h b/src/bluetooth/qbluetoothuuid.h
+index c581820..c81786c 100644
+--- a/src/bluetooth/qbluetoothuuid.h
++++ b/src/bluetooth/qbluetoothuuid.h
+@@ -14,7 +14,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-struct quint128
++struct quint128_s
+ {
+     quint8 data[16];
+ };
+@@ -345,7 +345,7 @@ public:
+     explicit constexpr QBluetoothUuid(quint32 uuid) noexcept
+         : QUuid(uuid, 0x0, 0x1000, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb) {};
+ 
+-    explicit QBluetoothUuid(quint128 uuid);
++    explicit QBluetoothUuid(quint128_s uuid);
+     explicit QBluetoothUuid(const QString &uuid);
+     QBluetoothUuid(const QBluetoothUuid &uuid) = default;
+     QBluetoothUuid(const QUuid &uuid);
+@@ -369,7 +369,7 @@ public:
+ 
+     quint16 toUInt16(bool *ok = nullptr) const;
+     quint32 toUInt32(bool *ok = nullptr) const;
+-    quint128 toUInt128() const;
++    quint128_s toUInt128() const;
+ 
+     static QString serviceClassToString(ServiceClassUuid uuid);
+     static QString protocolToString(ProtocolUuid uuid);
+diff --git a/src/bluetooth/qleadvertiser_bluez.cpp b/src/bluetooth/qleadvertiser_bluez.cpp
+index 8d67df7..afcaa43 100644
+--- a/src/bluetooth/qleadvertiser_bluez.cpp
++++ b/src/bluetooth/qleadvertiser_bluez.cpp
+@@ -210,7 +210,7 @@ template<> quint8 servicesType<quint32>(bool dataComplete)
+ {
+     return dataComplete ? 0x5 : 0x4;
+ }
+-template<> quint8 servicesType<quint128>(bool dataComplete)
++template<> quint8 servicesType<quint128_s>(bool dataComplete)
+ {
+     return dataComplete ? 0x7 : 0x6;
+ }
+@@ -245,7 +245,7 @@ void QLeAdvertiserBluez::setServicesData(const QLowEnergyAdvertisingData &src, A
+ {
+     QList<quint16> services16;
+     QList<quint32> services32;
+-    QList<quint128> services128;
++    QList<quint128_s> services128;
+     const QList<QBluetoothUuid> services = src.services();
+     for (const QBluetoothUuid &service : services) {
+         bool ok;
+@@ -262,8 +262,8 @@ void QLeAdvertiserBluez::setServicesData(const QLowEnergyAdvertisingData &src, A
+ 
+         // QBluetoothUuid::toUInt128() is always Big-Endian
+         // convert it to host order
+-        quint128 hostOrder;
+-        quint128 qtUuidOrder = service.toUInt128();
++        quint128_s hostOrder;
++        quint128_s qtUuidOrder = service.toUInt128();
+         ntoh128(&qtUuidOrder, &hostOrder);
+         services128 << hostOrder;
+     }
+diff --git a/src/bluetooth/qlowenergycontroller_bluez.cpp b/src/bluetooth/qlowenergycontroller_bluez.cpp
+index a81ae59..1b6f579 100644
+--- a/src/bluetooth/qlowenergycontroller_bluez.cpp
++++ b/src/bluetooth/qlowenergycontroller_bluez.cpp
+@@ -64,9 +64,9 @@ using namespace QBluetooth;
+ 
+ const int maxPrepareQueueSize = 1024;
+ 
+-static inline QBluetoothUuid convert_uuid128(const quint128 *p)
++static inline QBluetoothUuid convert_uuid128(const quint128_s *p)
+ {
+-    quint128 dst_hostOrder, dst_bigEndian;
++    quint128_s dst_hostOrder, dst_bigEndian;
+ 
+     // Bluetooth LE data comes as little endian
+     // uuids are constructed using high endian
+@@ -74,8 +74,8 @@ static inline QBluetoothUuid convert_uuid128(const quint128 *p)
+     hton128(&dst_hostOrder, &dst_bigEndian);
+ 
+     // convert to Qt's own data type
+-    quint128 qtdst;
+-    memcpy(&qtdst, &dst_bigEndian, sizeof(quint128));
++    quint128_s qtdst;
++    memcpy(&qtdst, &dst_bigEndian, sizeof(quint128_s));
+ 
+     return QBluetoothUuid(qtdst);
+ }
+@@ -160,8 +160,8 @@ template<> void putDataAndIncrement(const QBluetoothUuid &uuid, char *&dst)
+     if (uuidSize == 2) {
+         putBtData(uuid.toUInt16(), dst);
+     } else {
+-        quint128 hostOrder;
+-        quint128 qtUuidOrder = uuid.toUInt128();
++        quint128_s hostOrder;
++        quint128_s qtUuidOrder = uuid.toUInt128();
+         ntoh128(&qtUuidOrder, &hostOrder);
+         putBtData(hostOrder, dst);
+     }
+@@ -211,7 +211,7 @@ void QLowEnergyControllerPrivateBluez::init()
+             }
+     );
+     connect(hciManager.get(), &HciManager::signatureResolvingKeyReceived,
+-            [this](quint16 handle, bool remoteKey, const quint128 &csrk) {
++            [this](quint16 handle, bool remoteKey, const quint128_s &csrk) {
+                 if (handle != connectionHandle)
+                     return;
+                 if ((remoteKey && role == QLowEnergyController::CentralRole)
+@@ -928,7 +928,7 @@ QLowEnergyHandle parseReadByTypeCharDiscovery(
+     if (elementLength == 7) // 16 bit uuid
+         charData->uuid = QBluetoothUuid(bt_get_le16(&data[5]));
+     else
+-        charData->uuid = convert_uuid128((quint128 *)&data[5]);
++        charData->uuid = convert_uuid128((quint128_s *)&data[5]);
+ 
+     qCDebug(QT_BT_BLUEZ) << "Found handle:" << Qt::hex << attributeHandle
+              << "properties:" << charData->properties
+@@ -956,7 +956,7 @@ QLowEnergyHandle parseReadByTypeIncludeDiscovery(
+     if (elementLength == 8) //16 bit uuid
+         foundServices->append(QBluetoothUuid(bt_get_le16(&data[6])));
+     else
+-        foundServices->append(convert_uuid128((quint128 *) &data[6]));
++        foundServices->append(convert_uuid128((quint128_s *) &data[6]));
+ 
+     qCDebug(QT_BT_BLUEZ) << "Found included service: " << Qt::hex
+                          << attributeHandle << "uuid:" << *foundServices;
+@@ -1028,7 +1028,7 @@ void QLowEnergyControllerPrivateBluez::processReply(
+             if (elementLength == 6) //16 bit uuid
+                 uuid = QBluetoothUuid(bt_get_le16(&data[offset+4]));
+             else if (elementLength == 20) //128 bit uuid
+-                uuid = convert_uuid128((quint128 *)&data[offset+4]);
++                uuid = convert_uuid128((quint128_s *)&data[offset+4]);
+             //else -> do nothing
+ 
+             offset += elementLength;
+@@ -1324,7 +1324,7 @@ void QLowEnergyControllerPrivateBluez::processReply(
+             if (format == 0x01)
+                 uuid = QBluetoothUuid(bt_get_le16(&data[offset+2]));
+             else if (format == 0x02)
+-                uuid = convert_uuid128((quint128 *)&data[offset+2]);
++                uuid = convert_uuid128((quint128_s *)&data[offset+2]);
+ 
+             offset += elementLength;
+ 
+@@ -2289,7 +2289,7 @@ void QLowEnergyControllerPrivateBluez::handleReadByTypeRequest(const QByteArray
+     if (is16BitUuid) {
+         type = QBluetoothUuid(bt_get_le16(typeStart));
+     } else if (is128BitUuid) {
+-        type = QBluetoothUuid(convert_uuid128(reinterpret_cast<const quint128 *>(typeStart)));
++        type = QBluetoothUuid(convert_uuid128(reinterpret_cast<const quint128_s *>(typeStart)));
+     } else {
+         qCWarning(QT_BT_BLUEZ) << "read by type request has invalid packet size" << packet.size();
+         sendErrorResponse(static_cast<QBluezConst::AttCommand>(packet.at(0)), 0,
+@@ -2457,7 +2457,7 @@ void QLowEnergyControllerPrivateBluez::handleReadByGroupTypeRequest(const QByteA
+     if (is16BitUuid) {
+         type = QBluetoothUuid(bt_get_le16(typeStart));
+     } else if (is128BitUuid) {
+-        type = QBluetoothUuid(convert_uuid128(reinterpret_cast<const quint128 *>(typeStart)));
++        type = QBluetoothUuid(convert_uuid128(reinterpret_cast<const quint128_s *>(typeStart)));
+     } else {
+         qCWarning(QT_BT_BLUEZ) << "read by group type request has invalid packet size"
+                                << packet.size();
+@@ -3175,14 +3175,14 @@ void QLowEnergyControllerPrivateBluez::loadSigningDataIfNecessary(SigningKeyType
+         return;
+     }
+     const QByteArray keyData = QByteArray::fromHex(keyString);
+-    if (keyData.size() != qsizetype(sizeof(quint128))) {
++    if (keyData.size() != qsizetype(sizeof(quint128_s))) {
+         qCWarning(QT_BT_BLUEZ) << "Signing key in settings file has invalid size"
+                                << keyString.size();
+         return;
+     }
+     qCDebug(QT_BT_BLUEZ) << "CSRK of peer device is" << keyString;
+     const quint32 counter = settings.value(QLatin1String("Counter"), 0).toUInt();
+-    quint128 csrk;
++    quint128_s csrk;
+     using namespace std;
+     memcpy(csrk.data, keyData.constData(), keyData.size());
+     signingData.insert(remoteDevice.toUInt64(), SigningData(csrk, counter - 1));
+@@ -3228,8 +3228,8 @@ static QByteArray uuidToByteArray(const QBluetoothUuid &uuid)
+         putBtData(uuid.toUInt16(), ba.data());
+     } else {
+         ba.resize(16);
+-        quint128 hostOrder;
+-        quint128 qtUuidOrder = uuid.toUInt128();
++        quint128_s hostOrder;
++        quint128_s qtUuidOrder = uuid.toUInt128();
+         ntoh128(&qtUuidOrder, &hostOrder);
+         putBtData(hostOrder, ba.data());
+     }
+@@ -3466,7 +3466,7 @@ QLowEnergyControllerPrivateBluez::checkReadPermissions(QList<Attribute> &attribu
+     return QBluezConst::AttError::ATT_ERROR_NO_ERROR;
+ }
+ 
+-bool QLowEnergyControllerPrivateBluez::verifyMac(const QByteArray &message, const quint128 &csrk,
++bool QLowEnergyControllerPrivateBluez::verifyMac(const QByteArray &message, const quint128_s &csrk,
+                                              quint32 signCounter, quint64 expectedMac)
+ {
+     if (!cmacCalculator)
+diff --git a/src/bluetooth/qlowenergycontroller_bluez_p.h b/src/bluetooth/qlowenergycontroller_bluez_p.h
+index 320349c..3334460 100644
+--- a/src/bluetooth/qlowenergycontroller_bluez_p.h
++++ b/src/bluetooth/qlowenergycontroller_bluez_p.h
+@@ -151,10 +151,10 @@ private:
+ 
+     struct SigningData {
+         SigningData() = default;
+-        SigningData(const quint128 &csrk, quint32 signCounter = quint32(-1))
++        SigningData(const quint128_s &csrk, quint32 signCounter = quint32(-1))
+             : key(csrk), counter(signCounter) {}
+ 
+-        quint128 key;
++        quint128_s key;
+         quint32 counter = quint32(-1);
+     };
+     QHash<quint64, SigningData> signingData;
+@@ -280,7 +280,7 @@ private:
+     QBluezConst::AttError checkReadPermissions(const Attribute &attr);
+     QBluezConst::AttError checkReadPermissions(QList<Attribute> &attributes);
+ 
+-    bool verifyMac(const QByteArray &message, const quint128 &csrk, quint32 signCounter,
++    bool verifyMac(const QByteArray &message, const quint128_s &csrk, quint32 signCounter,
+                    quint64 expectedMac);
+ 
+     void updateLocalAttributeValue(
+diff --git a/tests/auto/bic/data/QtBluetooth.5.10.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.10.0.linux-gcc-amd64.txt
+index d8b4312..6942026 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.10.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.10.0.linux-gcc-amd64.txt
+@@ -4615,10 +4615,10 @@ QBluetoothLocalDevice (0x0x7f0bf572eaf8) 0
+   QObject (0x0x7f0bf57df960) 0
+       primary-for QBluetoothLocalDevice (0x0x7f0bf572eaf8)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7f0bf57dfd80) 0
++quint128_s (0x0x7f0bf57dfd80) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.11.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.11.0.linux-gcc-amd64.txt
+index ed8c8d2..e3145cf 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.11.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.11.0.linux-gcc-amd64.txt
+@@ -4615,10 +4615,10 @@ QBluetoothLocalDevice (0x0x7f4411c70820) 0
+   QObject (0x0x7f4411cc2ae0) 0
+       primary-for QBluetoothLocalDevice (0x0x7f4411c70820)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7f4411cc2f00) 0
++quint128_s (0x0x7f4411cc2f00) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.12.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.12.0.linux-gcc-amd64.txt
+index 98f1c8c..1d87659 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.12.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.12.0.linux-gcc-amd64.txt
+@@ -4680,10 +4680,10 @@ QBluetoothLocalDevice (0x0x7f889c8871a0) 0
+   QObject (0x0x7f889c7feb40) 0
+       primary-for QBluetoothLocalDevice (0x0x7f889c8871a0)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7f889c7fef60) 0
++quint128_s (0x0x7f889c7fef60) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.13.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.13.0.linux-gcc-amd64.txt
+index ef61ed6..cc14f31 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.13.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.13.0.linux-gcc-amd64.txt
+@@ -4890,10 +4890,10 @@ QBluetoothLocalDevice (0x0x7f5eb91038f0) 0
+   QObject (0x0x7f5eb8e2b900) 0
+       primary-for QBluetoothLocalDevice (0x0x7f5eb91038f0)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7f5eb8e73360) 0
++quint128_s (0x0x7f5eb8e73360) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.14.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.14.0.linux-gcc-amd64.txt
+index d69a6b7..85eed85 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.14.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.14.0.linux-gcc-amd64.txt
+@@ -4929,10 +4929,10 @@ QBluetoothLocalDevice (0x0x7faa66f806e8) 0
+   QObject (0x0x7faa670b7660) 0
+       primary-for QBluetoothLocalDevice (0x0x7faa66f806e8)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7faa670fb0c0) 0
++quint128_s (0x0x7faa670fb0c0) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.2.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.2.0.linux-gcc-amd64.txt
+index be0a7dc..6f17f6f 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.2.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.2.0.linux-gcc-amd64.txt
+@@ -3665,10 +3665,10 @@ QBluetoothLocalDevice (0x0x7fd1f5086ea0) 0
+   QObject (0x0x7fd1f4e3f900) 0
+       primary-for QBluetoothLocalDevice (0x0x7fd1f5086ea0)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7fd1f4e3fd20) 0
++quint128_s (0x0x7fd1f4e3fd20) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.3.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.3.0.linux-gcc-amd64.txt
+index 66fbef0..32f8581 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.3.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.3.0.linux-gcc-amd64.txt
+@@ -3676,10 +3676,10 @@ QBluetoothLocalDevice (0x0x7ffec5a14a90) 0
+   QObject (0x0x7ffec56bcc00) 0
+       primary-for QBluetoothLocalDevice (0x0x7ffec5a14a90)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7ffec5800060) 0
++quint128_s (0x0x7ffec5800060) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.4.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.4.0.linux-gcc-amd64.txt
+index dfdde04..3aa081a 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.4.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.4.0.linux-gcc-amd64.txt
+@@ -3708,10 +3708,10 @@ QBluetoothLocalDevice (0x0x7fa3d7dbe618) 0
+   QObject (0x0x7fa3d7dedf00) 0
+       primary-for QBluetoothLocalDevice (0x0x7fa3d7dbe618)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7fa3d7adc360) 0
++quint128_s (0x0x7fa3d7adc360) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.6.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.6.0.linux-gcc-amd64.txt
+index ddb2eed..f29b3d3 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.6.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.6.0.linux-gcc-amd64.txt
+@@ -3972,10 +3972,10 @@ QBluetoothLocalDevice (0x0x7efe9883c270) 0
+   QObject (0x0x7efe988e30c0) 0
+       primary-for QBluetoothLocalDevice (0x0x7efe9883c270)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7efe988e34e0) 0
++quint128_s (0x0x7efe988e34e0) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.7.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.7.0.linux-gcc-amd64.txt
+index ab85793..8520f33 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.7.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.7.0.linux-gcc-amd64.txt
+@@ -4254,10 +4254,10 @@ QBluetoothLocalDevice (0x0x7fcf5e4e0c30) 0
+   QObject (0x0x7fcf5e2c40c0) 0
+       primary-for QBluetoothLocalDevice (0x0x7fcf5e4e0c30)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7fcf5e2c44e0) 0
++quint128_s (0x0x7fcf5e2c44e0) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.8.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.8.0.linux-gcc-amd64.txt
+index 34e7789..78121ad 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.8.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.8.0.linux-gcc-amd64.txt
+@@ -4279,10 +4279,10 @@ QBluetoothLocalDevice (0x0x7fc1f8031958) 0
+   QObject (0x0x7fc1f7d983c0) 0
+       primary-for QBluetoothLocalDevice (0x0x7fc1f8031958)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7fc1f7d987e0) 0
++quint128_s (0x0x7fc1f7d987e0) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/bic/data/QtBluetooth.5.9.0.linux-gcc-amd64.txt b/tests/auto/bic/data/QtBluetooth.5.9.0.linux-gcc-amd64.txt
+index a5d85e0..85f9ab0 100644
+--- a/tests/auto/bic/data/QtBluetooth.5.9.0.linux-gcc-amd64.txt
++++ b/tests/auto/bic/data/QtBluetooth.5.9.0.linux-gcc-amd64.txt
+@@ -4294,10 +4294,10 @@ QBluetoothLocalDevice (0x0x7f66340d64e0) 0
+   QObject (0x0x7f6633e3b1e0) 0
+       primary-for QBluetoothLocalDevice (0x0x7f66340d64e0)
+ 
+-Class quint128
++Class quint128_s
+    size=16 align=1
+    base size=16 base align=1
+-quint128 (0x0x7f6633e3b600) 0
++quint128_s (0x0x7f6633e3b600) 0
+ 
+ Class QBluetoothUuid
+    size=16 align=4
+diff --git a/tests/auto/qbluetoothuuid/tst_qbluetoothuuid.cpp b/tests/auto/qbluetoothuuid/tst_qbluetoothuuid.cpp
+index 604fca4..1278cd5 100644
+--- a/tests/auto/qbluetoothuuid/tst_qbluetoothuuid.cpp
++++ b/tests/auto/qbluetoothuuid/tst_qbluetoothuuid.cpp
+@@ -15,7 +15,7 @@
+ 
+ QT_USE_NAMESPACE
+ 
+-Q_DECLARE_METATYPE(quint128)
++Q_DECLARE_METATYPE(quint128_s)
+ 
+ class tst_QBluetoothUuid : public QObject
+ {
+@@ -34,12 +34,12 @@ private slots:
+     void tst_conversion();
+     void tst_comparison_data();
+     void tst_comparison();
+-    void tst_quint128ToUuid();
++    void tst_quint128_sToUuid();
+ };
+ 
+ tst_QBluetoothUuid::tst_QBluetoothUuid()
+ {
+-    qRegisterMetaType<quint128>();
++    qRegisterMetaType<quint128_s>();
+ }
+ 
+ tst_QBluetoothUuid::~tst_QBluetoothUuid()
+@@ -155,11 +155,11 @@ void tst_QBluetoothUuid::tst_conversion_data()
+     QTest::addColumn<bool>("constructUuid32");
+     QTest::addColumn<quint32>("uuid32");
+     QTest::addColumn<bool>("constructUuid128");
+-    QTest::addColumn<quint128>("uuid128");
++    QTest::addColumn<quint128_s>("uuid128");
+     QTest::addColumn<QString>("uuidS");
+ 
+     static const auto uuid128_32 = [](quint8 a, quint8 b, quint8 c, quint8 d) {
+-        quint128 x = {
++        quint128_s x = {
+             {
+                 a, b, c, d,
+                 0x00, 0x00,
+@@ -201,7 +201,7 @@ void tst_QBluetoothUuid::tst_conversion_data()
+     newRow32("0xffffffff", 0xff, 0xff, 0xff, 0xff, "FFFFFFFF" BASEUUID);
+ 
+     {
+-        quint128 uuid128 = {
++        quint128_s uuid128 = {
+             {
+                 0x00, 0x11, 0x22, 0x33,
+                 0x44, 0x55,
+@@ -224,7 +224,7 @@ void tst_QBluetoothUuid::tst_conversion()
+     QFETCH(bool, constructUuid32);
+     QFETCH(quint32, uuid32);
+     QFETCH(bool, constructUuid128);
+-    QFETCH(quint128, uuid128);
++    QFETCH(quint128_s, uuid128);
+     QFETCH(QString, uuidS);
+ 
+     int minimumSize = 16;
+@@ -313,7 +313,7 @@ void tst_QBluetoothUuid::tst_comparison()
+     QFETCH(bool, constructUuid32);
+     QFETCH(quint32, uuid32);
+     QFETCH(bool, constructUuid128);
+-    QFETCH(quint128, uuid128);
++    QFETCH(quint128_s, uuid128);
+ 
+     QVERIFY(QBluetoothUuid() == QBluetoothUuid());
+ 
+@@ -351,10 +351,10 @@ void tst_QBluetoothUuid::tst_comparison()
+     }
+ }
+ 
+-void tst_QBluetoothUuid::tst_quint128ToUuid()
++void tst_QBluetoothUuid::tst_quint128_sToUuid()
+ {
+     QBluetoothUuid temp(QString("{67C8770B-44F1-410A-AB9A-F9B5446F13EE}"));
+-    quint128 array = temp.toUInt128();
++    quint128_s array = temp.toUInt128();
+     QBluetoothUuid u(array);
+     QVERIFY(temp == u);
+ 
+diff --git a/tests/auto/qlowenergycontroller-gattserver/test/tst_qlowenergycontroller-gattserver.cpp b/tests/auto/qlowenergycontroller-gattserver/test/tst_qlowenergycontroller-gattserver.cpp
+index 973785b..9b64aed 100644
+--- a/tests/auto/qlowenergycontroller-gattserver/test/tst_qlowenergycontroller-gattserver.cpp
++++ b/tests/auto/qlowenergycontroller-gattserver/test/tst_qlowenergycontroller-gattserver.cpp
+@@ -53,7 +53,7 @@ private:
+     QScopedPointer<QLowEnergyController> m_leController;
+ 
+ #if defined(CHECK_CMAC_SUPPORT)
+-    bool checkCmacSupport(const quint128& csrkMsb);
++    bool checkCmacSupport(const quint128_s& csrkMsb);
+ #endif
+ };
+ 
+@@ -142,7 +142,7 @@ void TestQLowEnergyControllerGattServer::cmacVerifier()
+ {
+ #if defined(CONFIG_LINUX_CRYPTO_API) && defined(QT_BUILD_INTERNAL) && defined(CONFIG_BLUEZ_LE)
+     // Test data comes from spec v4.2, Vol 3, Part H, Appendix D.1
+-    const quint128 csrk = {
++    const quint128_s csrk = {
+         { 0x3c, 0x4f, 0xcf, 0x09, 0x88, 0x15, 0xf7, 0xab,
+           0xa6, 0xd2, 0xae, 0x28, 0x16, 0x15, 0x7e, 0x2b }
+     };
+@@ -168,11 +168,11 @@ void TestQLowEnergyControllerGattServer::cmacVerifier()
+ #include <linux/if_alg.h>
+ #include <unistd.h>
+ 
+-bool TestQLowEnergyControllerGattServer::checkCmacSupport(const quint128& csrk)
++bool TestQLowEnergyControllerGattServer::checkCmacSupport(const quint128_s& csrk)
+ {
+     bool retval = false;
+ #if defined(CONFIG_LINUX_CRYPTO_API) && defined(QT_BUILD_INTERNAL) && defined(CONFIG_BLUEZ_LE)
+-    quint128 csrkMsb;
++    quint128_s csrkMsb;
+     std::reverse_copy(std::begin(csrk.data), std::end(csrk.data), std::begin(csrkMsb.data));
+ 
+     int testSocket = socket(AF_ALG, SOCK_SEQPACKET, 0);
+-- 
+2.45.4
+

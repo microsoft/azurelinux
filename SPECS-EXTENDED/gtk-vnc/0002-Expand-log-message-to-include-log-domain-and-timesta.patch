@@ -1,0 +1,61 @@
+From 333032105927ab9ae53563f889a3edd9beba0704 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 19 Feb 2025 16:22:14 +0000
+Subject: [PATCH 2/2] Expand log message to include log domain and timestamp
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This helps correlate and distinguish logs from other components
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/vncutil.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/src/vncutil.c b/src/vncutil.c
+index ec14ff7..18fe41e 100644
+--- a/src/vncutil.c
++++ b/src/vncutil.c
+@@ -28,13 +28,21 @@
+ 
+ static gboolean debugFlag = FALSE;
+ static guint debugHandler = 0;
++static GTimeZone *debugTZ = NULL;
+ 
+ static void vnc_log_handler(
+-    const gchar *log_domain G_GNUC_UNUSED,
++    const gchar *log_domain,
+     GLogLevelFlags log_level G_GNUC_UNUSED,
+     const gchar *message,
+     gpointer user_data G_GNUC_UNUSED) {
+-    g_printerr("%s\n", message);
++    GDateTime *now = g_date_time_new_now(debugTZ);
++    gchar *nowstr = g_date_time_format(now, "%H:%M:%S");
++    g_printerr("%s: %s.%d: %s\n",
++               log_domain, nowstr,
++               g_date_time_get_microsecond(now)/1000,
++               message);
++    g_free(nowstr);
++    g_date_time_unref(now);
+ }
+ 
+ /**
+@@ -51,11 +59,14 @@ void vnc_util_set_debug(gboolean enabled)
+             debugHandler =
+                 g_log_set_handler(G_LOG_DOMAIN,  G_LOG_LEVEL_DEBUG,
+                                   vnc_log_handler, NULL);
++            debugTZ = g_time_zone_new_utc();
+         }
+     } else {
+         if (debugHandler != 0) {
+             g_log_remove_handler(G_LOG_DOMAIN, debugHandler);
+             debugHandler = 0;
++            g_time_zone_unref(debugTZ);
++            debugTZ = NULL;
+         }
+     }
+     debugFlag = enabled;
+-- 
+2.47.1
+

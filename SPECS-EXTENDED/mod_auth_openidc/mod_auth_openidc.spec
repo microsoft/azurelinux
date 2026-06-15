@@ -13,7 +13,7 @@
 Summary:        OpenID Connect auth module for Apache HTTP Server
 Name:           mod_auth_openidc
 Version:        2.4.14.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -30,7 +30,7 @@ BuildRequires:  httpd-devel
 BuildRequires:  jansson-devel
 BuildRequires:  jq-devel
 BuildRequires:  openssl-devel
-BuildRequires:  pcre-devel
+BuildRequires:  pcre2-devel
 Requires:       httpd-mmn
 
 %description
@@ -87,6 +87,9 @@ install -m 700 -d %{buildroot}%{httpd_pkg_cache_dir}/cache
 %dir %attr(0700, apache, apache) %{httpd_pkg_cache_dir}/cache
 
 %changelog
+* Thu Jan 08 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.4.14.2-2
+- Bump to rebuild with updated pcre2.
+
 * Tue Sep 05 2023 Archana Choudhary <archana1@microsoft.com> - 2.4.14.2-1
 - Upgrade to 2.4.14.2 - CVE-2021-20718, CVE-2021-39191, CVE-2022-23527, CVE-2023-28625
 - Add DESTDIR to resolve mod_auth_openidc.so filepath

@@ -454,7 +454,7 @@ func CreateManager(rootDir string, configFileName string) (m *CCacheManager, err
 	logger.Log.Infof("  creating blob storage client...")
 	accessType := azureblobstorage.AnonymousAccess
 	if configuration.RemoteStoreConfig.UploadEnabled {
-		accessType = azureblobstorage.ManagedIdentityAccess
+		accessType = azureblobstorage.AzureCLIAccess
 	}
 
 	azureBlobStorage, err := azureblobstorage.Create(configuration.RemoteStoreConfig.TenantId, configuration.RemoteStoreConfig.UserName, configuration.RemoteStoreConfig.Password, configuration.RemoteStoreConfig.StorageAccount, accessType)

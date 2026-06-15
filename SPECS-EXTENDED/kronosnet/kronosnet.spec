@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 ###############################################################################
 ###############################################################################
 ##
-##  Copyright (C) 2012-2019 Red Hat, Inc.  All rights reserved.
+##  Copyright (C) 2012-2022 Red Hat, Inc.  All rights reserved.
 ##
 ##  This copyrighted material is made available to anyone wishing to use,
 ##  modify, copy, or redistribute it subject to the terms and conditions
@@ -38,17 +38,19 @@ Distribution:   Azure Linux
 
 Name: kronosnet
 Summary: Multipoint-to-Multipoint VPN daemon
-Version: 1.20
-Release: 2%{?dist}
-License: GPLv2+ and LGPLv2+
+Version: 1.29
+Release: 3%{?dist}
+License: GPL-2.0-or-later AND LGPL-2.1-or-later
 URL: https://kronosnet.org
 Source0: https://kronosnet.org/releases/%{name}-%{version}.tar.xz
 
 # Build dependencies
+BuildRequires: make
 BuildRequires: gcc libqb-devel
 # required to build man pages
 %if %{with buildman}
-BuildRequires: libxml2-devel doxygen
+# BuildRequires: libxml2-devel doxygen 
+BuildRequires: libxml2-devel doxygen doxygen2man
 %endif
 %if %{with sctp}
 BuildRequires: lksctp-tools-devel
@@ -156,20 +158,17 @@ BuildRequires: autoconf automake libtool
 	--with-initdefaultdir=%{_sysconfdir}/sysconfig/ \
 	--with-systemddir=%{_unitdir}
 
-make %{_smp_mflags}
+%make_build
 
 %install
 rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
+%make_install
 
 # tree cleanup
 # remove static libraries
 find %{buildroot} -name "*.a" -exec rm {} \;
 # remove libtools leftovers
 find %{buildroot} -name "*.la" -exec rm {} \;
-
-# remove init scripts
-rm -rf %{buildroot}/etc/init.d
 
 # remove docs
 rm -rf %{buildroot}/usr/share/doc/kronosnet
@@ -181,7 +180,7 @@ rm -rf %{buildroot}/usr/share/doc/kronosnet
 %if %{with libnozzle}
 %package -n libnozzle1
 Summary: Simple userland wrapper around kernel tap devices
-License: LGPLv2+
+License: LGPL-2.1-or-later
 
 %description -n libnozzle1
  This is an over-engineered commodity library to manage a pool
@@ -201,7 +200,7 @@ License: LGPLv2+
 
 %package -n libnozzle1-devel
 Summary: Simple userland wrapper around kernel tap devices (developer files)
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libnozzle1%{_isa} = %{version}-%{release}
 Requires: pkgconfig
 
@@ -222,7 +221,7 @@ Requires: pkgconfig
 
 %package -n libknet1
 Summary: Kronosnet core switching implementation
-License: LGPLv2+
+License: LGPL-2.1-or-later
 
 %description -n libknet1
  The whole kronosnet core is implemented in this library.
@@ -243,7 +242,7 @@ License: LGPLv2+
 
 %package -n libknet1-devel
 Summary: Kronosnet core switching implementation (developer files)
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 Requires: pkgconfig
 
@@ -264,7 +263,7 @@ Requires: pkgconfig
 %if %{with nss}
 %package -n libknet1-crypto-nss-plugin
 Summary: Provides libknet1 nss support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-crypto-nss-plugin
@@ -277,7 +276,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with openssl}
 %package -n libknet1-crypto-openssl-plugin
 Summary: Provides libknet1 openssl support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-crypto-openssl-plugin
@@ -290,7 +289,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with zlib}
 %package -n libknet1-compress-zlib-plugin
 Summary: Provides libknet1 zlib support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-zlib-plugin
@@ -303,7 +302,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with lz4}
 %package -n libknet1-compress-lz4-plugin
 Summary: Provides libknet1 lz4 and lz4hc support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-lz4-plugin
@@ -317,7 +316,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with lzo2}
 %package -n libknet1-compress-lzo2-plugin
 Summary: Provides libknet1 lzo2 support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-lzo2-plugin
@@ -330,7 +329,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with lzma}
 %package -n libknet1-compress-lzma-plugin
 Summary: Provides libknet1 lzma support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-lzma-plugin
@@ -343,7 +342,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with bzip2}
 %package -n libknet1-compress-bzip2-plugin
 Summary: Provides libknet1 bzip2 support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-bzip2-plugin
@@ -356,7 +355,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %if %{with zstd}
 %package -n libknet1-compress-zstd-plugin
 Summary: Provides libknet1 zstd support
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
 
 %description -n libknet1-compress-zstd-plugin
@@ -368,7 +367,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 
 %package -n libknet1-crypto-plugins-all
 Summary: Provides libknet1 crypto plugins meta package
-License: LGPLv2+
+License: LGPL-2.1-or-later
 %if %{with nss}
 Requires: libknet1-crypto-nss-plugin%{_isa} = %{version}-%{release}
 %endif
@@ -383,7 +382,7 @@ Requires: libknet1-crypto-openssl-plugin%{_isa} = %{version}-%{release}
 
 %package -n libknet1-compress-plugins-all
 Summary: Provides libknet1 compress plugins meta package
-License: LGPLv2+
+License: LGPL-2.1-or-later
 %if %{with zlib}
 Requires: libknet1-compress-zlib-plugin%{_isa} = %{version}-%{release}
 %endif
@@ -410,7 +409,7 @@ Requires: libknet1-compress-zstd-plugin%{_isa} = %{version}-%{release}
 
 %package -n libknet1-plugins-all
 Summary: Provides libknet1 plugins meta package
-License: LGPLv2+
+License: LGPL-2.1-or-later
 Requires: libknet1-compress-plugins-all%{_isa} = %{version}-%{release}
 Requires: libknet1-crypto-plugins-all%{_isa} = %{version}-%{release}
 
@@ -422,8 +421,11 @@ Requires: libknet1-crypto-plugins-all%{_isa} = %{version}-%{release}
 %if %{with installtests}
 %package -n kronosnet-tests
 Summary: Provides kronosnet test suite
-License: GPLv2+
+License: GPL-2.0-or-later
 Requires: libknet1%{_isa} = %{version}-%{release}
+%if %{with libnozzle}
+Requires: libnozzle1%{_isa} = %{version}-%{release}
+%endif
 
 %description -n kronosnet-tests
  This package contains all the libknet and libnozzle test suite.
@@ -437,8 +439,98 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 %endif
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.20-2
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Thu Mar 13 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.29-3
+- Initial Azure Linux import from Fedora 41 (license: MIT)
+- License Verified
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.29-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Thu Jun 06 2024 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.29-1
+- New upstream release
+- Fix build on armhf
+- Update to latest doxyxml from libqb
+- Fix FORTIFY source detection
+- Fix potential overflow in the test suite
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.28-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.28-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Wed Sep 27 2023 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.28-1
+- New upstream release
+- Fix build on i686 machines
+
+* Tue Sep 26 2023 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.27-1
+- New upstream release
+- Fix potential startup race condition (corosync use case)
+- Fix crypto config check
+- Minor API cleanup
+- Test suite fixes
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.26-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Mon Jul 10 2023 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.26-1
+- New upstream release
+- Improve TX performance and use less CPU
+- minor other improvements
+- Build system update
+
+* Tue Jun 06 2023 Jan Friesse <jfriesse@redhat.com> - 1.25-3
+- migrated to SPDX license
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.25-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Jan 04 2023 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.25-1
+- New upstream release
+- Fix PMTUd issues
+- Update docs and upstream URLs
+- Fix spec file for test suite build conditional
+- Build system update
+
+* Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.24-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon May 30 2022 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.24-1
+- New upstream release
+- Fix minor issues
+- Update docs and upstream URLs
+- Test suite refactoring
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.23-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Nov 15 2021 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.23-1
+- New upstream release
+- Fix several major issues
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1.22-2
+- Rebuilt with OpenSSL 3.0.0
+
+* Mon Aug 30 2021 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.22-1
+- New upstream release
+- Fix several major issues
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 14 2021 Timm Bäder <tbaeder@redhat.com> - 1.21-2
+- Use make macros
+
+* Wed Apr 28 2021 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.21-1
+- New upstream release
+- Update to openssl 3.0alpha13
+- Drop -rpath usage from libknet
+- Various libnozzle fixes
+- API: validate handles for public api calls to avoid crashes
+- Test suite improvements to speed up testing
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.20-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Oct 19 2020 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.20-1
 - New upstream release
@@ -455,6 +547,9 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 - Removed unused poc-code from the source tree
 - Make sure to initialize epoll events structures
 
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Tue Jul 14 2020 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.18-1
 - New upstream release
 - Add ability to change crypto configuration at runtime without
@@ -462,6 +557,7 @@ Requires: libknet1%{_isa} = %{version}-%{release}
 - Add compatibility support for openssl 3.0
 - Add functional testing framework and new test cases
 - Minor build fixes
+- Fix BuildRequires to use libqb doxygen2man vs internal copy
 
 * Thu Apr 23 2020 Fabio M. Di Nitto <fdinitto@redhat.com> - 1.16-1
 - New upstream release

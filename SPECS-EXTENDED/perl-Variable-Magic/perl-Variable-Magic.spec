@@ -1,12 +1,13 @@
 Name:           perl-Variable-Magic
-Version:        0.62
-Release:        10%{?dist}
+Version:        0.64
+Release:        4%{?dist}
 Summary:        Associate user-defined magic to variables from Perl
-License:        GPL+ or Artistic
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
+
 URL:            https://metacpan.org/release/Variable-Magic
-Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-%{version}.tar.gz#/perl-Variable-Magic-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/V/VP/VPIT/Variable-Magic-%{version}.tar.gz
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  gcc
@@ -45,7 +46,6 @@ BuildRequires:  perl(threads::shared)
 BuildRequires:  perl(Tie::Array)
 BuildRequires:  perl(Tie::Hash)
 # Dependencies
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 Requires:       perl(Carp)
 Requires:       perl(XSLoader)
 
@@ -61,28 +61,88 @@ you can add your own magic to any variable without the pain of the C API.
 %setup -q -n Variable-Magic-%{version}
 
 %build
-%{__perl} Makefile.PL INSTALLDIRS=vendor OPTIMIZE="$RPM_OPT_FLAGS" NO_PACKLIST=1
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}" NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=$RPM_BUILD_ROOT
-
-find $RPM_BUILD_ROOT -type f -name '*.bs' -empty -delete
-
-%{_fixperms} -c $RPM_BUILD_ROOT/*
+%{make_install}
+find %{buildroot} -type f -name '*.bs' -empty -delete
+%{_fixperms} -c %{buildroot}
 
 %check
 make test
 
 %files
-%doc Changes README
-%{perl_vendorarch}/auto/*
-%{perl_vendorarch}/Variable*
-%{_mandir}/man3/*
+%doc Changes CONTRIBUTING README
+%{perl_vendorarch}/auto/Variable/
+%{perl_vendorarch}/Variable/
+%{_mandir}/man3/Variable::Magic.3*
 
 %changelog
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.62-10
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 0.64-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.64-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Mon Jun 10 2024 Jitka Plesnikova <jplesnik@redhat.com> - 0.64-2
+- Perl 5.40 rebuild
+
+* Tue Mar 19 2024 Paul Howarth <paul@city-fan.org> - 0.64-1
+- Update to 0.64 (rhbz#2270204)
+  - This is a maintenance release; the code contains no functional change
+  - Contributing guidelines are now listed in the new CONTRIBUTING file
+  - Fix for t/18-opinfo.t broken under blead (CPAN RT#151104)
+- Use %%{make_build} and %%{make_install}
+- Make %%files list more explicit
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.63-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.63-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.63-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Jitka Plesnikova <jplesnik@redhat.com> - 0.63-3
+- Perl 5.38 rebuild
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 0.63-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Wed Sep 21 2022 Paul Howarth <paul@city-fan.org> - 0.63-1
+- Update to 0.63 (rhbz#2128532)
+  - Add support for 5.37.3's PADSV_STORE optimization; B.pm-related tests have
+    been taught about this new thing (CPAN RT#144052)
+  - Updated contact information
+- Use SPDX-format license tag
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Tue May 31 2022 Jitka Plesnikova <jplesnik@redhat.com> - 0.62-16
+- Perl 5.36 rebuild
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Jul 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-14
+- Second attempt - Rebuilt for
+  https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri May 21 2021 Jitka Plesnikova <jplesnik@redhat.com> - 0.62-13
+- Perl 5.34 rebuild
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Jitka Plesnikova <jplesnik@redhat.com> - 0.62-10
+- Perl 5.32 rebuild
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 0.62-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

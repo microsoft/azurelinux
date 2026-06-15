@@ -1,7 +1,7 @@
 Name:		 multiperf
 Summary:	 IB Performance tests
 Version:	 3.0
-Release:	 1%{?dist}
+Release:	 2%{?dist}
 License:	 BSD 3-Clause, GPL v2 or later
 Vendor:          Microsoft Corporation
 Distribution:    Azure Linux
@@ -9,7 +9,6 @@ Group:		 Productivity/Networking/Diagnostic
 Source0:         https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz#/%{name}-%{version}.tar.gz
 Url:		 ""
 BuildRoot:      /var/tmp/%{name}-%{version}-build
-ExclusiveArch:   x86_64
 
 BuildRequires:  libibverbs-devel
 
@@ -37,7 +36,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %_bindir/*
 
 %changelog
-* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com>
+* Mon Sep 15 2025 Elaheh Dehghani <edehghani@microsoft.com> - 3.0-2
+- Enable ARM64 build by removing ExclusiveArch
+* Tue Dec  17 2024 Binu Jose Philip <bphilip@microsoft.com> - 3.0-1
 - Initial Azure Linux import from NVIDIA (license: GPLv2)
 - License verified
 * Sun Feb 08 2015 - gilr@mellanox.com

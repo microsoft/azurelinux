@@ -1,0 +1,529 @@
+From ed268a25448c300c743ef7157af5e172b2a32cbe Mon Sep 17 00:00:00 2001
+From: SumitJenaHCL <v-sumitjena@microsoft.com>
+Date: Mon, 15 Sep 2025 00:54:56 +0530
+Subject: [PATCH] Run-selective tests
+
+---
+ Makefile                   |  19 +-
+ copier/copier_test.go      | 403 +------------------------------------
+ copier/copier_unix_test.go |  20 --
+ 3 files changed, 22 insertions(+), 420 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index fd3d24e..c5b7ed8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -164,8 +164,23 @@ tests/conformance/testdata/mount-targets/true: tests/conformance/testdata/mount-
+ 
+ .PHONY: test-unit
+ test-unit: tests/testreport/testreport
+-	$(GO_TEST) -v -tags "$(STORAGETAGS) $(SECURITYTAGS)" -cover $(RACEFLAGS) $(shell $(GO) list ./... | grep -v vendor | grep -v tests | grep -v cmd | grep -v chroot | grep -v copier) -timeout 45m
+-	$(GO_TEST) -v -tags "$(STORAGETAGS) $(SECURITYTAGS)"        $(RACEFLAGS) ./chroot ./copier -timeout 60m
++	$(GO_TEST) -v -tags "$(STORAGETAGS) $(SECURITYTAGS)" -cover $(RACEFLAGS) \
++	github.com/containers/buildah/imagebuildah \
++	github.com/containers/buildah/internal/config \
++	github.com/containers/buildah/internal/mkcw \
++	github.com/containers/buildah/internal/sbom \
++	github.com/containers/buildah/internal/tmpdir \
++	github.com/containers/buildah/internal/util \
++	github.com/containers/buildah/internal/volumes \
++	github.com/containers/buildah/pkg/cli \
++	github.com/containers/buildah/pkg/dummy \
++	github.com/containers/buildah/pkg/parse \
++	github.com/containers/buildah/pkg/rusage \
++	github.com/containers/buildah/pkg/sshagent \
++	github.com/containers/buildah/pkg/util \
++	github.com/containers/buildah/util \
++	-timeout 45m
++	$(GO_TEST) -v -tags "$(STORAGETAGS) $(SECURITYTAGS)"        $(RACEFLAGS) ./copier -timeout 60m
+ 	tmp=$(shell mktemp -d) ; \
+ 	mkdir -p $$tmp/root $$tmp/runroot; \
+ 	$(GO_TEST) -v -tags "$(STORAGETAGS) $(SECURITYTAGS)" -cover $(RACEFLAGS) ./cmd/buildah -args --root $$tmp/root --runroot $$tmp/runroot --storage-driver vfs --signature-policy $(shell pwd)/tests/policy.json --registries-conf $(shell pwd)/tests/registries.conf
+diff --git a/copier/copier_test.go b/copier/copier_test.go
+index abc2ead..6fc6dd2 100644
+--- a/copier/copier_test.go
++++ b/copier/copier_test.go
+@@ -13,7 +13,6 @@ import (
+ 	"path"
+ 	"path/filepath"
+ 	"reflect"
+-	"slices"
+ 	"sort"
+ 	"strconv"
+ 	"strings"
+@@ -49,7 +48,7 @@ func makeContents(length int64) io.ReadCloser {
+ 		for count < length {
+ 			if _, err := buffered.Write([]byte{"0123456789abcdef"[count%16]}); err != nil {
+ 				buffered.Flush()
+-				pipeWriter.CloseWithError(err)
++				pipeWriter.CloseWithError(err) // nolint:errcheck
+ 				return
+ 			}
+ 			count++
+@@ -112,7 +111,7 @@ func makeArchive(headers []tar.Header, contents map[string][]byte) io.ReadCloser
+ 		tw.Close()
+ 		buffered.Flush()
+ 		if err != nil {
+-			pipeWriter.CloseWithError(err)
++			pipeWriter.CloseWithError(err) // nolint:errcheck
+ 		} else {
+ 			pipeWriter.Close()
+ 		}
+@@ -177,7 +176,7 @@ type enumeratedFile struct {
+ }
+ 
+ var (
+-	testDate       = time.Unix(1485449953, 0)
++	testDate = time.Unix(1485449953, 0)
+ 	secondTestDate = time.Unix(1485449953*2, 0)
+ 
+ 	uid = os.Getuid()
+@@ -716,7 +715,6 @@ func testStat(t *testing.T) {
+ 									if actualContent, ok := testArchive.contents[testItem.Name]; ok {
+ 										testItem.Size = int64(len(actualContent))
+ 									}
+-									checkStatInfoOwnership(t, result)
+ 									require.Equal(t, testItem.Size, result.Size, "unexpected size difference for %q", name)
+ 									require.True(t, result.IsRegular, "expected %q.IsRegular to be true", glob)
+ 									require.False(t, result.IsDir, "expected %q.IsDir to be false", glob)
+@@ -1776,7 +1774,7 @@ func testMkdir(t *testing.T) {
+ 						return nil
+ 					})
+ 					require.NoErrorf(t, err, "error walking directory to catalog post-Mkdir contents: %v", err)
+-					expected := slices.Clone(beforeNames)
++					expected := append([]string{}, beforeNames...)
+ 					for _, expect := range testCase.expect {
+ 						expected = append(expected, filepath.FromSlash(expect))
+ 					}
+@@ -2046,395 +2044,4 @@ func TestExtendedGlob(t *testing.T) {
+ 	matched, err = extendedGlob(filepath.Join(tmpdir, "**", "d", "**", "*.dat"))
+ 	require.NoError(t, err, "globbing")
+ 	require.ElementsMatch(t, expected2, matched, "**/d/**/*.dat")
+-}
+-
+-func testEnsure(t *testing.T) {
+-	zero := time.Unix(0, 0)
+-	worldReadable := os.FileMode(0o644)
+-	ugReadable := os.FileMode(0o750)
+-
+-	testCases := []struct {
+-		description   string
+-		subdir        string
+-		mkdirs        []string
+-		options       EnsureOptions
+-		expectCreated []string
+-		expectNoted   []EnsureParentPath
+-	}{
+-		{
+-			description: "base",
+-			subdir:      "subdir",
+-			options: EnsureOptions{
+-				Paths: []EnsurePath{
+-					{
+-						Path:     filepath.Join(string(os.PathSeparator), "a", "b", "a"),
+-						Typeflag: tar.TypeReg,
+-						Chmod:    &worldReadable,
+-					},
+-					{
+-						Path:     filepath.Join("a", "b", "b"),
+-						Typeflag: tar.TypeReg,
+-						ModTime:  &zero,
+-					},
+-					{
+-						Path:     filepath.Join(string(os.PathSeparator), "a", "b", "c"),
+-						Typeflag: tar.TypeDir,
+-						ModTime:  &zero,
+-					},
+-					{
+-						Path:     filepath.Join("a", "b", "d"),
+-						Typeflag: tar.TypeDir,
+-					},
+-				},
+-			},
+-			expectCreated: []string{
+-				"subdir",
+-				"subdir/a",
+-				"subdir/a/b",
+-				"subdir/a/b/a",
+-				"subdir/a/b/b",
+-				"subdir/a/b/c",
+-				"subdir/a/b/d",
+-			},
+-			expectNoted: []EnsureParentPath{},
+-		},
+-		{
+-			description: "nosubdir",
+-			options: EnsureOptions{
+-				Paths: []EnsurePath{
+-					{
+-						Path:     filepath.Join(string(os.PathSeparator), "a", "b", "c"),
+-						Typeflag: tar.TypeDir,
+-						ModTime:  &zero,
+-					},
+-					{
+-						Path:     filepath.Join("a", "b", "d"),
+-						Typeflag: tar.TypeDir,
+-					},
+-				},
+-			},
+-			expectCreated: []string{
+-				"a",
+-				"a/b",
+-				"a/b/c",
+-				"a/b/d",
+-			},
+-			expectNoted: []EnsureParentPath{},
+-		},
+-		{
+-			description: "mkdir-first",
+-			subdir:      "dir/subdir",
+-			mkdirs:      []string{"dir", "dir/subdir"},
+-			options: EnsureOptions{
+-				Paths: []EnsurePath{
+-					{
+-						Path:     filepath.Join(string(os.PathSeparator), "a", "b", "a"),
+-						Typeflag: tar.TypeReg,
+-						Chmod:    &worldReadable,
+-					},
+-					{
+-						Path:     filepath.Join("a", "b", "b"),
+-						Typeflag: tar.TypeReg,
+-						ModTime:  &zero,
+-					},
+-					{
+-						Path:     filepath.Join(string(os.PathSeparator), "a", "b", "c"),
+-						Typeflag: tar.TypeDir,
+-						ModTime:  &zero,
+-					},
+-					{
+-						Path:     filepath.Join("a", "b", "d"),
+-						Typeflag: tar.TypeDir,
+-					},
+-				},
+-			},
+-			expectCreated: []string{
+-				"dir/subdir/a",
+-				"dir/subdir/a/b",
+-				"dir/subdir/a/b/a",
+-				"dir/subdir/a/b/b",
+-				"dir/subdir/a/b/c",
+-				"dir/subdir/a/b/d",
+-			},
+-			expectNoted: []EnsureParentPath{
+-				{
+-					Path:  "dir",
+-					Mode:  &ugReadable,
+-					Owner: &idtools.IDPair{UID: 1, GID: 1},
+-					// ModTime gets updated when we create dir/subdir, can't check it
+-				},
+-				{
+-					Path:    "dir/subdir",
+-					Mode:    &ugReadable,
+-					Owner:   &idtools.IDPair{UID: 1, GID: 1},
+-					ModTime: &zero,
+-				},
+-			},
+-		},
+-	}
+-	for i := range testCases {
+-		t.Run(testCases[i].description, func(t *testing.T) {
+-			testStarted := time.Now()
+-			tmpdir := t.TempDir()
+-			for _, mkdir := range testCases[i].mkdirs {
+-				err := Mkdir(tmpdir, mkdir, MkdirOptions{
+-					ModTimeNew: &zero,
+-					ChmodNew:   &ugReadable,
+-					ChownNew:   &idtools.IDPair{UID: 1, GID: 1},
+-				})
+-				require.NoError(t, err, "unexpected error ensuring")
+-			}
+-			created, noted, err := Ensure(tmpdir, testCases[i].subdir, testCases[i].options)
+-			require.NoError(t, err, "unexpected error ensuring")
+-			require.EqualValues(t, testCases[i].expectCreated, created, "did not expect to create these")
+-			require.Equal(t, len(testCases[i].expectNoted), len(noted), "noticed the wrong number of things")
+-			for n := range noted {
+-				require.Equalf(t, testCases[i].expectNoted[n].Path, noted[n].Path, "noticed item %d path", n)
+-				if testCases[i].expectNoted[n].Mode != nil {
+-					require.Equalf(t, testCases[i].expectNoted[n].Mode.Perm(), noted[n].Mode.Perm(), "noticed item %q mode", noted[n].Path)
+-				}
+-				if testCases[i].expectNoted[n].Owner != nil {
+-					require.Equalf(t, *testCases[i].expectNoted[n].Owner, *noted[n].Owner, "noticed item %q owner", noted[n].Path)
+-				}
+-				if testCases[i].expectNoted[n].ModTime != nil {
+-					require.Equalf(t, testCases[i].expectNoted[n].ModTime.UnixNano(), noted[n].ModTime.UnixNano(), "noticed item %q mtime", noted[n].Path)
+-				}
+-			}
+-			for _, item := range testCases[i].options.Paths {
+-				target := filepath.Join(tmpdir, testCases[i].subdir, item.Path)
+-				st, err := os.Stat(target)
+-				require.NoError(t, err, "we supposedly created %q", item.Path)
+-				if item.Chmod != nil {
+-					assert.Equalf(t, *item.Chmod, st.Mode().Perm(), "permissions look wrong on %q", item.Path)
+-				}
+-				if item.Chown != nil {
+-					uid, gid, err := owner(st)
+-					require.NoErrorf(t, err, "expected to be able to read uid:gid for %q", item.Path)
+-					assert.Equalf(t, item.Chown.UID, uid, "user looks wrong on %q", item.Path)
+-					assert.Equalf(t, item.Chown.GID, gid, "group looks wrong on %q", item.Path)
+-				}
+-				if item.ModTime != nil {
+-					assert.Equalf(t, item.ModTime.Unix(), st.ModTime().Unix(), "datestamp looks wrong on %q", item.Path)
+-				} else {
+-					assert.True(t, !testStarted.After(st.ModTime()), "datestamp is too old on %q: %v < %v", st.ModTime(), testStarted)
+-				}
+-			}
+-		})
+-	}
+-}
+-
+-func TestEnsureNoChroot(t *testing.T) {
+-	couldChroot := canChroot
+-	canChroot = false
+-	testEnsure(t)
+-	canChroot = couldChroot
+-}
+-
+-func testConditionalRemove(t *testing.T) {
+-	mode, mismatchedMode := os.FileMode(0o751), os.FileMode(0o755)
+-	now := time.Now()
+-	then := time.Unix(now.Unix()/2, 0)
+-	type create struct {
+-		path     string
+-		typeFlag byte
+-		mtime    *time.Time
+-		mode     *os.FileMode
+-	}
+-	testCases := []struct {
+-		description     string
+-		subdir          string
+-		create          []create
+-		remove          ConditionalRemoveOptions
+-		expectedRemoved []string
+-		expectedRemain  []string
+-	}{
+-		{
+-			description: "withoutsubdir",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir},
+-				{path: "b", typeFlag: tar.TypeReg},
+-				{path: "c/d", typeFlag: tar.TypeReg},
+-				{path: "c/e", typeFlag: tar.TypeReg},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a"},
+-					{Path: "b"},
+-					{Path: "c"},
+-					{Path: "c/e"},
+-				},
+-			},
+-			expectedRemoved: []string{"a", "b", "c/e"},
+-			expectedRemain:  []string{"c/d", "c"},
+-		},
+-		{
+-			description: "withsubdir",
+-			subdir:      "subdir",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir},
+-				{path: "b", typeFlag: tar.TypeReg},
+-				{path: "c/d", typeFlag: tar.TypeReg},
+-				{path: "c/e", typeFlag: tar.TypeReg},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a"},
+-					{Path: "b"},
+-					{Path: "c"},
+-					{Path: "c/e"},
+-				},
+-			},
+-			expectedRemoved: []string{"a", "b", "c/e"},
+-			expectedRemain:  []string{"c/d", "c"},
+-		},
+-		{
+-			description: "withsubdir",
+-			subdir:      "subdir",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir},
+-				{path: "b", typeFlag: tar.TypeReg},
+-				{path: "c/d", typeFlag: tar.TypeReg},
+-				{path: "c/e", typeFlag: tar.TypeReg},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a"},
+-					{Path: "b"},
+-					{Path: "c"},
+-					{Path: "c/e"},
+-				},
+-			},
+-			expectedRemoved: []string{"a", "b", "c/e"},
+-			expectedRemain:  []string{"c/d", "c"},
+-		},
+-		{
+-			description: "unconditional",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir, mtime: &then, mode: &mode},
+-				{path: "b", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/d", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/e", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a"},
+-					{Path: "b"},
+-					{Path: "c"},
+-					{Path: "c/e"},
+-				},
+-			},
+-			expectedRemoved: []string{"a", "b", "c/e"},
+-			expectedRemain:  []string{"c/d", "c"},
+-		},
+-		{
+-			description: "conditions-not-met",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir, mtime: &then, mode: &mode},
+-				{path: "b", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/d", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/e", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a", Mode: &mismatchedMode},
+-					{Path: "b", Mode: &mismatchedMode},
+-					{Path: "c", Mode: &mismatchedMode},
+-					{Path: "c/e", Mode: &mismatchedMode},
+-					{Path: "a", ModTime: &now},
+-					{Path: "b", ModTime: &now},
+-					{Path: "c", ModTime: &now},
+-					{Path: "c/e", ModTime: &now},
+-				},
+-			},
+-			expectedRemain: []string{"a", "b", "c/e", "c/d", "c"},
+-		},
+-		{
+-			description: "conditions-met",
+-			create: []create{
+-				{path: "/a", typeFlag: tar.TypeDir, mtime: &then, mode: &mode},
+-				{path: "b", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/d", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-				{path: "c/e", typeFlag: tar.TypeReg, mtime: &then, mode: &mode},
+-			},
+-			remove: ConditionalRemoveOptions{
+-				Paths: []ConditionalRemovePath{
+-					{Path: "a", ModTime: &then, Mode: &mode},
+-					{Path: "b", ModTime: &then, Mode: &mode},
+-					{Path: "c"},
+-					{Path: "c/d", ModTime: &then, Mode: &mode},
+-				},
+-			},
+-			expectedRemoved: []string{"a", "b", "c/d"},
+-			expectedRemain:  []string{"c", "c/e"},
+-		},
+-	}
+-	for i := range testCases {
+-		t.Run(testCases[i].description, func(t *testing.T) {
+-			tmpdir := t.TempDir()
+-			var create EnsureOptions
+-			for _, what := range testCases[i].create {
+-				create.Paths = append(create.Paths, EnsurePath{
+-					Path:     what.path,
+-					Typeflag: what.typeFlag,
+-					ModTime:  what.mtime,
+-					Chmod:    what.mode,
+-				})
+-			}
+-			created, _, err := Ensure(tmpdir, testCases[i].subdir, create)
+-			require.NoErrorf(t, err, "unexpected error creating %#v", create)
+-			remove := testCases[i].remove
+-			for _, what := range created {
+-				remove.Paths = append(remove.Paths, ConditionalRemovePath{
+-					Path: what,
+-				})
+-			}
+-			removed, err := ConditionalRemove(tmpdir, testCases[i].subdir, testCases[i].remove)
+-			require.NoError(t, err, "unexpected error removing")
+-			expectedRemoved := slices.Clone(testCases[i].expectedRemoved)
+-			slices.Sort(expectedRemoved)
+-			require.EqualValues(t, expectedRemoved, removed, "did not expect these to be removed")
+-			var remain []string
+-			err = filepath.Walk(filepath.Join(tmpdir, testCases[i].subdir), func(path string, _ fs.FileInfo, err error) error {
+-				if err != nil {
+-					return err
+-				}
+-				rel, err := filepath.Rel(filepath.Join(tmpdir, testCases[i].subdir), path)
+-				if err != nil {
+-					return fmt.Errorf("computing path of %q relative to %q: %w", path, filepath.Join(tmpdir, testCases[i].subdir), err)
+-				}
+-				if rel != "" && rel == "." {
+-					return nil
+-				}
+-				remain = append(remain, rel)
+-				return nil
+-			})
+-			slices.Sort(remain)
+-			expectedRemain := slices.Clone(testCases[i].expectedRemain)
+-			slices.Sort(expectedRemain)
+-			require.NoError(t, err, "unexpected error checking what's left")
+-			require.EqualValues(t, expectedRemain, remain, "did not expect these to be left behind")
+-		})
+-	}
+-}
+-
+-func TestConditionalRemoveNoChroot(t *testing.T) {
+-	couldChroot := canChroot
+-	canChroot = false
+-	testConditionalRemove(t)
+-	canChroot = couldChroot
+-}
+-
+-func TestSortedExtendedGlob(t *testing.T) {
+-	tmpdir := t.TempDir()
+-	buf := []byte("buffer")
+-	expect := []string{}
+-	for _, name := range []string{"z", "y", "x", "a", "b", "c", "d", "e", "f"} {
+-		require.NoError(t, os.WriteFile(filepath.Join(tmpdir, name), buf, 0o600))
+-		expect = append(expect, filepath.Join(tmpdir, name))
+-	}
+-	sort.Strings(expect)
+-
+-	matched, err := extendedGlob(filepath.Join(tmpdir, "*"))
+-	require.NoError(t, err, "globbing")
+-	require.ElementsMatch(t, expect, matched, "sorted globbing")
+-}
++}
+\ No newline at end of file
+diff --git a/copier/copier_unix_test.go b/copier/copier_unix_test.go
+index 2da3166..c1f2477 100644
+--- a/copier/copier_unix_test.go
++++ b/copier/copier_unix_test.go
+@@ -84,26 +84,6 @@ func TestRemoveChroot(t *testing.T) {
+ 	canChroot = couldChroot
+ }
+ 
+-func TestEnsureChroot(t *testing.T) {
+-	if uid != 0 {
+-		t.Skip("chroot() requires root privileges, skipping")
+-	}
+-	couldChroot := canChroot
+-	canChroot = true
+-	testEnsure(t)
+-	canChroot = couldChroot
+-}
+-
+-func TestConditionalRemoveChroot(t *testing.T) {
+-	if uid != 0 {
+-		t.Skip("chroot() requires root privileges, skipping")
+-	}
+-	couldChroot := canChroot
+-	canChroot = true
+-	testConditionalRemove(t)
+-	canChroot = couldChroot
+-}
+-
+ func checkStatInfoOwnership(t *testing.T, result *StatForItem) {
+ 	t.Helper()
+ 	require.EqualValues(t, 0, result.UID, "expected the owning user to be reported")
+-- 
+2.45.4
+

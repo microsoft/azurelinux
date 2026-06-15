@@ -1,0 +1,135 @@
+From b6e803fc90bb9d49345adca4f38856ce97fde9f8 Mon Sep 17 00:00:00 2001
+Message-ID: <b6e803fc90bb9d49345adca4f38856ce97fde9f8.1744876588.git.jdenemar@redhat.com>
+From: Jiri Denemark <jdenemar@redhat.com>
+Date: Wed, 9 Apr 2025 15:35:20 +0200
+Subject: [PATCH] qemu: Properly propagate migration state to TPM cleanup code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When migrating a domain with TPM state on a shared disk, we need to skip
+TPM cleanup on both ends. So far the code only handled successful
+migration and skipped the cleanup on the source host. But if the
+migration failed for some reason, the cleanup would be incorrectly
+called on the destination host removing the TPM files even though the
+domain was still running on the source host.
+
+https://issues.redhat.com/browse/RHEL-82411
+
+Signed-off-by: Jiri Denemark <jdenemar@redhat.com>
+Reviewed-by: Ján Tomko <jtomko@redhat.com>
+(cherry picked from commit 97ed7f22b089c5fdd9ee02cffc6854f6e021ab2b)
+
+https://issues.redhat.com/browse/RHEL-86800
+Signed-off-by: Jiri Denemark <jdenemar@redhat.com>
+---
+ src/qemu/qemu_driver.c    | 7 +++++--
+ src/qemu/qemu_migration.c | 6 +++---
+ src/qemu/qemu_process.c   | 8 ++------
+ 3 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/src/qemu/qemu_driver.c b/src/qemu/qemu_driver.c
+index f8f3d2c725..4c6eff9286 100644
+--- a/src/qemu/qemu_driver.c
++++ b/src/qemu/qemu_driver.c
+@@ -3853,6 +3853,7 @@ processMonitorEOFEvent(virQEMUDriver *driver,
+     const char *auditReason = "shutdown";
+     unsigned int stopFlags = 0;
+     virObjectEvent *event = NULL;
++    bool migration;
+ 
+     if (vm->def->id != domid) {
+         VIR_DEBUG("Domain %s was restarted, ignoring EOF",
+@@ -3863,6 +3864,8 @@ processMonitorEOFEvent(virQEMUDriver *driver,
+     if (qemuProcessBeginStopJob(vm, VIR_JOB_DESTROY, true) < 0)
+         return;
+ 
++    migration = vm->job->asyncJob == VIR_ASYNC_JOB_MIGRATION_IN;
++
+     if (!virDomainObjIsActive(vm)) {
+         VIR_DEBUG("Domain %p '%s' is not active, ignoring EOF",
+                   vm, vm->def->name);
+@@ -3877,7 +3880,7 @@ processMonitorEOFEvent(virQEMUDriver *driver,
+         auditReason = "failed";
+     }
+ 
+-    if (vm->job->asyncJob == VIR_ASYNC_JOB_MIGRATION_IN) {
++    if (migration) {
+         stopFlags |= VIR_QEMU_PROCESS_STOP_MIGRATED;
+         qemuMigrationDstErrorSave(driver, vm->def->name,
+                                   qemuMonitorLastError(priv->mon));
+@@ -3890,7 +3893,7 @@ processMonitorEOFEvent(virQEMUDriver *driver,
+     virObjectEventStateQueue(driver->domainEventState, event);
+ 
+  endjob:
+-    qemuDomainRemoveInactive(driver, vm, 0, false);
++    qemuDomainRemoveInactive(driver, vm, 0, migration);
+     qemuProcessEndStopJob(vm);
+ }
+ 
+diff --git a/src/qemu/qemu_migration.c b/src/qemu/qemu_migration.c
+index 62da892254..5cb7642315 100644
+--- a/src/qemu/qemu_migration.c
++++ b/src/qemu/qemu_migration.c
+@@ -3592,7 +3592,7 @@ qemuMigrationDstPrepareFresh(virQEMUDriver *driver,
+          * and there is no 'goto cleanup;' in the middle of those */
+         VIR_FREE(priv->origname);
+         virDomainObjRemoveTransientDef(vm);
+-        qemuDomainRemoveInactive(driver, vm, 0, false);
++        qemuDomainRemoveInactive(driver, vm, 0, true);
+     }
+     virDomainObjEndAPI(&vm);
+     virErrorRestore(&origErr);
+@@ -6963,7 +6963,7 @@ qemuMigrationDstFinishActive(virQEMUDriver *driver,
+     }
+ 
+     if (!qemuDomainObjIsActive(vm))
+-        qemuDomainRemoveInactive(driver, vm, VIR_DOMAIN_UNDEFINE_TPM, false);
++        qemuDomainRemoveInactive(driver, vm, VIR_DOMAIN_UNDEFINE_TPM, true);
+ 
+     virErrorRestore(&orig_err);
+     return NULL;
+@@ -7099,7 +7099,7 @@ qemuMigrationProcessUnattended(virQEMUDriver *driver,
+     qemuMigrationJobFinish(vm);
+ 
+     if (!virDomainObjIsActive(vm))
+-        qemuDomainRemoveInactive(driver, vm, 0, false);
++        qemuDomainRemoveInactive(driver, vm, 0, true);
+ }
+ 
+ 
+diff --git a/src/qemu/qemu_process.c b/src/qemu/qemu_process.c
+index fac5678439..ad7e99750f 100644
+--- a/src/qemu/qemu_process.c
++++ b/src/qemu/qemu_process.c
+@@ -8731,7 +8731,6 @@ void qemuProcessStop(virQEMUDriver *driver,
+     size_t i;
+     g_autofree char *timestamp = NULL;
+     g_autoptr(virQEMUDriverConfig) cfg = virQEMUDriverGetConfig(driver);
+-    bool outgoingMigration;
+ 
+     VIR_DEBUG("Shutting down vm=%p name=%s id=%d pid=%lld, "
+               "reason=%s, asyncJob=%s, flags=0x%x",
+@@ -8807,10 +8806,7 @@ void qemuProcessStop(virQEMUDriver *driver,
+ 
+     qemuDomainCleanupRun(driver, vm);
+ 
+-    outgoingMigration = (flags & VIR_QEMU_PROCESS_STOP_MIGRATED) &&
+-        (asyncJob == VIR_ASYNC_JOB_MIGRATION_OUT);
+-
+-    qemuExtDevicesStop(driver, vm, outgoingMigration);
++    qemuExtDevicesStop(driver, vm, !!(flags & VIR_QEMU_PROCESS_STOP_MIGRATED));
+ 
+     qemuDBusStop(driver, vm);
+ 
+@@ -9070,7 +9066,7 @@ qemuProcessAutoDestroy(virDomainObj *dom,
+                                      VIR_DOMAIN_EVENT_STOPPED,
+                                      VIR_DOMAIN_EVENT_STOPPED_DESTROYED);
+ 
+-    qemuDomainRemoveInactive(driver, dom, 0, false);
++    qemuDomainRemoveInactive(driver, dom, 0, !!(stopFlags & VIR_QEMU_PROCESS_STOP_MIGRATED));
+ 
+     qemuProcessEndStopJob(dom);
+ 
+-- 
+2.49.0

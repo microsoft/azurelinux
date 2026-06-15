@@ -5,7 +5,7 @@ Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.11
-Release:        3%{?dist}
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,8 +36,17 @@ Patch0:         CVE-2024-45337.patch
 Patch1:         CVE-2024-45338.patch
 Patch2:         CVE-2025-22869.patch
 Patch3:         CVE-2025-22872.patch
+Patch4:         CVE-2025-47911.patch
+Patch5:         CVE-2025-58190.patch
+Patch6:         CVE-2026-27136.patch
+Patch7:         CVE-2026-39821.patch
+Patch8:         CVE-2026-39829.patch
+Patch9:         CVE-2026-39830.patch
+Patch10:        CVE-2026-39834.patch
+Patch11:        CVE-2026-42506.patch
+Patch12:        CVE-2026-46597.patch
 
-BuildRequires:  golang >= 1.18.3
+BuildRequires:  golang < 1.25
 %global debug_package %{nil}
 %define our_gopath %{_topdir}/.gopath
 
@@ -45,9 +54,7 @@ BuildRequires:  golang >= 1.18.3
 The official command line client for Cloud Foundry.
 
 %prep
-%setup -q -n cli-%{version}
-tar --no-same-owner -xf %{SOURCE1}
-%autopatch -p1
+%autosetup -p1 -n cli-%{version} -a1
 
 %build
 export GOPATH=%{our_gopath}
@@ -64,11 +71,20 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 
 %files
 %defattr(-,root,root)
-%license LICENSE
-%doc NOTICE README.md
+%license LICENSE NOTICE
+%doc README.md
 %{_bindir}/cf
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-6
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-5
+- Patch for CVE-2025-47911, CVE-2025-58190
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 8.7.11-4
+- Set BR for golang to < 1.25
+
 * Tue Apr 22 2025 Archana Shettigar <v-shettigara@microsoft.com> - 8.7.11-3
 - Fix CVE-2025-22872 with an upstream patch
 

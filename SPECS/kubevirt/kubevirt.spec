@@ -19,32 +19,37 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.2.0
-Release:        18%{?dist}
+Version:        1.7.1
+Release:        7%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# The containers_meta packages and associated files are not required for the Mariner build
-# Nexus team needs these to-be-upstreamed patches for the operator Edge to work
-# correctly.
-Patch0:         Cleanup-housekeeping-cgroup-on-vm-del.patch
-Patch1:         CVE-2023-48795.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2024-45337.patch
-Patch4:         CVE-2024-45338.patch
-Patch5:         CVE-2023-45288.patch
-Patch6:         CVE-2023-44487.patch
-Patch7:         CVE-2025-22869.patch
-Patch8:         CVE-2025-22872.patch
-
+Patch0:         CVE-2025-11065.patch
+Patch1:         CVE-2026-35469.patch
+Patch2:         CVE-2026-39829.patch
+Patch3:         CVE-2026-42506.patch
+Patch4:         CVE-2026-46597.patch
+Patch5:         CVE-2026-39821.patch
+Patch6:         CVE-2026-39830.patch
+Patch7:         CVE-2026-39834.patch
+Patch8:         CVE-2026-27136.patch
+Patch9:         CVE-2026-25680.patch
+Patch10:        CVE-2026-25681.patch
+Patch11:        CVE-2026-39827.patch
+Patch12:        CVE-2026-39828.patch
+Patch13:        CVE-2026-39835.patch
+Patch14:        CVE-2026-42502.patch
+Patch15:        CVE-2026-7374.patch
+Patch16:        CVE-2026-33814.patch
+ 
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
-BuildRequires:  golang >= 1.21
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  golang >= 1.24
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
@@ -197,9 +202,6 @@ install -p -m 0755 cmd/virt-launcher/node-labeller/node-labeller.sh %{buildroot}
 mkdir -p %{buildroot}%{_datadir}/kube-virt/virt-handler
 install -p -m 0644 cmd/virt-handler/nsswitch.conf %{buildroot}%{_datadir}/kube-virt/virt-handler/
 
-# virt-launcher SELinux policy needs to land in virt-handler container
-install -p -m 0644 cmd/virt-handler/virt_launcher.cil %{buildroot}/
-
 # Persistent reservation helper configuration files
 mkdir -p %{buildroot}%{_datadir}/kube-virt/pr-helper
 install -p -m 0644 cmd/pr-helper/multipath.conf %{buildroot}%{_datadir}/kube-virt/pr-helper/
@@ -246,7 +248,6 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_datadir}/kube-virt/virt-handler
 %{_bindir}/virt-handler
 %{_bindir}/virt-chroot
-/virt_launcher.cil
 
 %files virt-launcher
 %license LICENSE
@@ -280,6 +281,86 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-7
+- Patch for CVE-2026-33814
+
+* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-6
+- Patch for CVE-2026-7374
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39829, CVE-2026-39834, CVE-2026-39830, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-4
+- Bump to rebuild with updated glibc
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-3
+- Patch for CVE-2026-35469
+
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.7.1-2
+- Bump to rebuild with updated glibc
+
+* Wed Feb 25 2026 Harshit Gupta <guptaharshit@microsoft.com> - 1.7.1-1
+- Upgrade KubeVirt to v1.7.1
+- Remove CVE-2025-47911.patch and CVE-2025-58190.patch since
+  vulnerable versions of golang.org/x/net/html no longer used in 1.7.1
+
+* Fri Feb 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-3
+- Patch for CVE-2025-58190, CVE-2025-47911
+
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.0-2
+- Patch for CVE-2025-11065
+
+* Tue Feb 03 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 1.7.0-1
+- Upgrade to 1.7.0
+- Remove CVE-2025-47913.patch - vulnerable ssh/agent package no longer vendored in 1.7.0
+- Remove CVE-2025-64435.patch - fixed upstream via PR#15680 (controller_ref.go removed)
+- Bump golang BuildRequires to >= 1.24 per upstream PR#15784
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.3-3
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.6.3-2
+- Bump to rebuild with updated glibc
+
+* Tue Dec 30 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.6.3-1
+- Upgrade to 1.6.3
+- Remove CVE-2025-64324.patch
+
+* Wed Dec 17 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.3-4
+- Added patch for CVE-2025-64435
+
+* Tue Dec 16 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.3-3
+- Patch for CVE-2025-64324
+
+* Mon Nov 24 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.3-2
+- Bump to rebuild with updated glibc
+
+* Mon Nov 24 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
+- Auto-upgrade to 1.5.3 - for CVE-2025-64437, CVE-2025-64433, CVE-2025-64434, CVE-2025-64432
+
+* Tue Nov 18 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-6
+- Patch for CVE-2025-47913
+
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-5
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-4
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.5.0-3
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.5.0-2
+- Bump to rebuild with updated glibc
+
+* Fri Jul 11 2025 Harshit Gupta <guptaharshit@microsoft.com> - 1.5.0-1
+- Upgrade to 1.5.0
+- Removed old patches
+- Remove virt_launcher.cil SELinux policy
+
+* Thu Jul 10 2025 BinduSri Adabala <v-badabala@microsoft.com> - 1.2.0-19
+- Patch CVE-2024-33394
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-18
 - Bump to rebuild with updated glibc
 
@@ -292,7 +373,7 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 * Mon Mar 03 2025 corvus-callidus <108946721+corvus-callidus@users.noreply.github.com> - 1.2.0-15
 - Address CVE-2023-44487
 
-* Sun March 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
+* Sun Mar 02 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.2.0-14
 - Address CVE-2025-22869
 
 * Tue Feb 25 2025 Chris Co <chrco@microsoft.com> - 1.2.0-14

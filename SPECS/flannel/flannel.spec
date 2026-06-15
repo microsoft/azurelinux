@@ -3,7 +3,7 @@
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
 Version:        0.24.2
-Release:        15%{?dist}
+Release:        28%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,10 +16,13 @@ Patch1:         CVE-2023-44487.patch
 Patch2:         CVE-2023-45288.patch
 Patch3:         CVE-2025-30204.patch
 Patch4:         CVE-2024-51744.patch
+Patch5:         CVE-2025-65637.patch
+Patch6:         CVE-2026-32241.patch
+Patch7:         CVE-2026-39821.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
-BuildRequires:  golang >= 1.20
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 
 %description
@@ -52,6 +55,43 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %{_bindir}/flanneld
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-28
+- Patch for CVE-2026-39821
+
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.24.2-27
+- Bump to rebuild with updated glibc
+
+* Mon Mar 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.24.2-26
+- Bump to rebuild with updated glibc
+* Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-25
+- Patch for CVE-2026-32241
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-24
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-23
+- Bump to rebuild with updated glibc
+
+* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-22
+- Patch for CVE-2025-65637
+
+* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-21
+- Bump to rebuild with updated glibc
+
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-20
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-19
+- Bump to rebuild with updated glibc
+
+* Fri Sep 17 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-18
+- Bump to rebuild with updated glibc
+
+* Fri Sep 05 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-17
+- Bump to rebuild with updated glibc
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 0.24.2-16
+- Set BR for golang to < 1.25
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.24.2-15
 - Bump to rebuild with updated glibc
 

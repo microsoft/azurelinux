@@ -1,0 +1,51 @@
+From 91b1b21fe68bdbcb51552cc2dc2e930da139a123 Mon Sep 17 00:00:00 2001
+From: dj_palli <v-dpalli@microsoft.com>
+Date: Thu, 10 Jul 2025 07:22:28 +0000
+Subject: [PATCH] Address ptest error fix
+
+Description: fix the Ptest failure by removing the unused global variables in test-aa
+
+---
+ utils/apparmor/aa.py           | 1 -
+ utils/apparmor/common.py       | 1 -
+ utils/test/test-aa-easyprof.py | 1 -
+ 3 files changed, 3 deletions(-)
+
+diff --git a/utils/apparmor/aa.py b/utils/apparmor/aa.py
+index 4ba484d..71754aa 100644
+--- a/utils/apparmor/aa.py
++++ b/utils/apparmor/aa.py
+@@ -1486,7 +1486,6 @@ def set_logfile(filename):
+
+ def do_logprof_pass(logmark=''):
+     # set up variables for this pass
+-    global active_profiles
+     global sev_db
+ #    aa = hasher()
+ #     changed = dict()
+diff --git a/utils/apparmor/common.py b/utils/apparmor/common.py
+index bbe2834..b4ae059 100644
+--- a/utils/apparmor/common.py
++++ b/utils/apparmor/common.py
+@@ -69,7 +69,6 @@ def msg(out, output=sys.stdout):
+ 
+ def debug(out):
+     """Print debug message"""
+-    global DEBUGGING
+     if DEBUGGING:
+         try:
+             print("DEBUG: %s" % (out), file=sys.stderr)
+diff --git a/utils/test/test-aa-easyprof.py b/utils/test/test-aa-easyprof.py
+index d205797..9d8e51c 100755
+--- a/utils/test/test-aa-easyprof.py
++++ b/utils/test/test-aa-easyprof.py
+@@ -108,7 +108,6 @@ class T(unittest.TestCase):
+ 
+     def setUp(self):
+         """Setup for tests"""
+-        global topdir
+ 
+         self.tmpdir = os.path.realpath(tempfile.mkdtemp(prefix='test-aa-easyprof'))
+ 
+-- 
+2.45.2

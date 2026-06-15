@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      3%{?dist}
+Release:      14%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -11,9 +11,12 @@ Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
-Patch0:       CVE-2025-4574.patch
-Patch1:       CVE-2025-5791.patch
-
+Patch0:       rust-1.90-fixes.patch
+Patch1:       CVE-2026-41602.patch
+Patch2:       CVE-2026-39821.patch
+Patch3:       CVE-2026-33814.patch
+Patch4:       CVE-2025-4574.patch
+Patch5:       CVE-2025-5791.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -30,7 +33,7 @@ BuildRequires:  fuse-devel
 # kernel-uvm is required for debuggability, exercising confidential guest (confidential_guest=true)
 # code paths without actual SEV SNP enablement (sev_snp_guest=false)
 Requires:  kernel-uvm
-Requires:  moby-containerd-cc
+Requires:  containerd2
 # Must match the version specified by the `assets.virtiofsd.version` field in the source's versions.yaml.
 Requires:  virtiofsd = 1.8.0
 
@@ -149,8 +152,42 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Tue Jun 24 2025 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.aks0-3
+* Mon Jun 15 2026 Sreenivasulu Malavathula <v-smalavathu@microsoft.com> - 3.15.0.aks0-14
 - Patch CVE-2025-4574, CVE-2025-5791
+
+* Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.15.0-aks0-13
+- Bump release to rebuild with rust
+
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-12
+- Patch for CVE-2026-33814
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-11
+- Patch for CVE-2026-39821
+
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-10
+- Patch for CVE-2026-41602
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.15.0-aks0-9
+- Bump release to rebuild with rust
+
+* Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.15.0-aks0-8
+- Bump release to rebuild with rust
+
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.15.0-aks0-7
+- Bump release to rebuild with rust
+
+* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0-aks0-6
+- Bump release to rebuild with rust
+- Add patch to suppress dead_code warnings and add explicit lifetime for U32Set iterator
+
+* Fri Aug 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0-aks0-5
+- Bump release to rebuild with rust
+
+* Tue Jul 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 3.15.0.aks0-4
+- Bump release to rebuild with rust
+
+* Mon Jul 21 2025 Saul Paredes <saulparedes@microsoft.com> - 3.15.0.aks0-3
+- Update dependency on containerd2
 
 * Fri Jun 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-2
 - Bump release to rebuild with rust
@@ -249,7 +286,7 @@ fi
 *   Mon Aug 07 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.6.0-2
 -   Bump release to rebuild with go 1.19.12
 
-*   Tue Jul 11 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
+*   Fri Jul 28 2023 Dallas Delaney <dadelan@microsoft.com> 0.6.0-1
 -   Upgrade to version 0.6.0
 
 *   Thu Jul 13 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.2-2

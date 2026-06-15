@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        7%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,19 @@ Patch8:         CVE-2025-22868.patch
 Patch9:         CVE-2025-22870.patch
 Patch10:        CVE-2024-51744.patch
 Patch11:        CVE-2025-22872.patch
+Patch12:        CVE-2025-65637.patch
+Patch13:        CVE-2025-10543.patch
+Patch14:        CVE-2025-11065.patch
+Patch15:        CVE-2025-30204.patch
+Patch16:        CVE-2025-47911.patch
+Patch17:        CVE-2025-58190.patch
+Patch18:        CVE-2026-41602.patch
+Patch19:        CVE-2026-39821.patch
+Patch20:        CVE-2026-42506.patch
+Patch21:        CVE-2026-27136.patch
+Patch22:        CVE-2026-25680.patch
+Patch23:        CVE-2026-25681.patch
+Patch24:        CVE-2026-42502.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -156,6 +169,39 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-18
+- Bump release to rebuild with rust
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-17
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-16
+- Patch for CVE-2026-41602
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-15
+- Bump release to rebuild with rust
+
+* Mon Feb 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-14
+- Bump release to rebuild with rust
+
+* Thu Feb 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-13
+- Patch for CVE-2025-58190, CVE-2025-47911, CVE-2025-30204
+
+* Wed Feb 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-12
+- Patch for CVE-2025-11065
+
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 2.7.5-11
+- Bump release to rebuild with rust
+
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-10
+- Patch for CVE-2025-10543
+
+* Mon Dec 08 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-9
+- Patch for CVE-2025-65637
+
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.7.5-8
+- Bump release to rebuild with rust
+
 * Tue Jun 10 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.5-7
 - Bump release to rebuild with rust
 
@@ -177,7 +223,7 @@ go test ./...
 * Mon Feb 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.7.5-1
 - Auto-upgrade to 2.7.5 - Upgrade influxdb to fix CVE-2023-44487
 
-* Wed Jan 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.3-9
+* Mon Jan 27 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.7.3-9
 - Fix CVE-2024-28180
 
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.7.3-8

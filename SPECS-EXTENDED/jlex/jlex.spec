@@ -82,6 +82,8 @@ install -pD -T dist/lib/%{name}.jar \
 # javadoc
 install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
 
 %pre javadoc
 # workaround for rpm bug, can be removed in F-17
@@ -96,6 +98,8 @@ rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
 %files javadoc
 %defattr(-,root,root,-)
 %{_javadocdir}/%{name}
+%license ADDITIONAL_LICENSE_INFO
+%license LICENSE
 
 %changelog
 * Mon Feb 24 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.6-286

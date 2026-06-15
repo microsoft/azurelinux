@@ -22,13 +22,13 @@ Distribution:   Azure Linux
 %global short_name   commons-%{base_name}
 %bcond_with tests
 Name:           apache-%{short_name}
-Version:        3.6
-Release:        3%{?dist}
+Version:        3.11.0
+Release:        1%{?dist}
 Summary:        Internet protocol suite Java library
 License:        Apache-2.0
 Group:          Development/Libraries/Java
 URL:            http://commons.apache.org/%{base_name}/
-Source0:        http://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
+Source0:        https://archive.apache.org/dist/commons/%{base_name}/source/%{short_name}-%{version}-src.tar.gz
 Source1:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
@@ -57,7 +57,7 @@ Group:          Documentation/HTML
 %{summary}.
 
 %prep
-%setup -q -n %{short_name}-%{version}-src
+%autosetup -p1 -n %{short_name}-%{version}-src
 cp %{SOURCE1} build.xml
 %pom_remove_parent .
 
@@ -69,6 +69,8 @@ cp %{SOURCE1} build.xml
   jar javadoc
 
 %install
+mv target/site/apidocs/legal/ADDITIONAL_LICENSE_INFO .
+mv target/site/apidocs/legal/LICENSE .
 # pom
 install -dm 0755 %{buildroot}%{_javadir}
 install -pm 0644 target/%{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{short_name}.jar
@@ -92,6 +94,11 @@ cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
 %{_javadocdir}/%{name}
 
 %changelog
+* Tue Nov 04 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 3.11.0-1
+- Upgrade to 3.11.0
+- Fix Build Issues
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.6-3
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

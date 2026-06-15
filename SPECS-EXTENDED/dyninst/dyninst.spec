@@ -1,7 +1,7 @@
 Summary: An API for Run-time Code Generation
 License: LGPLv2+
 Name: dyninst
-Release: 21%{?dist}
+Release: 30%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://www.dyninst.org
@@ -31,7 +31,7 @@ BuildRequires: tbb tbb-devel
 
 # Extra requires just for the testsuite
 BuildRequires: gcc-gfortran libstdc++-static libxml2-devel
-BuildRequires: glibc-static >= 2.38-11%{?dist}
+BuildRequires: glibc-static >= 2.38-20%{?dist}
 
 # Testsuite files should not provide/require anything
 %{?filter_setup:
@@ -194,6 +194,33 @@ echo "%{_libdir}/dyninst" > %{buildroot}/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 %attr(644,root,root) %{_libdir}/dyninst/testsuite/*.a
 
 %changelog
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 10.1.0-30
+- Bump to rebuild with updated glibc
+
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 10.1.0-29
+- Bump to rebuild with updated glibc
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-28
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-27
+- Bump to rebuild with updated glibc
+
+* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-26
+- Bump to rebuild with updated glibc
+
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-25
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-24
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-23
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 10.1.0-22
+- Bump to rebuild with updated glibc
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 10.1.0-21
 - Bump to rebuild with updated glibc
 

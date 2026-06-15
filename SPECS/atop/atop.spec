@@ -2,7 +2,7 @@
 Summary:        An advanced interactive monitor to view the load on system and process level
 Name:           atop
 Version:        2.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source1:        atop.d
 
 Patch0:         atop-sysconfig.patch
 Patch1:         format.patch
+Patch2:         CVE-2025-31160.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
@@ -43,6 +44,7 @@ http://www.atcomputing.nl/Tools/atop/kernpatch.html
 %setup -q
 %patch 0  -b .sysconfig
 %patch 1  -b .format
+%patch 2  -p1
 
 # Correct unit file path
 sed -i "s|%{_sysconfdir}/default/atop|%{_sysconfdir}/sysconfig/atop|g" atop.service
@@ -91,6 +93,9 @@ install -Dp -m 0644 atop-rotate.* %{buildroot}%{_unitdir}/
 %{_sbindir}/atopacctd
 
 %changelog
+* Mon Nov 03 2025 Aditya Singh <v-aditysing@microsoft.com> - 2.9.0-2
+- Added Patch for CVE-2025-31160
+
 * Fri Jan 05 2024 Muhammad Falak <mwani@microsoft.com> - 2.9.0-1
 - Bump version to 2.9.0
 - Drop un-needed patches

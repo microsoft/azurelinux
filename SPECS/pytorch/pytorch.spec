@@ -2,7 +2,7 @@
 Summary:        Tensors and Dynamic neural networks in Python with strong GPU acceleration.
 Name:           pytorch
 Version:        2.2.2
-Release:        7%{?dist}
+Release:        15%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,15 @@ Patch7:         CVE-2021-22569.patch
 Patch8:         CVE-2025-32434.patch
 Patch9:         CVE-2025-3730.patch
 Patch10:        CVE-2025-2953.patch
+Patch11:        CVE-2025-55552.patch
+Patch12:        CVE-2025-55560.patch
+Patch13:        CVE-2025-46152.patch
+Patch14:        CVE-2025-3001.patch
+Patch15:        CVE-2026-24747.patch
+Patch16:        CVE-2026-0994.patch
+Patch17:        CVE-2026-34445.patch
+Patch18:        CVE-2026-34446.patch
+Patch19:        CVE-2025-51480.patch
 
 %description
 PyTorch is a Python package that provides two high-level features:
@@ -93,6 +102,30 @@ cp -arf docs %{buildroot}/%{_pkgdocdir}
 %{_docdir}/*
 
 %changelog
+* Mon May 18 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-15
+- Patch for CVE-2025-51480
+
+* Fri Apr 10 2026 Aninda Pradhan <v-anipradhan@microsoft.com> - 2.2.2-14
+- Updated patch CVE-2025-55560 to include missing function definition is_sparse_any
+
+* Thu Apr 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-13
+- Patch for CVE-2026-34446, CVE-2026-34445
+
+* Wed Feb 11 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 2.2.2-12
+- Patch for CVE-2026-0994
+
+* Wed Jan 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-11
+- Patch for CVE-2026-24747
+
+* Thu Dec 25 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-10
+- Patch for CVE-2025-3001
+
+* Thu Dec 04 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.2-9
+- Patch for CVE-2025-55560 & CVE-2025-46152
+ 
+* Mon Nov 24 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-8
+- Patch CVE-2025-55552
+
 * Tue Apr 29 2025 Archana Shettigar <v-shettigara@microsoft.com> - 2.2.2-7
 - Patch CVE-2025-2953
 

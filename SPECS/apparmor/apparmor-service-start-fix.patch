@@ -1,0 +1,12 @@
+diff -Naur apparmor-2.13/parser/apparmor.service apparmor-2.13-mod/parser/apparmor.service
+--- apparmor-2.13/parser/apparmor.service	2018-04-15 19:18:53.000000000 +0530
++++ apparmor-2.13-mod/parser/apparmor.service	2018-08-08 20:21:02.092378749 +0530
+@@ -9,7 +9,7 @@
+ 
+ [Service]
+ Type=oneshot
+-ExecStart=/lib/apparmor/apparmor.systemd reload
++ExecStart=/lib/apparmor/apparmor.systemd start
+ ExecReload=/lib/apparmor/apparmor.systemd reload
+ 
+ # systemd maps 'restart' to 'stop; start' which means removing AppArmor confinement

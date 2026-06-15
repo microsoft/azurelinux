@@ -1,0 +1,38 @@
+From 7c4c453945ce68b04f36162637dac8a651a1601a Mon Sep 17 00:00:00 2001
+Message-ID: <7c4c453945ce68b04f36162637dac8a651a1601a.1709801660.git.tredaelli@redhat.com>
+From: Timothy Redaelli <tredaelli@redhat.com>
+Date: Tue, 5 Mar 2024 19:50:10 +0100
+Subject: [PATCH] tests: Fix "SSL db: implementation" test with openssl >
+ 3.2.0.
+
+In OpenSSL 3.2.0 (81b741f) all the "alert" error messages was updated to
+replace "sslv3" with "ssl/tls".
+
+This commit updates the "SSL db: implementation" test to support both the
+pre-openssl 3.2.0 error message: "sslv3 alert certificate unknown" and the
+post-openssl 3.2.0 error message: "ssl/tls alert certificate unknown".
+
+Signed-off-by: Timothy Redaelli <tredaelli@redhat.com>
+---
+ tests/ovsdb-server.at | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/ovsdb-server.at b/tests/ovsdb-server.at
+index b8ccc4c8e..35447a52e 100644
+--- a/tests/ovsdb-server.at
++++ b/tests/ovsdb-server.at
+@@ -936,8 +936,10 @@ AT_CHECK_UNQUOTED(
+   [ignore])
+ # The error message for being unable to negotiate a shared ciphersuite
+ # is 'sslv3 alert handshake failure'. This is not the clearest message.
++# In openssl 3.2.0 all the error messages was updated to replace "sslv3" with
++# "ssl/tls".
+ AT_CHECK_UNQUOTED(
+-  [grep "sslv3 alert handshake failure" output], [0],
++  [grep -E "(sslv3|ssl/tls) alert handshake failure" output], [0],
+   [stdout],
+   [ignore])
+ OVSDB_SERVER_SHUTDOWN(["
+-- 
+2.44.0
+

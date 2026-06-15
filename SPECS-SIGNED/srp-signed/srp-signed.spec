@@ -31,9 +31,11 @@
 %define __os_install_post %{__os_install_post_leave_signatures} %{nil}
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_version
+%global target_kernel_release %azl_kernel_release
+%global target_mlnx_ofa_kernel_version %azl_mlnx_ofa_kernel_version
+%global target_mlnx_ofa_kernel_release %azl_mlnx_ofa_kernel_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
@@ -42,12 +44,12 @@
 %global KVERSION %{target_kernel_version_full}
 
 %define _name srp
-%{!?_mofed_full_version: %define _mofed_full_version 24.10-20%{release_suffix}%{?dist}}
+%{!?_mofed_full_version: %define _mofed_full_version %{target_mlnx_ofa_kernel_version}-%{target_mlnx_ofa_kernel_release}%{?dist}}
 
 Summary:	 srp driver
 Name:		 %{_name}-signed
-Version:	 24.10
-Release:	 20%{release_suffix}%{?dist}
+Version:	 25.07
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com
 Group:		 System Environment/Base
@@ -110,6 +112,15 @@ popd
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+- Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
+
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
+- Upgrade version to 25.07.
+
+* Fri Oct 10 2025 Pawel Winogrodzki <pawelwi@microsoft.com> - 24.10-21
+- Bump mofed release number
+
 * Thu May 29 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 24.10-20
 - Add kernel version and release nb into release nb
 

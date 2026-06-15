@@ -1,0 +1,85 @@
+From e2180b2e1493abc2a8d1165e10bf264d50fac0ae Mon Sep 17 00:00:00 2001
+From: Akira TAGOH <akira@tagoh.org>
+Date: Wed, 1 Mar 2023 15:24:27 +0900
+Subject: [PATCH] Fix the build issue
+
+Some code ignores a return value of g_string_free() and that causes:
+
+ignoring return value of 'gchar* g_string_free_and_steal(GString*)' declared with attribute 'warn_unused_result' [-Wunused-result]
+
+This fixes it.
+---
+ src/paps.cc | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/src/paps.cc b/src/paps.cc
+index cb48ddc..429b764 100644
+--- a/src/paps.cc
++++ b/src/paps.cc
+@@ -368,6 +368,7 @@ copy_pango_parse_enum (GType       type,
+ 	{
+ 	  int i;
+ 	  GString *s = g_string_new (nullptr);
++	  gchar *gstr;
+ 
+ 	  for (i = 0, v = g_enum_get_value (klass, i); v;
+ 	       i++  , v = g_enum_get_value (klass, i))
+@@ -382,10 +383,10 @@ copy_pango_parse_enum (GType       type,
+ 		       G_ENUM_CLASS_TYPE_NAME(klass),
+ 		       s->str);
+ 
+-	  if (possible_values)
+-	    *possible_values = s->str;
++	  gstr = g_string_free (s, possible_values ? false : true);
+ 
+-	  g_string_free (s, possible_values ? false : true);
++	  if (possible_values)
++	    *possible_values = gstr;
+ 	}
+     }
+ 
+@@ -1001,7 +1002,7 @@ read_file (FILE   *file,
+       if (ferror (file))
+         {
+           fprintf(stderr, _("%s: Error reading file.\n"), g_get_prgname ());
+-          g_string_free (inbuf, true);
++          (void) g_string_free (inbuf, true);
+           exit(1);
+         }
+       else if (bp == nullptr)
+@@ -1043,8 +1044,7 @@ read_file (FILE   *file,
+   if (inbuf->len && inbuf->str[inbuf->len-1] != '\n')
+     g_string_append(inbuf, "\n");
+ 
+-  text = inbuf->str;
+-  g_string_free (inbuf, false);
++  text = g_string_free (inbuf, false);
+ 
+   if (encoding != nullptr && cvh != nullptr)
+     g_iconv_close(cvh);
+@@ -1671,7 +1671,11 @@ get_date()
+       fprintf(stderr, _("%1$s: Error while converting date string from '%2$s' to UTF-8.\n"),
+         g_get_prgname(), get_encoding());
+       /* Return the unconverted string. */
+-      g_string_free(inbuf, false);
++      /*
++       * inbuf isn't used here, but a few memory is
++       * allocated by default. so it should be freed anyway.
++       */
++      (void) g_string_free(inbuf, true);
+       g_iconv_close(cvh);
+       return date;
+     }
+@@ -1679,8 +1683,7 @@ get_date()
+     obuffer[BUFSIZE * 6 - 1 - oblen] = 0;
+     g_string_append(inbuf, bp);
+ 
+-    date_utf8 = inbuf->str;
+-    g_string_free(inbuf, false);
++    date_utf8 = g_string_free(inbuf, false);
+     g_iconv_close(cvh);
+   }
+ 
+-- 
+2.39.2
+

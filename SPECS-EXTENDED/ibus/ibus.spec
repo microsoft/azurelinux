@@ -41,7 +41,7 @@ Distribution:   Azure Linux
 Name:           ibus
 Version:        1.5.31
 # https://github.com/fedora-infra/rpmautospec/issues/101
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Intelligent Input Bus for Linux OS
 License:        LGPL-2.1-or-later
 URL:            https://github.com/ibus/%name/wiki
@@ -414,7 +414,8 @@ dconf update || :
 
 %files -f %{name}10.lang
 # FIXME: no version number
-%doc AUTHORS COPYING README
+%doc AUTHORS README
+%license COPYING
 %dir %{_datadir}/ibus/
 %{_bindir}/ibus
 %{_bindir}/ibus-daemon
@@ -536,6 +537,10 @@ dconf update || :
 %{_datadir}/installed-tests/ibus
 
 %changelog
+* Thu Dec 18 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.5.31-2
+- Addressed license warning issue.
+- License verified.
+
 * Thu Mar 13 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.5.31-1
 - Update to version 1.5.31
 - License verified

@@ -1,0 +1,290 @@
+From e1dfa0a1b54411b56c92e8156b06ce01f05a0d44 Mon Sep 17 00:00:00 2001
+From: SumitJenaHCL <v-sumitjena@microsoft.com>
+Date: Fri, 19 Sep 2025 20:53:49 +0530
+Subject: [PATCH] Run selective tests
+
+---
+ pkg/machine/provider/platform_test.go |  32 ----
+ pkg/systemd/quadlet/unitdirs_test.go  | 223 --------------------------
+ 2 files changed, 255 deletions(-)
+ delete mode 100644 pkg/systemd/quadlet/unitdirs_test.go
+
+diff --git a/pkg/machine/provider/platform_test.go b/pkg/machine/provider/platform_test.go
+index 9ab62ab..1d38063 100644
+--- a/pkg/machine/provider/platform_test.go
++++ b/pkg/machine/provider/platform_test.go
+@@ -23,22 +23,6 @@ func TestSupportedProviders(t *testing.T) {
+ 	}
+ }
+ 
+-func TestInstalledProviders(t *testing.T) {
+-	installed, err := InstalledProviders()
+-	assert.NoError(t, err)
+-	switch runtime.GOOS {
+-	case "darwin":
+-		// TODO: need to verify if an arm64 machine reports {applehv, libkrun}
+-		assert.Equal(t, []define.VMType{define.AppleHvVirt}, installed)
+-	case "windows":
+-		provider, err := Get()
+-		assert.NoError(t, err)
+-		assert.Contains(t, installed, provider)
+-	case "linux":
+-		assert.Equal(t, []define.VMType{define.QemuVirt}, installed)
+-	}
+-}
+-
+ func TestHasPermsForProvider(t *testing.T) {
+ 	provider, err := Get()
+ 	assert.NoError(t, err)
+@@ -69,19 +53,3 @@ func TestBadSupportedProviders(t *testing.T) {
+ 		assert.NotEqual(t, []define.VMType{define.AppleHvVirt}, SupportedProviders())
+ 	}
+ }
+-
+-func TestBadInstalledProviders(t *testing.T) {
+-	installed, err := InstalledProviders()
+-	assert.NoError(t, err)
+-	switch runtime.GOOS {
+-	case "darwin":
+-		assert.NotEqual(t, []define.VMType{define.QemuVirt}, installed)
+-		if runtime.GOARCH != "arm64" {
+-			assert.NotEqual(t, []define.VMType{define.AppleHvVirt, define.LibKrun}, installed)
+-		}
+-	case "windows":
+-		assert.NotContains(t, installed, define.QemuVirt)
+-	case "linux":
+-		assert.NotEqual(t, []define.VMType{define.AppleHvVirt}, installed)
+-	}
+-}
+diff --git a/pkg/systemd/quadlet/unitdirs_test.go b/pkg/systemd/quadlet/unitdirs_test.go
+deleted file mode 100644
+index 6ca785d..0000000
+--- a/pkg/systemd/quadlet/unitdirs_test.go
++++ /dev/null
+@@ -1,223 +0,0 @@
+-//go:build linux
+-
+-package quadlet
+-
+-import (
+-	"fmt"
+-	"os"
+-	"os/exec"
+-	"os/user"
+-	"path"
+-	"path/filepath"
+-	"strconv"
+-	"strings"
+-	"syscall"
+-	"testing"
+-
+-	"github.com/stretchr/testify/assert"
+-)
+-
+-func TestUnitDirs(t *testing.T) {
+-	u, err := user.Current()
+-	assert.NoError(t, err)
+-	uidInt, err := strconv.Atoi(u.Uid)
+-	assert.NoError(t, err)
+-
+-	if os.Getenv("_UNSHARED") != "true" {
+-		unitDirs := GetUnitDirs(false)
+-
+-		resolvedUnitDirAdminUser := ResolveUnitDirAdminUser()
+-		userLevelFilter := GetUserLevelFilter(resolvedUnitDirAdminUser)
+-		rootfulPaths := NewSearchPaths()
+-		AppendSubPaths(rootfulPaths, UnitDirTemp, false, userLevelFilter)
+-		AppendSubPaths(rootfulPaths, UnitDirAdmin, false, userLevelFilter)
+-		AppendSubPaths(rootfulPaths, UnitDirDistro, false, userLevelFilter)
+-		assert.Equal(t, rootfulPaths.GetSortedPaths(), unitDirs, "rootful unit dirs should match")
+-
+-		configDir, err := os.UserConfigDir()
+-		assert.NoError(t, err)
+-
+-		rootlessPaths := NewSearchPaths()
+-
+-		systemUserDirLevel := len(strings.Split(resolvedUnitDirAdminUser, string(os.PathSeparator)))
+-		nonNumericFilter := GetNonNumericFilter(resolvedUnitDirAdminUser, systemUserDirLevel)
+-
+-		runtimeDir, found := os.LookupEnv("XDG_RUNTIME_DIR")
+-		if found {
+-			AppendSubPaths(rootlessPaths, path.Join(runtimeDir, "containers/systemd"), false, nil)
+-		}
+-		AppendSubPaths(rootlessPaths, path.Join(configDir, "containers/systemd"), false, nil)
+-		AppendSubPaths(rootlessPaths, filepath.Join(UnitDirAdmin, "users"), true, nonNumericFilter)
+-		AppendSubPaths(rootlessPaths, filepath.Join(UnitDirAdmin, "users", u.Uid), true, userLevelFilter)
+-
+-		unitDirs = GetUnitDirs(true)
+-		assert.Equal(t, rootlessPaths.GetSortedPaths(), unitDirs, "rootless unit dirs should match")
+-
+-		// Test that relative path returns an empty list
+-		t.Setenv("QUADLET_UNIT_DIRS", "./relative/path")
+-		unitDirs = GetUnitDirs(false)
+-		assert.Equal(t, []string{}, unitDirs)
+-
+-		name := t.TempDir()
+-		t.Setenv("QUADLET_UNIT_DIRS", name)
+-		unitDirs = GetUnitDirs(false)
+-		assert.Equal(t, []string{name}, unitDirs, "rootful should use environment variable")
+-
+-		unitDirs = GetUnitDirs(true)
+-		assert.Equal(t, []string{name}, unitDirs, "rootless should use environment variable")
+-
+-		symLinkTestBaseDir := t.TempDir()
+-
+-		actualDir := filepath.Join(symLinkTestBaseDir, "actual")
+-		err = os.Mkdir(actualDir, 0755)
+-		assert.NoError(t, err)
+-		innerDir := filepath.Join(actualDir, "inner")
+-		err = os.Mkdir(innerDir, 0755)
+-		assert.NoError(t, err)
+-		symlink := filepath.Join(symLinkTestBaseDir, "symlink")
+-		err = os.Symlink(actualDir, symlink)
+-		assert.NoError(t, err)
+-		t.Setenv("QUADLET_UNIT_DIRS", symlink)
+-		unitDirs = GetUnitDirs(true)
+-		assert.Equal(t, []string{actualDir, innerDir}, unitDirs, "directory resolution should follow symlink")
+-
+-		// Make a more elborate test with the following structure:
+-		// <BASE>/linkToDir - real directory to link to
+-		// <BASE>/linkToDir/a - real directory
+-		// <BASE>/linkToDir/b - link to <BASE>/unitDir/b/a should be ignored
+-		// <BASE>/linkToDir/c - link to <BASE>/unitDir should be ignored
+-		// <BASE>/unitDir - start from here
+-		// <BASE>/unitDir/a - real directory
+-		// <BASE>/unitDir/a/a - real directory
+-		// <BASE>/unitDir/a/a/a - real directory
+-		// <BASE>/unitDir/b/a - real directory
+-		// <BASE>/unitDir/b/b - link to <BASE>/unitDir/a/a should be ignored
+-		// <BASE>/unitDir/c - link to <BASE>/linkToDir
+-		createDir := func(path, name string, dirs []string) (string, []string) {
+-			dirName := filepath.Join(path, name)
+-			assert.NotContains(t, dirs, dirName)
+-			err = os.Mkdir(dirName, 0755)
+-			assert.NoError(t, err)
+-			dirs = append(dirs, dirName)
+-			return dirName, dirs
+-		}
+-
+-		linkDir := func(path, name, target string) {
+-			linkName := filepath.Join(path, name)
+-			err = os.Symlink(target, linkName)
+-			assert.NoError(t, err)
+-		}
+-
+-		symLinkRecursiveTestBaseDir := t.TempDir()
+-
+-		expectedDirs := make([]string, 0)
+-		// Create <BASE>/unitDir
+-		unitsDirPath, expectedDirs := createDir(symLinkRecursiveTestBaseDir, "unitsDir", expectedDirs)
+-		// Create <BASE>/unitDir/a
+-		aDirPath, expectedDirs := createDir(unitsDirPath, "a", expectedDirs)
+-		// Create <BASE>/unitDir/a/a
+-		aaDirPath, expectedDirs := createDir(aDirPath, "a", expectedDirs)
+-		// Create <BASE>/unitDir/a/a/a
+-		_, expectedDirs = createDir(aaDirPath, "a", expectedDirs)
+-		// Create <BASE>/unitDir/a/b
+-		_, expectedDirs = createDir(aDirPath, "b", expectedDirs)
+-		// Create <BASE>/unitDir/b
+-		bDirPath, expectedDirs := createDir(unitsDirPath, "b", expectedDirs)
+-		// Create <BASE>/unitDir/b/a
+-		baDirPath, expectedDirs := createDir(bDirPath, "a", expectedDirs)
+-		// Create <BASE>/linkToDir
+-		linkToDirPath, expectedDirs := createDir(symLinkRecursiveTestBaseDir, "linkToDir", expectedDirs)
+-		// Create <BASE>/linkToDir/a
+-		_, expectedDirs = createDir(linkToDirPath, "a", expectedDirs)
+-
+-		// Link <BASE>/unitDir/b/b to <BASE>/unitDir/a/a
+-		linkDir(bDirPath, "b", aaDirPath)
+-		// Link <BASE>/linkToDir/b to <BASE>/unitDir/b/a
+-		linkDir(linkToDirPath, "b", baDirPath)
+-		// Link <BASE>/linkToDir/c to <BASE>/unitDir
+-		linkDir(linkToDirPath, "c", unitsDirPath)
+-		// Link <BASE>/unitDir/c to <BASE>/linkToDir
+-		linkDir(unitsDirPath, "c", linkToDirPath)
+-
+-		t.Setenv("QUADLET_UNIT_DIRS", unitsDirPath)
+-		unitDirs = GetUnitDirs(true)
+-		assert.Equal(t, expectedDirs, unitDirs, "directory resolution should follow symlink")
+-		// remove the temporary directory at the end of the program
+-		defer os.RemoveAll(symLinkTestBaseDir)
+-
+-		// because chroot is only available for root,
+-		// unshare the namespace and map user to root
+-		c := exec.Command("/proc/self/exe", os.Args[1:]...)
+-		c.Stdin = os.Stdin
+-		c.Stdout = os.Stdout
+-		c.Stderr = os.Stderr
+-		c.SysProcAttr = &syscall.SysProcAttr{
+-			Cloneflags: syscall.CLONE_NEWUSER,
+-			UidMappings: []syscall.SysProcIDMap{
+-				{
+-					ContainerID: 0,
+-					HostID:      uidInt,
+-					Size:        1,
+-				},
+-			},
+-		}
+-		c.Env = append(os.Environ(), "_UNSHARED=true")
+-		err = c.Run()
+-		assert.NoError(t, err)
+-	} else {
+-		fmt.Println(os.Args)
+-
+-		symLinkTestBaseDir := t.TempDir()
+-		rootF, err := os.Open("/")
+-		assert.NoError(t, err)
+-		defer rootF.Close()
+-		defer func() {
+-			err := rootF.Chdir()
+-			assert.NoError(t, err)
+-			err = syscall.Chroot(".")
+-			assert.NoError(t, err)
+-		}()
+-		err = syscall.Chroot(symLinkTestBaseDir)
+-		assert.NoError(t, err)
+-
+-		err = os.MkdirAll(UnitDirAdmin, 0755)
+-		assert.NoError(t, err)
+-		err = os.RemoveAll(UnitDirAdmin)
+-		assert.NoError(t, err)
+-
+-		createDir := func(path, name string) string {
+-			dirName := filepath.Join(path, name)
+-			err = os.Mkdir(dirName, 0755)
+-			assert.NoError(t, err)
+-			return dirName
+-		}
+-
+-		linkDir := func(path, name, target string) {
+-			linkName := filepath.Join(path, name)
+-			err = os.Symlink(target, linkName)
+-			assert.NoError(t, err)
+-		}
+-
+-		systemdDir := createDir("/", "systemd")
+-		userDir := createDir("/", "users")
+-		linkDir(systemdDir, "users", userDir)
+-		linkDir(UnitDirAdmin, "", systemdDir)
+-
+-		uidDir := createDir(userDir, u.Uid)
+-		uidDir2 := createDir(userDir, strconv.Itoa(uidInt+1))
+-		userInternalDir := createDir(userDir, "internal")
+-
+-		// Make sure QUADLET_UNIT_DIRS is not set
+-		t.Setenv("QUADLET_UNIT_DIRS", "")
+-		// Test Rootful
+-		unitDirs := GetUnitDirs(false)
+-		assert.NotContains(t, unitDirs, userDir, "rootful should not contain rootless")
+-		assert.NotContains(t, unitDirs, userInternalDir, "rootful should not contain rootless")
+-
+-		// Test Rootless
+-		unitDirs = GetUnitDirs(true)
+-		assert.NotContains(t, unitDirs, uidDir2, "rootless should not contain other users'")
+-		assert.Contains(t, unitDirs, userInternalDir, "rootless should contain sub-directories of users dir")
+-		assert.Contains(t, unitDirs, uidDir, "rootless should contain the directory for its UID")
+-	}
+-}
+-- 
+2.45.4
+

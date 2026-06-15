@@ -43,7 +43,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml
 Version:        5.1.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        OCaml compiler and programming environment
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 Vendor:         Microsoft Corporation
@@ -78,6 +78,7 @@ Patch:          0003-Update-framepointers-tests-to-avoid-false-positive-w.patch
 # https://github.com/ocaml/ocaml/issues/12829
 # https://github.com/ocaml/ocaml/pull/12831
 Patch:          0004-Fix-s390x-stack-reallocation-code-in-PIC-mode.patch
+Patch:          CVE-2026-28364.patch
 
 BuildRequires:  make
 BuildRequires:  git
@@ -468,6 +469,9 @@ hardlink -t %{buildroot}%{_libdir}/ocaml/stublibs
 
 
 %changelog
+* Mon Mar 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.1.1-2
+- Patch for CVE-2026-28364
+
 * Fri Mar 08 2024 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 5.1.1-1
 - Upgraded ocaml to 5.1.1
 - Importing and adopting spec changes from Fedora (License: MIT).

@@ -1,7 +1,7 @@
 Summary:        software font engine.
 Name:           freetype
 Version:        2.13.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD/GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          System Environment/Libraries
 URL:            https://www.freetype.org/
 Source0:        https://download.savannah.gnu.org/releases/freetype/freetype-%{version}.tar.gz
 Source1:        https://download.savannah.gnu.org/releases/freetype/freetype-doc-%{version}.tar.gz
+Patch0:         CVE-2026-23865.patch
 BuildRequires:  brotli-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  gcc
@@ -58,7 +59,7 @@ find %{buildroot} -name '*.a' -delete
 
 mkdir -p %{buildroot}%{_datadir}/licenses/freetype
 cp LICENSE.TXT %{buildroot}%{_datadir}/licenses/freetype
-cp -r docs/* %{buildroot}%{_datadir}/licenses/freetype
+cp docs/FTL.TXT docs/GPLv2.TXT %{buildroot}%{_datadir}/licenses/freetype
 
 %check
 make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
@@ -68,9 +69,9 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 
 %files
 %defattr(-,root,root)
-%license docs/LICENSE.TXT
+%license LICENSE.TXT docs/FTL.TXT docs/GPLv2.TXT
 %{_libdir}/*.so*
-%{_datadir}/*
+%{_datadir}/licenses/freetype/
 
 %files devel
 %defattr(-,root,root)
@@ -78,8 +79,13 @@ make -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_bindir}/freetype-config
+%{_datadir}/aclocal/*
+%{_mandir}/man1/*
 
 %changelog
+* Tue Mar 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.13.2-2
+- Patch for CVE-2026-23865
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.2-1
 - Auto-upgrade to 2.13.2 - Azure Linux 3.0 - package upgrades
 

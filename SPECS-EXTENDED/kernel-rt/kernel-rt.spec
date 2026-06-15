@@ -4,6 +4,7 @@
 %define uname_r %{version}-%{rt_version}-%{release}
 %define mariner_version 3
 %define version_upstream %(echo %{version} | rev | cut -d'.' -f2- | rev)
+%define short_name rt
 
 # find_debuginfo.sh arguments are set by default in rpm's macros.
 # The default arguments regenerate the build-id for vmlinux in the
@@ -24,7 +25,7 @@
 Summary:        Realtime Linux Kernel
 Name:           kernel-rt
 Version:        6.6.85.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -75,6 +76,11 @@ Requires:       filesystem
 Requires:       kmod
 Requires(post): coreutils
 Requires(postun): coreutils
+Conflicts:      kernel
+Conflicts:      kernel-64k
+Conflicts:      kernel-ipe
+Conflicts:      kernel-lpg-innovate
+Conflicts:      kernel-hwe
 ExclusiveArch:  x86_64
 # When updating the config files it is important to sanitize them.
 # Steps for updating a config file:
@@ -145,17 +151,21 @@ Requires:       audit
 %description tools
 This package contains the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     python3-perf
+%package -n     python3-perf-%{short_name}
 Summary:        Python 3 extension for perf tools
+Provides:       python3-perf
+Requires:       %{name} = %{version}-%{release}
 Requires:       python3
 
-%description -n python3-perf
+%description -n python3-perf-%{short_name}
 This package contains the Python 3 extension for the 'perf' performance analysis tools for Linux kernel.
 
-%package -n     bpftool
+%package -n     bpftool-%{short_name}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
+Provides:       bpftool
+Requires:       %{name} = %{version}-%{release}
 
-%description -n bpftool
+%description -n bpftool-%{short_name}
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
 
@@ -408,14 +418,20 @@ ln -sf linux-%{uname_r}.cfg /boot/mariner.cfg
 %{_unitdir}/cpupower.service
 %config(noreplace) %{_sysconfdir}/sysconfig/cpupower
 
-%files -n python3-perf
+%files -n python3-perf-%{short_name}
 %{python3_sitearch}/*
 
-%files -n bpftool
+%files -n bpftool-%{short_name}
 %{_sbindir}/bpftool
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Fri Aug 22 2025 Siddharth Chintamaneni <siddharthc@microsoft.com> - 6.6.85.1-3
+- Introducing kernel-hwe
+
+* Tue Jun 10 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-2
+- Rename bpftool and python3-perf to be kernel specific
+
 * Sat May 22 2025 Harshit Gupta <guptaharshit@microsoft.com> - 6.6.85.1-1
 - Auto-upgrade to 6.6.85.1
 - Add reapply-serial-8250-adjust-fifo-mode-timeout.patch

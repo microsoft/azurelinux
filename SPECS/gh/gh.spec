@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.62.0
-Release:        8%{?dist}
+Release:        16%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,8 +22,25 @@ Patch6:         CVE-2025-25204.patch
 Patch7:         CVE-2025-27144.patch
 Patch8:         CVE-2025-22869.patch
 Patch9:         CVE-2025-22872.patch
+Patch10:        CVE-2025-48938.patch
+Patch11:        CVE-2025-58183.patch
+Patch12:        CVE-2026-23991.patch
+Patch13:        CVE-2026-23992.patch
+Patch14:        CVE-2025-11065.patch
+Patch15:        CVE-2025-47911.patch
+Patch16:        CVE-2025-58190.patch
+Patch17:        CVE-2026-24117.patch
+Patch18:        CVE-2026-32288.patch
+Patch19:        CVE-2026-5160.patch
+Patch20:        CVE-2026-39821.patch
+Patch21:        CVE-2026-39829.patch
+Patch22:        CVE-2026-39830.patch
+Patch23:        CVE-2026-39834.patch
+Patch24:        CVE-2026-42506.patch
+Patch25:        CVE-2026-46597.patch
+Patch26:        CVE-2026-27136.patch
 
-BuildRequires:  golang < 1.23
+BuildRequires:  golang < 1.24
 BuildRequires:  git
 Requires:       git
 %global debug_package %{nil}
@@ -49,6 +66,7 @@ make GH_VERSION="v%{version}" bin/gh manpages
 install -Dm755 bin/gh %{buildroot}%{_bindir}/gh
 install -d %{buildroot}%{_mandir}/man1/
 cp share/man/man1/* %{buildroot}%{_mandir}/man1
+mv %{buildroot}%{_mandir}/man1/gh-repo-license* .
 
 %check
 make test
@@ -58,12 +76,37 @@ make test
 %license LICENSE
 %doc README.md
 %{_bindir}/gh
+%license gh-repo-license*
 %{_mandir}/man1/*
 %{_datadir}/bash-completion/completions/gh
 %{_datadir}/fish/vendor_completions.d/gh.fish
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-16
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-15
+- Patch for CVE-2026-5160
+
+* Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-14
+- Patch for CVE-2026-32288
+
+* Fri Feb 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-13
+- Patch for CVE-2026-24117, CVE-2025-58190, CVE-2025-47911
+
+* Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-12
+- Patch for CVE-2025-11065
+
+* Mon Jan 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-11
+- Patch for CVE-2026-23991, CVE-2026-23992
+
+* Sat Nov 15 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-10
+- Patch for CVE-2025-58183
+
+* Mon Jun 16 2025 Sreeniavsulu Malavathula <v-smalavathu@microsoft.com> - 2.62.0-9
+- Patch CVE-2025-48938
+
 * Tue Apr 22 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 2.62.0-8
 - Patch CVE-2025-22872
 
@@ -73,10 +116,10 @@ make test
 * Fri Feb 21 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.62.0-6
 - Patch CVE-2025-25204
 
-* Wed Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-5
+* Tue Jan 21 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.62.0-5
 - Patch CVE-2024-53859, CVE-2024-53858
 
-* Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
+* Sat Jan 18 2025 Rohit Rawat <rohitrawat@microsoft.com> - 2.62.0-4
 - Add patch for CVE-2024-45338
 
 * Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.62.0-3

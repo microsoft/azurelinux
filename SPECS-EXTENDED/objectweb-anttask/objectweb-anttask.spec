@@ -20,7 +20,7 @@ Distribution:   Azure Linux
 
 Name:           objectweb-anttask
 Version:        1.2
-Release:        267%{?dist}
+Release:        268%{?dist}
 Summary:        ObjectWeb Ant task
 License:        LGPLv2+
 Group:          Development/Languages/Java
@@ -53,7 +53,7 @@ cp %{SOURCE1} ./LICENSE.txt
 export CLASSPATH=$(build-classpath xalan-j2)
 ant \
     -Dbuild.compiler=modern \
-    -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+    -Dant.build.javac.source=1.7 -Dant.build.javac.target=1.7 \
     jar
 
 %install
@@ -69,6 +69,10 @@ popd
 %{_javadir}/*
 
 %changelog
+* Tue Nov 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 1.2-268
+- Updated java version to resolve build issues.
+- License verified.
+
 * Thu Feb 22 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.2-267
 - Updating naming for 3.0 version of Azure Linux.
 

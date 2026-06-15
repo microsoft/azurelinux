@@ -2,7 +2,7 @@
 Summary:        Cmake
 Name:           cmake
 Version:        3.30.3
-Release:        7%{?dist}
+Release:        14%{?dist}
 License:        BSD AND LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,8 +25,23 @@ Patch7:         CVE-2023-44487.patch
 # Utilities/cmnghttp2/lib/includes/nghttp2/nghttp2ver.h. Manual inspection is
 # required to determine what upstream patches are included.
 Patch8:         CVE-2023-35945.patch
-Patch9:		CVE-2024-48615.patch
-Patch10:	CVE-2025-4947.patch
+Patch9:         CVE-2024-48615.patch
+Patch10:        CVE-2025-4947.patch
+Patch11:        CVE-2025-5916.patch
+Patch12:        CVE-2025-5917.patch
+Patch13:        CVE-2025-5918.patch
+Patch14:        CVE-2025-9301.patch
+Patch15:        CVE-2025-10148.patch
+Patch16:        CVE-2025-14017.patch
+Patch17:        CVE-2025-10966.patch
+Patch18:        CVE-2025-14524.patch
+Patch19:        CVE-2026-27135.patch
+Patch20:        CVE-2026-4873.patch
+Patch21:        CVE-2026-6276.patch
+Patch22:        CVE-2026-6253.patch
+Patch23:        CVE-2026-6429.patch
+Patch24:        CVE-2026-5545.patch
+
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
 BuildRequires:  curl
@@ -106,6 +121,27 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 %{_libdir}/rpm/macros.d/macros.cmake
 
 %changelog
+* Wed May 27 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-14
+- Patch for CVE-2026-4873, CVE-2026-6276, CVE-2026-6253, CVE-2026-6429, CVE-2026-5545
+
+* Fri Mar 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-13
+- Patch for CVE-2026-27135
+
+* Wed Jan 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-12
+- Patch for CVE-2025-10966 & CVE-2025-14524
+
+* Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-11
+- Patch for CVE-2025-14017
+
+* Sat Sep 13 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-10
+- Patch for CVE-2025-10148
+
+* Fri Aug 22 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.30.3-9
+- Patch for CVE-2025-9301
+
+* Tue Jun 24 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-8
+- Patch CVE-2025-5916, CVE-2025-5917 & CVE-2025-5918
+
 * Tue Jun 03 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.30.3-7
 - Patch CVE-2025-4947
 

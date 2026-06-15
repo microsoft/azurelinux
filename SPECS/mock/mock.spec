@@ -1,21 +1,30 @@
 %bcond_with lint
 %bcond_without tests
 
-# mock group id allocate for Fedora
-%global mockgid 135
+# Modern distributions (using RPM v4.20+;
+# for example, Fedora 42+) do not
+# require the %%pre scriptlet for creating users/groups because the sysusers
+# feature is now built directly into RPM.  Simply including the sysusers
+# `mock.conf` file in a package payload is sufficient to leverage this feature.
+# However, for older distributions that lack this capability, we still define
+# the %%pre scriptlet.
+%if 0%{?fedora} < 42 || (0%{?rhel} && 0%{?rhel} <= 10) || (0%{?mageia} && 0%{?mageia} < 10) || (0%{?suse_version} && 0%{?suse_version} < 1660)
+%bcond_without sysusers_compat
+%else
+%bcond_with sysusers_compat
+%endif
 
 %global __python %{__python3}
 %global python_sitelib %{python3_sitelib}
 
 Summary:       Builds packages inside chroots
 Name:          mock
-Version:       5.6
-Release:       2%{?dist}
+Version:       6.7
+Release:       1%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later
 Source:        https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:        disable-copying-ca-trust-dirs.patch
 URL:           https://github.com/rpm-software-management/mock/
 BuildArch:     noarch
 Requires:      tar
@@ -40,7 +49,7 @@ Suggests:      mock-core-configs
 %endif
 
 Requires:      systemd
-%if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel}
 Requires:      systemd-container
 %endif
 Requires:      coreutils
@@ -56,7 +65,7 @@ Requires:      python%{python3_pkgversion}-jinja2
 Requires:      python%{python3_pkgversion}-requests
 Requires:      python%{python3_pkgversion}-rpm
 Requires:      python%{python3_pkgversion}-pyroute2
-Requires:      python%{python3_pkgversion}-templated-dictionary
+Requires:      python%{python3_pkgversion}-templated-dictionary >= 1.5
 Requires:      python%{python3_pkgversion}-backoff
 BuildRequires: python%{python3_pkgversion}-backoff
 BuildRequires: python%{python3_pkgversion}-devel
@@ -66,7 +75,9 @@ BuildRequires: python%{python3_pkgversion}-pylint
 BuildRequires: python%{python3_pkgversion}-rpm
 BuildRequires: python%{python3_pkgversion}-rpmautospec-core
 
-%if 0%{?fedora} >= 38
+BuildRequires: argparse-manpage
+
+%if 0%{?fedora} >= 38 || 0%{?rhel} >= 11 || 0%{?mageia} >= 10 || 0%{?suse_version} >= 1600
 # DNF5 stack
 Recommends:    dnf5
 Recommends:    dnf5-plugins
@@ -83,18 +94,22 @@ Recommends:    dnf-utils
 Recommends:    btrfs-progs
 Suggests:      qemu-user-static
 Suggests:      procenv
+Recommends:    buildah
 Recommends:    podman
+Recommends:    skopeo
+Recommends:    fuse-overlayfs
 
 %if %{with tests}
 BuildRequires: python%{python3_pkgversion}-distro
 BuildRequires: python%{python3_pkgversion}-jinja2
+BuildRequires: python%{python3_pkgversion}-jsonschema
 BuildRequires: python%{python3_pkgversion}-pyroute2
 BuildRequires: python%{python3_pkgversion}-pytest
 BuildRequires: python%{python3_pkgversion}-requests
 BuildRequires: python%{python3_pkgversion}-templated-dictionary
 %endif
 
-%if 0%{?azl} || 0%{?fedora} || 0%{?rhel} >= 8
+%if 0%{?azl} || 0%{?fedora} || 0%{?rhel}
 BuildRequires: perl-interpreter
 %else
 BuildRequires: perl
@@ -111,17 +126,17 @@ Mock takes an SRPM and builds it in a chroot.
 
 %package scm
 Summary: Mock SCM integration module
-Requires:      %{name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
 %if ! 0%{?azl}
-Recommends:    cvs
+Recommends: cvs
 %endif
-Recommends:    git
-Recommends:    subversion
-Recommends:    tar
+Recommends: git
+Recommends: subversion
+Recommends: tar
 
 %if ! 0%{?azl}
 # We could migrate to 'copr-distgit-client'
-Recommends:    rpkg
+Recommends: rpkg
 %endif
 
 %description scm
@@ -146,14 +161,19 @@ Requires:      python%{python3_pkgversion}-rpmautospec-core
 Mock plugin that preprocesses spec files using rpmautospec.
 
 %package filesystem
-Summary:       Mock filesystem layout
+Summary:  Mock filesystem layout
+Requires(pre):  shadow-utils
+BuildRequires:  systemd-rpm-macros
+
+%if %{with sysusers_compat}
 Requires(pre): shadow-utils
+%endif
 
 %description filesystem
 Filesystem layout and group for Mock.
 
 %prep
-%autosetup -p2 -n mock-%{name}-%{version}-1/%{name}
+%autosetup -n %{name}-%{name}-%{version}-1/%{name}
 for file in py/mock.py py/mock-parse-buildlog.py; do
   sed -i 1"s|#!/usr/bin/python3 |#!%{__python} |" $file
 done
@@ -166,12 +186,20 @@ for i in py/mockbuild/constants.py py/mock-parse-buildlog.py; do
     perl -p -i -e 's|^PKGPYTHONDIR\s*=.*|PKGPYTHONDIR="%{python_sitelib}/mockbuild"|' $i
 done
 for i in docs/mock.1 docs/mock-parse-buildlog.1; do
-    perl -p -i -e 's|\@VERSION\@|%{version}"|' $i
+  perl -p -i -e 's|\@VERSION\@|%{version}|' $i
 done
 
-%if ! 0%{?azl}
-./precompile-bash-completion "mock.complete"
+%if 0%{?fedora} >= 44 || 0%{?rhel} >= 11
+for i in docs/site-defaults.cfg py/mockbuild/config.py; do
+    perl -p -i -e 's|config_opts\["shadow_utils_isolation_option"\] = .*|config_opts["shadow_utils_isolation_option"] = "--root"|' "$i"
+done
 %endif
+
+%if ! 0%{?azl}
+./precompile-bash-completion "mock.complete" || cp -a ./etc/bash_completion.d/mock ./mock.complete
+%endif
+
+argparse-manpage --pyfile ./py/mock-hermetic-repo.py --function _argparser > mock-hermetic-repo.1
 
 %install
 #base filesystem
@@ -181,10 +209,10 @@ mkdir -p %{buildroot}%{_sysconfdir}/mock/templates
 install -d %{buildroot}%{_bindir}
 install -d %{buildroot}%{_libexecdir}/mock
 install mockchain %{buildroot}%{_bindir}/mockchain
+install py/mock-hermetic-repo.py %{buildroot}%{_bindir}/mock-hermetic-repo
 install py/mock-parse-buildlog.py %{buildroot}%{_bindir}/mock-parse-buildlog
 install py/mock.py %{buildroot}%{_libexecdir}/mock/mock
 ln -s consolehelper %{buildroot}%{_bindir}/mock
-install create_default_route_in_container.sh %{buildroot}%{_libexecdir}/mock/
  
 install -d %{buildroot}%{_sysconfdir}/pam.d
 cp -a etc/pam/* %{buildroot}%{_sysconfdir}/pam.d/
@@ -209,7 +237,7 @@ install -d %{buildroot}%{python_sitelib}/
 cp -a py/mockbuild %{buildroot}%{python_sitelib}/
 
 install -d %{buildroot}%{_mandir}/man1
-cp -a docs/mock.1 docs/mock-parse-buildlog.1 %{buildroot}%{_mandir}/man1/
+cp -a docs/mock.1 docs/mock-parse-buildlog.1 mock-hermetic-repo.1 %{buildroot}%{_mandir}/man1/
 install -d %{buildroot}%{_datadir}/cheat
 cp -a docs/mock.cheat %{buildroot}%{_datadir}/cheat/mock
 
@@ -217,15 +245,22 @@ install -d %{buildroot}/var/lib/mock
 install -d %{buildroot}/var/cache/mock
 
 mkdir -p %{buildroot}%{_pkgdocdir}
+install -p -m 0644 docs/buildroot-lock-schema-*.json %{buildroot}%{_pkgdocdir}
 install -p -m 0644 docs/site-defaults.cfg %{buildroot}%{_pkgdocdir}
+
+mkdir -p %{buildroot}%{_sysusersdir}
+install -p -D -m 0644 mock.conf %{buildroot}%{_sysusersdir}
 
 sed -i 's/^_MOCK_NVR = None$/_MOCK_NVR = "%name-%version-%release"/' \
     %{buildroot}%{_libexecdir}/mock/mock
 
+%if %{with sysusers_compat}
 %pre filesystem
-# check for existence of mock group, create it if not found
-getent group mock > /dev/null || groupadd -f -g %mockgid -r mock
-exit 0
+# Some of these older distributions do not ship with the %%sysusers_*_compat.
+# Instead of another ifdef/else here, we prefer to hardcode the scriptlet
+# content here.
+getent group 'mock' >/dev/null || groupadd -f -g '135' -r 'mock' || :
+%endif
 
 %check
 %if %{with lint}
@@ -239,8 +274,9 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 
 
 %files
-%defattr(0644, root, mock)
+%dir %{_pkgdocdir}/
 %doc %{_pkgdocdir}/site-defaults.cfg
+%doc %{_pkgdocdir}/buildroot-lock-schema-*.json
 %{_datadir}/bash-completion/completions/mock
 %{_datadir}/bash-completion/completions/mock-parse-buildlog
 
@@ -249,6 +285,7 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 # executables
 %{_bindir}/mock
 %{_bindir}/mockchain
+%{_bindir}/mock-hermetic-repo
 %{_bindir}/mock-parse-buildlog
 %{_libexecdir}/mock
 
@@ -258,9 +295,12 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %exclude %{python_sitelib}/mockbuild/__pycache__/scm.*
 %exclude %{python_sitelib}/mockbuild/plugins/lvm_root.*
 %exclude %{python_sitelib}/mockbuild/plugins/__pycache__/lvm_root.*
+%exclude %{python_sitelib}/mockbuild/plugins/rpmautospec.*
+%exclude %{python3_sitelib}/mockbuild/plugins/__pycache__/rpmautospec.*.py*
 
 # config files
 %config(noreplace) %{_sysconfdir}/%{name}/*.ini
+%config(noreplace) %{_sysconfdir}/%{name}/hermetic-build.cfg
 %config(noreplace) %{_sysconfdir}/pam.d/%{name}
 %config(noreplace) %{_sysconfdir}/security/console.apps/%{name}
 
@@ -271,6 +311,7 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 # docs
 %{_mandir}/man1/mock.1*
 %{_mandir}/man1/mock-parse-buildlog.1*
+%{_mandir}/man1/mock-hermetic-repo.1*
 %{_datadir}/cheat/mock
 
 # cache & build dirs
@@ -297,8 +338,12 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 %dir  %{_sysconfdir}/mock/eol/templates
 %dir  %{_sysconfdir}/mock/templates
 %dir  %{_datadir}/cheat
+%config(noreplace) %{_sysusersdir}/mock.conf
 
 %changelog
+* Thu May 07 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 6.7-1
+- Upgrade to 6.7 upstream release
+
 * Wed May 07 2025 Reuben Olinsky <reubeno@microsoft.com> - 5.6-2
 - Backport change allowing disabling ca-trust file copying.
 
@@ -752,3 +797,4 @@ pylint-3 py/mockbuild/ py/*.py py/mockbuild/plugins/* || :
 - Fix keeping the LVM volume mounted
 - suggest dnf-utils
 - Always create /dev/loop nodes
+

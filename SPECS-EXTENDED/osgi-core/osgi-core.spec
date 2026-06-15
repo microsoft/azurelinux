@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 #
 # spec file for package osgi-core
 #
-# Copyright (c) 2020 SUSE LLC
+# Copyright (c) 2024 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -19,8 +19,8 @@ Distribution:   Azure Linux
 
 
 Name:           osgi-core
-Version:        7.0.0
-Release:        2%{?dist}
+Version:        8.0.0
+Release:        1%{?dist}
 Summary:        OSGi Core API
 License:        Apache-2.0
 Group:          Development/Libraries/Java
@@ -31,13 +31,13 @@ Source2:        http://www.apache.org/licenses/LICENSE-2.0
 Source3:        %{name}-build.xml
 BuildRequires:  ant
 BuildRequires:  fdupes
-BuildRequires:  javapackages-local-bootstrap
+BuildRequires:  javapackages-local-bootstrap >= 6
 BuildRequires:  osgi-annotation
 BuildRequires:  unzip
 BuildArch:      noarch
 
 %description
-OSGi Core Release 7, Interfaces and Classes for use in compiling bundles.
+OSGi Core Release 8, Interfaces and Classes for use in compiling bundles.
 
 %package javadoc
 Summary:        API documentation for %{name}
@@ -94,16 +94,24 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}/osgi.core.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/site/apidocs/* %{buildroot}%{_javadocdir}/%{name}/
+mv %{buildroot}%{_javadocdir}/%{name}/legal/ADDITIONAL_LICENSE_INFO .
+mv %{buildroot}%{_javadocdir}/%{name}/legal/LICENSE .
+
 %fdupes -s %{buildroot}%{_javadocdir}
 
 %files -f .mfiles
 %license LICENSE
+%license ADDITIONAL_LICENSE_INFO
 
 %files javadoc
 %license LICENSE
 %{_javadocdir}/%{name}
 
 %changelog
+* Wed Dec 17 2025 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 8.0.0-1
+- Upgrade to 8.0.0 (Reference: openSUSE Tumbleweed)
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.0-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

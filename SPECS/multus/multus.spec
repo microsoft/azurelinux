@@ -19,7 +19,7 @@
 Summary:        CNI plugin providing multiple interfaces in containers
 Name:           multus
 Version:        4.0.2
-Release:        5%{?dist}
+Release:        8%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -33,7 +33,12 @@ Patch2:         CVE-2023-45288.patch
 Patch3:         CVE-2024-45338.patch
 # CVE-2025-22872 will be fixed in go net v0.38 by https://github.com/golang/net/commit/e1fcd82abba34df74614020343be8eb1fe85f0d9
 Patch4:         CVE-2025-22872.patch
-BuildRequires:  golang
+Patch5:         CVE-2025-47911.patch
+Patch6:         CVE-2025-58190.patch
+Patch7:         CVE-2026-27136.patch
+Patch8:         CVE-2026-39821.patch
+Patch9:         CVE-2026-42506.patch
+BuildRequires:  golang < 1.25
 BuildRequires:  golang-packaging
 
 %description
@@ -75,6 +80,15 @@ install -D -m0644 deployments/multus-daemonset-crio.yml %{buildroot}%{_datadir}/
 %{_datarootdir}/k8s-yaml/multus/multus.yaml
 
 %changelog
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.0.2-8
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
+
+* Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.0.2-7
+- Patch for CVE-2025-47911, CVE-2025-58190
+
+* Sun Aug 31 2025 Andrew Phelps <anphel@microsoft.com> - 4.0.2-6
+- Set BR for golang to < 1.25
+
 * Fri Apr 25 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 4.0.2-5
 - Add patch for CVE-2025-22872
 

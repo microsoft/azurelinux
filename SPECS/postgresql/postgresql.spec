@@ -2,7 +2,7 @@
 %define groupname postgres
 Summary:        PostgreSQL database engine
 Name:           postgresql
-Version:        16.9
+Version:        16.14
 Release:        1%{?dist}
 License:        PostgreSQL
 Vendor:         Microsoft Corporation
@@ -10,7 +10,7 @@ Distribution:   Azure Linux
 Group:          Applications/Databases
 URL:            https://www.postgresql.org
 Source0:        https://ftp.postgresql.org/pub/source/v%{version}/%{name}-%{version}.tar.bz2
-Source1:	%{name}.service
+Source1:        %{name}.service
 
 # Common libraries needed
 BuildRequires:  krb5-devel
@@ -243,6 +243,19 @@ fi
 %{_unitdir}/%{name}.service
 
 %changelog
+* Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.14-1
+- Auto-upgrade to 16.14 - for CVE-2026-6473, CVE-2026-6479, CVE-2026-6638, CVE-2026-6474, CVE-2026-6475, CVE-2026-6477, CVE-2026-6478, CVE-2026-6472, CVE-2026-6637
+
+* Fri Feb 13 2026 Kanishk Bansal <kanbansal@microsoft.com> - 16.12-1
+- Upgrade to 16.12 - for CVE-2026-2003, CVE-2026-2004, CVE-2026-2005, 
+  CVE-2026-2006, CVE-2026-2007
+
+* Fri Nov 14 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.11-1
+- Auto-upgrade to 16.11 - for CVE-2025-12817, CVE-2025-12818
+
+* Mon Aug 18 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.10-1
+- Auto-upgrade to 16.10 - for CVE-2025-8714, CVE-2025-8715, CVE-2025-8713
+
 * Mon May 19 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 16.9-1
 - Auto-upgrade to 16.9 - for CVE-2025-4207
 

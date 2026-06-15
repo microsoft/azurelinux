@@ -1,0 +1,109 @@
+From 6a074bff2c2a1d531f7d379095c924d81abd2cdf Mon Sep 17 00:00:00 2001
+From: akhila-guruju <v-guakhila@microsoft.com>
+Date: Wed, 12 Nov 2025 07:22:20 +0000
+Subject: [PATCH] fix cython-0.29 compatibility error
+
+Patch Reference: https://cython.readthedocs.io/en/latest/src/userguide/migrating_to_cy30.html#exception-values-and-noexcept
+---
+ src/amqp_management.pyx  | 6 +++---
+ src/connection.pyx       | 6 +++---
+ src/message_receiver.pyx | 2 +-
+ src/message_sender.pyx   | 4 ++--
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/src/amqp_management.pyx b/src/amqp_management.pyx
+index a055ccf..fbbdfb9 100644
+--- a/src/amqp_management.pyx
++++ b/src/amqp_management.pyx
+@@ -95,19 +95,19 @@ cdef class cManagementOperation(StructBase):
+ 
+ #### Management Link Callbacks
+ 
+-cdef void on_amqp_management_open_complete(void* context, c_amqp_management.AMQP_MANAGEMENT_OPEN_RESULT_TAG open_result):
++cdef void on_amqp_management_open_complete(void* context, c_amqp_management.AMQP_MANAGEMENT_OPEN_RESULT_TAG open_result) noexcept:
+     _logger.debug("Management link open: %r", open_result)
+     if context != NULL:
+         context_obj = <object>context
+         context_obj._management_open_complete(open_result)
+ 
+-cdef void on_amqp_management_error(void* context):
++cdef void on_amqp_management_error(void* context) noexcept:
+     _logger.debug("Management link error")
+     if context != NULL:
+         context_obj = <object>context
+         context_obj._management_operation_error()
+ 
+-cdef void on_execute_operation_complete(void* context, c_amqp_management.AMQP_MANAGEMENT_EXECUTE_OPERATION_RESULT_TAG execute_operation_result, unsigned int status_code, const char* status_description, c_message.MESSAGE_HANDLE message):
++cdef void on_execute_operation_complete(void* context, c_amqp_management.AMQP_MANAGEMENT_EXECUTE_OPERATION_RESULT_TAG execute_operation_result, unsigned int status_code, const char* status_description, c_message.MESSAGE_HANDLE message) noexcept:
+     cdef c_message.MESSAGE_HANDLE cloned
+     description = "None" if <void*>status_description == NULL else status_description
+     _logger.debug("Management op complete: %r, status code: %r, description: %r", execute_operation_result, status_code, description)
+diff --git a/src/connection.pyx b/src/connection.pyx
+index 2b13401..d36126a 100644
+--- a/src/connection.pyx
++++ b/src/connection.pyx
+@@ -79,7 +79,7 @@ cdef class Connection(StructBase):
+         self._c_value = value._c_value
+         self._create()
+ 
+-    cdef create(self, XIO sasl_client, const char* hostname, const char* container_id, c_connection.ON_CONNECTION_STATE_CHANGED on_connection_state_changed, c_xio.ON_IO_ERROR on_io_error, void* callback_context):
++    cdef create(self, XIO sasl_client, const char* hostname, const char* container_id, c_connection.ON_CONNECTION_STATE_CHANGED on_connection_state_changed, c_xio.ON_IO_ERROR on_io_error, void* callback_context) noexcept:
+         self.destroy()
+         self._sasl_client = sasl_client
+         self._c_value = c_connection.connection_create2(sasl_client._c_value, hostname, container_id, NULL, NULL, on_connection_state_changed, callback_context, on_io_error, callback_context)
+@@ -183,7 +183,7 @@ cdef class Connection(StructBase):
+ 
+ #### Callback
+ 
+-cdef void on_connection_state_changed(void* context, c_connection.CONNECTION_STATE_TAG new_connection_state, c_connection.CONNECTION_STATE_TAG previous_connection_state):
++cdef void on_connection_state_changed(void* context, c_connection.CONNECTION_STATE_TAG new_connection_state, c_connection.CONNECTION_STATE_TAG previous_connection_state) noexcept:
+     if <void*>context != NULL:
+         context_pyobj = <PyObject*>context
+         if context_pyobj.ob_refcnt == 0: # context is being garbage collected, skip the callback
+@@ -196,7 +196,7 @@ cdef void on_connection_state_changed(void* context, c_connection.CONNECTION_STA
+             _logger.info("Unknown connection state changed: %r to %r", previous_connection_state, new_connection_state)
+ 
+ 
+-cdef void on_io_error(void* context):
++cdef void on_io_error(void* context) noexcept:
+     if <void*>context != NULL:
+         context_obj = <object>context
+         if hasattr(context_obj, '_io_error'):
+diff --git a/src/message_receiver.pyx b/src/message_receiver.pyx
+index b99647c..2cc020e 100644
+--- a/src/message_receiver.pyx
++++ b/src/message_receiver.pyx
+@@ -120,7 +120,7 @@ cdef class cMessageReceiver(StructBase):
+ 
+ #### Callbacks (context is a MessageReceiver instance)
+ 
+-cdef void on_message_receiver_state_changed(void* context, c_message_receiver.MESSAGE_RECEIVER_STATE_TAG new_state, c_message_receiver.MESSAGE_RECEIVER_STATE_TAG previous_state):
++cdef void on_message_receiver_state_changed(void* context, c_message_receiver.MESSAGE_RECEIVER_STATE_TAG new_state, c_message_receiver.MESSAGE_RECEIVER_STATE_TAG previous_state) noexcept:
+     if context != NULL:
+         context_pyobj = <PyObject*>context
+         if context_pyobj.ob_refcnt == 0: # context is being garbage collected, skip the callback
+diff --git a/src/message_sender.pyx b/src/message_sender.pyx
+index 738207a..2922ec9 100644
+--- a/src/message_sender.pyx
++++ b/src/message_sender.pyx
+@@ -97,7 +97,7 @@ cdef class cMessageSender(StructBase):
+ #### Callbacks (context is a MessageSender instance)
+ 
+ 
+-cdef void on_message_send_complete(void* context, c_message_sender.MESSAGE_SEND_RESULT_TAG send_result, c_amqpvalue.AMQP_VALUE delivery_state):
++cdef void on_message_send_complete(void* context, c_message_sender.MESSAGE_SEND_RESULT_TAG send_result, c_amqpvalue.AMQP_VALUE delivery_state) noexcept:
+     cdef c_amqpvalue.AMQP_VALUE send_data
+     if <void*>delivery_state == NULL:
+         wrapped = None
+@@ -114,7 +114,7 @@ cdef void on_message_send_complete(void* context, c_message_sender.MESSAGE_SEND_
+             context_obj._on_message_sent(context_obj, send_result, delivery_state=wrapped)
+ 
+ 
+-cdef void on_message_sender_state_changed(void* context, c_message_sender.MESSAGE_SENDER_STATE_TAG new_state, c_message_sender.MESSAGE_SENDER_STATE_TAG previous_state):
++cdef void on_message_sender_state_changed(void* context, c_message_sender.MESSAGE_SENDER_STATE_TAG new_state, c_message_sender.MESSAGE_SENDER_STATE_TAG previous_state) noexcept:
+     if context != NULL:
+         context_pyobj = <PyObject*>context
+         if context_pyobj.ob_refcnt == 0: # context is being garbage collected, skip the callback
+-- 
+2.43.0
+

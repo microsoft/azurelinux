@@ -1,0 +1,1107 @@
+From 75e02d57bd188286c69469e92f75cd672c2bcb08 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 23 Feb 2023 17:12:24 +0100
+Subject: [PATCH 1/8] Adapt to pkgconf-1.9.4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes error handled prototype.
+Adapts to passing flags to file_open.
+Adapts tests to no traling spaces (incompatible change).
+Works around a possible pkgconf regression with trailing null bytes.
+
+TODO: t/package.t fails on missing shared libs from dependencies.
+TODO: Restore compatibility with older pkgconfs.
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 13 ++++++++++---
+ t/client.t    |  2 +-
+ t/package.t   | 28 ++++++++++++++--------------
+ t/simple.t    |  8 ++++----
+ 4 files changed, 29 insertions(+), 22 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index 3afa483..4055d40 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -14,7 +14,7 @@ struct my_client_t {
+ typedef struct my_client_t my_client_t;
+ 
+ static bool
+-my_error_handler(const char *msg, const pkgconf_client_t *_, const void *data)
++my_error_handler(const char *msg, const pkgconf_client_t *_, void *data)
+ {
+   dSP;
+ 
+@@ -243,7 +243,7 @@ _package_from_file(self, filename)
+   CODE:
+     fp = fopen(filename, "r");
+     if(fp != NULL)
+-      RETVAL = PTR2IV(pkgconf_pkg_new_from_file(&self->client, filename, fp));
++      RETVAL = PTR2IV(pkgconf_pkg_new_from_file(&self->client, filename, fp, 0));
+     else
+       RETVAL = 0;
+   OUTPUT:
+@@ -385,6 +385,7 @@ _get_string(self, client, type)
+   INIT:
+     pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
++    char *buffer;
+     size_t len;
+     int eflag;
+     int flags;
+@@ -411,8 +412,14 @@ _get_string(self, client, type)
+     len = pkgconf_fragment_render_len(&filtered_list, escape, NULL);
+     RETVAL = newSV(len == 1 ? len : len-1);
+     SvPOK_on(RETVAL);
++    buffer = SvPVX(RETVAL);
++    pkgconf_fragment_render_buf(&filtered_list, buffer, len, escape, NULL);
++    /*
++     * Trim trailing null bytes observed in pkgconf-1.9.4. Probably related to
++     * 648a2249fcb10bf679bdb587ef2bbddaab3023ad pkgconf commit.
++     */
++    while (len > 1 && buffer[len-2] == '\0') len--;
+     SvCUR_set(RETVAL, len-1);
+-    pkgconf_fragment_render_buf(&filtered_list, SvPVX(RETVAL), len, escape, NULL);
+     pkgconf_fragment_free(&filtered_list);
+     pkgconf_fragment_free(&unfiltered_list);
+   OUTPUT:
+diff --git a/t/client.t b/t/client.t
+index 6c80f83..1850622 100644
+--- a/t/client.t
++++ b/t/client.t
+@@ -289,7 +289,7 @@ subtest 'global' => sub {
+     my $client = PkgConfig::LibPkgConf::Client->new( path => 'corpus/lib1', global => { prefix => '/klingon/autobot/force' } );
+     my $pkg = $client->find('foo');
+ 
+-    is( $pkg->cflags, '-fPIC -I/klingon/autobot/force/include/foo ' );
++    is( $pkg->cflags, '-fPIC -I/klingon/autobot/force/include/foo' );
+ 
+   };
+ 
+diff --git a/t/package.t b/t/package.t
+index 8da6efb..a4b1e6d 100644
+--- a/t/package.t
++++ b/t/package.t
+@@ -43,9 +43,9 @@ subtest 'find' => sub {
+   is $pkg->version, '1.2.3', 'version';
+   is $pkg->description, 'A testing pkg-config file', 'description';
+ 
+-  is $pkg->libs, '-L/test/lib -lfoo ', 'libs';
+-  is $pkg->cflags, '-fPIC -I/test/include/foo ', 'cflags';
+-  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC ', 'cflags_static';
++  is $pkg->libs, '-L/test/lib -lfoo', 'libs';
++  is $pkg->cflags, '-fPIC -I/test/include/foo', 'cflags';
++  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC', 'cflags_static';
+ 
+   my @libs           = $pkg->list_libs;
+   my @cflags         = $pkg->list_cflags;
+@@ -101,9 +101,9 @@ subtest 'package_from_file' => sub {
+   is $pkg->version, '1.2.3', 'version';
+   is $pkg->description, 'A testing pkg-config file', 'description';
+ 
+-  is $pkg->libs, '-L/test/lib -lfoo ', 'libs';
+-  is $pkg->cflags, '-fPIC -I/test/include/foo ', 'cflags';
+-  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC ', 'cflags_static';
++  is $pkg->libs, '-L/test/lib -lfoo', 'libs';
++  is $pkg->cflags, '-fPIC -I/test/include/foo', 'cflags';
++  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC', 'cflags_static';
+ 
+   my @libs           = $pkg->list_libs;
+   my @cflags         = $pkg->list_cflags;
+@@ -146,8 +146,8 @@ subtest 'filte sys' => sub {
+   
+   my $pkg = $client->find('foo');
+ 
+-  is $pkg->libs,   '-lfoo ', 'libs';  
+-  is $pkg->cflags, '-fPIC ', 'cflags';
++  is $pkg->libs,   '-lfoo', 'libs';
++  is $pkg->cflags, '-fPIC', 'cflags';
+ 
+ };
+ 
+@@ -162,8 +162,8 @@ subtest 'quotes and spaces' => sub {
+   my $pkg = $client->find('foo1');
+ 
+   TODO: { local $TODO = 'not important';
+-  is $pkg->libs, "-L/test/lib -LC:/Program\\ Files/Foo\\ App/lib -lfoo1 ";
+-  is $pkg->cflags, '-fPIC -I/test/include/foo1 -IC:/Program\\ Files/Foo\\ App/include ';
++  is $pkg->libs, "-L/test/lib -LC:/Program\\ Files/Foo\\ App/lib -lfoo1";
++  is $pkg->cflags, '-fPIC -I/test/include/foo1 -IC:/Program\\ Files/Foo\\ App/include';
+   };
+ 
+   is [map { "$_" } $pkg->list_libs]->[1], '-LC:/Program Files/Foo App/lib';
+@@ -180,9 +180,9 @@ subtest 'package with prereq' => sub {
+   
+   my $pkg = $client->find('foo');
+   
+-  is $pkg->libs,           '-L/test/lib -lfoo -L/test2/lib -lbar ';
+-  is $pkg->cflags,         '-I/test/include/foo -I/test2/include/bar ';
+-  is $pkg->cflags_static,  '-I/test/include/foo -I/test2/include/bar -DFOO_STATIC -DBAR_STATIC ';
++  is $pkg->libs,           '-L/test/lib -lfoo -L/test2/lib -lbar';
++  is $pkg->cflags,         '-I/test/include/foo -I/test2/include/bar';
++  is $pkg->cflags_static,  '-I/test/include/foo -I/test2/include/bar -DFOO_STATIC -DBAR_STATIC';
+ 
+   is_deeply [$pkg->list_libs],           [qw( -L/test/lib -lfoo -L/test2/lib -lbar )];
+   is_deeply [$pkg->list_cflags],         [qw( -I/test/include/foo -I/test2/include/bar )];
+@@ -200,7 +200,7 @@ subtest 'package with static libs' => sub {
+   
+   my $pkg = $client->find('foo');
+ 
+-  is $pkg->libs_static, '-L/test/lib -lfoo -lbar -lbaz ';
++  is $pkg->libs_static, '-L/test/lib -lfoo -lbar -lbaz';
+   is_deeply [$pkg->list_libs_static], [qw( -L/test/lib -lfoo -lbar -lbaz )];
+ 
+ };
+diff --git a/t/simple.t b/t/simple.t
+index c106620..ce04e8c 100644
+--- a/t/simple.t
++++ b/t/simple.t
+@@ -18,11 +18,11 @@ subtest 'simple stuff' => sub {
+   eval { pkgconf_version('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_version not found';
+ 
+-  is pkgconf_cflags('foo'), '-fPIC -I/test/include/foo ', 'pkgconf_cflags found';
++  is pkgconf_cflags('foo'), '-fPIC -I/test/include/foo', 'pkgconf_cflags found';
+   eval { pkgconf_cflags('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_cflags not found';
+ 
+-  is pkgconf_libs('foo'), '-L/test/lib -lfoo ', 'pkgconf_libs found';
++  is pkgconf_libs('foo'), '-L/test/lib -lfoo', 'pkgconf_libs found';
+   eval { pkgconf_libs('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_libs not found';
+ };
+@@ -31,8 +31,8 @@ subtest 'static' => sub {
+ 
+   local $ENV{PKG_CONFIG_PATH} = 'corpus/lib3';
+   
+-  is pkgconf_cflags_static('foo'), '-I/test/include/foo -DFOO_STATIC ', 'cflags';  
+-  is pkgconf_libs_static('foo'), '-L/test/lib -lfoo -lbar -lbaz ', 'libs';  
++  is pkgconf_cflags_static('foo'), '-I/test/include/foo -DFOO_STATIC', 'cflags';
++  is pkgconf_libs_static('foo'), '-L/test/lib -lfoo -lbar -lbaz', 'libs';
+ 
+ };
+ 
+-- 
+2.39.2
+
+From e9c5282cc4cb01c6270676f5b2dfd5965ed00a3e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 28 Feb 2023 18:49:55 +0100
+Subject: [PATCH 2/8] Use solver for cflags/libs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Some t/package.t are fixed now.
+But packages loaded with package_from_file() fails on the solver. See
+t/package.t.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 33 ++++++++++++++++++++++++++++-----
+ 1 file changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index 4055d40..0469f7f 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -383,6 +383,12 @@ _get_string(self, client, type)
+     my_client_t *client
+     int type
+   INIT:
++    pkgconf_pkg_t dep_graph_root = {
++        .id = "",
++        .realname = "",
++        .flags = PKGCONF_PKG_PROPF_VIRTUAL,
++    };
++    pkgconf_list_t query = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+     char *buffer;
+@@ -391,23 +397,39 @@ _get_string(self, client, type)
+     int flags;
+     int old_flags;
+     bool escape = true;
++    bool resolved;
+   CODE:
+     old_flags = flags = pkgconf_client_get_flags(&client->client);
+-    if(type % 2)
+-      flags = flags | PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS;
++    if(type % 2) {
++      flags |= (PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
++    } else {
++      flags &= ~(PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
++    }
+     pkgconf_client_set_flags(&client->client, flags);
++    pkgconf_queue_push(&query, self->realname); /* TODO: contrain a version */
++    pkgconf_solution_free(&client->client, &dep_graph_root);
++    pkgconf_cache_free(&client->client);
++    resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
++    pkgconf_queue_free(&query);
++    if (!resolved) {
++      pkgconf_solution_free(&client->client, &dep_graph_root);
++      XSRETURN_EMPTY;
++    }
+     /*
+      * TODO: attribute for max depth (also in the list version below)
+      */
+     eflag = type > 1
+-      ? pkgconf_pkg_cflags(&client->client, self, &unfiltered_list, client->maxdepth)
+-      : pkgconf_pkg_libs(&client->client,   self, &unfiltered_list, client->maxdepth);
++      /* Depth more than 2 duplicates last clfags word. pkgconf hard-codes 2. */
++      ? pkgconf_pkg_cflags(&client->client, &dep_graph_root, &unfiltered_list, 2/*client->maxdepth*/)
++      : pkgconf_pkg_libs(&client->client,   &dep_graph_root, &unfiltered_list, client->maxdepth);
+     pkgconf_client_set_flags(&client->client, old_flags);   
+     /*
+      * TODO: throw an exception (also in the list verson below)
+      */
+-    if(eflag != PKGCONF_PKG_ERRF_OK)
++    if(eflag != PKGCONF_PKG_ERRF_OK) {
++      pkgconf_solution_free(&client->client, &dep_graph_root);
+       XSRETURN_EMPTY;
++    }
+     pkgconf_fragment_filter(&client->client, &filtered_list, &unfiltered_list, directory_filter, NULL);
+     len = pkgconf_fragment_render_len(&filtered_list, escape, NULL);
+     RETVAL = newSV(len == 1 ? len : len-1);
+@@ -422,6 +444,7 @@ _get_string(self, client, type)
+     SvCUR_set(RETVAL, len-1);
+     pkgconf_fragment_free(&filtered_list);
+     pkgconf_fragment_free(&unfiltered_list);
++    pkgconf_solution_free(&client->client, &dep_graph_root);
+   OUTPUT:
+     RETVAL
+ 
+-- 
+2.39.2
+
+From d3efe46b52b6ae3defb90cd695e835ebf6d13204 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 28 Feb 2023 19:34:00 +0100
+Subject: [PATCH 3/8] Cache packages loaded from files
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Solver works on cached packages. Packages are cached either manually,
+or by exploring all installation paths. To obtain cflags/libs with the
+solver we need to cache the packages loaded from files.
+
+Drawbacks:
+
+(1) pkgconf tool flushed the cache before retrieving nonstatic libs
+("reset solver when solving for library groups"). I don't understand
+why. I was unable to observe any effect. Because we stash the package
+into a cache, we cannot drop the cache when retrieving the libs. Thus
+this patch removes flushing the cache added in port to 1.9.4.
+
+(2) The from-file-loaded package poisons the cache. When querying
+other packages, the from-file-loaded package could be included in the
+results. I'm not sure whether the original isolation was good or bad.
+I can imagine someone wants to override a system-provided pkgconfig
+file and thus loads the override from a file.
+
+Alternatively, we could cache the package loaded from a file
+temporarily just around using the solver. That would narrow the time
+window when the package is in the cache.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 12 +++++++-----
+ t/package.t   |  2 +-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index 0469f7f..9740711 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -240,11 +240,15 @@ _package_from_file(self, filename)
+     const char *filename
+   INIT:
+     FILE *fp;
++    pkgconf_pkg_t *package;
+   CODE:
+     fp = fopen(filename, "r");
+-    if(fp != NULL)
+-      RETVAL = PTR2IV(pkgconf_pkg_new_from_file(&self->client, filename, fp, 0));
+-    else
++    if(fp != NULL) {
++      package = pkgconf_pkg_new_from_file(&self->client, filename, fp, 0);
++      if (package != NULL)
++         pkgconf_cache_add(&self->client, package);
++      RETVAL = PTR2IV(package);
++    } else
+       RETVAL = 0;
+   OUTPUT:
+     RETVAL
+@@ -407,8 +411,6 @@ _get_string(self, client, type)
+     }
+     pkgconf_client_set_flags(&client->client, flags);
+     pkgconf_queue_push(&query, self->realname); /* TODO: contrain a version */
+-    pkgconf_solution_free(&client->client, &dep_graph_root);
+-    pkgconf_cache_free(&client->client);
+     resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
+     pkgconf_queue_free(&query);
+     if (!resolved) {
+diff --git a/t/package.t b/t/package.t
+index a4b1e6d..91ee84e 100644
+--- a/t/package.t
++++ b/t/package.t
+@@ -94,7 +94,7 @@ subtest 'package_from_file' => sub {
+   note "cflags         = @{[ $pkg->cflags ]}";
+   note "cflags_static  = @{[ $pkg->cflags_static ]}";
+ 
+-  is $pkg->refcount, 1, 'refcount';
++  is $pkg->refcount, 2, 'refcount';
+   is $pkg->id, 'foo', 'id';
+   is $pkg->filename, 'corpus/lib1/foo.pc', 'filename';
+   is $pkg->realname, 'foo', 'realname';
+-- 
+2.39.2
+
+From 07e27f1f569390404cdd5518a3143fda6103ce08 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 1 Mar 2023 12:53:39 +0100
+Subject: [PATCH 4/8] Handle a version in solver query
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index 9740711..aef513b 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -3,6 +3,7 @@
+ #include "XSUB.h"
+ 
+ #include <libpkgconf/libpkgconf.h>
++#include <stdio.h>
+ 
+ struct my_client_t {
+   pkgconf_client_t client;
+@@ -392,6 +393,7 @@ _get_string(self, client, type)
+         .realname = "",
+         .flags = PKGCONF_PKG_PROPF_VIRTUAL,
+     };
++    char query_string[PKGCONF_BUFSIZE];
+     pkgconf_list_t query = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+@@ -403,6 +405,13 @@ _get_string(self, client, type)
+     bool escape = true;
+     bool resolved;
+   CODE:
++    if (sizeof(query_string) <=
++        snprintf(query_string, sizeof(query_string), "%s = %s",
++        self->realname, self->version))
++      XSRETURN_EMPTY;
++    pkgconf_queue_push(&query, query_string);
++    /*pkgconf_solution_free(&client->client, &dep_graph_root);
++    pkgconf_cache_free(&client->client);*/
+     old_flags = flags = pkgconf_client_get_flags(&client->client);
+     if(type % 2) {
+       flags |= (PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+@@ -410,7 +419,6 @@ _get_string(self, client, type)
+       flags &= ~(PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+     }
+     pkgconf_client_set_flags(&client->client, flags);
+-    pkgconf_queue_push(&query, self->realname); /* TODO: contrain a version */
+     resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
+     pkgconf_queue_free(&query);
+     if (!resolved) {
+-- 
+2.39.2
+
+From 7041a9a6dbcebf3a82e031f979c235e12614d51d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 1 Mar 2023 14:13:27 +0100
+Subject: [PATCH 5/8] Use solver for list of cflags/libs
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This resolves all the remaining tests.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 133 ++++++++++++++++++++++++--------------------------
+ 1 file changed, 63 insertions(+), 70 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index aef513b..b0fa350 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -82,6 +82,67 @@ directory_filter(const pkgconf_client_t *client, const pkgconf_fragment_t *frag,
+   return true;
+ }
+ 
++/*
++ * Solve cflags/libs recursively using a pkgconf solver for the given package.
++ * On success returns true and the caller needs to free the filtered_list.
++ * Otherwise, returns false and the lists are still untouched or already freed.
++ */
++static bool
++solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
++      pkgconf_list_t *filtered_list) {
++  pkgconf_pkg_t dep_graph_root = {
++    .id = "",
++    .realname = "",
++    .flags = PKGCONF_PKG_PROPF_VIRTUAL,
++  };
++  char query_string[PKGCONF_BUFSIZE];
++  pkgconf_list_t query = PKGCONF_LIST_INITIALIZER;
++  pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
++  int eflag;
++  int flags;
++  int old_flags;
++  bool resolved;
++
++  if (sizeof(query_string) <=
++      snprintf(query_string, sizeof(query_string), "%s = %s",
++      package->realname, package->version))
++    false;
++  pkgconf_queue_push(&query, query_string);
++  old_flags = flags = pkgconf_client_get_flags(&client->client);
++  if(type % 2) {
++    flags |= (PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
++  } else {
++    flags &= ~(PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
++  }
++  pkgconf_client_set_flags(&client->client, flags);
++  resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
++  pkgconf_queue_free(&query);
++  if (!resolved) {
++    pkgconf_solution_free(&client->client, &dep_graph_root);
++    false;
++  }
++  /*
++   * TODO: attribute for max depth (also in the list version below)
++   */
++  eflag = type > 1
++    /* Depth more than 2 duplicates last cflags word. pkgconf hard-codes 2. */
++    ? pkgconf_pkg_cflags(&client->client, &dep_graph_root, &unfiltered_list, 2/*client->maxdepth*/)
++    : pkgconf_pkg_libs(&client->client,   &dep_graph_root, &unfiltered_list, client->maxdepth);
++  pkgconf_client_set_flags(&client->client, old_flags);
++  /*
++   * TODO: throw an exception (also in the list verson below)
++   */
++  if(eflag != PKGCONF_PKG_ERRF_OK) {
++    pkgconf_solution_free(&client->client, &dep_graph_root);
++    false;
++  }
++  pkgconf_fragment_filter(&client->client, filtered_list, &unfiltered_list, directory_filter, NULL);
++
++  pkgconf_fragment_free(&unfiltered_list);
++  pkgconf_solution_free(&client->client, &dep_graph_root);
++  return true;
++}
++
+ MODULE = PkgConfig::LibPkgConf  PACKAGE = PkgConfig::LibPkgConf::Client
+ 
+ 
+@@ -388,59 +449,13 @@ _get_string(self, client, type)
+     my_client_t *client
+     int type
+   INIT:
+-    pkgconf_pkg_t dep_graph_root = {
+-        .id = "",
+-        .realname = "",
+-        .flags = PKGCONF_PKG_PROPF_VIRTUAL,
+-    };
+-    char query_string[PKGCONF_BUFSIZE];
+-    pkgconf_list_t query = PKGCONF_LIST_INITIALIZER;
+-    pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+     char *buffer;
+     size_t len;
+-    int eflag;
+-    int flags;
+-    int old_flags;
+     bool escape = true;
+-    bool resolved;
+   CODE:
+-    if (sizeof(query_string) <=
+-        snprintf(query_string, sizeof(query_string), "%s = %s",
+-        self->realname, self->version))
+-      XSRETURN_EMPTY;
+-    pkgconf_queue_push(&query, query_string);
+-    /*pkgconf_solution_free(&client->client, &dep_graph_root);
+-    pkgconf_cache_free(&client->client);*/
+-    old_flags = flags = pkgconf_client_get_flags(&client->client);
+-    if(type % 2) {
+-      flags |= (PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+-    } else {
+-      flags &= ~(PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+-    }
+-    pkgconf_client_set_flags(&client->client, flags);
+-    resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
+-    pkgconf_queue_free(&query);
+-    if (!resolved) {
+-      pkgconf_solution_free(&client->client, &dep_graph_root);
++    if (!solve_flags(self, client, type, &filtered_list))
+       XSRETURN_EMPTY;
+-    }
+-    /*
+-     * TODO: attribute for max depth (also in the list version below)
+-     */
+-    eflag = type > 1
+-      /* Depth more than 2 duplicates last clfags word. pkgconf hard-codes 2. */
+-      ? pkgconf_pkg_cflags(&client->client, &dep_graph_root, &unfiltered_list, 2/*client->maxdepth*/)
+-      : pkgconf_pkg_libs(&client->client,   &dep_graph_root, &unfiltered_list, client->maxdepth);
+-    pkgconf_client_set_flags(&client->client, old_flags);   
+-    /*
+-     * TODO: throw an exception (also in the list verson below)
+-     */
+-    if(eflag != PKGCONF_PKG_ERRF_OK) {
+-      pkgconf_solution_free(&client->client, &dep_graph_root);
+-      XSRETURN_EMPTY;
+-    }
+-    pkgconf_fragment_filter(&client->client, &filtered_list, &unfiltered_list, directory_filter, NULL);
+     len = pkgconf_fragment_render_len(&filtered_list, escape, NULL);
+     RETVAL = newSV(len == 1 ? len : len-1);
+     SvPOK_on(RETVAL);
+@@ -453,8 +468,6 @@ _get_string(self, client, type)
+     while (len > 1 && buffer[len-2] == '\0') len--;
+     SvCUR_set(RETVAL, len-1);
+     pkgconf_fragment_free(&filtered_list);
+-    pkgconf_fragment_free(&unfiltered_list);
+-    pkgconf_solution_free(&client->client, &dep_graph_root);
+   OUTPUT:
+     RETVAL
+ 
+@@ -465,33 +478,14 @@ _get_list(self, client, type)
+     my_client_t *client
+     int type
+   INIT:
+-    pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+     pkgconf_node_t *node;
+     pkgconf_fragment_t *frag;
+     int count = 0;
+     HV *h;
+-    int eflag;
+-    int flags;
+-    int old_flags;
+   CODE:
+-    old_flags = flags = pkgconf_client_get_flags(&client->client);
+-    if(type % 2)
+-      flags = flags | PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS;
+-    pkgconf_client_set_flags(&client->client, flags);
+-    /*
+-     * TODO: attribute for max depth
+-     */
+-    eflag = type > 1
+-      ? pkgconf_pkg_cflags(&client->client, self, &unfiltered_list, client->maxdepth)
+-      : pkgconf_pkg_libs(&client->client,   self, &unfiltered_list, client->maxdepth);
+-    pkgconf_client_set_flags(&client->client, old_flags);   
+-    /*
+-     * TODO: throw an exception
+-     */
+-    if(eflag != PKGCONF_PKG_ERRF_OK)
++    if (!solve_flags(self, client, type, &filtered_list))
+       XSRETURN_EMPTY;
+-    pkgconf_fragment_filter(&client->client, &filtered_list, &unfiltered_list, directory_filter, NULL);
+     PKGCONF_FOREACH_LIST_ENTRY(filtered_list.head, node)
+     {
+       h = newHV();
+@@ -507,7 +501,6 @@ _get_list(self, client, type)
+       ST(count++) = newRV_noinc((SV*) h);
+     }
+     pkgconf_fragment_free(&filtered_list);
+-    pkgconf_fragment_free(&unfiltered_list);
+     XSRETURN(count);
+ 
+ 
+-- 
+2.39.2
+
+From 84be5ffc76672161d3b6d9c6dfa96331b010a655 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 1 Mar 2023 17:14:20 +0100
+Subject: [PATCH 6/8] Restore a trailing space in cflags and libs strings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+pkgconf-1.9 fixed cflags and libs values by removing the trailing
+spaces. However, this consitutes a change in behaviour (people got
+used to concatenate flags) and thus this patch returns the trailing
+spaces.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs |  5 +++++
+ t/client.t    |  2 +-
+ t/package.t   | 28 ++++++++++++++--------------
+ t/simple.t    |  8 ++++----
+ 4 files changed, 24 insertions(+), 19 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index b0fa350..f8a0b65 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -467,6 +467,11 @@ _get_string(self, client, type)
+      */
+     while (len > 1 && buffer[len-2] == '\0') len--;
+     SvCUR_set(RETVAL, len-1);
++    /*
++     * Append a space if not already there to mimic pkgconf < 1.9 behaviour.
++     */
++    if (len > 1 && buffer[len-2] != ' ')
++      sv_catpvs(RETVAL, " ");
+     pkgconf_fragment_free(&filtered_list);
+   OUTPUT:
+     RETVAL
+diff --git a/t/client.t b/t/client.t
+index 1850622..6c80f83 100644
+--- a/t/client.t
++++ b/t/client.t
+@@ -289,7 +289,7 @@ subtest 'global' => sub {
+     my $client = PkgConfig::LibPkgConf::Client->new( path => 'corpus/lib1', global => { prefix => '/klingon/autobot/force' } );
+     my $pkg = $client->find('foo');
+ 
+-    is( $pkg->cflags, '-fPIC -I/klingon/autobot/force/include/foo' );
++    is( $pkg->cflags, '-fPIC -I/klingon/autobot/force/include/foo ' );
+ 
+   };
+ 
+diff --git a/t/package.t b/t/package.t
+index 91ee84e..f409f99 100644
+--- a/t/package.t
++++ b/t/package.t
+@@ -43,9 +43,9 @@ subtest 'find' => sub {
+   is $pkg->version, '1.2.3', 'version';
+   is $pkg->description, 'A testing pkg-config file', 'description';
+ 
+-  is $pkg->libs, '-L/test/lib -lfoo', 'libs';
+-  is $pkg->cflags, '-fPIC -I/test/include/foo', 'cflags';
+-  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC', 'cflags_static';
++  is $pkg->libs, '-L/test/lib -lfoo ', 'libs';
++  is $pkg->cflags, '-fPIC -I/test/include/foo ', 'cflags';
++  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC ', 'cflags_static';
+ 
+   my @libs           = $pkg->list_libs;
+   my @cflags         = $pkg->list_cflags;
+@@ -101,9 +101,9 @@ subtest 'package_from_file' => sub {
+   is $pkg->version, '1.2.3', 'version';
+   is $pkg->description, 'A testing pkg-config file', 'description';
+ 
+-  is $pkg->libs, '-L/test/lib -lfoo', 'libs';
+-  is $pkg->cflags, '-fPIC -I/test/include/foo', 'cflags';
+-  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC', 'cflags_static';
++  is $pkg->libs, '-L/test/lib -lfoo ', 'libs';
++  is $pkg->cflags, '-fPIC -I/test/include/foo ', 'cflags';
++  is $pkg->cflags_static, '-fPIC -I/test/include/foo -DFOO_STATIC ', 'cflags_static';
+ 
+   my @libs           = $pkg->list_libs;
+   my @cflags         = $pkg->list_cflags;
+@@ -146,8 +146,8 @@ subtest 'filte sys' => sub {
+   
+   my $pkg = $client->find('foo');
+ 
+-  is $pkg->libs,   '-lfoo', 'libs';
+-  is $pkg->cflags, '-fPIC', 'cflags';
++  is $pkg->libs,   '-lfoo ', 'libs';
++  is $pkg->cflags, '-fPIC ', 'cflags';
+ 
+ };
+ 
+@@ -162,8 +162,8 @@ subtest 'quotes and spaces' => sub {
+   my $pkg = $client->find('foo1');
+ 
+   TODO: { local $TODO = 'not important';
+-  is $pkg->libs, "-L/test/lib -LC:/Program\\ Files/Foo\\ App/lib -lfoo1";
+-  is $pkg->cflags, '-fPIC -I/test/include/foo1 -IC:/Program\\ Files/Foo\\ App/include';
++  is $pkg->libs, "-L/test/lib -LC:/Program\\ Files/Foo\\ App/lib -lfoo1 ";
++  is $pkg->cflags, '-fPIC -I/test/include/foo1 -IC:/Program\\ Files/Foo\\ App/include ';
+   };
+ 
+   is [map { "$_" } $pkg->list_libs]->[1], '-LC:/Program Files/Foo App/lib';
+@@ -180,9 +180,9 @@ subtest 'package with prereq' => sub {
+   
+   my $pkg = $client->find('foo');
+   
+-  is $pkg->libs,           '-L/test/lib -lfoo -L/test2/lib -lbar';
+-  is $pkg->cflags,         '-I/test/include/foo -I/test2/include/bar';
+-  is $pkg->cflags_static,  '-I/test/include/foo -I/test2/include/bar -DFOO_STATIC -DBAR_STATIC';
++  is $pkg->libs,           '-L/test/lib -lfoo -L/test2/lib -lbar ';
++  is $pkg->cflags,         '-I/test/include/foo -I/test2/include/bar ';
++  is $pkg->cflags_static,  '-I/test/include/foo -I/test2/include/bar -DFOO_STATIC -DBAR_STATIC ';
+ 
+   is_deeply [$pkg->list_libs],           [qw( -L/test/lib -lfoo -L/test2/lib -lbar )];
+   is_deeply [$pkg->list_cflags],         [qw( -I/test/include/foo -I/test2/include/bar )];
+@@ -200,7 +200,7 @@ subtest 'package with static libs' => sub {
+   
+   my $pkg = $client->find('foo');
+ 
+-  is $pkg->libs_static, '-L/test/lib -lfoo -lbar -lbaz';
++  is $pkg->libs_static, '-L/test/lib -lfoo -lbar -lbaz ';
+   is_deeply [$pkg->list_libs_static], [qw( -L/test/lib -lfoo -lbar -lbaz )];
+ 
+ };
+diff --git a/t/simple.t b/t/simple.t
+index ce04e8c..3d07fee 100644
+--- a/t/simple.t
++++ b/t/simple.t
+@@ -18,11 +18,11 @@ subtest 'simple stuff' => sub {
+   eval { pkgconf_version('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_version not found';
+ 
+-  is pkgconf_cflags('foo'), '-fPIC -I/test/include/foo', 'pkgconf_cflags found';
++  is pkgconf_cflags('foo'), '-fPIC -I/test/include/foo ', 'pkgconf_cflags found';
+   eval { pkgconf_cflags('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_cflags not found';
+ 
+-  is pkgconf_libs('foo'), '-L/test/lib -lfoo', 'pkgconf_libs found';
++  is pkgconf_libs('foo'), '-L/test/lib -lfoo ', 'pkgconf_libs found';
+   eval { pkgconf_libs('bogus') };
+   like $@, qr{package bogus not found}, 'pkgconf_libs not found';
+ };
+@@ -31,8 +31,8 @@ subtest 'static' => sub {
+ 
+   local $ENV{PKG_CONFIG_PATH} = 'corpus/lib3';
+   
+-  is pkgconf_cflags_static('foo'), '-I/test/include/foo -DFOO_STATIC', 'cflags';
+-  is pkgconf_libs_static('foo'), '-L/test/lib -lfoo -lbar -lbaz', 'libs';
++  is pkgconf_cflags_static('foo'), '-I/test/include/foo -DFOO_STATIC ', 'cflags';
++  is pkgconf_libs_static('foo'), '-L/test/lib -lfoo -lbar -lbaz ', 'libs';
+ 
+ };
+ 
+-- 
+2.39.2
+
+From 348261375be479ced9b352eaf6252ab21e87f0f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 2 Mar 2023 15:27:06 +0100
+Subject: [PATCH 7/8] Make it buildable with pkgconf < 1.9 again
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index f8a0b65..e7da2e4 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -15,7 +15,11 @@ struct my_client_t {
+ typedef struct my_client_t my_client_t;
+ 
+ static bool
++#if LIBPKGCONF_VERSION >= 10900
+ my_error_handler(const char *msg, const pkgconf_client_t *_, void *data)
++#else
++my_error_handler(const char *msg, const pkgconf_client_t *_, const void *data)
++#endif
+ {
+   dSP;
+ 
+@@ -90,6 +94,7 @@ directory_filter(const pkgconf_client_t *client, const pkgconf_fragment_t *frag,
+ static bool
+ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+       pkgconf_list_t *filtered_list) {
++#if LIBPKGCONF_VERSION >= 10900
+   pkgconf_pkg_t dep_graph_root = {
+     .id = "",
+     .realname = "",
+@@ -97,17 +102,20 @@ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+   };
+   char query_string[PKGCONF_BUFSIZE];
+   pkgconf_list_t query = PKGCONF_LIST_INITIALIZER;
++  bool resolved;
++#endif
+   pkgconf_list_t unfiltered_list = PKGCONF_LIST_INITIALIZER;
+   int eflag;
+   int flags;
+   int old_flags;
+-  bool resolved;
+ 
++#if LIBPKGCONF_VERSION >= 10900
+   if (sizeof(query_string) <=
+       snprintf(query_string, sizeof(query_string), "%s = %s",
+       package->realname, package->version))
+     false;
+   pkgconf_queue_push(&query, query_string);
++#endif
+   old_flags = flags = pkgconf_client_get_flags(&client->client);
+   if(type % 2) {
+     flags |= (PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+@@ -115,31 +123,42 @@ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+     flags &= ~(PKGCONF_PKG_PKGF_MERGE_PRIVATE_FRAGMENTS | PKGCONF_PKG_PKGF_SEARCH_PRIVATE);
+   }
+   pkgconf_client_set_flags(&client->client, flags);
++#if LIBPKGCONF_VERSION >= 10900
+   resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
+   pkgconf_queue_free(&query);
+   if (!resolved) {
+     pkgconf_solution_free(&client->client, &dep_graph_root);
+     false;
+   }
++#endif
+   /*
+    * TODO: attribute for max depth (also in the list version below)
+    */
+   eflag = type > 1
++#if LIBPKGCONF_VERSION >= 10900
+     /* Depth more than 2 duplicates last cflags word. pkgconf hard-codes 2. */
+     ? pkgconf_pkg_cflags(&client->client, &dep_graph_root, &unfiltered_list, 2/*client->maxdepth*/)
+     : pkgconf_pkg_libs(&client->client,   &dep_graph_root, &unfiltered_list, client->maxdepth);
++#else
++    ? pkgconf_pkg_cflags(&client->client, package,         &unfiltered_list, client->maxdepth)
++    : pkgconf_pkg_libs(&client->client,   package,         &unfiltered_list, client->maxdepth);
++#endif
+   pkgconf_client_set_flags(&client->client, old_flags);
+   /*
+    * TODO: throw an exception (also in the list verson below)
+    */
+   if(eflag != PKGCONF_PKG_ERRF_OK) {
++#if LIBPKGCONF_VERSION >= 10900
+     pkgconf_solution_free(&client->client, &dep_graph_root);
++#endif
+     false;
+   }
+   pkgconf_fragment_filter(&client->client, filtered_list, &unfiltered_list, directory_filter, NULL);
+ 
+   pkgconf_fragment_free(&unfiltered_list);
++#if LIBPKGCONF_VERSION >= 10900
+   pkgconf_solution_free(&client->client, &dep_graph_root);
++#endif
+   return true;
+ }
+ 
+@@ -306,7 +325,11 @@ _package_from_file(self, filename)
+   CODE:
+     fp = fopen(filename, "r");
+     if(fp != NULL) {
++#if LIBPKGCONF_VERSION >= 10900
+       package = pkgconf_pkg_new_from_file(&self->client, filename, fp, 0);
++#else
++      package = pkgconf_pkg_new_from_file(&self->client, filename, fp);
++#endif
+       if (package != NULL)
+          pkgconf_cache_add(&self->client, package);
+       RETVAL = PTR2IV(package);
+-- 
+2.39.2
+
+From 464e9e0ef0ec9ad768353f1b451f4fe5ad5188d3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Fri, 3 Mar 2023 11:11:33 +0100
+Subject: [PATCH 8/8] Cache packages loaded from file only temporarily
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This implements an alternative approach outlined in
+d3efe46b52b6ae3defb90cd695e835ebf6d13204 commit.
+
+This prevents from having packages loaded from files in a client-wide
+cache all the time. The cache is used for resolving cflags/libs.
+
+A downside is that the code is more complex.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ LibPkgConf.xs                       | 27 +++++++++++++++++++--------
+ lib/PkgConfig/LibPkgConf/Package.pm | 16 ++++++++--------
+ t/package.t                         |  2 +-
+ 3 files changed, 28 insertions(+), 17 deletions(-)
+
+diff --git a/LibPkgConf.xs b/LibPkgConf.xs
+index e7da2e4..63c78fb 100644
+--- a/LibPkgConf.xs
++++ b/LibPkgConf.xs
+@@ -88,12 +88,17 @@ directory_filter(const pkgconf_client_t *client, const pkgconf_fragment_t *frag,
+ 
+ /*
+  * Solve cflags/libs recursively using a pkgconf solver for the given package.
++ * Type encodes cflags/libs/shared/static queried property.
++ * loaded_from_file is true temporarily injecting a loaded-from-file package
++ * into a package cache as pkgconf_queue_solve() operates only on the cache
++ * and packages in a path.
+  * On success returns true and the caller needs to free the filtered_list.
+- * Otherwise, returns false and the lists are still untouched or already freed.
++ * Otherwise, returns false and the filterer_list is still untouched or
++ * already freed.
+  */
+ static bool
+ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+-      pkgconf_list_t *filtered_list) {
++      bool loaded_from_file, pkgconf_list_t *filtered_list) {
+ #if LIBPKGCONF_VERSION >= 10900
+   pkgconf_pkg_t dep_graph_root = {
+     .id = "",
+@@ -115,6 +120,10 @@ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+       package->realname, package->version))
+     false;
+   pkgconf_queue_push(&query, query_string);
++  if (loaded_from_file)
++    loaded_from_file = (NULL == pkgconf_cache_lookup(&client->client, package->id));
++  if (loaded_from_file)
++    pkgconf_cache_add(&client->client, package);
+ #endif
+   old_flags = flags = pkgconf_client_get_flags(&client->client);
+   if(type % 2) {
+@@ -125,6 +134,8 @@ solve_flags(pkgconf_pkg_t *package, my_client_t *client, int type,
+   pkgconf_client_set_flags(&client->client, flags);
+ #if LIBPKGCONF_VERSION >= 10900
+   resolved = pkgconf_queue_solve(&client->client, &query, &dep_graph_root, client->maxdepth);
++  if (loaded_from_file)
++    pkgconf_cache_remove(&client->client, package);
+   pkgconf_queue_free(&query);
+   if (!resolved) {
+     pkgconf_solution_free(&client->client, &dep_graph_root);
+@@ -330,8 +341,6 @@ _package_from_file(self, filename)
+ #else
+       package = pkgconf_pkg_new_from_file(&self->client, filename, fp);
+ #endif
+-      if (package != NULL)
+-         pkgconf_cache_add(&self->client, package);
+       RETVAL = PTR2IV(package);
+     } else
+       RETVAL = 0;
+@@ -467,17 +476,18 @@ pc_filedir(self)
+ 
+ 
+ SV *
+-_get_string(self, client, type)
++_get_string(self, client, type, loaded_from_file)
+     pkgconf_pkg_t *self
+     my_client_t *client
+     int type
++    bool loaded_from_file
+   INIT:
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+     char *buffer;
+     size_t len;
+     bool escape = true;
+   CODE:
+-    if (!solve_flags(self, client, type, &filtered_list))
++    if (!solve_flags(self, client, type, loaded_from_file, &filtered_list))
+       XSRETURN_EMPTY;
+     len = pkgconf_fragment_render_len(&filtered_list, escape, NULL);
+     RETVAL = newSV(len == 1 ? len : len-1);
+@@ -501,10 +511,11 @@ _get_string(self, client, type)
+ 
+ 
+ void
+-_get_list(self, client, type)
++_get_list(self, client, type, loaded_from_file)
+     pkgconf_pkg_t *self
+     my_client_t *client
+     int type
++    bool loaded_from_file
+   INIT:
+     pkgconf_list_t filtered_list   = PKGCONF_LIST_INITIALIZER;
+     pkgconf_node_t *node;
+@@ -512,7 +523,7 @@ _get_list(self, client, type)
+     int count = 0;
+     HV *h;
+   CODE:
+-    if (!solve_flags(self, client, type, &filtered_list))
++    if (!solve_flags(self, client, type, loaded_from_file, &filtered_list))
+       XSRETURN_EMPTY;
+     PKGCONF_FOREACH_LIST_ENTRY(filtered_list.head, node)
+     {
+diff --git a/lib/PkgConfig/LibPkgConf/Package.pm b/lib/PkgConfig/LibPkgConf/Package.pm
+index a5b65be..9198566 100644
+--- a/lib/PkgConfig/LibPkgConf/Package.pm
++++ b/lib/PkgConfig/LibPkgConf/Package.pm
+@@ -86,7 +86,7 @@ Library flags.  This usually includes things like C<-L/foo/lib> and C<-lfoo>.
+ sub libs
+ {
+   my($self) = @_;
+-  $self->_get_string($self->{client}, 0);
++  $self->_get_string($self->{client}, 0, exists $self->{filename});
+ }
+ 
+ =head2 libs_static
+@@ -98,7 +98,7 @@ Static library flags.
+ sub libs_static
+ {
+   my($self) = @_;
+-  $self->_get_string($self->{client}, 1);
++  $self->_get_string($self->{client}, 1, exists $self->{filename});
+ }
+ 
+ =head2 cflags
+@@ -110,7 +110,7 @@ Compiler flags.  This usually includes things like C<-I/foo/include> and C<-DFOO
+ sub cflags
+ {
+   my($self) = @_;
+-  $self->_get_string($self->{client}, 2);
++  $self->_get_string($self->{client}, 2, exists $self->{filename});
+ }
+ 
+ =head2 cflags_static
+@@ -122,7 +122,7 @@ Static compiler flags.
+ sub cflags_static
+ {
+   my($self) = @_;
+-  $self->_get_string($self->{client}, 3);
++  $self->_get_string($self->{client}, 3, exists $self->{filename});
+ }
+ 
+ =head2 list_libs
+@@ -144,7 +144,7 @@ sub list_libs
+ {
+   my($self) = @_;
+   require PkgConfig::LibPkgConf::Fragment;
+-  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 0);
++  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 0, exists $self->{filename});
+ }
+ 
+ =head2 list_libs_static
+@@ -159,7 +159,7 @@ sub list_libs_static
+ {
+   my($self) = @_;
+   require PkgConfig::LibPkgConf::Fragment;
+-  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 1);
++  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 1, exists $self->{filename});
+ }
+ 
+ =head2 list_cflags
+@@ -181,7 +181,7 @@ sub list_cflags
+ {
+   my($self) = @_;
+   require PkgConfig::LibPkgConf::Fragment;
+-  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 2);
++  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 2, exists $self->{filename});
+ }
+ 
+ =head2 list_cflags_static
+@@ -196,7 +196,7 @@ sub list_cflags_static
+ {
+   my($self) = @_;
+   require PkgConfig::LibPkgConf::Fragment;
+-  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 3);
++  map { bless $_, 'PkgConfig::LibPkgConf::Fragment' } $self->_get_list($self->{client}, 3, exists $self->{filename});
+ }
+ 
+ =head2 variable
+diff --git a/t/package.t b/t/package.t
+index f409f99..486f6c4 100644
+--- a/t/package.t
++++ b/t/package.t
+@@ -94,7 +94,7 @@ subtest 'package_from_file' => sub {
+   note "cflags         = @{[ $pkg->cflags ]}";
+   note "cflags_static  = @{[ $pkg->cflags_static ]}";
+ 
+-  is $pkg->refcount, 2, 'refcount';
++  is $pkg->refcount, 1, 'refcount';
+   is $pkg->id, 'foo', 'id';
+   is $pkg->filename, 'corpus/lib1/foo.pc', 'filename';
+   is $pkg->realname, 'foo', 'realname';
+-- 
+2.39.2
+

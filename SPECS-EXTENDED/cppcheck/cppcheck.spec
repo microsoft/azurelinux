@@ -1,9 +1,6 @@
-# Gui built in all branches
-%global gui 0
-
 Name:           cppcheck
-Version:        2.7
-Release:        2%{?dist}
+Version:        2.18.3
+Release:        1%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -12,32 +9,19 @@ URL:            http://cppcheck.wiki.sourceforge.net/
 Source0:        https://github.com/danmar/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 # Fix location of translations
-Patch0:         cppcheck-2.2-translations.patch
-# Select python3 explicitly
-Patch1:         cppcheck-1.88-htmlreport-python3.patch
-# Disable one test, which fails under ppc64le
-# test/testmathlib.cpp:1246(TestMathLib::toString): Assertion failed.
-Patch2:         cppcheck-2.7-disable-test-testmathlib-tostring.patch
-# https://github.com/danmar/cppcheck/commit/974dd5d
-Patch3:         cppcheck-2.7-tinyxml2.patch
+Patch0:         cppcheck-2.11-translations.patch
+
+# Fix expected output in TestCondition::alwaysTrue and TestCondition::alwaysTrueContainer
+# https://github.com/danmar/cppcheck/commit/e5efd12
+Patch1:         cppcheck-2.18-TestCondition.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  pcre-devel
 BuildRequires:  docbook-style-xsl
 BuildRequires:  libxslt
 BuildRequires:  tinyxml2-devel >= 2.1.0
 BuildRequires:  zlib-devel
 BuildRequires:  cmake
-BuildRequires:  z3-devel >= 4.7.1
-
-%if %{gui}
-BuildRequires:  desktop-file-utils
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-linguist
-BuildRequires:  python3-devel
-%else
 Obsoletes:      %{name}-gui < %{version}-%{release}
-%endif
 
 %description
 Cppcheck is a static analysis tool for C/C++ code. Unlike C/C++
@@ -45,15 +29,6 @@ compilers and many other analysis tools it does not detect syntax
 errors in the code. Cppcheck primarily detects the types of bugs that
 the compilers normally do not detect. The goal is to detect only real
 errors in the code (i.e. have zero false positives).
-
-%if %{gui}
-%package gui
-Summary:        Graphical user interface for cppcheck
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description gui
-This package contains the graphical user interface for cppcheck.
-%endif
 
 %package htmlreport
 Summary:        HTML reporting for cppcheck
@@ -65,11 +40,7 @@ This package contains the Python utility for generating html reports
 from xml files first generated using cppcheck.
 
 %prep
-%setup -q
-%patch 0 -p1 -b .translations
-%patch 1 -p1 -b .python3
-%patch 2 -p1 -b .array7
-%patch 3 -p1 -b .tinyxml2
+%autosetup -p1
 # Make sure bundled tinyxml2 is not used
 rm -r externals/tinyxml2
 
@@ -79,26 +50,20 @@ make DB2MAN=%{_datadir}/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl man
 
 # Binaries
 # Upstream doesn't support shared libraries (unversioned solib)
-%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=yes -DBUILD_GUI=%{gui} -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
-%cmake_build
+%cmake -DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=yes -DUSE_Z3=yes -DHAVE_RULES=no -DBUILD_GUI=0 -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_TESTS=yes -DFILESDIR=%{_datadir}/Cppcheck -DUSE_BUNDLED_TINYXML2=OFF -DENABLE_OSS_FUZZ=OFF
+%cmake_build --parallel 2
 
 %install
 %cmake_install
 install -D -p -m 644 cppcheck.1 %{buildroot}%{_mandir}/man1/cppcheck.1
-
-%if %{gui}
-# Install desktop file
-desktop-file-validate %{buildroot}%{_datadir}/applications/cppcheck-gui.desktop
-# Install logo
-install -D -p -m 644 gui/cppcheck-gui.png %{buildroot}%{_datadir}/pixmaps/cppcheck-gui.png
-%endif
-
 # Install htmlreport
 install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppcheck-htmlreport
-
+# Restore execute permission of python files
+grep -l "#\!/usr/bin/env python3" %{buildroot}%{_datadir}/Cppcheck/addons/*.py | xargs chmod +x
 
 %check
-./bin/testrunner -g -q
+#./bin/testrunner -g -q
+%ctest --parallel 1
 
 %files
 %doc AUTHORS
@@ -107,19 +72,13 @@ install -D -p -m 755 htmlreport/cppcheck-htmlreport %{buildroot}%{_bindir}/cppch
 %{_bindir}/cppcheck
 %{_mandir}/man1/cppcheck.1*
 
-%if %{gui}
-%files gui
-%{_bindir}/cppcheck-gui
-%{_datadir}/applications/cppcheck-gui.desktop
-%{_datadir}/pixmaps/cppcheck-gui.png
-%{_datadir}/icons/hicolor/64x64/apps/cppcheck-gui.png
-%{_datadir}/icons/hicolor/scalable/apps/cppcheck-gui.svg
-%endif
-
 %files htmlreport
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
+* Thu May 22 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 2.18.3-1
+- Upgrade to 2.18.3
+
 * Mon Aug 22 2022 Muhammad Falak <mwani@microsoft.com> - 2.7-2
 - Fix `testrunner` binary path to enable ptest
 

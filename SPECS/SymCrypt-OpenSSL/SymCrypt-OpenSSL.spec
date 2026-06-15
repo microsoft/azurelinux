@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.9.0
+Version:        1.9.5
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -16,6 +16,8 @@ BuildRequires:  make
 
 Requires:       SymCrypt >= 103.8.0
 Requires:       openssl
+
+Conflicts: openssl-fips-provider
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
@@ -79,14 +81,32 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/sy
 # These permissions are a result of a security review to mitigate potential risks:
 # - Group and others are denied read access to prevent user-level code from inferring
 #   details about other running applications and their certsinuse usage.
-# - All users have write and execute permissions to create new log files and to 
-#   check file attributes (e.g., to ensure a log file hasn't been tampered with or 
+# - All users have write and execute permissions to create new log files and to
+#   check file attributes (e.g., to ensure a log file hasn't been tampered with or
 #   replaced by a symlink).
 # - The sticky bit is set to prevent malicious users from deleting the log files
 #   and interfering with certsinuse alerting mechanisms.
 %dir %attr(1733, root, root) %{_localstatedir}/log/keysinuse/
 
 %changelog
+* Fri Mar 06 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.5-1
+- Auto-upgrade to 1.9.5 - bug fixes
+
+* Thu Nov 13 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.4-2
+- Add conflicts with openssl-fips-provider
+
+* Tue Oct 28 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.4-1
+- Auto-upgrade to 1.9.4 - bug fixes
+
+* Tue Sep 30 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.3-1
+- Auto-upgrade to 1.9.3 - bug fixes
+
+* Mon Sep 22 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.9.2-1
+- Auto-upgrade to 1.9.2 - bug fixes
+
+* Fri Jul 25 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.1-1
+- Upgrade SymCrypt-OpenSSL to 1.9.1 for compatability and bug fixes.
+
 * Wed Jun 11 2025 Tobias Brick <tobiasb@microsoft.com> - 1.9.0-1
 - Auto-upgrade to 1.9.0 - Support digest state exports.
 - Added second test run that forces the use of the SymCrypt provider.

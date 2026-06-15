@@ -10,18 +10,20 @@
 %bcond_without xpmem
 %bcond_with    vfs
 %bcond_with    mad
+%bcond_with    ze
 %bcond_without mlx5
+%bcond_with    efa
 
 Summary:        UCX is a communication library implementing high-performance messaging
 Name:           ucx
-Version:        1.18.0
-Release:        2%{?dist}
+Version:        1.19.0
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            http://www.openucx.org
-Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}-rc3/ucx-%{version}.tar.gz
+Source0:        https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
 
 
 # UCX currently supports only the following architectures
@@ -48,6 +50,9 @@ BuildRequires: gdrcopy
 BuildRequires: libibverbs-devel
 %endif
 %if %{with mlx5}
+BuildRequires: rdma-core-devel
+%endif
+%if %{with efa}
 BuildRequires: rdma-core-devel
 %endif
 %if %{with knem}
@@ -119,6 +124,7 @@ Provides header files and examples for developing with UCX.
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
            %_with_arg mlx5 mlx5 \
+           %_with_arg efa efa \
            %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg rocm rocm \
@@ -193,6 +199,9 @@ Provides static libraries required for developing with UCX.
 %endif
 %if %{with mlx5}
 %{_libdir}/pkgconfig/ucx-ib-mlx5.pc
+%endif
+%if %{with efa}
+%{_libdir}/pkgconfig/ucx-ib-efa.pc
 %endif
 %if %{with rdmacm}
 %{_libdir}/pkgconfig/ucx-rdmacm.pc
@@ -275,6 +284,19 @@ devices.
 
 %files ib-mlx5
 %{_libdir}/ucx/libuct_ib_mlx5.so.*
+%endif
+
+%if %{with efa}
+%package ib-efa
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: UCX EFA device RDMA support
+Group: System Environment/Libraries
+
+%description ib-efa
+Provides support for EFA device as an IBTA transport for UCX.
+
+%files ib-efa
+%{_libdir}/ucx/libuct_ib_efa.so.*
 %endif
 
 %if %{with mad}
@@ -392,7 +414,7 @@ library internals, protocol objects, transports status, and more.
 %if %{with ze}
 %package ze
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Summary: UCX Virtual Filesystem support.
+Summary: UCX ZE GPU support.
 Group: System Environment/Libraries
 
 %description ze
@@ -400,11 +422,15 @@ Provides oneAPI Level Zero (ZE) Runtime support for UCX.
 
 %files ze
 %{_libdir}/ucx/libuct_ze.so.*
-%{_bindir}/ucx/libucm_ze.so.*
+%{_libdir}/ucx/libucm_ze.so.*
 %endif
 
 
 %changelog
+* Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 1.19.0-1
+- Upgrade version to 1.19.0.
+- Update source path
+
 * Fri Jan 31 2025 Alberto David Perez Guevara <aperezguevar@microsoft.com> - 1.18.0-2
 - Enable knem and xpmem flags
 

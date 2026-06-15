@@ -1,13 +1,14 @@
 Summary:        Library to implement a well-behaved Unix daemon process.
 Name:           python-daemon
 Version:        3.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://pypi.python.org/pypi/python-daemon/
 Source0:        https://files.pythonhosted.org/packages/source/p/python-daemon/%{name}-%{version}.tar.gz
+Patch0:         python-daemon-3.0.1-fix-ptest-deprecated-assertEquals-with-assertEqual.patch
 BuildArch:      noarch
 
 %description
@@ -35,7 +36,7 @@ daemon program. A DaemonContext instance holds the behaviour and configured proc
 use the instance as a context manager to enter a daemon state.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %py3_build
@@ -52,6 +53,10 @@ pip3 install mock testscenarios testtools
 %{python3_sitelib}/*
 
 %changelog
+* Mon Feb 23 2026 Ratiranjan Behera <v-ratbehera@microsoft.com> - 3.0.1-2
+- Fix ptest regression on Azure Linux 3.0 by replacing deprecated unittest
+  assertEquals() with assertEqual() in python-daemon tests (TASK 16234)
+
 * Wed May 08 2024 Sam Meluch <sammeluch@microsoft.com> - 3.0.1-1
 - Upgrade package to latest version
 

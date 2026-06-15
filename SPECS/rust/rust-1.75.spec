@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.75.0
-Release:        16%{?dist}
+Release:        30%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,18 @@ Patch0:         CVE-2023-45853.patch
 Patch1:         CVE-2024-32884.patch
 Patch2:         CVE-2024-31852.patch
 Patch3:         CVE-2025-4574_1.75.patch
+Patch4:         CVE-2025-53605_1.75.patch
+Patch5:         CVE-2026-24116_1.75.patch
+Patch6:         CVE-2025-58160_1.75.patch
+Patch7:         CVE-2026-25541_1.75.patch
+Patch8:         CVE-2026-25727_1.75.patch
+Patch9:         CVE-2023-48795_1.75.patch
+Patch10:        CVE-2026-33056_1.75.patch
+Patch11:        CVE-2026-33055_1.75.patch
+Patch12:        CVE-2026-34743_1.75.patch
+Patch13:        CVE-2026-5222_1.75.patch
+Patch14:        CVE-2026-5223_1.75.patch
+Patch15:        CVE-2026-40034_1.75.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -63,7 +75,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-11%{?dist}
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:  sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -179,13 +191,55 @@ rm %{buildroot}%{_bindir}/*.old
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-30
+- Add patch for CVE-2026-5222, CVE-2026-5223
+- Backport patch for CVE-2026-40034
+
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.75.0-29
+- Bump to rebuild with updated glibc
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-28
+- Add patch for CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
+
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.75.0-27
+- Bump to rebuild with updated glibc
+
+* Tue Feb 10 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.75.0-26
+- Add patch for CVE-2026-25541, CVE-2026-25727 & CVE-2023-48795
+
+* Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 1.75.0-25
+- Add patch for CVE-2026-24116 & CVE-2025-58160
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-24
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-23
+- Bump to rebuild with updated glibc
+
+* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-22
+- Bump to rebuild with updated glibc
+
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-21
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-20
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-19
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 1.75.0-18
+- Bump to rebuild with updated glibc
+
+* Mon Jul 21 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 1.75.0-17
+- Add patch for CVE-2025-53605
+
 * Tue Jun 10 2025 Kavya Sree Kaitepalli kkaitepalli@microsoft.com - 1.75.0-16
 - Run %check as non root user to fix ptests
 - Patch CVE-2025-4574
 
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.75.0-15
 - Bump to rebuild with updated glibc
-
 
 * Mon May 12 2025 Andrew Phelps anphel@microsoft.com - 1.75.0-14
 - Bump to rebuild with updated glibc

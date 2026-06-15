@@ -1,0 +1,201 @@
+From a5afac6ee6535b2bcb5214beb648c16b3fd3e99b Mon Sep 17 00:00:00 2001
+From: Rohit Rawat <rohitrawat@microsoft.com>
+Date: Tue, 25 Nov 2025 12:22:08 +0000
+Subject: [PATCH] network/tc: fix stack overflow when dropping tclass or qdisc
+
+This patch is combination of two patches that fixed the issue in v255-stable:
+1. network/tc: fix stack overflow when dropping tclass or qdisc by Yu Watanabe <watanabe.yu+github@gmail.com> at
+  https://github.com/systemd/systemd-stable/commit/af95833d49ee4a77511d5ce9a507f9c74352347c
+2. network/tc: Avoid concurrent set modification in tclass_drop()/qdisc_drop() by Daan De Meyer <daan.j.demeyer@gmail.com> at
+  https://github.com/systemd/systemd-stable/commit/b3fd8fa1cae7837043bfb1096c413a086f720a4b
+
+Note: This patch is needed only in systemd v255 and is already present in
+  later releases(v256 and above)
+
+---
+ src/network/tc/qdisc.c  | 52 ++++++++++++++++++++++++++++++-----------
+ src/network/tc/qdisc.h  |  2 ++
+ src/network/tc/tclass.c | 51 +++++++++++++++++++++++++++++-----------
+ src/network/tc/tclass.h |  2 ++
+ 4 files changed, 81 insertions(+), 26 deletions(-)
+
+diff --git a/src/network/tc/qdisc.c b/src/network/tc/qdisc.c
+index f20f410..43f5c73 100644
+--- a/src/network/tc/qdisc.c
++++ b/src/network/tc/qdisc.c
+@@ -285,31 +285,57 @@ int link_find_qdisc(Link *link, uint32_t handle, const char *kind, QDisc **ret)
+         return -ENOENT;
+ }
+
+-QDisc* qdisc_drop(QDisc *qdisc) {
++void qdisc_mark_recursive(QDisc *qdisc) {
+         TClass *tclass;
+-        Link *link;
+
+         assert(qdisc);
++        assert(qdisc->link);
++
++        if (qdisc_is_marked(qdisc))
++                return;
+
+-        link = ASSERT_PTR(qdisc->link);
++        qdisc_mark(qdisc);
+
+-        /* also drop all child classes assigned to the qdisc. */
+-        SET_FOREACH(tclass, link->tclasses) {
++        /* also mark all child classes assigned to the qdisc. */
++        SET_FOREACH(tclass, qdisc->link->tclasses) {
+                 if (TC_H_MAJ(tclass->classid) != qdisc->handle)
+                         continue;
+
+-                tclass_drop(tclass);
++                tclass_mark_recursive(tclass);
+         }
++}
+
+-        qdisc_enter_removed(qdisc);
++void link_qdisc_drop_marked(Link *link) {
++        QDisc *qdisc;
+
+-        if (qdisc->state == 0) {
+-                log_qdisc_debug(qdisc, link, "Forgetting");
+-                qdisc = qdisc_free(qdisc);
+-        } else
+-                log_qdisc_debug(qdisc, link, "Removed");
++        assert(link);
++
++        SET_FOREACH(qdisc, link->qdiscs) {
++                if (!qdisc_is_marked(qdisc))
++                        continue;
++
++                qdisc_unmark(qdisc);
++                qdisc_enter_removed(qdisc);
++
++                if (qdisc->state == 0) {
++                        log_qdisc_debug(qdisc, link, "Forgetting");
++                        qdisc_free(qdisc);
++                } else
++                        log_qdisc_debug(qdisc, link, "Removed");
++        }
++}
++
++QDisc* qdisc_drop(QDisc *qdisc) {
++        assert(qdisc);
++        assert(qdisc->link);
++
++        qdisc_mark_recursive(qdisc);
++
++        /* link_qdisc_drop_marked() may invalidate qdisc, so run link_tclass_drop_marked() first. */
++        link_tclass_drop_marked(qdisc->link);
++        link_qdisc_drop_marked(qdisc->link);
+
+-        return qdisc;
++        return NULL;
+ }
+
+ static int qdisc_handler(sd_netlink *rtnl, sd_netlink_message *m, Request *req, Link *link, QDisc *qdisc) {
+diff --git a/src/network/tc/qdisc.h b/src/network/tc/qdisc.h
+index a62b941..cbba1be 100644
+--- a/src/network/tc/qdisc.h
++++ b/src/network/tc/qdisc.h
+@@ -77,7 +77,9 @@ DEFINE_NETWORK_CONFIG_STATE_FUNCTIONS(QDisc, qdisc);
+ QDisc* qdisc_free(QDisc *qdisc);
+ int qdisc_new_static(QDiscKind kind, Network *network, const char *filename, unsigned section_line, QDisc **ret);
+
++void qdisc_mark_recursive(QDisc *qdisc);
+ QDisc* qdisc_drop(QDisc *qdisc);
++void link_qdisc_drop_marked(Link *link);
+
+ int link_find_qdisc(Link *link, uint32_t handle, const char *kind, QDisc **qdisc);
+
+diff --git a/src/network/tc/tclass.c b/src/network/tc/tclass.c
+index 0a5fec0..fc74c48 100644
+--- a/src/network/tc/tclass.c
++++ b/src/network/tc/tclass.c
+@@ -252,31 +252,56 @@ static void log_tclass_debug(TClass *tclass, Link *link, const char *str) {
+                        strna(tclass_get_tca_kind(tclass)));
+ }
+
+-TClass* tclass_drop(TClass *tclass) {
++void tclass_mark_recursive(TClass *tclass) {
+         QDisc *qdisc;
+-        Link *link;
+
+         assert(tclass);
++        assert(tclass->link);
++
++        if (tclass_is_marked(tclass))
++                return;
+
+-        link = ASSERT_PTR(tclass->link);
++        tclass_mark(tclass);
+
+-        /* Also drop all child qdiscs assigned to the class. */
+-        SET_FOREACH(qdisc, link->qdiscs) {
++        /* Also mark all child qdiscs assigned to the class. */
++        SET_FOREACH(qdisc, tclass->link->qdiscs) {
+                 if (qdisc->parent != tclass->classid)
+                         continue;
+
+-                qdisc_drop(qdisc);
++                qdisc_mark_recursive(qdisc);
+         }
++}
+
+-        tclass_enter_removed(tclass);
++void link_tclass_drop_marked(Link *link) {
++        TClass *tclass;
+
+-        if (tclass->state == 0) {
+-                log_tclass_debug(tclass, link, "Forgetting");
+-                tclass = tclass_free(tclass);
+-        } else
+-                log_tclass_debug(tclass, link, "Removed");
++        assert(link);
++
++        SET_FOREACH(tclass, link->tclasses) {
++                if (!tclass_is_marked(tclass))
++                        continue;
++
++                tclass_unmark(tclass);
++                tclass_enter_removed(tclass);
++
++                if (tclass->state == 0) {
++                        log_tclass_debug(tclass, link, "Forgetting");
++                        tclass_free(tclass);
++                } else
++                        log_tclass_debug(tclass, link, "Removed");
++        }
++}
++
++TClass* tclass_drop(TClass *tclass) {
++        assert(tclass);
++
++        tclass_mark_recursive(tclass);
++
++        /* link_tclass_drop_marked() may invalidate tclass, so run link_qdisc_drop_marked() first. */
++        link_qdisc_drop_marked(tclass->link);
++        link_tclass_drop_marked(tclass->link);
+
+-        return tclass;
++        return NULL;
+ }
+
+ static int tclass_handler(sd_netlink *rtnl, sd_netlink_message *m, Request *req, Link *link, TClass *tclass) {
+diff --git a/src/network/tc/tclass.h b/src/network/tc/tclass.h
+index e73e23c..85df57d 100644
+--- a/src/network/tc/tclass.h
++++ b/src/network/tc/tclass.h
+@@ -58,7 +58,9 @@ DEFINE_NETWORK_CONFIG_STATE_FUNCTIONS(TClass, tclass);
+ TClass* tclass_free(TClass *tclass);
+ int tclass_new_static(TClassKind kind, Network *network, const char *filename, unsigned section_line, TClass **ret);
+
++void tclass_mark_recursive(TClass *tclass);
+ TClass* tclass_drop(TClass *tclass);
++void link_tclass_drop_marked(Link *link);
+
+ int link_find_tclass(Link *link, uint32_t classid, TClass **ret);
+
+--
+2.45.4
+

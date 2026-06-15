@@ -21,9 +21,10 @@ var (
 	specsDirPath       = exe.InputStringFlag(app, "Path to specs directory.")
 	outputSnapshotPath = exe.OutputFlag(app, "Path to the generated snapshot.")
 
-	buildDirPath = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
-	distTag      = app.Flag("dist-tag", "The distribution tag.").Required().String()
-	workerTar    = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
+	buildDirPath             = app.Flag("build-dir", "Directory to store temporary files.").Required().String()
+	distTag                  = app.Flag("dist-tag", "The distribution tag.").Required().String()
+	workerTar                = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz.").Required().ExistingFile()
+	releaseVersionMacrosFile = app.Flag("versions-macro-file", "File containing release and version macros for all SPECS to use while parsing specs.").ExistingFile()
 
 	logFlags = exe.SetupLogFlags(app)
 )
@@ -33,7 +34,7 @@ func main() {
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 	logger.InitBestEffort(logFlags)
 
-	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath)
+	snapshotGenerator, err := rpmssnapshot.New(*buildDirPath, *workerTar, *specsDirPath, *releaseVersionMacrosFile)
 	if err != nil {
 		logger.Log.Fatalf("Failed to initialize RPM snapshot generator. Error: %v", err)
 	}

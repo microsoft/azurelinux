@@ -370,15 +370,22 @@ Daily build packages are available via `DAILY_BUILD_ID`. Use `DAILY_BUILD_ID=lkg
 
 ### Authentication
 
-If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require keys and certificates. The keys and certificates can be set using:
+If supplying custom endpoints for source/SRPM/package servers, accessing these resources may require authentication.
+Keys and certificates for TLS based authentication can be set using:
 
 ```bash
 sudo make image CONFIG_FILE="./imageconfigs/core-efi.json" CA_CERT=/path/to/rootca.crt TLS_CERT=/path/to/user.crt TLS_KEY=/path/to/user.key
 ```
 
+For SRPM packing (i.e., for retrieving package sources), Azure CLI login can be used to access authenticated Azure blob storages, which do not support anonymous access:
+```bash
+sudo make build-packages SOURCE_AUTH_MODE="azurecli"
+```
+Using this mode requires prior `az login` with your managed identity ID.
+
 ## Building Everything From Scratch
 
-**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core`**
+**NOTE: Source files must be made available for all packages. They can be placed manually in the corresponding SPEC/\* folders, `SOURCE_URL=<YOUR_SOURCE_SERVER>` may be provided, or DOWNLOAD_SRPMS=y may be used to use pre-packages sources. Core Azure Linux source packages are available at `SOURCE_URL=https://azurelinuxsrcstorage.blob.core.windows.net/sources/core` and support anonymous access.**
 
 The build system can operate without using pre-built components if desired. There are several variables which enable/disable build components and sources of data. They are listed here along with their default values:
 
@@ -807,6 +814,7 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | TEST_RUN_LIST                 |                                                                                                        | Explicit list of packages to test. The package test will be skipped if the build system thinks it is already up-to-date. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
 | TEST_RERUN_LIST               |                                                                                                        | Always test these package, even if it its corresponding package is up-to-date. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
 | TEST_IGNORE_LIST              |                                                                                                        | Ignore testing these packages. Ignoring and forcing the same test re-run is invalid and will fail the build. The argument accepts both spec and package names. Example: for `python-werkzeug.spec`, which builds the `python3-werkzeug` package both `python-werkzeug` and `python3-werkzeug` are correct.
+| EXTRA_MACROS_FILES              |                                                                                                        | Space separated list of additional `<macros.name>` containing additional RPM macros, which will be available to the build. Used to resolve versions of kernel Out of Tree Module packages.
 
 ---
 
@@ -840,6 +848,8 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | CA_CERT                       |                                                                                                          | CA cert to access the above resources, in addition to the system certificate store
 | TLS_CERT                      |                                                                                                          | TLS cert to access the above resources
 | TLS_KEY                       |                                                                                                          | TLS key to access the above resources
+| SOURCE_AUTH_MODE              |                                                                                                          |
+Authentication mode for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base). The azurecli option enables Azure CLI based authentication for accessing Azure Blob Storages which do not allow for public access. The default method is anonymous access using HTTP GET.
 
 ---
 
@@ -856,6 +866,10 @@ To reproduce an ISO build, run the same make invocation as before, but set:
 | INCREMENTAL_TOOLCHAIN            | n                                                                                                      | Only build toolchain RPM packages if they are not already present
 | RUN_CHECK                        | n                                                                                                      | Run the %check sections when compiling packages
 | ALLOW_TOOLCHAIN_REBUILDS         | n                                                                                                      | Do not treat rebuilds of toolchain packages during regular package build phase as errors.
+| VALIDATE_TOOLCHAIN_GPG           | (auto - based on toolchain build mode)                                                                 | Enable RPM GPG signature verification for toolchain packages. Automatically set to `y` when downloading pre-built toolchain packages (`REBUILD_TOOLCHAIN=n`), and `n` when rebuilding locally or using `DAILY_BUILD_ID`. Packages are validated against keys specified in `TOOLCHAIN_GPG_VALIDATION_KEYS`.
+| TOOLCHAIN_GPG_VALIDATION_KEYS    | `$(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY` | Space separated list of GPG key files used to validate RPM signatures when `VALIDATE_TOOLCHAIN_GPG=y`.
+| VALIDATE_IMAGE_GPG               | n                                                                                                      | Enable RPM GPG signature verification during image builds. When set to `y`, all packages fetched for image generation must have valid GPG signatures. Packages are validated against keys specified in `IMAGE_GPG_VALIDATION_KEYS`. Production builds should enable this to ensure all packages have completed the signing process.
+| IMAGE_GPG_VALIDATION_KEYS        | `$(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY` | Space separated list of GPG key files used to validate RPM signatures when `VALIDATE_IMAGE_GPG=y`.
 |  PACKAGE_BUILD_RETRIES           | 1                                                                                                      | Number of build retries for each package
 | CHECK_BUILD_RETRIES              | 1                                                                                                      | Minimum number of check section retries for each package if RUN_CHECK=y and tests fail.
 | MAX_CASCADING_REBUILDS           |                                                                                                        | When a package rebuilds, how many additional layers of dependent packages will be forced to rebuild (leave unset for unbounded, i.e., all downstream packages will rebuild)

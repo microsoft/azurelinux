@@ -1,0 +1,51 @@
+From 40df9e0f016e4ce67e90e3e7f5b0ec87c5cb0a32 Mon Sep 17 00:00:00 2001
+From: Kavya Sree Kaitepalli <kkaitepalli@microsoft.com>
+Date: Tue, 28 Oct 2025 17:39:43 +0000
+Subject: [PATCH] Suppress dead_code warnings and add explicit lifetime for U32Set iterator for Rust 1.90
+
+---
+ src/agent/src/device/block_device_handler.rs | 1 +
+ src/agent/src/storage/block_handler.rs       | 1 +
+ src/libs/kata-types/src/utils/u32_set.rs     | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/agent/src/device/block_device_handler.rs b/src/agent/src/device/block_device_handler.rs
+index d518f9d..8607751 100644
+--- a/src/agent/src/device/block_device_handler.rs
++++ b/src/agent/src/device/block_device_handler.rs
+@@ -29,6 +29,7 @@ use tracing::instrument;
+ pub struct VirtioBlkPciDeviceHandler {}
+ 
+ #[derive(Debug)]
++#[allow(dead_code)]
+ pub struct VirtioBlkCcwDeviceHandler {}
+ 
+ #[derive(Debug)]
+diff --git a/src/agent/src/storage/block_handler.rs b/src/agent/src/storage/block_handler.rs
+index 251a4df..074efc3 100644
+--- a/src/agent/src/storage/block_handler.rs
++++ b/src/agent/src/storage/block_handler.rs
+@@ -94,6 +94,7 @@ impl StorageHandler for VirtioBlkPciHandler {
+ }
+ 
+ #[derive(Debug)]
++#[allow(dead_code)]
+ pub struct VirtioBlkCcwHandler {}
+ 
+ #[async_trait::async_trait]
+diff --git a/src/libs/kata-types/src/utils/u32_set.rs b/src/libs/kata-types/src/utils/u32_set.rs
+index 44c55a1..837e7a0 100644
+--- a/src/libs/kata-types/src/utils/u32_set.rs
++++ b/src/libs/kata-types/src/utils/u32_set.rs
+@@ -47,7 +47,7 @@ impl U32Set {
+     }
+ 
+     /// Get an iterator over the CPU set.
+-    pub fn iter(&self) -> Iter<u32> {
++    pub fn iter(&self) -> Iter<'_, u32> {
+         self.0.iter()
+     }
+ }
+-- 
+2.45.4
+

@@ -1,0 +1,33 @@
+From dd205eeae9fb06ac113884e4c9e9f3a90eef7554 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Mon, 27 Nov 2023 14:09:04 +0000
+Subject: [PATCH 3/3] src: Include <libxml/parser.h>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+libxml2 2.12.1 failed with this error:
+
+xml-c.c:92:9: warning: implicit declaration of function ‘xmlReadMemory’; did you mean ‘xmlInitMemory’? [-Wimplicit-function-declaration]
+   92 |   doc = xmlReadMemory (String_val (xmlv), caml_string_length (xmlv),
+      |         ^~~~~~~~~~~~~
+      |         xmlInitMemory
+---
+ src/xml-c.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/xml-c.c b/src/xml-c.c
+index 72042bf..6c546b9 100644
+--- a/src/xml-c.c
++++ b/src/xml-c.c
+@@ -28,6 +28,7 @@
+ #include <caml/memory.h>
+ #include <caml/mlvalues.h>
+ 
++#include <libxml/parser.h>
+ #include <libxml/xpath.h>
+ #include <libxml/xpathInternals.h>
+ 
+-- 
+2.42.0
+

@@ -1,0 +1,34 @@
+From 8bc0ab8efd3653189d354e2f179c323a42196584 Mon Sep 17 00:00:00 2001
+From: Kevin Lockwood <v-klockwood@microsoft.com>
+Date: Wed, 16 Jul 2025 13:24:32 -0700
+Subject: [PATCH] fix compiler/source version
+
+---
+ common.xml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common.xml b/common.xml
+index 7e34b95..a5d236a 100644
+--- a/common.xml
++++ b/common.xml
+@@ -3,7 +3,7 @@
+ <project name="common" basedir=".">
+ 
+   <property file="build.properties"/>
+-  <property name="project.version" value="4.4.13"/>
++  <property name="project.version" value="4.4.16"/>
+   <property name="project.groupId" value="org.apache.httpcomponents"/>
+ 
+   <property name="project.organization.name" value="The Apache Software Foundation"/>
+@@ -13,7 +13,7 @@
+   <property name="project.license.url" value="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+ 
+ 
+-  <property name="compiler.source" value="1.6"/>
++  <property name="compiler.source" value="7"/>
+   <property name="compiler.target" value="${compiler.source}"/>
+ 
+ </project>
+-- 
+2.34.1
+

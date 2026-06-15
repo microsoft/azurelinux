@@ -1,0 +1,25 @@
+From 720533055469af660e8e79a127999d1c626e95f7 Mon Sep 17 00:00:00 2001
+From: John Bowler <jbowler@acm.org>
+Date: Thu, 1 Feb 2024 05:06:45 -0800
+Subject: [PATCH] Check for defined PNG_IGNORE_ADLER32
+
+The check was missing round the first usage, it was there in the second.
+---
+ pngcrush.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/pngcrush.c b/pngcrush.c
+index 102bb39..43b1fe5 100644
+--- a/pngcrush.c
++++ b/pngcrush.c
+@@ -5524,8 +5524,10 @@ int main(int argc, char *argv[])
+                      * they were already checked in the pngcrush_measure_idat
+                      * function
+                      */
++# ifdef PNG_IGNORE_ADLER32
+                     png_set_option(read_ptr, PNG_IGNORE_ADLER32,
+                         PNG_OPTION_ON);
++# endif
+                     png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE,
+                                        PNG_CRC_QUIET_USE);
+                 }

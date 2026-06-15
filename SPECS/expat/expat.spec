@@ -2,7 +2,7 @@
 Summary:        An XML parser library
 Name:           expat
 Version:        2.6.4
-Release:        1%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,6 +10,13 @@ Group:          System Environment/GeneralLibraries
 URL:            https://libexpat.github.io/
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{underscore_version}/%{name}-%{version}.tar.bz2
 Patch0:         CVE-2024-8176.patch
+Patch1:         CVE-2025-59375.patch
+Patch2:         CVE-2026-24515.patch
+Patch3:         CVE-2026-25210.patch
+Patch4:         Stop-updating-event-pointer-on-exit-for-reentry.patch
+Patch5:         CVE-2026-32776.patch
+Patch6:         CVE-2026-32777.patch
+Patch7:         CVE-2026-32778.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 %description
@@ -67,6 +74,22 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
+* Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-6
+- Patch for CVE-2026-32778, CVE-2026-32777, CVE-2026-32776
+
+* Tue Mar 31 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.6.4-5
+- Patch to restore event pointer behavior from Expat 2.6.4
+- which was changed due to fix for CVE-2024-8176.
+
+* Mon Feb 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-4
+- Patch for CVE-2026-25210
+
+* Tue Jan 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-3
+- Patch for CVE-2026-24515
+
+* Tue Sep 23 2025 Akhila Guruju <v-guakhila@microsoft.com> - 2.6.4-2
+- Fix CVE-2025-59375 with a patch
+
 * Thu Mar 20 2025 Kshitiz Godara <kgodara@microsoft.com> - 2.6.4-1
 - Fix CVE-2024-8176 with a patch
 

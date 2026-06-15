@@ -1,0 +1,43 @@
+From 3cfbf8e889b50d5d19795d6f81f66345c70ce4e0 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Wed, 9 Jun 2021 06:57:51 -0400
+Subject: [PATCH] Remove libdir definition from sdl-config for multilib support
+
+If we export the library directory, then the contents of sdl-config
+wind up differing across architectures, which will make sdl12-compat
+not multilib-safe.
+
+Thus, strip out the libdir stuff so that this isn't a problem.
+---
+ sdl-config.in | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/sdl-config.in b/sdl-config.in
+index 528a355..addabd8 100755
+--- a/sdl-config.in
++++ b/sdl-config.in
+@@ -10,7 +10,6 @@
+ prefix=@CMAKE_INSTALL_PREFIX@
+ exec_prefix=${prefix}
+ exec_prefix_set=no
+-libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+ 
+ @ENABLE_STATIC_FALSE@usage="\
+@@ -53,11 +52,11 @@ while test $# -gt 0; do
+       echo -I${includedir}/SDL @SDL_CFLAGS@
+       ;;
+ @ENABLE_SHARED_TRUE@    --libs)
+-@ENABLE_SHARED_TRUE@      echo -L${libdir} @SDL_RLD_FLAGS@ @SDL_LIBS@
++@ENABLE_SHARED_TRUE@      echo @SDL_RLD_FLAGS@ @SDL_LIBS@
+ @ENABLE_SHARED_TRUE@      ;;
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_TRUE@    --static-libs)
+ @ENABLE_STATIC_TRUE@@ENABLE_SHARED_FALSE@    --libs|--static-libs)
+-@ENABLE_STATIC_TRUE@      echo -L${libdir} @SDL_LIBS@ @SDL_STATIC_LIBS@
++@ENABLE_STATIC_TRUE@      echo @SDL_LIBS@ @SDL_STATIC_LIBS@
+ @ENABLE_STATIC_TRUE@      ;;
+     *)
+       echo "${usage}" 1>&2
+-- 
+2.31.1
+

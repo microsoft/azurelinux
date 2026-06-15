@@ -1,6 +1,6 @@
 Name:           opensc
-Version:        0.25.1
-Release:        4%{?dist}
+Version:        0.27.1
+Release:        1%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause
@@ -132,7 +132,8 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %files
-%doc COPYING NEWS README*
+%license COPYING
+%doc NEWS README*
 
 %{_datadir}/bash-completion/*
 
@@ -203,6 +204,12 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Tue Mar 31 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.27.1-1
+- Auto-upgrade to 0.27.1 - for CVE-2025-13763, CVE-2025-49010, CVE-2025-66215, CVE-2025-66038, CVE-2025-66037
+
+* Tue Jun 10 2025 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.26.1-1
+- Auto-upgrade to 0.26.1 - for CVE-2024-45619
+
 * Tue Sep 03 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 0.25.1-4
 - Add missing Distribution tag.
 

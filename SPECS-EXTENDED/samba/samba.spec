@@ -87,7 +87,7 @@
 
 Name:           samba
 Version:        4.18.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 
 %define samba_depver %{version}-%{release}
@@ -113,6 +113,7 @@ Source14:       samba.pamd
 Source201:      README.downgrade
 
 Patch0:         0001-Disable-building-smb.conf.5-in-docs-xml-wscript.patch
+Patch1:         0002-CVE-2025-49716-netlogon.patch
 
 Requires(pre): /usr/sbin/groupadd
 Requires(post): systemd
@@ -3872,6 +3873,9 @@ fi
 %endif
 
 %changelog
+* Tue Oct 14 2025 Andy Zaugg <azaugg@linkedin.com> - 4.18.3-2
+- Fix winbind netlogon issue with Windows security update 2025 CVE-2025-49716
+
 * Thu Aug 08 2024 Sindhu Karri <lakarri@microsoft.com> - 4.18.3-1
 - Upgrade samba to build with Python 3.12
 - Add patch 0001-Disable-building-smb.conf.5-in-docs-xml-wscript.patch to fix build

@@ -1,17 +1,21 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%define		baseversion 1.1.6
+%define		baseversion 1.2.14
 
 Summary:	Python binding for the ALSA library
 Name:		python-alsa
 Version:	%{baseversion}
-Release:	12%{?dist}
-License:	LGPLv2+
-Source0:	ftp://ftp.alsa-project.org/pub/pyalsa/pyalsa-%{version}.tar.bz2
+Release:	4%{?dist}
+License:	LGPL-2.1-or-later
+Source0:	https://www.alsa-project.org/files/pub/pyalsa/pyalsa-%{version}.tar.bz2
 Source1:  %{name}-LICENSE.txt
 URL:		http://www.alsa-project.org/
 BuildRequires:	alsa-lib-devel >= %{version}
 BuildRequires:	python3-devel
+BuildRequires:	python3-setuptools
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
 BuildRequires:	gcc
 
 # Filter private shared library provides
@@ -29,25 +33,99 @@ Summary: %summary
 %description -n python3-alsa %_description
 
 %prep
-%autosetup -n pyalsa-%{version}
+%autosetup -n pyalsa-%{version} -p 1
 mv %{SOURCE1} ./LICENSE.txt
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 	
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files '*'
 
-%files -n python3-alsa
+%check
+%pyproject_check_import
+
+%files -n python3-alsa -f %{pyproject_files}
 %license LICENSE.txt
-%{python3_sitearch}/*
 
 %changelog
-* Fri Dec 10 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.6-12
-- License verified
+* Fri Sep 26 2025 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.14-1
+- Upgrade to version 1.2.14
+- Added check section.
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.1.6-11
-- Initial CBL-Mariner import from Fedora 32 (license: MIT).
+* Wed Dec 18 2024 Sumit Jena <v-sumitjena@microsoft.com> - 1.2.12-4
+- Initial Azure Linux import from Fedora 41 (license: MIT).
+- License verified.
+
+* Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.12-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Tue Jun 11 2024 Python Maint <python-maint@redhat.com> - 1.2.12-2
+- Rebuilt for Python 3.13
+
+* Tue Jun 11 2024 Jaroslav Kysela <perex@perex.cz> - 1.2.12-1
+- Updated to 1.2.12
+
+* Fri Jun 07 2024 Python Maint <python-maint@redhat.com> - 1.2.7-10
+- Rebuilt for Python 3.13
+
+* Fri Jan 26 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Fri Jul 21 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jun 13 2023 Python Maint <python-maint@redhat.com> - 1.2.7-6
+- Rebuilt for Python 3.12
+
+* Wed Mar 08 2023 Gwyn Ciesla <gwync@protonmail.com> - 1.2.7-5
+- migrated to SPDX license
+
+* Fri Jan 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.7-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 1.2.7-2
+- Rebuilt for Python 3.11
+
+* Tue May 31 2022 Jaroslav Kysela <perex@perex.cz> - 1.2.7-1
+- Updated to 1.2.6
+
+* Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Mon Dec 06 2021 Jaroslav Kysela <perex@perex.cz> - 1.2.6-1
+- Updated to 1.2.6
+
+* Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.6-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 1.1.6-16
+- Rebuilt for Python 3.10
+
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.6-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Thu Dec 10 2020 Gwyn Ciesla <gwync@protonmail.com> - 1.1.6-14
+- Patch for Python 3.10.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.6-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
+* Tue Jun 23 2020 Gwyn Ciesla <gwync@protonmail.com> - 1.1.6-12
+- BR python3-setuptools
+
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 1.1.6-11
+- Rebuilt for Python 3.9
 
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.6-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild

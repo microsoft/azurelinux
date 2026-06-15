@@ -1,18 +1,14 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-%global snapshot 0
 
 Name:           libpinyin
-Version:        2.9.92
+Version:        2.10.3
 Release:        1%{?dist}
 Summary:        Library to deal with pinyin
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/libpinyin/libpinyin
 Source0:        https://downloads.sourceforge.net/libpinyin/libpinyin/%{name}-%{version}.tar.gz
-%if %snapshot
-Patch0:         libpinyin-2.8.x-head.patch
-%endif
 
 BuildRequires:  gcc-c++
 BuildRequires:  kyotocabinet-devel, glib2-devel
@@ -57,32 +53,27 @@ Requires:       %{name} = %{version}-%{release}
 %description -n libzhuyin
 The libzhuyin package contains libzhuyin compatibility library.
 
-
 %prep
-%setup -q
-
-%if %snapshot
-%patch -P0 -p1 -b .head
-%endif
+%autosetup
 
 %build
 %configure --disable-static \
            --with-dbm=KyotoCabinet \
            --enable-libzhuyin
 %make_build
+
 %check
 make check
 
 %install
-%make_install
+%make_install DESTDIR=$RPM_BUILD_ROOT
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-
 
 %ldconfig_scriptlets
 
-
 %files
-%doc AUTHORS COPYING README
+%doc AUTHORS README
+%license COPYING
 %{_libdir}/libpinyin*.so.*
 %dir %{_libdir}/libpinyin
 
@@ -109,6 +100,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/libzhuyin*.so.*
 
 %changelog
+* Mon Dec 22 2025 Aditya Singh <v-aditysing@microsoft.com> - 2.10.3-1
+- Upgrade to version 2.10.3
+- License verified
+
 * Mon Nov 11 2024 Sumit Jena <v-sumitjena@microsoft.com> - 2.9.92-1
 - Update to version 2.9.92
 - License verified

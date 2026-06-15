@@ -1,13 +1,14 @@
 Summary:        SELinux library and simple utilities
 Name:           libselinux
 Version:        3.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/SELinuxProject/selinux/wiki
 Source0:        https://github.com/SELinuxProject/selinux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch1:         libselinux-usr-etc-selinux-path.patch
 BuildRequires:  libsepol-devel
 BuildRequires:  pcre2-devel
 BuildRequires:  swig
@@ -64,7 +65,7 @@ The libselinux-python package contains the python3 bindings for developing
 SELinux applications.
 
 %prep
-%autosetup
+%autosetup -p2
 
 %build
 export USE_PCRE2="y"
@@ -109,6 +110,10 @@ echo "d /run/setrans 0755 root root" > %{buildroot}/%{_libdir}/tmpfiles.d/libsel
 %{python3_sitelib}/*
 
 %changelog
+* Tue Sep 30 2025 Chris PeBenito <chpebeni@microsoft.com> - 3.6-4
+- Support SELinux policy tree at /usr/etc/selinux.  This supports a
+  dm-verity protected policy in a read-only /usr.
+
 * Wed Apr 03 2024 Betty Lakes <bettylakes@microsoft.com> - 3.6-3
 - Move to pcre2
 

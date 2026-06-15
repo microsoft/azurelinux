@@ -1,0 +1,11 @@
+--- pylint-3.3.6/pyproject.toml~	2025-03-20 10:21:05.597486341 -0500
++++ pylint-3.3.6/pyproject.toml	2025-03-20 10:23:55.768622830 -0500
+@@ -8,8 +8,6 @@
+ description = "python code static checker"
+ readme = "README.rst"
+ keywords = [ "lint", "linter", "python", "static code analysis" ]
+-license = "GPL-2.0-or-later"
+-license-files = [ "LICENSE", "CONTRIBUTORS.txt" ]
+ authors = [
+   { name = "Python Code Quality Authority", email = "code-quality@python.org" },
+ ]

@@ -1,0 +1,73 @@
+From 6ff5edcab541fe2b4e04e021c14c424fd9658dcc Mon Sep 17 00:00:00 2001
+From: Chris Co <chrco@microsoft.com>
+Date: Tue, 9 Sep 2025 05:22:16 +0000
+Subject: [PATCH] parser: set DISTRO="suse" if built on Azure Linux
+
+To maintain compatibility with the previous Mariner 2.0 AppArmor,
+override the distro detection to set "suse".
+
+Previous Mariner 2.0 AppArmor was subjected to the upstream issue
+where parser distro evaluation would always resolve to "suse".
+This behavior was eventually fixed upstream:
+
+https://gitlab.com/apparmor/apparmor/-/merge_requests/928
+
+This version of the AppArmor source has this fix applied, so
+we will set DISTRO=suse so we also run the install-suse make
+target and get the apparmor system services.
+
+suse is also still one of the only other RPM-based distributions
+that ships a functional AppArmor.
+
+Signed-off-by: Chris Co <chrco@microsoft.com>
+---
+ parser/Makefile | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/parser/Makefile b/parser/Makefile
+index c39ed30..19eed82 100644
+--- a/parser/Makefile
++++ b/parser/Makefile
+@@ -376,23 +376,22 @@ install-unknown:
+ INSTALLDEPS=arch
+ 
+ ifndef DISTRO
+-DISTRO=$(shell if [ -f /etc/slackware-version ] ; then \
+-	         echo slackware ; \
+-	       elif [ -f /etc/debian_version ] ; then \
+-	         echo debian ;\
+-	       elif which rpm > /dev/null ; then \
+-	         if [ "$$(rpm --eval '0%{?suse_version}')" != "0" ] ; then \
+-	             echo suse ;\
+-	         elif [ "$$(rpm --eval '%{_host_vendor}')" = redhat ] ; then \
+-	            echo redhat ;\
+-	         elif [ "$$(rpm --eval '0%{?fedora}')" != "0" ] ; then \
+-	            echo redhat ;\
+-	         else \
+-	            echo unknown ;\
+-	         fi ;\
+-	       else \
+-	          echo unknown ;\
+-	       fi)
++# To maintain compatability with the previous Mariner 2.0 AppArmor,
++# override the distro detection to set "suse".
++#
++# Previous Mariner 2.0 AppArmor was subjected to the upstream issue
++# where this distro evaluation would always resolve to "suse".
++# This behavior was eventually fixed upstream:
++#
++# https://gitlab.com/apparmor/apparmor/-/merge_requests/928
++# 
++# This version of the AppArmor source has this fix applied, so
++# we will set DISTRO=suse so we also run the install-suse make
++# target and get the apparmor systemd services.
++#
++# suse is also still one of the only other RPM-based distributions
++# that ships a functional AppArmor.
++DISTRO=suse
+ endif
+ 
+ ifdef DISTRO
+-- 
+2.45.4
+

@@ -1,28 +1,28 @@
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
-Name:          usbmuxd
-Version:       1.1.0
-Release:       20%{?dist}
-Summary:       Daemon for communicating with Apple's iOS devices
+Vendor:           Microsoft Corporation
+Distribution:     Azure Linux
+Name:             usbmuxd
+Version:          1.1.1
+Release:          1%{?dist}
+Summary:          Daemon for communicating with Apple's iOS devices
 # All code is dual licenses as GPLv3+ or GPLv2+, except libusbmuxd which is LGPLv2+.
-License:       GPLv3+ or GPLv2+
-URL:           http://www.libimobiledevice.org/
-Source0:       http://www.libimobiledevice.org/downloads/%{name}-%{version}.tar.bz2
+License:          GPLv3+ or GPLv2+
+URL:              https://www.libimobiledevice.org/
+Source0:          https://github.com/libimobiledevice/usbmuxd/releases/download/%{version}/%{name}-%{version}.tar.bz2
+Patch0:           upgrade-fix-1.1.1.patch
 
-BuildRequires: gcc
-BuildRequires: libimobiledevice-devel
-BuildRequires: libplist-devel
-BuildRequires: libusbx-devel
-BuildRequires: systemd
-BuildRequires: systemd-devel
+BuildRequires:    gcc
+BuildRequires:    libimobiledevice-devel
+BuildRequires:    libplist-devel
+BuildRequires:    libusbx-devel
+BuildRequires:    systemd
+BuildRequires:    systemd-devel
 
-Requires(pre): shadow-utils
-Requires(post): systemd
-Requires(preun): systemd
+Requires(pre):    shadow-utils
+Requires(post):   systemd
+Requires(preun):  systemd
 Requires(postun): systemd
 
 BuildRequires: autoconf libtool automake git
-Patch0: 68bdf4be88b128c56eea5117361c4e7b51eb27b1...9af2b12552693a47601347e1eafc1e94132d727e.patch
 
 %description
 usbmuxd is a daemon used for communicating with Apple's iPod Touch, iPhone, 
@@ -70,6 +70,11 @@ exit 0
 %{_datadir}/man/man8/usbmuxd.8.gz
 
 %changelog
+* Tue Nov 18 2025 Sandeep Karambelkar <skarambelkar@microsoft.com> - 1.1.1-1
+- Update to version 1.1.1
+- Add patch to fix the build issue
+- License verified
+
 * Mon Jun 14 2021 Thomas Crain <thcrain@microsoft.com> - 1.1.0-20
 - Add build-time dependency on systemd-devel for systemd pkgconfig files
 

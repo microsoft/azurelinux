@@ -23,7 +23,7 @@ Distribution:   Azure Linux
 Summary:        A bootstrap package for building '%{base_name}'.
 Name:           %{base_name}-bootstrap
 Version:        7.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 URL:            http://javacc.org
@@ -52,7 +52,7 @@ rm -f lib/*.jar
 
 %build
 %{ant} \
-  -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
   jar
 
 %install
@@ -66,6 +66,10 @@ install -pm 0644 target/%{base_name}-%{version}.jar %{buildroot}%{_javadir}/%{ba
 %doc README
 
 %changelog
+* Thu Nov 20 2025 Akarsh Chaudhary <v-akarshc@microsoft.com> - 7.0.4-4
+- Setting compiler.source to value 1.8 to fix the Build.
+- License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-3
 - Splitting as separate 'javacc-bootstrap' package.
 - Switching to using single digit 'Release' tags.

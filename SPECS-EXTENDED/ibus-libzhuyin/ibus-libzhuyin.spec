@@ -1,24 +1,15 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-# This package depends on automagic byte compilation
-# https://fedoraproject.org/wiki/Changes/No_more_automagic_Python_bytecompilation_phase_2
-%global _python_bytecompile_extra 1
-
-%global snapshot 0
 
 Name:       ibus-libzhuyin
-Version:    1.9.1
-Release:    6%{?dist}
+Version:    1.10.4
+Release:    1%{?dist}
 Summary:    New Zhuyin engine based on libzhuyin for IBus
 License:    GPLv2+
 URL:        https://github.com/libzhuyin/ibus-libzhuyin
-Source0:    http://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
-%if %snapshot
-Patch0:     ibus-libzhuyin-1.9.x-HEAD.patch
-%endif
+Source0:    https://downloads.sourceforge.net/libzhuyin/ibus-libzhuyin/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++
-BuildRequires:  perl(File::Find)
 BuildRequires:  gettext-devel
 BuildRequires:  intltool
 BuildRequires:  libtool
@@ -40,11 +31,7 @@ It includes a Chinese Zhuyin (Bopomofo) input method
 based on libzhuyin for IBus.
 
 %prep
-%setup -q
-%if %snapshot
-%patch 0 -p1 -b .head
-%endif
-
+%autosetup
 
 %build
 %configure --disable-static \
@@ -52,17 +39,19 @@ based on libzhuyin for IBus.
            --with-python=python3
 
 # make -C po update-gmo
-make %{?_smp_mflags} V=1
+%make_build
 
 %install
-make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
+%make_install
+
+%py_byte_compile %{python3} $RPM_BUILD_ROOT%{_datadir}/ibus-libzhuyin/setup
 
 %find_lang %{name}
 
 %files -f %{name}.lang
 %license COPYING
 %doc AUTHORS README ChangeLog INSTALL NEWS
-%{_datadir}/appdata/*.appdata.xml
+%{_datadir}/metainfo/*.appdata.xml
 %{_datadir}/glib-2.0/schemas/*.gschema.xml
 %{_datadir}/applications/ibus-setup-libzhuyin.desktop
 %{_libexecdir}/ibus-engine-libzhuyin
@@ -74,8 +63,11 @@ make install DESTDIR=${RPM_BUILD_ROOT} INSTALL="install -p"
 %{_datadir}/ibus-libzhuyin/*symbol.txt
 %{_libdir}/ibus-libzhuyin/
 
-
 %changelog
+* Mon Dec 22 2025 Aditya Singh <v-aditysing@microsoft.com> - 1.10.4-1
+- Upgrade to version 1.10.4
+- License verified.
+
 * Wed Feb 16 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.9.1-6
 - License verified.
 

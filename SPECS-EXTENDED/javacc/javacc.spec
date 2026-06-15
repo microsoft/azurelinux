@@ -21,7 +21,7 @@ Distribution:   Azure Linux
 Summary:        A Parser and Scanner Generator for Java
 Name:           javacc
 Version:        7.0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Group:          Development/Libraries/Java
 URL:            http://javacc.org
@@ -84,7 +84,7 @@ find ./examples -type f -exec sed -i 's/\r//' {} \;
 
 %build
 %{ant} \
-  -Dant.build.javac.source=1.6 -Dant.build.javac.target=1.6 \
+  -Dant.build.javac.source=1.8 -Dant.build.javac.target=1.8 \
   jar javadoc
 
 %install
@@ -99,12 +99,31 @@ install -pm 0644 pom.xml %{buildroot}%{_mavenpomdir}/%{name}.pom
 # javadoc
 install -dm 0755 %{buildroot}%{_javadocdir}/%{name}
 cp -pr target/javadoc/* %{buildroot}%{_javadocdir}/%{name}/
+
+# Move license-like files out of javadoc tree to avoid license warnings
+legaldir=%{buildroot}%{_javadocdir}/%{name}/legal
+
+if [ -d "$legaldir" ]; then
+    # install renamed copies into licensedir
+    install -Dm 0644 $legaldir/LICENSE \
+        %{buildroot}%{_licensedir}/javacc/LICENSE.javadoc
+
+    install -Dm 0644 $legaldir/ADDITIONAL_LICENSE_INFO \
+        %{buildroot}%{_licensedir}/javacc/ADDITIONAL_LICENSE_INFO.javadoc
+
+    # remove the originals to avoid confusion
+    rm -rf $legaldir
+fi
+
+# Remove all javadoc legal directories afterward
+find %{buildroot}%{_javadocdir}/%{name} -type d -name legal
+
 %fdupes -s %{buildroot}%{_javadocdir}
 %fdupes -s www
 %fdupes -s examples
 
 %jpackage_script javacc '' '' javacc javacc true
-ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
+ln -s javacc %{buildroot}%{_bindir}/javacc.sh
 %jpackage_script jjdoc '' '' javacc jjdoc true
 %jpackage_script jjtree '' '' javacc jjtree true
 
@@ -124,9 +143,15 @@ ln -s %{_bindir}/javacc %{buildroot}%{_bindir}/javacc.sh
 
 %files javadoc
 %license LICENSE
-%{_javadocdir}/%{name}
+%doc %{_javadocdir}/%{name}   
+%license %{_licensedir}/javacc/*                 
 
 %changelog
+* Wed Dec 17 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 7.0.4-4
+- Updated javac to use 1.8 to resolve build issues.
+- Fixed license path warnings
+- License verified
+
 * Sat Jul 24 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.0.4-3
 - Splitting as separate 'javacc' package with a build-time dependency on 'javacc-bootstrap'.
 - Switching to using single digit 'Release' tags.

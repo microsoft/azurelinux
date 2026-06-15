@@ -28,6 +28,7 @@ Group:          Development/Libraries/Java
 URL:            https://args4j.kohsuke.org
 Source0:        https://github.com/kohsuke/%{name}/archive/%{name}-site-%{version}.tar.gz
 Source1:        %{name}-build.tar.xz
+Patch0:         change-source-option-to-1.8.patch
 BuildRequires:  ant
 BuildRequires:  fdupes
 BuildRequires:  java-devel
@@ -65,7 +66,7 @@ Group:          Documentation/HTML
 This package contains the API documentation for %{name}.
 
 %prep
-%setup -q -n %{name}-%{name}-site-%{version} -a 1
+%autosetup -a1 -p1 -n %{name}-%{name}-site-%{version}
 
 # removing classpath addition
 sed -i 's/<addClasspath>true/<addClasspath>false/g' %{name}-tools/pom.xml
@@ -136,6 +137,10 @@ cp -r %{name}-tools/target/site/apidocs %{buildroot}%{_javadocdir}/%{name}/%{nam
 %license %{name}/LICENSE.txt
 
 %changelog
+* Fri Jul 18 2025 Sumit Jena <v-sumitjena@microsoft.com> - 2.33.3
+- Patch to change source and target options as build fix
+- License verified
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 2.33-2
 - Converting the 'Release' tag to the '[number].[distribution]' format.
 

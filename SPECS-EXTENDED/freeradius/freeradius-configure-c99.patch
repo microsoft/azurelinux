@@ -1,0 +1,35 @@
+The backtrace_symbols function expects a pointer to an array of void *
+values, not a pointer to an array of a single element. Removing the
+address operator ensures that the right type is used.
+
+This avoids an unconditional failure of this probe with compilers that
+treat incompatible pointer types as a compilation error.
+
+Submitted upstream: <https://github.com/FreeRADIUS/freeradius-server/pull/5246>
+
+diff --git a/configure b/configure
+index ed01ee2bdd912f63..1e6d2284779cdd58 100755
+--- a/configure
++++ b/configure
+@@ -13390,7 +13390,7 @@ main (void)
+ {
+ 
+         void *sym[1];
+-        backtrace_symbols(&sym, sizeof(sym))
++        backtrace_symbols(sym, sizeof(sym))
+   ;
+   return 0;
+ }
+diff --git a/configure.ac b/configure.ac
+index 76320213b51d7bb4..6a689711d6c90483 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2168,7 +2168,7 @@ if test "x$ac_cv_header_execinfo_h" = "xyes"; then
+         #include <execinfo.h>
+       ]], [[
+         void *sym[1];
+-        backtrace_symbols(&sym, sizeof(sym)) ]])],[
++        backtrace_symbols(sym, sizeof(sym)) ]])],[
+         AC_MSG_RESULT(yes)
+         ac_cv_lib_execinfo_backtrace_symbols="yes"
+       ],[

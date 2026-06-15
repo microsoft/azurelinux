@@ -3,7 +3,7 @@ Distribution:   Azure Linux
 
 Name: catatonit
 Version: 0.1.7
-Release: 19%{?dist}
+Release: 28%{?dist}
 Summary: A signal-forwarding process manager for containers
 License: GPLv3+
 URL: https://github.com/openSUSE/catatonit
@@ -13,7 +13,7 @@ BuildRequires: automake
 BuildRequires: file
 BuildRequires: gcc
 BuildRequires: git
-BuildRequires: glibc-static >= 2.38-11%{?dist}
+BuildRequires: glibc-static >= 2.38-20%{?dist}
 BuildRequires: libtool
 BuildRequires: make
 
@@ -61,6 +61,33 @@ ln -s %{_libexecdir}/%{name}/%{name} %{buildroot}%{_libexecdir}/podman/%{name}
 %{_libexecdir}/podman/%{name}
 
 %changelog
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.1.7-28
+- Bump to rebuild with updated glibc
+
+* Wed Mar 25 2026 Aditya Singh <v-aditysing@microsoft.com> - 0.1.7-27
+- Bump to rebuild with updated glibc
+
+* Thu Jan 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.1.7-26
+- Bump to rebuild with updated glibc
+
+* Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 0.1.7-25
+- Bump to rebuild with updated glibc
+
+* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 0.1.7-24
+- Bump to rebuild with updated glibc
+
+* Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.1.7-23
+- Bump to rebuild with updated glibc
+
+* Wed Oct 08 2025 Andrew Phelps <anphel@microsoft.com> - 0.1.7-22
+- Bump to rebuild with updated glibc
+
+* Thu Aug 28 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.1.7-21
+- Bump to rebuild with updated glibc
+
+* Mon Aug 25 2025 Andrew Phelps <anphel@microsoft.com> - 0.1.7-20
+- Bump to rebuild with updated glibc
+
 * Thu May 22 2025 Kanishk Bansal <kanbansal@microsoft.com> - 0.1.7-19
 - Bump to rebuild with updated glibc
 

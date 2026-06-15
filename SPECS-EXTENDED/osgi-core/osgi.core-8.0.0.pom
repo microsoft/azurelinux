@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.osgi</groupId>
+  <artifactId>osgi.core</artifactId>
+  <version>8.0.0</version>
+  <description>OSGi Core Release 8, Interfaces and Classes for use in compiling bundles</description>
+  <name>org.osgi:osgi.core</name>
+  <url>https://www.osgi.org/</url>
+  <organization>
+    <name>OSGi Alliance</name>
+    <url>https://www.osgi.org/</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+      <comments>Apache License, Version 2.0</comments>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://osgi.org/gitweb/build.git</url>
+    <connection>scm:git:https://osgi.org/git/build.git</connection>
+    <developerConnection>scm:git:https://osgi.org/git/build.git</developerConnection>
+    <tag>r8-core-final</tag>
+  </scm>
+  <developers>
+    <developer>
+      <id>osgi</id>
+      <email>info@osgi.org</email>
+      <name>OSGi Alliance</name>
+      <organization>OSGi Alliance</organization>
+      <organizationUrl>https://www.osgi.org/</organizationUrl>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi.annotation</artifactId>
+      <version>7.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,7 +1,7 @@
 Summary:        Fast and Lightweight Log processor and forwarder for Linux, BSD and OSX
 Name:           fluent-bit
-Version:        3.1.9
-Release:        4%{?dist}
+Version:        3.1.10
+Release:        6%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,6 +13,14 @@ Patch2:         CVE-2024-27532.patch
 Patch3:         CVE-2024-50608.patch
 Patch4:         CVE-2024-50609.patch
 Patch5:         CVE-2025-31498.patch
+Patch6:         CVE-2025-54126.patch
+Patch7:         CVE-2025-58749.patch
+Patch8:         CVE-2025-12970.patch
+Patch9:         CVE-2025-12977.patch
+Patch10:        CVE-2025-12969.patch
+Patch11:        CVE-2025-62408.patch
+Patch12:        CVE-2025-63657.patch
+Patch13:        CVE-2025-63652.patch
 BuildRequires:  bison
 BuildRequires:  cmake
 BuildRequires:  cyrus-sasl-devel
@@ -56,7 +64,7 @@ Development files for %{name}
     -DFLB_OUT_TD=Off \
     -DFLB_OUT_ES=Off \
     -DFLB_SHARED_LIB=On \
-%if %{with_check}
+%if 0%{?with_check}
     -DFLB_TESTS_RUNTIME=On \
     -DFLB_TESTS_INTERNAL=On \
 %endif
@@ -87,6 +95,30 @@ Development files for %{name}
 %{_libdir}/fluent-bit/*.so
 
 %changelog
+* Thu Apr 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-6
+- Patch for CVE-2025-63652
+
+* Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-5
+- Patch for CVE-2025-63649, CVE-2025-63656 and CVE-2025-63657
+
+* Wed Dec 17 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-4
+- Patch for CVE-2025-62408
+
+* Mon Dec 08 2025 BinduSri Adabala <v-badabala@microsoft.com> - 3.1.10-3
+- Patch for CVE-2025-12977 and CVE-2025-12969
+
+* Mon Dec 01 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.10-2
+- Patch for CVE-2025-12970
+
+* Mon Dec 01 2025 Kanishk Bansal <kanbansal@microsoft.com> - 3.1.10-1
+- Upgrade to 3.1.10
+
+* Thu Sep 25 2025 Aditya Singh <v-aditysing@microsoft.com> - 3.1.9-6
+- Patch for CVE-2025-58749
+
+* Wed Aug 06 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.1.9-5
+- Patch for CVE-2025-54126
+
 * Fri Apr 11 2025 Ankita Pareek <ankitapareek@microsoft.com> - 3.1.9-4
 - Address CVE-2025-31498 with a patch
 
@@ -96,7 +128,7 @@ Development files for %{name}
 * Tue Dec 10 2024 Sudipta Pandit <sudpandit@microsoft.com> - 3.1.9-2
 - Backport fixes for CVE-2024-27532
 
-* Tue Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
+* Sat Nov 23 2024 Paul Meyer <paul.meyer@microsoft.com> - 3.1.9-1
 - Update to 3.1.9 to enable Lua filter plugin using system luajit library.
 - Remove patches for CVE-2024-25629 and CVE-2024-28182 as they are fixed in 3.1.9.
 - [Jon Slobodzian] Reconciled with Fasttrack/3.0 on 11/23, updated Changelog date from 11/5.

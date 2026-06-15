@@ -1,21 +1,17 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           gnome-desktop-testing
-Version:        2018.1
-Release:        4%{?dist}
+Version:        2021.1
+Release:        1%{?dist}
 Summary:        GNOME test runner for installed tests
 
 License:        LGPLv2+
-URL:            https://live.gnome.org/Initiatives/GnomeGoals/InstalledTests
+URL:            https://gitlab.gnome.org/GNOME/gnome-desktop-testing
 Source0:        https://gitlab.gnome.org/GNOME/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  systemd-devel
-BuildRequires:  pkgconfig(libgsystem)
 BuildRequires:  git automake autoconf libtool
-
-# https://gitlab.gnome.org/GNOME/gnome-desktop-testing/merge_requests/1
-Patch0: 0001-Don-t-crash-on-unknown-command-line-options.patch
 
 %description
 gnome-desktop-testing-runner is a basic runner for tests that are
@@ -34,11 +30,17 @@ make %{?_smp_mflags}
 make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
-%doc COPYING README
+%license COPYING
 %{_bindir}/gnome-desktop-testing-runner
 %{_bindir}/ginsttest-runner
+%{_mandir}/man1/ginsttest-runner.1.gz
+%{_mandir}/man1/gnome-desktop-testing-runner.1.gz
 
 %changelog
+* Wed Dec 24 2025 Aditya Singh <v-aditysing@microsoft.com> - 2021.1-1
+- Upgrade to version 2021.1
+- License verified
+
 * Tue Sep 19 2023 Jon Slobodzian <joslobo@microsoft.com> - 2018.1-4
 - Fix build issue for systemd/systemd-bootstrap confusion
 - License verified

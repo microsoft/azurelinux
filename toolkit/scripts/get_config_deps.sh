@@ -44,6 +44,8 @@ do
 	then
 		echo "$filename"
 	else
-		echo $(realpath "$config_base_dir/$filename")
+		# Use -m to canonicalize paths even if they don't exist
+		# This allows the Makefile to detect missing files and provide a helpful error
+		echo $(realpath -m "$config_base_dir/$filename")
 	fi
 done

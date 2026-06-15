@@ -23,6 +23,8 @@ PACKAGE_BUILD_LIST      ?=
 PACKAGE_REBUILD_LIST    ?=
 ##help:var:PACKAGE_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore during the build. Must not overlap with "PACKAGE_REBUILD_LIST", may overlap with "PACKAGE_BUILD_LIST". Example: PACKAGE_IGNORE_LIST="zlib".
 PACKAGE_IGNORE_LIST     ?=
+##help:var:SOURCE_AUTH_MODE:<mode>=Mode to use for downloading source files for SRPM packing. Valid options: anonymous, azurecli (as defined in the srpmpacker code base).
+SOURCE_AUTH_MODE        ?=
 ##help:var:SRPM_PACK_LIST:<spec_list>=List of space-separated spec folders inside "SPECS_DIR" to analyze for the build. If empty, all items inside the "SPECS_DIR" will be analyzed. Example: SRPM_PACK_LIST="kernel go which".
 SRPM_PACK_LIST          ?=
 ##help:var:TEST_RUN_LIST:<spec_list>=List of space-separated spec folders to consider for package tests. Specs from the listed folders MUST contain the "%check" section. If empty, all testable items from "SRPM_PACK_LIST" will be considered. Will not re-test previously built packages. Example: TEST_RUN_LIST="libguestfs zlib".
@@ -31,6 +33,8 @@ TEST_RUN_LIST           ?=
 TEST_RERUN_LIST         ?=
 ##help:var:TEST_IGNORE_LIST:<spec_list>=List of space-separated spec folders to ignore for package tests. Must not overlap with "TEST_RERUN_LIST", may overlap with "TEST_RUN_LIST". Example: TEST_IGNORE_LIST="acl".
 TEST_IGNORE_LIST        ?=
+##help:var:EXTRA_MACROS_FILES:<file1> <file2>=Space separated list of additional files whose contents will be appended to the versions macro file used during package builds. Example: EXTRA_MACROS_FILES="file1 file2".
+EXTRA_MACROS_FILES ?=
 
 ######## SET INCREMENTAL BUILD FLAGS ########
 
@@ -162,8 +166,13 @@ else
 VALIDATE_TOOLCHAIN_GPG ?= y
 endif
 endif
+##help:var:VALIDATE_IMAGE_GPG:{y,n}=Enable RPM GPG signature verification during package fetching and image builds. When enabled, all packages must be signed - this validates that packages have completed the signing process. Default is 'n' for local development with unsigned packages. Production builds use a multi-step workflow (build packages -> sign packages -> build images) and should set 'y' for the final image build step to enforce that all packages are signed. Keys used for validation can be modified with the IMAGE_GPG_VALIDATION_KEYS variable.
+VALIDATE_IMAGE_GPG ?= n
 
-TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY)
+# Default GPG keys for package GPG validation, used with VALIDATE_TOOLCHAIN_GPG and VALIDATE_IMAGE_GPG
+default_gpg_keys := $(strip $(wildcard $(PROJECT_ROOT)/SPECS/azurelinux-repos/MICROSOFT-*-GPG-KEY) $(wildcard $(toolkit_root)/repos/MICROSOFT-*-GPG-KEY))
+TOOLCHAIN_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
+IMAGE_GPG_VALIDATION_KEYS ?= $(default_gpg_keys)
 
 ######## COMMON MAKEFILE UTILITIES ########
 
@@ -200,6 +209,9 @@ all: toolchain go-tools chroot-tools
 # General help information used by 'help' target; this should be included first so
 # its help will be displayed at the top of the help output.
 include $(SCRIPTS_DIR)/help.mk
+
+# Set-up the Azure configuration for the build
+include $(SCRIPTS_DIR)/azure_config.mk
 
 # Set up for the timestamp feature
 include $(SCRIPTS_DIR)/timestamp.mk

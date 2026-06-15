@@ -1,0 +1,94 @@
+From 873e57548d92eb916656b6304a780f63958aa9fe Mon Sep 17 00:00:00 2001
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Date: Tue, 22 Oct 2024 15:49:01 +0900
+Subject: [PATCH 01/10] virtio-net: Add queues before loading them
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RH-Author: 小田喜陽彦 <None>
+RH-MergeRequest: 299: virtio-net: Add queues before loading them
+RH-Jira: RHEL-69477
+RH-Acked-by: Laurent Vivier <lvivier@redhat.com>
+RH-Acked-by: Jason Wang <jasowang@redhat.com>
+RH-Commit: [1/1] 7bd06d5f9c0f0ce3d211204c404451d7002bb7fb (akihiko.odaki/qemu-kvm)
+
+Call virtio_net_set_multiqueue() to add queues before loading their
+states. Otherwise the loaded queues will not have handlers and elements
+in them will not be processed.
+
+Cc: qemu-stable@nongnu.org
+Fixes: 8c49756825da ("virtio-net: Add only one queue pair when realizing")
+Reported-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+(cherry picked from commit 9379ea9db3c0064fa2787db0794a23a30f7b2d2d)
+---
+ hw/net/virtio-net.c        | 10 ++++++++++
+ hw/virtio/virtio.c         |  7 +++++++
+ include/hw/virtio/virtio.h |  2 ++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index ed33a32877..90d05f94d4 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -3032,6 +3032,15 @@ static void virtio_net_set_multiqueue(VirtIONet *n, int multiqueue)
+     virtio_net_set_queue_pairs(n);
+ }
+ 
++static int virtio_net_pre_load_queues(VirtIODevice *vdev)
++{
++    virtio_net_set_multiqueue(VIRTIO_NET(vdev),
++                              virtio_has_feature(vdev->guest_features, VIRTIO_NET_F_RSS) ||
++                              virtio_has_feature(vdev->guest_features, VIRTIO_NET_F_MQ));
++
++    return 0;
++}
++
+ static int virtio_net_post_load_device(void *opaque, int version_id)
+ {
+     VirtIONet *n = opaque;
+@@ -4010,6 +4019,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+     vdc->guest_notifier_mask = virtio_net_guest_notifier_mask;
+     vdc->guest_notifier_pending = virtio_net_guest_notifier_pending;
+     vdc->legacy_features |= (0x1 << VIRTIO_NET_F_GSO);
++    vdc->pre_load_queues = virtio_net_pre_load_queues;
+     vdc->post_load = virtio_net_post_load_virtio;
+     vdc->vmsd = &vmstate_virtio_net_device;
+     vdc->primary_unplug_pending = primary_unplug_pending;
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 9e10cbc058..10f24a58dd 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -3251,6 +3251,13 @@ virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+         config_len--;
+     }
+ 
++    if (vdc->pre_load_queues) {
++        ret = vdc->pre_load_queues(vdev);
++        if (ret) {
++            return ret;
++        }
++    }
++
+     num = qemu_get_be32(f);
+ 
+     if (num > VIRTIO_QUEUE_MAX) {
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 0fcbc5c0c6..953dfca27c 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -210,6 +210,8 @@ struct VirtioDeviceClass {
+     void (*guest_notifier_mask)(VirtIODevice *vdev, int n, bool mask);
+     int (*start_ioeventfd)(VirtIODevice *vdev);
+     void (*stop_ioeventfd)(VirtIODevice *vdev);
++    /* Called before loading queues. Useful to add queues before loading. */
++    int (*pre_load_queues)(VirtIODevice *vdev);
+     /* Saving and loading of a device; trying to deprecate save/load
+      * use vmsd for new devices.
+      */
+-- 
+2.39.3
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+	<dependencies>
+		<dependency>
+			<packageName>qpid-proton</packageName>
+			<version>0.40.0</version>
+			<licenses>
+				<license>
+					<name>Apache-2.0</name>
+					<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+				</license>
+			</licenses>
+		</dependency>
+	</dependencies>
+</licenseSummary>

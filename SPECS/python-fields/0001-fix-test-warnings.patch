@@ -1,0 +1,29 @@
+From 04a827245d0054b1138a67c6551d7400d8e3c1d5 Mon Sep 17 00:00:00 2001
+From: SumitJenaHCL <v-sumitjena@microsoft.com>
+Date: Tue, 24 Feb 2026 13:48:12 +0530
+Subject: [PATCH] fix test warnings
+
+---
+ conftest.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/conftest.py b/conftest.py
+index 68e639f..1a8bd54 100644
+--- a/conftest.py
++++ b/conftest.py
+@@ -1,8 +1,10 @@
+ import sys
++from pathlib import Path
++
+ PY3 = sys.version_info[0] >= 3
+ 
+-def pytest_ignore_collect(path, config):
+-    basename = path.basename
++def pytest_ignore_collect(collection_path: Path, config):
++    basename = collection_path.name
+ 
+     if not PY3 and "py3" in basename or PY3 and "py2" in basename or 'pytest' in basename:
+         return True
+-- 
+2.45.4
+

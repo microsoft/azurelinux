@@ -38,7 +38,7 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 
 		for provide, nodes := range provideToNodes {
-			err = replaceNodesWithProvides(res, pkgGraph, provide, nodes, rpmFile)
+			err = replaceNodesWithProvides(pkgGraph, provide, nodes, rpmFile)
 			if err != nil {
 				return
 			}
@@ -47,13 +47,16 @@ func InjectMissingImplicitProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph
 		}
 	}
 
-	// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
-	err = pkgGraph.MakeDAG()
+	if didInjectAny {
+		// Make sure the graph is still a directed acyclic graph (DAG) after manipulating it.
+		err = pkgGraph.MakeDAG()
+	}
+
 	return
 }
 
 // replaceNodesWithProvides will replace a slice of nodes with a new node with the given provides in the graph.
-func replaceNodesWithProvides(res *BuildResult, pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
+func replaceNodesWithProvides(pkgGraph *pkggraph.PkgGraph, provides *pkgjson.PackageVer, nodes []*pkggraph.PkgNode, rpmFileProviding string) (err error) {
 	var parentNode *pkggraph.PkgNode
 
 	// Find a local run node that is backed by the same rpm as the one providing the implicit provide.

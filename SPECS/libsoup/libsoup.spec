@@ -4,7 +4,7 @@
 Summary:        libsoup HTTP client/server library
 Name:           libsoup
 Version:        3.4.4
-Release:        7%{?dist}
+Release:        15%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,6 +65,20 @@ Patch15:         CVE-2025-46421.patch
 Patch16:         CVE-2025-32053.patch
 Patch17:         CVE-2025-4476.patch
 Patch18:         CVE-2025-32907.patch
+Patch19:         CVE-2025-4948.patch
+Patch20:         CVE-2025-4969.patch
+Patch21:         CVE-2025-11021.patch
+Patch22:         CVE-2025-12105.patch
+Patch23:         CVE-2025-32049.patch
+Patch24:         CVE-2026-1467.patch
+Patch25:         CVE-2026-1536.patch
+Patch26:         CVE-2026-1761.patch
+Patch27:         CVE-2026-1801.patch
+Patch28:         fix-ssl-test.patch
+Patch29:         CVE-2026-0716.patch
+Patch30:         CVE-2026-2443.patch
+Patch31:         CVE-2026-2369.patch
+Patch32:         CVE-2026-2436.patch
 
 %description
 libsoup is HTTP client/server library for GNOME
@@ -96,7 +110,13 @@ These are the additional language files of libsoup.
     -Dntlm=disabled \
     -Ddoc_tests=false \
     -Ddocs=disabled \
+%if 0%{?with_check}
+    -Dtests=true \
+    -Dgssapi=disabled \
+    -Dpkcs11_tests=disabled
+%else
     -Dtests=false
+%endif
 %meson_build
 
 %install
@@ -106,7 +126,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %find_lang %{name}-%{BaseVersion}
 
 %check
-%meson_test
+%if 0%{?with_check}
+%meson_test --timeout-multiplier 10
+%endif
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -132,6 +154,32 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %defattr(-,root,root)
 
 %changelog
+* Thu Apr 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-15
+- Patch for CVE-2026-2436
+
+* Wed Mar 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-14
+- Patch for CVE-2026-2369
+
+* Tue Feb 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-13
+- Patch for CVE-2026-0716, CVE-2026-2443
+- enable ptests and fix ssl-test
+- fix patch for CVE-2025-32907 & CVE-2026-1536
+
+* Mon Feb 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-12
+- Patch for CVE-2026-1801, CVE-2026-1761, CVE-2026-1536, CVE-2025-32049, CVE-2026-1467
+
+* Tue Dec 23 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-11
+- Patch for CVE-2025-12105
+
+* Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-10
+- Patch for CVE-2025-11021
+
+* Tue Aug 12 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-9
+- Patch for CVE-2025-4969
+
+* Tue Jul 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4.4-8
+- Patch for CVE-2025-4948
+
 * Fri Jun 13 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 3.4.4-7
 - Add patch for CVE-2025-4476
 - Add patch for CVE-2025-32907

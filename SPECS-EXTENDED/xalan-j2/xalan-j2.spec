@@ -228,7 +228,8 @@ update-alternatives --install %{_javadir}/jaxp_transform_impl.jar \
 
 %files
 %defattr(0644,root,root,0755)
-%doc KEYS LICENSE.txt NOTICE.txt
+%doc KEYS
+%license LICENSE.txt NOTICE.txt 
 %{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-serializer-%{version}.jar
@@ -245,7 +246,8 @@ update-alternatives --install %{_javadir}/jaxp_transform_impl.jar \
 
 %files bootstrap
 %defattr(0644,root,root,0755)
-%doc KEYS LICENSE.txt NOTICE.txt
+%doc KEYS
+%license LICENSE.txt NOTICE.txt
 %{_javadir}/%{name}-%{version}.jar
 %{_javadir}/%{name}.jar
 %{_javadir}/%{name}-serializer-%{version}.jar
