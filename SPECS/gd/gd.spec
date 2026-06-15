@@ -125,8 +125,6 @@ export TMPDIR=${TMPDIR:/tmp}
 # https://github.com/libgd/libgd/issues/900
 XFAIL_TESTS="$XFAIL_TESTS tiff/tiff_dpi tiff/tiff_im2im tiff/tiff_read_bw"
 export LD_LIBRARY_PATH=$(pwd)/src/.libs:$(pwd)/.libs:$LD_LIBRARY_PATH
-export LIBRARY_PATH=$(pwd)/src/.libs:$LIBRARY_PATH
-export TESTS_ENVIRONMENT="LD_LIBRARY_PATH=$(pwd)/src/.libs:$(pwd)/.libs"
 %make_build check
 
 %install
@@ -164,7 +162,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 2.3.3-5
-- Fixed %check by setting test library paths and marking unstable TIFF tests as XFAIL.
+- Fixed %%check by setting test library paths and marking unstable TIFF tests as XFAIL.
 
 * Wed May 17 2023 Olivia Crain <oliviacrain@microsoft.com> - 2.3.3-4
 - Bumping release to re-build with newer 'libtiff' libraries.
