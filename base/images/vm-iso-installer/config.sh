@@ -99,6 +99,7 @@ INSTALL_PKGS=(
     azurelinux-release
     "$AZL_REPOS_PKG"
     setup
+    rootfiles
     shadow-utils
     util-linux
     selinux-policy-targeted
