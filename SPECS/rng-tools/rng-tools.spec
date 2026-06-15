@@ -61,7 +61,7 @@ popd
 %{_mandir}/*
 
 %changelog
-* Wed May 13 2026 BinduSri Adabala <v-badabala@microsoft.com> - 6.16.1-2
+* Wed May 13 2026 BinduSri Adabala <v-badabala@microsoft.com> - 6.16-2
 - Disabled rngtestjitter.sh in check section due to unavailable runtime jitter source.
 
 * Mon Nov 06 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.16-1
