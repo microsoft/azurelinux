@@ -261,6 +261,16 @@ stages:
                 -v "$PWD:/workdir" \
                 localhost/azldev-runner \
                 bash -eu -o pipefail -c '
+                  # /workdir (the PR checkout) is owned by root -- the agent
+                  # runs as root -- but this container runs as builduser (uid
+                  # 1000), so git refuses to read .git ("detected dubious
+                  # ownership") when azldev shells out for rpmautospec synthetic
+                  # history. Mark it safe for builduser. (The GitHub render gate
+                  # sidesteps this by building the image with UID=$(id -u) so the
+                  # uids match; here the host is root and we cannot useradd uid
+                  # 0, so we reconcile with safe.directory instead.) Scoped to
+                  # /workdir, not "*", and the container is disposable.
+                  git config --global --add safe.directory /workdir
                   azldev component build -v --local-repo-with-publish ./base/out "$@"
                 ' bash "${build_args[@]}"
               echo "##[endgroup]"
