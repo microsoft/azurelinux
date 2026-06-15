@@ -11,7 +11,7 @@
 Summary:        Signed HvLoader.efi for %{buildarch} systems
 Name:           edk2-hvloader-signed-%{buildarch}
 Version:        %{GITDATE}git%{GITCOMMIT}
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -74,6 +74,9 @@ popd
 /boot/efi/HvLoader.efi
 
 %changelog
+* Mon Jun 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-18
+- Bump release for consistency with edk2 spec.
+
 * Wed May 06 2026 Sumedh Sharma <sumsharma@microsoft.com> - 20240524git3e722403cd16-17
 - Bump release for consistency with edk2 spec.
 
