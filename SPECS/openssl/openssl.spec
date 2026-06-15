@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -68,6 +68,7 @@ Patch80:  0001-Replacing-deprecated-functions-with-NULL-or-highest.patch
 Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
 Patch83:  Allow-NULL-buffer-with-0-bsize.patch
 Patch100: CVE-2026-31791.patch
+Patch101: CVE-2026-34182.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -364,6 +365,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Mon Jun 15 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.7-2
+- Patch CVE-2026-34182
+
 * Fri Apr 24 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.3.7-1
 - Upgrade to 3.3.7
 - Remove unused patches
