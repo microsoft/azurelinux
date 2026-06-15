@@ -13,7 +13,6 @@ URL:            https://www.crummy.com/software/BeautifulSoup/
 Source0:        https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         0001-Skip-the-lxml-tree-builder-s-test_surrogate_in_chara.patch
 Patch1:         0001-Change-the-html.parser-tree-builder-s-code-for-handl.patch
-# https://git.launchpad.net/beautifulsoup/commit/?id=9786a62726de5a8caba10021c4d4a58c8a3e9e3f
 Patch11:        beautifulsoup4-4.14-disable-soupsieve.patch
 BuildArch:      noarch
 # html5lib BR just for test coverage
@@ -106,7 +105,6 @@ python3 -m tox -q --recreate -e py312
 %changelog
 * Mon May 25 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 4.14.3-1
 - Upgrade to 4.14.3 to fix ptest errors.
-- License verified.
 
 * Fri Mar 21 2025 Jyoti kanase <v-jykanase@microsoft.com> -  4.12.3-8
 - Initial Azure Linux import from Fedora 41 (license: MIT).
