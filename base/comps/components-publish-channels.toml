@@ -2568,6 +2568,7 @@ components = [
     "xorg-x11-fonts",
     "xorg-x11-proto-devel",
     "xprop",
+    "xrandr",
     "xrdb",
     "xrestop",
     "xvidcore",
