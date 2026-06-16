@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      13%{?dist}
+Release:      14%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -15,6 +15,7 @@ Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
 Patch2:       CVE-2026-39821.patch
 Patch3:       CVE-2026-33814.patch
+Patch4:       tarfs-fix-ictime-kernel-6.6.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -153,6 +154,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Jun 16 2026 Roaa Sakr <romoh@microsoft.com> - 3.15.0.aks0-14
+- Fix tarfs kernel module build failure with kernel 6.6+ (i_ctime removed from struct inode)
+
 * Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.15.0-aks0-13
 - Bump release to rebuild with rust
 

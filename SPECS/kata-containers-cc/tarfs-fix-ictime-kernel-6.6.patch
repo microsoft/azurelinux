@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Roaa Sakr <romoh@microsoft.com>
+Date: Mon, 16 Jun 2026 00:00:00 +0000
+Subject: [PATCH] tarfs: use inode_set_ctime accessor for kernel 6.6+
+
+Linux kernel 6.6 removed the i_ctime field from struct inode and replaced
+it with accessor functions inode_set_ctime() and inode_get_ctime(). The
+tarfs kernel module directly accessed inode->i_ctime, which fails to
+compile against kernel headers >= 6.6.
+
+Use a LINUX_VERSION_CODE guard to call inode_set_ctime() on 6.6+ while
+preserving backward compatibility with older kernels.
+
+Signed-off-by: Roaa Sakr <romoh@microsoft.com>
+---
+ src/tarfs/tarfs.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/src/tarfs/tarfs.c b/src/tarfs/tarfs.c
+index 92de8bc..47450eb 100644
+--- a/src/tarfs/tarfs.c
++++ b/src/tarfs/tarfs.c
+@@ -319,9 +319,19 @@ static struct inode *tarfs_iget(struct super_block *sb, u64 ino)
+ 
+ 	set_nlink(inode, 1);
+ 
+-	inode->i_mtime.tv_sec = inode->i_atime.tv_sec = inode->i_ctime.tv_sec =
+-		(((u64)disk_inode.hmtime & 0xf) << 32) | le32_to_cpu(disk_inode.lmtime);
+-	inode->i_mtime.tv_nsec = inode->i_atime.tv_nsec = inode->i_ctime.tv_nsec = 0;
++	{
++		u64 ts_sec = (((u64)disk_inode.hmtime & 0xf) << 32) |
++			le32_to_cpu(disk_inode.lmtime);
++
++		inode->i_mtime.tv_sec = inode->i_atime.tv_sec = ts_sec;
++		inode->i_mtime.tv_nsec = inode->i_atime.tv_nsec = 0;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 6, 0)
++		inode_set_ctime(inode, ts_sec, 0);
++#else
++		inode->i_ctime.tv_sec = ts_sec;
++		inode->i_ctime.tv_nsec = 0;
++#endif
++	}
+ 
+ 	inode->i_mode = mode;
+ 	inode->i_size = le64_to_cpu(disk_inode.size);
+-- 
+2.39.0
