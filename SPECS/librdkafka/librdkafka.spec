@@ -5,7 +5,7 @@
 Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        2.3.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
 # files like src/rdfnv1a.c are under Public Domain
