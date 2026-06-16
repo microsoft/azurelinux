@@ -42,12 +42,12 @@ Patch404:       CVE-2026-35385.patch
 Patch405:       CVE-2026-35386.patch
 Patch406:       CVE-2026-35388.patch
 Patch407:       CVE-2026-35414.patch
+Patch408:       CVE-2026-35387.patch
 
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965:       openssh-8.2p1-visibility.patch
-Patch966:       CVE-2026-35387.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -109,7 +109,6 @@ The module is most useful for su and sudo service stacks.
 
 %prep
 %setup -q -a 3
-%patch 966 -p1
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch -P 300 -p2 -b .psaa-build
@@ -132,6 +131,7 @@ popd
 %patch -P 405 -p1 -b .CVE-2026-35386.patch
 %patch -P 406 -p1 -b .CVE-2026-35388.patch
 %patch -P 407 -p1 -b .CVE-2026-35414.patch
+%patch -P 408 -p1 -b .CVE-2026-35387.patch
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
