@@ -5,7 +5,7 @@
 Summary:        The Apache Kafka C library
 Name:           librdkafka
 Version:        2.3.0
-Release:        4%{?dist}
+Release:        3%{?dist}
 # files like src/crc32c.c are under zlib license
 # files like win32/wingetopt.c are under ISC
 # files like src/rdfnv1a.c are under Public Domain
@@ -100,6 +100,9 @@ rm %{buildroot}%{_docdir}/librdkafka/LICENSE %{buildroot}%{_docdir}/librdkafka/L
 %{_libdir}/pkgconfig/rdkafka++-static.pc
 
 %changelog
+* Tue Jun 16 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 2.3.0-3
+- Bump release to build freeradius
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 2.3.0-2
 - Sanitize license files
 

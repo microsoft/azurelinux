@@ -887,6 +887,9 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/kafka/messages-json.conf
 
 %changelog
+* Tue Jun 16 2026 Pawel Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.10-1
+- Upgrade to v3.2.10
+
 * Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.5-4
 - Bumping release to rebuild with new 'net-snmp' libs.
 
