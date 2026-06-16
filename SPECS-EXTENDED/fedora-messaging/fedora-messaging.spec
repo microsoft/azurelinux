@@ -7,7 +7,7 @@
 
 Name:           %{pkgname}
 Version:        3.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Set of tools for using Fedora's messaging infrastructure
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,6 +59,11 @@ Requires:       python3-requests
 Requires:       python3-service-identity
 Requires:       python3-tomli
 Requires:       python3-twisted
+# python3-automat is a runtime dependency of Twisted's reactor, which
+# fedora-messaging (and the koji-fedoramessaging plugin) loads when publishing.
+# Azure Linux's python-twisted does not pull it in, so require it here to keep
+# the plugin functional without modifying the shared python-twisted package.
+Requires:       python3-automat
 %{?python_provide:%python_provide python3-%{pkgname}}
 
 %description -n python3-%{pkgname} %{_description}
@@ -109,6 +114,9 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/LICENSES/GPL-2.0-or-later.txt
 
 %changelog
+* Tue Jun 16 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-2
+- Require python3-automat so the Twisted reactor (used by the messaging plugin) works at runtime.
+
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-1
 - Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.
