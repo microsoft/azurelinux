@@ -1,0 +1,34 @@
+From 02294c746691d1c4683af4550dee35b7143633c3 Mon Sep 17 00:00:00 2001
+From: Vince Perri <5596945+vinceaperri@users.noreply.github.com>
+Date: Tue, 16 Jun 2026 19:03:21 +0000
+Subject: Revert "Revert "templates: Fix user-facing typo with an
+ incorrect use of "it's""""
+
+This reverts the Fedora downstream patch
+"0001-Revert-templates-Fix-user-facing-typo-with-an-incorr.patch", thereby
+re-applying upstream GRUB commit 722737630889607c3b5761f1f5a48f1674cd2821
+("templates: Fix user-facing typo with an incorrect use of \"it's\"").
+
+Restores the correct possessive "Its output" in the os-prober warning
+message in util/grub.d/30_os-prober.in. Applied as a trailing patch after
+Patch0383/Patch0384 so the full os-prober block matches upstream.
+---
+ util/grub.d/30_os-prober.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/util/grub.d/30_os-prober.in b/util/grub.d/30_os-prober.in
+index c08dfc4..cae0530 100644
+--- a/util/grub.d/30_os-prober.in
++++ b/util/grub.d/30_os-prober.in
+@@ -36,7 +36,7 @@ if ! command -v os-prober > /dev/null || ! command -v linux-boot-prober > /dev/n
+   exit 0
+ fi
+ 
+-grub_warn "$(gettext_printf "os-prober will be executed to detect other bootable partitions.\nIt's output will be used to detect bootable binaries on them and create new boot entries.")"
++grub_warn "$(gettext_printf "os-prober will be executed to detect other bootable partitions.\nIts output will be used to detect bootable binaries on them and create new boot entries.")"
+ 
+ OSPROBED="`os-prober | tr ' ' '^' | paste -s -d ' '`"
+ if [ -z "${OSPROBED}" ] ; then
+-- 
+2.45.4
+
