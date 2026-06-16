@@ -257,6 +257,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.console-setup]
 [components.container-selinux]
 [components.containerd]
+[components.containernetworking-plugins]
 [components.containers-common]
 [components.convmv]
 [components.corosync]

@@ -180,6 +180,7 @@ components = [
     "conntrack-tools",
     "container-selinux",
     "containerd",
+    "containernetworking-plugins",
     "containers-common",
     "convmv",
     "coreutils",
