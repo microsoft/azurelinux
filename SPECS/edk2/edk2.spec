@@ -56,7 +56,7 @@ Distribution:   Azure Linux
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    17%{?dist}
+Release:    18%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -152,6 +152,11 @@ Patch1014: CVE-2026-22796.patch
 Patch1015: CVE-2025-69419.patch
 Patch1016: CVE-2026-28389.patch
 Patch1017: CVE-2026-28390.patch
+Patch1018: CVE-2026-34180.patch
+Patch1019: CVE-2026-42767.patch
+Patch1020: CVE-2026-45445.patch
+Patch1021: CVE-2026-45447.patch
+Patch1022: CVE-2026-9076.patch
 
 # python3-devel and libuuid-devel are required for building tools.
 # python3-devel is also needed for varstore template generation and
@@ -799,6 +804,9 @@ done
 %endif
 
 %changelog
+* Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-18
+- Patch for CVE-2026-9076, CVE-2026-45447, CVE-2026-45445, CVE-2026-42767, CVE-2026-34180
+
 * Wed May 06 2026 Sumedh Sharma <sumsharma@microsoft.com> - 20240524git3e722403cd16-17
 - Enable build_aarch64 to build arm64 firmware bins
 - Disable OVMF compilation on aarch64 hosts due to missing cross gcc-x86_64-linux-gnu
