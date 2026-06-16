@@ -3,13 +3,15 @@
 Summary:        Python wrapper module around the OpenSSL library
 Name:           pyOpenSSL
 Version:        24.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://github.com/pyca/pyopenssl
 Source0:        %{pypi_source %{srcname} %{version}}
+Patch0:         CVE-2026-27448.patch
+Patch1:         CVE-2026-27459.patch
 BuildArch:      noarch
 
 %description
@@ -61,6 +63,9 @@ LANG=en_US.UTF-8  PYTHONPATH=%{buildroot}%{python3_sitelib} \
 %{python3_sitelib}/*
 
 %changelog
+* Thu Mar 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.2.1-2
+- Patch for CVE-2026-27459, CVE-2026-27448
+
 * Fri Aug 16 2023 Daniel McIlvaney <damcilva@microsoft.com> - 24.2.1-1
 - Selectively take upstream changes from F41 to update to 24.2.1 to support our
     version of python-cryptography.

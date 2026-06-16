@@ -27,9 +27,9 @@
 #
 
 %if 0%{azl}
-%global target_kernel_version_full %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}-%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_azl_build_kernel_version %(/bin/rpm -q --queryformat '%{RPMTAG_VERSION}' $(/bin/rpm -q --whatprovides kernel-headers))
-%global target_kernel_release %(/bin/rpm -q --queryformat '%{RPMTAG_RELEASE}' $(/bin/rpm -q --whatprovides kernel-headers) | /bin/cut -d . -f 1)
+%global target_azl_build_kernel_version %azl_kernel_version
+%global target_kernel_release %azl_kernel_release
+%global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
 %global target_kernel_version_full f.a.k.e
@@ -67,7 +67,22 @@
 %if (0%{?rhel} >= 10)
 %global _hardening_gcc_ldflags %{nil}
 %global _gcc_lto_cflags %{nil}
+%global _legacy_options -fcommon -fno-exceptions
 %endif
+
+
+%if (0%{?fedora} >= 39)
+%global _hardening_gcc_cflags %{nil}
+%global _gcc_lto_cflags %{nil}
+# A way to override -fexceptions:
+%global _legacy_options -fcommon -fno-exceptions
+%endif
+
+%if %{defined azl3}
+# Yet another method of overriding -fexceptions:
+%global _frame_pointers_cflags	 -fno-exceptions %{?_include_frame_pointers:-fno-omit-frame-pointer}
+%endif
+
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -90,10 +105,9 @@
 %{!?KERNEL_SOURCES: %global KERNEL_SOURCES /lib/modules/%{KVERSION}/source}
 
 %{!?_name: %global _name mlnx-ofa_kernel}
-%{!?_version: %global _version 25.07}
-%{!?_release: %global _release OFED.25.07.0.9.7.1}
+%{!?_release: %global _release OFED.26.01.1.0.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-%global MLNX_OFA_DRV_SRC 24.10-0.7.0
+%global MLNX_OFA_DRV_SRC 26.01-1.0.0
 
 %global utils_pname %{_name}
 %global devel_pname %{_name}-devel
@@ -106,15 +120,15 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel
-Version:	 25.07
+Version:	 26.01
 Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
-Source0:         %{_distro_sources_url}/%{_name}-%{_version}.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
+Source0:         %{_distro_sources_url}/%{_name}-%{version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
 Vendor:          Microsoft Corporation
@@ -131,6 +145,7 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: kmod-mellanox
 
 BuildRequires:  kernel-devel = %{target_kernel_version_full}
 BuildRequires:  kernel-headers = %{target_kernel_version_full}
@@ -153,10 +168,18 @@ Requires: module-init-tools
 Requires: lsof
 Requires: ofed-scripts
 
-
+%if %{IS_RHEL_VENDOR}
+# For the symlink /etc/init.d -> /etc/rc.d/init.d that conflicts with openibd
+Requires: chkconfig
+%endif
 %if "%{KMP}" == "1"
 BuildRequires: %kernel_module_package_buildreqs
 BuildRequires: /usr/bin/perl
+%endif
+%if "%{_vendor}" == "suse"
+%if 0%{?sle_version} >= 150600
+Requires: systemd-sysvcompat
+%endif
 %endif
 %description
 InfiniBand "verbs", Access Layer  and ULPs.
@@ -302,7 +325,8 @@ drivers against it.
 %{!?install_mod_dir: %global install_mod_dir updates}
 
 %prep
-%setup -n %{_name}-%{_version}
+%setup -n %{_name}-%{version}
+ofed_scripts/ofed_patch.sh
 set -- *
 mkdir source
 mv "$@" source/
@@ -660,7 +684,7 @@ fi
 #end of post uninstall
 
 %post -n %{devel_pname}
-if [ -d "%{_prefix}/src/ofa_kernel/default" -a $1 -gt 1 ]; then
+if [ -d "%{_prefix}/src/ofa_kernel/default" ] && [ ! -L "%{_prefix}/src/ofa_kernel/default" ] && [ $1 -gt 1 ]; then
 	touch %{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}.missing_link
 	# Will run update-alternatives in posttrans
 else
@@ -766,6 +790,12 @@ update-alternatives --remove \
 %{_prefix}/src/mlnx-ofa_kernel-%version
 
 %changelog
+* Mon May 11 2026 Azure Linux Team - 26.01-1
+- Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
+
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-2
+- Tweak specs to use dynamic versioning for kernel.
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update source path

@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        14%{?dist}
+Release:        18%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -73,6 +73,13 @@ Patch14:        CVE-2025-11065.patch
 Patch15:        CVE-2025-30204.patch
 Patch16:        CVE-2025-47911.patch
 Patch17:        CVE-2025-58190.patch
+Patch18:        CVE-2026-41602.patch
+Patch19:        CVE-2026-39821.patch
+Patch20:        CVE-2026-42506.patch
+Patch21:        CVE-2026-27136.patch
+Patch22:        CVE-2026-25680.patch
+Patch23:        CVE-2026-25681.patch
+Patch24:        CVE-2026-42502.patch
 BuildRequires:  clang
 BuildRequires:  golang
 BuildRequires:  kernel-headers
@@ -162,6 +169,18 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-18
+- Bump release to rebuild with rust
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-17
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
+* Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-16
+- Patch for CVE-2026-41602
+
+* Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-15
+- Bump release to rebuild with rust
+
 * Mon Feb 23 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.7.5-14
 - Bump release to rebuild with rust
 

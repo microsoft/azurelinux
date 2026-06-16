@@ -1,7 +1,7 @@
 Summary:        Contains programs for compressing and decompressing files
 Name:           bzip2
 Version:        1.0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 URL:            https://sourceware.org/bzip2/index.html
 Group:          System Environment/Base
@@ -11,6 +11,7 @@ Source0:        https://sourceware.org/pub/%{name}/%{name}-%{version}.tar.gz
 Provides:       libbz2.so.1()(64bit)
 Patch0:         https://www.linuxfromscratch.org/patches/lfs/11.0/bzip2-1.0.8-install_docs-1.patch
 Patch1:         cflags-fix.patch
+Patch2:         CVE-2026-42250.patch
 Requires:       bzip2-libs = %{version}-%{release}
 Conflicts:      toybox
 
@@ -94,6 +95,9 @@ make %{?_smp_mflags} check
 %{_libdir}/libbz2.so.*
 
 %changelog
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.8-2
+- Patch for CVE-2026-42250
+
 * Thu Oct 14 2021 Jon Slobodzian <joslobo@microsoft.com> - 1.0.8-1
 - Upgrade to 1.0.8 to fix CVE-2016-3189
 

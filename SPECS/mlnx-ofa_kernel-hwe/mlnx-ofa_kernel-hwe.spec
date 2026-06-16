@@ -27,9 +27,9 @@
 #
 
 %if 0%{azl}
-# hard code versions due to ADO bug:58993948
-%global target_azl_build_kernel_version 6.12.57.1
-%global target_kernel_release 5
+
+%global target_azl_build_kernel_version %azl_kernel_hwe_version
+%global target_kernel_release %azl_kernel_hwe_release
 %global target_kernel_version_full %{target_azl_build_kernel_version}-%{target_kernel_release}%{?dist}
 %global release_suffix _%{target_azl_build_kernel_version}.%{target_kernel_release}
 %else
@@ -66,7 +66,22 @@
 %if (0%{?rhel} >= 10)
 %global _hardening_gcc_ldflags %{nil}
 %global _gcc_lto_cflags %{nil}
+%global _legacy_options -fcommon -fno-exceptions
 %endif
+
+
+%if (0%{?fedora} >= 39)
+%global _hardening_gcc_cflags %{nil}
+%global _gcc_lto_cflags %{nil}
+# A way to override -fexceptions:
+%global _legacy_options -fcommon -fno-exceptions
+%endif
+
+%if %{defined azl3}
+# Yet another method of overriding -fexceptions:
+%global _frame_pointers_cflags	 -fno-exceptions %{?_include_frame_pointers:-fno-omit-frame-pointer}
+%endif
+
 
 # %{!?KVERSION: %global KVERSION %(uname -r)}
 %{!?KVERSION: %global KVERSION %{target_kernel_version_full}}
@@ -85,10 +100,10 @@
 
 %global base_name mlnx-ofa_kernel
 %{!?_name: %global _name %{base_name}-hwe}
-%{!?_version: %global _version 25.07}
-%{!?_release: %global _release OFED.25.07.0.9.7.1}
+%{!?_version: %global _version 26.01}
+%{!?_release: %global _release OFED.26.01.1.0.0.1}
 %global _kmp_rel %{_release}%{?_kmp_build_num}%{?_dist}
-%global MLNX_OFA_DRV_SRC 24.10-0.7.0
+%global MLNX_OFA_DRV_SRC 26.01-1.0.0
 
 %global utils_pname %{name}
 %global devel_pname %{name}-devel
@@ -101,14 +116,14 @@
 
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
-Version:	 25.07
-Release:	 5%{release_suffix}%{?dist}
+Version:	 26.01
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/mlnx-ofa_kernel-%{_version}.tgz
 
 BuildRoot:	 /var/tmp/%{name}-%{version}-build
@@ -283,7 +298,7 @@ The driver sources are located at: http://www.mellanox.com/downloads/ofed/
 
 %prep
 %setup -n mlnx-ofa_kernel-%{_version}
-
+ofed_scripts/ofed_patch.sh
 set -- *
 mkdir source
 mv "$@" source/
@@ -392,7 +407,7 @@ fi
 %endif # end KMP=1
 
 %post -n %{devel_pname}
-if [ -d "%{_prefix}/src/ofa_kernel/default" -a $1 -gt 1 ]; then
+if [ -d "%{_prefix}/src/ofa_kernel/default" ] && [ ! -L "%{_prefix}/src/ofa_kernel/default" ] && [ $1 -gt 1 ]; then
 	touch %{_prefix}/src/ofa_kernel/%{_arch}/%{KVERSION}.missing_link
 	# Will run update-alternatives in posttrans
 else
@@ -449,6 +464,18 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Mon May 11 2026 Azure Linux Team - 26.01-1_6.18.31.1.1
+- Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
+
+* Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 25.07-8_6.12.57.1.6
+- Tweak specs to use dynamic versioning for kernel
+
+* Fri Mar 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 25.07-7_6.12.78.2.1
+- Bump release to rebuild for new kernel release
+
+* Fri Mar 06 2026 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-6_6.12.57.1.6
+- Bump to match kernel-hwe.
+
 * Tue Feb 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 25.07-5_6.12.57.1.5
 - Bump release to match kernel-hwe
 

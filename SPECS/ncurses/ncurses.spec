@@ -3,7 +3,7 @@
 Summary:        Libraries for terminal handling of character screens
 Name:           ncurses
 Version:        6.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,7 @@ URL:            https://invisible-island.net/ncurses/
 # Use a nopatch file to clear the CVE after choosing the correct patch level
 #
 Source0:        https://invisible-mirror.net/archives/%{name}/current/%{name}-%{version}-%{patchlevel}.tgz
+Patch0:         CVE-2025-69720.patch
 Requires:       %{name}-libs = %{version}-%{release}
 
 
@@ -234,6 +235,9 @@ xz NEWS
 %files term -f terms.term
 
 %changelog
+* Wed Mar 25 2026 Archana Shettigar <v-shettigara@microsoft.com> - 6.4-3
+- Patch CVE-2025-69720
+
 * Tue Nov 28 2023 Andrew Phelps <anphel@microsoft.com> - 6.4-2
 - Update to version 6.4-20231125
 

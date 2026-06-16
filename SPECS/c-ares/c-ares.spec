@@ -1,7 +1,7 @@
 Summary:        A library that performs asynchronous DNS operations
 Name:           c-ares
 Version:        1.30.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -65,10 +65,6 @@ if [[ $? -ne 0 ]]; then
 	check_status=1
 fi
 
-${TOOLSBIN}/acountry www.google.com
-if [[ $? -ne 0 ]]; then
-	check_status=1
-fi
 
 ${TOOLSBIN}/ahost www.google.com
 if [[ $? -ne 0 ]]; then
@@ -120,6 +116,9 @@ fi
 %{_mandir}/man3/ares_*
 
 %changelog
+* Mon Apr 27 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>- 1.30.0-2
+- Fixed ptest by removing acountry test from %check since it is removed upstream and no longer built.
+
 * Tue Jun 25 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.30.0-1
 - Upgrade to v1.30.0 to fix CVE-2024-25629
 

@@ -1,0 +1,47 @@
+From ee56f2df58941892c102869290a52450f9727f83 Mon Sep 17 00:00:00 2001
+From: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+Date: Tue, 12 Aug 2025 15:10:05 +0200
+Subject: [PATCH 03/20] mod: add flatcar/ignition@0.36.2
+
+it's required for Ignition conversion.
+
+Signed-off-by: Mathieu Tortuyaux <mtortuyaux@microsoft.com>
+---
+ go.mod | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/go.mod b/go.mod
+index a34e8f5e..be20c337 100644
+--- a/go.mod
++++ b/go.mod
+@@ -15,6 +15,7 @@ require (
+ 	github.com/coreos/go-semver v0.3.1
+ 	github.com/coreos/go-systemd/v22 v22.5.0
+ 	github.com/coreos/vcontext v0.0.0-20230201181013-d72178a18687
++	github.com/flatcar/ignition v0.36.2
+ 	github.com/google/renameio/v2 v2.0.0
+ 	github.com/google/uuid v1.6.0
+ 	github.com/mdlayher/vsock v1.2.1
+@@ -44,9 +45,11 @@ require (
+ 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0 // indirect
+ 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.51.0 // indirect
+ 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.51.0 // indirect
++	github.com/ajeddeloh/go-json v0.0.0-20160803184958-73d058cf8437 // indirect
+ 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+ 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
+ 	github.com/coreos/go-json v0.0.0-20230131223807-18775e0fb4fb // indirect
++	github.com/coreos/go-systemd v0.0.0-20181031085051-9002847aa142 // indirect
+ 	github.com/davecgh/go-spew v1.1.1 // indirect
+ 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
+ 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
+@@ -77,6 +80,7 @@ require (
+ 	go.opentelemetry.io/otel/sdk v1.36.0 // indirect
+ 	go.opentelemetry.io/otel/sdk/metric v1.36.0 // indirect
+ 	go.opentelemetry.io/otel/trace v1.36.0 // indirect
++	go4.org v0.0.0-20160314031811-03efcb870d84 // indirect
+ 	golang.org/x/crypto v0.39.0 // indirect
+ 	golang.org/x/sync v0.15.0 // indirect
+ 	golang.org/x/text v0.26.0 // indirect
+-- 
+2.49.1
+

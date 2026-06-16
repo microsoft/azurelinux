@@ -2,7 +2,7 @@
 Summary:        Interfaces for Python
 Name:           python-zope-interface
 Version:        6.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ZPLv2.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,7 @@ URL:            https://github.com/zopefoundation/zope.interface
 Source0:        https://pypi.python.org/packages/source/z/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-zope-event
 %endif
 
 %description
@@ -40,7 +41,11 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %py3_install
 
 %check
-%python3 setup.py test
+pip3 install zope.testing
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    %{python3} -m unittest discover -v \
+    -s %{buildroot}%{python3_sitelib}/zope/interface \
+    -t %{buildroot}%{python3_sitelib}
 
 %files -n python3-zope-interface
 %defattr(-,root,root,-)
@@ -48,6 +53,9 @@ For detailed documentation, please see http://docs.zope.org/zope.interface
 %{python3_sitelib}/*
 
 %changelog
+* Thu May 28 2026 Vijayender Putta <v-vijputta@microsoft.com> - 6.1-2
+- Fix ptest error
+
 * Wed Feb 14 2024 Rohit Rawat <rohitrawat@microsoft.com> - 6.1-1
 - Upgrade to 6.1
 

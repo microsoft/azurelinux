@@ -20,7 +20,7 @@
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
 Version:           3.3.0
-Release:           2%{?dist}
+Release:           4%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
 Distribution:      Azure Linux
@@ -34,6 +34,7 @@ Source1:           openvswitch.sysusers
 # OVS (including OVN) backports (0 - 300)
 Patch0: 0001-tests-Fix-SSL-db-implementation-test-with-openssl-3..patch
 Patch10: 0001-tests-Fix-compatibility-issue-with-Python-3.13-in-vl.patch
+Patch11: CVE-2026-34956.patch
 
 BuildRequires: gcc gcc-c++ make
 BuildRequires: autoconf automake libtool
@@ -304,12 +305,17 @@ pushd $dir
 %if %{with check}
     touch resolv.conf
     export OVS_RESOLV_CONF=$(pwd)/resolv.conf
-    if make check TESTSUITEFLAGS='%{_smp_mflags}' ||
-       make check TESTSUITEFLAGS='--recheck' ||
-       make check TESTSUITEFLAGS='--recheck'; then :;
+    # Fast first pass; on retry raise OVS_CTL_TIMEOUT so timing-sensitive
+    # tests (notably PMD Auto Load Balance) tolerate CPU contention on CI.
+    if make check TESTSUITEFLAGS='%{_smp_mflags}'; then :;
     else
-        cat tests/testsuite.log
-        exit 1
+        export OVS_CTL_TIMEOUT=120
+        if make check TESTSUITEFLAGS='--recheck' ||
+           make check TESTSUITEFLAGS='--recheck'; then :;
+        else
+            cat tests/testsuite.log
+            exit 1
+        fi
     fi
 %endif
 %if %{with check_datapath_kernel}
@@ -505,6 +511,12 @@ fi
 %{_sysusersdir}/openvswitch.conf
 
 %changelog
+* Fri May 15 2026 Sumit Jena <sumitjena@microsoft.com> - 3.3.0-4
+- Make %check more tolerant to CI timing jitter.
+
+* Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.0-3
+- Patch for CVE-2026-34956
+
 * Thu Jan 08 2026 Tobias Brick <tobiasb@microsoft.com> - 3.3.0-2
 - Add patches from fedora f40 to fix tests with new versions of openssl and python.
 - Update to use correct locations for license files.

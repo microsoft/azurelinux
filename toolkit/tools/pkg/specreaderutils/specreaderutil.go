@@ -188,14 +188,18 @@ func CreateChroot(chrootName, workerTar, buildDir, specsDir string, opts ...Chro
 
 	// If this is not a regular build then copy in all of the SPECs since there are no bind mounts.
 	if !buildpipeline.IsRegularBuild() {
-		dirsToCopy := []string{specsDir, cfg.SrpmsDir}
+		dirsToCopy := []string{specsDir}
+		if cfg.SrpmsDir != "" {
+			dirsToCopy = append(dirsToCopy, cfg.SrpmsDir)
+		}
 		for _, dir := range dirsToCopy {
 			dirInChroot := filepath.Join(chroot.RootDir(), dir)
 			err = directory.CopyContents(dir, dirInChroot)
 			if err != nil {
+				logger.Log.Errorf("Failed to copy directory (%s) into chroot at (%s): %s", dir, dirInChroot, err)
 				closeErr := chroot.Close(leaveFilesOnDisk)
 				if closeErr != nil {
-					logger.Log.Errorf("Failed to close chroot, err: %s", err)
+					logger.Log.Errorf("Failed to close chroot, err: %s", closeErr)
 				}
 				return
 			}

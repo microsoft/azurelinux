@@ -1,0 +1,23 @@
+From 7c0798d6de3467603dff42253448e36aded7f5ac Mon Sep 17 00:00:00 2001
+From: Steffen Ullrich <github@maulwuff.de>
+Date: Fri, 22 Dec 2023 08:07:20 +0100
+Subject: [PATCH] fixed test fail #147 with OpenSSL 3.2
+
+OpenSSL >= 3.2 prepends a TLS Alert record to the server's plaintext
+"This server is SSL only" reply, breaking the exact-match assertion in
+t/core.t. Switch the assertion to a regex match.
+
+Upstream-reference: https://github.com/noxxi/p5-io-socket-ssl/commit/7c0798d6de3467603dff42253448e36aded7f5ac
+---
+--- a/t/core.t
++++ b/t/core.t
+@@ -74,7 +74,8 @@
+ 	LocalAddr => $localip,
+     );
+     print $client "Test\n";
+-    is( <$client>, "This server is SSL only", "Client non-SSL connection");
++
++    like( <$client>, qr/This server is SSL only/, "Client non-SSL connection");
+     close $client;
+ 
+     $client = IO::Socket::SSL->new(

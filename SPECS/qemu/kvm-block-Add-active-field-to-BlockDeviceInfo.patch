@@ -1,0 +1,317 @@
+From 454a498569318365a16ed65bd2110daef5bb3fc3 Mon Sep 17 00:00:00 2001
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 4 Feb 2025 22:13:52 +0100
+Subject: [PATCH 08/23] block: Add 'active' field to BlockDeviceInfo
+
+RH-Author: Kevin Wolf <kwolf@redhat.com>
+RH-MergeRequest: 339: QMP command for block device reactivation after migration
+RH-Jira: RHEL-54296 RHEL-78397
+RH-Acked-by: Eric Blake <eblake@redhat.com>
+RH-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+RH-Commit: [7/22] 6309d1a9ac2a7a21013cfe71dc40474cbdc89464 (kmwolf/centos-qemu-kvm)
+
+This allows querying from QMP (and also HMP) whether an image is
+currently active or inactive (in the sense of BDRV_O_INACTIVE).
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Fabiano Rosas <farosas@suse.de>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20250204211407.381505-2-kwolf@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit aec81049c2daa8a97b89e59f03733b21ae0f8c2d)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c                            |  4 ++++
+ block/monitor/block-hmp-cmds.c     |  5 +++--
+ block/qapi.c                       |  1 +
+ include/block/block-global-state.h |  3 +++
+ qapi/block-core.json               |  6 +++++-
+ tests/qemu-iotests/184.out         |  2 ++
+ tests/qemu-iotests/191.out         | 16 ++++++++++++++++
+ tests/qemu-iotests/273.out         |  5 +++++
+ 8 files changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/block.c b/block.c
+index c317de9eaa..c94d78eefd 100644
+--- a/block.c
++++ b/block.c
+@@ -6824,6 +6824,10 @@ void bdrv_init_with_whitelist(void)
+     bdrv_init();
+ }
+ 
++bool bdrv_is_inactive(BlockDriverState *bs) {
++    return bs->open_flags & BDRV_O_INACTIVE;
++}
++
+ int bdrv_activate(BlockDriverState *bs, Error **errp)
+ {
+     BdrvChild *child, *parent;
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index bdf2eb50b6..cc832549e1 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -630,11 +630,12 @@ static void print_block_info(Monitor *mon, BlockInfo *info,
+     }
+ 
+     if (inserted) {
+-        monitor_printf(mon, ": %s (%s%s%s)\n",
++        monitor_printf(mon, ": %s (%s%s%s%s)\n",
+                        inserted->file,
+                        inserted->drv,
+                        inserted->ro ? ", read-only" : "",
+-                       inserted->encrypted ? ", encrypted" : "");
++                       inserted->encrypted ? ", encrypted" : "",
++                       inserted->active ? "" : ", inactive");
+     } else {
+         monitor_printf(mon, ": [not inserted]\n");
+     }
+diff --git a/block/qapi.c b/block/qapi.c
+index 2b5793f1d9..709170e63d 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -63,6 +63,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+     info->file                   = g_strdup(bs->filename);
+     info->ro                     = bdrv_is_read_only(bs);
+     info->drv                    = g_strdup(bs->drv->format_name);
++    info->active                 = !bdrv_is_inactive(bs);
+     info->encrypted              = bs->encrypted;
+ 
+     info->cache = g_new(BlockdevCacheInfo, 1);
+diff --git a/include/block/block-global-state.h b/include/block/block-global-state.h
+index bd7cecd1cf..a826bf5f78 100644
+--- a/include/block/block-global-state.h
++++ b/include/block/block-global-state.h
+@@ -175,6 +175,9 @@ BlockDriverState * GRAPH_RDLOCK
+ check_to_replace_node(BlockDriverState *parent_bs, const char *node_name,
+                       Error **errp);
+ 
++
++bool GRAPH_RDLOCK bdrv_is_inactive(BlockDriverState *bs);
++
+ int no_coroutine_fn GRAPH_RDLOCK
+ bdrv_activate(BlockDriverState *bs, Error **errp);
+ 
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index aa40d44f1d..92af032744 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -486,6 +486,10 @@
+ # @backing_file_depth: number of files in the backing file chain
+ #     (since: 1.2)
+ #
++# @active: true if the backend is active; typical cases for inactive backends
++#     are on the migration source instance after migration completes and on the
++#     destination before it completes. (since: 10.0)
++#
+ # @encrypted: true if the backing device is encrypted
+ #
+ # @detect_zeroes: detect and optimize zero writes (Since 2.1)
+@@ -556,7 +560,7 @@
+ { 'struct': 'BlockDeviceInfo',
+   'data': { 'file': 'str', '*node-name': 'str', 'ro': 'bool', 'drv': 'str',
+             '*backing_file': 'str', 'backing_file_depth': 'int',
+-            'encrypted': 'bool',
++            'active': 'bool', 'encrypted': 'bool',
+             'detect_zeroes': 'BlockdevDetectZeroesOptions',
+             'bps': 'int', 'bps_rd': 'int', 'bps_wr': 'int',
+             'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
+index e8f631f853..52692b6b3b 100644
+--- a/tests/qemu-iotests/184.out
++++ b/tests/qemu-iotests/184.out
+@@ -26,6 +26,7 @@ Testing:
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 1073741824,
+@@ -59,6 +60,7 @@ Testing:
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 1073741824,
+                 "filename": "null-co://",
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+index c3309e4bc6..2a72ca7106 100644
+--- a/tests/qemu-iotests/191.out
++++ b/tests/qemu-iotests/191.out
+@@ -114,6 +114,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 67108864,
+@@ -155,6 +156,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT.ovl2",
+@@ -183,6 +185,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 67108864,
+@@ -224,6 +227,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT",
+@@ -252,6 +256,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 67108864,
+@@ -293,6 +298,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.IMGFMT.mid",
+@@ -321,6 +327,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 67108864,
+                 "filename": "TEST_DIR/t.IMGFMT.base",
+@@ -350,6 +357,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.IMGFMT.base",
+@@ -521,6 +529,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 67108864,
+@@ -562,6 +571,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT.ovl2",
+@@ -590,6 +600,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "backing-image": {
+@@ -642,6 +653,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT.ovl3",
+@@ -670,6 +682,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 67108864,
+                 "filename": "TEST_DIR/t.IMGFMT.base",
+@@ -699,6 +712,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 393216,
+                 "filename": "TEST_DIR/t.IMGFMT.base",
+@@ -727,6 +741,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 67108864,
+@@ -768,6 +783,7 @@ wrote 65536/65536 bytes at offset 1048576
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT",
+diff --git a/tests/qemu-iotests/273.out b/tests/qemu-iotests/273.out
+index 71843f02de..c19753c685 100644
+--- a/tests/qemu-iotests/273.out
++++ b/tests/qemu-iotests/273.out
+@@ -23,6 +23,7 @@ Testing: -blockdev file,node-name=base,filename=TEST_DIR/t.IMGFMT.base -blockdev
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "backing-image": {
+@@ -74,6 +75,7 @@ Testing: -blockdev file,node-name=base,filename=TEST_DIR/t.IMGFMT.base -blockdev
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT",
+@@ -102,6 +104,7 @@ Testing: -blockdev file,node-name=base,filename=TEST_DIR/t.IMGFMT.base -blockdev
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "backing-image": {
+                     "virtual-size": 197120,
+@@ -142,6 +145,7 @@ Testing: -blockdev file,node-name=base,filename=TEST_DIR/t.IMGFMT.base -blockdev
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT.mid",
+@@ -170,6 +174,7 @@ Testing: -blockdev file,node-name=base,filename=TEST_DIR/t.IMGFMT.base -blockdev
+         {
+             "iops_rd": 0,
+             "detect_zeroes": "off",
++            "active": true,
+             "image": {
+                 "virtual-size": 197120,
+                 "filename": "TEST_DIR/t.IMGFMT.base",
+-- 
+2.48.1
+
