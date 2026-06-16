@@ -64,6 +64,7 @@ popd
 %ninja_install -C %{_target_platform}
 
 %check
+#triggering build to check the test results
 %ninja_test -C %{_target_platform}
 
 %files
