@@ -2572,6 +2572,7 @@ components = [
     "xorg-x11-proto-devel",
     "xorg-x11-server-Xwayland",
     "xprop",
+    "xrandr",
     "xrdb",
     "xrestop",
     "xvidcore",
