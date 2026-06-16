@@ -6967,6 +6967,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.xorg-x11-xtrans-devel]
 [components.xpdf]
 [components.xprop]
+[components.xrandr]
 [components.xrdb]
 [components.xrestop]
 [components.xsel]
