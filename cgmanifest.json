@@ -22322,6 +22322,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-Automat",
+          "version": "24.8.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/8d/2d/ede4ad7fc34ab4482389fa3369d304f2fa22e50770af706678f6a332fa82/automat-24.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-azure-sdk",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/Azure/azure-sdk-for-python/archive/2b2cfd4/azure-sdk-2b2cfd4.tar.gz"

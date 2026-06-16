@@ -1657,6 +1657,7 @@
                 "python-astunparse",
                 "python-async-generator",
                 "python-augeas",
+                "python-Automat",
                 "python-azure-sdk",
                 "python-backoff",
                 "python-beautifulsoup4",
