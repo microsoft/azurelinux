@@ -1,11 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-"""Overlay classification taxonomy — labels, sub-categories, and heuristic signal patterns.
+"""Overlay classification taxonomy — labels and heuristic signal patterns.
 
 This module defines the shared vocabulary for the overlay classifier:
-- Top-level labels (Backport-fedora, Upstream-fix, AZL-customization)
-- AZL-customization sub-categories (10 buckets)
+- Top-level labels (Backport-dist-git + 9 flat AZL-* categories)
+- Upstreamability tag (yes / no / unknown) — orthogonal to category
 - Signal patterns: compiled regexes + field checks used by the heuristic engine
 """
 
@@ -26,31 +26,49 @@ if TYPE_CHECKING:
 
 
 class TopLevel(Enum):
-    """Top-level overlay classification labels."""
+    """Top-level overlay classification labels.
 
-    BACKPORT_FEDORA = "Backport-fedora"
-    UPSTREAM_FIX = "Upstream-fix"
-    AZL_CUSTOMIZATION = "AZL-customization"
+    AZL-* labels are flat categories (no sub-categories). The Sankey diagram
+    reconstructs the visual grouping from the ``AZL-`` prefix.
+    """
+
+    BACKPORT_DIST_GIT = "Backport-dist-git"
+    AZL_DEPENDENCY_PRUNING = "AZL-dependency-pruning"
+    AZL_FEATURE_DISABLEMENT = "AZL-feature-disablement"
+    AZL_BRANDING_POLICY = "AZL-branding-policy"
+    AZL_BUILD = "AZL-build"
+    AZL_TEST_DISABLEMENT = "AZL-test-disablement"
+    AZL_SECURITY = "AZL-security"
+    AZL_RELEASE_MANAGEMENT = "AZL-release-management"
+    AZL_MISSING_DEPENDENCY_WORKAROUND = "AZL-missing-dependency-workaround"
+    AZL_PLATFORM_ADAPTATION = "AZL-platform-adaptation"
 
 
-class SubCategory(Enum):
-    """Sub-categories for AZL-customization and Upstream-fix."""
+# Prefix used by the Sankey generator to aggregate AZL labels into a visual group.
+AZL_PREFIX = "AZL-"
 
-    # Upstream-fix sub-categories
-    UPSTREAMABLE = "Upstreamable"
-    WAITING_FOR_FEDORA = "Waiting-for-fedora"
 
-    # AZL-customization sub-categories
-    DEPENDENCY_PRUNING = "Dependency-pruning"
-    FEATURE_DISABLEMENT = "Feature-disablement"
-    BRANDING = "Branding"
-    BUILD_ENVIRONMENT = "Build-environment"
-    TEST_DISABLEMENT = "Test-disablement"
-    SECURITY_COMPLIANCE = "Security/compliance"
-    RELEASE_MANAGEMENT = "Release-management"
-    MISSING_DEPENDENCY_WORKAROUND = "Missing-dependency-workaround"
-    PLATFORM_ADAPTATION = "Platform-adaptation"
-    DISTRO_POLICY_ALIGNMENT = "Distro-policy-alignment"
+class Upstreamability(Enum):
+    """Whether an overlay's change can be pushed upstream.
+
+    Orthogonal to category — any AZL-* category can have overlays that are
+    upstreamable or not.
+    """
+
+    YES = "yes"
+    """The change can/should be upstreamed:
+    - Self-created fix with no upstream PR yet (push it upstream).
+    - Workaround for a missing upstream fix (upstream fix needed).
+    - Related to an upstream gap (e.g., missing macros that could be added upstream,
+      though the overlay may still be needed even after the upstream change lands).
+    """
+    NO = "no"
+    """The change is inherently AZL-specific and cannot be upstreamed
+    (e.g., branding, AZL-only build infra, release management).
+    """
+    UNKNOWN = "unknown"
+    """Insufficient information to determine upstreamability."""
+AZL_PREFIX = "AZL-"
 
 
 # ---------------------------------------------------------------------------
@@ -78,7 +96,6 @@ class Rule:
 
     name: str
     top_level: TopLevel
-    sub_category: SubCategory | None = None
     signals: Sequence[Signal] = field(default_factory=list)
     priority: int = 0
     """Higher priority rules are evaluated first. Ties broken by definition order."""
@@ -91,7 +108,7 @@ class Rule:
 # Compiled signal patterns
 # ---------------------------------------------------------------------------
 
-# -- Backport-fedora signals --
+# -- Backport-dist-git signals (Fedora dist-git references) --
 
 _SIG_FEDORA_COMMIT_URL = Signal(
     name="fedora-commit-url",
@@ -120,7 +137,7 @@ _SIG_FIXED_UPSTREAM_FEDORA = Signal(
     ),
 )
 
-# -- Upstream-fix signals --
+# -- Backport-dist-git signals (upstream project references) --
 
 _SIG_CVE = Signal(
     name="cve-reference",
@@ -422,329 +439,458 @@ _SIG_RHEL_DEFINE = Signal(
 # ---------------------------------------------------------------------------
 
 RULES: list[Rule] = [
-    # -- Backport-fedora (priority 100) --
+    # -- Backport-dist-git (priority 100) --
     Rule(
         name="backport-fedora-commit-url",
-        top_level=TopLevel.BACKPORT_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_FEDORA_COMMIT_URL],
         priority=100,
     ),
     Rule(
         name="backport-keyword",
-        top_level=TopLevel.BACKPORT_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_BACKPORT_KEYWORD],
         priority=95,
     ),
     Rule(
         name="backport-temporary-snapshot",
-        top_level=TopLevel.BACKPORT_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_TEMPORARY_SNAPSHOT],
         priority=90,
     ),
     Rule(
         name="backport-fixed-upstream-fedora",
-        top_level=TopLevel.BACKPORT_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_FIXED_UPSTREAM_FEDORA],
         priority=90,
     ),
     # -- Workaround override (priority 85) --
-    # When an overlay explicitly says "workaround" or "until upstream fix" AND
-    # disables a feature, it's AZL-customization even if upstream URLs are present.
     Rule(
         name="azl-workaround-feature-disable",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_WORKAROUND_KEYWORD, _SIG_DISABLE_KEYWORD],
         priority=85,
         require_all=True,
     ),
-    # -- Upstream-fix / Waiting-for-fedora (has upstream refs) --
+    # -- Backport-dist-git / upstream fix signals (priority 80→65) --
     Rule(
         name="upstream-fix-cve",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_CVE],
         priority=80,
     ),
     Rule(
         name="upstream-fix-bug-url",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_UPSTREAM_BUG_URL],
         priority=75,
     ),
     Rule(
         name="upstream-fix-commit-url",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_UPSTREAM_COMMIT_URL],
         priority=75,
     ),
     Rule(
         name="upstream-fix-pr-url",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_UPSTREAM_PR_URL],
         priority=75,
     ),
     Rule(
         name="upstream-fix-bug-id",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_UPSTREAM_BUG_ID],
         priority=70,
     ),
-    # -- Upstream-fix / Upstreamable (no upstream refs yet) --
     Rule(
         name="upstream-fix-patch-from-upstream",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.WAITING_FOR_FEDORA,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_PATCH_FROM_UPSTREAM_AUTHOR],
         priority=72,
     ),
     Rule(
         name="upstream-fix-patch-add",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.UPSTREAMABLE,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_PATCH_ADD_NO_FEDORA],
         priority=70,
     ),
     Rule(
         name="upstream-fix-commit-header",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.UPSTREAMABLE,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_FIX_COMMIT_HEADER],
         priority=65,
     ),
     Rule(
         name="upstream-fix-keyword",
-        top_level=TopLevel.UPSTREAM_FIX,
-        sub_category=SubCategory.UPSTREAMABLE,
+        top_level=TopLevel.BACKPORT_DIST_GIT,
         signals=[_SIG_UPSTREAM_FIX_KEYWORD],
         priority=65,
     ),
-    # -- AZL-customization sub-categories (priority 50 down) --
-    # Test-disablement
+    # -- AZL flat categories (priority 50 down) --
+    # AZL-test-disablement
     Rule(
         name="azl-test-skip-group",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.TEST_DISABLEMENT,
+        top_level=TopLevel.AZL_TEST_DISABLEMENT,
         signals=[_SIG_CHECK_SKIP_GROUP],
         priority=55,
     ),
     Rule(
         name="azl-test-skip-config",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.TEST_DISABLEMENT,
+        top_level=TopLevel.AZL_TEST_DISABLEMENT,
         signals=[_SIG_CHECK_SKIP_CONFIG],
         priority=55,
     ),
     Rule(
         name="azl-test-skip-keyword",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.TEST_DISABLEMENT,
+        top_level=TopLevel.AZL_TEST_DISABLEMENT,
         signals=[_SIG_SKIP_TEST_KEYWORD],
         priority=50,
     ),
-    # Security/compliance
+    # AZL-security
     Rule(
         name="azl-security-fips",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.SECURITY_COMPLIANCE,
+        top_level=TopLevel.AZL_SECURITY,
         signals=[_SIG_FIPS],
         priority=52,
     ),
     Rule(
         name="azl-security-crypto",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.SECURITY_COMPLIANCE,
+        top_level=TopLevel.AZL_SECURITY,
         signals=[_SIG_CRYPTO_SECURITY],
         priority=50,
     ),
-    # Missing-dependency-workaround
+    # AZL-missing-dependency-workaround
     Rule(
         name="azl-missing-dep-workaround-prefix",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.MISSING_DEPENDENCY_WORKAROUND,
+        top_level=TopLevel.AZL_MISSING_DEPENDENCY_WORKAROUND,
         signals=[_SIG_WORKAROUND_PREFIX],
         priority=52,
     ),
     Rule(
         name="azl-missing-dep-not-yet",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.MISSING_DEPENDENCY_WORKAROUND,
+        top_level=TopLevel.AZL_MISSING_DEPENDENCY_WORKAROUND,
         signals=[_SIG_NOT_YET],
         priority=50,
     ),
     Rule(
         name="azl-missing-dep-bootstrap",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.MISSING_DEPENDENCY_WORKAROUND,
+        top_level=TopLevel.AZL_MISSING_DEPENDENCY_WORKAROUND,
         signals=[_SIG_BOOTSTRAP],
         priority=45,
     ),
-    # Release-management
+    # AZL-release-management
     Rule(
         name="azl-release-tag-overlay",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.RELEASE_MANAGEMENT,
+        top_level=TopLevel.AZL_RELEASE_MANAGEMENT,
         signals=[_SIG_RELEASE_TAG],
         priority=50,
     ),
     Rule(
         name="azl-release-keyword",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.RELEASE_MANAGEMENT,
+        top_level=TopLevel.AZL_RELEASE_MANAGEMENT,
         signals=[_SIG_RELEASE_KEYWORD],
         priority=48,
     ),
-    # Branding
+    # AZL-branding-policy (includes former Branding + Distro-policy-alignment)
     Rule(
         name="azl-branding-replacement",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BRANDING,
+        top_level=TopLevel.AZL_BRANDING_POLICY,
         signals=[_SIG_FEDORA_TO_AZL],
         priority=50,
     ),
     Rule(
         name="azl-branding-set-distro",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BRANDING,
+        top_level=TopLevel.AZL_BRANDING_POLICY,
         signals=[_SIG_SET_DISTRO_VARIANT],
         priority=50,
     ),
     Rule(
         name="azl-branding-keyword",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BRANDING,
+        top_level=TopLevel.AZL_BRANDING_POLICY,
         signals=[_SIG_BRANDING_KEYWORD],
         priority=45,
     ),
-    # Feature-disablement
+    Rule(
+        name="azl-branding-rhel-alignment",
+        top_level=TopLevel.AZL_BRANDING_POLICY,
+        signals=[_SIG_RHEL_ALIGNMENT],
+        priority=45,
+    ),
+    Rule(
+        name="azl-branding-rhel-define",
+        top_level=TopLevel.AZL_BRANDING_POLICY,
+        signals=[_SIG_RHEL_DEFINE],
+        priority=40,
+    ),
+    # AZL-feature-disablement
     Rule(
         name="azl-feature-mingw-group",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_MINGW_GROUP],
         priority=55,
     ),
     Rule(
         name="azl-feature-build-without",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_BUILD_WITHOUT],
         priority=50,
     ),
     Rule(
         name="azl-feature-disable-keyword",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_DISABLE_KEYWORD],
         priority=45,
     ),
     Rule(
         name="azl-feature-with-x-zero",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_WITH_X_ZERO],
         priority=45,
     ),
     Rule(
         name="azl-feature-meson-cmake-off",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_MESON_CMAKE_OFF],
         priority=40,
     ),
     Rule(
         name="azl-feature-remove-subpackage",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.FEATURE_DISABLEMENT,
+        top_level=TopLevel.AZL_FEATURE_DISABLEMENT,
         signals=[_SIG_REMOVE_SUBPACKAGE],
         priority=45,
     ),
-    # Dependency-pruning
+    # AZL-dependency-pruning
     Rule(
         name="azl-dep-remove-tag",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.DEPENDENCY_PRUNING,
+        top_level=TopLevel.AZL_DEPENDENCY_PRUNING,
         signals=[_SIG_REMOVE_DEP_TAG],
         priority=48,
     ),
     Rule(
         name="azl-dep-not-available",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.DEPENDENCY_PRUNING,
+        top_level=TopLevel.AZL_DEPENDENCY_PRUNING,
         signals=[_SIG_NOT_AVAILABLE],
         priority=50,
     ),
     Rule(
         name="azl-dep-removing-from-distro",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.DEPENDENCY_PRUNING,
+        top_level=TopLevel.AZL_DEPENDENCY_PRUNING,
         signals=[_SIG_REMOVING_FROM_DISTRO],
         priority=48,
     ),
-    # Build-environment
+    # AZL-build
     Rule(
         name="azl-build-compiler-flags",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BUILD_ENVIRONMENT,
+        top_level=TopLevel.AZL_BUILD,
         signals=[_SIG_COMPILER_FLAGS],
         priority=45,
     ),
     Rule(
         name="azl-build-triplet",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BUILD_ENVIRONMENT,
+        top_level=TopLevel.AZL_BUILD,
         signals=[_SIG_TRIPLET],
         priority=45,
     ),
     Rule(
         name="azl-build-mock-container",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BUILD_ENVIRONMENT,
+        top_level=TopLevel.AZL_BUILD,
         signals=[_SIG_MOCK_CONTAINER],
         priority=40,
     ),
     Rule(
         name="azl-build-toolchain",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BUILD_ENVIRONMENT,
+        top_level=TopLevel.AZL_BUILD,
         signals=[_SIG_TOOLCHAIN],
         priority=38,
     ),
     Rule(
         name="azl-build-autosetup",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.BUILD_ENVIRONMENT,
+        top_level=TopLevel.AZL_BUILD,
         signals=[_SIG_AUTOSETUP],
         priority=35,
     ),
-    # Platform-adaptation
+    # AZL-platform-adaptation
     Rule(
         name="azl-platform-arch",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.PLATFORM_ADAPTATION,
+        top_level=TopLevel.AZL_PLATFORM_ADAPTATION,
         signals=[_SIG_ARCH_KEYWORD],
         priority=45,
-    ),
-    # Distro-policy-alignment
-    Rule(
-        name="azl-distro-rhel-alignment",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.DISTRO_POLICY_ALIGNMENT,
-        signals=[_SIG_RHEL_ALIGNMENT],
-        priority=45,
-    ),
-    Rule(
-        name="azl-distro-rhel-define",
-        top_level=TopLevel.AZL_CUSTOMIZATION,
-        sub_category=SubCategory.DISTRO_POLICY_ALIGNMENT,
-        signals=[_SIG_RHEL_DEFINE],
-        priority=40,
     ),
 ]
 
 # Pre-sort by descending priority for evaluation order
 RULES.sort(key=lambda r: r.priority, reverse=True)
+
+
+# ---------------------------------------------------------------------------
+# Upstreamability signal patterns
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class UpstreamabilityRule:
+    """A rule that assigns an upstreamability tag to an overlay."""
+
+    name: str
+    result: Upstreamability
+    signals: Sequence[Signal] = field(default_factory=list)
+    priority: int = 0
+    require_all: bool = False
+
+
+# -- Signals indicating upstreamability = "no" (inherently AZL-specific) --
+
+_USIG_BRANDING = Signal(
+    name="upstream-no-branding",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"\b(?:branding|rebrand|azurelinux|azure linux|vendor)\b",
+        re.IGNORECASE,
+    ),
+)
+
+_USIG_RELEASE_MGMT = Signal(
+    name="upstream-no-release",
+    fields=["overlay_type", "tag"],
+    pattern=re.compile(r"Release|%autorelease|pkgrelease|specrelease"),
+)
+
+_USIG_AZL_ONLY_INFRA = Signal(
+    name="upstream-no-azl-infra",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"\b(?:azldev|azl[- ]?specific|azure linux only)\b",
+        re.IGNORECASE,
+    ),
+)
+
+# -- Signals indicating upstreamability = "yes" --
+
+# Case 1: self-created fix with no upstream PR
+_USIG_SELF_FIX_NO_PR = Signal(
+    name="upstream-yes-self-fix",
+    fields=[],
+    structural_check="is_self_authored_patch",
+)
+
+# Case 2: workaround that needs upstream fix
+_USIG_NEEDS_UPSTREAM_FIX = Signal(
+    name="upstream-yes-needs-fix",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"\b(?:work[- ]?around|workaround|needs upstream fix|upstream "
+        r"(?:doesn.t|does not|lacks?)|flaky test|fails? in)\b",
+        re.IGNORECASE,
+    ),
+)
+
+_USIG_UNTIL_UPSTREAM = Signal(
+    name="upstream-yes-until-upstream",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"(?:until (?:the )?(?:upstream|fix)|pending upstream|upstream TODO|should be upstreamed)",
+        re.IGNORECASE,
+    ),
+)
+
+# Case 3: upstream lacks a feature/macro that could be added
+_USIG_UPSTREAM_LACKS = Signal(
+    name="upstream-yes-lacks-feature",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"(?:upstream lacks|fedora (?:doesn.t|does not) (?:have|support|provide)|"
+        r"no (?:upstream )?macro|missing (?:upstream )?(?:macro|flag|option))",
+        re.IGNORECASE,
+    ),
+)
+
+# -- Signals for test-related workarounds (often upstreamable) --
+_USIG_TEST_WORKAROUND = Signal(
+    name="upstream-yes-test-workaround",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"(?:[Ss]kip.*(?:flaky|failing|broken).*test|[Dd]isable.*(?:flaky|broken).*test|"
+        r"test.*(?:fails?|broken|flaky) (?:in|on|under))",
+        re.IGNORECASE,
+    ),
+)
+
+# -- Signals for missing dep workarounds (typically upstreamable once dep imported) --
+_USIG_MISSING_DEP = Signal(
+    name="upstream-yes-missing-dep",
+    fields=["all_text"],
+    pattern=re.compile(
+        r"(?:not yet (?:in AZL|imported|available|packaged)|"
+        r"^WORKAROUND:|temporary.*remove when)",
+        re.IGNORECASE,
+    ),
+)
+
+
+UPSTREAMABILITY_RULES: list[UpstreamabilityRule] = [
+    # -- "no" rules (highest priority — inherently AZL-specific) --
+    UpstreamabilityRule(
+        name="upstream-no-branding",
+        result=Upstreamability.NO,
+        signals=[_USIG_BRANDING],
+        priority=80,
+    ),
+    UpstreamabilityRule(
+        name="upstream-no-release-mgmt",
+        result=Upstreamability.NO,
+        signals=[_USIG_RELEASE_MGMT],
+        priority=80,
+    ),
+    UpstreamabilityRule(
+        name="upstream-no-azl-infra",
+        result=Upstreamability.NO,
+        signals=[_USIG_AZL_ONLY_INFRA],
+        priority=75,
+    ),
+    # -- "yes" rules --
+    UpstreamabilityRule(
+        name="upstream-yes-self-fix",
+        result=Upstreamability.YES,
+        signals=[_USIG_SELF_FIX_NO_PR],
+        priority=70,
+    ),
+    UpstreamabilityRule(
+        name="upstream-yes-needs-fix",
+        result=Upstreamability.YES,
+        signals=[_USIG_NEEDS_UPSTREAM_FIX],
+        priority=65,
+    ),
+    UpstreamabilityRule(
+        name="upstream-yes-until-upstream",
+        result=Upstreamability.YES,
+        signals=[_USIG_UNTIL_UPSTREAM],
+        priority=65,
+    ),
+    UpstreamabilityRule(
+        name="upstream-yes-lacks-feature",
+        result=Upstreamability.YES,
+        signals=[_USIG_UPSTREAM_LACKS],
+        priority=60,
+    ),
+    UpstreamabilityRule(
+        name="upstream-yes-test-workaround",
+        result=Upstreamability.YES,
+        signals=[_USIG_TEST_WORKAROUND],
+        priority=55,
+    ),
+    UpstreamabilityRule(
+        name="upstream-yes-missing-dep",
+        result=Upstreamability.YES,
+        signals=[_USIG_MISSING_DEP],
+        priority=55,
+    ),
+]
+
+UPSTREAMABILITY_RULES.sort(key=lambda r: r.priority, reverse=True)
+
+# Categories that are inherently not upstreamable (fallback when no signal matches)
+NOT_UPSTREAMABLE_CATEGORIES: frozenset[str] = frozenset({
+    TopLevel.AZL_BRANDING_POLICY.value,
+    TopLevel.AZL_RELEASE_MANAGEMENT.value,
+})

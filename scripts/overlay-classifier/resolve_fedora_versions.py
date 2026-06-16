@@ -1,9 +1,9 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-"""Resolve Fedora package versions for Backport-fedora overlays.
+"""Resolve Fedora package versions for Backport-dist-git overlays.
 
-For each overlay classified as Backport-fedora, queries Fedora Koji to find:
+For each overlay classified as Backport-dist-git, queries Fedora Koji to find:
 - The current NVR in AZL's tracked Fedora branch (f43)
 - The NVR that contains the backported fix (earliest Fedora tag with the fix)
 
@@ -11,7 +11,7 @@ This helps teams know when an overlay can be safely removed — i.e., when AZL
 bumps its upstream pin to a Fedora version that already includes the fix.
 
 Reads classified JSON (from classify_overlays.py or final_report.json) and
-writes an enriched copy with a ``fedora_fix_info`` field on Backport-fedora entries.
+writes an enriched copy with a ``fedora_fix_info`` field on Backport-dist-git entries.
 
 Usage:
     python resolve_fedora_versions.py -i classified_overlays.json -o enriched.json
@@ -156,7 +156,7 @@ def resolve_entry(
     koji: xmlrpc.client.ServerProxy,
     azl_ver: int,
 ) -> dict[str, Any] | None:
-    """Resolve Fedora fix version info for a single Backport-fedora entry.
+    """Resolve Fedora fix version info for a single Backport-dist-git entry.
 
     Returns a ``fedora_fix_info`` dict or None if resolution fails.
     """
@@ -212,7 +212,7 @@ def resolve_all(
     output_path: Path,
     azl_ver: int = 43,
 ) -> dict[str, Any]:
-    """Enrich all Backport-fedora entries with Fedora version info."""
+    """Enrich all Backport-dist-git entries with Fedora version info."""
     data = json.loads(input_path.read_text())
     koji = _koji_proxy()
 
@@ -222,7 +222,7 @@ def resolve_all(
     for collection_key in ("overlays", "group_entries"):
         for entry in data.get(collection_key, []):
             cl = entry.get("classification", {})
-            if cl.get("top_level") != "Backport-fedora":
+            if cl.get("top_level") != "Backport-dist-git":
                 continue
 
             print(f"Resolving: {entry.get('component', '?')} ...", file=sys.stderr)
@@ -253,7 +253,7 @@ def resolve_all(
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="Resolve Fedora package versions for Backport-fedora overlays",
+        description="Resolve Fedora package versions for Backport-dist-git overlays",
     )
     parser.add_argument(
         "--input", "-i",
@@ -265,7 +265,7 @@ def main() -> None:
         "--output", "-o",
         type=Path,
         required=True,
-        help="Output JSON with fedora_fix_info added to Backport-fedora entries",
+        help="Output JSON with fedora_fix_info added to Backport-dist-git entries",
     )
     parser.add_argument(
         "--azl-fedora-version",

@@ -4,7 +4,8 @@
 Reads classified_overlays.json and produces a standalone HTML file with
 a Plotly Sankey diagram showing the flow:
 
-    Overlay Type → Top-level Label → Sub-category (AZL-customization + Upstream-fix)
+    All Overlays → {Backport-dist-git, AZL-customization}
+                   → AZL-* categories → Upstreamability {yes, no, unknown}
 
 Usage:
     python generate_sankey.py -i classified_overlays.json -o sankey.html
@@ -19,30 +20,34 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from taxonomy import AZL_PREFIX
+
 # -- Color palette ----------------------------------------------------------
 
-TOP_LEVEL_COLORS = {
-    "Backport-fedora": "rgba(31, 119, 180, 0.8)",
-    "Upstream-fix": "rgba(255, 127, 14, 0.8)",
+# Visual group for the first Sankey column
+GROUP_COLORS = {
+    "Backport-dist-git": "rgba(31, 119, 180, 0.8)",
     "AZL-customization": "rgba(44, 160, 44, 0.8)",
 }
 
-SUB_CATEGORY_COLORS = {
-    # Upstream-fix sub-categories
-    "Upstreamable": "rgba(255, 187, 120, 0.7)",
-    "Waiting-for-fedora": "rgba(255, 152, 48, 0.7)",
-    # AZL-customization sub-categories
-    "Feature-disablement": "rgba(77, 175, 74, 0.7)",
-    "Test-disablement": "rgba(152, 78, 163, 0.7)",
-    "Dependency-pruning": "rgba(255, 127, 0, 0.7)",
-    "Build-environment": "rgba(55, 126, 184, 0.7)",
-    "Missing-dependency-workaround": "rgba(228, 26, 28, 0.7)",
-    "Security/compliance": "rgba(166, 86, 40, 0.7)",
-    "Release-management": "rgba(247, 129, 191, 0.7)",
-    "Branding": "rgba(0, 191, 255, 0.7)",
-    "Platform-adaptation": "rgba(153, 153, 153, 0.7)",
-    "Distro-policy-alignment": "rgba(255, 215, 0, 0.7)",
+# Individual AZL-* category colors for the second column
+AZL_CATEGORY_COLORS = {
+    "AZL-dependency-pruning": "rgba(255, 127, 0, 0.7)",
+    "AZL-feature-disablement": "rgba(77, 175, 74, 0.7)",
+    "AZL-branding-policy": "rgba(0, 191, 255, 0.7)",
+    "AZL-build": "rgba(55, 126, 184, 0.7)",
+    "AZL-test-disablement": "rgba(152, 78, 163, 0.7)",
+    "AZL-security": "rgba(166, 86, 40, 0.7)",
+    "AZL-release-management": "rgba(247, 129, 191, 0.7)",
+    "AZL-missing-dependency-workaround": "rgba(228, 26, 28, 0.7)",
+    "AZL-platform-adaptation": "rgba(153, 153, 153, 0.7)",
     "uncategorized": "rgba(200, 200, 200, 0.7)",
+}
+
+UPSTREAMABILITY_COLORS = {
+    "yes": "rgba(50, 205, 50, 0.8)",
+    "no": "rgba(220, 20, 60, 0.8)",
+    "unknown": "rgba(180, 180, 180, 0.8)",
 }
 
 # -- Fallback color for unknown types/categories --
@@ -53,50 +58,66 @@ def _get_color(name: str, palette: dict[str, str]) -> str:
     return palette.get(name, _FALLBACK)
 
 
-def _build_sankey_data(
+def _build_sankey_data(  # noqa: PLR0915
     data: dict[str, Any],
 ) -> dict[str, Any]:
     """Build Plotly Sankey node/link structures from classified data.
 
-    Three-layer flow:
-        All Overlays → Top-level Label → Sub-category (AZL-customization + Upstream-fix)
+    Four-layer flow:
+        All Overlays → {Backport-dist-git, AZL-customization}
+                       → AZL-* categories → Upstreamability {yes, no, unknown}
+
+    AZL-customization is a virtual aggregate node — AZL-* labels in the data
+    are grouped under it by detecting the ``AZL-`` prefix.
     """
     overlays: list[dict[str, Any]] = data.get("overlays", [])
     groups: list[dict[str, Any]] = data.get("group_entries", [])
     total = len(overlays) + len(groups)
 
-    # Top-level labels that have sub-categories
-    labels_with_subcats = {"AZL-customization", "Upstream-fix"}
-
     # --- Count flows ---
-    top_counts: Counter[str] = Counter()
-    top_to_sub: Counter[tuple[str, str]] = Counter()
+    # Visual groups (Backport-dist-git, AZL-customization aggregate)
+    group_counts: Counter[str] = Counter()
+    # Per AZL-* category breakdown
+    azl_cat_counts: Counter[str] = Counter()
+    # AZL category → upstreamability flows
+    cat_to_upstream: Counter[tuple[str, str]] = Counter()
 
     for entry in [*overlays, *groups]:
         cl = entry.get("classification", {})
         top = cl.get("top_level") or "unclassified"
-        sub = cl.get("sub_category") or "uncategorized"
+        upstream = cl.get("upstreamability") or "unknown"
 
-        top_counts[top] += 1
-        if top in labels_with_subcats:
-            top_to_sub[(top, sub)] += 1
+        if top.startswith(AZL_PREFIX):
+            group_counts["AZL-customization"] += 1
+            azl_cat_counts[top] += 1
+            cat_to_upstream[(top, upstream)] += 1
+        else:
+            group_counts[top] += 1
 
     # --- Build node list ---
     # Layer 0: single aggregate node
     aggregate_label = f"All Overlays ({total})"
-    top_levels = sorted(top_counts.keys())
-    sub_cats = sorted({k[1] for k in top_to_sub})
+    visual_groups = sorted(group_counts.keys())
+    azl_cats = sorted(azl_cat_counts.keys())
+    upstream_tags = sorted({k[1] for k in cat_to_upstream})
 
     nodes: list[str] = [aggregate_label]
     node_colors: list[str] = ["rgba(100, 100, 100, 0.8)"]
 
-    for tl in top_levels:
-        nodes.append(tl)
-        node_colors.append(_get_color(tl, TOP_LEVEL_COLORS))
+    for grp in visual_groups:
+        nodes.append(grp)
+        node_colors.append(_get_color(grp, GROUP_COLORS))
 
-    for sc in sub_cats:
-        nodes.append(sc)
-        node_colors.append(_get_color(sc, SUB_CATEGORY_COLORS))
+    for cat in azl_cats:
+        nodes.append(cat)
+        node_colors.append(_get_color(cat, AZL_CATEGORY_COLORS))
+
+    # Upstreamability nodes — use display labels
+    upstream_display = {"yes": "Upstreamable", "no": "Not upstreamable", "unknown": "Unknown"}
+    for tag in upstream_tags:
+        display = upstream_display.get(tag, tag)
+        nodes.append(display)
+        node_colors.append(_get_color(tag, UPSTREAMABILITY_COLORS))
 
     node_index = {name: i for i, name in enumerate(nodes)}
 
@@ -106,21 +127,32 @@ def _build_sankey_data(
     values: list[int] = []
     link_colors: list[str] = []
 
-    # Layer 1 links: aggregate → top-level
+    # Layer 1 links: aggregate → visual group
     agg_idx = node_index[aggregate_label]
-    for tl in top_levels:
+    for grp in visual_groups:
         sources.append(agg_idx)
-        targets.append(node_index[tl])
-        values.append(top_counts[tl])
-        color = _get_color(tl, TOP_LEVEL_COLORS).replace("0.8", "0.3")
+        targets.append(node_index[grp])
+        values.append(group_counts[grp])
+        color = _get_color(grp, GROUP_COLORS).replace("0.8", "0.3")
         link_colors.append(color)
 
-    # Layer 2 links: top-level → sub-category
-    for (top, sub), count in sorted(top_to_sub.items()):
-        sources.append(node_index[top])
-        targets.append(node_index[sub])
+    # Layer 2 links: AZL-customization → individual AZL-* categories
+    if "AZL-customization" in node_index:
+        azl_idx = node_index["AZL-customization"]
+        for cat in azl_cats:
+            sources.append(azl_idx)
+            targets.append(node_index[cat])
+            values.append(azl_cat_counts[cat])
+            color = _get_color(cat, AZL_CATEGORY_COLORS).replace("0.7", "0.3")
+            link_colors.append(color)
+
+    # Layer 3 links: AZL-* category → upstreamability
+    for (cat, tag), count in sorted(cat_to_upstream.items()):
+        display = upstream_display.get(tag, tag)
+        sources.append(node_index[cat])
+        targets.append(node_index[display])
         values.append(count)
-        color = _get_color(sub, SUB_CATEGORY_COLORS).replace("0.7", "0.3")
+        color = _get_color(tag, UPSTREAMABILITY_COLORS).replace("0.8", "0.3")
         link_colors.append(color)
 
     return {
@@ -130,7 +162,7 @@ def _build_sankey_data(
         "targets": targets,
         "values": values,
         "link_colors": link_colors,
-        "top_counts": dict(top_counts),
+        "group_counts": dict(group_counts),
     }
 
 
@@ -140,16 +172,15 @@ def _generate_html(sankey_data: dict[str, Any], total: int) -> str:
     node_colors = sankey_data["node_colors"]
 
     # Build labels with counts
-    top_counts = sankey_data.get("top_counts", {})
+    group_counts = sankey_data.get("group_counts", {})
     node_labels: list[str] = []
     for i, n in enumerate(nodes):
         if n.startswith("All Overlays"):
-            # Aggregate node already includes count in name
             node_labels.append(n)
-        elif n in top_counts:
-            node_labels.append(f"{n} ({top_counts[n]})")
+        elif n in group_counts:
+            node_labels.append(f"{n} ({group_counts[n]})")
         else:
-            # Sub-category: sum incoming link values
+            # AZL-* category: sum incoming link values
             incoming = sum(
                 v
                 for s, t, v in zip(
@@ -202,8 +233,12 @@ def _generate_html(sankey_data: dict[str, Any], total: int) -> str:
     def _swatch(name: str, color: str) -> str:
         return f'<div class="legend-item"><span class="legend-swatch" style="background:{color}"></span>{name}</div>'
 
-    legend_tops = "".join(_swatch(n, c) for n, c in TOP_LEVEL_COLORS.items())
-    legend_subs = "".join(_swatch(n, c) for n, c in SUB_CATEGORY_COLORS.items())
+    legend_groups = "".join(_swatch(n, c) for n, c in GROUP_COLORS.items())
+    legend_cats = "".join(_swatch(n, c) for n, c in AZL_CATEGORY_COLORS.items() if n != "uncategorized")
+    upstream_display = {"yes": "Upstreamable", "no": "Not upstreamable", "unknown": "Unknown"}
+    legend_upstream = "".join(
+        _swatch(upstream_display.get(n, n), c) for n, c in UPSTREAMABILITY_COLORS.items()
+    )
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -265,12 +300,16 @@ def _generate_html(sankey_data: dict[str, Any], total: int) -> str:
 
 <div class="legend">
   <div class="legend-section">
-    <h3>Top-level Labels</h3>
-    {legend_tops}
+    <h3>Groups</h3>
+    {legend_groups}
   </div>
   <div class="legend-section">
-    <h3>Sub-categories</h3>
-    {legend_subs}
+    <h3>AZL Categories</h3>
+    {legend_cats}
+  </div>
+  <div class="legend-section">
+    <h3>Upstreamability</h3>
+    {legend_upstream}
   </div>
 </div>
 

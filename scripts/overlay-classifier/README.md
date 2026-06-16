@@ -23,7 +23,7 @@ python classify_overlays.py \
 #   cp ../../base/build/work/scratch/overlay-classifier/classified_overlays.json \
 #      ../../base/build/work/scratch/overlay-classifier/final_report.json
 
-# Step 4: Resolve Fedora fix versions for Backport-fedora overlays
+# Step 4: Resolve Fedora fix versions for Backport-dist-git overlays
 # Queries Fedora Koji to find which version has the fix (tells you when overlays can be removed)
 python resolve_fedora_versions.py \
   -i ../../base/build/work/scratch/overlay-classifier/final_report.json \
@@ -59,7 +59,7 @@ Phase 1 (Deterministic)     Phase 2 (Deterministic)     Phase 3 (Non-determinist
                             ┌────────────────────────────────────────┐
                             │ resolve_fedora_versions.py             │
                             │                                        │
-                            │ • Query Fedora Koji for Backport-fedora│
+                            │ • Query Fedora Koji for Backport-dist-git│
                             │ • Find fix NVR + earliest Fedora tag   │
                             │ • Add removable_when guidance          │
                             └──────────────────┬─────────────────────┘
@@ -76,39 +76,24 @@ Phase 1 (Deterministic)     Phase 2 (Deterministic)     Phase 3 (Non-determinist
 
 ## Classification Labels
 
-### Top-level (3 buckets)
+All labels are flat — no hierarchy. Labels with the `AZL-` prefix represent AZL-specific customizations; the Sankey diagram groups them under a virtual "AZL-customization" node for visual clarity.
 
 | Label | Description |
 |-------|-------------|
-| **Backport-fedora** | Fix IS in Fedora (any branch). Overlay applies the actual fix. Self-resolves when AZL bumps its upstream pin. |
-| **Upstream-fix** | Fix is NOT in any Fedora branch. Overlay is a candidate for upstreaming. |
-| **AZL-customization** | Intentional AZL-specific deviation. Includes workarounds even if the real fix exists in Fedora. |
+| **Backport-dist-git** | Fix IS in upstream dist-git (Fedora or upstream project repo). Overlay applies the actual fix. Self-resolves when AZL bumps its upstream pin. |
+| **AZL-dependency-pruning** | Removing deps not shipped in AZL |
+| **AZL-feature-disablement** | Disabling unneeded features/subpackages |
+| **AZL-branding-policy** | Fedora→AzureLinux name/path changes; RHEL/enterprise convention alignment |
+| **AZL-build** | Toolchain/mock/CI environment adjustments |
+| **AZL-test-disablement** | Skipping failing tests |
+| **AZL-security** | FIPS, crypto policy changes |
+| **AZL-release-management** | Release tag and changelog mechanics |
+| **AZL-missing-dependency-workaround** | Temporary workarounds for unimported packages |
+| **AZL-platform-adaptation** | Architecture-specific adjustments |
 
 > **Key distinction — fix vs. workaround:** If an overlay **applies the upstream fix** →
-> Backport-fedora or Upstream-fix. If it **works around** the problem (disables a feature,
-> skips a test) → AZL-customization, even if the fix exists upstream.
-
-### Upstream-fix sub-categories (2 buckets)
-
-| Sub-category | Description | Example |
-|-------------|-------------|---------|
-| **Upstreamable** | Self-created fix with no upstream PR/bug link yet. Should be pushed upstream. | openpace Makefile fix ("TODO: push to upstream") |
-| **Waiting-for-fedora** | Fix exists upstream (has PR URLs, bug IDs, commit links, CVE refs). Waiting for upstream to release and/or Fedora to pick it up. | vamp-plugin-sdk (merged commit not in a release yet) |
-
-### AZL-customization sub-categories (10 buckets)
-
-| Sub-category | Description |
-|-------------|-------------|
-| Dependency-pruning | Removing deps not shipped in AZL |
-| Feature-disablement | Disabling unneeded features/subpackages |
-| Branding | Fedora→AzureLinux name/path changes |
-| Build-environment | Toolchain/mock/CI environment adjustments |
-| Test-disablement | Skipping failing tests |
-| Security/compliance | FIPS, crypto policy changes |
-| Release-management | Release tag and changelog mechanics |
-| Missing-dependency-workaround | Temporary workarounds for unimported packages |
-| Platform-adaptation | Architecture-specific adjustments |
-| Distro-policy-alignment | RHEL/enterprise convention alignment |
+> Backport-dist-git. If it **works around** the problem (disables a feature,
+> skips a test) → one of the AZL-* categories, even if the fix exists upstream.
 
 ## Data Sources
 
@@ -156,19 +141,21 @@ Human reviewers can edit the cache to correct misclassifications — corrections
       },
       "fingerprint": "a1b2c3d4e5f6g7h8",
       "classification": {
-        "top_level": "AZL-customization",
-        "sub_category": "Feature-disablement",
+        "top_level": "AZL-feature-disablement",
         "confidence": "high",
         "classified_by": "heuristic",
         "matched_rules": ["azl-feature-disable-keyword:disable-keyword"],
-        "rationale": "..."
+        "rationale": "...",
+        "upstreamability": "yes",
+        "upstreamability_rule": "upstream-yes-needs-fix",
+        "upstreamability_rationale": "Matched rule: upstream-yes-needs-fix (signal: ...)"
       }
     }
   ],
   "group_entries": [ ... ],
   "summary": {
-    "by_top_level": { "AZL-customization": 584, "Backport-fedora": 28, "Upstream-fix": 31 },
-    "by_sub_category": { "Feature-disablement": 232, "Test-disablement": 195, ... },
+    "by_top_level": { "AZL-feature-disablement": 232, "AZL-test-disablement": 195, "Backport-dist-git": 59, ... },
+    "by_upstreamability": { "yes": 120, "no": 380, "unknown": 302 },
     "by_confidence": { "high": 303, "medium": 340, "low": 159 },
     "pipeline_stats": { "from_cache": 0, "heuristic_high": 303, ... }
   }
@@ -181,8 +168,8 @@ Human reviewers can edit the cache to correct misclassifications — corrections
 |------|------|---------------|
 | `extract_overlays.py` | TOML parser + git blame + patch header enrichment | ✅ |
 | `classify_overlays.py` | Heuristic rule engine + cache | ✅ |
-| `taxonomy.py` | Label definitions + signal patterns + 44 rules | ✅ |
-| `resolve_fedora_versions.py` | Koji queries for Backport-fedora fix NVRs | ✅ (network-dependent) |
+| `taxonomy.py` | Label definitions + signal patterns + 44 category rules + 9 upstreamability rules | ✅ |
+| `resolve_fedora_versions.py` | Koji queries for Backport-dist-git fix NVRs | ✅ (network-dependent) |
 | `generate_report.py` | Markdown report generator | ✅ |
 | `generate_sankey.py` | Interactive Sankey diagram (HTML) | ✅ |
 | `classifications_cache.json` | Pinned results for consistency | ✅ |
@@ -202,17 +189,21 @@ TOML + git + patch hdrs → 44 rules by priority      → Decision tree (Q0-Q4)�
 
 - **44 rules** sorted by descending priority:
   - Workaround override (priority 85) — requires BOTH workaround + disable keywords (AND logic)
-  - Backport-fedora (priority 100→90) — Fedora dist-git URLs, backport/cherry-pick keywords
-  - Upstream-fix / Waiting-for-fedora (priority 80→70) — CVE, upstream URLs, PRs, bug IDs, upstream patch authors
-  - Upstream-fix / Upstreamable (priority 70→65) — patch-add without Fedora URL, fix commit headers
-  - AZL sub-categories (priority 55→35) — feature/test disablement, dependency pruning, branding, etc.
+  - Backport-dist-git (priority 100→65) — Fedora dist-git URLs, backport/cherry-pick keywords, CVE, upstream URLs, PRs, bug IDs, upstream patch authors, patch-add without Fedora URL, fix commit headers
+  - AZL-* categories (priority 55→35) — feature/test disablement, dependency pruning, branding, etc.
 - **Signal types:** compiled regexes matching against text fields, OR structural checks (overlay type, build config, patch author domain)
 - **Rule logic:** Most rules use OR (any signal fires the rule). The workaround rule uses AND (`require_all=True` — both signals must match).
-- **Winner:** highest-priority matching rule determines top-level + sub-category.
+- **Winner:** highest-priority matching rule determines the flat category label.
 - **3-tier confidence:**
-  - `high` — single top-level + single sub-category matched
-  - `medium` — same top-level but conflicting sub-categories, OR sub-category is Upstreamable (always needs LLM review)
-  - `low` — conflicting top-levels or no rules matched at all
+  - `high` — single label matched
+  - `medium` — multiple AZL-* categories matched (conflicting AZL labels)
+  - `low` — conflicting between Backport and AZL labels, or no rules matched
+- **Upstreamability** — 9 additional rules (separate from category rules) evaluate independently:
+  - Backport-dist-git → always `no` (fix already upstream)
+  - AZL-branding-policy, AZL-release-management → fallback `no` (inherently AZL-specific)
+  - Signal-based `yes`: self-authored patches without upstream PR, workaround keywords, flaky test skips, "upstream lacks" patterns, missing dependency workarounds
+  - Signal-based `no`: branding/vendor keywords, release tag overlays, AZL-specific infra
+  - Default: `unknown` when no signals match
 
 ### LLM Decision Tree (Phase 3)
 
@@ -221,25 +212,23 @@ Q0: Companion overlay? (same component, supports a sibling overlay)
     → YES: Inherit sibling's classification
     → NO: continue
 
-Q1: Fedora backport signals? (dist-git URL, "backport", "cherry-pick", "rawhide")
+Q1: Does any text reference a Fedora dist-git commit URL, upstream commit/PR/bug URL,
+    CVE, "backport", "cherry-pick", or "fixed in f4x/rawhide"?
     → YES: verify fix vs. workaround
-    Q1b: Check if fix is in Fedora (azldev query → Fedora API → gh CLI)
-      → Overlay applies the actual fix AND fix is in Fedora → Backport-fedora
-      → Overlay applies the actual fix AND fix is NOT in Fedora → Upstream-fix
+      → Overlay applies the actual fix → Backport-dist-git
       → Overlay works around the problem → AZL-customization
     → NO: continue
 
-Q2: CVE / upstream URL / PR URL / bug tracker reference?
-    AND the fix is NOT yet in any Fedora branch?
-    → YES: Upstream-fix / Waiting-for-fedora
-    → NO: continue
-
-Q3: file-add adding a .patch from upstream author / upstream bug ID / toolchain compat?
-    → If upstream PR/bug/commit links exist → Upstream-fix / Waiting-for-fedora
-    → If no upstream tracking yet → Upstream-fix / Upstreamable
+Q2: Is this a file-add overlay adding a patch (.patch/.diff)?
+    If YES, examine the patch content:
+    a) Is the patch authored by an upstream contributor (not an AZL/Microsoft author)?
+    b) Does the patch filename or commit message reference an upstream bug tracker ID?
+    c) Does the patch come from the upstream project's own repo?
+    → If (a) OR (b) OR (c): Backport-dist-git
     → Otherwise: continue
 
-Q4: AZL-customization → pick from 10 sub-categories
+Q3: This is an AZL customization. Which AZL-* category?
+    → pick from the 9 AZL-* categories
 ```
 
 **Key principles:**
@@ -249,10 +238,8 @@ Q4: AZL-customization → pick from 10 sub-categories
 3. When a patch has a PR URL or bug reference, verify whether the fix is included in
    the version Fedora currently ships. A merged PR does NOT mean it's in Fedora.
 4. "In Fedora" means available in **any** Fedora branch, not just AZL's tracked branch.
-   If the overlay applies the upstream fix → Backport-fedora. If it works around the
+   If the overlay applies the upstream fix → Backport-dist-git. If it works around the
    problem → AZL-customization.
-5. All Upstreamable classifications are capped at medium confidence — the LLM verifies
-   by checking patch authorship, PR status, and description intent.
 
 ## Difficulties & Limitations
 
@@ -269,33 +256,19 @@ A single logical change often spans 2–6 overlays (e.g., `file-add` + `spec-add
 overlay independently with no cross-overlay context. Only the LLM decision tree (Q0)
 handles grouping by checking sibling overlays and shared `commit_sha`.
 
-### Ambiguous Sub-categories
+### Ambiguous Categories
 
-~315 overlays match multiple sub-categories (e.g., removing a `BuildRequires` could be
-Dependency-pruning OR Feature-disablement). Priority ordering resolves the conflict
-deterministically but may not always pick the most appropriate sub-category.
-
-### Upstreamable vs. Waiting-for-fedora
-
-The heuristic uses patch author email domain and "from upstream" text to distinguish
-self-created fixes (Upstreamable) from upstream patches applied locally (Waiting-for-fedora).
-This is inherently fragile:
-- Microsoft employees can submit upstream PRs — their patches are still "upstream"
-- Upstream contributors can author AZL-specific patches
-- Commit messages like "workaround" can be misnomers (e.g., vamp-plugin-sdk uses
-  "workaround" in the commit header but applies an actual upstream fix)
-- The heuristic cannot follow PR URLs to verify merge status
-
-All Upstreamable entries are capped at **medium confidence** so the LLM always reviews
-them with full context (patch content, PR status, author intent).
+~315 overlays match multiple AZL-* categories (e.g., removing a `BuildRequires` could be
+AZL-dependency-pruning OR AZL-feature-disablement). Priority ordering resolves the conflict
+deterministically but may not always pick the most appropriate category.
 
 ### Fix vs. Workaround Distinction
 
-The classifier must distinguish overlays that **apply the actual fix** (Backport-fedora
-or Upstream-fix) from those that **work around** the problem (AZL-customization). This
+The classifier must distinguish overlays that **apply the actual fix** (Backport-dist-git)
+from those that **work around** the problem (AZL-customization). This
 requires understanding semantic intent, not just pattern matching:
 - "Disable doc generation to work around cliff incompatibility" → workaround → AZL-customization
-- "Add patch to fix Makefile race from upstream" → actual fix → Upstream-fix
+- "Add patch to fix Makefile race from upstream" → actual fix → Backport-dist-git
 
 The `require_all` AND-logic on the workaround rule (`workaround-keyword` + `disable-keyword`)
 helps but doesn't cover all cases. The LLM is significantly more precise here.
@@ -309,10 +282,9 @@ which upstream release contains the fix.
 
 ### Temporal Context
 
-Distinguishing "Backport-fedora" from "Upstream-fix" depends on whether a fix has landed
-in Fedora *at classification time*. The `resolve_fedora_versions.py` script queries Koji
-to find fix NVRs for Backport-fedora entries, but the initial classification still relies
-on description text containing phrases like "fixed in rawhide" or Fedora dist-git URLs.
+The `resolve_fedora_versions.py` script queries Koji to find fix NVRs for
+Backport-dist-git entries. The initial classification relies on description text
+containing phrases like "fixed in rawhide" or Fedora dist-git URLs.
 
 ### Cache Contamination
 

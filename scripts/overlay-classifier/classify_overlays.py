@@ -13,11 +13,20 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
 
-from taxonomy import RULES, Rule, Signal
+from taxonomy import (
+    AZL_PREFIX,
+    NOT_UPSTREAMABLE_CATEGORIES,
+    RULES,
+    UPSTREAMABILITY_RULES,
+    Rule,
+    Signal,
+    Upstreamability,
+)
 
 # ---------------------------------------------------------------------------
 # Text corpus construction
@@ -172,6 +181,27 @@ def _check_rhel_define(_entry: dict[str, Any], _text_fields: dict[str, str], ctx
     return isinstance(defines, dict) and "rhel" in defines
 
 
+@_register_check("is_self_authored_patch")
+def _check_self_authored_patch(entry: dict[str, Any], text_fields: dict[str, str], _ctx: dict[str, Any]) -> bool:
+    """Check if overlay adds a patch authored by Microsoft/AZL with no upstream PR URL."""
+    if text_fields["overlay_type"] not in ("patch-add", "file-add"):
+        return False
+    pm = entry.get("patch_metadata", {})
+    if not isinstance(pm, dict):
+        return False
+    author = str(pm.get("patch_author", "")).lower()
+    azl_domains = ("@microsoft.com", "@linux.microsoft.com")
+    is_azl_author = any(domain in author for domain in azl_domains)
+    if not is_azl_author:
+        return False
+    # No upstream PR URL present
+    all_text = text_fields["all_text"].lower()
+    has_upstream_pr = bool(
+        re.search(r"github\.com/[^\s/]+/[^\s/]+/pull/\d+", all_text)
+    )
+    return not has_upstream_pr
+
+
 def _check_structural(
     signal: Signal,
     entry: dict[str, Any],
@@ -229,7 +259,7 @@ def classify_entry(
 ) -> dict[str, Any]:
     """Classify a single overlay or group entry using heuristic rules.
 
-    Returns a classification dict with top_level, sub_category, confidence, matched_rules.
+    Returns a classification dict with top_level, confidence, matched_rules.
     """
     text_fields = _build_text_fields(entry)
     matched: list[tuple[Rule, str]] = []
@@ -251,7 +281,6 @@ def classify_entry(
     if not matched:
         return {
             "top_level": None,
-            "sub_category": None,
             "confidence": "low",
             "classified_by": "heuristic",
             "matched_rules": [],
@@ -263,32 +292,22 @@ def classify_entry(
     matched_rule_names = list(dict.fromkeys(f"{r.name}:{s}" for r, s in matched))
 
     # Determine confidence (3-tier):
-    #   high — single top-level + single (or no) sub-category
-    #   medium — single top-level but conflicting sub-categories,
-    #            OR sub-category is Upstreamable (needs LLM verification)
-    #   low — conflicting top-level signals
+    #   high — single top-level label
+    #   medium — multiple AZL-* labels (conflicting AZL categories)
+    #   low — conflicting between Backport and AZL labels
     top_levels = {r.top_level for r, _ in matched}
-    if len(top_levels) > 1:
+    azl_levels = {tl for tl in top_levels if tl.value.startswith(AZL_PREFIX)}
+    non_azl_levels = top_levels - azl_levels
+    if non_azl_levels and azl_levels:
+        # Conflict between Backport-dist-git and AZL-*
         confidence = "low"
-    elif len(matched) == 1:
-        confidence = "high"
-    else:
-        sub_cats = {r.sub_category for r, _ in matched if r.sub_category}
-        confidence = "medium" if len(sub_cats) > 1 else "high"
-
-    # Cap Upstreamable at medium — the heuristic can't reliably distinguish
-    # "self-created fix to push upstream" from "upstream fix applied locally".
-    # The LLM pass verifies by checking patch authorship, PR status, and intent.
-    if (
-        best_rule.sub_category is not None
-        and best_rule.sub_category.value == "Upstreamable"
-        and confidence == "high"
-    ):
+    elif len(top_levels) > 1:
         confidence = "medium"
+    else:
+        confidence = "high"
 
     result: dict[str, Any] = {
         "top_level": best_rule.top_level.value,
-        "sub_category": best_rule.sub_category.value if best_rule.sub_category else None,
         "confidence": confidence,
         "classified_by": "heuristic",
         "matched_rules": matched_rule_names,
@@ -302,6 +321,73 @@ def classify_entry(
     result["rationale"] = "; ".join(descriptions)
 
     return result
+
+
+def classify_upstreamability(
+    entry: dict[str, Any],
+    top_level: str | None,
+) -> dict[str, Any]:
+    """Classify the upstreamability of an overlay entry.
+
+    Returns a dict with upstreamability, matched_rule, and rationale.
+    Backport-dist-git entries are inherently "no" (fix already upstream).
+    """
+    # Backport-dist-git = fix already exists upstream → not upstreamable
+    if top_level == "Backport-dist-git":
+        return {
+            "upstreamability": Upstreamability.NO.value,
+            "upstreamability_rule": "backport-inherently-no",
+            "upstreamability_rationale": "Fix already exists upstream (Backport-dist-git)",
+        }
+
+    # Non-AZL, unclassified entries → unknown
+    if not top_level or not top_level.startswith(AZL_PREFIX):
+        return {
+            "upstreamability": Upstreamability.UNKNOWN.value,
+            "upstreamability_rule": None,
+            "upstreamability_rationale": "Unclassified entry",
+        }
+
+    text_fields = _build_text_fields(entry)
+
+    # Evaluate upstreamability rules
+    for rule in UPSTREAMABILITY_RULES:
+        if rule.require_all:
+            all_match = all(
+                _evaluate_signal(s, entry, text_fields) for s in rule.signals
+            )
+            if all_match:
+                return {
+                    "upstreamability": rule.result.value,
+                    "upstreamability_rule": rule.name,
+                    "upstreamability_rationale": f"Matched rule: {rule.name}",
+                }
+        else:
+            for signal in rule.signals:
+                if _evaluate_signal(signal, entry, text_fields):
+                    return {
+                        "upstreamability": rule.result.value,
+                        "upstreamability_rule": rule.name,
+                        "upstreamability_rationale": (
+                            f"Matched rule: {rule.name} (signal: {signal.name})"
+                        ),
+                    }
+
+    # Fallback: categories that are inherently not upstreamable
+    if top_level in NOT_UPSTREAMABLE_CATEGORIES:
+        return {
+            "upstreamability": Upstreamability.NO.value,
+            "upstreamability_rule": "category-inherently-no",
+            "upstreamability_rationale": (
+                f"Category {top_level} is inherently AZL-specific"
+            ),
+        }
+
+    return {
+        "upstreamability": Upstreamability.UNKNOWN.value,
+        "upstreamability_rule": None,
+        "upstreamability_rationale": "No upstreamability signals matched",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -348,7 +434,7 @@ def _save_cache(cache_path: Path, cache: dict[str, dict[str, Any]]) -> None:
 # ---------------------------------------------------------------------------
 
 
-def classify_all(
+def classify_all(  # noqa: PLR0915
     input_path: Path,
     output_path: Path,
     cache_path: Path | None = None,
@@ -385,6 +471,11 @@ def classify_all(
             conf = classification["confidence"]
             stats[f"heuristic_{conf}"] += 1
 
+        # Upstreamability (always re-evaluated, not cached)
+        top_level = entry["classification"].get("top_level")
+        upstream_info = classify_upstreamability(entry, top_level)
+        entry["classification"].update(upstream_info)
+
     # Classify group entries
     for entry in data.get("group_entries", []):
         fp = _compute_fingerprint(entry)
@@ -401,24 +492,29 @@ def classify_all(
             conf = classification["confidence"]
             stats[f"heuristic_{conf}"] += 1
 
+        # Upstreamability (always re-evaluated, not cached)
+        top_level = entry["classification"].get("top_level")
+        upstream_info = classify_upstreamability(entry, top_level)
+        entry["classification"].update(upstream_info)
+
     # Compute summary
     all_entries = data.get("overlays", []) + data.get("group_entries", [])
     by_top_level: dict[str, int] = {}
-    by_sub_category: dict[str, int] = {}
     by_confidence: dict[str, int] = {}
+    by_upstreamability: dict[str, int] = {}
 
     for entry in all_entries:
         cl = entry.get("classification", {})
         tl = cl.get("top_level") or "unclassified"
-        sc = cl.get("sub_category") or "none"
         conf = cl.get("confidence") or "unknown"
+        upstream = cl.get("upstreamability") or "unknown"
         by_top_level[tl] = by_top_level.get(tl, 0) + 1
-        by_sub_category[sc] = by_sub_category.get(sc, 0) + 1
         by_confidence[conf] = by_confidence.get(conf, 0) + 1
+        by_upstreamability[upstream] = by_upstreamability.get(upstream, 0) + 1
 
     data["summary"] = {
         "by_top_level": dict(sorted(by_top_level.items())),
-        "by_sub_category": dict(sorted(by_sub_category.items())),
+        "by_upstreamability": dict(sorted(by_upstreamability.items())),
         "by_confidence": dict(sorted(by_confidence.items())),
         "pipeline_stats": stats,
     }
@@ -476,10 +572,9 @@ def main() -> None:
     print("\nBy top-level label:", file=sys.stderr)
     for label, count in sorted(summary["by_top_level"].items(), key=lambda x: -x[1]):
         print(f"  {label}: {count}", file=sys.stderr)
-    print("\nBy sub-category:", file=sys.stderr)
-    for cat, count in sorted(summary["by_sub_category"].items(), key=lambda x: -x[1]):
-        if cat != "none":
-            print(f"  {cat}: {count}", file=sys.stderr)
+    print("\nBy upstreamability:", file=sys.stderr)
+    for tag, count in sorted(summary["by_upstreamability"].items(), key=lambda x: -x[1]):
+        print(f"  {tag}: {count}", file=sys.stderr)
     print("\nBy confidence:", file=sys.stderr)
     for conf, count in sorted(summary["by_confidence"].items()):
         print(f"  {conf}: {count}", file=sys.stderr)
