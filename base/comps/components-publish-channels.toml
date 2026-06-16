@@ -2571,6 +2571,7 @@ components = [
     "xrandr",
     "xrdb",
     "xrestop",
+    "xset",
     "xvidcore",
     "xxhash",
     "xz",

@@ -6971,6 +6971,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.xrdb]
 [components.xrestop]
 [components.xsel]
+[components.xset]
 [components.xtl]
 [components.xvidcore]
 [components.xwayland-run]
