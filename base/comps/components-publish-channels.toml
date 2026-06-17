@@ -1156,6 +1156,7 @@ components = [
     "mpich",
     "mptcpd",
     "mrtg",
+    "msgpack",
     "msr-tools",
     "mstflint",
     "msv",
