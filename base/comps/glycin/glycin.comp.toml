@@ -1,12 +1,6 @@
 [components.glycin]
 
-# Disable HEIF and JPEG XL support — libheif and libjxl are not shipped in
-# Azure Linux 4.0. Upstream spec uses `%bcond heif/jpegxl %{undefined rhel}`,
-# gating both the C-level BuildRequires and the meson `-Dloaders=` list.
-# However, `%cargo_generate_buildrequires -a` still scans all workspace
-# members and emits crate() deps for glycin-heif/glycin-jxl. We must also
-# remove those loader source dirs (same pattern as glycin-raw/glycin-jpeg2000).
-# AB#20330 / Koji task 2584524
+# Disable HEIF and JPEG XL — libheif and libjxl are not available in Azure Linux 4.0.
 [components.glycin.build]
 without = ["heif", "jpegxl"]
 
