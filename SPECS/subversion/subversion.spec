@@ -12,8 +12,6 @@ Patch0:         CVE-2024-46901-advisory.patch
 BuildRequires:  apr-devel
 BuildRequires:  apr-util
 BuildRequires:  apr-util-devel
-BuildRequires:  apr-util-openssl
-BuildRequires:  ca-certificates
 BuildRequires:  expat-devel
 BuildRequires:  libserf-devel
 BuildRequires:  libtool
@@ -26,6 +24,8 @@ BuildRequires:  utf8proc-devel
 BuildRequires:  python3
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
+BuildRequires:  apr-util-openssl
+BuildRequires:  ca-certificates
 BuildRequires:  openssl
 BuildRequires:  cyrus-sasl
 BuildRequires:  cyrus-sasl-devel
