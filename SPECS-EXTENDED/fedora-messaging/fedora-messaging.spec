@@ -7,7 +7,7 @@
 
 Name:           %{pkgname}
 Version:        3.9.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Set of tools for using Fedora's messaging infrastructure
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -71,6 +71,13 @@ Requires:       python3-automat
 %prep
 %autosetup -n %{srcname}-%{version} -p0
 
+# Azure Linux 3 ships python3-jsonschema 2.6.0, but upstream pins jsonschema
+# >=3.2.0; that lower bound in the wheel metadata makes pkg_resources raise a
+# VersionConflict when the plugin loads, silently dropping every Koji event.
+# 2.6.0 is sufficient here, so relax the bound before the wheel is built
+# (anchored to ^jsonschema so types-jsonschema is left untouched).
+sed -i -E 's/^jsonschema = .*/jsonschema = ">=2.6.0,<5.0.0"/' pyproject.toml
+
 %generate_buildrequires
 %pyproject_buildrequires
 
@@ -114,10 +121,9 @@ install -D -p -m 0644 fm-consumer@.service %{buildroot}%{_unitdir}/fm-consumer@.
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/LICENSES/GPL-2.0-or-later.txt
 
 %changelog
-* Tue Jun 16 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-2
-- Require python3-automat so the Twisted reactor (used by the messaging plugin) works at runtime.
-
 * Thu Jun 11 2026 Adit Jha <aditjha@microsoft.com> - 3.9.0-1
 - Initial Azure Linux import from Fedora 43 (license: MIT).
 - License verified.
 - Omit Fedora-specific broker profiles (fedora.toml, fedora.stg.toml) and bundled cert/key files; ship only the generic example config.
+- Require python3-automat so the Twisted reactor (used by the messaging plugin) works at runtime.
+- Relax the jsonschema lower bound to >=2.6.0 so the package loads against Azure Linux 3's python3-jsonschema 2.6.0.
