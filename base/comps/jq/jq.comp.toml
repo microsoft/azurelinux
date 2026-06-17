@@ -5,7 +5,7 @@
 release = { calculation = "manual" }
 
 [[components.jq.overlays]]
-description = "Bump Release for a test rebuild (no source change); pins %autorelease to a static 5."
+description = "Bump Release for a test rebuild (no source change); pins %autorelease to a static 6."
 type = "spec-set-tag"
 tag = "Release"
-value = "5%{?dist}"
+value = "6%{?dist}"
