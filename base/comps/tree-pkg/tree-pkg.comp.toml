@@ -1,0 +1,10 @@
+[components.tree-pkg]
+# Pin the Release for a throwaway test rebuild so the auto-calculator does not
+# re-bump the static value set by the overlay below.
+release = { calculation = "manual" }
+
+[[components.tree-pkg.overlays]]
+description = "Bump Release for a test rebuild (no source change); 3 -> 4."
+type = "spec-set-tag"
+tag = "Release"
+value = "4%{?dist}"

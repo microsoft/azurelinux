@@ -1,0 +1,11 @@
+[components.jq]
+# Pin the Release to a static value for a throwaway test rebuild. The upstream
+# spec uses %autorelease; manual calculation stops azldev from recomputing it so
+# the bumped value below is honored verbatim.
+release = { calculation = "manual" }
+
+[[components.jq.overlays]]
+description = "Bump Release for a test rebuild (no source change); pins %autorelease to a static 4."
+type = "spec-set-tag"
+tag = "Release"
+value = "4%{?dist}"
