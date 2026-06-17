@@ -290,7 +290,7 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
-* Mon Jun 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-8
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-8
 - Patch CVE-2026-35387
 
 * Wed Apr 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-7
