@@ -1,7 +1,7 @@
 Summary:        Libxml2
 Name:           libxml2
 Version:        2.11.5
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,7 @@ Patch13:        CVE-2025-7425.patch
 Patch14:        CVE-2026-0990.patch
 Patch15:        CVE-2026-0992.patch
 Patch16:        CVE-2025-8732.patch
+Patch17:        CVE-2026-0989.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-xml
@@ -96,6 +97,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/cmake/libxml2/libxml2-config.cmake
 
 %changelog
+* Tue Mar 17 2026 Vijayender Putta <v-vijputta@microsoft.com> - 2.11.5-10
+- Patch for CVE-2026-0989
+
 * Mon Jan 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.11.5-9
 - Patch for CVE-2026-0990, CVE-2026-0992, CVE-2025-8732
 
