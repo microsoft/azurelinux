@@ -77,6 +77,7 @@ Patch106: CVE-2026-45445.patch
 Patch107: CVE-2026-45446.patch
 Patch108: CVE-2026-7383.patch
 Patch109: CVE-2026-9076.patch
+Patch110: CVE-2026-42767.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -374,7 +375,7 @@ install -m644 %{SOURCE9} \
 
 %changelog
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-3
-- Patch for CVE-2026-9076, CVE-2026-7383, CVE-2026-45446, CVE-2026-45445, CVE-2026-42768, CVE-2026-42766, CVE-2026-34183, CVE-2026-34180
+- Patch for CVE-2026-9076, CVE-2026-7383, CVE-2026-45446, CVE-2026-45445, CVE-2026-42768, CVE-2026-42766, CVE-2026-34183, CVE-2026-34180, CVE-2026-42767
 
 * Mon Jun 15 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.7-2
 - Patch CVE-2026-34182
