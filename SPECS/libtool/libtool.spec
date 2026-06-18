@@ -42,8 +42,22 @@ find %{buildroot}%{_libdir} -name '*.la' -delete
 rm -rf %{buildroot}%{_infodir}
 
 %check
-# Tests 66 (link-order) and 169 (cmdline_wrap) are known-flaky in chroot
-make %{?_smp_mflags} check || :
+# libtool 2.4.7's testsuite has 169 tests; 5 are upstream-expected
+# failures. Two more fail unconditionally on a modern toolchain in the
+# build chroot:
+#   * 66 "Link order test" (link-order.at:106) -- libtool's expected
+#     EGREP pattern for the relink command no longer matches the output
+#     produced by current GCC/binutils. This is a known upstream
+#     regression in libtool 2.4.7 vs binutils >= 2.39, not fixed in
+#     2.4.7. See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=58105.
+#   * 169 "Run tests with low max_cmd_len" (cmdline_wrap.at:48) -- a
+#     recursive test that re-runs the suite with max_cmd_len=24. It
+#     cascades whenever any earlier test has failed (the test itself
+#     warns: "If we already have failures, then reruns will fail too!")
+#     and so always fails when 66 fails.
+# Use autotest's native range syntax to skip exactly these two; any
+# other regression still fails the build.
+make %{?_smp_mflags} check TESTSUITEFLAGS='1-65 67-168'
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -83,8 +97,10 @@ make %{?_smp_mflags} check || :
 
 %changelog
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.4.7-2
-- Tolerate `make check` failures in %%check; tests 66 (link-order) and
-  169 (cmdline_wrap) are known-flaky in the build chroot.
+- Skip exactly tests 66 (link-order, broken with binutils >= 2.39) and
+  169 (cmdline_wrap, cascades from 66) via TESTSUITEFLAGS instead of
+  swallowing all `make check` failures. Any other regression now
+  fails the build.
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.4.7-1
 - Auto-upgrade to 2.4.7 - Azure Linux 3.0 - package upgrades
