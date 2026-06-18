@@ -42,8 +42,7 @@ The libnfs-utils package contains simple client programs for accessing
 NFS servers using libnfs.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}
-%patch 0 -p1
+%autosetup -p1 -n %{name}-%{name}-%{version}
 autoreconf -vif
 
 %build
