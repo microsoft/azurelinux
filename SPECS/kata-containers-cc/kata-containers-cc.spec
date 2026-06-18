@@ -15,9 +15,8 @@ Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
 Patch2:       CVE-2026-39821.patch
 Patch3:       CVE-2026-33814.patch
-# Patch for vendor packages
-Patch1000:    CVE-2025-5791.patch
-Patch1001:    CVE-2025-4574.patch
+Patch4:       CVE-2025-5791.patch
+Patch5:       CVE-2025-4574.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -50,12 +49,7 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -N -n %{sourceName}-%{version}
-%autopatch -p1 -M 999
-pushd %{_builddir}/%{sourceName}-%{version}
-tar -xf %{SOURCE1}
-%autopatch -p1 -m 1000 -M 1999
-popd
+%autosetup -p1 -a1 -n %{sourceName}-%{version}
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
