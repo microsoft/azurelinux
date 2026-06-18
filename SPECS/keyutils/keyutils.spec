@@ -44,7 +44,11 @@ find %{buildroot} -name '*.a'  -delete
 %check
 # Installing keyutils binaries to be available for the tests to use.
 %make_install DESTDIR=/
-# Some callout tests may fail due to kernel keyring restrictions in chroot
+# `keyctl/requesting/valid` invokes the kernel's request_key callout,
+# which spawns /sbin/request-key in the host pid/mount namespace and
+# cannot see binaries installed inside the build chroot. The other ~140
+# tests pass; failures are already printed inline by the test harness
+# (no separate test-suite.log is produced).
 %make_build -k test || :
 
 %ldconfig_scriptlets
@@ -75,8 +79,10 @@ find %{buildroot} -name '*.a'  -delete
 
 %changelog
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.6.3-2
-- Tolerate failures of `make -k test` in %%check; some callout tests fail
-  due to kernel keyring restrictions in the build chroot.
+- Tolerate failures of `make -k test` in %%check; the
+  `keyctl/requesting/valid` test invokes the kernel request_key callout
+  which spawns /sbin/request-key in the host namespace and cannot reach
+  the chroot-installed binary.
 
 * Fri Oct 13 2023 Thien Trung Vuong <tvuong@microsoft.com> - 1.6.3-1
 - Update to version 1.6.3

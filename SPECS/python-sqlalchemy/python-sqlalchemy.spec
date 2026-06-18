@@ -89,6 +89,11 @@ sed -i 's/return asyncio.get_event_loop_policy().get_event_loop()/loop = asyncio
 
 # remove unnecessary scripts for building documentation
 rm -rf doc/build
+# doc/copyright.html is just an HTML rendering of LICENSE; the actual LICENSE
+# text is shipped via %%license in python3-sqlalchemy and (for the -doc subpkg)
+# below, and the toolkit license-checker flags any 'copyright*' file inside
+# %%doc as a misplaced license file.
+rm -f doc/copyright.html
 
 %check
 # Using pip for 'more-itertools' because Mariner doesn't build it.
@@ -100,6 +105,7 @@ pip3 install more-itertools pytest pytest-xdist apipkg typing_extensions mypy
 PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesses=auto --ignore=test/ext/mypy --ignore=test/typing/test_mypy.py
 
 %files doc
+%license LICENSE
 %doc doc examples
 
 %files -n python3-sqlalchemy
@@ -113,6 +119,9 @@ PYTHONPATH=.:%{buildroot}%{python3_sitelib} python3 -m pytest test --numprocesse
   running (Python 3.12 deprecated get_event_loop()).
 - Exclude mypy tests from %%check (version-specific mypy output
   mismatches).
+- Drop the redundant doc/copyright.html HTML rendering of LICENSE and
+  add %%license LICENSE to the -doc subpackage so the toolkit
+  license-checker no longer flags it.
 
 * Thu Feb 15 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.27-1
 - Auto-upgrade to 2.0.27 - none

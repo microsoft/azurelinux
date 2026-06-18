@@ -11,7 +11,7 @@ License:        GPLv3+ AND LGPLv2+ AND (GPL+ OR Artistic)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://tracker.debian.org/pkg/fakeroot
-Source0:        https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
+Source0:        https://snapshot.debian.org/archive/debian/20231106T210201Z/pool/main/f/fakeroot/%{name}_%{version}.orig.tar.gz
 # Debian package patches, from debian.tar.xz
 Patch2:         debian_fix-shell-in-fakeroot.patch
 # Address some POSIX-types related problems.
@@ -160,7 +160,8 @@ fi
 %files
 %endif
 %defattr(-,root,root,-)
-%doc COPYING AUTHORS BUGS DEBUG doc/README.saving
+%license COPYING
+%doc AUTHORS BUGS DEBUG doc/README.saving
 %{_bindir}/faked-*
 %ghost %{_bindir}/faked
 %{_bindir}/fakeroot-*
@@ -181,6 +182,8 @@ fi
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.32.2-2
 - Split the obj-sysv and obj-tcp test runs and retry the tcp variant once
   to ride out intermittent t.tar failures in chroot environments.
+- Move COPYING from %%doc to %%license so the toolkit license-checker no
+  longer flags it as a misplaced license file.
 
 * Tue Jan 23 2024 Andrew Phelps <anphel@microsoft.com> - 1.32.2-1
 - Upgrade to version 1.32.2

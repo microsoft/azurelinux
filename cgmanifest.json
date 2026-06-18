@@ -3589,7 +3589,7 @@
         "other": {
           "name": "fakeroot",
           "version": "1.32.2",
-          "downloadUrl": "https://cdn-aws.deb.debian.org/debian/pool/main/f/fakeroot/fakeroot_1.32.2.orig.tar.gz"
+          "downloadUrl": "https://snapshot.debian.org/archive/debian/20231106T210201Z/pool/main/f/fakeroot/fakeroot_1.32.2.orig.tar.gz"
         }
       }
     },

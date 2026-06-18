@@ -26,6 +26,8 @@ Requires:       openssl >= 1.1.1g-6
 Requires:       python3
 %if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-pytest
+BuildRequires:  python3-six
 %endif
 
 %description -n python3-m2crypto
@@ -48,10 +50,30 @@ messenger for Zope.
 %py3_install
 
 %check
-# setup.py test is deprecated and fails with Python 3.12 due to
-# bundled six.py meta-path importer incompatibility
+# M2Crypto 0.38.0 (last released 2021) has two known incompatibilities
+# with Python 3.12 that cannot be fixed at the spec level:
+#
+#  1. The bundled `M2Crypto/six.py` lazy importer for `six.moves` was
+#     broken by importlib changes in 3.12. We replace it with the system
+#     `six` (installed below) to get past this layer.
+#  2. `M2Crypto/SSL/ssl_dispatcher.py` does `import asyncore` at module
+#     load time. `asyncore` was removed from the Python 3.12 stdlib
+#     (PEP 594). Because `M2Crypto/__init__.py` eagerly imports `SSL`,
+#     every `from M2Crypto import ...` fails with
+#     `ModuleNotFoundError: No module named 'asyncore'`, which means
+#     the test suite cannot even collect.
+#
+# Upstream M2Crypto >= 0.40 drops the asyncore-based dispatcher. Until
+# this package can be rebased on 0.40+, the tests cannot pass under
+# Python 3.12 and we tolerate failure with `|| :`. We still run pytest
+# (with the six.py shim so reviewers see the real underlying error) and
+# still install `parameterized`, so the day this package is updated the
+# %check section starts being meaningful with no further work.
 pip3 install parameterized
-%python3 -m pytest tests/ -k "not test_tls1_nok" || :
+cp -f $(%python3 -c "import six; print(six.__file__)") \
+  %{buildroot}%{python3_sitearch}/M2Crypto/six.py
+PYTHONPATH=%{buildroot}%{python3_sitearch} \
+  %python3 -m pytest tests/ -k "not test_tls1_nok" || :
 
 %files -n python3-m2crypto
 %defattr(-,root,root)
@@ -60,8 +82,17 @@ pip3 install parameterized
 
 %changelog
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.38.0-5
-- Replace deprecated `setup.py test` with `pytest` and tolerate failures;
-  the bundled six.py meta-path importer is incompatible with Python 3.12.
+- Replace deprecated `setup.py test` with `pytest` and document the
+  two real upstream Python-3.12 incompatibilities (vendored
+  `six.moves` importer + removed `asyncore` stdlib module) that
+  prevent the test suite from collecting. Continue to tolerate
+  failure (`|| :`) until this package is rebased on M2Crypto >= 0.40.
+- Replace the bundled `M2Crypto/six.py` in the buildroot with the
+  system `six` so that the pytest run gets past the first import
+  failure and surfaces the real underlying error (asyncore removal)
+  in the build log instead of masking it.
+- Add `python3-pytest` and `python3-six` BuildRequires (used by the
+  pytest run and the six shim above respectively).
 
 * Wed Jan 29 2025 Jyoti Kanase <v-jykanase@microsoft.com> - 0.38.0-4
 - Fix CVE-2019-11358
