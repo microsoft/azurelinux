@@ -3525,7 +3525,7 @@ fi
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
 - Patch for CVE-2026-48914
 
-* Tue May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
+* Wed May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
 - Enable user_static builds for qemu
 - configure user_static with 'enable-pie'
 - manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
