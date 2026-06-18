@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,6 +40,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Skip the timeout test, which is unreliable on our (vm) build machines
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
+# Skip pma test - persistent memory allocator requires MAP_FIXED mmap
+# which may not work reliably in chroot build environments
+sed -i 's/$(MAKE) $(NEED_PMA)/echo "skipping pma test"/' test/Makefile
 
 # Generate locale for `en_US.iso88591` which is required for ptest
 # Ideally it should have been present. Investigate if its a `chroot` only issue
@@ -63,6 +66,10 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 5.2.2-2
+- Skip pma (persistent memory allocator) test in chroot; it requires
+  MAP_FIXED mmap which is not reliable in build chroot environments.
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
 
