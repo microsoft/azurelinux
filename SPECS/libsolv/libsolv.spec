@@ -1,10 +1,12 @@
 Summary:        A free package dependency solver
 Name:           libsolv
 Version:        0.7.28
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD
 URL:            https://github.com/openSUSE/libsolv
 Source0:        https://github.com/openSUSE/libsolv/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-9149.patch
+Patch1:         CVE-2026-9150.patch
 Group:          Development/Tools
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,7 +41,7 @@ Requires:       xz
 %{summary}
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %cmake \
@@ -80,7 +82,10 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man1/*
 
 %changelog
-* Fri April 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.7.28-3
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.7.28-4
+- Patch for CVE-2026-9150, CVE-2026-9149
+
+* Fri Apr 11 2025 Riken Maharjan <rmaharjan@microsoft.com> - 0.7.28-3
 - Enable conda support.
 
 * Wed Sep 04 2024 Reuben Olinsky <reubeno@microsoft.com> - 0.7.28-2
@@ -100,7 +105,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 * Tue Oct 19 2021 Jon Slobodzian <joslobo@microsoft.com> - 0.7.19-2
 - RPM no longer requires libdb, so remove dependency from libsolv
 
-* Tue Aug 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-1
+* Sat Aug 14 2021 Thomas Crain <thcrain@microsoft.com> - 0.7.19-1
 - Upgrade to latest upstream
 - Install files to %%{_libdir} instead of %%{_lib64dir}
 - Lint spec

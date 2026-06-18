@@ -4,8 +4,8 @@ Distribution:   Azure Linux
 %global rundir /run/
 
 Name:     lldpd
-Version:  1.0.17
-Release:  2%{?dist}
+Version:  1.0.22
+Release:  1%{?dist}
 Summary:  ISC-licensed implementation of LLDP
 
 License:  ISC
@@ -157,11 +157,15 @@ fi
 %files devel
 %{_includedir}/lldp-const.h
 %{_includedir}/lldpctl.h
+%{_includedir}/lldpctl.hpp
 %{_libdir}/liblldpctl.so
 %{_libdir}/pkgconfig/lldpctl.pc
 
 
 %changelog
+* Thu Jun 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.0.22-1
+- Auto-upgrade to 1.0.22 - for CVE-2026-46433
+
 * Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.0.17-2
 - Bumping release to rebuild with new 'net-snmp' libs.
 

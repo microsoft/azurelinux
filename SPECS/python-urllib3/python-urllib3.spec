@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        2.0.7
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -16,6 +16,7 @@ Patch3:         CVE-2025-50181.patch
 Patch4:         CVE-2025-66418.patch
 Patch5:         CVE-2025-66471.patch
 Patch6:         CVE-2026-21441.patch
+Patch7:         CVE-2026-44431.patch
 
 %description
 A powerful, sanity-friendly HTTP client for Python.
@@ -87,6 +88,9 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 %{python3_sitelib}/*
 
 %changelog
+* Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.7-5
+- Patch for CVE-2026-44431
+
 * Fri Jan 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.7-4
 - Patch for CVE-2026-21441
 

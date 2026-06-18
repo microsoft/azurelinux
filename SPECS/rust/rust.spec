@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -57,6 +57,10 @@ Patch12:        CVE-2026-2006.patch
 Patch13:        CVE-2026-33056.patch
 Patch14:        CVE-2026-33055.patch
 Patch15:        CVE-2026-34743.patch
+Patch16:        CVE-2026-5222.patch
+Patch17:        CVE-2026-5223.patch
+Patch18:        CVE-2026-40034.patch
+
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -74,7 +78,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-19%{?dist}
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -194,6 +198,12 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
+- Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
+
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.90.0-8
+- Bump to rebuild with updated glibc
+
 * Tue Apr 07 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-7
 - Patch for CVE-2026-2006, CVE-2026-33056, CVE-2026-33055 & CVE-2026-34743
 

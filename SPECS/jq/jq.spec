@@ -1,7 +1,7 @@
 Summary:        jq is a lightweight and flexible command-line JSON processor.
 Name:           jq
 Version:        1.7.1
-Release:        6%{?dist}
+Release:        7%{?dist}
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 License:        MIT
@@ -16,7 +16,13 @@ Patch5:         CVE-2026-33948.patch
 Patch6:         CVE-2026-39956.patch
 Patch7:         CVE-2026-39979.patch
 Patch8:         CVE-2026-40164.patch
-Patch9:         CVE-2025-9403.patch
+Patch9:         CVE-2026-40612.patch
+Patch10:        CVE-2026-41256.patch
+Patch11:        CVE-2026-41257.patch
+Patch12:        CVE-2026-43895.patch
+Patch13:        CVE-2026-43896.patch
+Patch14:        CVE-2026-44777.patch
+Patch15:        CVE-2025-9403.patch
 Distribution:   Azure Linux
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -43,7 +49,8 @@ Development files for jq
 
 %build
 %configure \
-    --disable-static
+    --disable-static \
+    --enable-maintainer-mode
 make %{?_smp_mflags}
 
 %install
@@ -70,8 +77,11 @@ make check
 %{_includedir}/*
 
 %changelog
-* Tue May 12 2026 Vijayender Putta <v-vijputta@microsoft.com> - 1.7.1-6
+* Tue May 12 2026 Vijayender Putta <v-vijputta@microsoft.com> - 1.7.1-7
 - Patch for CVE-2025-9403
+
+* Tue May 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-6
+- Patch for CVE-2026-43896, CVE-2026-43895, CVE-2026-41257, CVE-2026-41256, CVE-2026-40612, CVE-2026-44777
 
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-5
 - Patch for CVE-2026-40164, CVE-2026-39979, CVE-2026-39956, CVE-2026-33948, CVE-2026-33947, CVE-2026-32316

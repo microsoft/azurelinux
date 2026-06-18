@@ -1,0 +1,33 @@
+From 72abd40cf44290f432f5c7e85ae4ea213c0ac4c0 Mon Sep 17 00:00:00 2001
+From: Chris PeBenito <chpebeni@linux.microsoft.com>
+Date: Mon, 15 Jun 2026 13:54:22 +0000
+Subject: [PATCH 40/41] irqbalance: v1.9.4 added namespacing in the systemd
+ unit.
+
+Add cap_userns equivalents to standard capability rules since irqbalance
+v1.9.4 added PrivateUsers=true to the systemd unit.
+
+Signed-off-by: Chris PeBenito <chpebeni@linux.microsoft.com>
+---
+ policy/modules/services/irqbalance.te | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/policy/modules/services/irqbalance.te b/policy/modules/services/irqbalance.te
+index 609d9ef50..c400f4c20 100644
+--- a/policy/modules/services/irqbalance.te
++++ b/policy/modules/services/irqbalance.te
+@@ -23,8 +23,11 @@ init_unit_file(irqbalance_unit_t)
+ # Local policy
+ #
+ 
++# v1.9.4 added namespacing in the systemd unit
+ allow irqbalance_t self:capability { setpcap };
+ dontaudit irqbalance_t self:capability { net_admin sys_tty_config };
++allow irqbalance_t self:cap_userns { setpcap };
++dontaudit irqbalance_t self:cap_userns { net_admin sys_tty_config };
+ allow irqbalance_t self:process { getcap getsched setcap signal_perms };
+ allow irqbalance_t self:udp_socket create_socket_perms;
+ allow irqbalance_t self:unix_stream_socket create_stream_socket_perms;
+-- 
+2.54.0
+
