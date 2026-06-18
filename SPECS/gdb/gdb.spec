@@ -112,7 +112,7 @@ make check TESTS='gdb.base/default.exp'
 %{_mandir}/*/*
 
 %changelog
-* Tue May 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-10
+* Wed May 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-10
 - Patch for CVE-2025-11083
 * Tue May 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 13.2-9
 - Patch for CVE-2025-1178, CVE-2025-1176
