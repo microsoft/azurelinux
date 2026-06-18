@@ -49,10 +49,7 @@ every software/card that does so, too.
 
 
 %prep
-%setup -q
-%patch 0 -p1 -b .pinpad
-%patch 1 -p1 -b .file-cache
-%patch 2 -p1
+%autosetup -p1
 
 # The test-pkcs11-tool-allowed-mechanisms already works in Fedora
 sed -i -e '/XFAIL_TESTS/,$ {
