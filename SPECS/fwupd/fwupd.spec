@@ -7,6 +7,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/fwupd/fwupd
 Source0:        https://github.com/fwupd/fwupd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Patch0:         reprocess-device-metadata-after-coldplug.patch
+Patch1:         defer-ensure-device-supported.patch
 
 %global glib2_version 2.68.0
 %global libxmlb_version 0.3.24
@@ -33,10 +35,11 @@ Source0:        https://github.com/fwupd/fwupd/archive/refs/tags/%{version}.tar.
 %ifarch i686 x86_64
 %global have_msr 1
 %endif
-# only available recently
+
 %global have_modem_manager 0
 # passim is in SPECS-EXTENDED; disable the local caching daemon
 %global have_passim 0
+
 BuildRequires:  freefont
 BuildRequires:  gettext
 %if 0%{?enable_docs}
@@ -117,12 +120,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Files for development with %{name}.
 
+%if 0%{?enable_tests}
 %package tests
 Summary:        Data files for installed tests
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tests
 Data files for installed tests.
+%endif
 
 %if 0%{?have_modem_manager}
 %package plugin-modem-manager
@@ -169,7 +174,7 @@ or server machines.
     -Ddocs=disabled \
 %endif
     -Dlvfs=disabled \
-%if 0%{?enable_tests}
+%if 0%{?with_check} || 0%{?enable_tests}
     -Dtests=true \
 %else
     -Dtests=false \
@@ -197,13 +202,21 @@ or server machines.
 
 %meson_build
 
-%if 0%{?enable_tests}
+%if 0%{?with_check}
 %check
 %meson_test
 %endif
 
 %install
 %meson_install
+
+# Remove installed-test artifacts when not building the -tests subpackage
+%if ! 0%{?enable_tests}
+rm -rf %{buildroot}%{_datadir}/installed-tests/fwupd
+rm -rf %{buildroot}%{_libexecdir}/installed-tests/fwupd
+rm -f %{buildroot}%{_datadir}/fwupd/remotes.d/fwupd-tests.conf
+rm -rf %{buildroot}%{_datadir}/fwupd/host-emulate.d
+%endif
 
 mkdir -p --mode=0700 %{buildroot}%{_localstatedir}/lib/fwupd/gnupg
 
@@ -320,12 +333,10 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/fwupd
 %{_libdir}/libfwupd*.so
 %{_libdir}/pkgconfig/fwupd.pc
 
-%files tests
 %if 0%{?enable_tests}
+%files tests
 %{_datadir}/fwupd/host-emulate.d/*.json.gz
 %{_datadir}/installed-tests/fwupd
-# libgusb >= 0.4.5
-%{_datadir}/fwupd/device-tests/*.json
 %{_libexecdir}/installed-tests/fwupd
 %{_datadir}/fwupd/remotes.d/fwupd-tests.conf
 %endif
@@ -333,6 +344,8 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/fwupd
 %changelog
 * Thu Jun 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 2.0.20-1
 - Update to version 2.0.20
+- Backport upstream fixes (964aa10, aadaf0b) for UEFI KEK update failure
+  caused by device enumeration order during coldplug
 
 * Fri Oct 18 2024 Jocelyn Berrendonner <jocelynb@microsoft.com> - 2.0.1-2
 - Integrating the spec into Azure Linux
