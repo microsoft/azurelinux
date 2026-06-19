@@ -47,11 +47,11 @@ python3 -m pytest -v -k "not (PrefixSuffixGoldenTest or fstring or test_inline_c
 
 %changelog
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.2.0-2
-- Replace `setup.py test` with `pytest`; install the package via
-  `pip3 install -e .` so the plugin entry point is discovered; exclude
-  PrefixSuffixGoldenTest and fstring/inline tests that break on Python
-  3.12 AST changes.
-- Add python3-pip to BuildRequires.
+- Replace `setup.py test` (deprecated and removed in setuptools 72) with
+  a direct `python3 -m pytest` invocation that discovers tests from the
+  unpacked source tree; exclude PrefixSuffixGoldenTest and the
+  fstring / inline_* test cases that fail due to Python 3.12 AST changes.
+- Add python3-pip to BuildRequires so %%check can pip-install pytest.
 
 * Wed Oct 26 2022 Riken Maharjan <rmaharjan@microsoft.com> - 0.2.0-1
 - Original version for CBL-Mariner. License Verified.
