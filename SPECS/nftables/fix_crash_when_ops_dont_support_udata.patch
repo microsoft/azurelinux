@@ -12,6 +12,7 @@ Fix this by falling back to 'type' format.
 Fixes: 6e48df5329ea ('src: add "typeof" build/parse/print support')
 Signed-off-by: Florian Westphal <fw@strlen.de>
 Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Upstream Patch Reference : https://git.netfilter.org/nftables/commit/?id=be737a1986bfee0ddea4bee7863dca0123a2bcbc
 ---
  src/netlink.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
