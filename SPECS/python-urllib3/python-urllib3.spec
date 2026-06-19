@@ -49,7 +49,6 @@ rm -rf test/contrib/
 %pyproject_install
 
 %check
-pip3 install --upgrade pip
 # Pin pytest<9: pytest 9.x rejects non-Collection iterables (chain) in parametrize argvalues
 pip3 install tornado>=6.2 \
     trustme>=0.9.0 \
@@ -62,7 +61,6 @@ pip3 install tornado>=6.2 \
     flaky \
     idna>=3.4 \
     psutil \
-    'pytest>=7.4.0,<9' \
     pytest-timeout>=2.1.0 \
     pytest-xdist \
     urllib3>=%{version}
