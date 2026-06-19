@@ -35,6 +35,8 @@ Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1
 # bootstrap 04
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
+Patch1:         CVE-2026-39821.patch
+
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
 Provides:       golang = %{version}-%{release}
@@ -62,6 +64,7 @@ tar xf %{SOURCE5} --no-same-owner
 mv -v go go-bootstrap-04
 
 %setup -q -n go
+%autopatch -p1 -m 1
 
 %build
 # go 1.4 bootstraps with C.
@@ -169,8 +172,13 @@ fi
 %{_bindir}/*
 
 %changelog
+<<<<<<< HEAD
 * Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-2
 - Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+=======
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
+- Patch for CVE-2026-39821
+>>>>>>> 92dba45e50 ([Critical] Patch golang & golang-1.25 for CVE-2026-39821 (#17627))
 
 * Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
 - Bump version to 1.26.4-1
