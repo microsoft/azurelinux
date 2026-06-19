@@ -37,6 +37,7 @@ Patch7:         CVE-2025-11065.patch
 Patch8:         CVE-2026-39821.patch
 BuildRequires: golang < 1.23
 BuildRequires: hostname
+BuildRequires: tzdata
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -99,8 +100,6 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
-export ZONEINFO=/usr/share/zoneinfo
-export TZ=UTC
 
 echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts 2>/dev/null || true
 
