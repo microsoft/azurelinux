@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.7
-Release: 2%{?dist}
+Release: 3%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -69,6 +69,15 @@ Patch82:  filter-unsupported-algs-key-lengths-dynamically.patch
 Patch83:  Allow-NULL-buffer-with-0-bsize.patch
 Patch100: CVE-2026-31791.patch
 Patch101: CVE-2026-34182.patch
+Patch102: CVE-2026-34180.patch
+Patch103: CVE-2026-34183.patch
+Patch104: CVE-2026-42766.patch
+Patch105: CVE-2026-42768.patch
+Patch106: CVE-2026-45445.patch
+Patch107: CVE-2026-45446.patch
+Patch108: CVE-2026-7383.patch
+Patch109: CVE-2026-9076.patch
+Patch110: CVE-2026-42767.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -365,6 +374,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-3
+- Patch for CVE-2026-9076, CVE-2026-7383, CVE-2026-45446, CVE-2026-45445, CVE-2026-42768, CVE-2026-42766, CVE-2026-34183, CVE-2026-34180, CVE-2026-42767
+
 * Mon Jun 15 2026 Kanishk Bansal <kanbansal@microsoft.com> - 3.3.7-2
 - Patch CVE-2026-34182
 
