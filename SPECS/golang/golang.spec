@@ -173,8 +173,13 @@ fi
 
 %changelog
 <<<<<<< HEAD
+<<<<<<< HEAD
 * Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-2
 - Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+=======
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
+- Patch for CVE-2026-39821
+>>>>>>> 92dba45e50 ([Critical] Patch golang & golang-1.25 for CVE-2026-39821 (#17627))
 =======
 * Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
 - Patch for CVE-2026-39821
