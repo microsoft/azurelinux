@@ -53,14 +53,24 @@ DEFAULT_SOURCE_ACCOUNT = "azltempstaginglookaside"
 DEFAULT_SOURCE_CONTAINER = "repo"
 BLOB_PREFIX = "pkgs"
 DEFAULT_RESUME_FILE = "sources-upload-failures.txt"
-DEFAULT_TAGS = ("Origin=Initial hydration with Beta build sources",)
+DEFAULT_TAGS = (("Origin", "Initial hydration with Beta build sources"),)
 DEFAULT_RETRIES = 3
+DEFAULT_WORKERS_PER_CPU = 10
 COPY_POLL_INTERVAL_S = 2.0
 COPY_TIMEOUT_S = 600.0
 BACKOFF_BASE_S = 2.0
 PROGRESS_INTERVAL = 200
-PENDING_COPY_STATES = frozenset({"pending"})
 TERMINAL_FAILURE_STATES = frozenset({"failed", "aborted"})
+
+
+def log_error(msg: str) -> None:
+    """Print an ``ERROR:``-prefixed message to stderr."""
+    print(f"ERROR: {msg}", file=sys.stderr)
+
+
+def log_warning(msg: str) -> None:
+    """Print a ``WARNING:``-prefixed message to stderr."""
+    print(f"WARNING: {msg}", file=sys.stderr)
 
 
 def report_progress(done: int, total: int, label: str, failed: int = 0, *, force: bool = False) -> None:
@@ -137,7 +147,7 @@ def parse_sources_file(path: Path) -> Iterator[tuple[str, str, str]]:
             continue
         parsed = parse_sources_line(line)
         if parsed is None:
-            print(f"WARNING: unrecognized line in {path}: {raw!r}", file=sys.stderr)
+            log_warning(f"unrecognized line in {path}: {raw!r}")
             continue
         yield parsed
 
@@ -180,7 +190,7 @@ def load_resume_entries(path: Path, source_base_url: str) -> list[Entry]:
         if not url or url.startswith("#"):
             continue
         if not url.startswith(prefix):
-            print(f"WARNING: skipping resume URL with unexpected prefix: {url}", file=sys.stderr)
+            log_warning(f"skipping resume URL with unexpected prefix: {url}")
             continue
         entries.append(Entry(blob_path=url[len(prefix) :], source_url=url))
     return entries
@@ -227,7 +237,7 @@ def apply_tags(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> bool:
     try:
         dest.set_blob_tags(tags)
     except AzureError as err:
-        print(f"ERROR: failed to set tags for {entry.source_url}: {err}", file=sys.stderr)
+        log_error(f"failed to set tags for {entry.blob_path}: {err}")
         return False
     return True
 
@@ -258,7 +268,7 @@ def initiate_copy(entry: Entry, ctx: CopyContext) -> tuple[Entry, str, BlobClien
     try:
         dest.start_copy_from_url(entry.source_url)
     except AzureError as err:
-        print(f"ERROR: failed to start copy for {entry.source_url}: {err}", file=sys.stderr)
+        log_error(f"failed to start copy for {entry.source_url}: {err}")
         return entry, "error", None
 
     return entry, "initiated", dest
@@ -275,17 +285,14 @@ def poll_copy(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> tuple[Ent
         try:
             copy = dest.get_blob_properties().copy
         except AzureError as err:
-            print(f"ERROR: failed to query copy status for {entry.source_url}: {err}", file=sys.stderr)
+            log_error(f"failed to query copy status for {entry.blob_path}: {err}")
             return entry, False
 
         status = copy.status or "unknown"
         if status == "success":
             return entry, apply_tags(entry, dest, tags)
         if status in TERMINAL_FAILURE_STATES:
-            print(
-                f"ERROR: copy {status} for {entry.source_url}: {copy.status_description or 'no detail'}",
-                file=sys.stderr,
-            )
+            log_error(f"copy {status} for {entry.source_url}: {copy.status_description or 'no detail'}")
             return entry, False
 
         if time.monotonic() >= deadline:
@@ -293,8 +300,8 @@ def poll_copy(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> tuple[Ent
                 try:
                     dest.abort_copy(copy.id)
                 except AzureError as err:
-                    print(f"WARNING: failed to abort timed-out copy for {entry.source_url}: {err}", file=sys.stderr)
-            print(f"ERROR: copy timed out after {COPY_TIMEOUT_S:.0f}s for {entry.source_url}", file=sys.stderr)
+                    log_warning(f"failed to abort timed-out copy for {entry.blob_path}: {err}")
+            log_error(f"copy timed out after {COPY_TIMEOUT_S:.0f}s for {entry.source_url}")
             return entry, False
 
         time.sleep(COPY_POLL_INTERVAL_S)
@@ -348,7 +355,7 @@ def upload_entries(entries: list[Entry], ctx: CopyContext, workers: int, retries
             return []
         if attempt < retries:
             backoff = BACKOFF_BASE_S * 2 ** (attempt - 1)
-            print(f"{len(failures)} failure(s); retrying in {backoff:.0f}s...", file=sys.stderr)
+            log_warning(f"{len(failures)} failure(s); retrying in {backoff:.0f}s...")
             time.sleep(backoff)
         pending = failures
     return pending
@@ -388,22 +395,20 @@ def resolve_entries(
     print(f"Verifying {len(entries)} source(s) exist under {source_base_url}/{BLOB_PREFIX}/ ...")
     missing = verify_sources(entries, source_container, args.workers)
     if missing:
-        print(f"ERROR: {len(missing)} source(s) missing from {source_base_url}:", file=sys.stderr)
+        log_error(f"{len(missing)} source(s) missing from {source_base_url}:")
         for entry in missing:
             print(f"  {entry.source_url}", file=sys.stderr)
         return None
     return entries
 
 
-def parse_tags(parser: argparse.ArgumentParser, raw_tags: list[str]) -> dict[str, str]:
-    """Parse ``KEY=VALUE`` tag strings into a dict, erroring out on malformed input."""
-    tags: dict[str, str] = {}
-    for item in raw_tags:
-        key, sep, value = item.partition("=")
-        if not sep or not key:
-            parser.error(f"invalid --tag {item!r}; expected KEY=VALUE")
-        tags[key] = value
-    return tags
+def parse_tag(item: str) -> tuple[str, str]:
+    """Parse one ``KEY=VALUE`` tag string for argparse ``type=``."""
+    key, sep, value = item.partition("=")
+    if not sep or not key:
+        msg = f"invalid tag {item!r}; expected KEY=VALUE"
+        raise argparse.ArgumentTypeError(msg)
+    return key, value
 
 
 def parse_args() -> argparse.Namespace:
@@ -426,7 +431,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--workers",
         type=int,
-        default=10 * (os.cpu_count() or 1),
+        default=DEFAULT_WORKERS_PER_CPU * (os.cpu_count() or 1),
         help="Number of parallel copy/poll workers (default: 10x CPU count = %(default)s).",
     )
     parser.add_argument(
@@ -455,24 +460,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tag",
         action="append",
+        type=parse_tag,
         default=list(DEFAULT_TAGS),
         metavar="KEY=VALUE",
-        help="Blob index tag to set on each uploaded source. Repeatable (default: %(default)s).",
+        help="Blob index tag to set on each uploaded source. Repeatable (default: Origin=...).",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Detect and verify sources, print what would be copied, but do not copy.",
     )
-    args = parser.parse_args()
-    args.tags = parse_tags(parser, args.tag)
-    return args
+    return parser.parse_args()
 
 
 def main() -> int:
     """Run the source migration and return a process exit code."""
     args = parse_args()
-    tags: dict[str, str] = args.tags
+    tags: dict[str, str] = dict(args.tag)
 
     # Line-buffer stdout so progress is visible live, even when redirected to a file.
     if isinstance(sys.stdout, io.TextIOWrapper):
@@ -495,10 +499,7 @@ def main() -> int:
     try:
         target_container.get_container_properties()
     except AzureError as err:
-        print(
-            f"ERROR: cannot access target container '{args.container}' in account '{args.account_name}': {err}",
-            file=sys.stderr,
-        )
+        log_error(f"cannot access target container '{args.container}' in account '{args.account_name}': {err}")
         return 1
 
     entries = resolve_entries(args, source_base_url, source_container)
@@ -520,10 +521,9 @@ def main() -> int:
     failures = upload_entries(entries, ctx, args.workers, args.retries)
     if failures:
         write_failures(resume_path, failures)
-        print(
-            f"ERROR: {len(failures)} upload(s) failed after {args.retries} attempt(s). "
+        log_error(
+            f"{len(failures)} upload(s) failed after {args.retries} attempt(s). "
             f"Failed source URLs written to {resume_path}.",
-            file=sys.stderr,
         )
         return 1
 
