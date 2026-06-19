@@ -37,7 +37,6 @@ Patch7:         CVE-2025-11065.patch
 Patch8:         CVE-2026-39821.patch
 BuildRequires: golang < 1.23
 BuildRequires: hostname
-BuildRequires: tzdata
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
