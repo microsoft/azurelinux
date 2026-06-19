@@ -100,6 +100,7 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
 
+# Ensure hostname resolves for fake-tablet init in wrangler tests
 echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts 2>/dev/null || true
 
 export TMPDIR=$PWD/tmp
