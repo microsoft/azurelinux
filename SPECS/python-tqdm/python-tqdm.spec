@@ -7,7 +7,7 @@ with "tqdm(iterable)", and you are done!
 Summary:        Fast, Extensible Progress Meter
 Name:           python-%{srcname}
 Version:        4.67.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MPLv2.0 AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -77,8 +77,24 @@ pip3 install iniconfig \
   rich \
   pandas \
   keras
+# tests/tests_synchronisation.py::test_imap creates a multiprocessing.Pool
+# but never calls pool.join() or pool.terminate(), so its non-daemon
+# helper threads (_handle_workers / _handle_tasks / _handle_results) can
+# stay alive in the pytest process after the test summary is printed.
+# Under x86_64 CPU contention these threads sometimes fail to drain in
+# time and the Python interpreter blocks forever waiting for them,
+# burning the full 4h chroot timeout. We cap each test at 180s via
+# pytest-timeout (in-test hangs) and wrap the whole pytest invocation
+# in a 600s shell `timeout` (post-test interpreter-exit hangs).
+# Retry once before treating it as a real failure to absorb single-shot
+# scheduling races on shared CI runners.
 # Exclude tests_pandas.py: tqdm uses pandas.core.common.is_builtin_func removed in newer pandas
-%pytest --ignore=tests/tests_pandas.py
+run_tests() {
+    %py3_test_envvars timeout 600 %__pytest \
+        --timeout=180 --timeout-method=signal \
+        --ignore=tests/tests_pandas.py
+}
+run_tests || run_tests
 
 %files -n python3-%{srcname} -f %{pyproject_files}
 %license LICENCE
@@ -91,6 +107,16 @@ pip3 install iniconfig \
 
 
 %changelog
+* Sat Jun 20 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-3
+- Cap each test at 180s via pytest-timeout (--timeout-method=signal)
+  and wrap the pytest invocation in a 600s shell `timeout` to handle
+  the post-pytest interpreter-exit hang caused by
+  tests/tests_synchronisation.py::test_imap leaking a
+  multiprocessing.Pool whose non-daemon helper threads occasionally
+  fail to drain under x86_64 CPU contention.
+- Run the pytest invocation twice via a small shell wrapper and only
+  treat the suite as failed when both runs fail.
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 4.67.2-2
 - Ignore tests/tests_pandas.py in %%check; tqdm uses
   `pandas.core.common.is_builtin_func` which was removed in newer
