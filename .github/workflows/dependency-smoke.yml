@@ -27,6 +27,7 @@ jobs:
       matrix:
         dir:
           - scripts/ci/control-tower
+          - scripts/ci/render-specs-check
           - scripts/ci/spec-review
           - scripts/mcps
     steps:
@@ -47,7 +48,9 @@ jobs:
           # shellcheck disable=SC1091
           . .smoke-venv/bin/activate
           python -m pip install --quiet --upgrade pip
-          pip install --quiet -r requirements.txt
+          if [[ -f requirements.txt ]]; then
+            pip install --quiet -r requirements.txt
+          fi
 
           shopt -s nullglob
           scripts=( *.py )
@@ -69,12 +72,12 @@ jobs:
                 continue
                 ;;
             esac
+
             echo "import $mod"
             python -c "import $mod"
           done
 
-      - name: Run Control Tower helper tests
-        if: matrix.dir == 'scripts/ci/control-tower'
+      - name: Run helper tests
         env:
           DIR: ${{ matrix.dir }}
         run: |
@@ -82,5 +85,13 @@ jobs:
           cd "$DIR"
           # shellcheck disable=SC1091
           . .smoke-venv/bin/activate
-          pip install --quiet -r tests/requirements.txt
+
+          if [[ ! -d tests ]]; then
+            echo "No helper tests in $DIR; skipping."
+            exit 0
+          fi
+
+          if [[ -f tests/requirements.txt ]]; then
+            pip install --quiet -r tests/requirements.txt
+          fi
           python -m pytest tests
