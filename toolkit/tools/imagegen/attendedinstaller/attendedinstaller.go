@@ -36,7 +36,7 @@ import (
 const (
 	defaultGridWeight = 1
 
-	enterCooldown = 300 * time.Millisecond
+	enterCooldown = 50 * time.Millisecond
 
 	textRow        = 3
 	textColumn     = 0
