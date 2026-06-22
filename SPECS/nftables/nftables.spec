@@ -12,7 +12,7 @@ Source2:        nftables.conf
 Source3:        main.nft
 Source4:        router.nft
 Source5:        nat.nft
-Patch0:          fix_crash_when_ops_dont_support_udata.patch
+Patch0:         fix_crash_when_ops_dont_support_udata.patch
 
 BuildRequires:  asciidoc
 BuildRequires:  bison
