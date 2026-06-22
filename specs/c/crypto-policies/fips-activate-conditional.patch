@@ -1,0 +1,180 @@
+diff -ruN a/policies/FIPS.pol b/policies/FIPS.pol
+--- a/policies/FIPS.pol	2026-06-22 18:16:48.593591573 +0000
++++ b/policies/FIPS.pol	2026-06-22 18:17:15.060282697 +0000
+@@ -75,3 +75,5 @@
+ etm@SSH = ANY
+ 
+ __ems = ENFORCE
++
++__openssl_fips_activate = 1
+diff -ruN a/python/cryptopolicies/cryptopolicies.py b/python/cryptopolicies/cryptopolicies.py
+--- a/python/cryptopolicies/cryptopolicies.py	2026-06-22 18:16:48.557590633 +0000
++++ b/python/cryptopolicies/cryptopolicies.py	2026-06-22 18:16:57.376821297 +0000
+@@ -32,6 +32,7 @@
+ ), 0) | {
+     'min_ec_size': 256,
+     '__openssl_block_sha1_signatures': 1,  # all but the LEGACY and SHA1 now
++    '__openssl_fips_activate': 0,
+ }
+ 
+ 
+diff -ruN a/python/policygenerators/openssl.py b/python/policygenerators/openssl.py
+--- a/python/policygenerators/openssl.py	2026-06-22 18:16:48.575591103 +0000
++++ b/python/policygenerators/openssl.py	2026-06-22 19:01:22.649741805 +0000
+@@ -19,7 +19,7 @@
+ FIPS_MODULE_CONFIG = '''
+ [fips_sect]
+ tls1-prf-ems-check = {}
+-activate = 1
++activate = {}
+ '''
+ 
+ 
+@@ -399,7 +399,10 @@
+         # and, just in case, EMS is enforcing by default.
+         # It only puts `= 0` there if it's explicitly relaxed.
+         # That's the reason why `__ems` is a tri-state enum.
+-        return FIPS_MODULE_CONFIG.format(int(policy.enums['__ems'] != 'RELAX'))
++        return FIPS_MODULE_CONFIG.format(
++            int(policy.enums['__ems'] != 'RELAX'),
++            int(policy.integers['__openssl_fips_activate']),
++        )
+ 
+     @classmethod
+     def test_config(cls, config):  # pylint: disable=unused-argument
+diff -ruN a/tests/alternative-policies/FIPS.pol b/tests/alternative-policies/FIPS.pol
+--- a/tests/alternative-policies/FIPS.pol	2026-06-22 18:16:48.612592069 +0000
++++ b/tests/alternative-policies/FIPS.pol	2026-06-22 18:17:15.060282697 +0000
+@@ -90,3 +90,5 @@
+ ssh_etm = 1
+ 
+ __ems = ENFORCE
++
++__openssl_fips_activate = 1
+diff -ruN a/tests/outputs/BSI-openssl_fips.txt b/tests/outputs/BSI-openssl_fips.txt
+--- a/tests/outputs/BSI-openssl_fips.txt	2026-06-22 19:01:43.509247787 +0000
++++ b/tests/outputs/BSI-openssl_fips.txt	2026-06-22 19:01:43.512247867 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/DEFAULT:GOST-openssl_fips.txt b/tests/outputs/DEFAULT:GOST-openssl_fips.txt
+--- a/tests/outputs/DEFAULT:GOST-openssl_fips.txt	2026-06-22 19:01:43.522248133 +0000
++++ b/tests/outputs/DEFAULT:GOST-openssl_fips.txt	2026-06-22 19:01:43.524248186 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/DEFAULT:NO-PQ-openssl_fips.txt b/tests/outputs/DEFAULT:NO-PQ-openssl_fips.txt
+--- a/tests/outputs/DEFAULT:NO-PQ-openssl_fips.txt	2026-06-22 19:01:43.528248292 +0000
++++ b/tests/outputs/DEFAULT:NO-PQ-openssl_fips.txt	2026-06-22 19:01:43.530248345 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/DEFAULT-openssl_fips.txt b/tests/outputs/DEFAULT-openssl_fips.txt
+--- a/tests/outputs/DEFAULT-openssl_fips.txt	2026-06-22 19:01:43.516247973 +0000
++++ b/tests/outputs/DEFAULT-openssl_fips.txt	2026-06-22 19:01:43.518248026 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/DEFAULT:TEST-PQ-openssl_fips.txt b/tests/outputs/DEFAULT:TEST-PQ-openssl_fips.txt
+--- a/tests/outputs/DEFAULT:TEST-PQ-openssl_fips.txt	2026-06-22 19:01:43.534248451 +0000
++++ b/tests/outputs/DEFAULT:TEST-PQ-openssl_fips.txt	2026-06-22 19:01:43.536248505 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/EMPTY-openssl_fips.txt b/tests/outputs/EMPTY-openssl_fips.txt
+--- a/tests/outputs/EMPTY-openssl_fips.txt	2026-06-22 19:01:43.540248611 +0000
++++ b/tests/outputs/EMPTY-openssl_fips.txt	2026-06-22 19:01:43.542248664 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/FEDORA42-openssl_fips.txt b/tests/outputs/FEDORA42-openssl_fips.txt
+--- a/tests/outputs/FEDORA42-openssl_fips.txt	2026-06-22 19:01:43.546248770 +0000
++++ b/tests/outputs/FEDORA42-openssl_fips.txt	2026-06-22 19:01:43.548248824 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/FEDORA43-openssl_fips.txt b/tests/outputs/FEDORA43-openssl_fips.txt
+--- a/tests/outputs/FEDORA43-openssl_fips.txt	2026-06-22 19:01:43.552248930 +0000
++++ b/tests/outputs/FEDORA43-openssl_fips.txt	2026-06-22 19:01:43.554248983 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/FUTURE-openssl_fips.txt b/tests/outputs/FUTURE-openssl_fips.txt
+--- a/tests/outputs/FUTURE-openssl_fips.txt	2026-06-22 19:01:43.558249090 +0000
++++ b/tests/outputs/FUTURE-openssl_fips.txt	2026-06-22 19:01:43.560249143 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/GOST-ONLY-openssl_fips.txt b/tests/outputs/GOST-ONLY-openssl_fips.txt
+--- a/tests/outputs/GOST-ONLY-openssl_fips.txt	2026-06-22 19:01:43.564249249 +0000
++++ b/tests/outputs/GOST-ONLY-openssl_fips.txt	2026-06-22 19:01:43.566249302 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/LEGACY:AD-SUPPORT-openssl_fips.txt b/tests/outputs/LEGACY:AD-SUPPORT-openssl_fips.txt
+--- a/tests/outputs/LEGACY:AD-SUPPORT-openssl_fips.txt	2026-06-22 19:01:43.576249568 +0000
++++ b/tests/outputs/LEGACY:AD-SUPPORT-openssl_fips.txt	2026-06-22 19:01:43.578249621 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/outputs/LEGACY-openssl_fips.txt b/tests/outputs/LEGACY-openssl_fips.txt
+--- a/tests/outputs/LEGACY-openssl_fips.txt	2026-06-22 19:01:43.570249408 +0000
++++ b/tests/outputs/LEGACY-openssl_fips.txt	2026-06-22 19:01:43.572249462 +0000
+@@ -1,4 +1,4 @@
+ 
+ [fips_sect]
+ tls1-prf-ems-check = 1
+-activate = 1
++activate = 0
+diff -ruN a/tests/unit/test_cryptopolicy.py b/tests/unit/test_cryptopolicy.py
+--- a/tests/unit/test_cryptopolicy.py	2026-06-22 18:39:30.606355205 +0000
++++ b/tests/unit/test_cryptopolicy.py	2026-06-22 18:39:30.610761108 +0000
+@@ -366,6 +366,7 @@
+         ssh_certs = 0
+         min_ec_size = 256
+         __openssl_block_sha1_signatures = 1
++        __openssl_fips_activate = 0
+         etm = ANY
+         __ems = DEFAULT
+         # No scope-specific properties found.
+@@ -397,6 +398,7 @@
+         ssh_certs = 0
+         min_ec_size = 256
+         __openssl_block_sha1_signatures = 1
++        __openssl_fips_activate = 0
+         etm = ANY
+         __ems = ENFORCE
+         # Scope-specific properties derived for select backends:

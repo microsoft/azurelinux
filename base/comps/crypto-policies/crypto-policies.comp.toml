@@ -1,3 +1,26 @@
 [components.crypto-policies]
 # Release: 1.git%{git_commit_hash}%{?dist}
 release = { calculation = "manual" }
+
+[[components.crypto-policies.overlays]]
+description = "Bump release for AZL4 patch addition"
+type = "spec-set-tag"
+tag = "Release"
+value = "2.git%{git_commit_hash}%{?dist}"
+
+# Only activate the FIPS provider when the FIPS crypto policy is selected.
+# Upstream unconditionally sets `activate = 1` in openssl_fips.txt for all
+# policies. We add a new __openssl_fips_activate integer property (default 0,
+# set to 1 only in FIPS.pol) so that non-FIPS policies get a fips_sect that
+# configures-but-does-not-activate the provider.
+[[components.crypto-policies.overlays]]
+description = "Add patch: only activate FIPS provider under FIPS policy"
+type = "spec-add-tag"
+tag = "Patch"
+value = "fips-activate-conditional.patch"
+
+[[components.crypto-policies.overlays]]
+description = "Add patch file: fips-activate-conditional.patch"
+type = "file-add"
+source = "fips-activate-conditional.patch"
+file = "fips-activate-conditional.patch"

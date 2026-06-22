@@ -14,7 +14,7 @@
 
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        1.git%{git_commit_hash}%{?dist}
+Release: 2.git%{git_commit_hash}%{?dist}
 Summary:        System-wide crypto policies
 
 License:        LGPL-2.1-or-later
@@ -46,6 +46,7 @@ Conflicts: gnutls < 3.8.10
 # Most users want this, the split is mostly for Fedora CoreOS
 Recommends: crypto-policies-scripts
 
+Patch: fips-activate-conditional.patch
 %description
 This package provides pre-built configuration files with
 cryptographic policies for various cryptographic back-ends,
