@@ -21712,6 +21712,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "portaudio",
+          "version": "19.7.0",
+          "downloadUrl": "https://files.portaudio.com/archives/pa_stable_v190700_20210406.tgz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "portreserve",
           "version": "0.0.5",
           "downloadUrl": "http://cyberelk.net/tim/data/portreserve/stable/portreserve-0.0.5.tar.bz2"
