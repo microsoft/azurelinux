@@ -2,7 +2,7 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:           libjwt
 Version:        1.12.1
-Release:        1%{?dist}
+Release:        23%{?dist}
 Summary:        A JSON Web Token library in C
 
 License:        MPL-2.0
@@ -76,7 +76,7 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
-* Mon Jun 15 2026 Sindhu Karri <lakarri@microsoft.com> - 1.12.1-1
+* Mon Jun 15 2026 Sindhu Karri <lakarri@microsoft.com> - 1.12.1-23
 - Initial Azure Linux import from Fedora 44 (license: MIT).
 - Required by slurmrestd (Slurm REST API daemon) for JWT-based
   authentication. Tracked via ADO #61504121.
