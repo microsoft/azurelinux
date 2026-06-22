@@ -14,12 +14,15 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "5"
+azl_pkgrelease = "6"
 # 4th version component from the AZL kernel source (6.18.31.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.31-1.1.azl4.aarch64).
 kextraversion = "1"
 # NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
 nvidia_open_version = "595.58.03"
+mlnx_ofa_version = "26.04"
+mlnx_ofa_release = "OFED.26.04.0.8.5.1"
+mlnx_ofa_bundle_release = "0.8.5.0"
 
 # Download the source tarball from the AzureLinux kernel repo
 [[components.kernel.source-files]]
@@ -34,6 +37,15 @@ filename = "open-gpu-kernel-modules-595.58.03.tar.gz"
 hash = "a422b6935209d590f57fa6766f59bb207d9130f8a6777af9245c4ff8cd0f4c4ccef4602a0b26d543e1e8efba24241180992fdb749ea4e5d2aa5218a584b85101"
 hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/595.58.03.tar.gz" }
+
+# Download the NVIDIA MLNX_OFED source bundle. We don't need the entire bundle
+# — only the mlnx-ofa_kernel SRPM (and its inner tarball) inside it — but NVIDIA
+# does not host mlnx-ofa_kernel as a standalone download.
+[[components.kernel.source-files]]
+filename = "MLNX_OFED_SRC-26.04-0.8.5.0.tgz"
+hash = "1829d190f84f6d54597b98c40e162afa64939e608f7eaf494ac626c454e4d0310e14dedb7108326e9c9a667634eb27cf751dae806249f1783a66c8fc07aacd13"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://linux.mellanox.com/public/repo/doca/3.4.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.04-0.8.5.0.tgz" }
 
 # Insert version and release information from the component defines into the spec file, and update the source URL to match the AzureLinux kernel source structure
 [[components.kernel.overlays]]
@@ -340,6 +352,81 @@ replacement = """# AZL: kmod subpackage file lists and scriptlets (nvidia-open)
 
 # AZL-KMOD-FILES-ANCHOR"""
 
+# --- kmod-mlnx-ofa_kernel: source file registration ---
+[[components.kernel.overlays]]
+description = "Add kmod-mlnx-ofa_kernel.inc subpackage definition to sources"
+type = "file-add"
+file = "kmod-mlnx-ofa_kernel.inc"
+source = "kmod-mlnx-ofa_kernel.inc"
+
+[[components.kernel.overlays]]
+description = "Register MLNX_OFED_SRC bundle as Source6100. The inner mlnx-ofa_kernel tarball is extracted from the bundle's SRPM in the kmod-mlnx-ofa 'prep' phase — see kmod-mlnx-ofa_kernel.inc."
+type = "spec-insert-tag"
+tag = "Source6100"
+value = "MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_bundle_release}.tgz"
+
+[[components.kernel.overlays]]
+description = "Register kmod-mlnx-ofa_kernel.inc as Source6101"
+type = "spec-insert-tag"
+tag = "Source6101"
+value = "kmod-mlnx-ofa_kernel.inc"
+
+# --- kmod-mlnx-ofa_kernel: phase injection ---
+[[components.kernel.overlays]]
+description = "Run mlnx-ofa_kernel kmod 'package' phase — declares the kmod-mlnx-ofa_kernel subpackage"
+type = "spec-search-replace"
+regex = '# AZL-KMOD-PACKAGE-ANCHOR'
+replacement = """# AZL: kmod subpackage declarations (mlnx-ofa_kernel)
+%global _kmod_phase package
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
+# AZL-KMOD-PACKAGE-ANCHOR"""
+
+[[components.kernel.overlays]]
+description = "Run mlnx-ofa_kernel kmod 'prep' phase — extracts the mlnx-ofa_kernel tarball"
+type = "spec-search-replace"
+regex = '# AZL-KMOD-PREP-ANCHOR'
+replacement = """# AZL: Prepare kmod subpackage sources (mlnx-ofa_kernel)
+%global _kmod_phase prep
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
+# AZL-KMOD-PREP-ANCHOR"""
+
+[[components.kernel.overlays]]
+description = "Run mlnx-ofa_kernel kmod 'build' phase — runs ./configure + make kernel modules against the just-built kernel tree"
+type = "spec-search-replace"
+regex = '# AZL-KMOD-BUILD-ANCHOR'
+replacement = """# AZL: Build kmod subpackage modules (mlnx-ofa_kernel)
+%global _kmod_phase build
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
+# AZL-KMOD-BUILD-ANCHOR"""
+
+[[components.kernel.overlays]]
+description = "Run mlnx-ofa_kernel kmod 'install' phase — make install_modules into /lib/modules/<KVERREL>/extra/mlnx-ofa_kernel"
+type = "spec-search-replace"
+regex = '# AZL-KMOD-INSTALL-ANCHOR'
+replacement = """# AZL: Install kmod subpackage files (mlnx-ofa_kernel)
+%global _kmod_phase install
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
+# AZL-KMOD-INSTALL-ANCHOR"""
+
+[[components.kernel.overlays]]
+description = "Run mlnx-ofa_kernel kmod 'files' phase — adds %post/%postun/%files for the mlnx-ofa_kernel kmod subpackage"
+type = "spec-search-replace"
+regex = '# AZL-KMOD-FILES-ANCHOR'
+replacement = """# AZL: kmod subpackage file lists and scriptlets (mlnx-ofa_kernel)
+%global _kmod_phase files
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
+# AZL-KMOD-FILES-ANCHOR"""
+
 # Prepend AZL changelog entries to the top of %changelog. The kernel uses
 # `release.calculation = "manual"` (no rpmautospec), so changelog entries are
 # hand-curated here rather than derived from `git log`. Convention: one entry
@@ -360,6 +447,9 @@ description = "Prepend AZL changelog entries (one per lock-fingerprint change) a
 type = "spec-prepend-lines"
 section = "%changelog"
 lines = [
+    "* Wed Jun 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.6",
+    "- feat(kernel): add kmod-mlnx-ofa_kernel subpackage (mlnx-ofa_kernel 26.04, NIC+RDMA+IPoIB)",
+    "",
     "* Wed May 27 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.31-1.5",
     "- feat(kernel): add hand-curated changelog entry",
     "",
