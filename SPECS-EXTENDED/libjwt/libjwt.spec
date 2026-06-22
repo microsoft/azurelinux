@@ -76,7 +76,7 @@ find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
-* Mon Jun 15 2026 lakarri <lakarri@microsoft.com> - 1.12.1-1
+* Mon Jun 15 2026 Sindhu Karri <lakarri@microsoft.com> - 1.12.1-1
 - Initial Azure Linux import from Fedora 44 (license: MIT).
 - Required by slurmrestd (Slurm REST API daemon) for JWT-based
   authentication. Tracked via ADO #61504121.
