@@ -36,6 +36,8 @@ import (
 const (
 	defaultGridWeight = 1
 
+	enterCooldown = 300 * time.Millisecond
+
 	textRow        = 3
 	textColumn     = 0
 	textRowSpan    = 1
@@ -68,6 +70,7 @@ type AttendedInstaller struct {
 	grid              *tview.Grid
 	pauseCustomInput  bool
 	pauseSpeakupInput bool
+	ignoreEnterUntil  time.Time
 	currentView       int
 	allViews          []views.View
 	backdropStyle     tview.Theme
@@ -199,6 +202,9 @@ func (ai *AttendedInstaller) showView(newView int) (err error) {
 		return
 	}
 
+	// Apply Enter cooldown to all views to prevent carried key events from auto-advancing.
+	ai.ignoreEnterUntil = time.Now().Add(enterCooldown)
+
 	ai.grid.AddItem(view.Primitive(), primaryContentRow, primaryContentColumn, primaryContentRowSpan, primaryContentColumnSpan, primaryContentMinSize, primaryContentMinSize, true)
 	ai.app.SetFocus(ai.grid)
 	ai.currentView = newView
@@ -221,6 +227,10 @@ func (ai *AttendedInstaller) quit() {
 }
 
 func (ai *AttendedInstaller) globalInputCapture(event *tcell.EventKey) *tcell.EventKey {
+	if event.Key() == tcell.KeyEnter && !ai.ignoreEnterUntil.IsZero() && time.Now().Before(ai.ignoreEnterUntil) {
+		return nil
+	}
+
 	// If we're clearing the speakup buffer, don't process keypresses
 	// tcell has no easy way of differentiating between keypad enter (speakup clear) and enter
 	if ai.pauseSpeakupInput && event.Key() == tcell.KeyEnter {
