@@ -1,7 +1,7 @@
 %define         underscore_version %(echo %{version} | cut -d. -f1-3 --output-delimiter="_")
 Summary:        An XML parser library
 Name:           expat
-Version:        2.8.0
+Version:        2.8.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -66,8 +66,8 @@ rm -rf %{buildroot}/%{_docdir}/%{name}
 %{_libdir}/libexpat.so.1*
 
 %changelog
-* Wed May 27 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.8.0-1
-- Upgrade to 2.8.0 to fix CVE-2026-7210
+* Mon Jun 22 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.8.1-1
+- Upgrade to 2.8.1 to fix CVE-2026-7210
 
 * Wed Apr 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.6.4-6
 - Patch for CVE-2026-32778, CVE-2026-32777, CVE-2026-32776
