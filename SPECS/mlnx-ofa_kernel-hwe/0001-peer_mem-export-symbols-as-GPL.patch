@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Zheyu Shen <zheyushen@microsoft.com>
+Date: Tue, 26 May 2026 00:00:00 +0000
+Subject: [PATCH] peer_mem: export IB peer memory API as GPL-only symbols
+
+The IB peer-memory API in drivers/infiniband/core/peer_mem.c was
+historically exported with EXPORT_SYMBOL. That dates back to a time when
+the consumer was the NVIDIA closed-source GPU driver, which could not
+link against EXPORT_SYMBOL_GPL symbols.
+
+Today the consumers are GPL kernel modules (AMDGPU, NVIDIA open-source
+driver). Exposing the peer-memory client registration API as
+EXPORT_SYMBOL_GPL more accurately reflects the GPL licensing of
+mlnx-ofa_kernel and matches the kernel's modern expectations around
+in-kernel API surfaces.
+
+In addition, switching to EXPORT_SYMBOL_GPL allows out-of-tree drivers
+(AMDGPU, NVIDIA open-source GPU driver) to discover the peer-memory
+client API via module symbol resolution at runtime instead of having
+to hard-link against the mlnx-ofa_kernel build, which is required to
+break the diamond build-time dependency between an OOT GPU driver and
+multiple OOT NIC drivers that all consume the same API, which is the
+situation we are facing with AMD GPU (MI300X works with Mellanox while
+MI455X comes with Vulcano NIC, and we would like the same kmod to be
+able to work with both hardware).
+
+Signed-off-by: Zheyu Shen <zheyushen@microsoft.com>
+---
+ drivers/infiniband/core/peer_mem.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/infiniband/core/peer_mem.c b/drivers/infiniband/core/peer_mem.c
+--- a/drivers/infiniband/core/peer_mem.c
++++ b/drivers/infiniband/core/peer_mem.c
+@@ -86,7 +86,7 @@ void *ib_register_peer_memory_client(const struct peer_memory_client *peer_clien
+ 	mutex_unlock(&peer_memory_mutex);
+ 	return ib_peer_client;
+ }
+-EXPORT_SYMBOL(ib_register_peer_memory_client);
++EXPORT_SYMBOL_GPL(ib_register_peer_memory_client);
+ 
+ void ib_unregister_peer_memory_client(void *reg_handle)
+ {
+@@ -107,7 +107,7 @@ void ib_unregister_peer_memory_client(void *reg_handle)
+ 
+ 	kobject_put(&ib_peer_client->kobj);
+ }
+-EXPORT_SYMBOL(ib_unregister_peer_memory_client);
++EXPORT_SYMBOL_GPL(ib_unregister_peer_memory_client);
+ 
+ static struct ib_peer_memory_client *
+ ib_get_peer_client(unsigned long addr, size_t size,
+@@ -317,7 +317,7 @@ void ib_umem_activate_invalidation_notifier(struct ib_umem *umem,
+ 
+ 	/* At this point func can be called asynchronously */
+ }
+-EXPORT_SYMBOL(ib_umem_activate_invalidation_notifier);
++EXPORT_SYMBOL_GPL(ib_umem_activate_invalidation_notifier);
+ 
+ /*
+  * Caller has blocked DMA and will no longer be able to handle invalidate
+@@ -358,7 +358,7 @@ void ib_umem_stop_invalidation_notifier(struct ib_umem *umem)
+ 		ib_unmap_peer_client(umem_p, cur_state, UMEM_PEER_UNMAPPED);
+ 
+ }
+-EXPORT_SYMBOL(ib_umem_stop_invalidation_notifier);
++EXPORT_SYMBOL_GPL(ib_umem_stop_invalidation_notifier);
+ 
+ static void fix_peer_sgls(struct ib_umem_peer *umem_p,
+ 			  unsigned long peer_page_size)
+-- 
+2.43.0
