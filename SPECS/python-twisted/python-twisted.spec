@@ -16,8 +16,6 @@ Patch2:         CVE-2024-41810.patch
 Patch3:         CVE-2026-42304.patch
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-pyOpenSSL
-
 BuildRequires:  python3-pip
 BuildRequires:  python3-hatchling
 BuildRequires:  python3-hatch-fancy-pypi-readme
@@ -40,10 +38,11 @@ An asynchronous networking framework written in Python
 Summary:        An asynchronous networking framework written in Python
 Requires:       python3
 Requires:       python3-attrs
+Requires:       python3-Automat
 Requires:       python3-constantly
 Requires:       python3-hyperlink
 Requires:       python3-incremental
-Requires:       python3-netaddr
+Requires:       python3-typing-extensions
 Requires:       python3-zope-interface
 AutoReqProv:    no
 Provides:       python3dist(twisted) = %{version}-%{release}
@@ -82,9 +81,21 @@ export TZ=UTC
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
+# Pin transitive deps inside the tox-managed virtualenv. Newer releases of
+# cryptography (>=44), pyOpenSSL (>=25) and Incremental (>=24.7) drop APIs
+# (OpenSSL.crypto.X509Req), tighten RSA key-size validation, and change the
+# prerelease version string format, all of which break Twisted 23.10's tests.
+cat > /tmp/twisted-constraints.txt <<'EOF'
+cryptography<44
+pyOpenSSL<25
+incremental<24.7
+EOF
+chmod a+r /tmp/twisted-constraints.txt
+sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py \
+                                 'pyopenssl<25' 'cryptography<44'
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
+LANG=en_US.UTF-8 sudo --preserve-env=PIP_CONSTRAINT PIP_CONSTRAINT=/tmp/twisted-constraints.txt \
+                      -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
 %files -n python3-twisted
 %defattr(-,root,root)
@@ -111,7 +122,7 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_mandir}/man1/twistd.1*
 
 %changelog
-* Wed Jun 10 2026 Aditya Singh <v-aditysing@microsoft.com> - 23.10.0-1
+* Mon Jun 22 2026 Aditya Singh <v-aditysing@microsoft.com> - 23.10.0-1
 - Upgrade to version 23.10.0 to fix pTest failure.
 
 * Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-5
