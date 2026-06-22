@@ -91,8 +91,8 @@ pyOpenSSL<25
 incremental<24.7
 EOF
 chmod a+r /tmp/twisted-constraints.txt
-sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py \
-                                 'pyopenssl<25' 'cryptography<44'
+sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
+
 chmod g+w . -R
 LANG=en_US.UTF-8 sudo --preserve-env=PIP_CONSTRAINT PIP_CONSTRAINT=/tmp/twisted-constraints.txt \
                       -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
