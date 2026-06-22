@@ -1,7 +1,7 @@
 Summary:        The Apache Subversion control system
 Name:           subversion
 Version:        1.14.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -24,6 +24,15 @@ BuildRequires:  utf8proc-devel
 BuildRequires:  python3
 BuildRequires:  shadow-utils
 BuildRequires:  sudo
+BuildRequires:  apr-util-openssl
+BuildRequires:  ca-certificates
+BuildRequires:  openssl
+BuildRequires:  cyrus-sasl
+BuildRequires:  cyrus-sasl-devel
+BuildRequires:  cyrus-sasl-md5
+BuildRequires:  cyrus-sasl-lib
+BuildRequires:  openldap
+BuildRequires:  openldap-devel
 %endif
 Requires:       apr
 Requires:       apr-util
@@ -51,6 +60,9 @@ Provides Perl (SWIG) support for Subversion version control system.
 %prep
 %autosetup -p0
 
+# AzL has no /usr/bin/python; pin svneditor.py shebang so SVN_EDITOR can exec it.
+%{__sed} -i 's|/usr/bin/env python.*|%{__python3}|' subversion/tests/cmdline/svneditor.py
+
 %build
 export CFLAGS="%{build_cflags} -Wformat"
 sh configure --prefix=%{_prefix}        \
@@ -77,7 +89,41 @@ make pure_vendor_install -C subversion/bindings/swig/perl/native \
 # subversion expect nonroot user to run tests
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test make check && userdel test -r -f
+
+cat > openssl-legacy.cnf << 'EOF'
+openssl_conf = openssl_init
+
+[openssl_init]
+providers = provider_sect
+
+[provider_sect]
+default = default_sect
+legacy  = legacy_sect
+
+[default_sect]
+activate = 1
+
+[legacy_sect]
+activate = 1
+EOF
+
+OPENSSL_MODULES_DIR=%{_libdir}/ossl-modules
+
+%{__mkdir_p} /dev/shm/svn-test-wc
+export TMPDIR=/dev/shm/svn-test-wc
+export SVN_TEST_WORK=/dev/shm/svn-test-wc
+export SVN_SQLITE_USE_WAL=0
+
+openssl dhparam -out subversion/tests/cmdline/svntest.dh 2048
+
+sudo -u test env \
+  OPENSSL_CONF=$PWD/openssl-legacy.cnf \
+  OPENSSL_MODULES=$OPENSSL_MODULES_DIR \
+  LC_ALL=C LANG=C TZ=UTC \
+  make check; rc=$?
+
+userdel test -r -f || :
+( exit $rc )
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -85,7 +131,6 @@ sudo -u test make check && userdel test -r -f
 %{_bindir}/svn*
 %{_libdir}/libsvn_*.so.*
 %{_mandir}/man[158]/*
-%{_datadir}/locale/*
 %exclude %{_libdir}/libsvn_swig_perl*so*
 
 %files devel
@@ -100,10 +145,12 @@ sudo -u test make check && userdel test -r -f
 %{perl_vendorarch}/SVN
 %{perl_vendorarch}/auto/SVN
 %{_libdir}/libsvn_swig_perl*so*
-%{_libdir}/perl5/*
 %{_mandir}/man3/SVN*
 
 %changelog
+* Fri May 15 2026 Sumit Jena <sumitjena@microsoft.com> - 1.14.3-3
+- Fix ptest failures
+
 * Fri Mar 07 2025 Kevin Lockwood <v-klockwood@microsoft.com> - 1.14.3-2
 - Add patch for CVE-2024-46901
 

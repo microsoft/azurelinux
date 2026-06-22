@@ -3617,6 +3617,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "fedora-messaging",
+          "version": "3.9.0",
+          "downloadUrl": "https://github.com/fedora-infra/fedora-messaging/releases/download/v3.9.0/fedora_messaging-3.9.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "fence-virt",
           "version": "1.0.0",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/fence-virt-1.0.0.tar.bz2"
@@ -8613,6 +8623,16 @@
           "name": "kpatch",
           "version": "0.9.8",
           "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "koji-fedoramessaging",
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/fedora-infra/koji-fedoramessaging/archive/refs/tags/1.1.2.tar.gz"
         }
       }
     },
@@ -22312,6 +22332,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-Automat",
+          "version": "24.8.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/8d/2d/ede4ad7fc34ab4482389fa3369d304f2fa22e50770af706678f6a332fa82/automat-24.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-azure-sdk",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/Azure/azure-sdk-for-python/archive/2b2cfd4/azure-sdk-2b2cfd4.tar.gz"
@@ -22343,8 +22373,8 @@
         "type": "other",
         "other": {
           "name": "python-beautifulsoup4",
-          "version": "4.12.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.12.3.tar.gz"
+          "version": "4.14.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.14.3.tar.gz"
         }
       }
     },
@@ -22645,6 +22675,16 @@
           "name": "python-cpuinfo",
           "version": "7.0.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/py-cpuinfo/py-cpuinfo-7.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-crochet",
+          "version": "2.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/crochet/crochet-2.1.1.tar.gz"
         }
       }
     },
@@ -23602,6 +23642,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-koji-fedoramessaging-messages",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/fedora-infra/koji-fedoramessaging-messages/archive/refs/tags/v1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kombu",
           "version": "5.0.2",
           "downloadUrl": "https://github.com/celery/kombu/archive/v5.0.2/python-kombu-5.0.2.tar.gz"
@@ -24195,6 +24245,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pika",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/pika/pika/archive/1.3.2/pika-1.3.2.tar.gz"
         }
       }
     },
@@ -24995,6 +25055,16 @@
           "name": "python-semantic_version",
           "version": "2.10.0",
           "downloadUrl": "https://github.com/rbarrois/python-semanticversion/archive/2.10.0/python-semanticversion-2.10.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-service-identity",
+          "version": "24.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/07/a5/dfc752b979067947261dbbf2543470c58efe735c3c1301dd870ef27830ee/service_identity-24.2.0.tar.gz"
         }
       }
     },
