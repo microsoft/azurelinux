@@ -38,11 +38,9 @@ An asynchronous networking framework written in Python
 Summary:        An asynchronous networking framework written in Python
 Requires:       python3
 Requires:       python3-attrs
-Requires:       python3-Automat
 Requires:       python3-constantly
 Requires:       python3-hyperlink
 Requires:       python3-incremental
-Requires:       python3-typing-extensions
 Requires:       python3-zope-interface
 AutoReqProv:    no
 Provides:       python3dist(twisted) = %{version}-%{release}
