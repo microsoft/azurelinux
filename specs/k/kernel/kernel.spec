@@ -1177,6 +1177,8 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+Source6100: MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_bundle_release}.tgz
+Source6101: kmod-mlnx-ofa_kernel.inc
 
 ## Patches needed for building this package
 
@@ -1232,6 +1234,11 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: kmod subpackage declarations (mlnx-ofa_kernel)
+%global _kmod_phase package
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2260,6 +2267,11 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: Prepare kmod subpackage sources (mlnx-ofa_kernel)
+%global _kmod_phase prep
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3399,6 +3411,11 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+# AZL: Build kmod subpackage modules (mlnx-ofa_kernel)
+%global _kmod_phase build
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3906,6 +3923,11 @@ popd
 %global _kmod_phase install
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: Install kmod subpackage files (mlnx-ofa_kernel)
+%global _kmod_phase install
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4576,8 +4598,16 @@ fi\
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+# AZL: kmod subpackage file lists and scriptlets (mlnx-ofa_kernel)
+%global _kmod_phase files
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/kmod-mlnx-ofa_kernel.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Wed Jun 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.6
+- feat(kernel): add kmod-mlnx-ofa_kernel subpackage (mlnx-ofa_kernel 26.04, NIC+RDMA+IPoIB)
+
 * Wed May 27 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.31-1.5
 - feat(kernel): add hand-curated changelog entry
 
