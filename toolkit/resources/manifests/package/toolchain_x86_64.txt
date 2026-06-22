@@ -102,7 +102,7 @@ elfutils-libelf-lang-0.189-6.azl3.x86_64.rpm
 expat-2.8.1-1.azl3.x86_64.rpm
 expat-debuginfo-2.8.1-1.azl3.x86_64.rpm
 expat-devel-2.8.1-1.azl3.x86_64.rpm
-expat-libs-2.8.0-1.azl3.x86_64.rpm
+expat-libs-2.8.1-1.azl3.x86_64.rpm
 file-5.45-1.azl3.x86_64.rpm
 file-debuginfo-5.45-1.azl3.x86_64.rpm
 file-devel-5.45-1.azl3.x86_64.rpm
