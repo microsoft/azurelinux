@@ -1,8 +1,21 @@
 # Support
 
+> [!NOTE]
+> Azure Linux 4.0 is currently in **Preview**. We currently recommend it for evaluation and testing only, with broader production support on the roadmap as we continue towards General Availability (GA). **Production issue support isn't available for 4.0 during this phase.**
+> Your feedback during this phase is welcome and helps shape the product, so please share it through [GitHub issues](https://github.com/microsoft/azurelinux/issues) and [GitHub Discussions](https://github.com/microsoft/azurelinux/discussions).
+
+## Bugs, docs, and feature requests
+
+Use [GitHub issues](https://github.com/microsoft/azurelinux/issues) to report bugs, documentation problems, and feature requests. Pick the matching template when you open an issue. For guidance, see [how to report issues](https://aka.ms/azurelinux-reportissues).
+
+For general questions and feedback, use [GitHub Discussions](https://github.com/microsoft/azurelinux/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
 ## Production support
 
-Official Azure Support is for **production issues only**. If you're running an Azure Linux production workload on Azure and you hit an outage, regression, or configuration problem that's affecting that workload, [open an Azure support request](https://learn.microsoft.com/azure/azure-portal/supportability/how-to-create-azure-support-request) through the Azure portal.
+> [!NOTE]
+> Azure Linux 4.0 isn't generally available (GA) yet. 
+
+If you're running a GA version of Azure Linux in production on Azure and you hit an outage, regression, or configuration problem, [open an Azure support request](https://learn.microsoft.com/azure/azure-portal/supportability/how-to-create-azure-support-request) through the Azure portal.
 
 > [!IMPORTANT]
 > Azure Linux is open source, but Microsoft support and lifecycle commitments apply only to **Azure scenarios**. Specifically:
@@ -17,9 +30,3 @@ Use Azure Support for production issues such as:
 - System configuration and lifecycle management on production hosts.
 - Security baseline guidance for a deployed environment.
 - Image and deployment troubleshooting in production.
-
-## Bugs, docs, and feature requests
-
-Use [GitHub issues](https://github.com/microsoft/azurelinux/issues) to report bugs, documentation problems, and feature requests. Pick the matching template when you open an issue. For guidance, see [how to report issues](https://aka.ms/azurelinux-reportissues).
-
-For general questions and feedback, use [GitHub Discussions](https://github.com/microsoft/azurelinux/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
