@@ -15,8 +15,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.14.1
-Release:        3%{?dist}
+Version:        24.17.0
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -194,6 +194,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Tue Jun 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.17.0-1
+- Auto-upgrade to 24.17.0 - for fixing multiple cves
+
 * Mon Apr 27 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.14.1-3
 - Remove nodejs20 and keep nodejs 24 as default nodejs
 
