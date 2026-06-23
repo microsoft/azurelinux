@@ -27,7 +27,7 @@
 Summary: Qt6 - Multimedia support
 Name:    qt6-%{qt_module}
 Version: 6.10.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
@@ -170,7 +170,7 @@ rm -r %{buildroot}%{_qt6_archdatadir}/mkspecs/features/ios/add_ios_ffmpeg_librar
 %if %{with ffmpeg}
 %{_qt6_headerdir}/QtFFmpegMediaPluginImpl/
 %endif
-%{_qt6_headerdir}/QtGstreamerMediaPluginImpl/
+
 %{_qt6_headerdir}/QtMultimedia/
 %{_qt6_headerdir}/QtMultimediaTestLib/
 %{_qt6_headerdir}/QtMultimediaQuick/
@@ -182,8 +182,8 @@ rm -r %{buildroot}%{_qt6_archdatadir}/mkspecs/features/ios/add_ios_ffmpeg_librar
 %{_qt6_libdir}/libQt6FFmpegMediaPluginImpl.a
 %{_qt6_libdir}/libQt6FFmpegMediaPluginImpl.prl
 %endif
-%{_qt6_libdir}/libQt6GstreamerMediaPluginImpl.a
-%{_qt6_libdir}/libQt6GstreamerMediaPluginImpl.prl
+
+
 %{_qt6_libdir}/libQt6Multimedia.so
 %{_qt6_libdir}/libQt6Multimedia.prl
 %{_qt6_libdir}/libQt6MultimediaTestLib.a
@@ -201,7 +201,7 @@ rm -r %{buildroot}%{_qt6_archdatadir}/mkspecs/features/ios/add_ios_ffmpeg_librar
 %if %{with ffmpeg}
 %dir %{_qt6_libdir}/cmake/Qt6FFmpegMediaPluginImplPrivate
 %endif
-%dir %{_qt6_libdir}/cmake/Qt6GstreamerMediaPluginImplPrivate
+
 %dir %{_qt6_libdir}/cmake/Qt6Multimedia
 %dir %{_qt6_libdir}/cmake/Qt6MultimediaPrivate
 %dir %{_qt6_libdir}/cmake/Qt6MultimediaTestLibPrivate/
@@ -217,7 +217,7 @@ rm -r %{buildroot}%{_qt6_archdatadir}/mkspecs/features/ios/add_ios_ffmpeg_librar
 %if %{with ffmpeg}
 %{_qt6_libdir}/cmake/Qt6FFmpegMediaPluginImplPrivate/*.cmake
 %endif
-%{_qt6_libdir}/cmake/Qt6GstreamerMediaPluginImplPrivate/*.cmake
+
 %{_qt6_libdir}/cmake/Qt6Multimedia/*.cmake
 %{_qt6_libdir}/cmake/Qt6MultimediaPrivate/*.cmake
 %{_qt6_libdir}/cmake/Qt6MultimediaQuickPrivate/*.cmake

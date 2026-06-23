@@ -36,3 +36,18 @@ type = "spec-search-replace"
 section = "%files"
 regex = '^%\{_qt6_plugindir\}/multimedia/libgstreamermediaplugin\.so$'
 replacement = ''
+
+# Dropping the gstreamer-plugins-bad BR also stops the GStreamer media plugin
+# devel artifacts (QtGstreamerMediaPluginImpl headers/.a/.prl/cmake) from being
+# built. The runtime %files entries were removed above, but the matching
+# %files devel entries were missed, so qt6-qtmultimedia-devel packaging fails
+# with "File/Directory not found". A single line-based regex drops every devel
+# %files entry that references QtGstreamerMediaPluginImpl (headers, .a, .prl,
+# the cmake %dir, and the cmake glob).
+[[components.qt6-qtmultimedia.overlays]]
+description = "Remove all QtGstreamerMediaPluginImpl devel %files entries (not built without gstreamer-plugins-bad)"
+type = "spec-search-replace"
+section = "%files"
+package = "devel"
+regex = '^.*GstreamerMediaPluginImpl.*$'
+replacement = ''
