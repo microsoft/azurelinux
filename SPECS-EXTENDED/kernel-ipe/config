@@ -7609,7 +7609,7 @@ CONFIG_CRYPTO_SHA3=y
 # CONFIG_CRYPTO_VMAC is not set
 # CONFIG_CRYPTO_WP512 is not set
 # CONFIG_CRYPTO_XCBC is not set
-# CONFIG_CRYPTO_XXHASH is not set is not set
+# CONFIG_CRYPTO_XXHASH is not set
 # end of Hashes, digests, and MACs
 
 #
