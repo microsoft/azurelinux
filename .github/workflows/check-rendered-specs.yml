@@ -130,6 +130,7 @@ jobs:
             --security-opt seccomp=unconfined \
             --security-opt apparmor=unconfined \
             -v "$WORKSPACE/pr-head:/workdir" \
+            -v "$WORKSPACE/scripts/ci/render-specs-check:/scripts-render:ro" \
             -v "$WORKSPACE/locks-output:/output" \
             localhost/azldev-runner \
             bash -eu -o pipefail -c '
@@ -139,6 +140,8 @@ jobs:
               # before producing the file. The locks-comment script
               # already treats `null` as "no drift".
               echo null > /output/update-output.json
+              # Validate the resolved source origins before any fetch/update.
+              python3 /scripts-render/source_origin_guard.py
               # Capture stdout (JSON) separately from stderr (logs).
               azldev component update -a -O json \
                 > /output/update-output.json
@@ -387,14 +390,16 @@ jobs:
             -e BASE_REPO \
             localhost/azldev-runner \
             bash -eu -o pipefail -c '
-              SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
-
               # Stale forks may not have the upstream base SHA in their object
               # store. Fetch it explicitly so the version-bump diff below and
               # `compute_change_set.sh` can both resolve the base commit. The
               # base repo is public so no auth is needed.
               git -C /workdir remote add base "https://github.com/$BASE_REPO.git" 2>/dev/null || true
               git -C /workdir fetch --no-tags base "$PR_BASE_SHA"
+
+              # Validate the resolved source origins before any fetch/render.
+              python3 /scripts-render/source_origin_guard.py
+              SPECS_DIR=$(azldev config dump -q -f json | jq -r .project.renderedSpecsDir)
 
               # A change to .azldev-version swaps the azldev binary, which can
               # alter rendered output for ANY component -- not just the ones
