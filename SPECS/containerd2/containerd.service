@@ -8,6 +8,14 @@ ExecStartPre=/sbin/modprobe overlay
 ExecStart=/usr/bin/containerd
 Restart=always
 Delegate=yes
+
+# Avoid inheriting host default resource limits for container workloads.
+LimitNPROC=infinity
+LimitCORE=infinity
+LimitNOFILE=infinity
+
+# Only systemd 226 and newer support TasksMax.
+TasksMax=infinity
 KillMode=process
 OOMScoreAdjust=-999
 
