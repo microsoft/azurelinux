@@ -7,21 +7,31 @@
         <specification>Azure Linux VM Base Image</specification>
     </description>
     <!--
-        Two build profiles control which `azurelinux-repos*` package is
-        baked into the image, which determines where the OS points at
-        runtime:
-          - vm-base:     ships azurelinux-repos     (runtime → PMC beta)
-          - vm-base-dev: ships azurelinux-repos-dev (runtime → azl4-dev)
-        Both variants build from the same source (`azl4-dev` blob below);
-        koji overrides this for distro builds. Exactly one profile must
+        Build profiles vary along two independent axes:
+
+        1. VM generation (boot firmware):
+             - vm-base*: Gen2 / UEFI boot (shim + grub2-efi stack),
+                         built for x86_64 and aarch64.
+             - vm-gen1*: Gen1 / legacy BIOS boot (grub2-pc), x86_64 only
+                         (Azure Arm VMs are Gen2-only).
+        2. Which `azurelinux-repos*` package is baked in, controlling
+           where the OS points at runtime:
+             - <name>:     ships azurelinux-repos     (runtime → PMC beta)
+             - <name>-dev: ships azurelinux-repos-dev (runtime → azl4-dev)
+
+        All four profiles build from the same source (`azl4-dev` blob
+        below) and share the vast majority of their package set; koji
+        overrides the source for distro builds. Exactly one profile must
         be selected per build, matching the corresponding entry in
         base/images/images.toml.
     -->
     <profiles>
-        <profile name="vm-base"     description="Ships azurelinux-repos (runtime → PMC beta)" import="false" />
-        <profile name="vm-base-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+        <profile name="vm-base"     description="Gen2/UEFI; ships azurelinux-repos (runtime → PMC beta)" import="false" />
+        <profile name="vm-base-dev" description="Gen2/UEFI; ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+        <profile name="vm-gen1"     description="Gen1/BIOS; ships azurelinux-repos (runtime → PMC beta)" import="false" />
+        <profile name="vm-gen1-dev" description="Gen1/BIOS; ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
     </profiles>
-    <preferences arch="x86_64">
+    <preferences arch="x86_64" profiles="vm-base,vm-base-dev">
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
@@ -50,7 +60,7 @@
         </type>
     </preferences>
 
-    <preferences arch="aarch64">
+    <preferences arch="aarch64" profiles="vm-base,vm-base-dev">
         <version>0.1</version>
         <packagemanager>dnf5</packagemanager>
         <locale>en_US</locale>
@@ -70,6 +80,41 @@
             eficsm="false"
             bootpartition="false"
             efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+
+    <!--
+        Gen1 (legacy BIOS) profiles. Azure Generation 1 VMs boot via
+        SeaBIOS rather than UEFI, so this builds a BIOS-GRUB disk with
+        grub2-pc instead of the shim + grub2-efi stack used by the Gen2
+        (vm-base) profiles — hence firmware="bios" and no EFI partition
+        attributes (eficsm / efipartsize). Gen1 is x86_64-only: Azure Arm
+        VMs are Gen2-only, so there is no aarch64 Gen1 variant.
+    -->
+    <preferences arch="x86_64" profiles="vm-gen1,vm-gen1-dev">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyS0 earlyprintk=ttyS0 rd.shell=0"
+            firmware="bios"
+            overlayroot="false"
+            bootpartition="false"
             rootfs_label="azurelinux">
             <bootloader name="grub2" bls="true" console="serial" timeout="1" />
             <size unit="G">5</size>
@@ -117,7 +162,6 @@
         <package name="device-mapper-event" />
         <package name="dnf5" />
         <package name="dnf5-plugins" />
-        <package name="efibootmgr" />
         <package name="file" />
         <package name="firewalld" />
         <package name="glibc" />
@@ -168,21 +212,33 @@
     </packages>
 
     <!--
+        efibootmgr manages UEFI boot entries, so it ships only in the
+        Gen2 (UEFI) profiles — it's inert on Gen1 (BIOS) systems.
+    -->
+    <packages type="image" profiles="vm-base,vm-base-dev">
+        <package name="efibootmgr" />
+    </packages>
+
+    <!--
         Variant-scoped repos package: governs the .repo files written
         into /etc/yum.repos.d/ in the built image (runtime). The two
         packages conflict, so they're separated into per-variant
         sections rather than relying on the variant's bootstrap section.
     -->
-    <packages type="image" profiles="vm-base-dev">
+    <packages type="image" profiles="vm-base-dev,vm-gen1-dev">
         <package name="azurelinux-repos-dev" />
     </packages>
-    <packages type="image" profiles="vm-base">
+    <packages type="image" profiles="vm-base,vm-gen1">
         <package name="azurelinux-repos" />
     </packages>
 
     <packages type="bootstrap">
         <package name="azurelinux-release-cloud" />
         <package name="filesystem" />
+    </packages>
+
+    <!-- Gen2 (UEFI) bootstrap: shim + grub2-efi stack -->
+    <packages type="bootstrap" profiles="vm-base,vm-base-dev">
         <package name="grub2-efi-x64-modules" arch="x86_64" />
         <package name="grub2-efi-x64" arch="x86_64" />
         <package name="grub2-efi-aa64-modules" arch="aarch64" />
@@ -191,10 +247,16 @@
         <package name="shim" arch="aarch64" />
     </packages>
 
-    <packages type="bootstrap" profiles="vm-base-dev">
+    <!-- Gen1 (legacy BIOS) bootstrap: grub2-pc (x86_64-only) -->
+    <packages type="bootstrap" profiles="vm-gen1,vm-gen1-dev">
+        <package name="grub2-pc-modules" arch="x86_64" />
+        <package name="grub2-pc" arch="x86_64" />
+    </packages>
+
+    <packages type="bootstrap" profiles="vm-base-dev,vm-gen1-dev">
         <package name="azurelinux-repos-dev" />
     </packages>
-    <packages type="bootstrap" profiles="vm-base">
+    <packages type="bootstrap" profiles="vm-base,vm-gen1">
         <package name="azurelinux-repos" />
     </packages>
 </image>

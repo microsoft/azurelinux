@@ -65,6 +65,46 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- vm-gen1 (legacy BIOS / Azure Gen1) --------------------------------
+# Shares vm-base.kiwi; the vm-gen1* profiles build a BIOS-boot (grub2-pc)
+# x86_64-only disk instead of the UEFI (shim + grub2-efi) vm-base profiles.
+
+[images.vm-gen1]
+description = "VM Base Image (Gen1 / BIOS)"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-gen1" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.vm-gen1.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.vm-gen1-dev]
+description = "VM Base Image (Gen1 / BIOS) (dev)"
+definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-gen1-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.vm-gen1-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 # ---- container-base (core profile) -------------------------------------
 [images.container-base]
 description = "Container Base Image"
