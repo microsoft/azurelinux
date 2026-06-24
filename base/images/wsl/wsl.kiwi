@@ -39,9 +39,14 @@
         <package name="curl"/>
         <package name="dbus"/>
         <package name="default-editor"/>
+        <package name="diffutils"/>
         <package name="file"/>
+        <package name="findutils"/>
+        <package name="gawk"/>
         <package name="glibc-langpack-en"/>
         <package name="gnupg2"/>
+        <package name="grep"/>
+        <package name="gzip"/>
         <package name="iproute"/>
         <package name="iputils"/>
         <package name="less"/>
@@ -51,9 +56,11 @@
         <package name="nmap-ncat"/>
         <package name="openssh-clients"/>
         <package name="passwd"/>
+        <package name="patch"/>
         <package name="pciutils"/>
         <package name="procps-ng"/>
         <package name="rsync"/>
+        <package name="sed"/>
         <package name="shadow-utils"/>
         <package name="sudo"/>
         <package name="symlinks"/>
@@ -73,6 +80,7 @@
         <package name="which"/>
         <package name="whois"/>
         <package name="wsl-setup"/>
+        <package name="xz"/>
         <package name="zip"/>
         <package name="zram-generator-defaults"/>
     </packages>
