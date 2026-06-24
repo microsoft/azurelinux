@@ -15793,8 +15793,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "3.3.0040",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/openvswitch-3.3.0040.tar.gz"
+          "version": "3.3.9",
+          "downloadUrl": "https://www.openvswitch.org/releases/openvswitch-3.3.9.tar.gz"
         }
       }
     },
