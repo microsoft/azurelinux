@@ -3,7 +3,7 @@
 
 Name:           jboss-parent
 Version:        20
-Release: 26%{?dist}
+Release: 27%{?dist}
 Summary:        JBoss Parent POM
 License:        CC0-1.0
 URL:            http://www.jboss.org/
