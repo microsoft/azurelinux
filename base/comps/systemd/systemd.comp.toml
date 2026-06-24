@@ -52,3 +52,8 @@ description = "Remove build params reducing default timeout to 45s; leaving upst
 type = "spec-search-replace"
 regex = '-Ddefault-user-timeout-sec=45'
 replacement = "#-Ddefault-user-timeout-sec=45"
+
+[[components.systemd.overlays]]
+description = "AzureLinux: avoid PID 1 self-deadlock during the generator phase (nss-systemd userdb lookup). Seen as a boot freeze on AZL4 during Trident A/B rollback. Submitted upstream."
+type = "patch-add"
+source = "0001-core-do-not-let-generators-deadlock-on-PID-1-userdb.patch"

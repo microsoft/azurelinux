@@ -1,0 +1,118 @@
+From 150e75217f151e1b4d3ef01f089cef23c79e8228 Mon Sep 17 00:00:00 2001
+From: Brian Fjeldstad <bfjelds@microsoft.com>
+Date: Wed, 24 Jun 2026 01:39:29 +0000
+Subject: [PATCH] core: don't let generators deadlock on PID 1's own userdb
+ service
+
+When PID 1 runs system generators it does so synchronously, from
+manager_startup() -> manager_run_generators() -> manager_execute_generators()
+-> execute_directories(), which forks a generator executor and blocks in
+pidref_wait_for_terminate_and_check() until the whole batch finishes or the
+DEFAULT_TIMEOUT_USEC (90s) timeout fires. While blocked there PID 1's event
+loop does not run, so PID 1 cannot answer any of its own Varlink IPC -
+including the io.systemd.DynamicUser userdb service it listens on at
+/run/systemd/userdb/io.systemd.DynamicUser (see src/core/varlink.c).
+
+If a generator performs an NSS user/group lookup that is routed through
+nss-systemd, the lookup connects to that socket and waits for a reply that
+cannot arrive until generators complete. The result is a self-deadlock: the
+generator blocks for the full timeout, the executor is then killed, and
+PID 1 logs
+
+    Failed to fork off sandboxing environment for executing generators: Protocol error
+    Freezing execution
+
+immediately after switch-root.
+
+This is easy to hit with the shipped factory nsswitch.conf, whose group line
+is
+
+    group: files [SUCCESS=merge] systemd
+
+The [SUCCESS=merge] action causes nss-systemd to be consulted (to merge
+group memberships) even when the group already exists in /etc/group, so even
+a lookup of a purely static group such as systemd-network results in a
+GetGroupRecord/GetMemberships Varlink call into the busy PID 1.
+
+Reproducer:
+  - Boot a system whose nsswitch.conf group line is
+    "files [SUCCESS=merge] systemd" (the systemd factory default).
+  - Have a system generator resolve a group during early boot, e.g. the
+    netplan generator (/usr/lib/systemd/system-generators/netplan), which
+    looks up the "systemd-network" group.
+  - On a sufficiently slow machine the generator's lookup connects to
+    /run/systemd/userdb/io.systemd.DynamicUser and blocks; at the generator
+    timeout the manager freezes.
+
+strace of the wrapped generator shows the final syscalls:
+
+    connect(4, {AF_UNIX, "/run/systemd/userdb/io.systemd.DynamicUser"}, 45)
+    sendto(4, {"method":"io.systemd.UserDatabase.GetMemberships",
+               "parameters":{"groupName":"systemd-network",
+                             "service":"io.systemd.DynamicUser"}, ...})
+    epoll_wait(5, ...)    <- blocks until SIGALRM
+
+We already have machinery for exactly this situation. nss-systemd honours a
+$SYSTEMD_NSS_DYNAMIC_BYPASS environment variable: when set,
+nss_glue_userdb_flags() adds USERDB_EXCLUDE_DYNAMIC_USER so the userdb client
+skips connecting to /run/systemd/userdb/io.systemd.DynamicUser entirely. It
+is already used in two places to avoid deadlocking against / looping back
+into PID 1:
+
+  - For the system D-Bus broker: service.c sets EXEC_NSS_DYNAMIC_BYPASS for
+    the dbus unit ("System D-Bus needs nss-systemd disabled, so that we don't
+    deadlock") and exec-invoke.c then exports SYSTEMD_NSS_DYNAMIC_BYPASS=1 in
+    its environment, because nss-systemd relies on blocking Varlink calls back
+    to a PID 1 that is itself waiting on D-Bus.
+  - For DynamicUser= units: exec-invoke.c exports the same variable while
+    PID 1 sets the unit up, to avoid an nss-systemd feedback loop with
+    ourselves.
+
+Generators are the same class of problem - code that PID 1 must wait on,
+performing NSS lookups that route back to a PID 1 which cannot answer - so
+apply the same bypass for them: set $SYSTEMD_NSS_DYNAMIC_BYPASS=1 in the
+environment built by build_generator_environment(). Static records (nss
+"files") and any userdb services that happen to already be running continue
+to resolve; only the dynamic-user source provided by the still-busy PID 1 is
+skipped, and only for the duration of the generator phase.
+
+env-generators run even earlier and share the same exposure, but do not
+perform NSS lookups in practice, so they are left unchanged here.
+---
+ src/core/manager.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/src/core/manager.c b/src/core/manager.c
+index 015f575ac1..ffa56cc05c 100644
+--- a/src/core/manager.c
++++ b/src/core/manager.c
+@@ -4362,6 +4362,26 @@ static int build_generator_environment(Manager *m, char ***ret) {
+         if (r < 0)
+                 return r;
+ 
++        /* PID 1 runs generators synchronously: while blocked inside manager_run_generators() its event loop
++         * is not running, so it cannot answer its own Varlink IPC - including the io.systemd.DynamicUser
++         * userdb service it exposes on /run/systemd/userdb/. If a generator performs an NSS lookup that
++         * resolves through nss-systemd (e.g. getgrnam() for a group with the "[SUCCESS=merge] systemd"
++         * nsswitch.conf default), the lookup connects to that socket and blocks waiting for a reply that
++         * cannot arrive until the generators finish - a self-deadlock broken only by the generator timeout
++         * (DEFAULT_TIMEOUT_USEC), after which the manager freezes.
++         *
++         * This is the same class of deadlock we already break for the system D-Bus broker, which nss-systemd
++         * depends on yet PID 1 must wait for: service.c sets EXEC_NSS_DYNAMIC_BYPASS for the dbus unit
++         * ("System D-Bus needs nss-systemd disabled, so that we don't deadlock") and exec-invoke.c then
++         * exports SYSTEMD_NSS_DYNAMIC_BYPASS=1 in its environment; the same variable is also set in
++         * exec-invoke.c when PID 1 sets up a DynamicUser= unit, to avoid an nss-systemd feedback loop. Apply
++         * the same bypass for generators. nss-systemd honours the variable (nss_glue_userdb_flags() ->
++         * USERDB_EXCLUDE_DYNAMIC_USER) and skips the dynamic-user source served by the busy PID 1; static
++         * "files" records and any already-running userdb services still resolve. */
++        r = strv_env_assign(&nl, "SYSTEMD_NSS_DYNAMIC_BYPASS", "1");
++        if (r < 0)
++                return r;
++
+         *ret = TAKE_PTR(nl);
+         return 0;
+ }
+-- 
+2.49.0
+
