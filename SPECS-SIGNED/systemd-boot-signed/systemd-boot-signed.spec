@@ -98,6 +98,9 @@ popd
 /boot/efi/EFI/BOOT/%{grubefiname}
 
 %changelog
+* Wed Jun 24 2026 Vince Perri <viperri@microsoft.com> - 255-32
+- Bump release to match systemd spec
+
 * Wed May 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
 - Bump release to match systemd spec
 
