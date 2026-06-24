@@ -131,6 +131,7 @@ make check
 %changelog
 * Tue Jun 23 2026 Apurv Parekh <apurvparekh@microsoft.com> - 1.21.3-5
 - Backport upstream fix for SPNEGO mechListMIC parsing (krb5 commit 942c503, ticket 9183)
+ 
 * Fri May 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.21.3-4
 - Patch for CVE-2026-40356
 
