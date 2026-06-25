@@ -1,0 +1,169 @@
+From 942c5036e14066a1f4badfdf67716c47f2e33a39 Mon Sep 17 00:00:00 2001
+From: dovsyannikov <Dmitry.Ovsyannikov@dell.com>
+Date: Wed, 3 Sep 2025 13:52:57 +0000
+Subject: [PATCH] Fix SPNEGO mechListMIC parsing
+
+Commit fdceb225f881e2b1337eebcb9a9443fa4a9be3fd erroneously altered
+get_negTokenResp() to look for mechListMIC with tag 0xA4 instead of
+0xA3.  Fix it.
+
+Restore the t_spnego.c reselection test by constructing a
+two-mechanism SPNEGO initiator credential using the internal
+structures.
+
+[ghudson@mit.edu: added test case; rewrote commit message]
+
+ticket: 9183 (new)
+tags: pullup
+target_version: 1.21-next
+target_version: 1.22-next
+Upstream-reference: https://github.com/krb5/krb5/commit/942c5036e14066a1f4badfdf67716c47f2e33a39.patch
+---
+ src/lib/gssapi/spnego/spnego_mech.c |  2 +-
+ src/tests/gssapi/Makefile.in        |  2 +-
+ src/tests/gssapi/deps               | 19 ++++++++-
+ src/tests/gssapi/t_spnego.c         | 60 ++++++++++++++++++++++-------
+ 4 files changed, 66 insertions(+), 17 deletions(-)
+
+diff --git a/src/lib/gssapi/spnego/spnego_mech.c b/src/lib/gssapi/spnego/spnego_mech.c
+index 43ba63ab2a7..4a778364336 100644
+--- a/src/lib/gssapi/spnego/spnego_mech.c
++++ b/src/lib/gssapi/spnego/spnego_mech.c
+@@ -3515,7 +3515,7 @@ get_negTokenResp(OM_uint32 *minor_status, struct k5input *in,
+ 			return GSS_S_DEFECTIVE_TOKEN;
+ 	}
+ 
+-	if (k5_der_get_value(&seq, CONTEXT | 0x04, &field)) {
++	if (k5_der_get_value(&seq, CONTEXT | 0x03, &field)) {
+ 		*mechListMIC = get_octet_string(&field);
+ 
+                 /* Handle Windows 2000 duplicate response token */
+diff --git a/src/tests/gssapi/Makefile.in b/src/tests/gssapi/Makefile.in
+index 97a6ac3f3f7..5f57173cd8a 100644
+--- a/src/tests/gssapi/Makefile.in
++++ b/src/tests/gssapi/Makefile.in
+@@ -4,7 +4,7 @@ DEFINES = -DUSE_AUTOCONF_H
+ 
+ # For t_prf.c
+ LOCALINCLUDES = -I$(srcdir)/../../lib/gssapi/mechglue \
+-	-I$(srcdir)/../../lib/gssapi/krb5 \
++	-I$(srcdir)/../../lib/gssapi/krb5 -I$(srcdir)/../../lib/gssapi/spnego \
+ 	-I$(srcdir)/../../lib/gssapi/generic -I../../lib/gssapi/krb5 \
+ 	-I../../lib/gssapi/generic
+ 
+diff --git a/src/tests/gssapi/deps b/src/tests/gssapi/deps
+index 2c55fa51799..e93250af777 100644
+--- a/src/tests/gssapi/deps
++++ b/src/tests/gssapi/deps
+@@ -187,9 +187,24 @@ $(OUTPRE)t_saslname.$(OBJEXT): $(BUILDTOP)/include/gssapi/gssapi.h \
+   $(BUILDTOP)/include/gssapi/gssapi_ext.h $(BUILDTOP)/include/gssapi/gssapi_krb5.h \
+   $(BUILDTOP)/include/krb5/krb5.h $(COM_ERR_DEPS) $(top_srcdir)/include/krb5.h \
+   common.h t_saslname.c
+-$(OUTPRE)t_spnego.$(OBJEXT): $(BUILDTOP)/include/gssapi/gssapi.h \
++$(OUTPRE)t_spnego.$(OBJEXT): $(BUILDTOP)/include/autoconf.h \
++  $(BUILDTOP)/include/gssapi/gssapi.h $(BUILDTOP)/include/gssapi/gssapi_alloc.h \
+   $(BUILDTOP)/include/gssapi/gssapi_ext.h $(BUILDTOP)/include/gssapi/gssapi_krb5.h \
+-  $(BUILDTOP)/include/krb5/krb5.h $(COM_ERR_DEPS) $(top_srcdir)/include/krb5.h \
++  $(BUILDTOP)/include/krb5/krb5.h $(BUILDTOP)/include/osconf.h \
++  $(BUILDTOP)/include/profile.h $(BUILDTOP)/lib/gssapi/generic/gssapi_err_generic.h \
++  $(COM_ERR_DEPS) $(srcdir)/../../lib/gssapi/generic/gssapiP_generic.h \
++  $(srcdir)/../../lib/gssapi/generic/gssapi_ext.h $(srcdir)/../../lib/gssapi/generic/gssapi_generic.h \
++  $(srcdir)/../../lib/gssapi/mechglue/mechglue.h $(srcdir)/../../lib/gssapi/mechglue/mglueP.h \
++  $(srcdir)/../../lib/gssapi/spnego/gssapiP_negoex.h \
++  $(srcdir)/../../lib/gssapi/spnego/gssapiP_spnego.h \
++  $(top_srcdir)/include/k5-buf.h $(top_srcdir)/include/k5-err.h \
++  $(top_srcdir)/include/k5-gmt_mktime.h $(top_srcdir)/include/k5-input.h \
++  $(top_srcdir)/include/k5-int-pkinit.h $(top_srcdir)/include/k5-int.h \
++  $(top_srcdir)/include/k5-platform.h $(top_srcdir)/include/k5-plugin.h \
++  $(top_srcdir)/include/k5-queue.h $(top_srcdir)/include/k5-thread.h \
++  $(top_srcdir)/include/k5-trace.h $(top_srcdir)/include/krb5.h \
++  $(top_srcdir)/include/krb5/authdata_plugin.h $(top_srcdir)/include/krb5/plugin.h \
++  $(top_srcdir)/include/port-sockets.h $(top_srcdir)/include/socket-utils.h \
+   common.h t_spnego.c
+ $(OUTPRE)t_srcattrs.$(OBJEXT): $(BUILDTOP)/include/gssapi/gssapi.h \
+   $(BUILDTOP)/include/gssapi/gssapi_ext.h $(BUILDTOP)/include/gssapi/gssapi_krb5.h \
+diff --git a/src/tests/gssapi/t_spnego.c b/src/tests/gssapi/t_spnego.c
+index 4091739f835..3b53097182d 100644
+--- a/src/tests/gssapi/t_spnego.c
++++ b/src/tests/gssapi/t_spnego.c
+@@ -29,6 +29,11 @@
+ #include <string.h>
+ #include <assert.h>
+ 
++/* See create_reselection_cred(). */
++#include "k5-int.h"
++#include <mglueP.h>
++#include <gssapiP_spnego.h>
++
+ #include "common.h"
+ 
+ static gss_OID_desc mech_krb5_wrong = {
+@@ -228,6 +233,47 @@ test_neghints(void)
+     (void)gss_delete_sec_context(&minor, &actx, NULL);
+ }
+ 
++/*
++ * There is currently no API to create a SPNEGO credential supporting multiple
++ * mechanisms unless a third-party mechanism is configured in the mechs file;
++ * the default credential contains only krb5 (after tickets #8021 and #8217)
++ * and a SPNEGO cred cannot be created from an existing union cred.  Using
++ * internal structures, create a two-mechanism initiator cred so that we can
++ * test reselection.
++ */
++static gss_cred_id_t
++create_reselection_cred(void)
++{
++    OM_uint32 major, minor;
++    gss_OID_desc mlist[2] = { mech_krb5, mech_iakerb };
++    gss_OID_set_desc mechs = { 2, mlist };
++    gss_cred_id_t cred;
++    spnego_gss_cred_id_t scred;
++    gss_union_cred_t ucred;
++
++    major = gss_acquire_cred(&minor, GSS_C_NO_NAME, GSS_C_INDEFINITE,
++                             &mechs, GSS_C_INITIATE, &cred, NULL, NULL);
++    check_gsserr("gss_acquire_cred(reslection)", major, minor);
++
++    scred = calloc(1, sizeof(*scred));
++    assert(scred != NULL);
++    scred->mcred = cred;
++
++    ucred = calloc(1, sizeof(*ucred));
++    assert(ucred != NULL);
++    ucred->loopback = ucred;
++    ucred->count = 1;
++    ucred->mechs_array = calloc(1, sizeof(*ucred->mechs_array));
++    ucred->cred_array = calloc(1, sizeof(*ucred->cred_array));
++    assert(ucred->mechs_array != NULL && ucred->cred_array != NULL);
++    ucred->mechs_array[0].elements = malloc(mech_spnego.length);
++    assert(ucred->mechs_array[0].elements != NULL);
++    g_OID_copy(&ucred->mechs_array[0], &mech_spnego);
++    ucred->cred_array[0] = (gss_cred_id_t)scred;
++
++    return (gss_cred_id_t)ucred;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -254,19 +300,7 @@ main(int argc, char *argv[])
+     }
+ 
+     /* Get default initiator cred. */
+-    major = gss_acquire_cred(&minor, GSS_C_NO_NAME, GSS_C_INDEFINITE,
+-                             &mechset_spnego, GSS_C_INITIATE,
+-                             &initiator_cred_handle, NULL, NULL);
+-    check_gsserr("gss_acquire_cred(initiator)", major, minor);
+-
+-    /*
+-     * The following test is designed to exercise SPNEGO reselection on the
+-     * client and server.  Unfortunately, it no longer does so after tickets
+-     * #8217 and #8021, since SPNEGO now only acquires a single krb5 cred and
+-     * there is no way to expand the underlying creds with gss_set_neg_mechs().
+-     * To fix this we need gss_acquire_cred_with_cred() or some other way to
+-     * turn a cred with a specifically requested mech set into a SPNEGO cred.
+-     */
++    initiator_cred_handle = create_reselection_cred();
+ 
+     /* Make the initiator prefer IAKERB and offer krb5 as an alternative. */
+     pref_oids[0] = mech_iakerb;
