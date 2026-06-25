@@ -194,7 +194,11 @@ Patch205:       CVE-2025-15649.patch
 Patch206:       CVE-2026-42496.patch
 Patch207:       CVE-2026-48959.patch
 Patch208:       CVE-2026-48962.patch
+<<<<<<< HEAD
 Patch209:       CVE-2026-8376.patch
+=======
+Patch209:       CVE-2026-12087.patch
+>>>>>>> 64b39481b2 ([AutoPR- Security] Patch perl for CVE-2026-12087 [HIGH] (#17774))
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6851,8 +6855,13 @@ popd
 
 # Old changelog entries are preserved in CVS.
 %changelog
+<<<<<<< HEAD
 * Wed Jun 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 4:5.38.2-511
 - Patch for CVE-2026-8376
+=======
+* Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-511
+- Patch for CVE-2026-12087
+>>>>>>> 64b39481b2 ([AutoPR- Security] Patch perl for CVE-2026-12087 [HIGH] (#17774))
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-510
 - Patch for CVE-2026-48962, CVE-2026-48959, CVE-2026-42496, CVE-2025-15649
