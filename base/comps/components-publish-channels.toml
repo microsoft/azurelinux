@@ -259,6 +259,7 @@ components = [
     "double-conversion",
     "doxygen",
     "dpdk",
+    "dpkg",
     "dracut",
     "driverctl",
     "drpm",
