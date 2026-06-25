@@ -1,0 +1,40 @@
+* Fri Jan 31 2025 Tobias Brick <tobiasb@microsoft.com> - 103.8.0-1
+- Add FIPS approved services indicator
+- Add ML-DSA implementation
+
+* Mon Nov 25 2024 Tobias Brick <tobiasb@microsoft.com> - 103.6.0-1
+- Upgrde to 103.6.0
+
+* Mon Oct 21 2024 Tobias Brick <tobiasb@microsoft.com> - 103.5.1-1
+- Update 103.5.1
+
+* Mon Oct 14 2024 Tobias Brick <tobiasb@microsoft.com> - 103.4.2-2
+- Add debuginfo package
+
+* Wed Jun 26 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.2-1
+- Update SymCrypt to v103.4.2 for FIPS certification
+
+* Thu Apr 25 2024 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-2
+- Disable outline atomics in aarch64 builds
+
+* Thu Dec 28 2023 Maxwell Moyer-McKee <mamckee@microsoft.com> - 103.4.1-1
+- Update SymCrypt to v103.4.1 for SymCrypt-OpenSSL provider.
+
+* Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 103.0.1-1
+- Update SymCrypt to v103.0.1 for FIPS certification. Run unit tests in check
+
+* Fri Oct 07 2022 Andy Caldwell <andycaldwell@microsoft.com> - 102.0.0-2
+- Update `clang` on aarch64 builds to enable `-pie`
+
+* Mon Jun 06 2022 Samuel Lee <saml@microsoft.com> - 102.0.0-1
+- Update SymCrypt to v102.0.0 to improve performance of FIPS self-tests
+
+* Tue Apr 05 2022 Cameron Baird <cameronbaird@microsoft.com> - 101.2.0-2
+- BuildRequires clang in aarch64 builds
+
+* Tue Mar 29 2022 Samuel Lee <saml@microsoft.com> - 101.2.0-1
+- Update SymCrypt to v101.2.0 to include FIPS self-tests, certifiable AES-GCM, and fix aarch64 build
+
+* Mon Feb 14 2022 Samuel Lee <saml@microsoft.com> - 101.0.0-1
+- Original version for CBL-Mariner
+- Verified license
