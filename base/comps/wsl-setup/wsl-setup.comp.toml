@@ -1,0 +1,19 @@
+[components.wsl-setup]
+
+# Explicitly enable WSL interop in the shipped /etc/wsl.conf. Interop (and
+# Windows PATH appending) is enabled by default in WSL, but pinning both keys
+# makes the behavior explicit in the distro's config and stable against any
+# future change to WSL's defaults.
+# There is no file-append overlay, so the section is prepended; wsl.conf is INI,
+# so section order is irrelevant to WSL's parser.
+# Ref: https://learn.microsoft.com/en-us/windows/wsl/wsl-config#interop-settings
+[[components.wsl-setup.overlays]]
+description = "Explicitly enable WSL interop and Windows PATH appending in /etc/wsl.conf"
+type = "file-prepend-lines"
+file = "wsl.conf"
+lines = [
+    "[interop]",
+    "enabled=true",
+    "appendWindowsPath=true",
+    "",
+]
