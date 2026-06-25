@@ -1,0 +1,15 @@
+# BASELINE COMMIT — pristine Azure Linux 3.0 SymCrypt as a local component.
+#
+# This is a verbatim vendoring of the Azure Linux 3.0 `SymCrypt` package
+# (microsoft/azurelinux @ 3.0-dev, SPECS/SymCrypt), placed unchanged as a
+# `type = "local"` component purely as a review reference point. The
+# subsequent commits layer the Azure Linux 4.0 deviations on top, so the
+# diff against this baseline is exactly "what we had to change from 3.0".
+#
+# As-is this baseline renders but does not yet build under AZL4: source
+# tarballs are still declared the 3.0 way (via SymCrypt.signatures.json)
+# rather than as comp.toml source-files, so azldev cannot fetch them, and
+# the spec still carries 3.0-only build machinery. Both are fixed in the
+# following commits.
+[components.SymCrypt]
+spec = { type = "local", path = "SymCrypt.spec" }
