@@ -2415,6 +2415,7 @@ components = [
     "SuperLU",
     "swig",
     "swtpm",
+    "SymCrypt",
     "symlinks",
     "sympy",
     "synce4l",
