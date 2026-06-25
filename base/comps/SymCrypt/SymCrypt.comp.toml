@@ -1,15 +1,34 @@
-# BASELINE COMMIT — pristine Azure Linux 3.0 SymCrypt as a local component.
+# SymCrypt is Microsoft's core cryptographic library, maintained here as a
+# local spec ported from Azure Linux 3.0.
 #
-# This is a verbatim vendoring of the Azure Linux 3.0 `SymCrypt` package
-# (microsoft/azurelinux @ 3.0-dev, SPECS/SymCrypt), placed unchanged as a
-# `type = "local"` component purely as a review reference point. The
-# subsequent commits layer the Azure Linux 4.0 deviations on top, so the
-# diff against this baseline is exactly "what we had to change from 3.0".
+# The upstream SymCrypt and jitterentropy-library release tarballs are declared
+# as `source-files` entries below. azldev tries the lookaside cache first (keyed
+# by the component name, SymCrypt) and falls back to the `origin` URI only on a
+# miss. The fallback matters: these tarballs are not published to the Azure
+# Linux lookaside, so the origin GitHub release URLs are what actually resolve
+# them.
 #
-# As-is this baseline renders but does not yet build under AZL4: source
-# tarballs are still declared the 3.0 way (via SymCrypt.signatures.json)
-# rather than as comp.toml source-files, so azldev cannot fetch them, and
-# the spec still carries 3.0-only build machinery. Both are fixed in the
-# following commits.
+# The build-environment-variables script (Source3) is a vendored local file in
+# this directory, not a downloaded source. Regenerate it for a new release with
+# ./generate-env-file.sh --release-tag v<version>.
+#
+# Release and changelog are managed by rpmautospec (release.calculation =
+# "autorelease"): the Release integer is derived from this component's git
+# history at render time, and the spec's %autochangelog generates the changelog
+# from the same history. The inherited changelog entries are preserved verbatim
+# in the `changelog` sidecar file and appended below the generated entries.
 [components.SymCrypt]
 spec = { type = "local", path = "SymCrypt.spec" }
+release = { calculation = "autorelease" }
+
+[[components.SymCrypt.source-files]]
+filename = "SymCrypt-103.8.0.tar.gz"
+hash = "d0282d7188451ff3ed5f16db4fb19a38c7d2358d17ff504af1fd66a7a968e8c9"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt/archive/v103.8.0.tar.gz" }
+
+[[components.SymCrypt.source-files]]
+filename = "jitterentropy-library-3.3.1.tar.gz"
+hash = "4a50cb02b4836cd5550016e2fc2263e6982abaa11467a9e1cea260c1c2f7d487"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/smuellerDD/jitterentropy-library/archive/v3.3.1.tar.gz" }
