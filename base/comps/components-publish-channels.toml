@@ -316,6 +316,7 @@ components = [
     "flashrom",
     "flex",
     "flexiblas",
+    "fluent-bit",
     "fmt",
     "fontawesome-fonts",
     "fontawesome4-fonts",
