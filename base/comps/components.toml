@@ -451,6 +451,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.flexmark-java]
 [components.flite]
 [components.fltk]
+[components.fluent-bit]
 [components.fluid-soundfont]
 [components.fmt]
 [components.fontawesome-fonts]
