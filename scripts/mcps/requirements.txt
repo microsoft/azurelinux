@@ -1,2 +1,2 @@
-mcp==1.27.2
+mcp==1.28.0
 python-dotenv==1.2.2
