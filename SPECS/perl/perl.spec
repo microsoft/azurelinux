@@ -127,7 +127,7 @@ License:        GPL+ or Artistic
 Epoch:          %{perl_epoch}
 Version:        %{perl_version}
 # release number must be even higher, because dual-lived modules will be broken otherwise
-Release:        511%{?dist}
+Release:        512%{?dist}
 Summary:        Practical Extraction and Report Language
 Url:            https://www.perl.org/
 Vendor:         Microsoft Corporation
@@ -194,11 +194,8 @@ Patch205:       CVE-2025-15649.patch
 Patch206:       CVE-2026-42496.patch
 Patch207:       CVE-2026-48959.patch
 Patch208:       CVE-2026-48962.patch
-<<<<<<< HEAD
-Patch209:       CVE-2026-8376.patch
-=======
 Patch209:       CVE-2026-12087.patch
->>>>>>> 64b39481b2 ([AutoPR- Security] Patch perl for CVE-2026-12087 [HIGH] (#17774))
+Patch210:       CVE-2026-8376.patch
 
 # Update some of the bundled modules
 # see http://fedoraproject.org/wiki/Perl/perl.spec for instructions
@@ -6852,19 +6849,19 @@ popd
 %files vmsish
 %{privlib}/vmsish.pm
 %{_mandir}/man3/vmsish.*
-
 # Old changelog entries are preserved in CVS.
 %changelog
-<<<<<<< HEAD
-* Wed Jun 17 2026 Sushil Sati <v-sushilsati@microsoft.com> - 4:5.38.2-511
+* Thu Jun 25 2026 Sushil Sati <v-sushilsati@microsoft.com> - 4:5.38.2-512
 - Patch for CVE-2026-8376
-=======
+
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-511
 - Patch for CVE-2026-12087
->>>>>>> 64b39481b2 ([AutoPR- Security] Patch perl for CVE-2026-12087 [HIGH] (#17774))
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4:5.38.2-510
 - Patch for CVE-2026-48962, CVE-2026-48959, CVE-2026-42496, CVE-2025-15649
+
+* Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
+- Patch CVE-2025-40909
 
 * Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
 - Patch CVE-2025-40909
