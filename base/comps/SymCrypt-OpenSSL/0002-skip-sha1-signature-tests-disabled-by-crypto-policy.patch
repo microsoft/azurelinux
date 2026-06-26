@@ -1,0 +1,51 @@
+From 5538334ee18ce60cd6c9457328f174c19f3724e4 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 26 Jun 2026 14:54:02 +0000
+Subject: [PATCH 2/2] Skip SHA-1 RSA sign/verify smoke tests disabled by crypto
+ policy
+
+Azure Linux ships the Red Hat "allow disabling of SHA-1 signatures"
+OpenSSL patch, and its default crypto policy disables SHA-1 signature
+creation and verification. The SslPlay smoke test exercised RSA-PKCS1
+sign/verify with SHA-1, which now fails with
+"evp_pkey_ctx_set_md: invalid digest" even under the default provider.
+
+Remove the two SHA-1 RSA sign/verify cases so the smoke test reflects
+what the platform actually permits. SHA-1 used purely as a hash (the
+digest state-export and SSH-KDF cases) is unaffected, as the policy
+only restricts SHA-1 signatures.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ SslPlay/SslPlay.cpp | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/SslPlay/SslPlay.cpp b/SslPlay/SslPlay.cpp
+index cb822a5..8cc626f 100644
+--- a/SslPlay/SslPlay.cpp
++++ b/SslPlay/SslPlay.cpp
+@@ -1059,7 +1059,9 @@ void TestRsaEvp(int modulus, uint32_t exponent)
+ 
+     TestRsaSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_MD5", EVP_md5(), 16);
+ #endif
+-    TestRsaSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha1", EVP_sha1(), 20);
++    // SHA-1 signature creation and verification are disabled by the default
++    // crypto policy on Azure Linux (which ships the Red Hat "allow disabling of
++    // SHA-1 signatures" OpenSSL patch), so this case is omitted.
+     TestRsaSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha256", EVP_sha256(), 32);
+     TestRsaSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha384", EVP_sha384(), 48);
+     TestRsaSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha512", EVP_sha512(), 64);
+@@ -1079,7 +1081,9 @@ void TestRsaEvp(int modulus, uint32_t exponent)
+ #if OPENSSL_VERSION_MAJOR == 1
+     TestRsaDigestSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_MD5", EVP_md5());
+ #endif
+-    TestRsaDigestSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha1", EVP_sha1());
++    // SHA-1 signature creation and verification are disabled by the default
++    // crypto policy on Azure Linux (which ships the Red Hat "allow disabling of
++    // SHA-1 signatures" OpenSSL patch), so this case is omitted.
+     TestRsaDigestSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha256", EVP_sha256());
+     TestRsaDigestSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha384", EVP_sha384());
+     TestRsaDigestSignVerify(privateKey, publicKey, "RSA_PKCS1_PADDING", RSA_PKCS1_PADDING, 0, "EVP_sha512", EVP_sha512());
+-- 
+2.52.0
+

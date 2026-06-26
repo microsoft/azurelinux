@@ -1,16 +1,25 @@
-# BASELINE COMMIT — pristine Azure Linux 3.0 SymCrypt-OpenSSL as a local component.
+# SymCrypt-OpenSSL (SCOSSL) lets OpenSSL use SymCrypt as the provider for its
+# core cryptographic operations. It is maintained here as a local spec ported
+# from Azure Linux 3.0 and has a build- and run-time dependency on the SymCrypt
+# component in this repo.
 #
-# This is a verbatim vendoring of the Azure Linux 3.0 `SymCrypt-OpenSSL`
-# package (microsoft/azurelinux @ 3.0-dev, SPECS/SymCrypt-OpenSSL), placed
-# unchanged as a `type = "local"` component purely as a review reference
-# point. The subsequent commit layers the Azure Linux 4.0 deviations on top,
-# so the diff against this baseline is exactly "what we had to change from
-# 3.0".
+# The upstream SymCrypt-OpenSSL release tarball is declared as a `source-files`
+# entry below. azldev tries the lookaside cache first (keyed by the component
+# name, SymCrypt-OpenSSL) and falls back to the `origin` URI only on a miss.
+# The fallback matters: this tarball is not published to the Azure Linux
+# lookaside, so the origin GitHub release URL is what actually resolves it.
 #
-# As-is this baseline renders but does not yet build under AZL4: the source
-# tarball is still declared the 3.0 way (via SymCrypt-OpenSSL.signatures.json)
-# rather than as a comp.toml source-file, so azldev cannot fetch it, and the
-# spec still carries 3.0-only build assumptions. Both are fixed in the
-# following commit.
+# Release and changelog are managed by rpmautospec (release.calculation =
+# "autorelease"): the Release integer is derived from this component's git
+# history at render time, and the spec's %autochangelog generates the changelog
+# from the same history. The inherited changelog entries are preserved verbatim
+# in the `changelog` sidecar file and appended below the generated entries.
 [components.SymCrypt-OpenSSL]
 spec = { type = "local", path = "SymCrypt-OpenSSL.spec" }
+release = { calculation = "autorelease" }
+
+[[components.SymCrypt-OpenSSL.source-files]]
+filename = "SymCrypt-OpenSSL-1.9.5.tar.gz"
+hash = "f62a66c772a05fe925d12f6981bfdc642711c104858f8152ed7a3a8bdf003c08"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.9.5.tar.gz" }
