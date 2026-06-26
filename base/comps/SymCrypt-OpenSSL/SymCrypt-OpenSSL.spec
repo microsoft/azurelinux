@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.9.5
+Version:        1.9.6
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -10,6 +10,9 @@ URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0001:      0001-register-symcrypt-provider-for-config-drop-in.patch
 Patch0002:      0002-skip-sha1-signature-tests-disabled-by-crypto-policy.patch
+# The v1.9.6 release tag shipped without bumping the CMake project version, so
+# the provider reports 1.9.5 via OSSL_PROV_PARAM_VERSION. Correct it downstream.
+Patch0003:      0003-bump-project-version-to-match-release-tag.patch
 
 BuildRequires:  openssl-devel
 BuildRequires:  openssl-devel-engine

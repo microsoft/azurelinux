@@ -1,4 +1,4 @@
-From 70bce2f413e6997103f059564909b7a3b7138b8f Mon Sep 17 00:00:00 2001
+From 115f648995926362080f05fe80d670ed6494ce5c Mon Sep 17 00:00:00 2001
 From: Tobias Brick <tobiasb@microsoft.com>
 Date: Fri, 26 Jun 2026 14:53:36 +0000
 Subject: [PATCH 1/2] Register the SymCrypt provider in [provider_sect] for

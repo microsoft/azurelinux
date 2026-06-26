@@ -1,4 +1,4 @@
-From 5538334ee18ce60cd6c9457328f174c19f3724e4 Mon Sep 17 00:00:00 2001
+From 4a0dc44dc83cc86f92feac65175fa1370c30efc2 Mon Sep 17 00:00:00 2001
 From: Tobias Brick <tobiasb@microsoft.com>
 Date: Fri, 26 Jun 2026 14:54:02 +0000
 Subject: [PATCH 2/2] Skip SHA-1 RSA sign/verify smoke tests disabled by crypto

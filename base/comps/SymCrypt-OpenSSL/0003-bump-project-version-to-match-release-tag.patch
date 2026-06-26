@@ -1,0 +1,30 @@
+From 9fc7d0510476acb5aa495e59c9b34248f3363ab2 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 26 Jun 2026 16:31:49 +0000
+Subject: [PATCH] Bump project version to 1.9.6 to match release tag
+
+The v1.9.6 release tag was created without updating the CMake project
+version, so the provider still reports 1.9.5 via OSSL_PROV_PARAM_VERSION
+(e.g. in `openssl list -providers`). Bump it to match the tag.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c09a03b..a75e7e0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,7 @@
+ cmake_minimum_required(VERSION 3.13.0)
+ 
+ project(SymCrypt-OpenSSL
+-    VERSION 1.9.5
++    VERSION 1.9.6
+     DESCRIPTION "The SymCrypt engine and provider for OpenSSL (SCOSSL)"
+     HOMEPAGE_URL "https://github.com/microsoft/SymCrypt-OpenSSL")
+ 
+-- 
+2.52.0
+
