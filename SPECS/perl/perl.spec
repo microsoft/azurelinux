@@ -6863,9 +6863,6 @@ popd
 * Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
 - Patch CVE-2025-40909
 
-* Wed Jun 04 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 4:5.38.2-509
-- Patch CVE-2025-40909
-
 * Tue May 27 2025 Nicolas Guibourge <nicolasg@microsoft.com> - 4:5.38.2-508
 - Remove password protected zip files from upstream src tarball
 
