@@ -1,0 +1,40 @@
+From 115f648995926362080f05fe80d670ed6494ce5c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 26 Jun 2026 14:53:36 +0000
+Subject: [PATCH 1/2] Register the SymCrypt provider in [provider_sect] for
+ config drop-in
+
+Add a [provider_sect] stanza to symcrypt_prov.cnf that maps the
+symcryptprovider module to the existing [symcrypt_prov_sect]. OpenSSL
+merges same-named [provider_sect] sections across config includes, so
+with this in place, dropping symcrypt_prov.cnf into the OpenSSL config
+drop-in directory is enough to register and activate the provider; no
+edit to the main openssl.cnf is required.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ SymCryptProvider/symcrypt_prov.cnf | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/SymCryptProvider/symcrypt_prov.cnf b/SymCryptProvider/symcrypt_prov.cnf
+index b0afe42..50b5c3a 100644
+--- a/SymCryptProvider/symcrypt_prov.cnf
++++ b/SymCryptProvider/symcrypt_prov.cnf
+@@ -4,6 +4,14 @@
+ # value assigned does not matter, and the provider will be
+ # activated as long as the "activate" key is present.
+ 
++# Register the provider with libcrypto. This [provider_sect] is merged into
++# the one in the main openssl.cnf, so dropping this file into the OpenSSL
++# config drop-in directory is enough to make the provider available. The key
++# (symcryptprovider) is the module name OpenSSL loads (symcryptprovider.so);
++# it maps to the [symcrypt_prov_sect] configuration below.
++[provider_sect]
++symcryptprovider = symcrypt_prov_sect
++
+ [symcrypt_prov_sect]
+ activate = 1
+ identity = symcryptprovider
+-- 
+2.52.0
+
