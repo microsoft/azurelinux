@@ -1,0 +1,272 @@
+From 30708e8d1142287e9c6bb839f1b3f84c71ca4485 Mon Sep 17 00:00:00 2001
+From: Chris Henzie <chrishenzie@gmail.com>
+Date: Fri, 15 May 2026 22:19:37 +0000
+Subject: [PATCH 1/5] Bound user-database file reads in openUserFile
+
+openUserFile now stats the opened file, refuses anything that is not a
+regular file, and wraps the returned fs.File so reads are capped at
+maxUserFileBytes (10 MiB). All callers of openUserFile read either
+etc/passwd or etc/group; both are regular files on real systems, well
+under the cap.
+
+The cap and the regular-file check together bound parser memory use
+when reading user-database files of unexpected shape or size.
+
+Adds tests for the cap and for the non-regular file rejection. The cap
+test covers three boundary points: a small pad (trailing entry parsed),
+a pad placing the entry's last byte exactly on the cap (still parsed),
+and a pad past the cap (read returns an "exceeds" error).
+
+Assisted-by: Antigravity
+Signed-off-by: Chris Henzie <chrishenzie@gmail.com>
+(cherry picked from commit 7b05ec421d0a07b33964c74145b6bf5dff58f476)
+Signed-off-by: Chris Henzie <chrishenzie@gmail.com>
+---
+ pkg/oci/spec_opts.go                  |  56 +++++++++-
+ pkg/oci/spec_opts_user_bounds_test.go | 146 ++++++++++++++++++++++++++
+ 2 files changed, 200 insertions(+), 2 deletions(-)
+ create mode 100644 pkg/oci/spec_opts_user_bounds_test.go
+
+diff --git a/pkg/oci/spec_opts.go b/pkg/oci/spec_opts.go
+index c298e4bb2..c989552db 100644
+--- a/pkg/oci/spec_opts.go
++++ b/pkg/oci/spec_opts.go
+@@ -24,6 +24,7 @@ import (
+ 	"encoding/json"
+ 	"errors"
+ 	"fmt"
++	"io"
+ 	"io/fs"
+ 	"math"
+ 	"os"
+@@ -1800,10 +1801,13 @@ type readLinker interface {
+ // openUserFile attempts to open a file within the root fs.
+ // It handles cases where the file is an absolute symlink (e.g., NixOS /etc/passwd -> /nix/store/...),
+ // which triggers "path escapes from parent" errors in Go 1.24+ due to stricter os.DirFS validation.
++//
++// The returned file rejects non-regular sources and returns an error if more
++// than maxUserFileBytes are read from it.
+ func openUserFile(root fs.FS, name string) (fs.File, error) {
+ 	f, err := root.Open(name)
+ 	if err == nil {
+-		return f, nil
++		return wrapUserFile(f, name)
+ 	}
+ 
+ 	// Check if the FS implements our local ReadLink interface.
+@@ -1820,7 +1824,11 @@ func openUserFile(root fs.FS, name string) (fs.File, error) {
+ 				if rerr == nil {
+ 					// filepath.Rel might return OS-specific separators (backslashes on Windows).
+ 					// fs.Open strictly expects forward slashes, so we convert it.
+-					return root.Open(filepath.ToSlash(rel))
++					f, oerr := root.Open(filepath.ToSlash(rel))
++					if oerr != nil {
++						return nil, oerr
++					}
++					return wrapUserFile(f, name)
+ 				}
+ 			}
+ 		}
+@@ -1829,3 +1837,47 @@ func openUserFile(root fs.FS, name string) (fs.File, error) {
+ 	// Return the original error if we couldn't resolve it
+ 	return nil, err
+ }
++
++// maxUserFileBytes caps how much data is read from any user-database file
++// opened via openUserFile. Real systems keep these files well under 1 MiB;
++// 10 MiB is generous headroom while keeping peak memory during
++// user.ParsePasswd/ParseGroup bounded to single-digit MiB.
++const maxUserFileBytes = 10 << 20
++
++// wrapUserFile rejects non-regular sources and returns an fs.File that
++// errors out if more than maxUserFileBytes are read from it.
++func wrapUserFile(f fs.File, name string) (fs.File, error) {
++	info, err := f.Stat()
++	if err != nil {
++		f.Close()
++		return nil, fmt.Errorf("stat %s: %w", name, err)
++	}
++	if !info.Mode().IsRegular() {
++		f.Close()
++		return nil, fmt.Errorf("%s is not a regular file", name)
++	}
++	return &limitedFile{
++		File: f,
++		// Allow one byte past the cap so an overflow surfaces as an
++		// error rather than a silent EOF that the parser would treat as
++		// a clean end-of-file (and miss any entries past the cap).
++		r:    &io.LimitedReader{R: f, N: maxUserFileBytes + 1},
++		name: name,
++	}, nil
++}
++
++// limitedFile is an fs.File whose Read returns an error once more than
++// maxUserFileBytes have been read.
++type limitedFile struct {
++	fs.File
++	r    *io.LimitedReader
++	name string
++}
++
++func (l *limitedFile) Read(p []byte) (int, error) {
++	n, err := l.r.Read(p)
++	if l.r.N == 0 {
++		return n, fmt.Errorf("%q exceeds %d bytes", l.name, maxUserFileBytes)
++	}
++	return n, err
++}
+diff --git a/pkg/oci/spec_opts_user_bounds_test.go b/pkg/oci/spec_opts_user_bounds_test.go
+new file mode 100644
+index 000000000..54384f79a
+--- /dev/null
++++ b/pkg/oci/spec_opts_user_bounds_test.go
+@@ -0,0 +1,146 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package oci
++
++import (
++	"bytes"
++	"errors"
++	"io/fs"
++	"testing"
++	"testing/fstest"
++	"time"
++
++	"github.com/moby/sys/user"
++	"github.com/stretchr/testify/assert"
++)
++
++// TestOpenUserFileCapsReads asserts the boundary behavior of the read cap:
++// well below, ending exactly at, and past maxUserFileBytes.
++func TestOpenUserFileCapsReads(t *testing.T) {
++	t.Parallel()
++
++	beyond := []byte("\nbeyond:x:42:\n")
++
++	for _, tc := range []struct {
++		name     string
++		padBytes int
++		wantGids []uint32
++		wantErr  bool
++	}{
++		{
++			name:     "pad below cap, beyond is parsed",
++			padBytes: 100,
++			wantGids: []uint32{42},
++		},
++		{
++			name:     "beyond ends exactly at cap, is parsed",
++			padBytes: maxUserFileBytes - len(beyond),
++			wantGids: []uint32{42},
++		},
++		{
++			name:     "pad past cap, read errors out",
++			padBytes: maxUserFileBytes,
++			wantErr:  true,
++		},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			t.Parallel()
++
++			data := append(bytes.Repeat([]byte{0}, tc.padBytes), beyond...)
++			fsys := fstest.MapFS{
++				"etc/group": &fstest.MapFile{Data: data, Mode: 0o644},
++			}
++
++			gids, err := getSupplementalGroupsFromFS(fsys, func(g user.Group) bool {
++				return g.Name == "beyond"
++			})
++			if tc.wantErr {
++				assert.ErrorContains(t, err, "exceeds")
++				return
++			}
++			assert.NoError(t, err)
++			assert.Equal(t, tc.wantGids, gids)
++		})
++	}
++}
++
++// TestOpenUserFileRejectsNonRegularFiles verifies that non-regular files
++// are refused before any byte is read from them.
++func TestOpenUserFileRejectsNonRegularFiles(t *testing.T) {
++	t.Parallel()
++
++	for _, tc := range []struct {
++		name string
++		mode fs.FileMode
++	}{
++		{name: "char device", mode: fs.ModeDevice | fs.ModeCharDevice | 0o666},
++		{name: "socket", mode: fs.ModeSocket | 0o666},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			t.Parallel()
++
++			f := &nonRegularFile{mode: tc.mode}
++			rootFS := singleFileFS{name: "etc/group", file: f}
++
++			_, err := getSupplementalGroupsFromFS(rootFS, nil)
++			assert.Error(t, err)
++			assert.False(t, f.readCalled, "Read should not be called on non-regular file")
++		})
++	}
++}
++
++// nonRegularFile implements fs.File and reports a configurable non-regular
++// mode via Stat.
++type nonRegularFile struct {
++	mode       fs.FileMode
++	readCalled bool
++}
++
++func (f *nonRegularFile) Read([]byte) (int, error) {
++	f.readCalled = true
++	return 0, errors.New("read should not be called on non-regular file")
++}
++
++func (f *nonRegularFile) Stat() (fs.FileInfo, error) {
++	return nonRegularFileInfo{mode: f.mode}, nil
++}
++func (f *nonRegularFile) Close() error { return nil }
++
++type nonRegularFileInfo struct {
++	mode fs.FileMode
++}
++
++func (nonRegularFileInfo) Name() string        { return "group" }
++func (nonRegularFileInfo) Size() int64         { return 0 }
++func (i nonRegularFileInfo) Mode() fs.FileMode { return i.mode }
++func (nonRegularFileInfo) ModTime() time.Time  { return time.Time{} }
++func (nonRegularFileInfo) IsDir() bool         { return false }
++func (nonRegularFileInfo) Sys() any            { return nil }
++
++// singleFileFS routes a single name to a single fs.File and returns
++// fs.ErrNotExist for everything else.
++type singleFileFS struct {
++	name string
++	file fs.File
++}
++
++func (s singleFileFS) Open(name string) (fs.File, error) {
++	if name == s.name {
++		return s.file, nil
++	}
++	return nil, fs.ErrNotExist
++}
+-- 
+2.54.0.1189.g8c84645362-goog
+
