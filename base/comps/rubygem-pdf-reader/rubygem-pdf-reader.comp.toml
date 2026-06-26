@@ -1,9 +1,255 @@
 [components.rubygem-pdf-reader]
 
-[[components.rubygem-pdf-reader.source-files]]
-filename = "pdf-reader-2.4.2-spec.txz"
-hash = "49de5d0e3bb8067101624ecc00a6e5f646a6dbdb4200343b15b1b268776e2248071056e7c73432a3b038130d7e8d5f81e9911742bc016272335bee18c51fd708"
-hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/rubygem-pdf-reader/pdf-reader-2.4.2-spec.txz/sha512/49de5d0e3bb8067101624ecc00a6e5f646a6dbdb4200343b15b1b268776e2248071056e7c73432a3b038130d7e8d5f81e9911742bc016272335bee18c51fd708/pdf-reader-2.4.2-spec.txz" }
-replace-upstream = true
-replace-reason = "Serve a locally-modified `pdf-reader-2.4.2-spec.txz` with 47 pathological PDF fixtures removed from `spec/data/` to avoid scan failures. All fixtures are benign upstream regression PDFs not consumed at AZL runtime. Companion patch in `modify_source.sh` makes `pdf_spec_file()` call rspec's `skip` only for the 47 removed filenames; it still raises `ArgumentError` for any other missing fixture."
+# Remove all 47 pathological PDF test fixtures from spec/data/ that trip
+# AZL signing-pipeline AV scanner. All are benign upstream regression
+# PDFs not consumed at AZL runtime.
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/broken_string.pdf"
+description = "Remove broken_string.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/clearscan-with-image-removed.pdf"
+description = "Remove clearscan-with-image-removed.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/clearscan.pdf"
+description = "Remove clearscan.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/content_stream_as_array.pdf"
+description = "Remove content_stream_as_array.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/content_stream_missing_final_operator.pdf"
+description = "Remove content_stream_missing_final_operator.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/content_stream_refers_to_invalid_font.pdf"
+description = "Remove content_stream_refers_to_invalid_font.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/difference_table2.pdf"
+description = "Remove difference_table2.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/difference_table_encrypted.pdf"
+description = "Remove difference_table_encrypted.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/encrypted_*.pdf"
+description = "Remove encrypted PDF test fixtures flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/form_xobject_recursive.pdf"
+description = "Remove form_xobject_recursive.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/hard_lock_under_osx.pdf"
+description = "Remove hard_lock_under_osx.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/indirect_mediabox.pdf"
+description = "Remove indirect_mediabox.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/invisible.pdf"
+description = "Remove invisible.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/junk_prefix.pdf"
+description = "Remove junk_prefix.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/junk_prefix_1024.pdf"
+description = "Remove junk_prefix_1024.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/kids-as-direct-objects.pdf"
+description = "Remove kids-as-direct-objects.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/mediabox_and_cropbox_are_references.pdf"
+description = "Remove mediabox_and_cropbox_are_references.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/mediabox_missing.pdf"
+description = "Remove mediabox_missing.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/one-byte-identity.pdf"
+description = "Remove one-byte-identity.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/overlapping-chars-x-fake-bold.pdf"
+description = "Remove overlapping-chars-x-fake-bold.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/overlapping-chars-xy-fake-bold.pdf"
+description = "Remove overlapping-chars-xy-fake-bold.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/pages_object_missing_type.pdf"
+description = "Remove pages_object_missing_type.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/rotate-180.pdf"
+description = "Remove rotate-180.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/rotate-then-undo.pdf"
+description = "Remove rotate-then-undo.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/screwey_xref_offsets.pdf"
+description = "Remove screwey_xref_offsets.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/standard_font_with_no_difference.pdf"
+description = "Remove standard_font_with_no_difference.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/symbol.pdf"
+description = "Remove symbol.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/times-with-control-character.pdf"
+description = "Remove times-with-control-character.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/truetype-arial.pdf"
+description = "Remove truetype-arial.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/type1-arial.pdf"
+description = "Remove type1-arial.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/type3_font.pdf"
+description = "Remove type3_font.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/type3_font_with_rare_font_matrix.pdf"
+description = "Remove type3_font_with_rare_font_matrix.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/zapf.pdf"
+description = "Remove zapf.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/zeroed_xref_entry.pdf"
+description = "Remove zeroed_xref_entry.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-remove"
+file = "pdf-reader-2.4.2-spec.txz/data/zlib_stream_issue.pdf"
+description = "Remove zlib_stream_issue.pdf test fixture flagged by AZL signing-pipeline AV scanner"
+
+# Patch the test helper to insert the AZL_STRIPPED_FIXTURES constant after
+# `module ReaderSpecHelper` so tests for stripped fixtures skip gracefully
+# instead of raising ArgumentError.
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-search-replace"
+file = "pdf-reader-2.4.2-spec.txz/support/reader_spec_helper.rb"
+regex = 'module ReaderSpecHelper\n'
+replacement = """module ReaderSpecHelper
+
+  # AZL downstream: fixtures stripped from spec/data/ for package-
+  # signing-scan compliance. pdf_spec_file() skips (rather than raises)
+  # ONLY for entries in this set; any other missing fixture still raises.
+  AZL_STRIPPED_FIXTURES = %w[
+    broken_string.pdf
+    clearscan-with-image-removed.pdf
+    clearscan.pdf
+    content_stream_as_array.pdf
+    content_stream_missing_final_operator.pdf
+    content_stream_refers_to_invalid_font.pdf
+    difference_table2.pdf
+    difference_table_encrypted.pdf
+    encrypted_version1_revision2_128bit_rc4_blank_user_password.pdf
+    encrypted_version1_revision2_128bit_rc4_no_doc_id.pdf
+    encrypted_version1_revision2_40bit_rc4_user_pass_apples.pdf
+    encrypted_version2_revision3_128bit_rc4_blank_user_pass.pdf
+    encrypted_version2_revision3_128bit_rc4_user_pass_apples.pdf
+    encrypted_version4_revision4_128bit_aes_user_pass_apples_enc_metadata.pdf
+    encrypted_version4_revision4_128bit_aes_user_pass_apples_unenc_metadata.pdf
+    encrypted_version4_revision4_128bit_rc4_user_pass_apples_enc_metadata.pdf
+    encrypted_version4_revision4_128bit_rc4_user_pass_apples_unenc_metadata.pdf
+    encrypted_version5_revision5_256bit_aes_user_pass_apples_enc_metadata.pdf
+    encrypted_version5_revision5_256bit_aes_user_pass_apples_unenc_metadata.pdf
+    encrypted_version5_revision6_256bit_aes_user_pass_apples_enc_metadata.pdf
+    encrypted_version5_revision6_256bit_aes_user_pass_apples_unenc_metadata.pdf
+    form_xobject_recursive.pdf
+    hard_lock_under_osx.pdf
+    indirect_mediabox.pdf
+    invisible.pdf
+    junk_prefix.pdf
+    junk_prefix_1024.pdf
+    kids-as-direct-objects.pdf
+    mediabox_and_cropbox_are_references.pdf
+    mediabox_missing.pdf
+    one-byte-identity.pdf
+    overlapping-chars-x-fake-bold.pdf
+    overlapping-chars-xy-fake-bold.pdf
+    pages_object_missing_type.pdf
+    rotate-180.pdf
+    rotate-then-undo.pdf
+    screwey_xref_offsets.pdf
+    standard_font_with_no_difference.pdf
+    symbol.pdf
+    times-with-control-character.pdf
+    truetype-arial.pdf
+    type1-arial.pdf
+    type3_font.pdf
+    type3_font_with_rare_font_matrix.pdf
+    zapf.pdf
+    zeroed_xref_entry.pdf
+    zlib_stream_issue.pdf
+  ].freeze
+"""
+description = "Insert AZL_STRIPPED_FIXTURES constant listing stripped PDF filenames"
+
+# Insert an elsif branch before the existing else/raise so stripped fixtures
+# get rspec `skip` instead of ArgumentError
+[[components.rubygem-pdf-reader.overlays]]
+type = "file-search-replace"
+file = "pdf-reader-2.4.2-spec.txz/support/reader_spec_helper.rb"
+regex = '    else\n      raise ArgumentError, "#{valid_filename} not found"'
+replacement = '''    elsif AZL_STRIPPED_FIXTURES.include?("#{base}.pdf")
+      skip "PDF fixture #{File.basename(valid_filename)} stripped for downstream scan compliance"
+    else
+      raise ArgumentError, "#{valid_filename} not found"'''
+description = "Make pdf_spec_file() skip (not raise) for stripped fixtures; still raises for any other missing fixture"
