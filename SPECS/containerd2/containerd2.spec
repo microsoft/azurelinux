@@ -32,6 +32,9 @@ Patch12:	CVE-2026-47262.patch
 Patch13:	CVE-2026-25680.patch
 Patch14:	CVE-2026-25681.patch
 Patch15:	CVE-2026-42502.patch
+
+%{?systemd_requires}
+
 BuildRequires: golang < 1.25
 BuildRequires: go-md2man
 BuildRequires: make
@@ -102,6 +105,8 @@ fi
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
 %dir /opt/containerd
 %dir /opt/containerd/bin
+%dir /opt/containerd/lib
+
 %changelog
 
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
@@ -112,13 +117,6 @@ fi
 
 * Sat May 30 2026 Jon Slobodzian <joslobo@microsoft.com> - 2.2.4-2
 - Resolve merge from fasttrack, bring patches for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136 forward to 2.2.4 version of containerd2.
-- Patch for CVE-2026-33814
-
-* Mon May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-4
-- Patch for CVE-2026-39882
-
-* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.1.6-3
-- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136
 
 * Fri May 29 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-1
 - Upgrade to 2.2.4
