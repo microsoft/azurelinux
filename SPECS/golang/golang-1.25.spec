@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.25.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -166,18 +166,12 @@ fi
 %{_bindir}/*
 
 %changelog
-<<<<<<< HEAD
-<<<<<<< HEAD
-* Thu June 04 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.25.11-2
+
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.25.11-3
 - Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
-=======
+
 * Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.25.11.2
 - Patch for CVE-2026-39821
->>>>>>> 92dba45e50 ([Critical] Patch golang & golang-1.25 for CVE-2026-39821 (#17627))
-=======
-* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.25.11.2
-- Patch for CVE-2026-39821
->>>>>>> 92dba45e50 ([Critical] Patch golang & golang-1.25 for CVE-2026-39821 (#17627))
 
 * Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.11-1
 - Bump version to 1.25.11-1
