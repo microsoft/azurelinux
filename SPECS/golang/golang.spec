@@ -172,7 +172,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Thu June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-3
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-3
 - Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
 
 * Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
