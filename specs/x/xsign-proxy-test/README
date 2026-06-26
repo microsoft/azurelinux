@@ -1,0 +1,3 @@
+xsign-proxy-test dummy package
+
+This package tests xsign-proxy client-server communication during RPM builds.
