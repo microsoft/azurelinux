@@ -1,0 +1,12 @@
+# Upgrade netplan 1.1.2 -> 1.2.1 by moving the dist-git import pointer from the
+# global Fedora f43 snapshot to the Fedora f44 head.
+#
+# f44 ships netplan 1.2.1-2, which contains the upstream generate/configure
+# split (PR #552, first released in 1.2). That split makes the boot-time
+# systemd generator validation-only and defers virtual-device creation to
+# netplan-configure.service, resolving the AZL4 rollback PID1 generator
+# self-deadlock (getgrnam NSS lookup under the generator sandbox).
+#
+# Fedora f44 dist-git: https://src.fedoraproject.org/rpms/netplan/commits/f44
+[components.netplan]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "66c31bcd3e9aeb8d15a5b4184009e57d799b0158" }

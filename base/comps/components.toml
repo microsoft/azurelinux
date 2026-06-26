@@ -2178,7 +2178,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.netcdf-cxx]
 [components.netlabel_tools]
 [components.netpbm]
-[components.netplan]
 [components.nettle]
 [components.network-manager-applet]
 [components.newt]

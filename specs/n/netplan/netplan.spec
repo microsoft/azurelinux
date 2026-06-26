@@ -20,8 +20,8 @@
 %bcond_with tests
 
 Name:           netplan
-Version:        1.1.2
-Release: 5%{?dist}
+Version:        1.2.1
+Release: 4%{?dist}
 Summary:        Network configuration tool using YAML
 License:        GPL-3.0-only
 URL:            http://netplan.io/
@@ -29,9 +29,6 @@ Source0:        https://github.com/canonical/%{name}/archive/%{version}/%{name}-
 
 # Downstream only
 Patch1001:      netplan-fallback-renderer.patch
-# https://github.com/canonical/netplan/pull/555
-# probably won't be necessary in > 1.1.2
-Patch1002:      status_fail_cleanly.patch
 
 BuildRequires:  gcc
 BuildRequires:  meson
@@ -43,6 +40,7 @@ BuildRequires:  pkgconfig(systemd)
 BuildRequires:  pkgconfig(yaml-0.1)
 BuildRequires:  pkgconfig(uuid)
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  %{_bindir}/pandoc
 BuildRequires:  python3dist(cffi)
@@ -81,6 +79,8 @@ Requires:       python3-%{name}%{?_isa} = %{version}-%{release}
 Provides:       %{ubuntu_name} = %{version}-%{release}
 Provides:       %{ubuntu_name}%{?_isa} = %{version}-%{release}
 
+# provides "netplan status" functionality
+Suggests:       systemd-networkd
 
 
 %description
@@ -104,8 +104,10 @@ Currently supported backends are NetworkManager and systemd-networkd.
 %dir %{_sysconfdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/generate
+%{_libexecdir}/%{name}/configure
 %{_libexecdir}/%{name}/%{name}-dbus
 %{_datadir}/bash-completion/completions/%{name}
+%{_unitdir}/netplan-configure.service
 
 # ------------------------------------------------------------------------------------------------
 
@@ -285,6 +287,15 @@ EOF
 
 
 %changelog
+* Tue May 05 2026 Jonathan Wright <jonathan@almalinux.org> - 1.2.1-2
+- Suggest systemd-networkd for "netplan status" functionality
+
+* Tue May 05 2026 Jonathan Wright <jonathan@almalinux.org> - 1.2.1-1
+- update to netplan 1.2.1 rhbz#2422802
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.1.2-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 
