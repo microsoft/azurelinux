@@ -40,15 +40,18 @@
         <package name="dbus"/>
         <package name="default-editor"/>
         <package name="diffutils"/>
+        <package name="ethtool"/>
         <package name="file"/>
         <package name="findutils"/>
         <package name="gawk"/>
+        <package name="git"/>
         <package name="glibc-langpack-en"/>
         <package name="gnupg2"/>
         <package name="grep"/>
         <package name="gzip"/>
         <package name="iproute"/>
         <package name="iputils"/>
+        <package name="jq"/>
         <package name="less"/>
         <package name="lsof"/>
         <package name="man-db"/>
@@ -70,6 +73,7 @@
         <package name="tar"/>
         <package name="tcpdump"/>
         <package name="time"/>
+        <package name="tmux"/>
         <package name="traceroute"/>
         <package name="tree"/>
         <package name="unzip"/>
