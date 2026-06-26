@@ -3961,7 +3961,7 @@
         "other": {
           "name": "freeradius",
           "version": "3.2.10",
-          "downloadUrl": "https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_10/freeradius-server-3.2.10.tar.bz2"
+          "downloadUrl": "https://www.freeradius.org/ftp/pub/freeradius/freeradius-server-3.2.10.tar.bz2"
         }
       }
     },
