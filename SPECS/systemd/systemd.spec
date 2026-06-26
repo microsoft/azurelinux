@@ -139,6 +139,10 @@ Patch0490:      use-none-scheduler.patch
 # 'azurelinux-...' and modified for our 'system-*' pam files
 Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 
+# ukify: fix insertion of padding in merged sections
+# Backport of upstream commit ec1d031f3de02f84beca89e2b402d085fba62be4
+Patch0492:      ukify-fix-insertion-of-padding-in-merged-sections.patch
+
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
@@ -1240,6 +1244,12 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Jun 24 2026 Vince Perri <viperri@microsoft.com> - 255-32
+- Backport upstream ukify fix (ec1d031f3de02f84beca89e2b402d085fba62be4):
+  when merging into an existing PE section, padding was derived from the new
+  section size instead of the existing section size, which can leave
+  insufficient padding and corrupt the resulting UKI.
+
 * Wed May 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
 - Prevent corruption from stale alias state on daemon-reload
 
