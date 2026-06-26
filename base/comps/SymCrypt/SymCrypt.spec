@@ -2,7 +2,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.8.0
+Version:        103.11.0
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -88,8 +88,8 @@ chmod 755 %{buildroot}%{_libdir}/libsymcrypt.so.%{version}
 ./bin/exe/symcryptunittest
 
 %files
-%license LICENSE
-%license NOTICE
+%license LICENSE.txt
+%license NOTICE.txt
 %{_libdir}/libsymcrypt.so*
 %{_includedir}/*
 
