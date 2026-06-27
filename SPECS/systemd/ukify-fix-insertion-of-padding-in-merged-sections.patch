@@ -1,0 +1,34 @@
+From ec1d031f3de02f84beca89e2b402d085fba62be4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Tue, 19 Aug 2025 11:02:44 +0200
+Subject: [PATCH] ukify: fix insertion of padding in merged sections
+
+The padding was done to expand the new section contents to the expected size of
+the new section. And this then would be used for the content in the existing
+section. The new section cannot be larger than the old section, but it can be
+smaller. If the new section was smaller, then we'd not write enough padding and
+the output file would be corrupted.
+
+This was observed in CI when the .sbat section in the stub was padded to 1k.
+The UKI with an .sbat section that was merged and was fairly short would hit
+this scenario and be corrupted.
+
+[Rebased onto systemd v255 by Vince Perri <viperri@microsoft.com>]
+---
+ src/ukify/ukify.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/ukify/ukify.py b/src/ukify/ukify.py
+--- a/src/ukify/ukify.py
++++ b/src/ukify/ukify.py
+@@ -618,9 +618,8 @@ def pe_add_sections(uki: UKI, output: str):
+                 if new_section.Misc_VirtualSize > s.SizeOfRawData:
+                     raise PEError(f'Not enough space in existing section {section.name} to append new data.')
+ 
+-                padding = bytes(new_section.SizeOfRawData - new_section.Misc_VirtualSize)
++                padding = bytes(s.SizeOfRawData - new_section.Misc_VirtualSize)
+                 pe.__data__ = pe.__data__[:s.PointerToRawData] + data + padding + pe.__data__[pe.sections[i+1].PointerToRawData:]
+-                s.SizeOfRawData = new_section.SizeOfRawData
+                 s.Misc_VirtualSize = new_section.Misc_VirtualSize
+                 break
+         else:

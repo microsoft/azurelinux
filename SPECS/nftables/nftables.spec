@@ -1,7 +1,7 @@
 Summary:        Netfilter Tables userspace utillites
 Name:           nftables
 Version:        1.0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ Source2:        nftables.conf
 Source3:        main.nft
 Source4:        router.nft
 Source5:        nat.nft
+Patch0:         fix_crash_when_ops_dont_support_udata.patch
 
 BuildRequires:  asciidoc
 BuildRequires:  bison
@@ -134,6 +135,10 @@ sed -i -e 's/\(sofile=\)".*"/\1"'$sofile'"/' \
 %{python3_sitelib}/nftables/
 
 %changelog
+* Thu Jun 18 2026 Sumedh Sharma <sumsharma@microsoft.com> - 1.0.9-2
+- Fix segmentation fault when listing ruleset containing unsupported
+  udata in expression.
+
 * Mon Feb 26 2024 Neha Agarwal <nehaagarwal@microsoft.com> - 1.0.9-1
 - Update to v1.0.9
 

@@ -60,13 +60,13 @@
 
 Summary:        Postfix Mail Transport Agent
 Name:           postfix
-Version:        3.9.0
-Release:        2%{?dist}
+Version:        3.9.11
+Release:        1%{?dist}
 License:        (IBM AND GPLv2+) OR (EPL-2.0 AND GPLv2+)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            http://www.postfix.org
-Source0:        ftp://ftp.porcupine.org/mirrors/postfix-release/official/%{name}-%{version}.tar.gz
+Source0:        https://archive.mgm51.com/mirrors/postfix-source/official/%{name}-%{version}.tar.gz#/%{name}-%{version}-https.tar.gz
 Source1:        postfix-etc-init.d-postfix
 Source2:        postfix.service
 Source3:        README-Postfix-SASL-RedHat.txt
@@ -426,6 +426,7 @@ cp -p examples/chroot-setup/LINUX2 %{buildroot}%{postfix_doc_dir}/examples/chroo
 cp conf/{main,bounce}.cf.default %{buildroot}%{postfix_doc_dir}
 sed -i 's#%{postfix_config_dir}\(/bounce\.cf\.default\)#%{postfix_doc_dir}\1#' %{buildroot}%{_mandir}/man5/bounce.5
 rm -f %{buildroot}%{postfix_config_dir}/{TLS_,}LICENSE
+rm -f %{buildroot}%{postfix_doc_dir}/LICENSE %{buildroot}%{postfix_doc_dir}/TLS_LICENSE
 
 find %{buildroot}%{postfix_doc_dir} -type f | xargs chmod 644
 find %{buildroot}%{postfix_doc_dir} -type d | xargs chmod 755
@@ -783,6 +784,9 @@ exit 0
 %endif
 
 %changelog
+* Fri May 22 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.9.11-1
+- Upgrade to version 3.9.11 for CVE-2026-43964
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.9.0-2
 - Remove dependency on 'libdb'. Using Fedora 40 (license: MIT) spec for guidance.
 

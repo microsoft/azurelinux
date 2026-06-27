@@ -10,6 +10,6 @@
     "httpd-ssl-pass-dialog": "b9bd4816dda673ad9294a0fbd2904fac9b96eabddb4d72080ae58b498bcd1db9",
     "macros.httpd": "6dbf9313a5d085cb705fa5ef393372ec940008f08bf1c9350f8f49d58df75dff",
     "ssl.conf": "6690cb873d2312d0ecffcda3822562cd1b1b11ac44b1fcb7bd1b720a9e53c333",
-    "httpd-2.4.67.tar.bz2": "66cd206637b0d5c446fa7dabe75fe03525da8fb55855876c46288cd88b136aa4"
+    "httpd-2.4.68.tar.bz2": "68c74d4df38c26bed4dfbdb8f3baf1eb532f3872357becc1bba5d136f6b63c06"
   }
 }

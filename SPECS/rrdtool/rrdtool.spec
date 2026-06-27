@@ -4,13 +4,14 @@
 Summary:        Round Robin Database Tool to store and display time-series data
 Name:           rrdtool
 Version:        1.8.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv2 OR GPLv2 WITH FLOSS License Exception
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://oss.oetiker.ch/rrdtool/
 Source0:        https://github.com/oetiker/rrdtool-1.x/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-43958.patch
 BuildRequires:  cairo-devel
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype-devel
@@ -78,19 +79,19 @@ Requires:       lua(abi) = %{luaver}
 The %{name}-lua package includes RRDtool bindings for Lua.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 ./configure \
 	--prefix=%{_prefix}	\
 	--enable-tcl-site \
-    --with-tcllib=%{_libdir} \
+	--with-tcllib=%{_libdir} \
 	--enable-python 	\
 	--enable-ruby \
 	--disable-perl		\
 	--disable-examples	\
-        --with-systemdsystemunitdir=%{_unitdir} \
-        --disable-docs 		\
+	--with-systemdsystemunitdir=%{_unitdir} \
+	--disable-docs 		\
 	--disable-static
 
 perl -pi.orig -e 's|-Wl,--rpath -Wl,\$\(EPREFIX\)/lib||g' \
@@ -161,6 +162,9 @@ rm -rf %{buildroot}%{_libdir}/python2.7
 %{_libdir}/ruby
 
 %changelog
+* Tue Jun 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.8.0-3
+- Patch for CVE-2026-43958
+
 * Wed Jul 31 2024 Andrew Phelps <anphel@microsoft.com> - 1.8.0-2
 - Update file listings to remove duplicate files
 

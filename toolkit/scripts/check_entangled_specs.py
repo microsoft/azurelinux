@@ -80,14 +80,6 @@ version_release_matching_groups = [
         "SPECS/isert-hwe/isert-hwe.spec"
     ]),
     frozenset([
-        "SPECS-SIGNED/knem-modules-signed/knem-modules-signed.spec",
-        "SPECS/knem/knem.spec"
-    ]),
-    frozenset([
-        "SPECS-SIGNED/knem-hwe-modules-signed/knem-hwe-modules-signed.spec",
-        "SPECS/knem-hwe/knem-hwe.spec"
-    ]),
-    frozenset([
         "SPECS-SIGNED/mft_kernel-signed/mft_kernel-signed.spec",
         "SPECS/mft_kernel/mft_kernel.spec"
     ]),
