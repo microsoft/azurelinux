@@ -9,12 +9,6 @@ Distribution:   Azure Linux
 URL:            http://www.litech.org/radvd/
 Source0:        https://github.com/radvd-project/radvd/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Source1:        radvd-tmpfs.conf
-## https://github.com/reubenhwk/radvd/commit/6e45acbf3d64b9bd945adcb3de622fd7d059ceb9.patch
-Patch0:         radvd-werror.patch
-Patch1:         radvd-endianess.patch
-Patch2:         radvd-stderr_logging.patch
-Patch3:         radvd-nodaemon_manpage,patch
-Patch4:         radvd-double_free_ifacelist.patch
 
 BuildRequires:  bison
 BuildRequires:  check-devel
@@ -39,7 +33,7 @@ Install radvd if you are setting up IPv6 network and/or Mobile IPv6
 services.
 
 %prep
-%setup -q
+%autosetup -p1
 
 for F in CHANGES; do
     iconv -f iso-8859-1 -t utf-8 < "$F" > "${F}.new"
@@ -91,7 +85,7 @@ exit 0
 
 %files
 %license COPYRIGHT
-%doc CHANGES INTRO.html README TODO
+%doc CHANGES INTRO.html README.md TODO
 %{_unitdir}/radvd.service
 %config(noreplace) %{_sysconfdir}/radvd.conf
 %config(noreplace) %{_sysconfdir}/sysconfig/radvd
