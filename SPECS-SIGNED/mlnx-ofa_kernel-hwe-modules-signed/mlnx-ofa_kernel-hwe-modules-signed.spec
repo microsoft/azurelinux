@@ -131,6 +131,8 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
+Obsoletes: fwctl-hwe <= 24.10
+Provides: fwctl-hwe = %{version}-%{release}
 
 Requires: kernel-hwe = %{target_kernel_version_full}
 Requires: kmod
@@ -238,8 +240,6 @@ fi
   after the upgrade to DOCA 3.3.0 / kernel-hwe 6.18 (PR #17447). The
   in-tree fwctl framework is now provided by the HWE kernel itself,
   so the out-of-tree, signed copy is unnecessary.
-- Drop the now-stale fwctl-hwe Obsoletes/Provides pair (no consumers
-  in the repo).
 
 * Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 26.01-1_6.18.31.1.1
 - Bump to match upgrade to DOCA 3.3.0 (OFED 26.01).
