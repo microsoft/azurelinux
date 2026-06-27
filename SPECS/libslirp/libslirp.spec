@@ -1,6 +1,6 @@
 Summary:        A general purpose TCP-IP emulator
 Name:           libslirp
-Version:        4.7.0
+Version:        4.9.3
 Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
@@ -48,6 +48,9 @@ developing applications that use %{name}.
 %{_libdir}/pkgconfig/slirp.pc
 
 %changelog
+* Sat Jun 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.9.3-1
+- Auto-upgrade to 4.9.3 - for CVE-2026-9539
+
 * Thu Jan 18 2024 Sindhu Karri <lakarri@microsoft.com> - 4.7.0-1
 - Upgrade slirp to 4.7.0
 - Updated source URL to a generic URL that allows autoupgrades in the future
