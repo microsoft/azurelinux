@@ -46,7 +46,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 %{_name}-signed
 Version:	 26.01
-Release:	 1%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -88,7 +88,6 @@ Source26:       smc_diag.ko
 Source27:       rpcrdma.ko
 Source28:       svcrdma.ko
 Source29:       xprtrdma.ko
-Source30:       fwctl.ko
 Source31:       mlx5_fwctl.ko
 Source32:       mana_ib.ko
 Source33:       mlx5_dpll.ko
@@ -132,8 +131,6 @@ Obsoletes: mlnx-en-kmp-trace
 Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
-Obsoletes: fwctl-hwe <= 24.10
-Provides:  fwctl-hwe = %{version}-%{release}
 
 Requires: kernel-hwe = %{target_kernel_version_full}
 Requires: kmod
@@ -191,7 +188,6 @@ cp -rf %{SOURCE26} ./lib/modules/%{KVERSION}/updates/net/smc/smc_diag.ko
 cp -rf %{SOURCE27} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/rpcrdma.ko
 cp -rf %{SOURCE28} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/svcrdma.ko
 cp -rf %{SOURCE29} ./lib/modules/%{KVERSION}/updates/net/sunrpc/xprtrdma/xprtrdma.ko
-cp -rf %{SOURCE30} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/fwctl.ko
 cp -rf %{SOURCE31} ./lib/modules/%{KVERSION}/updates/drivers/fwctl/mlx5/mlx5_fwctl.ko
 cp -rf %{SOURCE32} ./lib/modules/%{KVERSION}/updates/drivers/infiniband/hw/mana/mana_ib.ko
 cp -rf %{SOURCE33} ./lib/modules/%{KVERSION}/updates/drivers/net/ethernet/mellanox/mlx5/core/mlx5_dpll.ko
@@ -237,6 +233,14 @@ fi
 %license %{_datadir}/licenses/%{_name}/copyright
 
 %changelog
+* Fri Jun 27 2026 Jon Slobodzian <joslobo@microsoft.com> - 26.01-2_6.18.31.1.1
+- Drop fwctl.ko: it is no longer produced by the HWE OFED build
+  after the upgrade to DOCA 3.3.0 / kernel-hwe 6.18 (PR #17447). The
+  in-tree fwctl framework is now provided by the HWE kernel itself,
+  so the out-of-tree, signed copy is unnecessary.
+- Drop the now-stale fwctl-hwe Obsoletes/Provides pair (no consumers
+  in the repo).
+
 * Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 26.01-1_6.18.31.1.1
 - Bump to match upgrade to DOCA 3.3.0 (OFED 26.01).
 
