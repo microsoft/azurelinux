@@ -1,6 +1,6 @@
 Summary:        A Router Advertisement daemon
 Name:           radvd
-Version:        2.19
+Version:        2.21
 Release:        1%{?dist}
 # The code includes the advertising clause, so it's GPL-incompatible
 License:        BSD WITH advertising
@@ -103,6 +103,9 @@ exit 0
 %{_sbindir}/radvdump
 
 %changelog
+* Sat Jun 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.21-1
+- Auto-upgrade to 2.21 - for CVE-2026-48715
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.19-1
 - Auto-upgrade to 2.19 - Azure Linux 3.0 - package upgrades
 
