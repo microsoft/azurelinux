@@ -1,6 +1,6 @@
 Summary:        The fastest markdown parser in pure Python.
 Name:           python-mistune
-Version:        3.2.1
+Version:        3.3.0
 Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
@@ -45,6 +45,9 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 %{python3_sitelib}/*
 
 %changelog
+* Sun Jun 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.3.0-1
+- Auto-upgrade to 3.3.0 - for CVE-2026-49851
+
 * Mon May 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.2.1-1
 - Auto-upgrade to 3.2.1 - CVE-2026-33079
 
