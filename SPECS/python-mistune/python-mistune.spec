@@ -42,6 +42,7 @@ The fastest markdown parser in pure Python with renderer features, inspired by m
 %files -n python3-mistune
 %defattr(-,root,root)
 %license LICENSE
+%{_bindir}/mistune
 %{python3_sitelib}/*
 
 %changelog
