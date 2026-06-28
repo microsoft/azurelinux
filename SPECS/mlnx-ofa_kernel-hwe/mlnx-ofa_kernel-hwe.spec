@@ -117,7 +117,7 @@
 Summary:	 Infiniband HCA Driver
 Name:		 mlnx-ofa_kernel-hwe
 Version:	 26.01
-Release:	 1%{release_suffix}%{?dist}
+Release:	 2%{release_suffix}%{?dist}
 License:	 GPLv2
 Url:		 http://www.mellanox.com/
 Group:		 System Environment/Base
@@ -193,8 +193,6 @@ Obsoletes: mlnx-en-doc
 Obsoletes: mlnx-en-debuginfo
 Obsoletes: mlnx-en-sources
 Obsoletes: mlnx-rdma-rxe
-Obsoletes: fwctl-hwe <= 24.10
-Provides:  fwctl-hwe = %{version}-%{release}
 
 Summary: Infiniband Driver and ULPs kernel modules
 Group: System Environment/Libraries
@@ -464,6 +462,10 @@ update-alternatives --remove \
 %{_prefix}/src/ofa_kernel/%{_arch}/[0-9]*
 
 %changelog
+* Fri Jun 27 2026 Jon Slobodzian <joslobo@microsoft.com> - 26.01-2_6.18.31.1.1
+- Bump release to stay entangled with the signed sibling, which dropped
+  fwctl.ko (no longer produced by HWE OFED after the DOCA 3.3.0 bump).
+
 * Mon May 11 2026 Azure Linux Team - 26.01-1_6.18.31.1.1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
