@@ -27214,8 +27214,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-nokogiri",
-          "version": "1.15.4",
-          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.15.4.tar.gz"
+          "version": "1.19.4",
+          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.19.4.tar.gz"
         }
       }
     },
