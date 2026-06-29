@@ -1,5 +1,8 @@
 [components.dtc]
 
+[components.dtc.build]
+defines = { foo = "bar" }
+
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # The upstream spec hard-codes `%global with_mingw 1` whenever %fedora is
 # defined (true in our build environment) rather than gating on a %bcond, so
