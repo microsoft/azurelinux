@@ -7,7 +7,7 @@
 Summary:        Signed Linux Kernel for %{buildarch} systems
 Name:           kernel-64k-signed-%{buildarch}
 Version:        6.6.143.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -105,6 +105,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %exclude /module_info.ld
 
 %changelog
+* Mon Jun 29 2026 Omkhar Arasaratnam <omkhar@linkedin.com> - 6.6.143.1-2
+- Release bump to stay in lockstep with the kernel spec entanglement group for the ipv6 fraggap fix (torvalds/linux@736b380e28d0).
+
 * Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.143.1-1
 - Auto-upgrade to 6.6.143.1
 

@@ -1,0 +1,79 @@
+From 736b380e28d0480c7bc3e022f1950f31fe53a7c5 Mon Sep 17 00:00:00 2001
+From: Wongi Lee <qw3rtyp0@gmail.com>
+Date: Tue, 16 Jun 2026 22:46:17 +0900
+Subject: ipv6: account for fraggap on the paged allocation path
+
+In __ip6_append_data(), when the paged-allocation branch is taken
+(MSG_MORE / NETIF_F_SG / large fraglen), alloclen and pagedlen are
+computed as
+
+	alloclen = fragheaderlen + transhdrlen;
+	pagedlen = datalen - transhdrlen;
+
+datalen already includes fraggap (datalen = length + fraggap). When
+fraggap is non-zero, this is not the first skb and transhdrlen is zero.
+The fraggap bytes carried over from the previous skb are copied just past
+the fragment headers in the new skb's linear area. The linear area is
+therefore undersized by fraggap bytes while pagedlen is overstated by the
+same amount, and the copy writes past skb->end into the trailing
+skb_shared_info.
+
+An unprivileged user can trigger this via a UDPv6 socket using
+MSG_MORE together with MSG_SPLICE_PAGES.
+
+The bad accounting was introduced by commit 773ba4fe9104 ("ipv6:
+avoid partial copy for zc"). Before commit ce650a166335 ("udp6: Fix
+__ip6_append_data()'s handling of MSG_SPLICE_PAGES"), the negative
+copy value caused -EINVAL to be returned. That later commit allowed
+MSG_SPLICE_PAGES to proceed in this case, making the corruption
+triggerable.
+
+The non-paged branch sets alloclen to fraglen, which already accounts
+for fraggap because datalen does. Bring the paged branch in line by
+adding fraggap to alloclen and subtracting it from pagedlen.
+
+After this adjustment, copy no longer collapses to -fraggap on the
+paged path, so remove the stale comment describing that old arithmetic.
+Since a negative copy is no longer expected for a valid MSG_SPLICE_PAGES
+case, remove the MSG_SPLICE_PAGES exception from the negative copy check.
+
+Fixes: 773ba4fe9104 ("ipv6: avoid partial copy for zc")
+Signed-off-by: Jungwoo Lee <jwlee2217@gmail.com>
+Signed-off-by: Wongi Lee <qw3rtyp0@gmail.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/ajFTqRljatR17fFy@DESKTOP-19IMU7U.localdomain
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/ipv6/ip6_output.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 9f1e0e4f74641..368e4fa3b43ca 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1667,8 +1667,8 @@ alloc_new_skb:
+ 				  !(rt->dst.dev->features & NETIF_F_SG)))
+ 				alloclen = fraglen;
+ 			else {
+-				alloclen = fragheaderlen + transhdrlen;
+-				pagedlen = datalen - transhdrlen;
++				alloclen = fragheaderlen + transhdrlen + fraggap;
++				pagedlen = datalen - transhdrlen - fraggap;
+ 			}
+ 			alloclen += alloc_extra;
+ 
+@@ -1683,10 +1683,7 @@ alloc_new_skb:
+ 			fraglen = datalen + fragheaderlen;
+ 
+ 			copy = datalen - transhdrlen - fraggap - pagedlen;
+-			/* [!] NOTE: copy may be negative if pagedlen>0
+-			 * because then the equation may reduces to -fraggap.
+-			 */
+-			if (copy < 0 && !(flags & MSG_SPLICE_PAGES)) {
++			if (copy < 0) {
+ 				err = -EINVAL;
+ 				goto error;
+ 			}
+-- 
+cgit 1.3-korg
+

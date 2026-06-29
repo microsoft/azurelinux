@@ -27,7 +27,7 @@
 Summary:        Linux Kernel
 Name:           kernel-64k
 Version:        6.6.143.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,6 +41,7 @@ Source4:        cpupower
 Source5:        cpupower.service
 Patch0:         0001-add-mstflint-kernel-%{mstflintver}.patch
 Patch1:         0002-efi-Added-efi-cmdline-line-option-to-dynamically-adj.patch
+Patch2:         0001-ipv6-account-for-fraggap-on-the-paged-allocation-pat.patch
 ExclusiveArch:  aarch64
 BuildRequires:  audit-devel
 BuildRequires:  bash
@@ -380,6 +381,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jun 29 2026 Omkhar Arasaratnam <omkhar@linkedin.com> - 6.6.143.1-2
+- Backport upstream torvalds/linux@736b380e28d0 ("ipv6: account for fraggap on the paged allocation path") to fix an OOB-write in __ip6_append_data().
+
 * Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.143.1-1
 - Auto-upgrade to 6.6.143.1
 
