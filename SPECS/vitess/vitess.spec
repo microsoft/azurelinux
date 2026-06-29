@@ -100,8 +100,9 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
 
-# Ensure hostname resolves for fake-tablet init in wrangler tests
-echo "127.0.0.1 localhost $(hostname)" >> /etc/hosts 2>/dev/null || true
+# wrangler's fake-tablet init calls netutil.FullyQualifiedHostname(); map the
+# build chroot's (ephemeral) hostname so it resolves. localhost is already mapped.
+echo "127.0.0.1 $(hostname)" >> /etc/hosts 2>/dev/null || true
 
 export TMPDIR=$PWD/tmp
 mkdir -p $TMPDIR
@@ -109,7 +110,6 @@ mkdir -p $TMPDIR
 export VTDATAROOT=$PWD/vtdataroot
 mkdir -p $VTDATAROOT
 
-export VT_MYSQL_ROOT=/usr
 export VTROOT=$PWD
 
 go test -mod=vendor \
