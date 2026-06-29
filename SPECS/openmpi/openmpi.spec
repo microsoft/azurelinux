@@ -104,10 +104,6 @@
 # type: bool (0/1)
 %{!?build_debuginfo_rpm: %define build_debuginfo_rpm 0}
 
-# Should we build an all-in-one RPM, or several sub-package RPMs?
-# type: bool (0/1)
-%{!?build_all_in_one_rpm: %define build_all_in_one_rpm 0}
-
 # Should we use the default "check_files" RPM step (i.e., check for
 # unpackaged files)?  It is discouraged to disable this, but some
 # installers need it (e.g., older versions of OFED, because they
@@ -245,9 +241,7 @@ Requires: %{modules_rpm_name}
 Requires: %{mpi_selector_rpm_name}
 %endif
 Requires: ucx
-%if !%{build_all_in_one_rpm}
 Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
-%endif
 
 %description
 Open MPI is an open source implementation of the Message Passing
@@ -263,8 +257,6 @@ communication techniques.
 
 This RPM contains all the tools necessary to compile, link, and run
 Open MPI and OpenSHMEM jobs.
-
-%if !%{build_all_in_one_rpm}
 
 #############################################################################
 #
@@ -301,8 +293,6 @@ This subpackage provides general tools (mpirun, mpiexec, etc.) and the
 Module Component Architecture (MCA) base and plugins necessary for
 running Open MPI/OpenSHMEM jobs.
 
-%endif
-
 #############################################################################
 #
 # Preamble Section (devel)
@@ -316,11 +306,7 @@ Group: Development/Libraries
 AutoReq: no
 %endif
 Provides: openmpi-devel = %{version}
-%if %{build_all_in_one_rpm}
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-%else
 Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
-%endif
 
 %description devel
 Open MPI is an open source implementation of the Message Passing
@@ -351,11 +337,7 @@ Group: Development/Documentation
 AutoReq: no
 %endif
 Provides: openmpi-docs = %{version}
-%if %{build_all_in_one_rpm}
-Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-%else
 Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
-%endif
 
 %description docs
 Open MPI is an open source implementation of the Message Passing
@@ -576,8 +558,6 @@ EOF
 %endif
 # End of shell_scripts if
 
-%if !%{build_all_in_one_rpm}
-
 # Build lists of files that are specific to each package that are not
 # easily identifiable by a single directory (e.g., the different
 # libraries).  In a somewhat lame move, we can't just pipe everything
@@ -643,9 +623,6 @@ mv tmp.files devel.files
 grep -v %{_mandir} docs.files > tmp.files | /bin/true
 mv tmp.files docs.files
 
-%endif
-# End of build_all_in_one_rpm
-
 #############################################################################
 #
 # Clean Section
@@ -690,50 +667,6 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 # Files Section
 #
 #############################################################################
-
-%if %{build_all_in_one_rpm}
-
-#
-# All in one RPM
-#
-# Easy; just list the prefix and then specifically call out the doc
-# files.
-#
-
-%files
-%defattr(-, root, root, -)
-%if %(test "%{_prefix}" = "/usr" && echo 1 || echo 0)
-%{_bindir}/*
-%{_includedir}/*
-%{_libdir}/*
-%{_datadir}
-%else
-%{_prefix}
-%endif
-# If the sysconfdir is not under the prefix, then list it explicitly.
-%if !%{sysconfdir_in_prefix}
-%{_sysconfdir}
-%endif
-# If %{install_in_opt}, then we're instaling OMPI to
-# /opt/openmpi/<version>.  But be sure to also explicitly mention
-# /opt/openmpi so that it can be removed by RPM when everything under
-# there is also removed.
-%if %{install_in_opt}
-%dir /opt/%{name}
-%endif
-# If we're installing the modulefile, get that, too
-%if %{install_modulefile}
-%{modulefile_path}
-%endif
-# If we're installing the shell scripts, get those, too
-%if %{install_shell_scripts}
-%{shell_scripts_path}/%{shell_scripts_basename}.sh
-%{shell_scripts_path}/%{shell_scripts_basename}.csh
-%endif
-%doc README INSTALL
-%license LICENSE
-
-%else
 
 #
 # Sub-package RPMs
@@ -787,11 +720,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 # files found in that tree, because rpmbuild may have compressed them
 # (e.g., foo.1.gz or foo.1.bz2) -- and we therefore don't know the
 # exact filenames.
-%files docs -f docs.files
+%files docs
 %defattr(-, root, root, -)
 %{_mandir}
-
-%endif
 
 
 #############################################################################
@@ -801,7 +732,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 #############################################################################
 %changelog
 * Mon Jun 29 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-2
-- Build runtime, devel, and docs subpackages by default
+- Remove unused all-in-one packaging switch
 
 * Mon May 11 2026 Azure Linux Team - 3:4.1.9a1-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
