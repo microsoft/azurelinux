@@ -5645,6 +5645,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.rust-mbox]
 [components.rust-md-5]
 [components.'rust-md-5_0.9']
+[components.rust-md5]
 [components.rust-md5-asm]
 [components.rust-memchr]
 [components.rust-memfd]
