@@ -91,6 +91,13 @@ jobs:
           path: pr-head
           fetch-depth: 0
           persist-credentials: false
+          # checkout v7 blocks fork-PR-head refs by default under
+          # pull_request_target (this reusable workflow inherits that event
+          # from the stub). Opt out: the PR is checked out as data into
+          # pr-head/, this job holds only `contents: read` (no secrets, no
+          # pull-requests write), and azldev only ever processes it inside the
+          # sandboxed container — so the fork head is never executed with trust.
+          allow-unsafe-pr-checkout: true
 
       - name: Build azldev runner container
         run: |
@@ -322,6 +329,13 @@ jobs:
           path: pr-head
           fetch-depth: 0
           persist-credentials: false
+          # checkout v7 blocks fork-PR-head refs by default under
+          # pull_request_target (this reusable workflow inherits that event
+          # from the stub). Opt out: the PR is checked out as data into
+          # pr-head/, this job holds only `contents: read` (no secrets, no
+          # pull-requests write), and azldev only ever processes it inside the
+          # sandboxed container — so the fork head is never executed with trust.
+          allow-unsafe-pr-checkout: true
 
       - name: Build azldev runner container
         run: |
