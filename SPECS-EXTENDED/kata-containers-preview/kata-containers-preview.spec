@@ -16,6 +16,8 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        kata-containers-%{upstream_ver}-cargo.tar.gz
 # This patch can be removed when this package is upgraded to v3.30.0
 Patch0:         rust-fix-unstable-name-collisions.patch
+# This patch can be removed when this package is upgraded to v3.32.0
+Patch1:         rust-1.96-protection-cpuid.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -118,7 +120,7 @@ popd
 
 %changelog
 * Mon Jun 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.27.0~preview2-2
-- Backport upstream commit to fix unstable_name_collisions errors
+- Backport upstream commits to fix unstable_name_collisions errors and to remove unsafe blocks
 
 * Mon Apr 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.27.0.preview2-1
 - Auto-upgrade to 3.27.0.preview2
