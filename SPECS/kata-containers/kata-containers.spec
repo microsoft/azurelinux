@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.19.1.kata3
-Release:        5%{?dist}
+Release:        6%{?dist}
 
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -121,6 +121,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Jun 29 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.19.1.kata3-6
+- Backport upstream commit to fix unstable_name_collisions errors
+
 * Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.19.1.kata3-5
 - Bump release to rebuild with rust
 
