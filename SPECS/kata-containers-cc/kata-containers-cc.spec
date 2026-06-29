@@ -11,13 +11,15 @@ Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
-Patch0:       rust-1.90-fixes.patch
+Patch0:       rust-1.96-fixes.patch
 Patch1:       CVE-2026-41602.patch
 Patch2:       CVE-2026-39821.patch
 Patch3:       CVE-2026-33814.patch
 Patch4:       CVE-2025-5791.patch
 Patch5:       CVE-2025-4574.patch
 Patch6:       CVE-2026-42250.patch
+# This patch can be removed when this package is upgraded to v3.30.0
+Patch7:       rust-fix-unstable-name-collisions.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release

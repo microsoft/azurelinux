@@ -12,7 +12,7 @@ Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         CVE-2026-24054.patch
-Patch1:         rust-1.90-fixes.patch
+Patch1:         rust-1.96-fixes.patch
 Patch2:         CVE-2026-24834.patch
 Patch3:         CVE-2026-25727.patch
 Patch4:         CVE-2026-25541.patch
@@ -20,6 +20,8 @@ Patch5:         CVE-2025-11065.patch
 Patch6:         CVE-2026-41602.patch
 Patch7:         CVE-2026-39821.patch
 Patch8:         CVE-2026-33814.patch
+# This patch can be removed when this package is upgraded to v3.30.0
+Patch9:         rust-fix-unstable-name-collisions.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
