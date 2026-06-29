@@ -61,6 +61,14 @@ parameters:
   - name: pollTimeoutSeconds
     type: number
     default: 21600
+  # POC (US 20499): when true (default), run ONLY the Control Tower auth probe
+  # below and skip the change-detection + scratch-build steps. Lets us prove the
+  # passed service connection authenticates to Control Tower from BOTH internal
+  # and fork PRs without waiting on a full build. Flip to false (or remove this
+  # gate) once the source-scan/upload flow is wired in.
+  - name: probeOnly
+    type: boolean
+    default: true
 
 stages:
   - stage: PRPackageBuild
@@ -86,160 +94,201 @@ stages:
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
         steps:
-          # Full history: `azldev component changed` tree-diffs two commits and
-          # rpmautospec derives Release/changelog from `git log`. The CI
-          # checkout may be shallow (depth 1); unshallow once, up front. Never
-          # `git fetch --depth=N` afterwards — that re-shallows a full clone and
-          # silently corrupts the rpmautospec Release calculation.
-          - script: |
-              set -euo pipefail
-              if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-                echo "##[group]Fetching full git history"
-                git fetch --unshallow
-                echo "##[endgroup]"
-              fi
-            displayName: "Ensure full git history"
-
-          - task: PipAuthenticate@1
-            displayName: "Authenticate pip"
-            inputs:
-              artifactFeeds: "azl/ControlTowerFeed"
-
-          # azldev opens the repo with go-git, which rejects a config that
-          # declares the `worktreeconfig` extension while
-          # core.repositoryformatversion is still 0:
-          #   "core.repositoryformatversion does not support extension: worktreeconfig"
-          # Native git tolerates this, and the ADO agent checkout leaves the
-          # extension set, so strip it before any azldev invocation. Each CI run
-          # is a fresh checkout so this is safe and self-contained.
-          # TODO: remove this step once azldev no longer needs the workaround
-          # (go-git v6 fixes the underlying bug):
-          # https://github.com/microsoft/azure-linux-dev-tools/issues/241
-          - script: |
-              set -euo pipefail
-              if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
-                echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
-                git config --unset-all extensions.worktreeConfig || true
-              fi
-            displayName: "Normalize git config for azldev (go-git)"
-
-          # Host deps for change detection + the Control Tower submission only:
-          # azldev (`azldev component changed` + git diff -- no mock, no build)
-          # and the Control Tower Python client. The build itself never runs on
-          # the agent; it runs asynchronously in Control Tower's own sandbox.
-          - script: |
-              set -euo pipefail
-              echo "##[group]Azldev (host, for change-set)"
-              # Only the version string comes from the PR checkout; reject a
-              # malformed/garbage value before it reaches `go install`.
-              AZLDEV_VERSION="$(tr -d '\n' < .azldev-version)"
-              if ! printf '%s' "$AZLDEV_VERSION" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
-                echo "##[error].azldev-version is empty or has unexpected characters"
-                exit 1
-              fi
-              echo "Installing azldev@${AZLDEV_VERSION}..."
-              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
-
-              go_bin_path="$(go env GOPATH)/bin"
-              echo "##vso[task.prependpath]$go_bin_path"
-
-              "$go_bin_path/azldev" --version
-              echo "##[endgroup]"
-
-              echo "##[group]Python dependencies (Control Tower client)"
-              pip install -r scripts/ci/control-tower/requirements.txt
-              echo "##[endgroup]"
-            displayName: "Install host dependencies"
-
-          # Resolve the PR commit range. A PR-policy build checks out the MERGE
-          # commit (Build.SourceVersion): parent ^1 is the target-branch tip,
-          # parent ^2 is the PR head. The diff ^1..^2 is exactly the PR's
-          # changes relative to the target branch. We read the range here and
-          # set pipeline variables so the wiring stays visible in the YAML.
-          - script: |
-              set -euo pipefail
-              if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
-                echo "##[error]HEAD is not a merge commit -- this pipeline must run as a PR build (Build.Reason=PullRequest)."
-                exit 1
-              fi
-              target_commit="$(git rev-parse HEAD^1)"
-              source_commit="$(git rev-parse HEAD^2)"
-              # PR-supplied data is untrusted: validate both SHAs before use.
-              for sha in "$target_commit" "$source_commit"; do
-                if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
-                  echo "##[error]invalid commit SHA: $sha"
-                  exit 1
-                fi
-              done
-              echo "Resolved range: target=$target_commit source=$source_commit"
-              echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
-              echo "##vso[task.setvariable variable=targetCommit;isreadonly=true]$target_commit"
-            displayName: "Determine PR commit range"
-
-          # Compute the changed-component set with the shared, cross-pipeline
-          # single-source-of-truth helper (also used by the GitHub Actions PR
-          # gates). changed-components.json holds the per-component change
-          # records consumed by the Control Tower submit step below.
-          # compute_change_set.sh hard-fails on the supply-chain drift tripwire
-          # (sourcesChange without an identity change) -- a guard we want to keep
-          # on PRs. The script self-prefixes AZLDEV_ALLOW_ROOT=1 internally.
-          - script: |
-              set -euo pipefail
-              change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
-              echo "##[group]Preparing change set"
-              scripts/ci/components/compute_change_set.sh \
-                --output-dir "$change_set_dir" \
-                --source-commit "$SOURCE_COMMIT" \
-                --target-commit "$TARGET_COMMIT"
-              echo "##[endgroup]"
-              echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$change_set_dir/changed-components.json"
-            env:
-              SOURCE_COMMIT: $(sourceCommit)
-              TARGET_COMMIT: $(targetCommit)
-            displayName: "Prepare change set"
-
-          # Submit a SCRATCH Control Tower build of the PR head for the changed
-          # components. Scratch = throwaway: it never persists to a production
-          # repo, so building unmerged PR code is safe. Scratch is the default
-          # (no --official-build); run_package_build.py additionally refuses an
-          # OFFICIAL build for a PR trigger. --wait-for-completion makes the
-          # script block until the build reaches a terminal state and fail the
-          # check on a build failure (or if it does not finish within
-          # --poll-timeout-seconds, 6h below -- our worst-case build). No PR
-          # code is built on this agent.
-          #
-          # This step assumes the pipeline is wired as a REVIEWER-GATED check in
-          # ADO (see the wrapper header): it should not auto-run on every PR
-          # push, so that a maintainer eyeballs the diff before unmerged code is
-          # submitted for a build.
+          # POC (US 20499 / sources-upload prcheck): verify the passed service
+          # connection can authenticate to Control Tower from BOTH internal and
+          # fork PRs. Acquires a token for the Control Tower app via the WIF
+          # service connection and does a read-only GET against
+          # /api/Workflow/plans -- no build is submitted. While probeOnly is
+          # true (default), the change-detection + scratch-build steps below are
+          # skipped, so the POC run ends right after this probe.
           - task: AzureCLI@2
-            displayName: "Submit scratch build to Control Tower"
+            displayName: "POC: Probe Control Tower auth (GET /api/Workflow/plans)"
             inputs:
               azureSubscription: ${{ parameters.serviceConnection }}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 set -euo pipefail
-
-                # --poll-timeout-seconds comes from the pollTimeoutSeconds
-                # parameter (6h default = our worst-case build). Keep it below
-                # the job's timeoutInMinutes (wrapper) so the script's own clear
-                # failure fires before ADO blunt-kills the job.
-                python3 scripts/ci/control-tower/run_package_build.py \
-                  --api-audience "$API_AUDIENCE" \
-                  --api-base-url "$API_BASE_URL" \
-                  --build-reason "$CT_BUILD_REASON" \
-                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "${{ parameters.packageTarget }}" \
-                  --commit-sha "$SOURCE_COMMIT" \
-                  --repo-uri "$UPSTREAM_REPO_URL" \
-                  --wait-for-completion \
-                  --poll-timeout-seconds ${{ parameters.pollTimeoutSeconds }}
+                base_url="${API_BASE_URL%/}"
+                url="$base_url/api/Workflow/plans"
+                echo "Acquiring Control Tower token for audience: $API_AUDIENCE"
+                token="$(az account get-access-token --resource "$API_AUDIENCE" --query accessToken -o tsv)"
+                echo "GET $url"
+                http_code="$(curl -sS -o /tmp/ct_plans.json -w '%{http_code}' \
+                  -H "Authorization: Bearer $token" \
+                  -H "Accept: application/json" \
+                  "$url")"
+                echo "HTTP status: $http_code"
+                echo "Response (first 1000 bytes):"
+                head -c 1000 /tmp/ct_plans.json || true
+                echo
+                if [ "$http_code" != "200" ]; then
+                  echo "##[error]Control Tower auth probe failed (HTTP $http_code)."
+                  exit 1
+                fi
+                echo "Control Tower auth probe succeeded (HTTP 200)."
             env:
               API_AUDIENCE: $(ApiAudience)
               API_BASE_URL: $(ApiBaseDirectUrl)
-              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
-              CT_BUILD_REASON: $(Build.Reason)
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              SOURCE_COMMIT: $(sourceCommit)
-              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+
+          # POC gate: only emit the real change-detection + scratch-build steps
+          # when probeOnly is false. While probeOnly is true the run stops after
+          # the probe above.
+          - ${{ if eq(parameters.probeOnly, false) }}:
+            # Full history: `azldev component changed` tree-diffs two commits and
+            # rpmautospec derives Release/changelog from `git log`. The CI
+            # checkout may be shallow (depth 1); unshallow once, up front. Never
+            # `git fetch --depth=N` afterwards — that re-shallows a full clone and
+            # silently corrupts the rpmautospec Release calculation.
+            - script: |
+                set -euo pipefail
+                if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+                  echo "##[group]Fetching full git history"
+                  git fetch --unshallow
+                  echo "##[endgroup]"
+                fi
+              displayName: "Ensure full git history"
+
+            - task: PipAuthenticate@1
+              displayName: "Authenticate pip"
+              inputs:
+                artifactFeeds: "azl/ControlTowerFeed"
+
+            # azldev opens the repo with go-git, which rejects a config that
+            # declares the `worktreeconfig` extension while
+            # core.repositoryformatversion is still 0:
+            #   "core.repositoryformatversion does not support extension: worktreeconfig"
+            # Native git tolerates this, and the ADO agent checkout leaves the
+            # extension set, so strip it before any azldev invocation. Each CI run
+            # is a fresh checkout so this is safe and self-contained.
+            # TODO: remove this step once azldev no longer needs the workaround
+            # (go-git v6 fixes the underlying bug):
+            # https://github.com/microsoft/azure-linux-dev-tools/issues/241
+            - script: |
+                set -euo pipefail
+                if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
+                  echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
+                  git config --unset-all extensions.worktreeConfig || true
+                fi
+              displayName: "Normalize git config for azldev (go-git)"
+
+            # Host deps for change detection + the Control Tower submission only:
+            # azldev (`azldev component changed` + git diff -- no mock, no build)
+            # and the Control Tower Python client. The build itself never runs on
+            # the agent; it runs asynchronously in Control Tower's own sandbox.
+            - script: |
+                set -euo pipefail
+                echo "##[group]Azldev (host, for change-set)"
+                # Only the version string comes from the PR checkout; reject a
+                # malformed/garbage value before it reaches `go install`.
+                AZLDEV_VERSION="$(tr -d '\n' < .azldev-version)"
+                if ! printf '%s' "$AZLDEV_VERSION" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
+                  echo "##[error].azldev-version is empty or has unexpected characters"
+                  exit 1
+                fi
+                echo "Installing azldev@${AZLDEV_VERSION}..."
+                go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
+
+                go_bin_path="$(go env GOPATH)/bin"
+                echo "##vso[task.prependpath]$go_bin_path"
+
+                "$go_bin_path/azldev" --version
+                echo "##[endgroup]"
+
+                echo "##[group]Python dependencies (Control Tower client)"
+                pip install -r scripts/ci/control-tower/requirements.txt
+                echo "##[endgroup]"
+              displayName: "Install host dependencies"
+
+            # Resolve the PR commit range. A PR-policy build checks out the MERGE
+            # commit (Build.SourceVersion): parent ^1 is the target-branch tip,
+            # parent ^2 is the PR head. The diff ^1..^2 is exactly the PR's
+            # changes relative to the target branch. We read the range here and
+            # set pipeline variables so the wiring stays visible in the YAML.
+            - script: |
+                set -euo pipefail
+                if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
+                  echo "##[error]HEAD is not a merge commit -- this pipeline must run as a PR build (Build.Reason=PullRequest)."
+                  exit 1
+                fi
+                target_commit="$(git rev-parse HEAD^1)"
+                source_commit="$(git rev-parse HEAD^2)"
+                # PR-supplied data is untrusted: validate both SHAs before use.
+                for sha in "$target_commit" "$source_commit"; do
+                  if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+                    echo "##[error]invalid commit SHA: $sha"
+                    exit 1
+                  fi
+                done
+                echo "Resolved range: target=$target_commit source=$source_commit"
+                echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
+                echo "##vso[task.setvariable variable=targetCommit;isreadonly=true]$target_commit"
+              displayName: "Determine PR commit range"
+
+            # Compute the changed-component set with the shared, cross-pipeline
+            # single-source-of-truth helper (also used by the GitHub Actions PR
+            # gates). changed-components.json holds the per-component change
+            # records consumed by the Control Tower submit step below.
+            # compute_change_set.sh hard-fails on the supply-chain drift tripwire
+            # (sourcesChange without an identity change) -- a guard we want to keep
+            # on PRs. The script self-prefixes AZLDEV_ALLOW_ROOT=1 internally.
+            - script: |
+                set -euo pipefail
+                change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
+                echo "##[group]Preparing change set"
+                scripts/ci/components/compute_change_set.sh \
+                  --output-dir "$change_set_dir" \
+                  --source-commit "$SOURCE_COMMIT" \
+                  --target-commit "$TARGET_COMMIT"
+                echo "##[endgroup]"
+                echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$change_set_dir/changed-components.json"
+              env:
+                SOURCE_COMMIT: $(sourceCommit)
+                TARGET_COMMIT: $(targetCommit)
+              displayName: "Prepare change set"
+
+            # Submit a SCRATCH Control Tower build of the PR head for the changed
+            # components. Scratch = throwaway: it never persists to a production
+            # repo, so building unmerged PR code is safe. Scratch is the default
+            # (no --official-build); run_package_build.py additionally refuses an
+            # OFFICIAL build for a PR trigger. --wait-for-completion makes the
+            # script block until the build reaches a terminal state and fail the
+            # check on a build failure (or if it does not finish within
+            # --poll-timeout-seconds, 6h below -- our worst-case build). No PR
+            # code is built on this agent.
+            #
+            # This step assumes the pipeline is wired as a REVIEWER-GATED check in
+            # ADO (see the wrapper header): it should not auto-run on every PR
+            # push, so that a maintainer eyeballs the diff before unmerged code is
+            # submitted for a build.
+            - task: AzureCLI@2
+              displayName: "Submit scratch build to Control Tower"
+              inputs:
+                azureSubscription: ${{ parameters.serviceConnection }}
+                scriptType: bash
+                scriptLocation: inlineScript
+                inlineScript: |
+                  set -euo pipefail
+
+                  # --poll-timeout-seconds comes from the pollTimeoutSeconds
+                  # parameter (6h default = our worst-case build). Keep it below
+                  # the job's timeoutInMinutes (wrapper) so the script's own clear
+                  # failure fires before ADO blunt-kills the job.
+                  python3 scripts/ci/control-tower/run_package_build.py \
+                    --api-audience "$API_AUDIENCE" \
+                    --api-base-url "$API_BASE_URL" \
+                    --build-reason "$CT_BUILD_REASON" \
+                    --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                    --package-target "${{ parameters.packageTarget }}" \
+                    --commit-sha "$SOURCE_COMMIT" \
+                    --repo-uri "$UPSTREAM_REPO_URL" \
+                    --wait-for-completion \
+                    --poll-timeout-seconds ${{ parameters.pollTimeoutSeconds }}
+              env:
+                API_AUDIENCE: $(ApiAudience)
+                API_BASE_URL: $(ApiBaseDirectUrl)
+                # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
+                CT_BUILD_REASON: $(Build.Reason)
+                CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                SOURCE_COMMIT: $(sourceCommit)
+                UPSTREAM_REPO_URL: $(Build.Repository.Uri)
