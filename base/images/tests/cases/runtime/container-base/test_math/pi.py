@@ -14,8 +14,11 @@ PI_1000 = (
     "035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989"
 )
 
+MAX_SECONDS_PER_COMPUTE = 20.0
+
 
 def calc_pi(limit: int) -> Iterator[object]:
+    """Calculate Pi digits one at a time via the spigot algorithm."""
     q, r, t, k, n, step = 1, 0, 1, 1, 3, 3
     counter = 0
     while counter != limit + 1:
@@ -42,19 +45,22 @@ def calc_pi(limit: int) -> Iterator[object]:
 
 
 def pi_to_places(places: int) -> str:
+    """Return Pi, accurate to the given number of decimal places."""
     return "".join(str(d) for d in calc_pi(places))
 
 
 def verify_pi_1000() -> bool:
+    """Check that Pi to 1000 places matches the known reference value."""
     return pi_to_places(1000) == PI_1000
 
 
 def verify_pi_n_times_1000(nrange: int = 10, mult: int = 1000) -> bool:
+    """Repeatedly compute Pi at growing precision and assert performance (max 20s per computation)."""
     for count in range(nrange + 1):
         places = max(count * mult, 3)
         start = time.time()
         answer = pi_to_places(places)
-        if len(answer) != places + 2 or time.time() - start > 20.0:
+        if len(answer) != places + 2 or time.time() - start > MAX_SECONDS_PER_COMPUTE:
             return False
     return True
 

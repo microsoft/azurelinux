@@ -19,10 +19,10 @@ REPO_CONFIG_URLS = (
 
 
 def fetch(url: str, retries: int = 4) -> str:
-    """Fetch a URL, retrying transient HTTP errors with backoff."""
+    """Fetch a URL, retrying transient HTTP errors with exponential backoff, and a 30s timeout to avoid hangs."""
     for attempt in range(1, retries + 1):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url)) as resp:
+            with urllib.request.urlopen(urllib.request.Request(url), timeout=30) as resp:  # noqa: S310 — https literals only
                 return resp.read().decode()
         except HTTPError:
             time.sleep(attempt * 2)
@@ -45,14 +45,14 @@ def substring_between(source: str, before: str, after: str) -> str:
     beg = source.find(before)
     if beg < 0:
         return ""
-    sub = source[beg + len(before):]
+    sub = source[beg + len(before) :]
     end = sub.find(after)
     if end >= 0:
         sub = sub[:end]
     return re.sub(r"<.*?>", "", sub).strip()
 
 
-def verify_weather(strict: bool = True) -> bool:
+def verify_weather(*, strict: bool = True) -> bool:
     """Fetch Redmond weather; strict requires all forecast fields present."""
     page = fetch_first(WEATHER_URLS)
     visibility = substring_between(page, "<b>Visibility</b></td>", "</td>")
@@ -60,13 +60,16 @@ def verify_weather(strict: bool = True) -> bool:
     humidity = substring_between(page, "<b>Humidity</b></td>", "</td>")
     wind = substring_between(page, "<b>Wind Speed</b></td>", "</td>")
     forecast = substring_between(page, 'alt="Today:', '"')
-    print(f"weather: bytes={len(page)} humidity={humidity!r} wind={wind!r} visibility={visibility!r} dewpoint={dewpoint!r} forecast={forecast!r}")
+    print(
+        f"weather: bytes={len(page)} humidity={humidity!r} wind={wind!r} "
+        f"visibility={visibility!r} dewpoint={dewpoint!r} forecast={forecast!r}"
+    )
     if not (wind and humidity and visibility and dewpoint) and strict:
         return False
     return len(page) > 0
 
 
-def verify_sustained_https(iterations: int = 50, strict: bool = True) -> bool:
+def verify_sustained_https(iterations: int = 50, *, strict: bool = True) -> bool:
     """Repeat repo-config fetch; strict requires name+enabled fields each time."""
     for i in range(iterations):
         page = fetch_first(REPO_CONFIG_URLS)
