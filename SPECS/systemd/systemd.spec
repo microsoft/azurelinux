@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        32%{?dist}
+Release:        33%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -138,6 +138,10 @@ Patch0490:      use-none-scheduler.patch
 # NOTE: the patch was based on the fedora patch, but renamed to
 # 'azurelinux-...' and modified for our 'system-*' pam files
 Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
+
+# ukify: fix insertion of padding in merged sections
+# Backport of upstream commit ec1d031f3de02f84beca89e2b402d085fba62be4
+Patch0492:      ukify-fix-insertion-of-padding-in-merged-sections.patch
 
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
@@ -1253,7 +1257,7 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
-* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-32
+* Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
 - Skip tests in %%check that require capabilities not available in the build
   chroot (mount-namespace privileges, systemd-detect-virt on PATH, etc.):
   test-fd-util, test-mount-util, test-mountpoint-util, test-path-util,
@@ -1263,6 +1267,12 @@ rm -f %{name}.lang
   standalone-sysusers, standalone-shutdown) so an installation against an
   older systemd is rejected by rpm at dependency-resolution time instead of
   failing later on file conflicts.
+  
+* Wed Jun 24 2026 Vince Perri <viperri@microsoft.com> - 255-32
+- Backport upstream ukify fix (ec1d031f3de02f84beca89e2b402d085fba62be4):
+  when merging into an existing PE section, padding was derived from the new
+  section size instead of the existing section size, which can leave
+  insufficient padding and corrupt the resulting UKI.
 
 * Wed May 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
 - Prevent corruption from stale alias state on daemon-reload
