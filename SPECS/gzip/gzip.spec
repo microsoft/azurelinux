@@ -70,7 +70,7 @@ make %{?_smp_mflags} check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9-4
 - Added %%license line automatically
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.9-3
+* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.9-3
 - Fixed reference URL. Verified license.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.9-2
