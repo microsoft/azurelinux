@@ -106,7 +106,7 @@
 
 # Should we build an all-in-one RPM, or several sub-package RPMs?
 # type: bool (0/1)
-%{!?build_all_in_one_rpm: %define build_all_in_one_rpm 1}
+%{!?build_all_in_one_rpm: %define build_all_in_one_rpm 0}
 
 # Should we use the default "check_files" RPM step (i.e., check for
 # unpackaged files)?  It is discouraged to disable this, but some
@@ -224,7 +224,7 @@ Summary: A powerful implementation of MPI/SHMEM
 Name: openmpi
 Epoch: 3
 Version: 4.1.9a1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: BSD
 Group: Development/Libraries
 # https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
@@ -245,6 +245,9 @@ Requires: %{modules_rpm_name}
 Requires: %{mpi_selector_rpm_name}
 %endif
 Requires: ucx
+%if !%{build_all_in_one_rpm}
+Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
+%endif
 
 %description
 Open MPI is an open source implementation of the Message Passing
@@ -313,7 +316,11 @@ Group: Development/Libraries
 AutoReq: no
 %endif
 Provides: openmpi-devel = %{version}
-Requires: %{name}-runtime
+%if %{build_all_in_one_rpm}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+%else
+Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
+%endif
 
 %description devel
 Open MPI is an open source implementation of the Message Passing
@@ -344,7 +351,11 @@ Group: Development/Documentation
 AutoReq: no
 %endif
 Provides: openmpi-docs = %{version}
-Requires: %{name}-runtime
+%if %{build_all_in_one_rpm}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+%else
+Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
+%endif
 
 %description docs
 Open MPI is an open source implementation of the Message Passing
@@ -789,6 +800,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 #
 #############################################################################
 %changelog
+* Mon Jun 29 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-2
+- Build runtime, devel, and docs subpackages by default
+
 * Mon May 11 2026 Azure Linux Team - 3:4.1.9a1-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
