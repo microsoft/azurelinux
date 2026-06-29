@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Outbound HTTP fetch + parse helpers, run inside the container to validate networking."""
+"""Outbound HTTPS fetch + parse helpers, run inside the container to validate networking."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ def verify_weather(strict: bool = True) -> bool:
     return len(page) > 0
 
 
-def verify_sustained_http(iterations: int = 50, strict: bool = True) -> bool:
+def verify_sustained_https(iterations: int = 50, strict: bool = True) -> bool:
     """Repeat repo-config fetch; strict requires name+enabled fields each time."""
     for i in range(iterations):
         page = fetch_first(REPO_CONFIG_URLS)
@@ -84,6 +84,6 @@ def verify_sustained_http(iterations: int = 50, strict: bool = True) -> bool:
 if __name__ == "__main__":
     import sys
 
-    checks = {"weather": verify_weather, "sustained": verify_sustained_http}
+    checks = {"weather": verify_weather, "sustained": verify_sustained_https}
     strict = "--strict" in sys.argv
     sys.exit(0 if checks[sys.argv[1]](strict=strict) else 1)
