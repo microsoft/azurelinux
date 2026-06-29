@@ -18,8 +18,7 @@ The Gzip package contains programs for compressing and
 decompressing files.
 
 %prep
-%setup -q
-%patch 0 -p1
+%autosetup -p1
 
 %build
 %configure --disable-silent-rules
