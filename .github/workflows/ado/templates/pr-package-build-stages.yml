@@ -129,7 +129,7 @@ stages:
                 echo "Control Tower auth probe succeeded (HTTP 200)."
             env:
               API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseDirectUrl)
+              API_BASE_URL: $(ApiBaseAFDUrl)
 
           # POC gate: only emit the real change-detection + scratch-build steps
           # when probeOnly is false. While probeOnly is true the run stops after
