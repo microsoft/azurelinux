@@ -237,7 +237,7 @@ stages:
                   --poll-timeout-seconds ${{ parameters.pollTimeoutSeconds }}
             env:
               API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseDirectUrl)
+              API_BASE_URL: $(ApiBaseAFDUrl)
               # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
               CT_BUILD_REASON: $(Build.Reason)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
