@@ -100,6 +100,16 @@ BuildArch:      noarch
 %description doc
 Documentation package for Rust.
 
+%package src
+Summary:        Sources for the Rust standard library
+BuildArch:      noarch
+Recommends:     %{name} = %{version}-%{release}
+
+%description src
+This package includes source files for the Rust standard library. It may be
+useful as a reference for code completion tools in various editors, such as
+rust-analyzer.
+
 %prep
 # Setup .cargo directory
 mkdir -p $HOME
@@ -167,6 +177,9 @@ rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
+# Ambiguous python shebangs in the stdlib sources break brp-mangle-shebangs.
+find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+'
+
 %ldconfig_scriptlets
 
 %files
@@ -176,6 +189,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
+%exclude %{_libdir}/rustlib/src
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
@@ -201,9 +215,15 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
 
+%files src
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%dir %{_libdir}/rustlib
+%{_libdir}/rustlib/src
+
 %changelog
-* Thu Jun 18 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.0-1
+* Wed Jul 01 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.0-1
 - Upgrade to v1.96.0 and update CVEs
+- Subpackage rust-src
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
