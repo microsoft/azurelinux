@@ -432,7 +432,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 10%{?dist}
+Release: 9%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -3521,23 +3521,16 @@ fi
 # endif !tools_only
 %endif
 %changelog
-
-* Tue Jun 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-10
-
-* Tue Jun 30 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-9
-
-* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
+* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-9
 - Patch for CVE-2026-3195
 
-* Tue May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
+- Patch for CVE-2026-48914
+
+* Wed May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
 - Enable user_static builds for qemu
 - configure user_static with 'enable-pie'
 - manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
-
-* Wed Mar 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-2
-- Patch for CVE-2025-14876, CVE-2024-8354
-
-* Fri Feb 06 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 9.1.0-1
 - add conflicts between qemu-user-static and qemu-user-binfmt as both
   provide binfmt rules
 
