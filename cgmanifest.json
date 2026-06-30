@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "acl",
-          "version": "2.3.1",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.3.1.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.4.0.tar.gz"
         }
       }
     },
@@ -715,8 +715,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.5.2",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.2.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.6.0.tar.gz"
         }
       }
     },
@@ -1747,8 +1747,8 @@
         "type": "other",
         "other": {
           "name": "cifs-utils",
-          "version": "7.3",
-          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.3.tar.bz2"
+          "version": "7.6",
+          "downloadUrl": "https://download.samba.org/pub/linux-cifs/cifs-utils/cifs-utils-7.6.tar.bz2"
         }
       }
     },
@@ -26173,8 +26173,8 @@
         "type": "other",
         "other": {
           "name": "radvd",
-          "version": "2.19",
-          "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.19.tar.xz"
+          "version": "2.21",
+          "downloadUrl": "https://github.com/radvd-project/radvd/releases/download/v2.21/radvd-2.21.tar.xz"
         }
       }
     },
@@ -30086,8 +30086,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0620",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0620.tar.gz"
+          "version": "9.2.0735",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0735.tar.gz"
         }
       }
     },
