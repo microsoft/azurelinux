@@ -241,7 +241,6 @@ Requires: %{modules_rpm_name}
 Requires: %{mpi_selector_rpm_name}
 %endif
 Requires: ucx
-Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description
 Open MPI is an open source implementation of the Message Passing
@@ -260,41 +259,6 @@ Open MPI and OpenSHMEM jobs.
 
 #############################################################################
 #
-# Preamble Section (runtime)
-#
-#############################################################################
-
-%package runtime
-Summary: Tools and plugin modules for running Open MPI/SHMEM jobs
-Group: Development/Libraries
-Provides: mpi
-Provides: openmpi = %{version}
-Provides: openmpi-runtime = %{version}
-%if %{disable_auto_requires}
-AutoReq: no
-%endif
-%if %{install_modulefile}
-Requires: %{modules_rpm_name}
-%endif
-
-%description runtime
-Open MPI is an open source implementation of the Message Passing
-Interface specification (http://www.mpi-forum.org/) developed and
-maintained by a consortium of research, academic, and industry
-partners.
-
-Open MPI also includes an implementation of the OpenSHMEM parallel
-programming API (http://www.openshmem.org/).  OpenSHMEM is a
-Partitioned Global Address Space (PGAS) abstraction layer, which
-provides fast inter-process communication using one-sided
-communication techniques.
-
-This subpackage provides general tools (mpirun, mpiexec, etc.) and the
-Module Component Architecture (MCA) base and plugins necessary for
-running Open MPI/OpenSHMEM jobs.
-
-#############################################################################
-#
 # Preamble Section (devel)
 #
 #############################################################################
@@ -306,7 +270,7 @@ Group: Development/Libraries
 AutoReq: no
 %endif
 Provides: openmpi-devel = %{version}
-Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description devel
 Open MPI is an open source implementation of the Message Passing
@@ -337,7 +301,7 @@ Group: Development/Documentation
 AutoReq: no
 %endif
 Provides: openmpi-docs = %{version}
-Requires: %{name}-runtime%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
 
 %description docs
 Open MPI is an open source implementation of the Message Passing
@@ -677,7 +641,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 # specific file lists.
 #
 
-%files runtime -f runtime.files
+%files -f runtime.files
 %defattr(-, root, root, -)
 %if %(test "%{_prefix}" = "/usr" && echo 1 || echo 0)
 %{_bindir}/*
@@ -732,7 +696,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 #############################################################################
 %changelog
 * Mon Jun 29 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-2
-- Remove unused all-in-one packaging switch
+- Build Open MPI runtime in the main package with split devel and docs
 
 * Mon May 11 2026 Azure Linux Team - 3:4.1.9a1-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
