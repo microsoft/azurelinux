@@ -1,7 +1,7 @@
 Summary:        A fast, reliable HA, load balancing, and proxy solution.
 Name:           haproxy
 Version:        2.9.11
-Release:        6%{?dist}
+Release:        7%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,8 @@ Source0:        https://www.haproxy.org/download/2.9/src/%{name}-%{version}.tar.
 Patch0:         CVE-2025-32464.patch
 Patch1:         CVE-2025-11230.patch
 Patch2:         CVE-2026-33555.patch
+Patch3:         CVE-2026-55203.patch
+Patch4:         CVE-2026-55204.patch
 BuildRequires:  lua-devel
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
@@ -62,6 +64,9 @@ install -vDm644 examples/transparent_proxy.cfg  %{buildroot}/%{_sysconfdir}/hapr
 %{_mandir}/*
 
 %changelog
+* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.9.11-7
+- Patch for CVE-2026-55204, CVE-2026-55203
+
 * Mon May 18 2026 Sudipta Pandit <sudpandit@microsoft.com> - 2.9.11-6
 - Mark /etc/haproxy/haproxy.cfg as %%config(noreplace) to prevent overwrite on upgrade
 
