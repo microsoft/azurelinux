@@ -1364,6 +1364,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.initial-setup]
 [components.initscripts]
 [components.inkscape]
+[components.inotify-tools]
 [components.intel-cmt-cat]
 [components.intel-ipp-crypto-mb]
 [components.intel-ipsec-mb]
