@@ -41,25 +41,24 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-#Patch0:         CVE-2025-4574.patch
-#Patch1:         CVE-2025-53605.patch
-#Patch2:         CVE-2024-11738.patch
-#Patch3:         CVE-2025-55159.patch
-#Patch4:         CVE-2025-67873.patch
-#Patch5:         CVE-2025-68114.patch
-#Patch6:         CVE-2025-4207.patch
-#Patch7:         CVE-2025-12818.patch
-#Patch8:         CVE-2026-24116.patch
-#Patch9:         CVE-2025-58160.patch
-#Patch10:        CVE-2026-25541.patch
-#Patch11:        CVE-2026-25727.patch
-#Patch12:        CVE-2026-2006.patch
-#Patch13:        CVE-2026-33056.patch
-#Patch14:        CVE-2026-33055.patch
-#Patch15:        CVE-2026-34743.patch
-#Patch16:        CVE-2026-5222.patch
-#Patch17:        CVE-2026-5223.patch
-#Patch18:        CVE-2026-40034.patch
+Patch0:         CVE-2025-4574.patch
+Patch1:         CVE-2025-53605.patch
+Patch2:         CVE-2024-11738.patch
+Patch3:         CVE-2025-67873.patch
+Patch4:         CVE-2025-68114.patch
+Patch5:         CVE-2025-4207.patch
+Patch6:         CVE-2025-12818.patch
+Patch7:         CVE-2026-24116.patch
+Patch8:         CVE-2025-58160.patch
+Patch9:        CVE-2026-25541.patch
+Patch10:        CVE-2026-25727.patch
+Patch11:        CVE-2026-2006.patch
+Patch12:        CVE-2026-33056.patch
+Patch13:        CVE-2026-33055.patch
+Patch14:        CVE-2026-34743.patch
+Patch15:        CVE-2026-5222.patch
+Patch16:        CVE-2026-5223.patch
+Patch17:        CVE-2026-40034.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -204,7 +203,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %changelog
 * Thu Jun 18 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.0-1
-- Upgrade to v1.96.0
+- Upgrade to v1.96.0 and update CVEs
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
