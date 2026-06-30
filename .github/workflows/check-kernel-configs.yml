@@ -1,0 +1,162 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# This action checks that required kernel configs have not been removed or
+# modified to an undesirable value.
+name: Kernel Required Configs Check
+
+on:
+  push:
+    branches: [ 4.0 ]
+    paths:
+      - 'base/comps/kernel*/*config*'
+  pull_request:
+    branches: [ 4.0 ]
+    paths:
+      - 'base/comps/kernel*/*config*'
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check:
+    name: Kernel configs check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Workflow trigger checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          # Need history so git diff-tree can resolve the base/before commit.
+          fetch-depth: 0
+
+      - name: Get base commit for PRs
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$BASE_REF"
+          base_sha=$(git rev-parse "origin/$BASE_REF")
+          echo "base_sha=$base_sha" >> "$GITHUB_ENV"
+          echo "Merging $HEAD_SHA into $BASE_REF"
+
+      - name: Get base commit for Pushes
+        if: ${{ github.event_name == 'push' }}
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          # `github.event.before` is 0000...0000 on the first push of a new
+          # branch, and may point at a commit no longer reachable after a
+          # force-push. In either case, fall back to merge-base against the
+          # repo default branch so we still get a sensible diff window.
+          zero_sha="0000000000000000000000000000000000000000"
+          base_sha=""
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "$zero_sha" ]; then
+            if git fetch --quiet origin "$BEFORE_SHA" 2>/dev/null \
+                && git rev-parse --quiet --verify "$BEFORE_SHA^{commit}" >/dev/null; then
+              base_sha="$BEFORE_SHA"
+            else
+              echo "before-sha $BEFORE_SHA is not reachable (likely force-push); falling back to default branch"
+            fi
+          else
+            echo "no before-sha (first push of branch); falling back to default branch"
+          fi
+          if [ -z "$base_sha" ]; then
+            git fetch --quiet origin "$DEFAULT_BRANCH"
+            base_sha=$(git merge-base "origin/$DEFAULT_BRANCH" "$HEAD_SHA")
+          fi
+          echo "base_sha=$base_sha" >> "$GITHUB_ENV"
+          echo "Merging $HEAD_SHA into $base_sha"
+
+      # For consistency, we use the same major/minor version of Python that Azure Linux ships.
+      - name: Setup Python 3.14
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.14'
+
+      - name: Get Python dependencies
+        run: python3 -m pip install -r scripts/ci/kernel/kernel-config-checker/requirements.txt
+
+      - name: Check if config files changed
+        env:
+          BASE_SHA: ${{ env.base_sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r "$BASE_SHA" "$HEAD_SHA")'"
+          changed_configs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r "$BASE_SHA" "$HEAD_SHA" | { grep "base/comps/kernel.*/.*config.*$" || test $? = 1; })
+          echo "Files to validate: '${changed_configs}'"
+          {
+            echo "updated_configs<<EOF"
+            echo "${changed_configs}"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Run kernel config checking script
+        if: ${{ env.updated_configs != '' }}
+        env:
+          UPDATED_CONFIGS: ${{ env.updated_configs }}
+        run: |
+          set -euo pipefail
+          JSON_PATH="scripts/ci/kernel/kernel-config-checker/kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json"
+
+          # Extract kernel names that have overrides in the JSON (these are the kernels we track).
+          tracked_kernels=$(python3 -c "
+          import json
+          with open('${JSON_PATH}') as f:
+              data = json.load(f)
+          for o in data['overrides']:
+              print(o['name'])
+          ")
+          echo "Tracked kernels: ${tracked_kernels}"
+
+          failed=0
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+
+            # Extract kernel name from path (e.g., base/comps/kernel/6.18-x86_64-azl.config -> kernel).
+            kernel_name=$(echo "$file" | sed 's|base/comps/\([^/]*\)/.*|\1|')
+
+            if ! echo "${tracked_kernels}" | grep -qx "${kernel_name}"; then
+              echo "============================================"
+              echo "Skipping: ${file} (kernel=${kernel_name} not tracked in JSON)"
+              echo "============================================"
+              continue
+            fi
+
+            # Determine architecture from filename.
+            if [[ "$file" == *"aarch64"* ]]; then
+              arch="arm64"
+            else
+              arch="x86_64"
+            fi
+
+            echo "============================================"
+            echo "Checking: ${file} (kernel=${kernel_name}, arch=${arch})"
+            echo "============================================"
+
+            if ! (cd scripts/ci/kernel/kernel-config-checker && python3 -m kernel_config_checker.check_config \
+              "../../../../${file}" \
+              kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json \
+              "${kernel_name}" "${arch}"); then
+              failed=1
+            fi
+          done <<< "$UPDATED_CONFIGS"
+
+          if [ "$failed" -eq 1 ]; then
+            echo ""
+            echo "✗ One or more kernel config checks failed"
+            exit 1
+          fi
