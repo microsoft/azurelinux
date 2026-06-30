@@ -638,6 +638,7 @@ components = [
     "inih",
     "iniparser",
     "initscripts",
+    "inotify-tools",
     "intel-cmt-cat",
     "intel-ipp-crypto-mb",
     "intel-ipsec-mb",

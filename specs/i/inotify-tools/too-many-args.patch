@@ -1,0 +1,97 @@
+commit e837b015abae4cc98b052a939dc0c1a4f5bfd5d0
+Author: Jan Kratochvil <jan@jankratochvil.net>
+Date:   Sun Feb 16 16:05:15 2025 +0800
+
+    Fix a crash on >=1024 watched files
+---
+ src/common.cpp | 50 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/src/common.cpp b/src/common.cpp
+index 02b8aea..60929ea 100644
+--- a/src/common.cpp
++++ b/src/common.cpp
+@@ -113,13 +113,15 @@ void construct_path_list(int argc,
+                 }
+ 	}
+ 
+-	int watch_count = 0;
+-	int exclude_count = 0;
+-	list->watch_files_ = (char const**)malloc(sizeof(char*) * LIST_CHUNK);
++	size_t watch_count = 0;
++	size_t watch_allocated = LIST_CHUNK;
++	size_t exclude_count = 0;
++	size_t exclude_allocated = LIST_CHUNK;
++	list->watch_files_ = (char const**)malloc(sizeof(char*) * watch_allocated);
+ 	if (!list->watch_files_)
+ 		return;
+ 
+-	list->exclude_files_ = (char const**)malloc(sizeof(char*) * LIST_CHUNK);
++	list->exclude_files_ = (char const**)malloc(sizeof(char*) * exclude_allocated);
+ 	if (!list->exclude_files_)
+ 		return;
+ 
+@@ -133,11 +135,31 @@ void construct_path_list(int argc,
+ 			continue;
+ 
+ 		if ('@' == name[0]) {
++			if (exclude_count == exclude_allocated - 1) {
++				exclude_allocated *= 2;
++				auto mem = (char const**) realloc (list->exclude_files_, sizeof(char*) * exclude_allocated);
++				if (!mem) {
++					list->watch_files_[watch_count] = NULL;
++					list->exclude_files_[exclude_count] = NULL;
++					return;
++				}
++				list->exclude_files_ = mem;
++			}
+ 			list->exclude_files_[exclude_count++] =
+ 			    strdup(&name[1]);
+ 			continue;
+ 		}
+ 
++		if (watch_count == watch_allocated - 1) {
++			watch_allocated *= 2;
++			auto mem = (char const**) realloc (list->watch_files_, sizeof(char*) * watch_allocated);
++			if (!mem) {
++				list->watch_files_[watch_count] = NULL;
++				list->exclude_files_[exclude_count] = NULL;
++				return;
++			}
++			list->watch_files_ = mem;
++		}
+ 		list->watch_files_[watch_count++] = strdup(name);
+ 	}
+ 
+@@ -147,11 +169,31 @@ void construct_path_list(int argc,
+ 			continue;
+ 
+ 		if ('@' == argv[i][0]) {
++			if (exclude_count == exclude_allocated - 1) {
++				exclude_allocated *= 2;
++				auto mem = (char const**) realloc (list->exclude_files_, sizeof(char*) * exclude_allocated);
++				if (!mem) {
++					list->watch_files_[watch_count] = NULL;
++					list->exclude_files_[exclude_count] = NULL;
++					return;
++				}
++				list->exclude_files_ = mem;
++			}
+ 			list->exclude_files_[exclude_count++] =
+ 			    strdup(&argv[i][1]);
+ 			continue;
+ 		}
+ 
++		if (watch_count == watch_allocated - 1) {
++			watch_allocated *= 2;
++			auto mem = (char const**) realloc (list->watch_files_, sizeof(char*) * watch_allocated);
++			if (!mem) {
++				list->watch_files_[watch_count] = NULL;
++				list->exclude_files_[exclude_count] = NULL;
++				return;
++			}
++			list->watch_files_ = mem;
++		}
+ 		list->watch_files_[watch_count++] = strdup(argv[i]);
+ 	}
+ 
