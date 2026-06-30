@@ -470,7 +470,11 @@ Patch27:  kvm-block-Drain-nodes-before-inactivating-them.patch
 Patch28:  kvm-block-export-Add-option-to-allow-export-of-inactive-.patch
 Patch29:  kvm-nbd-server-Support-inactive-nodes.patch
 Patch30:  kvm-migration-Fix-UAF-for-incoming-migration-on-Migratio.patch
+<<<<<<< HEAD
 Patch31:  CVE-2026-48914.patch
+=======
+Patch31:  CVE-2026-3195.patch
+>>>>>>> 4f239ee108 ([AutoPR- Security] Patch qemu for CVE-2026-3195 [HIGH] (#17830))
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3522,10 +3526,17 @@ fi
 
 
 %changelog
+<<<<<<< HEAD
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
 - Patch for CVE-2026-48914
 
 * Wed May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
+=======
+* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
+- Patch for CVE-2026-3195
+
+* Tue May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
+>>>>>>> 4f239ee108 ([AutoPR- Security] Patch qemu for CVE-2026-3195 [HIGH] (#17830))
 - Enable user_static builds for qemu
 - configure user_static with 'enable-pie'
 - manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
