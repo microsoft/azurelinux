@@ -1,7 +1,7 @@
 Summary:        Access control list utilities
 Name:           acl
-Version:        2.3.1
-Release:        2%{?dist}
+Version:        2.4.0
+Release:        1%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -59,10 +59,10 @@ chmod 0755 %{buildroot}%{_libdir}/libacl.so.*.*.*
 %check
 # Skip following four tests which fail due to lack of ACL support in tools like cp from coreutils
 # As noted in coreutils build log: "configure: WARNING: GNU coreutils will be built without ACL support."
-sed -e 's|test/cp.test||' -i test/Makemodule.am Makefile.in Makefile
-sed -e 's|test/root/permissions.test||' -i test/Makemodule.am Makefile.in Makefile
-sed -e 's|test/root/setfacl.test||' -i test/Makemodule.am Makefile.in Makefile
-sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
+sed -e 's|test/cp.run||' -i test/Makemodule.am Makefile.in Makefile
+sed -e 's|test/root/permissions.run||' -i test/Makemodule.am Makefile.in Makefile
+sed -e 's|test/root/setfacl.run||' -i test/Makemodule.am Makefile.in Makefile
+sed -e 's|test/missc.run||' -i test/Makemodule.am Makefile.in Makefile
 %make_build check
 
 %ldconfig_scriptlets -n libacl
@@ -78,11 +78,14 @@ sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
 %{_mandir}/man5/acl.5*
 
 %files -n libacl-devel
+%license doc/COPYING doc/COPYING.LGPL
 %{_libdir}/libacl.so
 %{_includedir}/acl
 %{_includedir}/sys/acl.h
 %{_mandir}/man3/acl_*
 %{_libdir}/libacl.a
+%exclude %{_docdir}/acl/COPYING
+%exclude %{_docdir}/acl/COPYING.LGPL
 %{_docdir}/acl/*
 %{_libdir}/pkgconfig/libacl.pc
 
@@ -90,6 +93,9 @@ sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
 %{_libdir}/libacl.so.*
 
 %changelog
+* Mon Jun 29 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.4.0-1
+- Upgrade to 2.4.0 for CVE-2026-54369, CVE-2026-54370, CVE-2026-54371
+
 * Wed Sep 20 2023 Jon Slobodzian <joslobo@microsoft.com> - 2.3.1-2
 - Recompile with stack-protection fixed gcc version (CVE-2023-4039)
 
@@ -102,7 +108,7 @@ sed -e 's|test/misc.test||' -i test/Makemodule.am Makefile.in Makefile
 * Tue Apr 14 2020 Henry Beberman <henry.beberman@microsoft.com> - 2.2.53-4
 - Update files to include license
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 2.2.53-3
+* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 2.2.53-3
 - Replaced dead link. Fixed Source URL. Verified license.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 2.2.53-2
