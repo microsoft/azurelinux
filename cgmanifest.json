@@ -11321,8 +11321,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.7.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
+          "version": "4.9.3",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.3/libslirp-v4.9.3.tar.gz"
         }
       }
     },
