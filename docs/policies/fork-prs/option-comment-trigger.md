@@ -22,9 +22,10 @@ build of the current head commit; each new commit needs a fresh comment.
 - A **Write+** collaborator comments `/azp run` to authorize the build of the
   current head commit. The build *is* the check, so the Azure Pipelines GitHub App
   posts pass/fail to the PR natively — no separate GitHub App is needed.
-- Internal PRs can skip the comment: set the comment requirement to **"Only on
-  pull requests from non-team members."** Write+ authors build automatically;
-  fork/non-member PRs require `/azp run`.
+- PRs from team members can skip the comment: set the comment requirement to
+  **"Only on pull requests from non-team members."** Then any PR authored by a
+  Write+ member — including from that member's own fork — builds automatically;
+  only PRs from non-members need `/azp run`.
 
 ## Security posture
 
