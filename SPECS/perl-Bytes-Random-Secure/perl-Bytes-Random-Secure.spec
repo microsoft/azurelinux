@@ -68,8 +68,7 @@ greater control over the random number generator's seeding, there is an
 object-oriented interface that provides much more flexibility.
 
 %prep
-%setup -q -n Bytes-Random-Secure-%{version}
-%patch 0 -p1
+%autosetup -p1 -n Bytes-Random-Secure-%{version}
 %if !%{with perl_Bytes_Random_Secure_enables_optional_test}
 rm t/21-bytes_random_tests.t
 perl -i -ne 'print $_ unless m{^t/21-bytes_random_tests.t}' MANIFEST
