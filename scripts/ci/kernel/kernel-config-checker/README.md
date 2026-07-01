@@ -69,6 +69,20 @@ Example:
 python -m kernel_config_checker.check_config --check-all kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json CONFIG_DRM
 ```
 
+### Run the CI validation locally
+
+The `Kernel Required Configs Check` GitHub Actions workflow validates changed kernel configs by running the pytest harness in `tests/`. To reproduce a run locally, invoke pytest with the same base/head SHAs the workflow would use:
+
+```bash
+python -m pytest tests/ \
+  --base-sha "$(git merge-base HEAD origin/4.0)" \
+  --head-sha HEAD
+```
+
+Omit the flags to default to `HEAD^..HEAD`. The harness walks the diff, filters to `base/comps/kernel*/*config*` paths whose kernel appears in the policy JSON's `overrides`, and runs the same `check_kernel_config` logic used by the CLI. Deletions of tracked kernel config files fail a dedicated test.
+
+To add a new check (e.g. a lint over the policy JSON, or a per-arch invariant), drop another `test_*.py` into `tests/` — no workflow changes required.
+
 ## Configuration Schema
 
 The system uses a structured JSON schema with default and override sections:
@@ -141,6 +155,9 @@ scripts/ci/kernel/kernel-config-checker/
 │   ├── __init__.py             # Package init
 │   ├── add_config.py           # Interactive config adder
 │   └── check_config.py         # Main checker and utilities
+├── tests/                       # Pytest harness invoked by CI
+│   ├── conftest.py              # Shared fixtures + git-diff parametrization
+│   └── test_kernel_config_validation.py  # Policy checks over changed configs
 ├── requirements.txt            # Python dependencies
 └── README.md                   # This file
 ```
