@@ -7,15 +7,14 @@
 #   .github/workflows/ado/templates/package-build-stages.yml
 #
 # Authenticates via Workload Identity Federation (OIDC) and calls the Control
-# Tower APIs to run the v1 post-merge delta build (stopgap until source upload
-# is reworked):
+# Tower APIs to run the v1 post-merge delta build:
 #   1. Resolve the (target, source) commit range for this push from the
 #      previous CI build (ADO Builds API).
 #   2. Submit official package builds for the components that changed across
 #      that range, via Workload Identity Federation (OIDC) to Control Tower.
 #
-# The setup + change-detection + validation steps are shared with the
-# source-upload pipeline via templates/steps/common-steps.yml.
+# The setup + change-detection + validation steps are composed from the shared
+# templates/steps/* step templates via templates/steps/common-steps.yml.
 #
 # Helper scripts live under:
 # - scripts/ci/control-tower/ - (Control Tower-specific)

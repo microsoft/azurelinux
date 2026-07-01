@@ -1,7 +1,7 @@
 # Microsoft Corporation
 #
-# Shared step set for the POST-MERGE Control Tower pipelines (package build +
-# source upload). Spliced into each pipeline's single job via:
+# Shared step set for the POST-MERGE package-build Control Tower pipeline.
+# Spliced into the pipeline's single job via:
 #
 #   steps:
 #     - template: steps/common-steps.yml
@@ -22,7 +22,7 @@
 #     after it (the default; do NOT set step-level `continueOnError` on them).
 #     Later steps depend on earlier ones. A job-level `continueOnError` (which
 #     only affects how the JOB result is reported, not intra-job step flow) is
-#     fine -- the source-upload pipeline uses one.
+#     fine.
 #
 # The PR check composes these same granular templates directly, with its own
 # commit-range-pr.yml and without the lock/render-verify steps (those are

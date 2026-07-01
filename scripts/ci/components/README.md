@@ -1,9 +1,9 @@
 # Shared azldev component helpers
 
 Pipeline-agnostic shell + Python helpers consumed by the GitHub Actions
-PR gates (`.github/workflows/check-rendered-specs.yml`), the ADO
-Control Tower integration pipeline
-(`.github/workflows/ado/templates/sources-upload-stages.yml`), and the ADO
+PR gates (`.github/workflows/check-rendered-specs.yml`), the ADO post-merge
+package-build pipeline
+(`.github/workflows/ado/templates/package-build-stages.yml`), and the ADO
 PR Control Tower check
 (`.github/workflows/ado/templates/pr-check-ct-stages.yml`).
 
@@ -21,12 +21,12 @@ PR Control Tower check
   `AZLDEV_ALLOW_ROOT=1` prefix per
   [`ado-pipeline.instructions.md`](../../../.github/instructions/ado-pipeline.instructions.md).
   Callers do **not** set this at step scope.
-- **Single source of truth.** Both pipelines should call these scripts
+- **Single source of truth.** Every consumer should call these scripts
   rather than re-implementing the change-set computation. A regression
-  here breaks both gates simultaneously, so changes need extra care.
+  here breaks every gate simultaneously, so changes need extra care.
 
 ## Callers
 
 - `check-rendered-specs.yml` `render` job → `compute_change_set.sh`
-- `sources-upload-stages.yml` "Prepare change set" step → `compute_change_set.sh`
+- `package-build-stages.yml` (via `steps/prepare-change-set.yml`) → `compute_change_set.sh`
 - `pr-check-ct-stages.yml` (via `steps/prepare-change-set.yml`) → `compute_change_set.sh`

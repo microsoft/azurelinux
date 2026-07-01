@@ -5,9 +5,9 @@
 # OneBranch-coupled knobs as parameters. The wrapper at
 # .github/workflows/ado/package-build.yml supplies concrete values.
 #
-# The setup + change-detection + validation steps are shared with the
-# source-upload pipeline via templates/steps/common-steps.yml; this template
-# appends only the package-build-specific Control Tower call.
+# The setup + change-detection + validation steps come from the shared
+# templates/steps/common-steps.yml (composed from templates/steps/*); this
+# template appends only the package-build-specific Control Tower call.
 
 parameters:
   - name: outputDirectory

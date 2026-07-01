@@ -40,6 +40,6 @@ found for the fallback) exits non-zero so the calling step fails.
 
 ## Callers
 
-- `templates/steps/common-steps.yml` "Determine source and target commit range"
-  step → `determine_commit_range.py` (shared by the package-build and
-  source-upload pipelines).
+- `templates/steps/commit-range-postmerge.yml` "Determine source and target
+  commit range" step → `determine_commit_range.py` (used by the post-merge
+  package-build pipeline).
