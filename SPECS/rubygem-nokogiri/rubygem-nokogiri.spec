@@ -2,7 +2,7 @@
 %global gem_name nokogiri
 Summary:        a Rubygem providing HTML, XML, SAX, and Reader parsers with XPath and CSS selector support
 Name:           rubygem-nokogiri
-Version:        1.15.4
+Version:        1.19.4
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -39,6 +39,9 @@ gem install -V --local --force --install-dir %{buildroot}/%{gemdir} %{gem_name}-
 %{gemdir}
 
 %changelog
+* Sun Jun 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.19.4-1
+- Auto-upgrade to 1.19.4 - for CVE-2026-57438, CVE-2026-57435, CVE-2026-57236, CVE-2026-57437, CVE-2026-57434, CVE-2026-57436, CVE-2026-57234, CVE-2026-57235
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.15.4-1
 - Auto-upgrade to 1.15.4 - Azure Linux 3.0 - package upgrades
 

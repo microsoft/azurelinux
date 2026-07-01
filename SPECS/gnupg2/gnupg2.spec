@@ -1,7 +1,7 @@
 Summary:        OpenPGP standard implementation used for encrypted communication and data storage.
 Name:           gnupg2
 Version:        2.4.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD and CC0 and GPLv2+ and LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,7 @@ Group:          Applications/Cryptography.
 URL:            https://gnupg.org/index.html
 Source0:        https://gnupg.org/ftp/gcrypt/gnupg/gnupg-%{version}.tar.bz2
 Patch0:         CVE-2026-24882.patch
+Patch1:         CVE-2026-57062.patch
 BuildRequires:  zlib-devel
 BuildRequires:  bzip2-devel
 BuildRequires:  readline-devel
@@ -105,6 +106,9 @@ ln -s $(pwd)/bin/gpg $(pwd)/bin/gpg2
 %defattr(-,root,root)
 
 %changelog
+* Mon Jun 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.9-3
+- Patch for CVE-2026-57062
+
 * Tue Feb 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.4.9-2
 - Patch for CVE-2026-24882
 
