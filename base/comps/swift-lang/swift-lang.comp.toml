@@ -1,0 +1,63 @@
+[components.swift-lang]
+
+# Azure Linux re-vendors its GCC triple to <arch>-azurelinux-linux, which
+# upstream clang does not know about. Teach the clang we produce about it via
+# clang's built-in GCC fallback-triple list (mirrors the sibling llvm patch,
+# specs/l/llvm/0001-Clang-Add-azurelinux-to-fallback-triples.patch).
+[[components.swift-lang.overlays]]
+description = "Add azurelinux to clang's GCC fallback triples so the produced clang finds the Azure Linux GCC runtime at runtime"
+type = "patch-add"
+source = "clang-add-azurelinux-fallback-triple.patch"
+
+# Spec does not use %autosetup or %autopatch so we need to insert it ourselves.
+[[components.swift-lang.overlays]]
+description = "Apply the azurelinux fallback-triple patch (Patch45) at the end of the patch block, after the last upstream patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch 9$'
+replacement = """%patch 9
+%patch 45"""
+
+# ===========================================================================
+# BEGIN BOOTSTRAP SCAFFOLDING -- remove once a swift-lang built with the durable
+# fix above is the bootstrap toolchain. The CCC_OVERRIDE_OPTIONS export and the
+# importer patch only work around the gen-0 bootstrap clang/swiftc not yet
+# knowing the azurelinux triple. To remove: delete both overlays below plus
+# clang-importer-azurelinux-gcc-triple.patch, then confirm the build succeeds.
+# ===========================================================================
+
+# The bootstrap driver clang (invoked as a subprocess) defaults to
+# <arch>-unknown-linux-gnu and can't find Azure Linux's GCC, so %build's first
+# link fails. %build is unprivileged (can't touch root-owned /usr/lib/gcc), so
+# point every driver clang at the azurelinux triple via CCC_OVERRIDE_OPTIONS
+# (read at exec, inherited by all build-script subprocesses). The in-process
+# ClangImporter ignores this env and is handled by the patch below.
+[[components.swift-lang.overlays]]
+description = "Bootstrap fix: export CCC_OVERRIDE_OPTIONS=--gcc-triple so driver clang finds Azure Linux's re-vendored GCC during %build without writing into root-owned /usr/lib/gcc"
+type = "spec-prepend-lines"
+section = "%build"
+lines = [
+    "export CCC_OVERRIDE_OPTIONS=\"+--gcc-triple=%{_arch}-azurelinux-linux +-Wno-unused-command-line-argument\"",
+]
+
+# Scoped build-time fix for the bootstrap swiftc's in-process ClangImporter,
+# which ignores the env above: pass -Xcc --gcc-triple to every C++-interop host
+# swiftc so it finds libstdc++. Two hunks (SwiftCompilerSources + AddPureSwift);
+# see the patch header for details.
+[[components.swift-lang.overlays]]
+description = "Point the bootstrap swiftc in-process ClangImporter at the azurelinux GCC triple (SwiftCompilerSources + AddPureSwift) so C++ interop finds libstdc++"
+type = "patch-add"
+source = "clang-importer-azurelinux-gcc-triple.patch"
+
+# Spec does not use %autosetup or %autopatch so we need to insert it ourselves.
+[[components.swift-lang.overlays]]
+description = "Apply the importer gcc-triple patch (Patch46) at the end of the patch block, after Patch45"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch 45$'
+replacement = """%patch 45
+%patch 46"""
+
+# ===========================================================================
+# END BOOTSTRAP SCAFFOLDING
+# ===========================================================================

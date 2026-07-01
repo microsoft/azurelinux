@@ -1,0 +1,66 @@
+From: Tobias Brick <tobiasb@microsoft.com>
+Subject: [PATCH] Point the bootstrap swiftc in-process ClangImporter at the azurelinux GCC triple
+
+Azure Linux re-vendors its GCC triple to <arch>-azurelinux-linux, which the
+prebuilt bootstrap swiftc's in-process ClangImporter cannot auto-detect (it
+probes <arch>-unknown-linux-gnu) and so fails to find libstdc++ when compiling
+host Swift targets with C++ interop. Pass -Xcc --gcc-triple=<arch>-azurelinux-
+linux, which ClangImporter forwards to clang so it locates the GCC install for
+that triple. --gcc-triple is arch-explicit and gcc-version-agnostic, and this
+assumes the <arch>-azurelinux-linux GCC install is present (Azure Linux builds).
+
+Two distinct code paths inject the interop -Xcc flags, so both are patched:
+SwiftCompilerSources/CMakeLists.txt (its own SWIFT_COMPILER_SOURCES_SDK_FLAGS)
+and AddPureSwift.cmake's _set_swift_cxx_interop_options (swiftASTGen and every
+other interop-enabled pure-Swift host target). Both are scoped to swiftc only,
+so the compiler-rt / sanitizer compiles (-nostdinc++ -ffreestanding) are
+unaffected.
+
+TRANSITIONAL: needed only because the gen-0 bootstrap toolchain predates the
+azurelinux fallback-triple fix (clang-add-azurelinux-fallback-triple.patch).
+Once a swift-lang built with that fix becomes the bootstrap toolchain, its
+ClangImporter finds the azurelinux GCC natively and this patch (plus the
+CCC_OVERRIDE_OPTIONS export in the spec) can be dropped.
+
+diff --git swift.orig/SwiftCompilerSources/CMakeLists.txt swift/SwiftCompilerSources/CMakeLists.txt
+index f384189..bf3dfe3 100644
+--- swift.orig/SwiftCompilerSources/CMakeLists.txt
++++ swift/SwiftCompilerSources/CMakeLists.txt
+@@ -82,6 +82,15 @@ if(SWIFT_HOST_VARIANT_SDK IN_LIST SWIFT_DARWIN_PLATFORMS)
+   endif()
+ elseif(BOOTSTRAPPING_MODE STREQUAL "CROSSCOMPILE")
+   list(APPEND SWIFT_COMPILER_SOURCES_SDK_FLAGS_default "-sdk" "${SWIFT_SDK_${SWIFT_HOST_VARIANT_SDK}_ARCH_${SWIFT_HOST_VARIANT_ARCH}_PATH}")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++  # Azure Linux re-vendors its GCC triple to <arch>-azurelinux-linux, which the
++  # bootstrap swiftc's in-process ClangImporter cannot auto-detect (it probes
++  # <arch>-unknown-linux-gnu). Tell clang to search for the azurelinux GCC triple
++  # so C++ interop finds the libstdc++ headers. --gcc-triple lets clang pick the
++  # GCC version itself. Scoped to the compiler-sources swiftc only, so the
++  # compiler-rt/sanitizer builds (-nostdinc++ -ffreestanding) are unaffected.
++  # This assumes an Azure Linux host with an <arch>-azurelinux-linux GCC install.
++  list(APPEND SWIFT_COMPILER_SOURCES_SDK_FLAGS_default "-Xcc" "--gcc-triple=${SWIFT_HOST_VARIANT_ARCH}-azurelinux-linux")
+ endif()
+ set(SWIFT_COMPILER_SOURCES_SDK_FLAGS ${SWIFT_COMPILER_SOURCES_SDK_FLAGS_default}
+   CACHE STRING "Swift flags used to compiler the Swift compiler sources")
+diff --git swift.orig/cmake/modules/AddPureSwift.cmake swift/cmake/modules/AddPureSwift.cmake
+index c370377..896560f 100644
+--- swift.orig/cmake/modules/AddPureSwift.cmake
++++ swift/cmake/modules/AddPureSwift.cmake
+@@ -90,6 +90,17 @@ function(_set_swift_cxx_interop_options name)
+     # Necessary to avoid treating IBOutlet and IBAction as keywords
+     "SHELL:-Xcc -UIBOutlet -Xcc -UIBAction -Xcc -UIBInspectable"
+   )
++  # Azure Linux re-vendors its GCC triple to <arch>-azurelinux-linux, which
++  # swiftc's in-process ClangImporter cannot auto-detect (it probes
++  # <arch>-unknown-linux-gnu) and so fails to find the libstdc++ headers
++  # (<string>, <cassert>, ...) needed by C++ interop. Tell clang to search for
++  # the azurelinux GCC triple for every interop-enabled pure-Swift host target.
++  # --gcc-triple is arch-explicit and gcc-version-agnostic; this assumes an
++  # Azure Linux host with an <arch>-azurelinux-linux GCC install.
++  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++    target_compile_options(${name} PRIVATE
++      "SHELL:-Xcc --gcc-triple=${SWIFT_HOST_VARIANT_ARCH}-azurelinux-linux")
++  endif()
+ 
+   if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+     target_compile_options(${name} PRIVATE

@@ -1,0 +1,35 @@
+From: Tobias Brick <tobiasb@microsoft.com>
+Subject: [PATCH] [Clang] Add azurelinux to fallback triples
+
+Azure Linux re-vendors its GCC triple to <arch>-azurelinux-linux, which is
+not in clang's built-in fallback list, so the clang produced by this swift
+toolchain cannot find the GCC runtime. Add azurelinux to the fallback
+triples. Without this, downstream `swift build` of packages that compile
+C/C++ (e.g. antlr4-project) fails to link.
+
+This mirrors the equivalent change Azure Linux carries on its standalone
+llvm/clang (specs/l/llvm/0001-Clang-Add-azurelinux-to-fallback-triples.patch).
+
+diff --git llvm-project.orig/clang/lib/Driver/ToolChains/Gnu.cpp llvm-project/clang/lib/Driver/ToolChains/Gnu.cpp
+index 5e9a655..6a5a724 100644
+--- llvm-project.orig/clang/lib/Driver/ToolChains/Gnu.cpp
++++ llvm-project/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -2464,7 +2464,7 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+   static const char *const AArch64LibDirs[] = {"/lib64", "/lib"};
+   static const char *const AArch64Triples[] = {
+       "aarch64-none-linux-gnu", "aarch64-linux-gnu", "aarch64-redhat-linux",
+-      "aarch64-suse-linux"};
++      "aarch64-suse-linux",     "aarch64-azurelinux-linux"};
+   static const char *const AArch64beLibDirs[] = {"/lib"};
+   static const char *const AArch64beTriples[] = {"aarch64_be-none-linux-gnu"};
+ 
+@@ -2492,7 +2492,8 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+       "x86_64-pc-linux-gnu",    "x86_64-redhat-linux6E",
+       "x86_64-redhat-linux",    "x86_64-suse-linux",
+       "x86_64-manbo-linux-gnu", "x86_64-slackware-linux",
+-      "x86_64-unknown-linux",   "x86_64-amazon-linux"};
++      "x86_64-unknown-linux",   "x86_64-amazon-linux",
++      "x86_64-azurelinux-linux"};
+   static const char *const X32Triples[] = {"x86_64-linux-gnux32",
+                                            "x86_64-pc-linux-gnux32"};
+   static const char *const X32LibDirs[] = {"/libx32", "/lib"};
