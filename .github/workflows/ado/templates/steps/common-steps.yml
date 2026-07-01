@@ -160,7 +160,7 @@ steps:
   # attacker-supplied bytes ride into the lookaside under an
   # unchanged component identity, so we treat it as hostile and
   # fail closed (supply-chain drift tripwire). --include-unchanged
-  # (set inside compute_changed.sh) ensures the full component
+  # (set inside compute_change_set.sh) ensures the full component
   # list is available for downstream consumers.
   - script: |
       set -euo pipefail

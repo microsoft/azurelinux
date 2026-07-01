@@ -9,9 +9,8 @@ PR package-build check
 
 | Script | Purpose |
 | ------ | ------- |
-| `compute_changed.sh` | Wraps `azldev component changed --from <target> --to <source> -O json`. |
 | `compute_render_set.py` | Computes the union of (azldev-flagged components) and (components with hand-edited rendered specs), then drops deleted entries. |
-| `compute_change_set.sh` | Orchestrates the two above: writes `changed-components.json`, `specs-diff.txt`, and `render-set.txt` into a caller-chosen output directory. |
+| `compute_change_set.sh` | Runs `azldev component changed --from <base> --to <head>` inline, unions the result with `compute_render_set.py`, and writes `changed-components.json`, `specs-diff.txt`, and `render-set.txt` into a caller-chosen output directory. |
 
 ## Conventions
 

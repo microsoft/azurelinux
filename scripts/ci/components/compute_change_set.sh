@@ -77,11 +77,23 @@ changed_file="$output_dir/$changed_components_file_name"
 specs_diff_file="$output_dir/$specs_diff_file_name"
 render_set_file="$output_dir/$render_set_file_name"
 
-# @AI: replace below wrapper script with function, unless you find it used in multiple places. If replaced, check for necessary doc updates.
-"$script_dir/compute_changed.sh" \
-  --output-file "$changed_file" \
-  --source-commit "$to_commit" \
-  --target-commit "$from_commit"
+# Compute the set of changed components between two commits. Writes one JSON
+# entry per component to $out_file with fields: component, changeType,
+# sourcesChange. azldev hard-fails if any component has sourcesChange == true
+# without a corresponding identity change (added/changed/deleted) -- a
+# supply-chain drift guard. Inline AZLDEV_ALLOW_ROOT=1 so CI agents running as
+# root work without lifting the restriction at step scope (see
+# .github/instructions/ado-pipeline.instructions.md).
+compute_changed() {
+  local out_file="$1" from="$2" to="$3"
+  mkdir -p "$(dirname "$out_file")"
+  AZLDEV_ALLOW_ROOT=1 azldev component changed --from "$from" --to "$to" \
+    -a --include-unchanged -O json > "$out_file"
+  echo "Changed components (non-unchanged):"
+  jq -r '.[] | select(.changeType != "unchanged") | "  \(.changeType)\t\(.component)"' "$out_file" | sort
+}
+
+compute_changed "$changed_file" "$from_commit" "$to_commit"
 
 # azldev's renderedSpecsDir is absolute. Translate to repo-relative so it
 # matches git's output (`git diff --name-only` always emits repo-relative
