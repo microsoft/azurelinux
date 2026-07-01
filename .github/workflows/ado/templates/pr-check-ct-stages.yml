@@ -1,9 +1,10 @@
 # Microsoft Corporation
 #
-# Raw stages template for the PR package-build check. Wrapper-agnostic: declares
-# the stages/jobs/steps and exposes the wrapper-coupled knobs as parameters. The
-# wrapper at .github/workflows/ado/pr-package-build.yml supplies concrete
-# values. See that wrapper for why this pipeline exists.
+# Raw stages template for the PR Control Tower check (prcheck + scratch package
+# build). Wrapper-agnostic: declares the stages/jobs/steps and exposes the
+# wrapper-coupled knobs as parameters. The wrapper at
+# .github/workflows/ado/pr-check-ct.yml supplies concrete values. See that
+# wrapper for why this pipeline exists.
 #
 # What it does, per PR:
 #   1. Ensure full git history (rpmautospec + change detection need it).
@@ -64,9 +65,9 @@ parameters:
     default: 21600
 
 stages:
-  - stage: PRPackageBuild
+  - stage: PRCheckCT
     jobs:
-      - job: PRPackageBuild
+      - job: PRCheckCT
         # Fail-loud: a failed submission, an immediate Control Tower rejection,
         # or a build that fails (or never reaches a terminal state) turns the PR
         # check red. The build runs in Control Tower's own sandbox -- NOT on

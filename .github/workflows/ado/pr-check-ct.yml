@@ -1,16 +1,17 @@
 # Microsoft Corporation
 #
-# Wrapper pipeline — passed to ADO as the entry point for the PR package-build
-# check. It submits a *scratch* Control Tower build of the components a pull
-# request changes, WAITS for that build to finish, and fails the check if the
-# build fails (or is rejected). The build runs in Control Tower's own sandbox —
-# NO PR-controlled code is built on the CI agent (only read-only change
-# detection runs there).
+# Wrapper pipeline — passed to ADO as the entry point for the PR Control Tower
+# check. It calls Control Tower 'prcheck' (which uploads the changed
+# components' missing lookaside sources) and then submits a *scratch* Control
+# Tower build of those components, WAITS for that build to finish, and fails
+# the check if the build fails (or is rejected). The build runs in Control
+# Tower's own sandbox — NO PR-controlled code is built on the CI agent (only
+# read-only change detection runs there).
 #
 # This file owns all OneBranch-specific wiring (governed templates repo,
 # NonOfficial variant, featureFlags) and delegates the actual stages/jobs/steps
 # to the raw stages template at:
-#   .github/workflows/ado/templates/pr-package-build-stages.yml
+#   .github/workflows/ado/templates/pr-check-ct-stages.yml
 #
 # WHY SCRATCH + REVIEWER-GATED: building unmerged PR code is only safe because
 #   (a) it is a *scratch* build (throwaway, never persisted to a production
@@ -84,10 +85,10 @@ extends:
         enabled: false
 
     stages:
-      - template: /.github/workflows/ado/templates/pr-package-build-stages.yml@self
+      - template: /.github/workflows/ado/templates/pr-check-ct-stages.yml@self
         parameters:
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          artifactBaseName: prpackagebuild
+          artifactBaseName: prcheckct
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           poolType: linux
           serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV

@@ -4,8 +4,8 @@ Pipeline-agnostic shell + Python helpers consumed by the GitHub Actions
 PR gates (`.github/workflows/check-rendered-specs.yml`), the ADO
 Control Tower integration pipeline
 (`.github/workflows/ado/templates/sources-upload-stages.yml`), and the ADO
-PR package-build check
-(`.github/workflows/ado/templates/pr-package-build-stages.yml`).
+PR Control Tower check
+(`.github/workflows/ado/templates/pr-check-ct-stages.yml`).
 
 | Script | Purpose |
 | ------ | ------- |
@@ -29,4 +29,4 @@ PR package-build check
 
 - `check-rendered-specs.yml` `render` job → `compute_change_set.sh`
 - `sources-upload-stages.yml` "Prepare change set" step → `compute_change_set.sh`
-- `pr-package-build-stages.yml` "Prepare change set" step → `compute_change_set.sh`
+- `pr-check-ct-stages.yml` (via `steps/prepare-change-set.yml`) → `compute_change_set.sh`
