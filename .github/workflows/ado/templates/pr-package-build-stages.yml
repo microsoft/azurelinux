@@ -173,7 +173,7 @@ stages:
               # Baseline = the MERGE BASE (fork point) of the target-branch tip
               # (HEAD^1) and the PR head (HEAD^2), NOT the target tip itself.
               # See the block comment above for why; this is passed as the
-              # `--target-commit` (from) baseline to the change-set helper.
+              # `--from-commit` baseline to the change-set helper.
               target_commit="$(git merge-base HEAD^1 HEAD^2)"
               # PR-supplied data is untrusted: validate both SHAs before use.
               for sha in "$target_commit" "$source_commit"; do
@@ -200,12 +200,12 @@ stages:
               # AI: use job variables for 'changedComponentsFile' and derive 'change_set_dir' from it, rather than hardcoding the staging path here.
               change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
               echo "##[group]Preparing change set"
-              # AI: extend the script below to allow optionally to set the names of the output files (changed-components.json, specs-diff.txt, render-set.txt) via parameters, rather than hardcoding them in the script. Then use the new parameters here to set the output file names, so the wrapper can control them if needed.
-              # AI: re-name the --X-commit parameters to --from-commit and --to-commit for clarity, since the script is computing the diff from the merge base (fork point) to the PR head. Once done, make sure the ordering of the passed commits is correct - seems wrong in case of this YAML.
+              # from = merge base (fork point), to = PR head; the helper diffs
+              # from -> to. See the "Determine PR commit range" step above.
               scripts/ci/components/compute_change_set.sh \
                 --output-dir "$change_set_dir" \
-                --source-commit "$SOURCE_COMMIT" \
-                --target-commit "$TARGET_COMMIT"
+                --from-commit "$TARGET_COMMIT" \
+                --to-commit "$SOURCE_COMMIT"
               echo "##[endgroup]"
               echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$change_set_dir/changed-components.json"
             env:

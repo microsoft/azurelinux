@@ -24,19 +24,32 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 usage() {
-  echo "Usage: $0 --output-dir DIR --source-commit SHA --target-commit SHA" >&2
+  echo "Usage: $0 --output-dir DIR --from-commit SHA --to-commit SHA \\" >&2
+  echo "          [--changed-components-file NAME] [--specs-diff-file NAME] [--render-set-file NAME]" >&2
+  echo "  --from-commit  baseline commit (merge-base / fork point)" >&2
+  echo "  --to-commit    newer commit (e.g. PR head)" >&2
   exit 1
 }
 
+# Output file names default to the canonical set but can be overridden by a
+# caller that needs to control them (e.g. to stage several change sets side by
+# side). Only the names are configurable; they always land under --output-dir.
+changed_components_file_name="changed-components.json"
+specs_diff_file_name="specs-diff.txt"
+render_set_file_name="render-set.txt"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --output-dir)     output_dir="$2"; shift 2 ;;
-    --source-commit)  source_commit="$2"; shift 2 ;;
-    --target-commit)  target_commit="$2"; shift 2 ;;
+    --output-dir)              output_dir="$2"; shift 2 ;;
+    --from-commit)             from_commit="$2"; shift 2 ;;
+    --to-commit)               to_commit="$2"; shift 2 ;;
+    --changed-components-file) changed_components_file_name="$2"; shift 2 ;;
+    --specs-diff-file)         specs_diff_file_name="$2"; shift 2 ;;
+    --render-set-file)         render_set_file_name="$2"; shift 2 ;;
     *) usage ;;
   esac
 done
-[[ -z "${output_dir:-}" || -z "${source_commit:-}" || -z "${target_commit:-}" ]] && usage
+[[ -z "${output_dir:-}" || -z "${from_commit:-}" || -z "${to_commit:-}" ]] && usage
 
 # Defensive guard: the script owns --output-dir exclusively for the duration
 # of the invocation (it does `rm -rf` below to clean up stale state). Refuse
@@ -60,15 +73,15 @@ mkdir -p "$output_dir"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-changed_file="$output_dir/changed-components.json"
-specs_diff_file="$output_dir/specs-diff.txt"
-render_set_file="$output_dir/render-set.txt"
+changed_file="$output_dir/$changed_components_file_name"
+specs_diff_file="$output_dir/$specs_diff_file_name"
+render_set_file="$output_dir/$render_set_file_name"
 
 # @AI: replace below wrapper script with function, unless you find it used in multiple places. If replaced, check for necessary doc updates.
 "$script_dir/compute_changed.sh" \
   --output-file "$changed_file" \
-  --source-commit "$source_commit" \
-  --target-commit "$target_commit"
+  --source-commit "$to_commit" \
+  --target-commit "$from_commit"
 
 # azldev's renderedSpecsDir is absolute. Translate to repo-relative so it
 # matches git's output (`git diff --name-only` always emits repo-relative
@@ -81,7 +94,7 @@ specs_dir="$(realpath --relative-to="$(pwd)" "$specs_dir_abs")"
 # `azldev component changed` misses). --no-renames prevents collapse of
 # delete+add into a rename entry, which would lose the old path; the
 # Python script filters out deleted/unknown components.
-git diff --no-renames --name-only "$target_commit" "$source_commit" \
+git diff --no-renames --name-only "$from_commit" "$to_commit" \
   -- "$specs_dir" > "$specs_diff_file"
 
 python3 "$script_dir/compute_render_set.py" \

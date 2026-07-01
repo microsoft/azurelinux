@@ -181,10 +181,11 @@ steps:
       trap publish_artifact EXIT
 
       echo "##[group]Preparing change set"
+      # from = previous build's commit (baseline), to = this build's commit.
       scripts/ci/components/compute_change_set.sh \
         --output-dir "$change_set_dir" \
-        --source-commit "$SOURCE_COMMIT" \
-        --target-commit "$TARGET_COMMIT"
+        --from-commit "$TARGET_COMMIT" \
+        --to-commit "$SOURCE_COMMIT"
       echo "##[endgroup]"
 
       echo "##[group]Upload set (sourcesChange == true, changeType in {added, changed})"
