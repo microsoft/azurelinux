@@ -5,12 +5,13 @@
 Summary:        Perl extension to generate cryptographically-secure random bytes
 Name:           perl-Bytes-Random-Secure
 Version:        0.29
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        GPL+ OR Artistic
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://metacpan.org/release/Bytes-Random-Secure
 Source0:        https://cpan.metacpan.org/modules/by-module/Bytes/Bytes-Random-Secure-%{version}.tar.gz
+Patch0:         CVE-2026-11625.patch
 BuildArch:      noarch
 
 BuildRequires:  make
@@ -68,6 +69,7 @@ object-oriented interface that provides much more flexibility.
 
 %prep
 %setup -q -n Bytes-Random-Secure-%{version}
+%patch 0 -p1
 %if !%{with perl_Bytes_Random_Secure_enables_optional_test}
 rm t/21-bytes_random_tests.t
 perl -i -ne 'print $_ unless m{^t/21-bytes_random_tests.t}' MANIFEST
@@ -92,6 +94,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.29-22
+- Patch for CVE-2026-11625
+
 * Tue May 31 2022 Pawel Winogrodzki <pawelwi@microsoft.com> - 0.29-21
 - Initial CBL-Mariner import from Fedora 34 (license: MIT).
 - License verified.
