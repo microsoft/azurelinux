@@ -80,83 +80,21 @@ jobs:
           echo "base_sha=$base_sha" >> "$GITHUB_ENV"
           echo "Merging $HEAD_SHA into $base_sha"
 
-      # For consistency, we use the same major/minor version of Python that Azure Linux ships.
-      - name: Setup Python 3.14
+      - name: Setup Python 3.12
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.14'
+          python-version: '3.12'
 
       - name: Get Python dependencies
         run: python3 -m pip install -r scripts/ci/kernel/kernel-config-checker/requirements.txt
 
-      - name: Check if config files changed
+      - name: Run kernel config pytest validations
         env:
           BASE_SHA: ${{ env.base_sha }}
           HEAD_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          echo "Files changed: '$(git diff-tree --no-commit-id --name-only -r "$BASE_SHA" "$HEAD_SHA")'"
-          changed_configs=$(git diff-tree --diff-filter=d --no-commit-id --name-only -r "$BASE_SHA" "$HEAD_SHA" | { grep "base/comps/kernel.*/.*config.*$" || test $? = 1; })
-          echo "Files to validate: '${changed_configs}'"
-          {
-            echo "updated_configs<<EOF"
-            echo "${changed_configs}"
-            echo "EOF"
-          } >> "$GITHUB_ENV"
-
-      - name: Run kernel config checking script
-        if: ${{ env.updated_configs != '' }}
-        env:
-          UPDATED_CONFIGS: ${{ env.updated_configs }}
-        run: |
-          set -euo pipefail
-          JSON_PATH="scripts/ci/kernel/kernel-config-checker/kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json"
-
-          # Extract kernel names that have overrides in the JSON (these are the kernels we track).
-          tracked_kernels=$(python3 -c "
-          import json
-          with open('${JSON_PATH}') as f:
-              data = json.load(f)
-          for o in data['overrides']:
-              print(o['name'])
-          ")
-          echo "Tracked kernels: ${tracked_kernels}"
-
-          failed=0
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-
-            # Extract kernel name from path (e.g., base/comps/kernel/6.18-x86_64-azl.config -> kernel).
-            kernel_name=$(echo "$file" | sed 's|base/comps/\([^/]*\)/.*|\1|')
-
-            if ! echo "${tracked_kernels}" | grep -qx "${kernel_name}"; then
-              echo "============================================"
-              echo "Skipping: ${file} (kernel=${kernel_name} not tracked in JSON)"
-              echo "============================================"
-              continue
-            fi
-
-            # Determine architecture from filename.
-            if [[ "$file" == *"aarch64"* ]]; then
-              arch="arm64"
-            else
-              arch="x86_64"
-            fi
-
-            echo "============================================"
-            echo "Checking: ${file} (kernel=${kernel_name}, arch=${arch})"
-            echo "============================================"
-
-            if ! (cd scripts/ci/kernel/kernel-config-checker && python3 -m kernel_config_checker.check_config \
-              "../../../../${file}" \
-              kernel_config_checker/kernel_configs_json/azl4-os-required-kernel-configs.json \
-              "${kernel_name}" "${arch}"); then
-              failed=1
-            fi
-          done <<< "$UPDATED_CONFIGS"
-
-          if [ "$failed" -eq 1 ]; then
-            echo ""
-            echo "✗ One or more kernel config checks failed"
-            exit 1
-          fi
+          cd scripts/ci/kernel/kernel-config-checker
+          python3 -m pytest -q tests/test_kernel_config_validation.py \
+            --base-sha "$BASE_SHA" \
+            --head-sha "$HEAD_SHA"
