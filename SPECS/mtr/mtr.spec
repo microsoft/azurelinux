@@ -3,7 +3,7 @@
 Summary: Network diagnostic tool combining 'traceroute' and 'ping'
 Name: mtr
 Version: 0.95
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -13,8 +13,9 @@ Source1: net-x%{name}.desktop
 Source2: mtr-gtk-pkexec-wrapper.sh
 Source3: org.fedoraproject.mtr.policy
 Patch0:CVE-2025-49809.patch
+Patch1: 0001-configure-prefer-ncursesw-over-ncurses-for-wide-char.patch
 
-BuildRequires: ncurses-devel
+BuildRequires: pkgconfig(ncursesw)
 BuildRequires: autoconf automake libtool git
 
 %description
@@ -62,6 +63,9 @@ install -D -p -m 0755 mtr %{buildroot}%{_sbindir}/mtr
 %{_datadir}/bash-completion/completions/%{name}
 
 %changelog
+* Tue Apr 21 2026 Chris Co <chrco@microsoft.com> - 0.95-4
+- Add patch to prefer ncursesw, fixing mtr segfault due to ncurses/tinfo ABI mismatch
+
 * Mon Jul 14 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.95-3
 - Patch for CVE-2025-49809
 
