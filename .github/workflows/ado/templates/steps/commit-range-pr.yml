@@ -1,0 +1,52 @@
+# Microsoft Corporation
+#
+# Step template: resolve the PR commit range from the merge commit's parents.
+# A PR-policy build checks out the MERGE commit (Build.SourceVersion): parent
+# ^1 is the target-branch tip, parent ^2 is the PR head. The PR's true change
+# set is the diff between their MERGE BASE (the fork point) and ^2 -- i.e.
+# `git diff merge-base(^1,^2)..^2`, the same three-dot set GitHub's "Files
+# changed" shows. We compare against the merge base, NOT the target tip:
+# comparing against the tip additionally flags every component that landed on
+# the target branch after the PR forked (the PR head still carries their
+# pre-update state), which can balloon a 1-component PR into dozens.
+#
+# Emits job-scope variables sourceCommit (PR head, ^2) and baseCommit (the
+# merge base). These feed prepare-change-set.yml (from=baseCommit,
+# to=sourceCommit) and the trailing Control Tower call.
+
+steps:
+  # Fail fast, at compile time, when this is not a PR build: the merge-commit
+  # parent logic below only makes sense for a PullRequest trigger. Including the
+  # guard step is decided by a template expression on Build.Reason, so a
+  # mis-triggered run stops at its very first step.
+  - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    - script: |
+        echo "##[error]This pipeline must run as a PR build (Build.Reason=PullRequest); got '$(Build.Reason)'."
+        exit 1
+      displayName: "Guard: PR build only"
+
+  - script: |
+      set -euo pipefail
+      # Defense in depth: a PullRequest trigger should always check out a merge
+      # commit, but verify the ^2 parent exists before relying on it.
+      if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
+        echo "##[error]HEAD is not a merge commit -- expected a PR merge build."
+        exit 1
+      fi
+      source_commit="$(git rev-parse HEAD^2)"
+      # Baseline = the MERGE BASE (fork point) of the target-branch tip
+      # (HEAD^1) and the PR head (HEAD^2), NOT the target tip itself.
+      # See the block comment above for why; this is passed as the
+      # `--from-commit` baseline to the change-set helper.
+      base_commit="$(git merge-base HEAD^1 HEAD^2)"
+      # PR-supplied data is untrusted: validate both SHAs before use.
+      for sha in "$base_commit" "$source_commit"; do
+        if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+          echo "##[error]invalid commit SHA: $sha"
+          exit 1
+        fi
+      done
+      echo "Resolved range: base(merge-base)=$base_commit source=$source_commit"
+      echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
+      echo "##vso[task.setvariable variable=baseCommit;isreadonly=true]$base_commit"
+    displayName: "Determine PR commit range"

@@ -1,0 +1,42 @@
+# Microsoft Corporation
+#
+# Step template: render the components flagged by the change set (azldev-flagged
+# plus any with hand-edited spec files) in --check-only mode: azldev renders to
+# a staging area and diffs against the on-disk output without writing. Exits
+# nonzero if any component's rendered output would change, catching both stale
+# renders and direct hand-edits.
+#
+# Consumes the job-scope variable renderSetFile set by prepare-change-set.yml.
+
+steps:
+  - script: |
+      set -euo pipefail
+      # A missing render-set file means "Prepare change set" did not complete;
+      # fail loud rather than silently skipping the render check.
+      if [[ ! -f "$RENDER_SET_FILE" ]]; then
+        echo "##[error]render-set file '$RENDER_SET_FILE' is missing -- 'Prepare change set' did not complete cleanly."
+        exit 1
+      fi
+      # An empty render set just means no PR-scoped components changed.
+      if [[ ! -s "$RENDER_SET_FILE" ]]; then
+        echo "No changed components -- skipping render."
+        exit 0
+      fi
+      echo "##[group]Render set"
+      sed 's/^/  - /' "$RENDER_SET_FILE"
+      echo "##[endgroup]"
+      echo "##[group]Specs rendering + verification"
+      # `-x` fails loudly if the arg list would split into multiple
+      # xargs invocations -- a multi-batch render-check would
+      # silently mask drift in the later batches. `-n 50000` is
+      # required for `-x` to have any effect (without `-n`/`-L`,
+      # GNU xargs never splits). `--` ends azldev option parsing so
+      # component names beginning with `-` (none today) are
+      # unambiguous. `env AZLDEV_ALLOW_ROOT=1` is inline per
+      # .github/instructions/ado-pipeline.instructions.md.
+      xargs -x -n 50000 -d '\n' env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only -- \
+        < "$RENDER_SET_FILE"
+      echo "##[endgroup]"
+    env:
+      RENDER_SET_FILE: $(renderSetFile)
+    displayName: "Verify rendered specs are up to date"

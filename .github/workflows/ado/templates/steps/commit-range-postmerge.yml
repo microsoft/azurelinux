@@ -1,0 +1,63 @@
+# Microsoft Corporation
+#
+# Step template: resolve the (target, source) commit range for a POST-MERGE
+# delta build.
+#   source = the commit that triggered this run (Build.SourceVersion).
+#   target = the previous CI build's commit on this branch, looked up via the
+#            ADO Builds API. Pairing each build with the one immediately before
+#            it keeps concurrent runs from overlapping and captures every commit
+#            a rebase merge appends. Runs after the dependency-install step
+#            because it imports the azure-devops SDK. See
+#            scripts/ci/ado/determine_commit_range.py for the full rationale and
+#            the first-run (source^1) fallback.
+#
+# Emits job-scope variables sourceCommit and targetCommit.
+
+steps:
+  - script: |
+      set -euo pipefail
+      # The helper prints the resolved range to stdout as two lines:
+      #   sourceCommit=<sha>
+      #   targetCommit=<sha>
+      # (all diagnostics go to stderr). We parse them and set the
+      # pipeline variables HERE so the variable wiring is visible in
+      # the YAML rather than hidden in the script.
+      range_output="$(python3 scripts/ci/ado/determine_commit_range.py \
+        --definition-id "$SYSTEM_DEFINITIONID" \
+        --current-build-id "$BUILD_BUILDID" \
+        --branch "$DELTA_QUERY_BRANCH" \
+        --source-commit "$BUILD_SOURCEVERSION")"
+      echo "$range_output"
+
+      source_commit="$(sed -n 's/^sourceCommit=//p' <<< "$range_output")"
+      target_commit="$(sed -n 's/^targetCommit=//p' <<< "$range_output")"
+      if [[ -z "$source_commit" || -z "$target_commit" ]]; then
+        echo "##[error]determine_commit_range.py did not emit a source/target commit range."
+        exit 1
+      fi
+
+      # The helper emits baselineQueryFailed=true ONLY when the ADO Builds API
+      # query itself failed (bad SYSTEM_ACCESSTOKEN scope, network, SDK
+      # misconfig) -- as opposed to a successful query that simply found no
+      # prior build (a benign first run). A failed query silently degrades EVERY
+      # run to a single-commit delta, with the weekly true-up as the sole safety
+      # net, so raise a visible pipeline warning here rather than letting it pass
+      # unnoticed.
+      if [[ "$(sed -n 's/^baselineQueryFailed=//p' <<< "$range_output")" == "true" ]]; then
+        echo "##vso[task.logissue type=warning]Delta build could not query previous builds; degraded to a single-commit delta (target=source^1). Check the SYSTEM_ACCESSTOKEN scope and ADO Builds API connectivity. The weekly true-up job covers any gap."
+      fi
+
+      # Mark the resolved range readonly: it is computed once here and only
+      # consumed downstream, so locking it prevents a later step from clobbering
+      # the commit range (matches changedComponentsFile / renderSetFile below).
+      echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
+      echo "##vso[task.setvariable variable=targetCommit;isreadonly=true]$target_commit"
+    env:
+      SYSTEM_COLLECTIONURI: $(System.CollectionUri)
+      SYSTEM_TEAMPROJECT: $(System.TeamProject)
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+      SYSTEM_DEFINITIONID: $(System.DefinitionId)
+      BUILD_BUILDID: $(Build.BuildId)
+      DELTA_QUERY_BRANCH: $(Build.SourceBranch)
+      BUILD_SOURCEVERSION: $(Build.SourceVersion)
+    displayName: "Determine source and target commit range"

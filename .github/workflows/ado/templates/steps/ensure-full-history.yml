@@ -1,0 +1,20 @@
+# Microsoft Corporation
+#
+# Step template: ensure the full git history is present, ONCE, before anything
+# that needs it. The OneBranch checkout may be shallow (depth 1), but lock
+# resolution, spec rendering (rpmautospec derives Release/changelog from
+# `git log` over the lock files), and commit-range detection all require the
+# complete history. Doing the unshallow here means the helper scripts can assume
+# full history and never fetch themselves -- a `git fetch --depth=N` inside a
+# script would re-shallow a full clone, which silently corrupts the rpmautospec
+# Release calculation (and is a footgun when running the scripts locally).
+
+steps:
+  - script: |
+      set -euo pipefail
+      if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+        echo "##[group]Fetching full git history"
+        git fetch --unshallow
+        echo "##[endgroup]"
+      fi
+    displayName: "Ensure full git history"

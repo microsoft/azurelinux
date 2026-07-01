@@ -1,0 +1,70 @@
+# Microsoft Corporation
+#
+# Step template: detect changed components and prepare the render set, then
+# publish changed-components.json as a triage artifact on every exit path.
+# Emits job-scope variables changedComponentsFile and renderSetFile for
+# downstream consumers (the render-verify step and the trailing Control Tower
+# call).
+#
+# The (from, to) commit range is read from job-scope variables named by the
+# fromCommitVar / toCommitVar parameters, so the post-merge (targetCommit ->
+# sourceCommit) and PR (baseCommit -> sourceCommit) pipelines share this
+# template unchanged. compute_change_set.sh diffs from -> to.
+#
+# compute_change_set.sh hard-fails on the supply-chain drift tripwire
+# (sourcesChange == true without an identity change in {added, changed,
+# deleted}): that combination would let attacker-supplied bytes ride into the
+# lookaside under an unchanged component identity, so it fails closed.
+#
+# Requires the job-scope variable `ob_outputDirectory` (the triage artifact is
+# published there).
+
+parameters:
+  - name: fromCommitVar
+    type: string
+    default: targetCommit
+  - name: toCommitVar
+    type: string
+    default: sourceCommit
+
+steps:
+  - script: |
+      set -euo pipefail
+      change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
+      json_file="$change_set_dir/changed-components.json"
+      render_set_file="$change_set_dir/render-set.txt"
+
+      # Publish the changed-components JSON for post-mortem triage on
+      # EVERY exit path, not just success -- if azldev hard-fails on a
+      # consistency tripwire the partial JSON is exactly what an
+      # operator needs to investigate.
+      publish_artifact() {
+        if [[ -s "$json_file" ]]; then
+          mkdir -p "$(ob_outputDirectory)/changed-components"
+          cp "$json_file" "$(ob_outputDirectory)/changed-components/" || true
+        fi
+      }
+      trap publish_artifact EXIT
+
+      echo "##[group]Preparing change set"
+      scripts/ci/components/compute_change_set.sh \
+        --output-dir "$change_set_dir" \
+        --from-commit "$FROM_COMMIT" \
+        --to-commit "$TO_COMMIT"
+      echo "##[endgroup]"
+
+      echo "##[group]Upload set (sourcesChange == true, changeType in {added, changed})"
+      upload_count=$(jq -r '[.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed")))] | length' "$json_file")
+      jq -r '.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed"))) | .component' "$json_file" | sort
+      echo "Total: $upload_count component(s) to upload."
+      echo "##[endgroup]"
+
+      # Publish the downstream pipeline variables now that the change set is
+      # ready (consumed by the render-verify step and the trailing Control
+      # Tower call).
+      echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$json_file"
+      echo "##vso[task.setvariable variable=renderSetFile;isreadonly=true]$render_set_file"
+    env:
+      FROM_COMMIT: $(${{ parameters.fromCommitVar }})
+      TO_COMMIT: $(${{ parameters.toCommitVar }})
+    displayName: "Prepare change set"
