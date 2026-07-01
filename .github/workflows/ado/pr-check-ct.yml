@@ -57,6 +57,12 @@ trigger: none
 
 pr: none
 
+# Source the Control Tower API audience + base URL from the variable group here,
+# in the wrapper (the env-specific entry point), and pass them to the stages
+# template as parameters. The stages template stays variable-group-agnostic.
+variables:
+  - group: ControlTower-PRCheck
+
 resources:
   repositories:
     - repository: templates
@@ -92,7 +98,8 @@ extends:
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           poolType: linux
           serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
-          variableGroup: ControlTower-PRCheck
+          apiAudience: $(ApiAudience)
+          apiBaseAFDUrl: $(ApiBaseAFDUrl)
           # Control Tower package target for the 4.0 branch.
           packageTarget: azl4
           # This check WAITS for the Control Tower build to finish (pass/fail),

@@ -46,7 +46,11 @@ parameters:
     default: linux
   - name: serviceConnection
     type: string
-  - name: variableGroup
+  # Control Tower API audience + base URL, passed by the wrapper (which owns the
+  # variable group / env-specific values). The template stays group-agnostic.
+  - name: apiAudience
+    type: string
+  - name: apiBaseAFDUrl
     type: string
   # Control Tower package target for builds submitted from this pipeline
   # (e.g. azl4 for the 4.0 branch, azl5 for 5.0). Bound per-branch by the
@@ -80,7 +84,6 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - group: ${{ parameters.variableGroup }}
           - name: ob_outputDirectory
             value: ${{ parameters.outputDirectory }}
           - name: ob_artifactBaseName
@@ -110,8 +113,7 @@ stages:
           # Call Control Tower 'prcheck' BEFORE the build. Among other things,
           # prcheck uploads the missing lookaside sources for the changed
           # components, so they are available when the scratch build below
-          # fetches them. It runs first for exactly that reason -- the build
-          # depends on the sources prcheck uploads.
+          # fetches them.
           - task: AzureCLI@2
             displayName: "Call Control Tower 'prcheck' API"
             inputs:
@@ -124,15 +126,13 @@ stages:
                 python3 scripts/ci/control-tower/run_prcheck.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$CT_BUILD_REASON" \
+                  --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
                   --source-commit "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseAFDUrl)
-              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
-              CT_BUILD_REASON: $(Build.Reason)
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               # TODO: Base commit is not used yet. Will be needed once we move
@@ -170,7 +170,7 @@ stages:
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$CT_BUILD_REASON" \
+                  --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
                   --package-target "${{ parameters.packageTarget }}" \
                   --commit-sha "$SOURCE_COMMIT" \
@@ -178,10 +178,8 @@ stages:
                   --wait-for-completion \
                   --poll-timeout-seconds ${{ parameters.pollTimeoutSeconds }}
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseAFDUrl)
-              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
-              CT_BUILD_REASON: $(Build.Reason)
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)

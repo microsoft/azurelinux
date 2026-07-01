@@ -41,6 +41,13 @@ See [.github/workflows/ado/package-build.yml](.github/workflows/ado/package-buil
 
 Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See the granular templates under [.github/workflows/ado/templates/steps/](.github/workflows/ado/templates/steps/) (e.g. `ensure-full-history.yml`, `install-deps.yml`, `prepare-change-set.yml`), shared by the `package-build` (via `common-steps.yml`) and `pr-check-ct` pipelines.
 
+**Parameterize the names of pipeline variables a template sets.** If a step template sets a job variable (`##vso[task.setvariable variable=<name>...]`), expose `<name>` through a parameter (with the conventional name as the default) so a caller composing several templates can rename it to avoid collisions. Use a consistent suffix scheme:
+
+- **Same-job variables** (default `##vso[task.setvariable]`, no `isoutput`): parameter `<var_name>Var` (e.g. `sourceCommitVar`, `changedComponentsFileVar`).
+- **Output variables** (`isoutput=true`, visible in other jobs/stages): parameter `<var_name>OutputVar`, AND the setting task's `name:` must also be parameterized (a cross-job output variable is referenced as `<taskName>.<var>`, so the task name is part of the contract).
+
+Reading another template's variable follows the same shape: take a `<var_name>Var` parameter and reference it as `$(${{ parameters.<var_name>Var }})` in `env:` (e.g. `prepare-change-set.yml`'s `fromCommitVar`/`toCommitVar`).
+
 ## OneBranch templates (MANDATORY — wrapper only)
 
 The rules in this section apply to the **wrapper** file. The raw stages template MUST NOT reference OneBranch at all.

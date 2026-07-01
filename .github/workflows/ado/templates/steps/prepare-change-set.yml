@@ -26,6 +26,12 @@ parameters:
   - name: toCommitVar
     type: string
     default: sourceCommit
+  - name: changedComponentsFileVar
+    type: string
+    default: changedComponentsFile
+  - name: renderSetFileVar
+    type: string
+    default: renderSetFile
 
 steps:
   - script: |
@@ -62,8 +68,8 @@ steps:
       # Publish the downstream pipeline variables now that the change set is
       # ready (consumed by the render-verify step and the trailing Control
       # Tower call).
-      echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$json_file"
-      echo "##vso[task.setvariable variable=renderSetFile;isreadonly=true]$render_set_file"
+      echo "##vso[task.setvariable variable=${{ parameters.changedComponentsFileVar }};isreadonly=true]$json_file"
+      echo "##vso[task.setvariable variable=${{ parameters.renderSetFileVar }};isreadonly=true]$render_set_file"
     env:
       FROM_COMMIT: $(${{ parameters.fromCommitVar }})
       TO_COMMIT: $(${{ parameters.toCommitVar }})

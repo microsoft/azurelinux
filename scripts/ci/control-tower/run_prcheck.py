@@ -167,10 +167,6 @@ def main() -> None:
     print("Payload:")
     print(json.dumps(payload, indent=2))
 
-    if args.build_reason == "PullRequest":
-        print("Skipping Control Tower call - pull request triggers are not supported, yet.")
-        return
-
     if not components:
         print("No affected components detected between source and target commits; skipping Control Tower call.")
         return

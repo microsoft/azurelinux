@@ -14,6 +14,14 @@
 # merge base). These feed prepare-change-set.yml (from=baseCommit,
 # to=sourceCommit) and the trailing Control Tower call.
 
+parameters:
+  - name: sourceCommitVar
+    type: string
+    default: sourceCommit
+  - name: baseCommitVar
+    type: string
+    default: baseCommit
+
 steps:
   # Fail fast, at compile time, when this is not a PR build: the merge-commit
   # parent logic below only makes sense for a PullRequest trigger. Including the
@@ -47,6 +55,6 @@ steps:
         fi
       done
       echo "Resolved range: base(merge-base)=$base_commit source=$source_commit"
-      echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
-      echo "##vso[task.setvariable variable=baseCommit;isreadonly=true]$base_commit"
+      echo "##vso[task.setvariable variable=${{ parameters.sourceCommitVar }};isreadonly=true]$source_commit"
+      echo "##vso[task.setvariable variable=${{ parameters.baseCommitVar }};isreadonly=true]$base_commit"
     displayName: "Determine PR commit range"
