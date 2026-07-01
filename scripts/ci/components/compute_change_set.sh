@@ -64,6 +64,7 @@ changed_file="$output_dir/changed-components.json"
 specs_diff_file="$output_dir/specs-diff.txt"
 render_set_file="$output_dir/render-set.txt"
 
+# @AI: replace below wrapper script with function, unless you find it used in multiple places. If replaced, check for necessary doc updates.
 "$script_dir/compute_changed.sh" \
   --output-file "$changed_file" \
   --source-commit "$source_commit" \

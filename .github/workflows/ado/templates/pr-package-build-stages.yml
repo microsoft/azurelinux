@@ -164,6 +164,7 @@ stages:
           # pipeline variables so the wiring stays visible in the YAML.
           - script: |
               set -euo pipefail
+              # AI: move build reason check to a template expression with 'variables['Build.Reason']' to fail fast.
               if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
                 echo "##[error]HEAD is not a merge commit -- this pipeline must run as a PR build (Build.Reason=PullRequest)."
                 exit 1
@@ -183,6 +184,7 @@ stages:
               done
               echo "Resolved range: base(merge-base)=$target_commit source=$source_commit"
               echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
+              # AI: re-name to 'baseCommit' and 'base_commit', since this is not the target tip but the merge base (fork point).
               echo "##vso[task.setvariable variable=targetCommit;isreadonly=true]$target_commit"
             displayName: "Determine PR commit range"
 
@@ -195,8 +197,11 @@ stages:
           # on PRs. The script self-prefixes AZLDEV_ALLOW_ROOT=1 internally.
           - script: |
               set -euo pipefail
+              # AI: use job variables for 'changedComponentsFile' and derive 'change_set_dir' from it, rather than hardcoding the staging path here.
               change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
               echo "##[group]Preparing change set"
+              # AI: extend the script below to allow optionally to set the names of the output files (changed-components.json, specs-diff.txt, render-set.txt) via parameters, rather than hardcoding them in the script. Then use the new parameters here to set the output file names, so the wrapper can control them if needed.
+              # AI: re-name the --X-commit parameters to --from-commit and --to-commit for clarity, since the script is computing the diff from the merge base (fork point) to the PR head. Once done, make sure the ordering of the passed commits is correct - seems wrong in case of this YAML.
               scripts/ci/components/compute_change_set.sh \
                 --output-dir "$change_set_dir" \
                 --source-commit "$SOURCE_COMMIT" \
