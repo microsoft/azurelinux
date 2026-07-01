@@ -29,6 +29,19 @@ Two distinct threats, both in scope:
   `%install`, …) in production as the check's intended function. This is a
   property of *what the check does*, not of how it authenticates.
 
+## Authorization model (decide alongside the option)
+
+Choosing an option also means deciding **how a privileged (secret-bearing) run
+is authorized** on a fork PR:
+
+1. **Automatically** on every fork PR.
+2. **Only when a maintainer allows it** — not any team member.
+3. **When any Write+ team member allows it.**
+
+Model 3 is **required** for the comment-triggered option. The internal-template
+and notifier options can be configured for any of the three (models 2–3 via the
+per-run ADO Environment approval noted below the table).
+
 ## How to read the comparison
 
 > [!WARNING]
@@ -55,7 +68,7 @@ approval prompt in the PR itself would take extra work.
 | --- | --- | --- | --- | --- |
 | [Comment-triggered `/azp run`](option-comment-trigger.md) | The SC token is present in a job that runs PR-HEAD YAML and scripts; safety depends on the commenter reviewing that exact commit | A GitHub **Write+** collaborator comments `/azp run` for each commit they want checked; Write+ members' own PRs (including from their forks) can be set to skip the comment | Single pipeline; PR status reported natively. **~2–3 days** | Yes, gated on the comment |
 | [Internal-template pattern](option-internal-template.md) | The SC is reachable only through a template the fork cannot modify; the fork can still attempt to reach other secrets and pipelines in the ADO project | Runs automatically on fork PRs once configured `*` | Private ADO template repo + SC checks; the isolated-project variant adds a dedicated project to own (the shared-project variant is cheaper but widens blast radius). **~2 weeks** | Yes |
-| [Notifier → trusted-internal split](option-notifier-split.md) | The PR only fires a no-secrets notifier pipeline that triggers a separate internal pipeline; the SC token never enters a fork-controlled job and the privileged stage runs trusted-branch code only | Runs automatically if the completion trigger fires for fork runs (verify — see the option); posting status onto the PR requires a GitHub App `*` | Two pipelines + a completion trigger, plus a GitHub App to report status. **2–3 weeks** | Yes |
+| [Notifier → trusted-internal split](option-notifier-split.md) | The PR only fires a no-secrets notifier pipeline that triggers a separate internal pipeline; the SC token never enters a fork-controlled job and the privileged stage runs trusted-branch code only | Runs automatically if the completion trigger fires for fork runs; posting status onto the PR requires a GitHub App `*` | Two pipelines + a completion trigger, plus a GitHub App to report status. **2–3 weeks** | Yes |
 | [GitHub Actions + OIDC](option-github-actions-oidc.md) *(not available)* | Disallowed for this scenario: OIDC into a production Entra tenant is [blocked by default, exception-only, and not usable from pull requests](https://eng.ms/docs/more/github-inside-microsoft/troubleshoot/oidc) ([Open Source Security policy](https://docs.opensource.microsoft.com/security/azure)) | — | N/A | No |
 | No fork PRs (for completeness) | No SC token is ever issued to a fork build; no automatic prod-Koji build on fork code (the build still runs the PR's spec at merge-queue time, gated by maintainer merge approval) | Fork PRs get no check; a maintainer pushes the branch upstream or relies on the merge-queue run | No new ADO or GitHub infrastructure. N/A | No |
 
