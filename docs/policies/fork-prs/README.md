@@ -40,7 +40,7 @@ is authorized** on a fork PR:
 
 Model 3 is **required** for the comment-triggered option. The internal-template
 and notifier options can be configured for any of the three (models 2–3 via the
-per-run ADO Environment approval noted below the table).
+per-run ADO Environment approval noted with the `*` footnote above the table).
 
 ## How to read the comparison
 
