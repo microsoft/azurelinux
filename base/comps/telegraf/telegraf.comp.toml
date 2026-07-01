@@ -7,7 +7,6 @@
 [components.telegraf]
 spec = { type = "local", path = "telegraf.spec" }
 # Local Go package authored by AzL: use rpmautospec (%autorelease / %autochangelog).
-release = { calculation = "autorelease" }
 
 [[components.telegraf.source-files]]
 filename = "telegraf-1.38.2.tar.gz"
