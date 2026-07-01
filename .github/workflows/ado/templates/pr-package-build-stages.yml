@@ -13,20 +13,21 @@
 #   3. Resolve the PR commit range from the merge commit's parents
 #      (^1 = target-branch tip, ^2 = PR head).
 #   4. Compute the changed-component set (shared compute_change_set.sh).
-#   5. Submit a *scratch* Control Tower build of the PR head for exactly those
+#   5. Call Control Tower 'prcheck' for those components: among other things it
+#      uploads the missing lookaside sources so they are present when the build
+#      below fetches them.
+#   6. Submit a *scratch* Control Tower build of the PR head for exactly those
 #      components (run_package_build.py --wait-for-completion). The build runs
 #      in Control Tower's own sandbox; this pipeline WAITS for it to reach a
 #      terminal state and fails the check if the build fails (or does not
 #      finish within the poll timeout). NO PR-controlled code is built on the
 #      CI agent -- only read-only change detection runs here.
 #
-# It deliberately does NOT reuse templates/steps/common-steps.yml: that shared
-# step set resolves the commit range via the *previous CI build* (the
-# post-merge delta logic), which is wrong for a PR. A PR range comes from the
-# merge commit's parents, computed inline below. Reusing common-steps would
-# also pull in the lock/render verify steps (already covered by the GitHub
-# Actions PR gates) and force a refactor of a file shared by two production
-# pipelines.
+# Setup + change detection are composed from the shared templates/steps/*
+# templates (the same ones the post-merge pipeline uses via common-steps.yml),
+# but with the PR commit-range template (merge-commit parents, not the
+# previous-build delta) and WITHOUT the lock/render-verify steps -- those PR
+# gates already run in GitHub Actions.
 #
 # Because it calls Control Tower, this pipeline needs the WIF service connection
 # and the Control Tower variable group (audience + base URL); the wrapper
@@ -86,132 +87,57 @@ stages:
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
         steps:
-          # Full history: `azldev component changed` tree-diffs two commits and
-          # rpmautospec derives Release/changelog from `git log`. The CI
-          # checkout may be shallow (depth 1); unshallow once, up front. Never
-          # `git fetch --depth=N` afterwards — that re-shallows a full clone and
-          # silently corrupts the rpmautospec Release calculation.
-          - script: |
-              set -euo pipefail
-              if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-                echo "##[group]Fetching full git history"
-                git fetch --unshallow
-                echo "##[endgroup]"
-              fi
-            displayName: "Ensure full git history"
+          # Shared setup + change detection, composed from the granular step
+          # templates. install-deps skips mock and the ADO API client (neither
+          # is needed for read-only change detection) but strips the go-git
+          # worktreeConfig extension so azldev can open the agent checkout.
+          - template: steps/ensure-full-history.yml
 
-          - task: PipAuthenticate@1
-            displayName: "Authenticate pip"
+          - template: steps/install-deps.yml
+            parameters:
+              normalizeGoGitConfig: true
+
+          # PR commit range = merge-commit parents (baseCommit = merge base,
+          # sourceCommit = PR head). prepare-change-set diffs baseCommit ->
+          # sourceCommit.
+          - template: steps/commit-range-pr.yml
+
+          - template: steps/prepare-change-set.yml
+            parameters:
+              fromCommitVar: baseCommit
+
+          # Call Control Tower 'prcheck' BEFORE the build. Among other things,
+          # prcheck uploads the missing lookaside sources for the changed
+          # components, so they are available when the scratch build below
+          # fetches them. It runs first for exactly that reason -- the build
+          # depends on the sources prcheck uploads.
+          - task: AzureCLI@2
+            displayName: "Call Control Tower 'prcheck' API"
             inputs:
-              artifactFeeds: "azl/ControlTowerFeed"
+              azureSubscription: ${{ parameters.serviceConnection }}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
 
-          # azldev opens the repo with go-git, which rejects a config that
-          # declares the `worktreeconfig` extension while
-          # core.repositoryformatversion is still 0:
-          #   "core.repositoryformatversion does not support extension: worktreeconfig"
-          # Native git tolerates this, and the ADO agent checkout leaves the
-          # extension set, so strip it before any azldev invocation. Each CI run
-          # is a fresh checkout so this is safe and self-contained.
-          # TODO: remove this step once azldev no longer needs the workaround
-          # (go-git v6 fixes the underlying bug):
-          # https://github.com/microsoft/azure-linux-dev-tools/issues/241
-          - script: |
-              set -euo pipefail
-              if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
-                echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
-                git config --unset-all extensions.worktreeConfig || true
-              fi
-            displayName: "Normalize git config for azldev (go-git)"
-
-          # Host deps for change detection + the Control Tower submission only:
-          # azldev (`azldev component changed` + git diff -- no mock, no build)
-          # and the Control Tower Python client. The build itself never runs on
-          # the agent; it runs asynchronously in Control Tower's own sandbox.
-          - script: |
-              set -euo pipefail
-              echo "##[group]Azldev (host, for change-set)"
-              # Only the version string comes from the PR checkout; reject a
-              # malformed/garbage value before it reaches `go install`.
-              AZLDEV_VERSION="$(tr -d '\n' < .azldev-version)"
-              if ! printf '%s' "$AZLDEV_VERSION" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
-                echo "##[error].azldev-version is empty or has unexpected characters"
-                exit 1
-              fi
-              echo "Installing azldev@${AZLDEV_VERSION}..."
-              go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
-
-              go_bin_path="$(go env GOPATH)/bin"
-              echo "##vso[task.prependpath]$go_bin_path"
-
-              "$go_bin_path/azldev" --version
-              echo "##[endgroup]"
-
-              echo "##[group]Python dependencies (Control Tower client)"
-              pip install -r scripts/ci/control-tower/requirements.txt
-              echo "##[endgroup]"
-            displayName: "Install host dependencies"
-
-          # Resolve the PR commit range. A PR-policy build checks out the MERGE
-          # commit (Build.SourceVersion): parent ^1 is the target-branch tip,
-          # parent ^2 is the PR head. The PR's true change set is the diff
-          # between their MERGE BASE (the fork point) and ^2 -- i.e.
-          # `git diff merge-base(^1,^2)..^2`, the same three-dot set GitHub's
-          # "Files changed" shows. We deliberately compare against the merge
-          # base, NOT the target tip: comparing against the tip additionally
-          # flags every component that landed on the target branch after the PR
-          # forked (the PR head still carries their pre-update state), which can
-          # balloon a 1-component PR into dozens. We read the range here and set
-          # pipeline variables so the wiring stays visible in the YAML.
-          - script: |
-              set -euo pipefail
-              # AI: move build reason check to a template expression with 'variables['Build.Reason']' to fail fast.
-              if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
-                echo "##[error]HEAD is not a merge commit -- this pipeline must run as a PR build (Build.Reason=PullRequest)."
-                exit 1
-              fi
-              source_commit="$(git rev-parse HEAD^2)"
-              # Baseline = the MERGE BASE (fork point) of the target-branch tip
-              # (HEAD^1) and the PR head (HEAD^2), NOT the target tip itself.
-              # See the block comment above for why; this is passed as the
-              # `--from-commit` baseline to the change-set helper.
-              target_commit="$(git merge-base HEAD^1 HEAD^2)"
-              # PR-supplied data is untrusted: validate both SHAs before use.
-              for sha in "$target_commit" "$source_commit"; do
-                if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
-                  echo "##[error]invalid commit SHA: $sha"
-                  exit 1
-                fi
-              done
-              echo "Resolved range: base(merge-base)=$target_commit source=$source_commit"
-              echo "##vso[task.setvariable variable=sourceCommit;isreadonly=true]$source_commit"
-              # AI: re-name to 'baseCommit' and 'base_commit', since this is not the target tip but the merge base (fork point).
-              echo "##vso[task.setvariable variable=targetCommit;isreadonly=true]$target_commit"
-            displayName: "Determine PR commit range"
-
-          # Compute the changed-component set with the shared, cross-pipeline
-          # single-source-of-truth helper (also used by the GitHub Actions PR
-          # gates). changed-components.json holds the per-component change
-          # records consumed by the Control Tower submit step below.
-          # compute_change_set.sh hard-fails on the supply-chain drift tripwire
-          # (sourcesChange without an identity change) -- a guard we want to keep
-          # on PRs. The script self-prefixes AZLDEV_ALLOW_ROOT=1 internally.
-          - script: |
-              set -euo pipefail
-              # AI: use job variables for 'changedComponentsFile' and derive 'change_set_dir' from it, rather than hardcoding the staging path here.
-              change_set_dir="$(Build.ArtifactStagingDirectory)/change-set"
-              echo "##[group]Preparing change set"
-              # from = merge base (fork point), to = PR head; the helper diffs
-              # from -> to. See the "Determine PR commit range" step above.
-              scripts/ci/components/compute_change_set.sh \
-                --output-dir "$change_set_dir" \
-                --from-commit "$TARGET_COMMIT" \
-                --to-commit "$SOURCE_COMMIT"
-              echo "##[endgroup]"
-              echo "##vso[task.setvariable variable=changedComponentsFile;isreadonly=true]$change_set_dir/changed-components.json"
+                python3 scripts/ci/control-tower/run_prcheck.py \
+                  --api-audience "$API_AUDIENCE" \
+                  --api-base-url "$API_BASE_URL" \
+                  --build-reason "$CT_BUILD_REASON" \
+                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                  --source-commit "$SOURCE_COMMIT" \
+                  --repo-uri "$UPSTREAM_REPO_URL"
             env:
+              API_AUDIENCE: $(ApiAudience)
+              API_BASE_URL: $(ApiBaseAFDUrl)
+              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
+              CT_BUILD_REASON: $(Build.Reason)
+              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
-              TARGET_COMMIT: $(targetCommit)
-            displayName: "Prepare change set"
+              # TODO: Base commit is not used yet. Will be needed once we move
+              # detection of affected components to CT. ADO task: 18816
+              BASE_COMMIT: $(baseCommit)
+              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
 
           # Submit a SCRATCH Control Tower build of the PR head for the changed
           # components. Scratch = throwaway: it never persists to a production
