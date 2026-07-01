@@ -1,15 +1,21 @@
 ---
 applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,.github/workflows/scripts/**"
-description: "Policy: GitHub PR fork builds for ADO pipelines under .github/workflows/ado/. Defines what is allowed, what is forbidden, and how to enforce it. Long-form rationale lives in docs/ado-pipelines-fork-pr-security.md."
+description: "Policy: GitHub PR fork builds for ADO pipelines under .github/workflows/ado/. Defines what is allowed, what is forbidden, and how to enforce it. Long-form rationale lives in docs/policies/fork-prs/."
 ---
 
 # Policy: GitHub PR fork builds for ADO pipelines
+
+> **Status — pending revision.** The fork-PR approach is being decided. The
+> candidate options and their trade-offs are laid out in
+> [`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md); no option
+> has been adopted yet. Until a decision is made and this file is updated, the
+> normative rule below remains the operative default.
 
 This policy governs how ADO pipelines under `.github/workflows/ado/` may
 be configured with respect to GitHub pull requests originating from
 **forks** of this repository. It is the operative rule. Long-form
 rationale, threat analysis, and design alternatives live in
-[`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md).
+[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md).
 
 > If anything in this policy conflicts with what the user is asking for,
 > **stop and ask** rather than guessing.
@@ -25,7 +31,7 @@ rationale, threat analysis, and design alternatives live in
   - ADO pipelines **without secrets access** (see definition below).
     Authors of such pipelines should still read the residual-risk
     section in
-    [`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md#residual-risks-of-non-secret-ado-pipelines-on-fork-prs)
+    [`docs/policies/fork-prs/cross-cutting-non-secret-risks.md`](../../docs/policies/fork-prs/cross-cutting-non-secret-risks.md#residual-risks-of-non-secret-ado-pipelines-on-fork-prs)
     before opting in to fork PR builds.
 
 ## Definitions
@@ -61,7 +67,7 @@ pipeline's identity and can call any API that identity is permitted to
 call. The full threat model and the design options that *could*
 mitigate it (internal-template pattern in shared vs. isolated ADO
 projects) are documented in
-[`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md).
+[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md).
 
 ## Hosted agents only
 
@@ -75,7 +81,7 @@ eliminates the risk of one workload leaking state to another via
 caches, modified dotfiles, planted binaries on `PATH`, or modified
 language-toolchain caches. The self-hosted-pool poisoning class of
 attack documented in
-[`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md) does not
+[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md) does not
 apply when this rule is followed.
 
 ## Network class (R0 vs R1)
@@ -143,7 +149,7 @@ to build fork PRs) requires:
 
 1. Implementations of at minimum the **internal-template
    pattern in an isolated ADO project** (Variant B in
-   [`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md#variant-b--isolated-ado-project)).
+   [`docs/policies/fork-prs/option-internal-template.md`](../../docs/policies/fork-prs/option-internal-template.md#variant-b--isolated-ado-project)).
 2. Discussion and explicit approval by project maintainers.
 3. Documentation of the approved exception in this file (or a
    sibling).

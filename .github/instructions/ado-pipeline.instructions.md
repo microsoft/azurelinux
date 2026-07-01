@@ -219,7 +219,7 @@ build_client = connection.clients.get_build_client()
 
 > Fork-PR builds for ADO pipelines with secrets access are governed by a
 > separate policy: [`ado-pr-check-fork-policy.instructions.md`](ado-pr-check-fork-policy.instructions.md).
-> Long-form rationale lives in [`docs/ado-pipelines-fork-pr-security.md`](../../docs/ado-pipelines-fork-pr-security.md).
+> Long-form rationale lives in [`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md).
 
 Apply all of these unless there is a documented reason not to:
 
