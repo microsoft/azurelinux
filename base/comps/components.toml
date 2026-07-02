@@ -6750,7 +6750,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.suitesparse]
 [components.sundials]
 [components.superlu_dist]
-[components.swift-lang]
 [components.swig]
 [components.switcheroo-control]
 [components.swtpm]
