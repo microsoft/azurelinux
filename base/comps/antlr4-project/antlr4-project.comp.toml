@@ -1,0 +1,3 @@
+# Don't build swift-antlr4-runtime as none of our packages depend on it.
+[components.antlr4-project]
+build.without = ["swift"]
