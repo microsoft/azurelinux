@@ -1,0 +1,26 @@
+# Telegraf — agent for collecting, processing, aggregating, and writing metrics.
+# Shipped in AzL 3.0 but missing from 4.0; this restores it as a general-purpose metrics
+# agent. Not available in Fedora; maintained as a local spec with vendored Go dependencies.
+# Curated ("Balanced") custom build keeps the binary's dependency/CVE surface small.
+# Packaged per the Fedora Go packaging guidelines for upstreaming:
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Golang/
+[components.telegraf]
+spec = { type = "local", path = "telegraf.spec" }
+# Local Go package authored by AzL: use rpmautospec (%autorelease / %autochangelog).
+
+[[components.telegraf.source-files]]
+filename = "telegraf-1.38.2.tar.gz"
+hash = "36c419978e98da9809e18865053399dd2198abc3d650f54424e3eb359ff8dfcb615f8b0a82dba484d03acfe5abe51a160a41ef486e5602f99400bd69e7afe48d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/influxdata/telegraf/archive/v1.38.2/telegraf-1.38.2.tar.gz" }
+
+[[components.telegraf.source-files]]
+filename = "telegraf-1.38.2-vendor.tar.bz2"
+# Reproducible vendor archive (generate_source_tarball.sh / go_vendor_archive).
+# Hosted in the AzL lookaside store (pkgs_modified) following the same scheme as other
+# non-upstream sources, e.g. base/comps/espeak-ng/espeak-ng.comp.toml. The blob must be
+# uploaded before CI source checks and package builds can fetch it; the merge queue's
+# sources-upload pipeline publishes changed-component sources.
+hash = "1108fe48086a7051c5cb89935c6de1c675c3ea8212a979d147ad0c03aef327c6234fa9eee292e4f9594ba9ec2cb757fc9eff46630aea43551bca3d948b30b27f"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/telegraf/telegraf-1.38.2-vendor.tar.bz2/sha512/1108fe48086a7051c5cb89935c6de1c675c3ea8212a979d147ad0c03aef327c6234fa9eee292e4f9594ba9ec2cb757fc9eff46630aea43551bca3d948b30b27f/telegraf-1.38.2-vendor.tar.bz2" }

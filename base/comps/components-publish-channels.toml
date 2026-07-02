@@ -2437,6 +2437,7 @@ components = [
     "tcpdump",
     "tcsh",
     "teckit",
+    "telegraf",
     "telnet",
     "testng",
     "texinfo",

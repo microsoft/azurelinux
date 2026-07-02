@@ -1,0 +1,12 @@
+# System user for the telegraf agent. Home is /etc/telegraf, matching upstream InfluxData and
+# its Fedora/RHEL packaging (`useradd -r -M -d /etc/telegraf`).
+#
+# The home field has no effect on configuration: the systemd unit loads config via an explicit
+# `-config /etc/telegraf/telegraf.conf -config-directory /etc/telegraf/telegraf.d`, independent
+# of $HOME. /etc/telegraf is root-owned and not writable by telegraf (upstream ships it with -M,
+# so it is never a writable home), and that is fine here because the curated plugin set writes
+# nothing under $HOME: the Azure credentials in use (NewDefaultAzureCredential /
+# NewManagedIdentityCredential) keep tokens in memory and azidentity's optional on-disk cache is
+# not linked in. Agent state (the statefile) lives separately under /var/lib/telegraf.
+# Type Name      ID  GECOS       Home directory   Shell
+u     telegraf    -   "Telegraf"  /etc/telegraf    /usr/sbin/nologin

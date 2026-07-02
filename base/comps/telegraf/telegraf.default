@@ -1,0 +1,2 @@
+# Extra command-line options passed to telegraf by the systemd unit.
+#TELEGRAF_OPTS=
