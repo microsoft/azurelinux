@@ -1,158 +1,71 @@
 ---
-applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/*.yml,.github/workflows/scripts/**"
-description: "Policy: GitHub PR fork builds for ADO pipelines under .github/workflows/ado/. Defines what is allowed, what is forbidden, and how to enforce it. Long-form rationale lives in docs/policies/fork-prs/."
+applyTo: ".github/workflows/ado/*.yml,.github/workflows/ado/templates/**/*.yml,scripts/ci/**"
+description: "Policy: how ADO pipelines under .github/workflows/ado/ handle GitHub fork pull requests — what is allowed, what is forbidden, and how it is enforced."
 ---
 
 # Policy: GitHub PR fork builds for ADO pipelines
 
-> **Status — pending revision.** The fork-PR approach is being decided. The
-> candidate options and their trade-offs are laid out in
-> [`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md); no option
-> has been adopted yet. Until a decision is made and this file is updated, the
-> normative rule below remains the operative default.
-
-This policy governs how ADO pipelines under `.github/workflows/ado/` may
-be configured with respect to GitHub pull requests originating from
-**forks** of this repository. It is the operative rule. Long-form
-rationale, threat analysis, and design alternatives live in
-[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md).
+The operative rule for how ADO pipelines under `.github/workflows/ado/` run
+against GitHub pull requests from **forks** of this repository.
 
 > If anything in this policy conflicts with what the user is asking for,
 > **stop and ask** rather than guessing.
 
 ## Scope
 
-- **In scope:** ADO YAML pipelines under `.github/workflows/ado/`
-  (wrappers and raw stages templates) and their helper scripts under
-  `.github/workflows/scripts/`.
-- **Out of scope (today):**
-  - GitHub Actions workflows under `.github/workflows/*.yml`. They have
-    a different security model and are not addressed here.
-  - ADO pipelines **without secrets access** (see definition below).
-    Authors of such pipelines should still read the residual-risk
-    section in
-    [`docs/policies/fork-prs/cross-cutting-non-secret-risks.md`](../../docs/policies/fork-prs/cross-cutting-non-secret-risks.md#residual-risks-of-non-secret-ado-pipelines-on-fork-prs)
-    before opting in to fork PR builds.
+- **In scope:** ADO YAML pipelines under `.github/workflows/ado/` (wrappers and
+  raw stages templates) and their helper scripts under
+  `scripts/ci/`.
+- **Out of scope:** GitHub Actions workflows under `.github/workflows/*.yml`
+  (different security model).
 
 ## Definitions
 
-- **Fork PR** -- a GitHub pull request whose source branch lives in a
-  fork of this repository (i.e. not pushed to a branch of the upstream
-  repository).
-- **Upstream PR** -- a pull request whose source branch lives in the
-  upstream repository itself.
-- **Merge queue commit** -- a commit produced by the GitHub merge queue
-  on a `gh-readonly-queue/<base>/pr-<n>-<sha>` branch.
-- **Secrets access** -- an ADO pipeline has secrets access if **any**
-  of the following are true:
-  - It uses a service connection (e.g. `azureSubscription:`,
-    `serviceConnection:` inputs on tasks such as `AzureCLI@2`).
-  - It binds a variable group via `variables: - group: <name>`.
-  - It downloads a secure file via `DownloadSecureFile@1` (or similar).
-  - It runs in an ADO Environment that has approvals or secret-bearing
-    resources attached.
-  - It otherwise has any pipeline-level mechanism through which a
-    credential, token, or sensitive value reaches the running job.
+- **Fork PR** — a pull request whose source branch lives in a fork, not in a
+  branch of the upstream repository.
+- **Merge-queue commit** — a commit on a `gh-readonly-queue/<base>/pr-<n>-<sha>`
+  branch produced by the GitHub merge queue.
+- **Privileged check** — a pipeline with **secrets access**: it uses a service
+  connection (e.g. `azureSubscription:` / `serviceConnection:`), binds a
+  secret-bearing variable group, downloads a secure file, or runs in a
+  secret-bearing ADO Environment — i.e. a credential or token reaches the job.
+  Currently the source-upload + package-build check is the privileged one.
 
-## Normative rule
+## Rules
 
-ADO pipelines with secrets access **MUST NOT** be configured to build
-fork PRs.
+Contributions — including from internal developers — arrive as **fork PRs**.
 
-**Why (brief):** a fork PR can rewrite any file in the PR HEAD,
-including pipeline YAML, shell snippets, and helper scripts. If that
-code runs in a job bound to a service connection or a secret-bearing
-variable group, the attacker gets arbitrary code execution under the
-pipeline's identity and can call any API that identity is permitted to
-call. The full threat model and the design options that *could*
-mitigate it (internal-template pattern in shared vs. isolated ADO
-projects) are documented in
-[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md).
+1. **Non-privileged checks** build fork PRs automatically.
+2. **Privileged checks MUST NOT build fork PRs automatically.** A privileged
+   check builds a fork PR only when an authorized reviewer triggers it **per
+   commit** with an Azure Pipelines `/azp run` comment. This applies to **every**
+   fork PR, including those opened by team members.
+   - On the privileged pipeline, "Make secrets available to builds of forks" is
+     ON **and** "Require a team member's comment before building a pull request"
+     is ON, so no fork build receives secrets without an explicit per-commit
+     comment.
+   - Authorization is currently any **Write+** collaborator; the project is
+     narrowing Write+ to maintainers so this becomes maintainer-only.
+3. **Hosted agents only** — Microsoft-hosted agents or **1ES Hosted Pools**.
+   Self-hosted agent pools are forbidden.
+4. **CODEOWNERS** MUST cover `.github/workflows/ado/**` and
+   `scripts/ci/**`, requiring maintainer review.
+5. **PR-derived input** (branch names, commit SHAs, PR numbers, `git diff`
+   filenames) MUST be regex-validated before use in shell, file paths, or HTTP
+   calls.
+6. **Secrets** are passed via the task `env:` block, never inline `$(...)`.
+7. **Network class** — prefer the lowest-trust `LinuxHostVersion.Network` the
+   workload allows; a higher-trust class MUST be justified by the wrapper author.
+8. **YAML triggers** stay `trigger: none` / `pr: none`; PR firing is configured
+   in ADO, per the [ADO pipeline instructions](ado-pipeline.instructions.md).
 
-## Hosted agents only
+## Reviewer checklist (every change to an ADO pipeline)
 
-All ADO pipelines under `.github/workflows/ado/` **MUST** run on
-hosted agent pools -- either Microsoft-hosted agents or **1ES Hosted
-Pools** (the internal Microsoft hosted-pool offering defined in Azure).
-Self-hosted agent pools are forbidden.
-
-**Why:** hosted pools guarantee a clean worker for each build. This
-eliminates the risk of one workload leaking state to another via
-caches, modified dotfiles, planted binaries on `PATH`, or modified
-language-toolchain caches. The self-hosted-pool poisoning class of
-attack documented in
-[`docs/policies/fork-prs/`](../../docs/policies/fork-prs/README.md) does not
-apply when this rule is followed.
-
-## Network class (R0 vs R1)
-
-When a pipeline executes any PR-derived content (which includes
-upstream PRs and merge-queue commits), prefer the **lowest-trust
-network class** the workload can run on (e.g. `R0` over `R1`). The
-chosen `LinuxHostVersion.Network` value in the wrapper's OneBranch
-`featureFlags` is a security-relevant decision and should be
-explicitly justified by the wrapper author. Higher-trust network
-classes increase the surface available to attacker-controlled code if
-any of the other rules are ever bypassed.
-
-## CODEOWNERS coverage
-
-`.github/workflows/ado/**` and `.github/workflows/scripts/**` **MUST**
-have CODEOWNERS entries that require maintainer review on any change.
-
-**Why:** the wrapper, the raw stages template, and the helper scripts
-are all part of the trust boundary. A merged malicious change to any
-of them can weaken every other control in this policy.
-
-## Enforcement
-
-To comply with the normative rule, configure the ADO pipeline as
-follows:
-
-1. **GitHub PR trigger settings** (ADO pipeline UI -> Triggers -> Pull
-   request validation, **not** YAML):
-   - "Build pull requests from forks of this repository" -> **OFF**.
-   - "Make secrets available to builds of forks" -> **OFF** (defense
-     in depth: this must be off even if the previous toggle is also
-     off, in case the previous toggle is ever flipped by mistake).
-2. **GitHub branch policy / merge queue** (GitHub repo settings):
-   - The pipeline's check is required only on PRs from upstream
-     branches and on merge-queue commits.
-3. **YAML triggers** stay as `trigger: none` / `pr: none` per the
-   existing [ADO pipeline instructions](ado-pipeline.instructions.md);
-   PR firing is configured in ADO, not in YAML.
-
-## Reviewer checklist (apply on every change to an ADO pipeline)
-
-Tick these off before approving:
-
-- [ ] Pipeline still runs on a hosted pool (Microsoft-hosted or 1ES
-      Hosted Pool). No self-hosted pool introduced.
-- [ ] The ADO pipeline's GitHub PR trigger does **not** enable fork PR
-      builds (verify in the ADO UI; YAML cannot guarantee this).
-- [ ] If the change adds or modifies a service connection, variable
-      group, secure file, or secret-bearing environment, the policy
-      author confirms the pipeline is still upstream-PR-only.
-- [ ] PR-derived strings (branch names, commit SHAs, PR numbers,
-      filenames produced by `git diff`, etc.) are sanitized /
-      regex-validated before being used in shell, file paths, or HTTP
-      calls.
-- [ ] CODEOWNERS still covers the modified files.
-- [ ] Network class (`LinuxHostVersion.Network`) is no higher-trust
-      than the workload requires.
-
-## Exceptions
-
-There are **no standing exceptions** to the normative rule today. A
-future exception (i.e. allowing a specific secret-bearing ADO pipeline
-to build fork PRs) requires:
-
-1. Implementations of at minimum the **internal-template
-   pattern in an isolated ADO project** (Variant B in
-   [`docs/policies/fork-prs/option-internal-template.md`](../../docs/policies/fork-prs/option-internal-template.md#variant-b--isolated-ado-project)).
-2. Discussion and explicit approval by project maintainers.
-3. Documentation of the approved exception in this file (or a
-   sibling).
-
-Until such an exception is approved and documented, the rule is
-absolute.
+- [ ] Runs on a hosted pool (no self-hosted pool introduced).
+- [ ] No privileged check builds fork PRs automatically — it is comment-gated
+      per commit (verify in the ADO UI; YAML cannot guarantee this).
+- [ ] "Make secrets available to builds of forks" is enabled **only** on the
+      privileged pipeline, with the comment requirement ON.
+- [ ] PR-derived strings are sanitized / regex-validated.
+- [ ] CODEOWNERS covers the modified files.
+- [ ] Secrets pass via `env:`; network class is no higher-trust than required.
