@@ -5,8 +5,8 @@
 
 Summary:       High-performance and highly configurable free RADIUS server
 Name:          freeradius
-Version:       3.2.5
-Release:       4%{?dist}
+Version:       3.2.10
+Release:       1%{?dist}
 Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
@@ -14,7 +14,7 @@ URL:           https://www.freeradius.org/
 
 %global dist_base freeradius-server-%{version}
 
-Source0:   https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_5/%{dist_base}.tar.bz2
+Source0:   https://www.freeradius.org/ftp/pub/freeradius/%{dist_base}.tar.bz2
 Source100: radiusd.service
 Source102: freeradius-logrotate
 Source103: freeradius-pam-conf
@@ -181,6 +181,15 @@ BuildRequires: json-c-devel
 
 %description rest
 This plugin provides the REST support for the FreeRADIUS server project.
+
+%package kafka
+Summary: Kafka producer support for FreeRADIUS
+Requires: %{name} = %{version}-%{release}
+Requires: librdkafka1
+BuildRequires: librdkafka-devel
+
+%description kafka
+This plugin provides Kafka producer support for the FreeRADIUS server project.
 
 %prep
 %autosetup -p1 -n %{dist_base}
@@ -516,6 +525,7 @@ EOF
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/wimax
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/yubikey
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/dpsk
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/proxy_rate_limit
 
 # mods-enabled
 # symlink: /etc/raddb/mods-enabled/xxx -> ../mods-available/xxx
@@ -550,7 +560,8 @@ EOF
 %config(missingok) /etc/raddb/mods-enabled/unix
 %config(missingok) /etc/raddb/mods-enabled/unpack
 %config(missingok) /etc/raddb/mods-enabled/utf8
-
+%config(missingok) /etc/raddb/mods-enabled/dpsk
+%config(missingok) /etc/raddb/mods-enabled/proxy_rate_limit
 # policy
 %dir %attr(750,root,radiusd) /etc/raddb/policy.d
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/policy.d/accounting
@@ -625,6 +636,7 @@ EOF
 %{_libdir}/freeradius/rlm_pap.so
 %{_libdir}/freeradius/rlm_passwd.so
 %{_libdir}/freeradius/rlm_preprocess.so
+%{_libdir}/freeradius/rlm_proxy_rate_limit.so
 %{_libdir}/freeradius/rlm_radutmp.so
 %{_libdir}/freeradius/rlm_realm.so
 %{_libdir}/freeradius/rlm_replicate.so
@@ -868,7 +880,16 @@ EOF
 %{_libdir}/freeradius/rlm_rest.so
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/rest
 
+%files kafka
+%{_libdir}/freeradius/rlm_kafka.so
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/kafka
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-available/kafka_async
+%attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/kafka/messages-json.conf
+
 %changelog
+* Tue Jun 16 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.10-1
+- Upgrade to v3.2.10
+
 * Tue Jan 06 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 3.2.5-4
 - Bumping release to rebuild with new 'net-snmp' libs.
 
