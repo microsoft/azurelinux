@@ -21,8 +21,6 @@ parameters:
     default: linux
   - name: serviceConnection
     type: string
-  # Control Tower API audience + base URL, passed by the wrapper (which owns the
-  # variable group / env-specific values). The template stays group-agnostic.
   - name: apiAudience
     type: string
   - name: apiBaseAFDUrl
@@ -30,8 +28,7 @@ parameters:
   - name: timeoutInMinutes
     type: number
   # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0). Bound per-branch by the
-  # wrapper so a branch's builds land in the correct target.
+  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
   - name: packageTarget
     type: string
 
@@ -57,8 +54,6 @@ stages:
             value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
-          # Runtime-consumed params surfaced as variables so a caller may pass
-          # runtime $[ ] / $(macro) expressions (evaluated here, not inline).
           - name: apiAudience
             value: ${{ parameters.apiAudience }}
           - name: apiBaseAFDUrl
@@ -97,3 +92,6 @@ stages:
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+              # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
+              # not add a BUILD_REASON entry here -- the agent silently ignores
+              # env: overrides of that reserved predefined variable.

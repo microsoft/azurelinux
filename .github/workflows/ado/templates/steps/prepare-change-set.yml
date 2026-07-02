@@ -7,9 +7,8 @@
 # call).
 #
 # The (from, to) commit range is read from job-scope variables named by the
-# fromCommitVar / toCommitVar parameters, so the post-merge (targetCommit ->
-# sourceCommit) and PR (baseCommit -> sourceCommit) pipelines share this
-# template unchanged. compute_change_set.sh diffs from -> to.
+# fromCommitVar / toCommitVar parameters (defaults targetCommit -> sourceCommit).
+# compute_change_set.sh diffs from -> to.
 #
 # compute_change_set.sh hard-fails on the supply-chain drift tripwire
 # (sourcesChange == true without an identity change in {added, changed,

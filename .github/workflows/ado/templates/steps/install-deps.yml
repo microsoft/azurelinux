@@ -3,15 +3,13 @@
 # Step template: authenticate to the internal pip feed and install the host
 # tools the Control Tower change-detection + submission steps need. azldev is
 # always installed (its version comes from the committed .azldev-version and is
-# validated before use); everything else is opt-in so each pipeline pulls only
-# what it uses:
-#   installMock            - mock + rpmautospec, needed by the post-merge
-#                            pipelines' lock/render steps. The PR check does
-#                            read-only change detection and does not need it.
-#   installAdoRequirements - the azure-devops SDK used by the post-merge
-#                            commit-range helper (determine_commit_range.py).
+# validated before use); everything else is opt-in:
+#   installMock            - install mock + rpmautospec (needed for lock/render
+#                            steps); leave off for change-detection-only jobs.
+#   installAdoRequirements - install the azure-devops SDK used by
+#                            determine_commit_range.py (post-merge delta helper).
 #   normalizeGoGitConfig   - strip extensions.worktreeConfig so azldev's go-git
-#                            can open the ADO-agent checkout (PR check only).
+#                            can open the ADO-agent checkout.
 
 parameters:
   - name: installMock

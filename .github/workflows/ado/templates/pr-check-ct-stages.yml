@@ -31,8 +31,7 @@
 # gates already run in GitHub Actions.
 #
 # Because it calls Control Tower, this pipeline needs the WIF service connection
-# and the Control Tower variable group (audience + base URL); the wrapper
-# supplies both as parameters.
+# and the Control Tower API audience + base URL, supplied as parameters.
 
 parameters:
   - name: outputDirectory
@@ -46,24 +45,19 @@ parameters:
     default: linux
   - name: serviceConnection
     type: string
-  # Control Tower API audience + base URL, passed by the wrapper (which owns the
-  # variable group / env-specific values). The template stays group-agnostic.
   - name: apiAudience
     type: string
   - name: apiBaseAFDUrl
     type: string
   # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0). Bound per-branch by the
-  # wrapper so a branch's builds land in the correct target.
+  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
   - name: packageTarget
     type: string
   - name: timeoutInMinutes
     type: number
   # Max seconds run_package_build.py waits for the Control Tower build to reach
-  # a terminal state. Keep below the job's timeoutInMinutes (above) so the
-  # script's own clear failure fires before ADO blunt-kills the job. Default
-  # 21600 = 6h (our worst-case build); the wrapper passes it alongside
-  # timeoutInMinutes so the two are raised together.
+  # a terminal state. Keep below the job's timeoutInMinutes so the script's own
+  # clear failure fires before ADO blunt-kills the job. Default 21600 = 6h.
   - name: pollTimeoutSeconds
     type: number
     default: 21600
@@ -90,8 +84,6 @@ stages:
             value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
-          # Runtime-consumed params surfaced as variables so a caller may pass
-          # runtime $[ ] / $(macro) expressions (evaluated here, not inline).
           - name: apiAudience
             value: ${{ parameters.apiAudience }}
           - name: apiBaseAFDUrl
@@ -149,6 +141,9 @@ stages:
               # detection of affected components to CT. ADO task: 18816
               BASE_COMMIT: $(baseCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+              # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
+              # not add a BUILD_REASON entry here -- the agent silently ignores
+              # env: overrides of that reserved predefined variable.
 
           # Submit a SCRATCH Control Tower build of the PR head for the changed
           # components. Scratch = throwaway: it never persists to a production
@@ -175,8 +170,8 @@ stages:
 
                 # --poll-timeout-seconds comes from the pollTimeoutSeconds
                 # parameter (6h default = our worst-case build). Keep it below
-                # the job's timeoutInMinutes (wrapper) so the script's own clear
-                # failure fires before ADO blunt-kills the job.
+                # the job's timeoutInMinutes so the script's own clear failure
+                # fires before ADO blunt-kills the job.
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
@@ -195,3 +190,6 @@ stages:
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+              # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
+              # not add a BUILD_REASON entry here -- the agent silently ignores
+              # env: overrides of that reserved predefined variable.
