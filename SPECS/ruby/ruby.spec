@@ -87,7 +87,7 @@ Name:           ruby
 # provides should be versioned according to the ruby version.
 # More info: https://stdgems.org/
 Version:        %{ruby_version}
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        (Ruby OR BSD) AND Public Domain AND MIT AND CC0 AND zlib AND UCD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -114,6 +114,7 @@ Patch7:         CVE-2025-6442.patch
 Patch8:         CVE-2025-24294.patch
 Patch9:         CVE-2025-61594.patch
 Patch10:        CVE-2026-27820.patch
+Patch11:        CVE-2026-47241.patch
 BuildRequires:  openssl-devel
 # Pkgconfig(yaml-0.1) is needed to build the 'psych' gem.
 BuildRequires:  pkgconfig(yaml-0.1)
@@ -418,6 +419,9 @@ sudo -u test make test TESTS="-v"
 %{_rpmconfigdir}/rubygems.con
 
 %changelog
+* Thu Jul 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.5-9
+- Patch for CVE-2026-47241
+
 * Sat Apr 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.5-8
 - Patch for CVE-2026-27820
 
