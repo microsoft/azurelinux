@@ -68,9 +68,11 @@ steps:
       # Publish the downstream pipeline variables now that the change set is
       # ready (consumed by the render-verify step and the trailing Control
       # Tower call).
-      echo "##vso[task.setvariable variable=${{ parameters.changedComponentsFileVar }};isreadonly=true]$json_file"
-      echo "##vso[task.setvariable variable=${{ parameters.renderSetFileVar }};isreadonly=true]$render_set_file"
+      echo "##vso[task.setvariable variable=$CHANGED_COMPONENTS_FILE_VAR;isreadonly=true]$json_file"
+      echo "##vso[task.setvariable variable=$RENDER_SET_FILE_VAR;isreadonly=true]$render_set_file"
     env:
       FROM_COMMIT: $(${{ parameters.fromCommitVar }})
       TO_COMMIT: $(${{ parameters.toCommitVar }})
+      CHANGED_COMPONENTS_FILE_VAR: ${{ parameters.changedComponentsFileVar }}
+      RENDER_SET_FILE_VAR: ${{ parameters.renderSetFileVar }}
     displayName: "Prepare change set"

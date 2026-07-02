@@ -90,6 +90,16 @@ stages:
             value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
+          # Runtime-consumed params surfaced as variables so a caller may pass
+          # runtime $[ ] / $(macro) expressions (evaluated here, not inline).
+          - name: apiAudience
+            value: ${{ parameters.apiAudience }}
+          - name: apiBaseAFDUrl
+            value: ${{ parameters.apiBaseAFDUrl }}
+          - name: packageTarget
+            value: ${{ parameters.packageTarget }}
+          - name: pollTimeoutSeconds
+            value: ${{ parameters.pollTimeoutSeconds }}
         steps:
           # Shared setup + change detection, composed from the granular step
           # templates. install-deps skips mock and the ADO API client (neither
@@ -131,8 +141,8 @@ stages:
                   --source-commit "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
-              API_AUDIENCE: ${{ parameters.apiAudience }}
-              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
+              API_AUDIENCE: $(apiAudience)
+              API_BASE_URL: $(apiBaseAFDUrl)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               # TODO: Base commit is not used yet. Will be needed once we move
@@ -172,14 +182,16 @@ stages:
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "${{ parameters.packageTarget }}" \
+                  --package-target "$PACKAGE_TARGET" \
                   --commit-sha "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL" \
                   --wait-for-completion \
-                  --poll-timeout-seconds ${{ parameters.pollTimeoutSeconds }}
+                  --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
             env:
-              API_AUDIENCE: ${{ parameters.apiAudience }}
-              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
+              API_AUDIENCE: $(apiAudience)
+              API_BASE_URL: $(apiBaseAFDUrl)
+              PACKAGE_TARGET: $(packageTarget)
+              POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)

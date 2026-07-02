@@ -44,9 +44,13 @@ Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/
 **Parameterize the names of pipeline variables a template sets.** If a step template sets a job variable (`##vso[task.setvariable variable=<name>...]`), expose `<name>` through a parameter (with the conventional name as the default) so a caller composing several templates can rename it to avoid collisions. Use a consistent suffix scheme:
 
 - **Same-job variables** (default `##vso[task.setvariable]`, no `isoutput`): parameter `<var_name>Var` (e.g. `sourceCommitVar`, `changedComponentsFileVar`).
-- **Output variables** (`isoutput=true`, visible in other jobs/stages): parameter `<var_name>OutputVar`, AND the setting task's `name:` must also be parameterized (a cross-job output variable is referenced as `<taskName>.<var>`, so the task name is part of the contract).
+- **Output variables** (`isoutput=true`, visible in other jobs/stages): parameter `<var_name>OutputVar` for the variable name, AND parameter `<var_name>OutputVarTask` for the setting task's `name:` (a cross-job output variable is referenced as `<taskName>.<var>`, so the task name is part of the contract).
 
 Reading another template's variable follows the same shape: take a `<var_name>Var` parameter and reference it as `$(${{ parameters.<var_name>Var }})` in `env:` (e.g. `prepare-change-set.yml`'s `fromCommitVar`/`toCommitVar`).
+
+**Pass pipeline parameters and variables into scripts through `env:`.** Do not inline `$(someVariable)` or `${{ parameters.X }}` inside an `inlineScript`/`script` body — map them in the step's `env:` block and reference the environment variable in the script. This keeps the script readable, avoids quoting/injection pitfalls, and makes the data flow explicit. This also covers values used to build a `##vso[...]` logging command: route the parameter through `env:` and reference `$ENV_VAR` in the `echo` rather than substituting `${{ parameters.X }}` inline.
+
+**Surface runtime-consumed parameters as `variables` when the template owns a `variables` section.** When a template defines its own `variables` section (i.e. it declares stages/jobs), convert the input parameters it consumes at runtime into entries in that `variables` section (`- name: foo` / `value: ${{ parameters.foo }}`) and reference them as `$(foo)`. A parameter value may be a runtime `$[ <expression> ]` (or `$(macro)`) expression, which is only evaluated inside the `variables` section — referencing `${{ parameters.foo }}` directly elsewhere would emit the literal, unevaluated string. Parameters used only in compile-time structural positions (e.g. `pool.type`, `timeoutInMinutes`, task `name:`/`azureSubscription:`) stay as parameters.
 
 ## OneBranch templates (MANDATORY — wrapper only)
 
@@ -246,6 +250,10 @@ Use these as a starting point for a new pipeline. Two files: a wrapper (NonOffic
 trigger: none
 pr: none
 
+# Variables extracted from this group: ApiAudience, ApiBaseUrl.
+variables:
+  - group: <variable-group-name>
+
 resources:
   repositories:
     - repository: templates
@@ -268,7 +276,8 @@ extends:
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           poolType: linux
           serviceConnection: <service-connection-name>
-          variableGroup: <variable-group-name>
+          apiAudience: $(ApiAudience)
+          apiBaseUrl: $(ApiBaseUrl)
           timeoutInMinutes: <int>   # explicit, conservative
 ```
 
@@ -287,7 +296,9 @@ parameters:
     default: linux
   - name: serviceConnection
     type: string
-  - name: variableGroup
+  - name: apiAudience
+    type: string
+  - name: apiBaseUrl
     type: string
   - name: timeoutInMinutes
     type: number
@@ -300,13 +311,18 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - group: ${{ parameters.variableGroup }}      # audience URI, base URL, etc.
           - name: ob_outputDirectory
             value: ${{ parameters.outputDirectory }}
           - name: ob_artifactBaseName
             value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
+          # Runtime-consumed params surfaced as variables (see the variable
+          # rules above); reference as $(apiAudience) / $(apiBaseUrl).
+          - name: apiAudience
+            value: ${{ parameters.apiAudience }}
+          - name: apiBaseUrl
+            value: ${{ parameters.apiBaseUrl }}
         steps:
           - task: PipAuthenticate@1
             displayName: "Authenticate pip"
@@ -325,8 +341,8 @@ stages:
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL"
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseUrl)
+              API_AUDIENCE: $(apiAudience)
+              API_BASE_URL: $(apiBaseUrl)
 ```
 
 Replace every `<...>` placeholder.

@@ -21,7 +21,11 @@ parameters:
     default: linux
   - name: serviceConnection
     type: string
-  - name: variableGroup
+  # Control Tower API audience + base URL, passed by the wrapper (which owns the
+  # variable group / env-specific values). The template stays group-agnostic.
+  - name: apiAudience
+    type: string
+  - name: apiBaseAFDUrl
     type: string
   - name: timeoutInMinutes
     type: number
@@ -47,13 +51,20 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - group: ${{ parameters.variableGroup }}
           - name: ob_outputDirectory
             value: ${{ parameters.outputDirectory }}
           - name: ob_artifactBaseName
             value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
+          # Runtime-consumed params surfaced as variables so a caller may pass
+          # runtime $[ ] / $(macro) expressions (evaluated here, not inline).
+          - name: apiAudience
+            value: ${{ parameters.apiAudience }}
+          - name: apiBaseAFDUrl
+            value: ${{ parameters.apiBaseAFDUrl }}
+          - name: packageTarget
+            value: ${{ parameters.packageTarget }}
         steps:
           # Shared setup + change detection + validation (PipAuthenticate,
           # install deps, determine commit range, verify locks, prepare change
@@ -73,17 +84,16 @@ stages:
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$CT_BUILD_REASON" \
+                  --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "${{ parameters.packageTarget }}" \
+                  --package-target "$PACKAGE_TARGET" \
                   --official-build \
                   --commit-sha "$SOURCE_COMMIT" \
                   --repo-uri "$UPSTREAM_REPO_URL"
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseAFDUrl)
-              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
-              CT_BUILD_REASON: $(Build.Reason)
+              API_AUDIENCE: $(apiAudience)
+              API_BASE_URL: $(apiBaseAFDUrl)
+              PACKAGE_TARGET: $(packageTarget)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)

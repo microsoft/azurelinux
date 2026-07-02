@@ -58,9 +58,11 @@ steps:
       # Mark the resolved range readonly: it is computed once here and only
       # consumed downstream, so locking it prevents a later step from clobbering
       # the commit range (matches changedComponentsFile / renderSetFile below).
-      echo "##vso[task.setvariable variable=${{ parameters.sourceCommitVar }};isreadonly=true]$source_commit"
-      echo "##vso[task.setvariable variable=${{ parameters.targetCommitVar }};isreadonly=true]$target_commit"
+      echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
+      echo "##vso[task.setvariable variable=$TARGET_COMMIT_VAR;isreadonly=true]$target_commit"
     env:
+      SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
+      TARGET_COMMIT_VAR: ${{ parameters.targetCommitVar }}
       SYSTEM_COLLECTIONURI: $(System.CollectionUri)
       SYSTEM_TEAMPROJECT: $(System.TeamProject)
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)

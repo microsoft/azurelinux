@@ -57,9 +57,7 @@ trigger: none
 
 pr: none
 
-# Source the Control Tower API audience + base URL from the variable group here,
-# in the wrapper (the env-specific entry point), and pass them to the stages
-# template as parameters. The stages template stays variable-group-agnostic.
+# Variables extracted from this group: ApiAudience, ApiBaseAFDUrl.
 variables:
   - group: ControlTower-PRCheck
 
