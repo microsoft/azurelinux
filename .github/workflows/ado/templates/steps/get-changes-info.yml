@@ -1,0 +1,74 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Composite step template: gather a build's change-set information. Given a
+# `mode` (pr | postmerge) it resolves the commit range, installs the host tools
+# it needs (azldev + mock, plus the ADO API client in postmerge mode and the
+# go-git config normalization in pr mode), verifies lock files, computes the
+# changed-component set, and verifies rendered specs.
+#
+# Its install-deps covers only these internal needs. A caller that needs other
+# host tools (e.g. the Control Tower client for a submission step) installs them
+# with its own install-deps.yml step.
+#
+# Requires the job-scope variable ob_outputDirectory. Sets the change-info
+# variables named by the *Var parameters.
+
+parameters:
+  - name: baseCommitVar
+    type: string
+    default: baseCommit
+  - name: changedComponentsFileVar
+    type: string
+    default: changedComponentsFile
+  - name: mode
+    type: string
+    values:
+      - pr
+      - postmerge
+  - name: renderSetFileVar
+    type: string
+    default: renderSetFile
+  - name: sourceCommitVar
+    type: string
+    default: sourceCommit
+
+steps:
+  - template: ensure-full-history.yml
+
+  - template: install-deps.yml
+    parameters:
+      installAdoRequirements: ${{ eq(parameters.mode, 'postmerge') }}
+      installAzldev: true
+      installMock: true
+      normalizeGoGitConfig: ${{ eq(parameters.mode, 'pr') }}
+
+  # Sets job variables:
+  # - baseCommit
+  # - sourceCommit
+  - ${{ if eq(parameters.mode, 'pr') }}:
+    - template: commit-range-pr.yml
+      parameters:
+        baseCommitVar: ${{ parameters.baseCommitVar }}
+        sourceCommitVar: ${{ parameters.sourceCommitVar }}
+  - ${{ if eq(parameters.mode, 'postmerge') }}:
+    - template: commit-range-postmerge.yml
+      parameters:
+        baseCommitVar: ${{ parameters.baseCommitVar }}
+        sourceCommitVar: ${{ parameters.sourceCommitVar }}
+
+  - template: verify-locks.yml
+
+  # Sets job variables:
+  # - changedComponentsFile
+  # - renderSetFile
+  - template: prepare-change-set.yml
+    parameters:
+      changedComponentsFileVar: ${{ parameters.changedComponentsFileVar }}
+      fromCommitVar: ${{ parameters.baseCommitVar }}
+      renderSetFileVar: ${{ parameters.renderSetFileVar }}
+      toCommitVar: ${{ parameters.sourceCommitVar }}
+
+  - template: verify-rendered-specs.yml
+    parameters:
+      renderSetFileVar: ${{ parameters.renderSetFileVar }}

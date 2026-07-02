@@ -1,32 +1,27 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
-# Step template: resolve the PR commit range from the merge commit's parents.
-# A PR-policy build checks out the MERGE commit (Build.SourceVersion): parent
-# ^1 is the target-branch tip, parent ^2 is the PR head. The PR's true change
-# set is the diff between their MERGE BASE (the fork point) and ^2 -- i.e.
-# `git diff merge-base(^1,^2)..^2`, the same three-dot set GitHub's "Files
-# changed" shows. We compare against the merge base, NOT the target tip:
-# comparing against the tip additionally flags every component that landed on
-# the target branch after the PR forked (the PR head still carries their
-# pre-update state), which can balloon a 1-component PR into dozens.
+# Step template: resolve a PR's commit range from the merge commit's parents.
+# A PR-policy build checks out the MERGE commit: parent ^1 is the target-branch
+# tip, parent ^2 is the PR head. The change set is the diff between their MERGE
+# BASE (fork point) and ^2 -- the same three-dot set GitHub's "Files changed"
+# shows. Comparing against the merge base rather than the target tip avoids
+# flagging components that merely landed on the target branch after the fork.
 #
-# Emits job-scope variables sourceCommit (PR head, ^2) and baseCommit (the
-# merge base). These feed prepare-change-set.yml (from=baseCommit,
-# to=sourceCommit) and the trailing Control Tower call.
+# Sets job variables named by baseCommitVar (merge base) and sourceCommitVar
+# (PR head).
 
 parameters:
-  - name: sourceCommitVar
-    type: string
-    default: sourceCommit
   - name: baseCommitVar
     type: string
     default: baseCommit
+  - name: sourceCommitVar
+    type: string
+    default: sourceCommit
 
 steps:
   # Fail fast, at compile time, when this is not a PR build: the merge-commit
-  # parent logic below only makes sense for a PullRequest trigger. Including the
-  # guard step is decided by a template expression on Build.Reason, so a
-  # mis-triggered run stops at its very first step.
+  # parent logic only makes sense for a PullRequest trigger.
   - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
     - script: |
         echo "##[error]This pipeline must run as a PR build (Build.Reason=PullRequest); got '$BUILD_REASON'."
@@ -42,10 +37,6 @@ steps:
         exit 1
       fi
       source_commit="$(git rev-parse HEAD^2)"
-      # Baseline = the MERGE BASE (fork point) of the target-branch tip
-      # (HEAD^1) and the PR head (HEAD^2), NOT the target tip itself.
-      # See the block comment above for why; this is passed as the
-      # `--from-commit` baseline to the change-set helper.
       base_commit="$(git merge-base HEAD^1 HEAD^2)"
       # PR-supplied data is untrusted: validate both SHAs before use.
       for sha in "$base_commit" "$source_commit"; do
@@ -55,9 +46,9 @@ steps:
         fi
       done
       echo "Resolved range: base(merge-base)=$base_commit source=$source_commit"
-      echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
       echo "##vso[task.setvariable variable=$BASE_COMMIT_VAR;isreadonly=true]$base_commit"
+      echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
     env:
-      SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
       BASE_COMMIT_VAR: ${{ parameters.baseCommitVar }}
+      SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
     displayName: "Determine PR commit range"

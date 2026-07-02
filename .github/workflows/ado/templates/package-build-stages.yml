@@ -5,67 +5,69 @@
 # OneBranch-coupled knobs as parameters. The wrapper at
 # .github/workflows/ado/package-build.yml supplies concrete values.
 #
-# The setup + change-detection + validation steps come from the shared
-# templates/steps/common-steps.yml (composed from templates/steps/*); this
-# template appends only the package-build-specific Control Tower call.
+# Per push: gather the change-set info (get-changes-info, mode=postmerge: full
+# history, deps, commit range, lock + render verification, changed-component
+# set), then submit an official Control Tower build for the changed components.
 
 parameters:
-  - name: outputDirectory
+  - name: apiAudience
+    type: string
+  - name: apiBaseAFDUrl
     type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
+    type: string
+  - name: outputDirectory
+    type: string
+  # Control Tower package target for builds submitted from this pipeline
+  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
+  - name: packageTarget
     type: string
   - name: poolType
     type: string
     default: linux
   - name: serviceConnection
     type: string
-  - name: apiAudience
-    type: string
-  - name: apiBaseAFDUrl
-    type: string
   - name: timeoutInMinutes
     type: number
-  # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
-  - name: packageTarget
-    type: string
 
 stages:
   - stage: PackageBuild
     jobs:
       - job: PackageBuild
-        # This is a post-merge build: code has already merged, so there is no PR
-        # or merge queue to gate. The job fails loud -- any failing step turns
-        # the run red so submission/validation breakage is visible and alertable
-        # rather than masked as a partial success. The build itself runs
-        # asynchronously in Control Tower/Koji; this pipeline only submits it and
-        # confirms acceptance (see run_package_build.py).
-        # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)
-        # with enough headroom for setup steps and the final API call.
+        # Post-merge build: code has already merged, so there is no PR or merge
+        # queue to gate. Fails loud -- any failing step turns the run red so
+        # submission/validation breakage is visible rather than masked. The
+        # build runs asynchronously in Control Tower/Koji; this pipeline only
+        # submits it and confirms acceptance (see run_package_build.py).
         timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
-          - name: LinuxContainerImage
-            value: ${{ parameters.containerImage }}
           - name: apiAudience
             value: ${{ parameters.apiAudience }}
           - name: apiBaseAFDUrl
             value: ${{ parameters.apiBaseAFDUrl }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
           - name: packageTarget
             value: ${{ parameters.packageTarget }}
         steps:
-          # Shared setup + change detection + validation (PipAuthenticate,
-          # install deps, determine commit range, verify locks, prepare change
-          # set, verify rendered specs). Produces the job-scope variables and
-          # change-set files the submit step below consumes.
-          - template: steps/common-steps.yml
+          # Sets job variables:
+          # - changedComponentsFile
+          # - sourceCommit
+          - template: steps/get-changes-info.yml
+            parameters:
+              mode: postmerge
+
+          - template: steps/install-deps.yml
+            parameters:
+              installControlTowerClient: true
 
           - task: AzureCLI@2
             displayName: "Submit package build to Control Tower"
@@ -88,8 +90,8 @@ stages:
             env:
               API_AUDIENCE: $(apiAudience)
               API_BASE_URL: $(apiBaseAFDUrl)
-              PACKAGE_TARGET: $(packageTarget)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+              PACKAGE_TARGET: $(packageTarget)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
               # Build.Reason is auto-exposed to the script as $BUILD_REASON; do

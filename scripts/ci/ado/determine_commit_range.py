@@ -1,6 +1,6 @@
 """Resolve the ``(target, source)`` commit range for a post-merge delta build.
 
-Strategy (see ``.github/workflows/ado/templates/steps/common-steps.yml``):
+Strategy (see ``.github/workflows/ado/templates/steps/commit-range-postmerge.yml``):
 
 * ``source`` is the commit that triggered this run (``Build.SourceVersion``).
 * ``target`` is the ``sourceVersion`` of the immediately-preceding CI build of

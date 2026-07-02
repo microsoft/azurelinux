@@ -1,10 +1,9 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Step template: verify lock files are current. --check-only validates without
-# writing and exits nonzero if any lock would change. Publishes a lock-update
-# diff to ob_outputDirectory for triage.
-#
-# Requires the job-scope variable `ob_outputDirectory`.
+# writing and exits nonzero if any lock would change; publishes a lock-update
+# diff to ob_outputDirectory.
 
 steps:
   - script: |

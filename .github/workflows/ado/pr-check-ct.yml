@@ -91,13 +91,11 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/pr-check-ct-stages.yml@self
         parameters:
-          outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          artifactBaseName: prcheckct
-          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
-          poolType: linux
-          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           apiAudience: $(ApiAudience)
           apiBaseAFDUrl: $(ApiBaseAFDUrl)
+          artifactBaseName: prcheckct
+          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Control Tower package target for the 4.0 branch.
           packageTarget: azl4
           # This check WAITS for the Control Tower build to finish (pass/fail),
@@ -107,4 +105,6 @@ extends:
           # script's own clear failure fires before ADO blunt-kills the job.
           # Raise both together if a legitimate build is being killed.
           pollTimeoutSeconds: 21600
+          poolType: linux
+          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           timeoutInMinutes: 420

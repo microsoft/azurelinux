@@ -1,36 +1,29 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Step template: detect changed components and prepare the render set, then
 # publish changed-components.json as a triage artifact on every exit path.
-# Emits job-scope variables changedComponentsFile and renderSetFile for
-# downstream consumers (the render-verify step and the trailing Control Tower
-# call).
+# compute_change_set.sh diffs from -> to and hard-fails on the supply-chain
+# drift tripwire (sourcesChange == true without an identity change in
+# {added, changed, deleted}). Requires the job-scope variable ob_outputDirectory.
 #
-# The (from, to) commit range is read from job-scope variables named by the
-# fromCommitVar / toCommitVar parameters (defaults targetCommit -> sourceCommit).
-# compute_change_set.sh diffs from -> to.
-#
-# compute_change_set.sh hard-fails on the supply-chain drift tripwire
-# (sourcesChange == true without an identity change in {added, changed,
-# deleted}): that combination would let attacker-supplied bytes ride into the
-# lookaside under an unchanged component identity, so it fails closed.
-#
-# Requires the job-scope variable `ob_outputDirectory` (the triage artifact is
-# published there).
+# Reads the (from, to) commit range from the variables named by fromCommitVar /
+# toCommitVar; sets the variables named by changedComponentsFileVar and
+# renderSetFileVar.
 
 parameters:
-  - name: fromCommitVar
-    type: string
-    default: targetCommit
-  - name: toCommitVar
-    type: string
-    default: sourceCommit
   - name: changedComponentsFileVar
     type: string
     default: changedComponentsFile
+  - name: fromCommitVar
+    type: string
+    default: baseCommit
   - name: renderSetFileVar
     type: string
     default: renderSetFile
+  - name: toCommitVar
+    type: string
+    default: sourceCommit
 
 steps:
   - script: |
@@ -39,10 +32,9 @@ steps:
       json_file="$change_set_dir/changed-components.json"
       render_set_file="$change_set_dir/render-set.txt"
 
-      # Publish the changed-components JSON for post-mortem triage on
-      # EVERY exit path, not just success -- if azldev hard-fails on a
-      # consistency tripwire the partial JSON is exactly what an
-      # operator needs to investigate.
+      # Publish the changed-components JSON for post-mortem triage on EVERY exit
+      # path, not just success -- if azldev hard-fails on a consistency tripwire
+      # the partial JSON is exactly what an operator needs to investigate.
       publish_artifact() {
         if [[ -s "$json_file" ]]; then
           mkdir -p "$(ob_outputDirectory)/changed-components"
@@ -64,14 +56,11 @@ steps:
       echo "Total: $upload_count component(s) to upload."
       echo "##[endgroup]"
 
-      # Publish the downstream pipeline variables now that the change set is
-      # ready (consumed by the render-verify step and the trailing Control
-      # Tower call).
       echo "##vso[task.setvariable variable=$CHANGED_COMPONENTS_FILE_VAR;isreadonly=true]$json_file"
       echo "##vso[task.setvariable variable=$RENDER_SET_FILE_VAR;isreadonly=true]$render_set_file"
     env:
-      FROM_COMMIT: $(${{ parameters.fromCommitVar }})
-      TO_COMMIT: $(${{ parameters.toCommitVar }})
       CHANGED_COMPONENTS_FILE_VAR: ${{ parameters.changedComponentsFileVar }}
+      FROM_COMMIT: $(${{ parameters.fromCommitVar }})
       RENDER_SET_FILE_VAR: ${{ parameters.renderSetFileVar }}
+      TO_COMMIT: $(${{ parameters.toCommitVar }})
     displayName: "Prepare change set"

@@ -39,7 +39,34 @@ File-pairing convention: a wrapper at `.github/workflows/ado/<name>.yml` pairs w
 
 See [.github/workflows/ado/package-build.yml](.github/workflows/ado/package-build.yml) and [.github/workflows/ado/templates/package-build-stages.yml](.github/workflows/ado/templates/package-build-stages.yml) for the canonical example.
 
-Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See the granular templates under [.github/workflows/ado/templates/steps/](.github/workflows/ado/templates/steps/) (e.g. `ensure-full-history.yml`, `install-deps.yml`, `prepare-change-set.yml`), shared by the `package-build` (via `common-steps.yml`) and `pr-check-ct` pipelines.
+Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See the granular templates under [.github/workflows/ado/templates/steps/](.github/workflows/ado/templates/steps/) (e.g. `ensure-full-history.yml`, `install-deps.yml`, `prepare-change-set.yml`) and the composite `get-changes-info.yml`, shared by the `package-build` and `pr-check-ct` pipelines.
+
+**A template comment describes only what the template itself does** — not how a caller may or may not use it, and not where its parameter *values* originate. Assumptions about the caller (e.g. "passed by the wrapper", "owns the variable group", "the PR check does X") go stale and belong in the caller, not the shared template. The calling convention is documented here, once; do not repeat it in every YAML.
+
+**Copyright notice on every new file.** Any new file introduced (any language, not just ADO pipelines) starts with:
+
+```text
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+```
+
+Adjust the comment syntax to the file type (e.g. `//` for C, `<!-- -->` for XML/HTML).
+
+**Sort lists alphabetically.** Within a file, keep `parameters`, `variables`, and step `env:` entries in alphabetical order by name (case-insensitive). This makes additions and diffs predictable and variables easy to find. Ordered sequences whose order is semantically load-bearing — job `steps:`, script lines — are NOT sorted.
+
+**Prefer a script file over `inlineScript` for single-command tasks.** A task whose body is one functionally-important command/script should reference a script file (e.g. `Bash@3` `filePath`, or `AzureCLI@2` `scriptLocation: scriptPath`) rather than embedding it inline. **Exception:** an `AzureCLI@2` step that exists only to establish the WIF az-login context for a non-shell script (e.g. `python3 some_script.py …` consumed by `DefaultAzureCredential`) keeps `inlineScript` — `scriptPath` runs the file *through* bash (ignoring any `#!` line), so honoring the rule would require a throwaway bash wrapper that adds indirection without value.
+
+**Comment which variables a composed template sets, above the `- template:` line.** When a template you invoke sets job/output variables that *this* file consumes, list them above the invocation in this fixed format (omit an empty section; list only the variables the caller actually uses):
+
+```yaml
+          # Sets job variables:
+          # - <var_name1>
+          # - <var_name2>
+          #
+          # Sets output job variables:
+          # - <output_var_name1>
+          - template: steps/commit-range-pr.yml
+```
 
 **Parameterize the names of pipeline variables a template sets.** If a step template sets a job variable (`##vso[task.setvariable variable=<name>...]`), expose `<name>` through a parameter (with the conventional name as the default) so a caller composing several templates can rename it to avoid collisions. Use a consistent suffix scheme:
 
@@ -247,6 +274,9 @@ Use these as a starting point for a new pipeline. Two files: a wrapper (NonOffic
 ### Wrapper — `.github/workflows/ado/<name>.yml`
 
 ```yaml
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 trigger: none
 pr: none
 
@@ -271,34 +301,37 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/<name>-stages.yml@self
         parameters:
-          outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          artifactBaseName: <artifact-base-name>
-          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
-          poolType: linux
-          serviceConnection: <service-connection-name>
           apiAudience: $(ApiAudience)
           apiBaseUrl: $(ApiBaseUrl)
+          artifactBaseName: <artifact-base-name>
+          containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
+          poolType: linux
+          serviceConnection: <service-connection-name>
           timeoutInMinutes: <int>   # explicit, conservative
 ```
 
 ### Raw stages — `.github/workflows/ado/templates/<name>-stages.yml`
 
 ```yaml
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 parameters:
-  - name: outputDirectory
+  - name: apiAudience
+    type: string
+  - name: apiBaseUrl
     type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
     type: string
+  - name: outputDirectory
+    type: string
   - name: poolType
     type: string
     default: linux
   - name: serviceConnection
-    type: string
-  - name: apiAudience
-    type: string
-  - name: apiBaseUrl
     type: string
   - name: timeoutInMinutes
     type: number
@@ -311,18 +344,16 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
-          - name: LinuxContainerImage
-            value: ${{ parameters.containerImage }}
-          # Runtime-consumed params surfaced as variables (see the variable
-          # rules above); reference as $(apiAudience) / $(apiBaseUrl).
           - name: apiAudience
             value: ${{ parameters.apiAudience }}
           - name: apiBaseUrl
             value: ${{ parameters.apiBaseUrl }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
         steps:
           - task: PipAuthenticate@1
             displayName: "Authenticate pip"

@@ -3,64 +3,43 @@
 # Raw stages template for the PR Control Tower check (prcheck + scratch package
 # build). Wrapper-agnostic: declares the stages/jobs/steps and exposes the
 # wrapper-coupled knobs as parameters. The wrapper at
-# .github/workflows/ado/pr-check-ct.yml supplies concrete values. See that
-# wrapper for why this pipeline exists.
+# .github/workflows/ado/pr-check-ct.yml supplies concrete values.
 #
-# What it does, per PR:
-#   1. Ensure full git history (rpmautospec + change detection need it).
-#   2. Authenticate to the internal pip feed and install host deps: azldev (for
-#      change detection only -- no mock, no build) and the Control Tower Python
-#      client.
-#   3. Resolve the PR commit range from the merge commit's parents
-#      (^1 = target-branch tip, ^2 = PR head).
-#   4. Compute the changed-component set (shared compute_change_set.sh).
-#   5. Call Control Tower 'prcheck' for those components: among other things it
-#      uploads the missing lookaside sources so they are present when the build
-#      below fetches them.
-#   6. Submit a *scratch* Control Tower build of the PR head for exactly those
-#      components (run_package_build.py --wait-for-completion). The build runs
-#      in Control Tower's own sandbox; this pipeline WAITS for it to reach a
-#      terminal state and fails the check if the build fails (or does not
-#      finish within the poll timeout). NO PR-controlled code is built on the
-#      CI agent -- only read-only change detection runs here.
-#
-# Setup + change detection are composed from the shared templates/steps/*
-# templates (the same ones the post-merge pipeline uses via common-steps.yml),
-# but with the PR commit-range template (merge-commit parents, not the
-# previous-build delta) and WITHOUT the lock/render-verify steps -- those PR
-# gates already run in GitHub Actions.
-#
-# Because it calls Control Tower, this pipeline needs the WIF service connection
-# and the Control Tower API audience + base URL, supplied as parameters.
+# Per PR: gather the change-set info (get-changes-info, mode=pr: full history,
+# deps, commit range, lock + render verification, changed-component set), then
+# call Control Tower 'prcheck' (uploads the changed components' missing
+# lookaside sources) and submit a *scratch* Control Tower build of the PR head
+# for those components, waiting for it to finish. NO PR-controlled code is built
+# on the CI agent -- only read-only change detection runs here.
 
 parameters:
-  - name: outputDirectory
+  - name: apiAudience
+    type: string
+  - name: apiBaseAFDUrl
     type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
     type: string
-  - name: poolType
-    type: string
-    default: linux
-  - name: serviceConnection
-    type: string
-  - name: apiAudience
-    type: string
-  - name: apiBaseAFDUrl
+  - name: outputDirectory
     type: string
   # Control Tower package target for builds submitted from this pipeline
   # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
   - name: packageTarget
     type: string
-  - name: timeoutInMinutes
-    type: number
   # Max seconds run_package_build.py waits for the Control Tower build to reach
   # a terminal state. Keep below the job's timeoutInMinutes so the script's own
   # clear failure fires before ADO blunt-kills the job. Default 21600 = 6h.
   - name: pollTimeoutSeconds
     type: number
     default: 21600
+  - name: poolType
+    type: string
+    default: linux
+  - name: serviceConnection
+    type: string
+  - name: timeoutInMinutes
+    type: number
 
 stages:
   - stage: PRCheckCT
@@ -68,49 +47,39 @@ stages:
       - job: PRCheckCT
         # Fail-loud: a failed submission, an immediate Control Tower rejection,
         # or a build that fails (or never reaches a terminal state) turns the PR
-        # check red. The build runs in Control Tower's own sandbox -- NOT on
-        # this agent -- but this pipeline WAITS for it to finish
-        # (run_package_build.py --wait-for-completion). Size the timeout to
-        # cover the FULL build: it must exceed the script's pollTimeoutSeconds
-        # (6h default) so the script's own clear failure fires before ADO
-        # blunt-kills the job.
+        # check red. The build runs in Control Tower's own sandbox -- NOT on this
+        # agent -- but this pipeline WAITS for it to finish. Size the timeout to
+        # cover the FULL build: it must exceed pollTimeoutSeconds (6h default).
         timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
-          - name: LinuxContainerImage
-            value: ${{ parameters.containerImage }}
           - name: apiAudience
             value: ${{ parameters.apiAudience }}
           - name: apiBaseAFDUrl
             value: ${{ parameters.apiBaseAFDUrl }}
+          - name: LinuxContainerImage
+            value: ${{ parameters.containerImage }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
           - name: packageTarget
             value: ${{ parameters.packageTarget }}
           - name: pollTimeoutSeconds
             value: ${{ parameters.pollTimeoutSeconds }}
         steps:
-          # Shared setup + change detection, composed from the granular step
-          # templates. install-deps skips mock and the ADO API client (neither
-          # is needed for read-only change detection) but strips the go-git
-          # worktreeConfig extension so azldev can open the agent checkout.
-          - template: steps/ensure-full-history.yml
+          # Sets job variables:
+          # - baseCommit
+          # - changedComponentsFile
+          # - sourceCommit
+          - template: steps/get-changes-info.yml
+            parameters:
+              mode: pr
 
           - template: steps/install-deps.yml
             parameters:
-              normalizeGoGitConfig: true
-
-          # PR commit range = merge-commit parents (baseCommit = merge base,
-          # sourceCommit = PR head). prepare-change-set diffs baseCommit ->
-          # sourceCommit.
-          - template: steps/commit-range-pr.yml
-
-          - template: steps/prepare-change-set.yml
-            parameters:
-              fromCommitVar: baseCommit
+              installControlTowerClient: true
 
           # Call Control Tower 'prcheck' BEFORE the build. Among other things,
           # prcheck uploads the missing lookaside sources for the changed
@@ -135,11 +104,11 @@ stages:
             env:
               API_AUDIENCE: $(apiAudience)
               API_BASE_URL: $(apiBaseAFDUrl)
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              SOURCE_COMMIT: $(sourceCommit)
               # TODO: Base commit is not used yet. Will be needed once we move
               # detection of affected components to CT. ADO task: 18816
               BASE_COMMIT: $(baseCommit)
+              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+              SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
               # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
               # not add a BUILD_REASON entry here -- the agent silently ignores
@@ -149,16 +118,13 @@ stages:
           # components. Scratch = throwaway: it never persists to a production
           # repo, so building unmerged PR code is safe. Scratch is the default
           # (no --official-build); run_package_build.py additionally refuses an
-          # OFFICIAL build for a PR trigger. --wait-for-completion makes the
-          # script block until the build reaches a terminal state and fail the
-          # check on a build failure (or if it does not finish within
-          # --poll-timeout-seconds, 6h below -- our worst-case build). No PR
-          # code is built on this agent.
+          # OFFICIAL build for a PR trigger. --wait-for-completion blocks until
+          # the build reaches a terminal state and fails the check on a build
+          # failure (or on poll-timeout). No PR code is built on this agent.
           #
           # This step assumes the pipeline is wired as a REVIEWER-GATED check in
-          # ADO (see the wrapper header): it should not auto-run on every PR
-          # push, so that a maintainer eyeballs the diff before unmerged code is
-          # submitted for a build.
+          # ADO: it should not auto-run on every PR push, so a maintainer
+          # eyeballs the diff before unmerged code is submitted for a build.
           - task: AzureCLI@2
             displayName: "Submit scratch build to Control Tower"
             inputs:
@@ -168,10 +134,6 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                # --poll-timeout-seconds comes from the pollTimeoutSeconds
-                # parameter (6h default = our worst-case build). Keep it below
-                # the job's timeoutInMinutes so the script's own clear failure
-                # fires before ADO blunt-kills the job.
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
@@ -185,9 +147,9 @@ stages:
             env:
               API_AUDIENCE: $(apiAudience)
               API_BASE_URL: $(apiBaseAFDUrl)
+              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               PACKAGE_TARGET: $(packageTarget)
               POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               SOURCE_COMMIT: $(sourceCommit)
               UPSTREAM_REPO_URL: $(Build.Repository.Uri)
               # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
