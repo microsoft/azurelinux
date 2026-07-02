@@ -76,7 +76,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.ansible-pcp]
 [components.anthy-unicode]
 [components.antlr]
-[components.antlr4-project]
 [components.aopalliance]
 [components.apache-commons-beanutils]
 [components.apache-commons-cli]
