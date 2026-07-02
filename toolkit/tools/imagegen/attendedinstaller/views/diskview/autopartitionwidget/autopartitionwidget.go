@@ -134,13 +134,40 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 
 		bootPartitionName     = "esp"
 		bootPartitionFsType   = "fat32"
-		bootPartitionStartMiB = 1
-		bootPartitionEndMiB   = 9
+		defaultBootStartMiB   = 1
+		defaultBootEndMiB     = 9
 
 		rootPartitionName = "rootfs"
 		rootFsType        = "ext4"
 		rootMountPoint    = "/"
 	)
+
+	bootPartitionStartMiB := uint64(defaultBootStartMiB)
+	bootPartitionEndMiB := uint64(defaultBootEndMiB)
+	rootPartitionStartMiB := bootPartitionEndMiB
+
+	// Preserve partition boundaries from the loaded config when available.
+	if len(cfg.Disks) > 0 {
+		for _, partition := range cfg.Disks[0].Partitions {
+			switch partition.ID {
+			case bootPartitionName:
+				if partition.Start > 0 {
+					bootPartitionStartMiB = partition.Start
+				}
+				if partition.End > partition.Start {
+					bootPartitionEndMiB = partition.End
+				}
+			case rootPartitionName:
+				if partition.Start > 0 {
+					rootPartitionStartMiB = partition.Start
+				}
+			}
+		}
+	}
+
+	if rootPartitionStartMiB < bootPartitionEndMiB {
+		rootPartitionStartMiB = bootPartitionEndMiB
+	}
 
 	bootMountPoint, bootMountOptions, bootFlags, err := configuration.BootPartitionConfig(ap.bootType, partitionTableType)
 	if err != nil {
@@ -159,7 +186,7 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 		configuration.Partition{
 			ID:     rootPartitionName,
 			Name:   rootPartitionName,
-			Start:  bootPartitionEndMiB,
+			Start:  rootPartitionStartMiB,
 			End:    diskutils.AutoEndSize,
 			FsType: rootFsType,
 		},
