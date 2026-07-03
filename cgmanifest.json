@@ -27754,8 +27754,8 @@
         "type": "other",
         "other": {
           "name": "runc",
-          "version": "1.3.3",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.3.3.tar.gz"
+          "version": "1.3.6",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.3.6.tar.gz"
         }
       }
     },
