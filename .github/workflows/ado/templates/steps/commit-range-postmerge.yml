@@ -9,8 +9,7 @@
 #          merge appends. See scripts/ci/ado/determine_commit_range.py for the
 #          rationale and the first-run (source^1) fallback.
 #
-# Sets job variables named by baseCommitVar (previous build) and sourceCommitVar
-# (this build).
+# Sets job variables named by baseCommitVar and sourceCommitVar.
 
 parameters:
   - name: baseCommitVar

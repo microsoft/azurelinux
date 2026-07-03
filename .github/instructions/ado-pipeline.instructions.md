@@ -43,18 +43,9 @@ Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/
 
 **A template comment describes only what the template itself does** — not how a caller may or may not use it, and not where its parameter *values* originate. Assumptions about the caller (e.g. "passed by the wrapper", "owns the variable group", "the PR check does X") go stale and belong in the caller, not the shared template. The calling convention is documented here, once; do not repeat it in every YAML.
 
-**Copyright notice on every new file.** Any new file introduced (any language, not just ADO pipelines) starts with:
-
-```text
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
-```
-
-Adjust the comment syntax to the file type (e.g. `//` for C, `<!-- -->` for XML/HTML).
-
 **Sort lists alphabetically.** Within a file, keep `parameters`, `variables`, and step `env:` entries in alphabetical order by name (case-insensitive). This makes additions and diffs predictable and variables easy to find. Ordered sequences whose order is semantically load-bearing — job `steps:`, script lines — are NOT sorted.
 
-**Prefer a script file over `inlineScript` for single-command tasks.** A task whose body is one functionally-important command/script should reference a script file (e.g. `Bash@3` `filePath`, or `AzureCLI@2` `scriptLocation: scriptPath`) rather than embedding it inline. **Exception:** an `AzureCLI@2` step that exists only to establish the WIF az-login context for a non-shell script (e.g. `python3 some_script.py …` consumed by `DefaultAzureCredential`) keeps `inlineScript` — `scriptPath` runs the file *through* bash (ignoring any `#!` line), so honoring the rule would require a throwaway bash wrapper that adds indirection without value.
+**Prefer a script file over `inlineScript` for single-command tasks.** A task whose body is one functionally-important command/script should reference a script file (e.g. `Bash@3` `filePath`, or `AzureCLI@2` `scriptLocation: scriptPath`) rather than embedding it inline. **Exception:** if `scriptPath` cannot be used without an artificial wrapper, keep `inlineScript`. (For example, an `AzureCLI@2` step whose body is a non-shell command such as `python3 some_script.py …` — run for its WIF az-login context — cannot use `scriptPath`, which runs the file *through* bash and ignores any `#!` line; adding a throwaway bash wrapper just to satisfy the rule is not worth it.)
 
 **Comment which variables a composed template sets, above the `- template:` line.** When a template you invoke sets job/output variables that *this* file consumes, list them above the invocation in this fixed format (omit an empty section; list only the variables the caller actually uses):
 

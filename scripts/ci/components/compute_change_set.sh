@@ -51,6 +51,18 @@ while [[ $# -gt 0 ]]; do
 done
 [[ -z "${output_dir:-}" || -z "${from_commit:-}" || -z "${to_commit:-}" ]] && usage
 
+# The output-file-name params are joined onto --output-dir verbatim, so a value
+# containing a path separator or traversal (e.g. `../foo`) would escape it.
+# Reject anything that is not a plain file name.
+for name in "$changed_components_file_name" "$specs_diff_file_name" "$render_set_file_name"; do
+  case "$name" in
+    */* | "" | . | ..)
+      echo "refusing unsafe output file name: '$name' (must be a plain file name)" >&2
+      exit 2
+      ;;
+  esac
+done
+
 # Defensive guard: the script owns --output-dir exclusively for the duration
 # of the invocation (it does `rm -rf` below to clean up stale state). Refuse
 # obviously-dangerous paths so a future caller passing an empty-after-

@@ -1,4 +1,5 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Raw stages template for the package-build pipeline (v1 post-merge delta
 # build). OneBranch-agnostic: declares the stages/jobs/steps and exposes the

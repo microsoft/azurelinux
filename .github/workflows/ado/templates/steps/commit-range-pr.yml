@@ -37,6 +37,8 @@ steps:
         exit 1
       fi
       source_commit="$(git rev-parse HEAD^2)"
+      # Baseline = the MERGE BASE (fork point) of the target-branch tip (HEAD^1)
+      # and the PR head (HEAD^2), NOT the target tip itself.
       base_commit="$(git merge-base HEAD^1 HEAD^2)"
       # PR-supplied data is untrusted: validate both SHAs before use.
       for sha in "$base_commit" "$source_commit"; do

@@ -9,6 +9,9 @@ steps:
   - script: |
       set -euo pipefail
       scripts/ci/control-tower/verify_locks.sh \
-        --output-file "$(Build.ArtifactStagingDirectory)/lock-update.json" \
-        --publish-dir "$(ob_outputDirectory)"
+        --output-file "$ARTIFACT_STAGING_DIR/lock-update.json" \
+        --publish-dir "$OB_OUTPUT_DIR"
+    env:
+      ARTIFACT_STAGING_DIR: $(Build.ArtifactStagingDirectory)
+      OB_OUTPUT_DIR: $(ob_outputDirectory)
     displayName: "Verify lock files are up to date"

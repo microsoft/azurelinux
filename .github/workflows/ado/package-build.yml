@@ -1,4 +1,5 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Wrapper pipeline — passed to ADO as the entry point for the package-build
 # pipeline. This file owns all OneBranch-specific wiring (governed templates

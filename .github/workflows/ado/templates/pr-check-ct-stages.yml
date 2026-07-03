@@ -1,4 +1,5 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Raw stages template for the PR Control Tower check (prcheck + scratch package
 # build). Wrapper-agnostic: declares the stages/jobs/steps and exposes the
