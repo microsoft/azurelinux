@@ -59,8 +59,7 @@ Patch43:        CVE-2026-39835.patch
 Patch44:        CVE-2026-42502.patch
 Patch45:        CVE-2026-46598.patch
 Patch46:        CVE-2025-29923.patch
-Patch47:        CVE-2025-46327-prereqs.patch
-Patch48:        CVE-2025-46327.patch
+Patch47:        CVE-2025-46327.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
