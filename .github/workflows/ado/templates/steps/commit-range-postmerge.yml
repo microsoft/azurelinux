@@ -30,7 +30,7 @@ steps:
       range_output="$(python3 scripts/ci/ado/determine_commit_range.py \
         --definition-id "$SYSTEM_DEFINITIONID" \
         --current-build-id "$BUILD_BUILDID" \
-        --branch "$DELTA_QUERY_BRANCH" \
+        --branch "$BUILD_SOURCEBRANCH" \
         --source-commit "$BUILD_SOURCEVERSION")"
       echo "$range_output"
 
@@ -52,13 +52,12 @@ steps:
       echo "##vso[task.setvariable variable=$BASE_COMMIT_VAR;isreadonly=true]$base_commit"
       echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
     env:
+      # System.AccessToken is a secret -- NOT auto-exposed -- so it must be
+      # mapped here. Every other predefined variable the script uses
+      # (Build.BuildId, Build.SourceBranch, Build.SourceVersion,
+      # System.CollectionUri, System.DefinitionId, System.TeamProject) is
+      # auto-exposed as $NAME and referenced directly, so it is not mapped here.
       BASE_COMMIT_VAR: ${{ parameters.baseCommitVar }}
-      BUILD_BUILDID: $(Build.BuildId)
-      BUILD_SOURCEVERSION: $(Build.SourceVersion)
-      DELTA_QUERY_BRANCH: $(Build.SourceBranch)
       SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
       SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-      SYSTEM_COLLECTIONURI: $(System.CollectionUri)
-      SYSTEM_DEFINITIONID: $(System.DefinitionId)
-      SYSTEM_TEAMPROJECT: $(System.TeamProject)
     displayName: "Determine source and base commit range"
