@@ -4,7 +4,7 @@
 Summary:        Tool for creating identical machine images for multiple platforms from a single source configuration.
 Name:           packer
 Version:        1.9.5
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        MPLv2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,7 +14,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 # Below is a manually created tarball, no download link.
 # We're using pre-populated Go modules from this tarball, since network is disabled during build time.
 # How to re-build this file:
-#   1. wget https://github.com/hashicorp/packer/archive/v%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
+#   1. wget https://github.com/hashicorp/packer/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
 #   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2025-21613.patch.
@@ -30,44 +30,20 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-v2.tar.gz
-Patch0:         CVE-2022-3064.patch
+Source1:        %{name}-%{version}-vendor-v3.tar.gz
+# Fixed issue in pTest through below patch
+Patch0:         update-format-function-checks-in-panic-go.patch
 Patch1:         CVE-2024-6104.patch
-Patch2:         CVE-2024-24786.patch
-Patch3:         CVE-2025-21613.patch
-Patch4:         CVE-2024-28180.patch
-Patch5:         CVE-2025-27144.patch
-Patch6:         CVE-2025-22869.patch
-Patch7:         CVE-2025-22868.patch
-Patch8:         CVE-2025-30204.patch
-Patch9:         CVE-2025-22870.patch
-Patch10:        CVE-2024-51744.patch
-Patch11:        CVE-2025-22872.patch
-Patch12:        CVE-2025-58058.patch
-Patch13:        CVE-2025-47913.patch
-Patch14:        CVE-2025-11065.patch
-Patch15:        CVE-2025-47911.patch
-Patch16:        CVE-2025-58190.patch
-Patch17:        CVE-2026-39821.patch
-Patch18:        CVE-2026-39829.patch
-Patch19:        CVE-2026-39830.patch
-Patch20:        CVE-2026-39832.patch
-Patch21:        CVE-2026-39834.patch
-Patch22:        CVE-2026-42506.patch
-Patch23:        CVE-2026-42508.patch
-Patch24:        CVE-2026-46597.patch
-Patch25:        CVE-2026-27136.patch
-Patch26:        CVE-2026-25680.patch
-Patch27:        CVE-2026-25681.patch
-Patch28:        CVE-2026-39827.patch
-Patch29:        CVE-2026-39828.patch
-Patch30:        CVE-2026-39835.patch
-Patch31:        CVE-2026-42502.patch
-Patch32:        CVE-2026-46598.patch
-Patch33:        CVE-2026-33814.patch
-Patch34:        CVE-2026-39833.patch
+Patch2:         CVE-2024-28180.patch
+Patch3:         CVE-2025-27144.patch
+Patch4:         CVE-2025-22868.patch
+Patch5:         CVE-2025-30204.patch
+Patch6:         CVE-2024-51744.patch
+Patch7:         CVE-2025-58058.patch
+Patch8:         CVE-2025-11065.patch
+Patch9:         CVE-2026-45571.patch
 
-BuildRequires:  golang >= 1.21
+BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
 BuildRequires:  glibc-devel
 
@@ -97,6 +73,9 @@ go test -mod=vendor
 %{_bindir}/packer
 
 %changelog
+* Wed Jul 01 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.9.5-17
+- Upgraded vendor packages to patch CVE-2026-45570 and CVE-2026-45571 and fixed issue in pTest
+
 * Mon Jun 08 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.9.5-16
 - Fix patch for CVE-2026-39832
 - Patch for CVE-2026-39833
