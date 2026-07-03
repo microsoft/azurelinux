@@ -125,7 +125,8 @@ fi
 
 %changelog
 * Thu Jun 04 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-24
-- Patch CVE-2025-29923                                                                               - Patch CVE-2025-46327
+- Patch CVE-2025-29923
+- Patch CVE-2025-46327
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
