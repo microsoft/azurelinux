@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 Summary:        MessagePack (de)serializer.
 Name:           python-msgpack
-Version:        1.0.5
-Release:        2%{?dist}
+Version:        1.2.1
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -45,6 +45,9 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jul 03 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.1-1
+- Auto-upgrade to 1.2.1 - for CVE-2026-57585
+
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.0.5-2
 - Use pytest instead of tox to fix the ptest
 
