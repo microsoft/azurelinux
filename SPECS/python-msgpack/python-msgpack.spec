@@ -29,7 +29,7 @@ Requires:       python3
 MessagePack is a fast, compact binary serialization format, suitable for similar data to JSON. This package provides CPython bindings for reading and writing MessagePack data.
 
 %prep
-%autosetup -n msgpack-python-%{version}
+%autosetup -p1 -n msgpack-python-%{version}
 
 %build
 %py3_build
