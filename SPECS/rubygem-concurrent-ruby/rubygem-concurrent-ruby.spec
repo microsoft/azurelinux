@@ -2,7 +2,7 @@
 %global gem_name concurrent-ruby
 Summary:        Modern concurrency tools for Ruby
 Name:           rubygem-concurrent-ruby
-Version:        1.2.2
+Version:        1.3.7
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -38,6 +38,9 @@ cp -r lib/ %{buildroot}%{gem_instdir}/
 %{gemdir}
 
 %changelog
+* Sun Jun 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.3.7-1
+- Auto-upgrade to 1.3.7 - for CVE-2026-54904, CVE-2026-54905, CVE-2026-54906
+
 * Thu Nov 02 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.2.2-1
 - Auto-upgrade to 1.2.2 - Azure Linux 3.0 - package upgrades
 

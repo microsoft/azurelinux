@@ -3,21 +3,21 @@
 
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
-Version:        6.12.89.1
+Version:        6.18.36.1
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Kernel
 URL:            https://github.com/microsoft/CBL-Mariner-Linux-Kernel
-Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
+Source0:        https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/%{version}.tar.gz#/kernel-hwe-%{version}.tar.gz
 BuildArch:	    noarch
 
 %description
 The Linux API Headers expose the kernel's API for use by downstream builds.
 
 %prep
-%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-hwe-%{version}
+%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-azl3-hwe-%{version}
 
 %build
 make mrproper
@@ -35,6 +35,12 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Tue Jun 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.36.1-1
+- Auto-upgrade to 6.18.36.1
+
+* Fri May 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.31.1-1
+- Auto-upgrade to 6.18.31.1
+
 * Fri May 15 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.12.89.1-1
 - Auto-upgrade to 6.12.89.1
 

@@ -45,8 +45,8 @@
         "type": "other",
         "other": {
           "name": "acl",
-          "version": "2.3.1",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.3.1.tar.gz"
+          "version": "2.4.0",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/acl/acl-2.4.0.tar.gz"
         }
       }
     },
@@ -155,8 +155,8 @@
         "type": "other",
         "other": {
           "name": "alsa-lib",
-          "version": "1.2.9",
-          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.9.tar.bz2"
+          "version": "1.2.16.1",
+          "downloadUrl": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.16.1.tar.bz2"
         }
       }
     },
@@ -544,6 +544,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "argparse-manpage",
+          "version": "4.7",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse_manpage/argparse_manpage-4.7.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "args4j",
           "version": "2.33",
           "downloadUrl": "https://github.com/kohsuke/args4j/archive/args4j-site-2.33.tar.gz"
@@ -705,8 +715,8 @@
         "type": "other",
         "other": {
           "name": "attr",
-          "version": "2.5.2",
-          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.5.2.tar.gz"
+          "version": "2.6.0",
+          "downloadUrl": "https://download.savannah.nongnu.org/releases/attr/attr-2.6.0.tar.gz"
         }
       }
     },
@@ -915,8 +925,8 @@
         "type": "other",
         "other": {
           "name": "azurelinux-image-tools",
-          "version": "1.4.0",
-          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.4.0.tar.gz"
+          "version": "1.5.0",
+          "downloadUrl": "https://github.com/microsoft/azure-linux-image-tools/archive/refs/tags/v1.5.0.tar.gz"
         }
       }
     },
@@ -1817,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.56",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.56.tar.gz"
+          "version": "51.1.101",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
         }
       }
     },
@@ -2818,8 +2828,8 @@
         "type": "other",
         "other": {
           "name": "dnsmasq",
-          "version": "2.92",
-          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.92.tar.xz"
+          "version": "2.93",
+          "downloadUrl": "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.93.tar.xz"
         }
       }
     },
@@ -3508,8 +3518,8 @@
         "type": "other",
         "other": {
           "name": "expat",
-          "version": "2.6.4",
-          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_6_4/expat-2.6.4.tar.bz2"
+          "version": "2.8.2",
+          "downloadUrl": "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.bz2"
         }
       }
     },
@@ -3600,6 +3610,16 @@
           "name": "fdupes",
           "version": "2.2.1",
           "downloadUrl": "https://github.com/adrianlopezroche/fdupes/releases/download/v2.2.1/fdupes-2.2.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "fedora-messaging",
+          "version": "3.9.0",
+          "downloadUrl": "https://github.com/fedora-infra/fedora-messaging/releases/download/v3.9.0/fedora_messaging-3.9.0.tar.gz"
         }
       }
     },
@@ -3940,8 +3960,8 @@
         "type": "other",
         "other": {
           "name": "freeradius",
-          "version": "3.2.5",
-          "downloadUrl": "https://github.com/FreeRADIUS/freeradius-server/releases/download/release_3_2_5/freeradius-server-3.2.5.tar.bz2"
+          "version": "3.2.10",
+          "downloadUrl": "https://www.freeradius.org/ftp/pub/freeradius/freeradius-server-3.2.10.tar.bz2"
         }
       }
     },
@@ -4680,8 +4700,8 @@
         "type": "other",
         "other": {
           "name": "gnutls",
-          "version": "3.8.3",
-          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.3.tar.xz"
+          "version": "3.8.13",
+          "downloadUrl": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz"
         }
       }
     },
@@ -5480,8 +5500,8 @@
         "type": "other",
         "other": {
           "name": "httpd",
-          "version": "2.4.67",
-          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.67.tar.bz2"
+          "version": "2.4.68",
+          "downloadUrl": "https://archive.apache.org/dist/httpd/httpd-2.4.68.tar.bz2"
         }
       }
     },
@@ -6650,8 +6670,8 @@
         "type": "other",
         "other": {
           "name": "hyperv-daemons",
-          "version": "6.6.141.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.141.1.tar.gz"
+          "version": "6.6.143.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.143.1.tar.gz"
         }
       }
     },
@@ -7110,8 +7130,18 @@
         "type": "other",
         "other": {
           "name": "ibarr",
-          "version": "0.1.5",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-0.1.5.tar.gz"
+          "version": "2601.0.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibarr-2601.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ibdump",
+          "version": "6.0.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibdump-6.0.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -7121,7 +7151,7 @@
         "other": {
           "name": "ibsim",
           "version": "0.12.1",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibsim-0.12.1.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ibsim-0.12.1_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -7661,8 +7691,8 @@
         "type": "other",
         "other": {
           "name": "iser",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-26.01.tgz"
         }
       }
     },
@@ -7671,8 +7701,8 @@
         "type": "other",
         "other": {
           "name": "iser-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/iser-26.01.tgz"
         }
       }
     },
@@ -7681,8 +7711,8 @@
         "type": "other",
         "other": {
           "name": "isert",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-26.01.tgz"
         }
       }
     },
@@ -7691,8 +7721,8 @@
         "type": "other",
         "other": {
           "name": "isert-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/isert-26.01.tgz"
         }
       }
     },
@@ -8331,8 +8361,8 @@
         "type": "other",
         "other": {
           "name": "kernel",
-          "version": "6.6.141.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.141.1.tar.gz"
+          "version": "6.6.143.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.143.1.tar.gz"
         }
       }
     },
@@ -8341,8 +8371,8 @@
         "type": "other",
         "other": {
           "name": "kernel-64k",
-          "version": "6.6.141.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.141.1.tar.gz"
+          "version": "6.6.143.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.143.1.tar.gz"
         }
       }
     },
@@ -8351,8 +8381,8 @@
         "type": "other",
         "other": {
           "name": "kernel-headers",
-          "version": "6.6.141.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.141.1.tar.gz"
+          "version": "6.6.143.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.143.1.tar.gz"
         }
       }
     },
@@ -8361,8 +8391,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe",
-          "version": "6.12.89.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
+          "version": "6.18.36.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.36.1.tar.gz"
         }
       }
     },
@@ -8371,8 +8401,8 @@
         "type": "other",
         "other": {
           "name": "kernel-hwe-headers",
-          "version": "6.12.89.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/hwe/6.12.89.1.tar.gz"
+          "version": "6.18.36.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl3-hwe/6.18.36.1.tar.gz"
         }
       }
     },
@@ -8381,8 +8411,8 @@
         "type": "other",
         "other": {
           "name": "kernel-ipe",
-          "version": "6.6.141.1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.141.1.tar.gz"
+          "version": "6.6.143.1",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/mariner-3/6.6.143.1.tar.gz"
         }
       }
     },
@@ -8401,8 +8431,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.137.mshv1",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv1.tar.gz"
+          "version": "6.6.137.mshv2",
+          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv2.tar.gz"
         }
       }
     },
@@ -8583,6 +8613,16 @@
           "name": "kpatch",
           "version": "0.9.8",
           "downloadUrl": "https://github.com/dynup/kpatch/archive/refs/tags/v0.9.8.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "koji-fedoramessaging",
+          "version": "1.1.2",
+          "downloadUrl": "https://github.com/fedora-infra/koji-fedoramessaging/archive/refs/tags/1.1.2.tar.gz"
         }
       }
     },
@@ -11271,8 +11311,8 @@
         "type": "other",
         "other": {
           "name": "libslirp",
-          "version": "4.7.0",
-          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
+          "version": "4.9.3",
+          "downloadUrl": "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.9.3/libslirp-v4.9.3.tar.gz"
         }
       }
     },
@@ -11841,8 +11881,8 @@
         "type": "other",
         "other": {
           "name": "libvma",
-          "version": "9.8.72",
-          "downloadUrl": "https://github.com/Mellanox/libvma/archive/9.8.72/libvma-9.8.72.tar.gz"
+          "version": "9.8.84",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/libvma-9.8.84.tar.gz"
         }
       }
     },
@@ -12211,8 +12251,8 @@
         "type": "other",
         "other": {
           "name": "libXpm",
-          "version": "3.5.17",
-          "downloadUrl": "https://www.x.org/archive//individual/lib/libXpm-3.5.17.tar.xz"
+          "version": "3.5.19",
+          "downloadUrl": "https://www.x.org/archive//individual/lib/libXpm-3.5.19.tar.xz"
         }
       }
     },
@@ -12451,8 +12491,8 @@
         "type": "other",
         "other": {
           "name": "lldpd",
-          "version": "1.0.17",
-          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.17/lldpd-1.0.17.tar.gz"
+          "version": "1.0.22",
+          "downloadUrl": "https://github.com/lldpd/lldpd/releases/download/1.0.22/lldpd-1.0.22.tar.gz"
         }
       }
     },
@@ -13391,8 +13431,8 @@
         "type": "other",
         "other": {
           "name": "mft_kernel",
-          "version": "4.33.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.33.0.tgz"
+          "version": "4.35.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.35.0.tgz"
         }
       }
     },
@@ -13401,8 +13441,8 @@
         "type": "other",
         "other": {
           "name": "mft_kernel-hwe",
-          "version": "4.33.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.33.0.tgz"
+          "version": "4.35.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mft-4.35.0.tgz"
         }
       }
     },
@@ -13492,8 +13532,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ethtool",
-          "version": "6.14",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ethtool-6.14.tar.gz"
+          "version": "2601.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ethtool-2601.0.2.tar.gz"
         }
       }
     },
@@ -13502,8 +13542,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-iproute2",
-          "version": "6.15.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-iproute2-6.15.0.tar.gz"
+          "version": "2601.0.6",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-iproute2-2601.0.6.tar.gz"
         }
       }
     },
@@ -13512,8 +13552,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-nfsrdma",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-26.01.tgz"
         }
       }
     },
@@ -13522,8 +13562,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-nfsrdma-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-nfsrdma-26.01.tgz"
         }
       }
     },
@@ -13532,8 +13572,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ofa_kernel",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-26.01.tgz"
         }
       }
     },
@@ -13542,8 +13582,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-ofa_kernel-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-ofa_kernel-26.01.tgz"
         }
       }
     },
@@ -13552,8 +13592,8 @@
         "type": "other",
         "other": {
           "name": "mlnx-tools",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-tools-25.07.tar.gz"
+          "version": "2601.0.2",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlnx-tools-2601.0.2.tar.gz"
         }
       }
     },
@@ -13583,7 +13623,7 @@
         "other": {
           "name": "mlx-steering-dump",
           "version": "1.0.0",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/mlx-steering-dump-1.0.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/mlx-steering-dump-1.0.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -13632,8 +13672,8 @@
         "type": "other",
         "other": {
           "name": "mock",
-          "version": "5.6",
-          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-5.6-1.tar.gz"
+          "version": "6.7",
+          "downloadUrl": "https://github.com/rpm-software-management/mock/archive/refs/tags/mock-6.7-1.tar.gz"
         }
       }
     },
@@ -13933,7 +13973,7 @@
         "other": {
           "name": "multiperf",
           "version": "3.0",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/multiperf-3.0.tar.gz"
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/multiperf-3.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -14402,8 +14442,8 @@
         "type": "other",
         "other": {
           "name": "nettle",
-          "version": "3.9.1",
-          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.9.1.tar.gz"
+          "version": "3.10",
+          "downloadUrl": "https://ftp.gnu.org/gnu/nettle/nettle-3.10.tar.gz"
         }
       }
     },
@@ -14552,8 +14592,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.14.1",
-          "downloadUrl": "https://nodejs.org/download/release/v24.14.1/node-v24.14.1.tar.xz"
+          "version": "24.17.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.17.0/node-v24.17.0.tar.xz"
         }
       }
     },
@@ -15403,8 +15443,8 @@
         "type": "other",
         "other": {
           "name": "ofed-docs",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-docs-25.07.tar.gz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-docs-26.01.tar.gz"
         }
       }
     },
@@ -15413,8 +15453,8 @@
         "type": "other",
         "other": {
           "name": "ofed-scripts",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-scripts-25.07.tar.gz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ofed-scripts-26.01.tar.gz"
         }
       }
     },
@@ -15593,8 +15633,8 @@
         "type": "other",
         "other": {
           "name": "openmpi",
-          "version": "4.1.7",
-          "downloadUrl": "https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-4.1.7.tar.bz2"
+          "version": "4.1.9a1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/openmpi-4.1.9a1.tar.bz2"
         }
       }
     },
@@ -15703,8 +15743,8 @@
         "type": "other",
         "other": {
           "name": "openssl",
-          "version": "3.3.5",
-          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.5/openssl-3.3.5.tar.gz"
+          "version": "3.3.7",
+          "downloadUrl": "https://github.com/openssl/openssl/releases/download/openssl-3.3.7/openssl-3.3.7.tar.gz"
         }
       }
     },
@@ -15743,8 +15783,8 @@
         "type": "other",
         "other": {
           "name": "openvswitch",
-          "version": "3.3.0",
-          "downloadUrl": "http://openvswitch.org/releases/openvswitch-3.3.0.tar.gz"
+          "version": "3.3.9",
+          "downloadUrl": "https://www.openvswitch.org/releases/openvswitch-3.3.9.tar.gz"
         }
       }
     },
@@ -16183,8 +16223,8 @@
         "type": "other",
         "other": {
           "name": "perftest",
-          "version": "25.07.0",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perftest-25.07.0-0.104.g0c03534.tar.gz"
+          "version": "26.01.5",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/perftest-26.01.5-1.tar.gz"
         }
       }
     },
@@ -22194,7 +22234,7 @@
         "other": {
           "name": "python-argparse-manpage",
           "version": "1.5",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/a/argparse-manpage/argparse-manpage-1.5.tar.gz"
+          "downloadUrl": "https://github.com/praiskup/argparse-manpage/archive/refs/tags/v4.7.tar.gz"
         }
       }
     },
@@ -22272,6 +22312,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-Automat",
+          "version": "24.8.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/8d/2d/ede4ad7fc34ab4482389fa3369d304f2fa22e50770af706678f6a332fa82/automat-24.8.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-azure-sdk",
           "version": "5.0.0",
           "downloadUrl": "https://github.com/Azure/azure-sdk-for-python/archive/2b2cfd4/azure-sdk-2b2cfd4.tar.gz"
@@ -22303,8 +22353,8 @@
         "type": "other",
         "other": {
           "name": "python-beautifulsoup4",
-          "version": "4.12.3",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.12.3.tar.gz"
+          "version": "4.14.3",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/b/beautifulsoup4/beautifulsoup4-4.14.3.tar.gz"
         }
       }
     },
@@ -22605,6 +22655,16 @@
           "name": "python-cpuinfo",
           "version": "7.0.0",
           "downloadUrl": "https://files.pythonhosted.org/packages/source/p/py-cpuinfo/py-cpuinfo-7.0.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-crochet",
+          "version": "2.1.1",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/c/crochet/crochet-2.1.1.tar.gz"
         }
       }
     },
@@ -23562,6 +23622,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-koji-fedoramessaging-messages",
+          "version": "1.3.0",
+          "downloadUrl": "https://github.com/fedora-infra/koji-fedoramessaging-messages/archive/refs/tags/v1.3.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-kombu",
           "version": "5.0.2",
           "downloadUrl": "https://github.com/celery/kombu/archive/v5.0.2/python-kombu-5.0.2.tar.gz"
@@ -23783,8 +23853,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "3.2.1",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.2.1.tar.gz"
+          "version": "3.3.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.3.0.tar.gz"
         }
       }
     },
@@ -24155,6 +24225,16 @@
           "name": "python-pexpect",
           "version": "4.8.0",
           "downloadUrl": "https://github.com/pexpect/pexpect/archive/4.8.0/pexpect-4.8.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "python-pika",
+          "version": "1.3.2",
+          "downloadUrl": "https://github.com/pika/pika/archive/1.3.2/pika-1.3.2.tar.gz"
         }
       }
     },
@@ -24962,6 +25042,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "python-service-identity",
+          "version": "24.2.0",
+          "downloadUrl": "https://files.pythonhosted.org/packages/07/a5/dfc752b979067947261dbbf2543470c58efe735c3c1301dd870ef27830ee/service_identity-24.2.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "python-setuptools",
           "version": "69.0.3",
           "downloadUrl": "https://pypi.org/packages/source/s/setuptools/setuptools-69.0.3.tar.gz"
@@ -25313,8 +25403,8 @@
         "type": "other",
         "other": {
           "name": "python-templated-dictionary",
-          "version": "1.4",
-          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.4-1.tar.gz"
+          "version": "1.6",
+          "downloadUrl": "https://github.com/xsuchy/templated-dictionary/archive/refs/tags/python-templated-dictionary-1.6-1.tar.gz"
         }
       }
     },
@@ -25673,8 +25763,8 @@
         "type": "other",
         "other": {
           "name": "python-webob",
-          "version": "1.8.8",
-          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.8.tar.gz"
+          "version": "1.8.10",
+          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.10.tar.gz"
         }
       }
     },
@@ -26153,8 +26243,8 @@
         "type": "other",
         "other": {
           "name": "radvd",
-          "version": "2.19",
-          "downloadUrl": "http://www.litech.org/radvd/dist/radvd-2.19.tar.xz"
+          "version": "2.21",
+          "downloadUrl": "https://github.com/radvd-project/radvd/releases/download/v2.21/radvd-2.21.tar.xz"
         }
       }
     },
@@ -26255,6 +26345,16 @@
           "name": "rdma-core",
           "version": "59.0",
           "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v59.0/rdma-core-59.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rdma-core",
+          "version": "2601.0.7",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rdma-core-2601.0.7.tar.gz"
         }
       }
     },
@@ -26564,8 +26664,8 @@
         "type": "other",
         "other": {
           "name": "rshim",
-          "version": "2.4.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rshim-2.4.4.tar.gz"
+          "version": "2.6.6",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rshim-2.6.6.tar.gz"
         }
       }
     },
@@ -26714,8 +26814,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-concurrent-ruby",
-          "version": "1.2.2",
-          "downloadUrl": "https://github.com/ruby-concurrency/concurrent-ruby/archive/refs/tags/v1.2.2.tar.gz"
+          "version": "1.3.7",
+          "downloadUrl": "https://github.com/ruby-concurrency/concurrent-ruby/archive/refs/tags/v1.3.7.tar.gz"
         }
       }
     },
@@ -27194,8 +27294,8 @@
         "type": "other",
         "other": {
           "name": "rubygem-nokogiri",
-          "version": "1.15.4",
-          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.15.4.tar.gz"
+          "version": "1.19.4",
+          "downloadUrl": "https://github.com/sparklemotion/nokogiri/archive/refs/tags/v1.19.4.tar.gz"
         }
       }
     },
@@ -27644,8 +27744,8 @@
         "type": "other",
         "other": {
           "name": "runc",
-          "version": "1.3.3",
-          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.3.3.tar.gz"
+          "version": "1.3.6",
+          "downloadUrl": "https://github.com/opencontainers/runc/archive/v1.3.6.tar.gz"
         }
       }
     },
@@ -28446,8 +28546,8 @@
         "type": "other",
         "other": {
           "name": "sockperf",
-          "version": "3.10",
-          "downloadUrl": "https://linux.mellanox.com/public/repo/mlnx_ofed/24.10-0.7.0.0/SRPMS/sockperf-3.10.tar.gz"
+          "version": "3.1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/sockperf-3.1_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -28696,8 +28796,8 @@
         "type": "other",
         "other": {
           "name": "srp",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-26.01.tgz"
         }
       }
     },
@@ -28706,8 +28806,8 @@
         "type": "other",
         "other": {
           "name": "srp-hwe",
-          "version": "25.07",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-25.07.tgz"
+          "version": "26.01",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/srp-26.01.tgz"
         }
       }
     },
@@ -29496,8 +29596,8 @@
         "type": "other",
         "other": {
           "name": "trident",
-          "version": "0.22.0",
-          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.22.0.tar.gz"
+          "version": "0.24.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.24.0.tar.gz"
         }
       }
     },
@@ -29638,6 +29738,16 @@
           "name": "ucx",
           "version": "1.19.0",
           "downloadUrl": "https://github.com/openucx/ucx/releases/download/v1.19.0/ucx-1.19.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "ucx",
+          "version": "1.20.0",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/ucx-1.20.0_doca-3.3.0.tar.gz"
         }
       }
     },
@@ -30066,8 +30176,8 @@
         "type": "other",
         "other": {
           "name": "vim",
-          "version": "9.2.0488",
-          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0488.tar.gz"
+          "version": "9.2.0735",
+          "downloadUrl": "https://github.com/vim/vim/archive/v9.2.0735.tar.gz"
         }
       }
     },
@@ -31098,8 +31208,8 @@
         "type": "other",
         "other": {
           "name": "xorg-x11-server-Xwayland",
-          "version": "24.1.6",
-          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.6.tar.xz"
+          "version": "24.1.12",
+          "downloadUrl": "https://www.x.org/pub/individual/xserver/xwayland-24.1.12.tar.xz"
         }
       }
     },
@@ -31168,8 +31278,8 @@
         "type": "other",
         "other": {
           "name": "xpmem",
-          "version": "2.7.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
+          "version": "2601.0.9",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2601.0.9.tar.gz"
         }
       }
     },
@@ -31178,8 +31288,8 @@
         "type": "other",
         "other": {
           "name": "xpmem-hwe",
-          "version": "2.7.4",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2.7.4.tar.gz"
+          "version": "2601.0.9",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/xpmem-2601.0.9.tar.gz"
         }
       }
     },

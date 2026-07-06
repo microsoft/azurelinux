@@ -1,0 +1,75 @@
+From e3ae371266ce0bc0d43483ffef1b415a8fd92f03 Mon Sep 17 00:00:00 2001
+From: Ilya Maximets <i.maximets@ovn.org>
+Date: Mon, 8 Jun 2026 18:42:32 +0200
+Subject: [PATCH] tests: bfd: Fix waiting time after re-enabling BFD in decay
+ test.
+
+The BFD decay test disables BFD on one of the ports, making both sides
+to go Down.  Then it re-enables BFD and expects them to be Up within
+1.5 seconds.  This seems reasonable given the 300-500 ms configured
+timings.  However, while not in the Up state, the minimal transmission
+time is increased to be at least 1,000,000 microseconds, according to
+RFC 5880 Section 6.8.3:
+
+   When bfd.SessionState is not Up, the system MUST set
+   bfd.DesiredMinTxInterval to a value of not less than one second
+   (1,000,000 microseconds).  This is intended to ensure that the
+   bandwidth consumed by BFD sessions that are not Up is negligible,
+   particularly in the case where a neighbor may not be running BFD.
+
+And this is correctly implemented in bfd_min_tx() function.
+
+Since both sides are not Up, it takes at least two round trips for the
+states to converge.  There is a 25% randomness baked into the messages,
+so it is at least 750 ms per message, i.e., at least 1500 ms total, if
+we're very lucky.
+
+There is extra overhead in the test due to execution of the unixctl
+commands, actual packet processing, and the time it takes to execute
+the next checks.  That seems to push the timing a little and make the
+overall wait of just 1500 ms enough for the test to pass.  However,
+if the randomness is not in our favor, it may not be enough.  Ideally,
+we need at least 2000 ms, or better 2500 ms, to be sure that all
+exchanges are complete and the states are properly set.  To be safe,
+it might be better to use 3500 ms even.
+
+3500 ms should not be enough to trigger decay, as state changes reset
+the decay timer.  So, increasing the wait times this way should not
+affect the later checks.
+
+Without this change, the BFD decay test fails on my laptop in ~3% of
+the cases.  With this change, I was not able to reproduce the failure
+after 1500 iterations.
+
+We see occasional failures of this test in our CI, but they are mostly
+covered by the automatic re-check.  It's rare to see the test fail
+twice in a row to trigger the full CI failure, but it definitely does
+happen from time to time.  The failures tend to be more frequent on
+different architectures like arm or s390.  This test was flaky for as
+long as I remember working on OVS.
+
+I'm not sure if this change covers all the failures of this particular
+test, but it definitely covers a lot of them.
+
+Fixes: c1c4e8c76912 ("bfd: Implement BFD decay.")
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+ tests/bfd.at | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/bfd.at b/tests/bfd.at
+index f5c6409f6c6..ac4c8722d18 100644
+--- a/tests/bfd.at
++++ b/tests/bfd.at
+@@ -393,7 +393,9 @@ BFD_CHECK_RX([p0], [300ms], [300ms], [1ms])
+ 
+ # resume the bfd on p1. the bfd should not go to decay mode direclty.
+ AT_CHECK([ovs-vsctl set Interface p1 bfd:enable=true])
+-ovs-appctl time/warp 1500 500
++# Minimum transmission interval while the state is not Up is 1 second and
++# we need to wait for a few round-trips before the state stabilizes.
++ovs-appctl time/warp 3500 500
+ BFD_CHECK_TX([p0], [500ms], [300ms], [500ms])
+ BFD_CHECK_RX([p0], [500ms], [300ms], [500ms])
+ 

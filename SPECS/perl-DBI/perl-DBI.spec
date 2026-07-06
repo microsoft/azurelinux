@@ -5,13 +5,15 @@
 Summary:        A database access API for perl
 Name:           perl-DBI
 Version:        1.643
-Release:        3%{?dist}
+Release:        5%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
 # The source tarball must be repackaged to remove the DBI/FAQ.pm, since the
 # license is not a FSF free license.
 Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
+Patch0:         CVE-2026-10879.patch
+Patch1:         CVE-2026-9698.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
@@ -106,7 +108,8 @@ functions, variables and conventions that provide a consistent
 database interface independent of the actual database being used.
 
 %prep
-%setup -q -n DBI-%{version}
+%autosetup -n DBI-%{version} -p1
+
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -161,6 +164,12 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.643-5
+- Patch for CVE-2026-9698
+
+* Tue Jun 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.643-4
+- Patch for CVE-2026-10879
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.643-3
 - Release bump to regenerate package's requires and provides.
 

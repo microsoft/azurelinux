@@ -21,8 +21,8 @@
 
 Summary:	 Cross-partition memory
 Name:		 %{_name}-signed
-Version:	 2.7.4
-Release:	 23%{release_suffix}%{?dist}
+Version:	 2601.0.9
+Release:	 1%{release_suffix}%{?dist}
 License:	 GPLv2 and LGPLv2.1
 Group:		 System Environment/Libraries
 Vendor:          Microsoft Corporation
@@ -95,6 +95,9 @@ fi
 
 
 %changelog
+* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 2601.0.9-1
+- Bump to match upgrade to DOCA 3.3.0 (xpmem 2601.0.9).
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 2.7.4-23
 - Tweak specs to use dynamic versioning for kernel and mlnx_ofa_kernel versions.
 
