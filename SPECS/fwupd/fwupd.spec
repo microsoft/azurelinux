@@ -210,6 +210,13 @@ or server machines.
 %install
 %meson_install
 
+# Ship the efivars free-space escape hatch commented-out in the default config.
+# Some firmware implementations can misreport efivars free space via RT->QueryVariableInfo,
+# making fwupd refuse UEFI db/KEK/dbx (uefi_db) updates with "Not enough efivarfs
+# space". If a user hits that, they simply uncomment the line below. Upstream instead
+# automates this per-HWID (fwupd 3a6d9e38 + 3b603759), which is not present in 2.0.20.
+printf '#IgnoreEfivarsFreeSpace=true\n\n' >> %{buildroot}%{_sysconfdir}/fwupd/fwupd.conf
+
 # Remove installed-test artifacts when not building the -tests subpackage
 %if ! 0%{?enable_tests}
 rm -rf %{buildroot}%{_datadir}/installed-tests/fwupd
