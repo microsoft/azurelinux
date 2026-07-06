@@ -46,10 +46,6 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: apiAudience
-            value: ${{ parameters.apiAudience }}
-          - name: apiBaseAFDUrl
-            value: ${{ parameters.apiBaseAFDUrl }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
           - name: ob_artifactBaseName
@@ -89,8 +85,13 @@ stages:
                   --commit-sha "$SOURCE_COMMIT" \
                   --repo-uri "$BUILD_REPOSITORY_URI"
             env:
-              API_AUDIENCE: $(apiAudience)
-              API_BASE_URL: $(apiBaseAFDUrl)
+              # apiAudience / apiBaseAFDUrl come from the parameters directly
+              # (not surfaced as same-named job variables): the wrapper passes
+              # $(ApiAudience) / $(ApiBaseAFDUrl) from the variable group, and a
+              # job variable of the same (case-insensitive) name would
+              # self-reference -> "cyclical reference" and never resolve.
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               PACKAGE_TARGET: $(packageTarget)
               SOURCE_COMMIT: $(sourceCommit)

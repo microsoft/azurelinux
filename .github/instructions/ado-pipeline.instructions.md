@@ -70,7 +70,7 @@ Reading another template's variable follows the same shape: take a `<var_name>Va
 
 **Predefined variables: reference the auto-exposed env var directly; never re-map them.** ADO auto-exposes every non-secret predefined variable to scripts as an env var — uppercased with `.` → `_` (e.g. `Build.Reason` → `$BUILD_REASON`, `Build.ArtifactStagingDirectory` → `$BUILD_ARTIFACTSTAGINGDIRECTORY`, `Build.Repository.Uri` → `$BUILD_REPOSITORY_URI`, `System.DefinitionId` → `$SYSTEM_DEFINITIONID`). This is the default way to use a predefined variable: reference `$NAME` directly in the script and do NOT add it to `env:` — neither under its own name (the agent silently drops an `env:` entry that shadows a reserved variable) nor under a new alias (redundant, and it hides that the value is predefined). A short inline comment noting a value is auto-exposed prevents a maintainer from "completing" the `env:` block. **The one exception is a *secret* predefined variable** such as `System.AccessToken`, which is NOT auto-exposed and therefore MUST be mapped in `env:`.
 
-**Surface runtime-consumed parameters as `variables` when the template owns a `variables` section.** When a template defines its own `variables` section (i.e. it declares stages/jobs), convert the input parameters it consumes at runtime into entries in that `variables` section (`- name: foo` / `value: ${{ parameters.foo }}`) and reference them as `$(foo)`. A parameter value may be a runtime `$[ <expression> ]` (or `$(macro)`) expression, which is only evaluated inside the `variables` section — referencing `${{ parameters.foo }}` directly elsewhere would emit the literal, unevaluated string. Parameters used only in compile-time structural positions (e.g. `pool.type`, `timeoutInMinutes`, task `name:`/`azureSubscription:`) stay as parameters.
+**Surface runtime-consumed parameters as `variables` when the template owns a `variables` section.** When a template defines its own `variables` section (i.e. it declares stages/jobs), convert the input parameters it consumes at runtime into entries in that `variables` section (`- name: foo` / `value: ${{ parameters.foo }}`) and reference them as `$(foo)`. A parameter value may be a runtime `$[ <expression> ]` (or `$(macro)`) expression, which is only evaluated inside the `variables` section — referencing `${{ parameters.foo }}` directly elsewhere would emit the literal, unevaluated string. Parameters used only in compile-time structural positions (e.g. `pool.type`, `timeoutInMinutes`, task `name:`/`azureSubscription:`) stay as parameters. **Caveat — do not create a self-referential cycle:** if a parameter's value is a `$(macro)` that references a variable whose name matches the surfaced variable's name (variable names are case-insensitive — e.g. a param passed `apiAudience: $(ApiAudience)` from a variable group), surfacing it as a same-named job variable makes it reference itself, and ADO reports *"Unable to expand variable … A cyclical reference was detected."* In that case reference the parameter directly (`${{ parameters.foo }}`) in `env:` instead, or surface it under a distinct name.
 
 ## OneBranch templates (MANDATORY — wrapper only)
 
@@ -337,10 +337,6 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: apiAudience
-            value: ${{ parameters.apiAudience }}
-          - name: apiBaseUrl
-            value: ${{ parameters.apiBaseUrl }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
           - name: ob_artifactBaseName
@@ -365,8 +361,11 @@ stages:
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL"
             env:
-              API_AUDIENCE: $(apiAudience)
-              API_BASE_URL: $(apiBaseUrl)
+              # Referenced from the parameters directly: the wrapper passes
+              # $(ApiAudience) / $(ApiBaseUrl) from the group, so a same-named
+              # job variable would self-reference (cyclical reference).
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseUrl }}
 ```
 
 Replace every `<...>` placeholder.

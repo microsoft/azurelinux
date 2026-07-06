@@ -55,10 +55,6 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - name: apiAudience
-            value: ${{ parameters.apiAudience }}
-          - name: apiBaseAFDUrl
-            value: ${{ parameters.apiBaseAFDUrl }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
           - name: ob_artifactBaseName
@@ -103,8 +99,13 @@ stages:
                   --source-commit "$SOURCE_COMMIT" \
                   --repo-uri "$BUILD_REPOSITORY_URI"
             env:
-              API_AUDIENCE: $(apiAudience)
-              API_BASE_URL: $(apiBaseAFDUrl)
+              # apiAudience / apiBaseAFDUrl are referenced from the parameters
+              # directly (NOT surfaced as same-named job variables): the wrapper
+              # passes $(ApiAudience) / $(ApiBaseAFDUrl) from the variable group,
+              # and a job variable of the same (case-insensitive) name would
+              # self-reference -> "cyclical reference" and never resolve.
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               # TODO: Base commit is not used yet. Will be needed once we move
               # detection of affected components to CT. ADO task: 18816
               BASE_COMMIT: $(baseCommit)
@@ -146,8 +147,11 @@ stages:
                   --wait-for-completion \
                   --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
             env:
-              API_AUDIENCE: $(apiAudience)
-              API_BASE_URL: $(apiBaseAFDUrl)
+              # See the prcheck step: apiAudience / apiBaseAFDUrl come from the
+              # parameters directly to avoid a cyclical self-reference with the
+              # same-named variable-group variables.
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               PACKAGE_TARGET: $(packageTarget)
               POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
