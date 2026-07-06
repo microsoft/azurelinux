@@ -47,7 +47,7 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       automake
 Requires:       glib2-devel >= %{glib2_version}
 Requires:       indent
-Requires:       libIDL-devel >= %{libidl_version}
+Requires(pre):       libIDL-devel >= %{libidl_version}
 # we install a pc file
 Requires:       pkgconfig
 Conflicts:      ORBit-devel <= 1:0.5.8
