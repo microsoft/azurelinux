@@ -87,14 +87,14 @@ stages:
                   --package-target "$PACKAGE_TARGET" \
                   --official-build \
                   --commit-sha "$SOURCE_COMMIT" \
-                  --repo-uri "$UPSTREAM_REPO_URL"
+                  --repo-uri "$BUILD_REPOSITORY_URI"
             env:
               API_AUDIENCE: $(apiAudience)
               API_BASE_URL: $(apiBaseAFDUrl)
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               PACKAGE_TARGET: $(packageTarget)
               SOURCE_COMMIT: $(sourceCommit)
-              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
-              # Build.Reason is auto-exposed to the script as $BUILD_REASON; do
-              # not add a BUILD_REASON entry here -- the agent silently ignores
-              # env: overrides of that reserved predefined variable.
+              # Build.Reason and Build.Repository.Uri are predefined and
+              # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI; reference
+              # them directly and do not map them here (env: overrides of
+              # reserved variables are silently ignored by the agent).

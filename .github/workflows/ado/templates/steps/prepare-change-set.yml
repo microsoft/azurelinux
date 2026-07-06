@@ -28,7 +28,7 @@ parameters:
 steps:
   - script: |
       set -euo pipefail
-      change_set_dir="$ARTIFACT_STAGING_DIR/change-set"
+      change_set_dir="$BUILD_ARTIFACTSTAGINGDIRECTORY/change-set"
       json_file="$change_set_dir/changed-components.json"
       render_set_file="$change_set_dir/render-set.txt"
 
@@ -59,7 +59,6 @@ steps:
       echo "##vso[task.setvariable variable=$CHANGED_COMPONENTS_FILE_VAR;isreadonly=true]$json_file"
       echo "##vso[task.setvariable variable=$RENDER_SET_FILE_VAR;isreadonly=true]$render_set_file"
     env:
-      ARTIFACT_STAGING_DIR: $(Build.ArtifactStagingDirectory)
       CHANGED_COMPONENTS_FILE_VAR: ${{ parameters.changedComponentsFileVar }}
       FROM_COMMIT: $(${{ parameters.fromCommitVar }})
       OB_OUTPUT_DIR: $(ob_outputDirectory)
