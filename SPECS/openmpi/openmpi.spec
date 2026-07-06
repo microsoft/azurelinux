@@ -220,7 +220,7 @@ Summary: A powerful implementation of MPI/SHMEM
 Name: openmpi
 Epoch: 3
 Version: 4.1.9a1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: BSD
 Group: Development/Libraries
 # https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
@@ -240,6 +240,7 @@ Requires: %{modules_rpm_name}
 %if %{use_mpi_selector}
 Requires: %{mpi_selector_rpm_name}
 %endif
+Requires: openssh-clients
 Requires: ucx
 
 %description
@@ -271,6 +272,7 @@ AutoReq: no
 %endif
 Provides: openmpi-devel = %{version}
 Requires: %{name}%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: gcc-gfortran
 
 %description devel
 Open MPI is an open source implementation of the Message Passing
@@ -706,6 +708,9 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 #
 #############################################################################
 %changelog
+* Thu Jul 02 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-3
+- Restore Open MPI SSH and devel compiler dependencies
+
 * Mon Jun 29 2026 Mitch Zhu <mitchzhu@microsoft.com> - 3:4.1.9a1-2
 - Build Open MPI runtime in the main package with split devel and docs
 - Restore Open MPI environment modulefile
