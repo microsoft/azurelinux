@@ -1986,6 +1986,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.log4j]
 [components.logrotate]
 [components.logwatch]
+[components.lolcat]
 [components.lorax]
 [components.lpcnetfreedv]
 [components.lrzsz]
