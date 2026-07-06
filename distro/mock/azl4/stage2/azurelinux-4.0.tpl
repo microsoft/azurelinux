@@ -89,13 +89,13 @@ user_agent={{ user_agent }}
 
 [base]
 name=base
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch
+baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch
 enabled=1
 skip_if_unavailable=False
 
 [sdk]
 name=sdk
-baseurl=https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/sdk/$basearch
+baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
 enabled=1
 skip_if_unavailable=False
 
