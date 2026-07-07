@@ -1,7 +1,7 @@
 Summary: Library for parsing IDL (Interface Definition Language)
 Name: libIDL
 Version: 0.8.14
-Release: 23%{?dist}
+Release: 24%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL: http://ftp.gnome.org/pub/gnome/sources/libIDL/0.8/
@@ -61,6 +61,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*a
 %{_infodir}/libIDL2.info.*
 
 %changelog
+* Tue Jul 07 2026 Vijayender Putta <v-vijputta@microsoft.com> - 0.8.14-24 
+- Resolved license issue
+
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 0.8.14-23
 - Remove epoch from pkgconfig
 
