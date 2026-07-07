@@ -54,6 +54,10 @@ DEFAULT_SOURCE_CONTAINER = "repo"
 BLOB_PREFIX = "pkgs"
 DEFAULT_RESUME_FILE = "sources-upload-failures.txt"
 DEFAULT_TAGS = (("Origin", "Initial hydration with Beta build sources"),)
+# Metadata key recording each blob's source URL. Stored as metadata rather than
+# an index tag because source URLs routinely exceed the 256-character index-tag
+# value limit and may contain characters disallowed in tags (e.g. ``~``, ``^``).
+ORIGIN_LOCATION_METADATA_KEY = "OriginLocation"
 DEFAULT_RETRIES = 3
 DEFAULT_WORKERS_PER_CPU = 10
 COPY_POLL_INTERVAL_S = 2.0
@@ -230,15 +234,25 @@ def fetch_source_size(source_container: ContainerClient, blob_path: str) -> int 
         return None
 
 
-def apply_tags(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> bool:
-    """Set blob index tags on a destination blob; return whether it succeeded."""
-    if not tags:
-        return True
+def apply_metadata_and_tags(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> bool:
+    """Set ``OriginLocation`` metadata and blob index tags on a destination blob.
+
+    The ``OriginLocation`` metadata records the source URL the blob was copied
+    from; it is stored as metadata (not an index tag) because source URLs
+    routinely exceed the 256-character index-tag value limit. Returns whether
+    every update succeeded.
+    """
     try:
-        dest.set_blob_tags(tags)
+        dest.set_blob_metadata({ORIGIN_LOCATION_METADATA_KEY: entry.source_url})
     except AzureError as err:
-        log_error(f"failed to set tags for {entry.blob_path}: {err}")
+        log_error(f"failed to set metadata for {entry.blob_path}: {err}")
         return False
+    if tags:
+        try:
+            dest.set_blob_tags(tags)
+        except AzureError as err:
+            log_error(f"failed to set tags for {entry.blob_path}: {err}")
+            return False
     return True
 
 
@@ -247,7 +261,7 @@ def initiate_copy(entry: Entry, ctx: CopyContext) -> tuple[Entry, str, BlobClien
 
     Returns the entry, an outcome (``"skipped"``, ``"initiated"`` or
     ``"error"``), and the destination blob client when a copy was started.
-    Already-present blobs still have their tags refreshed.
+    Already-present blobs still have their metadata and tags refreshed.
     """
     dest = ctx.target_container.get_blob_client(entry.blob_path)
 
@@ -261,7 +275,7 @@ def initiate_copy(entry: Entry, ctx: CopyContext) -> tuple[Entry, str, BlobClien
         existing = None
 
     if existing is not None and source_size is not None and existing.size == source_size:
-        if not apply_tags(entry, dest, ctx.tags):
+        if not apply_metadata_and_tags(entry, dest, ctx.tags):
             return entry, "error", None
         return entry, "skipped", None
 
@@ -277,8 +291,8 @@ def initiate_copy(entry: Entry, ctx: CopyContext) -> tuple[Entry, str, BlobClien
 def poll_copy(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> tuple[Entry, bool]:
     """Poll a started copy until it completes, fails, or times out.
 
-    On success the configured tags are applied. Returns the entry and whether
-    the copy (and tagging) succeeded.
+    On success the ``OriginLocation`` metadata and configured tags are applied.
+    Returns the entry and whether the copy (and metadata/tagging) succeeded.
     """
     deadline = time.monotonic() + COPY_TIMEOUT_S
     while True:
@@ -290,7 +304,7 @@ def poll_copy(entry: Entry, dest: BlobClient, tags: dict[str, str]) -> tuple[Ent
 
         status = copy.status or "unknown"
         if status == "success":
-            return entry, apply_tags(entry, dest, tags)
+            return entry, apply_metadata_and_tags(entry, dest, tags)
         if status in TERMINAL_FAILURE_STATES:
             log_error(f"copy {status} for {entry.source_url}: {copy.status_description or 'no detail'}")
             return entry, False
@@ -512,6 +526,7 @@ def main() -> int:
         print(f"Dry run: would upload {len(entries)} blob(s):")
         for entry in sorted(entries, key=lambda e: e.blob_path):
             print(f"  {entry.blob_path}")
+        print(f"Metadata to apply: {ORIGIN_LOCATION_METADATA_KEY}=<source URL per blob>")
         if tags:
             print("Tags to apply: " + ", ".join(f"{k}={v}" for k, v in tags.items()))
         return 0
