@@ -372,9 +372,5 @@ enable gpio-manager.service
 # Enable authselect-apply-changes.service
 enable authselect-apply-changes.service
 
-# Enable netplan-configure.service so netplan applies its backend configuration
-# (networkd/NetworkManager files + virtual devices: dummy/bridge/bond/vlan/SR-IOV)
-# at boot. netplan 1.2.1 split this work out of the boot-time systemd generator
-# (now validation-only); the upstream/Fedora unit ships preset: disabled, so
-# without this line netplan config would silently never apply at boot.
+# Enable netplan-configure service
 enable netplan-configure.service
