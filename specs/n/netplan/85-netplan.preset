@@ -1,0 +1,8 @@
+# Azure Linux: enable netplan-configure.service by default.
+#
+# netplan 1.2.1 split the boot-time systemd generator (now validation-only)
+# from the actual backend-file writing + virtual-device creation (dummy /
+# bridge / bond / vlan / SR-IOV), which now runs in netplan-configure.service.
+# The upstream/Fedora unit ships preset: disabled, so without this preset
+# netplan config would silently never apply at boot (empty /run/systemd/network).
+enable netplan-configure.service

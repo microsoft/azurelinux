@@ -21,11 +21,12 @@
 
 Name:           netplan
 Version:        1.2.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Network configuration tool using YAML
 License:        GPL-3.0-only
 URL:            http://netplan.io/
 Source0:        https://github.com/canonical/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Source1: 85-netplan.preset
 
 # Downstream only
 Patch1001:      netplan-fallback-renderer.patch
@@ -108,6 +109,7 @@ Currently supported backends are NetworkManager and systemd-networkd.
 %{_libexecdir}/%{name}/%{name}-dbus
 %{_datadir}/bash-completion/completions/%{name}
 %{_unitdir}/netplan-configure.service
+%{_presetdir}/85-netplan.preset
 
 # ------------------------------------------------------------------------------------------------
 
@@ -255,6 +257,9 @@ sed -i -e "/    test('legacy-tests',/,+3d" \
 
 %install
 %meson_install
+
+# Azure Linux: enable netplan-configure.service by default via a preset.
+install -D -m 0644 %{SOURCE1} %{buildroot}%{_presetdir}/85-netplan.preset
 
 # Pre-create the config directory
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}

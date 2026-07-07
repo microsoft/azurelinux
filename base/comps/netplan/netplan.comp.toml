@@ -10,3 +10,45 @@
 # Fedora f44 dist-git: https://src.fedoraproject.org/rpms/netplan/commits/f44
 [components.netplan]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "66c31bcd3e9aeb8d15a5b4184009e57d799b0158" }
+
+# Enable netplan-configure.service by default for Azure Linux.
+#
+# netplan 1.2.1 defers backend-file writing and virtual-device creation from
+# the boot-time systemd generator (now validation-only) into a new
+# netplan-configure.service. Fedora ships that unit preset: disabled, so
+# without enabling it netplan config silently never applies at boot. Ship a
+# systemd system-preset that enables it (applied by the image build preset
+# mechanism, the same way azurelinux-release ships 90-default.preset).
+
+# 1. Add the preset file to the sources root.
+[[components.netplan.overlays]]
+description = "Add systemd system-preset that enables netplan-configure.service by default"
+type = "file-add"
+file = "85-netplan.preset"
+source = "85-netplan.preset"
+
+# 2. Register the preset as a Source so %{SOURCE1} resolves.
+[[components.netplan.overlays]]
+description = "Register 85-netplan.preset as a spec Source"
+type = "spec-insert-tag"
+tag = "Source1"
+value = "85-netplan.preset"
+
+# 3. Install the preset into the systemd system-preset directory. Anchor on
+#    %meson_install (scoped to %install) rather than appending to the section,
+#    because the section trailer is a %if %{with tests}/%check block and a bare
+#    append would land the install command inside that conditional.
+[[components.netplan.overlays]]
+description = "Install 85-netplan.preset into the systemd system-preset dir"
+type = "spec-search-replace"
+section = "%install"
+regex = '%meson_install'
+replacement = "%meson_install\n\n# Azure Linux: enable netplan-configure.service by default via a preset.\ninstall -D -m 0644 %{SOURCE1} %{buildroot}%{_presetdir}/85-netplan.preset"
+
+# 4. Ship the preset file in the main package %files, next to the unit it enables.
+[[components.netplan.overlays]]
+description = "Package the netplan-configure.service enable preset"
+type = "spec-search-replace"
+section = "%files"
+regex = '%\{_unitdir\}/netplan-configure\.service'
+replacement = "%{_unitdir}/netplan-configure.service\n%{_presetdir}/85-netplan.preset"
