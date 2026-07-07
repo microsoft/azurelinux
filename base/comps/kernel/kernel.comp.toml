@@ -371,6 +371,15 @@ type = "spec-insert-tag"
 tag = "Source6101"
 value = "kmod-mlnx-ofa_kernel.inc"
 
+[[components.kernel.overlays]]
+description = "Add conditional Requires for kmod-iser to base kernel package."
+type = "spec-search-replace"
+regex = '^Requires:\s*\(\(%\{name\}-modules-extra-uname-r\s*=\s*%\{KVERREL\}\)\s*if\s*%\{name\}-modules-extra-matched\)$'
+replacement = """Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((kmod-iser-uname-r = %{KVERREL}) if kmod-iser-matched)
+%endif"""
+
 # --- kmod-mlnx-ofa_kernel: phase injection ---
 [[components.kernel.overlays]]
 description = "Run mlnx-ofa_kernel kmod 'package' phase — declares the kmod-mlnx-ofa_kernel subpackage"
