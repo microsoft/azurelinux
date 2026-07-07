@@ -49,8 +49,9 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*a
 
 %files
 %{_libdir}/libIDL-*.so.*
+%license COPYING
 
-%doc AUTHORS COPYING README NEWS BUGS MAINTAINERS
+%doc AUTHORS README NEWS BUGS MAINTAINERS
 
 %files devel
 %{_includedir}/libIDL-2.0/
