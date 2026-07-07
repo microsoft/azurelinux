@@ -372,3 +372,5 @@ enable gpio-manager.service
 # Enable authselect-apply-changes.service
 enable authselect-apply-changes.service
 
+# Enable netplan-configure service
+enable netplan-configure.service
