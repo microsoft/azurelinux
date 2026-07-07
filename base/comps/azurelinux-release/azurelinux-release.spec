@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        18%{?dist}
+Release:        19%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -476,6 +476,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Tue Jul 07 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0-19
+- Enable netplan-configure.service by default via 90-default.preset
+
 * Wed Jun 10 2026 Andrew Phelps <anphel@microsoft.com> - 4.0-18
 - Update CPE_NAME in os-release to a well-formed CPE 2.3 formatted string
   (microsoft:azure_linux), replacing the legacy CPE 2.2 URI binding
