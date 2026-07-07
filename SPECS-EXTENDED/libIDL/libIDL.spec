@@ -7,7 +7,7 @@ Distribution:   Azure Linux
 URL: http://ftp.gnome.org/pub/gnome/sources/libIDL/0.8/
 Source: http://download.gnome.org/sources/libIDL/0.8/%{name}-%{version}.tar.bz2
 Patch0: libIDL-0.8.6-multilib.patch
-License: LGPLv2+
+License: LGPL-2.0-or-later
 BuildRequires:  gcc
 BuildRequires: pkgconfig >= 0.8
 BuildRequires: glib2-devel >= 2.0
@@ -62,7 +62,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/*a
 
 %changelog
 * Tue Jul 07 2026 Vijayender Putta <v-vijputta@microsoft.com> - 0.8.14-24 
-- Resolved license issue
+- License verified.
 
 * Wed Nov 03 2021 Muhammad Falak <mwani@microsft.com> - 0.8.14-23
 - Remove epoch from pkgconfig
