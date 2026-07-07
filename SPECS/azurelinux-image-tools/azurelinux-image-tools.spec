@@ -2,7 +2,7 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.5.0
+Version:        1.5.1
 Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
@@ -110,6 +110,9 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Tue Jul 7 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.1-1
+- Upgrade to version 1.5.1
+
 * Fri May 29 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
 - Upgrade to version 1.5.0
 
