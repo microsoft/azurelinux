@@ -33,15 +33,16 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 Source1:        %{name}-%{version}-vendor-v3.tar.gz
 # Fixed issue in pTest through below patch
 Patch0:         update-format-function-checks-in-panic-go.patch
-Patch1:         CVE-2024-6104.patch
-Patch2:         CVE-2024-28180.patch
-Patch3:         CVE-2025-27144.patch
-Patch4:         CVE-2025-22868.patch
-Patch5:         CVE-2025-30204.patch
-Patch6:         CVE-2024-51744.patch
-Patch7:         CVE-2025-58058.patch
-Patch8:         CVE-2025-11065.patch
-Patch9:         CVE-2026-45571.patch
+Patch1:         CVE-2022-3064.patch
+Patch2:         CVE-2024-6104.patch
+Patch3:         CVE-2024-28180.patch
+Patch4:         CVE-2025-27144.patch
+Patch5:         CVE-2025-22868.patch
+Patch6:         CVE-2025-30204.patch
+Patch7:         CVE-2024-51744.patch
+Patch8:         CVE-2025-58058.patch
+Patch9:         CVE-2025-11065.patch
+Patch10:        CVE-2026-45571.patch
 
 BuildRequires:  golang >= 1.25
 BuildRequires:  kernel-headers
