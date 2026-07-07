@@ -22,6 +22,11 @@ Patch10:        CVE-2026-7168.patch
 Patch11:        CVE-2026-5545.patch
 Patch12:        CVE-2026-6253.patch
 Patch13:        CVE-2026-6429.patch
+Patch14:        CVE-2026-12064.patch
+Patch15:        CVE-2026-8926.patch
+Patch16:        CVE-2026-8927.patch
+Patch17:        CVE-2026-8932.patch
+Patch18:        CVE-2026-9545.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
@@ -111,6 +116,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/libcurl.so.*
 
 %changelog
+* Tue Jul 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-9
+- Patch for CVE-2026-9545, CVE-2026-8932, CVE-2026-8927, CVE-2026-8926, CVE-2026-12064
+
 * Mon Jun 15 2026 Vince Perri <viperri@microsoft.com> - 8.11.1-9
 - Remove cmake build dependency to break cyclic dependency between curl and cmake
 
