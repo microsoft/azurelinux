@@ -752,6 +752,9 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((kmod-mlnx-ofa_kernel-uname-r = %{KVERREL}) if kmod-mlnx-ofa_kernel-matched)
+%endif
 Provides: installonlypkg(kernel)
 %endif
 
@@ -4605,6 +4608,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Jul 06 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.7
+- feat(kernel): add kmod-mlnx-ofa_kernel-matched sentinel package for automatic kernel upgrade tracking
+
 * Wed Jun 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.6
 - feat(kernel): add kmod-mlnx-ofa_kernel subpackage (mlnx-ofa_kernel 26.04, NIC+RDMA+IPoIB)
 

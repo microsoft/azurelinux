@@ -23,6 +23,7 @@ Provides:       mlnx-ofa-kmod-version = %{mlnx_ofa_version}
 Provides:       mlnx-ofa-kmod-release = %{mlnx_ofa_release}
 Provides:       kmod-%{_kmod_name} = %{version}-%{release}
 Provides:       kmod-mlnx-ofa = %{version}-%{release}
+Provides:       kmod-mlnx-ofa_kernel-uname-r = %{KVERREL}
 Obsoletes:      kmod-mlnx-ofa < %{version}-%{release}
 Provides:       installonlypkg(kernel-module)
 Requires:       %{name}-core-uname-r = %{KVERREL}
@@ -33,6 +34,15 @@ Requires(postun): kmod
 NVIDIA / Mellanox InfiniBand and Ethernet (mlx5) kernel modules built from
 mlnx-ofa_kernel %{mlnx_ofa_version} (%{mlnx_ofa_release}) against kernel
 %{KVERREL}.
+
+%package -n kmod-mlnx-ofa_kernel-matched
+Summary:        Meta package to ensure kmod-mlnx-ofa_kernel is installed for all kernels
+
+%description -n kmod-mlnx-ofa_kernel-matched
+This meta package provides a single reference that other packages can Require
+to have kmod-mlnx-ofa_kernel installed for all kernels. When installed, the
+kernel package automatically pulls in the version-matched kmod-mlnx-ofa_kernel
+for each kernel version on this machine (x86_64 and aarch64 only).
 
 # -------------------------------------------------------------------------
 # -devel: headers + Module.symvers + helper scripts for building out-of-tree
@@ -273,6 +283,9 @@ fi
 %files -n kmod-%{_kmod_name}-%{mlnx_ofa_version}
 %license %{_datadir}/licenses/kmod-%{_kmod_name}-%{mlnx_ofa_version}/COPYING
 /lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel/
+
+%files -n kmod-mlnx-ofa_kernel-matched
+# empty sentinel package — no files
 
 %files -n kmod-%{_kmod_name}-devel-%{mlnx_ofa_version}
 %license %{_datadir}/licenses/kmod-%{_kmod_name}-%{mlnx_ofa_version}/COPYING

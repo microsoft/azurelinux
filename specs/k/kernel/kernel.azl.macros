@@ -2,7 +2,7 @@
 # Do not edit manually; changes will be overwritten.
 %_without_debug 1
 %_without_selftests 1
-%azl_pkgrelease 6
+%azl_pkgrelease 7
 %kextraversion 1
 %mlnx_ofa_bundle_release 0.8.5.0
 %mlnx_ofa_release OFED.26.04.0.8.5.1

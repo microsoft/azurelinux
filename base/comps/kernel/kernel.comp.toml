@@ -14,7 +14,7 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "6"
+azl_pkgrelease = "7"
 # 4th version component from the AZL kernel source (6.18.31.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.31-1.1.azl4.aarch64).
 kextraversion = "1"
@@ -371,6 +371,15 @@ type = "spec-insert-tag"
 tag = "Source6101"
 value = "kmod-mlnx-ofa_kernel.inc"
 
+[[components.kernel.overlays]]
+description = "Add conditional Requires for kmod-mlnx-ofa_kernel to base kernel package."
+type = "spec-search-replace"
+regex = '^Requires:\s*\(\(%\{name\}-modules-extra-uname-r\s*=\s*%\{KVERREL\}\)\s*if\s*%\{name\}-modules-extra-matched\)$'
+replacement = """Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((kmod-mlnx-ofa_kernel-uname-r = %{KVERREL}) if kmod-mlnx-ofa_kernel-matched)
+%endif"""
+
 # --- kmod-mlnx-ofa_kernel: phase injection ---
 [[components.kernel.overlays]]
 description = "Run mlnx-ofa_kernel kmod 'package' phase — declares the kmod-mlnx-ofa_kernel subpackage"
@@ -447,6 +456,9 @@ description = "Prepend AZL changelog entries (one per lock-fingerprint change) a
 type = "spec-prepend-lines"
 section = "%changelog"
 lines = [
+    "* Mon Jul 06 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.7",
+    "- feat(kernel): add kmod-mlnx-ofa_kernel-matched sentinel package for automatic kernel upgrade tracking",
+    "",
     "* Wed Jun 10 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.6",
     "- feat(kernel): add kmod-mlnx-ofa_kernel subpackage (mlnx-ofa_kernel 26.04, NIC+RDMA+IPoIB)",
     "",
