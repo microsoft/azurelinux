@@ -17,7 +17,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #   1. wget https://github.com/hashicorp/packer/archive/v%%{version}.tar.gz -O %%{name}-%%{version}.tar.gz
 #   2. tar -xf %%{name}-%%{version}.tar.gz
 #   3. cd %%{name}-%%{version}
-#   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2025-21613.patch.
+#   4. Apply all patches affecting "go.mod" and "go.sum" files. Example: CVE-2026-45571.patch.
 #   5. go mod vendor
 #   6. tar  --sort=name \
 #           --mtime="2021-04-26 00:00Z" \
@@ -30,7 +30,7 @@ Source0:        https://github.com/hashicorp/packer/archive/refs/tags/v%{version
 #       - The additional options enable generation of a tarball with the same hash every time regardless of the environment.
 #         See: https://reproducible-builds.org/docs/archives/
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
-Source1:        %{name}-%{version}-vendor-v3.tar.gz
+Source1:        %{name}-%{version}-vendor-v4.tar.gz
 # Fixed issue in pTest through below patch
 Patch0:         update-format-function-checks-in-panic-go.patch
 Patch1:         CVE-2022-3064.patch
