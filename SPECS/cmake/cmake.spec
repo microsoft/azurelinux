@@ -11,36 +11,11 @@ URL:            https://www.cmake.org/
 Source0:        https://github.com/Kitware/CMake/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        macros.cmake
 Patch0:         0001-manually-recreating-patches.patch
-Patch1:         CVE-2024-6197.patch
-Patch2:         CVE-2024-6874.patch
-Patch3:         CVE-2024-8096.patch
-Patch4:         CVE-2024-11053.patch
-Patch5:         CVE-2024-7264.patch
-Patch6:         CVE-2024-9681.patch
-Patch7:         CVE-2023-44487.patch
-# When upgrading cmake, verify by hand that this patch is actually contained
-# within the cmnghttp2 source. The autoupgrader mistakenly removes it. Upstream
-# nghttp2 patched this with v1.55.1 and newer. As of cmake v3.30.3, cmake has
-# nghttp2 v1.52.0 plus some upstream patches. nghttp2 version can be found in
-# Utilities/cmnghttp2/lib/includes/nghttp2/nghttp2ver.h. Manual inspection is
-# required to determine what upstream patches are included.
-Patch8:         CVE-2023-35945.patch
-Patch9:         CVE-2024-48615.patch
-Patch10:        CVE-2025-4947.patch
-Patch11:        CVE-2025-5916.patch
-Patch12:        CVE-2025-5917.patch
-Patch13:        CVE-2025-5918.patch
-Patch14:        CVE-2025-9301.patch
-Patch15:        CVE-2025-10148.patch
-Patch16:        CVE-2025-14017.patch
-Patch17:        CVE-2025-10966.patch
-Patch18:        CVE-2025-14524.patch
-Patch19:        CVE-2026-27135.patch
-Patch20:        CVE-2026-4873.patch
-Patch21:        CVE-2026-6276.patch
-Patch22:        CVE-2026-6253.patch
-Patch23:        CVE-2026-6429.patch
-Patch24:        CVE-2026-5545.patch
+Patch1:         CVE-2024-48615.patch
+Patch2:         CVE-2025-5916.patch
+Patch3:         CVE-2025-5917.patch
+Patch4:         CVE-2025-5918.patch
+Patch5:         CVE-2025-9301.patch
 
 BuildRequires:  bzip2
 BuildRequires:  bzip2-devel
@@ -75,6 +50,11 @@ operating system and in a compiler-independent manner.
 
 %prep
 %autosetup -p1
+
+# Build links against system curl and nghttp2 (--system-curl / --system-nghttp2),
+# so the bundled copies are never compiled. Remove them to guarantee the vendored
+# sources can never be used and to eliminate their CVE exposure.
+rm -rf Utilities/cmcurl Utilities/cmnghttp2
 
 %build
 export JAVA_HOME="%{_libdir}/jvm/msopenjdk-17"
@@ -127,6 +107,8 @@ bin/ctest --force-new-ctest-process --rerun-failed --output-on-failure
 * Mon Jul 06 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.30.3-15
 - Use system curl and nghttp2 instead of bundled libraries
 - Add nghttp2-devel build dependency
+- Remove bundled cmcurl and cmnghttp2 sources during prep
+- Drop CVE patches that only applied to the bundled curl and nghttp2 copies
 
 * Wed May 27 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 3.30.3-14
 - Patch for CVE-2026-4873, CVE-2026-6276, CVE-2026-6253, CVE-2026-6429, CVE-2026-5545
