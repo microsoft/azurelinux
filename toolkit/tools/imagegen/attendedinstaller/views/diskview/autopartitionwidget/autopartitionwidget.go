@@ -132,10 +132,10 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 		targetDiskType     = "path"
 		partitionTableType = "gpt"
 
-		bootPartitionName     = "esp"
-		bootPartitionFsType   = "fat32"
-		defaultBootStartMiB   = 1
-		defaultBootEndMiB     = 9
+		bootPartitionName   = "esp"
+		bootPartitionFsType = "fat32"
+		defaultBootStartMiB = 1
+		defaultBootEndMiB   = 9
 
 		rootPartitionName = "rootfs"
 		rootFsType        = "ext4"
@@ -149,15 +149,15 @@ func (ap *AutoPartitionWidget) mustUpdateConfiguration(sysConfig *configuration.
 	// Preserve partition boundaries from the loaded config when available.
 	if len(cfg.Disks) > 0 {
 		for _, partition := range cfg.Disks[0].Partitions {
-			switch partition.ID {
-			case bootPartitionName:
+			switch {
+			case partition.HasFlag(configuration.PartitionFlagESP):
 				if partition.Start > 0 {
 					bootPartitionStartMiB = partition.Start
 				}
 				if partition.End > partition.Start {
 					bootPartitionEndMiB = partition.End
 				}
-			case rootPartitionName:
+			case partition.ID == rootPartitionName:
 				if partition.Start > 0 {
 					rootPartitionStartMiB = partition.Start
 				}
