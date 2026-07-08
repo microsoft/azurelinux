@@ -1,65 +1,70 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Raw stages template for the package-build pipeline (v1 post-merge delta
 # build). OneBranch-agnostic: declares the stages/jobs/steps and exposes the
 # OneBranch-coupled knobs as parameters. The wrapper at
 # .github/workflows/ado/package-build.yml supplies concrete values.
 #
-# The setup + change-detection + validation steps are shared with the
-# source-upload pipeline via templates/steps/common-steps.yml; this template
-# appends only the package-build-specific Control Tower call.
+# Per push: gather the change-set info (get-changes-info, mode=postmerge: full
+# history, deps, commit range, lock + render verification, changed-component
+# set), then submit an official Control Tower build for the changed components.
 
 parameters:
-  - name: outputDirectory
+  - name: apiAudience
+    type: string
+  - name: apiBaseAFDUrl
     type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
+    type: string
+  - name: outputDirectory
+    type: string
+  # Control Tower package target for builds submitted from this pipeline
+  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
+  - name: packageTarget
     type: string
   - name: poolType
     type: string
     default: linux
   - name: serviceConnection
     type: string
-  - name: variableGroup
-    type: string
   - name: timeoutInMinutes
     type: number
-  # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0). Bound per-branch by the
-  # wrapper so a branch's builds land in the correct target.
-  - name: packageTarget
-    type: string
 
 stages:
   - stage: PackageBuild
     jobs:
       - job: PackageBuild
-        # This is a post-merge build: code has already merged, so there is no PR
-        # or merge queue to gate. The job fails loud -- any failing step turns
-        # the run red so submission/validation breakage is visible and alertable
-        # rather than masked as a partial success. The build itself runs
-        # asynchronously in Control Tower/Koji; this pipeline only submits it and
-        # confirms acceptance (see run_package_build.py).
-        # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)
-        # with enough headroom for setup steps and the final API call.
+        # Post-merge build: code has already merged, so there is no PR or merge
+        # queue to gate. Fails loud -- any failing step turns the run red so
+        # submission/validation breakage is visible rather than masked. The
+        # build runs asynchronously in Control Tower/Koji; this pipeline only
+        # submits it and confirms acceptance (see run_package_build.py).
         timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - group: ${{ parameters.variableGroup }}
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
+          - name: packageTarget
+            value: ${{ parameters.packageTarget }}
         steps:
-          # Shared setup + change detection + validation (PipAuthenticate,
-          # install deps, determine commit range, verify locks, prepare change
-          # set, verify rendered specs). Produces the job-scope variables and
-          # change-set files the submit step below consumes.
-          - template: steps/common-steps.yml
+          # Sets job variables:
+          # - changedComponentsFile
+          # - sourceCommit
+          - template: steps/get-changes-info.yml
+            parameters:
+              mode: postmerge
+
+          - template: steps/install-deps.yml
+            parameters:
+              installControlTowerClient: true
 
           - task: AzureCLI@2
             displayName: "Submit package build to Control Tower"
@@ -73,17 +78,24 @@ stages:
                 python3 scripts/ci/control-tower/run_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$CT_BUILD_REASON" \
+                  --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "${{ parameters.packageTarget }}" \
+                  --package-target "$PACKAGE_TARGET" \
                   --official-build \
                   --commit-sha "$SOURCE_COMMIT" \
-                  --repo-uri "$UPSTREAM_REPO_URL"
+                  --repo-uri "$BUILD_REPOSITORY_URI"
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseAFDUrl)
-              # Non-reserved name: an `env:` override of the reserved BUILD_REASON var is silently ignored by the agent.
-              CT_BUILD_REASON: $(Build.Reason)
+              # apiAudience / apiBaseAFDUrl come from the parameters directly
+              # (not surfaced as same-named job variables): the wrapper passes
+              # $(ApiAudience) / $(ApiBaseAFDUrl) from the variable group, and a
+              # job variable of the same (case-insensitive) name would
+              # self-reference -> "cyclical reference" and never resolve.
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+              PACKAGE_TARGET: $(packageTarget)
               SOURCE_COMMIT: $(sourceCommit)
-              UPSTREAM_REPO_URL: $(Build.Repository.Uri)
+              # Build.Reason and Build.Repository.Uri are predefined and
+              # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI; reference
+              # them directly and do not map them here (env: overrides of
+              # reserved variables are silently ignored by the agent).

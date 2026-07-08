@@ -1,9 +1,9 @@
-"""Resolve the ``(target, source)`` commit range for a post-merge delta build.
+"""Resolve the ``(base, source)`` commit range for a post-merge delta build.
 
-Strategy (see ``.github/workflows/ado/templates/steps/common-steps.yml``):
+Strategy (see ``.github/workflows/ado/templates/steps/commit-range-postmerge.yml``):
 
 * ``source`` is the commit that triggered this run (``Build.SourceVersion``).
-* ``target`` is the ``sourceVersion`` of the immediately-preceding CI build of
+* ``base`` is the ``sourceVersion`` of the immediately-preceding CI build of
   this pipeline definition on the same branch, selected by build id —
   regardless of that build's result.
 
@@ -19,7 +19,7 @@ Rebase-merge aware: because the range is a two-commit span (previous tip →
 current tip), it captures EVERY commit a rebase merge appends, not just the
 tip. ``azldev component changed`` then tree-diffs the two endpoints.
 
-Fallback (first run, or no prior CI build found): ``target = source^1``. That
+Fallback (first run, or no prior CI build found): ``base = source^1``. That
 run only builds the single tip commit's components, self-correcting on the next
 push. Two distinct situations trigger this fallback and are NOT treated the
 same: a successful query that simply found no prior build (benign -- a genuine
@@ -29,7 +29,7 @@ a single-commit delta -- so it additionally emits ``baselineQueryFailed=true``
 and the calling step raises a visible pipeline warning.
 
 The resolved hashes are printed to stdout as two ``key=value`` lines
-(``sourceCommit=<sha>`` and ``targetCommit=<sha>``), plus an optional
+(``sourceCommit=<sha>`` and ``baseCommit=<sha>``), plus an optional
 ``baselineQueryFailed=true`` line when the build-history query failed. The
 calling pipeline step reads them, sets the corresponding ADO pipeline variables,
 and raises a warning on query failure -- so the variable wiring and the warning
@@ -74,19 +74,19 @@ def _log(message: str) -> None:
     print(message, file=sys.stderr)
 
 
-def _emit_range(source_commit: str, target_commit: str, *, query_failed: bool = False) -> None:
+def _emit_range(source_commit: str, base_commit: str, *, query_failed: bool = False) -> None:
     """Print the resolved range to stdout as ``key=value`` lines.
 
     The calling pipeline step parses these lines and sets the ``sourceCommit`` /
-    ``targetCommit`` pipeline variables, so the variable wiring lives in the YAML
+    ``baseCommit`` pipeline variables, so the variable wiring lives in the YAML
     rather than in this script. When ``query_failed`` is True an extra
     ``baselineQueryFailed=true`` line is emitted so the caller can raise a
     pipeline warning -- this marks the actionable "Builds API query failed" case
     and is deliberately NOT emitted for a benign "no prior build" first run.
     """
-    _log(f"Resolved range: target={target_commit} source={source_commit}")
+    _log(f"Resolved range: base={base_commit} source={source_commit}")
     print(f"sourceCommit={source_commit}")
-    print(f"targetCommit={target_commit}")
+    print(f"baseCommit={base_commit}")
     if query_failed:
         print("baselineQueryFailed=true")
 
@@ -196,7 +196,7 @@ def main() -> int:
         _log(f"ERROR: --source-commit is not a 40-character hex SHA: {source_commit!r}")
         return 1
 
-    target_commit: str | None = None
+    base_commit: str | None = None
     # Distinguish a *failed* build-history query (actionable) from a successful
     # query that simply found no prior build (benign). Only the former sets this.
     query_failed = False
@@ -207,7 +207,7 @@ def main() -> int:
             branch=args.branch,
             top=args.top,
         )
-        target_commit = _select_baseline(builds, args.current_build_id)
+        base_commit = _select_baseline(builds, args.current_build_id)
     except (ClientException, OSError, RuntimeError) as exc:
         # The query itself failed (bad token scope, network, SDK misconfig).
         # Fall back to a single-commit delta so the run still makes progress,
@@ -216,33 +216,33 @@ def main() -> int:
         query_failed = True
         _log(f"WARNING: Could not query previous builds ({exc}); falling back to source^1.")
 
-    if target_commit is None:
+    if base_commit is None:
         if not query_failed:
             # Benign: the query succeeded but there is genuinely no prior CI
             # build (e.g. the first run on a new branch).
             _log(
                 "INFO: No previous CI build found for this branch; building only "
-                "the tip commit (target = source^1). The weekly true-up job covers "
+                "the tip commit (base = source^1). The weekly true-up job covers "
                 "any gap."
             )
-        target_commit = _parent_commit(source_commit)
-        if target_commit is None:
+        base_commit = _parent_commit(source_commit)
+        if base_commit is None:
             _log("ERROR: Unable to determine a parent of the source commit; cannot compute a build range.")
             return 1
-        _emit_range(source_commit, target_commit, query_failed=query_failed)
+        _emit_range(source_commit, base_commit, query_failed=query_failed)
         return 0
 
     # Both endpoints must be present for the downstream tree diff in the
     # change-set step. Full history is fetched once by the pipeline before this
     # step runs, so we only sanity-check presence here (no fetching).
-    missing = [commit for commit in (target_commit, source_commit) if not _commit_present(commit)]
+    missing = [commit for commit in (base_commit, source_commit) if not _commit_present(commit)]
     if missing:
         _log(
             f"WARNING: commit(s) not present locally: {', '.join(missing)}; the change-set step may be "
             "unable to diff them. Ensure the full git history was fetched before this step."
         )
 
-    _emit_range(source_commit, target_commit)
+    _emit_range(source_commit, base_commit)
     return 0
 
 

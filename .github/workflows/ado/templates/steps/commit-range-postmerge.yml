@@ -1,0 +1,63 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: resolve the commit range for a post-merge delta build.
+# source = the commit that triggered this run (Build.SourceVersion).
+# base   = the previous CI build's commit on this branch, from the ADO Builds
+#          API. Pairing each build with the one immediately before it keeps
+#          concurrent runs from overlapping and captures every commit a rebase
+#          merge appends. See scripts/ci/ado/determine_commit_range.py for the
+#          rationale and the first-run (source^1) fallback.
+#
+# Sets job variables named by baseCommitVar and sourceCommitVar.
+
+parameters:
+  - name: baseCommitVar
+    type: string
+    default: baseCommit
+  - name: sourceCommitVar
+    type: string
+    default: sourceCommit
+
+steps:
+  - script: |
+      set -euo pipefail
+      # The helper prints the resolved range to stdout as two lines:
+      #   sourceCommit=<sha>
+      #   baseCommit=<sha>
+      # (all diagnostics go to stderr). We parse them and set the pipeline
+      # variables HERE so the wiring is visible in the YAML.
+      range_output="$(python3 scripts/ci/ado/determine_commit_range.py \
+        --definition-id "$SYSTEM_DEFINITIONID" \
+        --current-build-id "$BUILD_BUILDID" \
+        --branch "$BUILD_SOURCEBRANCH" \
+        --source-commit "$BUILD_SOURCEVERSION")"
+      echo "$range_output"
+
+      source_commit="$(sed -n 's/^sourceCommit=//p' <<< "$range_output")"
+      base_commit="$(sed -n 's/^baseCommit=//p' <<< "$range_output")"
+      if [[ -z "$source_commit" || -z "$base_commit" ]]; then
+        echo "##[error]determine_commit_range.py did not emit a source/base commit range."
+        exit 1
+      fi
+
+      # baselineQueryFailed=true means the ADO Builds API query itself failed
+      # (bad SYSTEM_ACCESSTOKEN scope, network, SDK misconfig) -- not a benign
+      # first run. A failed query silently degrades every run to a single-commit
+      # delta, so raise a visible warning here.
+      if [[ "$(sed -n 's/^baselineQueryFailed=//p' <<< "$range_output")" == "true" ]]; then
+        echo "##vso[task.logissue type=warning]Delta build could not query previous builds; degraded to a single-commit delta (base=source^1). Check the SYSTEM_ACCESSTOKEN scope and ADO Builds API connectivity. The weekly true-up job covers any gap."
+      fi
+
+      echo "##vso[task.setvariable variable=$BASE_COMMIT_VAR;isreadonly=true]$base_commit"
+      echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
+    env:
+      # System.AccessToken is a secret -- NOT auto-exposed -- so it must be
+      # mapped here. Every other predefined variable the script uses
+      # (Build.BuildId, Build.SourceBranch, Build.SourceVersion,
+      # System.CollectionUri, System.DefinitionId, System.TeamProject) is
+      # auto-exposed as $NAME and referenced directly, so it is not mapped here.
+      BASE_COMMIT_VAR: ${{ parameters.baseCommitVar }}
+      SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    displayName: "Determine source and base commit range"

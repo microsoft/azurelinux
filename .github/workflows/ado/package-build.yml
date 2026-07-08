@@ -1,4 +1,5 @@
-# Microsoft Corporation
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
 #
 # Wrapper pipeline — passed to ADO as the entry point for the package-build
 # pipeline. This file owns all OneBranch-specific wiring (governed templates
@@ -7,15 +8,14 @@
 #   .github/workflows/ado/templates/package-build-stages.yml
 #
 # Authenticates via Workload Identity Federation (OIDC) and calls the Control
-# Tower APIs to run the v1 post-merge delta build (stopgap until source upload
-# is reworked):
+# Tower APIs to run the v1 post-merge delta build:
 #   1. Resolve the (target, source) commit range for this push from the
 #      previous CI build (ADO Builds API).
 #   2. Submit official package builds for the components that changed across
 #      that range, via Workload Identity Federation (OIDC) to Control Tower.
 #
-# The setup + change-detection + validation steps are shared with the
-# source-upload pipeline via templates/steps/common-steps.yml.
+# The setup + change-detection + validation steps are composed from the shared
+# templates/steps/* step templates via templates/steps/get-changes-info.yml.
 #
 # Helper scripts live under:
 # - scripts/ci/control-tower/ - (Control Tower-specific)
@@ -43,6 +43,10 @@
 trigger: none
 
 pr: none
+
+# Variables extracted from this group: ApiAudience, ApiBaseAFDUrl.
+variables:
+  - group: ControlTower-PRCheck
 
 resources:
   repositories:
@@ -74,14 +78,15 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/package-build-stages.yml@self
         parameters:
-          outputDirectory: $(Build.ArtifactStagingDirectory)/output
+          apiAudience: $(ApiAudience)
+          apiBaseAFDUrl: $(ApiBaseAFDUrl)
           artifactBaseName: packagebuild
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
-          poolType: linux
-          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
-          variableGroup: ControlTower-PRCheck
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Control Tower package target for the 4.0 branch.
           packageTarget: azl4
+          poolType: linux
+          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)
           # with enough headroom for setup steps and the final API call.
           timeoutInMinutes: 25

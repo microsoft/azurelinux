@@ -437,8 +437,8 @@ jobs:
                 # current head.
                 /scripts-components/compute_change_set.sh \
                   --output-dir /output/change-set \
-                  --source-commit "$PR_HEAD_SHA" \
-                  --target-commit "$PR_BASE_SHA"
+                  --from-commit "$PR_BASE_SHA" \
+                  --to-commit "$PR_HEAD_SHA"
 
                 # Components removed in this PR no longer have a comp.toml, so
                 # `azldev component render` will not touch (or clean) their old

@@ -1,0 +1,56 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: resolve a PR's commit range from the merge commit's parents.
+# A PR-policy build checks out the MERGE commit: parent ^1 is the target-branch
+# tip, parent ^2 is the PR head. The change set is the diff between their MERGE
+# BASE (fork point) and ^2 -- the same three-dot set GitHub's "Files changed"
+# shows. Comparing against the merge base rather than the target tip avoids
+# flagging components that merely landed on the target branch after the fork.
+#
+# Sets job variables named by baseCommitVar (merge base) and sourceCommitVar
+# (PR head).
+
+parameters:
+  - name: baseCommitVar
+    type: string
+    default: baseCommit
+  - name: sourceCommitVar
+    type: string
+    default: sourceCommit
+
+steps:
+  # Fail fast, at compile time, when this is not a PR build: the merge-commit
+  # parent logic only makes sense for a PullRequest trigger.
+  - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    - script: |
+        echo "##[error]This pipeline must run as a PR build (Build.Reason=PullRequest); got '$BUILD_REASON'."
+        exit 1
+      displayName: "Guard: PR build only"
+
+  - script: |
+      set -euo pipefail
+      # Defense in depth: a PullRequest trigger should always check out a merge
+      # commit, but verify the ^2 parent exists before relying on it.
+      if ! git rev-parse --verify -q "HEAD^2" >/dev/null; then
+        echo "##[error]HEAD is not a merge commit -- expected a PR merge build."
+        exit 1
+      fi
+      source_commit="$(git rev-parse HEAD^2)"
+      # Baseline = the MERGE BASE (fork point) of the target-branch tip (HEAD^1)
+      # and the PR head (HEAD^2), NOT the target tip itself.
+      base_commit="$(git merge-base HEAD^1 HEAD^2)"
+      # PR-supplied data is untrusted: validate both SHAs before use.
+      for sha in "$base_commit" "$source_commit"; do
+        if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+          echo "##[error]invalid commit SHA: $sha"
+          exit 1
+        fi
+      done
+      echo "Resolved range: base(merge-base)=$base_commit source=$source_commit"
+      echo "##vso[task.setvariable variable=$BASE_COMMIT_VAR;isreadonly=true]$base_commit"
+      echo "##vso[task.setvariable variable=$SOURCE_COMMIT_VAR;isreadonly=true]$source_commit"
+    env:
+      BASE_COMMIT_VAR: ${{ parameters.baseCommitVar }}
+      SOURCE_COMMIT_VAR: ${{ parameters.sourceCommitVar }}
+    displayName: "Determine PR commit range"
