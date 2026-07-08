@@ -1,0 +1,13 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: validate that the resolved source origins (Fedora dist-git,
+# lookaside, and repo base URIs) match the trusted allowlist before any source
+# fetch or lock update runs, so a PR cannot redirect source fetches to an
+# untrusted origin. Requires azldev on PATH (install-deps installAzldev).
+
+steps:
+  - script: |
+      set -euo pipefail
+      python3 scripts/ci/render-specs-check/source_origin_guard.py
+    displayName: "Verify source origins"

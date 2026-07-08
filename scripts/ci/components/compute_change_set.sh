@@ -24,19 +24,44 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 usage() {
-  echo "Usage: $0 --output-dir DIR --source-commit SHA --target-commit SHA" >&2
+  echo "Usage: $0 --output-dir DIR --from-commit SHA --to-commit SHA \\" >&2
+  echo "          [--changed-components-file NAME] [--specs-diff-file NAME] [--render-set-file NAME]" >&2
+  echo "  --from-commit  baseline commit (merge-base / fork point)" >&2
+  echo "  --to-commit    newer commit (e.g. PR head)" >&2
   exit 1
 }
 
+# Output file names default to the canonical set but can be overridden by a
+# caller that needs to control them (e.g. to stage several change sets side by
+# side). Only the names are configurable; they always land under --output-dir.
+changed_components_file_name="changed-components.json"
+specs_diff_file_name="specs-diff.txt"
+render_set_file_name="render-set.txt"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --output-dir)     output_dir="$2"; shift 2 ;;
-    --source-commit)  source_commit="$2"; shift 2 ;;
-    --target-commit)  target_commit="$2"; shift 2 ;;
+    --output-dir)              output_dir="$2"; shift 2 ;;
+    --from-commit)             from_commit="$2"; shift 2 ;;
+    --to-commit)               to_commit="$2"; shift 2 ;;
+    --changed-components-file) changed_components_file_name="$2"; shift 2 ;;
+    --specs-diff-file)         specs_diff_file_name="$2"; shift 2 ;;
+    --render-set-file)         render_set_file_name="$2"; shift 2 ;;
     *) usage ;;
   esac
 done
-[[ -z "${output_dir:-}" || -z "${source_commit:-}" || -z "${target_commit:-}" ]] && usage
+[[ -z "${output_dir:-}" || -z "${from_commit:-}" || -z "${to_commit:-}" ]] && usage
+
+# The output-file-name params are joined onto --output-dir verbatim, so a value
+# containing a path separator or traversal (e.g. `../foo`) would escape it.
+# Reject anything that is not a plain file name.
+for name in "$changed_components_file_name" "$specs_diff_file_name" "$render_set_file_name"; do
+  case "$name" in
+    */* | "" | . | ..)
+      echo "refusing unsafe output file name: '$name' (must be a plain file name)" >&2
+      exit 2
+      ;;
+  esac
+done
 
 # Defensive guard: the script owns --output-dir exclusively for the duration
 # of the invocation (it does `rm -rf` below to clean up stale state). Refuse
@@ -60,14 +85,27 @@ mkdir -p "$output_dir"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-changed_file="$output_dir/changed-components.json"
-specs_diff_file="$output_dir/specs-diff.txt"
-render_set_file="$output_dir/render-set.txt"
+changed_file="$output_dir/$changed_components_file_name"
+specs_diff_file="$output_dir/$specs_diff_file_name"
+render_set_file="$output_dir/$render_set_file_name"
 
-"$script_dir/compute_changed.sh" \
-  --output-file "$changed_file" \
-  --source-commit "$source_commit" \
-  --target-commit "$target_commit"
+# Compute the set of changed components between two commits. Writes one JSON
+# entry per component to $out_file with fields: component, changeType,
+# sourcesChange. azldev hard-fails if any component has sourcesChange == true
+# without a corresponding identity change (added/changed/deleted) -- a
+# supply-chain drift guard. Inline AZLDEV_ALLOW_ROOT=1 so CI agents running as
+# root work without lifting the restriction at step scope (see
+# .github/instructions/ado-pipeline.instructions.md).
+compute_changed() {
+  local out_file="$1" from="$2" to="$3"
+  mkdir -p "$(dirname "$out_file")"
+  AZLDEV_ALLOW_ROOT=1 azldev component changed --from "$from" --to "$to" \
+    -a --include-unchanged -O json > "$out_file"
+  echo "Changed components (non-unchanged):"
+  jq -r '.[] | select(.changeType != "unchanged") | "  \(.changeType)\t\(.component)"' "$out_file" | sort
+}
+
+compute_changed "$changed_file" "$from_commit" "$to_commit"
 
 # azldev's renderedSpecsDir is absolute. Translate to repo-relative so it
 # matches git's output (`git diff --name-only` always emits repo-relative
@@ -80,7 +118,7 @@ specs_dir="$(realpath --relative-to="$(pwd)" "$specs_dir_abs")"
 # `azldev component changed` misses). --no-renames prevents collapse of
 # delete+add into a rename entry, which would lose the old path; the
 # Python script filters out deleted/unknown components.
-git diff --no-renames --name-only "$target_commit" "$source_commit" \
+git diff --no-renames --name-only "$from_commit" "$to_commit" \
   -- "$specs_dir" > "$specs_diff_file"
 
 python3 "$script_dir/compute_render_set.py" \

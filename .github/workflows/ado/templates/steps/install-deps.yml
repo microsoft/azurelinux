@@ -1,0 +1,96 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: authenticate to the internal pip feed, then install the
+# requested host tools. Each tool is opt-in via a boolean parameter. azldev's
+# version comes from the committed .azldev-version and is validated before use.
+
+parameters:
+  # azure-devops SDK (scripts/ci/ado/requirements.txt).
+  - name: installAdoRequirements
+    type: boolean
+    default: false
+  # azldev CLI (change detection + spec render).
+  - name: installAzldev
+    type: boolean
+    default: false
+  # Control Tower client (scripts/ci/control-tower/requirements.txt).
+  - name: installControlTowerClient
+    type: boolean
+    default: false
+  # mock + mock-rpmautospec (spec render / lock work).
+  - name: installMock
+    type: boolean
+    default: false
+  # strip extensions.worktreeConfig so azldev's go-git can open the checkout.
+  - name: normalizeGoGitConfig
+    type: boolean
+    default: false
+
+steps:
+  - task: PipAuthenticate@1
+    displayName: "Authenticate pip"
+    inputs:
+      artifactFeeds: "azl/ControlTowerFeed"
+
+  - ${{ if parameters.normalizeGoGitConfig }}:
+    # azldev opens the repo with go-git, which rejects a config that declares
+    # the `worktreeconfig` extension while core.repositoryformatversion is still
+    # 0: "core.repositoryformatversion does not support extension: worktreeconfig".
+    # Native git tolerates this and the ADO agent checkout leaves the extension
+    # set, so strip it. Each CI run is a fresh checkout so this is self-contained.
+    # TODO: remove once azldev no longer needs the workaround (go-git v6 fixes
+    # the underlying bug): https://github.com/microsoft/azure-linux-dev-tools/issues/241
+    - script: |
+        set -euo pipefail
+        if git config --get extensions.worktreeConfig >/dev/null 2>&1; then
+          echo "Removing extensions.worktreeConfig so go-git (azldev) can open the repo"
+          git config --unset-all extensions.worktreeConfig || true
+        fi
+      displayName: "Normalize git config for azldev (go-git)"
+
+  - ${{ if parameters.installMock }}:
+    - script: |
+        set -euo pipefail
+        echo "##[group]Mock"
+        tdnf install -y mock mock-rpmautospec python3-chardet
+        sudo usermod -aG mock "$(whoami)"
+        echo "##[endgroup]"
+      displayName: "Install mock"
+
+  - ${{ if parameters.installAzldev }}:
+    - script: |
+        set -euo pipefail
+        echo "##[group]Azldev (host)"
+        # Only the version string comes from the checkout; reject a
+        # malformed/garbage value before it reaches `go install`.
+        AZLDEV_VERSION="$(tr -d '\n' < .azldev-version)"
+        if ! printf '%s' "$AZLDEV_VERSION" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
+          echo "##[error].azldev-version is empty or has unexpected characters"
+          exit 1
+        fi
+        echo "Installing azldev@${AZLDEV_VERSION}..."
+        go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}"
+
+        go_bin_path="$(go env GOPATH)/bin"
+        echo "##vso[task.prependpath]$go_bin_path"
+
+        "$go_bin_path/azldev" --version
+        echo "##[endgroup]"
+      displayName: "Install azldev"
+
+  - ${{ if parameters.installControlTowerClient }}:
+    - script: |
+        set -euo pipefail
+        echo "##[group]Python dependencies (Control Tower client)"
+        pip install -r scripts/ci/control-tower/requirements.txt
+        echo "##[endgroup]"
+      displayName: "Install Control Tower Python client"
+
+  - ${{ if parameters.installAdoRequirements }}:
+    - script: |
+        set -euo pipefail
+        echo "##[group]Python dependencies (ADO API client)"
+        pip install -r scripts/ci/ado/requirements.txt
+        echo "##[endgroup]"
+      displayName: "Install ADO API Python client"

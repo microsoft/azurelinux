@@ -1,0 +1,67 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: detect changed components and prepare the render set, then
+# publish changed-components.json as a triage artifact on every exit path.
+# compute_change_set.sh diffs from -> to and hard-fails on the supply-chain
+# drift tripwire (sourcesChange == true without an identity change in
+# {added, changed, deleted}). Requires the job-scope variable ob_outputDirectory.
+#
+# Reads the (from, to) commit range from the variables named by fromCommitVar /
+# toCommitVar; sets the variables named by changedComponentsFileVar and
+# renderSetFileVar.
+
+parameters:
+  - name: changedComponentsFileVar
+    type: string
+    default: changedComponentsFile
+  - name: fromCommitVar
+    type: string
+    default: baseCommit
+  - name: renderSetFileVar
+    type: string
+    default: renderSetFile
+  - name: toCommitVar
+    type: string
+    default: sourceCommit
+
+steps:
+  - script: |
+      set -euo pipefail
+      change_set_dir="$BUILD_ARTIFACTSTAGINGDIRECTORY/change-set"
+      json_file="$change_set_dir/changed-components.json"
+      render_set_file="$change_set_dir/render-set.txt"
+
+      # Publish the changed-components JSON for post-mortem triage on EVERY exit
+      # path, not just success -- if azldev hard-fails on a consistency tripwire
+      # the partial JSON is exactly what an operator needs to investigate.
+      publish_artifact() {
+        if [[ -s "$json_file" ]]; then
+          mkdir -p "$OB_OUTPUT_DIR/changed-components"
+          cp "$json_file" "$OB_OUTPUT_DIR/changed-components/" || true
+        fi
+      }
+      trap publish_artifact EXIT
+
+      echo "##[group]Preparing change set"
+      scripts/ci/components/compute_change_set.sh \
+        --output-dir "$change_set_dir" \
+        --from-commit "$FROM_COMMIT" \
+        --to-commit "$TO_COMMIT"
+      echo "##[endgroup]"
+
+      echo "##[group]Upload set (sourcesChange == true, changeType in {added, changed})"
+      upload_count=$(jq -r '[.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed")))] | length' "$json_file")
+      jq -r '.[] | select(.sourcesChange == true and (.changeType | IN("added", "changed"))) | .component' "$json_file" | sort
+      echo "Total: $upload_count component(s) to upload."
+      echo "##[endgroup]"
+
+      echo "##vso[task.setvariable variable=$CHANGED_COMPONENTS_FILE_VAR;isreadonly=true]$json_file"
+      echo "##vso[task.setvariable variable=$RENDER_SET_FILE_VAR;isreadonly=true]$render_set_file"
+    env:
+      CHANGED_COMPONENTS_FILE_VAR: ${{ parameters.changedComponentsFileVar }}
+      FROM_COMMIT: $(${{ parameters.fromCommitVar }})
+      OB_OUTPUT_DIR: $(ob_outputDirectory)
+      RENDER_SET_FILE_VAR: ${{ parameters.renderSetFileVar }}
+      TO_COMMIT: $(${{ parameters.toCommitVar }})
+    displayName: "Prepare change set"

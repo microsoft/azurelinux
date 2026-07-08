@@ -1,0 +1,16 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+#
+# Step template: unshallow the git checkout when it is shallow, so the full
+# history is available to later steps. Fetches with --unshallow exactly once;
+# a `git fetch --depth=N` would otherwise re-shallow a full clone.
+
+steps:
+  - script: |
+      set -euo pipefail
+      if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+        echo "##[group]Fetching full git history"
+        git fetch --unshallow
+        echo "##[endgroup]"
+      fi
+    displayName: "Ensure full git history"

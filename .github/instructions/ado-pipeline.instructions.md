@@ -35,11 +35,42 @@ Every ADO pipeline in this repo is split into **two YAML files**:
 
    `ob_*` job-scope variables and `LinuxContainerImage` still appear here (ADO requires them at job scope), but they are set from `${{ parameters.* }}`, so the raw author never has to know which OneBranch convention they satisfy.
 
-File-pairing convention: a wrapper at `.github/workflows/ado/<name>.yml` pairs with a raw stages template at `.github/workflows/ado/templates/<stem>-stages.yml`. **Multiple wrappers MAY share a single raw stages template** — that is in fact a primary motivation for the split: define several ADO pipelines (e.g. a DEV NonOfficial wrapper and a PROD Official wrapper, or per-environment variants) that all run the same stages/jobs/steps but differ in OneBranch variant, `featureFlags`, service connection, variable group, container image, etc. When wrappers share a raw template, name them so the relationship is obvious (e.g. `sources-upload-dev.yml` + `sources-upload-prod.yml` both pointing at `templates/sources-upload-stages.yml`). The variant choice cannot be hoisted into a shared sub-template because ADO requires `extends:` at the root of the entry pipeline — that is exactly why each wrapper exists.
+File-pairing convention: a wrapper at `.github/workflows/ado/<name>.yml` pairs with a raw stages template at `.github/workflows/ado/templates/<stem>-stages.yml`. **Multiple wrappers MAY share a single raw stages template** — that is in fact a primary motivation for the split: define several ADO pipelines (e.g. a DEV NonOfficial wrapper and a PROD Official wrapper, or per-environment variants) that all run the same stages/jobs/steps but differ in OneBranch variant, `featureFlags`, service connection, variable group, container image, etc. When wrappers share a raw template, name them so the relationship is obvious (e.g. `package-build-dev.yml` + `package-build-prod.yml` both pointing at `templates/package-build-stages.yml`). The variant choice cannot be hoisted into a shared sub-template because ADO requires `extends:` at the root of the entry pipeline — that is exactly why each wrapper exists.
 
-See [.github/workflows/ado/sources-upload.yml](.github/workflows/ado/sources-upload.yml) and [.github/workflows/ado/templates/sources-upload-stages.yml](.github/workflows/ado/templates/sources-upload-stages.yml) for the canonical example.
+See [.github/workflows/ado/package-build.yml](.github/workflows/ado/package-build.yml) and [.github/workflows/ado/templates/package-build-stages.yml](.github/workflows/ado/templates/package-build-stages.yml) for the canonical example.
 
-Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See [.github/workflows/ado/templates/steps/common-steps.yml](.github/workflows/ado/templates/steps/common-steps.yml), shared by the `package-build` and `sources-upload` pipelines.
+Shared **step sub-templates** live under `.github/workflows/ado/templates/steps/<name>.yml` and are spliced into a job's `steps:` via `- template: steps/<name>.yml` (path relative to the including stages template). Use these to share step sequences across stages templates that differ only in a trailing pipeline-specific step. Splicing as **steps** (not a separate job/stage) keeps job-scoped pipeline variables and on-disk files flowing to the steps that follow — a separate job would force output variables + artifact upload/download. The including job must define any job-scope variables the shared steps reference (e.g. `ob_outputDirectory`). See the granular templates under [.github/workflows/ado/templates/steps/](.github/workflows/ado/templates/steps/) (e.g. `ensure-full-history.yml`, `install-deps.yml`, `prepare-change-set.yml`) and the composite `get-changes-info.yml`, shared by the `package-build` and `pr-check-ct` pipelines.
+
+**A template comment describes only what the template itself does** — not how a caller may or may not use it, and not where its parameter *values* originate. Assumptions about the caller (e.g. "passed by the wrapper", "owns the variable group", "the PR check does X") go stale and belong in the caller, not the shared template. The calling convention is documented here, once; do not repeat it in every YAML.
+
+**Sort lists alphabetically.** Within a file, keep `parameters`, `variables`, and step `env:` entries in alphabetical order by name (case-insensitive). This makes additions and diffs predictable and variables easy to find. Ordered sequences whose order is semantically load-bearing — job `steps:`, script lines — are NOT sorted.
+
+**Prefer a script file over `inlineScript` for single-command tasks.** A task whose body is one functionally-important command/script should reference a script file (e.g. `Bash@3` `filePath`, or `AzureCLI@2` `scriptLocation: scriptPath`) rather than embedding it inline. **Exception:** if `scriptPath` cannot be used without an artificial wrapper, keep `inlineScript`. (For example, an `AzureCLI@2` step whose body is a non-shell command such as `python3 some_script.py …` — run for its WIF az-login context — cannot use `scriptPath`, which runs the file *through* bash and ignores any `#!` line; adding a throwaway bash wrapper just to satisfy the rule is not worth it.)
+
+**Comment which variables a composed template sets, above the `- template:` line.** When a template you invoke sets job/output variables that *this* file consumes, list them above the invocation in this fixed format (omit an empty section; list only the variables the caller actually uses):
+
+```yaml
+          # Sets job variables:
+          # - <var_name1>
+          # - <var_name2>
+          #
+          # Sets output job variables:
+          # - <output_var_name1>
+          - template: steps/commit-range-pr.yml
+```
+
+**Parameterize the names of pipeline variables a template sets.** If a step template sets a job variable (`##vso[task.setvariable variable=<name>...]`), expose `<name>` through a parameter (with the conventional name as the default) so a caller composing several templates can rename it to avoid collisions. Use a consistent suffix scheme:
+
+- **Same-job variables** (default `##vso[task.setvariable]`, no `isoutput`): parameter `<var_name>Var` (e.g. `sourceCommitVar`, `changedComponentsFileVar`).
+- **Output variables** (`isoutput=true`, visible in other jobs/stages): parameter `<var_name>OutputVar` for the variable name, AND parameter `<var_name>OutputVarTask` for the setting task's `name:` (a cross-job output variable is referenced as `<taskName>.<var>`, so the task name is part of the contract).
+
+Reading another template's variable follows the same shape: take a `<var_name>Var` parameter and reference it as `$(${{ parameters.<var_name>Var }})` in `env:` (e.g. `prepare-change-set.yml`'s `fromCommitVar`/`toCommitVar`).
+
+**Pass pipeline parameters and variables into scripts through `env:`.** Do not inline `$(someVariable)` or `${{ parameters.X }}` inside an `inlineScript`/`script` body — map them in the step's `env:` block and reference the environment variable in the script. This keeps the script readable, avoids quoting/injection pitfalls, and makes the data flow explicit. This also covers values used to build a `##vso[...]` logging command: route the parameter through `env:` and reference `$ENV_VAR` in the `echo` rather than substituting `${{ parameters.X }}` inline.
+
+**Predefined variables: reference the auto-exposed env var directly; never re-map them.** ADO auto-exposes every non-secret predefined variable to scripts as an env var — uppercased with `.` → `_` (e.g. `Build.Reason` → `$BUILD_REASON`, `Build.ArtifactStagingDirectory` → `$BUILD_ARTIFACTSTAGINGDIRECTORY`, `Build.Repository.Uri` → `$BUILD_REPOSITORY_URI`, `System.DefinitionId` → `$SYSTEM_DEFINITIONID`). This is the default way to use a predefined variable: reference `$NAME` directly in the script and do NOT add it to `env:` — neither under its own name (the agent silently drops an `env:` entry that shadows a reserved variable) nor under a new alias (redundant, and it hides that the value is predefined). A short inline comment noting a value is auto-exposed prevents a maintainer from "completing" the `env:` block. **The one exception is a *secret* predefined variable** such as `System.AccessToken`, which is NOT auto-exposed and therefore MUST be mapped in `env:`.
+
+**Surface runtime-consumed parameters as `variables` when the template owns a `variables` section.** When a template defines its own `variables` section (i.e. it declares stages/jobs), convert the input parameters it consumes at runtime into entries in that `variables` section (`- name: foo` / `value: ${{ parameters.foo }}`) and reference them as `$(foo)`. A parameter value may be a runtime `$[ <expression> ]` (or `$(macro)`) expression, which is only evaluated inside the `variables` section — referencing `${{ parameters.foo }}` directly elsewhere would emit the literal, unevaluated string. Parameters used only in compile-time structural positions (e.g. `pool.type`, `timeoutInMinutes`, task `name:`/`azureSubscription:`) stay as parameters. **Caveat — do not create a self-referential cycle:** if a parameter's value is a `$(macro)` that references a variable whose name matches the surfaced variable's name (variable names are case-insensitive — e.g. a param passed `apiAudience: $(ApiAudience)` from a variable group), surfacing it as a same-named job variable makes it reference itself, and ADO reports *"Unable to expand variable … A cyclical reference was detected."* In that case reference the parameter directly (`${{ parameters.foo }}`) in `env:` instead, or surface it under a distinct name.
 
 ## OneBranch templates (MANDATORY — wrapper only)
 
@@ -236,8 +267,15 @@ Use these as a starting point for a new pipeline. Two files: a wrapper (NonOffic
 ### Wrapper — `.github/workflows/ado/<name>.yml`
 
 ```yaml
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 trigger: none
 pr: none
+
+# Variables extracted from this group: ApiAudience, ApiBaseUrl.
+variables:
+  - group: <variable-group-name>
 
 resources:
   repositories:
@@ -256,31 +294,37 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/<name>-stages.yml@self
         parameters:
-          outputDirectory: $(Build.ArtifactStagingDirectory)/output
+          apiAudience: $(ApiAudience)
+          apiBaseUrl: $(ApiBaseUrl)
           artifactBaseName: <artifact-base-name>
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          outputDirectory: $(Build.ArtifactStagingDirectory)/output
           poolType: linux
           serviceConnection: <service-connection-name>
-          variableGroup: <variable-group-name>
           timeoutInMinutes: <int>   # explicit, conservative
 ```
 
 ### Raw stages — `.github/workflows/ado/templates/<name>-stages.yml`
 
 ```yaml
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 parameters:
-  - name: outputDirectory
+  - name: apiAudience
+    type: string
+  - name: apiBaseUrl
     type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
     type: string
+  - name: outputDirectory
+    type: string
   - name: poolType
     type: string
     default: linux
   - name: serviceConnection
-    type: string
-  - name: variableGroup
     type: string
   - name: timeoutInMinutes
     type: number
@@ -293,13 +337,12 @@ stages:
         pool:
           type: ${{ parameters.poolType }}
         variables:
-          - group: ${{ parameters.variableGroup }}      # audience URI, base URL, etc.
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
           - name: LinuxContainerImage
             value: ${{ parameters.containerImage }}
+          - name: ob_artifactBaseName
+            value: ${{ parameters.artifactBaseName }}
+          - name: ob_outputDirectory
+            value: ${{ parameters.outputDirectory }}
         steps:
           - task: PipAuthenticate@1
             displayName: "Authenticate pip"
@@ -318,8 +361,11 @@ stages:
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL"
             env:
-              API_AUDIENCE: $(ApiAudience)
-              API_BASE_URL: $(ApiBaseUrl)
+              # Referenced from the parameters directly: the wrapper passes
+              # $(ApiAudience) / $(ApiBaseUrl) from the group, so a same-named
+              # job variable would self-reference (cyclical reference).
+              API_AUDIENCE: ${{ parameters.apiAudience }}
+              API_BASE_URL: ${{ parameters.apiBaseUrl }}
 ```
 
 Replace every `<...>` placeholder.

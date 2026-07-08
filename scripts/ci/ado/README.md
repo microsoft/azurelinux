@@ -6,7 +6,7 @@ build metadata) from ADO YAML pipelines, using the official
 
 | File | Purpose |
 | ---- | ------- |
-| `determine_commit_range.py` | Resolves the `(target, source)` commit range for the post-merge delta build and prints it to stdout as `sourceCommit=<sha>` / `targetCommit=<sha>` lines. The calling step sets the pipeline variables. |
+| `determine_commit_range.py` | Resolves the `(base, source)` commit range for the post-merge delta build and prints it to stdout as `sourceCommit=<sha>` / `baseCommit=<sha>` lines. The calling step sets the pipeline variables. |
 | `requirements.txt` | Python dependencies (`azure-devops`), installed from the internal feed. |
 
 ## Conventions
@@ -29,17 +29,17 @@ build metadata) from ADO YAML pipelines, using the official
   pipeline's "Ensure full git history" step fetches it once up front) and never
   fetches — a `git fetch --depth=N` would re-shallow a full clone.
 - **Output:** two `key=value` lines on **stdout** (`sourceCommit=<sha>` and
-  `targetCommit=<sha>`); all diagnostics go to **stderr**. The caller parses
+  `baseCommit=<sha>`); all diagnostics go to **stderr**. The caller parses
   stdout and owns the `##vso[task.setvariable]` wiring, so pipeline-variable
   assignment stays visible in the YAML.
 
 It is best-effort: if the previous build cannot be found (first run) or the ADO
-query fails, it falls back to `target = source^1` (warning on stderr) rather
+query fails, it falls back to `base = source^1` (warning on stderr) rather
 than failing the pipeline. A hard failure (invalid source SHA, or no parent
 found for the fallback) exits non-zero so the calling step fails.
 
 ## Callers
 
-- `templates/steps/common-steps.yml` "Determine source and target commit range"
-  step → `determine_commit_range.py` (shared by the package-build and
-  source-upload pipelines).
+- `templates/steps/commit-range-postmerge.yml` "Determine source and base
+  commit range" step → `determine_commit_range.py` (used by the post-merge
+  package-build pipeline).
