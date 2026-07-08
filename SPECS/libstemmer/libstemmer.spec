@@ -69,7 +69,7 @@ mv snowball-data-%{snowball_data_commit} snowball-data
 cd snowball-%{version}
 
 %build
-make libstemmer.so %{?_smp_mflags} EXECFLAGS="%{optflags}" LDFLAGS="%{build_ldflags}"
+make libstemmer.so %{?_smp_mflags} CFLAGS="%{optflags} -fPIC -Iinclude" LDFLAGS="$RPM_LD_FLAGS"
 
 %install
 mkdir -p %{buildroot}%{_libdir}

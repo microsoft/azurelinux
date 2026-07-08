@@ -6,7 +6,7 @@ License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/fwupd/fwupd
-Source0:        https://github.com/fwupd/fwupd/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
 Patch0:         reprocess-device-metadata-after-coldplug.patch
 Patch1:         defer-ensure-device-supported.patch
 

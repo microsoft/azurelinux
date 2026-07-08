@@ -4111,7 +4111,7 @@
         "other": {
           "name": "fwupd",
           "version": "2.0.20",
-          "downloadUrl": "https://github.com/fwupd/fwupd/archive/refs/tags/2.0.20.tar.gz"
+          "downloadUrl": "https://github.com/fwupd/fwupd/releases/download/2.0.20/fwupd-2.0.20.tar.xz"
         }
       }
     },
