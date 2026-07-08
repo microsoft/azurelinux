@@ -1,7 +1,7 @@
 Summary:        A minimalistic network configuration daemon with DHCPv4, rdisc and DHCPv6 support
 Name:           dhcpcd
 Version:        10.0.8
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-2-Clause AND ISC AND MIT
 Url:            https://github.com/NetworkConfiguration/%{name}
 Source0:        https://github.com/NetworkConfiguration/%{name}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -12,6 +12,7 @@ Patch0:         CVE-2026-56114.patch
 Patch1:         CVE-2026-56116.patch
 Patch2:         CVE-2026-56117.patch
 Patch3:         CVE-2026-56113.patch
+Patch4:         CVE-2026-14258.patch
 Group:          System Environment/Base
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -79,6 +80,9 @@ install -d %{buildroot}%{_sharedstatedir}/%{_name}
 %{_sharedstatedir}/%{name}
 
 %changelog
+* Fri Jul 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.0.8-4
+- Patch for CVE-2026-14258
+
 * Mon Jun 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.0.8-3
 - Patch for CVE-2026-56113
 
