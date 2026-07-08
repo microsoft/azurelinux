@@ -1,7 +1,7 @@
 Summary:        Cloud instance init scripts
 Name:           cloud-init
 Version:        24.3.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -144,6 +144,9 @@ make check %{?_smp_mflags}
 %config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 
 %changelog
+* Fri Apr 03 2026 Dan Streetman <ddstreet@ieee.org> - 24.3.1-3
+- Fix no-single-process patch typo
+
 * Fri Jun 27 2025 Archana Shettigar <v-shettigara@microsoft.com> - 24.3.1-2
 - Patch CVE-2024-6174 & CVE-2024-11584
 

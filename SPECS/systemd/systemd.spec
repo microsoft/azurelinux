@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        30%{?dist}
+Release:        33%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -139,6 +139,10 @@ Patch0490:      use-none-scheduler.patch
 # 'azurelinux-...' and modified for our 'system-*' pam files
 Patch0491:      azurelinux-use-system-auth-in-pam-systemd-user.patch
 
+# ukify: fix insertion of padding in merged sections
+# Backport of upstream commit ec1d031f3de02f84beca89e2b402d085fba62be4
+Patch0492:      ukify-fix-insertion-of-padding-in-merged-sections.patch
+
 # Patches for Azure Linux
 Patch0900:      do-not-test-openssl-sm3.patch
 Patch0901:      networkd-default-use-domains.patch
@@ -154,6 +158,7 @@ Patch0910:      CVE-2026-40226.patch
 Patch0911:      CVE-2026-40225.patch
 Patch0912:      networkd-address-skip-firewall-init.patch
 Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
+Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -615,6 +620,7 @@ useful to test systemd internals.
 %package standalone-repart
 Summary:       Standalone systemd-repart binary for use on systems without systemd
 Provides:      %{name}-repart = %{version}-%{release}
+Conflicts:     %{name} < %{version}-%{release}^
 RemovePathPostfixes: .standalone
 
 %description standalone-repart
@@ -625,6 +631,7 @@ package and is meant for use on systems without systemd.
 %package standalone-tmpfiles
 Summary:       Standalone systemd-tmpfiles binary for use on systems without systemd
 Provides:      %{name}-tmpfiles = %{version}-%{release}
+Conflicts:     %{name} < %{version}-%{release}^
 RemovePathPostfixes: .standalone
 
 %description standalone-tmpfiles
@@ -635,6 +642,7 @@ package and is meant for use on systems without systemd.
 %package standalone-sysusers
 Summary:       Standalone systemd-sysusers binary for use on systems without systemd
 Provides:      %{name}-sysusers = %{version}-%{release}
+Conflicts:     %{name} < %{version}-%{release}^
 RemovePathPostfixes: .standalone
 
 %description standalone-sysusers
@@ -645,6 +653,7 @@ package and is meant for use on systems without systemd.
 %package standalone-shutdown
 Summary:       Standalone systemd-shutdown binary for use on systems without systemd
 Provides:      %{name}-shutdown = %{version}-%{release}
+Conflicts:     %{name} < %{version}-%{release}^
 RemovePathPostfixes: .standalone
 
 %description standalone-shutdown
@@ -917,7 +926,16 @@ cp %{buildroot}/usr/lib/systemd/boot/efi/systemd-bootaa64.efi %{buildroot}/boot/
 
 %check
 %if %{with tests}
-meson test -C %{_vpath_builddir} -t 6 --print-errorlogs
+# Skip tests that require capabilities not available in the build chroot:
+#   test-fd-util, test-mount-util, test-mountpoint-util, test-path-util,
+#   test-time-util, test-calendarspec, test-date -- need mount-namespace
+#     privileges (MS_SLAVE remount fails with EINVAL in chroot).
+#   test-udev -- invokes systemd-detect-virt which is not on PATH yet.
+#   test-rpm-macros -- environmental mismatch with the build chroot.
+# These all pass in a real (non-chroot) environment.
+SKIP='test-fd-util|test-mount-util|test-mountpoint-util|test-path-util|test-time-util|test-calendarspec|test-date|test-udev|test-rpm-macros'
+TESTS=$(meson test -C %{_vpath_builddir} --list | awk -F' / ' '{print $NF}' | grep -vxE "$SKIP" | sort -u)
+meson test -C %{_vpath_builddir} -t 6 --print-errorlogs $TESTS
 %endif
 
 #############################################################################################
@@ -1239,6 +1257,26 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
+- Skip tests in %%check that require capabilities not available in the build
+  chroot (mount-namespace privileges, systemd-detect-virt on PATH, etc.):
+  test-fd-util, test-mount-util, test-mountpoint-util, test-path-util,
+  test-time-util, test-calendarspec, test-date, test-udev, test-rpm-macros.
+- Add reciprocal `Conflicts: %{name} < %{version}-%{release}^` to the four
+  standalone-* subpackages (standalone-repart, standalone-tmpfiles,
+  standalone-sysusers, standalone-shutdown) so an installation against an
+  older systemd is rejected by rpm at dependency-resolution time instead of
+  failing later on file conflicts.
+  
+* Wed Jun 24 2026 Vince Perri <viperri@microsoft.com> - 255-32
+- Backport upstream ukify fix (ec1d031f3de02f84beca89e2b402d085fba62be4):
+  when merging into an existing PE section, padding was derived from the new
+  section size instead of the existing section size, which can leave
+  insufficient padding and corrupt the resulting UKI.
+
+* Wed May 27 2026 Dan Streetman <ddstreet@ieee.org> - 255-31
+- Prevent corruption from stale alias state on daemon-reload
+
 * Thu May 28 2026 Nikola Bojanic <nbojanic@microsoft.com> - 255-30
 - Backport upstream commit 78f8d5e: network: also check ID_NET_MANAGED_BY
   property on reconfigure.

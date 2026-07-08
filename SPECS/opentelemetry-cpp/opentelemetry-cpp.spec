@@ -4,13 +4,14 @@
 Summary:        The OpenTelemetry C++ Client
 Name:           opentelemetry-cpp
 Version:        1.14.2
-Release:       	2%{?dist}
+Release:       	3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/open-telemetry/opentelemetry-cpp
 Source0:        https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        https://github.com/open-telemetry/%{proto_name}/archive/refs/tags/v%{proto_version}.tar.gz#/%{proto_name}-%{proto_version}.tar.gz
+Patch0:         CVE-2026-44967.patch
 
 BuildRequires:  c-ares-devel
 BuildRequires:  cmake
@@ -77,6 +78,9 @@ mkdir build && cd build
 %{_libdir}/cmake/opentelemetry-cpp/*
 
 %changelog
+* Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.14.2-3
+- Patch for CVE-2026-44967
+
 * Thu Jul 25 2024 Devin Anderson <danderson@microsoft.com> - 1.14.2-2
 - Bump release to rebuild with latest 'abseil-cpp'.
 - Provide explicit fetch for protobuf archive.

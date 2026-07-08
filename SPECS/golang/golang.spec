@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.26.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -114,6 +114,9 @@ rm -f  %{gopath}/src/runtime/*.c
   ./make.bash --no-clean
 )
 
+# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
+rm -rf %{_libdir}/golang
+
 %install
 
 mkdir -p %{buildroot}%{_bindir}
@@ -169,6 +172,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-3
+- Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
 * Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
 - Patch for CVE-2026-39821
 
