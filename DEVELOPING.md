@@ -10,7 +10,35 @@ The [`azldev`](https://github.com/microsoft/azure-linux-dev-tools) CLI tool driv
 go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
 ```
 
-> **Note:** azldev is still in active development, using the latest commit from the `main` branch is recommended for the most up-to-date features and fixes.
+`go install` writes executables to the directory reported by `go env GOBIN`.
+When that value is empty, it uses `$(go env GOPATH)/bin`. Make sure the install
+directory is on `PATH` before starting VS Code or Copilot CLI. For the default
+Go configuration:
+
+```bash
+export PATH="$(go env GOPATH)/bin:$PATH"
+command -v azldev
+```
+
+Add the `export` to your shell startup file to persist it. If `go env GOBIN`
+prints a custom directory, add that directory instead.
+
+> **Note:** azldev is still in active development, to ensure you have a stable version, install the version pinned by `.azldev-version` in this repo.
+
+### Refresh agent guidance
+
+The `azldev-*` skills and generated instruction wrappers are emitted by azldev. Make
+durable guidance changes in azldev, then install the version pinned by
+`.azldev-version` using the command above. Always regenerate from that pinned version.
+From this repository's root, run:
+
+```bash
+azldev docs agent install --full
+```
+
+Until an automated freshness check is enabled, the contributor updating azldev guidance
+owns running this command and reviewing the resulting skills, instructions, and MCP
+configuration changes before committing them.
 
 ### azldev documentation
 
@@ -96,7 +124,28 @@ copilot --add-dir .
 copilot --add-dir . -i "Upgrade vim to the next stable release"
 ```
 
-Note: `copilot` supports fully autonomous operation (no interactive mode) with `-p <prompt>` however, until azldev supports a full MCP mode the tool approvals are very difficult. `--yolo` (same as `--allow-all-tools --allow-all-paths --allow-all-urls`) is an option, but use with extreme caution since it grants the agent unrestricted access to your filesystem and network. For now, it's recommended to use `-i` to at least have visibility into the agent's thought process and tool usage.
+The repository configures MCP servers for both VS Code (`.vscode/mcp.json`) and
+Copilot CLI (`.mcp.json`), including the `azldev advanced mcp` server. Run Copilot
+CLI from the repository root.
+
+The MCP configuration starts `azldev` by name, so it must be on the `PATH`
+inherited by Copilot CLI.
+
+The Azure DevOps MCP server also requires the organization name and one enabled
+domain. Export them before starting Copilot CLI in any mode:
+
+```bash
+export AZURE_DEVOPS_ORG='<organization>'
+export AZURE_DEVOPS_DOMAIN='<domain>'
+```
+
+Note: `copilot` supports fully autonomous operation (no interactive mode) with
+`copilot -p '<prompt>' --additional-mcp-config=@.mcp.json`. The additional MCP
+configuration makes the repository's MCP servers available in prompt mode.
+`--yolo` (same as `--allow-all-tools --allow-all-paths --allow-all-urls`) is an
+option, but use with extreme caution since it grants the agent unrestricted
+access to your filesystem and network. For now, it's recommended to use `-i` to
+at least have visibility into the agent's thought process and tool usage.
 
 #### Using as a plugin (cross-repo access)
 

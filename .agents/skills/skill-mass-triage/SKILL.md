@@ -136,11 +136,11 @@ You are diagnosing Koji build failures for Azure Linux. For each task below, inv
 - Output directory: {{OUTPUT_DIR}}
 
 ## Investigation procedure
-Read the skill file at `.github/skills/skill-koji-triage/SKILL.md` for the full investigation
+Read the skill file at `.agents/skills/skill-koji-triage/SKILL.md` for the full investigation
 workflow — including how to use MCP tools, fetch logs, and categorize failures. Follow it exactly.
 
 ## Setup
-1. Read `.github/skills/skill-koji-triage/SKILL.md` (MUST do this first).
+1. Read `.agents/skills/skill-koji-triage/SKILL.md` (MUST do this first).
 2. The orchestrator has already configured the default Koji base URL and SSL settings. **Do NOT call `set_koji_url`** — changing the default would affect other parallel sub-agents sharing the same MCP server.
    - If you need to fetch from a different Koji instance for some reason, pass `override_base_url` directly to `koji_fetch` or `koji_allow_insecure` instead.
 3. If the koji tools do not work as-is, inform the orchestrator of the issue — do not attempt to reconfigure them yourself, as that may cause issues for other parallel sub-agents.

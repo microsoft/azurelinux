@@ -25,7 +25,7 @@ handoffs:
 ---
 # Build Failure Diagnosis
 
-This agent diagnoses build failures — Koji triage, upstream investigation, root cause analysis, and fix recommendations. Follow the [skill-koji-triage skill](../skills/skill-koji-triage/SKILL.md) for the full investigation workflow, including discovery, log analysis, and failure categorization (unless working as an orchestrator, have sub-agents use the triage skill for you if so).
+This agent diagnoses build failures — Koji triage, upstream investigation, root cause analysis, and fix recommendations. Follow the [skill-koji-triage skill](../../.agents/skills/skill-koji-triage/SKILL.md) for the full investigation workflow, including discovery, log analysis, and failure categorization (unless working as an orchestrator, have sub-agents use the triage skill for you if so).
 
 ## Workflow
 
