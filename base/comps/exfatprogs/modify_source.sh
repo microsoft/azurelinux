@@ -2,7 +2,7 @@
 #
 # exfatprogs: deterministic strip-and-repack of upstream `exfatprogs-1.3.1.tar.xz`
 # with the `tests/` directory removed. Rationale lives in the comp.toml
-# `replace-reason` field; see also `.github/skills/skill-modify-source/SKILL.md`.
+# `replace-reason` field.
 #
 # Usage:   bash base/comps/exfatprogs/modify_source.sh
 # Output:  base/build/work/scratch/exfatprogs/exfatprogs-1.3.1.tar.xz (+ .sha512)

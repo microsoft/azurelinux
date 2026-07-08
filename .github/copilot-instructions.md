@@ -53,7 +53,7 @@ azldev comp update -a          # Refresh all locks
 
 **Always re-run `update` before opening a PR**, even after minor edits — the input fingerprint is computed from the full component config, and the `Update Locks` CI check runs against the committed state.
 
-**⚠️ Critical quirk** — `%changelog` and `Release:` are derived from `git log` for the component, not the working tree. In this mono-repo, commits that change a component's tracked inputs (for example `base/comps/<name>/` and/or `locks/<name>.lock`) drift the rendered output, so after committing you must re-render and amend (or commit the spec separately). See [`skill-update-component`](skills/skill-update-component/SKILL.md) for the finalize-and-amend pattern that keeps `Check Rendered Specs` and `Update Locks` both green, including the pin-bump variant.
+**⚠️ Critical quirk** — `%changelog` and `Release:` are derived from `git log` for the component, not the working tree. In this mono-repo, commits that change a component's tracked inputs (for example `base/comps/<name>/` and/or `locks/<name>.lock`) drift the rendered output, so after committing you must re-render and amend (or commit the spec separately). See [`azldev-update-component`](../.agents/skills/azldev-update-component/SKILL.md) for the finalize-and-amend pattern that keeps `Check Rendered Specs` and `Update Locks` both green, including the pin-bump variant.
 
 ### Prior to PR
 
@@ -61,9 +61,9 @@ When making a PR, the lock and rendered specs must be updated and self-consisten
 
 ## Key Concepts
 
-**Components** = unit of packaging (→ one or more RPMs). Spec sources: upstream (default, from Fedora dist-git), local, or pinned upstream. See [`comp-toml.instructions.md`](instructions/comp-toml.instructions.md#spec-source-types) for syntax.
+**Components** = unit of packaging (→ one or more RPMs). Spec sources: upstream (default, from Fedora dist-git), local, or pinned upstream. See the [`azldev-comp-toml` skill](../.agents/skills/azldev-comp-toml/SKILL.md#spec-source) for syntax.
 
-**Overlays** modify upstream specs/sources without forking. See [`comp-toml.instructions.md`](instructions/comp-toml.instructions.md#overlays) for types, syntax, and pitfalls. Schema: [`azldev.schema.json`](../external/schemas/azldev.schema.json).
+**Overlays** modify upstream specs/sources without forking. See the [`azldev-overlays` skill](../.agents/skills/azldev-overlays/SKILL.md) for types, syntax, and pitfalls. Schema: [`azldev.schema.json`](../external/schemas/azldev.schema.json).
 
 **TOML include hierarchy**: `azldev.toml` → `distro/distro.toml` + `base/project.toml` → `base/comps/components.toml` → `**/*.comp.toml` (stitched into single namespace).
 

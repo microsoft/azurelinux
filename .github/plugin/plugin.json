@@ -2,7 +2,9 @@
   "name": "azurelinux",
   "description": "Azure Linux OS development skills — component builds, overlays, mock testing, Koji triage, AKS health",
   "version": "1.0.0",
-  "author": "Azure Linux Team",
-  "skills": ".github/skills/",
+  "author": {
+    "name": "Azure Linux Team"
+  },
+  "skills": ".agents/skills/",
   "agents": ".github/agents/"
 }

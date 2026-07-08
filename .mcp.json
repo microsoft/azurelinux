@@ -1,24 +1,14 @@
 {
-  "inputs": [
-    {
-      "description": "Azure DevOps organization name  (e.g. 'contoso')",
-      "id": "ado_org",
-      "type": "promptString"
-    },
-    {
-      "description": "Repeat to enable specific domains: core, work, work-items, search, test-plans, repositories, wiki, pipelines, advanced-security.",
-      "id": "ado_domain",
-      "password": false,
-      "type": "promptString"
-    }
-  ],
-  "servers": {
+  "mcpServers": {
     "azldev": {
       "args": [
         "advanced",
         "mcp"
       ],
       "command": "azldev",
+      "tools": [
+        "*"
+      ],
       "type": "stdio"
     },
     "azure-mcp-server": {
@@ -48,6 +38,9 @@
       "env": {
         "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
       },
+      "tools": [
+        "*"
+      ],
       "type": "stdio"
     },
     "fedora-distgit": {
@@ -55,6 +48,9 @@
         "scripts/mcps/fedora-distgit-mcp.py"
       ],
       "command": "python3",
+      "tools": [
+        "*"
+      ],
       "type": "stdio"
     },
     "koji": {
@@ -62,20 +58,28 @@
         "scripts/mcps/koji-mcp.py"
       ],
       "command": "python3",
+      "tools": [
+        "*"
+      ],
       "type": "stdio"
     },
     "microsoft/azure-devops-mcp": {
       "args": [
         "-y",
         "@azure-devops/mcp@latest",
-        "${input:ado_org}",
+        "$AZURE_DEVOPS_ORG",
         "-d",
-        "${input:ado_domain}"
+        "$AZURE_DEVOPS_DOMAIN"
       ],
       "command": "npx",
-      "gallery": "https://api.mcp.github.com",
-      "type": "stdio",
-      "version": "1.0.0"
+      "env": {
+        "AZURE_DEVOPS_DOMAIN": "$AZURE_DEVOPS_DOMAIN",
+        "AZURE_DEVOPS_ORG": "$AZURE_DEVOPS_ORG"
+      },
+      "tools": [
+        "*"
+      ],
+      "type": "stdio"
     }
   }
 }

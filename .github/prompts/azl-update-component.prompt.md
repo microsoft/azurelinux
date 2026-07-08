@@ -6,7 +6,7 @@ description: "Update an existing Azure Linux component (version bump, dependency
 
 Update **${input:component_name}** — target version: **${input:new_version:target version}**, update type: **${input:update_type:version|dependency|overlay|config}**.
 
-Use structural patterns from [comp-toml.instructions.md](../instructions/comp-toml.instructions.md). If overlays break, follow the [skill-fix-overlay skill](../skills/skill-fix-overlay/SKILL.md). Test changes using the [skill-build-component skill](../skills/skill-build-component/SKILL.md).
+Use structural guidance from the [azldev-comp-toml skill](../../.agents/skills/azldev-comp-toml/SKILL.md). If overlays break, follow the [azldev-overlays skill](../../.agents/skills/azldev-overlays/SKILL.md). Test changes using the [azldev-build-component skill](../../.agents/skills/azldev-build-component/SKILL.md), then finalize the lock and rendered output with the [azldev-update-component skill](../../.agents/skills/azldev-update-component/SKILL.md).
 
 ## Workflow
 
@@ -17,7 +17,11 @@ Use structural patterns from [comp-toml.instructions.md](../instructions/comp-to
    - `overlay` — modifying or adding overlays
    - `config` — build config changes (`build.defines`, `build.without`)
 3. **Apply changes** to the `.comp.toml` file
-4. **Verify overlays still apply:**
+4. **Refresh source resolution when needed.** If the change affects the upstream
+   commit pin, upstream distro/version, snapshot, or another source-resolution input,
+   run `azldev comp update -p ${input:component_name}` before rendering. Overlay and
+   build-only changes can defer `update` until finalization.
+5. **Verify overlays still apply:**
    ```bash
    azldev comp render -p ${input:component_name}
    ```
@@ -27,10 +31,12 @@ Use structural patterns from [comp-toml.instructions.md](../instructions/comp-to
    azldev comp prep-sources -p ${input:component_name} -o base/build/work/scratch/${input:component_name}-post --force
    diff -r base/build/work/scratch/${input:component_name}-pre base/build/work/scratch/${input:component_name}-post
    ```
-   If overlays fail, follow the [skill-fix-overlay skill](../skills/skill-fix-overlay/SKILL.md).
-5. **Migrate to dedicated file** if the component is still inline and now needs customization (use `/azl-migrate-component`)
-6. **Build and test:** `azldev comp build -p ${input:component_name}`
-7. **Smoke-test** the built RPMs in a mock chroot
+   If overlays fail, follow the [azldev-overlays skill](../../.agents/skills/azldev-overlays/SKILL.md).
+6. **Migrate to dedicated file** if the component is still inline and now needs customization (use `/azl-migrate-component`)
+7. **Build and test:** `azldev comp build -p ${input:component_name}`
+8. **Smoke-test** the built RPMs in a mock chroot
+9. **Finalize** the lock, commit, post-commit render, and amend by following the
+   `azldev-update-component` workflow
 
 ## Versioning Risk Assessment
 

@@ -6,7 +6,7 @@ description: "Remove component(s) from Azure Linux"
 
 Remove the component(s) **${input:component_names}** from the **${input:project:base}** project.
 
-Follow the workflow in the [skill-remove-component skill](../skills/skill-remove-component/SKILL.md).
+Follow the workflow in the [azldev-remove-component skill](../../.agents/skills/azldev-remove-component/SKILL.md).
 
 ## Workflow
 

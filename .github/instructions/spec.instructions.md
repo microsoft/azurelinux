@@ -9,7 +9,7 @@ description: Read this when working with spec files (`*.spec`) that are hand-mai
 
 Most components import specs from upstream (Fedora) via `*.comp.toml` — hand-coded specs are only for **Azure Linux-originating packages** that don't exist upstream (e.g., `azurelinux-release`, `azurelinux-repos`).
 
-If the package exists upstream, **prefer overlays** over maintaining a forked spec. Overlays get automatic upstream updates and are more resilient to changes. See the `skill-add-component` skill for the decision tree.
+If the package exists upstream, **prefer overlays** over maintaining a forked spec. Overlays get automatic upstream updates and are more resilient to changes. See the `azldev-add-component` skill for the decision tree.
 
 ## Relationship to `.comp.toml`
 
@@ -38,4 +38,4 @@ To see the upstream spec before overlays: `azldev comp prep-sources -p <name> --
 
 ## Debugging a spec
 
-If overlays produce an incorrect spec, use `prep-sources` to compare before/after. See skills `skill-fix-overlay` and `skill-build-component` for step-by-step workflows.
+If overlays produce an incorrect spec, use `prep-sources` to compare before/after. See skills `azldev-overlays` and `azldev-build-component` for step-by-step workflows.
