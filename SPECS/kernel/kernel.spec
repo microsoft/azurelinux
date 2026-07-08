@@ -32,7 +32,7 @@
 Summary:        Linux Kernel
 Name:           kernel
 Version:        6.6.143.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -440,6 +440,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Mon Jul 06 2026 Deepu Thomas <dethoma@microsoft.com> - 6.6.143.1-2
+- Enable CONFIG_FS_ENCRYPTION (fscrypt) for ext4/f2fs filesystem encryption
+
 * Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.143.1-1
 - Auto-upgrade to 6.6.143.1
 
