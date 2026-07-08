@@ -100,7 +100,7 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 * Tue Dec 31 2024 Rohit Rawat <rohitrawat@microsoft.com> - 2.27.0-3
 - Add patch for CVE-2024-45338
 
-* Mon Dec 30 2024 Muhammad Falak <mwani@microsoft.com> - 2.27.0-2
+* Wed Jan 08 2025 Muhammad Falak <mwani@microsoft.com> - 2.27.0-2
 - Patch CVE-2024-45337
 
 * Thu May 02 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.27.0-1
