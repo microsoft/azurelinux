@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        13%{?dist}
+Release:        12%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,7 +37,6 @@ Patch21:        CVE-2026-39827.patch
 Patch22:        CVE-2026-39835.patch
 Patch23:        CVE-2026-42502.patch
 Patch24:        CVE-2026-46598.patch
-Patch25:        CVE-2026-39833.patch
 
 BuildRequires:  golang
 Requires:       docker-cli
@@ -71,9 +70,6 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
-* Fri Jun 05 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.27.0-13
-- Patch for CVE-2026-39833 and fix patch for CVE-2026-39832
-
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-12
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 

@@ -1,13 +1,14 @@
 Summary:        Terminal multiplexer
 Name:           tmux
 Version:        3.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC and BSD
 URL:            https://tmux.github.io/
 Group:          Applications/System
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/tmux/tmux/releases/download/%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-11623.patch
 Requires:       libevent ncurses
 BuildRequires:  libevent-devel ncurses-devel
 
@@ -37,6 +38,9 @@ make  %{?_smp_mflags} check
 %exclude /usr/src
 
 %changelog
+* Thu Jun 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.4-2
+- Patch for CVE-2026-11623
+
 * Fri Feb 23 2024 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4-1
 - Auto-upgrade to 3.4 - Azure Linux 3.0 Upgrades
 
