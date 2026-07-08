@@ -1,11 +1,11 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 11.6.2
+%define npm_version 11.13.0
 
 %global nodejs_datadir %{_datarootdir}/nodejs
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 77
-%global icu_minor 1
+%global icu_major 78
+%global icu_minor 3
 %global icu_version %{icu_major}.%{icu_minor}
 
 %global icudatadir %{nodejs_datadir}/icudata
@@ -15,8 +15,8 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.14.1
-Release:        3%{?dist}
+Version:        24.17.0
+Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,8 +26,8 @@ URL:            https://github.com/nodejs/node
 # !!!! because it contains patented algorithms.
 # !!!  => use generate_source_tarball.sh script to create a clean and reproducible source tarball.
 Source0:        https://nodejs.org/download/release/v%{version}/node-v%{version}.tar.xz
-Source1:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-b.zip
-Source2:        https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
+Source1:        https://github.com/unicode-org/icu/releases/download/release-%{icu_version}/icu4c-%{icu_version}-data-bin-b.zip
+Source2:        https://github.com/unicode-org/icu/releases/download/release-%{icu_version}/icu4c-%{icu_version}-data-bin-l.zip
 Source3:        btest402.js
 Patch0:         disable-tlsv1-tlsv1-1.patch
 Patch1:         CVE-2019-10906.patch
@@ -35,8 +35,6 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
-Patch6:         CVE-2026-33671.patch
-Patch7:         CVE-2026-33672.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -194,6 +192,16 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Tue Jun 23 2026 Sumit Jena <sumitjena@microsoft.com> - 24.17.0-1
+- Upgrade to 24.17.0 (bundled npm 11.13.0).
+- Bump bundled ICU to 78.3 (tools/icu/current_ver.dep).
+
+* Tue May 19 2026 Sumit Jena <sumitjena@microsoft.com> - 24.14.1-4
+- Bump bundled ICU data to 78.2 to match upstream Node 24.14.1
+  (tools/icu/current_ver.dep); fixes segfault running @typespec/compiler
+  (nodejs/node#17161). Adjust Source1/Source2 URL templates for ICU 78.x
+  release naming (release-X.Y, icu4c-X.Y-...).
+
 * Mon Apr 27 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 24.14.1-3
 - Remove nodejs20 and keep nodejs 24 as default nodejs
 

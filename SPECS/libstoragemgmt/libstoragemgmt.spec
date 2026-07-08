@@ -1,12 +1,15 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
+%if 0%{?with_check}
+Patch0:         libstoragemgmt-tests-gate-hw-disk-probes.patch
+%endif
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -33,6 +36,8 @@ BuildRequires:  valgrind
 BuildRequires:  git
 %endif
 Requires:       python3-%{name}
+Requires(pre):  /usr/sbin/groupadd
+Requires(pre):  /usr/sbin/useradd
 
 %description
 The libStorageMgmt library will provide a vendor agnostic open source storage
@@ -454,6 +459,15 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Sun Jun 21 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-2
+- Add test-only patch (gated by with_check) to skip /dev/sd*
+  hardware probes in test_local_disk_link_type and
+  test_local_disk_link_speed_get; fixes %check failure in
+  chroot.
+- Add Requires(pre) on /usr/sbin/groupadd and /usr/sbin/useradd
+  so the %pre scriptlet works on minimal images where
+  shadow-utils is not installed.
+
 * Tue Feb 06 2024 Nan Liu <liunan@microsoft.com> - 1.9.8-1
 - Upgrade to 1.9.8 in Azure Linux 3.0
 - Remove the unneeded patch
