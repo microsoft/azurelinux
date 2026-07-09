@@ -39,7 +39,6 @@ emptyrpm:
 patches:
     ignore_list:
         - linux-kernel-test.patch
-        - patch-6.18-redhat.patch
 
 runpath:
     ignore:
