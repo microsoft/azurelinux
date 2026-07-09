@@ -1,0 +1,16 @@
+[ req ]
+default_bits = 3072
+distinguished_name = req_distinguished_name
+prompt = no
+x509_extensions = myexts
+
+[ req_distinguished_name ]
+O = Red Hat
+CN = Red Hat Enterprise Linux kernel signing key
+emailAddress = secalert@redhat.com
+
+[ myexts ]
+basicConstraints=critical,CA:FALSE
+keyUsage=digitalSignature
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid

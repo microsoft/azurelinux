@@ -1,0 +1,60 @@
+RHEL_MAJOR = 10
+RHEL_MINOR = 99
+
+#
+# RHEL_RELEASE
+# -------------
+#
+# Represents build number in 'release' part of RPM's name-version-release.
+#   name is <package_name>, e.g. kernel
+#   version is upstream kernel version this kernel is based on, e.g. 4.18.0
+#   release is <RHEL_RELEASE>.<dist_tag>[<buildid>], e.g. 100.el8
+#
+# Use this spot to avoid future merge conflicts.
+# Do not trim this comment.
+RHEL_RELEASE = 0
+
+#
+# RHEL_REBASE_NUM
+# ----------------
+#
+# Used in RPM version string for Gemini kernels, which dont use upstream
+# VERSION/PATCHLEVEL/SUBLEVEL. The number represents rebase number for
+# current MAJOR release.
+#
+# Use this spot to avoid future merge conflicts.
+# Do not trim this comment.
+RHEL_REBASE_NUM = 1
+
+
+#
+# ZSTREAM
+# -------
+#
+#  This variable controls whether we use zstream numbering or not for the
+#  package release. The zstream release keeps the build number of the last
+#  build done for ystream for the Beta milestone, and increments a second
+#  number for each build. The third number is used for branched builds
+#  (eg.: for builds with security fixes or hot fixes done outside of the
+#  batch release process).
+#
+#  For example, with ZSTREAM unset or set to "no", all builds will contain
+#  a release with only the build number, eg.: kernel-<kernel version>-X.el*,
+#  where X is the build number. With ZSTREAM set to "yes", we will have
+#  builds with kernel-<kernel version>-X.Y.Z.el*, where X is the last
+#  RHEL_RELEASE number before ZSTREAM flag was set to yes, Y will now be the
+#  build number and Z will always be 1 except if you're doing a branched build
+#  (when you give RHDISTGIT_BRANCH on the command line, in which case the Z
+#  number will be incremented instead of the Y).
+#
+ZSTREAM ?= no
+
+#
+# Automotive
+# ----------
+#
+# Represents the major and minor release used by automotive.
+# Primarily this is used to to identify the build target when
+# building the kernel-automotive packages.
+AUTOMOTIVE_MAJOR = 2
+AUTOMOTIVE_MINOR = 99
