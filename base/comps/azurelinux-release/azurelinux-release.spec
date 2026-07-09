@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -55,6 +55,7 @@ Source21:       50-azure-cloud.conf
 Source22:       70-azurelinux-hardening.conf
 Source23:       50-client-alive-interval.conf
 Source24:       50-permit-root-login.conf
+Source25:       10-azure-kvp.cfg
 
 BuildArch:      noarch
 
@@ -342,6 +343,7 @@ install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
 install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
+install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
 
 %if %{with container}
@@ -454,6 +456,7 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 %{_sysconfdir}/chrony.d/chrony-azure.conf
 %{_prefix}/lib/systemd/networkd.conf.d/50-azure-cloud.conf
 %{_sysconfdir}/ssh/sshd_config.d/50-client-alive-interval.conf
+%config(noreplace) %{_sysconfdir}/cloud/cloud.cfg.d/10-azure-kvp.cfg
 %endif
 
 
@@ -476,6 +479,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Wed Jul 08 2026 Mitch Zhu <mitchzhu@microsoft.com> - 4.0-20
+- Add cloud-init Azure KVP telemetry config to the cloud identity package
+
 * Tue Jul 07 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0-19
 - Enable netplan-configure.service by default via 90-default.preset
 
