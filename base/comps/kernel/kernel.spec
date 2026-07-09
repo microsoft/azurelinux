@@ -1,6 +1,3 @@
-# This spec file has been modified by azldev to include build configuration overlays.
-# Do not edit manually; changes may be overwritten.
-
 # All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
 %{load:%{_sourcedir}/kernel.azl.macros}
 
@@ -4578,7 +4575,10 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
-* Tue Jul 21 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.7
+* Tue Jul 21 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.9
+- feat(kernel): convert component to local spec
+
+* Tue Jul 21 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.8
 - feat(kernel): vendor kernel spec sources for local-spec migration
 
 * Wed Jul 15 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.6
