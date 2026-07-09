@@ -84,13 +84,6 @@ determine_config_path()
 		else
 			config_path="rt/generic"
 		fi
-	elif [[ "$variant" == *"automotive"* ]]; then
-		# Automotive variant - goes under automotive/
-		if [[ "$variant" == *"debug"* ]]; then
-			config_path="automotive/debug"
-		else
-			config_path="automotive/generic"
-		fi
 	else
 		# Stock kernel - goes under top-level debug or generic
 		if [[ "$variant" == *"debug"* ]]; then
