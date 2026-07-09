@@ -1,0 +1,11 @@
+/var/log/kvm_stat.csv {
+	size 10M
+	missingok
+	compress
+	maxage 30
+	rotate 5
+	nodateext
+	postrotate
+		/usr/bin/systemctl try-restart kvm_stat.service
+	endscript
+}
