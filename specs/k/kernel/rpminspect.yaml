@@ -12,8 +12,6 @@ badfuncs:
 emptyrpm:
     expected_empty:
         - kernel
-        - kernel-debug
-        - kernel-debug-devel-matched
         - kernel-devel-matched
         - kernel-modules-extra-matched
         - kernel-zfcpdump
