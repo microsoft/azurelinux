@@ -7,7 +7,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 9
+%define azl_pkgrelease 10
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -163,8 +163,6 @@ Summary: The Linux kernel
 %global include_fedora 1
 # Include RHEL files
 %global include_rhel 1
-# Include RT files
-%global include_rt 1
 # Provide Patchlist.changelog file
 %global patchlist_changelog 1
 # Set released_kernel to 1 when the upstream source tarball contains a
@@ -226,18 +224,6 @@ Summary: The Linux kernel
 %define with_arm64_16k %{?_with_arm64_16k:    1} %{?!_with_arm64_16k:    0}
 # kernel-64k (aarch64 kernel with 64K page_size)
 %define with_arm64_64k %{?_without_arm64_64k: 0} %{?!_without_arm64_64k: 1}
-# we default reatime builds to off for fedora and on for rhel/centos/eln
-%if 0%{?fedora}
-# kernel-rt (x86_64 and aarch64 only PREEMPT_RT enabled kernel)
-%define with_realtime  %{?_with_realtime:  1} %{?!_with_realtime:  0}
-# kernel-rt-64k (aarch64 RT kernel with 64K page_size)
-%define with_realtime_arm64_64k %{?_with_realtime_arm64_64k: 1} %{?!_with_realtime_arm64_64k: 0}
-%else
-# kernel-rt (x86_64 and aarch64 only PREEMPT_RT enabled kernel)
-%define with_realtime  %{?_without_realtime:  0} %{?!_without_realtime:  1}
-# kernel-rt-64k (aarch64 RT kernel with 64K page_size)
-%define with_realtime_arm64_64k %{?_without_realtime_arm64_64k: 0} %{?!_without_realtime_arm64_64k: 1}
-%endif
 
 # Supported variants
 #            with_base with_debug    with_gcov
@@ -245,7 +231,6 @@ Summary: The Linux kernel
 # zfcpdump   X                       X
 # arm64_16k  X         X             X
 # arm64_64k  X         X             X
-# realtime   X         X             X
 
 # kernel-doc
 %define with_doc       %{?_without_doc:       0} %{?!_without_doc:       1}
@@ -273,8 +258,6 @@ Summary: The Linux kernel
 %define with_baseonly  %{?_with_baseonly:     1} %{?!_with_baseonly:     0}
 # Only build the debug variants (--with dbgonly):
 %define with_dbgonly   %{?_with_dbgonly:      1} %{?!_with_dbgonly:      0}
-# Only build the realtime kernel (--with rtonly):
-%define with_rtonly    %{?_with_rtonly:       1} %{?!_with_rtonly:       0}
 # Only build the tools package
 %define with_toolsonly %{?_with_toolsonly:    1} %{?!_with_toolsonly:    0}
 # Control whether we perform a compat. check against published ABI.
@@ -388,7 +371,6 @@ Summary: The Linux kernel
 # if requested, only build base kernel
 %if %{with_baseonly}
 %define with_debug 0
-%define with_realtime 0
 %define with_vdso_install 0
 %define with_perf 0
 %define with_libperf 0
@@ -408,34 +390,12 @@ Summary: The Linux kernel
 %define with_selftests 0
 %endif
 
-# if requested, only build realtime kernel
-%if %{with_rtonly}
-%define with_realtime 1
-%define with_realtime_arm64_64k 1
-%define with_up 0
-%define with_debug 0
-%define with_debuginfo 0
-%define with_vdso_install 0
-%define with_perf 0
-%define with_libperf 0
-%define with_tools 0
-%define with_kernel_abi_stablelists 0
-%define with_selftests 0
-%define with_headers 0
-%define with_efiuki 0
-%define with_zfcpdump 0
-%define with_arm64_16k 0
-%define with_arm64_64k 0
-%endif
-
 # if requested, only build tools
 %if %{with_toolsonly}
 %define with_tools 1
 %define with_up 0
 %define with_base 0
 %define with_debug 0
-%define with_realtime 0
-%define with_realtime_arm64_64k 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
 %define with_cross_headers 0
@@ -453,12 +413,6 @@ Summary: The Linux kernel
 %define with_vdso_install 0
 %define with_configchecks 0
 %endif
-
-# RT kernels are only built on x86_64 and aarch64
-%ifnarch x86_64 aarch64
-%define with_realtime 0
-%endif
-
 
 %if %{zipmodules}
 %global zipsed -e 's/\.ko$/\.ko.%compext/'
@@ -499,7 +453,6 @@ Summary: The Linux kernel
 # don't build noarch kernels or headers (duh)
 %ifarch noarch
 %define with_up 0
-%define with_realtime 0
 %define with_headers 0
 %define with_cross_headers 0
 %define with_tools 0
@@ -518,7 +471,6 @@ Summary: The Linux kernel
 %ifnarch aarch64
 %define with_arm64_16k 0
 %define with_arm64_64k 0
-%define with_realtime_arm64_64k 0
 %endif
 
 %if 0%{?fedora}
@@ -562,8 +514,6 @@ Summary: The Linux kernel
 %define with_zfcpdump 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
-%define with_realtime 0
-%define with_realtime_arm64_64k 0
 
 %define with_debuginfo 0
 %define with_perf 0
@@ -597,15 +547,13 @@ Summary: The Linux kernel
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
 # Azure Linux ships a single general-purpose kernel. All other variants
-# (debug, realtime/rt-64k, arm64-16k/64k, zfcpdump, efiuki) are
+# (debug, arm64-16k/64k, zfcpdump, efiuki) are
 # disabled here. This gate runs after all upstream arch/variant resolution so
 # it wins; the disabled variant code is trimmed away incrementally. Kernel
 # selftests (kernel-selftests-internal) are intentionally left enabled.
 # ============================================================================
 %define with_debug 0
 %define with_debug_meta 0
-%define with_realtime 0
-%define with_realtime_arm64_64k 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
 %define with_zfcpdump 0
@@ -617,11 +565,6 @@ Summary: The Linux kernel
 %else
 %define with_up_base 0
 %endif
-%if %{with_realtime} && %{with_base}
-%define with_realtime_base 1
-%else
-%define with_realtime_base 0
-%endif
 %if %{with_arm64_16k} && %{with_base}
 %define with_arm64_16k_base 1
 %else
@@ -631,11 +574,6 @@ Summary: The Linux kernel
 %define with_arm64_64k_base 1
 %else
 %define with_arm64_64k_base 0
-%endif
-%if %{with_realtime_arm64_64k} && %{with_base}
-%define with_realtime_arm64_64k_base 1
-%else
-%define with_realtime_arm64_64k_base 0
 %endif
 
 #
@@ -979,25 +917,6 @@ Source213: Module.kabi_dup_x86_64
 
 Source300: kernel-abi-stablelists-%{kabiversion}.tar.xz
 Source301: kernel-kabi-dw-%{kabiversion}.tar.xz
-
-%if 0%{include_rt}
-%if 0%{include_rhel}
-Source474: %{name}-aarch64-rt-rhel.config
-Source475: %{name}-aarch64-rt-debug-rhel.config
-Source476: %{name}-aarch64-rt-64k-rhel.config
-Source477: %{name}-aarch64-rt-64k-debug-rhel.config
-Source478: %{name}-x86_64-rt-rhel.config
-Source479: %{name}-x86_64-rt-debug-rhel.config
-%endif
-%if 0%{include_fedora}
-Source480: %{name}-aarch64-rt-fedora.config
-Source481: %{name}-aarch64-rt-debug-fedora.config
-Source482: %{name}-aarch64-rt-64k-fedora.config
-Source483: %{name}-aarch64-rt-64k-debug-fedora.config
-Source484: %{name}-x86_64-rt-fedora.config
-Source485: %{name}-x86_64-rt-debug-fedora.config
-%endif
-%endif
 
 
 # Sources for kernel-tools
@@ -1511,9 +1430,6 @@ Requires: %{name}-%{1}-core-uname-r = %{KVERREL}%{uname_suffix %{1}}\
 Requires: %{name}-%{1}-modules-uname-r = %{KVERREL}%{uname_suffix %{1}}\
 Requires: %{name}-%{1}-modules-core-uname-r = %{KVERREL}%{uname_suffix %{1}}\
 Requires: ((%{name}-%{1}-modules-extra-uname-r = %{KVERREL}%{uname_suffix %{1}}) if %{name}-modules-extra-matched)\
-%if "%{1}" == "rt" || "%{1}" == "rt-debug" || "%{1}" == "rt-64k" || "%{1}" == "rt-64k-debug"\
-Requires: realtime-setup\
-%endif\
 Provides: installonlypkg(kernel)\
 %description %{1}\
 The meta-package for the %{1} kernel\
@@ -1553,7 +1469,7 @@ Requires: %{name}-%{?1:%{1}-}-modules-core-uname-r = %{KVERREL}%{uname_variant %
 %endif\
 %{expand:%%kernel_debuginfo_package %{?1:%{1}}}\
 %endif\
-%if %{with_efiuki} && ("%{1}" != "rt" && "%{1}" != "rt-debug" && "%{1}" != "rt-64k" && "%{1}" != "rt-64k-debug")\
+%if %{with_efiuki}\
 %package %{?1:%{1}-}uki-virt\
 Summary: %{variant_summary} unified kernel image for virtual machines\
 Provides: installonlypkg(kernel)\
@@ -1645,51 +1561,6 @@ a 64K page size.
 %endif
 %description 64k-debug-core
 The debug kernel package contains a variant of the ARM64 Linux kernel using
-a 64K page size.
-This variant of the kernel has numerous debugging options enabled.
-It should only be installed when trying to gather additional information
-on kernel bugs, as some of these options impact performance noticably.
-%endif
-
-%if %{with_debug} && %{with_realtime}
-%define variant_summary The Linux PREEMPT_RT kernel compiled with extra debugging enabled
-%kernel_variant_package rt-debug
-%description rt-debug-core
-The kernel package contains the Linux kernel (vmlinuz), the core of any
-Linux operating system.  The kernel handles the basic functions
-of the operating system:  memory allocation, process allocation, device
-input and output, etc.
-
-This variant of the kernel has numerous debugging options enabled.
-It should only be installed when trying to gather additional information
-on kernel bugs, as some of these options impact performance noticably.
-%endif
-
-%if %{with_realtime_base}
-%define variant_summary The Linux kernel compiled with PREEMPT_RT enabled
-%kernel_variant_package rt
-%description rt-core
-This package includes a version of the Linux kernel compiled with the
-PREEMPT_RT real-time preemption support
-%endif
-
-%if %{with_realtime_arm64_64k_base}
-%define variant_summary The Linux PREEMPT_RT kernel compiled for 64k pagesize usage
-%kernel_variant_package rt-64k
-%description rt-64k-core
-The kernel package contains a variant of the ARM64 Linux PREEMPT_RT kernel using
-a 64K page size.
-%endif
-
-%if %{with_realtime_arm64_64k} && %{with_debug}
-%define variant_summary The Linux PREEMPT_RT kernel compiled with extra debugging enabled
-%if !%{debugbuildsenabled}
-%kernel_variant_package -m rt-64k-debug
-%else
-%kernel_variant_package rt-64k-debug
-%endif
-%description rt-64k-debug-core
-The debug kernel package contains a variant of the ARM64 Linux PREEMPT_RT kernel using
 a 64K page size.
 This variant of the kernel has numerous debugging options enabled.
 It should only be installed when trying to gather additional information
@@ -2627,9 +2498,6 @@ BuildKernel() {
     # Copy the System.map file for depmod to use
     cp System.map $RPM_BUILD_ROOT/.
 
-    if [[ "$Variant" == "rt" || "$Variant" == "rt-debug" || "$Variant" == "rt-64k" || "$Variant" == "rt-64k-debug" ]]; then
-	%{log_msg "Skipping efiuki build"}
-    else
 %if %{with_efiuki}
         %{log_msg "Setup the EFI UKI kernel"}
 	KernelUnifiedImageDir="$RPM_BUILD_ROOT/lib/modules/$KernelVer"
@@ -2695,8 +2563,6 @@ BuildKernel() {
 
 # with_efiuki
 %endif
-	:  # in case of empty block
-    fi # "$Variant" is an RT variant
 
 
     #
@@ -2767,12 +2633,6 @@ BuildKernel() {
 
         %{log_msg "Create module list files for all kernel variants"}
         variants_param=""
-        if [[ "$Variant" == "rt" || "$Variant" == "rt-debug" ]]; then
-            variants_param="-r rt"
-        fi
-        if [[ "$Variant" == "rt-64k" || "$Variant" == "rt-64k-debug" ]]; then
-            variants_param="-r rt-64k"
-        fi
         # this creates ../modules-*.list output, where each kmod path is as it
         # appears in modules.dep (relative to lib/modules/$KernelVer)
         ret=0
@@ -2885,14 +2745,6 @@ mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 cd linux-%{KVERREL}
 
 %if %{with_debug}
-%if %{with_realtime}
-BuildKernel %make_target %kernel_image %{_use_vdso} rt-debug
-%endif
-
-%if %{with_realtime_arm64_64k}
-BuildKernel %make_target %kernel_image %{_use_vdso} rt-64k-debug
-%endif
-
 %if %{with_arm64_16k}
 BuildKernel %make_target %kernel_image %{_use_vdso} 16k-debug
 %endif
@@ -2918,20 +2770,12 @@ BuildKernel %make_target %kernel_image %{_use_vdso} 16k
 BuildKernel %make_target %kernel_image %{_use_vdso} 64k
 %endif
 
-%if %{with_realtime_base}
-BuildKernel %make_target %kernel_image %{_use_vdso} rt
-%endif
-
-%if %{with_realtime_arm64_64k_base}
-BuildKernel %make_target %kernel_image %{_use_vdso} rt-64k
-%endif
-
 %if %{with_up_base}
 BuildKernel %make_target %kernel_image %{_use_vdso}
 %endif
 
 %ifnarch noarch %{nobuildarches}
-%if !%{with_debug} && !%{with_zfcpdump} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k} && !%{with_realtime} && !%{with_realtime_arm64_64k}
+%if !%{with_debug} && !%{with_zfcpdump} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k}
 # If only building the user space tools, then initialize the build environment
 # and some variables so that the various userspace tools can be built.
 %{log_msg "Initialize userspace tools build environment"}
@@ -3922,28 +3766,6 @@ fi\
 %kernel_variant_preun -v 64k -u virt -e
 %endif
 
-%if %{with_realtime_base}
-%kernel_variant_preun -v rt
-%kernel_variant_post -v rt -r kernel
-%endif
-
-%if %{with_realtime} && %{with_debug}
-%kernel_variant_preun -v rt-debug
-%kernel_variant_post -v rt-debug
-%endif
-
-%if %{with_realtime_arm64_64k_base}
-%kernel_variant_preun -v rt-64k
-%kernel_variant_post -v rt-64k
-%kernel_kvm_post rt-64k
-%endif
-
-%if %{with_debug} && %{with_realtime_arm64_64k}
-%kernel_variant_preun -v rt-64k-debug
-%kernel_variant_post -v rt-64k-debug
-%kernel_kvm_post rt-64k-debug
-%endif
-
 ###
 ### file lists
 ###
@@ -4231,7 +4053,7 @@ fi\
 %{expand:%%files -f debuginfo%{?3}.list %{?3:%{3}-}debuginfo}\
 %endif\
 %endif\
-%if %{with_efiuki} && "%{3}" != "rt" && "%{3}" != "rt-debug" && "%{3}" != "rt-64k" && "%{3}" != "rt-64k-debug"\
+%if %{with_efiuki}\
 %{expand:%%files %{?3:%{3}-}uki-virt}\
 %dir /lib/modules\
 %dir /lib/modules/%{KVERREL}%{?3:+%{3}}\
@@ -4267,10 +4089,6 @@ fi\
 %if %{with_arm64_64k}
 %kernel_variant_files %{_use_vdso} %{with_debug} 64k-debug
 %endif
-%kernel_variant_files %{_use_vdso} %{with_realtime_base} rt
-%if %{with_realtime}
-%kernel_variant_files %{_use_vdso} %{with_debug} rt-debug
-%endif
 
 %if %{with_debug_meta}
 %files debug
@@ -4300,10 +4118,6 @@ fi\
 %kernel_variant_files %{_use_vdso} %{with_zfcpdump} zfcpdump
 %kernel_variant_files %{_use_vdso} %{with_arm64_16k_base} 16k
 %kernel_variant_files %{_use_vdso} %{with_arm64_64k_base} 64k
-%kernel_variant_files %{_use_vdso} %{with_realtime_arm64_64k_base} rt-64k
-%if %{with_realtime_arm64_64k}
-%kernel_variant_files %{_use_vdso} %{with_debug} rt-64k-debug
-%endif
 
 %ifnarch noarch %{nobuildarches}
 %files modules-extra-matched
@@ -4321,6 +4135,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.10
+- Remove realtime (rt / rt-64k) variant support paths and sources
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.9
 - Remove non-x86_64/aarch64 architecture support paths and sources
 
