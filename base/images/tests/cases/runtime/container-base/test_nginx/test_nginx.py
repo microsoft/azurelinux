@@ -7,22 +7,7 @@ nginx installed on top of the image-under-test.
 
 from __future__ import annotations
 
-import time
-
 import pytest
-
-
-def wait_for_http(container_exec_shell, url: str):
-    """Poll until an HTTP endpoint responds successfully."""
-    result = None
-    for _ in range(5):
-        result = container_exec_shell(f"curl -sf {url}")
-        if result.exit_code == 0:
-            return result
-        time.sleep(1)
-
-    assert result is not None
-    return result
 
 
 @pytest.mark.dockerfile()
@@ -35,11 +20,6 @@ def test_nginx_config_valid(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_nginx_health_endpoint(container_exec_shell) -> None:
+def test_nginx_health_endpoint(assert_http_server) -> None:
     """nginx /health endpoint must return 200."""
-    start = container_exec_shell("nginx")
-    assert start.exit_code == 0, f"nginx failed to start: {start.output}"
-
-    result = wait_for_http(container_exec_shell, "http://localhost:80/health")
-    assert result.exit_code == 0, f"health check failed: {result.output}"
-    assert "healthy" in result.output
+    assert_http_server("nginx", "http://localhost:80/health", "healthy")

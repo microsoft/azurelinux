@@ -1,0 +1,1 @@
+Hello from the PHP server running from Azure Linux PHP container. Saves zip file correctly.

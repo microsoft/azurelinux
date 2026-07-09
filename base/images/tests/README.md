@@ -155,6 +155,8 @@ base/images/
 | `running_container` | function | `ContainerInstance` | Fresh container per test — auto-skips on VMs |
 | `container_exec_shell` | function | callable | `(cmd, shell="bash") → ContainerExecResult` |
 | `container_exec` | function | callable | `(args) → ContainerExecResult` |
+| `wait_for_http` | function | callable | `(url, *, retries=5, delay=1.0, connect_timeout=2.0, max_time=5.0) → ContainerExecResult` — polls an in-container HTTP endpoint with `curl`; raises after retries |
+| `assert_http_server` | function | callable | `(start_command, url, expected, *, retries=5, delay=1.0) → ContainerExecResult` — starts a server, waits for `url`, asserts `expected` in body |
 
 ## Adding tests
 

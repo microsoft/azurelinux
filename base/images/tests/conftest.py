@@ -9,9 +9,11 @@ in :mod:`utils.pytest_plugin` (loaded early via entry point).
 from __future__ import annotations
 
 import logging
+import shlex
 import shutil
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 import pytest
@@ -390,3 +392,82 @@ def container_exec_shell(podman_client, running_container):
             [shell, "-c", command],
         )
     return _exec_shell
+
+
+@pytest.fixture
+def wait_for_http(container_exec_shell):
+    """Callable that polls an in-container HTTP endpoint until it responds.
+
+    Runs ``curl -sSf <url>`` inside the running test container, retrying
+    until the request succeeds. Bounded connect/read timeouts keep a
+    hung server from stalling the suite, and the call fails explicitly
+    (raising ``AssertionError``) once the retries are exhausted rather
+    than returning a failed result a caller might forget to check.
+
+    Usage::
+
+        def test_example(container_exec_shell, wait_for_http):
+            container_exec_shell("nginx")
+            result = wait_for_http("http://localhost:80/health")
+            assert "healthy" in result.output
+    """
+    def _wait(
+        url: str,
+        *,
+        retries: int = 5,
+        delay: float = 1.0,
+        connect_timeout: float = 2.0,
+        max_time: float = 5.0,
+    ):
+        result = None
+        for _ in range(retries):
+            result = container_exec_shell(
+                f"curl -sSf --connect-timeout {connect_timeout} "
+                f"--max-time {max_time} {shlex.quote(url)}"
+            )
+            if result.exit_code == 0:
+                return result
+            time.sleep(delay)
+
+        output = result.output if result is not None else "<no attempts>"
+        raise AssertionError(
+            f"HTTP endpoint {url} did not respond after {retries} attempt(s): "
+            f"{output}"
+        )
+    return _wait
+
+
+@pytest.fixture
+def assert_http_server(container_exec_shell, wait_for_http):
+    """Start an HTTP server in the container and assert its response.
+
+    Runs ``start_command`` inside the running test container, waits for
+    ``url`` to respond, and asserts ``expected`` appears in the response
+    body. Returns the successful result for further assertions.
+
+    Usage::
+
+        def test_example(assert_http_server):
+            assert_http_server(
+                "nohup python3 /app/app.py > /tmp/server.log 2>&1 &",
+                "http://localhost:8080/",
+                "Hello from the server",
+            )
+    """
+    def _assert(
+        start_command: str,
+        url: str,
+        expected: str,
+        *,
+        retries: int = 5,
+        delay: float = 1.0,
+    ):
+        start = container_exec_shell(start_command)
+        assert start.exit_code == 0, f"failed to start server: {start.output}"
+
+        result = wait_for_http(url, retries=retries, delay=delay)
+        assert expected in result.output, (
+            f"unexpected response body: {result.output!r}"
+        )
+        return result
+    return _assert
