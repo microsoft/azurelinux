@@ -1,0 +1,1 @@
+Hello from the node server running from Azure Linux NodeJS container.
