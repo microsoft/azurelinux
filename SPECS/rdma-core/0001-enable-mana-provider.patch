@@ -1,0 +1,42 @@
+From d3ee27cdf7e7e8a369480a776e76c35efc3bbb10 Mon Sep 17 00:00:00 2001
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Thu, 9 Jul 2026 13:27:44 +0000
+Subject: [PATCH] Enable the MANA userspace provider (libmana)
+
+The MLNX_OFED source tarball disables most providers by wrapping their
+add_subdirectory() calls in `if (0)` blocks, keeping only efa, mlx4 and
+mlx5. As a result libmana.so was never built or shipped, even though the
+libibverbs package declares a virtual `Provides: libmana`.
+
+Move providers/mana out of the disabled block (alongside efa) so the
+shared provider library libmana.so.1 is compiled and installed. The
+mana/man documentation stays disabled, matching efa/mlx4.
+
+Signed-off-by: Kshitiz Godara <kgodara@microsoft.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2a60422..ab5cf00 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -736,6 +736,7 @@ add_subdirectory(providers/bnxt_re)
+ add_subdirectory(providers/cxgb4) # NO SPARSE
+ endif()
+ add_subdirectory(providers/efa)
++add_subdirectory(providers/mana)
+ if (0)
+ add_subdirectory(providers/efa/man)
+ add_subdirectory(providers/erdma)
+@@ -743,7 +744,6 @@ add_subdirectory(providers/hns)
+ add_subdirectory(providers/hns/man)
+ add_subdirectory(providers/ionic)
+ add_subdirectory(providers/irdma)
+-add_subdirectory(providers/mana)
+ add_subdirectory(providers/mana/man)
+ endif()
+ add_subdirectory(providers/mlx4)
+-- 
+2.53.0
+
