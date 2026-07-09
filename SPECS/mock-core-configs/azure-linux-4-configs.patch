@@ -1,0 +1,142 @@
+From 456009e94db38fbf5478726924d169292ed13653 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 10 Jun 2026 22:53:28 +0000
+Subject: [PATCH] configs: add Azure Linux 4.0 beta configuration
+
+Add mock configuration files for Azure Linux 4.0:
+- azure-linux-4-aarch64.cfg
+- azure-linux-4-x86_64.cfg
+- templates/azure-linux-4.tpl
+- releng/release-notes-next/azure-linux-4.config
+
+The template bootstraps from the AZL4 beta container image and
+points at the packages.microsoft.com beta repos.
+
+Also updates docs/Mock-Core-Configs.md to change the Azure Linux
+maintainer from @scaronni to @tobiasb-ms and @reubeno.
+
+Assisted-By: GitHub Copilot
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ docs/Mock-Core-Configs.md                     |  1 +
+ .../etc/mock/azure-linux-4-aarch64.cfg        |  6 ++
+ .../etc/mock/azure-linux-4-x86_64.cfg         |  6 ++
+ .../etc/mock/templates/azure-linux-4.tpl      | 59 +++++++++++++++++++
+ .../release-notes-next/azure-linux-4.config   |  1 +
+ 5 files changed, 73 insertions(+)
+ create mode 100644 mock-core-configs/etc/mock/azure-linux-4-aarch64.cfg
+ create mode 100644 mock-core-configs/etc/mock/azure-linux-4-x86_64.cfg
+ create mode 100644 mock-core-configs/etc/mock/templates/azure-linux-4.tpl
+ create mode 100644 releng/release-notes-next/azure-linux-4.config
+
+diff --git a/docs/Mock-Core-Configs.md b/docs/Mock-Core-Configs.md
+index 781cf94..8b7f6e1 100644
+--- a/docs/Mock-Core-Configs.md
++++ b/docs/Mock-Core-Configs.md
+@@ -45,6 +45,7 @@ distribution.
+ | [Amazon Linux 2](https://aws.amazon.com/amazon-linux-2/)                       | `amazonlinux-2-*` | [@stewartsmith](https://github.com/stewartsmith)                      | NA  |
+ | [Amazon Linux](https://aws.amazon.com/linux/amazon-linux-2023/)                | `amazonlinux-*`   | [@amazonlinux](https://github.com/amazonlinux)                        | [Issues](https://github.com/amazonlinux/amazon-linux-2023/issues)  |
+ | [Anolis](https://openanolis.cn/)                                               | `anolis-*`        | NA                                                                    | [Issues](https://bugzilla.openanolis.cn/)  |
++| [Azure Linux](https://github.com/microsoft/azurelinux)                         | `azure-linux-*`   | [@tobiasb-ms](https://github.com/tobiasb-ms) [@reubeno](https://github.com/reubeno) | [Issues](https://github.com/microsoft/azurelinux/issues)  |
+ | [CentOS Stream](https://www.centos.org/centos-stream/)                         | `centos-stream*`  | [@rpm-software-management](https://github.com/rpm-software-management)| [Issues](https://issues.redhat.com/projects/CS)  |
+ | [CentOS Linux](https://www.centos.org/centos-linux/)                           | `centos*`         | [@rpm-software-management](https://github.com/rpm-software-management)| NA  |
+ | [Circle Linux](https://cclinux.org/)                                           | `circlelinux-*`   | [@bella485](https://github.com/bella485)                              | [Issues](https://bugzilla.cclinux.org/)  |
+diff --git a/mock-core-configs/etc/mock/azure-linux-4-aarch64.cfg b/mock-core-configs/etc/mock/azure-linux-4-aarch64.cfg
+new file mode 100644
+index 0000000..3ba74d2
+--- /dev/null
++++ b/mock-core-configs/etc/mock/azure-linux-4-aarch64.cfg
+@@ -0,0 +1,6 @@
++include('templates/azure-linux-4.tpl')
++
++config_opts['root'] = 'azure-linux-4-aarch64'
++config_opts['description'] = 'Azure Linux 4.0'
++config_opts['target_arch'] = 'aarch64'
++config_opts['legal_host_arches'] = ('aarch64',)
+diff --git a/mock-core-configs/etc/mock/azure-linux-4-x86_64.cfg b/mock-core-configs/etc/mock/azure-linux-4-x86_64.cfg
+new file mode 100644
+index 0000000..a7e131d
+--- /dev/null
++++ b/mock-core-configs/etc/mock/azure-linux-4-x86_64.cfg
+@@ -0,0 +1,6 @@
++include('templates/azure-linux-4.tpl')
++
++config_opts['root'] = 'azure-linux-4-x86_64'
++config_opts['description'] = 'Azure Linux 4.0'
++config_opts['target_arch'] = 'x86_64'
++config_opts['legal_host_arches'] = ('x86_64',)
+diff --git a/mock-core-configs/etc/mock/templates/azure-linux-4.tpl b/mock-core-configs/etc/mock/templates/azure-linux-4.tpl
+new file mode 100644
+index 0000000..5dde8f4
+--- /dev/null
++++ b/mock-core-configs/etc/mock/templates/azure-linux-4.tpl
+@@ -0,0 +1,59 @@
++config_opts['chroot_setup_cmd'] = (
++    'install bash bzip2 coreutils cpio diffutils dnf5 azurelinux-release-common '
++    'findutils gawk glibc-minimal-langpack grep gzip info patch azurelinux-rpm-config '
++    'rpm-build sed shadow-utils tar unzip util-linux which xz'
++)
++# TODO: Replace the explicit chroot_setup_cmd package list above with a
++# distro-provided build group or metapackage (e.g. @buildsys-build) once one is
++# defined for Azure Linux 4.0.
++
++config_opts['dist'] = 'azl4'
++config_opts['macros']['%dist'] = '.azl4'
++config_opts['macros']['%vendor'] = 'Microsoft Corporation'
++config_opts['macros']['%distribution'] = 'Azure Linux'
++config_opts['releasever'] = '4.0'
++config_opts['package_manager'] = 'dnf5'
++config_opts['extra_chroot_dirs'] = [ '/run/lock', ]
++
++# Bootstrap from the published Azure Linux 4.0 base/core container image.
++config_opts['use_bootstrap'] = True
++config_opts['use_bootstrap_image'] = True
++config_opts['bootstrap_image'] = 'mcr.microsoft.com/azurelinux-beta/base/core:4.0'
++# The image ships dnf5 but not dnf5-plugins, so mark it as not "ready" and
++# let mock install the rest of the bootstrap packages itself.
++config_opts['bootstrap_image_ready'] = False
++
++config_opts['dnf.conf'] = """
++[main]
++keepcache=1
++debuglevel=2
++reposdir=/dev/null
++logfile=/var/log/yum.log
++retries=20
++obsoletes=1
++gpgcheck=1
++assumeyes=1
++syslog_ident=mock
++syslog_device=
++metadata_expire=0
++mdpolicy=group:primary
++best=1
++install_weak_deps=0
++protected_packages=
++user_agent={{ user_agent }}
++
++[azurelinux-base]
++name=Azure Linux $releasever - $basearch - Base
++baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch
++gpgcheck=1
++gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
++enabled=1
++
++[azurelinux-build-deps]
++name=Azure Linux $releasever - $basearch - Additional Build Dependencies
++baseurl=https://packages.microsoft.com/azurelinux/4.0/beta/sdk/$basearch
++gpgcheck=1
++gpgkey=file:///usr/share/distribution-gpg-keys/azure-linux/MICROSOFT-RPM-GPG-KEY
++enabled=1
++
++"""
+diff --git a/releng/release-notes-next/azure-linux-4.config b/releng/release-notes-next/azure-linux-4.config
+new file mode 100644
+index 0000000..377f505
+--- /dev/null
++++ b/releng/release-notes-next/azure-linux-4.config
+@@ -0,0 +1 @@
++Add Azure Linux 4.0 beta configuration (x86_64, aarch64).
+-- 
+2.45.4
+

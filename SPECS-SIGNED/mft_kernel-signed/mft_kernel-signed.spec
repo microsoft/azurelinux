@@ -13,8 +13,8 @@
 
 Name:            %{_name}-signed
 Summary:         %{_name} Kernel Module for the %{KVERSION} kernel
-Version:         4.33.0
-Release:         2%{release_suffix}%{?dist}
+Version:         4.35.0
+Release:         1%{release_suffix}%{?dist}
 License:         Dual BSD/GPLv2
 Group:           System Environment/Kernel
 
@@ -81,6 +81,9 @@ popd
 /lib/modules/%{KVERSION}/updates/
 
 %changelog
+* Wed May 13 2026 Azure Linux Team <azurelinux-team@microsoft.com> - 4.35.0-1
+- Bump to match upgrade to DOCA 3.3.0 (mft 4.35.0).
+
 * Fri Apr 10 2026 Mykhailo Bykhovtsev <mbykhovtsev@microsoft.com> - 4.33.0-2
 - Tweak specs to use dynamic versioning for kernel
 

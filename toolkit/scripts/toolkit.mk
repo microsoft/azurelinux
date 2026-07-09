@@ -138,8 +138,7 @@ install-prereqs:
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
 	if [ "$$current_os" = "mariner" ]; then \
-		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang || \
-		$(call print_error,Install failed) ; \
+		$(call print_error,Mariner 2.0 is no longer supported) ; \
 	elif [ "$$current_os" = "azurelinux" ]; then \
 		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" || \
 		$(call print_error,Install failed) ; \
@@ -156,8 +155,7 @@ install-prereqs-and-configure:
 	current_os=$$(grep '^ID=' /etc/os-release | cut -d'=' -f2-) && \
 	echo "Current OS: $$current_os" && \
 	if [ "$$current_os" = "mariner" ]; then \
-		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --use-msft-golang --configure-docker || \
-		$(call print_error,Install failed) ; \
+		$(call print_error,Mariner 2.0 is no longer supported) ; \
 	elif [ "$$current_os" = "azurelinux" ]; then \
 		"$(toolkit_root)/docs/building/prerequisites-mariner.sh" --configure-docker || \
 		$(call print_error,Install failed) ; \
