@@ -1887,7 +1887,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libslirp]
 [components.libsmi]
 [components.libsodium]
-[components.libsolv]
 [components.libsoup]
 [components.libspatialite]
 [components.libspectre]

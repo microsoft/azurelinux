@@ -1,0 +1,152 @@
+diff --git a/ext/repo_rpmmd.c b/ext/repo_rpmmd.c
+index 42b7c73..2d3281c 100644
+--- a/ext/repo_rpmmd.c
++++ b/ext/repo_rpmmd.c
+@@ -842,6 +842,9 @@ startElement(struct solv_xmlparser *xmlp, int state, const char *name, const cha
+         str = solv_xmlparser_find_attr("build", atts);
+         if (str && (ti = strtoull(str, 0, 10)) != 0)
+           repodata_set_num(pd->data, handle, SOLVABLE_BUILDTIME, ti);
++        str = solv_xmlparser_find_attr("file", atts);
++        if (str && (ti = strtoull(str, 0, 10)) != 0)
++          repodata_set_num(pd->data, handle, SOLVABLE_FILETIME, ti);
+ 	break;
+       }
+     case STATE_SIZE:
+diff --git a/src/knownid.h b/src/knownid.h
+index 3d558af..abad692 100644
+--- a/src/knownid.h
++++ b/src/knownid.h
+@@ -274,6 +274,7 @@ KNOWNID(UPDATE_COLLECTIONLIST,		"update:collectionlist"),	/* list of UPDATE_COLL
+ KNOWNID(SOLVABLE_MULTIARCH,		"solvable:multiarch"),		/* debian multi-arch field */
+ KNOWNID(SOLVABLE_SIGNATUREDATA,		"solvable:signaturedata"),	/* conda */
+ KNOWNID(SOLVABLE_ORDERWITHREQUIRES,	"solvable:orderwithrequires"),	/* rpm */
++KNOWNID(SOLVABLE_FILETIME,		"solvable:filetime"),		/* file publish time from rpm-md <time file="..."> */
+ 
+ KNOWNID(ID_NUM_INTERNAL,		0)
+ 
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index 8a5cd8a..9fda423 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -18,4 +18,12 @@ FOREACH(tcdir testcases libsolv-zypptestcases)
+             ENDIF ()
+         ENDFOREACH ()
+     ENDIF ()
+-ENDFOREACH ()
+\ No newline at end of file
++ENDFOREACH ()
++
++# Standalone regression test: verify the rpm-md <time file="..."/> attribute
++# is retained as solvable:filetime. repo_add_rpmmd is only built with RPMMD.
++IF (ENABLE_RPMMD)
++    ADD_EXECUTABLE (test_rpmmd_filetime test_rpmmd_filetime.c)
++    TARGET_LINK_LIBRARIES (test_rpmmd_filetime libsolvext libsolv ${SYSTEM_LIBRARIES})
++    ADD_TEST (rpmmd_filetime ${CMAKE_CURRENT_BINARY_DIR}/test_rpmmd_filetime)
++ENDIF (ENABLE_RPMMD)
+diff --git a/test/test_rpmmd_filetime.c b/test/test_rpmmd_filetime.c
+new file mode 100644
+index 0000000..5a9df21
+--- /dev/null
++++ b/test/test_rpmmd_filetime.c
+@@ -0,0 +1,100 @@
++/*
++ * test_rpmmd_filetime.c
++ *
++ * Regression test for the rpm-md primary.xml parser (ext/repo_rpmmd.c):
++ * the package <time file="..."/> attribute must be recorded as
++ * solvable:filetime. This value is a prerequisite for the DNF
++ * virtual-snapshot plugins.
++ *
++ * If the parsing regresses, filetime is no longer stored and this test
++ * fails, even while the rest of the ctest suite stays green.
++ */
++
++#include <stdio.h>
++
++#include "pool.h"
++#include "repo.h"
++#include "repo_rpmmd.h"
++#include "solv_xfopen.h"
++#include "knownid.h"
++
++/* Minimal rpm-md primary.xml with a single package that carries both a
++ * build time and, crucially, a file publish time (<time file="123">). */
++static const char primary_xml[] =
++"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
++"<metadata xmlns=\"http://linux.duke.edu/metadata/common\""
++" xmlns:rpm=\"http://linux.duke.edu/metadata/rpm\" packages=\"1\">\n"
++"  <package type=\"rpm\">\n"
++"    <name>filetime-test</name>\n"
++"    <arch>x86_64</arch>\n"
++"    <version epoch=\"0\" ver=\"1.0\" rel=\"1\"/>\n"
++"    <time file=\"123\" build=\"456\"/>\n"
++"  </package>\n"
++"</metadata>\n";
++
++int
++main(int argc, char **argv)
++{
++  Pool *pool;
++  Repo *repo;
++  FILE *fp;
++  Id p;
++  Solvable *s;
++  unsigned long long filetime = 0, buildtime = 0;
++  int nsolv = 0;
++
++  (void)argc;
++  (void)argv;
++
++  pool = pool_create();
++  repo = repo_create(pool, "test");
++
++  fp = solv_fmemopen(primary_xml, sizeof(primary_xml) - 1, "r");
++  if (!fp)
++    {
++      fprintf(stderr, "FAIL: solv_fmemopen failed\n");
++      pool_free(pool);
++      return 1;
++    }
++  if (repo_add_rpmmd(repo, fp, 0, 0) != 0)
++    {
++      fprintf(stderr, "FAIL: repo_add_rpmmd: %s\n", pool_errstr(pool));
++      fclose(fp);
++      pool_free(pool);
++      return 1;
++    }
++  fclose(fp);
++
++  FOR_REPO_SOLVABLES(repo, p, s)
++    {
++      nsolv++;
++      buildtime = solvable_lookup_num(s, SOLVABLE_BUILDTIME, 0);
++      filetime = solvable_lookup_num(s, SOLVABLE_FILETIME, 0);
++    }
++
++  if (nsolv != 1)
++    {
++      fprintf(stderr, "FAIL: expected 1 solvable, parsed %d\n", nsolv);
++      pool_free(pool);
++      return 1;
++    }
++  /* Sanity: the pre-existing <time build="..."> handling must still work. */
++  if (buildtime != 456)
++    {
++      fprintf(stderr, "FAIL: solvable:buildtime = %llu, expected 456\n", buildtime);
++      pool_free(pool);
++      return 1;
++    }
++  /* The behavior under test: <time file="123"> must land in filetime. */
++  if (filetime != 123)
++    {
++      fprintf(stderr, "FAIL: solvable:filetime = %llu, expected 123 "
++                      "(<time file=\"123\"> not retained)\n", filetime);
++      pool_free(pool);
++      return 1;
++    }
++
++  printf("PASS: <time file=\"123\"> retained as solvable:filetime=%llu\n", filetime);
++  pool_free(pool);
++  return 0;
++}
+
