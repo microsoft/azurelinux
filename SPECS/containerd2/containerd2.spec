@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -35,7 +35,8 @@ Patch15:	CVE-2026-42502.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang < 1.25
+BuildRequires: golang
+BuildRequires: gcc
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -69,11 +70,19 @@ used directly by developers or end-users.
 
 %build
 export BUILDTAGS="-mod=vendor"
-make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
+# systemcrypto (OpenSSL) via cgo needs CGO_ENABLED=1. containerd builds
+# CGO_ENABLED=0 by default, and the shim additionally hardcodes a fully-static
+# link (-extldflags "-static") that is incompatible with cgo+glibc and the
+# OpenSSL backend's runtime dlopen, so enable cgo everywhere and drop the
+# static link.
+export CGO_ENABLED=1
+sed -i 's/ -extldflags "-static"//g' Makefile
+make VERSION="%{version}" REVISION="%{commit_hash}" SHIM_CGO_ENABLED=1 binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
-make VERSION="%{version}" REVISION="%{commit_hash}" test
+export CGO_ENABLED=1
+make VERSION="%{version}" REVISION="%{commit_hash}" SHIM_CGO_ENABLED=1 test
 
 %install
 make VERSION="%{version}" REVISION="%{commit_hash}" DESTDIR="%{buildroot}" PREFIX="/usr" install install-man
@@ -108,6 +117,11 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Thu Jul 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-5
+- Remove 'BuildRequires: golang < 1.25' and build with cgo (CGO_ENABLED=1 +
+  SHIM_CGO_ENABLED=1) so the default Go toolchain's systemcrypto (OpenSSL)
+  backend works, resolving Go stdlib CVE-2026-25679, CVE-2026-27139,
+  CVE-2026-33811, CVE-2026-39836 (was built on Go 1.24.13).
 
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
