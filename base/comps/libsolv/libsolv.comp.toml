@@ -1,0 +1,7 @@
+[components.libsolv]
+
+[[components.libsolv.overlays]]
+description = "Make file time available for dnf plugins, a prerequisite for virtual snapshots"
+type = "patch-add"
+source = "0002-Make-file-time-available-for-dnf-plugins.patch"
+
