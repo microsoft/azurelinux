@@ -10,17 +10,6 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
-Patch0:         CVE-2026-24054.patch
-Patch1:         rust-1.90-fixes.patch
-Patch2:         CVE-2026-24834.patch
-Patch3:         CVE-2026-25727.patch
-Patch4:         CVE-2026-25541.patch
-Patch5:         CVE-2025-11065.patch
-Patch6:         CVE-2026-41602.patch
-Patch7:         CVE-2026-39821.patch
-Patch8:         CVE-2026-33814.patch
-Patch9:         CVE-2025-58160.patch
-Patch10:        CVE-2026-27171.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -71,11 +60,17 @@ popd
 %{kata_bin}/kata-collect-data.sh
 %{kata_bin}/kata-monitor
 %{kata_bin}/kata-runtime
+%{kata_bin}/kata-ctl
 
 %{defaults_kata}/configuration.toml
+%{defaults_kata}/configuration-clh.toml`
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-clh-runtime-rs.toml
+%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
+%{kata_shim_bin}/containerd-shim-kata-v2-go
+%{kata_shim_bin}/containerd-shim-kata-v2-rs
 
 %license LICENSE
 %doc CONTRIBUTING.md
@@ -84,6 +79,7 @@ popd
 %files tools
 %dir %{kata_path}
 %dir %{tools_pkg}
+%{tools_pkg}/VERSION
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
 %{tools_pkg}/tools/osbuilder/Makefile
