@@ -1,0 +1,13 @@
+# inotify tests fail with ENOSPC in containerized/mock build environments due
+# to exhausted inotify instance limits.
+
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Skip inotify tests that fail in containerized build environments (ENOSPC on inotify_init)"
+type = "spec-search-replace"
+section = "%check"
+regex = "--skip 'src/sys/socket/mod.rs'"
+replacement = "--skip sys::test_inotify\n    --skip 'src/sys/socket/mod.rs'"

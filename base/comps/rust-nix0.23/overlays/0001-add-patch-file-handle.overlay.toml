@@ -1,0 +1,22 @@
+# AZL kernels have 4-part versions like 6.6.121.1-1.azl3, but the semver crate
+# in nix's test helpers only understands 3. This patches require_kernel_version!
+# to cope by trimming the extra part.
+#
+# It's a compatibility fix (about our version scheme, not the CPU), and it's
+# upstreamable: RHEL/CentOS also use 4-part versions (e.g. 4.18.0-513.el8), so
+# the fix helps more than just AZL.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Add patch file to handle 4-part kernel versions in the require_kernel_version test macro"
+type = "file-add"
+file = "fix-4part-kernel-version.patch"
+source = "../fix-4part-kernel-version.patch"
+
+[[overlays]]
+description = "Register the 4-part kernel version fix patch in the spec"
+type = "spec-insert-tag"
+tag = "Patch9999"
+value = "fix-4part-kernel-version.patch"

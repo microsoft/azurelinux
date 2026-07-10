@@ -1,0 +1,10 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "unknown"
+
+[[overlays]]
+description = "Remove tmpfiles write to /sys/fs/selinux/checkreqprot as it was deprecated in the kernel"
+type = "file-search-replace"
+file = "selinux-policy.conf"
+regex = "w /sys/fs/selinux/checkreqprot - - - - 0\\n"
+replacement = ""

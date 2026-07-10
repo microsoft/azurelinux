@@ -1,0 +1,17 @@
+# Build from AZL's own kernel source tree (CBL-Mariner-Linux-Kernel)
+# instead of the Fedora tarball. Specific to how AZL sources the kernel.
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+# Use the AzureLinux kernel source
+[[overlays]]
+description = "Use AzureLinux kernel source URL"
+type = "spec-update-tag"
+tag = "Source0"
+value = "kernel-%{specrpmversion}.%{kextraversion}.tar.gz"
+[[overlays]]
+description = "Fix tarball extraction path for AzureLinux"
+type = "spec-search-replace"
+regex = "linux-%{tarfile_release}"
+replacement = "CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion}"

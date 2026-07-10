@@ -1,0 +1,37 @@
+# Point the kernel spec's version/release macros at the AZL kernel (its
+# 4-part version scheme). This is about how AZL versions and ships the
+# kernel, not a CPU-architecture change, so it can't go upstream.
+
+# These edits only rewrite version/release strings, so this is
+# version/release mechanics -- matching how the sibling kernel-headers package
+# categorizes the equivalent specversion/specrelease edits.
+# upstream-status inapplicable: permanent AZL-only versioning, never sent upstream.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Set specrpmversion to 6.18.31"
+type = "spec-search-replace"
+regex = "%define specrpmversion .+"
+replacement = "%define specrpmversion 6.18.31"
+[[overlays]]
+description = "Derive specversion from specrpmversion. This becomes KVERREL which becomes the uname"
+type = "spec-search-replace"
+regex = "%define specversion .+"
+replacement = "%define specversion %{specrpmversion}"
+[[overlays]]
+description = "Derive tarfile_release from specrpmversion (include for completeness but later overridden)"
+type = "spec-search-replace"
+regex = "%define tarfile_release .+"
+replacement = "%define tarfile_release %{specrpmversion}"
+[[overlays]]
+description = "Set pkgrelease to azl_pkgrelease macro. Looks to only be realted to documentation"
+type = "spec-search-replace"
+regex = "%define pkgrelease .+"
+replacement = "%define pkgrelease %{azl_pkgrelease}"
+[[overlays]]
+description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component flows into Release:, uname -r, and /lib/modules/ path"
+type = "spec-search-replace"
+regex = "%define specrelease .+"
+replacement = "%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?buildid}%{?dist}"
