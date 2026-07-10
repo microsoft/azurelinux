@@ -1685,6 +1685,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.libcdr]
 [components.libcerf]
 [components.libcgif]
+[components.libcgroup]
 [components.libclc]
 [components.libcloudproviders]
 [components.libcomps]
