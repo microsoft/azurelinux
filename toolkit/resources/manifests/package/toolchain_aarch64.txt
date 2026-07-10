@@ -302,8 +302,8 @@ pam-1.5.3-5.azl3.aarch64.rpm
 pam-debuginfo-1.5.3-5.azl3.aarch64.rpm
 pam-devel-1.5.3-5.azl3.aarch64.rpm
 pam-lang-1.5.3-5.azl3.aarch64.rpm
-patch-2.7.6-9.azl3.aarch64.rpm
-patch-debuginfo-2.7.6-9.azl3.aarch64.rpm
+patch-2.7.6-10.azl3.aarch64.rpm
+patch-debuginfo-2.7.6-10.azl3.aarch64.rpm
 pcre2-10.42-3.azl3.aarch64.rpm
 pcre2-debuginfo-10.42-3.azl3.aarch64.rpm
 pcre2-devel-10.42-3.azl3.aarch64.rpm
