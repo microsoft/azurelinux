@@ -26363,8 +26363,8 @@
         "type": "other",
         "other": {
           "name": "rdma-core",
-          "version": "2601.0.7",
-          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/rdma-core-2601.0.7.tar.gz"
+          "version": "64.0",
+          "downloadUrl": "https://github.com/linux-rdma/rdma-core/releases/download/v64.0/rdma-core-64.0.tar.gz"
         }
       }
     },

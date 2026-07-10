@@ -30,7 +30,7 @@
 %endif
 
 Name: rdma-core
-Version: 2601.0.7
+Version: 64.0
 Release: 1%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
@@ -102,6 +102,9 @@ BuildRequires: python
 # AzureLinux fix to include missing asm/socket.h
 %if 0%{?azl}
 BuildRequires: kernel-headers
+# Provides /usr/bin/rst2man so man pages build fresh from source instead of
+# falling back to the (hash-mismatched) prebuilt cache in the upstream tarball.
+BuildRequires: python3-docutils
 %endif
 
 # EulerOS fix to include make and /usr/bin/ld
@@ -391,7 +394,7 @@ easy, object-oriented access to IB verbs.
 %endif
 
 %prep
-%setup
+%autosetup -p1
 
 %build
 
@@ -455,7 +458,7 @@ mkdir -p %{buildroot}/%{_sysconfdir}/rdma
 # Red Hat specific glue
 %global dracutlibdir %{_prefix}/lib/dracut
 %global sysmodprobedir %{_prefix}/lib/modprobe.d
- %define _ver 2601.0.7 
+ %define _ver 64.0
  %define _rel 1 
 mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_udevrulesdir}
@@ -491,10 +494,16 @@ rm -rf %{buildroot}/%{_initrddir}/
 rm -f %{buildroot}/%{_sbindir}/srp_daemon.sh
 %endif
 
-rm -f %{buildroot}%{_sysconfdir}/libibverbs.d/efa.driver
-rm -f %{buildroot}%{_sysconfdir}/libibverbs.d/mlx4.driver
-rm -f %{buildroot}%{_libdir}/libibverbs/libefa-rdmav*.so
-rm -f %{buildroot}%{_libdir}/libibverbs/libmlx4-rdmav*.so
+# iwpmd (iWARP port mapper) is built by upstream but not shipped by this spec
+# (no iwpmd subpackage); drop its files so they are not left unpackaged.
+rm -f %{buildroot}%{_sbindir}/iwpmd
+rm -f %{buildroot}%{_sysconfdir}/iwpmd.conf
+rm -f %{buildroot}%{_sysconfdir}/rdma/modules/iwpmd.conf
+rm -f %{buildroot}%{_unitdir}/iwpmd.service
+rm -f %{buildroot}%{_udevrulesdir}/90-iwpmd.rules
+rm -f %{buildroot}%{_mandir}/man5/iwpmd.*
+rm -f %{buildroot}%{_mandir}/man8/iwpmd.*
+
 
 %post -n rdma-core
 if [ -x /sbin/udevadm ]; then
@@ -538,12 +547,14 @@ fi
 %doc installed_docs/tag_matching.md
 %doc installed_docs/70-persistent-ipoib.rules
 %config(noreplace) %{_sysconfdir}/rdma/mlx4.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/infiniband.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/iwarp.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/opa.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/rdma.conf
-%if 0
+%config(noreplace) %{_sysconfdir}/rdma/modules/roce.conf
 %dir %{_sysconfdir}/modprobe.d
 %config(noreplace) %{_sysconfdir}/modprobe.d/mlx4.conf
 %config(noreplace) %{_sysconfdir}/modprobe.d/truescale.conf
-%endif
 %dir %{dracutlibdir}
 %dir %{dracutlibdir}/modules.d
 %dir %{dracutlibdir}/modules.d/50rdma
@@ -552,18 +563,21 @@ fi
 %{_udevrulesdir}/60-rdma-ndd.rules
 %{_udevrulesdir}/60-rdma-persistent-naming.rules
 %{_udevrulesdir}/75-rdma-description.rules
+%{_udevrulesdir}/90-rdma-hw-modules.rules
+%{_udevrulesdir}/90-rdma-ulp-modules.rules
 %{_udevrulesdir}/90-rdma-umad.rules
 %dir %{sysmodprobedir}
 %{sysmodprobedir}/libmlx4.conf
 %{_libexecdir}/mlx4-setup.sh
-%if 0
 %{_libexecdir}/truescale-serdes.cmds
-%endif
 %{_sbindir}/rdma-ndd
 %if "%{WITH_SYSTEMD}" == "1"
 %{_unitdir}/rdma-ndd.service
+%{_unitdir}/rdma-hw.target
+%{_unitdir}/rdma-load-modules@.service
 %endif
 %{_sbindir}/rdma_topo
+%{_mandir}/man7/rxe*
 %{_mandir}/man8/rdma-ndd.*
 %license COPYING.*
 
@@ -584,9 +598,17 @@ fi
 %{_mandir}/man3/*_to_ibv_rate.*
 %{_mandir}/man7/rdma_cm.*
 %ifnarch s390x s390
+%{_mandir}/man3/efadv*
+%{_mandir}/man3/hnsdv*
+%{_mandir}/man3/ionic_dv*
+%{_mandir}/man3/manadv*
+%{_mandir}/man3/mlx4dv*
 %{_mandir}/man3/mlx5dv*
-%endif
-%ifnarch s390x s390
+%{_mandir}/man7/efadv*
+%{_mandir}/man7/hnsdv*
+%{_mandir}/man7/ionicdv*
+%{_mandir}/man7/manadv*
+%{_mandir}/man7/mlx4dv*
 %{_mandir}/man7/mlx5dv*
 %endif
 %{_mandir}/man3/ibnd_*
@@ -675,7 +697,6 @@ fi
 %{_mandir}/man8/ibfindnodesusing*
 %{_mandir}/man8/ibrouters*
 %{_mandir}/man8/ibnodes*
-%{_mandir}/man8/ibnodes*
 %{_mandir}/man8/ibswitches*
 %{_mandir}/man8/ibhosts*
 %{_mandir}/man8/dump_fts*
@@ -710,10 +731,14 @@ fi
 %{_libdir}/libibverbs/*.so
 %ifnarch s390x s390
 %{_libdir}/libefa.so.*
+%{_libdir}/libhns.so.*
+%{_libdir}/libionic.so.*
+%{_libdir}/libmana.so.*
 %{_libdir}/libmlx4.so.*
 %{_libdir}/libmlx5.so.*
 %endif
-%config(noreplace) %{_sysconfdir}/libibverbs.d/mlx5.driver
+%config(noreplace) %{_sysconfdir}/libibverbs.d/*.driver
+%{_prefix}/lib/sysusers.d/rdma.conf
 %doc installed_docs/libibverbs.md
 
 %files -n libibverbs-utils
@@ -811,6 +836,14 @@ fi
 %endif
 
 %changelog
+* Fri Jul 10 2026 Kshitiz Godara <kgodara@microsoft.com> - 64.0-1
+- Experimental switch to upstream rdma-core 64.0 (linux-rdma).
+- Drop OFED MANA enablement patch; upstream builds libmana by default.
+- Package hns and ionic shared providers; use wildcard for provider .driver files.
+
+* Thu Jul 09 2026 Kshitiz Godara <kgodara@microsoft.com> - 2601.0.7-2
+- Enable and package the MANA userspace provider (libmana) via Patch0.
+
 * Mon May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
