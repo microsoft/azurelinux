@@ -1,0 +1,11 @@
+# Bump release for avif removal rebuild.
+
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump release for avif removal rebuild"
+type = "spec-set-tag"
+tag = "Release"
+value = "20%{?prever}%{?short}%{?dist}"
