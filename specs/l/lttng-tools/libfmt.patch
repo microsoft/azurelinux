@@ -1,0 +1,28 @@
+commit 8169896bb7d43e372c1b50aed31f146266169706
+Author: Michael Jeanson <mjeanson@efficios.com>
+Date:   Fri Jul 4 11:10:49 2025 -0400
+
+    fix: link error in libpause_sessiond.so
+    
+    /bin/sh: symbol lookup error: lttng-tools/tests/regression/tools/notification/.libs/libpause_sessiond.so: undefined symbol: _ZN3fmt3v117vformatB5cxx11ENS0_17basic_string_viewIcEENS0_17basic_format_argsINS0_7contextEEE
+
+diff --git a/tests/regression/tools/notification/Makefile.am b/tests/regression/tools/notification/Makefile.am
+index 8e72c3546..ce117030d 100644
+--- a/tests/regression/tools/notification/Makefile.am
++++ b/tests/regression/tools/notification/Makefile.am
+@@ -41,6 +41,7 @@ libpause_consumer_la_LIBADD = \
+ 	$(top_builddir)/src/common/libsessiond-comm.la \
+ 	$(top_builddir)/src/common/libcommon-gpl.la \
+ 	$(top_builddir)/src/lib/lttng-ctl/liblttng-ctl.la \
++	$(top_builddir)/src/vendor/fmt/libfmt.la \
+ 	$(DL_LIBS)
+ libpause_consumer_la_LDFLAGS = $(FORCE_SHARED_LIB_OPTIONS)
+ 
+@@ -48,6 +49,7 @@ libpause_sessiond_la_SOURCES = sessiond_testpoints.cpp
+ libpause_sessiond_la_LIBADD = \
+ 	$(top_builddir)/src/common/libcommon-gpl.la \
+ 	$(top_builddir)/src/lib/lttng-ctl/liblttng-ctl.la \
++	$(top_builddir)/src/vendor/fmt/libfmt.la \
+ 	$(DL_LIBS)
+ libpause_sessiond_la_LDFLAGS = $(FORCE_SHARED_LIB_OPTIONS)
+ noinst_LTLIBRARIES = libpause_sessiond.la libpause_consumer.la

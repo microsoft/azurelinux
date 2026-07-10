@@ -1995,6 +1995,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.lsof]
 [components.lsscsi]
 [components.ltrace]
+[components.lttng-tools]
 [components.lttng-ust]
 [components.lua]
 [components.lua-filesystem]
