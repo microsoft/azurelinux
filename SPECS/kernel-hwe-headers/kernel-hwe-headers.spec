@@ -4,7 +4,7 @@
 Summary:        Linux API header files
 Name:           kernel-hwe-headers
 Version:        6.18.38.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,6 +35,9 @@ cp -rv usr/include/* /%{buildroot}%{_includedir}
 %{_includedir}/*
 
 %changelog
+* Fri Jul 10 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.38.1-2
+- Enable vmxnet3
+
 * Tue Jul 07 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.38.1-1
 - Auto-upgrade to 6.18.38.1
 
