@@ -10,6 +10,8 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Source1:        %{name}-%{version}-cargo.tar.gz
+# Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
+Patch0:         dbs-arch-cpuid-unsafe.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -63,7 +65,7 @@ popd
 %{kata_bin}/kata-ctl
 
 %{defaults_kata}/configuration.toml
-%{defaults_kata}/configuration-clh.toml`
+%{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
 %{defaults_kata}/configuration-clh-runtime-rs.toml
 %{defaults_kata}/configuration-clh-runtime-rs-debug.toml
