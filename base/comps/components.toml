@@ -135,6 +135,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.azure-vm-utils]
 [components.babel]
 [components.babeltrace]
+[components.babeltrace2]
 [components.bash-completion]
 [components.bats]
 [components.bc]
