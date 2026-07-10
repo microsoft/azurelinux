@@ -26,12 +26,10 @@ Patch14:        CVE-2026-12064.patch
 Patch15:        CVE-2026-8926.patch
 Patch16:        CVE-2026-8927.patch
 Patch17:        CVE-2026-8932.patch
-Patch18:        CVE-2026-9545.patch
-Patch19:        CVE-2026-8458.patch
-Patch20:        CVE-2026-10536.patch
-Patch21:        CVE-2026-8286.patch
-Patch22:        CVE-2026-8924.patch
-Patch23:        CVE-2026-9079.patch
+Patch18:        CVE-2026-8458.patch
+Patch19:        CVE-2026-10536.patch
+Patch20:        CVE-2026-8286.patch
+Patch21:        CVE-2026-9079.patch
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
@@ -122,7 +120,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 
 %changelog
 * Tue Jul 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-10
-- Patch for CVE-2026-9545, CVE-2026-8932, CVE-2026-8927, CVE-2026-8926, CVE-2026-12064, CVE-2026-8458, CVE-2026-9079, CVE-2026-8924, CVE-2026-8286, CVE-2026-10536
+- Patch for CVE-2026-8932, CVE-2026-8927, CVE-2026-8926, CVE-2026-12064, CVE-2026-8458, CVE-2026-9079, CVE-2026-8286, CVE-2026-10536
 
 * Mon Jun 15 2026 Vince Perri <viperri@microsoft.com> - 8.11.1-9
 - Remove cmake build dependency to break cyclic dependency between curl and cmake
