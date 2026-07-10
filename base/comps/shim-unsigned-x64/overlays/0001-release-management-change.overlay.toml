@@ -1,0 +1,22 @@
+# Workaround: add dist tag to the release to avoid NEVR conflicts
+# while we are still rebuilding all packages in new tags nightly.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"
+
+# Workaround: create a compat symlink that does not include the dist tag.
+[[overlays]]
+type = "spec-append-lines"
+section = "%install"
+lines = ["ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2"]
+
+[[overlays]]
+type = "spec-append-lines"
+section = "%files"
+lines = ["%{_datadir}/shim/%{version}-2"]

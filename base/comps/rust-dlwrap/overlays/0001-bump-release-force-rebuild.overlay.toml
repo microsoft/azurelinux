@@ -1,0 +1,11 @@
+# WORKAROUND: Manually bump the Release on this package to aid with Stage2 bring-up.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump release to force rebuild and fix corrupted stage1 RPM (DB size mismatch)"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"
