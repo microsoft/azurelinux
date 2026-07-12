@@ -81,9 +81,9 @@ popd
 %files tools
 %dir %{kata_path}
 %dir %{tools_pkg}
-%{tools_pkg}/VERSION
 %dir %{tools_pkg}/tools
 %dir %{tools_pkg}/tools/osbuilder
+%{tools_pkg}/tools/osbuilder/VERSION
 %{tools_pkg}/tools/osbuilder/Makefile
 
 %dir %{tools_pkg}/tools/osbuilder/scripts
