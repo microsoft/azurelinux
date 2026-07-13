@@ -9,7 +9,6 @@ components = [
     "containerd",
     "dnf",
     "erlang-lager",
-    "fakeroot",
     "fontconfig",
     "ghc",
     "glib2",
@@ -37,7 +36,6 @@ components = [
     "golang-github-json-iterator",
     "golang-github-logr",
     "golang-github-mailru-easyjson",
-    "golang-github-moby-spdystream",
     "golang-github-mwitkow-conntrack",
     "golang-github-nxadm-tail",
     "golang-github-olekukonko-tablewriter",
@@ -97,7 +95,6 @@ components = [
     "perl",
     "perl-POE",
     "poetry",
-    "python-aioquic",
     "python-awscrt",
     "python-azure-data-tables",
     "python-azure-mgmt-applicationinsights",
@@ -136,11 +133,9 @@ components = [
     "python-oslo-config",
     "python-pandas",
     "python-passlib",
-    "python-pexpect",
     "python-psutil",
     "python-pydantic",
     "python-pyftpdlib",
-    "python-pytest-xdist",
     "python-rapidfuzz",
     "python-scikit-image",
     "python-sphinxcontrib-htmlhelp",
@@ -174,7 +169,6 @@ components = [
     "satyr",
     "scancode-toolkit",
     "scipy",
-    "socat",
     "srt",
     "sssd",
     "superlu_dist",
@@ -189,3 +183,7 @@ components = [
 
 [component-groups.check-skip-initial-failures.default-component-config.build]
 check = { skip = true, skip_reason = "Disabling checks for initial set of failures." }
+
+[component-groups.check-skip-initial-failures.metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "unknown"

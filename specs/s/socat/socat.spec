@@ -68,7 +68,7 @@ echo ".so man1/socat.1" | gzip > %{buildroot}/%{_mandir}/man1/filan.1.gz
 cp -a %{buildroot}/%{_mandir}/man1/filan.1.gz %{buildroot}/%{_mandir}/man1/procan.1.gz
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 %ifarch x86_64

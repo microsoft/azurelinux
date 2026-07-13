@@ -109,7 +109,7 @@ export LDFLAGS="%{__global_ldflags} %(pkg-config --libs python3-embed)"
 %endif
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 %pyproject_check_import
