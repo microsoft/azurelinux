@@ -1,0 +1,87 @@
+From a9fcd4a3fb45396dfaf89ec1fecaf14cf04922e6 Mon Sep 17 00:00:00 2001
+From: Sumit Jena <sumitjena@microsoft.com>
+Date: Tue, 30 Jun 2026 02:22:58 +0530
+Subject: [PATCH] tests: make lslocks and fincore ptests deterministic
+
+Two regression tests are flaky when run in the Azure Linux build
+environment:
+
+* tests/ts/lslocks/lslocks: the OFD and lease "+HOLDERS" subtests
+  enumerate lock holders by scanning /proc, so locks held by unrelated
+  processes on the build host can leak into the output and break the
+  row-count assertion intermittently. Re-execute the test in a private
+  PID namespace with a freshly mounted /proc (via "unshare -r --pid
+  --fork --mount-proc") so only the test's own processes are visible.
+  A user namespace (-r) is used so this works for the unprivileged user
+  the test suite runs as, and the test falls back to running without
+  isolation when the kernel does not allow it.
+
+* tests/ts/fincore/count: some filesystems (overlayfs, 9p, virtiofs)
+  accept O_DIRECT but silently fall back to buffered I/O, leaving the
+  data resident in the page cache and producing wrong page counts.
+  Skip the directio subtests when O_DIRECT does not actually bypass the
+  page cache on the current filesystem.
+
+This is an Azure Linux build-environment workaround for test flakiness
+that is also tracked upstream; it is not a backport of those reports.
+
+Signed-off-by: Sumit Jena <sumitjena@microsoft.com>
+Upstream-reference: https://github.com/util-linux/util-linux/issues/2624
+Upstream-reference: https://github.com/util-linux/util-linux/issues/3266
+---
+ tests/ts/fincore/count   | 13 +++++++++++++
+ tests/ts/lslocks/lslocks | 14 ++++++++++++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/tests/ts/fincore/count b/tests/ts/fincore/count
+index caf9c3a..cf09b9e 100755
+--- a/tests/ts/fincore/count
++++ b/tests/ts/fincore/count
+@@ -50,6 +50,19 @@ function check_dd_fs_feat
+ 	_dd if=/dev/zero of="$testf" bs=1k count=2 oflag=direct,append &>/dev/null \
+ 		|| ts_skip "unsupported: dd oflag=direct,append"
+ 
++	# Azure Linux: some filesystems (e.g. overlayfs, 9p, virtiofs) accept
++	# O_DIRECT but silently fall back to buffered I/O, leaving the data
++	# resident in the page cache. The directio sub-tests below would then
++	# report wrong page counts, so skip the test when O_DIRECT does not
++	# actually bypass the page cache on this filesystem.
++	rm -f "$testf"
++	_dd if=/dev/zero of="$testf" bs="$PAGE_SIZE" count=1 oflag=direct &>/dev/null \
++		|| ts_skip "unsupported: dd oflag=direct"
++	if [ "$($TS_CMD_FINCORE --output PAGES --noheadings "$testf" 2>/dev/null | tr -dc '0-9')" != 0 ]; then
++		rm -f "$testf"
++		ts_skip "O_DIRECT does not bypass the page cache on this filesystem"
++	fi
++
+ 	# TODO: Should we check for sparse file support?
+ 
+ 	rm -f "$testf"
+diff --git a/tests/ts/lslocks/lslocks b/tests/ts/lslocks/lslocks
+index a9ef69a..fa93506 100755
+--- a/tests/ts/lslocks/lslocks
++++ b/tests/ts/lslocks/lslocks
+@@ -14,6 +14,20 @@
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
++# Azure Linux: the OFD and lease "+HOLDERS" subtests enumerate lock holders by
++# scanning /proc, so locks held by unrelated processes on the build host can
++# leak into the output and make the result non-deterministic. Re-execute this
++# test in a private PID namespace with a freshly mounted /proc so that only the
++# test processes are visible. A user namespace (-r) is used so this works for
++# the unprivileged user the test suite runs as. If the kernel does not allow
++# it, fall back to running without isolation.
++if [ -z "${UTIL_LINUX_LSLOCKS_PRIVATE_PIDNS:-}" ]; then
++	export UTIL_LINUX_LSLOCKS_PRIVATE_PIDNS=1
++	if unshare -r --pid --fork --mount-proc --propagation unchanged true >/dev/null 2>&1; then
++		exec unshare -r --pid --fork --mount-proc --propagation unchanged "$0" "$@"
++	fi
++fi
++
+ TS_TOPDIR="${0%/*}/../.."
+ TS_DESC="flock"
+ 
+-- 
+2.45.4
+

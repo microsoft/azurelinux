@@ -5,7 +5,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,7 @@ Patch0:         CVE-2025-14104.patch
 Patch1:         CVE-2026-27456.patch
 Patch2:         CVE-2026-3184.patch
 Patch3:         CVE-2026-13595.patch
+Patch4:         fix-flaky-ptests.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -175,6 +176,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Mon Jul 13 2026 Sumit Jena <sumitjena@microsoft.com> - 2.40.2-6
+- Added fix-flaky-ptests.patch to resolve flakyness in %%check section.
+
 * Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-5
 - Patch for CVE-2026-13595
 
