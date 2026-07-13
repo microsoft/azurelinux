@@ -7,13 +7,13 @@ Release: 4%{?dist}
 License: GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-URL: https://www.bitwizard.nl/mtr/
+URL:     https://www.bitwizard.nl/mtr/
 Source0: https://github.com/traviscross/mtr/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1: net-x%{name}.desktop
 Source2: mtr-gtk-pkexec-wrapper.sh
 Source3: org.fedoraproject.mtr.policy
-Patch0:CVE-2025-49809.patch
-Patch1:CVE-2026-14461.patch
+Patch0:  CVE-2025-49809.patch
+Patch1:  CVE-2026-14461.patch
 
 BuildRequires: ncurses-devel
 BuildRequires: autoconf automake libtool git
