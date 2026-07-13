@@ -58,6 +58,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Add a new component to the distro | [`skill-add-component`](.github/skills/skill-add-component/SKILL.md) |
 | Remove component(s) from the distro | [`skill-remove-component`](.github/skills/skill-remove-component/SKILL.md) |
 | Diagnose and fix overlay issues | [`skill-fix-overlay`](.github/skills/skill-fix-overlay/SKILL.md) |
+| Suggest category & annotate overlay metadata | [`skill-annotate-overlays`](.github/skills/skill-annotate-overlays/SKILL.md) |
 | Test and inspect packages in mock chroot | [`skill-mock`](.github/skills/skill-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`skill-review-component`](.github/skills/skill-review-component/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.github/skills/skill-koji-triage/SKILL.md) |
