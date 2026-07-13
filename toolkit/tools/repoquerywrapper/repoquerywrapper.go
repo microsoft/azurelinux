@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	QueryCmdFindPresent = "find-present"
+	QueryCmdFindPresent     = "find-present"
+	QueryCmdFindNamePresent = "find-name-present"
 )
 
 var (
@@ -33,7 +34,7 @@ var (
 	workerTar = app.Flag("worker-tar", "Full path to worker_chroot.tar.gz").Required().ExistingFile()
 	buildDir  = app.Flag("worker-dir", "Directory to store chroot while running repo query.").Required().String()
 
-	queryCmd        = app.Flag("query-cmd", "The query commands to run. Available command is: 'find-present'.").Required().String()
+	queryCmd        = app.Flag("query-cmd", "The query commands to run. Available commands are: 'find-present', 'find-name-present'.").Required().String()
 	queryInputFile  = app.Flag("query-input-file", "Path to a file with the query input data.").Required().String()
 	queryOutputFile = app.Flag("query-output-file", "Path to a file for the query output data.").Required().String()
 )
@@ -83,6 +84,51 @@ func main() {
 		}
 	}
 
+	// cmd         : 'find-name-present'
+	// query input : a file where each line is a bare rpm package name
+	//               (no version/release/arch) to search for.
+	// query output: a file where each line is a name that has AT LEAST ONE
+	//               matching RPM (any version/release/arch) available in the
+	//               queried repos.
+	//
+	// Motivation: image composition uses a fetcher that walks ordered repos
+	// first-match; the local toolchain-repo shadows PMC even when PMC has a
+	// newer NEVRA for the same package name. Callers use this query to identify
+	// which toolchain packages can be safely scrubbed so PMC's copy is used
+	// instead. See rpmrepocloner.go and toolkit/resources/manifests/package/local.repo.
+	if *queryCmd == QueryCmdFindNamePresent {
+
+		// Build a set of package names present in the queried repos by
+		// stripping "-<version>-<release>.<arch>" from each basename.
+		presentNames := make(map[string]bool)
+		for basename := range packagesAvailableFromRepos {
+			name := packageNameFromNEVRA(basename)
+			if name != "" {
+				presentNames[name] = true
+			}
+		}
+
+		inputNames, err := readFileLines(*queryInputFile)
+		if err != nil {
+			logger.PanicOnError(err)
+		}
+
+		var outputNames []string
+		for _, inputName := range inputNames {
+			if inputName == "" {
+				continue
+			}
+			if presentNames[inputName] {
+				outputNames = append(outputNames, inputName)
+			}
+		}
+
+		err = writeFileLines(outputNames, *queryOutputFile)
+		if err != nil {
+			logger.PanicOnError(err)
+		}
+	}
+
 	if logger.Log.IsLevelEnabled(logrus.DebugLevel) {
 		for i, pkg := range packagesAvailableFromRepos {
 			logger.Log.Debugf("Found package: %s, %s", i, pkg)
@@ -108,4 +154,32 @@ func writeFileLines(lines []string, fileName string) (err error) {
 		return err
 	}
 	return nil
+}
+
+// packageNameFromNEVRA parses an RPM basename of the form
+// "<name>-<version>-<release>.<arch>" (with the ".rpm" suffix already stripped)
+// and returns just the "<name>" portion. Returns an empty string if the input
+// does not have the expected structure.
+//
+// Per RPM rules, <version> and <release> may not contain '-', but <name> may.
+// So we parse from the right: strip ".<arch>", then "-<release>", then
+// "-<version>", leaving the name.
+func packageNameFromNEVRA(basename string) string {
+	lastDot := strings.LastIndex(basename, ".")
+	if lastDot < 0 {
+		return ""
+	}
+	nameVerRel := basename[:lastDot]
+
+	lastDash := strings.LastIndex(nameVerRel, "-")
+	if lastDash < 0 {
+		return ""
+	}
+	nameVer := nameVerRel[:lastDash]
+
+	lastDash = strings.LastIndex(nameVer, "-")
+	if lastDash < 0 {
+		return ""
+	}
+	return nameVer[:lastDash]
 }
