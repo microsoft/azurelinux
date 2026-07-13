@@ -16,6 +16,7 @@ Patch3:			CVE-2026-43968.patch
 Patch4:			CVE-2026-7790.patch
 Patch5:			CVE-2026-43973.patch
 Patch6:			CVE-2026-43966.patch
+Patch7:			CVE-2026-44839.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -73,7 +74,7 @@ done
 
 %changelog
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
-- Patch for CVE-2026-43966
+- Patch for CVE-2026-43966, CVE-2026-44839
 
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-6
 - Patch for CVE-2026-43973
