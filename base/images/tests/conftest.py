@@ -395,6 +395,32 @@ def container_exec_shell(podman_client, running_container):
 
 
 @pytest.fixture
+def write_file_in_container(container_exec_shell):
+    """Callable to write file content into the running test container.
+
+    Preserves leading whitespace and content exactly as provided, while
+    normalizing trailing newlines so the written file ends with exactly
+    one trailing newline.
+
+    Usage::
+
+        def test_example(write_file_in_container):
+            result = write_file_in_container("/tmp/example.conf", "key=value")
+            assert result.exit_code == 0
+    """
+
+    def _write(path: str, content: str):
+        normalized_content = content.rstrip("\n") + "\n"
+        write_cmd = (
+            f"printf %s {shlex.quote(normalized_content)} > "
+            f"{shlex.quote(path)}"
+        )
+        return container_exec_shell(write_cmd)
+
+    return _write
+
+
+@pytest.fixture
 def wait_for_http(container_exec_shell):
     """Callable that polls an in-container HTTP endpoint until it responds.
 
