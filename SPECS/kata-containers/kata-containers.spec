@@ -12,6 +12,8 @@ Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%
 Source1:        %{name}-%{version}-cargo.tar.gz
 # Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
 Patch0:         dbs-arch-cpuid-unsafe.patch
+Patch1:         CVE-2025-11065.patch
+Patch2:         CVE-2026-41602.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
