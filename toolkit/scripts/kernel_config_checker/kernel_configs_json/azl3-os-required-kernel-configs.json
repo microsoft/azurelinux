@@ -3147,6 +3147,20 @@
             }
           ],
           "justification": "kernel-hwe 6.18 builds CRYPTO_DH as builtin on arm64 (selected by other built-in components)"
+        },
+        {
+          "name": "CONFIG_VMXNET3",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "n"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22300"
         }
       ]
     }
