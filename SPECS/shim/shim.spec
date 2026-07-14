@@ -36,8 +36,8 @@
 
 Summary:        First stage UEFI bootloader
 Name:           shim
-Version:        15.8
-Release:        6%{?dist}
+Version:        16.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,8 +70,8 @@ Obsoletes:      shim-unsigned <= 15.4
 # Obsoletes behavior.
 Provides:       shim-unsigned = %{version}-%{release}
 
-# This is when grub was updated to be signed with the newer Azure Linux certificate
-Conflicts:      grub2-efi-binary < 2.06-22
+# This shim requires grub with SBAT generation 5 or greater. grub 2.06-27 is the first release with `grub,5` SBAT generation support.
+Conflicts:      grub2-efi-binary < 2.06-27
 
 %ifarch x86_64
 BuildRequires:  shim-unsigned-x64 = %{version}
@@ -84,16 +84,29 @@ BuildRequires:  coreutils
 BuildRequires:  efivar
 BuildRequires:  openssl
 BuildRequires:  pesign
+BuildRequires:  python3
+BuildRequires:  python3-cryptography
 BuildRequires:  util-linux
 
 # This is the signed shim which has been reviewed upstream by
 # https://github.com/rhboot/shim-review and then signed by the
-# Microsoft UEFI signing key
-Source0:        shim%{efiarch}.efi
+# Microsoft UEFI signing key. For 16.1, we received two signed
+# shim binaries, one signed with the 2011 signing key and one
+# signed with the 2023 signing key.
+Source0:        shim%{efiarch}.efi.signed.MS-2011
+Source1:        shim%{efiarch}.efi.signed.MS-2023
 
 # This is the MokManager EFI binaries that have been signed by the
 # Azure Linux signing cert.
-Source1:        mm%{efiarch}.efi
+Source2:        mm%{efiarch}.efi
+
+Source10:       verify_combine_sigs
+
+# These are the Microsoft UEFI signing certs that were used to sign the
+# shim binaries. These were obtained from
+# https://github.com/microsoft/secureboot_objects/blob/main/PreSignedObjects/DB/Certificates
+Source20:       0001-MicCorUEFCA2011_2011-06-27.der
+Source21:       0002-microsoft_uefi_ca_2023.der
 
 %description
 Initial UEFI bootloader that handles chaining to a trusted full bootloader
@@ -122,10 +135,13 @@ echo "%{name}" > dnf-protected.conf
 # ADD UCS-2/UTF-16 LE Byte Order Mark (BOM)
 echo -ne '\xff\xfe' | cat - %{shimdir}/BOOT%{EFIARCH}.CSV > BOOT%{EFIARCH}.CSV
 
+# Construct dual-signed shim binary
+./verify_combine_sigs -a %{efiarch} --unsigned-path %{shimdir} %{SOURCE0} %{SOURCE1}
+
 %install
 install -D dnf-protected.conf %{buildroot}%{_sysconfdir}/dnf/protected.d/%{name}.conf
 
-install -D shim%{efiarch}.efi %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi
+install -D build/shim%{efiarch}.efi.signed %{buildroot}/boot/efi/EFI/BOOT/boot%{efiarch}.efi
 
 install -D mm%{efiarch}.efi -t %{buildroot}/boot/efi/EFI/%{efidir}
 
@@ -192,6 +208,10 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
+* Fri Jun 19 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
+- Update to version 16.1
+- Generate dual-signed shim
+
 * Mon Mar 02 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 15.8-6
 - Change BuildRequires to allow updating shim-unsigned separately
 
