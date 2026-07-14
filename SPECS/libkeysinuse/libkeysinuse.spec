@@ -71,4 +71,6 @@ mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
 
 %changelog
 * Mon Jul 13 2026 Maxwell Moyer-McKee <mamckee@microsoft.com> - 1.11.0-1
+- Original version for CBL-Mariner
+- Verified license
 - Initial release of standalone KeysInUse library
