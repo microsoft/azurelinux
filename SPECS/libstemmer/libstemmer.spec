@@ -1,22 +1,24 @@
+%global snowball_data_commit 381b447563f9bef87b218ebbedde3159afdc3032
+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-Name:		libstemmer
-Version:	0
-Release:	15%{?dist}
-Summary:	C stemming algorithm library
-# The site and project is no longer being actively maintained. 
-# The code is available on Github - https://github.com/snowballstem/snowball
-URL:		http://snowball.tartarus.org
-# The licence is specified on website
-# http://snowball.tartarus.org/license.php
-# There is a pull request to include it into source code
-# https://github.com/snowballstem/snowball/issues/10
-License:	BSD
-Source0:	http://snowball.tartarus.org/dist/%{name}_c.tgz
-Source1:	Notice.txt
-Source2:	BSD.txt
+Name:           libstemmer
+Version:        3.0.1
+Release:        1%{?dist}
+Summary:        C stemming algorithm library
+URL:            https://snowballstem.org/
+License:        BSD-3-Clause
+
+Source0:        https://github.com/snowballstem/snowball/archive/refs/tags/v%{version}.tar.gz#/snowball-%{version}.tar.gz
+# Test data for the compiler.
+Source1:        https://github.com/snowballstem/snowball-data/archive/%{snowball_data_commit}.zip#/snowball-data-%{version}.zip
+
+Patch0:         snowball-sharedlib.patch
 
 BuildRequires:  gcc
+BuildRequires:  perl
+BuildRequires:  make
+BuildRequires:  unzip
 
 %description
 Snowball stemming algorithms for use in Information Retrieval Snowball 
@@ -59,12 +61,12 @@ researchers wishing to reproduce results of earlier experiments.
 
 
 %prep
-%setup -q -n libstemmer_c
-
-# Add rule to make libstemmer.so
-sed -i -r "s|(^libstemmer.o:)|libstemmer.so: \$\(snowball_sources:.c=.o\)\n\
-\t\$\(CC\) \$\(CFLAGS\) -shared \$\(LDFLAGS\) -Wl,-soname,libstemmer.so.0 \
--o \$\@.0.0.0 \$\^\n\1|" Makefile
+%autosetup -n snowball-%{version}
+# Extract and rename the test data archive so %check can find it at ../snowball-data
+cd ..
+unzip %{SOURCE1}
+mv snowball-data-%{snowball_data_commit} snowball-data
+cd snowball-%{version}
 
 %build
 make libstemmer.so %{?_smp_mflags} CFLAGS="%{optflags} -fPIC -Iinclude" LDFLAGS="$RPM_LD_FLAGS"
@@ -77,13 +79,16 @@ ln -s libstemmer.so.0.0.0	%{buildroot}%{_libdir}/libstemmer.so.0
 ln -s libstemmer.so.0.0.0	%{buildroot}%{_libdir}/libstemmer.so
 install -p -D -m 644	include/*	%{buildroot}%{_includedir}/
 
-cp %{SOURCE1} %{SOURCE2} .
-
 %ldconfig_scriptlets
 
+%check
+# Check the compiler
+export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+make check
+
 %files
-%license Notice.txt BSD.txt
-%doc README
+%license COPYING
+%doc README.rst
 %{_libdir}/libstemmer.so.*
 
 %files devel
@@ -91,6 +96,10 @@ cp %{SOURCE1} %{SOURCE2} .
 %{_includedir}/*
 
 %changelog
+* Tue Jun 30 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.0.1-1
+- Update to upstream version 3.0.1 using the snowballstem/snowball source.
+- License verified.
+
 * Thu Oct 14 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 0-15
 - Initial CBL-Mariner import from Fedora 32 (license: MIT).
 - Converting the 'Release' tag to the '[number].[distribution]' format.

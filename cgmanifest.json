@@ -4110,8 +4110,8 @@
         "type": "other",
         "other": {
           "name": "fwupd",
-          "version": "2.0.1",
-          "downloadUrl": "https://github.com/fwupd/fwupd/releases/download/2.0.1/fwupd-2.0.1.tar.xz"
+          "version": "2.0.20",
+          "downloadUrl": "https://github.com/fwupd/fwupd/releases/download/2.0.20/fwupd-2.0.20.tar.xz"
         }
       }
     },
@@ -10171,8 +10171,8 @@
         "type": "other",
         "other": {
           "name": "libjcat",
-          "version": "0.2.2",
-          "downloadUrl": "https://github.com/hughsie/libjcat/releases/download/0.2.2/libjcat-0.2.2.tar.xz"
+          "version": "0.2.6",
+          "downloadUrl": "https://github.com/hughsie/libjcat/releases/download/0.2.6/libjcat-0.2.6.tar.xz"
         }
       }
     },
@@ -11451,8 +11451,8 @@
         "type": "other",
         "other": {
           "name": "libstemmer",
-          "version": "0",
-          "downloadUrl": "http://snowball.tartarus.org/dist/libstemmer_c.tgz"
+          "version": "3.0.1",
+          "downloadUrl": "https://github.com/snowballstem/snowball/archive/refs/tags/v3.0.1.tar.gz"
         }
       }
     },
@@ -12241,8 +12241,8 @@
         "type": "other",
         "other": {
           "name": "libxmlb",
-          "version": "0.3.21",
-          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.21/libxmlb-0.3.21.tar.xz"
+          "version": "0.3.25",
+          "downloadUrl": "https://github.com/hughsie/libxmlb/releases/download/0.3.25/libxmlb-0.3.25.tar.xz"
         }
       }
     },

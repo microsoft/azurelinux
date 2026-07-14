@@ -1,0 +1,38 @@
+--- snowball-2.2.0/GNUmakefile.orig	2021-11-09 19:42:18.000000000 -0700
++++ snowball-2.2.0/GNUmakefile	2022-08-19 15:46:07.985433300 -0600
+@@ -175,7 +175,7 @@ CPPFLAGS=
+ 
+ INCLUDES=-Iinclude
+ 
+-all: snowball$(EXEEXT) libstemmer.a stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
++all: snowball$(EXEEXT) libstemmer.so stemwords$(EXEEXT) $(C_OTHER_SOURCES) $(C_OTHER_HEADERS) $(C_OTHER_OBJECTS)
+ 
+ algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
+ 	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
+@@ -222,19 +222,24 @@ libstemmer/modules_utf8.h libstemmer/mki
+ 
+ libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
+ 
++libstemmer.so: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
++	$(CC) $(CFLAGS) $^ -shared -Wl,-h,libstemmer.so.0 -o $@.0.0.0 $(LDFLAGS)
++	ln -s libstemmer.so.0.0.0 libstemmer.so.0
++	ln -s libstemmer.so.0 libstemmer.so
++
+ libstemmer.a: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
+ 	$(AR) -cru $@ $^
+ 
+ examples/%.o: examples/%.c
+ 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+ 
+-stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.a
++stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.so
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ tests/%.o: tests/%.c
+ 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+ 
+-stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
++stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.so
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)

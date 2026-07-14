@@ -1,15 +1,17 @@
 Summary:        Firmware update daemon
 Name:           fwupd
-Version:        2.0.1
-Release:        2%{?dist}
+Version:        2.0.20
+Release:        1%{?dist}
 License:        LGPL-2.1-or-later
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/fwupd/fwupd
 Source0:        https://github.com/fwupd/fwupd/releases/download/%{version}/%{name}-%{version}.tar.xz
+Patch0:         reprocess-device-metadata-after-coldplug.patch
+Patch1:         defer-ensure-device-supported.patch
 
-%global glib2_version 2.45.8
-%global libxmlb_version 0.1.3
+%global glib2_version 2.68.0
+%global libxmlb_version 0.3.24
 %global libusb_version 1.0.9
 %global libcurl_version 7.62.0
 %global libjcat_version 0.1.0
@@ -28,24 +30,16 @@ Source0:        https://github.com/fwupd/fwupd/releases/download/%{version}/%{na
 %ifarch x86_64 aarch64 riscv64
 %global have_uefi 1
 %endif
-# gpio.h is only available on these arches
-%ifarch x86_64 aarch64
-%global have_gpio 1
-%endif
-# flashrom is only available on these arches
-%ifarch i686 x86_64 armv7hl aarch64 ppc64le riscv64
-%global have_flashrom 1
-%endif
+# flashrom is in SPECS-EXTENDED; disable the plugin
+%global have_flashrom 0
 %ifarch i686 x86_64
 %global have_msr 1
 %endif
-# Until we actually have seen it outside x86
-%ifarch i686 x86_64
-%global have_thunderbolt 1
-%endif
-# only available recently
-%global have_modem_manager 1
-%global have_passim 1
+
+%global have_modem_manager 0
+# passim is in SPECS-EXTENDED; disable the local caching daemon
+%global have_passim 0
+
 BuildRequires:  freefont
 BuildRequires:  gettext
 %if 0%{?enable_docs}
@@ -58,7 +52,6 @@ BuildRequires:  gnutls-utils
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  json-glib-devel
 BuildRequires:  libarchive-devel
-BuildRequires:  libcbor-devel
 BuildRequires:  libcurl-devel
 BuildRequires:  libdrm-devel
 BuildRequires:  libjcat
@@ -75,6 +68,7 @@ BuildRequires:  python3-jinja2
 BuildRequires:  python3-packaging
 BuildRequires:  sqlite-devel
 BuildRequires:  systemd
+BuildRequires:  libmnl-devel
 BuildRequires:  systemd-devel
 # JocelynB - usbutils provides usb.ids that is required by the fwupd meson build system (without this, an error is produced on ARM)
 BuildRequires:  usbutils
@@ -91,7 +85,7 @@ Provides:       dbxtool
 %if 0%{?have_passim}
 BuildRequires:  passim-devel
 %endif
-%ifarch %{valgrind_arches}
+%ifarch x86_64 aarch64
 BuildRequires:  valgrind
 BuildRequires:  valgrind-devel
 %endif
@@ -126,12 +120,14 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description devel
 Files for development with %{name}.
 
+%if 0%{?enable_tests}
 %package tests
 Summary:        Data files for installed tests
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description tests
 Data files for installed tests.
+%endif
 
 %if 0%{?have_modem_manager}
 %package plugin-modem-manager
@@ -178,7 +174,7 @@ or server machines.
     -Ddocs=disabled \
 %endif
     -Dlvfs=disabled \
-%if 0%{?enable_tests}
+%if 0%{?with_check} || 0%{?enable_tests}
     -Dtests=true \
 %else
     -Dtests=false \
@@ -187,26 +183,6 @@ or server machines.
     -Dplugin_flashrom=enabled \
 %else
     -Dplugin_flashrom=disabled \
-%endif
-%if 0%{?have_msr}
-    -Dplugin_msr=enabled \
-%else
-    -Dplugin_msr=disabled \
-%endif
-%if 0%{?have_gpio}
-    -Dplugin_gpio=enabled \
-%else
-    -Dplugin_gpio=disabled \
-%endif
-%if 0%{?have_uefi}
-    -Dplugin_uefi_capsule=enabled \
-    -Dplugin_uefi_pk=enabled \
-    -Dplugin_tpm=enabled \
-    -Defi_binary=false \
-%else
-    -Dplugin_uefi_capsule=disabled \
-    -Dplugin_uefi_pk=disabled \
-    -Dplugin_tpm=disabled \
 %endif
 %if 0%{?have_modem_manager}
     -Dplugin_modem_manager=enabled \
@@ -221,19 +197,33 @@ or server machines.
     -Dman=true \
     -Dsystemd_unit_user="" \
     -Dbluez=enabled \
-    -Dplugin_powerd=disabled \
-    -Dlaunchd=disabled \
+    -Dcbor=disabled \
     -Dsupported_build=enabled
 
 %meson_build
 
-%if 0%{?enable_tests}
+%if 0%{?with_check}
 %check
 %meson_test
 %endif
 
 %install
 %meson_install
+
+# Ship the efivars free-space escape hatch commented-out in the default config.
+# Some firmware implementations can misreport efivars free space via RT->QueryVariableInfo,
+# making fwupd refuse UEFI db/KEK/dbx (uefi_db) updates with "Not enough efivarfs
+# space". If a user hits that, they simply uncomment the line below. Upstream instead
+# automates this per-HWID (fwupd 3a6d9e38 + 3b603759), which is not present in 2.0.20.
+printf '#IgnoreEfivarsFreeSpace=true\n\n' >> %{buildroot}%{_sysconfdir}/fwupd/fwupd.conf
+
+# Remove installed-test artifacts when not building the -tests subpackage
+%if ! 0%{?enable_tests}
+rm -rf %{buildroot}%{_datadir}/installed-tests/fwupd
+rm -rf %{buildroot}%{_libexecdir}/installed-tests/fwupd
+rm -f %{buildroot}%{_datadir}/fwupd/remotes.d/fwupd-tests.conf
+rm -rf %{buildroot}%{_datadir}/fwupd/host-emulate.d
+%endif
 
 mkdir -p --mode=0700 %{buildroot}%{_localstatedir}/lib/fwupd/gnupg
 
@@ -273,8 +263,9 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/fwupd
 %config(noreplace)%{_sysconfdir}/pki/fwupd
 %{_sysconfdir}/pki/fwupd-metadata
 %if 0%{?have_msr}
-%{_libdir}/modules-load.d/fwupd-msr.conf
+/usr/lib/modules-load.d/fwupd-msr.conf
 %endif
+/usr/lib/modules-load.d/fwupd-i2c.conf
 %{_datadir}/dbus-1/system.d/org.freedesktop.fwupd.conf
 %{bash_completionsdir}/fwupdmgr
 %{bash_completionsdir}/fwupdtool
@@ -349,17 +340,20 @@ mkdir -p %{buildroot}%{_localstatedir}/cache/fwupd
 %{_libdir}/libfwupd*.so
 %{_libdir}/pkgconfig/fwupd.pc
 
-%files tests
 %if 0%{?enable_tests}
+%files tests
 %{_datadir}/fwupd/host-emulate.d/*.json.gz
 %{_datadir}/installed-tests/fwupd
-# libgusb >= 0.4.5
-%{_datadir}/fwupd/device-tests/*.json
 %{_libexecdir}/installed-tests/fwupd
 %{_datadir}/fwupd/remotes.d/fwupd-tests.conf
 %endif
 
 %changelog
+* Thu Jun 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 2.0.20-1
+- Update to version 2.0.20
+- Backport upstream fixes (964aa10, aadaf0b) for UEFI KEK update failure
+  caused by device enumeration order during coldplug
+
 * Fri Oct 18 2024 Jocelyn Berrendonner <jocelynb@microsoft.com> - 2.0.1-2
 - Integrating the spec into Azure Linux
 - Initial CBL-Mariner import from Fedora 42 (license: MIT).
