@@ -144,7 +144,7 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 
 %changelog
 * Mon Jul 13 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.32-1
-- Upgrade to version 3.5.32.
+- Upgrade to version 3.5.32 (fixes CVE-2026-59818).
 - Drop CVE-2026-29181, CVE-2026-39821, and CVE-2026-33814 patches; these fixes are already included upstream via bundled dependency updates (go.opentelemetry.io/otel 1.43.0, golang.org/x/net 0.55.0).
 
 * Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.30-2
