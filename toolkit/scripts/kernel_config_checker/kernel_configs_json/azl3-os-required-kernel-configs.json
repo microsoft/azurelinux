@@ -2871,6 +2871,20 @@
           "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/54118255"
         },
         {
+          "name": "CONFIG_FS_ENCRYPTION",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22389"
+        },
+        {
           "name": "CONFIG_FW_CFG_SYSFS",
           "values": [
             {
