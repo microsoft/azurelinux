@@ -3,6 +3,22 @@
   "$id": "https://github.com/microsoft/azure-linux-dev-tools/internal/projectconfig/config-file",
   "$ref": "#/$defs/ConfigFile",
   "$defs": {
+    "BugRef": {
+      "properties": {
+        "url": {
+          "type": "string",
+          "pattern": "^https?://",
+          "format": "uri",
+          "title": "URL",
+          "description": "HTTP(S) link to the bug entry"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "url"
+      ]
+    },
     "CheckConfig": {
       "properties": {
         "skip": {
@@ -118,6 +134,14 @@
           "type": "array",
           "title": "Overlays",
           "description": "Overlays to apply to this component's spec and/or sources"
+        },
+        "overlay-files": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Overlay files",
+          "description": "Path or glob patterns (relative to the component config file or matched spec directory) matched against the filesystem to locate per-file overlay documents after component config resolution. Use an empty list to disable inherited overlay-file patterns"
         },
         "build": {
           "$ref": "#/$defs/ComponentBuildConfig",
@@ -239,12 +263,12 @@
         "section": {
           "type": "string",
           "title": "Section name",
-          "description": "The name of the section to which this overlay applies"
+          "description": "The name of the section to which this overlay applies. Optional for spec-prepend-lines/spec-append-lines/spec-search-replace; when omitted these overlays target the entire spec file."
         },
         "package": {
           "type": "string",
           "title": "Package name",
-          "description": "The name of the sub-package to which this overlay applies"
+          "description": "The name of the sub-package to which this overlay applies. Cannot be combined with an omitted section on overlays that support whole-file targeting."
         },
         "tag": {
           "type": "string",
@@ -278,6 +302,11 @@
           "type": "string",
           "title": "Source",
           "description": "For overlays that require a source file as input"
+        },
+        "metadata": {
+          "$ref": "#/$defs/OverlayMetadata",
+          "title": "Metadata",
+          "description": "Optional documentation metadata describing the overlay's intent and provenance"
         }
       },
       "additionalProperties": false,
@@ -343,6 +372,11 @@
           "type": "object",
           "title": "Distros",
           "description": "Definitions of distros to build for or consume from"
+        },
+        "resources": {
+          "$ref": "#/$defs/ResourcesConfig",
+          "title": "Resources",
+          "description": "Reusable named resource definitions"
         },
         "component-groups": {
           "additionalProperties": {
@@ -513,6 +547,11 @@
           "type": "string",
           "title": "Mock config file",
           "description": "Path to the aarch64 mock config file for this version"
+        },
+        "inputs": {
+          "$ref": "#/$defs/DistroVersionInputs",
+          "title": "Inputs",
+          "description": "Per-use-case input repositories"
         }
       },
       "additionalProperties": false,
@@ -520,6 +559,44 @@
       "required": [
         "release-ver"
       ]
+    },
+    "DistroVersionInput": {
+      "properties": {
+        "repo": {
+          "type": "string",
+          "title": "Repo",
+          "description": "Name of an entry under [resources.rpm-repos]; mutually exclusive with set"
+        },
+        "set": {
+          "type": "string",
+          "title": "Set",
+          "description": "Name of an entry under [resources.rpm-repo-sets]; mutually exclusive with repo"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DistroVersionInputs": {
+      "properties": {
+        "rpm-build": {
+          "items": {
+            "$ref": "#/$defs/DistroVersionInput"
+          },
+          "type": "array",
+          "title": "RPM-build inputs",
+          "description": "Repos and repo-sets made available to mock when building RPMs"
+        },
+        "image-build": {
+          "items": {
+            "$ref": "#/$defs/DistroVersionInput"
+          },
+          "type": "array",
+          "title": "Image-build inputs",
+          "description": "Repos and repo-sets made available to kiwi when building images"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "ImageCapabilities": {
       "properties": {
@@ -643,7 +720,8 @@
         "type": {
           "type": "string",
           "enum": [
-            "download"
+            "download",
+            "custom"
           ],
           "title": "Origin type",
           "description": "Type of origin for this source file"
@@ -655,12 +733,72 @@
           "examples": [
             "https://example.com/source.tar.gz"
           ]
+        },
+        "script": {
+          "type": "string",
+          "title": "Script",
+          "description": "Shell script filename (relative to the component spec directory) to run in mock to generate this source file. Required when origin type is 'custom'."
+        },
+        "mock-packages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Mock packages",
+          "description": "RPM packages to install in the mock chroot before running the generation script. Only valid when origin type is 'custom'."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "type"
+      ]
+    },
+    "OverlayMetadata": {
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "backport-dist-git",
+            "azl-pruning",
+            "azl-compatibility",
+            "azl-dep-missing-workaround",
+            "azl-branding-policy",
+            "azl-disable-flaky-tests",
+            "azl-disable-unsupported-tests",
+            "azl-security-compliance",
+            "azl-release-management",
+            "azl-platform-adaptation"
+          ],
+          "title": "Category",
+          "description": "Classification of the overlay's intent"
+        },
+        "commits": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Commits",
+          "description": "URLs of upstream commits this overlay backports or references"
+        },
+        "bugs": {
+          "items": {
+            "$ref": "#/$defs/BugRef"
+          },
+          "type": "array",
+          "title": "Bug references",
+          "description": "References to issue-tracker entries related to this overlay"
+        },
+        "upstreamable": {
+          "type": "boolean",
+          "title": "Upstreamable",
+          "description": "Whether this overlay's change can be upstreamed; omit if not yet assessed"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "category"
       ]
     },
     "PackageConfig": {
@@ -846,6 +984,206 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "ResourcesConfig": {
+      "properties": {
+        "rpm-repos": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RpmRepoResource"
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "description": "Name; projected verbatim into dnf section headers and kiwi --add-repo arguments."
+          },
+          "type": "object",
+          "title": "RPM repositories",
+          "description": "Reusable named RPM repository definitions"
+        },
+        "rpm-repo-set-templates": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RpmRepoSetTemplate"
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "description": "Name; projected verbatim into dnf section headers and kiwi --add-repo arguments."
+          },
+          "type": "object",
+          "title": "RPM repo set templates",
+          "description": "Named layout templates that describe a fixed matrix of sub-repos"
+        },
+        "rpm-repo-sets": {
+          "additionalProperties": {
+            "$ref": "#/$defs/RpmRepoSet"
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "description": "Name; projected verbatim into dnf section headers and kiwi --add-repo arguments."
+          },
+          "type": "object",
+          "title": "RPM repo sets",
+          "description": "Template instantiations that expand to a group of related RPM repos"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RpmRepoResource": {
+      "oneOf": [
+        {
+          "not": {
+            "required": [
+              "metalink"
+            ]
+          },
+          "required": [
+            "base-uri"
+          ]
+        },
+        {
+          "not": {
+            "required": [
+              "base-uri"
+            ]
+          },
+          "required": [
+            "metalink"
+          ]
+        }
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description (diagnostic only)"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "rpm-md"
+          ],
+          "title": "Type",
+          "description": "Repository access protocol; defaults to rpm-md"
+        },
+        "base-uri": {
+          "type": "string",
+          "pattern": "^https?://[^\\s]+$",
+          "format": "uri",
+          "title": "Base URI",
+          "description": "Repository base URI (dnf baseurl). Mutually exclusive with metalink. Must be an http(s) URL."
+        },
+        "metalink": {
+          "type": "string",
+          "pattern": "^https?://[^\\s]+$",
+          "format": "uri",
+          "title": "Metalink",
+          "description": "Repository metalink URL. Mutually exclusive with base-uri. Must be an http(s) URL."
+        },
+        "disable-gpg-check": {
+          "type": "boolean",
+          "title": "Disable GPG check",
+          "description": "Opt out of GPG signature verification for this repo (zero value = checking enabled)"
+        },
+        "gpg-key": {
+          "type": "string",
+          "pattern": "^((https?|file)://\\S+|[^\\s:]\\S*)$",
+          "title": "GPG key",
+          "description": "Path or URI to the GPG key file. Accepted URI schemes: http, https, file. Bare paths are resolved relative to the defining TOML file."
+        },
+        "arches": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Arches",
+          "description": "Restrict to specific target architectures; empty = all"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RpmRepoSet": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description (diagnostic only)"
+        },
+        "template": {
+          "type": "string",
+          "title": "Template",
+          "description": "Name of the rpm-repo-set-template to instantiate"
+        },
+        "base-uri": {
+          "type": "string",
+          "pattern": "^https?://[^\\s]+$",
+          "format": "uri",
+          "title": "Base URI",
+          "description": "URL prefix under which all sub-repos in this set live"
+        },
+        "name-prefix": {
+          "type": "string",
+          "title": "Name prefix",
+          "description": "Prepended to each sub-repo's name to form the repo ID"
+        },
+        "gpg-key": {
+          "type": "string",
+          "pattern": "^\\S+$",
+          "title": "GPG key",
+          "description": "Path or URI to the GPG key file. Accepted URI schemes: http, https, file. Bare paths are resolved relative to the defining TOML file."
+        },
+        "disable-gpg-check": {
+          "type": "boolean",
+          "title": "Disable GPG check",
+          "description": "Opt out of GPG signature verification for repos in this set"
+        },
+        "arches": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Arches",
+          "description": "Restrict to specific target architectures; empty = all"
+        },
+        "subrepos": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Sub-repos",
+          "description": "Allowlist of template sub-repos to instantiate (default: all)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "template",
+        "base-uri"
+      ]
+    },
+    "RpmRepoSetTemplate": {
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description",
+          "description": "Human-readable description (diagnostic only)"
+        },
+        "subrepos": {
+          "items": {
+            "$ref": "#/$defs/SubrepoSpec"
+          },
+          "type": "array",
+          "title": "Sub-repos",
+          "description": "Ordered list of sub-repos in the layout"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "subrepos"
+      ]
+    },
     "SourceFileReference": {
       "properties": {
         "filename": {
@@ -932,6 +1270,36 @@
       "type": "object",
       "required": [
         "type"
+      ]
+    },
+    "SubrepoSpec": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name",
+          "description": "Stable short identifier; combined with the set's name-prefix to form the repo ID"
+        },
+        "subpath": {
+          "type": "string",
+          "title": "Sub-path",
+          "description": "Relative path under the set's base URI; may contain $basearch"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "binary",
+            "debug",
+            "source"
+          ],
+          "title": "Kind",
+          "description": "Sub-repo classification; defaults to binary"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "subpath"
       ]
     },
     "TestSuiteConfig": {

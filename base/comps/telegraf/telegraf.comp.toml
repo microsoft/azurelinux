@@ -15,12 +15,10 @@ hash-type = "SHA512"
 origin = { type = "download", uri = "https://github.com/influxdata/telegraf/archive/v1.38.2/telegraf-1.38.2.tar.gz" }
 
 [[components.telegraf.source-files]]
-filename = "telegraf-1.38.2-vendor.tar.bz2"
-# Reproducible vendor archive (generate_source_tarball.sh / go_vendor_archive).
-# Hosted in the AzL lookaside store (pkgs_modified) following the same scheme as other
-# non-upstream sources, e.g. base/comps/espeak-ng/espeak-ng.comp.toml. The blob must be
-# uploaded before CI source checks and package builds can fetch it; the merge queue's
-# sources-upload pipeline publishes changed-component sources.
-hash = "1108fe48086a7051c5cb89935c6de1c675c3ea8212a979d147ad0c03aef327c6234fa9eee292e4f9594ba9ec2cb757fc9eff46630aea43551bca3d948b30b27f"
-hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/telegraf/telegraf-1.38.2-vendor.tar.bz2/sha512/1108fe48086a7051c5cb89935c6de1c675c3ea8212a979d147ad0c03aef327c6234fa9eee292e4f9594ba9ec2cb757fc9eff46630aea43551bca3d948b30b27f/telegraf-1.38.2-vendor.tar.bz2" }
+filename      = "telegraf-1.38.2-vendor.tar.gz"
+origin.type          = "custom"
+origin.script        = "generate_source_tarball.sh"
+origin.mock-packages = ["golang"]
+origin.inputs        =  ["telegraf-1.38.2.tar.gz"]
+hash-type     = "SHA512"
+hash          = "4004e684a8f65e404a4949eca7593b53981f7cf8a0622869b76dc694e6bffdd1be034ff460908277546160e9781ecd8fbfc8d86f096c57096d9ef286fcda086f"                   # run prep-sources --allow-no-hashes once to populate
