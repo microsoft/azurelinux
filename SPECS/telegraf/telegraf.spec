@@ -1,14 +1,4 @@
-Summary:        agent for collecting, processing, aggregating, and writing metrics.
-Name:           telegraf
-Version:        1.31.0
-<<<<<<< HEAD
 Release:        25%{?dist}
-=======
-Release:        24%{?dist}
->>>>>>> a8b52434f0 ([AutoPR- Security] Patch telegraf for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207 [HIGH] (#17999))
-License:        MIT
-Vendor:         Microsoft Corporation
-Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -62,11 +52,6 @@ Patch41:        CVE-2026-39828.patch
 Patch43:        CVE-2026-39835.patch
 Patch44:        CVE-2026-42502.patch
 Patch45:        CVE-2026-46598.patch
-<<<<<<< HEAD
-Patch46:        CVE-2025-29923.patch
-Patch47:        CVE-2025-46327.patch
-Patch48:        CVE-2026-54908.patch
-=======
 Patch46:        CVE-2026-58207.patch
 Patch47:        CVE-2026-58208.patch
 Patch48:        CVE-2026-58209.patch
@@ -74,10 +59,9 @@ Patch49:        CVE-2026-58250.patch
 Patch50:        CVE-2026-58251.patch
 Patch51:        CVE-2026-58252.patch
 Patch52:        CVE-2026-58253.patch
->>>>>>> a8b52434f0 ([AutoPR- Security] Patch telegraf for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207 [HIGH] (#17999))
-
-BuildRequires:  golang
-BuildRequires:  systemd-devel
+Patch53:        CVE-2025-29923.patch
+Patch54:        CVE-2025-46327.patch
+Patch55:        CVE-2026-54908.patch
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
@@ -136,23 +120,22 @@ fi
 %{_bindir}/telegraf
 %{_unitdir}/telegraf.service
 %{_sysconfdir}/logrotate.d/%{name}
-%dir %{_sysconfdir}/%{name}/telegraf.d
-
 %changelog
-<<<<<<< HEAD
-* Thu Jul 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-25
+* Tue Jul 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-26
 - Patch for CVE-2026-54908
 
-* Thu Jun 04 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-24
+* Tue Jul 14 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-25
 - Patch CVE-2025-29923
 - Patch CVE-2025-46327
-=======
+
 * Sun Jul 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-24
 - Patch for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207
->>>>>>> a8b52434f0 ([AutoPR- Security] Patch telegraf for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207 [HIGH] (#17999))
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+
+* Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
+- Patch for CVE-2026-41889, CVE-2026-42151
 
 * Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
 - Patch for CVE-2026-41889, CVE-2026-42151
