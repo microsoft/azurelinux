@@ -24,13 +24,13 @@ parameters:
     type: string
   - name: outputDirectory
     type: string
-  # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
-  - name: packageTarget
+  # Distro-config RPM build-environment used by Control Tower.
+  - name: packageEnvironment
     type: string
-  # Max seconds run_package_build.py waits for the Control Tower build to reach
-  # a terminal state. Keep below the job's timeoutInMinutes so the script's own
-  # clear failure fires before ADO blunt-kills the job. Default 21600 = 6h.
+  # Max seconds run_scratch_package_build.py waits for the Control Tower build
+  # to reach a terminal state. Keep below the job's timeoutInMinutes so the
+  # script's own clear failure fires before ADO blunt-kills the job. Default
+  # 21600 = 6h.
   - name: pollTimeoutSeconds
     type: number
     default: 21600
@@ -61,8 +61,8 @@ stages:
             value: ${{ parameters.artifactBaseName }}
           - name: ob_outputDirectory
             value: ${{ parameters.outputDirectory }}
-          - name: packageTarget
-            value: ${{ parameters.packageTarget }}
+          - name: packageEnvironment
+            value: ${{ parameters.packageEnvironment }}
           - name: pollTimeoutSeconds
             value: ${{ parameters.pollTimeoutSeconds }}
         steps:
@@ -117,12 +117,12 @@ stages:
               # reserved variables are silently ignored by the agent).
 
           # Submit a SCRATCH Control Tower build of the PR head for the changed
-          # components. Scratch = throwaway: it never persists to a production
-          # repo, so building unmerged PR code is safe. Scratch is the default
-          # (no --official-build); run_package_build.py additionally refuses an
-          # OFFICIAL build for a PR trigger. --wait-for-completion blocks until
-          # the build reaches a terminal state and fails the check on a build
-          # failure (or on poll-timeout). No PR code is built on this agent.
+          # components. Scratch artifacts are throwaway and are not persisted to
+          # a production repo. The scratch-only runner has no official endpoint
+          # or mode switch, preventing accidental official submissions. This is
+          # not an authorization boundary: PR code can modify checkout-controlled
+          # helpers. --wait-for-completion blocks until the build reaches a
+          # terminal state and fails the check on failure or poll timeout.
           #
           # This step assumes the pipeline is wired as a REVIEWER-GATED check in
           # ADO: it should not auto-run on every PR push, so a maintainer
@@ -136,14 +136,12 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_package_build.py \
+                python3 scripts/ci/control-tower/run_scratch_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
-                  --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "$PACKAGE_TARGET" \
+                  --environment "$PACKAGE_ENVIRONMENT" \
                   --commit-sha "$SOURCE_COMMIT" \
-                  --repo-uri "$BUILD_REPOSITORY_URI" \
                   --wait-for-completion \
                   --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
             env:
@@ -153,10 +151,6 @@ stages:
               API_AUDIENCE: ${{ parameters.apiAudience }}
               API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              PACKAGE_TARGET: $(packageTarget)
+              PACKAGE_ENVIRONMENT: $(packageEnvironment)
               POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
               SOURCE_COMMIT: $(sourceCommit)
-              # Build.Reason and Build.Repository.Uri are predefined and
-              # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI; reference
-              # them directly and do not map them here (env: overrides of
-              # reserved variables are silently ignored by the agent).

@@ -72,3 +72,15 @@ jobs:
             echo "import $mod"
             python -c "import $mod"
           done
+
+      - name: Run Control Tower helper tests
+        if: matrix.dir == 'scripts/ci/control-tower'
+        env:
+          DIR: ${{ matrix.dir }}
+        run: |
+          set -euo pipefail
+          cd "$DIR"
+          # shellcheck disable=SC1091
+          . .smoke-venv/bin/activate
+          pip install --quiet -r tests/requirements.txt
+          python -m pytest tests
