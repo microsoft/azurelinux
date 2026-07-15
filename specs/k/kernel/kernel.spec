@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 11
+%define azl_pkgrelease 12
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -83,11 +83,8 @@
 	end
 }
 
-# This returns the main kernel tied to a debug variant. For example,
-# kernel-debug is the debug version of kernel, so we return an empty
-# string. However, kernel-64k-debug is the debug version of kernel-64k,
-# in this case we need to return "64k", and so on. This is used in
-# macros below where we need this for some uname based requires.
+# Return the main kernel suffix for a compound variant name. This is used in
+# macros below for uname-based dependencies.
 %define uname_variant() %{lua:
 	local flavour = rpm.expand('%{?1:%{1}}')
 	_, _, main, sub = flavour:find("(%w+)-(.*)")
@@ -221,17 +218,11 @@ Summary: The Linux kernel
 %define with_base      %{?_without_base:      0} %{?!_without_base:      1}
 # kernel-zfcpdump (s390 specific kernel for zfcpdump)
 %define with_zfcpdump  %{?_without_zfcpdump:  0} %{?!_without_zfcpdump:  1}
-# kernel-16k (aarch64 kernel with 16K page_size)
-%define with_arm64_16k %{?_with_arm64_16k:    1} %{?!_with_arm64_16k:    0}
-# kernel-64k (aarch64 kernel with 64K page_size)
-%define with_arm64_64k %{?_without_arm64_64k: 0} %{?!_without_arm64_64k: 1}
 
 # Supported variants
 #            with_base with_gcov
 # up         X         X
 # zfcpdump   X                       X
-# arm64_16k  X         X
-# arm64_64k  X         X
 
 # kernel-doc
 %define with_doc       %{?_without_doc:       0} %{?!_without_doc:       1}
@@ -309,7 +300,6 @@ Summary: The Linux kernel
 %define with_cross_headers 0
 # no stablelist
 %define with_kernel_abi_stablelists 0
-%define with_arm64_64k 0
 %endif
 
 %if %{with_verbose}
@@ -383,8 +373,6 @@ Summary: The Linux kernel
 %define with_tools 1
 %define with_up 0
 %define with_base 0
-%define with_arm64_16k 0
-%define with_arm64_64k 0
 %define with_cross_headers 0
 %define with_doc 0
 %define with_selftests 0
@@ -454,12 +442,6 @@ Summary: The Linux kernel
 
 %define with_zfcpdump 0
 
-# 16k and 64k variants only for aarch64
-%ifnarch aarch64
-%define with_arm64_16k 0
-%define with_arm64_64k 0
-%endif
-
 %if 0%{?fedora}
 # This is not for Fedora
 %define with_zfcpdump 0
@@ -499,8 +481,6 @@ Summary: The Linux kernel
 %define with_up 0
 %define with_debug 0
 %define with_zfcpdump 0
-%define with_arm64_16k 0
-%define with_arm64_64k 0
 
 %define with_debuginfo 0
 %define with_perf 0
@@ -523,13 +503,11 @@ Summary: The Linux kernel
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
 # Azure Linux ships a single general-purpose kernel. All other variants
-# (arm64-16k/64k, zfcpdump, efiuki) are
-# disabled here. This gate runs after all upstream arch/variant resolution so
-# it wins; the disabled variant code is trimmed away incrementally. Kernel
-# selftests (kernel-selftests-internal) are intentionally left enabled.
+# (zfcpdump and efiuki) are disabled here. This gate runs after all upstream
+# arch/variant resolution so it wins; the disabled variant code is trimmed
+# away incrementally. Kernel selftests (kernel-selftests-internal) are
+# intentionally left enabled.
 # ============================================================================
-%define with_arm64_16k 0
-%define with_arm64_64k 0
 %define with_zfcpdump 0
 %define with_efiuki 0
 
@@ -538,16 +516,6 @@ Summary: The Linux kernel
 %define with_up_base 1
 %else
 %define with_up_base 0
-%endif
-%if %{with_arm64_16k} && %{with_base}
-%define with_arm64_16k_base 1
-%else
-%define with_arm64_16k_base 0
-%endif
-%if %{with_arm64_64k} && %{with_base}
-%define with_arm64_64k_base 1
-%else
-%define with_arm64_64k_base 0
 %endif
 
 #
@@ -808,8 +776,6 @@ Source22: filtermods.py
 %if 0%{?include_rhel}
 Source24: %{name}-aarch64-rhel.config
 Source32: %{name}-x86_64-rhel.config
-# ARM64 64K page-size kernel config
-Source42: %{name}-aarch64-64k-rhel.config
 %endif
 
 %if %{include_rhel}
@@ -822,7 +788,6 @@ Source41: x509.genkey.centos
 Source50: x509.genkey.fedora
 
 Source52: %{name}-aarch64-fedora.config
-Source54: %{name}-aarch64-16k-fedora.config
 Source60: %{name}-x86_64-fedora.config
 
 Source62: def_variants.yaml.fedora
@@ -1227,11 +1192,10 @@ Linux kernel, suitable for the kabi-dw tool.
 # This macro creates a kernel-<subpackage>-debuginfo package.
 #	%%kernel_debuginfo_package <subpackage>
 #
-# Explanation of the find_debuginfo_opts: We build multiple kernels (debug,
-# rt, 64k etc.) so the regex filters those kernels appropriately. We also
-# have to package several binaries as part of kernel-devel but getting
-# unique build-ids is tricky for these userspace binaries. We don't really
-# care about debugging those so we just filter those out and remove it.
+# Explanation of the find_debuginfo_opts: The regex supports named kernel
+# variants. We also package several binaries as part of kernel-devel, but
+# getting unique build-ids is tricky for these userspace binaries. We don't
+# care about debugging those, so we filter them out.
 %define kernel_debuginfo_package() \
 %package %{?1:%{1}-}debuginfo\
 Summary: Debug information for package %{name}%{?1:-%{1}}\
@@ -1489,22 +1453,6 @@ zfcpdump infrastructure.
 # with_zfcpdump
 %endif
 
-%if %{with_arm64_16k_base}
-%define variant_summary The Linux kernel compiled for 16k pagesize usage
-%kernel_variant_package 16k
-%description 16k-core
-The kernel package contains a variant of the ARM64 Linux kernel using
-a 16K page size.
-%endif
-
-%if %{with_arm64_64k_base}
-%define variant_summary The Linux kernel compiled for 64k pagesize usage
-%kernel_variant_package 64k
-%description 64k-core
-The kernel package contains a variant of the ARM64 Linux kernel using
-a 64K page size.
-%endif
-
 %if %{with_up_base}
 # And finally the main -core package
 
@@ -1523,22 +1471,6 @@ Prebuilt default unified kernel image for virtual machines.
 
 %description uki-virt-addons
 Prebuilt default unified kernel image addons for virtual machines.
-%endif
-
-%if %{with_arm64_16k_base} && %{with_efiuki}
-%description 16k-uki-virt
-Prebuilt 16k unified kernel image for virtual machines.
-
-%description 16k-uki-virt-addons
-Prebuilt 16k unified kernel image addons for virtual machines.
-%endif
-
-%if %{with_arm64_64k_base} && %{with_efiuki}
-%description 64k-uki-virt
-Prebuilt 64k unified kernel image for virtual machines.
-
-%description 64k-uki-virt-addons
-Prebuilt 64k unified kernel image addons for virtual machines.
 %endif
 
 %ifnarch noarch %{nobuildarches}
@@ -2645,20 +2577,12 @@ cd linux-%{KVERREL}
 BuildKernel %make_target %kernel_image %{_use_vdso} zfcpdump
 %endif
 
-%if %{with_arm64_16k_base}
-BuildKernel %make_target %kernel_image %{_use_vdso} 16k
-%endif
-
-%if %{with_arm64_64k_base}
-BuildKernel %make_target %kernel_image %{_use_vdso} 64k
-%endif
-
 %if %{with_up_base}
 BuildKernel %make_target %kernel_image %{_use_vdso}
 %endif
 
 %ifnarch noarch %{nobuildarches}
-%if !%{with_zfcpdump} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k}
+%if !%{with_zfcpdump} && !%{with_up}
 # If only building the user space tools, then initialize the build environment
 # and some variables so that the various userspace tools can be built.
 %{log_msg "Initialize userspace tools build environment"}
@@ -3599,27 +3523,6 @@ fi\
 %kernel_variant_post -v zfcpdump
 %endif
 
-%if %{with_arm64_16k_base}
-%kernel_variant_preun -v 16k -e
-%kernel_variant_post -v 16k
-%endif
-
-%if %{with_arm64_16k_base} && %{with_efiuki}
-%kernel_variant_posttrans -v 16k -u virt
-%kernel_variant_preun -v 16k -u virt -e
-%endif
-
-%if %{with_arm64_64k_base}
-%kernel_variant_preun -v 64k -e
-%kernel_variant_post -v 64k
-%endif
-
-
-%if %{with_arm64_64k_base} && %{with_efiuki}
-%kernel_variant_posttrans -v 64k -u virt
-%kernel_variant_preun -v 64k -u virt -e
-%endif
-
 ###
 ### file lists
 ###
@@ -3935,8 +3838,6 @@ fi\
 
 %kernel_variant_files %{_use_vdso} %{with_up_base}
 %kernel_variant_files %{_use_vdso} %{with_zfcpdump} zfcpdump
-%kernel_variant_files %{_use_vdso} %{with_arm64_16k_base} 16k
-%kernel_variant_files %{_use_vdso} %{with_arm64_64k_base} 64k
 
 %ifnarch noarch %{nobuildarches}
 %files modules-extra-matched
@@ -3954,6 +3855,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.12
+- Remove alternate arm64 16K and 64K page-size variant support
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.11
 - Remove debug variant package paths and debug config sources
 
