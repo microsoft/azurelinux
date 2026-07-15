@@ -20,6 +20,9 @@ Patch8:         CVE-2026-4111.patch
 Patch9:         CVE-2026-4424.patch
 Patch10:        CVE-2026-4426.patch
 Patch11:        CVE-2026-5121.patch
+# Skip encrypted corrupted ptests
+Patch12:        skip-stripped-fixture-tests.patch
+
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -77,6 +80,10 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Jul 15 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.7.7-7
+- Strip encrypted/corrupted pre-compressed test fixtures from source tarball
+- Skip stripped fixture tests
+
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-6
 - Patch for CVE-2026-5121, CVE-2026-4426, CVE-2026-4424
 

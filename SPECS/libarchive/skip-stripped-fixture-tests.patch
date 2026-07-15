@@ -1,0 +1,418 @@
+From bea825865cc8c144faf667d2c32116008a7104f6 Mon Sep 17 00:00:00 2001
+From: akhila-guruju <v-guakhila@microsoft.com>
+Date: Wed, 15 Jul 2026 16:07:18 +0530
+Subject: [PATCH] skip stripped fixture tests
+
+---
+ cpio/test/test_option_passphrase.c            |  2 +
+ libarchive/test/test_fuzz.c                   | 45 -------------------
+ .../test_read_format_7zip_encryption_data.c   |  2 +
+ .../test_read_format_7zip_encryption_header.c |  2 +
+ ...st_read_format_7zip_encryption_partially.c |  2 +
+ .../test/test_read_format_7zip_malformed.c    |  2 +
+ .../test/test_read_format_rar_encryption.c    | 14 ++++++
+ .../test_read_format_rar_encryption_data.c    |  2 +
+ .../test_read_format_rar_encryption_header.c  |  2 +
+ ...est_read_format_rar_encryption_partially.c |  2 +
+ .../test_read_format_zip_encryption_data.c    |  2 +
+ .../test_read_format_zip_encryption_header.c  |  2 +
+ ...est_read_format_zip_encryption_partially.c |  2 +
+ .../test/test_read_format_zip_malformed.c     |  2 +
+ ...d_format_zip_traditional_encryption_data.c |  2 +
+ .../test/test_read_format_zip_winzip_aes.c    |  6 +++
+ .../test_read_format_zip_winzip_aes_large.c   |  2 +
+ tar/test/test_option_passphrase.c             |  2 +
+ unzip/test/test_P_encryption.c                |  2 +
+ 19 files changed, 52 insertions(+), 45 deletions(-)
+
+diff --git a/cpio/test/test_option_passphrase.c b/cpio/test/test_option_passphrase.c
+index 28818cb..0f57920 100644
+--- a/cpio/test/test_option_passphrase.c
++++ b/cpio/test/test_option_passphrase.c
+@@ -8,6 +8,8 @@
+ 
+ DEFINE_TEST(test_option_passphrase)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	const char *reffile = "test_option_passphrase.zip";
+ 
+ 	extract_reference_file(reffile);
+diff --git a/libarchive/test/test_fuzz.c b/libarchive/test/test_fuzz.c
+index dcb4f73..adbad21 100644
+--- a/libarchive/test/test_fuzz.c
++++ b/libarchive/test/test_fuzz.c
+@@ -490,18 +490,6 @@ DEFINE_TEST(test_fuzz_zip)
+ 		"test_read_format_zip_comment_stored_2.zip",
+ 		NULL
+ 	};
+-	static const char *fileset10[] = {
+-		"test_read_format_zip_encryption_data.zip",
+-		NULL
+-	};
+-	static const char *fileset11[] = {
+-		"test_read_format_zip_encryption_header.zip",
+-		NULL
+-	};
+-	static const char *fileset12[] = {
+-		"test_read_format_zip_encryption_partially.zip",
+-		NULL
+-	};
+ 	static const char *fileset13[] = {
+ 		"test_read_format_zip_filename_cp866.zip",
+ 		NULL
+@@ -534,10 +522,6 @@ DEFINE_TEST(test_fuzz_zip)
+ 		"test_read_format_zip_mac_metadata.zip",
+ 		NULL
+ 	};
+-	static const char *fileset21[] = {
+-		"test_read_format_zip_malformed1.zip",
+-		NULL
+-	};
+ 	static const char *fileset22[] = {
+ 		"test_read_format_zip_msdos.zip",
+ 		NULL
+@@ -566,30 +550,10 @@ DEFINE_TEST(test_fuzz_zip)
+ 		"test_read_format_zip_symlink.zip",
+ 		NULL
+ 	};
+-	static const char *fileset29[] = {
+-		"test_read_format_zip_traditional_encryption_data.zip",
+-		NULL
+-	};
+ 	static const char *fileset30[] = {
+ 		"test_read_format_zip_ux.zip",
+ 		NULL
+ 	};
+-	static const char *fileset31[] = {
+-		"test_read_format_zip_winzip_aes128.zip",
+-		NULL
+-	};
+-	static const char *fileset32[] = {
+-		"test_read_format_zip_winzip_aes256.zip",
+-		NULL
+-	};
+-	static const char *fileset33[] = {
+-		"test_read_format_zip_winzip_aes256_large.zip",
+-		NULL
+-	};
+-	static const char *fileset34[] = {
+-		"test_read_format_zip_winzip_aes256_stored.zip",
+-		NULL
+-	};
+ 	static const char *fileset35[] = {
+ 		"test_read_format_zip_zip64a.zip",
+ 		NULL
+@@ -609,9 +573,6 @@ DEFINE_TEST(test_fuzz_zip)
+ 		{0, fileset7},
+ 		{0, fileset8},
+ 		{0, fileset9},
+-		{0, fileset10},
+-		{0, fileset11},
+-		{0, fileset12},
+ 		{0, fileset13},
+ 		{0, fileset14},
+ 		{0, fileset15},
+@@ -620,7 +581,6 @@ DEFINE_TEST(test_fuzz_zip)
+ 		{0, fileset18},
+ 		{0, fileset19},
+ 		{0, fileset20},
+-		{0, fileset21},
+ 		{0, fileset22},
+ 		{0, fileset23},
+ 		{0, fileset24},
+@@ -628,12 +588,7 @@ DEFINE_TEST(test_fuzz_zip)
+ 		{0, fileset26},
+ 		{0, fileset27},
+ 		{0, fileset28},
+-		{0, fileset29},
+ 		{0, fileset30},
+-		{0, fileset31},
+-		{0, fileset32},
+-		{0, fileset33},
+-		{0, fileset34},
+ 		{0, fileset35},
+ 		{0, fileset36},
+ 		{1, NULL}
+diff --git a/libarchive/test/test_read_format_7zip_encryption_data.c b/libarchive/test/test_read_format_7zip_encryption_data.c
+index 653044a..27fe765 100644
+--- a/libarchive/test/test_read_format_7zip_encryption_data.c
++++ b/libarchive/test/test_read_format_7zip_encryption_data.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_7zip_encryption_data)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted) with AES-256. The headers
+ 	   are NOT encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_7zip_encryption.7z";
+diff --git a/libarchive/test/test_read_format_7zip_encryption_header.c b/libarchive/test/test_read_format_7zip_encryption_header.c
+index d0c4804..02df76a 100644
+--- a/libarchive/test/test_read_format_7zip_encryption_header.c
++++ b/libarchive/test/test_read_format_7zip_encryption_header.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_7zip_encryption_header)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted) with AES-256. The headers
+ 	   ARE encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_7zip_encryption_header.7z";
+diff --git a/libarchive/test/test_read_format_7zip_encryption_partially.c b/libarchive/test/test_read_format_7zip_encryption_partially.c
+index 51a6c06..7c6ea7e 100644
+--- a/libarchive/test/test_read_format_7zip_encryption_partially.c
++++ b/libarchive/test/test_read_format_7zip_encryption_partially.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_7zip_encryption_partially)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted) with AES-256. The headers
+ 	   are NOT encrypted. Password is "12345678". It contains one encrypted
+ 	   and one unencrypted file. */
+diff --git a/libarchive/test/test_read_format_7zip_malformed.c b/libarchive/test/test_read_format_7zip_malformed.c
+index f212087..b8c0455 100644
+--- a/libarchive/test/test_read_format_7zip_malformed.c
++++ b/libarchive/test/test_read_format_7zip_malformed.c
+@@ -61,6 +61,8 @@ test_malformed2(void)
+ 
+ DEFINE_TEST(test_read_format_7zip_malformed)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_malformed1();
+ 	test_malformed2();
+ }
+diff --git a/libarchive/test/test_read_format_rar_encryption.c b/libarchive/test/test_read_format_rar_encryption.c
+index a184b86..b77bd46 100644
+--- a/libarchive/test/test_read_format_rar_encryption.c
++++ b/libarchive/test/test_read_format_rar_encryption.c
+@@ -132,11 +132,15 @@ static void test_encrypted_rar_archive(const char *filename, int filenamesEncryp
+ 
+ DEFINE_TEST(test_read_format_rar4_encrypted)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar4_encrypted.rar", 0, 0);
+ }
+ 
+ DEFINE_TEST(test_read_format_rar4_encrypted_filenames)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar4_encrypted_filenames.rar", 1, 0);
+ }
+ 
+@@ -152,25 +156,35 @@ DEFINE_TEST(test_read_format_rar4_solid_encrypted)
+ 
+ DEFINE_TEST(test_read_format_rar4_solid_encrypted_filenames)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar4_solid_encrypted_filenames.rar", 1, 1);
+ }
+ 
+ DEFINE_TEST(test_read_format_rar5_encrypted)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar5_encrypted.rar", 0, 0);
+ }
+ 
+ DEFINE_TEST(test_read_format_rar5_encrypted_filenames)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar5_encrypted_filenames.rar", 1, 0);
+ }
+ 
+ DEFINE_TEST(test_read_format_rar5_solid_encrypted)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar5_solid_encrypted.rar", 0, 1);
+ }
+ 
+ DEFINE_TEST(test_read_format_rar5_solid_encrypted_filenames)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_encrypted_rar_archive("test_read_format_rar5_solid_encrypted_filenames.rar", 1, 1);
+ }
+diff --git a/libarchive/test/test_read_format_rar_encryption_data.c b/libarchive/test/test_read_format_rar_encryption_data.c
+index 540546a..0865df0 100644
+--- a/libarchive/test/test_read_format_rar_encryption_data.c
++++ b/libarchive/test/test_read_format_rar_encryption_data.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_rar_encryption_data)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted). The headers
+ 	   are NOT encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_rar_encryption_data.rar";
+diff --git a/libarchive/test/test_read_format_rar_encryption_header.c b/libarchive/test/test_read_format_rar_encryption_header.c
+index e54db51..3aed654 100644
+--- a/libarchive/test/test_read_format_rar_encryption_header.c
++++ b/libarchive/test/test_read_format_rar_encryption_header.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_rar_encryption_header)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted) with AES-256. The headers
+ 	   ARE encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_rar_encryption_header.rar";
+diff --git a/libarchive/test/test_read_format_rar_encryption_partially.c b/libarchive/test/test_read_format_rar_encryption_partially.c
+index e68e788..8e3f983 100644
+--- a/libarchive/test/test_read_format_rar_encryption_partially.c
++++ b/libarchive/test/test_read_format_rar_encryption_partially.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_rar_encryption_partially)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file contains one file that is encrypted (foo.txt, password=12345678)
+ 	   and one file that is not encrypted (bar.txt) The header is not encrypted
+ 	   on this file. */
+diff --git a/libarchive/test/test_read_format_zip_encryption_data.c b/libarchive/test/test_read_format_zip_encryption_data.c
+index 4a6502b..d94a4e2 100644
+--- a/libarchive/test/test_read_format_zip_encryption_data.c
++++ b/libarchive/test/test_read_format_zip_encryption_data.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_zip_encryption_data)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted). The headers
+ 	   are NOT encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_zip_encryption_data.zip";
+diff --git a/libarchive/test/test_read_format_zip_encryption_header.c b/libarchive/test/test_read_format_zip_encryption_header.c
+index fb19c14..9a66c54 100644
+--- a/libarchive/test/test_read_format_zip_encryption_header.c
++++ b/libarchive/test/test_read_format_zip_encryption_header.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_zip_encryption_header)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (encrypted) with AES-256. The headers
+ 	   ARE encrypted. Password is "12345678". */
+ 	const char *refname = "test_read_format_zip_encryption_header.zip";
+diff --git a/libarchive/test/test_read_format_zip_encryption_partially.c b/libarchive/test/test_read_format_zip_encryption_partially.c
+index cd5d210..19e49d1 100644
+--- a/libarchive/test/test_read_format_zip_encryption_partially.c
++++ b/libarchive/test/test_read_format_zip_encryption_partially.c
+@@ -26,6 +26,8 @@
+ 
+ DEFINE_TEST(test_read_format_zip_encryption_partially)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file contains one file that is encrypted (foo.txt, password=12345678)
+ 	   and one file that is not encrypted (bar.txt) The header is not encrypted
+ 	   on this file. */
+diff --git a/libarchive/test/test_read_format_zip_malformed.c b/libarchive/test/test_read_format_zip_malformed.c
+index 7e46abd..b96f06b 100644
+--- a/libarchive/test/test_read_format_zip_malformed.c
++++ b/libarchive/test/test_read_format_zip_malformed.c
+@@ -57,5 +57,7 @@ test_malformed1(void)
+ 
+ DEFINE_TEST(test_read_format_zip_malformed)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	test_malformed1();
+ }
+diff --git a/libarchive/test/test_read_format_zip_traditional_encryption_data.c b/libarchive/test/test_read_format_zip_traditional_encryption_data.c
+index 0cf2d0a..31c84fa 100644
+--- a/libarchive/test/test_read_format_zip_traditional_encryption_data.c
++++ b/libarchive/test/test_read_format_zip_traditional_encryption_data.c
+@@ -27,6 +27,8 @@
+ 
+ DEFINE_TEST(test_read_format_zip_traditional_encryption_data)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* This file is password protected (Traditional PKWARE Encrypted).
+ 	   The headers are NOT encrypted. Password is "12345678". */
+ 	const char *refname =
+diff --git a/libarchive/test/test_read_format_zip_winzip_aes.c b/libarchive/test/test_read_format_zip_winzip_aes.c
+index 9b609b4..45a633c 100644
+--- a/libarchive/test/test_read_format_zip_winzip_aes.c
++++ b/libarchive/test/test_read_format_zip_winzip_aes.c
+@@ -134,18 +134,24 @@ test_winzip_aes(const char *refname, int need_libz)
+ 
+ DEFINE_TEST(test_read_format_zip_winzip_aes128)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* WinZip AES-128 encryption. */
+ 	test_winzip_aes("test_read_format_zip_winzip_aes128.zip", 1);
+ }
+ 
+ DEFINE_TEST(test_read_format_zip_winzip_aes256)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* WinZip AES-256 encryption. */
+ 	test_winzip_aes("test_read_format_zip_winzip_aes256.zip", 1);
+ }
+ 
+ DEFINE_TEST(test_read_format_zip_winzip_aes256_stored)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	/* WinZip AES-256 encryption with stored data. */
+ 	test_winzip_aes("test_read_format_zip_winzip_aes256_stored.zip", 0);
+ }
+diff --git a/libarchive/test/test_read_format_zip_winzip_aes_large.c b/libarchive/test/test_read_format_zip_winzip_aes_large.c
+index 4f52bb9..fa66bfd 100644
+--- a/libarchive/test/test_read_format_zip_winzip_aes_large.c
++++ b/libarchive/test/test_read_format_zip_winzip_aes_large.c
+@@ -27,6 +27,8 @@
+ 
+ DEFINE_TEST(test_read_format_zip_winzip_aes256_large)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	const char *refname = "test_read_format_zip_winzip_aes256_large.zip";
+ 	struct archive_entry *ae;
+ 	struct archive *a;
+diff --git a/tar/test/test_option_passphrase.c b/tar/test/test_option_passphrase.c
+index 968a33c..490f6c9 100644
+--- a/tar/test/test_option_passphrase.c
++++ b/tar/test/test_option_passphrase.c
+@@ -8,6 +8,8 @@
+ 
+ DEFINE_TEST(test_option_passphrase)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	const char *reffile = "test_option_passphrase.zip";
+ 
+ 	extract_reference_file(reffile);
+diff --git a/unzip/test/test_P_encryption.c b/unzip/test/test_P_encryption.c
+index e2cf3cd..3350fc7 100644
+--- a/unzip/test/test_P_encryption.c
++++ b/unzip/test/test_P_encryption.c
+@@ -9,6 +9,8 @@
+ /* Test P arg - password protected */
+ DEFINE_TEST(test_P_encryption)
+ {
++	skipping("test fixture stripped from Azure Linux source tarball");
++	return;
+ 	const char *reffile = "test_encrypted.zip";
+ 	int r;
+ 
+-- 
+2.34.1
+
