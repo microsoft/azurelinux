@@ -18,13 +18,20 @@ from __future__ import annotations
 
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from http import HTTPStatus
+from typing import TYPE_CHECKING, cast
 
 import requests
-from azure.identity import DefaultAzureCredential
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+if TYPE_CHECKING:
+    from azure.identity import DefaultAzureCredential
+
+type JsonValue = None | bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue]
+type JsonObject = dict[str, JsonValue]
 
 # JobStatus values from the Control Tower service
 # (azl-ControlTower/ControlTower/Shared/Models/Jobs/JobStatus.cs).
@@ -39,6 +46,7 @@ TERMINAL_FAILURE_STATUSES = frozenset({"Failed", "Cancelled", "CancelledByAdmin"
 # stays terminal on purpose: a missing/blank status is a real problem, not an
 # unrecognized-but-valid new state.
 TERMINAL_STATUSES = TERMINAL_FAILURE_STATUSES | {SUCCESS_STATUS}
+_MAX_ERROR_BODY_CHARS = 4000
 
 
 @dataclass
@@ -84,6 +92,20 @@ def _auth_headers(token: str) -> dict[str, str]:
     }
 
 
+def _append_validation_errors(lines: list[str], errors: object) -> bool:
+    """Append ASP.NET validation errors and report whether any were found."""
+    if not isinstance(errors, dict) or not errors:
+        return False
+
+    lines.append("  validation errors:")
+    for field, messages in errors.items():
+        if isinstance(messages, list):
+            lines.extend(f"    - {field}: {message}" for message in messages)
+        else:
+            lines.append(f"    - {field}: {messages}")
+    return True
+
+
 def format_error(response: requests.Response) -> str:
     """Render a detailed diagnostic string for a failed CT response.
 
@@ -95,7 +117,7 @@ def format_error(response: requests.Response) -> str:
     method = response.request.method if response.request is not None else "?"
     lines: list[str] = [f"HTTP {response.status_code} {response.reason} from {method} {response.url}"]
 
-    body: Any
+    body: object
     try:
         body = response.json()
     except ValueError:
@@ -115,15 +137,7 @@ def format_error(response: requests.Response) -> str:
         if "title" in body and body.get("title") != body.get("error"):
             lines.append(f"  title: {body['title']}")
             matched_known_key = True
-        errors = body.get("errors")
-        if isinstance(errors, dict) and errors:
-            lines.append("  validation errors:")
-            for field, messages in errors.items():
-                if isinstance(messages, list):
-                    for msg in messages:
-                        lines.append(f"    - {field}: {msg}")
-                else:
-                    lines.append(f"    - {field}: {messages}")
+        if _append_validation_errors(lines, body.get("errors")):
             matched_known_key = True
         correlation_id = body.get("correlationId") or body.get("traceId")
         if correlation_id:
@@ -135,10 +149,9 @@ def format_error(response: requests.Response) -> str:
     if not matched_known_key:
         raw = response.text or ""
         if raw:
-            truncated = raw if len(raw) <= 4000 else raw[:4000] + "... [truncated]"
+            truncated = raw if len(raw) <= _MAX_ERROR_BODY_CHARS else raw[:_MAX_ERROR_BODY_CHARS] + "... [truncated]"
             lines.append("  raw body:")
-            for raw_line in truncated.splitlines() or [truncated]:
-                lines.append(f"    {raw_line}")
+            lines.extend(f"    {raw_line}" for raw_line in (truncated.splitlines() or [truncated]))
 
     return "\n".join(lines)
 
@@ -151,7 +164,7 @@ def _request_with_refresh(
     audience: str,
     token_holder: TokenHolder,
     *,
-    json_payload: dict | None = None,
+    json_payload: JsonObject | None = None,
 ) -> requests.Response:
     """Issue a request. On a 401, refresh the bearer token once and retry."""
     response = session.request(
@@ -161,7 +174,7 @@ def _request_with_refresh(
         json=json_payload,
         timeout=(10, 60),
     )
-    if response.status_code == 401:
+    if response.status_code == HTTPStatus.UNAUTHORIZED:
         print(
             "Bearer token rejected (401) — refreshing and retrying once...",
             flush=True,
@@ -177,20 +190,20 @@ def _request_with_refresh(
     return response
 
 
-def _parse_json_object(response: requests.Response, context: str) -> dict:
+def _parse_json_object(response: requests.Response, context: str) -> JsonObject:
     """Parse ``response`` body as a JSON object, raising on non-object payloads."""
     try:
         body = response.json()
     except ValueError as exc:
-        raise RuntimeError(
-            f"{context} returned HTTP {response.status_code} but the body was not valid JSON:\n{response.text}"
-        ) from exc
+        message = f"{context} returned HTTP {response.status_code} but the body was not valid JSON:\n{response.text}"
+        raise RuntimeError(message) from exc
     if not isinstance(body, dict):
-        raise RuntimeError(
+        message = (
             f"{context} returned HTTP {response.status_code} with a non-object "
             f"JSON body (expected an object):\n{response.text}"
         )
-    return body
+        raise RuntimeError(message)  # noqa: TRY004 - a malformed remote response is an operational failure
+    return cast("JsonObject", body)
 
 
 def post_scenario(
@@ -200,10 +213,10 @@ def post_scenario(
     credential: DefaultAzureCredential,
     audience: str,
     token_holder: TokenHolder,
-    payload: dict,
+    payload: JsonObject,
     *,
     context: str,
-) -> dict:
+) -> JsonObject:
     """POST a scenario request and return the parsed response dict.
 
     ``path`` is the API path (e.g. ``/api/Scenario/prcheck``) appended to
@@ -234,7 +247,7 @@ def get_job_status(
     audience: str,
     token_holder: TokenHolder,
     job_id: str,
-) -> dict:
+) -> JsonObject:
     """GET the job status. Refreshes the bearer token on 401 and retries once."""
     url = f"{base_url}/api/Workflow/jobs/status/{job_id}"
     response = _request_with_refresh(session, "GET", url, credential, audience, token_holder)
@@ -243,7 +256,7 @@ def get_job_status(
     return _parse_json_object(response, "Control Tower job status")
 
 
-def _summarize_tasks(tasks: Any) -> str:
+def _summarize_tasks(tasks: object) -> str:
     """Return a compact one-line summary of task statuses (e.g. ``3/5 Completed``)."""
     if not isinstance(tasks, list) or not tasks:
         return ""
@@ -251,7 +264,8 @@ def _summarize_tasks(tasks: Any) -> str:
     counts: dict[str, int] = {}
     for task in tasks:
         if isinstance(task, dict):
-            status = task.get("status", "Unknown")
+            raw_status = task.get("status")
+            status = raw_status if isinstance(raw_status, str) else "Unknown"
             counts[status] = counts.get(status, 0) + 1
     parts = ", ".join(f"{count} {status}" for status, count in sorted(counts.items()))
     return f"{total} tasks ({parts})"
@@ -285,7 +299,7 @@ def poll_until_terminal(
     token_holder: TokenHolder,
     job_id: str,
     poll_timeout_seconds: int,
-) -> tuple[dict, bool]:
+) -> tuple[JsonObject, bool]:
     """Poll the job status until it reaches a terminal state or the timeout expires.
 
     Returns ``(last_status_dict, timed_out)``:
@@ -298,11 +312,12 @@ def poll_until_terminal(
     start = time.monotonic()
     deadline = start + poll_timeout_seconds
     previous_status: str | None = None
-    job_status_object: dict = {}
+    job_status_object: JsonObject = {}
 
     while True:
         job_status_object = get_job_status(session, base_url, credential, audience, token_holder, job_id)
-        current_status = job_status_object.get("status", "Unknown")
+        raw_status = job_status_object.get("status")
+        current_status = raw_status if isinstance(raw_status, str) else "Unknown"
         elapsed = int(time.monotonic() - start)
 
         if current_status != previous_status:
@@ -352,13 +367,13 @@ def poll_until_terminal(
         time.sleep(min(interval_seconds, max(1, int(remaining))))
 
 
-def print_final_status(final: dict) -> None:
+def print_final_status(final: JsonObject) -> None:
     """Pretty-print the final job status payload."""
     print("Final job status payload:")
     print(json.dumps(final, indent=2, default=str))
 
 
-def report_failure(final: dict) -> None:
+def report_failure(final: JsonObject) -> None:
     """Emit ADO-style error lines with the most actionable fields from ``final``."""
     status = final.get("status", "Unknown")
     error_message = final.get("errorMessage")

@@ -45,29 +45,32 @@ def _load_components_from_file(path: Path) -> list[str]:
     ``changeType`` value fails closed rather than being forwarded to
     Control Tower.
     """
-    ALLOWED_UPLOAD_TYPES = {"added", "changed"}
+    allowed_upload_types = {"added", "changed"}
 
     try:
         raw = path.read_text(encoding="utf-8")
     except OSError as exc:
-        raise SystemExit(f"##[error]Failed to read --changed-components-file {path!s}: {exc}") from exc
+        message = f"##[error]Failed to read --changed-components-file {path!s}: {exc}"
+        raise SystemExit(message) from exc
 
     try:
         entries = json.loads(raw)
     except json.JSONDecodeError as exc:
-        raise SystemExit(f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}") from exc
+        message = f"##[error]--changed-components-file {path!s} is not valid JSON: {exc}"
+        raise SystemExit(message) from exc
 
     if not isinstance(entries, list):
-        raise SystemExit(
+        message = (
             f"##[error]--changed-components-file {path!s} top-level value "
             f"must be a JSON array (got {type(entries).__name__})."
         )
+        raise SystemExit(message)
 
     components: list[str] = []
     for entry in entries:
         if not isinstance(entry, dict):
             continue
-        if entry.get("changeType") not in ALLOWED_UPLOAD_TYPES:
+        if entry.get("changeType") not in allowed_upload_types:
             continue
         if entry.get("sourcesChange") is True:
             name = entry.get("component")
@@ -131,7 +134,26 @@ def _parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _build_payload(args: argparse.Namespace, components: list[str]) -> ct.JsonObject:
+    """Build the Control Tower prcheck request payload."""
+    payload: ct.JsonObject = {
+        "components": components,
+        "buildReason": args.build_reason,
+        "repoUri": args.repo_uri,
+    }
+    if args.source_commit is not None:
+        payload["sourceCommitSha"] = args.source_commit
+    if args.source_branch is not None:
+        payload["sourceBranch"] = args.source_branch
+    if args.target_commit is not None:
+        payload["targetCommitSha"] = args.target_commit
+    if args.target_branch is not None:
+        payload["targetBranch"] = args.target_branch
+    return payload
+
+
 def main() -> None:
+    """Submit a prcheck job and wait for its terminal status."""
     args = _parse_args()
 
     if args.poll_timeout_seconds <= 0:
@@ -149,19 +171,7 @@ def main() -> None:
     base_url = args.api_base_url.rstrip("/")
 
     # ── Build payload ────────────────────────────────────────────────
-    payload: dict = {
-        "components": components,
-        "buildReason": args.build_reason,
-        "repoUri": args.repo_uri,
-    }
-    if args.source_commit is not None:
-        payload["sourceCommitSha"] = args.source_commit
-    if args.source_branch is not None:
-        payload["sourceBranch"] = args.source_branch
-    if args.target_commit is not None:
-        payload["targetCommitSha"] = args.target_commit
-    if args.target_branch is not None:
-        payload["targetBranch"] = args.target_branch
+    payload = _build_payload(args, components)
 
     print("Calling Control Tower 'prcheck' endpoint...")
     print("Payload:")
@@ -197,7 +207,7 @@ def main() -> None:
     print(json.dumps(prcheck_response, indent=2, default=str))
 
     job_id = prcheck_response.get("jobId")
-    if not job_id:
+    if not isinstance(job_id, str) or not job_id:
         print("##[error]Control Tower 'prcheck' response did not include a 'jobId'. Cannot poll for job status.")
         sys.exit(1)
 
