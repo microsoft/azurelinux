@@ -21,9 +21,8 @@
 #       on every PR push — a maintainer triggers it after eyeballing the diff,
 #       which bounds "unmerged code consumes build capacity / runs in CT" to an
 #       explicit human decision. See the reviewer-gate prerequisite below.
-# run_package_build.py enforces the matching invariant: it refuses to submit an
-# OFFICIAL (persisted) build for a PR trigger -- scratch is the default, so the
-# PR check only ever produces throwaway builds.
+# run_scratch_package_build.py has no official endpoint or mode switch, so this
+# PR check can only submit throwaway builds.
 #
 # NonOfficial: this is PR validation. It calls the Control Tower DEV endpoint
 # (via the DEV service connection) and produces only scratch builds; it is not
@@ -97,11 +96,11 @@ extends:
           artifactBaseName: prcheckct
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          # Control Tower package target for the 4.0 branch.
-          packageTarget: azl4
+          # Distro-config RPM build-environment for the 4.0 branch.
+          packageEnvironment: "4.0"
           # This check WAITS for the Control Tower build to finish (pass/fail),
           # so the job must cover the full build. pollTimeoutSeconds caps how
-          # long run_package_build.py waits (21600 = 6h, our worst-case build);
+          # long run_scratch_package_build.py waits (21600 = 6h, our worst-case build);
           # timeoutInMinutes sits above that plus setup headroom, so the
           # script's own clear failure fires before ADO blunt-kills the job.
           # Raise both together if a legitimate build is being killed.
