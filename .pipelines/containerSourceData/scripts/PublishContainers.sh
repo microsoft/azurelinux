@@ -88,40 +88,56 @@ function acr_login {
         --password "$oras_access_token"
 }
 
+# Retry a registry-touching command with exponential backoff.
+# ACR occasionally returns transient "error pinging v2 registry" /
+# connection-timeout errors while a long-running publish batch is in flight.
+# Any docker/oras call that talks to ACR should be wrapped here.
+# $1: human-readable description (for logging)
+# $2..: command + args to invoke
+function retry_registry_op {
+    local desc=$1; shift
+    local max_retries=${MAX_REGISTRY_RETRIES:-5}
+    local retry_count=0
+    local backoff=5
+
+    while [ $retry_count -lt $max_retries ]; do
+        echo "+++ $desc (attempt $((retry_count + 1))/$max_retries)"
+        if "$@"; then
+            return 0
+        fi
+        retry_count=$((retry_count + 1))
+        if [ $retry_count -lt $max_retries ]; then
+            echo "+++ $desc failed; retrying in ${backoff}s..."
+            sleep $backoff
+            backoff=$((backoff * 2))
+        else
+            echo "+++ $desc failed after $max_retries attempts"
+            return 1
+        fi
+    done
+}
+
 # Attach the end-of-life annotation to the container image.
 # $1: image name
 function oras_attach {
     local image_name=$1
-    local max_retries=3
-    local retry_count=0
-
-    while [ $retry_count -lt $max_retries ]; do
-        echo "+++ Attempting to attach lifecycle annotation to $image_name (attempt $((retry_count + 1))/$max_retries)"
-        
-        if oras attach \
+    retry_registry_op "attach lifecycle annotation to $image_name" \
+        oras attach \
             --artifact-type "application/vnd.microsoft.artifact.lifecycle" \
             --annotation "vnd.microsoft.artifact.lifecycle.end-of-life.date=$END_OF_LIFE_1_YEAR" \
-            "$image_name"; then
-            echo "+++ Successfully attached lifecycle annotation to $image_name"
-            return 0
-        else
-            retry_count=$((retry_count + 1))
-            if [ $retry_count -lt $max_retries ]; then
-                echo "+++ Failed to attach lifecycle annotation to $image_name. Retrying in 5 seconds..."
-                sleep 5
-            else
-                echo "+++ Failed to attach lifecycle annotation to $image_name after $max_retries attempts"
-                return 1
-            fi
-        fi
-    done
+            "$image_name"
 }
 
 # Detach the end-of-life annotation from the container image.
 # $1: image name
 function oras_detach {
     local image_name=$1
-    lifecycle_manifests=$(oras discover -o json  --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name")
+    local lifecycle_manifests
+    if ! lifecycle_manifests=$(retry_registry_op "discover lifecycle manifests for $image_name" \
+                                oras discover -o json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
+        echo "+++ Warning: could not discover lifecycle manifests for $image_name; skipping detach"
+        return
+    fi
     manifests=$(echo "$lifecycle_manifests" | jq -r '.manifests')
 
     if [[ -z $manifests ]]; then
@@ -136,7 +152,8 @@ function oras_detach {
         digest=$(echo "$lifecycle_manifests" | jq -r ".manifests[$i].digest")
         echo "Deleting manifest with digest: $digest"
         imageNameWithoutTag=${image_name%:*}
-        oras manifest delete --force "$imageNameWithoutTag@$digest"
+        retry_registry_op "delete lifecycle manifest $imageNameWithoutTag@$digest" \
+            oras manifest delete --force "$imageNameWithoutTag@$digest"
     done
 }
 
@@ -218,19 +235,22 @@ function create_multi_arch_tags {
     fi
 
     # create, annotate, and push manifest
-    docker manifest create "$full_multiarch_tag" --amend "$original_container-amd64"
+    retry_registry_op "docker manifest create $full_multiarch_tag (amd64)" \
+        docker manifest create "$full_multiarch_tag" --amend "$original_container-amd64"
     docker manifest annotate "$full_multiarch_tag" "$original_container-amd64" \
         --os-version "$OS_VERSION_PREFIX$azure_linux_version"
 
     if [[ $architecture_build == *"ARM64"*  ]]; then
-        docker manifest create "$full_multiarch_tag" --amend "$original_container-arm64"
+        retry_registry_op "docker manifest create $full_multiarch_tag (arm64)" \
+            docker manifest create "$full_multiarch_tag" --amend "$original_container-arm64"
         docker manifest annotate "$full_multiarch_tag" "$original_container-arm64" \
             --os-version "$OS_VERSION_PREFIX$azure_linux_version" \
             --variant "v8"
     fi
 
     echo "+++ push $full_multiarch_tag tag"
-    docker manifest push "$full_multiarch_tag"
+    retry_registry_op "docker manifest push $full_multiarch_tag" \
+        docker manifest push "$full_multiarch_tag"
     echo "+++ $full_multiarch_tag tag pushed successfully"
     oras_detach "$full_multiarch_tag"
     oras_attach "$full_multiarch_tag"
