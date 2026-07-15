@@ -49,7 +49,14 @@ def load_build_components(path: Path) -> list[str]:
         raise SystemExit(1)
 
     components: list[str] = []
-    for entry in entries:
+    for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            print(
+                f"##[error]--changed-components-file {path!s} entry {index} "
+                f"must be a JSON object (got {type(entry).__name__})."
+            )
+            raise SystemExit(1)
+
         change_type = entry.get("changeType")
         if change_type not in known_change_types:
             print(
@@ -59,7 +66,14 @@ def load_build_components(path: Path) -> list[str]:
             )
             raise SystemExit(1)
         if change_type in build_change_types:
-            components.append(entry["component"])
+            component = entry.get("component")
+            if not isinstance(component, str) or not component:
+                print(
+                    f"##[error]--changed-components-file {path!s} entry {index} "
+                    f"must contain a non-empty string 'component' for changeType {change_type!r}."
+                )
+                raise SystemExit(1)
+            components.append(component)
 
     return sorted(set(components))
 

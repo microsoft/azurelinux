@@ -5,24 +5,21 @@
 # check. It calls Control Tower 'prcheck' (which uploads the changed
 # components' missing lookaside sources) and then submits a *scratch* Control
 # Tower build of those components, WAITS for that build to finish, and fails
-# the check if the build fails (or is rejected). The build runs in Control
-# Tower's own sandbox — NO PR-controlled code is built on the CI agent (only
-# read-only change detection runs there).
+# the check if the build fails (or is rejected). The package build runs in
+# Control Tower's own sandbox; checkout-controlled pipeline helpers still run
+# on the CI agent under the configured service connection.
 #
 # This file owns all OneBranch-specific wiring (governed templates repo,
 # NonOfficial variant, featureFlags) and delegates the actual stages/jobs/steps
 # to the raw stages template at:
 #   .github/workflows/ado/templates/pr-check-ct-stages.yml
 #
-# WHY SCRATCH + REVIEWER-GATED: building unmerged PR code is only safe because
-#   (a) it is a *scratch* build (throwaway, never persisted to a production
-#       repo), so a malicious PR cannot poison published artifacts, and
-#   (b) the check is REVIEWER-GATED: it is wired in ADO so it does NOT auto-run
-#       on every PR push — a maintainer triggers it after eyeballing the diff,
-#       which bounds "unmerged code consumes build capacity / runs in CT" to an
-#       explicit human decision. See the reviewer-gate prerequisite below.
-# run_scratch_package_build.py has no official endpoint or mode switch, so this
-# PR check can only submit throwaway builds.
+# WHY SCRATCH + REVIEWER-GATED: the checked-in scratch-only runner has no
+# official endpoint or mode switch, which prevents accidental official
+# submissions. This is not an authorization boundary because a PR can modify
+# checkout-controlled helpers. The current security control is the ADO reviewer
+# gate: this pipeline does NOT auto-run on every PR push, and a maintainer
+# triggers it only after inspecting the diff. See the prerequisite below.
 #
 # NonOfficial: this is PR validation. It calls the Control Tower DEV endpoint
 # (via the DEV service connection) and produces only scratch builds; it is not

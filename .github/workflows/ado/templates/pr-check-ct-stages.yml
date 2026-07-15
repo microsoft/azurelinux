@@ -117,12 +117,12 @@ stages:
               # reserved variables are silently ignored by the agent).
 
           # Submit a SCRATCH Control Tower build of the PR head for the changed
-          # components. Scratch = throwaway: it never persists to a production
-          # repo, so building unmerged PR code is safe. The scratch-only runner
-          # has no official endpoint or mode switch. --wait-for-completion
-          # blocks until the build reaches a terminal state and fails the check
-          # on a build failure (or on poll-timeout). No PR code is built on this
-          # agent.
+          # components. Scratch artifacts are throwaway and are not persisted to
+          # a production repo. The scratch-only runner has no official endpoint
+          # or mode switch, preventing accidental official submissions. This is
+          # not an authorization boundary: PR code can modify checkout-controlled
+          # helpers. --wait-for-completion blocks until the build reaches a
+          # terminal state and fails the check on failure or poll timeout.
           #
           # This step assumes the pipeline is wired as a REVIEWER-GATED check in
           # ADO: it should not auto-run on every PR push, so a maintainer
