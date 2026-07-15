@@ -1,0 +1,33 @@
+From: Thien Trung Vuong <tvuong@microsoft.com>
+Date: Thu, 16 Jul 2026 00:00:00 +0000
+Subject: [PATCH] tests: do not build the Windows phony-guest image
+
+The Windows phony guest (test-data/phony-guests/windows.img) is generated
+at "make check" time by make-windows-img.sh, which partitions a disk inside
+the libguestfs appliance and runs "mkfs ntfs" on the new partitions. In a
+build environment without /dev/kvm the appliance runs under slow TCG
+emulation, where the partition device node (/dev/sda1) is not always created
+by udev before mkfs runs; the image build then fails with
+"mkfs: /dev/sda1: No such file or directory". Because windows.img is
+check_DATA, that failure takes down the entire %check.
+
+Azure Linux does not test Windows guests, so drop windows.img from the
+phony-guest image set. guests-all-good.xml (used by the *-guests tests) is
+generated only from images that exist -- make-guests-all-good.pl skips
+missing/empty files -- and the windows domain that remains in guests.xml is
+tolerated by the tests as a deliberately-missing disk.
+---
+diff --git a/test-data/phony-guests/Makefile.am b/test-data/phony-guests/Makefile.am
+index ad6457431b..e7d57ecbc9 100644
+--- a/test-data/phony-guests/Makefile.am
++++ b/test-data/phony-guests/Makefile.am
+@@ -53,8 +53,7 @@ disk_images = \
+ 	fedora-lvm-on-luks.img \
+ 	ubuntu.img \
+ 	archlinux.img \
+-	coreos.img \
+-	windows.img
++	coreos.img
+ 
+ # This is 'check_DATA' because we don't need it until 'make check'
+ # time and we need the tools we have built in order to make it.
