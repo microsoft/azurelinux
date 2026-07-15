@@ -7,7 +7,7 @@ License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.libarchive.org/
-Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}-v1.tar.gz
+Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}-stripped.tar.gz
 Patch0:         CVE-2025-1632.patch
 Patch1:         CVE-2025-25724.patch
 Patch2:         CVE-2025-5914.patch
@@ -20,7 +20,7 @@ Patch8:         CVE-2026-4111.patch
 Patch9:         CVE-2026-4424.patch
 Patch10:        CVE-2026-4426.patch
 Patch11:        CVE-2026-5121.patch
-# Skip encrypted corrupted ptests
+# Skip encrypted corrupted ptests (includes removal of CVE corrupted files also)
 Patch12:        skip-stripped-fixture-tests.patch
 
 Provides:       bsdtar = %{version}-%{release}
