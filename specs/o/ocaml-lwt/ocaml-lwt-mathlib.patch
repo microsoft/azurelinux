@@ -1,0 +1,10 @@
+--- lwt-5.9.0/src/retry/dune.orig	2024-11-13 07:20:29.000000000 -0700
++++ lwt-5.9.0/src/retry/dune	2024-12-13 16:10:56.455465198 -0700
+@@ -13,6 +13,7 @@ let () = Jbuild_plugin.V1.send @@ {|
+  (synopsis "A utility for retrying Lwt computations")
+  (wrapped false)
+  (libraries lwt lwt.unix)
++ (c_library_flags -lm)
+  |} ^ preprocess ^ {|
+  (flags (:standard -w +A)))
+ 
