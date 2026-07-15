@@ -2233,6 +2233,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.ocaml-fileutils]
 [components.ocaml-findlib]
 [components.ocaml-fmt]
+[components.ocaml-gettext]
 [components.ocaml-intrinsics-kernel]
 [components.ocaml-labltk]
 [components.ocaml-lwt]
