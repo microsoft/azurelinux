@@ -1,6 +1,6 @@
 {
   "Signatures": {
-    "trident-0.24.0.tar.gz": "945ba4516c361868decd9d314eca85cf1823937c0eea82537de37030d9d0a7ac",
-    "trident-0.24.0-cargo.tar.gz": "a56e87bb7cb84b969ae4c22402896e5edd0d19c2345d2c0f71d6c269d2a42c24"
+    "trident-0.25.0.tar.gz": "a53b276174319a1efaffb08bceaa48a129cb4c3d51075a0c0fdcaff5ba7d2da3",
+    "trident-0.25.0-cargo.tar.gz": "5acf73ecd949562784529ecae569697b9bac75cb81256965769622b02d85017b"
   }
 }
