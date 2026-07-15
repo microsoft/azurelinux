@@ -2238,6 +2238,7 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.ocaml-lwt]
 [components.ocaml-ocamlbuild]
 [components.ocaml-ocplib-endian]
+[components.ocaml-ounit]
 [components.ocaml-pp]
 [components.ocaml-ppx-derivers]
 [components.ocaml-ppx-here]
