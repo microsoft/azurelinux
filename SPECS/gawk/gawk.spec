@@ -1,13 +1,16 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gawk
 Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-40467.patch
+Patch1:         CVE-2026-40468.patch
+Patch2:         CVE-2026-40553.patch
 Requires:       gmp
 Requires:       mpfr
 Requires:       readline >= 7.0
@@ -20,6 +23,9 @@ The Gawk package contains programs for manipulating text files.
 
 %prep
 %setup -q
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
 
 %build
 %configure \
@@ -63,6 +69,9 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.2-2
+- Patch for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
 
