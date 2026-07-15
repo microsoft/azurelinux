@@ -321,6 +321,48 @@
         "justification": "Needed to see early logging in serial console - PR: https://github.com/microsoft/azurelinux/pull/6888"
       },
       {
+        "name": "CONFIG_CRYPTO",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_AES",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_ANSI_CPRNG",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
         "name": "CONFIG_CRYPTO_ARC4",
         "values": [
           {
@@ -332,7 +374,21 @@
             "value": "m"
           }
         ],
-        "justification": "Enable FIPS crypto configs and dependencies for arm64"
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_CTR",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
       },
       {
         "name": "CONFIG_CRYPTO_DEV_BCM_SPU",
@@ -344,6 +400,132 @@
         ],
         "justification": "Enable FIPS crypto configs and dependencies for arm64"
       },
+        {
+          "name": "CONFIG_CRYPTO_DRBG",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_DRBG_CTR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_DRBG_HASH",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_DRBG_HMAC",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_FIPS",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_JITTERENTROPY_OSR",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "3"
+            },
+            {
+              "architecture": "arm64",
+              "value": "3"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_RNG",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
+        {
+          "name": "CONFIG_CRYPTO_RNG2",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "y"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
+            }
+          ],
+          "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+        },
       {
         "name": "CONFIG_CRYPTO_DH",
         "values": [
@@ -415,6 +597,62 @@
         "justification": "Present since initial kernel configuration"
       },
       {
+        "name": "CONFIG_CRYPTO_SELFTESTS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_SHA256",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_SHA3",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_CRYPTO_SHA512",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
         "name": "CONFIG_CUSE",
         "values": [
           {
@@ -427,6 +665,34 @@
           }
         ],
         "justification": "Enable CUSE to support Nvidia rshim interface for Azure Linux hosts - PR: https://github.com/microsoft/azurelinux/pull/6853"
+      },
+      {
+        "name": "CONFIG_HW_RANDOM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "y"
+          },
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
+      },
+      {
+        "name": "CONFIG_HW_RANDOM_TIMERIOMEM",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
       },
       {
         "name": "CONFIG_DEBUG_PREEMPT",
@@ -2767,7 +3033,7 @@
           "values": [
             {
               "architecture": "x86_64",
-              "value": "m"
+              "value": "n"
             },
             {
               "architecture": "arm64",
@@ -2780,11 +3046,15 @@
           "name": "CONFIG_HSA_AMD_SVM",
           "values": [
             {
-              "architecture": "arm64",
+              "architecture": "x86_64",
               "value": "n"
+            },
+            {
+              "architecture": "arm64",
+              "value": "y"
             }
           ],
-          "justification": "kernel does not enable HSA_AMD_SVM on arm64 - PR: https://github.com/microsoft/azurelinux/pull/14660"
+          "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
           "name": "CONFIG_NUMA_BALANCING",
@@ -2815,14 +3085,14 @@
           "values": [
             {
               "architecture": "x86_64",
-              "value": "m"
+              "value": "n"
             },
             {
               "architecture": "arm64",
-              "value": "m"
+              "value": "n"
             }
           ],
-          "justification": "kernel: Enable CONFIG_TCP_CONG_BBR3 - PR: https://github.com/microsoft/azurelinux/pull/16044"
+          "justification": "Align kernel 6.18 with its generated configuration"
         },
         {
           "name": "CONFIG_UCLAMP_TASK",
@@ -2875,6 +3145,340 @@
             }
           ],
           "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/60759133"
+        },
+        {
+          "name": "CONFIG_BLK_CGROUP_IOLATENCY",
+          "values": [
+            { "architecture": "x86_64", "value": "n" },
+            { "architecture": "arm64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_CRYPTO_ARC4",
+          "values": [
+            { "architecture": "x86_64", "value": "n" },
+            { "architecture": "arm64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_CRYPTO_DH",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_CRYPTO_ECDSA",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DMI_SYSFS",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DRM",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DRM_KMS_HELPER",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DRM_VGEM",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DXGKRNL",
+          "values": [
+            { "architecture": "x86_64", "value": "n" },
+            { "architecture": "arm64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_HSA_AMD",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_HSA_AMD_P2P",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_INFINIBAND_BNXT_RE",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_IP_VS_DEBUG",
+          "values": [
+            { "architecture": "x86_64", "value": "n" },
+            { "architecture": "arm64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_ISO9660_FS",
+          "values": [
+            { "architecture": "x86_64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_MCTP",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NFT_DUP_NETDEV",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NFT_FWD_NETDEV",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NFT_REJECT_NETDEV",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NF_CONNTRACK_PROCFS",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NF_CT_NETLINK_HELPER",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_NF_DUP_NETDEV",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_ROSE",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_SECURITY_SMACK",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_SEV_GUEST",
+          "values": [
+            { "architecture": "x86_64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_SMB_SERVER",
+          "values": [
+            { "architecture": "x86_64", "value": "m" },
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_TDX_GUEST_DRIVER",
+          "values": [
+            { "architecture": "x86_64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_TUN",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_USB_HIDDEV",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_USB_SERIAL_CH341",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_USB_TMC",
+          "values": [
+            { "architecture": "x86_64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_XFS_SUPPORT_V4",
+          "values": [
+            { "architecture": "x86_64", "value": "y" },
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_ZONE_DMA",
+          "values": [
+            { "architecture": "x86_64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_ARM_SMMU_QCOM_DEBUG",
+          "values": [
+            { "architecture": "arm64", "value": "n" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_DMABUF_MOVE_NOTIFY",
+          "values": [
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_FPGA_DFL_AFU",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_GPIO_MLXBF2",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_MMC_DW",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_MMC_DW_PLTFM",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_PATA_LEGACY",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_PCI_P2PDMA",
+          "values": [
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_PHY_RTK_RTD_USB2PHY",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_PHY_RTK_RTD_USB3PHY",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_SENSORS_MLXREG_FAN",
+          "values": [
+            { "architecture": "arm64", "value": "m" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
+        },
+        {
+          "name": "CONFIG_VIRTIO_CONSOLE",
+          "values": [
+            { "architecture": "arm64", "value": "y" }
+          ],
+          "justification": "Align kernel 6.18 with its generated configuration"
         }
       ]
     },
