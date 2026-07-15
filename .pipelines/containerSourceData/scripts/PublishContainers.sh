@@ -134,7 +134,7 @@ function oras_detach {
     local image_name=$1
     local lifecycle_manifests
     if ! lifecycle_manifests=$(retry_registry_op "discover lifecycle manifests for $image_name" \
-                                oras discover -o json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
+                                oras discover --format json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
         echo "+++ Warning: could not discover lifecycle manifests for $image_name; skipping detach"
         return
     fi
