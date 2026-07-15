@@ -1,0 +1,19 @@
+# Fedora ships openbios as a single noarch RPM (built once on x86_64), so it
+# never compiles forthstrap on aarch64 and never hits the segfault,
+# so this is an AZL build-infrastructure difference, not a genuine
+# per-arch binary adjustment. Hence azl-compatibility, and inapplicable since
+# upstream would not add ExclusiveArch: x86_64 to a noarch package.
+
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://github.com/openbios/openbios/issues/18" },
+    { url = "https://github.com/openbios/openbios/issues/25" },
+]
+
+[[overlays]]
+description = "Restrict build to x86_64 — forthstrap segfaults on aarch64 (upstream bug #18/#25)"
+type = "spec-add-tag"
+tag = "ExclusiveArch"
+value = "x86_64"

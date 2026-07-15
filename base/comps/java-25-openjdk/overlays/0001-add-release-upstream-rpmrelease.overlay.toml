@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Add azl_release to upstream %{rpmrelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = "^Release:\\s+%\\{\\?eaprefix\\}%\\{rpmrelease\\}%\\{\\?extraver\\}%\\{\\?dist\\}$"
+replacement = "Release: %{?eaprefix}%[%{rpmrelease} + %{azl_release}]%{?extraver}%{?dist}"

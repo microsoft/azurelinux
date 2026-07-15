@@ -1,12 +1,3 @@
 [components.shim-unsigned-aarch64]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "67c1d520f9a8080f6b689714099f813f23154c8f" }
 
-overlays = [
-    # Workaround: add dist tag to the release to avoid NEVR conflicts
-    # while we are still rebuilding all packages in new tags nightly.
-    { type = "spec-update-tag", tag = "Release", value = "2%{?dist}" },
-
-    # Workaround: create a compat symlink that does not include the dist tag.
-    { type = "spec-append-lines", section = "%install", lines = ["ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2"] },
-    { type = "spec-append-lines", section = "%files", lines = ["%{_datadir}/shim/%{version}-2"] }
-]

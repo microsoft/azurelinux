@@ -8,8 +8,3 @@
 # Release: 1.git%{hash}%{?dist}
 release = { calculation = "manual" }
 
-[[components.openbios.overlays]]
-description = "Restrict build to x86_64 — forthstrap segfaults on aarch64 (upstream bug #18/#25)"
-type = "spec-add-tag"
-tag = "ExclusiveArch"
-value = "x86_64"

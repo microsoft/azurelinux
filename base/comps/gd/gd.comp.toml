@@ -5,10 +5,3 @@ release = { calculation = "manual" }
 # AZL does not ship libavif — disable avif support.
 # The avif bcond defaults ON via %bcond_without on Fedora.
 build.without = ["avif"]
-
-# Bump release for avif removal rebuild.
-[[components.gd.overlays]]
-description = "Bump release for avif removal rebuild"
-type = "spec-set-tag"
-tag = "Release"
-value = "20%{?prever}%{?short}%{?dist}"

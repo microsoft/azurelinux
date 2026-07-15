@@ -1,0 +1,125 @@
+# AZL kmod subpackage framework: build out-of-tree modules (nvidia-open)
+# as subpackages of the kernel via phase-gated .inc includes and anchor
+# sentinels. An AZL-specific way of shipping kernel modules.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# ============================================================================
+# kmod subpackage framework — modular kmod builds alongside the kernel
+#
+# This framework allows building out-of-tree kernel modules as subpackages of
+# the kernel RPM. Each kmod is defined in its own .inc file (e.g.
+# kmod-nvidia-open.inc) with phase-gated sections that run at each RPM build
+# phase (%description, %prep, %build, %install, %files).
+#
+# To add a new kmod:
+#   1. Create kmod-<name>.inc with phase-gated sections
+#   2. Add file-add overlays for .inc and any extra source files
+#   3. Add spec-insert-tag overlays to register sources (Source6xxx range)
+#   4. Add spec-search-replace overlays targeting the AZL-KMOD-*-ANCHOR
+#      sentinels for each phase (the anchor survives replacement so the
+#      next kmod can chain onto it)
+# ============================================================================
+
+# --- kmod-nvidia-open: source file registration ---
+# Registers the NVIDIA open GPU kernel module sources and configuration files.
+# Source numbers 6000-6099 are reserved for nvidia-open.
+[[overlays]]
+description = "Add kmod-nvidia-open.inc subpackage definition to sources"
+type = "file-add"
+file = "kmod-nvidia-open.inc"
+source = "../kmod-nvidia-open.inc"
+[[overlays]]
+description = "Add NVIDIA modprobe config file for kmod-nvidia-open subpackage"
+type = "file-add"
+file = "kmod-nvidia-open-modprobe.conf"
+source = "../kmod-nvidia-open-modprobe.conf"
+[[overlays]]
+description = "Register NVIDIA open-gpu-kernel-modules tarball as Source6000"
+type = "spec-insert-tag"
+tag = "Source6000"
+value = "open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz"
+[[overlays]]
+description = "Register NVIDIA modprobe config as Source6001"
+type = "spec-insert-tag"
+tag = "Source6001"
+value = "kmod-nvidia-open-modprobe.conf"
+[[overlays]]
+description = "Register kmod-nvidia-open.inc as Source6002"
+type = "spec-insert-tag"
+tag = "Source6002"
+value = "kmod-nvidia-open.inc"
+# --- kmod framework: phase anchor insertion ---
+# These overlays insert unique sentinel comments at unconditional locations in
+# the upstream spec. Per-kmod overlays below target these sentinels with
+# spec-search-replace, replacing SENTINEL with <kmod include> + SENTINEL so
+# each sentinel survives for the next kmod to chain onto.
+[[overlays]]
+description = "Insert kmod package anchor after main %description — unconditional location for kmod subpackage declarations"
+type = "spec-append-lines"
+section = "%description"
+lines = ["", "# AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)"]
+[[overlays]]
+description = "Insert kmod prep anchor at end of %prep — unconditional location for kmod source extraction"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["", "# AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)"]
+[[overlays]]
+description = "Insert kmod build anchor before modsign macros — unconditional location at the end of the active %build body"
+type = "spec-search-replace"
+regex = "# Module signing \\(modsign\\)"
+replacement = "# AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)\n\n# Module signing (modsign)"
+# Module signing (modsign)"""
+[[overlays]]
+description = "Insert kmod install anchor before ### clean — unconditional location at the end of the active %install body"
+type = "spec-search-replace"
+regex = "### clean"
+replacement = "# AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)\n\n###\n### clean"
+###
+### clean"""
+[[overlays]]
+description = "Insert kmod files anchor after %files modules-extra-matched — unconditional location for kmod file lists"
+type = "spec-append-lines"
+section = "%files"
+package = "modules-extra-matched"
+lines = ["", "# AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)"]
+# --- kmod-nvidia-open: phase injection ---
+# RPM %include is a preprocessor directive — it must appear directly in the spec
+# text (not inside a %define macro). Each phase sets _kmod_phase and _kmod_name
+# globals, then includes the kmod .inc file. The .inc file's %if guards select
+# the correct section for that phase.
+#
+# To add a new kmod: duplicate the phase blocks below, changing _kmod_name and
+# the %include path. Each block targets the framework anchor for its phase.
+[[overlays]]
+description = "Run kmod 'package' phase at package anchor — declares kmod subpackages"
+type = "spec-search-replace"
+regex = "# AZL-KMOD-PACKAGE-ANCHOR"
+replacement = "# AZL: kmod subpackage declarations (nvidia-open)\n%global _kmod_phase package\n%global _kmod_name nvidia-open\n%include %{_sourcedir}/kmod-nvidia-open.inc\n\n# AZL-KMOD-PACKAGE-ANCHOR"
+# AZL-KMOD-PACKAGE-ANCHOR"""
+[[overlays]]
+description = "Run kmod 'prep' phase at prep anchor — extracts kmod source tarballs"
+type = "spec-search-replace"
+regex = "# AZL-KMOD-PREP-ANCHOR"
+replacement = "# AZL: Prepare kmod subpackage sources (nvidia-open)\n%global _kmod_phase prep\n%global _kmod_name nvidia-open\n%include %{_sourcedir}/kmod-nvidia-open.inc\n\n# AZL-KMOD-PREP-ANCHOR"
+# AZL-KMOD-PREP-ANCHOR"""
+[[overlays]]
+description = "Run kmod 'build' phase at build anchor — compiles NVIDIA modules against the just-built kernel"
+type = "spec-search-replace"
+regex = "# AZL-KMOD-BUILD-ANCHOR"
+replacement = "# AZL: Build kmod subpackage modules (nvidia-open)\n%global _kmod_phase build\n%global _kmod_name nvidia-open\n%include %{_sourcedir}/kmod-nvidia-open.inc\n\n# AZL-KMOD-BUILD-ANCHOR"
+# AZL-KMOD-BUILD-ANCHOR"""
+[[overlays]]
+description = "Run kmod 'install' phase at install anchor — installs NVIDIA modules, configs, and licenses"
+type = "spec-search-replace"
+regex = "# AZL-KMOD-INSTALL-ANCHOR"
+replacement = "# AZL: Install kmod subpackage files (nvidia-open)\n%global _kmod_phase install\n%global _kmod_name nvidia-open\n%include %{_sourcedir}/kmod-nvidia-open.inc\n\n# AZL-KMOD-INSTALL-ANCHOR"
+# AZL-KMOD-INSTALL-ANCHOR"""
+[[overlays]]
+description = "Run kmod 'files' phase at files anchor — adds %post/%postun/%files for NVIDIA kmod subpackage"
+type = "spec-search-replace"
+regex = "# AZL-KMOD-FILES-ANCHOR"
+replacement = "# AZL: kmod subpackage file lists and scriptlets (nvidia-open)\n%global _kmod_phase files\n%global _kmod_name nvidia-open\n%include %{_sourcedir}/kmod-nvidia-open.inc\n\n# AZL-KMOD-FILES-ANCHOR"
+
+# AZL-KMOD-FILES-ANCHOR"""

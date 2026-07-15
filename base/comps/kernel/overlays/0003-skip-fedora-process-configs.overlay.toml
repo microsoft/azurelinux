@@ -1,0 +1,15 @@
+# Skip Fedora's process_configs.sh: the f43 configs target 6.18.13 and
+# fail listnewconfig against our 6.18.31 kernel. We re-run it with AZL
+# configs at the end of %prep. A Fedora version-skew fix for AZL.
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+# Skip the Fedora process_configs.sh run — Fedora f43 configs target 6.18.13 and lack
+# new config options in 6.18.31, causing -n (listnewconfig) to fail. Our AZL overlay at the
+# end of %prep replaces all configs and re-runs process_configs.sh with strict validation.
+[[overlays]]
+description = "Skip Fedora process_configs.sh — f43 configs are for 6.18.13 and fail against 6.18.31 kernel. AZL re-runs at end of %prep."
+type = "spec-search-replace"
+regex = "RHJOBS=\\$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%\\{name\\} \\./process_configs\\.sh \\$OPTS %\\{specrpmversion\\}"
+replacement = "echo \"AZL: skipping Fedora process_configs.sh (re-run with AZL configs below)\" # RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}"

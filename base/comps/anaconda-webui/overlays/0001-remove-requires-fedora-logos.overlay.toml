@@ -1,0 +1,22 @@
+# The upstream Fedora spec requires fedora-logos (gated behind %if 0%{?fedora}).
+# AZL uses generic-logos for branding; fedora-logos is not shipped and breaks
+# repoclosure. Replace with system-logos, the distro-neutral virtual provide.
+# Ref: https://github.com/microsoft/azurelinux/pull/16413 removed fedora-logos
+# from the component list; this patches the consumer side.
+
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/anaconda-webui/c/d4ef9345b8787c46f9280b2239c07b23af83f0aa?branch=f44" }]
+
+[[overlays]]
+description = "Remove Requires: fedora-logos (Fedora-specific)"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "fedora-logos"
+
+[[overlays]]
+description = "Add Requires: system-logos (distro-neutral virtual provide)"
+type = "spec-add-tag"
+tag = "Requires"
+value = "system-logos"
