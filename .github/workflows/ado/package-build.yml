@@ -83,8 +83,8 @@ extends:
           artifactBaseName: packagebuild
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
-          # Control Tower package target for the 4.0 branch.
-          packageTarget: azl4
+          # Distro-config RPM build-environment for the 4.0 branch.
+          packageEnvironment: "4.0"
           poolType: linux
           serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)

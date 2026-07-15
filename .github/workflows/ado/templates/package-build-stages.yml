@@ -21,9 +21,8 @@ parameters:
     type: string
   - name: outputDirectory
     type: string
-  # Control Tower package target for builds submitted from this pipeline
-  # (e.g. azl4 for the 4.0 branch, azl5 for 5.0).
-  - name: packageTarget
+  # Distro-config RPM build-environment used by Control Tower.
+  - name: packageEnvironment
     type: string
   - name: poolType
     type: string
@@ -41,7 +40,7 @@ stages:
         # queue to gate. Fails loud -- any failing step turns the run red so
         # submission/validation breakage is visible rather than masked. The
         # build runs asynchronously in Control Tower/Koji; this pipeline only
-        # submits it and confirms acceptance (see run_package_build.py).
+        # submits it and confirms acceptance (see run_official_package_build.py).
         timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
         pool:
           type: ${{ parameters.poolType }}
@@ -52,12 +51,11 @@ stages:
             value: ${{ parameters.artifactBaseName }}
           - name: ob_outputDirectory
             value: ${{ parameters.outputDirectory }}
-          - name: packageTarget
-            value: ${{ parameters.packageTarget }}
+          - name: packageEnvironment
+            value: ${{ parameters.packageEnvironment }}
         steps:
           # Sets job variables:
           # - changedComponentsFile
-          # - sourceCommit
           - template: steps/get-changes-info.yml
             parameters:
               mode: postmerge
@@ -67,7 +65,7 @@ stages:
               installControlTowerClient: true
 
           - task: AzureCLI@2
-            displayName: "Submit package build to Control Tower"
+            displayName: "Submit official package build to Control Tower"
             inputs:
               azureSubscription: ${{ parameters.serviceConnection }}
               scriptType: bash
@@ -75,15 +73,12 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_package_build.py \
+                python3 scripts/ci/control-tower/run_official_package_build.py \
                   --api-audience "$API_AUDIENCE" \
                   --api-base-url "$API_BASE_URL" \
                   --build-reason "$BUILD_REASON" \
                   --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --package-target "$PACKAGE_TARGET" \
-                  --official-build \
-                  --commit-sha "$SOURCE_COMMIT" \
-                  --repo-uri "$BUILD_REPOSITORY_URI"
+                  --environment "$PACKAGE_ENVIRONMENT"
             env:
               # apiAudience / apiBaseAFDUrl come from the parameters directly
               # (not surfaced as same-named job variables): the wrapper passes
@@ -93,9 +88,7 @@ stages:
               API_AUDIENCE: ${{ parameters.apiAudience }}
               API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              PACKAGE_TARGET: $(packageTarget)
-              SOURCE_COMMIT: $(sourceCommit)
-              # Build.Reason and Build.Repository.Uri are predefined and
-              # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI; reference
-              # them directly and do not map them here (env: overrides of
-              # reserved variables are silently ignored by the agent).
+              PACKAGE_ENVIRONMENT: $(packageEnvironment)
+              # Build.Reason is predefined and auto-exposed as $BUILD_REASON;
+              # reference it directly and do not map it here (env: overrides
+              # of reserved variables are silently ignored by the agent).
