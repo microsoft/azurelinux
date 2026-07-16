@@ -146,7 +146,7 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
 
 # Architecture-specific support.  Internal.  Do not use directly.
 
-%__cflags_arch_x86_64_level %[0%{?rhel} == 9 ? "-v2" : ""]%[0%{?rhel} > 9 ? "-v3" : ""]
+%__cflags_arch_x86_64_level -v2
 %__cflags_arch_x86_64 -march=x86-64%{?__cflags_arch_x86_64_level:%{__cflags_arch_x86_64_level}}
 
 %__cflags_arch_x86_64_common -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection -mtls-dialect=gnu2 %{_frame_pointers_cflags} %{_frame_pointers_cflags_x86_64}
