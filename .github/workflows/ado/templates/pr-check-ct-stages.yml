@@ -6,22 +6,26 @@
 # wrapper-coupled knobs as parameters. The wrapper at
 # .github/workflows/ado/pr-check-ct.yml supplies concrete values.
 #
-# Per PR: gather the change-set info (get-changes-info, mode=pr: full history,
-# deps, commit range, lock + render verification, changed-component set), then
-# call Control Tower 'prcheck' (uploads the changed components' missing
-# lookaside sources) and submit a *scratch* Control Tower build of the PR head
-# for those components, waiting for it to finish. NO PR-controlled code is built
-# on the CI agent -- only read-only change detection runs here.
+# Per PR and deployment: gather the change-set info (get-changes-info, mode=pr:
+# full history, deps, commit range, lock + render verification,
+# changed-component set), then call Control Tower 'prcheck' (uploads the changed
+# components' missing lookaside sources). When skipPackageBuilds is false, also
+# submit a *scratch* Control Tower build of the PR head for those components and
+# wait for it to finish. Each deployment runs in a separate parallel job.
+# Checkout-controlled helpers execute on the CI agent under the
+# deployment-specific service connection; package builds run in Control Tower's
+# sandbox.
 
 parameters:
-  - name: apiAudience
-    type: string
-  - name: apiBaseAFDUrl
-    type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
     type: string
+  # Named map of deployment identifier to apiAudience, apiBaseAFDUrl,
+  # continueOnError, serviceConnection, and skipPackageBuilds.
+  # Identifiers must be valid Azure Pipelines job-name suffixes.
+  - name: deployments
+    type: object
   - name: outputDirectory
     type: string
   # Distro-config RPM build-environment used by Control Tower.
@@ -37,120 +41,127 @@ parameters:
   - name: poolType
     type: string
     default: linux
-  - name: serviceConnection
-    type: string
   - name: timeoutInMinutes
     type: number
 
 stages:
   - stage: PRCheckCT
     jobs:
-      - job: PRCheckCT
-        # Fail-loud: a failed submission, an immediate Control Tower rejection,
-        # or a build that fails (or never reaches a terminal state) turns the PR
-        # check red. The build runs in Control Tower's own sandbox -- NOT on this
-        # agent -- but this pipeline WAITS for it to finish. Size the timeout to
-        # cover the FULL build: it must exceed pollTimeoutSeconds (6h default).
-        timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
-        pool:
-          type: ${{ parameters.poolType }}
-        variables:
-          - name: LinuxContainerImage
-            value: ${{ parameters.containerImage }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: packageEnvironment
-            value: ${{ parameters.packageEnvironment }}
-          - name: pollTimeoutSeconds
-            value: ${{ parameters.pollTimeoutSeconds }}
-        steps:
-          # Sets job variables:
-          # - baseCommit
-          # - changedComponentsFile
-          # - sourceCommit
-          - template: steps/get-changes-info.yml
-            parameters:
-              mode: pr
+      - ${{ each deployment in parameters.deployments }}:
+          - job: PRCheckCT_${{ deployment.key }}
+            displayName: "PR Control Tower check (${{ deployment.key }})"
+            # Fail-loud: a failed submission, an immediate Control Tower
+            # rejection, or a build that fails (or never reaches a terminal
+            # state) turns the PR check red unless that deployment explicitly
+            # allows prcheck errors. Deployment jobs run independently in
+            # parallel, and any failed job fails the stage. The build runs in
+            # Control Tower's own sandbox -- NOT on this agent -- but this
+            # pipeline WAITS for it to finish. Size the timeout to cover the
+            # FULL build: it must exceed pollTimeoutSeconds (6h default).
+            timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+            pool:
+              type: ${{ parameters.poolType }}
+            variables:
+              - name: LinuxContainerImage
+                value: ${{ parameters.containerImage }}
+              - name: ob_artifactBaseName
+                value: ${{ parameters.artifactBaseName }}-${{ deployment.key }}
+              - name: ob_outputDirectory
+                value: ${{ parameters.outputDirectory }}/${{ deployment.key }}
+              - name: packageEnvironment
+                value: ${{ parameters.packageEnvironment }}
+              - name: pollTimeoutSeconds
+                value: ${{ parameters.pollTimeoutSeconds }}
+            steps:
+              # Sets job variables:
+              # - baseCommit
+              # - changedComponentsFile
+              # - sourceCommit
+              - template: steps/get-changes-info.yml
+                parameters:
+                  mode: pr
 
-          - template: steps/install-deps.yml
-            parameters:
-              installControlTowerClient: true
+              - template: steps/install-deps.yml
+                parameters:
+                  installControlTowerClient: true
 
-          # Call Control Tower 'prcheck' BEFORE the build. Among other things,
-          # prcheck uploads the missing lookaside sources for the changed
-          # components, so they are available when the scratch build below
-          # fetches them.
-          - task: AzureCLI@2
-            displayName: "Call Control Tower 'prcheck' API"
-            inputs:
-              azureSubscription: ${{ parameters.serviceConnection }}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -euo pipefail
+              # Call Control Tower 'prcheck' BEFORE the build. Among other
+              # things, prcheck uploads the missing lookaside sources for the
+              # changed components, so they are available when the scratch
+              # build below fetches them.
+              - task: AzureCLI@2
+                displayName: "Call Control Tower 'prcheck' API (${{ deployment.key }})"
+                continueOnError: ${{ deployment.value.continueOnError }}
+                inputs:
+                  azureSubscription: ${{ deployment.value.serviceConnection }}
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_prcheck.py \
-                  --api-audience "$API_AUDIENCE" \
-                  --api-base-url "$API_BASE_URL" \
-                  --build-reason "$BUILD_REASON" \
-                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --source-commit "$SOURCE_COMMIT" \
-                  --repo-uri "$BUILD_REPOSITORY_URI"
-            env:
-              # apiAudience / apiBaseAFDUrl are referenced from the parameters
-              # directly (NOT surfaced as same-named job variables): the wrapper
-              # passes $(ApiAudience) / $(ApiBaseAFDUrl) from the variable group,
-              # and a job variable of the same (case-insensitive) name would
-              # self-reference -> "cyclical reference" and never resolve.
-              API_AUDIENCE: ${{ parameters.apiAudience }}
-              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
-              # TODO: Base commit is not used yet. Will be needed once we move
-              # detection of affected components to CT. ADO task: 18816
-              BASE_COMMIT: $(baseCommit)
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              SOURCE_COMMIT: $(sourceCommit)
-              # Build.Reason and Build.Repository.Uri are predefined and
-              # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI; reference
-              # them directly and do not map them here (env: overrides of
-              # reserved variables are silently ignored by the agent).
+                    python3 scripts/ci/control-tower/run_prcheck.py \
+                      --api-audience "$API_AUDIENCE" \
+                      --api-base-url "$API_BASE_URL" \
+                      --build-reason "$BUILD_REASON" \
+                      --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                      --source-commit "$SOURCE_COMMIT" \
+                      --repo-uri "$BUILD_REPOSITORY_URI"
+                env:
+                  # Values come directly from parameters rather than same-named
+                  # job variables, which would create cyclical references.
+                  API_AUDIENCE: ${{ deployment.value.apiAudience }}
+                  API_BASE_URL: ${{ deployment.value.apiBaseAFDUrl }}
+                  # TODO: Base commit is not used yet. Will be needed once we
+                  # move detection of affected components to CT. ADO task:
+                  # 18816
+                  BASE_COMMIT: $(baseCommit)
+                  CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                  SOURCE_COMMIT: $(sourceCommit)
+                  # Build.Reason and Build.Repository.Uri are predefined and
+                  # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI;
+                  # reference them directly and do not map them here (env:
+                  # overrides of reserved variables are silently ignored by
+                  # the agent).
 
-          # Submit a SCRATCH Control Tower build of the PR head for the changed
-          # components. Scratch artifacts are throwaway and are not persisted to
-          # a production repo. The scratch-only runner has no official endpoint
-          # or mode switch, preventing accidental official submissions. This is
-          # not an authorization boundary: PR code can modify checkout-controlled
-          # helpers. --wait-for-completion blocks until the build reaches a
-          # terminal state and fails the check on failure or poll timeout.
-          #
-          # This step assumes the pipeline is wired as a REVIEWER-GATED check in
-          # ADO: it should not auto-run on every PR push, so a maintainer
-          # eyeballs the diff before unmerged code is submitted for a build.
-          - task: AzureCLI@2
-            displayName: "Submit scratch build to Control Tower"
-            inputs:
-              azureSubscription: ${{ parameters.serviceConnection }}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -euo pipefail
+              - ${{ if not(deployment.value.skipPackageBuilds) }}:
+                  # Submit a SCRATCH Control Tower build of the PR head for the
+                  # changed components. Scratch artifacts are throwaway and are
+                  # not persisted to a production repo. The scratch-only runner
+                  # has no official endpoint or mode switch, preventing
+                  # accidental official submissions. This is not an
+                  # authorization boundary: PR code can modify
+                  # checkout-controlled helpers. --wait-for-completion blocks
+                  # until the build reaches a terminal state and fails the
+                  # check on failure or poll timeout.
+                  #
+                  # This step assumes the pipeline is wired as a REVIEWER-GATED
+                  # check in ADO: it should not auto-run on every PR push, so a
+                  # maintainer eyeballs the diff before unmerged code is
+                  # submitted for a build.
+                  - task: AzureCLI@2
+                    displayName: "Submit scratch build to Control Tower (${{ deployment.key }})"
+                    continueOnError: ${{ deployment.value.continueOnError }}
+                    inputs:
+                      azureSubscription: ${{ deployment.value.serviceConnection }}
+                      scriptType: bash
+                      scriptLocation: inlineScript
+                      inlineScript: |
+                        set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_scratch_package_build.py \
-                  --api-audience "$API_AUDIENCE" \
-                  --api-base-url "$API_BASE_URL" \
-                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --environment "$PACKAGE_ENVIRONMENT" \
-                  --commit-sha "$SOURCE_COMMIT" \
-                  --wait-for-completion \
-                  --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
-            env:
-              # See the prcheck step: apiAudience / apiBaseAFDUrl come from the
-              # parameters directly to avoid a cyclical self-reference with the
-              # same-named variable-group variables.
-              API_AUDIENCE: ${{ parameters.apiAudience }}
-              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              PACKAGE_ENVIRONMENT: $(packageEnvironment)
-              POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
-              SOURCE_COMMIT: $(sourceCommit)
+                        python3 scripts/ci/control-tower/run_scratch_package_build.py \
+                          --api-audience "$API_AUDIENCE" \
+                          --api-base-url "$API_BASE_URL" \
+                          --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                          --environment "$PACKAGE_ENVIRONMENT" \
+                          --commit-sha "$SOURCE_COMMIT" \
+                          --wait-for-completion \
+                          --poll-timeout-seconds "$POLL_TIMEOUT_SECONDS"
+                    env:
+                      # See the prcheck step: parameter values are used directly
+                      # to avoid cyclical same-named variable references.
+                      API_AUDIENCE: ${{ deployment.value.apiAudience }}
+                      API_BASE_URL: ${{ deployment.value.apiBaseAFDUrl }}
+                      CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                      PACKAGE_ENVIRONMENT: $(packageEnvironment)
+                      POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
+                      SOURCE_COMMIT: $(sourceCommit)
