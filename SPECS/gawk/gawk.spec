@@ -22,10 +22,7 @@ Provides:       awk
 The Gawk package contains programs for manipulating text files.
 
 %prep
-%setup -q
-%patch 0 -p1
-%patch 1 -p1
-%patch 2 -p1
+%autosetup -p1
 
 %build
 %configure \
@@ -46,6 +43,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 # Skip the timeout test, which is unreliable on our (vm) build machines
 sed -i 's/ timeout / /' test/Makefile
 sed -i 's/ pty1 / /' test/Makefile
+# Skip pma test - persistent memory allocator requires MAP_FIXED mmap
+# which may not work reliably in chroot build environments
+sed -i 's/$(MAKE) $(NEED_PMA)/echo "skipping pma test"/' test/Makefile
 
 # Generate locale for `en_US.iso88591` which is required for ptest
 # Ideally it should have been present. Investigate if its a `chroot` only issue
@@ -71,6 +71,8 @@ make %{?_smp_mflags} check
 %changelog
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.2-2
 - Patch for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467
+- Skip pma (persistent memory allocator) test in chroot; it requires
+  MAP_FIXED mmap which is not reliable in build chroot environments.
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
