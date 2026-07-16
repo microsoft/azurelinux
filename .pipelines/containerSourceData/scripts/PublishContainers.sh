@@ -133,8 +133,12 @@ function oras_attach {
 function oras_detach {
     local image_name=$1
     local lifecycle_manifests
+    # NOTE: keep `-o json`; on the oras version installed on the publish
+    # agent, `--format json` does not emit the schema jq expects below and
+    # causes `parse error: Invalid numeric literal`. The deprecation
+    # warning from `-o` is harmless.
     if ! lifecycle_manifests=$(retry_registry_op "discover lifecycle manifests for $image_name" \
-                                oras discover --format json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
+                                oras discover -o json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
         echo "+++ Warning: could not discover lifecycle manifests for $image_name; skipping detach"
         return
     fi
