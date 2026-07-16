@@ -47,6 +47,9 @@ overlays = [
     # Update vendor macro.
     { type = "file-search-replace", file = "macros", regex = "%_vendor.*", replacement = "%_vendor azurelinux" },
 
+    # Update cflags_arch_x86_64_level macro.
+    { type = "file-search-replace", file = "macros", regex = "%__cflags_arch_x86_64_level .*", replacement = "%__cflags_arch_x86_64_level -v2" },
+
     # Remove dist.sh file; we'll replace it wholesale with our own version.
     { type = "file-remove", file = "dist.sh" },
     # Add our own version of dist.sh customized for Azure Linux.
