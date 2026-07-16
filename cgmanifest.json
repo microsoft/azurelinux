@@ -24403,8 +24403,8 @@
         "type": "other",
         "other": {
           "name": "python-pyasn1",
-          "version": "0.4.8",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-0.4.8.tar.gz"
+          "version": "0.6.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/a4/9a/23310166d960def5897e91fe20e5b724601b02a22e84ba1f94232c0b7f67/pyasn1-0.6.4.tar.gz"
         }
       }
     },
