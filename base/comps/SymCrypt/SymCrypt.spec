@@ -2,7 +2,7 @@
 %define debug_package %{nil}
 Summary:        A core cryptographic library written by Microsoft
 Name:           SymCrypt
-Version:        103.11.0
+Version:        103.12.1
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation

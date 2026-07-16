@@ -2,10 +2,10 @@
 spec = { type = "local", path = "SymCrypt.spec" }
 
 [[components.SymCrypt.source-files]]
-filename = "SymCrypt-103.11.0.tar.gz"
-hash = "1c24ca0cf3ee30336a610421a64864db7f0756ac0846f0450525c473f85b5345"
+filename = "SymCrypt-103.12.1.tar.gz"
+hash = "06ab84b0b8d90a3d1d448781825561d266493206bdc156aeb77aa22f7986a03d"
 hash-type = "SHA256"
-origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt/archive/v103.11.0.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/SymCrypt/archive/v103.12.1.tar.gz" }
 
 [[components.SymCrypt.source-files]]
 filename = "jitterentropy-library-3.3.1.tar.gz"
