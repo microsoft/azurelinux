@@ -48,9 +48,9 @@ Requires: lsof
 Requires: python3
 Requires: python3-pip
 Requires: jq
+Requires: systemd-ukify
 %ifarch x86_64
 Requires: grub2-pc
-Requires: systemd-ukify
 %endif
 
 %description imagecustomizer
@@ -112,6 +112,7 @@ go test -C toolkit/tools ./...
 %changelog
 * Tue Jul 7 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.1-1
 - Upgrade to version 1.5.1
+- Enable systemd-ukify for arm64
 
 * Fri May 29 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
 - Upgrade to version 1.5.0
