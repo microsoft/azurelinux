@@ -1,7 +1,7 @@
 Summary:        Libcap
 Name:           libcap
 Version:        2.69
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        GPLv2+
 Group:          System Environment/Security
 URL:            https://www.gnu.org/software/hurd/community/gsoc/project_ideas/libcap.html
@@ -10,7 +10,7 @@ Patch0:         CVE-2025-1390.patch
 Patch1:         CVE-2026-4878.patch
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 
 %description
 The libcap package implements the user-space interfaces to the POSIX 1003.1e capabilities available
@@ -63,6 +63,9 @@ sed -i '/echo "attempt to exploit kernel bug"/,/^fi$/d' quicktest.sh
 %{_mandir}/man3/*
 
 %changelog
+* Fri Aug 07 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.69-16
+- Bump to rebuild with updated glibc
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.69-15
 - Bump to rebuild with updated glibc
 

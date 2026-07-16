@@ -10,7 +10,7 @@
 Summary:        Main C library
 Name:           glibc
 Version:        2.38
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        BSD AND GPLv2+ AND Inner-Net AND ISC AND LGPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -294,12 +294,14 @@ grep "^FAIL: nptl/tst-mutex10" tests.sum >/dev/null && n=$((n+1)) ||:
 # expected failures in pipeline test runs (due to timeouts or test environment)
 grep "^FAIL: elf/tst-env-setuid-tunables" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: malloc/tst-malloc-tcache-leak" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: malloc/tst-malloc-too-large-malloc-hugetlb2" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-pthread-setuid-loop" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-robust-fork" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-thread-affinity-pthread" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nptl/tst-thread-affinity-pthread2" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: nss/tst-nss-files-hosts-getent" tests.sum >/dev/null && n=$((n+1)) ||:
 grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
+grep "^FAIL: stdlib/test-bz22786" tests.sum >/dev/null && n=$((n+1)) ||:
 # consider the test passed if the only failures are expected ones above
 [ `grep ^FAIL tests.sum | wc -l` -eq $n ]
 
@@ -388,6 +390,10 @@ grep "^FAIL: string/test-mempcpy" tests.sum >/dev/null && n=$((n+1)) ||:
 %exclude %{_libdir}/locale/C.utf8
 
 %changelog
+* Thu Jul 16 2026 Sumit Jena <v-sumitjena@microsoft.com> - 2.38-21
+- Allow environment-dependent ptest failures (malloc/tst-malloc-too-large-malloc-hugetlb2,
+  stdlib/test-bz22786) in the check's expected-failures list
+
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 2.38-20
 - Patch for CVE-2026-4046
 

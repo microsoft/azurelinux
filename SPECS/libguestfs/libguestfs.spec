@@ -25,7 +25,7 @@
 Summary:        Access and modify virtual machine disk images
 Name:           libguestfs
 Version:        1.52.0
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -82,7 +82,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  gdisk
 BuildRequires:  genisoimage
 BuildRequires:  gfs2-utils
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:  gobject-introspection-devel
 BuildRequires:  gperf
 BuildRequires:  grep
@@ -1154,6 +1154,9 @@ rm ocaml/html/.gitignore
 %endif
 
 %changelog
+* Fri Aug 07 2026 Sumit Jena <v-sumitjena@microsoft.com> - 1.52.0-24
+- Bump to rebuild with updated glibc
+
 * Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.52.0-23
 - Use direct backend with force_tcg in %%check so make quickcheck does not
   require a running libvirtd / /var/run/libvirt/libvirt-sock in the build
