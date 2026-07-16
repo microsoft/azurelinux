@@ -101,17 +101,17 @@ function retry_registry_op {
     local backoff=5
 
     while [ $retry_count -lt $max_retries ]; do
-        echo "+++ $desc (attempt $((retry_count + 1))/$max_retries)"
+        echo "+++ $desc (attempt $((retry_count + 1))/$max_retries)" >&2
         if "$@"; then
             return 0
         fi
         retry_count=$((retry_count + 1))
         if [ $retry_count -lt $max_retries ]; then
-            echo "+++ $desc failed; retrying in ${backoff}s..."
+            echo "+++ $desc failed; retrying in ${backoff}s..." >&2
             sleep $backoff
             backoff=$((backoff * 2))
         else
-            echo "+++ $desc failed after $max_retries attempts"
+            echo "+++ $desc failed after $max_retries attempts" >&2
             return 1
         fi
     done
@@ -133,12 +133,8 @@ function oras_attach {
 function oras_detach {
     local image_name=$1
     local lifecycle_manifests
-    # NOTE: keep `-o json`; on the oras version installed on the publish
-    # agent, `--format json` does not emit the schema jq expects below and
-    # causes `parse error: Invalid numeric literal`. The deprecation
-    # warning from `-o` is harmless.
     if ! lifecycle_manifests=$(retry_registry_op "discover lifecycle manifests for $image_name" \
-                                oras discover -o json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
+                                oras discover --format json --artifact-type "application/vnd.microsoft.artifact.lifecycle" "$image_name"); then
         echo "+++ Warning: could not discover lifecycle manifests for $image_name; skipping detach"
         return
     fi
