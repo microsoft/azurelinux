@@ -6,7 +6,7 @@ Util modules declare their dependencies as module-level constants and
 use them at the call site::
 
     # in utils/extract.py
-    GUESTMOUNT = NativeTool("guestmount", package_hint="libguestfs-tools",
+    GUESTMOUNT = NativeTool("guestmount", package_hint="libguestfs",
                             reason="FUSE-mount VM images", when="vm")
 
     def mount_vm_image(...):

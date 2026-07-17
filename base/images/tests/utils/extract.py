@@ -22,13 +22,13 @@ logger = logging.getLogger(__name__)
 # (and used at the call sites below) where they're needed.
 GUESTMOUNT = NativeTool(
     name="guestmount",
-    package_hint="libguestfs / libguestfs-tools",
+    package_hint="libguestfs",
     reason="FUSE-mount VM images read-only",
     when="vm",
 )
 GUESTUNMOUNT = NativeTool(
     name="guestunmount",
-    package_hint="libguestfs / libguestfs-tools",
+    package_hint="libguestfs",
     reason="unmount guestmount FUSE mounts",
     when="vm",
 )
