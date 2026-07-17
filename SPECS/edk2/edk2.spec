@@ -56,7 +56,7 @@ Distribution:   Azure Linux
 
 Name:       edk2
 Version:    %{GITDATE}git%{GITCOMMIT}
-Release:    18%{?dist}
+Release:    1800%{?dist}
 Summary:    UEFI firmware for 64-bit virtual machines
 License:    Apache-2.0 AND (BSD-2-Clause OR GPL-2.0-or-later) AND BSD-2-Clause-Patent AND BSD-3-Clause AND BSD-4-Clause AND ISC AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:        https://www.tianocore.org
@@ -406,7 +406,11 @@ cp -a -- \
 %ifarch x86_64
 # extract hvloader source into place
 tar -xf %{SOURCE6} --directory MdeModulePkg/Application
-sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \ \ MdeModulePkg\/Application\/HvLoader-%{HVLOADER_VER}/HvLoader.inf' MdeModulePkg/MdeModulePkg.dsc
+sed -i '/MdeModulePkg\/Application\/HelloWorld\/HelloWorld.inf/a \
+  MdeModulePkg/Application/HvLoader-%{HVLOADER_VER}/HvLoader.inf {\
+    <BuildOptions>\
+      GCC:*_*_X64_DLINK_FLAGS = -z common-page-size=0x1000\
+  }' MdeModulePkg/MdeModulePkg.dsc
 %endif
 
 %build
@@ -807,6 +811,9 @@ done
 %endif
 
 %changelog
+* Fri Jul 17 2026 Cameron Baird <cameronbaird@microsoft.com> - 20240524git3e722403cd16-1800
+- Build hvloader with 4k page alignment 
+
 * Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 20240524git3e722403cd16-18
 - Patch for CVE-2026-9076, CVE-2026-7383, CVE-2026-45447, CVE-2026-45445, CVE-2026-42767, CVE-2026-42766, CVE-2026-34182, CVE-2026-34180
 
