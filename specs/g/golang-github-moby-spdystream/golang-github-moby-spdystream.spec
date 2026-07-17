@@ -53,7 +53,7 @@ BuildRequires:  golang(github.com/gorilla/websocket)
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 %gocheck

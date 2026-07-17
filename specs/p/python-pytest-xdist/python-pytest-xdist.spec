@@ -48,7 +48,7 @@ Summary:        %{summary}
 %pyproject_save_files -l xdist
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 %tox

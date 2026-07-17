@@ -54,3 +54,7 @@ components = [
 
 [component-groups.mingw-disabled.default-component-config.build]
 without = ["mingw"]
+
+[component-groups.mingw-disabled.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"

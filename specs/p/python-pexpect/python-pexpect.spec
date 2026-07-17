@@ -85,7 +85,7 @@ rm -rf %{buildroot}%{python3_sitelib}/pexpect/tests
 
 %if %{with check}
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 export PYTHONIOENCODING=UTF-8

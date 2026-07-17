@@ -1,0 +1,21 @@
+# Components with flaky / race-condition %check failures.
+# These tests fail intermittently (timing-sensitive, environment-dependent)
+# rather than deterministically, and should be re-enabled once the upstream
+# flakiness is addressed.
+[component-groups.check-skip-flaky-tests]
+description = "Components with flaky or race-condition check failures"
+components = [
+    "fakeroot",
+    "golang-github-moby-spdystream",
+    "python-aioquic",
+    "python-pexpect",
+    "python-pytest-xdist",
+    "socat",
+]
+
+[component-groups.check-skip-flaky-tests.default-component-config.build]
+check = { skip = true, skip_reason = "Disabling checks for flaky tests." }
+
+[component-groups.check-skip-flaky-tests.metadata]
+category = "azl-disable-flaky-tests"
+upstream-status = "upstreamable"

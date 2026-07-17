@@ -116,7 +116,7 @@ rename -- -tcp '' %{buildroot}%{_mandir}{,/*}/man1/fake{d,root}-tcp.1
 sed -e 's/-tcp//g' fake{d,root}-tcp.lang > fakeroot.lang
 
 %check
-# Check section disabled: Disabling checks for initial set of failures.
+# Check section disabled: Disabling checks for flaky tests.
 exit 0
 
 for type in sysv tcp; do
