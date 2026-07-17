@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 14
+%define azl_pkgrelease 15
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -130,9 +130,6 @@ Summary: The Linux kernel
 
 # Sign modules on all arches
 %global signmodules 1
-
-# Add additional rhel certificates to system trusted keys.
-%global rhelkeys 1
 
 # Compress modules only for architectures that build modules
 %ifarch noarch
@@ -727,31 +724,6 @@ Source81: process_configs.sh
 Source85: kernel.sbat.template
 
 Source87: flavors
-
-Source100: rheldup3.x509
-Source101: rhelkpatch1.x509
-Source102: nvidiagpuoot001.x509
-Source103: rhelimaca1.x509
-Source104: rhelima.x509
-Source105: rhelima_centos.x509
-Source106: fedoraimaca.x509
-
-%if 0%{?fedora}%{?eln}
-%define ima_ca_cert %{SOURCE106}
-%endif
-
-%if 0%{?rhel} && !0%{?eln}
-%define ima_ca_cert %{SOURCE103}
-# rhel && !eln
-%endif
-
-%if 0%{?centos}
-%define ima_signing_cert %{SOURCE105}
-%else
-%define ima_signing_cert %{SOURCE104}
-%endif
-
-%define ima_cert_name ima.cer
 
 Source200: check-kabi
 
@@ -1499,27 +1471,7 @@ cp %{SOURCE50} x509.genkey
 cp %{SOURCE62} def_variants.yaml
 
 %if %{signkernel}%{signmodules}
-
-# Add DUP and kpatch certificates to system trusted keys for RHEL
-truncate -s0 ../certs/rhel.pem
-%if 0%{?rhel}
-%if %{rhelkeys}
-%{log_msg "Add DUP and kpatch certificates to system trusted keys for RHEL"}
-openssl x509 -inform der -in %{SOURCE100} -out rheldup3.pem
-openssl x509 -inform der -in %{SOURCE101} -out rhelkpatch1.pem
-openssl x509 -inform der -in %{SOURCE102} -out nvidiagpuoot001.pem
-cat rheldup3.pem rhelkpatch1.pem nvidiagpuoot001.pem >> ../certs/rhel.pem
-# rhelkeys
-%endif
-
-# rhel
-%endif
-
-openssl x509 -inform der -in %{ima_ca_cert} -out imaca.pem
-cat imaca.pem >> ../certs/rhel.pem
-
 for i in *.config; do
-  sed -i 's@CONFIG_SYSTEM_TRUSTED_KEYS=""@CONFIG_SYSTEM_TRUSTED_KEYS="certs/rhel.pem"@' $i
   sed -i 's@CONFIG_EFI_SBAT_FILE=""@CONFIG_EFI_SBAT_FILE="kernel.sbat"@' $i
 done
 %endif
@@ -2273,11 +2225,6 @@ BuildKernel() {
     mkdir -p $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer
 %if %{signkernel}
     install -m 0644 %{secureboot_ca_0} $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/kernel-signing-ca.cer
-%endif
-
-%if 0%{?rhel}
-    # Red Hat IMA code-signing cert, which is used to authenticate package files
-    install -m 0644 %{ima_signing_cert} $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/%{ima_cert_name}
 %endif
 
 %if %{signmodules}
@@ -3566,6 +3513,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.15
+- Drop unused inherited RHEL/Fedora kernel certificate bundle sources
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.14
 - Build directly from complete Azure Linux configs and remove unused config sources
 
