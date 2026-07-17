@@ -39,6 +39,7 @@ tests.test-suites = [
   { name = "lisa-perf" },
   { name = "lisa-smoke" },
   { name = "lisa-kernel-ltp" },
+  { name = "image-read-only-checks" },
 ]
 
 [images.vm-base.capabilities]
@@ -57,6 +58,7 @@ tests.test-suites = [
   { name = "lisa-perf" },
   { name = "lisa-smoke" },
   { name = "lisa-kernel-ltp" },
+  { name = "image-read-only-checks" },
 ]
 
 [images.vm-base-dev.capabilities]
@@ -178,6 +180,52 @@ description = "Lisa cvm tests"
 [test-suites.lisa-kernel-ltp]
 type = "lisa"
 description = "Lisa kernel LTP tests"
+
+# LISA qemu read-only checks. azldev generates a runbook
+# from the test-cases below, boots a QEMU VM from the built image artifact,
+# and runs the cases. Requires a local QEMU/libvirt host with libvirt-python
+# and pycdlib available for the qemu platform.
+#
+# NOTE: the upstream LISA 'libvirt' pip extra is intentionally NOT listed in
+# pip-extras below. LISA upstream pins 'libvirt-python ~= 9.3.0', which fails to
+# build against a modern host libvirt (e.g. 11.x): its bundled generator.py
+# cannot map newer API entries in /usr/share/libvirt/api/libvirt-api.xml and
+# version, so install it (plus pycdlib) into the LISA venv out-of-band, e.g.:
+#   <venv>/bin/pip install "libvirt-python==<host-libvirt-version>"
+# Check the host version with: libvirtd --version   (or virsh --version)
+#
+# Usage:   azldev image test vm-base --test-suite image-read-only-checks \
+#          --image-path base/out/images/vm-base/azl4-vm-base.x86_64-0.1.qcow2
+[test-suites.image-read-only-checks]
+type = "lisa"
+description = "Lisa read-only checks(no reboot, no fresh VM) on QEMU VM"
+
+[test-suites.image-read-only-checks.lisa]
+pip-extras = ["azure"]
+# azldev generates the runbook and inlines the image path (as the qcow2 disk)
+# and the admin key. These names are combined into the generated runbook's criteria.
+test-cases = [
+    "verify_l3_cache",
+    "verify_cpu_count",
+    "verify_dns_name_resolution",
+    "verify_floppy_module_is_blacklisted",
+    "verify_default_targetpw",
+    "verify_grub",
+    "verify_udev_rules_moved",
+    "verify_serial_console_is_enabled",
+    "verify_no_pre_exist_users",
+    "verify_python_version",
+    "verify_openssl_version",
+    "verify_azure_64bit_os",
+    "verify_omi_version",
+    "verify_no_swap_on_osdisk",
+    "verify_essential_kernel_modules",
+    "verify_enable_kprobe",
+]
+
+[test-suites.image-read-only-checks.lisa.framework]
+git-url = "https://github.com/microsoft/lisa.git"
+ref = "5ef4eb9a09f9b21f3bca76802151ac2190b6de50"
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]
