@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.9.6
+Version:        1.11.0
 Release:        %autorelease
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -8,21 +8,16 @@ Distribution:   Azure Linux
 Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0001:      0001-register-symcrypt-provider-for-config-drop-in.patch
-Patch0002:      0002-skip-sha1-signature-tests-disabled-by-crypto-policy.patch
-# The v1.9.6 release tag shipped without bumping the CMake project version, so
-# the provider reports 1.9.5 via OSSL_PROV_PARAM_VERSION. Correct it downstream.
-Patch0003:      0003-bump-project-version-to-match-release-tag.patch
 
-BuildRequires:  openssl-devel
-BuildRequires:  openssl-devel-engine
-BuildRequires:  SymCrypt >= 103.8.0
+BuildRequires:  openssl-devel >= 3.5.0
+BuildRequires:  openssl-devel-engine >= 3.5.0
+BuildRequires:  SymCrypt >= 103.12.0
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  make
 
-Requires:       SymCrypt >= 103.8.0
+Requires:       SymCrypt >= 103.12.0
 Requires:       openssl-libs
 
 %description
@@ -68,12 +63,13 @@ install SymCryptProvider/symcrypt_prov.cnf %{buildroot}%{_sysconfdir}/pki/tls/op
 # Run in a subshell so the exit code of the test does not affect the main shell's exit code.
 # This is important because the entire section is wrapped in a script by rpmbuild itself.
 # The test is run twice: once with the default provider and once with the SymCrypt provider.
-# The SHA-1 RSA sign/verify cases are removed by Patch1, since SHA-1 signatures
-# are disabled by the default crypto policy on Azure Linux.
+# SslPlay exercises SHA-1 RSA sign/verify, which the default Azure Linux crypto policy
+# disables. OPENSSL_ENABLE_SHA1_SIGNATURES=1 re-enables SHA-1 signatures for the test
+# process so those cases run instead of failing with "invalid digest".
 (
         set -e
-        ./%{__cmake_builddir}/SslPlay/SslPlay
-        ./%{__cmake_builddir}/SslPlay/SslPlay --provider-path ./%{__cmake_builddir}/SymCryptProvider/ --provider symcryptprovider --no-engine
+        OPENSSL_ENABLE_SHA1_SIGNATURES=1 ./%{__cmake_builddir}/test/SslPlay/SslPlay
+        OPENSSL_ENABLE_SHA1_SIGNATURES=1 ./%{__cmake_builddir}/test/SslPlay/SslPlay --provider-path ./%{__cmake_builddir}/SymCryptProvider/ --provider symcryptprovider --no-engine
 )
 
 %files
