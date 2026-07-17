@@ -20,7 +20,7 @@ def lifecycle_mocks(monkeypatch: pytest.MonkeyPatch) -> tuple[Mock, Mock, Mock, 
     print_final_status = Mock()
     report_failure = Mock()
 
-    monkeypatch.setattr(package_build, "DefaultAzureCredential", Mock(return_value=object()))
+    monkeypatch.setattr(package_build.ct, "make_credential", Mock(return_value=object()), raising=False)
     monkeypatch.setattr(package_build.ct, "get_token", Mock(return_value="token"))
     monkeypatch.setattr(package_build.ct, "make_session", Mock(return_value=object()))
     monkeypatch.setattr(package_build.ct, "poll_until_terminal", poll_until_terminal)
@@ -48,6 +48,15 @@ def _submit(*, wait_for_completion: bool = False) -> None:
 
 class TestPackageBuildLifecycle:
     """Verify shared submission and polling behavior."""
+
+    def test_uses_pipeline_service_connection(
+        self,
+        lifecycle_mocks: tuple[Mock, Mock, Mock, Mock],
+    ) -> None:
+        """Use the identity authenticated by the enclosing AzureCLI task."""
+        _submit()
+
+        package_build.ct.make_credential.assert_called_once_with()
 
     @pytest.mark.parametrize("job_id", [None, 123])
     def test_missing_or_non_string_job_id_fails(

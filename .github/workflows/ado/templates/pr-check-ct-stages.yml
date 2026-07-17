@@ -117,13 +117,15 @@ stages:
                   BASE_COMMIT: $(baseCommit)
                   CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
                   SOURCE_COMMIT: $(sourceCommit)
+                  # Secret predefined variables are not auto-exposed.
+                  SYSTEM_ACCESSTOKEN: $(System.AccessToken)
                   # Build.Reason and Build.Repository.Uri are predefined and
                   # auto-exposed as $BUILD_REASON / $BUILD_REPOSITORY_URI;
                   # reference them directly and do not map them here (env:
                   # overrides of reserved variables are silently ignored by
                   # the agent).
 
-              - ${{ if not(deployment.value.skipPackageBuilds) }}:
+              - ${{ if ne(deployment.value.skipPackageBuilds, true) }}:
                   # Submit a SCRATCH Control Tower build of the PR head for the
                   # changed components. Scratch artifacts are throwaway and are
                   # not persisted to a production repo. The scratch-only runner
@@ -165,3 +167,5 @@ stages:
                       PACKAGE_ENVIRONMENT: $(packageEnvironment)
                       POLL_TIMEOUT_SECONDS: $(pollTimeoutSeconds)
                       SOURCE_COMMIT: $(sourceCommit)
+                      # Secret predefined variables are not auto-exposed.
+                      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
