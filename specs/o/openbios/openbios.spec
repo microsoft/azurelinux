@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/openbios.azl.macros}
+
 %global hash c3a19c1
 %global date 20240913
 
@@ -13,7 +16,7 @@
 
 Name:           openbios
 Version:        %{date}
-Release:        1.git%{hash}%{?dist}
+Release: %[1 + %{azl_release}].git%{hash}%{?dist}
 Epoch:          1
 Summary:        OpenBIOS implementation of IEEE 1275-1994
 
@@ -29,6 +32,7 @@ BuildArch:      noarch
 # date=`git log -1 --format='%cd' --date=short | tr -d -`
 # git archive --prefix openbios-${date}-git${hash}/ ${hash} | xz -7e > ../openbios-${date}-git${hash}.tar.xz
 Source0:        %{name}-%{date}-git%{hash}.tar.xz
+Source9999: openbios.azl.macros
 
 # Note that these packages build 32 bit binaries with the -m32 flag.
 BuildRequires: make
@@ -40,7 +44,7 @@ BuildRequires:  fcode-utils
 BuildRequires:  libxslt
 
 
-ExclusiveArch: x86_64
+Patch0: 0001-config-scripts-switch-arch-fix-build-on-aarch64-and-riscv64.patch
 %description
 The OpenBIOS project provides you with most free and open source Open
 Firmware implementations available. Here you find several
@@ -66,7 +70,7 @@ such as coreboot or U-Boot.
 
 
 %prep
-%setup -q -n %{name}-%{date}-git%{hash}
+%autosetup -p1 -n %{name}-%{date}-git%{hash}
 
 
 %build
