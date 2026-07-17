@@ -19,12 +19,13 @@ Patch6:			CVE-2026-57211.patch
 Patch7:			CVE-2026-57212.patch
 Patch8:			CVE-2026-57213.patch
 Patch9:			CVE-2026-57214.patch
-Patch10:			CVE-2026-57215.patch
-Patch11:			CVE-2026-57217.patch
-Patch12:			CVE-2026-57218.patch
-Patch13:			CVE-2026-57219.patch
-Patch14:			CVE-2026-57220.patch
-Patch15:			CVE-2026-57221.patch
+Patch10:		CVE-2026-57215.patch
+Patch11:		CVE-2026-57217.patch
+Patch12:		CVE-2026-57218.patch
+Patch13:		CVE-2026-57219.patch
+Patch14:		CVE-2026-57220.patch
+Patch15:		CVE-2026-57221.patch
+Patch16:                CVE-2026-57216.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -82,7 +83,7 @@ done
 
 %changelog
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
-- Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211
+- Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216
 
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-6
 - Patch for CVE-2026-43973
