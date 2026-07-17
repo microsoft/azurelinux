@@ -12,7 +12,7 @@
 # the deployment-specific service connections.
 #
 # This file owns all OneBranch-specific wiring (governed templates repo,
-# Official variant, featureFlags) and delegates the actual stages/jobs/steps
+# NonOfficial variant, featureFlags) and delegates the actual stages/jobs/steps
 # to the raw stages template at:
 #   .github/workflows/ado/templates/pr-check-ct-stages.yml
 #
@@ -23,9 +23,8 @@
 # gate: this pipeline does NOT auto-run on every PR push, and a maintainer
 # triggers it only after inspecting the diff. See the prerequisite below.
 #
-# Official: this remains reviewer-gated PR validation and produces only scratch
-# builds, but it uses the PROD service connection alongside DEV and STAGING.
-# OneBranch Official governance is required for production identity use.
+# TEST-ONLY OVERRIDE: use NonOfficial governance while validating this pipeline
+# from the temporary draft PR. Do not merge this override into the 4.0 branch.
 #
 # Helper scripts live under:
 # - scripts/ci/control-tower/ - (Control Tower client + submit script).
@@ -72,7 +71,7 @@ resources:
       ref: refs/heads/main
 
 extends:
-  template: v2/OneBranch.Official.CrossPlat.yml@templates
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
   parameters:
     featureFlags:
       golang:
