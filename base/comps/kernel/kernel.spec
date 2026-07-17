@@ -4575,6 +4575,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Jul 30 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.11
+- fix(kmod-nvidia-open): move driver version from package name into Version field
+
 * Mon Jul 27 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.10
 - feat(kernel): enable Broadcom RoCE driver (bnxt_re) as module on x86_64
 
