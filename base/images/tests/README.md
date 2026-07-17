@@ -84,8 +84,8 @@ capability isn't in `--capabilities`.
 
 System packages (not pip-installable):
 
-- **`libguestfs-tools`** + **`guestfs-tools`** — `guestmount`,
-  `guestunmount`, `virt-inspector` (VM images)
+- **`libguestfs`** — `guestmount`, `guestunmount` (VM images)
+- **`guestfs-tools`** — `virt-inspector` (VM images)
 - **`skopeo`** — OCI archive conversion (container images, static tests)
 - **`umoci`** — OCI image unpacking (container images, static tests)
 - **`buildah`** — cleanup of rootless umoci extracts (container images, static tests)
@@ -240,7 +240,7 @@ module-level `NativeTool` constants and uses them at the call sites:
 # utils/extract.py
 GUESTMOUNT = NativeTool(
     name="guestmount",
-    package_hint="libguestfs-tools",
+    package_hint="libguestfs",
     reason="FUSE-mount VM images",
     when="vm",            # "always" | "vm" | "container"
 )
