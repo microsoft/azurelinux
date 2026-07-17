@@ -19,6 +19,7 @@ BuildRequires:  python3-devel
 BuildRequires:  python3-wheel
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pip
+Requires:       python3
 
 %description -n python3-pyasn1
 This is an implementation of ASN.1 types and codecs in Python programming language.
