@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 12
+%define azl_pkgrelease 14
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -146,12 +146,6 @@ Summary: The Linux kernel
 %global compression_flags --compress --check=crc32 --lzma2=dict=1MiB
 %global compext xz
 
-%if 0%{?fedora}
-%define primary_target fedora
-%else
-%define primary_target rhel
-%endif
-
 #
 # genspec.sh variables
 #
@@ -159,10 +153,6 @@ Summary: The Linux kernel
 # kernel package name
 %global package_name kernel
 %global gemini 0
-# Include Fedora files
-%global include_fedora 1
-# Include RHEL files
-%global include_rhel 1
 # Provide Patchlist.changelog file
 %global patchlist_changelog 1
 # Set released_kernel to 1 when the upstream source tarball contains a
@@ -170,13 +160,6 @@ Summary: The Linux kernel
 # Set released_kernel to 0 when the upstream source tarball contains an
 #  unreleased kernel development snapshot.
 %global released_kernel 1
-# Set debugbuildsenabled to 1 to build separate base and debug kernels
-#  (on supported architectures). The kernel-debug-* subpackages will
-#  contain the debug kernel.
-# Set debugbuildsenabled to 0 to not build a separate debug kernel, but
-#  to build the base kernel using the debug configuration. (Specifying
-#  the --with-release option overrides this setting.)
-%define debugbuildsenabled 1
 # define buildid .local
 %define specrpmversion 6.18.31
 %define specversion %{specrpmversion}
@@ -288,12 +271,6 @@ Summary: The Linux kernel
 # Want to build a vanilla kernel build without any non-upstream patches?
 %define with_vanilla %{?_with_vanilla: 1} %{?!_with_vanilla: 0}
 
-%ifarch x86_64 aarch64
-%define with_efiuki %{?_without_efiuki: 0} %{?!_without_efiuki: 1}
-%else
-%define with_efiuki 0
-%endif
-
 %if 0%{?fedora}
 # Kernel headers are being split out into a separate package
 %define with_headers 0
@@ -345,10 +322,6 @@ Summary: The Linux kernel
 %define nopatches 1
 %endif
 
-%if %{with_release}
-%define debugbuildsenabled 1
-%endif
-
 %if !%{with_debuginfo}
 %define _enable_debug_packages 0
 %endif
@@ -377,7 +350,6 @@ Summary: The Linux kernel
 %define with_doc 0
 %define with_selftests 0
 %define with_headers 0
-%define with_efiuki 0
 %define with_zfcpdump 0
 %define with_vdso_install 0
 %define with_kabichk 0
@@ -502,14 +474,12 @@ Summary: The Linux kernel
 # ============================================================================
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
-# Azure Linux ships a single general-purpose kernel. All other variants
-# (zfcpdump and efiuki) are disabled here. This gate runs after all upstream
-# arch/variant resolution so it wins; the disabled variant code is trimmed
-# away incrementally. Kernel selftests (kernel-selftests-internal) are
-# intentionally left enabled.
+# Azure Linux ships a single general-purpose kernel. The zfcpdump variant is
+# disabled here. This gate runs after all upstream arch/variant resolution so
+# it wins; the disabled variant code is trimmed away incrementally. Kernel
+# selftests (kernel-selftests-internal) are intentionally left enabled.
 # ============================================================================
 %define with_zfcpdump 0
-%define with_efiuki 0
 
 # short-hand for "are we building base/non-debug variants of ...?"
 %if %{with_up} && %{with_base}
@@ -701,31 +671,6 @@ BuildRequires: llvm
 BuildRequires: lld
 %endif
 
-%if %{with_efiuki}
-BuildRequires: dracut
-# For dracut UEFI uki binaries
-BuildRequires: binutils
-# For the initrd
-BuildRequires: lvm2
-BuildRequires: systemd-boot-unsigned
-# For systemd-stub and systemd-pcrphase
-BuildRequires: systemd-udev >= 252-1
-# For systemd-repart
-BuildRequires: xfsprogs e2fsprogs dosfstools
-# For UKI kernel cmdline addons
-BuildRequires: systemd-ukify
-# For TPM operations in UKI initramfs
-BuildRequires: tpm2-tools
-# For UKI sb cert
-%if 0%{?rhel}%{?centos} && !0%{?eln}
-%if 0%{?centos}
-BuildRequires: centos-sb-certs >= 9.0-23
-%else
-BuildRequires: redhat-sb-certs >= 9.4-0.1
-%endif
-%endif
-%endif
-
 # Because this is the kernel, it's hard to get a single upstream URL
 # to represent the base without needing to do a bunch of patching. This
 # tarball is generated from a src-git tree. If you want to see the
@@ -773,47 +718,15 @@ Source22: filtermods.py
 
 %define modsign_cmd %{SOURCE21}
 
-%if 0%{?include_rhel}
-Source24: %{name}-aarch64-rhel.config
-Source32: %{name}-x86_64-rhel.config
-%endif
-
-%if %{include_rhel}
-Source23: x509.genkey.rhel
-Source34: def_variants.yaml.rhel
-Source41: x509.genkey.centos
-%endif
-
-%if 0%{?include_fedora}
+# The Fedora module classification and signing-key templates are retained as
+# the baseline for Azure Linux while the generated Fedora configs are removed.
 Source50: x509.genkey.fedora
-
-Source52: %{name}-aarch64-fedora.config
-Source60: %{name}-x86_64-fedora.config
-
 Source62: def_variants.yaml.fedora
-%endif
-
-Source70: partial-kgcov-snip.config
-Source71: partial-kgcov-debug-snip.config
-Source72: partial-clang-snip.config
-Source73: partial-clang-debug-snip.config
-Source74: partial-clang_lto-x86_64-snip.config
-Source75: partial-clang_lto-x86_64-debug-snip.config
-Source76: partial-clang_lto-aarch64-snip.config
-Source77: partial-clang_lto-aarch64-debug-snip.config
-Source80: generate_all_configs.sh
 Source81: process_configs.sh
 
-Source83: uki.sbat.template
-Source84: uki-addons.sbat.template
 Source85: kernel.sbat.template
 
-Source86: dracut-virt.conf
-
 Source87: flavors
-
-Source151: uki_create_addons.py
-Source152: uki_addons.json
 
 Source100: rheldup3.x509
 Source101: rhelkpatch1.x509
@@ -855,11 +768,6 @@ Source301: kernel-kabi-dw-%{kabiversion}.tar.xz
 # Sources for kernel-tools
 Source2002: kvm_stat.logrotate
 
-# Some people enjoy building customized kernels from the dist-git in Fedora and
-# use this to override configuration options. One day they may all use the
-# source tree, but in the mean time we carry this to support the legacy workflow
-Source3000: merge.py
-Source3001: kernel-local
 %if %{patchlist_changelog}
 Source3002: Patchlist.changelog
 %endif
@@ -1371,8 +1279,8 @@ The meta-package for the %{1} kernel\
 # This macro creates a kernel-<subpackage> and its -devel and -debuginfo too.
 #	%%define variant_summary The Linux kernel compiled for <configuration>
 #	%%kernel_variant_package [-n <pretty-name>] [-m] [-o] <subpackage>
-# -m: Used with debugbuildsenabled==0 to create a "meta" debug variant that
-#     depends on base variant and skips debug/internal/partner packages.
+# -m: Creates a meta variant that depends on the base variant and skips
+#     internal/partner packages and debuginfo.
 # -o: Skips main "Provides" that would satisfy general kernel requirements that
 #     special-purpose kernels shouldn't include.
 #
@@ -1400,21 +1308,6 @@ Requires: %{name}-%{?1:%{1}-}-modules-core-uname-r = %{KVERREL}%{uname_variant %
 %{expand:%%kernel_modules_partner_package %{?1:%{1}} %{!?{-n}:%{1}}%{?{-n}:%{-n*}}}\
 %endif\
 %{expand:%%kernel_debuginfo_package %{?1:%{1}}}\
-%endif\
-%if %{with_efiuki}\
-%package %{?1:%{1}-}uki-virt\
-Summary: %{variant_summary} unified kernel image for virtual machines\
-Provides: installonlypkg(kernel)\
-Provides: %{name}-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
-Requires: %{name}%{?1:-%{1}}-modules-core-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
-Requires(pre): %{kernel_prereq}\
-Requires(pre): systemd >= 254-1\
-Recommends: uki-direct\
-%package %{?1:%{1}-}uki-virt-addons\
-Summary: %{variant_summary} unified kernel image addons for virtual machines\
-Provides: installonlypkg(kernel)\
-Requires: %{name}%{?1:-%{1}}-uki-virt = %{specrpmversion}-%{release}\
-Requires(pre): systemd >= 254-1\
 %endif\
 %if %{with_gcov}\
 %{expand:%%kernel_gcov_package %{?1:%{1}}}\
@@ -1463,14 +1356,6 @@ The kernel package contains the Linux kernel (vmlinuz), the core of any
 Linux operating system.  The kernel handles the basic functions
 of the operating system: memory allocation, process allocation, device
 input and output, etc.
-%endif
-
-%if %{with_up_base} && %{with_efiuki}
-%description uki-virt
-Prebuilt default unified kernel image for virtual machines.
-
-%description uki-virt-addons
-Prebuilt default unified kernel image addons for virtual machines.
 %endif
 
 %ifnarch noarch %{nobuildarches}
@@ -1589,8 +1474,6 @@ rm -f localversion-next localversion-rt
 	scripts/clang-tools 2> /dev/null
 
 # SBAT data
-sed -e s,@KVER,%{KVERREL}, -e s,@SBAT_SUFFIX,%{sbat_suffix}, %{SOURCE83} > uki.sbat
-sed -e s,@KVER,%{KVERREL}, -e s,@SBAT_SUFFIX,%{sbat_suffix}, %{SOURCE84} > uki-addons.sbat
 sed -e s,@KVER,%{KVERREL}, -e s,@SBAT_SUFFIX,%{sbat_suffix}, %{SOURCE85} > kernel.sbat
 
 # only deal with configs if we are going to build for the arch
@@ -1603,63 +1486,17 @@ mkdir configs
 cd configs
 
 %{log_msg "Copy additional source files into buildroot"}
-# Drop some necessary files from the source dir into the buildroot
-cp $RPM_SOURCE_DIR/%{name}-*.config .
-cp %{SOURCE80} .
-# merge.py
-cp %{SOURCE3000} .
-# kernel-local - rename and copy for partial snippet config process
-cp %{SOURCE3001} partial-kernel-local-snip.config
-cp %{SOURCE3001} partial-kernel-local-debug-snip.config
-FLAVOR=%{primary_target} SPECPACKAGE_NAME=%{name} SPECVERSION=%{specversion} SPECRPMVERSION=%{specrpmversion} ./generate_all_configs.sh %{debugbuildsenabled}
-
-# Collect custom defined config options
-%{log_msg "Collect custom defined config options"}
-PARTIAL_CONFIGS=""
-%if %{with_gcov}
-PARTIAL_CONFIGS="$PARTIAL_CONFIGS %{SOURCE70} %{SOURCE71}"
+# Azure Linux maintains complete per-architecture configs. Copy only the config
+# for the current build architecture instead of generating Fedora/RHEL variants
+# that are discarded before the build.
+%ifarch x86_64
+cp %{SOURCE5000} %{name}-%{specrpmversion}-x86_64.config
 %endif
-%if %{with toolchain_clang}
-PARTIAL_CONFIGS="$PARTIAL_CONFIGS %{SOURCE72} %{SOURCE73}"
+%ifarch aarch64
+cp %{SOURCE5001} %{name}-%{specrpmversion}-aarch64.config
 %endif
-%if %{with clang_lto}
-PARTIAL_CONFIGS="$PARTIAL_CONFIGS %{SOURCE74} %{SOURCE75} %{SOURCE76} %{SOURCE77}"
-%endif
-PARTIAL_CONFIGS="$PARTIAL_CONFIGS partial-kernel-local-snip.config partial-kernel-local-debug-snip.config"
-
-GetArch()
-{
-  case "$1" in
-  *aarch64*) echo "aarch64" ;;
-  *x86_64*) echo "x86_64" ;;
-  # no arch, apply everywhere
-  *) echo "" ;;
-  esac
-}
-
-# Merge in any user-provided local config option changes
-%{log_msg "Merge in any user-provided local config option changes"}
-%ifnarch %nobuildarches
-for i in %{all_configs}
-do
-  kern_arch="$(GetArch $i)"
-  kern_debug="$(echo $i | grep -q debug && echo "debug" || echo "")"
-
-  for j in $PARTIAL_CONFIGS
-  do
-    part_arch="$(GetArch $j)"
-    part_debug="$(echo $j | grep -q debug && echo "debug" || echo "")"
-
-    # empty arch means apply to all arches
-    if [ "$part_arch" == "" -o "$part_arch" == "$kern_arch" ] && [ "$part_debug" == "$kern_debug" ]
-    then
-      mv $i $i.tmp
-      ./merge.py $j $i.tmp > $i
-    fi
-  done
-  rm -f $i.tmp
-done
-%endif
+cp %{SOURCE50} x509.genkey
+cp %{SOURCE62} def_variants.yaml
 
 %if %{signkernel}%{signmodules}
 
@@ -1698,32 +1535,8 @@ for opt in %{clang_make_opts}; do
   OPTS="$OPTS -m $opt"
 done
 %endif
-%{log_msg "Generate redhat configs"}
-echo "AZL: skipping Fedora process_configs.sh (re-run with AZL configs below)" # RHJOBS=$RPM_BUILD_NCPUS SPECPACKAGE_NAME=%{name} ./process_configs.sh $OPTS %{specrpmversion}
-
-# We may want to override files from the primary target in case of building
-# against a flavour of it (eg. centos not rhel), thus override it here if
-# necessary
-update_scripts() {
-	TARGET="$1"
-
-	for i in "$RPM_SOURCE_DIR"/*."$TARGET"; do
-		NEW=${i%."$TARGET"}
-		cp "$i" "$(basename "$NEW")"
-	done
-}
-
-%{log_msg "Set scripts/SOURCES targets"}
-update_target=%{primary_target}
-if [ "%{primary_target}" == "rhel" ]; then
-: # no-op to avoid empty if-fi error
-%if 0%{?centos}
-  update_scripts $update_target
-  %{log_msg "Updating scripts/sources to centos version"}
-  update_target=centos
-%endif
-fi
-update_scripts $update_target
+%{log_msg "Validate Azure Linux configs"}
+SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{specrpmversion}
 
 %endif
 
@@ -1745,21 +1558,6 @@ cd ..
 # AZL: Copy mariner.pem signing CA cert into kernel source tree
 %ifnarch noarch %nobuildarches
 cp %{SOURCE5002} linux-%{KVERREL}/certs/mariner.pem
-# AZL: Overwrite Fedora-generated configs with complete AZL kernel configs
-%{log_msg "AZL: Overwrite configs with AZL kernel configs"}
-cd linux-%{KVERREL}/configs
-# Remove all Fedora-generated configs — we replace with AZL configs for build arch only
-rm -f %{name}-%{specrpmversion}-*.config
-%ifarch x86_64
-cp %{SOURCE5000} %{name}-%{specrpmversion}-x86_64.config
-%endif
-%ifarch aarch64
-cp %{SOURCE5001} %{name}-%{specrpmversion}-aarch64.config
-%endif
-# Re-run process_configs.sh to validate AZL configs (make olddefconfig + listnewconfig)
-OPTS="-w -n -c"
-SPECPACKAGE_NAME=%{name} RHJOBS=$RPM_BUILD_NCPUS ./process_configs.sh $OPTS %{specrpmversion}
-cd ../..
 %endif
 
 # AZL: Prepare kmod subpackage sources (nvidia-open)
@@ -2326,73 +2124,6 @@ BuildKernel() {
 
     # Copy the System.map file for depmod to use
     cp System.map $RPM_BUILD_ROOT/.
-
-%if %{with_efiuki}
-        %{log_msg "Setup the EFI UKI kernel"}
-	KernelUnifiedImageDir="$RPM_BUILD_ROOT/lib/modules/$KernelVer"
-    	KernelUnifiedImage="$KernelUnifiedImageDir/$InstallName-virt.efi"
-	KernelUnifiedInitrd="$KernelUnifiedImageDir/$InstallName-virt.img"
-
-    	mkdir -p $KernelUnifiedImageDir
-
-    	dracut --conf=%{SOURCE86} \
-           --confdir=$(mktemp -d) \
-           --no-hostonly \
-           --verbose \
-           --kver "$KernelVer" \
-           --kmoddir "$RPM_BUILD_ROOT/lib/modules/$KernelVer/" \
-           --logfile=$(mktemp) \
-	   $KernelUnifiedInitrd
-
-	ukify build --linux $(realpath $KernelImage) --initrd $KernelUnifiedInitrd \
-	   --sbat @uki.sbat --os-release @/etc/os-release --uname $KernelVer \
-	   --cmdline 'console=tty0 console=ttyS0' --output $KernelUnifiedImage
-
-	rm -f $KernelUnifiedInitrd
-
-  KernelAddonsDirOut="$KernelUnifiedImage.extra.d"
-  mkdir -p $KernelAddonsDirOut
-  python3 %{SOURCE151} %{SOURCE152} $KernelAddonsDirOut virt %{primary_target} %{_target_cpu} @uki-addons.sbat
-
-%if %{signkernel}
-	%{log_msg "Sign the EFI UKI kernel"}
-%if 0%{?fedora}%{?eln}
-        %pesign -s -i $KernelUnifiedImage -o $KernelUnifiedImage.signed -a %{secureboot_ca_0} -c %{secureboot_key_0} -n %{pesign_name_0}
-%else
-%if 0%{?centos}
-        UKI_secureboot_name=centossecureboot204
-%else
-        UKI_secureboot_name=redhatsecureboot504
-%endif
-        UKI_secureboot_cert=%{_datadir}/pki/sb-certs/secureboot-uki-virt-%{_arch}.cer
-
-        %pesign -s -i $KernelUnifiedImage -o $KernelUnifiedImage.signed -a %{secureboot_ca_0} -c $UKI_secureboot_cert -n $UKI_secureboot_name
-# 0%{?fedora}%{?eln}
-%endif
-        if [ ! -s $KernelUnifiedImage.signed ]; then
-            echo "pesigning failed"
-            exit 1
-        fi
-        mv $KernelUnifiedImage.signed $KernelUnifiedImage
-
-      for addon in "$KernelAddonsDirOut"/*; do
-        %pesign -s -i $addon -o $addon.signed -a %{secureboot_ca_0} -c %{secureboot_key_0} -n %{pesign_name_0}
-        rm -f $addon
-        mv $addon.signed $addon
-      done
-
-# signkernel
-%endif
-
-    # hmac sign the UKI for FIPS
-    KernelUnifiedImageHMAC="$KernelUnifiedImageDir/.$InstallName-virt.efi.hmac"
-    %{log_msg "hmac sign the UKI for FIPS"}
-    %{log_msg "Creating hmac file: $KernelUnifiedImageHMAC"}
-    (cd $KernelUnifiedImageDir && sha512hmac $InstallName-virt.efi) > $KernelUnifiedImageHMAC;
-
-# with_efiuki
-%endif
-
 
     #
     # Generate the modules files lists
@@ -3442,11 +3173,11 @@ fi\
 %{nil}
 
 # This macro defines a %%posttrans script for a kernel package.
-#	%%kernel_variant_posttrans [-v <subpackage>] [-u uki-suffix]
+#	%%kernel_variant_posttrans [-v <subpackage>]
 # More text can follow to go at the end of this variant's %%post.
 #
-%define kernel_variant_posttrans(v:u:) \
-%{expand:%%posttrans %{?-v:%{-v*}-}%{!?-u*:core}%{?-u*:uki-%{-u*}}}\
+%define kernel_variant_posttrans(v:) \
+%{expand:%%posttrans %{?-v:%{-v*}-}core}\
 %if 0%{!?fedora:1}\
 if [ -x %{_sbindir}/weak-modules ]\
 then\
@@ -3454,7 +3185,7 @@ then\
 fi\
 %endif\
 rm -f %{_localstatedir}/lib/rpm-state/%{name}/installing_core_%{KVERREL}%{?-v:+%{-v*}}\
-/bin/kernel-install add %{KVERREL}%{?-v:+%{-v*}} /lib/modules/%{KVERREL}%{?-v:+%{-v*}}/vmlinuz%{?-u:-%{-u*}.efi} || exit $?\
+/bin/kernel-install add %{KVERREL}%{?-v:+%{-v*}} /lib/modules/%{KVERREL}%{?-v:+%{-v*}}/vmlinuz || exit $?\
 if [[ ! -e "/boot/symvers-%{KVERREL}%{?-v:+%{-v*}}.%compext" ]]; then\
     cp "/lib/modules/%{KVERREL}%{?-v:+%{-v*}}/symvers.%compext" "/boot/symvers-%{KVERREL}%{?-v:+%{-v*}}.%compext"\
     if command -v restorecon &>/dev/null; then\
@@ -3490,16 +3221,16 @@ touch %{_localstatedir}/lib/rpm-state/%{name}/installing_core_%{KVERREL}%{?-v:+%
 
 #
 # This macro defines a %%preun script for a kernel package.
-#	%%kernel_variant_preun [-v <subpackage>] -u [uki-suffix] -e
+#	%%kernel_variant_preun [-v <subpackage>] -e
 # Add kernel-install's --entry-type=type1|type2|all option (if supported) to limit removal
 # to a specific boot entry type.
 #
-%define kernel_variant_preun(v:u:e) \
-%{expand:%%preun %{?-v:%{-v*}-}%{!?-u*:core}%{?-u*:uki-%{-u*}}}\
+%define kernel_variant_preun(v:e) \
+%{expand:%%preun %{?-v:%{-v*}-}core}\
 entry_type=""\
 %{-e: \
 /bin/kernel-install --help|grep -q -- '--entry-type=' &&\
-    entry_type="--entry-type %{!?-u:type1}%{?-u:type2}" \
+  entry_type="--entry-type type1" \
 }\
 /bin/kernel-install remove %{KVERREL}%{?-v:+%{-v*}} $entry_type || exit $?\
 if [ -x %{_sbindir}/weak-modules ]\
@@ -3507,11 +3238,6 @@ then\
     %{_sbindir}/weak-modules --remove-kernel %{KVERREL}%{?-v:+%{-v*}} || exit $?\
 fi\
 %{nil}
-
-%if %{with_up_base} && %{with_efiuki}
-%kernel_variant_posttrans -u virt
-%kernel_variant_preun -u virt -e
-%endif
 
 %if %{with_up_base}
 %kernel_variant_preun -e
@@ -3810,21 +3536,6 @@ fi\
 %{expand:%%files -f debuginfo%{?3}.list %{?3:%{3}-}debuginfo}\
 %endif\
 %endif\
-%if %{with_efiuki}\
-%{expand:%%files %{?3:%{3}-}uki-virt}\
-%dir /lib/modules\
-%dir /lib/modules/%{KVERREL}%{?3:+%{3}}\
-/lib/modules/%{KVERREL}%{?3:+%{3}}/System.map\
-/lib/modules/%{KVERREL}%{?3:+%{3}}/symvers.%compext\
-/lib/modules/%{KVERREL}%{?3:+%{3}}/config\
-/lib/modules/%{KVERREL}%{?3:+%{3}}/modules.builtin*\
-%attr(0644, root, root) /lib/modules/%{KVERREL}%{?3:+%{3}}/%{?-k:%{-k*}}%{!?-k:vmlinuz}-virt.efi\
-%attr(0644, root, root) /lib/modules/%{KVERREL}%{?3:+%{3}}/.%{?-k:%{-k*}}%{!?-k:vmlinuz}-virt.efi.hmac\
-%ghost /%{image_install_path}/efi/EFI/Linux/%{?-k:%{-k*}}%{!?-k:*}-%{KVERREL}%{?3:+%{3}}.efi\
-%{expand:%%files %{?3:%{3}-}uki-virt-addons}\
-%dir /lib/modules/%{KVERREL}%{?3:+%{3}}/%{?-k:%{-k*}}%{!?-k:vmlinuz}-virt.efi.extra.d/ \
-/lib/modules/%{KVERREL}%{?3:+%{3}}/%{?-k:%{-k*}}%{!?-k:vmlinuz}-virt.efi.extra.d/*.addon.efi\
-%endif\
 %if %{?3:1} %{!?3:0}\
 %{expand:%%files %{3}}\
 %endif\
@@ -3855,6 +3566,12 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.14
+- Build directly from complete Azure Linux configs and remove unused config sources
+
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.13
+- Remove disabled unified kernel image support and sources
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.12
 - Remove alternate arm64 16K and 64K page-size variant support
 
