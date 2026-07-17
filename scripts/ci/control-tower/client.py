@@ -11,24 +11,25 @@ Provides:
 Authentication:
     Requires an active Azure CLI session (e.g. via an ``AzureCLI@2`` pipeline
     task with a Workload Identity Federation service connection).
-    ``DefaultAzureCredential`` discovers the session automatically.
+    Callers choose the credential implementation. Token diagnostics expose
+    non-secret identity claims so credential-chain selection can be verified.
 """
 
 from __future__ import annotations
 
+import base64
+import binascii
 import json
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import requests
+from azure.core.credentials import TokenCredential
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-
-if TYPE_CHECKING:
-    from azure.identity import DefaultAzureCredential
 
 type JsonValue = None | bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
@@ -47,6 +48,9 @@ TERMINAL_FAILURE_STATUSES = frozenset({"Failed", "Cancelled", "CancelledByAdmin"
 # unrecognized-but-valid new state.
 TERMINAL_STATUSES = TERMINAL_FAILURE_STATUSES | {SUCCESS_STATUS}
 _MAX_ERROR_BODY_CHARS = 4000
+_SAFE_TOKEN_CLAIMS = ("aud", "iss", "tid", "appid", "azp", "oid", "roles", "scp", "idtyp", "xms_mirid", "ver", "exp")
+_TOKEN_IDENTITY_CLAIMS = ("aud", "iss", "tid", "appid", "azp", "oid", "idtyp", "xms_mirid")
+_DIAGNOSTIC_RESPONSE_HEADERS = ("apim-request-id", "x-azure-ref", "x-ms-request-id", "WWW-Authenticate")
 
 
 @dataclass
@@ -79,9 +83,59 @@ def make_session() -> requests.Session:
     return session
 
 
-def get_token(credential: DefaultAzureCredential, audience: str) -> str:
-    """Acquire a bearer token for the given audience."""
-    return credential.get_token(f"{audience}/.default").token
+def _safe_token_claims(token: str) -> JsonObject:
+    """Decode only non-secret identity and authorization claims from a JWT."""
+    sections = token.split(".")
+    if len(sections) != 3:
+        raise ValueError("access token is not a three-section JWT")
+
+    payload = sections[1] + "=" * (-len(sections[1]) % 4)
+    claims = json.loads(base64.urlsafe_b64decode(payload).decode())
+    if not isinstance(claims, dict):
+        raise ValueError("access token payload is not a JSON object")
+
+    return {claim: claims[claim] for claim in _SAFE_TOKEN_CLAIMS if claim in claims}
+
+
+def print_token_diagnostics(credential_name: str, token: str) -> None:
+    """Print safe JWT claims without exposing the raw bearer token."""
+    try:
+        claims = _safe_token_claims(token)
+    except (binascii.Error, json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
+        print(f"##[warning]{credential_name} token diagnostics unavailable: {exc}")
+        return
+
+    print(f"{credential_name} token claims (raw token omitted):")
+    print(json.dumps(claims, indent=2, sort_keys=True))
+
+
+def compare_token_identities(reference_token: str, actual_token: str) -> None:
+    """Warn when Azure CLI and DefaultAzureCredential select different identities."""
+    try:
+        reference = _safe_token_claims(reference_token)
+        actual = _safe_token_claims(actual_token)
+    except (binascii.Error, json.JSONDecodeError, UnicodeDecodeError, ValueError) as exc:
+        print(f"##[warning]Token identity comparison unavailable: {exc}")
+        return
+
+    differences = [
+        claim for claim in _TOKEN_IDENTITY_CLAIMS
+        if reference.get(claim) != actual.get(claim)
+    ]
+    if differences:
+        print(
+            "##[warning]AzureCliCredential and DefaultAzureCredential tokens "
+            f"differ for identity claims: {', '.join(differences)}"
+        )
+    else:
+        print("AzureCliCredential and DefaultAzureCredential token identities match.")
+
+
+def get_token(credential: TokenCredential, audience: str) -> str:
+    """Acquire a bearer token and print safe identity diagnostics."""
+    token = credential.get_token(f"{audience}/.default").token
+    print_token_diagnostics(type(credential).__name__, token)
+    return token
 
 
 def _auth_headers(token: str) -> dict[str, str]:
@@ -116,6 +170,10 @@ def format_error(response: requests.Response) -> str:
     """
     method = response.request.method if response.request is not None else "?"
     lines: list[str] = [f"HTTP {response.status_code} {response.reason} from {method} {response.url}"]
+    for header in _DIAGNOSTIC_RESPONSE_HEADERS:
+        value = response.headers.get(header)
+        if value:
+            lines.append(f"  {header}: {value}")
 
     body: object
     try:
@@ -160,7 +218,7 @@ def _request_with_refresh(
     session: requests.Session,
     method: str,
     url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     *,
@@ -210,7 +268,7 @@ def post_scenario(
     session: requests.Session,
     base_url: str,
     path: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     payload: JsonObject,
@@ -243,7 +301,7 @@ def post_scenario(
 def get_job_status(
     session: requests.Session,
     base_url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     job_id: str,
@@ -294,7 +352,7 @@ def _poll_interval_seconds(elapsed_seconds: float) -> int:
 def poll_until_terminal(
     session: requests.Session,
     base_url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     job_id: str,

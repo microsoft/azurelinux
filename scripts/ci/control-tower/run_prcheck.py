@@ -26,7 +26,8 @@ import sys
 from pathlib import Path
 
 import client as ct
-from azure.identity import DefaultAzureCredential
+from azure.core.exceptions import ClientAuthenticationError
+from azure.identity import AzureCliCredential, DefaultAzureCredential
 
 
 def _parse_components(value: str) -> list[str]:
@@ -182,8 +183,17 @@ def main() -> None:
         return
 
     # ── Acquire bearer token ─────────────────────────────────────────
+    azure_cli_token: str | None = None
+    try:
+        azure_cli_token = ct.get_token(AzureCliCredential(), args.api_audience)
+    except ClientAuthenticationError as exc:
+        print(f"##[warning]AzureCliCredential comparison token failed: {exc}")
+
     credential = DefaultAzureCredential()
-    token_holder = ct.TokenHolder(token=ct.get_token(credential, args.api_audience))
+    default_token = ct.get_token(credential, args.api_audience)
+    if azure_cli_token is not None:
+        ct.compare_token_identities(azure_cli_token, default_token)
+    token_holder = ct.TokenHolder(token=default_token)
 
     session = ct.make_session()
 
