@@ -1,15 +1,29 @@
-# The forthstrap Forth interpreter segfaults on aarch64 due to pointer
-# truncation in cell2pointer() — mmap returns addresses above 4 GiB that
-# don't fit in a 32-bit cell. Known upstream bug with no fix:
-# https://github.com/openbios/openbios/issues/18
-# https://github.com/openbios/openbios/issues/25
-# Restrict to x86_64 builders where the address space layout avoids the bug.
+# Backport the upstream fix for forthstrap pointer truncation on aarch64 and
+# riscv64 hosts:
+# https://github.com/openbios/openbios/commit/e5ac46dd24e6216c36aa80462af25457e7029440
 [components.openbios]
-# Release: 1.git%{hash}%{?dist}
+# Release: %[1 + %{azl_release}].git%{hash}%{?dist}
 release = { calculation = "manual" }
 
+[components.openbios.build.defines]
+# AZL-only release counter. Add this to upstream's Release value (1) so future
+# Azure Linux rebuilds only need to increment this define.
+azl_release = "1"
+
 [[components.openbios.overlays]]
-description = "Restrict build to x86_64 — forthstrap segfaults on aarch64 (upstream bug #18/#25)"
-type = "spec-add-tag"
-tag = "ExclusiveArch"
-value = "x86_64"
+description = "Compose azl_release with upstream Release so Azure Linux rebuilds can be bumped independently"
+type = "spec-set-tag"
+tag = "Release"
+value = "%[1 + %{azl_release}].git%{hash}%{?dist}"
+
+[[components.openbios.overlays]]
+description = "Backport upstream host bit-width detection for aarch64 and riscv64 to prevent forthstrap pointer truncation"
+type = "patch-add"
+source = "0001-config-scripts-switch-arch-fix-build-on-aarch64-and-riscv64.patch"
+
+[[components.openbios.overlays]]
+description = "Use %autosetup so OpenBIOS patches are applied automatically"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%setup -q -n %\{name\}-%\{date\}-git%\{hash\}$'
+replacement = '%autosetup -p1 -n %{name}-%{date}-git%{hash}'

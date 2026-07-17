@@ -1,0 +1,32 @@
+From e5ac46dd24e6216c36aa80462af25457e7029440 Mon Sep 17 00:00:00 2001
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Mon, 29 Jun 2026 22:08:12 +0100
+Subject: [PATCH] config/scripts/switch-arch: fix build on aarch64 and riscv64
+ hosts
+
+Ensure that the host compiler builds with -DNATIVE_BITWIDTH_SMALLER_THAN_HOST_BITWIDTH
+on aarch64 and riscv64 hosts for 32-bit target architectures, otherwise host pointers
+can end up being truncated to 32-bits causing a segfault running forthstrap.
+
+Resolves: https://github.com/openbios/openbios/issues/18
+Resolves: https://github.com/openbios/openbios/issues/25
+Closes: https://github.com/openbios/openbios/pull/12
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ config/scripts/switch-arch | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/config/scripts/switch-arch b/config/scripts/switch-arch
+index 013116bf..2c20d273 100755
+--- a/config/scripts/switch-arch
++++ b/config/scripts/switch-arch
+@@ -38,7 +38,8 @@ longbits()
+     if test "$cpu" = "sparc64" -o "$cpu" = "ia64" \
+         -o "$cpu" = "amd64" -o "$cpu" = "x86_64" \
+         -o "$cpu" = "powerpc64" -o "$cpu" = "ppc64" \
+-        -o "$cpu" = "ppc64le" -o "$cpu" = "alpha" ; then
++        -o "$cpu" = "ppc64le" -o "$cpu" = "alpha" \
++        -o "$cpu" = "aarch64" -o "$cpu" = "riscv64" ; then
+         echo 64
+     else
+         echo 32
