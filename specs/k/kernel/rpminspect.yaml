@@ -14,10 +14,6 @@ emptyrpm:
         - kernel
         - kernel-devel-matched
         - kernel-modules-extra-matched
-        - kernel-zfcpdump
-        - kernel-zfcpdump-devel-matched
-        - kernel-zfcpdump-modules
-        - kernel-zfcpdump-modules-partner
 
 patches:
     ignore_list:

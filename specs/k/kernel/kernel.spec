@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 18
+%define azl_pkgrelease 19
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -191,13 +191,10 @@ Summary: The Linux kernel
 %define with_up        %{?_without_up:        0} %{?!_without_up:        1}
 # build the base variants
 %define with_base      %{?_without_base:      0} %{?!_without_base:      1}
-# kernel-zfcpdump (s390 specific kernel for zfcpdump)
-%define with_zfcpdump  %{?_without_zfcpdump:  0} %{?!_without_zfcpdump:  1}
 
 # Supported variants
 #            with_base with_gcov
 # up         X         X
-# zfcpdump   X                       X
 
 # kernel-doc
 %define with_doc       %{?_without_doc:       0} %{?!_without_doc:       1}
@@ -246,9 +243,6 @@ Summary: The Linux kernel
 # gcov support
 %define with_gcov %{?_with_gcov:1}%{?!_with_gcov:0}
 
-# Want to build a vanilla kernel build without any non-upstream patches?
-%define with_vanilla %{?_with_vanilla: 1} %{?!_with_vanilla: 0}
-
 %if 0%{?fedora}
 # Kernel headers are being split out into a separate package
 %define with_headers 0
@@ -284,10 +278,6 @@ Summary: The Linux kernel
 %define nopatches 0
 %endif
 
-%if %{with_vanilla}
-%define nopatches 1
-%endif
-
 %if !%{with_debuginfo}
 %define _enable_debug_packages 0
 %endif
@@ -315,7 +305,6 @@ Summary: The Linux kernel
 %define with_doc 0
 %define with_selftests 0
 %define with_headers 0
-%define with_zfcpdump 0
 %define with_vdso_install 0
 %define with_selftests 0
 %define with_vdso_install 0
@@ -363,13 +352,6 @@ Summary: The Linux kernel
 # sparse is currently disabled for the AZL local-spec path
 %define with_sparse 0
 
-%define with_zfcpdump 0
-
-%if 0%{?fedora}
-# This is not for Fedora
-%define with_zfcpdump 0
-%endif
-
 # Per-arch tweaks
 
 %ifarch x86_64
@@ -403,7 +385,6 @@ Summary: The Linux kernel
 # disable BuildKernel commands
 %define with_up 0
 %define with_debug 0
-%define with_zfcpdump 0
 
 %define with_debuginfo 0
 %define with_perf 0
@@ -425,12 +406,9 @@ Summary: The Linux kernel
 # ============================================================================
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
-# Azure Linux ships a single general-purpose kernel. The zfcpdump variant is
-# disabled here. This gate runs after all upstream arch/variant resolution so
-# it wins; the disabled variant code is trimmed away incrementally. Kernel
-# selftests (kernel-selftests-internal) are intentionally left enabled.
+# Azure Linux ships a single general-purpose kernel. Kernel selftests
+# (kernel-selftests-internal) are intentionally left enabled.
 # ============================================================================
-%define with_zfcpdump 0
 
 # short-hand for "are we building base/non-debug variants of ...?"
 %if %{with_up} && %{with_base}
@@ -701,18 +679,13 @@ Patch999999: linux-kernel-test.patch
 The %{package_name} meta package
 
 # This macro does requires, provides, conflicts, obsoletes for a kernel package.
-#	%%kernel_reqprovconf [-o] <subpackage>
+#	%%kernel_reqprovconf <subpackage>
 # It uses any kernel_<subpackage>_conflicts and kernel_<subpackage>_obsoletes
 # macros defined above.
-# -o: Skips main "Provides" that would satisfy general kernel requirements that
-#     special-purpose kernels shouldn't include.
-#     For example, used for zfcpdump-core to *not* provide kernel-core. (BZ 2027654)
 #
-%define kernel_reqprovconf(o) \
-%if %{-o:0}%{!-o:1}\
+%define kernel_reqprovconf() \
 Provides: kernel = %{specversion}-%{pkg_release}\
 Provides: %{name} = %{specversion}-%{pkg_release}\
-%endif\
 Provides: %{name}-%{_target_cpu} = %{specrpmversion}-%{pkg_release}%{uname_suffix %{?1}}\
 Provides: %{name}-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
 Requires: %{name}%{?1:-%{1}}-modules-core-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
@@ -1161,13 +1134,11 @@ The meta-package for the %{1} kernel\
 #
 # This macro creates a kernel-<subpackage> and its -devel and -debuginfo too.
 #	%%define variant_summary The Linux kernel compiled for <configuration>
-#	%%kernel_variant_package [-n <pretty-name>] [-m] [-o] <subpackage>
+#	%%kernel_variant_package [-n <pretty-name>] [-m] <subpackage>
 # -m: Creates a meta variant that depends on the base variant and skips
 #     internal/partner packages and debuginfo.
-# -o: Skips main "Provides" that would satisfy general kernel requirements that
-#     special-purpose kernels shouldn't include.
 #
-%define kernel_variant_package(n:mo) \
+%define kernel_variant_package(n:m) \
 %package %{?1:%{1}-}core\
 Summary: %{variant_summary}\
 Provides: %{name}-%{?1:%{1}-}core-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
@@ -1176,7 +1147,7 @@ Provides: installonlypkg(kernel)\
 Requires: %{name}-core-uname-r = %{KVERREL}%{uname_variant %{?1}}\
 Requires: %{name}-%{?1:%{1}-}-modules-core-uname-r = %{KVERREL}%{uname_variant %{?1}}\
 %endif\
-%{expand:%%kernel_reqprovconf %{?1:%{1}} %{-o:%{-o}}}\
+%{expand:%%kernel_reqprovconf %{?1:%{1}}}\
 %if %{?1:1} %{!?1:0} \
 %{expand:%%kernel_meta_package %{?1:%{1}}}\
 %endif\
@@ -1218,16 +1189,6 @@ AutoProv: yes\
 %description %{?1:%{1}-}modules-partner\
 This package provides kernel modules for the %{?2:%{2} }kernel package for Red Hat partners usage.\
 %{nil}
-
-# Now, each variant package.
-%if %{with_zfcpdump}
-%define variant_summary The Linux kernel compiled for zfcpdump usage
-%kernel_variant_package -o zfcpdump
-%description zfcpdump-core
-The kernel package contains the Linux kernel (vmlinuz) for use by the
-zfcpdump infrastructure.
-# with_zfcpdump
-%endif
 
 %if %{with_up_base}
 # And finally the main -core package
@@ -1513,10 +1474,6 @@ BuildKernel() {
     InstallName=${5:-vmlinuz}
 
     %{log_msg "Setup variables"}
-    DoModules=1
-    if [ "$Variant" = "zfcpdump" ]; then
-	    DoModules=0
-    fi
 
     # When the bootable image is just the ELF kernel, strip it.
     # We already copy the unstripped file into the debuginfo package.
@@ -1549,9 +1506,7 @@ BuildKernel() {
     # This ensures build-ids are unique to allow parallel debuginfo
     perl -p -i -e "s/^CONFIG_BUILD_SALT.*/CONFIG_BUILD_SALT=\"%{KVERREL}\"/" .config
     %{make} ARCH=$Arch KCFLAGS="$KCFLAGS" WITH_GCOV="%{?with_gcov}" %{?_smp_mflags} $MakeTarget %{?sparse_mflags} %{?kernel_mflags}
-    if [ $DoModules -eq 1 ]; then
-	%{make} ARCH=$Arch KCFLAGS="$KCFLAGS" WITH_GCOV="%{?with_gcov}" %{?_smp_mflags} modules %{?sparse_mflags} || exit 1
-    fi
+    %{make} ARCH=$Arch KCFLAGS="$KCFLAGS" WITH_GCOV="%{?with_gcov}" %{?_smp_mflags} modules %{?sparse_mflags} || exit 1
 
     %{log_msg "Setup RPM_BUILD_ROOT directories"}
     mkdir -p $RPM_BUILD_ROOT/%{image_install_path}
@@ -1572,7 +1527,6 @@ BuildKernel() {
 
     %{log_msg "Cleanup temp btf files"}
     # Remove large intermediate files we no longer need to save space
-    # (-f required for zfcpdump builds that do not enable BTF)
     rm -f vmlinux.o .tmp_vmlinux.btf
 
     %{log_msg "Install files to RPM_BUILD_ROOT"}
@@ -1647,12 +1601,10 @@ BuildKernel() {
     (cd $RPM_BUILD_ROOT/%{image_install_path} && sha512hmac $InstallName-$KernelVer) > $RPM_BUILD_ROOT/%{image_install_path}/.vmlinuz-$KernelVer.hmac;
     cp $RPM_BUILD_ROOT/%{image_install_path}/.vmlinuz-$KernelVer.hmac $RPM_BUILD_ROOT/lib/modules/$KernelVer/.vmlinuz.hmac
 
-    if [ $DoModules -eq 1 ]; then
-	%{log_msg "Install modules in RPM_BUILD_ROOT"}
-	# Override $(mod-fw) because we don't want it to install any firmware
-	# we'll get it from the linux-firmware package and we don't want conflicts
-	%{make} %{?_smp_mflags} ARCH=$Arch INSTALL_MOD_PATH=$RPM_BUILD_ROOT %{?_smp_mflags} modules_install KERNELRELEASE=$KernelVer mod-fw=
-    fi
+    %{log_msg "Install modules in RPM_BUILD_ROOT"}
+    # Override $(mod-fw) because we don't want it to install any firmware
+    # we'll get it from the linux-firmware package and we don't want conflicts
+    %{make} %{?_smp_mflags} ARCH=$Arch INSTALL_MOD_PATH=$RPM_BUILD_ROOT %{?_smp_mflags} modules_install KERNELRELEASE=$KernelVer mod-fw=
 
 %if %{with_gcov}
     %{log_msg "install gcov-needed files to $BUILDROOT/$BUILD/"}
@@ -1895,22 +1847,6 @@ BuildKernel() {
     ( find $RPM_BUILD_ROOT/lib/modules/$KernelVer -name '*.ko' | xargs /sbin/modinfo -l | \
         grep -E -v 'GPL( v2)?$|Dual BSD/GPL$|Dual MPL/GPL$|GPL and additional rights$' ) && exit 1
 
-
-    if [ $DoModules -eq 0 ]; then
-        %{log_msg "Create empty files for RPM packaging"}
-        # Ensure important files/directories exist to let the packaging succeed
-        echo '%%defattr(-,-,-)' > ../kernel${Variant:+-${Variant}}-modules-core.list
-        echo '%%defattr(-,-,-)' > ../kernel${Variant:+-${Variant}}-modules.list
-        echo '%%defattr(-,-,-)' > ../kernel${Variant:+-${Variant}}-modules-extra.list
-        echo '%%defattr(-,-,-)' > ../kernel${Variant:+-${Variant}}-modules-internal.list
-        echo '%%defattr(-,-,-)' > ../kernel${Variant:+-${Variant}}-modules-partner.list
-        mkdir -p $RPM_BUILD_ROOT/lib/modules/$KernelVer/kernel
-        # Add files usually created by make modules, needed to prevent errors
-        # thrown by depmod during package installation
-        touch $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.order
-        touch $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.builtin
-    fi
-
     # Copy the System.map file for depmod to use
     cp System.map $RPM_BUILD_ROOT/.
 
@@ -1976,35 +1912,33 @@ BuildKernel() {
         fi
     }
 
-    if [ $DoModules -eq 1 ]; then
-        # save modules.dep for debugging
-        cp $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep ../
+    # save modules.dep for debugging
+    cp $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep ../
 
-        %{log_msg "Create module list files for all kernel variants"}
-        variants_param=""
-        # this creates ../modules-*.list output, where each kmod path is as it
-        # appears in modules.dep (relative to lib/modules/$KernelVer)
-        ret=0
-        %{SOURCE22} -l "../filtermods-$KernelVer.log" sort -d $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep -c configs/def_variants.yaml $variants_param -o .. || ret=$?
-        if [ $ret -ne 0 ]; then
-            echo "8< --- filtermods-$KernelVer.log ---"
-            cat "../filtermods-$KernelVer.log"
-            echo "--- filtermods-$KernelVer.log --- >8"
+    %{log_msg "Create module list files for all kernel variants"}
+    variants_param=""
+    # this creates ../modules-*.list output, where each kmod path is as it
+    # appears in modules.dep (relative to lib/modules/$KernelVer)
+    ret=0
+    %{SOURCE22} -l "../filtermods-$KernelVer.log" sort -d $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep -c configs/def_variants.yaml $variants_param -o .. || ret=$?
+    if [ $ret -ne 0 ]; then
+      echo "8< --- filtermods-$KernelVer.log ---"
+      cat "../filtermods-$KernelVer.log"
+      echo "--- filtermods-$KernelVer.log --- >8"
 
-            echo "8< --- modules.dep ---"
-            cat $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep
-            echo "--- modules.dep --- >8"
-            exit 1
-        fi
+      echo "8< --- modules.dep ---"
+      cat $RPM_BUILD_ROOT/lib/modules/$KernelVer/modules.dep
+      echo "--- modules.dep --- >8"
+      exit 1
+    fi
 
-        create_module_file_list "kernel" ../modules-core.list ../kernel${Variant:+-${Variant}}-modules-core.list 1 0
-        create_module_file_list "kernel" ../modules.list ../kernel${Variant:+-${Variant}}-modules.list 0 0
-        create_module_file_list "internal" ../modules-internal.list ../kernel${Variant:+-${Variant}}-modules-internal.list 0 1
-        create_module_file_list "kernel" ../modules-extra.list ../kernel${Variant:+-${Variant}}-modules-extra.list 0 1
+    create_module_file_list "kernel" ../modules-core.list ../kernel${Variant:+-${Variant}}-modules-core.list 1 0
+    create_module_file_list "kernel" ../modules.list ../kernel${Variant:+-${Variant}}-modules.list 0 0
+    create_module_file_list "internal" ../modules-internal.list ../kernel${Variant:+-${Variant}}-modules-internal.list 0 1
+    create_module_file_list "kernel" ../modules-extra.list ../kernel${Variant:+-${Variant}}-modules-extra.list 0 1
 %if 0%{!?fedora:1}
-        create_module_file_list "partner" ../modules-partner.list ../kernel${Variant:+-${Variant}}-modules-partner.list 1 1
+    create_module_file_list "partner" ../modules-partner.list ../kernel${Variant:+-${Variant}}-modules-partner.list 1 1
 %endif
-    fi # $DoModules -eq 1
 
     remove_depmod_files()
     {
@@ -2042,13 +1976,10 @@ BuildKernel() {
 
 %if %{with_debuginfo}
     # Generate vmlinux.h and put it to kernel-devel path
-    # zfcpdump build does not have btf anymore
-    if [ "$Variant" != "zfcpdump" ]; then
-	%{log_msg "Build the bootstrap bpftool to generate vmlinux.h"}
-        # Build the bootstrap bpftool to generate vmlinux.h
-        BuildBpftool
-        tools/bpf/bpftool/bootstrap/bpftool btf dump file vmlinux format c > $RPM_BUILD_ROOT/$DevelDir/vmlinux.h
-    fi
+    %{log_msg "Build the bootstrap bpftool to generate vmlinux.h"}
+    # Build the bootstrap bpftool to generate vmlinux.h
+    BuildBpftool
+    tools/bpf/bpftool/bootstrap/bpftool btf dump file vmlinux format c > $RPM_BUILD_ROOT/$DevelDir/vmlinux.h
 %endif
 
     %{log_msg "Cleanup kernel-devel and kernel-debuginfo files"}
@@ -2065,11 +1996,9 @@ BuildKernel() {
 %endif
 
 %if %{signmodules}
-    if [ $DoModules -eq 1 ]; then
-        # Save the signing keys so we can sign the modules in __modsign_install_post
-        cp certs/signing_key.pem certs/signing_key.pem.sign${Variant:++${Variant}}
-        cp certs/signing_key.x509 certs/signing_key.x509.sign${Variant:++${Variant}}
-    fi
+    # Save the signing keys so we can sign the modules in __modsign_install_post
+    cp certs/signing_key.pem certs/signing_key.pem.sign${Variant:++${Variant}}
+    cp certs/signing_key.x509 certs/signing_key.x509.sign${Variant:++${Variant}}
 %endif
 
 %if %{with_gcov}
@@ -2088,16 +2017,12 @@ mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
 
 cd linux-%{KVERREL}
 
-%if %{with_zfcpdump}
-BuildKernel %make_target %kernel_image %{_use_vdso} zfcpdump
-%endif
-
 %if %{with_up_base}
 BuildKernel %make_target %kernel_image %{_use_vdso}
 %endif
 
 %ifnarch noarch %{nobuildarches}
-%if !%{with_zfcpdump} && !%{with_up}
+%if !%{with_up}
 # If only building the user space tools, then initialize the build environment
 # and some variables so that the various userspace tools can be built.
 %{log_msg "Initialize userspace tools build environment"}
@@ -2332,8 +2257,6 @@ find Documentation -type d | xargs chmod u+w
 #
 # This must be run _after_ find-debuginfo.sh runs, otherwise that will strip
 # the signature off of the modules.
-#
-# Don't sign modules for the zfcpdump variant as it is monolithic.
 
 %define __modsign_install_post \
   if [ "%{signmodules}" -eq "1" ]; then \
@@ -2341,7 +2264,6 @@ find Documentation -type d | xargs chmod u+w
     modules_dirs="$(shopt -s nullglob; echo $RPM_BUILD_ROOT/lib/modules/%{KVERREL}*)" \
     for modules_dir in $modules_dirs; do \
         variant_suffix="${modules_dir#$RPM_BUILD_ROOT/lib/modules/%{KVERREL}}" \
-        [ "$variant_suffix" == "+zfcpdump" ] && continue \
 	%{log_msg "Signing modules for %{KVERREL}${variant_suffix}"} \
         %{modsign_cmd} certs/signing_key.pem.sign${variant_suffix} certs/signing_key.x509.sign${variant_suffix} $modules_dir/ \
     done \
@@ -3018,11 +2940,6 @@ fi\
 %kernel_variant_post
 %endif
 
-%if %{with_zfcpdump}
-%kernel_variant_preun -v zfcpdump
-%kernel_variant_post -v zfcpdump
-%endif
-
 ###
 ### file lists
 ###
@@ -3309,7 +3226,6 @@ fi\
 %{nil}
 
 %kernel_variant_files %{_use_vdso} %{with_up_base}
-%kernel_variant_files %{_use_vdso} %{with_zfcpdump} zfcpdump
 
 %ifnarch noarch %{nobuildarches}
 %files modules-extra-matched
@@ -3327,6 +3243,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.19
+- Remove stale vanilla and zfcpdump build options and always handle base kernel modules.
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.18
 - Remove unused inherited flavor and RHEL-version inputs.
 
