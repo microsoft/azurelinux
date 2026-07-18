@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 16
+%define azl_pkgrelease 17
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -150,8 +150,6 @@ Summary: The Linux kernel
 # kernel package name
 %global package_name kernel
 %global gemini 0
-# Provide Patchlist.changelog file
-%global patchlist_changelog 1
 # Set released_kernel to 1 when the upstream source tarball contains a
 #  kernel release. (This includes prepatch or "rc" releases.)
 # Set released_kernel to 0 when the upstream source tarball contains an
@@ -679,10 +677,6 @@ Source87: flavors
 
 # Sources for kernel-tools
 Source2002: kvm_stat.logrotate
-
-%if %{patchlist_changelog}
-Source3002: Patchlist.changelog
-%endif
 
 Source4000: README.rst
 Source4001: rpminspect.yaml
@@ -3337,6 +3331,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.17
+- Remove the unused inherited patch-list changelog source.
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.16
 - Remove disabled inherited kABI checking and stablelist machinery.
 
