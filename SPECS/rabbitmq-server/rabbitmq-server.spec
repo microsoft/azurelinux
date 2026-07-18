@@ -25,7 +25,7 @@ Patch12:		CVE-2026-57218.patch
 Patch13:		CVE-2026-57219.patch
 Patch14:		CVE-2026-57220.patch
 Patch15:		CVE-2026-57221.patch
-Patch16:                CVE-2026-57216.patch
+Patch16:		CVE-2026-57216.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
