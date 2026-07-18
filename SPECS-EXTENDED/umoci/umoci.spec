@@ -1,7 +1,7 @@
 Summary:        Open Container Image manipulation tool
 Name:           umoci
 Version:        0.4.7
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -23,7 +23,7 @@ alternative to oci-image-tools provided by the OCI.
 %build
 tar --no-same-owner -xf %{SOURCE0}
 export GOPATH=%{our_gopath}
-make BUILD_FLAGS="-mod=vendor" VERSION="%{version}" umoci
+GOOS=linux GOARCH=amd64 go build -mod=vendor -ldflags="-X github.com/opencontainers/umoci.version=%{version}" -o ./umoci github.com/opencontainers/umoci/cmd/umoci
 
 %install
 install -D -m 0755 ./umoci %{buildroot}%{_bindir}/umoci
@@ -39,6 +39,9 @@ go test -mod=vendor
 %{_bindir}/umoci
 
 %changelog
+* Fri Jul 17 2026 Sandeep Karambelkar <skarambelkar@microsoft.com> - 0.4.7-14
+- Fix the version for umoci
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.4.7-13
 - Bump release to rebuild with go 1.20.10
 
