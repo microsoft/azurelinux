@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 17
+%define azl_pkgrelease 18
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -626,7 +626,6 @@ BuildRequires: lld
 # xzcat -qq ${TARBALL} | git get-tar-commit-id
 Source0: kernel-%{specrpmversion}.%{kextraversion}.tar.gz
 
-Source1: Makefile.rhelver
 Source2: %{package_name}.changelog
 
 Source10: redhatsecurebootca5.cer
@@ -672,8 +671,6 @@ Source62: def_variants.yaml.fedora
 Source81: process_configs.sh
 
 Source85: kernel.sbat.template
-
-Source87: flavors
 
 # Sources for kernel-tools
 Source2002: kvm_stat.logrotate
@@ -1319,7 +1316,6 @@ ApplyOptionalPatch()
 mv CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specrpmversion}.%{kextraversion} linux-%{KVERREL}
 
 cd linux-%{KVERREL}
-# cp -a %{SOURCE1} . (disabled for AzureLinux — Makefile.rhelver is Red Hat-specific)
 
 %{log_msg "Start of patch applications"}
 %if !%{nopatches}
@@ -3331,6 +3327,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.18
+- Remove unused inherited flavor and RHEL-version inputs.
+
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.17
 - Remove the unused inherited patch-list changelog source.
 
@@ -3360,7 +3359,6 @@ fi\
 
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.8
 - Remove unused automotive kernel support
-
 
 * Fri Jul 17 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.7
 - Build only the base kernel variants and restore kernel selftests
