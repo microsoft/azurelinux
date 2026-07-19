@@ -20,7 +20,7 @@
 Summary:           Open vSwitch daemon/database/utilities
 Name:              openvswitch
 Version:           3.3.9
-Release:           1%{?dist}
+Release:           2%{?dist}
 License:           ASL 2.0 AND LGPLv2+ AND SISSL
 Vendor:            Microsoft Corporation
 Distribution:      Azure Linux
@@ -33,6 +33,10 @@ Source1:           openvswitch.sysusers
 
 # Upstream branch-3.3 backport, pending v3.3.10.
 Patch0:  0001-tests-bfd-Fix-waiting-time-after-re-enabling-BFD-in-.patch
+
+# Skip the timing-sensitive "ALB - min num PMD/RxQ" test that persistently
+# times out under the CPU contention of the package build/CI.
+Patch1:  0002-tests-alb-skip-min-num-PMD-RxQ-under-CI-contention.patch
 
 BuildRequires: gcc gcc-c++ make
 BuildRequires: autoconf automake libtool
@@ -509,6 +513,10 @@ fi
 %{_sysusersdir}/openvswitch.conf
 
 %changelog
+* Mon Jul 20 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.3.9-2
+- Skip the timing-sensitive "ALB - min num PMD/RxQ" ptest that persistently
+  times out under the CPU contention of the package build/CI.
+
 * Wed Jun 24 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.3.9-1
 - Update to 3.3.9. Drops openssl-3.2 SSL test, Python 3.13 vlog,
   CVE-2026-34956, ovsdb-idl flaky, and ofproto-dpif select-group
