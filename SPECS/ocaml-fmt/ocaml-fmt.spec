@@ -7,12 +7,15 @@
 Summary:        OCaml Format pretty-printer combinators
 Name:           ocaml-%{srcname}
 Version:        0.9.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        ISC
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://erratique.ch/software/fmt
 Source0:        https://github.com/dbuenzli/fmt/archive/v%{version}/%{srcname}-%{version}.tar.gz
+# test/styled_perf_bug is an infinite-loop throughput benchmark (not a pass/fail
+# test); mark it build-only so `pkg.ml test` (%check) doesn't hang until timeout.
+Patch0:         ocaml-fmt-0.9.0-dont-run-perf-bug-benchmark.patch
 
 BuildRequires:  ocaml >= 4.05.0
 BuildRequires:  ocaml-cmdliner-devel >= 0.9.8
@@ -101,6 +104,11 @@ ocaml pkg/pkg.ml test
 %{_libdir}/ocaml/%{srcname}/%{srcname}*.mli
 
 %changelog
+* Mon Jul 20 2026 Sumit Jena <v-sumitjena@microsoft.com> - 0.9.0-2
+- Mark test/styled_perf_bug as build-only (~run:false) in pkg/pkg.ml (Patch0);
+  it is an infinite-loop throughput benchmark that hung `pkg.ml test` in %%check
+  until the build timed out. test/test still runs.
+
 * Tue Jun 04 2024 Andrew Phelps <anphel@microsoft.com> - 0.9.0-1
 - Upgrade to version 0.9.0
 

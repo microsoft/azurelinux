@@ -1,0 +1,21 @@
+pkg/pkg.ml: build but do not run the styled_perf_bug benchmark
+
+test/styled_perf_bug.ml is an infinite-loop (`while true do ... done`)
+micro-benchmark that prints formatting throughput forever ("Formatted N
+messages/second"). It is a manual reproducer for a styling performance bug,
+not a pass/fail test. Registered with a plain `Pkg.test`, it is executed by
+`ocaml pkg/pkg.ml test` (the %check step) and never returns, so the package
+build hangs until the CI 4h timeout.
+
+Mark it `~run:false` (topkg's build-only mode) so the executable is still
+compiled -- keeping build coverage -- but is not run. test/test still runs.
+
+--- a/pkg/pkg.ml
++++ b/pkg/pkg.ml
+@@ -16,5 +16,5 @@
+        Pkg.mllib ~api:[] "src/fmt_top.mllib";
+        Pkg.lib "src/fmt_tty_top_init.ml";
+        Pkg.test "test/test";
+-       Pkg.test "test/styled_perf_bug";
++       Pkg.test ~run:false "test/styled_perf_bug";
+      ]
