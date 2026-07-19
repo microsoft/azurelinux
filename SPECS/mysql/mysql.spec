@@ -3,7 +3,7 @@
 Summary:        MySQL.
 Name:           mysql
 Version:        8.0.46
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions AND LGPLv2 AND BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -115,6 +115,13 @@ sudo -u test ctest --exclude-regex merge_large_tests || { cat Testing/Temporary/
 %{_libdir}/pkgconfig/mysqlclient.pc
 
 %changelog
+* Sun Jul 19 2026 Sumit Jena <v-sumitjena@microsoft.com> - 8.0.46-2
+- Extend skip-failing-ptests.patch to also disable the AMD64-flaky router test
+  ShareConnectionTinyPoolOneServerTest.classic_protocol_server_greeting_error
+  (routertest_integration_routing_sharing_constrained_pools): under
+  max-connections=1 its cleanup races on AMD64 with "1040 Too many connections"
+  and a wait_for_idle_server_connections timeout, while passing on ARM64.
+
 * Wed Apr 22 2026 Kanishk Bansal <kanbansal@microsoft.com> - 8.0.46-1
 - Upgrade to fix CVE-2026-6409, CVE-2026-34278, CVE-2026-35239, CVE-2026-21998, CVE-2026-35237,
   CVE-2026-22009, CVE-2026-34270, CVE-2026-34293, CVE-2026-34271, CVE-2026-22002, CVE-2026-22017,
