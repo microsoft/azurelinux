@@ -6,7 +6,7 @@ Name:           nginx
 # Currently on "stable" version of nginx from https://nginx.org/en/download.html.
 # Note: Stable versions are even (1.20), mainline versions are odd (1.21)
 Version:        1.28.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        BSD-2-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ Patch14:        CVE-2026-42055.patch
 
 # njs patches start at 1001 to keep them separate from nginx patches
 Patch1001:      CVE-2026-8711.patch
+Patch1002:      CVE-2026-56434.patch
 
 BuildRequires:  libxml2-devel
 BuildRequires:  libxslt-devel
@@ -186,6 +187,9 @@ rm -rf nginx-tests
 %dir %{_sysconfdir}/%{name}
 
 %changelog
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-8
+- Patch for CVE-2026-56434
+
 * Tue Jun 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.28.3-7
 - Patch for CVE-2026-42055
 
