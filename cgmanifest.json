@@ -14602,8 +14602,8 @@
         "type": "other",
         "other": {
           "name": "nodejs",
-          "version": "24.17.0",
-          "downloadUrl": "https://nodejs.org/download/release/v24.17.0/node-v24.17.0.tar.xz"
+          "version": "24.18.0",
+          "downloadUrl": "https://nodejs.org/download/release/v24.18.0/node-v24.18.0.tar.xz"
         }
       }
     },
