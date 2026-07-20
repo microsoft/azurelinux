@@ -432,7 +432,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -473,6 +473,7 @@ Patch30:  kvm-migration-Fix-UAF-for-incoming-migration-on-Migratio.patch
 Patch31:  CVE-2026-3195.patch
 Patch32:  CVE-2026-48914.patch
 Patch33:  CVE-2026-3196.patch
+Patch34:  CVE-2026-3842.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -3522,6 +3523,9 @@ fi
 # endif !tools_only
 %endif
 %changelog
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-11
+- Patch for CVE-2026-3842
+
 * Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-10
 - Patch for CVE-2026-3196
 
