@@ -49,6 +49,26 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
 
+pushd %{_builddir}/%{name}-%{version}/src/runtime/config
+cp configuration-clh.toml configuration-clh-preview.toml
+cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
+popd
+
+pushd %{_builddir}/%{name}-%{version}/src/runtime-rs/config
+cp configuration-clh-runtime-rs.toml configuration-clh-preview-runtime-rs.toml
+cp configuration-clh-runtime-rs-debug.toml configuration-clh-preview-runtime-rs-debug.toml
+popd
+
+for config_file in \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs-debug.toml; do
+  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
+  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
+  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
+done
+
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
 %define kata_shim_bin %{_prefix}/local/bin
@@ -60,6 +80,12 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
+install -m 0644 \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs.toml \
+  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs-debug.toml \
+  %{buildroot}%{defaults_kata}/
 
 %files
 %{kata_bin}/kata-collect-data.sh
@@ -70,6 +96,10 @@ popd
 %{defaults_kata}/configuration.toml
 %{defaults_kata}/configuration-clh.toml
 %{defaults_kata}/configuration-clh-debug.toml
+%{defaults_kata}/configuration-clh-preview.toml
+%{defaults_kata}/configuration-clh-preview-debug.toml
+%{defaults_kata}/configuration-clh-preview-runtime-rs.toml
+%{defaults_kata}/configuration-clh-preview-runtime-rs-debug.toml
 %{defaults_kata}/configuration-clh-runtime-rs.toml
 %{defaults_kata}/configuration-clh-runtime-rs-debug.toml
 
@@ -123,6 +153,7 @@ popd
 %changelog
 * Mon Jul 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.32.0.kata0-1
 - Auto-upgrade to 3.32.0.kata0
+- Add preview configurations for VM templating
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.19.1.kata3-7
 - Patch for CVE-2026-56852
