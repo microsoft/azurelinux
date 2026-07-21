@@ -196,6 +196,7 @@ make cctest
 %changelog
 * Tue Jul 21 2026 Sumit Jena <sumitjena@microsoft.com> - 24.18.0-1
 - Upgrade to 24.18.0 (bundled npm 11.16.0).
+- Fixes CVE-2026-45149
 
 * Tue Jun 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.17.0-2
 - Patch for CVE-2026-12151 and CVE-2026-9679
