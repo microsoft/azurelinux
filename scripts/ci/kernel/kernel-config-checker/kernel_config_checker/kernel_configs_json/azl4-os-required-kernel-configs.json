@@ -2736,7 +2736,7 @@
             "value": "y"
           }
         ],
-        "justification": "Perf tuning changes - PR: https://github.com/microsoft/azurelinux/pull/8944"
+        "justification": "madvise allows workloads that benefit from transparent huge pages to opt in, while other workloads avoid system-wide THP overhead. This is a balanced default for Azure Linux. Historical context: https://github.com/microsoft/azurelinux/pull/8944"
       },
       {
         "name": "CONFIG_TUN",
@@ -3342,13 +3342,6 @@
           "name": "CONFIG_TDX_GUEST_DRIVER",
           "values": [
             { "architecture": "x86_64", "value": "y" }
-          ],
-          "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_TRANSPARENT_HUGEPAGE_MADVISE",
-          "values": [
-            { "architecture": "x86_64", "value": "n" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
         },
