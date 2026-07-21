@@ -4,13 +4,26 @@
 
 ### Install azldev
 
-The [`azldev`](https://github.com/microsoft/azure-linux-dev-tools) CLI tool drives all component, image, and build workflows. Install it from source (requires Go):
+The [`azldev`](https://github.com/microsoft/azure-linux-dev-tools) CLI tool drives all component, image, and build workflows. Its version is declared in `tools/azldev/go.mod`.
+
+From the repository root, install the selected version with:
 
 ```bash
-go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
+go -C tools/azldev install github.com/microsoft/azure-linux-dev-tools/cmd/azldev
+azldev --version
 ```
 
-> **Note:** azldev is still in active development, using the latest commit from the `main` branch is recommended for the most up-to-date features and fixes.
+Go installs the command in `$(go env GOPATH)/bin`; add that directory to `PATH` if needed. Installation is recommended for normal development and shell completion. For one-off use without installing:
+
+```bash
+go -C tools/azldev run github.com/microsoft/azure-linux-dev-tools/cmd/azldev --version
+```
+
+For unpinned development, you can also run the latest version of the tool:
+
+```bash
+go install github.com/microsoft/azure-linux-dev-tools/cmd/azldev@latest
+```
 
 ### Render specs
 
@@ -33,9 +46,11 @@ If the workspace is opened correctly, the agent will automatically gain access t
 The `azl-diagnose` agent and Koji-related tools require:
 
 1. **MCP Python packages** — the MCP servers won't start without them:
+
    ```bash
    pip3 install --user -r scripts/mcps/requirements.txt
    ```
+
 2. **Network access to the internal Koji instance** — The internal Koji is only accessible via VPN or the corporate network. If the agent reports connection errors, verify you are connected before retrying.
 3. **(Optional) `.env` configuration** — Create a `.env` file (in the workspace root or `scripts/mcps/`) to pre-configure MCP server settings like the Koji base URL and pre-approved insecure URLs. This avoids the agent having to set the URL or approve self-signed certificates every session. See [scripts/mcps/.env.example](scripts/mcps/.env.example) for available variables.
 

@@ -26,12 +26,11 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
-          go-version: stable
+          go-version-file: tools/azldev/go.mod
           cache: false
 
-      - name: Install azldev
-        run: |
-          go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
-
       - name: "Validate config (strict)"
-        run: azldev config dump > /dev/null
+        run: |
+          set -euo pipefail
+          azldev_hash="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py hash tools/azldev/go.mod)"
+          go run "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${azldev_hash}" config dump > /dev/null

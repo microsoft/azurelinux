@@ -35,9 +35,9 @@ RUN tdnf -y install \
     symcrypt-openssl \
     && tdnf clean all
 
-# The version is passed in as a build arg from .azldev-version in the repo
-# root.  Callers (check-rendered-specs.yml, etc.) read the file and pass it
-# via --build-arg so the Dockerfile never needs repo-root build context.
+# The azldev Git hash is resolved from tools/azldev/go.mod. Callers
+# (check-rendered-specs.yml, etc.) pass it via --build-arg so the Dockerfile
+# never needs repo-root build context.
 # No default — omitting --build-arg will fail the build loudly.
 # Optional Go module proxy for the `go install` below. Callers that build
 # behind an internal-only proxy forward it via --build-arg GOPROXY=...; Docker
@@ -50,10 +50,10 @@ RUN tdnf -y install \
 # direct) and would break the install below. The ADO/OneBranch PR build
 # forwards the host's internal proxy.
 ARG GOPROXY
-ARG AZLDEV_VERSION
-RUN test -n "${AZLDEV_VERSION}" || { echo "ERROR: AZLDEV_VERSION build-arg is required (read from .azldev-version)" >&2; exit 1; } \
+ARG AZLDEV_HASH
+RUN test -n "${AZLDEV_HASH}" || { echo "ERROR: AZLDEV_HASH build-arg is required" >&2; exit 1; } \
     && GOBIN=/usr/local/bin go install \
-    "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_VERSION}" \
+    "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@${AZLDEV_HASH}" \
     && rm -rf /root/go /root/.cache
 
 ARG UID=1000
