@@ -9,5 +9,5 @@ description = 'azurelinux-base'
 log-dir = 'build/logs'
 work-dir = 'build/work'
 output-dir = 'out'
-default-distro = { name = "azurelinux" }
+default-distro = { name = "azurelinux", version = "4.0-stage2" }
 rendered-specs-dir = '../specs'
