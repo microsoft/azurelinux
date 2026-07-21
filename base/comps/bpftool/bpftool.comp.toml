@@ -1,0 +1,12 @@
+[components.bpftool]
+
+# bpftool 7.7 updates its bundled libbpf for the BPF kfunc implicit-argument
+# transition exposed by newer kernel BTF. Fedora 43 remains on bpftool 7.6.
+# Ref: https://src.fedoraproject.org/rpms/bpftool/c/285dbe33afe28586591c405a113c548f9cd6f08e
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "rawhide" }, upstream-commit = "285dbe33afe28586591c405a113c548f9cd6f08e" }
+
+[[components.bpftool.overlays]]
+description = "Add the direct OpenSSL development dependency required by bpftool 7.7 signing support"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "openssl-devel"
