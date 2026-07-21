@@ -15,7 +15,7 @@
 
 Name: criu
 Version: 4.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Tool for Checkpoint/Restore in User-space
 License: GPL-2.0-only AND LGPL-2.1-only AND MIT
 URL: http://criu.org/
@@ -55,6 +55,7 @@ BuildRequires: make
 # https://bugzilla.redhat.com/show_bug.cgi?id=902875
 ExclusiveArch: x86_64 %{arm} ppc64le aarch64 s390x riscv64
 
+Patch100: 0001-rseq-use-kernel-rseq.h-when-glibc-detects-it.patch
 %description
 criu is the user-space part of Checkpoint/Restore in User-space
 (CRIU), a project to implement checkpoint/restore functionality for
@@ -118,6 +119,7 @@ This script can help to workaround the so called "PID mismatch" problem.
 %setup -q
 %patch -P 99 -p1
 
+%patch -P 100 -p1
 %build
 # This package calls LD directly without specifying the LTO plugins.  Until
 # that is fixed, disable LTO.

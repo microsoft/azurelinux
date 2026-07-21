@@ -276,7 +276,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.cri-o]
 [components.cri-tools]
 [components.'cri-tools1.35']
-[components.criu]
 [components.cronie]
 [components.crontabs]
 [components.cross-binutils]
