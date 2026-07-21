@@ -12,6 +12,10 @@ go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-
 
 > **Note:** azldev is still in active development, using the latest commit from the `main` branch is recommended for the most up-to-date features and fixes.
 
+### azldev documentation
+
+See the [azldev user guide](https://github.com/microsoft/azure-linux-dev-tools/tree/main/docs/user) for how-to guides and reference documentation covering components, overlays, images, configuration, and CLI commands.
+
 ### Render specs
 
 The `specs/` directory (as specified by `rendered-specs-dir` config) contains "rendered" spec files created by `azldev`. They are a read-only snapshot of the final spec files after all overlays and modifications have been applied. They are the canonical source for what will be built and packaged.
@@ -33,9 +37,11 @@ If the workspace is opened correctly, the agent will automatically gain access t
 The `azl-diagnose` agent and Koji-related tools require:
 
 1. **MCP Python packages** — the MCP servers won't start without them:
+
    ```bash
    pip3 install --user -r scripts/mcps/requirements.txt
    ```
+
 2. **Network access to the internal Koji instance** — The internal Koji is only accessible via VPN or the corporate network. If the agent reports connection errors, verify you are connected before retrying.
 3. **(Optional) `.env` configuration** — Create a `.env` file (in the workspace root or `scripts/mcps/`) to pre-configure MCP server settings like the Koji base URL and pre-approved insecure URLs. This avoids the agent having to set the URL or approve self-signed certificates every session. See [scripts/mcps/.env.example](scripts/mcps/.env.example) for available variables.
 
