@@ -1,0 +1,13 @@
+[components.criu]
+
+# Backport from Fedora commit 12ddfeab47d329eb37e8d7f31f97cde574930c00.
+[[components.criu.overlays]]
+description = "Use kernel rseq definitions when glibc exposes the newer Linux UAPI"
+type = "patch-add"
+source = "0001-rseq-use-kernel-rseq.h-when-glibc-detects-it.patch"
+
+[[components.criu.overlays]]
+description = "Apply the rseq compatibility patch from CRIU's explicit prep patch list"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P 100 -p1"]

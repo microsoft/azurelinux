@@ -1,0 +1,47 @@
+From 95531dcc36c2453b9242e0de17b8fedb20ce48ca Mon Sep 17 00:00:00 2001
+From: Adrian Reber <areber@redhat.com>
+Date: Tue, 3 Mar 2026 06:29:53 +0000
+Subject: [PATCH] rseq: use kernel rseq.h when glibc detects it
+
+Recent glibc conditionally includes the kernel's linux/rseq.h when
+__GLIBC_HAVE_KERNEL_RSEQ is defined, but CRIU's own definitions conflict
+with that newer kernel header. Use the kernel definitions when glibc has
+detected them, and otherwise retain CRIU's fallback definitions.
+
+Signed-off-by: Adrian Reber <areber@redhat.com>
+---
+ criu/include/linux/rseq.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/criu/include/linux/rseq.h b/criu/include/linux/rseq.h
+index 5ceefbf8e..d7f81e9a2 100644
+--- a/criu/include/linux/rseq.h
++++ b/criu/include/linux/rseq.h
+@@ -14,6 +14,16 @@
+ 
+ #include "common/config.h"
+ 
++/*
++ * If glibc detected that the kernel rseq.h header exists, include
++ * it directly using angle brackets (which bypasses -iquote and finds
++ * the real kernel header). Otherwise fall back to our own copy of
++ * the definitions.
++ */
++#ifdef __GLIBC_HAVE_KERNEL_RSEQ
++#include <linux/rseq.h>
++#else /* !__GLIBC_HAVE_KERNEL_RSEQ */
++
+ #ifdef CONFIG_HAS_NO_LIBC_RSEQ_DEFS
+ /*
+  * linux/rseq.h
+@@ -45,6 +55,8 @@ enum rseq_cs_flags {
+ };
+ #endif /* CONFIG_HAS_NO_LIBC_RSEQ_DEFS */
+ 
++#endif /* !__GLIBC_HAVE_KERNEL_RSEQ */
++
+ /*
+  * Let's use our own definition of struct rseq_cs because some distros
+  * (for example Mariner GNU/Linux) declares this structure their-own way.
+-- 
+2.51.1
