@@ -1,5 +1,10 @@
 [components.systemd]
 
+# systemd 258.5 filters the EFSBADCRC and EFSCORRUPTED aliases introduced by
+# Linux 7.0, avoiding duplicate errno lookup-table initializers under -Werror.
+# Ref: https://github.com/systemd/systemd/commit/3cfb16998808a6ec8012a6120d0a82f0e1a0c8bb
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "1841dad7e2620be4d8b8dcb1dedaa45cd62d0771" }
+
 # AZL's setup package is 2.15.0-1, but upstream Fedora 41+ systemd requires >= 2.15.0-3.
 # Lower the version threshold to match what's available in AZL.
 # Ref: https://src.fedoraproject.org/rpms/setup/commits/rawhide (2.15.0-3 added /usr/lib/sysusers.d ownership)
