@@ -3,7 +3,7 @@
 
 Name:             xdp-tools
 Version:          1.5.8
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:          Utilities and example programs for use with XDP
 %global _soversion 1.5.0
 
@@ -35,6 +35,7 @@ Requires:         libxdp = %{version}-%{release}
 
 %global _hardened_build 1
 
+Patch0: xdp-tools-include-limits.patch
 %description
 Utilities and example programs for use with XDP
 
