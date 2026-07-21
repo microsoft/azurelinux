@@ -21,6 +21,9 @@ Source15:       azurelinux-logo-48.png
 Source16:       azurelinux-logo-96.png
 Source17:       azurelinux-logo-256.png
 
+# Windows ICO icon (wsl-setup consumes /usr/share/pixmaps/fedora-logo.ico)
+Source18:       azurelinux-logo.ico
+
 # Bootloader assets (Apple EFI / rEFInd)
 Source20:       azurelinux.icns
 Source21:       azurelinux.vol
@@ -105,6 +108,7 @@ ln -s ../apps/start-here.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/plac
 mkdir -p %{buildroot}%{_datadir}/pixmaps
 install -p -m 644 %{SOURCE10} %{buildroot}%{_datadir}/pixmaps/azurelinux-logo.svg
 install -p -m 644 %{SOURCE15} %{buildroot}%{_datadir}/pixmaps/azurelinux-logo.png
+install -p -m 644 %{SOURCE18} %{buildroot}%{_datadir}/pixmaps/azurelinux-logo.ico
 
 # Compatibility symlinks for consumers that expect generic-logos / fedora-logos filenames
 # plymouth, sddm, gnome-control-center use system-logo-white.png
@@ -115,6 +119,7 @@ ln -s azurelinux-logo.png %{buildroot}%{_datadir}/pixmaps/fedora-gdm-logo.png
 ln -s azurelinux-logo.png %{buildroot}%{_datadir}/pixmaps/fedora-logo.png
 ln -s azurelinux-logo.png %{buildroot}%{_datadir}/pixmaps/fedora-logo-small.png
 ln -s azurelinux-logo.svg %{buildroot}%{_datadir}/pixmaps/fedora-logo-sprite.svg
+ln -s azurelinux-logo.ico %{buildroot}%{_datadir}/pixmaps/fedora-logo.ico
 
 # Compatibility: fedora-logo-icon.svg in hicolor scalable (mate-desktop expects this)
 ln -s azurelinux-logo-icon.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/fedora-logo-icon.svg
@@ -147,11 +152,13 @@ install -p -m 644 %{SOURCE15} %{buildroot}%{_datadir}/pixmaps/poweredby.png
 %{_datadir}/icons/hicolor/*/places/*
 %{_datadir}/pixmaps/azurelinux-logo.svg
 %{_datadir}/pixmaps/azurelinux-logo.png
+%{_datadir}/pixmaps/azurelinux-logo.ico
 %{_datadir}/pixmaps/system-logo-white.png
 %{_datadir}/pixmaps/fedora-gdm-logo.png
 %{_datadir}/pixmaps/fedora-logo.png
 %{_datadir}/pixmaps/fedora-logo-small.png
 %{_datadir}/pixmaps/fedora-logo-sprite.svg
+%{_datadir}/pixmaps/fedora-logo.ico
 %{_datadir}/pixmaps/bootloader/*
 %{_datadir}/plymouth/themes/charge/logo.png
 %{_datadir}/plymouth/themes/spinner/watermark.png
