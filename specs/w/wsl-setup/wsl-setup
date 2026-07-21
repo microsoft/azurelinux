@@ -17,7 +17,7 @@ DISTRIBUTION_CONF_FILE="/usr/lib/wsl-distribution.conf"
 DISTRIBUTION_CONF_LINK="/etc/wsl-distribution.conf"
 . /etc/os-release
 DEFAULT_NAME="${NAME// /}-${VERSION_ID%.*}"
-ICON_PATH="/usr/share/pixmaps/fedora-logo.ico"
+ICON_PATH="/usr/share/pixmaps/azurelinux-logo.png"
 
 ###############
 # Show help

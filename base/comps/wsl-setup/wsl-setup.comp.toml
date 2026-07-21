@@ -1,0 +1,13 @@
+[components.wsl-setup]
+
+# The wsl-setup script (Source8) sets the default WSL distribution icon via ICON_PATH.
+# Upstream Fedora points this at /usr/share/pixmaps/fedora-logo.ico, which azurelinux-logos
+# does not provide (it only ships a fedora-logo.png compatibility symlink, not a .ico). Point
+# it at the Azure Linux logo, which azurelinux-logos installs directly at
+# /usr/share/pixmaps/azurelinux-logo.png.
+[[components.wsl-setup.overlays]]
+description = "Use the Azure Linux logo (/usr/share/pixmaps/azurelinux-logo.png) as the default WSL distribution icon instead of the Fedora fedora-logo.ico path, which is not shipped by azurelinux-logos"
+type = "file-search-replace"
+file = "wsl-setup"
+regex = 'ICON_PATH="/usr/share/pixmaps/fedora-logo\.ico"'
+replacement = 'ICON_PATH="/usr/share/pixmaps/azurelinux-logo.png"'
