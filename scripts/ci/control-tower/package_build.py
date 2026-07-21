@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import client as ct
-from azure.identity import DefaultAzureCredential
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -96,7 +95,7 @@ def submit_and_monitor(
     print(json.dumps(request.payload, indent=2))
 
     base_url = api_base_url.rstrip("/")
-    credential = DefaultAzureCredential()
+    credential = ct.make_credential()
     token_holder = ct.TokenHolder(token=ct.get_token(credential, api_audience))
     session = ct.make_session()
 

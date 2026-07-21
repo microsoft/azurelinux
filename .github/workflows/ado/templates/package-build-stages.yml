@@ -89,6 +89,8 @@ stages:
               API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
               CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
               PACKAGE_ENVIRONMENT: $(packageEnvironment)
+              # Secret predefined variables are not auto-exposed.
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               # Build.Reason is predefined and auto-exposed as $BUILD_REASON;
               # reference it directly and do not map it here (env: overrides
               # of reserved variables are silently ignored by the agent).
