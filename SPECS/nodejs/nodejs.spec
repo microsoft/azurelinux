@@ -16,7 +16,7 @@ Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
 Version:        24.17.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -37,6 +37,7 @@ Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
 Patch6:         CVE-2026-12151.patch
 Patch7:         CVE-2026-9679.patch
+Patch8:         CVE-2026-45149.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -194,6 +195,9 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Mon Jul 20 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 24.17.0-3
+- Patch bundled brace-expansion for CVE-2026-45149.
+
 * Tue Jun 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.17.0-2
 - Patch for CVE-2026-12151 and CVE-2026-9679
 
