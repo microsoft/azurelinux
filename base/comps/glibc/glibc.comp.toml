@@ -1,3 +1,15 @@
 [components.glibc]
 # Release: %{baserelease}%{?dist}
 release = { calculation = "manual" }
+
+[[components.glibc.overlays]]
+description = "Bump the manual release for the OPEN_TREE header compatibility fix"
+type = "spec-search-replace"
+regex = '^%global baserelease 10$'
+replacement = "%global baserelease 11"
+
+# Backport of https://sourceware.org/git/?p=glibc.git;a=commit;h=3ecfa68561d723564a1fb565366182eb4acb3e8f
+[[components.glibc.overlays]]
+description = "Avoid redefining OPEN_TREE macros provided by newer Linux UAPI headers"
+type = "patch-add"
+source = "glibc-open-tree-guards.patch"

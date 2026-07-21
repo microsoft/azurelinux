@@ -1,0 +1,38 @@
+From 3ecfa68561d723564a1fb565366182eb4acb3e8f Mon Sep 17 00:00:00 2001
+From: Florian Weimer <fweimer@redhat.com>
+Date: Wed, 4 Mar 2026 18:32:36 +0100
+Subject: [PATCH] Linux: Only define OPEN_TREE_* macros in <sys/mount.h> if
+ undefined (bug 33921)
+
+There is a conditional inclusion of <linux/mount.h> earlier in the file.
+If that defines the macros, do not redefine them.  This addresses build
+problems as the token sequence used by the UAPI macro definitions changes
+between Linux versions.
+
+Adapted to the glibc snapshot used by Azure Linux.
+Backport-of: 3ecfa68561d723564a1fb565366182eb4acb3e8f
+---
+ sysdeps/unix/sysv/linux/sys/mount.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/sysdeps/unix/sysv/linux/sys/mount.h b/sysdeps/unix/sysv/linux/sys/mount.h
+index 365da1c..dbf31e9 100644
+--- a/sysdeps/unix/sysv/linux/sys/mount.h
++++ b/sysdeps/unix/sysv/linux/sys/mount.h
+@@ -264,8 +264,12 @@ enum fsconfig_command
+ #define FSOPEN_CLOEXEC          0x00000001
+ 
+ /* open_tree flags.  */
+-#define OPEN_TREE_CLONE    1         /* Clone the target tree and attach the clone */
+-#define OPEN_TREE_CLOEXEC  O_CLOEXEC /* Close the file on execve() */
++#ifndef OPEN_TREE_CLONE
++# define OPEN_TREE_CLONE    1 /* Clone the target tree and attach the clone */
++#endif
++#ifndef OPEN_TREE_CLOEXEC
++# define OPEN_TREE_CLOEXEC  O_CLOEXEC /* Close the file on execve() */
++#endif
+ 
+ 
+ __BEGIN_DECLS
+-- 
+2.51.0
