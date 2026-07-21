@@ -164,6 +164,10 @@ unzip -d %{buildroot}%{icudatadir} %{SOURCE1} icudt%{icu_major}b.dat
 # Make sure i18n support is working
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE3}
 
+# Verify both bundled brace-expansion copies enforce their configured limit.
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node --max-old-space-size=64 -e "const { expand } = require('brace-expansion'); if (expand('{1..100000000}', { max: 10 }).length !== 10) process.exit(1);"
+%{buildroot}/%{_bindir}/node --max-old-space-size=64 --expose-internals -e "const { braceExpand } = require('internal/deps/minimatch/index'); if (braceExpand('{1..100000000}', { braceExpandMax: 10 }).length !== 10) process.exit(1);"
+
 make cctest
 
 %post -p /sbin/ldconfig
@@ -196,7 +200,7 @@ make cctest
 
 %changelog
 * Mon Jul 20 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 24.17.0-3
-- Patch bundled brace-expansion for CVE-2026-45149.
+- Patch npm and core minimatch copies of brace-expansion for CVE-2026-45149.
 
 * Tue Jun 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.17.0-2
 - Patch for CVE-2026-12151 and CVE-2026-9679
