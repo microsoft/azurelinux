@@ -7,7 +7,7 @@ License:        BSD AND Public Domain AND (ASL 2.0 OR CC0 1.0 OR OpenSSL)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://www.libarchive.org/
-Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz
+Source0:        https://github.com/libarchive/libarchive/releases/download/v%{version}/%{name}-%{version}.tar.gz#/%{name}-%{version}-stripped.tar.gz
 Patch0:         CVE-2025-1632.patch
 Patch1:         CVE-2025-25724.patch
 Patch2:         CVE-2025-5914.patch
@@ -21,6 +21,12 @@ Patch9:         CVE-2026-4424.patch
 Patch10:        CVE-2026-4426.patch
 Patch11:        CVE-2026-5121.patch
 Patch12:        CVE-2026-14164.patch
+<<<<<<< HEAD
+=======
+Patch13:        CVE-2026-15028.patch
+# Skip encrypted corrupted ptests (includes removal of CVE corrupted files also)
+Patch14:        skip-stripped-fixture-tests.patch
+>>>>>>> 6d281097ef ([AutoPR- Security] Patch libarchive for CVE-2026-15028, CVE-2026-14164 [HIGH] (#18059))
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -78,8 +84,14 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+<<<<<<< HEAD
 * Fri Jul 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-7
 - Patch for CVE-2026-14164
+=======
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-7
+- Patch for CVE-2026-15028, CVE-2026-14164
+- Strip encrypted/corrupted pre-compressed test fixtures from source tarball & skip stripped fixture tests
+>>>>>>> 6d281097ef ([AutoPR- Security] Patch libarchive for CVE-2026-15028, CVE-2026-14164 [HIGH] (#18059))
 
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-6
 - Patch for CVE-2026-5121, CVE-2026-4426, CVE-2026-4424
