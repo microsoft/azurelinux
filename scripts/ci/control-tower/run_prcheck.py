@@ -26,7 +26,6 @@ import sys
 from pathlib import Path
 
 import client as ct
-from azure.identity import DefaultAzureCredential
 
 
 def _parse_components(value: str) -> list[str]:
@@ -182,7 +181,7 @@ def main() -> None:
         return
 
     # ── Acquire bearer token ─────────────────────────────────────────
-    credential = DefaultAzureCredential()
+    credential = ct.make_credential()
     token_holder = ct.TokenHolder(token=ct.get_token(credential, args.api_audience))
 
     session = ct.make_session()

@@ -11,12 +11,14 @@ Provides:
 Authentication:
     Requires an active Azure CLI session (e.g. via an ``AzureCLI@2`` pipeline
     task with a Workload Identity Federation service connection).
-    ``DefaultAzureCredential`` discovers the session automatically.
+    Azure Pipelines uses ``AzurePipelinesCredential`` for renewable WIF tokens;
+    local execution falls back to ``AzureCliCredential``.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -24,11 +26,12 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING, cast
 
 import requests
+from azure.identity import AzureCliCredential, AzurePipelinesCredential
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 if TYPE_CHECKING:
-    from azure.identity import DefaultAzureCredential
+    from azure.core.credentials import TokenCredential
 
 type JsonValue = None | bool | int | float | str | Sequence[JsonValue] | Mapping[str, JsonValue]
 type JsonObject = dict[str, JsonValue]
@@ -47,6 +50,12 @@ TERMINAL_FAILURE_STATUSES = frozenset({"Failed", "Cancelled", "CancelledByAdmin"
 # unrecognized-but-valid new state.
 TERMINAL_STATUSES = TERMINAL_FAILURE_STATUSES | {SUCCESS_STATUS}
 _MAX_ERROR_BODY_CHARS = 4000
+_PIPELINE_CREDENTIAL_ENV = {
+    "client_id": "AZURESUBSCRIPTION_CLIENT_ID",
+    "service_connection_id": "AZURESUBSCRIPTION_SERVICE_CONNECTION_ID",
+    "system_access_token": "SYSTEM_ACCESSTOKEN",
+    "tenant_id": "AZURESUBSCRIPTION_TENANT_ID",
+}
 
 
 @dataclass
@@ -54,6 +63,35 @@ class TokenHolder:
     """Mutable bearer-token holder so helpers can observe in-place refreshes."""
 
     token: str
+
+
+def make_credential() -> TokenCredential:
+    """Create a renewable pipeline credential or a local Azure CLI credential."""
+    values = {
+        argument: os.environ.get(variable)
+        for argument, variable in _PIPELINE_CREDENTIAL_ENV.items()
+    }
+    configured = [argument for argument, value in values.items() if value]
+    if not configured:
+        return AzureCliCredential()
+
+    missing = [
+        variable
+        for argument, variable in _PIPELINE_CREDENTIAL_ENV.items()
+        if not values[argument]
+    ]
+    if missing:
+        raise RuntimeError(
+            "Missing Azure Pipelines credential variables: "
+            + ", ".join(sorted(missing))
+        )
+
+    return AzurePipelinesCredential(
+        tenant_id=cast(str, values["tenant_id"]),
+        client_id=cast(str, values["client_id"]),
+        service_connection_id=cast(str, values["service_connection_id"]),
+        system_access_token=cast(str, values["system_access_token"]),
+    )
 
 
 def make_session() -> requests.Session:
@@ -79,7 +117,7 @@ def make_session() -> requests.Session:
     return session
 
 
-def get_token(credential: DefaultAzureCredential, audience: str) -> str:
+def get_token(credential: TokenCredential, audience: str) -> str:
     """Acquire a bearer token for the given audience."""
     return credential.get_token(f"{audience}/.default").token
 
@@ -160,7 +198,7 @@ def _request_with_refresh(
     session: requests.Session,
     method: str,
     url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     *,
@@ -210,7 +248,7 @@ def post_scenario(
     session: requests.Session,
     base_url: str,
     path: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     payload: JsonObject,
@@ -243,7 +281,7 @@ def post_scenario(
 def get_job_status(
     session: requests.Session,
     base_url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     job_id: str,
@@ -294,7 +332,7 @@ def _poll_interval_seconds(elapsed_seconds: float) -> int:
 def poll_until_terminal(
     session: requests.Session,
     base_url: str,
-    credential: DefaultAzureCredential,
+    credential: TokenCredential,
     audience: str,
     token_holder: TokenHolder,
     job_id: str,

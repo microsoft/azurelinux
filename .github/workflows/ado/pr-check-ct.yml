@@ -2,15 +2,17 @@
 # Licensed under the MIT License.
 #
 # Wrapper pipeline — passed to ADO as the entry point for the PR Control Tower
-# check. It calls Control Tower 'prcheck' (which uploads the changed
-# components' missing lookaside sources) and then submits a *scratch* Control
-# Tower build of those components, WAITS for that build to finish, and fails
-# the check if the build fails (or is rejected). The package build runs in
-# Control Tower's own sandbox; checkout-controlled pipeline helpers still run
-# on the CI agent under the configured service connection.
+# check. For each configured deployment, it calls Control Tower 'prcheck'
+# (which uploads the changed components' missing lookaside sources). DEV then
+# submits a *scratch* Control Tower build of those components and WAITS for it
+# to finish; STAGING and PROD skip package builds. DEV and PROD API failures
+# fail the check, while STAGING prcheck failures are non-blocking. Deployment
+# jobs run independently in parallel. Package builds run in Control Tower's own
+# sandbox; checkout-controlled pipeline helpers still run on CI agents under
+# the deployment-specific service connections.
 #
 # This file owns all OneBranch-specific wiring (governed templates repo,
-# NonOfficial variant, featureFlags) and delegates the actual stages/jobs/steps
+# Official variant, featureFlags) and delegates the actual stages/jobs/steps
 # to the raw stages template at:
 #   .github/workflows/ado/templates/pr-check-ct-stages.yml
 #
@@ -21,9 +23,9 @@
 # gate: this pipeline does NOT auto-run on every PR push, and a maintainer
 # triggers it only after inspecting the diff. See the prerequisite below.
 #
-# NonOfficial: this is PR validation. It calls the Control Tower DEV endpoint
-# (via the DEV service connection) and produces only scratch builds; it is not
-# a production-classified pipeline.
+# Official: this remains reviewer-gated PR validation and produces only scratch
+# builds, but it uses the PROD service connection alongside DEV and STAGING.
+# OneBranch Official governance is required for production identity use.
 #
 # Helper scripts live under:
 # - scripts/ci/control-tower/ - (Control Tower client + submit script).
@@ -31,13 +33,13 @@
 #   with the GitHub Actions PR gates and the Control Tower pipelines).
 #
 # Prerequisites (ADO / Azure Portal):
-#   1. Entra ID App Registration with audience URI
+#   1. Entra ID App Registrations with audience URIs
 #      "api://<ControlTower-ClientId>" (see variable group below).
-#   2. Federated identity credential on the app registration for the ADO
-#      service connection (issuer: https://vstoken.dev.azure.com/<org-id>,
+#   2. Federated identity credentials on the app registrations for the ADO
+#      service connections (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
-#   3. ARM service connection in ADO project settings using Workload Identity
-#      Federation (manual).
+#   3. DEV, STAGING, and PROD ARM service connections in ADO project settings
+#      using Workload Identity Federation (manual).
 #   4. REVIEWER-GATED trigger (configured in ADO, not here): wire this pipeline
 #      as a build-validation check that does NOT automatically queue on every
 #      PR push (e.g. an optional/manual build-validation policy, or a manual
@@ -46,15 +48,19 @@
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
-#     - ApiAudience          : Entra ID audience URI for the Control Tower app
-#     - ApiBaseAFDUrl        : Base URL of the Control Tower service (Azure Front Door endpoint)
+#     - ApiAudienceDev        : DEV Entra ID audience URI
+#     - ApiAudienceStaging    : STAGING Entra ID audience URI
+#     - ApiAudienceProd       : PROD Entra ID audience URI
+#     - ApiBaseAFDUrlDev      : DEV Azure Front Door endpoint base URL
+#     - ApiBaseAFDUrlStaging  : STAGING Azure Front Door endpoint base URL
+#     - ApiBaseAFDUrlProd     : PROD Azure Front Door endpoint base URL
 
 # Trigger controlled by ADO branch policy — not YAML triggers.
 trigger: none
 
 pr: none
 
-# Variables extracted from this group: ApiAudience, ApiBaseAFDUrl.
+# Variables extracted from this group: deployment audiences and endpoint URLs.
 variables:
   - group: ControlTower-PRCheck
 
@@ -66,7 +72,7 @@ resources:
       ref: refs/heads/main
 
 extends:
-  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  template: v2/OneBranch.Official.CrossPlat.yml@templates
   parameters:
     featureFlags:
       golang:
@@ -88,10 +94,27 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/pr-check-ct-stages.yml@self
         parameters:
-          apiAudience: $(ApiAudience)
-          apiBaseAFDUrl: $(ApiBaseAFDUrl)
           artifactBaseName: prcheckct
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          deployments:
+            DEV:
+              apiAudience: $(ApiAudienceDev)
+              apiBaseAFDUrl: $(ApiBaseAFDUrlDev)
+              continueOnError: false
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
+              skipPackageBuilds: false
+            STAGING:
+              apiAudience: $(ApiAudienceStaging)
+              apiBaseAFDUrl: $(ApiBaseAFDUrlStaging)
+              continueOnError: true
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-STAGING
+              skipPackageBuilds: true
+            PROD:
+              apiAudience: $(ApiAudienceProd)
+              apiBaseAFDUrl: $(ApiBaseAFDUrlProd)
+              continueOnError: false
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-PROD
+              skipPackageBuilds: true
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Distro-config RPM build-environment for the 4.0 branch.
           packageEnvironment: "4.0"
@@ -103,5 +126,4 @@ extends:
           # Raise both together if a legitimate build is being killed.
           pollTimeoutSeconds: 21600
           poolType: linux
-          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           timeoutInMinutes: 420
