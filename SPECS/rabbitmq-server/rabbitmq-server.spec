@@ -16,9 +16,12 @@ Patch3:			CVE-2026-43968.patch
 Patch4:			CVE-2026-7790.patch
 Patch5:			CVE-2026-43973.patch
 <<<<<<< HEAD
+<<<<<<< HEAD
 Patch6:			CVE-2026-43966.patch
 Patch7:			CVE-2026-44839.patch
 =======
+=======
+>>>>>>> e26bd620ff ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216 [HIGH] (#18025))
 Patch6:			CVE-2026-57211.patch
 Patch7:			CVE-2026-57212.patch
 Patch8:			CVE-2026-57213.patch
@@ -30,6 +33,9 @@ Patch13:		CVE-2026-57219.patch
 Patch14:		CVE-2026-57220.patch
 Patch15:		CVE-2026-57221.patch
 Patch16:		CVE-2026-57216.patch
+<<<<<<< HEAD
+>>>>>>> e26bd620ff ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216 [HIGH] (#18025))
+=======
 >>>>>>> e26bd620ff ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216 [HIGH] (#18025))
 
 BuildRequires:  elixir
@@ -88,8 +94,13 @@ done
 
 %changelog
 <<<<<<< HEAD
+<<<<<<< HEAD
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
 - Patch for CVE-2026-43966, CVE-2026-44839
+=======
+* Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
+- Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216
+>>>>>>> e26bd620ff ([AutoPR- Security] Patch rabbitmq-server for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216 [HIGH] (#18025))
 =======
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
 - Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216
