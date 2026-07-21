@@ -12,16 +12,26 @@
 # upstream's CMake gates them on BUILD_TESTING=ON, which we don't set), so
 # stripping these test fixtures is functionally inert.
 #
-# Replace upstream Source0 with a deterministically-repacked tarball produced
-# by base/comps/kf6-karchive/modify_source.sh. The upstream filename is
-# preserved so `replace-upstream = true` swaps the entry in place in the
-# Fedora `sources` manifest -- no spec edit required.
+# Archive overlays strip these scanner-flagged fixtures from upstream Source0
+# during source preparation, avoiding a separate modified-source tarball.
 [components.kf6-karchive]
+
+[[components.kf6-karchive.overlays]]
+type = "file-remove"
+file = "autotests/data/password_protected.7z"
+archive = "karchive-6.23.0.tar.xz"
+description = "Remove password-protected 7-Zip test fixture flagged by AZL signing-pipeline AV scanner"
+
+[[components.kf6-karchive.overlays]]
+type = "file-remove"
+file = "autotests/data/zip64_extra_zip64_size_first.zip.gz"
+archive = "karchive-6.23.0.tar.xz"
+description = "Remove ZIP64 edge-case test fixture flagged by AZL signing-pipeline AV scanner"
 
 [[components.kf6-karchive.source-files]]
 filename = "karchive-6.23.0.tar.xz"
-hash = "dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a"
+hash = "a880069c33572d8c0f86bd535ce591eb8bb66a416ec992f7f8964935dd480bfa1c9a15f7ebf16bc7d0dde7afdeb2f68a5ea739ce820887cc855ad731c3c7df3f"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/kf6-karchive/karchive-6.23.0.tar.xz/sha512/dc92a030772bfea4fd270e0bf5aa1e6b9f0bb45fed19ad8c2c992fd8f36238c4730efebe7ac2d950c6be91213cd062afd0f69f404733678e511c74b94d09ad4a/karchive-6.23.0.tar.xz" }
+origin = { type = "overlay" }
 replace-upstream = true
-replace-reason = "AZL-repacked tarball with autotest fixtures stripped that trip anti-malware scanning on the AZL RPM-signing pipeline: autotests/data/password_protected.7z (password-protected 7-Zip) and autotests/data/zip64_extra_zip64_size_first.zip.gz (ZIP64 edge-case fixture whose inner .zip the scanner rejects after decompressing the .gz wrapper). The autotests are not built or run in our spec (no %check, BUILD_TESTING is off), so removing these test fixtures is functionally inert. See modify_source.sh."
+replace-reason = "Upstream autotest fixtures trigger signing-pipeline scanning and are not built or run; archive overlays remove them before SRPM creation."
