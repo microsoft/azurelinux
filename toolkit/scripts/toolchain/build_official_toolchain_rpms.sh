@@ -529,6 +529,8 @@ build_rpm_in_chroot_no_install cracklib
 
 # pam needs cracklib and libxcrypt (installed above)
 chroot_and_install_rpms cracklib
+# cmake needs system curl (--system-curl); nghttp2 was installed above and persists
+chroot_and_install_rpms curl
 build_rpm_in_chroot_no_install cmake
 build_rpm_in_chroot_no_install pam
 build_rpm_in_chroot_no_install docbook-dtd-xml
