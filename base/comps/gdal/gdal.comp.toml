@@ -12,19 +12,23 @@
 # no-op (exits 0; gcore tests were OOM-killing the build POD), so stripping
 # this fixture is functionally inert.
 #
-# Replace upstream Source1 with a deterministically-repacked tarball produced
-# by base/comps/gdal/modify_source.sh. The upstream filename is preserved so
-# `replace-upstream = true` swaps the entry in place in the Fedora `sources`
-# manifest -- no spec edit required.
+# Archive overlays strip this scanner-flagged fixture from upstream Source1
+# during source preparation, avoiding a separate modified-source tarball.
 [components.gdal]
+
+[[components.gdal.overlays]]
+type = "file-remove"
+file = "gcore/data/zero_5GB_sozip_of_sozip.zip"
+archive = "gdalautotest-3.11.5.tar.gz"
+description = "Remove large test fixture to reduce source size"
 
 [[components.gdal.source-files]]
 filename = "gdalautotest-3.11.5.tar.gz"
-hash = "a39cc826885a2336c80545203947c4693851aae3de02b980be25b4b579658e6314e058dc228660294b2370242df8f298c4fe64c6d3b1cd0bf5adf56b3e321b77"
+hash = "d60d672407f1821a85ce55f708df264d41af60f7863fbd275f369b6a95adc1882bfb9b9f6b8c5e6f773afb754238d3a0c4a9aec91d2c8cd9f6db8c41cf6a59d7"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/gdal/gdalautotest-3.11.5.tar.gz/sha512/a39cc826885a2336c80545203947c4693851aae3de02b980be25b4b579658e6314e058dc228660294b2370242df8f298c4fe64c6d3b1cd0bf5adf56b3e321b77/gdalautotest-3.11.5.tar.gz" }
+origin = { type = "overlay" }
 replace-upstream = true
-replace-reason = "Repacked source tarball without gcore/data/zero_5GB_sozip_of_sozip.zip which was flagged as a Trojan. See modify_source.sh."
+replace-reason = "The gdalautotest source contains a nested archive that trips signing-pipeline scanning; the archive overlay removes this unused fixture."
 
 [components.gdal.build]
 # Azure Linux does not support MinGW cross-compilation.

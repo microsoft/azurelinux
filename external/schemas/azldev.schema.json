@@ -715,7 +715,8 @@
           "type": "string",
           "enum": [
             "download",
-            "custom"
+            "custom",
+            "overlay"
           ],
           "title": "Origin type",
           "description": "Type of origin for this source file"
