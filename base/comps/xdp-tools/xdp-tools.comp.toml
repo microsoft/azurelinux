@@ -1,0 +1,7 @@
+[components.xdp-tools]
+
+# Backport of https://github.com/xdp-project/xdp-tools/commit/5f5a7c78f42713db3ac6fe95c0445f0ff1f78968
+[[components.xdp-tools.overlays]]
+description = "Include limits.h explicitly after Linux UAPI stopped providing it transitively"
+type = "patch-add"
+source = "xdp-tools-include-limits.patch"

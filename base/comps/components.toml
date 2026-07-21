@@ -6924,7 +6924,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.xdg-user-dirs-gtk]
 [components.xdg-utils]
 [components.xdotool]
-[components.xdp-tools]
 [components.xerces-c]
 [components.xerces-j2]
 [components.xeus]
