@@ -1,0 +1,27 @@
+From 5f5a7c78f42713db3ac6fe95c0445f0ff1f78968 Mon Sep 17 00:00:00 2001
+From: nucleo <nucleo@fedoraproject.org>
+Date: Thu, 26 Feb 2026 15:57:47 +0200
+Subject: [PATCH] xdpdump: include <limits.h> removed from linux/ethtool.h
+
+Removing <limits.h> from linux/ethtool.h exposed undeclared UINT_MAX and
+ULONG_MAX uses in xdpdump. Include the defining standard header directly.
+
+Signed-off-by: nucleo <nucleo@fedoraproject.org>
+---
+ xdp-dump/xdpdump.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xdp-dump/xdpdump.c b/xdp-dump/xdpdump.c
+index 19d51e4e..fa3aeb32 100644
+--- a/xdp-dump/xdpdump.c
++++ b/xdp-dump/xdpdump.c
+@@ -7,6 +7,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <inttypes.h>
++#include <limits.h>
+ #include <signal.h>
+ #include <stdbool.h>
+ #include <stdio.h>
+-- 
+2.51.0
