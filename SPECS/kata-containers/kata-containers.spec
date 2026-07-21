@@ -54,16 +54,9 @@ cp configuration-clh.toml configuration-clh-preview.toml
 cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
 popd
 
-pushd %{_builddir}/%{name}-%{version}/src/runtime-rs/config
-cp configuration-clh-runtime-rs.toml configuration-clh-preview-runtime-rs.toml
-cp configuration-clh-runtime-rs-debug.toml configuration-clh-preview-runtime-rs-debug.toml
-popd
-
 for config_file in \
   %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs-debug.toml; do
+  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
   sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
   sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
   sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
@@ -83,8 +76,6 @@ popd
 install -m 0644 \
   %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
   %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime-rs/config/configuration-clh-preview-runtime-rs-debug.toml \
   %{buildroot}%{defaults_kata}/
 
 %files
@@ -98,8 +89,6 @@ install -m 0644 \
 %{defaults_kata}/configuration-clh-debug.toml
 %{defaults_kata}/configuration-clh-preview.toml
 %{defaults_kata}/configuration-clh-preview-debug.toml
-%{defaults_kata}/configuration-clh-preview-runtime-rs.toml
-%{defaults_kata}/configuration-clh-preview-runtime-rs-debug.toml
 %{defaults_kata}/configuration-clh-runtime-rs.toml
 %{defaults_kata}/configuration-clh-runtime-rs-debug.toml
 
