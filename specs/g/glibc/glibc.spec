@@ -155,7 +155,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 10
+%global baserelease 11
 Release: %{baserelease}%{?dist}
 
 # Licenses:
@@ -497,6 +497,7 @@ Recommends: glibc-gconv-extra%{_isa} = %{version}-%{release}
 # unconditionally pull in glibc-gconv-extra in that case.
 Requires: (glibc-gconv-extra%{_isa} = %{version}-%{release} if redhat-rpm-config)
 
+Patch25: glibc-open-tree-guards.patch
 %description
 The glibc package contains standard libraries which are used by
 multiple programs on the system. In order to save disk space and
