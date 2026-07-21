@@ -2,7 +2,37 @@
 config_opts['use_bootstrap_image'] = False
 
 # General packages required
-config_opts['chroot_setup_cmd'] = 'install @{% if mirrored %}buildsys-{% endif %}build'
+#
+# N.B. Our snapshot of Fedora updates does not provide groups so we instead enumerate packages.
+#
+# config_opts['chroot_setup_cmd'] = 'install @{% if mirrored %}buildsys-{% endif %}build'
+#
+config_opts['chroot_setup_cmd'] = 'install'
+config_opts['chroot_setup_cmd'] += ' bash'
+config_opts['chroot_setup_cmd'] += ' bzip2'
+config_opts['chroot_setup_cmd'] += ' coreutils'
+config_opts['chroot_setup_cmd'] += ' cpio'
+config_opts['chroot_setup_cmd'] += ' diffutils'
+config_opts['chroot_setup_cmd'] += ' fedora-release'
+config_opts['chroot_setup_cmd'] += ' findutils'
+config_opts['chroot_setup_cmd'] += ' gawk'
+config_opts['chroot_setup_cmd'] += ' gcc'
+config_opts['chroot_setup_cmd'] += ' gcc-c++'
+config_opts['chroot_setup_cmd'] += ' grep'
+config_opts['chroot_setup_cmd'] += ' gzip'
+config_opts['chroot_setup_cmd'] += ' info'
+config_opts['chroot_setup_cmd'] += ' make'
+config_opts['chroot_setup_cmd'] += ' patch'
+config_opts['chroot_setup_cmd'] += ' python'
+config_opts['chroot_setup_cmd'] += ' redhat-rpm-config'
+config_opts['chroot_setup_cmd'] += ' rpm-build'
+config_opts['chroot_setup_cmd'] += ' sed'
+config_opts['chroot_setup_cmd'] += ' shadow-utils'
+config_opts['chroot_setup_cmd'] += ' tar'
+config_opts['chroot_setup_cmd'] += ' unzip'
+config_opts['chroot_setup_cmd'] += ' util-linux'
+config_opts['chroot_setup_cmd'] += ' which'
+config_opts['chroot_setup_cmd'] += ' xz'
 
 # Provide path to system-installed logging.ini file.
 config_opts['log_config_file'] = '/etc/mock/logging.ini'
@@ -57,14 +87,6 @@ user_agent={{ user_agent }}
 
 # repos
 
-[local]
-name=local
-baseurl=https://kojipkgs.fedoraproject.org/repos/f{{ releasever }}-build/latest/$basearch/
-cost=2000
-enabled={{ not mirrored }}
-skip_if_unavailable=False
-
-{% if mirrored %}
 [fedora]
 name=fedora
 metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=$basearch
@@ -74,9 +96,8 @@ skip_if_unavailable=False
 
 [updates]
 name=updates
-metalink=https://mirrors.fedoraproject.org/metalink?repo=updates-released-f$releasever&arch=$basearch
+baseurl=https://kojifedoramirror.blob.core.windows.net/fedora-mirror/snapshots/20260528/fedora-43-updates/$basearch
 gpgkey=file:///usr/share/distribution-gpg-keys/fedora/RPM-GPG-KEY-fedora-{{ releasever }}-primary
 gpgcheck=1
 skip_if_unavailable=False
-{% endif %}
 """
