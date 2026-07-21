@@ -1,4 +1,10 @@
-Release:        25%{?dist}
+Summary:        agent for collecting, processing, aggregating, and writing metrics.
+Name:           telegraf
+Version:        1.31.0
+Release:        26%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -62,6 +68,10 @@ Patch52:        CVE-2026-58253.patch
 Patch53:        CVE-2025-29923.patch
 Patch54:        CVE-2025-46327.patch
 Patch55:        CVE-2026-54908.patch
+
+BuildRequires:  golang
+BuildRequires:  systemd-devel
+
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
@@ -120,6 +130,7 @@ fi
 %{_bindir}/telegraf
 %{_unitdir}/telegraf.service
 %{_sysconfdir}/logrotate.d/%{name}
+%dir %{_sysconfdir}/%{name}/telegraf.d
 %changelog
 * Tue Jul 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-26
 - Patch for CVE-2026-54908
@@ -133,9 +144,6 @@ fi
 
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
 - Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
-
-* Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
-- Patch for CVE-2026-41889, CVE-2026-42151
 
 * Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
 - Patch for CVE-2026-41889, CVE-2026-42151
