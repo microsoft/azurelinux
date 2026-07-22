@@ -166,7 +166,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.bootc]
 [components.booth]
 [components.bouncycastle]
-[components.bpftool]
 [components.bpftrace]
 [components.breezy]
 [components.brltty]
