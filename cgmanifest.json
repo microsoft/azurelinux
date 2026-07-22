@@ -2727,6 +2727,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "dirmngr",
+          "version": "2.4.9",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-2.4.9.tar.bz2"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "discount",
           "version": "2.2.7",
           "downloadUrl": "https://github.com/Orc/discount/archive/v2.2.7.tar.gz"
