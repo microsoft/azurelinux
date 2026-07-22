@@ -41,16 +41,17 @@
 %global _azl_krel %{release}
 
 # -------------------------------------------------------------------------
-# mlnx-ofa_kernel — userspace utilities (OFED-versioned).
-# Installonly; the userspace scripts and configuration files install at their
-# pristine canonical paths as produced by `make install_scripts`.
+# mlnx-ofa_kernel — userspace utilities (OFED-versioned singleton).
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel
 Summary:        NVIDIA / Mellanox OFED userspace utilities (mlnx-ofa_kernel %{mlnx_ofa_version})
 Version:        %{mlnx_ofa_version}
 Release:        %{mlnx_ofa_release}%{?dist}
+# Restore the kernel NVR macros clobbered by the Version/Release tags above,
+# before any %{version}/%{release}/%{KVERREL} is used below or in later subpackages.
+%global version %{_azl_kver}
+%global release %{_azl_krel}
 AutoReq:        no
-Provides:       installonlypkg(kernel-module)
 Provides:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}
 Provides:       mlnx-ofa-userspace-release = %{mlnx_ofa_release}
 Requires:       coreutils
@@ -70,27 +71,17 @@ openibd service, interface-manager scripts, ibdev2netdev, modprobe configs and
 udev rules. The kernel modules ship in the matching mlnx-ofa_kernel-modules
 package.
 
-# Restore kernel NVR macros clobbered by mlnx-ofa_kernel's Version/Release so
-# the modules/devel subpackages below resolve %{version}/%{release} to the
-# kernel NVR (they must share the kernel's version, not the OFED version).
-%global version %{_azl_kver}
-%global release %{_azl_krel}
-
 # -------------------------------------------------------------------------
 # mlnx-ofa_kernel-modules — the kernel modules (per-kernel).
-# The NVR encodes BOTH versions: Version = kernel version, Release = OFED
-# version prefixed onto the kernel release (e.g. 6.18.31-26.04.1.6.azl4).
-# Setting an explicit Version/Release clobbers the global %{version}/%{release}
-# macros, so we restore them to the kernel NVR right after this subpackage's
-# %description (below). installonlypkg(kernel-module) lets multiple kernels'
-# modules coexist under their version-namespaced /lib/modules dirs. The matched
-# sentinel + the kernel's conditional Requires drive automatic per-kernel
-# installation (see kernel.comp.toml).
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-modules
 Summary:        NVIDIA / Mellanox OFED kernel modules (mlnx-ofa_kernel %{mlnx_ofa_version})
 Version:        %{mlnx_ofa_version}
 Release:        %{_azl_kver}.%{_azl_krel}
+# Restore the kernel NVR macros clobbered by the Version/Release tags above,
+# before %{KVERREL} (which expands %{release}) is used in the Provides/Requires below.
+%global version %{_azl_kver}
+%global release %{_azl_krel}
 AutoReq:        no
 Provides:       mlnx-ofa-kmod-version = %{mlnx_ofa_version}
 Provides:       mlnx-ofa-kmod-release = %{mlnx_ofa_release}
@@ -99,7 +90,10 @@ Provides:       kmod-mlnx-ofa_kernel = %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Obsoletes:      kmod-mlnx-ofa_kernel < %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Provides:       installonlypkg(kernel-module)
 Requires:       %{name}-core-uname-r = %{KVERREL}
-Requires:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}
+# Singleton userspace, upgraded in place: require "at least" this OFED version
+# rather than an exact match, so an older kernel's modules accept the newer
+# shared userspace when multiple kernels are installed side-by-side.
+Requires:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Requires(post): kmod
 Requires(postun): kmod
 
@@ -107,11 +101,6 @@ Requires(postun): kmod
 NVIDIA / Mellanox InfiniBand and Ethernet (mlx5) kernel modules built from
 mlnx-ofa_kernel %{mlnx_ofa_version} (%{mlnx_ofa_release}) against kernel
 %{KVERREL}.
-
-# Restore kernel NVR macros clobbered by mlnx-ofa_kernel-modules' Version/Release
-# so the subpackages below resolve %{version}/%{release} to the kernel NVR again.
-%global version %{_azl_kver}
-%global release %{_azl_krel}
 
 # Opt-in sentinel: when installed, the kernel package's conditional Requires
 # pulls the version-matched mlnx-ofa_kernel-modules for every kernel on this
@@ -128,8 +117,7 @@ for each kernel version on this machine (x86_64 and aarch64 only).
 # -------------------------------------------------------------------------
 # mlnx-ofa_kernel-devel — headers + Module.symvers + helper scripts, used to
 # build out-of-tree modules (e.g. nvidia-peermem / GPUDirect) against this
-# kmod. Per-kernel (files under /usr/src/ofa_kernel/<arch>/<KVERREL>/), so it
-# is installonly too; update-alternatives manages the `default` pointer.
+# kmod.
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-devel
 Summary:        Development files for mlnx-ofa_kernel (%{mlnx_ofa_version}, kernel %{KVERREL})
@@ -162,18 +150,17 @@ the kernel build that produced them. Multiple kernel versions can coexist
 Summary:        Source of the NVIDIA / Mellanox OFED main kernel driver
 Version:        %{mlnx_ofa_version}
 Release:        %{mlnx_ofa_release}%{?dist}
+# Restore the kernel NVR macros clobbered by the Version/Release tags above so
+# the kernel's own %files templates (which reference raw %{version}/%{release})
+# resolve to the kernel NVR again.
+%global version %{_azl_kver}
+%global release %{_azl_krel}
 AutoReq:        no
 
 %description -n mlnx-ofa_kernel-source
 Pristine source of the mlnx-ofa_kernel %{mlnx_ofa_version} driver under
 /usr/src/ofa_kernel-%{mlnx_ofa_version}/source/. Install this only to view the
 driver sources; use mlnx-ofa_kernel-devel to build other drivers against it.
-
-# Restore kernel NVR macros clobbered by mlnx-ofa_kernel-source's
-# Version/Release so the kernel's own %files templates (which reference the
-# raw %{version}/%{release} macros) resolve to the kernel NVR again.
-%global version %{_azl_kver}
-%global release %{_azl_krel}
 %endif
 
 %endif
