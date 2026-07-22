@@ -9,7 +9,9 @@ Podman CLI directly.
 from __future__ import annotations
 
 import logging
+import time
 import uuid
+from collections.abc import Callable
 from pathlib import Path
 from typing import Iterator, NamedTuple, cast
 
@@ -188,6 +190,8 @@ def create_container(
     client: DockerClient,
     image_ref: str,
     container_name: str | None = None,
+    *,
+    networks: list[str] | None = None,
 ) -> ContainerInstance:
     """Create and start a container with exec access.
 
@@ -198,6 +202,7 @@ def create_container(
         client: Active python-on-whales Podman client.
         image_ref: Image ID or reference to run.
         container_name: Optional name; auto-generated if None.
+        networks: Optional networks to attach the container to.
 
     Returns:
         A ContainerInstance with the container's ID, name, and image ref.
@@ -212,6 +217,7 @@ def create_container(
         command=["sleep", "infinity"],
         name=container_name,
         detach=True,
+        networks=networks or [],
     )
 
     # Verify the container is running and exec works.
@@ -306,6 +312,26 @@ def _make_exec_result(
         stderr=stderr,
         output=stdout + stderr,
     )
+
+
+def wait_until_service_ready(
+    exec_shell: Callable[[str], ContainerExecResult],
+    command: str,
+    *,
+    contains: str = "",
+    attempts: int = 10,
+    delay: float = 1.0,
+) -> ContainerExecResult:
+    """Poll ``command`` until it exits 0 and its output contains ``contains``."""
+    output = ""
+    for attempt in range(attempts):
+        if attempt:
+            time.sleep(delay)
+        result = exec_shell(command)
+        if result.exit_code == 0 and contains in result.output:
+            return result
+        output = result.output
+    raise AssertionError(f"{command!r} never became ready: {output}")
 
 
 def destroy_container(client: DockerClient, container_name: str) -> None:

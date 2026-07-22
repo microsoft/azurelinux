@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import uuid
 from pathlib import Path
 
 import pytest
@@ -332,6 +333,21 @@ def container_image_ref(
     return resolve_image_reference(podman_client, image_path=image_path, image_ref=image_ref)
 
 
+def _effective_image(podman_client, container_image_ref: str, request: pytest.FixtureRequest) -> str:
+    """Build the per-test image from ``@pytest.mark.dockerfile()`` if present, else use the base image."""
+    marker = request.node.get_closest_marker("dockerfile")
+    if marker is None:
+        return container_image_ref
+    test_dir = Path(request.fspath).parent
+    dockerfile_path = (test_dir / (marker.args[0] if marker.args else "Dockerfile")).resolve()
+    if not dockerfile_path.exists():
+        pytest.fail(
+            f"Dockerfile not found: {dockerfile_path} "
+            f"(from @pytest.mark.dockerfile on {request.node.name})"
+        )
+    return build_image(podman_client, dockerfile_path, container_image_ref)
+
+
 @pytest.fixture
 def running_container(
     podman_client, image_type: str,
@@ -348,25 +364,7 @@ def running_container(
     if container_image_ref is None:
         pytest.fail("container_image_ref was not resolved for a container image")
 
-    # Check for @pytest.mark.dockerfile() marker.
-    effective_image = container_image_ref
-    dockerfile_marker = request.node.get_closest_marker("dockerfile")
-    if dockerfile_marker is not None:
-        test_dir = Path(request.fspath).parent
-        if dockerfile_marker.args:
-            dockerfile_path = (test_dir / dockerfile_marker.args[0]).resolve()
-        else:
-            dockerfile_path = (test_dir / "Dockerfile").resolve()
-
-        if not dockerfile_path.exists():
-            pytest.fail(
-                f"Dockerfile not found: {dockerfile_path} "
-                f"(from @pytest.mark.dockerfile on {request.node.name})"
-            )
-
-        effective_image = build_image(
-            podman_client, dockerfile_path, container_image_ref,
-        )
+    effective_image = _effective_image(podman_client, container_image_ref, request)
 
     logger.info("Creating container for test %s", request.node.name)
     instance = create_container(podman_client, effective_image)
@@ -442,6 +440,56 @@ def write_file_in_container(container_exec_shell):
         return container_exec_shell(write_cmd)
 
     return _write
+
+
+@pytest.fixture
+def client_server_exec_shell(
+    podman_client, image_type: str,
+    container_image_ref: str | None, request: pytest.FixtureRequest,
+):
+    """Two networked containers, each with a callable to execute shell commands.
+
+    Usage::
+
+        def test_example(client_server_exec_shell):
+            server_exec, client_exec, server_host = client_server_exec_shell
+            server_exec("some-daemon &")
+            result = client_exec(f"curl http://{server_host}:8080")
+            assert result.exit_code == 0
+    """
+    if image_type != "container":
+        pytest.skip("client_server_exec_shell only applicable to container images")
+    if container_image_ref is None:
+        pytest.fail("container_image_ref was not resolved for a container image")
+
+    effective_image = _effective_image(podman_client, container_image_ref, request)
+
+    network_name = f"azl-test-net-{uuid.uuid4().hex[:12]}"
+    podman_client.network.create(network_name)
+
+    def _exec_shell_for(container):
+        def _exec_shell(command: str, *, shell: str = "bash"):
+            return exec_in_container(podman_client, container.container_name, [shell, "-c", command])
+        return _exec_shell
+
+    suffix = uuid.uuid4().hex[:12]
+    logger.info("Creating server and client containers for test %s", request.node.name)
+    server = client = None
+    try:
+        server = create_container(
+            podman_client, effective_image, f"azl-test-server-{suffix}", networks=[network_name],
+        )
+        client = create_container(
+            podman_client, effective_image, f"azl-test-client-{suffix}", networks=[network_name],
+        )
+        yield _exec_shell_for(server), _exec_shell_for(client), server.container_name
+    finally:
+        try:
+            for container in (server, client):
+                if container is not None:
+                    destroy_container(podman_client, container.container_name)
+        finally:
+            podman_client.network.remove(network_name)
 
 
 @pytest.fixture

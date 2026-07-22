@@ -167,6 +167,7 @@ base/images/
 | `container_exec` | function | callable | `(args) → ContainerExecResult` |
 | `wait_for_http` | function | callable | `(url, *, retries=5, delay=1.0, connect_timeout=2.0, max_time=5.0) → ContainerExecResult` — polls an in-container HTTP endpoint with `curl`; raises after retries |
 | `assert_http_server` | function | callable | `(start_command, url, expected, *, retries=5, delay=1.0) → ContainerExecResult` — starts a server, waits for `url`, asserts `expected` in body |
+| `client_server_exec_shell` | function | tuple | Networked server and client containers for cross-container tests |
 
 ## Adding tests
 
@@ -236,9 +237,10 @@ Dockerfile only trigger one build.
 > `container_exec_shell("nginx")`. This keeps behaviour predictable and
 > ensures each test controls exactly what runs.
 
-For service tests, poll readiness with a short bounded loop before asserting on
-responses; do not assume the service binds synchronously. Foreground services
-should be backgrounded explicitly, for example
+For service tests, poll readiness before asserting on responses; do not assume the
+service binds synchronously — use `wait_until_service_ready(exec_shell, probe_cmd,
+contains=...)` from `utils.container_runtime`. Foreground services should be
+backgrounded explicitly, for example
 `container_exec_shell("nohup my-service > /tmp/my-service.log 2>&1 &")`.
 
 ## Adding a native-tool dependency
