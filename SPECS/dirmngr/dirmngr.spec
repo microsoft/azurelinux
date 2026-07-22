@@ -125,3 +125,4 @@ find %{buildroot}%{_mandir}/man8 -mindepth 1 ! -name 'dirmngr*' -delete
   with gnupg2 via check_entangled_specs.py, so the first release is 2 to
   match the current gnupg2 Release.
 - Fixes ADO 62225284 / GH#3142.
+- Original version for Azure Linux
