@@ -1,6 +1,6 @@
 Summary:        Fast incremental file transfer.
 Name:           rsync
-Version:        3.4.3
+Version:        3.4.4
 Release:        1%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
@@ -60,6 +60,9 @@ EOF
 %{_sysconfdir}/rsyncd.conf
 
 %changelog
+* Wed Jul 22 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.4-1
+- Auto-upgrade to 3.4.4 - none
+
 * Wed May 20 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.4.3-1
 - Auto-upgrade to 3.4.3 - for CVE-2026-43617, CVE-2026-43618, CVE-2026-43619, CVE-2026-43620, CVE-2026-45232, CVE-2026-29518
 
