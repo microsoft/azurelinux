@@ -126,3 +126,4 @@ find %{buildroot}%{_mandir}/man8 -mindepth 1 ! -name 'dirmngr*' -delete
   match the current gnupg2 Release.
 - Fixes ADO 62225284 / GH#3142.
 - Original version for Azure Linux
+- License verified
