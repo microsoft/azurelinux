@@ -1,0 +1,7 @@
+[components.rust-databake]
+# Pin to the f43 commit that ships databake 0.2.1, which fixes the doctests
+# that derive `Bake` on private-field structs (rejected by databake-derive 0.2.1).
+# Keep in lockstep with rust-databake-derive.
+# TODO: Drop this override once the default Fedora 43 snapshot
+# in distro/azurelinux.distro.toml advances past this commit.
+spec = { type = "upstream", upstream-name = "rust-databake", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "0fa89dcc66b2ae3d467581a66da072693ed6914a" }
