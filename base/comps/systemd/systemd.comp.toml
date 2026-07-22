@@ -52,3 +52,15 @@ description = "Remove build params reducing default timeout to 45s; leaving upst
 type = "spec-search-replace"
 regex = '-Ddefault-user-timeout-sec=45'
 replacement = "#-Ddefault-user-timeout-sec=45"
+
+# Backport of https://github.com/systemd/systemd/commit/3cfb16998808a6ec8012a6120d0a82f0e1a0c8bb
+[[components.systemd.overlays]]
+description = "Filter Linux 7.0 errno aliases that generate duplicate lookup-table initializers"
+type = "patch-add"
+source = "systemd-filter-linux-7-errno-aliases.patch"
+
+# Adapted from https://github.com/systemd/systemd/commit/5f81a59a2465921728fac173e572796db6355413
+[[components.systemd.overlays]]
+description = "Recognize the NULL_FS_MAGIC value introduced by Linux 7.0"
+type = "patch-add"
+source = "systemd-add-nullfs-magic.patch"

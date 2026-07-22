@@ -1,0 +1,31 @@
+From 5f81a59a2465921728fac173e572796db6355413 Mon Sep 17 00:00:00 2001
+From: Yu Watanabe <watanabe.yu+github@gmail.com>
+Date: Thu, 26 Feb 2026 15:40:08 +0900
+Subject: [PATCH] include: recognize NULL_FS_MAGIC from Linux 7.0
+
+Adapt the NULL_FS_MAGIC portion of the upstream Linux 7.0-rc1 header sync.
+---
+ src/basic/filesystem-sets.py   | 1 +
+ src/include/uapi/linux/magic.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/basic/filesystem-sets.py b/src/basic/filesystem-sets.py
+index 09fcc0347a..7bfab3b82b 100755
+--- a/src/basic/filesystem-sets.py
++++ b/src/basic/filesystem-sets.py
+@@ -80,6 +80,7 @@ NAME_TO_MAGIC = {
+     'nsfs':            ['NSFS_MAGIC'],
+     'ntfs':            ['NTFS_SB_MAGIC'],
+     'ntfs3':           ['NTFS3_SUPER_MAGIC'],
++    'nullfs':          ['NULL_FS_MAGIC'],
+     'ocfs2':           ['OCFS2_SUPER_MAGIC'],
+     'openpromfs':      ['OPENPROM_SUPER_MAGIC'],
+     'orangefs':        ['ORANGEFS_DEVREQ_MAGIC'],
+diff --git a/src/include/uapi/linux/magic.h b/src/include/uapi/linux/magic.h
+index 638ca21b7a..4f2da935a7 100644
+--- a/src/include/uapi/linux/magic.h
++++ b/src/include/uapi/linux/magic.h
+@@ -107,0 +108 @@
++#define NULL_FS_MAGIC          0x4E554C4C      /* "NULL" */
+--
+2.51.0
