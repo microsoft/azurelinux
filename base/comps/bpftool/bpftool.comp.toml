@@ -1,0 +1,7 @@
+[components.bpftool]
+
+# Backport of https://github.com/libbpf/libbpf/commit/cc7760ce9a4acacd6be3f7025c393cf6a84e6eb8
+[[components.bpftool.overlays]]
+description = "Remove the bundled libbpf kfunc declaration that conflicts with generated vmlinux.h"
+type = "patch-add"
+source = "0001-libbpf-remove-bpf_stream_vprintk-declaration.patch"

@@ -1,0 +1,24 @@
+From cc7760ce9a4acacd6be3f7025c393cf6a84e6eb8 Mon Sep 17 00:00:00 2001
+From: Ihor Solodrai <ihor.solodrai@linux.dev>
+Date: Wed, 18 Feb 2026 13:56:51 -0800
+Subject: [PATCH] libbpf: Remove extern declaration of bpf_stream_vprintk()
+
+Building a BPF program that includes both vmlinux.h and bpf_helpers.h can
+fail due to conflicting declarations of bpf_stream_vprintk(). Remove the
+bundled declaration and use the target kernel declaration from vmlinux.h.
+
+Adapted to the libbpf revision bundled with bpftool 7.6.0.
+---
+ libbpf/src/bpf_helpers.h | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/libbpf/src/bpf_helpers.h b/libbpf/src/bpf_helpers.h
+index 80c0285..34f4d1a 100644
+--- a/libbpf/src/bpf_helpers.h
++++ b/libbpf/src/bpf_helpers.h
+@@ -318,3 +318,0 @@
+-extern int bpf_stream_vprintk(int stream_id, const char *fmt__str, const void *args,
+-			      __u32 len__sz, void *aux__prog) __weak __ksym;
+-
+--
+2.51.0

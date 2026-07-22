@@ -3,7 +3,7 @@
 
 Name:           bpftool
 Version:        7.6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Inspection and simple manipulation of eBPF programs and maps
 
 %global libname libbpf
@@ -25,6 +25,7 @@ BuildRequires:  clang
 BuildRequires:  python3-docutils
 BuildRequires:  kernel-devel
 
+Patch0: 0001-libbpf-remove-bpf_stream_vprintk-declaration.patch
 %description
 This package contains the bpftool, which allows inspection and simple
 manipulation of eBPF programs and maps.
