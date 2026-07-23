@@ -1,0 +1,9 @@
+[components.python-ecdsa]
+
+# Python 3.14.5's stricter base64 decoder exposes a latent bug in ecdsa 0.19.1's
+# der.unpem() that breaks PKCS8 PEM parsing ("binascii.Error: Incorrect padding",
+# test_SigningKey_from_pem_pkcs8v2_EdDSA). Pin the Fedora f43 commit that bumps to 0.19.2
+# and adds upstream PR #371, which fixes der.unpem(). 0.19.1 -> 0.19.2 is a patch release.
+# f43 commit: https://src.fedoraproject.org/rpms/python-ecdsa/c/8db599ee140bd16957d7886a26d7bbe908531d15
+# Upstream fix: https://github.com/tlsfuzzer/python-ecdsa/pull/371
+spec = { type = "upstream", upstream-commit = "8db599ee140bd16957d7886a26d7bbe908531d15" }
