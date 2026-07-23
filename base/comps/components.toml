@@ -4479,7 +4479,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.qt6-qttools]
 [components.qt6-qttranslations]
 [components.qt6-qtvirtualkeyboard]
-[components.qt6-qtwayland]
 [components.qt6-qtwebchannel]
 [components.qt6-qtwebsockets]
 [components.qtwebkit]
