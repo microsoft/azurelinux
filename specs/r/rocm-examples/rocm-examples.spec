@@ -28,7 +28,7 @@
 
 Name:           rocm-examples
 Version:        %{rocm_version}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        A collection of examples for the ROCm software stack
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0
@@ -69,6 +69,7 @@ BuildRequires:  gtest-devel
 # Only x86_64 works right now:
 ExclusiveArch:  x86_64
 
+BuildRequires: libpfm-devel
 %description
 This repository is a collection of examples to enable new users
 to start using ROCm, as well as provide more advanced examples
