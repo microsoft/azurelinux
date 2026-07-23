@@ -3656,7 +3656,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-drgn]
 [components.python-dulwich]
 [components.python-durationpy]
-[components.python-ecdsa]
 [components.python-editables]
 [components.python-elementpath]
 [components.python-email-validator]
