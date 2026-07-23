@@ -1734,7 +1734,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.libfontenc]
 [components.libftdi]
 [components.libfyaml]
-[components.libgcrypt]
 [components.libgdata]
 [components.libgdiplus]
 [components.libgdither]

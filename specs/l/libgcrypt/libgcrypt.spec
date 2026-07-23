@@ -18,7 +18,7 @@ print(string.sub(hash, 0, 16))
 
 Name: libgcrypt
 Version: 1.11.1
-Release: 4%{?dist}
+Release: 6%{?dist}
 URL: https://www.gnupg.org/
 Source0: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2
 Source1: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-%{version}.tar.bz2.sig
@@ -30,6 +30,7 @@ Patch5: libgcrypt-1.11.0-marvin.patch
 # Part of 1.11.2 release
 Patch6: 0001-Fix-missing-simd-common-riscv.h-in-libgcrypt-tarball.patch
 Patch7: 0001-Add-missing-simd-common-riscv.h.patch
+Patch8: libgcrypt-1.11.1-ecc-montgomery.patch
 
 %global gcrylibdir %{_libdir}
 %global gcrysoname libgcrypt.so.20
@@ -68,6 +69,7 @@ applications using libgcrypt.
 %patch 5 -p1
 %patch 6 -p1
 %patch 7 -p1
+%patch 8 -p1
 
 %build
 # should be all algorithms except SM3 and SM4, aria
@@ -100,7 +102,10 @@ LIBGCRYPT_FORCE_FIPS_MODE=1 make check
 
 %define libpath $RPM_BUILD_ROOT%{gcrylibdir}/%{gcrysoname}.?.?
 
-PROFILE=%{?dist} annocheck --ignore-unknown --verbose --profile=${PROFILE:1} %{libpath}
+# Disabled now due to failing in F44
+# https://github.com/rpminspect/rpminspect/issues/1546
+# export PROFILE=%{?dist}
+# annocheck --ignore-unknown --verbose --profile=${PROFILE:1} %{libpath}
 
 # Add generation of HMAC checksums of the final stripped binaries 
 %define __spec_install_post \
@@ -182,6 +187,10 @@ mkdir -p -m 755 $RPM_BUILD_ROOT/etc/gcrypt
 %license COPYING
 
 %changelog
+* Mon Apr 27 2026 Jakub Jelen <jjelen@redhat.com> - 1.11.1-4
+- Fix CVE-2026-41989 (#2461782)
+- Skip annochecks
+
 * Wed Nov 26 2025 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 1.11.1-3
 - Fix missing header on RISC-V
 

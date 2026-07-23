@@ -1,0 +1,9 @@
+[components.libgcrypt]
+# Pin to f43 1.11.1-4, which disables the annocheck %check step and fixes
+# CVE-2026-41989. The default AZL4 Fedora 43 snapshot (2026-02-24) predates
+# this commit (2026-04-27), so without this pin the build fails in %check with
+# "annocheck: Overall: FAIL (due to MAYB results)".
+# https://src.fedoraproject.org/rpms/libgcrypt/c/87da1ac2a755f3b2b2cf368397ad29fade89c038?branch=f43
+# TODO: Drop this override once the default Fedora 43 snapshot in
+# distro/azurelinux.distro.toml advances past 2026-04-27.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "87da1ac2a755f3b2b2cf368397ad29fade89c038" }
