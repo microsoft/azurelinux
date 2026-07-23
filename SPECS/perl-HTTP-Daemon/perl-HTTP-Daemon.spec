@@ -1,6 +1,6 @@
 Name:           perl-HTTP-Daemon
 Version:        6.16
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Simple HTTP server class
 License:        GPL+ or Artistic
 Vendor:         Microsoft Corporation
@@ -9,6 +9,7 @@ URL:            https://metacpan.org/release/HTTP-Daemon
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-%{version}.tar.gz#/perl-HTTP-Daemon-%{version}.tar.gz
 # Use Makefile.PL without unneeded dependencies
 Patch0:         HTTP-Daemon-6.04-EU-MM-is-not-deprecated.patch
+Patch1:         CVE-2026-8450.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -81,6 +82,7 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n HTTP-Daemon-%{version}
+%patch 1 -p1
 %patch 0 -p1
 
 %build
@@ -116,6 +118,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 6.16-2
+- Patch for CVE-2026-8450
+
 * Wed Mar 27 2024 Sam Meluch <sammeluch@microsoft.com> - 6.16-1
 - Upgrade to version 6.16 for Azure Linux 3.0
 - Add tests package
