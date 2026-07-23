@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        20%{?dist}
+Release:        21%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -273,15 +273,17 @@ ln -s azurelinux-release %{buildroot}%{_sysconfdir}/system-release
 
 # URL of the homepage of the distribution
 # Example: gstreamer1-plugins-base.spec
-%global dist_home_url https://aka.ms/azurelinux
+%global dist_home_url https://azure.microsoft.com/products/azure-linux
 
 # Bugzilla / bug reporting URLs shown to users.
 # Examples: gcc.spec
-%global dist_bug_report_url https://aka.ms/azurelinux
+%global dist_bug_report_url https://github.com/microsoft/azurelinux/issues
 
-# debuginfod server, as used in elfutils.spec.
-# TODO(azl): review
-%global dist_debuginfod_url ima:enforcing https://debuginfod.microsoft.com/ ima:ignore
+# Azure Linux has no public debuginfod server yet, so do not configure a
+# default. When a server is available, set its URL here and rebuild both
+# azurelinux-release (which publishes this macro) and elfutils (which consumes
+# it at build time to generate the debuginfod client configuration).
+%global dist_debuginfod_url %{nil}
 # -------------------------------------------------------------------------
 
 # TODO(azl): review; dynamically generate RELEASE_TYPE from release_type macro
@@ -299,8 +301,8 @@ LOGO=azurelinux-logo-icon
 CPE_NAME="cpe:2.3:o:microsoft:azure_linux:%{dist_version}:*:*:*:*:*:*:*"
 DEFAULT_HOSTNAME="azurelinux"
 HOME_URL="%{dist_home_url}"
-DOCUMENTATION_URL="https://aka.ms/azurelinux"
-SUPPORT_URL="https://aka.ms/azurelinux"
+DOCUMENTATION_URL="https://learn.microsoft.com/azure/azure-linux"
+SUPPORT_URL="https://azure.microsoft.com/support"
 BUG_REPORT_URL="%{dist_bug_report_url}"
 EOF
 
@@ -385,8 +387,12 @@ cat >> %{buildroot}%{_rpmconfigdir}/macros.d/macros.dist << EOF
 %%dist_purl_namespace %{dist_purl_namespace}
 %%dist_home_url       %{dist_home_url}
 %%dist_bug_report_url %{dist_bug_report_url}
+EOF
+%if "%{?dist_debuginfod_url}"
+cat >> %{buildroot}%{_rpmconfigdir}/macros.d/macros.dist << EOF
 %%dist_debuginfod_url %{dist_debuginfod_url}
 EOF
+%endif
 
 # Install licenses
 install -pm 0644 %{SOURCE1} licenses/LICENSE
@@ -479,6 +485,10 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-21
+- Set canonical product, documentation, support, and issue-reporting URLs
+- Remove the inactive default debuginfod server configuration
+
 * Wed Jul 08 2026 Mitch Zhu <mitchzhu@microsoft.com> - 4.0-20
 - Add cloud-init Azure KVP telemetry config to the cloud identity package
 
