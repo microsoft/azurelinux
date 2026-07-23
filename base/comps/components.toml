@@ -4526,7 +4526,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.rocm-bandwidth-test]
 [components.rocm-cmake]
 [components.rocm-core]
-[components.rocm-examples]
 [components.rocm-omp]
 [components.rocm-rpm-macros]
 [components.rocm-rpp]
