@@ -1,0 +1,6 @@
+[components.php-phpunit-php-code-coverage13]
+
+# PHPUnit 13.1+ requires code-coverage 14 and cannot initialize this suite.
+# Re-enable when the buildroot provides a code-coverage 13-compatible runner,
+# or when this component generation moves to code-coverage 14.
+build.without = ["tests"]
