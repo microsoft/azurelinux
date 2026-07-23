@@ -4578,9 +4578,6 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
-* Thu Jul 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.8
-- feat(kernel): vendor kernel spec sources for local-spec migration
-
 * Mon Jul 20 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.7
 - feat(kernel): align x86_64 and arm64 transparent hugepage default to madvise
 
