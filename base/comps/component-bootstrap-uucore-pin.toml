@@ -1,0 +1,122 @@
+# Pin crate(uucore) = 0.0.27 for all uu_* coreutils crates.
+#
+# The Fedora f43-updates repo ships rust-uucore 0.7.0 which has breaking API
+# changes (removed help_about/help_usage/help_section macros). Our specs source
+# crate version 0.0.27, and the Cargo.toml dependency is >=0.0.19 — loose enough
+# for DNF to pull 0.7.0 from updates, causing compilation failures.
+#
+# The Stage 1 Koji build tag uses f43-build/latest which only serves the newest
+# NVR per package. Since 0.7.0 superseded 0.0.27, the external repo only has 0.7.0.
+# The AZL-built rust-uucore (0.0.27) must be built and tagged BEFORE these
+# consumer packages — at that point both versions coexist in the tag and the pin
+# selects 0.0.27.
+#
+# Two kinds of constraints are needed because %cargo_generate_buildrequires
+# produces loose dynamic deps (crate(uucore) >= 0.0.19) in a later mock pass.
+# The BuildRequires pin selects 0.0.27 when available; the BuildConflicts
+# prevents 0.7.0 from being silently installed if 0.0.27 is missing (dnf5
+# builddep otherwise skips the unsatisfiable pin without error). Each kind is
+# applied to both rust-uucore and rust-uucore_procs, for four overlay entries.
+
+[component-groups.rust-uucore-version-pin]
+description = "Pin crate(uucore) = 0.0.27 to prevent version skew with Fedora f43-updates"
+components = [
+    "rust-coreutils",
+    "rust-uu_base32",
+    "rust-uu_base64",
+    "rust-uu_basename",
+    "rust-uu_basenc",
+    "rust-uu_cat",
+    "rust-uu_chcon",
+    "rust-uu_cksum",
+    "rust-uu_comm",
+    "rust-uu_cp",
+    "rust-uu_csplit",
+    "rust-uu_cut",
+    "rust-uu_date",
+    "rust-uu_dd",
+    "rust-uu_df",
+    "rust-uu_dir",
+    "rust-uu_dircolors",
+    "rust-uu_dirname",
+    "rust-uu_du",
+    "rust-uu_echo",
+    "rust-uu_env",
+    "rust-uu_expand",
+    "rust-uu_expr",
+    "rust-uu_factor",
+    "rust-uu_false",
+    "rust-uu_fmt",
+    "rust-uu_fold",
+    "rust-uu_hashsum",
+    "rust-uu_head",
+    "rust-uu_id",
+    "rust-uu_join",
+    "rust-uu_link",
+    "rust-uu_ln",
+    "rust-uu_ls",
+    "rust-uu_mkdir",
+    "rust-uu_mktemp",
+    "rust-uu_more",
+    "rust-uu_mv",
+    "rust-uu_nl",
+    "rust-uu_numfmt",
+    "rust-uu_od",
+    "rust-uu_paste",
+    "rust-uu_pr",
+    "rust-uu_printenv",
+    "rust-uu_printf",
+    "rust-uu_ptx",
+    "rust-uu_pwd",
+    "rust-uu_readlink",
+    "rust-uu_realpath",
+    "rust-uu_rm",
+    "rust-uu_rmdir",
+    "rust-uu_runcon",
+    "rust-uu_seq",
+    "rust-uu_shred",
+    "rust-uu_shuf",
+    "rust-uu_sleep",
+    "rust-uu_sort",
+    "rust-uu_split",
+    "rust-uu_sum",
+    "rust-uu_tac",
+    "rust-uu_tail",
+    "rust-uu_tee",
+    "rust-uu_test",
+    "rust-uu_touch",
+    "rust-uu_tr",
+    "rust-uu_true",
+    "rust-uu_truncate",
+    "rust-uu_tsort",
+    "rust-uu_unexpand",
+    "rust-uu_uniq",
+    "rust-uu_unlink",
+    "rust-uu_vdir",
+    "rust-uu_wc",
+    "rust-uu_yes",
+]
+
+[[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
+description = "Pin uucore to 0.0.27 to prevent version skew with Fedora f43-updates repo"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "rust-uucore-devel = 0.0.27"
+
+[[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
+description = "Pin uucore_procs to 0.0.27 to match pinned uucore version — the 0.7.0 proc macros generate code calling 0.7.0-only APIs"
+type = "spec-insert-tag"
+tag = "BuildRequires"
+value = "rust-uucore_procs-devel = 0.0.27"
+
+[[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
+description = "Block uucore > 0.0.27 from being pulled via dynamic BuildRequires from %cargo_generate_buildrequires"
+type = "spec-insert-tag"
+tag = "BuildConflicts"
+value = "rust-uucore-devel > 0.0.27"
+
+[[component-groups.rust-uucore-version-pin.default-component-config.overlays]]
+description = "Block uucore_procs > 0.0.27 to match pinned uucore version"
+type = "spec-insert-tag"
+tag = "BuildConflicts"
+value = "rust-uucore_procs-devel > 0.0.27"
