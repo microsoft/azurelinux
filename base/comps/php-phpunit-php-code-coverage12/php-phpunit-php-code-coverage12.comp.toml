@@ -1,0 +1,16 @@
+[components.php-phpunit-php-code-coverage12]
+
+# Backport of https://github.com/sebastianbergmann/php-code-coverage/commit/4aa7982d6b8ec54c786ab7b80f1ba5fc629a72a3
+# The equivalent 12.x fix is in upstream 12.5.7 and Fedora f43 commit
+# 01730291e8d4fb41dfb04004a4757e053e749bd8. That Fedora spec requires
+# PHPUnit >= 12.5.28, newer than the current DEV and PROD buildroots.
+[[components.php-phpunit-php-code-coverage12.overlays]]
+description = "Use complete PHP versions in test requirements accepted by current PHPUnit runners"
+type = "patch-add"
+source = "code-coverage12-complete-php-version-requirements.patch"
+
+[[components.php-phpunit-php-code-coverage12.overlays]]
+description = "Apply the added compatibility patch because the upstream spec does not use autosetup"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P0 -p1"]

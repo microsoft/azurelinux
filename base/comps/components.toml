@@ -3134,7 +3134,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.php-phpunit-Version]
 [components.php-phpunit-php-code-coverage10]
 [components.php-phpunit-php-code-coverage11]
-[components.php-phpunit-php-code-coverage12]
 [components.php-phpunit-php-code-coverage13]
 [components.php-phpunit-php-code-coverage7]
 [components.php-phpunit-php-code-coverage9]
