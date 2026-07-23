@@ -81,9 +81,7 @@ Tests from %{name}. Execute them
 with "%{_libexecdir}/%{name}/test".
 
 %prep
-%setup -q -n HTTP-Daemon-%{version}
-%patch 1 -p1
-%patch 0 -p1
+%autosetup -n HTTP-Daemon-%{version} -p1
 
 %build
 perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
