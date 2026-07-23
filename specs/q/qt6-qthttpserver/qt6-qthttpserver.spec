@@ -13,7 +13,7 @@
 Summary: Library to facilitate the creation of an http server with Qt
 Name:    qt6-qthttpserver
 Version: 6.10.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License:    BSD-3-Clause AND GFDL-1.3-no-invariants-only AND GPL-3.0-only WITH Qt-GPL-exception-1.0
 URL:        http://qt-project.org/
@@ -32,7 +32,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  ninja-build
 BuildRequires:  cmake(Qt6BuildInternals) = %{version}
 BuildRequires:  cmake(Qt6Core) = %{version}
-BuildRequires:  qt6-qtbase-private-devel = %{version}
+BuildRequires:  qt6-qtbase-private-devel >= %{version}
 BuildRequires:  cmake(Qt6Network) = %{version}
 BuildRequires:  cmake(Qt6Concurrent) = %{version}
 BuildRequires:  cmake(Qt6WebSockets) = %{version}
