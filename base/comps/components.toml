@@ -1106,7 +1106,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.greenboot-rs]
 [components.grep]
 [components.groff]
-[components.grpc]
 [components.gsettings-desktop-schemas]
 [components.gsl]
 [components.gsm]
