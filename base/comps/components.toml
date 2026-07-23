@@ -3662,7 +3662,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-email-validator]
 [components.python-enchant]
 [components.python-et_xmlfile]
-[components.python-exceptiongroup]
 [components.python-execnet]
 [components.python-executing]
 [components.python-expandvars]
