@@ -1,0 +1,9 @@
+[components.python-aiohttp]
+
+# CPython 3.14.4+ rejects control chars in http cookies (gh-143919), breaking aiohttp's
+# test_parse_set_cookie_headers_uses_unquote_with_octal. Pin the Fedora f43 tip commit
+# (aiohttp 3.13.5), which carries Fedora's deselect of that test. 3.13.3 -> 3.13.5 are
+# bugfix-only patch releases with no backward-incompatible changes (per upstream CHANGES.rst),
+# so dependents are unaffected.
+# f43 commit: https://src.fedoraproject.org/rpms/python-aiohttp/c/52767ad11096d46c0ba3521aceda79937f8462a2
+spec = { type = "upstream", upstream-commit = "52767ad11096d46c0ba3521aceda79937f8462a2" }

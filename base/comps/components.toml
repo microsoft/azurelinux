@@ -3385,7 +3385,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-aiodns]
 [components.python-aiofiles]
 [components.python-aiohappyeyeballs]
-[components.python-aiohttp]
 [components.python-aiomysql]
 [components.python-aioodbc]
 [components.python-aioquic]
