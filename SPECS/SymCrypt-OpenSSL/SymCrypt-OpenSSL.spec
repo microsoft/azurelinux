@@ -1,6 +1,6 @@
 Summary:        The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations
 Name:           SymCrypt-OpenSSL
-Version:        1.3.0
+Version:        1.10.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -54,6 +54,9 @@ cmake --build . --target install
 %{_includedir}/scossl.h
 
 %changelog
+* Thu Jul 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.10.0-1
+- Auto-upgrade to 1.10.0 - Add ML-KEM and ML-KEM hybrid
+
 * Mon May 22 2023 Samuel Lee <saml@microsoft.com> - 1.3.0-1
 - Update SymCrypt-OpenSSL to v1.3.0. Adds support for HMAC and fixes corner RSA-PSS bug. Run smoke test in check
 
