@@ -4474,7 +4474,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.qt6-qttools]
 [components.qt6-qttranslations]
 [components.qt6-qtvirtualkeyboard]
-[components.qt6-qtwayland]
 [components.qt6-qtwebchannel]
 [components.qt6-qtwebsockets]
 [components.qtwebkit]
