@@ -4578,6 +4578,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Jul 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.9
+- feat(kernel): convert component to local spec
+
 * Thu Jul 23 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.8
 - feat(kernel): vendor kernel spec sources for local-spec migration
 
