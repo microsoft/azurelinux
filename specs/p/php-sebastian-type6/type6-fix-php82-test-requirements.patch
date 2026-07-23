@@ -1,0 +1,30 @@
+From 19206ebcf038226cfc5908a7d48e0ddf3a4de318 Mon Sep 17 00:00:00 2001
+From: Sebastian Bergmann <sb@sebastian-bergmann.de>
+Date: Wed, 13 May 2026 14:48:44 +0200
+Subject: [PATCH] Fix version constraint
+
+---
+ tests/unit/ReflectionMapperTest.php | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tests/unit/ReflectionMapperTest.php b/tests/unit/ReflectionMapperTest.php
+index 1ca802d..2574950 100644
+--- a/tests/unit/ReflectionMapperTest.php
++++ b/tests/unit/ReflectionMapperTest.php
+@@ -228 +228 @@ final class ReflectionMapperTest extends TestCase
+-    #[RequiresPhp('>= 8.2')]
++    #[RequiresPhp('^8.2')]
+@@ -237 +237 @@ final class ReflectionMapperTest extends TestCase
+-    #[RequiresPhp('>= 8.2')]
++    #[RequiresPhp('^8.2')]
+@@ -246 +246 @@ final class ReflectionMapperTest extends TestCase
+-    #[RequiresPhp('>= 8.2')]
++    #[RequiresPhp('^8.2')]
+@@ -255 +255 @@ final class ReflectionMapperTest extends TestCase
+-    #[RequiresPhp('>= 8.2')]
++    #[RequiresPhp('^8.2')]
+@@ -308 +308 @@ final class ReflectionMapperTest extends TestCase
+-    #[RequiresPhp('>= 8.2')]
++    #[RequiresPhp('^8.2')]
+--
+2.51.0

@@ -29,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        6.0.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Collection of value objects that represent the types of the PHP type system, v%{major}
 
 License:        BSD-3-Clause
@@ -58,6 +58,7 @@ Requires:       php-composer(fedora/autoloader)
 Provides:       php-composer(%{pk_vendor}/%{pk_project}) = %{version}
 
 
+Patch0: type6-fix-php82-test-requirements.patch
 %description
 Collection of value objects that represent the types of the PHP type system.
 
@@ -70,6 +71,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 %setup -q -n %{gh_project}-%{gh_commit}
 
 
+%patch -P0 -p1
 %build
 # Generate the Autoloader
 phpab --template fedora --output src/autoload.php src
