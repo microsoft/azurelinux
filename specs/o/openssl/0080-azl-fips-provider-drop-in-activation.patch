@@ -1,0 +1,1700 @@
+From dae2d14ccced6072a7cc763de4c5d27be733448c Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Mon, 3 Aug 2026 16:02:08 +0000
+Subject: [PATCH] azl: config-driven FIPS provider drop-in activation
+
+Replace Fedora's hard-coded FIPS force-load (fips_local.cnf / implicit
+"fips") with drop-in-driven selection. When the kernel is in FIPS mode,
+select the designated FIPS provider from the standard configuration --
+already parsed via openssl.cnf's openssl.d include, so no config file is
+opened by path here -- then activate it plus the base provider and set
+the default property query.
+
+The parts of the configuration we consult:
+
+  # [provider_sect] and its "fips = fips_sect" entry are stock OpenSSL
+  # provider registration, not introduced here. Our only tie-in is that
+  # the designated provider name below must match one of these keys,
+  # which is how we resolve it to a provider config section.
+  [provider_sect]
+  fips = fips_sect
+
+  [azl_fips_provider]
+  # Designate the FIPS provider: the key is the provider name (matching
+  # its [provider_sect] entry above) and the value is the fixed marker
+  # "azl-fips-module". Exactly one such entry must exist across all
+  # installed provider drop-ins; zero or more than one is rejected.
+  fips = azl-fips-module
+
+  # Property-query strictness once the FIPS provider is active:
+  #   enforcing -> fips=yes    preferred -> ?fips=yes
+  # Absent defaults to enforcing.
+  azl_fips_prop_query_mode = enforcing
+
+When the kernel is in FIPS mode and the designated provider cannot be
+activated (no designation, more than one, unregistered provider,
+identity alias collision, ambiguous or invalid property-query value, or
+provider load failure), initialization fails closed regardless of the
+config's config_diagnostics setting. OpenSSL
+otherwise swallows a config-module failure under
+CONF_MFLAGS_IGNORE_RETURN_CODES when config_diagnostics is off; forcing
+diagnostics on in this path makes the failure propagate out of
+OPENSSL_init_crypto() rather than letting OpenSSL come up without FIPS
+enforcement.
+
+Force the designated provider active from its configured module path
+rather than by bare name. provider_conf_load() reports success even when
+a configured activate=1 soft-fails (it ends `return ok >= 0`, and a
+non-fatal activation failure yields ok==0), so a bare-name forced
+activation could fall back to loading a same-named module from the
+default module directory -- silently substituting a different, possibly
+non-validated module for the one the drop-in designated. Resolve the
+drop-in's `module` path and pin it in the single forced
+provider_conf_activate(), treating any non-success as fatal, so a module
+that cannot be loaded fails closed instead of being bypassed.
+
+Reject configurations where another providers-section entry aliases its
+identity to the designated FIPS provider name. Such an entry would
+activate first under the designated name, causing Fedora's
+already-activated shortcut to report success without loading the pinned
+module path.
+
+The forced activation carries the designated provider section and
+ambient configuration into the pinned load. This preserves integrity,
+security, and other provider parameters if a configured activate=1
+attempt soft-failed and the forced activation becomes a retry.
+
+Covered by test/recipes/03-test_prov_conf_fips_* : designation,
+fail-closed on missing/ambiguous/unloadable designation, property-query
+merge (enforcing and preferred), and a substitution regression that
+plants a loadable same-named decoy on the default module search path and
+asserts the configured-path activation fails closed rather than loading
+it. Unit coverage also rejects identity alias collisions, while a CLI
+recipe exercises the real library-init path and confirms a missing
+designation aborts initialization rather than failing open. Ambiguous
+dotted property-query mode entries are rejected so include order cannot
+silently choose between enforcing and preferred policy.
+
+Provider-agnostic: SymCrypt (or any provider) can be designated via the
+same mechanism by naming it in [provider_sect] and [azl_fips_provider].
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ crypto/evp/evp_fetch.c                        |   4 +-
+ crypto/provider_conf.c                        | 383 +++++++++++++++++-
+ include/crypto/evp.h                          |   2 +
+ include/internal/provider.h                   |  32 ++
+ test/build.info                               |  15 +
+ test/prov_conf_fips_activate_test.c           | 208 ++++++++++
+ test/prov_conf_fips_ambiguous.cnf             |  20 +
+ test/prov_conf_fips_good.cnf                  |  17 +
+ test/prov_conf_fips_merge_enforcing.cnf       |  25 ++
+ test/prov_conf_fips_merge_preferred.cnf       |  25 ++
+ test/prov_conf_fips_nodesig.cnf               |  15 +
+ test/prov_conf_fips_off_test.c                |  89 ++++
+ test/prov_conf_fips_substitution.cnf          |  27 ++
+ test/prov_conf_fips_test.c                    | 330 +++++++++++++++
+ test/prov_conf_fips_unloadable.cnf            |  24 ++
+ test/recipes/03-test_prov_conf_fips.t         |  12 +
+ .../recipes/03-test_prov_conf_fips_activate.t |  28 ++
+ test/recipes/03-test_prov_conf_fips_off.t     |  41 ++
+ .../recipes/03-test_prov_conf_fips_realinit.t |  55 +++
+ .../03-test_prov_conf_fips_substitution.t     |  47 +++
+ 20 files changed, 1377 insertions(+), 22 deletions(-)
+ create mode 100644 test/prov_conf_fips_activate_test.c
+ create mode 100644 test/prov_conf_fips_ambiguous.cnf
+ create mode 100644 test/prov_conf_fips_good.cnf
+ create mode 100644 test/prov_conf_fips_merge_enforcing.cnf
+ create mode 100644 test/prov_conf_fips_merge_preferred.cnf
+ create mode 100644 test/prov_conf_fips_nodesig.cnf
+ create mode 100644 test/prov_conf_fips_off_test.c
+ create mode 100644 test/prov_conf_fips_substitution.cnf
+ create mode 100644 test/prov_conf_fips_test.c
+ create mode 100644 test/prov_conf_fips_unloadable.cnf
+ create mode 100644 test/recipes/03-test_prov_conf_fips.t
+ create mode 100644 test/recipes/03-test_prov_conf_fips_activate.t
+ create mode 100644 test/recipes/03-test_prov_conf_fips_off.t
+ create mode 100644 test/recipes/03-test_prov_conf_fips_realinit.t
+ create mode 100644 test/recipes/03-test_prov_conf_fips_substitution.t
+
+diff --git a/crypto/evp/evp_fetch.c b/crypto/evp/evp_fetch.c
+index fbebca1..e300e5f 100644
+--- a/crypto/evp/evp_fetch.c
++++ b/crypto/evp/evp_fetch.c
+@@ -527,8 +527,8 @@ int EVP_set_default_properties(OSSL_LIB_CTX *libctx, const char *propq)
+     return evp_set_default_properties_int(libctx, propq, 1, 0);
+ }
+ 
+-static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
+-                                        int loadconfig)
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig)
+ {
+     OSSL_PROPERTY_LIST **plp = ossl_ctx_global_properties(libctx, loadconfig);
+     OSSL_PROPERTY_LIST *pl1, *pl2;
+diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
+index 1e5053c..795a19f 100644
+--- a/crypto/provider_conf.c
++++ b/crypto/provider_conf.c
+@@ -11,17 +11,40 @@
+ #include <openssl/trace.h>
+ #include <openssl/err.h>
+ #include <openssl/evp.h>
+-#include <unistd.h>
+ #include <openssl/conf.h>
+ #include <openssl/safestack.h>
+ #include <openssl/provider.h>
+ #include "internal/provider.h"
+ #include "internal/cryptlib.h"
++#include "crypto/evp.h"
+ #include "provider_local.h"
+ #include "crypto/context.h"
+ 
+ DEFINE_STACK_OF(OSSL_PROVIDER)
+ 
++/*
++ * Marker value used to designate the FIPS provider in the [azl_fips_provider]
++ * section of the FIPS provider drop-in. Each drop-in declares its provider as
++ *     <provider-name> = azl-fips-module
++ * The provider NAME is the config key (so distinct providers survive as
++ * distinct entries and can be counted), while this fixed VALUE marks the entry
++ * as a FIPS-provider designation. This lets us detect and reject a
++ * misconfiguration that designates more than one FIPS provider.
++ */
++#define OSSL_AZL_FIPS_PROVIDER_MARKER "azl-fips-module"
++#define OSSL_AZL_FIPS_PROVIDER_SECTION "azl_fips_provider"
++
++/*
++ * Per-provider knob (in the [azl_fips_provider] section) selecting how strict the
++ * default property query is once the FIPS provider is active:
++ *   enforcing -> fips=yes   (a fetch with no FIPS implementation fails)
++ *   preferred -> ?fips=yes  (FIPS preferred; falls back to a non-FIPS impl)
++ * Absent defaults to "enforcing".
++ */
++#define OSSL_AZL_FIPS_PROP_QUERY_KEY "azl_fips_prop_query_mode"
++#define OSSL_AZL_FIPS_PROP_QUERY_ENFORCING "enforcing"
++#define OSSL_AZL_FIPS_PROP_QUERY_PREFERRED "preferred"
++
+ /* PROVIDER config module */
+ 
+ typedef struct {
+@@ -66,6 +89,63 @@ static const char *skip_dot(const char *name)
+     return name;
+ }
+ 
++/*
++ * Look up a key within a single CONF section by its logical (dot-stripped)
++ * name, returning the associated value or NULL if absent.
++ *
++ * Unlike NCONF_get_string(), this does NOT fall back to the [default] section
++ * or the process environment when the key is missing from the given section.
++ * The FIPS drop-in selection must stay strictly scoped: a stray top-level key
++ * (e.g. an 'azl_fips_prop_query_mode' left in the global section) must not be
++ * able to silently influence -- and in the enforcing->preferred case, weaken --
++ * the FIPS designation. skip_dot() matches the dotted-key convention the rest
++ * of provider_conf uses for name uniquification.
++ *
++ * This scoping also defends against an OpenSSL include quirk: Fedora's
++ * rh-openssl.cnf runs '.include /etc/pki/tls/openssl.d' from *inside*
++ * [default_sect], and CONF section context persists across include
++ * boundaries. Leading unsectioned lines in a drop-in are therefore parsed as
++ * part of [default_sect], not as top-level config -- so a drop-in must open
++ * [azl_fips_provider] (and its provider sections) explicitly. Because we never
++ * fall back to [default], such stray lines cannot reach or weaken the
++ * designation.
++ */
++static const char *section_get0_value(const STACK_OF(CONF_VALUE) *sect,
++                                      const char *key)
++{
++    int i;
++
++    if (sect == NULL)
++        return NULL;
++
++    for (i = 0; i < sk_CONF_VALUE_num(sect); i++) {
++        const CONF_VALUE *v = sk_CONF_VALUE_value(sect, i);
++
++        if (v->name != NULL && strcmp(skip_dot(v->name), key) == 0)
++            return v->value;
++    }
++    return NULL;
++}
++
++/*
++ * Fetch a CONF section without leaving a CONF "no such section" error on the
++ * error stack when it is simply absent -- the FIPS selection code reports its
++ * own, more specific diagnostics for a missing/empty section.
++ */
++static STACK_OF(CONF_VALUE) *get_section_quiet(const CONF *conf,
++                                               const char *name)
++{
++    STACK_OF(CONF_VALUE) *sect;
++
++    ERR_set_mark();
++    sect = NCONF_get_section(conf, name);
++    if (sect == NULL)
++        ERR_pop_to_mark();
++    else
++        ERR_clear_last_mark();
++    return sect;
++}
++
+ /*
+  * Parse the provider params section
+  * Returns:
+@@ -400,6 +480,275 @@ static int provider_conf_load(OSSL_LIB_CTX *libctx, const char *name,
+     return ok >= 0;
+ }
+ 
++/*
++ * Validate a FIPS provider drop-in CONF and select the single designated FIPS
++ * provider. This performs all of the drop-in validation -- it does NOT load a
++ * provider module -- so it can be unit-tested without a FIPS provider present.
++ *
++ * On success returns 1 and fills *name_out / *sect_out (both point into
++ * fips_conf; the caller keeps it alive) and *enforcing_out (1 = enforcing, 0 =
++ * preferred). Returns 0 on any misconfiguration, raising an error.
++ */
++int ossl_prov_conf_select_fips(const CONF *fips_conf, const char *prov_sect,
++                               const char **name_out, const char **sect_out,
++                               int *enforcing_out)
++{
++    STACK_OF(CONF_VALUE) *provlist;
++    STACK_OF(CONF_VALUE) *provsect;
++    CONF_VALUE *pval;
++    const char *fips_name = NULL;
++    const char *fips_sect = NULL;
++    const char *identity;
++    const char *mode = NULL;
++    int j, n = 0;
++    int aliases = 0;
++    int mode_entries = 0;
++    int fips_query_enforcing = 1;
++
++    /*
++     * The [azl_fips_provider] section designates which provider is THE FIPS
++     * provider. Count only entries whose value is OSSL_AZL_FIPS_PROVIDER_MARKER
++     * (the provider name is the key), so a misconfiguration that designates
++     * zero or more than one is detected rather than silently resolved.
++     */
++    provlist = get_section_quiet(fips_conf, OSSL_AZL_FIPS_PROVIDER_SECTION);
++    if (provlist == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "Kernel FIPS mode is active but the FIPS provider "
++                       "configuration has no [" OSSL_AZL_FIPS_PROVIDER_SECTION
++                       "] section designating a FIPS provider.");
++        return 0;
++    }
++
++    for (j = 0; j < sk_CONF_VALUE_num(provlist); j++) {
++        pval = sk_CONF_VALUE_value(provlist, j);
++        if (strcmp(skip_dot(pval->name), OSSL_AZL_FIPS_PROP_QUERY_KEY) == 0) {
++            mode = pval->value;
++            mode_entries++;
++        }
++        if (pval->value != NULL
++                && strcmp(pval->value, OSSL_AZL_FIPS_PROVIDER_MARKER) == 0) {
++            n++;
++            /*
++             * The provider name is the key. Strip any dotted uniquifier
++             * (e.g. "0.myfips") so the name matches its [provider_sect] entry
++             * and activates under the correct provider name.
++             */
++            fips_name = skip_dot(pval->name);
++        }
++    }
++
++    if (n != 1) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "Kernel FIPS mode is active but the ["
++                       OSSL_AZL_FIPS_PROVIDER_SECTION "] section designates %d FIPS "
++                       "providers (expected exactly one entry with value '"
++                       OSSL_AZL_FIPS_PROVIDER_MARKER "').", n);
++        return 0;
++    }
++
++    /*
++     * Map the designated provider name to its config section via the *actual*
++     * providers section (the value of the 'providers' line in openssl_init),
++     * not a hardcoded "provider_sect". The lookup is scoped to that section
++     * only -- a top-level key of the same name must not resolve it.
++     */
++    provsect = get_section_quiet(fips_conf, prov_sect);
++    fips_sect = section_get0_value(provsect, fips_name);
++    if (fips_sect == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS provider '%s' is designated in ["
++                       OSSL_AZL_FIPS_PROVIDER_SECTION "] but is not registered in "
++                       "[%s].", fips_name, prov_sect);
++        return 0;
++    }
++
++    /*
++     * The [provider_sect] key is the provider name. A redundant 'identity'
++     * that restates that name is fine; an aliasing 'identity' would load the
++     * provider under a different name than we designated, defeating the
++     * exactly-one check, so reject it.
++     */
++    identity = section_get0_value(get_section_quiet(fips_conf, fips_sect),
++                                  "identity");
++    if (identity != NULL && strcmp(identity, fips_name) != 0) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS provider section '%s' aliases its identity "
++                       "to '%s'; the designated FIPS provider must load "
++                       "under its [%s] name '%s'.",
++                       fips_sect, identity, prov_sect, fips_name);
++        return 0;
++    }
++
++    /*
++     * Alias-collision guard. The designated-identity check above only inspects
++     * the designated section. But ANOTHER entry in [prov_sect] -- with a
++     * different key -- can set 'identity = <fips_name>', which makes
++     * provider_conf_load() activate THAT entry's module under the designated
++     * name during provider_conf_init()'s ordinary providers loop, which runs
++     * BEFORE our forced, module-path-pinned activation. Fedora's fips-force
++     * patch then turns the pinned activation into a no-op success
++     * (prov_already_activated() -> the provider name is already active ->
++     * returns 1) WITHOUT loading the designated module path -- so the aliased
++     * module silently stands in for the one the drop-in designated, defeating
++     * the whole point of pinning the module path.
++     *
++     * Defend by requiring that exactly one [prov_sect] entry resolves to
++     * fips_name. An entry resolves via its section's 'identity' if present,
++     * otherwise via its own dot-stripped key (which is how provider_conf_load()
++     * derives the activation name). More than one match is a collision and
++     * fails closed.
++     */
++    for (j = 0; j < sk_CONF_VALUE_num(provsect); j++) {
++        const char *ename;
++
++        pval = sk_CONF_VALUE_value(provsect, j);
++        ename = section_get0_value(get_section_quiet(fips_conf, pval->value),
++                                   "identity");
++        if (ename == NULL)
++            ename = skip_dot(pval->name);
++        if (strcmp(ename, fips_name) == 0)
++            aliases++;
++    }
++    if (aliases != 1) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "%d [%s] entries resolve to the designated FIPS "
++                       "provider name '%s' (expected exactly one); another "
++                       "entry aliases its identity to the designated provider.",
++                       aliases, prov_sect, fips_name);
++        return 0;
++    }
++
++    /*
++     * Read the property-query strictness knob from the [azl_fips_provider]
++     * section only. Absent -> enforcing (the safe default). An invalid value
++     * or more than one logical mode entry fails closed rather than allowing
++     * include order to choose the effective policy.
++     */
++    if (mode_entries > 1) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "The [" OSSL_AZL_FIPS_PROVIDER_SECTION "] section "
++                       "contains %d '" OSSL_AZL_FIPS_PROP_QUERY_KEY "' "
++                       "entries (expected at most one).",
++                       mode_entries);
++        return 0;
++    }
++
++    if (mode == NULL) {
++        fips_query_enforcing = 1;       /* key absent: keep the default */
++    } else if (strcmp(mode, OSSL_AZL_FIPS_PROP_QUERY_ENFORCING) == 0) {
++        fips_query_enforcing = 1;
++    } else if (strcmp(mode, OSSL_AZL_FIPS_PROP_QUERY_PREFERRED) == 0) {
++        fips_query_enforcing = 0;
++    } else {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "Invalid '" OSSL_AZL_FIPS_PROP_QUERY_KEY "' value "
++                       "'%s' in [" OSSL_AZL_FIPS_PROVIDER_SECTION "] "
++                       "(expected '" OSSL_AZL_FIPS_PROP_QUERY_ENFORCING
++                       "' or '" OSSL_AZL_FIPS_PROP_QUERY_PREFERRED "').",
++                       mode);
++        return 0;
++    }
++
++    *name_out = fips_name;
++    *sect_out = fips_sect;
++    *enforcing_out = fips_query_enforcing;
++    return 1;
++}
++
++/*
++ * When the kernel is in FIPS mode, activate the single designated FIPS
++ * provider and enforce that exactly one FIPS provider is designated.
++ *
++ * The designation is read from the ambient configuration (cnf) -- the fully
++ * parsed openssl.cnf, which already pulls in every installed provider drop-in
++ * through its openssl.d include.
++ *
++ * Returns 1 on success (the designated FIPS provider and the base provider are
++ * loaded and active, and default properties require FIPS), or 0 on any
++ * failure.
++ */
++static int provider_conf_activate_fips(OSSL_LIB_CTX *libctx, const CONF *cnf,
++                                       const char *prov_sect)
++{
++    const char *fips_name = NULL;
++    const char *fips_sect = NULL;
++    const char *fips_path = NULL;
++    STACK_OF(CONF_VALUE) *fips_provconf;
++    int fips_query_enforcing = 1;
++
++    OSSL_TRACE(CONF, "Kernel FIPS mode active; selecting designated FIPS provider\n");
++
++    if (!ossl_prov_conf_select_fips(cnf, prov_sect, &fips_name, &fips_sect,
++                                    &fips_query_enforcing))
++        return 0;
++
++    OSSL_TRACE2(CONF, "Activating designated FIPS provider '%s' (section '%s')\n",
++                fips_name, fips_sect);
++
++    /*
++     * Resolve the designated provider's module path from its drop-in section so
++     * that the forced activation below loads the *configured* module rather
++     * than resolving the provider by bare name from the default module
++     * directory. A drop-in that omits 'module' (the common case -- the provider
++     * is found by name on the default search path) leaves fips_path NULL, which
++     * is fine.
++     */
++    fips_provconf = NCONF_get_section(cnf, fips_sect);
++    if (fips_provconf == NULL) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "FIPS provider section '%s' not found.", fips_sect);
++        return 0;
++    }
++    fips_path = section_get0_value(fips_provconf, "module");
++
++    /*
++     * Force the designated FIPS provider active. The kernel FIPS flag -- not
++     * the drop-in's 'activate' knob -- is the authority here, so we activate
++     * unconditionally and treat *any* failure as fatal.
++     *
++     * We pass the configured module path explicitly rather than letting the
++     * activation resolve the provider by bare name. provider_conf_activate()
++     * reports a *non-fatal* failure (return 0) when a configured activation
++     * fails to load its module; without the explicit path, a subsequent forced
++     * activation would fall back to loading a same-named provider from the
++     * default module directory -- silently substituting a different (and
++     * possibly non-validated) module for the one the drop-in designated. By
++     * pinning the path and requiring a return of 1, a module that cannot be
++     * loaded fails closed instead of being silently bypassed.
++     *
++     * Pass the provider section and ambient CONF as well as the pinned path.
++     * If its configured activate=1 attempt failed, this forced attempt is a
++     * retry and must retain the same integrity and security parameters rather
++     * than loading the module with defaults.
++     */
++    if (provider_conf_activate(libctx, fips_name, fips_sect, fips_path, 0,
++                               cnf) != 1) {
++        ERR_raise_data(ERR_LIB_CRYPTO, ERR_R_INIT_FAIL,
++                       "Failed to activate FIPS provider '%s'.", fips_name);
++        return 0;
++    }
++
++    if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
++        return 0;
++
++    /*
++     * enforcing -> fips=yes (mandatory); preferred -> ?fips=yes (optional,
++     * allows fallback to a non-FIPS implementation). Merge (rather than
++     * replace) the default property query so that any default properties an
++     * application configured via its own alg_section are preserved and
++     * composed with our FIPS designation; our token wins on conflict.
++     */
++    if (evp_default_properties_merge(libctx,
++            fips_query_enforcing ? "fips=yes" : "?fips=yes", 1) != 1)
++        return 0;
++
++    OSSL_TRACE1(CONF, "FIPS provider active; default property query is '%s'\n",
++                fips_query_enforcing ? "fips=yes" : "?fips=yes");
++
++    return 1;
++}
++
+ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+ {
+     STACK_OF(CONF_VALUE) *elist;
+@@ -424,28 +773,22 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+             return 0;
+     }
+ 
+-    if (ossl_get_kernel_fips_flag() != 0) { /* XXX from provider_conf_load */
++    if (ossl_get_kernel_fips_flag() != 0) {
+         OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
+-#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
+-
+-        if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
+-            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
+-            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
+-                return 0;
+ 
+-            if (provider_conf_load(libctx, "fips", "fips_sect", fips_conf) != 1) {
+-                NCONF_free(fips_conf);
+-                return 0;
+-            }
+-            NCONF_free(fips_conf);
+-        } else {
+-            if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
+-                return 0;
+-        }
+-        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
+-            return 0;
+-        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
++        if (!provider_conf_activate_fips(libctx, cnf, CONF_imodule_get_value(md))) {
++            /*
++             * The kernel is in FIPS mode but the designated FIPS provider could
++             * not be activated. This must be fatal regardless of the config's
++             * config_diagnostics setting: otherwise CONF_modules_load_file_ex()
++             * swallows the module return code under
++             * CONF_MFLAGS_IGNORE_RETURN_CODES and OpenSSL would come up without
++             * FIPS enforcement. Forcing diagnostics on makes the failure
++             * propagate so OPENSSL_init_crypto() fails closed.
++             */
++            OSSL_LIB_CTX_set_conf_diagnostics(libctx, 1);
+             return 0;
++        }
+     }
+ 
+     return 1;
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index 3f1eed3..16ca594 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -933,6 +933,8 @@ int evp_method_store_remove_all_provided(const OSSL_PROVIDER *prov);
+ 
+ int evp_default_properties_enable_fips_int(OSSL_LIB_CTX *libctx, int enable,
+                                            int loadconfig);
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig);
+ int evp_set_default_properties_int(OSSL_LIB_CTX *libctx, const char *propq,
+                                    int loadconfig, int mirrored);
+ char *evp_get_global_properties_str(OSSL_LIB_CTX *libctx, int loadconfig);
+diff --git a/include/internal/provider.h b/include/internal/provider.h
+index c0f1d00..95e2b70 100644
+--- a/include/internal/provider.h
++++ b/include/internal/provider.h
+@@ -117,6 +117,38 @@ void ossl_provider_deinit_child(OSSL_LIB_CTX *ctx);
+ /* FIPS flag access */
+ int ossl_get_kernel_fips_flag(void);
+ 
++/*
++ * Validate a FIPS provider drop-in configuration and select the single
++ * designated FIPS provider.
++ *
++ * Pure with respect to the supplied CONF: it loads no provider module, so it
++ * is safe to unit-test without a FIPS provider present.
++ *
++ * Parameters:
++ *   fips_conf  - the parsed configuration to inspect
++ *   prov_sect  - name of the providers section (the value of the 'providers'
++ *                line in openssl_init, e.g. "provider_sect"); the designated
++ *                provider is mapped to its config section via this section only
++ *
++ * Returns 1 on success and sets:
++ *   *name_out       - the designated provider's name (dot-stripped)
++ *   *sect_out       - its config section name (its entry's value in prov_sect)
++ *                     (both borrowed from fips_conf; keep it alive, don't free)
++ *   *enforcing_out  - 1 = enforcing ("fips=yes"), 0 = preferred ("?fips=yes")
++ *
++ * Returns 0 (and raises an error) on any misconfiguration:
++ *   - no [azl_fips_provider] section
++ *   - not exactly one designated provider
++ *   - a designated name absent from the prov_sect section
++ *   - an aliasing 'identity' in the provider's section
++ *   - an invalid property-query mode
++ */
++struct conf_st;
++int ossl_prov_conf_select_fips(const struct conf_st *fips_conf,
++                               const char *prov_sect,
++                               const char **name_out, const char **sect_out,
++                               int *enforcing_out);
++
+ # ifdef __cplusplus
+ }
+ # endif
+diff --git a/test/build.info b/test/build.info
+index 3dca611..0605318 100644
+--- a/test/build.info
++++ b/test/build.info
+@@ -1113,6 +1113,21 @@ IF[{- !$disabled{tests} -}]
+   INCLUDE[context_internal_test]=.. ../include ../apps/include
+   DEPEND[context_internal_test]=../libcrypto.a libtestutil.a
+ 
++  PROGRAMS{noinst}=prov_conf_fips_test
++  SOURCE[prov_conf_fips_test]=prov_conf_fips_test.c
++  INCLUDE[prov_conf_fips_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_fips_test]=../libcrypto.a libtestutil.a
++
++  PROGRAMS{noinst}=prov_conf_fips_activate_test
++  SOURCE[prov_conf_fips_activate_test]=prov_conf_fips_activate_test.c
++  INCLUDE[prov_conf_fips_activate_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_fips_activate_test]=../libcrypto.a libtestutil.a
++
++  PROGRAMS{noinst}=prov_conf_fips_off_test
++  SOURCE[prov_conf_fips_off_test]=prov_conf_fips_off_test.c
++  INCLUDE[prov_conf_fips_off_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_fips_off_test]=../libcrypto.a libtestutil.a
++
+   IF[{- !$disabled{zlib} || !$disabled{brotli} || !$disabled{zstd} -}]
+     PROGRAMS{noinst}=bio_comp_test
+     SOURCE[bio_comp_test]=bio_comp_test.c
+diff --git a/test/prov_conf_fips_activate_test.c b/test/prov_conf_fips_activate_test.c
+new file mode 100644
+index 0000000..2d223ac
+--- /dev/null
++++ b/test/prov_conf_fips_activate_test.c
+@@ -0,0 +1,208 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++/*
++ * Exercises the config-driven FIPS provider activation path in provider_conf.c
++ * with the kernel FIPS flag forced on (the recipe sets OPENSSL_FORCE_FIPS_MODE).
++ * Uses the built-in "null" provider as the designated FIPS provider, so no
++ * loadable module is required.
++ */
++
++#include <openssl/conf.h>
++#include <openssl/evp.h>
++#include <openssl/provider.h>
++#include "crypto/evp.h"
++#include "testutil.h"
++
++static char *good_cnf = NULL;
++static char *nodesig_cnf = NULL;
++static char *ambiguous_cnf = NULL;
++static char *unloadable_cnf = NULL;
++static char *merge_enforcing_cnf = NULL;
++static char *merge_preferred_cnf = NULL;
++
++/*
++ * A single valid designation activates the designated provider and forces the
++ * FIPS default property (enforcing -> fips=yes).
++ */
++static int test_designated_activates(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, good_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "null")))
++        goto err;
++    if (!TEST_true(EVP_default_properties_is_fips_enabled(ctx)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * With config_diagnostics = 0 (the shipped default that normally swallows
++ * module errors via CONF_MFLAGS_IGNORE_RETURN_CODES), a missing designation
++ * under kernel FIPS mode must still make config load FAIL. This proves
++ * provider_conf_init()'s forced OSSL_LIB_CTX_set_conf_diagnostics() propagates
++ * the failure so OpenSSL fails closed rather than coming up without FIPS.
++ */
++static int test_no_designation_fails_closed(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_false(OSSL_LIB_CTX_load_config(ctx, nodesig_cnf)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * Two entries carry the designation marker. Designating more than one FIPS
++ * provider is ambiguous and must fail closed under kernel FIPS mode.
++ */
++static int test_ambiguous_designation_fails(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_false(OSSL_LIB_CTX_load_config(ctx, ambiguous_cnf)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * The designated FIPS provider names a module that cannot be loaded. Activation
++ * must fail closed rather than coming up without the FIPS provider.
++ */
++static int test_unloadable_provider_fails(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_false(OSSL_LIB_CTX_load_config(ctx, unloadable_cnf)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * Merge (not replace) semantics: an application configures a default property
++ * (app.prop=1) via alg_section, which is processed before the FIPS drop-in. Our
++ * activation must merge the FIPS designation onto the existing query so BOTH
++ * the application's property and the FIPS token survive. Regression guard for
++ * the preferred-mode path, which previously called EVP_set_default_properties()
++ * and clobbered the application's query.
++ */
++static int check_merge_preserves_app_prop(const char *cnf, int optional)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    char *propstr = NULL;
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "null")))
++        goto err;
++    if (!TEST_ptr(propstr = evp_get_global_properties_str(ctx, 1)))
++        goto err;
++    /*
++     * The application's alg_section property (app.prop) must survive the merge.
++     */
++    if (!TEST_ptr(strstr(propstr, "app.prop")))
++        goto err;
++    /*
++     * The mode-correct FIPS token must also survive: enforcing yields the
++     * mandatory "fips=yes", preferred yields the optional "?fips=yes". A bare
++     * strstr(propstr, "fips") cannot tell them apart (it also matches a negated
++     * "-fips"), so the '?' optional flag -- the whole point of preferred mode --
++     * would go unverified. Check the exact token instead. Because "fips=yes" is
++     * a substring of "?fips=yes", enforcing additionally asserts the '?' form is
++     * absent, pinning mandatory vs optional.
++     */
++    if (optional) {
++        if (!TEST_ptr(strstr(propstr, "?fips=yes")))
++            goto err;
++    } else {
++        if (!TEST_ptr(strstr(propstr, "fips=yes"))
++                || !TEST_ptr_null(strstr(propstr, "?fips=yes")))
++            goto err;
++    }
++
++    testresult = 1;
++ err:
++    OPENSSL_free(propstr);
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++static int test_merge_preserves_app_prop_enforcing(void)
++{
++    return check_merge_preserves_app_prop(merge_enforcing_cnf, 0);
++}
++
++static int test_merge_preserves_app_prop_preferred(void)
++{
++    return check_merge_preserves_app_prop(merge_preferred_cnf, 1);
++}
++
++OPT_TEST_DECLARE_USAGE("good_conf no_designation_conf ambiguous_conf unloadable_conf merge_enforcing_conf merge_preferred_conf\n")
++
++int setup_tests(void)
++{
++    if (!test_skip_common_options()) {
++        TEST_error("Error parsing test options\n");
++        return 0;
++    }
++
++    if (!TEST_ptr(good_cnf = test_get_argument(0))
++            || !TEST_ptr(nodesig_cnf = test_get_argument(1))
++            || !TEST_ptr(ambiguous_cnf = test_get_argument(2))
++            || !TEST_ptr(unloadable_cnf = test_get_argument(3))
++            || !TEST_ptr(merge_enforcing_cnf = test_get_argument(4))
++            || !TEST_ptr(merge_preferred_cnf = test_get_argument(5)))
++        return 0;
++
++    ADD_TEST(test_designated_activates);
++    ADD_TEST(test_no_designation_fails_closed);
++    ADD_TEST(test_ambiguous_designation_fails);
++    ADD_TEST(test_unloadable_provider_fails);
++    ADD_TEST(test_merge_preserves_app_prop_enforcing);
++    ADD_TEST(test_merge_preserves_app_prop_preferred);
++    return 1;
++}
+diff --git a/test/prov_conf_fips_ambiguous.cnf b/test/prov_conf_fips_ambiguous.cnf
+new file mode 100644
+index 0000000..307edad
+--- /dev/null
++++ b/test/prov_conf_fips_ambiguous.cnf
+@@ -0,0 +1,20 @@
++openssl_conf = openssl_init
++
++# Deliberately 0: proves the failure propagates even when errors are ignored.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
++
++# Two entries carry the designation marker: the section designates more than
++# one FIPS provider, which must fail closed under kernel FIPS mode.
++[azl_fips_provider]
++null = azl-fips-module
++base = azl-fips-module
++azl_fips_prop_query_mode = enforcing
+diff --git a/test/prov_conf_fips_good.cnf b/test/prov_conf_fips_good.cnf
+new file mode 100644
+index 0000000..ea27f97
+--- /dev/null
++++ b/test/prov_conf_fips_good.cnf
+@@ -0,0 +1,17 @@
++openssl_conf = openssl_init
++
++# Deliberately 0: the shipped default that would normally swallow module errors.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
++
++[azl_fips_provider]
++null = azl-fips-module
++azl_fips_prop_query_mode = enforcing
+diff --git a/test/prov_conf_fips_merge_enforcing.cnf b/test/prov_conf_fips_merge_enforcing.cnf
+new file mode 100644
+index 0000000..4d1a014
+--- /dev/null
++++ b/test/prov_conf_fips_merge_enforcing.cnf
+@@ -0,0 +1,25 @@
++# The application configures a default property (app.prop=1) via alg_section, which
++# is processed BEFORE the FIPS drop-in below. The drop-in must MERGE its FIPS
++# designation onto the existing query rather than replacing it, so both app.prop=1
++# and the FIPS token survive. Enforcing mode -> fips=yes.
++openssl_conf = openssl_init
++
++# Deliberately 0: the shipped default that would normally swallow module errors.
++config_diagnostics = 0
++
++[openssl_init]
++alg_section = evp_properties
++providers = provider_sect
++
++[evp_properties]
++default_properties = app.prop=1
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
++
++[azl_fips_provider]
++null = azl-fips-module
++azl_fips_prop_query_mode = enforcing
+diff --git a/test/prov_conf_fips_merge_preferred.cnf b/test/prov_conf_fips_merge_preferred.cnf
+new file mode 100644
+index 0000000..172014b
+--- /dev/null
++++ b/test/prov_conf_fips_merge_preferred.cnf
+@@ -0,0 +1,25 @@
++# The application configures a default property (app.prop=1) via alg_section, which
++# is processed BEFORE the FIPS drop-in below. The drop-in must MERGE its FIPS
++# designation onto the existing query rather than replacing it, so both app.prop=1
++# and the FIPS token survive. Enforcing mode -> fips=yes.
++openssl_conf = openssl_init
++
++# Deliberately 0: the shipped default that would normally swallow module errors.
++config_diagnostics = 0
++
++[openssl_init]
++alg_section = evp_properties
++providers = provider_sect
++
++[evp_properties]
++default_properties = app.prop=1
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
++
++[azl_fips_provider]
++null = azl-fips-module
++azl_fips_prop_query_mode = preferred
+diff --git a/test/prov_conf_fips_nodesig.cnf b/test/prov_conf_fips_nodesig.cnf
+new file mode 100644
+index 0000000..1e94196
+--- /dev/null
++++ b/test/prov_conf_fips_nodesig.cnf
+@@ -0,0 +1,15 @@
++openssl_conf = openssl_init
++
++# Deliberately 0: proves the failure propagates even when errors are ignored.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
++
++# No [azl_fips_provider] section: under kernel FIPS mode this must fail closed.
+diff --git a/test/prov_conf_fips_off_test.c b/test/prov_conf_fips_off_test.c
+new file mode 100644
+index 0000000..a31f430
+--- /dev/null
++++ b/test/prov_conf_fips_off_test.c
+@@ -0,0 +1,89 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++/*
++ * Exercises the config-driven FIPS provider path with the kernel FIPS flag OFF
++ * (the recipe does NOT set OPENSSL_FORCE_FIPS_MODE, and the build host is not in
++ * kernel FIPS mode). The whole [azl_fips_provider] mechanism must be inert:
++ * configs that would fail closed under kernel FIPS mode load normally, and no
++ * FIPS default property is forced. This is a separate binary from the
++ * activation test because the kernel FIPS flag is read once per process.
++ */
++
++#include <openssl/conf.h>
++#include <openssl/evp.h>
++#include "testutil.h"
++
++static char *good_cnf = NULL;
++static char *nodesig_cnf = NULL;
++
++/*
++ * A missing designation is fatal only under kernel FIPS mode. With the kernel
++ * flag off, the same config that fails closed in the activation test loads
++ * fine and does not force FIPS.
++ */
++static int test_no_designation_ok_when_fips_off(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, nodesig_cnf)))
++        goto err;
++    if (!TEST_false(EVP_default_properties_is_fips_enabled(ctx)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * A valid designation is ignored when the kernel is not in FIPS mode: the
++ * provider is not force-activated and the FIPS default property is not set.
++ */
++static int test_designation_inert_when_fips_off(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, good_cnf)))
++        goto err;
++    if (!TEST_false(EVP_default_properties_is_fips_enabled(ctx)))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++OPT_TEST_DECLARE_USAGE("good_conf no_designation_conf\n")
++
++int setup_tests(void)
++{
++    if (!test_skip_common_options()) {
++        TEST_error("Error parsing test options\n");
++        return 0;
++    }
++
++    if (!TEST_ptr(good_cnf = test_get_argument(0))
++            || !TEST_ptr(nodesig_cnf = test_get_argument(1)))
++        return 0;
++
++    ADD_TEST(test_no_designation_ok_when_fips_off);
++    ADD_TEST(test_designation_inert_when_fips_off);
++    return 1;
++}
+diff --git a/test/prov_conf_fips_substitution.cnf b/test/prov_conf_fips_substitution.cnf
+new file mode 100644
+index 0000000..d7996b3
+--- /dev/null
++++ b/test/prov_conf_fips_substitution.cnf
+@@ -0,0 +1,27 @@
++openssl_conf = openssl_init
++
++# Deliberately 0: the shipped default that would normally swallow module errors.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++# activate = 1 so the generic provider loop attempts to LOAD the drop-in from its
++# configured (bogus) module path. That load soft-fails. The bug was that the
++# forced FIPS activation then retried the provider by bare name, resolving a
++# same-named module from the default module directory -- silently substituting a
++# different, possibly non-validated module for the one the drop-in designated.
++# The forced activation must instead pin the configured path and fail closed.
++[provider_sect]
++myfips = myfips_sect
++
++[myfips_sect]
++module = /nonexistent/myfips.so
++activate = 1
++
++# Designated FIPS provider points at a module that cannot be loaded. Under kernel
++# FIPS mode, activation must fail closed even though a loadable, same-named decoy
++# (myfips.so) is present on the default module search path.
++[azl_fips_provider]
++myfips = azl-fips-module
++azl_fips_prop_query_mode = enforcing
+diff --git a/test/prov_conf_fips_test.c b/test/prov_conf_fips_test.c
+new file mode 100644
+index 0000000..b7c46cf
+--- /dev/null
++++ b/test/prov_conf_fips_test.c
+@@ -0,0 +1,330 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++/*
++ * Unit tests for the FIPS provider drop-in validation performed by
++ * ossl_prov_conf_select_fips() (crypto/provider_conf.c). These exercise the
++ * "designate exactly one FIPS provider" and property-query-mode parsing logic
++ * without loading a provider module, so no FIPS provider needs to be present.
++ */
++
++#include <openssl/bio.h>
++#include <openssl/conf.h>
++#include <openssl/err.h>
++#include "internal/provider.h"
++#include "testutil.h"
++
++/* Load an in-memory config string into a fresh CONF. */
++static CONF *conf_from_string(const char *str)
++{
++    CONF *conf = NCONF_new(NULL);
++    BIO *bio = BIO_new_mem_buf(str, -1);
++    long eline = 0;
++
++    if (conf == NULL || bio == NULL || NCONF_load_bio(conf, bio, &eline) <= 0) {
++        NCONF_free(conf);
++        BIO_free(bio);
++        return NULL;
++    }
++    BIO_free(bio);
++    return conf;
++}
++
++/*
++ * Drive ossl_prov_conf_select_fips() with a config string and compare against
++ * the expected outcome. On expected success, also check the selected provider
++ * name and the enforcing flag. Errors left on the stack by failure cases are
++ * cleared so they do not bleed into later tests.
++ */
++static int check_select(const char *cfg, const char *prov_sect, int expect_ok,
++                        const char *expect_name, int expect_enforcing)
++{
++    CONF *conf = conf_from_string(cfg);
++    const char *name = NULL;
++    const char *sect = NULL;
++    int enforcing = -1;
++    int rc, testresult = 0;
++
++    if (!TEST_ptr(conf))
++        goto err;
++
++    rc = ossl_prov_conf_select_fips(conf, prov_sect, &name, &sect, &enforcing);
++    if (!TEST_int_eq(rc, expect_ok))
++        goto err;
++
++    if (expect_ok) {
++        if (!TEST_str_eq(name, expect_name)
++                || !TEST_ptr(sect)
++                || !TEST_int_eq(enforcing, expect_enforcing))
++            goto err;
++    } else {
++        ERR_clear_error();
++    }
++
++    testresult = 1;
++ err:
++    NCONF_free(conf);
++    return testresult;
++}
++
++/* A well-formed drop-in with a single designated, registered provider. */
++#define BASE_PROVIDER_SECT \
++    "[provider_sect]\n" \
++    "fips = fips_sect\n" \
++    "[fips_sect]\n" \
++    "activate = 1\n"
++
++static int test_enforcing_explicit(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "azl_fips_prop_query_mode = enforcing\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 1, "fips", 1);
++}
++
++static int test_preferred(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "azl_fips_prop_query_mode = preferred\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 1, "fips", 0);
++}
++
++/* Absent mode key defaults to enforcing. */
++static int test_mode_default(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 1, "fips", 1);
++}
++
++static int test_invalid_mode(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "azl_fips_prop_query_mode = sometimes\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 0, NULL, 0);
++}
++
++/*
++ * Dotted uniquifiers allow merged drop-ins to retain duplicate logical keys.
++ * Conflicting mode entries must fail closed instead of letting include order
++ * silently choose between enforcing and preferred.
++ */
++static int test_ambiguous_mode(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "0.azl_fips_prop_query_mode = enforcing\n"
++                        "1.azl_fips_prop_query_mode = preferred\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 0, NULL, 0);
++}
++
++/* No [azl_fips_provider] section at all. */
++static int test_missing_section(void)
++{
++    return check_select(BASE_PROVIDER_SECT, "provider_sect", 0, NULL, 0);
++}
++
++/* A [azl_fips_provider] section that designates nothing (only the mode key). */
++static int test_zero_designations(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "azl_fips_prop_query_mode = enforcing\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 0, NULL, 0);
++}
++
++/* Two providers both marked azl-fips-module -> ambiguous, must fail. */
++static int test_two_designations(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "symcrypt = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "fips = fips_sect\n"
++                        "symcrypt = symcrypt_sect\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n"
++                        "[symcrypt_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 0, NULL, 0);
++}
++
++/* Designated name is absent from [provider_sect]. */
++static int test_unregistered_name(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "default = default_sect\n"
++                        "[default_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 0, NULL, 0);
++}
++
++/* A redundant 'identity' that restates the designated name is allowed. */
++static int test_redundant_identity(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "fips = fips_sect\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n"
++                        "identity = fips\n",
++                        "provider_sect", 1, "fips", 1);
++}
++
++/* An aliasing 'identity' (differs from the designated name) must fail. */
++static int test_aliasing_identity(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "fips = fips_sect\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n"
++                        "identity = something_else\n",
++                        "provider_sect", 0, NULL, 0);
++}
++
++/*
++ * The providers section is named by the 'providers' line in openssl_init, not
++ * hardwired to "provider_sect". Selection must honor the caller-supplied name
++ * (here "my_providers") when mapping the designated provider to its section.
++ */
++static int test_custom_providers_section(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[my_providers]\n"
++                        "fips = fips_sect\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n",
++                        "my_providers", 1, "fips", 1);
++}
++
++/*
++ * The name->section map must be scoped to the providers section only. A stray
++ * top-level 'fips = ...' must NOT satisfy an unregistered designation via
++ * NCONF_get_string()'s [default]-section fallback.
++ */
++static int test_name_map_no_default_fallback(void)
++{
++    return check_select("fips = fips_sect\n"
++                        "[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "default = default_sect\n"
++                        "[default_sect]\n"
++                        "activate = 1\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 0, NULL, 0);
++}
++
++/*
++ * The property-query mode must be read from [azl_fips_provider] only. A stray
++ * top-level 'azl_fips_prop_query_mode = preferred' must NOT downgrade the
++ * enforcing default via the [default]-section fallback.
++ */
++static int test_mode_no_default_fallback(void)
++{
++    return check_select("azl_fips_prop_query_mode = preferred\n"
++                        "[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        BASE_PROVIDER_SECT,
++                        "provider_sect", 1, "fips", 1);
++}
++
++/*
++ * Dotted uniquifiers on the designation key (and its [provider_sect] entry)
++ * are stripped, so the provider is selected and named correctly.
++ */
++static int test_dotted_designation(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "0.fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "0.fips = fips_sect\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 1, "fips", 1);
++}
++
++/*
++ * Alias collision: a second provider entry ('decoy') sets identity = the
++ * designated name ('fips'). During provider_conf_init()'s providers loop that
++ * decoy activates its own module UNDER the name 'fips' before our forced,
++ * module-path-pinned activation runs; Fedora's fips-force then makes the pinned
++ * activation a no-op success, so the decoy would silently stand in for the
++ * designated module. Selection must reject this and fail closed.
++ */
++static int test_alias_collision(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "decoy = decoy_sect\n"
++                        "fips = fips_sect\n"
++                        "[decoy_sect]\n"
++                        "activate = 1\n"
++                        "identity = fips\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 0, NULL, 0);
++}
++
++/*
++ * The alias-collision guard must not over-reject: a well-formed config may list
++ * OTHER, differently-named providers alongside the designated FIPS provider.
++ * Only entries resolving to the designated name collide; an unrelated provider
++ * (its own distinct name, no aliasing identity) must be allowed.
++ */
++static int test_other_provider_ok(void)
++{
++    return check_select("[azl_fips_provider]\n"
++                        "fips = azl-fips-module\n"
++                        "[provider_sect]\n"
++                        "default = default_sect\n"
++                        "fips = fips_sect\n"
++                        "[default_sect]\n"
++                        "activate = 1\n"
++                        "[fips_sect]\n"
++                        "activate = 1\n",
++                        "provider_sect", 1, "fips", 1);
++}
++
++int setup_tests(void)
++{
++    ADD_TEST(test_enforcing_explicit);
++    ADD_TEST(test_preferred);
++    ADD_TEST(test_mode_default);
++    ADD_TEST(test_invalid_mode);
++    ADD_TEST(test_ambiguous_mode);
++    ADD_TEST(test_missing_section);
++    ADD_TEST(test_zero_designations);
++    ADD_TEST(test_two_designations);
++    ADD_TEST(test_unregistered_name);
++    ADD_TEST(test_redundant_identity);
++    ADD_TEST(test_aliasing_identity);
++    ADD_TEST(test_custom_providers_section);
++    ADD_TEST(test_name_map_no_default_fallback);
++    ADD_TEST(test_mode_no_default_fallback);
++    ADD_TEST(test_dotted_designation);
++    ADD_TEST(test_alias_collision);
++    ADD_TEST(test_other_provider_ok);
++    return 1;
++}
+diff --git a/test/prov_conf_fips_unloadable.cnf b/test/prov_conf_fips_unloadable.cnf
+new file mode 100644
+index 0000000..5a35d44
+--- /dev/null
++++ b/test/prov_conf_fips_unloadable.cnf
+@@ -0,0 +1,24 @@
++openssl_conf = openssl_init
++
++# Deliberately 0: proves the failure propagates even when errors are ignored.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++# activate = 0 so the generic provider loop only registers the drop-in without
++# loading it; the load failure must surface from the forced FIPS activation
++# path (which forces diagnostics on), not the generic loop (whose error is
++# swallowed under config_diagnostics = 0).
++[provider_sect]
++brokenfips = brokenfips_sect
++
++[brokenfips_sect]
++module = /nonexistent/azl-broken-fips.so
++activate = 0
++
++# The designated FIPS provider points at a module that cannot be loaded, so
++# activation must fail closed under kernel FIPS mode.
++[azl_fips_provider]
++brokenfips = azl-fips-module
++azl_fips_prop_query_mode = enforcing
+diff --git a/test/recipes/03-test_prov_conf_fips.t b/test/recipes/03-test_prov_conf_fips.t
+new file mode 100644
+index 0000000..5742561
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips.t
+@@ -0,0 +1,12 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use OpenSSL::Test::Simple;
++
++simple_test("test_prov_conf_fips", "prov_conf_fips_test");
+diff --git a/test/recipes/03-test_prov_conf_fips_activate.t b/test/recipes/03-test_prov_conf_fips_activate.t
+new file mode 100644
+index 0000000..7685402
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_activate.t
+@@ -0,0 +1,28 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use OpenSSL::Test qw/:DEFAULT srctop_file/;
++
++setup("test_prov_conf_fips_activate");
++
++plan tests => 1;
++
++# The kernel FIPS flag is read once per process from this env var, so the whole
++# test process runs as if the kernel were in FIPS mode.
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++
++ok(run(test(["prov_conf_fips_activate_test",
++             srctop_file("test", "prov_conf_fips_good.cnf"),
++             srctop_file("test", "prov_conf_fips_nodesig.cnf"),
++             srctop_file("test", "prov_conf_fips_ambiguous.cnf"),
++             srctop_file("test", "prov_conf_fips_unloadable.cnf"),
++             srctop_file("test", "prov_conf_fips_merge_enforcing.cnf"),
++             srctop_file("test", "prov_conf_fips_merge_preferred.cnf")])),
++   "config-driven FIPS activation and fail-closed under forced kernel FIPS");
+diff --git a/test/recipes/03-test_prov_conf_fips_off.t b/test/recipes/03-test_prov_conf_fips_off.t
+new file mode 100644
+index 0000000..fc3a16f
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_off.t
+@@ -0,0 +1,41 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++
++use OpenSSL::Test qw/:DEFAULT srctop_file/;
++
++setup("test_prov_conf_fips_off");
++
++# Deliberately do NOT set OPENSSL_FORCE_FIPS_MODE: this process must run with the
++# kernel FIPS flag off, so the [azl_fips_provider] mechanism must be inert.
++delete $ENV{OPENSSL_FORCE_FIPS_MODE};
++
++# OPENSSL_FORCE_FIPS_MODE only forces the flag ON; there is no force-OFF hook, so
++# with the env var unset the kernel FIPS flag falls back to
++# /proc/sys/crypto/fips_enabled. On a FIPS-enabled build host we therefore cannot
++# create the "kernel not in FIPS mode" condition this recipe requires, and the
++# inert assertions would spuriously fail. Skip there to keep %check deterministic.
++my $host_fips = 0;
++if (open(my $fh, '<', '/proc/sys/crypto/fips_enabled')) {
++    my $val = <$fh>;
++    close($fh);
++    $host_fips = 1 if defined $val && $val =~ /^\s*1/;
++}
++
++plan skip_all =>
++    "host kernel is in FIPS mode; cannot exercise the inert (non-FIPS) path"
++    if $host_fips;
++
++plan tests => 1;
++
++ok(run(test(["prov_conf_fips_off_test",
++             srctop_file("test", "prov_conf_fips_good.cnf"),
++             srctop_file("test", "prov_conf_fips_nodesig.cnf")])),
++   "FIPS designation mechanism is inert when the kernel is not in FIPS mode");
+diff --git a/test/recipes/03-test_prov_conf_fips_realinit.t b/test/recipes/03-test_prov_conf_fips_realinit.t
+new file mode 100644
+index 0000000..a1387c5
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_realinit.t
+@@ -0,0 +1,55 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use OpenSSL::Test qw/:DEFAULT srctop_file/;
++
++setup("test_prov_conf_fips_realinit");
++
++# This recipe exists specifically to cover the fail-closed *delivery* path that
++# the C-driver suites structurally cannot reach.
++#
++# The C tests load config via OSSL_LIB_CTX_load_config(), i.e.
++# CONF_modules_load_file_ex(..., flags=0). With flags == 0 the
++# CONF_MFLAGS_IGNORE_RETURN_CODES bit is never set, so the return-code-swallow
++# in CONF_modules_load_file_ex ("if (IGNORE_RETURN_CODES && !diagnostics) ret =
++# 1;") is unreachable there. Those tests therefore only prove that the engine
++# *decides* to fail (select/activate returns 0); they cannot prove the failure
++# is *delivered* to the caller.
++#
++# The real process init path (OPENSSL_init_crypto -> DEFAULT_CONF_MFLAGS) DOES
++# set IGNORE_RETURN_CODES. On that path a decided FIPS failure would be silently
++# swallowed -- the host would come up without FIPS (fail open) -- unless the
++# forced-activation code turns config diagnostics on mid-load so the swallow is
++# skipped. This recipe drives that exact path by shelling to apps/openssl and
++# asserts the process fails closed.
++#
++# Regression value: remove the diagnostics-forcing and this goes RED (openssl
++# starts, exits 0) while every C-driver test stays green.
++plan tests => 1;
++
++# The kernel FIPS flag is read once per process from this env var, so the run
++# behaves as if the kernel were in FIPS mode.
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++
++# Reuse the missing-designation drop-in: it activates the built-in null provider
++# (no loadable module required, so this is deterministic and never skips) but
++# provides no [azl_fips_provider] designation, so forced FIPS activation must
++# fail. Crucially the file sets config_diagnostics = 0 -- the shipped default
++# that, together with IGNORE_RETURN_CODES on the real init path, would swallow
++# the error. Only the forced diagnostics override makes this fail closed.
++$ENV{OPENSSL_CONF} = srctop_file("test", "prov_conf_fips_nodesig.cnf");
++
++# `openssl list -providers` triggers full library initialization through the
++# real config-load path. Fail-closed means startup fails and the command exits
++# non-zero. On code without the diagnostics-forcing fix, IGNORE_RETURN_CODES
++# swallows the failure, the command starts non-FIPS and exits 0 -- which this
++# assertion catches.
++ok(!run(app(["openssl", "list", "-providers"])),
++   "missing FIPS designation under kernel FIPS mode fails closed on the real init path");
+diff --git a/test/recipes/03-test_prov_conf_fips_substitution.t b/test/recipes/03-test_prov_conf_fips_substitution.t
+new file mode 100644
+index 0000000..703a42a
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_fips_substitution.t
+@@ -0,0 +1,47 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use File::Copy;
++use File::Spec::Functions qw/catdir catfile/;
++use OpenSSL::Test qw/:DEFAULT srctop_file bldtop_file result_dir/;
++
++setup("test_prov_conf_fips_substitution");
++
++# This regression needs a loadable, same-named decoy module on the default
++# search path. Reuse the built legacy provider as the decoy; skip if it is not
++# built (e.g. no-legacy / no-module / static builds).
++my $decoy_src = bldtop_file("providers", "legacy.so");
++
++plan skip_all => "loadable legacy provider module not built"
++    unless -f $decoy_src;
++
++plan tests => 1;
++
++# Plant the decoy on the default module search path as "myfips.so" -- the bare
++# name the pre-fix code would fall back to when the designated provider's
++# configured (bogus) module path fails to load.
++my $moddir = catdir(result_dir(), "mods");
++mkdir $moddir unless -d $moddir;
++my $decoy = catfile($moddir, "myfips.so");
++copy($decoy_src, $decoy) or die "cannot plant decoy module: $!";
++
++# The kernel FIPS flag is read once per process from this env var, so the run
++# behaves as if the kernel were in FIPS mode.
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++$ENV{OPENSSL_MODULES} = $moddir;
++$ENV{OPENSSL_CONF} = srctop_file("test", "prov_conf_fips_substitution.cnf");
++
++# Fail-closed: the designated FIPS provider's configured module cannot load, and
++# the forced activation must pin that path rather than retrying by bare name. So
++# startup fails and `openssl list -providers` exits non-zero. On the pre-fix
++# code the bare-name retry loads the planted decoy and the command exits 0 --
++# this assertion is what catches that silent substitution.
++ok(!run(app(["openssl", "list", "-providers"])),
++   "designated FIPS provider with unloadable module fails closed; no bare-name substitution");
+-- 
+2.52.0
+

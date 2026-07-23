@@ -23,3 +23,27 @@ tag = "Requires"
 value = "openssl-fips-provider"
 package = "libs"
 description = "Don't require openssl-fips-provider on Azure Linux"
+
+# Rework FIPS provider auto-activation. See comments in patch file for details.
+[[components.openssl.overlays]]
+type = "patch-add"
+source = "0080-azl-fips-provider-drop-in-activation.patch"
+description = "AZL config-driven FIPS provider drop-in activation. patch-add auto-assigns the next number (Patch80); the spec's `%autosetup -S git` applies it last -- i.e. on top of Fedora's pristine patch 0019."
+
+# Drop the legacy /etc/pki/tls/fips_local.cnf symlink. Nothing reads it after the
+# AZL 0080 rework above (which reads the openssl.d drop-in instead), so both its
+# creation in %install and its %files entry are removed.
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+section = "%install"
+regex = '^ln -s /etc/crypto-policies/back-ends/openssl_fips\.config \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove legacy fips_local.cnf symlink creation (unused after AZL 0080 rework)"
+
+[[components.openssl.overlays]]
+type = "spec-search-replace"
+section = "%files"
+package = "libs"
+regex = '^%config %\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove legacy fips_local.cnf from %files (unused after AZL 0080 rework)"
