@@ -1,0 +1,13 @@
+[components.python-pdm-backend]
+
+# editables 0.6 renamed the generated editable `.pth` file from `<name>.pth` to
+# `_editable_impl_<name>.pth`. pdm-backend 2.4.5's editable-wheel tests hard-code the old
+# `demo_package.pth` name, so test_build_editable{,_src,_pep420} fail against editables 0.6.
+# Only the test expectation is stale; the editable-wheel feature itself is unaffected.
+# Backport upstream PR #304 (adds a find_pth_filename helper that accepts either name) as a
+# patch, matching Fedora's own fix (rhbz#2480529).
+# Upstream fix: https://github.com/pdm-project/pdm-backend/pull/304
+[[components.python-pdm-backend.overlays]]
+description = "Backport upstream PR #304 so editable-wheel tests accept the editables 0.6 `.pth` name (`_editable_impl_demo_package.pth`); pdm-backend 2.4.5 hard-codes the old `demo_package.pth` and fails against editables 0.6"
+type = "patch-add"
+source = "304.patch"

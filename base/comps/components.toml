@@ -3975,7 +3975,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.python-pbr]
 [components.python-pbs-installer]
 [components.python-pdfminer]
-[components.python-pdm-backend]
 [components.python-peachpy]
 [components.python-pecan]
 [components.python-pefile]
