@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/elfutils.azl.macros}
+
 # Rebuild --with static to enable static subpackages
 # This is *not* supported by elfutils maintainers
 %bcond_with static
@@ -8,12 +11,13 @@
 Name: elfutils
 Version: 0.194
 %global baserelease 3
-Release: %{baserelease}%{?dist}
+Release: %[%{baserelease} + %{azl_release}]%{?dist}
 URL: http://elfutils.org/
 %global source_url ftp://sourceware.org/pub/elfutils/%{version}/
 License: GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later) AND GFDL-1.3-no-invariants-or-later
 Source: %{?source_url}%{name}-%{version}.tar.bz2
 Source1: elfutils-debuginfod.sysusers
+Source9999: elfutils.azl.macros
 Summary: A collection of utilities and DSOs to handle ELF files and DWARF data
 
 # Needed for isa specific Provides and Requires.
@@ -486,10 +490,10 @@ fi
 %{_mandir}/man1/debuginfod-find.1*
 %{_mandir}/man7/debuginfod*.7*
 %config(noreplace) %{_sysconfdir}/profile.d/*
-%if "%{?dist_debuginfod_url}"
+
 %config(noreplace) %{_sysconfdir}/debuginfod/*
 %config(noreplace) %{_datadir}/fish/vendor_conf.d/*
-%endif
+
 
 %files debuginfod-client-devel
 %{_libdir}/pkgconfig/libdebuginfod.pc
@@ -528,6 +532,10 @@ exit 0
 %systemd_postun_with_restart debuginfod.service
 
 %changelog
+* Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 0.194-4
+- Rebuild without a default debuginfod server
+- Keep non-URL debuginfod client configuration
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.194-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

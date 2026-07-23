@@ -2,8 +2,45 @@
 # Release: %{baserelease}%{?dist}
 release = { calculation = "manual" }
 
+[components.elfutils.build.defines]
+# Azure Linux-only release delta. Keep the imported Fedora baserelease intact.
+azl_release = "1"
+
+[[components.elfutils.overlays]]
+description = "Add the Azure Linux release delta to the imported Fedora baserelease"
+type = "spec-search-replace"
+regex = '^Release:\s+%\{baserelease\}%\{\?dist\}$'
+replacement = 'Release: %[%{baserelease} + %{azl_release}]%{?dist}'
+
+[[components.elfutils.overlays]]
+description = "Record the Azure Linux rebuild without a default debuginfod server"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 0.194-4",
+    "- Rebuild without a default debuginfod server",
+    "- Keep non-URL debuginfod client configuration",
+    "",
+]
+
 [[components.elfutils.overlays]]
 description = "Remove elfutils-default-yama-scope package"
 type = "spec-search-replace"
 regex = "%global provide_yama_scope\\s+1"
 replacement = "%global provide_yama_scope 0"
+
+[[components.elfutils.overlays]]
+description = "Remove the default-URL packaging condition"
+type = "spec-search-replace"
+section = "%files"
+package = "debuginfod-client"
+regex = '^%if "%\{\?dist_debuginfod_url\}"$'
+replacement = ""
+
+[[components.elfutils.overlays]]
+description = "Remove the matching default-URL conditional terminator"
+type = "spec-search-replace"
+section = "%files"
+package = "debuginfod-client"
+regex = '^%endif$'
+replacement = ""
