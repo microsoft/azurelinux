@@ -1,0 +1,5 @@
+[components.php-sebastian-environment9]
+
+# Align environment 9 with the version available in the PME Fedora 43 snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-environment9/c/953fc2e3f9f76bc94fb7b8d8af9f9a8737201f37
+spec = { type = "upstream", upstream-commit = "953fc2e3f9f76bc94fb7b8d8af9f9a8737201f37" }

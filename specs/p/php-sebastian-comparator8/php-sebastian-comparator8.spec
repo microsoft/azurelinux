@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    29b232ddc29c2b114c0358c69b3084e7c3da0d58
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   comparator
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,14 +24,14 @@
 %global ns_project   Comparator
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.0
+Version:        8.1.2
 Release: 3%{?dist}
 Summary:        Compare PHP values for equality, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -47,7 +44,7 @@ BuildRequires:  php-fedora-autoloader-devel
 # from composer.json, "require-dev": {
 #        "phpunit/phpunit": "^13.0"
 BuildRequires:  phpunit13
-BuildRequires:  (php-composer(%{pk_vendor}/diff)     >= 8.0   with php-composer(%{pk_vendor}/diff)     < 9)
+BuildRequires:  (php-composer(%{pk_vendor}/diff)     >= 8.1   with php-composer(%{pk_vendor}/diff)     < 9)
 BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 8.0   with php-composer(%{pk_vendor}/exporter) < 9)
 %endif
 
@@ -60,7 +57,7 @@ BuildRequires:  (php-composer(%{pk_vendor}/exporter) >= 8.0   with php-composer(
 Requires:       php(language) >= 8.4
 Requires:       php-dom
 Requires:       php-mbstring
-Requires:       (php-composer(%{pk_vendor}/diff)     >= 8.0   with php-composer(%{pk_vendor}/diff)     < 9)
+Requires:       (php-composer(%{pk_vendor}/diff)     >= 8.1   with php-composer(%{pk_vendor}/diff)     < 9)
 Requires:       (php-composer(%{pk_vendor}/exporter) >= 8.0   with php-composer(%{pk_vendor}/exporter) < 9)
 # from phpcompatinfo report for version 6.3.0
 #   Only core, date, spl (bcmath is optional)
@@ -79,7 +76,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -127,6 +124,17 @@ exit $ret
 
 
 %changelog
+* Tue Apr 14 2026 Remi Collet <remi@remirepo.net> - 8.1.2-1
+- update to 8.1.2
+
+* Wed Apr  8 2026 Remi Collet <remi@remirepo.net> - 8.1.1-1
+- update to 8.1.1
+
+* Tue Apr  7 2026 Remi Collet <remi@remirepo.net> - 8.1.0-1
+- update to 8.1.0
+- open https://github.com/sebastianbergmann/comparator/pull/139
+  raise dependency on sebastian/diff 8.1
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 8.0.0-2
 - enable test suite
 

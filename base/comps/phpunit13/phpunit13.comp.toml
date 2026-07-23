@@ -1,0 +1,5 @@
+[components.phpunit13]
+
+# Align PHPUnit 13 with the dependency generation available in the PME snapshot.
+# Ref: https://src.fedoraproject.org/rpms/phpunit13/c/c4f0365573cca92cd6fd9cdb66984390c533ac63
+spec = { type = "upstream", upstream-commit = "c4f0365573cca92cd6fd9cdb66984390c533ac63" }

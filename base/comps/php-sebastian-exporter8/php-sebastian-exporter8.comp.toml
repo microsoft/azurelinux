@@ -1,0 +1,5 @@
+[components.php-sebastian-exporter8]
+
+# Align exporter 8 with the version available in the PME Fedora 43 snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-exporter8/c/1c6b3fcdd4f3b2355999cc3b9a4624cad9bd320e
+spec = { type = "upstream", upstream-commit = "1c6b3fcdd4f3b2355999cc3b9a4624cad9bd320e" }

@@ -1,0 +1,5 @@
+[components.php-sebastian-comparator8]
+
+# Align comparator 8 with the version available in the PME Fedora 43 snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-comparator8/c/c348a4c45bffa68b0433d8a0546dd7fa6a0dc6a8
+spec = { type = "upstream", upstream-commit = "c348a4c45bffa68b0433d8a0546dd7fa6a0dc6a8" }

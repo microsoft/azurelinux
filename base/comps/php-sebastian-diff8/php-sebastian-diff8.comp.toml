@@ -1,0 +1,5 @@
+[components.php-sebastian-diff8]
+
+# Align diff 8 with the version available in the PME Fedora 43 snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-diff8/c/f175e4f735352ed9f1495fed6302aa3185e2a695
+spec = { type = "upstream", upstream-commit = "f175e4f735352ed9f1495fed6302aa3185e2a695" }

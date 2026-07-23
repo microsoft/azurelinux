@@ -13,11 +13,8 @@
 %bcond_without       tests
 
 # Github
-%global gh_commit    a8b58fde2f4fbc69a064e1f80ff917607cf7737c
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
-%global gh_owner    sebastianbergmann
+%global gh_owner     sebastianbergmann
 %global gh_project   php-code-coverage
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    phpunit
 %global pk_project   php-code-coverage
@@ -25,11 +22,11 @@
 %global ns_vendor    SebastianBergmann
 %global ns_project   CodeCoverage
 %global php_home     %{_datadir}/php
-%global ver_major    13
+%global ver_major    14
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
-Version:        13.0.1
-Release: 3%{?dist}
+Version:        14.1.9
+Release: 2%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # SPDX: Main license is BSD-3-Clause
@@ -39,7 +36,7 @@ Summary:        PHP code coverage information, version %{ver_major}
 License:        BSD-3-Clause AND MIT AND Apache-2.0
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -47,21 +44,22 @@ BuildRequires:  php(language) >= 8.4.1
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 BuildRequires:  (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-BuildRequires:  (php-composer(phpunit/php-file-iterator)          >= 7.0    with php-composer(phpunit/php-file-iterator)          < 8)
 BuildRequires:  (php-composer(phpunit/php-text-template)          >= 6.0    with php-composer(phpunit/php-text-template)          < 7)
 BuildRequires:  (php-composer(sebastian/complexity)               >= 6.0    with php-composer(sebastian/complexity)               < 7)
-BuildRequires:  (php-composer(sebastian/environment)              >= 9.0    with php-composer(sebastian/environment)              < 10)
+BuildRequires:  (php-composer(sebastian/environment)              >= 9.2    with php-composer(sebastian/environment)              < 10)
+BuildRequires:  (php-composer(sebastian/git-state)                >= 1.0    with php-composer(sebastian/git-state)                < 2)
 BuildRequires:  (php-composer(sebastian/lines-of-code)            >= 5.0    with php-composer(sebastian/lines-of-code)            < 6)
 BuildRequires:  (php-composer(sebastian/version)                  >= 7.0    with php-composer(sebastian/version)                  < 8)
 BuildRequires:  (php-composer(theseer/tokenizer)                  >= 2.0.1  with php-composer(theseer/tokenizer)                  < 3)
 BuildRequires:  php-dom
 BuildRequires:  php-json
 BuildRequires:  php-libxml
+BuildRequires:  php-mbstring
 BuildRequires:  php-tokenizer
 BuildRequires:  php-xmlwriter
 # From composer.json, "require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
+#        "phpunit/phpunit": "^13.1"
+BuildRequires:  phpunit13 >= 13.1
 BuildRequires:  php-xdebug
 %endif
 
@@ -69,24 +67,26 @@ BuildRequires:  php-xdebug
 #        "php": ">=8.3",
 #        "ext-dom": "*",
 #        "ext-libxml": "*",
+#        "ext-mbstring": "*",
 #        "ext-xmlwriter": "*",
 #        "nikic/php-parser": "^5.7.0",
-#        "phpunit/php-file-iterator": "^7.0",
 #        "phpunit/php-text-template": "^6.0",
 #        "sebastian/complexity": "^6.0",
-#        "sebastian/environment": "^9.0",
+#        "sebastian/environment": "^9.2",
+#        "sebastian/git-state": "^1.0",
 #        "sebastian/lines-of-code": "^5.0",
 #        "sebastian/version": "^7.0",
 #        "theseer/tokenizer": "^2.0.1"
 Requires:       php(language) >= 8.3
 Requires:       php-dom
 Requires:       php-libxml
+Requires:       php-mbstring
 Requires:       php-xmlwriter
 Requires:       (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-Requires:       (php-composer(phpunit/php-file-iterator)          >= 7.0    with php-composer(phpunit/php-file-iterator)          < 8)
 Requires:       (php-composer(phpunit/php-text-template)          >= 6.0    with php-composer(phpunit/php-text-template)          < 7)
 Requires:       (php-composer(sebastian/complexity)               >= 6.0    with php-composer(sebastian/complexity)               < 7)
-Requires:       (php-composer(sebastian/environment)              >= 9.0    with php-composer(sebastian/environment)              < 10)
+Requires:       (php-composer(sebastian/environment)              >= 9.2    with php-composer(sebastian/environment)              < 10)
+Requires:       (php-composer(sebastian/git-state)                >= 1.0    with php-composer(sebastian/git-state)                < 2)
 Requires:       (php-composer(sebastian/lines-of-code)            >= 5.0    with php-composer(sebastian/lines-of-code)            < 6)
 Requires:       (php-composer(sebastian/version)                  >= 7.0    with php-composer(sebastian/version)                  < 8)
 Requires:       (php-composer(theseer/tokenizer)                  >= 2.0.1  with php-composer(theseer/tokenizer)                  < 3)
@@ -119,7 +119,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -131,10 +131,10 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 cat << 'EOF' | tee -a src/autoload.php
 \Fedora\Autoloader\Dependencies::required([
     '%{php_home}/PhpParser5/autoload.php',
-    '%{php_home}/%{ns_vendor}/FileIterator7/autoload.php',
     '%{php_home}/%{ns_vendor}/Template6/autoload.php',
     '%{php_home}/%{ns_vendor}/Complexity6/autoload.php',
     '%{php_home}/%{ns_vendor}/Environment9/autoload.php',
+    '%{php_home}/%{ns_vendor}/GitState1/autoload.php',
     '%{php_home}/%{ns_vendor}/LinesOfCode5/autoload.php',
     '%{php_home}/%{ns_vendor}/Version7/autoload.php',
     '%{php_home}/TheSeer/Tokenizer2/autoload.php',
@@ -163,6 +163,10 @@ export XDEBUG_MODE=coverage
 
 cat << 'EOF' | tee -a tests/bootstrap.php
 define('TEST_FILES_PATH', __DIR__ . '/_files/');
+\Fedora\Autoloader\Dependencies::required([
+  TEST_FILES_PATH . '/Target/TraitOne.php',
+  TEST_FILES_PATH . '/CoveredClass.php',
+]);
 EOF
 
 ret=0
@@ -184,12 +188,48 @@ exit $ret
 %files
 %license LICENSE
 %doc README.md
-%doc ChangeLog-%{ver_major}.0.md
+%doc ChangeLog-%{ver_major}.1.md
 %doc composer.json
 %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}
 
 
 %changelog
+* Sat May 16 2026 Remi Collet <remi@remirepo.net> - 14.1.9-1
+- update to 14.1.9
+
+* Sun May 10 2026 Remi Collet <remi@remirepo.net> - 14.1.8-1
+- update to 14.1.8
+
+* Tue May  5 2026 Remi Collet <remi@remirepo.net> - 14.1.7-1
+- update to 14.1.7
+
+* Sat Apr 25 2026 Remi Collet <remi@remirepo.net> - 14.1.6-1
+- update to 14.1.6
+
+* Sun Apr 19 2026 Remi Collet <remi@remirepo.net> - 14.1.3-1
+- update to 14.1.3
+
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 14.1.2-1
+- update to 14.1.2
+
+* Mon Apr 13 2026 Remi Collet <remi@remirepo.net> - 14.1.1-1
+- update to 14.1.1
+- raise dependency on sebastian/environment 9.2
+
+* Wed Apr  8 2026 Remi Collet <remi@remirepo.net> - 14.0.0-2
+- enable test suite
+
+* Fri Apr  3 2026 Remi Collet <remi@remirepo.net> - 14.0.0-1
+- update to 14.0.0
+- raise dependency on sebastian/environment 9.1
+- add dependency on sebastian/git-state 1.0
+- rename to php-phpunit-php-code-coverage14
+- move to /usr/share/php/SebastianBergmann/CodeCoverage14
+
+* Thu Apr  2 2026 Remi Collet <remi@remirepo.net> - 13.0.2-1
+- update to 13.0.2
+- drop dependency on phpunit/php-file-iterator
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 13.0.1-2
 - enable test suite
 

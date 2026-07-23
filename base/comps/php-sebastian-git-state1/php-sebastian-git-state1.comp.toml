@@ -1,0 +1,5 @@
+[components.php-sebastian-git-state1]
+
+# PHPUnit 13.1 and code-coverage 14 require git-state 1 from the PME snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-git-state1/c/96557e66e5874a6a5122872f78de52a36ca81452
+spec = { type = "upstream", upstream-commit = "96557e66e5874a6a5122872f78de52a36ca81452" }

@@ -1,0 +1,5 @@
+[components.php-phpunit-php-code-coverage14]
+
+# PHPUnit 13.1 requires the code-coverage 14 generation from the PME snapshot.
+# Ref: https://src.fedoraproject.org/rpms/php-phpunit-php-code-coverage14/c/dec491c0f6c4c34d7dd7ed0e296525fa3af42ea4
+spec = { type = "upstream", upstream-commit = "dec491c0f6c4c34d7dd7ed0e296525fa3af42ea4" }

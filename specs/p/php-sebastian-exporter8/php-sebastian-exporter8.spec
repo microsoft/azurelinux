@@ -12,11 +12,8 @@
 
 %bcond_without       tests
 
-%global gh_commit    dc31f1f8e0186c8f0bb3e48fd4d51421d8905fea
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   exporter
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -29,14 +26,14 @@
 %global pear_channel pear.phpunit.de
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.0
+Version:        8.0.2
 Release: 3%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -73,7 +70,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -116,6 +113,12 @@ exit $ret
 
 
 %changelog
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 8.0.2-1
+- update to 8.0.2
+
+* Fri Apr 10 2026 Remi Collet <remi@remirepo.net> - 8.0.1-1
+- update to 8.0.1
+
 * Tue Feb 10 2026 Remi Collet <remi@remirepo.net> - 8.0.0-2
 - enable test suite
 
