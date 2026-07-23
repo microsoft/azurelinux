@@ -3,3 +3,15 @@
 # Align PHPUnit 13 with the dependency generation available in the PME snapshot.
 # Ref: https://src.fedoraproject.org/rpms/phpunit13/c/c4f0365573cca92cd6fd9cdb66984390c533ac63
 spec = { type = "upstream", upstream-commit = "c4f0365573cca92cd6fd9cdb66984390c533ac63" }
+
+# Backport of https://github.com/sebastianbergmann/phpunit/commit/4aab6e3e6865e191014cc64cbf612eb1cc121614
+[[components.phpunit13.overlays]]
+description = "Disable diff 8.3 final-newline markers to preserve PHPUnit expected failure output"
+type = "patch-add"
+source = "phpunit13-configure-diff8-output.patch"
+
+[[components.phpunit13.overlays]]
+description = "Apply the added compatibility patch because the upstream spec only applies Patch0 explicitly"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P1 -p1"]

@@ -32,7 +32,7 @@
 
 Name:           %{pk_project}%{ver_major}
 Version:        13.1.8
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        The PHP Unit Testing framework version %{ver_major}
 
 License:        BSD-3-Clause
@@ -148,6 +148,7 @@ Provides:       phpunit                       = %{version}-%{release}
 %endif
 
 
+Patch1: phpunit13-configure-diff8-output.patch
 %description
 PHPUnit is a programmer-oriented testing framework for PHP.
 It is an instance of the xUnit architecture for unit testing frameworks.
@@ -165,6 +166,7 @@ Documentation: https://phpunit.de/documentation.html
 find . -name \*.rpm -delete -print
 
 
+%patch -P1 -p1
 %build
 %{_bindir}/phpab \
   --template fedora2 \
