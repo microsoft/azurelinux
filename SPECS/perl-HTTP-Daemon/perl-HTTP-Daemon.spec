@@ -1,5 +1,5 @@
 Name:           perl-HTTP-Daemon
-Version:        6.16
+Version:        6.17
 Release:        1%{?dist}
 Summary:        Simple HTTP server class
 License:        GPL+ or Artistic
@@ -116,6 +116,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Thu Jul 23 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.17-1
+- Auto-upgrade to 6.17 - for CVE-2026-8450
+
 * Wed Mar 27 2024 Sam Meluch <sammeluch@microsoft.com> - 6.16-1
 - Upgrade to version 6.16 for Azure Linux 3.0
 - Add tests package
