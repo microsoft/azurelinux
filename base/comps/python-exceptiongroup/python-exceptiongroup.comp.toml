@@ -1,0 +1,14 @@
+[components.python-exceptiongroup]
+
+# On CPython >= 3.11 the native BaseExceptionGroup is used, and 3.14.5 snapshots the
+# sub-exceptions at construction, so test_exceptions_mutate_original_sequence (which
+# expected the group's repr to reflect a post-construction mutation of the original list)
+# now fails. Backport upstream commit 0c6cfbf (PR #155): it fixes the backport's __repr__
+# to reflect the stored exceptions and makes the test only assert repr on < 3.11, since on
+# native BaseExceptionGroup the repr is CPython's responsibility. The test still runs (and
+# validates `excgrp.exceptions is exc_tuple`) rather than being skipped.
+# Upstream fix: https://github.com/agronholm/exceptiongroup/commit/0c6cfbf677f6b50df17311cfdad01e9ff17310aa
+[[components.python-exceptiongroup.overlays]]
+description = "Backport upstream PR #155 (commit 0c6cfbf) to fix the exception-group repr under mutation and make test_exceptions_mutate_original_sequence version-aware; on native BaseExceptionGroup (CPython 3.14.5) it no longer asserts the unsupportable mutated repr"
+type = "patch-add"
+source = "fix-repr-mutated-exception-sequence.patch"

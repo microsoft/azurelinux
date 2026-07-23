@@ -1,0 +1,50 @@
+From 0c6cfbf677f6b50df17311cfdad01e9ff17310aa Mon Sep 17 00:00:00 2001
+From: Fridayai700 <aifriday700@gmail.com>
+Date: Wed, 18 Feb 2026 21:55:23 +0000
+Subject: [PATCH] Fix ExceptionGroup repr changing when original exception
+ sequence is mutated (#155)
+
+Co-authored-by: Claude Opus 4.6 <noreply@anthropic.com>
+Co-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>
+---
+ src/exceptiongroup/_exceptions.py |  4 +++-
+ tests/test_exceptions.py          | 14 ++++++++++----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/src/exceptiongroup/_exceptions.py b/src/exceptiongroup/_exceptions.py
+index f42c1ad..b101e44 100644
+--- a/src/exceptiongroup/_exceptions.py
++++ b/src/exceptiongroup/_exceptions.py
+@@ -275,7 +275,9 @@ def __str__(self) -> str:
+         return f"{self.message} ({len(self._exceptions)} sub-exception{suffix})"
+ 
+     def __repr__(self) -> str:
+-        return f"{self.__class__.__name__}({self.args[0]!r}, {self.args[1]!r})"
++        return (
++            f"{self.__class__.__name__}({self.args[0]!r}, {list(self._exceptions)!r})"
++        )
+ 
+ 
+ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
+diff --git a/tests/test_exceptions.py b/tests/test_exceptions.py
+index e2bc81a..932f394 100644
+--- a/tests/test_exceptions.py
++++ b/tests/test_exceptions.py
+@@ -882,7 +882,13 @@ def test_exceptions_mutate_original_sequence():
+ 
+     exceptions.append(KeyError("bar"))
+     assert excgrp.exceptions is exc_tuple
+-    assert repr(excgrp) == (
+-        "BaseExceptionGroup('foo', [ValueError(1), KeyboardInterrupt(), "
+-        "KeyError('bar')])"
+-    )
++    if sys.version_info < (3, 11):
++        # On < 3.11, the backport is active and stores exceptions as a tuple,
++        # so repr reflects the original (unmutated) exceptions.
++        # On >= 3.11, native BaseExceptionGroup is used. Whether the repr
++        # shows original or mutated exceptions depends on the CPython version
++        # (cpython#141736 fixes it for 3.13.12+, but not yet in 3.14).
++        # We only assert the backport behavior since we control it.
++        assert repr(excgrp) == (
++            "BaseExceptionGroup('foo', [ValueError(1), KeyboardInterrupt()])"
++        )
