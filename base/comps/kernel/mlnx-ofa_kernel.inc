@@ -10,8 +10,10 @@
 # Activated by setting _kmod_phase (+ _kmod_name) globals and %include-ing this
 # file from kernel.comp.toml overlays (see the AZL-KMOD-*-ANCHOR wiring).
 #
-# Subpackages produced (upstream-faithful naming; DKMS intentionally omitted):
-#   mlnx-ofa_kernel                  userspace utils  (OFED-versioned; installonly + alternatives)
+# Subpackages produced (DKMS intentionally omitted):
+#   mlnx-ofa_kernel                  userspace CLI tools (version-namespaced under
+#                                    /usr/libexec/mlnx-ofa/<ver>/; install-only, multi-version)
+#   mlnx-ofa_kernel-common           system integration + /usr/bin selector wrappers (singleton)
 #   mlnx-ofa_kernel-modules          kernel modules   (per-kernel; installonly + sentinel)
 #   mlnx-ofa_kernel-modules-matched  opt-in sentinel  (auto kernel-upgrade tracking)
 #   mlnx-ofa_kernel-devel            headers+symvers  (per-kernel; installonly)
@@ -22,6 +24,16 @@
 #   mlnx_ofa_release  — vendor release stamp (e.g. OFED.26.04.0.8.5.1)
 #   SOURCE6100        — MLNX_OFED_SRC-<ver>-<bundle>.tgz bundle
 #
+
+# Version-namespaced install area for the multi-version userspace binaries.
+# The versioned mlnx-ofa_kernel package installs its CLI tools under
+# %{_mofa_libexec}/bin/; mlnx-ofa_kernel-common ships /usr/bin selector wrappers
+# that exec the copy matching the running kernel (resolved via the per-kernel
+# by-kernel/<uname-r> symlink dropped by mlnx-ofa_kernel-modules). Defined
+# outside the phase guards so it is available in every include (package/install/files).
+%global _mofa_ns      %{mlnx_ofa_version}-%{mlnx_ofa_release}
+%global _mofa_base    %{_libexecdir}/mlnx-ofa
+%global _mofa_libexec %{_mofa_base}/%{_mofa_ns}
 
 # =========================================================================
 # Phase: package — subpackage declarations
@@ -41,10 +53,14 @@
 %global _azl_krel %{release}
 
 # -------------------------------------------------------------------------
-# mlnx-ofa_kernel — userspace utilities (OFED-versioned singleton).
+# mlnx-ofa_kernel — userspace CLI tools, version-namespaced + install-only.
+# All files live under %{_mofa_libexec}/ (no fixed system paths), so multiple
+# OFED userspace versions coexist, one per kernel build. The system-integration
+# files (systemd/udev/modprobe/configs) and the /usr/bin selector wrappers live
+# in the singleton mlnx-ofa_kernel-common package instead.
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel
-Summary:        NVIDIA / Mellanox OFED userspace utilities (mlnx-ofa_kernel %{mlnx_ofa_version})
+Summary:        NVIDIA / Mellanox OFED userspace tools (mlnx-ofa_kernel %{mlnx_ofa_version}), version-namespaced
 Version:        %{mlnx_ofa_version}
 Release:        %{mlnx_ofa_release}%{?dist}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above,
@@ -52,7 +68,11 @@ Release:        %{mlnx_ofa_release}%{?dist}
 %global version %{_azl_kver}
 %global release %{_azl_krel}
 AutoReq:        no
-Provides:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}
+# Install-only so old versions are not erased on upgrade; the namespaced paths
+# are what actually let versions coexist. The exact version-release is exported
+# so the matching -modules can pin it precisely.
+Provides:       installonlypkg(kernel-module)
+Provides:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Provides:       mlnx-ofa-userspace-release = %{mlnx_ofa_release}
 Requires:       coreutils
 Requires:       pciutils
@@ -60,16 +80,38 @@ Requires:       grep
 Requires:       procps-ng
 Requires:       lsof
 Requires:       kmod
+
+%description -n mlnx-ofa_kernel
+Version-namespaced NVIDIA / Mellanox OFED userspace CLI tools (ibdev2netdev,
+setup_mr_cache.sh, mlnx_interface_mgr.sh, mlnx_conf_mgr.sh) for mlnx-ofa_kernel
+%{mlnx_ofa_version} (%{mlnx_ofa_release}), installed under %{_mofa_libexec}/.
+Multiple versions coexist; mlnx-ofa_kernel-common provides the /usr/bin selector
+wrappers that pick the copy matching the running kernel. The kernel modules ship
+in the matching mlnx-ofa_kernel-modules package.
+
+# -------------------------------------------------------------------------
+# mlnx-ofa_kernel-common — singleton system integration + selector wrappers.
+# Owns the files the OS only reads from fixed paths (systemd units, udev rules
+# + helpers, modprobe configs, /etc/infiniband configs) plus the /usr/bin
+# selector wrappers and the dispatcher. Inherits the kernel NVR (no own
+# Version/Release) and is NOT install-only, so exactly one copy is installed and
+# upgraded in place.
+# -------------------------------------------------------------------------
+%package -n mlnx-ofa_kernel-common
+Summary:        NVIDIA / Mellanox OFED userspace system integration and version selector
+AutoReq:        no
+Requires:       coreutils
+Requires:       kmod
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
 
-%description -n mlnx-ofa_kernel
-InfiniBand "verbs", Access Layer and ULPs userspace utilities for the NVIDIA /
-Mellanox OFED stack (mlnx-ofa_kernel %{mlnx_ofa_version}, %{mlnx_ofa_release}):
-openibd service, interface-manager scripts, ibdev2netdev, modprobe configs and
-udev rules. The kernel modules ship in the matching mlnx-ofa_kernel-modules
-package.
+%description -n mlnx-ofa_kernel-common
+Version-independent userspace pieces of the NVIDIA / Mellanox OFED stack: the
+openibd service, interface-manager systemd units, udev rules and helpers,
+modprobe configuration, and the /usr/bin selector wrappers that dispatch to the
+version-namespaced mlnx-ofa_kernel tools matching the running kernel. Exactly
+one version is installed at a time.
 
 # -------------------------------------------------------------------------
 # mlnx-ofa_kernel-modules — the kernel modules (per-kernel).
@@ -90,10 +132,10 @@ Provides:       kmod-mlnx-ofa_kernel = %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Obsoletes:      kmod-mlnx-ofa_kernel < %{mlnx_ofa_version}-%{mlnx_ofa_release}
 Provides:       installonlypkg(kernel-module)
 Requires:       %{name}-core-uname-r = %{KVERREL}
-# Singleton userspace, upgraded in place: require "at least" this OFED version
-# rather than an exact match, so an older kernel's modules accept the newer
-# shared userspace when multiple kernels are installed side-by-side.
+# Pin the exact matching version-namespaced userspace, and pull the singleton
+# system-integration + selector-wrapper package.
 Requires:       mlnx-ofa-userspace-version = %{mlnx_ofa_version}-%{mlnx_ofa_release}
+Requires:       mlnx-ofa_kernel-common
 Requires(post): kmod
 Requires(postun): kmod
 
@@ -301,6 +343,58 @@ if [ "%{_sbindir}" != "/usr/sbin" ] && [ -d "%{buildroot}/usr/sbin" ]; then
     rmdir "%{buildroot}/usr/sbin" 2>/dev/null || :
 fi
 
+# --- AZL: version-namespace the userspace CLI tools ----------------------
+# Relocate the standalone tools into %{_mofa_libexec}/bin so multiple OFED
+# userspace versions coexist, then install /usr/bin selector wrappers (owned by
+# mlnx-ofa_kernel-common) that exec the copy matching the running kernel.
+install -d %{buildroot}%{_mofa_libexec}/bin
+for _t in ibdev2netdev setup_mr_cache.sh mlnx_interface_mgr.sh mlnx_conf_mgr.sh; do
+    if [ -e "%{buildroot}%{_bindir}/${_t}" ]; then
+        mv "%{buildroot}%{_bindir}/${_t}" "%{buildroot}%{_mofa_libexec}/bin/${_t}"
+    fi
+done
+# NOTE: %{_datadir}/mlnx_ofed (mod_load_funcs et al.) is sourced by the openibd
+# init script from the FIXED path /usr/share/mlnx_ofed, so it is NOT namespaced;
+# it stays there and is owned by the singleton mlnx-ofa_kernel-common package.
+
+# Per-kernel mapping: running-kernel -> this build's userspace version dir.
+# Owned by mlnx-ofa_kernel-modules (unique per %{KVERREL}); the selector reads
+# it to find the right tools for `uname -r`.
+install -d %{buildroot}%{_mofa_base}/by-kernel
+ln -sfn "../%{_mofa_ns}" "%{buildroot}%{_mofa_base}/by-kernel/%{KVERREL}"
+
+# Selector dispatcher (owned by mlnx-ofa_kernel-common; version-independent).
+cat > %{buildroot}%{_mofa_base}/mlnx-ofa-select << 'EOFSEL'
+#!/bin/bash
+# Dispatch to the mlnx-ofa_kernel userspace tool matching the running kernel.
+# Resolution: /usr/libexec/mlnx-ofa/by-kernel/<uname -r> -> <version> dir;
+# fall back to the newest installed version if the running kernel has no map.
+set -e
+tool=${MLNX_OFA_TOOL:-$(basename "$0")}
+base=%{_mofa_base}
+map="$base/by-kernel/$(uname -r)"
+if [ -e "$map" ]; then
+    verdir=$(readlink -f "$map")
+else
+    newest=$(find "$base" -mindepth 1 -maxdepth 1 -type d ! -name by-kernel \
+        -printf '%%f\n' 2>/dev/null | sort -V | tail -n1)
+    [ -n "$newest" ] && verdir="$base/$newest"
+fi
+if [ -z "${verdir:-}" ] || [ ! -x "$verdir/bin/$tool" ]; then
+    echo "mlnx-ofa: no userspace found for kernel $(uname -r) (tool: $tool)" >&2
+    exit 1
+fi
+exec "$verdir/bin/$tool" "$@"
+EOFSEL
+chmod 0755 %{buildroot}%{_mofa_base}/mlnx-ofa-select
+
+# /usr/bin selector wrappers (owned by -common) — symlinks to the dispatcher,
+# which keys off the invoked basename.
+install -d %{buildroot}%{_bindir}
+for _t in ibdev2netdev setup_mr_cache.sh mlnx_interface_mgr.sh mlnx_conf_mgr.sh; do
+    ln -sfn %{_mofa_base}/mlnx-ofa-select "%{buildroot}%{_bindir}/${_t}"
+done
+
 # Stage the devel tree (headers + compat + ofed_scripts + Module.symvers) for
 # this exact kernel build.
 _devel_stage="%{_builddir}/src/mlnx-ofa_kernel/default"
@@ -403,10 +497,23 @@ install -m 0755 "${_srcroot}/source/ofed_scripts/mlnx_interface_mgr.sh" %{buildr
 # ---- license ----
 install -D -m 0644 "${_srcroot}/source/COPYING" \
     %{buildroot}%{_datadir}/licenses/mlnx-ofa_kernel/COPYING
+# Namespaced license copy for the version-namespaced userspace package (unique
+# path per version so install-only copies never collide).
+install -D -m 0644 "${_srcroot}/source/COPYING" \
+    %{buildroot}%{_mofa_libexec}/COPYING
 
-# AZL is systemd-only; drop the legacy SysV openibd init script.
-rm -f "%{buildroot}/etc/init.d/openibd"
-rmdir "%{buildroot}/etc/init.d" 2>/dev/null || :
+# openibd.service is a thin systemd wrapper whose ExecStart is /etc/init.d/openibd
+# (upstream's actual implementation: loads modules, brings interfaces up/down).
+# It is invoked directly by systemd, NOT via SysV runlevel machinery, so keep
+# it — deleting it breaks the service ("Failed at step EXEC spawning
+# /etc/init.d/openibd"). Normalise it to the canonical init.d dir (%{_initrddir},
+# reachable as /etc/init.d through the distro symlink) and mark it executable.
+_ob=$(find %{buildroot} -path '*/init.d/openibd' -print -quit 2>/dev/null)
+if [ -n "$_ob" ]; then
+    install -d %{buildroot}%{_initrddir}
+    [ "$_ob" != "%{buildroot}%{_initrddir}/openibd" ] && mv "$_ob" %{buildroot}%{_initrddir}/openibd
+    chmod 0755 %{buildroot}%{_initrddir}/openibd
+fi
 %endif
 
 %endif
@@ -460,8 +567,8 @@ update-alternatives --remove \
 	ofa_kernel_headers \
 	%{_prefix}/src/ofa_kernel/%{_arch}/%{KVERREL} || :
 
-# ---- mlnx-ofa_kernel (userspace) scriptlets ----
-%post -n mlnx-ofa_kernel
+# ---- mlnx-ofa_kernel-common scriptlets ----
+%post -n mlnx-ofa_kernel-common
 export SYSTEMCTL_SKIP_SYSV=1
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 if [ $1 -eq 1 ]; then
@@ -479,24 +586,33 @@ if [ $1 -eq 1 ]; then
     fi
 fi
 
-%preun -n mlnx-ofa_kernel
+%preun -n mlnx-ofa_kernel-common
 export SYSTEMCTL_SKIP_SYSV=1
 if [ $1 -eq 0 ]; then
     /usr/bin/systemctl disable openibd >/dev/null 2>&1 || true
 fi
 
-%postun -n mlnx-ofa_kernel
+%postun -n mlnx-ofa_kernel-common
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 || :
 
 # ---- file lists ----
 %files -n mlnx-ofa_kernel
+%dir %{_mofa_libexec}
+%license %{_mofa_libexec}/COPYING
+%{_mofa_libexec}/bin
+
+%files -n mlnx-ofa_kernel-common
 %license %{_datadir}/licenses/mlnx-ofa_kernel/COPYING
-%dir /etc/infiniband
-%{_sbindir}/ibdev2netdev
-%{_sbindir}/setup_mr_cache.sh
+%dir %{_mofa_base}
+%dir %{_mofa_base}/by-kernel
+%{_mofa_base}/mlnx-ofa-select
+%{_bindir}/ibdev2netdev
+%{_bindir}/setup_mr_cache.sh
 %{_bindir}/mlnx_interface_mgr.sh
 %{_bindir}/mlnx_conf_mgr.sh
+%dir /etc/infiniband
 %{_unitdir}/openibd.service
+%{_initrddir}/openibd
 /etc/systemd/system/mlnx_interface_mgr@.service
 /lib/udev/sf-rep-netdev-rename
 /lib/udev/auxdev-sf-netdev-rename
@@ -513,6 +629,7 @@ fi
 %files -n mlnx-ofa_kernel-modules
 %license %{_datadir}/licenses/mlnx-ofa_kernel/COPYING
 /lib/modules/%{KVERREL}/extra/mlnx-ofa_kernel/
+%{_mofa_base}/by-kernel/%{KVERREL}
 
 %files -n mlnx-ofa_kernel-modules-matched
 # empty sentinel package — no files

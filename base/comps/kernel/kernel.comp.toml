@@ -14,14 +14,14 @@ without = [
 
 [components.kernel.build.defines]
 # RPM release number for the Azure Linux kernel package
-azl_pkgrelease = "6"
+azl_pkgrelease = "64"
 # 4th version component from the AZL kernel source (6.18.31.1). Included in specrelease so it appears
 # in the RPM Release tag, uname -r, and /lib/modules/ path (e.g. 6.18.31-1.1.azl4.aarch64).
 kextraversion = "1"
 # NVIDIA open GPU kernel module version (built as a subpackage of the kernel)
 nvidia_open_version = "595.58.03"
 mlnx_ofa_version = "26.04"
-mlnx_ofa_release = "OFED.26.04.0.8.5.1"
+mlnx_ofa_release = "OFED.26.04.0.8.5.5"
 mlnx_ofa_bundle_release = "0.8.5.0"
 
 # Download the source tarball from the AzureLinux kernel repo
