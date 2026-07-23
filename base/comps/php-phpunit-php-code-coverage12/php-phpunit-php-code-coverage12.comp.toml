@@ -1,0 +1,13 @@
+[components.php-phpunit-php-code-coverage12]
+
+# Backport of https://github.com/sebastianbergmann/php-code-coverage/commit/4aa7982d6b8ec54c786ab7b80f1ba5fc629a72a3
+[[components.php-phpunit-php-code-coverage12.overlays]]
+description = "Use complete PHP versions in test requirements accepted by current PHPUnit runners"
+type = "patch-add"
+source = "code-coverage12-complete-php-version-requirements.patch"
+
+[[components.php-phpunit-php-code-coverage12.overlays]]
+description = "Apply the added compatibility patch because the upstream spec does not use autosetup"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P0 -p1"]

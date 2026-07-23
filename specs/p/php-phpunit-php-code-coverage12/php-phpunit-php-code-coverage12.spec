@@ -29,7 +29,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
 Version:        12.5.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # SPDX: Main license is BSD-3-Clause
@@ -109,6 +109,7 @@ Provides:       bundled(js-jquery)    = 3.7.1
 Provides:       bundled(js-billboard) = 3.15.1
 
 
+Patch0: code-coverage12-complete-php-version-requirements.patch
 %description
 Library that provides collection, processing, and rendering functionality
 for PHP code coverage information.
@@ -122,6 +123,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 %setup -q -n %{gh_project}-%{gh_commit}
 
 
+%patch -P0 -p1
 %build
 %{_bindir}/phpab \
   --template fedora \

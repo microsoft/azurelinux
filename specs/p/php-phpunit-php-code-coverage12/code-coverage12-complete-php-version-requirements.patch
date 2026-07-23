@@ -1,0 +1,23 @@
+From 4aa7982d6b8ec54c786ab7b80f1ba5fc629a72a3 Mon Sep 17 00:00:00 2001
+From: Sebastian Bergmann <sb@sebastian-bergmann.de>
+Date: Thu, 16 Apr 2026 09:20:32 +0200
+Subject: [PATCH] Use complete PHP version requirements
+
+---
+ tests/tests/StaticAnalysis/Visitor/ExecutableLinesFindingVisitorTest.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/tests/StaticAnalysis/Visitor/ExecutableLinesFindingVisitorTest.php b/tests/tests/StaticAnalysis/Visitor/ExecutableLinesFindingVisitorTest.php
+index fb473503..28afdd6c 100644
+--- a/tests/tests/StaticAnalysis/Visitor/ExecutableLinesFindingVisitorTest.php
++++ b/tests/tests/StaticAnalysis/Visitor/ExecutableLinesFindingVisitorTest.php
+@@ -31,2 +31,2 @@ final class ExecutableLinesFindingVisitorTest extends TestCase
+-    #[RequiresPhp('>=8.1')]
++    #[RequiresPhp('>=8.1.0')]
+     public function testExecutableLinesAreGroupedByBranchPhp81(): void
+@@ -37,2 +37,2 @@ final class ExecutableLinesFindingVisitorTest extends TestCase
+-    #[RequiresPhp('>=8.2')]
++    #[RequiresPhp('>=8.2.0')]
+     public function testExecutableLinesAreGroupedByBranchPhp82(): void
+--
+2.51.0
