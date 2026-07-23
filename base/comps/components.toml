@@ -1108,7 +1108,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.greenboot-rs]
 [components.grep]
 [components.groff]
-[components.grpc]
 [components.gsettings-desktop-schemas]
 [components.gsl]
 [components.gsm]

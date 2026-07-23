@@ -1,0 +1,14 @@
+[components.grpc]
+
+# System google-benchmark is built with libpfm, so its CMake config
+# (/usr/lib64/cmake/benchmark/benchmarkConfig.cmake) does find_dependency(PFM),
+# which needs libpfm's devel files. The buildroot only pulls libpfm (runtime) via
+# google-benchmark, not libpfm-devel, so grpc's %build cmake configure aborts with
+# "Could NOT find PFM (missing: PFM_LIBRARY PFM_INCLUDE_DIR)". Add libpfm-devel,
+# mirroring Fedora's own grpc fix.
+# Fedora fix: https://src.fedoraproject.org/rpms/grpc/c/e57bdb01893e49b38eb638f8e316b241dcd7382c
+[[components.grpc.overlays]]
+description = "Add libpfm-devel so libpfm-enabled google-benchmark's CMake config find_dependency(PFM) resolves; without it grpc's %build cmake configure fails to find PFM"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "libpfm-devel"
