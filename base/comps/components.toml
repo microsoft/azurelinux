@@ -4458,7 +4458,6 @@ includes = ["**/*.comp.toml", "component-check-disablement.toml", "component-min
 [components.qt6-qtdatavis3d]
 [components.qt6-qtdeclarative]
 [components.qt6-qtgraphs]
-[components.qt6-qthttpserver]
 [components.qt6-qtimageformats]
 [components.qt6-qtlanguageserver]
 [components.qt6-qtlocation]

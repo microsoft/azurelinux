@@ -1,0 +1,24 @@
+[components.qt6-qthttpserver]
+
+# Relax the exact BuildRequires pin on qt6-qtbase-private-devel from `= %{version}`
+# to `>= %{version}`.
+#
+# In the stage-1 bootstrap the buildroot is populated only from upstream Fedora, which
+# has moved qt6 on from 6.10.2 to 6.10.3. qt6-qthttpserver (frozen at 6.10.2 here) then
+# fails its buildroot install with "No match for argument: qt6-qtbase-private-devel =
+# 6.10.2" because Fedora only ships the 6.10.3 subpackage. It is the ONLY qt6 module that
+# pins private-devel exactly -- qt6-qtconnectivity already uses `>= %{version}` and the
+# other 27 modules leave it unversioned -- so relaxing it aligns with the rest of the
+# stack rather than diverging.
+#
+# Note: Qt's public-API patch-release compatibility does NOT extend to the private headers
+# this package ships, so a cross-version build is not formally guaranteed by upstream. It is
+# acceptable here because Azure Linux keeps qt6-qtbase and the qt6 modules on closely aligned
+# versions (they are bumped together), so private-devel will only ever be a patch ahead during
+# a transition like this -- never a minor/major jump -- and the specific pairing is validated by
+# the build itself. This constraint should stay within the same 6.x minor series.
+[[components.qt6-qthttpserver.overlays]]
+description = "Relax qt6-qtbase-private-devel from '= %{version}' to '>= %{version}' so qthttpserver builds against a closely-aligned newer Qt patch release in the buildroot (Fedora bumped qt6 to 6.10.3); aligns with qt6-qtconnectivity (>=) and the 27 unversioned qt6 modules"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+qt6-qtbase-private-devel = %\{version\}$'
+replacement = "BuildRequires:  qt6-qtbase-private-devel >= %{version}"
