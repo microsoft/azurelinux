@@ -6,7 +6,7 @@
 Name:           rubygem-%{gem_name}
 Summary:        Useful extensions to Ruby's String class
 Version:        2.8.6
-Release: 7%{?dist}
+Release: 8%{?dist}
 # SPDX confirmed
 License:        MIT
 
