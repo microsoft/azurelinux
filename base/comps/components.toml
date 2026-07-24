@@ -3235,7 +3235,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.php-sebastian-type3]
 [components.php-sebastian-type4]
 [components.php-sebastian-type5]
-[components.php-sebastian-type6]
 [components.php-sebastian-type7]
 [components.php-sebastian-version3]
 [components.php-sebastian-version4]
