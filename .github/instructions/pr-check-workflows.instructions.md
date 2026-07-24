@@ -31,16 +31,18 @@ If the check builds, renders, or runs PR code, do the whole thing inside the bui
 
 The shared runner image is [`.github/workflows/containers/azldev-runner.Dockerfile`](../workflows/containers/azldev-runner.Dockerfile). It's a minimal Azure Linux base with `mock`, `git`, `python3`, `sudo`, and `azldev` itself (installed to `/usr/local/bin` during image build) — enough to run any `azldev` subcommand. Reuse it rather than building a per-check image; add extras via a derived `FROM localhost/azldev-runner` stage if a check genuinely needs more.
 
-`azldev` is baked in via `go install` during image build. The version is pinned in `.azldev-version` at the repo root and passed to the Dockerfile as `--build-arg AZLDEV_VERSION=…`. All CI workflows (GH Actions, ADO, Dockerfile) read from the same file. Image build context is `.github/workflows/containers/` only — keep it that way so the build can never see PR-controlled files.
+`azldev` is baked in via `go install` during image build. The version is declared in `tools/azldev/go.mod`; callers resolve it to a validated full Git hash before passing it to the Dockerfile as `--build-arg AZLDEV_HASH=…`. Image build context is `.github/workflows/containers/` only — keep it that way so the build can never see PR-controlled files.
 
 Build it with the caller's UID so bind-mounted writes don't end up root-owned:
 
 ```yaml
 - name: Build azldev runner
   run: |
+    set -euo pipefail
+    AZLDEV_HASH="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py hash tools/azldev/go.mod)"
     docker build \
       --build-arg UID=$(id -u) \
-      --build-arg AZLDEV_VERSION="$(cat .azldev-version)" \
+      --build-arg AZLDEV_HASH="$AZLDEV_HASH" \
       -t localhost/azldev-runner \
       -f .github/workflows/containers/azldev-runner.Dockerfile \
       .github/workflows/containers/

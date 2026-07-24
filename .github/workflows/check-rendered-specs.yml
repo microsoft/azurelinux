@@ -16,7 +16,7 @@
 # render is skipped and only the locks comment is posted.
 #
 # Security: the PR checkout is data-only. Trusted base code resolves the
-# post-merge azldev pin and passes only a validated version token to the trusted
+# post-merge azldev pin and passes only a validated full hash to the trusted
 # runner Dockerfile, which hardcodes the Microsoft-owned module path. PR-derived
 # azldev runs only inside sandboxed jobs with a read-only token and no secrets.
 # A selected ref can still contain code introduced through the module's fork
@@ -69,7 +69,7 @@ jobs:
     outputs:
       patch-url: ${{ steps.upload-locks-patch.outputs.artifact-url }}
       # Resolve once so lock and render checks use the same binary.
-      azldev-version: ${{ steps.resolve.outputs.azldev-version }}
+      azldev-hash: ${{ steps.resolve.outputs.azldev-hash }}
       render-all: ${{ steps.resolve.outputs.render-all }}
     steps:
       # --- Trusted base branch (tools, scripts, container config) ---
@@ -79,6 +79,12 @@ jobs:
           repository: ${{ inputs.repo }}
           ref: "4.0"
           persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: tools/azldev/go.mod
+          cache: false
 
       # --- PR head (untrusted data — TOML configs, overlays, locks) ---
       - name: Checkout PR head (data)
@@ -97,9 +103,9 @@ jobs:
           # sandboxed container — so the fork head is never executed with trust.
           allow-unsafe-pr-checkout: true
 
-      # The trusted helper reads PR data but emits only a validated version and
+      # The trusted helper reads PR data but emits only a validated hash and
       # boolean. Equal pins need one freshness check but no mergeability polling.
-      - name: Resolve post-merge azldev version
+      - name: Resolve post-merge azldev hash
         id: resolve
         env:
           REPO: ${{ inputs.repo }}
@@ -109,18 +115,19 @@ jobs:
         run: |
           set -euo pipefail
           resolve_output="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py \
+            post-merge \
             --repo "$REPO" \
             --pr-number "$PR_NUMBER" \
             --head-sha "$PR_HEAD_SHA" \
             --base-sha "$(git rev-parse HEAD)" \
-            --base-version-file .azldev-version \
-            --head-version-file pr-head/.azldev-version)"
+            --base-modfile tools/azldev/go.mod \
+            --head-modfile pr-head/tools/azldev/go.mod)"
           echo "$resolve_output"
 
-          azldev_version="$(sed -n 's/^azldev-version=//p' <<< "$resolve_output")"
+          azldev_hash="$(sed -n 's/^azldev-hash=//p' <<< "$resolve_output")"
           render_all="$(sed -n 's/^render-all=//p' <<< "$resolve_output")"
-          if ! [[ "$azldev_version" =~ ^[0-9A-Za-z._+-]+$ ]]; then
-            echo "::error::resolver emitted an invalid azldev version"
+          if ! [[ "$azldev_hash" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::resolver emitted an invalid azldev hash"
             exit 1
           fi
           if [[ "$render_all" != "true" && "$render_all" != "false" ]]; then
@@ -128,18 +135,18 @@ jobs:
             exit 1
           fi
           {
-            printf 'azldev-version=%s\n' "$azldev_version"
+            printf 'azldev-hash=%s\n' "$azldev_hash"
             printf 'render-all=%s\n' "$render_all"
           } >> "$GITHUB_OUTPUT"
 
       - name: Build azldev runner container
         env:
-          AZLDEV_VERSION: ${{ steps.resolve.outputs.azldev-version }}
+          AZLDEV_HASH: ${{ steps.resolve.outputs.azldev-hash }}
         run: |
           set -euo pipefail
           docker build \
             --build-arg UID="$(id -u)" \
-            --build-arg AZLDEV_VERSION="$AZLDEV_VERSION" \
+            --build-arg AZLDEV_HASH="$AZLDEV_HASH" \
             -t localhost/azldev-runner \
             -f .github/workflows/containers/azldev-runner.Dockerfile \
             .github/workflows/containers/
@@ -360,14 +367,14 @@ jobs:
           allow-unsafe-pr-checkout: true
 
       - name: Build azldev runner container
-        # Reuse the version that update_locks already resolved.
+        # Reuse the hash that update_locks already resolved.
         env:
-          AZLDEV_VERSION: ${{ needs.update_locks.outputs.azldev-version }}
+          AZLDEV_HASH: ${{ needs.update_locks.outputs.azldev-hash }}
         run: |
           set -euo pipefail
           docker build \
             --build-arg UID="$(id -u)" \
-            --build-arg AZLDEV_VERSION="$AZLDEV_VERSION" \
+            --build-arg AZLDEV_HASH="$AZLDEV_HASH" \
             -t localhost/azldev-runner \
             -f .github/workflows/containers/azldev-runner.Dockerfile \
             .github/workflows/containers/

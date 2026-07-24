@@ -41,3 +41,18 @@ updates:
       actions:
         patterns:
           - "*"
+
+  # Dependabot does not yet update dependencies declared only with Go tool
+  # directives: https://github.com/dependabot/dependabot-core/issues/12050.
+  # Keep the direct Azure Linux tool current without opening standalone PRs for
+  # its transitive dependencies. Add another dependency-name here for each
+  # additional repository-managed Go tool.
+  - package-ecosystem: gomod
+    directory: /tools/azldev
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    allow:
+      - dependency-name: github.com/microsoft/azure-linux-dev-tools

@@ -1,19 +1,21 @@
-# Smoke-test the azldev version pinned in .azldev-version.
+# Smoke-test the azldev module version pinned in tools/azldev/go.mod.
 #
-# When a PR bumps .azldev-version (or touches the runner image / this workflow),
-# build the runner container with that exact pin and confirm the resulting
-# binary can (a) run and (b) parse every component definition in the repo via
-# `azldev component list`. This catches the two failure modes of a version bump:
-# the pin doesn't `go install`, or the new version breaks on the repo's TOMLs.
+# When a PR updates the module pin or its resolver (or touches the runner
+# image / this workflow), build the runner container with its resolved immutable
+# hash and confirm the resulting binary can (a) run and (b) parse every component
+# definition in the repo via `azldev component list`. This catches resolver/Go
+# integration regressions, pins that do not install, and incompatible TOMLs.
 name: "azldev Smoke Test"
 
 on:
   pull_request:
     branches: ["4.0"]
     paths:
-      - ".azldev-version"
+      - "tools/azldev/go.mod"
+      - "tools/azldev/go.sum"
       - ".github/workflows/containers/azldev-runner.Dockerfile"
       - ".github/workflows/azldev-smoke.yml"
+      - "scripts/ci/render-specs-check/resolve_azldev_version.py"
   workflow_dispatch:
 
 # Cancel in-progress runs of this workflow if a new run is triggered.
@@ -36,25 +38,24 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        with:
+          go-version-file: tools/azldev/go.mod
+          cache: false
+
       - name: Build azldev runner container
         run: |
           set -euo pipefail
-          version="$(tr -d '\n' < .azldev-version)"
-          if [ -z "$version" ]; then
-            echo "::error::.azldev-version is empty"
+          azldev_hash="$(python3 scripts/ci/render-specs-check/resolve_azldev_version.py hash tools/azldev/go.mod)"
+          if ! [[ "$azldev_hash" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::resolver emitted an invalid azldev hash"
             exit 1
           fi
-          # Restrict to the charset Go module versions use (commit SHAs, tags,
-          # pseudo-versions). This blocks shell metacharacters so the value is
-          # safe to pass straight through to `docker build --build-arg` below.
-          if ! printf '%s' "$version" | grep -Eq '^[0-9A-Za-z._+-]+$'; then
-            echo "::error::.azldev-version contains unexpected characters: '$version'"
-            exit 1
-          fi
-          echo "azldev version pin: $version"
+          echo "azldev hash: $azldev_hash"
           docker build \
             --build-arg UID="$(id -u)" \
-            --build-arg AZLDEV_VERSION="$version" \
+            --build-arg AZLDEV_HASH="$azldev_hash" \
             -t localhost/azldev-runner \
             -f .github/workflows/containers/azldev-runner.Dockerfile \
             .github/workflows/containers/
