@@ -1,0 +1,28 @@
+[components.phpunit13]
+
+# Backport of https://github.com/sebastianbergmann/phpunit/commit/4aab6e3e6865e191014cc64cbf612eb1cc121614
+# The fix is in upstream 13.1.10 and later Fedora f43 revisions. PHPUnit 13.1
+# requires code-coverage 14, so updating would cross the retained major boundary.
+[[components.phpunit13.overlays]]
+description = "Disable diff 8.3 final-newline markers in PHPUnit-owned diff output"
+type = "patch-add"
+source = "phpunit13-configure-diff8-output.patch"
+
+[[components.phpunit13.overlays]]
+description = "Require the diff 8.3 constructor API used by the compatibility backport at runtime"
+type = "spec-search-replace"
+regex = '''^Requires:       \(php-composer\(sebastian/diff\) >= 8\.0\.0                with php-composer\(sebastian/diff\) < 9\)$'''
+replacement = "Requires:       (php-composer(sebastian/diff) >= 8.3.0                with php-composer(sebastian/diff) < 9)"
+
+[[components.phpunit13.overlays]]
+description = "Exclude comparator-output assertions because stage builds cannot consume the same-stage comparator and diff outputs"
+type = "spec-search-replace"
+section = "%check"
+regex = '''^OPT=.*--no-coverage'$'''
+replacement = '''OPT='--filter "^((?!(testIsInitialized|testExclusionOfFileCanBeQueried|ComparisonFailureBuilderTest|assertArrays|JsonMatchesTest|IsEqualTest|IsEqualCanonicalizingTest|IsEqualIgnoringCaseTest|IsEqualWithDeltaTest|IsIdenticalTest|StringMatchesFormatDescriptionTest)).)*$" --testsuite=unit --no-coverage''''
+
+[[components.phpunit13.overlays]]
+description = "Apply the added compatibility patch because the upstream spec only applies Patch0 explicitly"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P1 -p1"]
