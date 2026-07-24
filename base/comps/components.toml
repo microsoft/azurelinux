@@ -3187,7 +3187,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.php-sebastian-diff5]
 [components.php-sebastian-diff6]
 [components.php-sebastian-diff7]
-[components.php-sebastian-diff8]
 [components.php-sebastian-environment4]
 [components.php-sebastian-environment5]
 [components.php-sebastian-environment6]
