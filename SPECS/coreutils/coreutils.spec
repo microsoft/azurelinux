@@ -10,7 +10,6 @@ URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
-Patch0:         coreutils-9.4-i18n-1.patch
 Patch1:         coreutils-9.4-uname-1.patch
 BuildRequires:  libacl-devel
 BuildRequires:  libattr-devel
