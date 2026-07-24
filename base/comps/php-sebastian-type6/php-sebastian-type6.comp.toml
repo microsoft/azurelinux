@@ -1,0 +1,16 @@
+[components.php-sebastian-type6]
+
+# Backport of https://github.com/sebastianbergmann/type/commit/19206ebcf038226cfc5908a7d48e0ddf3a4de318
+# The fix is in upstream 6.0.4 and Fedora f43 commit
+# 9e9486aed72832a31fab1a7d223f829dc6a1234d. That Fedora spec requires
+# PHPUnit >= 12.5.25, newer than the current DEV and PROD buildroots.
+[[components.php-sebastian-type6.overlays]]
+description = "Use PHPUnit-compatible PHP 8.2 test requirements without changing the type 6 runtime API"
+type = "patch-add"
+source = "type6-fix-php82-test-requirements.patch"
+
+[[components.php-sebastian-type6.overlays]]
+description = "Apply the added compatibility patch because the upstream spec does not use autosetup"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P0 -p1"]
