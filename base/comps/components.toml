@@ -3254,7 +3254,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.phpunit10]
 [components.phpunit11]
 [components.phpunit12]
-[components.phpunit13]
 [components.phpunit8]
 [components.phpunit9]
 [components.picocli]
