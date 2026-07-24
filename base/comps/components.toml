@@ -706,7 +706,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.glew]
 [components.glib]
 [components.glib-networking]
-[components.glib2]
 [components.'glibmm2.4']
 [components.'glibmm2.68']
 [components.glog]
