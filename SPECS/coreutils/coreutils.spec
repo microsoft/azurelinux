@@ -39,7 +39,6 @@ These are the additional language files of coreutils.
 %autosetup -p1
 
 %build
-autoreconf -fi
 export FORCE_UNSAFE_CONFIGURE=1 &&  ./configure \
     --prefix=%{_prefix} \
     --enable-install-program=arch \
@@ -65,12 +64,11 @@ install -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/profile.d/
 %find_lang %{name}
 
 %check
-sed -i '/tests\/misc\/sort.pl/d' Makefile
+sed -i '/tests\/sort\/sort.pl/d' Makefile
 sed -i 's/test-getlogin$(EXEEXT)//' gnulib-tests/Makefile
-sed -i 's/PET/-05/g' tests/misc/date-debug.sh
-sed -i 's/2>err\/merge-/2>\&1 > err\/merge-/g' tests/misc/sort-merge-fdlimit.sh
+sed -i 's/PET/-05/g' tests/date/date-debug.sh
+sed -i 's/2>err\/merge-/2>\&1 > err\/merge-/g' tests/sort/sort-merge-fdlimit.sh
 sed -i 's/)\" = \"10x0/| head -n 1)\" = \"10x0/g' tests/split/r-chunk.sh
-sed  -i '/mb.sh/d' Makefile
 LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 
 %post   -p /sbin/ldconfig
