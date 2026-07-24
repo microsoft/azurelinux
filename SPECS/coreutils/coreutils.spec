@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
-Version:        9.4
-Release:        6%{?dist}
+Version:        9.8
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,7 +12,6 @@ Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 Source1:        serial-console.sh
 Patch0:         coreutils-9.4-i18n-1.patch
 Patch1:         coreutils-9.4-uname-1.patch
-Patch2:         CVE-2024-0684.patch
 BuildRequires:  libacl-devel
 BuildRequires:  libattr-devel
 BuildRequires:  libselinux-devel
@@ -92,6 +91,9 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Fri Jul 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 9.8-1
+- Auto-upgrade to 9.8 - CVE-2025-5278
+
 * Thu Aug 8 2024 Chris Gunn <chrisgun@microsoft.com> - 9.4-6
 - Enable xattr and acl support.
 

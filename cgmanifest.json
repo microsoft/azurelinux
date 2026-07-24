@@ -2147,8 +2147,8 @@
         "type": "other",
         "other": {
           "name": "coreutils",
-          "version": "9.4",
-          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-9.4.tar.xz"
+          "version": "9.8",
+          "downloadUrl": "https://ftp.gnu.org/gnu/coreutils/coreutils-9.8.tar.xz"
         }
       }
     },
