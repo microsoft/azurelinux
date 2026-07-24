@@ -85,10 +85,10 @@ tox
 * Fri Jul 24 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
 - Upgrade from 2.8.0 to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
 
-* Tue Apr 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
+* Mon May 05 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
 - Fixed ptest
 
-* Fri Apr 26 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
+* Wed Jul 24 2024 Osama Esmail <osamaesmail@microsoft.com> - 2.8.0-1
 - Updating to 2.8.0-1 for 3.0
 - Using literal package name so auto-upgrader can do its thing
 - Adding buildrequires & replacing check section with simple tox command
