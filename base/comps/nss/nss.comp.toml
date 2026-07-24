@@ -1,6 +1,10 @@
 [components.nss]
 # Release: %{nss_release}%{?dist}
 release = { calculation = "manual" }
-# Pin to 3.121.0 (commit f97da13) — required by 389-ds-base-libs 3.1.4 which
-# has a runtime dependency on nss >= 3.121.0.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f97da13cbff826185fa4896bf6529cc44094056d" }
+# Pin to 3.123.1 (commit a2e1a543) — required by 389-ds-base / 389-ds-base-libs
+# 3.1.4 built in the Fedora 43 snapshot, which have a runtime dependency on
+# nss >= 3.123.1. Additive minor bump from 3.121.0 across 3.122.x -> 3.123.1;
+# NSS SONAMEs are unversioned and ABI-stable across the 3.x series, NSPR stays
+# at 4.38.2.
+# https://src.fedoraproject.org/rpms/nss/c/a2e1a543d0c2cb811e939c90d9ebdbf9579468d6
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a2e1a543d0c2cb811e939c90d9ebdbf9579468d6" }

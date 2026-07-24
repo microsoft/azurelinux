@@ -77726,18 +77726,14 @@ diff --git a/gtests/common/testvectors_base/test-structs.h b/gtests/common/testv
 diff --git a/gtests/pk11_gtest/manifest.mn b/gtests/pk11_gtest/manifest.mn
 --- a/gtests/pk11_gtest/manifest.mn
 +++ b/gtests/pk11_gtest/manifest.mn
-@@ -35,10 +35,11 @@
-       pk11_import_unittest.cc \
-       pk11_kbkdf.cc \
+@@ -37,6 +37,7 @@
        pk11_kem_unittest.cc \
-       pk11_keygen.cc \
        pk11_key_unittest.cc \
+       pk11_keygen.cc \
 +      pk11_mldsa_unittest.cc \
        pk11_module_unittest.cc \
        pk11_pbe_unittest.cc \
        pk11_pbkdf2_unittest.cc \
-       pk11_prf_unittest.cc \
-       pk11_prng_unittest.cc \
 diff --git a/gtests/pk11_gtest/ml-dsa-ietf-vectors.h b/gtests/pk11_gtest/ml-dsa-ietf-vectors.h
 new file mode 100644
 --- /dev/null
@@ -80315,18 +80311,14 @@ new file mode 100644
 diff --git a/gtests/pk11_gtest/pk11_gtest.gyp b/gtests/pk11_gtest/pk11_gtest.gyp
 --- a/gtests/pk11_gtest/pk11_gtest.gyp
 +++ b/gtests/pk11_gtest/pk11_gtest.gyp
-@@ -36,10 +36,11 @@
-         'pk11_import_unittest.cc',
-         'pk11_kbkdf.cc',
+@@ -38,6 +38,7 @@
          'pk11_kem_unittest.cc',
-         'pk11_keygen.cc',
          'pk11_key_unittest.cc',
+         'pk11_keygen.cc',
 +        'pk11_mldsa_unittest.cc',
          'pk11_module_unittest.cc',
          'pk11_pbe_unittest.cc',
          'pk11_pbkdf2_unittest.cc',
-         'pk11_prf_unittest.cc',
-         'pk11_prng_unittest.cc',
 diff --git a/gtests/pk11_gtest/pk11_import_unittest.cc b/gtests/pk11_gtest/pk11_import_unittest.cc
 --- a/gtests/pk11_gtest/pk11_import_unittest.cc
 +++ b/gtests/pk11_gtest/pk11_import_unittest.cc

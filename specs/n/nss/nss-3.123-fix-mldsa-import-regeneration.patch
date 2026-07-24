@@ -1,0 +1,29 @@
+--- a/lib/pk11wrap/pk11akey.c
++++ b/lib/pk11wrap/pk11akey.c
+@@ -2145,7 +2145,7 @@
+                 PORT_SetError(SEC_ERROR_BAD_KEY);
+                 break;
+             }
+-            pubKey.u.mldsa.paramSet = SECKEY_GetMLDSAPkcs11ParamSetByOidTag(paramSet);
++            pubKey.u.mldsa.paramSet = SECKEY_GetMLDSAOidTagByPkcs11ParamSet(paramSet);
+             if (pubKey.u.mldsa.paramSet == SEC_OID_UNKNOWN) {
+                 PORT_SetError(SEC_ERROR_BAD_KEY);
+                 break;
+--- a/lib/softoken/pkcs11.c
++++ b/lib/softoken/pkcs11.c
+@@ -1565,10 +1565,15 @@
+                                 (PORT_Memcmp(valueAttribute->attrib.pValue,
+                                              privKey.keyVal, valueLen) != 0)) {
+                                 crv = CKR_ATTRIBUTE_VALUE_INVALID;
+                             }
+                         }
++                        if (crv == CKR_OK && !sftk_hasAttribute(object, CKA_NSS_DB)) {
++                            crv = sftk_forceAttribute(object, CKA_NSS_DB,
++                                                      pubKey.keyVal,
++                                                      pubKey.keyValLen);
++                        }
+                         PORT_SafeZero(&privKey, sizeof(privKey));
+                         PORT_SafeZero(&pubKey, sizeof(pubKey));
+                     }
+                     if (valueAttribute)
+                         sftk_FreeAttribute(valueAttribute);

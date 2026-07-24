@@ -18,9 +18,7 @@ diff --git a/cmd/lib/secutil.c b/cmd/lib/secutil.c
 diff --git a/gtests/ssl_gtest/ssl_auth_unittest.cc b/gtests/ssl_gtest/ssl_auth_unittest.cc
 --- a/gtests/ssl_gtest/ssl_auth_unittest.cc
 +++ b/gtests/ssl_gtest/ssl_auth_unittest.cc
-@@ -2293,6 +2293,28 @@
-                        TlsConnectTestBase::kTlsV12,
-                        ::testing::Values(TlsAgent::kServerEcdsa256,
+@@ -2439,5 +2439,27 @@
                                           TlsAgent::kServerEcdsa384),
                         ::testing::Values(ssl_auth_ecdsa),
                         ::testing::Values(ssl_sig_ecdsa_sha1)));
@@ -46,6 +44,7 @@ diff --git a/gtests/ssl_gtest/ssl_auth_unittest.cc b/gtests/ssl_gtest/ssl_auth_u
 +                       ::testing::Values(TlsAgent::kServerMlDsa87),
 +                       ::testing::Values(ssl_auth_mldsa87),
 +                       ::testing::Values(ssl_sig_mldsa87)));
+ 
  }  // namespace nss_test
 diff --git a/gtests/ssl_gtest/tls_agent.h b/gtests/ssl_gtest/tls_agent.h
 --- a/gtests/ssl_gtest/tls_agent.h
@@ -375,44 +374,35 @@ diff --git a/tests/ssl/sslcov.txt b/tests/ssl/sslcov.txt
  #XYBER    TLS13  :1301 ECC TLS13_XYBER768D00_WITH_AES_128_GCM_SHA256
  #XYBER    TLS13  :1302 ECC TLS13_XYBER768D00_WITH_AES_256_GCM_SHA384
  #XYBER    TLS13  :1303 ECC TLS13_XYBER768D00_WITH_CHACHA20_POLY1305_SHA256
-diff --git a/tests/ssl_gtests/ssl_gtests.sh b/tests/ssl_gtests/ssl_gtests.sh
---- a/tests/ssl_gtests/ssl_gtests.sh
-+++ b/tests/ssl_gtests/ssl_gtests.sh
-@@ -47,23 +47,35 @@
-   make_cert rsa_pss_noparam rsapss_noparam sign
-   make_cert rsa_decrypt rsa kex
-   make_cert ecdsa256 p256 sign
-   make_cert ecdsa384 p384 sign
-   make_cert ecdsa521 p521 sign
-+  make_cert mldsa44 mldsa44 sign
-+  make_cert mldsa65 mldsa65 sign
-+  make_cert mldsa87 mldsa87 sign
-   make_cert ecdh_ecdsa p256 kex
-   make_cert rsa_ca rsa_ca ca
-   make_cert rsa_chain rsa_chain sign
-   make_cert rsa_pss_ca rsapss_ca ca
-   make_cert rsa_pss_chain rsapss_chain sign
-   make_cert rsa_ca_rsa_pss_chain rsa_ca_rsapss_chain sign
-+  make_cert mldsa44_ca mldsa44_ca ca
-+  make_cert mldsa44_chain mldsa44_chain sign
-+  make_cert mldsa65_ca mldsa65_ca ca
-+  make_cert mldsa65_chain mldsa65_chain sign
-+  make_cert mldsa87_ca mldsa87_ca ca
-+  make_cert mldsa87_chain mldsa87_chain sign
-   make_cert ecdh_rsa ecdh_rsa kex
-   if [ -z "${NSS_DISABLE_DSA}" ]; then
-       make_cert dsa dsa sign
-   fi
-   make_cert delegator_ecdsa256 delegator_p256 sign
-   make_cert delegator_rsae2048 delegator_rsae2048 sign
-   make_cert delegator_rsa_pss2048 delegator_rsa_pss2048 sign
-+  make_cert delegator_mldsa44 delegator_mldsa44 sign
-+  make_cert delegator_mldsa65 delegator_mldsa65 sign
-+  make_cert delegator_mldsa87 delegator_mldsa87 sign
- }
- 
- ############################## ssl_gtest_init ##########################
- # local shell function to initialize this script
- ########################################################################
-
-
+diff --git a/tests/ssl_gtests/ssl_gtest_db.sh b/tests/ssl_gtests/ssl_gtest_db.sh
+--- a/tests/ssl_gtests/ssl_gtest_db.sh
++++ b/tests/ssl_gtests/ssl_gtest_db.sh
+@@ -59,16 +59,28 @@
+ make_cert ecdsa256 p256 sign
+ make_cert ecdsa384 p384 sign
+ make_cert ecdsa521 p521 sign
++make_cert mldsa44 mldsa44 sign
++make_cert mldsa65 mldsa65 sign
++make_cert mldsa87 mldsa87 sign
+ make_cert ecdh_ecdsa p256 kex
+ make_cert rsa_ca rsa_ca ca
+ make_cert rsa_chain rsa_chain sign
+ make_cert rsa_pss_ca rsapss_ca ca
+ make_cert rsa_pss_chain rsapss_chain sign
+ make_cert rsa_ca_rsa_pss_chain rsa_ca_rsapss_chain sign
++make_cert mldsa44_ca mldsa44_ca ca
++make_cert mldsa44_chain mldsa44_chain sign
++make_cert mldsa65_ca mldsa65_ca ca
++make_cert mldsa65_chain mldsa65_chain sign
++make_cert mldsa87_ca mldsa87_ca ca
++make_cert mldsa87_chain mldsa87_chain sign
+ make_cert ecdh_rsa ecdh_rsa kex
+ if [ -z "${NSS_DISABLE_DSA}" ]; then
+     make_cert dsa dsa sign
+ fi
+ make_cert delegator_ecdsa256 delegator_p256 sign
+ make_cert delegator_rsae2048 delegator_rsae2048 sign
+ make_cert delegator_rsa_pss2048 delegator_rsa_pss2048 sign
++make_cert delegator_mldsa44 delegator_mldsa44 sign
++make_cert delegator_mldsa65 delegator_mldsa65 sign
++make_cert delegator_mldsa87 delegator_mldsa87 sign

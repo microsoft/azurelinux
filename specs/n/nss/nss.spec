@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 %global nspr_version 4.38.2
-%global nss_version 3.121.0
+%global nss_version 3.123.1
 # NOTE: To avoid NVR clashes of nspr* packages:
 # - reset %%{nspr_release} to 1, when updating %%{nspr_version}
 # - increment %%{nspr_version}, when updating the NSS part only
@@ -10,7 +10,7 @@
 %global nss_release %baserelease
 # use "%%global nspr_release %%[%%baserelease+n]" to handle offsets when
 # release number between nss and nspr are different.
-%global nspr_release %[%baserelease+3]
+%global nspr_release %[%baserelease+6]
 # only need to update this as we added new
 # algorithms under nss policy control
 %global crypto_policies_version 20240521
@@ -147,8 +147,9 @@ Patch61:          nss-3.118-ml-dsa-tls.patch
 Patch65:          nss-3.118-ml-dsa-test-for-sign-verify-pkcs12.patch
 Patch66:          nss-3.118-ml-dsa-tls-test.patch
 Patch67:          nss-3.118-ml-dsa-unittests.patch
+Patch68:          nss-3.123-fix-mldsa-import-regeneration.patch
 
-Patch70:          nss-3.118.1-fix-test-typo.patch
+Patch70:          nss-dbtests-sqlite-mangling.patch
 
 Patch100:         nspr-config-pc.patch
 Patch101:         nspr-gcc-atomics.patch
@@ -1102,6 +1103,15 @@ fi
 
 
 %changelog
+* Thu May  7 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.123.1-1
+- Update NSS to 3.123.1
+
+* Mon May  4 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.122.2-1
+- Update NSS to 3.122.2
+
+* Mon Apr 20 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.122.1-1
+- Update NSS to 3.122.1
+
 * Tue Mar  3 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 3.121.0-1
 - Update NSS to 3.121.0
 - Updated patch nss-3.118-ml-dsa-leancrypto.patch
