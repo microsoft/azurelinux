@@ -1,0 +1,8 @@
+# Pin to a specific Fedora dist-git commit for stage1 prod bring-up. Brings
+# glib2 to 2.86.5 (from 2.86.4), the minimum required by dependents built in the
+# Fedora 43 snapshot (e.g. NetworkManager, ModemManager-glib) that need
+# glib2 >= 2.86.5. Micro release within the 2.86 series: SONAMEs unchanged, and
+# it additionally includes the fix for CVE-2026-0988.
+# https://src.fedoraproject.org/rpms/glib2/c/e50e7d423012d102a88f5b5b055affbe1e6bcfed
+[components.glib2]
+spec = { type = "upstream", upstream-commit = "e50e7d423012d102a88f5b5b055affbe1e6bcfed" }
