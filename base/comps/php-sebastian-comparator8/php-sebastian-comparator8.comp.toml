@@ -1,0 +1,9 @@
+[components.php-sebastian-comparator8]
+
+# Pick up comparator's diff 8.3 compatibility while retaining the PME dependency majors.
+# Ref: https://src.fedoraproject.org/rpms/php-sebastian-comparator8/c/0e716c70f4b738091fdf7b412549375d2e7ab888
+spec = { type = "upstream", upstream-commit = "0e716c70f4b738091fdf7b412549375d2e7ab888" }
+
+# The DEV buildroot has previous-stage diff8 8.0, while comparator 8.1.4 tests
+# require diff8 8.3. Re-enable when stage builds consume the same-stage diff8.
+build.without = ["tests"]
