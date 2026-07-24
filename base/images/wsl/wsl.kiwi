@@ -67,9 +67,7 @@
         <package name="shadow-utils"/>
         <package name="sudo"/>
         <package name="symlinks"/>
-        <package name="systemd-networkd"/>
         <package name="systemd-udev"/>
-        <package name="systemd-resolved"/>
         <package name="tar"/>
         <package name="tcpdump"/>
         <package name="time"/>
