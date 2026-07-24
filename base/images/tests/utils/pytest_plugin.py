@@ -22,6 +22,7 @@ _EXT_TO_TYPE: dict[str, str] = {
     ".tar.xz": "container",
     ".tar.gz": "container",
     ".tar": "container",
+    ".wsl": "wsl",
 }
 
 # Capabilities that imply an image type.
@@ -80,9 +81,12 @@ def pytest_addoption(parser) -> None:  # type: ignore[no-untyped-def]
     )
     group.addoption(
         "--image-type",
-        choices=("vm", "container"),
+        choices=("vm", "container", "wsl"),
         default=None,
-        help=("Image type: 'vm' or 'container'. If omitted, derived from --capabilities or --image-path extension."),
+        help=(
+            "Image type: 'vm', 'container', or 'wsl'. If omitted, derived "
+            "from --capabilities or --image-path extension."
+        ),
     )
     group.addoption(
         "--capabilities",

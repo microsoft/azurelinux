@@ -136,10 +136,24 @@ runtime-package-management = false
 [images.wsl]
 description = "WSL Image"
 definition = { type = "kiwi", path = "wsl/wsl.kiwi", profile = "wsl" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.wsl.capabilities]
+machine-bootable = false
+container = false
+systemd = true
+runtime-package-management = true
 
 [images.wsl-dev]
 description = "WSL Image (dev)"
 definition = { type = "kiwi", path = "wsl/wsl.kiwi", profile = "wsl-dev" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.wsl-dev.capabilities]
+machine-bootable = false
+container = false
+systemd = true
+runtime-package-management = true
 
 # ---- vm-iso-installer --------------------------------------------------
 

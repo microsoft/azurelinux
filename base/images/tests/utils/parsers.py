@@ -42,12 +42,20 @@ def parse_os_release(content: str) -> dict[str, str]:
     return result
 
 
-def query_rpm_packages(rootfs: Path) -> set[str]:
-    """Query installed RPM packages via ``rpm --root``.
+def query_rpm_package_sizes(rootfs: Path) -> dict[str, int]:
+    """Query installed RPM package on-disk sizes via ``rpm --root``.
 
-    Raises :class:`RuntimeError` if the query fails (e.g. missing rpmdb).
+    Returns a mapping of package name to total installed size in bytes (the
+    RPM ``%{SIZE}`` header). ``%{NAME}`` is not unique — install-only
+    packages (e.g. the kernel) can be present at multiple versions — so
+    sizes for repeated names are summed rather than overwritten.
+
+    Raises:
+        RuntimeError: If the ``rpm`` query fails (e.g. missing rpmdb) or
+            returns a non-integer ``%{SIZE}`` (incomplete data would
+            silently undercount the footprint).
     """
-    cmd = [RPM.name, "--root", str(rootfs), "-qa", "--qf", "%{NAME}\n"]
+    cmd = [RPM.name, "--root", str(rootfs), "-qa", "--qf", "%{NAME} %{SIZE}\n"]
     logger.debug("Running: %s", " ".join(cmd))
     result = subprocess.run(
         cmd,
@@ -56,7 +64,19 @@ def query_rpm_packages(rootfs: Path) -> set[str]:
         check=False,
     )
     if result.returncode != 0:
-        raise RuntimeError(f"rpm query failed (rc={result.returncode}): {result.stderr.strip()}")
-    pkgs = {line.strip() for line in result.stdout.splitlines() if line.strip()}
-    logger.debug("rpm query returned %d packages", len(pkgs))
-    return pkgs
+        raise RuntimeError(f"rpm size query failed (rc={result.returncode}): {result.stderr.strip()}")
+    sizes: dict[str, int] = {}
+    for raw_line in result.stdout.splitlines():
+        entry = raw_line.strip()
+        if not entry:
+            continue
+        name, separator, size_str = entry.rpartition(" ")
+        if not separator or not name or not size_str:
+            raise RuntimeError(f"unexpected rpm size entry: {entry!r}")
+        try:
+            size = int(size_str)
+        except ValueError as exc:
+            raise RuntimeError(f"unexpected rpm size for {name}: {size_str!r}") from exc
+        sizes[name] = sizes.get(name, 0) + size
+    logger.debug("rpm size query returned %d package names", len(sizes))
+    return sizes
