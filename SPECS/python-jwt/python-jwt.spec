@@ -1,6 +1,8 @@
 # This package refers to PyJWT(https://github.com/jpadilla/pyjwt). Not to be confused with python-jwt(https://github.com/davedoesdev/python-jwt)
 # what it's called on pypi
-%global srcname PyJWT
+# Lowercased: PyPI serves the 2.13.0 sdist as pyjwt-2.13.0.tar.gz and the tarball's
+# internal directory is also lowercase (was PyJWT-2.8.0.tar.gz / PyJWT-2.8.0 dir before)
+%global srcname pyjwt
 # what it's imported as
 %global libname jwt
 # name of egg info directory
@@ -17,14 +19,14 @@ claims to be transferred between two parties encoded as digitally signed and
 encrypted JSON objects.}
 
 Name:           python-jwt
-Version:        2.8.0
-Release:        2%{?dist}
+Version:        2.13.0
+Release:        1%{?dist}
 Summary:        JSON Web Token implementation in Python
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/jpadilla/pyjwt
-Source0:        https://files.pythonhosted.org/packages/30/72/8259b2bccfe4673330cea843ab23f86858a419d8f1493f66d413a76c7e3b/PyJWT-2.8.0.tar.gz
+Source0:        https://files.pythonhosted.org/packages/3b/81/58d0ac84e1ef3a3843791d6954d94c0b33d526c75eeb1efbce9d0a4c4077/pyjwt-2.13.0.tar.gz
 BuildArch:      noarch
 
 %description %{common_description}
@@ -36,10 +38,10 @@ BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
-%if 0%{?with_check}
-BuildRequires:  python3-atomicwrites
+# Added: required by %%check (pip3 install tox) and by pyproject build/install macros
 BuildRequires:  python3-pip
-%endif
+# Added: %%pyproject_wheel (in %build) needs the `wheel` package's bdist_wheel command
+BuildRequires:  python3-wheel
 %{?python_provide:%python_provide python3-%{pkgname}}
 
 %description -n python3-%{pkgname} %{common_description}
@@ -47,30 +49,42 @@ BuildRequires:  python3-pip
 
 %prep
 %autosetup -n %{srcname}-%{version}
-rm -rf %{eggname}.egg-info
+# python3-setuptools in Azure Linux (69.0.3) predates PEP 639 support (needs setuptools
+# >= 77, per upstream's build-system.requires); rewrite the PEP 639 `license = "MIT"`
+# string to the legacy `license = {text = "MIT"}` table form so metadata validation passes
+sed -i 's/^license = "MIT"$/license = {text = "MIT"}/' pyproject.toml
 
 %generate_buildrequires
 %pyproject_buildrequires
 
 %build
-%py3_build
+# Switched from %%py3_build (ran `setup.py build`): the 2.13.0 sdist no longer ships
+# setup.py, only pyproject.toml
+%pyproject_wheel
 
 %install
-%py3_install
+# Switched from %%py3_install (ran `setup.py install`) for the same reason as %build
+%pyproject_install
+# Generates the file list consumed by %%files -f %%{pyproject_files} below, avoiding a
+# hardcoded/guessed dist-info directory name
+%pyproject_save_files %{libname}
 
 %check
 pip3 install tox==4.25.0 --ignore-installed
 tox
 
 %if %{with python3}
-%files -n python3-%{pkgname}
+# Switched to the macro-generated file list since %%pyproject_install produces a
+# *.dist-info directory (not the egg-info path this used to hardcode)
+%files -n python3-%{pkgname} -f %{pyproject_files}
 %doc README.rst AUTHORS.rst
 %license LICENSE
-%{python3_sitelib}/%{libname}
-%{python3_sitelib}/%{eggname}-%{version}-py%{python3_version}.egg-info
 %endif
 
 %changelog
+* Fri Jul 24 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
+- Upgrade from 2.8.0 to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
+
 * Tue Apr 08 2024 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
 - Fixed ptest
 
