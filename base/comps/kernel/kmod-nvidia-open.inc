@@ -32,11 +32,14 @@ AutoReq:        no
 # Track the actual NVIDIA driver version via Provides for dependency resolution.
 Provides:       nvidia-open-kmod-version = %{nvidia_open_version}
 Provides:       nvidia-kmod = %{nvidia_open_version}
+Provides:       kmod-nvidia-open-uname-r = %{KVERREL}
 # Mark this kmod as install-only so multiple versions can coexist alongside
 # their matching kernels (dnf/dnf5 default installonlypkgs includes the
 # 'installonlypkg(kernel-module)' token).
 Provides:       installonlypkg(kernel-module)
 Requires:       %{name}-core-uname-r = %{KVERREL}
+# TODO: Add userspace package dependency when package name/version contract is finalized.
+# Requires:       <nvidia-userspace-package> = %{nvidia_open_version}
 Requires(post): kmod
 Requires(postun): kmod
 Conflicts:      nvidia-closed-kmod
@@ -51,7 +54,15 @@ Each kernel version produces a separate kmod package
 (kmod-nvidia-open-<nvidia_driver_version>-<KVERREL>) so that multiple kernel versions
 can coexist with their own NVIDIA modules.
 Use 'Requires: nvidia-open-kmod-version = %{nvidia_open_version}' to depend on a
-specific NVIDIA driver version, or 'Requires: nvidia-kmod = %{nvidia_open_version}'.
+specific NVIDIA driver version, or 'Requires: nvidia-kmod = %{nvidia_open_version}' to
+depend on a specific NVIDIA driver package version.
+
+%package -n kmod-nvidia-open-matched
+Summary:        Meta package to ensure kmod-nvidia-open is installed for all kernels
+
+%description -n kmod-nvidia-open-matched
+This meta package provides a single reference that other packages can Require to have kmod-nvidia-open installed for all kernels. When installed, the kernel package automatically pulls in the version-matched kmod-nvidia-open for each kernel version on this machine (x86_64 and aarch64 only).
+
 %endif
 
 %endif
@@ -149,6 +160,10 @@ install -D -m 0644 %{_builddir}/open-gpu-kernel-modules-%{nvidia_open_version}/C
 /lib/modules/%{KVERREL}/extra/nvidia/nvidia-uvm.ko.%{compext}
 /lib/modules/%{KVERREL}/extra/nvidia/nvidia-peermem.ko.%{compext}
 %{_modprobedir}/kmod-%{_kmod_name}-%{KVERREL}.conf
+
+%files -n kmod-nvidia-open-matched
+# empty sentinel package — no files
+
 %endif
 
 %endif

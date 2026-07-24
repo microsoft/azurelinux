@@ -35,6 +35,7 @@ emptyrpm:
         - kernel-rt-64k-debug-devel-matched
         - kernel-rt-64k-devel-matched
         - kernel-rt-64k-modules-extra-matched
+        - kmod-nvidia-open-matched
 
 patches:
     ignore_list:

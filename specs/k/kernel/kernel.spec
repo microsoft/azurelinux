@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 14
+%define azl_pkgrelease 15
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -784,6 +784,9 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((kmod-nvidia-open-uname-r = %{KVERREL}) if kmod-nvidia-open-matched)
+%endif
 Provides: installonlypkg(kernel)
 %endif
 
@@ -4609,6 +4612,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Tue Aug 11 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.15
+- feat(kmod-nvidia-open): add opt-in kmod-nvidia-open-matched sentinel package for automatic kernel upgrade tracking
+
 * Fri Aug 07 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.14
 - feat(kernel): build base variants, keep UKI, and restore selftests
 
