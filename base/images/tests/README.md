@@ -1,8 +1,8 @@
 # Azure Linux Image Tests
 
-Validation framework for built Azure Linux images (VM and container).
-Includes both static (offline filesystem) and runtime (live container)
-tests, all driven by pytest.
+Validation framework for built Azure Linux images (VM, container, and
+WSL). Includes both static (offline filesystem) and runtime (live
+container) tests, all driven by pytest.
 
 ## How it gets invoked
 
@@ -16,6 +16,9 @@ azldev image test  vm-base
 
 azldev image build container-base
 azldev image test  container-base
+
+azldev image build wsl
+azldev image test  wsl
 ```
 
 (Most images come in two variants. The canonical/unsuffixed name
@@ -53,6 +56,12 @@ uv run pytest cases/static/ \
     --image-path /path/to/image.oci.tar.xz \
     --image-name container-base \
     --capabilities container,runtime-package-management
+
+# Static tests — WSL image (plain rootfs tarball)
+uv run pytest cases/static/ \
+    --image-path /path/to/image.wsl \
+    --image-name wsl \
+    --capabilities systemd,runtime-package-management
 
 # Runtime tests — Container image (requires podman)
 uv run pytest cases/runtime/ \
@@ -148,6 +157,7 @@ base/images/
 | `oci_image_config` | session | `dict[str, object]` | Parsed `skopeo inspect --config` output (use with `@pytest.mark.require_capability("container")`) |
 | `os_release` | session | `dict[str, str]` | Parsed `/etc/os-release` |
 | `installed_packages` | session | `set[str]` | Installed RPM names (`rpm --root`) |
+| `installed_package_sizes` | session | `dict[str, int]` | Installed RPM name → on-disk size in bytes (`rpm --root`, `%{SIZE}`) |
 | `disk_info` | session | `DiskInfo \| None` | VM only |
 | `partition_table` | session | `list[PartitionInfo]` | VM only — auto-skips on containers |
 | `podman_client` | session | `DockerClient \| None` | python-on-whales Podman client; None for non-container images |

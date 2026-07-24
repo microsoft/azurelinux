@@ -23,8 +23,11 @@ from utils.extract import (
     inspect_oci_config,
     mount_container_image,
     mount_vm_image,
+    mount_wsl_image,
+    read_text_confined,
     unmount_container_image,
     unmount_vm_image,
+    unmount_wsl_image,
 )
 from utils.container_runtime import (
     build_image,
@@ -35,7 +38,7 @@ from utils.container_runtime import (
     get_podman_client,
     resolve_image_reference,
 )
-from utils.parsers import parse_os_release, query_rpm_packages
+from utils.parsers import parse_os_release, query_rpm_package_sizes
 from utils.pytest_plugin import (
     derive_image_type_from_capabilities,
     detect_image_type,
@@ -97,7 +100,7 @@ def image_type(
     capabilities: set[str],
     image_path: Path | None, image_ref: str | None,
 ) -> str:
-    """``'vm'`` or ``'container'`` — from ``--image-type``, capabilities, or file extension."""
+    """``'vm'``, ``'container'``, or ``'wsl'`` — from ``--image-type``, capabilities, or file extension."""
     explicit = request.config.getoption("--image-type")
     if explicit:
         logger.info("Image type (explicit): %s", explicit)
@@ -188,6 +191,14 @@ def rootfs(image_path: Path | None, image_type: str, workdir: Path) -> Path:
         yield mountpoint
         logger.info("Unmounting VM image at %s", mountpoint)
         unmount_vm_image(mountpoint)
+    elif image_type == "wsl":
+        wsl_dir = workdir / "wsl"
+        logger.info("Extracting WSL image to %s", wsl_dir)
+        rootfs_path = mount_wsl_image(image_path, wsl_dir)
+        logger.info("WSL rootfs ready at %s", rootfs_path)
+        yield rootfs_path
+        logger.info("Cleaning up WSL extract at %s", wsl_dir)
+        unmount_wsl_image(wsl_dir)
     else:
         container_dir = workdir / "container"
         logger.info("Extracting container image to %s", container_dir)
@@ -237,20 +248,33 @@ def os_release(rootfs: Path) -> dict[str, str]:
     logger.debug("Looking for os-release at %s", os_release_path)
     if not os_release_path.exists():
         pytest.fail("/etc/os-release not found in image")
-    result = parse_os_release(os_release_path.read_text())
+    # Read via a chroot-confined resolver: /etc/os-release is commonly a
+    # symlink, and the extracted tree is inspected through host paths, so a
+    # crafted absolute link must not let this read escape the rootfs.
+    result = parse_os_release(read_text_confined(rootfs, "etc/os-release"))
     logger.info("os-release: ID=%s VERSION_ID=%s", result.get("ID"), result.get("VERSION_ID"))
     logger.debug("os-release full: %s", result)
     return result
 
 
 @pytest.fixture(scope="session")
-def installed_packages(rootfs: Path) -> set[str]:
-    """Set of installed RPM package names."""
-    logger.info("Querying installed RPM packages via rpm --root")
-    pkgs = query_rpm_packages(rootfs)
-    logger.info("Found %d installed packages", len(pkgs))
-    logger.debug("Packages: %s", sorted(pkgs))
-    return pkgs
+def installed_package_sizes(rootfs: Path) -> dict[str, int]:
+    """Mapping of installed RPM package name to on-disk size in bytes.
+
+    Single source of truth for installed-package data; the
+    :func:`installed_packages` fixture derives its name set from this.
+    """
+    logger.info("Querying installed RPM package sizes via rpm --root")
+    sizes = query_rpm_package_sizes(rootfs)
+    logger.info("Found size info for %d packages", len(sizes))
+    logger.debug("Packages: %s", sorted(sizes))
+    return sizes
+
+
+@pytest.fixture(scope="session")
+def installed_packages(installed_package_sizes: dict[str, int]) -> set[str]:
+    """Set of installed RPM package names (derived from package sizes)."""
+    return set(installed_package_sizes)
 
 
 @pytest.fixture(scope="session")
