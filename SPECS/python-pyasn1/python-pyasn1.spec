@@ -47,7 +47,7 @@ to be suitable for a wide range of protocols based on ASN.1 specification.
 %{python3_sitelib}/*
 
 %changelog
-* Wed Jul 22 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.6.4-1
+* Fri Jul 24 2026 BinduSri Adabala <v-badabala@microsoft.com> - 0.6.4-1
 - Upgrade to 0.6.4
 
 * Fri Jul 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.4.8-3
