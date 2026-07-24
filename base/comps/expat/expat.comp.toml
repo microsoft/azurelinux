@@ -1,0 +1,5 @@
+# Pin to a specific Fedora dist-git commit for stage1 prod bring-up and for
+# compatibility with upstream Fedora 43. Brings expat to version 2.8.1.
+# https://src.fedoraproject.org/rpms/expat/c/e7c4e277fa46ee92ce5bdb1e8c78a573f7304176
+[components.expat]
+spec = { type = "upstream", upstream-commit = "e7c4e277fa46ee92ce5bdb1e8c78a573f7304176" }

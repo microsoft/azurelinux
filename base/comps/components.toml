@@ -411,7 +411,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.exif]
 [components.exiv2]
 [components.exo]
-[components.expat]
 [components.expect]
 [components.expected]
 [components.extra-cmake-modules]
