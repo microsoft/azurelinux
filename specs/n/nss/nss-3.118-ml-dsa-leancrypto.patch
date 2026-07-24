@@ -20447,11 +20447,10 @@ diff --git a/lib/freebl/manifest.mn b/lib/freebl/manifest.mn
 diff --git a/lib/freebl/ml_dsa.c b/lib/freebl/ml_dsa.c
 --- a/lib/freebl/ml_dsa.c
 +++ b/lib/freebl/ml_dsa.c
-@@ -17,93 +17,464 @@
+@@ -17,92 +17,463 @@
  #include "secitem.h"
  #include "blapit.h"
  #include "secport.h"
- #include "nssilock.h"
  #include "secrng.h"
 -#include "ml_dsat.h"
 +
