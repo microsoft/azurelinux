@@ -701,7 +701,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.ghostscript]
 [components.gi-docgen]
 [components.git]
-[components.git-lfs]
 [components.gjs]
 [components.gl2ps]
 [components.glew]

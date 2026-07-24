@@ -1,0 +1,20 @@
+[components.git-lfs]
+
+# t-prune.sh intermittently fails with "Prune error: missing object" on git 2.54+. After a commit,
+# git 2.54's default 'geometric' maintenance strategy fires a *detached* background repack once the
+# repo exceeds ~100 loose objects (was 6700 under 'gc'); the subtest commits 1000 files then runs
+# `git lfs prune`, so that repack races prune's object scan. Fix: run maintenance synchronously
+# (maintenance.autoDetach=false) so the repack finishes first -- same approach as git's own test
+# suite (git.git 09505b1). Upstream report: https://github.com/git-lfs/git-lfs/issues/6309
+[[components.git-lfs.overlays]]
+description = "Run git auto-maintenance synchronously during %check (maintenance.autoDetach=false) so the post-commit 'geometric' repack finishes before `git lfs prune` instead of racing it. On git 2.54+ the detached background repack (triggered at ~100 loose objects) races the 1000-file t-prune.sh subtest and intermittently fails with 'missing object'. Mirrors git's own test-suite fix (git.git 09505b1)."
+type = "spec-prepend-lines"
+section = "%check"
+lines = [
+    "# t-prune.sh commits 1000 files then runs `git lfs prune`. On git 2.54+ the default 'geometric'",
+    "# maintenance strategy fires a detached background repack (at ~100 loose objects) that races",
+    "# prune and intermittently fails with 'missing object'. Run maintenance synchronously so the",
+    "# repack finishes first -- same fix as git's own test suite (git.git 09505b1). Upstream:",
+    "# https://github.com/git-lfs/git-lfs/issues/6309",
+    "export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=maintenance.autoDetach GIT_CONFIG_VALUE_0=false",
+]
