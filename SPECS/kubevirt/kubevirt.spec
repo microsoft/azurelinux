@@ -20,7 +20,7 @@
 Summary:        Container native virtualization
 Name:           kubevirt
 Version:        1.7.1
-Release:        7%{?dist}
+Release:        9%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -44,6 +44,9 @@ Patch13:        CVE-2026-39835.patch
 Patch14:        CVE-2026-42502.patch
 Patch15:        CVE-2026-7374.patch
 Patch16:        CVE-2026-33814.patch
+Patch17:        0001-Fix-VM-with-PCI-hostdev-failing-to-restart-after-hot.patch
+Patch18:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
+Patch19:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -281,6 +284,13 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Wed Jun 10 2026 Max Weiss <maxweiss@microsoft.com> - 1.7.1-9
+- Add patch for hotplug volume detach deadlock in virt-handler
+- Add patch for cleanupAttachmentPods fallback keeping useless old pods
+
+* Wed Jun 10 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-8
+- Add PCI passthrough patch
+
 * Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-7
 - Patch for CVE-2026-33814
 
