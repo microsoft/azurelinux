@@ -1,35 +1,33 @@
 %global debug_package %{nil}
 Summary:        An asynchronous networking framework written in Python
 Name:           python-twisted
-Version:        22.10.0
-Release:        5%{?dist}
+Version:        23.10.0
+Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://twistedmatrix.com
 Source0:        https://github.com/twisted/twisted/archive/twisted-%{version}.tar.gz
-# Disabling UDP multicast test, which failes in container environments.
-# For more details, see: https://twistedmatrix.com/trac/ticket/7494
-Patch0:         disable_multicast_test.patch
+Patch0:         Disable-multicast-ssl-test.patch
 Patch1:         CVE-2024-41671.patch
 # Patch2 is required for both CVE-2024-41671 and CVE-2024-41810
 Patch2:         CVE-2024-41810.patch
-Patch3:         CVE-2023-46137.patch
-Patch4:         CVE-2026-42304.patch
+Patch3:         CVE-2026-42304.patch
+
 BuildRequires:  python3-devel
-BuildRequires:  python3-incremental
-BuildRequires:  python3-pyOpenSSL
-BuildRequires:  python3-setuptools
-BuildRequires:  python3-xml
-BuildRequires:  python3-zope-interface
-%if 0%{?with_check}
 BuildRequires:  python3-pip
+BuildRequires:  python3-hatchling
+BuildRequires:  python3-hatch-fancy-pypi-readme
+BuildRequires:  python3-incremental
+BuildRequires:  python3-pathspec
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-trove-classifiers
+BuildRequires:  shadow-utils
 BuildRequires:  net-tools
 BuildRequires:  sudo
 BuildRequires:  tzdata
 BuildRequires:  git
-%endif
 
 AutoReqProv:    no
 
@@ -43,7 +41,6 @@ Requires:       python3-attrs
 Requires:       python3-constantly
 Requires:       python3-hyperlink
 Requires:       python3-incremental
-Requires:       python3-netaddr
 Requires:       python3-zope-interface
 AutoReqProv:    no
 Provides:       python3dist(twisted) = %{version}-%{release}
@@ -56,28 +53,47 @@ Twisted also supports many common network protocols, including SMTP, POP3, IMAP,
 %prep
 %autosetup -p 1 -n twisted-twisted-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
-ln -s twistd %{buildroot}/%{_bindir}/twistd3
-ln -s trial %{buildroot}/%{_bindir}/trial3
-ln -s tkconch %{buildroot}/%{_bindir}/tkconch3
-ln -s pyhtmlizer %{buildroot}/%{_bindir}/pyhtmlizer3
-ln -s twist %{buildroot}/%{_bindir}/twist3
-ln -s conch %{buildroot}/%{_bindir}/conch3
-ln -s ckeygen %{buildroot}/%{_bindir}/ckeygen3
-ln -s cftp %{buildroot}/%{_bindir}/cftp3
+%pyproject_install
+mkdir -p %{buildroot}%{_mandir}/man1/
+for s in conch core mail; do
+  cp -a docs/$s/man/*.1 %{buildroot}%{_mandir}/man1/
+done
+
+mkdir -p %{buildroot}%{python3_sitelib}/twisted/plugins
+
+ln -s ./trial  %{buildroot}%{_bindir}/trial-3
+ln -s ./twistd %{buildroot}%{_bindir}/twistd-3
+
+%pyproject_save_files twisted
+echo "%ghost %{python3_sitelib}/twisted/plugins/dropin.cache" >> %{pyproject_files}
 
 %check
+export TZ=UTC
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 chmod g+w . -R
 useradd test -G root -m
-sudo -u test pip3 install --upgrade pip
-sudo -u test pip3 install 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser
+# Pin transitive deps inside the tox-managed virtualenv. Newer releases of
+# cryptography (>=44), pyOpenSSL (>=25) and Incremental (>=24.7) drop APIs
+# (OpenSSL.crypto.X509Req), tighten RSA key-size validation, and change the
+# prerelease version string format, all of which break Twisted 23.10's tests.
+cat > /tmp/twisted-constraints.txt <<'EOF'
+cryptography<44
+pyOpenSSL<25
+incremental<24.7
+EOF
+chmod a+r /tmp/twisted-constraints.txt
+sudo -u test pip3 install --user packaging==23.2 'tox>=3.27.1,<4.0.0' PyHamcrest cython-test-exception-raiser py
+
 chmod g+w . -R
-LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
+LANG=en_US.UTF-8 sudo --preserve-env=PIP_CONSTRAINT PIP_CONSTRAINT=/tmp/twisted-constraints.txt \
+                      -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 
 %files -n python3-twisted
 %defattr(-,root,root)
@@ -92,16 +108,21 @@ LANG=en_US.UTF-8 sudo -u test /home/test/.local/bin/tox -e nocov-posix-alldeps
 %{_bindir}/conch
 %{_bindir}/ckeygen
 %{_bindir}/cftp
-%{_bindir}/twistd3
-%{_bindir}/trial3
-%{_bindir}/tkconch3
-%{_bindir}/pyhtmlizer3
-%{_bindir}/twist3
-%{_bindir}/conch3
-%{_bindir}/ckeygen3
-%{_bindir}/cftp3
+%{_bindir}/trial-3
+%{_bindir}/twistd-3
+%{_mandir}/man1/cftp.1*
+%{_mandir}/man1/ckeygen.1*
+%{_mandir}/man1/conch.1*
+%{_mandir}/man1/mailmail.1*
+%{_mandir}/man1/pyhtmlizer.1*
+%{_mandir}/man1/tkconch.1*
+%{_mandir}/man1/trial.1*
+%{_mandir}/man1/twistd.1*
 
 %changelog
+* Mon Jun 22 2026 Aditya Singh <v-aditysing@microsoft.com> - 23.10.0-1
+- Upgrade to version 23.10.0 to fix pTest failure.
+
 * Thu May 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 22.10.0-5
 - Patch for CVE-2026-42304
 

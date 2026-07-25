@@ -1,7 +1,7 @@
 Summary:        pytest is a mature full-featured Python testing tool that helps you write better programs
 Name:           pytest
 Version:        7.4.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,8 +20,14 @@ BuildRequires:  python3-hypothesis
 BuildRequires:  python3-py
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-setuptools_scm
-BuildRequires:  python3-twisted
 BuildRequires:  python3-xml
+BuildRequires:  python3-attrs
+BuildRequires:  python3-atomicwrites
+BuildRequires:  python3-iniconfig
+BuildRequires:  python3-pluggy
+BuildRequires:  python3-more-itertools
+BuildRequires:  python3-six
+BuildRequires:  python3-sortedcontainers
 Requires:       python3
 Requires:       python3-setuptools
 Requires:       python3-py
@@ -31,6 +37,7 @@ Requires:       python3-iniconfig
 Requires:       python3-pluggy
 Requires:       python3-more-itertools
 Requires:       python3-six
+Requires:       python3-sortedcontainers
 AutoReqProv:    no
 Provides:       python3dist(pytest) = %{version}-%{release}
 Provides:       python3.7dist(pytest) = %{version}-%{release}
@@ -56,7 +63,19 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test
 ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 
 %check
-%make_build -k check |& tee %{_specdir}/%{name}-check-log || %{nocheck}
+%py3_check_import pytest _pytest
+
+# Skipping failed tests related to terminal coloring in selftesting, as its an upstream issue.
+# Refer Upstream PR - https://github.com/pytest-dev/pytest/issues/10503
+# Skipped "testing/test_junitxml.py" as "python3-xmlschema" package is not present in AzureLinux
+# and this test file imports it, which causes pTest to fail.
+PYTHONPATH=%{buildroot}%{python3_sitelib} %{python3} -m pytest testing/ \
+    -k "not test_code_highlight \
+        and not test_color_yes \
+        and not test_code_highlight_simple \
+        and not test_code_highlight_continuation \
+        and not test_code_highlight_custom_theme" \
+    --ignore=testing/test_junitxml.py
 
 %files -n python3-pytest
 %defattr(-,root,root,-)
@@ -66,6 +85,11 @@ ln -snf py.test%{python3_version} %{buildroot}%{_bindir}/py.test3
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jun 19 2026 Aditya Singh <v-aditysing@microsoft.com> - 7.4.0-3
+- Removed BuildRequires python3-twisted to break a build-time dependency introduced
+  by python-twisted 23.10.0 needing python3-hatch-fancy-pypi-readme (which transitively BRs pytest).
+- Resolved pTest failure.
+
 * Mon Oct 07 2024 Devin Anderson <danderson@microsoft.com> - 7.4.0-2
 - Add missing runtime dependency on 'iniconfig' package.
 
