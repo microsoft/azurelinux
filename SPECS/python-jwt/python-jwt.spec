@@ -1,7 +1,5 @@
 # This package refers to PyJWT(https://github.com/jpadilla/pyjwt). Not to be confused with python-jwt(https://github.com/davedoesdev/python-jwt)
 # what it's called on pypi
-# Lowercased: PyPI serves the 2.13.0 sdist as pyjwt-2.13.0.tar.gz and the tarball's
-# internal directory is also lowercase (was PyJWT-2.8.0.tar.gz / PyJWT-2.8.0 dir before)
 %global srcname pyjwt
 # what it's imported as
 %global libname jwt
@@ -38,9 +36,7 @@ BuildRequires:  python3-devel >= 3.6
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-cryptography >= 3
 Requires:       python3-cryptography >= 3
-# Added: required by %%check (pip3 install tox) and by pyproject build/install macros
 BuildRequires:  python3-pip
-# Added: %%pyproject_wheel (in %build) needs the `wheel` package's bdist_wheel command
 BuildRequires:  python3-wheel
 %{?python_provide:%python_provide python3-%{pkgname}}
 
@@ -49,24 +45,18 @@ BuildRequires:  python3-wheel
 
 %prep
 %autosetup -n %{srcname}-%{version}
-# python3-setuptools in Azure Linux (69.0.3) predates PEP 639 support (needs setuptools
-# >= 77, per upstream's build-system.requires); rewrite the PEP 639 `license = "MIT"`
-# string to the legacy `license = {text = "MIT"}` table form so metadata validation passes
+# Fix invalid [project].license format under PEP 621 by rewriting the string license 
+# field to legacy table form for older setuptools compatibility.
 sed -i 's/^license = "MIT"$/license = {text = "MIT"}/' pyproject.toml
 
 %generate_buildrequires
 %pyproject_buildrequires
 
 %build
-# Switched from %%py3_build (ran `setup.py build`): the 2.13.0 sdist no longer ships
-# setup.py, only pyproject.toml
 %pyproject_wheel
 
 %install
-# Switched from %%py3_install (ran `setup.py install`) for the same reason as %build
 %pyproject_install
-# Generates the file list consumed by %%files -f %%{pyproject_files} below, avoiding a
-# hardcoded/guessed dist-info directory name
 %pyproject_save_files %{libname}
 
 %check
@@ -74,16 +64,14 @@ pip3 install tox==4.25.0 --ignore-installed
 tox
 
 %if %{with python3}
-# Switched to the macro-generated file list since %%pyproject_install produces a
-# *.dist-info directory (not the egg-info path this used to hardcode)
 %files -n python3-%{pkgname} -f %{pyproject_files}
 %doc README.rst AUTHORS.rst
 %license LICENSE
 %endif
 
 %changelog
-* Fri Jul 24 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
-- Upgrade from 2.8.0 to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
+* Mon Jul 27 2026 BinduSri Adabala <v-badabala@microsoft.com> - 2.13.0-1
+- Upgrade to 2.13.0 to fix CVE-2026-48524, CVE-2026-32597, CVE-2026-48526, CVE-2026-48522 and CVE-2026-48525
 
 * Mon May 05 2025 Riken Maharjan <rmaharjan@microsoft.com> - 2.8.0-2
 - Fixed ptest
