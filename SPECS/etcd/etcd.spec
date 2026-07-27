@@ -42,7 +42,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang >= 1.16
+BuildRequires:  golang >= 1.25.12
 
 %description
 A highly-available key value store for shared configuration and service discovery.
