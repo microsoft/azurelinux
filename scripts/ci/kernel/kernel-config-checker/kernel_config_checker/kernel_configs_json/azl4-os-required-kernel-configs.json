@@ -3025,6 +3025,16 @@
           "justification": "Enable firmware-first hardware error reporting through ACPI APEI GHES on x86_64 - Work item: https://microsoft.visualstudio.com/OS/_workitems/edit/63295066"
         },
         {
+          "name": "CONFIG_USB_NET_RNDIS_HOST",
+          "values": [
+            {
+              "architecture": "x86_64",
+              "value": "m"
+            }
+          ],
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/62487471"
+        },
+        {
           "name": "CONFIG_DRM_ACCEL_IVPU",
           "values": [
             {
