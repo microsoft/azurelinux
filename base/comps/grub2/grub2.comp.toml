@@ -64,3 +64,41 @@ replacement = '''Patch0382: 0382-Set-correctly-the-memory-attributes-for-the-ker
 Patch0383: 0383-Revert-Revert-templates-Disable-the-os-prober-by-default.patch
 Patch0384: 0384-Revert-Revert-templates-Properly-disable-the-os-prober-by-d.patch
 Patch0385: 0385-Revert-Revert-templates-Fix-user-facing-typo-with-an.patch'''
+
+# SBAT: edit the upstream sbat.csv.in in place. Swap grub.rh to the
+# @@UPSTREAM_VERSION_RELEASE@@ placeholder and append the grub.azurelinux vendor line.
+# The placeholder is substituted at build time from an interim spec macro pinned to
+# the Fedora grub2 NEVR; swap that macro for the azldev EVR macro when bug 21798 lands.
+
+[[components.grub2.overlays]]
+description = "SBAT: point the upstream grub.rh line at the upstream-Fedora NEVR placeholder"
+type = "file-search-replace"
+file = "sbat.csv.in"
+regex = 'Red Hat,grub2,@@VERSION_RELEASE@@'
+replacement = 'Red Hat,grub2,@@UPSTREAM_VERSION_RELEASE@@'
+
+[[components.grub2.overlays]]
+description = "SBAT: append the Azure Linux grub vendor entry to the end of sbat.csv.in"
+type = "file-search-replace"
+file = "sbat.csv.in"
+regex = '\n\z'
+replacement = "\ngrub.azurelinux,3,Microsoft,grub2,@@VERSION_RELEASE@@,https://github.com/microsoft/azurelinux/issues\n"
+
+[[components.grub2.overlays]]
+description = "SBAT: define interim upstream-EVR spec macro (pinned Fedora grub2 NEVR); replaced by the azldev EVR macro from bug 21798"
+type = "spec-prepend-lines"
+lines = ["%global upstream_version_release 2.12-40.fc43", ""]
+
+[[components.grub2.overlays]]
+description = "SBAT: substitute @@UPSTREAM_VERSION_RELEASE@@ in generated SBAT templates without masking sed failures"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^sed -e "s,@@VERSION@@,%\{version\},g" -e "s,@@VERSION_RELEASE@@,%\{version\}-%\{release\},g" \\$'
+replacement = 'sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{upstream_version_release},g" \'
+
+[[components.grub2.overlays]]
+description = "SBAT: correct the missing scheme separator in the upstream GNU GRUB URL"
+type = "file-search-replace"
+file = "sbat.csv.in"
+regex = 'https//www.gnu.org/software/grub/'
+replacement = 'https://www.gnu.org/software/grub/'
