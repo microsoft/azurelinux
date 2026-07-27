@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -32,6 +32,7 @@ Patch12:	CVE-2026-47262.patch
 Patch13:	CVE-2026-25680.patch
 Patch14:	CVE-2026-25681.patch
 Patch15:	CVE-2026-42502.patch
+Patch16:	CVE-2026-56852.patch
 
 %{?systemd_requires}
 
@@ -113,6 +114,9 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-6
+- Patch for CVE-2026-56852
+
 * Thu Jul 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-5
 - Remove 'BuildRequires: golang < 1.25' and set GOEXPERIMENT=ms_nocgo_opensslcrypto
   to build with the default Go toolchain, resolving Go stdlib CVE-2026-25679,
