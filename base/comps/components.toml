@@ -1771,7 +1771,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.libisoburn]
 [components.libisofs]
 [components.libjaylink]
-[components.libjcat]
 [components.libjpeg-turbo]
 [components.libkcapi]
 [components.libkdumpfile]
