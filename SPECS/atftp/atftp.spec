@@ -1,7 +1,7 @@
 Summary:        Advanced Trivial File Transfer Protocol (ATFTP) - TFTP server
 Name:           atftp
 Version:        0.8.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 URL:            http://sourceforge.net/projects/atftp
 License:        GPLv2+
 Group:          System Environment/Daemons
@@ -85,14 +85,8 @@ ATFTPD_BIND_ADDRESSES=
 EOF
 
 %check
-# Upstream's test/test.sh is an end-to-end network test that expects an
-# interactive shell, a writable tftpboot dir, the ability to mount a tmpfs
-# ramdisk via sudo, and (optionally) several remote hosts for the multicast
-# and mtftp scenarios. It is not designed to run in a non-interactive build
-# chroot, and the upstream-shipped redhat/atftp.spec.in deliberately ships
-# no %%check stage at all. We follow that precedent here. The build itself
-# still exercises the toolchain via `make` in %%build.
-:
+sed -i 's/^start_server$/chown -R nobody $DIRECTORY\nstart_server/g' test/test.sh || true
+make %{?_smp_mflags} check
 
 %pre
 if [ $1 -eq 1 ] ; then
@@ -133,12 +127,6 @@ fi
 
 
 %changelog
-* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.8.0-2
-- Drop %%check: upstream's test/test.sh is an interactive end-to-end network
-  test (requires sudo+tmpfs, multiple SSH hosts for multicast, etc.) and is
-  not runnable in a non-interactive build chroot. Upstream's own
-  redhat/atftp.spec.in ships no %%check for the same reason.
-
 * Wed Dec 20 2023 Muhammad Falak <mwani@microsoft.com> - 0.8.0-1
 - Bump version to 0.8.0
 
