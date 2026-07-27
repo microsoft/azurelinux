@@ -1,4 +1,12 @@
+# Pin to a specific Fedora dist-git commit for stage1 prod bring-up. Brings
+# samba to 4.23.7 (from 4.23.5) so it matches the newer samba RPMs we build
+# against in that environment. Micro releases within the 4.23 series: the
+# dist-git delta is version + sources only (no spec/packaging changes), and
+# SONAMEs are unchanged.
+# https://src.fedoraproject.org/rpms/samba/c/7f48f560f98a44a98b0562493e21c018aa66a933
 [components.samba]
+spec = { type = "upstream", upstream-commit = "7f48f560f98a44a98b0562493e21c018aa66a933" }
+
 # Release: %{samba_release}
 release = { calculation = "autorelease" }
 
