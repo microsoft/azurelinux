@@ -457,7 +457,7 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
-* Sun Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-3
+* Mon Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-3
 - Make libstoragemgmt-tests-gate-hw-disk-probes.patch unconditional
   so it is included in the SRPM; the patch is test-only and harmless
   when applied unconditionally.

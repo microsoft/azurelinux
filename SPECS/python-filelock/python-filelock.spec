@@ -71,7 +71,7 @@ pip3 install pytest-asyncio
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
-* Sun Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.20.3-3
+* Mon Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.20.3-3
 - Make filelock-tests-isolate-caplog.patch unconditional so it is
   included in the SRPM; the patch is test-only and harmless when
   applied unconditionally.
