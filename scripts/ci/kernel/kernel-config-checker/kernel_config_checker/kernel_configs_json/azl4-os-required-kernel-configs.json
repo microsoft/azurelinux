@@ -3233,9 +3233,9 @@
         {
           "name": "CONFIG_INFINIBAND_BNXT_RE",
           "values": [
-            { "architecture": "x86_64", "value": "n" }
+            { "architecture": "x86_64", "value": "m" }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/63295045"
         },
         {
           "name": "CONFIG_IP_VS_DEBUG",
