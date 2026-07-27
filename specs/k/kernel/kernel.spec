@@ -4578,6 +4578,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Jul 27 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.11
+- feat(kernel): enable ACPI APEI GHES (Generic Hardware Error Source) on x86_64
+
 * Mon Jul 27 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.10
 - feat(kernel): enable Broadcom RoCE driver (bnxt_re) as module on x86_64
 
