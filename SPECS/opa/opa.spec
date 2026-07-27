@@ -5,7 +5,7 @@
 Summary:        Open source, general-purpose policy engine
 Name:           opa
 Version:        0.63.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 # Upstream license specification: MIT and Apache-2.0
 # Main package:    ASL 2.0
 # internal/jwx:    MIT
@@ -24,6 +24,7 @@ Patch2:         CVE-2023-45288.patch
 Patch3:         CVE-2025-46569.patch
 Patch4:         CVE-2025-11065.patch
 Patch5:         CVE-2026-39821.patch
+Patch6:         CVE-2026-56852.patch
 # Warn users about WebAssembly missing
 BuildRequires:  golang
 BuildRequires:  make
@@ -57,6 +58,9 @@ install -D -p -m 0644 man/*             %{buildroot}%{_mandir}/man1/
 %{_bindir}/*
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.63.0-5
+- Patch for CVE-2026-56852
+
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.63.0-4
 - Patch for CVE-2026-39821
 
