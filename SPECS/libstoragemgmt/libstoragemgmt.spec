@@ -1,15 +1,13 @@
 Summary:        Storage array management library
 Name:           libstoragemgmt
 Version:        1.9.8
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/libstorage/libstoragemgmt
 Source0:        https://github.com/libstorage/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
-%if 0%{?with_check}
 Patch0:         libstoragemgmt-tests-gate-hw-disk-probes.patch
-%endif
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -459,6 +457,11 @@ fi
 %{_mandir}/man1/local_lsmplugin.1*
 
 %changelog
+* Sun Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-3
+- Make libstoragemgmt-tests-gate-hw-disk-probes.patch unconditional
+  so it is included in the SRPM; the patch is test-only and harmless
+  when applied unconditionally.
+
 * Sun Jun 21 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.9.8-2
 - Add test-only patch (gated by with_check) to skip /dev/sd*
   hardware probes in test_local_disk_link_type and

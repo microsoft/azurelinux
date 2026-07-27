@@ -2,16 +2,14 @@
 Summary:        A platform independent file lock
 Name:           python-filelock
 Version:        3.20.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Unlicense
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://github.com/toxdev/filelock
 Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         remove-python-3.14-classifier.patch
-%if 0%{?with_check}
 Patch1:         filelock-tests-isolate-caplog.patch
-%endif
 BuildArch:      noarch
 
 %description
@@ -73,6 +71,11 @@ pip3 install pytest-asyncio
 %license %{python3_sitelib}/%{srcname}-%{version}.dist-info/licenses/LICENSE
 
 %changelog
+* Sun Jul 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.20.3-3
+- Make filelock-tests-isolate-caplog.patch unconditional so it is
+  included in the SRPM; the patch is test-only and harmless when
+  applied unconditionally.
+
 * Sat Jun 20 2026 Kshitiz Godara <kgodara@microsoft.com> - 3.20.3-2
 - Add test-only patch (gated by with_check) to clear caplog before
   strict equality assertions; fixes intermittent aarch64 failure of
