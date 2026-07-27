@@ -71,7 +71,6 @@ Patch55:        CVE-2026-54908.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
-
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
@@ -131,6 +130,7 @@ fi
 %{_unitdir}/telegraf.service
 %{_sysconfdir}/logrotate.d/%{name}
 %dir %{_sysconfdir}/%{name}/telegraf.d
+
 %changelog
 * Tue Jul 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-26
 - Patch for CVE-2026-54908
