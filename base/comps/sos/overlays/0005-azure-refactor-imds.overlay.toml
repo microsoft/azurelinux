@@ -1,0 +1,16 @@
+# Backport of upstream sos PR sosreport/sos#4322 (merged as 2ee17f7e): refactor
+# the Azure IMDS collection to use Python urllib with pretty-printed JSON output
+# and bump the IMDS API version to 2025-04-07.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/sosreport/sos/commit/2ee17f7ebc8b09bdc75f017480ff0bcb27aefa9d" },
+    { url = "https://src.fedoraproject.org/rpms/sos/c/2ffb3ee602e2e1edbb06c12d0a98794775a0222f" },
+]
+
+[[overlays]]
+description = "Refactor Azure IMDS collection to use Python urllib with pretty-printed JSON output and bump API version to 2025-04-07 (upstream PR sosreport/sos#4322)"
+type = "patch-add"
+file = "azure-refactor-IMDS-collection-with-pretty-printed-JSON.patch"
+source = "../azure-refactor-IMDS-collection-with-pretty-printed-JSON.patch"

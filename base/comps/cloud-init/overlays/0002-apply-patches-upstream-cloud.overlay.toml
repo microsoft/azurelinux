@@ -1,0 +1,150 @@
+# Apply patches from the upstream cloud-init azl4 PR (downstream Azure Linux
+# enablement series staged as Patch tags and source files).
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [
+    { url = "https://github.com/canonical/cloud-init/commit/e591185d8393bfbff2b09c20b9dad415a68973db" },
+    { url = "https://github.com/canonical/cloud-init/commit/8ae74678152957e23fda2c670d0f7ec29ec2c5a2" },
+    { url = "https://github.com/canonical/cloud-init/commit/314531fa3c760b86138be26bd7ad51cb03a94f42" },
+    { url = "https://github.com/canonical/cloud-init/commit/8771a379e59e9fa576a43952447e4e50322c173d" },
+    { url = "https://github.com/canonical/cloud-init/commit/1fd06a6ef65648aad18309537ff7953e763c27d9" },
+    { url = "https://github.com/canonical/cloud-init/commit/9a8656669ec483ce34bb26b1d2817c96bee261ae" },
+    { url = "https://github.com/canonical/cloud-init/commit/fe50391f2eebcc1e31b0b58035d181baf0f319bc" },
+    { url = "https://github.com/canonical/cloud-init/commit/1c634786941717902342e61899c5684bc8360c6e" },
+    { url = "https://github.com/canonical/cloud-init/commit/24bd380d48efc4944ddb0cbd35db089fef36bcaf" },
+    { url = "https://github.com/canonical/cloud-init/commit/81001c5b2f64938288b78db99860500a35f432ea" },
+    { url = "https://github.com/canonical/cloud-init/commit/f2d5f5e7fd1f33e4c105257b97d003b7356ab4a3" },
+]
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+file = "0001-fix-azurelinux-remove-some-config-excluded-only-from.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+file = "0002-fix-azurelinux-remove-custom-azurelinux-group-config.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+file = "0003-fix-azurelinux-set-azurelinux-default-username-to-az.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+file = "0004-fix-azurelinux-include-azurelinux-in-distro-group-wi.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+file = "0005-fix-azurelinux-Set-specific-list-of-network-renderer.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+file = "0006-fix-azurelinux-use-libexec-path-for-ds-identify-6874.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+file = "0007-fix-azurelinux-remove-overridden-package_command-met.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+file = "0008-fix-azurelinux-remove-use_lib_exec-property-override.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+file = "0009-fix-azurelinux-update-systemd-cloud-init-.service-te.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+file = "0010-fix-azurelinux-update-hosts.azurelinux.tmpl-6874.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "spec-add-tag"
+tag = "Patch"
+value = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
+
+[[overlays]]
+description = "Apply patches from upstream cloud-init azl4 pr"
+type = "file-add"
+source = "../0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"
+file = "0011-fix-azurelinux-update-test_util-with-Azure-Linux-4-o.patch"

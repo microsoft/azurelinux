@@ -1,0 +1,17 @@
+# Set the cloud-init distro/variant to azurelinux.
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Set distro to azurelinux"
+type = "spec-search-replace"
+section = "%install"
+regex = '%py3_install -- --init-system=systemd'
+replacement = '%py3_install -- --init-system=systemd --distro=azurelinux'
+
+[[overlays]]
+description = "Set variant to azurelinux"
+type = "spec-search-replace"
+regex = 'python3 tools/render-template --variant %{\?rhel:rhel}%{!\?rhel:fedora}'
+replacement = "python3 tools/render-template --variant azurelinux"

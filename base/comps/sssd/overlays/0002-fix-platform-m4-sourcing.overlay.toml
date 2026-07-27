@@ -1,0 +1,14 @@
+# Backport of upstream SSSD PR sssd/sssd#8397 (merged as 308af8f2): fix
+# platform.m4 sourcing /etc/os-release overwriting the VERSION shell variable.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/SSSD/sssd/commit/308af8f215eea347a32d068e658d99bb1bfb2ba9" },
+    { url = "https://src.fedoraproject.org/rpms/sssd/c/b376dd54d9687134711770dc03d20a83ee0b6f16?branch=f44" },
+]
+
+[[overlays]]
+description = "Fix platform.m4 sourcing /etc/os-release overwriting VERSION shell variable, which breaks @VERSION@ substitutions in .in files"
+type = "patch-add"
+source = "../fix-platform-m4-version-overwrite.patch"

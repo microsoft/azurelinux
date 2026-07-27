@@ -1,5 +1,14 @@
 includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-check-disablement.toml", "component-mingw-disablement.toml", "components-publish-channels.toml"]
 
+# Project-wide default: every component automatically discovers per-file overlay
+# documents under its own `overlays/` directory. The glob is resolved relative
+# to each concrete component's config file, so components without an `overlays/`
+# directory simply match nothing (non-matching globs are ignored). This lets
+# components keep their overlays as one-logical-change-per-file `*.overlay.toml`
+# documents without repeating `overlay-files` in every comp.toml.
+# See https://github.com/microsoft/azure-linux-dev-tools/blob/main/docs/user/reference/config/overlays.md#per-file-overlay-format
+[default-component-config]
+overlay-files = ["overlays/*.overlay.toml"]
 #
 # Components imported from Fedora with no per-component modifications.
 # Please keep this list sorted alphabetically for readability.

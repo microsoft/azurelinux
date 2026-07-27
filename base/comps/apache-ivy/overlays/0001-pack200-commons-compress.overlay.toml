@@ -1,0 +1,43 @@
+# Use Apache Commons Compress for pack200 support: stage two downstream patches
+# (Source4/Source5), wire them into %prep, and dos2unix the touched files.
+# Backport of upstream Apache Ivy commit d772841 (IVY-1652).
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/apache/ant-ivy/commit/d77284167b6695903b80c72afed57469ffab5cc3" }]
+
+[[overlays]]
+description = "Stage the Apache Commons Compress pack200 backport patch (downstream Source4)"
+type = "file-add"
+file = "IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch"
+source = "../IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch"
+
+[[overlays]]
+description = "Register the Commons Compress pack200 patch as Source4"
+type = "spec-add-tag"
+tag = "Source4"
+value = "IMPROVEMENT-use-Apache-Commons-Compress-for-pack200-.patch"
+
+[[overlays]]
+description = "Stage the Pack200Packing.java removal patch (downstream Source5)"
+type = "file-add"
+file = "remove-Pack200Packing-java.patch"
+source = "../remove-Pack200Packing-java.patch"
+
+[[overlays]]
+description = "Register the Pack200Packing.java removal patch as Source5"
+type = "spec-add-tag"
+tag = "Source5"
+value = "remove-Pack200Packing-java.patch"
+
+[[overlays]]
+description = "Extend the dos2unix invocation to cover every file touched by the pack200 backport"
+type = "spec-search-replace"
+regex = "dos2unix src/java/org/apache/ivy/ant/IvyAntSettings.java"
+replacement = "dos2unix src/java/org/apache/ivy/ant/IvyAntSettings.java asciidoc/release-notes.adoc ivy.xml optional.patterns src/java/org/apache/ivy/core/pack/PackagingManager.java src/java/org/apache/ivy/core/pack/PackingRegistry.java src/java/org/apache/ivy/core/settings/IvySettings.java src/java/org/apache/ivy/core/pack/ArchivePacking.java src/java/org/apache/ivy/core/pack/OsgiBundlePacking.java src/java/org/apache/ivy/core/pack/Pack200Packing.java src/java/org/apache/ivy/core/pack/StreamPacking.java src/java/org/apache/ivy/core/pack/ZipPacking.java src/java/org/apache/ivy/util/FileUtil.java test/java/org/apache/ivy/core/retrieve/RetrieveTest.java test/java/org/apache/ivy/core/pack/ZipPackingTest.java version.properties"
+
+[[overlays]]
+description = "Apply the staged Source4/Source5 patches in %prep alongside the existing Source3 patch"
+type = "spec-search-replace"
+regex = "patch -p1 -l < %{SOURCE3}"
+replacement = "patch -p1 -l < %{SOURCE3}\npatch -p1 -l < %{SOURCE4}\npatch -p1 -l < %{SOURCE5}"

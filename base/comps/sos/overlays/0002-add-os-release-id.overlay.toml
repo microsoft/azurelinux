@@ -1,0 +1,15 @@
+# Microsoft-authored sos Policy fix so os_release_id matches the os-release
+# ID field on Azure Linux. Upstreamed as sosreport/sos commit fcc6a5f4.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/sosreport/sos/commit/fcc6a5f498bc1e7edf7c2f2acf0f506ced0f21dc" },
+    { url = "https://src.fedoraproject.org/rpms/sos/c/2ffb3ee602e2e1edbb06c12d0a98794775a0222f" },
+]
+
+[[overlays]]
+description = "Add os_release_id value to match os-release ID"
+type = "patch-add"
+file = "Policy-Add-os_release_id-check.patch"
+source = "../Policy-Add-os_release_id-check.patch"
