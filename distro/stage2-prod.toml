@@ -1,0 +1,6 @@
+# This config file is not included by default in the containing project, but may
+# be explicitly added to force selection of 4.0-stage2-prod as the default distro
+# version to build.
+
+[distros.azurelinux]
+default-version = "4.0-stage2-prod"
