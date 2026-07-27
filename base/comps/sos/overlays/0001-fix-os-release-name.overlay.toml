@@ -1,0 +1,15 @@
+# Microsoft-authored sos Policy fix so os_release_name matches the os-release
+# NAME field on Azure Linux. Upstreamed as sosreport/sos commit 48c34be5.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/sosreport/sos/commit/48c34be5c676408a48aab663ac3497a5cdb27f61" },
+    { url = "https://src.fedoraproject.org/rpms/sos/c/90adfb5f51aa12f4acd59d3267d4ffe904ba0457" },
+]
+
+[[overlays]]
+description = "Fix os_release_name value to match os-release NAME"
+type = "patch-add"
+file = "Policy-Fix-os_release_name-value.patch"
+source = "../Policy-Fix-os_release_name-value.patch"

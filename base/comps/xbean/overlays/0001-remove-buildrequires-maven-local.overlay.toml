@@ -1,0 +1,20 @@
+# AZL ships only java-25-openjdk; there is no java-21-openjdk, so the
+# upstream BuildRequires on maven-local-openjdk21 is unsatisfiable.
+# Retarget to the openjdk25 variant. This is the openjdk21 -> openjdk25
+# portion of Fedora rawhide commit 1df289d.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/xbean/c/1df289d87c3617482e813a5dac348b01c67d271f" }]
+
+[[overlays]]
+description = "Remove BuildRequires on maven-local-openjdk21 — AZL does not ship java-21-openjdk"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "maven-local-openjdk21"
+
+[[overlays]]
+description = "Add BuildRequires on maven-local-openjdk25 in place of maven-local-openjdk21"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "maven-local-openjdk25"

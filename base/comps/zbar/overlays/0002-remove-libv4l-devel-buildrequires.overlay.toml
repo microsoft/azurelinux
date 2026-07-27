@@ -1,0 +1,17 @@
+# v4l-utils/libv4l not shipped in AZL — disable video capture support.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[overlays]]
+description = "Disable video capture support — libv4l not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = '%configure '
+replacement = '%configure --without-video '

@@ -1,0 +1,25 @@
+# AZL ships only java-25-openjdk; there is no java-21-openjdk, so the
+# upstream references to ant-openjdk21 and java-21-openjdk are
+# unsatisfiable. Retarget to the openjdk25 variant.
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Remove BuildRequires on ant-openjdk21 — AZL does not ship java-21-openjdk"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "ant-openjdk21"
+
+[[overlays]]
+description = "Add BuildRequires on ant-openjdk25 in place of ant-openjdk21"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "ant-openjdk25"
+
+[[overlays]]
+description = "Retarget JAVA_HOME from java-21-openjdk to java-25-openjdk in %build"
+type = "spec-search-replace"
+section = "%build"
+regex = "java-21-openjdk"
+replacement = "java-25-openjdk"

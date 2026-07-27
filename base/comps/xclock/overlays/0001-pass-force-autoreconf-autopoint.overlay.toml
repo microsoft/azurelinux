@@ -1,0 +1,12 @@
+# Upstream fix: https://src.fedoraproject.org/rpms/xclock/c/1e407488967006428f14fa87fe0cd63e6cf77ce0
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/xclock/c/1e407488967006428f14fa87fe0cd63e6cf77ce0" }]
+
+[[overlays]]
+description = "Pass --force to autoreconf so autopoint overwrites the locally modified config.rpath. Fixed upstream in Fedora rawhide (xclock-1.1.1-11)."
+type = "spec-search-replace"
+section = "%build"
+regex = 'autoreconf -v --install'
+replacement = 'autoreconf -v --install --force'

@@ -1,0 +1,12 @@
+# Backport from Fedora rawhide commit 478c15c.
+# Required by meson's gnome.generate_gir; missing from f43 spec.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/glade/c/478c15c" }]
+
+[[overlays]]
+description = "Add missing BuildRequires for gobject-introspection-devel needed by meson gnome.generate_gir"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "gobject-introspection-devel"

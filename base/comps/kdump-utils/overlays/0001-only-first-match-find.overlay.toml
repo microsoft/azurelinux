@@ -1,0 +1,11 @@
+# Upstream (currently unmerged) PR: https://github.com/rhkdump/kdump-utils/pull/153
+# The commit below is the PR's head commit (not yet merged upstream).
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamable"
+commits = [{ url = "https://github.com/rhkdump/kdump-utils/commit/c999bac950b817d229549d57f592980f4dc1655b" }]
+
+[[overlays]]
+description = "Use only first match in _find_kernel_path_by_release()"
+type = "patch-add"
+source = "../kdumpctl-Use-only-first-match-in-_find_kernel_path_b.patch"
