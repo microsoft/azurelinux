@@ -47,7 +47,11 @@ Patch25:        CVE-2026-25681.patch
 Patch26:        CVE-2026-39827.patch
 Patch27:        CVE-2026-39835.patch
 Patch28:        CVE-2026-42502.patch
+<<<<<<< HEAD
 Patch29:        CVE-2024-7598.patch
+=======
+Patch29:        CVE-2026-56852.patch
+>>>>>>> 305872251c ([AutoPR- Security] Patch kubernetes for CVE-2026-56852 [HIGH] (#18165))
 
 BuildRequires:  flex-devel
 BuildRequires:  glibc-static >= 2.38-20%{?dist}
@@ -300,8 +304,13 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
+<<<<<<< HEAD
 * Sun Jun 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-26
 - Patch for CVE-2024-7598
+=======
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-26
+- Patch for CVE-2026-56852
+>>>>>>> 305872251c ([AutoPR- Security] Patch kubernetes for CVE-2026-56852 [HIGH] (#18165))
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-25
 - Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
