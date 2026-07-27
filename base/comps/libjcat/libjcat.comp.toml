@@ -1,0 +1,17 @@
+[components.libjcat]
+
+# libjcat's %check aborts in the AZL4 stage-1 (Fedora 43) buildroot on the
+# pkcs7-self-signed-pq-gnutls self-test. The snapshot we build (0.2.5) has no
+# runtime skip for post-quantum signing: it calls jcat_engine_self_sign() with
+# JCAT_SIGN_FLAG_USE_PQ and then unconditionally g_assert_no_error(). When
+# ML-DSA-87 cannot be enabled at runtime in this buildroot, self-sign returns an
+# error and the assertion aborts %check. (0.2.6 later added a runtime skip via
+# g_test_skip(), but it only matches G_IO_ERROR_NOT_SUPPORTED, so it can still
+# fail if GnuTLS surfaces the unavailability as a different error.)
+# Temporarily skip %check to unblock building until ML-DSA-87 works at runtime
+# in the stage-1 crypto stack (or upstream skips PQ whenever it is unavailable).
+# Upstream: https://github.com/hughsie/libjcat/issues/195 (and #199)
+# TODO(AB#22607): Re-enable %check once ML-DSA-87 works at runtime in the
+# stage-1 buildroot, or upstream libjcat skips PQ when it is unavailable.
+[components.libjcat.build]
+check = { skip = true, skip_reason = "pkcs7-self-signed-pq self-test aborts on AZL4 stage-1 (Fedora 43): the snapshot we build (0.2.5) unconditionally asserts that post-quantum (ML-DSA-87) self-signing succeeds, but ML-DSA-87 cannot be enabled at runtime in this buildroot, so %check fails. (0.2.6 adds a runtime skip but it only matches G_IO_ERROR_NOT_SUPPORTED.) Tracked in AB#22607; re-enable once ML-DSA-87 works at runtime or upstream (hughsie/libjcat#195) skips PQ when unavailable." }
