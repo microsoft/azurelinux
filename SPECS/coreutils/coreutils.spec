@@ -1,7 +1,7 @@
 Summary:        Basic system utilities
 Name:           coreutils
-Version:        9.4
-Release:        6%{?dist}
+Version:        9.8
+Release:        1%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -10,9 +10,8 @@ URL:            https://www.gnu.org/software/coreutils
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 # make this package to own serial console profile since it utilizes stty tool
 Source1:        serial-console.sh
-Patch0:         coreutils-9.4-i18n-1.patch
+Patch0:         coreutils-9.8-i18n.patch
 Patch1:         coreutils-9.4-uname-1.patch
-Patch2:         CVE-2024-0684.patch
 BuildRequires:  libacl-devel
 BuildRequires:  libattr-devel
 BuildRequires:  libselinux-devel
@@ -41,7 +40,7 @@ These are the additional language files of coreutils.
 %autosetup -p1
 
 %build
-autoreconf -fi
+AUTOPOINT=true autoreconf -fi
 export FORCE_UNSAFE_CONFIGURE=1 &&  ./configure \
     --prefix=%{_prefix} \
     --enable-install-program=arch \
@@ -92,6 +91,13 @@ LANGUAGE=en_US.UTF-8 LC_ALL=en_US.UTF-8 make -k check
 %defattr(-,root,root)
 
 %changelog
+* Mon Jul 27 2026 Akhila Guruju <v-guakhila@microsoft.com> - 9.8-1
+- Upgrade to 9.8 to address CVE-2025-5278
+- Rebase i18n multibyte patch to 9.8 (coreutils-9.8-i18n.patch)
+- Drop CVE-2024-0684.patch; fixed upstream in 9.5
+- Skip autopoint during autoreconf (AUTOPOINT=true) to prevent stale
+  gettext-0.19 m4 macros from overwriting bundled gnulib macros
+
 * Thu Aug 8 2024 Chris Gunn <chrisgun@microsoft.com> - 9.4-6
 - Enable xattr and acl support.
 
