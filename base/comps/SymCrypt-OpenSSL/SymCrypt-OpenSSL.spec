@@ -9,6 +9,10 @@ Group:          System/Libraries
 URL:            https://github.com/microsoft/SymCrypt-OpenSSL
 Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
+# Azure Linux: designate SymCrypt as the FIPS provider for openssl's
+# config-driven kernel-FIPS activation (adds [azl_fips_provider] to the drop-in).
+Patch0001:      0001-Designate-SymCrypt-as-the-Azure-Linux-FIPS-provider.patch
+
 BuildRequires:  openssl-devel >= 3.5.0
 BuildRequires:  openssl-devel-engine >= 3.5.0
 BuildRequires:  SymCrypt >= 103.12.0
@@ -19,6 +23,11 @@ BuildRequires:  make
 
 Requires:       SymCrypt >= 103.12.0
 Requires:       openssl-libs
+# Azure Linux: satisfy openssl's FIPS-provider virtual capability so this
+# package can serve as the designated FIPS provider, and ensure at most one
+# designated provider is installed by conflicting with openssl-fips-provider.
+Provides:       openssl(fips-provider)
+Conflicts:      openssl-fips-provider
 
 %description
 The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt as the provider for core cryptographic operations

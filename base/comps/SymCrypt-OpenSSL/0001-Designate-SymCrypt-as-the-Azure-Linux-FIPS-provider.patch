@@ -1,0 +1,42 @@
+From bda87b9b5901f4d75ed2d356b64ae5e1e2ea2805 Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Wed, 22 Jul 2026 16:02:12 +0000
+Subject: [PATCH] Designate SymCrypt as the Azure Linux FIPS provider
+
+Azure Linux's openssl reads an [azl_fips_provider] section from the ambient
+config (merged across all installed provider drop-ins) to select which provider
+to activate when the kernel is in FIPS mode. Add that section to the SymCrypt
+provider drop-in so SymCrypt is designated as the FIPS provider.
+
+The key is the provider name (matching [provider_sect] above); the fixed value
+"azl-fips-module" marks the entry as the FIPS designation. The property-query
+mode is "preferred" (default query "?fips=yes": FIPS preferred with fallback
+to a non-FIPS implementation) rather than "enforcing" ("fips=yes").
+
+Exactly one FIPS provider may be designated across all installed provider
+drop-ins, so a system that designates SymCrypt must not also ship another
+designated FIPS provider drop-in (e.g. openssl-fips-provider).
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+---
+ SymCryptProvider/symcrypt_prov.cnf | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/SymCryptProvider/symcrypt_prov.cnf b/SymCryptProvider/symcrypt_prov.cnf
+index 6cebccc..5039287 100644
+--- a/SymCryptProvider/symcrypt_prov.cnf
++++ b/SymCryptProvider/symcrypt_prov.cnf
+@@ -15,4 +15,8 @@ keysinuse = keysinuse_sect
+ [keysinuse_sect]
+ enabled = 0
+ max_file_size = 5KB
+-logging_delay_seconds = 3600
+\ No newline at end of file
++logging_delay_seconds = 3600
++
++[azl_fips_provider]
++symcryptprovider = azl-fips-module
++azl_fips_prop_query_mode = preferred
+-- 
+2.52.0
+
