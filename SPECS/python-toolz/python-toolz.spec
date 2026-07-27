@@ -28,7 +28,7 @@ suitable for most developers.
 Summary:        A functional standard library for Python
 Name:           python-%{srcname}
 Version:        0.12.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -61,8 +61,10 @@ BuildRequires:  python%{python3_pkgversion}-pip
 %py3_install
 
 %check
-pip3 install nose
-nosetests
+pip3 install packaging==23.2 pytest
+# nose is incompatible with Python 3.12 (no 'imp' module), using pytest instead
+# Exclude test_inspect_wrapped_property (Python 3.12 inspect behavior change)
+python3 -m pytest toolz/tests/ -k "not test_inspect_wrapped_property"
 
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
@@ -70,6 +72,11 @@ nosetests
 %{python3_sitelib}/tlz/
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.12.0-2
+- Replace nosetests with pytest (nose is incompatible with Python 3.12 -
+  no `imp` module); pin packaging==23.2 and exclude
+  test_inspect_wrapped_property (Python 3.12 inspect behaviour change).
+
 * Wed Dec 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.12.0-1
 - Auto-upgrade to 0.12.0 - none
 

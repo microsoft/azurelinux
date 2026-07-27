@@ -1,0 +1,54 @@
+From: Kshitiz Godara <kgodara@microsoft.com>
+Date: Sat, 20 Jun 2026 00:00:00 +0000
+Subject: [PATCH] tests: clear caplog before strict equality assertions
+
+The three tests that compare caplog.messages / caplog.records by strict
+equality assume an empty capture buffer when the test starts. That
+assumption is broken when an earlier async test leaves an unawaited
+BaseAsyncFileLock.release() Task on the event loop: CPython later
+garbage-collects the orphan task and asyncio emits an ERROR log via
+the "asyncio" logger ("Task was destroyed but it is pending!"). That
+record lands in caplog of the next test that calls set_level, and the
+strict equality assertion fails non-deterministically (most visibly on
+aarch64, where allocator/GC timing tends to fire the cycle collector
+at a different test boundary than on x86_64).
+
+Call caplog.clear() right after caplog.set_level() so each test only
+asserts on log records it produced itself. Pure test-side fix; no
+behavioral change to filelock.
+
+---
+ tests/test_async_filelock.py | 2 ++
+ tests/test_filelock.py       | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/tests/test_async_filelock.py b/tests/test_async_filelock.py
+--- a/tests/test_async_filelock.py
++++ b/tests/test_async_filelock.py
+@@ -20,6 +20,7 @@
+     caplog: pytest.LogCaptureFixture,
+ ) -> None:
+     caplog.set_level(logging.DEBUG)
++    caplog.clear()
+
+     # test lock creation by passing a `str`
+     lock_path = tmp_path / filename
+@@ -52,6 +53,7 @@
+     caplog: pytest.LogCaptureFixture,
+ ) -> None:
+     caplog.set_level(logging.DEBUG)
++    caplog.clear()
+
+     # test lock creation by passing a `str`
+     lock_path = tmp_path / filename
+diff --git a/tests/test_filelock.py b/tests/test_filelock.py
+--- a/tests/test_filelock.py
++++ b/tests/test_filelock.py
+@@ -37,6 +37,7 @@
+     caplog: pytest.LogCaptureFixture,
+ ) -> None:
+     caplog.set_level(logging.DEBUG)
++    caplog.clear()
+
+     # test lock creation by passing a `str`
+     lock_path = tmp_path / filename
