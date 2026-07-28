@@ -1,0 +1,2 @@
+[components.qt6-qtvirtualkeyboard]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "5eedb10e98149d1ff94c10ea59ef85ef7f4fca77" }

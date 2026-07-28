@@ -1,0 +1,2 @@
+[components.python-pyqt6]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ee8f2814d4f1e4293ac4ce5f234bacee34324b4e" }

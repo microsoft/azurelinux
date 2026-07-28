@@ -1,4 +1,5 @@
 [components.qt6-qthttpserver]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e127c8dc7dec5d9c1a660283121f07886e44e864" }
 
 # Relax the exact BuildRequires pin on qt6-qtbase-private-devel from `= %{version}`
 # to `>= %{version}`.

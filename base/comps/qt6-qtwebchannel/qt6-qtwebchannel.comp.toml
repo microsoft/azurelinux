@@ -1,0 +1,2 @@
+[components.qt6-qtwebchannel]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "22d4f3eaabfd256c5a66deb661a90b3ab8e7bb7f" }

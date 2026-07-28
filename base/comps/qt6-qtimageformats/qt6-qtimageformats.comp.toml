@@ -1,0 +1,2 @@
+[components.qt6-qtimageformats]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3a242a49e3e1ce01388cf632499ded60fa8032df" }

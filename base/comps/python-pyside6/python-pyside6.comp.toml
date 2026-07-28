@@ -1,4 +1,5 @@
 [components.python-pyside6]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e7532b972758ba041266a2b21fabf357e90dff56" }
 
 # The spec hardcodes "redhat-linux-build" in %build and %install, assuming the CMake build
 # directory follows Fedora's naming (%{_vendor}=redhat). On AZL, _vendor=azurelinux so the

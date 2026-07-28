@@ -1,4 +1,5 @@
 [components.qt6]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ce3f55f58989d6c1baec29fcdb9c6a6c6d0a6cbb" }
 
 # Override the qt6_qtwebengine_arches macro to a non-existent architecture so
 # that dependent packages (gpsbabel, libksysguard, python-pyside6, python-pyqt6,

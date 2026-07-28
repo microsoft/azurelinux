@@ -1,0 +1,2 @@
+[components.qt6-qtremoteobjects]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "600d49e4c706c3a867477de4b2ddc7e829861465" }

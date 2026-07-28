@@ -1,0 +1,2 @@
+[components.qt6-qtnetworkauth]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3af7d3e81f017cdb17baab26d1d6977b33076848" }

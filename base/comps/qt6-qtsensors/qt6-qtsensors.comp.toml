@@ -1,0 +1,2 @@
+[components.qt6-qtsensors]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bc06b8031a6007346719a6ba1567f5ae3597618b" }

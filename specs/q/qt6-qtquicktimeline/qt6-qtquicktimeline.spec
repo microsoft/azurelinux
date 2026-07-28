@@ -11,8 +11,8 @@
 
 Summary: Qt6 - QuickTimeline plugin
 Name:    qt6-%{qt_module}
-Version: 6.10.2
-Release: 2%{?dist}
+Version: 6.10.3
+Release: 3%{?dist}
 
 License: GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
@@ -95,6 +95,9 @@ Requires: qt6-qtdeclarative-devel%{?_isa}
 %{_qt6_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Mar 31 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.3-1
+- 6.10.3
+
 * Mon Feb 09 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.2-1
 - 6.10.2
 

@@ -1,0 +1,2 @@
+[components.qt6-qtwebsockets]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ed2f723d88dcc8413bdb56531cfa7da246598844" }

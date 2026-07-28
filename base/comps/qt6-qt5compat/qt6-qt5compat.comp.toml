@@ -1,0 +1,2 @@
+[components.qt6-qt5compat]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a2aadd1ff3f7586f2091c6b21480bb6835de051b" }

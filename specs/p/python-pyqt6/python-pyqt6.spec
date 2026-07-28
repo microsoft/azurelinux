@@ -9,12 +9,17 @@
 
 Summary: PyQt6 is Python bindings for Qt6
 Name:    python-pyqt6
-Version: 6.10.2
+Version: 6.11.0
 Release: 5%{?dist}
 License: gpl-3.0-only
 Url:     http://www.riverbankcomputing.com/software/pyqt/
 Source0: https://pypi.python.org/packages/source/P/PyQt6/pyqt6-%{version}%{?snap:.%{snap}}.tar.gz
 Source1: macros.pyqt6
+
+# Compatibility with Python 3.15
+# brings back PyWeakref_GetObject which was removed in Python 3.15
+# but is still part of the stable ABI.
+Patch:   py315.patch
 
 BuildRequires: make
 BuildRequires: chrpath
@@ -241,6 +246,12 @@ sed -i \
 
 
 %changelog
+* Thu Apr 02 2026 Jan Grulich <jgrulich@redhat.com> - 6.11.0-2
+- Rebuild (qt6)
+
+* Thu Apr 02 2026 Sandro Mani <manisandro@gmail.com> - 6.11.0-1
+- Update to 6.11.0
+
 * Tue Feb 10 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.2-3
 - Rebuild (qt6)
 
