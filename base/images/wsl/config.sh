@@ -24,5 +24,7 @@ systemctl mask \
     systemd-vconsole-setup.service \
     getty@tty1.service \
     tmp.mount \
+    systemd-tmpfiles-clean.service \
+    systemd-tmpfiles-clean.timer
     systemd-tmpfiles-setup-dev.service \
     systemd-tmpfiles-setup-dev-early.service
