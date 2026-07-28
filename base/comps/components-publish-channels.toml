@@ -2733,8 +2733,6 @@ packages = [
     # Qt5 binding for poppler; pulls full Qt5 stack.
     "poppler-qt5", # srpm: poppler
     "poppler-qt5-devel", # srpm: poppler
-    # wxWidgets-based 'Observer' GUI; pulls full wxGTK stack.
-    "erlang-wx", # srpm: erlang
     # KDE/Plasma wallet integration; pulls kf5-kcoreaddons, kf5-ki18n, kf5-kwallet.
     "subversion-kde", # srpm: subversion
     # Fedora installer GUI / live-ISO / install-image / widget-glade-devel sub-packages; pull GUI desktop stack (nm-connection-editor, gnome-kiosk, blivet-gui, glade, zenity, anaconda-webui).
