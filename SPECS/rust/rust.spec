@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,6 +60,7 @@ Patch15:        CVE-2026-34743.patch
 Patch16:        CVE-2026-5222.patch
 Patch17:        CVE-2026-5223.patch
 Patch18:        CVE-2026-40034.patch
+Patch19:        CVE-2026-47143.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -198,6 +199,9 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Tue Jul 28 2026 SumitJenaHCL <v-sumitjena@microsoft.com> - 1.90.0-10
+- Patch for CVE-2026-47143
+
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
 
@@ -223,11 +227,11 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-2
 - Bump to rebuild with updated glibc
 
-* Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
-- Upgrade to 1.90.0
-
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
 - Bump to rebuild with updated glibc
+
+* Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
+- Upgrade to 1.90.0
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
 - Bump to rebuild with updated glibc
