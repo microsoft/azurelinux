@@ -1,0 +1,10 @@
+[components.fido-device-onboard]
+
+[[components.fido-device-onboard.overlays]]
+description = "Pin libcryptsetup-rs to 0.13.2 because FDO 0.5.5 uses the pre-0.14 CryptParamsReencrypt API"
+type = "patch-add"
+source = "pin-libcryptsetup-rs-0.13.2.patch"
+
+[components.fido-device-onboard.overlays.metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
