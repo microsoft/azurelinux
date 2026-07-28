@@ -1,0 +1,110 @@
+From: Saul Paredes <saulparedes@microsoft.com>
+Subject: [PATCH] wrap x86 CPUID intrinsics in unsafe blocks for Rust <= 1.93
+
+The x86 CPUID intrinsics (__cpuid, __cpuid_count, __get_cpuid_max) are
+declared as `unsafe fn` on Rust toolchains up to and including 1.93, so
+calling them without an `unsafe` block fails to compile with E0133 on
+Azure Linux's Rust 1.90:
+
+    error[E0133]: call to unsafe function `__cpuid` is unsafe and requires
+    unsafe function or block
+
+Wrap the affected call sites in `src/dragonball/dbs_arch` (dbs-arch) and
+`src/libs/kata-sys-util` (kata-sys-util) in `unsafe {}` blocks. The
+#[allow(unused_unsafe)] attributes keep the build clean under
+`--deny warnings` on newer toolchains where the intrinsics are already safe.
+
+NOTE: This patch is only needed up to Rust 1.93. The x86 CPUID intrinsics
+were made safe `fn`s in Rust 1.94, so this patch can be removed once the
+Azure Linux Rust toolchain is updated to Rust 1.94 or newer.
+
+Signed-off-by: Saul Paredes <saulparedes@microsoft.com>
+---
+diff --git a/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs b/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
+index 5dd04ffd6c..036f1bcb4b 100644
+--- a/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
++++ b/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
+@@ -101,9 +101,10 @@ impl BrandString {
+ 
+     /// Creates a brand string, initialized from the CPUID leaves 0x80000002 through 0x80000004
+     /// of the host CPU.
++    #[allow(unused_unsafe)]
+     fn from_host_cpuid() -> Result<Self, Error> {
+         let mut this = Self::new();
+-        let mut cpuid_regs = host_cpuid(0x8000_0000);
++        let mut cpuid_regs = unsafe { host_cpuid(0x8000_0000) };
+ 
+         if cpuid_regs.eax < 0x8000_0004 {
+             // Brand string not supported by the host CPU
+@@ -111,7 +112,7 @@ impl BrandString {
+         }
+ 
+         for leaf in 0x8000_0002..=0x8000_0004 {
+-            cpuid_regs = host_cpuid(leaf);
++            cpuid_regs = unsafe { host_cpuid(leaf) };
+             this.set_reg_for_leaf(leaf, Reg::Eax, cpuid_regs.eax);
+             this.set_reg_for_leaf(leaf, Reg::Ebx, cpuid_regs.ebx);
+             this.set_reg_for_leaf(leaf, Reg::Ecx, cpuid_regs.ecx);
+diff --git a/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs b/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
+index 26e129cc5d..f220e1952f 100644
+--- a/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
++++ b/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
+@@ -16,6 +16,7 @@ pub enum Error {
+ }
+ 
+ /// Get CPUID value for (`function`, `count`).
++#[allow(unused_unsafe)]
+ pub fn get_cpuid(function: u32, count: u32) -> Result<CpuidResult, Error> {
+     #[cfg(target_env = "sgx")]
+     {
+@@ -25,7 +26,7 @@ pub fn get_cpuid(function: u32, count: u32) -> Result<CpuidResult, Error> {
+     // TODO: replace with validation based on `has_cpuid()` when it becomes stable:
+     //  https://doc.rust-lang.org/core/arch/x86/fn.has_cpuid.html
+     // this is safe because the host supports the `cpuid` instruction
+-    let max_function = __get_cpuid_max(function & leaf_0x80000000::LEAF_NUM).0;
++    let max_function = unsafe { __get_cpuid_max(function & leaf_0x80000000::LEAF_NUM).0 };
+     if function > max_function {
+         return Err(Error::InvalidParameters(format!(
+             "Function not supported: 0x{function:x}",
+@@ -33,7 +34,7 @@ pub fn get_cpuid(function: u32, count: u32) -> Result<CpuidResult, Error> {
+     }
+ 
+     // this is safe because the host supports the `cpuid` instruction
+-    let entry = __cpuid_count(function, count);
++    let entry = unsafe { __cpuid_count(function, count) };
+     if entry.eax == 0 && entry.ebx == 0 && entry.ecx == 0 && entry.edx == 0 {
+         return Err(Error::InvalidParameters(format!("Invalid count: {count}")));
+     }
+diff --git a/src/libs/kata-sys-util/src/protection.rs b/src/libs/kata-sys-util/src/protection.rs
+index 38a38009a5..aceb7b79c1 100644
+--- a/src/libs/kata-sys-util/src/protection.rs
++++ b/src/libs/kata-sys-util/src/protection.rs
+@@ -91,6 +91,10 @@ pub fn available_guest_protection() -> Result<GuestProtection, ProtectionError>
+ }
+ 
+ #[cfg(target_arch = "x86_64")]
++// `unsafe` is required on Rust toolchains where the x86 CPUID intrinsics are
++// still `unsafe fn`s (<= 1.93), and unnecessary on newer toolchains where they
++// are safe; allow the resulting warning so it builds under `--deny warnings`.
++#[allow(unused_unsafe)]
+ pub fn arch_guest_protection(
+     sev_path: &str,
+     snp_path: &str,
+@@ -126,7 +130,7 @@ pub fn arch_guest_protection(
+         // shouldn't hurt to double-check and have better logging if anything
+         // goes wrong.
+ 
+-        let fn0 = x86_64::__cpuid(0);
++        let fn0 = unsafe { x86_64::__cpuid(0) };
+         // The values in [ ebx, edx, ecx ] spell out "AuthenticAMD" when
+         // interpreted byte-wise as ASCII.  No need to bother here with an
+         // actual conversion to string though.
+@@ -139,7 +143,7 @@ pub fn arch_guest_protection(
+         }
+ 
+         // AMD64 Architecture Prgrammer's Manual Fn8000_001f docs on pg. 640
+-        let fn8000_001f = x86_64::__cpuid(0x8000_001f);
++        let fn8000_001f = unsafe { x86_64::__cpuid(0x8000_001f) };
+         if fn8000_001f.eax & 0x10 == 0 {
+             return Err(ProtectionError::CheckFailed("SEV not supported".to_owned()));
+         }
