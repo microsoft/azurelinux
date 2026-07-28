@@ -46,7 +46,6 @@ The SymCrypt engine for OpenSSL (SCOSSL) allows the use of OpenSSL with SymCrypt
 
 %build
 %cmake   \
-        -DKEYSINUSE_ENABLED=1 \
         -DOPENSSL_ROOT_DIR="%{_prefix}/local/ssl" \
         -DSYMCRYPT_ROOT_DIR=%{buildroot}%{_includedir}/.. \
         -DCMAKE_TOOLCHAIN_FILE="../cmake-toolchain/LinuxUserMode-%{symcrypt_arch}.cmake" \
