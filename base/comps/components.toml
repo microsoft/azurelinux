@@ -431,7 +431,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.festival]
 [components.ffcall]
 [components.fftw]
-[components.fido-device-onboard]
 [components.file]
 [components.filesystem]
 [components.findutils]

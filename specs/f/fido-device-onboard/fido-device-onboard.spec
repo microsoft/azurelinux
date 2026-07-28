@@ -7,7 +7,7 @@
 
 Name:           fido-device-onboard
 Version:        0.5.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        A rust implementation of the FIDO Device Onboard Specification
 License:        BSD-3-Clause
 
@@ -34,6 +34,7 @@ BuildRequires:  tpm2-tss-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  libpq-devel
 
+Patch2: pin-libcryptsetup-rs-0.13.2.patch
 %description
 %{summary}.
 

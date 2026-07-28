@@ -1,0 +1,11 @@
+diff --git a/client-linuxapp/Cargo.toml b/client-linuxapp/Cargo.toml
+--- a/client-linuxapp/Cargo.toml
++++ b/client-linuxapp/Cargo.toml
+@@ -16,6 +16,6 @@ nix = "0.26"
+ uuid = "1.3"
+ thiserror = "1"
+-libcryptsetup-rs = { version = ">= 0.11.2", features = ["mutex"] }
++libcryptsetup-rs = { version = "=0.13.2", features = ["mutex"] }
+ secrecy = "0.8"
+ devicemapper = "0.34"
+ openssl = "0.10.72"
