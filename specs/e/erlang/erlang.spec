@@ -70,12 +70,12 @@
 # reltool (*)
 # wx
 #
-%global __with_wxwidgets 0
+%global __with_wxwidgets 1
 
 
 Name:		erlang
 Version:	26.2.5.17
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	General-purpose programming language and runtime environment
 
 License:	Apache-2.0
@@ -146,7 +146,7 @@ Requires: %{name}-common_test%{?_isa} = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 %if %{__with_wxwidgets}
-Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
+
 %endif # __with_wxwidgets
 %if %{__with_wxwidgets}
 Requires: %{name}-dialyzer%{?_isa} = %{version}-%{release}
@@ -158,7 +158,7 @@ Requires: %{name}-erl_docgen%{?_isa} = %{version}-%{release}
 Requires: %{name}-erl_interface%{?_isa} = %{version}-%{release}
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 %if %{__with_wxwidgets}
-Requires: %{name}-et%{?_isa} = %{version}-%{release}
+
 %endif # __with_wxwidgets
 Requires: %{name}-eunit%{?_isa} = %{version}-%{release}
 Requires: %{name}-ftp%{?_isa} = %{version}-%{release}
@@ -172,14 +172,14 @@ Requires: %{name}-megaco%{?_isa} = %{version}-%{release}
 %endif # __with_wxwidgets
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
 %if %{__with_wxwidgets}
-Requires: %{name}-observer%{?_isa} = %{version}-%{release}
+
 %endif # __with_wxwidgets
 Requires: %{name}-odbc%{?_isa} = %{version}-%{release}
 Requires: %{name}-os_mon%{?_isa} = %{version}-%{release}
 Requires: %{name}-parsetools%{?_isa} = %{version}-%{release}
 Requires: %{name}-public_key%{?_isa} = %{version}-%{release}
 %if %{__with_wxwidgets}
-Requires: %{name}-reltool%{?_isa} = %{version}-%{release}
+
 %endif # __with_wxwidgets
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
@@ -192,7 +192,7 @@ Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-tftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-tools%{?_isa} = %{version}-%{release}
 %if %{__with_wxwidgets}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
+
 %endif # __with_wxwidgets
 Requires: %{name}-xmerl%{?_isa} = %{version}-%{release}
 
@@ -218,11 +218,11 @@ Provides support for Abstract Syntax Notation One.
 Summary: A portable framework for automatic testing
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
-Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-observer%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
 Requires: %{name}-snmp%{?_isa} = %{version}-%{release}
@@ -261,16 +261,6 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Cryptographical support.
 
 %if %{__with_wxwidgets}
-%package debugger
-Summary: A debugger for debugging and testing of Erlang programs
-Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
-Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
-
-%description debugger
-A debugger for debugging and testing of Erlang programs.
 %endif # __with_wxwidgets
 
 %if %{__with_wxwidgets}
@@ -281,7 +271,7 @@ Requires: %{name}-erts%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 Requires: %{name}-syntax_tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
+
 Requires: graphviz
 Obsoletes: erlang-typer
 
@@ -389,16 +379,6 @@ Obsoletes: erlang-webtool
 Functionality necessary to run the Erlang System itself.
 
 %if %{__with_wxwidgets}
-%package et
-Summary: An event tracer for Erlang programs
-Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
-
-%description et
-An event tracer for Erlang programs.
 %endif # __with_wxwidgets
 
 %package eunit
@@ -476,9 +456,9 @@ Main erlang library.
 %package megaco
 Summary: Megaco/H.248 support library
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
-Requires: %{name}-debugger%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-et%{?_isa} = %{version}-%{release}
+
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
 Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
 Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
@@ -499,18 +479,6 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 A heavy duty real-time distributed database.
 
 %if %{__with_wxwidgets}
-%package observer
-Summary: A set of tools for tracing and investigation of distributed systems
-Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-et%{?_isa} = %{version}-%{release}
-Requires: %{name}-inets%{?_isa} = %{version}-%{release}
-Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-runtime_tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
-
-%description observer
-A set of tools for tracing and investigation of distributed systems.
 %endif # __with_wxwidgets
 
 %package odbc
@@ -557,22 +525,6 @@ Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
 API to public key infrastructure.
 
 %if %{__with_wxwidgets}
-%package reltool
-Summary: A release management tool
-Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-sasl%{?_isa} = %{version}-%{release}
-Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
-Requires: %{name}-tools%{?_isa} = %{version}-%{release}
-Requires: %{name}-wx%{?_isa} = %{version}-%{release}
-
-%description reltool
-Reltool is a release management tool. It analyses a given
-Erlang/OTP installation and determines various dependencies
-between applications. The graphical frontend depicts the
-dependencies and enables interactive customization of a
-target system. The backend provides a batch interface
-for generation of customized target systems.
 %endif # __with_wxwidgets
 
 %package runtime_tools
@@ -613,11 +565,11 @@ MIB compiler and tools for creating SNMP agents.
 %package src
 Summary: Erlang sources
 Requires: %{name}-asn1%{?_isa} = %{version}-%{release}
-
+Requires: %{name}-common_test%{?_isa} = %{version}-%{release}
 Requires: %{name}-compiler%{?_isa} = %{version}-%{release}
 Requires: %{name}-crypto%{?_isa} = %{version}-%{release}
 
-
+Requires: %{name}-dialyzer%{?_isa} = %{version}-%{release}
 Requires: %{name}-diameter%{?_isa} = %{version}-%{release}
 Requires: %{name}-edoc%{?_isa} = %{version}-%{release}
 Requires: %{name}-eldap%{?_isa} = %{version}-%{release}
@@ -628,7 +580,7 @@ Requires: %{name}-eunit%{?_isa} = %{version}-%{release}
 Requires: %{name}-ftp%{?_isa} = %{version}-%{release}
 Requires: %{name}-inets%{?_isa} = %{version}-%{release}
 Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-
+Requires: %{name}-megaco%{?_isa} = %{version}-%{release}
 Requires: %{name}-mnesia%{?_isa} = %{version}-%{release}
 
 Requires: %{name}-odbc%{?_isa} = %{version}-%{release}
@@ -729,17 +681,6 @@ Obsoletes: emacs-erlang-el
 A set of programming tools including a coverage analyzer etc.
 
 %if %{__with_wxwidgets}
-%package wx
-Summary: A library for wxWidgets support in Erlang
-BuildRequires: wxGTK-devel
-Requires: %{name}-erts%{?_isa} = %{version}-%{release}
-Requires: %{name}-kernel%{?_isa} = %{version}-%{release}
-Requires: %{name}-stdlib%{?_isa} = %{version}-%{release}
-Requires: mesa-libGL
-Requires: mesa-libGLU
-
-%description wx
-A Graphics System used to write platform independent user interfaces.
 %endif # __with_wxwidgets
 
 %package xmerl
@@ -792,7 +733,7 @@ CFLAGS="${ERL_FLAGS}" CXXFLAGS="${ERL_FLAGS}" %configure --enable-shared-zlib --
 	--without-jinterface \
 %endif # __with_java
 %if %{__with_wxwidgets}
-	--with-wx-config=/usr/bin/wx-config
+ --without-wx --without-debugger --without-et --without-observer --without-reltool
 %else
 	--without-common_test \
 	--without-debugger \
@@ -1065,13 +1006,6 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif
 
 %if %{__with_wxwidgets}
-%files debugger
-%{_libdir}/erlang/lib/debugger-*/
-%if %{with doc}
-%{_mandir}/man3/debugger.*
-%{_mandir}/man3/i.*
-%{_mandir}/man3/int.*
-%endif
 %endif # __with_wxwidgets
 
 %if %{__with_wxwidgets}
@@ -1246,17 +1180,6 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %{_sysusersdir}/erlang.conf
 
 %if %{__with_wxwidgets}
-%files et
-%dir %{_libdir}/erlang/lib/et-*/
-%{_libdir}/erlang/lib/et-*/ebin
-%{_libdir}/erlang/lib/et-*/include
-%{_libdir}/erlang/lib/et-*/src
-%if %{with doc}
-%{_mandir}/man3/et.*
-%{_mandir}/man3/et_collector.*
-%{_mandir}/man3/et_selector.*
-%{_mandir}/man3/et_viewer.*
-%endif
 %endif # __with_wxwidgets
 
 %files eunit
@@ -1274,7 +1197,7 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %{_libdir}/erlang/lib/asn1-*/examples/
 %{_libdir}/erlang/lib/diameter-*/examples/
 %if %{__with_wxwidgets}
-%{_libdir}/erlang/lib/et-*/examples/
+
 %endif # __with_wxwidgets
 %{_libdir}/erlang/lib/eunit-*/examples/
 %{_libdir}/erlang/lib/inets-*/examples/
@@ -1284,10 +1207,10 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif # __with_wxwidgets
 %{_libdir}/erlang/lib/mnesia-*/examples/
 %if %{__with_wxwidgets}
-%{_libdir}/erlang/lib/observer-*/examples/
+
 %endif # __with_wxwidgets
 %if %{__with_wxwidgets}
-%{_libdir}/erlang/lib/reltool-*/examples/
+
 %endif # __with_wxwidgets
 %{_libdir}/erlang/lib/runtime_tools-*/examples/
 %{_libdir}/erlang/lib/sasl-*/examples/
@@ -1297,7 +1220,7 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %{_libdir}/erlang/lib/syntax_tools-*/examples/
 %{_libdir}/erlang/lib/tools-*/examples/
 %if %{__with_wxwidgets}
-%{_libdir}/erlang/lib/wx-*/examples/
+
 %endif # __with_wxwidgets
 %endif # __with_examples
 
@@ -1424,20 +1347,6 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif
 
 %if %{__with_wxwidgets}
-%files observer
-%dir %{_libdir}/erlang/lib/observer-*/
-%{_libdir}/erlang/lib/observer-*/ebin/
-%{_libdir}/erlang/lib/observer-*/include/
-%{_libdir}/erlang/lib/observer-*/priv/
-%{_libdir}/erlang/lib/observer-*/src/
-%if %{with doc}
-%{_mandir}/man1/cdv.*
-%{_mandir}/man3/crashdump.*
-%{_mandir}/man3/etop.*
-%{_mandir}/man3/observer.*
-%{_mandir}/man3/ttb.*
-%{_mandir}/man6/observer.*
-%endif
 %endif # __with_wxwidgets
 
 %files odbc
@@ -1471,13 +1380,6 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif
 
 %if %{__with_wxwidgets}
-%files reltool
-%dir %{_libdir}/erlang/lib/reltool-*/
-%{_libdir}/erlang/lib/reltool-*/ebin
-%{_libdir}/erlang/lib/reltool-*/src
-%if %{with doc}
-%{_mandir}/man3/reltool.*
-%endif
 %endif # __with_wxwidgets
 
 %files runtime_tools
@@ -1737,252 +1639,6 @@ ERL_TOP=${ERL_TOP} make TARGET=${TARGET} release_tests
 %endif # __with_emacs
 
 %if %{__with_wxwidgets}
-%files wx
-%dir %{_libdir}/erlang/lib/wx-*/
-%{_libdir}/erlang/lib/wx-*/ebin
-%{_libdir}/erlang/lib/wx-*/include
-%{_libdir}/erlang/lib/wx-*/priv
-%{_libdir}/erlang/lib/wx-*/src
-%if %{with doc}
-%{_mandir}/man3/gl.*
-%{_mandir}/man3/glu.*
-%{_mandir}/man3/wx.*
-%{_mandir}/man3/wxAcceleratorEntry.*
-%{_mandir}/man3/wxAcceleratorTable.*
-%{_mandir}/man3/wxActivateEvent.*
-%{_mandir}/man3/wxArtProvider.*
-%{_mandir}/man3/wxAuiDockArt.*
-%{_mandir}/man3/wxAuiManager.*
-%{_mandir}/man3/wxAuiManagerEvent.*
-%{_mandir}/man3/wxAuiNotebook.*
-%{_mandir}/man3/wxAuiNotebookEvent.*
-%{_mandir}/man3/wxAuiPaneInfo.*
-%{_mandir}/man3/wxAuiSimpleTabArt.*
-%{_mandir}/man3/wxAuiTabArt.*
-%{_mandir}/man3/wxBitmap.*
-%{_mandir}/man3/wxBitmapButton.*
-%{_mandir}/man3/wxBitmapDataObject.*
-%{_mandir}/man3/wxBookCtrlBase.*
-%{_mandir}/man3/wxBookCtrlEvent.*
-%{_mandir}/man3/wxBoxSizer.*
-%{_mandir}/man3/wxBrush.*
-%{_mandir}/man3/wxBufferedDC.*
-%{_mandir}/man3/wxBufferedPaintDC.*
-%{_mandir}/man3/wxButton.*
-%{_mandir}/man3/wxCalendarCtrl.*
-%{_mandir}/man3/wxCalendarDateAttr.*
-%{_mandir}/man3/wxCalendarEvent.*
-%{_mandir}/man3/wxCaret.*
-%{_mandir}/man3/wxCheckBox.*
-%{_mandir}/man3/wxCheckListBox.*
-%{_mandir}/man3/wxChildFocusEvent.*
-%{_mandir}/man3/wxChoice.*
-%{_mandir}/man3/wxChoicebook.*
-%{_mandir}/man3/wxClientDC.*
-%{_mandir}/man3/wxClipboard.*
-%{_mandir}/man3/wxClipboardTextEvent.*
-%{_mandir}/man3/wxCloseEvent.*
-%{_mandir}/man3/wxColourData.*
-%{_mandir}/man3/wxColourDialog.*
-%{_mandir}/man3/wxColourPickerCtrl.*
-%{_mandir}/man3/wxColourPickerEvent.*
-%{_mandir}/man3/wxComboBox.*
-%{_mandir}/man3/wxCommandEvent.*
-%{_mandir}/man3/wxContextMenuEvent.*
-%{_mandir}/man3/wxControl.*
-%{_mandir}/man3/wxControlWithItems.*
-%{_mandir}/man3/wxCursor.*
-%{_mandir}/man3/wxDC.*
-%{_mandir}/man3/wxDCOverlay.*
-%{_mandir}/man3/wxDataObject.*
-%{_mandir}/man3/wxDateEvent.*
-%{_mandir}/man3/wxDatePickerCtrl.*
-%{_mandir}/man3/wxDialog.*
-%{_mandir}/man3/wxDirDialog.*
-%{_mandir}/man3/wxDirPickerCtrl.*
-%{_mandir}/man3/wxDisplay.*
-%{_mandir}/man3/wxDisplayChangedEvent.*
-%{_mandir}/man3/wxDropFilesEvent.*
-%{_mandir}/man3/wxEraseEvent.*
-%{_mandir}/man3/wxEvent.*
-%{_mandir}/man3/wxEvtHandler.*
-%{_mandir}/man3/wxFileDataObject.*
-%{_mandir}/man3/wxFileDialog.*
-%{_mandir}/man3/wxFileDirPickerEvent.*
-%{_mandir}/man3/wxFilePickerCtrl.*
-%{_mandir}/man3/wxFindReplaceData.*
-%{_mandir}/man3/wxFindReplaceDialog.*
-%{_mandir}/man3/wxFlexGridSizer.*
-%{_mandir}/man3/wxFocusEvent.*
-%{_mandir}/man3/wxFont.*
-%{_mandir}/man3/wxFontData.*
-%{_mandir}/man3/wxFontDialog.*
-%{_mandir}/man3/wxFontPickerCtrl.*
-%{_mandir}/man3/wxFontPickerEvent.*
-%{_mandir}/man3/wxFrame.*
-%{_mandir}/man3/wxGBSizerItem.*
-%{_mandir}/man3/wxGCDC.*
-%{_mandir}/man3/wxGLCanvas.*
-%{_mandir}/man3/wxGLContext.*
-%{_mandir}/man3/wxGauge.*
-%{_mandir}/man3/wxGenericDirCtrl.*
-%{_mandir}/man3/wxGraphicsBrush.*
-%{_mandir}/man3/wxGraphicsContext.*
-%{_mandir}/man3/wxGraphicsFont.*
-%{_mandir}/man3/wxGraphicsGradientStops.*
-%{_mandir}/man3/wxGraphicsMatrix.*
-%{_mandir}/man3/wxGraphicsObject.*
-%{_mandir}/man3/wxGraphicsPath.*
-%{_mandir}/man3/wxGraphicsPen.*
-%{_mandir}/man3/wxGraphicsRenderer.*
-%{_mandir}/man3/wxGrid.*
-%{_mandir}/man3/wxGridBagSizer.*
-%{_mandir}/man3/wxGridCellAttr.*
-%{_mandir}/man3/wxGridCellBoolEditor.*
-%{_mandir}/man3/wxGridCellBoolRenderer.*
-%{_mandir}/man3/wxGridCellChoiceEditor.*
-%{_mandir}/man3/wxGridCellEditor.*
-%{_mandir}/man3/wxGridCellFloatEditor.*
-%{_mandir}/man3/wxGridCellFloatRenderer.*
-%{_mandir}/man3/wxGridCellNumberEditor.*
-%{_mandir}/man3/wxGridCellNumberRenderer.*
-%{_mandir}/man3/wxGridCellRenderer.*
-%{_mandir}/man3/wxGridCellStringRenderer.*
-%{_mandir}/man3/wxGridCellTextEditor.*
-%{_mandir}/man3/wxGridEvent.*
-%{_mandir}/man3/wxGridSizer.*
-%{_mandir}/man3/wxHelpEvent.*
-%{_mandir}/man3/wxHtmlEasyPrinting.*
-%{_mandir}/man3/wxHtmlLinkEvent.*
-%{_mandir}/man3/wxHtmlWindow.*
-%{_mandir}/man3/wxIcon.*
-%{_mandir}/man3/wxIconBundle.*
-%{_mandir}/man3/wxIconizeEvent.*
-%{_mandir}/man3/wxIdleEvent.*
-%{_mandir}/man3/wxImage.*
-%{_mandir}/man3/wxImageList.*
-%{_mandir}/man3/wxInitDialogEvent.*
-%{_mandir}/man3/wxJoystickEvent.*
-%{_mandir}/man3/wxKeyEvent.*
-%{_mandir}/man3/wxLayoutAlgorithm.*
-%{_mandir}/man3/wxListBox.*
-%{_mandir}/man3/wxListCtrl.*
-%{_mandir}/man3/wxListEvent.*
-%{_mandir}/man3/wxListItem.*
-%{_mandir}/man3/wxListItemAttr.*
-%{_mandir}/man3/wxListView.*
-%{_mandir}/man3/wxListbook.*
-%{_mandir}/man3/wxLocale.*
-%{_mandir}/man3/wxLogNull.*
-%{_mandir}/man3/wxMDIChildFrame.*
-%{_mandir}/man3/wxMDIClientWindow.*
-%{_mandir}/man3/wxMDIParentFrame.*
-%{_mandir}/man3/wxMask.*
-%{_mandir}/man3/wxMaximizeEvent.*
-%{_mandir}/man3/wxMemoryDC.*
-%{_mandir}/man3/wxMenu.*
-%{_mandir}/man3/wxMenuBar.*
-%{_mandir}/man3/wxMenuEvent.*
-%{_mandir}/man3/wxMenuItem.*
-%{_mandir}/man3/wxMessageDialog.*
-%{_mandir}/man3/wxMiniFrame.*
-%{_mandir}/man3/wxMirrorDC.*
-%{_mandir}/man3/wxMouseCaptureChangedEvent.*
-%{_mandir}/man3/wxMouseCaptureLostEvent.*
-%{_mandir}/man3/wxMouseEvent.*
-%{_mandir}/man3/wxMoveEvent.*
-%{_mandir}/man3/wxMultiChoiceDialog.*
-%{_mandir}/man3/wxNavigationKeyEvent.*
-%{_mandir}/man3/wxNotebook.*
-%{_mandir}/man3/wxNotificationMessage.*
-%{_mandir}/man3/wxNotifyEvent.*
-%{_mandir}/man3/wxOverlay.*
-%{_mandir}/man3/wxPageSetupDialog.*
-%{_mandir}/man3/wxPageSetupDialogData.*
-%{_mandir}/man3/wxPaintDC.*
-%{_mandir}/man3/wxPaintEvent.*
-%{_mandir}/man3/wxPalette.*
-%{_mandir}/man3/wxPaletteChangedEvent.*
-%{_mandir}/man3/wxPanel.*
-%{_mandir}/man3/wxPasswordEntryDialog.*
-%{_mandir}/man3/wxPen.*
-%{_mandir}/man3/wxPickerBase.*
-%{_mandir}/man3/wxPopupTransientWindow.*
-%{_mandir}/man3/wxPopupWindow.*
-%{_mandir}/man3/wxPostScriptDC.*
-%{_mandir}/man3/wxPreviewCanvas.*
-%{_mandir}/man3/wxPreviewControlBar.*
-%{_mandir}/man3/wxPreviewFrame.*
-%{_mandir}/man3/wxPrintData.*
-%{_mandir}/man3/wxPrintDialog.*
-%{_mandir}/man3/wxPrintDialogData.*
-%{_mandir}/man3/wxPrintPreview.*
-%{_mandir}/man3/wxPrinter.*
-%{_mandir}/man3/wxPrintout.*
-%{_mandir}/man3/wxProgressDialog.*
-%{_mandir}/man3/wxQueryNewPaletteEvent.*
-%{_mandir}/man3/wxRadioBox.*
-%{_mandir}/man3/wxRadioButton.*
-%{_mandir}/man3/wxRegion.*
-%{_mandir}/man3/wxSashEvent.*
-%{_mandir}/man3/wxSashLayoutWindow.*
-%{_mandir}/man3/wxSashWindow.*
-%{_mandir}/man3/wxScreenDC.*
-%{_mandir}/man3/wxScrollBar.*
-%{_mandir}/man3/wxScrollEvent.*
-%{_mandir}/man3/wxScrollWinEvent.*
-%{_mandir}/man3/wxScrolledWindow.*
-%{_mandir}/man3/wxSetCursorEvent.*
-%{_mandir}/man3/wxShowEvent.*
-%{_mandir}/man3/wxSingleChoiceDialog.*
-%{_mandir}/man3/wxSizeEvent.*
-%{_mandir}/man3/wxSizer.*
-%{_mandir}/man3/wxSizerFlags.*
-%{_mandir}/man3/wxSizerItem.*
-%{_mandir}/man3/wxSlider.*
-%{_mandir}/man3/wxSpinButton.*
-%{_mandir}/man3/wxSpinCtrl.*
-%{_mandir}/man3/wxSpinEvent.*
-%{_mandir}/man3/wxSplashScreen.*
-%{_mandir}/man3/wxSplitterEvent.*
-%{_mandir}/man3/wxSplitterWindow.*
-%{_mandir}/man3/wxStaticBitmap.*
-%{_mandir}/man3/wxStaticBox.*
-%{_mandir}/man3/wxStaticBoxSizer.*
-%{_mandir}/man3/wxStaticLine.*
-%{_mandir}/man3/wxStaticText.*
-%{_mandir}/man3/wxStatusBar.*
-%{_mandir}/man3/wxStdDialogButtonSizer.*
-%{_mandir}/man3/wxStyledTextCtrl.*
-%{_mandir}/man3/wxStyledTextEvent.*
-%{_mandir}/man3/wxSysColourChangedEvent.*
-%{_mandir}/man3/wxSystemOptions.*
-%{_mandir}/man3/wxSystemSettings.*
-%{_mandir}/man3/wxTaskBarIcon.*
-%{_mandir}/man3/wxTaskBarIconEvent.*
-%{_mandir}/man3/wxTextAttr.*
-%{_mandir}/man3/wxTextCtrl.*
-%{_mandir}/man3/wxTextDataObject.*
-%{_mandir}/man3/wxTextEntryDialog.*
-%{_mandir}/man3/wxToggleButton.*
-%{_mandir}/man3/wxToolBar.*
-%{_mandir}/man3/wxToolTip.*
-%{_mandir}/man3/wxToolbook.*
-%{_mandir}/man3/wxTopLevelWindow.*
-%{_mandir}/man3/wxTreeCtrl.*
-%{_mandir}/man3/wxTreeEvent.*
-%{_mandir}/man3/wxTreebook.*
-%{_mandir}/man3/wxUpdateUIEvent.*
-%{_mandir}/man3/wxWebView.*
-%{_mandir}/man3/wxWebViewEvent.*
-%{_mandir}/man3/wxWindow.*
-%{_mandir}/man3/wxWindowCreateEvent.*
-%{_mandir}/man3/wxWindowDC.*
-%{_mandir}/man3/wxWindowDestroyEvent.*
-%{_mandir}/man3/wxXmlResource.*
-%{_mandir}/man3/wx_misc.*
-%{_mandir}/man3/wx_object.*
-%endif
 %endif # __with_wxwidgets
 
 %files xmerl
