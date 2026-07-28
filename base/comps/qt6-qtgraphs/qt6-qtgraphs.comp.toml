@@ -1,0 +1,2 @@
+[components.qt6-qtgraphs]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "482646cd6133ab89ebeaac88f1421402bfb426ac" }

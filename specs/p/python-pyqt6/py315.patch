@@ -1,0 +1,17 @@
+diff -rupN --no-dereference pyqt6-6.11.0/qpy/QtCore/qpycore_pyqtslot.cpp pyqt6-6.11.0-new/qpy/QtCore/qpycore_pyqtslot.cpp
+--- pyqt6-6.11.0/qpy/QtCore/qpycore_pyqtslot.cpp	2026-03-24 18:25:28.741840800 +0100
++++ pyqt6-6.11.0-new/qpy/QtCore/qpycore_pyqtslot.cpp	2026-04-02 09:30:33.235872748 +0200
+@@ -24,6 +24,13 @@
+ #include "qpycore_pyqtslot.h"
+ 
+ 
++// PyWeakref_GetObject was removed from headers in Python 3.15 but is still
++// part of the stable ABI. Declare it here for Python 3.15+ compatibility.
++#if PY_VERSION_HEX >= 0x030f0000
++extern "C" PyObject* PyWeakref_GetObject(PyObject *ref);
++#endif
++
++
+ // Create the slot for a callable.
+ PyQtSlot::PyQtSlot(PyObject *callable, bool callable_is_method,
+         const Chimera::Signature *slot_signature)

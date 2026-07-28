@@ -14,8 +14,8 @@
 
 Summary: Qt6 - QtTool components
 Name:    qt6-qttools
-Version: 6.10.2
-Release: 2%{?dist}
+Version: 6.10.3
+Release: 3%{?dist}
 
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io
@@ -34,6 +34,9 @@ Patch1: qttools-run-qttools-with-qt6-suffix.patch
 
 # 32-bit MIPS needs explicit -latomic
 Patch2: qttools-add-libatomic.patch
+
+# Support LLVM/Clang 22
+Patch3: qdoc-support-newer-clang.patch
 
 ## upstream patches
 
@@ -158,6 +161,7 @@ Requires: %{name}-common = %{version}-%{release}
 %ifarch %{mips32}
 %patch -P2 -p1 -b .libatomic
 %endif
+%patch -P3 -p1 -b .llvm22
 
 %build
 %cmake_qt6 \
@@ -394,6 +398,12 @@ popd
 
 
 %changelog
+* Tue Mar 31 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.3-1
+- 6.10.3
+
+* Fri Feb 27 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.2-2
+- Rebuild (LLVM-22)
+
 * Mon Feb 09 2026 Jan Grulich <jgrulich@redhat.com> - 6.10.2-1
 - 6.10.2
 

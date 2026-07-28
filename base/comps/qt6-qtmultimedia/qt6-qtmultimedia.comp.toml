@@ -6,6 +6,7 @@
 #
 # Part of the distro-wide effort to remove ffmpeg/libav* from Azure Linux.
 [components.qt6-qtmultimedia]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "508e28a0c94acf866b7245392d21211f671da066" }
 build.without = ["ffmpeg"]
 
 # gstreamer1-plugins-bad-free is not shipped in AZL4. Remove the BR to avoid

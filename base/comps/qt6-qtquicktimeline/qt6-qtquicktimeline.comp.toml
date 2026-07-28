@@ -1,0 +1,2 @@
+[components.qt6-qtquicktimeline]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "05539fbed6688ac1c19882d6f9346abd3d81972c" }

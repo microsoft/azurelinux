@@ -1,0 +1,2 @@
+[components.qt6-qtshadertools]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "ce5846c3357eff2ac5f52b818e3f533d85bf1f43" }

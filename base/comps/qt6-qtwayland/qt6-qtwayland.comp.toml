@@ -1,36 +1,7 @@
 [components.qt6-qtwayland]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e96dca235e83bc256548884b980c999c26bc5101" }
 
-# The Wayland client plugin CMake files (Ivi/QtShell shell integrations and the
-# Adwaita decoration) are exported into either cmake/Qt6WaylandClient/ or
-# cmake/Qt6Gui/ depending on the qtbase version used to build: newer qtbase
-# (stage1/PME buildroots) puts them under Qt6Gui/, older qtbase (dev/beta
-# buildroots) under Qt6WaylandClient/. The locked 6.10.2 %files hardcodes the
-# old Qt6WaylandClient/ paths, which fails against newer qtbase. Rather than
-# hardcode Qt6Gui/ (which then breaks against older qtbase), match the plugin
-# files by name under a directory-independent cmake/Qt6*/ glob so packaging
-# succeeds in both. Fedora f43 "Fix %files section" only did the Qt6Gui half:
-# https://src.fedoraproject.org/rpms/qt6-qtwayland/c/e96dca235e83bc256548884b980c999c26bc5101
-[[components.qt6-qtwayland.overlays]]
-description = "Match the Wayland client shell-integration plugin CMake files under a directory-independent Qt6*/ glob so packaging works whether qtbase exports them under Qt6WaylandClient/ (older) or Qt6Gui/ (newer)"
-type = "spec-search-replace"
-section = "%files"
-package = "devel"
-regex = '^%\{_qt6_libdir\}/cmake/Qt6WaylandClient/\*\.cmake$'
-replacement = '''%{_qt6_libdir}/cmake/Qt6*/Qt6QWaylandIviShellIntegration*.cmake
-%{_qt6_libdir}/cmake/Qt6*/Qt6QWaylandQtShellIntegration*.cmake'''
-
-[[components.qt6-qtwayland.overlays]]
-description = "Match the adwaita-decoration %exclude path under a directory-independent Qt6*/ glob (older vs newer qtbase export dir)"
-type = "spec-search-replace"
-section = "%files"
-package = "devel"
-regex = '^%exclude %\{_qt6_libdir\}/cmake/Qt6WaylandClient/Qt6QWaylandAdwaitaDecoration\*\.cmake$'
-replacement = '%exclude %{_qt6_libdir}/cmake/Qt6*/Qt6QWaylandAdwaitaDecoration*.cmake'
-
-[[components.qt6-qtwayland.overlays]]
-description = "Match the adwaita-decoration subpackage CMake path under a directory-independent Qt6*/ glob (older vs newer qtbase export dir)"
-type = "spec-search-replace"
-section = "%files"
-package = "adwaita-decoration"
-regex = '^%\{_qt6_libdir\}/cmake/Qt6WaylandClient/Qt6QWaylandAdwaitaDecoration\*\.cmake$'
-replacement = '%{_qt6_libdir}/cmake/Qt6*/Qt6QWaylandAdwaitaDecoration*.cmake'
+# Pinned to the f43 6.10.3 commit, which moves the Wayland client shell-integration
+# and Adwaita-decoration CMake files to cmake/Qt6Gui/ upstream ("Fix %files section").
+# That matches what qtbase 6.10.3 exports, so the previous %files search-replace
+# workarounds (for the 6.10.2 spec vs newer qtbase) are no longer needed.

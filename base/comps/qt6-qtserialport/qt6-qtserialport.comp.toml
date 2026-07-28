@@ -1,0 +1,2 @@
+[components.qt6-qtserialport]
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "f50e461f0dd0efb6acafc277343535f53a91b062" }
