@@ -4426,7 +4426,6 @@ includes = ["**/*.comp.toml", "component-bootstrap-uucore-pin.toml", "component-
 [components.qt5-qtdeclarative]
 [components.qt5-qtgraphicaleffects]
 [components.qt5-qtlocation]
-[components.qt5-qtmultimedia]
 [components.qt5-qtquickcontrols]
 [components.qt5-qtquickcontrols2]
 [components.qt5-qtscript]

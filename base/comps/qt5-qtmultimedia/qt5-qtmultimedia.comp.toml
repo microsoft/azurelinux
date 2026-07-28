@@ -1,0 +1,11 @@
+[components.qt5-qtmultimedia]
+
+[[components.qt5-qtmultimedia.overlays]]
+description = "Drop gstreamer-plugins-bad BuildRequires — Azure Linux does not ship gstreamer1-plugins-bad-free; qtmultimedia auto-detects it and only loses the optional GStreamer photography/camerabin backend"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-plugins-bad-%{gst})"
+
+[components.qt5-qtmultimedia.overlays.metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"

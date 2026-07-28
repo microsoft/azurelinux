@@ -13,7 +13,7 @@
 Summary: Qt5 - Multimedia support
 Name:    qt5-%{qt_module}
 Version: 5.15.18
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -49,7 +49,6 @@ BuildRequires: pkgconfig(gstreamer-app-%{gst})
 BuildRequires: pkgconfig(gstreamer-audio-%{gst})
 BuildRequires: pkgconfig(gstreamer-base-%{gst})
 BuildRequires: pkgconfig(gstreamer-pbutils-%{gst})
-BuildRequires: pkgconfig(gstreamer-plugins-bad-%{gst})
 BuildRequires: pkgconfig(gstreamer-video-%{gst})
 BuildRequires: pkgconfig(libpulse) pkgconfig(libpulse-mainloop-glib)
 %if 0%{?openal}
