@@ -65,8 +65,8 @@
 # change is a SONAME change and dependencies need to be rebuilt
 Summary: Software framework for cross-language services development
 Name:    thrift
-Version: 0.15.0
-Release: 6%{?dist}
+Version: 0.24.0
+Release: 1%{?dist}
 
 # Parts of the source are used under the BSD and zlib licenses, but
 # these are OK for inclusion in an Apache 2.0-licensed whole:
@@ -87,12 +87,6 @@ Source2: https://raw.github.com/apache/%{name}/%{version}/bootstrap.sh
  
 # fix configure.ac insistence on using /usr/local/lib for JAVA_PREFIX
 Patch1: configure-java-prefix.patch
-Patch2: CVE-2025-48431.patch
-Patch3: CVE-2026-41602.patch
-Patch4: CVE-2026-41603.patch
-Patch5: CVE-2026-41605.patch
-Patch6: CVE-2026-41636.patch
- 
  
 # BuildRequires for language-specific bindings are listed under these
 # subpackages, to facilitate enabling or disabling individual language
@@ -100,6 +94,8 @@ Patch6: CVE-2026-41636.patch
 
 BuildRequires: pkgconfig(libcrypto)
 BuildRequires: python3-six
+BuildRequires: python3-pip
+BuildRequires: python3-wheel
 %if 0%{?want_java} > 0
 BuildRequires: ant >= 1.7
 %endif
@@ -325,7 +321,9 @@ sed -i -e 's/ -shared / -Wl,--as-needed\0/g' libtool
 %make_build
  
 %install
-%make_install
+# Disable pip build isolation and network access so the Python bindings build
+# offline using the pre-installed python3-setuptools and python3-wheel.
+%make_install PYTHON_SETUPUTIL_ARGS="--no-build-isolation --no-index"
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
 find %{buildroot} -name fastbinary.so | xargs -r chmod 755
 find %{buildroot} -name \*.erl -or -name \*.hrl -or -name \*.app | xargs -r chmod 644
@@ -398,7 +396,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
  
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}
-%{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
+%{python3_sitearch}/%{name}-%{version}.dist-info/
 %doc LICENSE NOTICE
  
 %if 0%{?want_java} > 0
@@ -411,6 +409,10 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %endif
  
 %changelog
+* Tue Jul 28 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 0.24.0-1
+- Upgrade to 0.24.0 for CVE-2026-48144, CVE-2026-49158, CVE-2026-58023, CVE-2026-58662, CVE-2026-66053, CVE-2026-55970, CVE-2026-41608, CVE-2026-55969, CVE-2026-43871, CVE-2026-48586, CVE-2026-48145, CVE-2026-55971, CVE-2026-41606, CVE-2026-41607
+- Removed CVE patches fixed in upstream: CVE-2025-48431, CVE-2026-41602, CVE-2026-41603, CVE-2026-41605, CVE-2026-41636
+
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.15.0-6
 - Patch for CVE-2026-41636, CVE-2026-41605, CVE-2026-41603, CVE-2026-41602, CVE-2025-48431
 
