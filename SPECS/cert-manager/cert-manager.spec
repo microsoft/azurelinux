@@ -38,7 +38,11 @@ Patch21:        CVE-2026-39828.patch
 Patch22:        CVE-2026-39835.patch
 Patch23:        CVE-2026-42502.patch
 Patch24:        CVE-2026-33814.patch
+<<<<<<< HEAD
 Patch25:        CVE-2026-63308.patch
+=======
+Patch25:        CVE-2026-56852.patch
+>>>>>>> da0ebf15a9 ([AutoPR- Security] Patch cert-manager for CVE-2026-56852 [HIGH] (#18151))
 
 BuildRequires:  golang
 Requires:       %{name}-acmesolver
@@ -130,8 +134,13 @@ install -D -m0755 bin/webhook %{buildroot}%{_bindir}/
 %{_bindir}/webhook
 
 %changelog
+<<<<<<< HEAD
 * Wed Jul 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-10
 - Patch for CVE-2026-63308
+=======
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-10
+- Patch for CVE-2026-56852
+>>>>>>> da0ebf15a9 ([AutoPR- Security] Patch cert-manager for CVE-2026-56852 [HIGH] (#18151))
 
 * Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.12.15-9
 - Patch for CVE-2026-33814
