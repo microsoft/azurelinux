@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 4
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 595.58.03
 
@@ -132,6 +132,9 @@ Summary: The Linux kernel
 %endif
 
 # RHEL/CentOS specific .SBAT entries
+%if 0%{?azl4}
+%global sbat_suffix azurelinux
+%else
 %if 0%{?centos}
 %global sbat_suffix centos
 %else
@@ -139,6 +142,7 @@ Summary: The Linux kernel
 %global sbat_suffix fedora
 %else
 %global sbat_suffix rhel
+%endif
 %endif
 %endif
 
@@ -4616,6 +4620,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 6.18.39-1.4
+- feat(kernel): add Azure Linux SBAT records
+
 * Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
 - chore(kernel): tidy release macros
 
