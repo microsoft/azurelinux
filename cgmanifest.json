@@ -3458,8 +3458,8 @@
         "type": "other",
         "other": {
           "name": "etcd",
-          "version": "3.5.30",
-          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.30.tar.gz"
+          "version": "3.5.33",
+          "downloadUrl": "https://github.com/etcd-io/etcd/archive/v3.5.33.tar.gz"
         }
       }
     },
