@@ -165,6 +165,16 @@ rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
+rustdoc_licensedir="%{buildroot}%{_defaultlicensedir}/%{name}-doc/bundled"
+rustdoc_htmldir="%{buildroot}%{_docdir}/docs/html"
+mkdir -p "$rustdoc_licensedir"
+mv "%{buildroot}%{_docdir}/rustc/licenses" "$rustdoc_licensedir/spdx"
+find "$rustdoc_htmldir" -type f \( -iname '*license*' -o -iname '*copyright*' \) | while read -r f; do
+    install -Dm644 "$f" "$rustdoc_licensedir/html/${f#$rustdoc_htmldir/}"
+    rm -f "$f"
+done
+find "$rustdoc_htmldir" -type f -iname '*bsd*' -delete
+
 %ldconfig_scriptlets
 
 %files
@@ -187,7 +197,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_docdir}/rustc/licenses/*
+%license %{_defaultlicensedir}/%{name}-doc/bundled
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
@@ -201,6 +211,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %changelog
 * Tue Jul 28 2026 SumitJenaHCL <v-sumitjena@microsoft.com> - 1.90.0-10
 - Patch for CVE-2026-47143
+- Fix rust-doc license check warnings
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
