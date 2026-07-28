@@ -30,6 +30,7 @@ Patch14:        CVE-2026-59844.patch
 Patch15:        CVE-2026-59845.patch
 Patch16:        CVE-2026-59847.patch
 Patch17:        CVE-2026-59850.patch
+Patch18:        CVE-2026-59848.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -164,7 +165,7 @@ popd
 
 %changelog
 * Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-9
-- Patch for CVE-2026-59850, CVE-2026-59847, CVE-2026-59845, CVE-2026-59844, CVE-2026-59843
+- Patch for CVE-2026-59850, CVE-2026-59847, CVE-2026-59845, CVE-2026-59844, CVE-2026-59843, CVE-2026-59848
 
 * Tue May 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.10.6-8
 - Patch for CVE-2026-0968
