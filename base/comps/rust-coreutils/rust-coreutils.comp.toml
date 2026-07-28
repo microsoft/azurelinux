@@ -1,0 +1,222 @@
+[components.rust-coreutils]
+# Pin to the latest Fedora dist-git commit, which packages upstream 0.7.0.
+# The overlays below carry us forward to 0.9.0, which Fedora has not yet
+# packaged but is the version Azure Linux ships.
+spec = { type = "upstream", upstream-commit = "b86e8fd647f6f28854879e33db45721a9d566919" }
+
+# Bump from Fedora's 0.7.0 to upstream uutils/coreutils 0.9.0.
+[[components.rust-coreutils.overlays]]
+description = "Bump uutils-coreutils from Fedora's 0.7.0 to upstream 0.9.0"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.9.0"
+
+# Fedora's coreutils-fix-metadata.diff was generated against the 0.7.0 crate
+# and its hunk line numbers no longer apply to 0.9.0, so we drop it. Instead of
+# reproducing its loosening, we pin selinux to the exact version frozen in the
+# vendored tree + Cargo.lock (0.6.2) so the manifest constraint matches the
+# locked artifact for this security-critical component.
+[[components.rust-coreutils.overlays]]
+description = "Drop Fedora's 0.7.0-targeted metadata patch reference (replaced by inline sed in %prep below)"
+type = "spec-remove-tag"
+tag = "Patch"
+value = "coreutils-fix-metadata.diff"
+
+[[components.rust-coreutils.overlays]]
+description = "Remove the now-unreferenced metadata patch file from sources"
+type = "file-remove"
+file = "coreutils-fix-metadata.diff"
+
+[[components.rust-coreutils.overlays]]
+description = "Pin the security-critical selinux crate to the exact vendored/locked version (=0.6.2)"
+type = "spec-append-lines"
+section = "%prep"
+lines = [
+    "# selinux is security-critical; pin it to exactly the version frozen in the",
+    "# vendored tree and Cargo.lock (0.6.2). Upstream declares 'selinux = \"0.6\"'",
+    "# (a caret range) in [workspace.dependencies]; tighten it to an exact pin so",
+    "# the manifest constraint matches the locked artifact. 0.6.2 already satisfies",
+    "# and is locked, so the offline/--locked build stays reproducible.",
+    "sed -i '/^\\[workspace.dependencies\\]/,/^\\[/ s/^selinux = \"0.6\"$/selinux = \"=0.6.2\"/' Cargo.toml",
+]
+
+# --- Vendored build switch -------------------------------------------------
+# Azure Linux does not mirror Fedora's full rust2rpm crate ecosystem, so the
+# per-crate `BuildRequires: crate(...)` emitted by %cargo_generate_buildrequires
+# cannot be satisfied. Instead, ship a pre-populated `vendor/` tree (produced
+# with `cargo vendor` against the unpacked 0.9.0 sources) and build offline.
+[[components.rust-coreutils.overlays]]
+description = "Add the cargo-vendored dependency tarball for offline build"
+type = "file-add"
+file = "vendor.tar.xz"
+source = "vendor.tar.xz"
+
+[[components.rust-coreutils.overlays]]
+description = "Register the vendor tarball as Source1"
+type = "spec-insert-tag"
+tag = "Source1"
+value = "vendor.tar.xz"
+
+[[components.rust-coreutils.overlays]]
+description = "Extract the vendor tarball and tell cargo to use vendored deps"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%cargo_prep$'
+replacement = "tar -xf %{SOURCE1}\n%cargo_prep -v vendor"
+
+[[components.rust-coreutils.overlays]]
+description = "Skip per-crate BuildRequires generation: deps are vendored, not packaged as RPMs in AZL"
+type = "spec-search-replace"
+section = "%generate_buildrequires"
+regex = '^%cargo_generate_buildrequires.*$'
+replacement = "# Azure Linux: deps are vendored via Source1; no crate(...) BuildRequires needed."
+
+[[components.rust-coreutils.overlays]]
+description = "selinux-sys (vendored -sys crate) needs libselinux C headers at compile time"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "libselinux-devel"
+
+[[components.rust-coreutils.overlays]]
+description = "selinux-sys uses bindgen, which needs libclang at compile time"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "clang-devel"
+
+[[components.rust-coreutils.overlays]]
+description = "Linking against libacl (used by cp/mv attribute preservation) requires libacl-devel"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "libacl-devel"
+
+# In vendor mode, %cargo_install doesn't populate %{crate_instdir} with the
+# upstream source tree, so the rust2rpm-style `devel` and `+<feature>-devel`
+# subpackages fail with "File not found". Stub %{crate_instdir} with the
+# expected doc/license files so those (otherwise unused in AZL) subpackages
+# still build. A follow-up should drop these subpackages entirely via a local
+# spec since AZL does not consume `crate(...)` BuildRequires.
+[[components.rust-coreutils.overlays]]
+description = "Stub %{crate_instdir} so the inherited rust2rpm -devel subpackages can build under vendor mode"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "# Azure Linux: vendor-mode %%cargo_install skips the crate source copy.",
+    "# Stub the files referenced by the inherited rust2rpm devel subpackages.",
+    "mkdir -p %{buildroot}%{crate_instdir}",
+    "for f in LICENSE CODE_OF_CONDUCT.md CONTRIBUTING.md DEVELOPMENT.md README.md SECURITY.md; do",
+    "    install -m 0644 \"$f\" %{buildroot}%{crate_instdir}/\"$f\"",
+    "done",
+    "# README.package.md is Fedora-specific; create an empty placeholder.",
+    "touch %{buildroot}%{crate_instdir}/README.package.md",
+    "# Placeholder for the %ghost Cargo.toml referenced by +<feature>-devel subpackages.",
+    "touch %{buildroot}%{crate_instdir}/Cargo.toml",
+]
+
+# Strip the stale 0.7.0 entry from Fedora's `sources` lookaside file. The
+# 0.9.0 entry is appended by the `source-files` block below; without this
+# overlay the rendered `sources` would list both versions, which is harmless
+# at build time but confusing to readers and to diff tooling.
+[[components.rust-coreutils.overlays]]
+description = "Remove the obsolete 0.7.0 crate hash from the sources lookaside file"
+type = "file-search-replace"
+file = "sources"
+regex = '^SHA512 \(coreutils-0\.7\.0\.crate\) = [0-9a-f]+\n'
+replacement = ""
+
+[[components.rust-coreutils.overlays]]
+description = "Use the upstream GitHub release tarball for 0.9.0 instead of crate-based Source"
+type = "spec-update-tag"
+tag = "Source"
+value = "coreutils-0.9.0.tar.gz"
+
+[[components.rust-coreutils.overlays]]
+description = "Set project URL to upstream GitHub project for tarball-sourced build"
+type = "spec-update-tag"
+tag = "URL"
+value = "https://github.com/uutils/coreutils"
+
+# Stage the 0.9.0 source tarball in component sources to avoid lookaside
+# fetches for a version Fedora dist-git does not yet carry.
+[[components.rust-coreutils.overlays]]
+description = "Add the 0.9.0 source tarball from local component sources for build validation"
+type = "file-add"
+file = "coreutils-0.9.0.tar.gz"
+source = "coreutils-0.9.0.tar.gz"
+
+# --- PATH-based coexistence with GNU coreutils -----------------------------
+# Azure Linux ships both GNU coreutils (owning the real files at %{_bindir})
+# and uutils. To let the two coexist and make uutils selectable without ever
+# touching /usr/bin, expose the uutils utilities under plain names in a private
+# directory (/usr/lib/uutils/bin) and prepend that dir to PATH via per-shell
+# profile snippets. The directory is deliberately /usr/lib/uutils (not
+# .../uutils-coreutils) so sibling uutils projects (e.g. uutils tar) can share
+# it. Selection is PATH-only: absolute paths and scripts keep using GNU
+# coreutils; only interactive/login name lookups resolve to uutils first.
+# Shells covered: sh/bash/zsh (profile.d/*.sh), csh/tcsh (profile.d/*.csh),
+# and fish (vendor_conf.d/*.fish).
+[[components.rust-coreutils.overlays]]
+description = "Add the sh/bash/zsh profile.d snippet that puts uutils first on PATH (Azure Linux coexistence policy)"
+type = "file-add"
+file = "uutils-coreutils.sh"
+source = "uutils-coreutils.sh"
+
+[[components.rust-coreutils.overlays]]
+description = "Add the csh/tcsh profile.d snippet that puts uutils first on PATH"
+type = "file-add"
+file = "uutils-coreutils.csh"
+source = "uutils-coreutils.csh"
+
+[[components.rust-coreutils.overlays]]
+description = "Add the fish vendor_conf.d snippet that puts uutils first on PATH"
+type = "file-add"
+file = "uutils-coreutils.fish"
+source = "uutils-coreutils.fish"
+
+[[components.rust-coreutils.overlays]]
+description = "Register the sh/bash/zsh PATH snippet as Source2"
+type = "spec-insert-tag"
+tag = "Source2"
+value = "uutils-coreutils.sh"
+
+[[components.rust-coreutils.overlays]]
+description = "Register the csh/tcsh PATH snippet as Source3"
+type = "spec-insert-tag"
+tag = "Source3"
+value = "uutils-coreutils.csh"
+
+[[components.rust-coreutils.overlays]]
+description = "Register the fish PATH snippet as Source4"
+type = "spec-insert-tag"
+tag = "Source4"
+value = "uutils-coreutils.fish"
+
+[[components.rust-coreutils.overlays]]
+description = "Create plain-named uutils symlinks in /usr/lib/uutils/bin and install the per-shell PATH profile snippets"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "# Azure Linux: expose uutils utilities under plain names in a private",
+    "# directory so the profile snippets can put them first on PATH without",
+    "# colliding with the GNU coreutils files in %{_bindir}. Link to the shipped",
+    "# uu_* entries, which is robust to the upstream layout (multicall binary,",
+    "# shell wrapper, or standalone binaries).",
+    "install -d %{buildroot}%{_prefix}/lib/uutils/bin",
+    "for _uu in %{buildroot}%{_bindir}/uu_*; do",
+    "    _base=$(basename \"$_uu\")",
+    "    ln -sr \"$_uu\" \"%{buildroot}%{_prefix}/lib/uutils/bin/${_base#uu_}\"",
+    "done",
+    "# PATH indirection profiles so uutils is the default for interactive shells.",
+    "install -d %{buildroot}%{_sysconfdir}/profile.d",
+    "install -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.sh",
+    "install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/uutils-coreutils.csh",
+    "# fish reads vendor conf.d snippets automatically.",
+    "install -d %{buildroot}%{_datadir}/fish/vendor_conf.d",
+    "install -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/fish/vendor_conf.d/uutils-coreutils.fish",
+]
+
+[[components.rust-coreutils.overlays]]
+description = "Own the private uutils bin dir and the per-shell profile snippets in the uutils-coreutils package"
+type = "spec-search-replace"
+section = "%files"
+regex = '^%\{_bindir\}/uu_\*$'
+replacement = "%{_bindir}/uu_*\n%dir %{_prefix}/lib/uutils\n%{_prefix}/lib/uutils/bin\n%config(noreplace) %{_sysconfdir}/profile.d/uutils-coreutils.sh\n%config(noreplace) %{_sysconfdir}/profile.d/uutils-coreutils.csh\n%dir %{_datadir}/fish/vendor_conf.d\n%{_datadir}/fish/vendor_conf.d/uutils-coreutils.fish"
