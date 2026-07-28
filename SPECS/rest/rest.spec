@@ -34,7 +34,7 @@ Requires:       %{name} = %{version}-%{release}
 Files for development with %{name}.
 
 %prep
-%autosetup
+%autosetup -p1
 
 %build
 %meson -Dsoup2=false -Dgtk_doc=false
