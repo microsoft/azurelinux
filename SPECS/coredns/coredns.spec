@@ -3,7 +3,13 @@
 # set commit number that corresponds to the github tag for the version
 %global coredns_gitcommit "6e11ebddfc13bfca683fcbcae72cc4af6de47dd2"
 
+Summary:        Fast and flexible DNS server
+Name:           coredns
+Version:        1.11.4
 Release:        20%{?dist}
+License:        Apache License 2.0
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          System Environment/Libraries
 URL:            https://github.com/coredns/coredns
 #Source0:       https://github.com/coredns/coredns/archive/v%%{version}.tar.gz
@@ -50,6 +56,9 @@ Patch17:        CVE-2026-39821.patch
 Patch18:        CVE-2026-56852.patch
 Patch19:        CVE-2026-62299.patch
 Patch20:        CVE-2026-62994.patch
+
+BuildRequires:  golang < 1.25
+
 %description
 CoreDNS is a fast and flexible DNS server.
 
@@ -99,9 +108,6 @@ go install github.com/fatih/faillint@latest && \
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-17
 - Patch for CVE-2026-39821
-
-* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-16
-- Patch for CVE-2026-32936, CVE-2026-32934, CVE-2026-33489, CVE-2026-33190
 
 * Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.11.4-16
 - Patch for CVE-2026-32936, CVE-2026-32934, CVE-2026-33489, CVE-2026-33190
