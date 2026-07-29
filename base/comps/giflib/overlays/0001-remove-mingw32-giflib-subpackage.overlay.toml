@@ -1,0 +1,88 @@
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# Remove all mingw subpackages and their build dependencies.
+
+[[overlays]]
+description = "Remove mingw32-giflib subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-remove-subpackage"
+package = "mingw32-%{name}"
+
+[[overlays]]
+description = "Remove mingw32-giflib-tools subpackage"
+type = "spec-remove-subpackage"
+package = "mingw32-%{name}-tools"
+
+[[overlays]]
+description = "Remove mingw64-giflib subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-%{name}"
+
+[[overlays]]
+description = "Remove mingw64-giflib-tools subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-%{name}-tools"
+
+[[overlays]]
+description = "Remove mingw32-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-filesystem"
+
+[[overlays]]
+description = "Remove mingw32-gcc BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-gcc"
+
+[[overlays]]
+description = "Remove mingw64-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-filesystem"
+
+[[overlays]]
+description = "Remove mingw64-gcc BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-gcc"
+
+[[overlays]]
+description = "Remove mingw cmake build step"
+type = "spec-search-replace"
+section = "%build"
+regex = "^\\%mingw_cmake$"
+replacement = ""
+
+[[overlays]]
+description = "Remove mingw make build step"
+type = "spec-search-replace"
+section = "%build"
+regex = "^\\%mingw_make_build$"
+replacement = ""
+
+[[overlays]]
+description = "Remove mingw install steps"
+type = "spec-search-replace"
+section = "%install"
+regex = "^\\%mingw_make_install$"
+replacement = ""
+
+[[overlays]]
+description = "Remove mingw mandir cleanup (mingw32)"
+type = "spec-search-replace"
+section = "%install"
+regex = "^rm -rf %\\{buildroot\\}%\\{mingw32_mandir\\}$"
+replacement = ""
+
+[[overlays]]
+description = "Remove mingw mandir cleanup (mingw64)"
+type = "spec-search-replace"
+section = "%install"
+regex = "^rm -rf %\\{buildroot\\}%\\{mingw64_mandir\\}$"
+replacement = ""
+
+[[overlays]]
+description = "Remove mingw debug install post step"
+type = "spec-search-replace"
+section = "%install"
+regex = "^\\%mingw_debug_install_post$"
+replacement = ""

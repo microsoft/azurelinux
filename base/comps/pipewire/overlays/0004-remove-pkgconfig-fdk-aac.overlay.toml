@@ -1,0 +1,23 @@
+# AZL does not ship fdk-aac-free. Disable the bluez5 AAC codec module
+# so the build doesn't require pkgconfig(fdk-aac); the other bluez5
+# codecs (SBC, lc3, ldac on non-s390x) remain enabled for Bluetooth
+# audio streaming.
+#
+# Update regex on Fedora rebase; do NOT remove the overlays.
+
+[[overlays]]
+description = "Remove pkgconfig(fdk-aac) BuildRequires (fdk-aac-free not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(fdk-aac)"
+
+# Narrowly anchor on the single `-D bluez5-codec-aptx=disabled` option
+# (rather than a joint phrase like `-D volume=disabled -D bluez5-codec-
+# aptx=disabled`) so this overlay survives upstream Fedora reordering
+# of the meson options.
+[[overlays]]
+description = "Inject -D bluez5-codec-aac=disabled into the %meson invocation (no fdk-aac-free in AZL). Anchored on the neighbouring bluez5-codec-aptx option so the overlay is resilient to upstream reordering of other -D flags."
+type = "spec-search-replace"
+section = "%build"
+regex = "-D bluez5-codec-aptx=disabled"
+replacement = "-D bluez5-codec-aac=disabled -D bluez5-codec-aptx=disabled"

@@ -1,0 +1,14 @@
+# AZL does not ship opus — disable opus in the meson build.
+
+[[overlays]]
+description = "Remove opus-devel BuildRequires (opus not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"
+
+[[overlays]]
+description = "Disable opus audio codec in meson build"
+type = "spec-search-replace"
+section = "%build"
+regex = "%meson \\\\"
+replacement = "%meson \\\n   -Dopus=disabled \\"

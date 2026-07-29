@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Remove libavif BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavif)"

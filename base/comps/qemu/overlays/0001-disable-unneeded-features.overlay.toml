@@ -1,0 +1,41 @@
+# Disable features not needed in Azure Linux's Hyper-V/KVM environment.
+# Upstream could expose a bcond/condition so we set Xen, brlapi, jack, spice, dbus_display OFF without spec surgery.
+overlays = [
+    # Upstream enables Xen when %fedora is set (which it is on our builders), so force it off.
+    {
+        description = 'Disable Xen support - not needed for Azure Linux (Hyper-V/KVM only)',
+        type = 'spec-search-replace',
+        regex = '^%global have_xen 1$',
+        replacement = '%global have_xen 0',
+    },
+    # brltty pulls in bluetooth, audio, and more runtime deps.
+    {
+        description = 'Disable Baum Braille device backend',
+        type = 'spec-search-replace',
+        regex = '^%global have_brlapi 1$',
+        replacement = '%global have_brlapi 0',
+    },
+    # jack audio backend is enabled by default, but we disable it.
+    {
+        description = 'Disable JACK audio backend',
+        type = 'spec-search-replace',
+        regex = '^%global have_jack 1$',
+        replacement = '%global have_jack 0',
+    },
+    # Disable spice support for remote display.
+    {
+        description = 'Disable SPICE support',
+        type = 'spec-search-replace',
+        regex = '^%global have_spice 1$',
+        replacement = '%global have_spice 0',
+    },
+    # Disable D-Bus display server (and its audio module). Without this, qemu's meson unconditionally
+    # builds audio-dbus.so when have_dbus_display=1, which causes "Installed (but unpackaged)" errors
+    # since we strip the audio-dbus subpackage.
+    {
+        description = 'Disable D-Bus display server',
+        type = 'spec-search-replace',
+        regex = '^%global have_dbus_display 1$',
+        replacement = '%global have_dbus_display 0',
+    },
+]

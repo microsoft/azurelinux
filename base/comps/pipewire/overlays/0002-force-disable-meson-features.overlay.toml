@@ -1,0 +1,35 @@
+[[overlays]]
+description = "Force-disable meson features whose dependencies are not shipped in AZL.\nRequired because Fedora's %meson macro always passes --auto-features=enabled,\nwhich flips every auto-default feature to mandatory and would otherwise turn\nthese missing deps into hard build failures:\n  - opus / bluez5-codec-opus: opus codec library not shipped in AZL\n  - echo-cancel-webrtc: webrtc-audio-processing not shipped in AZL\n    (see the component removal and BR-drop overlays below)\n  - v4l2 / pipewire-v4l2: v4l-utils not shipped in AZL\nThe modules themselves still build; only the codec/backend implementations\nthat need the unavailable libraries are skipped.\n"
+type = "spec-search-replace"
+section = "%build"
+regex = "%meson \\\\"
+replacement = "%meson \\\n    -D opus=disabled -D bluez5-codec-opus=disabled \\\n    -D echo-cancel-webrtc=disabled \\\n    -D v4l2=disabled -D pipewire-v4l2=disabled \\"
+
+# Drop the webrtc-audio-processing BuildRequires lines. The library is not
+# shipped in AZL (Google-derived AEC code that is significantly behind upstream
+# and carries downstream-only patches just to keep building); see the matching
+# component removal in this PR.
+#
+# The BR is gated only by an unconditional `%if 0%{?fedora} >= 40 || ...`
+# block — there is no upstream %bcond, so `build.without` cannot reach it and
+# spec-remove-tag is the only path. The matching -D echo-cancel-webrtc=disabled
+# meson flag is injected by the combined opus/echo-cancel-webrtc overlay above
+# (required because Fedora's %meson uses --auto-features=enabled).
+#
+# libpipewire-module-echo-cancel.so still ships (with the speex / null
+# backends); only the WebRTC backend (libspa-aec-webrtc.so) is dropped.
+#
+# If a spec-remove-tag eventually stops matching after a Fedora rebase,
+# update the value to the new BR spelling — do NOT remove the overlay; the
+# constraint is permanent (webrtc-audio-processing is not shipped in AZL).
+[[overlays]]
+description = "Drop webrtc-audio-processing-1 BR (fedora>=40 / rhel>=10 branch); library not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(webrtc-audio-processing-1)"
+
+[[overlays]]
+description = "Drop legacy webrtc-audio-processing BR (else branch, EL<10 / F<40); library not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(webrtc-audio-processing) >= 0.2"

@@ -1,0 +1,95 @@
+# Remove RDP-only libexec entries from %files
+
+[[overlays]]
+description = "Remove RDP-only enable-service from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_libexecdir\\}/gnome-remote-desktop-enable-service"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only configuration-daemon from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_libexecdir\\}/gnome-remote-desktop-configuration-daemon"
+replacement = ""
+
+# Remove RDP-only systemd units from %files
+[[overlays]]
+description = "Remove RDP-only handover unit from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_userunitdir\\}/%\\{systemd_unit_handover\\}"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only system unit from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_unitdir\\}/%\\{systemd_unit_system\\}"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only configuration service unit from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_unitdir\\}/gnome-remote-desktop-configuration\\.service"
+replacement = ""
+
+# Remove RDP-only desktop/dbus entries from %files
+[[overlays]]
+description = "Remove RDP-only handover desktop file from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/applications/org\\.gnome\\.RemoteDesktop\\.Handover\\.desktop"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only dbus system service from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/dbus-1/system-services/org\\.gnome\\.RemoteDesktop\\.Configuration\\.service"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only dbus system.d conf from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/dbus-1/system\\.d/org\\.gnome\\.RemoteDesktop\\.conf"
+replacement = ""
+
+# Remove RDP-only polkit/sysusers/tmpfiles from %files
+[[overlays]]
+description = "Remove RDP-only polkit configure-system-daemon policy from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/polkit-1/actions/org\\.gnome\\.remotedesktop\\.configure-system-daemon\\.policy"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only polkit enable-system-daemon policy from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/polkit-1/actions/org\\.gnome\\.remotedesktop\\.enable-system-daemon\\.policy"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only polkit rules from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_datadir\\}/polkit-1/rules\\.d/20-gnome-remote-desktop\\.rules"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only sysusers conf from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_sysusersdir\\}/gnome-remote-desktop-sysusers\\.conf"
+replacement = ""
+
+[[overlays]]
+description = "Remove RDP-only tmpfiles conf from %files"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_tmpfilesdir\\}/gnome-remote-desktop-tmpfiles\\.conf"
+replacement = ""

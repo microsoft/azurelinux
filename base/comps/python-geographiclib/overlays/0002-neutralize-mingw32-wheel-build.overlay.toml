@@ -1,0 +1,34 @@
+[[overlays]]
+description = "Neutralize mingw32 wheel build step (replace with bash no-op `:` to preserve subshell structure)"
+type = "spec-search-replace"
+section = "%build"
+regex = "^\\%mingw32_py3_build_wheel$"
+replacement = ":"
+
+[[overlays]]
+description = "Neutralize mingw64 wheel build step"
+type = "spec-search-replace"
+section = "%build"
+regex = "^\\%mingw64_py3_build_wheel$"
+replacement = ":"
+
+[[overlays]]
+description = "Neutralize mingw32 wheel install step — `:` keeps the upstream `( ... )` subshell non-empty so bash doesn't fail with `syntax error near unexpected token ')'`"
+type = "spec-search-replace"
+section = "%install"
+regex = "^\\%mingw32_py3_install_wheel$"
+replacement = ":"
+
+[[overlays]]
+description = "Neutralize mingw64 wheel install step"
+type = "spec-search-replace"
+section = "%install"
+regex = "^\\%mingw64_py3_install_wheel$"
+replacement = ":"
+
+[[overlays]]
+description = "Neutralize mingw debug install post step"
+type = "spec-search-replace"
+section = "%install"
+regex = "^\\%mingw_debug_install_post$"
+replacement = ":"

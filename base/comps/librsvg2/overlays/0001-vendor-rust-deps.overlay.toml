@@ -1,0 +1,17 @@
+# Fix the BR-unresolvable nightly failure: use vendored Rust dependencies (like
+# RHEL) so cargo does not dynamically generate BuildRequires that pull in
+# rust-image+avif-native → dav1d (a crate not available in AZL), and swap the
+# rust-toolset BuildRequires for cargo-rpm-macros since AZL does not ship the
+# rust-toolset metapackage. Both are packaging-environment adaptations to what
+# AZL ships, so they are not applicable upstream (Fedora ships rust-toolset).
+[[overlays]]
+description = "Enable bundled Rust dependencies — AZL does not ship dav1d crate needed by rust-image+avif-native"
+type = "spec-search-replace"
+regex = '%global\s+bundled_rust_deps\s+0'
+replacement = '%global bundled_rust_deps 1'
+
+[[overlays]]
+description = "Replace rust-toolset BR with cargo-rpm-macros — AZL does not ship rust-toolset metapackage"
+type = "spec-search-replace"
+regex = 'BuildRequires:\s+rust-toolset'
+replacement = 'BuildRequires:  cargo-rpm-macros'

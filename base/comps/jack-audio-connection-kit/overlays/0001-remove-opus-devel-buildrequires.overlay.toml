@@ -1,0 +1,14 @@
+# AZL is removing opus — remove the BR and explicitly disable opus.
+
+[[overlays]]
+description = "Remove opus-devel BuildRequires (opus being removed from AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "opus-devel"
+
+[[overlays]]
+description = "Disable opus support in waf configure"
+type = "spec-search-replace"
+section = "%build"
+regex = "python3 \\./waf configure \\\\"
+replacement = "python3 ./waf configure \\\n   --no-opus \\"

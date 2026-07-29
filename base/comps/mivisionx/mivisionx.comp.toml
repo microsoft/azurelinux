@@ -9,14 +9,3 @@
 # Part of the distro-wide effort to remove ffmpeg/libav*.
 [components.mivisionx]
 
-[[components.mivisionx.overlays]]
-description = "Drop BuildRequires on libavcodec-free-devel — removing ffmpeg/libav* (amd_media extension auto-disables)"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "libavcodec-free-devel"
-
-[[components.mivisionx.overlays]]
-description = "Drop BuildRequires on libavformat-free-devel — removing ffmpeg/libav* (amd_media extension auto-disables)"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "libavformat-free-devel"

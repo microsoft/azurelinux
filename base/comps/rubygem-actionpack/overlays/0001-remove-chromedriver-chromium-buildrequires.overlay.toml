@@ -1,0 +1,11 @@
+# Chromium/chromedriver are not packaged in Azure Linux. They are only used by
+# the %check test suite. Despite the `:remote` option set in abstract_unit.rb,
+# every test in test/dispatch/system_testing/ instantiates Selenium drivers
+# eagerly and fails without chromedriver. Disable that entire directory; the
+# rest of the actionpack test suite still runs.
+
+[[overlays]]
+description = "Remove chromedriver/chromium BuildRequires - not packaged in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver chromium chromium-headless"

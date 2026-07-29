@@ -1,0 +1,15 @@
+# Chromium/chromedriver are not available in Azure Linux;
+# selenium-webdriver depends on chromedriver at runtime, so the whole
+# browser-testing stack must be removed.
+
+[[overlays]]
+description = "Remove chromedriver/chromium BuildRequires - not available in Azure Linux"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "chromedriver chromium chromium-headless"
+
+[[overlays]]
+description = "Remove selenium-webdriver BuildRequires - depends on chromedriver which is unavailable"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "rubygem(selenium-webdriver)"

@@ -1,0 +1,6 @@
+[[overlays]]
+description = "Remove recommends: default-yama-scope"
+type = "spec-remove-tag"
+package = "headless"
+tag = "Recommends"
+value = "default-yama-scope"

@@ -1,0 +1,15 @@
+# v4l-utils/libv4l not shipped in AZL. Disable the libv4l userspace wrapper
+# while keeping the kernel V4L2 API available (WITH_V4L defaults to ON).
+
+[[overlays]]
+description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[overlays]]
+description = "Disable libv4l userspace wrapper — kernel V4L2 API still available via WITH_V4L (default ON)"
+type = "spec-search-replace"
+section = "%build"
+regex = "-DWITH_LIBV4L=ON"
+replacement = "-DWITH_LIBV4L=OFF"

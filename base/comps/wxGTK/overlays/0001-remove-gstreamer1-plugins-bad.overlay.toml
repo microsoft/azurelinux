@@ -1,0 +1,25 @@
+[[overlays]]
+description = "Remove gstreamer1-plugins-bad-free-devel BuildRequires — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "gstreamer1-plugins-bad-free-devel"
+
+[[overlays]]
+description = "Disable wxMediaCtrl at configure time — gstreamer1-plugins-bad-free not shipped in AZL"
+type = "spec-search-replace"
+section = "%build"
+regex = "%configure \\\\"
+replacement = "%configure \\\n  --disable-mediactrl \\"
+
+[[overlays]]
+description = "Remove wxGTK-devel Requires on wxGTK-media — media subpackage is empty (mediactrl disabled)"
+type = "spec-remove-tag"
+section = "%package"
+package = "devel"
+tag = "Requires"
+value = "%{name}-media = %{version}-%{release}"
+
+[[overlays]]
+description = "Remove wxGTK-media subpackage — mediactrl is disabled and no media library is built"
+type = "spec-remove-subpackage"
+package = "media"

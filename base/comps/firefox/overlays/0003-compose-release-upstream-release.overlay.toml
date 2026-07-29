@@ -1,0 +1,21 @@
+# Compose AZL release counter with upstream's Release integer. Uses RPM's
+# `%[ ... ]` expression syntax so the final Release tag stays a single
+# integer (Fedora-style). The literal "1" in the replacement MIRRORS the
+# upstream Release integer at the pinned f43 commit — when bumping the
+# `upstream-commit` pin, re-render and update this literal if upstream
+# bumped its own Release (e.g. to "2"). The regex is anchored to the full
+# upstream line, so if upstream changes the Release format (e.g. drops
+# `%{?pre_tag}` or bumps the leading integer), `azldev comp render` will
+# report `STATUS=error` for this component and leave the rendered spec
+# unchanged — caught at PR time by the `Check Rendered Specs` CI job.
+#
+# AZL-only rebuild (no upstream pin change): bump `azl_release` only.
+# Upstream pin bump: update upstream-commit, re-render, update the
+# literal here to match the new upstream Release integer, and reset
+# `azl_release = "1"`.
+
+[[overlays]]
+description = "Compose azl_release with upstream Release integer so AZL-only bumps are tracked independently of upstream Fedora's Release counter"
+type = "spec-search-replace"
+regex = "^Release:\\s+1%\\{\\?pre_tag\\}%\\{\\?dist\\}$"
+replacement = "Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}"

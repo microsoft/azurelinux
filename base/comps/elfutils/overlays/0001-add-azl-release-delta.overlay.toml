@@ -1,0 +1,19 @@
+# Azure Linux release-management overlays: bump the imported Fedora baserelease by
+# the AZL-only azl_release delta and record the matching %changelog entry for the
+# rebuild without a default debuginfod server. AZL-only bookkeeping; never upstreamed.
+[[overlays]]
+description = "Add the Azure Linux release delta to the imported Fedora baserelease"
+type = "spec-search-replace"
+regex = '^Release:\s+%\{baserelease\}%\{\?dist\}$'
+replacement = 'Release: %[%{baserelease} + %{azl_release}]%{?dist}'
+
+[[overlays]]
+description = "Record the Azure Linux rebuild without a default debuginfod server"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 0.194-4",
+    "- Rebuild without a default debuginfod server",
+    "- Keep non-URL debuginfod client configuration",
+    "",
+]

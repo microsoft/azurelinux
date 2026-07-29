@@ -7,8 +7,3 @@
 # Part of the distro-wide effort to remove ffmpeg/libav*.
 [components.openal-soft]
 
-[[components.openal-soft.overlays]]
-description = "Drop BuildRequires on pkgconfig(libavcodec) — only used by uninstalled alffplay example"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "pkgconfig(libavcodec)"

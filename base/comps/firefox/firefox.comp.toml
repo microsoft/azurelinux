@@ -26,116 +26,6 @@ release = { calculation = "manual" }
 #   5. 'fix(firefox): drop fdk-aac-free-devel and Fedora fdk-aac patch'
 azl_release = "5"
 
-# Firefox 148.0's mfbt/tests/TestIntegerRange.cpp uses uint8_t/uint16_t/uint32_t/uint64_t
-# without #include <cstdint>. GCC 15 (used in Azure Linux bootstrap) enforces stricter
-# C++ standards compliance and no longer leaks these types through transitive includes,
-# causing a compilation failure. The test binaries (controlled by build_tests) are not
-# shipped in the RPM and are only used when run_firefox_tests is enabled (which it is not).
-# Disabling them avoids the broken test compilation without affecting the final package.
-#
-# Upstream spec: https://src.fedoraproject.org/rpms/firefox/blob/f43/f/firefox.spec
-# Koji build failure: task 907428 (aarch64), task 898577 (x86_64)
-# TODO: Remove when upstream Firefox fixes GCC 15 compatibility (missing <cstdint> include).
-[[components.firefox.overlays]]
-description = "Disable build-time test compilation to avoid GCC 15 missing <cstdint> error in TestIntegerRange.cpp"
-type = "spec-search-replace"
-regex = '%global build_tests       1'
-replacement = '%global build_tests       0'
-
-# Firefox 148.0's bundled breakpad crash reporter has a GCC 15 compatibility issue:
-# minidump_descriptor.h references a field 'address_within_principal_mapping_' that
-# does not exist in the class. This fails on x86_64 where the crash reporter is enabled
-# (enable_mozilla_crashreporter = 1). Disabling it aligns with the aarch64/ppc64le
-# configuration and removes the non-essential crash reporter from the build.
-#
-# Upstream spec: https://src.fedoraproject.org/rpms/firefox/blob/f43/f/firefox.spec
-# TODO: Remove when upstream Firefox updates bundled breakpad for GCC 15 compatibility.
-[[components.firefox.overlays]]
-description = "Disable crash reporter to avoid GCC 15 breakpad compilation error in minidump_descriptor.h"
-type = "spec-search-replace"
-regex = '%global enable_mozilla_crashreporter 1'
-replacement = '%global enable_mozilla_crashreporter 0'
-
-# AZL does not ship fdk-aac-free. Four coordinated overlays are
-# required: simply dropping the BR causes ./mach configure to hard-fail.
-#
-# Mechanism: the Fedora firefox-mozconfig (Source10) ships
-# `ac_add_options --with-system-fdk-aac` unconditionally, and Fedora's
-# mozilla-1667096.patch (Patch401) wires that into
-# `pkg_check_modules('MOZ_FDK_AAC', 'fdk-aac', when='--with-system-fdk-aac')`
-# in toolkit/moz.configure. Mozilla's pkg_check_modules defaults to
-# `allow_missing=False`, so configure exits 1 if fdk-aac.pc is not in
-# the buildroot — which it won't be once fdk-aac-free is dropped.
-#
-# Patch401 is fdk-aac-only — it touches exactly 4 files
-# (toolkit/moz.configure to add the `--with-system-fdk-aac` option +
-# pkg_check_modules; ffvpx moz.build / codec_list.c / libfdk-aacdec.c
-# to wire `ff_libfdk_aac_decoder` into the ffvpx codec table). Nothing
-# else depends on it.
-#
-# We therefore (a) skip the `%patch -P401` invocation in %prep, which
-# removes the `--with-system-fdk-aac` configure option entirely AND
-# removes the `ff_libfdk_aac_decoder` entry from ffvpx's codec table
-# (otherwise the link of libmozavcodec.so fails with `undefined
-# reference to ff_libfdk_aac_decoder` because the wrapper .c file isn't
-# compiled); (b) drop the `Patch401:` source declaration so the
-# now-unused mozilla-1667096.patch is also pruned from the rendered
-# SRPM by azldev's render filter; (c) drop the now-stale
-# `ac_add_options --with-system-fdk-aac` line from firefox-mozconfig
-# (Source10), because once Patch401 is gone that option is
-# unrecognized by ./mach configure and aborts the build; and (d) drop
-# the now-unnecessary fdk-aac-free-devel BR.
-#
-# Update regexes on Fedora rebase if upstream renames Patch401 or
-# reflows firefox-mozconfig; do NOT remove the overlays.
-
-[[components.firefox.overlays]]
-description = "Skip Fedora's mozilla-1667096.patch (Patch401) in %prep. The patch is fdk-aac-only and (i) adds the `--with-system-fdk-aac` configure option and (ii) registers `ff_libfdk_aac_decoder` in ffvpx's codec_list.c. Without the wrapper .c file (libfdk-aacdec.c, also added by the patch) compiled in, that codec-table entry produces `undefined reference to ff_libfdk_aac_decoder` when linking libmozavcodec.so."
-type = "spec-search-replace"
-section = "%prep"
-regex = '^%patch -P401 -p1 -b \.1667096$'
-replacement = '# AZL: mozilla-1667096.patch (Patch401) skipped — adds fdk-aac support; see firefox.comp.toml'
-
-[[components.firefox.overlays]]
-description = "Drop the Patch401 source declaration for the now-unused mozilla-1667096.patch. azldev's render filter prunes patch files not referenced in the rendered spec, so removing the declaration also retires the ~21KB .patch file from the SRPM."
-type = "spec-remove-tag"
-tag = "Patch401"
-value = "mozilla-1667096.patch"
-
-[[components.firefox.overlays]]
-description = "Drop the `ac_add_options --with-system-fdk-aac` line from firefox-mozconfig (Source10). Once Patch401 is skipped, toolkit/moz.configure no longer declares `--with-system-fdk-aac`, so leaving the mozconfig line in (or flipping it to `--without-`) aborts ./mach configure with 'unknown option'."
-type = "file-search-replace"
-file = "firefox-mozconfig"
-regex = 'ac_add_options --with-system-fdk-aac'
-replacement = ''
-
-[[components.firefox.overlays]]
-description = "Drop BuildRequires: fdk-aac-free-devel (no longer needed once the mozconfig override above disables MOZ_FDK_AAC; fdk-aac-free is being removed from AZL anyway)"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "fdk-aac-free-devel"
-
-# Compose AZL release counter with upstream's Release integer. Uses RPM's
-# `%[ ... ]` expression syntax so the final Release tag stays a single
-# integer (Fedora-style). The literal "1" in the replacement MIRRORS the
-# upstream Release integer at the pinned f43 commit — when bumping the
-# `upstream-commit` pin, re-render and update this literal if upstream
-# bumped its own Release (e.g. to "2"). The regex is anchored to the full
-# upstream line, so if upstream changes the Release format (e.g. drops
-# `%{?pre_tag}` or bumps the leading integer), `azldev comp render` will
-# report `STATUS=error` for this component and leave the rendered spec
-# unchanged — caught at PR time by the `Check Rendered Specs` CI job.
-#
-# AZL-only rebuild (no upstream pin change): bump `azl_release` only.
-# Upstream pin bump: update upstream-commit, re-render, update the
-# literal here to match the new upstream Release integer, and reset
-# `azl_release = "1"`.
-[[components.firefox.overlays]]
-description = "Compose azl_release with upstream Release integer so AZL-only bumps are tracked independently of upstream Fedora's Release counter"
-type = "spec-search-replace"
-regex = '^Release:\s+1%\{\?pre_tag\}%\{\?dist\}$'
-replacement = 'Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}'
-
 # The upstream Mozilla source tarball ships content flagged by the AZL RPM
 # signing pipeline as obfuscated / malware-like (e.g. an obfuscated Windows
 # binary used only by media-sniffer unit tests, crashtest HTML that trips
@@ -160,7 +50,6 @@ replacement = 'Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}'
 # `sources` lookaside manifest so the build does not also try to fetch the
 # unmodified upstream tarball alongside our repacked one. This is handled
 # by `replace-upstream = true` on the source-files entry below.
-
 [[components.firefox.source-files]]
 filename = "firefox-148.0.source.tar.xz"
 hash = "c9c9f29fbd8f889bf3cf3d88776e1a62da7b2a65d386538d2bd048dd70caaaf8324adb5303a5fa9aa73c2cf6eb9f89cb4b34f9e67c4208d88636dd5376af90a9"

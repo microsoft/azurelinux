@@ -1,0 +1,4 @@
+[[overlays]]
+description = "Guard gi.require_version('Flatpak') so the module loads even without flatpak-libs typelib"
+type = "patch-add"
+source = "../0001-flatpak_manager-guard-gi-import-for-missing-typelib.patch"

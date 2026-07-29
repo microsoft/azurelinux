@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Drop python3-impacket BuildRequires (only used by Fedora-gated upstream test 1451; python-impacket is not packaged for Azure Linux due to RPM-signing issues)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "python3-impacket"

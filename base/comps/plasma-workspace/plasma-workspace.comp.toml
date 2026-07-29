@@ -7,8 +7,3 @@
 # integration component.
 [components.plasma-workspace]
 
-[[components.plasma-workspace.overlays]]
-description = "Drop BuildRequires on kpipewire-devel — removing ffmpeg/libav* from the distro"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "kpipewire-devel"

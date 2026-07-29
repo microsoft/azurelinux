@@ -1,0 +1,15 @@
+# AZL does not ship libavif — disable avif support in imgcodecs.
+# No bcond exists; need to remove the BR and pass -DWITH_AVIF=OFF.
+
+[[overlays]]
+description = "Remove libavif BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavif)"
+
+[[overlays]]
+description = "Disable avif support in opencv imgcodecs"
+type = "spec-search-replace"
+section = "%build"
+regex = "%cmake \\\\"
+replacement = "%cmake \\\n -DWITH_AVIF=OFF \\"

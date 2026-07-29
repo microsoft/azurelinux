@@ -1,0 +1,19 @@
+# Remove the +xen feature subpackage — Xen is not applicable to Azure Linux.
+
+[[overlays]]
+description = "Remove %package +xen-devel section"
+type = "spec-remove-section"
+section = "%package"
+package = "%{name}+xen-devel"
+
+[[overlays]]
+description = "Remove %description +xen-devel section"
+type = "spec-remove-section"
+section = "%description"
+package = "%{name}+xen-devel"
+
+[[overlays]]
+description = "Remove %files +xen-devel section"
+type = "spec-remove-section"
+section = "%files"
+package = "%{name}+xen-devel"

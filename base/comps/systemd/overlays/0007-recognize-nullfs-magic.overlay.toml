@@ -1,0 +1,6 @@
+# Adapted from upstream systemd commit 5f81a59a: recognize the NULL_FS_MAGIC
+# filesystem magic value introduced by Linux 7.0.
+[[overlays]]
+description = "Recognize the NULL_FS_MAGIC value introduced by Linux 7.0"
+type = "patch-add"
+source = "../systemd-add-nullfs-magic.patch"

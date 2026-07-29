@@ -1,0 +1,6 @@
+[[overlays]]
+description = "Remove glycin-heif/jxl loader sources to prevent cargo from generating unresolvable crate BRs"
+type = "spec-search-replace"
+section = "%prep"
+regex = "rm -r glycin-loaders/glycin-jpeg2000"
+replacement = "rm -r glycin-loaders/glycin-jpeg2000\n%if %{without heif}\nrm -rf glycin-loaders/glycin-heif\n%endif\n%if %{without jpegxl}\nrm -rf glycin-loaders/glycin-jxl\n%endif"

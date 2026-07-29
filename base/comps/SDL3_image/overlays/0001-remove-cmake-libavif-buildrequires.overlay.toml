@@ -1,0 +1,26 @@
+[[overlays]]
+description = "Remove cmake(libavif) BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "cmake(libavif)"
+
+[[overlays]]
+description = "Disable avif support in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = "-DSDLIMAGE_AVIF=ON"
+replacement = "-DSDLIMAGE_AVIF=OFF"
+
+[[overlays]]
+description = "Disable avif save support in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = "-DSDLIMAGE_AVIF_SAVE=ON"
+replacement = "-DSDLIMAGE_AVIF_SAVE=OFF"
+
+[[overlays]]
+description = "Disable avif shared linking in cmake build flags"
+type = "spec-search-replace"
+section = "%build"
+regex = "-DSDLIMAGE_AVIF_SHARED=ON"
+replacement = "-DSDLIMAGE_AVIF_SHARED=OFF"

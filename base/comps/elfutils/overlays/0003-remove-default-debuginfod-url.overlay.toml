@@ -1,0 +1,18 @@
+# Azure Linux does not ship a default debuginfod server, so drop the Fedora
+# dist_debuginfod_url packaging conditional from the debuginfod-client %files
+# section (and its matching terminator) to keep the non-URL client configuration.
+[[overlays]]
+description = "Remove the default-URL packaging condition"
+type = "spec-search-replace"
+section = "%files"
+package = "debuginfod-client"
+regex = '^%if "%\{\?dist_debuginfod_url\}"$'
+replacement = ""
+
+[[overlays]]
+description = "Remove the matching default-URL conditional terminator"
+type = "spec-search-replace"
+section = "%files"
+package = "debuginfod-client"
+regex = '^%endif$'
+replacement = ""

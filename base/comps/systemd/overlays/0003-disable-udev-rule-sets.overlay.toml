@@ -1,0 +1,6 @@
+[[overlays]]
+description = "Disable udev rule that sets default io scheduler to bfq"
+type = "file-search-replace"
+file = "60-block-scheduler.rules"
+regex = "(?m)^"
+replacement = "#"

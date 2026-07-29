@@ -8,14 +8,3 @@
 # media features are unavailable.
 [components.plasma-desktop]
 
-[[components.plasma-desktop.overlays]]
-description = "Drop BuildRequires on kpipewire — removing ffmpeg/libav* from the distro"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "kpipewire"
-
-[[components.plasma-desktop.overlays]]
-description = "Drop Requires on kpipewire — removing ffmpeg/libav* from the distro"
-type = "spec-remove-tag"
-tag = "Requires"
-value = "kpipewire%{?_isa}"

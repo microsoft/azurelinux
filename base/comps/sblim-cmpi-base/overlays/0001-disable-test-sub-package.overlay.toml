@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Disable test sub-package - sblim-testsuite is sdk-tier in AZL"
+type = "spec-search-replace"
+regex = "^%global with_test_subpackage 1$"
+replacement = "%global with_test_subpackage 0"

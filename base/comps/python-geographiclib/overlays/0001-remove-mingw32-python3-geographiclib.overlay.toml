@@ -1,0 +1,48 @@
+# Azure Linux does not ship mingw cross-compilation toolchains.
+# Remove all mingw subpackages and their build dependencies.
+
+[[overlays]]
+description = "Remove mingw32-python3-geographiclib subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-remove-subpackage"
+package = "mingw32-python3-%{pkg_name}"
+
+[[overlays]]
+description = "Remove mingw64-python3-geographiclib subpackage"
+type = "spec-remove-subpackage"
+package = "mingw64-python3-%{pkg_name}"
+
+[[overlays]]
+description = "Remove mingw32-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-filesystem"
+
+[[overlays]]
+description = "Remove mingw32-python3 BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-python3"
+
+[[overlays]]
+description = "Remove mingw32-python3-build BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw32-python3-build"
+
+[[overlays]]
+description = "Remove mingw64-filesystem BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-filesystem"
+
+[[overlays]]
+description = "Remove mingw64-python3 BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-python3"
+
+[[overlays]]
+description = "Remove mingw64-python3-build BuildRequires"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "mingw64-python3-build"

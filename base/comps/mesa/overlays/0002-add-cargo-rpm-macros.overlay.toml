@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Add cargo-rpm-macros — Fedora-style Rust build macros used by Azure Linux"
+type = "spec-add-tag"
+tag = "BuildRequires"
+value = "cargo-rpm-macros"

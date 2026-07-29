@@ -1,0 +1,6 @@
+[[overlays]]
+description = "Remove dependency on older version of dnf not carried in Azure Linux"
+type = "spec-remove-tag"
+tag = "Requires"
+value = "dnf4"
+package = "systemdeps-core"

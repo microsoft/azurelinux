@@ -5,14 +5,3 @@
 # works.
 [components.festival-freebsoft-utils]
 
-[[components.festival-freebsoft-utils.overlays]]
-description = "Drop BuildRequires: sox — sox is not shipped in AZL"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "sox"
-
-[[components.festival-freebsoft-utils.overlays]]
-description = "Drop Recommends: sox — sox is not shipped in AZL"
-type = "spec-remove-tag"
-tag = "Recommends"
-value = "sox"

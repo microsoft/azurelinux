@@ -1,0 +1,163 @@
+# Remove the audio and SDL UI sub-packages that are no longer built.
+# If upstream gated the backends on a bcond, the %package/%files blocks would be conditionalized and these removals unnecessary.
+overlays = [
+    # Remove qemu-audio-pipewire
+    {
+        description = 'Remove %package audio-pipewire',
+        type = 'spec-remove-section',
+        package = 'audio-pipewire',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-pipewire',
+        type = 'spec-remove-section',
+        package = 'audio-pipewire',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-pipewire',
+        type = 'spec-remove-section',
+        package = 'audio-pipewire',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-pa
+    {
+        description = 'Remove %package audio-pa',
+        type = 'spec-remove-section',
+        package = 'audio-pa',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-pa',
+        type = 'spec-remove-section',
+        package = 'audio-pa',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-pa',
+        type = 'spec-remove-section',
+        package = 'audio-pa',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-sdl
+    {
+        description = 'Remove %package audio-sdl',
+        type = 'spec-remove-section',
+        package = 'audio-sdl',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-sdl',
+        type = 'spec-remove-section',
+        package = 'audio-sdl',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-sdl',
+        type = 'spec-remove-section',
+        package = 'audio-sdl',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-alsa
+    {
+        description = 'Remove %package audio-alsa',
+        type = 'spec-remove-section',
+        package = 'audio-alsa',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-alsa',
+        type = 'spec-remove-section',
+        package = 'audio-alsa',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-alsa',
+        type = 'spec-remove-section',
+        package = 'audio-alsa',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-dbus
+    {
+        description = 'Remove %package audio-dbus',
+        type = 'spec-remove-section',
+        package = 'audio-dbus',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-dbus',
+        type = 'spec-remove-section',
+        package = 'audio-dbus',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-dbus',
+        type = 'spec-remove-section',
+        package = 'audio-dbus',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-oss
+    {
+        description = 'Remove %package audio-oss',
+        type = 'spec-remove-section',
+        package = 'audio-oss',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-oss',
+        type = 'spec-remove-section',
+        package = 'audio-oss',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-oss',
+        type = 'spec-remove-section',
+        package = 'audio-oss',
+        section = '%files',
+    },
+
+    # Remove qemu-audio-jack
+    {
+        description = 'Remove %package audio-jack',
+        type = 'spec-remove-section',
+        package = 'audio-jack',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description audio-jack',
+        type = 'spec-remove-section',
+        package = 'audio-jack',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files audio-jack',
+        type = 'spec-remove-section',
+        package = 'audio-jack',
+        section = '%files',
+    },
+
+    # Remove SDL UI sub-package
+    {
+        description = 'Remove %package ui-sdl',
+        type = 'spec-remove-section',
+        package = 'ui-sdl',
+        section = '%package',
+    },
+    {
+        description = 'Remove %description ui-sdl',
+        type = 'spec-remove-section',
+        package = 'ui-sdl',
+        section = '%description',
+    },
+    {
+        description = 'Remove %files ui-sdl',
+        type = 'spec-remove-section',
+        package = 'ui-sdl',
+        section = '%files',
+    },
+]

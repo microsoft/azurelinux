@@ -1,0 +1,23 @@
+[[overlays]]
+description = "Drop BuildRequires on libavformat — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavformat)"
+
+[[overlays]]
+description = "Drop BuildRequires on libavcodec — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavcodec)"
+
+[[overlays]]
+description = "Drop BuildRequires on libavutil — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libavutil)"
+
+[[overlays]]
+description = "Drop BuildRequires on libswscale — removing ffmpeg/libav* (used only by uninstalled example binaries)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(libswscale)"

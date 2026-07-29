@@ -1,0 +1,18 @@
+[[overlays]]
+description = "Remove SPA v4l2 plugin from %files (disabled at meson level)"
+type = "spec-search-replace"
+section = "%files"
+regex = "%{_libdir}/spa-%{spaversion}/v4l2/"
+replacement = ""
+
+[[overlays]]
+description = "Drop libv4l-devel BR (v4l-utils not shipped in AZL); not gated by the v4l2 bcond"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libv4l-devel"
+
+[[overlays]]
+description = "Remove pw-v4l2 man page in %install (meson generates it even with -D pipewire-v4l2=disabled)"
+type = "spec-append-lines"
+section = "%install"
+lines = ["# Remove pw-v4l2 man page (generated even with -D pipewire-v4l2=disabled)", "rm -f %{buildroot}%{_mandir}/man1/pw-v4l2.1*"]

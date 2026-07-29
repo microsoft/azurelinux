@@ -1,0 +1,7 @@
+# Backport of upstream systemd commit 3cfb1699: filter the Linux 7.0 errno
+# aliases that otherwise generate duplicate lookup-table initializers, which
+# break the build against newer kernel headers.
+[[overlays]]
+description = "Filter Linux 7.0 errno aliases that generate duplicate lookup-table initializers"
+type = "patch-add"
+source = "../systemd-filter-linux-7-errno-aliases.patch"
