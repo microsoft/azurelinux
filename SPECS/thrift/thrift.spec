@@ -361,7 +361,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 
 
 %files
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %{_bindir}/thrift
 %{_libdir}/libthrift-%{version}.so
 %{_libdir}/libthriftz-%{version}.so
@@ -377,7 +377,7 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %{_libdir}/pkgconfig/thrift-nb.pc
 %{_libdir}/pkgconfig/thrift.pc
 %{_libdir}/pkgconfig/thrift_c_glib.pc
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 
  
 %if 0%{?want_php} != 0
@@ -385,27 +385,27 @@ find %{buildroot} -name \*.py -exec grep -q /usr/bin/env {} \; -print | xargs -r
 %config(noreplace) /etc/php.d/thrift_protocol.ini
 %{_datadir}/php/Thrift/
 %{php_extdir}/thrift_protocol.so
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %endif
  
 %if %{?want_erlang} > 0
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/%{name}-%{version}/
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %endif
  
 %files -n python3-%{name}
 %{python3_sitearch}/%{name}
 %{python3_sitearch}/%{name}-%{version}.dist-info/
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
  
 %if 0%{?want_java} > 0
 %files -n lib%{name}-javadoc
 %{_javadocdir}/%{name}
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
  
 %files -n lib%{name}-java -f .mfiles
-%doc LICENSE NOTICE
+%license LICENSE NOTICE
 %endif
  
 %changelog
