@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop BuildRequires on ffmpeg-free-devel — removing ffmpeg from the distro"
 type = "spec-remove-tag"

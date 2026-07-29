@@ -5,6 +5,10 @@
 #
 # Update regex on Fedora rebase; do NOT remove the overlays.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove pkgconfig(fdk-aac) BuildRequires (fdk-aac-free not available in AZL)"
 type = "spec-remove-tag"

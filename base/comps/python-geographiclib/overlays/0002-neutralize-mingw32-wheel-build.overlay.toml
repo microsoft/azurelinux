@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Neutralize mingw32 wheel build step (replace with bash no-op `:` to preserve subshell structure)"
 type = "spec-search-replace"

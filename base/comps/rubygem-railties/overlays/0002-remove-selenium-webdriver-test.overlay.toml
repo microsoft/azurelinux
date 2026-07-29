@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove selenium-webdriver from test Gemfile - no chromedriver available"
 type = "spec-search-replace"

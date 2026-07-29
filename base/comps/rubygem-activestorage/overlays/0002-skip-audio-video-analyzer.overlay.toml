@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Skip audio/video analyzer/previewer tests — they shell out to ffmpeg/ffprobe, which are no longer available"
 type = "spec-search-replace"

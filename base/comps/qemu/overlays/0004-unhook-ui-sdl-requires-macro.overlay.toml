@@ -1,6 +1,8 @@
 # Unhook ui-sdl Requires from qemu-system-* emulators (configure --disable-sdl
 # is set by an earlier overlay).
 
+metadata = { category = "azl-pruning", upstream-status = "needs-upstream-hook" }
+
 overlays = [
     {
         description = 'Empty requires_ui_sdl macro',

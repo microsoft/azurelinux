@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove cmake(libavif) BuildRequires (libavif not available in AZL)"
 type = "spec-remove-tag"

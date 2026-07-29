@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop BuildRequires on kpipewire — removing ffmpeg/libav* from the distro"
 type = "spec-remove-tag"

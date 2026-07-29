@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove Recommends on gstreamer1-plugins-bad-free from webkitgtk6.0 package — not shipped in AZL"
 type = "spec-remove-tag"

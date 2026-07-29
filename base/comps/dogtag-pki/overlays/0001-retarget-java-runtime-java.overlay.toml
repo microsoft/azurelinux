@@ -5,6 +5,10 @@
 # %changelog entries that mention these monikers (spec-search-replace
 # cannot be scoped to the preamble alone).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Retarget java_runtime to java-25-openjdk"
 type = "spec-search-replace"

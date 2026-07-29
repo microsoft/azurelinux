@@ -31,6 +31,10 @@
 # Update regexes on Fedora rebase if upstream renames Patch401 or
 # reflows firefox-mozconfig; do NOT remove the overlays.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Skip Fedora's mozilla-1667096.patch (Patch401) in %prep. The patch is fdk-aac-only and (i) adds the `--with-system-fdk-aac` configure option and (ii) registers `ff_libfdk_aac_decoder` in ffvpx's codec_list.c. Without the wrapper .c file (libfdk-aacdec.c, also added by the patch) compiled in, that codec-table entry produces `undefined reference to ff_libfdk_aac_decoder` when linking libmozavcodec.so."
 type = "spec-search-replace"

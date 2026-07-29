@@ -5,6 +5,9 @@
 # component-check-disablement.toml, so dropping these BuildRequires is purely a
 # dependency-resolution change with no behavioral impact.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove chromedriver BuildRequires - not packaged in Azure Linux"
 type = "spec-remove-tag"

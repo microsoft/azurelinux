@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
 [[overlays]]
 description = "Guard gi.require_version('Flatpak') so the module loads even without flatpak-libs typelib"
 type = "patch-add"

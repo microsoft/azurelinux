@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove SPA v4l2 plugin from %files (disabled at meson level)"
 type = "spec-search-replace"

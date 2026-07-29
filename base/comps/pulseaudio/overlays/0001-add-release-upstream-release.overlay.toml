@@ -6,6 +6,9 @@
 # When that happens, update the regex *and* the baseline number in the
 # replacement to the new upstream value, and reset azl_release to "1".
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Add azl_release to upstream Release so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
 type = "spec-search-replace"

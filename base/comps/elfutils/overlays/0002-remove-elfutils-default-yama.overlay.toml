@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove elfutils-default-yama-scope package"
 type = "spec-search-replace"

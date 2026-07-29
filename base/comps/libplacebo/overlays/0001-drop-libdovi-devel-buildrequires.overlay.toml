@@ -4,6 +4,9 @@
 # and only affects parsing of Dolby Vision RPU metadata at runtime —
 # standard HDR10 / HDR10+ paths are unaffected.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop libdovi-devel BuildRequires; rust-dolby_vision (which provides libdovi) is being removed from Azure Linux 4.0"
 type = "spec-remove-tag"

@@ -8,6 +8,10 @@
 # Note: %{nil} cannot be used as the macro value because %ifarch requires at
 # least one argument.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Clear qt6_qtwebengine_arches macro to disable qtwebengine across dependent packages"
 type = "file-search-replace"

@@ -2,6 +2,9 @@
 # mingw support is out of scope for Azure Linux, and enabling it presently brings in
 # dependencies on Python 3.11, which we do not support.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable mingw support"
 type = "spec-search-replace"

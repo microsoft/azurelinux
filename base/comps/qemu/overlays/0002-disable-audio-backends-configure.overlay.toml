@@ -1,6 +1,8 @@
 # Strip audio/SDL backends at configure time. Upstream lacks macros to disable
 # these; we flip the flags and clear the driver list directly.
 
+metadata = { category = "azl-pruning", upstream-status = "needs-upstream-hook" }
+
 overlays = [
     {
         description = 'configure: disable-pipewire',

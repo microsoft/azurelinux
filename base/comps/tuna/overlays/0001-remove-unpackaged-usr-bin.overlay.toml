@@ -4,6 +4,10 @@
 # leaving an unpackaged file when the bcond is off (rpmbuild fails). Strip
 # it explicitly when oscilloscope is disabled.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Remove unpackaged /usr/bin/oscilloscope when oscilloscope bcond is off"
 type = "spec-append-lines"

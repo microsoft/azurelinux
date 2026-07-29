@@ -1,6 +1,10 @@
 # AZL does not ship fdk-aac-free — disable AAC audio support in FreeRDP.
 # Update regex on Fedora rebase; do NOT remove the overlays.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Drop BuildRequires: pkgconfig(fdk-aac) (fdk-aac-free not available in AZL)"
 type = "spec-remove-tag"

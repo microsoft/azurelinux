@@ -5,6 +5,9 @@
 
 # 3. Remove BuildRequires for virt-firmware-rs (not yet available in AZL4).
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "WORKAROUND: Remove virt-firmware-rs BuildRequires — not yet in AZL4. Provides igvm-wrap for IGVM/confidential VM support. Remove overlay when virt-firmware-rs is imported."
 type = "spec-remove-tag"

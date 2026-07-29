@@ -2,6 +2,10 @@
 # selenium-webdriver depends on chromedriver at runtime, so the whole
 # browser-testing stack must be removed.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Remove chromedriver/chromium BuildRequires - not available in Azure Linux"
 type = "spec-remove-tag"

@@ -20,6 +20,10 @@
 # upstream-status is needs-upstream-hook: upstream's only knob is the coarse
 # __with_wxwidgets toggle; fine-grained per-application removal would require a
 # hook upstream does not yet provide.
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 # Stop OTP building the five applications; otherwise their files land in the
 # buildroot with no %files section left to claim them.
 [[overlays]]

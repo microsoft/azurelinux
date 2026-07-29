@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Disable test sub-package - sblim-testsuite is sdk-tier in AZL"
 type = "spec-search-replace"

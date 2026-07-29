@@ -5,6 +5,9 @@
 # %{_libdir}/imlib2/ directory glob in %files absorbs the missing plugin
 # without an "unpackaged file" error.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
 type = "spec-remove-tag"

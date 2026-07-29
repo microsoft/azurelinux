@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove gstreamer1-plugins-bad-free-devel BuildRequires — gstreamer1-plugins-bad-free not shipped in AZL"
 type = "spec-remove-tag"

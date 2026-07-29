@@ -3,6 +3,9 @@
 # the non-asm makefile on x86_64. This loses asm-optimized CRC32/AES but is
 # functionally identical.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove yasm BuildRequires — yasm is not available in Azure Linux"
 type = "spec-search-replace"

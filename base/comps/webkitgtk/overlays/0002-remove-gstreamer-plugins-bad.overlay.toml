@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove gstreamer-plugins-bad-1.0 BuildRequires (gstreamer1-plugins-bad-free not shipped in AZL; vestigial in upstream spec, no gst-bad headers are #included under default cmake options)"
 type = "spec-remove-tag"

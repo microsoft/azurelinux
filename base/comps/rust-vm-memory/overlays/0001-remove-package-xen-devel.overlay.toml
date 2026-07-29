@@ -1,5 +1,8 @@
 # Remove the +xen feature subpackage — Xen is not applicable to Azure Linux.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove %package +xen-devel section"
 type = "spec-remove-section"

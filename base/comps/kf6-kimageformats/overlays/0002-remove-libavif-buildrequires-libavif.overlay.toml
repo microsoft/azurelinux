@@ -1,6 +1,10 @@
 # AZL does not ship libavif — remove the cmake(libavif) BR so the avif
 # plugin is not discovered or built.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove libavif BuildRequires (libavif not available in AZL)"
 type = "spec-remove-tag"

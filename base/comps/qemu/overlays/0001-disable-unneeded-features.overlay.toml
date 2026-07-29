@@ -1,5 +1,7 @@
 # Disable features not needed in Azure Linux's Hyper-V/KVM environment.
 # Upstream could expose a bcond/condition so we set Xen, brlapi, jack, spice, dbus_display OFF without spec surgery.
+metadata = { category = "azl-pruning", upstream-status = "needs-upstream-hook" }
+
 overlays = [
     # Upstream enables Xen when %fedora is set (which it is on our builders), so force it off.
     {

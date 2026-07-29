@@ -9,6 +9,9 @@
 # to advertise mingw BuildRequires and break build-dep closure for the AZL
 # repo. Drop this overlay the next time the upstream Release bumps past 0.33.
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Bump Release 0.33 → 0.34 to force a rebuild that drops stale mingw BRs"
 type = "spec-search-replace"

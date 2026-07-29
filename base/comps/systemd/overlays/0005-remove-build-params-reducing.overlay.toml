@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove build params reducing default timeout to 45s; leaving upstream default of 90s"
 type = "spec-search-replace"

@@ -1,5 +1,9 @@
 # Remove RDP-only libexec entries from %files
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove RDP-only enable-service from %files"
 type = "spec-search-replace"

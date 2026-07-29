@@ -3,6 +3,9 @@
 # 1. Rename the build config section so edk2-build.py skips the Xen build.
 #    The script iterates sections starting with "build." prefix.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Disable Xen OVMF build - rename config section so edk2-build.py skips it"
 type = "file-search-replace"

@@ -2,6 +2,9 @@
 # removing the HiGHS BuildRequires entry and stripping the configure flags.
 # HiGHS is an optional LP solver backend; Cbc's primary solver (Clp) is unaffected.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Disable HiGHS BuildRequires — coin-or-HiGHS not available in Azure Linux"
 type = "spec-remove-tag"

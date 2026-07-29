@@ -1,5 +1,9 @@
 # AZL does not ship opus — disable opus in the meson build.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove opus-devel BuildRequires (opus not available in AZL)"
 type = "spec-remove-tag"

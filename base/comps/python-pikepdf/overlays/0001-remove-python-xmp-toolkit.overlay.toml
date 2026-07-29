@@ -2,6 +2,9 @@
 # dependency for XMP metadata tests on x86_64. Strip it from the pyproject.toml
 # test extras so %pyproject_buildrequires doesn't pull in the missing package.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove python-xmp-toolkit from test dependencies (not available in Azure Linux)"
 type = "spec-append-lines"
