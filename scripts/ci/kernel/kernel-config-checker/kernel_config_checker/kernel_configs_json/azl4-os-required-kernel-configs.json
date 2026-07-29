@@ -3022,7 +3022,7 @@
               "value": "y"
             }
           ],
-          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/63295066"
+          "justification": "Enable firmware-first hardware error reporting through ACPI APEI GHES on x86_64 - Work item: https://microsoft.visualstudio.com/OS/_workitems/edit/63295066"
         },
         {
           "name": "CONFIG_DRM_ACCEL_IVPU",
