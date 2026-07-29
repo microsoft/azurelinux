@@ -64,6 +64,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Build, boot, test, or configure images | [`azldev-image`](.agents/skills/azldev-image/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.agents/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.agents/skills/skill-mass-triage/SKILL.md) |
+| Fix Stage 1 Fedora mirror dependency gaps (injections) | [`skill-fedora-mirror-injections`](.agents/skills/skill-fedora-mirror-injections/SKILL.md) |
 | Inspect Koji AKS cluster health and node pools | [`skill-aks-health`](.agents/skills/skill-aks-health/SKILL.md) |
 | Resolve Koji AKS deployment context | [`skill-deployment-context`](.agents/skills/skill-deployment-context/SKILL.md) |
 | KQL queries for Koji logs, pods, and events | [`skill-kql-queries`](.agents/skills/skill-kql-queries/SKILL.md) |
