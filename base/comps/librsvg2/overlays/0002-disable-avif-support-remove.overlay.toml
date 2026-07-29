@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Disable AVIF support to remove dav1d dependency"
 type = "spec-search-replace"

@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Disable system_testing tests - all instantiate chrome drivers and fail without chromedriver"
 type = "spec-search-replace"

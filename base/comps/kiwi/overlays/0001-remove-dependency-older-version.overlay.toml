@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
 [[overlays]]
 description = "Remove dependency on older version of dnf not carried in Azure Linux"
 type = "spec-remove-tag"

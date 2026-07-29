@@ -1,5 +1,7 @@
 # Unhook audio Requires from qemu-system-* emulators.
 # A proper upstream bcond gating audio would zero these automatically.
+metadata = { category = "azl-pruning", upstream-status = "needs-upstream-hook" }
+
 overlays = [
     {
         description = 'Empty requires_audio_pipewire macro',

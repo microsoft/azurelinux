@@ -1,5 +1,9 @@
 # AZL is removing opus — remove the BR and explicitly disable opus.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove opus-devel BuildRequires (opus being removed from AZL)"
 type = "spec-remove-tag"

@@ -10,6 +10,9 @@
 # leaving an unclosed %if. Intentionally unscoped — the same guard appears in 4
 # locations (%package, %install, %files x2) and all must be disabled.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable Fedora-specific icon subpackage (breeze-icon-theme-fedora) — requires fedora-release-common which AZL does not ship"
 type = "spec-search-replace"

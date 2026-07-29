@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop BuildRequires on libavcodec-free-devel — removing ffmpeg/libav* (amd_media extension auto-disables)"
 type = "spec-remove-tag"

@@ -1,6 +1,11 @@
 # Backport of upstream systemd commit 3cfb1699: filter the Linux 7.0 errno
 # aliases that otherwise generate duplicate lookup-table initializers, which
 # break the build against newer kernel headers.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/systemd/systemd/commit/3cfb16998808a6ec8012a6120d0a82f0e1a0c8bb" }]
+
 [[overlays]]
 description = "Filter Linux 7.0 errno aliases that generate duplicate lookup-table initializers"
 type = "patch-add"

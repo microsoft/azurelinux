@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove recommends: default-yama-scope"
 type = "spec-remove-tag"

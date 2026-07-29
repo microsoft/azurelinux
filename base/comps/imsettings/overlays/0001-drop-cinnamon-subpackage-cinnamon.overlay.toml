@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop -cinnamon subpackage; Cinnamon DE not shipped on Azure Linux 4.0."
 type = "spec-remove-subpackage"

@@ -5,6 +5,9 @@
 # %changelog entries (spec-search-replace cannot be scoped to the
 # preamble alone).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
 [[overlays]]
 description = "Retarget java_devel to java-25-openjdk-devel"
 type = "spec-search-replace"

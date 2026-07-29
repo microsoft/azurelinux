@@ -4,6 +4,9 @@
 # the standard `build.without = ["mingw"]` mechanism has no effect. Force it
 # off via spec overlay.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable mingw sub-packages — Azure Linux does not ship mingw toolchains"
 type = "spec-search-replace"

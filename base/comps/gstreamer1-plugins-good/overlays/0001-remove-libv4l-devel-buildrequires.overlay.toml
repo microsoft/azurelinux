@@ -1,5 +1,9 @@
 # v4l-utils/libv4l not shipped in AZL — disable the v4l2 GStreamer plugin.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
 type = "spec-remove-tag"

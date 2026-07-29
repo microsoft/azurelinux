@@ -1,6 +1,9 @@
 # Azure Linux does not ship mingw cross-compilation toolchains.
 # Remove all mingw subpackages and their build dependencies.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Remove mingw32-jxrlib subpackage — Azure Linux does not ship mingw toolchains"
 type = "spec-remove-subpackage"

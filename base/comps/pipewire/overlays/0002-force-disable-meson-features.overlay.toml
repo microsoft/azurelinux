@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Force-disable meson features whose dependencies are not shipped in AZL.\nRequired because Fedora's %meson macro always passes --auto-features=enabled,\nwhich flips every auto-default feature to mandatory and would otherwise turn\nthese missing deps into hard build failures:\n  - opus / bluez5-codec-opus: opus codec library not shipped in AZL\n  - echo-cancel-webrtc: webrtc-audio-processing not shipped in AZL\n    (see the component removal and BR-drop overlays below)\n  - v4l2 / pipewire-v4l2: v4l-utils not shipped in AZL\nThe modules themselves still build; only the codec/backend implementations\nthat need the unavailable libraries are skipped.\n"
 type = "spec-search-replace"

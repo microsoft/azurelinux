@@ -13,6 +13,8 @@
 #   and builds `accel-qtest-*.so` plugins, so we rm them from the buildroot
 #   after install to avoid "Installed (but unpackaged)" errors.
 
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
 overlays = [
     {
         description = 'Hoist `%define testsdir` so %install expands correctly after %package tests is removed',

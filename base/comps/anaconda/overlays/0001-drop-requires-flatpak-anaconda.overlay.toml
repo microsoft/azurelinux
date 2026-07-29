@@ -4,6 +4,9 @@
 # doesn't ship. Removing these Requires unhooks anaconda-core from
 # the flatpak chain so flatpak can be demoted to sdk.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop Requires: flatpak from anaconda-core (flatpak source-type unused on AZL)"
 type = "spec-remove-tag"

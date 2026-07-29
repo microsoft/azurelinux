@@ -19,6 +19,9 @@
 # new macro shape — do NOT remove the overlay; the constraint is permanent
 # (webrtc-audio-processing is not shipped in AZL).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable WebRTC AEC backend (webrtc-audio-processing not shipped in AZL)"
 type = "spec-search-replace"

@@ -14,6 +14,9 @@
 # literal here to match the new upstream Release integer, and reset
 # `azl_release = "1"`.
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Compose azl_release with upstream Release integer so AZL-only bumps are tracked independently of upstream Fedora's Release counter"
 type = "spec-search-replace"

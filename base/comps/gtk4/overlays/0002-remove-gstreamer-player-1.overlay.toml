@@ -3,6 +3,9 @@
 # GstPlayer (gstreamer-player-1.0) lives in gstreamer1-plugins-bad-free-libs,
 # which is the source of both the BuildRequires and the runtime Requires below.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove gstreamer-player-1.0 BuildRequires — gstreamer1-plugins-bad-free not shipped in AZL"
 type = "spec-remove-tag"

@@ -1,5 +1,9 @@
 # AZL does not ship libbluray — Blu-Ray playback support is dropped from gvfs.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Drop BuildRequires: pkgconfig(libbluray) (libbluray not available in AZL)"
 type = "spec-remove-tag"

@@ -9,6 +9,10 @@
 # Koji build failure: task 907428 (aarch64), task 898577 (x86_64)
 # TODO: Remove when upstream Firefox fixes GCC 15 compatibility (missing <cstdint> include).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Disable build-time test compilation to avoid GCC 15 missing <cstdint> error in TestIntegerRange.cpp"
 type = "spec-search-replace"

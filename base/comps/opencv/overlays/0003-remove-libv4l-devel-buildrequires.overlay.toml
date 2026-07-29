@@ -1,6 +1,10 @@
 # v4l-utils/libv4l not shipped in AZL. Disable the libv4l userspace wrapper
 # while keeping the kernel V4L2 API available (WITH_V4L defaults to ON).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove libv4l-devel BuildRequires — libv4l not shipped in AZL"
 type = "spec-remove-tag"

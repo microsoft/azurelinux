@@ -1,5 +1,7 @@
 # Remove the audio and SDL UI sub-packages that are no longer built.
 # If upstream gated the backends on a bcond, the %package/%files blocks would be conditionalized and these removals unnecessary.
+metadata = { category = "azl-pruning", upstream-status = "needs-upstream-hook" }
+
 overlays = [
     # Remove qemu-audio-pipewire
     {

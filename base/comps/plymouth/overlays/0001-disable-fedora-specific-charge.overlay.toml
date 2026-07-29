@@ -12,6 +12,9 @@
 # The same guard appears in 4 spec sections (%package, %install, %postun,
 # %files) and all must be disabled.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Disable Fedora-specific charge theme subpackage (plymouth-theme-charge) — requires fedora-logos-classic which AZL does not ship"
 type = "spec-search-replace"

@@ -1,6 +1,10 @@
 # Azure Linux release-management overlays: bump the imported Fedora baserelease by
 # the AZL-only azl_release delta and record the matching %changelog entry for the
 # rebuild without a default debuginfod server. AZL-only bookkeeping; never upstreamed.
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Add the Azure Linux release delta to the imported Fedora baserelease"
 type = "spec-search-replace"

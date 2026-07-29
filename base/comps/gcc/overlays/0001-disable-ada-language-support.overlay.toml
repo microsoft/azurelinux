@@ -3,6 +3,9 @@
 # via libraries like CUDA. Dropping support for these features make the build
 # faster. The overlays below implement those choices.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable Ada language support"
 type = "spec-search-replace"

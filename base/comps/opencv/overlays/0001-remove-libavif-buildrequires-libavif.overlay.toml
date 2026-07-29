@@ -1,6 +1,10 @@
 # AZL does not ship libavif — disable avif support in imgcodecs.
 # No bcond exists; need to remove the BR and pass -DWITH_AVIF=OFF.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove libavif BuildRequires (libavif not available in AZL)"
 type = "spec-remove-tag"

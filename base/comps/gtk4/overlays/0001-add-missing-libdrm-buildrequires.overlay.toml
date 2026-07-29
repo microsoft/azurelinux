@@ -3,6 +3,9 @@
 # this BR the build fails at meson.build:731. This is a latent
 # upstream gap; keep the BR even though gtk4 itself now lives in sdk.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
 [[overlays]]
 description = "Add missing libdrm BuildRequires (gtk4 4.20+ meson requirement)"
 type = "spec-add-tag"

@@ -4,6 +4,9 @@
 # eagerly and fails without chromedriver. Disable that entire directory; the
 # rest of the actionpack test suite still runs.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove chromedriver/chromium BuildRequires - not packaged in Azure Linux"
 type = "spec-remove-tag"

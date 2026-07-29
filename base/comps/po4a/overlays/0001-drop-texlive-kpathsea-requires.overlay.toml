@@ -8,6 +8,10 @@
 # texlive-kpathsea(-bin) live in sdk. Users translating TeX sources can
 # install texlive-kpathsea-bin from sdk on demand.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Drop texlive-kpathsea Requires - TeX format support is optional, texlive is sdk-tier"
 type = "spec-remove-tag"

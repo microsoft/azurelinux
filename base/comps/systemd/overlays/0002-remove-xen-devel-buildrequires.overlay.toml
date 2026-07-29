@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Remove xen-devel BuildRequires — not available in AZL (AZL targets Hyper-V/Azure, not Xen)"
 type = "spec-remove-tag"

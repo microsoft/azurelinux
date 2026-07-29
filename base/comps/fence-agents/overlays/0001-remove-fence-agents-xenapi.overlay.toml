@@ -3,6 +3,9 @@
 # Clearing the package name leaves " \\" — a blank continuation that adds
 # only harmless whitespace to the Requires list.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Remove fence-agents-xenapi from fence-agents-all Requires - Xen not needed for Azure Linux"
 type = "spec-search-replace"

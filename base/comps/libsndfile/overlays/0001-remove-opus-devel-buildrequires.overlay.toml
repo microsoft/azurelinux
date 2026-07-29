@@ -4,6 +4,10 @@
 # other three as well.  We make this explicit with --disable-external-libs and
 # drop the now-dead flac/ogg/vorbis BRs to keep the dep graph honest.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove opus-devel BuildRequires (opus not available in AZL)"
 type = "spec-remove-tag"

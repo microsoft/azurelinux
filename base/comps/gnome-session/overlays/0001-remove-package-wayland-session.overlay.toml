@@ -3,6 +3,10 @@
 # depends on it (and gdm is being removed). Removing it also drops the
 # transitive Requires on gnome-shell.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Remove %package wayland-session"
 type = "spec-remove-section"

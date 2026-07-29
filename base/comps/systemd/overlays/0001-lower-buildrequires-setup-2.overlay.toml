@@ -2,6 +2,9 @@
 # Lower the version threshold to match what's available in AZL.
 # Ref: https://src.fedoraproject.org/rpms/setup/commits/rawhide (2.15.0-3 added /usr/lib/sysusers.d ownership)
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Lower BuildRequires on setup from 2.15.0-3 to 2.15.0-1 to match AZL's available version"
 type = "spec-search-replace"

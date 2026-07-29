@@ -1,3 +1,6 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
 [[overlays]]
 description = "Drop BuildRequires on neatvnc — removing ffmpeg/libav* and neatvnc from the distro"
 type = "spec-remove-tag"

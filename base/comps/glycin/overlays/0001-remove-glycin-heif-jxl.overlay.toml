@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Remove glycin-heif/jxl loader sources to prevent cargo from generating unresolvable crate BRs"
 type = "spec-search-replace"

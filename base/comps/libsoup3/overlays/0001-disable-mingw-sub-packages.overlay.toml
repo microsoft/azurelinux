@@ -2,6 +2,9 @@
 # The upstream spec conditionally enables mingw when %fedora is defined,
 # which is true in our build environment. Force it off.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
 [[overlays]]
 description = "Disable mingw sub-packages — Azure Linux does not ship mingw toolchains"
 type = "spec-search-replace"

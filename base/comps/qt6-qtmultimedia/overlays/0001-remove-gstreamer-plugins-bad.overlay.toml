@@ -2,6 +2,10 @@
 # linking against libgstplay/libgstphotography (unresolved runtime deps that
 # break all transitive consumers up to libplasma).
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Remove gstreamer-plugins-bad BR — gstreamer1-plugins-bad-free not shipped in AZL"
 type = "spec-remove-tag"

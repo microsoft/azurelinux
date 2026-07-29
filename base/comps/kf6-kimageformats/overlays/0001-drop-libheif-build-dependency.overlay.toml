@@ -5,6 +5,10 @@
 # plugin directory absorbs the absent plugin without an "unpackaged file"
 # error.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Drop libheif build dependency ahead of libheif removal from Azure Linux 4.0"
 type = "spec-remove-tag"
