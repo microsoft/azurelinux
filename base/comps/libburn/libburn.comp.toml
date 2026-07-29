@@ -1,0 +1,8 @@
+[components.libburn]
+
+# Pin the libburnia stack to Fedora 43's 1.5.8 update; libisoburn rejects
+# older libburn and libisofs libraries at runtime.
+# https://src.fedoraproject.org/rpms/libburn/c/cfce77a89906b68afbab3a5fb314eeeb460e0ee8?branch=f43
+# TODO: Drop this override once the default Fedora 43 snapshot in
+# distro/azurelinux.distro.toml advances past 2026-04-03.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cfce77a89906b68afbab3a5fb314eeeb460e0ee8" }

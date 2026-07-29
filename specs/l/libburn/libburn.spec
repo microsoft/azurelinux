@@ -5,8 +5,8 @@
 
 Summary:         Library for reading, mastering and writing optical discs
 Name:            libburn
-Version:         1.5.6
-Release: 9%{?dist}
+Version:         1.5.8
+Release: 3%{?dist}
 License:         GPL-2.0-or-later
 URL:             https://libburnia-project.org/
 Source0:         https://files.libburnia-project.org/releases/%{pkgname}-%{version}.tar.gz
@@ -14,7 +14,6 @@ Source1:         https://files.libburnia-project.org/releases/%{pkgname}-%{versi
 Source2:         https://keys.openpgp.org/vks/v1/by-fingerprint/44BC9FD0D688EB007C4DD029E9CBDFC0ABC0A854
 Patch0:          libburn-0.6.16-multilib.patch
 Patch1:          libburn-1.5.4-rpath.patch
-Patch2:          https://dev.lovelyhq.com/libburnia/libburn/commit/d537f9dd35282df834a311ead5f113af67d223b3.patch#/libburn-1.5.6-c23.patch
 BuildRequires:   gnupg2
 BuildRequires:   gcc, make, intltool, gettext
 %if 0%{?rhel} && "%{name}" != "%{pkgname}"
@@ -64,7 +63,7 @@ features from the command line.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup -p1 -n %{pkgname}-%{version}
+%autosetup -n %{pkgname}-%{version} -p1
 
 # Rename from libburn to libburn1 for EPEL
 %if 0%{?rhel} && "%{name}" != "%{pkgname}"
@@ -135,6 +134,9 @@ fi
 %{_mandir}/man1/cdrskin%{?variant}.1*
 
 %changelog
+* Fri Apr 03 2026 Robert Scheck <robert@fedoraproject.org> 1.5.8-1
+- Upgrade to 1.5.8 (#2454539)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.6-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
