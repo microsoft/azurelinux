@@ -1,0 +1,17 @@
+[components.package-notes]
+
+# The upstream spec derives the osCpe value baked into the SRPM macros from
+# /usr/lib/system-release-cpe in the buildroot. During bootstrap this component
+# is built in a Fedora buildroot, which would bake in Fedora's CPE. Hardcode the
+# Azure Linux CPE instead so the value matches what azurelinux-release installs
+# to /usr/lib/system-release-cpe.
+[[components.package-notes.overlays]]
+description = "Hardcode the Azure Linux OS CPE instead of reading it from the buildroot"
+type = "spec-search-replace"
+section = "%build"
+regex = '^sed "s\|@OSCPE@\|\$\(cat /usr/lib/system-release-cpe\)\|" %\{SOURCE0\} >redhat-package-notes$'
+replacement = 'sed "s|@OSCPE@|cpe:2.3:o:microsoft:azure_linux:4.0:*:*:*:*:*:*:*|" %{SOURCE0} >redhat-package-notes'
+
+[components.package-notes.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
