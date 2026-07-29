@@ -4,7 +4,7 @@
 
 **An open-source Linux distribution built and optimized for [Azure](https://azure.microsoft.com/), with sources derived from [Fedora Linux](https://fedoraproject.org/).** Azure Linux provides a secured, reliable operating system for virtual machines, containers, and bare-metal platforms.
 
-Azure Linux is built on a robust open-source foundation from the Fedora ecosystem and enhanced with Azure-specific innovations. This provides the familiarity of the RPM package ecosystem, while adding Azure-native security, compliance, and operational capabilities. 
+Azure Linux is built on a robust open-source foundation from the Fedora ecosystem and enhanced with Azure-specific innovations. This provides the familiarity of the RPM package ecosystem, while adding Azure-native security, compliance, and operational capabilities.
 
 Key features of Azure Linux include: hardened security posture, an Azure-optimized kernel, supply chain security, native Azure integration, and a predictable lifecycle.
 
@@ -52,6 +52,34 @@ Before using a downloaded ISO, [verify the checksum and signature of the ISO](./
 After downloading and verifying the ISO, follow the [ISO installer instructions](./docs/iso-installer-in-local-vm.md) to install and use Azure Linux in a local VM (Hyper-V on Windows or QEMU/KVM on Linux). The ISO runs the [Anaconda](https://anaconda-installer.readthedocs.io/) installer.
 
 _Note: Support for the ISO is community based. Before filing a new bug or feature request, please search the list of Github Issues. If you are unable to find a matching issue, please report new bugs by clicking [here](https://github.com/microsoft/azurelinux/issues). For additional information, refer to the [SUPPORT.md](./SUPPORT.md) file._
+
+</details>
+
+<details open>
+<summary><b>🐧 WSL</b></summary>
+
+To try Azure Linux on the Windows Subsystem for Linux, please download the `.wsl` distribution package for your architecture:
+
+- [x86_64](https://osrelease.download.prss.microsoft.com/pr/download/AzureLinux-4.0-x86_64.wsl)
+- [ARM64](https://osrelease.download.prss.microsoft.com/pr/download/AzureLinux-4.0-aarch64.wsl)
+
+Install the distribution using `wsl`:
+
+```powershell
+wsl --install --from-file "C:\Path\To\AzureLinux-4.0-ARCH.wsl"
+```
+
+To list all the installed distributions:
+
+```powershell
+wsl --list
+```
+
+To use the distro:
+
+```powershell
+wsl -d AzureLinux-4
+```
 
 </details>
 
