@@ -1410,7 +1410,7 @@
             "value": "m"
           }
         ],
-        "justification": "Needed for customer - PR: https://github.com/microsoft/azurelinux/pull/5406"
+        "justification": "Enable Broadcom NetXtreme-E RoCE support for customer workloads - Work item: https://microsoft.visualstudio.com/OS/_workitems/edit/63295045"
       },
       {
         "name": "CONFIG_INIT_ON_FREE_DEFAULT_ON",
@@ -3229,13 +3229,6 @@
             { "architecture": "x86_64", "value": "n" }
           ],
           "justification": "Align kernel 6.18 with its generated configuration"
-        },
-        {
-          "name": "CONFIG_INFINIBAND_BNXT_RE",
-          "values": [
-            { "architecture": "x86_64", "value": "m" }
-          ],
-          "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/63295045"
         },
         {
           "name": "CONFIG_IP_VS_DEBUG",
