@@ -1,0 +1,54 @@
+# Strip audio/SDL backends at configure time. Upstream lacks macros to disable
+# these; we flip the flags and clear the driver list directly.
+
+overlays = [
+    {
+        description = 'configure: disable-pipewire',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-pipewire \\',
+        replacement = '--disable-pipewire \',
+    },
+    {
+        description = 'configure: disable pulseaudio',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-pa \\',
+        replacement = '--disable-pa \',
+    },
+    {
+        description = 'configure: disable sdl',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-sdl \\',
+        replacement = '--disable-sdl \',
+    },
+    {
+        description = 'configure: disable sdl-image',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-sdl-image \\',
+        replacement = '--disable-sdl-image \',
+    },
+    {
+        description = 'configure: disable alsa',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-alsa \\',
+        replacement = '--disable-alsa \',
+    },
+    {
+        description = 'configure: disable oss',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--enable-oss \\',
+        replacement = '--disable-oss \',
+    },
+    {
+        description = 'configure: remove all audio drivers',
+        type = 'spec-search-replace',
+        section = '%build',
+        regex = '--audio-drv-list=.* \\',
+        replacement = '--audio-drv-list= \',
+    },
+]

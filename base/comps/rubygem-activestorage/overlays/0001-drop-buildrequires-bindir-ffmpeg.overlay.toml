@@ -1,0 +1,23 @@
+[[overlays]]
+description = "Drop BuildRequires on %{_bindir}/ffmpeg — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "%{_bindir}/ffmpeg"
+
+[[overlays]]
+description = "Drop BuildRequires on %{_bindir}/ffprobe — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "%{_bindir}/ffprobe"
+
+[[overlays]]
+description = "Drop Suggests on %{_bindir}/ffmpeg — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "Suggests"
+value = "%{_bindir}/ffmpeg"
+
+[[overlays]]
+description = "Drop Suggests on %{_bindir}/ffprobe — removing ffmpeg from the distro"
+type = "spec-remove-tag"
+tag = "Suggests"
+value = "%{_bindir}/ffprobe"

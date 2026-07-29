@@ -1,0 +1,40 @@
+# Unhook audio Requires from qemu-system-* emulators.
+# A proper upstream bcond gating audio would zero these automatically.
+overlays = [
+    {
+        description = 'Empty requires_audio_pipewire macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_pipewire .*',
+        replacement = '%define requires_audio_pipewire %{nil}',
+    },
+    {
+        description = 'Empty requires_audio_pa macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_pa .*',
+        replacement = '%define requires_audio_pa %{nil}',
+    },
+    {
+        description = 'Empty requires_audio_sdl macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_sdl .*',
+        replacement = '%define requires_audio_sdl %{nil}',
+    },
+    {
+        description = 'Empty requires_audio_alsa macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_alsa .*',
+        replacement = '%define requires_audio_alsa %{nil}',
+    },
+    {
+        description = 'Empty requires_audio_dbus macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_dbus .*',
+        replacement = '%define requires_audio_dbus %{nil}',
+    },
+    {
+        description = 'Empty requires_audio_oss macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_audio_oss .*',
+        replacement = '%define requires_audio_oss %{nil}',
+    },
+]

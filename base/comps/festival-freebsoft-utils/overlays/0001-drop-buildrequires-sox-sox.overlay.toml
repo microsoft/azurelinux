@@ -1,0 +1,11 @@
+[[overlays]]
+description = "Drop BuildRequires: sox — sox is not shipped in AZL"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "sox"
+
+[[overlays]]
+description = "Drop Recommends: sox — sox is not shipped in AZL"
+type = "spec-remove-tag"
+tag = "Recommends"
+value = "sox"

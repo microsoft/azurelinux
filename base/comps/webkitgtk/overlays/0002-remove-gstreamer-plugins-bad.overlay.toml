@@ -1,0 +1,12 @@
+[[overlays]]
+description = "Remove gstreamer-plugins-bad-1.0 BuildRequires (gstreamer1-plugins-bad-free not shipped in AZL; vestigial in upstream spec, no gst-bad headers are #included under default cmake options)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-plugins-bad-1.0)"
+
+[[overlays]]
+description = "Disable avif support in WebKitGTK cmake builds (libavif not available in AZL)"
+type = "spec-search-replace"
+section = "%build"
+regex = "%cmake \\\\"
+replacement = "%cmake \\\n  -DUSE_AVIF=OFF \\"

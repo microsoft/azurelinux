@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Add azl_release to upstream %{baserelease} so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = "^Release:\\s+%\\{baserelease\\}%\\{\\?snapdate:\\.%\\{snapdate\\}git%\\{shortcommit\\}\\}%\\{\\?dist\\}$"
+replacement = "Release:        %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}"

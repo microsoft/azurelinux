@@ -1,0 +1,11 @@
+# The upstream spec gates only the `%package -n oscilloscope` and
+# `%files -n oscilloscope` blocks on the bcond. The `oscilloscope`
+# console-script entry-point is still installed by `%pyproject_install`,
+# leaving an unpackaged file when the bcond is off (rpmbuild fails). Strip
+# it explicitly when oscilloscope is disabled.
+
+[[overlays]]
+description = "Remove unpackaged /usr/bin/oscilloscope when oscilloscope bcond is off"
+type = "spec-append-lines"
+section = "%install"
+lines = ["%if %{without oscilloscope}", "rm -f %{buildroot}%{_bindir}/oscilloscope", "%endif"]

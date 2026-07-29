@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Remove elfutils-default-yama-scope package"
+type = "spec-search-replace"
+regex = "%global provide_yama_scope\\s+1"
+replacement = "%global provide_yama_scope 0"

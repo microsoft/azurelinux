@@ -6,8 +6,3 @@
 # extractors) is unaffected.
 [components.kf6-kfilemetadata]
 
-[[components.kf6-kfilemetadata.overlays]]
-description = "Drop BuildRequires on ffmpeg-free-devel — removing ffmpeg from the distro"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "ffmpeg-free-devel"

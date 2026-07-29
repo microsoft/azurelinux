@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Set default llmnr support to disabled"
+type = "spec-search-replace"
+regex = "-Ddefault-llmnr=.*$"
+replacement = "-Ddefault-llmnr=no"

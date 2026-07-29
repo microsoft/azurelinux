@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Override buildjdkver to use Java 25 instead of 24 for bootstrap"
+type = "spec-search-replace"
+regex = "^%global buildjdkver 24$"
+replacement = "%global buildjdkver 25"

@@ -16,38 +16,3 @@
 
 [components.webkitgtk]
 
-[[components.webkitgtk.overlays]]
-description = "Remove libavif BuildRequires (libavif not available in AZL)"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "pkgconfig(libavif)"
-
-[[components.webkitgtk.overlays]]
-description = "Remove gstreamer-plugins-bad-1.0 BuildRequires (gstreamer1-plugins-bad-free not shipped in AZL; vestigial in upstream spec, no gst-bad headers are #included under default cmake options)"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "pkgconfig(gstreamer-plugins-bad-1.0)"
-
-[[components.webkitgtk.overlays]]
-description = "Disable avif support in WebKitGTK cmake builds (libavif not available in AZL)"
-type = "spec-search-replace"
-section = "%build"
-regex = '%cmake \\'
-replacement = '''%cmake \
-  -DUSE_AVIF=OFF \'''
-
-[[components.webkitgtk.overlays]]
-description = "Remove Recommends on gstreamer1-plugins-bad-free from webkitgtk6.0 package — not shipped in AZL"
-type = "spec-remove-tag"
-section = "%package"
-package = "webkitgtk6.0"
-tag = "Recommends"
-value = "gstreamer1-plugins-bad-free"
-
-[[components.webkitgtk.overlays]]
-description = "Remove Recommends on gstreamer1-plugins-bad-free from webkit2gtk4.1 package — not shipped in AZL"
-type = "spec-remove-tag"
-section = "%package"
-package = "webkit2gtk4.1"
-tag = "Recommends"
-value = "gstreamer1-plugins-bad-free"

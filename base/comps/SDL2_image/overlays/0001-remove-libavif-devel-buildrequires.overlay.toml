@@ -1,0 +1,12 @@
+[[overlays]]
+description = "Remove libavif-devel BuildRequires (libavif not available in AZL)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "libavif-devel"
+
+[[overlays]]
+description = "Disable avif support entirely instead of just disabling shared linking"
+type = "spec-search-replace"
+section = "%build"
+regex = "--disable-avif-shared"
+replacement = "--disable-avif"

@@ -1,0 +1,11 @@
+# Unhook ui-sdl Requires from qemu-system-* emulators (configure --disable-sdl
+# is set by an earlier overlay).
+
+overlays = [
+    {
+        description = 'Empty requires_ui_sdl macro',
+        type = 'spec-search-replace',
+        regex = '%define requires_ui_sdl .*',
+        replacement = '%define requires_ui_sdl %{nil}',
+    },
+]

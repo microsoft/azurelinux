@@ -1,0 +1,10 @@
+# Update the now-stale comment in the (empty) `%if 0%{?fedora}` block left
+# behind by removing the BuildRequires (in sibling
+# 0001-drop-python3-impacket-buildrequires.overlay.toml), so future readers
+# know the omission is intentional rather than an oversight.
+
+[[overlays]]
+description = "Annotate the now-empty %if 0%{?fedora} block to make the AZL deviation explicit (avoid confusion with the original 'needed for upstream test 1451' comment)"
+type = "spec-search-replace"
+regex = "^# needed for upstream test 1451$"
+replacement = "# python3-impacket BuildRequires intentionally omitted in Azure Linux — see curl.comp.toml overlay (RPM signing blocker; test 1451 is Fedora-gated)"

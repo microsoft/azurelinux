@@ -4,8 +4,3 @@
 # infinipath-psm since it's for obsolete hardware. Remove the BuildRequires.
 [components.libfabric]
 
-[[components.libfabric.overlays]]
-description = "Remove infinipath-psm-devel BuildRequires — legacy hardware, not packaged in Azure Linux"
-type = "spec-remove-tag"
-tag = "BuildRequires"
-value = "infinipath-psm-devel"

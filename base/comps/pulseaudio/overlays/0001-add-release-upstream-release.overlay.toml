@@ -1,0 +1,13 @@
+# Add azl_release to upstream's hardcoded Release (9) so we can bump release
+# independently of upstream while keeping a single-number Fedora-style Release
+# schema. The regex matches the current upstream Release verbatim and acts as
+# a tripwire: if Fedora bumps the upstream number (e.g. 9 → 10), the regex
+# will stop matching and force a conscious re-evaluation of the baseline.
+# When that happens, update the regex *and* the baseline number in the
+# replacement to the new upstream value, and reset azl_release to "1".
+
+[[overlays]]
+description = "Add azl_release to upstream Release so we can bump release independently of upstream while keeping a single-number Fedora-style Release schema"
+type = "spec-search-replace"
+regex = "^Release:\\s+9%\\{\\?snap:\\.%\\{snap\\}git%\\{shortcommit\\}\\}%\\{\\?dist\\}$"
+replacement = "Release:        %[9 + %{azl_release}]%{?snap:.%{snap}git%{shortcommit}}%{?dist}"

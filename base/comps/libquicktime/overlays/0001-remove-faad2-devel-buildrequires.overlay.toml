@@ -1,0 +1,12 @@
+[[overlays]]
+description = "Remove faad2-devel BuildRequires (AAC requires CELA review)"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "faad2-devel"
+
+[[overlays]]
+description = "Remove lqt_faad2.so from %files (no longer built without faad2)"
+type = "spec-search-replace"
+section = "%files"
+regex = "%\\{_libdir\\}/%\\{name\\}/lqt_faad2\\.so"
+replacement = ""
