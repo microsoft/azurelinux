@@ -1,3 +1,9 @@
 [components.python-blivet]
-# Release: 9%{?prerelease}%{?dist}
+# Release: 10%{?prerelease}%{?dist}
 release = { calculation = "manual" }
+
+[[components.python-blivet.overlays]]
+description = "Bump release for CPE 2.3 parser backport"
+type = "spec-update-tag"
+tag = "Release"
+value = "10%{?prerelease}%{?dist}"

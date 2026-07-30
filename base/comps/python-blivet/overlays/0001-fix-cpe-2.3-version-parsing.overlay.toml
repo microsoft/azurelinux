@@ -1,0 +1,12 @@
+# Blivet 3.12.1 parses CPE 2.3 fields as CPE 2.2, causing Azure Linux's
+# `azure_linux` product identifier to be interpreted as a numeric version.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/storaged-project/blivet/commit/bb696202fa44b7d516f5cdff7a699e32edc982df" }]
+
+[[overlays]]
+description = "Backport CPE 2.3 distro version parsing fix"
+type = "patch-add"
+file = "bb696202-fix-cpe-2.3-version-parsing.patch"
+source = "../bb696202-fix-cpe-2.3-version-parsing.patch"
