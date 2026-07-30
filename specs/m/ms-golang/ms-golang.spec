@@ -22,25 +22,13 @@
 Summary:        Go
 Name:           ms-golang
 Version:        1.26.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Security
 URL:            https://github.com/microsoft/go
 Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/%{ms_go_filename}
-
-# bootstrap 00, same content as https://dl.google.com/go/go1.4-bootstrap-20171003.tar.gz
-Source1:        https://github.com/microsoft/go/releases/download/v1.4.0-1/go1.4-bootstrap-20171003.tar.gz
-Patch0:         go14_bootstrap_aarch64.patch
-# bootstrap 01
-Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.20230802.5.src.tar.gz
-# bootstrap 02
-Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
-# bootstrap 03
-Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
-# bootstrap 04
-Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
 Patch1:         CVE-2026-39821.patch
 
@@ -50,9 +38,10 @@ Provides:       golang = %{version}-%{release}
 Provides:       msft-golang = %{version}-%{release}
 # Microsoft build of Go; mutually exclusive with the Fedora upstream 'golang' package.
 Conflicts:      golang
-# The Go bootstrap chain compiles the go1.4 C bootstrap, so a C toolchain is required.
-# AzL 3.0 provided these implicitly via its build environment; AzL 4.0's minimal mock
-# buildroot does not, so declare them explicitly.
+# Bootstrap from the distro Go toolchain (Fedora golang) rather than the historical
+# multi-stage C bootstrap. Go 1.26 requires a >= 1.24 bootstrap; AzL 4.0 ships golang
+# 1.25.x, which satisfies it. gcc/glibc-devel are still needed for cgo during the build.
+BuildRequires:  golang >= 1.24
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
 
@@ -60,88 +49,25 @@ BuildRequires:  glibc-devel
 Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
 
 %prep
-# Setup bootstrap source
-tar xf %{SOURCE1} --no-same-owner
-patch -Np1 --ignore-whitespace < %{PATCH0}
-mv -v go go-bootstrap-00
-
-tar xf %{SOURCE2} --no-same-owner
-mv -v go go-bootstrap-01
-
-tar xf %{SOURCE3} --no-same-owner
-mv -v go go-bootstrap-02
-
-tar xf %{SOURCE4} --no-same-owner
-mv -v go go-bootstrap-03
-
-tar xf %{SOURCE5} --no-same-owner
-mv -v go go-bootstrap-04
-
 %setup -q -n go
-%autopatch -p1 -m 1
+%autopatch -p1
 
 %build
-# go 1.4 bootstraps with C.
-# go 1.20 bootstraps with go >= 1.17.13
-# go >= 1.22 bootstraps with go >= 1.20.14
-#
-# These conditions make building the current go compiler from C a multistep
-# process. Approximately once a year, the bootstrap requirement is moved
-# forward, adding another step.
-#
-# PS: Since go compiles fairly quickly, the extra overhead is around 2-3 minutes
-#     on a reasonable machine.
+# Bootstrap the Microsoft Go toolchain from the distro Go compiler (Fedora golang),
+# provided via BuildRequires, instead of the historical go1.4 -> ... multi-stage C
+# bootstrap chain. make.bash reads GOROOT_BOOTSTRAP to find the bootstrap compiler.
+export GOROOT_BOOTSTRAP="$(go env GOROOT)"
 
-# Use prev bootstrap to compile next bootstrap.
-function go_bootstrap() {
-  local bootstrap=$1
-  # The bootstrap trees are unpacked in %prep next to the main source, i.e. under
-  # %{_builddir}. Reference them via %{_builddir} rather than %{_topdir}/BUILD so this
-  # works with RPM >= 4.20, which builds inside a per-package subdirectory.
-  local new_root=%{_builddir}/go-bootstrap-${bootstrap}
-  (
-    cd ${new_root}/src
-    CGO_ENABLED=0 ./make.bash
-  )
-  # Stage the rolling bootstrap toolchain in a build-local, writable directory.
-  # AzL 3.0 built as root and staged this in %{_libdir}/golang; AzL 4.0 builds
-  # unprivileged in mock and cannot write to system paths, so use %{_builddir}.
-  # Nuke the older bootstrapper
-  rm -rf %{_builddir}/go-bootstrap-root
-  # Install the new bootstrapper
-  mv -v $new_root %{_builddir}/go-bootstrap-root
-  export GOROOT=%{_builddir}/go-bootstrap-root
-  export GOROOT_BOOTSTRAP=%{_builddir}/go-bootstrap-root
-}
-
-# go1.4's C bootstrap (cmd/dist) predates C23. Modern gcc defaults to -std=gnu23,
-# where 'bool' is a keyword, so go1.4's `typedef int bool;` fails under its -Werror.
-# Build the C bootstrap (stage 00) with an older standard, then restore the default CC
-# for the later Go-based bootstraps.
-export CC="gcc -std=gnu17"
-go_bootstrap 00
-export CC="gcc"
-go_bootstrap 01
-go_bootstrap 02
-go_bootstrap 03
-go_bootstrap 04
-
-# Build current go version
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
-export GOROOT_BOOTSTRAP=%{_builddir}/go-bootstrap-root
 
-export GOROOT="`pwd`"
+export GOROOT="$(pwd)"
 export GOPATH=%{gopath}
 export GOROOT_FINAL=%{_bindir}/go
-rm -f  %{gopath}/src/runtime/*.c
 (
   cd src
   ./make.bash --no-clean
 )
-
-# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
-rm -rf %{_builddir}/go-bootstrap-root
 
 %install
 
@@ -198,6 +124,11 @@ fi
 %{_bindir}/*
 
 %changelog
+* Thu Jul 30 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-4
+- Bootstrap from the distro Go toolchain (BuildRequires: golang) instead of the
+  multi-stage C bootstrap chain; drop the five bootstrap source tarballs, the go1.4
+  aarch64 patch, and the C23/build-dir bootstrap workarounds.
+
 * Wed Jul 29 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-3
 - Introduce the Microsoft build of Go as the 'ms-golang' package for Azure Linux 4.0.
 - Provides 'golang' and conflicts with the Fedora upstream 'golang' package.
