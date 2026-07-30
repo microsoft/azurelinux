@@ -1,7 +1,8 @@
-diff -ru node-v16.14.0-orig/src/crypto/crypto_context.cc node-v16.14.0/src/crypto/crypto_context.cc
---- node-v16.14.0-orig/src/crypto/crypto_context.cc	2022-02-08 04:37:50.000000000 -0800
-+++ node-v16.14.0/src/crypto/crypto_context.cc	2022-02-25 09:17:21.964960342 -0800
-@@ -467,28 +467,16 @@
+diff --git a/src/crypto/crypto_context.cc b/src/crypto/crypto_context.cc
+index 3513afc5..146bed1b 100644
+--- a/src/crypto/crypto_context.cc
++++ b/src/crypto/crypto_context.cc
+@@ -1506,28 +1506,16 @@ void SecureContext::Init(const FunctionCallbackInfo<Value>& args) {
        min_version = 0;
        max_version = kMaxSupportedVersion;
        method = TLS_client_method();
