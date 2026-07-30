@@ -9,8 +9,8 @@
 
 Summary:         Library to enable creation and expansion of ISO-9660 filesystems
 Name:            libisoburn
-Version:         1.5.6
-Release: 10%{?dist}
+Version:         1.5.8
+Release: 3%{?dist}
 License:         GPL-2.0-or-later
 URL:             https://libburnia-project.org/
 Source0:         https://files.libburnia-project.org/releases/%{pkgname}-%{version}.tar.gz
@@ -21,11 +21,6 @@ Patch0:          libisoburn-1.0.8-multilib.patch
 Patch1:          libisoburn-1.5.4-rpath.patch
 BuildRequires:   gnupg2
 BuildRequires:   gcc, gcc-c++, make, readline-devel, libacl-devel, zlib-devel
-%if 0%{?rhel} == 7
-BuildRequires:   autoconf, automake, libtool
-BuildRequires:   libburn1-devel >= %{version}, libisofs1-devel >= %{version}
-Requires:        libburn1 >= %{version}, libisofs1 >= %{version}
-%else
 %if (0%{?rhel} && "%{name}" != "%{pkgname}")
 BuildRequires:   autoconf, automake, libtool
 %global variant 1
@@ -34,7 +29,6 @@ BuildRequires:   libburn%{?variant}-devel >= %{version}
 BuildRequires:   libisofs%{?variant}-devel >= %{version}
 Requires:        libburn%{?variant} >= %{version}
 Requires:        libisofs%{?variant} >= %{version}
-%endif
 
 %description
 Libisoburn is a front-end for libraries libburn and libisofs which
@@ -71,13 +65,9 @@ documentation for developing applications that use %{name}.
 Summary:         ISO-9660 and Rock Ridge image manipulation tool
 URL:             https://scdbackup.sourceforge.net/xorriso_eng.html
 Requires:        %{name}%{?_isa} = %{version}-%{release}
-%if 0%{!?_without_kde:1} && (0%{?fedora} || 0%{?rhel} == 7 || (0%{?rhel} && "%{name}" != "%{pkgname}"))
+%if 0%{!?_without_kde:1} && (0%{?fedora} || (0%{?rhel} && "%{name}" != "%{pkgname}"))
 Requires:        kde-filesystem >= 4
 Requires:        kf5-filesystem >= 5
-%endif
-%if 0%{?rhel} && 0%{?rhel} <= 7
-Requires(post):  /sbin/install-info
-Requires(preun): /sbin/install-info
 %endif
 Requires(post):  %{?el8:/usr/sbin/}alternatives, coreutils
 Requires(preun): %{?el8:/usr/sbin/}alternatives
@@ -98,10 +88,10 @@ DVD-RAM, BD-R and BD-RE.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup -p1 -n %{pkgname}-%{version}
+%autosetup -n %{pkgname}-%{version} -p1
 
 # Use libisofs1 and libburn1 on EPEL
-%if 0%{?rhel} == 7 || (0%{?rhel} && "%{name}" != "%{pkgname}")
+%if (0%{?rhel} && "%{name}" != "%{pkgname}")
 sed -e 's@\(libisofs\|libburn\)-1.pc@\11-1.pc@g' -i configure.ac
 sed -e 's@\(libisofs\|libburn\)/@\11/@g' -i configure.ac */*.[hc] */*/*.cpp
 sed -e 's@\(lisofs\|lburn\)@\11@g' -i Makefile.am
@@ -137,7 +127,7 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/%{name}.la
 rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}
 
 # Install the KDE service menu handler
-%if 0%{!?_without_kde:1} && (0%{?fedora} || 0%{?rhel} == 7 || (0%{?rhel} && "%{name}" != "%{pkgname}"))
+%if 0%{!?_without_kde:1} && (0%{?fedora} || (0%{?rhel} && "%{name}" != "%{pkgname}"))
 install -D -p -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/kde4/services/ServiceMenus/xorriso_extract_iso_image.desktop
 install -D -p -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_datadir}/kservices5/ServiceMenus/xorriso_extract_iso_image.desktop
 %endif
@@ -181,12 +171,6 @@ cd releng
 %ldconfig_scriptlets
 
 %post -n xorriso%{?variant}
-%if 0%{?rhel} == 7
-/sbin/install-info %{_infodir}/xorrecord.info.gz %{_infodir}/dir || :
-/sbin/install-info %{_infodir}/xorriso.info.gz %{_infodir}/dir || :
-/sbin/install-info %{_infodir}/xorrisofs.info.gz %{_infodir}/dir || :
-%endif
-
 alternatives --install %{_bindir}/cdrecord cdrecord %{_bindir}/xorrecord%{?variant} 50 \
   --slave %{_mandir}/man1/cdrecord.1.gz cdrecord-cdrecordman %{_mandir}/man1/xorrecord%{?variant}.1.gz
 alternatives --install %{_bindir}/mkisofs mkisofs %{_bindir}/xorrisofs%{?variant} 50 \
@@ -194,13 +178,6 @@ alternatives --install %{_bindir}/mkisofs mkisofs %{_bindir}/xorrisofs%{?variant
 
 %preun -n xorriso%{?variant}
 if [ $1 -eq 0 ]; then
-%if 0%{?rhel} == 7
-  /sbin/install-info --delete %{_infodir}/xorrecord.info.gz %{_infodir}/dir || :
-  /sbin/install-info --delete %{_infodir}/xorriso.info.gz %{_infodir}/dir || :
-  /sbin/install-info --delete %{_infodir}/xorrisofs.info.gz %{_infodir}/dir || :
-  /sbin/install-info --delete %{_infodir}/xorriso-dd-target.info.gz %{_infodir}/dir || :
-%endif
-
   alternatives --remove cdrecord %{_bindir}/xorrecord%{?variant}
   alternatives --remove mkisofs %{_bindir}/xorrisofs%{?variant}
 fi
@@ -238,12 +215,15 @@ fi
 %{_infodir}/xorriso%{?variant}.info*
 %{_infodir}/xorrisofs%{?variant}.info*
 %{_infodir}/xorriso-dd-target%{?variant}.info*
-%if 0%{!?_without_kde:1} && (0%{?fedora} || 0%{?rhel} == 7 || (0%{?rhel} && "%{name}" != "%{pkgname}"))
+%if 0%{!?_without_kde:1} && (0%{?fedora} || (0%{?rhel} && "%{name}" != "%{pkgname}"))
 %{_datadir}/kde4/services/ServiceMenus/xorriso_extract_iso_image.desktop
 %{_datadir}/kservices5/ServiceMenus/xorriso_extract_iso_image.desktop
 %endif
 
 %changelog
+* Fri Apr 03 2026 Robert Scheck <robert@fedoraproject.org> 1.5.8-1
+- Upgrade to 1.5.8 (#2454542)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.6-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

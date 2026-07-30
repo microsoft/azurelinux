@@ -1,0 +1,8 @@
+[components.libisoburn]
+
+# Pin to Fedora 43's 1.5.8 update after libburn and libisofs 1.5.8
+# are available in the Azure Linux buildroot.
+# https://src.fedoraproject.org/rpms/libisoburn/c/56862de41a088e9d693a869ba197a3b46ba3a710?branch=f43
+# TODO: Drop this override once the default Fedora 43 snapshot in
+# distro/azurelinux.distro.toml advances past 2026-04-03.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "56862de41a088e9d693a869ba197a3b46ba3a710" }
