@@ -44,8 +44,8 @@ Upstream Patch reference: https://patch-diff.githubusercontent.com/raw/rsyslog/r
  tests/uxsock_simple.sh             |   2 +-
  tests/uxsock_simple_abstract-vg.sh |   3 +
  tests/uxsock_simple_abstract.sh    |  57 ++++++
- tests/uxsockrcvr.c                 | 132 ++++++++++---
- 10 files changed, 667 insertions(+), 61 deletions(-)
+ tests/uxsockrcvr.c                 | 131 +++++++++++--
+ 10 files changed, 667 insertions(+), 60 deletions(-)
  create mode 100755 tests/uxsock_multiple-vg.sh
  create mode 100755 tests/uxsock_multiple.sh
  create mode 100755 tests/uxsock_multiple_netns-vg.sh
@@ -889,7 +889,7 @@ index 0000000..1a0d09a
 +seq_check 0 9999
 +exit_test
 diff --git a/tests/uxsockrcvr.c b/tests/uxsockrcvr.c
-index 0d61ce9..131b67d 100644
+index 0d61ce9..05bbfc6 100644
 --- a/tests/uxsockrcvr.c
 +++ b/tests/uxsockrcvr.c
 @@ -31,6 +31,7 @@
@@ -935,14 +935,13 @@ index 0d61ce9..131b67d 100644
  	fprintf(stderr, "usage: uxsockrcvr -s /socket/name -o /output/file -l\n"
  			"-l adds newline after each message received\n"
  			"-s MUST be specified\n"
--			"if -o ist not specified, stdout is used\n");
 +			"-a Use abstract socket name\n"
 +			"-T {DGRAM|STREAM"
 +#ifdef SOCK_SEQPACKET
-+            "|SEQPACKET"
++			"|SEQPACKET"
 +#endif /* def SOCK_SEQPACKET */
-+	    "} Set socket type (default DGRAM)\n"
-+	    "if -o ist not specified, stdout is used\n");
++			"} Set socket type (default DGRAM)\n"
+ 			"if -o ist not specified, stdout is used\n");
  	exit(1);
  }
  
@@ -1019,7 +1018,7 @@ index 0d61ce9..131b67d 100644
  		perror("server: socket");
  		exit(1);
  	}
-@@ -151,40 +204,77 @@ main(int argc, char *argv[])
+@@ -151,40 +204,78 @@ main(int argc, char *argv[])
  	/*      Set up address structure for server socket      */
  	memset(&addr, 0, sizeof(addr));
  	addr.sun_family = AF_UNIX;
@@ -1074,6 +1073,9 @@ index 0d61ce9..131b67d 100644
 -			if(rlen == -1) {
 -				perror("uxsockrcvr : recv\n");
 -				exit(1);
+-			} else {
+-				fwrite(data, 1, rlen, fp);
+-				if(addNL)
 +		}
 +		if (sockConnected && fds[0].revents & POLLIN) {
 +			fds[nfds].fd = accept(fds[0].fd, NULL, NULL);
@@ -1086,28 +1088,26 @@ index 0d61ce9..131b67d 100644
 +			}
 +		}
 +		for (index = sockConnected; index < nfds; ++index) {
-+		    if (fds[index].revents & POLLIN) {
-+			fromlen = sizeof(from);
-+			rlen = recvfrom(fds[index].fd, data, 2000, 0, &from, &fromlen);
-+			if (rlen == -1) {
-+			    perror("uxsockrcvr : recv\n");
-+			    exit(1);
- 			} else {
--				fwrite(data, 1, rlen, fp);
--				if(addNL)
--					fputc('\n', fp);
-+			    fwrite(data, 1, rlen, fp);
-+			    if (addNL) fputc('\n', fp);
++			if (fds[index].revents & POLLIN) {
++				fromlen = sizeof(from);
++				rlen = recvfrom(fds[index].fd, data, 2000, 0, &from, &fromlen);
++				if (rlen == -1) {
++					perror("uxsockrcvr : recv\n");
++					exit(1);
++				} else {
++					fwrite(data, 1, rlen, fp);
++					if(addNL)
+ 					fputc('\n', fp);
++				}
  			}
-+		    }
-+		    if (fds[index].revents & POLLHUP) {
-+			close(fds[index].fd);
-+			fds[index].fd = -1;
-+			fds[index].events = 0;
-+		    }
++			if (fds[index].revents & POLLHUP) {
++				close(fds[index].fd);
++				fds[index].fd = -1;
++				fds[index].events = 0;
++			}
 +		}
 +		while (nfds && fds[nfds - 1].fd < 0) {
-+		    --nfds;
++			--nfds;
  		}
  	}
  
