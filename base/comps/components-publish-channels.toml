@@ -80,6 +80,7 @@ components = [
     "at-spi2-core",
     "atkmm",
     "atlas",
+    "atop",
     "attr",
     "audit",
     "augeas",
