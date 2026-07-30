@@ -1,0 +1,1116 @@
+From ff3ec4c31dc3a214b67c9b368d81faba7b7a7ade Mon Sep 17 00:00:00 2001
+From: Billie Alsup <balsup@cisco.com>
+Date: Wed, 16 Apr 2025 14:00:29 -0700
+Subject: [PATCH 1/2] New functionality for omuxsock
+
+This builds on "PR#6121 net: Add NetworkNamespace APIS"
+to add Network Namespace support for omuxsock.  In
+addition, new functionality is added to support
+abstract socket names, as well as connected sockets.
+
+Changes are isolated to omuxsock to provide the new
+functionality:
+
+a. Abstract unix socket names (including network namespaces)
+b. Connected socket support (SOCK_STREAM, SOCK_SEQPACKET)
+c. Support for load, and action configuration
+d. Bug fix related to closing/reopening sockets
+   This bug would cause the socket to be closed and
+   reopened for every message sent.
+
+New tests are added as follows:
+
+a. uxsock_multiple.sh tests basic functionality with
+   multiple output instances.
+b. uxsock_multiple_netns.sh is similar but using
+   multiple namespaces.
+c. uxsock_simple_abstract.sh mirrors the existing
+   uxsock_simple.sh but tests with abstract socket
+   names.
+
+The uxsockrcvr test program was modified to support
+these new tests.
+
+Signed-off-by: Billie Alsup <balsup@cisco.com>
+
+Upstream Patch reference: https://patch-diff.githubusercontent.com/raw/rsyslog/rsyslog/pull/5630.patch
+---
+ plugins/omuxsock/omuxsock.c        | 289 +++++++++++++++++++++++++----
+ tests/Makefile.am                  |  16 +-
+ tests/uxsock_multiple-vg.sh        |   3 +
+ tests/uxsock_multiple.sh           |  95 ++++++++++
+ tests/uxsock_multiple_netns-vg.sh  |   3 +
+ tests/uxsock_multiple_netns.sh     | 128 +++++++++++++
+ tests/uxsock_simple.sh             |   2 +-
+ tests/uxsock_simple_abstract-vg.sh |   3 +
+ tests/uxsock_simple_abstract.sh    |  57 ++++++
+ tests/uxsockrcvr.c                 | 132 ++++++++++---
+ 10 files changed, 667 insertions(+), 61 deletions(-)
+ create mode 100755 tests/uxsock_multiple-vg.sh
+ create mode 100755 tests/uxsock_multiple.sh
+ create mode 100755 tests/uxsock_multiple_netns-vg.sh
+ create mode 100755 tests/uxsock_multiple_netns.sh
+ create mode 100755 tests/uxsock_simple_abstract-vg.sh
+ create mode 100755 tests/uxsock_simple_abstract.sh
+
+diff --git a/plugins/omuxsock/omuxsock.c b/plugins/omuxsock/omuxsock.c
+index 99fbc22..54fe257 100644
+--- a/plugins/omuxsock/omuxsock.c
++++ b/plugins/omuxsock/omuxsock.c
+@@ -26,6 +26,7 @@
+ #include "rsyslog.h"
+ #include <stdio.h>
+ #include <stdarg.h>
++#include <stddef.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
+@@ -43,6 +44,7 @@
+ #include "glbl.h"
+ #include "errmsg.h"
+ #include "unicode-helper.h"
++#include "net.h"
+ 
+ MODULE_TYPE_OUTPUT
+ MODULE_TYPE_NOKEEP
+@@ -51,15 +53,21 @@ MODULE_CNFNAME("omuxsock")
+ /* internal structures
+  */
+ DEF_OMOD_STATIC_DATA
+-DEFobjCurrIf(glbl)
++DEFobjCurrIf(glbl) DEFobjCurrIf(net)
+ 
+ #define INVLD_SOCK -1
+ 
+ typedef struct _instanceData {
+ 	permittedPeers_t *pPermPeers;
+-	uchar *sockName;
+-	int sock;
+-	struct sockaddr_un addr;
++	uchar *tplName; /**< Template name */
++	uchar *sockName; /**< Socket name */
++	char *namespace; /**< Network namespace */
++	int sockType; /**< Socket type (DGRAM, STREAM, SEQPACKET) */
++	int bAbstract; /**< True if an abstract socket address */
++	int bConnected; /**< True if a connection oriented (STREAM, SEQPACKET) */
++	int sock; /**< Socket descriptor */
++	struct sockaddr_un addr; /**< Unix socket address */
++	socklen_t addrLen; /**< The socket address length */
+ } instanceData;
+ 
+ 
+@@ -69,14 +77,20 @@ typedef struct wrkrInstanceData {
+ 
+ /* config data */
+ typedef struct configSettings_s {
+-	uchar *tplName; /* name of the default template to use */
+-	uchar *sockName; /* name of the default template to use */
++	uchar *tplName; /**< Name of the default template to use */
++	uchar *sockName; /**< Name of the default socket to use */
++	char *namespace; /**< Network namespace for abstract addresses */
++	int sockType; /**< Socket type (DGRAM, STREAM, SEQPACKET) */
++	int bAbstract; /**< True if default socket is abstract socket */
++	int bConnected; /**< True if connection oriented (STREAM, SEQPACKET) */
+ } configSettings_t;
+ static configSettings_t cs;
+ 
+ /* module-global parameters */
+ static struct cnfparamdescr modpdescr[] = {
+-	{ "template", eCmdHdlrGetWord, 0 },
++	{"template", eCmdHdlrGetWord, 0},        {"abstract", eCmdHdlrInt, 0},
++	{"socketname", eCmdHdlrString, 0},       {"sockettype", eCmdHdlrString, 0},
++	{"networknamespace", eCmdHdlrString, 0},
+ };
+ static struct cnfparamblk modpblk =
+ 	{ CNFPARAMBLK_VERSION,
+@@ -84,21 +98,91 @@ static struct cnfparamblk modpblk =
+ 	  modpdescr
+ 	};
+ 
++/* tables for interfacing with the v6 config system */
++/* action (instance) parameters */
++static struct cnfparamdescr actpdescr[] = {
++	{"template", eCmdHdlrGetWord, 0},        {"abstract", eCmdHdlrInt, 0},
++	{"socketname", eCmdHdlrString, 0},       {"sockettype", eCmdHdlrString, 0},
++	{"networknamespace", eCmdHdlrString, 0},
++};
++static struct cnfparamblk actpblk = {CNFPARAMBLK_VERSION, sizeof(actpdescr) / sizeof(struct cnfparamdescr), actpdescr};
++
+ struct modConfData_s {
+-	rsconf_t *pConf;	/* our overall config object */
+-	uchar 	*tplName;	/* default template */
++	rsconf_t *pConf; /**< our overall config object */
++	uchar *tplName; /**< default template */
++	uchar *sockName; /**< Socket name */
++	char *namespace; /**< Network namespace */
++	int sockType; /**< Socket type (DGRAM, STREAM, SEQPACKET) */
++	int bAbstract; /**< True if socket name is abstract */
++	int bConnected; /**< True if socket is connection oriented (STREAM, SEQPACKET) */
+ };
+ 
+ static modConfData_t *loadModConf = NULL;/* modConf ptr to use for the current load process */
+ static modConfData_t *runModConf = NULL;/* modConf ptr to use for the current exec process */
+ 
+-
+ static pthread_mutex_t mutDoAct = PTHREAD_MUTEX_INITIALIZER;
+ 
++/**
++ * @brief A structure to map identifiers to socket information
++ * @details Socket information includes the socket type, and
++ *          whether it is a connection-oriented socket type.
++ */
++static struct {
++    const char *id; /**< The identifier used in configuration */
++    int value; /**< The underlying socket type for this identifier */
++    int connected; /**< True if the socket type is connection oriented */
++} socketType_map[] = {
++    {"DGRAM", SOCK_DGRAM, 0},
++    {"STREAM", SOCK_STREAM, 1},
++#ifdef SOCK_SEQPACKET
++    {"SEQPACKET", SOCK_SEQPACKET, 1},
++#endif /* def SOCK_SEQPACKET */
++};
++#define ARRAY_SIZE(n) (sizeof(n) / sizeof((n)[0]))
++
++/**
++ * @brief Lookup an identifier to obtain socket information
++ * @param estr The identifer to lookup.  The lookup is case
++ *             insensitive.
++ * @param type The location to store the socket type
++ * @param connected The location to store an indicator of whether
++ *                  this socket type is connection oriented or not.
++ * @return RS_RET_OK on success, otherwise a failure code.
++ * @details This uses the above socketType_map structure to find
++ *          information for a given socket type identifier.
++ */
++static rsRetVal ATTR_NONNULL() _decodeSockType(es_str_t *estr, int *type, int *connected) {
++    DEFiRet;
++    char *cstr = es_str2cstr(estr, NULL);
++    size_t index;
++
++    if (!cstr) {
++        ABORT_FINALIZE(RS_RET_OUT_OF_MEMORY);
++    }
++
++    for (index = 0; index < ARRAY_SIZE(socketType_map); ++index) {
++        if (!strcasecmp(cstr, socketType_map[index].id)) {
++            *type = socketType_map[index].value;
++            *connected = socketType_map[index].connected;
++            FINALIZE
++        }
++    }
++    LogError(0, RS_RET_ERR, "omuxsock: bad socket type %s", cstr);
++    ABORT_FINALIZE(RS_RET_ERR);
++
++finalize_it:
++    free(cstr);
++    RETiRet;
++}
++
+ BEGINinitConfVars		/* (re)set config variables to default values */
+ CODESTARTinitConfVars
+ 	cs.tplName = NULL;
+ 	cs.sockName = NULL;
++	cs.namespace = NULL;
++	cs.sockType = SOCK_DGRAM;
++	cs.bAbstract = 0;
++	cs.bConnected = 0;
+ ENDinitConfVars
+ 
+ 
+@@ -162,6 +246,11 @@ CODESTARTbeginCnfLoad
+ 	loadModConf = pModConf;
+ 	pModConf->pConf = pConf;
+ 	pModConf->tplName = NULL;
++	pModConf->sockName = NULL;
++	pModConf->namespace = NULL;
++	pModConf->sockType = SOCK_DGRAM;
++	pModConf->bAbstract = 0;
++	pModConf->bConnected = 0;
+ ENDbeginCnfLoad
+ 
+ BEGINsetModCnf
+@@ -190,6 +279,14 @@ CODESTARTsetModCnf
+ 						"was already set via legacy directive - may lead to inconsistent "
+ 						"results.");
+ 			}
++		} else if (!strcmp(modpblk.descr[i].name, "abstract")) {
++			loadModConf->bAbstract = !!(int)pvals[i].val.d.n;
++		} else if (!strcmp(modpblk.descr[i].name, "socketname")) {
++			loadModConf->sockName = (uchar *)es_str2cstr(pvals[i].val.d.estr, NULL);
++		} else if (!strcmp(modpblk.descr[i].name, "sockettype")) {
++			CHKiRet(_decodeSockType(pvals[i].val.d.estr, &loadModConf->sockType, &loadModConf->bConnected));
++		} else if (!strcmp(modpblk.descr[i].name, "networknamespace")) {
++			loadModConf->namespace = es_str2cstr(pvals[i].val.d.estr, NULL);
+ 		} else {
+ 			dbgprintf("omuxsock: program error, non-handled "
+ 			  "param '%s' in beginCnfLoad\n", modpblk.descr[i].name);
+@@ -206,6 +303,10 @@ CODESTARTendCnfLoad
+ 	/* free legacy config vars */
+ 	free(cs.tplName);
+ 	cs.tplName = NULL;
++	free(cs.sockName);
++	cs.sockName = NULL;
++	free(cs.namespace);
++	cs.namespace = NULL;
+ ENDendCnfLoad
+ 
+ BEGINcheckCnf
+@@ -220,11 +321,14 @@ ENDactivateCnf
+ BEGINfreeCnf
+ CODESTARTfreeCnf
+ 	free(pModConf->tplName);
++	free(pModConf->sockName);
++	free(pModConf->namespace);
+ ENDfreeCnf
+ 
+ BEGINcreateInstance
+ CODESTARTcreateInstance
+ 	pData->sock = INVLD_SOCK;
++	pData->sockType = SOCK_DGRAM;
+ ENDcreateInstance
+ 
+ BEGINcreateWrkrInstance
+@@ -243,9 +347,85 @@ BEGINfreeInstance
+ CODESTARTfreeInstance
+ 	/* final cleanup */
+ 	closeSocket(pData);
++	free(pData->tplName);
+ 	free(pData->sockName);
++	free(pData->namespace);
+ ENDfreeInstance
+ 
++BEGINnewActInst
++    struct cnfparamvals *pvals = NULL;
++    int i;
++    int bHaveAbstract = 0;
++    int bHaveSocketType = 0;
++    uchar *tplToUse;
++
++    CODESTARTnewActInst;
++    CODE_STD_STRING_REQUESTnewActInst(1);
++    if ((pvals = nvlstGetParams(lst, &actpblk, NULL)) == NULL) {
++        ABORT_FINALIZE(RS_RET_MISSING_CNFPARAMS);
++    }
++    CHKiRet(createInstance(&pData));
++
++    for (i = 0; i < actpblk.nParams; ++i) {
++        if (!pvals[i].bUsed) continue;
++        if (!strcmp(actpblk.descr[i].name, "template")) {
++            pData->tplName = (uchar *)es_str2cstr(pvals[i].val.d.estr, NULL);
++        } else if (!strcmp(actpblk.descr[i].name, "abstract")) {
++            pData->bAbstract = !!(int)pvals[i].val.d.n;
++            bHaveAbstract = 1;
++        } else if (!strcmp(actpblk.descr[i].name, "socketname")) {
++            pData->sockName = (uchar *)es_str2cstr(pvals[i].val.d.estr, NULL);
++        } else if (!strcmp(actpblk.descr[i].name, "sockettype")) {
++            CHKiRet(_decodeSockType(pvals[i].val.d.estr, &pData->sockType, &pData->bConnected));
++            bHaveSocketType = 1;
++        } else if (!strcmp(actpblk.descr[i].name, "networknamespace")) {
++            pData->namespace = es_str2cstr(pvals[i].val.d.estr, NULL);
++        }
++    }
++
++    if (!pData->namespace && loadModConf->namespace) {
++        CHKmalloc(pData->namespace = strdup(loadModConf->namespace));
++    }
++    if (!pData->sockName) {
++        if (bHaveAbstract) {
++            LogError(0, RS_RET_NO_SOCK_CONFIGURED, "omuxsock: abstract configured without socket name\n");
++            ABORT_FINALIZE(RS_RET_NO_SOCK_CONFIGURED);
++        }
++        if (bHaveSocketType) {
++            LogError(0, RS_RET_NO_SOCK_CONFIGURED, "omuxsock: socket type configured without socket name\n");
++            ABORT_FINALIZE(RS_RET_NO_SOCK_CONFIGURED);
++        }
++        /*
++         * Note that we explicitly want the semantics that these parameters be consumed
++         * as a group, and not be individually used as a default if the corresponding
++         * parameter is not provided in the instance.
++         */
++        if (loadModConf != NULL && loadModConf->sockName != NULL) {
++            pData->sockName = ustrdup(loadModConf->sockName);
++            pData->bAbstract = loadModConf->bAbstract;
++            pData->sockType = loadModConf->sockType;
++            pData->bConnected = loadModConf->bConnected;
++        } else if (cs.sockName == NULL) {
++            LogError(0, RS_RET_NO_SOCK_CONFIGURED, "No output socket configured for omuxsock\n");
++            ABORT_FINALIZE(RS_RET_NO_SOCK_CONFIGURED);
++        } else {
++            /*
++             * Ownership is transferred here.  There is only one default through cs structure.
++             */
++            pData->sockName = cs.sockName;
++            pData->bAbstract = cs.bAbstract;
++            pData->sockType = cs.sockType;
++            pData->bConnected = cs.bConnected;
++            cs.sockName = NULL; /* pData is now owner and will free it */
++        }
++    }
++
++    tplToUse = ustrdup((pData->tplName == NULL) ? getDfltTpl() : pData->tplName);
++    CHKiRet(OMSRsetEntry(*ppOMSR, 0, tplToUse, OMSR_NO_RQD_TPL_OPTS));
++
++    CODE_STD_FINALIZERnewActInst cnfparamvalsDestruct(pvals, &actpblk);
++ENDnewActInst
++
+ BEGINfreeWrkrInstance
+ CODESTARTfreeWrkrInstance
+ ENDfreeWrkrInstance
+@@ -257,7 +437,7 @@ CODESTARTdbgPrintInstInfo
+ ENDdbgPrintInstInfo
+ 
+ 
+-/* Send a message via UDP
++/* Send a message
+  * rgehards, 2007-12-20
+  */
+ static rsRetVal sendMsg(instanceData *pData, char *msg, size_t len)
+@@ -270,13 +450,27 @@ static rsRetVal sendMsg(instanceData *pData, char *msg, size_t len)
+ 	}
+ 
+ 	if(pData->sock != INVLD_SOCK) {
+-		lenSent = sendto(pData->sock, msg, len, 0, (const struct sockaddr *)&pData->addr,
+-			sizeof(pData->addr));
++		/*
++		 * This style is perhaps easier to follow.  However note that even for non-connection-oriented
++		 * sockets, a simple send can be used, as long as connect was called earlier.  The connect
++		 * parameters are simply used as the default in subsequent send() invocations.
++		 */
++		if (pData->bConnected) {
++			lenSent = send(pData->sock, msg, len, 0);
++		} else {
++			lenSent = sendto(pData->sock, msg, len, 0, (const struct sockaddr *)&pData->addr, pData->addrLen);
++		}
+ 		if(lenSent != len) {
+ 			int eno = errno;
+ 			char errStr[1024];
+-			DBGPRINTF("omuxsock suspending: sendto(), socket %d, error: %d = %s.\n",
+-				pData->sock, eno, rs_strerror_r(eno, errStr, sizeof(errStr)));
++
++			/*
++			 * XXX/rgerhards: how is this message correct, in that we are returning OK still?
++			 * In reality, the remainder of the partially sent message (or never sent message)
++			 * is simply dropped, and we do not change the state of the socket.
++			 */
++			DBGPRINTF("omuxsock suspending: send%s(), socket %d, error: %d = %s.\n", pData->bConnected ? "" : "to",
++					pData->sock, eno, rs_strerror_r(eno, errStr, sizeof(errStr)));
+ 		}
+ 	}
+ 
+@@ -291,23 +485,40 @@ static rsRetVal
+ openSocket(instanceData *pData)
+ {
+ 	DEFiRet;
+-	assert(pData->sock == INVLD_SOCK);
++	size_t nameLen;
+ 
+-	if((pData->sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
+-		char errStr[1024];
+-		int eno = errno;
+-		DBGPRINTF("error %d creating AF_UNIX/SOCK_DGRAM: %s.\n",
+-			eno, rs_strerror_r(eno, errStr, sizeof(errStr)));
+-		pData->sock = INVLD_SOCK;
+-		ABORT_FINALIZE(RS_RET_NO_SOCKET);
++	assert(pData->sock == INVLD_SOCK);
+ 
+-	}
++	CHKiRet(net.netns_socket(&pData->sock, AF_UNIX, pData->sockType, 0, pData->namespace));
+ 
+ 	/* set up server address structure */
+ 	memset(&pData->addr, 0, sizeof(pData->addr));
++	/*
++	 * For pathname addresses, the +1 is the terminating \0.
++	 * For abstract addresses, the +1 is the leading \0 and note that there is NO terminating \0.
++	 */
++	nameLen = strlen((char *)pData->sockName);
++	if ((nameLen + 1) > sizeof(pData->addr.sun_path)) {
++		LogError(0, RS_TRUNCAT_TOO_LARGE, "Socket name '%s' is too long", pData->sockName);
++		ABORT_FINALIZE(RS_TRUNCAT_TOO_LARGE);
++	}
++	pData->addrLen = offsetof(struct sockaddr_un, sun_path) + 1 + nameLen;
+ 	pData->addr.sun_family = AF_UNIX;
+-	strncpy(pData->addr.sun_path, (char*)pData->sockName, sizeof(pData->addr.sun_path));
+-	pData->addr.sun_path[sizeof(pData->addr.sun_path)-1] = '\0';
++	/*
++	 * Note destination is all \0 initially, so a non-abstract name is properly terminated,
++	 * and an abstract name doesn't care what follows (and may consume the entire sun_path).
++	 */
++	strncpy(pData->addr.sun_path + pData->bAbstract, (char *)pData->sockName, nameLen);
++
++	/*
++	 * Note that connect is legal even for non-connected sockets, and the parameters so passed
++	 * become defaults for the send function.
++	 */
++	if (pData->bConnected && connect(pData->sock, (struct sockaddr *)&pData->addr, pData->addrLen) == -1) {
++		LogError(errno, RS_RET_NO_SOCKET, "Error connecting to %ssocket %s", pData->bAbstract ? "abstract " : "",
++				pData->sockName);
++		ABORT_FINALIZE(RS_RET_NO_SOCKET);
++	}
+ 
+ finalize_it:
+ 	if(iRet != RS_RET_OK) {
+@@ -323,13 +534,13 @@ finalize_it:
+ static rsRetVal doTryResume(instanceData *pData)
+ {
+ 	DEFiRet;
++	if (pData->sock == INVLD_SOCK) {
++		DBGPRINTF("omuxsock trying to resume\n");
++		iRet = openSocket(pData);
+ 
+-	DBGPRINTF("omuxsock trying to resume\n");
+-	closeSocket(pData);
+-	iRet = openSocket(pData);
+-
+-	if(iRet != RS_RET_OK) {
+-		iRet = RS_RET_SUSPENDED;
++		if (iRet != RS_RET_OK) {
++			iRet = RS_RET_SUSPENDED;
++		}
+ 	}
+ 
+ 	RETiRet;
+@@ -375,12 +586,10 @@ CODE_STD_STRING_REQUESTparseSelectorAct(1)
+ 	}
+ 
+ 	/* ok, if we reach this point, we have something for us */
+-	p += sizeof(":omuxsock:") - 1; /* eat indicator sequence  (-1 because of '\0'!) */
++	p += sizeof(":omuxsock:") - 1; /* eat indicator sequence (-1 because of '\0'!) */
+ 	CHKiRet(createInstance(&pData));
+ 
+ 	/* check if a non-standard template is to be applied */
+-	if(*(p-1) == ';')
+-		--p;
+ 	CHKiRet(cflineParseTemplateName(&p, *ppOMSR, 0, 0, getDfltTpl()));
+ 
+ 	if(cs.sockName == NULL) {
+@@ -389,7 +598,10 @@ CODE_STD_STRING_REQUESTparseSelectorAct(1)
+ 	}
+ 
+ 	pData->sockName = cs.sockName;
+-	cs.sockName = NULL; /* pData is now owner and will fee it */
++	pData->sockType = cs.sockType;
++	pData->bAbstract = cs.bAbstract;
++	pData->bConnected = cs.bConnected;
++	cs.sockName = NULL; /* pData is now owner and will free it */
+ 
+ CODE_STD_FINALIZERparseSelectorAct
+ ENDparseSelectorAct
+@@ -423,6 +635,7 @@ CODEqueryEtryPt_STD_OMOD_QUERIES
+ CODEqueryEtryPt_STD_OMOD8_QUERIES
+ CODEqueryEtryPt_STD_CONF2_QUERIES
+ CODEqueryEtryPt_STD_CONF2_setModCnf_QUERIES
++CODEqueryEtryPt_STD_CONF2_OMOD_QUERIES
+ ENDqueryEtryPt
+ 
+ 
+@@ -440,9 +653,9 @@ BEGINmodInit()
+ CODESTARTmodInit
+ INITLegCnfVars
+ 	*ipIFVersProvided = CURR_MOD_IF_VERSION; /* we only support the current interface specification */
+-CODEmodInit_QueryRegCFSLineHdlr
++	CODEmodInit_QueryRegCFSLineHdlr;
+ 	CHKiRet(objUse(glbl, CORE_COMPONENT));
+-
++	CHKiRet(objUse(net, LM_NET_FILENAME));
+ 	CHKiRet(regCfSysLineHdlr((uchar *)"omuxsockdefaulttemplate", 0, eCmdHdlrGetWord, setLegacyDfltTpl,
+ 		NULL, NULL));
+ 	CHKiRet(regCfSysLineHdlr((uchar *)"omuxsocksocket", 0, eCmdHdlrGetWord, NULL, &cs.sockName, NULL));
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index a9713e0..2d63722 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -1483,7 +1483,15 @@ endif
+ endif
+ 
+ if ENABLE_OMUXSOCK
+-TESTS += uxsock_simple.sh
++TESTS += uxsock_simple.sh \
++	 uxsock_simple_abstract.sh \
++	 uxsock_multiple.sh \
++	 uxsock_multiple_netns.sh
++if HAVE_VALGRIND
++TESTS += uxsock_simple_abstract-vg.sh \
++	 uxsock_multiple-vg.sh \
++	 uxsock_multiple_netns-vg.sh
++endif # HAVE_VALGRIND
+ endif
+ 
+ if ENABLE_RELP
+@@ -2622,6 +2630,12 @@ EXTRA_DIST= \
+ 	testsuites/omprog-transactions-bin.sh \
+ 	pipe_noreader.sh \
+ 	uxsock_simple.sh \
++	uxsock_simple_abstract.sh \
++	uxsock_simple_abstract-vg.sh \
++	uxsock_multiple.sh \
++	uxsock_multiple-vg.sh \
++	uxsock_multiple_netns.sh \
++	uxsock_multiple_netns-vg.sh \
+ 	asynwr_simple.sh \
+ 	asynwr_simple_2.sh \
+ 	asynwr_timeout.sh \
+diff --git a/tests/uxsock_multiple-vg.sh b/tests/uxsock_multiple-vg.sh
+new file mode 100755
+index 0000000..5157947
+--- /dev/null
++++ b/tests/uxsock_multiple-vg.sh
+@@ -0,0 +1,3 @@
++#!/bin/bash
++export USE_VALGRIND="YES"
++source ${srcdir:-.}/uxsock_multiple.sh
+diff --git a/tests/uxsock_multiple.sh b/tests/uxsock_multiple.sh
+new file mode 100755
+index 0000000..93ea9e2
+--- /dev/null
++++ b/tests/uxsock_multiple.sh
+@@ -0,0 +1,95 @@
++#!/bin/bash
++# This tests basic omuxsock functionality. Multiple socket receivers are started
++# which sends all data to an output file, then a rsyslog instance is started which
++# generates messages and sends them to multiple unix sockets. Datagram sockets are
++# being used.
++# Based on uxsock_simple.sh added 2010-08-06 by Rgerhards
++# Updated 2025-04-16 for abstract sockets
++. ${srcdir:=.}/diag.sh init
++check_command_available timeout
++
++uname
++if [ $(uname) != "Linux" ] ; then
++    echo "This test requires Linux (AF_UNIX abstract addresses)"
++    exit 77
++fi
++
++SOCKET_NAMES=(
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.0"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.DGRAM"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.STREAM"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.SEQPACKET"
++)
++
++# create the pipe and start a background process that copies data from
++# it to the "regular" work file
++generate_conf
++for name in "${SOCKET_NAMES[@]}"; do
++    ext=${name##*.}
++    if [ ${ext} == "0" ]; then
++        add_conf '
++
++        $template outfmt,"%msg:F,58:2%\n"
++
++        module(
++            load = "../plugins/omuxsock/.libs/omuxsock"
++            template = "outfmt"
++            SocketName = "'${name}'"
++            abstract = "1"
++        )
++        :msg, contains, "msgnum:" {
++            action(
++                type = "omuxsock"
++            )
++        '
++    else
++        add_conf '
++            action(
++                type = "omuxsock"
++                SocketName = "'$name'"
++                abstract = "1"
++                SocketType = "'$ext'"
++            )
++        '
++    fi
++done
++add_conf '
++}
++'
++BGPROCESS=()
++for name in "${SOCKET_NAMES[@]}"; do
++    ext=${name##*.}
++    if [ "${ext}" == "0" ]; then
++        type=""
++    else
++        type="-T${ext}"
++    fi
++    timeout 30s ./uxsockrcvr -a -s$name ${type} -o ${RSYSLOG_OUT_LOG}.${ext} -t 60 &
++    PID=($!)
++    BGPROCESS+=($PID)
++    echo background uxsockrcvr ${name} process id is $PID
++done
++
++# now do the usual run
++startup
++# 10000 messages should be enough
++injectmsg 0 10000
++shutdown_when_empty # shut down rsyslogd when done processing messages
++wait_shutdown
++
++# wait for the cp process to finish, do pipe-specific cleanup
++echo shutting down uxsockrcvr...
++# TODO: we should do this more reliable in the long run! (message counter? timeout?)
++for pid in ${BGPROCESS[@]}; do
++    kill $pid
++    wait $pid
++done
++echo background processes have terminated, continue test...
++
++# and continue the usual checks
++BASE=${RSYSLOG_OUT_LOG}
++for name in "${SOCKET_NAMES[@]}"; do
++    RSYSLOG_OUT_LOG=${BASE}.${name##*.}
++    seq_check 0 9999
++done
++exit_test
+diff --git a/tests/uxsock_multiple_netns-vg.sh b/tests/uxsock_multiple_netns-vg.sh
+new file mode 100755
+index 0000000..4eec983
+--- /dev/null
++++ b/tests/uxsock_multiple_netns-vg.sh
+@@ -0,0 +1,3 @@
++#!/bin/bash
++export USE_VALGRIND="YES"
++source ${srcdir:-.}/uxsock_multiple_netns.sh
+diff --git a/tests/uxsock_multiple_netns.sh b/tests/uxsock_multiple_netns.sh
+new file mode 100755
+index 0000000..d233d30
+--- /dev/null
++++ b/tests/uxsock_multiple_netns.sh
+@@ -0,0 +1,128 @@
++#!/bin/bash
++# This tests basic omuxsock functionality with namespaces.
++# Multiple socket receivers are started which sends all data
++# to an output file, then a rsyslog instance is started which
++# generates messages and sends them to multiple unix sockets.
++# Multiple socket types are being used.
++# Based on uxsock_simple.sh added 2010-08-06 by Rgerhards
++# Updated 2025-04-16 for abstract sockets and multiple socket
++# types.
++echo ===============================================================================
++echo \[uxsock_multiple_netns.sh\]: test for transmitting to another namespace
++echo This test must be run with CAP_SYS_ADMIN capabilities [network namespace creation/change required]
++if [ "$EUID" -ne 0 ]; then
++    exit 77 # Not root, skip this test
++fi
++
++. ${srcdir:=.}/diag.sh init
++check_command_available timeout
++
++uname
++if [ $(uname) != "Linux" ] ; then
++    echo "This test requires Linux (AF_UNIX abstract addresses)"
++    exit 77
++fi
++
++NS_PREFIX=$(basename ${RSYSLOG_DYNNAME})
++
++SOCKET_NAMES=(
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.0"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.DGRAM"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.STREAM"
++    "$RSYSLOG_DYNNAME-testbench-dgram-uxsock.SEQPACKET"
++)
++
++# create the pipe and start a background process that copies data from
++# it to the "regular" work file
++generate_conf
++for name in "${SOCKET_NAMES[@]}"; do
++    ext=${name##*.}
++    NS=${NS_PREFIX}.${ext}
++    if [ ${ext} == "0" ]; then
++        add_conf '
++
++        $template outfmt,"%msg:F,58:2%\n"
++
++        module(
++            load = "../plugins/omuxsock/.libs/omuxsock"
++            template = "outfmt"
++            SocketName = "'${name}'"
++            abstract = "1"
++            NetworkNamespace="'${NS}'"
++        )
++        :msg, contains, "msgnum:" {
++            action(
++                type = "omuxsock"
++            )
++        '
++    else
++        add_conf '
++            action(
++                type = "omuxsock"
++                SocketName = "'$name'"
++                abstract = "1"
++                SocketType = "'$ext'"
++                NetworkNamespace="'${NS}'"
++            )
++            action(
++                type = "omuxsock"
++                SocketName = "'$name'"
++                abstract = "1"
++                SocketType = "'$ext'"
++                NetworkNamespace="'${NS}.fail'"
++            )
++        '
++    fi
++done
++add_conf '
++}
++'
++
++BGPROCESS=()
++for name in "${SOCKET_NAMES[@]}"; do
++    ext=${name##*.}
++    NS=${NS_PREFIX}.${ext}
++    ip netns add "${NS}"
++    ip netns exec "${NS}" ip link set dev lo up
++    ip netns delete "${NS}.fail" > /dev/null 2>&1
++    if [ "${ext}" == "0" ]; then
++        type=""
++    else
++        type="-T${ext}"
++    fi
++    timeout 30s ip netns exec "${NS}" ./uxsockrcvr -a -s$name ${type} -o ${RSYSLOG_OUT_LOG}.${ext} -t 60 &
++    PID=($!)
++    BGPROCESS+=($PID)
++    echo background uxsockrcvr ${name} process id is $PID
++done
++
++# now do the usual run
++startup
++# 10000 messages should be enough
++injectmsg 0 10000
++shutdown_when_empty # shut down rsyslogd when done processing messages
++wait_shutdown
++
++# wait for the cp process to finish, do pipe-specific cleanup
++echo shutting down uxsockrcvr...
++# TODO: we should do this more reliable in the long run! (message counter? timeout?)
++for pid in ${BGPROCESS[@]}; do
++    kill $pid
++    wait $pid
++done
++echo background processes have terminated, continue test...
++
++# Remove namespaces
++for name in "${SOCKET_NAMES[@]}"; do
++    ext=${name##*.}
++    NS=${NS_PREFIX}.${ext}
++    ip netns delete "${NS}" > /dev/null 2>&1
++done
++
++# and continue the usual checks
++BASE=${RSYSLOG_OUT_LOG}
++for name in "${SOCKET_NAMES[@]}"; do
++    RSYSLOG_OUT_LOG=${BASE}.${name##*.}
++    seq_check 0 9999
++done
++exit_test
+diff --git a/tests/uxsock_simple.sh b/tests/uxsock_simple.sh
+index af97698..2cbd7ca 100755
+--- a/tests/uxsock_simple.sh
++++ b/tests/uxsock_simple.sh
+@@ -12,7 +12,7 @@ if [ $(uname) = "FreeBSD" ] ; then
+    exit 77
+ fi
+ 
+-# create the pipe and start a background process that copies data from 
++# create the pipe and start a background process that copies data from
+ # it to the "regular" work file
+ generate_conf
+ add_conf '
+diff --git a/tests/uxsock_simple_abstract-vg.sh b/tests/uxsock_simple_abstract-vg.sh
+new file mode 100755
+index 0000000..ff24ff3
+--- /dev/null
++++ b/tests/uxsock_simple_abstract-vg.sh
+@@ -0,0 +1,3 @@
++#!/bin/bash
++export USE_VALGRIND="YES"
++source ${srcdir:-.}/uxsock_simple_abstract.sh
+diff --git a/tests/uxsock_simple_abstract.sh b/tests/uxsock_simple_abstract.sh
+new file mode 100755
+index 0000000..1a0d09a
+--- /dev/null
++++ b/tests/uxsock_simple_abstract.sh
+@@ -0,0 +1,57 @@
++#!/bin/bash
++# This tests basic omuxsock functionality. A socket receiver is started which sends
++# all data to an output file, then a rsyslog instance is started which generates
++# messages and sends them to the unix socket. Datagram sockets are being used.
++# added 2010-08-06 by Rgerhards
++# Updated 2025-04-16 for abstract sockets
++. ${srcdir:=.}/diag.sh init
++check_command_available timeout
++
++uname
++if [ $(uname) != "Linux" ] ; then
++    echo "This test requires Linux (AF_UNIX abstract addresses)"
++    exit 77
++fi
++
++SOCKET_NAME="$RSYSLOG_DYNNAME-testbench-dgram-uxsock-abstract"
++
++# create the pipe and start a background process that copies data from
++# it to the "regular" work file
++generate_conf
++add_conf '
++$MainMsgQueueTimeoutShutdown 10000
++
++$template outfmt,"%msg:F,58:2%\n"
++
++module(
++    load = "../plugins/omuxsock/.libs/omuxsock"
++    template = "outfmt"
++)
++
++:msg, contains, "msgnum:" action(
++    type = "omuxsock"
++    SocketName = "'$SOCKET_NAME'"
++    abstract = "1"
++)
++'
++timeout 30s ./uxsockrcvr -a -s$SOCKET_NAME -o $RSYSLOG_OUT_LOG -t 60 &
++BGPROCESS=$!
++echo background uxsockrcvr process id is $BGPROCESS
++
++# now do the usual run
++startup
++# 10000 messages should be enough
++injectmsg 0 10000
++shutdown_when_empty # shut down rsyslogd when done processing messages
++wait_shutdown
++
++# wait for the cp process to finish, do pipe-specific cleanup
++echo shutting down uxsockrcvr...
++# TODO: we should do this more reliable in the long run! (message counter? timeout?)
++kill $BGPROCESS
++wait $BGPROCESS
++echo background process has terminated, continue test...
++
++# and continue the usual checks
++seq_check 0 9999
++exit_test
+diff --git a/tests/uxsockrcvr.c b/tests/uxsockrcvr.c
+index 0d61ce9..131b67d 100644
+--- a/tests/uxsockrcvr.c
++++ b/tests/uxsockrcvr.c
+@@ -31,6 +31,7 @@
+ #include "config.h"
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stddef.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <signal.h>
+@@ -53,8 +54,14 @@
+ #define DFLT_TIMEOUT 60
+ 
+ char *sockName = NULL;
+-int sock;
++int sockType = SOCK_DGRAM;
++int sockConnected = 0;
+ int addNL = 0;
++int abstract;
++#define MAX_FDS 4
++int sockBacklog = MAX_FDS - 1;
++struct pollfd fds[MAX_FDS];
++int nfds;
+ 
+ 
+ /* called to clean up on exit
+@@ -62,8 +69,12 @@ int addNL = 0;
+ void
+ cleanup(void)
+ {
+-	unlink(sockName);
+-	close(sock);
++	int index;
++
++	if (!abstract) unlink(sockName);
++	for (index = 0; index < nfds; ++index) {
++		close(fds[index].fd);
++	}
+ }
+ 
+ 
+@@ -80,10 +91,46 @@ usage(void)
+ 	fprintf(stderr, "usage: uxsockrcvr -s /socket/name -o /output/file -l\n"
+ 			"-l adds newline after each message received\n"
+ 			"-s MUST be specified\n"
+-			"if -o ist not specified, stdout is used\n");
++			"-a Use abstract socket name\n"
++			"-T {DGRAM|STREAM"
++#ifdef SOCK_SEQPACKET
++            "|SEQPACKET"
++#endif /* def SOCK_SEQPACKET */
++	    "} Set socket type (default DGRAM)\n"
++	    "if -o ist not specified, stdout is used\n");
+ 	exit(1);
+ }
+ 
++static struct {
++    const char *id;
++    int val;
++    int connected;
++} _sockType_map[] = {
++    {"DGRAM", SOCK_DGRAM, 0},
++    {"STREAM", SOCK_STREAM, 1},
++#ifdef SOCK_SEQPACKET
++    {"SEQPACKET", SOCK_SEQPACKET, 1},
++#endif /* def SOCK_SEQPACKET */
++    {NULL, 0, 0},
++};
++
++static void _decode_sockType(const char *s) {
++    int index;
++
++    for (index = 0; _sockType_map[index].id; ++index) {
++        if (!strcasecmp(s, _sockType_map[index].id)) {
++            sockType = _sockType_map[index].val;
++            sockConnected = _sockType_map[index].connected;
++            return;
++        }
++    }
++    fprintf(stderr, "?Illegal socket type '%s'. Valid socket types:\n", s);
++
++    for (index = 0; _sockType_map[index].id; ++index) {
++        fprintf(stderr, "  %s\n", _sockType_map[index].id);
++    }
++    exit(1);
++}
+ 
+ int
+ main(int argc, char *argv[])
+@@ -96,15 +143,18 @@ main(int argc, char *argv[])
+ 	struct  sockaddr_un addr; /* address of server */
+ 	struct  sockaddr from;
+ 	socklen_t fromlen;
+-	struct pollfd fds[1];
++	int index;
+ 
+ 	if(argc < 2) {
+ 		fprintf(stderr, "error: too few arguments!\n");
+ 		usage();
+ 	}
+ 
+-	while((opt = getopt(argc, argv, "s:o:lt:")) != EOF) {
++	while ((opt = getopt(argc, argv, "as:o:lt:T:")) != EOF) {
+ 		switch((char)opt) {
++		case 'a':
++			abstract = 1;
++			break;
+ 		case 'l':
+ 			addNL = 1;
+ 			break;
+@@ -120,6 +170,9 @@ main(int argc, char *argv[])
+ 		case 't':
+ 			timeout = atoi(optarg);
+ 			break;
++		case 'T':
++			_decode_sockType(optarg);
++			break;
+ 		default:usage();
+ 		}
+ 	}
+@@ -141,7 +194,7 @@ main(int argc, char *argv[])
+ 	}
+ 
+ 	/*      Create a UNIX datagram socket for server        */
+-	if ((sock = socket(AF_UNIX, SOCK_DGRAM, 0)) < 0) {
++	if ((fds[0].fd = socket(AF_UNIX, sockType, 0)) < 0) {
+ 		perror("server: socket");
+ 		exit(1);
+ 	}
+@@ -151,40 +204,77 @@ main(int argc, char *argv[])
+ 	/*      Set up address structure for server socket      */
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;
+-	strcpy(addr.sun_path, sockName);
++	strncpy(addr.sun_path + abstract, sockName, sizeof(addr.sun_path) - abstract);
++	/*
++	 * Abstract socket addresses do not require termination.
++	 */
++	if (!abstract && addr.sun_path[sizeof(addr.sun_path) - 1]) {
++		addr.sun_path[sizeof(addr.sun_path) - 1] = 0;
++		fprintf(stderr, "warning: socket path truncated: %s\n", addr.sun_path);
++	}
+ 
+-	if (bind(sock, (struct sockaddr*) &addr, sizeof(addr)) < 0) {
+-		close(sock);
++	/*
++	 * For pathname addresses, the +1 is the terminating \0 character.
++	 * For abstract addresses, the +1 is the leading \0 character.
++	 */
++	if (bind(fds[0].fd, (struct sockaddr *)&addr, offsetof(struct sockaddr_un, sun_path) + strlen(sockName) + 1) < 0) {
+ 		perror("server: bind");
++		close(fds[0].fd);
++		exit(1);
++	}
++
++	if (sockConnected && listen(fds[0].fd, sockBacklog) == -1) {
++		perror("server: listen");
++		close(fds[0].fd);
+ 		exit(1);
+ 	}
+ 
+-	fds[0].fd = sock;
+ 	fds[0].events = POLLIN;
++	nfds = 1;
+ 
+ 	/* we now run in an endless loop. We do not check who sends us
+ 	 * data. This should be no problem for our testbench use.
+ 	 */
+ 
+ 	while(1) {
+-		fromlen = sizeof(from);
+-		rlen = poll(fds, 1, timeout);
++		rlen = poll(fds, nfds, timeout);
+ 		if(rlen == -1) {
+ 			perror("uxsockrcvr : poll\n");
+ 			exit(1);
+ 		} else if(rlen == 0) {
+ 			fprintf(stderr, "Socket timed out - nothing to receive\n");
+ 			exit(1);
+-		} else {
+-			rlen = recvfrom(sock, data, 2000, 0, &from, &fromlen);
+-			if(rlen == -1) {
+-				perror("uxsockrcvr : recv\n");
+-				exit(1);
++		}
++		if (sockConnected && fds[0].revents & POLLIN) {
++			fds[nfds].fd = accept(fds[0].fd, NULL, NULL);
++			fds[nfds].events = POLLIN;
++			fds[nfds].revents = 0;
++			if (fds[nfds].fd < 0) {
++				perror("accept");
++			} else if (++nfds == MAX_FDS) {
++				fds[0].events = 0;
++			}
++		}
++		for (index = sockConnected; index < nfds; ++index) {
++		    if (fds[index].revents & POLLIN) {
++			fromlen = sizeof(from);
++			rlen = recvfrom(fds[index].fd, data, 2000, 0, &from, &fromlen);
++			if (rlen == -1) {
++			    perror("uxsockrcvr : recv\n");
++			    exit(1);
+ 			} else {
+-				fwrite(data, 1, rlen, fp);
+-				if(addNL)
+-					fputc('\n', fp);
++			    fwrite(data, 1, rlen, fp);
++			    if (addNL) fputc('\n', fp);
+ 			}
++		    }
++		    if (fds[index].revents & POLLHUP) {
++			close(fds[index].fd);
++			fds[index].fd = -1;
++			fds[index].events = 0;
++		    }
++		}
++		while (nfds && fds[nfds - 1].fd < 0) {
++		    --nfds;
+ 		}
+ 	}
+ 
+-- 
+2.43.0
+
