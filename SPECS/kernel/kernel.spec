@@ -31,7 +31,7 @@
 
 Summary:        Linux Kernel
 Name:           kernel
-Version:        6.6.145.1
+Version:        6.6.145.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -440,6 +440,9 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Jul 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.2-1
+- Auto-upgrade to 6.6.145.2
+
 * Tue Jul 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.1-1
 - Auto-upgrade to 6.6.145.1
 
