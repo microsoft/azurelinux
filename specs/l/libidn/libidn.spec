@@ -12,7 +12,7 @@
 Summary: Internationalized Domain Name support library
 Name: libidn
 Version: 1.43
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://www.gnu.org/software/libidn/
 License: (LGPL-3.0-or-later OR GPL-2.0-or-later) AND GPL-3.0-or-later AND GFDL-1.3-or-later
 Source0: https://ftp.gnu.org/gnu/libidn/libidn-%{version}.tar.gz
@@ -64,7 +64,7 @@ developing programs which use the GNU libidn library.
 %package java
 Summary:       Java port of the GNU Libidn library
 BuildRequires: java-devel
-BuildRequires: javapackages-local
+BuildRequires: javapackages-local-openjdk25
 BuildRequires: mvn(com.google.guava:guava)
 BuildRequires: mvn(junit:junit)
 BuildRequires: make

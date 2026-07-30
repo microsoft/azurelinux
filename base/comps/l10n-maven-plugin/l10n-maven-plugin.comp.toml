@@ -1,0 +1,12 @@
+[components.l10n-maven-plugin]
+
+[[components.l10n-maven-plugin.overlays]]
+description = "Use the OpenJDK 25 maven-local provider"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+maven-local$'
+replacement = "BuildRequires:  maven-local-openjdk25"
+
+[components.l10n-maven-plugin.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/l10n-maven-plugin/c/192a9a20e740d2308310e7525e16b40e5fe079b7" }]
