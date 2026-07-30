@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-minimal-os">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux Minimal OS Image</specification>
+    </description>
+    <!--
+        Build profiles: select "minimal-os" or "minimal-os-dev" to ship
+        azurelinux-repos or azurelinux-repos-dev respectively. That controls
+        which package repository the image uses at runtime.
+    -->
+    <profiles>
+        <profile name="minimal-os"     description="Ships azurelinux-repos (runtime → PMC beta)" import="false" />
+        <profile name="minimal-os-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+    </profiles>
+    <preferences>
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>C</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhdx"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="32"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" />
+            <size unit="G">1</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+
+    <!--
+        Single build-time repository (azl4-dev) for both variants —
+        koji overrides this for distro builds; for local builds this
+        is the only blob currently populated for AZL4. The variant
+        only affects which `azurelinux-repos*` package ships, NOT
+        where build-time RPMs come from.
+    -->
+    <repository type="rpm-md" alias="azurelinux-base">
+        <source
+            path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
+    </repository>
+
+    <packages type="image">
+        <package name="azurelinux-release" />
+        <package name="bash" />
+        <package name="ca-certificates" />
+        <package name="dbus" />
+        <package name="dnf5" />
+        <package name="e2fsprogs" />
+        <package name="grub2" />
+        <package name="glibc-minimal-langpack" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="kernel" />
+        <package name="ncurses-libs" />
+        <package name="openssl" />
+        <package name="rpm" />
+        <package name="shadow-utils" />
+        <package name="sudo" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-udev" />
+        <package name="util-linux" />
+        <package name="zlib" />
+    </packages>
+
+    <!--
+        Variant-scoped repos package: governs the .repo files written
+        into /etc/yum.repos.d/ in the built image (runtime). The two
+        packages conflict, so they're separated into per-variant
+        sections rather than relying on the variant's bootstrap section.
+    -->
+    <packages type="image" profiles="minimal-os-dev">
+        <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="image" profiles="minimal-os">
+        <package name="azurelinux-repos" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="azurelinux-release" />
+        <package name="filesystem" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
+    </packages>
+
+    <packages type="bootstrap" profiles="minimal-os-dev">
+        <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="bootstrap" profiles="minimal-os">
+        <package name="azurelinux-repos" />
+    </packages>
+</image>
