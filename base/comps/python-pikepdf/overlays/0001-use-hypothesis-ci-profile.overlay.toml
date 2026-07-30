@@ -1,0 +1,13 @@
+# Hypothesis's default 200 ms deadline is unreliable under parallel Koji load.
+# Its built-in CI profile keeps all generated examples and assertions enabled
+# while disabling timing deadlines for this package's test run only.
+[metadata]
+category = "azl-disable-flaky-tests"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Use the Hypothesis CI profile for package tests"
+type = "spec-search-replace"
+section = "%check"
+regex = '^%\{pytest\} -ra$'
+replacement = "%{pytest} -ra --hypothesis-profile=ci"
