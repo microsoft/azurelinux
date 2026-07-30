@@ -165,15 +165,11 @@ rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
-rustdoc_licensedir="%{buildroot}%{_defaultlicensedir}/%{name}-doc/bundled"
-rustdoc_htmldir="%{buildroot}%{_docdir}/docs/html"
-mkdir -p "$rustdoc_licensedir"
-mv "%{buildroot}%{_docdir}/rustc/licenses" "$rustdoc_licensedir/spdx"
-find "$rustdoc_htmldir" -type f \( -iname '*license*' -o -iname '*copyright*' \) | while read -r f; do
-    install -Dm644 "$f" "$rustdoc_licensedir/html/${f#$rustdoc_htmldir/}"
-    rm -f "$f"
-done
-find "$rustdoc_htmldir" -type f -iname '*bsd*' -delete
+# Move bundled third-party license texts out of %{_docdir} (where rpm auto-tags them %doc)
+# into the license dir, so they are classified only as %license and not flagged as duplicates.
+mkdir -p %{buildroot}%{_licensedir}/rust-doc
+mv %{buildroot}%{_docdir}/rustc/licenses/* %{buildroot}%{_licensedir}/rust-doc/
+rmdir %{buildroot}%{_docdir}/rustc/licenses
 
 %ldconfig_scriptlets
 
@@ -197,7 +193,7 @@ find "$rustdoc_htmldir" -type f -iname '*bsd*' -delete
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_defaultlicensedir}/%{name}-doc/bundled
+%license %{_licensedir}/rust-doc/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
@@ -211,6 +207,7 @@ find "$rustdoc_htmldir" -type f -iname '*bsd*' -delete
 %changelog
 * Tue Jul 28 2026 SumitJenaHCL <v-sumitjena@microsoft.com> - 1.90.0-10
 - Patch for CVE-2026-47143
+- Update CVE-2026-25541.patch to apply cleanly against vendored bytes 1.10.1
 - Fix rust-doc license check warnings
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
@@ -238,11 +235,11 @@ find "$rustdoc_htmldir" -type f -iname '*bsd*' -delete
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-2
 - Bump to rebuild with updated glibc
 
-* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
-- Bump to rebuild with updated glibc
-
 * Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
 - Upgrade to 1.90.0
+
+* Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10
+- Bump to rebuild with updated glibc
 
 * Thu Oct 23 2025 Kanishk Bansal <kanbansal@microsoft.com> - 1.86.0-9
 - Bump to rebuild with updated glibc
