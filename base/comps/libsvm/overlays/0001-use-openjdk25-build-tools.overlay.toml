@@ -1,0 +1,22 @@
+# Build the Java interface with the explicit OpenJDK 25 toolchain after Fedora
+# removed the generic Java packaging providers.
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/libsvm/c/b920f3188571c82eefa605564533c0171550ee01" }]
+
+[[overlays]]
+description = "Build the Java interface with OpenJDK 25"
+type = "spec-search-replace"
+section = "%package"
+package = "java"
+regex = '^BuildRequires:\s+java-devel$'
+replacement = "BuildRequires:  java-25-devel"
+
+[[overlays]]
+description = "Use the OpenJDK 25 maven-local provider"
+type = "spec-search-replace"
+section = "%package"
+package = "java"
+regex = '^BuildRequires:\s+maven-local$'
+replacement = "BuildRequires:  maven-local-openjdk25"

@@ -1,0 +1,14 @@
+[components.libidn]
+
+[[components.libidn.overlays]]
+description = "Use the OpenJDK 25 javapackages-local provider"
+type = "spec-search-replace"
+section = "%package"
+package = "java"
+regex = '^BuildRequires:\s+javapackages-local$'
+replacement = "BuildRequires: javapackages-local-openjdk25"
+
+[components.libidn.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/libidn/c/e246a509d6ad317cec538d17fad6a209d6869e4b" }]
