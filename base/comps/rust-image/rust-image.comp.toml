@@ -1,0 +1,24 @@
+[components.rust-image]
+
+# Azure Linux does not ship the rav1e (ravif) or dav1d crates/libraries, so the
+# `image` crate's AVIF support -- encode via ravif/rav1e and decode via dav1d --
+# cannot be satisfied. Drop the AVIF features and their optional dependencies,
+# mirroring the rav1e/dav1d component removals and the libavif/librsvg2
+# AVIF-disable changes.
+[[components.rust-image.overlays]]
+description = "Add and register a patch dropping the image crate's avif/avif-native features and their ravif/dav1d/rgb/mp4parse optional deps (AZL ships neither rav1e nor dav1d)"
+type = "patch-add"
+source = "image-drop-avif-features.patch"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-image.overlays]]
+description = "Drop the image+avif-devel subpackage (ravif/rav1e AVIF encoder, not shipped on AZL)"
+type = "spec-remove-subpackage"
+package = "%{name}+avif-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }
+
+[[components.rust-image.overlays]]
+description = "Drop the image+avif-native-devel subpackage (dav1d AVIF decoder, not shipped on AZL)"
+type = "spec-remove-subpackage"
+package = "%{name}+avif-native-devel"
+metadata = { category = "azl-pruning", upstream-status = "inapplicable" }

@@ -1,0 +1,113 @@
+From 57a2cbd96d78312d34f8ad7917e1b5849770247f Mon Sep 17 00:00:00 2001
+From: Thien Trung Vuong <tvuong@microsoft.com>
+Date: Thu, 30 Jul 2026 00:00:00 -0700
+Subject: [PATCH] image: drop AVIF (ravif/rav1e + dav1d) features and their
+ optional deps
+
+Azure Linux does not ship the rav1e (ravif) or dav1d crates/libraries, so the
+`image` crate's AVIF support cannot be satisfied. Drop the AVIF features and
+their optional dependencies from the crate metadata:
+  - remove the `avif` feature (dep:ravif, dep:rgb) and `avif-native` feature
+    (dep:mp4parse, dep:dav1d)
+  - drop `avif` from the `default-formats` feature set
+  - drop the ravif-only `ravif?/asm` (nasm) and `ravif?/threading` (rayon) refs
+  - remove the now-unused `[dependencies.ravif]`, `[dependencies.dav1d]`,
+    `[dependencies.rgb]` and `[dependencies.mp4parse]` blocks (avif-only
+    optional deps; leaving them would make Cargo synthesize implicit
+    rgb/mp4parse features with no matching RPM subpackage)
+
+The corresponding `image+avif-devel` / `image+avif-native-devel` subpackages are
+dropped via spec-remove-subpackage overlays. See the rav1e/dav1d component
+removals (rust-rav1e, dav1d) and the libavif/librsvg2 AVIF-disable changes.
+---
+ Cargo.toml | 30 +-----------------------------
+ 1 file changed, 1 insertion(+), 29 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index f9eaeab..2460eb1 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -58,14 +58,6 @@ rustdoc-args = [
+ ]
+ 
+ [features]
+-avif = [
+-    "dep:ravif",
+-    "dep:rgb",
+-]
+-avif-native = [
+-    "dep:mp4parse",
+-    "dep:dav1d",
+-]
+ benchmarks = []
+ bmp = []
+ color_quant = ["dep:color_quant"]
+@@ -75,7 +67,6 @@ default = [
+     "default-formats",
+ ]
+ default-formats = [
+-    "avif",
+     "bmp",
+     "dds",
+     "exr",
+@@ -106,13 +97,12 @@ jpeg = [
+     "dep:zune-core",
+     "dep:zune-jpeg",
+ ]
+-nasm = ["ravif?/asm"]
++nasm = []
+ png = ["dep:png"]
+ pnm = []
+ qoi = ["dep:qoi"]
+ rayon = [
+     "dep:rayon",
+-    "ravif?/threading",
+     "exr?/rayon",
+ ]
+ serde = ["dep:serde"]
+@@ -135,10 +125,6 @@ version = "0.1.0"
+ version = "1.1"
+ optional = true
+ 
+-[dependencies.dav1d]
+-version = ">=0.10.3,<0.12"
+-optional = true
+-
+ [dependencies.exr]
+ version = "1.74.0"
+ optional = true
+@@ -155,10 +141,6 @@ optional = true
+ [dependencies.moxcms]
+ version = "0.7.4"
+ 
+-[dependencies.mp4parse]
+-version = "0.17.0"
+-optional = true
+-
+ [dependencies.num-traits]
+ version = "0.2.0"
+ 
+@@ -170,20 +152,10 @@ optional = true
+ version = "0.4"
+ optional = true
+ 
+-[dependencies.ravif]
+-version = "0.12"
+-optional = true
+-default-features = false
+-
+ [dependencies.rayon]
+ version = "1.7.0"
+ optional = true
+ 
+-[dependencies.rgb]
+-version = "0.8.48"
+-optional = true
+-default-features = false
+-
+ [dependencies.serde]
+ version = "1.0.214"
+ features = ["derive"]
+-- 
+2.55.0
+
