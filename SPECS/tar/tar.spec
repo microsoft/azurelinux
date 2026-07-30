@@ -22,7 +22,7 @@ Contains GNU archiving program
 
 %build
 export FORCE_UNSAFE_CONFIGURE=1  
-      ./configure \
+./configure \
     --prefix=%{_prefix} \
     --bindir=/bin \
     --disable-silent-rules
