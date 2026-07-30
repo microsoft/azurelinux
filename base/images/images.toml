@@ -65,6 +65,34 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- minimal-os --------------------------------------------------------
+
+[images.minimal-os]
+description = "Minimal OS Image"
+definition = { type = "kiwi", path = "minimal-os/minimal-os.kiwi", profile = "minimal-os" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+]
+
+[images.minimal-os.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.minimal-os-dev]
+description = "Minimal OS Image (dev)"
+definition = { type = "kiwi", path = "minimal-os/minimal-os.kiwi", profile = "minimal-os-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+]
+
+[images.minimal-os-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 # ---- container-base (core profile) -------------------------------------
 [images.container-base]
 description = "Container Base Image"
