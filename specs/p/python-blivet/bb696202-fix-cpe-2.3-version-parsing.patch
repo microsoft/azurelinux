@@ -1,0 +1,33 @@
+From bb696202fa44b7d516f5cdff7a699e32edc982df Mon Sep 17 00:00:00 2001
+From: Vojtech Trefny <vtrefny@redhat.com>
+Date: Thu, 3 Jul 2025 11:20:44 +0200
+Subject: [PATCH] tests: Fix reading distro and version from CPE version 2.3
+
+---
+ tests/run_tests.py | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/tests/run_tests.py b/tests/run_tests.py
+index 40f9a0ec..78c95ce3 100644
+--- a/tests/run_tests.py
++++ b/tests/run_tests.py
+@@ -63,8 +63,14 @@ def get_version_from_cpe(cpe):
+          - "cpe:/o:fedoraproject:fedora:39"
+          - "cpe:/o:redhat:enterprise_linux:7.3:GA:server
+     """
+-    # 2nd to 4th fields from e.g. "cpe:/o:fedoraproject:fedora:25" or "cpe:/o:redhat:enterprise_linux:7.3:GA:server"
+-    _project, distro, version = tuple(cpe.split(":")[2:5])
++    if cpe.startswith("cpe:2.3"):
++        # version 2.3 of CPE standard
++        # 3th to 6th fields from "cpe:<cpe_version>:<part>:<vendor>:<product>:<version>:<update>:<edition>:"
++        _project, distro, version = tuple(cpe.split(":")[3:6])
++    else:
++        # older version of CPE standard
++        # 2nd to 4th fields from e.g. "cpe:/o:fedoraproject:fedora:25" or "cpe:/o:redhat:enterprise_linux:7.3:GA:server"
++        _project, distro, version = tuple(cpe.split(":")[2:5])
+     version = str(int(float(version)))
+     return (distro, version)
+ 
+-- 
+2.53.0
+

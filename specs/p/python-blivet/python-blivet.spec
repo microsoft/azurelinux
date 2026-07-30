@@ -8,7 +8,7 @@ Version: 3.12.1
 
 #%%global prerelease .b2
 # prerelease, if defined, should be something like .a1, .b1, .b2.dev1, or .c2
-Release: 9%{?prerelease}%{?dist}
+Release: 10%{?prerelease}%{?dist}
 Epoch: 1
 License: LGPL-2.1-or-later
 %global realname blivet
@@ -45,6 +45,7 @@ Patch103: 0003-Fix-setting-mount-options-in-FSTabManager.get_device.patch
 
 BuildArch: noarch
 
+Patch104: bb696202-fix-cpe-2.3-version-parsing.patch
 %description
 The python-blivet package is a python module for examining and modifying
 storage configuration.
