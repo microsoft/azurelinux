@@ -3,7 +3,7 @@
 Summary:        Rocket-fast system for log processing
 Name:           rsyslog
 Version:        8.2308.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPLv3+ AND ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,8 @@ Source5:        rsyslog.logrotate
 Patch0:         issue5158.patch
 Patch1:         CVE-2026-19654.patch
 Patch2:         CVE-2026-78002.patch
+Patch3:         add-network-namespace-APIs.patch
+Patch4:         adding-new-functionality-for-omuxsock.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -205,6 +207,14 @@ fi
 %{_libdir}/rsyslog/omsnmp.so
 
 %changelog
+* Mon Sep 21 2026 BinduSri Adabala <v-badabala@microsoft.com> - 8.2308.0-8
+- Add new functionality for omuxsock - Extends omuxsock output plugin to support abstract
+  Unix socket names, connection-oriented sockets (STREAM/SEQPACKET), network
+  namespace targeting, and fixes socket close/reopen bug on every message sent.
+- Add NetworkNamespace APIs - Moves network namespace management into rsyslog shared
+  net module as reusable APIs, enabling any plugin to switch Linux network
+  namespaces without duplicating code. Required dependency for PR#5630.
+
 * Mon Sep 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-7
 - Patch for CVE-2026-78002
 
