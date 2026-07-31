@@ -20,6 +20,7 @@ Patch0:         issue5158.patch
 Patch1:         CVE-2026-19654.patch
 Patch2:         add-network-namespace-APIs.patch
 Patch3:         adding-new-functionality-for-omuxsock.patch
+Patch4:         fix-message-loss-bug-for-connected-Unix-domain-sockets.patch
 BuildRequires:  autogen
 BuildRequires:  curl-devel
 BuildRequires:  gnutls-devel
@@ -207,12 +208,9 @@ fi
 
 %changelog
 * Tue Aug 25 2026 BinduSri Adabala <v-badabala@microsoft.com> - 8.2308.0-7
-- Add new functionality for omuxsock - Extends omuxsock output plugin to support abstract
-  Unix socket names, connection-oriented sockets (STREAM/SEQPACKET), network
-  namespace targeting, and fixes socket close/reopen bug on every message sent.
-- Add NetworkNamespace APIs - Moves network namespace management into rsyslog shared
-  net module as reusable APIs, enabling any plugin to switch Linux network
-  namespaces without duplicating code. Required dependency for PR#5630.
+- Add new functionality for omuxsock.
+- Add NetworkNamespace APIs.
+- Fixes message loss regression affecting STREAM and SEQPACKET Unix domain sockets.
 
 * Sun Aug 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.2308.0-6
 - Patch for CVE-2026-19654
