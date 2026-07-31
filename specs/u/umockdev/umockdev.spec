@@ -3,7 +3,7 @@
 
 Name:             umockdev
 Version:          0.19.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:          Mock hardware devices
 
 License:          LGPL-2.1-or-later
@@ -45,7 +45,7 @@ using %{name}.
 # don't be too picky about timing; upstream CI and local developer tests
 # are strict, but many koji arches are emulated and utterly slow
 export SLOW_TESTBED_FACTOR=10
-%meson_test
+%meson_test --timeout-multiplier 10
 
 %install
 %meson_install
