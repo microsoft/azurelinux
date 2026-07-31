@@ -8,10 +8,11 @@ nginx installed on top of the image-under-test.
 from __future__ import annotations
 
 import pytest
+from utils.container_runtime import AssertHttpServer, ExecShell
 
 
 @pytest.mark.dockerfile()
-def test_nginx_config_valid(container_exec_shell) -> None:
+def test_nginx_config_valid(container_exec_shell: ExecShell) -> None:
     """nginx configuration must pass validation."""
     result = container_exec_shell("nginx -t")
     assert result.exit_code == 0, f"nginx -t failed: {result.output}"
@@ -20,6 +21,6 @@ def test_nginx_config_valid(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_nginx_health_endpoint(assert_http_server) -> None:
+def test_nginx_health_endpoint(assert_http_server: AssertHttpServer) -> None:
     """nginx /health endpoint must return 200."""
     assert_http_server("nginx", "http://localhost:80/health", "healthy")

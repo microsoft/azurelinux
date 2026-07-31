@@ -8,6 +8,7 @@ OpenMPI installed on top of the image-under-test.
 from __future__ import annotations
 
 import pytest
+from utils.container_runtime import ExecShell
 
 MPI_RUN = "/usr/lib64/openmpi/bin/mpirun"
 PRTE_RUN = "/usr/lib64/openmpi/bin/prterun"
@@ -16,7 +17,7 @@ MPI_TIMEOUT_SECS = 30
 
 
 @pytest.mark.dockerfile()
-def test_openmpi_mpirun_version(container_exec_shell) -> None:
+def test_openmpi_mpirun_version(container_exec_shell: ExecShell) -> None:
     """mpirun binary must exist and report version."""
     result = container_exec_shell(f"OMPI_PRTERUN={PRTE_RUN} {MPI_RUN} --version")
     assert result.exit_code == 0, f"mpirun --version failed: {result.output}"
@@ -24,7 +25,7 @@ def test_openmpi_mpirun_version(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_openmpi_runs_multiple_ranks(container_exec_shell) -> None:
+def test_openmpi_runs_multiple_ranks(container_exec_shell: ExecShell) -> None:
     """mpirun should launch two ranks in a single container."""
     result = container_exec_shell(
         f"OMPI_PRTERUN={PRTE_RUN} "
@@ -42,7 +43,7 @@ def test_openmpi_runs_multiple_ranks(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_openmpi_send_receive_between_two_ranks(container_exec_shell) -> None:
+def test_openmpi_send_receive_between_two_ranks(container_exec_shell: ExecShell) -> None:
     """Two MPI ranks should exchange tagged messages successfully."""
     compile_and_run = (
         f"{MPI_CC} -O2 -o /tmp/send_receive "

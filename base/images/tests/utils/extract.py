@@ -56,10 +56,10 @@ BUILDAH = NativeTool(
 )
 
 
-def _run(cmd: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+def _run(cmd: list[str], *, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     """Run a command, logging it and raising with stderr on failure."""
     logger.info("Running: %s", " ".join(cmd))
-    result = subprocess.run(cmd, capture_output=True, text=True, **kwargs)
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env, check=False)
     if result.returncode != 0:
         logger.error(
             "Command failed (rc=%d): %s\nstdout: %s\nstderr: %s",

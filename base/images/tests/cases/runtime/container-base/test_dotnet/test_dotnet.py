@@ -10,19 +10,20 @@ that communicates with it over localhost.
 from __future__ import annotations
 
 import pytest
+from utils.container_runtime import AssertHttpServer, ExecShell
 
 EXPECTED_RESPONSE = "Hello World!"
 
 
 @pytest.mark.dockerfile()
-def test_dotnet_version(container_exec_shell) -> None:
+def test_dotnet_version(container_exec_shell: ExecShell) -> None:
     """.NET runtime must be present and report a version."""
     result = container_exec_shell("dotnet --version")
     assert result.exit_code == 0, f"dotnet --version failed: {result.output}"
 
 
 @pytest.mark.dockerfile()
-def test_dotnet_web(assert_http_server, container_exec_shell) -> None:
+def test_dotnet_web(assert_http_server: AssertHttpServer, container_exec_shell: ExecShell) -> None:
     """A .NET server and RestSharp client must communicate over localhost."""
     assert_http_server(
         "nohup dotnet /app/webapp/app.dll > /tmp/server.log 2>&1 &",

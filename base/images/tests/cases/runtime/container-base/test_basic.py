@@ -8,8 +8,10 @@ running container. Each test gets a fresh container instance via the
 
 from __future__ import annotations
 
+from utils.container_runtime import ExecShell
 
-def test_shell_accessible(container_exec_shell) -> None:
+
+def test_shell_accessible(container_exec_shell: ExecShell) -> None:
     """Container shell must be functional via exec."""
     result = container_exec_shell("echo hello-from-container")
     assert result.exit_code == 0, (
@@ -18,7 +20,7 @@ def test_shell_accessible(container_exec_shell) -> None:
     assert "hello-from-container" in result.output
 
 
-def test_dns_resolution(container_exec_shell) -> None:
+def test_dns_resolution(container_exec_shell: ExecShell) -> None:
     """Container must be able to resolve localhost via DNS."""
     result = container_exec_shell("getent hosts localhost")
     assert result.exit_code == 0, (

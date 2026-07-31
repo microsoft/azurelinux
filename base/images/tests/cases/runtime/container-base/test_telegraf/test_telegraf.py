@@ -9,13 +9,13 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
+from utils.container_runtime import ExecShell, WriteFile
 
 TELEGRAF_CONFIG = "/etc/telegraf/telegraf.conf"
 
 
 @pytest.mark.dockerfile()
-def test_telegraf_emits_mem_metrics(container_exec_shell) -> None:
+def test_telegraf_emits_mem_metrics(container_exec_shell: ExecShell) -> None:
     """telegraf --test must emit mem plugin measurement output."""
     result = container_exec_shell(f"telegraf --config {TELEGRAF_CONFIG} --test")
     assert result.exit_code == 0, f"telegraf --test failed: {result.output}"
@@ -23,7 +23,7 @@ def test_telegraf_emits_mem_metrics(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_telegraf_reports_version_and_plugin_usage(container_exec_shell) -> None:
+def test_telegraf_reports_version_and_plugin_usage(container_exec_shell: ExecShell) -> None:
     """telegraf binary should report version and cpu plugin usage details."""
     result = container_exec_shell("telegraf --version && telegraf --usage cpu")
     assert result.exit_code == 0, f"telegraf version/usage check failed: {result.output}"
@@ -33,7 +33,7 @@ def test_telegraf_reports_version_and_plugin_usage(container_exec_shell) -> None
 
 @pytest.mark.dockerfile()
 def test_telegraf_file_output_plugin_writes_metrics(
-    container_exec_shell, write_file_in_container
+    container_exec_shell: ExecShell, write_file_in_container: WriteFile
 ) -> None:
     """telegraf should be able to flush metrics to file output."""
     config_body = (

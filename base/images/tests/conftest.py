@@ -15,10 +15,26 @@ import subprocess
 import tempfile
 import time
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-
+from python_on_whales import DockerClient
+from utils.container_runtime import (
+    AssertHttpServer,
+    ContainerExecResult,
+    ContainerInstance,
+    ExecShell,
+    WaitForHttp,
+    WriteFile,
+    build_image,
+    cleanup_test_images,
+    create_container,
+    destroy_container,
+    exec_in_container,
+    get_podman_client,
+    resolve_image_reference,
+)
 from utils.disk import inspect_disk
 from utils.extract import (
     inspect_oci_config,
@@ -29,15 +45,6 @@ from utils.extract import (
     unmount_container_image,
     unmount_vm_image,
     unmount_wsl_image,
-)
-from utils.container_runtime import (
-    build_image,
-    cleanup_test_images,
-    create_container,
-    destroy_container,
-    exec_in_container,
-    get_podman_client,
-    resolve_image_reference,
 )
 from utils.parsers import parse_os_release, query_rpm_package_sizes
 from utils.pytest_plugin import (
@@ -130,7 +137,7 @@ def image_type(
 
 
 @pytest.fixture(scope="session")
-def workdir(request: pytest.FixtureRequest) -> Path:
+def workdir(request: pytest.FixtureRequest) -> Iterator[Path]:
     """Working directory for mounts and extractions.
 
     If ``--workdir`` is set, the directory is reused as-is and never
@@ -176,7 +183,7 @@ def workdir(request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(scope="session")
-def rootfs(image_path: Path | None, image_type: str, workdir: Path) -> Path:
+def rootfs(image_path: Path | None, image_type: str, workdir: Path) -> Iterator[Path]:
     """Mounted rootfs — session yield-fixture with cleanup.
 
     Requires ``--image-path`` (not ``--image-ref``); skips otherwise.
@@ -317,7 +324,7 @@ def podman_client(image_type: str):
 
 @pytest.fixture(scope="session")
 def container_image_ref(
-    podman_client, image_path: Path | None, image_ref: str | None,
+    podman_client: DockerClient, image_path: Path | None, image_ref: str | None,
     image_type: str,
 ) -> str | None:
     """Resolve the container image once per session and cache the reference.
@@ -333,12 +340,12 @@ def container_image_ref(
     return resolve_image_reference(podman_client, image_path=image_path, image_ref=image_ref)
 
 
-def _effective_image(podman_client, container_image_ref: str, request: pytest.FixtureRequest) -> str:
+def _effective_image(podman_client: DockerClient, container_image_ref: str, request: pytest.FixtureRequest) -> str:
     """Build the per-test image from ``@pytest.mark.dockerfile()`` if present, else use the base image."""
     marker = request.node.get_closest_marker("dockerfile")
     if marker is None:
         return container_image_ref
-    test_dir = Path(request.fspath).parent
+    test_dir = request.path.parent
     dockerfile_path = (test_dir / (marker.args[0] if marker.args else "Dockerfile")).resolve()
     if not dockerfile_path.exists():
         pytest.fail(
@@ -350,7 +357,7 @@ def _effective_image(podman_client, container_image_ref: str, request: pytest.Fi
 
 @pytest.fixture
 def running_container(
-    podman_client, image_type: str,
+    podman_client: DockerClient, image_type: str,
     container_image_ref: str | None, request: pytest.FixtureRequest,
 ):
     """Fresh container per test with guaranteed teardown.
@@ -377,7 +384,7 @@ def running_container(
 
 
 @pytest.fixture
-def container_exec(podman_client, running_container):
+def container_exec(podman_client: DockerClient, running_container: ContainerInstance):
     """Callable to execute commands in the running test container.
 
     Usage::
@@ -397,7 +404,7 @@ def container_exec(podman_client, running_container):
 
 
 @pytest.fixture
-def container_exec_shell(podman_client, running_container):
+def container_exec_shell(podman_client: DockerClient, running_container: ContainerInstance) -> ExecShell:
     """Callable to execute shell commands in the running test container.
 
     Usage::
@@ -417,7 +424,7 @@ def container_exec_shell(podman_client, running_container):
 
 
 @pytest.fixture
-def write_file_in_container(container_exec_shell):
+def write_file_in_container(container_exec_shell: ExecShell) -> WriteFile:
     """Callable to write file content into the running test container.
 
     Preserves leading whitespace and content exactly as provided, while
@@ -444,9 +451,9 @@ def write_file_in_container(container_exec_shell):
 
 @pytest.fixture
 def client_server_exec_shell(
-    podman_client, image_type: str,
+    podman_client: DockerClient, image_type: str,
     container_image_ref: str | None, request: pytest.FixtureRequest,
-):
+) -> Iterator[tuple[ExecShell, ExecShell, str]]:
     """Two networked containers, each with a callable to execute shell commands.
 
     Usage::
@@ -467,8 +474,8 @@ def client_server_exec_shell(
     network_name = f"azl-test-net-{uuid.uuid4().hex[:12]}"
     podman_client.network.create(network_name)
 
-    def _exec_shell_for(container):
-        def _exec_shell(command: str, *, shell: str = "bash"):
+    def _exec_shell_for(container: ContainerInstance) -> ExecShell:
+        def _exec_shell(command: str, *, shell: str = "bash") -> ContainerExecResult:
             return exec_in_container(podman_client, container.container_name, [shell, "-c", command])
         return _exec_shell
 
@@ -493,7 +500,7 @@ def client_server_exec_shell(
 
 
 @pytest.fixture
-def wait_for_http(container_exec_shell):
+def wait_for_http(container_exec_shell: ExecShell) -> WaitForHttp:
     """Callable that polls an in-container HTTP endpoint until it responds.
 
     Runs ``curl -sSf <url>`` inside the running test container, retrying
@@ -536,7 +543,7 @@ def wait_for_http(container_exec_shell):
 
 
 @pytest.fixture
-def assert_http_server(container_exec_shell, wait_for_http):
+def assert_http_server(container_exec_shell: ExecShell, wait_for_http: WaitForHttp) -> AssertHttpServer:
     """Start an HTTP server in the container and assert its response.
 
     Runs ``start_command`` inside the running test container, waits for

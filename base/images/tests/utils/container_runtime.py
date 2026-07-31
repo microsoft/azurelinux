@@ -11,15 +11,13 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-from collections.abc import Callable
 from pathlib import Path
-from typing import Iterator, NamedTuple, cast
+from typing import Iterator, NamedTuple, Protocol, cast
 
 from python_on_whales import DockerClient
 from python_on_whales.exceptions import DockerException, NoSuchContainer, NoSuchImage
 
 from .tools import NativeTool
-
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +43,46 @@ class ContainerExecResult(NamedTuple):
     stdout: str
     stderr: str
     output: str
+
+
+class ExecShell(Protocol):
+    """Run a shell command string inside a test container."""
+
+    def __call__(self, command: str, *, shell: str = "bash") -> ContainerExecResult: ...
+
+
+class WriteFile(Protocol):
+    """Write file content into a test container (trailing newline normalized)."""
+
+    def __call__(self, path: str, content: str) -> ContainerExecResult: ...
+
+
+class WaitForHttp(Protocol):
+    """Poll an in-container HTTP endpoint until it responds, or raise on timeout."""
+
+    def __call__(
+        self,
+        url: str,
+        *,
+        retries: int = 5,
+        delay: float = 1.0,
+        connect_timeout: float = 2.0,
+        max_time: float = 5.0,
+    ) -> ContainerExecResult: ...
+
+
+class AssertHttpServer(Protocol):
+    """Start an HTTP server in the container, wait for it, and assert the response body."""
+
+    def __call__(
+        self,
+        start_command: str,
+        url: str,
+        expected: str,
+        *,
+        retries: int = 5,
+        delay: float = 1.0,
+    ) -> ContainerExecResult: ...
 
 
 class ContainerInstance(NamedTuple):
@@ -315,7 +353,7 @@ def _make_exec_result(
 
 
 def wait_until_service_ready(
-    exec_shell: Callable[[str], ContainerExecResult],
+    exec_shell: ExecShell,
     command: str,
     *,
     contains: str = "",
