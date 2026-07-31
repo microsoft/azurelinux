@@ -60,8 +60,10 @@ _Note: Support for the ISO is community based. Before filing a new bug or featur
 
 To try Azure Linux on the Windows Subsystem for Linux, please download the `.wsl` distribution package for your architecture:
 
-- [x86_64](https://aka.ms/wslazlinux-x86_64)
-- [ARM64](https://aka.ms/wslazlinux-aarch64)
+- [x86_64](https://aka.ms/azurelinux-4.0-x86_64.wsl)
+- [ARM64](https://aka.ms/azurelinux-4.0-aarch64.wsl)
+
+Before installing a downloaded package, [verify the checksum and signature of the `.wsl` package](./docs/verify-wsl-signature-and-checksum.md).
 
 Install the distribution using `wsl`:
 
