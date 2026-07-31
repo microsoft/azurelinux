@@ -1,0 +1,25 @@
+From 1e20031661bc9df5692003b38550c328a48c0d50 Mon Sep 17 00:00:00 2001
+From: Jakub Jelen <jjelen@redhat.com>
+Date: Tue, 13 Jan 2026 21:44:54 +0100
+Subject: [PATCH] Workardound new bug in softhsm 2.7.0
+
+Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+---
+ tests/softhsm-init.sh | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/softhsm-init.sh b/tests/softhsm-init.sh
+index 99e00555..1b35357c 100755
+--- a/tests/softhsm-init.sh
++++ b/tests/softhsm-init.sh
+@@ -51,6 +51,9 @@ cat >"$TMPPDIR/softhsm.conf" <<EOF
+ directories.tokendir = $TOKDIR
+ objectstore.backend = file
+ log.level = DEBUG
++# The hashed ECDSA mechanisms wrongly do not support multi-part operations
++# https://github.com/softhsm/SoftHSMv2/pull/683
++slots.mechanisms = -CKM_ECDSA_SHA1,CKM_ECDSA_SHA224,CKM_ECDSA_SHA256,CKM_ECDSA_SHA384,CKM_ECDSA_SHA512
+ EOF
+ 
+ export SOFTHSM2_CONF=$TMPPDIR/softhsm.conf
+
