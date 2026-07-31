@@ -29606,8 +29606,8 @@
         "type": "other",
         "other": {
           "name": "trident",
-          "version": "0.24.0",
-          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.24.0.tar.gz"
+          "version": "0.26.0",
+          "downloadUrl": "https://github.com/microsoft/trident/archive/refs/tags/v0.26.0.tar.gz"
         }
       }
     },
