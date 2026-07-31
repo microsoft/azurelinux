@@ -4,12 +4,12 @@
 from __future__ import annotations
 
 import pytest
-from utils.container_runtime import wait_until_service_ready
+from utils.container_runtime import ExecShell, wait_until_service_ready
 
 EXPECTED_LEN = "4"
 
 
-def _start_redis(container_exec_shell) -> None:
+def _start_redis(container_exec_shell: ExecShell) -> None:
     """Start redis-server daemonized and wait until it answers PING."""
     start = container_exec_shell("redis-server --protected-mode no --save 60 1 --daemonize yes")
     assert start.exit_code == 0, f"redis-server failed to start: {start.output}"
@@ -18,7 +18,7 @@ def _start_redis(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_redis_version(container_exec_shell) -> None:
+def test_redis_version(container_exec_shell: ExecShell) -> None:
     """The Redis server reports its version."""
     _start_redis(container_exec_shell)
     result = container_exec_shell("redis-cli INFO server")
@@ -27,7 +27,7 @@ def test_redis_version(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_redis_cross_container(client_server_exec_shell) -> None:
+def test_redis_cross_container(client_server_exec_shell: tuple[ExecShell, ExecShell, str]) -> None:
     """A client container reaches the server container's Redis over the network and runs LPUSH."""
     server_exec, client_exec, server_host = client_server_exec_shell
 

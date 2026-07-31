@@ -4,9 +4,10 @@
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Iterator
 
 import pytest
-from utils.container_runtime import wait_until_service_ready
+from utils.container_runtime import ExecShell, wait_until_service_ready
 
 DB_PORT = 5432
 DB_NAME = "postgres"
@@ -21,7 +22,7 @@ PG_RUNDIR = "/run/postgresql"
 
 
 @contextlib.contextmanager
-def _postgres_password_file(container_exec_shell, password: str):
+def _postgres_password_file(container_exec_shell: ExecShell, password: str) -> Iterator[str]:
     """Yield a postgres-owned temp password file; remove it on exit."""
     mk = container_exec_shell("mktemp")
     assert mk.exit_code == 0, f"mktemp failed: {mk.output}"
@@ -34,7 +35,7 @@ def _postgres_password_file(container_exec_shell, password: str):
         container_exec_shell(f"runuser -u postgres rm -f {filepath}")
 
 
-def _start_postgresql(container_exec_shell, *, listen_all: bool = False) -> None:
+def _start_postgresql(container_exec_shell: ExecShell, *, listen_all: bool = False) -> None:
     """Init the cluster and start the server; listen_all also opens it to remote hosts."""
     socket = container_exec_shell(
         f"mkdir -p {PG_RUNDIR} && chown postgres:postgres {PG_RUNDIR}",
@@ -66,7 +67,7 @@ def _start_postgresql(container_exec_shell, *, listen_all: bool = False) -> None
     wait_until_service_ready(container_exec_shell, f"pg_isready -h localhost -p {DB_PORT}")
 
 
-def _run_crud_workflow(exec_shell, host: str) -> None:
+def _run_crud_workflow(exec_shell: ExecShell, host: str) -> None:
     """Create a table, insert two rows, and read them back against the DB at ``host``."""
     psql = f"PGPASSWORD={DB_PASSWORD} psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME}"
 
@@ -87,7 +88,7 @@ def _run_crud_workflow(exec_shell, host: str) -> None:
     assert f"{EXPECTED_ROWS} rows" in select.output, f"expected {EXPECTED_ROWS} rows: {select.output}"
 
 
-def _assert_bad_auth_rejected(exec_shell, host: str) -> None:
+def _assert_bad_auth_rejected(exec_shell: ExecShell, host: str) -> None:
     """A wrong password must be rejected, proving the scram rule is enforced (not trust)."""
     bad_auth = exec_shell(
         f"PGPASSWORD=wrong psql -h {host} -p {DB_PORT} -U {DB_USER} -d {DB_NAME} -c 'SELECT 1;'",
@@ -97,7 +98,7 @@ def _assert_bad_auth_rejected(exec_shell, host: str) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_postgresql_version(container_exec_shell) -> None:
+def test_postgresql_version(container_exec_shell: ExecShell) -> None:
     """The PostgreSQL server binary reports a version."""
     result = container_exec_shell("postgres --version")
     assert result.exit_code == 0, f"postgres --version failed: {result.output}"
@@ -105,7 +106,7 @@ def test_postgresql_version(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_postgresql_database_server(container_exec_shell) -> None:
+def test_postgresql_database_server(container_exec_shell: ExecShell) -> None:
     """Server accepts TCP connections and handles create/insert/select."""
     _start_postgresql(container_exec_shell)
     _assert_bad_auth_rejected(container_exec_shell, "localhost")
@@ -113,7 +114,7 @@ def test_postgresql_database_server(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_postgresql_cross_container(client_server_exec_shell) -> None:
+def test_postgresql_cross_container(client_server_exec_shell: tuple[ExecShell, ExecShell, str]) -> None:
     """A client container reaches a server container's database over the network."""
     server_exec, client_exec, server_host = client_server_exec_shell
 

@@ -4,12 +4,12 @@
 from __future__ import annotations
 
 import pytest
-from utils.container_runtime import wait_until_service_ready
+from utils.container_runtime import ExecShell, wait_until_service_ready
 
 PORT = 11211
 
 
-def _start_memcached(container_exec_shell) -> None:
+def _start_memcached(container_exec_shell: ExecShell) -> None:
     """Start memcached daemonized and wait until it accepts connections."""
     # Run as the memcached user, since the server cannot run as root.
     start = container_exec_shell(f"memcached -u memcached -d -p {PORT}")
@@ -23,7 +23,7 @@ def _start_memcached(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_memcached_version(container_exec_shell) -> None:
+def test_memcached_version(container_exec_shell: ExecShell) -> None:
     """The Memcached server binary reports a version."""
     result = container_exec_shell("memcached --version")
     assert result.exit_code == 0, f"memcached --version failed: {result.output}"
@@ -31,7 +31,7 @@ def test_memcached_version(container_exec_shell) -> None:
 
 
 @pytest.mark.dockerfile()
-def test_memcached_set_get(container_exec_shell) -> None:
+def test_memcached_set_get(container_exec_shell: ExecShell) -> None:
     """Store a value with memcached and read it back."""
     _start_memcached(container_exec_shell)
     # Text protocol: "set <key> <flags> <exptime> <bytes>" + the value, then get it back.
