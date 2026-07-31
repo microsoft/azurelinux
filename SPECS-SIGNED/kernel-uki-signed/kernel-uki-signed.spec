@@ -5,7 +5,7 @@
 %define kernelver %{version}-%{release}
 Summary:        Signed Unified Kernel Image for %{buildarch} systems
 Name:           kernel-uki-signed-%{buildarch}
-Version:        6.6.145.1
+Version:        6.6.145.2
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -68,6 +68,9 @@ popd
 /boot/efi/EFI/Linux/vmlinuz-uki-%{kernelver}.efi
 
 %changelog
+* Thu Jul 30 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.2-1
+- Auto-upgrade to 6.6.145.2
+
 * Tue Jul 28 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.6.145.1-1
 - Auto-upgrade to 6.6.145.1
 
