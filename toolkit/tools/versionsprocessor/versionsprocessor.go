@@ -179,8 +179,8 @@ func processPackageVersionString(packageVersionString string, specFileName strin
 
 	if len(releaseVerSplit) <= 2 {
 		errorString := fmt.Sprintf("Empty version-release format retrieved from spec file (%s)", specFileName)
-		err = fmt.Errorf(errorString)
-		logger.Log.Errorf(errorString)
+		err = fmt.Errorf("%s", errorString)
+		logger.Log.Error(errorString)
 
 		return []string{""}, err
 	}

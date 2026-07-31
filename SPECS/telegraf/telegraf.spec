@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        23%{?dist}
+Release:        25%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,7 +51,21 @@ Patch34:        CVE-2026-46597.patch
 Patch35:        CVE-2026-27136.patch
 Patch36:        CVE-2026-41889.patch
 Patch37:        CVE-2026-42151.patch
-Patch38:        CVE-2026-39833.patch
+Patch38:        CVE-2026-25680.patch
+Patch39:        CVE-2026-25681.patch
+Patch40:        CVE-2026-39827.patch
+Patch41:        CVE-2026-39828.patch
+Patch43:        CVE-2026-39835.patch
+Patch44:        CVE-2026-42502.patch
+Patch45:        CVE-2026-46598.patch
+Patch46:        CVE-2026-58207.patch
+Patch47:        CVE-2026-58208.patch
+Patch48:        CVE-2026-58209.patch
+Patch49:        CVE-2026-58250.patch
+Patch50:        CVE-2026-58251.patch
+Patch51:        CVE-2026-58252.patch
+Patch52:        CVE-2026-58253.patch
+Patch53:        CVE-2026-56852.patch
 
 BuildRequires:  golang
 BuildRequires:  systemd-devel
@@ -116,9 +130,14 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Mon Jun 01 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.31.0-23
-- Fix Patch for CVE-2026-39832
-- Patch for CVE-2026-39833
+* Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-25
+- Patch for CVE-2026-56852
+
+* Sun Jul 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-24
+- Patch for CVE-2026-58253, CVE-2026-58252, CVE-2026-58251, CVE-2026-58250, CVE-2026-58209, CVE-2026-58208, CVE-2026-58207
+
+* Tue Jun 02 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-23
+- Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 
 * Thu May 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-22
 - Patch for CVE-2026-41889, CVE-2026-42151

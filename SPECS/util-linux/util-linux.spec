@@ -5,7 +5,7 @@
 Summary:        Utilities for file systems, consoles, partitions, and messages
 Name:           util-linux
 Version:        2.40.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        GPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,7 @@ Source4:        su-l
 Patch0:         CVE-2025-14104.patch
 Patch1:         CVE-2026-27456.patch
 Patch2:         CVE-2026-3184.patch
+Patch3:         CVE-2026-13595.patch
 BuildRequires:  audit-devel
 BuildRequires:  libcap-ng-devel
 BuildRequires:  libselinux-devel
@@ -174,6 +175,9 @@ rm -rf %{buildroot}/lib/systemd/system
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-5
+- Patch for CVE-2026-13595
+
 * Wed Apr 08 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.40.2-4
 - Patch for CVE-2026-3184, CVE-2026-27456
 

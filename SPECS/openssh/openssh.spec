@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        6%{?dist}
+Release:        9%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -38,13 +38,23 @@ Patch400:       CVE-2025-26465.patch
 Patch401:       CVE-2025-32728.patch
 Patch402:       CVE-2025-61984.patch
 Patch403:       CVE-2025-61985.patch
+Patch404:       CVE-2026-35385.patch
+Patch405:       CVE-2026-35386.patch
+Patch406:       CVE-2026-35388.patch
+Patch407:       CVE-2026-35414.patch
+Patch408:       CVE-2026-35387.patch
+Patch409:       CVE-2026-59995.patch
+Patch410:       CVE-2026-59996.patch
+Patch411:       CVE-2026-59997.patch
+Patch412:       CVE-2026-59999.patch
+Patch413:       CVE-2026-60000.patch
+Patch414:       CVE-2026-60001.patch
+Patch415:       CVE-2026-60002.patch
+
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
-Patch965: openssh-8.2p1-visibility.patch
-Patch966: CVE-2026-35385.patch
-Patch967: CVE-2026-35386.patch
-Patch968: CVE-2026-35388.patch
+Patch965:       openssh-8.2p1-visibility.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -106,9 +116,6 @@ The module is most useful for su and sudo service stacks.
 
 %prep
 %setup -q -a 3
-%patch 966 -p1
-%patch 967 -p1
-%patch 968 -p1
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch -P 300 -p2 -b .psaa-build
@@ -127,6 +134,18 @@ popd
 %patch -P 965 -p1 -b .visibility
 %patch -P 402 -p1 -b .CVE-2025-61984.patch
 %patch -P 403 -p1 -b .CVE-2025-61985.patch
+%patch -P 404 -p1 -b .CVE-2026-35385.patch
+%patch -P 405 -p1 -b .CVE-2026-35386.patch
+%patch -P 406 -p1 -b .CVE-2026-35388.patch
+%patch -P 407 -p1 -b .CVE-2026-35414.patch
+%patch -P 408 -p1 -b .CVE-2026-35387.patch
+%patch -P 409 -p1 -b .CVE-2026-59995.patch
+%patch -P 410 -p1 -b .CVE-2026-59996.patch
+%patch -P 411 -p1 -b .CVE-2026-59997.patch
+%patch -P 412 -p1 -b .CVE-2026-59999.patch
+%patch -P 413 -p1 -b .CVE-2026-60000.patch
+%patch -P 414 -p1 -b .CVE-2026-60001.patch
+%patch -P 415 -p1 -b .CVE-2026-60002.patch
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -285,6 +304,15 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Thu Jul 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-9
+- Patch CVE-2026-60002, CVE-2026-60001, CVE-2026-60000, CVE-2026-59999, CVE-2026-59997, CVE-2026-59996, CVE-2026-59995
+
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-8
+- Patch CVE-2026-35387
+
+* Wed Apr 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-7
+- Patch CVE-2026-35414
+
 * Mon Apr 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-6
 - Patch CVE-2026-35385, CVE-2026-35386, CVE-2026-35388
 

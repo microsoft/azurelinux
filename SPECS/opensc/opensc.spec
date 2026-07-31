@@ -1,6 +1,6 @@
 Name:           opensc
 Version:        0.27.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause
@@ -9,9 +9,10 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/OpenSC/OpenSC/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        opensc.module
-Patch1:         opensc-0.19.0-pinpad.patch
+Patch0:         opensc-0.19.0-pinpad.patch
 # File caching by default (#2000626)
-Patch8:         %{name}-0.22.0-file-cache.patch
+Patch1:         %{name}-0.22.0-file-cache.patch
+Patch2:         CVE-2026-10275.patch
 
 BuildRequires:  make
 BuildRequires:  pcsc-lite-devel
@@ -48,9 +49,7 @@ every software/card that does so, too.
 
 
 %prep
-%setup -q
-%patch 1 -p1 -b .pinpad
-%patch 8 -p1 -b .file-cache
+%autosetup -p1
 
 # The test-pkcs11-tool-allowed-mechanisms already works in Fedora
 sed -i -e '/XFAIL_TESTS/,$ {
@@ -204,6 +203,9 @@ rm %{buildroot}%{_mandir}/man1/opensc-notify.1*
 
 
 %changelog
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.27.1-2
+- Patch for CVE-2026-10275
+
 * Tue Mar 31 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 0.27.1-1
 - Auto-upgrade to 0.27.1 - for CVE-2025-13763, CVE-2025-49010, CVE-2025-66215, CVE-2025-66038, CVE-2025-66037
 
