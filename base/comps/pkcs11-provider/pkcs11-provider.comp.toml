@@ -1,0 +1,6 @@
+[components.pkcs11-provider]
+# Pin to Fedora 44's 1.1 release to fix softhsm/rsapssam with OpenSC 0.27.1.
+# Version 1.0 makes OpenSSL default to SHA1 during public-key verification:
+# https://github.com/openssl-projects/pkcs11-provider/commit/acc3324cd543957f89741bd2f1282bda56251150
+# TODO: Drop once the default Fedora snapshot provides version 1.1 or newer.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "809c6aa8918a5fe74150eb749672bcb8f8b9cb1a" }
