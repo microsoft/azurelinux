@@ -1,0 +1,12 @@
+# The default Meson test setup uses multiplier 5, giving each test 150 seconds.
+# Slow build architectures can exceed that wall clock while running the full suite.
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Increase Meson test timeout for slow build architectures"
+type = "spec-search-replace"
+section = "%check"
+regex = '^%meson_test$'
+replacement = "%meson_test --timeout-multiplier 10"
