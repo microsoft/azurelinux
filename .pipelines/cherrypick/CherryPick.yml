@@ -15,7 +15,7 @@ resources:
     - repository: CBL-Mariner-Pipelines
       type: git
       name: mariner/CBL-Mariner-Pipelines
-      ref: refs/heads/skarambelkar-test-cherrypick
+      ref: refs/heads/skarambelkar-githubapp-rollout-post-pr-fix
 
 jobs:
   - job: 'CherryPick'
