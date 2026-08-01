@@ -15,7 +15,15 @@ Patch2:         CVE-2026-48858.patch
 Patch3:         CVE-2026-48860.patch
 Patch4:         CVE-2026-49759.patch
 Patch5:         CVE-2026-49760.patch
+<<<<<<< HEAD
 Patch6:         CVE-2026-54886.patch
+=======
+Patch6:         CVE-2026-42792.patch
+Patch7:         CVE-2026-55737.patch
+Patch8:         CVE-2026-55953.patch
+Patch9:         CVE-2026-58227.patch
+Patch10:        CVE-2026-59251.patch
+>>>>>>> 1efe0751e2 ([AutoPR- Security] Patch erlang for CVE-2026-59251, CVE-2026-58227, CVE-2026-55953, CVE-2026-55737, CVE-2026-42792 [HIGH] (#18274))
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -60,8 +68,13 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+<<<<<<< HEAD
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
 - Patch for CVE-2026-54886
+=======
+* Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
+- Patch for CVE-2026-59251, CVE-2026-58227, CVE-2026-55953, CVE-2026-55737, CVE-2026-42792
+>>>>>>> 1efe0751e2 ([AutoPR- Security] Patch erlang for CVE-2026-59251, CVE-2026-58227, CVE-2026-55953, CVE-2026-55737, CVE-2026-42792 [HIGH] (#18274))
 
 * Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-2
 - Patch for CVE-2026-49760, CVE-2026-49759, CVE-2026-48860, CVE-2026-48858, CVE-2026-48856, CVE-2026-48855
