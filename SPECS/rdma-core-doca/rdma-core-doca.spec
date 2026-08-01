@@ -126,14 +126,15 @@ BuildRequires: perl-generators
 %endif
 
 Requires: pciutils
+Conflicts: rdma-core
 # Red Hat/Fedora previously shipped redhat/ as a stand-alone
 # package called 'rdma', which we're supplanting here.
-Provides: rdma = %{version}-%{release}
-Obsoletes: rdma < %{version}-%{release}
-Provides: rdma-ndd = %{version}-%{release}
-Obsoletes: rdma-ndd < %{version}-%{release}
-Provides: rdma-core-help = %{version}-%{release}
-Obsoletes: rdma-core-help < %{version}-%{release}
+Provides: rdma-doca = %{version}-%{release}
+Obsoletes: rdma-doca < %{version}-%{release}
+Provides: rdma-ndd-doca = %{version}-%{release}
+Obsoletes: rdma-ndd-doca < %{version}-%{release}
+Provides: rdma-core-help-doca = %{version}-%{release}
+Obsoletes: rdma-core-help-doca < %{version}-%{release}
 # the ndd utility moved from infiniband-diags to rdma-core
 Conflicts: infiniband-diags <= 1.6.7
 Requires: pciutils
@@ -163,28 +164,29 @@ scripts, dracut rules, and the rdma-ndd utility.
 %package devel
 Summary: RDMA core development libraries and headers
 Group: System Environment/Libraries
-Requires: libibverbs%{?_isa} = %{version}-%{release}
-Provides: libibverbs-devel = %{version}-%{release}
-Obsoletes: libibverbs-devel < %{version}-%{release}
-Provides: libibverbs-devel-static = %{version}-%{release}
-Obsoletes: libibverbs-devel-static < %{version}-%{release}
-Requires: libibumad%{?_isa} = %{version}-%{release}
-Provides: libibumad-devel = %{version}-%{release}
-Obsoletes: libibumad-devel < %{version}-%{release}
-Provides: libibumad-static = %{version}-%{release}
-Obsoletes: libibumad-static < %{version}-%{release}
-Requires: librdmacm%{?_isa} = %{version}-%{release}
-Provides: librdmacm-devel = %{version}-%{release}
-Obsoletes: librdmacm-devel < %{version}-%{release}
-Provides: librdmacm-static = %{version}-%{release}
-Obsoletes: librdmacm-static < %{version}-%{release}
-Provides: ibacm-devel = %{version}-%{release}
-Obsoletes: ibacm-devel < %{version}-%{release}
-Requires: infiniband-diags%{?_isa} = %{version}-%{release}
-Provides: infiniband-diags-devel = %{version}-%{release}
-Obsoletes: infiniband-diags-devel < %{version}-%{release}
-Provides: libibmad-devel = %{version}-%{release}
-Obsoletes: libibmad-devel < %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
+Provides: libibverbs-devel-doca = %{version}-%{release}
+Obsoletes: libibverbs-devel-doca < %{version}-%{release}
+Provides: libibverbs-devel-static-doca = %{version}-%{release}
+Obsoletes: libibverbs-devel-static-doca < %{version}-%{release}
+Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Provides: libibumad-devel-doca = %{version}-%{release}
+Obsoletes: libibumad-devel-doca < %{version}-%{release}
+Provides: libibumad-static-doca = %{version}-%{release}
+Obsoletes: libibumad-static-doca < %{version}-%{release}
+Requires: librdmacm-doca%{?_isa} = %{version}-%{release}
+Provides: librdmacm-devel-doca = %{version}-%{release}
+Obsoletes: librdmacm-devel-doca < %{version}-%{release}
+Provides: librdmacm-static-doca = %{version}-%{release}
+Obsoletes: librdmacm-static-doca < %{version}-%{release}
+Provides: ibacm-devel-doca = %{version}-%{release}
+Obsoletes: ibacm-devel-doca < %{version}-%{release}
+Requires: infiniband-diags-doca%{?_isa} = %{version}-%{release}
+Provides: infiniband-diags-devel-doca = %{version}-%{release}
+Obsoletes: infiniband-diags-devel-doca < %{version}-%{release}
+Provides: libibmad-devel-doca = %{version}-%{release}
+Obsoletes: libibmad-devel-doca < %{version}-%{release}
 %if %{with_static}
 # Since our pkg-config files include private references to these packages they
 # need to have their .pc files installed too, even for dynamic linking, or
@@ -192,106 +194,109 @@ Obsoletes: libibmad-devel < %{version}-%{release}
 BuildRequires: pkgconfig(libnl-3.0)
 BuildRequires: pkgconfig(libnl-route-3.0)
 %endif
-Provides: libcxgb3-static = %{version}-%{release}
-Obsoletes: libcxgb3-static < %{version}-%{release}
-Provides: libcxgb4-static = %{version}-%{release}
-Obsoletes: libcxgb4-static < %{version}-%{release}
-Provides: libhfi1-static = %{version}-%{release}
-Obsoletes: libhfi1-static < %{version}-%{release}
-Provides: libipathverbs-static = %{version}-%{release}
-Obsoletes: libipathverbs-static < %{version}-%{release}
-Provides: libmlx4-devel = %{version}-%{release}
-Obsoletes: libmlx4-devel < %{version}-%{release}
-Provides: libmlx4-static = %{version}-%{release}
-Obsoletes: libmlx4-static < %{version}-%{release}
-Provides: libmlx5-devel = %{version}-%{release}
-Obsoletes: libmlx5-devel < %{version}-%{release}
-Provides: libmlx5-static = %{version}-%{release}
-Obsoletes: libmlx5-static < %{version}-%{release}
-Provides: libnes-static = %{version}-%{release}
-Obsoletes: libnes-static < %{version}-%{release}
-Provides: libocrdma-static = %{version}-%{release}
-Obsoletes: libocrdma-static < %{version}-%{release}
-Provides: libi40iw-devel-static = %{version}-%{release}
-Obsoletes: libi40iw-devel-static < %{version}-%{release}
-Provides: libmthca-static = %{version}-%{release}
-Obsoletes: libmthca-static < %{version}-%{release}
+Provides: libcxgb3-static-doca = %{version}-%{release}
+Obsoletes: libcxgb3-static-doca < %{version}-%{release}
+Provides: libcxgb4-static-doca = %{version}-%{release}
+Obsoletes: libcxgb4-static-doca < %{version}-%{release}
+Provides: libhfi1-static-doca = %{version}-%{release}
+Obsoletes: libhfi1-static-doca < %{version}-%{release}
+Provides: libipathverbs-static-doca = %{version}-%{release}
+Obsoletes: libipathverbs-static-doca < %{version}-%{release}
+Provides: libmlx4-devel-doca = %{version}-%{release}
+Obsoletes: libmlx4-devel-doca < %{version}-%{release}
+Provides: libmlx4-static-doca = %{version}-%{release}
+Obsoletes: libmlx4-static-doca < %{version}-%{release}
+Provides: libmlx5-devel-doca = %{version}-%{release}
+Obsoletes: libmlx5-devel-doca < %{version}-%{release}
+Provides: libmlx5-static-doca = %{version}-%{release}
+Obsoletes: libmlx5-static-doca < %{version}-%{release}
+Provides: libnes-static-doca = %{version}-%{release}
+Obsoletes: libnes-static-doca < %{version}-%{release}
+Provides: libocrdma-static-doca = %{version}-%{release}
+Obsoletes: libocrdma-static-doca < %{version}-%{release}
+Provides: libi40iw-devel-static-doca = %{version}-%{release}
+Obsoletes: libi40iw-devel-static-doca < %{version}-%{release}
+Provides: libmthca-static-doca = %{version}-%{release}
+Obsoletes: libmthca-static-doca < %{version}-%{release}
 
 %description devel
 RDMA core development libraries and headers.
 
-%package -n infiniband-diags
+%package -n infiniband-diags-doca
 Summary: InfiniBand Diagnostic Tools
-Provides: perl(IBswcountlimits)
-Provides: libibmad = %{version}-%{release}
-Obsoletes: libibmad < %{version}-%{release}
-Provides: libibmad5 = %{version}-%{release}
-Obsoletes: libibmad5 < %{version}-%{release}
-Provides: libibnetdisc5 = %{version}-%{release}
-Obsoletes: libibnetdisc5 < %{version}-%{release}
-Obsoletes: openib-diags < 1.3
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Provides: libibmad-doca = %{version}-%{release}
+Obsoletes: libibmad-doca < %{version}-%{release}
+Provides: libibmad5-doca = %{version}-%{release}
+Obsoletes: libibmad5-doca < %{version}-%{release}
+Provides: libibnetdisc5-doca = %{version}-%{release}
+Obsoletes: libibnetdisc5-doca < %{version}-%{release}
+Obsoletes: openib-diags-doca < 1.3
 
-%description -n infiniband-diags
+%description -n infiniband-diags-doca
 This package provides IB diagnostic programs and scripts needed to diagnose an
 IB subnet.  infiniband-diags now also provides libibmad.  libibmad provides
 low layer IB functions for use by the IB diagnostic and management
 programs. These include MAD, SA, SMP, and other basic IB functions.
 
-%package -n infiniband-diags-compat
+%package -n infiniband-diags-compat-doca
 Summary: OpenFabrics Alliance InfiniBand Diagnostic Tools
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
-%description -n infiniband-diags-compat
+%description -n infiniband-diags-compat-doca
 Deprecated scripts and utilities which provide duplicated functionality, most
 often at a reduced performance. These are maintained for the time being for
 compatibility reasons.
 
-%package -n libibverbs
+%package -n libibverbs-doca
 Summary: A library and drivers for direct userspace use of RDMA (InfiniBand/iWARP/RoCE) hardware
 Group: System Environment/Libraries
+Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Provides: libcxgb4 = %{version}-%{release}
-Obsoletes: libcxgb4 < %{version}-%{release}
-Provides: libefa = %{version}-%{release}
-Obsoletes: libefa < %{version}-%{release}
-Provides: libefa1 = %{version}-%{release}
-Obsoletes: libefa1 < %{version}-%{release}
-Provides: liberdma = %{version}-%{release}
-Obsoletes: liberdma < %{version}-%{release}
-Provides: libhfi1 = %{version}-%{release}
-Obsoletes: libhfi1 < %{version}-%{release}
-Provides: libhns = %{version}-%{release}
-Obsoletes: libhns < %{version}-%{release}
-Provides: libionic = %{version}-%{release}
-Obsoletes: libionic < %{version}-%{release}
-Provides: libipathverbs = %{version}-%{release}
-Obsoletes: libipathverbs < %{version}-%{release}
-Provides: libirdma = %{version}-%{release}
-Obsoletes: libirdma < %{version}-%{release}
-Provides: libmana = %{version}-%{release}
-Obsoletes: libmana < %{version}-%{release}
-Provides: libmana1 = %{version}-%{release}
-Obsoletes: libmana1 < %{version}-%{release}
-Provides: libmlx4 = %{version}-%{release}
-Obsoletes: libmlx4 < %{version}-%{release}
-Provides: libmlx4-1 = %{version}-%{release}
-Obsoletes: libmlx4-1 < %{version}-%{release}
-Provides: libmlx5-1 = %{version}-%{release}
-Obsoletes: libmlx5-1 < %{version}-%{release}
+Provides: libcxgb4-doca = %{version}-%{release}
+Obsoletes: libcxgb4-doca < %{version}-%{release}
+Provides: libefa-doca = %{version}-%{release}
+Obsoletes: libefa-doca < %{version}-%{release}
+Provides: libefa1-doca = %{version}-%{release}
+Obsoletes: libefa1-doca < %{version}-%{release}
+Provides: liberdma-doca = %{version}-%{release}
+Obsoletes: liberdma-doca < %{version}-%{release}
+Provides: libhfi1-doca = %{version}-%{release}
+Obsoletes: libhfi1-doca < %{version}-%{release}
+Provides: libhns-doca = %{version}-%{release}
+Obsoletes: libhns-doca < %{version}-%{release}
+Provides: libionic-doca = %{version}-%{release}
+Obsoletes: libionic-doca < %{version}-%{release}
+Provides: libipathverbs-doca = %{version}-%{release}
+Obsoletes: libipathverbs-doca < %{version}-%{release}
+Provides: libirdma-doca = %{version}-%{release}
+Obsoletes: libirdma-doca < %{version}-%{release}
+Provides: libmana-doca = %{version}-%{release}
+Obsoletes: libmana-doca < %{version}-%{release}
+Provides: libmana1-doca = %{version}-%{release}
+Obsoletes: libmana1-doca < %{version}-%{release}
+Provides: libmlx4-doca = %{version}-%{release}
+Obsoletes: libmlx4-doca < %{version}-%{release}
+Provides: libmlx4-1-doca = %{version}-%{release}
+Obsoletes: libmlx4-1-doca < %{version}-%{release}
+Provides: libmlx5-1-doca = %{version}-%{release}
+Obsoletes: libmlx5-1-doca < %{version}-%{release}
 %ifnarch s390x s390
-Provides: libmlx5 = %{version}-%{release}
-Obsoletes: libmlx5 < %{version}-%{release}
+Provides: libmlx5-doca = %{version}-%{release}
+Obsoletes: libmlx5-doca < %{version}-%{release}
 %endif
-Provides: libmthca = %{version}-%{release}
-Obsoletes: libmthca < %{version}-%{release}
-Provides: libocrdma = %{version}-%{release}
-Obsoletes: libocrdma < %{version}-%{release}
-Provides: librxe = %{version}-%{release}
-Obsoletes: librxe < %{version}-%{release}
-Provides: libibverbs1 = %{version}-%{release}
-Obsoletes: libibverbs1 < %{version}-%{release}
+Provides: libmthca-doca = %{version}-%{release}
+Obsoletes: libmthca-doca < %{version}-%{release}
+Provides: libocrdma-doca = %{version}-%{release}
+Obsoletes: libocrdma-doca < %{version}-%{release}
+Provides: librxe-doca = %{version}-%{release}
+Obsoletes: librxe-doca < %{version}-%{release}
+Provides: libibverbs1-doca = %{version}-%{release}
+Obsoletes: libibverbs1-doca < %{version}-%{release}
 
-%description -n libibverbs
+%description -n libibverbs-doca
 libibverbs is a library that allows userspace processes to use RDMA
 "verbs" as described in the InfiniBand Architecture Specification and
 the RDMA Protocol Verbs Specification.  This includes direct hardware
@@ -305,25 +310,27 @@ Device-specific plug-in ibverbs userspace drivers are included:
 - libmana: Microsoft Azure Network Adapter
 - libmlx5: Mellanox ConnectX-4+ InfiniBand HCA
 
-%package -n libibverbs-utils
+%package -n libibverbs-utils-doca
 Summary: Examples for the libibverbs library
-Requires: libibverbs%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 
-%description -n libibverbs-utils
+%description -n libibverbs-utils-doca
 Useful libibverbs example programs such as ibv_devinfo, which
 displays information about RDMA devices.
 
-%package -n ibacm
+%package -n ibacm-doca
 Summary: InfiniBand Communication Manager Assistant
 Group: System Environment/Libraries
+Requires: %{name}%{?_isa} = %{version}-%{release}
 %if "%{WITH_SYSTEMD}" == "1"
 %{systemd_requires}
 %endif
 Conflicts: rdma-core < 32
-Requires: libibumad%{?_isa} = %{version}-%{release}
-Requires: libibverbs%{?_isa} = %{version}-%{release}
+Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 
-%description -n ibacm
+%description -n ibacm-doca
 The ibacm daemon helps reduce the load of managing path record lookups on
 large InfiniBand fabrics by providing a user space implementation of what
 is functionally similar to an ARP cache.  The use of ibacm, when properly
@@ -333,59 +340,64 @@ user applications need not know about this daemon as long as their app
 uses librdmacm to handle connection bring up/tear down.  The librdmacm
 library knows how to talk directly to the ibacm daemon to retrieve data.
 
-%package -n libibumad
+%package -n libibumad-doca
 Summary: OpenFabrics Alliance InfiniBand umad (userspace management datagram) library
-Provides: libibumad3 = %{version}-%{release}
-Obsoletes: libibumad3 < %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Provides: libibumad3-doca = %{version}-%{release}
+Obsoletes: libibumad3-doca < %{version}-%{release}
 
-%description -n libibumad
+%description -n libibumad-doca
 libibumad provides the userspace management datagram (umad) library
 functions, which sit on top of the umad modules in the kernel. These
 are used by the IB diagnostic and management tools, including OpenSM.
 
-%package -n librdmacm
+%package -n librdmacm-doca
 Summary: Userspace RDMA Connection Manager
 Group: System Environment/Libraries
-Requires: libibverbs%{?_isa} = %{version}-%{release}
-Provides: librdmacm1 = %{version}-%{release}
-Obsoletes: librdmacm1 < %{version}-%{release}
-Provides: rsocket = %{version}-%{release}
-Obsoletes: rsocket < %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
+Provides: librdmacm1-doca = %{version}-%{release}
+Obsoletes: librdmacm1-doca < %{version}-%{release}
+Provides: rsocket-doca = %{version}-%{release}
+Obsoletes: rsocket-doca < %{version}-%{release}
 
-%description -n librdmacm
+%description -n librdmacm-doca
 librdmacm provides a userspace RDMA Communication Management API.
 
-%package -n librdmacm-utils
+%package -n librdmacm-utils-doca
 Summary: Examples for the librdmacm library
 Group: System Environment/Libraries
-Requires: librdmacm%{?_isa} = %{version}-%{release}
-Requires: libibverbs%{?_isa} = %{version}-%{release}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: librdmacm-doca%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 
-%description -n librdmacm-utils
+%description -n librdmacm-utils-doca
 Example test programs for the librdmacm library.
 
-%package -n srp_daemon
+%package -n srp_daemon-doca
 Summary: Tools for using the InfiniBand SRP protocol devices
 Group: System Environment/Libraries
-Obsoletes: srptools < %{version}-%{release}
-Provides: srptools = %{version}-%{release}
-Obsoletes: openib-srptools <= 0.0.6
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Obsoletes: srptools-doca < %{version}-%{release}
+Provides: srptools-doca = %{version}-%{release}
+Obsoletes: openib-srptools-doca <= 0.0.6
 %if "%{WITH_SYSTEMD}" == "1"
 %{systemd_requires}
 %endif
-Requires: libibumad%{?_isa} = %{version}-%{release}
-Requires: libibverbs%{?_isa} = %{version}-%{release}
+Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 
-%description -n srp_daemon
+%description -n srp_daemon-doca
 In conjunction with the kernel ib_srp driver, srp_daemon allows you to
 discover and use SCSI devices via the SCSI RDMA Protocol over InfiniBand.
 
 %if %{with_pyverbs}
-%package -n python3-pyverbs
+%package -n python3-pyverbs-doca
 Summary: Python3 API over IB verbs
-%{?python_provide:%python_provide python%{python3_pkgversion}-pyverbs}
+Requires: %{name}%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-pyverbs-doca}
 
-%description -n python3-pyverbs
+%description -n python3-pyverbs-doca
 Pyverbs is a Cython-based Python API over libibverbs, providing an
 easy, object-oriented access to IB verbs.
 %endif
@@ -503,31 +515,31 @@ if [ -x /sbin/udevadm ]; then
 /sbin/udevadm trigger --subsystem-match=infiniband_mad --action=change || true
 fi
 
-%post -n infiniband-diags -p /sbin/ldconfig
-%postun -n infiniband-diags -p /sbin/ldconfig
+%post -n infiniband-diags-doca -p /sbin/ldconfig
+%postun -n infiniband-diags-doca -p /sbin/ldconfig
 
-%post -n libibverbs -p /sbin/ldconfig
-%postun -n libibverbs -p /sbin/ldconfig
+%post -n libibverbs-doca -p /sbin/ldconfig
+%postun -n libibverbs-doca -p /sbin/ldconfig
 
-%post -n libibumad -p /sbin/ldconfig
-%postun -n libibumad -p /sbin/ldconfig
+%post -n libibumad-doca -p /sbin/ldconfig
+%postun -n libibumad-doca -p /sbin/ldconfig
 
-%post -n librdmacm -p /sbin/ldconfig
-%postun -n librdmacm -p /sbin/ldconfig
+%post -n librdmacm-doca -p /sbin/ldconfig
+%postun -n librdmacm-doca -p /sbin/ldconfig
 
-%post -n ibacm
+%post -n ibacm-doca
 %systemd_post ibacm.service
-%preun -n ibacm
+%preun -n ibacm-doca
 %systemd_preun ibacm.service
-%postun -n ibacm
+%postun -n ibacm-doca
 %systemd_postun_with_restart ibacm.service
 
 %if "%{WITH_SYSTEMD}" == "1"
-%post -n srp_daemon
+%post -n srp_daemon-doca
 %systemd_post srp_daemon.service
-%preun -n srp_daemon
+%preun -n srp_daemon-doca
 %systemd_preun srp_daemon.service
-%postun -n srp_daemon
+%postun -n srp_daemon-doca
 %systemd_postun_with_restart srp_daemon.service
 %endif
 
@@ -591,7 +603,7 @@ fi
 %endif
 %{_mandir}/man3/ibnd_*
 
-%files -n infiniband-diags-compat
+%files -n infiniband-diags-compat-doca
 %{_sbindir}/ibcheckerrs
 %{_mandir}/man8/ibcheckerrs*
 %{_sbindir}/ibchecknet
@@ -632,7 +644,7 @@ fi
 %{_sbindir}/ibclearcounters
 %{_mandir}/man8/ibclearcounters*
 
-%files -n infiniband-diags
+%files -n infiniband-diags-doca
 %{_sbindir}/ibaddr
 %{_sbindir}/ibnetdiscover
 %{_sbindir}/ibping
@@ -703,7 +715,7 @@ fi
 %config(noreplace) %{_sysconfdir}/infiniband-diags/error_thresholds
 %config(noreplace) %{_sysconfdir}/infiniband-diags/ibdiag.conf
 
-%files -n libibverbs
+%files -n libibverbs-doca
 %dir %{_sysconfdir}/libibverbs.d
 %dir %{_libdir}/libibverbs
 %{_libdir}/libibverbs*.so.*
@@ -716,11 +728,11 @@ fi
 %config(noreplace) %{_sysconfdir}/libibverbs.d/mlx5.driver
 %doc installed_docs/libibverbs.md
 
-%files -n libibverbs-utils
+%files -n libibverbs-utils-doca
 %{_bindir}/ibv_*
 %{_mandir}/man1/ibv_*
 
-%files -n ibacm
+%files -n ibacm-doca
 %config(noreplace) %{_sysconfdir}/rdma/ibacm_opts.cfg
 %{_bindir}/ib_acme
 %{_sbindir}/ibacm
@@ -735,7 +747,7 @@ fi
 %doc installed_docs/ibacm.md
 
 %if 0
-%files -n iwpmd
+%files -n iwpmd-doca
 %{_sbindir}/iwpmd
 %{_unitdir}/iwpmd.service
 %config(noreplace) %{_sysconfdir}/rdma/modules/iwpmd.conf
@@ -745,17 +757,17 @@ fi
 %{_mandir}/man5/iwpmd.*
 %endif
 
-%files -n libibumad
+%files -n libibumad-doca
 %{_libdir}/libibumad*.so.*
 
-%files -n librdmacm
+%files -n librdmacm-doca
 %{_libdir}/librdmacm*.so.*
 %dir %{_libdir}/rsocket
 %{_libdir}/rsocket/*.so*
 %doc installed_docs/librdmacm.md
 %{_mandir}/man7/rsocket.*
 
-%files -n librdmacm-utils
+%files -n librdmacm-utils-doca
 %{_bindir}/cmtime
 %{_bindir}/mckey
 %{_bindir}/rcopy
@@ -783,7 +795,7 @@ fi
 %{_mandir}/man1/udaddy.*
 %{_mandir}/man1/udpong.*
 
-%files -n srp_daemon
+%files -n srp_daemon-doca
 %config(noreplace) %{_sysconfdir}/srp_daemon.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/srp_daemon.conf
 %{_libexecdir}/srp_daemon/start_on_all_ports
@@ -805,7 +817,7 @@ fi
 %doc installed_docs/ibsrpdm.md
 
 %if %{with_pyverbs}
-%files -n python3-pyverbs
+%files -n python3-pyverbs-doca
 %{python3_sitearch}/pyverbs
 %doc installed_docs/tests
 %endif

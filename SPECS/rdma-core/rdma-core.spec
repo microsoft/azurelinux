@@ -42,6 +42,7 @@ BuildRequires: systemd
 BuildRequires: systemd-devel
 BuildRequires: valgrind
 Requires: pciutils
+Conflicts: rdma-core-doca
 
 Provides: rdma = %{version}-%{release}
 
