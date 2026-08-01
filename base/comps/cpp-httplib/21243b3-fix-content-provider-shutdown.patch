@@ -1,0 +1,51 @@
+From 21243b3c9ee4c668186fff040ebb647cf1e58633 Mon Sep 17 00:00:00 2001
+From: yhirose <yuji.hirose.bug@gmail.com>
+Date: Sun, 22 Feb 2026 13:54:23 -0500
+Subject: [PATCH] Fix incomplete content provider success on shutdown
+
+Backport the completion accounting portions applicable to cpp-httplib 0.30.1.
+The peer-liveness changes from the original commit are unnecessary because
+this version still checks peer state in wait_writable().
+---
+ httplib.h | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/httplib.h b/httplib.h
+--- a/httplib.h
++++ b/httplib.h
+@@ -5982,6 +5982,11 @@ inline bool write_content_with_progress(Stream &strm,
+     }
+   }
+ 
++  if (offset < end_offset) { // exited due to is_shutting_down(), not completion
++    error = Error::Write;
++    return false;
++  }
++
+   error = Error::Success;
+   return true;
+ }
+@@ -6034,7 +6039,8 @@ write_content_without_length(Stream &strm,
+       return false;
+     }
+   }
+-  return true;
++  return !data_available; // true only if done() was called, false if shutting
++                          // down
+ }
+ 
+ template <typename T, typename U>
+@@ -6132,6 +6138,11 @@ write_content_chunked(Stream &strm, const ContentProvider &content_provider,
+     }
+   }
+ 
++  if (data_available) { // exited due to is_shutting_down(), not done()
++    error = Error::Write;
++    return false;
++  }
++
+   error = Error::Success;
+   return true;
+ }
+-- 
+2.53.0
