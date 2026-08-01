@@ -2,7 +2,7 @@
 
 Name:           kata-containers
 Version:        3.32.0.kata0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
@@ -43,6 +43,31 @@ This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version} -a 1
+
+# auto-triage: removal-based validation
+__at_root="${RPM_BUILD_DIR:-$(pwd)}"
+__at_hit=0
+for __at_path in kata-containers-3.19.1.kata3/src/runtime/vendor/go.opentelemetry.io/otel/exporters/jaeger/internal/third_party/thrift/lib/go/thrift/binary_protocol.go kata-containers-3.19.1.kata3/src/runtime/vendor/go.opentelemetry.io/otel/exporters/jaeger/internal/third_party/thrift/lib/go/thrift/compact_protocol.go; do
+    __at_path="${__at_path#/}"
+    __at_matches=""
+    if [ -e "$__at_path" ]; then
+        __at_matches="$__at_path"
+    else
+        __at_matches="$(find "$__at_root" -path "*/$__at_path" -print 2>/dev/null)"
+    fi
+    if [ -n "$__at_matches" ]; then
+        echo "auto-triage: removing matches for $__at_path:" >&2
+        echo "$__at_matches" >&2
+        printf '%s\n' "$__at_matches" | xargs -r rm -rf
+        __at_hit=1
+    else
+        echo "auto-triage: WARN no match for $__at_path under $__at_root" >&2
+    fi
+done
+if [ "$__at_hit" -eq 0 ]; then
+    echo "auto-triage: ERROR no affected files matched under $__at_root — failing %prep to avoid false NOSHIP" >&2
+    exit 1
+fi
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -140,6 +165,9 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Sat Aug 01 2026 Kanishk-Bansal <kbkanishk975@gmail.com> - 3.32.0.kata0-2
+- auto-triage kata-containers CVE-2026-55969 by removing affected files
+
 * Mon Jul 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.32.0.kata0-1
 - Auto-upgrade to 3.32.0.kata0
 - Add preview configurations for VM templating
