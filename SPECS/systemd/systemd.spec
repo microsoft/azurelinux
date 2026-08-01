@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        33%{?dist}
+Release:        34%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -121,6 +121,10 @@ GIT_DIR=../../src/systemd/.git git diffab -M v233..master@{2017-06-15} -- hwdb/[
 # https://bugzilla.redhat.com/show_bug.cgi?id=2164404
 # Drop when dracut-060 is available.
 Patch0001:      https://github.com/systemd/systemd/pull/26494.patch
+
+# sysext: preserve the final hierarchy's SELinux context on synthetic layers
+# Backport of upstream commit 54459a5f8085f4975ae43c5ff2cb49babca9a512
+Patch0002:      sysext-set-SELinux-context-for-hierarchies.patch
 
 # Those are downstream-only patches, but we don't want them in packit builds:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1738828
@@ -1257,6 +1261,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Jul 31 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 255-34
+- Backport upstream commit 54459a5f8085f4975ae43c5ff2cb49babca9a512 to
+  preserve the final hierarchy's SELinux context on systemd-sysext metadata.
+
 * Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
 - Skip tests in %%check that require capabilities not available in the build
   chroot (mount-namespace privileges, systemd-detect-virt on PATH, etc.):

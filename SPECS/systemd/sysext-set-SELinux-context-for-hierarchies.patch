@@ -1,0 +1,125 @@
+From 54459a5f8085f4975ae43c5ff2cb49babca9a512 Mon Sep 17 00:00:00 2001
+From: gerblesh <101901964+gerblesh@users.noreply.github.com>
+Date: Thu, 14 Nov 2024 19:12:40 +0000
+Subject: [PATCH] sysext: set SELinux context for hierarchies
+
+The synthetic metadata directory is the top overlayfs lower layer. If it
+keeps the tmpfs default label, the merged hierarchy inherits tmpfs_t even
+when the host and extension trees are labeled correctly.
+
+Apply the final hierarchy's label to the synthetic directory and its
+metadata. This is the immutable-sysext subset of the upstream change,
+adapted to systemd v255's SELinux utility API.
+
+Backport of upstream commit 54459a5f8085f4975ae43c5ff2cb49babca9a512.
+[Backported to systemd v255 by Aadhar Agarwal <aadagarwal@microsoft.com>]
+---
+ src/sysext/sysext.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 46 insertions(+), 5 deletions(-)
+
+diff --git a/src/sysext/sysext.c b/src/sysext/sysext.c
+--- a/src/sysext/sysext.c
++++ b/src/sysext/sysext.c
+@@ -29,6 +29,7 @@
+ #include "fs-util.h"
+ #include "hashmap.h"
+ #include "initrd-util.h"
++#include "selinux-util.h"
+ #include "log.h"
+ #include "main-func.h"
+ #include "missing_magic.h"
+@@ -525,7 +526,7 @@ static int merge_hierarchy(
+                 const char *meta_path,
+                 const char *overlay_path) {
+ 
+-        _cleanup_free_ char *resolved_hierarchy = NULL, *f = NULL, *buf = NULL;
++        _cleanup_free_ char *resolved_hierarchy = NULL, *f = NULL, *buf = NULL, *label = NULL;
+         _cleanup_strv_free_ char **layers = NULL;
+         struct stat st;
+         int r;
+@@ -533,6 +534,8 @@ static int merge_hierarchy(
+         assert(hierarchy);
+         assert(meta_path);
+         assert(overlay_path);
++
++        (void) mac_selinux_init();
+ 
+         /* Resolve the path of the host's version of the hierarchy, i.e. what we want to use as lowest layer
+          * in the overlayfs stack. */
+@@ -551,20 +554,54 @@ static int merge_hierarchy(
+                 }
+         }
+ 
++        r = mkdir_p(meta_path, 0700);
++        if (r < 0)
++                return log_error_errno(r, "Failed to make directory '%s': %m", meta_path);
++
++        r = mac_selinux_fix_full(AT_FDCWD, meta_path, hierarchy, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to fix label of '%s' as '%s': %m", meta_path, hierarchy);
++
+         /* Let's generate a metadata file that lists all extensions we took into account for this
+          * hierarchy. We include this in the final fs, to make things nicely discoverable and
+          * recognizable. */
++        f = path_join(meta_path, image_class_info[image_class].dot_directory_name);
++        if (!f)
++                return log_oom();
++
++        label = path_join(hierarchy, image_class_info[image_class].dot_directory_name);
++        if (!label)
++                return log_oom();
++
++        r = mkdir_p(f, 0755);
++        if (r < 0)
++                return log_error_errno(r, "Failed to make directory '%s': %m", f);
++
++        r = mac_selinux_fix_full(AT_FDCWD, f, label, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to fix label of '%s' as '%s': %m", f, label);
++
++        free(f);
+         f = path_join(meta_path, image_class_info[image_class].dot_directory_name, image_class_info[image_class].short_identifier_plural);
+         if (!f)
+                 return log_oom();
+ 
++        free(label);
++        label = path_join(hierarchy, image_class_info[image_class].dot_directory_name, image_class_info[image_class].short_identifier_plural);
++        if (!label)
++                return log_oom();
++
+         buf = strv_join(extensions, "\n");
+         if (!buf)
+                 return log_oom();
+ 
+-        r = write_string_file(f, buf, WRITE_STRING_FILE_CREATE|WRITE_STRING_FILE_MKDIR_0755);
++        r = write_string_file(f, buf, WRITE_STRING_FILE_CREATE);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write extension meta file '%s': %m", f);
++
++        r = mac_selinux_fix_full(AT_FDCWD, f, label, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to fix label of '%s' as '%s': %m", f, label);
+ 
+         /* Put the meta path (i.e. our synthesized stuff) at the top of the layer stack */
+         layers = strv_new(meta_path);
+@@ -631,9 +668,18 @@ static int merge_hierarchy(
+         if (!f)
+                 return log_oom();
+ 
++        free(label);
++        label = path_join(hierarchy, image_class_info[image_class].dot_directory_name, "dev");
++        if (!label)
++                return log_oom();
++
+         r = write_string_file(f, FORMAT_DEVNUM(st.st_dev), WRITE_STRING_FILE_CREATE);
+         if (r < 0)
+                 return log_error_errno(r, "Failed to write '%s': %m", f);
++
++        r = mac_selinux_fix_full(AT_FDCWD, f, label, 0);
++        if (r < 0)
++                return log_error_errno(r, "Failed to fix label of '%s' as '%s': %m", f, label);
+ 
+         /* Make sure the top-level dir has an mtime marking the point we established the merge */
+         if (utimensat(AT_FDCWD, meta_path, NULL, AT_SYMLINK_NOFOLLOW) < 0)
+-- 
+2.45.4
