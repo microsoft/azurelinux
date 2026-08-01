@@ -21,6 +21,7 @@ Patch9:         CVE-2026-4424.patch
 Patch10:        CVE-2026-4426.patch
 Patch11:        CVE-2026-5121.patch
 Patch12:        CVE-2026-14164.patch
+Patch13:        CVE-2026-15028.patch
 Provides:       bsdtar = %{version}-%{release}
 
 BuildRequires:  xz-libs
@@ -78,8 +79,8 @@ make %{?_smp_mflags} check
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Jul 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-7
-- Patch for CVE-2026-14164
+* Wed Jul 22 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-7
+- Patch for CVE-2026-15028, CVE-2026-14164
 
 * Fri Apr 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.7.7-6
 - Patch for CVE-2026-5121, CVE-2026-4426, CVE-2026-4424
