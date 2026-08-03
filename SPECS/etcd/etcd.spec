@@ -1,6 +1,6 @@
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.32
+Version:        3.5.33
 Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
@@ -30,7 +30,7 @@ Source1:        etcd.service
 #       e. create tarball containing 'vendor' folder and 'go.mod' and 'go.sum' files
 #          (same naming rules than described above)
 #       f. repeat above operations for 'etcd-dump-logs' folder
-#   4. create 'etcd-%{version}-vendor.tar.gz' tarball containing all tarballs created above
+#   4. create 'etcd-%%{version}-vendor.tar.gz' tarball containing all tarballs created above
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
@@ -42,7 +42,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
-BuildRequires:  golang >= 1.16
+BuildRequires:  golang >= 1.25.12
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -143,6 +143,10 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Mon Jul 27 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.5.33-1
+- Upgrade to version 3.5.33.
+- Fixes CVE-2026-56852 by upgrading vendor package golang.org/x/text from version 0.37.0 => 0.39.0.
+
 * Mon Jul 13 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.32-1
 - Upgrade to version 3.5.32 (fixes CVE-2026-59818).
 - Drop CVE-2026-29181, CVE-2026-39821, and CVE-2026-33814 patches; these fixes are already included upstream via bundled dependency updates (go.opentelemetry.io/otel 1.43.0, golang.org/x/net 0.55.0).
