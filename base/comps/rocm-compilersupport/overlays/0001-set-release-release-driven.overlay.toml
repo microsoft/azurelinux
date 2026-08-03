@@ -1,0 +1,10 @@
+# spec-set-tag is the documented form for manual-release components and is
+# anchor-free, so this survives upstream Release-line restructures (e.g.
+# Fedora's rocm-7.x preview branch wraps Release in %if/%endif which would
+# break a literal spec-search-replace anchor).
+
+[[overlays]]
+description = "Set Release to %{azl_release}-driven formula so AZL-only rebuilds bump cleanly without manual edits"
+type = "spec-set-tag"
+tag = "Release"
+value = "%[15 + %{azl_release}].rocm%{rocm_version}%{?dist}"

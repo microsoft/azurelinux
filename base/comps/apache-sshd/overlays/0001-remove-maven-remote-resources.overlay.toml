@@ -1,0 +1,31 @@
+# This change works around an upstream Fedora 43 packaging bug: the installed
+# versions of maven-remote-resources-plugin, plexus-utils, and plexus-xml in the
+# Fedora 43 repos are mutually incompatible during the Maven 3 -> 4 transition.
+# This issue has existed in Fedora 43 and fails the build. The Fedora 44 commit
+# (7959d32) upgraded apache-sshd to 2.16 and disabled maven-remote-resources-plugin
+# for the RPM build to avoid this issue.
+# TODO: remove this overlay once pinning to f44.
+
+[[overlays]]
+description = "Remove maven-remote-resources-plugin (Xpp3Dom classloading clash with plexus-xml/maven4)"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%pom_remove_plugin :maven-remote-resources-plugin"]
+
+[[overlays]]
+description = "Add patch for maven.compiler.release POM property (xmvn javadoc fix)"
+type = "patch-add"
+file = "add-maven-compiler-release.patch"
+source = "../add-maven-compiler-release.patch"
+
+[[overlays]]
+description = "Use %autosetup to auto-apply all patches"
+type = "spec-search-replace"
+regex = "%setup -q"
+replacement = "%autosetup -p1"
+
+[[overlays]]
+description = "Remove explicit %patch call now handled by %autosetup"
+type = "spec-search-replace"
+regex = "%patch -P0 -p1"
+replacement = ""

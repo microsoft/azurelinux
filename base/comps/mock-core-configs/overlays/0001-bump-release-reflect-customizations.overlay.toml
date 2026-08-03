@@ -1,0 +1,7 @@
+# Bump release to reflect Azure Linux customizations.
+
+[[overlays]]
+description = "Bump Release to reflect Azure Linux customizations"
+type = "spec-update-tag"
+tag = "Release"
+value = "3%{?dist}"

@@ -1,0 +1,5 @@
+[[overlays]]
+description = "Use the Azure Linux GCC toolchain triple in clang20's default config so clang20 can find gcc runtime files in stage2 builds"
+type = "spec-search-replace"
+regex = "%global cfg_file_content --gcc-triple=%{_target_cpu}-redhat-linux"
+replacement = "%global cfg_file_content --gcc-triple=%{_target_cpu}-%{_vendor}-linux"

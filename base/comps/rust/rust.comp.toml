@@ -2,30 +2,3 @@
 # Fedora repo does not host 1.93, which the spec gets pinned to. Fetch
 # spec from a more recent commit to pickup version - 1.94.1.
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43"}, upstream-commit = "b431103e3e71d30dda680c95d2f5d4fe50003436" }
-
-# Azure Linux does not ship mingw cross-compilation toolchains.
-[[components.rust.overlays]]
-description = "Disable mingw cross-compilation targets — Azure Linux does not ship mingw toolchains"
-type = "spec-search-replace"
-regex = '%global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'
-replacement = '#global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu'
-
-[[components.rust.overlays]]
-description = "Discover compiler-rt's installed runtime directory so Rust works with both Stage 1 and native Stage 2 LLVM layouts"
-type = "spec-prepend-lines"
-section = "%build"
-lines = ['%define compiler_rt_libdir $(dirname "$(find %{clang_lib} -type f -name libclang_rt.profile.a -print -quit)")']
-
-[[components.rust.overlays]]
-description = "Use Clang's discovered compiler-rt directory for Rust profiler_builtins"
-type = "spec-search-replace"
-section = "%build"
-regex = '%define profiler %{clang_lib}/%{_arch}-redhat-linux-gnu/libclang_rt.profile.a'
-replacement = '%define profiler %{compiler_rt_libdir}/libclang_rt.profile.a'
-
-[[components.rust.overlays]]
-description = "Use Clang's discovered compiler-rt directory for Rust optimized compiler builtins"
-type = "spec-search-replace"
-section = "%build"
-regex = '%define optimized_builtins %{clang_lib}/%{_arch}-redhat-linux-gnu/libclang_rt.builtins.a'
-replacement = '%define optimized_builtins %{compiler_rt_libdir}/libclang_rt.builtins.a'
