@@ -8,6 +8,10 @@
 # upstream-status inapplicable: permanent AZL-only build logic replacing Fedora's
 # pre-built-headers install path; not upstreamable.
 
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Generate native and cross-arch userspace headers via make headers_install from the AZL kernel source"
 type = "spec-append-lines"

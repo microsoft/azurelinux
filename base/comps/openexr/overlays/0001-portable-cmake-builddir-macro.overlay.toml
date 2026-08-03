@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Use portable %{__cmake_builddir} macro instead of hardcoded redhat-linux-build path"
 type = "spec-search-replace"

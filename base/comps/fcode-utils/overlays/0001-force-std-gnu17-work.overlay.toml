@@ -5,6 +5,11 @@
 # Upstream fix: https://github.com/openbios/fcode-utils/issues/20
 # TODO: Remove this overlay once a new upstream release (> 1.0.3) is available.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+commits = [{ url = "https://github.com/openbios/fcode-utils/commit/3fa70fef80276aab948ee6c7d10903b268d5b2d5" }]
+
 [[overlays]]
 description = "Force -std=gnu17 to work around GCC 15 C23 bool keyword conflict (openbios/fcode-utils#20)"
 type = "spec-search-replace"

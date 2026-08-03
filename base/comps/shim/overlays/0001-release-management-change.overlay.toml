@@ -1,5 +1,9 @@
 # TEMPORARILY force dist tag to be present in release to avoid NEVR conflicts
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Remove the spec's %global dist override so the dist tag stays in Release (avoids NEVR conflicts)"
 type = "spec-search-replace"

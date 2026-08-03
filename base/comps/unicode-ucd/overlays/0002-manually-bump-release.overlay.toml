@@ -1,6 +1,10 @@
 # WORKAROUND: Manually bump the Release on this package to aid with Stage2
 # bring-up.
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Manually bump release"
 type = "spec-update-tag"

@@ -1,6 +1,11 @@
 # Patch the fallback triples to include azurelinux.
 # When clang's config files are not present, it will fall back to a set of hardcoded triples, which don't include azurelinux.
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+commits = [{ url = "https://github.com/llvm/llvm-project/pull/200894" }]
+
 [[overlays]]
 description = "Patch fallback triples to include azurelinux."
 type = "patch-add"

@@ -1,5 +1,9 @@
 # BOOT*.CSV files are UTF-16LE, so regex/replacement include explicit NUL bytes.
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Set BOOT*.CSV boot-entry label from Fedora to AzureLinux"
 type = "file-search-replace"

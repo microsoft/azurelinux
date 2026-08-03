@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Fix install-data-local silently dropping one documentation file per build.\n\nThe upstream Makefile.am uses 'find -exec sh -c ... {} +' without a dummy $0\nplaceholder. Per POSIX, the first argument after 'sh -c script' becomes $0 and\nis excluded from $@, causing the first file returned by find to be silently\ndropped. Different filesystem types return files in different find order, so\ndifferent files are dropped on x86_64 vs aarch64 builders, causing noarch\nrpmdiff failures in Koji.\n\nTODO: push change to upstream\n"
 type = "patch-add"

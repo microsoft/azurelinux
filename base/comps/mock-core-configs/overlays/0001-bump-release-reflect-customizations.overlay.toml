@@ -1,5 +1,9 @@
 # Bump release to reflect Azure Linux customizations.
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Bump Release to reflect Azure Linux customizations"
 type = "spec-update-tag"

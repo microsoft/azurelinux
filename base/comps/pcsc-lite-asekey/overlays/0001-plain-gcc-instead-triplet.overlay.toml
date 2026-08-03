@@ -5,6 +5,10 @@
 # which fails.
 # We can work around this for now by overriding CC=gcc to call gcc directory.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Use plain gcc instead of triplet-prefixed compiler name to work around build on Koji builders"
 type = "spec-search-replace"

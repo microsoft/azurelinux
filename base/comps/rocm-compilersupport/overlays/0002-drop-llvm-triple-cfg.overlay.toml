@@ -23,6 +23,10 @@
 #      every downstream ROCm consumer (mivisionx, rocblas, hipblaslt, …)
 #      sees the right toolchain triple without needing any change of its own.
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Drop %{llvm_triple}.cfg next to the in-tree stage-1 clang so later build stages can locate the Azure Linux GCC toolchain"
 type = "spec-search-replace"

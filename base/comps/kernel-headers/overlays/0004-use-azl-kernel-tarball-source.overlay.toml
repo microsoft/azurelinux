@@ -6,6 +6,10 @@
 # upstream-status inapplicable: a permanent AZL-only source substitution that
 # Fedora would never accept (they ship their own tarball).
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
 [[overlays]]
 type = "spec-update-tag"
 description = "Use the Azure Linux 6.18.31.1 kernel source tarball instead of Fedora's pre-built headers tarball"

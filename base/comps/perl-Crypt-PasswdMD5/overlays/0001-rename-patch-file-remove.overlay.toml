@@ -1,6 +1,10 @@
 # Rename patch to remove ':' so the repo can be checked out on Windows for
 # compliance scanning. ':' is reserved on Windows filesystems.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Rename patch file to remove ':' (invalid on Windows filesystems)"
 type = "file-rename"

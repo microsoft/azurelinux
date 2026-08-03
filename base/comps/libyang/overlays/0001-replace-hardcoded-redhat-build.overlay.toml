@@ -3,6 +3,10 @@
 # _vendor=azurelinux, so the directory is azurelinux-linux-build. Replace with the standard
 # %{_vpath_builddir} RPM macro.
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Replace hardcoded redhat-linux-build with %{_vpath_builddir} in %check so ctest finds the CMake build dir on AZL"
 type = "spec-search-replace"

@@ -5,6 +5,10 @@
 # libopeniscsiusr.so. Fix by parameterizing the path via a MESON_BUILDDIR make variable,
 # passed from the spec using the standard %{_vpath_builddir} RPM macro.
 
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Replace hardcoded redhat-linux-build with $(MESON_BUILDDIR) make variable in libiscsi Makefile patch"
 type = "file-search-replace"

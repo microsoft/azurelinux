@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Use the Azure Linux GCC toolchain triple in clang's default config so clang can find gcc runtime files in stage2 builds"
 type = "spec-search-replace"
