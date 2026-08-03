@@ -1,0 +1,26 @@
+# TEMPORARILY force dist tag to be present in release to avoid NEVR conflicts
+
+[[overlays]]
+description = "Remove the spec's %global dist override so the dist tag stays in Release (avoids NEVR conflicts)"
+type = "spec-search-replace"
+regex = "%global dist.*"
+replacement = ""
+
+# TEMPORARILY remove release from the dependency on the shim unsigned packages
+[[overlays]]
+description = "Pin the x64 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
+type = "spec-search-replace"
+regex = "^BuildRequires:.*unsignedx64.*$"
+replacement = "BuildRequires: %{unsignedx64} = 15.8"
+
+[[overlays]]
+description = "Pin the ia32 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
+type = "spec-search-replace"
+regex = "^BuildRequires:.*unsignedia32.*$"
+replacement = "BuildRequires: %{unsignedia32} = 15.8"
+
+[[overlays]]
+description = "Pin the aa64 unsigned-shim BuildRequires to 15.8 (drop the release-qualified dependency)"
+type = "spec-search-replace"
+regex = "^BuildRequires:.*unsignedaa64.*$"
+replacement = "BuildRequires: %{unsignedaa64} = 15.8"

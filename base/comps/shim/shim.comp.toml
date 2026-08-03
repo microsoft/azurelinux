@@ -1,22 +1,3 @@
 [components.shim]
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "7b08c421ed4dbca88af0cbaabb73332d08944c86" }
 
-overlays = [
-  # TEMPORARILY force dist tag to be present in release to avoid NEVR conflicts
-  { type = "spec-search-replace", regex = '%global dist.*', replacement = "" },
-
-  # TEMPORARILY remove release from the dependency on the shim unsigned packages
-  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedx64.*$', replacement = "BuildRequires: %{unsignedx64} = 15.8" },
-  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedia32.*$', replacement = "BuildRequires: %{unsignedia32} = 15.8" },
-  { type = "spec-search-replace", regex = '^BuildRequires:.*unsignedaa64.*$', replacement = "BuildRequires: %{unsignedaa64} = 15.8" },
-
-  # TEMPORARILY use the unsigned shim binaries from our shim-unsigned-ARCH packages
-  { type = "spec-append-lines", section = "%prep", lines = [
-    "test -e %{shimdirx64}/$(basename %{shimefix64}) && cp -vf %{shimdirx64}/$(basename %{shimefix64}) %{shimefix64} ||:",
-    "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:",
-    "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:",
-  ] },
-
-  # BOOT*.CSV files are UTF-16LE, so regex/replacement include explicit NUL bytes.
-  { description = "Set BOOT*.CSV boot-entry label from Fedora to AzureLinux", type = "file-search-replace", file = "BOOT*.CSV", regex = "F\u0000e\u0000d\u0000o\u0000r\u0000a\u0000", replacement = "A\u0000z\u0000u\u0000r\u0000e\u0000L\u0000i\u0000n\u0000u\u0000x\u0000" },
-]

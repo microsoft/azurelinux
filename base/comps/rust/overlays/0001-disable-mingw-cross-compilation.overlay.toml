@@ -1,0 +1,7 @@
+# Azure Linux does not ship mingw cross-compilation toolchains.
+
+[[overlays]]
+description = "Disable mingw cross-compilation targets — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = "%global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu"
+replacement = "#global mingw_targets i686-pc-windows-gnu x86_64-pc-windows-gnu"

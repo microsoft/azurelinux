@@ -1,0 +1,7 @@
+# TEMPORARILY use the unsigned shim binaries from our shim-unsigned-ARCH packages
+
+[[overlays]]
+description = "Copy prebuilt unsigned shim binaries from the shim-unsigned-ARCH packages into the tree during %prep"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["test -e %{shimdirx64}/$(basename %{shimefix64}) && cp -vf %{shimdirx64}/$(basename %{shimefix64}) %{shimefix64} ||:", "test -e %{shimdiria32}/$(basename %{shimefiia32}) && cp -vf %{shimdiria32}/$(basename %{shimefiia32}) %{shimefiia32} ||:", "test -e %{shimdiraa64}/$(basename %{shimefiaa64}) && cp -vf %{shimdiraa64}/$(basename %{shimefiaa64}) %{shimefiaa64} ||:"]

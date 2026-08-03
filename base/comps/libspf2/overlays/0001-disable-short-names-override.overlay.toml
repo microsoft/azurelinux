@@ -1,0 +1,42 @@
+# Fix noarch rpmdiff failure in the -apidocs subpackage.
+#
+# Root cause: the upstream spec enables doxygen SHORT_NAMES=YES via sed in
+# %build. SHORT_NAMES replaces all output filenames with a global counter
+# (a00001, a00002, ...) assigned by convertNameToFile() in doxygen. The
+# counter order depends on readdir() traversal and multi-threaded output
+# generation (ThreadPool + hash-based containers), making it nondeterministic
+# across hosts/architectures. AZL's x86_64 and aarch64 builders produce
+# different filename sequences, triggering Koji's noarch rpmdiff check.
+#
+# Fix approach (two layers):
+#   1. Remove the sed that enables SHORT_NAMES — doxygen's default (NO) derives
+#      filenames from symbol names, which is fully deterministic.
+#   2. Disable CALL_GRAPH in Doxyfile.in — even with deterministic filenames,
+#      graphviz-generated graph images (SVG/PNG) can have nondeterministic
+#      content due to layout differences across architectures. Removing call
+#      graphs eliminates this second source of divergence. The HTML pages,
+#      class/file indexes, and all textual content are unaffected.
+
+# Layer 1: Neutralize SHORT_NAMES=YES — keep the default (NO) for deterministic filenames
+
+[[overlays]]
+type = "spec-search-replace"
+section = "%build"
+description = "Disable SHORT_NAMES override — counter-based naming is nondeterministic across architectures, causing noarch rpmdiff failures"
+regex = "sed -i -e .+SHORT_NAMES.+Doxyfile"
+replacement = "# SHORT_NAMES left at default (NO) for reproducible noarch builds"
+
+# Layer 2: Disable call graphs to avoid nondeterministic graphviz output
+[[overlays]]
+type = "patch-add"
+description = "Disable doxygen CALL_GRAPH to remove nondeterministic graphviz-generated images from noarch -apidocs"
+source = "../disable-call-graphs.patch"
+
+# The spec uses explicit %patch calls (not %autopatch/%patchlist), so patch-add
+# only registers the Patch tag — we need to apply it ourselves.
+# Patch4 because upstream has Patch1-3; patch-add auto-assigns the next number.
+[[overlays]]
+type = "spec-append-lines"
+section = "%prep"
+description = "Apply the disable-call-graphs patch"
+lines = ["%patch -P4 -p1"]

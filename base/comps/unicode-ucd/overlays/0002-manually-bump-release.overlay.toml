@@ -1,0 +1,8 @@
+# WORKAROUND: Manually bump the Release on this package to aid with Stage2
+# bring-up.
+
+[[overlays]]
+description = "Manually bump release"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"

@@ -1,0 +1,66 @@
+# AZL changes %_vendor from "redhat" to "azurelinux" (see azurelinux-rpm-config),
+# so GCC installs its runtime objects under /usr/lib/gcc/<cpu>-azurelinux-linux/<ver>/.
+# Upstream clang's GCCInstallationDetector triple list does not include the
+# "azurelinux" vendor, so without help any clang built against this layout can't
+# find crtbeginS.o / libstdc++ / libgcc and link of any C++ test program (e.g.
+# CMake compiler probe) fails with "cannot open crtbeginS.o" and "unable to find
+# library -lstdc++".
+#
+# Fix it by dropping <triple>.cfg next to the clang binaries with
+# --gcc-triple=<azl-triple>. Clang's config-file lookup (clang/lib/Driver/Driver.cpp
+# step 5) tries <triple>.cfg from the binary's directory before any system
+# config dir, mode-independently — so this single file covers clang, clang++,
+# clang-cpp, clang-cl, clang-dxc, and flang, without leaking onto explicit
+# cross-target (--target=...) invocations whose triple won't match the filename.
+#
+# The three overlays below drop the file in three places:
+#   1. next to the stage-1 clang in the in-package build tree, so stage 2+
+#      of this spec's %build can compile and link;
+#   2. pre-staged inside the stage-2 build tree before %cmake_build runs, so
+#      the LLVM runtimes sub-build (compiler-rt, libcxx, libcxxabi) can
+#      configure once stage-2 clang is produced;
+#   3. installed into %{bundle_prefix}/bin alongside the shipped clang, so
+#      every downstream ROCm consumer (mivisionx, rocblas, hipblaslt, …)
+#      sees the right toolchain triple without needing any change of its own.
+
+[[overlays]]
+description = "Drop %{llvm_triple}.cfg next to the in-tree stage-1 clang so later build stages can locate the Azure Linux GCC toolchain"
+type = "spec-search-replace"
+section = "%build"
+regex = "build_stage1=\\$p/build-llvm"
+replacement = "build_stage1=$p/build-llvm\n\n# AZL: drop the per-triple clang config inside the stage-1 build tree so\n# every subsequent stage (stage-2 llvm, device-libs, comgr, hipcc) compiled\n# by this clang finds the Azure Linux GCC toolchain at\n# /usr/lib/gcc/%{_target_cpu}-%{_vendor}-linux/.\necho \"--gcc-triple=%{_target_cpu}-%{_vendor}-linux\" > $build_stage1/bin/%{llvm_triple}.cfg"
+
+# Stage 2 builds the LLVM "runtimes" project (compiler-rt, libcxx, libcxxabi)
+# as a sub-build that re-invokes CMake using the freshly-built stage-2 clang
+# at build-llvm-2/bin/. That sub-build re-runs the compiler/linker probes
+# and hits the same GCC-toolchain-detection failure as stage 1 unless its
+# clang has a per-triple config alongside it. Drop the cfg file into the
+# stage-2 bin directory before %cmake_build runs; it sits there until clang
+# is built and is picked up automatically on first invocation.
+[[overlays]]
+description = "Drop %{llvm_triple}.cfg into the stage-2 build tree so the LLVM runtimes sub-build can find the Azure Linux GCC toolchain"
+type = "spec-search-replace"
+section = "%build"
+regex = "-DLLVM_ENABLE_RUNTIMES=%\\{llvm_runtimes\\}"
+replacement = "-DLLVM_ENABLE_RUNTIMES=%{llvm_runtimes}\n\n# AZL: pre-stage the per-triple clang config inside build-llvm-2/bin so\n# the LLVM runtimes sub-build can locate the Azure Linux GCC toolchain.\n# The .cfg only needs to exist by the time clang is invoked.\nmkdir -p $PWD/build-llvm-2/bin\necho \"--gcc-triple=%{_target_cpu}-%{_vendor}-linux\" > $PWD/build-llvm-2/bin/%{llvm_triple}.cfg"
+
+# The shipped rocm-llvm clang at %{bundle_prefix}/bin/ doesn't read /etc/clang
+# (which is where the system llvm/llvm20 packages put their --gcc-triple cfg),
+# so we need to drop a per-triple cfg next to the rocm-llvm binaries too.
+# Appending to %install (rather than anchoring on a fragile upstream comment
+# like "# Remove lld's libs") guarantees this runs even if upstream reshapes
+# the cleanup block at the bottom of %install.
+[[overlays]]
+description = "Install %{llvm_triple}.cfg next to the shipped rocm-llvm clang so every downstream ROCm consumer sees the Azure Linux GCC toolchain"
+type = "spec-append-lines"
+section = "%install"
+lines = ["", "# AZL: drop a per-triple clang config file next to the shipped rocm-llvm", "# binaries so every clang/clang++/flang/clang-cl/clang-dxc invocation that", "# uses the default (AZL) target triple can locate the GCC toolchain at", "# /usr/lib/gcc/%{_target_cpu}-%{_vendor}-linux/. Cross-target invocations", "# (--target=<other>) do not match this filename and are unaffected.", "echo \"--gcc-triple=%{_target_cpu}-%{_vendor}-linux\" > %{buildroot}%{bundle_prefix}/bin/%{llvm_triple}.cfg"]
+
+# %{bundle_prefix}/bin/clang* in %files -n rocm-clang does not match a file
+# named <triple>.cfg, so it has to be listed explicitly.
+[[overlays]]
+description = "Ship the per-triple clang config file as part of rocm-clang"
+type = "spec-append-lines"
+section = "%files"
+package = "rocm-clang"
+lines = ["%{bundle_prefix}/bin/%{llvm_triple}.cfg"]

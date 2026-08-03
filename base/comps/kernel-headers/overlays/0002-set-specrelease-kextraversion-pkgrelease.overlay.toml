@@ -1,0 +1,9 @@
+# Category azl-release-management: this sets the specrelease macro so the 4th version
+# component and package release are explicit.
+# upstream-status inapplicable: permanent AZL-only release scheme, never upstreamed.
+
+[[overlays]]
+type = "spec-search-replace"
+description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component and package release are explicit"
+regex = "%define specrelease .+"
+replacement = "%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?dist}"

@@ -1,0 +1,11 @@
+[[overlays]]
+description = "Fix install-data-local silently dropping one documentation file per build.\n\nThe upstream Makefile.am uses 'find -exec sh -c ... {} +' without a dummy $0\nplaceholder. Per POSIX, the first argument after 'sh -c script' becomes $0 and\nis excluded from $@, causing the first file returned by find to be silently\ndropped. Different filesystem types return files in different find order, so\ndifferent files are dropped on x86_64 vs aarch64 builders, causing noarch\nrpmdiff failures in Koji.\n\nTODO: push change to upstream\n"
+type = "patch-add"
+source = "../fix-install-data-local-missing-dollar0.patch"
+
+[[overlays]]
+description = "Apply the install-data-local fix patch after existing patches"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^%patch 1 -p1 -b \\.unsupported-tests$"
+replacement = "%patch 1 -p1 -b .unsupported-tests\n%patch 2 -p1"

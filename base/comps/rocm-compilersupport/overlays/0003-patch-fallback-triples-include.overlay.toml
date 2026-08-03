@@ -1,0 +1,7 @@
+# Patch the fallback triples to include azurelinux.
+# When clang's config files are not present, it will fall back to a set of hardcoded triples, which don't include azurelinux.
+
+[[overlays]]
+description = "Patch fallback triples to include azurelinux."
+type = "patch-add"
+source = "../0001-Clang-Add-azurelinux-to-fallback-triples.patch"
