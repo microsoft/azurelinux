@@ -2,6 +2,10 @@
 # so it doesn't transitively pull in golang-github-jmespath-devel. Add the
 # missing build dependency explicitly until a non-bootstrap aws-sdk-go is available.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Add missing transitive BuildRequires on go-jmespath (needed by aws-sdk-go, missing in bootstrap builds)"
 type = "spec-add-tag"

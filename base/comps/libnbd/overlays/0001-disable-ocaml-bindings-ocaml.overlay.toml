@@ -2,6 +2,10 @@
 # bootstrap build tag (ocaml-findlib-devel requires ocamlx() hashes
 # that don't match the available OCaml packages).
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Disable OCaml bindings until OCaml bootstrap is resolved"
 type = "spec-search-replace"
