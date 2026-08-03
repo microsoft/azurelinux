@@ -101,17 +101,17 @@ function retry_registry_op {
     local backoff=5
 
     while [ $retry_count -lt $max_retries ]; do
-        echo "+++ $desc (attempt $((retry_count + 1))/$max_retries)"
+        echo "+++ $desc (attempt $((retry_count + 1))/$max_retries)" >&2
         if "$@"; then
             return 0
         fi
         retry_count=$((retry_count + 1))
         if [ $retry_count -lt $max_retries ]; then
-            echo "+++ $desc failed; retrying in ${backoff}s..."
+            echo "+++ $desc failed; retrying in ${backoff}s..." >&2
             sleep $backoff
             backoff=$((backoff * 2))
         else
-            echo "+++ $desc failed after $max_retries attempts"
+            echo "+++ $desc failed after $max_retries attempts" >&2
             return 1
         fi
     done
