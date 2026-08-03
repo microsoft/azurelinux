@@ -22,9 +22,7 @@ Provides:       %{name}-runtime = %{version}-%{release}
 This package contains a parser generator
 
 %prep
-%setup -q
-%patch 0 -p1
-%patch 1 -p1
+%autosetup -p1
 
 %build
 #make some fixes required by glibc-2.28:
@@ -51,6 +49,7 @@ make %{?_smp_mflags} check
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
+%exclude %{_docdir}/%{name}/COPYING
 %{_bindir}/*
 %{_libdir}/*.a
 %{_datarootdir}/%{name}/*
