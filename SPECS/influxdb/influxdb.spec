@@ -18,7 +18,7 @@
 Summary:        Scalable datastore for metrics, events, and real-time analytics
 Name:           influxdb
 Version:        2.7.5
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -39,7 +39,7 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.
 #           --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #           -cf %%{name}-%%{version}-vendor.tar.gz vendor
 #
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-v1-vendor.tar.gz
 # Below is a manually created tarball, no download link.
 # predownloaded assets include ui assets and swager json. Used to replace fetch-assets and fetch-swagger script.
 # Use generate_source_tarbbal.sh to get this generated from a source code file.
@@ -50,7 +50,7 @@ Source1:        %{name}-%{version}-vendor.tar.gz
 #   4. make generate-web-assets
 #   5. cd static
 #   6. tar -cvf %%{name}-%%{version}-static-data.tar.gz data/
-Source2:        %{name}-%{version}-static-data.tar.gz
+Source2:        %{name}-%{version}-v1-static-data.tar.gz
 Source3:        influxdb.service
 Source4:        influxdb.tmpfiles
 Source5:        config.yaml
@@ -170,6 +170,12 @@ go test ./...
 %{_tmpfilesdir}/influxdb.conf
 
 %changelog
+* Mon Aug 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 2.7.5-20
+- Upgrade thrift module to 0.24.0 in the vendor tarbal to fix CVE-2026-55971, CVE-2026-48144, 
+  CVE-2026-58662, CVE-2026-55969, CVE-2026-43871, CVE-2026-48145, CVE-2026-55968, CVE-2026-41608, 
+  CVE-2026-49158, CVE-2026-48586, CVE-2026-58389, CVE-2026-45112, CVE-2026-58023, CVE-2026-55970, 
+  CVE-2026-66053
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.7.5-19
 - Patch for CVE-2026-56852
 
