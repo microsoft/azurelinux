@@ -85,13 +85,10 @@ done
 
 %changelog
 * Wed Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-8
-- Rebased 3.0-dev CVE patches (CVE-2026-43966, CVE-2026-44839) on top of fasttrack CVE ordering; renumbered as Patch17, Patch18.
+- Patch for CVE-2026-43966, CVE-2026-44839
 
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
 - Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216
-
-* Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
-- Patch for CVE-2026-43966, CVE-2026-44839
 
 * Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-6
 - Patch for CVE-2026-43973
