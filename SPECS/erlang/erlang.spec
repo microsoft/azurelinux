@@ -12,15 +12,15 @@ Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{v
 Patch0:         CVE-2026-48855.patch
 Patch1:         CVE-2026-48856.patch
 Patch2:         CVE-2026-48858.patch
-Patch1:         CVE-2026-48860.patch
-Patch2:         CVE-2026-49759.patch
-Patch3:         CVE-2026-49760.patch
-Patch4:         CVE-2026-42792.patch
-Patch5:         CVE-2026-55737.patch
-Patch6:         CVE-2026-55953.patch
-Patch7:         CVE-2026-58227.patch
-Patch8:         CVE-2026-59251.patch
-Patch9:         CVE-2026-54886.patch
+Patch3:         CVE-2026-48860.patch
+Patch4:         CVE-2026-49759.patch
+Patch5:         CVE-2026-49760.patch
+Patch6:         CVE-2026-42792.patch
+Patch7:         CVE-2026-55737.patch
+Patch8:         CVE-2026-55953.patch
+Patch9:         CVE-2026-58227.patch
+Patch10:        CVE-2026-59251.patch
+Patch11:        CVE-2026-54886.patch
 BuildRequires:  unzip
 
 %if 0%{?with_check}
