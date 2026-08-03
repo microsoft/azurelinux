@@ -31,12 +31,9 @@ Patch19:        CVE-2026-10536.patch
 Patch20:        CVE-2026-8286.patch
 Patch21:        CVE-2026-9079.patch
 Patch22:        CVE-2026-11856.patch
-BuildRequires:  autoconf
-BuildRequires:  automake
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
-BuildRequires:  libtool
 BuildRequires:  nghttp2-devel
 BuildRequires:  openssl-devel
 Requires:       curl-libs = %{version}-%{release}
