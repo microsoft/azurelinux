@@ -1,0 +1,15 @@
+[components.elixir]
+
+# Fedora Rawhide removed these dependencies while erlang-doc is unavailable:
+# https://src.fedoraproject.org/rpms/elixir/c/823281c9f97e28abfa07c65a7fdc03f4964e4343
+[[components.elixir.overlays]]
+description = "Remove unavailable Erlang documentation build dependency"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "erlang-doc"
+
+[[components.elixir.overlays]]
+description = "Remove unavailable Erlang documentation recommendation"
+type = "spec-remove-tag"
+tag = "Recommends"
+value = "erlang-doc"
