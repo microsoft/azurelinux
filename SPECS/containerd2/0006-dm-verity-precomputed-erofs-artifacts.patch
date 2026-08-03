@@ -1,0 +1,1504 @@
+From: Dallas Delaney <dadelan@microsoft.com>
+Subject: [PATCH] erofs: precomputed dm-verity artifacts
+
+Squash of two commits on the ACL containerd branch:
+
+  erofs: consume signed precomputed EROFS and dm-verity artifacts
+  erofs: select the newest precomputed bundle and fail closed
+
+Materializes signed, prebuilt EROFS blobs and Merkle trees from OCI
+referrers instead of formatting a hash tree per node. Bundles are bound to
+their source layer through the EROFS superblock UUID and verified against
+the declared root hash; anything inconsistent is a hard error rather than
+a silent fall back to local formatting. When several bundles exist the
+newest by OCI creation time wins, and a malformed newest bundle fails
+rather than falling back to an older one.
+
+Layer signatures are passed to the kernel whenever they are present and
+the feature is enabled. containerd does not inspect IPE policy to decide
+this; the kernel alone interprets IPE.
+
+Security corrections folded in (review of the ACL series):
+  - Validate referrer descriptors before use. Descriptors come back from a
+    registry's referrers response verbatim -- FetchReferrers returns
+    index.Manifests unchecked and dockerFetcher.Fetch is lazy -- so a crafted
+    digest reached go-digest's Digest.Verifier(), which panics rather than
+    returning an error, crashing containerd from a remote input. Digest is
+    now validated and the attacker-controlled Size is bounded by
+    maxManifestSize before io.ReadAll allocates on the strength of it.
+  - Ignore precomputed artifact annotations when dm-verity is disabled
+    instead of failing the pull. Those annotations can arrive straight off an
+    image manifest with no referrer discovery involved, so erroring let any
+    registry make a node that never opted into dm-verity refuse an image.
+    The layer is now converted the ordinary way.
+  - Extend signature enforcement to native EROFS layers, alongside the
+    hash-tree formatting added for them in Patch8. writeLayerSignature is
+    introduced by this patch, which is why the two halves are split.
+
+---
+diff --git a/internal/dmverity/dmverity.go b/internal/dmverity/dmverity.go
+index 12b6a9895..246d65817 100644
+--- a/internal/dmverity/dmverity.go
++++ b/internal/dmverity/dmverity.go
+@@ -23,6 +23,7 @@ import (
+ 	"encoding/json"
+ 	"fmt"
+ 	"os"
++	"path/filepath"
+ )
+ 
+ type DmverityOptions struct {
+@@ -67,6 +68,11 @@ func SignaturePath(layerBlobPath string) string {
+ 	return layerBlobPath + ".sig"
+ }
+ 
++// HashDevicePath returns the path used for a separate precomputed Merkle tree.
++func HashDevicePath(layerBlobPath string) string {
++	return layerBlobPath + ".hashtree"
++}
++
+ // WriteSignature writes a base64-encoded signature to the signature file for a layer.
+ func WriteSignature(layerBlobPath string, base64Sig string) error {
+ 	sigPath := SignaturePath(layerBlobPath)
+@@ -87,6 +93,33 @@ func DevicePath(name string) string {
+ type DmverityMetadata struct {
+ 	RootHash   string `json:"roothash"`
+ 	HashOffset uint64 `json:"hashoffset"`
++	HashDevice string `json:"hashdevice,omitempty"`
++}
++
++// WriteMetadata writes dm-verity mount metadata for a layer.
++func WriteMetadata(layerBlobPath string, metadata DmverityMetadata) error {
++	if metadata.RootHash == "" {
++		return fmt.Errorf("cannot write dm-verity metadata without a root hash")
++	}
++	data, err := json.MarshalIndent(metadata, "", "  ")
++	if err != nil {
++		return fmt.Errorf("failed to marshal dm-verity metadata: %w", err)
++	}
++	if err := os.WriteFile(MetadataPath(layerBlobPath), data, 0644); err != nil {
++		return fmt.Errorf("failed to write dm-verity metadata: %w", err)
++	}
++	return nil
++}
++
++// ResolveHashDevice returns the hash device path described by metadata.
++func ResolveHashDevice(layerBlobPath string, metadata *DmverityMetadata) string {
++	if metadata == nil || metadata.HashDevice == "" {
++		return layerBlobPath
++	}
++	if filepath.IsAbs(metadata.HashDevice) {
++		return metadata.HashDevice
++	}
++	return filepath.Join(filepath.Dir(layerBlobPath), metadata.HashDevice)
+ }
+ 
+ func ReadMetadata(layerBlobPath string) (*DmverityMetadata, error) {
+diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
+index 4f027e7d4..a3be00c4b 100644
+--- a/internal/dmverity/dmverity_linux.go
++++ b/internal/dmverity/dmverity_linux.go
+@@ -19,7 +19,6 @@ package dmverity
+ import (
+ 	"bytes"
+ 	"context"
+-	"encoding/json"
+ 	"fmt"
+ 	"os"
+ 	"runtime"
+@@ -161,8 +160,10 @@ func OpenWithSignature(dataDevice string, name string, hashDevice string, rootHa
+ 	}
+ 
+ 	loopParams := mount.LoopParams{
+-		Readonly:  true,
+-		Autoclear: false, // Don't use autoclear - dm-verity needs the loop device to stay active
++		Readonly: true,
++		// The dm-verity target holds the loop devices open. Autoclear detaches
++		// them when the mapper is removed, including after a daemon restart.
++		Autoclear: true,
+ 	}
+ 
+ 	dataLoop, err := mount.SetupLoop(dataDevice, loopParams)
+@@ -207,10 +208,28 @@ func OpenWithSignature(dataDevice string, name string, hashDevice string, rootHa
+ 		}
+ 		return "", fmt.Errorf("failed to open dm-verity device: %w", err)
+ 	}
++	dataLoop.Close()
++	if hashLoop != nil {
++		hashLoop.Close()
++	}
+ 
+ 	return devicePath, nil
+ }
+ 
++// VerifyArtifacts verifies a precomputed EROFS data device and separate
++// dm-verity hash device against the expected root hash.
++func VerifyArtifacts(dataDevice, hashDevice, rootHash string) error {
++	rootDigest, err := utils.ParseRootHash(rootHash)
++	if err != nil {
++		return fmt.Errorf("invalid root hash: %w", err)
++	}
++	params := verity.DefaultParams()
++	if err := verity.Verify(&params, dataDevice, hashDevice, rootDigest); err != nil {
++		return fmt.Errorf("verify precomputed dm-verity artifacts: %w", err)
++	}
++	return nil
++}
++
+ func Close(name string) error {
+ 	if err := verity.Close(name); err != nil {
+ 		return fmt.Errorf("failed to close dm-verity device: %w", err)
+@@ -339,12 +358,8 @@ func FormatLayerBlob(ctx context.Context, layerBlobPath string, blockSize uint32
+ 		RootHash:   rootHash,
+ 		HashOffset: hashOffset,
+ 	}
+-	metadataBytes, err := json.MarshalIndent(metadata, "", "  ")
+-	if err != nil {
+-		return "", fmt.Errorf("failed to marshal dm-verity metadata: %w", err)
+-	}
+-	if err := os.WriteFile(metadataPath, metadataBytes, 0644); err != nil {
+-		return "", fmt.Errorf("failed to write dm-verity metadata: %w", err)
++	if err := WriteMetadata(layerBlobPath, metadata); err != nil {
++		return "", err
+ 	}
+ 
+ 	formatted = true
+diff --git a/internal/dmverity/dmverity_other.go b/internal/dmverity/dmverity_other.go
+index 793d17802..d5c840b6f 100644
+--- a/internal/dmverity/dmverity_other.go
++++ b/internal/dmverity/dmverity_other.go
+@@ -41,6 +41,10 @@ func OpenWithSignature(_ string, _ string, _ string, _ string, _ uint64, _ *Dmve
+ 	return "", errUnsupported
+ }
+ 
++func VerifyArtifacts(_ string, _ string, _ string) error {
++	return errUnsupported
++}
++
+ func Close(_ string) error {
+ 	return errUnsupported
+ }
+diff --git a/pkg/snapshotters/signatures.go b/pkg/snapshotters/signatures.go
+index d398efb78..af8cba50b 100644
+--- a/pkg/snapshotters/signatures.go
++++ b/pkg/snapshotters/signatures.go
+@@ -17,8 +17,11 @@
+ package snapshotters
+ 
+ import (
++	"bytes"
+ 	"context"
++	"encoding/base64"
+ 	"encoding/json"
++	"fmt"
+ 	"io"
+ 	"sync"
+ 	"time"
+@@ -46,222 +49,359 @@ const (
+ 	// Kept under the same "containerd.io/dmverity/" prefix as the signature for symmetry,
+ 	// so neither value is auto-promoted into snapshot labels.
+ 	TargetLayerRootHashLabel = "containerd.io/dmverity/layer-roothash"
++	// TargetLayerEROFSDescriptorLabel contains the JSON descriptor for a precomputed EROFS blob.
++	TargetLayerEROFSDescriptorLabel = "containerd.io/dmverity/erofs-descriptor"
++	// TargetLayerMerkleTreeDescriptorLabel contains the JSON descriptor for a precomputed Merkle-tree blob.
++	TargetLayerMerkleTreeDescriptorLabel = "containerd.io/dmverity/merkle-tree-descriptor"
+ 
+-	// Annotation keys used in signature manifest layers
+ 	sigLayerDigestAnnotation    = "io.cncf.notary.dmverity.layer-digest"
+ 	sigLayerRootHashAnnotation  = "io.cncf.notary.dmverity.layer-roothash"
+ 	sigLayerSignatureAnnotation = "io.cncf.notary.dmverity.layer-signature"
+ 
+-	// SignatureArtifactType is the artifact type for OCI referrers containing dm-verity signatures
++	precomputedSourceLayerAnnotation = "io.cncf.notary.dmverity.source-layer-digest"
++
++	// SignatureArtifactType is the artifact type for OCI referrers containing dm-verity signatures.
+ 	SignatureArtifactType = "application/vnd.cncf.notary.dmverity.v1"
++	// EROFSArtifactMediaType identifies a precomputed EROFS layer blob.
++	EROFSArtifactMediaType = "application/vnd.cncf.containerd.erofs.layer.v1"
++	// MerkleTreeArtifactMediaType identifies a separate dm-verity hash device.
++	MerkleTreeArtifactMediaType = "application/vnd.cncf.dmverity.merkle-tree.v1"
++	// LayerSignatureMediaType identifies a per-layer PKCS#7 root-hash signature.
++	LayerSignatureMediaType = "application/vnd.cncf.notary.dmverity.layer-signature+pkcs7"
+ 
+-	// ociAnnotationCreated is the OCI annotation for creation timestamp
+ 	ociAnnotationCreated = "org.opencontainers.image.created"
+ )
+ 
+-// LayerSignatureInfo contains signature information for a layer
++// LayerSignatureInfo contains signature and optional precomputed artifact information for a layer.
+ type LayerSignatureInfo struct {
+-	RootHash  string
+-	Signature string
++	RootHash   string
++	Signature  string
++	EROFS      *ocispec.Descriptor
++	MerkleTree *ocispec.Descriptor
+ }
+ 
+-// fetchSignatures fetches dm-verity signatures from the registry using OCI referrers API.
+-// Returns a map of layerDigest -> LayerSignatureInfo.
+-func fetchSignatures(ctx context.Context, fetcher remotes.Fetcher, manifestDigest digest.Digest) map[string]*LayerSignatureInfo {
+-	signatures := make(map[string]*LayerSignatureInfo)
++type referrerWithManifest struct {
++	desc      ocispec.Descriptor
++	manifest  ocispec.Manifest
++	createdAt time.Time
++}
+ 
++// ParseTargetDescriptor parses a descriptor propagated through a layer annotation.
++func ParseTargetDescriptor(value string) (ocispec.Descriptor, error) {
++	var desc ocispec.Descriptor
++	if err := json.Unmarshal([]byte(value), &desc); err != nil {
++		return ocispec.Descriptor{}, fmt.Errorf("parse precomputed descriptor: %w", err)
++	}
++	if desc.Digest == "" || desc.Size <= 0 || desc.MediaType == "" {
++		return ocispec.Descriptor{}, fmt.Errorf("invalid precomputed descriptor: %+v", desc)
++	}
++	if err := desc.Digest.Validate(); err != nil {
++		return ocispec.Descriptor{}, fmt.Errorf("invalid precomputed descriptor digest: %w", err)
++	}
++	return desc, nil
++}
++
++func fetchSignatures(ctx context.Context, fetcher remotes.Fetcher, manifestDigest digest.Digest) (map[string]*LayerSignatureInfo, []ocispec.Descriptor, error) {
++	signatures := make(map[string]*LayerSignatureInfo)
+ 	refFetcher, ok := fetcher.(remotes.ReferrersFetcher)
+ 	if !ok {
+ 		log.G(ctx).Debug("Fetcher does not support referrers API, skipping signature fetch")
+-		return signatures
++		return signatures, nil, nil
+ 	}
+ 
+-	// Fetch signature referrers for this manifest
+ 	referrers, err := refFetcher.FetchReferrers(ctx, manifestDigest,
+ 		remotes.WithReferrerArtifactTypes(SignatureArtifactType))
+ 	if err != nil {
+ 		if errdefs.IsNotFound(err) {
+-			log.G(ctx).Debug("No signature referrers found")
+-			return signatures
++			return signatures, nil, nil
+ 		}
+-		log.G(ctx).WithError(err).Debug("Failed to fetch referrers")
+-		return signatures
++		return nil, nil, fmt.Errorf("fetch dm-verity referrers for %s: %w", manifestDigest, err)
+ 	}
+-
+ 	if len(referrers) == 0 {
+-		log.G(ctx).Debug("No signature artifacts found for manifest")
+-		return signatures
+-	}
+-
+-	log.G(ctx).WithField("count", len(referrers)).WithField("manifest", manifestDigest).Info("Fetching dm-verity signature artifacts")
+-
+-	// Fetch all referrer manifests and find the newest one by timestamp
+-	type referrerWithManifest struct {
+-		desc      ocispec.Descriptor
+-		manifest  ocispec.Manifest
+-		createdAt time.Time
++		return signatures, nil, nil
+ 	}
+ 
+-	var parsedReferrers []referrerWithManifest
++	parsed := make([]referrerWithManifest, 0, len(referrers))
+ 	for _, refDesc := range referrers {
+-		rc, err := fetcher.Fetch(ctx, refDesc)
++		manifestData, err := fetchDescriptor(ctx, fetcher, refDesc)
+ 		if err != nil {
+-			log.G(ctx).WithError(err).WithField("digest", refDesc.Digest).Warn("Failed to fetch signature manifest")
+-			continue
++			return nil, nil, fmt.Errorf("fetch dm-verity manifest %s: %w", refDesc.Digest, err)
+ 		}
+-
+-		manifestData, err := io.ReadAll(rc)
+-		rc.Close()
+-		if err != nil {
+-			log.G(ctx).WithError(err).Warn("Failed to read signature manifest")
+-			continue
++		var manifest ocispec.Manifest
++		if err := json.Unmarshal(manifestData, &manifest); err != nil {
++			return nil, nil, fmt.Errorf("parse dm-verity manifest %s: %w", refDesc.Digest, err)
+ 		}
+-
+-		var sigManifest ocispec.Manifest
+-		if err := json.Unmarshal(manifestData, &sigManifest); err != nil {
+-			log.G(ctx).WithError(err).Warn("Failed to unmarshal signature manifest")
+-			continue
++		if manifest.Subject == nil || manifest.Subject.Digest != manifestDigest {
++			return nil, nil, fmt.Errorf("dm-verity manifest %s subject does not match image manifest %s", refDesc.Digest, manifestDigest)
+ 		}
+-
+-		// Parse the creation timestamp from annotations
+ 		var createdAt time.Time
+-		if sigManifest.Annotations != nil {
+-			if createdStr, ok := sigManifest.Annotations[ociAnnotationCreated]; ok {
+-				if t, err := time.Parse(time.RFC3339, createdStr); err == nil {
+-					createdAt = t
+-					log.G(ctx).WithFields(log.Fields{
+-						"digest":  refDesc.Digest,
+-						"created": createdStr,
+-					}).Debug("Parsed referrer creation timestamp")
+-				}
+-			}
++		if created := manifest.Annotations[ociAnnotationCreated]; created != "" {
++			createdAt, _ = time.Parse(time.RFC3339, created)
+ 		}
+-
+-		parsedReferrers = append(parsedReferrers, referrerWithManifest{
++		parsed = append(parsed, referrerWithManifest{
+ 			desc:      refDesc,
+-			manifest:  sigManifest,
++			manifest:  manifest,
+ 			createdAt: createdAt,
+ 		})
+ 	}
+ 
+-	if len(parsedReferrers) == 0 {
+-		log.G(ctx).Debug("No valid signature manifests found")
+-		return signatures
++	var precomputed []referrerWithManifest
++	var legacy []referrerWithManifest
++	for _, candidate := range parsed {
++		if containsPrecomputedArtifacts(candidate.manifest) {
++			precomputed = append(precomputed, candidate)
++		} else {
++			legacy = append(legacy, candidate)
++		}
+ 	}
+-
+-	// Find the newest referrer by timestamp
+-	newestIdx := 0
+-	for i := 1; i < len(parsedReferrers); i++ {
+-		if parsedReferrers[i].createdAt.After(parsedReferrers[newestIdx].createdAt) {
+-			newestIdx = i
++	if len(precomputed) > 0 {
++		candidate := newestReferrer(precomputed)
++		infos, artifactDescs, err := parsePrecomputedBundle(ctx, fetcher, candidate.manifest)
++		if err != nil {
++			return nil, nil, fmt.Errorf("parse precomputed dm-verity bundle %s: %w", candidate.desc.Digest, err)
+ 		}
++		log.G(ctx).WithFields(log.Fields{
++			"bundle":   candidate.desc.Digest,
++			"manifest": manifestDigest,
++			"layers":   len(infos),
++		}).Info("Using precomputed EROFS dm-verity bundle")
++		return infos, artifactDescs, nil
+ 	}
+ 
+-	newestReferrer := parsedReferrers[newestIdx]
+-	log.G(ctx).WithFields(log.Fields{
+-		"digest":  newestReferrer.desc.Digest,
+-		"created": newestReferrer.createdAt,
+-		"total":   len(parsedReferrers),
+-	}).Info("Using newest signature referrer")
+-
+-	// Extract signature data from the newest referrer's layer annotations
+-	for _, layer := range newestReferrer.manifest.Layers {
++	if len(legacy) == 0 {
++		return signatures, nil, nil
++	}
++	newest := newestReferrer(legacy)
++	for _, layer := range newest.manifest.Layers {
+ 		if layer.Annotations == nil {
+ 			continue
+ 		}
+-
+ 		layerDigest := layer.Annotations[sigLayerDigestAnnotation]
+ 		rootHash := layer.Annotations[sigLayerRootHashAnnotation]
+-		signature := layer.Annotations[sigLayerSignatureAnnotation]
++		sig := layer.Annotations[sigLayerSignatureAnnotation]
++		if layerDigest != "" && rootHash != "" && sig != "" {
++			signatures[layerDigest] = &LayerSignatureInfo{RootHash: rootHash, Signature: sig}
++		}
++	}
++	return signatures, nil, nil
++}
+ 
+-		if layerDigest != "" && rootHash != "" && signature != "" {
+-			signatures[layerDigest] = &LayerSignatureInfo{
+-				RootHash:  rootHash,
+-				Signature: signature,
++func newestReferrer(candidates []referrerWithManifest) referrerWithManifest {
++	newest := candidates[0]
++	for _, candidate := range candidates[1:] {
++		if candidate.createdAt.After(newest.createdAt) {
++			newest = candidate
++		}
++	}
++	return newest
++}
++
++func containsPrecomputedArtifacts(manifest ocispec.Manifest) bool {
++	for _, layer := range manifest.Layers {
++		if layer.MediaType == EROFSArtifactMediaType || layer.MediaType == MerkleTreeArtifactMediaType {
++			return true
++		}
++	}
++	return false
++}
++
++func parsePrecomputedBundle(ctx context.Context, fetcher remotes.Fetcher, manifest ocispec.Manifest) (map[string]*LayerSignatureInfo, []ocispec.Descriptor, error) {
++	infos := make(map[string]*LayerSignatureInfo)
++	var artifactDescs []ocispec.Descriptor
++	for _, layer := range manifest.Layers {
++		if layer.Annotations == nil {
++			return nil, nil, fmt.Errorf("bundle layer %s has no annotations", layer.Digest)
++		}
++		switch layer.MediaType {
++		case LayerSignatureMediaType:
++			sourceDigest := layer.Annotations[sigLayerDigestAnnotation]
++			rootHash := layer.Annotations[sigLayerRootHashAnnotation]
++			encodedSignature := layer.Annotations[sigLayerSignatureAnnotation]
++			if sourceDigest == "" || rootHash == "" || encodedSignature == "" {
++				return nil, nil, fmt.Errorf("signature descriptor %s is missing required annotations", layer.Digest)
++			}
++			signatureBytes, err := base64.StdEncoding.DecodeString(encodedSignature)
++			if err != nil {
++				return nil, nil, fmt.Errorf("decode signature for layer %s: %w", sourceDigest, err)
+ 			}
+-			log.G(ctx).WithFields(log.Fields{
+-				"layer":     layerDigest,
+-				"roothash":  rootHash,
+-				"signature": signature[:min(len(signature), 32)] + "...",
+-			}).Info("Found dm-verity signature for layer")
++			blob, err := fetchDescriptor(ctx, fetcher, layer)
++			if err != nil {
++				return nil, nil, fmt.Errorf("fetch signature blob for layer %s: %w", sourceDigest, err)
++			}
++			if !bytes.Equal(blob, signatureBytes) {
++				return nil, nil, fmt.Errorf("signature blob does not match signed annotation for layer %s", sourceDigest)
++			}
++			info := getLayerInfo(infos, sourceDigest)
++			if info.Signature != "" {
++				return nil, nil, fmt.Errorf("duplicate signature descriptor for layer %s", sourceDigest)
++			}
++			info.RootHash = rootHash
++			info.Signature = encodedSignature
++		case EROFSArtifactMediaType, MerkleTreeArtifactMediaType:
++			sourceDigest := layer.Annotations[precomputedSourceLayerAnnotation]
++			if sourceDigest == "" {
++				return nil, nil, fmt.Errorf("precomputed descriptor %s has invalid annotations", layer.Digest)
++			}
++			info := getLayerInfo(infos, sourceDigest)
++			desc := layer
++			if layer.MediaType == EROFSArtifactMediaType {
++				if info.EROFS != nil {
++					return nil, nil, fmt.Errorf("duplicate EROFS descriptor for layer %s", sourceDigest)
++				}
++				info.EROFS = &desc
++			} else {
++				if info.MerkleTree != nil {
++					return nil, nil, fmt.Errorf("duplicate Merkle-tree descriptor for layer %s", sourceDigest)
++				}
++				info.MerkleTree = &desc
++			}
++			artifactDescs = append(artifactDescs, desc)
++		default:
++			return nil, nil, fmt.Errorf("unexpected bundle layer media type %q", layer.MediaType)
+ 		}
+ 	}
++	for sourceDigest, info := range infos {
++		if _, err := digest.Parse(sourceDigest); err != nil {
++			return nil, nil, fmt.Errorf("invalid source layer digest %q: %w", sourceDigest, err)
++		}
++		if info.Signature == "" || info.RootHash == "" || info.EROFS == nil || info.MerkleTree == nil {
++			return nil, nil, fmt.Errorf("incomplete precomputed artifacts for layer %s", sourceDigest)
++		}
++	}
++	return infos, artifactDescs, nil
++}
+ 
+-	log.G(ctx).WithField("manifest", manifestDigest).Info("Signatures fetched successfully")
+-	return signatures
++func getLayerInfo(infos map[string]*LayerSignatureInfo, sourceDigest string) *LayerSignatureInfo {
++	info := infos[sourceDigest]
++	if info == nil {
++		info = &LayerSignatureInfo{}
++		infos[sourceDigest] = info
++	}
++	return info
++}
++
++func fetchDescriptor(ctx context.Context, fetcher remotes.Fetcher, desc ocispec.Descriptor) ([]byte, error) {
++	// Referrer descriptors arrive verbatim from the registry and have not been
++	// validated by the fetcher, so validate before anything touches
++	// Digest.Verifier(): go-digest panics on a digest with no algorithm
++	// separator or with an algorithm that is not linked into the binary.
++	if err := desc.Digest.Validate(); err != nil {
++		return nil, fmt.Errorf("invalid descriptor digest %q: %w", string(desc.Digest), err)
++	}
++	// desc.Size is likewise attacker-controlled; bound it before io.ReadAll
++	// allocates on the strength of it.
++	if desc.Size < 0 || desc.Size > maxManifestSize {
++		return nil, fmt.Errorf("descriptor %s size %d out of range (max %d)", desc.Digest, desc.Size, maxManifestSize)
++	}
++	rc, err := fetcher.Fetch(ctx, desc)
++	if err != nil {
++		return nil, err
++	}
++	defer rc.Close()
++	verifier := desc.Digest.Verifier()
++	data, err := io.ReadAll(io.TeeReader(io.LimitReader(rc, desc.Size+1), verifier))
++	if err != nil {
++		return nil, err
++	}
++	if int64(len(data)) != desc.Size {
++		return nil, fmt.Errorf("descriptor %s size mismatch: got %d, expected %d", desc.Digest, len(data), desc.Size)
++	}
++	if !verifier.Verified() {
++		return nil, fmt.Errorf("descriptor %s digest verification failed", desc.Digest)
++	}
++	return data, nil
+ }
+ 
+-// AppendSignatureHandlerWrapper creates a handler that fetches signatures when processing
+-// a manifest and adds signature annotations to layer descriptors.
+-// This should wrap the handler AFTER AppendInfoHandlerWrapper.
++// AppendSignatureHandlerWrapper creates a handler that fetches signatures and
++// precomputed EROFS artifacts when processing an image manifest.
+ func AppendSignatureHandlerWrapper(fetcher remotes.Fetcher) func(f images.Handler) images.Handler {
+ 	return func(f images.Handler) images.Handler {
+ 		return signatureHandler(f, fetcher)
+ 	}
+ }
+ 
+-// AppendSignatureHandlerWrapperFromResolver creates a signature handler wrapper using a resolver.
+-// The fetcher is lazily created from the resolver when the handler is first invoked.
+-// This is useful for the CRI path where the resolver is available at option setup time,
+-// but the fetcher needs to be created later.
++// AppendSignatureHandlerWrapperFromResolver lazily creates a fetcher from a resolver.
+ func AppendSignatureHandlerWrapperFromResolver(resolver remotes.Resolver, ref string) func(f images.Handler) images.Handler {
+ 	var (
+ 		fetcher     remotes.Fetcher
+ 		fetcherOnce sync.Once
+ 		fetcherErr  error
+ 	)
+-
+ 	return func(f images.Handler) images.Handler {
+ 		return images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+-			// Lazily initialize the fetcher
+ 			fetcherOnce.Do(func() {
+ 				fetcher, fetcherErr = resolver.Fetcher(ctx, ref)
+-				if fetcherErr != nil {
+-					log.G(ctx).WithError(fetcherErr).Warn("Failed to create fetcher for signature lookup")
+-				} else {
+-					log.G(ctx).Debug("Created fetcher for signature lookup")
+-				}
+ 			})
+-
+-			// If we couldn't create a fetcher, just pass through
+-			if fetcherErr != nil || fetcher == nil {
+-				return f.Handle(ctx, desc)
++			if fetcherErr != nil {
++				return nil, fmt.Errorf("create fetcher for dm-verity artifact lookup: %w", fetcherErr)
+ 			}
+-
+ 			return signatureHandler(f, fetcher).Handle(ctx, desc)
+ 		})
+ 	}
+ }
+ 
+-// signatureHandler is the core handler logic for fetching and attaching signatures
+ func signatureHandler(f images.Handler, fetcher remotes.Fetcher) images.Handler {
+ 	return images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+ 		children, err := f.Handle(ctx, desc)
+ 		if err != nil {
+ 			return nil, err
+ 		}
++		if !images.IsManifestType(desc.MediaType) {
++			return children, nil
++		}
+ 
+-		// When we encounter a manifest, fetch signatures for it
+-		if images.IsManifestType(desc.MediaType) {
+-			// Fetch signatures directly - no global cache needed
+-			signatures := fetchSignatures(ctx, fetcher, desc.Digest)
++		signatures, artifacts, err := fetchSignatures(ctx, fetcher, desc.Digest)
++		if err != nil {
++			return nil, err
++		}
++		if len(signatures) == 0 {
++			return children, nil
++		}
++		for _, artifact := range artifacts {
++			if _, err := f.Handle(ctx, artifact); err != nil {
++				return nil, fmt.Errorf("fetch precomputed artifact %s: %w", artifact.Digest, err)
++			}
++		}
+ 
+-			// Add signature annotations to layer descriptors
+-			for i := range children {
+-				c := &children[i]
+-				if images.IsLayerType(c.MediaType) {
+-					if sig, ok := signatures[c.Digest.String()]; ok {
+-						if c.Annotations == nil {
+-							c.Annotations = make(map[string]string)
+-						}
+-						c.Annotations[TargetLayerSignatureLabel] = sig.Signature
+-						c.Annotations[TargetLayerRootHashLabel] = sig.RootHash
+-						log.G(ctx).WithField("layer", c.Digest).Debug("Added signature annotations to layer")
+-					}
++		imageLayers := make(map[string]struct{})
++		for i := range children {
++			child := &children[i]
++			if !images.IsLayerType(child.MediaType) {
++				continue
++			}
++			imageLayers[child.Digest.String()] = struct{}{}
++			info, ok := signatures[child.Digest.String()]
++			if !ok {
++				if len(artifacts) > 0 {
++					return nil, fmt.Errorf("verified precomputed bundle does not contain layer %s", child.Digest)
++				}
++				continue
++			}
++			if child.Annotations == nil {
++				child.Annotations = make(map[string]string)
++			}
++			child.Annotations[TargetLayerSignatureLabel] = info.Signature
++			child.Annotations[TargetLayerRootHashLabel] = info.RootHash
++			if info.EROFS != nil && info.MerkleTree != nil {
++				erofsDesc, err := json.Marshal(info.EROFS)
++				if err != nil {
++					return nil, err
++				}
++				treeDesc, err := json.Marshal(info.MerkleTree)
++				if err != nil {
++					return nil, err
++				}
++				child.Annotations[TargetLayerEROFSDescriptorLabel] = string(erofsDesc)
++				child.Annotations[TargetLayerMerkleTreeDescriptorLabel] = string(treeDesc)
++			}
++		}
++		if len(artifacts) > 0 {
++			for sourceDigest := range signatures {
++				if _, ok := imageLayers[sourceDigest]; !ok {
++					return nil, fmt.Errorf("verified precomputed bundle contains unknown source layer %s", sourceDigest)
+ 				}
+ 			}
+ 		}
+-
+ 		return children, nil
+ 	})
+ }
+diff --git a/pkg/snapshotters/signatures_test.go b/pkg/snapshotters/signatures_test.go
+new file mode 100644
+index 000000000..b8832312d
+--- /dev/null
++++ b/pkg/snapshotters/signatures_test.go
+@@ -0,0 +1,302 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package snapshotters
++
++import (
++	"bytes"
++	"context"
++	"encoding/base64"
++	"encoding/json"
++	"errors"
++	"io"
++	"testing"
++	"time"
++
++	"github.com/containerd/containerd/v2/core/images"
++	"github.com/containerd/containerd/v2/core/remotes"
++	"github.com/opencontainers/go-digest"
++	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++)
++
++type artifactFetcher struct {
++	blobs map[digest.Digest][]byte
++	refs  map[digest.Digest][]ocispec.Descriptor
++}
++
++func (f *artifactFetcher) Fetch(_ context.Context, desc ocispec.Descriptor) (io.ReadCloser, error) {
++	data, ok := f.blobs[desc.Digest]
++	if !ok {
++		return nil, errors.New("blob not found")
++	}
++	return io.NopCloser(bytes.NewReader(data)), nil
++}
++
++func (f *artifactFetcher) FetchReferrers(_ context.Context, dgst digest.Digest, opts ...remotes.FetchReferrersOpt) ([]ocispec.Descriptor, error) {
++	var cfg remotes.FetchReferrersConfig
++	for _, opt := range opts {
++		if err := opt(context.Background(), &cfg); err != nil {
++			return nil, err
++		}
++	}
++	allowed := map[string]bool{}
++	for _, artifactType := range cfg.ArtifactTypes {
++		allowed[artifactType] = true
++	}
++	var result []ocispec.Descriptor
++	for _, desc := range f.refs[dgst] {
++		if len(allowed) == 0 || allowed[desc.ArtifactType] {
++			result = append(result, desc)
++		}
++	}
++	return result, nil
++}
++
++func TestSignatureHandlerPrecomputedBundle(t *testing.T) {
++	sourceManifest := descriptorFor([]byte("source manifest"), ocispec.MediaTypeImageManifest)
++	sourceLayer := descriptorFor([]byte("source layer"), ocispec.MediaTypeImageLayerGzip)
++	config := descriptorFor([]byte("{}"), ocispec.MediaTypeImageConfig)
++	signatureBytes := []byte{0x30, 0x03, 0x01, 0x02, 0x03}
++	signatureDesc := descriptorFor(signatureBytes, LayerSignatureMediaType)
++	signatureDesc.Annotations = map[string]string{
++		sigLayerDigestAnnotation:    sourceLayer.Digest.String(),
++		sigLayerRootHashAnnotation:  "abcd",
++		sigLayerSignatureAnnotation: base64.StdEncoding.EncodeToString(signatureBytes),
++	}
++	erofsDesc := descriptorFor([]byte("precomputed erofs"), EROFSArtifactMediaType)
++	erofsDesc.Annotations = precomputedAnnotations(sourceLayer.Digest.String())
++	treeDesc := descriptorFor([]byte("precomputed tree"), MerkleTreeArtifactMediaType)
++	treeDesc.Annotations = precomputedAnnotations(sourceLayer.Digest.String())
++	bundle := ocispec.Manifest{
++		MediaType:    ocispec.MediaTypeImageManifest,
++		ArtifactType: SignatureArtifactType,
++		Subject:      &sourceManifest,
++		Layers:       []ocispec.Descriptor{signatureDesc, erofsDesc, treeDesc},
++	}
++	bundleBytes, err := json.Marshal(bundle)
++	require.NoError(t, err)
++	bundleDesc := descriptorFor(bundleBytes, ocispec.MediaTypeImageManifest)
++	bundleDesc.ArtifactType = SignatureArtifactType
++
++	fetcher := &artifactFetcher{
++		blobs: map[digest.Digest][]byte{
++			bundleDesc.Digest:    bundleBytes,
++			signatureDesc.Digest: signatureBytes,
++			erofsDesc.Digest:     []byte("precomputed erofs"),
++			treeDesc.Digest:      []byte("precomputed tree"),
++		},
++		refs: map[digest.Digest][]ocispec.Descriptor{
++			sourceManifest.Digest: {bundleDesc},
++		},
++	}
++
++	var fetched []digest.Digest
++	base := images.HandlerFunc(func(_ context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
++		switch desc.Digest {
++		case sourceManifest.Digest:
++			return []ocispec.Descriptor{config, sourceLayer, sourceLayer}, nil
++		default:
++			fetched = append(fetched, desc.Digest)
++			return nil, nil
++		}
++	})
++	children, err := signatureHandler(base, fetcher).Handle(context.Background(), sourceManifest)
++	require.NoError(t, err)
++	require.Len(t, children, 3)
++	layer := children[1]
++	assert.Equal(t, "abcd", layer.Annotations[TargetLayerRootHashLabel])
++	assert.Equal(t, base64.StdEncoding.EncodeToString(signatureBytes), layer.Annotations[TargetLayerSignatureLabel])
++
++	gotEROFS, err := ParseTargetDescriptor(layer.Annotations[TargetLayerEROFSDescriptorLabel])
++	require.NoError(t, err)
++	assert.Equal(t, erofsDesc.Digest, gotEROFS.Digest)
++	gotTree, err := ParseTargetDescriptor(layer.Annotations[TargetLayerMerkleTreeDescriptorLabel])
++	require.NoError(t, err)
++	assert.Equal(t, treeDesc.Digest, gotTree.Digest)
++	assert.Equal(t, layer.Annotations, children[2].Annotations)
++	assert.ElementsMatch(t, []digest.Digest{erofsDesc.Digest, treeDesc.Digest}, fetched)
++}
++
++func TestSignatureHandlerRejectsInvalidPrecomputedBundle(t *testing.T) {
++	sourceManifest := descriptorFor([]byte("source manifest"), ocispec.MediaTypeImageManifest)
++	bundle := ocispec.Manifest{
++		MediaType:    ocispec.MediaTypeImageManifest,
++		ArtifactType: SignatureArtifactType,
++		Subject:      &sourceManifest,
++		Layers: []ocispec.Descriptor{{
++			MediaType:   EROFSArtifactMediaType,
++			Digest:      digest.FromString("orphan erofs"),
++			Size:        12,
++			Annotations: precomputedAnnotations(digest.FromString("source layer").String()),
++		}},
++	}
++	bundleBytes, err := json.Marshal(bundle)
++	require.NoError(t, err)
++	bundleDesc := descriptorFor(bundleBytes, ocispec.MediaTypeImageManifest)
++	bundleDesc.ArtifactType = SignatureArtifactType
++	fetcher := &artifactFetcher{
++		blobs: map[digest.Digest][]byte{bundleDesc.Digest: bundleBytes},
++		refs: map[digest.Digest][]ocispec.Descriptor{
++			sourceManifest.Digest: {bundleDesc},
++		},
++	}
++	base := images.HandlerFunc(func(context.Context, ocispec.Descriptor) ([]ocispec.Descriptor, error) {
++		return nil, nil
++	})
++	_, err = signatureHandler(base, fetcher).Handle(context.Background(), sourceManifest)
++	require.Error(t, err)
++	assert.Contains(t, err.Error(), "incomplete precomputed artifacts")
++}
++
++func TestFetchSignaturesSelectsNewestPrecomputedBundle(t *testing.T) {
++	sourceManifest := descriptorFor([]byte("source manifest"), ocispec.MediaTypeImageManifest)
++	sourceLayer := descriptorFor([]byte("source layer"), ocispec.MediaTypeImageLayerGzip)
++	older := newPrecomputedBundle(t, sourceManifest, sourceLayer, "older", "abcd", time.Date(2026, 7, 20, 1, 0, 0, 0, time.UTC))
++	newer := newPrecomputedBundle(t, sourceManifest, sourceLayer, "newer", "ef01", time.Date(2026, 7, 20, 2, 0, 0, 0, time.UTC))
++
++	fetcher := &artifactFetcher{
++		blobs: mergeBlobMaps(older.blobs, newer.blobs),
++		refs: map[digest.Digest][]ocispec.Descriptor{
++			sourceManifest.Digest: {older.descriptor, newer.descriptor},
++		},
++	}
++
++	signatures, artifacts, err := fetchSignatures(context.Background(), fetcher, sourceManifest.Digest)
++	require.NoError(t, err)
++	require.Contains(t, signatures, sourceLayer.Digest.String())
++	assert.Equal(t, "ef01", signatures[sourceLayer.Digest.String()].RootHash)
++	assert.ElementsMatch(t, []ocispec.Descriptor{newer.erofs, newer.tree}, artifacts)
++}
++
++func TestFetchSignaturesFailsClosedOnInvalidNewestPrecomputedBundle(t *testing.T) {
++	sourceManifest := descriptorFor([]byte("source manifest"), ocispec.MediaTypeImageManifest)
++	sourceLayer := descriptorFor([]byte("source layer"), ocispec.MediaTypeImageLayerGzip)
++	older := newPrecomputedBundle(t, sourceManifest, sourceLayer, "older", "abcd", time.Date(2026, 7, 20, 1, 0, 0, 0, time.UTC))
++
++	orphanEROFS := descriptorFor([]byte("orphan erofs"), EROFSArtifactMediaType)
++	orphanEROFS.Annotations = precomputedAnnotations(sourceLayer.Digest.String())
++	invalidManifest := ocispec.Manifest{
++		MediaType:    ocispec.MediaTypeImageManifest,
++		ArtifactType: SignatureArtifactType,
++		Subject:      &sourceManifest,
++		Layers:       []ocispec.Descriptor{orphanEROFS},
++		Annotations: map[string]string{
++			ociAnnotationCreated: time.Date(2026, 7, 20, 2, 0, 0, 0, time.UTC).Format(time.RFC3339),
++		},
++	}
++	invalidBytes, err := json.Marshal(invalidManifest)
++	require.NoError(t, err)
++	invalidDescriptor := descriptorFor(invalidBytes, ocispec.MediaTypeImageManifest)
++	invalidDescriptor.ArtifactType = SignatureArtifactType
++
++	fetcher := &artifactFetcher{
++		blobs: mergeBlobMaps(older.blobs, map[digest.Digest][]byte{
++			invalidDescriptor.Digest: invalidBytes,
++		}),
++		refs: map[digest.Digest][]ocispec.Descriptor{
++			sourceManifest.Digest: {older.descriptor, invalidDescriptor},
++		},
++	}
++
++	_, _, err = fetchSignatures(context.Background(), fetcher, sourceManifest.Digest)
++	require.Error(t, err)
++	assert.Contains(t, err.Error(), invalidDescriptor.Digest.String())
++	assert.Contains(t, err.Error(), "incomplete precomputed artifacts")
++}
++
++type precomputedBundleFixture struct {
++	descriptor ocispec.Descriptor
++	erofs      ocispec.Descriptor
++	tree       ocispec.Descriptor
++	blobs      map[digest.Digest][]byte
++}
++
++func newPrecomputedBundle(
++	t *testing.T,
++	subject ocispec.Descriptor,
++	sourceLayer ocispec.Descriptor,
++	name string,
++	rootHash string,
++	createdAt time.Time,
++) precomputedBundleFixture {
++	t.Helper()
++
++	signatureBytes := []byte("signature-" + name)
++	signatureDesc := descriptorFor(signatureBytes, LayerSignatureMediaType)
++	signatureDesc.Annotations = map[string]string{
++		sigLayerDigestAnnotation:    sourceLayer.Digest.String(),
++		sigLayerRootHashAnnotation:  rootHash,
++		sigLayerSignatureAnnotation: base64.StdEncoding.EncodeToString(signatureBytes),
++	}
++	erofsBytes := []byte("erofs-" + name)
++	erofsDesc := descriptorFor(erofsBytes, EROFSArtifactMediaType)
++	erofsDesc.Annotations = precomputedAnnotations(sourceLayer.Digest.String())
++	treeBytes := []byte("tree-" + name)
++	treeDesc := descriptorFor(treeBytes, MerkleTreeArtifactMediaType)
++	treeDesc.Annotations = precomputedAnnotations(sourceLayer.Digest.String())
++
++	manifest := ocispec.Manifest{
++		MediaType:    ocispec.MediaTypeImageManifest,
++		ArtifactType: SignatureArtifactType,
++		Subject:      &subject,
++		Layers:       []ocispec.Descriptor{signatureDesc, erofsDesc, treeDesc},
++		Annotations: map[string]string{
++			ociAnnotationCreated: createdAt.Format(time.RFC3339),
++		},
++	}
++	manifestBytes, err := json.Marshal(manifest)
++	require.NoError(t, err)
++	manifestDesc := descriptorFor(manifestBytes, ocispec.MediaTypeImageManifest)
++	manifestDesc.ArtifactType = SignatureArtifactType
++
++	return precomputedBundleFixture{
++		descriptor: manifestDesc,
++		erofs:      erofsDesc,
++		tree:       treeDesc,
++		blobs: map[digest.Digest][]byte{
++			manifestDesc.Digest:  manifestBytes,
++			signatureDesc.Digest: signatureBytes,
++			erofsDesc.Digest:     erofsBytes,
++			treeDesc.Digest:      treeBytes,
++		},
++	}
++}
++
++func mergeBlobMaps(maps ...map[digest.Digest][]byte) map[digest.Digest][]byte {
++	merged := make(map[digest.Digest][]byte)
++	for _, blobs := range maps {
++		for dgst, data := range blobs {
++			merged[dgst] = data
++		}
++	}
++	return merged
++}
++
++func descriptorFor(data []byte, mediaType string) ocispec.Descriptor {
++	return ocispec.Descriptor{
++		MediaType: mediaType,
++		Digest:    digest.FromBytes(data),
++		Size:      int64(len(data)),
++	}
++}
++
++func precomputedAnnotations(sourceDigest string) map[string]string {
++	return map[string]string{
++		precomputedSourceLayerAnnotation: sourceDigest,
++	}
++}
+diff --git a/plugins/diff/erofs/differ.go b/plugins/diff/erofs/differ.go
+index 4d5da2807..316c449da 100644
+--- a/plugins/diff/erofs/differ.go
++++ b/plugins/diff/erofs/differ.go
+@@ -183,9 +183,13 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 		// let a registry opt out of integrity and signature enforcement purely
+ 		// by publishing its layers with an EROFS media type.
+ 		if s.enableDmverity {
+-			if _, err := s.formatDmverityLayer(ctx, layerBlobPath); err != nil {
++			rootHash, err := s.formatDmverityLayer(ctx, layerBlobPath)
++			if err != nil {
+ 				return emptyDesc, fmt.Errorf("failed to format dm-verity layer: %w", err)
+ 			}
++			if err := s.writeLayerSignature(ctx, desc, layerBlobPath, rootHash); err != nil {
++				return emptyDesc, err
++			}
+ 		}
+ 		return desc, nil
+ 	}
+@@ -206,6 +210,19 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 		r: io.TeeReader(processor, digester.Hash()),
+ 	}
+ 
++	if used, err := s.applyPrecomputedArtifacts(ctx, desc, layerBlobPath); err != nil {
++		return emptyDesc, err
++	} else if used {
++		if _, err := io.Copy(io.Discard, rc); err != nil {
++			return emptyDesc, fmt.Errorf("calculate diffID for precomputed EROFS layer: %w", err)
++		}
++		return ocispec.Descriptor{
++			MediaType: ocispec.MediaTypeImageLayer,
++			Size:      rc.c,
++			Digest:    digester.Digest(),
++		}, nil
++	}
++
+ 	// Choose between tar index or tar conversion mode
+ 	// Generate deterministic UUID from layer digest
+ 	u := uuid.NewSHA1(uuid.NameSpaceURL, []byte("erofs:blobs/"+desc.Digest))
+@@ -237,27 +254,8 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 			return emptyDesc, fmt.Errorf("failed to format dm-verity layer: %w", err)
+ 		}
+ 
+-		// Pass a layer's dm-verity signature to the kernel when the layer
+-		// carries one, so the verity target is loaded with signature
+-		// verification. Rejecting UNSIGNED layers is a separate decision
+-		// (require_signatures).
+-		sig := desc.Annotations[snpkg.TargetLayerSignatureLabel]
+-		switch {
+-		case sig != "":
+-			expectedRootHash := desc.Annotations[snpkg.TargetLayerRootHashLabel]
+-			if expectedRootHash == "" {
+-				return emptyDesc, fmt.Errorf("dm-verity signature present but missing expected root hash for layer %s", desc.Digest)
+-			}
+-			if rootHash != expectedRootHash {
+-				return emptyDesc, fmt.Errorf("dm-verity root hash mismatch for layer %s: computed %q, expected %q", desc.Digest, rootHash, expectedRootHash)
+-			}
+-
+-			if err := dmverity.WriteSignature(layerBlobPath, sig); err != nil {
+-				return emptyDesc, err
+-			}
+-			log.G(ctx).WithField("path", dmverity.SignaturePath(layerBlobPath)).Debug("Wrote dm-verity signature file")
+-		case s.requireSignatures:
+-			return emptyDesc, fmt.Errorf("dm-verity signature required but not present on layer %s", desc.Digest)
++		if err := s.writeLayerSignature(ctx, desc, layerBlobPath, rootHash); err != nil {
++			return emptyDesc, err
+ 		}
+ 	}
+ 
+@@ -268,6 +266,27 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 	}, nil
+ }
+ 
++func (s erofsDiff) writeLayerSignature(ctx context.Context, desc ocispec.Descriptor, layerBlobPath, actualRootHash string) error {
++	sig := desc.Annotations[snpkg.TargetLayerSignatureLabel]
++	switch {
++	case sig != "":
++		expectedRootHash := desc.Annotations[snpkg.TargetLayerRootHashLabel]
++		if expectedRootHash == "" {
++			return fmt.Errorf("dm-verity signature present but missing expected root hash for layer %s", desc.Digest)
++		}
++		if actualRootHash != expectedRootHash {
++			return fmt.Errorf("dm-verity root hash mismatch for layer %s: actual %q, expected %q", desc.Digest, actualRootHash, expectedRootHash)
++		}
++		if err := dmverity.WriteSignature(layerBlobPath, sig); err != nil {
++			return err
++		}
++		log.G(ctx).WithField("path", dmverity.SignaturePath(layerBlobPath)).Debug("Wrote dm-verity signature file")
++	case s.requireSignatures:
++		return fmt.Errorf("dm-verity signature required but not present on layer %s", desc.Digest)
++	}
++	return nil
++}
++
+ type readCounter struct {
+ 	r io.Reader
+ 	c int64
+diff --git a/plugins/diff/erofs/precomputed.go b/plugins/diff/erofs/precomputed.go
+new file mode 100644
+index 000000000..c15c708f9
+--- /dev/null
++++ b/plugins/diff/erofs/precomputed.go
+@@ -0,0 +1,197 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package erofs
++
++import (
++	"context"
++	"encoding/binary"
++	"fmt"
++	"io"
++	"os"
++	"path/filepath"
++
++	"github.com/containerd/containerd/v2/core/content"
++	"github.com/containerd/containerd/v2/internal/dmverity"
++	snpkg "github.com/containerd/containerd/v2/pkg/snapshotters"
++	"github.com/containerd/log"
++	"github.com/google/uuid"
++	"github.com/opencontainers/go-digest"
++	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
++)
++
++const (
++	erofsSuperOffset = 1024
++	erofsMagic       = 0xE0F5E1E2
++	erofsUUIDOffset  = 48
++	erofsUUIDEnd     = erofsUUIDOffset + 16
++)
++
++func (s erofsDiff) applyPrecomputedArtifacts(ctx context.Context, sourceDesc ocispec.Descriptor, layerBlobPath string) (bool, error) {
++	erofsValue := sourceDesc.Annotations[snpkg.TargetLayerEROFSDescriptorLabel]
++	treeValue := sourceDesc.Annotations[snpkg.TargetLayerMerkleTreeDescriptorLabel]
++	if erofsValue == "" && treeValue == "" {
++		return false, nil
++	}
++	if !s.enableDmverity {
++		// These annotations can arrive straight off the image manifest, with
++		// no referrer discovery involved, so a registry must not be able to
++		// fail a pull on a node that never opted into dm-verity. Ignore them
++		// and convert the tar layer the ordinary way.
++		log.G(ctx).WithField("layer", sourceDesc.Digest).
++			Debug("ignoring precomputed dm-verity artifacts: dm-verity is disabled")
++		return false, nil
++	}
++	if erofsValue == "" || treeValue == "" {
++		return false, fmt.Errorf("incomplete precomputed artifact annotations for layer %s", sourceDesc.Digest)
++	}
++	erofsDesc, err := snpkg.ParseTargetDescriptor(erofsValue)
++	if err != nil {
++		return false, err
++	}
++	if erofsDesc.MediaType != snpkg.EROFSArtifactMediaType {
++		return false, fmt.Errorf("unexpected precomputed EROFS media type %q", erofsDesc.MediaType)
++	}
++	treeDesc, err := snpkg.ParseTargetDescriptor(treeValue)
++	if err != nil {
++		return false, err
++	}
++	if treeDesc.MediaType != snpkg.MerkleTreeArtifactMediaType {
++		return false, fmt.Errorf("unexpected precomputed Merkle-tree media type %q", treeDesc.MediaType)
++	}
++	rootHash := sourceDesc.Annotations[snpkg.TargetLayerRootHashLabel]
++	if rootHash == "" {
++		return false, fmt.Errorf("precomputed artifacts missing root hash for layer %s", sourceDesc.Digest)
++	}
++
++	hashDevicePath := dmverity.HashDevicePath(layerBlobPath)
++	cleanup := true
++	defer func() {
++		if !cleanup {
++			return
++		}
++		os.Remove(layerBlobPath)
++		os.Remove(hashDevicePath)
++		os.Remove(dmverity.MetadataPath(layerBlobPath))
++		os.Remove(dmverity.SignaturePath(layerBlobPath))
++	}()
++
++	if err := copyContentDescriptor(ctx, s.store, erofsDesc, layerBlobPath); err != nil {
++		return false, fmt.Errorf("materialize precomputed EROFS for layer %s: %w", sourceDesc.Digest, err)
++	}
++	if err := verifyEROFSUUID(layerBlobPath, sourceDesc.Digest.String()); err != nil {
++		return false, fmt.Errorf("verify precomputed EROFS source binding for layer %s: %w", sourceDesc.Digest, err)
++	}
++	if err := copyContentDescriptor(ctx, s.store, treeDesc, hashDevicePath); err != nil {
++		return false, fmt.Errorf("materialize precomputed Merkle tree for layer %s: %w", sourceDesc.Digest, err)
++	}
++
++	if err := dmverity.VerifyArtifacts(layerBlobPath, hashDevicePath, rootHash); err != nil {
++		return false, fmt.Errorf("precomputed artifacts failed dm-verity verification for layer %s: %w", sourceDesc.Digest, err)
++	}
++	if err := dmverity.WriteMetadata(layerBlobPath, dmverity.DmverityMetadata{
++		RootHash:   rootHash,
++		HashOffset: 0,
++		HashDevice: filepath.Base(hashDevicePath),
++	}); err != nil {
++		return false, err
++	}
++	if err := s.writeLayerSignature(ctx, sourceDesc, layerBlobPath, rootHash); err != nil {
++		return false, err
++	}
++
++	cleanup = false
++	log.G(ctx).WithFields(log.Fields{
++		"layer":       sourceDesc.Digest,
++		"erofs":       erofsDesc.Digest,
++		"merkle_tree": treeDesc.Digest,
++		"root_hash":   rootHash,
++	}).Info("Materialized verified precomputed EROFS dm-verity artifacts")
++	return true, nil
++}
++
++func verifyEROFSUUID(path, sourceDigest string) error {
++	parsedDigest, err := digest.Parse(sourceDigest)
++	if err != nil {
++		return fmt.Errorf("invalid source layer digest: %w", err)
++	}
++	if parsedDigest.String() != sourceDigest {
++		return fmt.Errorf("source layer digest is not canonical: %q", sourceDigest)
++	}
++
++	file, err := os.Open(path)
++	if err != nil {
++		return err
++	}
++	defer file.Close()
++
++	superblock := make([]byte, erofsUUIDEnd)
++	if _, err := file.ReadAt(superblock, erofsSuperOffset); err != nil {
++		return fmt.Errorf("read EROFS superblock: %w", err)
++	}
++	if magic := binary.LittleEndian.Uint32(superblock[:4]); magic != erofsMagic {
++		return fmt.Errorf("invalid EROFS superblock magic 0x%x", magic)
++	}
++	actualUUID, err := uuid.FromBytes(superblock[erofsUUIDOffset:erofsUUIDEnd])
++	if err != nil {
++		return fmt.Errorf("parse EROFS UUID: %w", err)
++	}
++	expectedUUID := uuid.NewSHA1(uuid.NameSpaceURL, []byte("erofs:blobs/"+sourceDigest))
++	if actualUUID != expectedUUID {
++		return fmt.Errorf("EROFS UUID %s does not match expected source-layer UUID %s", actualUUID, expectedUUID)
++	}
++	return nil
++}
++
++func copyContentDescriptor(ctx context.Context, store content.Store, desc ocispec.Descriptor, target string) error {
++	ra, err := store.ReaderAt(ctx, desc)
++	if err != nil {
++		return fmt.Errorf("open content %s: %w", desc.Digest, err)
++	}
++	defer ra.Close()
++
++	tmp, err := os.CreateTemp(filepath.Dir(target), "."+filepath.Base(target)+".tmp-*")
++	if err != nil {
++		return err
++	}
++	tmpPath := tmp.Name()
++	defer func() {
++		tmp.Close()
++		os.Remove(tmpPath)
++	}()
++
++	verifier := desc.Digest.Verifier()
++	written, err := io.Copy(io.MultiWriter(tmp, verifier), content.NewReader(ra))
++	if err != nil {
++		return err
++	}
++	if written != desc.Size {
++		return fmt.Errorf("content %s size mismatch: wrote %d, expected %d", desc.Digest, written, desc.Size)
++	}
++	if !verifier.Verified() {
++		return fmt.Errorf("content %s digest verification failed", desc.Digest)
++	}
++	if err := tmp.Sync(); err != nil {
++		return err
++	}
++	if err := tmp.Close(); err != nil {
++		return err
++	}
++	if err := os.Rename(tmpPath, target); err != nil {
++		return err
++	}
++	return nil
++}
+diff --git a/plugins/diff/erofs/precomputed_linux_test.go b/plugins/diff/erofs/precomputed_linux_test.go
+new file mode 100644
+index 000000000..23d6589a6
+--- /dev/null
++++ b/plugins/diff/erofs/precomputed_linux_test.go
+@@ -0,0 +1,194 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package erofs
++
++import (
++	"bytes"
++	"context"
++	"encoding/binary"
++	"encoding/json"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/containerd/containerd/v2/core/content"
++	"github.com/containerd/containerd/v2/internal/dmverity"
++	"github.com/containerd/containerd/v2/pkg/snapshotters"
++	"github.com/containerd/containerd/v2/plugins/content/local"
++	"github.com/google/uuid"
++	"github.com/opencontainers/go-digest"
++	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++)
++
++func TestApplyPrecomputedArtifacts(t *testing.T) {
++	ctx := context.Background()
++	sourceDigest := digest.FromString("source layer")
++	data := testEROFSData(sourceDigest)
++	sourceDataPath := filepath.Join(t.TempDir(), "source.erofs")
++	sourceTreePath := filepath.Join(t.TempDir(), "source.hashtree")
++	require.NoError(t, os.WriteFile(sourceDataPath, data, 0600))
++	sourceTree, err := os.OpenFile(sourceTreePath, os.O_CREATE|os.O_RDWR, 0600)
++	require.NoError(t, err)
++	sourceTree.Close()
++
++	opts := dmverity.DefaultDmverityOptions()
++	opts.DataBlockSize = 512
++	opts.HashBlockSize = 512
++	opts.HashOffset = 512
++	opts.UUID = "11111111-1111-1111-1111-111111111111"
++	rootHash, err := dmverity.Format(sourceDataPath, sourceTreePath, opts)
++	require.NoError(t, err)
++	tree, err := os.ReadFile(sourceTreePath)
++	require.NoError(t, err)
++
++	cs, err := local.NewStore(t.TempDir())
++	require.NoError(t, err)
++	erofsDesc := writeTestBlob(t, ctx, cs, data, snapshotters.EROFSArtifactMediaType)
++	treeDesc := writeTestBlob(t, ctx, cs, tree, snapshotters.MerkleTreeArtifactMediaType)
++	sourceDesc := descriptorWithPrecomputedArtifacts(t, sourceDigest, erofsDesc, treeDesc, rootHash)
++
++	layerBlobPath := filepath.Join(t.TempDir(), "layer.erofs")
++	differ := erofsDiff{store: cs, enableDmverity: true}
++	used, err := differ.applyPrecomputedArtifacts(ctx, sourceDesc, layerBlobPath)
++	require.NoError(t, err)
++	assert.True(t, used)
++
++	gotData, err := os.ReadFile(layerBlobPath)
++	require.NoError(t, err)
++	assert.Equal(t, data, gotData)
++	gotTree, err := os.ReadFile(dmverity.HashDevicePath(layerBlobPath))
++	require.NoError(t, err)
++	assert.Equal(t, tree, gotTree)
++	require.NoError(t, dmverity.VerifyArtifacts(
++		layerBlobPath,
++		dmverity.HashDevicePath(layerBlobPath),
++		rootHash,
++	))
++
++	metadataBytes, err := os.ReadFile(dmverity.MetadataPath(layerBlobPath))
++	require.NoError(t, err)
++	var metadata dmverity.DmverityMetadata
++	require.NoError(t, json.Unmarshal(metadataBytes, &metadata))
++	assert.Equal(t, filepath.Base(dmverity.HashDevicePath(layerBlobPath)), metadata.HashDevice)
++	assert.Zero(t, metadata.HashOffset)
++	_, err = os.Stat(dmverity.SignaturePath(layerBlobPath))
++	assert.ErrorIs(t, err, os.ErrNotExist)
++}
++
++func TestApplyPrecomputedArtifactsRejectsWrongRootHash(t *testing.T) {
++	ctx := context.Background()
++	sourceDigest := digest.FromString("source layer")
++	data := testEROFSData(sourceDigest)
++	sourceDataPath := filepath.Join(t.TempDir(), "source.erofs")
++	sourceTreePath := filepath.Join(t.TempDir(), "source.hashtree")
++	require.NoError(t, os.WriteFile(sourceDataPath, data, 0600))
++	require.NoError(t, os.WriteFile(sourceTreePath, nil, 0600))
++	opts := dmverity.DefaultDmverityOptions()
++	opts.DataBlockSize = 512
++	opts.HashBlockSize = 512
++	opts.HashOffset = 512
++	opts.UUID = "11111111-1111-1111-1111-111111111111"
++	_, err := dmverity.Format(sourceDataPath, sourceTreePath, opts)
++	require.NoError(t, err)
++	tree, err := os.ReadFile(sourceTreePath)
++	require.NoError(t, err)
++
++	cs, err := local.NewStore(t.TempDir())
++	require.NoError(t, err)
++	erofsDesc := writeTestBlob(t, ctx, cs, data, snapshotters.EROFSArtifactMediaType)
++	treeDesc := writeTestBlob(t, ctx, cs, tree, snapshotters.MerkleTreeArtifactMediaType)
++	sourceDesc := descriptorWithPrecomputedArtifacts(t, sourceDigest, erofsDesc, treeDesc, digest.FromString("wrong root").Hex())
++
++	layerBlobPath := filepath.Join(t.TempDir(), "layer.erofs")
++	differ := erofsDiff{store: cs, enableDmverity: true}
++	_, err = differ.applyPrecomputedArtifacts(ctx, sourceDesc, layerBlobPath)
++	require.Error(t, err)
++	assert.Contains(t, err.Error(), "failed dm-verity verification")
++	_, statErr := os.Stat(layerBlobPath)
++	assert.ErrorIs(t, statErr, os.ErrNotExist)
++	_, statErr = os.Stat(dmverity.HashDevicePath(layerBlobPath))
++	assert.ErrorIs(t, statErr, os.ErrNotExist)
++}
++
++func TestApplyPrecomputedArtifactsRejectsSourceLayerSubstitution(t *testing.T) {
++	ctx := context.Background()
++	artifactSourceDigest := digest.FromString("artifact source layer")
++	requestedSourceDigest := digest.FromString("requested source layer")
++	data := testEROFSData(artifactSourceDigest)
++	sourceDataPath := filepath.Join(t.TempDir(), "source.erofs")
++	sourceTreePath := filepath.Join(t.TempDir(), "source.hashtree")
++	require.NoError(t, os.WriteFile(sourceDataPath, data, 0600))
++	require.NoError(t, os.WriteFile(sourceTreePath, nil, 0600))
++	opts := dmverity.DefaultDmverityOptions()
++	opts.DataBlockSize = 512
++	opts.HashBlockSize = 512
++	opts.HashOffset = 512
++	opts.UUID = "11111111-1111-1111-1111-111111111111"
++	rootHash, err := dmverity.Format(sourceDataPath, sourceTreePath, opts)
++	require.NoError(t, err)
++	tree, err := os.ReadFile(sourceTreePath)
++	require.NoError(t, err)
++
++	cs, err := local.NewStore(t.TempDir())
++	require.NoError(t, err)
++	erofsDesc := writeTestBlob(t, ctx, cs, data, snapshotters.EROFSArtifactMediaType)
++	treeDesc := writeTestBlob(t, ctx, cs, tree, snapshotters.MerkleTreeArtifactMediaType)
++	sourceDesc := descriptorWithPrecomputedArtifacts(t, requestedSourceDigest, erofsDesc, treeDesc, rootHash)
++
++	differ := erofsDiff{store: cs, enableDmverity: true}
++	_, err = differ.applyPrecomputedArtifacts(ctx, sourceDesc, filepath.Join(t.TempDir(), "layer.erofs"))
++	require.ErrorContains(t, err, "does not match expected source-layer UUID")
++}
++
++func writeTestBlob(t *testing.T, ctx context.Context, cs content.Store, data []byte, mediaType string) ocispec.Descriptor {
++	t.Helper()
++	desc := ocispec.Descriptor{
++		MediaType: mediaType,
++		Digest:    digest.FromBytes(data),
++		Size:      int64(len(data)),
++	}
++	require.NoError(t, content.WriteBlob(ctx, cs, "precomputed-"+desc.Digest.Encoded()[:12], bytes.NewReader(data), desc))
++	return desc
++}
++
++func descriptorWithPrecomputedArtifacts(t *testing.T, sourceDigest digest.Digest, erofsDesc, treeDesc ocispec.Descriptor, rootHash string) ocispec.Descriptor {
++	t.Helper()
++	encodedEROFSBytes, err := json.Marshal(erofsDesc)
++	require.NoError(t, err)
++	encodedTreeBytes, err := json.Marshal(treeDesc)
++	require.NoError(t, err)
++	return ocispec.Descriptor{
++		Digest: sourceDigest,
++		Annotations: map[string]string{
++			snapshotters.TargetLayerEROFSDescriptorLabel:      string(encodedEROFSBytes),
++			snapshotters.TargetLayerMerkleTreeDescriptorLabel: string(encodedTreeBytes),
++			snapshotters.TargetLayerRootHashLabel:             rootHash,
++		},
++	}
++}
++
++func testEROFSData(sourceDigest digest.Digest) []byte {
++	data := bytes.Repeat([]byte("precomputed-erofs-"), 4096)
++	binary.LittleEndian.PutUint32(data[erofsSuperOffset:], erofsMagic)
++	expectedUUID := uuid.NewSHA1(uuid.NameSpaceURL, []byte("erofs:blobs/"+sourceDigest.String()))
++	copy(data[erofsSuperOffset+erofsUUIDOffset:erofsSuperOffset+erofsUUIDEnd], expectedUUID[:])
++	return data
++}
+diff --git a/plugins/mount/erofs/plugin_linux.go b/plugins/mount/erofs/plugin_linux.go
+index b63a4da0b..728c800ec 100644
+--- a/plugins/mount/erofs/plugin_linux.go
++++ b/plugins/mount/erofs/plugin_linux.go
+@@ -96,7 +96,8 @@ func openOrReuseDmverityDevice(ctx context.Context, source, deviceName string, m
+ 		"hash-offset": metadata.HashOffset,
+ 	}).Debug("opening dm-verity device")
+ 
+-	devicePath, err := dmverity.OpenWithSignature(source, deviceName, source, metadata.RootHash, metadata.HashOffset, nil, signatureFile)
++	hashDevice := dmverity.ResolveHashDevice(source, metadata)
++	devicePath, err := dmverity.OpenWithSignature(source, deviceName, hashDevice, metadata.RootHash, metadata.HashOffset, nil, signatureFile)
+ 	if err != nil {
+ 		return "", fmt.Errorf("failed to open dm-verity device: %w", err)
+ 	}

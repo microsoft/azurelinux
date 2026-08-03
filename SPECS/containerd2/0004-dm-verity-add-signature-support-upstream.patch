@@ -1,0 +1,5715 @@
+From: Aadhar Agarwal <aadagarwal@microsoft.com>
+Subject: [PATCH] erofs: add dm-verity signature support
+
+Aggregate of Aadhar Agarwal's dm-verity/signature work through containerd
+commit 55df3ca38, ported to containerd v2.2.4 plus the Azure Linux Patch0-7
+baseline. Contains no ACL changes.
+
+Generated from the ACL containerd branch, tag acl/platform-v2.2.4.
+
+Corrections folded in relative to the upstream branch:
+  - Canonical referrer strings in pkg/snapshotters/signatures.go
+    (containerd.io/dmverity/layer-*, io.cncf.notary.dmverity.layer-*,
+    application/vnd.cncf.notary.dmverity.v1) replacing placeholders.
+  - Deterministic superblock UUID in plugins/diff/erofs/dmverity_linux.go
+    (uuid.New() removed) so formatted blobs are reproducible.
+  - Dropped an orphaned "time" import in plugins/snapshots/erofs/erofs.go.
+    It was an artifact of how this patch used to be generated (reverting
+    the ACL changes out of a combined tree) and made the patch fail to
+    compile on its own. Its consumer is in Patch9.
+
+Security corrections folded in (review of the ACL series):
+  - Fail closed when dm-verity metadata is present but unusable. The mount
+    handler and the snapshotter's applyDmverityPolicy both treated any
+    ReadMetadata failure as "this layer has no dm-verity" and fell through
+    to a plain EROFS mount, so corrupting one sidecar silently downgraded a
+    protected layer. Absent metadata (ENOENT) still mounts plainly under
+    mode "auto"; unparseable metadata is now an error. applyDmverityPolicy
+    also parses the sidecar rather than stat'ing it, so mode "on" can no
+    longer be satisfied by a truncated file.
+  - Verify an existing dm-verity device before reusing it. Device-mapper
+    names are host-global while snapshot IDs are only unique within a
+    snapshotter root, so the reuse path could adopt an unrelated mapper.
+    It now calls dmverity.VerifyDevice against the expected root hash.
+  - Apply dm-verity hash-tree formatting to native EROFS layers. The native
+    branch in plugins/diff/erofs/differ.go returned before formatting, letting
+    a registry opt out simply by publishing its layers with an EROFS media
+    type. (Signature enforcement for that branch arrives with Patch10, which
+    is where writeLayerSignature is introduced.)
+  - Never wrap a dm-verity mapper in a loop device. Once forceloop latches --
+    which happens on any kernel without file-backed EROFS mounts (< 6.12) as
+    soon as one plain EROFS layer is mounted -- the handler rewrote m.Source
+    from /dev/mapper/containerd-erofs-<id> to /dev/loopN. Unmount identifies
+    the device to tear down from the mount source, so it no longer recognised
+    the mapper and dmverity.Close was never called, leaking the device and the
+    loops it holds on every unmount.
+  - Serialize the dm-verity device existence check against creation. Mapper
+    names are derived from the snapshot ID, so two concurrent mounts of the
+    same layer -- routine when several pods start from one image -- could both
+    see the device as absent and both try to create it. The loser's
+    DM_DEV_CREATE fails on the taken name, and go-dmverity's cleanup then
+    removes the winner's device out from under a live mount.
+  - Pin the goroutine to its OS thread while opening a signed device.
+    go-dmverity loads the root-hash signature into KEY_SPEC_THREAD_KEYRING and
+    names it in the device-mapper table, and the kernel resolves that name
+    against the calling thread's keyrings. Go may reschedule the goroutine onto
+    another thread between the add_key and the ioctls, which rejects a valid
+    signature and leaks the key because the deferred unlink misses too.
+  - Reject require_signatures=true combined with enable_dmverity=false at
+    plugin init. require_signatures is only honoured inside the dm-verity
+    block, so the combination gave an operator who asked for mandatory
+    signatures no enforcement at all.
+
+Removed relative to the previously shipped generation of this patch:
+  - IPE policy introspection (ipeRequiresDmveritySignatures and friends in
+    plugins/diff/erofs/). That is ACL code, not Aadhar's, and it leaked in
+    because the old patch was produced by reverting ACL changes out of a
+    combined tree rather than by exporting a commit. Containerd no longer
+    parses IPE policy at all; the kernel alone interprets it. See PATCHES.md.
+
+Expected to be dropped once add-signature-support lands in azurelinux.
+
+---
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 62254cd50..828665741 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -456,6 +456,10 @@ jobs:
+         run: |
+           sudo modprobe erofs
+ 
++      - name: Load dm-verity kernel module
++        run: |
++          sudo modprobe dm_verity
++
+       - name: Install containerd
+         env:
+           CGO_ENABLED: 1
+diff --git a/core/transfer/local/pull.go b/core/transfer/local/pull.go
+index 712e81e20..d884d79f0 100644
+--- a/core/transfer/local/pull.go
++++ b/core/transfer/local/pull.go
+@@ -224,6 +224,9 @@ func (ts *localTransferService) pull(ctx context.Context, ir transfer.ImageFetch
+ 			if enableRemoteSnapshotAnnotations {
+ 				handler = snpkg.AppendInfoHandlerWrapper(name)(handler)
+ 			}
++			// Always fetch signatures if available - the handler is a no-op if no referrers exist.
++			// The snapshotter decides whether to use them during mount.
++			handler = snpkg.AppendSignatureHandlerWrapper(fetcher)(handler)
+ 
+ 			unpacker, err = unpack.NewUnpacker(ctx, ts.content, uopts...)
+ 			if err != nil {
+diff --git a/docs/snapshotters/erofs.md b/docs/snapshotters/erofs.md
+index b42a8476b..6ca2baf9b 100644
+--- a/docs/snapshotters/erofs.md
++++ b/docs/snapshotters/erofs.md
+@@ -148,7 +148,7 @@ quota.  The `default_size` option can be used in the containerd configuration:
+ 
+ ## Data Integrity
+ 
+-The EROFS snapshotter provides two methods to consolidate data integrity:
++The EROFS snapshotter provides three methods to consolidate data integrity:
+ 
+ ### Data Integrity with Immutable File Attribute
+ 
+@@ -178,6 +178,58 @@ introduces additional runtime overhead since all container image reads from
+ the container will be slower because it needs to verify the Merkle hash tree
+ first.
+ 
++### Data Integrity with dm-verity
++
++The EROFS snapshotter supports device-mapper verity to provide block-level integrity
++verification for each EROFS layer. This method creates a dm-verity device for each
++layer and mounts it read-only. The dm-verity implementation uses the `go-dmverity`
++Go library, eliminating the need for external `veritysetup` command-line tools.
++This requires a Linux kernel with dm-verity support (CONFIG_DM_VERITY) and the
++device-mapper kernel module loaded.
++
++The differ must be configured to generate dm-verity metadata:
++
++```toml
++[plugins."io.containerd.differ.v1.erofs"]
++  enable_dmverity = true
++```
++
++When dm-verity is enabled, the EROFS differ formats each layer with dm-verity
++by appending a Merkle hash tree to the EROFS blob and generating a root hash.
++The hash tree is stored inline within the layer blob itself.
++The root hash and hash offset are saved in a `.dmverity` metadata file alongside the
++layer blob in JSON format. All other dm-verity parameters (block sizes, salt, etc.)
++are stored in a superblock within the layer blob and are auto-detected when mounting.
++Regular mode uses 4096-byte blocks (standard page size), while tar-index mode uses
++512-byte blocks (dm-verity logical_block_size constraint).
++
++The snapshotter can be configured to control dm-verity behavior using `dmverity_mode`:
++
++```toml
++[plugins."io.containerd.snapshotter.v1.erofs"]
++  dmverity_mode = "auto"  # Options: "auto" (default), "on", "off"
++```
++
++The available modes are:
++
++- `"auto"` (default): Uses dm-verity if `.dmverity` metadata exists for a layer,
++  otherwise mounts as regular EROFS. This allows mixing dm-verity and non-dm-verity
++  layers in the same system.
++
++- `"on"`: Requires dm-verity for all layers. If a layer lacks `.dmverity` metadata,
++  mounting will fail with an error. Use this mode when you want to enforce integrity
++  verification for all layers.
++
++- `"off"`: Disables dm-verity completely, even if `.dmverity` metadata exists.
++  Layers are mounted as regular EROFS without integrity verification. Use this for
++  compatibility or when dm-verity overhead is unacceptable.
++
++When mounting a layer with dm-verity enabled, the snapshotter reads the metadata
++from the `.dmverity` file and creates a dm-verity device. The dm-verity library
++automatically reads all parameters from the superblock, ensuring that any corruption
++or tampering will be detected at read time. The dm-verity device is then mounted as
++the backing layer in the OverlayFS stack
++
+ ## How It Works
+ 
+ For each layer, the EROFS snapshotter prepares a directory containing the
+@@ -204,9 +256,19 @@ In this case, the snapshot layer directory will look like this:
+   work
+ ```
+ 
++If dm-verity is enabled, a `.dmverity` metadata file will also be present:
++```
++  .erofslayer
++  fs
++  layer.erofs
++  layer.erofs.dmverity
++  work
++```
++
+ Then the EROFS snapshotter will check for the existence of `layer.erofs`: it
+ will mount the EROFS layer blob to `fs/` and return a valid overlayfs mount
+-with all parent layers.
++with all parent layers. If dm-verity is enabled and the `.dmverity` file exists,
++the snapshotter will create a dm-verity device and mount that instead.
+ 
+ If other differs (not the EROFS differ) are used, the EROFS snapshotter will
+ convert the flat directory into an EROFS layer blob on Commit instead.
+@@ -242,5 +304,3 @@ For the EROFS differ:
+  - EROFS Flatten filesystem support (EROFS fsmerge feature);
+ 
+  - ID-mapped mount spport;
+-
+- - DMVerity support.
+diff --git a/go.mod b/go.mod
+index 0eb18826d..f1e9e8fad 100644
+--- a/go.mod
++++ b/go.mod
+@@ -18,6 +18,7 @@ require (
+ 	github.com/containerd/errdefs/pkg v0.3.0
+ 	github.com/containerd/fifo v1.1.0
+ 	github.com/containerd/go-cni v1.1.13
++	github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33
+ 	github.com/containerd/go-runc v1.1.0
+ 	github.com/containerd/imgcrypt/v2 v2.0.1
+ 	github.com/containerd/log v0.1.0
+diff --git a/go.sum b/go.sum
+index 27c765493..a5e7cfd6f 100644
+--- a/go.sum
++++ b/go.sum
+@@ -53,6 +53,8 @@ github.com/containerd/fifo v1.1.0 h1:4I2mbh5stb1u6ycIABlBw9zgtlK8viPI9QkQNRQEEmY
+ github.com/containerd/fifo v1.1.0/go.mod h1:bmC4NWMbXlt2EZ0Hc7Fx7QzTFxgPID13eH0Qu+MAb2o=
+ github.com/containerd/go-cni v1.1.13 h1:eFSGOKlhoYNxpJ51KRIMHZNlg5UgocXEIEBGkY7Hnis=
+ github.com/containerd/go-cni v1.1.13/go.mod h1:nTieub0XDRmvCZ9VI/SBG6PyqT95N4FIhxsauF1vSBI=
++github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33 h1:uBWSkYhocTHv/UYSMPMScQl4nbSNtaCVA8EXJ/i+ZOw=
++github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33/go.mod h1:Su0PfhcZ1JsxHWSk8lTncpzC28QO2W6cvaWx7WkjQuo=
+ github.com/containerd/go-runc v1.1.0 h1:OX4f+/i2y5sUT7LhmcJH7GYrjjhHa1QI4e8yO0gGleA=
+ github.com/containerd/go-runc v1.1.0/go.mod h1:xJv2hFF7GvHtTJd9JqTS2UVxMkULUYw4JN5XAUZqH5U=
+ github.com/containerd/imgcrypt/v2 v2.0.1 h1:gQcmeCKA97fAl0wlpq0itSY/PagFBsn4/mlKUy6kOio=
+diff --git a/internal/cri/server/images/image_pull.go b/internal/cri/server/images/image_pull.go
+index c04a2652e..6a0d50a72 100644
+--- a/internal/cri/server/images/image_pull.go
++++ b/internal/cri/server/images/image_pull.go
+@@ -272,6 +272,10 @@ func (c *CRIImageService) pullImageWithLocalPull(
+ 		pullOpts = append(pullOpts,
+ 			containerd.WithImageHandlerWrapper(snpkg.AppendInfoHandlerWrapper(ref)))
+ 	}
++	// Always fetch signatures if available - the handler is a no-op if no referrers exist.
++	// The snapshotter decides whether to use them during mount.
++	pullOpts = append(pullOpts,
++		containerd.WithImageHandlerWrapper(snpkg.AppendSignatureHandlerWrapperFromResolver(resolver, ref)))
+ 
+ 	if c.config.DiscardUnpackedLayers {
+ 		// Allows GC to clean layers up from the content store after unpacking
+@@ -285,6 +289,7 @@ func (c *CRIImageService) pullImageWithLocalPull(
+ 	if err != nil {
+ 		return nil, fmt.Errorf("failed to pull and unpack image %q: %w", ref, err)
+ 	}
++
+ 	return image, nil
+ }
+ 
+diff --git a/internal/dmverity/dmverity.go b/internal/dmverity/dmverity.go
+new file mode 100644
+index 000000000..12b6a9895
+--- /dev/null
++++ b/internal/dmverity/dmverity.go
+@@ -0,0 +1,109 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++// Package dmverity provides functions for working with dm-verity for integrity verification
++// using the veritysetup-go library
++package dmverity
++
++import (
++	"encoding/base64"
++	"encoding/json"
++	"fmt"
++	"os"
++)
++
++type DmverityOptions struct {
++	// Salt for hashing, represented as a hex string
++	Salt string
++	// Hash algorithm to use (default: sha256)
++	HashAlgorithm string
++	// Size of data blocks in bytes (default: 4096)
++	DataBlockSize uint32
++	// Size of hash blocks in bytes (default: 4096)
++	HashBlockSize uint32
++	// Number of data blocks
++	DataBlocks uint64
++	// Offset of hash area in bytes
++	HashOffset uint64
++	// Hash type (default: 1)
++	HashType uint32
++	// NoSuperblock disables superblock usage (matches library's NoSuperblock field)
++	NoSuperblock bool
++	// UUID for device to use
++	UUID string
++}
++
++func DefaultDmverityOptions() *DmverityOptions {
++	return &DmverityOptions{
++		Salt:          "0000000000000000000000000000000000000000000000000000000000000000",
++		HashAlgorithm: "sha256",
++		DataBlockSize: 4096,
++		HashBlockSize: 4096,
++		HashType:      1,
++		NoSuperblock:  false, // By default, use superblock
++	}
++}
++
++func MetadataPath(layerBlobPath string) string {
++	return layerBlobPath + ".dmverity"
++}
++
++// SignaturePath returns the path to the dm-verity signature file for a layer.
++// The signature file contains the base64-encoded PKCS7 signature for root hash verification.
++func SignaturePath(layerBlobPath string) string {
++	return layerBlobPath + ".sig"
++}
++
++// WriteSignature writes a base64-encoded signature to the signature file for a layer.
++func WriteSignature(layerBlobPath string, base64Sig string) error {
++	sigPath := SignaturePath(layerBlobPath)
++	sigBytes, err := base64.StdEncoding.DecodeString(base64Sig)
++	if err != nil {
++		return fmt.Errorf("failed to decode signature: %w", err)
++	}
++	if err := os.WriteFile(sigPath, sigBytes, 0644); err != nil {
++		return fmt.Errorf("failed to write signature file: %w", err)
++	}
++	return nil
++}
++
++func DevicePath(name string) string {
++	return fmt.Sprintf("/dev/mapper/%s", name)
++}
++
++type DmverityMetadata struct {
++	RootHash   string `json:"roothash"`
++	HashOffset uint64 `json:"hashoffset"`
++}
++
++func ReadMetadata(layerBlobPath string) (*DmverityMetadata, error) {
++	metadataPath := MetadataPath(layerBlobPath)
++	data, err := os.ReadFile(metadataPath)
++	if err != nil {
++		return nil, fmt.Errorf("metadata file not found at %q: %w", metadataPath, err)
++	}
++
++	var metadata DmverityMetadata
++	if err := json.Unmarshal(data, &metadata); err != nil {
++		return nil, fmt.Errorf("failed to parse metadata file %q: %w", metadataPath, err)
++	}
++
++	if metadata.RootHash == "" {
++		return nil, fmt.Errorf("missing root hash in metadata file %q", metadataPath)
++	}
++
++	return &metadata, nil
++}
+diff --git a/internal/dmverity/dmverity_linux.go b/internal/dmverity/dmverity_linux.go
+new file mode 100644
+index 000000000..735cc6d34
+--- /dev/null
++++ b/internal/dmverity/dmverity_linux.go
+@@ -0,0 +1,229 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import (
++	"bytes"
++	"fmt"
++	"os"
++	"runtime"
++
++	"github.com/containerd/containerd/v2/core/mount"
++	"github.com/containerd/go-dmverity/pkg/utils"
++	"github.com/containerd/go-dmverity/pkg/verity"
++)
++
++func IsSupported() (bool, error) {
++	moduleData, err := os.ReadFile("/proc/modules")
++	if err != nil {
++		return false, fmt.Errorf("failed to read /proc/modules: %w", err)
++	}
++	if !bytes.Contains(moduleData, []byte("dm_verity")) {
++		return false, fmt.Errorf("dm_verity module not loaded")
++	}
++
++	return true, nil
++}
++
++func convertToVerityParams(opts *DmverityOptions) (verity.Params, error) {
++	params := verity.DefaultParams()
++
++	if opts != nil {
++		if opts.HashAlgorithm != "" {
++			params.HashName = opts.HashAlgorithm
++		}
++		if opts.DataBlockSize > 0 {
++			params.DataBlockSize = opts.DataBlockSize
++		}
++		if opts.HashBlockSize > 0 {
++			params.HashBlockSize = opts.HashBlockSize
++		}
++		if opts.DataBlocks > 0 {
++			params.DataBlocks = opts.DataBlocks
++		}
++		if opts.HashOffset > 0 {
++			params.HashAreaOffset = opts.HashOffset
++		}
++		if opts.HashType > 0 {
++			params.HashType = opts.HashType
++		}
++
++		if opts.Salt != "" {
++			salt, saltSize, err := utils.ApplySalt(opts.Salt, 256)
++			if err != nil {
++				return params, fmt.Errorf("invalid salt: %w", err)
++			}
++			params.Salt = salt
++			params.SaltSize = saltSize
++		}
++
++		if opts.UUID != "" {
++			uuidBytes, err := utils.ApplyUUID(opts.UUID, false, opts.NoSuperblock, nil)
++			if err != nil {
++				return params, fmt.Errorf("invalid UUID: %w", err)
++			}
++			params.UUID = uuidBytes
++		}
++
++		params.NoSuperblock = opts.NoSuperblock
++	}
++
++	return params, nil
++}
++
++// Format creates a dm-verity hash for a data device and returns the root hash.
++// If hashDevice is the same as dataDevice, the hash will be stored on the same device.
++func Format(dataDevice, hashDevice string, opts *DmverityOptions) (string, error) {
++	if opts == nil {
++		opts = DefaultDmverityOptions()
++	}
++
++	params, err := convertToVerityParams(opts)
++	if err != nil {
++		return "", fmt.Errorf("failed to convert options: %w", err)
++	}
++
++	if params.DataBlocks == 0 {
++		size, err := utils.GetBlockOrFileSize(dataDevice)
++		if err != nil {
++			return "", fmt.Errorf("failed to get device size: %w", err)
++		}
++		params.DataBlocks = uint64(size / int64(params.DataBlockSize))
++	}
++
++	// IMPORTANT: This may modify params.HashAreaOffset when using superblock mode
++	rootDigest, err := verity.Create(&params, dataDevice, hashDevice)
++	if err != nil {
++		return "", fmt.Errorf("failed to format dm-verity device: %w", err)
++	}
++
++	return fmt.Sprintf("%x", rootDigest), nil
++}
++
++// Open creates a read-only device-mapper target for transparent integrity verification.
++// It supports both superblock and no-superblock modes:
++//
++//   - Superblock mode (opts == nil or opts.NoSuperblock == false):
++//     Reads dm-verity parameters from the superblock at the specified hashOffset.
++//     Only rootHash needs to be provided; all other parameters are read from the device.
++//     Use hashOffset to specify where the superblock is located (required when hash tree
++//     is stored in the same file as data).
++//
++//   - No-superblock mode (opts != nil and opts.NoSuperblock == true):
++//     Uses explicitly provided parameters from opts. All dm-verity parameters must be
++//     supplied programmatically since there's no superblock to read from.
++func Open(dataDevice string, name string, hashDevice string, rootHash string, hashOffset uint64, opts *DmverityOptions) (string, error) {
++	return OpenWithSignature(dataDevice, name, hashDevice, rootHash, hashOffset, opts, "")
++}
++
++// OpenWithSignature creates a read-only device-mapper target with optional signature verification.
++// When signatureFile is provided, dm-verity will verify the root hash signature using the kernel keyring.
++// This provides cryptographic proof that the root hash hasn't been tampered with.
++func OpenWithSignature(dataDevice string, name string, hashDevice string, rootHash string, hashOffset uint64, opts *DmverityOptions, signatureFile string) (string, error) {
++	if rootHash == "" {
++		return "", fmt.Errorf("rootHash cannot be empty")
++	}
++
++	rootDigest, err := utils.ParseRootHash(rootHash)
++	if err != nil {
++		return "", fmt.Errorf("invalid root hash: %w", err)
++	}
++
++	var params verity.Params
++
++	if opts != nil && opts.NoSuperblock {
++		params, err = convertToVerityParams(opts)
++		if err != nil {
++			return "", fmt.Errorf("failed to convert options: %w", err)
++		}
++	} else {
++		params = verity.DefaultParams()
++		params.HashAreaOffset = hashOffset
++	}
++
++	loopParams := mount.LoopParams{
++		Readonly:  true,
++		Autoclear: false, // Don't use autoclear - dm-verity needs the loop device to stay active
++	}
++
++	dataLoop, err := mount.SetupLoop(dataDevice, loopParams)
++	if err != nil {
++		return "", fmt.Errorf("failed to setup loop device for data: %w", err)
++	}
++	dataLoopDevice := dataLoop.Name()
++
++	var hashLoop *os.File
++	var hashLoopDevice string
++	if hashDevice != dataDevice {
++		hashLoop, err = mount.SetupLoop(hashDevice, loopParams)
++		if err != nil {
++			dataLoop.Close()
++			mount.DetachLoopDevice(dataLoopDevice)
++			return "", fmt.Errorf("failed to setup loop device for hash: %w", err)
++		}
++		hashLoopDevice = hashLoop.Name()
++	} else {
++		hashLoopDevice = dataLoopDevice
++	}
++
++	// go-dmverity loads the root-hash signature into KEY_SPEC_THREAD_KEYRING and
++	// then names it in the device-mapper table, which the kernel resolves against
++	// the calling thread's keyrings. Go is free to reschedule this goroutine onto
++	// a different OS thread between the add_key and the DM ioctls, and that thread
++	// cannot see the key -- so a perfectly valid signature is rejected, and the
++	// deferred unlink misses too, leaking the key. Pin the goroutine across the
++	// call. verity.Open is fully synchronous, so this covers the whole sequence.
++	if signatureFile != "" {
++		runtime.LockOSThread()
++		defer runtime.UnlockOSThread()
++	}
++
++	devicePath, err := verity.Open(&params, name, dataLoopDevice, hashLoopDevice, rootDigest, signatureFile, nil)
++	if err != nil {
++		dataLoop.Close()
++		mount.DetachLoopDevice(dataLoopDevice)
++		if hashLoop != nil {
++			hashLoop.Close()
++			mount.DetachLoopDevice(hashLoopDevice)
++		}
++		return "", fmt.Errorf("failed to open dm-verity device: %w", err)
++	}
++
++	return devicePath, nil
++}
++
++func Close(name string) error {
++	if err := verity.Close(name); err != nil {
++		return fmt.Errorf("failed to close dm-verity device: %w", err)
++	}
++	return nil
++}
++
++// VerifyDevice ensures an existing dm-verity device matches the expected metadata and is healthy.
++func VerifyDevice(name string, rootHash string) error {
++	rootDigest, err := utils.ParseRootHash(rootHash)
++	if err != nil {
++		return fmt.Errorf("invalid root hash: %w", err)
++	}
++
++	// Use library's Check to verify device status and root hash
++	if !verity.Check(name, rootDigest) {
++		return fmt.Errorf("dm-verity device %q verification failed", name)
++	}
++
++	return nil
++}
+diff --git a/internal/dmverity/dmverity_other.go b/internal/dmverity/dmverity_other.go
+new file mode 100644
+index 000000000..20aae06e9
+--- /dev/null
++++ b/internal/dmverity/dmverity_other.go
+@@ -0,0 +1,47 @@
++//go:build !linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import "fmt"
++
++var errUnsupported = fmt.Errorf("dmverity is only supported on Linux systems")
++
++func IsSupported() (bool, error) {
++	return false, errUnsupported
++}
++
++func Format(_ string, _ string, _ *DmverityOptions) (string, error) {
++	return "", errUnsupported
++}
++
++func Open(_ string, _ string, _ string, _ string, _ uint64, _ *DmverityOptions) (string, error) {
++	return "", errUnsupported
++}
++
++func OpenWithSignature(_ string, _ string, _ string, _ string, _ uint64, _ *DmverityOptions, _ string) (string, error) {
++	return "", errUnsupported
++}
++
++func Close(_ string) error {
++	return errUnsupported
++}
++
++func VerifyDevice(_ string, _ string) error {
++	return errUnsupported
++}
+diff --git a/internal/dmverity/dmverity_test.go b/internal/dmverity/dmverity_test.go
+new file mode 100644
+index 000000000..15d08c0e2
+--- /dev/null
++++ b/internal/dmverity/dmverity_test.go
+@@ -0,0 +1,387 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dmverity
++
++import (
++	"os"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/containerd/containerd/v2/core/mount"
++	"github.com/containerd/containerd/v2/pkg/testutil"
++	"github.com/docker/go-units"
++	"github.com/stretchr/testify/assert"
++)
++
++const (
++	testDeviceName = "test-verity-device"
++)
++
++func TestDMVerity(t *testing.T) {
++	testutil.RequiresRoot(t)
++
++	supported, err := IsSupported()
++	if !supported || err != nil {
++		t.Skipf("dm-verity is not supported on this system: %v", err)
++	}
++
++	t.Run("IsSupported", func(t *testing.T) {
++		supported, err := IsSupported()
++		assert.True(t, supported)
++		assert.NoError(t, err)
++	})
++
++	t.Run("WithSuperblock", func(t *testing.T) {
++		t.Run("SameDevice", func(t *testing.T) {
++			tempDir := t.TempDir()
++			_, loopDevice := createLoopbackDevice(t, tempDir, "1Mb")
++			defer func() {
++				assert.NoError(t, mount.DetachLoopDevice(loopDevice))
++			}()
++
++			opts := testOptions(true, 1048576)
++
++			// Format with superblock - data and hash on same device
++			rootHash, err := Format(loopDevice, loopDevice, &opts)
++			assert.NoError(t, err)
++			assert.NotEmpty(t, rootHash)
++
++			// Open with superblock mode - provide hashOffset, opts is nil
++			deviceName := testDeviceName + "-sb-same"
++			devicePath, err := Open(loopDevice, deviceName, loopDevice, rootHash, opts.HashOffset, nil)
++			assert.NoError(t, err)
++			assert.Equal(t, "/dev/mapper/"+deviceName, devicePath)
++
++			waitForDevice(t, devicePath)
++
++			// Close device
++			err = Close(deviceName)
++			assert.NoError(t, err)
++
++			// Verify device is removed
++			_, err = os.Stat(devicePath)
++			assert.True(t, os.IsNotExist(err))
++		})
++
++		t.Run("SeparateDevices", func(t *testing.T) {
++			tempDir := t.TempDir()
++			_, dataDevice := createLoopbackDevice(t, tempDir, "1Mb")
++			_, hashDevice := createLoopbackDevice(t, tempDir, "512Kb")
++			defer func() {
++				assert.NoError(t, mount.DetachLoopDevice(dataDevice))
++				assert.NoError(t, mount.DetachLoopDevice(hashDevice))
++			}()
++
++			// HashOffset is REQUIRED even for separate devices when using superblock.
++			// Typically 4096 bytes (one block) is sufficient for superblock metadata.
++			opts := testOptions(true, 4096)
++			opts.UUID = "12345678-1234-5678-9012-123456789012" // Different UUID for variety
++
++			// Format with superblock - data and hash on separate devices
++			rootHash, err := Format(dataDevice, hashDevice, &opts)
++			assert.NoError(t, err)
++			assert.NotEmpty(t, rootHash)
++
++			// Open with superblock mode - separate devices
++			deviceName := testDeviceName + "-sb-sep"
++			devicePath, err := Open(dataDevice, deviceName, hashDevice, rootHash, opts.HashOffset, nil)
++			assert.NoError(t, err)
++			assert.Equal(t, "/dev/mapper/"+deviceName, devicePath)
++
++			waitForDevice(t, devicePath)
++
++			// Close device
++			err = Close(deviceName)
++			assert.NoError(t, err)
++
++			// Verify device is removed
++			_, err = os.Stat(devicePath)
++			assert.True(t, os.IsNotExist(err))
++		})
++	})
++
++	t.Run("NoSuperblock", func(t *testing.T) {
++		t.Run("SameDevice", func(t *testing.T) {
++			tempDir := t.TempDir()
++			_, loopDevice := createLoopbackDevice(t, tempDir, "1Mb")
++			defer func() {
++				assert.NoError(t, mount.DetachLoopDevice(loopDevice))
++			}()
++
++			opts := testOptions(false, 1048576)
++
++			// Format without superblock - data and hash on same device
++			rootHash, err := Format(loopDevice, loopDevice, &opts)
++			assert.NoError(t, err)
++			assert.NotEmpty(t, rootHash)
++
++			// Open with no-superblock mode - provide opts with NoSuperblock=true
++			deviceName := testDeviceName + "-nosb-same"
++			devicePath, err := Open(loopDevice, deviceName, loopDevice, rootHash, 0, &opts)
++			assert.NoError(t, err)
++			assert.Equal(t, "/dev/mapper/"+deviceName, devicePath)
++
++			waitForDevice(t, devicePath)
++
++			// Close device
++			err = Close(deviceName)
++			assert.NoError(t, err)
++
++			// Verify device is removed
++			_, err = os.Stat(devicePath)
++			assert.True(t, os.IsNotExist(err))
++		})
++
++		t.Run("SeparateDevices", func(t *testing.T) {
++			tempDir := t.TempDir()
++			_, dataDevice := createLoopbackDevice(t, tempDir, "1Mb")
++			_, hashDevice := createLoopbackDevice(t, tempDir, "512Kb")
++			defer func() {
++				assert.NoError(t, mount.DetachLoopDevice(dataDevice))
++				assert.NoError(t, mount.DetachLoopDevice(hashDevice))
++			}()
++
++			opts := testOptions(false, 0) // Hash device is separate, starts at offset 0
++
++			// Format without superblock - data and hash on separate devices
++			rootHash, err := Format(dataDevice, hashDevice, &opts)
++			assert.NoError(t, err)
++			assert.NotEmpty(t, rootHash)
++
++			// Open with no-superblock mode - separate devices
++			deviceName := testDeviceName + "-nosb-sep"
++			devicePath, err := Open(dataDevice, deviceName, hashDevice, rootHash, 0, &opts)
++			assert.NoError(t, err)
++			assert.Equal(t, "/dev/mapper/"+deviceName, devicePath)
++
++			waitForDevice(t, devicePath)
++
++			// Close device
++			err = Close(deviceName)
++			assert.NoError(t, err)
++
++			// Verify device is removed
++			_, err = os.Stat(devicePath)
++			assert.True(t, os.IsNotExist(err))
++		})
++	})
++}
++
++func createLoopbackDevice(t *testing.T, dir string, size string) (string, string) {
++	t.Helper()
++	file, err := os.CreateTemp(dir, "dmverity-tests-")
++	assert.NoError(t, err)
++
++	sizeInBytes, err := units.RAMInBytes(size)
++	assert.NoError(t, err)
++
++	err = file.Truncate(sizeInBytes * 2)
++	assert.NoError(t, err)
++
++	err = file.Close()
++	assert.NoError(t, err)
++
++	imagePath := file.Name()
++
++	loopDevice, err := mount.AttachLoopDevice(imagePath)
++	assert.NoError(t, err)
++
++	return imagePath, loopDevice
++}
++
++// waitForDevice waits for a device-mapper device to appear in /dev/mapper
++func waitForDevice(t *testing.T, devicePath string) {
++	t.Helper()
++	for i := 0; i < 100; i++ {
++		if _, err := os.Stat(devicePath); err == nil {
++			return
++		}
++		time.Sleep(10 * time.Millisecond)
++	}
++	t.Fatalf("device %s did not appear after waiting", devicePath)
++}
++
++// testOptions creates DmverityOptions for testing with common defaults
++func testOptions(superblock bool, hashOffset uint64) DmverityOptions {
++	opts := DmverityOptions{
++		Salt:          "0000000000000000000000000000000000000000000000000000000000000000",
++		HashAlgorithm: "sha256",
++		DataBlockSize: 4096,
++		HashBlockSize: 4096,
++		DataBlocks:    256,
++		HashOffset:    hashOffset,
++		HashType:      1,
++		NoSuperblock:  !superblock,
++	}
++	if superblock {
++		opts.UUID = "12345678-1234-1234-1234-123456789012"
++	}
++	return opts
++}
++
++// createTempFile creates a temporary file with optional data, returns file path and cleanup function
++func createTempFile(t *testing.T, data []byte) string {
++	t.Helper()
++	file, err := os.CreateTemp("", "test-data-*.img")
++	assert.NoError(t, err)
++	if len(data) > 0 {
++		_, err = file.Write(data)
++		assert.NoError(t, err)
++	}
++	err = file.Close()
++	assert.NoError(t, err)
++	t.Cleanup(func() { os.Remove(file.Name()) })
++	return file.Name()
++}
++
++func TestMetadataPath(t *testing.T) {
++	assert.Equal(t, "/path/to/layer.erofs.dmverity", MetadataPath("/path/to/layer.erofs"))
++}
++
++func TestDevicePath(t *testing.T) {
++	assert.Equal(t, "/dev/mapper/test-device", DevicePath("test-device"))
++	assert.Equal(t, "/dev/mapper/containerd-erofs-abc123", DevicePath("containerd-erofs-abc123"))
++}
++
++func TestReadMetadata(t *testing.T) {
++	tmpDir := t.TempDir()
++
++	createMetadataFile := func(filename, content string) string {
++		layerBlob := tmpDir + "/" + strings.TrimSuffix(filename, ".dmverity")
++		os.WriteFile(tmpDir+"/"+filename, []byte(content), 0644)
++		return layerBlob
++	}
++
++	// Valid case
++	layerBlob := createMetadataFile("layer.erofs.dmverity", `{"roothash":"abc123def456789012345678901234567890123456789012345678901234","hashoffset":12288}`)
++	metadata, err := ReadMetadata(layerBlob)
++	assert.NoError(t, err)
++	assert.Equal(t, "abc123def456789012345678901234567890123456789012345678901234", metadata.RootHash)
++	assert.Equal(t, uint64(12288), metadata.HashOffset)
++
++	// Valid case with pretty-printed JSON
++	layerBlob = createMetadataFile("layer2.erofs.dmverity", `{
++  "roothash": "def456789012345678901234567890123456789012345678901234567890",
++  "hashoffset": 16384
++}`)
++	metadata, err = ReadMetadata(layerBlob)
++	assert.NoError(t, err)
++	assert.Equal(t, "def456789012345678901234567890123456789012345678901234567890", metadata.RootHash)
++	assert.Equal(t, uint64(16384), metadata.HashOffset)
++
++	// Error: empty root hash
++	layerBlob = createMetadataFile("layer3.erofs.dmverity", `{"roothash":"","hashoffset":12288}`)
++	_, err = ReadMetadata(layerBlob)
++	assert.ErrorContains(t, err, "missing root hash")
++
++	// Error: missing root hash field
++	layerBlob = createMetadataFile("layer4.erofs.dmverity", `{"hashoffset":12288}`)
++	_, err = ReadMetadata(layerBlob)
++	assert.ErrorContains(t, err, "missing root hash")
++
++	// Error: invalid JSON
++	layerBlob = createMetadataFile("layer5.erofs.dmverity", `not valid json`)
++	_, err = ReadMetadata(layerBlob)
++	assert.ErrorContains(t, err, "failed to parse")
++
++	// Error: file not found
++	_, err = ReadMetadata(tmpDir + "/nonexistent.erofs")
++	assert.ErrorContains(t, err, "metadata file not found")
++}
++
++// TestErrorHandling tests error cases for dm-verity functions
++func TestErrorHandling(t *testing.T) {
++	testutil.RequiresRoot(t)
++
++	isSupported, err := IsSupported()
++	if err != nil || !isSupported {
++		t.Skip("dm-verity not supported on this system")
++	}
++
++	t.Run("Open_EmptyRootHash", func(t *testing.T) {
++		dataFile := createTempFile(t, nil)
++		_, err := Open(dataFile, "test-device", dataFile, "", 0, nil)
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "rootHash cannot be empty")
++	})
++
++	t.Run("Open_InvalidRootHash", func(t *testing.T) {
++		dataFile := createTempFile(t, nil)
++		_, err := Open(dataFile, "test-device", dataFile, "not-a-valid-hex-string", 0, nil)
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid root hash")
++	})
++
++	t.Run("Open_NonexistentDevice", func(t *testing.T) {
++		_, err = Open("/nonexistent/device.img", "test-device", "/nonexistent/device.img", "abc123", 0, nil)
++		assert.Error(t, err)
++	})
++
++	t.Run("Open_InvalidSalt", func(t *testing.T) {
++		dataFile := createTempFile(t, nil)
++		opts := DefaultDmverityOptions()
++		opts.NoSuperblock = true
++		opts.Salt = "invalid-hex-string"
++		_, err := Open(dataFile, "test-device", dataFile, "abc123def456", 0, opts)
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid salt")
++	})
++
++	t.Run("Close_NonexistentDevice", func(t *testing.T) {
++		err := Close("nonexistent-device-12345")
++		assert.Error(t, err)
++	})
++
++	t.Run("VerifyDevice_EmptyRootHash", func(t *testing.T) {
++		err := VerifyDevice("test-device", "")
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid root hash")
++	})
++
++	t.Run("VerifyDevice_InvalidRootHash", func(t *testing.T) {
++		err := VerifyDevice("test-device", "not-valid-hex")
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid root hash")
++	})
++
++	t.Run("VerifyDevice_NonexistentDevice", func(t *testing.T) {
++		err := VerifyDevice("nonexistent-device-12345", "abc123def456")
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "verification failed")
++	})
++
++	t.Run("Format_InvalidSalt", func(t *testing.T) {
++		dataFile := createTempFile(t, make([]byte, 1024*1024))
++		opts := DefaultDmverityOptions()
++		opts.Salt = "invalid-hex-string-not-valid"
++		_, err := Format(dataFile, dataFile, opts)
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid salt")
++	})
++
++	t.Run("Format_InvalidUUID", func(t *testing.T) {
++		dataFile := createTempFile(t, make([]byte, 1024*1024))
++		opts := DefaultDmverityOptions()
++		opts.UUID = "not-a-valid-uuid-format"
++		_, err := Format(dataFile, dataFile, opts)
++		assert.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid UUID")
++	})
++}
+diff --git a/internal/erofsutils/mount.go b/internal/erofsutils/mount.go
+index d99e979e2..35c469904 100644
+--- a/internal/erofsutils/mount.go
++++ b/internal/erofsutils/mount.go
+@@ -54,7 +54,7 @@ func ConvertTarErofs(ctx context.Context, r io.Reader, layerPath, uuid string, m
+ // The `--tar=i` option instructs mkfs.erofs to only generate the tar index
+ // for the tar content. The resulting file structure is:
+ // [Tar index][Original tar content]
+-func GenerateTarIndexAndAppendTar(ctx context.Context, r io.Reader, layerPath string, mkfsExtraOpts []string) error {
++func GenerateTarIndexAndAppendTar(ctx context.Context, r io.Reader, layerPath, uuid string, mkfsExtraOpts []string) error {
+ 	// Create a temporary file for storing the tar content
+ 	tarFile, err := os.CreateTemp("", "erofs-tar-*")
+ 	if err != nil {
+@@ -68,6 +68,9 @@ func GenerateTarIndexAndAppendTar(ctx context.Context, r io.Reader, layerPath st
+ 
+ 	// Generate tar index directly to layerPath using --tar=i option
+ 	args := append([]string{"--tar=i", "--aufs", "--quiet"}, mkfsExtraOpts...)
++	if uuid != "" {
++		args = append(args, []string{"-U", uuid}...)
++	}
+ 	args = append(args, layerPath)
+ 	cmd := exec.CommandContext(ctx, "mkfs.erofs", args...)
+ 	cmd.Stdin = teeReader
+diff --git a/pkg/snapshotters/signatures.go b/pkg/snapshotters/signatures.go
+new file mode 100644
+index 000000000..d398efb78
+--- /dev/null
++++ b/pkg/snapshotters/signatures.go
+@@ -0,0 +1,267 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package snapshotters
++
++import (
++	"context"
++	"encoding/json"
++	"io"
++	"sync"
++	"time"
++
++	"github.com/containerd/containerd/v2/core/images"
++	"github.com/containerd/containerd/v2/core/remotes"
++	"github.com/containerd/errdefs"
++	"github.com/containerd/log"
++	"github.com/opencontainers/go-digest"
++	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
++)
++
++const (
++	// TargetLayerSignatureLabel carries the base64-encoded PKCS#7 signature for dm-verity
++	// verification as a *descriptor annotation* between the signature handler and the
++	// erofs differ. It MUST NOT use the "containerd.io/snapshot/" prefix: that prefix is
++	// matched by snapshots.FilterInheritedLabels and would auto-promote the value into a
++	// snapshotter Info.Labels entry, where boltdb enforces a 4096-byte per-label cap.
++	// Full enterprise PKCS#7 envelopes (RSA-4096 leaf + intermediates + root + RFC3161
++	// timestamp counter-signature) routinely exceed 4 KiB; auto-promotion would reject
++	// the pull with InvalidArgument.
++	TargetLayerSignatureLabel = "containerd.io/dmverity/layer-signature"
++
++	// TargetLayerRootHashLabel carries the dm-verity root hash as a descriptor annotation.
++	// Kept under the same "containerd.io/dmverity/" prefix as the signature for symmetry,
++	// so neither value is auto-promoted into snapshot labels.
++	TargetLayerRootHashLabel = "containerd.io/dmverity/layer-roothash"
++
++	// Annotation keys used in signature manifest layers
++	sigLayerDigestAnnotation    = "io.cncf.notary.dmverity.layer-digest"
++	sigLayerRootHashAnnotation  = "io.cncf.notary.dmverity.layer-roothash"
++	sigLayerSignatureAnnotation = "io.cncf.notary.dmverity.layer-signature"
++
++	// SignatureArtifactType is the artifact type for OCI referrers containing dm-verity signatures
++	SignatureArtifactType = "application/vnd.cncf.notary.dmverity.v1"
++
++	// ociAnnotationCreated is the OCI annotation for creation timestamp
++	ociAnnotationCreated = "org.opencontainers.image.created"
++)
++
++// LayerSignatureInfo contains signature information for a layer
++type LayerSignatureInfo struct {
++	RootHash  string
++	Signature string
++}
++
++// fetchSignatures fetches dm-verity signatures from the registry using OCI referrers API.
++// Returns a map of layerDigest -> LayerSignatureInfo.
++func fetchSignatures(ctx context.Context, fetcher remotes.Fetcher, manifestDigest digest.Digest) map[string]*LayerSignatureInfo {
++	signatures := make(map[string]*LayerSignatureInfo)
++
++	refFetcher, ok := fetcher.(remotes.ReferrersFetcher)
++	if !ok {
++		log.G(ctx).Debug("Fetcher does not support referrers API, skipping signature fetch")
++		return signatures
++	}
++
++	// Fetch signature referrers for this manifest
++	referrers, err := refFetcher.FetchReferrers(ctx, manifestDigest,
++		remotes.WithReferrerArtifactTypes(SignatureArtifactType))
++	if err != nil {
++		if errdefs.IsNotFound(err) {
++			log.G(ctx).Debug("No signature referrers found")
++			return signatures
++		}
++		log.G(ctx).WithError(err).Debug("Failed to fetch referrers")
++		return signatures
++	}
++
++	if len(referrers) == 0 {
++		log.G(ctx).Debug("No signature artifacts found for manifest")
++		return signatures
++	}
++
++	log.G(ctx).WithField("count", len(referrers)).WithField("manifest", manifestDigest).Info("Fetching dm-verity signature artifacts")
++
++	// Fetch all referrer manifests and find the newest one by timestamp
++	type referrerWithManifest struct {
++		desc      ocispec.Descriptor
++		manifest  ocispec.Manifest
++		createdAt time.Time
++	}
++
++	var parsedReferrers []referrerWithManifest
++	for _, refDesc := range referrers {
++		rc, err := fetcher.Fetch(ctx, refDesc)
++		if err != nil {
++			log.G(ctx).WithError(err).WithField("digest", refDesc.Digest).Warn("Failed to fetch signature manifest")
++			continue
++		}
++
++		manifestData, err := io.ReadAll(rc)
++		rc.Close()
++		if err != nil {
++			log.G(ctx).WithError(err).Warn("Failed to read signature manifest")
++			continue
++		}
++
++		var sigManifest ocispec.Manifest
++		if err := json.Unmarshal(manifestData, &sigManifest); err != nil {
++			log.G(ctx).WithError(err).Warn("Failed to unmarshal signature manifest")
++			continue
++		}
++
++		// Parse the creation timestamp from annotations
++		var createdAt time.Time
++		if sigManifest.Annotations != nil {
++			if createdStr, ok := sigManifest.Annotations[ociAnnotationCreated]; ok {
++				if t, err := time.Parse(time.RFC3339, createdStr); err == nil {
++					createdAt = t
++					log.G(ctx).WithFields(log.Fields{
++						"digest":  refDesc.Digest,
++						"created": createdStr,
++					}).Debug("Parsed referrer creation timestamp")
++				}
++			}
++		}
++
++		parsedReferrers = append(parsedReferrers, referrerWithManifest{
++			desc:      refDesc,
++			manifest:  sigManifest,
++			createdAt: createdAt,
++		})
++	}
++
++	if len(parsedReferrers) == 0 {
++		log.G(ctx).Debug("No valid signature manifests found")
++		return signatures
++	}
++
++	// Find the newest referrer by timestamp
++	newestIdx := 0
++	for i := 1; i < len(parsedReferrers); i++ {
++		if parsedReferrers[i].createdAt.After(parsedReferrers[newestIdx].createdAt) {
++			newestIdx = i
++		}
++	}
++
++	newestReferrer := parsedReferrers[newestIdx]
++	log.G(ctx).WithFields(log.Fields{
++		"digest":  newestReferrer.desc.Digest,
++		"created": newestReferrer.createdAt,
++		"total":   len(parsedReferrers),
++	}).Info("Using newest signature referrer")
++
++	// Extract signature data from the newest referrer's layer annotations
++	for _, layer := range newestReferrer.manifest.Layers {
++		if layer.Annotations == nil {
++			continue
++		}
++
++		layerDigest := layer.Annotations[sigLayerDigestAnnotation]
++		rootHash := layer.Annotations[sigLayerRootHashAnnotation]
++		signature := layer.Annotations[sigLayerSignatureAnnotation]
++
++		if layerDigest != "" && rootHash != "" && signature != "" {
++			signatures[layerDigest] = &LayerSignatureInfo{
++				RootHash:  rootHash,
++				Signature: signature,
++			}
++			log.G(ctx).WithFields(log.Fields{
++				"layer":     layerDigest,
++				"roothash":  rootHash,
++				"signature": signature[:min(len(signature), 32)] + "...",
++			}).Info("Found dm-verity signature for layer")
++		}
++	}
++
++	log.G(ctx).WithField("manifest", manifestDigest).Info("Signatures fetched successfully")
++	return signatures
++}
++
++// AppendSignatureHandlerWrapper creates a handler that fetches signatures when processing
++// a manifest and adds signature annotations to layer descriptors.
++// This should wrap the handler AFTER AppendInfoHandlerWrapper.
++func AppendSignatureHandlerWrapper(fetcher remotes.Fetcher) func(f images.Handler) images.Handler {
++	return func(f images.Handler) images.Handler {
++		return signatureHandler(f, fetcher)
++	}
++}
++
++// AppendSignatureHandlerWrapperFromResolver creates a signature handler wrapper using a resolver.
++// The fetcher is lazily created from the resolver when the handler is first invoked.
++// This is useful for the CRI path where the resolver is available at option setup time,
++// but the fetcher needs to be created later.
++func AppendSignatureHandlerWrapperFromResolver(resolver remotes.Resolver, ref string) func(f images.Handler) images.Handler {
++	var (
++		fetcher     remotes.Fetcher
++		fetcherOnce sync.Once
++		fetcherErr  error
++	)
++
++	return func(f images.Handler) images.Handler {
++		return images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
++			// Lazily initialize the fetcher
++			fetcherOnce.Do(func() {
++				fetcher, fetcherErr = resolver.Fetcher(ctx, ref)
++				if fetcherErr != nil {
++					log.G(ctx).WithError(fetcherErr).Warn("Failed to create fetcher for signature lookup")
++				} else {
++					log.G(ctx).Debug("Created fetcher for signature lookup")
++				}
++			})
++
++			// If we couldn't create a fetcher, just pass through
++			if fetcherErr != nil || fetcher == nil {
++				return f.Handle(ctx, desc)
++			}
++
++			return signatureHandler(f, fetcher).Handle(ctx, desc)
++		})
++	}
++}
++
++// signatureHandler is the core handler logic for fetching and attaching signatures
++func signatureHandler(f images.Handler, fetcher remotes.Fetcher) images.Handler {
++	return images.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
++		children, err := f.Handle(ctx, desc)
++		if err != nil {
++			return nil, err
++		}
++
++		// When we encounter a manifest, fetch signatures for it
++		if images.IsManifestType(desc.MediaType) {
++			// Fetch signatures directly - no global cache needed
++			signatures := fetchSignatures(ctx, fetcher, desc.Digest)
++
++			// Add signature annotations to layer descriptors
++			for i := range children {
++				c := &children[i]
++				if images.IsLayerType(c.MediaType) {
++					if sig, ok := signatures[c.Digest.String()]; ok {
++						if c.Annotations == nil {
++							c.Annotations = make(map[string]string)
++						}
++						c.Annotations[TargetLayerSignatureLabel] = sig.Signature
++						c.Annotations[TargetLayerRootHashLabel] = sig.RootHash
++						log.G(ctx).WithField("layer", c.Digest).Debug("Added signature annotations to layer")
++					}
++				}
++			}
++		}
++
++		return children, nil
++	})
++}
+diff --git a/plugins/diff/erofs/differ.go b/plugins/diff/erofs/differ.go
+index a3a1b6df3..9298f94df 100644
+--- a/plugins/diff/erofs/differ.go
++++ b/plugins/diff/erofs/differ.go
+@@ -34,7 +34,9 @@ import (
+ 	"github.com/containerd/containerd/v2/core/diff"
+ 	"github.com/containerd/containerd/v2/core/images"
+ 	"github.com/containerd/containerd/v2/core/mount"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/erofsutils"
++	snpkg "github.com/containerd/containerd/v2/pkg/snapshotters"
+ 
+ 	"github.com/google/uuid"
+ )
+@@ -53,6 +55,11 @@ type erofsDiff struct {
+ 	// enableTarIndex enables generating tar index for tar content
+ 	// instead of fully converting the tar to EROFS format
+ 	enableTarIndex bool
++	// enableDmverity enables formatting layers with dm-verity after creation
++	enableDmverity bool
++	// requireSignatures requires dm-verity signatures to be present on layers
++	// when dm-verity is enabled. If true, Apply will fail if a layer lacks a signature.
++	requireSignatures bool
+ }
+ 
+ // DifferOpt is an option for configuring the erofs differ
+@@ -72,6 +79,21 @@ func WithTarIndexMode() DifferOpt {
+ 	}
+ }
+ 
++// WithDmverity enables dm-verity formatting for EROFS layers
++func WithDmverity() DifferOpt {
++	return func(d *erofsDiff) {
++		d.enableDmverity = true
++	}
++}
++
++// WithRequireSignatures requires dm-verity signatures to be present on layers.
++// This option only has effect when dm-verity is enabled.
++func WithRequireSignatures() DifferOpt {
++	return func(d *erofsDiff) {
++		d.requireSignatures = true
++	}
++}
++
+ // NewErofsDiffer creates a new EROFS differ with the provided options
+ func NewErofsDiffer(store content.Store, opts ...DifferOpt) differ {
+ 	d := &erofsDiff{
+@@ -156,6 +178,15 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 		if err != nil {
+ 			return emptyDesc, err
+ 		}
++		// A native EROFS layer is written to disk verbatim, but it is still a
++		// layer the dm-verity policy applies to. Skipping the block below would
++		// let a registry opt out of integrity and signature enforcement purely
++		// by publishing its layers with an EROFS media type.
++		if s.enableDmverity {
++			if _, err := s.formatDmverityLayer(ctx, layerBlobPath); err != nil {
++				return emptyDesc, fmt.Errorf("failed to format dm-verity layer: %w", err)
++			}
++		}
+ 		return desc, nil
+ 	}
+ 
+@@ -176,16 +207,17 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 	}
+ 
+ 	// Choose between tar index or tar conversion mode
++	// Generate deterministic UUID from layer digest
++	u := uuid.NewSHA1(uuid.NameSpaceURL, []byte("erofs:blobs/"+desc.Digest))
+ 	if s.enableTarIndex {
+ 		// Use the tar index method: generate tar index and append tar
+-		err = erofsutils.GenerateTarIndexAndAppendTar(ctx, rc, layerBlobPath, s.mkfsExtraOpts)
++		err = erofsutils.GenerateTarIndexAndAppendTar(ctx, rc, layerBlobPath, u.String(), s.mkfsExtraOpts)
+ 		if err != nil {
+ 			return emptyDesc, fmt.Errorf("failed to generate tar index: %w", err)
+ 		}
+ 		log.G(ctx).WithField("path", layerBlobPath).Debug("Applied layer using tar index mode")
+ 	} else {
+ 		// Use the tar method: fully convert tar to EROFS
+-		u := uuid.NewSHA1(uuid.NameSpaceURL, []byte("erofs:blobs/"+desc.Digest))
+ 		err = erofsutils.ConvertTarErofs(ctx, rc, layerBlobPath, u.String(), s.mkfsExtraOpts)
+ 		if err != nil {
+ 			return emptyDesc, fmt.Errorf("failed to convert tar to erofs: %w", err)
+@@ -198,6 +230,34 @@ func (s erofsDiff) Apply(ctx context.Context, desc ocispec.Descriptor, mounts []
+ 		return emptyDesc, err
+ 	}
+ 
++	// Format with dm-verity if enabled
++	if s.enableDmverity {
++		rootHash, err := s.formatDmverityLayer(ctx, layerBlobPath)
++		if err != nil {
++			return emptyDesc, fmt.Errorf("failed to format dm-verity layer: %w", err)
++		}
++
++		if s.requireSignatures {
++			sig := desc.Annotations[snpkg.TargetLayerSignatureLabel]
++			if sig == "" {
++				return emptyDesc, fmt.Errorf("dm-verity signature required but not present on layer %s", desc.Digest)
++			}
++
++			expectedRootHash := desc.Annotations[snpkg.TargetLayerRootHashLabel]
++			if expectedRootHash == "" {
++				return emptyDesc, fmt.Errorf("dm-verity signature present but missing expected root hash for layer %s", desc.Digest)
++			}
++			if rootHash != expectedRootHash {
++				return emptyDesc, fmt.Errorf("dm-verity root hash mismatch for layer %s: computed %q, expected %q", desc.Digest, rootHash, expectedRootHash)
++			}
++
++			if err := dmverity.WriteSignature(layerBlobPath, sig); err != nil {
++				return emptyDesc, err
++			}
++			log.G(ctx).WithField("path", dmverity.SignaturePath(layerBlobPath)).Debug("Wrote dm-verity signature file")
++		}
++	}
++
+ 	return ocispec.Descriptor{
+ 		MediaType: ocispec.MediaTypeImageLayer,
+ 		Size:      rc.c,
+diff --git a/plugins/diff/erofs/dmverity_linux.go b/plugins/diff/erofs/dmverity_linux.go
+new file mode 100644
+index 000000000..a6b09089a
+--- /dev/null
++++ b/plugins/diff/erofs/dmverity_linux.go
+@@ -0,0 +1,137 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package erofs
++
++import (
++	"context"
++	"encoding/json"
++	"fmt"
++	"os"
++
++	"github.com/containerd/go-dmverity/pkg/utils"
++	"github.com/containerd/go-dmverity/pkg/verity"
++	"github.com/containerd/log"
++
++	"github.com/containerd/containerd/v2/internal/dmverity"
++)
++
++// getDmverityOptions returns dm-verity options configured for this differ instance.
++// The block size is determined by the differ's mode:
++// - Tar index mode requires 512-byte blocks to match EROFS and dm-verity constraints
++// - Regular mode uses 4096-byte blocks (standard page size)
++func (s *erofsDiff) getDmverityOptions() *dmverity.DmverityOptions {
++	opts := dmverity.DefaultDmverityOptions()
++
++	// Tar index mode requires 512-byte blocks because:
++	// 1. EROFS tar index mode uses 512-byte metadata blocks (mkfs.erofs --tar=i)
++	// 2. dm-verity sets the virtual block device logical_block_size to match the data block size
++	// 3. EROFS requires its block size (512) to be >= the underlying block device's logical_block_size
++	// Using 4096-byte dm-verity blocks would set logical_block_size=4096, causing EROFS sb_set_blocksize(512) to fail
++	if s.enableTarIndex {
++		opts.DataBlockSize = 512
++		opts.HashBlockSize = 512
++	}
++	// Regular mode uses the default 4096-byte blocks (standard page size)
++
++	return opts
++}
++
++// formatDmverityLayer formats an EROFS layer with dm-verity hash tree and returns the computed root hash
++func (s *erofsDiff) formatDmverityLayer(ctx context.Context, layerBlobPath string) (string, error) {
++	metadataPath := dmverity.MetadataPath(layerBlobPath)
++	if _, err := os.Stat(metadataPath); err == nil {
++		log.G(ctx).WithField("path", layerBlobPath).Debug("Layer already formatted with dm-verity, skipping")
++		metadata, err := dmverity.ReadMetadata(layerBlobPath)
++		if err != nil {
++			return "", fmt.Errorf("failed to read existing dm-verity metadata: %w", err)
++		}
++		return metadata.RootHash, nil
++	}
++
++	fileInfo, err := os.Stat(layerBlobPath)
++	if err != nil {
++		return "", fmt.Errorf("failed to stat layer blob: %w", err)
++	}
++
++	opts := s.getDmverityOptions()
++	blockSize := int64(opts.DataBlockSize)
++	fileSize := fileInfo.Size()
++
++	// dm-verity requires the hash area to start at a block-aligned offset
++	dataBlocks := (fileSize + blockSize - 1) / blockSize
++	hashOffset := uint64(dataBlocks * blockSize)
++
++	opts.HashOffset = hashOffset
++	opts.DataBlocks = uint64(dataBlocks)
++
++	hashTreeSize, err := verity.GetHashTreeSize(&verity.Params{
++		HashName:      opts.HashAlgorithm,
++		DataBlockSize: opts.DataBlockSize,
++		HashBlockSize: opts.HashBlockSize,
++		DataBlocks:    opts.DataBlocks,
++		HashType:      opts.HashType,
++	})
++	if err != nil {
++		return "", fmt.Errorf("failed to calculate hash tree size: %w", err)
++	}
++
++	// In superblock mode, Format() stores the superblock at hashOffset and the hash tree after it
++	superblockSize := uint64(0)
++	if !opts.NoSuperblock {
++		superblockSize = utils.AlignUp(uint64(verity.SuperblockSize), uint64(opts.HashBlockSize))
++	}
++	requiredSize := hashOffset + superblockSize + hashTreeSize
++	if err := os.Truncate(layerBlobPath, int64(requiredSize)); err != nil {
++		return "", fmt.Errorf("failed to pre-allocate space for hash tree: %w", err)
++	}
++
++	// Leave opts.UUID unset so the dm-verity superblock is reproducible: a
++	// random UUID would make the formatted blob (and its digest) differ on every
++	// build, breaking reproducible/signable layers.
++
++	rootHash, err := dmverity.Format(layerBlobPath, layerBlobPath, opts)
++	if err != nil {
++		return "", fmt.Errorf("failed to format dm-verity: %w", err)
++	}
++
++	// Important: Save the ORIGINAL hashOffset (where superblock is located),
++	// not result.HashOffset (which points to where the hash tree starts after the superblock).
++	// Open() needs the superblock location to read device parameters.
++	metadata := dmverity.DmverityMetadata{
++		RootHash:   rootHash,
++		HashOffset: hashOffset,
++	}
++	metadataBytes, err := json.MarshalIndent(metadata, "", "  ")
++	if err != nil {
++		return "", fmt.Errorf("failed to marshal dm-verity metadata: %w", err)
++	}
++	if err := os.WriteFile(metadataPath, metadataBytes, 0644); err != nil {
++		return "", fmt.Errorf("failed to write dm-verity metadata: %w", err)
++	}
++
++	log.G(ctx).WithFields(log.Fields{
++		"path":       layerBlobPath,
++		"size":       fileSize,
++		"blockSize":  opts.DataBlockSize,
++		"hashOffset": hashOffset,
++		"rootHash":   rootHash,
++	}).Info("Successfully formatted dm-verity layer")
++
++	return rootHash, nil
++}
+diff --git a/plugins/diff/erofs/dmverity_linux_test.go b/plugins/diff/erofs/dmverity_linux_test.go
+new file mode 100644
+index 000000000..e72767dd3
+--- /dev/null
++++ b/plugins/diff/erofs/dmverity_linux_test.go
+@@ -0,0 +1,132 @@
++//go:build linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package erofs
++
++import (
++	"context"
++	"os"
++	"path/filepath"
++	"testing"
++
++	"github.com/containerd/log/logtest"
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++
++	"github.com/containerd/containerd/v2/internal/dmverity"
++)
++
++// TestGetDmverityOptions tests the block size configuration
++func TestGetDmverityOptions(t *testing.T) {
++	// tar-index mode uses 512-byte blocks
++	opts := (&erofsDiff{enableTarIndex: true, enableDmverity: true}).getDmverityOptions()
++	assert.Equal(t, uint32(512), opts.DataBlockSize)
++	assert.Equal(t, uint32(512), opts.HashBlockSize)
++
++	// regular mode uses 4096-byte blocks
++	opts = (&erofsDiff{enableTarIndex: false, enableDmverity: true}).getDmverityOptions()
++	assert.Equal(t, uint32(4096), opts.DataBlockSize)
++	assert.Equal(t, uint32(4096), opts.HashBlockSize)
++}
++
++// TestFormatDmverityLayer tests the layer formatting logic
++func TestFormatDmverityLayer(t *testing.T) {
++	supported, err := dmverity.IsSupported()
++	if err != nil || !supported {
++		t.Skip("dm-verity is not supported on this system")
++	}
++
++	ctx := logtest.WithT(context.Background(), t)
++	tmpDir := t.TempDir()
++
++	t.Run("formats layer and creates metadata", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
++		layerPath := filepath.Join(tmpDir, "layer.erofs")
++		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
++
++		rootHash, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++		assert.NotEmpty(t, rootHash)
++
++		metadata, err := dmverity.ReadMetadata(layerPath)
++		require.NoError(t, err)
++		assert.Equal(t, rootHash, metadata.RootHash)
++		assert.Greater(t, metadata.HashOffset, uint64(0))
++		assert.Equal(t, uint64(8192), metadata.HashOffset)
++	})
++
++	t.Run("skips formatting if metadata already exists", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
++		layerPath := filepath.Join(tmpDir, "layer-idempotent.erofs")
++		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
++
++		// First format
++		rootHash1, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++
++		rootHash2, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++		assert.Equal(t, rootHash1, rootHash2)
++	})
++
++	t.Run("uses 4096-byte blocks in regular mode", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
++		layerPath := filepath.Join(tmpDir, "layer-4k.erofs")
++		require.NoError(t, os.WriteFile(layerPath, make([]byte, 8192), 0644))
++
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++
++		metadata, _ := dmverity.ReadMetadata(layerPath)
++		assert.Equal(t, uint64(8192), metadata.HashOffset)
++	})
++
++	t.Run("uses 512-byte blocks in tar-index mode", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: true}
++		layerPath := filepath.Join(tmpDir, "layer-512.erofs")
++		require.NoError(t, os.WriteFile(layerPath, make([]byte, 1024), 0644))
++
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++
++		metadata, _ := dmverity.ReadMetadata(layerPath)
++		assert.Equal(t, uint64(1024), metadata.HashOffset)
++	})
++
++	t.Run("returns error for non-existent file", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
++		_, err := d.formatDmverityLayer(ctx, filepath.Join(tmpDir, "missing.erofs"))
++		require.Error(t, err)
++		assert.Contains(t, err.Error(), "failed to stat layer blob")
++	})
++
++	t.Run("rounds up non-aligned file size to block boundary", func(t *testing.T) {
++		d := &erofsDiff{enableDmverity: true, enableTarIndex: false}
++		layerPath := filepath.Join(tmpDir, "layer-unaligned.erofs")
++		// Write 5000 bytes (not aligned to 4096), should round up to 8192
++		require.NoError(t, os.WriteFile(layerPath, make([]byte, 5000), 0644))
++
++		_, err := d.formatDmverityLayer(ctx, layerPath)
++		require.NoError(t, err)
++
++		metadata, err := dmverity.ReadMetadata(layerPath)
++		require.NoError(t, err)
++		// Hash offset should be rounded up to next 4096-byte boundary
++		assert.Equal(t, uint64(8192), metadata.HashOffset)
++	})
++}
+diff --git a/plugins/diff/erofs/dmverity_other.go b/plugins/diff/erofs/dmverity_other.go
+new file mode 100644
+index 000000000..c3ea68174
+--- /dev/null
++++ b/plugins/diff/erofs/dmverity_other.go
+@@ -0,0 +1,28 @@
++//go:build !linux
++
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package erofs
++
++import (
++	"context"
++	"fmt"
++)
++
++func (s *erofsDiff) formatDmverityLayer(_ context.Context, _ string) (string, error) {
++	return "", fmt.Errorf("dm-verity formatting is only supported on Linux systems")
++}
+diff --git a/plugins/diff/erofs/plugin/plugin.go b/plugins/diff/erofs/plugin/plugin.go
+index c051ec9f8..454ab56ed 100644
+--- a/plugins/diff/erofs/plugin/plugin.go
++++ b/plugins/diff/erofs/plugin/plugin.go
+@@ -24,6 +24,7 @@ import (
+ 	"github.com/containerd/plugin/registry"
+ 
+ 	"github.com/containerd/containerd/v2/core/metadata"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/erofsutils"
+ 	"github.com/containerd/containerd/v2/plugins"
+ 	"github.com/containerd/containerd/v2/plugins/diff/erofs"
+@@ -37,6 +38,15 @@ type Config struct {
+ 	// EnableTarIndex enables the tar index mode where the index is generated
+ 	// for tar content without extracting the tar
+ 	EnableTarIndex bool `toml:"enable_tar_index"`
++
++	// EnableDmverity enables dm-verity formatting for EROFS layers
++	// Linux only
++	EnableDmverity bool `toml:"enable_dmverity"`
++
++	// RequireSignatures requires dm-verity signatures to be present on all layers.
++	// When enabled, layer application will fail if a signature is not present.
++	// Only has effect when EnableDmverity is true.
++	RequireSignatures bool `toml:"require_signatures"`
+ }
+ 
+ func init() {
+@@ -69,6 +79,13 @@ func init() {
+ 
+ 			var opts []erofs.DifferOpt
+ 
++			// require_signatures is only honoured inside the dm-verity block
++			// below, so accepting this combination would silently give an
++			// operator who asked for mandatory signatures no enforcement at all.
++			if config.RequireSignatures && !config.EnableDmverity {
++				return nil, fmt.Errorf("erofs differ: require_signatures requires enable_dmverity to be true")
++			}
++
+ 			if len(config.MkfsOptions) > 0 {
+ 				opts = append(opts, erofs.WithMkfsOptions(config.MkfsOptions))
+ 			}
+@@ -77,6 +94,21 @@ func init() {
+ 				opts = append(opts, erofs.WithTarIndexMode())
+ 			}
+ 
++			if config.EnableDmverity {
++				supported, err := dmverity.IsSupported()
++				if err != nil {
++					return nil, fmt.Errorf("dm-verity support check failed: %w", err)
++				}
++				if !supported {
++					return nil, fmt.Errorf("dm-verity is not supported on this system (dm_verity module not loaded): %w", plugin.ErrSkipPlugin)
++				}
++				opts = append(opts, erofs.WithDmverity())
++
++				if config.RequireSignatures {
++					opts = append(opts, erofs.WithRequireSignatures())
++				}
++			}
++
+ 			return erofs.NewErofsDiffer(cs, opts...), nil
+ 		},
+ 	})
+diff --git a/plugins/mount/erofs/plugin_linux.go b/plugins/mount/erofs/plugin_linux.go
+index 1de4af784..b63a4da0b 100644
+--- a/plugins/mount/erofs/plugin_linux.go
++++ b/plugins/mount/erofs/plugin_linux.go
+@@ -19,16 +19,21 @@ package erofs
+ import (
+ 	"context"
+ 	"errors"
++	"fmt"
+ 	"os"
++	"path/filepath"
+ 	"runtime"
+ 	"strings"
++	"sync"
+ 	"time"
+ 
++	"github.com/containerd/log"
+ 	"github.com/containerd/platforms"
+ 	"github.com/containerd/plugin"
+ 	"github.com/containerd/plugin/registry"
+ 
+ 	"github.com/containerd/containerd/v2/core/mount"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/plugins"
+ 	"github.com/containerd/errdefs"
+ 
+@@ -37,27 +42,159 @@ import (
+ 
+ var forceloop bool
+ 
+-type erofsMountHandler struct {
++type erofsMountHandler struct{}
++
++// NewErofsMountHandler creates a new EROFS mount handler that supports dm-verity
++func NewErofsMountHandler() mount.Handler {
++	return &erofsMountHandler{}
+ }
+ 
+-func newErofsMountHandler() mount.Handler {
+-	return erofsMountHandler{}
++// dmverityOpenMu serializes the "does this device already exist?" check and the
++// creation that follows it.
++//
++// Device-mapper names are derived from the snapshot ID, so two concurrent mounts
++// of the same layer -- routine when several pods start from one image -- can both
++// observe the device as absent and both call into the create path. The loser's
++// DM_DEV_CREATE fails because the name is taken, and its cleanup then removes the
++// winner's device out from under a live mount.
++//
++// One lock is enough. The guarded section is a handful of ioctls, and the kernel
++// already serializes device-mapper creation internally, so there is little
++// parallelism to win by sharding this per device name.
++var dmverityOpenMu sync.Mutex
++
++// openOrReuseDmverityDevice returns the /dev/mapper path for a layer, creating
++// the device if it does not already exist and validating it if it does.
++func openOrReuseDmverityDevice(ctx context.Context, source, deviceName string, metadata *dmverity.DmverityMetadata) (string, error) {
++	dmverityOpenMu.Lock()
++	defer dmverityOpenMu.Unlock()
++
++	devicePath := dmverity.DevicePath(deviceName)
++	if _, err := os.Stat(devicePath); !os.IsNotExist(err) {
++		// Device-mapper names are host-global while snapshot IDs are only
++		// unique within a snapshotter root, so an existing device of this
++		// name is not necessarily this layer. Confirm the live table's root
++		// hash before trusting it.
++		if err := dmverity.VerifyDevice(deviceName, metadata.RootHash); err != nil {
++			return "", fmt.Errorf("refusing to reuse existing dm-verity device %q: %w", deviceName, err)
++		}
++		log.G(ctx).WithField("device", devicePath).Debug("dm-verity device already exists, reusing")
++		return devicePath, nil
++	}
++
++	// Use signature file if it exists (written by the differ during Apply)
++	signatureFile := dmverity.SignaturePath(source)
++	if _, err := os.Stat(signatureFile); err != nil {
++		signatureFile = ""
++	} else {
++		log.G(ctx).WithField("root_hash", metadata.RootHash).Info("Using signature for dm-verity")
++	}
++
++	log.G(ctx).WithFields(log.Fields{
++		"source":      source,
++		"device-name": deviceName,
++		"hash-offset": metadata.HashOffset,
++	}).Debug("opening dm-verity device")
++
++	devicePath, err := dmverity.OpenWithSignature(source, deviceName, source, metadata.RootHash, metadata.HashOffset, nil, signatureFile)
++	if err != nil {
++		return "", fmt.Errorf("failed to open dm-verity device: %w", err)
++	}
++
++	// Wait for device to appear
++	for i := 0; i < 100; i++ {
++		if _, err := os.Stat(devicePath); err == nil {
++			break
++		}
++		time.Sleep(10 * time.Millisecond)
++	}
++
++	// Verify device exists
++	if _, err := os.Stat(devicePath); err != nil {
++		dmverity.Close(deviceName)
++		return "", fmt.Errorf("dm-verity device %q not found after creation: %w", devicePath, err)
++	}
++
++	log.G(ctx).WithField("device", devicePath).Info("dm-verity device created successfully")
++	return devicePath, nil
+ }
+ 
+-func (erofsMountHandler) Mount(ctx context.Context, m mount.Mount, mp string, _ []mount.ActiveMount) (mount.ActiveMount, error) {
++func (h *erofsMountHandler) Mount(ctx context.Context, m mount.Mount, mp string, _ []mount.ActiveMount) (mount.ActiveMount, error) {
+ 	if m.Type != "erofs" {
+ 		return mount.ActiveMount{}, errdefs.ErrNotImplemented
+ 	}
+ 
+-	// Ignore the loop option which is specified if the dedicated mount handler is available
+-	for i, v := range m.Options {
+-		if v == "loop" {
+-			m.Options = append(m.Options[:i], m.Options[i+1:]...)
+-			break
++	var dmverityDevice string
++
++	// Check for dmverity mode in mount options
++	dmverityMode := "auto" // default
++	for _, opt := range m.Options {
++		if strings.HasPrefix(opt, "X-containerd.dmverity=") {
++			dmverityMode = strings.TrimPrefix(opt, "X-containerd.dmverity=")
+ 		}
+ 	}
+ 
++	// Check if this layer has dm-verity metadata.
++	//
++	// Absent metadata and unusable metadata are deliberately NOT equivalent. A
++	// layer with no .dmverity sidecar is an ordinary EROFS layer and mounts
++	// plainly under "auto". A layer whose sidecar is present but truncated,
++	// malformed, or missing its root hash is a layer whose integrity we were
++	// asked to enforce and cannot -- treating that as "no dm-verity" would let
++	// anyone downgrade a protected layer to a plain mount by corrupting one
++	// file, so it fails closed.
++	var metadata *dmverity.DmverityMetadata
++	if dmverityMode != "off" {
++		md, err := dmverity.ReadMetadata(m.Source)
++		switch {
++		case err == nil:
++			metadata = md
++		case errors.Is(err, os.ErrNotExist):
++			if dmverityMode == "on" {
++				return mount.ActiveMount{}, fmt.Errorf("dm-verity mode is %q but no metadata found for layer %q", dmverityMode, m.Source)
++			}
++		default:
++			return mount.ActiveMount{}, fmt.Errorf("layer %q has unusable dm-verity metadata: %w", m.Source, err)
++		}
++	}
++
++	if metadata != nil {
++		log.G(ctx).WithField("source", m.Source).Debug("detected dm-verity metadata, setting up dm-verity device")
++
++		supported, err := dmverity.IsSupported()
++		if err != nil || !supported {
++			return mount.ActiveMount{}, fmt.Errorf("layer requires dm-verity but system doesn't support it (dm_verity module not loaded): %w", err)
++		}
++
++		// Extract snapshot ID from source path
++		// Path format: {root}/snapshots/{id}/layer.erofs
++		snapshotID := filepath.Base(filepath.Dir(m.Source))
++		deviceName := fmt.Sprintf("containerd-erofs-%s", snapshotID)
++
++		devicePath, err := openOrReuseDmverityDevice(ctx, m.Source, deviceName, metadata)
++		if err != nil {
++			return mount.ActiveMount{}, err
++		}
++		dmverityDevice = deviceName
++
++		m.Source = devicePath
++	}
++	// else: no metadata file, proceed with regular EROFS mount
++
++	filteredOptions := make([]string, 0, len(m.Options))
++	for _, v := range m.Options {
++		// Skip loop option (handled by loop device setup) and dmverity mode option (already processed)
++		if v == "loop" || strings.HasPrefix(v, "X-containerd.dmverity=") {
++			continue
++		}
++		filteredOptions = append(filteredOptions, v)
++	}
++	m.Options = filteredOptions
++
+ 	if err := os.MkdirAll(mp, 0700); err != nil {
++		if dmverityDevice != "" {
++			dmverity.Close(dmverityDevice)
++		}
+ 		return mount.ActiveMount{}, err
+ 	}
+ 
+@@ -75,24 +212,36 @@ func (erofsMountHandler) Mount(ctx context.Context, m mount.Mount, mp string, _
+ 			Readonly:  true,
+ 			Autoclear: true,
+ 		}
+-		// set up all loop devices
+-		loop, err := mount.SetupLoop(m.Source, params)
+-		if err != nil {
+-			return mount.ActiveMount{}, err
+-		}
+-		m.Source = loop.Name()
+-		loops = append(loops, loop)
+ 		defer func() {
+ 			for _, loop := range loops {
+ 				loop.Close()
+ 			}
+ 		}()
+ 
++		// A dm-verity mapper is already a block device and needs no loop. Wrapping
++		// it would rewrite m.Source to /dev/loopN, and Unmount identifies the device
++		// to tear down from the mount source, so the mapper and the loops it holds
++		// would leak on every unmount. This is reachable on any kernel without
++		// file-backed EROFS mounts (< 6.12) as soon as one plain EROFS layer has
++		// latched forceloop.
++		if dmverityDevice == "" {
++			// set up all loop devices
++			loop, err := mount.SetupLoop(m.Source, params)
++			if err != nil {
++				return mount.ActiveMount{}, err
++			}
++			m.Source = loop.Name()
++			loops = append(loops, loop)
++		}
++
+ 		for i, v := range m.Options {
+ 			// Convert raw files in `device=` into loop devices too
+ 			if strings.HasPrefix(v, "device=") {
+ 				loop, err := mount.SetupLoop(strings.TrimPrefix(v, "device="), params)
+ 				if err != nil {
++					if dmverityDevice != "" {
++						dmverity.Close(dmverityDevice)
++					}
+ 					return mount.ActiveMount{}, err
+ 				}
+ 				m.Options[i] = "device=" + loop.Name()
+@@ -100,9 +249,15 @@ func (erofsMountHandler) Mount(ctx context.Context, m mount.Mount, mp string, _
+ 		}
+ 		err = m.Mount(mp)
+ 		if err != nil {
++			if dmverityDevice != "" {
++				dmverity.Close(dmverityDevice)
++			}
+ 			return mount.ActiveMount{}, err
+ 		}
+ 	} else if err != nil {
++		if dmverityDevice != "" {
++			dmverity.Close(dmverityDevice)
++		}
+ 		return mount.ActiveMount{}, err
+ 	}
+ 
+@@ -114,8 +269,33 @@ func (erofsMountHandler) Mount(ctx context.Context, m mount.Mount, mp string, _
+ 	}, nil
+ }
+ 
+-func (erofsMountHandler) Unmount(ctx context.Context, path string) error {
+-	return mount.Unmount(path, 0)
++func (h *erofsMountHandler) Unmount(ctx context.Context, path string) error {
++	// Check what's currently mounted to determine if dm-verity device cleanup is needed
++	var deviceName string
++	mountInfo, err := mount.Lookup(path)
++	if err == nil {
++		source := mountInfo.Source
++		if strings.HasPrefix(source, "/dev/mapper/containerd-erofs-") {
++			deviceName = strings.TrimPrefix(source, "/dev/mapper/")
++		}
++	}
++
++	err = mount.Unmount(path, 0)
++
++	if deviceName != "" {
++		log.G(ctx).WithFields(log.Fields{
++			"mount-point": path,
++			"device":      deviceName,
++		}).Debug("attempting to close dm-verity device")
++
++		if closeErr := dmverity.Close(deviceName); closeErr != nil {
++			log.G(ctx).WithError(closeErr).WithField("device", deviceName).Debug("unable to close dm-verity device")
++		} else {
++			log.G(ctx).WithField("device", deviceName).Debug("dm-verity device closed successfully")
++		}
++	}
++
++	return err
+ }
+ 
+ type Config struct{}
+@@ -130,7 +310,7 @@ func init() {
+ 			p.OS = runtime.GOOS
+ 			ic.Meta.Platforms = append(ic.Meta.Platforms, p)
+ 
+-			return newErofsMountHandler(), nil
++			return NewErofsMountHandler(), nil
+ 		},
+ 	})
+ }
+diff --git a/plugins/snapshots/erofs/erofs.go b/plugins/snapshots/erofs/erofs.go
+index 292f1df63..bf193371c 100644
+--- a/plugins/snapshots/erofs/erofs.go
++++ b/plugins/snapshots/erofs/erofs.go
+@@ -18,6 +18,7 @@ package erofs
+ 
+ import (
+ 	"context"
++	"errors"
+ 	"fmt"
+ 	"os"
+ 	"path/filepath"
+@@ -30,6 +31,7 @@ import (
+ 	"github.com/containerd/containerd/v2/core/mount"
+ 	"github.com/containerd/containerd/v2/core/snapshots"
+ 	"github.com/containerd/containerd/v2/core/snapshots/storage"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/fsverity"
+ )
+ 
+@@ -43,6 +45,8 @@ type SnapshotterConfig struct {
+ 	setImmutable bool
+ 	// defaultSize creates a default size writable layer for active snapshots
+ 	defaultSize int64
++	// dmverityMode controls dm-verity behavior: "auto" (use if .dmverity exists), "on" (require .dmverity), "off" (disable)
++	dmverityMode string
+ }
+ 
+ // Opt is an option to configure the erofs snapshotter
+@@ -69,6 +73,13 @@ func WithImmutable() Opt {
+ 	}
+ }
+ 
++// WithDmverityMode sets the dm-verity mode: "auto" (default), "on" (required), or "off" (disabled)
++func WithDmverityMode(mode string) Opt {
++	return func(config *SnapshotterConfig) {
++		config.dmverityMode = mode
++	}
++}
++
+ // WithDefaultSize creates a default size writable layer for active snapshots
+ func WithDefaultSize(size int64) Opt {
+ 	return func(config *SnapshotterConfig) {
+@@ -90,6 +101,7 @@ type snapshotter struct {
+ 	setImmutable    bool
+ 	defaultWritable int64
+ 	blockMode       bool
++	dmverityMode    string
+ }
+ 
+ // NewSnapshotter returns a Snapshotter which uses EROFS+OverlayFS. The layers
+@@ -102,6 +114,24 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		opt(&config)
+ 	}
+ 
++	if config.dmverityMode == "" {
++		config.dmverityMode = "auto"
++	}
++
++	if config.dmverityMode != "auto" && config.dmverityMode != "on" && config.dmverityMode != "off" {
++		return nil, fmt.Errorf("invalid dmverity_mode %q: must be \"auto\", \"on\", or \"off\"", config.dmverityMode)
++	}
++
++	if config.dmverityMode == "on" {
++		supported, err := dmverity.IsSupported()
++		if err != nil {
++			return nil, fmt.Errorf("failed to check dm-verity support: %w", err)
++		}
++		if !supported {
++			return nil, fmt.Errorf("dmverity_mode is 'on' but dm-verity is not supported on this system")
++		}
++	}
++
+ 	if err := os.MkdirAll(root, 0700); err != nil {
+ 		return nil, err
+ 	}
+@@ -146,6 +176,7 @@ func NewSnapshotter(root string, opts ...Opt) (snapshots.Snapshotter, error) {
+ 		setImmutable:    config.setImmutable,
+ 		defaultWritable: config.defaultSize,
+ 		blockMode:       config.defaultSize > 0,
++		dmverityMode:    config.dmverityMode,
+ 	}, nil
+ }
+ 
+@@ -205,7 +236,56 @@ func (s *snapshotter) prepareDirectory(ctx context.Context, snapshotDir string,
+ 	return td, nil
+ }
+ 
+-func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.Mount, error) {
++// applyDmverityPolicy validates and applies dm-verity policy for a layer.
++// Returns the X-containerd.dmverity option if needed, or empty string otherwise.
++func (s *snapshotter) applyDmverityPolicy(layerBlob string) (string, error) {
++	// Parse the sidecar rather than just stat'ing it. Existence alone says
++	// nothing about whether the metadata can actually drive a dm-verity
++	// device, so a truncated or malformed file would otherwise satisfy mode
++	// "on" here and then silently degrade to a plain mount in the mount
++	// handler.
++	metadataExists := false
++	if _, err := dmverity.ReadMetadata(layerBlob); err == nil {
++		metadataExists = true
++	} else if !errors.Is(err, os.ErrNotExist) && s.dmverityMode != "off" {
++		return "", fmt.Errorf("layer %s has unusable dm-verity metadata: %w", layerBlob, err)
++	}
++
++	// Validate dmverityMode policy: mode "on" requires .dmverity metadata to exist
++	if s.dmverityMode == "on" && !metadataExists {
++		return "", fmt.Errorf("dm-verity mode is 'on' but .dmverity metadata not found for layer %s", layerBlob)
++	}
++
++	// Only return option if metadata exists and we need to override the default "auto" behavior
++	// This keeps standard EROFS mounts (without dm-verity) unchanged
++	if metadataExists && s.dmverityMode != "auto" {
++		// Mode "off": disables dm-verity even though metadata exists
++		// Mode "on": explicitly enables dm-verity (though "auto" would do the same)
++		return fmt.Sprintf("X-containerd.dmverity=%s", s.dmverityMode), nil
++	}
++
++	return "", nil
++}
++
++// createErofsMount creates a mount specification for an EROFS layer.
++// Applies dmverityMode policy and passes it to the mount handler.
++func (s *snapshotter) createErofsMount(layerBlob string) (mount.Mount, error) {
++	options := []string{"ro", "loop"}
++
++	if dmverityOpt, err := s.applyDmverityPolicy(layerBlob); err != nil {
++		return mount.Mount{}, err
++	} else if dmverityOpt != "" {
++		options = append(options, dmverityOpt)
++	}
++
++	return mount.Mount{
++		Source:  layerBlob,
++		Type:    "erofs",
++		Options: options,
++	}, nil
++}
++
++func (s *snapshotter) mounts(ctx context.Context, snap storage.Snapshot, info snapshots.Info) ([]mount.Mount, error) {
+ 	var options []string
+ 
+ 	if len(snap.ParentIDs) == 0 {
+@@ -218,13 +298,11 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
+ 					return nil, err
+ 				}
+ 			}
+-			return []mount.Mount{
+-				{
+-					Source:  layerBlob,
+-					Type:    "erofs",
+-					Options: []string{"ro", "loop"},
+-				},
+-			}, nil
++			m, err := s.createErofsMount(layerBlob)
++			if err != nil {
++				return nil, fmt.Errorf("failed to create erofs mount: %w", err)
++			}
++			return []mount.Mount{m}, nil
+ 		}
+ 		// if we only have one layer/no parents then just return a bind mount as overlay
+ 		// will not work
+@@ -302,13 +380,12 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
+ 		if err != nil {
+ 			return nil, err
+ 		}
+-		return []mount.Mount{
+-			{
+-				Source:  layerBlob,
+-				Type:    "erofs",
+-				Options: []string{"ro", "loop"},
+-			},
+-		}, nil
++
++		m, err := s.createErofsMount(layerBlob)
++		if err != nil {
++			return nil, fmt.Errorf("failed to create erofs mount: %w", err)
++		}
++		return []mount.Mount{m}, nil
+ 	}
+ 
+ 	first := len(mounts)
+@@ -318,10 +395,9 @@ func (s *snapshotter) mounts(snap storage.Snapshot, _ snapshots.Info) ([]mount.M
+ 			return nil, err
+ 		}
+ 
+-		m := mount.Mount{
+-			Source:  layerBlob,
+-			Type:    "erofs",
+-			Options: []string{"ro", "loop"},
++		m, err := s.createErofsMount(layerBlob)
++		if err != nil {
++			return nil, fmt.Errorf("failed to create erofs mount for parent %s: %w", snap.ParentIDs[i], err)
+ 		}
+ 
+ 		mounts = append(mounts, m)
+@@ -397,7 +473,7 @@ func (s *snapshotter) createSnapshot(ctx context.Context, kind snapshots.Kind, k
+ 	}); err != nil {
+ 		return nil, err
+ 	}
+-	return s.mounts(snap, info)
++	return s.mounts(ctx, snap, info)
+ }
+ 
+ func (s *snapshotter) Prepare(ctx context.Context, key, parent string, opts ...snapshots.Opt) ([]mount.Mount, error) {
+@@ -489,6 +565,8 @@ func (s *snapshotter) Commit(ctx context.Context, name, key string, opts ...snap
+ 		}
+ 	}
+ 
++	// Note: dm-verity formatting is handled by the EROFS differ, not here
++
+ 	return s.ms.WithTransaction(ctx, true, func(ctx context.Context) error {
+ 		if _, err := os.Stat(layerBlob); err != nil {
+ 			return fmt.Errorf("failed to get the converted erofs blob: %w", err)
+@@ -522,7 +600,7 @@ func (s *snapshotter) Mounts(ctx context.Context, key string) (_ []mount.Mount,
+ 	}); err != nil {
+ 		return nil, err
+ 	}
+-	return s.mounts(snap, info)
++	return s.mounts(ctx, snap, info)
+ }
+ 
+ func (s *snapshotter) getCleanupDirectories(ctx context.Context) ([]string, error) {
+@@ -569,6 +647,9 @@ func (s *snapshotter) Remove(ctx context.Context, key string) (err error) {
+ 				log.G(ctx).WithError(err).WithField("id", id).Warnf("failed to cleanup upperdir")
+ 			}
+ 
++			// Note: dm-verity device cleanup is handled by the EROFS mount handler
++			// during Deactivate/Unmount, not here in Remove()
++
+ 			for _, dir := range removals {
+ 				if err := os.RemoveAll(dir); err != nil {
+ 					log.G(ctx).WithError(err).WithField("path", dir).Warn("failed to remove directory")
+diff --git a/plugins/snapshots/erofs/erofs_linux_test.go b/plugins/snapshots/erofs/erofs_linux_test.go
+index b55f0b873..d9bd86fed 100644
+--- a/plugins/snapshots/erofs/erofs_linux_test.go
++++ b/plugins/snapshots/erofs/erofs_linux_test.go
+@@ -26,17 +26,25 @@ import (
+ 	"testing"
+ 	"time"
+ 
++	"github.com/stretchr/testify/assert"
++	"github.com/stretchr/testify/require"
++	bolt "go.etcd.io/bbolt"
++
+ 	"github.com/containerd/containerd/v2/core/content"
+ 	"github.com/containerd/containerd/v2/core/mount"
++	mountmanager "github.com/containerd/containerd/v2/core/mount/manager"
+ 	"github.com/containerd/containerd/v2/core/snapshots"
+ 	"github.com/containerd/containerd/v2/core/snapshots/storage"
+ 	"github.com/containerd/containerd/v2/core/snapshots/testsuite"
++	"github.com/containerd/containerd/v2/internal/dmverity"
+ 	"github.com/containerd/containerd/v2/internal/erofsutils"
+ 	"github.com/containerd/containerd/v2/internal/fsverity"
+ 	"github.com/containerd/containerd/v2/pkg/archive/tartest"
++	"github.com/containerd/containerd/v2/pkg/namespaces"
+ 	"github.com/containerd/containerd/v2/pkg/testutil"
+ 	"github.com/containerd/containerd/v2/plugins/content/local"
+ 	erofsdiffer "github.com/containerd/containerd/v2/plugins/diff/erofs"
++	erofsmount "github.com/containerd/containerd/v2/plugins/mount/erofs"
+ 	"github.com/opencontainers/go-digest"
+ 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+ )
+@@ -44,6 +52,10 @@ import (
+ const (
+ 	testFileContent       = "Hello, this is content for testing the EROFS Snapshotter!"
+ 	testNestedFileContent = "Nested file content"
++	testDmverityMetadata  = `{
++  "roothash": "fedcba098765432109876543210987654321098765432109876543210987",
++  "hashoffset": 4096
++}`
+ )
+ 
+ func newSnapshotter(t *testing.T, opts ...Opt) func(ctx context.Context, root string) (snapshots.Snapshotter, func() error, error) {
+@@ -209,10 +221,8 @@ func TestErofsDifferWithTarIndexMode(t *testing.T) {
+ 	// Create EROFS snapshotter
+ 	snapshotRoot := filepath.Join(tempDir, "snapshots")
+ 	s, err := NewSnapshotter(snapshotRoot)
+-	if err != nil {
+-		t.Fatal(err)
+-	}
+-	defer s.Close()
++	require.NoError(t, err)
++	t.Cleanup(func() { s.Close() })
+ 
+ 	// Create test tar content
+ 	tarReader := createTestTarContent()
+@@ -354,3 +364,342 @@ func createTestTarContent() io.ReadCloser {
+ 	// Return the tar as a ReadCloser
+ 	return tartest.TarFromWriterTo(tarWriter)
+ }
++
++// Helper to create a dm-verity metadata file for testing
++func createDmverityMetadata(t *testing.T, layerBlob string) {
++	t.Helper()
++	metadataPath := layerBlob + ".dmverity"
++	err := os.WriteFile(metadataPath, []byte(testDmverityMetadata), 0644)
++	require.NoError(t, err)
++	t.Cleanup(func() { os.Remove(metadataPath) })
++}
++
++// Helper to create a test layer blob file
++func createTestLayerBlob(t *testing.T, dir string) string {
++	t.Helper()
++	layerBlob := filepath.Join(dir, "layer.erofs")
++	err := os.WriteFile(layerBlob, []byte{}, 0644)
++	require.NoError(t, err)
++	return layerBlob
++}
++
++// TestCreateErofsMount tests mount creation without dm-verity
++func TestCreateErofsMount(t *testing.T) {
++	tmpDir := t.TempDir()
++	layerBlob := createTestLayerBlob(t, tmpDir)
++
++	s := &snapshotter{
++		root:         tmpDir,
++		dmverityMode: "off",
++	}
++
++	t.Run("creates regular erofs mount", func(t *testing.T) {
++		m, err := s.createErofsMount(layerBlob)
++		require.NoError(t, err)
++
++		assert.Equal(t, "erofs", m.Type)
++		assert.Equal(t, layerBlob, m.Source)
++		// No X-containerd.dmverity option needed since no .dmverity metadata exists
++		assert.Equal(t, []string{"ro", "loop"}, m.Options)
++	})
++
++	t.Run("always returns erofs mount type", func(t *testing.T) {
++		s.dmverityMode = "on"
++		createDmverityMetadata(t, layerBlob)
++
++		m, err := s.createErofsMount(layerBlob)
++		require.NoError(t, err)
++		// Mount type is always "erofs" - dm-verity detection happens in mount handler
++		assert.Equal(t, "erofs", m.Type)
++		assert.Equal(t, layerBlob, m.Source)
++		assert.Contains(t, m.Options, "ro")
++		assert.Contains(t, m.Options, "loop")
++	})
++
++	t.Run("mode off skips dm-verity even when metadata exists", func(t *testing.T) {
++		metadataFile := layerBlob + ".dmverity"
++		metadataContent := `{
++  "roothash": "fedcba098765432109876543210987654321098765432109876543210987",
++  "hashoffset": 4096
++}`
++		require.NoError(t, os.WriteFile(metadataFile, []byte(metadataContent), 0644))
++
++		s.dmverityMode = "off"
++
++		m, err := s.createErofsMount(layerBlob)
++		require.NoError(t, err)
++
++		assert.Equal(t, "erofs", m.Type)
++		assert.Equal(t, layerBlob, m.Source)
++		// X-containerd.dmverity=off overrides auto-detection when metadata exists
++		assert.Contains(t, m.Options, "X-containerd.dmverity=off")
++	})
++}
++
++// TestDmverityEndToEnd tests the full workflow: differ creates dm-verity layer,
++// snapshotter mounts it via mount manager, and cleanup on removal
++func TestDmverityEndToEnd(t *testing.T) {
++	testutil.RequiresRoot(t)
++
++	supported, err := dmverity.IsSupported()
++	if err != nil || !supported {
++		t.Skip("dm-verity is not supported on this system")
++	}
++
++	t.Run("with regular mode", func(t *testing.T) {
++		testDmverityEndToEndWithMode(t, false)
++	})
++
++	tarSupported, err := erofsutils.SupportGenerateFromTar()
++	if err == nil && tarSupported {
++		t.Run("with tar index mode", func(t *testing.T) {
++			testDmverityEndToEndWithMode(t, true)
++		})
++	} else {
++		t.Logf("Skipping tar index mode test: mkfs.erofs does not support tar mode")
++	}
++}
++
++func testDmverityEndToEndWithMode(t *testing.T, useTarIndex bool) {
++	ctx := context.Background()
++	ctx = namespaces.WithNamespace(ctx, "test")
++	tempDir := t.TempDir()
++
++	metadb := filepath.Join(tempDir, "mounts.db")
++	db, err := bolt.Open(metadb, 0600, nil)
++	require.NoError(t, err)
++	defer db.Close()
++
++	mountTargetDir := filepath.Join(tempDir, "mount-manager")
++	mgr, err := mountmanager.NewManager(db, mountTargetDir,
++		mountmanager.WithMountHandler("erofs", erofsmount.NewErofsMountHandler()))
++	require.NoError(t, err)
++
++	contentStore, err := local.NewStore(filepath.Join(tempDir, "content"))
++	require.NoError(t, err)
++
++	var differOpts []erofsdiffer.DifferOpt
++	differOpts = append(differOpts, erofsdiffer.WithDmverity())
++	if useTarIndex {
++		differOpts = append(differOpts, erofsdiffer.WithTarIndexMode())
++	}
++	differ := erofsdiffer.NewErofsDiffer(contentStore, differOpts...)
++
++	snapshotRoot := filepath.Join(tempDir, "snapshots")
++	sn, err := NewSnapshotter(snapshotRoot, WithDmverityMode("on"))
++	require.NoError(t, err)
++	defer sn.Close()
++
++	s := sn.(*snapshotter)
++
++	tarReader := createTestTarContent()
++	defer tarReader.Close()
++
++	tarContent, err := io.ReadAll(tarReader)
++	require.NoError(t, err)
++
++	desc := ocispec.Descriptor{
++		MediaType: ocispec.MediaTypeImageLayerGzip,
++		Digest:    digest.FromBytes(tarContent),
++		Size:      int64(len(tarContent)),
++	}
++
++	writer, err := contentStore.Writer(ctx,
++		content.WithRef("test-layer"),
++		content.WithDescriptor(desc))
++	require.NoError(t, err)
++
++	_, err = writer.Write(tarContent)
++	require.NoError(t, err)
++
++	err = writer.Commit(ctx, desc.Size, desc.Digest)
++	require.NoError(t, err)
++	writer.Close()
++
++	// Prepare snapshot
++	snapshotKey := "test-snapshot"
++	mounts, err := sn.Prepare(ctx, snapshotKey, "")
++	require.NoError(t, err)
++
++	_, err = differ.Apply(ctx, desc, mounts)
++	require.NoError(t, err)
++
++	commitKey := "test-commit"
++	err = sn.Commit(ctx, commitKey, snapshotKey)
++	require.NoError(t, err)
++
++	var snapshotID string
++	err = s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
++		var err error
++		snapshotID, _, _, err = storage.GetInfo(ctx, commitKey)
++		return err
++	})
++	require.NoError(t, err)
++
++	// Differ should create .dmverity metadata alongside layer
++	layerPath := s.layerBlobPath(snapshotID)
++	metadataPath := layerPath + ".dmverity"
++
++	metadataData, err := os.ReadFile(metadataPath)
++	require.NoError(t, err, ".dmverity file should exist")
++	require.NotEmpty(t, metadataData, "metadata should not be empty")
++
++	viewKey := "test-view"
++	viewMounts, err := sn.View(ctx, viewKey, commitKey)
++	require.NoError(t, err)
++
++	// Mount handler (not snapshotter) activates dm-verity
++	require.Len(t, viewMounts, 1)
++	assert.Equal(t, "erofs", viewMounts[0].Type)
++	assert.Contains(t, viewMounts[0].Options, "ro")
++	assert.Contains(t, viewMounts[0].Options, "loop")
++
++	viewTarget := filepath.Join(tempDir, "view-mount")
++	require.NoError(t, os.MkdirAll(viewTarget, 0755))
++
++	mountID := "test-view-mount"
++	activateInfo, err := mgr.Activate(ctx, mountID, viewMounts)
++	require.NoError(t, err)
++
++	// EROFS handler mounts directly, check Active mounts for the actual mount point
++	require.Len(t, activateInfo.Active, 1, "should have one active mount from EROFS handler")
++	actualMountPoint := activateInfo.Active[0].MountPoint
++	require.NotEmpty(t, actualMountPoint, "mount point should be set by EROFS handler")
++
++	testData, err := os.ReadFile(filepath.Join(actualMountPoint, "test-file.txt"))
++	require.NoError(t, err, "should be able to read test file from dm-verity mount")
++	assert.Equal(t, testFileContent, string(testData))
++
++	nestedData, err := os.ReadFile(filepath.Join(actualMountPoint, "testdir", "nested.txt"))
++	require.NoError(t, err, "should be able to read nested file from dm-verity mount")
++	assert.Equal(t, testNestedFileContent, string(nestedData))
++
++	err = mgr.Deactivate(ctx, mountID)
++	require.NoError(t, err)
++
++	err = sn.Remove(ctx, viewKey)
++	require.NoError(t, err)
++
++	err = sn.Remove(ctx, commitKey)
++	require.NoError(t, err)
++
++	err = s.ms.WithTransaction(ctx, false, func(ctx context.Context) error {
++		_, err := storage.GetSnapshot(ctx, commitKey)
++		return err
++	})
++	assert.Error(t, err, "snapshot should be removed from metadata")
++}
++
++// TestDmverityModeValidation tests dm-verity mode validation during snapshotter creation
++func TestDmverityModeValidation(t *testing.T) {
++	testutil.RequiresRoot(t)
++	tmpDir := t.TempDir()
++
++	t.Run("rejects invalid dmverity mode", func(t *testing.T) {
++		_, err := NewSnapshotter(tmpDir, WithDmverityMode("invalid-mode"))
++		require.Error(t, err)
++		assert.Contains(t, err.Error(), "invalid dmverity_mode")
++		assert.Contains(t, err.Error(), `must be "auto", "on", or "off"`)
++	})
++
++	t.Run("accepts valid auto mode", func(t *testing.T) {
++		root := filepath.Join(tmpDir, "auto")
++		s, err := NewSnapshotter(root, WithDmverityMode("auto"))
++		require.NoError(t, err)
++		assert.NotNil(t, s)
++		s.Close()
++	})
++
++	t.Run("accepts valid on mode when dm-verity is supported", func(t *testing.T) {
++		supported, err := dmverity.IsSupported()
++		if err != nil || !supported {
++			t.Skip("dm-verity not supported, skipping")
++		}
++
++		root := filepath.Join(tmpDir, "on")
++		s, err := NewSnapshotter(root, WithDmverityMode("on"))
++		require.NoError(t, err)
++		assert.NotNil(t, s)
++		s.Close()
++	})
++
++	t.Run("accepts valid off mode", func(t *testing.T) {
++		root := filepath.Join(tmpDir, "off")
++		s, err := NewSnapshotter(root, WithDmverityMode("off"))
++		require.NoError(t, err)
++		assert.NotNil(t, s)
++		s.Close()
++	})
++
++	t.Run("defaults to auto mode when not specified", func(t *testing.T) {
++		root := filepath.Join(tmpDir, "default")
++		s, err := NewSnapshotter(root)
++		require.NoError(t, err)
++		snap := s.(*snapshotter)
++		assert.Equal(t, "auto", snap.dmverityMode)
++		s.Close()
++	})
++}
++
++// TestApplyDmverityPolicy tests the dm-verity policy application logic
++func TestApplyDmverityPolicy(t *testing.T) {
++	testutil.RequiresRoot(t)
++	tmpDir := t.TempDir()
++	layerBlob := createTestLayerBlob(t, tmpDir)
++
++	t.Run("mode on requires metadata to exist", func(t *testing.T) {
++		s := &snapshotter{
++			dmverityMode: "on",
++		}
++
++		_, err := s.applyDmverityPolicy(layerBlob)
++		require.Error(t, err)
++		assert.Contains(t, err.Error(), "dm-verity mode is 'on' but .dmverity metadata not found")
++	})
++
++	t.Run("mode auto returns empty string when no metadata", func(t *testing.T) {
++		s := &snapshotter{
++			dmverityMode: "auto",
++		}
++
++		opt, err := s.applyDmverityPolicy(layerBlob)
++		require.NoError(t, err)
++		assert.Empty(t, opt)
++	})
++
++	t.Run("mode off returns dmverity=off when metadata exists", func(t *testing.T) {
++		createDmverityMetadata(t, layerBlob)
++
++		s := &snapshotter{
++			dmverityMode: "off",
++		}
++
++		opt, err := s.applyDmverityPolicy(layerBlob)
++		require.NoError(t, err)
++		assert.Equal(t, "X-containerd.dmverity=off", opt)
++	})
++
++	t.Run("mode on returns dmverity=on when metadata exists", func(t *testing.T) {
++		createDmverityMetadata(t, layerBlob)
++
++		s := &snapshotter{
++			dmverityMode: "on",
++		}
++
++		opt, err := s.applyDmverityPolicy(layerBlob)
++		require.NoError(t, err)
++		assert.Equal(t, "X-containerd.dmverity=on", opt)
++	})
++
++	t.Run("mode auto returns empty string when metadata exists", func(t *testing.T) {
++		createDmverityMetadata(t, layerBlob)
++
++		s := &snapshotter{
++			dmverityMode: "auto",
++		}
++
++		opt, err := s.applyDmverityPolicy(layerBlob)
++		require.NoError(t, err)
++		assert.Empty(t, opt) // auto mode doesn't add explicit option
++	})
++}
+diff --git a/plugins/snapshots/erofs/plugin/plugin.go b/plugins/snapshots/erofs/plugin/plugin.go
+index 6e734e84d..3a3d35b20 100644
+--- a/plugins/snapshots/erofs/plugin/plugin.go
++++ b/plugins/snapshots/erofs/plugin/plugin.go
+@@ -46,6 +46,10 @@ type Config struct {
+ 
+ 	// DefaultSize is the default size of a writable layer in string
+ 	DefaultSize string `toml:"default_size"`
++
++	// DmverityMode controls dm-verity behavior: "auto" (use if available), "on" (require), "off" (disable)
++	// Linux only
++	DmverityMode string `toml:"dmverity_mode"`
+ }
+ 
+ func init() {
+@@ -87,6 +91,10 @@ func init() {
+ 				opts = append(opts, erofs.WithDefaultSize(size))
+ 			}
+ 
++			if config.DmverityMode != "" {
++				opts = append(opts, erofs.WithDmverityMode(config.DmverityMode))
++			}
++
+ 			ic.Meta.Exports[plugins.SnapshotterRootDir] = root
+ 			ic.Meta.Capabilities = append(ic.Meta.Capabilities, "rebase")
+ 			return erofs.NewSnapshotter(root, opts...)
+diff --git a/vendor/github.com/containerd/go-dmverity/LICENSE b/vendor/github.com/containerd/go-dmverity/LICENSE
+new file mode 100644
+index 000000000..261eeb9e9
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/LICENSE
+@@ -0,0 +1,201 @@
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/dm/dm_linux.go b/vendor/github.com/containerd/go-dmverity/pkg/dm/dm_linux.go
+new file mode 100644
+index 000000000..87dd73c0b
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/dm/dm_linux.go
+@@ -0,0 +1,402 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dm
++
++import (
++	"errors"
++	"fmt"
++	"os"
++	"unsafe"
++
++	"golang.org/x/sys/unix"
++)
++
++// Ioctl encoding constants (see <asm-generic/ioctl.h>).
++const (
++	iocNRBits   = 8
++	iocTypeBits = 8
++	iocSizeBits = 14
++	iocDirBits  = 2
++
++	iocNRShift   = 0
++	iocTypeShift = iocNRShift + iocNRBits
++	iocSizeShift = iocTypeShift + iocTypeBits
++	iocDirShift  = iocSizeShift + iocSizeBits
++
++	iocWrite = 1
++	iocRead  = 2
++)
++
++// Device-mapper ioctl constants (see <linux/dm-ioctl.h>).
++// Ioctl type ("magic").
++const DMIOCTLType = 0xfd // matches Linux uapi header
++
++const (
++	DMNameLen     = 128
++	DMUUIDLen     = 129
++	DMMaxTypeName = 16
++)
++
++// DM ioctl command numbers (subset) per <linux/dm-ioctl.h>.
++const (
++	DMDevCreateCMD    = 3  // DM_DEV_CREATE
++	DMDevRemoveCMD    = 4  // DM_DEV_REMOVE
++	DMDevSuspendCMD   = 6  // DM_DEV_SUSPEND
++	DMDevStatusCMD    = 7  // DM_DEV_STATUS
++	DMTableLoadCMD    = 9  // DM_TABLE_LOAD
++	DMTableClearCMD   = 10 // DM_TABLE_CLEAR
++	DMTableStatusCMD  = 12 // DM_TABLE_STATUS
++	DMListVersionsCMD = 13 // DM_LIST_VERSIONS
++)
++
++const (
++	DMVersionMajor = 4
++	DMVersionMinor = 0
++	DMVersionPatch = 0
++)
++
++const (
++	DMReadOnlyFlag        = 1 << 0
++	DMSuspendFlag         = 1 << 1
++	DMStatusTableFlag     = 1 << 4
++	DMActivePresentFlag   = 1 << 5
++	DMInactivePresentFlag = 1 << 6
++)
++
++type dmIoctl struct {
++	Version     [3]uint32
++	DataSize    uint32
++	DataStart   uint32
++	TargetCount uint32
++	OpenCount   int32
++	Flags       uint32
++	EventNr     uint32
++	Padding     uint32
++	Dev         uint64
++	Name        [DMNameLen]byte
++	UUID        [DMUUIDLen]byte
++	Data        [7]byte
++}
++
++type dmTargetSpec struct {
++	SectorStart uint64
++	Length      uint64
++	Status      int32
++	Next        uint32
++	TargetType  [DMMaxTypeName]byte
++}
++
++type dmTargetVersions struct {
++	Next    uint32
++	Version [3]uint32
++	Name    [DMMaxTypeName]byte
++}
++
++type Control struct {
++	fd *os.File
++}
++
++type Target struct {
++	SectorStart uint64
++	Length      uint64
++	Type        string
++	Params      string
++}
++
++type DeviceStatus struct {
++	OpenCount       int32
++	TargetCount     uint32
++	EventNr         uint32
++	Flags           uint32
++	Dev             uint64
++	Major           uint32
++	Minor           uint32
++	Name            string
++	UUID            string
++	ActivePresent   bool
++	InactivePresent bool
++}
++
++func Open() (*Control, error) {
++	fd, err := os.OpenFile("/dev/mapper/control", os.O_RDWR, 0)
++	if err != nil {
++		return nil, err
++	}
++	return &Control{fd: fd}, nil
++}
++
++func (c *Control) Close() error {
++	if c == nil || c.fd == nil {
++		return nil
++	}
++	return c.fd.Close()
++}
++
++var ioctlSyscall = func(fd, req, arg uintptr) (uintptr, uintptr, unix.Errno) {
++	return unix.Syscall(unix.SYS_IOCTL, fd, req, arg)
++}
++
++func dmReq(nr uintptr) uintptr {
++	return iowr(DMIOCTLType, nr, unsafe.Sizeof(dmIoctl{}))
++}
++
++func (c *Control) rawIoctl(nr uintptr, buf unsafe.Pointer) error {
++	_, _, errno := ioctlSyscall(c.fd.Fd(), dmReq(nr), uintptr(buf))
++	if errno != 0 {
++		return errno
++	}
++	return nil
++}
++
++func makeBaseIoctl(name, uuid string, totalDataSize int) dmIoctl {
++	var io dmIoctl
++	io.Version[0] = DMVersionMajor
++	io.Version[1] = DMVersionMinor
++	io.Version[2] = DMVersionPatch
++	io.DataSize = uint32(totalDataSize)
++	io.DataStart = uint32(unsafe.Sizeof(dmIoctl{}))
++	copy(io.Name[:], []byte(name))
++	copy(io.UUID[:], []byte(uuid))
++	return io
++}
++
++func (c *Control) CreateDevice(name string) (uint64, error) {
++	buf := make([]byte, unsafe.Sizeof(dmIoctl{}))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	if err := c.rawIoctl(DMDevCreateCMD, unsafe.Pointer(io)); err != nil {
++		return 0, fmt.Errorf("dm create '%s': %w", name, err)
++	}
++	return io.Dev, nil
++}
++
++func (c *Control) RemoveDevice(name string) error {
++	buf := make([]byte, unsafe.Sizeof(dmIoctl{}))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	if err := c.rawIoctl(DMDevRemoveCMD, unsafe.Pointer(io)); err != nil {
++		return fmt.Errorf("dm remove '%s': %w", name, err)
++	}
++	return nil
++}
++
++func (c *Control) SuspendDevice(name string, suspend bool) error {
++	buf := make([]byte, unsafe.Sizeof(dmIoctl{}))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	if suspend {
++		io.Flags |= DMSuspendFlag
++	}
++	if err := c.rawIoctl(DMDevSuspendCMD, unsafe.Pointer(io)); err != nil {
++		return fmt.Errorf("dm suspend/resume '%s': %w", name, err)
++	}
++	return nil
++}
++
++func (c *Control) LoadTable(name string, targets []Target) error {
++	if len(targets) == 0 {
++		return errors.New("no targets provided")
++	}
++
++	headerSize := int(unsafe.Sizeof(dmIoctl{}))
++	payload := make([]byte, 0, headerSize+len(targets)*(int(unsafe.Sizeof(dmTargetSpec{}))+256))
++	body := make([]byte, 0, cap(payload)-headerSize)
++	for i, t := range targets {
++		start := len(body)
++		body = append(body, make([]byte, int(unsafe.Sizeof(dmTargetSpec{})))...)
++		spec := (*dmTargetSpec)(unsafe.Pointer(&body[start]))
++		spec.SectorStart = t.SectorStart
++		spec.Length = t.Length
++		spec.Status = 0
++		spec.Next = 0
++		copy(spec.TargetType[:], []byte(t.Type))
++
++		paramsBytes := append([]byte(t.Params), 0)
++		body = append(body, paramsBytes...)
++		rel := len(body) - start
++		pad := ((rel + 7) &^ 7) - rel
++		if pad > 0 {
++			body = append(body, make([]byte, pad)...)
++		}
++		if i < len(targets)-1 {
++			spec.Next = uint32(len(body) - start)
++		}
++	}
++
++	buf := make([]byte, headerSize+len(body))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	io.Flags |= DMReadOnlyFlag
++	io.TargetCount = uint32(len(targets))
++	copy(buf[headerSize:], body)
++
++	if err := c.rawIoctl(DMTableLoadCMD, unsafe.Pointer(io)); err != nil {
++		return fmt.Errorf("dm table load '%s': %w", name, err)
++	}
++	return nil
++}
++
++func (c *Control) ClearTable(name string) error {
++	buf := make([]byte, unsafe.Sizeof(dmIoctl{}))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	if err := c.rawIoctl(DMTableClearCMD, unsafe.Pointer(io)); err != nil {
++		if errors.Is(err, unix.EINVAL) || errors.Is(err, unix.ENXIO) {
++			return nil
++		}
++		return fmt.Errorf("dm table clear '%s': %w", name, err)
++	}
++	return nil
++}
++
++func (c *Control) DeviceStatus(name string) (DeviceStatus, error) {
++	buf := make([]byte, unsafe.Sizeof(dmIoctl{}))
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	*io = makeBaseIoctl(name, "", len(buf))
++	if err := c.rawIoctl(DMDevStatusCMD, unsafe.Pointer(io)); err != nil {
++		return DeviceStatus{}, fmt.Errorf("dm dev status '%s': %w", name, err)
++	}
++	nlen := 0
++	for nlen < len(io.Name) && io.Name[nlen] != 0 {
++		nlen++
++	}
++	ulen := 0
++	for ulen < len(io.UUID) && io.UUID[ulen] != 0 {
++		ulen++
++	}
++	maj := unix.Major(io.Dev)
++	minor := unix.Minor(io.Dev)
++	return DeviceStatus{
++		OpenCount:       io.OpenCount,
++		TargetCount:     io.TargetCount,
++		EventNr:         io.EventNr,
++		Flags:           io.Flags,
++		Dev:             io.Dev,
++		Major:           maj,
++		Minor:           minor,
++		Name:            string(io.Name[:nlen]),
++		UUID:            string(io.UUID[:ulen]),
++		ActivePresent:   (io.Flags & DMActivePresentFlag) != 0,
++		InactivePresent: (io.Flags & DMInactivePresentFlag) != 0,
++	}, nil
++}
++
++func (c *Control) TableStatus(name string, inactive bool) (string, error) {
++	bufSz := 16 * 1024
++	for tries := 0; tries < 3; tries++ {
++		buf := make([]byte, bufSz)
++		io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++		*io = makeBaseIoctl(name, "", bufSz)
++		if inactive {
++			io.Flags |= DMStatusTableFlag
++		}
++		if err := c.rawIoctl(DMTableStatusCMD, unsafe.Pointer(io)); err != nil {
++			if errors.Is(err, unix.ENOSPC) || errors.Is(err, unix.EINVAL) {
++				bufSz *= 2
++				continue
++			}
++			return "", fmt.Errorf("dm table status '%s': %w", name, err)
++		}
++		i := int(io.DataStart)
++		end := int(io.DataSize)
++		if end == 0 || end > len(buf) {
++			end = len(buf)
++		}
++		var out []byte
++		first := true
++		for i+int(unsafe.Sizeof(dmTargetSpec{})) <= end {
++			start := i
++			spec := (*dmTargetSpec)(unsafe.Pointer(&buf[i]))
++			i += int(unsafe.Sizeof(dmTargetSpec{}))
++			j := i
++			for j < end && buf[j] != 0 {
++				j++
++			}
++			if !first {
++				out = append(out, '\n')
++			}
++			first = false
++			out = append(out, buf[i:j]...)
++			if spec.Next == 0 {
++				break
++			}
++			i = start + int(spec.Next)
++		}
++		return string(out), nil
++	}
++	return "", fmt.Errorf("dm table status '%s': insufficient buffer after retries", name)
++}
++
++func ioc(dir, typ, nr, size uintptr) uintptr {
++	return (dir << iocDirShift) | (typ << iocTypeShift) | (nr << iocNRShift) | (size << iocSizeShift)
++}
++
++func iowr(typ, nr, size uintptr) uintptr { return ioc(iocRead|iocWrite, typ, nr, size) }
++
++func CheckVeritySignatureSupport() error {
++	fd, err := os.OpenFile("/dev/mapper/control", os.O_RDWR, 0)
++	if err != nil {
++		return fmt.Errorf("failed to open /dev/mapper/control: %w", err)
++	}
++	defer fd.Close()
++
++	bufSize := int(unsafe.Sizeof(dmIoctl{})) + 4096
++	buf := make([]byte, bufSize)
++	io := (*dmIoctl)(unsafe.Pointer(&buf[0]))
++	io.Version[0] = DMVersionMajor
++	io.Version[1] = DMVersionMinor
++	io.Version[2] = DMVersionPatch
++	io.DataSize = uint32(bufSize)
++	io.DataStart = uint32(unsafe.Sizeof(dmIoctl{}))
++
++	_, _, errno := ioctlSyscall(fd.Fd(), dmReq(DMListVersionsCMD), uintptr(unsafe.Pointer(io)))
++	if errno != 0 {
++		return fmt.Errorf("DM_LIST_VERSIONS ioctl failed: %w", errno)
++	}
++
++	offset := int(io.DataStart)
++	for offset < int(io.DataSize) {
++		if offset+int(unsafe.Sizeof(dmTargetVersions{})) > len(buf) {
++			break
++		}
++
++		tv := (*dmTargetVersions)(unsafe.Pointer(&buf[offset]))
++		nameLen := 0
++		for nameLen < len(tv.Name) && tv.Name[nameLen] != 0 {
++			nameLen++
++		}
++		name := string(tv.Name[:nameLen])
++
++		if name == "verity" {
++			major := tv.Version[0]
++			minor := tv.Version[1]
++
++			if major < 1 || (major == 1 && minor < 5) {
++				return fmt.Errorf("dm-verity signature not supported (requires >= 1.5.0, found %d.%d.%d)",
++					major, minor, tv.Version[2])
++			}
++			return nil
++		}
++
++		if tv.Next == 0 {
++			break
++		}
++		offset += int(tv.Next)
++	}
++
++	return fmt.Errorf("dm-verity target not found")
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/dm/target.go b/vendor/github.com/containerd/go-dmverity/pkg/dm/target.go
+new file mode 100644
+index 000000000..1cd59c71e
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/dm/target.go
+@@ -0,0 +1,101 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package dm
++
++import (
++	"encoding/hex"
++	"fmt"
++	"strings"
++)
++
++type OpenArgs struct {
++	Version            uint32
++	DataDevice         string
++	HashDevice         string
++	DataBlockSize      uint32
++	HashBlockSize      uint32
++	DataBlocks         uint64
++	HashName           string
++	RootDigest         []byte
++	Salt               []byte
++	HashStartBytes     uint64
++	Flags              []string
++	RootHashSigKeyDesc string
++}
++
++func BuildTargetParams(a OpenArgs) (string, error) {
++	if a.DataDevice == "" || a.HashDevice == "" {
++		return "", fmt.Errorf("data/hash device required")
++	}
++	if a.DataBlockSize == 0 || a.HashBlockSize == 0 {
++		return "", fmt.Errorf("block sizes must be non-zero")
++	}
++	if a.DataBlocks == 0 {
++		return "", fmt.Errorf("data blocks must be non-zero")
++	}
++	if len(a.RootDigest) == 0 {
++		return "", fmt.Errorf("root digest required")
++	}
++	if a.HashStartBytes%uint64(a.HashBlockSize) != 0 {
++		return "", fmt.Errorf("hash start %d must be aligned to hash block size %d", a.HashStartBytes, a.HashBlockSize)
++	}
++
++	hashStartBlocks := a.HashStartBytes / uint64(a.HashBlockSize)
++
++	algo := strings.ToLower(strings.TrimSpace(a.HashName))
++	if algo == "" {
++		algo = "sha256"
++	}
++
++	rootHex := strings.ToLower(hex.EncodeToString(a.RootDigest))
++	saltHex := "-"
++	if len(a.Salt) > 0 {
++		saltHex = strings.ToLower(hex.EncodeToString(a.Salt))
++	}
++
++	b := fmt.Sprintf("%d %s %s %d %d %d %d %s %s %s",
++		a.Version,
++		a.DataDevice,
++		a.HashDevice,
++		a.DataBlockSize,
++		a.HashBlockSize,
++		a.DataBlocks,
++		hashStartBlocks,
++		algo,
++		rootHex,
++		saltHex,
++	)
++
++	optionalCount := len(a.Flags)
++	if a.RootHashSigKeyDesc != "" {
++		optionalCount += 2
++	}
++
++	if optionalCount > 0 {
++		b += fmt.Sprintf(" %d", optionalCount)
++
++		for _, flag := range a.Flags {
++			b += " " + flag
++		}
++
++		if a.RootHashSigKeyDesc != "" {
++			b += fmt.Sprintf(" root_hash_sig_key_desc %s", a.RootHashSigKeyDesc)
++		}
++	}
++
++	return b, nil
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/keyring/keyring_linux.go b/vendor/github.com/containerd/go-dmverity/pkg/keyring/keyring_linux.go
+new file mode 100644
+index 000000000..f9ee47248
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/keyring/keyring_linux.go
+@@ -0,0 +1,51 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package keyring
++
++import (
++	"fmt"
++
++	"golang.org/x/sys/unix"
++)
++
++type KeySerial int32
++
++func CheckKeyringSupport() error {
++	_, err := unix.KeyctlSearch(unix.KEY_SPEC_THREAD_KEYRING, "logon", "dummy", 0)
++	if err == unix.ENOSYS {
++		return fmt.Errorf("kernel keyring not supported")
++	}
++	return nil
++}
++
++func AddKeyToThreadKeyring(keyType, description string, payload []byte) (KeySerial, error) {
++	keyID, err := unix.AddKey(keyType, description, payload, unix.KEY_SPEC_THREAD_KEYRING)
++	if err != nil {
++		return 0, fmt.Errorf("add_key syscall failed: %w", err)
++	}
++
++	return KeySerial(keyID), nil
++}
++
++func UnlinkKeyFromThreadKeyring(keyID KeySerial) error {
++	_, err := unix.KeyctlInt(unix.KEYCTL_UNLINK, int(keyID), unix.KEY_SPEC_THREAD_KEYRING, 0, 0)
++	if err != nil {
++		return fmt.Errorf("keyctl unlink failed: %w", err)
++	}
++
++	return nil
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/utils/losetup.go b/vendor/github.com/containerd/go-dmverity/pkg/utils/losetup.go
+new file mode 100644
+index 000000000..5e4bd31ce
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/utils/losetup.go
+@@ -0,0 +1,230 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package utils
++
++import (
++	"errors"
++	"fmt"
++	"math/rand"
++	"os"
++	"strings"
++	"time"
++
++	"golang.org/x/sys/unix"
++)
++
++// Adapted from github.com/containerd/containerd/v2/core/mount/losetup_linux.go
++
++const (
++	loopControlPath = "/dev/loop-control"
++	loopDevFormat   = "/dev/loop%d"
++	ebusyString     = "device or resource busy"
++)
++
++// LoopParams parameters to control loop device setup
++type LoopParams struct {
++	// Loop device should forbid write
++	Readonly bool
++	// Loop device is automatically cleared by kernel when the
++	// last opener closes it
++	Autoclear bool
++	// Use direct IO to access the loop backing file
++	Direct bool
++}
++
++func getFreeLoopDev() (uint32, error) {
++	ctrl, err := os.OpenFile(loopControlPath, os.O_RDWR, 0)
++	if err != nil {
++		return 0, fmt.Errorf("could not open %v: %v", loopControlPath, err)
++	}
++	defer ctrl.Close()
++	num, err := unix.IoctlRetInt(int(ctrl.Fd()), unix.LOOP_CTL_GET_FREE)
++	if err != nil {
++		return 0, fmt.Errorf("could not get free loop device: %w", err)
++	}
++	return uint32(num), nil
++}
++
++// setupLoopDev attaches the backing file to the loop device and returns
++// the file handle for the loop device. The caller is responsible for
++// closing the file handle.
++func setupLoopDev(backingFile, loopDev string, param LoopParams) (_ *os.File, retErr error) {
++	// 1. Open backing file and loop device
++	flags := os.O_RDWR
++	if param.Readonly {
++		flags = os.O_RDONLY
++	}
++
++	back, err := os.OpenFile(backingFile, flags, 0)
++	if err != nil {
++		return nil, fmt.Errorf("could not open backing file: %s: %w", backingFile, err)
++	}
++	defer back.Close()
++
++	loop, err := os.OpenFile(loopDev, flags, 0)
++	if err != nil {
++		return nil, fmt.Errorf("could not open loop device: %s: %w", loopDev, err)
++	}
++	defer func() {
++		if retErr != nil {
++			loop.Close()
++		}
++	}()
++
++	// Try modern LOOP_CONFIGURE ioctl (kernel >= 5.8)
++	config := unix.LoopConfig{
++		Fd: uint32(back.Fd()),
++	}
++
++	copy(config.Info.File_name[:], backingFile)
++	if param.Readonly {
++		config.Info.Flags |= unix.LO_FLAGS_READ_ONLY
++	}
++
++	if param.Autoclear {
++		config.Info.Flags |= unix.LO_FLAGS_AUTOCLEAR
++	}
++
++	if param.Direct {
++		config.Info.Flags |= unix.LO_FLAGS_DIRECT_IO
++	}
++
++	if err := unix.IoctlLoopConfigure(int(loop.Fd()), &config); err == nil {
++		return loop, nil
++	}
++
++	// Fallback to legacy LOOP_SET_FD + LOOP_SET_STATUS64 for older kernels
++	// 2. Set FD
++	if err := unix.IoctlSetInt(int(loop.Fd()), unix.LOOP_SET_FD, int(back.Fd())); err != nil {
++		return nil, fmt.Errorf("could not set loop fd for device: %s: %w", loopDev, err)
++	}
++
++	defer func() {
++		if retErr != nil {
++			_ = unix.IoctlSetInt(int(loop.Fd()), unix.LOOP_CLR_FD, 0)
++		}
++	}()
++
++	// 3. Set Info
++	info := unix.LoopInfo64{}
++	copy(info.File_name[:], backingFile)
++	if param.Readonly {
++		info.Flags |= unix.LO_FLAGS_READ_ONLY
++	}
++
++	if param.Autoclear {
++		info.Flags |= unix.LO_FLAGS_AUTOCLEAR
++	}
++
++	err = unix.IoctlLoopSetStatus64(int(loop.Fd()), &info)
++	if err != nil {
++		return nil, fmt.Errorf("failed to set loop device info: %w", err)
++	}
++
++	// 4. Set Direct IO
++	if param.Direct {
++		err = unix.IoctlSetInt(int(loop.Fd()), unix.LOOP_SET_DIRECT_IO, 1)
++		if err != nil {
++			return nil, fmt.Errorf("failed to setup loop with direct: %w", err)
++		}
++	}
++
++	return loop, nil
++}
++
++// setupLoop looks for (and possibly creates) a free loop device, and
++// then attaches backingFile to it.
++func setupLoop(backingFile string, param LoopParams) (*os.File, error) {
++	for retry := 1; retry < 100; retry++ {
++		num, err := getFreeLoopDev()
++		if err != nil {
++			return nil, err
++		}
++
++		loopDev := fmt.Sprintf(loopDevFormat, num)
++		file, err := setupLoopDev(backingFile, loopDev, param)
++		if err != nil {
++			// Per util-linux/sys-utils/losetup.c:create_loop(),
++			// free loop device can race and we end up failing
++			// with EBUSY when trying to set it up.
++			if strings.Contains(err.Error(), ebusyString) {
++				// Fallback a bit to avoid live lock
++				time.Sleep(time.Millisecond * time.Duration(rand.Intn(retry*10)))
++				continue
++			}
++			return nil, err
++		}
++
++		return file, nil
++	}
++
++	return nil, errors.New("timeout creating new loopback device")
++}
++
++func removeLoop(loopdev string) error {
++	file, err := os.Open(loopdev)
++	if err != nil {
++		return err
++	}
++	defer file.Close()
++
++	return unix.IoctlSetInt(int(file.Fd()), unix.LOOP_CLR_FD, 0)
++}
++
++// AttachLoopDevice attaches a specified backing file to a loop device
++func AttachLoopDevice(backingFile string) (string, error) {
++	file, err := setupLoop(backingFile, LoopParams{})
++	if err != nil {
++		return "", err
++	}
++	defer file.Close()
++	return file.Name(), nil
++}
++
++// DetachLoopDevice detaches the provided loop devices
++func DetachLoopDevice(devices ...string) error {
++	for _, dev := range devices {
++		if err := removeLoop(dev); err != nil {
++			return fmt.Errorf("failed to remove loop device: %s: %w", dev, err)
++		}
++	}
++
++	return nil
++}
++
++func SetupLoopDevice(path string) (string, func(), error) {
++	st, err := os.Stat(path)
++	if err != nil {
++		return "", nil, err
++	}
++
++	mode := st.Mode()
++	if (mode&os.ModeDevice) != 0 && (mode&os.ModeCharDevice) == 0 {
++		return path, func() {}, nil
++	}
++
++	loopPath, err := AttachLoopDevice(path)
++	if err != nil {
++		return "", nil, fmt.Errorf("failed to setup loop device for %s: %w", path, err)
++	}
++
++	cleanup := func() {
++		_ = DetachLoopDevice(loopPath)
++	}
++
++	return loopPath, cleanup, nil
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/utils/test_util.go b/vendor/github.com/containerd/go-dmverity/pkg/utils/test_util.go
+new file mode 100644
+index 000000000..7d5d42f2a
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/utils/test_util.go
+@@ -0,0 +1,293 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package utils
++
++import (
++	"context"
++	"crypto/rand"
++	"os"
++	"os/exec"
++	"regexp"
++	"strings"
++	"testing"
++	"time"
++)
++
++func RequireTool(t *testing.T, name string) string {
++	t.Helper()
++	p, err := exec.LookPath(name)
++	if err != nil {
++		t.Fatalf("%s not found in PATH", name)
++	}
++	return p
++}
++
++func RequireRoot(t *testing.T) {
++	t.Helper()
++	if os.Geteuid() != 0 {
++		t.Fatalf("requires root")
++	}
++}
++
++func RunCmd(t *testing.T, name string, args ...string) (string, string) {
++	t.Helper()
++	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
++	defer cancel()
++	cmd := exec.CommandContext(ctx, name, args...)
++	out, err := cmd.CombinedOutput()
++	if err != nil {
++		t.Fatalf("%s %v failed: %v\n%s", name, args, err, string(out))
++	}
++	return string(out), string(out)
++}
++
++func RunGoCLI(t *testing.T, args ...string) (string, string) {
++	t.Helper()
++	bin := RequireTool(t, "go-dmverity")
++	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
++	defer cancel()
++	cmd := exec.CommandContext(ctx, bin, args...)
++	out, err := cmd.CombinedOutput()
++	if err != nil {
++		t.Fatalf("%s %v failed: %v\n%s", bin, args, err, string(out))
++	}
++	return string(out), string(out)
++}
++
++func MakeTempFile(t *testing.T, size int64) string {
++	t.Helper()
++	f, err := os.CreateTemp("", "vgo-data-*")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer f.Close()
++	if size > 0 {
++		if err := f.Truncate(size); err != nil {
++			t.Fatal(err)
++		}
++		buf := make([]byte, 4096)
++		if _, err := rand.Read(buf); err == nil {
++			_, _ = f.WriteAt(buf, 0)
++		}
++	}
++	return f.Name()
++}
++
++func FirstLine(s string) string {
++	for i := 0; i < len(s); i++ {
++		if s[i] == '\n' || s[i] == '\r' {
++			return s[:i]
++		}
++	}
++	return s
++}
++
++func ExtractRootHex(t *testing.T, out string) string {
++	t.Helper()
++	re := regexp.MustCompile(`(?i)Root hash:\s*([0-9a-f]+)`)
++	m := re.FindStringSubmatch(out)
++	if len(m) < 2 {
++		t.Fatalf("failed to parse root hash from output: %s", out)
++	}
++	return m[1]
++}
++
++func CreateFormattedFiles(t *testing.T) (dataPath, hashPath, rootHex string) {
++	t.Helper()
++	dataPath = MakeTempFile(t, 4096*16)
++	f, err := os.CreateTemp("", "vgo-hash-*")
++	if err != nil {
++		t.Fatal(err)
++	}
++	f.Close()
++	hashPath = f.Name()
++	out, _ := RunGoCLI(t, "format", "--hash", "sha256", "--data-block-size", "4096", "--hash-block-size", "4096", "--salt", "-", "--no-superblock", "--hash-offset", "0", dataPath, hashPath)
++	rootHex = ExtractRootHex(t, out)
++	return
++}
++
++func MaskVerityDevices(s string) string {
++	s = strings.TrimSpace(s)
++	if s == "" {
++		return s
++	}
++	lines := strings.Split(s, "\n")
++	for i, line := range lines {
++		fields := strings.Fields(strings.TrimSpace(line))
++		if len(fields) >= 7 {
++			vIdx := -1
++			for idx, tok := range fields {
++				if tok == "verity" {
++					vIdx = idx
++					break
++				}
++			}
++			if vIdx >= 0 && vIdx+3 < len(fields) {
++				fields[vIdx+2] = "<dev>"
++				fields[vIdx+3] = "<dev>"
++				lines[i] = strings.Join(fields, " ")
++				continue
++			}
++		}
++		lines[i] = line
++	}
++	return strings.Join(lines, "\n")
++}
++
++type VerityTestParams struct {
++	Hash          string
++	DataBlockSize string
++	HashBlockSize string
++	Salt          string
++	NoSuperblock  bool
++	HashOffset    string
++}
++
++func DefaultVerityTestParams() VerityTestParams {
++	return VerityTestParams{
++		Hash:          "sha256",
++		DataBlockSize: "4096",
++		HashBlockSize: "4096",
++		Salt:          "-",
++		NoSuperblock:  true,
++		HashOffset:    "0",
++	}
++}
++
++func (p VerityTestParams) BuildOpenArgs(dataLoop, name, hashLoop, rootHex string) []string {
++	args := []string{"open"}
++	if p.Hash != "" {
++		args = append(args, "--hash", p.Hash)
++	}
++	if p.DataBlockSize != "" {
++		args = append(args, "--data-block-size", p.DataBlockSize)
++	}
++	if p.HashBlockSize != "" {
++		args = append(args, "--hash-block-size", p.HashBlockSize)
++	}
++	if p.Salt != "" {
++		args = append(args, "--salt", p.Salt)
++	}
++	if p.NoSuperblock {
++		args = append(args, "--no-superblock")
++		if p.HashOffset != "" {
++			args = append(args, "--hash-offset", p.HashOffset)
++		}
++	}
++	args = append(args, dataLoop, name, hashLoop, rootHex)
++	return args
++}
++
++func (p VerityTestParams) BuildVerifyArgs(data, hash, rootHex string) []string {
++	args := []string{"verify"}
++	if p.Hash != "" {
++		args = append(args, "--hash", p.Hash)
++	}
++	if p.DataBlockSize != "" {
++		args = append(args, "--data-block-size", p.DataBlockSize)
++	}
++	if p.HashBlockSize != "" {
++		args = append(args, "--hash-block-size", p.HashBlockSize)
++	}
++	if p.Salt != "" {
++		args = append(args, "--salt", p.Salt)
++	}
++	if p.NoSuperblock {
++		args = append(args, "--no-superblock")
++		if p.HashOffset != "" {
++			args = append(args, "--hash-offset", p.HashOffset)
++		}
++	}
++	args = append(args, data, hash, rootHex)
++	return args
++}
++
++func (p VerityTestParams) BuildCVeritysetupOpenArgs(dataLoop, name, hashLoop, rootHex string) []string {
++	args := []string{"--debug", "--verbose", "open", dataLoop, name, hashLoop, rootHex}
++	if p.Hash != "" {
++		args = append(args, "--hash", p.Hash)
++	}
++	if p.DataBlockSize != "" {
++		args = append(args, "--data-block-size", p.DataBlockSize)
++	}
++	if p.HashBlockSize != "" {
++		args = append(args, "--hash-block-size", p.HashBlockSize)
++	}
++	if p.Salt != "" {
++		args = append(args, "--salt", p.Salt)
++	}
++	if p.NoSuperblock {
++		args = append(args, "--no-superblock")
++	}
++	return args
++}
++
++func (p VerityTestParams) BuildCVeritysetupVerifyArgs(data, hash, rootHex string) []string {
++	args := []string{"--debug", "--verbose", "verify", data, hash, rootHex}
++	if p.Hash != "" {
++		args = append(args, "--hash", p.Hash)
++	}
++	if p.DataBlockSize != "" {
++		args = append(args, "--data-block-size", p.DataBlockSize)
++	}
++	if p.HashBlockSize != "" {
++		args = append(args, "--hash-block-size", p.HashBlockSize)
++	}
++	if p.Salt != "" {
++		args = append(args, "--salt", p.Salt)
++	}
++	if p.NoSuperblock {
++		args = append(args, "--no-superblock")
++	}
++	return args
++}
++
++type DMDeviceCleanup struct {
++	t       *testing.T
++	devices []string
++}
++
++func NewDMDeviceCleanup(t *testing.T) *DMDeviceCleanup {
++	t.Helper()
++	return &DMDeviceCleanup{t: t, devices: make([]string, 0)}
++}
++
++func (c *DMDeviceCleanup) Add(device string) string {
++	c.devices = append(c.devices, device)
++	return device
++}
++
++func (c *DMDeviceCleanup) Cleanup() {
++	for _, device := range c.devices {
++		if err := exec.Command("dmsetup", "remove", device).Run(); err != nil {
++			c.t.Logf("dmsetup remove %s: %v", device, err)
++		}
++	}
++}
++
++func OpenVerityDevice(t *testing.T, params VerityTestParams, dataLoop, name, hashLoop, rootHex string) {
++	t.Helper()
++	args := params.BuildOpenArgs(dataLoop, name, hashLoop, rootHex)
++	RunGoCLI(t, args...)
++}
++
++func VerifyDeviceRemoved(t *testing.T, name string) {
++	t.Helper()
++	if out, err := exec.Command("dmsetup", "info", name).CombinedOutput(); err == nil {
++		t.Fatalf("expected %s to be removed, but dmsetup info succeeded: %s", name, string(out))
++	}
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/utils/utils.go b/vendor/github.com/containerd/go-dmverity/pkg/utils/utils.go
+new file mode 100644
+index 000000000..259274983
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/utils/utils.go
+@@ -0,0 +1,229 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package utils
++
++import (
++	"crypto"
++	_ "crypto/sha1"   // register SHA1 for crypto.Hash
++	_ "crypto/sha256" // register SHA256 for crypto.Hash
++	_ "crypto/sha512" // register SHA512 for crypto.Hash
++	"encoding/hex"
++	"fmt"
++	"os"
++	"strings"
++	"unsafe"
++
++	"github.com/google/uuid"
++	"golang.org/x/sys/unix"
++)
++
++func GetBlockOrFileSize(path string) (int64, error) {
++	st, err := os.Stat(path)
++	if err != nil {
++		return 0, err
++	}
++	mode := st.Mode()
++	if (mode&os.ModeDevice) != 0 && (mode&os.ModeCharDevice) == 0 {
++		f, err := os.Open(path)
++		if err != nil {
++			return 0, err
++		}
++		defer f.Close()
++		var size uint64
++		_, _, errno := unix.Syscall(unix.SYS_IOCTL, f.Fd(), unix.BLKGETSIZE64, uintptr(unsafe.Pointer(&size)))
++		if errno != 0 {
++			return 0, errno
++		}
++		return int64(size), nil
++	}
++	return st.Size(), nil
++}
++
++func SelectHashSize(name string) int {
++	switch strings.ToLower(strings.TrimSpace(name)) {
++	case "sha1":
++		if crypto.SHA1.Available() {
++			return crypto.SHA1.Size()
++		}
++	case "sha256":
++		if crypto.SHA256.Available() {
++			return crypto.SHA256.Size()
++		}
++	case "sha512":
++		if crypto.SHA512.Available() {
++			return crypto.SHA512.Size()
++		}
++	}
++	return -1
++}
++
++func GetBitsDown(u uint32) uint {
++	var i uint
++	for (u >> i) > 1 {
++		i++
++	}
++	return i
++}
++
++func AlignUp(x, align uint64) uint64 {
++	if align == 0 {
++		return x
++	}
++	rem := x % align
++	if rem == 0 {
++		return x
++	}
++	return x + (align - rem)
++}
++
++func ParseSaltHex(saltHex string, maxSaltSize int) ([]byte, error) {
++	if saltHex == "" || saltHex == "-" {
++		return nil, nil
++	}
++
++	b := make([]byte, hex.DecodedLen(len(saltHex)))
++	n, err := hex.Decode(b, []byte(saltHex))
++	if err != nil {
++		return nil, fmt.Errorf("invalid salt hex: %w", err)
++	}
++	salt := b[:n]
++	if len(salt) > maxSaltSize {
++		return nil, fmt.Errorf("salt too large: %d > %d", len(salt), maxSaltSize)
++	}
++	return salt, nil
++}
++
++func ParseRootHash(rootHex string) ([]byte, error) {
++	rootHex = strings.TrimSpace(rootHex)
++	if rootHex == "" {
++		return nil, fmt.Errorf("root hash is required")
++	}
++
++	rootBytes := make([]byte, hex.DecodedLen(len(rootHex)))
++	n, err := hex.Decode(rootBytes, []byte(rootHex))
++	if err != nil {
++		return nil, fmt.Errorf("invalid root hex: %w", err)
++	}
++	return rootBytes[:n], nil
++}
++
++func ValidateRootHashSize(rootDigest []byte, hashName string) error {
++	expectedHashSize := SelectHashSize(hashName)
++	if expectedHashSize == 0 {
++		expectedHashSize = crypto.SHA256.Size()
++	}
++	if len(rootDigest) != expectedHashSize {
++		return fmt.Errorf("invalid root hash size: got %d bytes, expected %d bytes for %s",
++			len(rootDigest), expectedHashSize, hashName)
++	}
++	return nil
++}
++
++func ValidateHashOffset(hashAreaOffset uint64, hashBlockSize uint32, noSuperblock bool) error {
++	if noSuperblock && (hashAreaOffset%uint64(hashBlockSize) != 0) {
++		return fmt.Errorf("hash offset %d must be aligned to hash block size %d",
++			hashAreaOffset, hashBlockSize)
++	}
++	return nil
++}
++
++func ApplySalt(saltHex string, maxSaltSize int) ([]byte, uint16, error) {
++	salt, err := ParseSaltHex(saltHex, maxSaltSize)
++	if err != nil {
++		return nil, 0, err
++	}
++
++	if salt != nil {
++		return salt, uint16(len(salt)), nil
++	}
++	return nil, 0, nil
++}
++
++func ApplyUUID(uuidStr string, generateIfEmpty bool, noSuperblock bool, generateUUIDFunc func() (string, error)) ([16]byte, error) {
++	var result [16]byte
++
++	if uuidStr != "" {
++		parsedUUID, err := uuid.Parse(uuidStr)
++		if err != nil {
++			return result, fmt.Errorf("invalid UUID format: %w", err)
++		}
++		copy(result[:], parsedUUID[:])
++		return result, nil
++	} else if generateIfEmpty && !noSuperblock {
++		generatedUUID, err := generateUUIDFunc()
++		if err != nil {
++			return result, fmt.Errorf("failed to generate UUID: %w", err)
++		}
++		parsedUUID, err := uuid.Parse(generatedUUID)
++		if err != nil {
++			return result, fmt.Errorf("invalid generated UUID: %w", err)
++		}
++		copy(result[:], parsedUUID[:])
++		return result, nil
++	}
++
++	return result, nil
++}
++
++func CalculateDataBlocks(dataPath string, userSpecified uint64, dataBlockSize uint32) (uint64, error) {
++	if userSpecified != 0 {
++		return userSpecified, nil
++	}
++
++	size, err := GetBlockOrFileSize(dataPath)
++	if err != nil {
++		return 0, fmt.Errorf("determine data device size: %w", err)
++	}
++
++	if size <= 0 {
++		return 0, fmt.Errorf("cannot determine data size; provide --data-blocks")
++	}
++
++	if dataBlockSize == 0 {
++		return 0, fmt.Errorf("data block size required")
++	}
++
++	if size%int64(dataBlockSize) != 0 {
++		return 0, fmt.Errorf("data size %d not multiple of data block size %d",
++			size, dataBlockSize)
++	}
++
++	return uint64(size / int64(dataBlockSize)), nil
++}
++
++func ValidateDataHashOverlap(dataBlocks uint64, dataBlockSize uint32, hashAreaOffset uint64, dataPath, hashPath string) error {
++	if dataPath == hashPath && hashAreaOffset > 0 {
++		dataAreaSize := dataBlocks * uint64(dataBlockSize)
++		if dataAreaSize > hashAreaOffset {
++			return fmt.Errorf("data area (size %d) overlaps with hash area (offset %d)",
++				dataAreaSize, hashAreaOffset)
++		}
++	}
++	return nil
++}
++
++func IsBlockSizeValid(size uint32) bool {
++	return size%512 == 0 && size >= 512 && size <= (512*1024) && (size&(size-1)) == 0
++}
++
++func Uint64MultOverflow(a, b uint64) bool {
++	if b == 0 {
++		return false
++	}
++	result := a * b
++	return result/b != a
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/verity/merkle.go b/vendor/github.com/containerd/go-dmverity/pkg/verity/merkle.go
+new file mode 100644
+index 000000000..158df91da
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/verity/merkle.go
+@@ -0,0 +1,435 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package verity
++
++import (
++	"crypto"
++	_ "crypto/sha1"   // register SHA1 for crypto.Hash
++	_ "crypto/sha256" // register SHA256 for crypto.Hash
++	_ "crypto/sha512" // register SHA512 for crypto.Hash
++	"fmt"
++	"io"
++	"math"
++	"os"
++)
++
++type CryptHash struct {
++	hashName       string
++	dataBlockSize  uint32
++	hashBlockSize  uint32
++	dataBlocks     uint64
++	hashType       uint32
++	salt           []byte
++	hashAreaOffset uint64
++	dataDevice     string
++	hashDevice     string
++	rootHash       []byte
++	hashFunc       crypto.Hash
++}
++
++type hashTreeLevel struct {
++	offset    uint64
++	numBlocks uint64
++}
++
++func NewCryptHash(
++	hashName string,
++	dataBlockSize, hashBlockSize uint32,
++	dataBlocks uint64,
++	hashType uint32,
++	salt []byte,
++	hashAreaOffset uint64,
++	dataDevice, hashDevice string,
++	rootHash []byte,
++) *CryptHash {
++	hashMap := map[string]crypto.Hash{
++		"sha256": crypto.SHA256,
++		"sha512": crypto.SHA512,
++		"sha1":   crypto.SHA1,
++	}
++
++	hashFunc := crypto.SHA256
++	if h, ok := hashMap[hashName]; ok && h.Available() {
++		hashFunc = h
++	}
++
++	vh := &CryptHash{
++		hashName:       hashName,
++		dataBlockSize:  dataBlockSize,
++		hashBlockSize:  hashBlockSize,
++		dataBlocks:     dataBlocks,
++		hashType:       hashType,
++		salt:           salt,
++		hashAreaOffset: hashAreaOffset,
++		dataDevice:     dataDevice,
++		hashDevice:     hashDevice,
++		rootHash:       make([]byte, hashFunc.Size()),
++		hashFunc:       hashFunc,
++	}
++	if rootHash != nil {
++		copy(vh.rootHash, rootHash)
++	}
++	return vh
++}
++
++func (vh *CryptHash) RootHash() []byte {
++	out := make([]byte, len(vh.rootHash))
++	copy(out, vh.rootHash)
++	return out
++}
++
++func getBitsDown(u uint32) uint {
++	var i uint
++	for (u >> i) > 1 {
++		i++
++	}
++	return i
++}
++
++func (vh *CryptHash) hashLevels(dataFileBlocks uint64) ([]hashTreeLevel, error) {
++	digestSize := uint32(vh.hashFunc.Size())
++	if digestSize == 0 {
++		return nil, fmt.Errorf("invalid digest size")
++	}
++
++	hashPerBlockBits := getBitsDown(vh.hashBlockSize / digestSize)
++	if hashPerBlockBits == 0 {
++		return nil, fmt.Errorf("hash block size too small for digest")
++	}
++
++	numLevels := 0
++	for hashPerBlockBits*uint(numLevels) < 64 &&
++		((dataFileBlocks-1)>>(hashPerBlockBits*uint(numLevels))) > 0 {
++		numLevels++
++	}
++
++	if numLevels > VerityMaxLevels {
++		return nil, fmt.Errorf("hash tree exceeds maximum levels: %d", numLevels)
++	}
++
++	levels := make([]hashTreeLevel, numLevels)
++	hashPosition := vh.hashAreaOffset / uint64(vh.hashBlockSize)
++
++	for i := numLevels - 1; i >= 0; i-- {
++		levels[i].offset = hashPosition * uint64(vh.hashBlockSize)
++
++		sShift := uint((i + 1) * int(hashPerBlockBits))
++		if sShift > 63 {
++			return nil, fmt.Errorf("shift overflow at level %d", i)
++		}
++		s := (dataFileBlocks + (1 << sShift) - 1) >> sShift
++		levels[i].numBlocks = s
++
++		if hashPosition+s < hashPosition {
++			return nil, fmt.Errorf("hash position overflow")
++		}
++		hashPosition += s
++	}
++
++	return levels, nil
++}
++
++func (vh *CryptHash) GetHashTreeSize() (uint64, error) {
++	levels, err := vh.hashLevels(vh.dataBlocks)
++	if err != nil {
++		return 0, err
++	}
++
++	totalHashBlocks := uint64(0)
++	for _, level := range levels {
++		totalHashBlocks += level.numBlocks
++	}
++
++	return totalHashBlocks * uint64(vh.hashBlockSize), nil
++}
++
++func (vh *CryptHash) verifyHashBlock(data, salt []byte) ([]byte, error) {
++	h := vh.hashFunc.New()
++
++	if vh.hashType == 1 {
++		if len(salt) > 0 {
++			h.Write(salt)
++		}
++		h.Write(data)
++	} else {
++		h.Write(data)
++		if len(salt) > 0 {
++			h.Write(salt)
++		}
++	}
++
++	return h.Sum(nil), nil
++}
++
++func verifyZero(block []byte, offset uint64) error {
++	for i, b := range block {
++		if b != 0 {
++			return fmt.Errorf("spare area is not zeroed at position %d", offset+uint64(i))
++		}
++	}
++	return nil
++}
++
++func (vh *CryptHash) getDigestSizeFull(hashSize uint32) uint32 {
++	if vh.hashType == 0 {
++		return hashSize
++	}
++	if hashSize == 0 {
++		return 1
++	}
++	n := hashSize - 1
++	n |= n >> 1
++	n |= n >> 2
++	n |= n >> 4
++	n |= n >> 8
++	n |= n >> 16
++	return n + 1
++}
++
++func (vh *CryptHash) createOrVerify(
++	rd, wr *os.File,
++	dataBlock uint64, dataBlockSize uint32,
++	hashBlock uint64, hashBlockSize uint32,
++	blocks uint64,
++	verify bool,
++	calculatedDigest []byte,
++) error {
++	digestSize := uint32(vh.hashFunc.Size())
++	if digestSize > VerityMaxDigestSize {
++		return fmt.Errorf("digest size exceeds maximum")
++	}
++
++	hashPerBlock := uint32(1 << getBitsDown(hashBlockSize/digestSize))
++	digestSizeFull := vh.getDigestSizeFull(digestSize)
++	blocksToWrite := (blocks + uint64(hashPerBlock) - 1) / uint64(hashPerBlock)
++
++	seekRd := dataBlock * uint64(dataBlockSize)
++	if seekRd > math.MaxInt64 {
++		return fmt.Errorf("data seek offset overflow: %d > MaxInt64", seekRd)
++	}
++	if _, err := rd.Seek(int64(seekRd), io.SeekStart); err != nil {
++		return fmt.Errorf("cannot seek data device: %w", err)
++	}
++
++	if wr != nil {
++		seekWr := hashBlock * uint64(hashBlockSize)
++		if seekWr > math.MaxInt64 {
++			return fmt.Errorf("hash seek offset overflow: %d > MaxInt64", seekWr)
++		}
++		if _, err := wr.Seek(int64(seekWr), io.SeekStart); err != nil {
++			return fmt.Errorf("cannot seek hash device: %w", err)
++		}
++	}
++
++	leftBlock := make([]byte, hashBlockSize)
++	dataBuffer := make([]byte, dataBlockSize)
++
++	for blocksToWrite > 0 {
++		blocksToWrite--
++		leftBytes := hashBlockSize
++
++		for i := uint32(0); i < hashPerBlock; i++ {
++			if blocks == 0 {
++				break
++			}
++			blocks--
++
++			if _, err := io.ReadFull(rd, dataBuffer); err != nil {
++				return fmt.Errorf("cannot read data block: %w", err)
++			}
++
++			hash, err := vh.verifyHashBlock(dataBuffer, vh.salt)
++			if err != nil {
++				return fmt.Errorf("hash calculation failed: %w", err)
++			}
++			copy(calculatedDigest, hash)
++
++			if wr == nil {
++				break
++			}
++
++			if verify {
++				readDigest := make([]byte, digestSize)
++				if _, err := io.ReadFull(wr, readDigest); err != nil {
++					return fmt.Errorf("cannot read digest from hash device: %w", err)
++				}
++				if !bytesEqual(readDigest, calculatedDigest[:digestSize]) {
++					return fmt.Errorf("verification failed at data position %d", seekRd)
++				}
++			} else {
++				if _, err := wr.Write(calculatedDigest[:digestSize]); err != nil {
++					return fmt.Errorf("cannot write digest to hash device: %w", err)
++				}
++			}
++
++			if vh.hashType == 0 {
++				leftBytes -= digestSize
++			} else {
++				padding := digestSizeFull - digestSize
++				if padding > 0 {
++					if verify {
++						padBuf := make([]byte, padding)
++						if _, err := io.ReadFull(wr, padBuf); err != nil {
++							return fmt.Errorf("cannot read padding: %w", err)
++						}
++						if err := verifyZero(padBuf, seekRd); err != nil {
++							return err
++						}
++					} else {
++						if _, err := wr.Write(leftBlock[:padding]); err != nil {
++							return fmt.Errorf("cannot write padding: %w", err)
++						}
++					}
++				}
++				leftBytes -= digestSizeFull
++			}
++		}
++
++		if wr != nil && leftBytes > 0 {
++			if verify {
++				spareBuf := make([]byte, leftBytes)
++				if _, err := io.ReadFull(wr, spareBuf); err != nil {
++					return fmt.Errorf("cannot read spare area: %w", err)
++				}
++				if err := verifyZero(spareBuf, seekRd); err != nil {
++					return err
++				}
++			} else {
++				if _, err := wr.Write(leftBlock[:leftBytes]); err != nil {
++					return fmt.Errorf("cannot write spare area: %w", err)
++				}
++			}
++		}
++	}
++
++	return nil
++}
++
++func (vh *CryptHash) CreateOrVerifyHashTree(verify bool) error {
++	digestSize := uint32(vh.hashFunc.Size())
++	if digestSize > VerityMaxDigestSize {
++		return fmt.Errorf("digest size exceeds maximum")
++	}
++
++	dataFileBlocks := vh.dataBlocks
++
++	levels, err := vh.hashLevels(dataFileBlocks)
++	if err != nil {
++		return fmt.Errorf("failed to calculate hash levels: %w", err)
++	}
++
++	dataFile, err := os.Open(vh.dataDevice)
++	if err != nil {
++		return fmt.Errorf("cannot open data device %s: %w", vh.dataDevice, err)
++	}
++	defer dataFile.Close()
++
++	hashFile, err := os.OpenFile(vh.hashDevice, os.O_RDWR, 0)
++	if verify {
++		hashFile, err = os.Open(vh.hashDevice)
++	}
++	if err != nil {
++		return fmt.Errorf("cannot open hash device %s: %w", vh.hashDevice, err)
++	}
++	defer hashFile.Close()
++
++	calculatedDigest := make([]byte, digestSize)
++
++	for i := 0; i < len(levels); i++ {
++		var rd, wr *os.File
++		var dataBlock, hashBlock uint64
++		var dataBlockSize, hashBlockSize uint32
++		var blocks uint64
++
++		if i == 0 {
++			rd = dataFile
++			wr = hashFile
++			dataBlock = 0
++			dataBlockSize = vh.dataBlockSize
++			hashBlock = levels[i].offset / uint64(vh.hashBlockSize)
++			hashBlockSize = vh.hashBlockSize
++			blocks = dataFileBlocks
++		} else {
++			hashFile2, err := os.Open(vh.hashDevice)
++			if err != nil {
++				return fmt.Errorf("cannot open hash device for reading: %w", err)
++			}
++			rd = hashFile2
++			wr = hashFile
++			dataBlock = levels[i-1].offset / uint64(vh.hashBlockSize)
++			dataBlockSize = vh.hashBlockSize
++			hashBlock = levels[i].offset / uint64(vh.hashBlockSize)
++			hashBlockSize = vh.hashBlockSize
++			blocks = levels[i-1].numBlocks
++
++			err = vh.createOrVerify(rd, wr, dataBlock, dataBlockSize, hashBlock, hashBlockSize, blocks, verify, calculatedDigest)
++			hashFile2.Close()
++			if err != nil {
++				return err
++			}
++			continue
++		}
++
++		if err := vh.createOrVerify(rd, wr, dataBlock, dataBlockSize, hashBlock, hashBlockSize, blocks, verify, calculatedDigest); err != nil {
++			return err
++		}
++	}
++
++	if len(levels) > 0 {
++		lastLevel := levels[len(levels)-1]
++		err = vh.createOrVerify(
++			hashFile, nil,
++			lastLevel.offset/uint64(vh.hashBlockSize), vh.hashBlockSize,
++			0, vh.hashBlockSize,
++			lastLevel.numBlocks, verify, calculatedDigest,
++		)
++		if err != nil {
++			return err
++		}
++	} else {
++		err = vh.createOrVerify(
++			dataFile, nil,
++			0, vh.dataBlockSize,
++			0, vh.hashBlockSize,
++			dataFileBlocks, verify, calculatedDigest,
++		)
++		if err != nil {
++			return err
++		}
++	}
++
++	if verify {
++		if !bytesEqual(vh.rootHash, calculatedDigest[:digestSize]) {
++			return fmt.Errorf("root hash verification failed")
++		}
++	} else {
++		copy(vh.rootHash, calculatedDigest[:digestSize])
++	}
++
++	return nil
++}
++
++func bytesEqual(a, b []byte) bool {
++	if len(a) != len(b) {
++		return false
++	}
++	var diff byte
++	for i := range a {
++		diff |= a[i] ^ b[i]
++	}
++	return diff == 0
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/verity/params.go b/vendor/github.com/containerd/go-dmverity/pkg/verity/params.go
+new file mode 100644
+index 000000000..31cd4b90f
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/verity/params.go
+@@ -0,0 +1,51 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package verity
++
++const (
++	VeritySignature     = "verity\x00\x00"
++	SuperblockSize      = 512
++	VerityMaxHashType   = 1
++	VerityMaxLevels     = 63
++	VerityMaxDigestSize = 1024
++	MaxSaltSize         = 256
++	diskSectorSize      = 512
++)
++
++type Params struct {
++	HashName       string
++	DataBlockSize  uint32
++	HashBlockSize  uint32
++	DataBlocks     uint64
++	HashType       uint32
++	Salt           []byte
++	SaltSize       uint16
++	HashAreaOffset uint64
++	NoSuperblock   bool
++	UUID           [16]byte
++}
++
++func DefaultParams() Params {
++	return Params{
++		HashName: "sha256",
++		HashType: 1,
++	}
++}
++
++func IsBlockSizeValid(size uint32) bool {
++	return size%512 == 0 && size >= 512 && size <= (512*1024) && (size&(size-1)) == 0
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/verity/superblock.go b/vendor/github.com/containerd/go-dmverity/pkg/verity/superblock.go
+new file mode 100644
+index 000000000..92f085310
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/verity/superblock.go
+@@ -0,0 +1,329 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package verity
++
++import (
++	"bytes"
++	"crypto"
++	"encoding/binary"
++	"errors"
++	"fmt"
++	"io"
++	"math"
++	"strings"
++
++	"github.com/google/uuid"
++
++	"github.com/containerd/go-dmverity/pkg/utils"
++)
++
++var (
++	errInvalidSignature = errors.New("verity: invalid superblock signature")
++	errInvalidVersion   = errors.New("verity: unsupported superblock version")
++)
++
++func init() {
++	if binary.Size(Superblock{}) != SuperblockSize {
++		panic(fmt.Sprintf("verity: unexpected superblock size: %d", binary.Size(Superblock{})))
++	}
++}
++
++type Superblock struct {
++	Signature     [8]byte
++	Version       uint32
++	HashType      uint32
++	UUID          [16]byte
++	Algorithm     [32]byte
++	DataBlockSize uint32
++	HashBlockSize uint32
++	DataBlocks    uint64
++	SaltSize      uint16
++	Pad1          [6]byte
++	Salt          [256]byte
++	Pad2          [168]byte
++}
++
++func DefaultSuperblock() Superblock {
++	return Superblock{
++		Signature:     [8]byte{0x76, 0x65, 0x72, 0x69, 0x74, 0x79, 0x00, 0x00},
++		Version:       1,
++		HashType:      1,
++		DataBlockSize: 4096,
++		HashBlockSize: 4096,
++		Algorithm:     [32]byte{0x73, 0x68, 0x61, 0x32, 0x35, 0x36},
++	}
++}
++
++func NewSuperblock() *Superblock {
++	sb := DefaultSuperblock()
++	return &sb
++}
++
++func (sb *Superblock) Serialize() ([]byte, error) {
++	buf := bytes.NewBuffer(make([]byte, 0, SuperblockSize))
++	if err := binary.Write(buf, binary.LittleEndian, sb); err != nil {
++		return nil, fmt.Errorf("verity: failed to serialize superblock: %w", err)
++	}
++	if buf.Len() != SuperblockSize {
++		return nil, fmt.Errorf("verity: serialized superblock has unexpected length %d", buf.Len())
++	}
++	return buf.Bytes(), nil
++}
++
++func DeserializeSuperblock(data []byte) (*Superblock, error) {
++	if len(data) < SuperblockSize {
++		return nil, fmt.Errorf("verity: data too short for superblock (%d bytes)", len(data))
++	}
++
++	sb := &Superblock{}
++	buf := bytes.NewReader(data[:SuperblockSize])
++	if err := binary.Read(buf, binary.LittleEndian, sb); err != nil {
++		return nil, fmt.Errorf("verity: failed to deserialize superblock: %w", err)
++	}
++
++	if err := sb.validateBasic(); err != nil {
++		return nil, err
++	}
++	return sb, nil
++}
++
++func ReadSuperblock(r io.ReaderAt, sbOffset uint64) (*Superblock, error) {
++	if sbOffset%diskSectorSize != 0 {
++		return nil, fmt.Errorf("verity: superblock offset %d is not %d-byte aligned", sbOffset, diskSectorSize)
++	}
++	if sbOffset > math.MaxInt64 {
++		return nil, fmt.Errorf("verity: superblock offset overflows int64: %d", sbOffset)
++	}
++
++	buf := make([]byte, SuperblockSize)
++	n, err := r.ReadAt(buf, int64(sbOffset))
++	if err != nil && !errors.Is(err, io.EOF) {
++		return nil, fmt.Errorf("verity: read superblock failed: %w", err)
++	}
++	if n != SuperblockSize {
++		return nil, fmt.Errorf("verity: short read for superblock: got %d bytes", n)
++	}
++
++	sb, err := DeserializeSuperblock(buf)
++	if err != nil {
++		return nil, err
++	}
++
++	if uuidVal, uuidErr := uuid.FromBytes(sb.UUID[:]); uuidErr == nil {
++		if uuidVal == uuid.Nil {
++			return nil, errors.New("verity: superblock missing UUID")
++		}
++	}
++
++	return sb, nil
++}
++
++func (sb *Superblock) WriteSuperblock(w io.WriterAt, sbOffset uint64) error {
++	if sbOffset%diskSectorSize != 0 {
++		return fmt.Errorf("verity: superblock offset %d is not %d-byte aligned", sbOffset, diskSectorSize)
++	}
++	if sbOffset > math.MaxInt64 {
++		return fmt.Errorf("verity: superblock offset overflows int64: %d", sbOffset)
++	}
++
++	data, err := sb.Serialize()
++	if err != nil {
++		return err
++	}
++
++	n, writeErr := w.WriteAt(data, int64(sbOffset))
++	if writeErr != nil {
++		return fmt.Errorf("verity: write superblock failed: %w", writeErr)
++	}
++	if n != len(data) {
++		return fmt.Errorf("verity: short write for superblock: wrote %d bytes", n)
++	}
++	return nil
++}
++
++func (sb *Superblock) validateBasic() error {
++	if string(sb.Signature[:]) != VeritySignature {
++		return errInvalidSignature
++	}
++	if sb.Version != 1 {
++		return fmt.Errorf("%w: %d", errInvalidVersion, sb.Version)
++	}
++	return nil
++}
++
++func (sb *Superblock) algorithmString() string {
++	return strings.ToLower(strings.TrimRight(string(sb.Algorithm[:]), "\x00"))
++}
++
++func (sb *Superblock) UUIDString() (string, error) {
++	uuidVal, err := uuid.FromBytes(sb.UUID[:])
++	if err != nil {
++		return "", fmt.Errorf("verity: invalid superblock UUID: %w", err)
++	}
++	if uuidVal == uuid.Nil {
++		return "", errors.New("verity: superblock missing UUID")
++	}
++	return uuidVal.String(), nil
++}
++
++func (sb *Superblock) SetUUIDFromString(s string) error {
++	uuidVal, err := uuid.Parse(strings.TrimSpace(s))
++	if err != nil {
++		return fmt.Errorf("verity: invalid UUID %q: %w", s, err)
++	}
++	copy(sb.UUID[:], uuidVal[:])
++	return nil
++}
++
++func buildSuperblockFromParams(p *Params) (*Superblock, error) {
++	if p == nil {
++		return nil, errors.New("verity: nil params provided")
++	}
++	if !utils.IsBlockSizeValid(p.DataBlockSize) || !utils.IsBlockSizeValid(p.HashBlockSize) {
++		return nil, fmt.Errorf("verity: invalid block sizes: data %d hash %d", p.DataBlockSize, p.HashBlockSize)
++	}
++	if p.HashType > VerityMaxHashType {
++		return nil, fmt.Errorf("verity: unsupported hash type %d", p.HashType)
++	}
++	if len(p.Salt) != int(p.SaltSize) {
++		return nil, fmt.Errorf("verity: salt size mismatch: declared %d actual %d", p.SaltSize, len(p.Salt))
++	}
++	if p.SaltSize > MaxSaltSize {
++		return nil, fmt.Errorf("verity: salt too large: %d > %d", p.SaltSize, MaxSaltSize)
++	}
++
++	algo := strings.ToLower(strings.TrimSpace(p.HashName))
++	if algo == "" {
++		return nil, errors.New("verity: hash algorithm required")
++	}
++	if !isHashAlgorithmSupported(algo) {
++		return nil, fmt.Errorf("verity: hash algorithm %s not supported", algo)
++	}
++
++	sb := DefaultSuperblock()
++	copy(sb.Signature[:], VeritySignature)
++	sb.Version = 1
++	sb.HashType = p.HashType
++	sb.DataBlockSize = p.DataBlockSize
++	sb.HashBlockSize = p.HashBlockSize
++	sb.DataBlocks = p.DataBlocks
++	sb.SaltSize = p.SaltSize
++	sb.UUID = p.UUID
++
++	for i := range sb.Algorithm {
++		sb.Algorithm[i] = 0
++	}
++	copy(sb.Algorithm[:], []byte(algo))
++
++	for i := range sb.Salt {
++		sb.Salt[i] = 0
++	}
++	copy(sb.Salt[:], p.Salt)
++
++	p.NoSuperblock = false
++
++	return &sb, nil
++}
++
++func adoptParamsFromSuperblock(p *Params, sb *Superblock, sbOffset uint64) error {
++	if p == nil || sb == nil {
++		return errors.New("verity: nil params or superblock")
++	}
++	if err := sb.validateBasic(); err != nil {
++		return err
++	}
++	if sb.HashType > VerityMaxHashType {
++		return fmt.Errorf("verity: unsupported hash type %d", sb.HashType)
++	}
++	if !utils.IsBlockSizeValid(sb.DataBlockSize) || !utils.IsBlockSizeValid(sb.HashBlockSize) {
++		return fmt.Errorf("verity: invalid block size in superblock: data %d hash %d", sb.DataBlockSize, sb.HashBlockSize)
++	}
++	if sb.SaltSize > MaxSaltSize {
++		return fmt.Errorf("verity: superblock salt too large: %d", sb.SaltSize)
++	}
++
++	algo := sb.algorithmString()
++	if algo == "" {
++		return fmt.Errorf("verity: missing hash algorithm in superblock")
++	}
++
++	if p.HashName == "" {
++		p.HashName = algo
++	} else if !strings.EqualFold(p.HashName, algo) {
++		return fmt.Errorf("verity: algorithm mismatch: param %s superblock %s", p.HashName, algo)
++	}
++
++	if !isHashAlgorithmSupported(p.HashName) {
++		return fmt.Errorf("verity: hash algorithm %s not supported", p.HashName)
++	}
++
++	if p.DataBlockSize == 0 {
++		p.DataBlockSize = sb.DataBlockSize
++	} else if p.DataBlockSize != sb.DataBlockSize {
++		return fmt.Errorf("verity: data block size mismatch: param %d sb %d", p.DataBlockSize, sb.DataBlockSize)
++	}
++
++	if p.HashBlockSize == 0 {
++		p.HashBlockSize = sb.HashBlockSize
++	} else if p.HashBlockSize != sb.HashBlockSize {
++		return fmt.Errorf("verity: hash block size mismatch: param %d sb %d", p.HashBlockSize, sb.HashBlockSize)
++	}
++
++	if p.DataBlocks == 0 {
++		p.DataBlocks = sb.DataBlocks
++	} else if p.DataBlocks != sb.DataBlocks {
++		return fmt.Errorf("verity: data blocks mismatch: param %d sb %d", p.DataBlocks, sb.DataBlocks)
++	}
++
++	if len(p.Salt) == 0 {
++		p.Salt = make([]byte, sb.SaltSize)
++		copy(p.Salt, sb.Salt[:sb.SaltSize])
++		p.SaltSize = sb.SaltSize
++	} else {
++		if p.SaltSize != sb.SaltSize || !bytes.Equal(p.Salt, sb.Salt[:sb.SaltSize]) {
++			return fmt.Errorf("verity: salt mismatch")
++		}
++	}
++
++	p.HashType = sb.HashType
++	if p.UUID == ([16]byte{}) {
++		p.UUID = sb.UUID
++	} else if p.UUID != sb.UUID {
++		return fmt.Errorf("verity: UUID mismatch")
++	}
++	p.NoSuperblock = false
++	if sbOffset == 0 {
++		p.HashAreaOffset = uint64(p.HashBlockSize)
++	} else {
++		p.HashAreaOffset = sbOffset + utils.AlignUp(uint64(SuperblockSize), uint64(p.HashBlockSize))
++	}
++	return nil
++}
++
++func isHashAlgorithmSupported(name string) bool {
++	h := map[string]crypto.Hash{
++		"sha1":   crypto.SHA1,
++		"sha256": crypto.SHA256,
++		"sha512": crypto.SHA512,
++	}
++	algo := strings.ToLower(strings.TrimSpace(name))
++	hash, ok := h[algo]
++	if !ok {
++		return false
++	}
++	return hash.Available()
++}
+diff --git a/vendor/github.com/containerd/go-dmverity/pkg/verity/verity.go b/vendor/github.com/containerd/go-dmverity/pkg/verity/verity.go
+new file mode 100644
+index 000000000..eaf80d8ed
+--- /dev/null
++++ b/vendor/github.com/containerd/go-dmverity/pkg/verity/verity.go
+@@ -0,0 +1,517 @@
++/*
++   Copyright The containerd Authors.
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
++*/
++
++package verity
++
++import (
++	"bytes"
++	"crypto"
++	"errors"
++	"fmt"
++	"log"
++	"os"
++	"strings"
++	"time"
++
++	"golang.org/x/sys/unix"
++
++	"github.com/containerd/go-dmverity/pkg/dm"
++	"github.com/containerd/go-dmverity/pkg/keyring"
++	"github.com/containerd/go-dmverity/pkg/utils"
++)
++
++func validateParams(params *Params, digestSize int) error {
++	if params == nil {
++		return errors.New("verity: nil params")
++	}
++
++	if params.HashType > VerityMaxHashType {
++		return fmt.Errorf("verity: unsupported hash type %d", params.HashType)
++	}
++	if params.HashName == "" {
++		return errors.New("verity: hash algorithm required")
++	}
++
++	if params.SaltSize > MaxSaltSize {
++		return fmt.Errorf("salt size %d exceeds maximum of %d bytes", params.SaltSize, MaxSaltSize)
++	}
++
++	if digestSize > VerityMaxDigestSize {
++		return fmt.Errorf("digest size %d exceeds maximum of %d bytes", digestSize, VerityMaxDigestSize)
++	}
++
++	if !utils.IsBlockSizeValid(params.DataBlockSize) {
++		return fmt.Errorf("invalid data block size: %d", params.DataBlockSize)
++	}
++	if !utils.IsBlockSizeValid(params.HashBlockSize) {
++		return fmt.Errorf("invalid hash block size: %d", params.HashBlockSize)
++	}
++
++	if utils.Uint64MultOverflow(params.DataBlocks, uint64(params.DataBlockSize)) {
++		return fmt.Errorf("data device offset overflow: %d blocks * %d bytes",
++			params.DataBlocks, params.DataBlockSize)
++	}
++
++	if params.NoSuperblock {
++		if params.HashAreaOffset%uint64(params.HashBlockSize) != 0 {
++			return fmt.Errorf("hash offset %d must be aligned to hash block size %d", params.HashAreaOffset, params.HashBlockSize)
++		}
++	} else {
++		if params.HashAreaOffset == 0 {
++			return errors.New("verity: hash area offset not initialised for superblock mode")
++		}
++	}
++
++	pageSize := uint32(unix.Getpagesize())
++	if params.DataBlockSize > pageSize {
++		log.Printf("WARNING: Kernel cannot activate device if data block size (%d) exceeds page size (%d)",
++			params.DataBlockSize, pageSize)
++	}
++
++	return nil
++}
++
++func Verify(params *Params, dataDevice, hashDevice string, rootHash []byte) error {
++	if params == nil {
++		return errors.New("verity: nil params")
++	}
++
++	if !params.NoSuperblock {
++		hashFile, err := os.Open(hashDevice)
++		if err != nil {
++			return fmt.Errorf("cannot open hash device: %w", err)
++		}
++		defer hashFile.Close()
++
++		sbOffset := uint64(0)
++		if dataDevice == hashDevice && params.HashAreaOffset > 0 {
++			sbOffset = params.HashAreaOffset
++		}
++
++		sb, err := ReadSuperblock(hashFile, sbOffset)
++		if err != nil {
++			return err
++		}
++
++		if err := adoptParamsFromSuperblock(params, sb, sbOffset); err != nil {
++			return err
++		}
++	}
++
++	vh := NewCryptHash(
++		params.HashName,
++		params.DataBlockSize, params.HashBlockSize,
++		params.DataBlocks,
++		params.HashType,
++		params.Salt,
++		params.HashAreaOffset,
++		dataDevice, hashDevice,
++		rootHash,
++	)
++
++	if err := validateParams(params, vh.hashFunc.Size()); err != nil {
++		return err
++	}
++
++	return vh.CreateOrVerifyHashTree(true)
++}
++
++func Create(params *Params, dataDevice, hashDevice string) ([]byte, error) {
++	if params == nil {
++		return nil, errors.New("verity: nil params")
++	}
++
++	var sbOffset uint64
++	if !params.NoSuperblock {
++		sb, err := buildSuperblockFromParams(params)
++		if err != nil {
++			return nil, err
++		}
++
++		openFlags := os.O_RDWR | os.O_CREATE
++		if dataDevice == hashDevice {
++			sbOffset = params.HashAreaOffset
++			params.HashAreaOffset = sbOffset + utils.AlignUp(uint64(SuperblockSize), uint64(params.HashBlockSize))
++		} else {
++			openFlags |= os.O_TRUNC
++			sbOffset = 0
++		}
++
++		hashFile, err := os.OpenFile(hashDevice, openFlags, 0644)
++		if err != nil {
++			return nil, fmt.Errorf("cannot open or create hash device: %w", err)
++		}
++		defer hashFile.Close()
++
++		if err := sb.WriteSuperblock(hashFile, sbOffset); err != nil {
++			return nil, err
++		}
++	}
++
++	vh := NewCryptHash(
++		params.HashName,
++		params.DataBlockSize, params.HashBlockSize,
++		params.DataBlocks,
++		params.HashType,
++		params.Salt,
++		params.HashAreaOffset,
++		dataDevice, hashDevice,
++		nil,
++	)
++
++	if err := validateParams(params, vh.hashFunc.Size()); err != nil {
++		return nil, err
++	}
++
++	if err := vh.CreateOrVerifyHashTree(false); err != nil {
++		return nil, err
++	}
++
++	return vh.RootHash(), nil
++}
++
++func VerifyBlock(params *Params, hashName string, data, salt, expectedHash []byte) error {
++	vh := &CryptHash{
++		hashType: params.HashType,
++		hashFunc: func() crypto.Hash {
++			hashMap := map[string]crypto.Hash{
++				"sha256": crypto.SHA256,
++				"sha512": crypto.SHA512,
++				"sha1":   crypto.SHA1,
++			}
++			if h, ok := hashMap[hashName]; ok && h.Available() {
++				return h
++			}
++			return crypto.SHA256
++		}(),
++	}
++
++	calculatedHash, err := vh.verifyHashBlock(data, salt)
++	if err != nil {
++		return err
++	}
++
++	if !bytes.Equal(calculatedHash, expectedHash) {
++		return fmt.Errorf("block hash mismatch")
++	}
++
++	return nil
++}
++
++func InitParams(params *Params, dataLoop, hashLoop string) error {
++	if params == nil {
++		return errors.New("verity: nil params")
++	}
++
++	if !params.NoSuperblock {
++		f, err := os.OpenFile(hashLoop, os.O_RDONLY, 0)
++		if err != nil {
++			return fmt.Errorf("open hash device: %w", err)
++		}
++		defer f.Close()
++
++		sbOffset := uint64(0)
++		if dataLoop == hashLoop && params.HashAreaOffset > 0 {
++			sbOffset = params.HashAreaOffset
++		}
++
++		sb, err := ReadSuperblock(f, sbOffset)
++		if err != nil {
++			return fmt.Errorf("device is not a valid VERITY device: %w", err)
++		}
++
++		if err := adoptParamsFromSuperblock(params, sb, sbOffset); err != nil {
++			return fmt.Errorf("failed to adopt params from superblock: %w", err)
++		}
++	} else {
++		if params.HashAreaOffset%uint64(params.HashBlockSize) != 0 {
++			return fmt.Errorf("hash offset %d must be aligned to hash block size %d", params.HashAreaOffset, params.HashBlockSize)
++		}
++
++		if params.DataBlocks == 0 {
++			size, err := utils.GetBlockOrFileSize(dataLoop)
++			if err != nil {
++				return fmt.Errorf("determine data device size: %w", err)
++			}
++			if size%int64(params.DataBlockSize) != 0 {
++				return fmt.Errorf("data size %d not multiple of data block size %d", size, params.DataBlockSize)
++			}
++			params.DataBlocks = uint64(size / int64(params.DataBlockSize))
++		}
++	}
++
++	return nil
++}
++
++func DumpDevice(hashPath string) (string, error) {
++	hashFile, err := os.Open(hashPath)
++	if err != nil {
++		return "", fmt.Errorf("cannot open hash device: %w", err)
++	}
++	defer hashFile.Close()
++
++	params := &Params{}
++	superblock, err := ReadSuperblock(hashFile, 0)
++	if err != nil {
++		return "", fmt.Errorf("failed to read superblock: %w", err)
++	}
++
++	if err := adoptParamsFromSuperblock(params, superblock, 0); err != nil {
++		return "", fmt.Errorf("failed to adopt params from superblock: %w", err)
++	}
++
++	uuidStr, err := superblock.UUIDString()
++	if err != nil {
++		return "", fmt.Errorf("failed to get UUID string: %w", err)
++	}
++
++	digestSize := utils.SelectHashSize(params.HashName)
++	if digestSize <= 0 {
++		return "", fmt.Errorf("unsupported hash algorithm: %s", params.HashName)
++	}
++
++	hashPerBlock := params.HashBlockSize / uint32(digestSize)
++	hashBlocks := (params.DataBlocks + uint64(hashPerBlock) - 1) / uint64(hashPerBlock)
++
++	deviceSizeBytes := params.HashAreaOffset + hashBlocks*uint64(params.HashBlockSize)
++
++	var sb strings.Builder
++	sb.WriteString(fmt.Sprintf("\nVERITY header information for %s\n", hashPath))
++	sb.WriteString(fmt.Sprintf("UUID:            \t%s\n", uuidStr))
++	sb.WriteString(fmt.Sprintf("Hash type:       \t%d\n", params.HashType))
++	sb.WriteString(fmt.Sprintf("Data blocks:     \t%d\n", params.DataBlocks))
++	sb.WriteString(fmt.Sprintf("Data block size: \t%d\n", params.DataBlockSize))
++	sb.WriteString(fmt.Sprintf("Hash blocks:     \t%d\n", hashBlocks))
++	sb.WriteString(fmt.Sprintf("Hash block size: \t%d\n", params.HashBlockSize))
++	sb.WriteString(fmt.Sprintf("Hash algorithm:  \t%s\n", params.HashName))
++
++	sb.WriteString("Salt:            \t")
++	if params.SaltSize > 0 {
++		sb.WriteString(fmt.Sprintf("%x\n", params.Salt[:params.SaltSize]))
++	} else {
++		sb.WriteString("-\n")
++	}
++
++	sb.WriteString(fmt.Sprintf("Hash device size: \t%d [bytes]\n", deviceSizeBytes))
++
++	return sb.String(), nil
++}
++
++func GetHashTreeSize(params *Params) (uint64, error) {
++	if params == nil {
++		return 0, errors.New("verity: nil params")
++	}
++
++	if params.DataBlocks == 0 {
++		return 0, errors.New("data blocks must be greater than 0")
++	}
++
++	vh := NewCryptHash(
++		params.HashName,
++		params.DataBlockSize, params.HashBlockSize,
++		params.DataBlocks,
++		params.HashType,
++		nil,
++		0,
++		"", "",
++		nil,
++	)
++
++	return vh.GetHashTreeSize()
++}
++
++func Open(params *Params, name, dataDevice, hashDevice string, rootHash []byte, signatureFile string, flags []string) (string, error) {
++	var keyDesc string
++	var keyID keyring.KeySerial
++
++	if signatureFile != "" {
++		if err := keyring.CheckKeyringSupport(); err != nil {
++			return "", fmt.Errorf("signature verification requires kernel keyring support: %w", err)
++		}
++		if err := dm.CheckVeritySignatureSupport(); err != nil {
++			return "", fmt.Errorf("failed to check dm-verity signature support: %w", err)
++		}
++	}
++
++	if err := InitParams(params, dataDevice, hashDevice); err != nil {
++		return "", fmt.Errorf("InitParams failed: %w", err)
++	}
++
++	if err := utils.ValidateRootHashSize(rootHash, params.HashName); err != nil {
++		return "", err
++	}
++
++	if signatureFile != "" {
++		signatureData, err := os.ReadFile(signatureFile)
++		if err != nil {
++			return "", fmt.Errorf("failed to read signature file: %w", err)
++		}
++
++		uuidStr := ""
++		if params.UUID != ([16]byte{}) {
++			uuidStr = fmt.Sprintf("%x-%x-%x-%x-%x",
++				params.UUID[0:4], params.UUID[4:6], params.UUID[6:8],
++				params.UUID[8:10], params.UUID[10:16])
++		}
++
++		if uuidStr != "" {
++			keyDesc = fmt.Sprintf("cryptsetup:%s-%s", uuidStr, name)
++		} else {
++			keyDesc = fmt.Sprintf("cryptsetup:%s", name)
++		}
++
++		keyID, err = keyring.AddKeyToThreadKeyring("user", keyDesc, signatureData)
++		if err != nil {
++			return "", fmt.Errorf("failed to load signature into keyring: %w", err)
++		}
++
++		fmt.Fprintf(os.Stderr, "Loaded signature into thread keyring (key ID: %d, description: %s)\n", keyID, keyDesc)
++
++		defer func() {
++			if err := keyring.UnlinkKeyFromThreadKeyring(keyID); err != nil {
++				log.Printf("Warning: failed to unlink key from keyring: %v", err)
++			}
++		}()
++	}
++
++	openArgs := dm.OpenArgs{
++		Version:            params.HashType,
++		DataDevice:         dataDevice,
++		HashDevice:         hashDevice,
++		DataBlockSize:      params.DataBlockSize,
++		HashBlockSize:      params.HashBlockSize,
++		DataBlocks:         params.DataBlocks,
++		HashName:           params.HashName,
++		RootDigest:         rootHash,
++		Salt:               params.Salt,
++		HashStartBytes:     params.HashAreaOffset,
++		Flags:              flags,
++		RootHashSigKeyDesc: keyDesc,
++	}
++
++	targetParams, err := dm.BuildTargetParams(openArgs)
++	if err != nil {
++		return "", err
++	}
++
++	lengthSectors := params.DataBlocks * uint64(params.DataBlockSize/512)
++
++	c, err := dm.Open()
++	if err != nil {
++		return "", err
++	}
++	defer c.Close()
++
++	created := false
++	defer func() {
++		if !created {
++			_ = c.RemoveDevice(name)
++		}
++	}()
++
++	if _, err := c.CreateDevice(name); err != nil {
++		return "", err
++	}
++
++	target := dm.Target{
++		SectorStart: 0,
++		Length:      lengthSectors,
++		Type:        "verity",
++		Params:      targetParams,
++	}
++
++	if err := c.LoadTable(name, []dm.Target{target}); err != nil {
++		_ = c.RemoveDevice(name)
++		return "", fmt.Errorf("load table: %w", err)
++	}
++
++	if err := c.SuspendDevice(name, false); err != nil {
++		_ = c.RemoveDevice(name)
++		if signatureFile != "" && errors.Is(err, unix.EKEYREJECTED) {
++			return "", fmt.Errorf("signature verification failed: key rejected by kernel (check trusted keyring)")
++		}
++		return "", fmt.Errorf("resume device: %w", err)
++	}
++
++	created = true
++	devPath := "/dev/mapper/" + name
++
++	for i := 0; i < 50; i++ {
++		if _, err := os.Stat(devPath); err == nil {
++			return devPath, nil
++		}
++		time.Sleep(20 * time.Millisecond)
++	}
++
++	return devPath, nil
++}
++
++func Close(name string) error {
++	c, err := dm.Open()
++	if err != nil {
++		return fmt.Errorf("open dm control: %w", err)
++	}
++	defer c.Close()
++
++	_, err = c.DeviceStatus(name)
++	if err != nil {
++		return fmt.Errorf("device '%s' not found or inaccessible: %w", name, err)
++	}
++
++	if err := c.RemoveDevice(name); err != nil {
++		return fmt.Errorf("remove device: %w", err)
++	}
++
++	return nil
++}
++
++func Check(deviceName string, expectedRootHash []byte) bool {
++	c, err := dm.Open()
++	if err != nil {
++		return false
++	}
++	defer c.Close()
++
++	devStatus, err := c.DeviceStatus(deviceName)
++	if err != nil || !devStatus.ActivePresent {
++		return false
++	}
++
++	statusFlag, err := c.TableStatus(deviceName, false)
++	if err != nil {
++		return false
++	}
++
++	// Check if the device is in verified state (status contains "V")
++	if !strings.Contains(statusFlag, "V") {
++		return false
++	}
++
++	if len(expectedRootHash) > 0 {
++		tableParams, err := c.TableStatus(deviceName, true)
++		if err != nil {
++			return false
++		}
++
++		expectedHex := fmt.Sprintf("%x", expectedRootHash)
++
++		if !strings.Contains(tableParams, expectedHex) {
++			return false
++		}
++	}
++
++	return true
++}
+diff --git a/vendor/modules.txt b/vendor/modules.txt
+index 56fe379fc..d33c142f4 100644
+--- a/vendor/modules.txt
++++ b/vendor/modules.txt
+@@ -161,6 +161,12 @@ github.com/containerd/fifo
+ # github.com/containerd/go-cni v1.1.13
+ ## explicit; go 1.21
+ github.com/containerd/go-cni
++# github.com/containerd/go-dmverity v0.0.0-20260106143538-e097b6cc4a33
++## explicit; go 1.24.3
++github.com/containerd/go-dmverity/pkg/dm
++github.com/containerd/go-dmverity/pkg/keyring
++github.com/containerd/go-dmverity/pkg/utils
++github.com/containerd/go-dmverity/pkg/verity
+ # github.com/containerd/go-runc v1.1.0
+ ## explicit; go 1.18
+ github.com/containerd/go-runc

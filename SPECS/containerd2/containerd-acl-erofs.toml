@@ -1,0 +1,51 @@
+# Dormant ACL profile. The shared containerd2 package does not import this
+# file by default; ACL provisioning explicitly imports it.
+version = 2
+
+# snapshotter is set in both the legacy and the v3 location; neither alone is
+# sufficient. Imports are merged before the v2->v3 migration runs and this file
+# is imported last, so the legacy key here beats any global legacy snapshotter
+# in the base config. AKS emits one on the artifact streaming SKU
+# (snapshotter = "overlaybd"), and this profile deliberately overrides it:
+# layer integrity outranks a pull-latency optimisation. Kata is unaffected --
+# its snapshotter = "tardev" is scoped to containerd.runtimes.kata-cc and never
+# sets the global default. The v3 key in turn covers base configs that define
+# no grpc.v1.cri.containerd.runtimes, because migrateConfig returns early in
+# that case and never copies the legacy key.
+[plugins."io.containerd.grpc.v1.cri"]
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    snapshotter = "erofs"
+
+[plugins."io.containerd.cri.v1.images"]
+  snapshotter = "erofs"
+
+[plugins."io.containerd.transfer.v1.local"]
+  # Defining unpack_config REPLACES containerd's built-in default of
+  # {platform, overlayfs, walking differ}. The snapshotter here is not a
+  # duplicate of the one above: that one is what CRI requests, this is the set
+  # of combinations the transfer service supports, and getSupportedPlatform
+  # unpacks only when the two match. This is also the only place the differ
+  # can be named.
+  [[plugins."io.containerd.transfer.v1.local".unpack_config]]
+    platform = "linux/amd64"
+    snapshotter = "erofs"
+    differ = "erofs"
+
+[plugins."io.containerd.differ.v1.erofs"]
+  # The single dm-verity switch. It also drives referrer discovery on both pull
+  # paths: the differ advertises a dmverity-referrers capability that the
+  # transfer service and the CRI image service each read.
+  #
+  # dmverity_mode on the snapshotter is deliberately not set. It is a mount
+  # policy only -- how strict to be when a layer has no .dmverity sidecar -- and
+  # its "auto" default is what ACL wants: verify every layer that carries a
+  # sidecar, mount plainly those that do not. Setting "on" would make containerd
+  # a second enforcement point weaker than IPE, and would refuse to start on a
+  # host where the dm_verity module is not listed in /proc/modules.
+  enable_dmverity = true
+  enable_tar_index = true
+  # Must remain byte-compatible with the signing tool's mkfs.erofs invocation.
+  # The layer UUID is deliberately absent: the differ derives it from the layer
+  # digest and appends -U after these options, and precomputed artifacts are
+  # rejected unless their superblock carries that derived UUID.
+  mkfs_options = ["--sort=none", "-T", "0", "--mkfs-time"]

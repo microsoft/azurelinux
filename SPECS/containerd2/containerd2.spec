@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 4%{?dist}
+Release: 6015.verity%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -15,6 +15,10 @@ Distribution: Azure Linux
 Source0: https://github.com/containerd/containerd/archive/v%{version}.tar.gz#/%{upstream_name}-%{version}.tar.gz
 Source1: containerd.service
 Source2: containerd.toml
+Source3: containerd-acl-erofs.toml
+Source4: containerd-acl-config.toml
+Source5: containerd-acl-profile.conf
+Source6: containerd-acl-tmpfiles.conf
 
 Patch0:	multi-snapshotters-support.patch
 Patch1:	tardev-support.patch
@@ -32,6 +36,9 @@ Patch12:	CVE-2026-47262.patch
 Patch13:	CVE-2026-25680.patch
 Patch14:	CVE-2026-25681.patch
 Patch15:	CVE-2026-42502.patch
+Patch16:	0004-dm-verity-add-signature-support-upstream.patch
+Patch17:	0005-dm-verity-acl-integration.patch
+Patch18:	0006-dm-verity-precomputed-erofs-artifacts.patch
 
 %{?systemd_requires}
 
@@ -64,6 +71,19 @@ low-level storage and network attachments, etc.
 containerd is designed to be embedded into a larger system, rather than being
 used directly by developers or end-users.
 
+%package erofs
+Summary: EROFS/dm-verity profile for Azure Container Linux
+Requires: %{name} = %{version}-%{release}
+Requires: erofs-utils
+
+%description erofs
+Activates the EROFS snapshotter and dm-verity image verification in containerd
+for Azure Container Linux images.
+
+The main containerd2 package remains behavior-neutral. Installing this
+subpackage selects the ACL configuration profile and enables its EROFS and
+dm-verity settings.
+
 %prep
 %autosetup -p1 -n %{upstream_name}-%{version}
 
@@ -82,6 +102,11 @@ mkdir -p %{buildroot}/%{_unitdir}
 install -D -p -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/containerd.service
 install -D -p -m 0644 %{SOURCE2} %{buildroot}%{_sysconfdir}/containerd/config.toml
 install -vdm 755 %{buildroot}/opt/containerd/{bin,lib}
+
+install -D -p -m 0644 %{SOURCE3} %{buildroot}%{_datadir}/containerd2/acl-erofs.toml
+install -D -p -m 0644 %{SOURCE4} %{buildroot}%{_datadir}/containerd2/acl-config.toml
+install -D -p -m 0644 %{SOURCE5} %{buildroot}%{_prefix}/lib/systemd/system/containerd.service.d/90-acl-profile.conf
+install -D -p -m 0644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/10-containerd-acl.conf
 
 %post
 %systemd_post containerd.service
@@ -103,11 +128,27 @@ fi
 %{_mandir}/*
 %config(noreplace) %{_unitdir}/containerd.service
 %config(noreplace) %{_sysconfdir}/containerd/config.toml
+%dir %{_sysconfdir}/containerd
 %dir /opt/containerd
 %dir /opt/containerd/bin
 %dir /opt/containerd/lib
 
+%files erofs
+%{_datadir}/containerd2/acl-erofs.toml
+%{_datadir}/containerd2/acl-config.toml
+%{_prefix}/lib/systemd/system/containerd.service.d/90-acl-profile.conf
+%{_prefix}/lib/tmpfiles.d/10-containerd-acl.conf
+%dir %{_datadir}/containerd2
+%dir %{_prefix}/lib/systemd/system/containerd.service.d
+
 %changelog
+
+* Fri Jul 31 2026 Dallas Delaney <dadelan@microsoft.com> - 2.2.4-6015.verity
+- Apply the current ACL EROFS and dm-verity patch series from acl-scripts.
+- Preserve the Azure Linux 3.0 servicing baseline as Patch0-15 and apply the
+  ACL series as Patch16-18.
+- Package the ACL profile separately so stock Azure Linux behavior stays
+  unchanged unless containerd2-erofs is installed.
 
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
