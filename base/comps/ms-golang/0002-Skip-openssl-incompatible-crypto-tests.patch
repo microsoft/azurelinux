@@ -1,0 +1,35 @@
+Skip crypto tests incompatible with the Microsoft Go OpenSSL backend
+
+TestPSSGolden/TestPSSSigning use SHA-1 RSA-PSS, which the system OpenSSL
+provider rejects. TestSetGlobalRandom asserts a golden ML-KEM key from a
+deterministic RNG that the OpenSSL backend does not consume. These are
+backend policy differences, not defects.
+---
+--- a/src/crypto/rsa/pss_test.go	2026-08-03 22:47:04.746315785 +0000
++++ b/src/crypto/rsa/pss_test.go	2026-08-03 22:47:04.746315785 +0000
+@@ -26,6 +26,7 @@
+ // TestPSSGolden tests all the test vectors in pss-vect.txt from
+ // ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1-vec.zip
+ func TestPSSGolden(t *testing.T) {
++	t.Skip("Azure Linux: skipped for the Microsoft Go OpenSSL crypto backend; system OpenSSL rejects SHA-1 RSA-PSS")
+ 	inFile, err := os.Open("testdata/pss-vect.txt.bz2")
+ 	if err != nil {
+ 		t.Fatalf("Failed to open input file: %s", err)
+@@ -153,6 +154,7 @@
+ }
+ 
+ func TestPSSSigning(t *testing.T) {
++	t.Skip("Azure Linux: skipped for the Microsoft Go OpenSSL crypto backend; system OpenSSL rejects SHA-1 RSA-PSS")
+ 	var saltLengthCombinations = []struct {
+ 		signSaltLength, verifySaltLength int
+ 		good, fipsGood                   bool
+--- a/src/testing/cryptotest/rand_test.go	2026-08-03 22:47:04.766315745 +0000
++++ b/src/testing/cryptotest/rand_test.go	2026-08-03 22:47:04.766315745 +0000
+@@ -17,6 +17,7 @@
+ )
+ 
+ func TestSetGlobalRandom(t *testing.T) {
++	t.Skip("Azure Linux: skipped for the Microsoft Go OpenSSL crypto backend; ML-KEM key generation does not consume the deterministic test RNG")
+ 	seed1, _ := hex.DecodeString("6ae6783f4fbde91b6eb88b73a48ed247dbe5882e2579683432c1bfc525454add" +
+ 		"0cd87274d67084caaf0e0d36c8496db7fef55fe0e125750aa608d5e20ffc2d12")
+ 

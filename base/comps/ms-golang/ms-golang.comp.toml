@@ -1,0 +1,28 @@
+# Reuse Fedora's golang packaging while building the Microsoft Go source tree.
+[components.ms-golang]
+spec = { type = "upstream", upstream-name = "golang", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "77411fa4053581833ce67c9dd241d7545d4ed6e0" }
+overlays = [
+    { description = "Package the Fedora golang spec as ms-golang", type = "spec-set-tag", tag = "Name", value = "ms-golang" },
+    { description = "Build from the Microsoft Go release archive while retaining Fedora's local source filename", type = "spec-update-tag", tag = "Source0", value = "https://github.com/microsoft/go/releases/download/v1.26.5-2/go1.26.5-20260709.6.src.tar.gz#/go1.26.5.src.tar.gz" },
+    { description = "Point package metadata to Microsoft Go", type = "spec-update-tag", tag = "URL", value = "https://github.com/microsoft/go" },
+    { description = "Start the RPM release at the Microsoft Go revision (upstream v1.26.5-2)", type = "spec-search-replace", regex = '^Release:\s+%autorelease$', replacement = "Release:        %autorelease -b 2" },
+    { description = "Allow ms-golang to satisfy golang package dependencies", type = "spec-add-tag", tag = "Provides", value = "golang = %{version}-%{release}" },
+    { description = "Retain the historical Microsoft Go virtual provide", type = "spec-add-tag", tag = "Provides", value = "msft-golang = %{version}-%{release}" },
+    { description = "Prevent installation alongside Fedora golang", type = "spec-add-tag", tag = "Conflicts", value = "golang" },
+    { description = "Require a bootstrap compiler new enough for Go 1.26", type = "spec-search-replace", regex = '^BuildRequires:\s+golang > 1\.4$', replacement = "BuildRequires:  golang >= 1.24" },
+    { description = "Use the installed bootstrap compiler regardless of package GOROOT", type = "spec-search-replace", section = "%build", regex = '^export GOROOT_BOOTSTRAP=%\{goroot\}$', replacement = 'export GOROOT_BOOTSTRAP="$(go env GOROOT)"' },
+    { description = "Build every Microsoft Go tool with the nodwarf5 default installed in go.env", type = "spec-search-replace", section = "%build", regex = '^export GOHOSTOS=linux$', replacement = "export GOEXPERIMENT=nodwarf5\nexport GOHOSTOS=linux" },
+    { description = "Disable the shared stdlib build that duplicates crosscall2 with Microsoft system-crypto backends", type = "spec-search-replace", regex = '^%global shared 1$', replacement = "%global shared 0" },
+    { description = "Avoid publishing test fixture shared libraries as RPM capabilities", type = "spec-prepend-lines", lines = ["%define __find_provides %{nil}"] },
+    { description = "Replace Fedora's environment patch with one compatible with Microsoft Go defaults", type = "patch-remove", file = "0001-Modify-go.env.patch" },
+    { description = "Retain Azure Linux's DWARF compatibility setting in Microsoft Go", type = "patch-add", source = "0001-Set-nodwarf5-in-go.env.patch" },
+    { description = "Skip crypto/rsa PSS and testing/cryptotest ML-KEM tests that fail under the Microsoft Go OpenSSL crypto backend", type = "patch-add", source = "0002-Skip-openssl-incompatible-crypto-tests.patch" },
+]
+
+[[components.ms-golang.source-files]]
+filename = "go1.26.5.src.tar.gz"
+hash = "52aafddac2d7c6245d7759e65021197dc385732d4a7aefb4f15f064d0e3babfe"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/microsoft/go/releases/download/v1.26.5-2/go1.26.5-20260709.6.src.tar.gz" }
+replace-upstream = true
+replace-reason = "Build ms-golang from the Microsoft Go 1.26.5-2 source while reusing Fedora's golang packaging"

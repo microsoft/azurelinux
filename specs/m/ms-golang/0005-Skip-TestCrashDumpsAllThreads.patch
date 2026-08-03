@@ -1,0 +1,28 @@
+From c0c22e2aa7d1901c97da04f834ce9c7b9e38be80 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Sun, 11 Feb 2024 12:08:35 +0100
+Subject: [PATCH] Skip TestCrashDumpsAllThreads
+
+See golang.org/issues/64650
+---
+ src/runtime/crash_unix_test.go | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/runtime/crash_unix_test.go b/src/runtime/crash_unix_test.go
+index 123a462423..a0034d6455 100644
+--- a/src/runtime/crash_unix_test.go
++++ b/src/runtime/crash_unix_test.go
+@@ -74,6 +74,10 @@ func TestCrashDumpsAllThreads(t *testing.T) {
+ 		t.Skip("skipping; SIGQUIT is blocked, see golang.org/issue/19196")
+ 	}
+ 
++	if runtime.GOOS == "linux" && runtime.GOARCH == "s390x" {
++		t.Skip("skipping; frequent TestCrashDumpsAllThreads failures on linux/s390x, see golang.org/issue/64650")
++	}
++
+ 	testenv.MustHaveGoBuild(t)
+ 
+ 	if strings.Contains(os.Getenv("GOFLAGS"), "mayMoreStackPreempt") {
+-- 
+2.43.0
+

@@ -1,0 +1,25 @@
+From 958f06663d81dd4b946fce963b9f985f68da6212 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Wed, 16 Jul 2025 13:14:03 +0200
+Subject: [PATCH] Skip lsan_test.go in aarch64
+
+Reference: https://github.com/golang/go/issues/74476
+---
+ src/cmd/cgo/internal/testsanitizers/lsan_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cmd/cgo/internal/testsanitizers/lsan_test.go b/src/cmd/cgo/internal/testsanitizers/lsan_test.go
+index 4dde3d20ec..3bcf0eba51 100644
+--- a/src/cmd/cgo/internal/testsanitizers/lsan_test.go
++++ b/src/cmd/cgo/internal/testsanitizers/lsan_test.go
+@@ -2,7 +2,7 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+
+-//go:build linux || (freebsd && amd64)
++//go:build (linux && !(arm64 || riscv64)) || (freebsd && amd64)
+
+ package sanitizers_test
+
+--
+2.50.1

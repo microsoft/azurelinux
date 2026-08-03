@@ -1,0 +1,25 @@
+From 5f566346b70403891cfc52d0c807d72335691708 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Wed, 15 Jan 2025 21:45:33 +0100
+Subject: [PATCH] Fix _cgo_panic with gcc15 in 368
+
+---
+ src/cmd/link/internal/x86/asm.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cmd/link/internal/x86/asm.go b/src/cmd/link/internal/x86/asm.go
+index d535e5fb4d..c4253a8c08 100644
+--- a/src/cmd/link/internal/x86/asm.go
++++ b/src/cmd/link/internal/x86/asm.go
+@@ -184,7 +184,7 @@ func adddynrel(target *ld.Target, ldr *loader.Loader, syms *ld.ArchSyms, s loade
+ 				return true
+ 			}
+ 
+-			if r.Off() >= 2 && sData[r.Off()-2] == 0xff && sData[r.Off()-1] == 0xb3 {
++			if r.Off() >= 2 && sData[r.Off()-2] == 0xff && sData[r.Off()-1] >= 0xb0 && sData[r.Off()-1] <= 0xb7 {
+ 				su.MakeWritable()
+ 				// turn PUSHL of GOT entry into PUSHL of symbol itself.
+ 				// use unnecessary SS prefix to keep instruction same length.
+-- 
+2.47.1
+
