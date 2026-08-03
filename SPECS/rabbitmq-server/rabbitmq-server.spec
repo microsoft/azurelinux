@@ -89,7 +89,7 @@ done
 * Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-9
 - Patch for CVE-2026-65624, CVE-2026-59248
 
-* Wed Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-8
+* Thu Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-8
 - Patch for CVE-2026-43966, CVE-2026-44839
 
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
