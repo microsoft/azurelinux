@@ -2,7 +2,7 @@
 Summary:        BPF Compiler Collection (BCC)
 Name:           bcc
 Version:        0.29.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:            https://github.com/iovisor/bcc
 Source0:        https://github.com/iovisor/bcc/releases/download/v%{version}/%{name}-src-with-submodule.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2024-2314.patch
 Patch1:         CVE-2025-29481.patch
+Patch2:         backport-libbpf-tools-profile.patch
 BuildRequires:  bison
 BuildRequires:  clang-devel
 BuildRequires:  cmake >= 2.8.7
@@ -171,6 +172,9 @@ find %{buildroot}%{_lib64dir} -name '*.a' -delete
 %{_sbindir}/bpf-*
 
 %changelog
+* Thu Jul 02 2026 Mayank Singh <mayansingh@microsoft.com> - 0.29.1-5
+- Backport profile tool from upstream commit b14c463 (bcc v0.30.0)
+
 * Tue Dec 16 2025 Rachel Menge <rachelmenge@microsoft.com> - 0.29.1-4
 - Add libbpf-tools subpackage
 

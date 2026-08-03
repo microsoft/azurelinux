@@ -1,7 +1,7 @@
-From f220d7701ef580b355144d78417fd1602a329cb2 Mon Sep 17 00:00:00 2001
+From 734bf1a136c84d0ecc94048400a3e5c34a416dec Mon Sep 17 00:00:00 2001
 From: Kanishk Bansal <kanbansal@microsoft.com>
-Date: Fri, 22 May 2026 08:13:35 +0000
-Subject: [PATCH] nongit-fix.patch
+Date: Mon, 27 Jul 2026 04:48:18 +0000
+Subject: [PATCH] nongit-fix
 
 Signed-off-by: Kanishk Bansal <kanbansal@microsoft.com>
 ---
@@ -9,11 +9,11 @@ Signed-off-by: Kanishk Bansal <kanbansal@microsoft.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index b0a5372..6a63544 100644
+index f47ce7b..cd3f746 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -19,7 +19,7 @@ m4_define([bind_VERSION_MINOR], 20)dnl
- m4_define([bind_VERSION_PATCH], 23)dnl
+ m4_define([bind_VERSION_PATCH], 26)dnl
  m4_define([bind_VERSION_EXTRA], )dnl
  m4_define([bind_DESCRIPTION], [(Stable Release)])dnl
 -m4_define([bind_SRCID], [m4_esyscmd_s([git rev-parse --short HEAD | cut -b1-7])])dnl

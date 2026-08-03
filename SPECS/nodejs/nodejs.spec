@@ -1,5 +1,5 @@
 # Retrieved from 'deps/npm/package.json' inside the sources tarball.
-%define npm_version 11.13.0
+%define npm_version 11.16.0
 
 %global nodejs_datadir %{_datarootdir}/nodejs
 
@@ -15,7 +15,7 @@ Summary:        A JavaScript runtime built on Chrome's V8 JavaScript engine.
 Name:           nodejs
 # WARNINGS: MUST check and update the 'npm_version' macro for every version update of this package.
 #           The version of NPM can be found inside the sources under 'deps/npm/package.json'.
-Version:        24.17.0
+Version:        24.18.1
 Release:        1%{?dist}
 License:        BSD AND MIT AND Public Domain AND NAIST-2003 AND Artistic-2.0
 Vendor:         Microsoft Corporation
@@ -35,6 +35,8 @@ Patch2:         CVE-2024-22195.patch
 Patch3:         CVE-2020-28493.patch
 Patch4:         CVE-2024-34064.patch
 Patch5:         CVE-2025-27516.patch
+Patch6:         CVE-2026-12151.patch
+Patch7:         CVE-2026-9679.patch
 BuildRequires:  brotli-devel
 BuildRequires:  c-ares-devel
 BuildRequires:  coreutils >= 8.22
@@ -192,6 +194,19 @@ make cctest
 %{_prefix}/lib/node_modules/*
 
 %changelog
+* Thu Jul 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.18.1-1
+- Upgrade to 24.18.1 'Krypton' (LTS) (bundled npm 11.16.0).
+- This upgrade fixes CVE-2026-56846, CVE-2026-56848, CVE-2026-58043, CVE-2026-56850, CVE-2026-58040,
+  CVE-2026-58041, CVE-2026-58042, CVE-2026-58045, CVE-2026-56847, CVE-2026-58039, CVE-2026-58044
+- This upgrade also updates dependencies: llhttp to 9.4.3, undici to 7.29.0
+
+* Tue Jul 21 2026 Sumit Jena <sumitjena@microsoft.com> - 24.18.0-1
+- Upgrade to 24.18.0 (bundled npm 11.16.0).
+- Fixes CVE-2026-45149
+
+* Tue Jun 30 2026 Aditya Singh <v-aditysing@microsoft.com> - 24.17.0-2
+- Patch for CVE-2026-12151 and CVE-2026-9679
+
 * Tue Jun 23 2026 Sumit Jena <sumitjena@microsoft.com> - 24.17.0-1
 - Upgrade to 24.17.0 (bundled npm 11.13.0).
 - Bump bundled ICU to 78.3 (tools/icu/current_ver.dep).

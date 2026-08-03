@@ -5,7 +5,7 @@
 Summary: Industry-standard container runtime
 Name: %{upstream_name}2
 Version: 2.2.4
-Release: 4%{?dist}
+Release: 6%{?dist}
 License: ASL 2.0
 Group: Tools/Container
 URL: https://www.containerd.io
@@ -32,10 +32,11 @@ Patch12:	CVE-2026-47262.patch
 Patch13:	CVE-2026-25680.patch
 Patch14:	CVE-2026-25681.patch
 Patch15:	CVE-2026-42502.patch
+Patch16:	CVE-2026-56852.patch
 
 %{?systemd_requires}
 
-BuildRequires: golang < 1.25
+BuildRequires: golang
 BuildRequires: go-md2man
 BuildRequires: make
 BuildRequires: systemd-rpm-macros
@@ -69,10 +70,15 @@ used directly by developers or end-users.
 
 %build
 export BUILDTAGS="-mod=vendor"
+# cgo-less OpenSSL backend for our CGO_ENABLED=0 build (Go 1.26 systemcrypto needs cgo).
+# Go 1.26-only flag: remove at golang >= 1.27 (auto-selected there; else build fails).
+# Ref: https://github.com/microsoft/go/blob/microsoft/main/eng/doc/NocgoOpenSSL.md
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" binaries man
 
 %check
 export BUILDTAGS="-mod=vendor"
+export GOEXPERIMENT=ms_nocgo_opensslcrypto
 make VERSION="%{version}" REVISION="%{commit_hash}" test
 
 %install
@@ -108,6 +114,13 @@ fi
 %dir /opt/containerd/lib
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-6
+- Patch for CVE-2026-56852
+
+* Thu Jul 09 2026 Aadhar Agarwal <aadagarwal@microsoft.com> - 2.2.4-5
+- Remove 'BuildRequires: golang < 1.25' and set GOEXPERIMENT=ms_nocgo_opensslcrypto
+  to build with the default Go toolchain, resolving Go stdlib CVE-2026-25679,
+  CVE-2026-27139, CVE-2026-33811, CVE-2026-39836 (was built on Go 1.24.13).
 
 * Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.2.4-4
 - Patch for CVE-2026-42502, CVE-2026-25681, CVE-2026-25680

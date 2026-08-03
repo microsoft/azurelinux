@@ -5,7 +5,7 @@ Summary:        The official command line client for Cloud Foundry.
 Name:           cf-cli
 # Note: Upgrading the package also warrants an upgrade in the CF_BUILD_SHA
 Version:        8.7.11
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -51,6 +51,7 @@ Patch15:        CVE-2026-39827.patch
 Patch16:        CVE-2026-39828.patch
 Patch17:        CVE-2026-39835.patch
 Patch18:        CVE-2026-42502.patch
+Patch19:        CVE-2026-56852.patch
 
 BuildRequires:  golang < 1.25
 %global debug_package %{nil}
@@ -82,6 +83,9 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./out/cf
 %{_bindir}/cf
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-8
+- Patch for CVE-2026-56852
+
 * Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.7.11-7
 - Patch for CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
 

@@ -2,7 +2,7 @@
 Summary:        Low-level libraries useful for providing data structure handling for C.
 Name:           glib
 Version:        2.78.6
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -20,6 +20,14 @@ Patch7:         CVE-2025-14512.patch
 Patch8:         CVE-2026-1484.patch
 Patch9:         CVE-2026-1489.patch
 Patch10:        CVE-2026-0988.patch
+Patch11:        CVE-2026-58010.patch
+Patch12:        CVE-2026-58011.patch
+Patch13:        CVE-2026-58012.patch
+Patch14:        CVE-2026-58013.patch
+Patch15:        CVE-2026-58014.patch
+Patch16:        CVE-2026-58015.patch
+Patch17:        CVE-2026-58016.patch
+Patch18:        CVE-2026-15588.patch
 BuildRequires:  cmake
 BuildRequires:  gtk-doc
 BuildRequires:  libffi-devel
@@ -133,6 +141,12 @@ touch %{buildroot}%{_libdir}/gio/modules/giomodule.cache
 %doc %{_datadir}/gtk-doc/html/*
 
 %changelog
+* Thu Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-11
+- Patch for CVE-2026-15588
+
+* Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-10
+- Patch for CVE-2026-58016, CVE-2026-58015, CVE-2026-58014, CVE-2026-58013, CVE-2026-58012, CVE-2026-58011, CVE-2026-58010
+
 * Wed Mar 11 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.78.6-9
 - Patch for CVE-2026-0988
 

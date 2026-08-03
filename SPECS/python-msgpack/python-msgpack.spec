@@ -2,13 +2,14 @@
 Summary:        MessagePack (de)serializer.
 Name:           python-msgpack
 Version:        1.0.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages/Python
 URL:            https://msgpack.org/
 Source0:        https://github.com/msgpack/msgpack-python/archive/v%{version}.tar.gz#/msgpack-python-%{version}.tar.gz
+Patch0:         CVE-2026-57585.patch
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-Cython
@@ -28,7 +29,7 @@ Requires:       python3
 MessagePack is a fast, compact binary serialization format, suitable for similar data to JSON. This package provides CPython bindings for reading and writing MessagePack data.
 
 %prep
-%autosetup -n msgpack-python-%{version}
+%autosetup -p1 -n msgpack-python-%{version}
 
 %build
 %py3_build
@@ -45,6 +46,9 @@ MessagePack is a fast, compact binary serialization format, suitable for similar
 %{python3_sitelib}/*
 
 %changelog
+* Fri Jul 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.0.5-3
+- Patch for CVE-2026-57585
+
 * Tue Apr 29 2025 Riken Maharjan <rmaharjan@microsoft.com> -  1.0.5-2
 - Use pytest instead of tox to fix the ptest
 
