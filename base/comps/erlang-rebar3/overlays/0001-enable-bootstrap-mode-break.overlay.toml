@@ -1,0 +1,11 @@
+# Re-enable bootstrap mode so rebar3 can build itself without needing the old
+# broken erlang-rebar3 3.26.0 in the build tag. The latest upstream commit
+# disabled bootstrap (since Fedora already has a working 3.27.0), but AZL
+# doesn't yet.
+# TODO: Remove this overlay once rebar3 3.27.0 is in the AZL build tag.
+
+[[overlays]]
+description = "Enable bootstrap mode to break self-dependency on broken erlang-rebar3 3.26.0"
+type = "spec-search-replace"
+regex = "^%global bootstrap 0$"
+replacement = "%global bootstrap 1"

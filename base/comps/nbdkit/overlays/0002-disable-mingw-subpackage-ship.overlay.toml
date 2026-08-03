@@ -1,0 +1,7 @@
+# Azure Linux does not ship mingw cross-compilation toolchains.
+
+[[overlays]]
+description = "Disable mingw subpackage — Azure Linux does not ship mingw toolchains"
+type = "spec-search-replace"
+regex = "%global have_mingw 1"
+replacement = "%global have_mingw 0"
