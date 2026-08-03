@@ -31,9 +31,12 @@ Patch19:        CVE-2026-10536.patch
 Patch20:        CVE-2026-8286.patch
 Patch21:        CVE-2026-9079.patch
 Patch22:        CVE-2026-11856.patch
+BuildRequires:  autoconf
+BuildRequires:  automake
 BuildRequires:  krb5-devel
 BuildRequires:  libnghttp2-devel
 BuildRequires:  libssh2-devel
+BuildRequires:  libtool
 BuildRequires:  nghttp2-devel
 BuildRequires:  openssl-devel
 Requires:       curl-libs = %{version}-%{release}
@@ -76,6 +79,7 @@ This package contains minimal set of shared curl libraries.
 %autosetup -p1
 
 %build
+autoreconf -fi
 %configure \
     CFLAGS="%{optflags}" \
     CXXFLAGS="%{optflags}" \
@@ -122,6 +126,7 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %changelog
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-11
 - Patch for CVE-2026-11856
+- Regenerate autotools files to include patched tests in make check.
 
 * Tue Jul 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 8.11.1-10
 - Patch for CVE-2026-8932, CVE-2026-8927, CVE-2026-8926, CVE-2026-12064, CVE-2026-8458, CVE-2026-9079, CVE-2026-8286, CVE-2026-10536
