@@ -5,7 +5,7 @@ A tool for installing and managing Python packages}
 Summary:        A tool for installing and managing Python packages
 Name:           python-pip
 Version:        24.2
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT AND Python-2.0.1 AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND LGPL-2.1-only AND MPL-2.0 AND (Apache-2.0 OR BSD-2-Clause)
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -19,6 +19,7 @@ Patch3:         CVE-2026-1703.patch
 Patch4:         CVE-2026-3219.patch
 Patch5:         CVE-2026-6357.patch
 Patch6:         CVE-2026-8643.patch
+Patch7:         CVE-2026-13346.patch
 
 BuildArch:      noarch
 
@@ -62,6 +63,9 @@ BuildRequires:  python3-wheel
 %{python3_sitelib}/pip*
 
 %changelog
+* Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.2-10
+- Patch for CVE-2026-13346
+
 * Wed Jun 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.2-9
 - Patch for CVE-2026-8643
 
