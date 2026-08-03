@@ -1,21 +1,14 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        26.2.5.21
-Release:        3%{?dist}
+Version:        27.3.4.14
+Release:        1%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Patch0:         CVE-2026-48855.patch
-Patch1:         CVE-2026-48856.patch
-Patch2:         CVE-2026-48858.patch
-Patch3:         CVE-2026-48860.patch
-Patch4:         CVE-2026-49759.patch
-Patch5:         CVE-2026-49760.patch
-Patch6:         CVE-2026-54886.patch
 BuildRequires:  ncurses-devel
 BuildRequires:  openssl-devel
 BuildRequires:  unixODBC-devel
@@ -60,6 +53,10 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Thu Jul 09 2026 Sumit Jena <v-sumitjena@microsoft.com> - 27.3.4.14-1
+- Upgrade to 27.3.4.14.
+- Dropped CVE-2026-48855, CVE-2026-48856, CVE-2026-48858, CVE-2026-48860, CVE-2026-49759, CVE-2026-49760, CVE-2026-54886 patches, fixed upstream in this release.
+
 * Mon Jul 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
 - Patch for CVE-2026-54886
 
