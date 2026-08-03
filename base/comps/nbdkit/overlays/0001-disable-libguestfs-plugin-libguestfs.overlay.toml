@@ -3,6 +3,10 @@
 # The upstream spec already gates this behind !rhel, so this mirrors
 # the RHEL build configuration.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Disable libguestfs plugin until libguestfs is buildable"
 type = "spec-search-replace"

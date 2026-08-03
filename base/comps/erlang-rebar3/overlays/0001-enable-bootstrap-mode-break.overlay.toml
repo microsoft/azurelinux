@@ -4,6 +4,10 @@
 # doesn't yet.
 # TODO: Remove this overlay once rebar3 3.27.0 is in the AZL build tag.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Enable bootstrap mode to break self-dependency on broken erlang-rebar3 3.26.0"
 type = "spec-search-replace"

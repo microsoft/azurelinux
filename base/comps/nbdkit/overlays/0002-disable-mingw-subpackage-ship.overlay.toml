@@ -1,5 +1,9 @@
 # Azure Linux does not ship mingw cross-compilation toolchains.
 
+[metadata]
+category = "azl-pruning"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Disable mingw subpackage — Azure Linux does not ship mingw toolchains"
 type = "spec-search-replace"

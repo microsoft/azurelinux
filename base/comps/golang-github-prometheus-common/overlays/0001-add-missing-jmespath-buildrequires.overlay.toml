@@ -3,6 +3,10 @@
 # aws-sdk-go, which transitively needs github.com/jmespath/go-jmespath.
 # Add an explicit BuildRequires so the sigv4 tests can compile.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Add missing jmespath BuildRequires — transitive dep of aws-sdk-go, not pulled in due to bootstrap mode"
 type = "spec-add-tag"

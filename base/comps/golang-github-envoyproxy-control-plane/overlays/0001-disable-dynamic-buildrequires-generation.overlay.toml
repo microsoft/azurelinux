@@ -5,6 +5,10 @@
 # Remove this overlay once golang-github-sagikazarmark-crypt is available or viper
 # no longer requires it.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Disable dynamic BuildRequires generation — transitive dep on dead golang-github-sagikazarmark-crypt"
 type = "spec-search-replace"

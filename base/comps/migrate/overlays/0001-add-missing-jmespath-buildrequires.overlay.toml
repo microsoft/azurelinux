@@ -4,6 +4,10 @@
 # Add explicit BuildRequires for the missing transitive deps so the aws_s3
 # source driver can compile.
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Add missing jmespath BuildRequires — transitive dep of aws-sdk-go, not pulled in due to bootstrap mode"
 type = "spec-add-tag"
