@@ -114,14 +114,11 @@ cd testsuite
 %{_mandir}/man1/busybox.petitboot.1.gz
 
 %changelog
-* Wed Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.36.1-26
-- Rebased 3.0-dev CVE patches (CVE-2026-38752, CVE-2026-38753) on top of fasttrack CVE ordering; renumbered as Patch11, Patch12.
+* Tue Jul 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.36.1-26
+- Patch for CVE-2026-38753, CVE-2026-38752
 
 * Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.36.1-25
 - Patch for CVE-2026-38755, CVE-2026-38754
-
-* Tue Jul 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.36.1-25
-- Patch for CVE-2026-38753, CVE-2026-38752
 
 * Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.36.1-24
 - Bump to rebuild with updated glibc
