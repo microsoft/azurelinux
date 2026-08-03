@@ -1,5 +1,9 @@
 # TEMPORARILY use the unsigned shim binaries from our shim-unsigned-ARCH packages
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Copy prebuilt unsigned shim binaries from the shim-unsigned-ARCH packages into the tree during %prep"
 type = "spec-append-lines"

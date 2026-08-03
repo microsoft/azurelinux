@@ -4,6 +4,10 @@
 # the '\x2d' escape (which systemd decodes to '-' inside a path segment) --
 # only the source filename in our git tree changes.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Rename source file to remove '\\' (invalid on Windows filesystems)"
 type = "file-rename"

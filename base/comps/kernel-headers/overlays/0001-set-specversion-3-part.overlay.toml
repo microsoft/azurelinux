@@ -4,6 +4,10 @@
 # version/release mechanics.
 # upstream-status inapplicable: permanent AZL-only versioning, never sent upstream.
 
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
 [[overlays]]
 type = "spec-search-replace"
 description = "Set specversion to 3-part version matching kernel's specrpmversion"

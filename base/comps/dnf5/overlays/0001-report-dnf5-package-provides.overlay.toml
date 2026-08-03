@@ -3,6 +3,10 @@
 # same for tdnf, for the benefit of earlier customers of Azure
 # Linux.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
 [[overlays]]
 description = "Report that the dnf5 package provides tdnf for compatibility"
 type = "spec-add-tag"

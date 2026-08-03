@@ -2,6 +2,14 @@
 # TODO: re-enable doc once cliff sphinxext fix is released upstream
 # Upstream fix: https://github.com/openstack/cliff/commit/391261c849c994ca2d3f42926497e633047ed8c7
 
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamed"
+commits = [
+  { url = "https://src.fedoraproject.org/rpms/python-cliff/c/1db52a506c7d6a51f0ef63960ddc1c45765a76d1" },
+  { url = "https://github.com/openstack/cliff/commit/391261c849c994ca2d3f42926497e633047ed8c7" },
+]
+
 [[overlays]]
 description = "Disable doc generation to work around cliff sphinxext Python 3.14 incompatibility"
 type = "spec-search-replace"

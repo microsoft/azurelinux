@@ -6,6 +6,12 @@
 # for the RPM build to avoid this issue.
 # TODO: remove this overlay once pinning to f44.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/apache-sshd/c/7959d325a441ae1f8aa0aaabf91eec64e06b983b?branch=f44" }]
+
+
 [[overlays]]
 description = "Remove maven-remote-resources-plugin (Xpp3Dom classloading clash with plexus-xml/maven4)"
 type = "spec-append-lines"

@@ -1,3 +1,7 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "needs-upstream-hook"
+
 [[overlays]]
 description = "Discover compiler-rt's installed runtime directory so Rust works with both Stage 1 and native Stage 2 LLVM layouts"
 type = "spec-prepend-lines"

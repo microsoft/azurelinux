@@ -1,5 +1,9 @@
 # Build deps (Fedora's spec has none since it uses pre-built headers).
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
 [[overlays]]
 type = "spec-add-tag"
 description = "Add make as a build dependency for generating headers from source"

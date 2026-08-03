@@ -7,6 +7,14 @@
 # already upstream in mock-core-configs f44 — see commits below).
 #
 
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+  { url = "https://github.com/rpm-software-management/mock/commit/1339deac37d01b9f8098aadccd359c5ca55f7abc" },
+  { url = "https://src.fedoraproject.org/rpms/mock-core-configs/c/df9b846cf97e976756f80c747d58f97376923a33" },
+]
+
 [[overlays]]
 description = "Add Azure Linux 4.0 mock chroot template (azure-linux-4.tpl)"
 type = "file-add"

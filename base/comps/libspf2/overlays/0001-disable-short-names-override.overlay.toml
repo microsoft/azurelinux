@@ -19,6 +19,10 @@
 
 # Layer 1: Neutralize SHORT_NAMES=YES — keep the default (NO) for deterministic filenames
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
 [[overlays]]
 type = "spec-search-replace"
 section = "%build"

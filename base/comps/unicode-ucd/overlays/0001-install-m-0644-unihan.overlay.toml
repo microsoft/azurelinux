@@ -7,6 +7,10 @@
 # Fix: replace `cp -p` with `install -m 0644` to set permissions explicitly,
 # making the result independent of the downloader's behavior.
 
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
 [[overlays]]
 description = "Use install -m 0644 for Unihan.zip to ensure correct permissions regardless of source file mode"
 type = "spec-search-replace"
