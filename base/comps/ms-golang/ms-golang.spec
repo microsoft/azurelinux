@@ -19,7 +19,7 @@
 Summary:        Go
 Name:           ms-golang
 Version:        1.26.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,6 +28,9 @@ URL:            https://github.com/microsoft/go
 Source0:        https://github.com/microsoft/go/releases/download/v%{version}-%{ms_go_revision}/%{ms_go_filename}
 
 Patch1:         CVE-2026-39821.patch
+# Skip crypto tests incompatible with the Microsoft Go OpenSSL backend (SHA-1
+# RSA-PSS rejected by system OpenSSL; ML-KEM determinism differs). See patch.
+Patch2:         0002-Skip-openssl-incompatible-crypto-tests.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -121,6 +124,11 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Aug 04 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-5
+- Skip crypto/rsa PSS and testing/cryptotest ML-KEM tests that are incompatible
+  with the Microsoft Go OpenSSL crypto backend (system OpenSSL rejects SHA-1
+  RSA-PSS; ML-KEM key generation does not consume the deterministic test RNG).
+
 * Thu Jul 30 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-4
 - Bootstrap from the distro Go toolchain (BuildRequires: golang) instead of the
   multi-stage C bootstrap chain; drop the five bootstrap source tarballs, the go1.4
@@ -292,7 +300,7 @@ fi
 * Fri Aug 19 2022 Olivia Crain <oliviacrain@microsoft.com> - 1.18.5-1
 - Upgrade to version to fix CVE-2022-1705, CVE-2022-1962, CVE-2022-28131,
   CVE-2022-30630, CVE-2022-30631, CVE-2022-30632, CVE-2022-30633, CVE-2022-30635,
-  CVE-2022-32148, and CVE-2022-32189 
+  CVE-2022-32148, and CVE-2022-32189
 
 * Tue Jun 14 2022 Muhammad Falak <mwani@microsoft.com> - 1.18.3-1
 - Bump version to 1.18.3 to address CVE-2022-24675 & CVE-2022-28327
