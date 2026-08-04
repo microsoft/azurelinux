@@ -2,9 +2,9 @@
 # Removed once these defines move directly into kernel.spec.
 %_without_debug 1
 %_without_selftests 1
-%azl_pkgrelease 23
+%azl_pkgrelease 26
 %kextraversion 1
 %nvidia_open_version 595.58.03
 %mlnx_ofa_version 26.04
-%mlnx_ofa_release OFED.26.04.0.8.5.1
-%mlnx_ofa_bundle_release 0.8.5.0
+%mlnx_ofa_vendor_release 1.1.0.0
+%mlnx_ofa_ofed_version OFED.%{mlnx_ofa_version}.%{mlnx_ofa_vendor_release}

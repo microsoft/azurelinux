@@ -35,10 +35,10 @@ replace-reason = "The local spec vendors the rendered sources manifest; this dec
 # — only the mlnx-ofa_kernel SRPM (and its inner tarball) inside it — but NVIDIA
 # does not host mlnx-ofa_kernel as a standalone download.
 [[components.kernel.source-files]]
-filename = "MLNX_OFED_SRC-26.04-0.8.5.0.tgz"
-hash = "1829d190f84f6d54597b98c40e162afa64939e608f7eaf494ac626c454e4d0310e14dedb7108326e9c9a667634eb27cf751dae806249f1783a66c8fc07aacd13"
+filename = "MLNX_OFED_SRC-26.04-1.1.0.0.tgz"
+hash = "204b42dde1cd7f52e9e8151026a5a1a6d634ed6726609608209d2eacd0ab8a1080acac9aa411fcec33d00d94f957c549d7d5e7f8a69993e8ed0c0853b7e7ba83"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://linux.mellanox.com/public/repo/doca/3.4.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.04-0.8.5.0.tgz" }
+origin = { type = "download", uri = "https://linux.mellanox.com/public/repo/doca/3.4.1/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.04-1.1.0.0.tgz" }
 
 # kABI reference tarballs (Source300/Source301). kABI checking is disabled in
 # Azure Linux, but the spec still declares these sources, so they must be present
