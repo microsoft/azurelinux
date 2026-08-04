@@ -1,3 +1,9 @@
 [components.qt5-qtwebkit]
-# Release: 0.95%{?prerel}%{?dist}
+# Release: 0.96%{?prerel}%{?dist}
 release = { calculation = "manual" }
+
+[[components.qt5-qtwebkit.overlays]]
+description = "Bump release for the GStreamer MPEG-TS dependency fix"
+type = "spec-update-tag"
+tag = "Release"
+value = "0.96%{?prerel}%{?dist}"
