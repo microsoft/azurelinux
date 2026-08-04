@@ -749,6 +749,9 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((mlnx-ofa_kernel-modules-uname-r = %{KVERREL}) if mlnx-ofa_kernel-modules-matched)
+%endif
 Provides: installonlypkg(kernel)
 %endif
 
@@ -1174,6 +1177,8 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+Source6100: MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_bundle_release}.tgz
+Source6101: mlnx-ofa_kernel.inc
 
 ## Patches needed for building this package
 
@@ -1229,6 +1234,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+%global _kmod_phase package
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2257,6 +2266,10 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+%global _kmod_phase prep
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3396,6 +3409,10 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase build
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3903,6 +3920,10 @@ popd
 %global _kmod_phase install
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+%global _kmod_phase install
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4573,8 +4594,15 @@ fi\
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase files
+%global _kmod_name mlnx-ofa_kernel
+%include %{_sourcedir}/mlnx-ofa_kernel.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Jul 30 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.12
+- fix(kmod-mlnx-ofa_ernel): add mlnx-ofa_kernel
+
 * Thu Jul 30 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.11
 - fix(kmod-nvidia-open): move driver version from package name into Version field
 
