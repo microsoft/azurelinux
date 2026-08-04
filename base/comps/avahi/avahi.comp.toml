@@ -5,3 +5,6 @@
 # from the distro entirely.
 [components.avahi]
 build.with = ["bootstrap"]
+# Avahi uses this bcond only to select a reduced feature set; it is not a
+# transitional bootstrap build and should retain the normal distro suffix.
+build.defines = { __bootstrap = "%{nil}" }
