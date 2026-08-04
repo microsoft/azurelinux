@@ -19,8 +19,8 @@
 
 Summary:        Container native virtualization
 Name:           kubevirt
-Version:        1.7.1
-Release:        8%{?dist}
+Version:        1.8.4
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -28,23 +28,21 @@ Group:          System/Management
 URL:            https://github.com/kubevirt/kubevirt
 Source0:        https://github.com/kubevirt/kubevirt/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Patch0:         CVE-2025-11065.patch
-Patch1:         CVE-2026-35469.patch
-Patch2:         CVE-2026-39829.patch
-Patch3:         CVE-2026-42506.patch
-Patch4:         CVE-2026-46597.patch
-Patch5:         CVE-2026-39821.patch
-Patch6:         CVE-2026-39830.patch
-Patch7:         CVE-2026-39834.patch
-Patch8:         CVE-2026-27136.patch
-Patch9:         CVE-2026-25680.patch
-Patch10:        CVE-2026-25681.patch
-Patch11:        CVE-2026-39827.patch
-Patch12:        CVE-2026-39828.patch
-Patch13:        CVE-2026-39835.patch
-Patch14:        CVE-2026-42502.patch
-Patch15:        CVE-2026-7374.patch
-Patch16:        CVE-2026-33814.patch
-Patch17:        CVE-2026-56852.patch
+Patch1:         CVE-2026-39829.patch
+Patch2:         CVE-2026-42506.patch
+Patch3:         CVE-2026-46597.patch
+Patch4:         CVE-2026-39821.patch
+Patch5:         CVE-2026-39830.patch
+Patch6:         CVE-2026-39834.patch
+Patch7:         CVE-2026-27136.patch
+Patch8:         CVE-2026-25680.patch
+Patch9:         CVE-2026-25681.patch
+Patch10:        CVE-2026-39827.patch
+Patch11:        CVE-2026-39828.patch
+Patch12:        CVE-2026-39835.patch
+Patch13:        CVE-2026-42502.patch
+Patch14:        CVE-2026-33814.patch
+Patch15:        CVE-2026-56852.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -55,6 +53,7 @@ BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
 BuildRequires:  rsync
 BuildRequires:  sed
+BuildRequires:  pkgconfig(libnbd)
 BuildRequires:  pkgconfig(libvirt)
 ExclusiveArch:  x86_64 aarch64
 
