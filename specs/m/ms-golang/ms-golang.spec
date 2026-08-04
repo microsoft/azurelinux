@@ -22,7 +22,7 @@
 Summary:        Go
 Name:           ms-golang
 Version:        1.26.5
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -43,6 +43,9 @@ Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
 Patch1:         CVE-2026-39821.patch
+# Skip crypto tests incompatible with the Microsoft Go OpenSSL backend (SHA-1
+# RSA-PSS rejected by system OpenSSL; ML-KEM determinism differs). See patch.
+Patch2:         0002-Skip-openssl-incompatible-crypto-tests.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -198,6 +201,11 @@ fi
 %{_bindir}/*
 
 %changelog
+* Mon Aug 04 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-4
+- Skip crypto/rsa PSS and testing/cryptotest ML-KEM tests that are incompatible
+  with the Microsoft Go OpenSSL crypto backend (system OpenSSL rejects SHA-1
+  RSA-PSS; ML-KEM key generation does not consume the deterministic test RNG).
+
 * Wed Jul 29 2026 Nan Liu <liunan@microsoft.com> - 1.26.5-3
 - Introduce the Microsoft build of Go as the 'ms-golang' package for Azure Linux 4.0.
 - Provides 'golang' and conflicts with the Fedora upstream 'golang' package.
