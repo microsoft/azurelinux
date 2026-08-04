@@ -39,6 +39,7 @@ Patch9:         CVE-2026-56852.patch
 Patch10:        CVE-2026-43871.patch
 Patch11:        CVE-2026-55969.patch
 BuildRequires: golang < 1.23
+BuildRequires: hostname
 
 %description
 Vitess is a database clustering system for horizontal scaling of MySQL through
@@ -101,6 +102,19 @@ install -m 0755 -vp ./bin/*             %{buildroot}%{_bindir}/
 #   go/vt/vttablet/tabletserver/vstreamer - needs mysqlctl binary
 #   go/vt/wrangler/testlib            - needs mysqld (VT_MYSQL_ROOT)
 #   go/vt/zkctl                       - needs /usr/local/vitess/bin (zookeeper)
+
+# wrangler's fake-tablet init calls netutil.FullyQualifiedHostname(); map the
+# build chroot's (ephemeral) hostname so it resolves. localhost is already mapped.
+echo "127.0.0.1 $(hostname)" >> /etc/hosts 2>/dev/null || true
+
+export TMPDIR=$PWD/tmp
+mkdir -p $TMPDIR
+
+export VTDATAROOT=$PWD/vtdataroot
+mkdir -p $VTDATAROOT
+
+export VTROOT=$PWD
+
 go test -mod=vendor \
        ./go/mysql/binlog/... \
        ./go/mysql/capabilities/... \
