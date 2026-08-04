@@ -21,7 +21,7 @@
 
 Name:           qt5-%{qt_module}
 Version:        5.212.0
-Release:        0.95%{?prerel}%{?dist}
+Release: 0.96%{?prerel}%{?dist}
 Summary:        Qt5 - QtWebKit components
 
 License:        LGPL-2.0-only AND BSD-3-Clause
@@ -67,7 +67,6 @@ BuildRequires:  pkgconfig(xrender)
 BuildRequires:  pkgconfig(libxslt)
 BuildRequires:  pkgconfig(gl)
 BuildRequires:  pkgconfig(gstreamer-gl-1.0)
-BuildRequires:  pkgconfig(gstreamer-mpegts-1.0)
 BuildRequires:  perl-generators
 BuildRequires:  perl(File::Copy)
 BuildRequires:  python3
@@ -102,6 +101,7 @@ Provides:       bundled(brotli)
 Provides:       bundled(woff2)
 
 
+Patch12: qtwebkit-optional-gstreamer-mpegts.patch
 %description
 %{summary}
 

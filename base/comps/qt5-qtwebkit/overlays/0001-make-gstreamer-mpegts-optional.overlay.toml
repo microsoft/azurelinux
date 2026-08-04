@@ -1,0 +1,17 @@
+# Fedora ships gstreamer1-plugins-bad-free-devel, which provides the MPEG-TS
+# API. Azure Linux omits that package. QtWebKit's MPEG-TS source and linkage
+# are already gated by USE_GSTREAMER_MPEGTS, which is disabled by default.
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Remove unavailable GStreamer MPEG-TS build dependency"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "pkgconfig(gstreamer-mpegts-1.0)"
+
+[[overlays]]
+description = "Do not require the disabled GStreamer MPEG-TS integration"
+type = "patch-add"
+source = "qtwebkit-optional-gstreamer-mpegts.patch"

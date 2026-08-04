@@ -1,0 +1,25 @@
+From e76e13acac38658e132f1a03383869b2530151c1 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Tue, 4 Aug 2026 20:57:42 +0000
+Subject: [PATCH] cmake: make GStreamer MPEG-TS optional for Qt
+
+The Qt port requires the MPEG-TS component whenever video is enabled,
+even though MPEG-TS sources and linkage are guarded by
+USE_GSTREAMER_MPEGTS.
+
+Do not require MPEG-TS for generic GStreamer video support.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ Source/cmake/OptionsQt.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmake/OptionsQt.cmake b/Source/cmake/OptionsQt.cmake
+index 1ee60b77710..b9c7ab39861 100644
+--- a/Source/cmake/OptionsQt.cmake
++++ b/Source/cmake/OptionsQt.cmake
+@@ -804,3 +804,3 @@ if (USE_GSTREAMER)
+     if (ENABLE_VIDEO)
+-        list(APPEND GSTREAMER_COMPONENTS video mpegts tag gl)
++        list(APPEND GSTREAMER_COMPONENTS video tag gl)
+     endif ()
