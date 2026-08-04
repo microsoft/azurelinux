@@ -4578,6 +4578,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Aug 03 2026 Hayden Barnes <hbarnes@herodevs.com> - 6.18.31-1.12
+- feat(kernel): enable x86 Bluetooth
+
 * Thu Jul 30 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.11
 - fix(kmod-nvidia-open): move driver version from package name into Version field
 
