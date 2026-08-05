@@ -1,0 +1,44 @@
+name:                Diff
+version:             0.5
+x-revision: 1
+synopsis:            Diff algorithm in pure Haskell
+description:         Implementation of the standard diff algorithm, and utilities for pretty printing.  Time complexity is proportional to N (input length) & D (number of differences).  Space complexity is D^2.  Includes utilities for pretty printing.
+category:            Algorithms
+license:             BSD3
+license-file:        LICENSE
+author:              Sterling Clover
+maintainer:          David Fox <dsf@seereason.com>
+Tested-With:         GHC == 7.10.3, GHC == 8.0.2, GHC == 8.2.2, GHC == 8.4.4, GHC == 8.6.5,
+                     GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.2, GHC == 9.2.8, GHC == 9.4.7,
+                     GHC == 9.6.3, GHC == 9.8.1
+Build-Type:          Simple
+Cabal-Version:       >= 1.10
+homepage: https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.4.6927
+
+library
+  default-language: Haskell2010
+  build-depends:   base >= 4.8 && <= 6, array, pretty >= 1.1
+  hs-source-dirs:  src
+  exposed-modules:
+                   Data.Algorithm.Diff,
+                   Data.Algorithm.DiffOutput
+                   Data.Algorithm.DiffContext
+  ghc-options:     -Wall -funbox-strict-fields
+
+source-repository head
+  type:      git
+  location:  http://github.com/seereason/Diff
+
+test-suite diff-tests
+  default-language: Haskell2010
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test, src
+  main-is: Test.hs
+  build-depends: base >= 3 && <= 6, array
+                , pretty, QuickCheck, test-framework
+                , test-framework-quickcheck2, process
+                , directory
+  other-modules:
+                   Data.Algorithm.Diff,
+                   Data.Algorithm.DiffOutput
+                   Data.Algorithm.DiffContext
