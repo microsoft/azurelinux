@@ -1,0 +1,5 @@
+# Fedora enabled bootstrap mode while F44 lacked transitive Go dependencies:
+# https://src.fedoraproject.org/rpms/golang-github-aws-sdk-2/c/cb6b0ba3ea0781632fe9192449ec2bfeccdf2274
+# Azure Linux builds those prerequisites in both stages, so use full mode.
+[components.golang-github-aws-sdk-2]
+build.without = ["bootstrap"]
