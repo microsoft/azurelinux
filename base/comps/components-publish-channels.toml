@@ -2358,6 +2358,7 @@ components = [
     "shared-mime-info",
     "sharutils",
     "shell-color-prompt",
+    "ShellCheck",
     "shim",
     "shim-unsigned-aarch64",
     "shim-unsigned-x64",
@@ -2996,4 +2997,13 @@ packages = [
     "rust-zram-generator-devel", # srpm: rust-zram-generator
     # cargo-rpm-macros: build-time RPM macros for packaging cargo crates; not needed at base runtime, used by SDK packagers.
     "cargo-rpm-macros", # srpm: cargo-rpm-macros
+    # ShellCheck's Haskell library subpackages: only the statically-linked `shellcheck`
+    # executable is wanted in base. The ghc-ShellCheck library links the ghc runtime
+    # libraries (libHS*), and ghc-ShellCheck-devel hard-Requires ghc-compiler; both the
+    # ghc compiler and the ghc-* runtime libraries live in sdk. Keep these siblings in
+    # sdk so base carries only the executable (which needs only libc/libm/libffi/libgmp).
+    "ghc-ShellCheck", # srpm: ShellCheck
+    "ghc-ShellCheck-devel", # srpm: ShellCheck
+    "ghc-ShellCheck-doc", # srpm: ShellCheck
+    "ghc-ShellCheck-prof", # srpm: ShellCheck
 ]
