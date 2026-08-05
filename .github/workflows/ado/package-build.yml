@@ -8,11 +8,14 @@
 #   .github/workflows/ado/templates/package-build-stages.yml
 #
 # Authenticates via Workload Identity Federation (OIDC) and calls the Control
-# Tower APIs to run the v1 post-merge delta build:
+# Tower APIs to run the v1 post-merge delta build against each configured
+# deployment:
 #   1. Resolve the (target, source) commit range for this push from the
 #      previous CI build (ADO Builds API).
 #   2. Submit official package builds for the components that changed across
-#      that range, via Workload Identity Federation (OIDC) to Control Tower.
+#      that range, via deployment-specific Workload Identity Federation (OIDC)
+#      service connections to Control Tower. Deployment jobs run independently
+#      in parallel.
 #
 # The setup + change-detection + validation steps are composed from the shared
 # templates/steps/* step templates via templates/steps/get-changes-info.yml.
@@ -23,28 +26,30 @@
 # - scripts/ci/components/ - (cross-pipeline azldev helpers shared with the GH Actions PR gates).
 #
 # Prerequisites (ADO / Azure Portal):
-#   1. Entra ID App Registration with audience URI
+#   1. Entra ID App Registrations with audience URIs
 #      "api://<ControlTower-ClientId>" (see variable group below).
-#   2. Federated identity credential on the app registration for the ADO
-#      service connection (issuer: https://vstoken.dev.azure.com/<org-id>,
+#   2. Federated identity credentials on the app registrations for the ADO
+#      service connections (issuer: https://vstoken.dev.azure.com/<org-id>,
 #      subject: sc://<org>/<project>/<service-connection-name>).
-#   3. ARM service connection in ADO project settings using Workload Identity
-#      Federation (manual).
+#   3. DEV and PROD ARM service connections in ADO project settings using
+#      Workload Identity Federation (manual).
 #   4. CI trigger configured (in ADO pipeline settings) to fire on pushes to
 #      the target branch.
 #
 # Variable Group (ADO Pipelines > Library):
 #   Name: "ControlTower-PRCheck"
 #   Required variables:
-#     - ApiAudienceDev      : DEV Entra ID audience URI
-#     - ApiBaseAFDUrlDev    : DEV Azure Front Door endpoint base URL
+#     - ApiAudienceDev     : DEV Entra ID audience URI
+#     - ApiAudienceProd    : PROD Entra ID audience URI
+#     - ApiBaseAFDUrlDev   : DEV Azure Front Door endpoint base URL
+#     - ApiBaseAFDUrlProd  : PROD Azure Front Door endpoint base URL
 
 # Trigger controlled by ADO branch policy — not YAML triggers.
 trigger: none
 
 pr: none
 
-# Variables extracted from this group: ApiAudienceDev, ApiBaseAFDUrlDev.
+# Variables extracted from this group: deployment audiences and endpoint URLs.
 variables:
   - group: ControlTower-PRCheck
 
@@ -78,15 +83,21 @@ extends:
     stages:
       - template: /.github/workflows/ado/templates/package-build-stages.yml@self
         parameters:
-          apiAudience: $(ApiAudienceDev)
-          apiBaseAFDUrl: $(ApiBaseAFDUrlDev)
           artifactBaseName: packagebuild
           containerImage: mcr.microsoft.com/onebranch/azurelinux/build:3.0
+          deployments:
+            DEV:
+              apiAudience: $(ApiAudienceDev)
+              apiBaseAFDUrl: $(ApiBaseAFDUrlDev)
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
+            PROD:
+              apiAudience: $(ApiAudienceProd)
+              apiBaseAFDUrl: $(ApiBaseAFDUrlProd)
+              serviceConnection: CT-Endpoints-Access-ServiceConnection-PROD
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Distro-config RPM build-environment for the 4.0 branch.
           packageEnvironment: "4.0"
           poolType: linux
-          serviceConnection: CT-Endpoints-Access-ServiceConnection-DEV
           # Must exceed the script's --poll-timeout-seconds (default 600s = 10m)
           # with enough headroom for setup steps and the final API call.
           timeoutInMinutes: 25

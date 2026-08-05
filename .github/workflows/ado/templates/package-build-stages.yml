@@ -6,19 +6,21 @@
 # OneBranch-coupled knobs as parameters. The wrapper at
 # .github/workflows/ado/package-build.yml supplies concrete values.
 #
-# Per push: gather the change-set info (get-changes-info, mode=postmerge: full
-# history, deps, commit range, lock + render verification, changed-component
-# set), then submit an official Control Tower build for the changed components.
+# Per push and deployment: gather the change-set info (get-changes-info,
+# mode=postmerge: full history, deps, commit range, lock + render verification,
+# changed-component set), then submit an official Control Tower build for the
+# changed components. Each deployment runs in a separate parallel job.
 
 parameters:
-  - name: apiAudience
-    type: string
-  - name: apiBaseAFDUrl
-    type: string
   - name: artifactBaseName
     type: string
   - name: containerImage
     type: string
+  # Named map of deployment identifier to apiAudience, apiBaseAFDUrl, and
+  # serviceConnection. Identifiers must be valid Azure Pipelines job-name
+  # suffixes.
+  - name: deployments
+    type: object
   - name: outputDirectory
     type: string
   # Distro-config RPM build-environment used by Control Tower.
@@ -27,70 +29,70 @@ parameters:
   - name: poolType
     type: string
     default: linux
-  - name: serviceConnection
-    type: string
   - name: timeoutInMinutes
     type: number
 
 stages:
   - stage: PackageBuild
     jobs:
-      - job: PackageBuild
-        # Post-merge build: code has already merged, so there is no PR or merge
-        # queue to gate. Fails loud -- any failing step turns the run red so
-        # submission/validation breakage is visible rather than masked. The
-        # build runs asynchronously in Control Tower/Koji; this pipeline only
-        # submits it and confirms acceptance (see run_official_package_build.py).
-        timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
-        pool:
-          type: ${{ parameters.poolType }}
-        variables:
-          - name: LinuxContainerImage
-            value: ${{ parameters.containerImage }}
-          - name: ob_artifactBaseName
-            value: ${{ parameters.artifactBaseName }}
-          - name: ob_outputDirectory
-            value: ${{ parameters.outputDirectory }}
-          - name: packageEnvironment
-            value: ${{ parameters.packageEnvironment }}
-        steps:
-          # Sets job variables:
-          # - changedComponentsFile
-          - template: steps/get-changes-info.yml
-            parameters:
-              mode: postmerge
+      - ${{ each deployment in parameters.deployments }}:
+          - job: PackageBuild_${{ deployment.key }}
+            displayName: "Package build (${{ deployment.key }})"
+            # Post-merge build: code has already merged, so there is no PR or
+            # merge queue to gate. Fails loud -- any failing deployment turns
+            # the run red so submission/validation breakage is visible rather
+            # than masked. Deployment jobs run independently in parallel. The
+            # build runs asynchronously in Control Tower/Koji; this pipeline
+            # only submits it and confirms acceptance (see
+            # run_official_package_build.py).
+            timeoutInMinutes: ${{ parameters.timeoutInMinutes }}
+            pool:
+              type: ${{ parameters.poolType }}
+            variables:
+              - name: LinuxContainerImage
+                value: ${{ parameters.containerImage }}
+              - name: ob_artifactBaseName
+                value: ${{ parameters.artifactBaseName }}-${{ deployment.key }}
+              - name: ob_outputDirectory
+                value: ${{ parameters.outputDirectory }}/${{ deployment.key }}
+              - name: packageEnvironment
+                value: ${{ parameters.packageEnvironment }}
+            steps:
+              # Sets job variables:
+              # - changedComponentsFile
+              - template: steps/get-changes-info.yml
+                parameters:
+                  mode: postmerge
 
-          - template: steps/install-deps.yml
-            parameters:
-              installControlTowerClient: true
+              - template: steps/install-deps.yml
+                parameters:
+                  installControlTowerClient: true
 
-          - task: AzureCLI@2
-            displayName: "Submit official package build to Control Tower"
-            inputs:
-              azureSubscription: ${{ parameters.serviceConnection }}
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -euo pipefail
+              - task: AzureCLI@2
+                displayName: "Submit official package build to Control Tower (${{ deployment.key }})"
+                inputs:
+                  azureSubscription: ${{ deployment.value.serviceConnection }}
+                  scriptType: bash
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    set -euo pipefail
 
-                python3 scripts/ci/control-tower/run_official_package_build.py \
-                  --api-audience "$API_AUDIENCE" \
-                  --api-base-url "$API_BASE_URL" \
-                  --build-reason "$BUILD_REASON" \
-                  --changed-components-file "$CHANGED_COMPONENTS_FILE" \
-                  --environment "$PACKAGE_ENVIRONMENT"
-            env:
-              # apiAudience / apiBaseAFDUrl come from the parameters directly
-              # (not surfaced as same-named job variables): the wrapper passes
-              # $(ApiAudience) / $(ApiBaseAFDUrl) from the variable group, and a
-              # job variable of the same (case-insensitive) name would
-              # self-reference -> "cyclical reference" and never resolve.
-              API_AUDIENCE: ${{ parameters.apiAudience }}
-              API_BASE_URL: ${{ parameters.apiBaseAFDUrl }}
-              CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
-              PACKAGE_ENVIRONMENT: $(packageEnvironment)
-              # Secret predefined variables are not auto-exposed.
-              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-              # Build.Reason is predefined and auto-exposed as $BUILD_REASON;
-              # reference it directly and do not map it here (env: overrides
-              # of reserved variables are silently ignored by the agent).
+                    python3 scripts/ci/control-tower/run_official_package_build.py \
+                      --api-audience "$API_AUDIENCE" \
+                      --api-base-url "$API_BASE_URL" \
+                      --build-reason "$BUILD_REASON" \
+                      --changed-components-file "$CHANGED_COMPONENTS_FILE" \
+                      --environment "$PACKAGE_ENVIRONMENT"
+                env:
+                  # Values come directly from parameters rather than same-named
+                  # job variables, which would create cyclical references.
+                  API_AUDIENCE: ${{ deployment.value.apiAudience }}
+                  API_BASE_URL: ${{ deployment.value.apiBaseAFDUrl }}
+                  CHANGED_COMPONENTS_FILE: $(changedComponentsFile)
+                  PACKAGE_ENVIRONMENT: $(packageEnvironment)
+                  # Secret predefined variables are not auto-exposed.
+                  SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+                  # Build.Reason is predefined and auto-exposed as
+                  # $BUILD_REASON; reference it directly and do not map it here
+                  # (env: overrides of reserved variables are silently ignored
+                  # by the agent).
