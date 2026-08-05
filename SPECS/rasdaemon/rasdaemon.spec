@@ -1,7 +1,7 @@
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:			rasdaemon
-Version:		0.8.0
+Version:		0.8.1
 Release:		1%{?dist}
 Summary:		Utility to receive RAS error tracings
 License:		GPLv2
@@ -75,6 +75,9 @@ rm INSTALL %{buildroot}/usr/include/*.h
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
+* Wed Aug 05 2026 Andy Zaugg <azaugg@linkedin.com> - 0.8.1-1
+- Update to version 0.8.1. License verified.
+
 * Wed May 22 2024 Chris Co <chrco@microsoft.com> - 0.8.0-1
 - Update to version 0.8.0. From Fedora 40. License verified.
 
