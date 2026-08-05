@@ -5,11 +5,6 @@ config_opts['use_bootstrap_image'] = False
 # TODO: This will be moved into a comp.xml file.
 config_opts['chroot_setup_cmd'] = 'install'
 
-# We enable this for now; it's only required for stage2 builds that consume
-# dependencies from stage1. This config currently consumes dependencies from
-# stage1.
-config_opts['chroot_setup_cmd'] += ' azurelinux-stage1-compat'
-
 config_opts['chroot_setup_cmd'] += ' bash'
 config_opts['chroot_setup_cmd'] += ' bzip2'
 config_opts['chroot_setup_cmd'] += ' coreutils'
@@ -43,9 +38,6 @@ config_opts['plugin_conf']['ccache_enable'] = False
 config_opts['cleanup_on_success'] = False
 config_opts['cleanup_on_failure'] = False
 
-config_opts['macros']['%dist'] = '.azl4'
-config_opts['macros']['%vendor'] = 'Microsoft Corporation'
-config_opts['macros']['%distribution'] = 'Azure Linux'
 config_opts['dist'] = 'azl4'
 config_opts['extra_chroot_dirs'] = ['/run/lock']
 config_opts['releasever'] = '4.0'
