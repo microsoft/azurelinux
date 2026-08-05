@@ -1,7 +1,0 @@
-[components.libnma]
-
-# Disable GTK4 support unconditionally.
-# We do not want to enable support for GUI toolkits unless it blocks essential
-# functionality. GTK4 support is optional and we can disable it.
-[components.libnma.build]
-without = ["libnma_gtk4"]
