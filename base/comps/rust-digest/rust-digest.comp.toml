@@ -1,0 +1,9 @@
+[components.rust-digest]
+# Pinned to Fedora f43 HEAD (past the distro default snapshot) to provide
+# digest 0.11.3, required by the bumped default sha2/aes/hmac/sha1/md-5/
+# streebog/pbkdf2 crate-alignment cascade for uv 0.10.12
+# (crate(digest/default) >= 0.11.0). The ~30 existing dynamically-generated
+# consumers (rust-blake2, rust-rsa, rust-sha3, rust-ripemd, rust-sm3, rust-uucore, etc.)
+# which require digest < 0.11.0 are served by the new rust-digest0.10 compat
+# package, pinned at the commit this default previously resolved to.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "5183b7700eda8e1c31efd048b9c4746fbc8e134f" }

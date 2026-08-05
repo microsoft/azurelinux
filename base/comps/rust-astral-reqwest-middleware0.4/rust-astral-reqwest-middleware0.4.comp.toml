@@ -1,0 +1,16 @@
+[components.'rust-astral-reqwest-middleware0.4']
+# Version-suffixed compat package (same pattern as rust-nix0.30, etc.):
+# provides an older version of the "astral-reqwest-middleware" crate
+# alongside the newer rust-astral-reqwest-middleware (currently 0.5.1,
+# required by rust-ambient-id). uv requires
+# crate(astral-reqwest-middleware/default) >= 0.4.2, < 0.5.0, which 0.5.1
+# does not satisfy, and downgrading the shared component would break
+# rust-ambient-id. Pinned to the exact "Initial package" commit on the same
+# upstream Fedora repo (rust-astral-reqwest-middleware.git), version 0.4.2.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-astral-reqwest-middleware", upstream-commit = "c0fe429470cd62ccf4d20de7f59b24844f11a06a" }
+
+[[components.'rust-astral-reqwest-middleware0.4'.overlays]]
+description = "Rename package to rust-astral-reqwest-middleware0.4 so it can coexist with the newer rust-astral-reqwest-middleware (0.5.1) required by rust-ambient-id"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-astral-reqwest-middleware0.4"

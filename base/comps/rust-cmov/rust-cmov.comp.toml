@@ -1,0 +1,7 @@
+[components.rust-cmov]
+# New component: rust-cmov does not exist in AZL. It provides
+# architecture-specific constant-time predication intrinsics and is a
+# dependency of rust-ctutils (crate(cmov/default) >= 0.5.3, < 0.6.0), needed
+# transitively by rust-digest's "mac" feature -> rust-hmac 0.13.0 as part of
+# the uv crate-alignment cascade. Pinned to Fedora f43 HEAD (version 0.5.4).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bc3168902de75d99f5e549f37012cffc50fb7711" }

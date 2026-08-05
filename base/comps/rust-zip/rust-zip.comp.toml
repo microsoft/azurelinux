@@ -1,0 +1,5 @@
+[components.rust-zip]
+# Pin past the distro default snapshot (2026-02-24, zip 7.2.0) to Fedora f43
+# HEAD, which carries 8.6.0. uv 0.10.12 requires
+# crate(zip/default) >= 8.1.0, < 9.0.0, which 7.2.0 does not satisfy.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "87a4e2187e4cfc183eb7566bf7ae95058b105624" }

@@ -1,0 +1,16 @@
+--- astral-reqwest-middleware-0.4.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ astral-reqwest-middleware-0.4.2/Cargo.toml	2025-11-15T08:20:25.832732+00:00
+@@ -67,13 +67,3 @@
+ [dev-dependencies.reqwest]
+ version = "0.12.0"
+ features = ["rustls-tls"]
+-
+-[dev-dependencies.tokio]
+-version = "1.0.0"
+-features = [
+-    "macros",
+-    "rt-multi-thread",
+-]
+-
+-[dev-dependencies.wiremock]
+-version = "0.6.0"

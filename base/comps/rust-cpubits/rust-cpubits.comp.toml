@@ -1,0 +1,8 @@
+[components.rust-cpubits]
+# New component: rust-cpubits does not exist in AZL. It was first packaged in
+# Fedora after AZL's distro-default snapshot date (2026-02-24), so no commit
+# exists at that snapshot and an explicit upstream-commit pin (Fedora f43
+# HEAD) is required. Needed transitively by rust-aes 0.9.1
+# (crate(cpubits/default) >= 0.1.0, < 0.2.0) as part of the uv
+# crate-alignment cascade.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "4e784900139bc3b9b30c59a0e892319834cca2bb" }

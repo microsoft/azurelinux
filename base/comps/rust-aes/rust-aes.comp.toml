@@ -1,0 +1,8 @@
+[components.rust-aes]
+# Pinned to Fedora f43 HEAD (past the distro default snapshot) to provide
+# aes 0.9.1, required by rust-zip 8.6.0 in uv 0.10.12's crate-alignment
+# cascade (crate(aes/default) >= 0.9.0). Existing dynamically-generated consumers
+# (rust-aes-gcm, rust-secret-service, rust-sequoia-openpgp, rust-lopdf,
+# rust-pkcs5) which require aes < 0.9.0 are served by the new rust-aes0.8
+# compat package, pinned at the commit this default previously resolved to.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e194e176071e881f0c537bba923dedb85b0bf8c3" }

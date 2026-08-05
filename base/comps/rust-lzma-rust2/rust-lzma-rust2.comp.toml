@@ -1,0 +1,8 @@
+[components.rust-lzma-rust2]
+# Pin past the distro default snapshot (2026-02-24, lzma-rust2 0.16.2) to
+# Fedora f43 HEAD, which carries 0.18.0. rust-zip 8.6.0 requires
+# crate(lzma-rust2) >= 0.18.0, < 0.19.0 (default/encoder/optimization/std/xz
+# features), which 0.16.2 does not satisfy. No other in-tree consumer
+# hardcodes a narrower lzma-rust2 range. Upstream Fedora disables %check for
+# this package (most tests require unpackaged binary test-data fixtures).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "73b2b4d7494c7a480f4eded3747b37fc6581961f" }

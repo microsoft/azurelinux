@@ -1,0 +1,9 @@
+[components.rust-sha1]
+# Pinned to Fedora f43 HEAD (past the distro default snapshot) to provide
+# sha1 0.11.0, required by rust-zip 8.6.0 in uv 0.10.12's crate-alignment
+# cascade (crate(sha1/default) >= 0.11.0). Existing dynamically-generated consumers
+# (rust-pbkdf2, rust-rsa, rust-uucore, rust-uuid, rust-reqsign-*,
+# rust-sequoia-openpgp) which require sha1 < 0.11.0 are served by the new
+# rust-sha1_0.10 compat package, pinned at the commit this default
+# previously resolved to.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "fcbed45b586a52e8244e28cfad160b2c7094d64b" }

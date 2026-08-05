@@ -1,0 +1,15 @@
+[components.'rust-astral_async_http_range_reader0.9']
+# Version-suffixed compat package (same pattern as rust-nix0.30, etc.):
+# provides an older version of the "astral_async_http_range_reader" crate
+# alongside the newer rust-astral_async_http_range_reader (currently
+# 0.10.0). uv requires crate(astral_async_http_range_reader/default)
+# >= 0.9.1, < 0.10.0, which 0.10.0 does not satisfy. Pinned to the exact
+# "Initial package" commit (version 0.9.1) on the same upstream Fedora repo
+# (rust-astral_async_http_range_reader.git).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-astral_async_http_range_reader", upstream-commit = "621304627131768606b089ceef8aada79f07624e" }
+
+[[components.'rust-astral_async_http_range_reader0.9'.overlays]]
+description = "Rename package to rust-astral_async_http_range_reader0.9 so it can coexist with the newer rust-astral_async_http_range_reader (0.10.0)"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-astral_async_http_range_reader0.9"

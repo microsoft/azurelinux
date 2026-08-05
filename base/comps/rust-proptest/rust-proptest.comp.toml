@@ -1,0 +1,8 @@
+[components.rust-proptest]
+# Pin past the distro default snapshot (proptest 1.9.0) to Fedora f43 HEAD,
+# which carries 1.11.0. rust-ctutils 0.4.2 (new component needed transitively
+# for uv's crate-alignment cascade via rust-digest's "mac" feature ->
+# rust-hmac 0.13.0) requires crate(proptest/default) >= 1.11.0, < 2.0.0,
+# which 1.9.0 does not satisfy. Verified zero other hardcoded proptest
+# consumers in-tree, so this bump is isolated/low-risk.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "73ccd819a175dc490f9c60e9930bd0676ba29811" }

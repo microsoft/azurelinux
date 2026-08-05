@@ -1,0 +1,10 @@
+[components.rust-streebog]
+# Pinned to Fedora f43 HEAD (past the distro default snapshot) to provide
+# streebog 0.11.0, required by rust-hmac (default, 0.13.0) in uv 0.10.12's
+# crate-alignment cascade (crate(streebog/default) >= 0.11.0). No in-tree
+# hardcoded consumer besides this cascade needs the bump; the new
+# rust-streebog0.10 compat package (pinned at the commit this default
+# previously resolved to) exists in case any future consumer needs the
+# older range. Distinct from the pre-existing rust-streebog0.9 compat
+# package, which serves an even older streebog 0.9 range.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a8a5fd3b695654bbb28e147c54d0f82298edf1f1" }

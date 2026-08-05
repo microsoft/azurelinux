@@ -1,0 +1,14 @@
+[components.'rust-sha2_0.10']
+# Version-suffixed compat package providing the OLDER sha2 0.10.9, pinned at
+# the commit the default rust-sha2 previously resolved to (via the distro
+# snapshot), to serve its ~30 existing dynamically-generated consumers
+# (rust-secret-service, rust-rsa, rust-dsa, rust-ecdsa, rust-uucore, etc.)
+# which require sha2 < 0.11.0. The default rust-sha2 is now pinned to
+# Fedora f43 HEAD (0.11.0) to satisfy uv's crate-alignment cascade.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-sha2", upstream-commit = "a8803baabb4c1dffc14f6f9d0efc09002ca3ae4b" }
+
+[[components.'rust-sha2_0.10'.overlays]]
+description = "Rename package to rust-sha2_0.10 so it can coexist with the newer default rust-sha2"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-sha2_0.10"

@@ -1,0 +1,14 @@
+[components.'rust-aes0.8']
+# Version-suffixed compat package providing the OLDER aes 0.8.4, pinned at
+# the commit the default rust-aes previously resolved to (via the distro
+# snapshot), to serve its existing dynamically-generated consumers (rust-aes-gcm,
+# rust-secret-service, rust-sequoia-openpgp, rust-lopdf, rust-pkcs5) which
+# require aes < 0.9.0. The default rust-aes is now pinned to Fedora f43
+# HEAD (0.9.1) to satisfy uv's crate-alignment cascade.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-aes", upstream-commit = "0a8c2cf7d97ade07bf454c50c9cefde7e792d476" }
+
+[[components.'rust-aes0.8'.overlays]]
+description = "Rename package to rust-aes0.8 so it can coexist with the newer default rust-aes"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-aes0.8"

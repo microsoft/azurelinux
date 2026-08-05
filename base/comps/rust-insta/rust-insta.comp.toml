@@ -1,0 +1,6 @@
+[components.rust-insta]
+# Pin past the distro default snapshot (2026-02-24, insta 1.45.1) to Fedora f43
+# HEAD, which carries 1.46.3. uv 0.10.12 requires
+# crate(insta/default) >= 1.46.0, < 2.0.0 (dev-dependency, pulled in via
+# %cargo_generate_buildrequires -a -t), which 1.45.1 does not satisfy.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "1e42b427d53ef5919510258e090b969c0c71417d" }

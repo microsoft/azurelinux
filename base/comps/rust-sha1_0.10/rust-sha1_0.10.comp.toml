@@ -1,0 +1,14 @@
+[components.'rust-sha1_0.10']
+# Version-suffixed compat package providing the OLDER sha1 0.10.6, pinned at
+# the commit the default rust-sha1 previously resolved to (via the distro
+# snapshot), to serve its existing dynamically-generated consumers (rust-pbkdf2,
+# rust-rsa, rust-uucore, rust-uuid, rust-reqsign-*, rust-sequoia-openpgp)
+# which require sha1 < 0.11.0. The default rust-sha1 is now pinned to
+# Fedora f43 HEAD (0.11.0) to satisfy uv's crate-alignment cascade.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-sha1", upstream-commit = "73309bee5d3e645b3eedd4c5ba267af6323dc990" }
+
+[[components.'rust-sha1_0.10'.overlays]]
+description = "Rename package to rust-sha1_0.10 so it can coexist with the newer default rust-sha1"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-sha1_0.10"

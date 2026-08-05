@@ -1,0 +1,17 @@
+[components.'rust-streebog0.10']
+# Version-suffixed compat package providing the OLDER streebog 0.10.2,
+# pinned at the commit the default rust-streebog previously resolved to
+# (via the distro snapshot). No in-tree consumer currently requires this
+# range, but it is created alongside the default's bump so any existing
+# consumer discovered later has an unambiguous path back to streebog
+# < 0.11.0. The default rust-streebog is now pinned to Fedora f43 HEAD
+# (0.11.0) to satisfy uv's crate-alignment cascade. Distinct from the
+# pre-existing rust-streebog0.9 compat package, which serves an even older
+# streebog 0.9 range.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-streebog", upstream-commit = "2ef7ca93dc4118c455850a5cb95e1fa62d630fe3" }
+
+[[components.'rust-streebog0.10'.overlays]]
+description = "Rename package to rust-streebog0.10 so it can coexist with the newer default rust-streebog"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-streebog0.10"

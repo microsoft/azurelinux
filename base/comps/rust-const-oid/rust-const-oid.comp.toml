@@ -1,0 +1,9 @@
+[components.'rust-const-oid']
+# Pinned to Fedora f43 HEAD (past the distro default snapshot) to provide
+# const-oid 0.10.2, required by rust-digest's "oid" feature in uv
+# 0.10.12's crate-alignment cascade (crate(const-oid/default) >= 0.10.0).
+# Existing dynamically-generated consumers (rust-der, rust-rsa,
+# rust-sha1collisiondetection) which require const-oid < 0.10.0 are served
+# by the new rust-const-oid0.9 compat package, pinned at the commit this
+# default previously resolved to.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "3838eb7202ea6453f545162fb1d67e6097c6ec7e" }

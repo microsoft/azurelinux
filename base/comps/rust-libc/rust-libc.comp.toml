@@ -1,0 +1,8 @@
+[components.rust-libc]
+# Pin past the distro default snapshot (2026-02-24, libc 0.2.181) to Fedora f43
+# HEAD, which carries 0.2.189. rust-nix 0.31.3 (bumped alongside uv's crate
+# alignment) requires crate(libc/default) >= 0.2.186, < 0.3.0, which 0.2.181
+# does not satisfy. Verified all other hardcoded libc consumers in-tree
+# (kata-containers, libblkio, libkrun, nmstate, nispor) only require an open
+# `>= 0.2.x, < 0.3.0` range, so this bump is compatible with all of them.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a1f3270f4f2a755f2a63d9aad2c9a72fe4de5d6d" }

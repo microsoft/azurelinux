@@ -1,0 +1,14 @@
+[components.'rust-astral-reqwest-retry0.8']
+# Version-suffixed compat package (same pattern as rust-nix0.30, etc.):
+# provides an older version of the "astral-reqwest-retry" crate alongside
+# the newer rust-astral-reqwest-retry (currently 0.9.1). uv requires
+# crate(astral-reqwest-retry/default) >= 0.8.0, < 0.9.0, which 0.9.1 does
+# not satisfy. Pinned to the exact "Update to version 0.8.0" commit on the
+# same upstream Fedora repo (rust-astral-reqwest-retry.git).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-astral-reqwest-retry", upstream-commit = "47f8ff9c33ab7e4844e3ae5055104444c3160470" }
+
+[[components.'rust-astral-reqwest-retry0.8'.overlays]]
+description = "Rename package to rust-astral-reqwest-retry0.8 so it can coexist with the newer rust-astral-reqwest-retry (0.9.1)"
+type = "spec-set-tag"
+tag = "Name"
+value = "rust-astral-reqwest-retry0.8"

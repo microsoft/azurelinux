@@ -1,0 +1,8 @@
+[components.rust-ctutils]
+# New component: rust-ctutils does not exist in AZL. It was first packaged in
+# Fedora after AZL's distro-default snapshot date (2026-02-24), so no commit
+# exists at that snapshot and an explicit upstream-commit pin (Fedora f43
+# HEAD, version 0.4.2) is required. Needed transitively by rust-digest's
+# "mac" feature subpackage (crate(ctutils/default) >= 0.4.0, < 0.5.0), which
+# is required by rust-hmac 0.13.0 as part of the uv crate-alignment cascade.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "da9d15459406cc056c9457bafa1779d8a8adaa6e" }
