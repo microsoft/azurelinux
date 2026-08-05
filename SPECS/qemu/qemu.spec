@@ -775,8 +775,7 @@ Requires: %{name} = %{version}-%{release}
 The %{name}-tests rpm contains tests that can be used to verify
 the functionality of the installed %{name} package
 
-Install this package if you want access to the avocado_qemu
-tests, or qemu-iotests.
+Install this package if you want access to qemu-iotests.
 
 
 %if %{have_libblkio}
@@ -2047,14 +2046,10 @@ mkdir -p %{buildroot}%{_datadir}/%{name}/vhost-user
 # Create new directories and put them all under tests-src
 mkdir -p %{buildroot}%{testsdir}/python
 mkdir -p %{buildroot}%{testsdir}/tests
-mkdir -p %{buildroot}%{testsdir}/tests/avocado
 mkdir -p %{buildroot}%{testsdir}/tests/qemu-iotests
 mkdir -p %{buildroot}%{testsdir}/scripts/qmp
 
-# Install avocado_qemu tests
-cp -R %{qemu_kvm_build}/tests/avocado/* %{buildroot}%{testsdir}/tests/avocado/
-
-# Install qemu.py and qmp/ scripts required to run avocado_qemu tests
+# Install qemu.py and qmp/ scripts used by the packaged tests
 cp -R %{qemu_kvm_build}/python/qemu %{buildroot}%{testsdir}/python
 cp -R %{qemu_kvm_build}/scripts/qmp/* %{buildroot}%{testsdir}/scripts/qmp
 install -p -m 0755 tests/Makefile.include %{buildroot}%{testsdir}/tests/
@@ -2100,8 +2095,9 @@ rm -rf %{buildroot}%{_datadir}/%{name}/firmware
 
 # Remove datadir files packaged with excluded targets for AzLinux
 %if %{without ppc_support}
-rm -rf %{buildroot}%{_datadir}/%{name}/bamboo.dtb
-rm -rf %{buildroot}%{_datadir}/%{name}/canyonlands.dtb
+rm -rf %{buildroot}%{_datadir}/%{name}/dtb/bamboo.dtb
+rm -rf %{buildroot}%{_datadir}/%{name}/dtb/canyonlands.dtb
+rm -rf %{buildroot}%{_datadir}/%{name}/pnv-pnor.bin
 rm -rf %{buildroot}%{_datadir}/%{name}/qemu_vga.ndrv
 rm -rf %{buildroot}%{_datadir}/%{name}/skiboot.lid
 rm -rf %{buildroot}%{_datadir}/%{name}/u-boot.e500
@@ -2179,8 +2175,6 @@ ln -sf qemu-system-x86_64 %{buildroot}%{_bindir}/qemu-kvm
 # Needed until CBL-Mariner starts cross-compiling 'ipxe', 'seabios' and 'sgabios' for other architectures.
 rm -rf %{buildroot}%{_bindir}/qemu-system-i386
 rm -rf %{buildroot}%{_bindir}/qemu-system-x86_64
-rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-i386.so
-rm -rf %{buildroot}%{_libdir}/%{name}/accel-tcg-x86_64.so
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-i386*.stp
 rm -rf %{buildroot}%{_datadir}/systemtap/tapset/qemu-system-x86_64*.stp
 %if ! %{azl}
@@ -2608,10 +2602,6 @@ fi
 # Fedora specific
 %{_datadir}/applications/qemu.desktop
 %exclude %{_datadir}/%{name}/qemu-nsis.bmp
-%{_libexecdir}/virtfs-proxy-helper
-%if ! %{azl}
-%{_mandir}/man1/virtfs-proxy-helper.1*
-%endif
 
 
 %files tests
@@ -3222,7 +3212,9 @@ fi
 %files system-arm
 %files system-arm-core
 %{_bindir}/qemu-system-arm
+%{_datadir}/%{name}/ast27x0_bootrom.bin
 %{_datadir}/%{name}/npcm7xx_bootrom.bin
+%{_datadir}/%{name}/npcm8xx_bootrom.bin
 %{_datadir}/systemtap/tapset/qemu-system-arm.stp
 %{_datadir}/systemtap/tapset/qemu-system-arm-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-arm-simpletrace.stp
@@ -3295,7 +3287,7 @@ fi
 %{_mandir}/man1/qemu-system-microblaze.1*
 %{_mandir}/man1/qemu-system-microblazeel.1*
 %endif
-%{_datadir}/%{name}/petalogix*.dtb
+%{_datadir}/%{name}/dtb/petalogix*.dtb
 
 
 %files system-mips
@@ -3361,9 +3353,10 @@ fi
 %{_mandir}/man1/qemu-system-ppc64.1*
 %endif
 %endif
-%{_datadir}/%{name}/bamboo.dtb
-%{_datadir}/%{name}/canyonlands.dtb
+%{_datadir}/%{name}/dtb/bamboo.dtb
+%{_datadir}/%{name}/dtb/canyonlands.dtb
 %{_datadir}/%{name}/qemu_vga.ndrv
+%{_datadir}/%{name}/pnv-pnor.bin
 %{_datadir}/%{name}/skiboot.lid
 %{_datadir}/%{name}/u-boot.e500
 %{_datadir}/%{name}/u-boot-sam460-20100605.bin
@@ -3413,7 +3406,6 @@ fi
 %{_mandir}/man1/qemu-system-s390x.1*
 %endif
 %{_datadir}/%{name}/s390-ccw.img
-%{_datadir}/%{name}/s390-netboot.img
 %endif
 
 
@@ -3476,10 +3468,6 @@ fi
 %if %{have_64bit}
 %{_bindir}/qemu-system-x86_64
 %endif
-%{_libdir}/%{name}/accel-tcg-i386.so
-%if %{have_64bit}
-%{_libdir}/%{name}/accel-tcg-x86_64.so
-%endif
 %{_datadir}/systemtap/tapset/qemu-system-i386.stp
 %{_datadir}/systemtap/tapset/qemu-system-i386-log.stp
 %{_datadir}/systemtap/tapset/qemu-system-i386-simpletrace.stp
@@ -3526,7 +3514,7 @@ fi
 # endif !tools_only
 %endif
 %changelog
-* Fri Aug 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.1.0-1
+* Wed Aug 05 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.1.0-1
 - Upgrade QEMU to 10.1.0 while preserving the Azure Linux 3.0 package identity,
   dependency policy, firmware paths, static user builds, and headless feature set.
 - Remove CRIS system and user packages because QEMU 10 removed CRIS emulation;
@@ -3542,6 +3530,14 @@ fi
   included upstream, while retaining the drain-before-inactivation fix.
 - Rebase the Azure Linux migration test exclusions onto the split QEMU 10 test
   framework, preserving X.509 coverage while skipping userfaultfd and TLS-PSK.
+- Remove stale avocado_qemu test packaging because QEMU 10 replaced the
+  tests/avocado source tree with the functional test framework.
+- Remove virtfs-proxy-helper packaging because QEMU 9.2 removed the insecure,
+  unmaintained 9p proxy backend and its root helper.
+- Reconcile QEMU 10 firmware manifests: use the dtb subdirectory, package new
+  AST/NPCM/POWER firmware, and remove the retired s390-netboot image entry.
+- Remove stale accel-tcg module entries because QEMU 10 links TCG into the
+  system emulators instead of installing per-target accelerator modules.
 - Rebase the CVE-2026-3842 Hyper-V synthetic debugger fix for the QEMU 10 buffer
   layout, and remove other patches already included verbatim upstream.
 

@@ -218,9 +218,11 @@ their disabled counterparts: QEMU 10 no longer accepts those configure
 switches.
 
 `--enable-virtfs-proxy-helper` was removed because QEMU 10 no longer exposes a
-separate configure option for that helper. `--enable-virtfs` remains, so the
-supported virtfs functionality is still enabled without passing an invalid
-legacy switch.
+separate configure option for that helper. QEMU removed the 9p proxy backend
+and `virtfs-proxy-helper` in 9.2 because the backend was slow, unmaintained, and
+required a root helper without delivering the intended security benefit.
+`--enable-virtfs` remains, so supported local 9p functionality is still enabled
+without passing an invalid legacy switch.
 
 ## Package and file-layout changes
 
@@ -268,6 +270,67 @@ inside mixed target packages such as `qemu-user-static-mips` and
 `qemu-binfmt-conf.sh` can generate independently of the selected target list,
 plus firmware files owned only by guarded packages. This avoids both unpackaged
 files and references to files not built on i686.
+
+### Removed stale Avocado test packaging
+
+QEMU 10 removed the `tests/avocado` source and build directories when its
+acceptance tests moved to the newer `tests/functional` framework. The old
+`%install` code attempted to copy `qemu_kvm_build/tests/avocado/*`, which made
+the RPM build fail because that path no longer exists.
+
+The Avocado directory creation and copy were removed, matching the Azure Linux
+4.0 QEMU 10 spec. The tests subpackage continues to stage qemu-iotests and the
+Python/QMP helpers they use. Functional tests were not added to the RPM payload
+as part of this fix because the Azure Linux 4.0 package runs selected functional
+tests during `%check` but does not install the functional test source tree.
+
+### Removed `virtfs-proxy-helper` file entries
+
+The `%files common` list no longer claims
+`%{_libexecdir}/virtfs-proxy-helper` or its man page. QEMU removed both the
+proxy backend and helper in 9.2, so QEMU 10.1 cannot install these files. The
+Azure Linux 4.0 QEMU 10 spec likewise has no helper or man-page entry.
+
+This is the package-side counterpart to removing
+`--enable-virtfs-proxy-helper`. Keeping the stale `%files` entries allowed
+compilation and installation to finish but caused RPM file processing to fail
+with `File not found`. Supported 9p local backends and the separate virtiofs
+path are unaffected.
+
+### Removed loadable TCG accelerator entries
+
+The QEMU 9 spec claimed `accel-tcg-i386.so` and `accel-tcg-x86_64.so` in the
+`qemu-system-x86-core` package and removed those files on non-x86 builds. QEMU
+10.1 no longer installs per-target TCG accelerator modules; TCG support is
+linked into the corresponding `qemu-system-*` binaries. The only accelerator
+module produced by this build is `accel-qtest-*.so`, which remains owned by the
+tests package.
+
+Both stale `%files` entries and their obsolete `%install` cleanup commands were
+removed, matching the Azure Linux 4.0 QEMU 10 spec. Keeping the `%files` entries
+caused RPM processing to fail after the x86 emulator binaries had been built
+successfully.
+
+### Reconciled QEMU 10 firmware paths
+
+The firmware `%files` entries and target cleanup were compared with the actual
+QEMU 10.1 Meson install log and the Azure Linux 4.0 QEMU spec. This identified
+several related layout changes:
+
+- Petalogix, Bamboo, and Canyonlands device trees moved under
+  `%{_datadir}/qemu/dtb/`.
+- `ast27x0_bootrom.bin` and `npcm8xx_bootrom.bin` are new ARM firmware payloads
+  and are owned by `qemu-system-arm` alongside `npcm7xx_bootrom.bin`.
+- `pnv-pnor.bin` is a POWER firmware payload. It is owned by `qemu-system-ppc`
+  when PPC support is enabled and removed during `%install` when PPC support is
+  disabled.
+- `s390-netboot.img` is no longer installed by QEMU 10.1, so its stale
+  `qemu-system-s390x` file entry was removed. `s390-ccw.img` remains packaged.
+
+Updating both ownership and cleanup is necessary. For example, changing only
+the PPC `%files` paths would still leave moved DTBs and `pnv-pnor.bin` as
+unpackaged files in the default Azure Linux build, where PPC support is
+disabled.
 
 ## Patch-stack decisions
 

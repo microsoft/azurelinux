@@ -2,7 +2,7 @@
   "Signatures": {
     "95-kvm-memlock.conf": "9e3aba4d5c045fd7035c79286727d45ca15fc48ac1fa665dda84bdb128b1009d",
     "99-qemu-guest-agent.rules": "ab34240fa8f3e8ce37ced642493184a610e187b2d9e5e15f1132975b9f076c43",
-    "README.tests": "aff7743296f6db8ce40c0d116a91ef2dfd50db6c52aec6b56ffd03ea320a04c2",
+    "README.tests": "36be35e6a9c27c50ad5c0fd0d5baa1bee33f89fc0af1045fdfa59d2fbf4c7391",
     "bridge.conf": "13deacdf79d5afb01c48984cc3cd5291341ca5b28d43298e804dc511ce581895",
     "kvm-s390x.conf": "09aee1f49c96e77c65858daf20f1095eb6bef3267470c9d8f82a22ff164c96cd",
     "kvm-x86.conf": "9ab7f0565e6af908350387b83ee95755250ee2e6822af787c1c2e5e9388ddcd5",
