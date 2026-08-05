@@ -2486,6 +2486,7 @@ components = [
     "udica",
     "udisks2",
     "uid_wrapper",
+    "umoci",
     "umockdev",
     "unbound",
     "unicode-ucd",
