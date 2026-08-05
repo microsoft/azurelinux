@@ -10,6 +10,6 @@
     "qemu-ga.sysconfig": "bd1cdb44c121a1285995c939a411b63283792c66fbd623be2497d08d9b840ad9",
     "qemu-guest-agent.service": "ac9e9eb8981bcf841e1b6341e4d470c1d1dba396a16f6221840cb358b974d815",
     "vhost.conf": "a523b6e2082ab5b913c9541295424ce7f3ff7f8161e6f21c7a8f64d23dd22313",
-    "qemu-9.1.0.tar.xz": "816b7022a8ba7c2ac30e2e0cf973e826f6bcc8505339603212c5ede8e94d7834"
+    "qemu-10.1.0.tar.xz": "e0517349b50ca73ebec2fa85b06050d5c463ca65c738833bd8fc1f15f180be51"
   }
 }
