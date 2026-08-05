@@ -137,12 +137,13 @@ popd
 %ldconfig_scriptlets
 
 %check
-pushd obj
+cd obj
 # Tests are randomly failing when run in parallel
 %global _smp_build_ncpus 1
 # the torture rekey tests with different than initial kex is now failing in rawhide because of OpenSSH bug #2203241
-%ctest --exclude-regex torture_rekey
-popd
+# %%ctest is deliberately not used: it ends with "cd -", which overwrites ctest's
+# exit status and makes failing tests report success.
+%__ctest --output-on-failure --force-new-ctest-process %{?_smp_mflags} --exclude-regex torture_rekey
 
 %files
 %doc AUTHORS CHANGELOG README
