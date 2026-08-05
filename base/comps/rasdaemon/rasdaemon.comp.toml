@@ -1,0 +1,57 @@
+# rasdaemon — RAS (Reliability, Availability and Serviceability) error logging tool.
+#
+# Azure Linux carries rasdaemon 0.8.1, which is newer than the version Fedora
+# dist-git currently ships (0.8.0). Because there is no upstream commit to pin to
+# yet, the newer version is applied as an overlay on top of the Fedora 0.8.0 spec
+# plus the matching 0.8.1 source tarball. Drop this overlay and the source-files
+# entry once Fedora dist-git packages 0.8.1 and the default snapshot picks it up.
+[components.rasdaemon]
+
+[[components.rasdaemon.overlays]]
+description = "Bump rasdaemon to 0.8.1 (ahead of Fedora, which still ships 0.8.0)"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.8.1"
+[components.rasdaemon.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+[[components.rasdaemon.overlays]]
+description = "Point the project URL at the maintainer's current GitHub repository"
+type = "spec-update-tag"
+tag = "URL"
+value = "https://github.com/mchehab/rasdaemon"
+[components.rasdaemon.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[components.rasdaemon.overlays]]
+description = "Fetch the release tarball from the maintainer's GitHub releases instead of infradead"
+type = "spec-update-tag"
+tag = "Source0"
+value = "https://github.com/mchehab/rasdaemon/releases/download/v%{version}/%{name}-%{version}.tar.bz2"
+[components.rasdaemon.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[components.rasdaemon.overlays]]
+description = "Package the mc_event/mem_fail RAS trigger scripts newly shipped in 0.8.1"
+type = "spec-append-lines"
+section = "%files"
+lines = [
+    "%dir %{_sysconfdir}/ras/triggers",
+    "%{_sysconfdir}/ras/triggers/mc_event_trigger",
+    "%{_sysconfdir}/ras/triggers/mem_fail_trigger",
+]
+[components.rasdaemon.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "upstreamable"
+
+# Pristine upstream 0.8.1 release tarball from the maintainer's GitHub releases
+# (matches the spec's %{name}-%{version} Source0). Replaces the pruned 0.8.0
+# tarball once the Version overlay renders the new filename.
+[[components.rasdaemon.source-files]]
+filename = "rasdaemon-0.8.1.tar.bz2"
+hash = "7c227b6ec0b73bd0cf727910f2adc49fc3f5167c41cd4b41d3d7d17b84a4a25681def89c82a275efe5f445049d6b0db8bd35f863384aca9a848b228402917d4d"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/mchehab/rasdaemon/releases/download/v0.8.1/rasdaemon-0.8.1.tar.bz2" }
