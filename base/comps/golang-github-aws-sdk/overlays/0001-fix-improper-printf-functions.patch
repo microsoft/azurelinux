@@ -1,0 +1,168 @@
+From 19d98e37dad30432c30802e2ec26d62cacc7c4b6 Mon Sep 17 00:00:00 2001
+From: djedward <djedward>
+Date: Wed, 15 Jan 2025 06:27:19 +0000
+Subject: [PATCH] Fix improper use of Printf-style functions
+
+---
+ aws/session/shared_config.go                    |  2 +-
+ awstesting/assert.go                            | 12 ++++++------
+ private/model/api/load.go                       |  2 +-
+ service/dynamodb/dynamodbattribute/converter.go | 13 +++++++------
+ service/sqs/checksums.go                        |  2 +-
+ 5 files changed, 16 insertions(+), 15 deletions(-)
+
+diff --git a/aws/session/shared_config.go b/aws/session/shared_config.go
+index f3ce8183dd9..2945185b0be 100644
+--- a/aws/session/shared_config.go
++++ b/aws/session/shared_config.go
+@@ -349,7 +349,7 @@ func (cfg *sharedConfig) setFromIniFiles(profiles map[string]struct{}, profile s
+ 	if cfg.hasSSOTokenProviderConfiguration() {
+ 		skippedFiles = 0
+ 		for _, f := range files {
+-			section, ok := f.IniData.GetSection(fmt.Sprintf(ssoSectionPrefix + strings.TrimSpace(cfg.SSOSessionName)))
++			section, ok := f.IniData.GetSection(ssoSectionPrefix + strings.TrimSpace(cfg.SSOSessionName))
+ 			if ok {
+ 				var ssoSession ssoSession
+ 				ssoSession.setFromIniSection(section)
+diff --git a/awstesting/assert.go b/awstesting/assert.go
+index 8ca3a425081..750aaf282e2 100644
+--- a/awstesting/assert.go
++++ b/awstesting/assert.go
+@@ -25,12 +25,12 @@ func Match(t *testing.T, regex, expected string) {
+ func AssertURL(t *testing.T, expect, actual string, msgAndArgs ...interface{}) bool {
+ 	expectURL, err := url.Parse(expect)
+ 	if err != nil {
+-		t.Errorf(errMsg("unable to parse expected URL", err, msgAndArgs))
++		t.Error(errMsg("unable to parse expected URL", err, msgAndArgs))
+ 		return false
+ 	}
+ 	actualURL, err := url.Parse(actual)
+ 	if err != nil {
+-		t.Errorf(errMsg("unable to parse actual URL", err, msgAndArgs))
++		t.Error(errMsg("unable to parse actual URL", err, msgAndArgs))
+ 		return false
+ 	}
+ 
+@@ -47,12 +47,12 @@ var queryMapKey = regexp.MustCompile("(.*?)\\.[0-9]+\\.key")
+ func AssertQuery(t *testing.T, expect, actual string, msgAndArgs ...interface{}) bool {
+ 	expectQ, err := url.ParseQuery(expect)
+ 	if err != nil {
+-		t.Errorf(errMsg("unable to parse expected Query", err, msgAndArgs))
++		t.Error(errMsg("unable to parse expected Query", err, msgAndArgs))
+ 		return false
+ 	}
+ 	actualQ, err := url.ParseQuery(actual)
+ 	if err != nil {
+-		t.Errorf(errMsg("unable to parse actual Query", err, msgAndArgs))
++		t.Error(errMsg("unable to parse actual Query", err, msgAndArgs))
+ 		return false
+ 	}
+ 
+@@ -99,13 +99,13 @@ func AssertQuery(t *testing.T, expect, actual string, msgAndArgs ...interface{})
+ func AssertJSON(t *testing.T, expect, actual string, msgAndArgs ...interface{}) bool {
+ 	expectVal := map[string]interface{}{}
+ 	if err := json.Unmarshal([]byte(expect), &expectVal); err != nil {
+-		t.Errorf(errMsg("unable to parse expected JSON", err, msgAndArgs...))
++		t.Error(errMsg("unable to parse expected JSON", err, msgAndArgs...))
+ 		return false
+ 	}
+ 
+ 	actualVal := map[string]interface{}{}
+ 	if err := json.Unmarshal([]byte(actual), &actualVal); err != nil {
+-		t.Errorf(errMsg("unable to parse actual JSON", err, msgAndArgs...))
++		t.Error(errMsg("unable to parse actual JSON", err, msgAndArgs...))
+ 		return false
+ 	}
+ 
+diff --git a/private/model/api/load.go b/private/model/api/load.go
+index 2ff3614d1ca..446be557219 100644
+--- a/private/model/api/load.go
++++ b/private/model/api/load.go
+@@ -225,7 +225,7 @@ func (a *API) Setup() error {
+ 
+ 	a.fixStutterNames()
+ 	if err := a.validateShapeNames(); err != nil {
+-		log.Fatalf(err.Error())
++		log.Fatal(err.Error())
+ 	}
+ 	a.renameExportable()
+ 	a.applyShapeNameAliases()
+diff --git a/service/dynamodb/dynamodbattribute/converter.go b/service/dynamodb/dynamodbattribute/converter.go
+index e38e41dafd0..0c54d994942 100644
+--- a/service/dynamodb/dynamodbattribute/converter.go
++++ b/service/dynamodb/dynamodbattribute/converter.go
+@@ -3,6 +3,7 @@ package dynamodbattribute
+ import (
+ 	"bytes"
+ 	"encoding/json"
++	"errors"
+ 	"fmt"
+ 	"reflect"
+ 	"runtime"
+@@ -25,7 +26,7 @@ func ConvertToMap(in interface{}) (item map[string]*dynamodb.AttributeValue, err
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+@@ -73,7 +74,7 @@ func ConvertFromMap(item map[string]*dynamodb.AttributeValue, v interface{}) (er
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+@@ -127,7 +128,7 @@ func ConvertToList(in interface{}) (item []*dynamodb.AttributeValue, err error)
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+@@ -176,7 +177,7 @@ func ConvertFromList(item []*dynamodb.AttributeValue, v interface{}) (err error)
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+@@ -224,7 +225,7 @@ func ConvertTo(in interface{}) (item *dynamodb.AttributeValue, err error) {
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+@@ -254,7 +255,7 @@ func ConvertFrom(item *dynamodb.AttributeValue, v interface{}) (err error) {
+ 			if e, ok := r.(runtime.Error); ok {
+ 				err = e
+ 			} else if s, ok := r.(string); ok {
+-				err = fmt.Errorf(s)
++				err = errors.New(s)
+ 			} else {
+ 				err = r.(error)
+ 			}
+diff --git a/service/sqs/checksums.go b/service/sqs/checksums.go
+index e85e89a8170..1ce1a4c0cae 100644
+--- a/service/sqs/checksums.go
++++ b/service/sqs/checksums.go
+@@ -37,7 +37,7 @@ func verifySendMessage(r *request.Request) {
+ 		out := r.Data.(*SendMessageOutput)
+ 		err := checksumsMatch(in.MessageBody, out.MD5OfMessageBody)
+ 		if err != nil {
+-			setChecksumError(r, err.Error())
++			setChecksumError(r, "%s", err.Error())
+ 		}
+ 	}
+ }

@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/aws/aws-sdk-go/commit/19d98e37dad30432c30802e2ec26d62cacc7c4b6" }]
+
+[[overlays]]
+description = "Backport fixes for improper Printf-style calls rejected by Go 1.26"
+type = "patch-add"
+source = "0001-fix-improper-printf-functions.patch"
+
+[[overlays]]
+description = "Apply the Printf-style call backport during source preparation"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]

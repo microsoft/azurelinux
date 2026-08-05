@@ -1,0 +1,4 @@
+# Fedora enabled bootstrap mode while the complete Go dependency chain was
+# unavailable. Azure Linux provides those dependencies in both build stages.
+[components.golang-github-aws-sdk]
+build.without = ["bootstrap"]
