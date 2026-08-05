@@ -72,6 +72,8 @@ rm INSTALL %{buildroot}/usr/include/*.h
 %{_mandir}/*/*
 %{_unitdir}/*.service
 %{_sysconfdir}/ras/dimm_labels.d
+%{_sysconfdir}/ras/triggers/mc_event_trigger
+%{_sysconfdir}/ras/triggers/mem_fail_trigger
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
