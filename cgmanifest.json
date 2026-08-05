@@ -8441,8 +8441,8 @@
         "type": "other",
         "other": {
           "name": "kernel-mshv",
-          "version": "6.6.137.mshv2",
-          "downloadUrl": "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/kata/6.6.137.mshv2.tar.gz"
+          "version": "6.18.34.mshv1",
+          "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/kernel-mshv-6.18.34.mshv1.tar.gz"
         }
       }
     },
