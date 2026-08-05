@@ -3,9 +3,9 @@
 #
 # Wrapper pipeline — passed to ADO as the entry point for the PR Control Tower
 # check. For each configured deployment, it calls Control Tower 'prcheck'
-# (which uploads the changed components' missing lookaside sources). DEV then
-# submits a *scratch* Control Tower build of those components and WAITS for it
-# to finish; STAGING and PROD skip package builds. DEV and PROD API failures
+# (which uploads the changed components' missing lookaside sources). DEV and
+# PROD then submit a *scratch* Control Tower build of those components and
+# WAIT for it to finish; STAGING skips package builds. DEV and PROD API failures
 # fail the check, while STAGING prcheck failures are non-blocking. Deployment
 # jobs run independently in parallel. Package builds run in Control Tower's own
 # sandbox; checkout-controlled pipeline helpers still run on CI agents under
@@ -114,7 +114,7 @@ extends:
               apiBaseAFDUrl: $(ApiBaseAFDUrlProd)
               continueOnError: false
               serviceConnection: CT-Endpoints-Access-ServiceConnection-PROD
-              skipPackageBuilds: true
+              skipPackageBuilds: false
           outputDirectory: $(Build.ArtifactStagingDirectory)/output
           # Distro-config RPM build-environment for the 4.0 branch.
           packageEnvironment: "4.0"
