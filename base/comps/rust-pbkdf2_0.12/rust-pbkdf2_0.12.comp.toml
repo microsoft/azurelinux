@@ -1,14 +1,12 @@
 [components.'rust-pbkdf2_0.12']
-# Version-suffixed compat package providing the OLDER pbkdf2 0.12.2, pinned
-# at the commit the default rust-pbkdf2 previously resolved to (via the
-# distro snapshot), to serve its existing dynamically-generated consumers (rust-scrypt,
+# Version-suffixed compat package providing the OLDER pbkdf2 0.12.x,
+# serving its existing dynamically-generated consumers (rust-scrypt,
 # rust-bcrypt-pbkdf, rust-pkcs5) which require pbkdf2 < 0.13.0. The default
 # rust-pbkdf2 is now pinned to Fedora f43 HEAD (0.13.0) to satisfy uv's
-# crate-alignment cascade.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-pbkdf2", upstream-commit = "fcfb406c8d1ced473767b8e5cf8604ac720b4316" }
-
-[[components.'rust-pbkdf2_0.12'.overlays]]
-description = "Rename package to rust-pbkdf2_0.12 so it can coexist with the newer default rust-pbkdf2"
-type = "spec-set-tag"
-tag = "Name"
-value = "rust-pbkdf2_0.12"
+# crate-alignment cascade. This is Fedora's own rust-pbkdf2_0.12 dist-git
+# package (real upstream import, no rename), not a hand-rolled rename --
+# same convention as the pre-existing rust-nix0.30 compat package. Pinned
+# to its current f43 HEAD (rather than left bare) because this Fedora repo
+# was created after AZL's buildroot snapshot date, so the distro-default
+# rolling snapshot can't resolve it.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e84459d291d055c026d4b81d527abb3bf402980e" }

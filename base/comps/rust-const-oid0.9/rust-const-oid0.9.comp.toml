@@ -1,14 +1,12 @@
 [components.'rust-const-oid0.9']
-# Version-suffixed compat package providing the OLDER const-oid 0.9.6,
-# pinned at the commit the default rust-const-oid previously resolved to
-# (via the distro snapshot), to serve its existing dynamically-generated consumers
-# (rust-der, rust-rsa, rust-sha1collisiondetection) which require
-# const-oid < 0.10.0. The default rust-const-oid is now pinned to Fedora
-# f43 HEAD (0.10.2) to satisfy uv's crate-alignment cascade.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-const-oid", upstream-commit = "fe95104d53b634396f24a049256b8fe32cd155d0" }
-
-[[components.'rust-const-oid0.9'.overlays]]
-description = "Rename package to rust-const-oid0.9 so it can coexist with the newer default rust-const-oid"
-type = "spec-set-tag"
-tag = "Name"
-value = "rust-const-oid0.9"
+# Version-suffixed compat package providing the OLDER const-oid 0.9.x,
+# serving its existing dynamically-generated consumers (rust-der, rust-rsa,
+# rust-sha1collisiondetection) which require const-oid < 0.10.0. The
+# default rust-const-oid is now pinned to Fedora f43 HEAD (0.10.2) to
+# satisfy uv's crate-alignment cascade. This is Fedora's own
+# rust-const-oid0.9 dist-git package (real upstream import, no rename), not
+# a hand-rolled rename -- same convention as the pre-existing rust-nix0.30
+# compat package. Pinned to its current f43 HEAD (rather than left bare)
+# because this Fedora repo was created after AZL's buildroot snapshot date,
+# so the distro-default rolling snapshot can't resolve it.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "47e3ee51179b196d930cc69069ad023b396252d1" }

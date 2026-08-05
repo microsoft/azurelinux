@@ -1,16 +1,15 @@
 [components.'rust-hmac0.12']
-# Version-suffixed compat package providing the OLDER hmac 0.12.1, pinned at
-# the commit the default rust-hmac previously resolved to (via the distro
-# snapshot), to serve its existing dynamically-generated consumers (rust-hkdf,
-# rust-pbkdf2 default, rust-cookie, rust-rfc6979, rust-async-session,
-# rust-libsystemd, rust-reqsign-core) which require hmac < 0.13.0. The
-# default rust-hmac is now pinned to Fedora f43 HEAD (0.13.0) to satisfy
-# uv's crate-alignment cascade. Distinct from the pre-existing
-# rust-hmac0.11 compat package, which serves an even older hmac 0.11 range.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-name = "rust-hmac", upstream-commit = "e1dbb2c54c7d0f39dbcf6aae5eced17b4851dff8" }
-
-[[components.'rust-hmac0.12'.overlays]]
-description = "Rename package to rust-hmac0.12 so it can coexist with the newer default rust-hmac"
-type = "spec-set-tag"
-tag = "Name"
-value = "rust-hmac0.12"
+# Version-suffixed compat package providing the OLDER hmac 0.12.x, serving
+# its existing dynamically-generated consumers (rust-hkdf, rust-pbkdf2
+# default, rust-cookie, rust-rfc6979, rust-async-session, rust-libsystemd,
+# rust-reqsign-core) which require hmac < 0.13.0. The default rust-hmac is
+# now pinned to Fedora f43 HEAD (0.13.0) to satisfy uv's crate-alignment
+# cascade. Distinct from the pre-existing rust-hmac0.11 compat package,
+# which serves an even older hmac 0.11 range. This is Fedora's own
+# rust-hmac0.12 dist-git package (real upstream import, no rename), not a
+# hand-rolled rename -- same convention as the pre-existing
+# rust-nix0.30/rust-hmac0.11 compat packages. Pinned to its current f43
+# HEAD (rather than left bare) because this Fedora repo was created after
+# AZL's buildroot snapshot date, so the distro-default rolling snapshot
+# can't resolve it.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "22666a19753ee1e9df683ead09e72703c33d7207" }
