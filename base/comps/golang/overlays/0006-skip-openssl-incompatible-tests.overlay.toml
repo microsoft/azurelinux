@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-disable-unsupported-tests"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Skip crypto/rsa PSS and testing/cryptotest ML-KEM tests that fail under the Microsoft build of Go OpenSSL crypto backend"
+type = "patch-add"
+source = "../0006-Skip-openssl-incompatible-crypto-tests.patch"

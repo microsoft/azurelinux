@@ -1,0 +1,21 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Microsoft build of Go's default systemcrypto backend dlopens libcrypto.so.3 at runtime (provided by openssl-libs, not the openssl CLI); auto-dependency generation is disabled, so require openssl-libs explicitly"
+type = "spec-add-tag"
+tag = "Requires"
+value = "openssl-libs"
+
+[[overlays]]
+description = "Require the SymCrypt FIPS provider so the OpenSSL crypto backend can route through a FIPS-validated implementation"
+type = "spec-add-tag"
+tag = "Requires"
+value = "SymCrypt >= 103.6.0-1"
+
+[[overlays]]
+description = "Require the SymCrypt OpenSSL (SCOSSL) provider that plugs SymCrypt into the system OpenSSL used by the Go crypto backend"
+type = "spec-add-tag"
+tag = "Requires"
+value = "SymCrypt-OpenSSL >= 1.6.1-1"

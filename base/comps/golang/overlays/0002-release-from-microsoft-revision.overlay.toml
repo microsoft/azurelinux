@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Start the RPM release at the Microsoft build of Go revision (upstream v1.26.5-2)"
+type = "spec-search-replace"
+regex = '^Release:\s+%autorelease$'
+replacement = "Release:        %autorelease -b 2"
