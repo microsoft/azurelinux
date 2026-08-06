@@ -1,1 +1,4 @@
 [components.python-stestr]
+# Bootstrap mode omits the unavailable subunit2sql plugin only. It is not a
+# transitional build and should retain the normal distro suffix.
+build.defines = { __bootstrap = "%{nil}" }

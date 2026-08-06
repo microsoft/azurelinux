@@ -1,6 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/python-stestr.azl.macros}
+
 %global pypi_name stestr
 # Enable bootstrap
 %bcond_without bootstrap
@@ -14,13 +17,14 @@ stestr hard codes python-subunit-isms into how it works.
 
 Name:       python-%{pypi_name}
 Version:    4.1.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:    A test runner runner similar to testrepository
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:    Apache-2.0
 URL:        https://pypi.python.org/pypi/stestr
 Source0:    %pypi_source
+Source9999: python-stestr.azl.macros
 BuildArch:  noarch
 
 
