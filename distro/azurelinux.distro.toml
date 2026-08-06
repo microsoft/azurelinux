@@ -17,7 +17,7 @@ mock-config-aarch64 = "mock/azl4/stage1/azurelinux-4.0-aarch64.cfg"
 
 [distros.azurelinux.versions.'4.0-stage1'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used below for stage2.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-02-24T00:00:00-08:00" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-08-28T00:00:00+00:00" } }
 
 #
 # Azure Linux 4.0 Stage2
@@ -34,7 +34,7 @@ mock-config-aarch64 = "mock/azl4/stage2/azurelinux-4.0-aarch64.cfg"
 
 [distros.azurelinux.versions.'4.0-stage2'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-02-24T00:00:00-08:00" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-08-28T00:00:00+00:00" } }
 
 #
 # Azure Linux 4.0 Stage2 (prod/PME)
@@ -51,5 +51,5 @@ mock-config-aarch64 = "mock/azl4/stage2-prod/azurelinux-4.0-aarch64.cfg"
 
 [distros.azurelinux.versions.'4.0-stage2-prod'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-02-24T00:00:00-08:00" } }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43", snapshot = "2026-08-28T00:00:00+00:00" } }
 
