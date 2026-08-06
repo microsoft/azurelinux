@@ -2,5 +2,5 @@
 # be explicitly added to force selection of 4.0-stage2-prod as the default distro
 # version to build.
 
-[distros.azurelinux]
-default-version = "4.0-stage2-prod"
+[project]
+default-distro = { name = "azurelinux", version = "4.0-stage2-prod" }
