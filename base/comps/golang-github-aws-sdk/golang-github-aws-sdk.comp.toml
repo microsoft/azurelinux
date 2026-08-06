@@ -1,0 +1,4 @@
+[components.golang-github-aws-sdk]
+# Keep Fedora's reduced bootstrap build until the complete Go dependency chain
+# is available throughout Stage 2, but do not publish it as a distinct variant.
+build.defines = { __bootstrap = "%{nil}" }
