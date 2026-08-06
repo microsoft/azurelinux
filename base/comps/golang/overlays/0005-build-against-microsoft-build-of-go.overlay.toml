@@ -1,0 +1,44 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Require a bootstrap compiler new enough for Go 1.26"
+type = "spec-search-replace"
+regex = '^BuildRequires:\s+golang > 1\.4$'
+replacement = "BuildRequires:  golang >= 1.24"
+
+[[overlays]]
+description = "Use the installed bootstrap compiler regardless of package GOROOT"
+type = "spec-search-replace"
+section = "%build"
+regex = '^export GOROOT_BOOTSTRAP=%\{goroot\}$'
+replacement = 'export GOROOT_BOOTSTRAP="$(go env GOROOT)"'
+
+[[overlays]]
+description = "Build every Microsoft build of Go tool with the nodwarf5 default installed in go.env"
+type = "spec-search-replace"
+section = "%build"
+regex = '^export GOHOSTOS=linux$'
+replacement = "export GOEXPERIMENT=nodwarf5\nexport GOHOSTOS=linux"
+
+[[overlays]]
+description = "Disable the shared stdlib build that duplicates crosscall2 with Microsoft system-crypto backends"
+type = "spec-search-replace"
+regex = '^%global shared 1$'
+replacement = "%global shared 0"
+
+[[overlays]]
+description = "Avoid publishing test fixture shared libraries as RPM capabilities"
+type = "spec-prepend-lines"
+lines = ["%define __find_provides %{nil}"]
+
+[[overlays]]
+description = "Replace Fedora's environment patch with one compatible with Microsoft build of Go defaults"
+type = "patch-remove"
+file = "0001-Modify-go.env.patch"
+
+[[overlays]]
+description = "Retain Azure Linux's DWARF compatibility setting in Microsoft build of Go"
+type = "patch-add"
+source = "../0005-Set-nodwarf5-in-go.env.patch"

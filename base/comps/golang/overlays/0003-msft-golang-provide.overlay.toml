@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Retain the historical Microsoft build of Go virtual provide"
+type = "spec-add-tag"
+tag = "Provides"
+value = "msft-golang = %{version}-%{release}"

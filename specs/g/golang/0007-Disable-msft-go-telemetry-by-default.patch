@@ -1,0 +1,37 @@
+Disable Microsoft build of Go toolchain telemetry by default
+
+Azure Linux ships the Microsoft build of Go with the Microsoft-specific
+AppInsights telemetry turned off by default. Upstream starts it for
+`go build`, `go install`, and `go run` unless the environment variable
+MS_GOTOOLCHAIN_TELEMETRY_ENABLED=0 is set. That variable is read with
+os.Getenv (not the `go env` / go.env configuration) and is evaluated before
+the go command normalizes its environment, so a package cannot reliably set
+it for every invocation. Flip the gate to opt-in instead: Microsoft telemetry
+runs only when MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1 is explicitly set.
+
+This does not affect the separate upstream Go telemetry, which defaults to
+"local" mode and uploads nothing unless the user runs `go telemetry on`.
+
+The cmd/go script test harness asserts that an App Insights request is
+recorded whenever `go build`/`install`/`run` is invoked, which assumed the
+upstream default-on behavior. Now that telemetry is opt-in, the harness sets
+MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1 for the go subprocesses it spawns so the
+telemetry plumbing is still exercised by the test suite.
+---
+--- a/src/cmd/internal/telemetry/counter/counter.go
++++ b/src/cmd/internal/telemetry/counter/counter.go
+@@ -41,6 +41,6 @@
+ func OpenMicrosoft() {
+-	if os.Getenv("MS_GOTOOLCHAIN_TELEMETRY_ENABLED") == "0" {
+-		// Telemetry disabled.
++	if os.Getenv("MS_GOTOOLCHAIN_TELEMETRY_ENABLED") != "1" {
++		// Azure Linux: Microsoft build of Go toolchain telemetry is off by default; opt in with MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1.
+ 		return
+ 	}
+ 	var logger *slog.Logger
+--- a/src/cmd/go/script_test.go
++++ b/src/cmd/go/script_test.go
+@@ -259,2 +259,3 @@
+ 		"MS_GOTOOLCHAIN_TELEMETRY_ALLOW_GO_DEVEL=1", // allow telemetry for Go development versions
++		"MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1", // Azure Linux: telemetry is opt-in by default; enable it here so the test harness can exercise telemetry plumbing
+ 		"newline=\n",

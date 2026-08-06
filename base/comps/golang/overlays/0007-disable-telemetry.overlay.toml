@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Disable Microsoft build of Go toolchain telemetry by default (opt in with MS_GOTOOLCHAIN_TELEMETRY_ENABLED=1)"
+type = "patch-add"
+source = "../0007-Disable-msft-go-telemetry-by-default.patch"

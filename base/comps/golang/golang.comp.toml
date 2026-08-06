@@ -1,9 +1,13 @@
+# Azure Linux 4.0 golang: the Microsoft build of Go, packaged with Fedora's golang
+# spec. This replaces the Fedora upstream golang entirely, so the distro ships a
+# single golang toolchain sourced from Microsoft build of Go (systemcrypto / OpenSSL backend).
 [components.golang]
-# Override to pick up golang-1.25.8-1.fc43, which fixes an expired TLS test
-# certificate in net/smtp that causes %check failures after 2026-03-18.
-# Upstream: https://github.com/golang/go/issues/77504
-# Backport: https://github.com/golang/go/issues/77531 (Go 1.25.8)
-# Fedora commit: https://src.fedoraproject.org/rpms/golang/c/e0faaabdb215feb6be2b3232f480a03ce76ca132?branch=f43
-# TODO: Drop this override once the default Fedora 43 snapshot
-# in distro/azurelinux.distro.toml advances past this commit.
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "e0faaabdb215feb6be2b3232f480a03ce76ca132" }
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "44" }, upstream-commit = "77411fa4053581833ce67c9dd241d7545d4ed6e0" }
+
+[[components.golang.source-files]]
+filename = "go1.26.5.src.tar.gz"
+hash = "52aafddac2d7c6245d7759e65021197dc385732d4a7aefb4f15f064d0e3babfe"
+hash-type = "SHA256"
+origin = { type = "download", uri = "https://github.com/microsoft/go/releases/download/v1.26.5-2/go1.26.5-20260709.6.src.tar.gz" }
+replace-upstream = true
+replace-reason = "Ship the Microsoft build of Go 1.26.5-2 source as Azure Linux's golang while reusing Fedora's golang packaging"

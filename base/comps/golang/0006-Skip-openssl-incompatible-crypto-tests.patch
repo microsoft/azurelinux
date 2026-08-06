@@ -1,0 +1,37 @@
+Skip crypto tests incompatible with the Microsoft build of Go OpenSSL backend
+
+TestPSSGolden/TestPSSSigning use SHA-1 RSA-PSS, which the system OpenSSL
+provider rejects. TestSetGlobalRandom's mlkem.GenerateKey768 subtest asserts a
+golden ML-KEM key from a deterministic RNG that the OpenSSL backend does not
+consume; the skip is scoped to that subtest so the rand.Read, rand.Reader,
+ecdsa.GenerateKey, and cryptocustomrand subtests keep running. These are
+backend policy differences, not defects.
+---
+--- a/src/crypto/rsa/pss_test.go	2026-08-03 22:47:04.746315785 +0000
++++ b/src/crypto/rsa/pss_test.go	2026-08-03 22:47:04.746315785 +0000
+@@ -26,6 +26,7 @@
+ // TestPSSGolden tests all the test vectors in pss-vect.txt from
+ // ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-1/pkcs-1v2-1-vec.zip
+ func TestPSSGolden(t *testing.T) {
++	t.Skip("Azure Linux: skipped for the Microsoft build of Go OpenSSL crypto backend; system OpenSSL rejects SHA-1 RSA-PSS")
+ 	inFile, err := os.Open("testdata/pss-vect.txt.bz2")
+ 	if err != nil {
+ 		t.Fatalf("Failed to open input file: %s", err)
+@@ -153,6 +154,7 @@
+ }
+
+ func TestPSSSigning(t *testing.T) {
++	t.Skip("Azure Linux: skipped for the Microsoft build of Go OpenSSL crypto backend; system OpenSSL rejects SHA-1 RSA-PSS")
+ 	var saltLengthCombinations = []struct {
+ 		signSaltLength, verifySaltLength int
+ 		good, fipsGood                   bool
+--- a/src/testing/cryptotest/rand_test.go	2026-08-03 22:47:04.766315745 +0000
++++ b/src/testing/cryptotest/rand_test.go	2026-08-03 22:47:04.766315745 +0000
+@@ -96,6 +96,7 @@
+
+ 	// A direct internal use of drbg.Read.
+ 	t.Run("mlkem.GenerateKey768", func(t *testing.T) {
++		t.Skip("Azure Linux: skipped for the Microsoft build of Go OpenSSL crypto backend; ML-KEM key generation does not consume the deterministic test RNG. The other TestSetGlobalRandom subtests pass and remain enabled.")
+ 		exp, err := mlkem.NewDecapsulationKey768(seed1)
+ 		if err != nil {
+ 			t.Fatalf("mlkem.NewDecapsulationKey768: %v", err)
