@@ -150,11 +150,9 @@ rm $RPM_BUILD_ROOT/etc/iscsi/initiatorname.iscsi
 rm $RPM_BUILD_ROOT/etc/udev/rules.d/50-iscsi-firmware-login.rules
 rm $RPM_BUILD_ROOT/usr/lib/systemd/system-generators/ibft-rule-generator
 rm $RPM_BUILD_ROOT/usr/sbin/brcm_iscsiuio
-rm $RPM_BUILD_ROOT/usr/sbin/iscsi-gen-initiatorname
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_discovery
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_fw_login
 rm $RPM_BUILD_ROOT/usr/sbin/iscsi_offload
-rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi-gen-initiatorname.8
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_discovery.8
 rm $RPM_BUILD_ROOT/usr/share/man/man8/iscsi_fw_login.8
  
@@ -235,11 +233,13 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 %{_tmpfilesdir}/iscsi.conf
 %dir %{_sysconfdir}/iscsi
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/iscsi/iscsid.conf
+%{_sbindir}/iscsi-gen-initiatorname
 %{_sbindir}/iscsi-iname
 %{_sbindir}/iscsiadm
 %{_sbindir}/iscsid
 %{_sbindir}/iscsistart
 %{_libdir}/libiscsi.so.0
+%{_mandir}/man8/iscsi-gen-initiatorname.8.gz
 %{_mandir}/man8/iscsi-iname.8.gz
 %{_mandir}/man8/iscsiadm.8.gz
 %{_mandir}/man8/iscsid.8.gz
@@ -282,6 +282,7 @@ systemctl --no-reload preset iscsi.service iscsi-starter.service &>/dev/null || 
 - Update source to v2.1.12 to fix CVE-2026-44943 and CVE-2026-44944
 - Rebase downstream patches onto v2.1.12
 - Drop removal of no longer installed 'iface.example'
+- Retain 'iscsi-gen-initiatorname' required by 'iscsi-init.service'
 - Add '%%check' running the upstream 'libopeniscsiusr' test suite
 - Add missing '%%license' macro
 
