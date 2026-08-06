@@ -90,7 +90,6 @@ components = [
     "autofs",
     "automake",
     "avahi",
-    "azure-cli",
     "azure-vm-utils",
     "azurelinux-logos",
     "azurelinux-release",
@@ -3007,4 +3006,14 @@ packages = [
     "ghc-ShellCheck-devel", # srpm: ShellCheck
     "ghc-ShellCheck-doc", # srpm: ShellCheck
     "ghc-ShellCheck-prof", # srpm: ShellCheck
+]
+
+# This group includes packages intentionally included in the `microsoft` repo.
+[component-groups.microsoft-packages]
+description = "microsoft packages"
+default-component-config.publish.srpm-channel = "rpm-microsoft-srpm"
+default-component-config.publish.rpm-channel = "rpm-microsoft"
+default-component-config.publish.debuginfo-channel = "rpm-microsoft-debuginfo"
+components = [
+    "azure-cli",
 ]
