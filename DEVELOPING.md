@@ -36,10 +36,6 @@ From this repository's root, run:
 azldev docs agent install --full
 ```
 
-Until an automated freshness check is enabled, the contributor updating azldev guidance
-owns running this command and reviewing the resulting skills, instructions, and MCP
-configuration changes before committing them.
-
 ### azldev documentation
 
 See the [azldev user guide](https://github.com/microsoft/azure-linux-dev-tools/tree/main/docs/user) for how-to guides and reference documentation covering components, overlays, images, configuration, and CLI commands.
@@ -82,7 +78,7 @@ Ask Copilot about any aspect of the project — it can reference the instruction
 In VSCode, there are specialized prompts for common tasks. They can be accessed from the chat window by typing `/azl-...` to filter for Azure Linux prompts:
 
 | Prompt | What it does |
-|--------|--------------|
+| -------- | -------------- |
 | **`azl-diagnose`** | **Diagnose a build failure using a Koji task ID, URL, or package name. Great starting point for any build issue.** |
 | `azl-add-component` | Import a package from Fedora — overlays, build & test. |
 | `azl-update-component` | Version bump, dependency change, or overlay edit. |
