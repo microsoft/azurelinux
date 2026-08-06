@@ -11821,8 +11821,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
+          "version": "11.9.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-11.9.0.tar.xz"
         }
       }
     },
