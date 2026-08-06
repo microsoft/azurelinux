@@ -1,0 +1,53 @@
+name: "Check azldev agent docs"
+
+on:
+  pull_request:
+    branches: ["4.0"]
+    paths:
+      - ".azldev-version"
+      - ".agents/skills/**"
+      - "azldev.toml"
+      - "base/project.toml"
+      - ".github/instructions/**"
+      - ".github/workflows/check-agent-docs.yml"
+      - ".mcp.json"
+      - ".vscode/mcp.json"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check-agent-docs:
+    name: Check generated files
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Install azldev
+        run: go install "github.com/microsoft/azure-linux-dev-tools/cmd/azldev@$(cat .azldev-version)"
+
+      - name: Check generated agent docs
+        run: |
+          set -euo pipefail
+          azldev docs agent install --full
+          git add --intent-to-add -- .agents/skills .github/instructions .mcp.json .vscode/mcp.json
+          if ! git diff --exit-code -- .agents/skills .github/instructions .mcp.json .vscode/mcp.json; then
+            echo "::error::azldev agent docs are stale; run 'azldev docs agent install --full' and commit the changes"
+            exit 1
+          fi
