@@ -31,7 +31,7 @@
 
 Name: rdma-core-doca
 Version: 2601.0.7
-Release: 1%{?dist}
+Release: 3%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
 
