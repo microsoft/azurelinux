@@ -3,7 +3,7 @@
 Summary:        The Apache Portable Runtime Utility Library
 Name:           apr-util
 Version:        1.6.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -12,6 +12,7 @@ URL:            https://apr.apache.org/
 Source0:        https://archive.apache.org/dist/apr/%{name}-%{version}.tar.gz
 # Using Fedora 40 patch to enable LMDB support:
 Patch0:         apr-util-1.6.3-lmdb-support.patch
+Patch1:         CVE-2026-32327.patch
 
 BuildRequires:  apr-devel
 BuildRequires:  expat-devel
@@ -189,6 +190,9 @@ autoheader && autoconf
 %{_libdir}/apr-util-%{apuver}/apr_dbd_sqlite*
 
 %changelog
+* Fri Aug 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.3-3
+- Patch for CVE-2026-32327
+
 * Fri Jun 07 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.3-2
 - Switching to LMDB from BDB using Fedora 40 (license: MIT) spec for guidance.
 
