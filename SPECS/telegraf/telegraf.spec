@@ -133,10 +133,10 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
-* Thu Jul 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-28
+* Fri Aug 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-28
 - Patch for CVE-2026-54908
 
-* Thu Jul 30 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-27
+* Fri Aug 07 2026 Jyoti kanase <v-jykanase@microsoft.com> - 1.31.0-27
 - Patch CVE-2025-29923
 - Patch CVE-2025-46327
 
