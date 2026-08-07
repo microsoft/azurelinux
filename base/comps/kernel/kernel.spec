@@ -4575,6 +4575,10 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Aug 06 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.13
+- feat(kernel): enable ACPI APEI GHES (Generic Hardware Error Source) on x86_64
+- fix(kernel-config): enable EDAC_GHES for GHES memory error handling
+
 * Sun Aug 02 2026 Hayden Barnes <hbarnes@herodevs.com> - 6.18.31-1.12
 - feat(kernel): enable x86 USB HID
 
