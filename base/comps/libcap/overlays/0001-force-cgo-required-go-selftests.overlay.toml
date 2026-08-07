@@ -1,0 +1,19 @@
+# libcap's %check runs its Go self-tests. When the Go toolchain exposes
+# syscall.AllThreadsSyscall (Go >= 1.16, so Microsoft build of Go 1.26.x), libcap's
+# go/cgo-required.sh returns CGO_REQUIRED=0, which makes `make test` run the psx/cap
+# Go tests with CGO_ENABLED=0. Microsoft build of Go's systemcrypto (OpenSSL) backend is
+# baseline-enabled and requires cgo, so those CGO_ENABLED=0 test compiles fail
+# (crypto backend selection leaves systemFIPSMode/backendEnabled undefined).
+# Force CGO_REQUIRED=1 on the make command line so the Go self-tests build with cgo
+# enabled (a command-line make variable overrides the makefile's ':=' value and
+# propagates to the go/ sub-make).
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Run libcap's Go self-tests with cgo enabled (CGO_REQUIRED=1): Microsoft build of Go's systemcrypto backend requires cgo, so the default CGO_ENABLED=0 psx/cap tests fail to compile crypto"
+type = "spec-search-replace"
+section = "%check"
+regex = '^make test$'
+replacement = "make test CGO_REQUIRED=1"

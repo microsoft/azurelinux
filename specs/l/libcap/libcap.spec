@@ -3,7 +3,7 @@
 
 Name: libcap
 Version: 2.76
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Library for getting and setting POSIX.1e capabilities
 URL: https://sites.google.com/site/fullycapable/
 License: BSD-3-Clause OR GPL-2.0-only
@@ -75,7 +75,7 @@ gzip -cd %{SOURCE0} | %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1
 %make_build prefix=%{_prefix} lib=%{_lib} SBINDIR=%{_sbindir} CGO_REQUIRED=1 CGO_CFLAGS="${CFLAGS}" CGO_LDFLAGS="${LDFLAGS}" GO_BUILD_FLAGS="-buildmode=pie -a -v -x -ldflags='-compressdwarf=false -B gobuildid'" all
 
 %check
-make test
+make test CGO_REQUIRED=1
 
 %install
 %make_install prefix=%{_prefix} lib=%{_lib} SBINDIR=%{_sbindir} CGO_REQUIRED=1 CGO_CFLAGS="${CFLAGS}" CGO_LDFLAGS="${LDFLAGS}" GO_BUILD_FLAGS="-buildmode=pie -ldflags='-compressdwarf=false -B gobuildid'"
