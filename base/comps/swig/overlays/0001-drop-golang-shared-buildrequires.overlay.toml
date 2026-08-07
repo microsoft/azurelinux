@@ -1,0 +1,14 @@
+# Azure Linux's golang is the Microsoft build of Go, built with `%global shared 0`,
+# so it ships no `golang-shared` subpackage (the shared stdlib is incompatible with
+# the systemcrypto/OpenSSL backend). SWIG's Go test examples build with plain
+# cgo-enabled `go build` and never link the shared stdlib, so this BuildRequires is
+# unsatisfiable and unnecessary.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Drop the golang-shared BuildRequires: Microsoft build of Go provides no golang-shared subpackage and SWIG's Go examples don't use the shared stdlib"
+type = "spec-remove-tag"
+tag = "BuildRequires"
+value = "golang-shared"
