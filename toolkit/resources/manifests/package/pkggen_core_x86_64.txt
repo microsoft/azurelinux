@@ -244,10 +244,17 @@ ca-certificates-base-3.0.0-15.azl3.noarch.rpm
 ca-certificates-3.0.0-15.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 unzip-6.0-22.azl3.x86_64.rpm
+<<<<<<< HEAD
 python3-3.12.9-13.azl3.x86_64.rpm
 python3-devel-3.12.9-13.azl3.x86_64.rpm
 python3-libs-3.12.9-13.azl3.x86_64.rpm
 python3-setuptools-69.0.3-6.azl3.noarch.rpm
+=======
+python3-3.12.9-14.azl3.x86_64.rpm
+python3-devel-3.12.9-14.azl3.x86_64.rpm
+python3-libs-3.12.9-14.azl3.x86_64.rpm
+python3-setuptools-69.0.3-5.azl3.noarch.rpm
+>>>>>>> 84a7965614 ([AutoPR- Security] Patch python3 for CVE-2026-9669, CVE-2026-6879, CVE-2026-6100, CVE-2026-4786, CVE-2026-4360, CVE-2026-3644, CVE-2026-3276, CVE-2026-3087, CVE-2026-2297, CVE-2026-12003, CVE-2026-11972, CVE-2026-0864 [HIGH] (#18321))
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 which-2.21-8.azl3.x86_64.rpm
 libselinux-3.6-4.azl3.x86_64.rpm
