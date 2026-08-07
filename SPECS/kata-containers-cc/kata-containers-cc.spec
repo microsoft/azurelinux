@@ -3,7 +3,7 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      11%{?dist}
+Release:      16%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
@@ -13,7 +13,12 @@ Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{v
 Source1:      %{sourceName}-%{version}-cargo.tar.gz
 Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
-Patch2:       CVE-2026-33814.patch
+Patch2:       CVE-2026-39821.patch
+Patch3:       CVE-2026-33814.patch
+Patch4:       CVE-2025-5791.patch
+Patch5:       CVE-2025-4574.patch
+Patch6:       CVE-2026-42250.patch
+Patch7:       CVE-2026-56852.patch
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -46,10 +51,7 @@ Summary:        Kata Confidential Containers tools package for building the UVM
 This package contains the scripts and files required to build the UVM
 
 %prep
-%autosetup -p1 -n %{sourceName}-%{version}
-pushd %{_builddir}/%{sourceName}-%{version}
-tar -xf %{SOURCE1}
-popd
+%autosetup -p1 -a1 -n %{sourceName}-%{version}
 
 %build
 pushd %{_builddir}/%{sourceName}-%{version}/tools/osbuilder/node-builder/azure-linux
@@ -152,8 +154,23 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-11
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-16
+- Patch for CVE-2026-56852
+
+* Fri Jun 19 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-15
+- Patch for CVE-2026-42250
+
+* Thu Jun 18 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.15.0-aks0-14
+- Patch for CVE-2025-5791 and CVE-2025-4574
+
+* Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.15.0-aks0-13
+- Bump release to rebuild with rust
+
+* Fri May 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-12
 - Patch for CVE-2026-33814
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-11
+- Patch for CVE-2026-39821
 
 * Mon May 04 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-10
 - Patch for CVE-2026-41602

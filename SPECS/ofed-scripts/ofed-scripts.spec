@@ -28,11 +28,11 @@
 #  $Id: ofed-scripts.spec 8402 2006-07-06 06:35:57Z vlad $
 #
 
-%global         MLNX_OFED_VERSION 25.07.0.9.7.1
+%global         MLNX_OFED_VERSION 26.01.1.0.0.1
 
 Summary:        OFED scripts
 Name:           ofed-scripts
-Version:        25.07
+Version:        26.01
 Release:        1%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
@@ -41,7 +41,7 @@ Group:          System Environment/Base
 URL:            https://www.openfabrics.org
 # DOCA OFED feature sources come from the following MLNX_OFED_SRC tgz.
 # This archive contains the SRPMs for each feature and each SRPM includes the source tarball and the SPEC file.
-# https://linux.mellanox.com/public/repo/doca/3.1.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-25.07-0.9.7.0.tgz
+# https://linux.mellanox.com/public/repo/doca/3.3.0/SOURCES/mlnx_ofed/MLNX_OFED_SRC-26.01-1.0.0.0.tgz
 Source0:         %{_distro_sources_url}/%{name}-%{version}.tar.gz
 
 BuildRoot:      %{?build_root:%{build_root}}%{!?build_root:/var/tmp/%{name}-%{version}-root}
@@ -79,7 +79,6 @@ install -m 0755 vendor_pre_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
 install -m 0755 vendor_post_uninstall.sh $RPM_BUILD_ROOT%{_prefix}/sbin
 install -m 0755 ofed_info $RPM_BUILD_ROOT%{_prefix}/bin
 install -m 0755 ofed_rpm_info $RPM_BUILD_ROOT%{_prefix}/bin
-install -m 0755 hca_self_test.ofed $RPM_BUILD_ROOT%{_prefix}/bin
 
 %if ! (%{PYTHON3})
 sed -s -i -e '1s|python3\>|python|' $RPM_BUILD_ROOT%{_prefix}/sbin/sysinfo-snapshot.py
@@ -150,6 +149,9 @@ echo "/etc/ld.so.conf.d/ofed.conf" >> ofed-files
 %{_prefix}/sbin/*
 
 %changelog
+* Mon May 11 2026 Azure Linux Team - 26.01-1
+- Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
+
 * Tue Nov 04 2025 Suresh Babu Chalamalasetty <schalam@microsoft.com> - 25.07-1
 - Upgrade version to 25.07.
 - Update source path

@@ -1,6 +1,6 @@
 Summary:        X.Org X11 libXpm runtime library
 Name:           libXpm
-Version:        3.5.17
+Version:        3.5.19
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -62,6 +62,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_mandir}/man3/*.3*
 
 %changelog
+* Wed Jun 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.5.19-1
+- Auto-upgrade to 3.5.19 - for CVE-2026-4367
+
 * Tue Oct 17 2023 Neha Agarwal <nehaagarwal@microsoft.com> - 3.5.17-1
 - Update to v3.5.17 to fix CVE 2023-43788 and CVE-2023-43789
 

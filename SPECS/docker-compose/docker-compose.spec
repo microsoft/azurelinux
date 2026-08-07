@@ -1,7 +1,7 @@
 Summary:        Define and run multi-container applications with Docker
 Name:           docker-compose
 Version:        2.27.0
-Release:        9%{?dist}
+Release:        13%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -22,6 +22,23 @@ Patch6:         CVE-2025-11065.patch
 Patch7:         CVE-2025-47911.patch
 Patch8:         CVE-2025-58190.patch
 Patch9:         CVE-2026-39882.patch
+Patch10:        CVE-2026-35469.patch
+Patch11:        CVE-2026-39821.patch
+Patch12:        CVE-2026-39829.patch
+Patch13:        CVE-2026-39830.patch
+Patch14:        CVE-2026-39832.patch
+Patch15:        CVE-2026-39834.patch
+Patch16:        CVE-2026-42506.patch
+Patch17:        CVE-2026-46597.patch
+Patch18:        CVE-2026-27136.patch
+Patch19:        CVE-2026-25680.patch
+Patch20:        CVE-2026-25681.patch
+Patch21:        CVE-2026-39827.patch
+Patch22:        CVE-2026-39835.patch
+Patch23:        CVE-2026-42502.patch
+Patch24:        CVE-2026-46598.patch
+Patch25:        CVE-2026-56852.patch
+
 BuildRequires:  golang
 Requires:       docker-cli
 Obsoletes:      moby-compose < %{version}-%{release}
@@ -54,6 +71,18 @@ install -D -m0755 bin/build/docker-compose %{buildroot}/%{_libexecdir}/docker/cl
 %{_libexecdir}/docker/cli-plugins/docker-compose
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-13
+- Patch for CVE-2026-56852
+
+* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-12
+- Patch for CVE-2026-46598, CVE-2026-42502, CVE-2026-39835, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-11
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39832, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
+* Wed May 06 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-10
+- Patch for CVE-2026-35469
+
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.27.0-9
 - Patch for CVE-2026-39882
 

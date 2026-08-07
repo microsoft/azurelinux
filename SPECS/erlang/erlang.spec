@@ -1,17 +1,26 @@
 %define  debug_package %{nil}
 Summary:        erlang
 Name:           erlang
-Version:        26.2.5.20
-Release:        1%{?dist}
+Version:        26.2.5.21
+Release:        4%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Development/Languages
 URL:            https://erlang.org
 Source0:        https://github.com/erlang/otp/archive/OTP-%{version}/otp-OTP-%{version}.tar.gz#/%{name}-%{version}.tar.gz
-BuildRequires:  ncurses-devel
-BuildRequires:  openssl-devel
-BuildRequires:  unixODBC-devel
+Patch0:         CVE-2026-48855.patch
+Patch1:         CVE-2026-48856.patch
+Patch2:         CVE-2026-48858.patch
+Patch3:         CVE-2026-48860.patch
+Patch4:         CVE-2026-49759.patch
+Patch5:         CVE-2026-49760.patch
+Patch6:         CVE-2026-42792.patch
+Patch7:         CVE-2026-55737.patch
+Patch8:         CVE-2026-55953.patch
+Patch9:         CVE-2026-58227.patch
+Patch10:        CVE-2026-59251.patch
+Patch11:        CVE-2026-54886.patch
 BuildRequires:  unzip
 
 %if 0%{?with_check}
@@ -53,6 +62,19 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+
+* Sat Aug 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-4
+- Patch for CVE-2026-54886
+
+* Fri Jul 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-3
+- Patch for CVE-2026-59251, CVE-2026-58227, CVE-2026-55953, CVE-2026-55737, CVE-2026-42792
+
+* Tue Jun 16 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-2
+- Patch for CVE-2026-49760, CVE-2026-49759, CVE-2026-48860, CVE-2026-48858, CVE-2026-48856, CVE-2026-48855
+
+* Mon Jun 01 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.21-1
+- Auto-upgrade to 26.2.5.21 - for CVE-2026-42789, CVE-2026-42790
+
 * Sun Apr 26 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 26.2.5.20-1
 - Auto-upgrade to 26.2.5.20 - for CVE-2026-32147
 

@@ -2,7 +2,7 @@
 Summary:        rabbitmq-server
 Name:           rabbitmq-server
 Version:        3.13.7
-Release:        3%{?dist}
+Release:        8%{?dist}
 License:        Apache-2.0 and MPL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,23 @@ URL:            https://rabbitmq.com
 Source0:        https://github.com/rabbitmq/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz
 Patch0:			CVE-2025-30219.patch
 Patch1:			CVE-2025-50200.patch
+Patch2:			CVE-2026-8466.patch
+Patch3:			CVE-2026-43968.patch
+Patch4:			CVE-2026-7790.patch
+Patch5:			CVE-2026-43973.patch
+Patch6:			CVE-2026-57211.patch
+Patch7:			CVE-2026-57212.patch
+Patch8:			CVE-2026-57213.patch
+Patch9:			CVE-2026-57214.patch
+Patch10:		CVE-2026-57215.patch
+Patch11:		CVE-2026-57217.patch
+Patch12:		CVE-2026-57218.patch
+Patch13:		CVE-2026-57219.patch
+Patch14:		CVE-2026-57220.patch
+Patch15:		CVE-2026-57221.patch
+Patch16:		CVE-2026-57216.patch
+Patch17:		CVE-2026-43966.patch
+Patch18:		CVE-2026-44839.patch
 
 BuildRequires:  elixir
 BuildRequires:  erlang
@@ -67,6 +84,21 @@ done
 %{_libdir}/rabbitmq/lib/rabbitmq_server-%{version}/*
 
 %changelog
+* Wed Jul 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-8
+- Patch for CVE-2026-43966, CVE-2026-44839
+
+* Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-7
+- Patch for CVE-2026-57221, CVE-2026-57220, CVE-2026-57219, CVE-2026-57218, CVE-2026-57217, CVE-2026-57215, CVE-2026-57214, CVE-2026-57213, CVE-2026-57212, CVE-2026-57211, CVE-2026-57216
+
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-6
+- Patch for CVE-2026-43973
+
+* Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-5
+- Patch for CVE-2026-7790, CVE-2026-43968
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-4
+- Patch for CVE-2026-8466
+
 * Wed Oct 29 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.13.7-3
 - Patch for CVE-2025-50200
 

@@ -1,6 +1,6 @@
 Summary:        X.Org X11 libXfont2 runtime library
 Name:           libXfont2
-Version:        2.0.6
+Version:        2.0.8
 Release:        1%{?dist}
 License:        BSD AND MIT
 Vendor:         Microsoft Corporation
@@ -59,6 +59,9 @@ find %{buildroot} -type f -name "*.la" -delete -print
 %{_libdir}/pkgconfig/xfont2.pc
 
 %changelog
+* Thu Jul 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.0.8-1
+- Auto-upgrade to 2.0.8 - for CVE-2026-56001, CVE-2026-56002, CVE-2026-56003
+
 * Thu Feb 08 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 2.0.6-1
 - Upgrade to version 2.0.6
 

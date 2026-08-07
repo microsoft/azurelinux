@@ -1,0 +1,67 @@
+From cff57884176a1e6ba0857a417753d799958e0f46 Mon Sep 17 00:00:00 2001
+From: Samuel Karp <samuelkarp@google.com>
+Date: Tue, 26 May 2026 16:06:58 -0700
+Subject: [PATCH 2/5] cri: do not re-tag restored checkpoints
+
+Google-Bug-Id: 508657842
+Signed-off-by: Samuel Karp <samuelkarp@google.com>
+(cherry picked from commit 0c0918fa8fb4d997f889a3d811603995a3a2b68a)
+Signed-off-by: Samuel Karp <samuelkarp@google.com>
+---
+ .../checkpoint/checkpoint-restore-cri-test.sh   |  4 ++--
+ .../cri/server/container_checkpoint_linux.go    | 17 -----------------
+ 2 files changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/contrib/checkpoint/checkpoint-restore-cri-test.sh b/contrib/checkpoint/checkpoint-restore-cri-test.sh
+index 54735db14..2b2a66388 100755
+--- a/contrib/checkpoint/checkpoint-restore-cri-test.sh
++++ b/contrib/checkpoint/checkpoint-restore-cri-test.sh
+@@ -110,7 +110,7 @@ function test_from_archive() {
+ 	fi
+ 	# Cleanup
+ 	echo "--> Cleanup images: "
+-	crictl rmi "${TEST_IMAGE}" | sed 's/^/----> \t/'
++	(crictl rmi "${TEST_IMAGE}" || true) | sed 's/^/----> \t/'
+ 	echo -n "--> Verifying container rootfs: "
+ 	crictl exec "$ctr_id" ls -la /root/testfile
+ 	if crictl exec "$ctr_id" ls -la /etc/motd >/dev/null 2>&1; then
+@@ -184,7 +184,7 @@ function test_from_oci() {
+ 	echo "--> Cleanup images: "
+ 	../../bin/ctr -n k8s.io images rm localhost/checkpoint-image:latest | sed 's/^/----> \t/'
+ 	echo "--> Cleanup images: "
+-	crictl rmi "${TEST_IMAGE}" | sed 's/^/----> \t/'
++	(crictl rmi "${TEST_IMAGE}" || true) | sed 's/^/----> \t/'
+ 	echo "--> Deleting all pods: "
+ 	crictl -t 5s rmp -fa | sed 's/^/----> \t/'
+ 	SUCCESS=1
+diff --git a/internal/cri/server/container_checkpoint_linux.go b/internal/cri/server/container_checkpoint_linux.go
+index b54963ae8..b122c392d 100644
+--- a/internal/cri/server/container_checkpoint_linux.go
++++ b/internal/cri/server/container_checkpoint_linux.go
+@@ -331,23 +331,6 @@ func (c *criService) CRImportCheckpoint(
+ 	if _, err := reference.ParseAnyReference(config.RootfsImageName); err != nil {
+ 		return "", fmt.Errorf("error parsing reference: %q is not a valid repository/tag %v", config.RootfsImageName, err)
+ 	}
+-	tagImage, err := c.client.ImageService().Get(ctx, config.RootfsImageRef)
+-	if err != nil {
+-		return "", fmt.Errorf("failed to get checkpoint base image %s: %w", config.RootfsImageRef, err)
+-	}
+-	// Second step is to tag the image with the same tag it used to have
+-	// during checkpointing. For the error that the image NAME:TAG already
+-	// exists is ignored. It could happen that NAME:TAG now belongs to
+-	// another NAME@DIGEST than during checkpointing and the restore will
+-	// happen on another image.
+-	// TODO: handle if NAME:TAG points to a different NAME@DIGEST
+-	tagImage.Name = config.RootfsImageName
+-	_, err = c.client.ImageService().Create(ctx, tagImage)
+-	if err != nil {
+-		if !errdefs.IsAlreadyExists(err) {
+-			return "", fmt.Errorf("failed to tag checkpoint base image %s with %s: %w", config.RootfsImageRef, config.RootfsImageName, err)
+-		}
+-	}
+ 
+ 	var image imagestore.Image
+ 	for i := 1; i < 500; i++ {
+-- 
+2.54.0.1189.g8c84645362-goog
+

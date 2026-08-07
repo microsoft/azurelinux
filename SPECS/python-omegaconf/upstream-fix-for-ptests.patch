@@ -1,0 +1,111 @@
+From ed7e24bdbf68c3b9f979fd5bdb46f6b6c5472549 Mon Sep 17 00:00:00 2001
+From: akhila-guruju <v-guakhila@microsoft.com>
+Date: Tue, 12 May 2026 11:59:39 +0000
+Subject: [PATCH] Upstream fix for ptests
+
+Upstream Patch reference: https://github.com/omry/omegaconf/commit/a656e85e44795d471c812d9f9c326967465cf788.patch
+PR: https://github.com/omry/omegaconf/pull/1225
+
+Modified to apply to Azure Linux.
+Only first 2 commit changes are relevant to the ptests.
+Combined commit changes: https://github.com/omry/omegaconf/pull/1225/changes/BASE..8cb50f64ea58c217f908d3f65cb09c0707633234
+---
+ pydevd_plugins/__init__.py            |  7 ++--
+ pydevd_plugins/extensions/__init__.py |  7 ++--
+ tests/test_nodes.py                   | 50 +++++++++++++++++++++++++--
+ 3 files changed, 52 insertions(+), 12 deletions(-)
+
+diff --git a/pydevd_plugins/__init__.py b/pydevd_plugins/__init__.py
+index e4abcfa..f77af49 100644
+--- a/pydevd_plugins/__init__.py
++++ b/pydevd_plugins/__init__.py
+@@ -1,6 +1,3 @@
+-try:
+-    __import__("pkg_resources").declare_namespace(__name__)
+-except ImportError:  # pragma: no cover
+-    import pkgutil
++import pkgutil
+ 
+-    __path__ = pkgutil.extend_path(__path__, __name__)
++__path__ = pkgutil.extend_path(__path__, __name__)
+diff --git a/pydevd_plugins/extensions/__init__.py b/pydevd_plugins/extensions/__init__.py
+index e4abcfa..f77af49 100644
+--- a/pydevd_plugins/extensions/__init__.py
++++ b/pydevd_plugins/extensions/__init__.py
+@@ -1,6 +1,3 @@
+-try:
+-    __import__("pkg_resources").declare_namespace(__name__)
+-except ImportError:  # pragma: no cover
+-    import pkgutil
++import pkgutil
+ 
+-    __path__ = pkgutil.extend_path(__path__, __name__)
++__path__ = pkgutil.extend_path(__path__, __name__)
+diff --git a/tests/test_nodes.py b/tests/test_nodes.py
+index af73670..8ef8e94 100644
+--- a/tests/test_nodes.py
++++ b/tests/test_nodes.py
+@@ -843,8 +843,11 @@ def test_eq(node: ValueNode, value: Any, expected: Any) -> None:
+     assert (value != node) != expected
+ 
+     # Check hash except for unhashable types (dict/list).
+-    if not isinstance(value, (dict, list)):
+-        assert (node.__hash__() == value.__hash__()) == expected
++    # Per Python's hash contract: if a == b, then hash(a) == hash(b)
++    # Note: if a != b, hashes may or may not be equal (collisions are allowed)
++    # E.g. Path('a') != 'a' but their hashes are equal as of Python 3.12
++    if not isinstance(value, (dict, list)) and expected:
++        assert node.__hash__() == value.__hash__()
+ 
+ 
+ @mark.parametrize(
+@@ -998,3 +1001,46 @@ def test_interpolation_result_readonly(flags: Any) -> None:
+     # If no value was provided for the "readonly" flag, it should be set.
+     if readonly is None:
+         assert node._get_node_flag("readonly")
++
++
++@mark.skipif(
++    sys.version_info < (3, 12),
++    reason="Hash collision between Path and str only exists in Python 3.12+",
++)
++def test_path_str_hash_collision_handling() -> None:
++    """
++    Regression test for Python 3.12+ hash collision between Path and str.
++
++    In Python 3.12+, Path('x') and 'x' have identical hashes but are not equal.
++    This test verifies that OmegaConf's containers handle this collision correctly.
++    """
++    from pathlib import Path
++
++    path_str = "hello.txt"
++    path_obj = Path(path_str)
++    assert hash(path_obj) == hash(path_str)
++    assert path_obj != path_str  # type: ignore[comparison-overlap]
++
++    # Test PathNode behavior with hash collision
++    path_node = PathNode(path_obj)
++    assert hash(path_node) == hash(path_str)
++    assert path_node != path_str
++
++    list_cfg1 = OmegaConf.create([path_obj])
++    assert path_obj in list_cfg1
++    assert path_str not in list_cfg1
++
++    list_cfg2 = OmegaConf.create([path_str])
++    assert path_obj not in list_cfg2
++    assert path_str in list_cfg2
++
++    # Test DictConfig with both types as values
++    dict_cfg = OmegaConf.create(
++        {
++            "by_path": {"file": path_obj},
++            "by_string": {"file": path_str},
++        }
++    )
++    assert dict_cfg.by_path.file == path_obj
++    assert dict_cfg.by_string.file == path_str
++    assert dict_cfg.by_path.file != dict_cfg.by_string.file
+-- 
+2.43.0
+

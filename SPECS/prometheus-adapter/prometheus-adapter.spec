@@ -1,7 +1,7 @@
 Summary:        Kubernetes Custom, Resource, and External Metric APIs implemented to work with Prometheus.
 Name:           prometheus-adapter
 Version:        0.12.0
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -11,6 +11,13 @@ Patch0:         CVE-2024-45338.patch
 Patch1:         CVE-2025-22872.patch
 Patch2:         CVE-2025-47911.patch
 Patch3:         CVE-2025-58190.patch
+Patch4:         CVE-2026-39821.patch
+Patch5:         CVE-2026-42506.patch
+Patch6:         CVE-2026-27136.patch
+Patch7:         CVE-2026-25680.patch
+Patch8:         CVE-2026-25681.patch
+Patch9:         CVE-2026-42502.patch
+Patch10:        CVE-2026-56852.patch
 BuildRequires:  golang < 1.25
 
 %description
@@ -45,6 +52,12 @@ make test
 %doc README.md RELEASE.md
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-7
+- Patch for CVE-2026-56852
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-6
+- Patch for CVE-2026-42506, CVE-2026-39821, CVE-2026-27136, CVE-2026-42502, CVE-2026-25681, CVE-2026-25680
+
 * Thu Feb 12 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.12.0-5
 - Patch for CVE-2025-47911, CVE-2025-58190
 

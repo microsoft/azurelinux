@@ -1,6 +1,6 @@
 # Stub workflow — A copy of this workflow must live on the default branch (3.0) so that the pull_request_target
 # event can trigger it with access to secrets. It then delegates all real work to the reusable template on
-# tomls/base/main, which has the scripts, prompts, and agent definitions.
+# 4.0, which has the scripts, prompts, and agent definitions.
 #
 # This two-stage design lets fork PRs trigger the review safely: the stub runs in the
 # context of the default branch (with secret access), but the template checks out only
@@ -14,7 +14,7 @@ name: Spec Review
 
 # pull_request_target is required here: we need secret access (COPILOT_TOKEN) to run the
 # spec review agent on fork PRs. The stub itself runs NO code from the PR — it only
-# delegates to a trusted reusable workflow pinned to tomls/base/main, which sparse-checks
+# delegates to a trusted reusable workflow pinned to 4.0, which sparse-checks
 # out only .spec data files (never executable code) from the PR head.
 on: # zizmor: ignore[dangerous-triggers]
   pull_request_target:
@@ -22,9 +22,9 @@ on: # zizmor: ignore[dangerous-triggers]
     # not want to affect PRs targeting other branches.
 
     branches:
-      - tomls/base/main
+      - "4.0"
     paths:
-      - '**/*.spec'
+      - "**/*.spec"
 
 permissions: {}
 
@@ -38,7 +38,7 @@ jobs:
     if: github.repository == 'microsoft/azurelinux'
     # Intentionally branch-pinned to our own repo so the
     # reusable workflow picks up prompt/script/agent updates automatically.
-    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@tomls/base/main # zizmor: ignore[unpinned-uses]
+    uses: microsoft/azurelinux/.github/workflows/spec-review.yml@4.0 # zizmor: ignore[unpinned-uses]
     permissions:
       contents: read
       pull-requests: write # Post review comments and inline annotations on PRs
@@ -47,6 +47,6 @@ jobs:
       pr-head-repo: ${{ github.event.pull_request.head.repo.full_name }}
       pr-number: ${{ github.event.pull_request.number }}
       repo: ${{ github.repository }}
-      scripts-ref: tomls/base/main
+      scripts-ref: 4.0
     secrets:
       COPILOT_TOKEN: ${{ secrets.COPILOT_TOKEN }}

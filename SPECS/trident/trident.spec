@@ -9,7 +9,7 @@
 Summary:        Declarative, security-first OS lifecycle agent designed primarily for Azure Linux
 Name:           trident
 # Use hard-coded versions for distro build
-Version:        0.22.0
+Version:        0.26.0
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -29,8 +29,6 @@ Source0:        https://github.com/microsoft/trident/archive/refs/tags/v%{versio
 #   tar -czf %%{name}-%%{version}-cargo.tar.gz vendor/
 #
 Source1:        %{name}-%{version}-cargo.tar.gz
-%else
-Source1:        osmodifier
 %endif
 
 BuildRequires:  openssl-devel
@@ -42,7 +40,6 @@ BuildRequires:  rust
 %if %{undefined rpm_ver}
 # For distro build, require cargo to build and osmodifier
 BuildRequires:  cargo
-Requires:       azurelinux-image-tools-osmodifier
 %endif
 
 Requires:       e2fsprogs
@@ -50,25 +47,29 @@ Requires:       util-linux
 Requires:       dosfstools
 Requires:       efibootmgr
 Requires:       lsof
+Requires:       openssl
+Requires:       shadow-utils
 Requires:       systemd >= 255
 Requires:       systemd-udev
-Requires:       (%{name}-selinux if selinux-policy-%{selinuxtype})
+Requires:       (%{name}-selinux = %{version}-%{release} if selinux-policy-%{selinuxtype})
 
 # Optional dependencies for various optional features
 
 # For network configuration (os.network, managementOs.network)
-Suggests:       netplan        
+Suggests:       netplan
 # For RAID support (storage.raid)
-Suggests:       mdadm          
+Suggests:       mdadm
 # For encryption support (storage.encryption)
-Suggests:       tpm2-tools     
+Suggests:       tpm2-tools
 Suggests:       cryptsetup
-# For integrity support (storage.verity)     
+# For integrity support (storage.verity)
 Suggests:       veritysetup
 # For mounting NTFS filesystems
 Suggests:       ntfs-3g
 # For creating NTFS filesystems
 Suggests:       ntfsprogs
+# For GRUB boot configuration (os.kernelCommandLine, boot config)
+Suggests:       grub2-tools
 
 
 %description
@@ -78,10 +79,6 @@ and its dependencies for managing the lifecycle of Azure Linux hosts.
 %files
 %{_bindir}/%{name}
 %dir /etc/%{name}
-%if %{defined rpm_ver}
-# For Trident repo build, package osmodifier included via `Source1`
-%{_bindir}/osmodifier
-%endif
 %{_unitdir}/%{name}d.service
 %{_unitdir}/%{name}d.socket
 
@@ -98,7 +95,7 @@ and its dependencies for managing the lifecycle of Azure Linux hosts.
 
 %package provisioning
 Summary:        Trident files for the provisioning OS
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description provisioning
 Trident files for the provisioning OS
@@ -119,7 +116,7 @@ Trident files for the provisioning OS
 
 %package service
 Summary:        Trident files for SystemD update and commit services
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 Conflicts:      %{name}-install-service
 
 %description service
@@ -141,7 +138,7 @@ Trident files for SystemD commit services
 
 %package install-service
 Summary:        Trident files for SystemD install service
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 Conflicts:      %{name}-service
 
 %description install-service
@@ -197,7 +194,7 @@ fi
 
 %package static-pcrlock-files
 Summary:        Statically defined .pcrlock files
-Requires:       %{name}
+Requires:       %{name} = %{version}-%{release}
 
 %description static-pcrlock-files
 Statically defined .pcrlock files for PCR-based encryption. This is a workaround needed because AZL
@@ -206,6 +203,20 @@ be removed once the fix is merged in AZL 4.0.
 
 %files static-pcrlock-files
 %{_sharedstatedir}/pcrlock.d
+
+# ------------------------------------------------------------------------------
+
+%if %{defined rpm_ver}
+%package acl-agent
+Summary:        Trident ACL Agent
+Requires:       %{name} = %{version}-%{release}
+
+%description acl-agent
+The Trident ACL Agent triggers updates of ACL images.
+
+%files acl-agent
+%{_bindir}/%{name}-acl-agent
+%endif
 
 # ------------------------------------------------------------------------------
 
@@ -237,7 +248,11 @@ export TRIDENT_VERSION="%{version}-%{release}"
 # Use %{trident_version} for Trident repo build
 export TRIDENT_VERSION="%{trident_version}"
 %endif
-cargo build --release
+%if %{defined rpm_ver}
+cargo build --release -p trident -p trident-acl-agent
+%else
+cargo build --release -p trident
+%endif
 
 mkdir selinux
 cp -p packaging/selinux-policy-trident/trident.fc selinux/
@@ -266,12 +281,10 @@ cargo test --all --no-fail-fast -- --skip test_run_systemd_check --skip test_pre
 %endif
 
 %install
-%if %{defined rpm_ver}
-# For Trident repo build, package osmodifier included via `Source1`.
-# Distro RPM will use distro osmodifier RPM via Requires directive.
-install -D -m 755 %{SOURCE1} %{buildroot}%{_bindir}/osmodifier
-%endif
 install -D -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
+%if %{defined rpm_ver}
+install -D -m 755 target/release/%{name}-acl-agent %{buildroot}/%{_bindir}/%{name}-acl-agent
+%endif
 
 # Copy Trident SELinux policy module to /usr/share/selinux/packages
 install -D -m 0644 %{name}.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.bz2
@@ -300,6 +313,12 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
+* Wed Jul 29 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.26.0-1
+- Update to version 0.26.0
+
+* Wed Jun 18 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.24.0-1
+- Update to version 0.24.0
+
 * Thu Mar 26 2026 Brian Fjeldstad <bfjelds@microsoft.com> 0.22.0-1
 - Upgrade to version 0.22.0
 

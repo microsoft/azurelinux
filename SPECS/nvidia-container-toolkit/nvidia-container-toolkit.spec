@@ -2,7 +2,7 @@
 Summary:        NVIDIA container runtime hook
 Name:           nvidia-container-toolkit
 Version:        1.17.8
-Release:        2%{?dist}
+Release:        4%{?dist}
 License:        ALS2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -29,7 +29,9 @@ Source0:        %{name}-%{version}.tar.gz
 #       - For the value of "--mtime" use the date "2021-04-26 00:00Z" to simplify future updates.
 Source1:        %{name}-%{version}-vendor.tar.gz
 Patch0:         CVE-2025-22872.patch
-BuildRequires:  golang < 1.24.0
+Patch1:         CVE-2026-39830.patch
+Patch2:         CVE-2026-39834.patch
+BuildRequires:  golang
 Obsoletes: nvidia-container-runtime <= 3.5.0-1, nvidia-container-runtime-hook <= 1.4.0-2
 Provides: nvidia-container-runtime
 Provides: nvidia-container-runtime-hook
@@ -88,6 +90,12 @@ rm -f %{_bindir}/nvidia-container-toolkit
 %{_bindir}/nvidia-cdi-hook
 
 %changelog
+* Fri Jul 10 2026 Henry Li <lihl@microsoft.com> - 1.17.8-4
+- Remove golang version cap
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.17.8-3
+- Patch for CVE-2026-39834, CVE-2026-39830
+
 * Mon Jul 28 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.17.8-2
 - Patch for CVE-2025-22872
 

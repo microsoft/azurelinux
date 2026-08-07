@@ -432,7 +432,7 @@ Obsoletes: sgabios-bin <= 1:0.20180715git-10.fc38
 Summary: QEMU is a FAST! processor emulator
 Name: qemu
 Version: 9.1.0
-Release: 6%{?dist}
+Release: 11%{?dist}
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND FSFAP AND GPL-1.0-or-later AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-2.0-or-later WITH GCC-exception-2.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND MIT AND LicenseRef-Fedora-Public-Domain AND CC-BY-3.0
 URL: http://www.qemu.org/
 
@@ -470,6 +470,10 @@ Patch27:  kvm-block-Drain-nodes-before-inactivating-them.patch
 Patch28:  kvm-block-export-Add-option-to-allow-export-of-inactive-.patch
 Patch29:  kvm-nbd-server-Support-inactive-nodes.patch
 Patch30:  kvm-migration-Fix-UAF-for-incoming-migration-on-Migratio.patch
+Patch31:  CVE-2026-3195.patch
+Patch32:  CVE-2026-48914.patch
+Patch33:  CVE-2026-3196.patch
+Patch34:  CVE-2026-3842.patch
 
 Source10: qemu-guest-agent.service
 Source11: 99-qemu-guest-agent.rules
@@ -672,7 +676,7 @@ BuildRequires: rutabaga-gfx-ffi-devel
 %endif
 
 %if %{user_static}
-BuildRequires: glibc-static >= 2.38-19%{?dist}
+BuildRequires: glibc-static >= 2.38-20%{?dist}
 BuildRequires: glib2-static zlib-static
 BuildRequires: pcre2-devel-static
 %endif
@@ -3518,15 +3522,28 @@ fi
 %endif
 # endif !tools_only
 %endif
-
-
 %changelog
-* Tue Apr 14 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-6
+* Mon Jul 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-11
+- Patch for CVE-2026-3842
+
+* Wed Jul 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-10
+- Patch for CVE-2026-3196
+
+* Sat Jun 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-9
+- Patch for CVE-2026-3195
+
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.1.0-8
+- Patch for CVE-2026-48914
+
+* Wed May 20 2026 Sumedh Sharma <sumsharma@microsoft.com> - 9.1.0-7
 - Enable user_static builds for qemu
 - configure user_static with 'enable-pie'
 - manage systemd-binfmt restarts post install/uninstall to avoid start-limit-hit
 - add conflicts between qemu-user-static and qemu-user-binfmt as both
   provide binfmt rules
+
+* Thu May 07 2026 Aditya Singh <v-aditysing@microsoft.com> - 9.1.0-6
+- Bump to rebuild with updated glibc
 
 * Sun Apr 05 2026 Woojoong Kim <woojoongkim@microsoft.com> - 9.1.0-5
 - Add 23 QEMU patches from RHEL qemu-kvm 9.1.0-20 for KubeVirt live migration

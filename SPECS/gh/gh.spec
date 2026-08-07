@@ -1,7 +1,7 @@
 Summary:        GitHub official command line tool
 Name:           gh
 Version:        2.62.0
-Release:        15%{?dist}
+Release:        20%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,6 +32,22 @@ Patch16:        CVE-2025-58190.patch
 Patch17:        CVE-2026-24117.patch
 Patch18:        CVE-2026-32288.patch
 Patch19:        CVE-2026-5160.patch
+Patch20:        CVE-2026-39821.patch
+Patch21:        CVE-2026-39829.patch
+Patch22:        CVE-2026-39830.patch
+Patch23:        CVE-2026-39834.patch
+Patch24:        CVE-2026-42506.patch
+Patch25:        CVE-2026-46597.patch
+Patch26:        CVE-2026-27136.patch
+Patch27:        CVE-2026-25680.patch
+Patch28:        CVE-2026-25681.patch
+Patch29:        CVE-2026-39827.patch
+Patch30:        CVE-2026-39828.patch
+Patch31:        CVE-2026-39835.patch
+Patch32:        CVE-2026-42502.patch
+Patch33:        CVE-2026-45803.patch
+Patch34:        CVE-2026-56852.patch
+Patch35:        CVE-2026-59831.patch
 
 BuildRequires:  golang < 1.24
 BuildRequires:  git
@@ -76,6 +92,21 @@ make test
 %{_datadir}/zsh/site-functions/_gh
 
 %changelog
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-20
+- Patch for CVE-2026-59831
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-19
+- Patch for CVE-2026-56852
+
+* Wed Jun 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-18
+- Patch for CVE-2026-45803
+
+* Mon Jun 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-17
+- Patch for CVE-2026-42502, CVE-2026-39835, CVE-2026-39828, CVE-2026-39827, CVE-2026-25681, CVE-2026-25680
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-16
+- Patch for CVE-2026-46597, CVE-2026-42506, CVE-2026-39834, CVE-2026-39830, CVE-2026-39829, CVE-2026-39821, CVE-2026-27136
+
 * Mon Apr 20 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.62.0-15
 - Patch for CVE-2026-5160
 

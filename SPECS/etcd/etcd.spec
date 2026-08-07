@@ -1,9 +1,7 @@
-%global _default_patch_fuzz 2
-
 Summary:        A highly-available key value store for shared configuration
 Name:           etcd
-Version:        3.5.28
-Release:        2%{?dist}
+Version:        3.5.33
+Release:        1%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,7 +30,7 @@ Source1:        etcd.service
 #       e. create tarball containing 'vendor' folder and 'go.mod' and 'go.sum' files
 #          (same naming rules than described above)
 #       f. repeat above operations for 'etcd-dump-logs' folder
-#   4. create 'etcd-%{version}-vendor.tar.gz' tarball containing all tarballs created above
+#   4. create 'etcd-%%{version}-vendor.tar.gz' tarball containing all tarballs created above
 #
 #   NOTES:
 #       - You require GNU tar version 1.28+.
@@ -44,8 +42,7 @@ Source1:        etcd.service
 #             --pax-option=exthdr.name=%d/PaxHeaders/%f,delete=atime,delete=ctime \
 #             -cJf [tarball name] [folder to tar]
 Source2:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2026-29181.patch
-BuildRequires:  golang >= 1.16
+BuildRequires:  golang >= 1.25.12
 
 %description
 A highly-available key value store for shared configuration and service discovery.
@@ -72,7 +69,6 @@ mkdir -p %{ETCD_OUT_DIR}
 for component in server etcdctl etcdutl; do
     pushd $component
     tar --no-same-owner -xf %{_builddir}/%{name}-%{version}/vendor-$component.tar.gz
-    patch -p1 -s --fuzz=0 --no-backup-if-mismatch -f --input=%{PATCH0}
     go build \
         -o %{ETCD_OUT_DIR} \
         -ldflags=-X=go.etcd.io/etcd/api/v3/version.GitSHA=v%{version}
@@ -147,6 +143,20 @@ install -vdm755 %{buildroot}%{_sharedstatedir}/etcd
 /%{_docdir}/%{name}-%{version}-tools/*
 
 %changelog
+* Mon Jul 27 2026 Aditya Singh <v-aditysing@microsoft.com> - 3.5.33-1
+- Upgrade to version 3.5.33.
+- Fixes CVE-2026-56852 by upgrading vendor package golang.org/x/text from version 0.37.0 => 0.39.0.
+
+* Mon Jul 13 2026 Durga Jagadeesh Palli <v-dpalli@microsoft.com> - 3.5.32-1
+- Upgrade to version 3.5.32 (fixes CVE-2026-59818).
+- Drop CVE-2026-29181, CVE-2026-39821, and CVE-2026-33814 patches; these fixes are already included upstream via bundled dependency updates (go.opentelemetry.io/otel 1.43.0, golang.org/x/net 0.55.0).
+
+* Thu May 28 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.5.30-2
+- Patch CVE-2026-39821, CVE-2026-33814
+
+* Tue May 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 3.5.30-1
+- Upgrade to version 3.5.30 (fixes CVE-2026-44283).
+
 * Mon May 04 2026 Sumit Jena <v-sumitjena@microsoft.com> - 3.5.28-2
 - Patch for CVE-2026-29181
 

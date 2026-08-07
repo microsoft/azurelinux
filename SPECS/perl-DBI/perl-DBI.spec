@@ -4,19 +4,18 @@
 
 Summary:        A database access API for perl
 Name:           perl-DBI
-Version:        1.643
-Release:        3%{?dist}
+Version:        1.651
+Release:        1%{?dist}
 Group:          Development/Libraries
 License:        GPL+ or Artistic
 URL:            http://dbi.perl.org/
-# The source tarball must be repackaged to remove the DBI/FAQ.pm, since the
-# license is not a FSF free license.
-Source0:        https://cpan.metacpan.org/authors/id/T/TI/TIMB/DBI-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-%{version}.tgz
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 BuildRequires:  perl >= 5.28.0
 BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Module::Load)
 %if 0%{?with_check}
 BuildRequires:  perl(blib)
 BuildRequires:  perl(Test::More)
@@ -25,6 +24,7 @@ BuildRequires:  perl(Test::More)
 Requires:       perl-libs
 Requires:       perl(FileHandle)
 Requires:       perl(Math::BigInt)
+Requires:       perl(Module::Load)
 
 Provides:       perl(DBD::DBM) = %{version}-%{release}
 Provides:       perl(DBD::DBM::Statement) = %{version}-%{release}
@@ -106,7 +106,8 @@ functions, variables and conventions that provide a consistent
 database interface independent of the actual database being used.
 
 %prep
-%setup -q -n DBI-%{version}
+%autosetup -n DBI-%{version} -p1
+
 for F in lib/DBD/Gofer.pm; do
     iconv -f ISO-8859-1 -t UTF-8 < "$F" > "${F}.utf8"
     touch -r "$F" "${F}.utf8"
@@ -161,6 +162,18 @@ make test
 %{_mandir}/man3/*.3*
 
 %changelog
+* Thu Jul 16 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.651-1
+- Auto-upgrade to 1.651 - for CVE-2026-15043, CVE-2026-15392, CVE-2026-60081, CVE-2026-60082
+
+* Sat Jul 11 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.650-1
+- Upgrade to 1.650 for CVE-2026-14380, CVE-2026-14739 & CVE-2026-14740
+
+* Wed Jun 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.643-5
+- Patch for CVE-2026-9698
+
+* Tue Jun 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.643-4
+- Patch for CVE-2026-10879
+
 * Fri May 24 2024 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.643-3
 - Release bump to regenerate package's requires and provides.
 

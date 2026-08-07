@@ -1,7 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.3-20260508.1.src.tar.gz
-%global ms_go_revision  1
+%global ms_go_filename  go1.26.5-20260709.6.src.tar.gz
+%global ms_go_revision  2
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.3
-Release:        1%{?dist}
+Version:        1.26.5
+Release:        2%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,6 +34,8 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 # bootstrap 04
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
+
+Patch1:         CVE-2026-39821.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -62,6 +64,7 @@ tar xf %{SOURCE5} --no-same-owner
 mv -v go go-bootstrap-04
 
 %setup -q -n go
+%autopatch -p1 -m 1
 
 %build
 # go 1.4 bootstraps with C.
@@ -110,6 +113,9 @@ rm -f  %{gopath}/src/runtime/*.c
   cd src
   ./make.bash --no-clean
 )
+
+# Nuke the final bootstrapper. Note: It is not used in any step under install, post, postrun
+rm -rf %{_libdir}/golang
 
 %install
 
@@ -166,6 +172,21 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
+- Bump version to 1.26.5-2
+
+* Wed Jul 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-1
+- Bump version to 1.26.5-1
+
+* Fri June 26 2026 Amit Upadhyay amitupadhyay@microsoft.com - 1.26.4-3
+- Remove the remaining final bootstrap component to reduce attack surface; the residual bootstrap artifact has had prior vulnerability exposure, so removing it is a security improvement.
+
+* Fri Jun 05 2026 Jyoti Kanase <v-jykanase@microsoft.com> - 1.26.4.2
+- Patch for CVE-2026-39821
+
+* Wed Jun 03 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.4-1
+- Bump version to 1.26.4-1
+
 * Fri May 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.3-1
 - Bump version to 1.26.3-1
 

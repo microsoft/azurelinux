@@ -1,7 +1,7 @@
 Summary:        The Windows Azure Linux Agent
 Name:           WALinuxAgent
 Version:        2.11.1.4
-Release:        3%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -26,6 +26,7 @@ Patch2:         fix-argument-to-goalstate.patch
 # This patch adds azurelinux support into the setup.py. This patch should be
 # removed in the next 2.12 release/
 Patch3:         update-setup.patch
+Patch4:         acl-support.patch
 BuildRequires:  python3-distro
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-xml
@@ -112,6 +113,12 @@ python3 setup.py check && python3 setup.py test
 
 
 %changelog
+* Thu Jun 04 2026 Mayank Singh <mayansingh@microsoft.com> - 2.11.1.4-5
+- Fix waagent-network-setup.service failure and update to teardown the specific interface.
+
+* Tue Apr 21 2026 Mayank Singh <mayansingh@microsoft.com> - 2.11.1.4-4
+- Add support for Azure Container Linux
+
 * Thu Aug 15 2024 Chris Co <chrco@microsoft.com> - 2.11.1.4-3
 - Add patch to update setup.py with azurelinux support
 

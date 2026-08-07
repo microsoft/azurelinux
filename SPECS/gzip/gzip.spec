@@ -1,13 +1,14 @@
 Summary:        Programs for compressing and decompressing files
 Name:           gzip
 Version:        1.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gzip
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-41992.patch
 %if 0%{?with_check}
 BuildRequires:  less
 %endif
@@ -17,7 +18,7 @@ The Gzip package contains programs for compressing and
 decompressing files.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --disable-silent-rules
@@ -42,6 +43,9 @@ make %{?_smp_mflags} check
 %{_mandir}/*/*
 
 %changelog
+* Mon Jun 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.13-2
+- Patch for CVE-2026-41992
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.13-1
 - Auto-upgrade to 1.13 - Azure Linux 3.0 - package upgrades
 
@@ -66,7 +70,7 @@ make %{?_smp_mflags} check
 * Sat May 09 2020 Nick Samson <nisamson@microsoft.com> - 1.9-4
 - Added %%license line automatically
 
-* Fri Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.9-3
+* Tue Mar 03 2020 Jon Slobodzian <joslobo@microsoft.com> - 1.9-3
 - Fixed reference URL. Verified license.
 
 * Tue Sep 03 2019 Mateusz Malisz <mamalisz@microsoft.com> - 1.9-2

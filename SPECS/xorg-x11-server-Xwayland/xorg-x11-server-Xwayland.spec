@@ -10,8 +10,8 @@ Vendor:        Microsoft Corporation
 Distribution:  Azure Linux
 Summary:       Xwayland
 Name:          xorg-x11-server-Xwayland
-Version:       24.1.6
-Release:       4%{?dist}
+Version:       24.1.13
+Release:       1%{?dist}
  
 License:       MIT
 URL:           http://www.x.org
@@ -88,17 +88,6 @@ BuildRequires: pkgconfig(xcb-image)
 BuildRequires: pkgconfig(xcb-keysyms)
 BuildRequires: pkgconfig(xcb-renderutil)
 
-Patch0:        CVE-2025-49175.patch
-Patch1:        CVE-2025-49177.patch
-Patch2:        CVE-2025-49178.patch
-Patch3:        CVE-2025-49179.patch
-Patch4:        CVE-2025-49180.patch
-Patch5:        CVE-2025-62229.patch
-Patch6:        CVE-2025-62230.patch
-Patch7:        CVE-2025-62231.patch
-Patch8:        CVE-2026-33999.patch
-Patch9:        CVE-2026-34001.patch
-Patch10:       CVE-2026-34003.patch
 
 %description
 Xwayland is an X server for running X clients under Wayland.
@@ -149,6 +138,12 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/*.desktop
 %{_libdir}/pkgconfig/xwayland.pc
  
 %changelog
+* Sat Jul 11 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1.13-1
+- Auto-upgrade to 24.1.13 - for CVE-2026-55999 & CVE-2026-56000
+
+* Tue Jun 09 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 24.1.12-1
+- Auto-upgrade to 24.1.12 - for CVE-2026-50256, CVE-2026-50257, CVE-2026-50258, CVE-2026-50259, CVE-2026-50260, CVE-2026-50261, CVE-2026-50262 and CVE-2026-50263
+
 * Wed Apr 29 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 24.1.6-4
 - Patch for CVE-2026-34003, CVE-2026-34001, CVE-2026-33999
 

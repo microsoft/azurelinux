@@ -2,8 +2,8 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.3.0
-Release:        2%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -15,7 +15,7 @@ Source0:        https://github.com/microsoft/azure-linux-image-tools/archive/ref
 # Use generate_source_tarball.sh script with the package version to build this tarball.
 #
 Source1:        %{name}-%{version}-vendor.tar.gz
-Patch0:         CVE-2026-33814.patch
+Patch0:         CVE-2026-56852.patch
 BuildRequires: golang >= 1.25
 BuildRequires: systemd-udev
 Requires: %{name}-imagecustomizer = %{version}-%{release}
@@ -49,9 +49,9 @@ Requires: lsof
 Requires: python3
 Requires: python3-pip
 Requires: jq
+Requires: systemd-ukify
 %ifarch x86_64
 Requires: grub2-pc
-Requires: systemd-ukify
 %endif
 
 %description imagecustomizer
@@ -90,7 +90,6 @@ mkdir -p %{buildroot}%{_libdir}/imagecustomizer
 
 # Copy container scripts to component-specific lib directory (internal binaries)
 install -p -m 0755 toolkit/tools/imagecustomizer/container/entrypoint.sh %{buildroot}%{_libdir}/imagecustomizer/entrypoint.sh
-install -p -m 0755 toolkit/tools/imagecustomizer/container/run.sh %{buildroot}%{_libdir}/imagecustomizer/run.sh
 install -p -m 0755 toolkit/scripts/telemetry_hopper/telemetry_hopper.py %{buildroot}%{_libdir}/imagecustomizer/telemetry_hopper.py
 install -p -m 0644 toolkit/scripts/telemetry_hopper/requirements.txt %{buildroot}%{_libdir}/imagecustomizer/telemetry-requirements.txt
 
@@ -104,7 +103,6 @@ go test -C toolkit/tools ./...
 %{_bindir}/imagecustomizer
 # Container support files - internal binaries stored in component lib directory
 %{_libdir}/imagecustomizer/entrypoint.sh
-%{_libdir}/imagecustomizer/run.sh
 %{_libdir}/imagecustomizer/telemetry_hopper.py
 %{_libdir}/imagecustomizer/telemetry-requirements.txt
 
@@ -113,8 +111,24 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
-* Wed May 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
+* Tue Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
+- Upgrade to version 1.6.0
+- Enable systemd-ukify for arm64
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-2
+- Patch for CVE-2026-56852
+
+* Fri May 29 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.5.0-1
+- Upgrade to version 1.5.0
+
+* Sat May 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.4.0-2
 - Patch for CVE-2026-33814
+
+* Fri May 29 2026 Vince Perri <viperri@microsoft.com> - 1.4.0-1
+- Upgrade to version 1.4.0
+
+* Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.3.0-2
+- Patch for CVE-2026-39821
 
 * Tue Apr 28 2026 Aditya Singh <v-aditysing@microsoft.com> - 1.3.0-1
 - Upgrade to version 1.3.0 which includes fixes for CVE-2026-27141, CVE-2026-29181 and CVE-2026-39882

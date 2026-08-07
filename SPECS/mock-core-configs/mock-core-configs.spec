@@ -4,7 +4,7 @@
 
 Name:       mock-core-configs
 Version:    41.2
-Release:    1%{?dist}
+Release:    2%{?dist}
 Vendor:     Microsoft Corporation
 Distribution: Azure Linux
 Summary:    Mock core config files basic chroots
@@ -12,6 +12,10 @@ Summary:    Mock core config files basic chroots
 License:    GPL-2.0-or-later
 URL:        https://github.com/rpm-software-management/mock/
 Source:     https://github.com/rpm-software-management/mock/archive/refs/tags/%{name}-%{version}-1/%{name}-%{version}-1.tar.gz#/%{name}-%{version}.tar.gz
+
+# From upstream: https://github.com/rpm-software-management/mock/commit/1339deac37d01b9f8098aadccd359c5ca55f7abc
+Patch0:     azure-linux-4-configs.patch
+
 BuildArch:  noarch
 
 # The mock.rpm requires this.  Other packages may provide this if they tend to
@@ -46,6 +50,13 @@ chroots.
 %prep
 %setup -q -n mock-%{name}-%{version}-1/%{name}
 
+# Patches for Azure Linux 4 configs.
+# Note that the spec expects the build directory to be set as above
+# but the patch applies to the root of the source directory, so we do
+# this directory hopping to apply the patch.
+pushd ..
+%patch 0 -p1
+popd
 
 %build
 
@@ -154,6 +165,9 @@ fi
 %ghost %config(noreplace,missingok) %{_sysconfdir}/mock/default.cfg
 
 %changelog
+* Tue Jun 16 2026 Tobias Brick <tobiasb@microsoft.com> - 41.2-2
+- Add azure-linux-4 configs
+
 * Wed Aug 28 2024 Reuben Olinsky <reubeno@microsoft.com> - 41.2-1
 - Sync with Fedora 41 version of spec.
 
