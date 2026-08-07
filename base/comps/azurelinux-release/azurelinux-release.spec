@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        21%{?dist}
+Release:        22%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -485,6 +485,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-22
+- Persist CIS network sysctl defaults
+
 * Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-21
 - Set canonical product, documentation, support, and issue-reporting URLs
 - Remove the inactive default debuginfod server configuration
