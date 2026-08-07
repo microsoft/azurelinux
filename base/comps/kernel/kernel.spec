@@ -749,6 +749,9 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
+%ifarch x86_64 aarch64
+Requires: ((kmod-gdrcopy-uname-r = %{KVERREL}) if kmod-gdrcopy-matched)
+%endif
 Provides: installonlypkg(kernel)
 %endif
 
@@ -1174,6 +1177,8 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
+Source6010: gdrcopy-%{gdrcopy_version}.tar.gz
+Source6011: gdrcopy.inc
 
 ## Patches needed for building this package
 
@@ -1229,6 +1234,10 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+# AZL: GDRCopy userspace and gdrdrv kmod subpackages
+%global _kmod_phase package
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2257,6 +2266,9 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+%global _kmod_phase prep
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3396,6 +3408,9 @@ find Documentation -type d | xargs chmod u+w
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase build
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-BUILD-ANCHOR — do not remove (kmod overlays chain here)
 
 # Module signing (modsign)
@@ -3903,6 +3918,9 @@ popd
 %global _kmod_phase install
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
+
+%global _kmod_phase install
+%include %{_sourcedir}/gdrcopy.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4573,8 +4591,14 @@ fi\
 %global _kmod_name nvidia-open
 %include %{_sourcedir}/kmod-nvidia-open.inc
 
+%global _kmod_phase files
+%include %{_sourcedir}/gdrcopy.inc
+
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Aug 07 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.31-1.14
+- feat(kernel): add GDRCopy userspace and prebuilt kernel module packages
+
 * Thu Aug 06 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.13
 - feat(kernel): enable ACPI APEI GHES (Generic Hardware Error Source) on x86_64
 - fix(kernel-config): enable EDAC_GHES for GHES memory error handling

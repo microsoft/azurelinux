@@ -31,6 +31,13 @@ origin = { type = "download", uri = "https://github.com/NVIDIA/open-gpu-kernel-m
 replace-upstream = true
 replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
 
+# GDRCopy userspace and gdrdrv kernel module sources.
+[[components.kernel.source-files]]
+filename = "gdrcopy-2.6.tar.gz"
+hash = "3653881de4380ecf85d26a93d9e4ce66679001c9901189707fb13cb98f2ff841eb6d67b63784d1e048db7f7c1975052f22fea0f7813233d96fded2bd39031342"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v2.6.tar.gz" }
+
 # kABI reference tarballs (Source300/Source301). kABI checking is disabled in
 # Azure Linux, but the spec still declares these sources, so they must be present
 # to assemble the package. Candidates for removal when the kABI/stablelist

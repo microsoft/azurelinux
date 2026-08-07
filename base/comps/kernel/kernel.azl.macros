@@ -2,6 +2,8 @@
 # Removed once these defines move directly into kernel.spec.
 %_without_debug 1
 %_without_selftests 1
-%azl_pkgrelease 13
+%azl_pkgrelease 14
 %kextraversion 1
 %nvidia_open_version 595.58.03
+%gdrcopy_version 2.6
+%gdrcopy_release 1
