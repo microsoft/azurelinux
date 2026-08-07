@@ -551,21 +551,9 @@ python3-markupsafe-2.1.3-1.azl3.aarch64.rpm
 python3-newt-0.52.23-1.azl3.aarch64.rpm
 python3-packaging-23.2-3.azl3.noarch.rpm
 python3-pip-24.2-9.azl3.noarch.rpm
-python3-pygments-2.7.4-2.azl3.noarch.rpm
-python3-rpm-4.18.2-1.azl3.aarch64.rpm
-python3-rpm-generators-14-11.azl3.noarch.rpm
-<<<<<<< HEAD
-python3-setuptools-69.0.3-6.azl3.noarch.rpm
-python3-test-3.12.9-13.azl3.aarch64.rpm
-python3-tools-3.12.9-13.azl3.aarch64.rpm
-=======
 python3-setuptools-69.0.3-5.azl3.noarch.rpm
 python3-test-3.12.9-14.azl3.aarch64.rpm
 python3-tools-3.12.9-14.azl3.aarch64.rpm
->>>>>>> 84a7965614 ([AutoPR- Security] Patch python3 for CVE-2026-9669, CVE-2026-6879, CVE-2026-6100, CVE-2026-4786, CVE-2026-4360, CVE-2026-3644, CVE-2026-3276, CVE-2026-3087, CVE-2026-2297, CVE-2026-12003, CVE-2026-11972, CVE-2026-0864 [HIGH] (#18321))
-python3-wheel-0.43.0-2.azl3.noarch.rpm
-readline-8.2-2.azl3.aarch64.rpm
-readline-debuginfo-8.2-2.azl3.aarch64.rpm
 readline-devel-8.2-2.azl3.aarch64.rpm
 rpm-4.18.2-1.azl3.aarch64.rpm
 rpm-build-4.18.2-1.azl3.aarch64.rpm
