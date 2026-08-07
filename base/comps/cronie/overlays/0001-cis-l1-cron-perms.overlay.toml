@@ -1,0 +1,38 @@
+# Azure Linux CIS Level 1 hardening: restrict permissions on the cron
+# scheduling paths that cronie owns.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22875" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22876" },
+]
+
+# CIS 2.4.1.8: /etc/cron.d must be mode 0700 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir %\{_sysconfdir\}/cron\.d$'
+replacement = '%attr(0700,root,root) %dir %{_sysconfdir}/cron.d'
+description = "CIS 2.4.1.8: restrict /etc/cron.d to 0700"
+
+# CIS 2.4.1.9: /etc/cron.deny must be mode 0640.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%config\(noreplace,missingok\) %\{_sysconfdir\}/cron\.deny$'
+replacement = '%attr(0640,root,root) %config(noreplace,missingok) %{_sysconfdir}/cron.deny'
+description = "CIS 2.4.1.9: restrict /etc/cron.deny to 0640"
+
+# CIS 2.4.1.9: /etc/cron.allow must exist, owned root:root, mode 0640.
+# The control prefers an allow-list; ship it empty (only root may schedule
+# cron jobs by default) mirroring how cronie already ships an empty cron.deny.
+[[overlays]]
+type = "spec-append-lines"
+section = "%install"
+lines = ["touch $RPM_BUILD_ROOT%{_sysconfdir}/cron.allow"]
+description = "CIS 2.4.1.9: create empty /etc/cron.allow"
+
+[[overlays]]
+type = "spec-append-lines"
+section = "%files"
+lines = ["%attr(0640,root,root) %config(noreplace,missingok) %{_sysconfdir}/cron.allow"]
+description = "CIS 2.4.1.9: package /etc/cron.allow at 0640"
