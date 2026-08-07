@@ -37,7 +37,7 @@ print(string.sub(hash, 0, 16))
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.5.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 Source0: openssl-%{version}.tar.gz
 Source1: fips-hmacify.sh
@@ -147,6 +147,7 @@ Requires: coreutils
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
 Obsoletes: oqsprovider < 0.9.0
 
+Patch80: 0080-azl-force-symcrypt-in-kernel-fips-mode.patch
 %description
 The OpenSSL toolkit provides support for secure communications between
 machines. OpenSSL includes a certificate management tool and shared
@@ -159,6 +160,7 @@ Requires: ca-certificates >= 2008-5
 Requires: crypto-policies >= 20180730
 Recommends: pkcs11-provider%{?_isa}
 %if ( %{defined rhel} && (! %{defined centos}) && (! %{defined eln}) ) || %{defined azurelinux}
+Requires: SymCrypt-OpenSSL >= 1.11.0
 %endif
 
 %description libs
@@ -435,7 +437,7 @@ cat $RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h >> \
 install -m644 %{SOURCE9} \
 	$RPM_BUILD_ROOT/%{_prefix}/include/openssl/configuration.h
 %endif
-ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/fips_local.cnf
+
 
 %files
 %{!?_licensedir:%global license %%doc}
@@ -458,7 +460,7 @@ ln -s /etc/crypto-policies/back-ends/openssl_fips.config $RPM_BUILD_ROOT%{_sysco
 %dir %{_sysconfdir}/pki/tls/openssl.d
 %config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
 %config(noreplace) %{_sysconfdir}/pki/tls/ct_log_list.cnf
-%config %{_sysconfdir}/pki/tls/fips_local.cnf
+
 %attr(0755,root,root) %{_libdir}/libcrypto.so.%{version}
 %{_libdir}/libcrypto.so.%{soversion}
 %attr(0755,root,root) %{_libdir}/libssl.so.%{version}

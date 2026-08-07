@@ -1,0 +1,652 @@
+From df00358b070084d74f8a29a606f89245527f0def Mon Sep 17 00:00:00 2001
+From: Tobias Brick <tobiasb@microsoft.com>
+Date: Fri, 7 Aug 2026 03:11:02 +0000
+Subject: [PATCH] feat(fips): activate and prefer SymCrypt, enforce it in
+ kernel FIPS mode
+
+Azure Linux ships SymCrypt-OpenSSL as its FIPS provider. Drive it from
+the providers configuration module:
+
+- In all cases, ensure symcryptprovider is active. If the ambient
+  configuration already activated it, provider_conf_activate()
+  short-circuits on the already-active name check and this is a no-op.
+  Otherwise load the provider from its fixed, package-owned drop-in
+  (OPENSSLDIR/openssl.d/symcrypt_prov.cnf) so activation never depends
+  on the ambient configuration carrying the SymCrypt section. This is
+  what makes a later, unrelated OSSL_LIB_CTX_load_config() safe.
+
+- Base enforcement on actual provider state, not on whether the drop-in
+  load succeeded: consult the activation registry (a side-effect-free
+  state query) so an already-active SymCrypt satisfies enforcement even
+  when the fixed file is absent.
+
+- In all cases, merge the optional "?provider=symcryptprovider" default
+  property so SymCrypt is preferred while leaving fetches for algorithms
+  it does not provide free to resolve elsewhere.
+
+- In kernel FIPS mode, fail out of the configuration function if SymCrypt
+  is not active (a soft failure that does not abort when configuration
+  errors are ignored), and activate the base provider.
+
+- In kernel FIPS mode, merge the optional "?fips=yes" default property to
+  prefer FIPS-certified operations. It is intentionally optional:
+  SymCrypt's contract is to provide a FIPS-certified provider, not to
+  forbid non-approved algorithms, so FIPS_mode() intentionally stays
+  disabled.
+
+Preserve Fedora's config-module failure delivery; do not force
+configuration diagnostics.
+
+Add coverage for the property merges, kernel-FIPS enforcement, the
+inactive-but-configured case, and the unrelated-later-load guarantee.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 5f315f8d-6603-4659-8d14-4476bc265450
+---
+ crypto/evp/evp_fetch.c                        |   4 +-
+ crypto/provider_conf.c                        |  89 +++++--
+ include/crypto/evp.h                          |   2 +
+ test/build.info                               |   5 +
+ test/prov_conf_symcrypt.cnf                   |  16 ++
+ test/prov_conf_symcrypt_active.cnf            |  14 ++
+ test/prov_conf_symcrypt_app.cnf               |   7 +
+ test/prov_conf_symcrypt_missing.cnf           |  12 +
+ test/prov_conf_symcrypt_test.c                | 237 ++++++++++++++++++
+ test/recipes/03-test_prov_conf_symcrypt.t     |  26 ++
+ test/recipes/03-test_prov_conf_symcrypt_off.t |  38 +++
+ .../03-test_prov_conf_symcrypt_realinit.t     |  21 ++
+ 12 files changed, 453 insertions(+), 18 deletions(-)
+ create mode 100644 test/prov_conf_symcrypt.cnf
+ create mode 100644 test/prov_conf_symcrypt_active.cnf
+ create mode 100644 test/prov_conf_symcrypt_app.cnf
+ create mode 100644 test/prov_conf_symcrypt_missing.cnf
+ create mode 100644 test/prov_conf_symcrypt_test.c
+ create mode 100644 test/recipes/03-test_prov_conf_symcrypt.t
+ create mode 100644 test/recipes/03-test_prov_conf_symcrypt_off.t
+ create mode 100644 test/recipes/03-test_prov_conf_symcrypt_realinit.t
+
+diff --git a/crypto/evp/evp_fetch.c b/crypto/evp/evp_fetch.c
+index fbebca1..e300e5f 100644
+--- a/crypto/evp/evp_fetch.c
++++ b/crypto/evp/evp_fetch.c
+@@ -527,8 +527,8 @@ int EVP_set_default_properties(OSSL_LIB_CTX *libctx, const char *propq)
+     return evp_set_default_properties_int(libctx, propq, 1, 0);
+ }
+ 
+-static int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
+-                                        int loadconfig)
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig)
+ {
+     OSSL_PROPERTY_LIST **plp = ossl_ctx_global_properties(libctx, loadconfig);
+     OSSL_PROPERTY_LIST *pl1, *pl2;
+diff --git a/crypto/provider_conf.c b/crypto/provider_conf.c
+index 1e5053c..b1915fc 100644
+--- a/crypto/provider_conf.c
++++ b/crypto/provider_conf.c
+@@ -11,12 +11,12 @@
+ #include <openssl/trace.h>
+ #include <openssl/err.h>
+ #include <openssl/evp.h>
+-#include <unistd.h>
+ #include <openssl/conf.h>
+ #include <openssl/safestack.h>
+ #include <openssl/provider.h>
+ #include "internal/provider.h"
+ #include "internal/cryptlib.h"
++#include "crypto/evp.h"
+ #include "provider_local.h"
+ #include "crypto/context.h"
+ 
+@@ -424,28 +424,85 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+             return 0;
+     }
+ 
+-    if (ossl_get_kernel_fips_flag() != 0) { /* XXX from provider_conf_load */
++    {
+         OSSL_LIB_CTX *libctx = NCONF_get0_libctx((CONF *)cnf);
+-#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
++        int in_kernel_fips = ossl_get_kernel_fips_flag() != 0;
++        int symcrypt_active = 0;
++        CONF *sc_conf;
++        PROVIDER_CONF_GLOBAL *pcgbl;
++#  define AZL_SYMCRYPT_PROVIDER_NAME    "symcryptprovider"
++#  define AZL_SYMCRYPT_PROVIDER_SECTION "symcrypt_prov_sect"
++#  define AZL_SYMCRYPT_PROVIDER_CONF    OPENSSLDIR "/openssl.d/symcrypt_prov.cnf"
+ 
+-        if (access(FIPS_LOCAL_CONF, R_OK) == 0) {
+-            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
+-            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
++        /*
++         * In all cases, ensure SymCrypt (Azure Linux's FIPS provider) is
++         * active. If the ambient configuration already activated it,
++         * provider_conf_activate() short-circuits on the already-active name
++         * check and this is a no-op. Otherwise load the provider from its
++         * fixed, package-owned drop-in so activation never depends on the
++         * ambient configuration carrying the SymCrypt section (this is what
++         * makes a later, unrelated OSSL_LIB_CTX_load_config() safe).
++         *
++         * Use provider_conf_load() (not provider_conf_activate() directly) so
++         * the drop-in section's module=/identity=/activate= directives are
++         * honored, exactly as the ambient provider loop and Fedora's original
++         * fips_local.cnf handling do.
++         */
++        sc_conf = NCONF_new_ex(libctx, NCONF_default());
++        if (sc_conf != NULL
++                && NCONF_load(sc_conf, AZL_SYMCRYPT_PROVIDER_CONF, NULL) > 0
++                && NCONF_get_section(sc_conf,
++                                     AZL_SYMCRYPT_PROVIDER_SECTION) != NULL)
++            provider_conf_load(libctx, AZL_SYMCRYPT_PROVIDER_NAME,
++                               AZL_SYMCRYPT_PROVIDER_SECTION, sc_conf);
++        NCONF_free(sc_conf);
++
++        /*
++         * Enforcement below must reflect actual provider state, not merely
++         * whether our drop-in load succeeded: the ambient configuration's own
++         * drop-in may have already activated SymCrypt (and the fixed file may
++         * be absent). Consult the activation registry directly -- this is a
++         * pure state query with no fetch or fallback-loading side effects.
++         */
++        pcgbl = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
++        if (pcgbl != NULL && CRYPTO_THREAD_read_lock(pcgbl->lock)) {
++            symcrypt_active =
++                prov_already_activated(AZL_SYMCRYPT_PROVIDER_NAME,
++                                       pcgbl->activated_providers);
++            CRYPTO_THREAD_unlock(pcgbl->lock);
++        }
++
++        /*
++         * In all cases, prefer SymCrypt for algorithm fetches. The "?" makes
++         * this an optional preference, not a hard filter, so algorithms
++         * SymCrypt does not provide still resolve elsewhere.
++         */
++        if (evp_default_properties_merge(libctx,
++                                         "?provider=" AZL_SYMCRYPT_PROVIDER_NAME,
++                                         0) != 1)
++            return 0;
++
++        if (in_kernel_fips) {
++            /*
++             * In kernel FIPS mode, SymCrypt must be present. This is a soft
++             * failure: it fails out of the configuration function, which does
++             * not abort when configuration errors are ignored.
++             */
++            if (!symcrypt_active)
+                 return 0;
+ 
+-            if (provider_conf_load(libctx, "fips", "fips_sect", fips_conf) != 1) {
+-                NCONF_free(fips_conf);
++            if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
+                 return 0;
+-            }
+-            NCONF_free(fips_conf);
+-        } else {
+-            if (provider_conf_activate(libctx, "fips", NULL, NULL, 0, NULL) != 1)
++
++            /*
++             * In kernel FIPS mode, prefer FIPS-certified operations. Optional
++             * by design: SymCrypt's contract is to provide a FIPS-certified
++             * provider, not to forbid non-approved algorithms, so FIPS_mode()
++             * intentionally remains disabled.
++             */
++            if (evp_default_properties_merge(libctx, "?fips=yes", 0) != 1)
+                 return 0;
+         }
+-        if (provider_conf_activate(libctx, "base", NULL, NULL, 0, NULL) != 1)
+-            return 0;
+-        if (EVP_default_properties_enable_fips(libctx, 1) != 1)
+-            return 0;
+     }
+ 
+     return 1;
+diff --git a/include/crypto/evp.h b/include/crypto/evp.h
+index 3f1eed3..16ca594 100644
+--- a/include/crypto/evp.h
++++ b/include/crypto/evp.h
+@@ -933,6 +933,8 @@ int evp_method_store_remove_all_provided(const OSSL_PROVIDER *prov);
+ 
+ int evp_default_properties_enable_fips_int(OSSL_LIB_CTX *libctx, int enable,
+                                            int loadconfig);
++int evp_default_properties_merge(OSSL_LIB_CTX *libctx, const char *propq,
++                                 int loadconfig);
+ int evp_set_default_properties_int(OSSL_LIB_CTX *libctx, const char *propq,
+                                    int loadconfig, int mirrored);
+ char *evp_get_global_properties_str(OSSL_LIB_CTX *libctx, int loadconfig);
+diff --git a/test/build.info b/test/build.info
+index 3dca611..d557b60 100644
+--- a/test/build.info
++++ b/test/build.info
+@@ -1113,6 +1113,11 @@ IF[{- !$disabled{tests} -}]
+   INCLUDE[context_internal_test]=.. ../include ../apps/include
+   DEPEND[context_internal_test]=../libcrypto.a libtestutil.a
+ 
++  PROGRAMS{noinst}=prov_conf_symcrypt_test
++  SOURCE[prov_conf_symcrypt_test]=prov_conf_symcrypt_test.c
++  INCLUDE[prov_conf_symcrypt_test]=.. ../include ../apps/include
++  DEPEND[prov_conf_symcrypt_test]=../libcrypto.a libtestutil.a
++
+   IF[{- !$disabled{zlib} || !$disabled{brotli} || !$disabled{zstd} -}]
+     PROGRAMS{noinst}=bio_comp_test
+     SOURCE[bio_comp_test]=bio_comp_test.c
+diff --git a/test/prov_conf_symcrypt.cnf b/test/prov_conf_symcrypt.cnf
+new file mode 100644
+index 0000000..88a2d7b
+--- /dev/null
++++ b/test/prov_conf_symcrypt.cnf
+@@ -0,0 +1,16 @@
++openssl_conf = openssl_init
++
++# Match the shipped default: provider-module failures may be ignored by the
++# real OPENSSL_init_crypto() path.
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++symcryptprovider = symcrypt_prov_sect
++
++[symcrypt_prov_sect]
++module = p_test.so
++activate = 0
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_symcrypt_active.cnf b/test/prov_conf_symcrypt_active.cnf
+new file mode 100644
+index 0000000..3383dce
+--- /dev/null
++++ b/test/prov_conf_symcrypt_active.cnf
+@@ -0,0 +1,14 @@
++openssl_conf = openssl_init
++
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++symcryptprovider = symcrypt_prov_sect
++
++[symcrypt_prov_sect]
++module = p_test.so
++activate = 1
++greeting = SymCrypt test provider
+diff --git a/test/prov_conf_symcrypt_app.cnf b/test/prov_conf_symcrypt_app.cnf
+new file mode 100644
+index 0000000..f96252a
+--- /dev/null
++++ b/test/prov_conf_symcrypt_app.cnf
+@@ -0,0 +1,7 @@
++openssl_conf = openssl_init
++
++[openssl_init]
++alg_section = evp_properties
++
++[evp_properties]
++default_properties = app.prop=1
+diff --git a/test/prov_conf_symcrypt_missing.cnf b/test/prov_conf_symcrypt_missing.cnf
+new file mode 100644
+index 0000000..9ca89d5
+--- /dev/null
++++ b/test/prov_conf_symcrypt_missing.cnf
+@@ -0,0 +1,12 @@
++openssl_conf = openssl_init
++
++config_diagnostics = 0
++
++[openssl_init]
++providers = provider_sect
++
++[provider_sect]
++null = null_sect
++
++[null_sect]
++activate = 1
+diff --git a/test/prov_conf_symcrypt_test.c b/test/prov_conf_symcrypt_test.c
+new file mode 100644
+index 0000000..ce97f5d
+--- /dev/null
++++ b/test/prov_conf_symcrypt_test.c
+@@ -0,0 +1,237 @@
++/*
++ * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++ *
++ * Licensed under the Apache License 2.0 (the "License").  You may not use
++ * this file except in compliance with the License.  You can obtain a copy
++ * in the file LICENSE in the source distribution or at
++ * https://www.openssl.org/source/license.html
++ */
++
++#include <stdlib.h>
++#include <string.h>
++#include <openssl/conf.h>
++#include <openssl/err.h>
++#include <openssl/evp.h>
++#include <openssl/provider.h>
++#include "crypto/evp.h"
++#include "testutil.h"
++
++/*
++ * Azure Linux drives SymCrypt activation from crypto/provider_conf.c. These
++ * tests exercise the observable contract, parametrized by whether the process
++ * is in kernel FIPS mode (argv: expect_kernel_fips = 0 or 1, forced by the
++ * recipes via OPENSSL_FORCE_FIPS_MODE):
++ *
++ *   - In all cases, once SymCrypt is active the default properties gain the
++ *     optional "?provider=symcryptprovider" preference.
++ *   - In kernel FIPS mode only, they additionally gain "?fips=yes", and the
++ *     "base" provider is activated.
++ *   - In kernel FIPS mode, a config that does not (directly or via an earlier
++ *     load) leave SymCrypt active fails to load; outside FIPS it loads.
++ *   - A later, unrelated config load does not re-require SymCrypt's section:
++ *     once SymCrypt is active in the libctx, subsequent loads succeed even in
++ *     FIPS mode (the property that makes PKCS#11 &c. config loads safe).
++ *
++ * The fixed package drop-in (OPENSSLDIR/openssl.d/symcrypt_prov.cnf) is not
++ * present in the build tree, so the pure "force from the fixed file" backstop
++ * is covered at package/integration level, not here. Here SymCrypt is made
++ * active through an ambient config using the p_test.so stub provider, which is
++ * exactly the normal-system path.
++ */
++
++static char *symcrypt_active_cnf = NULL; /* activates symcryptprovider */
++static char *symcrypt_inactive_cnf = NULL; /* configures but activate=0 */
++static char *missing_cnf = NULL;         /* unrelated: no symcrypt at all */
++static char *app_cnf = NULL;             /* sets default_properties=app.prop=1 */
++static int expect_kernel_fips = 0;
++
++static int has_property_token(const char *properties, const char *token)
++{
++    const char *start = properties;
++    size_t token_len = strlen(token);
++
++    while (start != NULL) {
++        const char *end = strchr(start, ',');
++        size_t len = end == NULL ? strlen(start) : (size_t)(end - start);
++
++        if (len == token_len && strncmp(start, token, len) == 0)
++            return 1;
++        start = end == NULL ? NULL : end + 1;
++    }
++    return 0;
++}
++
++/*
++ * Verify the default properties: the app-configured token is preserved, the
++ * SymCrypt preference is always merged, and the FIPS preference is merged iff
++ * we are in kernel FIPS mode.
++ */
++static int check_properties(OSSL_LIB_CTX *ctx)
++{
++    char *propstr = evp_get_global_properties_str(ctx, 0);
++    int testresult = 0;
++
++    if (!TEST_ptr(propstr))
++        return 0;
++    TEST_info("default properties: %s", propstr);
++
++    if (!TEST_true(has_property_token(propstr, "app.prop=1")))
++        goto err;
++    if (!TEST_true(has_property_token(propstr, "?provider=symcryptprovider")))
++        goto err;
++    if (expect_kernel_fips) {
++        if (!TEST_true(has_property_token(propstr, "?fips=yes")))
++            goto err;
++    } else if (!TEST_false(has_property_token(propstr, "?fips=yes"))) {
++        goto err;
++    }
++
++    testresult = 1;
++ err:
++    OPENSSL_free(propstr);
++    return testresult;
++}
++
++/*
++ * An ambient config that activates SymCrypt: the provider is available, the
++ * SymCrypt (and, in FIPS, FIPS + base) preferences are applied.
++ */
++static int test_active_ambient(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, app_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, symcrypt_active_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++        goto err;
++    if (expect_kernel_fips
++            && !TEST_true(OSSL_PROVIDER_available(ctx, "base")))
++        goto err;
++    if (!check_properties(ctx))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * The DR-002 guarantee: once SymCrypt is active in the libctx, a later,
++ * unrelated config load (here one that mentions no SymCrypt section at all)
++ * must still succeed -- even in kernel FIPS mode. The old design failed this
++ * because it re-required symcrypt_prov_sect in every loaded config.
++ */
++static int test_unrelated_load_is_safe(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, app_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, symcrypt_active_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++        goto err;
++    /* The unrelated load must not be rejected for lacking SymCrypt's section. */
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, missing_cnf)))
++        goto err;
++    if (!TEST_true(OSSL_PROVIDER_available(ctx, "symcryptprovider")))
++        goto err;
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * With no path to an active SymCrypt (no ambient activation and no fixed
++ * drop-in in the build tree), kernel FIPS mode fails the config load; outside
++ * FIPS it loads.
++ */
++static int test_enforced_without_symcrypt(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int loaded;
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++
++    loaded = OSSL_LIB_CTX_load_config(ctx, missing_cnf);
++    if (expect_kernel_fips) {
++        if (!TEST_false(loaded))
++            goto err;
++        ERR_clear_error();
++    } else if (!TEST_true(loaded)) {
++        goto err;
++    }
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++/*
++ * Configuring SymCrypt without activating it (activate=0) is not sufficient:
++ * enforcement keys off actual activation, so kernel FIPS mode still fails.
++ */
++static int test_inactive_ambient_not_sufficient(void)
++{
++    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
++    int loaded;
++    int testresult = 0;
++
++    if (!TEST_ptr(ctx))
++        return 0;
++    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, app_cnf)))
++        goto err;
++
++    loaded = OSSL_LIB_CTX_load_config(ctx, symcrypt_inactive_cnf);
++    if (expect_kernel_fips) {
++        if (!TEST_false(loaded))
++            goto err;
++        ERR_clear_error();
++    } else if (!TEST_true(loaded)) {
++        goto err;
++    }
++
++    testresult = 1;
++ err:
++    OSSL_LIB_CTX_free(ctx);
++    return testresult;
++}
++
++OPT_TEST_DECLARE_USAGE("active_cnf inactive_cnf missing_cnf app_cnf expect_kernel_fips\n")
++
++int setup_tests(void)
++{
++    if (!test_skip_common_options()) {
++        TEST_error("Error parsing test options\n");
++        return 0;
++    }
++
++    if (!TEST_ptr(symcrypt_active_cnf = test_get_argument(0))
++            || !TEST_ptr(symcrypt_inactive_cnf = test_get_argument(1))
++            || !TEST_ptr(missing_cnf = test_get_argument(2))
++            || !TEST_ptr(app_cnf = test_get_argument(3))
++            || !TEST_ptr(test_get_argument(4)))
++        return 0;
++
++    expect_kernel_fips = atoi(test_get_argument(4)) != 0;
++
++    ADD_TEST(test_active_ambient);
++    ADD_TEST(test_unrelated_load_is_safe);
++    ADD_TEST(test_enforced_without_symcrypt);
++    ADD_TEST(test_inactive_ambient_not_sufficient);
++    return 1;
++}
+diff --git a/test/recipes/03-test_prov_conf_symcrypt.t b/test/recipes/03-test_prov_conf_symcrypt.t
+new file mode 100644
+index 0000000..a090992
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_symcrypt.t
+@@ -0,0 +1,26 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use OpenSSL::Test qw/:DEFAULT bldtop_dir srctop_file/;
++
++setup("test_prov_conf_symcrypt");
++
++plan tests => 1;
++
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++$ENV{OPENSSL_MODULES} = bldtop_dir("test");
++
++ok(run(test(["prov_conf_symcrypt_test",
++             srctop_file("test", "prov_conf_symcrypt_active.cnf"),
++             srctop_file("test", "prov_conf_symcrypt.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
++             "1"])),
++   "kernel FIPS mode enforces SymCrypt, merges ?provider/?fips, and keeps unrelated loads safe");
+diff --git a/test/recipes/03-test_prov_conf_symcrypt_off.t b/test/recipes/03-test_prov_conf_symcrypt_off.t
+new file mode 100644
+index 0000000..bb54ea7
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_symcrypt_off.t
+@@ -0,0 +1,38 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use OpenSSL::Test qw/:DEFAULT bldtop_dir srctop_file/;
++
++setup("test_prov_conf_symcrypt_off");
++
++delete $ENV{OPENSSL_FORCE_FIPS_MODE};
++
++my $host_fips = 0;
++if (open(my $fh, '<', '/proc/sys/crypto/fips_enabled')) {
++    my $val = <$fh>;
++    close($fh);
++    $host_fips = 1 if defined $val && $val =~ /^\s*1/;
++}
++
++plan skip_all =>
++    "host kernel is in FIPS mode; cannot exercise the non-FIPS path"
++    if $host_fips;
++
++plan tests => 1;
++
++$ENV{OPENSSL_MODULES} = bldtop_dir("test");
++
++ok(run(test(["prov_conf_symcrypt_test",
++             srctop_file("test", "prov_conf_symcrypt_active.cnf"),
++             srctop_file("test", "prov_conf_symcrypt.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
++             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
++             "0"])),
++   "non-FIPS mode prefers SymCrypt without forcing it or merging ?fips=yes");
+diff --git a/test/recipes/03-test_prov_conf_symcrypt_realinit.t b/test/recipes/03-test_prov_conf_symcrypt_realinit.t
+new file mode 100644
+index 0000000..2fae905
+--- /dev/null
++++ b/test/recipes/03-test_prov_conf_symcrypt_realinit.t
+@@ -0,0 +1,21 @@
++#! /usr/bin/env perl
++# Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
++#
++# Licensed under the Apache License 2.0 (the "License").  You may not use
++# this file except in compliance with the License.  You can obtain a copy
++# in the file LICENSE in the source distribution or at
++# https://www.openssl.org/source/license.html
++
++use strict;
++use warnings;
++use OpenSSL::Test qw/:DEFAULT srctop_file/;
++
++setup("test_prov_conf_symcrypt_realinit");
++
++plan tests => 1;
++
++$ENV{OPENSSL_FORCE_FIPS_MODE} = 1;
++$ENV{OPENSSL_CONF} = srctop_file("test", "prov_conf_symcrypt_missing.cnf");
++
++ok(run(app(["openssl", "list", "-providers"])),
++   "real init retains Fedora's ignored provider-module failure behavior");
+-- 
+2.52.0
+
