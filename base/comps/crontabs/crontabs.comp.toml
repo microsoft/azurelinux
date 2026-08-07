@@ -1,0 +1,3 @@
+[components.crontabs]
+# Imported from Fedora with Azure Linux CIS Level 1 hardening overlays in
+# overlays/. See 0001-cis-l1-cron-perms.overlay.toml.

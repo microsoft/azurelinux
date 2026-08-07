@@ -1,0 +1,47 @@
+# Azure Linux CIS Level 1 hardening: restrict permissions on the cron
+# scheduling paths that crontabs owns.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22870" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22871" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22872" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22873" },
+    { url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22874" },
+]
+
+# CIS 2.4.1.2: /etc/crontab must be mode 0600 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%config\(noreplace\) /etc/crontab$'
+replacement = '%attr(0600,root,root) %config(noreplace) /etc/crontab'
+description = "CIS 2.4.1.2: restrict /etc/crontab to 0600"
+
+# CIS 2.4.1.3: /etc/cron.hourly must be mode 0700 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir /etc/cron\.hourly$'
+replacement = '%attr(0700,root,root) %dir /etc/cron.hourly'
+description = "CIS 2.4.1.3: restrict /etc/cron.hourly to 0700"
+
+# CIS 2.4.1.4: /etc/cron.daily must be mode 0700 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir /etc/cron\.daily$'
+replacement = '%attr(0700,root,root) %dir /etc/cron.daily'
+description = "CIS 2.4.1.4: restrict /etc/cron.daily to 0700"
+
+# CIS 2.4.1.5: /etc/cron.weekly must be mode 0700 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir /etc/cron\.weekly$'
+replacement = '%attr(0700,root,root) %dir /etc/cron.weekly'
+description = "CIS 2.4.1.5: restrict /etc/cron.weekly to 0700"
+
+# CIS 2.4.1.6: /etc/cron.monthly must be mode 0700 (root-only).
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%dir /etc/cron\.monthly$'
+replacement = '%attr(0700,root,root) %dir /etc/cron.monthly'
+description = "CIS 2.4.1.6: restrict /etc/cron.monthly to 0700"
