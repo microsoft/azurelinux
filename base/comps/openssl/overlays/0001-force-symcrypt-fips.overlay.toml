@@ -1,0 +1,39 @@
+# Force SymCrypt as Azure Linux's OpenSSL FIPS provider in kernel FIPS mode.
+# These overlays share one provenance: patch 0080 hard-codes SymCrypt as the
+# FIPS provider, which makes SymCrypt-OpenSSL a hard runtime dependency and
+# renders Fedora's fips_local.cnf symlink obsolete.
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# The fips.so-removal overlay (in openssl.comp.toml) also enables Fedora's
+# FIPS-provider dependency. Azure Linux uses SymCrypt-OpenSSL instead of
+# openssl-fips-provider. The version floor guarantees a build that ships the
+# OpenSSL 3 provider and its symcrypt_prov.cnf drop-in: the provider was
+# introduced in 1.4.0, and 1.11.0 is the release verified against OpenSSL 3.5.
+# Without the floor, an engine-only release would satisfy RPM while leaving the
+# hard-coded [symcrypt_prov_sect] section absent at runtime.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^Requires: openssl-fips-provider$'
+replacement = 'Requires: SymCrypt-OpenSSL >= 1.11.0'
+description = "Replace Fedora's FIPS-provider dependency with SymCrypt"
+
+[[overlays]]
+type = "patch-add"
+source = "../0080-azl-force-symcrypt-in-kernel-fips-mode.patch"
+description = "Force SymCrypt with ?fips=yes when the kernel is in FIPS mode"
+
+# Fedora's force-FIPS patch reads fips_local.cnf to configure fips.so. Azure
+# Linux hard-codes SymCrypt instead, so the symlink is unused.
+[[overlays]]
+type = "spec-search-replace"
+regex = '^ln -s /etc/crypto-policies/back-ends/openssl_fips\.config \$RPM_BUILD_ROOT%\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove obsolete fips_local.cnf symlink creation"
+
+[[overlays]]
+type = "spec-search-replace"
+regex = '^%config %\{_sysconfdir\}/pki/tls/fips_local\.cnf$'
+replacement = ''
+description = "Remove obsolete fips_local.cnf from %files"
