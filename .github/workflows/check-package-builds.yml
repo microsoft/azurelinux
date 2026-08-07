@@ -28,6 +28,9 @@ on:
       - "toolkit/scripts/*"
       - "toolkit/tools/*"
 
+permissions:
+  contents: read
+
 jobs:
   package-checks:
     name: ${{ matrix.check-name }}
