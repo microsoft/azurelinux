@@ -130,6 +130,7 @@ Obsoletes: rdma-core < %{version}-%{release}
 Conflicts: rdma-core
 # Red Hat/Fedora previously shipped redhat/ as a stand-alone
 # package called 'rdma', which we're supplanting here.
+Provides: rdma = %{version}-%{release}
 Provides: rdma-doca = %{version}-%{release}
 Obsoletes: rdma-doca < %{version}-%{release}
 Provides: rdma-ndd-doca = %{version}-%{release}
@@ -166,29 +167,48 @@ scripts, dracut rules, and the rdma-ndd utility.
 Summary: RDMA core development libraries and headers
 Group: System Environment/Libraries
 Provides: rdma-core-devel = %{version}-%{release}
+Provides: rdma-core-devel%{?_isa} = %{version}-%{release}
 Obsoletes: rdma-core-devel < %{version}-%{release}
 Conflicts: rdma-core-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
+Provides: libibverbs-devel = %{version}-%{release}
+Provides: libibverbs-devel%{?_isa} = %{version}-%{release}
+Obsoletes: libibverbs-devel < %{version}-%{release}
 Provides: libibverbs-devel-doca = %{version}-%{release}
 Obsoletes: libibverbs-devel-doca < %{version}-%{release}
 Provides: libibverbs-devel-static-doca = %{version}-%{release}
 Obsoletes: libibverbs-devel-static-doca < %{version}-%{release}
 Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Provides: libibumad-devel = %{version}-%{release}
+Provides: libibumad-devel%{?_isa} = %{version}-%{release}
+Obsoletes: libibumad-devel < %{version}-%{release}
 Provides: libibumad-devel-doca = %{version}-%{release}
 Obsoletes: libibumad-devel-doca < %{version}-%{release}
 Provides: libibumad-static-doca = %{version}-%{release}
 Obsoletes: libibumad-static-doca < %{version}-%{release}
 Requires: librdmacm-doca%{?_isa} = %{version}-%{release}
+Provides: librdmacm-devel = %{version}-%{release}
+Provides: librdmacm-devel%{?_isa} = %{version}-%{release}
+Obsoletes: librdmacm-devel < %{version}-%{release}
 Provides: librdmacm-devel-doca = %{version}-%{release}
 Obsoletes: librdmacm-devel-doca < %{version}-%{release}
 Provides: librdmacm-static-doca = %{version}-%{release}
 Obsoletes: librdmacm-static-doca < %{version}-%{release}
+Provides: ibacm-devel = %{version}-%{release}
+Provides: ibacm-devel%{?_isa} = %{version}-%{release}
+Obsoletes: ibacm-devel < %{version}-%{release}
 Provides: ibacm-devel-doca = %{version}-%{release}
 Obsoletes: ibacm-devel-doca < %{version}-%{release}
 Requires: infiniband-diags-doca%{?_isa} = %{version}-%{release}
+Provides: infiniband-diags-devel = %{version}-%{release}
+Provides: infiniband-diags-devel%{?_isa} = %{version}-%{release}
+Obsoletes: infiniband-diags-devel < %{version}-%{release}
 Provides: infiniband-diags-devel-doca = %{version}-%{release}
 Obsoletes: infiniband-diags-devel-doca < %{version}-%{release}
+Provides: libibmad-devel = %{version}-%{release}
+Provides: libibmad-devel%{?_isa} = %{version}-%{release}
+Obsoletes: libibmad-devel < %{version}-%{release}
 Provides: libibmad-devel-doca = %{version}-%{release}
 Obsoletes: libibmad-devel-doca < %{version}-%{release}
 %if %{with_static}
@@ -229,10 +249,15 @@ RDMA core development libraries and headers.
 %package -n infiniband-diags-doca
 Summary: InfiniBand Diagnostic Tools
 Provides: infiniband-diags = %{version}-%{release}
+Provides: infiniband-diags%{?_isa} = %{version}-%{release}
 Obsoletes: infiniband-diags < %{version}-%{release}
 Conflicts: infiniband-diags
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibumad-doca%{?_isa} = %{version}-%{release}
+Provides: perl(IBswcountlimits)
+Provides: libibmad = %{version}-%{release}
+Provides: libibmad%{?_isa} = %{version}-%{release}
+Obsoletes: libibmad < %{version}-%{release}
 Provides: libibmad-doca = %{version}-%{release}
 Obsoletes: libibmad-doca < %{version}-%{release}
 Provides: libibmad5-doca = %{version}-%{release}
@@ -250,6 +275,7 @@ programs. These include MAD, SA, SMP, and other basic IB functions.
 %package -n infiniband-diags-compat-doca
 Summary: OpenFabrics Alliance InfiniBand Diagnostic Tools
 Provides: infiniband-diags-compat = %{version}-%{release}
+Provides: infiniband-diags-compat%{?_isa} = %{version}-%{release}
 Obsoletes: infiniband-diags-compat < %{version}-%{release}
 Conflicts: infiniband-diags-compat
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -263,25 +289,38 @@ compatibility reasons.
 Summary: A library and drivers for direct userspace use of RDMA (InfiniBand/iWARP/RoCE) hardware
 Group: System Environment/Libraries
 Provides: libibverbs = %{version}-%{release}
+Provides: libibverbs%{?_isa} = %{version}-%{release}
 Obsoletes: libibverbs < %{version}-%{release}
 Conflicts: libibverbs
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Provides: libcxgb4 = %{version}-%{release}
+Provides: libcxgb4%{?_isa} = %{version}-%{release}
+Obsoletes: libcxgb4 < %{version}-%{release}
 Provides: libcxgb4-doca = %{version}-%{release}
 Obsoletes: libcxgb4-doca < %{version}-%{release}
+Provides: libefa = %{version}-%{release}
+Provides: libefa%{?_isa} = %{version}-%{release}
+Obsoletes: libefa < %{version}-%{release}
 Provides: libefa-doca = %{version}-%{release}
 Obsoletes: libefa-doca < %{version}-%{release}
 Provides: libefa1-doca = %{version}-%{release}
 Obsoletes: libefa1-doca < %{version}-%{release}
 Provides: liberdma-doca = %{version}-%{release}
 Obsoletes: liberdma-doca < %{version}-%{release}
+Provides: libhfi1 = %{version}-%{release}
+Provides: libhfi1%{?_isa} = %{version}-%{release}
+Obsoletes: libhfi1 < %{version}-%{release}
 Provides: libhfi1-doca = %{version}-%{release}
 Obsoletes: libhfi1-doca < %{version}-%{release}
 Provides: libhns-doca = %{version}-%{release}
 Obsoletes: libhns-doca < %{version}-%{release}
 Provides: libionic-doca = %{version}-%{release}
 Obsoletes: libionic-doca < %{version}-%{release}
+Provides: libipathverbs = %{version}-%{release}
+Provides: libipathverbs%{?_isa} = %{version}-%{release}
+Obsoletes: libipathverbs < %{version}-%{release}
 Provides: libipathverbs-doca = %{version}-%{release}
 Obsoletes: libipathverbs-doca < %{version}-%{release}
 Provides: libirdma-doca = %{version}-%{release}
@@ -290,6 +329,9 @@ Provides: libmana-doca = %{version}-%{release}
 Obsoletes: libmana-doca < %{version}-%{release}
 Provides: libmana1-doca = %{version}-%{release}
 Obsoletes: libmana1-doca < %{version}-%{release}
+Provides: libmlx4 = %{version}-%{release}
+Provides: libmlx4%{?_isa} = %{version}-%{release}
+Obsoletes: libmlx4 < %{version}-%{release}
 Provides: libmlx4-doca = %{version}-%{release}
 Obsoletes: libmlx4-doca < %{version}-%{release}
 Provides: libmlx4-1-doca = %{version}-%{release}
@@ -297,13 +339,25 @@ Obsoletes: libmlx4-1-doca < %{version}-%{release}
 Provides: libmlx5-1-doca = %{version}-%{release}
 Obsoletes: libmlx5-1-doca < %{version}-%{release}
 %ifnarch s390x s390
+Provides: libmlx5 = %{version}-%{release}
+Provides: libmlx5%{?_isa} = %{version}-%{release}
+Obsoletes: libmlx5 < %{version}-%{release}
 Provides: libmlx5-doca = %{version}-%{release}
 Obsoletes: libmlx5-doca < %{version}-%{release}
 %endif
+Provides: libmthca = %{version}-%{release}
+Provides: libmthca%{?_isa} = %{version}-%{release}
+Obsoletes: libmthca < %{version}-%{release}
 Provides: libmthca-doca = %{version}-%{release}
 Obsoletes: libmthca-doca < %{version}-%{release}
+Provides: libocrdma = %{version}-%{release}
+Provides: libocrdma%{?_isa} = %{version}-%{release}
+Obsoletes: libocrdma < %{version}-%{release}
 Provides: libocrdma-doca = %{version}-%{release}
 Obsoletes: libocrdma-doca < %{version}-%{release}
+Provides: librxe = %{version}-%{release}
+Provides: librxe%{?_isa} = %{version}-%{release}
+Obsoletes: librxe < %{version}-%{release}
 Provides: librxe-doca = %{version}-%{release}
 Obsoletes: librxe-doca < %{version}-%{release}
 Provides: libibverbs1-doca = %{version}-%{release}
@@ -326,6 +380,7 @@ Device-specific plug-in ibverbs userspace drivers are included:
 %package -n libibverbs-utils-doca
 Summary: Examples for the libibverbs library
 Provides: libibverbs-utils = %{version}-%{release}
+Provides: libibverbs-utils%{?_isa} = %{version}-%{release}
 Obsoletes: libibverbs-utils < %{version}-%{release}
 Conflicts: libibverbs-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -339,6 +394,7 @@ displays information about RDMA devices.
 Summary: InfiniBand Communication Manager Assistant
 Group: System Environment/Libraries
 Provides: ibacm = %{version}-%{release}
+Provides: ibacm%{?_isa} = %{version}-%{release}
 Obsoletes: ibacm < %{version}-%{release}
 Conflicts: ibacm
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -362,6 +418,7 @@ library knows how to talk directly to the ibacm daemon to retrieve data.
 %package -n libibumad-doca
 Summary: OpenFabrics Alliance InfiniBand umad (userspace management datagram) library
 Provides: libibumad = %{version}-%{release}
+Provides: libibumad%{?_isa} = %{version}-%{release}
 Obsoletes: libibumad < %{version}-%{release}
 Conflicts: libibumad
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -377,6 +434,7 @@ are used by the IB diagnostic and management tools, including OpenSM.
 Summary: Userspace RDMA Connection Manager
 Group: System Environment/Libraries
 Provides: librdmacm = %{version}-%{release}
+Provides: librdmacm%{?_isa} = %{version}-%{release}
 Obsoletes: librdmacm < %{version}-%{release}
 Conflicts: librdmacm
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -393,6 +451,7 @@ librdmacm provides a userspace RDMA Communication Management API.
 Summary: Examples for the librdmacm library
 Group: System Environment/Libraries
 Provides: librdmacm-utils = %{version}-%{release}
+Provides: librdmacm-utils%{?_isa} = %{version}-%{release}
 Obsoletes: librdmacm-utils < %{version}-%{release}
 Conflicts: librdmacm-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -406,9 +465,13 @@ Example test programs for the librdmacm library.
 Summary: Tools for using the InfiniBand SRP protocol devices
 Group: System Environment/Libraries
 Provides: srp_daemon = %{version}-%{release}
+Provides: srp_daemon%{?_isa} = %{version}-%{release}
 Obsoletes: srp_daemon < %{version}-%{release}
 Conflicts: srp_daemon
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Obsoletes: srptools <= 1.0.3
+Provides: srptools = %{version}-%{release}
+Provides: srptools%{?_isa} = %{version}-%{release}
 Obsoletes: srptools-doca < %{version}-%{release}
 Provides: srptools-doca = %{version}-%{release}
 Obsoletes: openib-srptools-doca <= 0.0.6
@@ -426,6 +489,7 @@ discover and use SCSI devices via the SCSI RDMA Protocol over InfiniBand.
 %package -n python3-pyverbs-doca
 Summary: Python3 API over IB verbs
 Provides: python3-pyverbs = %{version}-%{release}
+Provides: python3-pyverbs%{?_isa} = %{version}-%{release}
 Obsoletes: python3-pyverbs < %{version}-%{release}
 Conflicts: python3-pyverbs
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -858,7 +922,7 @@ fi
 
 %changelog
 * Sat Aug 08 2026 Azure Linux Team - 2601.0.7-4
-- Replace standard RDMA packages with DOCA alternatives when requested
+- Replace standard RDMA packages and capabilities with DOCA alternatives
 
 * Mon May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
