@@ -31,7 +31,7 @@
 
 Name: rdma-core-doca
 Version: 2601.0.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: RDMA core userspace libraries and daemons
 Group: System Environment/Libraries
 
@@ -126,6 +126,7 @@ BuildRequires: perl-generators
 %endif
 
 Requires: pciutils
+Obsoletes: rdma-core < %{version}-%{release}
 Conflicts: rdma-core
 # Red Hat/Fedora previously shipped redhat/ as a stand-alone
 # package called 'rdma', which we're supplanting here.
@@ -164,6 +165,9 @@ scripts, dracut rules, and the rdma-ndd utility.
 %package devel
 Summary: RDMA core development libraries and headers
 Group: System Environment/Libraries
+Provides: rdma-core-devel = %{version}-%{release}
+Obsoletes: rdma-core-devel < %{version}-%{release}
+Conflicts: rdma-core-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 Provides: libibverbs-devel-doca = %{version}-%{release}
@@ -224,6 +228,9 @@ RDMA core development libraries and headers.
 
 %package -n infiniband-diags-doca
 Summary: InfiniBand Diagnostic Tools
+Provides: infiniband-diags = %{version}-%{release}
+Obsoletes: infiniband-diags < %{version}-%{release}
+Conflicts: infiniband-diags
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibumad-doca%{?_isa} = %{version}-%{release}
 Provides: libibmad-doca = %{version}-%{release}
@@ -242,6 +249,9 @@ programs. These include MAD, SA, SMP, and other basic IB functions.
 
 %package -n infiniband-diags-compat-doca
 Summary: OpenFabrics Alliance InfiniBand Diagnostic Tools
+Provides: infiniband-diags-compat = %{version}-%{release}
+Obsoletes: infiniband-diags-compat < %{version}-%{release}
+Conflicts: infiniband-diags-compat
 Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description -n infiniband-diags-compat-doca
@@ -252,6 +262,9 @@ compatibility reasons.
 %package -n libibverbs-doca
 Summary: A library and drivers for direct userspace use of RDMA (InfiniBand/iWARP/RoCE) hardware
 Group: System Environment/Libraries
+Provides: libibverbs = %{version}-%{release}
+Obsoletes: libibverbs < %{version}-%{release}
+Conflicts: libibverbs
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -312,6 +325,9 @@ Device-specific plug-in ibverbs userspace drivers are included:
 
 %package -n libibverbs-utils-doca
 Summary: Examples for the libibverbs library
+Provides: libibverbs-utils = %{version}-%{release}
+Obsoletes: libibverbs-utils < %{version}-%{release}
+Conflicts: libibverbs-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 
@@ -322,6 +338,9 @@ displays information about RDMA devices.
 %package -n ibacm-doca
 Summary: InfiniBand Communication Manager Assistant
 Group: System Environment/Libraries
+Provides: ibacm = %{version}-%{release}
+Obsoletes: ibacm < %{version}-%{release}
+Conflicts: ibacm
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %if "%{WITH_SYSTEMD}" == "1"
 %{systemd_requires}
@@ -342,6 +361,9 @@ library knows how to talk directly to the ibacm daemon to retrieve data.
 
 %package -n libibumad-doca
 Summary: OpenFabrics Alliance InfiniBand umad (userspace management datagram) library
+Provides: libibumad = %{version}-%{release}
+Obsoletes: libibumad < %{version}-%{release}
+Conflicts: libibumad
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Provides: libibumad3-doca = %{version}-%{release}
 Obsoletes: libibumad3-doca < %{version}-%{release}
@@ -354,6 +376,9 @@ are used by the IB diagnostic and management tools, including OpenSM.
 %package -n librdmacm-doca
 Summary: Userspace RDMA Connection Manager
 Group: System Environment/Libraries
+Provides: librdmacm = %{version}-%{release}
+Obsoletes: librdmacm < %{version}-%{release}
+Conflicts: librdmacm
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
 Provides: librdmacm1-doca = %{version}-%{release}
@@ -367,6 +392,9 @@ librdmacm provides a userspace RDMA Communication Management API.
 %package -n librdmacm-utils-doca
 Summary: Examples for the librdmacm library
 Group: System Environment/Libraries
+Provides: librdmacm-utils = %{version}-%{release}
+Obsoletes: librdmacm-utils < %{version}-%{release}
+Conflicts: librdmacm-utils
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: librdmacm-doca%{?_isa} = %{version}-%{release}
 Requires: libibverbs-doca%{?_isa} = %{version}-%{release}
@@ -377,6 +405,9 @@ Example test programs for the librdmacm library.
 %package -n srp_daemon-doca
 Summary: Tools for using the InfiniBand SRP protocol devices
 Group: System Environment/Libraries
+Provides: srp_daemon = %{version}-%{release}
+Obsoletes: srp_daemon < %{version}-%{release}
+Conflicts: srp_daemon
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Obsoletes: srptools-doca < %{version}-%{release}
 Provides: srptools-doca = %{version}-%{release}
@@ -394,6 +425,9 @@ discover and use SCSI devices via the SCSI RDMA Protocol over InfiniBand.
 %if %{with_pyverbs}
 %package -n python3-pyverbs-doca
 Summary: Python3 API over IB verbs
+Provides: python3-pyverbs = %{version}-%{release}
+Obsoletes: python3-pyverbs < %{version}-%{release}
+Conflicts: python3-pyverbs
 Requires: %{name}%{?_isa} = %{version}-%{release}
 %{?python_provide:%python_provide python%{python3_pkgversion}-pyverbs-doca}
 
@@ -823,6 +857,9 @@ fi
 %endif
 
 %changelog
+* Sat Aug 08 2026 Azure Linux Team - 2601.0.7-4
+- Replace standard RDMA packages with DOCA alternatives when requested
+
 * Mon May 12 2026 Azure Linux Team - 2601.0.7-1
 - Upgrade to DOCA 3.3.0 (OFED 26.01-1.0.0.0)
 
