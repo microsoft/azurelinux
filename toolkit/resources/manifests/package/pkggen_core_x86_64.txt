@@ -1,5 +1,5 @@
 filesystem-1.1-21.azl3.x86_64.rpm
-kernel-headers-6.6.145.2-1.azl3.noarch.rpm
+kernel-headers-6.6.150.1-1.azl3.noarch.rpm
 glibc-2.38-20.azl3.x86_64.rpm
 glibc-devel-2.38-20.azl3.x86_64.rpm
 glibc-i18n-2.38-20.azl3.x86_64.rpm
@@ -199,9 +199,9 @@ krb5-1.21.3-5.azl3.x86_64.rpm
 krb5-devel-1.21.3-5.azl3.x86_64.rpm
 nghttp2-1.61.0-3.azl3.x86_64.rpm
 nghttp2-devel-1.61.0-3.azl3.x86_64.rpm
-curl-8.11.1-10.azl3.x86_64.rpm
-curl-devel-8.11.1-10.azl3.x86_64.rpm
-curl-libs-8.11.1-10.azl3.x86_64.rpm
+curl-8.11.1-11.azl3.x86_64.rpm
+curl-devel-8.11.1-11.azl3.x86_64.rpm
+curl-libs-8.11.1-11.azl3.x86_64.rpm
 createrepo_c-1.0.3-1.azl3.x86_64.rpm
 libxml2-2.11.5-10.azl3.x86_64.rpm
 libxml2-devel-2.11.5-10.azl3.x86_64.rpm
@@ -244,9 +244,9 @@ ca-certificates-base-3.0.0-15.azl3.noarch.rpm
 ca-certificates-3.0.0-15.azl3.noarch.rpm
 dwz-0.14-2.azl3.x86_64.rpm
 unzip-6.0-22.azl3.x86_64.rpm
-python3-3.12.9-13.azl3.x86_64.rpm
-python3-devel-3.12.9-13.azl3.x86_64.rpm
-python3-libs-3.12.9-13.azl3.x86_64.rpm
+python3-3.12.9-14.azl3.x86_64.rpm
+python3-devel-3.12.9-14.azl3.x86_64.rpm
+python3-libs-3.12.9-14.azl3.x86_64.rpm
 python3-setuptools-69.0.3-6.azl3.noarch.rpm
 python3-pygments-2.7.4-2.azl3.noarch.rpm
 which-2.21-8.azl3.x86_64.rpm

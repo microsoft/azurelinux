@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [main, dev, 1.0*, 2.0*, 3.0*, fasttrack/*]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Check Manifests

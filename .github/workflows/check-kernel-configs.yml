@@ -15,6 +15,9 @@ on:
     paths:
       - 'SPECS/kernel*/config*'
 
+permissions:
+  contents: read
+
 jobs:
   check:
     name: Kernel configs check

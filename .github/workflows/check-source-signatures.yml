@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [3.0*]
 
+permissions:
+  contents: read
+
 jobs:
   spec-check:
     name: Source Signature Check
