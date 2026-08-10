@@ -1,0 +1,29 @@
+From 34bfd99697b006987fef14590d755d54ca338893 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 9 Feb 2021 10:41:46 +0100
+Subject: [PATCH] Remove a debugging output from
+ BibTeX::Parser::Entry::to_string()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ lib/BibTeX/Parser/Entry.pm | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/lib/BibTeX/Parser/Entry.pm b/lib/BibTeX/Parser/Entry.pm
+index 7297089..f748101 100644
+--- a/lib/BibTeX/Parser/Entry.pm
++++ b/lib/BibTeX/Parser/Entry.pm
+@@ -248,7 +248,6 @@ sub to_string {
+ 	    $type = ucfirst lc $type;
+ 	}
+     }
+-    print STDERR $self->key, "\n";
+     $result .= '@'.$type."{".$self->key.",\n";    
+     foreach my $field (@fields) {
+ 	my $value = $self->field($field);
+-- 
+2.26.2
+

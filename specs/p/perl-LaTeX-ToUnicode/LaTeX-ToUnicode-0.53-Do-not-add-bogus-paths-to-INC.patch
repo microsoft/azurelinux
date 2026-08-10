@@ -1,0 +1,52 @@
+From be2102b3834ffa3a4aa49f9a9bf825aafad571df Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Mon, 21 Aug 2023 17:11:01 +0200
+Subject: [PATCH] Do not add bogus paths to INC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We install LaTeX::Unicode into a standard Perl path, and thus don't
+need exploring Texlive root (otherwise a useless dependency on
+kpsewhich), and /*/lib.
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ script/ltx2unitxt | 19 -------------------
+ 1 file changed, 19 deletions(-)
+
+diff --git a/script/ltx2unitxt b/script/ltx2unitxt
+index 661ea40..5afc0d2 100755
+--- a/script/ltx2unitxt
++++ b/script/ltx2unitxt
+@@ -9,27 +9,8 @@
+ use strict;
+ use warnings;
+ 
+-use Cwd;
+-use File::Basename;
+ use File::Spec;
+ 
+-BEGIN {
+-    # find files relative to our installed location within TeX Live
+-    chomp(my $TLMaster = `kpsewhich -var-value=SELFAUTOPARENT`); # TL root
+-    if (length($TLMaster)) {
+-        unshift @INC, "$TLMaster/texmf-dist/scripts/bibtexperllibs";
+-    }
+-    # find development bibtexperllibs in sibling checkout to this script,
+-    # even if $0 is a symlink. Irrelevant when using from an installation.
+-    my $real0 = Cwd::abs_path($0);
+-    my $scriptdir = File::Basename::dirname($real0);
+-    my $dev_btxperllibs = Cwd::abs_path("$scriptdir/../..");
+-
+-    # we need the lib/ subdirectories inside ...
+-    unshift (@INC, glob ("$dev_btxperllibs/*/lib")) if -d $dev_btxperllibs;
+-
+-}
+-
+ use LaTeX::ToUnicode;
+ 
+ our %opts;
+-- 
+2.41.0
+
