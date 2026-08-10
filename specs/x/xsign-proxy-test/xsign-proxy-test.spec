@@ -45,7 +45,7 @@ fi
 # Test 4: Ping the daemon to verify connectivity
 echo "Pinging xsign-proxy-d daemon..."
 if /usr/local/bin/xsign_proxy_client.py ping; then
-#     echo "PASS: Daemon responded to ping"
+    echo "PASS: Daemon responded to ping"
 else
     echo "FAIL: Daemon did not respond to ping"
 fi
