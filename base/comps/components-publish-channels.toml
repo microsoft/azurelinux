@@ -1298,6 +1298,7 @@ components = [
     "paktype-naskh-basic-fonts",
     "pam",
     "pam_wrapper",
+    "pamtester",
     "pango",
     "pangomm",
     "pangomm2.48",

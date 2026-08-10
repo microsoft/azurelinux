@@ -1,0 +1,19 @@
+This fixes a C99 compatibility issue: the exit function is called without
+declaring it first.  Such implicit function declarations have been removed
+from the C language in 1999.
+
+diff --git a/configure b/configure
+index 781f9239b944eb3b..5c5d3132785ee057 100755
+--- a/configure
++++ b/configure
+@@ -3960,8 +3960,8 @@ main ()
+   for (i = 0; i < 256; i++)
+     if (XOR (islower (i), ISLOWER (i))
+ 	|| toupper (i) != TOUPPER (i))
+-      exit(2);
+-  exit (0);
++      return 2;
++  return 0;
+ }
+ _ACEOF
+ rm -f conftest$ac_exeext
