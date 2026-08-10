@@ -8,7 +8,7 @@ URL:            https://example.com/xsign-proxy-test
 
 Source0:        README
 
-BuildArch:      amd64
+BuildArch:      x86_64
 BuildRequires:  python3
 
 %description
