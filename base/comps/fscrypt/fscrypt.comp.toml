@@ -1,0 +1,21 @@
+[components.fscrypt]
+
+# The Fedora spec builds pam_fscrypt with a plain %gobuild, which uses
+# -buildmode=pie. A Go PIE binary is an ELF executable with the DF_1_PIE flag
+# set, and glibc (>= 2.30) refuses to dlopen() such objects:
+#   "cannot dynamically load position-independent executable".
+# PAM loads modules via dlopen, so pam_fscrypt.so is unusable when built this
+# way. Upstream's Makefile builds this target with -buildmode=c-shared; append
+# the same flag here so it wins over %gobuild's default -buildmode=pie and
+# produces a real, loadable shared library. Only the pam_fscrypt target needs
+# this; the CLI binaries stay PIE.
+[[components.fscrypt.overlays]]
+description = "Build pam_fscrypt as a c-shared library so PAM can dlopen it"
+type = "spec-search-replace"
+section = "%build"
+regex = '^  %gobuild -o %\{gobuilddir\}/lib/\$\(basename \$cmd\)\.so %\{goipath\}/\$cmd$'
+replacement = '  %gobuild -buildmode=c-shared -o %{gobuilddir}/lib/$(basename $cmd).so %{goipath}/$cmd'
+
+[components.fscrypt.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"

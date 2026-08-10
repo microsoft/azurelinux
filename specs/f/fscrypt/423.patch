@@ -1,0 +1,41 @@
+From 239ee0cde60ff62008a70609296629ba32865a28 Mon Sep 17 00:00:00 2001
+From: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+Date: Fri, 14 Feb 2025 21:16:14 +0100
+Subject: [PATCH] fix: use constant format string in errors.Wrapf
+
+Go 1.24 introduced stricter requirements for format strings in
+errors.Wrapf, requiring the first argument to be a constant string. This
+change updates Wrapf calls to use a constant format string (`"path:
+%s"`) instead of passing the `path` variable directly.
+
+Refs: https://go.dev/doc/go1.24#vet
+
+Resolves https://github.com/google/fscrypt/issues/422
+
+Signed-off-by: Mikel Olasagasti Uranga <mikel@olasagasti.info>
+---
+ cmd/fscrypt/commands.go | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmd/fscrypt/commands.go b/cmd/fscrypt/commands.go
+index 30aa3a7a..b151a06c 100644
+--- a/cmd/fscrypt/commands.go
++++ b/cmd/fscrypt/commands.go
+@@ -414,7 +414,7 @@ func unlockAction(c *cli.Context) error {
+ 	if policy.IsProvisionedByTargetUser() {
+ 		log.Printf("policy %s is already provisioned by %v",
+ 			policy.Descriptor(), ctx.TargetUser.Username)
+-		return newExitError(c, errors.Wrapf(ErrDirAlreadyUnlocked, path))
++		return newExitError(c, errors.Wrapf(ErrDirAlreadyUnlocked, "path: %s", path))
+ 	}
+ 
+ 	if err := policy.Unlock(optionFn, existingKeyFn); err != nil {
+@@ -521,7 +521,7 @@ func lockAction(c *cli.Context) error {
+ 		// locking the directory by dropping caches again.
+ 		if !policy.NeedsUserKeyring() || !isDirUnlockedHeuristic(path) {
+ 			log.Printf("policy %s is already fully deprovisioned", policy.Descriptor())
+-			return newExitError(c, errors.Wrapf(ErrDirAlreadyLocked, path))
++			return newExitError(c, errors.Wrapf(ErrDirAlreadyLocked, "path: %s", path))
+ 		}
+ 	}
+ 
