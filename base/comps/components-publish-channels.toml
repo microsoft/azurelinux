@@ -333,6 +333,7 @@ components = [
     "freexl",
     "fribidi",
     "frr",
+    "fscrypt",
     "fstrm",
     "fsverity-utils",
     "ftp",
@@ -3008,6 +3009,8 @@ packages = [
     "ghc-ShellCheck-devel", # srpm: ShellCheck
     "ghc-ShellCheck-doc", # srpm: ShellCheck
     "ghc-ShellCheck-prof", # srpm: ShellCheck
+    # fscrypt %gopkg source -devel sub-package (noarch Go module sources, no compiled binary); fscrypt CLI + pam_fscrypt module stay in base. Kept in sdk for downstream Go builds.
+    "golang-github-google-fscrypt-devel", # srpm: fscrypt
 ]
 
 # This group includes packages intentionally included in the `microsoft` repo.
