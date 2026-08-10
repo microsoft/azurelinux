@@ -17,7 +17,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.7.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp and pam_loginuid modules are GPLv2+.
@@ -75,6 +75,7 @@ BuildRequires: pkgconfig
 BuildRequires: sed
 BuildRequires: systemd
 
+Patch4: 0001-configure-cis-pam-policy.patch
 %description
 PAM (Pluggable Authentication Modules) is a system security tool that
 allows system administrators to set authentication policy without
@@ -136,6 +137,8 @@ cp %{SOURCE18} .
 %patch -P 1 -p1 -b .redhat-modules
 %patch -P 2 -p1 -b .nomsg
 %patch -P 3 -p1 -b .pam-unix-remove-obsolete-defines
+%patch -P 4 -p1
+
 
 %build
 %meson \

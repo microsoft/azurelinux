@@ -1,0 +1,18 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Configure CIS account lockout and password history defaults"
+type = "patch-add"
+source = "../0001-configure-cis-pam-policy.patch"
+
+[[overlays]]
+description = "Apply the CIS policy patch in PAM's manually enumerated prep sequence"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%patch -P 3 -p1 -b \.pam-unix-remove-obsolete-defines$'
+replacement = '''
+%patch -P 3 -p1 -b .pam-unix-remove-obsolete-defines
+%patch -P 4 -p1
+'''

@@ -4,7 +4,7 @@
 Summary: A library for password generation and password quality checking
 Name: libpwquality
 Version: 1.4.5
-Release: 15%{?dist}
+Release: 16%{?dist}
 URL: https://github.com/libpwquality/libpwquality/
 Source0: https://github.com/libpwquality/libpwquality/releases/download/libpwquality-%{version}/libpwquality-%{version}.tar.bz2
 
@@ -33,6 +33,7 @@ BuildRequires: pam-devel
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 
+Patch2: 0001-configure-cis-password-quality.patch
 %description
 This is a library for password quality checks and generation
 of random passwords that pass the checks.
