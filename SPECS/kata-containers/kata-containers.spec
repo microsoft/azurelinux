@@ -46,6 +46,9 @@ This package contains the scripts and files required to build the UVM
 
 %prep
 %autosetup -p1 -n %{name}-%{version} -a 1
+rm -rf vendor/quinn-proto/src/connection/assembler.rs
+rm -rf vendor/quinn-proto/src/connection/mod.rs
+rm -rf vendor/quinn-proto/src/connection/streams/recv.rs
 
 %build
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
