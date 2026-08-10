@@ -10191,8 +10191,8 @@
         "type": "other",
         "other": {
           "name": "libkcapi",
-          "version": "1.5.0",
-          "downloadUrl": "https://www.chronox.de/libkcapi/releases/1.5.0/libkcapi-1.5.0.tar.xz"
+          "version": "1.5.1",
+          "downloadUrl": "https://www.chronox.de/libkcapi/releases/1.5.1/libkcapi-1.5.1.tar.xz"
         }
       }
     },
