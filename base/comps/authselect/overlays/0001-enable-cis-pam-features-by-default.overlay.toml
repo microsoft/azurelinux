@@ -1,0 +1,12 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Enable CIS PAM features in the Azure Linux default authselect profile"
+type = "spec-search-replace"
+regex = '^%\{\?rhel:%global default_profile local\}$'
+replacement = '''
+%{?rhel:%global default_profile local}
+%{?azurelinux:%global default_profile local with-silent-lastlog with-faillock with-pwhistory without-nullok}
+'''

@@ -1,0 +1,50 @@
+From b6f7a7fa9fb31ef7c883782962a86673d9899fb6 Mon Sep 17 00:00:00 2001
+From: Lynsey Rydberg <lyrydber@microsoft.com>
+Date: Tue, 11 Aug 2026 19:42:04 +0000
+Subject: [PATCH] Configure CIS account lockout and password history defaults
+
+---
+ modules/pam_faillock/faillock.conf   | 4 ++--
+ modules/pam_pwhistory/pwhistory.conf | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/modules/pam_faillock/faillock.conf b/modules/pam_faillock/faillock.conf
+index 16d93df..e0ec686 100644
+--- a/modules/pam_faillock/faillock.conf
++++ b/modules/pam_faillock/faillock.conf
+@@ -29,7 +29,7 @@
+ # Deny access if the number of consecutive authentication failures
+ # for this user during the recent interval exceeds n tries.
+ # The default is 3.
+-# deny = 3
++deny = 5
+ #
+ # The length of the interval during which the consecutive
+ # authentication failures must happen for the user account
+@@ -42,7 +42,7 @@
+ # will not be re-enabled without resetting the faillock
+ # entries by the `faillock` command.
+ # The default is 600 (10 minutes).
+-# unlock_time = 600
++unlock_time = 900
+ #
+ # Root account can become locked as well as regular accounts.
+ # Enabled if option is present.
+diff --git a/modules/pam_pwhistory/pwhistory.conf b/modules/pam_pwhistory/pwhistory.conf
+index 51e783a..1e8bed5 100644
+--- a/modules/pam_pwhistory/pwhistory.conf
++++ b/modules/pam_pwhistory/pwhistory.conf
+@@ -6,11 +6,11 @@
+ #
+ # root account's passwords are also remembered.
+ # Enabled if option is present.
+-# enforce_for_root
++enforce_for_root
+ #
+ # Number of passwords to remember.
+ # The default is 10.
+-# remember = 10
++remember = 24
+ #
+ # Number of times to prompt for the password.
+ # The default is 1.
