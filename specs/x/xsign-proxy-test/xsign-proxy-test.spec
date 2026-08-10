@@ -8,7 +8,8 @@ URL:            https://example.com/xsign-proxy-test
 
 Source0:        README
 
-BuildArch:      noarch
+BuildArch:      amd64
+BuildRequires:  python3
 
 %description
 A dummy package that exercises the xsign-proxy-client during the build phase.
@@ -55,7 +56,7 @@ TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.txt"
 echo "This is a test file for xsign-proxy signing" > "$TEST_FILE"
 echo "Created test file: $TEST_FILE"
 
-# echo "Submitting test file for signing..."
+echo "Submitting test file for signing..."
 if /usr/local/bin/xsign_proxy_client.py sign "$TEST_FILE"; then
     echo "PASS: Sign request submitted successfully"
 else
