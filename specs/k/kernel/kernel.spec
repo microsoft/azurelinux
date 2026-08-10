@@ -1,8 +1,21 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
-%{load:%{_sourcedir}/kernel.azl.macros}
+# Azure Linux local kernel spec.
+#
+# This is a maintained local spec (migrated from the previous azldev TOML
+# overlay approach). Edit this file directly. Azure Linux customizations are
+# marked with "AZL:" comments throughout.
+
+# Azure Linux kernel build defines. These were previously injected via the
+# azldev-generated kernel.azl.macros file; they now live directly in the spec.
+# When rebuilding without a version change, bump azl_pkgrelease (manual release).
+%define azl_pkgrelease 14
+# 4th version component from the AZL kernel source (6.18.31.1). Flows into
+# Release:, uname -r, and the /lib/modules/ path.
+%define kextraversion 1
+# NVIDIA open GPU kernel module version (built as a kmod subpackage).
+%define nvidia_open_version 595.58.03
 
 # All Global changes to build and install go here.
 # Per the below section about __spec_install_pre, any rpm
@@ -694,6 +707,25 @@ Summary: The Linux kernel
 %define with_debug 0
 %endif
 
+# ============================================================================
+# AZL: Build only the base (up) kernel for x86_64 and aarch64.
+#
+# Azure Linux ships a single general-purpose kernel. All other variants
+# (debug, realtime/rt-64k, arm64-16k/64k, automotive, zfcpdump) are
+# disabled here. This gate runs after all upstream arch/variant resolution so
+# it wins; the disabled variant code is trimmed away incrementally. EFI UKI and
+# kernel selftests (kernel-selftests-internal) are intentionally left enabled.
+# ============================================================================
+%define with_debug 0
+%define with_debug_meta 0
+%define with_realtime 0
+%define with_realtime_arm64_64k 0
+%define with_arm64_16k 0
+%define with_arm64_64k 0
+%define with_automotive 0
+%define with_automotive_build 0
+%define with_zfcpdump 0
+
 # short-hand for "are we building base/non-debug variants of ...?"
 %if %{with_up} && %{with_base}
 %define with_up_base 1
@@ -1170,7 +1202,6 @@ Source3002: Patchlist.changelog
 Source4000: README.rst
 Source4001: rpminspect.yaml
 Source4002: gating.yaml
-Source9999: kernel.azl.macros
 Source5000: 6.18-x86_64-azl.config
 Source5001: 6.18-aarch64-azl.config
 Source5002: azurelinux-ca-20230216.pem
@@ -4578,6 +4609,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Fri Aug 07 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.14
+- feat(kernel): build base variants, keep UKI, and restore selftests
+
 * Thu Aug 06 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.13
 - feat(kernel): enable ACPI APEI GHES (Generic Hardware Error Source) on x86_64
 - fix(kernel-config): enable EDAC_GHES for GHES memory error handling

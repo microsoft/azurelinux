@@ -7,7 +7,7 @@ spec = { type = "local", path = "kernel.spec" }
 
 # The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist) which the
 # auto-calculator cannot parse. Release is managed manually: bump azl_pkgrelease
-# in kernel.azl.macros when rebuilding without a version change. The
+# in kernel.spec when rebuilding without a version change. The
 # %changelog is hand-curated inline in the spec.
 release = { calculation = "manual" }
 
