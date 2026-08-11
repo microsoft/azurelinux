@@ -214,6 +214,7 @@ components = [
     "cyrus-imapd",
     "cyrus-sasl",
     "Cython",
+    "dash",
     "dbus",
     "dbus-broker",
     "dbus-glib",
