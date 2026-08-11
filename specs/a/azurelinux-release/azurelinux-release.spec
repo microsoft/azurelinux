@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        22%{?dist}
+Release:        23%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -310,14 +310,11 @@ BUG_REPORT_URL="%{dist_bug_report_url}"
 EOF
 
 # Create the common /etc/issue
-echo "\S" > %{buildroot}%{_prefix}/lib/issue
-echo "Kernel \r on \m (\l)" >> %{buildroot}%{_prefix}/lib/issue
-echo >> %{buildroot}%{_prefix}/lib/issue
+echo "Authorized use only. All activity may be monitored and reported." > %{buildroot}%{_prefix}/lib/issue
 ln -s ../usr/lib/issue %{buildroot}%{_sysconfdir}/issue
 
 # Create /etc/issue.net
-echo "\S" > %{buildroot}%{_prefix}/lib/issue.net
-echo "Kernel \r on \m (\l)" >> %{buildroot}%{_prefix}/lib/issue.net
+echo "Authorized use only. All activity may be monitored and reported." > %{buildroot}%{_prefix}/lib/issue.net
 ln -s ../usr/lib/issue.net %{buildroot}%{_sysconfdir}/issue.net
 
 # Create /etc/issue.d
@@ -488,6 +485,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-23
+- Configure neutral local and remote login banners
+
 * Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-22
 - Persist CIS network sysctl defaults
 
