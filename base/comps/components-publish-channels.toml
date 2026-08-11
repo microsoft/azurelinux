@@ -2258,6 +2258,7 @@ components = [
     "rpm-mpi-hooks",
     "rpm-ostree",
     "rpmdevtools",
+    "rpmlint",
     "rrdtool",
     "rshim",
     "rsync",

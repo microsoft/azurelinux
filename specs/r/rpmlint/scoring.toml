@@ -1,0 +1,6 @@
+[Scoring]
+# This can set how bad each error is.
+# But we set BadnessThreshold to -1 so anything above 0
+# is actually fatal.
+# You can check configs/openSUSE/scoring.toml for more fine graded scoring.
+no-group-tag = 1
