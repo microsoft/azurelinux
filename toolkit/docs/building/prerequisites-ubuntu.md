@@ -7,9 +7,9 @@ This page outlines the requirements for building with the Azure Linux toolkit on
 
 ### Golang Package Requirements
 
-The Azure Linux toolkit on Ubuntu has been validated with the following:
+The Azure Linux toolkit requires Go 1.25 or newer. Ubuntu 26.04 provides the required package:
 
-- **Ubuntu 22.04**: Validated with `golang-1.24.13` (available as `golang-1.24-go` package)
+- **Ubuntu 26.04**: `golang-1.25-go` (currently Go 1.25.7)
 
 ## Installation Methods
 
@@ -23,8 +23,8 @@ The make targets automatically install the appropriate packages:
 sudo make -C toolkit install-prereqs
 
 # Manually create Go symlinks for proper PATH integration
-sudo ln -sf /usr/lib/go-1.24/bin/go /usr/bin/go
-sudo ln -sf /usr/lib/go-1.24/bin/gofmt /usr/bin/gofmt
+sudo ln -sf /usr/lib/go-1.25/bin/go /usr/bin/go
+sudo ln -sf /usr/lib/go-1.25/bin/gofmt /usr/bin/gofmt
 
 # Manually configure Docker if needed
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -43,6 +43,7 @@ sudo make -C toolkit install-prereqs-and-configure
 ```
 
 **Recommendation**:
+
 - Use `install-prereqs` on your local development machine
 - Use `install-prereqs-and-configure` in CI/CD pipelines or when you need a complete environment setup
 
@@ -55,8 +56,8 @@ If you prefer running the script directly, you have several options:
 sudo ./toolkit/docs/building/prerequisites-ubuntu.sh
 
 # Manually create Go symlinks for proper PATH integration
-sudo ln -sf /usr/lib/go-1.24/bin/go /usr/bin/go
-sudo ln -sf /usr/lib/go-1.24/bin/gofmt /usr/bin/gofmt
+sudo ln -sf /usr/lib/go-1.25/bin/go /usr/bin/go
+sudo ln -sf /usr/lib/go-1.25/bin/gofmt /usr/bin/gofmt
 
 # Manually configure Docker if needed
 curl -fsSL https://get.docker.com -o get-docker.sh
