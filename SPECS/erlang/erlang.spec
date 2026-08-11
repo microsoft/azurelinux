@@ -2,7 +2,7 @@
 Summary:        erlang
 Name:           erlang
 Version:        26.2.5.21
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -21,6 +21,10 @@ Patch8:         CVE-2026-55953.patch
 Patch9:         CVE-2026-58227.patch
 Patch10:        CVE-2026-59251.patch
 Patch11:        CVE-2026-54886.patch
+Patch12:        CVE-2026-53422.patch
+Patch13:        CVE-2026-54887.patch
+Patch14:        CVE-2026-55950.patch
+Patch15:        CVE-2026-59250.patch
 BuildRequires:  unzip
 
 %if 0%{?with_check}
@@ -62,6 +66,8 @@ export ERL_TOP=`pwd`
 %{_libdir}/erlang/*
 
 %changelog
+* Tue Aug 11 2026 Aditya Singh <v-aditysing@microsoft.com> - 26.2.5.21-5
+- Patch for CVE-2026-53422, CVE-2026-54887, CVE-2026-55950, CVE-2026-59250
 
 * Sat Aug 01 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 26.2.5.21-4
 - Patch for CVE-2026-54886
