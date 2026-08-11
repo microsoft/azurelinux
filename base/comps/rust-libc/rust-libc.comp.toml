@@ -1,0 +1,17 @@
+[components.rust-libc]
+# Pinned ahead of the distro's default snapshot: rust-nix 0.31.3 (planned in
+# a follow-up PR of the same uv 0.10.12 build-failure fix) requires
+# crate(libc/default) >= 0.2.186, < 0.3.0, which the snapshot's 0.2.181 does
+# not satisfy. Bumped to Fedora f43 HEAD as of 2026-08-11 (0.2.189).
+#
+# Reverse-dependency safety: the 5 in-tree consumers that hardcode a libc
+# requirement in their own spec (kata-containers, libblkio, nispor, nmstate
+# use open ">= 0.2.x, < 0.3.0" ranges; libkrun has a lower bound only,
+# ">= 0.2.39" with no upper bound) are all satisfied by 0.2.189.
+# The ~200 additional rust-crate consumers resolve their libc constraint
+# dynamically at build time (%cargo_generate_buildrequires) and aren't
+# visible via static grep; querying the already-built RPMs' resolved
+# `Requires: crate(libc...)` in the prod repo instead shows every one uses
+# Cargo's default open-ended range (>= 0.2.X, < 0.3.0~) with no upper bound
+# below 0.2.189 (full command/output recorded in the PR description).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a1f3270f4f2a755f2a63d9aad2c9a72fe4de5d6d" }
