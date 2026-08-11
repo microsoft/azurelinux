@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        24%{?dist}
+Release:        25%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -59,6 +59,10 @@ Source22:       70-azurelinux-hardening.conf
 Source23:       50-client-alive-interval.conf
 Source24:       50-permit-root-login.conf
 Source25:       10-azure-kvp.cfg
+Source26:       azurelinux-sudoers.conf
+Source27:       azurelinux-sudo.conf
+Source28:       azurelinux-sudo.logrotate
+Source29:       azurelinux-sugroup.conf
 
 BuildArch:      noarch
 
@@ -417,6 +421,12 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
+
+# Install CIS privileged-command policy and audit-log lifecycle files.
+install -Dm0440 %{SOURCE26} %{buildroot}%{_sysconfdir}/sudoers.d/10-azurelinux-cis
+install -Dm0644 %{SOURCE27} %{buildroot}%{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
+install -Dm0644 %{SOURCE28} %{buildroot}%{_sysconfdir}/logrotate.d/azurelinux-sudo
+install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sugroup.conf
 %files common
 %license licenses/LICENSE
 %{_prefix}/lib/azurelinux-release
@@ -443,6 +453,10 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 %{_sysconfdir}/swid/swidtags.d
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_sysctldir}/70-azurelinux-hardening.conf
+%attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers.d/10-azurelinux-cis
+%attr(0644,root,root) %{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/azurelinux-sudo
+%attr(0644,root,root) %{_prefix}/lib/sysusers.d/azurelinux-sugroup.conf
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/50-permit-root-login.conf
 
 
@@ -485,6 +499,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu Aug 13 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-25
+- Configure CIS privileged-command defaults
+
 * Thu Aug 13 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-24
 - Persist CIS kernel sysctl defaults (dmesg_restrict, yama.ptrace_scope, randomize_va_space)
 
