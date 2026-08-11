@@ -1,7 +1,7 @@
 Summary:        agent for collecting, processing, aggregating, and writing metrics.
 Name:           telegraf
 Version:        1.31.0
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,7 +9,7 @@ Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Use the generate_source_tarbbal.sh script to get the vendored sources.
-Source1:        %{name}-%{version}-vendor.tar.gz
+Source1:        %{name}-%{version}-v1-vendor.tar.gz
 
 Patch0:         CVE-2024-35255.patch
 Patch1:         CVE-2024-37298.patch
@@ -130,6 +130,9 @@ fi
 %dir %{_sysconfdir}/%{name}/telegraf.d
 
 %changelog
+* Mon Aug 03 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.31.0-26
+- Upgrade thrift module to 0.24.0
+
 * Tue Jul 28 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-25
 - Patch for CVE-2026-56852
 
