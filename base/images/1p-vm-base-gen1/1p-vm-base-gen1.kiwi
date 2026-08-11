@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-1p-vm-base-gen1">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux 4.0 1P VM Base Gen1 (BIOS) Image</specification>
+    </description>
+
+    <preferences arch="x86_64">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyS0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="true"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+
+    <!-- Build-time package source; koji overrides this for distro builds. -->
+    <repository type="rpm-md" alias="azurelinux-base">
+        <source path="https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch" />
+    </repository>
+
+    <packages type="image">
+        <!-- core-packages-image -->
+        <package name="ca-certificates" />
+        <package name="cronie-anacron" />
+        <package name="logrotate" />
+        <package name="shadow-utils" />
+        <package name="dracut" />
+
+        <!-- core-packages-base-image -->
+        <package name="azurelinux-rpm-config" />
+        <package name="bc" />
+        <package name="chrony" />
+        <package name="cpio" />
+        <package name="cracklib-dicts" />
+        <package name="cryptsetup" />
+        <package name="dbus" />
+        <package name="e2fsprogs" />
+        <package name="file" />
+        <package name="gdbm" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" /> <!-- provides en_US.UTF-8 locale -->
+        <package name="libtool" />
+        <package name="iproute" />
+        <package name="iptables" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="lvm2" />
+        <package name="lz4" />
+        <package name="net-tools" />
+        <package name="openssh-clients" />
+        <package name="pkg-config" />
+        <package name="procps-ng" />
+        <package name="setup" />
+        <package name="sudo" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-udev" />
+        <package name="tar" />
+        <package name="tzdata" />
+        <package name="util-linux" />
+        <package name="which" />
+
+        <!-- core-packages-container -->
+        <package name="bash" />
+        <package name="bzip2" />
+        <package name="curl" />
+        <package name="elfutils-libelf" />
+        <package name="expat" />
+        <package name="filesystem" />
+        <package name="findutils" />
+        <package name="grep" />
+        <package name="gzip" />
+        <package name="azurelinux-release-cloud" />
+        <package name="ncurses-libs" />
+        <package name="openssl" />
+        <package name="readline" />
+        <package name="rpm" />
+        <package name="rpm-libs" />
+        <package name="sed" />
+        <package name="sqlite-libs" />
+        <package name="SymCrypt" />
+        <package name="SymCrypt-OpenSSL" />
+        <package name="tdnf" />
+        <package name="xz" />
+        <package name="zlib" />
+
+        <!-- marketplace-tools -->
+        <package name="dnf5" />
+        <package name="wget" />
+
+        <!-- azurevm -->
+        <package name="cloud-init" />
+        <package name="cloud-utils-growpart" />
+        <package name="dhcpcd" />
+        <package name="grubby" />
+        <package name="hyperv-daemons" />
+        <package name="openssh-server" />
+        <package name="python3" />
+        <package name="rsyslog" />
+        <package name="WALinuxAgent" />
+        <package name="wireless-regdb" />
+
+        <!-- Hyper-V via kernel-modules + hyperv-daemons) -->
+        <package name="kernel-modules" />
+
+        <!-- boot: kernel + bootloader -->
+        <package name="kernel" />
+        <package name="grub2" />
+        <package name="grub2-pc" /> <!-- legacy BIOS (CSM) boot -->
+        <package name="grub2-pc-modules" />
+        <package name="grub2-efi-x64" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="shim" />
+        <package name="efibootmgr" />
+
+        <!-- runtime repos: points OS at PMC beta -->
+        <package name="azurelinux-repos" />
+
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="filesystem" />
+        <package name="azurelinux-release-identity-cloud" />
+        <package name="grub2-pc" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="grub2-efi-x64" />
+        <package name="shim" />
+    </packages>
+</image>
