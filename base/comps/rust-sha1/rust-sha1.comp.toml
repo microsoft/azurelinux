@@ -4,6 +4,6 @@
 # cascade (crate(sha1/default) >= 0.11.0). Existing dynamically-generated consumers
 # (rust-pbkdf2, rust-rsa, rust-uucore, rust-uuid, rust-reqsign-*,
 # rust-sequoia-openpgp) which require sha1 < 0.11.0 are served by the new
-# rust-sha1_0.10 compat package, pinned at the commit this default
-# previously resolved to.
+# rust-sha1_0.10 compat package, pinned to the Fedora compat repo's current
+# f43 HEAD (0.10.7).
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "fcbed45b586a52e8244e28cfad160b2c7094d64b" }
