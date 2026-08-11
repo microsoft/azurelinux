@@ -1,4 +1,8 @@
 [components.rust-nix]
+# Pin past the distro default snapshot (2026-02-24, nix 0.31.1) to Fedora f43
+# HEAD, which carries nix 0.31.3. uv 0.10.12 requires
+# crate(nix/default) >= 0.31.2, < 0.32.0, which 0.31.1 does not satisfy.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a5123770ff162c11cef0401690de0e3faa668a6e" }
 
 # Azure Linux kernels use 4-part versions (e.g. 6.6.121.1-1.azl3) which the
 # semver crate in test helpers cannot parse.  Patch the require_kernel_version!
@@ -23,3 +27,21 @@ type = "spec-search-replace"
 section = "%check"
 regex = "--skip 'src/sys/socket/mod.rs'"
 replacement = "--skip sys::test_inotify\n    --skip 'src/sys/socket/mod.rs'"
+
+# test_af_alg_aead fails with "bind failed: ENOENT" in containerized/mock
+# build environments. The gcm(aes) transform is present in the build
+# kernel's crypto API; ENOENT comes from the algif_aead AF_ALG type-handler
+# module not being loaded, and containers cannot autoload it (mock/CI hosts
+# restrict `modprobe` for AF_ALG type modules via modprobe.d install rules).
+# This is not the AF_ALG address family itself being unsupported (that
+# would fail earlier, at socket(), with EAFNOSUPPORT).
+# Same class of issue as the existing test_af_alg_cipher skip above
+# (host-environment-dependent, not a regression from the 0.31.1->0.31.3
+# bump -- test_af_alg_aead is unchanged since nix 0.31.1).
+[[components.rust-nix.overlays]]
+description = "Skip AF_ALG aead test that fails in containerized build environments (ENOENT on AF_ALG bind)"
+metadata = { category = "azl-disable-unsupported-tests", upstream-status = "inapplicable" }
+type = "spec-search-replace"
+section = "%check"
+regex = "--skip sys::test_socket::test_af_alg_cipher"
+replacement = "--skip sys::test_socket::test_af_alg_cipher\n    --skip sys::test_socket::test_af_alg_aead"
