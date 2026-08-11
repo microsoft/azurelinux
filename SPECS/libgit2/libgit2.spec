@@ -1,7 +1,7 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,8 +40,13 @@ developing applications that use %{name}.
 # Remove VCS files from examples
 find examples -name ".gitignore" -delete -print
 
-# Don't run "online" tests
-sed -i '/-sonline/s/^/#/' tests/CMakeLists.txt
+# Skip the two test groups that cannot run in the build environment: "online"
+# depends on external git hosts, "auth_clone" needs GITTEST_REMOTE_* credentials.
+# The other online-ish groups (gitdaemon, ssh, proxy, ...) run locally and pass.
+# Upstream moved these registrations from tests/ to tests/libgit2/, which had
+# silently disabled the previous sed, so fail loudly if they move again.
+sed -i -E '/^add_clar_test\(libgit2_tests (online|auth_clone) /s/^/#/' tests/libgit2/CMakeLists.txt
+test "$(grep -c '^#add_clar_test' tests/libgit2/CMakeLists.txt)" -eq 2
 
 # Remove bundled libraries (except libxdiff)
 pushd deps
@@ -79,6 +84,13 @@ popd
 %{_bindir}/git2
 
 %changelog
+* Tue Aug 11 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.2-2
+- Fix %%check: the sed disabling online tests targeted tests/CMakeLists.txt, but
+  upstream moved the clar registrations to tests/libgit2/CMakeLists.txt, so it
+  silently did nothing and the "online" and "auth_clone" tests failed. Disable
+  just those two (they need external hosts / GITTEST_REMOTE_* credentials) and
+  verify the substitution applied.
+
 * Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
 - Update to 1.7.2
 
