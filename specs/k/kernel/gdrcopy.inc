@@ -18,6 +18,8 @@ Version:        %{gdrcopy_version}
 Release:        %{gdrcopy_release}%{?dist}
 %global version %{_azl_kver}
 %global release %{_azl_krel}
+BuildRequires: cuda-cudart-devel-13-2
+BuildRequires: cuda-driver-devel-13-2
 
 %description -n gdrcopy
 GDRCopy provides low-overhead userspace mappings of NVIDIA GPU memory for
@@ -90,11 +92,17 @@ popd
 %ifarch x86_64 aarch64
 %{log_msg "Building GDRCopy %{gdrcopy_version} for NVIDIA %{nvidia_open_version} and kernel %{KVERREL}"}
 pushd %{_builddir}/gdrcopy-%{gdrcopy_version}
-# TODO: Build and package gdrcopy_sanity once Nvidia provides CUDA userspace
-# development packages for azl4.0 containing cuda.h and the link-time libcuda.so stub.
-# Upstream builds it via the "exes" target; nvcc is additionally required if
-# gdrcopy_pplat and the complete benchmark set are packaged.
 %{__make} %{?_smp_mflags} lib
+%ifarch x86_64
+GDRCOPY_CUDA_TARGET=x86_64-linux
+%else
+GDRCOPY_CUDA_TARGET=sbsa-linux
+%endif
+%{__make} %{?_smp_mflags} -C tests \
+    CUDA="/usr/local/cuda-13.2/targets/${GDRCOPY_CUDA_TARGET}" \
+    CUDA_LIB="-L /usr/local/cuda-13.2/targets/${GDRCOPY_CUDA_TARGET}/lib -L /usr/local/cuda-13.2/targets/${GDRCOPY_CUDA_TARGET}/lib/stubs -L /usr/lib64/nvidia -L /usr/lib/nvidia" \
+    GET_CUDA_VERSION="printf 13.2" \
+    gdrcopy_sanity
 pushd src/gdrdrv
 %{__make} %{?_smp_mflags} \
     KVER="%{KVERREL}" \
@@ -125,6 +133,8 @@ install -D -m 0644 src/gdrdrv/gdrdrv.ko \
     %{buildroot}/lib/modules/%{KVERREL}/extra/gdrcopy/gdrdrv.ko
 install -D -m 0644 LICENSE \
     %{buildroot}%{_datadir}/licenses/gdrcopy/LICENSE
+install -D -m 0755 tests/gdrcopy_sanity \
+    %{buildroot}%{_bindir}/gdrcopy_sanity
 install -D -m 0644 LICENSE \
     %{buildroot}%{_datadir}/licenses/kmod-gdrcopy-%{KVERREL}/LICENSE
 popd
@@ -146,6 +156,7 @@ popd
 
 %files -n gdrcopy
 %license %{_datadir}/licenses/gdrcopy/LICENSE
+%{_bindir}/gdrcopy_sanity
 %{_libdir}/libgdrapi.so.*
 
 %files -n gdrcopy-devel
