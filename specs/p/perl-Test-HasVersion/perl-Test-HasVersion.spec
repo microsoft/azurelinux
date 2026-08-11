@@ -3,7 +3,7 @@
 
 Name:           perl-Test-HasVersion
 Version:        0.014
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary:        Check Perl modules have version numbers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-HasVersion

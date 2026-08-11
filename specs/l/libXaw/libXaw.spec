@@ -6,7 +6,7 @@
 Summary: X Athena Widget Set
 Name: libXaw
 Version: 1.0.16
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: MIT-open-group AND X11 AND HPND AND HPND-sell-variant AND SMLNJ AND NTP
 URL: http://www.x.org
 

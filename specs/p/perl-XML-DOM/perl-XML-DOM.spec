@@ -3,7 +3,7 @@
 
 Name:           perl-XML-DOM
 Version:        1.46
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary:        DOM extension to XML::Parser
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

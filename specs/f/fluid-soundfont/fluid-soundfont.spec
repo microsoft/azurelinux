@@ -3,7 +3,7 @@
 
 Name:           fluid-soundfont
 Version:        3.1
-Release: 36%{?dist}
+Release: 37%{?dist}
 Summary:        Pro-quality GM/GS soundfont
 License:        MIT
 # The original URL (http://www.powermage.com/fluid) seems dead. Therefore we point

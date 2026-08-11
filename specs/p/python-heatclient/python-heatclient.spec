@@ -21,7 +21,7 @@ the OpenStack Heat API.
 
 Name:    python-heatclient
 Version: 4.0.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Python API and CLI for OpenStack Heat
 
 License: Apache-2.0

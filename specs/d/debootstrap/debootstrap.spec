@@ -10,7 +10,7 @@
 
 Name:           debootstrap
 Version:        1.0.140
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Debian GNU/Linux bootstrapper
 
 License:        MIT

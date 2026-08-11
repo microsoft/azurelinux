@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.4.0.1
 # can only be reset when subpkg bumped
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        Unicode normalization
 
 License:        BSD-3-Clause

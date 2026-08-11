@@ -6,7 +6,7 @@
 
 Name:           console-login-helper-messages
 Version:        0.21.3
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        Combines motd, issue, profile features to show system information to the user before/on login
 License:        BSD-3-Clause
 URL:            https://github.com/%{github_owner}/%{github_project}

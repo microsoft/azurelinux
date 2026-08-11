@@ -8,7 +8,7 @@
 
 Name:           perl-CryptX
 Version:        0.087
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Cryptographic toolkit
 # src/ltc/*:    Unlicense
 # src/ltm/*:    Unlicense

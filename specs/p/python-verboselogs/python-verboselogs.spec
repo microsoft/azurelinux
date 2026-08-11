@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.7
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary:        Verbose logging level for Python's logging module
 
 License:        MIT

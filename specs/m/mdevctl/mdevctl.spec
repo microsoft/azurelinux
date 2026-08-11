@@ -7,7 +7,7 @@
 
 Name:           mdevctl
 Version:        1.4.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        A mediated device management utility for Linux
 
 License:        LGPL-2.1-only

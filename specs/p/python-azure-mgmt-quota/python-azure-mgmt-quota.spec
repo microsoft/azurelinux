@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.0~b2
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:        Microsoft Azure Quota Management Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/

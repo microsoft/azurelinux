@@ -12,7 +12,7 @@ Version:       1.5.0
 
 Summary:       Block device I/O library
 Name:          libblkio
-Release: 6%{?dist}
+Release: 7%{?dist}
 URL:           %{forgeurl}
 Source0:       %{forgesource}
 # To create the vendor tarball:

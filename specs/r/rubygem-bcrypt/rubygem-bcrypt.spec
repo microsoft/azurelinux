@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.1.18
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Wrapper around bcrypt() password hashing algorithm
 # ext/mri/* - Public Domain
 # ext/jruby/* - ISC

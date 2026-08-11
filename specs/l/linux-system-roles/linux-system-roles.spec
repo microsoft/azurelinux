@@ -27,7 +27,7 @@ Name: linux-system-roles
 Url: https://github.com/linux-system-roles
 Summary: Set of interfaces for unified system management
 Version: 1.120.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 # Automatically converted from old format: GPLv3+ and MIT and BSD and Python - review is highly recommended.
 License: GPL-3.0-or-later AND LicenseRef-Callaway-MIT AND LicenseRef-Callaway-BSD AND LicenseRef-Callaway-Python

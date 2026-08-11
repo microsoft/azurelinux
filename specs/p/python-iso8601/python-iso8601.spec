@@ -12,7 +12,7 @@ This module parses the most common forms of ISO 8601 date strings \
 
 Name:           python-%{srcname}
 Version:        2.1.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Simple module to parse ISO 8601 dates
 
 License:        MIT

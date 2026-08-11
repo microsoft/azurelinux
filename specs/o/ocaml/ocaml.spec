@@ -49,7 +49,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml
 Version:        5.3.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 Summary:        OCaml compiler and programming environment
 

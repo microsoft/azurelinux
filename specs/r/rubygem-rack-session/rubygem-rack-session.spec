@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.1.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: A session implementation for Rack
 License: MIT
 URL: https://github.com/rack/rack-session

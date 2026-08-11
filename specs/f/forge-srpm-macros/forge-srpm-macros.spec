@@ -8,7 +8,7 @@
 
 Name:           forge-srpm-macros
 Version:        0.4.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Macros to simplify packaging of forge-hosted projects
 
 License:        GPL-1.0-or-later

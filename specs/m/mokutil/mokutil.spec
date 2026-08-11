@@ -3,7 +3,7 @@
 
 Name:           mokutil
 Version:        0.7.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Epoch:          2
 Summary:        Tool to manage UEFI Secure Boot MoK Keys
 License:        GPL-3.0-or-later

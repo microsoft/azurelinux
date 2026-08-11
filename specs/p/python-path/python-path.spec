@@ -5,7 +5,7 @@
 
 Name:           python-path
 Version:        17.1.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Python module wrapper for os.path
 
 License:        MIT

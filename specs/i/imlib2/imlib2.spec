@@ -4,7 +4,7 @@
 Summary:        Image loading, saving, rendering, and manipulation library
 Name:           imlib2
 Version:        1.12.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 License:        Imlib2
 URL:            http://docs.enlightenment.org/api/imlib2/html/
 Source0:        http://downloads.sourceforge.net/enlightenment/%{name}-%{version}.tar.xz

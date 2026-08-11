@@ -10,7 +10,7 @@
 
 Name: python-%{srcname}
 Version: %{srcversion}
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary: Utility for writing multi-host tests for pytest
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

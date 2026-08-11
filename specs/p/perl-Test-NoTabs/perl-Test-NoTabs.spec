@@ -3,7 +3,7 @@
 
 Name:		perl-Test-NoTabs
 Version:	2.02
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary:	Check the presence of tabs in your project
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-NoTabs

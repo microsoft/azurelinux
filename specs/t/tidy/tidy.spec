@@ -9,7 +9,7 @@
 Name:    tidy
 Summary: Utility to clean up and pretty print HTML/XHTML/XML
 Version: 5.8.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 License: W3C
 URL:     http://www.html-tidy.org/

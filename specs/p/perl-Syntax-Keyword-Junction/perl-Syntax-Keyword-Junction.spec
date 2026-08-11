@@ -6,7 +6,7 @@
 
 Name:           perl-Syntax-Keyword-Junction
 Version:        0.003009
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Perl6 style Junction operators in Perl5
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Syntax-Keyword-Junction

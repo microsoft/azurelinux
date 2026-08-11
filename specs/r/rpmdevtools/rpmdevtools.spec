@@ -3,7 +3,7 @@
 
 Name:           rpmdevtools
 Version:        9.6
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        RPM Development Tools
 
 # rpmdev-md5 and rpmdev-setuptree are GPL-2.0-only,

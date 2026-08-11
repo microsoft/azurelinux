@@ -5,7 +5,7 @@
 
 Name:           python-netaddr
 Version:        1.3.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        A pure Python network address representation and manipulation library
 
 License:        BSD-3-Clause

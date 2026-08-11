@@ -3,7 +3,7 @@
 
 Name:           perl-Module-Package
 Version:        0.30
-Release: 39%{?dist}
+Release: 40%{?dist}
 Summary:        Postmodern Perl Module Packaging
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Module-Package

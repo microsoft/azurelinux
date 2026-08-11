@@ -3,7 +3,7 @@
 
 Name:           perl-Test-MockRandom
 Version:        1.01
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary:        Replaces random number generation with non-random number generation
 License:        Apache-2.0
 URL:            https://metacpan.org/release/Test-MockRandom

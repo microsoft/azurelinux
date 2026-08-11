@@ -30,7 +30,7 @@
 
 Name:           rocthrust
 Version:        %{rocm_version}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        ROCm Thrust libary
 
 Url:            https://github.com/ROCm/%{upstreamname}

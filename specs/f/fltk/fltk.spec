@@ -16,7 +16,7 @@
 
 Name:		    fltk
 Version:	    1.3.11
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:	    C++ user interface toolkit
 
 # see COPYING (or http://www.fltk.org/COPYING.php ) for exceptions details

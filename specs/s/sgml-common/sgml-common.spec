@@ -5,7 +5,7 @@
 
 Name: sgml-common
 Version: 0.6.3
-Release: 68%{?dist}
+Release: 69%{?dist}
 
 Summary: Common SGML catalog and DTD files
 

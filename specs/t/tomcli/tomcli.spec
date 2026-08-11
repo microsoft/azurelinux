@@ -34,7 +34,7 @@ PATH=%{buildroot}%{_bindir}:${PATH}
 
 Name:           tomcli
 Version:        0.10.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        CLI for working with TOML files. Pronounced "tom clee."
 
 License:        MIT

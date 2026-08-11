@@ -7,7 +7,7 @@
 Summary: Utilities for monitoring process activities
 Name: psacct
 Version: 6.6.4
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPL-3.0-or-later
 URL: http://www.gnu.org/software/acct/
 

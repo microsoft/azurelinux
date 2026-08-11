@@ -8,7 +8,7 @@
 
 Name:           python-%{pkgname}
 Version:        0.9.0
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary:        Boolean operations on paths
 
 License:        MIT

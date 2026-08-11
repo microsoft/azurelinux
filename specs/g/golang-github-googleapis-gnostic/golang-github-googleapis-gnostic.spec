@@ -39,7 +39,7 @@ generate-gnostic directory.}
                        README-report-messages.md README-generate-gnostic.md
 
 Name:           %{goname}
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary:        Compiler for APIs described by the OpenAPI Specification
 
 # Upstream license specification: Apache-2.0

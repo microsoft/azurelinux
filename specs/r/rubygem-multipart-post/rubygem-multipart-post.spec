@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.2.3
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: A multipart form post accessory for Net::HTTP
 License: MIT
 URL: https://github.com/socketry/multipart-post

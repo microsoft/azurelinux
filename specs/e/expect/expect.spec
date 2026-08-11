@@ -8,7 +8,7 @@
 Summary: A program-script interaction and testing utility
 Name: expect
 Version: %{majorver}
-Release: 30%{?dist}
+Release: 31%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 URL: https://core.tcl.tk/expect/index
 Source: http://downloads.sourceforge.net/%{name}/%{name}%{version}.tar.gz

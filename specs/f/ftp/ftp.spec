@@ -4,7 +4,7 @@
 Summary: The standard UNIX FTP (File Transfer Protocol) client
 Name: ftp
 Version: 0.17
-Release: 100%{?dist}
+Release: 101%{?dist}
 License: BSD-4-Clause-UC
 # The Upstream of ftp is no longer active.
 # The source file for ftp is no longer available anywhere

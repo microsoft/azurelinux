@@ -3,7 +3,7 @@
 
 Name:		pari-galdata
 Version:	20080411
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary:	PARI/GP Computer Algebra System Galois resolvents
 License:	GPL-2.0-or-later
 URL:		http://pari.math.u-bordeaux.fr/packages.html

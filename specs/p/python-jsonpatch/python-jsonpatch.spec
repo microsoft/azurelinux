@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.33
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        Applying JSON Patches in Python
 
 License:        BSD-3-Clause

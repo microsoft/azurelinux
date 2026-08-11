@@ -10,7 +10,7 @@
 
 Name:           python-%{srcname}
 Version:        2.1.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Distributed Python deployment and communication
 License:        MIT
 URL:            https://github.com/pytest-dev/execnet

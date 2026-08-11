@@ -5,7 +5,7 @@
 
 Name: python-%{srcname}
 Version: 1.4.3
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Python URI normalizator
 
 License: MIT

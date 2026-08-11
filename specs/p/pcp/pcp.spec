@@ -3,7 +3,7 @@
 
 Name:    pcp
 Version: 7.1.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: System-level performance monitoring and performance management
 License: GPL-2.0-or-later AND LGPL-2.1-or-later AND CC-BY-3.0
 URL:     https://pcp.io

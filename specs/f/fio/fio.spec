@@ -3,7 +3,7 @@
 
 Name:		fio
 Version:	3.40
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:	Multithreaded IO generation tool
 
 License:	GPL-2.0-only

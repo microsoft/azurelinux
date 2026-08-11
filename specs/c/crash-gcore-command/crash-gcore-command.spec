@@ -6,7 +6,7 @@
 Summary: Gcore extension module for the crash utility
 Name: crash-gcore-command
 Version: 1.6.4
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPL-2.0-only
 Source0: https://github.com/fujitsu/crash-gcore/archive/v%{version}/%{name}-%{version}.tar.gz
 URL: https://github.com/fujitsu/crash-gcore

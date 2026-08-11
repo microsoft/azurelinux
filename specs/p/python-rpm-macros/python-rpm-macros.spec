@@ -58,7 +58,7 @@ elseif posix.stat('macros.python-srpm') then
 end
 }
 Version:        %{__default_python3_version}
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 BuildArch:      noarch
 

@@ -9,7 +9,7 @@
 
 Name: libiptcdata
 Version: 1.0.5
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: IPTC tag library
 
 License: LGPL-2.0-only

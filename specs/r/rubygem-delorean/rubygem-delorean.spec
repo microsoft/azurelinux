@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.1.0
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary: Delorean lets you travel in time with Ruby by mocking Time.now
 License: MIT
 URL: https://github.com/bebanjo/delorean

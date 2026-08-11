@@ -8,7 +8,7 @@
 Name: libcupsfilters
 Epoch: 1
 Version: 2.1.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Library for developing printing filters
 # the CUPS exception text is the same as LLVM exception, so using that name with
 # agreement from legal team

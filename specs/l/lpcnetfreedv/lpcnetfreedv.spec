@@ -6,7 +6,7 @@
 
 Name:           lpcnetfreedv
 Version:        0.5
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        LPCNet for FreeDV
 
 # Automatically converted from old format: BSD - review is highly recommended.

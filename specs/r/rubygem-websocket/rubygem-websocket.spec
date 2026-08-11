@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.11
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Universal Ruby library to handle WebSocket protocol
 License: MIT
 URL: http://github.com/imanel/websocket-ruby

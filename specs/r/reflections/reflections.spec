@@ -3,7 +3,7 @@
 
 Name:          reflections
 Version:       0.9.12
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary:       Java run-time meta-data analysis
 License:       WTFPL
 URL:           https://github.com/ronmamo/reflections

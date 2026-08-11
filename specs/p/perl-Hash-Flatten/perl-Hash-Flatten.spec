@@ -3,7 +3,7 @@
 
 Name:           perl-Hash-Flatten
 Version:        1.19
-Release: 44%{?dist}
+Release: 45%{?dist}
 Summary:        Flatten/unflatten complex data hashes
 License:        GPL-2.0-only
 URL:            https://metacpan.org/release/Hash-Flatten

@@ -6,7 +6,7 @@ Name:           perl-Mozilla-CA
 # certificates. They are taken from ca-certificates package instead
 # per bug #738383.
 Version:        20250602
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Mozilla's CA certificate bundle in PEM format
 # README:                       MPL-2.0
 ## Unbundled

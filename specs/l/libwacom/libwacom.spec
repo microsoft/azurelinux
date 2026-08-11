@@ -3,7 +3,7 @@
 
 Name:           libwacom
 Version:        2.18.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Tablet Information Client Library
 Requires:       %{name}-data
 

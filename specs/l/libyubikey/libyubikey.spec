@@ -3,7 +3,7 @@
 
 Name:           libyubikey
 Version:        1.13
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary:        C library for decrypting and parsing Yubikey One-time passwords
 
 # Automatically converted from old format: BSD - review is highly recommended.

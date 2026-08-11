@@ -3,7 +3,7 @@
 
 Name:           perl-AnyEvent-AIO
 Version:        1.1
-Release: 46%{?dist}
+Release: 47%{?dist}
 Summary:        Truly asynchronous file and directrory I/O
 
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.

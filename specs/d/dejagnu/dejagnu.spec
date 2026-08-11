@@ -4,7 +4,7 @@
 Summary: A front end for testing other programs
 Name: dejagnu
 Version: 1.6.3
-Release: 14%{?dist}
+Release: 15%{?dist}
 Epoch: 1
 # Note: baseboards/riscv-sim.exp is GPL 2.0 or later
 # GFDL-1.3-or-later: Everything in doc/

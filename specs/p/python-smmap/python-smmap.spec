@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        5.0.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        Sliding window memory map manager
 
 License:        BSD-3-Clause

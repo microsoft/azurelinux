@@ -5,7 +5,7 @@
 
 Name:               python-xmltodict
 Version:            0.14.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:            Python to transform XML to JSON
 
 License:            MIT

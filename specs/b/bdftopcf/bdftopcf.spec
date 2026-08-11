@@ -3,7 +3,7 @@
 
 Name:       bdftopcf
 Version:    1.1.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:    Font compiler for the X server and font server
 
 License:    MIT-open-group

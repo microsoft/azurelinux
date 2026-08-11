@@ -22,7 +22,7 @@
 Name:		grub2
 Epoch:		1
 Version:	2.12
-Release: 46%{?dist}
+Release: 47%{?dist}
 Summary:	Bootloader with support for Linux, Multiboot and more
 License:	GPL-3.0-or-later
 URL:		http://www.gnu.org/software/grub/

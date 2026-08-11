@@ -3,7 +3,7 @@
 
 Name:           jdependency
 Version:        2.12
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Class dependency analysis library for Java
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0

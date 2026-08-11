@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.2.1
-Release: 20%{?dist}
+Release: 21%{?dist}
 Summary:        Web Mercator XYZ tile utilities
 
 License:        BSD-3-Clause

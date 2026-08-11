@@ -3,7 +3,7 @@
 
 Name:       xhost
 Version:    1.0.9
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:    Manage hosts or users allowed to connect to the X server
 
 License:    MIT AND ICU

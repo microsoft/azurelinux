@@ -5,7 +5,7 @@
 Name:           perl-Time-Local
 Epoch:          2
 Version:        %{cpan_version}0
-Release: 521%{?dist}
+Release: 522%{?dist}
 Summary:        Efficiently compute time from local and GMT time
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Time-Local

@@ -6,7 +6,7 @@
 
 Name:		python-%{pypi_name}
 Version:	3.2.9
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:	Python module for writing files in the Excel 2007+ XLSX file format
 License:	BSD-2-Clause
 URL:		https://pypi.python.org/pypi/XlsxWriter

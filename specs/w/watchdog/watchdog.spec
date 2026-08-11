@@ -4,7 +4,7 @@
 Summary:          Software and/or Hardware watchdog daemon
 Name:             watchdog
 Version:          5.16
-Release: 12%{?dist}
+Release: 13%{?dist}
 License:          GPL-2.0-or-later
 
 URL:              http://sourceforge.net/projects/watchdog/

@@ -92,7 +92,7 @@
 
 Name:           %{rocfft_name}
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        ROCm Fast Fourier Transforms (FFT) library
 
 Url:            https://github.com/ROCm/%{upstreamname}

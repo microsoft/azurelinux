@@ -3,7 +3,7 @@
 
 Name:           glew
 Version:        2.2.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        The OpenGL Extension Wrangler Library
 # Automatically converted from old format: BSD and MIT - review is highly recommended.
 License:        LicenseRef-Callaway-BSD AND LicenseRef-Callaway-MIT

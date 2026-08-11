@@ -11,7 +11,7 @@
 Summary: Qt6 - QtTranslations module
 Name:    qt6-%{qt_module}
 Version: 6.10.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: GPL-3.0-only WITH Qt-GPL-exception-1.0
 Url:     http://www.qt.io

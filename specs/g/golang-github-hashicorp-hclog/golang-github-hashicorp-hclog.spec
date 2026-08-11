@@ -18,7 +18,7 @@ for use in development and production environments.}
 %global godocs          README.md README-hclogvet.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary:        Common logging package for hashicorp tools
 
 License:        MIT

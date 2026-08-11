@@ -31,7 +31,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        6.3.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause

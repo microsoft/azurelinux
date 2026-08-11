@@ -5,7 +5,7 @@
 
 Name:    vsftpd
 Version: 3.0.5
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: Very Secure Ftp Daemon
 
 # OpenSSL link exception

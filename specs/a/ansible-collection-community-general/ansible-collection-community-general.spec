@@ -3,7 +3,7 @@
 
 Name:           ansible-collection-community-general
 Version:        11.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Modules and plugins supported by Ansible community
 
 # rg --pcre2 -g '!tests/sanity/extra/licenses.py' 'SPDX-License-Identifier: (?!GPL-3\.0-or-later)' | sort | sed 's|^|# |'

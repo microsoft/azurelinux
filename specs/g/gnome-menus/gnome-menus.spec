@@ -5,7 +5,7 @@
 
 Name: gnome-menus
 Version: 3.38.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:  A menu system for the GNOME project
 
 License: LGPL-2.0-or-later

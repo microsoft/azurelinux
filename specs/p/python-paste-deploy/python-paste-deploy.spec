@@ -10,7 +10,7 @@ this configuration file.
 
 Name:           python-paste-deploy
 Version:        3.1.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary:        %{sum}
 License:        MIT
 URL:            https://github.com/Pylons/pastedeploy

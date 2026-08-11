@@ -18,7 +18,7 @@
 
 Name:		perl-Software-License-CCpack
 Version:	1.11
-Release: 42%{?dist}
+Release: 43%{?dist}
 Summary:	Software::License pack for Creative Commons' licenses
 License:	LGPL-3.0-only
 URL:		https://metacpan.org/release/Software-License-CCpack

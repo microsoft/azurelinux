@@ -11,7 +11,7 @@
 
 Name:           check
 Version:        0.15.2
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary:        A unit test framework for C
 License:        LGPL-2.1-or-later
 URL:            https://libcheck.github.io/check/

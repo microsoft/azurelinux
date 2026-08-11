@@ -3,7 +3,7 @@
 
 Name:           priv_wrapper
 Version:        1.0.1
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 Summary:        A library to disable resource limits and other privilege dropping
 License:        GPL-3.0-or-later

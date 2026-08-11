@@ -5,7 +5,7 @@
 
 Name:           sblim-testsuite
 Version:        1.3.0
-Release: 35%{?dist}
+Release: 36%{?dist}
 Summary:        SBLIM testsuite
 
 License:        EPL-1.0

@@ -4,7 +4,7 @@
 Summary: A utility for removing files based on when they were last accessed
 Name: tmpwatch
 Version: 2.11
-Release: 30%{?dist}
+Release: 31%{?dist}
 URL: https://pagure.io/%{name}
 Source0: https://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
 License: GPL-2.0-only

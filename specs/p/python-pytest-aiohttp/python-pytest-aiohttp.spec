@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.1.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Pytest plugin for aiohttp support
 
 License:        Apache-2.0

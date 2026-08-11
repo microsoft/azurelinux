@@ -6,7 +6,7 @@
 %global fontname wqy-zenhei
 
 Version: 0.9.46
-Release: 35%{?dist}
+Release: 36%{?dist}
 URL:     http://wenq.org/enindex.cgi
 
 %global foundry           WQY

@@ -3,7 +3,7 @@
 
 Name:           libmysofa
 Version:        1.3.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        C functions for reading HRTFs
 
 License:        BSD-3-Clause

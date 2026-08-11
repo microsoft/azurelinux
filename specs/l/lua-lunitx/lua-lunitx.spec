@@ -3,7 +3,7 @@
 
 Name:           lua-lunitx
 Version:        0.8.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        Unit testing framework for Lua
 
 License:        MIT

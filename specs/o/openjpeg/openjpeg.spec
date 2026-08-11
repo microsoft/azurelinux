@@ -20,7 +20,7 @@
 
 Name:           openjpeg
 Version:        2.5.4
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        C-Library for JPEG 2000
 
 # windirent.h is MIT, the rest is BSD

@@ -7,7 +7,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.34.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Selenium is a browser automation tool for automated testing of webapps and more
 License: Apache-2.0
 URL: https://selenium.dev

@@ -3,7 +3,7 @@
 
 Name:           perl-Moo
 Version:        2.005005
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Minimalist Object Orientation (with Moose compatibility)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

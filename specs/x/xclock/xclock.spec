@@ -3,7 +3,7 @@
 
 Name:       xclock
 Version:    1.1.1
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:    The classic X Window System clock utility
 
 License:    MIT-open-group AND SMLNJ AND MIT

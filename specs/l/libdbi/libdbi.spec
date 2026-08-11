@@ -4,7 +4,7 @@
 Summary: Database Independent Abstraction Layer for C
 Name: libdbi
 Version: 0.9.0
-Release: 29%{?dist}
+Release: 30%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 URL: http://libdbi.sourceforge.net/

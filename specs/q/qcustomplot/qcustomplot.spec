@@ -15,7 +15,7 @@
 
 Name:           qcustomplot
 Version:        2.1.1
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary:        Qt widget for plotting and data visualization
 
 License:        GPL-3.0-or-later

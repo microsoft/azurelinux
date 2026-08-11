@@ -3,7 +3,7 @@
 
 Name:           wayland
 Version:        1.24.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Wayland Compositor Infrastructure
 
 # SPDX

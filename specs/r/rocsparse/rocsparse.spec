@@ -82,7 +82,7 @@
 
 Name:           %{rocsparse_name}
 Version:        %{rocm_version}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        SPARSE implementation for ROCm
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

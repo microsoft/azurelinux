@@ -6,7 +6,7 @@
 
 Name:	    rutabaga-gfx-ffi
 Version:    0.1.3
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 Summary:    Handling virtio-gpu protocols
 URL:        https://chromium.googlesource.com/crosvm/crosvm

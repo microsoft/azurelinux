@@ -3,7 +3,7 @@
 
 Name:           perl-accessors
 Version:        1.01
-Release: 47%{?dist}
+Release: 48%{?dist}
 Summary:        Create accessor methods in caller's package
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/accessors

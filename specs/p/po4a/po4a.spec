@@ -3,7 +3,7 @@
 
 Name: po4a
 Version: 0.74
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: A tool maintaining translations anywhere
 
 # Note: source is imprecise about 2.0-only vs 2.0-or-later

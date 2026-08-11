@@ -18,7 +18,7 @@
 
 Name:           php-phpunit-Version
 Version:        2.0.1
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary:        Managing the version number of Git-hosted PHP projects
 
 License:        BSD-3-Clause

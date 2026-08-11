@@ -5,7 +5,7 @@
 
 Name:		librdkafka
 Version:	2.4.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:	The Apache Kafka C library
 
 License:	Apache-2.0

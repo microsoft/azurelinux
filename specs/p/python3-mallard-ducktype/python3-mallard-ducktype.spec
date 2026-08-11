@@ -5,7 +5,7 @@
 
 Name:    python3-mallard-ducktype
 Version: 1.0.2
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary: Parse Ducktype files and convert them to Mallard
 
 License: MIT

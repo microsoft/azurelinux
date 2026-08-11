@@ -12,7 +12,7 @@
 
 Name:          libgeotiff
 Version:       1.7.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 Summary:       GeoTIFF format library
 License:       MIT

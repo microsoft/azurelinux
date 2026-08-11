@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.0.1
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        JSON Matching Expressions
 
 License:        MIT

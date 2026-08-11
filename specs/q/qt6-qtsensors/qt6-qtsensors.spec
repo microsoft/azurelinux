@@ -14,7 +14,7 @@
 Summary: Qt6 - Sensors component
 Name:    qt6-%{qt_module}
 Version: 6.10.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0

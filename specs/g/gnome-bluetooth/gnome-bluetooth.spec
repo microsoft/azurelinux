@@ -9,7 +9,7 @@
 Name:		gnome-bluetooth
 Epoch:		1
 Version:	47.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:	Bluetooth graphical utilities
 
 License:	GPL-2.0-or-later

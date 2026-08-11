@@ -3,7 +3,7 @@
 
 Name:           python-ghp-import
 Version:        2.1.0
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary:        GitHub Pages Import
 BuildArch:      noarch
 

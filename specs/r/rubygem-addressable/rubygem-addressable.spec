@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.8.6
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: URI Implementation
 License: Apache-2.0
 URL: https://github.com/sporkmonger/addressable

@@ -25,7 +25,7 @@ clouds - test files
 
 Name:           python-%{pypi_name}
 Version:        4.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        An SDK for building applications to work with OpenStack
 
 License:        Apache-2.0

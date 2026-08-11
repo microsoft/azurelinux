@@ -3,7 +3,7 @@
 
 Name:		perl-Parse-Distname
 Version:	0.05
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:	Parse a distribution name
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/dist/Parse-Distname

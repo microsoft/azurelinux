@@ -24,7 +24,7 @@ Summary:        Architected Queuing Language Profiling Library
 Name:           aqlprofile
 License:        MIT
 Version:        0.0^git%{date0}.%{shortcommit0}
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # Only x86_64 works right now:
 ExclusiveArch:  x86_64

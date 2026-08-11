@@ -3,7 +3,7 @@
 
 Name:           ykclient
 Version:        2.15
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary:        Yubikey management library and client
 
 # Automatically converted from old format: BSD - review is highly recommended.

@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.3.1
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary:	Collection of text algorithms
 
 # SPDX confirmed

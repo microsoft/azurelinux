@@ -58,7 +58,7 @@
 
 Name:           nbdkit
 Version:        1.46.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        NBD server
 
 License:        BSD-3-Clause

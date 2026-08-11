@@ -3,7 +3,7 @@
 
 Name:		libfastjson
 Version:	1.2304.0
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:	A JSON implementation in C
 License:	MIT
 URL:		https://github.com/rsyslog/libfastjson

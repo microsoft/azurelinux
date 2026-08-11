@@ -6,7 +6,7 @@
 
 Name:		xdg-user-dirs
 Version:	0.18
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:	Handles user special directories
 
 License:	GPL-2.0-or-later AND MIT

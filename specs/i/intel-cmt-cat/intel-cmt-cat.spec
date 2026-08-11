@@ -10,7 +10,7 @@ including, Cache Monitoring Technology (CMT), Memory Bandwidth Monitoring
 
 Name:		intel-cmt-cat
 Version:	25.04
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:	Intel cache monitoring and allocation technology config tool
 
 License:	BSD-3-Clause

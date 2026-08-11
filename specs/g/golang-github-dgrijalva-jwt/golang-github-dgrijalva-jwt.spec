@@ -24,7 +24,7 @@ Golang implementation of json web tokens (jwt).}
 %global gosupfiles glide.lock glide.yaml
 
 Name:           %{goname}
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary:        Golang implementation of json web tokens (jwt)
 
 License:        MIT

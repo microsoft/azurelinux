@@ -3,7 +3,7 @@
 
 Name: kernelshark
 Version: 2.3.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 
 # As of 2.3.1, only kernelshark.cpp, kshark-record.cpp and examples are GPL-2.0. The rest of kernel-shark is LGPL-2.1.

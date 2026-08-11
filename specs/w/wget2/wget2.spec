@@ -14,7 +14,7 @@
 
 Name:           wget2
 Version:        2.2.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        An advanced file and recursive website downloader
 
 # Documentation is GFDL

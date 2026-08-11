@@ -11,7 +11,7 @@
 
 Name: oddjob
 Version: 0.34.7
-Release: 18%{?dist}
+Release: 19%{?dist}
 Source0: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz
 Source1: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz.asc
 Patch1: oddjob-override-mask-fix.patch

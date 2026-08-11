@@ -15,7 +15,7 @@
 
 Name: libyang
 Version: 3.12.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: YANG data modeling language library
 Url: https://github.com/CESNET/libyang
 Source: %{url}/archive/%{name}-%{version}.tar.gz

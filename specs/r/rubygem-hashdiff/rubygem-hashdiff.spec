@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Hashdiff is a diff lib to compute the smallest difference between two hashes
 License: MIT
 URL: https://github.com/liufengyun/hashdiff

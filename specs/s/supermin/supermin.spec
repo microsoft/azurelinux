@@ -41,7 +41,7 @@ ExcludeArch: %{ix86}
 Summary:       Tool for creating supermin appliances
 Name:          supermin
 Version:       5.3.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 License:       GPL-2.0-or-later
 
 ExclusiveArch: %{kernel_arches}

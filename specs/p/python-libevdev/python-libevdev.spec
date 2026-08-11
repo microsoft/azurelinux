@@ -3,7 +3,7 @@
 
 Name:		python-libevdev
 Version:	0.12
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:	Python bindings to the libevdev evdev device wrapper library
 
 # SPDX

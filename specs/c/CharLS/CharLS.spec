@@ -3,7 +3,7 @@
 
 Name:		CharLS
 Version:	2.4.2
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:	An optimized implementation of the JPEG-LS standard
 License:	BSD-3-Clause
 URL:		https://github.com/team-charls/charls

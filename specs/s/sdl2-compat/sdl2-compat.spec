@@ -12,7 +12,7 @@
 
 Name:           sdl2-compat
 Version:        2.32.64
-Release: 2%{?dist}
+Release: 3%{?dist}
 SourceLicense:  Zlib and Apache-2.0 and MIT and BSD-3-Clause
 Summary:        SDL 2.0 runtime compatibility library using SDL 3.0
 License:        Zlib

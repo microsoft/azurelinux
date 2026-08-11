@@ -10,7 +10,7 @@
 
 Name:		perl-Ref-Util-XS
 Version:	0.117
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary:	Utility functions for checking references
 License:	MIT
 URL:		https://metacpan.org/release/Ref-Util-XS

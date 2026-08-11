@@ -3,7 +3,7 @@
 
 Name:		libnfs
 Version:	6.0.2
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:	Client library for accessing NFS shares over a network
 # The library is licensed as LGPL-2.1-or-later
 # The protocol definition is BSD-2-Clause

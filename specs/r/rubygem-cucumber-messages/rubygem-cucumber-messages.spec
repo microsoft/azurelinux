@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 17.1.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary: Protocol Buffer messages for Cucumber's inter-process communication.
 License: MIT
 URL: https://github.com/cucumber/messages-ruby#readme

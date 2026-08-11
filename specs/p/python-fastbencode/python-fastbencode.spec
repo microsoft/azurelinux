@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.3.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Implementation of bencode with optional fast C extensions
 
 License:        GPL-2.0-or-later AND MIT

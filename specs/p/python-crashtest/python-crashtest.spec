@@ -9,7 +9,7 @@ inspection easier.}
 
 Name:           python-%{pypi_name}
 Version:        0.4.1
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary:        Manage Python errors with ease
 License:        MIT
 

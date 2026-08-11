@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.7.4
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary:        Parse C++ header files and generate a data structure
 
 License:        BSD-3-Clause

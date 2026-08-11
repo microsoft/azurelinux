@@ -4,7 +4,7 @@
 Summary: Fast compression and decompression utilities
 Name: ncompress
 Version: 5.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: Unlicense
 URL: https://github.com/vapier/%{name}
 Source: https://github.com/vapier/%{name}/archive/refs/tags/v%{version}.tar.gz

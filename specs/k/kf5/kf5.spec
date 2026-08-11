@@ -3,7 +3,7 @@
 
 Name:    kf5
 Version: 5.116.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Filesystem and RPM macros for KDE Frameworks 5
 License: BSD-3-Clause
 URL:     http://www.kde.org

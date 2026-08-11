@@ -12,7 +12,7 @@
 Name:		coin-or-%{module}
 Summary:	Coin-or branch and cut
 Version:	2.10.12
-Release: 11%{?dist}
+Release: 12%{?dist}
 
 # The project as a whole is licensed EPL-2.0.  However, many source files still
 # claim to be licensed EPL-1.0.  This is probably an upstream oversight.

@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.1.5
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary: Pure Ruby implementation of the RC4 algorithm
 License: MIT
 URL: https://github.com/caiges/Ruby-RC4

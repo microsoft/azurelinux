@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        5.6.5
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary:        Python CBOR (de)serializer with extensive tag support
 
 License:        MIT

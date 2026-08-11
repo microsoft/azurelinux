@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.12.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Small ERB Implementation
 License: MIT
 URL: https://github.com/jeremyevans/erubi

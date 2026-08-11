@@ -3,7 +3,7 @@
 
 Name:           perl-Devel-CallParser
 Version:        0.002
-Release: 41%{?dist}
+Release: 42%{?dist}
 Summary:        Custom parsing attached to subroutines
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-CallParser

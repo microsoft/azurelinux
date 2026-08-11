@@ -23,7 +23,7 @@
 
 Name: GraphicsMagick
 Version: 1.3.45
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: An ImageMagick fork, offering faster image generation and better quality
 Url: http://www.graphicsmagick.org/
 License: MIT

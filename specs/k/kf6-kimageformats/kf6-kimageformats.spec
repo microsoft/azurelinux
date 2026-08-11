@@ -6,7 +6,7 @@
 
 Name:           kf6-%{framework}
 Version:        6.23.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with additional image plugins for QtGui
 
 License:        LGPLv2+

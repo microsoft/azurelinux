@@ -16,7 +16,7 @@
 
 Name:           ccache
 Version:        4.11.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        C/C++ compiler cache
 
 # See LICENSE.adoc for licenses of bundled codes

@@ -21,7 +21,7 @@
 
 Name:           rpcsvc-proto
 Version:        1.4
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary:        RPC protocol definitions
 # Automatically converted from old format: BSD and LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-BSD AND LicenseRef-Callaway-LGPLv2+

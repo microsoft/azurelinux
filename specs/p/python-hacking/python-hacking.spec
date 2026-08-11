@@ -21,7 +21,7 @@
 
 Name:           python-%{pypi_name}
 Version:        7.0.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:        OpenStack Hacking Guideline Enforcement
 
 License:        Apache-2.0

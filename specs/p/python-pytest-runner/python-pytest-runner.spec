@@ -9,7 +9,7 @@
 
 Name:           python-%{modulename}
 Version:        4.0
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary:        Invoke py.test as distutils command with dependency resolution
 
 License:        MIT

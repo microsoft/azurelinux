@@ -3,7 +3,7 @@
 
 Name:       xset
 Version:    1.2.5
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary:    User preference utility for X
 
 License:    MIT-open-group

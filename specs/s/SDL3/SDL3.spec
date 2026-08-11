@@ -24,7 +24,7 @@
 
 Name:           SDL3
 Version:        3.4.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Cross-platform multimedia library
 License:        Zlib AND MIT AND Apache-2.0 AND (Apache-2.0 OR MIT)
 URL:            http://www.libsdl.org/

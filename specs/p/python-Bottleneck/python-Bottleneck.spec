@@ -7,7 +7,7 @@
 
 Name:		python-Bottleneck
 Version:	1.6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:	Collection of fast NumPy array functions written in Cython
 
 License:	BSD-2-Clause

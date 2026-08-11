@@ -3,7 +3,7 @@
 
 Name:           anaconda-webui
 Version:        53.1^20251022g00cddf56
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Anaconda installer Web interface
 License:        LGPL-2.1-or-later AND MIT
 URL:            https://github.com/rhinstaller/%{name}

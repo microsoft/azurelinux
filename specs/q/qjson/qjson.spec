@@ -16,7 +16,7 @@
 
 Name:           qjson
 Version:        0.9.0
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary:        A qt-based library that maps JSON data to QVariant objects
 
 # Automatically converted from old format: GPLv2+ - review is highly recommended.

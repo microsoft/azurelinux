@@ -5,7 +5,7 @@
 
 Name: efibootmgr
 Version: 18
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: EFI Boot Manager
 License: GPL-2.0-or-later
 URL: https://github.com/rhboot/%{name}/

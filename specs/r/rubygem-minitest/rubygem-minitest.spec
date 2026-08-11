@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 5.25.5
-Release: 102%{?dist}
+Release: 103%{?dist}
 Summary: minitest provides a complete suite of testing facilities
 # README.rdoc
 # SPDX confirmed

@@ -8,7 +8,7 @@
 %define minor 10
 Name:           cpprest
 Version:        2.10.19
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary:        C++ REST library
 License:        MIT
 Url:            https://github.com/Microsoft/cpprestsdk

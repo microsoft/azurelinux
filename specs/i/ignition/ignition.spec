@@ -25,7 +25,7 @@ Version:                2.26.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        First boot installer and configuration tool
 
 # Upstream license specification: Apache-2.0

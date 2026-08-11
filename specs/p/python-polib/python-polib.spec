@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.2.0
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        A library to parse and manage gettext catalogs
 
 License:        MIT

@@ -3,7 +3,7 @@
 
 Name:           liblockfile
 Version:        1.17
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        This implements a number of functions found in -lmail on SysV systems
 
 # regarding license please see file COPYRIGHT

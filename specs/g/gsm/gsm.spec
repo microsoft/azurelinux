@@ -8,7 +8,7 @@
 
 Name:           gsm
 Version:        %{ver_major}.%{ver_minor}.%{ver_patch}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        Shared libraries for GSM speech compressor
 
 License:        tu-berlin-2.0

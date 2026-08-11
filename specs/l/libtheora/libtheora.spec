@@ -9,7 +9,7 @@
 Name:           libtheora
 Epoch:          1
 Version:        1.1.1
-Release: 41%{?dist}
+Release: 42%{?dist}
 Summary:        Theora Video Compression Codec
 License:        BSD-3-Clause
 URL:            http://www.theora.org

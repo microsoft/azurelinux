@@ -5,7 +5,7 @@
 
 Name:           python-webtest
 Version:        3.0.6
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        Helper to test WSGI applications
 
 License:        MIT

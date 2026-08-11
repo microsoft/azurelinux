@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.3.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Provides "its" method formerly part of rspec-core
 License: MIT
 URL: https://github.com/rspec/rspec-its

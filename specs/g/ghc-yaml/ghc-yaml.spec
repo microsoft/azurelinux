@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.11.11.2
 # can only be reset when subpkg bumped
-Release: 25%{?dist}
+Release: 26%{?dist}
 Summary:        Support for parsing and rendering YAML documents
 
 License:        BSD-3-Clause

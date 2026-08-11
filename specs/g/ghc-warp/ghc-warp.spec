@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        3.4.7
 # can only be reset when subpkg bumped
-Release: 11%{?dist}
+Release: 12%{?dist}
 Summary:        A fast, light-weight web server for WAI applications
 
 License:        MIT

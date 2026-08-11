@@ -6,7 +6,7 @@
 Summary: Tools needed to create Texinfo format documentation files
 Name: texinfo
 Version: 7.2
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 Url: http://www.gnu.org/software/texinfo/
 Source0: ftp://ftp.gnu.org/gnu/texinfo/texinfo-%{version}.tar.xz

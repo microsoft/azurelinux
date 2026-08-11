@@ -3,7 +3,7 @@
 
 Name:		perl-Devel-OverloadInfo
 Version:	0.008
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:	Introspect overloaded operators
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Devel-OverloadInfo

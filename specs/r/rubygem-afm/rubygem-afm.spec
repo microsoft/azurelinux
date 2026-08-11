@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.2.2
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: Reading Adobe Font Metrics (afm) files
 License: MIT
 URL: http://github.com/halfbyte/afm

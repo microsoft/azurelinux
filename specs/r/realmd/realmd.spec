@@ -3,7 +3,7 @@
 
 Name:    realmd
 Version: 0.17.1
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary: Kerberos realm enrollment service
 License: LGPL-2.1-or-later
 URL:     https://gitlab.freedesktop.org/realmd/realmd

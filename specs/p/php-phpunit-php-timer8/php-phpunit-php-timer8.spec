@@ -30,7 +30,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        8.0.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        PHP Utility class for timing, version %{major}
 
 License:        BSD-3-Clause

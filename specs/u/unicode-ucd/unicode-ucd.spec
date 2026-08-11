@@ -7,7 +7,7 @@
 
 Name:           unicode-ucd
 Version:        17.0.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Unicode Character Database
 
 # http://www.unicode.org/terms_of_use.html in ReadMe.txt redirects to:

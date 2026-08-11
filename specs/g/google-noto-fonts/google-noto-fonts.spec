@@ -36,7 +36,7 @@ in Unicode.\
 
 Name:           %{fontname}-fonts
 Version:        %{rpmver}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary:        Hinted and Non Hinted OpenType fonts for Unicode scripts
 License:        OFL-1.1
 URL:            https://notofonts.github.io/

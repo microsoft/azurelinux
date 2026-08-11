@@ -3,7 +3,7 @@
 
 Name:           perl-Task-Weaken
 Version:        1.06
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary:        Ensure that a platform has weaken support
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Task-Weaken

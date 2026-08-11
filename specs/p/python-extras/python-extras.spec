@@ -5,7 +5,7 @@
 
 Name:           python-extras
 Version:        1.0.0
-Release: 43%{?dist}
+Release: 44%{?dist}
 Summary:        Useful extra bits for Python
 
 License:        MIT

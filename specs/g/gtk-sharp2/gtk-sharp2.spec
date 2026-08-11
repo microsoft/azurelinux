@@ -3,7 +3,7 @@
 
 Name:           gtk-sharp2
 Version:        2.12.45
-Release: 26%{?dist}
+Release: 27%{?dist}
 Summary:        GTK+ and GNOME bindings for Mono
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

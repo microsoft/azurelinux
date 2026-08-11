@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        2.4.0
-Release: 26%{?dist}
+Release: 27%{?dist}
 Summary:        Pure Python sorted container types
 
 License:        Apache-2.0

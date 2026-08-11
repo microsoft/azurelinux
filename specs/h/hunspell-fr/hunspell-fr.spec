@@ -10,7 +10,7 @@
 Name: hunspell-fr
 Summary: French hunspell dictionaries
 Version: 7.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Source: https://grammalecte.net/dic/hunspell-french-dictionaries-v%{version}.zip
 URL: https://grammalecte.net/
 License: MPL-2.0

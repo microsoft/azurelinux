@@ -3,7 +3,7 @@
 
 Name:           ladspa
 Version:        1.17
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 Summary:        Linux Audio Developer's Simple Plug-in API, examples and tools
 

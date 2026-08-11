@@ -16,7 +16,7 @@
 Name:             libijs
 Summary:          IJS Raster Image Transport Protocol Library
 Version:          0.35
-Release: 26%{?dist}
+Release: 27%{?dist}
 
 License:          AGPL-3.0-or-later
 

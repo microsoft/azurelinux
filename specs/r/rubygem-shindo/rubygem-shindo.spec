@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.3.10
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Simple depth first Ruby testing
 License: MIT
 URL: http://github.com/geemus/shindo

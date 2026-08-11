@@ -6,7 +6,7 @@
 Name:                   libconfig
 Summary:                C/C++ configuration file library
 Version:                1.7.3
-Release: 13%{?dist}
+Release: 14%{?dist}
 # lib/grammar.* are GPL-3.0-or-later WITH Bison-exception-2.2
 License:                LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2
 URL:                    http://www.hyperrealm.com/libconfig/

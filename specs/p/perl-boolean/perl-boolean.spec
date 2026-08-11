@@ -3,7 +3,7 @@
 
 Name:           perl-boolean
 Version:        0.46
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary:        Boolean support for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/boolean

@@ -20,7 +20,7 @@
 
 Name:           python-google-auth
 Version:        2.45.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Epoch:          1
 Summary:        Google Authentication Library
 

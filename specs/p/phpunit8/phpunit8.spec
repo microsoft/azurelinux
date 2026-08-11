@@ -30,7 +30,7 @@
 
 Name:           %{pk_project}%{ver_major}
 Version:        %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        The PHP Unit Testing framework version %{ver_major}
 
 License:        BSD-3-Clause

@@ -3,7 +3,7 @@
 
 Name:           perl-MouseX-Foreign
 Version:        1.000
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary:        Extends non-Mouse classes as well as Mouse classes
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

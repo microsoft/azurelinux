@@ -9,7 +9,7 @@
 
 Name:    bluez
 Version: 5.86
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Bluetooth utilities
 License: GPL-2.0-or-later
 URL:     http://www.bluez.org/

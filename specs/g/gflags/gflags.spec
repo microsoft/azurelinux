@@ -3,7 +3,7 @@
 
 Name:           gflags
 Version:        2.2.2
-Release: 19%{?dist}
+Release: 20%{?dist}
 Summary:        Library for commandline flag processing
 
 # Automatically converted from old format: BSD - review is highly recommended.

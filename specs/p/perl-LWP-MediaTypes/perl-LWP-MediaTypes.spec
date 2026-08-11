@@ -6,7 +6,7 @@
 
 Name:           perl-LWP-MediaTypes
 Version:        6.04
-Release: 22%{?dist}
+Release: 23%{?dist}
 Summary:        Guess media type for a file or a URL
 # lib/LWP/media.types:      CC0-1.0
 # lib/LWP/MediaTypes.pm:    GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -5,7 +5,7 @@
 
 Name:     aml
 Version:  0.3.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary:  Another Main Loop
 # main source is ISC
 # include/sys/queue.h is BSD

@@ -3,7 +3,7 @@
 
 Name:		libmad
 Version:	0.16.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary:	MPEG audio decoder library
 
 License:	GPL-2.0-or-later

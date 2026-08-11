@@ -21,7 +21,7 @@ Client library (cinderclient python module) and command line utility \
 
 Name:             python-cinderclient
 Version:          9.6.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:          Python API and CLI for OpenStack Cinder
 
 License:          Apache-2.0

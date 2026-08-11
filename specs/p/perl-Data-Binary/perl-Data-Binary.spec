@@ -3,7 +3,7 @@
 
 Name:		perl-Data-Binary
 Version:	0.01
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary:	Simple detection of binary versus text in strings
 License:	Artistic-2.0
 URL:		https://metacpan.org/release/Data-Binary

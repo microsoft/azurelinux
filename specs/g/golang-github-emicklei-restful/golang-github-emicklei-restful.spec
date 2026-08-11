@@ -20,7 +20,7 @@ Package for building REST-style Web Services using Go.}
 %global godocs          examples CHANGES.md README.md
 
 Name:           %{goname}
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Package for building REST-style Web Services using Go
 
 License:        MIT

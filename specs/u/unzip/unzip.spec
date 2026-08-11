@@ -9,7 +9,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 68%{?dist}
+Release: 69%{?dist}
 License: Info-ZIP
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
 

@@ -3,7 +3,7 @@
 
 Name:           python-libnacl
 Version:        2.1.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary:        Python bindings for libsodium based on ctypes
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

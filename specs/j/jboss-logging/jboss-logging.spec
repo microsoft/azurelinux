@@ -6,7 +6,7 @@
 
 Name:             jboss-logging
 Version:          3.6.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:          The JBoss Logging Framework
 License:          Apache-2.0
 

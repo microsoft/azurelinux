@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.15.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Interact with a server using the SMB 2/3 Protocol
 
 License:        MIT

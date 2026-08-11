@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        2.0.1
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary:        %{sum}
 
 # Automatically converted from old format: BSD - review is highly recommended.

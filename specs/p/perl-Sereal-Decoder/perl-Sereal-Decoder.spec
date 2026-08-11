@@ -6,7 +6,7 @@
 
 Name:           perl-Sereal-Decoder
 Version:        5.004
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary:        Perl deserialization for Sereal format
 # lib/Sereal/Decoder.pm:    GPL+ or Artistic
 ## Unbundled:

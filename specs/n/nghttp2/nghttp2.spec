@@ -10,7 +10,7 @@
 Summary: Experimental HTTP/2 client, server and proxy
 Name: nghttp2
 Version: 1.66.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 # Parts of ruby bindings are additionally under GPL-2.0-or-later, MIT and
 # HPND-Kevlin-Henney but they are NOT shipped.

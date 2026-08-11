@@ -3,7 +3,7 @@
 
 Name:           nuspell
 Version:        5.1.6
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary:        Fast and safe spellchecking C++ library and command-line tool
 License:        LGPL-3.0-or-later
 URL:            https://nuspell.github.io

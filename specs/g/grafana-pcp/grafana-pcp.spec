@@ -19,7 +19,7 @@ end}
 
 Name:           grafana-pcp
 Version:        5.3.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        Performance Co-Pilot Grafana Plugin
 License:        Apache-2.0
 URL:            https://github.com/performancecopilot/grafana-pcp

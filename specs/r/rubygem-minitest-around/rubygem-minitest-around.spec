@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.5.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Around block for minitest
 License: MIT
 URL: https://github.com/splattael/minitest-around

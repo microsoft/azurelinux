@@ -16,7 +16,7 @@
 
 Name:		slapi-nis
 Version:	0.70.0
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary:	Schema Compatibility plugins for Directory Server
 License:	GPL-3.0-or-later
 URL:		http://pagure.io/slapi-nis/

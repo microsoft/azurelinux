@@ -5,7 +5,7 @@
 
 Name:           perl-Pod-POM
 Version:        2.01
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary:        Object-oriented interface to Perl POD documents
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

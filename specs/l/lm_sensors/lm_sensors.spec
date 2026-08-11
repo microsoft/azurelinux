@@ -3,7 +3,7 @@
 
 Name: lm_sensors
 Version: 3.6.0
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: Hardware monitoring tools
 
 %define upstream_version %(echo %{version} | sed -e 's/\\./-/g')

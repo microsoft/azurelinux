@@ -6,7 +6,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-curses
 Version:        1.0.11
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary:        OCaml bindings for ncurses
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 

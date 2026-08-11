@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.17.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: FFI Extensions for Ruby
 License: BSD-3-Clause
 URL: https://github.com/ffi/ffi/wiki

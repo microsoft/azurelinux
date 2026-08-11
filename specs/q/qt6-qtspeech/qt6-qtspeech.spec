@@ -15,7 +15,7 @@
 Summary: Qt6 - Speech component
 Name:    qt6-%{qt_module}
 Version: 6.10.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 # Code can be either LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only
 # See e.g. src/plugins/speechdispatcher or src/tts

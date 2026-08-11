@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.0.22
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary:        A repository of test results
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
