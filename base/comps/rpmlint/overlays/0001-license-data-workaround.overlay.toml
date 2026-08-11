@@ -1,0 +1,31 @@
+# Azure Linux temporary license-data workaround for rpmlint.
+#
+# Fedora's rpmlint depends on rpmlint-fedora-license-data, which ships Fedora's
+# approved-license allow-list (populating ValidLicenses). That package is a
+# Fedora-specific legal/policy artifact, so we drop the dependency here. Without
+# it, ValidLicenses is empty (configdefaults.toml sets ValidLicenses = []) and
+# rpmlint's TagsCheck flags every SPDX token as invalid-license, producing false
+# positives on every checked package -- so we also filter the invalid-license
+# diagnostic in the shipped config.
+#
+# TODO: Once azurelinux-license-data is available,
+# replace the dropped rpmlint-fedora-license-data dependency with
+# azurelinux-license-data AND remove the invalid-license filter overlay below.
+
+[metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Drop the rpmlint-fedora-license-data dependency. It ships Fedora's approved-license allow-list, which is a legal/policy artifact specific to Fedora. Azure Linux will provide its own curated license data (azurelinux-license-data); until then the invalid-license filter overlay below suppresses the resulting false positives."
+type = "spec-remove-tag"
+tag = "Requires"
+value = "rpmlint-fedora-license-data"
+
+[[overlays]]
+description = "Filter rpmlint's invalid-license diagnostic. Dropping rpmlint-fedora-license-data leaves ValidLicenses empty (configdefaults.toml sets ValidLicenses = []), so TagsCheck flags every SPDX token as invalid-license and every checked package gets false positives. Suppress the diagnostic in the shipped Fedora config until azurelinux-license-data ships; remove this overlay once that data is available."
+type = "file-search-replace"
+file = "fedora.toml"
+regex = '(?m)^Filters = \[$'
+replacement = '''Filters = [
+    '.*invalid-license.*',  # AZL: no curated license allow-list yet; remove once azurelinux-license-data ships'''
