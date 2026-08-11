@@ -46,7 +46,7 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.23.1 on Ubuntu 22.04 since it is the most recent release available.
+# golang version pinned for stability to avoid breaking changes. As of 11-Aug-2026 we are using golang-1.25.7 on Ubuntu 26.04 since it is the most recent release available.
 # When making a breaking change to the toolkit which requires a newer golang version, update this version if needed.
 # If no newer version is available, suggest moving to a newer Ubuntu LTS version
 if [ "$INSTALL_PREREQS" = true ]; then
@@ -59,7 +59,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
     gawk \
     genisoimage \
     git \
-    golang-1.24-go \
+    golang-1.25-go \
     jq \
     make \
     openssl \
@@ -76,11 +76,11 @@ else
     echo "Skipping installation of prerequisite packages..."
 fi
 
-# Fix go 1.24 links if requested
+# Fix go 1.25 links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
     echo "Creating Go symlinks..."
-    ln -vsf /usr/lib/go-1.24/bin/go /usr/bin/go
-    ln -vsf /usr/lib/go-1.24/bin/gofmt /usr/bin/gofmt
+    ln -vsf /usr/lib/go-1.25/bin/go /usr/bin/go
+    ln -vsf /usr/lib/go-1.25/bin/gofmt /usr/bin/gofmt
 fi
 
 # Install and configure Docker if requested
