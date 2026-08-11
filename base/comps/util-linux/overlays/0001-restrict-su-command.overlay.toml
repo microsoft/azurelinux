@@ -1,0 +1,11 @@
+[metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22915" }]
+
+[[overlays]]
+description = "Restrict su to the empty CIS sugroup"
+type = "file-search-replace"
+file = "util-linux-su.pamd"
+regex = '(?m)^#auth\s+required\s+pam_wheel\.so use_uid$'
+replacement = "auth\t\trequired\tpam_wheel.so use_uid group=sugroup"

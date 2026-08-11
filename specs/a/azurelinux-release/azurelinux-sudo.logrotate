@@ -1,0 +1,6 @@
+# Retention follows the image-wide defaults in /etc/logrotate.conf.
+/var/log/sudo.log {
+    missingok
+    notifempty
+    create 0600 root root
+}
