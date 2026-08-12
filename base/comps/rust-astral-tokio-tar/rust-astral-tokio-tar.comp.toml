@@ -1,0 +1,9 @@
+[components.rust-astral-tokio-tar]
+# Pin past the distro default snapshot (0.5.6) to Fedora f43 HEAD (0.6.4),
+# satisfying uv 0.10.12's requirement (>= 0.6.0, < 0.7.0).
+# Temporary: drop once the distro default snapshot satisfies uv's
+# astral-tokio-tar floor (currently >= 0.6.0).
+# Sole in-tree consumer at pin time: uv (crates.io reverse-dependency check,
+# 2026-08-12). rust-tar dev-depends on astral-tokio-tar >= 0.6.2 but is safe
+# since AZL's rust-tar is 0.4.44 (pre-dates that dev-dep).
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "826ed24acec8b1446e6de76fa1d49ea5e651c835" }
