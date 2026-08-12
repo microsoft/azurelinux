@@ -52,27 +52,32 @@ else
 fi
 
 # Test 5: Create a test file in the exchange directory and submit it for signing
-TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.txt"
-echo "This is a test file for xsign-proxy signing" > "$TEST_FILE"
-echo "Created test file: $TEST_FILE"
+UNSIGNED_TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.txt"
+SIGNED_TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.signed.txt"
+echo "This is a test file for xsign-proxy signing" > "$UNSIGNED_TEST_FILE"
+echo "Created test file: $UNSIGNED_TEST_FILE"
 
 echo "Submitting test file for signing..."
-if /usr/local/bin/xsign_proxy_client.py sign "$TEST_FILE"; then
+if /usr/local/bin/xsign_proxy_client.py sign \
+    --input-file "$UNSIGNED_TEST_FILE" \
+    --output-file "$SIGNED_TEST_FILE"; then
     echo "PASS: Sign request submitted successfully"
 else
     echo "FAIL: Sign request failed"
-    rm -f "$TEST_FILE"
 fi
 
-# Clean up test file
-rm -f "$TEST_FILE"
+# Clean up test files
+# rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
 echo "=== All xsign-proxy tests passed ==="
 
 %install
 mkdir -p %{buildroot}%{_docdir}/%{name}
 echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
+install -D -m 0644 "$SIGNED_TEST_FILE" \
+    %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
 
 %files
+%config(noreplace) %{_sysconfdir}/xsign-proxy-test.signed.txt
 %{_docdir}/%{name}/README
 
 %changelog
