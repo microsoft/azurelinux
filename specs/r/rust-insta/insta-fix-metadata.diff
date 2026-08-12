@@ -1,6 +1,6 @@
---- insta-1.45.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ insta-1.45.1/Cargo.toml	2026-01-14T12:51:14.680100+00:00
-@@ -117,16 +117,19 @@
+--- insta-1.46.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ insta-1.46.3/Cargo.toml	2026-03-07T12:35:54.572687+00:00
+@@ -117,9 +117,12 @@
  optional = true
  
  [dependencies.console]
@@ -14,14 +14,6 @@
  
  [dependencies.csv]
  version = "1.1.6"
- optional = true
- 
- [dependencies.globset]
--version = ">= 0.4.6, < 0.4.17"
-+version = "0.4.6"
- optional = true
- 
- [dependencies.once_cell]
 @@ -150,7 +153,7 @@
  default-features = false
  
