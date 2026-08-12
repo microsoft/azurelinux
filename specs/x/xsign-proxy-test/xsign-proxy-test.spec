@@ -61,16 +61,22 @@ echo "Submitting test file for signing..."
 if /usr/local/bin/xsign_proxy_client.py sign \
     --input-file "$UNSIGNED_TEST_FILE" \
     --output-file "$SIGNED_TEST_FILE"; then
-    echo "PASS: Sign request submitted successfully"
+    echo "PASS: Sign request completed successfully"
 else
     echo "FAIL: Sign request failed"
 fi
+
+ls -la "$UNSIGNED_TEST_FILE"
+ls -la "$SIGNED_TEST_FILE"
 
 # Clean up test files
 # rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
 echo "=== All xsign-proxy tests passed ==="
 
 %install
+UNSIGNED_TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.txt"
+SIGNED_TEST_FILE="/var/lib/xsign-exchange/test-file-%{name}-%{version}.signed.txt"
+
 mkdir -p %{buildroot}%{_docdir}/%{name}
 echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
 install -D -m 0644 "$SIGNED_TEST_FILE" \
