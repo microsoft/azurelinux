@@ -1180,7 +1180,7 @@ Source5002: azurelinux-ca-20230216.pem
 Source6000: open-gpu-kernel-modules-%{nvidia_open_version}.tar.gz
 Source6001: kmod-nvidia-open-modprobe.conf
 Source6002: kmod-nvidia-open.inc
-Source6100: MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_bundle_release}.tgz
+Source6100: MLNX_OFED_SRC-%{mlnx_ofa_version}-%{mlnx_ofa_vendor_release}.tgz
 Source6101: mlnx-ofa_kernel.inc
 
 ## Patches needed for building this package

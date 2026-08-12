@@ -7,4 +7,4 @@
 %nvidia_open_version 595.58.03
 %mlnx_ofa_version 26.04
 %mlnx_ofa_vendor_release 1.1.0.0
-%mlnx_ofa_ofed_version OFED.%{mlnx_ofa_version}.%{mlnx_ofa_vendor_release}
+%mlnx_ofa_release OFED.%{mlnx_ofa_version}.%{mlnx_ofa_vendor_release}
