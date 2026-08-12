@@ -12,16 +12,20 @@
 # our spec does not reference it or ship it in any binary RPM, so stripping
 # this file is functionally inert.
 #
-# Replace upstream Source0 with a deterministically-repacked tarball produced
-# by base/comps/espeak-ng/modify_source.sh. The upstream filename is preserved
-# so `replace-upstream = true` swaps the entry in place in the Fedora `sources`
-# manifest without requiring a `Source0`/filename change.
+# Archive overlays strip this scanner-flagged fixture from upstream Source0
+# during source preparation, avoiding a separate modified-source tarball.
 [components.espeak-ng]
+
+[[components.espeak-ng.overlays]]
+type = "file-remove"
+file = "chromium_extension/index.php"
+archive = "espeak-ng-1.51.1.tar.gz"
+description = "Remove PHP webshell demo flagged as PHP/Webshell.NWM by AZL signing-pipeline AV scanner"
 
 [[components.espeak-ng.source-files]]
 filename = "espeak-ng-1.51.1.tar.gz"
-hash = "84685a24e93e743c4f0be73dd9d553a96ed95bc8c2c0c683d84935183e517ae039066de93e3f83617b2114b27b427ec18ff8169972188d2a81b55f839c7c726f"
+hash = "5de425918c64f621545f5cf025519bc92a7a2325751894bccf80eeb279e508b135914c1b8dddbe5681d4914639025e9535727fc2b5080d060e10e0b6108323f2"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/espeak-ng/espeak-ng-1.51.1.tar.gz/sha512/84685a24e93e743c4f0be73dd9d553a96ed95bc8c2c0c683d84935183e517ae039066de93e3f83617b2114b27b427ec18ff8169972188d2a81b55f839c7c726f/espeak-ng-1.51.1.tar.gz" }
+origin = { type = "overlay" }
 replace-upstream = true
-replace-reason = "Strips the `chromium_extension/index.php` demo file flagged as PHP/Webshell.NWM by anti-malware scanners on the AZL RPM-signing pipeline. See `modify_source.sh` next to this file."
+replace-reason = "Upstream source tarball contains the chromium_extension/index.php demo payload, which is removed by the archive overlay to allow SRPM publication."
