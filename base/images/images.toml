@@ -93,6 +93,27 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- 1p-vm-base-gen2-fips ----------------------------------------------
+
+[images.1p-vm-base-gen2-fips]
+description = "1P VM Base Gen2 FIPS Image (UEFI)"
+definition = { type = "kiwi", path = "1p-vm-base-gen2-fips/1p-vm-base-gen2-fips.kiwi" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.1p-vm-base-gen2-fips.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 # ---- container-base (core profile) -------------------------------------
 [images.container-base]
 description = "Container Base Image"
@@ -220,6 +241,10 @@ description = "Lisa cvm tests"
 [test-suites.lisa-kernel-ltp]
 type = "lisa"
 description = "Lisa kernel LTP tests"
+
+[test-suites.lisa-fips]
+type = "lisa"
+description = "Lisa FIPS Tests"
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]
