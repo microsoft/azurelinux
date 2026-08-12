@@ -68,6 +68,8 @@ fi
 
 ls -la "$UNSIGNED_TEST_FILE"
 ls -la "$SIGNED_TEST_FILE"
+ls -la /var/lib/xsign-exchange/
+find /var/lib/xsign-exchange/
 
 # Clean up test files
 # rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
