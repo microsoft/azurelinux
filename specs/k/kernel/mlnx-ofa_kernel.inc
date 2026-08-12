@@ -46,7 +46,7 @@
 %package -n mlnx-ofa_kernel
 Summary:        NVIDIA / Mellanox OFED userspace utilities (mlnx-ofa_kernel %{mlnx_ofa_version})
 Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_version}%{?dist}
+Release:        %{mlnx_ofa_release}%{?dist}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above,
 # before any %{version}/%{release}/%{KVERREL} is used below or in later subpackages.
 %global version %{_azl_kver}
@@ -77,7 +77,7 @@ package.
 %package -n mlnx-ofa_kernel-modules
 Summary:        NVIDIA / Mellanox OFED kernel modules (mlnx-ofa_kernel %{mlnx_ofa_version})
 Version:        %{mlnx_ofa_version}
-Release:        %{mlnx_ofa_srelease}.%{_azl_kver}.%{_azl_krel}
+Release:        %{mlnx_ofa_release}.%{_azl_kver}.%{_azl_krel}
 # Restore the kernel NVR macros clobbered by the Version/Release tags above,
 # before %{KVERREL} (which expands %{release}) is used in the Provides/Requires below.
 %global version %{_azl_kver}
@@ -121,6 +121,13 @@ for each kernel version on this machine (x86_64 and aarch64 only).
 # -------------------------------------------------------------------------
 %package -n mlnx-ofa_kernel-devel
 Summary:        Development files for mlnx-ofa_kernel (%{mlnx_ofa_version}, kernel %{KVERREL})
+Version:        %{mlnx_ofa_version}
+Release:        %{mlnx_ofa_release}%{?dist}
+# Restore the kernel NVR macros clobbered by the Version/Release tags above so
+# the kernel's own %files templates (which reference raw %{version}/%{release})
+# resolve to the kernel NVR again.
+%global version %{_azl_kver}
+%global release %{_azl_krel}
 AutoReq:        no
 Provides:       mlnx-ofa-kmod-devel-version = %{mlnx_ofa_version}
 Provides:       mlnx-ofa-kmod-devel-release = %{mlnx_ofa_release}
