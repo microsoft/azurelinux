@@ -22,6 +22,38 @@ cp %{SOURCE0} .
 %build
 echo "=== Testing xsign-proxy connectivity ==="
 
+# Function to retrieve the Mock buildroot name from chroot files
+get_buildroot_name() {
+    local buildroot_name
+    
+    # Method 1: Read from /etc/mock/default.cfg (created by Mock inside chroot)
+    if [ -f /etc/mock/default.cfg ]; then
+        buildroot_name=$(grep -oP "config_opts\['root'\]\s*=\s*['\047]\K[^\047]*" /etc/mock/default.cfg | head -1)
+        if [ -n "$buildroot_name" ]; then
+            echo "$buildroot_name"
+            return 0
+        fi
+    fi
+    
+    # Method 2: Parse /proc/self/cgroup for mock hints
+    if [ -f /proc/self/cgroup ]; then
+        buildroot_name=$(grep -oP 'mock[.-]\K[^/.\s]+' /proc/self/cgroup | head -1)
+        if [ -n "$buildroot_name" ]; then
+            echo "$buildroot_name"
+            return 0
+        fi
+    fi
+    
+    return 1
+}
+
+# Function to extract the Koji build tag from buildroot name
+parse_build_tag() {
+    local buildroot_name=$1
+    # Strip trailing -<digits>-<digits> suffix added by mock
+    echo "$buildroot_name" | sed 's/-[0-9]\+-[0-9]\+$//'
+}
+
 # Test 1: Verify the client script is available in the chroot
 if [ -x /usr/local/bin/xsign_proxy_client.py ]; then
     echo "PASS: xsign_proxy_client.py is present and executable"
@@ -34,6 +66,17 @@ if [ -d /var/run/xsign-proxy ]; then
     echo "PASS: Socket directory /var/run/xsign-proxy exists"
 else
     echo "FAIL: Socket directory /var/run/xsign-proxy not found"
+fi
+
+# Test 2.5: Retrieve and display the buildroot name and build tag
+echo "Retrieving buildroot name..."
+buildroot_name=$(get_buildroot_name)
+if [ -n "$buildroot_name" ]; then
+    echo "PASS: Retrieved buildroot name: $buildroot_name"
+    build_tag=$(parse_build_tag "$buildroot_name")
+    echo "      Extracted build tag: $build_tag"
+else
+    echo "WARN: Could not retrieve buildroot name from chroot files"
 fi
 
 # Test 3: Ping the daemon to verify connectivity
