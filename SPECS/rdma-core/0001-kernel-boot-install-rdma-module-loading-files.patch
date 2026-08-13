@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Azure Linux Team <azurelinux@microsoft.com>
+Date: Thu, 13 Aug 2026 00:00:00 +0000
+Subject: [PATCH] kernel-boot: install RDMA module loading files
+
+Restore installation of the systemd units, module configuration files,
+and udev rules needed to load RDMA kernel modules automatically.
+---
+ kernel-boot/CMakeLists.txt | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/kernel-boot/CMakeLists.txt b/kernel-boot/CMakeLists.txt
+index 7aa277e..0782203 100644
+--- a/kernel-boot/CMakeLists.txt
++++ b/kernel-boot/CMakeLists.txt
+@@ -1,3 +1,29 @@
++rdma_subst_install(FILES rdma-load-modules@.service.in
++  DESTINATION "${CMAKE_INSTALL_SYSTEMD_SERVICEDIR}"
++  RENAME rdma-load-modules@.service
++  PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
++
++rdma_subst_install(FILES "rdma-hw.target.in"
++  RENAME "rdma-hw.target"
++  DESTINATION "${CMAKE_INSTALL_SYSTEMD_SERVICEDIR}"
++  PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ)
++
++install(FILES
++  modules/infiniband.conf
++  modules/iwarp.conf
++  modules/opa.conf
++  modules/rdma.conf
++  modules/roce.conf
++  DESTINATION "${CMAKE_INSTALL_SYSCONFDIR}/rdma/modules")
++
++install(FILES "rdma-hw-modules.rules"
++  RENAME "90-rdma-hw-modules.rules"
++  DESTINATION "${CMAKE_INSTALL_UDEV_RULESDIR}")
++
++install(FILES "rdma-ulp-modules.rules"
++  RENAME "90-rdma-ulp-modules.rules"
++  DESTINATION "${CMAKE_INSTALL_UDEV_RULESDIR}")
++
+ install(FILES "rdma-persistent-naming.rules"
+   RENAME "60-rdma-persistent-naming.rules"
+   DESTINATION "${CMAKE_INSTALL_UDEV_RULESDIR}")
+-- 
+2.45.2

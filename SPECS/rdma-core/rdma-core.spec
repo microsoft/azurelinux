@@ -55,6 +55,8 @@ Patch4: 0004-providers-mana-Retrieve-queue-type-from-queue-ID.patch
 Patch5: 0005-providers-mana-unify-rc_qp-to-be-rnic_qp.patch
 Patch6: 0006-providers-mana-allocate-destroy-MWs.patch
 Patch7: 0007-libibverbs-Extend-ibv_cmd_create_qp_ex2-with-driver-.patch
+
+Patch8: 0001-kernel-boot-install-rdma-module-loading-files.patch
 # OFED: Build static libs by default.
 %define with_static %{?_without_static: 0} %{?!_without_static: 1}
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -471,11 +473,10 @@ mkdir -p %{buildroot}%{_libexecdir}
 mkdir -p %{buildroot}%{_udevrulesdir}
 mkdir -p %{buildroot}%{dracutlibdir}/modules.d/50rdma
 mkdir -p %{buildroot}%{sysmodprobedir}
+install -m0755 kernel-boot/dracut/50rdma/module-setup.sh %{buildroot}%{dracutlibdir}/modules.d/50rdma/module-setup.sh
 install -D -m0644 redhat/rdma.mlx4.conf %{buildroot}/%{_sysconfdir}/rdma/mlx4.conf
 install -D -m0644 redhat/rdma.mlx4.sys.modprobe %{buildroot}%{sysmodprobedir}/libmlx4.conf
 install -D -m0755 redhat/rdma.mlx4-setup.sh %{buildroot}%{_libexecdir}/mlx4-setup.sh
-rm -f %{buildroot}%{_sysconfdir}/rdma/modules/rdma.conf
-install -D -m0644 kernel-boot/modules/rdma.conf %{buildroot}%{_sysconfdir}/rdma/modules/rdma.conf
 
 # ibacm
 (if [ -d %{__cmake_builddir} ]; then cd %{__cmake_builddir}; fi
@@ -548,7 +549,11 @@ fi
 %doc installed_docs/tag_matching.md
 %doc installed_docs/70-persistent-ipoib.rules
 %config(noreplace) %{_sysconfdir}/rdma/mlx4.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/infiniband.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/iwarp.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/opa.conf
 %config(noreplace) %{_sysconfdir}/rdma/modules/rdma.conf
+%config(noreplace) %{_sysconfdir}/rdma/modules/roce.conf
 %if 0
 %dir %{_sysconfdir}/modprobe.d
 %config(noreplace) %{_sysconfdir}/modprobe.d/mlx4.conf
@@ -557,11 +562,16 @@ fi
 %dir %{dracutlibdir}
 %dir %{dracutlibdir}/modules.d
 %dir %{dracutlibdir}/modules.d/50rdma
+%{dracutlibdir}/modules.d/50rdma/module-setup.sh
 %dir %{_udevrulesdir}
 %{_udevrulesdir}/../rdma_rename
 %{_udevrulesdir}/60-rdma-ndd.rules
 %{_udevrulesdir}/60-rdma-persistent-naming.rules
 %{_udevrulesdir}/75-rdma-description.rules
+%{_udevrulesdir}/90-rdma-hw-modules.rules
+%{_udevrulesdir}/90-rdma-ulp-modules.rules
+%{_unitdir}/rdma-hw.target
+%{_unitdir}/rdma-load-modules@.service
 %{_udevrulesdir}/90-rdma-umad.rules
 %dir %{sysmodprobedir}
 %{sysmodprobedir}/libmlx4.conf
