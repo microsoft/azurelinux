@@ -102,6 +102,7 @@ INSTALL_PKGS=(
     rootfiles
     shadow-utils
     util-linux
+    xfsprogs
     selinux-policy-targeted
     audit
     chrony

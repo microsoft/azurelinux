@@ -116,6 +116,7 @@
         <package name="anaconda-core" />
         <package name="anaconda-tui" />
         <package name="anaconda-install-env-deps" />
+        <package name="xfsprogs" />
 
         <!-- Offline repo creation -->
         <package name="createrepo_c" />
