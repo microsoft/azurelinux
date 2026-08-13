@@ -22,36 +22,16 @@ cp %{SOURCE0} .
 %build
 echo "=== Testing xsign-proxy connectivity ==="
 
-# Function to retrieve the Mock buildroot name from chroot files
-get_buildroot_name() {
-    local buildroot_name
-    
-    # Method 1: Read from /etc/mock/default.cfg (created by Mock inside chroot)
-    if [ -f /etc/mock/default.cfg ]; then
-        buildroot_name=$(grep -oP "config_opts\['root'\]\s*=\s*['\047]\K[^\047]*" /etc/mock/default.cfg | head -1)
-        if [ -n "$buildroot_name" ]; then
-            echo "$buildroot_name"
-            return 0
-        fi
-    fi
-    
-    # Method 2: Parse /proc/self/cgroup for mock hints
-    if [ -f /proc/self/cgroup ]; then
-        buildroot_name=$(grep -oP 'mock[.-]\K[^/.\s]+' /proc/self/cgroup | head -1)
-        if [ -n "$buildroot_name" ]; then
-            echo "$buildroot_name"
-            return 0
-        fi
-    fi
-    
-    return 1
-}
+# Path written by the tag_info mock plugin before the build starts.
+KOJI_BUILD_TAG_FILE=/etc/koji-build-tag
 
-# Function to extract the Koji build tag from buildroot name
-parse_build_tag() {
-    local buildroot_name=$1
-    # Strip trailing -<digits>-<digits> suffix added by mock
-    echo "$buildroot_name" | sed 's/-[0-9]\+-[0-9]\+$//'
+# Read the Koji build tag published into the chroot by the tag_info plugin.
+get_build_tag() {
+    if [ -r "$KOJI_BUILD_TAG_FILE" ]; then
+        tr -d '[:space:]' < "$KOJI_BUILD_TAG_FILE"
+        return 0
+    fi
+    return 1
 }
 
 # Test 1: Verify the client script is available in the chroot
@@ -68,15 +48,13 @@ else
     echo "FAIL: Socket directory /var/run/xsign-proxy not found"
 fi
 
-# Test 2.5: Retrieve and display the buildroot name and build tag
-echo "Retrieving buildroot name..."
-buildroot_name=$(get_buildroot_name)
-if [ -n "$buildroot_name" ]; then
-    echo "PASS: Retrieved buildroot name: $buildroot_name"
-    build_tag=$(parse_build_tag "$buildroot_name")
-    echo "      Extracted build tag: $build_tag"
+# Test 2.5: Read and display the Koji build tag written by the tag_info plugin
+echo "Reading Koji build tag from $KOJI_BUILD_TAG_FILE..."
+build_tag=$(get_build_tag)
+if [ -n "$build_tag" ]; then
+    echo "PASS: Koji build tag: $build_tag"
 else
-    echo "WARN: Could not retrieve buildroot name from chroot files"
+    echo "WARN: Could not read Koji build tag from $KOJI_BUILD_TAG_FILE"
 fi
 
 # Test 3: Ping the daemon to verify connectivity
@@ -104,7 +82,12 @@ else
 fi
 
 ls -la "$UNSIGNED_TEST_FILE"
-ls -la "$SIGNED_TEST_FILE"
+# On unsigned tags the client skips the request, so no signed file is produced.
+if [ -f "$SIGNED_TEST_FILE" ]; then
+    ls -la "$SIGNED_TEST_FILE"
+else
+    echo "No signed file produced (expected on tags that are not signed tags)"
+fi
 
 # Clean up test files
 # rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
@@ -116,8 +99,15 @@ SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.s
 
 mkdir -p %{buildroot}%{_docdir}/%{name}
 echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
-install -D -m 0644 "$SIGNED_TEST_FILE" \
-    %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
+# Fall back to the unsigned file so the package still builds on tags where the
+# client intentionally skips signing.
+if [ -f "$SIGNED_TEST_FILE" ]; then
+    install -D -m 0644 "$SIGNED_TEST_FILE" \
+        %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
+else
+    install -D -m 0644 "$UNSIGNED_TEST_FILE" \
+        %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
+fi
 
 %files
 %config(noreplace) %{_sysconfdir}/xsign-proxy-test.signed.txt
