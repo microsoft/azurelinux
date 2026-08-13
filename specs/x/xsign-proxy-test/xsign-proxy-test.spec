@@ -52,6 +52,7 @@ else
 fi
 
 # Test 5: Create a test file in the writable RPM build directory and submit it for signing
+mkdir -p %{_builddir}/%{name}-%{version}
 UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
 SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
 echo "This is a test file for xsign-proxy signing" > "$UNSIGNED_TEST_FILE"
