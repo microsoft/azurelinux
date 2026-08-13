@@ -51,9 +51,9 @@ else
     echo "FAIL: Daemon did not respond to ping"
 fi
 
-# Test 5: Create a test file in the exchange directory and submit it for signing
-UNSIGNED_TEST_FILE="/var/lib/test-file-%{name}-%{version}.txt"
-SIGNED_TEST_FILE="/var/lib/test-file-%{name}-%{version}.signed.txt"
+# Test 5: Create a test file in the writable RPM build directory and submit it for signing
+UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
+SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
 echo "This is a test file for xsign-proxy signing" > "$UNSIGNED_TEST_FILE"
 echo "Created test file: $UNSIGNED_TEST_FILE"
 
@@ -76,8 +76,8 @@ find /var/lib/xsign-exchange/
 echo "=== All xsign-proxy tests passed ==="
 
 %install
-UNSIGNED_TEST_FILE="/var/lib/test-file-%{name}-%{version}.txt"
-SIGNED_TEST_FILE="/var/lib/test-file-%{name}-%{version}.signed.txt"
+UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
+SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
 
 mkdir -p %{buildroot}%{_docdir}/%{name}
 echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
