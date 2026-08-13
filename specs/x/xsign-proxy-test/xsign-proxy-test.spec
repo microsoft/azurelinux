@@ -81,5 +81,5 @@ install -D -m 0644 "$SIGNED_TEST_FILE" \
 %{_docdir}/%{name}/README
 
 %changelog
-* Thu Jun 26 2026 Test User <test@example.com> - 1.0.0-1
+* Fri Jun 26 2026 Test User <test@example.com> - 1.0.0-1
 - Initial package to test xsign-proxy client-server communication
