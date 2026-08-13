@@ -11,7 +11,6 @@ Source0:        https://download.gnome.org/sources/pango/1.51/%{name}-%{version}
 # All the tests were failing on same reason
 Patch0:         0001-skip-tests-which-are-known-to-fail.patch
 BuildRequires:  cairo-devel >= 1.18.0
-BuildRequires:  dejavu-sans-fonts
 BuildRequires:  fontconfig
 BuildRequires:  fontconfig-devel
 BuildRequires:  freetype
@@ -24,6 +23,9 @@ BuildRequires:  libXft-devel
 BuildRequires:  meson
 BuildRequires:  pkg-config
 BuildRequires:  pkgconfig(fribidi)
+%if 0%{?with_check}
+BuildRequires:  dejavu-sans-fonts
+%endif
 Requires:       harfbuzz-devel
 
 %description
