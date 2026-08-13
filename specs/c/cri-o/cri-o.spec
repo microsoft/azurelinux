@@ -33,7 +33,7 @@ Version:        1.32.0
 
 Name:           cri-o
 Epoch:          0
-Release: 5%{?dist}
+Release:        5%{?dist}
 Summary:        Open Container Initiative-based implementation of Kubernetes Container Runtime Interface
 
 # Upstream license specification: Apache-2.0

@@ -5,7 +5,7 @@
 
 Name:           xbean
 Version:        4.24
-Release: 12%{?dist}
+Release:        12%{?dist}
 Summary:        Java plugin based web server
 License:        Apache-2.0
 URL:            https://geronimo.apache.org/xbean/

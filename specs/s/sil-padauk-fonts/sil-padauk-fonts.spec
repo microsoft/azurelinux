@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version:  3.003
-Release: 21%{?dist}
+Release:  21%{?dist}
 URL:      https://software.sil.org/padauk/
 
 %global         foundry         SIL

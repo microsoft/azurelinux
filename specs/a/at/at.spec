@@ -6,7 +6,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release: 18%{?dist}
+Release:    18%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPL-3.0-or-later AND GPL-2.0-or-later AND ISC

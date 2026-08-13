@@ -19,7 +19,7 @@ be a replacement for github.com/gobuffalo/packr/v2.}
 %global godocs          examples README.md SHOULDERS.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release:        17%{?dist}
 Summary:        Embed static files in Go binaries
 
 License:        MIT

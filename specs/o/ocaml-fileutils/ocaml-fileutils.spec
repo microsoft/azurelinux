@@ -12,7 +12,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-fileutils
 Version:        0.6.6
-Release: 5%{?dist}
+Release:        5%{?dist}
 Summary:        OCaml library for common file and filename operations
 
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception

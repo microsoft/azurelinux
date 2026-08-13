@@ -5,7 +5,7 @@
 
 Name:           stringtemplate4
 Version:        4.3.4
-Release: 12%{?dist}
+Release:        12%{?dist}
 Summary:        A Java template engine
 License:        BSD-3-Clause
 URL:            http://www.stringtemplate.org/

@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        4.0.11
-Release: 7%{?dist}
+Release:        7%{?dist}
 Summary:        Git Object Database
 
 License:        BSD-3-Clause

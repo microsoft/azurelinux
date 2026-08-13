@@ -7,7 +7,7 @@
 
 Name:           python-pycares
 Version:        4.10.0
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        Python interface for c-ares
 
 License:        MIT

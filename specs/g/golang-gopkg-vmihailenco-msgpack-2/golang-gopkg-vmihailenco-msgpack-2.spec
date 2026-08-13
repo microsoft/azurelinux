@@ -19,7 +19,7 @@ MessagePack encoding for Golang.}
 %global godocs          README.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release:        17%{?dist}
 Summary:        MessagePack encoding for Golang
 
 License:        BSD-3-Clause

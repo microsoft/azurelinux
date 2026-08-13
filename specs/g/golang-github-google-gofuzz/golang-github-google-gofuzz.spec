@@ -18,7 +18,7 @@ Gofuzz is a library for populating Go objects with random values.}
 %global godocs          CONTRIBUTING.md README.md
 
 Name:           %{goname}
-Release: 14%{?dist}
+Release:        14%{?dist}
 Summary:        Fuzz testing for Go
 
 License:        Apache-2.0

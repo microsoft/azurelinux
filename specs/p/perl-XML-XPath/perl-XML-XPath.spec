@@ -10,7 +10,7 @@
 
 Name:           perl-XML-XPath
 Version:        1.48
-Release: 10%{?dist}
+Release:        10%{?dist}
 Summary:        XPath parser and evaluator for Perl
 # XML/XPath.pm, XML/XPath/PerlSAX.pm, REAME: GPL-1.0-or-later OR Artistic-1.0-Perl
 # Others: Artistic-2.0

@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        5.0.0
-Release: 28%{?dist}
+Release:        28%{?dist}
 Summary:        Container class boilerplate killer
 
 License:        BSD-2-Clause

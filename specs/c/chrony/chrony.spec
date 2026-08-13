@@ -12,7 +12,7 @@
 
 Name:           chrony
 Version:        4.8
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        An NTP client/server
 
 License:        GPL-2.0-only

@@ -23,7 +23,7 @@
 
 Name:             byteman
 Version:          4.0.26
-Release: 2%{?dist}
+Release:          2%{?dist}
 Summary:          Java agent-based bytecode injection tool
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:          LicenseRef-Callaway-LGPLv2+

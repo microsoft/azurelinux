@@ -5,7 +5,7 @@
 
 Name:           maven-invoker-plugin
 Version:        3.9.0
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        Maven Invoker Plugin
 
 License:        Apache-2.0

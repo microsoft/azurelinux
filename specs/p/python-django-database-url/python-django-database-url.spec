@@ -10,7 +10,7 @@
 
 Name:           python-django-database-url
 Version:        0.5.0
-Release: 31%{?dist}
+Release:        31%{?dist}
 Summary:        Use Database URLs in your Django Application
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

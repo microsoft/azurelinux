@@ -11,7 +11,7 @@ ExcludeArch: %{ix86}
 
 Name:           galera
 Version:        26.4.25
-Release: 2%{?dist}
+Release:        2%{?dist}
 Summary:        Synchronous multi-master wsrep provider (replication engine)
 
 License:        GPL-2.0-only

@@ -9,7 +9,7 @@
 
 Name:           bash-completion
 Version:        2.16
-Release: 3%{?dist}
+Release:        3%{?dist}
 Epoch:          1
 Summary:        Programmable completion for Bash
 

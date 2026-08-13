@@ -17,7 +17,7 @@
 
 Name:           qatengine
 Version:        2.0.0
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        Intel QuickAssist Technology (QAT) OpenSSL Engine
 
 # Most of the source code is BSD, with the following exceptions:

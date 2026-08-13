@@ -30,7 +30,7 @@
 
 Name:       python-%{library}
 Version:    0.13.2
-Release: 12%{?dist}
+Release:    12%{?dist}
 Summary:    Python client for the OpenShift API
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:    Apache-2.0

@@ -8,7 +8,7 @@
 
 Name:           liblerc
 Version:        4.0.0
-Release: 11%{?dist}
+Release:        11%{?dist}
 Summary:        Library for Limited Error Raster Compression
 
 License:        Apache-2.0

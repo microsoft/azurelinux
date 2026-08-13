@@ -19,7 +19,7 @@ requested.}
 %global godocs          README.md SHOULDERS.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release:        17%{?dist}
 Summary:        Get you accurate Go information about the directory of package requested
 
 License:        MIT

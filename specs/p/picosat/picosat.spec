@@ -3,7 +3,7 @@
 
 Name:           picosat
 Version:        965
-Release: 29%{?dist}
+Release:        29%{?dist}
 Summary:        A SAT solver
 
 License:        MIT

@@ -3,7 +3,7 @@
 
 Name:           python-deprecation
 Version:        2.1.0
-Release: 22%{?dist}
+Release:        22%{?dist}
 Summary:        A library to handle automated deprecations
 
 License:        Apache-2.0

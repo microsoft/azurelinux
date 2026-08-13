@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-ounit
 Version:        2.2.7
-Release: 17%{?dist}
+Release:        17%{?dist}
 Summary:        Unit test framework for OCaml
 
 License:        MIT

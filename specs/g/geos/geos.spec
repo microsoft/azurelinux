@@ -14,7 +14,7 @@
 
 Name:          geos
 Version:       3.14.1
-Release: 3%{?dist}
+Release:       3%{?dist}
 Summary:       GEOS is a C++ port of the Java Topology Suite
 
 License:       LGPL-2.1-only

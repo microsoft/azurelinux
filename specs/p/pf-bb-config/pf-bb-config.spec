@@ -3,7 +3,7 @@
 
 Name:           pf-bb-config
 Version:        24.07
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        PF BBDEV (baseband device) Configuration Application
 
 License:        Apache-2.0

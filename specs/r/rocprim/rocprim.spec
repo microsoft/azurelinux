@@ -22,7 +22,7 @@
 
 Name:           rocprim
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release:        4%{?dist}
 Summary:        ROCm parallel primatives
 
 License:        MIT AND BSD-3-Clause

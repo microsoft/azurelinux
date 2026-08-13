@@ -27,7 +27,7 @@
 %global xamarinrelease 199
 Name:           mono
 Version:        6.12.0
-Release: 22%{?dist}
+Release:        22%{?dist}
 Summary:        Cross-platform, Open Source, .NET development framework
 
 License:        MIT

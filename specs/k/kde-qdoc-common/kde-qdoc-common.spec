@@ -3,7 +3,7 @@
 
 Name:           kde-qdoc-common
 Version:        1.0.0
-Release: 3%{?dist}
+Release:        3%{?dist}
 Summary:        Common files for KDE's API documentation (using QDoc)
 BuildArch:      noarch
 

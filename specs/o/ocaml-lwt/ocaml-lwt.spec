@@ -8,7 +8,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-lwt
 Version:        5.9.1
-Release: 3%{?dist}
+Release:        3%{?dist}
 Summary:        OCaml lightweight thread library
 
 # The project as a whole is MIT.  The following files are BSD-2-Clause:

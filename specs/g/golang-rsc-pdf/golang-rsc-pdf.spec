@@ -18,7 +18,7 @@ PDF reader library in Go.}
 %global godocs          README.md
 
 Name:           %{goname}
-Release: 23%{?dist}
+Release:        23%{?dist}
 Summary:        PDF reader library in Go
 
 # Upstream license specification: BSD-3-Clause

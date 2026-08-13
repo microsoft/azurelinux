@@ -3,7 +3,7 @@
 
 Name:           vmaf
 Version:        3.0.0
-Release: 5%{?dist}
+Release:        5%{?dist}
 Summary:        Video Multi-Method Assessment Fusion
 
 License:        BSD-2-Clause-Patent

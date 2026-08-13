@@ -19,7 +19,7 @@ Client for OpenStack Octavia (Load Balancer as a Service)
 
 Name:           python-%{pypi_name}
 Version:        3.8.0
-Release: 6%{?dist}
+Release:        6%{?dist}
 Summary:        Client for OpenStack Octavia (Load Balancer as a Service)
 
 License:        Apache-2.0

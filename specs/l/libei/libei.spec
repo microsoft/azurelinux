@@ -13,7 +13,7 @@
 
 Name:           libei
 Version:        1.5.0
-Release: 2%{?dist}
+Release:        2%{?dist}
 Summary:        Library for Emulated Input
 
 License:        MIT
