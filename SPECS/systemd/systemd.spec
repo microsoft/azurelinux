@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        33%{?dist}
+Release:        34%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -159,6 +159,8 @@ Patch0911:      CVE-2026-40225.patch
 Patch0912:      networkd-address-skip-firewall-init.patch
 Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
+Patch915:      CVE-2026-15059.patch
+Patch916:      CVE-2026-16742.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1257,6 +1259,9 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 255-34
+- Patch for CVE-2026-16742, CVE-2026-15059
+
 * Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
 - Skip tests in %%check that require capabilities not available in the build
   chroot (mount-namespace privileges, systemd-detect-virt on PATH, etc.):
