@@ -508,10 +508,26 @@ jobs:
               # check_rendered_specs.py diffs the working tree (now containing
               # any re-render output and any orphan-cleanup deletions) against
               # HEAD and produces the user-facing patch.
+              # Run both gates before exiting so counter drift cannot prevent
+              # the report and fix patch needed by the PR comment job.
+              render_check_exit=0
               python3 /scripts-render/check_rendered_specs.py \
                 --specs-dir "$SPECS_DIR" \
                 --report /output/render-check-report.json \
-                --patch /output/rendered-specs.patch
+                --patch /output/rendered-specs.patch || render_check_exit=$?
+
+              # Counter configuration targets rendered text, so run this after
+              # the PR render and retain its machine-readable result with the
+              # existing drift artifacts.
+              counter_check_exit=0
+              azldev component check --release-counters -a -q -O json \
+                > /output/release-counter-check.json || counter_check_exit=$?
+
+              if [ "$render_check_exit" -ne 0 ]; then
+                exit "$render_check_exit"
+              fi
+
+              exit "$counter_check_exit"
             '
 
       # Dual upload: `archive: false` (v7 feature) gives browser users a direct
@@ -543,6 +559,7 @@ jobs:
           path: |
             render-output/render-output.json
             render-output/render-check-report.json
+            render-output/release-counter-check.json
 
   # Post the PR comment. Runs in a separate job so the `pull-requests: write`
   # token is only granted to a job that does NOT execute any PR-derived code:

@@ -23,21 +23,27 @@ steps:
       # An empty render set just means no components changed.
       if [[ ! -s "$RENDER_SET_FILE" ]]; then
         echo "No changed components -- skipping render."
-        exit 0
+      else
+        echo "##[group]Render set"
+        sed 's/^/  - /' "$RENDER_SET_FILE"
+        echo "##[endgroup]"
+        echo "##[group]Specs rendering + verification"
+        # `-x` fails loudly if the arg list would split into multiple xargs
+        # invocations -- a multi-batch render-check would silently mask drift in
+        # the later batches. `-n 50000` is required for `-x` to have any effect
+        # (without `-n`/`-L`, GNU xargs never splits). `--` ends azldev option
+        # parsing so component names beginning with `-` (none today) are
+        # unambiguous. `env AZLDEV_ALLOW_ROOT=1` is inline per
+        # .github/instructions/ado-pipeline.instructions.md.
+        xargs -x -n 50000 -d '\n' env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only -- \
+          < "$RENDER_SET_FILE"
+        echo "##[endgroup]"
       fi
-      echo "##[group]Render set"
-      sed 's/^/  - /' "$RENDER_SET_FILE"
-      echo "##[endgroup]"
-      echo "##[group]Specs rendering + verification"
-      # `-x` fails loudly if the arg list would split into multiple xargs
-      # invocations -- a multi-batch render-check would silently mask drift in
-      # the later batches. `-n 50000` is required for `-x` to have any effect
-      # (without `-n`/`-L`, GNU xargs never splits). `--` ends azldev option
-      # parsing so component names beginning with `-` (none today) are
-      # unambiguous. `env AZLDEV_ALLOW_ROOT=1` is inline per
-      # .github/instructions/ado-pipeline.instructions.md.
-      xargs -x -n 50000 -d '\n' env AZLDEV_ALLOW_ROOT=1 azldev component render --check-only -- \
-        < "$RENDER_SET_FILE"
+
+      echo "##[group]Release counter verification"
+      # Unlike GitHub's render workflow, this check-only render leaves the
+      # working tree untouched, so the counter gate validates committed specs.
+      env AZLDEV_ALLOW_ROOT=1 azldev component check --release-counters -a -q -O json
       echo "##[endgroup]"
     env:
       RENDER_SET_FILE: $(${{ parameters.renderSetFileVar }})
