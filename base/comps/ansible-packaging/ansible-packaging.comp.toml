@@ -1,3 +1,9 @@
 [components.ansible-packaging]
-# Release: 18.1%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: 18.1%{?dist}
+
+[components.ansible-packaging.release]
+calculation = "static"
+
+[components.ansible-packaging.release.counter]
+source = "release-tag"
+regex = '^[0-9]+\.([0-9]+)(?:%\{\??dist\})?$'

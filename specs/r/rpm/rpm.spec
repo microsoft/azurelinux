@@ -27,7 +27,7 @@
 
 %global rpmver 6.0.1
 #global snapver rc1
-%global baserelease 1
+%global baserelease 3
 %global sover 10
 
 %global srcver %{rpmver}%{?snapver:-%{snapver}}

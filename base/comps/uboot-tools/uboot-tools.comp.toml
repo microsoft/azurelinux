@@ -1,6 +1,6 @@
 [components.uboot-tools]
-# Release: 1%{?candidate:.%{candidate}}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: 1%{?candidate:.%{candidate}}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^([0-9]+)%\{\?candidate:\.%\{candidate\}\}(?:%\{\??dist\})?$' } }
 
 [components.uboot-tools.build]
 # Disable the "toolsonly" bcond to skip building firmware images for ARM dev

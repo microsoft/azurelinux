@@ -21,7 +21,7 @@
 
 Name:           qt5-%{qt_module}
 Version:        5.212.0
-Release: 0.96%{?prerel}%{?dist}
+Release: 0.100%{?prerel}%{?dist}
 Summary:        Qt5 - QtWebKit components
 
 License:        LGPL-2.0-only AND BSD-3-Clause

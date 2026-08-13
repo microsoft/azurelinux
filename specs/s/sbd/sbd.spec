@@ -22,7 +22,7 @@
 %global shortcommit %(echo %{longcommit}|cut -c1-8)
 %global modified %(echo %{longcommit}-|cut -f2 -d-)
 %global github_owner Clusterlabs
-%global baserelease 2
+%global baserelease 4
 
 %ifarch s390x s390
 # minimum timeout on LPAR diag288 watchdog is 15s

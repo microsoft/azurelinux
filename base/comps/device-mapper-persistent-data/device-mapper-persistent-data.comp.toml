@@ -1,3 +1,3 @@
 [components.device-mapper-persistent-data]
-# Release: 4%{?dist}%{?release_suffix}
-release = { calculation = "manual" }
+# Upstream Release: 4%{?dist}%{?release_suffix}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^([0-9]+)(?:%\{\??dist\})?%\{\?release_suffix\}$' } }

@@ -24,7 +24,7 @@
 #%%global	betaver	rc4
 #%%define	prerelease	1
 
-%global	baserelease	3
+%global	baserelease	5
 
 Name:		oniguruma
 Version:	%{mainver}%{?postver:.%postver}%{?gitversion:^%{?gitversion}}

@@ -1,3 +1,3 @@
 [components.resource-agents]
-# Release: 1%{?rcver:%{rcver}}%{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: 1%{?rcver:%{rcver}}%{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^([0-9]+)%\{\?rcver:%\{rcver\}\}%\{\?numcomm:\.%\{numcomm\}\}%\{\?alphatag:\.%\{alphatag\}\}%\{\?dirty:\.%\{dirty\}\}(?:%\{\??dist\})?$' } }

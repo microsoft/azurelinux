@@ -72,7 +72,7 @@
 %global patch_version 10
 
 # For handling bump release by rpmdev-bumpspec and mass rebuild
-%global baserelease 3
+%global baserelease 5
 
 # Set to RC version if building RC, else comment out.
 #%%global rcsuf rc3

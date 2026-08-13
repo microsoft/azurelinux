@@ -1,3 +1,3 @@
 [components.iscsi-initiator-utils]
-# Release: 0.git%{shortcommit0}%{?dist}.2
-release = { calculation = "manual" }
+# Upstream Release: 0.git%{shortcommit0}%{?dist}.2
+release = { calculation = "static", counter = { source = "release-tag", regex = '^0\.git%\{shortcommit0\}(?:%\{\??dist\})?\.([0-9]+)$' } }

@@ -1,3 +1,3 @@
 [components.mod_proxy_cluster]
-# Release: %{serial}%{?dist}.1
-release = { calculation = "manual" }
+# Upstream Release: %{serial}%{?dist}.1
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\{serial\}(?:%\{\??dist\})?\.([0-9]+)$' } }

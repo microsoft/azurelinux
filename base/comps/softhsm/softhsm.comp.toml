@@ -1,3 +1,3 @@
 [components.softhsm]
-# Release: %{?prever:0.}13%{?prever:.%{prever}}%{?dist}.1
-release = { calculation = "manual" }
+# Upstream Release: %{?prever:0.}13%{?prever:.%{prever}}%{?dist}.1
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\{\?prever:0\.\}([0-9]+)%\{\?prever:\.%\{prever\}\}(?:%\{\??dist\})?\.1$' } }

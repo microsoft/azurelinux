@@ -4,7 +4,7 @@
 %global	mainver		1.19.1
 #%%global	prever		.rc4
 
-%global	baserelease		1
+%global	baserelease		3
 %global	prerpmver		%(echo "%{?prever}" | sed -e 's|\\.||g')
 
 %global	gem_name	nokogiri

@@ -1,3 +1,3 @@
 [components.pcre]
-# Release: %{?rcversion:0.}1%{?rcversion:.%rcversion}%{?dist}.9
-release = { calculation = "manual" }
+# Upstream Release: %{?rcversion:0.}1%{?rcversion:.%rcversion}%{?dist}.9
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\{\?rcversion:0\.\}([0-9]+)%\{\?rcversion:\.%rcversion\}(?:%\{\??dist\})?\.9$' } }

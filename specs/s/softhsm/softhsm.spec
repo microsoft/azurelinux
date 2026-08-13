@@ -7,7 +7,7 @@
 Summary: Software version of a PKCS#11 Hardware Security Module
 Name: softhsm
 Version: 2.6.1
-Release: %{?prever:0.}13%{?prever:.%{prever}}%{?dist}.1
+Release: %{?prever:0.}15%{?prever:.%{prever}}%{?dist}.1
 License: BSD-2-clause
 Url: http://www.opendnssec.org/
 Source: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz

@@ -6,7 +6,7 @@
 %global	mainver	3.13.7
 %undefine	prever
 
-%global	baserelease	1
+%global	baserelease	3
 %global	prerpmver	%(echo "%{?prever}" | sed -e 's|\\.||g')
 
 %bcond_with bootstrap

@@ -14,7 +14,7 @@
 Name:          mod_proxy_cluster
 Summary:       JBoss mod_proxy_cluster for Apache httpd
 Version:       1.3.22
-Release:       %{serial}%{?dist}.1
+Release:       %{serial}%{?dist}.3
 License:       LGPL-3.0-only
 URL:           https://github.com/modcluster/mod_cluster
 Source0:       https://github.com/modcluster/mod_cluster/archive/%{namedversion}/mod_cluster-%{namedversion}.tar.gz

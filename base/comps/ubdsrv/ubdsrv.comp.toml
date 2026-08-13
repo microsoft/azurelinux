@@ -1,3 +1,3 @@
 [components.ubdsrv]
-# Release: 1.rc1%{?dist}.5
-release = { calculation = "manual" }
+# Upstream Release: 1.rc1%{?dist}.5
+release = { calculation = "static", counter = { source = "release-tag", regex = '^([0-9]+)\.rc1(?:%\{\??dist\})?\.5$' } }

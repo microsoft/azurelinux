@@ -5,7 +5,7 @@
 #%%global rcversion RC1
 Name:       pcre
 Version:    8.45
-Release:    %{?rcversion:0.}1%{?rcversion:.%rcversion}%{?dist}.9
+Release:    %{?rcversion:0.}3%{?rcversion:.%rcversion}%{?dist}.9
 %global myversion %{version}%{?rcversion:-%rcversion}
 Summary:    Perl-compatible regular expression library
 ## Source package only:

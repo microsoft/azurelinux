@@ -53,6 +53,11 @@
           "title": "Undefined macros",
           "description": "Macro names to undefine when passing to the builder."
         },
+        "emit-upstream-provenance": {
+          "type": "boolean",
+          "title": "Emit upstream provenance macros",
+          "description": "Inject %fedora_upstream_version/release macros derived from the pristine upstream Fedora spec (Fedora upstream components only)."
+        },
         "check": {
           "$ref": "#/$defs/CheckConfig",
           "title": "Check configuration",
@@ -592,6 +597,26 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "GitSourceConfig": {
+      "properties": {
+        "git-url": {
+          "type": "string",
+          "title": "Git URL",
+          "description": "URL of the git repository"
+        },
+        "ref": {
+          "type": "string",
+          "title": "Ref",
+          "description": "Commit SHA to check out (full hex hash)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "git-url",
+        "ref"
+      ]
+    },
     "ImageCapabilities": {
       "properties": {
         "machine-bootable": {
@@ -709,13 +734,61 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "LisaConfig": {
+      "properties": {
+        "framework": {
+          "$ref": "#/$defs/GitSourceConfig",
+          "title": "Framework",
+          "description": "Git source for the LISA framework"
+        },
+        "test-cases": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Test cases",
+          "description": "LISA test case names to run; combined into a generated runbook's criteria"
+        },
+        "pip-pre-install": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Pip pre-install",
+          "description": "Pip packages to install before the framework (for overriding version pins)"
+        },
+        "pip-extras": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Pip extras",
+          "description": "Pip extras to install from the LISA framework package"
+        },
+        "extra-args": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Extra arguments",
+          "description": "Additional arguments passed to LISA. Supports {image-path} {image-name} {capabilities} placeholders."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "framework",
+        "test-cases"
+      ]
+    },
     "Origin": {
       "properties": {
         "type": {
           "type": "string",
           "enum": [
             "download",
-            "custom"
+            "custom",
+            "overlay"
           ],
           "title": "Origin type",
           "description": "Type of origin for this source file"
@@ -989,10 +1062,110 @@
           "title": "Release calculation",
           "description": "Controls how the Release tag is managed during rendering. Empty or omitted means auto.",
           "default": "auto"
+        },
+        "counter": {
+          "$ref": "#/$defs/ReleaseCounter",
+          "title": "Release counter",
+          "description": "Physical location of the release counter to increment. Replaces an inherited counter atomically and is cleared by manual or autorelease calculation."
         }
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "ReleaseCounter": {
+      "oneOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "release-tag"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "directive"
+                  ]
+                },
+                {
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "regex"
+            ]
+          },
+          "else": false
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "spec-macro"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "regex"
+              ]
+            },
+            "required": [
+              "directive",
+              "name"
+            ]
+          },
+          "else": false
+        }
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "release-tag",
+            "spec-macro"
+          ],
+          "title": "Counter source",
+          "description": "Physical location of the release counter"
+        },
+        "regex": {
+          "type": "string",
+          "title": "Release tag regex",
+          "description": "Full-value regular expression with exactly one capturing group. Its rendered match must be a decimal integer. Required when source is release-tag"
+        },
+        "directive": {
+          "type": "string",
+          "enum": [
+            "global",
+            "define"
+          ],
+          "title": "Macro directive",
+          "description": "Macro directive that defines the counter. Required when source is spec-macro"
+        },
+        "name": {
+          "type": "string",
+          "title": "Macro name",
+          "description": "Name of the bare-integer macro counter. Required when source is spec-macro"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "source"
+      ]
     },
     "ResourcesConfig": {
       "properties": {
@@ -1332,6 +1505,11 @@
           "$ref": "#/$defs/PytestConfig",
           "title": "Pytest config",
           "description": "Pytest-specific configuration (required when type is pytest)"
+        },
+        "lisa": {
+          "$ref": "#/$defs/LisaConfig",
+          "title": "LISA config",
+          "description": "LISA-specific configuration used to generate and run a LISA runbook (optional)"
         }
       },
       "additionalProperties": false,

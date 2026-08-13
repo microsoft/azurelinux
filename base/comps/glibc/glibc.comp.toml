@@ -1,6 +1,6 @@
 [components.glibc]
-# Release: %{baserelease}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{baserelease}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "baserelease" } }
 
 [[components.glibc.overlays]]
 description = "Bump the manual release for the OPEN_TREE header compatibility fix"

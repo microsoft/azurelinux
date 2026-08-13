@@ -86,7 +86,7 @@
 # line.  gcc_release is the Fedora gcc release that the patches were
 # taken from.
 %global gcc_release 2
-%global cross_gcc_release 1
+%global cross_gcc_release 3
 %global cross_binutils_version 2.43.1-1
 %global isl_version 0.16.1
 %global isl_libmajor 15

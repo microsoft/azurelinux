@@ -155,7 +155,7 @@ Version: %{glibcversion}
 # - It allows using the Release number without the %%dist tag in the dependency
 #   generator to make the generated requires interchangeable between Rawhide
 #   and ELN (.elnYY < .fcXX).
-%global baserelease 11
+%global baserelease 14
 Release: %{baserelease}%{?dist}
 
 # Licenses:

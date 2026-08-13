@@ -1,6 +1,6 @@
 [components.python-blivet]
-# Release: 10%{?prerelease}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: 10%{?prerelease}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^([0-9]+)%\{\?prerelease\}(?:%\{\??dist\})?$' } }
 
 [[components.python-blivet.overlays]]
 description = "Bump release for CPE 2.3 parser backport"

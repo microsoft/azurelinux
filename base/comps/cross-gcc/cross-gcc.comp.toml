@@ -1,3 +1,3 @@
 [components.cross-gcc]
-# Release: %{cross_gcc_release}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{cross_gcc_release}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "cross_gcc_release" } }
