@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        23%{?dist}
+Release:        24%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -482,6 +482,9 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
+* Thu Aug 13 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-24
+- Persist CIS kernel sysctl defaults (dmesg_restrict, yama.ptrace_scope, randomize_va_space)
+
 * Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-23
 - Configure neutral local and remote login banners
 
