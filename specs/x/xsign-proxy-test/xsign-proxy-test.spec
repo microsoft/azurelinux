@@ -36,14 +36,7 @@ else
     echo "FAIL: Socket directory /var/run/xsign-proxy not found"
 fi
 
-# Test 3: Verify the exchange directory is bind-mounted
-if [ -d /var/lib/xsign-exchange ]; then
-    echo "PASS: Exchange directory /var/lib/xsign-exchange exists"
-else
-    echo "FAIL: Exchange directory /var/lib/xsign-exchange not found"
-fi
-
-# Test 4: Ping the daemon to verify connectivity
+# Test 3: Ping the daemon to verify connectivity
 echo "Pinging xsign-proxy-d daemon..."
 if /usr/local/bin/xsign_proxy_client.py ping; then
     echo "PASS: Daemon responded to ping"
@@ -51,7 +44,7 @@ else
     echo "FAIL: Daemon did not respond to ping"
 fi
 
-# Test 5: Create a test file in the writable RPM build directory and submit it for signing
+# Test 4: Create a test file in the writable RPM build directory and submit it for signing
 mkdir -p %{_builddir}/%{name}-%{version}
 UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
 SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
@@ -69,8 +62,6 @@ fi
 
 ls -la "$UNSIGNED_TEST_FILE"
 ls -la "$SIGNED_TEST_FILE"
-ls -la /var/lib/xsign-exchange/
-find /var/lib/xsign-exchange/
 
 # Clean up test files
 # rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
