@@ -1129,6 +1129,38 @@
             ]
           },
           "else": false
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "macros-file"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "regex"
+                  ]
+                },
+                {
+                  "required": [
+                    "directive"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "else": false
         }
       ],
       "properties": {
@@ -1136,7 +1168,8 @@
           "type": "string",
           "enum": [
             "release-tag",
-            "spec-macro"
+            "spec-macro",
+            "macros-file"
           ],
           "title": "Counter source",
           "description": "Physical location of the release counter"
@@ -1158,7 +1191,7 @@
         "name": {
           "type": "string",
           "title": "Macro name",
-          "description": "Name of the bare-integer macro counter. Required when source is spec-macro"
+          "description": "Name of the bare-integer macro counter. Required when source is spec-macro or macros-file"
         }
       },
       "additionalProperties": false,

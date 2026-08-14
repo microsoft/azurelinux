@@ -4,9 +4,13 @@
 # use Azure Linux kernel source and generate headers during build.
 spec = { type = "upstream" }
 
-# Manual release calculation required because the spec uses %{specrelease} macro
-# Release: %{specrelease}
-release = { calculation = "manual" }
+# The spec uses Release: %{specrelease}, which the auto-calculator cannot parse.
+# %azl_pkgrelease is not defined in the spec; it comes from build.defines below,
+# which azldev materializes into the generated kernel-headers.azl.macros file
+# next to the rendered spec. The counter therefore targets the macros file: the
+# define below stays the base value and the rendered counter is that base plus
+# the synthetic commit count. Release: %{specrelease} -> %{azl_pkgrelease}.
+release = { calculation = "static", counter = { source = "macros-file", name = "azl_pkgrelease" } }
 
 # Version updates: Fedora -> Azure Linux 6.18.31.1
 # Uses 3-part version (6.18.31) + kextraversion (1) scheme matching kernel.

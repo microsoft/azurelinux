@@ -1,3 +1,45 @@
 [components.osbs-client]
 # Release: %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
+#
+# Intentionally the only component left on `manual`. Its Release is not
+# reducible to a single deterministic counter without diverging from upstream:
+#
+#   %global dev_release 0
+#   %if 0%{?dev_release}
+#   %global postrelease dev
+#   %global release 23        <- definition 1
+#   %else
+#   %global postrelease 0
+#   %global release 6         <- definition 2
+#   %endif
+#   %if "x%{postrelease}" != "x0"
+#   Release: %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
+#   %else
+#   Release: %{release}%{?dist}
+#   %endif
+#
+# Neither Release value contains a literal digit, so `source = "release-tag"`
+# has nothing to capture; and `%{release}` has two physical definitions, so
+# `source = "spec-macro"` (which requires exactly one, to keep the bump
+# provably reachable from the rendered Release tag) refuses.
+#
+# Rejected alternatives:
+#  - Overlay collapsing the `%if 0%{?dev_release}` branch to a single
+#    `%global release 6`. Smallest overlay, but it deletes upstream's
+#    dev-release toggle and so changes build semantics for the dev_release=1
+#    configuration.
+#  - Overlay rewriting both branches to derive from one bare integer via
+#    `%{expr:}`. Semantics-preserving, but obscure and a permanent structural
+#    divergence on an otherwise overlay-free component.
+#  - Extending the `spec-macro` counter to bump N bare-integer definitions.
+#    A scan of every rendered spec found exactly one other spec whose Release
+#    chain reaches a multi-definition integer macro (cpuinfo), and that one is
+#    already served by a trailing-literal `release-tag` regex. The extension
+#    would generalize to zero additional components.
+#
+# Consequence: `azldev component update --bump` reports this component as
+# skipped (it requires --allow-manual), and it is excluded from
+# `component check --release-counters` / `--rebuild-readiness`. A mass rebuild
+# that must ship a new osbs-client EVR has to bump `%global release` by hand
+# via an overlay at that time.
 release = { calculation = "manual" }

@@ -5,11 +5,13 @@
 # kernel.spec directly; AZL-specific changes are marked with "AZL:" comments.
 spec = { type = "local", path = "kernel.spec" }
 
-# The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist) which the
-# auto-calculator cannot parse. Release is managed manually: bump azl_pkgrelease
-# in kernel.spec when rebuilding without a version change. The
-# %changelog is hand-curated inline in the spec.
-release = { calculation = "manual" }
+# The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist), which the
+# auto-calculator cannot parse. The counter lives in %azl_pkgrelease, which is
+# defined in the loose kernel.azl.macros source file rather than in the spec, so
+# the counter targets the macros file. Release: %{pkg_release} reaches it via
+# %{pkg_release} -> %{specrelease} -> %{azl_pkgrelease}. The %changelog is
+# hand-curated inline in the spec.
+release = { calculation = "static", counter = { source = "macros-file", name = "azl_pkgrelease" } }
 
 # --- Downloaded source tarballs (not vendored into the component dir) ---
 
