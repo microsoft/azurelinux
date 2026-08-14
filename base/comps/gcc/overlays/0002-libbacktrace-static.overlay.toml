@@ -1,0 +1,67 @@
+# Azure Linux exposes GCC's internal libbacktrace as a standalone
+# `libbacktrace-static` subpackage. There is no upstream package to
+# import. Downstream consumers need the static library + header
+# at build time, so we install them here.
+
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "inapplicable"
+
+# Bump the manual gcc release so the new subpackage and its dependents rebuild.
+[[overlays]]
+description = "Bump gcc release for the added libbacktrace-static subpackage"
+type = "spec-search-replace"
+regex = '^%global gcc_release 7$'
+replacement = "%global gcc_release 8"
+
+# Declare the new subpackage right after the C++ package/description block.
+[[overlays]]
+description = "Declare the libbacktrace-static subpackage"
+type = "spec-append-lines"
+section = "%description"
+package = "c++"
+lines = [
+    "%package -n libbacktrace-static",
+    "Summary: Static library for GCC's libbacktrace",
+    "",
+    "%description -n libbacktrace-static",
+    "This package contains GCC's static libbacktrace library and its header.",
+    "",
+]
+
+# Install the internal libbacktrace static archive and its header.
+[[overlays]]
+description = "Install libbacktrace static library and header into the buildroot"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "# Azure Linux: expose GCC's internal libbacktrace as a static library + header.",
+    "_azl_bt=%{_builddir}/gcc-%{version}-%{DATE}/obj-%{gcc_target_platform}/libbacktrace/.libs/libbacktrace.a",
+    "install -m 0644 -D \"$_azl_bt\" %{buildroot}%{_libdir}/libbacktrace.a",
+    "install -m 0644 -D %{_builddir}/gcc-%{version}-%{DATE}/libbacktrace/backtrace.h %{buildroot}%{_includedir}/backtrace.h",
+    "",
+]
+
+# List the installed libbacktrace-static files.
+[[overlays]]
+description = "Package the libbacktrace-static files"
+type = "spec-append-lines"
+section = "%files"
+package = "c++"
+lines = [
+    "%files -n libbacktrace-static",
+    "%{_includedir}/backtrace.h",
+    "%{_libdir}/libbacktrace.a",
+    "",
+]
+
+[[overlays]]
+description = "Add changelog entry for the libbacktrace-static subpackage"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Fri Aug 14 2026 Nan Liu <liunan@microsoft.com> - 15.2.1-8",
+    "- Add libbacktrace-static subpackage exposing GCC's internal libbacktrace",
+    "  static library and header for downstream consumers.",
+    "",
+]

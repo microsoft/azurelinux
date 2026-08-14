@@ -7,7 +7,7 @@
 %global gcc_major 15
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 7
+%global gcc_release 8
 %global nvptx_tools_gitrev a0c1fff6534a4df9fb17937c3c4a4b1071212029
 %global newlib_cygwin_gitrev d35cc82b5ec15bb8a5fe0fe11e183d1887992e99
 %global _unpackaged_files_terminate_build 0
@@ -401,6 +401,12 @@ Autoreq: true
 This package adds C++ support to the GNU Compiler Collection.
 It includes support for most of the current C++ specification,
 including templates and exception handling.
+
+%package -n libbacktrace-static
+Summary: Static library for GCC's libbacktrace
+
+%description -n libbacktrace-static
+This package contains GCC's static libbacktrace library and its header.
 
 %package -n libstdc++
 Summary: GNU Standard C++ Library
@@ -2473,6 +2479,11 @@ ln -sf gcc-annobin.so.0.0.0 $FULLPATH/plugin/gcc-annobin.so.0
 ln -sf gcc-annobin.so.0.0.0 $FULLPATH/plugin/gcc-annobin.so
 %endif
 
+# Azure Linux: expose GCC's internal libbacktrace as a static library + header.
+_azl_bt=%{_builddir}/gcc-%{version}-%{DATE}/obj-%{gcc_target_platform}/libbacktrace/.libs/libbacktrace.a
+install -m 0644 -D "$_azl_bt" %{buildroot}%{_libdir}/libbacktrace.a
+install -m 0644 -D %{_builddir}/gcc-%{version}-%{DATE}/libbacktrace/backtrace.h %{buildroot}%{_includedir}/backtrace.h
+
 %check
 cd obj-%{gcc_target_platform}
 
@@ -3031,6 +3042,10 @@ end
 %{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_major}/libsupc++.a
 %endif
 %doc rpm.doc/changelogs/gcc/cp/ChangeLog*
+
+%files -n libbacktrace-static
+%{_includedir}/backtrace.h
+%{_libdir}/libbacktrace.a
 
 %files -n libstdc++
 %{_prefix}/%{_lib}/libstdc++.so.6*
@@ -3814,6 +3829,10 @@ end
 %endif
 
 %changelog
+* Fri Aug 14 2026 Nan Liu <liunan@microsoft.com> - 15.2.1-8
+- Add libbacktrace-static subpackage exposing GCC's internal libbacktrace
+  static library and header for downstream consumers.
+
 * Fri Jan 23 2026 Jakub Jelinek <jakub@redhat.com> 15.2.1-7
 - update from releases/gcc-15 branch
   - PRs c++/122070, c++/122550, c++/123597, libstdc++/123147,
