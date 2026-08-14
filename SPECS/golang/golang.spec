@@ -173,7 +173,7 @@ fi
 %{_bindir}/*
 
 %changelog
-* Fri Aug 14 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>  - 1.26.5-3
+* Fri Aug 14 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 1.26.5-3
 - Patch for CVE-2026-46600
 
 * Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
