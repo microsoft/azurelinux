@@ -5,7 +5,7 @@
 
 Name:           atop
 Version:        2.12.1
-Release: 2%{?dist}
+Release:        2%{?dist}
 Summary:        An advanced interactive monitor to view the load on system and process level
 
 License:        GPL-2.0-or-later

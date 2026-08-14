@@ -7,7 +7,7 @@
 
 Name:           pcsc-lite-%{driver}
 Version:        3.7
-Release:        31%{dist}
+Release:        30%{dist}
 Summary:        ASEKey USB token driver
 # 92_pcscd_asekey.rules:    LGPLv2+
 # other files:              BSD

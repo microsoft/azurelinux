@@ -3,7 +3,7 @@
 
 Name:           perl-XML-Dumper
 Version:        0.81
-Release:        56%{dist}
+Release:        55%{dist}
 Summary:        Perl module for dumping Perl objects from/to XML
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
