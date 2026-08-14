@@ -36,8 +36,8 @@
 
 Summary:        First stage UEFI bootloader
 Name:           shim
-Version:        15.8
-Release:        6%{?dist}
+Version:        16.1
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -70,8 +70,8 @@ Obsoletes:      shim-unsigned <= 15.4
 # Obsoletes behavior.
 Provides:       shim-unsigned = %{version}-%{release}
 
-# This is when grub was updated to be signed with the newer Azure Linux certificate
-Conflicts:      grub2-efi-binary < 2.06-22
+# This shim requires grub with SBAT generation 5 or greater. grub 2.06-27 is the first release with `grub,5` SBAT generation support.
+Conflicts:      grub2-efi-binary < 2.06-27
 
 %ifarch x86_64
 BuildRequires:  shim-unsigned-x64 = %{version}
@@ -192,6 +192,9 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
+* Fri Jun 19 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
+- Update to version 16.1
+
 * Mon Mar 02 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 15.8-6
 - Change BuildRequires to allow updating shim-unsigned separately
 
