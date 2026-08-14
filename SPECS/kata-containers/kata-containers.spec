@@ -91,8 +91,8 @@ install -m 0644 \
 %{defaults_kata}/configuration-clh-debug.toml
 %{defaults_kata}/configuration-clh-preview.toml
 %{defaults_kata}/configuration-clh-preview-debug.toml
-%{defaults_kata}/configuration-clh-runtime-rs.toml
-%{defaults_kata}/configuration-clh-runtime-rs-debug.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs.toml
+%{defaults_kata}/configuration-clh-azure-runtime-rs-debug.toml
 
 %{kata_shim_bin}/containerd-shim-kata-v2
 %{kata_shim_bin}/containerd-shim-kata-v2-go
