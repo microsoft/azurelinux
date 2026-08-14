@@ -4,12 +4,19 @@
 # Step template: render the components in the render set (--check-only) and fail
 # if any component's rendered output would change, catching stale renders and
 # direct hand-edits. Reads the render-set path from the variable named by
-# renderSetFileVar.
+# renderSetFileVar, and the (from, to) commit range for the SRPM EVR check from
+# the variables named by fromCommitVar / toCommitVar.
 
 parameters:
+  - name: fromCommitVar
+    type: string
+    default: baseCommit
   - name: renderSetFileVar
     type: string
     default: renderSetFile
+  - name: toCommitVar
+    type: string
+    default: sourceCommit
 
 steps:
   - script: |
@@ -40,11 +47,17 @@ steps:
         echo "##[endgroup]"
       fi
 
-      echo "##[group]Release counter verification"
+      echo "##[group]SRPM EVR verification"
       # Unlike GitHub's render workflow, this check-only render leaves the
-      # working tree untouched, so the counter gate validates committed specs.
-      env AZLDEV_ALLOW_ROOT=1 azldev component check --release-counters -a -q -O json
+      # working tree untouched, so this gate validates committed specs. It
+      # always proves a release-only rebuild of every counter-bumped component
+      # would produce a new EVR, and `--from`/`--to` add the cross-ref
+      # regression check over the same commit range the change set used.
+      env AZLDEV_ALLOW_ROOT=1 azldev component check --evr \
+        --from "$FROM_COMMIT" --to "$TO_COMMIT" -a -q -O json
       echo "##[endgroup]"
     env:
+      FROM_COMMIT: $(${{ parameters.fromCommitVar }})
       RENDER_SET_FILE: $(${{ parameters.renderSetFileVar }})
+      TO_COMMIT: $(${{ parameters.toCommitVar }})
     displayName: "Verify rendered specs are up to date"

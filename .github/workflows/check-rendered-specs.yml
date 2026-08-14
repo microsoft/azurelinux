@@ -518,9 +518,12 @@ jobs:
 
               # Counter configuration targets rendered text, so run this after
               # the PR render and retain its machine-readable result with the
-              # existing drift artifacts.
+              # existing drift artifacts. `--from "$PR_BASE_SHA"` is the same
+              # baseline the render set was computed from (and was fetched
+              # explicitly above), so the EVR regression half compares exactly
+              # the range this PR introduces.
               counter_check_exit=0
-              azldev component check --release-counters -a -q -O json \
+              azldev component check --evr --from "$PR_BASE_SHA" -a -q -O json \
                 > /output/release-counter-check.json || counter_check_exit=$?
 
               if [ "$render_check_exit" -ne 0 ]; then

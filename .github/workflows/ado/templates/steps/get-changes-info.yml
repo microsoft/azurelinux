@@ -73,4 +73,6 @@ steps:
 
   - template: verify-rendered-specs.yml
     parameters:
+      fromCommitVar: ${{ parameters.baseCommitVar }}
       renderSetFileVar: ${{ parameters.renderSetFileVar }}
+      toCommitVar: ${{ parameters.sourceCommitVar }}
