@@ -1,46 +1,83 @@
-%global __ocaml_requires_opts -i Asttypes -i Parsetree -i Pa_extend
-%global __ocaml_provides_opts -i Dynlink -i Dynlinkaux -i Pa_extend
-Summary:        Classical version of camlp4 OCaml preprocessor
+# OCaml packages not built on i686 since OCaml 5 / Fedora 39.
+ExcludeArch: %{ix86}
+
+%ifnarch %{ocaml_native_compiler}
+%global debug_package %{nil}
+%endif
+
+%global giturl  https://github.com/camlp5/camlp5
+
 Name:           ocaml-camlp5
-Version:        8.00.02
-Release:        11%{?dist}
-License:        BSD
+Version:        8.04.00
+Release:        3%{?dist}
+Summary:        Preprocessor and pretty printer for OCaml
+
+License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://camlp5.github.io/
-Source0:        https://github.com/camlp5/camlp5/archive/rel%{version}.tar.gz#/camlp5-rel%{version}.tar.gz
+VCS:            git:%{giturl}.git
+Source0:        %{giturl}/archive/%{version}/camlp5-%{version}.tar.gz#/%{name}-%{version}.tar.gz
+
+# Kill -warn-error A
+Patch0:         camlp5-8.00-kill-warn-error.patch
+
+BuildRequires:  diffutils
 BuildRequires:  make
-BuildRequires:  ocaml
+BuildRequires:  ocaml >= 4.10
+BuildRequires:  ocaml-bos-devel
+BuildRequires:  ocaml-camlp-streams-devel >= 5.0
+BuildRequires:  ocaml-camlp5-buildscripts >= 0.06
+BuildRequires:  ocaml-findlib
+BuildRequires:  ocaml-fmt-devel
+BuildRequires:  ocaml-ounit-devel
+BuildRequires:  ocaml-pcre2-devel >= 8.0.3
+BuildRequires:  ocaml-re-devel >= 1.11.0
+BuildRequires:  ocaml-rpm-macros
+BuildRequires:  ocaml-rresult-devel
+BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(IPC::System::Simple)
+BuildRequires:  perl(String::ShellQuote)
+
 BuildRequires:  ocaml-ocamldoc
-BuildRequires:  perl
+
+# Do not provide symbols already provided by the OCaml compiler
+%global __ocaml_provides_opts -i Dynlink -i Dynlink_common -i Dynlink_config -i Dynlink_platform_intf -i Dynlink_symtable -i Dynlink_types
+# Do not require symbols that we don't provide
+%global __ocaml_requires_opts -i Dynlink_cmo_format -i MLast
+
+# Camlp5 RPM currently auto-requires ocaml(O_keywords), but its -devel subpackage provides it. That creates a circular dependency because the generator doesn’t know it’s internal.
+%global __ocaml_requires_opts -i O_keywords -i R_keywords
 
 %description
 Camlp5 is a preprocessor-pretty-printer of OCaml.
 
-It is the continuation of the classical camlp4 with new features.
+It is compatible with all versions of OCaml from 4.05.0 thru 4.14.0.
+Previous versions of Camlp5 have supported OCaml versions down to 1.07
+and jocaml 3.12.0 to 3.12.1, but this version cuts off support at
+4.10.0.  Camlp5 is heavily tested with OCaml versions from 4.10.0
+forward, with an extensive and ever-growing testsuite.
 
-OCaml 3.10 and above have an official camlp4 which is incompatible
-with classical (<= 3.09) versions.  You can find that in the
-ocaml-camlp4 package.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       ocaml-camlp-streams-devel%{?_isa}
+Requires:       ocaml-re-devel%{?_isa}
+
 
 %description    devel
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
+
 %prep
-%autosetup -p1 -n camlp5-rel%{version}
+%autosetup -n camlp5-%{version} -p1
 find . -name .gitignore -delete
 
-# Build with debug information
-sed -i 's,WARNERR="",WARNERR="-g",' configure
-sed -i 's,-linkall,& -g,g' top/Makefile
-for fil in compile/compile.sh $(find . -name Makefile); do
-  sed -i 's,\$[({]OCAMLN[})]c,& -g,;s,\$[({]OCAMLN[})]opt,& -g,;s,LINKFLAGS=,&-g ,' $fil
-done
+# Avoid obsolescence warning
+sed -i 's/egrep/grep -E/' configure
+
 
 %build
 # Upstream uses hand-written configure, grrrrrr.
@@ -49,50 +86,157 @@ done
     --bindir %{_bindir} \
     --libdir %{_libdir}/ocaml \
     --mandir %{_mandir}
-%make_build world.opt
+%ifarch %{ocaml_native_compiler}
+%make_build DEBUG=-g
+%else
+%make_build world DEBUG=-g
+%endif
+
 
 %install
-mkdir -p %{buildroot}%{_libdir}/ocaml
-# This is a hack because the make install rule is broken upstream.
-# We move the file later.
-mkdir -p %{buildroot}%{_libdir}/ocaml/ocaml
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{_mandir}
 %make_install
-cp -p etc/META %{buildroot}%{_libdir}/ocaml/camlp5
-rm -f doc/htmlp/{*.sh,Makefile,html2*}
-mv %{buildroot}%{_libdir}/ocaml/{ocaml/topfind.camlp5,}
+%ocaml_files
+sed -i '\@%{_bindir}@d;\@%{_mandir}@d' .ofiles
 
 
-%files
+%ifarch %{ocaml_native_compiler}
+# The testsuite relies on ocamlopt
+%check
+make -C testsuite all-tests
+make -C test all
+%endif
+
+
+%files -f .ofiles
 %license LICENSE
 %doc README.md
-%{_libdir}/ocaml/camlp5
-%{_libdir}/ocaml/topfind.camlp5
-%exclude %{_libdir}/ocaml/camlp5/*.a
-%exclude %{_libdir}/ocaml/camlp5/*.cmxa
-%exclude %{_libdir}/ocaml/camlp5/*.cmx
-%exclude %{_libdir}/ocaml/camlp5/*.mli
 
-%files devel
-%doc CHANGES ICHANGES DEVEL UPGRADING doc/html
-%{_libdir}/ocaml/camlp5/*.a
-%{_libdir}/ocaml/camlp5/*.cmxa
-%{_libdir}/ocaml/camlp5/*.cmx
-%{_libdir}/ocaml/camlp5/*.mli
+
+%files devel -f .ofiles-devel
+%doc CHANGES ICHANGES DEVEL UPGRADING doc/html doc/htmlp
 %{_bindir}/camlp5*
 %{_bindir}/mkcamlp5*
 %{_bindir}/ocpp5
 %{_mandir}/man1/*.1*
 
-%changelog
-* Fri Jan 21 2022 Thomas Crain <thcrain@microsoft.com> - 8.00.02-1
-- Upgrade to latest upstream version
-- Lint spec
-- License verified
 
-* Fri Oct 15 2021 Pawel Winogrodzki <pawelwi@microsoft.com> - 7.12-11
-- Initial CBL-Mariner import from Fedora 34 (license: MIT).
+%changelog
+* Fri Nov 28 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 8.04.00-3
+- Initial Azure Linux import from Fedora 44 (license: MIT)
+- License Verified
+
+* Tue Oct 14 2025 Richard W.M. Jones <rjones@redhat.com> - 8.04.00-2
+- OCaml 5.4.0 rebuild
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 8.04.00-1
+- New upstream version 8.04.00
+
+* Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.03.05-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
+
+* Fri Mar 21 2025 Jerry James <loganjerry@gmail.com> - 8.03.03-1
+- Version 8.03.03
+
+* Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.03.01-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+* Fri Jan 10 2025 Jerry James <loganjerry@gmail.com> - 8.03.01-1
+- OCaml 5.3.0 rebuild for Fedora 42
+- Version 8.03.01
+
+* Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 8.03.00-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+
+* Wed Jun 19 2024 Richard W.M. Jones <rjones@redhat.com> - 8.03.00-3
+- OCaml 5.2.0 ppc64le fix
+
+* Thu May 30 2024 Richard W.M. Jones <rjones@redhat.com> - 8.03.00-2
+- OCaml 5.2.0 for Fedora 41
+
+* Thu May 23 2024 Jerry James <loganjerry@gmail.com> - 8.03.00-1
+- Version 8.03.00
+
+* Mon Jan 29 2024 Richard W.M. Jones <rjones@redhat.com> - 8.02.01-7
+- Bump and rebuild
+
+* Thu Jan 25 2024 Fedora Release Engineering <releng@fedoraproject.org> - 8.02.01-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Sun Jan 21 2024 Fedora Release Engineering <releng@fedoraproject.org> - 8.02.01-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+
+* Mon Dec 18 2023 Richard W.M. Jones <rjones@redhat.com> - 8.02.01-4
+- OCaml 5.1.1 + s390x code gen fix for Fedora 40
+
+* Tue Dec 12 2023 Richard W.M. Jones <rjones@redhat.com> - 8.02.01-3
+- OCaml 5.1.1 rebuild for Fedora 40
+
+* Thu Oct 05 2023 Richard W.M. Jones <rjones@redhat.com> - 8.02.01-2
+- OCaml 5.1 rebuild for Fedora 40
+
+* Wed Oct  4 2023 Jerry James <loganjerry@gmail.com> - 8.02.01-1
+- Version 8.02.01
+- Depend on ocaml-pcre2 instead of ocaml-pcre
+
+* Sat Sep  9 2023 Jerry James <loganjerry@gmail.com> - 8.02.00-2
+- Add camlp-streams-/pcre-devel dependencies to devel subpackage
+
+* Tue Aug 15 2023 Jerry James <loganjerry@gmail.com> - 8.02.00-1
+- Version 8.02.00
+- Drop unnecessary function-ref patch
+
+* Thu Jul 20 2023 Fedora Release Engineering <releng@fedoraproject.org> - 8.01.00-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+
+* Tue Jul 11 2023 Richard W.M. Jones <rjones@redhat.com> - 8.01.00-2
+- OCaml 5.0 rebuild for Fedora 39
+
+* Mon Jul 10 2023 Jerry James <loganjerry@gmail.com> - 8.01.00-1
+- Version 8.01.00
+- Convert License tag to SPDX
+- Add function-ref patch to fix FTBFS with OCaml 5.0.0
+- Add %%check script
+- Use new OCaml macros
+
+* Tue Jan 24 2023 Richard W.M. Jones <rjones@redhat.com> - 8.00.03-4
+- Rebuild OCaml packages for F38
+
+* Thu Jan 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 8.00.03-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_38_Mass_Rebuild
+
+* Fri Jul 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.00.03-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
+
+* Sat Jun 18 2022 Richard W.M. Jones <rjones@redhat.com> - 8.00.03-1
+- Update to released 8.00.03 supporting OCaml 4.14.0
+- OCaml 4.14.0 rebuild
+
+* Fri Feb 04 2022 Richard W.M. Jones <rjones@redhat.com> - 8.00.03-0.4
+- OCaml 4.13.1 rebuild to remove package notes
+
+* Wed Jan 26 2022 Richard W.M. Jones <rjones@redhat.com> - 8.00.03-0.3
+- Rebuild to pick up new ocaml dependency
+
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 8.00.03-0.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
+* Tue Oct  5 2021 Richard W.M. Jones <rjones@redhat.com> - 8.00.03-0.1
+- Move to pre-release of 8.00.03 (git commit f1ede8037e)
+- Remove upstream patch.
+- Remove %%opt macro as its not used.
+
+* Mon Oct 04 2021 Richard W.M. Jones <rjones@redhat.com> - 8.00-4
+- OCaml 4.13.1 build
+
+* Tue Jul 27 2021 Richard W.M. Jones <rjones@redhat.com> - 8.00-3
+- Rebuild for changed ocamlx(Dynlink)
+
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 8.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Sun Feb 28 22:24:15 GMT 2021 Richard W.M. Jones <rjones@redhat.com> - 8.00-1
+- New upstream version 8.00.
+- OCaml 4.12.0 build
 
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 7.12-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
