@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        25%{?dist}
+Release:        26%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -63,6 +63,7 @@ Source26:       azurelinux-sudoers.conf
 Source27:       azurelinux-sudo.conf
 Source28:       azurelinux-sudo.logrotate
 Source29:       azurelinux-sugroup.conf
+Source30:       azurelinux-sshd-cis.conf
 
 BuildArch:      noarch
 
@@ -349,6 +350,8 @@ install -Dm0644 %{SOURCE17} -t %{buildroot}%{_prefix}/lib/sysctl.d/
 install -Dm0644 %{SOURCE20} -t %{buildroot}%{_sysconfdir}/chrony.d/
 install -Dm0644 %{SOURCE21} -t %{buildroot}%{_prefix}/lib/systemd/networkd.conf.d/
 install -Dm0600 %{SOURCE23} -t %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/
+install -Dm0600 %{SOURCE30} %{buildroot}%{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
+
 install -Dm0644 %{SOURCE25} -t %{buildroot}%{_sysconfdir}/cloud/cloud.cfg.d/
 %endif
 
@@ -469,6 +472,8 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 %if %{with cloud}
 %files cloud
+%attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config.d/30-azurelinux-cis.conf
+
 %files identity-cloud
 %{_prefix}/lib/os-release.cloud
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.cloud
@@ -499,6 +504,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Mon Aug 17 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-26
+- Configure CIS SSH server defaults for Azure Linux cloud images
+
 * Thu Aug 13 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-25
 - Configure CIS privileged-command defaults
 
