@@ -1,6 +1,6 @@
 Summary:        Open source antivirus engine
 Name:           clamav
-Version:        1.5.3
+Version:        1.5.4
 Release:        1%{?dist}
 License:        ASL 2.0 AND BSD AND bzip2-1.0.4 AND GPLv2 AND LGPLv2+ AND MIT AND Public Domain AND UnRar
 Vendor:         Microsoft Corporation
@@ -148,6 +148,9 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
+* Mon Aug 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.4-1
+- Auto-upgrade to 1.5.4 - CVE-2026-20348, CVE-2026-20345, CVE-2026-20347, CVE-2026-20346, CVE-2026-20339, CVE-2026-20337, CVE-2026-20338
+
 * Fri Jul 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.3-1
 - Auto-upgrade to 1.5.3 - for CVE-2026-20213, CVE-2026-20214, 
   CVE-2026-20215, CVE-2026-20216, CVE-2026-20217, CVE-2026-20243,
