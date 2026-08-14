@@ -1,0 +1,29 @@
+* Thu Apr 23 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-11
+- Revert proc-version-override
+
+* Tue Apr 21 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-10
+- Fix distcore macro definition
+
+* Fri Apr 17 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-9
+- Add sysctl config for system hardening
+
+* Wed Apr 15 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-8
+- Set prerelease name
+
+* Tue Apr 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
+- Update release name to Alpha2 and extend EOL date
+
+* Tue Apr 14 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-6
+- Enable networkd UseDomains= for cloud images
+
+* Thu Apr 09 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
+- Add ID_LIKE tag to os-release.
+
+* Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
+- Configure chrony to use Azure PTP timesource
+
+* Wed Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
+- Add proc-version-override service for Guest-Configuration-Extension compat
+
+* Fri Feb 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
+- Initial version
