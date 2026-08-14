@@ -1,0 +1,38 @@
+# TEMPORARY: Remove these bootstrap overrides after rebuilding the dependency cycle.
+[components.golang-github-cncf-xds]
+
+[components.golang-github-cncf-xds.build]
+with = ["bootstrap"]
+
+[[components.golang-github-cncf-xds.overlays]]
+description = "Temporarily declare bootstrap mode to break the gRPC dependency cycle"
+type = "spec-search-replace"
+regex = '^%bcond_without check$'
+replacement = '''%bcond_without check
+%bcond bootstrap 0'''
+
+[components.golang-github-cncf-xds.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[components.golang-github-cncf-xds.overlays]]
+description = "Temporarily skip dynamic build dependencies in bootstrap mode"
+type = "spec-search-replace"
+regex = '^%go_generate_buildrequires$'
+replacement = '''%if %{without bootstrap}
+%go_generate_buildrequires
+%endif'''
+
+[components.golang-github-cncf-xds.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
+
+[[components.golang-github-cncf-xds.overlays]]
+description = "Temporarily skip tests in bootstrap mode"
+type = "spec-search-replace"
+regex = '^%if %\{with check\}$'
+replacement = '%if %{with check} && %{without bootstrap}'
+
+[components.golang-github-cncf-xds.overlays.metadata]
+category = "azl-temp-workaround"
+upstream-status = "inapplicable"
