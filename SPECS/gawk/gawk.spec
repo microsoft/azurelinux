@@ -1,16 +1,23 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          Applications/File
 URL:            https://www.gnu.org/software/gawk
 Source0:        https://ftp.gnu.org/gnu/gawk/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-40467.patch
+Patch1:         CVE-2026-40468.patch
+Patch2:         CVE-2026-40553.patch
 Requires:       gmp
 Requires:       mpfr
 Requires:       readline >= 7.0
+%if 0%{?with_check}
+BuildRequires:  shadow-utils
+BuildRequires:  sudo
+%endif
 Provides:       /bin/awk
 Provides:       /bin/gawk
 Provides:       awk
@@ -19,7 +26,7 @@ Provides:       awk
 The Gawk package contains programs for manipulating text files.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure \
@@ -44,7 +51,12 @@ sed -i 's/ pty1 / /' test/Makefile
 # Generate locale for `en_US.iso88591` which is required for ptest
 # Ideally it should have been present. Investigate if its a `chroot` only issue
 %{_sbindir}/locale-gen.sh
-make %{?_smp_mflags} check
+
+# gawk's check_pma_security() refuses persistent memory when geteuid() == 0, so the
+# pma test only runs if the suite is not run as root.
+useradd testuser -m
+chown -R testuser:testuser .
+sudo -u testuser make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -63,6 +75,10 @@ make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.2-2
+- Patch for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467
+- Run the test suite as an unprivileged user so the pma test is exercised.
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 5.2.2-1
 - Auto-upgrade to 5.2.2 - Azure Linux 3.0 - package upgrades
 
