@@ -15,7 +15,7 @@
 Summary:        Go
 Name:           golang
 Version:        1.26.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -36,6 +36,7 @@ Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
 Patch1:         CVE-2026-39821.patch
+Patch2:         CVE-2026-46600.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -172,6 +173,9 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Aug 14 2026 Akarsh Chaudhary <v-akarshc@microsoft.com>  - 1.26.5-3
+- Patch for CVE-2026-46600
+
 * Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
 - Bump version to 1.26.5-2
 
