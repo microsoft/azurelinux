@@ -2345,6 +2345,7 @@
                 "nmap",
                 "ntopng",
                 "opentelemetry-cpp",
+                "openvmm",
                 "packer",
                 "pcaudiolib",
                 "pcre2",
