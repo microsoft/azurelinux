@@ -1,0 +1,9 @@
+[components.rust-cmov]
+# Pin to Fedora f43 HEAD (cmov 0.5.4); not yet packaged at the distro-default
+# snapshot date.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bc3168902de75d99f5e549f37012cffc50fb7711" }
+
+# %check-only dep on proptest >= 1.11.0, unavailable in azl4-build today; the
+# library itself does not need proptest to build.
+[components.rust-cmov.build]
+without = ["check"]
