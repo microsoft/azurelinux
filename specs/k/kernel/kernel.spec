@@ -10,7 +10,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 15
+%define azl_pkgrelease 46
 # 4th version component from the AZL kernel source (6.18.31.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
