@@ -116,7 +116,7 @@ func (d *Disk) IsValid() error {
 		}
 
 		// Verify MaxSize value.
-		lastPartition := d.Partitions[len(d.Partitions)-1]
+		lastPartition := &d.Partitions[len(d.Partitions)-1]
 		lastPartitionEnd, lastPartitionHasEnd := lastPartition.GetEnd()
 
 		switch {
@@ -143,6 +143,14 @@ func (d *Disk) IsValid() error {
 			if requiredSize > *d.MaxSize {
 				return fmt.Errorf("disk's partitions need %s but maxSize is only %s:\nGPT footer size is %s",
 					requiredSize.HumanReadable(), d.MaxSize.HumanReadable(), gptFooterSize.HumanReadable())
+			}
+
+			if !lastPartitionHasEnd {
+				// Explicitly set the size of the last partition.
+				// This allows us to control the alignment of the GPT footer instead of relying on the behavior of the
+				// partitioning tool (e.g. sfdisk).
+				lastPartitionEnd := *d.MaxSize - gptFooterSize
+				lastPartition.End = &lastPartitionEnd
 			}
 		}
 	}
