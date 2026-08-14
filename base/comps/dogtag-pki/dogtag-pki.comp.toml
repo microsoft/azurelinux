@@ -1,3 +1,3 @@
 [components.dogtag-pki]
-# Release: %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "release_number" } }

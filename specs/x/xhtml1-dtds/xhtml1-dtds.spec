@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 %global date    20020801
-%global baserelease 23
+%global baserelease 25
 
 Name:           xhtml1-dtds
 Version:        1.0

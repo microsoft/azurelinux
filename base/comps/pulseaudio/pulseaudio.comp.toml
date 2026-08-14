@@ -1,6 +1,6 @@
 [components.pulseaudio]
-# Release: %[9 + %{azl_release}]%{?snap:.%{snap}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %[9 + %{azl_release}]%{?snap:.%{snap}git%{shortcommit}}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\[([0-9]+) \+ %\{azl_release\}\]%\{\?snap:\.%\{snap\}git%\{shortcommit\}\}%\{\?dist\}$' } }
 
 [components.pulseaudio.build.defines]
 # AZL-only release counter. Added to upstream's hardcoded Release number (9)

@@ -1,6 +1,6 @@
 [components.rubygem-rake]
-# Release: %{?preminorver:0.}%{baserelease}%{?preminorver:%{rpmminorver}}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{?preminorver:0.}%[%{baserelease} + %{azl_release}]%{?preminorver:%{rpmminorver}}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "baserelease" } }
 
 [components.rubygem-rake.build.defines]
 # AZL-only release counter added to upstream's %{baserelease}. Bump for an AZL

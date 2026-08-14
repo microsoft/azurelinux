@@ -4,7 +4,8 @@
 # so the AZL release counter is composed with — rather than replacing —
 # upstream's value. That way the only knob to turn for an AZL-only rebuild
 # is `azl_release` in build.defines below.
-release = { calculation = "manual" }
+# Upstream Release: %[1 + %{azl_release}]%{?pre_tag}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\[([0-9]+) \+ %\{azl_release\}\]%\{\?pre_tag\}%\{\?dist\}$' } }
 
 [components.firefox.build.defines]
 # AZL-only release counter. Added to upstream's leading Release integer (1

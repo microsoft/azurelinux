@@ -199,7 +199,7 @@ Summary:          Distributed File System
 %if ( 0%{_for_fedora_koji_builds} )
 Name:             glusterfs
 Version:          11.2
-Release:          4%{?prereltag:%{prereltag}}%{?dist}
+Release:          7%{?prereltag:%{prereltag}}%{?dist}
 %else
 Name:             @PACKAGE_NAME@
 Version:          @PACKAGE_VERSION@

@@ -16,7 +16,7 @@
 
 Name:           openbios
 Version:        %{date}
-Release: %[1 + %{azl_release}].git%{hash}%{?dist}
+Release: %[5 + %{azl_release}].git%{hash}%{?dist}
 Epoch:          1
 Summary:        OpenBIOS implementation of IEEE 1275-1994
 

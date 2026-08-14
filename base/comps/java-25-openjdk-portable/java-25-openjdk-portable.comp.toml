@@ -8,8 +8,8 @@
 # from the last snapshot of the spec at that version.
 
 [components.java-25-openjdk-portable]
-# Release: %{?eaprefix}%{rpmrelease}%{?extraver}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{?eaprefix}%[%{rpmrelease} + %{azl_release}]%{?extraver}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "rpmrelease" } }
 spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cad9d5a1ed48cf7e9e12cfadfdacc11f523d46cb" }
 # Disable slowdebug variant builds; we don't ship -slowdebug subpackages.
 build.without = ["slowdebug"]

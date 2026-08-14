@@ -1,6 +1,6 @@
 [components.pipewire]
-# Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %[%{baserelease} + %{azl_release}]%{?snapdate:.%{snapdate}git%{shortcommit}}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "baserelease" } }
 build.without = ["v4l2", "roc"]
 
 [components.pipewire.build.defines]

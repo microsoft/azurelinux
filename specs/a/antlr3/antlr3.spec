@@ -3,7 +3,7 @@
 
 %global antlr_version 3.5.3
 %global javascript_runtime_version 3.1
-%global baserelease 16
+%global baserelease 18
 
 # This package needs itself to build.  Use this to bootstrap on a new system.
 %bcond bootstrap 0

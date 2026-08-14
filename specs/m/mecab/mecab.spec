@@ -3,7 +3,7 @@
 
 %define		mainver		0.996
 #%%define		betaver		pre3
-%define		baserelease	10
+%define		baserelease	13
 
 # Note:
 # mecab dictionary requires mecab-devel to rebuild it,

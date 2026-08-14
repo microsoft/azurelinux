@@ -44,7 +44,7 @@
 ## can be incremented to build packages reliably considered "newer"
 ## than previously built packages with the same pcmkversion)
 %global pcmkversion 3.0.1
-%global baserelease 12
+%global baserelease 14
 
 ## Upstream commit (full commit ID, abbreviated commit ID, or tag) to build
 %global commit 16e74fc4da93a08514e1ec320fa9530b6c3d9fd5

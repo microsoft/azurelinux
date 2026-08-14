@@ -12,7 +12,7 @@
 
 %global	gem_name	rake
 
-%global	baserelease	101
+%global	baserelease	104
 
 Summary:	Rake is a Make-like program implemented in Ruby
 Name:		rubygem-%{gem_name}

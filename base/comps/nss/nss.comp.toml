@@ -1,6 +1,6 @@
 [components.nss]
-# Release: %{nss_release}%{?dist}
-release = { calculation = "manual" }
+# Upstream Release: %{nss_release}%{?dist}
+release = { calculation = "static", counter = { source = "spec-macro", directive = "global", name = "baserelease" } }
 # Pin to 3.123.1 (commit a2e1a543) — required by 389-ds-base / 389-ds-base-libs
 # 3.1.4 built in the Fedora 43 snapshot, which have a runtime dependency on
 # nss >= 3.123.1. Additive minor bump from 3.121.0 across 3.122.x -> 3.123.1;

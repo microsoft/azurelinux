@@ -5,7 +5,8 @@
 # value before the counter was introduced; %{azl_release} then adds the
 # number of AZL-only rebuilds on top of that, ensuring Release stays
 # monotonic across the switchover.
-release = { calculation = "manual" }
+# Upstream Release: %[15 + %{azl_release}].rocm%{rocm_version}%{?dist}
+release = { calculation = "static", counter = { source = "release-tag", regex = '^%\[([0-9]+) \+ %\{azl_release\}\]\.rocm%\{rocm_version\}%\{\?dist\}$' } }
 
 [components.rocm-compilersupport.build.defines]
 # AZL-only release counter. Composed with the "15." base via the overlay

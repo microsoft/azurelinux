@@ -10,7 +10,7 @@
 
 Name: elfutils
 Version: 0.194
-%global baserelease 3
+%global baserelease 6
 Release: %[%{baserelease} + %{azl_release}]%{?dist}
 URL: http://elfutils.org/
 %global source_url ftp://sourceware.org/pub/elfutils/%{version}/
