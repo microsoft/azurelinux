@@ -1,0 +1,29 @@
+From 2e623108dec9759ad3e258aa695288a1ef6a0c72 Mon Sep 17 00:00:00 2001
+From: dormando <dormando@rydia.net>
+Date: Fri, 1 May 2026 13:48:44 -0700
+Subject: [PATCH] proto: fix crash in binary protocol
+
+If `watch mutations` is running and a binary protocol SET fails the
+logger code attempts to resolve a NULL item reference and will crash.
+
+Reported by Haruto Kimura (Stella)
+---
+ proto_bin.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/proto_bin.c b/proto_bin.c
+index 778ea9a..0e92539 100644
+--- a/proto_bin.c
++++ b/proto_bin.c
+@@ -1136,7 +1136,7 @@ static void process_bin_update(conn *c, char *extbuf) {
+         /* FIXME: losing c->cmd since it's translated below. refactor? */
+         LOGGER_LOG(c->thread->l, LOG_MUTATIONS, LOGGER_ITEM_STORE,
+                 NULL, status, 0, key, nkey, req->message.body.expiration,
+-                ITEM_clsid(it), c->sfd);
++                0, c->sfd);
+ 
+         /* Avoid stale data persisting in cache because we failed alloc.
+          * Unacceptable for SET. Anywhere else too? */
+-- 
+2.55.0
+
