@@ -1,0 +1,5 @@
+# TEMPORARY: Remove this bootstrap override after rebuilding the dependency cycle.
+[components.golang-x-telemetry]
+
+[components.golang-x-telemetry.build]
+with = ["bootstrap"]
