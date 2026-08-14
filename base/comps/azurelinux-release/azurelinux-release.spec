@@ -35,8 +35,7 @@
 Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
-# TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        24%{?dist}
+Release:        %autorelease -b 11
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -482,75 +481,4 @@ install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
 
 
 %changelog
-* Thu Aug 13 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-24
-- Persist CIS kernel sysctl defaults (dmesg_restrict, yama.ptrace_scope, randomize_va_space)
-
-* Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-23
-- Configure neutral local and remote login banners
-
-* Tue Aug 11 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-22
-- Persist CIS network sysctl defaults
-
-* Thu Jul 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-21
-- Set canonical product, documentation, support, and issue-reporting URLs
-- Remove the inactive default debuginfod server configuration
-
-* Wed Jul 08 2026 Mitch Zhu <mitchzhu@microsoft.com> - 4.0-20
-- Add cloud-init Azure KVP telemetry config to the cloud identity package
-
-* Tue Jul 07 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 4.0-19
-- Enable netplan-configure.service by default via 90-default.preset
-
-* Wed Jun 10 2026 Andrew Phelps <anphel@microsoft.com> - 4.0-18
-- Update CPE_NAME in os-release to a well-formed CPE 2.3 formatted string
-  (microsoft:azure_linux), replacing the legacy CPE 2.2 URI binding
-- Update system-release-cpe to the matching CPE 2.3 formatted string
-
-* Thu May 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-17
-- Redefine azurelinux macro as major version.
-
-* Tue May 12 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-16
-- Add 50-permit-root-login.conf to explicitly set PermitRootLogin no
-
-* Fri May 08 2026 Chris Co <chrco@microsoft.com> - 4.0-15
-- Update prerelease name to Beta
-- Drop eol_date and SUPPORT_END for the Beta phase
-
-* Wed May 06 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-14
-- Add Recommends weak dependency to prefer azurelinux-repos package.
-
-* Wed May 06 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-13
-- add 50-client-alive-interval.conf
-
-* Wed May 06 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-12
-- no-change bump to match "rendered" spec release
-
-* Thu Apr 23 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-11
-- Revert proc-version-override
-
-* Tue Apr 21 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-10
-- Fix distcore macro definition
-
-* Fri Apr 17 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-9
-- Add sysctl config for system hardening
-
-* Wed Apr 15 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-8
-- Set prerelease name
-
-* Tue Apr 14 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-7
-- Update release name to Alpha2 and extend EOL date
-
-* Tue Apr 14 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-6
-- Enable networkd UseDomains= for cloud images
-
-* Thu Apr 09 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-5
-- Add ID_LIKE tag to os-release.
-
-* Wed Apr 08 2026 Dan Streetman <ddstreet@ieee.org> - 4.0-4
-- Configure chrony to use Azure PTP timesource
-
-* Wed Apr 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 4.0-3
-- Add proc-version-override service for Guest-Configuration-Extension compat
-
-* Fri Feb 27 2026 Reuben Olinsky <reubeno@microsoft.com> - 4.0-2
-- Initial version
+%autochangelog
