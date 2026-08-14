@@ -73,6 +73,10 @@ Provides:       shim-unsigned = %{version}-%{release}
 # This shim requires grub with SBAT generation 5 or greater. grub 2.06-27 is the first release with `grub,5` SBAT generation support.
 Conflicts:      grub2-efi-binary < 2.06-27
 
+# This shim is incompatible with lxhvloader (all versions). Once the compatible lxhvloader is available, 
+# scope the Conflicts to just the affected versions. See work item 63139272.
+Conflicts:      mshv-bootloader-lx
+
 %ifarch x86_64
 BuildRequires:  shim-unsigned-x64 = %{version}
 %endif
@@ -208,7 +212,7 @@ fi
 /boot/efi/EFI/%{efidir}/*
 
 %changelog
-* Fri Jun 19 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
+* Wed Jul 29 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-1
 - Update to version 16.1
 - Generate dual-signed shim
 
