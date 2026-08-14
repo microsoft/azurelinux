@@ -35,8 +35,6 @@ Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1
 # bootstrap 04
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
 
-Patch1:         CVE-2026-39821.patch
-
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
 Provides:       golang = %{version}-%{release}
@@ -174,6 +172,7 @@ fi
 %changelog
 * Fri Aug 14 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.6-1
 - Bump version to 1.26.6-1
+- Remove patch of CVE-2026-39821
 
 * Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
 - Bump version to 1.26.5-2
