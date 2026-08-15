@@ -7,6 +7,11 @@ category = "azl-release-management"
 upstream-status = "inapplicable"
 
 [[overlays]]
+type = "spec-prepend-lines"
+description = "Define azl_pkgrelease in the spec so it is the release counter azldev bumps; the value here is the base and the rendered value is base plus the synthetic commit count"
+lines = ["%define azl_pkgrelease 1", ""]
+
+[[overlays]]
 type = "spec-search-replace"
 description = "Set specrelease to kextraversion.azl_pkgrelease.dist so the 4th version component and package release are explicit"
 regex = "%define specrelease .+"

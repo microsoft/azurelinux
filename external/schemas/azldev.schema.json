@@ -1073,103 +1073,12 @@
       "type": "object"
     },
     "ReleaseCounter": {
-      "oneOf": [
-        {
-          "if": {
-            "properties": {
-              "source": {
-                "const": "release-tag"
-              }
-            },
-            "required": [
-              "source"
-            ]
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "directive"
-                  ]
-                },
-                {
-                  "required": [
-                    "name"
-                  ]
-                }
-              ]
-            },
-            "required": [
-              "regex"
-            ]
-          },
-          "else": false
-        },
-        {
-          "if": {
-            "properties": {
-              "source": {
-                "const": "spec-macro"
-              }
-            },
-            "required": [
-              "source"
-            ]
-          },
-          "then": {
-            "not": {
-              "required": [
-                "regex"
-              ]
-            },
-            "required": [
-              "directive",
-              "name"
-            ]
-          },
-          "else": false
-        },
-        {
-          "if": {
-            "properties": {
-              "source": {
-                "const": "macros-file"
-              }
-            },
-            "required": [
-              "source"
-            ]
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "regex"
-                  ]
-                },
-                {
-                  "required": [
-                    "directive"
-                  ]
-                }
-              ]
-            },
-            "required": [
-              "name"
-            ]
-          },
-          "else": false
-        }
-      ],
       "properties": {
         "source": {
           "type": "string",
           "enum": [
             "release-tag",
-            "spec-macro",
-            "macros-file"
+            "spec-macro"
           ],
           "title": "Counter source",
           "description": "Physical location of the release counter"
@@ -1191,7 +1100,7 @@
         "name": {
           "type": "string",
           "title": "Macro name",
-          "description": "Name of the bare-integer macro counter. Required when source is spec-macro or macros-file"
+          "description": "Name of the bare-integer macro counter. Required when source is spec-macro"
         }
       },
       "additionalProperties": false,
