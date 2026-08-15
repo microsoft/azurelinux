@@ -1,4 +1,4 @@
-From 723925e7d9d10e283f20f512773ec2a32bd3d170 Mon Sep 17 00:00:00 2001
+From 6f176417348df1742d4dea47210c995bd1bbcabf Mon Sep 17 00:00:00 2001
 From: Max Weiss <maxweiss@microsoft.com>
 Date: Wed, 10 Jun 2026 22:23:36 -0700
 Subject: [PATCH] Fix cleanupAttachmentPods fallback keeping useless old pods
@@ -32,10 +32,10 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
  2 files changed, 168 insertions(+), 1 deletion(-)
 
 diff --git a/pkg/virt-controller/watch/vmi/vmi_test.go b/pkg/virt-controller/watch/vmi/vmi_test.go
-index e88b09b664..35b93fb7b2 100644
+index e7cfb66ad3..32adcd75d0 100644
 --- a/pkg/virt-controller/watch/vmi/vmi_test.go
 +++ b/pkg/virt-controller/watch/vmi/vmi_test.go
-@@ -3672,6 +3672,152 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
+@@ -4225,6 +4225,152 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
  				},
  			}, true),
  		)
@@ -189,7 +189,7 @@ index e88b09b664..35b93fb7b2 100644
  
  	Context("topology hints", func() {
 diff --git a/pkg/virt-controller/watch/vmi/volume-hotplug.go b/pkg/virt-controller/watch/vmi/volume-hotplug.go
-index 54fde22d51..0db143cac2 100644
+index 225e4ac553..181fb5c735 100644
 --- a/pkg/virt-controller/watch/vmi/volume-hotplug.go
 +++ b/pkg/virt-controller/watch/vmi/volume-hotplug.go
 @@ -84,8 +84,10 @@ func (c *Controller) cleanupAttachmentPods(currentPod *k8sv1.Pod, oldPods []*k8s
@@ -213,8 +213,8 @@ index 54fde22d51..0db143cac2 100644
  			foundRunning = true
  			continue
  		}
-@@ -132,6 +135,24 @@ func volumeReadyForPodDelete(phase v1.VolumePhase) bool {
- 	return true
+@@ -153,6 +156,24 @@ func (c *Controller) isUtilityVolumeWithBlockPVC(vmi *v1.VirtualMachineInstance,
+ 	return storagetypes.IsPVCBlock(pvc.Spec.VolumeMode), nil
  }
  
 +// podContainsVolumesToPreserve returns true if the pod contains at least one
@@ -239,5 +239,5 @@ index 54fde22d51..0db143cac2 100644
  	logger := log.Log.Object(vmi)
  
 -- 
-2.54.0
+2.50.1 (Apple Git-155)
 
