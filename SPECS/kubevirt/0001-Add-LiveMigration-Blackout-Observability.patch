@@ -279,7 +279,7 @@ index bb5c861c0e..dddbfa7d91 100644
 +	key := controller.NamespacedKey(domain.Namespace, domain.Name)
 +	vmi, exists := h.vmiForCompletedStats(key)
 +	if !exists {
-+		log.Log.V(logVerbosityInfo).Infof("dropping completed migration stats for VMI %s: VMI not found", key)
++		log.Log.V(3).Infof("dropping completed migration stats for VMI %s: VMI not found", key)
 +		return
 +	}
 +
@@ -1184,4 +1184,3 @@ index d4c0bc6dcd..190e2e4890 100644
  			Expect(libwait.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240*time.Second)).To(Succeed())
 -- 
 2.50.1 (Apple Git-155)
-
