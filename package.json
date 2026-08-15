@@ -1,0 +1,14 @@
+{
+  "name": "azurelinux-commit-tooling",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Development-only tooling for Azure Linux: commitlint and its shared config for validating Conventional Commit messages. Not part of any distro artifact.",
+  "license": "MIT",
+  "scripts": {
+    "commitlint": "commitlint --config commitlint.config.js"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2"
+  }
+}

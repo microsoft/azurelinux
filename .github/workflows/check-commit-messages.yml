@@ -1,0 +1,208 @@
+#
+# Validates that every commit entering the permanent 4.0 history through
+# rebase-merge follows the Conventional Commits header format documented in
+# CONTRIBUTING.md. Rules live in commitlint.config.js so this check and local
+# `commitlint` runs stay in sync.
+#
+# Workflows that run on 'pull_request_target' trigger need to be carefully
+# reviewed since they run in the context of the PR target and consume unvalidated
+# input controlled by a PR submitter. We've reviewed this workflow and
+# allow-listed it via the 'zizmor' comment below. This workflow only checks out
+# the base branch (never the PR head), reads commit metadata exclusively through
+# the GitHub API, and feeds those messages to commitlint as data -- it never
+# checks out or executes any code from the PR branch, so it is safe to use
+# pull_request_target.
+#
+
+name: "Check Commit Messages"
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    # Only run on PRs targeting 4.0. pull_request_target always uses the workflow
+    # from the default branch. This workflow does not require any untrusted
+    # scripts from the PR branch, so it is safe to use pull_request_target.
+    branches:
+      - "4.0"
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  main:
+    name: Validate commit messages
+    # Prevent forks from running a stale/vulnerable copy of this workflow with Actions enabled
+    if: github.repository == 'microsoft/azurelinux'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # Needed to post comments on PR
+    steps:
+      # Check out the base branch only (pull_request_target's default ref) to get
+      # commitlint.config.js. The PR head is never checked out or executed.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+
+      # Install commitlint from the committed lockfile so the ruleset (and its
+      # full dependency tree) is pinned and reproducible. commitlint.config.js
+      # resolves its `extends` from the workspace-root node_modules.
+      - name: Install commitlint
+        run: npm ci --no-audit --no-fund
+
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        id: validate_commits
+        with:
+          script: |
+            const path = require('path');
+            const { execFileSync } = require('child_process');
+
+            const pr = context.payload.pull_request;
+            const commits = await github.paginate(
+              github.rest.pulls.listCommits,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                per_page: 100,
+              }
+            );
+
+            // pulls.listCommits is hard-capped at 250 commits even with
+            // pagination. Fail closed if we did not receive the full set the PR
+            // reports, so a large PR cannot pass by validating only a prefix.
+            const expected = pr.commits;
+            if (typeof expected !== 'number' || commits.length !== expected) {
+              const message =
+                `Unable to validate all commits: received ${commits.length} ` +
+                `of ${expected} reported by the pull request. The commit-message ` +
+                `check cannot guarantee coverage of every commit; please split ` +
+                `this pull request.`;
+              core.setOutput('error_message', message);
+              core.setFailed(message);
+              return;
+            }
+
+            // Encode an untrusted commit subject at the rendering boundary: keep
+            // a conservative allowlist verbatim and emit every other character
+            // (including Markdown link/image syntax, HTML, mentions, backslashes,
+            // and Unicode format characters) as an HTML numeric entity. Wrapped
+            // in a <code> element, the result is inert text in the bot comment.
+            const encodeSubject = (text) => {
+              const firstLine = String(text || '').split('\n')[0].slice(0, 200);
+              let out = '';
+              for (const ch of firstLine) {
+                out += /[A-Za-z0-9 _.\-/:]/.test(ch)
+                  ? ch
+                  : `&#${ch.codePointAt(0)};`;
+              }
+              return out;
+            };
+
+            // Lint one commit message with the shared commitlint config. Returns
+            // true when valid. commitlint exits 1 for lint problems; any other
+            // failure (missing binary, bad config) is unexpected and re-thrown so
+            // the job fails loudly rather than silently passing commits.
+            const workspace = process.env.GITHUB_WORKSPACE;
+            const commitlintBin = path.join(workspace, 'node_modules', '.bin', 'commitlint');
+            const lintMessage = (message) => {
+              try {
+                execFileSync(commitlintBin, ['--config', 'commitlint.config.js'], {
+                  input: message,
+                  cwd: workspace,
+                  stdio: ['pipe', 'pipe', 'pipe'],
+                });
+                return true;
+              } catch (err) {
+                if (err.status === 1) return false;
+                throw new Error(
+                  `commitlint failed to run (status ${err.status}): ${err.message}`
+                );
+              }
+            };
+
+            const invalid = [];
+            for (const c of commits) {
+              const message = String(c.commit.message || '');
+              if (!lintMessage(message)) {
+                invalid.push({ sha: c.sha.substring(0, 8), subject: message.split('\n')[0] });
+              }
+            }
+
+            if (invalid.length === 0) {
+              core.setOutput('error_message', '');
+              core.info(`All ${commits.length} commit message(s) are valid.`);
+              return;
+            }
+
+            // Comment body: HTML-encoded subjects inside <code> elements.
+            const list = invalid
+              .map((c) => `- \`${c.sha}\` <code>${encodeSubject(c.subject)}</code>`)
+              .join('\n');
+            const commentMessage =
+              `The following commit(s) do not follow the Conventional Commits ` +
+              `header format:\n\n${list}`;
+            core.setOutput('error_message', commentMessage);
+
+            // Failure annotation/log: SHAs only, so no untrusted subject text is
+            // echoed into plain-text log output.
+            core.setFailed(
+              `The following commit(s) do not follow the Conventional Commits ` +
+              `header format: ${invalid.map((c) => c.sha).join(', ')}. ` +
+              `See the pull request comment for details.`
+            );
+
+      - uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        # When the previous step fails, the workflow would stop. By adding this
+        # condition you can continue the execution with the populated error message.
+        if: always() && (steps.validate_commits.outputs.error_message != '')
+        with:
+          header: commit-message-lint-error
+          message: |
+            Hello, and thank you for opening this pull request! 👋🏼  We appreciate the contribution.
+
+            Because this repository uses **rebase-merge**, every commit you push becomes part of the permanent `4.0` history. We require each commit message header to follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/), as described in [`CONTRIBUTING.md`](https://github.com/microsoft/azurelinux/blob/4.0/CONTRIBUTING.md#conventional-commits). PR titles do **not** need to follow this format.
+
+            A valid header looks like:
+
+            ```
+            feat(component): add capability
+            fix(kernel)!: change incompatible behavior
+            ```
+
+            Use one of the standard types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. The scope in parentheses and the `!` breaking-change marker are optional.
+
+            You can reproduce this check locally with the same rules:
+
+            ```
+            npm ci
+            npm run commitlint -- --from origin/4.0 --to HEAD
+            ```
+
+            Please fix the offending commit(s) below by amending or rebasing:
+
+            - To fix the most recent commit: `git commit --amend`, then `git push --force-with-lease`.
+            - To fix earlier commits (including `fixup!` / "address review feedback" commits): `git rebase -i`, reword the offending commits, then `git push --force-with-lease`.
+
+            Details:
+
+            ${{ steps.validate_commits.outputs.error_message }}
+
+      # Delete the previous comment once every commit message is valid.
+      - if: steps.validate_commits.outputs.error_message == ''
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        with:
+          header: commit-message-lint-error
+          delete: true
