@@ -30,10 +30,11 @@ import subprocess
 import urllib.error
 import urllib.request
 from pathlib import Path
+from threading import Lock
 from urllib.parse import urlparse
 
 from _mcp_utils import (
-    FastMCP,
+    MCPServer,
     StatusDict,
     check_ssrf,
     load_env,
@@ -42,7 +43,11 @@ from _mcp_utils import (
     write_output,
 )
 
-mcp = FastMCP("fedora-distgit")
+mcp = MCPServer("fedora-distgit")
+
+# MCP 2 runs synchronous tools in worker threads. Preserve the serialized
+# state and filesystem access that these tools relied on under MCP 1.
+_tool_lock = Lock()
 
 # Load .env config — may set AZLDEV_WORK_DIR etc.
 load_env()
@@ -204,7 +209,8 @@ def distgit_status() -> StatusDict:
 
     Returns the configured base URL, scratch directory, and cached repos.
     """
-    return _add_status({}, full=True)
+    with _tool_lock:
+        return _add_status({}, full=True)
 
 
 @mcp.tool()
@@ -214,12 +220,13 @@ def set_distgit_url(base_url: str) -> StatusDict:
     Defaults to https://src.fedoraproject.org. Only needs to be called if
     using a mirror or alternate instance."""
     global _base_url
-    old_url = _base_url
-    normalized, err = validate_base_url(base_url)
-    if err:
-        return _add_status({"error": err}, full=False)
-    _base_url = normalized
-    return _add_status({"old_url": old_url}, full=False)
+    with _tool_lock:
+        old_url = _base_url
+        normalized, err = validate_base_url(base_url)
+        if err:
+            return _add_status({"error": err}, full=False)
+        _base_url = normalized
+        return _add_status({"old_url": old_url}, full=False)
 
 
 @mcp.tool()
@@ -235,49 +242,50 @@ def distgit_fetch(path: str, override_base_url: str | None = None) -> StatusDict
       - /rpms/atlas/raw/rawhide/f/atlas.spec  (raw spec file)
 
     Response is written to a temp file. Use read_file or grep_search to inspect."""
-    if override_base_url:
-        base, err = validate_base_url(override_base_url)
-        if err:
-            return _add_status({"error": err}, full=False)
-    else:
-        base = _base_url
+    with _tool_lock:
+        if override_base_url:
+            base, err = validate_base_url(override_base_url)
+            if err:
+                return _add_status({"error": err}, full=False)
+        else:
+            base = _base_url
 
-    if not path.startswith("/"):
-        return _add_status({"error": "path must start with '/'"}, full=False)
+        if not path.startswith("/"):
+            return _add_status({"error": "path must start with '/'"}, full=False)
 
-    url = base + path
+        url = base + path
 
-    # Guard against SSRF via URL authority tricks
-    ssrf_err = check_ssrf(base, url)
-    if ssrf_err:
-        return _add_status({"error": ssrf_err}, full=False)
+        # Guard against SSRF via URL authority tricks
+        ssrf_err = check_ssrf(base, url)
+        if ssrf_err:
+            return _add_status({"error": ssrf_err}, full=False)
 
-    req = urllib.request.Request(url, headers={"User-Agent": "fedora-distgit-mcp/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "fedora-distgit-mcp/1.0"})
 
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = resp.read()
-    except urllib.error.HTTPError as e:
-        return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
-    except urllib.error.URLError as e:
-        return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
-    except Exception as e:
-        return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = resp.read()
+        except urllib.error.HTTPError as e:
+            return _add_status({"error": f"HTTP {e.code} fetching {url}: {e.reason}"}, full=False)
+        except urllib.error.URLError as e:
+            return _add_status({"error": f"can't fetch {url}: {e.reason}"}, full=False)
+        except Exception as e:
+            return _add_status({"error": f"can't fetch {url}: {e}"}, full=False)
 
-    try:
-        text = data.decode("utf-8")
-    except UnicodeDecodeError:
-        text = data.decode("latin-1")
+        try:
+            text = data.decode("utf-8")
+        except UnicodeDecodeError:
+            text = data.decode("latin-1")
 
-    # Pretty-print JSON responses for readability
-    try:
-        parsed = json.loads(text)
-        text = json.dumps(parsed, indent=2)
-    except (json.JSONDecodeError, ValueError):
-        pass
+        # Pretty-print JSON responses for readability
+        try:
+            parsed = json.loads(text)
+            text = json.dumps(parsed, indent=2)
+        except (json.JSONDecodeError, ValueError):
+            pass
 
-    output = write_output(text, output_dir=_fetch_dir, prefix="distgit_")
-    return _add_status({"output": output}, full=False)
+        output = write_output(text, output_dir=_fetch_dir, prefix="distgit_")
+        return _add_status({"output": output}, full=False)
 
 
 @mcp.tool()
@@ -311,115 +319,116 @@ def distgit_search(
 
     Results are written to a temp file. Use read_file or grep_search to inspect.
     """
-    if override_base_url:
-        base, err = validate_base_url(override_base_url)
+    with _tool_lock:
+        if override_base_url:
+            base, err = validate_base_url(override_base_url)
+            if err:
+                return _add_status({"error": err}, full=False)
+        else:
+            base = _base_url
+
+        valid_modes = ("pickaxe", "grep", "log-grep")
+        if mode not in valid_modes:
+            return _add_status({"error": f"mode must be one of {valid_modes}, got {mode!r}"}, full=False)
+        if not query:
+            return _add_status({"error": "query must not be empty."}, full=False)
+        if ref != "--all" and ref.startswith("-"):
+            return _add_status(
+                {"error": f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."},
+                full=False,
+            )
+
+        repo_dir, err = _ensure_repo(package, auto_clean, base)
         if err:
             return _add_status({"error": err}, full=False)
-    else:
-        base = _base_url
 
-    valid_modes = ("pickaxe", "grep", "log-grep")
-    if mode not in valid_modes:
-        return _add_status({"error": f"mode must be one of {valid_modes}, got {mode!r}"}, full=False)
-    if not query:
-        return _add_status({"error": "query must not be empty."}, full=False)
-    if ref != "--all" and ref.startswith("-"):
-        return _add_status(
-            {"error": f"ref must not start with '-' (got {ref!r}). Use a branch name like 'rawhide'."},
-            full=False,
-        )
+        git_dir = _git_dir(package, base)
 
-    repo_dir, err = _ensure_repo(package, auto_clean, base)
-    if err:
-        return _add_status({"error": err}, full=False)
+        # Build the git command
+        if mode == "pickaxe":
+            ref_args = ["--all"] if ref == "--all" else [ref]
+            cmd = [
+                "git",
+                "--git-dir",
+                git_dir,
+                "log",
+                "--oneline",
+                "-20",
+                f"-S{query}",
+                *ref_args,
+                "--",
+            ]
+        elif mode == "grep":
+            if ref == "--all":
+                return _add_status(
+                    {"error": "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."},
+                    full=False,
+                )
+            cmd = [
+                "git",
+                "--git-dir",
+                git_dir,
+                "grep",
+                "-n",
+                "-i",
+                "-e",
+                query,
+                ref,
+                "--",
+            ]
+        elif mode == "log-grep":
+            ref_args = ["--all"] if ref == "--all" else [ref]
+            cmd = [
+                "git",
+                "--git-dir",
+                git_dir,
+                "log",
+                "--oneline",
+                "-20",
+                f"--grep={query}",
+                *ref_args,
+            ]
 
-    git_dir = _git_dir(package, base)
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired:
+            return _add_status({"error": "Search timed out after 30s."}, full=False)
+        except Exception as e:
+            return _add_status({"error": f"running git: {e}"}, full=False)
 
-    # Build the git command
-    if mode == "pickaxe":
-        ref_args = ["--all"] if ref == "--all" else [ref]
-        cmd = [
-            "git",
-            "--git-dir",
-            git_dir,
-            "log",
-            "--oneline",
-            "-20",
-            f"-S{query}",
-            *ref_args,
-            "--",
-        ]
-    elif mode == "grep":
-        if ref == "--all":
+        output = result.stdout
+        if result.returncode != 0 and not output:
+            # git grep returns 1 for "no match" — that's expected
+            if mode == "grep" and result.returncode == 1:
+                return _add_status(
+                    {"output": f"No matches found for {query!r} in {package} at {ref}."},
+                    full=False,
+                )
+            stderr = result.stderr.strip()
+            return _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
+
+        if not output.strip():
             return _add_status(
-                {"error": "--all is not supported for grep mode; specify a single ref (e.g. 'rawhide')."},
+                {
+                    "output": f"No matches found for {query!r} in {package} ({mode} on {ref}).",
+                    "repo_dir": repo_dir,
+                },
                 full=False,
             )
-        cmd = [
-            "git",
-            "--git-dir",
-            git_dir,
-            "grep",
-            "-n",
-            "-i",
-            "-e",
-            query,
-            ref,
-            "--",
-        ]
-    elif mode == "log-grep":
-        ref_args = ["--all"] if ref == "--all" else [ref]
-        cmd = [
-            "git",
-            "--git-dir",
-            git_dir,
-            "log",
-            "--oneline",
-            "-20",
-            f"--grep={query}",
-            *ref_args,
-        ]
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=30,
+        lines = output.count("\n")
+        written = write_output(
+            output,
+            output_dir=_fetch_dir,
+            prefix=f"distgit_{package}_{mode}_",
+            extra_msg=f"Found {lines} result(s). Repo cloned at: {repo_dir}",
         )
-    except subprocess.TimeoutExpired:
-        return _add_status({"error": "Search timed out after 30s."}, full=False)
-    except Exception as e:
-        return _add_status({"error": f"running git: {e}"}, full=False)
-
-    output = result.stdout
-    if result.returncode != 0 and not output:
-        # git grep returns 1 for "no match" — that's expected
-        if mode == "grep" and result.returncode == 1:
-            return _add_status(
-                {"output": f"No matches found for {query!r} in {package} at {ref}."},
-                full=False,
-            )
-        stderr = result.stderr.strip()
-        return _add_status({"error": f"git exited with {result.returncode}: {stderr}"}, full=False)
-
-    if not output.strip():
-        return _add_status(
-            {
-                "output": f"No matches found for {query!r} in {package} ({mode} on {ref}).",
-                "repo_dir": repo_dir,
-            },
-            full=False,
-        )
-
-    lines = output.count("\n")
-    written = write_output(
-        output,
-        output_dir=_fetch_dir,
-        prefix=f"distgit_{package}_{mode}_",
-        extra_msg=f"Found {lines} result(s). Repo cloned at: {repo_dir}",
-    )
-    return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
+        return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
 
 
 @mcp.tool()
@@ -441,52 +450,53 @@ def distgit_show(
         override_base_url: If provided, clone from this dist-git instance
             instead of the default.
     """
-    if override_base_url:
-        base, err = validate_base_url(override_base_url)
+    with _tool_lock:
+        if override_base_url:
+            base, err = validate_base_url(override_base_url)
+            if err:
+                return _add_status({"error": err}, full=False)
+        else:
+            base = _base_url
+
+        # Validate commit is a hex SHA (prevents argument injection when commit
+        # appears before "--" in the arg list)
+        if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
+            return _add_status({"error": "commit must be a hex SHA hash (4-40 chars)."}, full=False)
+
+        repo_dir, err = _ensure_repo(package, auto_clean, base)
         if err:
             return _add_status({"error": err}, full=False)
-    else:
-        base = _base_url
 
-    # Validate commit is a hex SHA (prevents argument injection when commit
-    # appears before "--" in the arg list)
-    if not re.match(r"^[a-fA-F0-9]{4,40}$", commit):
-        return _add_status({"error": "commit must be a hex SHA hash (4-40 chars)."}, full=False)
+        git_dir = _git_dir(package, base)
 
-    repo_dir, err = _ensure_repo(package, auto_clean, base)
-    if err:
-        return _add_status({"error": err}, full=False)
+        try:
+            result = subprocess.run(
+                ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired:
+            return _add_status({"error": "git show timed out after 30s."}, full=False)
+        except Exception as e:
+            return _add_status({"error": f"running git: {e}"}, full=False)
 
-    git_dir = _git_dir(package, base)
+        if result.returncode != 0:
+            stderr = result.stderr.strip()
+            return _add_status(
+                {"error": f"git show failed (exit {result.returncode}): {stderr}"},
+                full=False,
+            )
 
-    try:
-        result = subprocess.run(
-            ["git", "--git-dir", git_dir, "show", "--stat", "--patch", commit, "--"],
-            capture_output=True,
-            text=True,
-            timeout=30,
+        output = result.stdout
+
+        written = write_output(
+            output,
+            output_dir=_fetch_dir,
+            prefix=f"distgit_{package}_show_",
+            extra_msg=f"Repo cloned at: {repo_dir}",
         )
-    except subprocess.TimeoutExpired:
-        return _add_status({"error": "git show timed out after 30s."}, full=False)
-    except Exception as e:
-        return _add_status({"error": f"running git: {e}"}, full=False)
-
-    if result.returncode != 0:
-        stderr = result.stderr.strip()
-        return _add_status(
-            {"error": f"git show failed (exit {result.returncode}): {stderr}"},
-            full=False,
-        )
-
-    output = result.stdout
-
-    written = write_output(
-        output,
-        output_dir=_fetch_dir,
-        prefix=f"distgit_{package}_show_",
-        extra_msg=f"Repo cloned at: {repo_dir}",
-    )
-    return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
+        return _add_status({"output": written, "repo_dir": repo_dir}, full=False)
 
 
 @mcp.tool()
@@ -497,34 +507,35 @@ def distgit_cleanup(remove_repos: bool = True) -> StatusDict:
         remove_repos: If true (default), also remove all cached git repos.
             Set to false to only clean fetched files while preserving clones.
     """
-    removed_files = 0
-    removed_bytes = 0
+    with _tool_lock:
+        removed_files = 0
+        removed_bytes = 0
 
-    # Clean fetched files
-    if os.path.isdir(_fetch_dir):
-        for entry in os.scandir(_fetch_dir):
-            if entry.is_file():
-                removed_bytes += entry.stat().st_size
-                Path(entry.path).unlink()
-                removed_files += 1
+        # Clean fetched files
+        if os.path.isdir(_fetch_dir):
+            for entry in os.scandir(_fetch_dir):
+                if entry.is_file():
+                    removed_bytes += entry.stat().st_size
+                    Path(entry.path).unlink()
+                    removed_files += 1
 
-    # Clean repos
-    removed_repos_count = 0
-    if remove_repos and os.path.isdir(_repos_dir):
-        # Count actual repos (hostname/package) before bulk-removing the tree.
-        removed_repos_count = len(_cached_repos())
-        for entry in os.scandir(_repos_dir):
-            if entry.is_dir():
-                shutil.rmtree(entry.path, ignore_errors=True)
+        # Clean repos
+        removed_repos_count = 0
+        if remove_repos and os.path.isdir(_repos_dir):
+            # Count actual repos (hostname/package) before bulk-removing the tree.
+            removed_repos_count = len(_cached_repos())
+            for entry in os.scandir(_repos_dir):
+                if entry.is_dir():
+                    shutil.rmtree(entry.path, ignore_errors=True)
 
-    return _add_status(
-        {
-            "files_removed": removed_files,
-            "bytes_reclaimed": removed_bytes,
-            "repos_removed": removed_repos_count,
-        },
-        full=False,
-    )
+        return _add_status(
+            {
+                "files_removed": removed_files,
+                "bytes_reclaimed": removed_bytes,
+                "repos_removed": removed_repos_count,
+            },
+            full=False,
+        )
 
 
 if __name__ == "__main__":
