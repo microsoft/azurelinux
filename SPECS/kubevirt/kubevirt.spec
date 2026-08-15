@@ -43,6 +43,9 @@ Patch12:        CVE-2026-39835.patch
 Patch13:        CVE-2026-42502.patch
 Patch14:        CVE-2026-33814.patch
 Patch15:        CVE-2026-56852.patch
+Patch16:        0001-Add-LiveMigration-Blackout-Observability.patch
+Patch17:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
+Patch18:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
@@ -297,6 +300,11 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 %{_bindir}/virt-tests
 
 %changelog
+* Fri Aug 14 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.8.4-1
+- Enable Kubevirt Sidecar
+- Add hotplug volue patches
+- Add live migration blackout observability patch
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-8
 - Patch for CVE-2026-56852
 
