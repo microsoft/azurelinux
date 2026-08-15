@@ -63,7 +63,7 @@
       ],
       "type": "stdio"
     },
-    "microsoft/azure-devops-mcp": {
+    "microsoft-azure-devops-mcp": {
       "args": [
         "-y",
         "@azure-devops/mcp@latest",
