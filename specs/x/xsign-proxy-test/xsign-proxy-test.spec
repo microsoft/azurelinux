@@ -22,18 +22,6 @@ cp %{SOURCE0} .
 %build
 echo "=== Testing xsign-proxy connectivity ==="
 
-# Path written by the tag_info mock plugin before the build starts.
-KOJI_BUILD_TAG_FILE=/etc/koji-build-tag
-
-# Read the Koji build tag published into the chroot by the tag_info plugin.
-get_build_tag() {
-    if [ -r "$KOJI_BUILD_TAG_FILE" ]; then
-        tr -d '[:space:]' < "$KOJI_BUILD_TAG_FILE"
-        return 0
-    fi
-    return 1
-}
-
 # Test 1: Verify the client script is available in the chroot
 if [ -x /usr/local/bin/xsign_proxy_client.py ]; then
     echo "PASS: xsign_proxy_client.py is present and executable"
@@ -46,15 +34,6 @@ if [ -d /var/run/xsign-proxy ]; then
     echo "PASS: Socket directory /var/run/xsign-proxy exists"
 else
     echo "FAIL: Socket directory /var/run/xsign-proxy not found"
-fi
-
-# Test 2.5: Read and display the Koji build tag written by the tag_info plugin
-echo "Reading Koji build tag from $KOJI_BUILD_TAG_FILE..."
-build_tag=$(get_build_tag)
-if [ -n "$build_tag" ]; then
-    echo "PASS: Koji build tag: $build_tag"
-else
-    echo "WARN: Could not read Koji build tag from $KOJI_BUILD_TAG_FILE"
 fi
 
 # Test 3: Ping the daemon to verify connectivity
@@ -82,12 +61,7 @@ else
 fi
 
 ls -la "$UNSIGNED_TEST_FILE"
-# On unsigned tags the client skips the request, so no signed file is produced.
-if [ -f "$SIGNED_TEST_FILE" ]; then
-    ls -la "$SIGNED_TEST_FILE"
-else
-    echo "No signed file produced (expected on tags that are not signed tags)"
-fi
+ls -la "$SIGNED_TEST_FILE"
 
 # Clean up test files
 # rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
@@ -99,15 +73,8 @@ SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.s
 
 mkdir -p %{buildroot}%{_docdir}/%{name}
 echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
-# Fall back to the unsigned file so the package still builds on tags where the
-# client intentionally skips signing.
-if [ -f "$SIGNED_TEST_FILE" ]; then
-    install -D -m 0644 "$SIGNED_TEST_FILE" \
-        %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
-else
-    install -D -m 0644 "$UNSIGNED_TEST_FILE" \
-        %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
-fi
+install -D -m 0644 "$SIGNED_TEST_FILE" \
+    %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
 
 %files
 %config(noreplace) %{_sysconfdir}/xsign-proxy-test.signed.txt
