@@ -11,8 +11,11 @@ import re
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
+
+if TYPE_CHECKING:
+    from urllib.parse import ParseResult
 
 # Return type for all MCP tools — values may be str, int, list, or None.
 StatusDict = dict[str, Any]
@@ -29,7 +32,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from mcp.server.fastmcp import FastMCP  # noqa: F401 — re-exported
+    from mcp.server import MCPServer  # noqa: F401 - re-exported for MCP entrypoints
 except ImportError:
     sys.stderr.write("\n" + "=" * 60 + "\n")
     sys.stderr.write("  MISSING DEPENDENCY: 'mcp' package not found\n")
@@ -99,7 +102,7 @@ def validate_base_url(base_url: str) -> tuple[str, str | None]:
     return normalized, None
 
 
-def effective_port(parsed) -> int | None:
+def effective_port(parsed: ParseResult) -> int | None:
     """Return the effective port for a parsed URL (explicit or scheme default)."""
     if parsed.port is not None:
         return parsed.port
