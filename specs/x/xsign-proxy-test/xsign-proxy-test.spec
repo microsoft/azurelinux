@@ -20,65 +20,58 @@ within the mock chroot via the bind-mounted Unix socket.
 cp %{SOURCE0} .
 
 %build
-echo "=== Testing xsign-proxy connectivity ==="
 
-# Test 1: Verify the client script is available in the chroot
-if [ -x /usr/local/bin/xsign_proxy_client.py ]; then
-    echo "PASS: xsign_proxy_client.py is present and executable"
-else
-    echo "FAIL: xsign_proxy_client.py not found or not executable"
-fi
-
-# Test 2: Verify the socket directory is bind-mounted
-if [ -d /var/run/xsign-proxy ]; then
-    echo "PASS: Socket directory /var/run/xsign-proxy exists"
-else
-    echo "FAIL: Socket directory /var/run/xsign-proxy not found"
-fi
-
-# Test 3: Ping the daemon to verify connectivity
-echo "Pinging xsign-proxy-d daemon..."
-if /usr/local/bin/xsign_proxy_client.py ping; then
-    echo "PASS: Daemon responded to ping"
-else
-    echo "FAIL: Daemon did not respond to ping"
-fi
-
-# Test 4: Create a test file in the writable RPM build directory and submit it for signing
+echo "=== Building the binary ==="
+TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
 mkdir -p %{_builddir}/%{name}-%{version}
-UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
-SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
-echo "This is a test file for xsign-proxy signing" > "$UNSIGNED_TEST_FILE"
-echo "Created test file: $UNSIGNED_TEST_FILE"
+echo "This is a test file for xsign-proxy signing" > "$TEST_FILE"
+echo "Created test file: $TEST_FILE"
 
-echo "Submitting test file for signing..."
-if /usr/local/bin/xsign_proxy_client.py sign \
-    --input-file "$UNSIGNED_TEST_FILE" \
-    --output-file "$SIGNED_TEST_FILE"; then
+XSIGN_PROXY_CLIENT=/usr/local/bin/xsign_proxy_client.py
+
+# Are we running on a secure-boot image?
+if [ -x "$XSIGN_PROXY_CLIENT" ]; then
+
+    SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
+
+    echo "===  verify the socket directory is bind-mounted ==="
+    if [ ! -d /var/run/xsign-proxy ]; then
+        echo "FAIL: Socket directory /var/run/xsign-proxy not found"
+        exit 1
+    fi
+
+    echo "===  pinging xsign-proxy-d daemon ==="
+    "$XSIGN_PROXY_CLIENT" ping
+    echo "PASS: Daemon responded to ping"
+
+    echo "=== signing the test file ==="
+    "$XSIGN_PROXY_CLIENT" sign \
+        --input-file "$TEST_FILE" \
+        --output-file "$SIGNED_TEST_FILE"
     echo "PASS: Sign request completed successfully"
+
+    ls -la "$TEST_FILE"
+    ls -la "$SIGNED_TEST_FILE"
+
+    echo "=== secure boot signing completed ==="
 else
-    echo "FAIL: Sign request failed"
+    echo "=== skipped secure boot signing ==="
 fi
-
-ls -la "$UNSIGNED_TEST_FILE"
-ls -la "$SIGNED_TEST_FILE"
-
-# Clean up test files
-# rm -f "$UNSIGNED_TEST_FILE" "$SIGNED_TEST_FILE"
-echo "=== All xsign-proxy tests passed ==="
 
 %install
-UNSIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
-SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.signed.txt"
+TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
+SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
 
-mkdir -p %{buildroot}%{_docdir}/%{name}
-echo "xsign-proxy-test package installed successfully" > %{buildroot}%{_docdir}/%{name}/README
-install -D -m 0644 "$SIGNED_TEST_FILE" \
-    %{buildroot}%{_sysconfdir}/xsign-proxy-test.signed.txt
+if [ -f "$SIGNED_TEST_FILE" ]; then
+    install -D -m 0644 "$SIGNED_TEST_FILE" \
+        %{buildroot}%{_sysconfdir}/xsign-proxy-test.txt
+else
+    install -D -m 0644 "$TEST_FILE" \
+        %{buildroot}%{_sysconfdir}/xsign-proxy-test.txt
+fi
 
 %files
-%config(noreplace) %{_sysconfdir}/xsign-proxy-test.signed.txt
-%{_docdir}/%{name}/README
+%config(noreplace) %{_sysconfdir}/xsign-proxy-test.txt
 
 %changelog
 * Fri Jun 26 2026 Test User <test@example.com> - 1.0.0-1
