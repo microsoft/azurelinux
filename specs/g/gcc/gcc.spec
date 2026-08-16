@@ -7,7 +7,7 @@
 %global gcc_major 15
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 7
+%global gcc_release 8
 %global nvptx_tools_gitrev a0c1fff6534a4df9fb17937c3c4a4b1071212029
 %global newlib_cygwin_gitrev d35cc82b5ec15bb8a5fe0fe11e183d1887992e99
 %global _unpackaged_files_terminate_build 0
@@ -361,6 +361,7 @@ chmod 755 %{buildroot}%{_prefix}/libexec/gcc/%{gcc_target_platform}/%{gcc_major}
 %{nil}
 %endif
 
+Patch101: 0001-gcc-recognize-azure-linux-devphase.patch
 %description
 The gcc package contains the GNU Compiler Collection version %{gcc_major}.
 You'll need this package in order to compile C code.
@@ -954,6 +955,7 @@ so that there cannot be any synchronization problems.
 %autopatch -p0 10
 %endif
 %autopatch -p0 -m 11 -M 99
+%patch -P 101 -p1
 touch -r isl-0.24/m4/ax_prog_cxx_for_build.m4 isl-0.24/m4/ax_prog_cc_for_build.m4
 
 %if 0%{?rhel} >= 9
@@ -966,7 +968,7 @@ rm -f gcc/testsuite/go.test/test/fixedbugs/issue19182.go
 rm -f libphobos/testsuite/libphobos.gc/forkgc2.d
 #rm -rf libphobos/testsuite/libphobos.gc
 
-echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
+echo '%{dist_name} %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 

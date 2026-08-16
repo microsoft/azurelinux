@@ -1,0 +1,25 @@
+# GCC uses DEV-PHASE as the shared downstream version suffix for compiler
+# drivers, internal frontends, coverage tools, and compiler-emitted metadata.
+
+[metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Brand GCC version strings with the Azure Linux distribution name"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^echo 'Red Hat %\\{version\\}-%\\{gcc_release\\}' > gcc/DEV-PHASE$"
+replacement = "echo '%{dist_name} %{version}-%{gcc_release}' > gcc/DEV-PHASE"
+
+[[overlays]]
+description = "Preserve __GNUC_RH_RELEASE__ compatibility with Azure Linux branding"
+type = "patch-add"
+source = "../0001-gcc-recognize-azure-linux-devphase.patch"
+
+[[overlays]]
+description = "Apply the Azure Linux DEV-PHASE compatibility patch"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%autopatch -p0 -m 11 -M 99$'
+replacement = "%autopatch -p0 -m 11 -M 99\n%patch -P 101 -p1"

@@ -1,0 +1,12 @@
+# The GCC component uses manual release calculation, so output-changing
+# customizations must explicitly increment gcc_release.
+
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Bump the GCC release for Azure Linux version branding"
+type = "spec-search-replace"
+regex = '^%global gcc_release 7$'
+replacement = "%global gcc_release 8"
