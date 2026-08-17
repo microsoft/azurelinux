@@ -20,7 +20,19 @@ section = "%files"
 lines = ["%{_bindir}/tdnf"]
 
 [[overlays]]
+description = "Include the gptdnf test symlink in the package"
+type = "spec-append-lines"
+section = "%files"
+lines = ["%{_bindir}/gptdnf"]
+
+[[overlays]]
 description = "Provide /usr/bin/tdnf as a compat symlink to dnf5"
 type = "spec-append-lines"
 section = "%install"
 lines = ["ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/tdnf"]
+
+[[overlays]]
+description = "Provide /usr/bin/gptdnf as a test symlink to dnf5"
+type = "spec-append-lines"
+section = "%install"
+lines = ["ln -sr %{buildroot}%{_bindir}/dnf5 %{buildroot}%{_bindir}/gptdnf"]
