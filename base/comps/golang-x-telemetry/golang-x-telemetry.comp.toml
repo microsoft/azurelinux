@@ -1,5 +1,17 @@
-# TEMPORARY: Remove this bootstrap override after rebuilding the dependency cycle.
 [components.golang-x-telemetry]
 
-[components.golang-x-telemetry.build]
-with = ["bootstrap"]
+[[components.golang-x-telemetry.overlays]]
+description = "Drop the separate telemetry.go.dev service module and its unrelated dependency tree"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%goprep -A$'
+replacement = '''%goprep -A
+
+# This is a separate module, which is for the services behind telemetry.go.dev,
+# which pulls in far too many dependencies, and we don't really need it.
+rm -rf godev'''
+
+[components.golang-x-telemetry.overlays.metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://src.fedoraproject.org/rpms/golang-x-telemetry/c/57ceff0a752db91320ff236fa24d77aec74bd84d" }]
