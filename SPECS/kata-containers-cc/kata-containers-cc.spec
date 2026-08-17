@@ -3,14 +3,14 @@
 
 Name:         kata-containers-cc
 Version:      3.15.0.aks0
-Release:      17%{?dist}
+Release:      18%{?dist}
 Summary:      Kata Confidential Containers package developed for Confidential Containers on AKS
 License:      ASL 2.0
 URL:          https://github.com/microsoft/kata-containers
 Vendor:       Microsoft Corporation
 Distribution: Azure Linux
 Source0:      https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{sourceName}-%{version}.tar.gz
-Source1:      %{sourceName}-%{version}-cargo.tar.gz
+Source1:      %{sourceName}-3.15.0.aks1-cargo.tar.gz
 Patch0:       rust-1.90-fixes.patch
 Patch1:       CVE-2026-41602.patch
 Patch2:       CVE-2026-39821.patch
@@ -158,6 +158,9 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Mon Aug 17 2026 Saul Paredes <saulparedes@microsoft.com> - 3.15.0.aks0-18
+- Remove windows bits that are not needed from vendored tarball
+
 * Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-17
 - Patch for CVE-2026-55969, CVE-2026-48586, CVE-2026-43871, CVE-2026-50540
 
