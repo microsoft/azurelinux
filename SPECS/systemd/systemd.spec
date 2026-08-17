@@ -159,8 +159,8 @@ Patch0911:      CVE-2026-40225.patch
 Patch0912:      networkd-address-skip-firewall-init.patch
 Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
-Patch915:      CVE-2026-15059.patch
-Patch916:      CVE-2026-16742.patch
+Patch0915:      CVE-2026-15059.patch
+Patch0916:      CVE-2026-16742.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
