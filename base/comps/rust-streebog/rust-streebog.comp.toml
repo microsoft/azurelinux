@@ -1,0 +1,8 @@
+[components.rust-streebog]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing
+# streebog 0.11.0, required by hmac 0.13.0's dev/test matrix
+# (crate(streebog/default) >= 0.11.0). No compat package is needed: the
+# old-range hmac/pbkdf2 compat packages patch out their streebog dev-dep
+# (see rust-hmac0.12/rust-pbkdf2_0.12), and the pre-existing
+# rust-streebog0.9 remains for anything still on that range.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "a8a5fd3b695654bbb28e147c54d0f82298edf1f1" }

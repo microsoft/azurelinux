@@ -1,5 +1,5 @@
---- proptest-1.9.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ proptest-1.9.0/Cargo.toml	2025-11-01T08:53:02.338580+00:00
+--- proptest-1.11.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ proptest-1.11.0/Cargo.toml	2026-03-25T19:31:34.916871+00:00
 @@ -19,6 +19,7 @@
  exclude = [
      "/gen-*.sh",
@@ -8,9 +8,9 @@
  ]
  autolib = false
  autobins = false
-@@ -176,4 +177,4 @@
+@@ -177,4 +178,4 @@
  version = "1.0"
  
  [dev-dependencies.trybuild]
--version = "=1.0.112"
-+version = "1.0.112"
+-version = "=1.0.115"
++version = "1.0.115"

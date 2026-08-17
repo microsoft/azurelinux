@@ -1,0 +1,6 @@
+[components.rust-pbkdf2]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing
+# pbkdf2 0.13.0, required by rust-zip 8.6.0 (crate(pbkdf2/default) >=
+# 0.13.0). Consumers requiring pbkdf2 < 0.13.0 are served by
+# rust-pbkdf2_0.12.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "64125a7336413fb33a8a876b293fed44d72d9292" }
