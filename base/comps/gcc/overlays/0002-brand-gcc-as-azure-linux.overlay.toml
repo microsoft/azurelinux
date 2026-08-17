@@ -7,10 +7,9 @@ upstream-status = "inapplicable"
 
 [[overlays]]
 description = "Brand GCC version strings with the Azure Linux distribution name"
-type = "spec-search-replace"
-section = "%prep"
-regex = "^echo 'Red Hat %\\{version\\}-%\\{gcc_release\\}' > gcc/DEV-PHASE$"
-replacement = "echo '%{dist_name} %{version}-%{gcc_release}' > gcc/DEV-PHASE"
+type = "spec-prepend-lines"
+section = "%build"
+lines = ["echo '%{dist_name} %{version}-%[%{gcc_release} + %{azl_release}]' > gcc/DEV-PHASE"]
 
 [[overlays]]
 description = "Preserve __GNUC_RH_RELEASE__ compatibility with Azure Linux branding"
@@ -19,7 +18,6 @@ source = "../0001-gcc-recognize-azure-linux-devphase.patch"
 
 [[overlays]]
 description = "Apply the Azure Linux DEV-PHASE compatibility patch"
-type = "spec-search-replace"
+type = "spec-append-lines"
 section = "%prep"
-regex = '^%autopatch -p0 -m 11 -M 99$'
-replacement = "%autopatch -p0 -m 11 -M 99\n%patch -P 101 -p1"
+lines = ["%patch -P 101 -p1"]

@@ -1,0 +1,12 @@
+# Keep Fedora's gcc_release intact and add Azure Linux's rebuild counter
+# through the structured Release tag overlay.
+
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Include the Azure Linux rebuild counter in the GCC release"
+type = "spec-update-tag"
+tag = "Release"
+value = "%[%{gcc_release} + %{azl_release}]%{?dist}"

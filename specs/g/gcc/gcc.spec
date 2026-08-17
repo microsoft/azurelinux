@@ -1,13 +1,16 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# All Azure Linux specs with overlays include this macro file, irrespective of whether new macros have been added.
+%{load:%{_sourcedir}/gcc.azl.macros}
+
 %global DATE 20260123
 %global gitrev 226e8310eed1ce10784f98f199e1aa4b12ca86b7
 %global gcc_version 15.2.1
 %global gcc_major 15
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 8
+%global gcc_release 7
 %global nvptx_tools_gitrev a0c1fff6534a4df9fb17937c3c4a4b1071212029
 %global newlib_cygwin_gitrev d35cc82b5ec15bb8a5fe0fe11e183d1887992e99
 %global _unpackaged_files_terminate_build 0
@@ -159,7 +162,7 @@
 Summary: Various compilers (C, C++, Objective-C, ...)
 Name: gcc
 Version: %{gcc_version}
-Release: %{gcc_release}%{?dist}
+Release: %[%{gcc_release} + %{azl_release}]%{?dist}
 # License notes for some of the less obvious ones:
 #   gcc/doc/cppinternals.texi: Linux-man-pages-copyleft-2-para
 #   isl: MIT, BSD-2-Clause
@@ -193,6 +196,7 @@ Source1: nvptx-tools-%{nvptx_tools_gitrev}.tar.xz
 Source2: newlib-cygwin-%{newlib_cygwin_gitrev}.tar.xz
 %global isl_version 0.24
 Source3: https://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.bz2
+Source9999: gcc.azl.macros
 URL: http://gcc.gnu.org
 # Need binutils with -pie support >= 2.14.90.0.4-4
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
@@ -955,7 +959,6 @@ so that there cannot be any synchronization problems.
 %autopatch -p0 10
 %endif
 %autopatch -p0 -m 11 -M 99
-%patch -P 101 -p1
 touch -r isl-0.24/m4/ax_prog_cxx_for_build.m4 isl-0.24/m4/ax_prog_cc_for_build.m4
 
 %if 0%{?rhel} >= 9
@@ -968,7 +971,7 @@ rm -f gcc/testsuite/go.test/test/fixedbugs/issue19182.go
 rm -f libphobos/testsuite/libphobos.gc/forkgc2.d
 #rm -rf libphobos/testsuite/libphobos.gc
 
-echo '%{dist_name} %{version}-%{gcc_release}' > gcc/DEV-PHASE
+echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
@@ -999,7 +1002,9 @@ fi
 # This test causes fork failures, because it spawns way too many threads
 rm -f gcc/testsuite/go.test/test/chan/goroutines.go
 
+%patch -P 101 -p1
 %build
+echo '%{dist_name} %{version}-%[%{gcc_release} + %{azl_release}]' > gcc/DEV-PHASE
 
 # Undo the broken autoconf change in recent Fedora versions
 export CONFIG_SITE=NONE

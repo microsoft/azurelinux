@@ -1,3 +1,7 @@
 [components.gcc]
-# Release: %{gcc_release}%{?dist}
+# Release: %[%{gcc_release} + %{azl_release}]%{?dist}
 release = { calculation = "manual" }
+
+[components.gcc.build.defines]
+# Azure Linux rebuild counter added to Fedora's gcc_release.
+azl_release = "1"
