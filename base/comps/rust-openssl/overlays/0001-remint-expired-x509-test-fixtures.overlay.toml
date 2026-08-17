@@ -1,0 +1,19 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/sfackler/rust-openssl/commit/10bbf71be84742fad3f9f782f282e48aa3ba389a" },
+]
+bugs = [
+    { url = "https://github.com/sfackler/rust-openssl/pull/2669" },
+]
+
+# The bundled X.509 test fixtures (leaf/intermediate-ca/root-ca/cert) expired on
+# 2026-08-11/12, so test_set_purpose and test_verify_param_set_depth fail in %check
+# on any build after that date. Fixed upstream after the 0.10.75 release by re-minting
+# the fixtures (notAfter -> 2037-12-31) and updating the derived assertions. Drop this
+# overlay once we move to a rust-openssl release that includes the fix.
+[[overlays]]
+description = "Backport upstream re-mint of expired X.509 test fixtures"
+type = "patch-add"
+source = "../0001-Re-mint-expired-X.509-test-fixtures.patch"

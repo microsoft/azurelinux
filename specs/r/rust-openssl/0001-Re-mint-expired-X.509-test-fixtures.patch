@@ -1,0 +1,389 @@
+From 10bbf71be84742fad3f9f782f282e48aa3ba389a Mon Sep 17 00:00:00 2001
+From: Justin W Smith <103147162+justsmth@users.noreply.github.com>
+Date: Tue, 11 Aug 2026 10:51:59 -0400
+Subject: [PATCH] Re-mint expired X.509 test fixtures (#2669)
+
+root-ca.pem and cert.pem expired on 2026-08-12 and intermediate-ca.pem
+and leaf.pem on 2026-08-11, breaking x509::tests::test_set_purpose and
+x509::tests::test_verify_param_set_depth for every consumer regardless
+of the commit under test. The sibling *_fails_verification tests kept
+passing only because the errors they assert are raised earlier in
+X509_verify_cert than the validity check, which masked the expiry.
+
+All four are re-issued with their original notBefore preserved and
+notAfter moved to 2037-12-31 23:59:59Z. certs.pem is regenerated as
+cert.pem followed by root-ca.pem.
+
+The 2037 horizon is deliberate rather than something further out.
+test_verify_param_set_time_fails_verification pins the verification
+clock past the fixtures' notAfter and asserts "certificate has
+expired". That clock is a libc::time_t, which is 32 bits wide on the
+i686-unknown-linux-gnu and arm-unknown-linux-gnueabihf targets that CI
+runs the test suite on, so it cannot represent any point after
+2038-01-19. Expiring the fixtures at the end of 2037 is therefore the
+furthest out they can go while that test still compiles and runs on
+every supported target. Its pinned clock moves from 2030 to 2038-01-01.
+
+Apart from the validity and the signature, the certificates are
+unchanged byte for byte: version, serial number, issuer and subject DN
+encodings, SubjectPublicKeyInfo, and the extension list including its
+ordering. leaf.pem and cert.pem are still X.509 v1 with no extensions,
+root-ca.pem still has basicConstraints CA:TRUE non-critical with no
+pathlen, and intermediate-ca.pem still has critical basicConstraints
+CA:TRUE pathlen:0 plus its critical keyUsage. Reusing the committed CA
+keys keeps every subjectKeyIdentifier and authorityKeyIdentifier stable.
+
+They were not re-issued with "openssl x509 -CA": OpenSSL 3.x
+unconditionally adds subjectKeyIdentifier and authorityKeyIdentifier
+when producing a certificate, with no option to suppress it, which
+promotes the two v1 fixtures to v3. Instead each one was re-signed in
+place. The new notAfter is a UTCTime of exactly the same length as the
+old one, so the validity bytes substitute directly with no enclosing
+DER length changes, and an RSA-2048 signature is always the trailing
+256 bytes of the certificate. Run from openssl/test:
+
+    # $1 = certificate, $2 = old notAfter, $3 = signing key
+    remint() {
+        openssl x509 -in "$1" -outform der |
+            perl -0777 -pe "s/$2/371231235959Z/" > tmp.der
+        openssl asn1parse -inform der -in tmp.der -strparse 4 \
+            -noout -out tbs.der
+        openssl dgst -sha256 -sign "$3" -out sig.bin tbs.der
+        head -c $(($(wc -c < tmp.der) - 256)) tmp.der > out.der
+        cat sig.bin >> out.der
+        openssl x509 -inform der -in out.der -out "$1"
+        rm -f tmp.der tbs.der sig.bin out.der
+    }
+
+    remint root-ca.pem          260812165611Z root-ca.key
+    remint intermediate-ca.pem  260811070749Z root-ca.key
+    remint leaf.pem             260811071752Z intermediate-ca.key
+    remint cert.pem             260812170003Z root-ca.key
+    cat cert.pem root-ca.pem > certs.pem
+
+There is no leaf.key, but leaf.pem is only ever verified and never used
+to sign, so it is re-issued over its existing SubjectPublicKeyInfo.
+
+Verified with:
+
+    openssl verify -CAfile root-ca.pem -untrusted intermediate-ca.pem \
+        leaf.pem
+    openssl verify -CAfile root-ca.pem cert.pem
+    openssl x509 -noout -modulus -in cert.pem
+    openssl rsa  -noout -modulus -in key.pem
+
+The SHA-1 fingerprint, signature and notAfter assertions derived from
+these files are updated, in x509/tests.rs and in the ssl tests that
+hash the server certificate loaded from cert.pem. The identity.p12
+fingerprints in pkcs12.rs are deliberately left alone: that file embeds
+its own copies of the old certificates and is not regenerated here.
+---
+ openssl/src/ssl/test/mod.rs      |  6 +++---
+ openssl/src/x509/tests.rs        | 32 ++++++++++++++++++--------------
+ openssl/test/cert.pem            | 14 +++++++-------
+ openssl/test/certs.pem           | 30 +++++++++++++++---------------
+ openssl/test/intermediate-ca.pem | 14 +++++++-------
+ openssl/test/leaf.pem            | 16 ++++++++--------
+ openssl/test/root-ca.pem         | 16 ++++++++--------
+ 7 files changed, 66 insertions(+), 62 deletions(-)
+
+diff --git a/src/ssl/test/mod.rs b/src/ssl/test/mod.rs
+index 1fc1988c0d..ed822f0f5e 100644
+--- a/src/ssl/test/mod.rs
++++ b/src/ssl/test/mod.rs
+@@ -213,7 +213,7 @@ fn verify_callback() {
+     let server = Server::builder().build();
+ 
+     let mut client = server.client();
+-    let expected = "59172d9313e84459bcff27f967e79e6e9217e584";
++    let expected = "a1d812f2dfc1fdd3830b7dd0dbf50fecb479f471";
+     client
+         .ctx()
+         .set_verify_callback(SslVerifyMode::PEER, move |_, x509| {
+@@ -235,7 +235,7 @@ fn ssl_verify_callback() {
+     let server = Server::builder().build();
+ 
+     let mut client = server.client().build().builder();
+-    let expected = "59172d9313e84459bcff27f967e79e6e9217e584";
++    let expected = "a1d812f2dfc1fdd3830b7dd0dbf50fecb479f471";
+     client
+         .ssl()
+         .set_verify_callback(SslVerifyMode::PEER, move |_, x509| {
+@@ -290,7 +290,7 @@ fn peer_certificate() {
+     let fingerprint = cert.digest(MessageDigest::sha1()).unwrap();
+     assert_eq!(
+         hex::encode(fingerprint),
+-        "59172d9313e84459bcff27f967e79e6e9217e584"
++        "a1d812f2dfc1fdd3830b7dd0dbf50fecb479f471"
+     );
+ }
+ 
+diff --git a/src/x509/tests.rs b/src/x509/tests.rs
+index 753a909f04..9a02c99c04 100644
+--- a/src/x509/tests.rs
++++ b/src/x509/tests.rs
+@@ -44,7 +44,7 @@ fn test_cert_loading() {
+     let cert = X509::from_pem(cert).unwrap();
+     let fingerprint = cert.digest(MessageDigest::sha1()).unwrap();
+ 
+-    let hash_str = "59172d9313e84459bcff27f967e79e6e9217e584";
++    let hash_str = "a1d812f2dfc1fdd3830b7dd0dbf50fecb479f471";
+     let hash_vec = Vec::from_hex(hash_str).unwrap();
+ 
+     assert_eq!(hash_vec, &*fingerprint);
+@@ -63,7 +63,7 @@ fn test_debug() {
+     assert!(debugged.contains(r#"countryName = "AU""#));
+     assert!(debugged.contains(r#"stateOrProvinceName = "Some-State""#));
+     assert!(debugged.contains(r#"not_before: Aug 14 17:00:03 2016 GMT"#));
+-    assert!(debugged.contains(r#"not_after: Aug 12 17:00:03 2026 GMT"#));
++    assert!(debugged.contains(r#"not_after: Dec 31 23:59:59 2037 GMT"#));
+ }
+ 
+ #[test]
+@@ -74,7 +74,7 @@ fn test_cert_issue_validity() {
+     let not_after = cert.not_after().to_string();
+ 
+     assert_eq!(not_before, "Aug 14 17:00:03 2016 GMT");
+-    assert_eq!(not_after, "Aug 12 17:00:03 2026 GMT");
++    assert_eq!(not_after, "Dec 31 23:59:59 2037 GMT");
+ }
+ 
+ #[test]
+@@ -475,11 +475,11 @@ fn test_stack_from_pem() {
+     assert_eq!(certs.len(), 2);
+     assert_eq!(
+         hex::encode(certs[0].digest(MessageDigest::sha1()).unwrap()),
+-        "59172d9313e84459bcff27f967e79e6e9217e584"
++        "a1d812f2dfc1fdd3830b7dd0dbf50fecb479f471"
+     );
+     assert_eq!(
+         hex::encode(certs[1].digest(MessageDigest::sha1()).unwrap()),
+-        "c0cbdf7cdd03c9773e5468e1f6d2da7d5cbb1875"
++        "9826e2edbd5b80acd2a868ffcca95a86e7a4ad72"
+     );
+ }
+ 
+@@ -501,13 +501,13 @@ fn signature() {
+     let signature = cert.signature();
+     assert_eq!(
+         hex::encode(signature.as_slice()),
+-        "4af607b889790b43470442cfa551cdb8b6d0b0340d2958f76b9e3ef6ad4992230cead6842587f0ecad5\
+-         78e6e11a221521e940187e3d6652de14e84e82f6671f097cc47932e022add3c0cb54a26bf27fa84c107\
+-         4971caa6bee2e42d34a5b066c427f2d452038082b8073993399548088429de034fdd589dcfb0dd33be7\
+-         ebdfdf698a28d628a89568881d658151276bde333600969502c4e62e1d3470a683364dfb241f78d310a\
+-         89c119297df093eb36b7fd7540224f488806780305d1e79ffc938fe2275441726522ab36d88348e6c51\
+-         f13dcc46b5e1cdac23c974fd5ef86aa41e91c9311655090a52333bc79687c748d833595d4c5f987508f\
+-         e121997410d37c"
++        "94348146b9873cdef635ed65e9e9ff9ac1fca10b60c8caefadea69fdca7a2a126766f1fb9999bb163c1\
++         835bd759de7fc85940457111b109853e23e8048270d16affe307b5fe7bdbcf5103d69ecfa17ff30f70e\
++         e9b5a658d6cd6b4f3674e8b03d303f1a500e1e2bdd1da36417f1e6583df67d3ec651f20416e8251293b\
++         2a9a694db34da04288c932e2b1cde6b91bea54c9f36c592e129a2ce6051924676ffc931620c4d4da74e\
++         a98f4647ae60d2d0a53b2d190ab0d75aad11be1de4b518ba5a5625f96d8ef039984b40f9ee85371939b\
++         5ae9da84d83d3e52feb72c4d596f67054b08a6a4e4a3fa7fe701b4bb34881c070ea9aa88899b219cc16\
++         4c388863161b6a"
+     );
+     let algorithm = cert.signature_algorithm();
+     assert_eq!(algorithm.object().nid(), Nid::SHA256WITHRSAENCRYPTION);
+@@ -848,7 +848,11 @@ fn test_name_to_owned() {
+ 
+ #[test]
+ fn test_verify_param_set_time_fails_verification() {
+-    const TEST_T_2030: time_t = 1893456000;
++    // The certificate fixtures expire at the end of 2037 so that this clock,
++    // which has to fall after their notAfter for the verification to fail,
++    // still fits in a 32-bit time_t. Such a time_t cannot represent any point
++    // after 2038-01-19.
++    const TEST_T_2038: time_t = 2145916800;
+ 
+     let cert = include_bytes!("../../test/cert.pem");
+     let cert = X509::from_pem(cert).unwrap();
+@@ -859,7 +863,7 @@ fn test_verify_param_set_time_fails_verification() {
+     let mut store_bldr = X509StoreBuilder::new().unwrap();
+     store_bldr.add_cert(ca).unwrap();
+     let mut verify_params = X509VerifyParam::new().unwrap();
+-    verify_params.set_time(TEST_T_2030);
++    verify_params.set_time(TEST_T_2038);
+     store_bldr.set_param(&verify_params).unwrap();
+     let store = store_bldr.build();
+ 
+diff --git a/test/cert.pem b/test/cert.pem
+index 032fe60e90..20ea476327 100644
+--- a/test/cert.pem
++++ b/test/cert.pem
+@@ -1,7 +1,7 @@
+ -----BEGIN CERTIFICATE-----
+ MIIDGzCCAgMCCQCHcfe97pgvpTANBgkqhkiG9w0BAQsFADBFMQswCQYDVQQGEwJB
+ VTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0
+-cyBQdHkgTHRkMB4XDTE2MDgxNDE3MDAwM1oXDTI2MDgxMjE3MDAwM1owWjELMAkG
++cyBQdHkgTHRkMB4XDTE2MDgxNDE3MDAwM1oXDTM3MTIzMTIzNTk1OVowWjELMAkG
+ A1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0
+ IFdpZGdpdHMgUHR5IEx0ZDETMBEGA1UEAwwKZm9vYmFyLmNvbTCCASIwDQYJKoZI
+ hvcNAQEBBQADggEPADCCAQoCggEBAKj0JYxEsxejUIX+I5GH0Hg2G0kX/y1H0+Ub
+@@ -10,10 +10,10 @@ mrGaijZiT/VCyPXqmcwFzXS5IOTpX1olJfW8rA41U1LCIcDUyFf6LtZ/v8rSeKr6
+ TuE6SGV4WRaBm1SrjWBeHVV866CRrtSS1ieT2asFsAyOZqWhk2fakwwBDFWDhOGI
+ ubfO+5aq9cBJbNRlzsgB3UZs3gC0O6GzbnZ6oT0TiJMeTsXXjABLUlaq/rrqFF4Y
+ euZkkbHTFBMz288PUc3m3ZTcpN+E7+ZOUBRZXKD20K07NugqCzUCAwEAATANBgkq
+-hkiG9w0BAQsFAAOCAQEASvYHuIl5C0NHBELPpVHNuLbQsDQNKVj3a54+9q1JkiMM
+-6taEJYfw7K1Xjm4RoiFSHpQBh+PWZS3hToToL2Zx8JfMR5MuAirdPAy1Sia/J/qE
+-wQdJccqmvuLkLTSlsGbEJ/LUUgOAgrgHOZM5lUgIhCneA0/dWJ3PsN0zvn69/faY
+-oo1iiolWiIHWWBUSdr3jM2AJaVAsTmLh00cKaDNk37JB940xConBGSl98JPrNrf9
+-dUAiT0iIBngDBdHnn/yTj+InVEFyZSKrNtiDSObFHxPcxGteHNrCPJdP1e+GqkHp
+-HJMRZVCQpSMzvHlofHSNgzWV1MX5h1CP4SGZdBDTfA==
++hkiG9w0BAQsFAAOCAQEAlDSBRrmHPN72Ne1l6en/msH8oQtgyMrvrepp/cp6KhJn
++ZvH7mZm7FjwYNb11nef8hZQEVxEbEJhT4j6ASCcNFq/+MHtf57289RA9aez6F/8w
++9w7ptaZY1s1rTzZ06LA9MD8aUA4eK90do2QX8eZYPfZ9PsZR8gQW6CUSk7KpppTb
++NNoEKIyTLisc3muRvqVMnzbFkuEpos5gUZJGdv/JMWIMTU2nTqmPRkeuYNLQpTst
++GQqw11qtEb4d5LUYulpWJfltjvA5mEtA+e6FNxk5ta6dqE2D0+Uv63LE1Zb2cFSw
++impOSj+n/nAbS7NIgcBw6pqoiJmyGcwWTDiIYxYbag==
+ -----END CERTIFICATE-----
+diff --git a/test/certs.pem b/test/certs.pem
+index 9d3516620d..514a3c55bb 100644
+--- a/test/certs.pem
++++ b/test/certs.pem
+@@ -1,7 +1,7 @@
+ -----BEGIN CERTIFICATE-----
+ MIIDGzCCAgMCCQCHcfe97pgvpTANBgkqhkiG9w0BAQsFADBFMQswCQYDVQQGEwJB
+ VTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0
+-cyBQdHkgTHRkMB4XDTE2MDgxNDE3MDAwM1oXDTI2MDgxMjE3MDAwM1owWjELMAkG
++cyBQdHkgTHRkMB4XDTE2MDgxNDE3MDAwM1oXDTM3MTIzMTIzNTk1OVowWjELMAkG
+ A1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0
+ IFdpZGdpdHMgUHR5IEx0ZDETMBEGA1UEAwwKZm9vYmFyLmNvbTCCASIwDQYJKoZI
+ hvcNAQEBBQADggEPADCCAQoCggEBAKj0JYxEsxejUIX+I5GH0Hg2G0kX/y1H0+Ub
+@@ -10,17 +10,17 @@ mrGaijZiT/VCyPXqmcwFzXS5IOTpX1olJfW8rA41U1LCIcDUyFf6LtZ/v8rSeKr6
+ TuE6SGV4WRaBm1SrjWBeHVV866CRrtSS1ieT2asFsAyOZqWhk2fakwwBDFWDhOGI
+ ubfO+5aq9cBJbNRlzsgB3UZs3gC0O6GzbnZ6oT0TiJMeTsXXjABLUlaq/rrqFF4Y
+ euZkkbHTFBMz288PUc3m3ZTcpN+E7+ZOUBRZXKD20K07NugqCzUCAwEAATANBgkq
+-hkiG9w0BAQsFAAOCAQEASvYHuIl5C0NHBELPpVHNuLbQsDQNKVj3a54+9q1JkiMM
+-6taEJYfw7K1Xjm4RoiFSHpQBh+PWZS3hToToL2Zx8JfMR5MuAirdPAy1Sia/J/qE
+-wQdJccqmvuLkLTSlsGbEJ/LUUgOAgrgHOZM5lUgIhCneA0/dWJ3PsN0zvn69/faY
+-oo1iiolWiIHWWBUSdr3jM2AJaVAsTmLh00cKaDNk37JB940xConBGSl98JPrNrf9
+-dUAiT0iIBngDBdHnn/yTj+InVEFyZSKrNtiDSObFHxPcxGteHNrCPJdP1e+GqkHp
+-HJMRZVCQpSMzvHlofHSNgzWV1MX5h1CP4SGZdBDTfA==
++hkiG9w0BAQsFAAOCAQEAlDSBRrmHPN72Ne1l6en/msH8oQtgyMrvrepp/cp6KhJn
++ZvH7mZm7FjwYNb11nef8hZQEVxEbEJhT4j6ASCcNFq/+MHtf57289RA9aez6F/8w
++9w7ptaZY1s1rTzZ06LA9MD8aUA4eK90do2QX8eZYPfZ9PsZR8gQW6CUSk7KpppTb
++NNoEKIyTLisc3muRvqVMnzbFkuEpos5gUZJGdv/JMWIMTU2nTqmPRkeuYNLQpTst
++GQqw11qtEb4d5LUYulpWJfltjvA5mEtA+e6FNxk5ta6dqE2D0+Uv63LE1Zb2cFSw
++impOSj+n/nAbS7NIgcBw6pqoiJmyGcwWTDiIYxYbag==
+ -----END CERTIFICATE-----
+ -----BEGIN CERTIFICATE-----
+ MIIDXTCCAkWgAwIBAgIJAOIvDiVb18eVMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV
+ BAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX
+-aWRnaXRzIFB0eSBMdGQwHhcNMTYwODE0MTY1NjExWhcNMjYwODEyMTY1NjExWjBF
++aWRnaXRzIFB0eSBMdGQwHhcNMTYwODE0MTY1NjExWhcNMzcxMjMxMjM1OTU5WjBF
+ MQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50
+ ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+ CgKCAQEArVHWFn52Lbl1l59exduZntVSZyDYpzDND+S2LUcO6fRBWhV/1Kzox+2G
+@@ -30,11 +30,11 @@ eIXlY1TvlwIvj3Ntw9zX+scTA4SXxH6M0rKv9gTOub2vCMSHeF16X8DQr4XsZuQr
+ aFff3RpK3F/WI2gp3qV1ynRAKuvmncGC3LDvYfcc2dgsc1N6Ffq8GIrkgRob6eBc
+ klDHp1d023Lwre+VaVDSo1//Y72UFwIDAQABo1AwTjAdBgNVHQ4EFgQUbNOlA6sN
+ XyzJjYqciKeId7g3/ZowHwYDVR0jBBgwFoAUbNOlA6sNXyzJjYqciKeId7g3/Zow
+-DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAVVaR5QWLZIRR4Dw6TSBn
+-BQiLpBSXN6oAxdDw6n4PtwW6CzydaA+creiK6LfwEsiifUfQe9f+T+TBSpdIYtMv
+-Z2H2tjlFX8VrjUFvPrvn5c28CuLI0foBgY8XGSkR2YMYzWw2jPEq3Th/KM5Catn3
+-AFm3bGKWMtGPR4v+90chEN0jzaAmJYRrVUh9vea27bOCn31Nse6XXQPmSI6Gyncy
+-OAPUsvPClF3IjeL1tmBotWqSGn1cYxLo+Lwjk22A9h6vjcNQRyZF2VLVvtwYrNU3
+-mwJ6GCLsLHpwW/yjyvn8iEltnJvByM/eeRnfXV6WDObyiZsE/n6DxIRJodQzFqy9
+-GA==
++DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAXSQO0qyr0PzEYQyW8HJ2
++a2fOJrnhtLVXRbk8pKIMU98UB7jus/rjufFOGMZstHlcvoxXxKbmScTdvySooxLp
++Ibt0dEIMG2R/sEl9ObKdReSQUE+h+tWsZ042r6nwHsHtdhzFIP6zHtolabbyBi4C
++gjcoo+LjuLPglx/O7uPGNyRjtK+REbuCzusu0QCJ5l1QgeXD0m86Qw3kZqTLCFXl
++KNVn70i/gybz6/FNduUXTVVl/IvTlPA7dICPRbWNX0n8tEWspAuUkaEz92A87Wbn
++DErEApER8Kk/CXtnwdtL/qvqPd23jkSmTPq3dcSqMr6HrZaSEQwIhx18DPqP/aIL
++fA==
+ -----END CERTIFICATE-----
+diff --git a/test/intermediate-ca.pem b/test/intermediate-ca.pem
+index 266ef593cb..bc66df9c5f 100644
+--- a/test/intermediate-ca.pem
++++ b/test/intermediate-ca.pem
+@@ -1,7 +1,7 @@
+ -----BEGIN CERTIFICATE-----
+ MIIDszCCApugAwIBAgIEFSQSITANBgkqhkiG9w0BAQsFADBFMQswCQYDVQQGEwJB
+ VTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50ZXJuZXQgV2lkZ2l0
+-cyBQdHkgTHRkMB4XDTIyMTEwMzA3MDc0OVoXDTI2MDgxMTA3MDc0OVowgYkxCzAJ
++cyBQdHkgTHRkMB4XDTIyMTEwMzA3MDc0OVoXDTM3MTIzMTIzNTk1OVowgYkxCzAJ
+ BgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5l
+ dCBXaWRnaXRzIFB0eSBMdGQxIDAeBgNVBAsMF0ludGVybWVkaWF0ZSBEZXBhcnRt
+ ZW50MSAwHgYDVQQDDBdpbnRlcm1lZGlhdGUuZm9vYmFyLmNvbTCCASIwDQYJKoZI
+@@ -13,10 +13,10 @@ eCviN9dYZdEKQzmH+3gXAXaNjHOTc43fSzxi5NZRN4rQF6WshTJn7rgNCHR9YDX8
+ tfGsRRBFZ4+gktnqRqZgHJFBFlDrHtVgYQxLenXaME9YsO1+JlsCAwEAAaNmMGQw
+ HQYDVR0OBBYEFAXJImmmxYXx6L1SRRhgP3Tyq2J6MB8GA1UdIwQYMBaAFGzTpQOr
+ DV8syY2KnIiniHe4N/2aMBIGA1UdEwEB/wQIMAYBAf8CAQAwDgYDVR0PAQH/BAQD
+-AgGGMA0GCSqGSIb3DQEBCwUAA4IBAQCnUh7iNbnFBjVa4sFx02r65syxUhcvM/ya
+-DcSe1esGUwjZLyKVl9BTfQ6kfNa/6Z/t5cprp0R3etalN31dxka7xSDwzFNdBczB
+-zYDIVOVlcGLL1Xjozacm6YHo773dqxZS36rVMk3NqNUY6GJJ+CGso2xZShcBg2KG
+-fPlNPiRz3847E3dwouDYcP1MXf2ql/Y7dRbE+8kb3bWkSusJVb/4EHjpR7yZjKmh
+-eXHVVx1dKnCGRldn3+dSNhN6mxNaSeBE2hb158+diQvL5u3f//va7SOpCi0f4d8E
+-UCnLhieyrDlr42XXfz42BqRpqBO1SDjQwzIIc9Fbevwb916OSExp
++AgGGMA0GCSqGSIb3DQEBCwUAA4IBAQCRUmaE6DlkUsdIYA1Fn1K/AotaJekITmW1
++uWzJ+FKQ0/XnGbZ2j7QR6olXXbpuSGxhtrNCSLVH3RBP34FWslVkizYFOgcaOLat
++msYjuOSLl3l91MsXoq4Uhr4KI3K8Wsr6in2dv1w4d4BZCv6hKurhyetk0oR8woDC
++gW07kT4vQsrAO91lgGEp/9VWZXZnouU7HtIJPiMqQY1M6mtQvBoq2fJvQB/tVwAo
++BuKKYvwmfZJ8UiFhuNVm/yxGM6JUNH+SRaEnGMHuBFz+1A9m6HV4zdFChxQybT9S
++qgltcop2D5oULXBwqrCGBIKIcTHYPNb3zlrI1jeGlKalbhEk1F7+
+ -----END CERTIFICATE-----
+diff --git a/test/leaf.pem b/test/leaf.pem
+index 0f7aa808de..c18808e66d 100644
+--- a/test/leaf.pem
++++ b/test/leaf.pem
+@@ -2,8 +2,8 @@
+ MIIDejCCAmICBBUkEiQwDQYJKoZIhvcNAQELBQAwgYkxCzAJBgNVBAYTAkFVMRMw
+ EQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0
+ eSBMdGQxIDAeBgNVBAsMF0ludGVybWVkaWF0ZSBEZXBhcnRtZW50MSAwHgYDVQQD
+-DBdpbnRlcm1lZGlhdGUuZm9vYmFyLmNvbTAeFw0yMjExMDMwNzE3NTJaFw0yNjA4
+-MTEwNzE3NTJaMHkxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
++DBdpbnRlcm1lZGlhdGUuZm9vYmFyLmNvbTAeFw0yMjExMDMwNzE3NTJaFw0zNzEy
++MzEyMzU5NTlaMHkxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+ HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQxGDAWBgNVBAsMD0xlYWYg
+ RGVwYXJ0bWVudDEYMBYGA1UEAwwPbGVhZi5mb29iYXIuY29tMIIBIjANBgkqhkiG
+ 9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs9STUHGIcSOtioK6+02k9Jx4JuYVJ0SB7Ebd
+@@ -12,10 +12,10 @@ iqtZ1HocHQ/LGNKfkILcclb4xp2nGYntKAyEqer3Qc6aPWAnQAV/+BshU1vlMfwU
+ T6vOJRG69mft6dkHEWSzZd7++7HmFQGnDmIs5jBJVCOgKVttkN8Bk2EsTvJi9zl2
+ SXLTcVrTAxEvuawv2ZXvdI/Cpt1WW0litXlFLcYBGwt/N93TX/L3Iyw5HcNd/xf9
+ QwOr6RR66krQJzKxwcIY934uq6cyTQhexgnffb65qXL4bbV5fwIDAQABMA0GCSqG
+-SIb3DQEBCwUAA4IBAQAZf0/r04AeKN2QhQ7Z0o2Iu/Yj3OD2tnbxVoltYk8CRfp3
+-7VGl/5PUbmXXBSwMc4Udj88JlreU7iNEPAKtBqFczw0pwNfvxKG4Eh3vsfKrP+5g
+-gtVwDG0mWeKJ7udrmFt8N0uwxVYDKp/gv5+Bw2eMew9Eoyenj6k2yg0nbFKzA3EH
+-DqngETzX0dhdiYwVcoJFUK5ni3tVl9qi6FpmaTE6C5nTQLyH4CI+vo2x/QHINGaJ
+-OzY/rx35iyVqXVqxN/gO/hp6g0nT5zLuMg2rfvcAhdDsD7htYcHiNkofrC8s0oQE
+-W+r01EhxdEVvY1nYWanBCF6tktc5v5qf2WMS4ye5
++SIb3DQEBCwUAA4IBAQAy7y/vDcNnX5FLsOQya4kLVfr2i2APShhPKRD7Z3mVjxRF
++CMebzSTEN5LSt/CB8vXjDoM4sRWufvE6g8RJ2t+z8IJC96If2Kxc3g1kCYs04CyM
++dZtb9unyNbs9liIIDA6gzbc0RE+ih0G5ISs/JbIEffcBKijmkhipKih1+K7cE29x
++2gLjb3bgW5M5g8lHukwfogMGkcTS7/R0TS9soreem0VrG2C7qMoKRlw78WaC7cCA
++MWsjLHxoTs/rql+VcPZoQn8NNS/i8LJNJcholIay3MzVvzP7PSBDqXmL81oB/ajs
++mPGNgrZ0yKkZhNp/Tpt/+pwnNVe9+6xfBDnUtt5m
+ -----END CERTIFICATE-----
+diff --git a/test/root-ca.pem b/test/root-ca.pem
+index 4ec2f53884..9dfb20cd74 100644
+--- a/test/root-ca.pem
++++ b/test/root-ca.pem
+@@ -1,7 +1,7 @@
+ -----BEGIN CERTIFICATE-----
+ MIIDXTCCAkWgAwIBAgIJAOIvDiVb18eVMA0GCSqGSIb3DQEBCwUAMEUxCzAJBgNV
+ BAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBX
+-aWRnaXRzIFB0eSBMdGQwHhcNMTYwODE0MTY1NjExWhcNMjYwODEyMTY1NjExWjBF
++aWRnaXRzIFB0eSBMdGQwHhcNMTYwODE0MTY1NjExWhcNMzcxMjMxMjM1OTU5WjBF
+ MQswCQYDVQQGEwJBVTETMBEGA1UECAwKU29tZS1TdGF0ZTEhMB8GA1UECgwYSW50
+ ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+ CgKCAQEArVHWFn52Lbl1l59exduZntVSZyDYpzDND+S2LUcO6fRBWhV/1Kzox+2G
+@@ -11,11 +11,11 @@ eIXlY1TvlwIvj3Ntw9zX+scTA4SXxH6M0rKv9gTOub2vCMSHeF16X8DQr4XsZuQr
+ aFff3RpK3F/WI2gp3qV1ynRAKuvmncGC3LDvYfcc2dgsc1N6Ffq8GIrkgRob6eBc
+ klDHp1d023Lwre+VaVDSo1//Y72UFwIDAQABo1AwTjAdBgNVHQ4EFgQUbNOlA6sN
+ XyzJjYqciKeId7g3/ZowHwYDVR0jBBgwFoAUbNOlA6sNXyzJjYqciKeId7g3/Zow
+-DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAVVaR5QWLZIRR4Dw6TSBn
+-BQiLpBSXN6oAxdDw6n4PtwW6CzydaA+creiK6LfwEsiifUfQe9f+T+TBSpdIYtMv
+-Z2H2tjlFX8VrjUFvPrvn5c28CuLI0foBgY8XGSkR2YMYzWw2jPEq3Th/KM5Catn3
+-AFm3bGKWMtGPR4v+90chEN0jzaAmJYRrVUh9vea27bOCn31Nse6XXQPmSI6Gyncy
+-OAPUsvPClF3IjeL1tmBotWqSGn1cYxLo+Lwjk22A9h6vjcNQRyZF2VLVvtwYrNU3
+-mwJ6GCLsLHpwW/yjyvn8iEltnJvByM/eeRnfXV6WDObyiZsE/n6DxIRJodQzFqy9
+-GA==
++DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAXSQO0qyr0PzEYQyW8HJ2
++a2fOJrnhtLVXRbk8pKIMU98UB7jus/rjufFOGMZstHlcvoxXxKbmScTdvySooxLp
++Ibt0dEIMG2R/sEl9ObKdReSQUE+h+tWsZ042r6nwHsHtdhzFIP6zHtolabbyBi4C
++gjcoo+LjuLPglx/O7uPGNyRjtK+REbuCzusu0QCJ5l1QgeXD0m86Qw3kZqTLCFXl
++KNVn70i/gybz6/FNduUXTVVl/IvTlPA7dICPRbWNX0n8tEWspAuUkaEz92A87Wbn
++DErEApER8Kk/CXtnwdtL/qvqPd23jkSmTPq3dcSqMr6HrZaSEQwIhx18DPqP/aIL
++fA==
+ -----END CERTIFICATE-----
