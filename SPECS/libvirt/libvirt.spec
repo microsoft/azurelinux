@@ -2222,7 +2222,7 @@ exit 0
 * Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.0.0-6
 - Patch for CVE-2025-13193
 
-* Thu May 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
+* Sat May 24 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
 - Fixes CVE-2024-4418 with an upstream patch
 
 * Fri May 23 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-4
