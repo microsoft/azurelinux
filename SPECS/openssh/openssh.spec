@@ -3,7 +3,7 @@
 Summary:        Free version of the SSH connectivity tools
 Name:           openssh
 Version:        %{openssh_ver}
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,14 +50,14 @@ Patch412:       CVE-2026-59999.patch
 Patch413:       CVE-2026-60000.patch
 Patch414:       CVE-2026-60001.patch
 Patch415:       CVE-2026-60002.patch
+Patch416:       CVE-2026-73281.patch
+Patch417:       CVE-2026-73282.patch
+Patch418:       CVE-2026-73283.patch
 
 # sk-dummy.so built with -fvisibility=hidden does not work
 # The tests fail with the following error:
 #   dlsym(sk_api_version) failed: (...)/sk-dummy.so: undefined symbol: sk_api_version
 Patch965:       openssh-8.2p1-visibility.patch
-Patch966:       CVE-2026-73281.patch
-Patch967:       CVE-2026-73282.patch
-Patch968:       CVE-2026-73283.patch
 
 BuildRequires:  audit-devel
 BuildRequires:  autoconf
@@ -119,9 +119,6 @@ The module is most useful for su and sudo service stacks.
 
 %prep
 %setup -q -a 3
-%patch 966 -p1
-%patch 967 -p1
-%patch 968 -p1
 
 pushd pam_ssh_agent_auth-%{pam_ssh_agent_ver}
 %patch -P 300 -p2 -b .psaa-build
@@ -152,6 +149,9 @@ popd
 %patch -P 413 -p1 -b .CVE-2026-60000.patch
 %patch -P 414 -p1 -b .CVE-2026-60001.patch
 %patch -P 415 -p1 -b .CVE-2026-60002.patch
+%patch -P 416 -p1 -b .CVE-2026-73281.patch
+%patch -P 417 -p1 -b .CVE-2026-73282.patch
+%patch -P 418 -p1 -b .CVE-2026-73283.patch
 
 %build
 # The -fvisibility=hidden is needed for clean build of the pam_ssh_agent_auth.
@@ -310,6 +310,9 @@ fi
 %{_mandir}/man8/ssh-sk-helper.8.gz
 
 %changelog
+* Mon Aug 17 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-10
+- Patch CVE-2026-73283, CVE-2026-73282, CVE-2026-73281
+
 * Thu Jul 09 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 9.8p1-9
 - Patch CVE-2026-60002, CVE-2026-60001, CVE-2026-60000, CVE-2026-59999, CVE-2026-59997, CVE-2026-59996, CVE-2026-59995
 
