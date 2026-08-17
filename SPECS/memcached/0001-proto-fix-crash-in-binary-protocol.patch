@@ -7,6 +7,8 @@ If `watch mutations` is running and a binary protocol SET fails the
 logger code attempts to resolve a NULL item reference and will crash.
 
 Reported by Haruto Kimura (Stella)
+
+Upstream Patch Reference : https://github.com/memcached/memcached/commit/32ea7d8b5b
 ---
  proto_bin.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

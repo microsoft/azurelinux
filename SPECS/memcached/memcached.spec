@@ -134,7 +134,7 @@ exit 0
 %{_unitdir}/memcached.service
 
 %changelog
-* Thu Aug 14 2026 Chris Gunn <chrisgun@microsoft.com> - 1.6.27-6
+* Fri Aug 14 2026 Chris Gunn <chrisgun@microsoft.com> - 1.6.27-6
 - Patch: fix crash in binary protocol
 
 * Thu May 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.27-5
