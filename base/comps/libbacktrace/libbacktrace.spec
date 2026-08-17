@@ -6,6 +6,11 @@
 # nothing for a debuginfo package to contain.
 %global debug_package %{nil}
 
+# LTO localizes the test's `int global` symbol, which the mtest_minidebug
+# mini-symtab recipe then drops, failing %check; LTO also just bloats this
+# small static archive.
+%global _lto_cflags %{nil}
+
 Name:           libbacktrace
 Version:        0^%{snapshotdate}git%{shortcommit}
 Release:        %autorelease

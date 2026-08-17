@@ -1,2 +1,5 @@
+* Sun Aug 17 2026 Nan Liu <liunan@microsoft.com> - 0^20260816git6f8310e238fc-2
+- Disable LTO so %check's mtest_minidebug passes (LTO localizes the tested global)
+
 * Sun Aug 16 2026 Nan Liu <liunan@microsoft.com> - 0^20260816git6f8310e238fc-1
 - Initial packaging of standalone libbacktrace from ianlancetaylor/libbacktrace

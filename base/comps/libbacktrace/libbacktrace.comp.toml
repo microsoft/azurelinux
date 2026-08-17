@@ -1,12 +1,6 @@
 [components.libbacktrace]
 spec = { type = "local", path = "libbacktrace.spec" }
 
-# PROTOTYPE: mtest_minidebug (MiniDebugInfo/.gnu_debugdata symbol lookup) fails
-# in the AZL4 buildroot; 42/43 tests pass. Investigate or disable just this test
-# before productionizing.
-[components.libbacktrace.build]
-check = { skip = true, skip_reason = "Prototype: mtest_minidebug fails in AZL4 buildroot (42/43 pass); revisit before productionizing." }
-
 # libbacktrace has no tagged upstream releases, so pin a git snapshot from the
 # canonical repo (the same project GCC vendors, and what openSUSE/Debian package
 # standalone). Bump `commit`/`snapshotdate` in the spec together with this hash.
