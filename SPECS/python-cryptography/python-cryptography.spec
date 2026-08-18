@@ -2,7 +2,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        42.0.5
-Release:        4%{?dist}
+Release:        5%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Source1:        cryptography-%{version}-vendor.tar.gz
 Patch0:         0001-remove-openssl-cipher-Cipher-chacha20_poly1305.patch
 Patch1:         0002-remove-poly1305-tests.patch
 Patch2:         CVE-2026-26007.patch
+Patch3:         CVE-2026-69249.patch
 
 %description
 Cryptography is a Python library which exposes cryptographic recipes and primitives.
@@ -112,6 +113,9 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %license LICENSE
 
 %changelog
+* Fri Aug 07 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 42.0.5-5
+- Patch for CVE-2026-69249
+
 * Fri Feb 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 42.0.5-4
 - Patch for CVE-2026-26007
 

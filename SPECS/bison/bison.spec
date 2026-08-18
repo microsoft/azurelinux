@@ -1,13 +1,15 @@
 Summary:        Contains a parser generator
 Name:           bison
 Version:        3.8.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv3+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Group:          System Environment/Base
 URL:            https://www.gnu.org/software/bison
 Source0:        https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+Patch0:         CVE-2026-56389.patch
+Patch1:         CVE-2026-56390.patch
 
 BuildRequires:  flex
 BuildRequires:  m4
@@ -20,7 +22,7 @@ Provides:       %{name}-runtime = %{version}-%{release}
 This package contains a parser generator
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 #make some fixes required by glibc-2.28:
@@ -47,6 +49,7 @@ make %{?_smp_mflags} check
 %files -f %{name}.lang
 %defattr(-,root,root)
 %license COPYING
+%exclude %{_docdir}/%{name}/COPYING
 %{_bindir}/*
 %{_libdir}/*.a
 %{_datarootdir}/%{name}/*
@@ -55,6 +58,9 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
+* Thu Jul 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.2-2
+- Patch for CVE-2026-56390, CVE-2026-56389
+
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.2-1
 - Auto-upgrade to 3.8.2 - Azure Linux 3.0 - package upgrades
 
