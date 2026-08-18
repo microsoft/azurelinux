@@ -1,6 +1,6 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.25.12-20260707.5.src.tar.gz
+%global ms_go_filename  go1.25.13-20260813.2.src.tar.gz
 %global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
@@ -14,7 +14,7 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.25.12
+Version:        1.25.13
 Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
@@ -32,8 +32,6 @@ Source2:        https://github.com/microsoft/go/releases/download/v1.19.12-1/go.
 Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.20240206.2.src.tar.gz
 # bootstrap 03
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
-
-Patch1:         CVE-2026-39821.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -166,6 +164,10 @@ fi
 %{_bindir}/*
 
 %changelog
+* Fri Aug 14 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.13-1
+- Bump version to 1.25.13-1
+- Remove patch of CVE-2026-39821
+
 * Wed Jul 08 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.25.12-1
 - Bump version to 1.25.12-1
 
