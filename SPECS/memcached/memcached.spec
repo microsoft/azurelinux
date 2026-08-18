@@ -6,8 +6,8 @@
 %bcond_with seccomp
 Summary:        High Performance, Distributed Memory Object Cache
 Name:           memcached
-Version:        1.6.27
-Release:        5%{?dist}
+Version:        1.6.45
+Release:        1%{?dist}
 License:        BSD
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -18,7 +18,6 @@ Patch0:         memcached-unit.patch
 Patch1:         CVE-2021-43519.patch
 Patch2:         CVE-2021-44647.patch
 Patch3:         CVE-2026-24809.patch
-Patch4:         CVE-2026-47783.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -27,6 +26,7 @@ BuildRequires:  perl-generators
 BuildRequires:  perl(IO::Socket::SSL)
 BuildRequires:  perl(Test::Harness)
 BuildRequires:  perl(Test::More)
+BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(FindBin)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(fields)
@@ -38,7 +38,7 @@ BuildRequires:  cyrus-sasl-devel
 BuildRequires:  libseccomp-devel
 %endif
 %if %{with tls}
-BuildRequires:  openssl-devel
+BuildRequires:  openssl-devel >= 1.1.1
 %endif
 Requires:       openssl-libs
 
@@ -133,6 +133,10 @@ exit 0
 %{_unitdir}/memcached.service
 
 %changelog
+* Tue Aug 18 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.45-1
+- Upgrade to 1.6.45
+- Remove CVE-2026-47783.patch, fixed upstream
+
 * Thu May 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.27-5
 - Patch for CVE-2026-47783
 
