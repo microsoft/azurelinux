@@ -81,9 +81,7 @@ BuildRequires: net-snmp-devel
 
 %prep
 # Unpack the code source tarball
-%setup -q
-%patch 1 -p1
-%patch 0 -p1
+%autosetup -p1
 # Unpack the documentation tarball in the folder created above
 %setup -q -a 4 -T -D
 # Remove documentation sources
