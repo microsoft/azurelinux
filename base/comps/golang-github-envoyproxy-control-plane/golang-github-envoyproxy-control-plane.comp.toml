@@ -1,1 +1,7 @@
 [components.golang-github-envoyproxy-control-plane]
+
+[[components.golang-github-envoyproxy-control-plane.source-files]]
+filename = "go-control-plane-0.13.4.tar.gz"
+hash = "c42791b0322bff372707b45ec140df2767e81c89a25e254622e088e6dcda86a4d6bf8384714c88e0deab34dd17f1f9a36ffa8c663a596885b02d8a24da2ec531"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://github.com/envoyproxy/go-control-plane/archive/v0.13.4/go-control-plane-0.13.4.tar.gz" }
