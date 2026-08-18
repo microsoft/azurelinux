@@ -46,9 +46,8 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Jun-2025 we are using golang-1.23.1 on Ubuntu 22.04 since it is the most recent release available.
-# When making a breaking change to the toolkit which requires a newer golang version, update this version if needed.
-# If no newer version is available, suggest moving to a newer Ubuntu LTS version
+# Go 1.24 bootstraps automatic toolchain management. Toolkit Go commands download
+# and use the version required by tools/go.mod.
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
     apt update
@@ -76,7 +75,7 @@ else
     echo "Skipping installation of prerequisite packages..."
 fi
 
-# Fix go 1.24 links if requested
+# Fix Go bootstrap links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
     echo "Creating Go symlinks..."
     ln -vsf /usr/lib/go-1.24/bin/go /usr/bin/go

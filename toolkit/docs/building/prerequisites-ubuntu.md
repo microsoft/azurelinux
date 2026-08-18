@@ -7,9 +7,18 @@ This page outlines the requirements for building with the Azure Linux toolkit on
 
 ### Golang Package Requirements
 
-The Azure Linux toolkit on Ubuntu has been validated with the following:
+The prerequisite script installs `golang-1.24-go` as a bootstrap toolchain. Toolkit Go commands use Go's automatic toolchain management to download and run the version required by `toolkit/tools/go.mod`. This allows the same prerequisite package to support Ubuntu 24.04 and 26.04 when the toolkit requires a newer Go release.
 
-- **Ubuntu 22.04**: Validated with `golang-1.24.13` (available as `golang-1.24-go` package)
+Automatic toolchain downloads use the configured `GOPROXY` and are stored in the invoking user's Go module cache. Each account that builds the toolkit, including `root` when invoking Make with `sudo`, must have network access or a pre-populated cache.
+
+Downloaded toolchains omit the `covdata` executable used by toolkit coverage tests. The `tool cmd/covdata` directive in `toolkit/tools/go.mod` makes Go build and run it from the selected toolchain's source when needed.
+
+To download the required toolchain before starting a build:
+
+```bash
+cd toolkit/tools
+GOTOOLCHAIN=auto go version
+```
 
 ## Installation Methods
 
@@ -43,6 +52,7 @@ sudo make -C toolkit install-prereqs-and-configure
 ```
 
 **Recommendation**:
+
 - Use `install-prereqs` on your local development machine
 - Use `install-prereqs-and-configure` in CI/CD pipelines or when you need a complete environment setup
 
