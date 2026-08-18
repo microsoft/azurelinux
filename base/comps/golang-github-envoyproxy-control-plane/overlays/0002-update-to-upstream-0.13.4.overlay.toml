@@ -1,0 +1,13 @@
+# Fedora retired this package at 0.11.1, while upstream 0.13.4 removes the
+# deprecated OpenCensus APIs and their dependency without downstream pruning.
+
+[metadata]
+category = "azl-pruning"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/envoyproxy/go-control-plane/commit/046fb88fc5941116f55023e92c652ac3b657727d" }]
+
+[[overlays]]
+description = "Update to upstream release without deprecated OpenCensus APIs"
+type = "spec-update-tag"
+tag = "Version"
+value = "0.13.4"
