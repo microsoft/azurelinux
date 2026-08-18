@@ -2,14 +2,14 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:			rasdaemon
-Version:		0.8.0
-Release: 9%{?dist}
+Version: 0.8.1
+Release: 10%{?dist}
 Summary:		Utility to receive RAS error tracings
 Group:			Applications/System
 # Automatically converted from old format: GPLv2 - review is highly recommended.
 License:		GPL-2.0-only
-URL:			http://git.infradead.org/users/mchehab/rasdaemon.git
-Source0:		http://www.infradead.org/~mchehab/rasdaemon/%{name}-%{version}.tar.bz2
+URL: https://github.com/mchehab/rasdaemon
+Source0: https://github.com/mchehab/rasdaemon/releases/download/v%{version}/%{name}-%{version}.tar.bz2
 
 ExcludeArch:		s390 s390x
 BuildRequires:		make
@@ -77,6 +77,9 @@ rm INSTALL %{buildroot}/usr/include/*.h
 %{_sysconfdir}/ras/dimm_labels.d
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
+%dir %{_sysconfdir}/ras/triggers
+%{_sysconfdir}/ras/triggers/mc_event_trigger
+%{_sysconfdir}/ras/triggers/mem_fail_trigger
 %changelog
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.0-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
