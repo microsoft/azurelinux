@@ -1,5 +1,5 @@
 Name:           perl-HTTP-Date
-Version:        6.06
+Version:        6.08
 Release:        1%{?dist}
 Summary:        Date conversion routines
 License:        GPL+ or Artistic
@@ -65,6 +65,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Tue Aug 18 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.08-1
+- Auto-upgrade to 6.08 - for CVE-2026-14741
+
 * Mon Dec 18 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.06-1
 - Auto-upgrade to 6.06 - Azure Linux 3.0 - package upgrades
 
