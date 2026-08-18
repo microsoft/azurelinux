@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.10.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -201,6 +201,9 @@ Patch2:         CVE-2025-12748.patch
 Patch3:         libvirt-qemu-tpm-do-not-update-profile-name-for-transient-domains.patch
 Patch4:         libvirt-qemu-Rename-outgoingMigration-parameter-in-various-TPM-functions.patch
 Patch5:         libvirt-qemu-Properly-propagate-migration-state-to-TPM-cleanup-code.patch
+Patch6:         CVE-2026-61477.patch
+Patch7:         CVE-2026-63622.patch
+Patch8:         CVE-2026-63623.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2197,6 +2200,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.10.0-3
+- Patch for CVE-2026-63623, CVE-2026-63622, CVE-2026-61477
+
 * Tue Mar 24 2026 Harshit Gupta <guptaharshit@microsoft.com> - 10.10.0-2
 - Add patches from https://gitlab.com/redhat/centos-stream/rpms/libvirt
   to fix TPM handling in QEMU migrations.
@@ -2216,7 +2222,7 @@ exit 0
 * Fri Nov 21 2025 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.0.0-6
 - Patch for CVE-2025-13193
 
-* Thu May 15 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
+* Sat May 24 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-5
 - Fixes CVE-2024-4418 with an upstream patch
 
 * Fri May 23 2025 Aninda Pradhan <v-anipradhan@microsoft.com> - 10.0.0-4
