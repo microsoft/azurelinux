@@ -3,13 +3,13 @@
 
 # Release date and version of stage 0 compiler can be found in "src/stage0" inside the extracted "Source0".
 # Look for "date:" and "rustc:".
-%define release_date 2025-08-07
-%define stage0_version 1.89.0
+%define release_date 2026-04-16
+%define stage0_version 1.95.0
 
 Summary:        Rust Programming Language
 Name:           rust
-Version:        1.90.0
-Release:        9%{?dist}
+Version:        1.96.1
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -41,25 +41,31 @@ Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{sta
 Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
 Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2025-4574.patch
-Patch1:         CVE-2025-53605.patch
-Patch2:         CVE-2024-11738.patch
-Patch3:         CVE-2025-55159.patch
-Patch4:         CVE-2025-67873.patch
-Patch5:         CVE-2025-68114.patch
-Patch6:         CVE-2025-4207.patch
-Patch7:         CVE-2025-12818.patch
-Patch8:         CVE-2026-24116.patch
-Patch9:         CVE-2025-58160.patch
-Patch10:        CVE-2026-25541.patch
-Patch11:        CVE-2026-25727.patch
-Patch12:        CVE-2026-2006.patch
-Patch13:        CVE-2026-33056.patch
-Patch14:        CVE-2026-33055.patch
-Patch15:        CVE-2026-34743.patch
-Patch16:        CVE-2026-5222.patch
-Patch17:        CVE-2026-5223.patch
-Patch18:        CVE-2026-40034.patch
+NoSource:       2
+NoSource:       3
+NoSource:       4
+NoSource:       5
+NoSource:       6
+NoSource:       7
+#Patch0:         CVE-2025-4574.patch
+#Patch1:         CVE-2025-53605.patch
+#Patch2:         CVE-2024-11738.patch
+#Patch3:         CVE-2025-55159.patch
+#Patch4:         CVE-2025-67873.patch
+#Patch5:         CVE-2025-68114.patch
+#Patch6:         CVE-2025-4207.patch
+#Patch7:         CVE-2025-12818.patch
+#Patch8:         CVE-2026-24116.patch
+#Patch9:         CVE-2025-58160.patch
+#Patch10:        CVE-2026-25541.patch
+#Patch11:        CVE-2026-25727.patch
+#Patch12:        CVE-2026-2006.patch
+#Patch13:        CVE-2026-33056.patch
+#Patch14:        CVE-2026-33055.patch
+#Patch15:        CVE-2026-34743.patch
+#Patch16:        CVE-2026-5222.patch
+#Patch17:        CVE-2026-5223.patch
+#Patch18:        CVE-2026-40034.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -99,7 +105,17 @@ Summary:        Rust documentation.
 BuildArch:      noarch
 
 %description doc
-Documentation package for Rust.
+Documentation package for Rust
+
+%package src
+Summary:        Sources for the Rust standard library
+BuildArch:      noarch
+Recommends:     %{name} = %{version}-%{release}
+
+%description src
+This package includes source files for the Rust standard library. It may be
+useful as a reference for code completion tools in various editors, such as
+rust-analyzer.
 
 %prep
 # Setup .cargo directory
@@ -132,7 +148,7 @@ sh ./configure \
     --prefix=%{_prefix} \
     --enable-extended \
     --enable-profiler \
-    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv" \
+    --tools="cargo,clippy,rustfmt,rust-analyzer-proc-macro-srv,rustdoc,src" \
     --release-channel="stable" \
     --release-description="Azure Linux %{version}-%{release}"
 
@@ -159,10 +175,17 @@ userdel -r test
 USER=root SUDO_USER=root %make_install
 mv %{buildroot}%{_docdir}/cargo/LICENSE-THIRD-PARTY .
 rm %{buildroot}%{_docdir}/rustc/{COPYRIGHT-library.html,COPYRIGHT.html}
+# Move third-party licenses from docdir to licensedir to avoid duplicate classification
+mkdir -p %{buildroot}%{_licensedir}/rust-doc
+mv %{buildroot}%{_docdir}/rustc/licenses/* %{buildroot}%{_licensedir}/rust-doc/
+rmdir %{buildroot}%{_docdir}/rustc/licenses
 rm %{buildroot}%{_docdir}/cargo/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
+
+# Ambiguous python shebangs in the stdlib sources break brp-mangle-shebangs.
+find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+'
 
 %ldconfig_scriptlets
 
@@ -173,6 +196,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_bindir}/rust-lldb
 %{_libdir}/lib*.so
 %{_libdir}/rustlib/*
+%exclude %{_libdir}/rustlib/src
 %{_libexecdir}/rust-analyzer-proc-macro-srv
 %{_bindir}/rust-gdb
 %{_bindir}/rust-gdbgui
@@ -183,10 +207,11 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_bindir}/rustfmt
 %{_datadir}/zsh/*
 %{_sysconfdir}/bash_completion.d/cargo
+%exclude %{_sysconfdir}/target-spec-json-schema.json
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_docdir}/rustc/licenses/*
+%license %{_licensedir}/rust-doc/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
@@ -196,6 +221,11 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %doc src/tools/clippy/CHANGELOG.md
 %doc src/tools/rustfmt/Configurations.md
 %{_mandir}/man1/*
+
+%files src
+%license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
+%dir %{_libdir}/rustlib
+%{_libdir}/rustlib/src
 
 %changelog
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
