@@ -10,7 +10,7 @@
 Summary:        Microsoft Kubernetes
 Name:           kubernetes
 Version:        1.30.10
-Release:        28%{?dist}
+Release:        29%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -302,13 +302,11 @@ fi
 %{_exec_prefix}/local/bin/pause
 
 %changelog
-<<<<<<< HEAD
-* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.30.10-28
-- Bump to rebuild with updated glibc
-=======
+* Tue Aug 18 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.30.10-29
+ - Bump to rebuild with updated glibc
+
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-28
-- Patch for CVE-2026-73500
->>>>>>> cb04492d60 ([AutoPR- Security] Patch kubernetes for CVE-2026-73500 [HIGH] (#18456))
+ - Patch for CVE-2026-73500
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.30.10-27
  - Patch for CVE-2024-7598
