@@ -39,7 +39,7 @@ if [ -x "$PESIGN_CLIENT" ]; then
     
     # Sign using pesign-client
     echo "=== signing the test file with pesign ==="
-    sudo -u pesign pesign-client \
+    pesign pesign-client \
         --sign \
         --token "OpenSC Card" \
         --certificate "IPL" \
