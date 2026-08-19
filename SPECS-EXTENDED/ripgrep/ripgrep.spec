@@ -104,7 +104,7 @@ install -Dm 644 complete/_rg %{buildroot}%{_datadir}/zsh/site-functions/_rg
 %{_datadir}/zsh
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 13.0.0-14
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 13.0.0-14
 - Bump release to rebuild with rust
 
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 13.0.0-13

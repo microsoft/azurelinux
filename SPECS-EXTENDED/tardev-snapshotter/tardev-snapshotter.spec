@@ -67,7 +67,7 @@ fi
 %config(noreplace) %{_unitdir}/%{name}.service
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.tardev1-10
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.2.0.tardev1-10
 - Bump release to rebuild with rust
 
 * Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.2.0.tardev1-9

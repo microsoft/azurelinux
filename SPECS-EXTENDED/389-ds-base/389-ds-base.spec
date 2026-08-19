@@ -733,7 +733,7 @@ exit 0
 %endif
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-12
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-12
 - Bump release to rebuild with rust
 
 * Wed Feb 11 2026 BinduSri Adabala <v-badabala@microsoft.com> - 3.1.1-11
@@ -742,7 +742,7 @@ exit 0
 * Mon Feb 02 2026 Archana Shettigar <v-shettigara@microsoft.com> - 3.1.1-10
 - Bump release to rebuild with rust
 
-* Tue Jan 13 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-9
+* Tue Jan 13 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.1.1-9
 - Bump release to rebuild with rust
 - Add patch add explicit lifetime for ValueArrayRef iterator
 

@@ -313,7 +313,7 @@ mkdir -p "$pcrlockroot"
 )
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.26.0-2
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.26.0-2
 - Bump release to rebuild with rust
 
 * Wed Jul 29 2026 Brian Fjeldstad <bfjelds@microsoft.com> - 0.26.0-1

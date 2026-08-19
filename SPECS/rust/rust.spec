@@ -244,7 +244,7 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 * Mon Jan 19 2026 Kanishk Bansal <kanbansal@microsoft.com> - 1.90.0-2
 - Bump to rebuild with updated glibc
 
-* Tue Oct 28 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
+* Tue Jan 13 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.90.0-1
 - Upgrade to 1.90.0
 
 * Mon Nov 10 2025 Andrew Phelps <anphel@microsoft.com> - 1.86.0-10

@@ -148,7 +148,7 @@ fi
 %dir %attr(-,clamav,clamav) %{_sharedstatedir}/clamav
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5.4-2
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.5.4-2
 - Bump release to rebuild with rust
 
 * Mon Aug 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.5.4-1

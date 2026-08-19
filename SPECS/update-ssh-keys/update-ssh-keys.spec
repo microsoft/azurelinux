@@ -80,7 +80,7 @@ cargo test --offline
 %{_bindir}/%{crate}
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.3.0-2
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.3.0-2
 - Bump release to rebuild with rust
 
 * Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.3.0-1

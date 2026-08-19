@@ -143,7 +143,7 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.32.0.kata0-4
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.32.0.kata0-4
 - Bump release to rebuild with rust
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
