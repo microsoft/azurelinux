@@ -14,7 +14,7 @@
 %global released_kernel 1
 
 # AZL: RPM release counter. Bump for rebuilds without a version change.
-%define azl_pkgrelease 1
+%define azl_pkgrelease 2
 # AZL: 4th version component from the AZL kernel source (6.18.39.1). Flows
 # into Version:, Release:, and the extracted source tree name.
 %define kextraversion 1
@@ -113,6 +113,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.2
+- chore(kernel-headers): bump release to stay aligned with kernel spec
+
 * Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.39.1
 
