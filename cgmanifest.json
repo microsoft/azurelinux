@@ -15953,8 +15953,8 @@
         "type": "other",
         "other": {
           "name": "p11-kit",
-          "version": "0.25.0",
-          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.25.0/p11-kit-0.25.0.tar.xz"
+          "version": "0.26.5",
+          "downloadUrl": "https://github.com/p11-glue/p11-kit/releases/download/0.26.5/p11-kit-0.26.5.tar.xz"
         }
       }
     },
