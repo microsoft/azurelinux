@@ -10,6 +10,7 @@ Source0:        README
 
 BuildArch:      noarch
 BuildRequires:  python3
+BuildRequires:  pesign
 
 %description
 A dummy package that exercises the xsign-proxy-client during the build phase.
