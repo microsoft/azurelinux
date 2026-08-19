@@ -17323,8 +17323,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBI",
-          "version": "1.651",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.651.tgz"
+          "version": "1.652",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.652.tgz"
         }
       }
     },
