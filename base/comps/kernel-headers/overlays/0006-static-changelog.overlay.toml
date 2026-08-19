@@ -1,0 +1,31 @@
+# Category azl-release-management: replaces the upstream Fedora spec's
+# %autochangelog macro with a static AZL-authored changelog. rpmautospec
+# expands %autochangelog at render time by walking git history; because
+# the render runs against a staged (non-git) overlay tree, it produces an
+# "Unknown User / Uncommitted changes" placeholder plus the pinned Fedora
+# dist-git history rather than an AZL-relevant log. A static block gives
+# deterministic, meaningful changelog output regardless of the render env.
+# upstream-status inapplicable: AZL-only release management, never sent upstream.
+
+[metadata]
+category = "azl-release-management"
+upstream-status = "inapplicable"
+
+[[overlays]]
+type = "spec-search-replace"
+description = "Replace %autochangelog with a static AZL changelog so renders don't include rpmautospec placeholders or unrelated Fedora dist-git history"
+regex = "%autochangelog"
+replacement = """* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1
+- feat(kernel): update kernel and kernel-headers to 6.18.39.1
+
+* Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1
+- feat(kernel): update kernel and kernel-headers to 6.18.31.1
+
+* Thu May 14 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.3-4
+- feat(kernel-headers): update source to 6.18.29.1
+
+* Wed May 13 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.3-3
+- chore(locks): update kernel locks to work with azldev 9696597 (allow file replacement)
+
+* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 6.18.3-2
+- feat: introduce deterministic commit resolution via Azure Linux lock file"""

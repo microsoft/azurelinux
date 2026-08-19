@@ -12,13 +12,13 @@ upstream-status = "inapplicable"
 
 [[overlays]]
 type = "spec-update-tag"
-description = "Use the Azure Linux 6.18.31.1 kernel source tarball instead of Fedora's pre-built headers tarball"
+description = "Use the Azure Linux 6.18.39.1 kernel source tarball instead of Fedora's pre-built headers tarball"
 tag = "Source0"
 value = "kernel-%{specversion}.%{kextraversion}.tar.gz"
 
 # Prep: extract Azure Linux tarball.
 [[overlays]]
 type = "spec-search-replace"
-description = "Extract the Azure Linux 6.18.31.1 kernel source archive layout"
+description = "Extract the Azure Linux 6.18.39.1 kernel source archive layout"
 regex = "%setup -q -c"
 replacement = "%setup -q -n CBL-Mariner-Linux-Kernel-rolling-lts-azl4-%{specversion}.%{kextraversion}"

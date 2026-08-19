@@ -12,10 +12,10 @@ upstream-status = "inapplicable"
 type = "spec-search-replace"
 description = "Set specversion to 3-part version matching kernel's specrpmversion"
 regex = "%define specversion .+"
-replacement = "%define specversion 6.18.31"
+replacement = "%define specversion 6.18.39"
 
 [[overlays]]
 type = "spec-search-replace"
 description = "Set tarfile_release to 3-part version (tarball name uses specversion.kextraversion)"
 regex = "%define tarfile_release .+"
-replacement = "%define tarfile_release 6.18.31"
+replacement = "%define tarfile_release 6.18.39"
