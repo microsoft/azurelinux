@@ -1,3 +1,4 @@
 # Managed by azldev component update. Do not edit manually.
 version = 1
-input-fingerprint = 'sha256:18950445d433186f2e91ec92852a2653af66c6ec97f66981c81a21fc600d2a58'
+manual-bump = 1
+input-fingerprint = 'sha256:e2de191b6d7fa0d796f2160d35ec990a77e1ca39890605b9af1530817017741f'
