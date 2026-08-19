@@ -18,7 +18,10 @@ BuildRequires:  perl(warnings)
 # Run-time:
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(Time::Local) >= 1.28
-# Time::Zone not used
+# str2time() falls back to Time::Zone to resolve named zones and returns undef
+# without it. Upstream 6.07 added a CEST case to t/date.t, so it is now also a
+# test dependency. Keep as long as t/date.t exercises named time zones.
+BuildRequires:  perl(Time::Zone)
 # Tests:
 BuildRequires:  perl(blib)
 BuildRequires:  perl(File::Spec)
