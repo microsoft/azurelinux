@@ -65,6 +65,45 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- marketplace-gen2 ---------------------------------------------------
+
+[images.marketplace-gen2]
+description = "Marketplace Gen2 Image"
+definition = { type = "kiwi", path = "marketplace-gen2/marketplace-gen2.kiwi", profile = "marketplace-gen2" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-dev]
+description = "Marketplace Gen2 Image (dev)"
+definition = { type = "kiwi", path = "marketplace-gen2/marketplace-gen2.kiwi", profile = "marketplace-gen2-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+# ---- marketplace-gen2-cvm -----------------------------------------------
 # ---- minimal-os --------------------------------------------------------
 
 [images.minimal-os]
