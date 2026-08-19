@@ -4760,8 +4760,8 @@
         "type": "other",
         "other": {
           "name": "golang",
-          "version": "1.26.6",
-          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.6-1/go1.26.6-20260813.3.src.tar.gz"
+          "version": "1.26.7",
+          "downloadUrl": "https://github.com/microsoft/go/releases/download/v1.26.7-1/go1.26.7-20260819.2.src.tar.gz"
         }
       }
     },
