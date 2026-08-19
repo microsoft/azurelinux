@@ -62,6 +62,7 @@ Detailed workflows live in skills (loaded on-demand when relevant):
 | Test and inspect packages in mock chroot | [`azldev-mock`](.agents/skills/azldev-mock/SKILL.md) |
 | Review component for hygiene and best practices | [`azldev-comp-toml` review checklist](.agents/skills/azldev-comp-toml/SKILL.md#review-checklist) |
 | Build, boot, test, or configure images | [`azldev-image`](.agents/skills/azldev-image/SKILL.md) |
+| Update or rebuild the Azure Linux kernel | [`kernel-update`](.agents/skills/kernel-update/SKILL.md) |
 | Triage Koji build failures | [`skill-koji-triage`](.agents/skills/skill-koji-triage/SKILL.md) |
 | Batch-triage build failures from results file | [`skill-mass-triage`](.agents/skills/skill-mass-triage/SKILL.md) |
 | Fix Stage 1 Fedora mirror dependency gaps (injections) | [`skill-fedora-mirror-injections`](.agents/skills/skill-fedora-mirror-injections/SKILL.md) |
