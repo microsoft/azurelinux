@@ -5,7 +5,7 @@
 
 Name:           woff2
 Version:        1.0.2
-Release: 24%{?dist}
+Release: 26%{?dist}
 Summary:        Web Open Font Format 2.0 library
 
 License:        MIT

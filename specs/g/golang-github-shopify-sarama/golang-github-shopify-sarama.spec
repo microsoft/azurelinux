@@ -17,7 +17,7 @@ Sarama is an MIT-licensed Go client library for Apache Kafka version 0.8 (and la
 %global godocs          examples CHANGELOG.md README.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary:        Go library for Apache Kafka 0.8, and up
 
 License:        MIT

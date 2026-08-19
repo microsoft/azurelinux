@@ -23,7 +23,7 @@
 
 Name:           tlog
 Version:        14
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        Terminal I/O logger
 
 %if "%{_vendor}" == "debbuild"

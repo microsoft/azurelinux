@@ -5,7 +5,7 @@
 
 Name:           wireless-regdb
 Version:        2025.10.07
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Regulatory database for 802.11 wireless networking
 
 License:        ISC

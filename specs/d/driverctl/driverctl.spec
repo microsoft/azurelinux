@@ -5,7 +5,7 @@
 
 Name:		driverctl
 Version:	0.101
-Release: 19%{?dist}
+Release: 21%{?dist}
 Summary:	Device driver control utility
 
 # Automatically converted from old format: LGPLv2 - review is highly recommended.

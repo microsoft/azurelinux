@@ -30,7 +30,7 @@ Tests for the Oslo Log handling library.
 
 Name:           python-oslo-log
 Version:        6.1.2
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        OpenStack Oslo Log library
 
 License:        Apache-2.0

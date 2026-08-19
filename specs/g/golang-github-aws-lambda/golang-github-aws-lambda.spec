@@ -18,7 +18,7 @@ functions.}
 %global godocs          README.md events/*.md
 
 Name:           %{goname}
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary:        Libraries, samples and tools to help Go developers develop AWS Lambda functions
 
 # Upstream license specification: Apache-2.0 and MIT

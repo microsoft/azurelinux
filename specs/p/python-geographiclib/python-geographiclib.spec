@@ -5,7 +5,7 @@
 
 Name:           python-%{pkg_name}
 Version:        2.1
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Python 3 implementation of geographiclib
 
 License:        MIT

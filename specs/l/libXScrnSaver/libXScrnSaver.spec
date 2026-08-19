@@ -4,7 +4,7 @@
 Summary: X.Org X11 libXss runtime library
 Name: libXScrnSaver
 Version: 1.2.4
-Release: 7%{?dist}
+Release: 9%{?dist}
 License: X11
 URL: http://www.x.org
 

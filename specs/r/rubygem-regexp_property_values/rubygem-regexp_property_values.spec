@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.0
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary: Inspect property values supported by Ruby's regex engine
 License: MIT
 URL: https://github.com/jaynetics/regexp_property_values

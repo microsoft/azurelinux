@@ -5,7 +5,7 @@
 Name:    websocketpp
 Summary: C++ WebSocket Protocol Library
 Version: 0.8.2
-Release: 20%{?dist}
+Release: 22%{?dist}
 
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD

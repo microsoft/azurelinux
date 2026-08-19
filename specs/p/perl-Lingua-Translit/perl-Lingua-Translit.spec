@@ -3,7 +3,7 @@
 
 Name:           perl-Lingua-Translit
 Version:        0.29
-Release: 11%{?dist}
+Release: 13%{?dist}
 Summary:        Transliterates text between writing systems
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

@@ -10,7 +10,7 @@
 
 Name:           perl-XML-Simple
 Version:        2.25
-Release: 24%{?dist}
+Release: 26%{?dist}
 Summary:        Easy API to maintain XML in Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-Simple

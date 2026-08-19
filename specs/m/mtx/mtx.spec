@@ -3,7 +3,7 @@
 
 Name: mtx
 Version: 1.3.12
-Release: 37%{?dist}
+Release: 39%{?dist}
 Summary: SCSI media changer control program
 # Automatically converted from old format: GPLv2 - review is highly recommended.
 License: GPL-2.0-only

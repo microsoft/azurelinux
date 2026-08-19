@@ -14,7 +14,7 @@
 Summary:   Multi Router Traffic Grapher
 Name:      mrtg
 Version:   2.17.10
-Release: 13%{?dist}
+Release: 15%{?dist}
 URL:       http://oss.oetiker.ch/mrtg/
 Source0:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz
 Source1:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz.md5

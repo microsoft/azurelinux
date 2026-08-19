@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.1.0
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary: A gem for controlling external programs running in the background
 License: MIT
 URL: http://github.com/enkessler/childprocess

@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        3.0.0
-Release: 15%{?dist}
+Release: 17%{?dist}
 Summary:        OpenStack Docs Theme
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.

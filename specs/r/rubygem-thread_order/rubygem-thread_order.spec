@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.1.1
-Release: 15%{?dist}
+Release: 17%{?dist}
 
 Summary:	Test helper for ordering threaded code
 License:	MIT

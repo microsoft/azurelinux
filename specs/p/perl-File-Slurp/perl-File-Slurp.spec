@@ -3,7 +3,7 @@
 
 Name:           perl-File-Slurp
 Version:        9999.32
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary:        Efficient Reading/Writing of Complete Files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Slurp

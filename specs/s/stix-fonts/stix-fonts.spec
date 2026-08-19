@@ -6,7 +6,7 @@
 Version: 2.13b171
 %forgemeta
 
-Release: 10%{?dist}
+Release: 12%{?dist}
 URL:     http://www.stixfonts.org/
 
 %global foundry           STIX

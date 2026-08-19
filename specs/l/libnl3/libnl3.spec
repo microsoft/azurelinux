@@ -3,7 +3,7 @@
 
 Name: libnl3
 Version: 3.12.0
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary: Convenience library for kernel netlink sockets
 License: LGPL-2.1-only
 URL: http://www.infradead.org/~tgr/libnl/

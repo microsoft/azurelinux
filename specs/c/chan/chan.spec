@@ -3,7 +3,7 @@
 
 Name: chan
 Version: 0.0.4
-Release: 16%{?dist}
+Release: 18%{?dist}
 Summary: Pure C implementation of Go channels
 License: Apache-2.0
 URL: https://github.com/tylertreat/%{name}

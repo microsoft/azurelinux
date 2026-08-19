@@ -38,7 +38,7 @@ Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
 Version:       1.58.1
-Release: 2%{?dist}
+Release: 4%{?dist}
 License:       LGPL-2.1-or-later
 
 # Build only for architectures that have a kernel

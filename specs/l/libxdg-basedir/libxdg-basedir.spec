@@ -3,7 +3,7 @@
 
 Name:           libxdg-basedir
 Version:        1.2.0
-Release: 37%{?dist}
+Release: 39%{?dist}
 Summary:        Implementation of the XDG Base Directory Specifications
 
 License:        MIT

@@ -17,7 +17,7 @@
 
 Name:           rocwmma
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        ROCm Matrix Multiple and Accumulate library
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

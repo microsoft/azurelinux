@@ -20,7 +20,7 @@ Summary: OpenPrinting CUPS filters for CUPS 2.X
 Name:    cups-filters
 Epoch:   1
 Version: 2.0.1
-Release: 13%{?dist}
+Release: 15%{?dist}
 
 # the CUPS exception text is the same as LLVM exception, so using that name with
 # agreement from legal team

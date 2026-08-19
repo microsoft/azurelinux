@@ -20,7 +20,7 @@ Share API.
 
 Name:       python-manilaclient
 Version:    5.0.0
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:    Client Library for OpenStack Share API
 License:    Apache-2.0
 URL:        https://pypi.io/pypi/%{name}

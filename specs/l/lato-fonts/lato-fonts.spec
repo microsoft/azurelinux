@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version: 2.015
-Release: 25%{?dist}
+Release: 27%{?dist}
 URL:     http://www.latofonts.com/
 
 %global fontlicense       OFL-1.1

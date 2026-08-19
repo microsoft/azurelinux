@@ -3,7 +3,7 @@
 
 Name: libtracefs
 Version: 1.8.1
-Release: 4%{?dist}
+Release: 6%{?dist}
 License: LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-2.0-only
 Summary: Library for access kernel tracefs
 

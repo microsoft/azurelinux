@@ -18,7 +18,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.9.1.0
 # can only be reset when subpkg bumped
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:        Efficient algorithms for vector arrays
 
 License:        BSD-3-Clause

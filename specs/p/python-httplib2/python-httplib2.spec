@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.22.0
-Release: 8%{?dist}
+Release: 10%{?dist}
 Summary:        Comprehensive HTTP client library
 License:        MIT
 URL:            https://pypi.python.org/pypi/httplib2

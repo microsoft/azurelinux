@@ -3,7 +3,7 @@
 
 Name:             umockdev
 Version:          0.19.5
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:          Mock hardware devices
 
 License:          LGPL-2.1-or-later

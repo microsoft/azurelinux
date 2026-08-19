@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.1.0
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:        Extensions for mypy (separated out from mypy/extensions)
 
 License:        MIT

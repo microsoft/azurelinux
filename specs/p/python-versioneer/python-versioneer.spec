@@ -8,7 +8,7 @@ version-control system about the current tree.}
 
 Name:           python-versioneer
 Version:        0.29
-Release: 8%{?dist}
+Release: 10%{?dist}
 Summary:        Easy VCS-based management of project version strings
 
 License:        Unlicense

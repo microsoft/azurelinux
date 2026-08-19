@@ -6,7 +6,7 @@
 
 Name:           rpmlint
 Version:        2.8.0
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Tool for checking common errors in RPM packages
 License:        GPL-2.0-or-later
 URL:            https://github.com/rpm-software-management/rpmlint

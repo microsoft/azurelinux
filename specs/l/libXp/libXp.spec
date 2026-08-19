@@ -13,7 +13,7 @@
 Summary: X.Org X11 libXp runtime library
 Name: libXp
 Version: 1.0.4
-Release: 10%{?dist}
+Release: 12%{?dist}
 License: X11 AND X11-distribute-modifications-variant
 URL: http://www.x.org
 

@@ -3,7 +3,7 @@
 
 Name:           hiredis
 Version:        1.2.0
-Release: 8%{?dist}
+Release: 10%{?dist}
 Summary:        Minimalistic C client library for Redis
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

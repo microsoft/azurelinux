@@ -3,7 +3,7 @@
 
 Name: gfs2-utils
 Version: 3.6.1
-Release: 3%{?dist}
+Release: 5%{?dist}
 # Refer to doc/README.licence in the upstream tarball
 License: GPL-2.0-or-later AND LGPL-2.1-or-later
 Summary: Utilities for managing the global file system (GFS2)

@@ -3,7 +3,7 @@
 
 Name:           liblzf
 Version:        3.6
-Release: 34%{?dist}
+Release: 36%{?dist}
 Summary:        Small data compression library
 
 # Automatically converted from old format: BSD or GPLv2+ - review is highly recommended.

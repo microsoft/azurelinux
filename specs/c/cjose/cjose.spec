@@ -3,7 +3,7 @@
 
 Name:           cjose
 Version:        0.6.2.2
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        C library implementing the Javascript Object Signing and Encryption (JOSE)
 
 License:        MIT

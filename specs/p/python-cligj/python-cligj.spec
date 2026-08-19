@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.7.2
-Release: 21%{?dist}
+Release: 23%{?dist}
 Summary:        Click params for GeoJSON CLI
 
 License:        BSD-3-Clause

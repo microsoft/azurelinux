@@ -6,7 +6,7 @@
 
 Name:           kyua
 Version:        0.13
-Release: 20%{?dist}
+Release: 22%{?dist}
 Summary:        Testing framework for infrastructure software
 
 # Automatically converted from old format: BSD - review is highly recommended.

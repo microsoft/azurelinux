@@ -15,7 +15,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.1.8
 # can only be reset when subpkg bumped
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:        Type level booleans
 
 License:        BSD-3-Clause

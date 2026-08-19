@@ -6,7 +6,7 @@
 Name: spausedd
 Summary: Utility to detect and log scheduler pause
 Version: 20210719
-Release: 12%{?dist}
+Release: 14%{?dist}
 License: ISC
 URL: https://github.com/jfriesse/spausedd
 Source0: https://github.com/jfriesse/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz

@@ -20,7 +20,7 @@ OSTree commits. Uses osbuild under the hood.
 }
 
 Name:           image-builder
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        An image building executable using osbuild
 ExcludeArch:    i686
 

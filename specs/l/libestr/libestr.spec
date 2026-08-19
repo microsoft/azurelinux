@@ -3,7 +3,7 @@
 
 Name:           libestr
 Version:        0.1.11
-Release: 13%{?dist}
+Release: 15%{?dist}
 Summary:        String handling essentials library
 
 License:        LGPL-2.1-or-later

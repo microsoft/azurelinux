@@ -5,7 +5,7 @@
 
 Name:           CUnit
 Version:        2.1.3
-Release: 36%{?dist}
+Release: 38%{?dist}
 Summary:        Unit testing framework for C
 
 License:        LGPL-2.0-or-later

@@ -19,7 +19,7 @@
 
 Name:           php-phpspec-prophecy
 Version:        1.25.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        Highly opinionated mocking framework for PHP
 
 License:        MIT

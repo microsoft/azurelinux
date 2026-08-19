@@ -3,7 +3,7 @@
 
 Name:           perl-XML-TokeParser
 Version:        0.05
-Release: 48%{?dist}
+Release: 50%{?dist}
 Summary:        Simplified interface to XML::Parser
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 

@@ -7,7 +7,7 @@
 
 Name:           discount
 Version:        2.2.7
-Release: 13%{?dist}
+Release: 15%{?dist}
 Summary:        A command-line utility for converting Markdown files into HTML
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD

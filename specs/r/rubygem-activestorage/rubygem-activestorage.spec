@@ -16,7 +16,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 8.0.2
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary: Local and cloud file storage framework
 License: MIT
 URL: https://rubyonrails.org

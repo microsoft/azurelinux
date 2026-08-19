@@ -7,7 +7,7 @@
 
 Name:           python-deepdiff
 Version:        8.6.1
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Deep Difference and search of any Python object/data
 
 License:        MIT

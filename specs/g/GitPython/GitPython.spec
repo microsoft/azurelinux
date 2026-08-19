@@ -5,7 +5,7 @@
 
 Name:           %{srcname}
 Version:        3.1.46
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        Python Git Library
 
 License:        BSD-3-Clause

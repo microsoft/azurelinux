@@ -18,7 +18,7 @@ application remains responsive.}
 
 Name: qcoro
 Version: 0.12.0
-Release: 4%{?dist}
+Release: 6%{?dist}
 
 License: MIT
 Summary: C++ Coroutines for Qt

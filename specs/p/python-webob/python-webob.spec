@@ -12,7 +12,7 @@ environment.
 Name:           python-webob
 Summary:        WSGI request and response object
 Version:        1.8.9
-Release: 7%{?dist}
+Release: 9%{?dist}
 License:        MIT
 URL:            https://webob.org
 Source:         %{pypi_source webob}

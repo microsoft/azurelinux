@@ -17,7 +17,7 @@ Name: azurelinux-rpm-config
 # the older branch. When the branch diverges, bump the Version to the Fedora
 # release number.
 Version: 1004
-Release: 4%{?dist}
+Release: 6%{?dist}
 # config.guess, config.sub are GPL-3.0-or-later WITH Autoconf-exception-generic
 License: GPL-1.0-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later WITH Autoconf-exception-generic
 URL: https://aka.ms/azurelinux

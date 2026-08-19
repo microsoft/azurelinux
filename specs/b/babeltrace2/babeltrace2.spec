@@ -3,7 +3,7 @@
 
 Name:           babeltrace2
 Version:        2.1.2
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        A trace manipulation toolkit
 License:        MIT AND GPL-2.0-only
 URL:            https://www.efficios.com/babeltrace

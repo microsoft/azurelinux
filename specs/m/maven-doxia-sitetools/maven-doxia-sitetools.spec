@@ -7,7 +7,7 @@
 
 Name:           maven-doxia-sitetools
 Version:        2.0.0
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        Doxia content generation framework
 License:        Apache-2.0
 URL:            https://maven.apache.org/doxia/

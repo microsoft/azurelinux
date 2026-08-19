@@ -3,7 +3,7 @@
 
 Name:           perl-Convert-Bencode_XS
 Version:        0.06
-Release: 48%{?dist}
+Release: 50%{?dist}
 Summary:        Faster conversions to/from Bencode format
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Convert-Bencode_XS

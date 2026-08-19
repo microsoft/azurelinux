@@ -3,7 +3,7 @@
 
 Name: libmng
 Version: 2.0.3
-Release: 25%{?dist}
+Release: 27%{?dist}
 URL: http://www.libmng.com/
 Summary: Library for Multiple-image Network Graphics support
 # This is a common zlib variant.

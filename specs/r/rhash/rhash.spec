@@ -3,7 +3,7 @@
 
 Name:           rhash
 Version:        1.4.5
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        Great utility for computing hash sums
 
 License:        MIT

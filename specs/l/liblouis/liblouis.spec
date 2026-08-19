@@ -3,7 +3,7 @@
 
 Name:           liblouis
 Version:        3.33.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        Braille translation and back-translation library
 
 # LGPL-2.1-or-later: the project as a whole

@@ -3,7 +3,7 @@
 
 Name:           libnfnetlink
 Version:        1.0.1
-Release: 32%{?dist}
+Release: 34%{?dist}
 Summary:        Netfilter netlink userspace library
 License:        GPL-2.0-or-later
 URL:            http://netfilter.org

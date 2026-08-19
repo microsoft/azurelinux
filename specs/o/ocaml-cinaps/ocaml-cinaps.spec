@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-cinaps
 Version:        0.15.1
-Release: 26%{?dist}
+Release: 28%{?dist}
 Summary:        Trivial Metaprogramming tool using the OCaml toplevel
 
 License:        MIT

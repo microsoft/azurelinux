@@ -3,7 +3,7 @@
 
 Name:           opensc
 Version:        0.26.1
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        Smart card library and applications
 
 License:        LGPL-2.1-or-later AND BSD-3-Clause

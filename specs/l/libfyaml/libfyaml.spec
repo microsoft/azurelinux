@@ -3,7 +3,7 @@
 
 Name:           libfyaml
 Version:        0.8
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        Complete YAML parser and emitter
 
 # All files MIT except

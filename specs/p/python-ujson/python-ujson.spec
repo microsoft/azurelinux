@@ -3,7 +3,7 @@
 
 Name:           python-ujson
 Version:        5.11.0
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Ultra fast JSON encoder and decoder written in pure C
 
 # The entire source is BSD-3-Clause, except:

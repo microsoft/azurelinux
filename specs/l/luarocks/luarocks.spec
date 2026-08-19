@@ -3,7 +3,7 @@
 
 Name:           luarocks
 Version:        3.9.2
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        A deployment and management system for Lua modules
 
 License:        MIT

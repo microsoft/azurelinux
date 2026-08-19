@@ -22,7 +22,7 @@
 
 Name:           libsodium
 Version:        1.0.21
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        The Sodium crypto library
 # Most source code is ISC, except:
 # BSD-2-Clause:

@@ -9,7 +9,7 @@
 
 Name:       utf8cpp
 Version:    4.0.8
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:    A simple, portable and lightweight library for handling UTF-8 encoded strings
 License:    BSL-1.0
 URL:        https://github.com/nemtrif/utfcpp

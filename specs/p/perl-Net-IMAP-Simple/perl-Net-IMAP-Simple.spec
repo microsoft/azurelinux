@@ -3,7 +3,7 @@
 
 Name:          perl-Net-IMAP-Simple
 Version:       1.2212
-Release: 21%{?dist}
+Release: 23%{?dist}
 Summary:       Simple IMAP account handling
 License:       GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:           https://metacpan.org/release/Net-IMAP-Simple

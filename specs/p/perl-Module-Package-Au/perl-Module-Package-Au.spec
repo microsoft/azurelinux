@@ -3,7 +3,7 @@
 
 Name:		perl-Module-Package-Au
 Version:	2
-Release: 33%{?dist}
+Release: 35%{?dist}
 Summary:	Reusable Module::Install bits
 License:	CC0-1.0
 URL:		https://metacpan.org/release/Module-Package-Au

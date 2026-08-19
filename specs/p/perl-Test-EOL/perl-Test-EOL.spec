@@ -3,7 +3,7 @@
 
 Name:		perl-Test-EOL
 Version:	2.02
-Release: 15%{?dist}
+Release: 17%{?dist}
 Summary:	Check the correct line endings in your project
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-EOL

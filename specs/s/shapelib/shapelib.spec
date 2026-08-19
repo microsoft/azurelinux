@@ -14,7 +14,7 @@
 
 Name:          shapelib
 Version:       1.6.1
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:       C library for handling ESRI Shapefiles
 # The core library is dual-licensed LGPLv2 or MIT.
 # Some contributed files have different licenses:

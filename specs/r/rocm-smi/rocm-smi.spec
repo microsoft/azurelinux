@@ -17,7 +17,7 @@
 
 Name:       rocm-smi
 Version:    %{rocm_version}
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:    ROCm System Management Interface Library
 
 License:    MIT AND NCSA

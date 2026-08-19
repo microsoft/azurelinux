@@ -25,7 +25,7 @@ Neutron's API.
 
 Name:       python-neutronclient
 Version:    11.3.1
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:    Python API and CLI for OpenStack Neutron
 
 License:    Apache-2.0

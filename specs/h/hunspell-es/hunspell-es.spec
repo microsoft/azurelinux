@@ -10,7 +10,7 @@
 Name: hunspell-es
 Summary: Spanish hunspell dictionaries
 Version: 2.9
-Release: 3%{?dist}
+Release: 5%{?dist}
 Epoch: 1
 Source0: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_AR.oxt
 Source1: https://github.com/sbosio/rla-es/releases/download/v%{version}/es_BO.oxt

@@ -6,7 +6,7 @@
 
 Name:           btrfs-progs
 Version:        6.19
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        Userspace programs for btrfs
 
 License:        GPL-2.0-only

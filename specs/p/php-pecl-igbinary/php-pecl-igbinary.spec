@@ -20,7 +20,7 @@
 Summary:        Replacement for the standard PHP serializer
 Name:           php-pecl-igbinary
 Version:        %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release: 6%{?dist}
+Release: 8%{?dist}
 Source0:        https://pecl.php.net/get/%{sources}.tgz
 License:        BSD-3-Clause
 

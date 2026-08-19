@@ -12,7 +12,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-compiler-libs-janestreet
 Version:        0.17.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        OCaml compiler libraries repackaged
 
 License:        MIT

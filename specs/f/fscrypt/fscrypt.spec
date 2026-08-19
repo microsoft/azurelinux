@@ -24,7 +24,7 @@ provides a uniform interface for creating and modifying encrypted directories.}
 %global godocs          CODE_OF_CONDUCT.md CONTRIBUTING.md NEWS.md README.md
 
 Name:           fscrypt
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Go tool for managing Linux filesystem encryption
 
 License:        Apache-2.0

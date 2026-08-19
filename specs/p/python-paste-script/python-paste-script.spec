@@ -13,7 +13,7 @@ Built-in features:\
 
 Name:           python-paste-script
 Version:        3.3.0
-Release: 12%{?dist}
+Release: 14%{?dist}
 BuildArch:      noarch
 
 # paste/script/wsgiserver/ is BSD licensed from CherryPy

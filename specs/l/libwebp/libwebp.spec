@@ -27,7 +27,7 @@
 
 Name:          libwebp
 Version:       1.6.0
-Release: 4%{?dist}
+Release: 6%{?dist}
 URL:           http://webmproject.org/
 Summary:       Library and tools for the WebP graphics format
 # Additional IPR is licensed as well. See PATENTS file for details

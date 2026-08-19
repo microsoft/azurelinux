@@ -18,7 +18,7 @@
 
 Name:           python-dateparser
 Version:        1.2.2
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Python parser for human readable dates
 
 License:        BSD-3-Clause
