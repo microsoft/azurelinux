@@ -1,0 +1,77 @@
+From 964aa10a956d593072732deb8ad8c32659112645 Mon Sep 17 00:00:00 2001
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+Date: Mon, 15 Jun 2026 15:00:38 -0400
+Subject: [PATCH] Re-process the device metadata when required after all
+ devices are added
+
+The requires tag processing needs the full device tree to be present for some of
+the <requires><firmware> tags that name other devicess.
+
+When requred, re-run all requires processing after all the devices have been
+fully enumerated.
+
+Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
+---
+ src/fu-engine.c | 24 ++++++++++++++++++++++--
+ src/fu-engine.h |  2 ++
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/src/fu-engine.c b/src/fu-engine.c
+index XXXXXXX..XXXXXXX 100644
+--- a/src/fu-engine.c
++++ b/src/fu-engine.c
+@@ -6829,8 +6829,9 @@ fu_engine_add_device(FuEngine *self, FuDevice *device)
+ 	/* check if the device needs emulation-tag */
+ 	fu_engine_ensure_device_emulation_tag(self, device);
+ 
+-	/* set or clear the SUPPORTED flag */
+-	fu_engine_ensure_device_supported(self, device);
++	/* set or clear the SUPPORTED flag right away when doing device holdplug */
++	if (fu_engine_get_loaded(self))
++		fu_engine_ensure_device_supported(self, device);
+ 
+ 	/* adopt any required children, which may or may not already exist */
+ 	fu_engine_adopt_children(self, device);
+@@ -8636,6 +8637,22 @@ fu_engine_backends_coldplug(FuEngine *self, FuProgress *progress)
+ 	}
+ }
+ 
++static void
++fu_engine_ensure_devices_supported_cb(gpointer data, gpointer user_data)
++{
++	FuDevice *device = FU_DEVICE(data);
++	FuEngine *self = FU_ENGINE(user_data);
++	fu_engine_ensure_device_supported(self, device);
++}
++
++/* exported for the self tests */
++void
++fu_engine_ensure_devices_supported(FuEngine *self)
++{
++	g_autoptr(GPtrArray) devices = fu_device_list_get_active(self->device_list);
++	g_ptr_array_foreach(devices, fu_engine_ensure_devices_supported_cb, self);
++}
++
+ /**
+  * fu_engine_load:
+  * @self: a #FuEngine
+@@ -8967,6 +8984,9 @@ fu_engine_load(FuEngine *self, FuEngineLoadFlags flags, FuProgress *progress, GE
+ 		fu_progress_step_done(progress);
+ 	}
+ 
++	/* rerun <requires> checks against the full device tree */
++	fu_engine_ensure_devices_supported(self);
++
+ 	/* dump plugin information to the console */
+ 	if (g_getenv("FWUPD_VERBOSE") != NULL) {
+ 		g_autoptr(GString) str = g_string_new(NULL);
+diff --git a/src/fu-engine.h b/src/fu-engine.h
+index XXXXXXX..XXXXXXX 100644
+--- a/src/fu-engine.h
++++ b/src/fu-engine.h
+@@ -250,3 +250,5 @@ fu_engine_undo_host_security_attr(FuEngine *self, const gchar *appstream_id, GEr
+     G_GNUC_NON_NULL(1, 2);
+ gboolean
+ fu_engine_plugin_allows_enumeration(FuEngine *self, FuPlugin *plugin) G_GNUC_NON_NULL(1, 2);
++void
++fu_engine_ensure_devices_supported(FuEngine *self) G_GNUC_NON_NULL(1);

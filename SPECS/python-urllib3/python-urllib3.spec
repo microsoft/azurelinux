@@ -1,7 +1,7 @@
 Summary:        A powerful, sanity-friendly HTTP client for Python.
 Name:           python-urllib3
 Version:        2.0.7
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -49,10 +49,10 @@ rm -rf test/contrib/
 %pyproject_install
 
 %check
-pip3 install --upgrade pip
+# Pin pytest<9: pytest 9.x rejects non-Collection iterables (chain) in parametrize argvalues
 pip3 install tornado>=6.2 \
     trustme>=0.9.0 \
-    pytest>=7.4.0 \
+    'pytest>=7.4.0,<9' \
     pytest-cov>=2.7.1 \
     Brotli>=1.0.9 \
     PySocks>=1.7.1 \
@@ -61,7 +61,6 @@ pip3 install tornado>=6.2 \
     flaky \
     idna>=3.4 \
     psutil \
-    pytest>=7.4.0 \
     pytest-timeout>=2.1.0 \
     pytest-xdist \
     urllib3>=%{version}
@@ -88,6 +87,10 @@ skiplist+=" or test_respect_retry_after_header_sleep"
 %{python3_sitelib}/*
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 2.0.7-6
+- Pin pytest<9 in %%check; pytest 9.x rejects non-Collection iterables
+  (chain) in parametrize argvalues used by the urllib3 test suite.
+
 * Fri May 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 2.0.7-5
 - Patch for CVE-2026-44431
 

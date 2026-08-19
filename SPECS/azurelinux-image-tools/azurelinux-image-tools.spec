@@ -2,8 +2,8 @@
 
 Summary:        Azure Linux Image Tools
 Name:           azurelinux-image-tools
-Version:        1.5.0
-Release:        2%{?dist}
+Version:        1.6.0
+Release:        1%{?dist}
 License:        MIT
 URL:            https://github.com/microsoft/azure-linux-image-tools/
 Group:          Applications/System
@@ -49,9 +49,9 @@ Requires: lsof
 Requires: python3
 Requires: python3-pip
 Requires: jq
+Requires: systemd-ukify
 %ifarch x86_64
 Requires: grub2-pc
-Requires: systemd-ukify
 %endif
 
 %description imagecustomizer
@@ -111,6 +111,10 @@ go test -C toolkit/tools ./...
 %{_bindir}/osmodifier
 
 %changelog
+* Tue Aug 3 2026 Chris Gunn <chrisgunn>@microsoft.com> - 1.6.0-1
+- Upgrade to version 1.6.0
+- Enable systemd-ukify for arm64
+
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.5.0-2
 - Patch for CVE-2026-56852
 

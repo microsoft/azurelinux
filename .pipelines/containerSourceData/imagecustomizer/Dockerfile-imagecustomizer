@@ -15,12 +15,6 @@ RUN tdnf update -y && \
    tdnf install -y azurelinux-repos-cloud-native && \
    tdnf update -y && \
    tdnf install -y oras && \
-   if [ "$TARGETARCH" = "amd64" ]; then \
-       echo "Installing AMD64-specific packages..."; \
-       tdnf install -y grub2-pc systemd-ukify; \
-   else \
-       echo "Skipping AMD64-specific packages for $TARGETARCH"; \
-   fi && \
    tdnf clean all
 
 # Create virtual environment and install Python dependencies for telemetry

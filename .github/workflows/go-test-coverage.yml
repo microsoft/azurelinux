@@ -12,6 +12,9 @@ on:
 env:
   EXPECTED_GO_VERSION: "1.24"
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Go Test Coverage

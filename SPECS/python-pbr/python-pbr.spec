@@ -1,7 +1,7 @@
 Summary:        Python Build Reasonableness
 Name:           python-pbr
 Version:        6.0.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        Apache-2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -25,6 +25,8 @@ Requires:       python3
 BuildRequires:  git
 BuildRequires:  gnupg2
 BuildRequires:  python3-pip
+BuildRequires:  python3-virtualenv
+BuildRequires:  python3-wheel
 %endif
 
 %description -n python3-pbr
@@ -42,8 +44,22 @@ export SKIP_PIP_INSTALL=1
 ln -s pbr %{buildroot}/%{_bindir}/pbr3
 
 %check
-pip3 install 'tox>=3.27.1,<4.0.0'
-tox -e py%{python3_version_nodots}
+# tox 3.x + virtualenv 21.x fails to editable-install due to setuptools isolation.
+# Run tests directly with stestr instead.
+#
+# Skip 5 tests that exercise pbr's pip-bootstrap path: they create a fresh
+# virtualenv and run 'pip install -U pip wheel build <pbr-source>'. Because
+# pbr 6.0.0 ships no pyproject.toml, pip falls back to a PEP 517 isolated
+# build env containing only setuptools+wheel. pbr's own setup.py starts with
+# 'from pbr import util', which fails inside that isolated env
+# (ModuleNotFoundError: No module named 'pbr'). PYTHONPATH cannot reach in
+# either, because pip strips it from the build subprocess. tox 'usedevelop'
+# papered over this historically by injecting an editable pbr install before
+# the tests spawned the inner venv, but that workflow is broken with current
+# setuptools. The self-bootstrap is fixed upstream in pbr 6.1+.
+pip3 install stestr testscenarios testresources six
+python3 -m stestr run --suppress-attachments \
+    --exclude-regex '(test_freeze_command|test_console_script_develop|test_console_script_install|test_pep_517_support|test_requirement_parsing)'
 
 %files -n python3-pbr
 %defattr(-,root,root)
@@ -55,6 +71,17 @@ tox -e py%{python3_version_nodots}
 %{python3_sitelib}/pbr
 
 %changelog
+* Wed Jun 17 2026 Kshitiz Godara <kgodara@microsoft.com> - 6.0.0-2
+- Replace tox-based testing with a direct stestr invocation; tox 3.x +
+  virtualenv 21.x fails to editable-install due to setuptools isolation.
+- Add python3-virtualenv and python3-wheel BRs so test discovery can
+  import pbr.tests.test_packaging / test_integration.
+- Exclude 5 tests (test_freeze_command, test_console_script_{develop,install},
+  test_pep_517_support, test_requirement_parsing) -- they create an isolated
+  virtualenv, pip-install pbr-from-source, then import a fixture
+  ('pbr_testpackage') whose __init__.py does 'import pbr.version', which
+  fails since the isolated venv has no system pbr.
+
 * Fri Feb 09 2024 Ameya Usgaonkar <ausgaonkar@microsoft.com> - 6.0.0-1
 - Upgrade to version 6.0.0
 

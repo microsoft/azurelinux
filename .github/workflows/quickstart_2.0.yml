@@ -10,6 +10,9 @@ on:
   schedule:
     - cron: "0 15 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   iso_quickstart:
     runs-on: ubuntu-latest

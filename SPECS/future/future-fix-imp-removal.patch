@@ -1,0 +1,44 @@
+--- a/src/future/standard_library/__init__.py	2023-01-13 03:16:35.000000000 +0000
++++ b/src/future/standard_library/__init__.py	2026-05-13 09:57:26.335659509 +0000
+@@ -62,7 +62,12 @@ from __future__ import absolute_import,
+ 
+ import sys
+ import logging
+-import imp
++try:
++    import imp
++except ImportError:
++    import importlib
++    import importlib.util
++    imp = None
+ import contextlib
+ import types
+ import copy
+@@ -297,8 +302,25 @@ class RenameImport(object):
+                 flog.debug('What to do here?')
+ 
+         name = bits[0]
+-        module_info = imp.find_module(name, path)
+-        return imp.load_module(name, *module_info)
++        if imp is not None:
++            module_info = imp.find_module(name, path)
++            return imp.load_module(name, *module_info)
++        else:
++            for entry in path:
++                spec = importlib.util.spec_from_file_location(
++                    name, os.path.join(entry, name + '.py'))
++                if spec is not None:
++                    break
++                spec = importlib.util.spec_from_file_location(
++                    name, os.path.join(entry, name, '__init__.py'))
++                if spec is not None:
++                    break
++            if spec is None:
++                raise ImportError('No module named {!r}'.format(name))
++            module = importlib.util.module_from_spec(spec)
++            spec.loader.exec_module(module)
++            sys.modules[name] = module
++            return module
+ 
+ 
+ class hooks(object):
