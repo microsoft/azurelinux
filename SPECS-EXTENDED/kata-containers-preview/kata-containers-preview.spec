@@ -14,6 +14,9 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{upstream_ver}.tar.gz#/kata-containers-%{upstream_ver}.tar.gz
 Source1:        kata-containers-%{upstream_ver}-cargo.tar.gz
+Patch0:         rust-fix-unstable-name-collisions.patch
+# This patch can be removed when this package is upgraded to v3.32.0
+Patch1:         rust-1.96-protection-cpuid.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler

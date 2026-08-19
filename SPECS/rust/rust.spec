@@ -213,12 +213,10 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
-* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-3
-- Bump release to rebuild with rust
-
-* Wed Aug 19 2026 Azure Linux Maintainer <azurelinux-maintainer@microsoft.com> - 1.96.1-1
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-1
 - Move stage0 bootstrap toolchain tarballs (cargo/rustc/rust-std) out of this
   SRPM into a new rust-bootstrap BuildRequires package, to keep this SRPM small.
+- Upgrade to 1.96.1
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
