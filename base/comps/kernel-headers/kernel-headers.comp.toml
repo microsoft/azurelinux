@@ -1,23 +1,23 @@
 [components.kernel-headers]
-# Kernel-headers using Fedora spec with overlays for Azure Linux 6.18.
-# Fedora's spec expects a pre-built headers tarball. These overlays adapt it to
-# use Azure Linux kernel source and generate headers during build.
-spec = { type = "upstream" }
+# Azure Linux maintains kernel-headers as a local spec (migrated away from the
+# azldev TOML-overlay-on-Fedora-upstream approach) so it can track the local
+# kernel spec, share its version/release scheme, and generate headers directly
+# from the AZL kernel source (Fedora's spec expects a pre-built headers
+# tarball). Edit kernel-headers.spec directly; AZL-specific changes are marked
+# with "AZL:" comments.
+spec = { type = "local", path = "kernel-headers.spec" }
 
-# Manual release calculation required because the spec uses %{specrelease} macro
-# Release: %{specrelease}
+# The spec uses %{specrelease} (kextraversion.azl_pkgrelease.dist) which the
+# auto-calculator cannot parse. Release is managed manually: bump azl_pkgrelease
+# in kernel-headers.spec when rebuilding without a version change. The
+# %changelog is hand-curated inline in the spec (matches base/comps/kernel).
 release = { calculation = "manual" }
 
-# Version updates: Fedora -> Azure Linux 6.18.31.1
-# Uses 3-part version (6.18.31) + kextraversion (1) scheme matching kernel.
-[components.kernel-headers.build.defines]
-# RPM release number for the Azure Linux kernel-headers package
-azl_pkgrelease = "1"
-# 4th version component from the AZL kernel source (6.18.31.1).
-kextraversion = "1"
-
+# Azure Linux kernel source tarball (rolling-lts/azl4). Same tarball as
+# base/comps/kernel; kept as a separate declaration so kernel-headers builds
+# stand-alone.
 [[components.kernel-headers.source-files]]
-filename = "kernel-6.18.31.1.tar.gz"
-hash = "1bf684812ff3fc38974dc99b3e2309cb46dc5af93ac794e79a4a4f3dd17debfadb14510aeaaa7fa2d4c6254876a9f8bc67b900a1951c8dda5d94e5f5028a7557"
+filename = "kernel-6.18.39.1.tar.gz"
+hash = "cd70c68662ae5fca906a45d2feae1e4cdaed63b0427856f46cbfa6398f2e4b32b6a233f05ea49b359abf9119b0644177637b9638ec773b1d26e8725db042e0c5"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.31.1.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.39.1.tar.gz" }

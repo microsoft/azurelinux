@@ -1,6 +1,3 @@
-# This spec file has been modified by azldev to include build configuration overlays.
-# Do not edit manually; changes may be overwritten.
-
 # Azure Linux local kernel-headers spec.
 #
 # This is a maintained local spec (migrated from the previous azldev TOML
