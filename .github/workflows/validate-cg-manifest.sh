@@ -17,6 +17,7 @@ set -euo pipefail
 
 # Specs, which contain multiple source files and are split into many entries inside 'cgmanifest.json'.
 ignore_multiple_sources=" \
+  rust-bootstrap \
   xorg-x11-apps \
   xorg-x11-font-utils \
   xorg-x11-server-utils \

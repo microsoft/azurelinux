@@ -44,4 +44,5 @@ cp %{SOURCE0} %{SOURCE1} %{SOURCE2} %{SOURCE3} %{SOURCE4} %{SOURCE5} \
 
 %changelog
 * Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.95.0-1
-- Original version. Split out of rust.spec to keep its SRPM small.
+- Original version for Azure Linux. Split out of rust.spec to keep its SRPM small.
+- License verified.

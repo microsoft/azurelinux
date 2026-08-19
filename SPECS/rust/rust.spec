@@ -37,6 +37,7 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 Source1:        rustc-%{version}-src-cargo.tar.gz
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
+#rust-bootstrap must be updated when upgrading rust
 BuildRequires:  rust-bootstrap = %{stage0_version}
 Patch0:         CVE-2025-53605.patch
 Patch1:         CVE-2025-67873.patch
@@ -45,10 +46,10 @@ Patch3:         CVE-2025-4207.patch
 Patch4:         CVE-2025-12818.patch
 Patch5:         CVE-2026-24116.patch
 Patch6:         CVE-2025-58160.patch
-Patch7:        CVE-2026-2006.patch
-Patch8:        CVE-2026-34743.patch
-Patch9:        CVE-2026-40034.patch
-Patch10:       CVE-2026-47143.patch
+Patch7:         CVE-2026-2006.patch
+Patch8:         CVE-2026-34743.patch
+Patch9:         CVE-2026-40034.patch
+Patch10:        CVE-2026-47143.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
