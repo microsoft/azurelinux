@@ -2,17 +2,8 @@
 %define our_gopath %{_topdir}/.gopath
 Summary:        Simple and easy way to configure a layer 3 network fabric designed for Kubernetes
 Name:           flannel
-%{_bindir}/flanneld
-
-%changelog
-* Tue Aug 18 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.24.2-31
-- Bump to rebuild with updated glibc
-
-* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-30
-- Patch for CVE-2026-73500
-
-* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-29
-- Patch for CVE-2026-56852
+Version:        0.24.2
+Release:        31%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -32,7 +23,7 @@ Patch8:         CVE-2026-56852.patch
 Patch9:         CVE-2026-73500.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-21%{?dist}
+BuildRequires:  glibc-static >= 2.38-20%{?dist}
 BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 
@@ -63,10 +54,17 @@ install -p -m 755 -t %{buildroot}%{_bindir} ./dist/flanneld
 %defattr(-,root,root)
 %doc README.md CONTRIBUTING.md DCO
 %license LICENSE
-Patch6:         CVE-2026-32241.patch
-Patch7:         CVE-2026-39821.patch
-Patch8:         CVE-2026-56852.patch
-Patch9:         CVE-2026-73500.patch
+%{_bindir}/flanneld
+
+%changelog
+* Wed Aug 19 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.24.2-31
+- Bump to rebuild with updated glibc
+
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-30
+- Patch for CVE-2026-73500
+
+* Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-29
+- Patch for CVE-2026-56852
 
 * Wed May 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 0.24.2-28
 - Patch for CVE-2026-39821
