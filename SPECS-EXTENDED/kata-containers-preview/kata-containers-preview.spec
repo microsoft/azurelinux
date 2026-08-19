@@ -5,7 +5,7 @@
 
 Name:           kata-containers-preview
 Version:        3.27.0~preview2
-Release:        1%{?dist}
+Release:        2%{?dist}
 
 Summary:        Kata Containers preview package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
@@ -115,6 +115,9 @@ popd
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Wed Oct 15 2025 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.27.0~preview2-2
+- Bump release to rebuild with rust
+
 * Mon Apr 13 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.27.0.preview2-1
 - Auto-upgrade to 3.27.0.preview2
 
