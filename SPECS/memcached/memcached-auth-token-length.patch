@@ -1,0 +1,71 @@
+From 9981d748f866e80a8f2ee1b12bf45717f9595df9 Mon Sep 17 00:00:00 2001
+From: dormando <dormando@rydia.net>
+Date: Fri, 1 May 2026 14:15:19 -0700
+Subject: [PATCH] auth: fix crash when given huge token
+
+Also prevents memory bloat when given extremely but not existentially
+large auth tokens.
+
+Reported by Haruto Kimura (Stella)
+---
+ proto_text.c   | 13 +++++++++++++
+ t/ascii-auth.t |  6 +++++-
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/proto_text.c b/proto_text.c
+index b213c93..69fd169 100644
+--- a/proto_text.c
++++ b/proto_text.c
+@@ -332,6 +332,8 @@ static size_t tokenize_command(char *command, token_t *tokens,
+     return ntokens;
+ }
+ 
++#define MAX_AUTH_REQ_LEN 16384
++
+ int try_read_command_asciiauth(conn *c) {
+     token_t tokens[MAX_TOKENS];
+     size_t ntokens;
+@@ -383,6 +385,17 @@ int try_read_command_asciiauth(conn *c) {
+             return 1;
+         }
+ 
++        if (size > MAX_AUTH_REQ_LEN) {
++            if (!c->resp) {
++                if (!resp_start(c)) {
++                    conn_set_state(c, conn_closing);
++                    return 1;
++                }
++            }
++            out_string(c, "CLIENT_ERROR auth token too long");
++            return 1;
++        }
++
+         // we don't actually care about the key at all; it can be anything.
+         // we do care about the size of the remaining read.
+         c->rlbytes = size + 2;
+diff --git a/t/ascii-auth.t b/t/ascii-auth.t
+index 40ca376ec4..4fad020195 100644
+--- a/t/ascii-auth.t
++++ b/t/ascii-auth.t
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env perl
+ 
+ use strict;
+-use Test::More tests => 9;
++use Test::More tests => 10;
+ use FindBin qw($Bin);
+ use lib "$Bin/lib";
+ use MemcachedTest;
+@@ -21,6 +21,10 @@ like(scalar <$sock>, qr/CLIENT_ERROR/, "failed to do a read");
+ print $sock "set foo 0 0 7\r\nfoo bab\r\n";
+ like(scalar <$sock>, qr/CLIENT_ERROR/, "failed to authenticate");
+ 
++# Super long tokens are invalid.
++print $sock "set foo 0 0 2147483646\r\nasfd\r\n";
++like(scalar <$sock>, qr/CLIENT_ERROR/, "failed to authenticate");
++
+ # Try for real.
+ print $sock "set foo 0 0 7\r\nfoo bar\r\n";
+ like(scalar <$sock>, qr/STORED/, "authenticated?");
+-- 
+2.45.4
