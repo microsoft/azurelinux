@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azl4-marketplace-gen2-cvm">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux 4.0 Marketplace Gen2 Confidential VM (CVM) Image</specification>
+    </description>
+
+    <profiles>
+        <profile name="marketplace-gen2-cvm"     description="Ships azurelinux-repos (runtime → PMC)" import="false" />
+        <profile name="marketplace-gen2-cvm-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+    </profiles>
+
+    <!-- CVM is AMD64-only per PRD -->
+    <preferences arch="x86_64">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyS0 earlyprintk=ttyS0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+
+    <!-- Build-time package source; koji overrides this for distro builds. -->
+    <repository type="rpm-md" alias="azurelinux-base">
+        <source path="https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch" />
+    </repository>
+
+    <packages type="image">
+        <!-- CVM-specific: TPM2 tooling for attestation -->
+        <package name="tpm2-tools" />
+
+        <!-- core-packages-image -->
+        <package name="ca-certificates" />
+        <package name="cronie-anacron" />
+        <package name="dracut" />
+        <package name="logrotate" />
+        <package name="shadow-utils" />
+
+        <!-- core-packages-base-image -->
+        <package name="azurelinux-rpm-config" />
+        <package name="bc" />
+        <package name="chrony" />
+        <package name="cpio" />
+        <package name="cracklib-dicts" />
+        <package name="cryptsetup" />
+        <package name="dbus" />
+        <package name="e2fsprogs" />
+        <package name="file" />
+        <package name="gdbm" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="iproute" />
+        <package name="iptables" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="libtool" />
+        <package name="lvm2" />
+        <package name="lz4" />
+        <package name="net-tools" />
+        <package name="openssh-clients" />
+        <package name="pkg-config" />
+        <package name="procps-ng" />
+        <package name="setup" />
+        <package name="sudo" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-udev" />
+        <package name="tar" />
+        <package name="tzdata" />
+        <package name="util-linux" />
+        <package name="which" />
+
+        <!-- core-packages-container -->
+        <package name="bash" />
+        <package name="bzip2" />
+        <package name="curl" />
+        <package name="elfutils-libelf" />
+        <package name="expat" />
+        <package name="filesystem" />
+        <package name="findutils" />
+        <package name="grep" />
+        <package name="gzip" />
+        <package name="azurelinux-release-cloud" />
+        <package name="ncurses-libs" />
+        <package name="openssl" />
+        <package name="readline" />
+        <package name="rpm" />
+        <package name="rpm-libs" />
+        <package name="sed" />
+        <package name="sqlite-libs" />
+        <package name="SymCrypt" />
+        <package name="SymCrypt-OpenSSL" />
+        <package name="xz" />
+        <package name="zlib" />
+
+        <!-- marketplace-tools -->
+        <package name="debootstrap" />
+        <package name="dnf5" />
+        <package name="wget" />
+
+        <!-- Administration, diagnostics, and troubleshooting baseline -->
+        <package name="acl" />
+        <package name="at" />
+        <package name="atop" />
+        <package name="attr" />
+        <package name="audit" />
+        <package name="bash-completion" />
+        <package name="bind-utils" />
+        <package name="dnf-plugins-core" />
+        <package name="hostname" />
+        <package name="jemalloc" />
+        <package name="keyutils" />
+        <package name="libdnf" />
+        <package name="libuser" />
+        <package name="lsof" />
+        <package name="man-db" />
+        <package name="nano" />
+        <package name="ncurses" />
+        <package name="ncurses-term" />
+        <package name="newt" />
+        <package name="nftables" />
+        <package name="nss" />
+        <package name="nvme-cli" />
+        <package name="pciutils" />
+        <package name="rng-tools" />
+        <package name="rootfiles" />
+        <package name="rsync" />
+        <package name="strace" />
+        <package name="sysstat" />
+        <package name="tcpdump" />
+        <package name="time" />
+        <package name="tmux" />
+        <package name="tpm2-tss" />
+        <package name="traceroute" />
+        <package name="unzip" />
+        <package name="vim-minimal" />
+        <package name="zchunk" />
+
+        <!-- SELinux -->
+        <package name="selinux-policy-targeted" />
+
+        <!-- Azure VM provisioning and guest integration -->
+        <package name="cloud-init" />
+        <package name="cloud-utils-growpart" />
+        <package name="dhcpcd" />
+        <package name="grubby" />
+        <package name="hyperv-daemons" />
+        <package name="openssh-server" />
+        <package name="python3" />
+        <package name="rsyslog" />
+        <package name="WALinuxAgent" />
+        <package name="wireless-regdb" />
+
+        <!-- Azure VM integration -->
+        <package name="azure-vm-utils" />
+        <package name="kernel-modules" />
+
+        <!-- boot: kernel + UEFI bootloader (CVM uses GRUB2 until UKI is available) -->
+        <package name="kernel" />
+        <package name="grub2" />
+        <package name="grub2-efi-x64" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="shim" />
+        <package name="efibootmgr" />
+
+    </packages>
+
+    <!-- Variant-scoped repos package -->
+    <packages type="image" profiles="marketplace-gen2-cvm-dev">
+        <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="image" profiles="marketplace-gen2-cvm">
+        <package name="azurelinux-repos" />
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="filesystem" />
+        <package name="azurelinux-release-identity-cloud" />
+        <package name="grub2-efi-x64-modules" />
+        <package name="grub2-efi-x64" />
+        <package name="shim" />
+    </packages>
+
+    <packages type="bootstrap" profiles="marketplace-gen2-cvm-dev">
+        <package name="azurelinux-repos-dev" />
+    </packages>
+    <packages type="bootstrap" profiles="marketplace-gen2-cvm">
+        <package name="azurelinux-repos" />
+    </packages>
+</image>

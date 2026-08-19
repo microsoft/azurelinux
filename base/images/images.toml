@@ -104,6 +104,46 @@ systemd = true
 runtime-package-management = true
 
 # ---- marketplace-gen2-cvm -----------------------------------------------
+# ---- marketplace-gen2-cvm -----------------------------------------------
+
+[images.marketplace-gen2-cvm]
+description = "Marketplace Gen2 Confidential VM Image"
+definition = { type = "kiwi", path = "marketplace-gen2-cvm/marketplace-gen2-cvm.kiwi", profile = "marketplace-gen2-cvm" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-cvm" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-cvm.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-cvm-dev]
+description = "Marketplace Gen2 Confidential VM Image (dev)"
+definition = { type = "kiwi", path = "marketplace-gen2-cvm/marketplace-gen2-cvm.kiwi", profile = "marketplace-gen2-cvm-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-cvm" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-cvm-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 # ---- minimal-os --------------------------------------------------------
 
 [images.minimal-os]
