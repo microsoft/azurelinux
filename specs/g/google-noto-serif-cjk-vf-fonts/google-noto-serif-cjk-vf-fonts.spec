@@ -5,7 +5,7 @@
 
 Epoch:   1
 Version: 2.003
-Release: 4%{?dist}
+Release: 6%{?dist}
 URL:     https://github.com/googlefonts/noto-cjk
 
 BuildRequires:            python3

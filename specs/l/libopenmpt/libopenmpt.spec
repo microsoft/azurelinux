@@ -3,7 +3,7 @@
 
 Name: libopenmpt
 Version: 0.8.4
-Release: 3%{?dist}
+Release: 5%{?dist}
 
 %global tar_root %{name}-%{version}+release.autotools
 

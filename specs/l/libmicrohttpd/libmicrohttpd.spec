@@ -3,7 +3,7 @@
 
 Name:           libmicrohttpd
 Version:        1.0.2
-Release: 4%{?dist}
+Release: 6%{?dist}
 Epoch:          1
 Summary:        Lightweight library for embedding a webserver in applications
 

@@ -3,7 +3,7 @@
 
 Name:           python-syrupy
 Version:        4.9.1
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:        Pytest snapshot plugin
 
 License:        Apache-2.0

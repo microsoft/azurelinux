@@ -9,7 +9,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.14.0
-Release: 23%{?dist}
+Release: 25%{?dist}
 Summary:        Lesscss compiler
 
 License:        MIT

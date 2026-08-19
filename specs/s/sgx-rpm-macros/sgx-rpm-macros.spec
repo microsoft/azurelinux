@@ -3,7 +3,7 @@
 
 Name: sgx-rpm-macros
 Version: 1
-Release: 4%{?dist}
+Release: 6%{?dist}
 License: MIT-0
 Summary: RPM macros for working with the SGX SDK
 

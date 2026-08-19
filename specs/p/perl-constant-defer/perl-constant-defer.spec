@@ -6,7 +6,7 @@
 
 Name:           perl-constant-defer
 Version:        6
-Release: 35%{?dist}
+Release: 37%{?dist}
 Summary:        Constant subs with deferred value calculation
 License:        GPL-3.0-or-later
 URL:            https://metacpan.org/release/constant-defer

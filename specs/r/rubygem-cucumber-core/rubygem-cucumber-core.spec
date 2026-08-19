@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 10.1.0
-Release: 11%{?dist}
+Release: 13%{?dist}
 Summary: Core library for the Cucumber BDD app
 License: MIT
 URL: https://cucumber.io

@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        %{pypi_version}
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary:        RFC 6570 URI Template Processor
 
 License:        MIT

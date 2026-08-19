@@ -5,7 +5,7 @@
 
 Name:    opensm
 Version: 3.3.24
-Release: 13%{?dist}
+Release: 15%{?dist}
 Summary: OpenIB InfiniBand Subnet Manager and management utilities
 License: GPL-2.0-only OR Linux-OpenIB
 Url:     https://github.com/linux-rdma/opensm

@@ -122,7 +122,7 @@
 
 Name:           %{rocblas_name}
 Version:        %{rocm_version}
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        BLAS implementation for ROCm
 Url:            https://github.com/ROCmSoftwarePlatform/%{upstreamname}
 License:        MIT AND BSD-3-Clause

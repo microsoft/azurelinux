@@ -6,7 +6,7 @@
 
 Name:           dnsconfd
 Version:        1.7.5
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Local DNS cache configuration daemon
 License:        MIT
 URL:            https://github.com/InfrastructureServices/dnsconfd

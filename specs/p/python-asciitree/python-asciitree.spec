@@ -5,7 +5,7 @@
 
 Name:       python-%{pypi_name}
 Version:    0.3.3
-Release: 37%{?dist}
+Release: 39%{?dist}
 Summary:    Draws ASCII trees
 
 License:    MIT

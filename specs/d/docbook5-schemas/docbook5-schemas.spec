@@ -3,7 +3,7 @@
 
 Name: docbook5-schemas
 Version: 5.1
-Release: 16%{?dist}
+Release: 18%{?dist}
 
 Summary: Norman Walsh's schemas (DTD, Relax NG, W3C schema) for Docbook 5.X
 

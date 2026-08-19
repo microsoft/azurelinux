@@ -14,7 +14,7 @@ Version:        174
 %global         debug_package %{nil}
 
 Name:           %{pypi_name}
-Release: 2%{?dist}
+Release: 4%{?dist}
 License:        Apache-2.0
 
 URL:            %{forgeurl}

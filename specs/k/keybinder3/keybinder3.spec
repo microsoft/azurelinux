@@ -3,7 +3,7 @@
 
 Name:		keybinder3
 Version:	0.3.2
-Release: 22%{?dist}
+Release: 24%{?dist}
 Summary:	A library for registering global keyboard shortcuts
 License:	MIT
 URL:		https://github.com/kupferlauncher/keybinder

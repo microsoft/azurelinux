@@ -10,7 +10,7 @@
 
 Name:           perl-XML-Twig
 Version:        3.54
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Perl module for processing huge XML documents in tree mode
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-Twig

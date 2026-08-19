@@ -6,7 +6,7 @@
 
 Name:           trilead-ssh2
 Version:        %{buildver}.%{patchlvl}
-Release: 19%{?dist}
+Release: 21%{?dist}
 Summary:        SSH-2 protocol implementation in pure Java
 
 # Project is under BSD, but some parts are MIT licensed

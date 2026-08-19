@@ -9,7 +9,7 @@
 
 Name:           tog-pegasus
 Version:        %{major_ver}.1
-Release: 87%{?dist}
+Release: 89%{?dist}
 Epoch:          2
 Summary:        OpenPegasus WBEM Services for Linux
 

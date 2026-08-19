@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        0.2.2
-Release: 22%{?dist}
+Release: 24%{?dist}
 Summary:        gRPC for GCP extensions
 
 License:        Apache-2.0

@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.22.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        Python module to handle URLs
 
 License:        Apache-2.0

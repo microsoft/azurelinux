@@ -10,7 +10,7 @@
 
 Name:           python-%{srcname}
 Version:        10.0
-Release: 20%{?dist}
+Release: 22%{?dist}
 Summary:        Human friendly output for text interfaces using Python
 
 License:        MIT

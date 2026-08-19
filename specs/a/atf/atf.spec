@@ -4,7 +4,7 @@
 Summary: Automated Testing Framework
 Name:    atf
 Version: 0.23
-Release: 3%{?dist}
+Release: 5%{?dist}
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
 URL:     https://github.com/freebsd/atf

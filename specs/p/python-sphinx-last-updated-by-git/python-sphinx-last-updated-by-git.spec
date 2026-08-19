@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.2.2
-Release: 21%{?dist}
+Release: 23%{?dist}
 Summary:        Get the "last updated" time for each Sphinx page from Git
 
 # Automatically converted from old format: BSD - review is highly recommended.

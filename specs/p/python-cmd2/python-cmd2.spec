@@ -5,7 +5,7 @@
 
 Name:             python-%{pypi_name}
 Version:          2.5.11
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:          Extra features for standard library's cmd module
 
 License:          MIT

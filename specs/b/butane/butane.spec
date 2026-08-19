@@ -25,7 +25,7 @@ configs for provisioning operating systems that use Ignition.}
 %global godocs          docs README.md
 
 Name:           butane
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        Butane config transpiler
 
 License:        Apache-2.0

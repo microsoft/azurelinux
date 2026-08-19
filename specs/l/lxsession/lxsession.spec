@@ -38,7 +38,7 @@
 
 Name:			lxsession
 Version:		%{main_version}%{git_ver_rpm}
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:		Lightweight X11 session manager
 Summary(de):	Leichtgewichtiger X11 Sitzungsverwalter
 

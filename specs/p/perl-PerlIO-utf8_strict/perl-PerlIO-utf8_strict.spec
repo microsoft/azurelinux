@@ -3,7 +3,7 @@
 
 Name:           perl-PerlIO-utf8_strict
 Version:        0.010
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary:        Fast and correct UTF-8 I/O
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/PerlIO-utf8_strict

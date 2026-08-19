@@ -11,7 +11,7 @@ Name: hunspell-cy
 Summary: Welsh hunspell dictionaries
 %global upstreamid 20040425
 Version: 0.%{upstreamid}
-Release: 37%{?dist}
+Release: 39%{?dist}
 Source: http://download.services.openoffice.org/contrib/dictionaries/cy_GB.zip
 URL: http://www.e-gymraeg.co.uk/
 License: GPL-1.0-or-later

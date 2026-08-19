@@ -8,7 +8,7 @@
 
 Name:           nvme-cli
 Version:        2.16
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        NVMe management command line interface
 
 License:        GPL-2.0-only

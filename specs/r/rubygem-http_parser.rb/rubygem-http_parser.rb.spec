@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	0.8.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:	Simple callback-based HTTP request/response parser
 License:	MIT
 URL:		https://github.com/tmm1/http_parser.rb

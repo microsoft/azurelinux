@@ -9,7 +9,7 @@
 
 Name:           python-%{srcname}
 Version:        0.9.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary:        VCR imitation for python-requests
 
 License:        Apache-2.0

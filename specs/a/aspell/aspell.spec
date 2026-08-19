@@ -4,7 +4,7 @@
 Summary: Spell checker
 Name: aspell
 Version: 0.60.8.1
-Release: 6%{?dist}
+Release: 8%{?dist}
 Epoch: 12
 # LGPLv2+ .. common/gettext.h
 # LGPLv2  .. modules/speller/default/phonet.hpp,

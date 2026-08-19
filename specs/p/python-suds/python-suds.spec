@@ -3,7 +3,7 @@
 
 Name:           python-suds
 Version:        1.2.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        A python SOAP client
 
 License:        LGPL-3.0-or-later

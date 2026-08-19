@@ -10,7 +10,7 @@
 Name: hunspell-hu
 Summary: Hungarian hunspell dictionaries
 Version: 1.6.1
-Release: 32%{?dist}
+Release: 34%{?dist}
 Source: http://downloads.sourceforge.net/magyarispell/hu_HU-%{version}.tar.gz
 URL: http://magyarispell.sourceforge.net
 License: LGPL-2.1-or-later OR GPL-2.0-or-later OR MPL-1.1

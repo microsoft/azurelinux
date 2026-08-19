@@ -11,7 +11,7 @@
 
 Name:               python-%{modname}
 Version:            1.7.1
-Release: 32%{?dist}
+Release: 34%{?dist}
 Summary:            %{sum}
 
 License:            BSD-3-Clause

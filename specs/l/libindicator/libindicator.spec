@@ -3,7 +3,7 @@
 
 Name:		libindicator
 Version:	12.10.1
-Release: 32%{?dist}
+Release: 34%{?dist}
 Summary:	Shared functions for Ayatana indicators
 
 # SPDX confirmed

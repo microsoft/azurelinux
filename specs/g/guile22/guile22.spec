@@ -9,7 +9,7 @@
 
 Name: guile22
 Version: 2.2.7
-Release: 19%{?dist}
+Release: 21%{?dist}
 Summary: A GNU implementation of Scheme for application extensibility
 Source: ftp://ftp.gnu.org/pub/gnu/guile/guile-%{version}.tar.xz
 URL: http://www.gnu.org/software/guile/

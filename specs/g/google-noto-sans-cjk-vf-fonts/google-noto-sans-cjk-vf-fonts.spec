@@ -5,7 +5,7 @@
 
 Epoch:   1
 Version: 2.004
-Release: 11%{?dist}
+Release: 13%{?dist}
 URL:     https://github.com/googlefonts/noto-cjk
 
 %global foundry           Google

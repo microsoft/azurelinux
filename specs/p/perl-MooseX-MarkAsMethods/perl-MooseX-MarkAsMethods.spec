@@ -3,7 +3,7 @@
 
 Name:           perl-MooseX-MarkAsMethods
 Version:        0.15
-Release: 38%{?dist}
+Release: 40%{?dist}
 Summary:        Mark overload code symbols as methods
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

@@ -9,7 +9,7 @@
 Summary:       Python bindings for CUPS
 Name:          python-cups
 Version:       2.0.4
-Release: 8%{?dist}
+Release: 10%{?dist}
 # older URL, but still with useful information about pycups
 #URL:           http://cyberelk.net/tim/software/pycups/
 URL:           https://github.com/OpenPrinting/pycups/

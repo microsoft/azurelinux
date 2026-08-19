@@ -3,7 +3,7 @@
 
 Name:           python-ukkonen
 Version:        1.0.1
-Release: 21%{?dist}
+Release: 23%{?dist}
 Summary:        Implementation of bounded Levenshtein distance (Ukkonen)
 
 License:        MIT

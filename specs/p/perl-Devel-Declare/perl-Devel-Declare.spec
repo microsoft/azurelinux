@@ -10,7 +10,7 @@
 
 Name:           perl-Devel-Declare
 Version:        0.006022
-Release: 26%{?dist}
+Release: 28%{?dist}
 Summary:        Adding keywords to perl, in perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Devel-Declare

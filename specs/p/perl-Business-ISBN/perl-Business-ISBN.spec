@@ -11,7 +11,7 @@
 Name:           perl-Business-ISBN
 %global cpan_version 3.011
 Version:        %(echo '%{cpan_version}' | tr '_' '.'})
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary:        Perl module to work with International Standard Book Numbers
 
 License:        Artistic-2.0

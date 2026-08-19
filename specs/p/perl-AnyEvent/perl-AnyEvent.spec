@@ -39,7 +39,7 @@
 
 Name:           perl-AnyEvent
 Version:        7.17
-Release: 22%{?dist}
+Release: 24%{?dist}
 Summary:        Framework for multiple event loops
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/AnyEvent

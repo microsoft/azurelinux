@@ -3,7 +3,7 @@
 
 Name:           perl-ColorThemes-Standard
 Version:        0.003
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary:        Standard collection of generic color themes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/ColorThemes-Standard/

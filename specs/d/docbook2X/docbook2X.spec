@@ -3,7 +3,7 @@
 
 Name:           docbook2X
 Version:        0.8.8
-Release: 51%{?dist}
+Release: 53%{?dist}
 Summary:        Convert docbook into man and Texinfo
 
 License:        MIT

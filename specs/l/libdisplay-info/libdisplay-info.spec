@@ -7,7 +7,7 @@
 
 Name:           libdisplay-info
 Version:        0.2.0
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        EDID and DisplayID library
 
 # Main license: MIT

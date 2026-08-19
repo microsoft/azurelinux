@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.17
-Release: 16%{?dist}
+Release: 18%{?dist}
 Summary: Ruby extension for the vips image processing library
 License: MIT
 URL: http://github.com/libvips/ruby-vips

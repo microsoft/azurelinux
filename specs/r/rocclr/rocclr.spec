@@ -63,7 +63,7 @@
 
 Name:           rocclr
 Version:        %{rocm_version}
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        ROCm Compute Language Runtime
 Url:            https://github.com/ROCm/clr
 License:        MIT

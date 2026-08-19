@@ -3,7 +3,7 @@
 
 Name:           tini
 Version:        0.19.0
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary:        A tiny but valid init for containers
 
 License:        MIT

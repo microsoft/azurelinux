@@ -3,7 +3,7 @@
 
 Name:       generic-logos
 Version:    18.0.0
-Release: 27%{?dist}
+Release: 29%{?dist}
 Summary:    Icons and pictures
 
 URL:        https://pagure.io/generic-logos

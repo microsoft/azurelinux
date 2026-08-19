@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.3.5
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary: Modern concurrency tools for Ruby
 License: MIT
 URL: http://www.concurrent-ruby.com

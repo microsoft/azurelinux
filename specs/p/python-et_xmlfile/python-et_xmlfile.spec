@@ -11,7 +11,7 @@ the openpyxl project but is now a standalone module.
 
 Name:           python-%{pypi_name}
 Version:        2.0.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        %{sum}
 
 License:        MIT

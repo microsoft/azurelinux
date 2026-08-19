@@ -4,7 +4,7 @@
 Summary:        Line wrapping with support for several locale setups
 Name:           perl-Text-WrapI18N
 Version:        0.06
-Release: 53%{?dist}
+Release: 55%{?dist}
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 
 URL:            https://metacpan.org/release/Text-WrapI18N

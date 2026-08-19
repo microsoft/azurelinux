@@ -9,7 +9,7 @@
 
 Name:           lua-term
 Version:        0.08
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary:        Terminal functions for Lua
 
 License:        MIT

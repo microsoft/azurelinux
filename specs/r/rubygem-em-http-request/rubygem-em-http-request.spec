@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.7
-Release: 15%{?dist}
+Release: 17%{?dist}
 Summary: EventMachine based, async HTTP Request client
 License: MIT
 URL: http://github.com/igrigorik/em-http-request

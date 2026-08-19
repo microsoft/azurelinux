@@ -18,7 +18,7 @@ Protoc plugin to generate polyglot message validators.}
                         rule_comparison.md README.md java/RELEASING.md
 
 Name:           %{goname}
-Release: 19%{?dist}
+Release: 21%{?dist}
 Summary:        Protoc plugin to generate polyglot message validators
 
 # Upstream license specification: Apache-2.0

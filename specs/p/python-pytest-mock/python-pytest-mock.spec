@@ -7,7 +7,7 @@
 
 Name:           python-%{package_name}
 Version:        3.14.1
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Thin-wrapper around the mock package for easier use with py.test
 
 License:        MIT

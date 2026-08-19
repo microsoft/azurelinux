@@ -6,7 +6,7 @@
 
 Name:           perl-XML-Catalog
 Version:        %(echo '%{cpan_version}' | tr -d 'v')
-Release: 34%{?dist}
+Release: 36%{?dist}
 Summary:        Resolve public identifiers and remap system identifiers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/XML-Catalog

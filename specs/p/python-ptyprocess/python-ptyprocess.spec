@@ -7,7 +7,7 @@
 
 Name:           python-ptyprocess
 Version:        0.7.0
-Release: 15%{?dist}
+Release: 17%{?dist}
 Summary:        Run a subprocess in a pseudo terminal
 
 License:        ISC

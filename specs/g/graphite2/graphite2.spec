@@ -3,7 +3,7 @@
 
 Name:           graphite2
 Version:        1.3.14
-Release: 20%{?dist}
+Release: 22%{?dist}
 Summary:        Font rendering capabilities for complex non-Roman writing systems
 
 # As per COPYING file this library is tri-licensed

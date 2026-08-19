@@ -13,7 +13,7 @@
 
 Name:           mysql-selinux
 Version:        1.0.14
-Release: 3%{?dist}
+Release: 5%{?dist}
 
 License:        GPL-3.0-only
 URL:            https://github.com/devexp-db/mysql-selinux

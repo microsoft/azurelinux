@@ -3,7 +3,7 @@
 
 Name:           libtpms
 Version:        0.10.2
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD-3-Clause AND LicenseRef-TCGL
 

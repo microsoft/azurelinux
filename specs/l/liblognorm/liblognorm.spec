@@ -5,7 +5,7 @@
 
 Name:		liblognorm
 Version:	2.0.6
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary:	Fast samples-based log normalization library
 License:	LGPL-2.1-or-later AND Apache-2.0
 URL:		http://www.liblognorm.com

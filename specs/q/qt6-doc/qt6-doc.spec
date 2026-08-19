@@ -4,7 +4,7 @@
 Name:    qt6-doc
 Summary: Qt6 - Complete documentation
 Version: 6.9.1
-Release: 4%{?dist}
+Release: 6%{?dist}
 BuildArch: noarch
 
 License: GFDL

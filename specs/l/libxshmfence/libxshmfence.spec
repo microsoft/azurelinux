@@ -3,7 +3,7 @@
 
 Name:           libxshmfence
 Version:        1.3.2
-Release: 8%{?dist}
+Release: 10%{?dist}
 Summary:        X11 shared memory fences
 
 License:        HPND-sell-variant

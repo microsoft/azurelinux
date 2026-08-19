@@ -9,7 +9,7 @@
 
 Name:           rust-peg0.5
 Version:        0.5.7
-Release: 14%{?dist}
+Release: 16%{?dist}
 Summary:        Simple Parsing Expression Grammar (PEG) parser generator
 
 License:        MIT

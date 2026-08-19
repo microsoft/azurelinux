@@ -2,6 +2,6 @@
 version = 1
 import-commit = 'c4442665a5c05f3b01546f16b7d245bdab14cf98'
 upstream-commit = 'c4442665a5c05f3b01546f16b7d245bdab14cf98'
-manual-bump = 1
-input-fingerprint = 'sha256:4197495a5773a914eeaf286a91eca09f631857d5defc8d7efd580cf6cc074b11'
+manual-bump = 2
+input-fingerprint = 'sha256:22b89033f21f6edafbff08e77ace32ca90e16435709fe8b28f0e683e059b96fe'
 resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'

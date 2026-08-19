@@ -6,7 +6,7 @@
 
 Name:           patchelf
 Version:        0.18.0
-Release: 10%{?dist}
+Release: 12%{?dist}
 Summary:        A utility for patching ELF binaries
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

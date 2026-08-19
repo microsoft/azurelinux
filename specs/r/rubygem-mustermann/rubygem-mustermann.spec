@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.0.3
-Release: 4%{?dist}
+Release: 6%{?dist}
 Summary: Your personal string matching expert
 License: MIT
 URL: https://github.com/sinatra/mustermann

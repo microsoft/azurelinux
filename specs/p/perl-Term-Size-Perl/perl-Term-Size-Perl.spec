@@ -3,7 +3,7 @@
 
 Name:           perl-Term-Size-Perl
 Version:        0.031
-Release: 23%{?dist}
+Release: 25%{?dist}
 Summary:        Perl extension for retrieving terminal size (Perl version)
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Term-Size-Perl

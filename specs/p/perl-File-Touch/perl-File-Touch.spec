@@ -3,7 +3,7 @@
 
 Name:           perl-File-Touch
 Version:        0.12
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary:        Update access, modification timestamps, creating nonexistent files
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/File-Touch

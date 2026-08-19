@@ -6,7 +6,7 @@
 Name:    kf6-ksvg
 Summary: Components for handling SVGs
 Version: 6.23.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 
 License: CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:     https://invent.kde.org/frameworks/%{framework}

@@ -5,7 +5,7 @@
 
 Name:           schroedinger
 Version:        1.0.11
-Release: 35%{?dist}
+Release: 37%{?dist}
 Summary:        Portable libraries for the high quality Dirac video codec
 
 # No version is given for the GPL or the LGPL

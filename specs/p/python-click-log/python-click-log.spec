@@ -7,7 +7,7 @@
 
 Name:           python-%{srcname}
 Version:        0.4.0
-Release: 16%{?dist}
+Release: 18%{?dist}
 Summary:        %{sum}
 
 License:        MIT

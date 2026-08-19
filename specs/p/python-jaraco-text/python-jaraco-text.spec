@@ -19,7 +19,7 @@
 
 Name:           python-%{pkg_name}
 Version:        4.0.0
-Release: 8%{?dist}
+Release: 10%{?dist}
 Summary:        Module for text manipulation
 
 License:        MIT

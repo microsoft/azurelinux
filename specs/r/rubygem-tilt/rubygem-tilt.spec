@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.2.0
-Release: 6%{?dist}
+Release: 8%{?dist}
 Summary: Generic interface to multiple Ruby template engines
 License: MIT
 URL: https://github.com/jeremyevans/tilt

@@ -3,7 +3,7 @@
 
 Name: python-pytest-sourceorder
 Version: 0.6.0
-Release: 18%{?dist}
+Release: 20%{?dist}
 Summary: Test-ordering plugin for pytest
 
 # Automatically converted from old format: GPLv3+ - review is highly recommended.

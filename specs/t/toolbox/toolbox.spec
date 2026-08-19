@@ -45,7 +45,7 @@ Version:       0.3
 %endif
 %endif
 
-Release: 2%{?dist}
+Release: 4%{?dist}
 Summary:       Tool for interactive command line environments on Linux
 
 License:       Apache-2.0

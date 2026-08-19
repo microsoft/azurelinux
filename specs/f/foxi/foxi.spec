@@ -10,7 +10,7 @@ Name:           foxi
 License:        MIT
 # 1.4.1 comes from VERSION_NUMBER file
 Version:        1.4.1^git%{date0}.%{shortcommit0}
-Release: 7%{?dist}
+Release: 9%{?dist}
 
 # Only for pytorch's arch
 ExclusiveArch:  x86_64 aarch64

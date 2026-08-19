@@ -4,7 +4,7 @@
 Name: hyphen-as
 Summary: Assamese hyphenation rules
 Version: 0.7.0
-Release: 29%{?dist}
+Release: 31%{?dist}
 Epoch: 1
 Source: http://download.savannah.gnu.org/releases/smc/hyphenation/patterns/%{name}-%{version}.tar.bz2
 URL: http://wiki.smc.org.in

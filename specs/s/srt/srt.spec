@@ -5,7 +5,7 @@
 
 Name:           srt
 Version:        1.5.4
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary:        Secure Reliable Transport protocol tools
 
 License:        MPL-2.0

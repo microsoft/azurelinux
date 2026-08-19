@@ -22,7 +22,7 @@
 
 Name:           bind-dyndb-ldap
 Version:        11.11
-Release: 11%{?dist}
+Release: 13%{?dist}
 Summary:        LDAP back-end plug-in for BIND
 
 License:        GPL-2.0-or-later

@@ -13,7 +13,7 @@
 Name:    extra-cmake-modules
 Summary: Additional modules for CMake build system
 Version: 6.23.0
-Release: 2%{?dist}
+Release: 4%{?dist}
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
 URL:     https://api.kde.org/ecm/

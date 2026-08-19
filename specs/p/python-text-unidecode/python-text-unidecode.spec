@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.3
-Release: 25%{?dist}
+Release: 27%{?dist}
 Summary:        A Python module for handling non-Roman text data
 
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.

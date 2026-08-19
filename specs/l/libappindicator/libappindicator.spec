@@ -15,7 +15,7 @@
 
 Name:		libappindicator
 Version:	12.10.1
-Release: 10%{?dist}
+Release: 12%{?dist}
 Summary:	Application indicators library
 
 # Automatically converted from old format: LGPLv2 and LGPLv3 - review is highly recommended.

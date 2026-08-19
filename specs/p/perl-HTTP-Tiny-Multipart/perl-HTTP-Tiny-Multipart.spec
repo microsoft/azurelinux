@@ -3,7 +3,7 @@
 
 Name:           perl-HTTP-Tiny-Multipart
 Version:        0.08
-Release: 21%{?dist}
+Release: 23%{?dist}
 Summary:        Add post_multipart to HTTP::Tiny
 
 License:        Artistic-2.0

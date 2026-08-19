@@ -3,7 +3,7 @@
 
 Name:           usbredir
 Version:        0.15.0
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:        USB network redirection protocol libraries
 License:        LGPL-2.1-or-later
 URL:            https://www.spice-space.org/usbredir.html

@@ -3,7 +3,7 @@
 
 Name:		perl-List-MoreUtils
 Version:	0.430
-Release: 15%{?dist}
+Release: 17%{?dist}
 Summary:	Provide the stuff missing in List::Util
 # All code present in version 0.416: GPL-1.0-or-later OR Artistic-1.0-Perl
 # All new code from version 0.417 onwards: Apache-2.0

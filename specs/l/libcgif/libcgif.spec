@@ -21,7 +21,7 @@
 Name:          %{libname}
 Summary:       A fast and lightweight GIF encoder
 Version:       0.5.1
-Release: 2%{?dist}
+Release: 4%{?dist}
 License:       MIT
 
 URL:           https://github.com/%{gh_owner}/%{gh_project}

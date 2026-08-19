@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.0
-Release: 12%{?dist}
+Release: 14%{?dist}
 Summary:        Auto-generate Sphinx API docs from Zope interfaces
 
 License:        BSD-3-Clause-Modification

@@ -3,7 +3,7 @@
 
 Name: libaio
 Version: 0.3.111
-Release: 23%{?dist}
+Release: 25%{?dist}
 Summary: Linux-native asynchronous I/O access library
 License: LGPL-2.0-or-later
 Source: http://releases.pagure.org/libaio/libaio-0.3.111.tar.gz

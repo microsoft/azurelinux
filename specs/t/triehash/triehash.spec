@@ -5,7 +5,7 @@
 
 Name:           triehash
 Version:        0.3
-Release: 17%{?dist}
+Release: 19%{?dist}
 Summary:        Generator for order-preserving minimal perfect hash functions in C
 
 License:        MIT

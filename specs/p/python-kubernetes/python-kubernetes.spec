@@ -21,7 +21,7 @@
 Name:       python-%{library}
 Epoch:      1
 Version:    34.1.0
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary:    Python client for the kubernetes API.
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:    Apache-2.0
