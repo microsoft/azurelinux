@@ -7,7 +7,7 @@
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 1
+%define azl_pkgrelease 2
 # 4th version component from the AZL kernel source (6.18.39.1). Flows into
 # Release:, uname -r, and the /lib/modules/ path.
 %define kextraversion 1
@@ -4609,6 +4609,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.2
+- feat(kernel): enable TCP BBR3 congestion control as a module
+
 * Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.39.1
 

@@ -3105,14 +3105,14 @@
           "values": [
             {
               "architecture": "x86_64",
-              "value": "n"
+              "value": "m"
             },
             {
               "architecture": "arm64",
-              "value": "n"
+              "value": "m"
             }
           ],
-          "justification": "Align kernel 6.18 with its generated configuration"
+          "justification": "Provide BBRv3 congestion control as an optional module on Azure Linux 4.0"
         },
         {
           "name": "CONFIG_UCLAMP_TASK",
