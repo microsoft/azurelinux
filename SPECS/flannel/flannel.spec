@@ -23,7 +23,7 @@ Patch8:         CVE-2026-56852.patch
 Patch9:         CVE-2026-73500.patch
 BuildRequires:  gcc
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:  golang < 1.25
 BuildRequires:  kernel-headers
 
