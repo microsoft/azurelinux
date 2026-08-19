@@ -27,28 +27,25 @@ mkdir -p %{_builddir}/%{name}-%{version}
 echo "This is a test file for xsign-proxy signing" > "$TEST_FILE"
 echo "Created test file: $TEST_FILE"
 
-XSIGN_PROXY_CLIENT=/usr/local/bin/xsign_proxy_client.py
+# Check if pesign is available for direct signing
+PESIGN_CLIENT=/usr/bin/pesign
 
 # Are we running on a secure-boot image?
-if [ -x "$XSIGN_PROXY_CLIENT" ]; then
+if [ -x "$PESIGN_CLIENT" ]; then
 
     SIGNED_TEST_FILE="%{_builddir}/%{name}-%{version}/test-file-%{name}-%{version}.txt"
 
-    echo "===  verify the socket directory is bind-mounted ==="
-    if [ ! -d /var/run/xsign-proxy ]; then
-        echo "FAIL: Socket directory /var/run/xsign-proxy not found"
-        exit 1
-    fi
-
-    echo "===  pinging xsign-proxy-d daemon ==="
-    "$XSIGN_PROXY_CLIENT" ping
-    echo "PASS: Daemon responded to ping"
-
-    echo "=== signing the test file ==="
-    "$XSIGN_PROXY_CLIENT" sign \
-        --input-file "$TEST_FILE" \
-        --output-file "$SIGNED_TEST_FILE"
-    echo "PASS: Sign request completed successfully"
+    echo "=== Using pesign for secure-boot signing ==="
+    
+    # Sign using pesign-client
+    echo "=== signing the test file with pesign ==="
+    sudo -u pesign pesign-client \
+        --sign \
+        --token "OpenSC Card" \
+        --certificate "IPL" \
+        --infile "$TEST_FILE" \
+        --outfile "$SIGNED_TEST_FILE"
+    echo "PASS: pesign sign request completed successfully"
 
     ls -la "$TEST_FILE"
     ls -la "$SIGNED_TEST_FILE"
