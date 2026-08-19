@@ -2727,6 +2727,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "direnv",
+          "version": "2.37.1",
+          "downloadUrl": "https://github.com/direnv/direnv/archive/refs/tags/v2.37.1.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "discount",
           "version": "2.2.7",
           "downloadUrl": "https://github.com/Orc/discount/archive/v2.2.7.tar.gz"
