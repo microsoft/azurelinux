@@ -32,7 +32,7 @@ jobs:
     # Prevent forks from running a stale/vulnerable copy of this stub with Actions enabled
     if: github.repository == 'microsoft/azurelinux'
     # Intentionally branch-pinned so the reusable workflow picks up updates automatically.
-    uses: microsoft/azurelinux/.github/workflows/check-rendered-specs.yml@b2b2b90f92842dc37bcd6f81c40e9b44ff8aea9a # 4.0
+    uses: microsoft/azurelinux/.github/workflows/check-rendered-specs.yml@4.0 # zizmor: ignore[unpinned-uses]
     permissions:
       contents: read
       pull-requests: write # Post/update/delete drift comments on PRs
