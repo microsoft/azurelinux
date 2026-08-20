@@ -7,6 +7,8 @@ Also prevents memory bloat when given extremely but not existentially
 large auth tokens.
 
 Reported by Haruto Kimura (Stella)
+
+Upstream Patch Reference : https://github.com/memcached/memcached/commit/9981d748f8
 ---
  proto_text.c   | 13 +++++++++++++
  t/ascii-auth.t |  6 +++++-
