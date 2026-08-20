@@ -1,0 +1,94 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Triggers are configured on the ADO pipeline definition.
+trigger: none
+
+parameters:
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - group: "Agent pools (DEV)"
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      use1esentry: false # Required by the current hosted-pool configuration.
+      LinuxHostVersion:
+        Network: R1
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: CheckSpecFiles
+        displayName: "Spec files check"
+        jobs:
+          - job: CheckSpecFiles
+            displayName: "Spec files check"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/CheckSpecFiles"
+            steps:
+              - checkout: self
+                fetchDepth: 0
+                persistCredentials: true
+
+              - task: PipAuthenticate@1
+                displayName: "Authenticate internal pip feed"
+                inputs:
+                  onlyAddExtraIndex: false
+                  artifactFeeds: "MarinerFeed"
+
+              - bash: |
+                  set -euo pipefail
+
+                  if [[ -z "${SYSTEM_PULLREQUEST_TARGETBRANCH:-}" ]]; then
+                    echo "System.PullRequest.TargetBranch is required."
+                    exit 1
+                  fi
+
+                  target_branch="${SYSTEM_PULLREQUEST_TARGETBRANCH#refs/heads/}"
+                  git fetch origin "refs/heads/${target_branch}:refs/remotes/origin/${target_branch}"
+                  base_sha="$(git merge-base HEAD "refs/remotes/origin/${target_branch}")"
+
+                  mapfile -t changed_specs < <(
+                    git diff --diff-filter=d --name-only "${base_sha}" HEAD |
+                      grep -E '^SPECS[^/]*/.+\.spec$' || true
+                  )
+
+                  if (( ${#changed_specs[@]} == 0 )); then
+                    echo "No changed spec files to validate."
+                    exit 0
+                  fi
+
+                  printf 'Spec files to validate:\n'
+                  printf '  %s\n' "${changed_specs[@]}"
+
+                  toolchain_spec_list="$(make --no-print-directory -sC toolkit printvar-toolchain_spec_list)"
+
+                  python3 --version | grep -E '^Python 3\.12(\.|$)'
+                  python3 -m venv "$(Agent.TempDirectory)/check-spec-files-venv"
+                  source "$(Agent.TempDirectory)/check-spec-files-venv/bin/activate"
+                  python -m pip install --quiet -r toolkit/scripts/requirements.txt
+                  python toolkit/scripts/check_spec_guidelines.py \
+                    --toolchain_specs "${toolchain_spec_list}" \
+                    --specs "${changed_specs[@]}"
+                displayName: "Check changed spec files"
+                env:
+                  SYSTEM_PULLREQUEST_TARGETBRANCH: "$(System.PullRequest.TargetBranch)"

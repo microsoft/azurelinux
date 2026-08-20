@@ -1,0 +1,69 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+# Triggers are configured on the ADO pipeline definition.
+trigger: none
+
+parameters:
+  - name: debug
+    type: boolean
+    default: false
+    displayName: "Run in debug mode"
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: OneBranch.Pipelines/GovernedTemplates
+      ref: refs/heads/main
+
+variables:
+  - group: "Agent pools (DEV)"
+  - name: system.debug
+    value: "${{ parameters.debug }}"
+
+extends:
+  template: v2/OneBranch.NonOfficial.CrossPlat.yml@templates
+  parameters:
+    featureFlags:
+      use1esentry: false # Required by the current hosted-pool configuration.
+      LinuxHostVersion:
+        Network: R1
+    globalSdl:
+      credscan:
+        suppressionsFile: .config/CredScanSuppressions.json
+    stages:
+      - stage: CheckStaticGlibc
+        displayName: "Static glibc version check"
+        jobs:
+          - job: CheckStaticGlibc
+            displayName: "Static glibc version check"
+            pool:
+              type: linux
+              isCustom: true
+              name: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
+            variables:
+              ob_outputDirectory: "$(Pipeline.Workspace)/not_used/CheckStaticGlibc"
+            steps:
+              - checkout: self
+                fetchDepth: 1
+
+              - task: PipAuthenticate@1
+                displayName: "Authenticate internal pip feed"
+                inputs:
+                  onlyAddExtraIndex: false
+                  artifactFeeds: "MarinerFeed"
+
+              - bash: |
+                  set -euo pipefail
+
+                  python3 --version | grep -E '^Python 3\.12(\.|$)'
+                  python3 -m venv "$(Agent.TempDirectory)/check-static-glibc-venv"
+                  source "$(Agent.TempDirectory)/check-static-glibc-venv/bin/activate"
+                  python -m pip install --quiet -r toolkit/scripts/requirements.txt
+
+                  mapfile -t specs < <(
+                    find SPECS SPECS-EXTENDED SPECS-SIGNED -type f -name '*.spec' -print
+                  )
+                  python toolkit/scripts/check_static_glibc.py "${specs[@]}"
+                displayName: "Check static glibc dependencies"
