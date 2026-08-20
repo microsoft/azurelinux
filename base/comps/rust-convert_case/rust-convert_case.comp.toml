@@ -1,0 +1,6 @@
+[components.rust-convert_case]
+# Pin past the distro default snapshot to Fedora f43 HEAD, providing
+# convert_case 0.10.0, required by rust-proptest-macro (patched to accept
+# crate(convert_case) >=0.10,<0.12). Consumers requiring older convert_case
+# ranges are served by rust-convert_case0.4/0.6/0.7.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "cdfa9545236b7c8ff0e311ccab27c8a364d8127a" }
