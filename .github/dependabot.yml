@@ -25,9 +25,28 @@ updates:
         patterns:
           - "*"
 
-  # GitHub Actions used by PR-check workflows.
+  # GitHub Actions used by PR-check workflows on the default branch.
   - package-ecosystem: github-actions
     directory: /
+    target-branch: "4.0"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - github-actions
+    # github-actions cooldown only supports a flat default-days (no semver granularity).
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # GitHub Actions used by PR-check workflows on the development branch.
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: "3.0-dev"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
