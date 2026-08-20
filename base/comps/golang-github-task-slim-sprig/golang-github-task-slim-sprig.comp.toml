@@ -1,0 +1,17 @@
+[components.golang-github-task-slim-sprig]
+
+[[components.golang-github-task-slim-sprig.overlays]]
+description = "Force float64 rounding before math.Modf to prevent fused arithmetic from changing round results"
+type = "patch-add"
+source = "0001-numeric-force-float64-rounding-before-modf.patch"
+
+[[components.golang-github-task-slim-sprig.overlays]]
+description = "Apply the float64 rounding patch after Go source preparation"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]
+
+[components.golang-github-task-slim-sprig.overlays.metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"
+bugs = [{ url = "https://github.com/golang/go/issues/77657" }]
