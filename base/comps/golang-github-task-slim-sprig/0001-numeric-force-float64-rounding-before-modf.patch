@@ -1,0 +1,22 @@
+From 0f85e14d9ed22d40591320b7afef80351cba390d Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Tue, 18 Aug 2026 00:00:00 +0000
+Subject: [PATCH] numeric: force float64 rounding before Modf
+
+Go may fuse the multiplication passed to math.Modf on arm64, preserving
+additional precision and changing the result of round. An explicit float64
+conversion forces rounding to float64 precision before the Modf call, as
+recommended in golang/go#77657.
+---
+ numeric.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/numeric.go b/numeric.go
+index 7a73fc4..f3abf5c 100644
+--- a/numeric.go
++++ b/numeric.go
+@@ -171 +171 @@ func round(a interface{}, p int, rOpt ...float64) float64 {
+-	digit := pow * val
++	digit := float64(pow * val)
+--
+2.51.0
