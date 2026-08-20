@@ -46,7 +46,7 @@ _LARGEST_PACKAGES_TO_LOG = 15
 
 
 def _family_of(image_name: str, known: Iterable[str]) -> str | None:
-    """Map an ``--image-name`` to its family (e.g. ``container-base-dev`` → ``container-base``)."""
+    """Map an ``--image-name`` to its family, including optional suffixed variants."""
     for family in known:
         if image_name == family or image_name.startswith(family + "-"):
             return family

@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 11;
+    release_number = 12;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -21,40 +21,28 @@ URL:            https://aka.ms/azurelinux
 BuildArch:      noarch
 
 # Required by %%check
-BuildRequires:  gnupg sed rpm
+BuildRequires:  gnupg rpm
 
 Source1:        archmap
-Source2:        azurelinux.repo.in
-Source3:        microsoft.repo
+Source2:        azurelinux.repo
+Source3:        azurelinux-preview.repo
+Source4:        cloud-native.repo
+Source5:        cloud-native-preview.repo
+Source6:        microsoft.repo
+Source7:        microsoft-preview.repo
 
 Source10:       RPM-GPG-KEY-azurelinux-4.0-primary
 
-# This main package is the default subpackage: official repositories.
-# Resolves against packages.microsoft.com; repos and packages are GPG signed.
-RemovePathPostfixes: .main
 Provides:       azurelinux-repos(%{version}) = %{release}
 Requires:       system-release(%{version})
 Requires:       azurelinux-gpg-keys >= %{version}-%{release}
-Conflicts:      %{name}-dev
+Obsoletes:      %{name}-dev < %{version}-%{release}
 
 %description
-This package provides the official Azure Linux yum/dnf repo definitions.
-
-# Alternate subpackage: daily dev repositories. Unsigned; GPG checks disabled.
-%package dev
-Summary:        Azure Linux development package repository definitions
-
-RemovePathPostfixes: .dev
-Provides:       azurelinux-repos(%{version}) = %{release}
-Requires:       system-release(%{version})
-Requires:       azurelinux-gpg-keys >= %{version}-%{release}
-Conflicts:      %{name}
-
-%description dev
-This package provides the development Azure Linux yum/dnf repo definitions
-that resolve against daily development repositories. Repository
-metadata and packages from these repositories are NOT GPG signed; signature
-verification is disabled.
+This package provides the production and preview Azure Linux yum/dnf repo
+definitions. Production binary repositories are enabled by default; preview
+repositories are temporarily enabled until production repositories are fully
+populated; source and debuginfo repositories are disabled by default.
 
 %package -n azurelinux-gpg-keys
 Summary:        Azure Linux RPM keys
@@ -69,14 +57,14 @@ This package provides the RPM signature keys.
 
 %install
 # Install the keys
-install -d -m 755 $RPM_BUILD_ROOT/etc/pki/rpm-gpg
-install -m 644 %{_sourcedir}/RPM-GPG-KEY* $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
+install -d -m 755 "%{buildroot}%{_sysconfdir}/pki/rpm-gpg"
+install -m 644 %{_sourcedir}/RPM-GPG-KEY* "%{buildroot}%{_sysconfdir}/pki/rpm-gpg/"
 
 # Link the primary/secondary keys to arch files, according to archmap.
 # Ex: if there's a key named RPM-GPG-KEY-azurelinux-4.0-primary, and archmap
 #     says "azurelinux-4.0-primary: x86_64 aarch64",
 #     RPM-GPG-KEY-azurelinux-4.0-{x86_64,aarch64} will be symlinked to that key.
-pushd $RPM_BUILD_ROOT/etc/pki/rpm-gpg/
+pushd "%{buildroot}%{_sysconfdir}/pki/rpm-gpg/"
 for keyfile in RPM-GPG-KEY*; do
     # resolve symlinks, so that we don't need to keep duplicate entries in archmap
     real_keyfile=$(basename $(readlink -f $keyfile))
@@ -96,126 +84,15 @@ ln -s RPM-GPG-KEY-azurelinux-%{version}-primary RPM-GPG-KEY-%{version}-azurelinu
 popd
 
 # Install repo files
-install -d -m 755 $RPM_BUILD_ROOT/etc/yum.repos.d
-
-# Helper to replace variables in the .repo file template.
-render_repo() {
-    local outfile="$1" prefix="$2" gpgcheck="$3" repo_gpgcheck="$4" expire="$5"
-    install -m 644 %{SOURCE2} "$outfile"
-    # Note: REPO_GPGCHECK_VALUE is substituted BEFORE GPGCHECK_VALUE because
-    # the latter is a substring of the former — reversing the order would
-    # leave a corrupted 'repo_gpgcheck=REPO_<n>_VALUE' line.
-    sed -i \
-        -e "s|REPO_URI_PREFIX|${prefix}|g" \
-        -e "s|REPO_GPGCHECK_VALUE|${repo_gpgcheck}|g" \
-        -e "s|GPGCHECK_VALUE|${gpgcheck}|g" \
-        -e "s|METADATA_EXPIRE_VALUE|${expire}|g" \
-        "$outfile"
-}
-
-# Render official .repo file pointing at packages.microsoft.com, signed,
-# longer metadata cache. The .main suffix will be removed thanks to
-# RemovePathPostfixes.
-#
-# NOTE: We presently set repo_gpgcheck=0. It would succeed against this
-# repository, but the "first use" experience with dnf5 blocks, presents
-# an error and requires a human to confirm import of the gpg keys into
-# the libdnf5 cache (separate from RPM database gpg key import). Because
-# of this and other issues reported upstream, we will hold off on enabling
-# this setting and revisit later.
-render_repo \
-    "$RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo.main" \
-    'https://packages.microsoft.com/azurelinux/$releasever/beta' \
-    1 0 '7d'
-
-# Render .repo file pointing at daily dev repos, unsigned, shorter cache.
-# The .dev suffix will be removed thanks to RemovePathPostfixes.
-render_repo \
-    "$RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo.dev" \
-    'https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev' \
-    0 0 '6h'
-
-# Install the Microsoft subrepo in both subpackages. The URL is fixed to
-# packages.microsoft.com (the Microsoft-curated content lives there
-# regardless of which Azure Linux base repo a system is pointed at), so the
-# same file is shipped to both variants. The .main / .dev suffixes are
-# stripped by RemovePathPostfixes.
-install -m 644 %{SOURCE3} \
-    "$RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.main"
-install -m 644 %{SOURCE3} \
-    "$RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.dev"
+install -d -m 755 "%{buildroot}%{_sysconfdir}/yum.repos.d"
+install -m 644 %{SOURCE2} "%{buildroot}%{_sysconfdir}/yum.repos.d/azurelinux.repo"
+install -m 644 %{SOURCE3} "%{buildroot}%{_sysconfdir}/yum.repos.d/azurelinux-preview.repo"
+install -m 644 %{SOURCE4} "%{buildroot}%{_sysconfdir}/yum.repos.d/cloud-native.repo"
+install -m 644 %{SOURCE5} "%{buildroot}%{_sysconfdir}/yum.repos.d/cloud-native-preview.repo"
+install -m 644 %{SOURCE6} "%{buildroot}%{_sysconfdir}/yum.repos.d/microsoft.repo"
+install -m 644 %{SOURCE7} "%{buildroot}%{_sysconfdir}/yum.repos.d/microsoft-preview.repo"
 
 %check
-# Make sure all repo variables were substituted
-for repo in $RPM_BUILD_ROOT/etc/yum.repos.d/*.repo.*; do
-    if grep -qE 'REPO_URI_PREFIX|GPGCHECK_VALUE|REPO_GPGCHECK_VALUE|METADATA_EXPIRE_VALUE' $repo; then
-        echo "ERROR: Repo $repo contains an unsubstituted placeholder value"
-        exit 1
-    fi
-done
-
-main_file=$RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo.main
-dev_file=$RPM_BUILD_ROOT/etc/yum.repos.d/azurelinux.repo.dev
-
-# Main repo file must exist with GPG checking enabled on every section.
-if [ ! -f "$main_file" ]; then
-    echo "ERROR: missing $main_file"
-    exit 1
-fi
-if [ "$(grep -c '^gpgcheck=1' "$main_file")" -ne 3 ] || \
-   [ "$(grep -c '^repo_gpgcheck=0' "$main_file")" -ne 3 ]; then
-    echo "ERROR: $main_file must correctly configure gpgcheck and repo_gpgcheck"
-    exit 1
-fi
-if [ "$(grep -c '^metadata_expire=7d' "$main_file")" -ne 3 ]; then
-    echo "ERROR: $main_file must have metadata_expire=7d on all 3 sections"
-    exit 1
-fi
-
-# Dev file must exist with GPG checking disabled on every section.
-if [ ! -f "$dev_file" ]; then
-    echo "ERROR: missing $dev_file"
-    exit 1
-fi
-if grep -qE '^(gpgcheck|repo_gpgcheck)=1' "$dev_file"; then
-    echo "ERROR: $dev_file must not have gpgcheck or repo_gpgcheck enabled"
-    exit 1
-fi
-if [ "$(grep -c '^metadata_expire=6h' "$dev_file")" -ne 3 ]; then
-    echo "ERROR: $dev_file must have metadata_expire=6h on all 3 sections"
-    exit 1
-fi
-
-# Both files must have exactly one enabled=1 section (the base repo) plus
-# two enabled=0 sections (debuginfo, source).
-for repo in "$main_file" "$dev_file"; do
-    if [ "$(grep -c '^enabled=1' "$repo")" -ne 1 ] || \
-       [ "$(grep -c '^enabled=0' "$repo")" -ne 2 ]; then
-        echo "ERROR: $repo has unexpected enabled-flag distribution"
-        exit 1
-    fi
-done
-
-# Microsoft subrepo: shipped in both subpackages. Must exist, be enabled by
-# default, GPG-signed, and point at packages.microsoft.com.
-for microsoft_file in \
-    $RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.main \
-    $RPM_BUILD_ROOT/etc/yum.repos.d/microsoft.repo.dev; do
-    if [ ! -f "$microsoft_file" ]; then
-        echo "ERROR: missing $microsoft_file"
-        exit 1
-    fi
-    if ! grep -q '^baseurl=https://packages.microsoft.com/azurelinux/\$releasever/beta/microsoft/\$basearch$' "$microsoft_file"; then
-        echo "ERROR: $microsoft_file must point at packages.microsoft.com microsoft subrepo"
-        exit 1
-    fi
-    if [ "$(grep -c '^enabled=1' "$microsoft_file")" -ne 1 ] || \
-       [ "$(grep -c '^gpgcheck=1' "$microsoft_file")" -ne 1 ]; then
-        echo "ERROR: $microsoft_file must be enabled=1 and gpgcheck=1"
-        exit 1
-    fi
-done
-
 # Check arch keys exists on supported architectures, and RPM considers
 # them valid
 TMPRING=$(mktemp)
@@ -223,31 +100,33 @@ DBPATH=$(mktemp -d)
 echo -n > "$TMPRING"
 for ARCH in $(sed -ne "s/^azurelinux-%{version}-primary://p" %{SOURCE1}); do
     gpg --no-default-keyring --keyring="$TMPRING" \
-        --import $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH
+        --import "%{buildroot}%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH"
     rpm --dbpath "$DBPATH" --import \
-        $RPM_BUILD_ROOT%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH --test
+        "%{buildroot}%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-%{version}-$ARCH" --test
 done
 # Ensure some arch key was imported
 gpg --no-default-keyring --keyring="$TMPRING" --list-keys | grep -A 2 '^pub\s' 
 rm -f "$TMPRING"
 
 %files
-%dir /etc/yum.repos.d
-%config(noreplace) /etc/yum.repos.d/azurelinux.repo.main
-%config(noreplace) /etc/yum.repos.d/microsoft.repo.main
-
-%files dev
-%dir /etc/yum.repos.d
-%config(noreplace) /etc/yum.repos.d/azurelinux.repo.dev
-%config(noreplace) /etc/yum.repos.d/microsoft.repo.dev
+%dir %{_sysconfdir}/yum.repos.d
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/azurelinux-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/cloud-native.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/cloud-native-preview.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/microsoft.repo
+%config(noreplace) %{_sysconfdir}/yum.repos.d/microsoft-preview.repo
 
 %files -n azurelinux-gpg-keys
-%dir /etc/pki/rpm-gpg
-/etc/pki/rpm-gpg/RPM-GPG-KEY-*
+%dir %{_sysconfdir}/pki/rpm-gpg
+%{_sysconfdir}/pki/rpm-gpg/RPM-GPG-KEY-*
 
 
 %changelog
 ## START: Generated by rpmautospec
+* Thu Aug 20 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.0-21
+- feat(azurelinux-repos): configure release channels
+
 * Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.0-20
 - build: mass rebuild auto-bumpable components
 

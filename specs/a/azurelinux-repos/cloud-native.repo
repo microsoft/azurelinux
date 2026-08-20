@@ -1,0 +1,33 @@
+[azurelinux-cloud-native]
+name=Azure Linux $releasever - $basearch - Production - Cloud Native
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/cloud-native/$basearch
+enabled=1
+countme=1
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True
+
+[azurelinux-cloud-native-source]
+name=Azure Linux $releasever - Production - Cloud Native - Source
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/cloud-native/srpms
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True
+
+[azurelinux-cloud-native-debuginfo]
+name=Azure Linux $releasever - $basearch - Production - Cloud Native - Debug
+baseurl=https://packages.microsoft.com/azurelinux/4/prod/cloud-native/debuginfo/$basearch
+enabled=0
+metadata_expire=6h
+repo_gpgcheck=0
+type=rpm
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-azurelinux-$releasever-$basearch
+skip_if_unavailable=True

@@ -21,14 +21,6 @@ azldev image build wsl
 azldev image test  wsl
 ```
 
-(Most images come in two variants. The canonical/unsuffixed name
-ships `azurelinux-repos` so the resulting OS points at PMC's
-`azurelinux/4.0/beta` repo at runtime; the `-dev` variant ships
-`azurelinux-repos-dev` so the OS points at the azl4-dev blob.
-Distroless container images strip the package manager entirely and
-have only the canonical entry. Append `-dev` to the image name —
-where present — to validate the dev variant.)
-
 `azldev` creates a per-suite Python venv, installs this directory's
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
 `--image-name`, and `--capabilities` arguments.
@@ -180,8 +172,7 @@ base/images/
     during collection — no boilerplate per file or per subdir). The
     directory name is treated as a *family*: an `--image-name` matches
     the family if it equals the family exactly OR has the form
-    `<family>-<variant>` (so `cases/static/vm-base/` runs for both
-    `vm-base` and `vm-base-dev`).
+    `<family>-<variant>` if an image family introduces variants.
 - **Shared runtime (every container):** add a `cases/runtime/test_<topic>.py`.
     Use `container_exec_shell("...")` for normal runtime tests. Use
     `container_exec([...])` only when the test must avoid a shell, such as
