@@ -1,7 +1,7 @@
 Summary:        Contains programs for manipulating text files
 Name:           gawk
 Version:        5.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        GPLv3
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -14,10 +14,6 @@ Patch2:         CVE-2026-40553.patch
 Requires:       gmp
 Requires:       mpfr
 Requires:       readline >= 7.0
-%if 0%{?with_check}
-BuildRequires:  shadow-utils
-BuildRequires:  sudo
-%endif
 Provides:       /bin/awk
 Provides:       /bin/gawk
 Provides:       awk
@@ -51,12 +47,7 @@ sed -i 's/ pty1 / /' test/Makefile
 # Generate locale for `en_US.iso88591` which is required for ptest
 # Ideally it should have been present. Investigate if its a `chroot` only issue
 %{_sbindir}/locale-gen.sh
-
-# gawk's check_pma_security() refuses persistent memory when geteuid() == 0, so the
-# pma test only runs if the suite is not run as root.
-useradd testuser -m
-chown -R testuser:testuser .
-sudo -u testuser make %{?_smp_mflags} check
+make %{?_smp_mflags} check
 
 %post   -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -75,6 +66,12 @@ sudo -u testuser make %{?_smp_mflags} check
 %{_sysconfdir}/profile.d/gawk.sh
 
 %changelog
+* Wed Aug 19 2026 Jon Slobodzian <joslobo@microsoft.com> - 5.2.2-3
+- Revert the `%check` section to its 5.2.2-1 form: run the test suite directly and
+  drop the sudo and shadow-utils BuildRequires. gawk is a toolchain bootstrap
+  package; those build-time deps created an unresolvable cycle in the package
+  dependency graph (grapher panic), breaking all check-enabled source builds.
+
 * Wed Jul 15 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 5.2.2-2
 - Patch for CVE-2026-40553, CVE-2026-40468, CVE-2026-40467
 - Run the test suite as an unprivileged user so the pma test is exercised.
