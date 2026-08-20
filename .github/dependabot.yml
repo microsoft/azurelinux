@@ -25,7 +25,7 @@ updates:
         patterns:
           - "*"
 
-  # GitHub Actions used by PR-check workflows on the default branch.
+  # GitHub Actions used by PR-check workflows.
   - package-ecosystem: github-actions
     directory: /
     target-branch: "4.0"
@@ -43,7 +43,7 @@ updates:
         patterns:
           - "*"
 
-  # GitHub Actions used by PR-check workflows on the development branch.
+  # GitHub Actions used by PR-check workflows on the 3.0-dev branch.
   - package-ecosystem: github-actions
     directory: /
     target-branch: "3.0-dev"
