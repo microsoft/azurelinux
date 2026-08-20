@@ -15,10 +15,10 @@ release = { calculation = "manual" }
 
 # Azure Linux kernel source tarball (rolling-lts/azl4).
 [[components.kernel.source-files]]
-filename = "kernel-6.18.31.1.tar.gz"
-hash = "1bf684812ff3fc38974dc99b3e2309cb46dc5af93ac794e79a4a4f3dd17debfadb14510aeaaa7fa2d4c6254876a9f8bc67b900a1951c8dda5d94e5f5028a7557"
+filename = "kernel-6.18.39.1.tar.gz"
+hash = "cd70c68662ae5fca906a45d2feae1e4cdaed63b0427856f46cbfa6398f2e4b32b6a233f05ea49b359abf9119b0644177637b9638ec773b1d26e8725db042e0c5"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.31.1.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.39.1.tar.gz" }
 replace-upstream = true
 replace-reason = "The local spec vendors the rendered sources manifest; this declaration supplies the download URI for the same pinned source and intentionally replaces the duplicate manifest entry."
 

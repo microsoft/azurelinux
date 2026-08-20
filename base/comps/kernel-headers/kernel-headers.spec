@@ -15,13 +15,13 @@
 
 # AZL: RPM release counter. Bump for rebuilds without a version change.
 %define azl_pkgrelease 1
-# AZL: 4th version component from the AZL kernel source (6.18.31.1). Flows
+# AZL: 4th version component from the AZL kernel source (6.18.39.1). Flows
 # into Version:, Release:, and the extracted source tree name.
 %define kextraversion 1
 
 # define buildid .local
-%define specversion 6.18.31
-%define tarfile_release 6.18.31
+%define specversion 6.18.39
+%define tarfile_release 6.18.39
 # This is needed to do merge window version magic
 # This allows pkg_release to have configurable %%{?dist} tag
 %define specrelease %{kextraversion}.%{azl_pkgrelease}%{?dist}
@@ -113,6 +113,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.1
+- feat(kernel): update kernel and kernel-headers to 6.18.39.1
+
 * Mon May 18 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.31-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.31.1
 
