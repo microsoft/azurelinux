@@ -20,7 +20,7 @@ Patch2:         CVE-2021-44647.patch
 Patch3:         CVE-2026-24809.patch
 Patch4:         CVE-2026-47783.patch
 Patch5:         memcached-auth-token-length.patch
-Patch6:         0001-proto-fix-crash-in-binary-protocol.patch
+Patch6:         proto-fix-crash-in-binary-protocol.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
