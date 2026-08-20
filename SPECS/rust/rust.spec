@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.96.1
-Release:        3%{?dist}
+Release:        1%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -35,10 +35,6 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 #
 
 Source1:        rustc-%{version}-src-cargo.tar.gz
-# Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
-# separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
-#rust-bootstrap must be updated when upgrading rust
-BuildRequires:  rust-bootstrap = %{stage0_version}
 Patch0:         CVE-2025-53605.patch
 Patch1:         CVE-2025-67873.patch
 Patch2:         CVE-2025-68114.patch
@@ -51,6 +47,10 @@ Patch8:         CVE-2026-34743.patch
 Patch9:         CVE-2026-40034.patch
 Patch10:        CVE-2026-47143.patch
 
+# Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
+# separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
+#rust-bootstrap must be updated when upgrading rust
+BuildRequires:  rust-bootstrap = %{stage0_version}
 BuildRequires:  binutils
 BuildRequires:  cmake
 # make sure rust relies on curl from CBL-Mariner (instead of using its vendored flavor)
@@ -89,7 +89,7 @@ Summary:        Rust documentation.
 BuildArch:      noarch
 
 %description doc
-Documentation package for Rust
+Documentation package for Rust.
 
 %package src
 Summary:        Sources for the Rust standard library
@@ -110,7 +110,7 @@ popd
 %autosetup -p1 -n rustc-%{version}-src
 
 # Setup build/cache directory using the prebuilt stage0 bootstrap toolchain
-# provided by the rust-bootstrap package (see BuildRequires above).
+# provided by the rust-bootstrap package
 BUILD_CACHE_DIR="build/cache/%{release_date}"
 mkdir -pv "$BUILD_CACHE_DIR"
 RUST_BOOTSTRAP_DIR="%{_datadir}/rust-bootstrap/%{stage0_version}"
