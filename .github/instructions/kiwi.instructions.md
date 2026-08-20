@@ -9,30 +9,21 @@ Kiwi files define Azure Linux image builds. They use the [KIWI NG](https://osins
 ## How images are registered
 
 Images are defined in `base/images/images.toml`. Each image is
-declared as a canonical (unsuffixed) entry plus a `-dev` variant,
-each selecting the matching kiwi `profile`:
+declared as a canonical entry selecting the matching kiwi `profile`:
 
 ```toml
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
-
-[images.container-base-dev]
-description = "Container Base Image (dev)"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core-dev" }
 ```
 
-The two variants share the same kiwi description; they differ only
-in which `azurelinux-repos*` package is shipped (controlling where
-the resulting OS points at runtime), and — for the `core` container
-specifically — the OCI tag (`:4.0` + `:latest` for canonical,
-`:4.0-dev` for the dev variant). Both variants build their RPMs
-from the same source (the kiwi `<repository>`); koji overrides this
-during distro builds.
+Package-manageable images ship `azurelinux-repos`, which enables repositories.
+Distroless container images strip the package manager and ship no runtime
+repository configuration.
 
-Distroless container images strip the package manager entirely, so
-they ship no `-repos` package and have only a single (canonical)
-entry — there's no `-dev` sibling because it would be byte-identical.
+Runtime repository selection is independent from image build inputs. Kiwi
+`<repository>` entries provide packages during local builds, and koji overrides
+them for distro builds.
 
 Each image has its own directory under `base/images/` containing the
 `.kiwi` file.

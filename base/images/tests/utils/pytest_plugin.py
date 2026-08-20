@@ -182,9 +182,9 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
     # image: skip if --image-name doesn't match the marker's family.
     # Family matching: the marker's value is treated as a family name that
     # matches an image-name exactly OR matches a `<family>-<variant>` name
-    # (e.g. ``image("vm-base")`` matches both ``vm-base`` and
-    # ``vm-base-dev``). This lets tests under ``cases/<family>/`` apply
-    # to every variant of an image without per-variant duplication.
+    # (e.g. ``image("vm-base")`` also matches any ``vm-base-*`` variant).
+    # This lets tests under ``cases/<family>/`` apply to every variant of
+    # an image without per-variant duplication.
     image_name = item.config.getoption("--image-name", default=None)
     for marker in item.iter_markers("image"):
         expected = marker.args[0] if marker.args else None

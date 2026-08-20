@@ -6,14 +6,8 @@
         <contact>azurelinux@microsoft.com</contact>
         <specification>Azure Linux Minimal OS Image</specification>
     </description>
-    <!--
-        Build profiles: select "minimal-os" or "minimal-os-dev" to ship
-        azurelinux-repos or azurelinux-repos-dev respectively. That controls
-        which package repository the image uses at runtime.
-    -->
     <profiles>
-        <profile name="minimal-os"     description="Ships azurelinux-repos (runtime → PMC beta)" import="false" />
-        <profile name="minimal-os-dev" description="Ships azurelinux-repos-dev (runtime → azl4-dev)" import="false" />
+        <profile name="minimal-os" description="Azure Linux Minimal OS Image" import="false" />
     </profiles>
     <preferences>
         <version>0.1</version>
@@ -42,13 +36,7 @@
         </type>
     </preferences>
 
-    <!--
-        Single build-time repository (azl4-dev) for both variants —
-        koji overrides this for distro builds; for local builds this
-        is the only blob currently populated for AZL4. The variant
-        only affects which `azurelinux-repos*` package ships, NOT
-        where build-time RPMs come from.
-    -->
+    <!-- Koji overrides this build-time repository for distro builds. -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
@@ -56,6 +44,7 @@
 
     <packages type="image">
         <package name="azurelinux-release" />
+        <package name="azurelinux-repos" />
         <package name="bash" />
         <package name="ca-certificates" />
         <package name="dbus" />
@@ -80,21 +69,9 @@
         <package name="zlib" />
     </packages>
 
-    <!--
-        Variant-scoped repos package: governs the .repo files written
-        into /etc/yum.repos.d/ in the built image (runtime). The two
-        packages conflict, so they're separated into per-variant
-        sections rather than relying on the variant's bootstrap section.
-    -->
-    <packages type="image" profiles="minimal-os-dev">
-        <package name="azurelinux-repos-dev" />
-    </packages>
-    <packages type="image" profiles="minimal-os">
-        <package name="azurelinux-repos" />
-    </packages>
-
     <packages type="bootstrap">
         <package name="azurelinux-release" />
+        <package name="azurelinux-repos" />
         <package name="filesystem" />
         <package name="grub2-efi-x64-modules" arch="x86_64" />
         <package name="grub2-efi-x64" arch="x86_64" />
@@ -104,10 +81,4 @@
         <package name="shim" arch="aarch64" />
     </packages>
 
-    <packages type="bootstrap" profiles="minimal-os-dev">
-        <package name="azurelinux-repos-dev" />
-    </packages>
-    <packages type="bootstrap" profiles="minimal-os">
-        <package name="azurelinux-repos" />
-    </packages>
 </image>
