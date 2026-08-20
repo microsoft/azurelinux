@@ -44,8 +44,8 @@ if [ -x "$PESIGN_CLIENT" ]; then
         --sign \
         --token "OpenSC Card" \
         --certificate "IPL" \
-        --infile "$TEST_FILE" \
-        --outfile "$SIGNED_TEST_FILE"
+        --in "$TEST_FILE" \
+        --out "$SIGNED_TEST_FILE"
     echo "PASS: pesign sign request completed successfully"
 
     ls -la "$TEST_FILE"
