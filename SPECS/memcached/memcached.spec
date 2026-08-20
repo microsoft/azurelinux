@@ -20,6 +20,7 @@ Patch2:         CVE-2021-44647.patch
 Patch3:         CVE-2026-24809.patch
 Patch4:         CVE-2026-47783.patch
 Patch5:         memcached-auth-token-length.patch
+Patch6:         0001-proto-fix-crash-in-binary-protocol.patch
 BuildRequires:  gcc
 BuildRequires:  libevent-devel
 BuildRequires:  systemd-devel
@@ -136,6 +137,7 @@ exit 0
 %changelog
 * Tue Aug 18 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 1.6.27-6
 - Prevent oversized ASCII authentication tokens from crashing the daemon
+- Fix crash in binary protocol
 
 * Thu May 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.6.27-5
 - Patch for CVE-2026-47783
