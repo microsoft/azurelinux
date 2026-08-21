@@ -40,12 +40,14 @@ if [ -x "$PESIGN_CLIENT" ]; then
     
     # Sign using pesign-client
     echo "=== signing the test file with pesign ==="
-    pesign pesign-client \
+    pesign-client \
+        --verbose \
+        --debug \
         --sign \
-        --token "OpenSC Card" \
-        --certificate "IPL" \
-        --in "$TEST_FILE" \
-        --out "$SIGNED_TEST_FILE"
+        --token "dummy-token" \
+        --certificate "dummy-certificate" \
+        --infile "$TEST_FILE" \
+        --outfile "$SIGNED_TEST_FILE"
     echo "PASS: pesign sign request completed successfully"
 
     ls -la "$TEST_FILE"
