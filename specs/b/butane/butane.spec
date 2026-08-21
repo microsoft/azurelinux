@@ -25,7 +25,7 @@ configs for provisioning operating systems that use Ignition.}
 %global godocs          docs README.md
 
 Name:           butane
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Butane config transpiler
 
 License:        Apache-2.0
@@ -102,10 +102,10 @@ echo "Building butane..."
 %global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(head -c8 /dev/urandom|od -An -tx1|tr -d ' \\n')" -a -v -x 
 
 echo "Building Linux Butane with static linking..."
-CGO_ENABLED=0 GOARCH=arm64 GOOS=linux %gocrossbuild -o butane-aarch64-unknown-linux-gnu-static internal/main.go
-CGO_ENABLED=0 GOARCH=ppc64le GOOS=linux %gocrossbuild -o butane-ppc64le-unknown-linux-gnu-static internal/main.go
-CGO_ENABLED=0 GOARCH=s390x GOOS=linux %gocrossbuild -o butane-s390x-unknown-linux-gnu-static internal/main.go
-CGO_ENABLED=0 GOARCH=amd64 GOOS=linux %gocrossbuild -o butane-x86_64-unknown-linux-gnu-static internal/main.go
+MS_GO_NOSYSTEMCRYPTO=1 CGO_ENABLED=0 GOARCH=arm64 GOOS=linux %gocrossbuild -o butane-aarch64-unknown-linux-gnu-static internal/main.go
+MS_GO_NOSYSTEMCRYPTO=1 CGO_ENABLED=0 GOARCH=ppc64le GOOS=linux %gocrossbuild -o butane-ppc64le-unknown-linux-gnu-static internal/main.go
+MS_GO_NOSYSTEMCRYPTO=1 CGO_ENABLED=0 GOARCH=s390x GOOS=linux %gocrossbuild -o butane-s390x-unknown-linux-gnu-static internal/main.go
+MS_GO_NOSYSTEMCRYPTO=1 CGO_ENABLED=0 GOARCH=amd64 GOOS=linux %gocrossbuild -o butane-x86_64-unknown-linux-gnu-static internal/main.go
 
 echo "Building macOS Butane..."
 GOARCH=amd64 GOOS=darwin %gocrossbuild -o butane-x86_64-apple-darwin internal/main.go

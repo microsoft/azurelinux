@@ -1,0 +1,22 @@
+# Azure Linux's golang is the Microsoft build of Go, whose systemcrypto (OpenSSL)
+# backend is baseline-enabled for Linux targets. The -redistributable Linux binaries
+# are cross-compiled static with CGO_ENABLED=0: the OpenSSL backend file is excluded
+# (no cgo) but systemcrypto stays enabled, so no crypto backend file is selected and
+# crypto/internal/backend/fips140 fails to compile (undefined systemFIPSMode/
+# backendEnabled). Disable systemcrypto for these cgo-free static cross-builds so the
+# pure-Go crypto implementation is used, keeping the redistributable binaries
+# self-contained (no runtime OpenSSL). Use the MS_GO_NOSYSTEMCRYPTO=1 env var, not
+# GOEXPERIMENT=nosystemcrypto: it is the documented, forward-compatible knob (Go 1.25.2
+# through 1.27+), whereas GOEXPERIMENT=nosystemcrypto is removed and rejected in Go 1.27.
+# butane supplies no GOEXPERIMENT override at all.
+# Ref: https://github.com/microsoft/go/blob/8ef6cff0f34e983fb707a455292ed162e1ecc3ae/eng/doc/fips/README.md#build-option-to-use-go-crypto
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Disable systemcrypto on the CGO_ENABLED=0 static Linux cross-builds via MS_GO_NOSYSTEMCRYPTO=1 (pure-Go crypto, self-contained): Microsoft Go baseline-enables the OpenSSL backend, which cannot compile without cgo; MS_GO_NOSYSTEMCRYPTO stays valid on Go 1.27 unlike the removed GOEXPERIMENT=nosystemcrypto"
+type = "spec-search-replace"
+section = "%build"
+regex = '^CGO_ENABLED=0 GOARCH'
+replacement = "MS_GO_NOSYSTEMCRYPTO=1 CGO_ENABLED=0 GOARCH"
