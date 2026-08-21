@@ -9791,8 +9791,8 @@
         "type": "other",
         "other": {
           "name": "libgit2",
-          "version": "1.7.2",
-          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.7.2/libgit2-1.7.2.tar.gz"
+          "version": "1.8.7",
+          "downloadUrl": "https://github.com/libgit2/libgit2/archive/v1.8.7/libgit2-1.8.7.tar.gz"
         }
       }
     },

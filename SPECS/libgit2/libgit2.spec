@@ -1,6 +1,6 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
-Version:        1.7.2
+Version:        1.8.7
 Release:        1%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
@@ -79,6 +79,9 @@ popd
 %{_bindir}/git2
 
 %changelog
+* Fri Aug 21 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 1.8.7-1
+- Auto-upgrade to 1.8.7 - for CVE-2026-53586, CVE-2026-53585, CVE-2026-53587, CVE-2026-53583, CVE-2026-53584
+
 * Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
 - Update to 1.7.2
 
