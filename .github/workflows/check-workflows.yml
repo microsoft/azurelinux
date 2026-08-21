@@ -1,0 +1,45 @@
+name: "Check workflows"
+on:
+  # Only trigger for changes that touch workflow files.
+  push:
+    branches: [ "3.0-dev" ]
+    paths: [ ".github/workflows/**" ]
+  pull_request:
+    branches: [ "3.0-dev" ]
+    paths: [ ".github/workflows/**" ]
+  workflow_dispatch:
+  schedule:
+    # Run every night at 3:15am PST (11:15am UTC)
+    - cron: '15 11 * * *'
+
+# Cancel in-progress runs of this workflow if a new run is triggered.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  check-workflows:
+    name: Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up rust toolchain
+        run: rustup default stable
+
+      - name: Enable cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+
+      - name: Install zizmor
+        run: cargo install --locked zizmor
+
+      - name: Run zizmor
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: zizmor --pedantic .
