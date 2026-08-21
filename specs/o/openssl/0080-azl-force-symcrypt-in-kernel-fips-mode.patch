@@ -7,7 +7,7 @@ Subject: [PATCH] feat(fips): activate and prefer SymCrypt, enforce it in
 Azure Linux ships SymCrypt-OpenSSL as its FIPS provider. Drive it from
 the providers configuration module:
 
-- In all cases, ensure symcryptprovider is active. If the ambient
+- In kernel FIPS mode, ensure symcryptprovider is active. If the ambient
   configuration already activated it, provider_conf_activate()
   short-circuits on the already-active name check and this is a no-op.
   Otherwise load the provider from its fixed, package-owned drop-in
@@ -15,12 +15,12 @@ the providers configuration module:
   on the ambient configuration carrying the SymCrypt section. This is
   what makes a later, unrelated OSSL_LIB_CTX_load_config() safe.
 
-- Base enforcement on actual provider state, not on whether the drop-in
-  load succeeded: consult the activation registry (a side-effect-free
-  state query) so an already-active SymCrypt satisfies enforcement even
-  when the fixed file is absent.
+- In kernel FIPS mode, base enforcement on provider-configuration activation
+  state. The activation registry is updated only after a successful
+  provider_conf_activate() call, so the check neither activates fallback
+  providers nor mistakes an activate=0 declaration for an active provider.
 
-- In all cases, merge the optional "?provider=symcryptprovider" default
+- In kernel FIPS mode, merge the optional "?provider=symcryptprovider" default
   property so SymCrypt is preferred while leaving fetches for algorithms
   it does not provide free to resolve elsewhere.
 
@@ -37,25 +37,25 @@ the providers configuration module:
 Preserve Fedora's config-module failure delivery; do not force
 configuration diagnostics.
 
-Add coverage for the property merges, kernel-FIPS enforcement, the
-inactive-but-configured case, and the unrelated-later-load guarantee.
+Add coverage for the property merges, kernel-FIPS enforcement, configured
+providers without activate=1, and the unrelated-later-load guarantee.
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 Copilot-Session: 5f315f8d-6603-4659-8d14-4476bc265450
 ---
  crypto/evp/evp_fetch.c                        |   4 +-
- crypto/provider_conf.c                        |  89 +++++--
+ crypto/provider_conf.c                        |  86 ++++++-
  include/crypto/evp.h                          |   2 +
  test/build.info                               |   5 +
- test/prov_conf_symcrypt.cnf                   |  16 ++
+ test/prov_conf_symcrypt.cnf                   |  15 +
  test/prov_conf_symcrypt_active.cnf            |  14 ++
  test/prov_conf_symcrypt_app.cnf               |   7 +
  test/prov_conf_symcrypt_missing.cnf           |  12 +
- test/prov_conf_symcrypt_test.c                | 237 ++++++++++++++++++
+ test/prov_conf_symcrypt_test.c                | 240 ++++++++++++++++++++
  test/recipes/03-test_prov_conf_symcrypt.t     |  26 ++
  test/recipes/03-test_prov_conf_symcrypt_off.t |  38 +++
  .../03-test_prov_conf_symcrypt_realinit.t     |  21 ++
- 12 files changed, 453 insertions(+), 18 deletions(-)
+ 12 files changed, 452 insertions(+), 18 deletions(-)
  create mode 100644 test/prov_conf_symcrypt.cnf
  create mode 100644 test/prov_conf_symcrypt_active.cnf
  create mode 100644 test/prov_conf_symcrypt_app.cnf
@@ -98,7 +98,7 @@ index 1e5053c..b1915fc 100644
  #include "provider_local.h"
  #include "crypto/context.h"
  
-@@ -424,28 +424,85 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -424,28 +424,90 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
@@ -108,8 +108,8 @@ index 1e5053c..b1915fc 100644
 -#  define FIPS_LOCAL_CONF           OPENSSLDIR "/fips_local.cnf"
 +        int in_kernel_fips = ossl_get_kernel_fips_flag() != 0;
 +        int symcrypt_active = 0;
-+        CONF *sc_conf;
 +        PROVIDER_CONF_GLOBAL *pcgbl;
++        CONF *sc_conf;
 +#  define AZL_SYMCRYPT_PROVIDER_NAME    "symcryptprovider"
 +#  define AZL_SYMCRYPT_PROVIDER_SECTION "symcrypt_prov_sect"
 +#  define AZL_SYMCRYPT_PROVIDER_CONF    OPENSSLDIR "/openssl.d/symcrypt_prov.cnf"
@@ -118,8 +118,8 @@ index 1e5053c..b1915fc 100644
 -            CONF *fips_conf = NCONF_new_ex(libctx, NCONF_default());
 -            if (NCONF_load(fips_conf, FIPS_LOCAL_CONF, NULL) <= 0)
 +        /*
-+         * In all cases, ensure SymCrypt (Azure Linux's FIPS provider) is
-+         * active. If the ambient configuration already activated it,
++         * In kernel FIPS mode, ensure SymCrypt (Azure Linux's FIPS provider)
++         * is active. If the ambient configuration already activated it,
 +         * provider_conf_activate() short-circuits on the already-active name
 +         * check and this is a no-op. Otherwise load the provider from its
 +         * fixed, package-owned drop-in so activation never depends on the
@@ -131,36 +131,41 @@ index 1e5053c..b1915fc 100644
 +         * honored, exactly as the ambient provider loop and Fedora's original
 +         * fips_local.cnf handling do.
 +         */
-+        sc_conf = NCONF_new_ex(libctx, NCONF_default());
-+        if (sc_conf != NULL
-+                && NCONF_load(sc_conf, AZL_SYMCRYPT_PROVIDER_CONF, NULL) > 0
-+                && NCONF_get_section(sc_conf,
-+                                     AZL_SYMCRYPT_PROVIDER_SECTION) != NULL)
-+            provider_conf_load(libctx, AZL_SYMCRYPT_PROVIDER_NAME,
-+                               AZL_SYMCRYPT_PROVIDER_SECTION, sc_conf);
-+        NCONF_free(sc_conf);
++        if (in_kernel_fips) {
++            sc_conf = NCONF_new_ex(libctx, NCONF_default());
++            if (sc_conf != NULL
++                    && NCONF_load(sc_conf, AZL_SYMCRYPT_PROVIDER_CONF, NULL) > 0
++                    && NCONF_get_section(sc_conf,
++                                         AZL_SYMCRYPT_PROVIDER_SECTION) != NULL)
++                provider_conf_load(libctx, AZL_SYMCRYPT_PROVIDER_NAME,
++                                   AZL_SYMCRYPT_PROVIDER_SECTION, sc_conf);
++            NCONF_free(sc_conf);
 +
-+        /*
-+         * Enforcement below must reflect actual provider state, not merely
-+         * whether our drop-in load succeeded: the ambient configuration's own
-+         * drop-in may have already activated SymCrypt (and the fixed file may
-+         * be absent). Consult the activation registry directly -- this is a
-+         * pure state query with no fetch or fallback-loading side effects.
-+         */
-+        pcgbl = ossl_lib_ctx_get_data(libctx, OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
-+        if (pcgbl != NULL && CRYPTO_THREAD_read_lock(pcgbl->lock)) {
-+            symcrypt_active =
-+                prov_already_activated(AZL_SYMCRYPT_PROVIDER_NAME,
-+                                       pcgbl->activated_providers);
++            /*
++             * provider_conf_activate() records providers here only after a
++             * successful activation. Unlike OSSL_PROVIDER_available(), this
++             * does not activate fallback providers while checking state.
++             */
++            pcgbl = ossl_lib_ctx_get_data(libctx,
++                                           OSSL_LIB_CTX_PROVIDER_CONF_INDEX);
++            if (pcgbl == NULL || !CRYPTO_THREAD_read_lock(pcgbl->lock))
++                return 0;
++            symcrypt_active = prov_already_activated(
++                AZL_SYMCRYPT_PROVIDER_NAME, pcgbl->activated_providers);
 +            CRYPTO_THREAD_unlock(pcgbl->lock);
-+        }
 +
++            /* A kernel-FIPS configuration must have activated SymCrypt. */
++            if (!symcrypt_active)
++                return 0;
++        }
 +        /*
-+         * In all cases, prefer SymCrypt for algorithm fetches. The "?" makes
-+         * this an optional preference, not a hard filter, so algorithms
-+         * SymCrypt does not provide still resolve elsewhere.
++         * In kernel FIPS mode, prefer SymCrypt for algorithm fetches. The
++         * preference must not affect ordinary userspace: provider selection
++         * happens before provider-specific parameter validation, so a
++         * provider cannot fall back after it rejects an advertised operation.
 +         */
-+        if (evp_default_properties_merge(libctx,
++        if (in_kernel_fips
++                && evp_default_properties_merge(libctx,
 +                                         "?provider=" AZL_SYMCRYPT_PROVIDER_NAME,
 +                                         0) != 1)
 +            return 0;
@@ -233,7 +238,7 @@ new file mode 100644
 index 0000000..88a2d7b
 --- /dev/null
 +++ b/test/prov_conf_symcrypt.cnf
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,15 @@
 +openssl_conf = openssl_init
 +
 +# Match the shipped default: provider-module failures may be ignored by the
@@ -248,7 +253,6 @@ index 0000000..88a2d7b
 +
 +[symcrypt_prov_sect]
 +module = p_test.so
-+activate = 0
 +greeting = SymCrypt test provider
 diff --git a/test/prov_conf_symcrypt_active.cnf b/test/prov_conf_symcrypt_active.cnf
 new file mode 100644
@@ -306,7 +310,7 @@ new file mode 100644
 index 0000000..ce97f5d
 --- /dev/null
 +++ b/test/prov_conf_symcrypt_test.c
-@@ -0,0 +1,237 @@
+@@ -0,0 +1,242 @@
 +/*
 + * Copyright 2026 The OpenSSL Project Authors. All Rights Reserved.
 + *
@@ -331,10 +335,11 @@ index 0000000..ce97f5d
 + * is in kernel FIPS mode (argv: expect_kernel_fips = 0 or 1, forced by the
 + * recipes via OPENSSL_FORCE_FIPS_MODE):
 + *
-+ *   - In all cases, once SymCrypt is active the default properties gain the
-+ *     optional "?provider=symcryptprovider" preference.
-+ *   - In kernel FIPS mode only, they additionally gain "?fips=yes", and the
-+ *     "base" provider is activated.
++ *   - In kernel FIPS mode, once SymCrypt is active the default properties
++ *     gain the optional "?provider=symcryptprovider" and "?fips=yes"
++ *     preferences, and the "base" provider is activated.
++ *   - Outside kernel FIPS mode, an ambient SymCrypt provider can be active,
++ *     but it is not added to the default property query.
 + *   - In kernel FIPS mode, a config that does not (directly or via an earlier
 + *     load) leave SymCrypt active fails to load; outside FIPS it loads.
 + *   - A later, unrelated config load does not re-require SymCrypt's section:
@@ -349,7 +354,7 @@ index 0000000..ce97f5d
 + */
 +
 +static char *symcrypt_active_cnf = NULL; /* activates symcryptprovider */
-+static char *symcrypt_inactive_cnf = NULL; /* configures but activate=0 */
++static char *symcrypt_configured_cnf = NULL; /* declares SymCrypt */
 +static char *missing_cnf = NULL;         /* unrelated: no symcrypt at all */
 +static char *app_cnf = NULL;             /* sets default_properties=app.prop=1 */
 +static int expect_kernel_fips = 0;
@@ -372,8 +377,7 @@ index 0000000..ce97f5d
 +
 +/*
 + * Verify the default properties: the app-configured token is preserved, the
-+ * SymCrypt preference is always merged, and the FIPS preference is merged iff
-+ * we are in kernel FIPS mode.
++ * SymCrypt and FIPS preferences are merged iff we are in kernel FIPS mode.
 + */
 +static int check_properties(OSSL_LIB_CTX *ctx)
 +{
@@ -386,13 +390,18 @@ index 0000000..ce97f5d
 +
 +    if (!TEST_true(has_property_token(propstr, "app.prop=1")))
 +        goto err;
-+    if (!TEST_true(has_property_token(propstr, "?provider=symcryptprovider")))
-+        goto err;
 +    if (expect_kernel_fips) {
++        if (!TEST_true(has_property_token(propstr,
++                                          "?provider=symcryptprovider")))
++            goto err;
 +        if (!TEST_true(has_property_token(propstr, "?fips=yes")))
 +            goto err;
-+    } else if (!TEST_false(has_property_token(propstr, "?fips=yes"))) {
-+        goto err;
++    } else {
++        if (!TEST_false(has_property_token(propstr,
++                                           "?provider=symcryptprovider")))
++            goto err;
++        if (!TEST_false(has_property_token(propstr, "?fips=yes")))
++            goto err;
 +    }
 +
 +    testresult = 1;
@@ -463,8 +472,8 @@ index 0000000..ce97f5d
 +
 +/*
 + * With no path to an active SymCrypt (no ambient activation and no fixed
-+ * drop-in in the build tree), kernel FIPS mode fails the config load; outside
-+ * FIPS it loads.
++ * drop-in in the build tree), a direct configuration load fails in kernel FIPS
++ * mode. Automatic initialization may continue when module errors are ignored.
 + */
 +static int test_enforced_without_symcrypt(void)
 +{
@@ -491,10 +500,10 @@ index 0000000..ce97f5d
 +}
 +
 +/*
-+ * Configuring SymCrypt without activating it (activate=0) is not sufficient:
-+ * enforcement keys off actual activation, so kernel FIPS mode still fails.
++ * Declaring SymCrypt without activate=1 does not activate it. Kernel-FIPS
++ * enforcement records a soft failure, while outside FIPS it remains valid.
 + */
-+static int test_inactive_ambient_not_sufficient(void)
++static int test_configured_ambient_requires_activation(void)
 +{
 +    OSSL_LIB_CTX *ctx = OSSL_LIB_CTX_new();
 +    int loaded;
@@ -505,12 +514,12 @@ index 0000000..ce97f5d
 +    if (!TEST_true(OSSL_LIB_CTX_load_config(ctx, app_cnf)))
 +        goto err;
 +
-+    loaded = OSSL_LIB_CTX_load_config(ctx, symcrypt_inactive_cnf);
++    loaded = OSSL_LIB_CTX_load_config(ctx, symcrypt_configured_cnf);
++    if (!TEST_true(loaded))
++        goto err;
 +    if (expect_kernel_fips) {
-+        if (!TEST_false(loaded))
-+            goto err;
 +        ERR_clear_error();
-+    } else if (!TEST_true(loaded)) {
++    } else if (!check_properties(ctx)) {
 +        goto err;
 +    }
 +
@@ -520,7 +529,7 @@ index 0000000..ce97f5d
 +    return testresult;
 +}
 +
-+OPT_TEST_DECLARE_USAGE("active_cnf inactive_cnf missing_cnf app_cnf expect_kernel_fips\n")
++OPT_TEST_DECLARE_USAGE("active_cnf configured_cnf missing_cnf app_cnf expect_kernel_fips\n")
 +
 +int setup_tests(void)
 +{
@@ -530,7 +539,7 @@ index 0000000..ce97f5d
 +    }
 +
 +    if (!TEST_ptr(symcrypt_active_cnf = test_get_argument(0))
-+            || !TEST_ptr(symcrypt_inactive_cnf = test_get_argument(1))
++            || !TEST_ptr(symcrypt_configured_cnf = test_get_argument(1))
 +            || !TEST_ptr(missing_cnf = test_get_argument(2))
 +            || !TEST_ptr(app_cnf = test_get_argument(3))
 +            || !TEST_ptr(test_get_argument(4)))
@@ -541,7 +550,7 @@ index 0000000..ce97f5d
 +    ADD_TEST(test_active_ambient);
 +    ADD_TEST(test_unrelated_load_is_safe);
 +    ADD_TEST(test_enforced_without_symcrypt);
-+    ADD_TEST(test_inactive_ambient_not_sufficient);
++    ADD_TEST(test_configured_ambient_requires_activation);
 +    return 1;
 +}
 diff --git a/test/recipes/03-test_prov_conf_symcrypt.t b/test/recipes/03-test_prov_conf_symcrypt.t
@@ -575,7 +584,7 @@ index 0000000..a090992
 +             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
 +             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
 +             "1"])),
-+   "kernel FIPS mode enforces SymCrypt, merges ?provider/?fips, and keeps unrelated loads safe");
++   "kernel FIPS mode enforces and prefers SymCrypt, then keeps unrelated loads safe");
 diff --git a/test/recipes/03-test_prov_conf_symcrypt_off.t b/test/recipes/03-test_prov_conf_symcrypt_off.t
 new file mode 100644
 index 0000000..bb54ea7
@@ -619,7 +628,7 @@ index 0000000..bb54ea7
 +             srctop_file("test", "prov_conf_symcrypt_missing.cnf"),
 +             srctop_file("test", "prov_conf_symcrypt_app.cnf"),
 +             "0"])),
-+   "non-FIPS mode prefers SymCrypt without forcing it or merging ?fips=yes");
++   "non-FIPS mode does not add a SymCrypt or FIPS provider preference");
 diff --git a/test/recipes/03-test_prov_conf_symcrypt_realinit.t b/test/recipes/03-test_prov_conf_symcrypt_realinit.t
 new file mode 100644
 index 0000000..2fae905
@@ -649,4 +658,3 @@ index 0000000..2fae905
 +   "real init retains Fedora's ignored provider-module failure behavior");
 -- 
 2.52.0
-
