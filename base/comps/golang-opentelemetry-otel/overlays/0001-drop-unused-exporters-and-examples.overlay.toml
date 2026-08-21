@@ -1,0 +1,24 @@
+# Azure Linux has no RPM consumers of these exporters, examples, or test
+# helpers. Keeping them creates build cycles through OpenTelemetry contrib,
+# gRPC, OpenCensus, Zipkin, and the retired Prometheus/conntrack chain.
+
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Drop unused OpenTelemetry exporters and examples"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^%goprep -A$'
+replacement = '''%goprep -A
+
+rm -r \
+    bridge/opentracing/test \
+    example/dice \
+    example/otel-collector \
+    example/opencensus \
+    example/prometheus \
+    exporters/otlp \
+    exporters/prometheus \
+    exporters/zipkin'''
