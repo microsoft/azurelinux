@@ -38,8 +38,10 @@ virtual machines on Linux via KVM or Microsoft Hypervisor.
 
 %global rust_target x86_64-unknown-linux-gnu
 
-# The release profile does not emit debug info.
-%global debug_package %{nil}
+# Unit tests for the pure-logic crates in the openvmm binary's dependency
+# closure. The rest of the test suite drives a live VM, which needs
+# virtualization the build environment does not have.
+%global test_crates -p acpi -p consomme -p crypto -p loader -p mesh_protobuf -p openvmm_core -p openvmm_entry -p pal -p pci_core -p vhdx -p vm_topology -p vmcore -p vmm_core
 
 %prep
 %autosetup -n %{name}-openvmm-v%{version} -N
@@ -61,7 +63,7 @@ cargo build --release --locked --offline -p openvmm --target %{rust_target}
 install -D -p -m 0755 target/%{rust_target}/release/openvmm %{buildroot}%{_bindir}/openvmm
 
 %check
-# The upstream test suite expects virtualization unavailable to the build.
+cargo test --release --locked --offline --lib --target %{rust_target} %{test_crates}
 ./target/%{rust_target}/release/openvmm --version
 
 %files
