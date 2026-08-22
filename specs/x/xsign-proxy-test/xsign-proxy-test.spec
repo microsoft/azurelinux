@@ -39,13 +39,16 @@ if [ -x "$PESIGN_CLIENT" ]; then
     echo "=== Using pesign for secure-boot signing ==="
     
     # Sign using pesign-client
+    # --certificat "short-circuit-signing"
+    # --certificat "unused-certificate-name"
+    #
     echo "=== signing the test file with pesign ==="
     pesign-client \
         --verbose \
         --debug \
         --sign \
-        --token "dummy-token" \
-        --certificate "dummy-certificate" \
+        --token "unused-token-name" \
+        --certificate "short-circuit-signing" \
         --infile "$TEST_FILE" \
         --outfile "$SIGNED_TEST_FILE"
     echo "PASS: pesign sign request completed successfully"
