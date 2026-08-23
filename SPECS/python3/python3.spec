@@ -6,7 +6,7 @@
 Summary:        A high-level scripting language
 Name:           python3
 Version:        3.12.14
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        PSF
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,7 @@ Source0:        https://www.python.org/ftp/python/%{version}/Python-%{version}.t
 # It has been removed in Python-3.12.0.tar.xz, but as our packages still require it, we will still provide for now.
 Source1:        https://github.com/python/cpython/blob/3.9/Tools/scripts/pathfix.py
 Patch0:         cgi3.patch
+Patch1:         CVE-2026-15806.patch
 
 BuildRequires:  bzip2-devel
 BuildRequires:  expat-devel >= 2.1.0
@@ -242,6 +243,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
 %{_libdir}/python%{majmin}/test/*
 
 %changelog
+* Sun Aug 23 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.12.14-2
+- Patch for CVE-2026-15806
+
 * Thu Aug 13 2026 Akhila Guruju <v-guakhila@microsoft.com> - 3.12.14-1
 - Upgrade to 3.12.14 for CVE-2026-18503, CVE-2026-15308, CVE-2026-7210, CVE-2026-4224
 - Remove patches CVE-2025-4516, CVE-2025-4517, CVE-2025-6069, CVE-2025-6075, CVE-2025-8194,
