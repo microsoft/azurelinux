@@ -1,12 +1,32 @@
 [components.shim-unsigned-aarch64]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "67c1d520f9a8080f6b689714099f813f23154c8f" }
+release = { calculation = "manual" }
+# Pin shim 16.1 to Fedora dist-git commit 4db14e5ed7d3bdb7fda97f62c93e612435f2cce9.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "4db14e5ed7d3bdb7fda97f62c93e612435f2cce9" }
 
-overlays = [
-    # Workaround: add dist tag to the release to avoid NEVR conflicts
-    # while we are still rebuilding all packages in new tags nightly.
-    { type = "spec-update-tag", tag = "Release", value = "2%{?dist}" },
+# Fedora ships one shim package across multiple Fedora releases. Azure Linux
+# historically signs and ships a distinct shim package for each major release,
+# so retain the Azure Linux dist tag. Revisit this if the packaging model changes.
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Set the Azure Linux 16.1 release with its distribution tag"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"
 
-    # Workaround: create a compat symlink that does not include the dist tag.
-    { type = "spec-append-lines", section = "%install", lines = ["ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2"] },
-    { type = "spec-append-lines", section = "%files", lines = ["%{_datadir}/shim/%{version}-2"] }
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Add the Azure Linux shim changelog entries"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Mon Aug 24 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-2",
+    "- Update shim-unsigned packages to 16.1",
+    "- Enforce the grub,5 SBAT generation baseline",
+    "- Remove obsolete %{version}-2 compatibility symlinks",
+    "",
 ]
+
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Enforce the grub,5 SBAT generation baseline"
+type = "spec-search-replace"
+section = "%build"
+regex = '^MAKEFLAGS\+="ENABLE_SHIM_HASH=true "$'
+replacement = "MAKEFLAGS+=\"ENABLE_SHIM_HASH=true \"\nMAKEFLAGS+=\"SBAT_AUTOMATIC_DATE=2025021800 \""
