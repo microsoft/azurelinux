@@ -22,6 +22,7 @@ lines = [
     "- Enforce the grub,5 SBAT generation baseline",
     "- Remove obsolete %{version}-2 compatibility symlinks",
     "- Add Azure Linux SBAT provenance",
+    "- Embed the Azure Linux vendor certificate",
     "",
 ]
 
@@ -78,3 +79,17 @@ type = "spec-search-replace"
 regex = "sbat\\.redhat\\.csv\\.in"
 replacement = "sbat.azurelinux.csv.in"
 metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Stage the Azure Linux Secure Boot CA as the shim vendor certificate"
+type = "file-add"
+file = "azurelinux-ca-20230216.der"
+source = "azurelinux-ca-20230216.der"
+metadata = { category = "azl-security-compliance", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Use the Azure Linux Secure Boot CA as shim Source1"
+type = "spec-search-replace"
+regex = "fedora-ca-20200709\\.cer"
+replacement = "azurelinux-ca-20230216.der"
+metadata = { category = "azl-security-compliance", upstream-status = "inapplicable" }
