@@ -21,6 +21,7 @@ lines = [
     "- Update shim-unsigned packages to 16.1",
     "- Enforce the grub,5 SBAT generation baseline",
     "- Remove obsolete %{version}-2 compatibility symlinks",
+    "- Omit unsupported IA32 output",
     "",
 ]
 
@@ -30,3 +31,54 @@ type = "spec-search-replace"
 section = "%build"
 regex = '^MAKEFLAGS\+="ENABLE_SHIM_HASH=true "$'
 replacement = "MAKEFLAGS+=\"ENABLE_SHIM_HASH=true \"\nMAKEFLAGS+=\"SBAT_AUTOMATIC_DATE=2025021800 \""
+
+# Azure Linux does not support IA32. Omit its packages and skip its build
+# and installation paths, which require the unsupported setarch -B call.
+[[components.shim-unsigned-x64.overlays]]
+description = "Remove the unsupported IA32 shim-unsigned subpackage"
+type = "spec-remove-subpackage"
+package = "shim-unsigned-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Remove the unsupported IA32 shim-unsigned debuginfo subpackage"
+type = "spec-remove-subpackage"
+package = "shim-unsigned-%{efialtarch}-debuginfo"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Do not run the debug-install helper for the IA32 build"
+type = "spec-search-replace"
+regex = '^%global __debug_install_post %{SOURCE100} %{efiarch} %{efialtarch}$'
+replacement = "%global __debug_install_post %{SOURCE100} %{efiarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip creating the unsupported IA32 build directory"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^mkdir build-%{efialtarch}$'
+replacement = ""
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip the unsupported IA32 build commands"
+type = "spec-search-replace"
+section = "%build"
+regex = '^cd build-%{efialtarch}$'
+replacement = "%if 0\ncd build-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Close the conditional that skips the IA32 build"
+type = "spec-append-lines"
+section = "%build"
+lines = ["%endif"]
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip the unsupported IA32 installation commands"
+type = "spec-search-replace"
+section = "%install"
+regex = '^cd build-%{efialtarch}$'
+replacement = "%if 0\ncd build-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Close the IA32 install conditional"
+type = "spec-append-lines"
+section = "%install"
+lines = ["%endif"]
