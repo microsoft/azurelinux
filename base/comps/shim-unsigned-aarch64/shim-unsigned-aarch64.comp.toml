@@ -23,6 +23,7 @@ lines = [
     "- Remove obsolete %{version}-2 compatibility symlinks",
     "- Add Azure Linux SBAT provenance",
     "- Embed the Azure Linux vendor certificate",
+    "- Add NX-compatible EFI variants",
     "",
 ]
 
@@ -93,3 +94,32 @@ type = "spec-search-replace"
 regex = "fedora-ca-20200709\\.cer"
 replacement = "azurelinux-ca-20230216.der"
 metadata = { category = "azl-security-compliance", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Create NX-compatible EFI variants"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "cd build-%{efiarch}",
+    "for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do",
+    "    cp ${efi}.efi ${efi}.nx.efi",
+    "    ./post-process-pe -n -x ${efi}.nx.efi",
+    "done",
+    "pesign -i shim%{efiarch}.nx.efi -P -h > shim%{efiarch}.nx.hash",
+    "cd ..",
+]
+metadata = { category = "azl-platform-adaptation", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-aarch64.overlays]]
+description = "Install NX-compatible EFI variants"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "cd build-%{efiarch}",
+    "for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do",
+    "    install -m 0644 ${efi}.nx.efi ${RPM_BUILD_ROOT}/%{shimdir}/",
+    "done",
+    "install -m 0644 shim%{efiarch}.nx.hash ${RPM_BUILD_ROOT}/%{shimdir}/",
+    "cd ..",
+]
+metadata = { category = "azl-platform-adaptation", upstream-status = "inapplicable" }

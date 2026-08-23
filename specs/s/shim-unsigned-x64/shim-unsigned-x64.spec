@@ -1,8 +1,11 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global upstream_version_release 16.1-1
+
 %global pesign_vre 0.106-1
 %global openssl_vre 1.0.2j
+%global shim_commit_id afc49558b34548644c1cd0ad1b6526a9470182ed
 
 # For prereleases, % global prerelease rc2, and downpatch Makefile
 %if %{defined prerelease}
@@ -23,25 +26,25 @@
 %global debug_package %{nil}
 %global __debug_package 1
 %global _binaries_in_noarch_packages_terminate_build 0
-%global __debug_install_post %{SOURCE100} %{efiarch} %{efialtarch}
+%global __debug_install_post %{SOURCE100} %{efiarch}
 %undefine _debuginfo_subpackages
 
 # currently here's what's in our dbx: nothing
 %global dbxfile %{nil}
 
 Name:		shim-unsigned-%{efiarch}
-Version:	15.8
-Release: 6%{?dist}
+Version:	16.1
+Release: 2%{?dist}
 Summary:	First-stage UEFI bootloader
 ExclusiveArch:	x86_64
 License:	BSD-2-Clause AND OpenSSL
 URL:		https://github.com/rhboot/shim
 Source0:	https://github.com/rhboot/shim/releases/download/%{version}%{?dashpre}/shim-%{version}%{?dotpre}.tar.bz2
-Source1:	fedora-ca-20200709.cer
+Source1:	azurelinux-ca-20230216.der
 %if 0%{?dbxfile}
 Source2:	%{dbxfile}
 %endif
-Source3:	sbat.redhat.csv
+Source3:	sbat.azurelinux.csv.in
 Source4:	shim.patches
 
 Source100:	shim-find-debuginfo.sh
@@ -53,6 +56,7 @@ BuildRequires:	elfutils-libelf-devel
 BuildRequires:	git openssl-devel openssl
 BuildRequires:	pesign >= %{pesign_vre}
 BuildRequires:	dos2unix findutils
+BuildRequires:	sed
 
 # Shim uses OpenSSL, but cannot use the system copy as the UEFI ABI is not
 # compatible with SysV (there's no red zone under UEFI) and there isn't a
@@ -71,27 +75,12 @@ use this package or when debugging this package.
 %description
 %desc
 
-%package -n shim-unsigned-%{efialtarch}
-Summary:	First-stage UEFI bootloader (unsigned data)
-Provides:	bundled(openssl) = %{openssl_vre}
-
-%description -n shim-unsigned-%{efialtarch}
-%desc
-
 %package debuginfo
 Summary:	Debug information for shim-unsigned-%{efiarch}
 AutoReqProv:	0
 BuildArch:	noarch
 
 %description debuginfo
-%debug_desc
-
-%package -n shim-unsigned-%{efialtarch}-debuginfo
-Summary:	Debug information for shim-unsigned-%{efialtarch}
-AutoReqProv:	0
-BuildArch:	noarch
-
-%description -n shim-unsigned-%{efialtarch}-debuginfo
 %debug_desc
 
 %package debugsource
@@ -107,14 +96,18 @@ BuildArch:	noarch
 git config --unset user.email
 git config --unset user.name
 mkdir build-%{efiarch}
-mkdir build-%{efialtarch}
-cp %{SOURCE3} data/
+
+sed -e 's/@@VERSION@@/%{version}/g' \
+    -e 's/@@RELEASE@@/%{release}/g' \
+    -e 's/@@UPSTREAM_VERSION_RELEASE@@/%{upstream_version_release}/g' \
+    < %{SOURCE3} > data/sbat.redhat.csv
 
 %build
-COMMIT_ID=5914984a1ffeab841f482c791426d7ca9935a5e6
+COMMIT_ID=%{shim_commit_id}
 MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMIT_ID=${COMMIT_ID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim RELEASE=%{release} "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
+MAKEFLAGS+="SBAT_AUTOMATIC_DATE=2025021800 "
 MAKEFLAGS+=" %{_smp_mflags} "
 if [ -f "%{SOURCE1}" ]; then
 	MAKEFLAGS="$MAKEFLAGS VENDOR_CERT_FILE=%{SOURCE1} "
@@ -131,6 +124,7 @@ make ${MAKEFLAGS} \
 	all
 cd ..
 
+%if 0
 cd build-%{efialtarch}
 setarch linux32 -B make ${MAKEFLAGS} \
 	ARCH=%{efialtarch} \
@@ -138,8 +132,16 @@ setarch linux32 -B make ${MAKEFLAGS} \
 	all
 cd ..
 
+%endif
+cd build-%{efiarch}
+for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do
+    cp ${efi}.efi ${efi}.nx.efi
+    ./post-process-pe -n -x ${efi}.nx.efi
+done
+pesign -i shim%{efiarch}.nx.efi -P -h > shim%{efiarch}.nx.hash
+cd ..
 %install
-COMMIT_ID=5914984a1ffeab841f482c791426d7ca9935a5e6
+COMMIT_ID=%{shim_commit_id}
 MAKEFLAGS="TOPDIR=.. -f ../Makefile COMMIT_ID=${COMMIT_ID} "
 MAKEFLAGS+="EFIDIR=%{efidir} PKGNAME=shim RELEASE=%{release} "
 MAKEFLAGS+="ENABLE_SHIM_HASH=true "
@@ -160,6 +162,7 @@ make ${MAKEFLAGS} \
 install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimdir}/"
 cd ..
 
+%if 0
 cd build-%{efialtarch}
 setarch linux32 make ${MAKEFLAGS} \
 	ARCH=%{efialtarch} \
@@ -169,7 +172,13 @@ setarch linux32 make ${MAKEFLAGS} \
 install -m 0644 BOOT*.CSV "${RPM_BUILD_ROOT}/%{shimaltdir}/"
 cd ..
 
-ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2
+%endif
+cd build-%{efiarch}
+for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do
+    install -m 0644 ${efi}.nx.efi ${RPM_BUILD_ROOT}/%{shimdir}/
+done
+install -m 0644 shim%{efiarch}.nx.hash ${RPM_BUILD_ROOT}/%{shimdir}/
+cd ..
 %files
 %license COPYRIGHT
 %dir %{shimrootdir}
@@ -179,23 +188,23 @@ ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2
 %{shimdir}/*.hash
 %{shimdir}/*.CSV
 
-%{_datadir}/shim/%{version}-2
-%files -n shim-unsigned-%{efialtarch}
-%license COPYRIGHT
-%dir %{shimrootdir}
-%dir %{shimversiondir}
-%dir %{shimaltdir}
-%{shimaltdir}/*.efi
-%{shimaltdir}/*.hash
-%{shimaltdir}/*.CSV
-
 %files debuginfo -f build-%{efiarch}/debugfiles.list
-
-%files -n shim-unsigned-%{efialtarch}-debuginfo -f build-%{efialtarch}/debugfiles.list
 
 %files debugsource -f build-%{efiarch}/debugsource.list
 
 %changelog
+* Mon Aug 24 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-2
+- Update shim-unsigned packages to 16.1
+- Enforce the grub,5 SBAT generation baseline
+- Remove obsolete %{version}-2 compatibility symlinks
+- Omit unsupported IA32 output
+- Add Azure Linux SBAT provenance
+- Embed the Azure Linux vendor certificate
+- Add NX-compatible EFI variants
+
+* Wed Sep 03 2025 Peter Jones <pjones@redhat.com> - 16.1-1
+- Update to shim-16.1
+
 * Fri Mar 22 2024 Nicolas Frayer <nfrayer@redhat.com>
 - Migrate to SPDX license
 - Please refer to https://fedoraproject.org/wiki/Changes/SPDX_Licenses_Phase_2
