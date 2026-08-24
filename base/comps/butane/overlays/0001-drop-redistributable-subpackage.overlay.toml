@@ -1,0 +1,44 @@
+# Azure Linux does not ship butane-redistributable. It only carries cross-compiled
+# Linux/macOS/Windows binaries for Fedora release engineering to sign ("Do not
+# install it") -- out of scope here. Remove the subpackage and gate its %build
+# cross-compilation and %install steps off with %if 0.
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the redistributable subpackage (unused by Azure Linux)"
+type = "spec-remove-subpackage"
+package = "redistributable"
+
+[[overlays]]
+description = "Disable the cross-compilation block (open %if 0 guard)"
+type = "spec-search-replace"
+section = "%build"
+regex = '^echo "Building Linux Butane with static linking\.\.\."$'
+replacement = '''%if 0
+echo "Building Linux Butane with static linking..."'''
+
+[[overlays]]
+description = "Disable the cross-compilation block (close guard)"
+type = "spec-search-replace"
+section = "%build"
+regex = '^GOARCH=amd64 GOOS=windows %gocrossbuild -o butane-x86_64-pc-windows-gnu\.exe internal/main\.go$'
+replacement = '''GOARCH=amd64 GOOS=windows %gocrossbuild -o butane-x86_64-pc-windows-gnu.exe internal/main.go
+%endif'''
+
+[[overlays]]
+description = "Stop installing the redistributable binaries (open %if 0 guard)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -d -p %\{buildroot\}%\{_datadir\}/butane$'
+replacement = '''%if 0
+install -d -p %{buildroot}%{_datadir}/butane'''
+
+[[overlays]]
+description = "Stop installing the redistributable binaries (close guard)"
+type = "spec-search-replace"
+section = "%install"
+regex = '^install -p -m 0644 \./butane-x86_64-unknown-linux-gnu-static %\{buildroot\}%\{_datadir\}/butane$'
+replacement = '''install -p -m 0644 ./butane-x86_64-unknown-linux-gnu-static %{buildroot}%{_datadir}/butane
+%endif'''

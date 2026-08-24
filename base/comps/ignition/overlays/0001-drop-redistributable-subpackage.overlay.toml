@@ -1,0 +1,27 @@
+# Azure Linux does not ship ignition-validate-redistributable. It only carries
+# cross-compiled Linux/macOS/Windows binaries for Fedora release engineering to sign
+# ("Do not install it") -- out of scope here. Remove the subpackage and turn its
+# Fedora-only %build/%install blocks off by flipping their %if 0%{?fedora} guards to
+# %if 0 (each is the sole %if 0%{?fedora} in its section).
+[metadata]
+category = "azl-pruning"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Remove the validate-redistributable subpackage (unused by Azure Linux)"
+type = "spec-remove-subpackage"
+package = "validate-redistributable"
+
+[[overlays]]
+description = "Turn off the cross-compilation: flip the %build Fedora guard to %if 0"
+type = "spec-search-replace"
+section = "%build"
+regex = '^%if 0%\{\?fedora\}$'
+replacement = "%if 0"
+
+[[overlays]]
+description = "Stop installing the redistributable binaries: flip the %install Fedora guard to %if 0"
+type = "spec-search-replace"
+section = "%install"
+regex = '^%if 0%\{\?fedora\}$'
+replacement = "%if 0"

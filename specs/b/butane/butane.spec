@@ -25,7 +25,7 @@ configs for provisioning operating systems that use Ignition.}
 %global godocs          docs README.md
 
 Name:           butane
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary:        Butane config transpiler
 
 License:        Apache-2.0
@@ -71,23 +71,6 @@ Provides: bundled(golang(gopkg.in/yaml.v3)) = 3.0.1
 %description
 %{common_description}
 
-%package redistributable
-Summary:       Statically built Butane for Linux, macOS and Windows
-License:       Apache-2.0
-BuildArch:     noarch
-
-# In case someone has this subpackage installed, obsolete the old name
-# Drop in Fedora 38
-Obsoletes:     butane-nonlinux < 0.13.1-3
-
-%description redistributable
-%{common_description}
-
-This package contains statically linked Linux, macOS and Windows Butane
-binaries built through cross-compilation. Do not install it. It is only
-used for building release binaries to be signed by Fedora release
-engineering and uploaded to the Butane GitHub releases page.
-
 %prep
 %goprep -k
 %autopatch -p1
@@ -101,6 +84,7 @@ echo "Building butane..."
 
 %global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(head -c8 /dev/urandom|od -An -tx1|tr -d ' \\n')" -a -v -x 
 
+%if 0
 echo "Building Linux Butane with static linking..."
 CGO_ENABLED=0 GOARCH=arm64 GOOS=linux %gocrossbuild -o butane-aarch64-unknown-linux-gnu-static internal/main.go
 CGO_ENABLED=0 GOARCH=ppc64le GOOS=linux %gocrossbuild -o butane-ppc64le-unknown-linux-gnu-static internal/main.go
@@ -113,11 +97,13 @@ GOARCH=arm64 GOOS=darwin %gocrossbuild -o butane-aarch64-apple-darwin internal/m
 
 echo "Building Windows Butane..."
 GOARCH=amd64 GOOS=windows %gocrossbuild -o butane-x86_64-pc-windows-gnu.exe internal/main.go
+%endif
 
 %install
 install -d -p %{buildroot}%{_bindir}
 install -p -m 0755 ./butane %{buildroot}%{_bindir}
 ln -s butane %{buildroot}%{_bindir}/fcct
+%if 0
 install -d -p %{buildroot}%{_datadir}/butane
 install -p -m 0644 ./butane-aarch64-apple-darwin %{buildroot}%{_datadir}/butane
 install -p -m 0644 ./butane-aarch64-unknown-linux-gnu-static %{buildroot}%{_datadir}/butane
@@ -126,6 +112,7 @@ install -p -m 0644 ./butane-s390x-unknown-linux-gnu-static %{buildroot}%{_datadi
 install -p -m 0644 ./butane-x86_64-apple-darwin %{buildroot}%{_datadir}/butane
 install -p -m 0644 ./butane-x86_64-pc-windows-gnu.exe %{buildroot}%{_datadir}/butane
 install -p -m 0644 ./butane-x86_64-unknown-linux-gnu-static %{buildroot}%{_datadir}/butane
+%endif
 
 %if %{with check}
 %check
@@ -137,17 +124,6 @@ install -p -m 0644 ./butane-x86_64-unknown-linux-gnu-static %{buildroot}%{_datad
 %doc %{godocs}
 %{_bindir}/butane
 %{_bindir}/fcct
-
-%files redistributable
-%license %{golicenses}
-%dir %{_datadir}/butane
-%{_datadir}/butane/butane-aarch64-apple-darwin
-%{_datadir}/butane/butane-aarch64-unknown-linux-gnu-static
-%{_datadir}/butane/butane-ppc64le-unknown-linux-gnu-static
-%{_datadir}/butane/butane-s390x-unknown-linux-gnu-static
-%{_datadir}/butane/butane-x86_64-apple-darwin
-%{_datadir}/butane/butane-x86_64-pc-windows-gnu.exe
-%{_datadir}/butane/butane-x86_64-unknown-linux-gnu-static
 
 %changelog
 * Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 0.26.0-2
