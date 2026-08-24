@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Use constant logger formats in tests for Go 1.26 vet"
+type = "patch-add"
+source = "../0001-tests-use-constant-logger-format.patch"
