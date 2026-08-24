@@ -19,7 +19,7 @@
 Summary:       Tools to access and modify virtual machine disk images
 Name:          guestfs-tools
 Version:       1.55.5
-Release: 4%{?dist}
+Release: 5%{?dist}
 License:       GPL-2.0-or-later AND LGPL-2.0-or-later
 
 # Build only for architectures that have a kernel
