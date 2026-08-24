@@ -1,0 +1,27 @@
+From e5f925e8d94e0957952bee1c9f433ad0ca2674d2 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 24 Aug 2026 23:28:54 +0000
+Subject: [PATCH] route builder: use a constant log format
+
+Go 1.26 rejects non-constant strings passed to printf-style logging.
+Use a constant format and pass the route path as an argument.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ route_builder.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/route_builder.go b/route_builder.go
+--- a/route_builder.go
++++ b/route_builder.go
+@@ -315,7 +315,7 @@ func (b *RouteBuilder) Build() Route {
+ 		os.Exit(1)
+ 	}
+ 	if b.function == nil {
+-		log.Printf("No function specified for route:" + b.currentPath)
++		log.Printf("No function specified for route: %s", b.currentPath)
+ 		os.Exit(1)
+ 	}
+ 	operationName := b.operation
+--
+2.51.0
