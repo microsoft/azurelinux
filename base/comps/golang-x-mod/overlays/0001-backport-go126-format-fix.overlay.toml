@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/golang/mod/commit/3f03020ad52668adcab6ffe2fe4a7a6fcce4ee9f" }]
+
+[[overlays]]
+description = "Backport the x/mod Go 1.26 format fix"
+type = "patch-add"
+source = "../0001-modfile-cast-invalid-input-to-rune.patch"
+
+[[overlays]]
+description = "Apply the x/mod Go 1.26 format fix"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]
