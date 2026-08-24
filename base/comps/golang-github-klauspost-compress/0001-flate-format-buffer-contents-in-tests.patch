@@ -1,0 +1,21 @@
+diff --git a/flate/inflate_test.go b/flate/inflate_test.go
+--- a/flate/inflate_test.go
++++ b/flate/inflate_test.go
+@@ -37,7 +37,7 @@ func TestReset(t *testing.T) {
+ 
+ 	for i, s := range ss {
+ 		if s != inflated[i].String() {
+-			t.Errorf("inflated[%d]:\ngot  %q\nwant %q", i, inflated[i], s)
++			t.Errorf("inflated[%d]:\ngot  %q\nwant %q", i, inflated[i].String(), s)
+ 		}
+ 	}
+ }
+@@ -94,7 +94,7 @@ func TestResetDict(t *testing.T) {
+ 
+ 	for i, s := range ss {
+ 		if s != inflated[i].String() {
+-			t.Errorf("inflated[%d]:\ngot  %q\nwant %q", i, inflated[i], s)
++			t.Errorf("inflated[%d]:\ngot  %q\nwant %q", i, inflated[i].String(), s)
+ 		}
+ 	}
+ }
