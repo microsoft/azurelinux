@@ -36,7 +36,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        27%{?dist}
+Release:        28%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -505,6 +505,9 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-28
+- Disable secure redirects and IPv6 router advertisements for CIS hardening
+
 * Sun Aug 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-27
 - Deny unused CIS network protocol modules by default
 
