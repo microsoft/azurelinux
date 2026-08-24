@@ -1,0 +1,69 @@
+# wsl-setup ships Fedora's defaults: the %post scriptlet invokes
+# /usr/bin/wsl-setup with no arguments, so the generated
+# /usr/lib/wsl-distribution.conf gets
+#   defaultName = <NAME-from-os-release without spaces>-<VERSION_ID major>
+#   icon        = /usr/share/pixmaps/fedora-logo.ico
+# On Azure Linux that resolves to "AzureLinux-4" and a Fedora-branded icon
+# path. Both were flagged by the WSL maintainers when reviewing the image
+# for microsoft/WSL#41120; upstream's guidance is for downstream distros to
+# pass non-default values to the post-install script, which is also what
+# RHEL does. The remaining overlays strip Fedora branding from the two
+# config/script files the package installs onto the running system.
+[components.wsl-setup]
+
+# The name WSL registers the distribution under must match the "Name" field
+# of the AzureLinux entry in WSL's distributions/DistributionInfo.json,
+# otherwise `wsl --install AzureLinux-4.0-BETA` and a double-click install
+# of the same .wsl artifact produce two differently-named distributions.
+# The icon is pointed at the real Azure Linux asset rather than relying on
+# the fedora-logo.ico compatibility symlink in azurelinux-logos.
+[[components.wsl-setup.overlays]]
+description = "Register WSL distribution as AzureLinux-4.0-BETA with the Azure Linux icon instead of Fedora's auto-generated defaults"
+type = "spec-search-replace"
+section = "%post"
+regex = '^%\{_bindir\}/wsl-setup$'
+replacement = '%{_bindir}/wsl-setup --name "AzureLinux-4.0-BETA" --icon %{_datadir}/pixmaps/azurelinux-logo.ico'
+
+[components.wsl-setup.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+bugs = [{ url = "https://github.com/microsoft/WSL/pull/41120" }]
+
+# Keep the scriptlet comment truthful now that the defaults are overridden.
+[[components.wsl-setup.overlays]]
+description = "Update %post comment — the naming is no longer auto-generated from os-release"
+type = "spec-search-replace"
+section = "%post"
+regex = '^# generate the "auto" naming, using the defaults$'
+replacement = '# Generate the distribution config with the Azure Linux name and icon'
+
+[components.wsl-setup.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+# /usr/libexec/wsl/oobe.sh is installed onto the running system and is the
+# first thing a user interacts with, so it should not describe itself as the
+# Fedora OOBE script.
+[[components.wsl-setup.overlays]]
+description = "Drop Fedora branding from the OOBE script header"
+type = "file-search-replace"
+file = "wsl-oobe.sh"
+regex = 'The Fedora WSL out of box experience script\.'
+replacement = "The Azure Linux WSL out of box experience script."
+
+[components.wsl-setup.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
+
+# The template becomes /usr/lib/wsl-distribution.conf (symlinked from
+# /etc/wsl-distribution.conf), so its example command is user-visible.
+[[components.wsl-setup.overlays]]
+description = "Use the Azure Linux artifact name in the wsl-distribution.conf example command"
+type = "file-search-replace"
+file = "wsl-distribution.conf"
+regex = 'wsl --install --from-file \./Fedora\.wsl'
+replacement = "wsl --install --from-file ./AzureLinux.wsl"
+
+[components.wsl-setup.overlays.metadata]
+category = "azl-branding-policy"
+upstream-status = "inapplicable"
