@@ -1,0 +1,4 @@
+[components.golang-x-oauth2]
+
+# Pin the fixed Fedora 43 update beyond the distro snapshot.
+spec = { type = "upstream", upstream-commit = "e6d1ba97054a0e7e6ac8868602d1609c09fb89e1" }
