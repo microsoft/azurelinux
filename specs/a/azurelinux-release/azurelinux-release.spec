@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        26%{?dist}
+Release:        27%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -52,6 +52,7 @@ Source14:       distro-template.swidtag
 Source15:       distro-variant-template.swidtag
 Source16:       20-azurelinux-defaults.conf
 Source17:       20-azure.conf
+Source18:       80-wsl.preset
 
 Source20:       chrony-azure.conf
 Source21:       50-azure-cloud.conf
@@ -373,6 +374,32 @@ echo "VARIANT=\"WSL\"" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 echo "VARIANT_ID=wsl" >> %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -i -e "s|(%{release_name}%{?prerelease})|(WSL%{?prerelease})|g" %{buildroot}%{_prefix}/lib/os-release.wsl
 sed -e "s#\$version#%{bug_version}#g" -e 's/$variant/WSL/;s/<!--.*-->//;/^$/d' %{SOURCE15} > %{buildroot}%{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+
+# WSL manages networking, DNS and the console for the distribution, so the
+# units that duplicate that management must not be enabled. This preset sorts
+# before 90-default.preset and systemd's 90-systemd.preset, and systemd applies
+# the first matching line, so it overrides both.
+install -Dm0644 %{SOURCE18} -t %{buildroot}%{_prefix}/lib/systemd/system-preset/
+
+# A preset can only act on units that have an [Install] section. The units
+# below are static -- systemd-vconsole-setup.service is pulled in by a udev
+# rule, and the rest by *.target.wants directories systemd ships in /usr/lib --
+# so masking is the only way to stop them. This is also exactly what WSL's
+# image validator looks for (an /etc/systemd/system entry pointing at
+# /dev/null).
+#
+# systemd-tmpfiles-setup.service is deliberately NOT masked: wsl-setup relies on
+# it to materialize the WSLg X11/Wayland/PulseAudio socket links, so masking it
+# would break GUI application support.
+install -d %{buildroot}%{_sysconfdir}/systemd/system
+for unit in systemd-vconsole-setup.service \
+            tmp.mount \
+            systemd-tmpfiles-clean.service \
+            systemd-tmpfiles-clean.timer \
+            systemd-tmpfiles-setup-dev.service \
+            systemd-tmpfiles-setup-dev-early.service; do
+    ln -s /dev/null %{buildroot}%{_sysconfdir}/systemd/system/"${unit}"
+done
 %endif
 
 # Create the symlink for /etc/os-release
@@ -500,10 +527,21 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %files identity-wsl
 %{_prefix}/lib/os-release.wsl
 %attr(0644,root,root) %{_swidtagdir}/com.microsoft.AzureLinux-variant.swidtag.wsl
+%{_prefix}/lib/systemd/system-preset/80-wsl.preset
+%{_sysconfdir}/systemd/system/systemd-vconsole-setup.service
+%{_sysconfdir}/systemd/system/tmp.mount
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-clean.service
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-clean.timer
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev.service
+%{_sysconfdir}/systemd/system/systemd-tmpfiles-setup-dev-early.service
 %endif
 
 
 %changelog
+* Mon Aug 24 2026 Muhammad Falak R Wani <falakreyaz@gmail.com> - 4.0-27
+- Add 80-wsl.preset disabling systemd-networkd, systemd-resolved and getty@tty1 for the WSL variant
+- Mask the static console, /tmp and early tmpfiles units that WSL manages itself
+
 * Mon Aug 17 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-26
 - Configure CIS SSH server defaults for Azure Linux cloud images
 
