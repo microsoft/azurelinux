@@ -1,0 +1,27 @@
+From b6cb6bf53fdd92607696b7287a5a69dca44692fd Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 24 Aug 2026 23:38:44 +0000
+Subject: [PATCH] checker: pass undefined enum value to Failf
+
+Go 1.26 detects that the %d directive has no corresponding argument.
+Pass the undefined enum value so the diagnostic reports it correctly.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ module/checker.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/module/checker.go b/module/checker.go
+--- a/module/checker.go
++++ b/module/checker.go
+@@ -265,7 +265,7 @@ func (m *Module) CheckEnum(f pgs.Field, rules *validate.EnumRules) {
+ 
+ 		for _, in := range r.In {
+ 			if _, ok = vals[in]; !ok {
+-				m.Failf("undefined `in` value (%d) conflicts with `defined_only` rule")
++				m.Failf("undefined `in` value (%d) conflicts with `defined_only` rule", in)
+ 			}
+ 		}
+ 	}
+--
+2.51.0
