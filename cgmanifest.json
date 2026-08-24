@@ -9721,8 +9721,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.10.3",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
+          "version": "1.11.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.3.tar.bz2"
         }
       }
     },
@@ -9841,8 +9841,8 @@
         "type": "other",
         "other": {
           "name": "libgpg-error",
-          "version": "1.48",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.48.tar.bz2"
+          "version": "1.49",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.bz2"
         }
       }
     },
