@@ -1,0 +1,4 @@
+[components.golang-x-text]
+
+# Pin the fixed Fedora 43 update beyond the distro snapshot.
+spec = { type = "upstream", upstream-commit = "cd64896efc11d0ca78c292d269cfded5265e2423" }
