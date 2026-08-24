@@ -1,0 +1,28 @@
+From 8fe688daccd5312f287dd568a55d8b747ed464b1 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 24 Aug 2026 23:33:26 +0000
+Subject: [PATCH] tests: use constant logger formats
+
+Go 1.26 rejects runtime strings passed directly as printf formats. Log
+the response strings through a constant %s format instead.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ client_test.go | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/client_test.go b/client_test.go
+--- a/client_test.go
++++ b/client_test.go
+@@ -667,3 +667,3 @@ func TestClient_ResponseLogHook(t *testing.T) {
+ 			if logger != nil {
+-				logger.Printf(successLog)
++				logger.Printf("%s", successLog)
+ 			} else {
+@@ -679,3 +679,3 @@ func TestClient_ResponseLogHook(t *testing.T) {
+ 			if logger != nil {
+-				logger.Printf(failLog)
++				logger.Printf("%s", failLog)
+ 			} else {
+--
+2.51.0
