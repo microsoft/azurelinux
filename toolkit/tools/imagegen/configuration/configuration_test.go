@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -14,6 +15,7 @@ import (
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMain(m *testing.M) {
@@ -60,6 +62,24 @@ func TestConfigurationShouldContainExpectedFields(t *testing.T) {
 	logger.Log.Infof("Actual: %v", actualConfiguration)
 
 	assert.Equal(t, expectedConfiguration, actualConfiguration)
+}
+
+func TestMarketplaceGen2RootUsesPartUuid(t *testing.T) {
+	configFiles, err := filepath.Glob("../../../imageconfigs/marketplace-gen2*.json")
+	require.NoError(t, err)
+	require.NotEmpty(t, configFiles)
+
+	for _, configFile := range configFiles {
+		t.Run(filepath.Base(configFile), func(t *testing.T) {
+			config, err := Load(configFile)
+			require.NoError(t, err)
+			require.NotEmpty(t, config.SystemConfigs)
+
+			root := config.SystemConfigs[0].GetRootPartitionSetting()
+			require.NotNil(t, root)
+			assert.Equal(t, MountIdentifierPartUuid, root.MountIdentifier)
+		})
+	}
 }
 
 func TestShouldErrorForMissingFile(t *testing.T) {

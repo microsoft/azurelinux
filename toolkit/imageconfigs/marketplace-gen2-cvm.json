@@ -43,6 +43,7 @@
                 },
                 {
                     "ID": "rootfs",
+                    "MountIdentifier": "partuuid",
                     "MountPoint": "/"
                 }
             ],

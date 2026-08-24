@@ -4,12 +4,51 @@
 package imagecustomizerapi
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
 	"github.com/microsoft/azurelinux/toolkit/tools/internal/ptrutils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
+
+func TestMarketplaceGen2RootUsesPartUuid(t *testing.T) {
+	configFiles, err := filepath.Glob("../../imageconfigs/marketplace-gen2-*.yaml")
+	require.NoError(t, err)
+	require.NotEmpty(t, configFiles)
+
+	for _, configFile := range configFiles {
+		t.Run(filepath.Base(configFile), func(t *testing.T) {
+			var config struct {
+				Storage struct {
+					FileSystems []struct {
+						DeviceId   string     `yaml:"deviceId"`
+						MountPoint MountPoint `yaml:"mountPoint"`
+					} `yaml:"filesystems"`
+				} `yaml:"storage"`
+			}
+
+			configData, err := os.ReadFile(configFile)
+			require.NoError(t, err)
+			require.NoError(t, yaml.Unmarshal(configData, &config))
+
+			var root *MountPoint
+			for i := range config.Storage.FileSystems {
+				fileSystem := &config.Storage.FileSystems[i]
+				if fileSystem.MountPoint.Path == "/" {
+					root = &fileSystem.MountPoint
+					break
+				}
+			}
+
+			require.NotNil(t, root)
+			assert.Equal(t, MountIdentifierTypePartUuid, root.IdType)
+		})
+	}
+}
 
 func TestConfigIsValid(t *testing.T) {
 	config := &Config{
