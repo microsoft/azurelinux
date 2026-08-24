@@ -13,7 +13,7 @@
 
 Name:           hivex
 Version:        1.3.24
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary:        Read and write Windows Registry binary hive files
 
 License:        LGPL-2.1-only AND LGPL-2.0-or-later AND GPL-2.0-or-later

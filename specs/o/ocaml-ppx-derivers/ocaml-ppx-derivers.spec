@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-ppx-derivers
 Version:        1.2.1
-Release: 45%{?dist}
+Release: 46%{?dist}
 Summary:        Deriving plugin registry
 
 License:        BSD-3-Clause

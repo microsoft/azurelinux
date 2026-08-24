@@ -6,7 +6,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-augeas
 Version:        0.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary:        OCaml bindings for Augeas configuration API
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
