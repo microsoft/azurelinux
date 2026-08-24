@@ -1,7 +1,7 @@
 # SBAT: edit the upstream sbat.csv.in in place. Swap grub.rh to the
 # @@UPSTREAM_VERSION_RELEASE@@ placeholder and append the grub.azurelinux vendor line.
-# The placeholder is substituted at build time from an interim spec macro pinned to
-# the Fedora grub2 NEVR; swap that macro for the azldev EVR macro when bug 21798 lands.
+# The placeholder is substituted at build time from the Fedora upstream provenance
+# macros emitted by azldev.
 [metadata]
 category = "azl-security-compliance"
 upstream-status = "inapplicable"
@@ -21,16 +21,13 @@ regex = '\n\z'
 replacement = "\ngrub.azurelinux,3,Microsoft,grub2,@@VERSION_RELEASE@@,https://github.com/microsoft/azurelinux/issues\n"
 
 [[overlays]]
-description = "SBAT: define interim upstream-EVR spec macro (pinned Fedora grub2 NEVR); replaced by the azldev EVR macro from bug 21798"
-type = "spec-prepend-lines"
-lines = ["%global upstream_version_release 2.12-40.fc43", ""]
-
-[[overlays]]
-description = "SBAT: substitute @@UPSTREAM_VERSION_RELEASE@@ in generated SBAT templates without masking sed failures"
+description = "SBAT: substitute the Fedora upstream provenance in generated SBAT templates without masking sed failures"
 type = "spec-search-replace"
 section = "%prep"
 regex = '^sed -e "s,@@VERSION@@,%\{version\},g" -e "s,@@VERSION_RELEASE@@,%\{version\}-%\{release\},g" \\$'
-replacement = 'sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{upstream_version_release},g" \'
+replacement = '''%{!?fedora_upstream_version:%{error:missing Fedora upstream version}}
+%{!?fedora_upstream_release:%{error:missing Fedora upstream release}}
+sed -e "s,@@VERSION@@,%{version},g" -e "s,@@VERSION_RELEASE@@,%{version}-%{release},g" -e "s,@@UPSTREAM_VERSION_RELEASE@@,%{?fedora_upstream_version}-%{?fedora_upstream_release},g" \'''
 
 [[overlays]]
 description = "SBAT: correct the missing scheme separator in the upstream GNU GRUB URL"
