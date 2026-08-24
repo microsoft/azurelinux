@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Fix OpenCensus format errors rejected by Go 1.26 vet"
+type = "patch-add"
+source = "../0001-fix-go126-format-errors.patch"
