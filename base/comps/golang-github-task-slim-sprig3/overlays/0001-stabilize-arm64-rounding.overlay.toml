@@ -1,0 +1,9 @@
+[metadata]
+category = "azl-platform-adaptation"
+upstream-status = "upstreamable"
+bugs = [{ url = "https://github.com/golang/go/issues/77657" }]
+
+[[overlays]]
+description = "Force float64 rounding before math.Modf on arm64"
+type = "patch-add"
+source = "../0001-numeric-force-float64-rounding-before-modf.patch"
