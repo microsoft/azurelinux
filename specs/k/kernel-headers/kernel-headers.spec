@@ -16,18 +16,24 @@
 # be 0.
 %global released_kernel 1
 
-# AZL: RPM release counter. Bump for rebuilds without a version change.
-%define azl_pkgrelease 2
-# AZL: 4th version component from the AZL kernel source (6.18.39.1). Flows
-# into Version:, Release:, and the extracted source tree name.
+# AZL: our kernel source comes to us with a non-standard 4-digit version
+# number (e.g. A.B.C.D), so we remove the 4th number (e.g. D) and use the
+# standard 3-digit version (e.g. A.B.C), and place the 4th number into the
+# leading (dot-separated) position of our release value, in the %{specrelease}
+# macro below. For example, if the kernel source is version "A.B.C.D", our rpm
+# V-R would start with "A.B.C-D." plus the remaining release macro/arch values.
 %define kextraversion 1
+# AZL: RPM release counter. Bump for rebuilds without a version change. This
+# corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
+# %{specrelease} macro below instead of a hardcoded value.
+%define azl_pkgrelease 3
 
 # define buildid .local
 %define specversion 6.18.39
 %define tarfile_release 6.18.39
 # This is needed to do merge window version magic
 # This allows pkg_release to have configurable %%{?dist} tag
-%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?dist}
+%define specrelease %{kextraversion}.%{azl_pkgrelease}%{?buildid}%{?dist}
 
 # This package doesn't contain any binary, thus no debuginfo package is needed
 %global debug_package %{nil}
@@ -116,6 +122,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
+- chore(kernel-headers): tidy release macros
+
 * Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.2
 - chore(kernel-headers): bump release to stay aligned with kernel spec
 

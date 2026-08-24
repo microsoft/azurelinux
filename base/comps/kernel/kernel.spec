@@ -6,11 +6,18 @@
 
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
-# When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 2
-# 4th version component from the AZL kernel source (6.18.39.1). Flows into
-# Release:, uname -r, and the /lib/modules/ path.
+# AZL: our kernel source comes to us with a non-standard 4-digit version
+# number (e.g. A.B.C.D), so we remove the 4th number (e.g. D) and use the
+# standard 3-digit version (e.g. A.B.C), and place the 4th number into the
+# leading (dot-separated) position of our release value, in the %{specrelease}
+# macro below. For example, if the kernel source is version "A.B.C.D", our rpm
+# (and uname -r) V-R would start with "A.B.C-D." plus the remaining release
+# macro/arch values.
 %define kextraversion 1
+# When rebuilding without a version change, bump azl_pkgrelease (manual release).
+# This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
+# %{specrelease} macro below instead of a hardcoded value.
+%define azl_pkgrelease 3
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 595.58.03
 
@@ -4609,6 +4616,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
+- chore(kernel): tidy release macros
+
 * Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.2
 - feat(kernel): enable TCP BBR3 congestion control as a module
 
