@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Format HTTP status as an integer for Go 1.26 vet"
+type = "patch-add"
+source = "../0001-tests-format-http-status-code-as-integer.patch"
