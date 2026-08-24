@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/golang/net/commit/7c360367ab7e57c0cfb7aef368fc6acefaaac3b1" }]
+
+[[overlays]]
+description = "Backport the x/net Go 1.26 format fix"
+type = "patch-add"
+source = "../0001-fix-invalid-format-strings.patch"
+
+[[overlays]]
+description = "Apply the x/net Go 1.26 format fix"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]
