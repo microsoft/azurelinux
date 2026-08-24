@@ -1,7 +1,7 @@
 Summary:        Metapackage for Kata UVM components
 Name:           kata-packages-uvm
 Version:        1.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -62,9 +62,6 @@ Requires:       acpica-tools
 Requires:       cargo
 Requires:       clang
 Requires:       kata-containers-tools
-%ifarch x86_64
-Requires:       kata-containers-cc-tools
-%endif
 Requires:       kernel-uvm
 Requires:       kernel-uvm-devel
 Requires:       make
@@ -110,6 +107,9 @@ Requires:       golang
 %files coco-sign
 
 %changelog
+* Mon Aug 24 2026 Jon Slobodzian <jslobodzian@microsoft.com> - 1.0.0-10
+- Remove dependency on kata-containers-cc-tools
+
 * Mon Oct 13 2025 Saul Paredes <saulparedes@microsoft.com> - 1.0.0-9
 - Enable build on aarch64
 
