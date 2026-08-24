@@ -16,7 +16,7 @@
 
 Name:           update-ssh-keys
 Version:        0.3.0
-Release:        2%{?dist}
+Release:        1%{?dist}
 Summary:        Utility for managing OpenSSH authorized public keys
 
 License:        Apache-2.0
@@ -80,9 +80,6 @@ cargo test --offline
 %{_bindir}/%{crate}
 
 %changelog
-* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 0.3.0-2
-- Bump release to rebuild with rust
-
 * Wed Feb 19 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 0.3.0-1
 - Initial Azure Linux import from the source project (license: same as "License" tag).
 - License verified

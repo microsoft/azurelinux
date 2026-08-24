@@ -27794,8 +27794,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.96.1",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.96.1-src.tar.xz"
+          "version": "1.90.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
         }
       }
     },
@@ -27806,16 +27806,6 @@
           "name": "rust-afterburn",
           "version": "5.8.2",
           "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
-        }
-      }
-    },
-    {
-      "component": {
-        "type": "other",
-        "other": {
-          "name": "rust-bootstrap",
-          "version": "1.95.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/2026-04-16/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz"
         }
       }
     },
