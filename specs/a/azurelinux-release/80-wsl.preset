@@ -1,0 +1,35 @@
+# Systemd preset overrides for the Azure Linux WSL variant.
+#
+# WSL manages networking, DNS resolution and the console on behalf of the
+# distribution. Units that duplicate that management either fail outright or
+# fight with the Windows host, and several of them fail noisily when more than
+# one WSL distribution is running at the same time. See:
+# https://learn.microsoft.com/windows/wsl/build-custom-distro#systemd-recommendations
+#
+# systemd reads preset files from all preset directories in lexicographic
+# filename order and applies the first line that matches a unit, so this file
+# takes precedence over both Azure Linux's 90-default.preset and systemd's own
+# 90-systemd.preset. The 80- prefix matches the convention fedora-release uses
+# for its variant presets (80-server.preset, 80-workstation.preset, ...).
+#
+# Only units with an [Install] section can be turned off from a preset.
+# systemd-vconsole-setup.service, tmp.mount and the systemd-tmpfiles-* units are
+# static, so azurelinux-release-wsl masks those instead. Keep the two lists in
+# sync with the comment in azurelinux-release.spec.
+
+# WSL configures the network adapters; the distribution must not.
+disable systemd-networkd.service
+disable systemd-networkd.socket
+disable systemd-networkd-varlink.socket
+disable systemd-networkd-wait-online.service
+
+# WSL owns DNS resolution and writes /etc/resolv.conf itself.
+disable systemd-resolved.service
+disable systemd-resolved-monitor.socket
+disable systemd-resolved-varlink.socket
+
+# tty1 is unreachable under WSL and claiming the console races with other
+# distributions running on the same host. The glob also covers the
+# getty@.service template itself, which systemd's preset enables with
+# DefaultInstance=tty1.
+disable getty@*.service
