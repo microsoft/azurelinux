@@ -1,0 +1,29 @@
+From 2e99d9f1b7898125b85623a8e6b36cd08a0e7258 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 24 Aug 2026 23:23:41 +0000
+Subject: [PATCH] tests: format cookie max age as integer
+
+Go 1.26's stricter printf analysis rejects %q for integer MaxAge
+values. Use %d so TestNewCookieFromOptions passes vet without disabling
+the check.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ cookie_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cookie_test.go b/cookie_test.go
+--- a/cookie_test.go
++++ b/cookie_test.go
+@@ -45,7 +45,7 @@ func TestNewCookieFromOptions(t *testing.T) {
+ 			t.Fatalf("%v: bad cookie domain: got %q, want %q", i+1, cookie.Domain, v.domain)
+ 		}
+ 		if cookie.MaxAge != v.maxAge {
+-			t.Fatalf("%v: bad cookie maxAge: got %q, want %q", i+1, cookie.MaxAge, v.maxAge)
++			t.Fatalf("%v: bad cookie maxAge: got %d, want %d", i+1, cookie.MaxAge, v.maxAge)
+ 		}
+ 		if cookie.Secure != v.secure {
+ 			t.Fatalf("%v: bad cookie secure: got %v, want %v", i+1, cookie.Secure, v.secure)
+
+--
+2.51.0
