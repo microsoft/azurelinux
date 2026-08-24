@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/klauspost/compress/commit/f0953f938f77977980c3b9f8c09eec06f2e88a69" }]
+
+[[overlays]]
+description = "Backport the compress Go 1.26 format fix"
+type = "patch-add"
+source = "../0001-flate-format-buffer-contents-in-tests.patch"
+
+[[overlays]]
+description = "Apply the compress Go 1.26 format fix"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]

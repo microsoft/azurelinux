@@ -1,0 +1,12 @@
+diff --git a/markdown_test.go b/markdown_test.go
+--- a/markdown_test.go
++++ b/markdown_test.go
+@@ -30,7 +30,7 @@ func TestMarkdownService_Render(t *testing.T) {
+ 	}
+ 
+ 	if resp.StatusCode != http.StatusOK {
+-		t.Fatalf("Render returned status, expected %q but got %q", http.StatusOK, resp.Status)
++		t.Fatalf("Render returned status, expected %d but got %q", http.StatusOK, resp.Status)
+ 	}
+ 
+ 	if markdown.HTML != markdownHTMLResponse {

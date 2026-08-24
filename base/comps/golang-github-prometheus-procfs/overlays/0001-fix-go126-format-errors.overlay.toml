@@ -1,0 +1,12 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [
+    { url = "https://github.com/prometheus/procfs/commit/de7907007d9cf91228438b1912b39cf5e55e9751" },
+    { url = "https://github.com/prometheus/procfs/commit/3c943fdba94a978d990553698da4add62bb11a30" },
+]
+
+[[overlays]]
+description = "Backport procfs format fixes for Go 1.26 vet"
+type = "patch-add"
+source = "../0001-fix-go126-format-errors.patch"

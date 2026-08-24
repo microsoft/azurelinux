@@ -1,0 +1,12 @@
+diff --git a/module/checker.go b/module/checker.go
+--- a/module/checker.go
++++ b/module/checker.go
+@@ -265,7 +265,7 @@ func (m *Module) CheckEnum(f pgs.Field, rules *validate.EnumRules) {
+ 
+ 		for _, in := range r.In {
+ 			if _, ok = vals[in]; !ok {
+-				m.Failf("undefined `in` value (%d) conflicts with `defined_only` rule")
++				m.Failf("undefined `in` value (%d) conflicts with `defined_only` rule", in)
+ 			}
+ 		}
+ 	}

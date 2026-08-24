@@ -1,0 +1,13 @@
+diff --git a/client_test.go b/client_test.go
+--- a/client_test.go
++++ b/client_test.go
+@@ -667,3 +667,3 @@ func TestClient_ResponseLogHook(t *testing.T) {
+ 			if logger != nil {
+-				logger.Printf(successLog)
++				logger.Printf("%s", successLog)
+ 			} else {
+@@ -679,3 +679,3 @@ func TestClient_ResponseLogHook(t *testing.T) {
+ 			if logger != nil {
+-				logger.Printf(failLog)
++				logger.Printf("%s", failLog)
+ 			} else {

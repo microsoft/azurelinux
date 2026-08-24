@@ -1,0 +1,12 @@
+diff --git a/route_builder.go b/route_builder.go
+--- a/route_builder.go
++++ b/route_builder.go
+@@ -315,7 +315,7 @@ func (b *RouteBuilder) Build() Route {
+ 		os.Exit(1)
+ 	}
+ 	if b.function == nil {
+-		log.Printf("No function specified for route:" + b.currentPath)
++		log.Printf("No function specified for route: %s", b.currentPath)
+ 		os.Exit(1)
+ 	}
+ 	operationName := b.operation

@@ -18,7 +18,7 @@ Protoc plugin to generate polyglot message validators.}
                         rule_comparison.md README.md java/RELEASING.md
 
 Name:           %{goname}
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary:        Protoc plugin to generate polyglot message validators
 
 # Upstream license specification: Apache-2.0
@@ -39,6 +39,7 @@ BuildRequires:  golang(github.com/lyft/protoc-gen-star)
 BuildRequires:  golang(github.com/lyft/protoc-gen-star/lang/go)
 BuildRequires:  golang(golang.org/x/net/context)
 
+Patch0: 0001-checker-pass-undefined-enum-value.patch
 %description
 %{common_description}
 
@@ -47,6 +48,7 @@ BuildRequires:  golang(golang.org/x/net/context)
 %prep
 %goprep
 
+%autopatch -p1
 %build
 %gobuild -o %{gobuilddir}/bin/protoc-gen-validate %{goipath}
 

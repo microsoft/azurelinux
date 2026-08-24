@@ -20,13 +20,14 @@ Package for building REST-style Web Services using Go.}
 %global godocs          examples CHANGES.md README.md
 
 Name:           %{goname}
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary:        Package for building REST-style Web Services using Go
 
 License:        MIT
 URL:            %{gourl}
 Source0:        %{gosource}
 
+Patch0: 0001-route-builder-use-constant-log-format.patch
 %description
 %{common_description}
 
@@ -35,6 +36,7 @@ Source0:        %{gosource}
 %prep
 %goprep
 
+%autopatch -p1
 %generate_buildrequires
 %go_generate_buildrequires
 

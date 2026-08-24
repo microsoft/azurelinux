@@ -1,0 +1,79 @@
+diff --git a/http2/server_test.go b/http2/server_test.go
+--- a/http2/server_test.go
++++ b/http2/server_test.go
+@@ -1839,7 +1839,7 @@ func testServerRequestBody(t *testing.T, body []byte, trailer http.Header) {
+ 			}
+ 			checkReq := func(r *http.Request) {
+ 				if r.ContentLength != tt.wantCL {
+-					t.Fatalf("Got: %q\nWant: %q", r.ContentLength, tt.wantCL)
++					t.Fatalf("Got: %d\nWant: %d", r.ContentLength, tt.wantCL)
+ 				}
+ 			}
+ 			testServerRequest(t, writeReq, checkReq)
+
+diff --git a/webdav/prop_test.go b/webdav/prop_test.go
+--- a/webdav/prop_test.go
++++ b/webdav/prop_test.go
+@@ -556,7 +556,7 @@ func TestMemPS(t *testing.T) {
+ 			sort.Sort(byStatus(propstats))
+ 			sort.Sort(byStatus(op.wantPropstats))
+ 			if !reflect.DeepEqual(propstats, op.wantPropstats) {
+-				t.Errorf("%s: propstat\ngot  %q\nwant %q", desc, propstats, op.wantPropstats)
++				t.Errorf("%s: propstat\ngot  %#v\nwant %#v", desc, propstats, op.wantPropstats)
+ 			}
+ 		}
+ 	}
+diff --git a/websocket/hybi_test.go b/websocket/hybi_test.go
+--- a/websocket/hybi_test.go
++++ b/websocket/hybi_test.go
+@@ -190,7 +190,7 @@ Sec-WebSocket-Version: 13
+ 		t.Errorf("handshake failed: %v", err)
+ 	}
+ 	if code != http.StatusSwitchingProtocols {
+-		t.Errorf("status expected %q but got %q", http.StatusSwitchingProtocols, code)
++		t.Errorf("status expected %d but got %d", http.StatusSwitchingProtocols, code)
+ 	}
+ 	expectedProtocols := []string{"chat", "superchat"}
+ 	if fmt.Sprintf("%v", config.Protocol) != fmt.Sprintf("%v", expectedProtocols) {
+@@ -239,10 +239,10 @@ Sec-WebSocket-Version: 13
+ 		t.Errorf("handshake failed: %v", err)
+ 	}
+ 	if code != http.StatusSwitchingProtocols {
+-		t.Errorf("status expected %q but got %q", http.StatusSwitchingProtocols, code)
++		t.Errorf("status expected %d but got %d", http.StatusSwitchingProtocols, code)
+ 	}
+ 	if len(config.Protocol) != 0 {
+-		t.Errorf("len(config.Protocol) expected 0, but got %q", len(config.Protocol))
++		t.Errorf("len(config.Protocol) expected 0, but got %d", len(config.Protocol))
+ 	}
+ 	b := bytes.NewBuffer([]byte{})
+ 	bw := bufio.NewWriter(b)
+@@ -285,7 +285,7 @@ Sec-WebSocket-Version: 9
+ 		t.Errorf("handshake expected err %q but got %q", ErrBadWebSocketVersion, err)
+ 	}
+ 	if code != http.StatusBadRequest {
+-		t.Errorf("status expected %q but got %q", http.StatusBadRequest, code)
++		t.Errorf("status expected %d but got %d", http.StatusBadRequest, code)
+ 	}
+ }
+ 
+@@ -583,7 +583,7 @@ Sec-WebSocket-Version: 13
+ 		t.Errorf("handshake failed: %v", err)
+ 	}
+ 	if code != http.StatusSwitchingProtocols {
+-		t.Errorf("status expected %q but got %q", http.StatusSwitchingProtocols, code)
++		t.Errorf("status expected %d but got %d", http.StatusSwitchingProtocols, code)
+ 	}
+ 	b := bytes.NewBuffer([]byte{})
+ 	bw := bufio.NewWriter(b)
+diff --git a/websocket/websocket_test.go b/websocket/websocket_test.go
+--- a/websocket/websocket_test.go
++++ b/websocket/websocket_test.go
+@@ -323,7 +323,7 @@ func TestHTTP(t *testing.T) {
+ 		return
+ 	}
+ 	if resp.StatusCode != http.StatusBadRequest {
+-		t.Errorf("Get: expected %q got %q", http.StatusBadRequest, resp.StatusCode)
++		t.Errorf("Get: expected %d got %d", http.StatusBadRequest, resp.StatusCode)
+ 	}
+ }

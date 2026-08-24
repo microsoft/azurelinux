@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Format unsupported credential types for Go 1.26 vet"
+type = "patch-add"
+source = "../0001-credentials-format-unsupported-type.patch"

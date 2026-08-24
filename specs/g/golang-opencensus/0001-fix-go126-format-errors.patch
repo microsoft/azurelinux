@@ -1,0 +1,47 @@
+diff --git a/tag/map.go b/tag/map.go
+--- a/tag/map.go
++++ b/tag/map.go
+@@ -193,7 +193,7 @@ func New(ctx context.Context, mutator ...Mutator) (context.Context, error) {
+ 				return ctx, fmt.Errorf("key:%q: %v", k, errInvalidKeyName)
+ 			}
+ 			if !checkValue(v.value) {
+-				return ctx, fmt.Errorf("key:%q value:%q: %v", k.Name(), v, errInvalidValue)
++				return ctx, fmt.Errorf("key:%q value:%q: %v", k.Name(), v.value, errInvalidValue)
+ 			}
+ 			m.insert(k, v.value, v.m)
+ 		}
+diff --git a/trace/trace_test.go b/trace/trace_test.go
+--- a/trace/trace_test.go
++++ b/trace/trace_test.go
+@@ -850,3 +850,3 @@ func TestChildSpanCount(t *testing.T) {
+ 	if got, want := spans["span-3"].ChildSpanCount, 0; got != want {
+-		t.Errorf("span-3.ChildSpanCount=%q; want %q", got, want)
++		t.Errorf("span-3.ChildSpanCount=%d; want %d", got, want)
+ 	}
+@@ -853,3 +853,3 @@ func TestChildSpanCount(t *testing.T) {
+ 	if got, want := spans["span-2"].ChildSpanCount, 0; got != want {
+-		t.Errorf("span-2.ChildSpanCount=%q; want %q", got, want)
++		t.Errorf("span-2.ChildSpanCount=%d; want %d", got, want)
+ 	}
+@@ -856,3 +856,3 @@ func TestChildSpanCount(t *testing.T) {
+ 	if got, want := spans["span-1"].ChildSpanCount, 1; got != want {
+-		t.Errorf("span-1.ChildSpanCount=%q; want %q", got, want)
++		t.Errorf("span-1.ChildSpanCount=%d; want %d", got, want)
+ 	}
+@@ -859,3 +859,3 @@ func TestChildSpanCount(t *testing.T) {
+ 	if got, want := spans["parent"].ChildSpanCount, 2; got != want {
+-		t.Errorf("parent.ChildSpanCount=%q; want %q", got, want)
++		t.Errorf("parent.ChildSpanCount=%d; want %d", got, want)
+ 	}
+diff --git a/trace/tracestate/tracestate_test.go b/trace/tracestate/tracestate_test.go
+--- a/trace/tracestate/tracestate_test.go
++++ b/trace/tracestate/tracestate_test.go
+@@ -35,7 +35,7 @@ func checkBack(t *testing.T, tracestate *Tracestate, wantKey, testname string) {
+ 
+ func checkSize(t *testing.T, tracestate *Tracestate, wantSize int, testname string) {
+ 	if gotSize := len(tracestate.entries); gotSize != wantSize {
+-		t.Errorf("test:%s: size of the list: got %q want %q", testname, gotSize, wantSize)
++		t.Errorf("test:%s: size of the list: got %d want %d", testname, gotSize, wantSize)
+ 	}
+ }
+ 

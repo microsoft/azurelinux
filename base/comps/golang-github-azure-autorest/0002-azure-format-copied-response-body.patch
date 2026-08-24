@@ -1,0 +1,18 @@
+diff --git a/autorest/azure/azure.go b/autorest/azure/azure.go
+--- a/autorest/azure/azure.go
++++ b/autorest/azure/azure.go
+@@ -337,3 +337,3 @@ func WithErrorUnlessStatusCode(codes ...int) autorest.RespondDecorator {
+ 				if decodeErr != nil {
+-					return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b, decodeErr)
++					return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b.String(), decodeErr)
+ 				}
+@@ -343,3 +343,3 @@ func WithErrorUnlessStatusCode(codes ...int) autorest.RespondDecorator {
+ 					if err := decoder.Decode(&e.ServiceError); err != nil {
+-						return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b, err)
++						return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b.String(), err)
+ 					}
+@@ -366,3 +366,3 @@ func WithErrorUnlessStatusCode(codes ...int) autorest.RespondDecorator {
+ 					if err := decoder.Decode(&rawBody); err != nil {
+-						return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b, err)
++						return fmt.Errorf("autorest/azure: error response cannot be parsed: %q error: %v", b.String(), err)
+ 					}

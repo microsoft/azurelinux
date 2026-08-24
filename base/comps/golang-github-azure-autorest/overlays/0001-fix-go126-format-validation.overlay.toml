@@ -1,0 +1,8 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "inapplicable"
+
+[[overlays]]
+description = "Format copied Azure response bodies as strings for Go 1.26 vet"
+type = "patch-add"
+source = "../0002-azure-format-copied-response-body.patch"

@@ -1,0 +1,15 @@
+[metadata]
+category = "upstream-backport"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/labstack/gommon/commit/2659cdaeb998f92ea22bbeb46892eb0e5d79fda3" }]
+
+[[overlays]]
+description = "Backport the gommon logging format fix for Go 1.26"
+type = "patch-add"
+source = "../0001-backport-log-format-fix.patch"
+
+[[overlays]]
+description = "Apply the gommon logging format fix after Fedora's test patch"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%patch -P1 -p1"]

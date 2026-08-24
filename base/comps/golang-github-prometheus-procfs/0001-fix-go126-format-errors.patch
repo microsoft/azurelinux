@@ -1,0 +1,185 @@
+diff --git a/mountinfo.go b/mountinfo.go
+--- a/mountinfo.go
++++ b/mountinfo.go
+@@ -100,3 +100,3 @@ func parseMountInfoString(mountString string) (*MountInfo, error) {
+ 	if err != nil {
+-		return nil, fmt.Errorf("%w: mount ID: %q", ErrFileParse, mount.MountID)
++		return nil, fmt.Errorf("%w: mount ID: %q", ErrFileParse, mountInfo[0])
+ 	}
+@@ -104,3 +104,3 @@ func parseMountInfoString(mountString string) (*MountInfo, error) {
+ 	if err != nil {
+-		return nil, fmt.Errorf("%w: parent ID: %q", ErrFileParse, mount.ParentID)
++		return nil, fmt.Errorf("%w: parent ID: %q", ErrFileParse, mountInfo[1])
+ 	}
+diff --git a/net_ip_socket.go b/net_ip_socket.go
+--- a/net_ip_socket.go
++++ b/net_ip_socket.go
+@@ -179,3 +179,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.Sl, err = strconv.ParseUint(s[0], 0, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Unable to parse sl field in %q: %w", ErrFileParse, line.Sl, err)
++		return nil, fmt.Errorf("%w: Unable to parse sl field in %q: %w", ErrFileParse, s[0], err)
+ 	}
+@@ -190,3 +190,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.LocalPort, err = strconv.ParseUint(l[1], 16, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Unable to parse local_address port value line %q: %w", ErrFileParse, line.LocalPort, err)
++		return nil, fmt.Errorf("%w: Unable to parse local_address port value line %q: %w", ErrFileParse, l[1], err)
+ 	}
+@@ -202,3 +202,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.RemPort, err = strconv.ParseUint(r[1], 16, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse rem_address port value in %q: %w", ErrFileParse, line.RemPort, err)
++		return nil, fmt.Errorf("%w: Cannot parse rem_address port value in %q: %w", ErrFileParse, r[1], err)
+ 	}
+@@ -207,3 +207,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.St, err = strconv.ParseUint(fields[3], 16, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse st value in %q: %w", ErrFileParse, line.St, err)
++		return nil, fmt.Errorf("%w: Cannot parse st value in %q: %w", ErrFileParse, fields[3], err)
+ 	}
+@@ -220,3 +220,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.TxQueue, err = strconv.ParseUint(q[0], 16, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse tx_queue value in %q: %w", ErrFileParse, line.TxQueue, err)
++		return nil, fmt.Errorf("%w: Cannot parse tx_queue value in %q: %w", ErrFileParse, q[0], err)
+ 	}
+@@ -223,3 +223,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.RxQueue, err = strconv.ParseUint(q[1], 16, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse trx_queue value in %q: %w", ErrFileParse, line.RxQueue, err)
++		return nil, fmt.Errorf("%w: Cannot parse trx_queue value in %q: %w", ErrFileParse, q[1], err)
+ 	}
+@@ -228,3 +228,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.UID, err = strconv.ParseUint(fields[7], 0, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse UID value in %q: %w", ErrFileParse, line.UID, err)
++		return nil, fmt.Errorf("%w: Cannot parse UID value in %q: %w", ErrFileParse, fields[7], err)
+ 	}
+@@ -233,3 +233,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 	if line.Inode, err = strconv.ParseUint(fields[9], 0, 64); err != nil {
+-		return nil, fmt.Errorf("%w: Cannot parse inode value in %q: %w", ErrFileParse, line.Inode, err)
++		return nil, fmt.Errorf("%w: Cannot parse inode value in %q: %w", ErrFileParse, fields[9], err)
+ 	}
+@@ -241,3 +241,3 @@ func parseNetIPSocketLine(fields []string, isUDP bool) (*netIPSocketLine, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Cannot parse drops value in %q: %w", ErrFileParse, drops, err)
++			return nil, fmt.Errorf("%w: Cannot parse drops value in %q: %w", ErrFileParse, fields[12], err)
+ 		}
+diff --git a/net_wireless.go b/net_wireless.go
+--- a/net_wireless.go
++++ b/net_wireless.go
+@@ -115,3 +115,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: parse Quality:link as integer %q: %w", ErrFileParse, qlink, err)
++			return nil, fmt.Errorf("%w: parse Quality:link as integer %q: %w", ErrFileParse, stats[1], err)
+ 		}
+@@ -120,3 +120,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Quality:level as integer %q: %w", ErrFileParse, qlevel, err)
++			return nil, fmt.Errorf("%w: Quality:level as integer %q: %w", ErrFileParse, stats[2], err)
+ 		}
+@@ -125,3 +125,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Quality:noise as integer %q: %w", ErrFileParse, qnoise, err)
++			return nil, fmt.Errorf("%w: Quality:noise as integer %q: %w", ErrFileParse, stats[3], err)
+ 		}
+@@ -130,3 +130,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Discarded:nwid as integer %q: %w", ErrFileParse, dnwid, err)
++			return nil, fmt.Errorf("%w: Discarded:nwid as integer %q: %w", ErrFileParse, stats[4], err)
+ 		}
+@@ -135,3 +135,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Discarded:crypt as integer %q: %w", ErrFileParse, dcrypt, err)
++			return nil, fmt.Errorf("%w: Discarded:crypt as integer %q: %w", ErrFileParse, stats[5], err)
+ 		}
+@@ -140,3 +140,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Discarded:frag as integer %q: %w", ErrFileParse, dfrag, err)
++			return nil, fmt.Errorf("%w: Discarded:frag as integer %q: %w", ErrFileParse, stats[6], err)
+ 		}
+@@ -145,3 +145,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Discarded:retry as integer %q: %w", ErrFileParse, dretry, err)
++			return nil, fmt.Errorf("%w: Discarded:retry as integer %q: %w", ErrFileParse, stats[7], err)
+ 		}
+@@ -150,3 +150,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Discarded:misc as integer %q: %w", ErrFileParse, dmisc, err)
++			return nil, fmt.Errorf("%w: Discarded:misc as integer %q: %w", ErrFileParse, stats[8], err)
+ 		}
+@@ -155,3 +155,3 @@ func parseWireless(r io.Reader) ([]*Wireless, error) {
+ 		if err != nil {
+-			return nil, fmt.Errorf("%w: Missed:beacon as integer %q: %w", ErrFileParse, mbeacon, err)
++			return nil, fmt.Errorf("%w: Missed:beacon as integer %q: %w", ErrFileParse, stats[9], err)
+ 		}
+diff --git a/nfs/parse.go b/nfs/parse.go
+--- a/nfs/parse.go
++++ b/nfs/parse.go
+@@ -21,3 +21,3 @@ func parseReplyCache(v []uint64) (ReplyCache, error) {
+ 	if len(v) != 3 {
+-		return ReplyCache{}, fmt.Errorf("invalid ReplyCache line %q", v)
++		return ReplyCache{}, fmt.Errorf("invalid ReplyCache line %v", v)
+ 	}
+@@ -33,3 +33,3 @@ func parseFileHandles(v []uint64) (FileHandles, error) {
+ 	if len(v) != 5 {
+-		return FileHandles{}, fmt.Errorf("invalid FileHandles, line %q", v)
++		return FileHandles{}, fmt.Errorf("invalid FileHandles, line %v", v)
+ 	}
+@@ -47,3 +47,3 @@ func parseInputOutput(v []uint64) (InputOutput, error) {
+ 	if len(v) != 2 {
+-		return InputOutput{}, fmt.Errorf("invalid InputOutput line %q", v)
++		return InputOutput{}, fmt.Errorf("invalid InputOutput line %v", v)
+ 	}
+@@ -58,3 +58,3 @@ func parseThreads(v []uint64) (Threads, error) {
+ 	if len(v) != 2 {
+-		return Threads{}, fmt.Errorf("invalid Threads line %q", v)
++		return Threads{}, fmt.Errorf("invalid Threads line %v", v)
+ 	}
+@@ -69,3 +69,3 @@ func parseReadAheadCache(v []uint64) (ReadAheadCache, error) {
+ 	if len(v) != 12 {
+-		return ReadAheadCache{}, fmt.Errorf("invalid ReadAheadCache line %q", v)
++		return ReadAheadCache{}, fmt.Errorf("invalid ReadAheadCache line %v", v)
+ 	}
+@@ -81,3 +81,3 @@ func parseNetwork(v []uint64) (Network, error) {
+ 	if len(v) != 4 {
+-		return Network{}, fmt.Errorf("invalid Network line %q", v)
++		return Network{}, fmt.Errorf("invalid Network line %v", v)
+ 	}
+@@ -94,3 +94,3 @@ func parseServerRPC(v []uint64) (ServerRPC, error) {
+ 	if len(v) != 5 {
+-		return ServerRPC{}, fmt.Errorf("invalid RPC line %q", v)
++		return ServerRPC{}, fmt.Errorf("invalid RPC line %v", v)
+ 	}
+@@ -108,3 +108,3 @@ func parseClientRPC(v []uint64) (ClientRPC, error) {
+ 	if len(v) != 3 {
+-		return ClientRPC{}, fmt.Errorf("invalid RPC line %q", v)
++		return ClientRPC{}, fmt.Errorf("invalid RPC line %v", v)
+ 	}
+@@ -122,3 +122,3 @@ func parseV2Stats(v []uint64) (V2Stats, error) {
+ 	if len(v[1:]) != values || values < 18 {
+-		return V2Stats{}, fmt.Errorf("invalid V2Stats line %q", v)
++		return V2Stats{}, fmt.Errorf("invalid V2Stats line %v", v)
+ 	}
+@@ -150,3 +150,3 @@ func parseV3Stats(v []uint64) (V3Stats, error) {
+ 	if len(v[1:]) != values || values < 22 {
+-		return V3Stats{}, fmt.Errorf("invalid V3Stats line %q", v)
++		return V3Stats{}, fmt.Errorf("invalid V3Stats line %v", v)
+ 	}
+@@ -182,3 +182,3 @@ func parseClientV4Stats(v []uint64) (ClientV4Stats, error) {
+ 	if len(v[1:]) != values {
+-		return ClientV4Stats{}, fmt.Errorf("invalid ClientV4Stats line %q", v)
++		return ClientV4Stats{}, fmt.Errorf("invalid ClientV4Stats line %v", v)
+ 	}
+@@ -260,3 +260,3 @@ func parseServerV4Stats(v []uint64) (ServerV4Stats, error) {
+ 	if len(v[1:]) != values || values != 2 {
+-		return ServerV4Stats{}, fmt.Errorf("invalid V4Stats line %q", v)
++		return ServerV4Stats{}, fmt.Errorf("invalid V4Stats line %v", v)
+ 	}
+@@ -272,3 +272,3 @@ func parseV4Ops(v []uint64) (V4Ops, error) {
+ 	if len(v[1:]) != values || values < 39 {
+-		return V4Ops{}, fmt.Errorf("invalid V4Ops line %q", v)
++		return V4Ops{}, fmt.Errorf("invalid V4Ops line %v", v)
+ 	}
+diff --git a/proc_cgroup.go b/proc_cgroup.go
+--- a/proc_cgroup.go
++++ b/proc_cgroup.go
+@@ -62,3 +62,3 @@ func parseCgroupString(cgroupStr string) (*Cgroup, error) {
+ 	if err != nil {
+-		return nil, fmt.Errorf("%w: hierarchy ID: %q", ErrFileParse, cgroup.HierarchyID)
++		return nil, fmt.Errorf("%w: hierarchy ID: %q", ErrFileParse, fields[0])
+ 	}
