@@ -16,8 +16,6 @@ Source1:        %{name}-%{version}-cargo.tar.gz
 Patch0:         dbs-arch-cpuid-unsafe.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-56852.patch
-Patch4:         CVE-2026-50540.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -145,6 +143,8 @@ install -m 0644 \
 %changelog
 * Mon Aug 24 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 4.1.0.kata0-1
 - Auto-upgrade to 4.1.0.kata0
+- Drop CVE-2026-56852 patch, fix is included in vendored golang.org/x/text v0.39.0
+- Drop CVE-2026-50540 patch, fix is included upstream in 4.1.0.kata0
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
 - Patch for CVE-2026-50540
