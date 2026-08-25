@@ -71,6 +71,16 @@
         "justification": "Needed for kernel upgrade 5.15.123.1 - PR: https://github.com/microsoft/azurelinux/pull/5916"
       },
       {
+        "name": "CONFIG_ARM64_ERRATUM_4118414",
+        "values": [
+          {
+            "architecture": "arm64",
+            "value": "y"
+          }
+        ],
+        "justification": "Mitigation for CVE-2025-10263 (completion of affected memory accesses may be observed out of order on affected Arm cores) - https://nvd.nist.gov/vuln/detail/CVE-2025-10263"
+      },
+      {
         "name": "CONFIG_ARM64_WORKAROUND_TSB_FLUSH_FAILURE",
         "values": [
           {
