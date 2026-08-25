@@ -1,0 +1,16 @@
+# T114 intermittently reports the trap as never delivered, on identical source.
+# Upstream attributes this class of flakiness to the test harness's port probing
+# and reworked it in b173c57, which does not apply to 5.9.4.
+# TODO: remove this overlay once the component is rebased past b173c57.
+
+[metadata]
+category = "azl-disable-flaky-tests"
+upstream-status = "upstreamed"
+commits = [{ url = "https://github.com/net-snmp/net-snmp/commit/b173c57ae3e316b70e4f81b48b3859e6ce8a70cb" }]
+
+
+[[overlays]]
+description = "Skip the flaky AgentX agentxtrap test (T114)"
+type = "spec-prepend-lines"
+section = "%check"
+lines = ["rm -vf testing/fulltests/default/T114agentxagentxtrap_simple"]
