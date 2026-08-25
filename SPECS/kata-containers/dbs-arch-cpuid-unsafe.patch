@@ -9,7 +9,7 @@ Azure Linux's Rust 1.90:
     error[E0133]: call to unsafe function `__cpuid` is unsafe and requires
     unsafe function or block
 
-Wrap the affected call sites in `src/dragonball/dbs_arch` (dbs-arch) and
+Wrap the affected call sites in `src/dragonball/crates/dbs_arch` (dbs-arch) and
 `src/libs/kata-sys-util` (kata-sys-util) in `unsafe {}` blocks. The
 #[allow(unused_unsafe)] attributes keep the build clean under
 `--deny warnings` on newer toolchains where the intrinsics are already safe.
@@ -20,10 +20,10 @@ Azure Linux Rust toolchain is updated to Rust 1.94 or newer.
 
 Signed-off-by: Saul Paredes <saulparedes@microsoft.com>
 ---
-diff --git a/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs b/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
+diff --git a/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/brand_string.rs b/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/brand_string.rs
 index 5dd04ffd6c..036f1bcb4b 100644
---- a/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
-+++ b/src/dragonball/dbs_arch/src/x86_64/cpuid/brand_string.rs
+--- a/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/brand_string.rs
++++ b/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/brand_string.rs
 @@ -101,9 +101,10 @@ impl BrandString {
  
      /// Creates a brand string, initialized from the CPUID leaves 0x80000002 through 0x80000004
@@ -45,10 +45,10 @@ index 5dd04ffd6c..036f1bcb4b 100644
              this.set_reg_for_leaf(leaf, Reg::Eax, cpuid_regs.eax);
              this.set_reg_for_leaf(leaf, Reg::Ebx, cpuid_regs.ebx);
              this.set_reg_for_leaf(leaf, Reg::Ecx, cpuid_regs.ecx);
-diff --git a/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs b/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
+diff --git a/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/common.rs b/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/common.rs
 index 26e129cc5d..f220e1952f 100644
---- a/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
-+++ b/src/dragonball/dbs_arch/src/x86_64/cpuid/common.rs
+--- a/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/common.rs
++++ b/src/dragonball/crates/dbs_arch/src/x86_64/cpuid/common.rs
 @@ -16,6 +16,7 @@ pub enum Error {
  }
  
