@@ -1,0 +1,34 @@
+[components.minizip-ng]
+
+# Remove the two password-protected (encrypted) libFuzzer seed-corpus zips that
+# fail the package-signing scan. The archive is repacked; the resulting hash is
+# pinned via the source-files entry.
+[[components.minizip-ng.overlays]]
+description = "Remove encrypted fuzz seed-corpus zips"
+type = "file-remove"
+archive = "minizip-ng-4.0.10.tar.gz"
+file = "test/fuzz/unzip_fuzzer_seed_corpus/encrypted_*.zip"
+[components.minizip-ng.overlays.metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# Drop the two CTest cases that read the removed fixtures. The spec has no %check
+# so nothing runs them, but this keeps the test registration consistent.
+[[components.minizip-ng.overlays]]
+description = "Drop CTest cases that read the removed encrypted fuzz zips"
+type = "file-search-replace"
+archive = "minizip-ng-4.0.10.tar.gz"
+file = "CMakeLists.txt"
+regex = '(?s)\n +if\(MZ_PKCRYPT\)\n +add_test\(NAME unzip-pkcrypt.*?add_test\(NAME unzip-wzaes.*?\n +endif\(\)'
+[components.minizip-ng.overlays.metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
+[[components.minizip-ng.source-files]]
+filename = "minizip-ng-4.0.10.tar.gz"
+hash = "9cb38550aec5f7983d8f3afd7ed376a05c9d0d4347507f8aea426d75da2d5d90555a671da9dbdd7982d3916f0371b4cb1cb647ed2a641e8256202cd8d4737fd7"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes test/fuzz/unzip_fuzzer_seed_corpus/encrypted_{pkcrypt,wzaes}.zip (password-protected fuzz seed-corpus fixtures) that fail the package-signing scan, and the two CTest cases that read them; test-only, not shipped in any binary RPM."
