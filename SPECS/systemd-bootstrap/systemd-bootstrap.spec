@@ -1,7 +1,7 @@
 Summary:        Bootstrap version of systemd. Workaround for systemd circular dependency.
 Name:           systemd-bootstrap
 Version:        250.3
-Release:        19%{?dist}
+Release:        20%{?dist}
 License:        LGPLv2+ AND GPLv2+ AND MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -50,6 +50,7 @@ Patch7:         update-cifs-for-kernel-headers-6.1.patch
 Patch8:         use-255-macros.patch
 Patch9:         CVE-2023-7008.patch
 Patch10:        CVE-2026-29111.patch
+Patch11:        CVE-2026-15059.patch
 BuildRequires:  docbook-dtd-xml
 BuildRequires:  docbook-style-xsl
 BuildRequires:  gettext
@@ -287,6 +288,9 @@ fi
 %{_datadir}/pkgconfig/udev.pc
 
 %changelog
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 250.3-20
+- Patch for CVE-2026-15059
+
 * Mon Mar 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 250.3-19
 - Patch for CVE-2026-29111
 
