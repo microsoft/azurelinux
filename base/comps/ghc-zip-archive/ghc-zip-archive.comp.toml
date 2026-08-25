@@ -1,0 +1,46 @@
+[components.ghc-zip-archive]
+
+# Remove the password-protected test zip that fails the package-signing scan.
+# The archive is extracted, the matched file dropped, and the tarball
+# deterministically repacked; the resulting hash is pinned via the source-files
+# entry below.
+[[components.ghc-zip-archive.overlays]]
+description = "Remove password-protected test fixture zip_with_password.zip"
+type = "file-remove"
+archive = "zip-archive-0.4.3.2.tar.gz"
+file = "tests/zip_with_password.zip"
+[components.ghc-zip-archive.overlays.metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# The encrypted-zip test cases consume the removed fixture. Keep the rest of the
+# Cabal suite running (%bcond tests 1) and surgically drop only those cases: their
+# TestList entries and their definitions.
+[[components.ghc-zip-archive.overlays]]
+description = "Drop encrypted-zip cases from the TestList (fixture removed)"
+type = "file-search-replace"
+archive = "zip-archive-0.4.3.2.tar.gz"
+file = "tests/test-zip-archive.hs"
+regex = '\n +, testExtractFilesFailOnEncrypted\n +, testPasswordProtectedRead\n +, testIncorrectPasswordRead'
+[components.ghc-zip-archive.overlays.metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+[[components.ghc-zip-archive.overlays]]
+description = "Drop encrypted-zip test definitions (fixture removed)"
+type = "file-search-replace"
+archive = "zip-archive-0.4.3.2.tar.gz"
+file = "tests/test-zip-archive.hs"
+regex = '(?s)testExtractFilesFailOnEncrypted :: FilePath -> Test\n.*?Nothing \(fromEncryptedEntry "INCORRECT" f\)\n\n'
+[components.ghc-zip-archive.overlays.metadata]
+category = "azl-security-compliance"
+upstream-status = "inapplicable"
+
+# Pin the post-overlay (repacked) tarball, replacing the upstream sources entry.
+[[components.ghc-zip-archive.source-files]]
+filename = "zip-archive-0.4.3.2.tar.gz"
+hash = "e031946f95c5bad31c979405c5853a21c856cb77e2048f0cafaf867e2f4fbdb301d0f015398fce4271ea8263f9759fe1722354b00ee7c1c21a9deaed20b00445"
+hash-type = "SHA512"
+origin = { type = "overlay" }
+replace-upstream = true
+replace-reason = "Removes tests/zip_with_password.zip (password-protected test fixture) that fails the package-signing scan, and the three test cases that read it; test-only, not shipped in any binary RPM."
