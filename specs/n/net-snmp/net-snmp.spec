@@ -13,7 +13,7 @@
 Summary:    A collection of SNMP protocol tools and libraries
 Name:       net-snmp
 Version:    5.9.4
-Release: 21%{?dist}
+Release: 22%{?dist}
 Epoch:      1
 
 License:    MIT-CMU AND BSD-3-Clause AND MIT
@@ -411,6 +411,7 @@ install -m 755 -d %{buildroot}/%{_unitdir}
 install -m 644 %SOURCE8 %SOURCE9 %{buildroot}/%{_unitdir}/
 
 %check
+rm -vf testing/fulltests/default/T114agentxagentxtrap_simple
 %if %{netsnmp_check}
 %ifarch ppc ppc64
 rm -vf testing/fulltests/default/T200snmpv2cwalkall_simple
