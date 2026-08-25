@@ -171,6 +171,12 @@ Summary: The Linux kernel
 %endif
 
 #
+%if 0%{?azl4}
+%define uki_addon_distro azurelinux
+%else
+%define uki_addon_distro %{primary_target}
+%endif
+
 # genspec.sh variables
 #
 
@@ -2913,7 +2919,7 @@ BuildKernel() {
 
   KernelAddonsDirOut="$KernelUnifiedImage.extra.d"
   mkdir -p $KernelAddonsDirOut
-  python3 %{SOURCE151} %{SOURCE152} $KernelAddonsDirOut virt %{primary_target} %{_target_cpu} @uki-addons.sbat
+  python3 %{SOURCE151} %{SOURCE152} $KernelAddonsDirOut virt %{uki_addon_distro} %{_target_cpu} @uki-addons.sbat
 
 %if %{signkernel}
 	%{log_msg "Sign the EFI UKI kernel"}
@@ -4622,6 +4628,7 @@ fi\
 %changelog
 * Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 6.18.39-1.4
 - feat(kernel): add Azure Linux SBAT records
+- fix(kernel): name UKI addons for Azure Linux
 
 * Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
 - chore(kernel): tidy release macros
