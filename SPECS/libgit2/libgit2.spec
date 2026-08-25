@@ -1,12 +1,17 @@
 Summary:        C implementation of the Git core methods as a library with a solid API
 Name:           libgit2
 Version:        1.7.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2 with exceptions
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-53583.patch
+Patch1:         CVE-2026-53584.patch
+Patch2:         CVE-2026-53585.patch
+Patch3:         CVE-2026-53586.patch
+Patch4:         CVE-2026-53587.patch
 
 BuildRequires:  cmake >= 3.5.1
 BuildRequires:  gcc
@@ -79,6 +84,9 @@ popd
 %{_bindir}/git2
 
 %changelog
+* Fri Aug 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.2-2
+- Patch for CVE-2026-53587, CVE-2026-53586, CVE-2026-53585, CVE-2026-53584, CVE-2026-53583
+
 * Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
 - Update to 1.7.2
 
