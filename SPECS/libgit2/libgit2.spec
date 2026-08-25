@@ -7,6 +7,11 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 URL:            https://libgit2.org/
 Source0:        https://github.com/libgit2/libgit2/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         CVE-2026-53583.patch
+Patch1:         CVE-2026-53584.patch
+Patch2:         CVE-2026-53585.patch
+Patch3:         CVE-2026-53586.patch
+Patch4:         CVE-2026-53587.patch
 
 BuildRequires:  cmake >= 3.5.1
 BuildRequires:  gcc
@@ -84,12 +89,17 @@ popd
 %{_bindir}/git2
 
 %changelog
+<<<<<<< HEAD
 * Tue Aug 11 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.2-2
 - Fix %%check: the sed disabling online tests targeted tests/CMakeLists.txt, but
   upstream moved the clar registrations to tests/libgit2/CMakeLists.txt, so it
   silently did nothing and the "online" and "auth_clone" tests failed. Disable
   just those two (they need external hosts / GITTEST_REMOTE_* credentials) and
   verify the substitution applied.
+=======
+* Fri Aug 21 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.2-2
+- Patch for CVE-2026-53587, CVE-2026-53586, CVE-2026-53585, CVE-2026-53584, CVE-2026-53583
+>>>>>>> a798de2551 ([AutoPR- Security] Patch libgit2 for CVE-2026-53587, CVE-2026-53586, CVE-2026-53585, CVE-2026-53584, CVE-2026-53583 [HIGH] (#18548))
 
 * Thu Feb 15 2024 Yash Panchal <yashpanchal@microsft.com> - 1.7.2-1
 - Update to 1.7.2
