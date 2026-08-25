@@ -43,14 +43,35 @@ if [ -x "$PESIGN_CLIENT" ]; then
     # --certificat "unused-certificate-name"
     #
     echo "=== signing the test file with pesign ==="
-    pesign-client \
-        --verbose \
-        --debug \
-        --sign \
-        --token "unused-token-name" \
-        --certificate "short-circuit-signing" \
-        --infile "$TEST_FILE" \
-        --outfile "$SIGNED_TEST_FILE"
+    SIGNING_TYPES=",${SIGULDRY_PESIGN_BRIDGE_SIGNING_TYPES},"
+    if [[ "$SIGNING_TYPES" == *",secure-boot-esrp-prod-signing,"* ]]; then
+        pesign-client \
+            --verbose \
+            --debug \
+            --sign \
+            --certificate "cp-459159-pgp" \
+            --token "unused-token-name" \
+            --infile "$TEST_FILE" \
+            --outfile "$SIGNED_TEST_FILE"
+    elif [[ "$SIGNING_TYPES" == *",secure-boot-esrp-test-signing,"* ]]; then
+        pesign-client \
+            --verbose \
+            --debug \
+            --sign \
+            --certificate "cp-450778-pgp" \
+            --token "unused-token-name" \
+            --infile "$TEST_FILE" \
+            --outfile "$SIGNED_TEST_FILE"
+    elif [[ "$SIGNING_TYPES" == *",secure-boot-self-signing,"* ]]; then
+        pesign-client \
+            --verbose \
+            --debug \
+            --sign \
+            --certificate "secure-boot-self-signing" \
+            --token "unused-token-name" \
+            --infile "$TEST_FILE" \
+            --outfile "$SIGNED_TEST_FILE"
+    fi
     echo "PASS: pesign sign request completed successfully"
 
     ls -la "$TEST_FILE"
