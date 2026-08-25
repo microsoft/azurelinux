@@ -1,7 +1,7 @@
 Summary:        Network Time Protocol reference implementation
 Name:           ntp
 Version:        4.2.8p17
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        BSD AND GPLv2+ AND LGPLv2+ AND MIT AND OpenLDAP AND Public Domain
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -17,6 +17,14 @@ Source5:        ntpdate.sysconfig
 Source6:        ntpdate.service
 Source7:        ntpd.service
 Source8:        LICENSE.PTR
+Patch0:         CVE-2026-63379.patch
+Patch1:         CVE-2026-63381.patch
+Patch2:         CVE-2026-63382.patch
+Patch3:         CVE-2026-63383.patch
+Patch4:         CVE-2026-63384.patch
+Patch5:         CVE-2026-63385.patch
+Patch6:         CVE-2026-63387.patch
+Patch7:         CVE-2026-63388.patch
 
 BuildRequires:  gcc >= 11.2.0
 BuildRequires:  glibc >= 2.34
@@ -62,6 +70,14 @@ state of the NTP daemon running on the local machine.
 
 %prep
 %setup -q -a 1
+%patch 0 -p1
+%patch 1 -p1
+%patch 2 -p1
+%patch 3 -p1
+%patch 4 -p1
+%patch 5 -p1
+%patch 6 -p1
+%patch 7 -p1
 
 %build
 
@@ -197,6 +213,9 @@ fi
 %{_mandir}/man8/ntpstat.8*
 
 %changelog
+* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 4.2.8p17-3
+- Patch for CVE-2026-63388, CVE-2026-63387, CVE-2026-63385, CVE-2026-63384, CVE-2026-63383, CVE-2026-63382, CVE-2026-63381, CVE-2026-63379
+
 * Tue Mar 17 2026 Sudipta Pandit <sudpandit@microsoft.com> - 4.2.8p17-2
 - Fix ntpdate-wrapper to use /usr/bin/ntpdate
 
