@@ -46,6 +46,10 @@ This package contains the scripts and files required to build the UVM
 %autosetup -p1 -n %{name}-%{version} -a 1
 
 %build
+# Upstream defaults src/runtime to STATIC=yes on x86_64, which exports CGO_ENABLED=0.
+# The Azure Linux Go toolchain defaults to GOEXPERIMENT=systemcrypto, which requires
+# CGO_ENABLED=1, so the static build fails to compile the crypto package.
+export STATIC=no
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
@@ -145,6 +149,7 @@ install -m 0644 \
 - Auto-upgrade to 4.1.0.kata0
 - Drop CVE-2026-56852 patch, fix is included in vendored golang.org/x/text v0.39.0
 - Drop CVE-2026-50540 patch, fix is included upstream in 4.1.0.kata0
+- Build src/runtime with STATIC=no so cgo stays enabled for GOEXPERIMENT=systemcrypto
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
 - Patch for CVE-2026-50540
