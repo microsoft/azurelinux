@@ -336,8 +336,8 @@ perl-CPAN-Meta-YAML-0.018-516.azl3.noarch.rpm
 perl-Data-Dumper-2.188-516.azl3.aarch64.rpm
 perl-DBD-SQLite-1.74-2.azl3.aarch64.rpm
 perl-DBD-SQLite-debuginfo-1.74-2.azl3.aarch64.rpm
-perl-DBI-1.651-1.azl3.aarch64.rpm
-perl-DBI-debuginfo-1.651-1.azl3.aarch64.rpm
+perl-DBI-1.652-1.azl3.aarch64.rpm
+perl-DBI-debuginfo-1.652-1.azl3.aarch64.rpm
 perl-DBIx-Simple-1.37-7.azl3.noarch.rpm
 perl-DBM_Filter-0.06-516.azl3.noarch.rpm
 perl-debugger-1.60-516.azl3.noarch.rpm
