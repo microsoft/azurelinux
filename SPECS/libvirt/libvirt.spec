@@ -185,7 +185,7 @@
 Summary:        Library providing a simple virtualization API
 Name:           libvirt
 Version:        10.10.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -204,6 +204,7 @@ Patch5:         libvirt-qemu-Properly-propagate-migration-state-to-TPM-cleanup-c
 Patch6:         CVE-2026-61477.patch
 Patch7:         CVE-2026-63622.patch
 Patch8:         CVE-2026-63623.patch
+Patch9:         CVE-2026-18917.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -2200,6 +2201,9 @@ exit 0
 %endif
 
 %changelog
+* Tue Aug 25 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.10.0-4
+- Patch for CVE-2026-18917
+
 * Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 10.10.0-3
 - Patch for CVE-2026-63623, CVE-2026-63622, CVE-2026-61477
 
