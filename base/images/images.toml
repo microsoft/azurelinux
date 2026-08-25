@@ -65,6 +65,124 @@ container = false
 systemd = true
 runtime-package-management = true
 
+# ---- marketplace-gen2 ---------------------------------------------------
+
+[images.marketplace-gen2]
+description = "Marketplace Gen2 Image"
+definition = { type = "kiwi", path = "marketplace-gen2/marketplace-gen2.kiwi", profile = "marketplace-gen2" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-dev]
+description = "Marketplace Gen2 Image (dev)"
+definition = { type = "kiwi", path = "marketplace-gen2/marketplace-gen2.kiwi", profile = "marketplace-gen2-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+# ---- marketplace-gen2-cvm -----------------------------------------------
+
+[images.marketplace-gen2-cvm]
+description = "Marketplace Gen2 Confidential VM Image"
+definition = { type = "kiwi", path = "marketplace-gen2-cvm/marketplace-gen2-cvm.kiwi", profile = "marketplace-gen2-cvm" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-cvm" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-cvm.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-cvm-dev]
+description = "Marketplace Gen2 Confidential VM Image (dev)"
+definition = { type = "kiwi", path = "marketplace-gen2-cvm/marketplace-gen2-cvm.kiwi", profile = "marketplace-gen2-cvm-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-cvm" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2-cvm-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+# ---- marketplace-gen2-fips ----------------------------------------------
+
+[images.marketplace-gen2-fips]
+description = "Marketplace Gen2 FIPS Image"
+definition = { type = "kiwi", path = "marketplace-gen2-fips/marketplace-gen2-fips.kiwi", profile = "marketplace-gen2-fips" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.marketplace-gen2-fips.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-fips-dev]
+description = "Marketplace Gen2 FIPS Image (dev)"
+definition = { type = "kiwi", path = "marketplace-gen2-fips/marketplace-gen2-fips.kiwi", profile = "marketplace-gen2-fips-dev" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.marketplace-gen2-fips-dev.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
 # ---- minimal-os --------------------------------------------------------
 
 [images.minimal-os]
@@ -220,6 +338,10 @@ description = "Lisa cvm tests"
 [test-suites.lisa-kernel-ltp]
 type = "lisa"
 description = "Lisa kernel LTP tests"
+
+[test-suites.lisa-fips]
+type = "lisa"
+description = "Lisa FIPS tests"
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]
