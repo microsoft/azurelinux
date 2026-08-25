@@ -1,6 +1,6 @@
 Summary:        LTTng-UST is an Userspace Tracer library
 Name:           lttng-ust
-Version:        2.13.6
+Version:        2.14.0
 Release:        1%{?dist}
 License:        GPLv2+ and LGPLv2+ and MIT
 URL:            https://lttng.org
@@ -62,6 +62,9 @@ rm -vf %{buildroot}%{_libdir}/*.la
 %{_libdir}/pkgconfig/lttng-ust*.pc
 
 %changelog
+* Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 2.14.0-1
+- Backport lttng-ust 2.14.0 from the Azure Linux 4.0 branch for compatibility with lttng-tools 2.14.0.
+
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.6-1
 - Auto-upgrade to 2.13.6 - Azure Linux 3.0 - package upgrades
 
