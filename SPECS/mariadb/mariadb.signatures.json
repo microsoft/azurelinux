@@ -19,6 +19,6 @@
     "rh-skipped-tests-ppc.list": "8d844255335c4dbeeaf363f95b8b690d024c84ad65620d36ec78650a9d54460e",
     "rh-skipped-tests-s390.list": "5e826f9f3cc920c0fe67434fd32b25a205d6a8530552e998edb376c4661b59f3",
     "wsrep_sst_rsync_tunnel": "5194ed1971d0afe8d2836c1d143263f6891311c9ac0fae536b866f2a885d056e",
-    "mariadb-10.11.18.tar.gz": "a973e9b3af53aaf08d782117ec4165adbacdeb545a9946a06cfad9cfa72f0149"
+    "mariadb-10.11.19.tar.gz": "8a88523366453b14b4122c2dbb5d82096eed73c858976fa231b454d27e232ae4"
   }
 }

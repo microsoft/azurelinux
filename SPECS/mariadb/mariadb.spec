@@ -130,7 +130,7 @@
 %global sameevr   %{epoch}:%{version}-%{release}
  
 Name:             %{majorname}
-Version:          10.11.18
+Version:          10.11.19
 Release:          1%{?dist}
 Epoch:            3
  
@@ -1767,6 +1767,9 @@ fi
 %endif
  
 %changelog
+* Tue Aug 25 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3:10.11.19-1
+- Auto-upgrade to 10.11.19 - for CVE-2026-61081, CVE-2026-60585, CVE-2026-60331, CVE-2026-60747, CVE-2026-47023, CVE-2026-60184
+
 * Fri May 29 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3:10.11.18-1
 - Auto-upgrade to 10.11.18 - for CVE-2026-48165, CVE-2026-48163
 
