@@ -56,9 +56,9 @@ cmake-debuginfo-3.30.3-15.azl3.aarch64.rpm
 coreutils-9.4-7.azl3.aarch64.rpm
 coreutils-debuginfo-9.4-7.azl3.aarch64.rpm
 coreutils-lang-9.4-7.azl3.aarch64.rpm
-cpio-2.14-1.azl3.aarch64.rpm
-cpio-debuginfo-2.14-1.azl3.aarch64.rpm
-cpio-lang-2.14-1.azl3.aarch64.rpm
+cpio-2.14-2.azl3.aarch64.rpm
+cpio-debuginfo-2.14-2.azl3.aarch64.rpm
+cpio-lang-2.14-2.azl3.aarch64.rpm
 cracklib-2.9.11-1.azl3.aarch64.rpm
 cracklib-debuginfo-2.9.11-1.azl3.aarch64.rpm
 cracklib-devel-2.9.11-1.azl3.aarch64.rpm
