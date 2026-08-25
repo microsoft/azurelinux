@@ -46,26 +46,9 @@ This package contains the scripts and files required to build the UVM
 %autosetup -p1 -n %{name}-%{version} -a 1
 
 %build
-# Upstream defaults src/runtime to STATIC=yes on x86_64, which exports CGO_ENABLED=0.
-# The Azure Linux Go toolchain defaults to GOEXPERIMENT=systemcrypto, which requires
-# CGO_ENABLED=1, so the static build fails to compile the crypto package.
-export STATIC=no
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
-
-pushd %{_builddir}/%{name}-%{version}/src/runtime/config
-cp configuration-clh.toml configuration-clh-preview.toml
-cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
-popd
-
-for config_file in \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
-  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
-  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
-  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
-done
 
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
@@ -78,10 +61,6 @@ pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 START_SERVICES=no PREFIX=%{buildroot} %make_build deploy-package
 PREFIX=%{buildroot} %make_build deploy-package-tools
 popd
-install -m 0644 \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml \
-  %{buildroot}%{defaults_kata}/
 
 %files
 %{kata_bin}/kata-collect-data.sh
@@ -149,7 +128,7 @@ install -m 0644 \
 - Auto-upgrade to 4.1.0.kata0
 - Drop CVE-2026-56852 patch, fix is included in vendored golang.org/x/text v0.39.0
 - Drop CVE-2026-50540 patch, fix is included upstream in 4.1.0.kata0
-- Build src/runtime with STATIC=no so cgo stays enabled for GOEXPERIMENT=systemcrypto
+- Generate and install the preview configurations from the node-builder scripts
 
 * Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
 - Patch for CVE-2026-50540
