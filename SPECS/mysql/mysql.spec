@@ -18,7 +18,8 @@ Patch3:         CVE-2025-62813.patch
 Patch4:         CVE-2025-0838.patch
 # Patch to skip failing ptests on x86 architecture
 %ifarch x86_64
-Patch5:         skip-failing-ptests.patch 
+Patch5:         skip-failing-ptests.patch
+%endif
 Patch6:         CVE-2026-63379.patch
 Patch7:         CVE-2026-63381.patch
 Patch8:         CVE-2026-63382.patch
@@ -27,7 +28,6 @@ Patch10:        CVE-2026-63384.patch
 Patch11:        CVE-2026-63385.patch
 Patch12:        CVE-2026-63387.patch
 Patch13:        CVE-2026-63388.patch
-%endif
 
 BuildRequires:  cmake
 BuildRequires:  libtirpc-devel
