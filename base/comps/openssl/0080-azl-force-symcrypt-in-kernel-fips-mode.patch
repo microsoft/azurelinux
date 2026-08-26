@@ -98,7 +98,7 @@ index 1e5053c..b1915fc 100644
  #include "provider_local.h"
  #include "crypto/context.h"
  
-@@ -424,28 +424,85 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
+@@ -424,28 +424,75 @@ static int provider_conf_init(CONF_IMODULE *md, const CONF *cnf)
              return 0;
      }
  
@@ -154,16 +154,6 @@ index 1e5053c..b1915fc 100644
 +                                       pcgbl->activated_providers);
 +            CRYPTO_THREAD_unlock(pcgbl->lock);
 +        }
-+
-+        /*
-+         * In all cases, prefer SymCrypt for algorithm fetches. The "?" makes
-+         * this an optional preference, not a hard filter, so algorithms
-+         * SymCrypt does not provide still resolve elsewhere.
-+         */
-+        if (evp_default_properties_merge(libctx,
-+                                         "?provider=" AZL_SYMCRYPT_PROVIDER_NAME,
-+                                         0) != 1)
-+            return 0;
 +
 +        if (in_kernel_fips) {
 +            /*
@@ -649,4 +639,3 @@ index 0000000..2fae905
 +   "real init retains Fedora's ignored provider-module failure behavior");
 -- 
 2.52.0
-
