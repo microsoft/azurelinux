@@ -14,6 +14,7 @@ BuildRequires: gcc-c++
 BuildRequires: m4
 BuildRequires: elfutils-devel
 BuildRequires: popt-devel
+BuildRequires: libbabeltrace2-devel
 BuildRequires: userspace-rcu-devel >= 0.14.0
 BuildRequires: lttng-ust-devel >= 2.14.0
 BuildRequires: lttng-ust-devel < 2.15.0
@@ -50,6 +51,7 @@ find %{buildroot} -name '*.la' -delete
 %changelog
 * Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 2.14.0-1
 - Backport lttng-tools 2.14.0 from the Azure Linux 4.0 branch for per-channel buffer allocation support.
+- Add gcc-c++ and libbabeltrace2-devel BuildRequires required by the 2.14 build.
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.11-1
 - Auto-upgrade to 2.13.11 - Azure Linux 3.0 - package upgrades
