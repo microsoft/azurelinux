@@ -23864,7 +23864,7 @@
         "other": {
           "name": "python-mistune",
           "version": "3.3.4",
-          "downloadUrl": "https://files.pythonhosted.org/packages/7b/92/328a294a6de83bacb95bed01f04e0eaff4e3616ee359fc821a5dfc539b02/mistune-3.3.4.tar.gz"
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.3.4.tar.gz"
         }
       }
     },
