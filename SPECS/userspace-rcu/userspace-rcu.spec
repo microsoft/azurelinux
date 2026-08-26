@@ -1,7 +1,7 @@
 Summary:        user space RCU (read-copy-update)
 Name:           userspace-rcu
 Version:        0.14.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 License:        LGPLv2+
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -9,6 +9,9 @@ Group:          Development/Tools
 URL:            https://liburcu.org
 #Source0:       https://github.com/urcu/userspace-rcu/archive/v%{version}.tar.gz
 Source0:        %{name}-%{version}.tar.gz
+# Backport of upstream 0.15 fix: add 'typename' to the C++ URCU_FORCE_CAST macro
+# so rcu_dereference() compiles in C++ dependent contexts (e.g. lttng-tools 2.14).
+Patch0:         cpp-force-cast-typename.patch
 BuildRequires:  elfutils-devel
 BuildRequires:  libxml2-devel
 BuildRequires:  m4
@@ -26,7 +29,7 @@ Requires:       userspace-rcu = %{version}-%{release}
 Library files for doing development with userspace-rcu.
 
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 autoreconf -fiv
@@ -58,6 +61,9 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
+* Tue Aug 26 2026 Ankita Pareek <ankitapareek@microsoft.com> - 0.14.0-3
+- Add typename to the C++ URCU_FORCE_CAST macro (backport from 0.15) to fix C++ consumers such as lttng-tools 2.14.
+
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.14.0-2
 - Sanitize license files
 
