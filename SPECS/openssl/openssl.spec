@@ -9,7 +9,7 @@
 Summary: Utilities from the general purpose cryptography library with TLS implementation
 Name: openssl
 Version: 3.3.7
-Release: 5%{?dist}
+Release: 6%{?dist}
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source: https://github.com/openssl/openssl/releases/download/openssl-%{version}/openssl-%{version}.tar.gz
@@ -82,6 +82,13 @@ Patch111: CVE-2026-45447.patch
 Patch112: CVE-2026-42769.patch
 Patch113: CVE-2026-42770.patch
 Patch114: 0117-Do-not-restrict-EVP_PKEY_Q_keygen-usage.patch
+Patch115: CVE-2026-54874.patch
+Patch116: CVE-2026-63072.patch
+Patch117: CVE-2026-63073.patch
+Patch118: CVE-2026-63074.patch
+Patch119: CVE-2026-63075.patch
+Patch120: CVE-2026-63076.patch
+Patch121: CVE-2026-75803.patch
 
 License: Apache-2.0
 URL: http://www.openssl.org/
@@ -378,6 +385,9 @@ install -m644 %{SOURCE9} \
 %ldconfig_scriptlets libs
 
 %changelog
+* Wed Aug 26 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.3.7-6
+- Patch for CVE-2026-75803, CVE-2026-63076, CVE-2026-63075, CVE-2026-63074, CVE-2026-63073, CVE-2026-63072, CVE-2026-54874
+
 * Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 3.3.7-5
 - Backport EVP_PKEY_Q_keygen provider key type support
 
