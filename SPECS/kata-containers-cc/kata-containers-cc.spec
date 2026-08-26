@@ -21,10 +21,14 @@ Patch4:       CVE-2025-5791.patch
 Patch5:       CVE-2025-4574.patch
 Patch6:       CVE-2026-42250.patch
 Patch7:       CVE-2026-56852.patch
+<<<<<<< HEAD
 Patch8:       CVE-2026-43871.patch
 Patch9:       CVE-2026-48586.patch
 Patch10:      CVE-2026-55969.patch
 Patch11:      CVE-2026-50540.patch
+=======
+Patch8:       rust-fix-unstable-name-collisions.patch
+>>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 ExclusiveArch: x86_64
 
 BuildRequires:  azurelinux-release
@@ -160,7 +164,14 @@ fi
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+<<<<<<< HEAD
 * Mon Aug 24 2026 Nikola Bojanic <nbojanic@microsoft.com> - 3.15.0.aks0-18
+=======
+* Wed Aug 26 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 3.15.0.aks0-18
+- Fix unstable_name_collisions rust build errors in kata-sys-util mount.rs
+
+* Mon Aug 24 2026 Nikola Bojanic <nbojanic@microsoft.com> - 3.15.0.aks0-17
+>>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 - Use smaller vendored sources
 
 * Mon Aug 03 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.15.0.aks0-17

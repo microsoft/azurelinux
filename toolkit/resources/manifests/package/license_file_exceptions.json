@@ -62,6 +62,7 @@
             ]
         },
         {
+<<<<<<< HEAD
             "_comment1": "Rust HTML documentation embeds font and third-party license/copyright files.",
             "_comment2": "These are licenses for fonts/tooling used in the web docs, not the main package licenses.",
             "PackageName": "rust-doc",
@@ -74,6 +75,27 @@
                 "^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$"
             ]
         }
+=======
+	    "PackageName": "rust",
+	    "IgnoredFilesRegexList": [
+	         "^/usr/lib/rustlib/.*?/license-files/.*"
+	    ]
+	},
+	{
+	    "_comment1": "Rust documentation contains font license files that are embedded in the documentation.",
+	    "_comment2": "These are license files for fonts used in the web documentation, not the main package licenses.",
+	    "PackageName": "rust-doc",
+	    "IgnoredFilesRegexList": [
+	        "^/usr/share/doc/docs/html/.*/fonts/.*\\.txt$",
+		"^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.txt$",
+		"^/usr/share/doc/docs/html/static\\.files/.*COPYRIGHT.*\\.txt$",
+		"^/usr/share/doc/docs/html/static\\.files/.*LICENSE.*\\.md$",
+		"^/usr/share/doc/docs/html/core/.*/fn\\..*absd.*\\.html$",
+		"^/usr/share/doc/docs/html/rustc/platform-support/.*bsd.*\\.html$",
+		"^/usr/share/doc/docs/html/search\\.index/.*\\.js$"
+	    ]
+	 }
+>>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
     ],
     "GlobalExceptionsRegexList": [
     ]
