@@ -29,6 +29,23 @@ go_is_supported() {
     "$1" version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'
 }
 
+# Points /usr/bin/go and /usr/bin/gofmt at the given Go root, then checks the links actually win.
+link_go() {
+    ln -vsf "$1/bin/go" /usr/bin/go
+    ln -vsf "$1/bin/gofmt" /usr/bin/gofmt
+
+    # Ubuntu's default PATH, and sudo's secure_path, list /usr/local/bin ahead of /usr/bin, so a
+    # stray go left there keeps winning. Without this warning the toolkit's own version gate fails
+    # much later, from a different script, with nothing pointing back to the real cause.
+    hash -r
+    go_on_path="$(command -v go 2>/dev/null || true)"
+    if [ -n "$go_on_path" ] && ! [ "$go_on_path" -ef /usr/bin/go ]; then
+        echo "WARNING: '$go_on_path' precedes /usr/bin/go on PATH and will be used instead:" >&2
+        echo "WARNING:   $("$go_on_path" version 2>&1 | head -n 1)" >&2
+        echo "WARNING: remove it if the build later reports an unsupported Go version." >&2
+    fi
+}
+
 # Define usage function
 usage() {
     echo "Usage: $0 [OPTIONS]"
@@ -135,8 +152,7 @@ if [ "$INSTALL_PREREQS" = true ]; then
         fi
 
         go_installed_root="$(go_root)"
-        ln -vsf "$go_installed_root/bin/go" /usr/bin/go
-        ln -vsf "$go_installed_root/bin/gofmt" /usr/bin/gofmt
+        link_go "$go_installed_root"
     fi
 else
     echo "Skipping installation of prerequisite packages..."
@@ -146,8 +162,7 @@ fi
 if [ "$FIX_GO_LINKS" = true ]; then
     if go_link_root="$(go_root)"; then
         echo "Creating Go symlinks from $go_link_root..."
-        ln -vsf "$go_link_root/bin/go" /usr/bin/go
-        ln -vsf "$go_link_root/bin/gofmt" /usr/bin/gofmt
+        link_go "$go_link_root"
     else
         echo "No Go installation in $GO_APT_ROOT or /usr/local/go, skipping Go symlinks..."
     fi

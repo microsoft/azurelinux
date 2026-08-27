@@ -26,6 +26,11 @@ Either way `go` and `gofmt` are symlinked into `/usr/bin`, so no separate step i
 A Go toolchain that is already installed in either location and reports 1.25 or newer is reused
 as-is — the script only ever replaces a `/usr/local/go` that is too old, and says so before it does.
 
+If some other `go` sits earlier on `PATH` than `/usr/bin` — `/usr/local/bin/go` is the usual
+culprit, since both Ubuntu's default `PATH` and `sudo`'s `secure_path` list `/usr/local/bin` first —
+the script names it and warns that it will be used instead. Remove it, or the build will later fail
+its Go version check.
+
 The pinned version and its checksums are the `GO_VERSION`/`GO_SHA256_*` variables at the top of
 `prerequisites-ubuntu.sh` and must be updated together.
 
