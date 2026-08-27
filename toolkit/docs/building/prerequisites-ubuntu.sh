@@ -131,8 +131,8 @@ if [ "$INSTALL_PREREQS" = true ]; then
                 echo "'$GO_APT_PACKAGE' is unavailable on this release, using the upstream toolchain..."
                 go_arch="$(dpkg --print-architecture)"
                 case "$go_arch" in
-                    amd64) go_sha256="$GO_SHA256_AMD64" ;;
-                    arm64) go_sha256="$GO_SHA256_ARM64" ;;
+                    amd64) go_sha256="$GO_SHA256_AMD64"; go_sha256_var=GO_SHA256_AMD64 ;;
+                    arm64) go_sha256="$GO_SHA256_ARM64"; go_sha256_var=GO_SHA256_ARM64 ;;
                     *)
                         echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
                         echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
@@ -145,7 +145,17 @@ if [ "$INSTALL_PREREQS" = true ]; then
                 trap 'rm -rf "$go_tmp_dir"' EXIT
                 curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
                   "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
-                echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
+                if echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum --status -c -; then
+                    echo "Checksum OK."
+                else
+                    echo "ERROR: go${GO_VERSION}.linux-${go_arch}.tar.gz does not match its pinned checksum." >&2
+                    echo "  expected: $go_sha256" >&2
+                    echo "  actual:   $(sha256sum < "$go_tmp_dir/go.tar.gz" | cut -d ' ' -f 1)" >&2
+                    echo "Either the download was corrupted or tampered with, or GO_VERSION was changed in" >&2
+                    echo "$0 without refreshing $go_sha256_var. The expected value for a given release is" >&2
+                    echo "published at https://go.dev/dl. Nothing has been installed." >&2
+                    exit 1
+                fi
 
                 if [ -e /usr/local/go ]; then
                     echo "WARNING: replacing the Go installation in /usr/local/go, it is older than $GO_VERSION." >&2
