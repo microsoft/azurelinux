@@ -2,7 +2,15 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-set -e
+set -eo pipefail
+
+# Ubuntu 26.04 packages Go 1.25, but the older releases still used by developers and CI (22.04,
+# 24.04) do not package it at all. Rather than special-casing releases, install the upstream
+# toolchain whenever the Go already on PATH is missing or older than 1.25.
+# Checksums are from https://go.dev/dl and must be updated together with GO_VERSION.
+GO_VERSION=1.25.14
+GO_SHA256_AMD64=a21ae5633a269bcd7e90cf767e48225633795e99d831742cbf3397064fee7712
+GO_SHA256_ARM64=9bf234ea70ffec9347fdf6b22ce4add51717d3386a38a441e8c8743fceb5eaee
 
 # Define usage function
 usage() {
@@ -46,9 +54,6 @@ while [ $# -gt 0 ]; do
 done
 
 # Install prerequisites if not disabled
-# golang version pinned for stability to avoid breaking changes. As of 11-Aug-2026 we are using golang-1.25.7 on Ubuntu 26.04 since it is the most recent release available.
-# When making a breaking change to the toolkit which requires a newer golang version, update this version if needed.
-# If no newer version is available, suggest moving to a newer Ubuntu LTS version
 if [ "$INSTALL_PREREQS" = true ]; then
     echo "Installing required packages..."
     apt update
@@ -59,7 +64,6 @@ if [ "$INSTALL_PREREQS" = true ]; then
     gawk \
     genisoimage \
     git \
-    golang-1.25-go \
     jq \
     make \
     openssl \
@@ -72,15 +76,49 @@ if [ "$INSTALL_PREREQS" = true ]; then
     wget \
     xfsprogs \
     zstd
+
+    # Ubuntu 26.04 ships golang-1.25-go, but 22.04 and 24.04 do not package Go 1.25 at all, and the
+    # apt package is not on PATH anyway. Install the upstream toolchain unless PATH already has
+    # Go 1.25 or newer.
+    if go version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'; then
+        echo "Found $(go version), skipping Go installation..."
+    else
+        go_arch="$(dpkg --print-architecture)"
+        case "$go_arch" in
+            amd64) go_sha256="$GO_SHA256_AMD64" ;;
+            arm64) go_sha256="$GO_SHA256_ARM64" ;;
+            *)
+                echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
+                echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
+                exit 1
+                ;;
+        esac
+
+        echo "Installing Go $GO_VERSION ($go_arch) from https://go.dev/dl..."
+        go_tmp_dir="$(mktemp -d)"
+        trap 'rm -rf "$go_tmp_dir"' EXIT
+        curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
+          "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
+        echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
+
+        rm -rf /usr/local/go
+        tar -C /usr/local -xzf "$go_tmp_dir/go.tar.gz"
+        ln -vsf /usr/local/go/bin/go /usr/bin/go
+        ln -vsf /usr/local/go/bin/gofmt /usr/bin/gofmt
+    fi
 else
     echo "Skipping installation of prerequisite packages..."
 fi
 
 # Fix go 1.25 links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
-    echo "Creating Go symlinks..."
-    ln -vsf /usr/lib/go-1.25/bin/go /usr/bin/go
-    ln -vsf /usr/lib/go-1.25/bin/gofmt /usr/bin/gofmt
+    if [ -x /usr/local/go/bin/go ]; then
+        echo "Creating Go symlinks..."
+        ln -vsf /usr/local/go/bin/go /usr/bin/go
+        ln -vsf /usr/local/go/bin/gofmt /usr/bin/gofmt
+    else
+        echo "No Go installation in /usr/local/go, skipping Go symlinks..."
+    fi
 fi
 
 # Install and configure Docker if requested
