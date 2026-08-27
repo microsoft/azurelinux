@@ -24,6 +24,11 @@ go_root() {
     return 1
 }
 
+# Returns zero when the given go binary is 1.25 or newer, e.g. go1.25.14, go1.26.0, go1.31rc1.
+go_is_supported() {
+    "$1" version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'
+}
+
 # Define usage function
 usage() {
     echo "Usage: $0 [OPTIONS]"
@@ -90,34 +95,43 @@ if [ "$INSTALL_PREREQS" = true ]; then
     zstd
 
     # Install Go from the distro when it is packaged, otherwise from the pinned upstream tarball.
-    if go version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'; then
+    if go_is_supported go; then
         echo "Found $(go version), skipping Go installation..."
     else
-        echo "Checking apt for '$GO_APT_PACKAGE' (not packaged before Ubuntu 26.04)..."
-        if apt install -y "$GO_APT_PACKAGE" && [ -x "$GO_APT_ROOT/bin/go" ]; then
-            echo "Installed $GO_APT_PACKAGE from apt."
+        if go_existing_root="$(go_root)" && go_is_supported "$go_existing_root/bin/go"; then
+            # Installed, just not on PATH. Relinking below is enough, and reinstalling would
+            # overwrite a toolchain that may well be newer than the one pinned here.
+            echo "Found $("$go_existing_root/bin/go" version) in $go_existing_root, reusing it..."
         else
-            echo "'$GO_APT_PACKAGE' is unavailable on this release, using the upstream toolchain..."
-            go_arch="$(dpkg --print-architecture)"
-            case "$go_arch" in
-                amd64) go_sha256="$GO_SHA256_AMD64" ;;
-                arm64) go_sha256="$GO_SHA256_ARM64" ;;
-                *)
-                    echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
-                    echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
-                    exit 1
-                    ;;
-            esac
+            echo "Checking apt for '$GO_APT_PACKAGE' (not packaged before Ubuntu 26.04)..."
+            if apt install -y "$GO_APT_PACKAGE" && [ -x "$GO_APT_ROOT/bin/go" ]; then
+                echo "Installed $GO_APT_PACKAGE from apt."
+            else
+                echo "'$GO_APT_PACKAGE' is unavailable on this release, using the upstream toolchain..."
+                go_arch="$(dpkg --print-architecture)"
+                case "$go_arch" in
+                    amd64) go_sha256="$GO_SHA256_AMD64" ;;
+                    arm64) go_sha256="$GO_SHA256_ARM64" ;;
+                    *)
+                        echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
+                        echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
+                        exit 1
+                        ;;
+                esac
 
-            echo "Installing Go $GO_VERSION ($go_arch) from https://go.dev/dl..."
-            go_tmp_dir="$(mktemp -d)"
-            trap 'rm -rf "$go_tmp_dir"' EXIT
-            curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
-              "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
-            echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
+                echo "Installing Go $GO_VERSION ($go_arch) from https://go.dev/dl..."
+                go_tmp_dir="$(mktemp -d)"
+                trap 'rm -rf "$go_tmp_dir"' EXIT
+                curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
+                  "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
+                echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
 
-            rm -rf /usr/local/go
-            tar -C /usr/local -xzf "$go_tmp_dir/go.tar.gz"
+                if [ -e /usr/local/go ]; then
+                    echo "WARNING: replacing the Go installation in /usr/local/go, it is older than $GO_VERSION." >&2
+                fi
+                rm -rf /usr/local/go
+                tar -C /usr/local -xzf "$go_tmp_dir/go.tar.gz"
+            fi
         fi
 
         go_installed_root="$(go_root)"
