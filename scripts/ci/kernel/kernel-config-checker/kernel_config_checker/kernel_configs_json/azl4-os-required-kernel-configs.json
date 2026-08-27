@@ -2805,6 +2805,20 @@
         "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52468301"
       },
       {
+        "name": "CONFIG_USB_STORAGE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable standard USB mass-storage devices - Work item: https://dev.azure.com/mariner-org/mariner/_workitems/edit/23493"
+      },
+      {
         "name": "CONFIG_USB_TMC",
         "values": [
           {
@@ -2817,6 +2831,20 @@
           }
         ],
         "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/52967503"
+      },
+      {
+        "name": "CONFIG_USB_UAS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "m"
+          },
+          {
+            "architecture": "arm64",
+            "value": "m"
+          }
+        ],
+        "justification": "Enable USB Attached SCSI devices - Work item: https://dev.azure.com/mariner-org/mariner/_workitems/edit/23493"
       },
       {
         "name": "CONFIG_USER_EVENTS",
