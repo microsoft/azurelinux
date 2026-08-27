@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 6
+%define azl_pkgrelease 7
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 595.58.03
 
@@ -182,8 +182,6 @@ Summary: The Linux kernel
 %global include_rhel 1
 # Include RT files
 %global include_rt 1
-# Include Automotive files
-%global include_automotive 0
 # Provide Patchlist.changelog file
 %global patchlist_changelog 1
 # Set released_kernel to 1 when the upstream source tarball contains a
@@ -255,8 +253,6 @@ Summary: The Linux kernel
 # kernel-rt-64k (aarch64 RT kernel with 64K page_size)
 %define with_realtime_arm64_64k %{?_without_realtime_arm64_64k: 0} %{?!_without_realtime_arm64_64k: 1}
 %endif
-# kernel-automotive (x86_64 and aarch64 with PREEMPT_RT enabled - currently off by default)
-%define with_automotive %{?_with_automotive:  1} %{?!_with_automotive:   0}
 
 # Supported variants
 #            with_base with_debug    with_gcov
@@ -264,7 +260,6 @@ Summary: The Linux kernel
 # arm64_16k  X         X             X
 # arm64_64k  X         X             X
 # realtime   X         X             X
-# automotive X         X             X
 
 # kernel-doc
 %define with_doc       %{?_without_doc:       0} %{?!_without_doc:       1}
@@ -294,10 +289,6 @@ Summary: The Linux kernel
 %define with_dbgonly   %{?_with_dbgonly:      1} %{?!_with_dbgonly:      0}
 # Only build the realtime kernel (--with rtonly):
 %define with_rtonly    %{?_with_rtonly:       1} %{?!_with_rtonly:       0}
-# Only build the automotive variant of the kernel (--with automotiveonly):
-%define with_automotiveonly %{?_with_automotiveonly:       1} %{?!_with_automotiveonly:       0}
-# Build the automotive kernel (--with automotive_build), this builds base variant with automotive config/options:
-%define with_automotive_build %{?_with_automotive_build:   1} %{?!_with_automotive_build:     0}
 # Only build the tools package
 %define with_toolsonly %{?_with_toolsonly:    1} %{?!_with_toolsonly:    0}
 # Control whether we perform a compat. check against published ABI.
@@ -351,7 +342,6 @@ Summary: The Linux kernel
 # no stablelist
 %define with_kernel_abi_stablelists 0
 %define with_arm64_64k 0
-%define with_automotive 0
 %endif
 
 %if %{with_verbose}
@@ -436,7 +426,6 @@ Summary: The Linux kernel
 %if %{with_rtonly}
 %define with_realtime 1
 %define with_realtime_arm64_64k 1
-%define with_automotive 0
 %define with_up 0
 %define with_debug 0
 %define with_debuginfo 0
@@ -452,23 +441,6 @@ Summary: The Linux kernel
 %define with_arm64_64k 0
 %endif
 
-# if requested, only build the automotive variant of the kernel
-%if %{with_automotiveonly}
-%define with_automotive 1
-%define with_realtime 0
-%define with_up 0
-%define with_debug 0
-%define with_debuginfo 0
-%define with_vdso_install 0
-%define with_selftests 1
-%endif
-
-# if requested, build kernel-automotive
-%if %{with_automotive_build}
-%define with_automotive 1
-%define with_selftests 1
-%endif
-
 # if requested, only build tools
 %if %{with_toolsonly}
 %define with_tools 1
@@ -479,7 +451,6 @@ Summary: The Linux kernel
 %define with_realtime_arm64_64k 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
-%define with_automotive 0
 %define with_cross_headers 0
 %define with_doc 0
 %define with_selftests 0
@@ -495,36 +466,9 @@ Summary: The Linux kernel
 %define with_configchecks 0
 %endif
 
-# RT and Automotive kernels are only built on x86_64 and aarch64
+# RT kernels are only built on x86_64 and aarch64
 %ifnarch x86_64 aarch64
 %define with_realtime 0
-%define with_automotive 0
-%endif
-
-%if %{with_automotive}
-# overrides compression algorithms for automotive
-%global compression zstd
-%global compression_flags --rm
-%global compext zst
-
-# automotive does not support the following variants
-%define with_realtime 0
-%define with_realtime_arm64_64k 0
-%define with_arm64_16k 0
-%define with_arm64_64k 0
-%define with_efiuki 0
-%define with_doc 0
-%define with_headers 0
-%define with_cross_headers 0
-%define with_perf 0
-%define with_libperf 0
-%define with_tools 0
-%define with_kabichk 0
-%define with_kernel_abi_stablelists 0
-%define with_kabidw_base 0
-%define signkernel 0
-%define signmodules 1
-%define rhelkeys 0
 %endif
 
 
@@ -568,7 +512,6 @@ Summary: The Linux kernel
 %ifarch noarch
 %define with_up 0
 %define with_realtime 0
-%define with_automotive 0
 %define with_headers 0
 %define with_cross_headers 0
 %define with_tools 0
@@ -625,7 +568,6 @@ Summary: The Linux kernel
 %define with_arm64_64k 0
 %define with_realtime 0
 %define with_realtime_arm64_64k 0
-%define with_automotive 0
 
 %define with_debuginfo 0
 %define with_perf 0
@@ -659,7 +601,7 @@ Summary: The Linux kernel
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
 # Azure Linux ships a single general-purpose kernel. All other variants
-# (debug, realtime/rt-64k, arm64-16k/64k, automotive) are
+# (debug, realtime/rt-64k, arm64-16k/64k) are
 # disabled here. This gate runs after all upstream arch/variant resolution so
 # it wins; the disabled variant code is trimmed away incrementally. EFI UKI and
 # kernel selftests (kernel-selftests-internal) are intentionally left enabled.
@@ -670,8 +612,6 @@ Summary: The Linux kernel
 %define with_realtime_arm64_64k 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
-%define with_automotive 0
-%define with_automotive_build 0
 
 # short-hand for "are we building base/non-debug variants of ...?"
 %if %{with_up} && %{with_base}
@@ -683,11 +623,6 @@ Summary: The Linux kernel
 %define with_realtime_base 1
 %else
 %define with_realtime_base 0
-%endif
-%if %{with_automotive} && %{with_base} && !%{with_automotive_build}
-%define with_automotive_base 1
-%else
-%define with_automotive_base 0
 %endif
 %if %{with_arm64_16k} && %{with_base}
 %define with_arm64_16k_base 1
@@ -973,7 +908,7 @@ Source42: %{name}-aarch64-64k-rhel.config
 Source43: %{name}-aarch64-64k-debug-rhel.config
 %endif
 
-%if %{include_rhel} || %{include_automotive}
+%if %{include_rhel}
 Source23: x509.genkey.rhel
 Source34: def_variants.yaml.rhel
 Source41: x509.genkey.centos
@@ -1066,20 +1001,6 @@ Source482: %{name}-aarch64-rt-64k-fedora.config
 Source483: %{name}-aarch64-rt-64k-debug-fedora.config
 Source484: %{name}-x86_64-rt-fedora.config
 Source485: %{name}-x86_64-rt-debug-fedora.config
-%endif
-%endif
-
-%if %{include_automotive}
-%if %{with_automotive_build}
-Source488: %{name}-aarch64-rhel.config
-Source489: %{name}-aarch64-debug-rhel.config
-Source490: %{name}-x86_64-rhel.config
-Source491: %{name}-x86_64-debug-rhel.config
-%else
-Source488: %{name}-aarch64-automotive-rhel.config
-Source489: %{name}-aarch64-automotive-debug-rhel.config
-Source490: %{name}-x86_64-automotive-rhel.config
-Source491: %{name}-x86_64-automotive-debug-rhel.config
 %endif
 %endif
 
@@ -1766,28 +1687,6 @@ It should only be installed when trying to gather additional information
 on kernel bugs, as some of these options impact performance noticably.
 %endif
 
-%if %{with_debug} && %{with_automotive} && !%{with_automotive_build}
-%define variant_summary The Linux Automotive kernel compiled with extra debugging enabled
-%kernel_variant_package automotive-debug
-%description automotive-debug-core
-The kernel package contains the Linux kernel (vmlinuz), the core of any
-Linux operating system.  The kernel handles the basic functions
-of the operating system:  memory allocation, process allocation, device
-input and output, etc.
-
-This variant of the kernel has numerous debugging options enabled.
-It should only be installed when trying to gather additional information
-on kernel bugs, as some of these options impact performance noticably.
-%endif
-
-%if %{with_automotive_base}
-%define variant_summary The Linux kernel compiled with PREEMPT_RT enabled
-%kernel_variant_package automotive
-%description automotive-core
-This package includes a version of the Linux kernel compiled with the
-PREEMPT_RT real-time preemption support, targeted for Automotive platforms
-%endif
-
 %if %{with_up} && %{with_debug}
 %if !%{debugbuildsenabled}
 %kernel_variant_package -m debug
@@ -1884,13 +1783,6 @@ Prebuilt 64k unified kernel image addons for virtual machines.
 %if %{with_baseonly}
 %if !%{with_up}
 %{log_msg "Cannot build --with baseonly, up build is disabled"}
-exit 1
-%endif
-%endif
-
-%if %{with_automotive}
-%if 0%{?fedora}
-%{log_msg "Cannot build automotive with a fedora baseline, must be rhel/centos/eln"}
 exit 1
 %endif
 %endif
@@ -2720,7 +2612,7 @@ BuildKernel() {
     # Copy the System.map file for depmod to use
     cp System.map $RPM_BUILD_ROOT/.
 
-    if [[ "$Variant" == "rt" || "$Variant" == "rt-debug" || "$Variant" == "rt-64k" || "$Variant" == "rt-64k-debug" || "$Variant" == "automotive" || "$Variant" == "automotive-debug" ]]; then
+    if [[ "$Variant" == "rt" || "$Variant" == "rt-debug" || "$Variant" == "rt-64k" || "$Variant" == "rt-64k-debug" ]]; then
 	%{log_msg "Skipping efiuki build"}
     else
 %if %{with_efiuki}
@@ -2789,7 +2681,7 @@ BuildKernel() {
 # with_efiuki
 %endif
 	:  # in case of empty block
-    fi # "$Variant" == "rt" || "$Variant" == "rt-debug" || "$Variant" == "automotive" || "$Variant" == "automotive-debug"
+    fi # "$Variant" is an RT variant
 
 
     #
@@ -2865,9 +2757,6 @@ BuildKernel() {
         fi
         if [[ "$Variant" == "rt-64k" || "$Variant" == "rt-64k-debug" ]]; then
             variants_param="-r rt-64k"
-        fi
-        if [[ "$Variant" == "automotive" || "$Variant" == "automotive-debug" ]]; then
-            variants_param="-r automotive"
         fi
         # this creates ../modules-*.list output, where each kmod path is as it
         # appears in modules.dep (relative to lib/modules/$KernelVer)
@@ -2986,10 +2875,6 @@ BuildKernel %make_target %kernel_image %{_use_vdso} rt-debug
 BuildKernel %make_target %kernel_image %{_use_vdso} rt-64k-debug
 %endif
 
-%if %{with_automotive} && !%{with_automotive_build}
-BuildKernel %make_target %kernel_image %{_use_vdso} automotive-debug
-%endif
-
 %if %{with_arm64_16k}
 BuildKernel %make_target %kernel_image %{_use_vdso} 16k-debug
 %endif
@@ -3019,16 +2904,12 @@ BuildKernel %make_target %kernel_image %{_use_vdso} rt
 BuildKernel %make_target %kernel_image %{_use_vdso} rt-64k
 %endif
 
-%if %{with_automotive_base}
-BuildKernel %make_target %kernel_image %{_use_vdso} automotive
-%endif
-
 %if %{with_up_base}
 BuildKernel %make_target %kernel_image %{_use_vdso}
 %endif
 
 %ifnarch noarch %{nobuildarches}
-%if !%{with_debug} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k} && !%{with_realtime} && !%{with_realtime_arm64_64k} && !%{with_automotive}
+%if !%{with_debug} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k} && !%{with_realtime} && !%{with_realtime_arm64_64k}
 # If only building the user space tools, then initialize the build environment
 # and some variables so that the various userspace tools can be built.
 %{log_msg "Initialize userspace tools build environment"}
@@ -3891,12 +3772,10 @@ fi\
 %define kernel_variant_posttrans(v:u:) \
 %{expand:%%posttrans %{?-v:%{-v*}-}%{!?-u*:core}%{?-u*:uki-%{-u*}}}\
 %if 0%{!?fedora:1}\
-%if !%{with_automotive}\
 if [ -x %{_sbindir}/weak-modules ]\
 then\
     %{_sbindir}/weak-modules --add-kernel %{KVERREL}%{?-v:+%{-v*}} || exit $?\
 fi\
-%endif\
 %endif\
 rm -f %{_localstatedir}/lib/rpm-state/%{name}/installing_core_%{KVERREL}%{?-v:+%{-v*}}\
 /bin/kernel-install add %{KVERREL}%{?-v:+%{-v*}} /lib/modules/%{KVERREL}%{?-v:+%{-v*}}/vmlinuz%{?-u:-%{-u*}.efi} || exit $?\
@@ -3947,12 +3826,10 @@ entry_type=""\
     entry_type="--entry-type %{!?-u:type1}%{?-u:type2}" \
 }\
 /bin/kernel-install remove %{KVERREL}%{?-v:+%{-v*}} $entry_type || exit $?\
-%if !%{with_automotive}\
 if [ -x %{_sbindir}/weak-modules ]\
 then\
     %{_sbindir}/weak-modules --remove-kernel %{KVERREL}%{?-v:+%{-v*}} || exit $?\
 fi\
-%endif\
 %{nil}
 
 %if %{with_up_base} && %{with_efiuki}
@@ -4020,11 +3897,6 @@ fi\
 %kernel_variant_post -v rt -r kernel
 %endif
 
-%if %{with_automotive_base}
-%kernel_variant_preun -v automotive
-%kernel_variant_post -v automotive -r kernel
-%endif
-
 %if %{with_realtime} && %{with_debug}
 %kernel_variant_preun -v rt-debug
 %kernel_variant_post -v rt-debug
@@ -4040,11 +3912,6 @@ fi\
 %kernel_variant_preun -v rt-64k-debug
 %kernel_variant_post -v rt-64k-debug
 %kernel_kvm_post rt-64k-debug
-%endif
-
-%if %{with_automotive} && %{with_debug} && !%{with_automotive_build}
-%kernel_variant_preun -v automotive-debug
-%kernel_variant_post -v automotive-debug
 %endif
 
 ###
@@ -4374,10 +4241,6 @@ fi\
 %if %{with_realtime}
 %kernel_variant_files %{_use_vdso} %{with_debug} rt-debug
 %endif
-%kernel_variant_files %{_use_vdso} %{with_automotive_base} automotive
-%if %{with_automotive} && !%{with_automotive_build}
-%kernel_variant_files %{_use_vdso} %{with_debug} automotive-debug
-%endif
 
 %if %{with_debug_meta}
 %files debug
@@ -4427,6 +4290,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Aug 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.7
+- refactor(kernel): remove automotive support
+
 * Thu Aug 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.6
 - refactor(kernel): trim support to x86_64 and aarch64
 
