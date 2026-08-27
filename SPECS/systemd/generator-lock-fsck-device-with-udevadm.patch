@@ -1,0 +1,170 @@
+diff --git a/src/shared/generator.c b/src/shared/generator.c
+index 5626587..4ae3dfa 100644
+--- a/src/shared/generator.c
++++ b/src/shared/generator.c
+@@ -219,6 +219,11 @@ static int write_fsck_sysroot_service(
+         if (r < 0)
+                 return r;
+ 
++        /* Azure Linux: wrap the fsck invocation in "udevadm lock" so systemd-fsck
++         * holds an exclusive advisory lock on the target device for the duration of
++         * the check. This prevents systemd-udevd from probing filesystem metadata
++         * while fsck is updating it, which can make the device's filesystem
++         * identifiers disappear from udev before the root mount begins. */
+         fprintf(f,
+                 "[Unit]\n"
+                 "Description=File System Check on %1$s\n"
+@@ -233,7 +238,7 @@ static int write_fsck_sysroot_service(
+                 "[Service]\n"
+                 "Type=oneshot\n"
+                 "RemainAfterExit=yes\n"
+-                "ExecStart=" SYSTEMD_FSCK_PATH " %6$s\n"
++                "ExecStart=/usr/bin/udevadm lock --device=%6$s --timeout=180 -- " SYSTEMD_FSCK_PATH " %6$s\n"
+                 "TimeoutSec=infinity\n",
+                 escaped,
+                 unit,
+diff --git a/test/test-fstab-generator/test-12-dev-sdx.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-12-dev-sdx.expected/systemd-fsck-root.service
+index 1473488..c200c27 100644
+--- a/test/test-fstab-generator/test-12-dev-sdx.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-12-dev-sdx.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/sdx1
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx1 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx1
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-13-label.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-13-label.expected/systemd-fsck-root.service
+index 85c1936..bec5e98 100644
+--- a/test/test-fstab-generator/test-13-label.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-13-label.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/disk/by-label/Root
++ExecStart=/usr/bin/udevadm lock --device=/dev/disk/by-label/Root --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/disk/by-label/Root
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-14-uuid.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-14-uuid.expected/systemd-fsck-root.service
+index 1c7eaea..af939ca 100644
+--- a/test/test-fstab-generator/test-14-uuid.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-14-uuid.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/disk/by-uuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7
++ExecStart=/usr/bin/udevadm lock --device=/dev/disk/by-uuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/disk/by-uuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-15-partuuid.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-15-partuuid.expected/systemd-fsck-root.service
+index ab27bfd..2f4aeae 100644
+--- a/test/test-fstab-generator/test-15-partuuid.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-15-partuuid.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/disk/by-partuuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7
++ExecStart=/usr/bin/udevadm lock --device=/dev/disk/by-partuuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/disk/by-partuuid/3f5ad593-4546-4a94-a374-bcfb68aa11f7
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-root.service
+index 1473488..c200c27 100644
+--- a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/sdx1
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx1 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx1
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-usr.service b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-usr.service
+new file mode 100644
+index 0000000..f5ad547
+--- /dev/null
++++ b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/systemd-fsck-usr.service
+@@ -0,0 +1,17 @@
++# Automatically generated by systemd-fstab-generator
++
++[Unit]
++Description=File System Check on /dev/sdx2
++Documentation=man:systemd-fsck-usr.service(8)
++
++DefaultDependencies=no
++BindsTo=dev-sdx2.device
++Conflicts=shutdown.target
++After=local-fs-pre.target dev-sdx2.device
++Before=shutdown.target
++
++[Service]
++Type=oneshot
++RemainAfterExit=yes
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx2 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx2
++TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/sysusr-usr.mount b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/sysusr-usr.mount
+index 63fcb10..8eaad0b 100644
+--- a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/sysusr-usr.mount
++++ b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected/sysusr-usr.mount
+@@ -4,6 +4,8 @@
+ Documentation=man:fstab(5) man:systemd-fstab-generator(8)
+ SourcePath=/etc/fstab
+ Before=initrd-usr-fs.target
++Requires=systemd-fsck-usr.service
++After=systemd-fsck-usr.service
+ After=blockdev@dev-sdx2.target
+ 
+ [Mount]
+diff --git a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected.sysroot/sysroot-usr.mount b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected.sysroot/sysroot-usr.mount
+index effb6fc..19eac28 100644
+--- a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected.sysroot/sysroot-usr.mount
++++ b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.expected.sysroot/sysroot-usr.mount
+@@ -4,6 +4,8 @@
+ Documentation=man:fstab(5) man:systemd-fstab-generator(8)
+ SourcePath=/etc/fstab
+ Before=local-fs.target
++Requires=systemd-fsck@dev-sdx2.service
++After=systemd-fsck@dev-sdx2.service
+ After=blockdev@dev-sdx2.target
+ 
+ [Mount]
+diff --git a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.input b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.input
+index 1ba9b06..0403ac5 100644
+--- a/test/test-fstab-generator/test-17-initrd-sysroot.fstab.input
++++ b/test/test-fstab-generator/test-17-initrd-sysroot.fstab.input
+@@ -1,2 +1,2 @@
+ /dev/sdx1 /sysroot auto defaults 0 1
+-/dev/sdx2 /sysroot/usr auto defaults 0 0
++/dev/sdx2 /sysroot/usr auto defaults 0 1
+diff --git a/test/test-fstab-generator/test-18-options.fstab.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-18-options.fstab.expected/systemd-fsck-root.service
+index 1473488..c200c27 100644
+--- a/test/test-fstab-generator/test-18-options.fstab.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-18-options.fstab.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/sdx1
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx1 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx1
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-root.service b/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-root.service
+index 1473488..c200c27 100644
+--- a/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-root.service
++++ b/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-root.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/sdx1
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx1 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx1
+ TimeoutSec=infinity
+diff --git a/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-usr.service b/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-usr.service
+index 8b42177..f8276b8 100644
+--- a/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-usr.service
++++ b/test/test-fstab-generator/test-19-mounts-from-cmdline.expected/systemd-fsck-usr.service
+@@ -13,5 +13,5 @@ Before=shutdown.target
+ [Service]
+ Type=oneshot
+ RemainAfterExit=yes
+-ExecStart=/usr/lib/systemd/systemd-fsck /dev/sdx5
++ExecStart=/usr/bin/udevadm lock --device=/dev/sdx5 --timeout=180 -- /usr/lib/systemd/systemd-fsck /dev/sdx5
+ TimeoutSec=infinity
