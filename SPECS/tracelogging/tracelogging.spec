@@ -1,7 +1,7 @@
 Summary:        tracelogging one-line structure logging API on top of LTTNG
 Name:           tracelogging
 Version:        0.3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -67,6 +67,10 @@ mkdir build && cd build
 %{_libdir}/cmake/tracelogging
 
 %changelog
+* Thu Aug 27 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.1-4
+- Updating patch commit message so that few pipelines doesn't treat
+  the patch file as spec file.
+
 * Tue Aug 25 2026 Kshitiz Godara <kgodara@microsoft.com> - 0.3.1-3
 - Update patch name to not start with module name.
 

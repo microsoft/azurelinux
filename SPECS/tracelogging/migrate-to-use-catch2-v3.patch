@@ -8,7 +8,7 @@ Azure Linux ships Catch2 3.x, which removed the v2 single-header
 
 Link the tests against Catch2::Catch2WithMain for the entry point and
 switch the includes to the split <catch2/catch_all.hpp> header so the
-%check build compiles against the shipped Catch2.
+module test compiles against the shipped Catch2.
 ---
  test/CMakeLists.txt       | 2 +-
  test/CatchMain.cpp        | 3 +--
