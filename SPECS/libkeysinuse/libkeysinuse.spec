@@ -2,7 +2,7 @@
 
 Summary:        The standalone KeysInUse library for tracking asymmetric key and certificate usage
 Name:           libkeysinuse
-Version:        1.11.0
+Version:        1.11.1
 Release:        1%{?dist}
 License:        MIT
 Vendor:         Microsoft Corporation
@@ -13,6 +13,7 @@ Source0:        https://github.com/microsoft/SymCrypt-OpenSSL/archive/v%{version
 BuildRequires:  SymCrypt >= 103.8.0
 BuildRequires:  cmake
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  openssl-devel
 
@@ -58,6 +59,10 @@ install KeysInUse/keysinuse.h %{buildroot}%{_includedir}
 cp -P bin/KeysInUse/libkeysinuse.so* %{buildroot}%{_libdir}
 
 mkdir -p %{buildroot}%{_localstatedir}/log/keysinuse/
+
+%check
+LD_LIBRARY_PATH="$(pwd)/bin/KeysInUse${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" ./bin/test/KeysInUseTest/KeysInUseTest
+
 
 %files
 %license LICENSE
