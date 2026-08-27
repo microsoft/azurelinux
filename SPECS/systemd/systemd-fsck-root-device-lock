@@ -1,0 +1,51 @@
+#!/bin/sh
+set -eu
+
+unit_name=systemd-fsck-root.service
+device_unit=$(
+    /usr/bin/systemctl show \
+        --property=BindsTo \
+        --value \
+        "$unit_name"
+)
+
+if [ -z "$device_unit" ]; then
+    exec /usr/bin/udevadm lock \
+        --backing=/ \
+        --timeout=180 \
+        -- \
+        /usr/lib/systemd/systemd-fsck
+fi
+
+case "$device_unit" in
+    *[[:space:]]*)
+        echo "Expected one block-device dependency for $unit_name: $device_unit" >&2
+        exit 1
+        ;;
+    dev-*.device)
+        device_path=$(
+            /usr/bin/systemd-escape \
+                --unescape \
+                --path \
+                "${device_unit%.device}"
+        )
+        ;;
+    *)
+        echo "Expected one block-device dependency for $unit_name: $device_unit" >&2
+        exit 1
+        ;;
+esac
+
+case "$device_path" in
+    /dev/*)
+        exec /usr/bin/udevadm lock \
+            --device="$device_path" \
+            --timeout=180 \
+            -- \
+            /usr/lib/systemd/systemd-fsck "$device_path"
+        ;;
+    *)
+        echo "Invalid root block-device path: $device_path" >&2
+        exit 1
+        ;;
+esac

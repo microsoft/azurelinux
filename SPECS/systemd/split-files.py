@@ -89,6 +89,7 @@ for file in files(buildroot):
                     /usr/lib.*/(security|pkgconfig)$|
                     /usr/lib/rpm(/macros.d|)$|
                     /usr/lib/firewalld(/services|)$|
+                    /usr/lib/dracut(/dracut\.conf\.d|)$|
                     /usr/share/(locale|licenses|doc)|             # no $
                     /etc(/pam\.d|/xdg|/X11|/X11/xinit|/X11.*\.d|)$|
                     /etc/(dnf|dnf/protected.d)$|
