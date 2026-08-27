@@ -48,13 +48,3 @@ RHEL_REBASE_NUM = 1
 #  number will be incremented instead of the Y).
 #
 ZSTREAM ?= no
-
-#
-# Automotive
-# ----------
-#
-# Represents the major and minor release used by automotive.
-# Primarily this is used to to identify the build target when
-# building the kernel-automotive packages.
-AUTOMOTIVE_MAJOR = 2
-AUTOMOTIVE_MINOR = 99
