@@ -9,7 +9,8 @@ This page outlines the requirements for building with the Azure Linux toolkit on
 
 The Azure Linux toolkit requires Go 1.25 or newer:
 
-- **Azure Linux 2.0 (CBL-Mariner)**: Not supported because its `msft-golang-1.24.1` package is below the minimum version
+- **Azure Linux 2.0 (CBL-Mariner)**: Not supported. `install-prereqs` refuses outright because 2.0
+  is end-of-life; its newest Go package, `msft-golang-1.24.1`, is below the minimum in any case.
 - **Azure Linux 3.0**: Supported by the current `golang` package
 
 ## Installation Methods
@@ -21,7 +22,6 @@ The make targets automatically detect your OS version and install the appropriat
 ```bash
 # For interactive development environments (local machines)
 # Installs prerequisites but doesn't modify system configuration
-# Note: On Azure Linux 2.0, this will remove golang if installed in favor of msft-golang due to the golang version requirement
 sudo make -C toolkit install-prereqs
 
 # Manually configure Docker if needed
