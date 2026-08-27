@@ -105,19 +105,6 @@ determine_config_path()
 		arm64)
 			config_path="$config_path/arm/aarch64"
 			;;
-		powerpc)
-			config_path="$config_path/powerpc"
-			;;
-		riscv)
-			config_path="$config_path/riscv/riscv64"
-			;;
-		s390)
-			if [[ "$variant" == *"zfcpdump"* ]]; then
-				config_path="$config_path/s390x/zfcpdump"
-			else
-				config_path="$config_path/s390x"
-			fi
-			;;
 		x86_64)
 			config_path="$config_path/x86"
 			;;

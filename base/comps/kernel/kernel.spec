@@ -17,7 +17,7 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 5
+%define azl_pkgrelease 6
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 595.58.03
 
@@ -111,18 +111,11 @@
 # this one might need tweaking (e.g. if default changes to w3.xzdio,
 # change below to w4T.xzdio):
 #
-# This is disabled on i686 as it triggers oom errors
-
-%ifnarch i686
+# This payload setting is used on supported AZL architectures.
 %define _binary_payload w3T.xzdio
-%endif
 
 Summary: The Linux kernel
-%if 0%{?fedora}
-%define secure_boot_arch x86_64
-%else
-%define secure_boot_arch x86_64 aarch64 s390x ppc64le
-%endif
+%define secure_boot_arch x86_64 aarch64
 
 # Signing for secure boot authentication
 %ifarch %{secure_boot_arch}
@@ -246,8 +239,6 @@ Summary: The Linux kernel
 %define with_base      %{?_without_base:      0} %{?!_without_base:      1}
 # build also debug variants
 %define with_debug     %{?_without_debug:     0} %{?!_without_debug:     1}
-# kernel-zfcpdump (s390 specific kernel for zfcpdump)
-%define with_zfcpdump  %{?_without_zfcpdump:  0} %{?!_without_zfcpdump:  1}
 # kernel-16k (aarch64 kernel with 16K page_size)
 %define with_arm64_16k %{?_with_arm64_16k:    1} %{?!_with_arm64_16k:    0}
 # kernel-64k (aarch64 kernel with 64K page_size)
@@ -270,7 +261,6 @@ Summary: The Linux kernel
 # Supported variants
 #            with_base with_debug    with_gcov
 # up         X         X             X
-# zfcpdump   X                       X
 # arm64_16k  X         X             X
 # arm64_64k  X         X             X
 # realtime   X         X             X
@@ -348,7 +338,7 @@ Summary: The Linux kernel
 # Want to build a vanilla kernel build without any non-upstream patches?
 %define with_vanilla %{?_with_vanilla: 1} %{?!_with_vanilla: 0}
 
-%ifarch x86_64 aarch64 riscv64
+%ifarch x86_64 aarch64
 %define with_efiuki %{?_without_efiuki: 0} %{?!_without_efiuki: 1}
 %else
 %define with_efiuki 0
@@ -371,11 +361,7 @@ Summary: The Linux kernel
 %endif
 
 %if %{with toolchain_clang}
-%ifarch s390x ppc64le
-%global llvm_ias 0
-%else
 %global llvm_ias 1
-%endif
 %global clang_make_opts HOSTCC=clang CC=clang LLVM_IAS=%{llvm_ias} LLVM=1
 %global make_opts %{make_opts} %{clang_make_opts}
 %endif
@@ -462,7 +448,6 @@ Summary: The Linux kernel
 %define with_selftests 0
 %define with_headers 0
 %define with_efiuki 0
-%define with_zfcpdump 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
 %endif
@@ -500,7 +485,6 @@ Summary: The Linux kernel
 %define with_selftests 0
 %define with_headers 0
 %define with_efiuki 0
-%define with_zfcpdump 0
 %define with_vdso_install 0
 %define with_kabichk 0
 %define with_kabidwchk 0
@@ -594,15 +578,8 @@ Summary: The Linux kernel
 %define with_debug 0
 %endif
 
-# sparse blows up on ppc
-%ifnarch ppc64le
+# sparse is currently disabled for the AZL local-spec path
 %define with_sparse 0
-%endif
-
-# zfcpdump mechanism is s390 only
-%ifnarch s390x
-%define with_zfcpdump 0
-%endif
 
 # 16k and 64k variants only for aarch64
 %ifnarch aarch64
@@ -611,38 +588,11 @@ Summary: The Linux kernel
 %define with_realtime_arm64_64k 0
 %endif
 
-%if 0%{?fedora}
-# This is not for Fedora
-%define with_zfcpdump 0
-%endif
-
 # Per-arch tweaks
-
-%ifarch i686
-%define asmarch x86
-%define hdrarch i386
-%define kernel_image arch/x86/boot/bzImage
-%endif
 
 %ifarch x86_64
 %define asmarch x86
 %define kernel_image arch/x86/boot/bzImage
-%endif
-
-%ifarch ppc64le
-%define asmarch powerpc
-%define hdrarch powerpc
-%define make_target vmlinux
-%define kernel_image vmlinux
-%define kernel_image_elf 1
-%define use_vdso 0
-%endif
-
-%ifarch s390x
-%define asmarch s390
-%define hdrarch s390
-%define kernel_image arch/s390/boot/bzImage
-%define vmlinux_decompressor arch/s390/boot/vmlinux
 %endif
 
 %ifarch aarch64
@@ -650,13 +600,6 @@ Summary: The Linux kernel
 %define hdrarch arm64
 %define make_target vmlinuz.efi
 %define kernel_image arch/arm64/boot/vmlinuz.efi
-%endif
-
-%ifarch riscv64
-%define asmarch riscv
-%define hdrarch riscv
-%define make_target vmlinuz.efi
-%define kernel_image arch/riscv/boot/vmlinuz.efi
 %endif
 
 # Should make listnewconfig fail if there's config options
@@ -672,17 +615,12 @@ Summary: The Linux kernel
 # Which is a BadThing(tm).
 
 # We only build kernel-headers on the following...
-%if 0%{?fedora}
-%define nobuildarches i386
-%else
-%define nobuildarches i386 i686
-%endif
+%define nobuildarches noarch
 
 %ifarch %nobuildarches
 # disable BuildKernel commands
 %define with_up 0
 %define with_debug 0
-%define with_zfcpdump 0
 %define with_arm64_16k 0
 %define with_arm64_64k 0
 %define with_realtime 0
@@ -698,11 +636,7 @@ Summary: The Linux kernel
 %endif
 
 # Architectures we build tools/cpupower on
-%if 0%{?fedora}
-%define cpupowerarchs %{ix86} x86_64 ppc64le aarch64 riscv64
-%else
-%define cpupowerarchs i686 x86_64 ppc64le aarch64 riscv64
-%endif
+%define cpupowerarchs x86_64 aarch64
 
 %if 0%{?use_vdso}
 %define _use_vdso 1
@@ -725,7 +659,7 @@ Summary: The Linux kernel
 # AZL: Build only the base (up) kernel for x86_64 and aarch64.
 #
 # Azure Linux ships a single general-purpose kernel. All other variants
-# (debug, realtime/rt-64k, arm64-16k/64k, automotive, zfcpdump) are
+# (debug, realtime/rt-64k, arm64-16k/64k, automotive) are
 # disabled here. This gate runs after all upstream arch/variant resolution so
 # it wins; the disabled variant code is trimmed away incrementally. EFI UKI and
 # kernel selftests (kernel-selftests-internal) are intentionally left enabled.
@@ -738,7 +672,6 @@ Summary: The Linux kernel
 %define with_arm64_64k 0
 %define with_automotive 0
 %define with_automotive_build 0
-%define with_zfcpdump 0
 
 # short-hand for "are we building base/non-debug variants of ...?"
 %if %{with_up} && %{with_base}
@@ -787,11 +720,7 @@ Version: %{specrpmversion}
 Release: %{pkg_release}
 # DO NOT CHANGE THE 'ExclusiveArch' LINE TO TEMPORARILY EXCLUDE AN ARCHITECTURE BUILD.
 # SET %%nobuildarches (ABOVE) INSTEAD
-%if 0%{?fedora}
-ExclusiveArch: noarch x86_64 s390x aarch64 ppc64le riscv64
-%else
-ExclusiveArch: noarch i386 i686 x86_64 s390x aarch64 ppc64le riscv64
-%endif
+ExclusiveArch: noarch x86_64 aarch64
 ExclusiveOS: Linux
 %ifnarch %{nobuildarches}
 Requires: %{name}-core-uname-r = %{KVERREL}
@@ -811,7 +740,7 @@ Provides: installonlypkg(kernel)
 BuildRequires: kmod, bash, coreutils, tar, git-core, which
 BuildRequires: bzip2, xz, findutils, m4, perl-interpreter, perl-Carp, perl-devel, perl-generators, make, diffutils, gawk, %compression
 # Kernel EFI/Compression set by CONFIG_KERNEL_ZSTD
-%ifarch x86_64 aarch64 riscv64
+%ifarch x86_64 aarch64
 BuildRequires: zstd
 %endif
 BuildRequires: gcc, binutils, redhat-rpm-config, hmaccalc, bison, flex, gcc-c++
@@ -843,9 +772,7 @@ BuildRequires: java-devel
 BuildRequires: libbabeltrace-devel
 BuildRequires: libpfm-devel
 BuildRequires: libtraceevent-devel
-%ifnarch s390x
 BuildRequires: numactl-devel
-%endif
 %ifarch aarch64
 BuildRequires: opencsd-devel >= 1.0.0
 %endif
@@ -867,10 +794,8 @@ BuildRequires: clang
 BuildRequires: swig
 %endif
 
-%ifnarch s390x
 BuildRequires: pciutils-devel
-%endif
-%ifarch i686 x86_64
+%ifarch x86_64
 BuildRequires: libnl3-devel
 %endif
 %endif
@@ -884,7 +809,7 @@ BuildRequires: openssl-devel
 
 %if %{with_selftests}
 BuildRequires: clang llvm-devel fuse-devel zlib-devel binutils-devel python3-docutils python3-jsonschema
-%ifarch x86_64 riscv64
+%ifarch x86_64
 BuildRequires: lld
 %endif
 BuildRequires: libasan-static
@@ -925,7 +850,7 @@ BuildRequires: openssl
 %if 0%{?rhel}%{?centos} && !0%{?eln}
 BuildRequires: system-sb-certs
 %endif
-%ifarch x86_64 aarch64 riscv64
+%ifarch x86_64 aarch64
 BuildRequires: nss-tools
 BuildRequires: pesign >= 0.10-4
 %endif
@@ -947,15 +872,6 @@ BuildRequires: binutils-%{_build_arch}-linux-gnu, gcc-%{_build_arch}-linux-gnu
 %undefine _include_gdb_index
 %endif
 
-%if 0%{?rhel}%{?centos}
-%ifarch riscv64
-# Temporary workaround to avoid using find-debuginfo and gdb.minimal.
-# The current c10s version of gdb-minimal (14.2-4.el10) crashes when given some
-# riscv64 kernel modules (see RHEL-91586). Not building the gdb index avoids
-# breaking CI for now.
-%undefine _include_gdb_index
-%endif
-%endif
 %endif
 
 # These below are required to build man pages
@@ -1015,14 +931,6 @@ Source10: redhatsecurebootca5.cer
 Source13: redhatsecureboot501.cer
 
 %if %{signkernel}
-# Name of the packaged file containing signing key
-%ifarch ppc64le
-%define signing_key_filename kernel-signing-ppc.cer
-%endif
-%ifarch s390x
-%define signing_key_filename kernel-signing-s390.cer
-%endif
-
 # Fedora/ELN pesign macro expects to see these cert file names, see:
 # https://github.com/rhboot/pesign/blob/main/src/pesign-rpmbuild-helper.in#L216
 %if 0%{?fedora}%{?eln}
@@ -1042,12 +950,6 @@ Source13: redhatsecureboot501.cer
 %ifarch x86_64 aarch64
 %define pesign_name_0 redhatsecureboot501
 %endif
-%ifarch s390x
-%define pesign_name_0 redhatsecureboot302
-%endif
-%ifarch ppc64le
-%define pesign_name_0 redhatsecureboot701
-%endif
 %endif
 # rhel && !eln
 %endif
@@ -1064,19 +966,11 @@ Source22: filtermods.py
 %if 0%{?include_rhel}
 Source24: %{name}-aarch64-rhel.config
 Source25: %{name}-aarch64-debug-rhel.config
-Source27: %{name}-ppc64le-rhel.config
-Source28: %{name}-ppc64le-debug-rhel.config
-Source29: %{name}-s390x-rhel.config
-Source30: %{name}-s390x-debug-rhel.config
-Source31: %{name}-s390x-zfcpdump-rhel.config
 Source32: %{name}-x86_64-rhel.config
 Source33: %{name}-x86_64-debug-rhel.config
 # ARM64 64K page-size kernel config
 Source42: %{name}-aarch64-64k-rhel.config
 Source43: %{name}-aarch64-64k-debug-rhel.config
-
-Source44: %{name}-riscv64-rhel.config
-Source45: %{name}-riscv64-debug-rhel.config
 %endif
 
 %if %{include_rhel} || %{include_automotive}
@@ -1092,14 +986,8 @@ Source52: %{name}-aarch64-fedora.config
 Source53: %{name}-aarch64-debug-fedora.config
 Source54: %{name}-aarch64-16k-fedora.config
 Source55: %{name}-aarch64-16k-debug-fedora.config
-Source56: %{name}-ppc64le-fedora.config
-Source57: %{name}-ppc64le-debug-fedora.config
-Source58: %{name}-s390x-fedora.config
-Source59: %{name}-s390x-debug-fedora.config
 Source60: %{name}-x86_64-fedora.config
 Source61: %{name}-x86_64-debug-fedora.config
-Source700: %{name}-riscv64-fedora.config
-Source701: %{name}-riscv64-debug-fedora.config
 
 Source62: def_variants.yaml.fedora
 %endif
@@ -1154,16 +1042,10 @@ Source106: fedoraimaca.x509
 Source200: check-kabi
 
 Source201: Module.kabi_aarch64
-Source202: Module.kabi_ppc64le
-Source203: Module.kabi_s390x
 Source204: Module.kabi_x86_64
-Source205: Module.kabi_riscv64
 
 Source210: Module.kabi_dup_aarch64
-Source211: Module.kabi_dup_ppc64le
-Source212: Module.kabi_dup_s390x
 Source213: Module.kabi_dup_x86_64
-Source214: Module.kabi_dup_riscv64
 
 Source300: kernel-abi-stablelists-%{kabiversion}.tar.xz
 Source301: kernel-kabi-dw-%{kabiversion}.tar.xz
@@ -1184,8 +1066,6 @@ Source482: %{name}-aarch64-rt-64k-fedora.config
 Source483: %{name}-aarch64-rt-64k-debug-fedora.config
 Source484: %{name}-x86_64-rt-fedora.config
 Source485: %{name}-x86_64-rt-debug-fedora.config
-Source486: %{name}-riscv64-rt-fedora.config
-Source487: %{name}-riscv64-rt-debug-fedora.config
 %endif
 %endif
 
@@ -1242,18 +1122,13 @@ Patch999999: linux-kernel-test.patch
 The %{package_name} meta package
 
 # This macro does requires, provides, conflicts, obsoletes for a kernel package.
-#	%%kernel_reqprovconf [-o] <subpackage>
+#	%%kernel_reqprovconf <subpackage>
 # It uses any kernel_<subpackage>_conflicts and kernel_<subpackage>_obsoletes
 # macros defined above.
-# -o: Skips main "Provides" that would satisfy general kernel requirements that
-#     special-purpose kernels shouldn't include.
-#     For example, used for zfcpdump-core to *not* provide kernel-core. (BZ 2027654)
 #
-%define kernel_reqprovconf(o) \
-%if %{-o:0}%{!-o:1}\
+%define kernel_reqprovconf() \
 Provides: kernel = %{specversion}-%{pkg_release}\
 Provides: %{name} = %{specversion}-%{pkg_release}\
-%endif\
 Provides: %{name}-%{_target_cpu} = %{specrpmversion}-%{pkg_release}%{uname_suffix %{?1}}\
 Provides: %{name}-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
 Requires: %{name}%{?1:-%{1}}-modules-core-uname-r = %{KVERREL}%{uname_suffix %{?1}}\
@@ -1741,7 +1616,7 @@ Provides: installonlypkg(kernel)\
 Requires: %{name}-core-uname-r = %{KVERREL}%{uname_variant %{?1}}\
 Requires: %{name}-%{?1:%{1}-}-modules-core-uname-r = %{KVERREL}%{uname_variant %{?1}}\
 %endif\
-%{expand:%%kernel_reqprovconf %{?1:%{1}} %{-o:%{-o}}}\
+%{expand:%%kernel_reqprovconf %{?1:%{1}}}\
 %if %{?1:1} %{!?1:0} \
 %{expand:%%kernel_meta_package %{?1:%{1}}}\
 %endif\
@@ -1800,15 +1675,6 @@ This package provides kernel modules for the %{?2:%{2} }kernel package for Red H
 %{nil}
 
 # Now, each variant package.
-%if %{with_zfcpdump}
-%define variant_summary The Linux kernel compiled for zfcpdump usage
-%kernel_variant_package -o zfcpdump
-%description zfcpdump-core
-The kernel package contains the Linux kernel (vmlinuz) for use by the
-zfcpdump infrastructure.
-# with_zfcpdump
-%endif
-
 %if %{with_arm64_16k_base}
 %define variant_summary The Linux kernel compiled for 16k pagesize usage
 %kernel_variant_package 16k
@@ -2164,10 +2030,7 @@ GetArch()
 {
   case "$1" in
   *aarch64*) echo "aarch64" ;;
-  *ppc64le*) echo "ppc64le" ;;
-  *s390x*) echo "s390x" ;;
   *x86_64*) echo "x86_64" ;;
-  *riscv64*) echo "riscv64" ;;
   # no arch, apply everywhere
   *) echo "" ;;
   esac
@@ -2209,12 +2072,6 @@ openssl x509 -inform der -in %{SOURCE101} -out rhelkpatch1.pem
 openssl x509 -inform der -in %{SOURCE102} -out nvidiagpuoot001.pem
 cat rheldup3.pem rhelkpatch1.pem nvidiagpuoot001.pem >> ../certs/rhel.pem
 # rhelkeys
-%endif
-%if %{signkernel}
-%ifarch s390x ppc64le
-openssl x509 -inform der -in %{secureboot_ca_0} -out secureboot.pem
-cat secureboot.pem >> ../certs/rhel.pem
-%endif
 %endif
 
 # rhel
@@ -2396,9 +2253,6 @@ BuildKernel() {
 
     %{log_msg "Setup variables"}
     DoModules=1
-    if [ "$Variant" = "zfcpdump" ]; then
-	    DoModules=0
-    fi
 
     # When the bootable image is just the ELF kernel, strip it.
     # We already copy the unstripped file into the debuginfo package.
@@ -2443,7 +2297,7 @@ BuildKernel() {
     mkdir -p $RPM_BUILD_ROOT%{debuginfodir}/%{image_install_path}
 %endif
 
-%ifarch aarch64 riscv64
+%ifarch aarch64
     %{log_msg "Build dtb kernel"}
     mkdir -p $RPM_BUILD_ROOT/%{image_install_path}/dtb-$KernelVer
     %{make} ARCH=$Arch dtbs INSTALL_DTBS_PATH=$RPM_BUILD_ROOT/%{image_install_path}/dtb-$KernelVer
@@ -2454,7 +2308,6 @@ BuildKernel() {
 
     %{log_msg "Cleanup temp btf files"}
     # Remove large intermediate files we no longer need to save space
-    # (-f required for zfcpdump builds that do not enable BTF)
     rm -f vmlinux.o .tmp_vmlinux.btf
 
     %{log_msg "Install files to RPM_BUILD_ROOT"}
@@ -2506,16 +2359,6 @@ BuildKernel() {
     %ifarch x86_64 aarch64
     %{log_msg "Sign kernel image"}
     %pesign -s -i $SignImage -o vmlinuz.signed -a %{secureboot_ca_0} -c %{secureboot_key_0} -n %{pesign_name_0}
-    %endif
-    %ifarch s390x ppc64le
-    if [ -x /usr/bin/rpm-sign ]; then
-	rpm-sign --key "%{pesign_name_0}" --lkmsign $SignImage --output vmlinuz.signed
-    elif [ "$DoModules" == "1" -a "%{signmodules}" == "1" ]; then
-	chmod +x scripts/sign-file
-	./scripts/sign-file -p sha256 certs/signing_key.pem certs/signing_key.x509 $SignImage vmlinuz.signed
-    else
-	mv $SignImage vmlinuz.signed
-    fi
     %endif
 
     if [ ! -s vmlinuz.signed ]; then
@@ -2635,7 +2478,7 @@ BuildKernel() {
 
 %if %{with_kabidw_base}
     # Don't build kabi base for debug kernels
-    if [ "$Variant" != "zfcpdump" -a "$Variant" != "debug" ]; then
+  if [ "$Variant" != "debug" ]; then
         mkdir -p $RPM_BUILD_ROOT/kabi-dwarf
         tar -xvf %{SOURCE301} -C $RPM_BUILD_ROOT/kabi-dwarf
 
@@ -2654,31 +2497,29 @@ BuildKernel() {
 %endif
 
 %if %{with_kabidwchk}
-    if [ "$Variant" != "zfcpdump" ]; then
-        mkdir -p $RPM_BUILD_ROOT/kabi-dwarf
-        tar -xvf %{SOURCE301} -C $RPM_BUILD_ROOT/kabi-dwarf
-        if [ -d "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}" ]; then
-            mkdir -p $RPM_BUILD_ROOT/kabi-dwarf/stablelists
-            tar -xvf %{SOURCE300} -C $RPM_BUILD_ROOT/kabi-dwarf/stablelists
+  mkdir -p $RPM_BUILD_ROOT/kabi-dwarf
+  tar -xvf %{SOURCE301} -C $RPM_BUILD_ROOT/kabi-dwarf
+  if [ -d "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}" ]; then
+    mkdir -p $RPM_BUILD_ROOT/kabi-dwarf/stablelists
+    tar -xvf %{SOURCE300} -C $RPM_BUILD_ROOT/kabi-dwarf/stablelists
 
-	    %{log_msg "GENERATING DWARF-based kABI dataset"}
-            chmod 0755 $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh
-            $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh generate \
-                "$RPM_BUILD_ROOT/kabi-dwarf/stablelists/kabi-current/kabi_stablelist_%{_target_cpu}" \
-                "$(pwd)" \
-                "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}.tmp" || :
+	%{log_msg "GENERATING DWARF-based kABI dataset"}
+    chmod 0755 $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh
+    $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh generate \
+      "$RPM_BUILD_ROOT/kabi-dwarf/stablelists/kabi-current/kabi_stablelist_%{_target_cpu}" \
+      "$(pwd)" \
+      "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}.tmp" || :
 
-	    %{log_msg "kABI DWARF-based comparison report"}
-            $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh compare \
-                "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}" \
-                "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}.tmp" || :
-	    %{log_msg "End of kABI DWARF-based comparison report"}
-        else
-	    %{log_msg "Baseline dataset for kABI DWARF-BASED comparison report not found"}
-        fi
-
-        rm -rf $RPM_BUILD_ROOT/kabi-dwarf
+	%{log_msg "kABI DWARF-based comparison report"}
+    $RPM_BUILD_ROOT/kabi-dwarf/run_kabi-dw.sh compare \
+      "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}" \
+      "$RPM_BUILD_ROOT/kabi-dwarf/base/%{_target_cpu}${Variant:+.${Variant}}.tmp" || :
+	%{log_msg "End of kABI DWARF-based comparison report"}
+  else
+	%{log_msg "Baseline dataset for kABI DWARF-BASED comparison report not found"}
     fi
+
+  rm -rf $RPM_BUILD_ROOT/kabi-dwarf
 %endif
 
    %{log_msg "Cleanup Makefiles/Kconfig files"}
@@ -2689,15 +2530,6 @@ BuildKernel() {
     cp -a scripts $RPM_BUILD_ROOT/lib/modules/$KernelVer/build
     rm -rf $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/scripts/tracing
     rm -f $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/scripts/spdxcheck.py
-
-%ifarch s390x
-    # CONFIG_EXPOLINE_EXTERN=y produces arch/s390/lib/expoline/expoline.o
-    # which is needed during external module build.
-    %{log_msg "Copy expoline.o"}
-    if [ -f arch/s390/lib/expoline/expoline.o ]; then
-      cp -a --parents arch/s390/lib/expoline/expoline.o $RPM_BUILD_ROOT/lib/modules/$KernelVer/build
-    fi
-%endif
 
     %{log_msg "Copy additional files for make targets"}
     # Files for 'make scripts' to succeed with kernel-devel.
@@ -2751,9 +2583,6 @@ BuildKernel() {
       cp -a --parents arch/%{asmarch}/kernel/module.lds $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/
     fi
     find $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/scripts \( -iname "*.o" -o -iname "*.cmd" \) -exec rm -f {} +
-%ifarch ppc64le
-    cp -a --parents arch/powerpc/lib/crtsavres.[So] $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/
-%endif
     if [ -d arch/%{asmarch}/include ]; then
       cp -a --parents arch/%{asmarch}/include $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/
     fi
@@ -2769,7 +2598,7 @@ BuildKernel() {
     cp -a include $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/include
     # Cross-reference from include/perf/events/sof.h
     cp -a sound/soc/sof/sof-audio.h $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/sound/soc/sof
-%ifarch i686 x86_64
+%ifarch x86_64
     # files for 'make prepare' to succeed with kernel-devel
     cp -a --parents arch/x86/entry/syscalls/syscall_32.tbl $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/
     cp -a --parents arch/x86/entry/syscalls/syscall_64.tbl $RPM_BUILD_ROOT/lib/modules/$KernelVer/build/
@@ -3100,13 +2929,10 @@ BuildKernel() {
 
 %if %{with_debuginfo}
     # Generate vmlinux.h and put it to kernel-devel path
-    # zfcpdump build does not have btf anymore
-    if [ "$Variant" != "zfcpdump" ]; then
 	%{log_msg "Build the bootstrap bpftool to generate vmlinux.h"}
-        # Build the bootstrap bpftool to generate vmlinux.h
-        BuildBpftool
-        tools/bpf/bpftool/bootstrap/bpftool btf dump file vmlinux format c > $RPM_BUILD_ROOT/$DevelDir/vmlinux.h
-    fi
+  # Build the bootstrap bpftool to generate vmlinux.h
+  BuildBpftool
+  tools/bpf/bpftool/bootstrap/bpftool btf dump file vmlinux format c > $RPM_BUILD_ROOT/$DevelDir/vmlinux.h
 %endif
 
     %{log_msg "Cleanup kernel-devel and kernel-debuginfo files"}
@@ -3120,11 +2946,6 @@ BuildKernel() {
     mkdir -p $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer
 %if %{signkernel}
     install -m 0644 %{secureboot_ca_0} $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/kernel-signing-ca.cer
-    %ifarch s390x ppc64le
-    if [ -x /usr/bin/rpm-sign ]; then
-        install -m 0644 %{secureboot_key_0} $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/%{signing_key_filename}
-    fi
-    %endif
 %endif
 
 %if 0%{?rhel}
@@ -3137,13 +2958,6 @@ BuildKernel() {
         # Save the signing keys so we can sign the modules in __modsign_install_post
         cp certs/signing_key.pem certs/signing_key.pem.sign${Variant:++${Variant}}
         cp certs/signing_key.x509 certs/signing_key.x509.sign${Variant:++${Variant}}
-        %ifarch s390x ppc64le
-        if [ ! -x /usr/bin/rpm-sign ]; then
-            install -m 0644 certs/signing_key.x509.sign${Variant:++${Variant}} $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/kernel-signing-ca.cer
-            openssl x509 -in certs/signing_key.pem.sign${Variant:++${Variant}} -outform der -out $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/%{signing_key_filename}
-            chmod 0644 $RPM_BUILD_ROOT%{_datadir}/doc/kernel-keys/$KernelVer/%{signing_key_filename}
-        fi
-        %endif
     fi
 %endif
 
@@ -3189,10 +3003,6 @@ BuildKernel %make_target %kernel_image %{_use_vdso} debug
 %endif
 %endif
 
-%if %{with_zfcpdump}
-BuildKernel %make_target %kernel_image %{_use_vdso} zfcpdump
-%endif
-
 %if %{with_arm64_16k_base}
 BuildKernel %make_target %kernel_image %{_use_vdso} 16k
 %endif
@@ -3217,8 +3027,8 @@ BuildKernel %make_target %kernel_image %{_use_vdso} automotive
 BuildKernel %make_target %kernel_image %{_use_vdso}
 %endif
 
-%ifnarch noarch i686 %{nobuildarches}
-%if !%{with_debug} && !%{with_zfcpdump} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k} && !%{with_realtime} && !%{with_realtime_arm64_64k} && !%{with_automotive}
+%ifnarch noarch %{nobuildarches}
+%if !%{with_debug} && !%{with_up} && !%{with_arm64_16k} && !%{with_arm64_64k} && !%{with_realtime} && !%{with_realtime_arm64_64k} && !%{with_automotive}
 # If only building the user space tools, then initialize the build environment
 # and some variables so that the various userspace tools can be built.
 %{log_msg "Initialize userspace tools build environment"}
@@ -3454,15 +3264,12 @@ find Documentation -type d | xargs chmod u+w
 # This must be run _after_ find-debuginfo.sh runs, otherwise that will strip
 # the signature off of the modules.
 #
-# Don't sign modules for the zfcpdump variant as it is monolithic.
-
 %define __modsign_install_post \
   if [ "%{signmodules}" -eq "1" ]; then \
     %{log_msg "Signing kernel modules ..."} \
     modules_dirs="$(shopt -s nullglob; echo $RPM_BUILD_ROOT/lib/modules/%{KVERREL}*)" \
     for modules_dir in $modules_dirs; do \
         variant_suffix="${modules_dir#$RPM_BUILD_ROOT/lib/modules/%{KVERREL}}" \
-        [ "$variant_suffix" == "+zfcpdump" ] && continue \
 	%{log_msg "Signing modules for %{KVERREL}${variant_suffix}"} \
         %{modsign_cmd} certs/signing_key.pem.sign${variant_suffix} certs/signing_key.x509.sign${variant_suffix} $modules_dir/ \
     done \
@@ -4118,7 +3925,7 @@ fi\
 %{expand:%%kernel_variant_posttrans %{?-v*:-v %{-v*}}}\
 %{expand:%%post %{?-v*:%{-v*}-}core}\
 %{-r:\
-if [ `uname -i` == "x86_64" -o `uname -i` == "i386" ] &&\
+if [ `uname -i` == "x86_64" ] &&\
    [ -f /etc/sysconfig/kernel ]; then\
   /bin/sed -r -i -e 's/^DEFAULTKERNEL=%{-r*}$/DEFAULTKERNEL=kernel%{?-v:-%{-v*}}/' /etc/sysconfig/kernel || exit $?\
 fi}\
@@ -4156,11 +3963,6 @@ fi\
 %if %{with_up_base}
 %kernel_variant_preun -e
 %kernel_variant_post
-%endif
-
-%if %{with_zfcpdump}
-%kernel_variant_preun -v zfcpdump
-%kernel_variant_post -v zfcpdump
 %endif
 
 %if %{with_up} && %{with_debug} && %{with_efiuki}
@@ -4269,7 +4071,7 @@ fi\
 %endif
 
 %if %{with_kabidw_base}
-%ifarch x86_64 s390x ppc64 ppc64le aarch64 riscv64
+%ifarch x86_64 aarch64
 %files kernel-kabidw-base-internal
 %defattr(-,root,root)
 /kabidw-base/%{_target_cpu}/*
@@ -4474,7 +4276,7 @@ fi\
 %ghost /%{image_install_path}/%{?-k:%{-k*}}%{!?-k:vmlinuz}-%{KVERREL}%{?3:+%{3}}\
 /lib/modules/%{KVERREL}%{?3:+%{3}}/.vmlinuz.hmac \
 %ghost /%{image_install_path}/.vmlinuz-%{KVERREL}%{?3:+%{3}}.hmac \
-%ifarch aarch64 riscv64\
+%ifarch aarch64\
 /lib/modules/%{KVERREL}%{?3:+%{3}}/dtb \
 %ghost /%{image_install_path}/dtb-%{KVERREL}%{?3:+%{3}} \
 %endif\
@@ -4602,7 +4404,6 @@ fi\
 %files 64k-debug-modules-extra
 %endif
 %endif
-%kernel_variant_files %{_use_vdso} %{with_zfcpdump} zfcpdump
 %kernel_variant_files %{_use_vdso} %{with_arm64_16k_base} 16k
 %kernel_variant_files %{_use_vdso} %{with_arm64_64k_base} 64k
 %kernel_variant_files %{_use_vdso} %{with_realtime_arm64_64k_base} rt-64k
@@ -4626,6 +4427,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Aug 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.6
+- refactor(kernel): trim support to x86_64 and aarch64
+
 * Thu Aug 27 2026 Hayden Barnes <hbarnes@herodevs.com> - 6.18.39-1.5
 - feat(kernel): enable x86 USB storage and UAS
 
