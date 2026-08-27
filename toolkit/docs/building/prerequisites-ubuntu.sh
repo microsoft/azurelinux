@@ -28,9 +28,11 @@ go_root() {
     return 1
 }
 
-# Returns zero when the given go binary is 1.25 or newer, e.g. go1.25.14, go1.26.0, go1.31rc1.
+# Returns zero when the given go binary meets the toolkit's minimum. A prerelease of the minimum
+# series must not qualify: go1.25rc1 predates go1.25.0, so the toolkit would reject it. Prereleases
+# of later series (go1.26rc1) are new enough and stay accepted.
 go_is_supported() {
-    "$1" version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'
+    "$1" version 2>/dev/null | grep -qE 'go1\.(25\.[0-9]|2[6-9]|[3-9][0-9])'
 }
 
 # Points /usr/bin/go and /usr/bin/gofmt at the given Go root, then checks the links actually win.
