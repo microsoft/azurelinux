@@ -23,6 +23,9 @@ prerequisites script picks a source at runtime:
 
 Either way `go` and `gofmt` are symlinked into `/usr/bin`, so no separate step is needed.
 
+A Go toolchain that is already installed in either location and reports 1.25 or newer is reused
+as-is — the script only ever replaces a `/usr/local/go` that is too old, and says so before it does.
+
 The pinned version and its checksums are the `GO_VERSION`/`GO_SHA256_*` variables at the top of
 `prerequisites-ubuntu.sh` and must be updated together.
 
