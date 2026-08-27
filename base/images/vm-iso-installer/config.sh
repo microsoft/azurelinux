@@ -96,17 +96,40 @@ EXTRA_REPO_PKGS=(
 )
 
 echo "=== Downloading target-install packages + dependencies ==="
-# Kiwi removes repo configs after package installation, so repos from the .kiwi
-# file are NOT available during config.sh. Use --repofrompath with the CDN URL
-# directly. Keep this URL in sync with the `azurelinux-base` repo in
-# vm-iso-installer.kiwi.
+# Kiwi removes its temporary package manager configuration before config.sh,
+# but imports the effective image description at /image/config.xml. Read every
+# build-time repository from that description so direct Kiwi builds use the
+# configured Azure Linux repo and Koji builds use the repos selected by the task.
+# Kiwi includes imageonly repos in the finished appliance but does not use
+# them during the build. Exclude them so this mirrors Kiwi's package inputs.
+BUILD_REPO_XPATH="/image/repository[not(translate(@imageonly, 'TRUE', 'true') = 'true')]/source[@path != '']/@path"
+BUILD_REPO_COUNT="$(xmllint --xpath "count($BUILD_REPO_XPATH)" /image/config.xml)"
+if (( BUILD_REPO_COUNT == 0 )); then
+    echo "ERROR: No build repositories found in /image/config.xml" >&2
+    exit 1
+fi
 
-AZL_BASE_URL="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$ARCH"
+BUILD_REPOS=()
+# XPath 1.0 cannot map string() over a node-set, so extract each value.
+# string() also decodes entities such as &amp; that appear in repository URLs.
+for ((i = 1; i <= BUILD_REPO_COUNT; i++)); do
+    BUILD_REPOS+=(
+        "$(xmllint --xpath "string(($BUILD_REPO_XPATH)[$i])" /image/config.xml)"
+    )
+done
+
+DNF_REPO_ARGS=(--setopt=reposdir=/dev/null)
+for i in "${!BUILD_REPOS[@]}"; do
+    repo_id="kiwi-build-$i"
+    echo "Using build repository: ${BUILD_REPOS[$i]}"
+    DNF_REPO_ARGS+=(
+        "--repofrompath=$repo_id,${BUILD_REPOS[$i]}"
+        "--repo=$repo_id"
+    )
+done
 
 dnf5 download \
-    --setopt=reposdir=/dev/null \
-    --repofrompath=azl-base,"$AZL_BASE_URL" \
-    --repo=azl-base \
+    "${DNF_REPO_ARGS[@]}" \
     --resolve \
     --alldeps \
     --skip-unavailable \
