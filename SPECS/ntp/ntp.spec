@@ -92,8 +92,10 @@ make -C ntpstat-master CFLAGS="$CFLAGS"
 cp %{SOURCE8} .
 
 make DESTDIR=%{buildroot} install
-install -v -m755    -d %{buildroot}%{_docdir}/%{name}-%{version}
-cp -v -R html/*     %{buildroot}%{_docdir}/%{name}-%{version}/
+rm -f \
+    %{buildroot}%{_docdir}/%{name}/html/copyright.html \
+    %{buildroot}%{_docdir}/%{name}/html/hints/bsdi \
+    %{buildroot}%{_docdir}/%{name}/html/hints/freebsd
 install -vdm 755 %{buildroot}%{_sysconfdir}
 
 mkdir -p %{buildroot}%{_sharedstatedir}/ntp/drift
@@ -113,7 +115,6 @@ restrict -6 ::1
 driftfile %{_sharedstatedir}/ntp/drift/ntp.drift
 EOF
 
-install -D -m644 COPYRIGHT %{buildroot}%{_datadir}/licenses/%{name}/LICENSE
 rm -rf %{buildroot}%{_sysconfdir}/rc.d/*
 
 %{_fixperms} %{buildroot}/*
@@ -158,7 +159,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%license COPYRIGHT LICENSE.PTR
+%license COPYRIGHT LICENSE.PTR html/copyright.html html/hints/bsdi html/hints/freebsd
 %dir %{_sharedstatedir}/ntp/drift
 %attr(0755, ntp, ntp) %{_sharedstatedir}/ntp/drift
 %attr(0750, root, root) %config(noreplace) %{_sysconfdir}/ntp.conf
@@ -177,10 +178,8 @@ fi
 %{_bindir}/ntptime
 %{_bindir}/sntp
 %{_bindir}/tickadj
-%{_docdir}/%{name}-%{version}/*
-%{_docdir}/ntp/*
-%{_docdir}/sntp/*
-%{_datadir}/licenses/ntp/LICENSE
+%doc %{_docdir}/ntp/*
+%doc %{_docdir}/sntp/*
 %{_mandir}/man1/ntpd.1.gz
 %{_mandir}/man1/ntpdc.1.gz
 %{_mandir}/man1/ntp-keygen.1.gz
