@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        33%{?dist}
+Release:        34%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -104,6 +104,17 @@ Source23:       sysusers.prov
 Source24:       sysusers.generate-pre.sh
 
 Source25:       98-default-mac-none.link
+
+# Temporary workaround. Remove Sources 26-28 and their install, signature,
+# and split-file changes when the native e2fsprogs whole-disk lock is
+# integrated into Azure Linux:
+# https://lore.kernel.org/linux-ext4/20260824161512.1332649-1-naraghavan@linux.microsoft.com/
+# Do not ship both implementations. The outer udevadm process retains its
+# exclusive lock while waiting for e2fsck; native e2fsck locking would then
+# block on a second independently-opened lock and deadlock boot.
+Source26:       systemd-fsck-root-device-lock.conf
+Source27:       systemd-fsck-root-device-lock
+Source28:       systemd-fsck-root-device-lock-dracut.conf
 
 %if 0
 GIT_DIR=../../src/systemd/.git git format-patch-ab --no-signature -M -N v235..v235-stable
@@ -882,6 +893,9 @@ install -Dm0644 -t %{buildroot}%{_pkgdocdir}/ %{SOURCE9}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1378974
 install -Dm0644 -t %{buildroot}%{system_unit_dir}/systemd-udev-trigger.service.d/ %{SOURCE10}
+install -Dm0644 -t %{buildroot}%{system_unit_dir}/systemd-fsck-root.service.d/ %{SOURCE26}
+install -Dm0755 %{SOURCE27} %{buildroot}%{_prefix}/lib/systemd/systemd-fsck-root-device-lock
+install -Dm0644 %{SOURCE28} %{buildroot}%{_prefix}/lib/dracut/dracut.conf.d/50-systemd-fsck-root-device-lock.conf
 
 # systemd-oomd default configuration
 install -Dm0644 -t %{buildroot}%{_prefix}/lib/systemd/oomd.conf.d/ %{SOURCE14}
@@ -1257,6 +1271,13 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Wed Aug 26 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-34
+- Route the generated initrd root filesystem check through `udevadm lock`
+  with a 180-second timeout.
+- Resolve the generated root device from the unit's BindsTo= dependency.
+- Add dracut configuration that copies the root drop-in and resolver into
+  rebuilt initramfs images.
+
 * Mon Jun 29 2026 Kshitiz Godara <kgodara@microsoft.com> - 255-33
 - Skip tests in %%check that require capabilities not available in the build
   chroot (mount-namespace privileges, systemd-detect-virt on PATH, etc.):
