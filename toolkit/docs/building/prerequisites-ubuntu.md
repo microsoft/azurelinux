@@ -37,6 +37,29 @@ The pinned version and its checksums are the `GO_VERSION`/`GO_SHA256_*` variable
 To use a Go you have installed yourself instead, make sure it is on `PATH` and reports 1.25 or
 newer; the script will detect it and skip the download.
 
+#### Updating the pinned Go version
+
+Go supports only the two most recent major releases: when 1.N ships, 1.(N-2) stops receiving
+security fixes. This pin therefore moves on Go's release cadence rather than Azure Linux's, and
+CVE fixes are a routine reason to move it. <https://go.dev/dl> lists the supported releases.
+
+Bumping the *patch* release (1.25.x → 1.25.y) means editing `prerequisites-ubuntu.sh` alone:
+
+1. Set `GO_VERSION`.
+2. Set `GO_SHA256_AMD64` and `GO_SHA256_ARM64` from <https://go.dev/dl> in the same change — the
+   checksums are version-specific, and a stale one aborts the install.
+
+Bumping the *major* release (1.25 → 1.26) additionally requires, all in one change:
+
+| Location | What to change |
+| --- | --- |
+| `prerequisites-ubuntu.sh` | `GO_APT_PACKAGE`, `GO_APT_ROOT`, and the version regex in `go_is_supported` |
+| `toolkit/tools/go.mod` | the `go` directive, which `toolkit/scripts/tools.mk` turns into the build-time minimum |
+| `.github/workflows/go-test-coverage.yml` | `EXPECTED_GO_VERSION`, which both selects the CI toolchain and asserts the `go.mod` directive matches |
+| `prerequisites-ubuntu.md`, `prerequisites-mariner.md` | the stated minimum version |
+
+Leaving any of them behind either fails CI or, worse, installs a toolchain the build then rejects.
+
 ## Installation Methods
 
 ### Method 1: Using Make Targets (Recommended)
