@@ -54,7 +54,7 @@ Bumping the *minor* release (1.25 → 1.26) additionally requires, all in one ch
 
 | Location | What to change |
 | --- | --- |
-| `prerequisites-ubuntu.sh` | `GO_APT_PACKAGE`, `GO_APT_ROOT`, and the version regex in `go_is_supported` |
+| `prerequisites-ubuntu.sh` | `GO_APT_PACKAGE`, `GO_APT_ROOT`, and the version regex in `go_version_ok` |
 | `toolkit/tools/go.mod` | the `go` directive, which `toolkit/scripts/tools.mk` turns into the build-time minimum |
 | `.github/workflows/go-test-coverage.yml` | `EXPECTED_GO_VERSION`, which both selects the CI toolchain and asserts the `go.mod` directive matches |
 | `prerequisites-ubuntu.md`, `prerequisites-mariner.md` | the stated minimum version |
