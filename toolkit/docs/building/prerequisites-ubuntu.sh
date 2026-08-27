@@ -4,13 +4,25 @@
 
 set -eo pipefail
 
-# Ubuntu 26.04 packages Go 1.25, but the older releases still used by developers and CI (22.04,
-# 24.04) do not package it at all. Rather than special-casing releases, install the upstream
-# toolchain whenever the Go already on PATH is missing or older than 1.25.
+# Go is installed separately from the other packages because its source depends on the release.
+# Ubuntu 26.04 packages Go 1.25 as golang-1.25-go; 22.04 and 24.04 do not package it at all, so
+# those fall back to the upstream toolchain. The distro package is preferred so that hosts which
+# can reach an apt mirror but not go.dev keep working without external egress.
 # Checksums are from https://go.dev/dl and must be updated together with GO_VERSION.
+GO_APT_PACKAGE=golang-1.25-go
+GO_APT_ROOT=/usr/lib/go-1.25
 GO_VERSION=1.25.14
 GO_SHA256_AMD64=a21ae5633a269bcd7e90cf767e48225633795e99d831742cbf3397064fee7712
 GO_SHA256_ARM64=9bf234ea70ffec9347fdf6b22ce4add51717d3386a38a441e8c8743fceb5eaee
+
+# Echoes the root of an installed Go toolchain, preferring the distro package over the upstream
+# tarball. Returns non-zero when neither is present.
+go_root() {
+    for root in "$GO_APT_ROOT" /usr/local/go; do
+        [ -x "$root/bin/go" ] && { echo "$root"; return 0; }
+    done
+    return 1
+}
 
 # Define usage function
 usage() {
@@ -77,34 +89,40 @@ if [ "$INSTALL_PREREQS" = true ]; then
     xfsprogs \
     zstd
 
-    # Ubuntu 26.04 ships golang-1.25-go, but 22.04 and 24.04 do not package Go 1.25 at all, and the
-    # apt package is not on PATH anyway. Install the upstream toolchain unless PATH already has
-    # Go 1.25 or newer.
+    # Install Go from the distro when it is packaged, otherwise from the pinned upstream tarball.
     if go version 2>/dev/null | grep -qE 'go1\.(2[5-9]|[3-9][0-9])'; then
         echo "Found $(go version), skipping Go installation..."
     else
-        go_arch="$(dpkg --print-architecture)"
-        case "$go_arch" in
-            amd64) go_sha256="$GO_SHA256_AMD64" ;;
-            arm64) go_sha256="$GO_SHA256_ARM64" ;;
-            *)
-                echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
-                echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
-                exit 1
-                ;;
-        esac
+        echo "Checking apt for '$GO_APT_PACKAGE' (not packaged before Ubuntu 26.04)..."
+        if apt install -y "$GO_APT_PACKAGE" && [ -x "$GO_APT_ROOT/bin/go" ]; then
+            echo "Installed $GO_APT_PACKAGE from apt."
+        else
+            echo "'$GO_APT_PACKAGE' is unavailable on this release, using the upstream toolchain..."
+            go_arch="$(dpkg --print-architecture)"
+            case "$go_arch" in
+                amd64) go_sha256="$GO_SHA256_AMD64" ;;
+                arm64) go_sha256="$GO_SHA256_ARM64" ;;
+                *)
+                    echo "ERROR: no upstream Go build is pinned for architecture '$go_arch'." >&2
+                    echo "Install Go $GO_VERSION or newer manually, then re-run with --no-install-prereqs." >&2
+                    exit 1
+                    ;;
+            esac
 
-        echo "Installing Go $GO_VERSION ($go_arch) from https://go.dev/dl..."
-        go_tmp_dir="$(mktemp -d)"
-        trap 'rm -rf "$go_tmp_dir"' EXIT
-        curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
-          "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
-        echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
+            echo "Installing Go $GO_VERSION ($go_arch) from https://go.dev/dl..."
+            go_tmp_dir="$(mktemp -d)"
+            trap 'rm -rf "$go_tmp_dir"' EXIT
+            curl -fsSL -o "$go_tmp_dir/go.tar.gz" \
+              "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz"
+            echo "$go_sha256  $go_tmp_dir/go.tar.gz" | sha256sum -c -
 
-        rm -rf /usr/local/go
-        tar -C /usr/local -xzf "$go_tmp_dir/go.tar.gz"
-        ln -vsf /usr/local/go/bin/go /usr/bin/go
-        ln -vsf /usr/local/go/bin/gofmt /usr/bin/gofmt
+            rm -rf /usr/local/go
+            tar -C /usr/local -xzf "$go_tmp_dir/go.tar.gz"
+        fi
+
+        go_installed_root="$(go_root)"
+        ln -vsf "$go_installed_root/bin/go" /usr/bin/go
+        ln -vsf "$go_installed_root/bin/gofmt" /usr/bin/gofmt
     fi
 else
     echo "Skipping installation of prerequisite packages..."
@@ -112,12 +130,12 @@ fi
 
 # Fix go 1.25 links if requested
 if [ "$FIX_GO_LINKS" = true ]; then
-    if [ -x /usr/local/go/bin/go ]; then
-        echo "Creating Go symlinks..."
-        ln -vsf /usr/local/go/bin/go /usr/bin/go
-        ln -vsf /usr/local/go/bin/gofmt /usr/bin/gofmt
+    if go_link_root="$(go_root)"; then
+        echo "Creating Go symlinks from $go_link_root..."
+        ln -vsf "$go_link_root/bin/go" /usr/bin/go
+        ln -vsf "$go_link_root/bin/gofmt" /usr/bin/gofmt
     else
-        echo "No Go installation in /usr/local/go, skipping Go symlinks..."
+        echo "No Go installation in $GO_APT_ROOT or /usr/local/go, skipping Go symlinks..."
     fi
 fi
 
