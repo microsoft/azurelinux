@@ -6,11 +6,6 @@
 # Triggers are configured on the ADO pipeline definition.
 trigger: none
 
-pr:
-  branches:
-    include:
-      - fasttrack/3.0
-
 parameters:
   - name: debug
     type: boolean
