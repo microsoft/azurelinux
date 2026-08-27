@@ -30,10 +30,8 @@
         </type>
     </preferences>
 
-    <!-- Single build-time repository (see vm-base.kiwi).
-         vm-iso-installer/config.sh ALSO uses this URL directly to populate
-         the offline repo bundled on the ISO; if this URL changes, update
-         AZL_BASE_URL in config.sh too. -->
+    <!-- Single build-time repository (see vm-base.kiwi). config.sh reads the
+         effective repository list from Kiwi's imported image description. -->
     <repository type="rpm-md" alias="azurelinux-base">
         <source
             path="https://stcontroltowerdevjwisitg.blob.core.windows.net/azl4-dev/base/$basearch" />
@@ -57,6 +55,8 @@
         <package name="iproute" />
         <package name="kernel" />
         <package name="kernel-modules" />
+        <!-- Provides xmllint for parsing Kiwi's effective config XML in config.sh. -->
+        <package name="libxml2" />
         <package name="selinux-policy-targeted" />
         <package name="setup" />
         <package name="shadow-utils" />
