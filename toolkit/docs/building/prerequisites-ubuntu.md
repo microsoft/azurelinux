@@ -28,8 +28,8 @@ as-is — the script only ever replaces a `/usr/local/go` that is too old, and s
 
 If some other `go` sits earlier on `PATH` than `/usr/bin` — `/usr/local/bin/go` is the usual
 culprit, since both Ubuntu's default `PATH` and `sudo`'s `secure_path` list `/usr/local/bin` first —
-the script names it and warns that it will be used instead. Remove it, or the build will later fail
-its Go version check.
+the script names it and warns that it will be used instead. That is only a problem if the shadowing
+copy is too old — remove it if the build later reports an unsupported Go version.
 
 The pinned version and its checksums are the `GO_VERSION`/`GO_SHA256_*` variables at the top of
 `prerequisites-ubuntu.sh` and must be updated together.
@@ -39,7 +39,7 @@ newer; the script will detect it and skip the download.
 
 #### Updating the pinned Go version
 
-Go supports only the two most recent major releases: when 1.N ships, 1.(N-2) stops receiving
+Go supports only the two most recent release series: when 1.N ships, 1.(N-2) stops receiving
 security fixes. This pin therefore moves on Go's release cadence rather than Azure Linux's, and
 CVE fixes are a routine reason to move it. <https://go.dev/dl> lists the supported releases.
 
@@ -50,7 +50,7 @@ Bumping the *patch* release (1.25.x → 1.25.y) means editing `prerequisites-ubu
    checksums are version-specific, and a stale one aborts the install with a message naming the
    constant that needs refreshing.
 
-Bumping the *major* release (1.25 → 1.26) additionally requires, all in one change:
+Bumping the *minor* release (1.25 → 1.26) additionally requires, all in one change:
 
 | Location | What to change |
 | --- | --- |
@@ -116,8 +116,8 @@ sudo usermod -aG docker $USER
 The `prerequisites-ubuntu.sh` script supports the following options:
 
 - `--fix-go-links`: Re-creates the `/usr/bin` symlinks for the Go binaries, pointing them at
-  whichever Go root is installed (`/usr/lib/go-1.25` or `/usr/local/go`). The prerequisites
-  installation already does this, so it is only needed to repair the links.
+  whichever Go root is installed (`/usr/lib/go-1.<minor_version>` or `/usr/local/go`). The
+  prerequisites installation already does this, so it is only needed to repair the links.
 - `--configure-docker`: Installs Docker and adds your user to the docker group
 - `--no-install-prereqs`: Skips installation of prerequisite packages
 - `--help`: Displays usage information

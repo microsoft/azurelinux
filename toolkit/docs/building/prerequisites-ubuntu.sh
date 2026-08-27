@@ -9,7 +9,7 @@ set -eo pipefail
 # those fall back to the upstream toolchain. The distro package is preferred so that hosts which
 # can reach an apt mirror but not go.dev keep working without external egress.
 #
-# Go supports only the two most recent major releases, so this pin has to keep moving. See
+# Go supports only the two most recent release series, so this pin has to keep moving. See
 # "Updating the pinned Go version" in prerequisites-ubuntu.md before changing any of it: the
 # minimum version is spelled out in four other places that must move at the same time.
 # Checksums are from https://go.dev/dl and must be updated together with GO_VERSION.
