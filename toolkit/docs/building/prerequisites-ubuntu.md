@@ -47,7 +47,8 @@ Bumping the *patch* release (1.25.x → 1.25.y) means editing `prerequisites-ubu
 
 1. Set `GO_VERSION`.
 2. Set `GO_SHA256_AMD64` and `GO_SHA256_ARM64` from <https://go.dev/dl> in the same change — the
-   checksums are version-specific, and a stale one aborts the install.
+   checksums are version-specific, and a stale one aborts the install with a message naming the
+   constant that needs refreshing.
 
 Bumping the *major* release (1.25 → 1.26) additionally requires, all in one change:
 
