@@ -13,6 +13,7 @@
     <include from="this://./components/common.xml" />
     <include from="this://./components/boot.xml" />
     <include from="this://./teams/cloud/vm-base.xml" />
+    <include from="this://./teams/cloud/onep.xml" />
     <include from="this://./teams/wsl.xml" />
     <include from="this://./teams/container.xml" />
     <include from="this://./teams/minimal-os.xml" />

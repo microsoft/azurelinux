@@ -14,6 +14,7 @@ description = "Azure Linux 4.0 Stage1"
 release-ver = "4.0"
 mock-config-x86_64 = "mock/azl4/stage1/azurelinux-4.0-x86_64.cfg"
 mock-config-aarch64 = "mock/azl4/stage1/azurelinux-4.0-aarch64.cfg"
+kiwi-config-override = "kiwi/azl4/stage1/azurelinux-4.0-kiwi-override.yml"
 
 [distros.azurelinux.versions.'4.0-stage1'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used below for stage2.
@@ -31,6 +32,7 @@ description = "Azure Linux 4.0 Stage2"
 release-ver = "4.0"
 mock-config-x86_64 = "mock/azl4/stage2/azurelinux-4.0-x86_64.cfg"
 mock-config-aarch64 = "mock/azl4/stage2/azurelinux-4.0-aarch64.cfg"
+kiwi-config-override = "kiwi/azl4/stage2/azurelinux-4.0-kiwi-override.yml"
 
 [distros.azurelinux.versions.'4.0-stage2'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.
@@ -48,6 +50,7 @@ description = "Azure Linux 4.0 Stage2 PROD"
 release-ver = "4.0"
 mock-config-x86_64 = "mock/azl4/stage2-prod/azurelinux-4.0-x86_64.cfg"
 mock-config-aarch64 = "mock/azl4/stage2-prod/azurelinux-4.0-aarch64.cfg"
+kiwi-config-override = "kiwi/azl4/stage2-prod/azurelinux-4.0-kiwi-override.yml"
 
 [distros.azurelinux.versions.'4.0-stage2-prod'.default-component-config]
 # NOTE: Ensure that the snapshot date matches the snapshot date used above for stage1.

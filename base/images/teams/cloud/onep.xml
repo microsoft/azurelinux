@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="OnePBase" description="First-party Azure VM packages" import="false">
+            <requires profile="VmBaseCore" />
+        </profile>
+        <profile name="1p-vm-base-gen1" description="1P VM Base Gen1 Image (BIOS)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="LegacyBoot" />
+            <requires profile="OnePBase" />
+        </profile>
+        <profile name="1p-vm-base-gen1-fips" description="1P VM Base Gen1 FIPS Image (BIOS)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="Fips" />
+            <requires profile="LegacyBoot" />
+            <requires profile="OnePBase" />
+        </profile>
+        <profile name="1p-vm-base-gen2-fips" description="1P VM Base Gen2 FIPS Image (UEFI)" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="Fips" />
+            <requires profile="UefiBoot" />
+            <requires profile="OnePBase" />
+        </profile>
+    </profiles>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen1">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 rd.shell=0" firmware="bios" overlayroot="false" eficsm="false" bootpartition="false" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen1-fips">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 fips=1 rd.shell=0" firmware="bios" overlayroot="false" eficsm="false" bootpartition="false" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="x86_64" profiles="1p-vm-base-gen2-fips">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 fips=1 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="1p-vm-base-gen2-fips">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyAMA0 fips=1 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="OnePBase">
+        <package name="azurelinux-release-cloud" />
+    </packages>
+    <packages type="image" profiles="OnePBase">
+        <package name="SymCrypt" />
+        <package name="SymCrypt-OpenSSL" />
+        <package name="cpio" />
+        <package name="cronie-anacron" />
+        <package name="curl" />
+        <package name="dbus" />
+        <package name="dhcpcd" />
+        <package name="dracut" />
+        <package name="e2fsprogs" />
+        <package name="elfutils-libelf" />
+        <package name="expat" />
+        <package name="filesystem" />
+        <package name="findutils" />
+        <package name="gdbm" />
+        <package name="grep" />
+        <package name="logrotate" />
+        <package name="ncurses-libs" />
+        <package name="openssl" />
+        <package name="procps-ng" />
+        <package name="python3" />
+        <package name="readline" />
+        <package name="rpm" />
+        <package name="rpm-libs" />
+        <package name="rsyslog" />
+        <package name="sed" />
+        <package name="sqlite-libs" />
+        <package name="systemd-udev" />
+        <package name="tdnf" />
+        <package name="tzdata" />
+        <package name="xz" />
+    </packages>
+</image>
