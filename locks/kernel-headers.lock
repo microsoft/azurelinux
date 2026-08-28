@@ -1,5 +1,5 @@
 # Managed by azldev component update. Do not edit manually.
 version = 1
-manual-bump = 2
-input-fingerprint = 'sha256:0564a8a1c48b9c514d2b610b112300c31601686c21f9fff197a31cd33c59070a'
-resolution-input-hash = 'sha256:466421704711c4fd3c71f0b2ed715a0e61d49e3e26f3a2637fee755795849c8e'
+manual-bump = 1
+input-fingerprint = 'sha256:fe790f61f7a84612332d7a3ab1c11ea3f0c0a75903798481061e48a91de4b6b7'
+resolution-input-hash = 'sha256:414080051897ad56509f699fec54e983a4aca0431207154d235ab4f8a7f3c1bc'
