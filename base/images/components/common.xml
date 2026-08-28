@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="BootableCore" description="Packages shared by every bootable image" import="false" />
+        <profile name="CloudCore" description="Packages shared by Azure guest images" import="false">
+            <requires profile="BootableCore" />
+        </profile>
+        <profile name="PackageManagement" description="Runtime package management configuration" import="false" />
+    </profiles>
+    <packages type="bootstrap" profiles="BootableCore">
+        <package name="filesystem" />
+    </packages>
+    <packages type="image" profiles="BootableCore">
+        <package name="bash" />
+        <package name="ca-certificates" />
+        <package name="dnf5" />
+        <package name="grub2" />
+        <package name="iproute" />
+        <package name="kernel" />
+        <package name="shadow-utils" />
+        <package name="systemd" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="util-linux" />
+    </packages>
+    <packages type="image" profiles="CloudCore">
+        <package name="WALinuxAgent" />
+        <package name="azurelinux-release-cloud" />
+        <package name="bzip2" />
+        <package name="chrony" />
+        <package name="cloud-init" />
+        <package name="cloud-utils-growpart" />
+        <package name="cracklib-dicts" />
+        <package name="cryptsetup" />
+        <package name="file" />
+        <package name="glibc" />
+        <package name="glibc-langpack-en" />
+        <package name="grubby" />
+        <package name="gzip" />
+        <package name="hyperv-daemons" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="kernel-modules" />
+        <package name="lvm2" />
+        <package name="lz4" />
+        <package name="net-tools" />
+        <package name="nftables" />
+        <package name="openssh-clients" />
+        <package name="openssh-server" />
+        <package name="selinux-policy-targeted" />
+        <package name="setup" />
+        <package name="sudo" />
+        <package name="tar" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="zlib" />
+    </packages>
+    <packages type="image" profiles="PackageManagement">
+        <package name="azurelinux-repos" />
+    </packages>
+    <packages type="bootstrap" profiles="PackageManagement">
+        <package name="azurelinux-repos" />
+    </packages>
+</image>

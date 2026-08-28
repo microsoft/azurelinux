@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <repository type="rpm-md" alias="azurelinux-base">
+        <source path="https://packages.microsoft.com/azurelinux/4.0/beta/base/$basearch" />
+    </repository>
+</image>

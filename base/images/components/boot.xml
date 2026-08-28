@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="Fips" description="FIPS boot support" import="false" />
+        <profile name="UefiBoot" description="Architecture-specific UEFI boot packages" import="false" />
+        <profile name="LegacyBoot" description="Legacy BIOS boot packages" import="false" />
+    </profiles>
+    <packages type="image" profiles="Fips">
+        <package name="dracut-fips" />
+    </packages>
+    <packages type="image" profiles="UefiBoot">
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="shim" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+    </packages>
+    <packages type="image" profiles="LegacyBoot">
+        <package name="grub2-pc" />
+        <package name="grub2-pc-modules" />
+    </packages>
+</image>
