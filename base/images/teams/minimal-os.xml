@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="MinimalOsCore" description="Minimal OS packages" import="false">
+            <requires profile="BootableCore" />
+        </profile>
+        <profile name="minimal-os" description="Azure Linux Minimal OS Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="MinimalOsCore" />
+        </profile>
+    </profiles>
+    <preferences profiles="minimal-os">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>C</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhdx" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="32" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" />
+            <size unit="G">1</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="MinimalOsCore">
+        <package name="azurelinux-release" />
+    </packages>
+    <packages type="image" profiles="MinimalOsCore">
+        <package name="azurelinux-release" />
+        <package name="dbus" />
+        <package name="e2fsprogs" />
+        <package name="glibc-minimal-langpack" />
+        <package name="grub2-efi-aa64" arch="aarch64" />
+        <package name="grub2-efi-aa64-modules" arch="aarch64" />
+        <package name="grub2-efi-x64" arch="x86_64" />
+        <package name="grub2-efi-x64-modules" arch="x86_64" />
+        <package name="iputils" />
+        <package name="irqbalance" />
+        <package name="ncurses-libs" />
+        <package name="openssl" />
+        <package name="rpm" />
+        <package name="shim" arch="aarch64" />
+        <package name="shim" arch="x86_64" />
+        <package name="sudo" />
+        <package name="systemd-udev" />
+        <package name="zlib" />
+    </packages>
+</image>

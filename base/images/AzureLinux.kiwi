@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-model href="https://raw.githubusercontent.com/OSInside/kiwi/refs/tags/v10.2.33/kiwi/schema/kiwi.rng" type="application/xml"?>
+<image schemaversion="8.3" name="azurelinux-4">
+    <description type="system">
+        <author>Azure Linux</author>
+        <contact>azurelinux@microsoft.com</contact>
+        <specification>Azure Linux 4 image hierarchy</specification>
+    </description>
+    <preferences>
+      <version>0.1</version>
+    </preferences>
+    <include from="this://./repositories/core.xml" />
+    <include from="this://./components/common.xml" />
+    <include from="this://./components/boot.xml" />
+    <include from="this://./teams/cloud/vm-base.xml" />
+    <include from="this://./teams/wsl.xml" />
+    <include from="this://./teams/container.xml" />
+    <include from="this://./teams/minimal-os.xml" />
+</image>

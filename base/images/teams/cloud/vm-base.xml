@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="VmBaseCore" description="VM base packages" import="false">
+            <requires profile="CloudCore" />
+        </profile>
+        <profile name="vm-base" description="Azure Linux VM Base Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="UefiBoot" />
+            <requires profile="VmBaseCore" />
+        </profile>
+    </profiles>
+    <preferences arch="x86_64" profiles="vm-base">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyS0 earlyprintk=ttyS0 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="vm-base">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="oem" format="vhd-fixed" formatoptions="force_size" initrd_system="dracut" filesystem="ext4" fscreateoptions="-m 1" kernelcmdline="console=ttyAMA0 earlyprintk=ttyAMA0 rd.shell=0" firmware="uefi" overlayroot="false" eficsm="false" bootpartition="false" efipartsize="200" rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="VmBaseCore">
+        <package name="azurelinux-release-cloud" />
+        <package name="coreutils" />
+    </packages>
+    <packages type="image" profiles="VmBaseCore">
+        <package name="acl" />
+        <package name="attr" />
+        <package name="audit" />
+        <package name="azure-vm-utils" />
+        <package name="bash-completion" />
+        <package name="bind-utils" />
+        <package name="brotli" />
+        <package name="chkconfig" />
+        <package name="cronie" />
+        <package name="cyrus-sasl" />
+        <package name="device-mapper-event" />
+        <package name="dnf5-plugins" />
+        <package name="firewalld" />
+        <package name="hostname" />
+        <package name="man-db" />
+        <package name="nano" />
+        <package name="ncurses" />
+        <package name="ncurses-term" />
+        <package name="nvme-cli" />
+        <package name="rootfiles" />
+        <package name="rsync" />
+        <package name="tpm2-tss" />
+        <package name="unzip" />
+        <package name="vim-minimal" />
+        <package name="zchunk" />
+    </packages>
+</image>

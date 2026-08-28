@@ -2,19 +2,20 @@
 # Image registry
 # ============================================================================
 #
-# Package-manageable images ship `azurelinux-repos`, which exposes repositories.
-# Distroless images contain neither a package manager nor runtime repositories.
+# Most images select one leaf profile from the shared AzureLinux.kiwi
+# hierarchy. The VM ISO installer retains its standalone definition.
+# Images with runtime package management ship azurelinux-repos. Distroless
+# images intentionally omit repository packages.
 #
-# Image build inputs remain independent of the runtime repository definitions:
-# each kiwi `<repository>` points at azl4-dev for local builds, and koji
-# overrides it for distro builds.
+# The kiwi repositories are build-time sources. Koji overrides them for
+# distro builds.
 # ============================================================================
 
 # ---- vm-base -----------------------------------------------------------
 
 [images.vm-base]
 description = "VM Base Image"
-definition = { type = "kiwi", path = "vm-base/vm-base.kiwi", profile = "vm-base" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "vm-base" }
 tests.test-suites = [
   { name = "static-image-checks" },
   { name = "lisa-main" },
@@ -30,25 +31,9 @@ container = false
 systemd = true
 runtime-package-management = true
 
-# ---- minimal-os --------------------------------------------------------
-
-[images.minimal-os]
-description = "Minimal OS Image"
-definition = { type = "kiwi", path = "minimal-os/minimal-os.kiwi", profile = "minimal-os" }
-tests.test-suites = [
-  { name = "static-image-checks" },
-]
-
-[images.minimal-os.capabilities]
-machine-bootable = true
-container = false
-systemd = true
-runtime-package-management = true
-
-# ---- container-base (core profile) -------------------------------------
 [images.container-base]
 description = "Container Base Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
 tests.test-suites = [
     { name = "static-image-checks" },
     { name = "runtime-container-tests" },
@@ -60,11 +45,9 @@ container = true
 systemd = false
 runtime-package-management = true
 
-# ---- distroless containers ---------------------------------------------
-
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-minimal" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-minimal" }
 tests.test-suites = [{ name = "static-image-checks" }]
 
 [images.container-distroless-minimal.capabilities]
@@ -75,7 +58,7 @@ runtime-package-management = false
 
 [images.container-distroless-base]
 description = "Container Distroless Base Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-base" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-base" }
 tests.test-suites = [{ name = "static-image-checks" }]
 
 [images.container-distroless-base.capabilities]
@@ -86,7 +69,7 @@ runtime-package-management = false
 
 [images.container-distroless-debug]
 description = "Container Distroless Debug Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "distroless-debug" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-debug" }
 tests.test-suites = [{ name = "static-image-checks" }]
 
 [images.container-distroless-debug.capabilities]
@@ -99,7 +82,7 @@ runtime-package-management = false
 
 [images.wsl]
 description = "WSL Image"
-definition = { type = "kiwi", path = "wsl/wsl.kiwi", profile = "wsl" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "wsl" }
 tests.test-suites = [{ name = "static-image-checks" }]
 
 [images.wsl.capabilities]
@@ -108,15 +91,20 @@ container = false
 systemd = true
 runtime-package-management = true
 
-# ---- vm-iso-installer --------------------------------------------------
-
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
 
-# ============================================================================
-# Test suites
-# ============================================================================
+[images.minimal-os]
+description = "Minimal OS Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "minimal-os" }
+tests.test-suites = [{ name = "static-image-checks" }]
+
+[images.minimal-os.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
 
 [test-suites.lisa-main]
 type = "lisa"
@@ -141,6 +129,10 @@ description = "Lisa cvm tests"
 [test-suites.lisa-kernel-ltp]
 type = "lisa"
 description = "Lisa kernel LTP tests"
+
+[test-suites.lisa-fips]
+type = "lisa"
+description = "Lisa FIPS tests"
 
 # Single shared pytest suite for static (offline) image validation.
 [test-suites.static-image-checks]
