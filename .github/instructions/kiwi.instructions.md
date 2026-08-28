@@ -8,29 +8,32 @@ Kiwi files define Azure Linux image builds. They use the [KIWI NG](https://osins
 
 ## How images are registered
 
-Images are defined in `base/images/images.toml`. Each image is
-declared as a canonical entry selecting the matching kiwi `profile`:
+Images are defined in `base/images/images.toml`. Most images select a leaf
+profile from the shared `base/images/AzureLinux.kiwi` description:
 
 ```toml
 [images.container-base]
 description = "Container Base Image"
-definition = { type = "kiwi", path = "container-base/container-base.kiwi", profile = "core" }
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
 ```
 
-Package-manageable images ship `azurelinux-repos`, which enables repositories.
-Distroless container images strip the package manager and ship no runtime
-repository configuration.
+`AzureLinux.kiwi` includes reusable fragments from `repositories/`,
+`components/`, and `teams/`. Includes remain flat in the root description;
+profile requirements express inheritance between fragments.
 
-Runtime repository selection is independent from image build inputs. Kiwi
-`<repository>` entries provide packages during local builds, and koji overrides
-them for distro builds.
+Shared KIWI hook scripts and `<file>` sources live directly under
+`base/images/`, because that directory is the shared description root. The root
+`config.sh` dispatches profile-specific behavior using `kiwi_profiles`,
+following Fedora's shared-description model. `<file>` entries remain scoped to
+the owning profile so their payloads do not leak into other images.
 
-Each image has its own directory under `base/images/` containing the
-`.kiwi` file.
+The ISO installer remains a standalone description under
+`base/images/vm-iso-installer/` because its distinct composition and workflow
+do not fit naturally into the shared image hierarchy.
 
 ## Image types
 
-- **Container** (`image="docker"`): OCI container images with `<containerconfig>` for name, tag, entrypoint
+- **Container** (`image="oci"`): OCI container images with `<containerconfig>` for name, tag, entrypoint
 - **VM** (`image="oem"`): Virtual machine images with disk format (`vhdx`, `qcow2`), filesystem, bootloader, and partition config
 
 ## Key elements

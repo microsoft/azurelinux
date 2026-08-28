@@ -21,6 +21,11 @@ azldev image build wsl
 azldev image test  wsl
 ```
 
+Images with runtime package management ship `azurelinux-repos`, which defines
+the repositories available in the resulting OS. These runtime repositories are
+independent of the package sources used to build the image. Distroless
+container images strip the package manager and do not ship a repository package.
+
 `azldev` creates a per-suite Python venv, installs this directory's
 `pyproject.toml`, and invokes pytest with the right `--image-path`,
 `--image-name`, and `--capabilities` arguments.
@@ -171,8 +176,8 @@ base/images/
     image family (the plugin applies `@pytest.mark.image("<dir>")`
     during collection — no boilerplate per file or per subdir). The
     directory name is treated as a *family*: an `--image-name` matches
-    the family if it equals the family exactly OR has the form
-    `<family>-<variant>` if an image family introduces variants.
+    the family if it equals the family exactly or has the form
+    `<family>-<variant>`.
 - **Shared runtime (every container):** add a `cases/runtime/test_<topic>.py`.
     Use `container_exec_shell("...")` for normal runtime tests. Use
     `container_exec([...])` only when the test must avoid a shell, such as
