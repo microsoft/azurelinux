@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="WslCore" description="WSL packages" import="false" />
+        <profile name="wsl" description="Azure Linux WSL Image" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="WslCore" />
+        </profile>
+    </profiles>
+    <preferences profiles="wsl">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type image="wsl" />
+        <rpm-locale-filtering>false</rpm-locale-filtering>
+        <rpm-excludedocs>false</rpm-excludedocs>
+    </preferences>
+    <packages patternType="plusRecommended" type="image" profiles="WslCore">
+        <package name="acl" />
+        <package name="attr" />
+        <package name="bash-color-prompt" />
+        <package name="bash-completion" />
+        <package name="bind-utils" />
+        <package name="bzip2" />
+        <package name="curl" />
+        <package name="dbus" />
+        <package name="default-editor" />
+        <package name="diffutils" />
+        <package name="ethtool" />
+        <package name="file" />
+        <package name="findutils" />
+        <package name="gawk" />
+        <package name="git" />
+        <package name="glibc-langpack-en" />
+        <package name="gnupg2" />
+        <package name="grep" />
+        <package name="gzip" />
+        <package name="iproute" />
+        <package name="iputils" />
+        <package name="jq" />
+        <package name="less" />
+        <package name="lsof" />
+        <package name="man-db" />
+        <package name="man-pages" />
+        <package name="nmap-ncat" />
+        <package name="openssh-clients" />
+        <package name="passwd" />
+        <package name="patch" />
+        <package name="pciutils" />
+        <package name="procps-ng" />
+        <package name="rsync" />
+        <package name="sed" />
+        <package name="shadow-utils" />
+        <package name="sudo" />
+        <package name="symlinks" />
+        <package name="systemd-networkd" />
+        <package name="systemd-resolved" />
+        <package name="systemd-udev" />
+        <package name="tar" />
+        <package name="tcpdump" />
+        <package name="time" />
+        <package name="tmux" />
+        <package name="traceroute" />
+        <package name="tree" />
+        <package name="unzip" />
+        <package name="usbutils" />
+        <package name="util-linux" />
+        <package name="vim-minimal" />
+        <package name="wget" />
+        <package name="which" />
+        <package name="whois" />
+        <package name="wsl-setup" />
+        <package name="xz" />
+        <package name="zip" />
+        <package name="zram-generator-defaults" />
+    </packages>
+    <packages type="bootstrap" profiles="WslCore">
+        <package name="azurelinux-release-wsl" />
+        <package name="bash" />
+        <package name="coreutils" />
+        <package name="dnf5" />
+        <package name="dnf5-plugins" />
+        <package name="rpm" />
+    </packages>
+</image>
