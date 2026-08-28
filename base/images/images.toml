@@ -106,6 +106,64 @@ container = false
 systemd = true
 runtime-package-management = true
 
+[images.1p-vm-base-gen1]
+description = "1P VM Base Gen1 Image (BIOS)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.1p-vm-base-gen1.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.1p-vm-base-gen1-fips]
+description = "1P VM Base Gen1 FIPS Image (BIOS)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1-fips" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.1p-vm-base-gen1-fips.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+fips-enabled = true
+
+[images.1p-vm-base-gen2-fips]
+description = "1P VM Base Gen2 FIPS Image (UEFI)"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2-fips" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.1p-vm-base-gen2-fips.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+fips-enabled = true
+
 [test-suites.lisa-main]
 type = "lisa"
 description = "Lisa tests which are run by default"
