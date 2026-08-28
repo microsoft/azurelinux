@@ -164,6 +164,44 @@ systemd = true
 runtime-package-management = true
 fips-enabled = true
 
+[images.marketplace-gen2]
+description = "Marketplace Gen2 Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+]
+
+[images.marketplace-gen2.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+
+[images.marketplace-gen2-fips]
+description = "Marketplace Gen2 FIPS Image"
+definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2-fips" }
+tests.test-suites = [
+  { name = "static-image-checks" },
+  { name = "lisa-main" },
+  { name = "lisa-xfs" },
+  { name = "lisa-perf" },
+  { name = "lisa-smoke" },
+  { name = "lisa-kernel-ltp" },
+  { name = "lisa-fips" },
+]
+
+[images.marketplace-gen2-fips.capabilities]
+machine-bootable = true
+container = false
+systemd = true
+runtime-package-management = true
+fips-enabled = true
+
 [test-suites.lisa-main]
 type = "lisa"
 description = "Lisa tests which are run by default"
@@ -179,10 +217,6 @@ description = "Lisa perf tests"
 [test-suites.lisa-smoke]
 type = "lisa"
 description = "Lisa smoke tests"
-
-[test-suites.lisa-cvm]
-type = "lisa"
-description = "Lisa cvm tests"
 
 [test-suites.lisa-kernel-ltp]
 type = "lisa"

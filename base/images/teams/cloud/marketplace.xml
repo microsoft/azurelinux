@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image>
+    <profiles>
+        <profile name="MarketplaceBase" description="Marketplace VM packages" import="false">
+            <requires profile="PackageManagement" />
+            <requires profile="CloudCore" />
+        </profile>
+        <profile name="marketplace-gen2" description="Azure Linux Marketplace Gen2 Image" import="false">
+            <requires profile="UefiBoot" />
+            <requires profile="MarketplaceBase" />
+        </profile>
+        <profile name="marketplace-gen2-fips" description="Azure Linux Marketplace Gen2 FIPS Image" import="false">
+            <requires profile="Fips" />
+            <requires profile="UefiBoot" />
+            <requires profile="MarketplaceBase" />
+        </profile>
+    </profiles>
+    <preferences arch="x86_64" profiles="marketplace-gen2">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyS0 earlyprintk=ttyS0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="marketplace-gen2">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyAMA0 earlyprintk=ttyAMA0 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="x86_64" profiles="marketplace-gen2-fips">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyS0 fips=1 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <preferences arch="aarch64" profiles="marketplace-gen2-fips">
+        <version>0.1</version>
+        <packagemanager>dnf5</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <release-version>4.0</release-version>
+        <type
+            image="oem"
+            format="vhd-fixed"
+            formatoptions="force_size"
+            initrd_system="dracut"
+            filesystem="ext4"
+            fscreateoptions="-m 1"
+            kernelcmdline="console=ttyAMA0 fips=1 rd.shell=0"
+            firmware="uefi"
+            overlayroot="false"
+            eficsm="false"
+            bootpartition="false"
+            efipartsize="200"
+            rootfs_label="azurelinux">
+            <bootloader name="grub2" bls="true" console="serial" timeout="1" />
+            <size unit="G">5</size>
+            <oemconfig>
+                <oem-resize>false</oem-resize>
+            </oemconfig>
+        </type>
+    </preferences>
+    <packages type="bootstrap" profiles="MarketplaceBase">
+        <package name="azurelinux-release-cloud" />
+    </packages>
+    <packages type="image" profiles="MarketplaceBase">
+        <package name="SymCrypt" />
+        <package name="SymCrypt-OpenSSL" />
+        <package name="acl" />
+        <package name="at" />
+        <package name="atop" />
+        <package name="attr" />
+        <package name="audit" />
+        <package name="azure-vm-utils" />
+        <package name="azurelinux-rpm-config" />
+        <package name="bash-completion" />
+        <package name="bc" />
+        <package name="bind-utils" />
+        <package name="cpio" />
+        <package name="cronie-anacron" />
+        <package name="curl" />
+        <package name="dbus" />
+        <package name="debootstrap" />
+        <package name="dhcpcd" />
+        <package name="dnf-plugins-core" />
+        <package name="dracut" />
+        <package name="e2fsprogs" />
+        <package name="efibootmgr" />
+        <package name="elfutils-libelf" />
+        <package name="expat" />
+        <package name="filesystem" />
+        <package name="findutils" />
+        <package name="gdbm" />
+        <package name="grep" />
+        <package name="hostname" />
+        <package name="iptables" />
+        <package name="jemalloc" />
+        <package name="keyutils" />
+        <package name="libdnf" />
+        <package name="libtool" />
+        <package name="libuser" />
+        <package name="logrotate" />
+        <package name="lsof" />
+        <package name="man-db" />
+        <package name="nano" />
+        <package name="ncurses" />
+        <package name="ncurses-libs" />
+        <package name="ncurses-term" />
+        <package name="newt" />
+        <package name="nss" />
+        <package name="nvme-cli" />
+        <package name="openssl" />
+        <package name="pciutils" />
+        <package name="pkg-config" />
+        <package name="procps-ng" />
+        <package name="python3" />
+        <package name="readline" />
+        <package name="rng-tools" />
+        <package name="rootfiles" />
+        <package name="rpm" />
+        <package name="rpm-libs" />
+        <package name="rsync" />
+        <package name="rsyslog" />
+        <package name="sed" />
+        <package name="sqlite-libs" />
+        <package name="strace" />
+        <package name="sysstat" />
+        <package name="systemd-udev" />
+        <package name="tcpdump" />
+        <package name="time" />
+        <package name="tmux" />
+        <package name="tpm2-tss" />
+        <package name="traceroute" />
+        <package name="tzdata" />
+        <package name="unzip" />
+        <package name="vim-minimal" />
+        <package name="wireless-regdb" />
+        <package name="xz" />
+        <package name="zchunk" />
+    </packages>
+</image>
