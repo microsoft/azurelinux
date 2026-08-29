@@ -50,7 +50,7 @@ Version:        255
 # determine the build information from local checkout
 Version:        %(tools/meson-vcs-tag.sh . error | sed -r 's/-([0-9])/.^\1/; s/-g/_g/')
 %endif
-Release:        34%{?dist}
+Release:        35%{?dist}
 
 # FIXME - hardcode to 'stable' for now as that's what we have in our blobstore
 %global stable 1
@@ -161,6 +161,13 @@ Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
 Patch0915:      CVE-2026-15059.patch
 Patch0916:      CVE-2026-16742.patch
+
+# Alternative to the proposed native e2fsprogs whole-disk lock:
+# https://lore.kernel.org/linux-ext4/20260824161512.1332649-1-naraghavan@linux.microsoft.com/
+# Do not ship both implementations. systemd-fsck retains its exclusive
+# lock while waiting for fsck; native e2fsck locking would then block on
+# a second independently-opened lock and deadlock boot.
+Patch0917:      systemd-fsck-lock-whole-disk.patch
 
 %ifarch %{ix86} x86_64 aarch64
 %global want_bootloader 1
@@ -1259,6 +1266,10 @@ rm -f %{name}.lang
 # %autochangelog. So we need to continue manually maintaining the
 # changelog here.
 %changelog
+* Fri Aug 28 2026 Pawel Winogrodzki <pawelwi@microsoft.com> - 255-35
+- Lock the whole disk in systemd-fsck while its child fsck process checks
+  the filesystem.
+
 * Thu Aug 13 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 255-34
 - Patch for CVE-2026-16742, CVE-2026-15059
 
