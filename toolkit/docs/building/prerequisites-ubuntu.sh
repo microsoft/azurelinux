@@ -196,11 +196,13 @@ else
     echo "Skipping installation of prerequisite packages..."
 fi
 
-# Neither Go root is on PATH -- that is the whole reason --fix-go-links exists -- so installing
-# prerequisites has to refresh the links as well, or the toolkit this just prepared still cannot
-# find go. --fix-go-links then means "only do the links", to repair them or to pair with
-# --no-install-prereqs.
-if [ "$INSTALL_PREREQS" = true ] || [ "$FIX_GO_LINKS" = true ]; then
+# Neither Go root this script manages ($GO_APT_ROOT, /usr/local/go) is on PATH, so a toolchain
+# installed above stays invisible to the toolkit until /usr/bin/go points at it. Refresh the links
+# only when the 'go' on PATH cannot build the toolkit: one that is already good enough is left
+# alone, whether this run installed it or it was there all along. --fix-go-links forces the
+# refresh, to repair the links or to pair with --no-install-prereqs.
+hash -r
+if [ "$FIX_GO_LINKS" = true ] || { [ "$INSTALL_PREREQS" = true ] && ! go_version_ok go; }; then
     link_go
 fi
 
