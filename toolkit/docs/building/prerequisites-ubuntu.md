@@ -117,7 +117,8 @@ The `prerequisites-ubuntu.sh` script supports the following options:
 
 - `--fix-go-links`: Re-creates the `/usr/bin` symlinks for the Go binaries, pointing them at
   whichever Go root is installed (`/usr/lib/go-1.<minor_version>` or `/usr/local/go`). The
-  prerequisites installation already does this, so it is only needed to repair the links.
+  prerequisites installation already does this whenever the `go` on `PATH` is missing or too old,
+  so it is only needed to repair the links.
 - `--configure-docker`: Installs Docker and adds your user to the docker group
 - `--no-install-prereqs`: Skips installation of prerequisite packages
 - `--help`: Displays usage information
