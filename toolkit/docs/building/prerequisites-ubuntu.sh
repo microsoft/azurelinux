@@ -196,12 +196,11 @@ else
     echo "Skipping installation of prerequisite packages..."
 fi
 
-# Neither Go root this script manages ($GO_APT_ROOT, /usr/local/go) is on PATH, so a toolchain
-# installed above stays invisible to the toolkit until /usr/bin/go points at it. Refresh the links
-# only when the 'go' on PATH cannot build the toolkit: one that is already good enough is left
-# alone, whether this run installed it or it was there all along. --fix-go-links forces the
-# refresh, to repair the links or to pair with --no-install-prereqs.
-hash -r
+# Neither $GO_APT_ROOT/bin nor /usr/local/go/bin is on PATH, so the toolkit reaches a Go installed
+# above only through the /usr/bin symlinks that link_go creates. Create them when the 'go' on PATH
+# is missing or too old for the toolkit; leave them alone when it is new enough, since that 'go' is
+# found first no matter where /usr/bin/go points. --fix-go-links skips the check and re-creates the
+# symlinks anyway, to repair them or to pair with --no-install-prereqs.
 if [ "$FIX_GO_LINKS" = true ] || { [ "$INSTALL_PREREQS" = true ] && ! go_version_ok go; }; then
     link_go
 fi
