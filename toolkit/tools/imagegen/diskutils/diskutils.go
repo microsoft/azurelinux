@@ -127,15 +127,6 @@ const (
 const (
 	// mappingFilePath is used for device mapping paths
 	mappingFilePath = "/dev/mapper/"
-
-	// maxPrimaryPartitionsForMBR is the maximum number of primary partitions
-	// allowed in the case of MBR partition
-	maxPrimaryPartitionsForMBR = 4
-
-	// name of all possible partition types
-	primaryPartitionType  = "primary"
-	extendedPartitionType = "extended"
-	logicalPartitionType  = "logical"
 )
 
 // Unit to byte conversion values
@@ -568,25 +559,11 @@ func CreatePartitions(diskDevPath string, disk configuration.Disk, rootEncryptio
 		return
 	}
 
-	usingExtendedPartition := (len(disk.Partitions) > maxPrimaryPartitionsForMBR) && (partitionTableType == configuration.PartitionTableTypeMbr)
-
 	// Partitions assumed to be defined in sorted order
 	for idx, partition := range disk.Partitions {
-		partType, partitionNumber := obtainPartitionDetail(idx, usingExtendedPartition)
-		// Insert an extended partition
-		if partType == extendedPartitionType {
-			err = createExtendedPartition(diskDevPath, partitionTableType, disk.Partitions, partIDToFsTypeMap,
-				partDevPathMap)
-			if err != nil {
-				return
-			}
+		partitionNumber := idx + 1
 
-			// Update partType and partitionNumber
-			partType = logicalPartitionType
-			partitionNumber = partitionNumber + 1
-		}
-
-		partDevPath, err := createSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition, partType)
+		partDevPath, err := createSinglePartition(diskDevPath, partitionNumber, partitionTableType, partition)
 		if err != nil {
 			err = fmt.Errorf("failed to create single partition:\n%w", err)
 			return partDevPathMap, partIDToFsTypeMap, encryptedRoot, err
@@ -649,7 +626,7 @@ func createPartitionTable(diskDevPath string, partitionTableType configuration.P
 
 // createSinglePartition creates a single partition based on the partition config
 func createSinglePartition(diskDevPath string, partitionNumber int, partitionTableType configuration.PartitionTableType,
-	partition configuration.Partition, partType string,
+	partition configuration.Partition,
 ) (partDevPath string, err error) {
 	const (
 		timeoutInSeconds = "5"
@@ -666,16 +643,10 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 	start := partition.Start * MiB / logicalSectorSize
 
-	end := partition.End*MiB/logicalSectorSize - 1
-	if partition.End == 0 {
-		end = 0
-	}
-
-	if partType == logicalPartitionType {
-		start = start + 1
-		if end != 0 {
-			end = end + 1
-		}
+	// Note: an End of 0 means "no explicit end", not "ends at sector 0".
+	end := uint64(0)
+	if partition.End != 0 {
+		end = partition.End*MiB/logicalSectorSize - 1
 	}
 
 	// Check whether the start sector is 4K-aligned
@@ -756,24 +727,30 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 
 // Adds escaping of string values for sfdisk scripts.
 //
-// Note: Support string escaping was only added in util-linux v2.32.1 (commits: 75ef5a1, 810b313)
+// Note: Support for string escaping was only added in util-linux v2.32.1 (commits: 75ef5a1, 810b313)
 //
-// util-linux versions:
-// - Ubuntu 20.04: v2.34.0
+// util-linux versions of the supported build hosts:
+// - Ubuntu 22.04: v2.37.2
 // - Azure Linux 2.0: v2.37.4
 //
-// So, it should be fine to assume that it is supported.
+// Both are well above the v2.36 already required by the "--lock" option used above, so it is fine to assume that
+// escaping is supported.
 func escapeSfdiskString(value string) string {
 	builder := strings.Builder{}
 	builder.WriteString("\"")
 
 	for _, c := range value {
-		switch c {
-		case '"':
+		switch {
+		case c == '"':
 			builder.WriteString("\\x22")
 
-		case '\\':
+		case c == '\\':
 			builder.WriteString("\\x5c")
+
+		case c < 0x20 || c == 0x7f:
+			// sfdisk scripts are line based, so a control character (a newline in particular) would let a
+			// partition name terminate the current directive and inject another one.
+			builder.WriteString(fmt.Sprintf("\\x%02x", c))
 
 		default:
 			builder.WriteRune(c)
@@ -784,7 +761,7 @@ func escapeSfdiskString(value string) string {
 	return builder.String()
 }
 
-// InitializeSinglePartition initializes a single partition based on the given partition configuration
+// waitForPartitionCreation waits for the device node of a newly created partition to appear.
 func waitForPartitionCreation(diskDevPath string, partitionNumber int) (partDevPath string, err error) {
 	const (
 		retryDuration    = time.Second
@@ -1028,26 +1005,6 @@ func ReadDiskPartitionTable(diskDevPath string) (*PartitionTable, error) {
 	return output.PartitionTable, nil
 }
 
-func createExtendedPartition(diskDevPath string, partitionTableType configuration.PartitionTableType,
-	partitions []configuration.Partition, partIDToFsTypeMap, partDevPathMap map[string]string,
-) (err error) {
-	// Create a new partition object for extended partition
-	extendedPartition := configuration.Partition{}
-	extendedPartition.ID = extendedPartitionType
-	extendedPartition.Start = partitions[maxPrimaryPartitionsForMBR-1].Start
-	extendedPartition.End = partitions[len(partitions)-1].End
-
-	partDevPath, err := createSinglePartition(diskDevPath, maxPrimaryPartitionsForMBR, partitionTableType,
-		extendedPartition, extendedPartitionType)
-	if err != nil {
-		err = fmt.Errorf("failed to create extended partition:\n%w", err)
-		return
-	}
-	partIDToFsTypeMap[extendedPartition.ID] = ""
-	partDevPathMap[extendedPartition.ID] = partDevPath
-	return
-}
-
 func getPartUUID(device string) (uuid string, err error) {
 	stdout, _, err := shell.Execute("blkid", device, "-s", "UUID", "-o", "value")
 	if err != nil {
@@ -1124,33 +1081,6 @@ func alignSectorAddress(sectorAddr, logicalSectorSize, physicalSectorSize uint64
 		alignedSector = sectorAddr
 	} else {
 		alignedSector = (sectorAddr/physicalSectorSize + 1) * physicalSectorSize
-	}
-
-	return
-}
-
-func obtainPartitionDetail(partitionIndex int, hasExtendedPartition bool) (partType string, partitionNumber int) {
-	const (
-		indexOffsetForNormalPartitionNumber  = 1
-		indexOffsetForLogicalPartitionNumber = 2
-	)
-
-	// partitionIndex is the index of the partition in the partition array, which starts at 0.
-	// partitionNumber, however, starts at 1 (E.g. /dev/sda1), and thus partitionNumber = partitionIndex + 1.
-	// In the case of logical partitions, since an extra extended partition has to be created first in order to
-	// to create logical partitions, so the partition number will further increase by 1, which equals partitionIndex + 2.
-
-	if hasExtendedPartition && partitionIndex >= (maxPrimaryPartitionsForMBR-1) {
-		if partitionIndex == (maxPrimaryPartitionsForMBR - 1) {
-			partType = extendedPartitionType
-			partitionNumber = partitionIndex + indexOffsetForNormalPartitionNumber
-		} else {
-			partType = logicalPartitionType
-			partitionNumber = partitionIndex + indexOffsetForLogicalPartitionNumber
-		}
-	} else {
-		partType = primaryPartitionType
-		partitionNumber = partitionIndex + indexOffsetForNormalPartitionNumber
 	}
 
 	return
