@@ -37,13 +37,18 @@ func (p PartitionTableType) String() string {
 func (p *PartitionTableType) GetValidPartitionTableTypes() (types []PartitionTableType) {
 	return []PartitionTableType{
 		PartitionTableTypeGpt,
-		PartitionTableTypeMbr,
 		PartitionTableTypeNone,
 	}
 }
 
 // IsValid returns an error if the PartitionTableType is not valid
 func (p *PartitionTableType) IsValid() (err error) {
+	if *p == PartitionTableTypeMbr {
+		// Fail here rather than part way through the build, once the disk has already been created and
+		// partially partitioned.
+		return fmt.Errorf("MBR partition tables are no longer supported, use (%s) instead", PartitionTableTypeGpt)
+	}
+
 	for _, valid := range p.GetValidPartitionTableTypes() {
 		if *p == valid {
 			return
