@@ -31,7 +31,7 @@
 Summary:        Linux Kernel
 Name:           kernel-hwe
 Version:        6.18.43.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 License:        GPLv2
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -430,6 +430,10 @@ echo "initrd of kernel %{uname_r} removed" >&2
 %{_sysconfdir}/bash_completion.d/bpftool
 
 %changelog
+* Thu Aug 20 2026 Henry Li <lihl@microsoft.com> - 6.18.43.1-2
+- Enable CONFIG_PCI_P2PDMA, CONFIG_VFIO_PCI_DMABUF, CONFIG_IOMMUFD
+- and CONFIG_IOMMUFD_VFIO_CONTAINER to support GPU pass-thru on arm64
+
 * Mon Aug 10 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 6.18.43.1-1
 - Auto-upgrade to 6.18.43.1
 
