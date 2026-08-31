@@ -121,7 +121,7 @@ const (
 
 	EfiSystemPartitionTypeUuid    = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
 	BiosBootPartitionTypeUuid     = "21686148-6449-6e6f-744e-656564454649"
-	GenericLinuxPartitionTypeUuid = "0FC63DAF-8483-4772-8E79-3D69D8477DE4"
+	GenericLinuxPartitionTypeUuid = "0fc63daf-8483-4772-8e79-3d69d8477de4"
 )
 
 const (

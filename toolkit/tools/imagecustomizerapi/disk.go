@@ -151,6 +151,7 @@ func (d *Disk) IsValid() error {
 				// partitioning tool (e.g. sfdisk).
 				lastPartitionEnd := *d.MaxSize - gptFooterSize
 				lastPartition.End = &lastPartitionEnd
+				lastPartition.filled = true
 			}
 		}
 	}
