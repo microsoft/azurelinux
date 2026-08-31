@@ -235,11 +235,25 @@ Distribution:   Azure Linux
 %else
 %define requires_block_ssh %{nil}
 %endif
-%define requires_audio_alsa %{nil}
-%define requires_audio_oss %{nil}
+%define requires_audio_alsa Requires: %{name}-audio-alsa = %{evr}
+%define requires_audio_oss Requires: %{name}-audio-oss = %{evr}
+%if %{with pulseaudio}
+%define pa_drv pa,
+%define requires_audio_pa Requires: %{name}-audio-pa = %{evr}
+%else
 %define requires_audio_pa %{nil}
+%endif
+%if %{with pipewire}
+%define requires_audio_pipewire Requires: %{name}-audio-pipewire = %{evr}
+%else
 %define requires_audio_pipewire %{nil}
+%endif
+%if %{with sdl}
+%define sdl_drv sdl,
+%define requires_audio_sdl Requires: %{name}-audio-sdl = %{evr}
+%else
 %define requires_audio_sdl %{nil}
+%endif
 %if %{with brltty}
 %define requires_char_baum Requires: %{name}-char-baum = %{evr}
 %else
@@ -263,7 +277,6 @@ Distribution:   Azure Linux
 %define requires_device_display_virtio_gpu_pci Requires: %{name}-device-display-virtio-gpu-pci = %{evr}
 %define requires_device_display_virtio_gpu_ccw Requires: %{name}-device-display-virtio-gpu-ccw = %{evr}
 %define requires_device_display_virtio_vga Requires: %{name}-device-display-virtio-vga = %{evr}
-%define requires_device_uefi_vars Requires: %{name}-device-uefi-vars = %{evr}
 # virtio-vga-gl requires virglrenderer AND opengl (QEMU 9.1.0+)
 %if %{have_virgl} && %{have_opengl}
 %define requires_device_display_virtio_vga_gl Requires: %{name}-device-display-virtio-vga-gl = %{evr}
@@ -304,10 +317,15 @@ Distribution:   Azure Linux
 %define requires_device_display_virtio_vga_rutabaga %{nil}
 %endif
 
+%if %{have_jack}
+%define jack_drv jack,
+%define requires_audio_jack Requires: %{name}-audio-jack = %{evr}
+%else
 %define requires_audio_jack %{nil}
+%endif
 
 %if %{have_dbus_display}
-%define requires_audio_dbus %{nil}
+%define requires_audio_dbus Requires: %{name}-audio-dbus = %{evr}
 %define requires_ui_dbus Requires: %{name}-ui-dbus = %{evr}
 %else
 %define requires_audio_dbus %{nil}
@@ -372,7 +390,6 @@ Distribution:   Azure Linux
 %{requires_device_display_virtio_vga} \
 %{requires_device_display_virtio_vga_gl} \
 %{requires_device_display_virtio_vga_rutabaga} \
-%{requires_device_uefi_vars} \
 %{requires_device_usb_host} \
 %{requires_device_usb_redirect} \
 %{requires_device_usb_smartcard} \
@@ -876,6 +893,59 @@ Install this package if you want to access remote NFS storage.
 %endif
 
 
+%package  audio-alsa
+Summary: QEMU ALSA audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-alsa
+This package provides the additional ALSA audio driver for QEMU.
+
+%if %{have_dbus_display}
+%package  audio-dbus
+Summary: QEMU D-Bus audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-dbus
+This package provides the additional D-Bus audio driver for QEMU.
+%endif
+
+%package  audio-oss
+Summary: QEMU OSS audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-oss
+This package provides the additional OSS audio driver for QEMU.
+
+%if %{with pulseaudio}
+%package  audio-pa
+Summary: QEMU PulseAudio audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-pa
+This package provides the additional PulseAudio audio driver for QEMU.
+%endif
+
+%if %{with pipewire}
+%package  audio-pipewire
+Summary: QEMU Pipewire audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-pipewire
+This package provides the additional Pipewire audio driver for QEMU.
+%endif
+
+%if %{with sdl}
+%package  audio-sdl
+Summary: QEMU SDL audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-sdl
+This package provides the additional SDL audio driver for QEMU.
+%endif
+
+%if %{have_jack}
+%package  audio-jack
+Summary: QEMU Jack audio driver
+Requires: %{name}-common%{?_isa} = %{version}-%{release}
+%description audio-jack
+This package provides the additional Jack audio driver for QEMU.
+%endif
+
+
 %if %{have_dbus_display}
 %package  ui-dbus
 Summary: QEMU D-Bus UI driver
@@ -1000,13 +1070,6 @@ Requires: %{name}-common%{?_isa} = %{version}-%{release}
 %description device-display-virtio-vga-rutabaga
 This package provides the virtio-vga-rutabaga display device for QEMU.
 %endif
-
-%package device-uefi-vars
-Summary: QEMU UEFI variable service
-Requires: %{name}-common%{?_isa} = %{version}-%{release}
-%description device-uefi-vars
-This package provides the UEFI variable service for QEMU.
-
 
 %package device-usb-host
 Summary: QEMU usb host device
@@ -1771,7 +1834,7 @@ run_configure \
 %ifarch x86_64
   --enable-af-xdp \
 %endif
-  --disable-alsa \
+  --enable-alsa \
   --enable-attr \
 %if %{have_libblkio}
   --enable-blkio \
@@ -1798,7 +1861,9 @@ run_configure \
   --enable-tools \
   --enable-guest-agent \
   --enable-iconv \
-  --disable-jack \
+%if %{have_jack}
+  --enable-jack \
+%endif
   --enable-kvm \
   --enable-l2tpv3 \
   --enable-libiscsi \
@@ -1824,10 +1889,14 @@ run_configure \
 %if %{have_opengl}
   --enable-opengl \
 %endif
-  --disable-oss \
-  --disable-pa \
+  --enable-oss \
+%if %{with pulseaudio}
+  --enable-pa \
+%endif
   --enable-pie \
-  --disable-pipewire \
+%if %{with pipewire}
+  --enable-pipewire \
+%endif
   --enable-pixman \
 %if %{have_block_rbd}
   --enable-rbd \
@@ -1861,7 +1930,7 @@ run_configure \
   --enable-xkbcommon \
   \
   \
-  --audio-drv-list= \
+  --audio-drv-list=%{?pa_drv}%{?sdl_drv}alsa,%{?jack_drv}oss \
   --target-list-exclude=moxie-softmmu \
   --with-default-devices \
   --enable-auth-pam \
@@ -1901,8 +1970,12 @@ run_configure \
 %if %{have_rutabaga_gfx}
   --enable-rutabaga-gfx \
 %endif
-  --disable-sdl \
-  --disable-sdl-image \
+%if %{with sdl}
+  --enable-sdl \
+%if %{have_sdl_image}
+  --enable-sdl-image \
+%endif
+%endif
 %if %{have_libcacard}
   --enable-smartcard \
 %endif
@@ -2582,6 +2655,7 @@ fi
 %{_datadir}/icons/*
 %{_datadir}/%{name}/keymaps/
 %{_datadir}/%{name}/linuxboot_dma.bin
+%{_libdir}/%{name}/hw-uefi-vars.so
 %attr(4755, -, -) %{_libexecdir}/qemu-bridge-helper
 %if ! %{azl}
 %{_mandir}/man1/%{name}.1*
@@ -2641,6 +2715,31 @@ fi
 %{_libdir}/%{name}/block-nfs.so
 %endif
 
+%files audio-alsa
+%{_libdir}/%{name}/audio-alsa.so
+%if %{have_dbus_display}
+%files audio-dbus
+%{_libdir}/%{name}/audio-dbus.so
+%endif
+%files audio-oss
+%{_libdir}/%{name}/audio-oss.so
+%if %{with pulseaudio}
+%files audio-pa
+%{_libdir}/%{name}/audio-pa.so
+%endif
+%if %{with pipewire}
+%files audio-pipewire
+%{_libdir}/%{name}/audio-pipewire.so
+%endif
+%if %{with sdl}
+%files audio-sdl
+%{_libdir}/%{name}/audio-sdl.so
+%endif
+%if %{have_jack}
+%files audio-jack
+%{_libdir}/%{name}/audio-jack.so
+%endif
+
 %if %{have_dbus_display}
 %files ui-dbus
 %{_libdir}/%{name}/ui-dbus.so
@@ -2698,8 +2797,6 @@ fi
 %files device-display-virtio-vga-rutabaga
 %{_libdir}/%{name}/hw-display-virtio-vga-rutabaga.so
 %endif
-%files device-uefi-vars
-%{_libdir}/%{name}/hw-uefi-vars.so
 %files device-usb-host
 %{_libdir}/%{name}/hw-usb-host.so
 %files device-usb-redirect
@@ -3519,13 +3616,14 @@ fi
   dependency policy, firmware paths, static user builds, and headless feature set.
 - Remove CRIS system and user packages because QEMU 10 removed CRIS emulation;
   obsolete the retired packages to support clean upgrades.
-- Add the qemu-device-uefi-vars package for the new hw-uefi-vars module.
+- Keep the Azure Linux 3.0 subpackage layout by packaging QEMU 10's new
+  hw-uefi-vars module in qemu-common instead of adding a 4.0-style subpackage.
 - Guard 64-bit emulators, packages, tapsets, and binfmt rules on 32-bit x86 because
   QEMU 10 no longer builds 64-bit targets on 32-bit hosts.
 - Disable new optional QEMU 10 features whose dependencies are unavailable in
   Azure Linux 3.0, and remove obsolete AVX and sanitizer configure switches.
-- Disable generic audio and SDL backends and remove their empty module packages,
-  matching the Azure Linux QEMU 10 headless build policy.
+- Preserve the Azure Linux 3.0 audio and SDL feature policy, dependency macros,
+  and module subpackages instead of adopting the Azure Linux 4.0 headless layout.
 - Remove the virtio queue-loading and late block-activation patch series now
   included upstream, while retaining the drain-before-inactivation fix.
 - Rebase the Azure Linux migration test exclusions onto the split QEMU 10 test
