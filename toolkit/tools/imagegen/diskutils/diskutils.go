@@ -628,10 +628,14 @@ func createPartitionTable(diskDevPath string, partitionTableType configuration.P
 	}
 
 	// Create new partition table.
-	// This will also wipe the existing partition.
+	// This replaces any existing partition table.
 	sfdiskScript := "label: gpt"
 
-	err := shell.NewExecBuilder("flock", "--timeout", "5", diskDevPath, "sfdisk", "--lock=no", diskDevPath).
+	// sfdisk only wipes pre-existing filesystem/RAID signatures when it is run interactively, so ask for it
+	// explicitly. Otherwise, stale signatures from a previous install survive in the newly partitioned space and
+	// confuse blkid/lsblk/udev. (This replaces the `sfdisk --delete` call that used to run before `parted mklabel`.)
+	err := shell.NewExecBuilder("flock", "--timeout", "5", diskDevPath, "sfdisk", "--lock=no", "--wipe=always",
+		"--wipe-partitions=always", diskDevPath).
 		Stdin(sfdiskScript).
 		LogLevel(logrus.DebugLevel, logrus.WarnLevel).
 		ErrorStderrLines(1).
@@ -726,7 +730,7 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 	logger.Log.Debugf("sfdisk script:\n%s", sfdiskScript)
 
 	err = shell.NewExecBuilder("flock", "--timeout", timeoutInSeconds, diskDevPath, "sfdisk", "--lock=no",
-		"--append", diskDevPath).
+		"--wipe-partitions=always", "--append", diskDevPath).
 		Stdin(sfdiskScript).
 		LogLevel(logrus.DebugLevel, logrus.WarnLevel).
 		ErrorStderrLines(1).

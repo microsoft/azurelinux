@@ -14,7 +14,6 @@ import (
 var (
 	validPartitionTableTypes = []PartitionTableType{
 		PartitionTableType("gpt"),
-		PartitionTableType("mbr"),
 		PartitionTableType(""),
 	}
 	invalidPartitionTableType                 = PartitionTableType("not_a_partition_type")
@@ -22,7 +21,6 @@ var (
 	invalidPartitionTableTypeJSON             = `1234`
 	validPartitionTableTypesToPartedArguments = map[PartitionTableType]string{
 		PartitionTableType("gpt"): "gpt",
-		PartitionTableType("mbr"): "msdos",
 		PartitionTableType(""):    "",
 	}
 )
@@ -96,4 +94,17 @@ func TestShouldFailConvertToPartedArgument_PartitionTableType(t *testing.T) {
 	_, err := invalidPartitionTableType.ConvertToPartedArgument()
 	assert.Error(t, err)
 	assert.Equal(t, "invalid value for PartitionTableType (not_a_partition_type)", err.Error())
+}
+
+func TestShouldFailParsingMbrPartitionTableType_PartitionTableType(t *testing.T) {
+	var checkedPartitionType PartitionTableType
+
+	mbr := PartitionTableTypeMbr
+	err := mbr.IsValid()
+	assert.Error(t, err)
+	assert.Equal(t, "MBR partition tables are no longer supported, use (gpt) instead", err.Error())
+
+	err = remarshalJSON(mbr, &checkedPartitionType)
+	assert.Error(t, err)
+	assert.Equal(t, "failed to parse [PartitionTableType]: MBR partition tables are no longer supported, use (gpt) instead", err.Error())
 }
