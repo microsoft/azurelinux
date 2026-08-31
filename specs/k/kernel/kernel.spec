@@ -665,9 +665,6 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
-%ifarch x86_64 aarch64
-Requires: ((kmod-nvidia-open-uname-r = %{KVERREL}) if kmod-nvidia-open-matched)
-%endif
 Provides: installonlypkg(kernel)
 %endif
 
@@ -4295,6 +4292,7 @@ fi\
 %changelog
 * Wed Sep 02 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.45-1.2
 - feat(kmod-nvidia-open): upgrade to 610.57.04
+- refactor(kmod-nvidia-open): remove matching sentinel
 
 * Tue Sep 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.45-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.45.1
