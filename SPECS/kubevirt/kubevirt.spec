@@ -46,7 +46,7 @@ Patch15:        CVE-2026-56852.patch
 Patch16:        0001-Add-LiveMigration-Blackout-Observability.patch
 Patch17:        0002-Fix-hotplug-volume-detach-deadlock-in-virt-handler.patch
 Patch18:        0003-Fix-cleanupAttachmentPods-fallback-keeping-useless-old-pods.patch
-Patch18:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
+Patch19:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
  
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
