@@ -16,3 +16,5 @@ stages:
   - stage: CodeQlAnalysis
     jobs:
     - template: SDL/CodeQL-CBL-Mariner.yml@CBL-Mariner-Pipelines
+      parameters:
+        poolName: "$(DEV_AMD64_Managed_NoUMI_AZL3)"
