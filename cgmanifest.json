@@ -29035,6 +29035,16 @@
       "component": {
         "type": "other",
         "other": {
+          "name": "libkeysinuse",
+          "version": "1.11.0",
+          "downloadUrl": "https://github.com/microsoft/SymCrypt-OpenSSL/archive/v1.11.0.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
           "name": "symlinks",
           "version": "1.7",
           "downloadUrl": "https://azurelinuxsrcstorage.blob.core.windows.net/sources/core/symlinks-1.7.tar.gz"
