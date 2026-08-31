@@ -45,12 +45,15 @@ make %{?_smp_mflags} check
 %install
 make DESTDIR=%{buildroot} install
 rm -vf %{buildroot}%{_libdir}/*.la
+# Ship LICENSE via %license instead of as a plain doc file.
+rm -vf %{buildroot}%{_docdir}/%{name}/LICENSE
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root)
+%license LICENSE
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_datadir}/*
@@ -64,6 +67,7 @@ rm -vf %{buildroot}%{_libdir}/*.la
 %changelog
 * Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 2.14.0-1
 - Backport lttng-ust 2.14.0 from the Azure Linux 4.0 branch for compatibility with lttng-tools 2.14.0.
+- Ship LICENSE via %%license instead of as a doc file.
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.6-1
 - Auto-upgrade to 2.13.6 - Azure Linux 3.0 - package upgrades

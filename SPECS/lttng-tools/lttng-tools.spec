@@ -39,6 +39,8 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 find %{buildroot} -name '*.la' -delete
+# LICENSE is shipped via %license; drop the duplicate copy under the doc dir.
+rm -f %{buildroot}%{_docdir}/%{name}/LICENSE
 
 %files
 %license LICENSE
@@ -52,6 +54,7 @@ find %{buildroot} -name '*.la' -delete
 * Tue Aug 25 2026 Ankita Pareek <ankitapareek@microsoft.com> - 2.14.0-1
 - Backport lttng-tools 2.14.0 from the Azure Linux 4.0 branch for per-channel buffer allocation support.
 - Add gcc-c++ and libbabeltrace2-devel BuildRequires required by the 2.14 build.
+- Drop duplicate LICENSE from the doc directory (shipped via %%license).
 
 * Fri Oct 27 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 2.13.11-1
 - Auto-upgrade to 2.13.11 - Azure Linux 3.0 - package upgrades
