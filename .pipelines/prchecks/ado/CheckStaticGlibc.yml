@@ -50,6 +50,14 @@ extends:
               - checkout: self
                 fetchDepth: 1
 
+              - bash: |
+                  set -euo pipefail
+
+                  echo "Installing Python 3.12 or later."
+                  sudo tdnf install -y python3 python3-pip
+                  python3 -c 'import sys; assert sys.version_info >= (3, 12), sys.version'
+                displayName: "Install Python 3.12 or later"
+
               - task: PipAuthenticate@1
                 displayName: "Authenticate internal pip feed"
                 inputs:
@@ -59,13 +67,16 @@ extends:
               - bash: |
                   set -euo pipefail
 
-                  python3 --version | grep -E '^Python 3\.12(\.|$)'
+                  echo "Creating the virtual environment and installing dependencies."
                   python3 -m venv "$(Agent.TempDirectory)/check-static-glibc-venv"
                   source "$(Agent.TempDirectory)/check-static-glibc-venv/bin/activate"
                   python -m pip install --quiet -r toolkit/scripts/requirements.txt
 
+                  echo "Collecting spec files."
                   mapfile -t specs < <(
                     find SPECS SPECS-EXTENDED SPECS-SIGNED -type f -name '*.spec' -print
                   )
+
+                  echo "Checking static glibc dependencies."
                   python toolkit/scripts/check_static_glibc.py "${specs[@]}"
                 displayName: "Check static glibc dependencies"
