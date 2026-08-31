@@ -1,0 +1,18 @@
+--- indicatif-0.18.4/Cargo.toml	1970-01-01T00:00:01+00:00
++++ indicatif-0.18.4/Cargo.toml	2026-05-08T21:27:35.356293+00:00
+@@ -45,7 +45,6 @@
+ [features]
+ default = [
+     "unicode-width",
+-    "wasmbind",
+ ]
+ futures = ["dep:futures-core"]
+ improved_unicode = [
+@@ -57,7 +56,6 @@
+     "dep:unicode-width",
+     "console/unicode-width",
+ ]
+-wasmbind = []
+ 
+ [lib]
+ name = "indicatif"

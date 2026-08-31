@@ -1,0 +1,52 @@
+From 5347e0e45dce63ccad2b8ca3eddcafff0e9ba49b Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Mon, 13 Apr 2026 16:36:08 +0100
+Subject: [PATCH 10/10] stratis: handle DbusClientMissingPropertyError on
+ .search() invocation
+
+Resolves: #984
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/manager/plugins/stratis.py | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/snapm/manager/plugins/stratis.py b/snapm/manager/plugins/stratis.py
+index 7000ed1b..a8be5500 100644
+--- a/snapm/manager/plugins/stratis.py
++++ b/snapm/manager/plugins/stratis.py
+@@ -19,6 +19,7 @@ from dbus.exceptions import DBusException
+ 
+ from dbus_client_gen import (
+     DbusClientMissingPropertyError,
++    DbusClientMissingSearchPropertiesError,
+ )
+ 
+ from dbus_python_client_gen import (
+@@ -425,10 +426,19 @@ def _find_in_progress_merge(managed_objects, pool_object_path, origin_uuid):
+         "MergeScheduled": True,
+     }
+ 
+-    return [
+-        MOFilesystem(info)
+-        for objpath, info in filesystems(props=fs_props).search(managed_objects)
+-    ]
++    try:
++        return [
++            MOFilesystem(info)
++            for objpath, info in filesystems(props=fs_props).search(managed_objects)
++        ]
++    # Outside a bug in stratisd this is exceedingly unlikely, but handle it
++    # by returning an empty list if we are unable to access the Origin or
++    # MergeScheduled properties for any reason. In the worst case we will end
++    # up returning a SnapmPluginError with a D-Bus error in the case that we
++    # fail to detect an in-progress merge and then on that basis attempt to
++    # start a revert operation on the same device.
++    except DbusClientMissingSearchPropertiesError:  # pragma: no cover
++        return []
+ 
+ 
+ def _pool_free_space_bytes(managed_objects, pool_name):
+-- 
+2.53.0
+

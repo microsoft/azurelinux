@@ -27,7 +27,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        3.0.0
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Looks up which function or method a line of code belongs to, version %{major}
 
 License:        BSD-3-Clause

@@ -3,7 +3,7 @@
 
 Name:           libgee
 Version:        0.20.8
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        GObject collection library
 
 License:        LGPL-2.1-or-later

@@ -5,8 +5,8 @@
 #define  prever_dot .rc3
 #define  postver    a
 
-%define version_alsa_lib  1.2.15.3
-%define version_alsa_ucm  1.2.15.3
+%define version_alsa_lib  1.2.16.1
+%define version_alsa_ucm  1.2.16.1
 %define version_alsa_tplg 1.2.5
 
 %global lib_patch         0
@@ -181,6 +181,12 @@ rm %{buildroot}/%{_includedir}/asoundlib.h
 %{_datadir}/alsa/topology
 
 %changelog
+* Sat Jun 13 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.16.1-1
+- update to 1.2.16.1
+
+* Mon Jun  1 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.16-1
+- update to 1.2.16
+
 * Tue Jan 13 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.15.3-1
 - update to 1.2.15.3
 

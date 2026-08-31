@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.10.2
-Release: 8%{?dist}
+Release: 5%{?dist}
 Summary: Template compilation framework in Ruby
 License: MIT
 URL: https://github.com/judofyr/temple

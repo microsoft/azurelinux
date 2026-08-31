@@ -1,0 +1,96 @@
+From faba720a2f9b9896a318cad87ecd7bcd24d6f791 Mon Sep 17 00:00:00 2001
+From: Roman Yepishev <ryepishev@google.com>
+Date: Sat, 27 Dec 2025 16:27:15 -0500
+Subject: [PATCH] plugins/power: do not unidle for inactive session
+
+NVIDIA drivers change the virtual terminal before suspend and restore it
+upon resume.
+
+Upon resume, there is a period of time when systemd reports that our
+session is not active (we are on a different virtual terminal). On
+resume, `idle_set_mode` would ignore that state change (keeping it as
+"sleep"), and if `WakeUpScreen` signal from screensaver arrives at that
+time, we will store "sleep" as `previous_idle_mode`, and set up a
+callback to restore to that state. That causes the machine to suspend
+15 seconds after resume.
+
+This change refactors the unidle calls, refactoring common checks into
+a separate function.
+
+Up until https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/3481,
+mutter was resetting the idle timer on AC events and gsd-power did not
+have to do anything. Once mutter starts resetting the idle timer again,
+we can remove the code handling AC events.
+
+Closes #903
+---
+ plugins/power/gsd-power-manager.c | 39 ++++++++++++++++++++++++-------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
+
+diff --git a/plugins/power/gsd-power-manager.c b/plugins/power/gsd-power-manager.c
+index 490b5536..e98cb844 100644
+--- a/plugins/power/gsd-power-manager.c
++++ b/plugins/power/gsd-power-manager.c
+@@ -2266,6 +2266,35 @@ set_temporary_unidle_on_ac (GsdPowerManager *manager,
+         }
+ }
+ 
++static gboolean
++should_set_temporary_unidle_on_ac (GsdPowerManager *manager)
++{
++        /* Do not unidle if lid is closed */
++        if (manager->lid_is_closed)
++                return FALSE;
++
++        /* Do not unidle if we are not in an active session */
++        if (! manager->session_is_active)
++                return FALSE;
++
++        /* Unidle is already running, so we will need to reset the timer */
++        if (manager->temporary_unidle_on_ac_id != 0)
++                return TRUE;
++
++        /* Do not unidle if our current state isn't dim or blank */
++        if (manager->current_idle_mode != GSD_POWER_IDLE_MODE_BLANK &&
++            manager->current_idle_mode != GSD_POWER_IDLE_MODE_DIM)
++                return FALSE;
++
++        return TRUE;
++}
++
++static void
++update_temporary_unidle_on_ac (GsdPowerManager *manager)
++{
++        set_temporary_unidle_on_ac(manager, should_set_temporary_unidle_on_ac (manager));
++}
++
+ static void
+ up_client_on_battery_cb (UpClient *client,
+                          GParamSpec *pspec,
+@@ -2290,13 +2319,7 @@ up_client_on_battery_cb (UpClient *client,
+ 
+         idle_configure (manager);
+ 
+-        if (manager->lid_is_closed)
+-                return;
+-
+-        if (manager->current_idle_mode == GSD_POWER_IDLE_MODE_BLANK ||
+-            manager->current_idle_mode == GSD_POWER_IDLE_MODE_DIM ||
+-            manager->temporary_unidle_on_ac_id != 0)
+-                set_temporary_unidle_on_ac (manager, TRUE);
++        update_temporary_unidle_on_ac (manager);
+ }
+ 
+ static void
+@@ -2359,7 +2382,7 @@ handle_screensaver_active (GsdPowerManager *manager,
+ static void
+ handle_wake_up_screen (GsdPowerManager *manager)
+ {
+-        set_temporary_unidle_on_ac (manager, TRUE);
++        update_temporary_unidle_on_ac (manager);
+ }
+ 
+ static void
+-- 
+2.53.0
+

@@ -7,15 +7,17 @@
 %if 0%{?rhel} && 0%{?rhel} >= 9
 %bcond_with    pkcs11
 %bcond_with    rtlsdr
+%bcond_with    radiacode
 %else
 %bcond_without pkcs11
 %bcond_without rtlsdr
+%bcond_without radiacode
 %endif
 
 Summary:        Random number generator related utilities
 Name:           rng-tools
 Version:        6.17
-Release: 10%{?dist}
+Release:        10%{?dist}
 License:        GPL-2.0-or-later
 URL:            https://github.com/nhorman/rng-tools
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -37,6 +39,9 @@ BuildRequires: rtl-sdr-devel
 %if %{with pkcs11}
 BuildRequires: libp11-devel
 Suggests: opensc
+%endif
+%if %{with radiacode}
+BuildRequires: libusb1-devel
 %endif
 
 Requires(post): systemd
@@ -65,17 +70,14 @@ TPM, jitter) and supplies entropy from them to a kernel entropy pool.
 %if !%{with rtlsdr}
 %define _without_rtlsdr --without-rtlsdr
 %endif
+%if !%{with radiacode}
+%define _without_radiacode --without-radiacode
+%endif
 
 ./autogen.sh
-# a dirty hack to force PIC for a PIC-aware assembly code for i686
-# /usr/lib/rpm/redhat/redhat-hardened-cc1 in Koji/Brew does not
-# force PIC for assembly sources as of now
-%ifarch i386 i686
-sed -i -e '/^#define RDRAND_RETRY_LIMIT\t10/a#define __PIC__ 1' rdrand_asm.S
-%endif
 # a dirty hack so libdarn_impl_a_CFLAGS overrides common CFLAGS
 sed -i -e 's/$(libdarn_impl_a_CFLAGS) $(CFLAGS)/$(CFLAGS) $(libdarn_impl_a_CFLAGS)/' Makefile.in
-%configure %{?_without_pkcs11} %{?_without_rtlsdr}
+%configure %{?_without_pkcs11} %{?_without_rtlsdr} %{?_without_radiacode}
 %make_build
 
 %install
@@ -107,6 +109,18 @@ install -D %{SOURCE2} -m0644 %{buildroot}%{_sysconfdir}/sysconfig/rngd
 %config(noreplace) %attr(0644,root,root)    %{_sysconfdir}/sysconfig/rngd
 
 %changelog
+* Wed May 20 2026 Vladislav Dronov <vdronov@redhat.com> - 6.17-10
+- Build with the updated jitterentropy v3.7.0 library
+
+* Fri May 15 2026 Vladislav Dronov <vdronov@redhat.com> - 6.17-9
+- Update to the upstream v6.17 @ e8da3cdc
+- Handle new radiacode entropy source
+- Handle changes in jitterentropy library
+- Drop older i686 force-PIC fix
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.17-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.17-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

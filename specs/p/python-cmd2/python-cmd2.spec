@@ -5,7 +5,7 @@
 
 Name:             python-%{pypi_name}
 Version:          2.5.11
-Release: 9%{?dist}
+Release:          7%{?dist}
 Summary:          Extra features for standard library's cmd module
 
 License:          MIT
@@ -14,6 +14,8 @@ Source0:          %{pypi_source}
 Patch0:           python-cmd2-2.5.11-disable-cov-tests.patch
 # Adapted from https://github.com/python-cmd2/cmd2/pull/1419
 Patch1:           Add-support-for-Python-3.14-and-remove-for-Python-3.8.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=2445817
+Patch2:           Fix_tests_for_argparse_usage_prefix_case_change_py3.14.patch
 BuildArch:        noarch
 
 %global _description\
@@ -78,6 +80,9 @@ exit 0
 %doc CHANGELOG.md README.md docs
 
 %changelog
+* Thu Apr 16 2026 Steve Traylen <steve.traylen@cern.ch> - 2.5.11-7
+- Fixtests for argparse usage case on py3.14 rhbz#2445817
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.5.11-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

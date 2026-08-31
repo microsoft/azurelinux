@@ -6,7 +6,7 @@
 
 Name:           perl-NTLM
 Version:        1.09
-Release: 44%{?dist}
+Release:        41%{?dist}
 Summary:        NTLM Perl module
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/NTLM

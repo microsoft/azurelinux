@@ -3,7 +3,7 @@
 
 Name:           mesa-libGLU
 Version:        9.0.3
-Release: 10%{?dist}
+Release:        7%{?dist}
 Summary:        Mesa libGLU library
 
 License:        X11

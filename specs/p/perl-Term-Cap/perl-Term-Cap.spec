@@ -3,7 +3,7 @@
 
 Name:           perl-Term-Cap
 Version:        1.18
-Release: 523%{?dist}
+Release:        520%{?dist}
 Summary:        Perl termcap interface
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Term-Cap

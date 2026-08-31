@@ -3,7 +3,7 @@
 
 Name:           perl-Archive-Zip
 Version:        1.68
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        Perl library for accessing Zip archives
 # lib/Archive/Zip/Member.pm:    (GPL-1.0-or-later OR Artistic-1.0-Perl) and Info-ZIP
 #                               (The _mapPermissionsToUnix() comments are

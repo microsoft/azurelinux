@@ -4,8 +4,8 @@
 #global prerel rc
 
 Name:           pugixml
-Version:        1.15
-Release: 4%{?dist}
+Version:        1.16
+Release:        1%{?dist}
 Summary:        A light-weight C++ XML processing library
 License:        MIT
 URL:            https://pugixml.org/
@@ -75,6 +75,12 @@ Documentation for %{name}
 
 
 %changelog
+* Fri Jun 26 2026 Richard Shaw <hobbes1069@gmail.com> - 1.16-1
+- update to 1.16.
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Aug 29 2025 Jerry James <loganjerry@gmail.com> - 1.15-1
 - Update to 1.15 (rhbz#2241663)
 - Change doc subpackage architecture to noarch

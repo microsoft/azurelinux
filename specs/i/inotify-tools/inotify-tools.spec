@@ -3,7 +3,7 @@
 
 Name:           inotify-tools
 Version:        4.23.9.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Command line utilities for inotify
 
 # GPL-2.0-only: the project as a whole

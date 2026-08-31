@@ -8,7 +8,7 @@
 
 Name:           %{githubname}
 Version:        %{githubver}
-Release: 6%{?dist}
+Release:        4%{?dist}
 Summary:        Libbpf library
 
 License:        LGPL-2.1-only OR BSD-2-Clause
@@ -18,6 +18,7 @@ BuildRequires:  gcc elfutils-libelf-devel elfutils-devel
 BuildRequires: make
 
 Patch1:         libbpf-Add-the-ability-to-suppress-perf-event-enable.patch
+Patch2:         libbpf-sync-bpf_stream_vprintk-declaration-with-kern.patch
 
 # This package supersedes libbpf from kernel-tools,
 # which has default Epoch: 0. By having Epoch: > 0
@@ -75,6 +76,9 @@ developing applications that use %{name}
 %{_libdir}/libbpf.a
 
 %changelog
+* Mon May 11 2026 Luca Boccassi <luca.boccassi@gmail.com> - 2:1.6.1-4
+- bpf_stream_vprintk declaration is updated to be compatible with kernel 7.0
+
 * Tue Aug 12 2025 Viktor Malik <vmalik@redhat.com> - 2:1.6.1-3
 - Backport patch to fix latest perf builds
 

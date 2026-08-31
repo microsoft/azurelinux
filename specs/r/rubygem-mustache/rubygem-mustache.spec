@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.1.1
-Release: 15%{?dist}
+Release: 12%{?dist}
 Summary: Mustache is a framework-agnostic way to render logic-free views
 License: MIT
 URL: https://github.com/mustache/mustache

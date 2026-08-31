@@ -1,0 +1,601 @@
+From 5b6651865a233c2a73c7bddb410898334c171cf7 Mon Sep 17 00:00:00 2001
+From: Tomas Jelinek <tojeline@redhat.com>
+Date: Mon, 2 Mar 2026 14:39:08 +0100
+Subject: [PATCH 2/3] typing fixes for python 3.15
+
+---
+ pcs/cli/cluster_property/output.py            |  19 +-
+ pcs/common/interface/dto.py                   | 179 ++++++++++++++----
+ pcs/common/pacemaker/cluster_property.py      |   3 +-
+ pcs/common/pacemaker/constraint/set.py        |   8 +-
+ pcs/common/pacemaker/resource/group.py        |   8 +-
+ pcs/common/pacemaker/resource/relations.py    |  13 +-
+ pcs/common/pacemaker/tag.py                   |   3 +-
+ pcs/lib/permissions/config/types.py           |   8 +-
+ pcs_test/tier0/common/interface/test_dto.py   |  22 +--
+ .../lib/permissions/config/test_parser.py     |  46 ++---
+ 10 files changed, 179 insertions(+), 130 deletions(-)
+
+diff --git a/pcs/cli/cluster_property/output.py b/pcs/cli/cluster_property/output.py
+index c9c46d1c3..68c6fc2d6 100644
+--- a/pcs/cli/cluster_property/output.py
++++ b/pcs/cli/cluster_property/output.py
+@@ -1,26 +1,17 @@
+ from shlex import quote
+-from typing import (
+-    Optional,
+-    Sequence,
+-)
++from typing import Optional, Sequence
+ 
+ from pcs.cli.nvset import nvset_dto_to_lines
+ from pcs.cli.resource.output import resource_agent_parameter_metadata_to_text
+ from pcs.common.pacemaker.cluster_property import ClusterPropertyMetadataDto
+-from pcs.common.pacemaker.nvset import (
+-    CibNvsetDto,
+-    ListCibNvsetDto,
+-)
++from pcs.common.pacemaker.nvset import CibNvsetDto, ListCibNvsetDto
+ from pcs.common.resource_agent.dto import ResourceAgentParameterDto
+ from pcs.common.str_tools import (
+     format_name_value_default_list,
+     format_name_value_list,
+     indent,
+ )
+-from pcs.common.types import (
+-    StringCollection,
+-    StringSequence,
+-)
++from pcs.common.types import StringCollection, StringSequence
+ 
+ 
+ class PropertyConfigurationFacade:
+@@ -35,7 +26,7 @@ class PropertyConfigurationFacade:
+             self._properties[0].nvpairs if self._properties else []
+         )
+         self._properties_metadata = properties_metadata
+-        self._readonly_properties = readonly_properties
++        self._readonly_properties = list(readonly_properties)
+         self._defaults_map = self.get_defaults(include_advanced=True)
+         self._name_nvpair_dto_map = {
+             nvpair_dto.name: nvpair_dto for nvpair_dto in self._first_nvpair_set
+@@ -82,7 +73,7 @@ class PropertyConfigurationFacade:
+         return self._properties_metadata
+ 
+     @property
+-    def readonly_properties(self) -> StringCollection:
++    def readonly_properties(self) -> list[str]:
+         return self._readonly_properties
+ 
+     def get_property_value(
+diff --git a/pcs/common/interface/dto.py b/pcs/common/interface/dto.py
+index c504bb5c7..a7efdfb74 100644
+--- a/pcs/common/interface/dto.py
++++ b/pcs/common/interface/dto.py
+@@ -1,18 +1,17 @@
+-from dataclasses import (
+-    asdict,
+-    fields,
+-    is_dataclass,
+-)
+-from enum import Enum
++from dataclasses import asdict, fields, is_dataclass
++from enum import Enum, EnumType
++from types import NoneType, UnionType
+ from typing import (
+     TYPE_CHECKING,
+     Any,
+-    Dict,
+     Iterable,
+     NewType,
+     TypeVar,
+     Union,
++    get_type_hints,
+ )
++from typing import get_args as get_type_args
++from typing import get_origin as get_type_origin
+ 
+ import dacite
+ 
+@@ -29,11 +28,9 @@ else:
+ 
+ 
+ PrimitiveType = Union[str, int, float, bool, None]
+-DtoPayload = Dict[str, "SerializableType"]  # type: ignore
+-SerializableType = Union[  # type: ignore
+-    PrimitiveType,
+-    DtoPayload,  # type: ignore
+-    Iterable["SerializableType"],  # type: ignore
++DtoPayload = dict[str, "SerializableType"]
++SerializableType = Union[
++    PrimitiveType, DtoPayload, Iterable["SerializableType"]
+ ]
+ 
+ T = TypeVar("T")
+@@ -46,20 +43,62 @@ class PayloadConversionError(Exception):
+     pass
+ 
+ 
++class _UnionNotAllowed(Exception):
++    pass
++
++
+ class DataTransferObject(DataclassInstance):
+     pass
+ 
+ 
+-def meta(name: str) -> Dict[str, str]:
+-    metadata: Dict[str, str] = {}
++def meta(name: str) -> dict[str, str]:
++    metadata: dict[str, str] = {}
+     if name:
+         metadata[META_NAME] = name
+     return metadata
+ 
+ 
+-# _type is Any, since based on static code analysis it can be either of
+-# type[Any], str, None - depending on the step in dataclass instance
+-# initialization
++# _type is Any - in reality, it is either one of:
++# * type
++# * enum.EnumType
++# * something defined in typing module, e.g. typing._GenericAlias, typing.Union
++# Especially the typing module changes with new Python versions.
++# Properly typing (rather metatyping, since its input and output are types)
++# this function doesn't bring any benefits.
++def _extract_type_from_optional(_type: Any) -> Any:
++    # Dataclass fields may be typed as 'Optional[some_type]' or
++    # 'Union[some_type, None]' or 'some_type | None'. This function extracts
++    # the inner type from an Optional, and thus allows to properly detect types
++    # of such dataclass fields. It raises an exception if a Union contains more
++    # than one type other than None, because in that case it is unclear which
++    # one is the correct type. However, such a field should never be defined in
++    # a dataclass, because field type must be unambiguous.
++
++    # Internal representation of Union and Optional is different in Python 3.12
++    # and 3.14. To be able to handle the differences, typing.get_origin is
++    # used. It transforms all the representations to Union or UnionType.
++    # https://docs.python.org/3/library/typing.html#typing.Union
++    _type_origin = get_type_origin(_type)
++    if not (_type_origin is Union or _type_origin is UnionType):
++        return _type
++
++    inner_types_without_none = [
++        inner_type
++        for inner_type in get_type_args(_type)
++        if inner_type is not NoneType
++    ]
++    if len(inner_types_without_none) == 1:
++        return inner_types_without_none[0]
++    raise _UnionNotAllowed()
++
++
++# _type is Any - in reality, it is either one of:
++# * type
++# * enum.EnumType
++# * something defined in typing module, e.g. typing._GenericAlias, typing.Union
++# Especially the typing module changes with new Python versions.
++# Properly typing (rather metatyping, since its input and output are types)
++# this function doesn't bring any benefits.
+ def _is_compatible_type(_type: Any, arg_index: int) -> bool:
+     return (
+         hasattr(_type, "__args__")
+@@ -68,29 +107,68 @@ def _is_compatible_type(_type: Any, arg_index: int) -> bool:
+     )
+ 
+ 
++# _type is Any - in reality, it is either one of:
++# * type
++# * enum.EnumType
++# * something defined in typing module, e.g. typing._GenericAlias, typing.Union
++# Especially the typing module changes with new Python versions.
++# Properly typing (rather metatyping, since its input and output are types)
++# this function doesn't bring any benefits.
++def _is_enum_type(_type: Any, arg_index: int) -> bool:
++    return (
++        hasattr(_type, "__args__")
++        and len(_type.__args__) >= arg_index
++        and type(_type.__args__[arg_index]) is EnumType
++    )
++
++
++# returns Any as the type of enum value can be anything and it can be different
++# for each Enum
++def _convert_enum(value: Enum) -> Any:
++    return value.value
++
++
+ def _convert_dict(
+     klass: type[DataTransferObject], obj_dict: DtoPayload
+ ) -> DtoPayload:
+     new_dict = {}
++    # resolve forward references in type hints, because type-detecting
++    # functions do not work with forward references
++    type_hints = get_type_hints(klass)
+     for _field in fields(klass):
++        try:
++            _type = _extract_type_from_optional(type_hints[_field.name])
++        except _UnionNotAllowed as e:
++            raise AssertionError(
++                f"Field '{_field.name}' in class '{klass}' is a Union: "
++                f"{_field.type}. "
++                "Dataclass fields cannot be Unions, unless they are a Union of "
++                "one type and None (which is equal to Optional)."
++            ) from e
+         value = obj_dict[_field.name]
+-        if is_dataclass(_field.type):
+-            value = _convert_dict(_field.type, value)  # type: ignore
+-        elif isinstance(value, list) and _is_compatible_type(_field.type, 0):
+-            value = [
+-                # ignore _field.type may not have __args__
+-                # this is prevented by _is_compatible_type
+-                _convert_dict(_field.type.__args__[0], item)  # type: ignore[union-attr]
+-                for item in value
++
++        new_value: SerializableType
++        if value is None:
++            # None must be handled here, other checks fail if they get None
++            new_value = value
++        elif is_dataclass(_type):
++            new_value = _convert_dict(_type, value)  # type: ignore
++        elif isinstance(value, list) and _is_compatible_type(_type, 0):
++            new_value = [
++                _convert_dict(_type.__args__[0], item) for item in value
+             ]
+-        elif isinstance(value, dict) and _is_compatible_type(_field.type, 1):
+-            value = {
+-                item_key: _convert_dict(_field.type.__args__[1], item_val)  # type: ignore[union-attr,arg-type]
++        elif isinstance(value, list) and _is_enum_type(_type, 0):
++            new_value = [_convert_enum(item) for item in value]
++        elif isinstance(value, dict) and _is_compatible_type(_type, 1):
++            new_value = {
++                item_key: _convert_dict(_type.__args__[1], item_val)  # type: ignore[arg-type]
+                 for item_key, item_val in value.items()
+             }
+         elif isinstance(value, Enum):
+-            value = value.value
+-        new_dict[_field.metadata.get(META_NAME, _field.name)] = value
++            new_value = _convert_enum(value)
++        else:
++            new_value = value
++        new_dict[_field.metadata.get(META_NAME, _field.name)] = new_value
+     return new_dict
+ 
+ 
+@@ -106,27 +184,44 @@ def _convert_payload(klass: type[DTOTYPE], data: DtoPayload) -> DtoPayload:
+         new_dict = dict(data)
+     except ValueError as e:
+         raise PayloadConversionError() from e
++    # resolve forward references in type hints, because type-detecting
++    # functions do not work with forward references
++    type_hints = get_type_hints(klass)
+     for _field in fields(klass):
+         new_name = _field.metadata.get(META_NAME, _field.name)
+         if new_name not in data:
+             continue
++
++        try:
++            _type = _extract_type_from_optional(type_hints[_field.name])
++        except _UnionNotAllowed as e:
++            raise AssertionError(
++                f"Field '{_field.name}' in class '{klass}' is a Union: "
++                f"{_field.type}. "
++                "Dataclass fields cannot be Unions, unless they are a Union of "
++                "one type and None (which is equal to Optional)."
++            ) from e
+         value = data[new_name]
+-        if is_dataclass(_field.type):
+-            value = _convert_payload(_field.type, value)  # type: ignore
+-        elif isinstance(value, list) and _is_compatible_type(_field.type, 0):
+-            value = [
+-                # ignore _field.type may not have __args__
+-                # this is prevented by _is_compatible_type
+-                _convert_payload(_field.type.__args__[0], item)  # type: ignore
+-                for item in value
++
++        new_value: SerializableType
++        if value is None:
++            # None must be handled here, other checks fail if they get None
++            new_value = value
++        elif is_dataclass(_type):
++            new_value = _convert_payload(_type, value)  # type: ignore
++        elif isinstance(value, list) and _is_compatible_type(_type, 0):
++            new_value = [
++                _convert_payload(_type.__args__[0], item) for item in value
+             ]
+-        elif isinstance(value, dict) and _is_compatible_type(_field.type, 1):
+-            value = {
+-                item_key: _convert_payload(_field.type.__args__[1], item_val)  # type: ignore[union-attr,arg-type]
++        elif isinstance(value, dict) and _is_compatible_type(_type, 1):
++            new_value = {
++                item_key: _convert_payload(_type.__args__[1], item_val)  # type: ignore[arg-type]
+                 for item_key, item_val in value.items()
+             }
++        else:
++            new_value = value
+         del new_dict[new_name]
+-        new_dict[_field.name] = value
++        new_dict[_field.name] = new_value
+     return new_dict
+ 
+ 
+diff --git a/pcs/common/pacemaker/cluster_property.py b/pcs/common/pacemaker/cluster_property.py
+index 06cfd423c..f6a92cb6e 100644
+--- a/pcs/common/pacemaker/cluster_property.py
++++ b/pcs/common/pacemaker/cluster_property.py
+@@ -3,10 +3,9 @@ from typing import Sequence
+ 
+ from pcs.common.interface.dto import DataTransferObject
+ from pcs.common.resource_agent.dto import ResourceAgentParameterDto
+-from pcs.common.types import StringCollection
+ 
+ 
+ @dataclass(frozen=True)
+ class ClusterPropertyMetadataDto(DataTransferObject):
+     properties_metadata: Sequence[ResourceAgentParameterDto]
+-    readonly_properties: StringCollection
++    readonly_properties: list[str]
+diff --git a/pcs/common/pacemaker/constraint/set.py b/pcs/common/pacemaker/constraint/set.py
+index e32839ec9..f46899888 100644
+--- a/pcs/common/pacemaker/constraint/set.py
++++ b/pcs/common/pacemaker/constraint/set.py
+@@ -1,16 +1,12 @@
+ from dataclasses import dataclass
+ from typing import Optional
+ 
+-from pcs.common.const import (
+-    PcmkAction,
+-    PcmkRoleType,
+-)
++from pcs.common.const import PcmkAction, PcmkRoleType
+ from pcs.common.interface.dto import DataTransferObject
+ from pcs.common.pacemaker.types import (
+     CibResourceSetOrdering,
+     CibResourceSetOrderType,
+ )
+-from pcs.common.types import StringSequence
+ 
+ 
+ @dataclass(frozen=True)
+@@ -24,4 +20,4 @@ class CibResourceSetDto(DataTransferObject):
+     role: Optional[PcmkRoleType]
+     score: Optional[str]
+     kind: Optional[CibResourceSetOrderType]
+-    resources_ids: StringSequence
++    resources_ids: list[str]
+diff --git a/pcs/common/pacemaker/resource/group.py b/pcs/common/pacemaker/resource/group.py
+index 0895449db..0d7649ff0 100644
+--- a/pcs/common/pacemaker/resource/group.py
++++ b/pcs/common/pacemaker/resource/group.py
+@@ -1,18 +1,14 @@
+ from dataclasses import dataclass
+-from typing import (
+-    Optional,
+-    Sequence,
+-)
++from typing import Optional, Sequence
+ 
+ from pcs.common.interface.dto import DataTransferObject
+ from pcs.common.pacemaker.nvset import CibNvsetDto
+-from pcs.common.types import StringSequence
+ 
+ 
+ @dataclass(frozen=True)
+ class CibResourceGroupDto(DataTransferObject):
+     id: str  # pylint: disable=invalid-name
+     description: Optional[str]
+-    member_ids: StringSequence
++    member_ids: list[str]
+     meta_attributes: Sequence[CibNvsetDto]
+     instance_attributes: Sequence[CibNvsetDto]
+diff --git a/pcs/common/pacemaker/resource/relations.py b/pcs/common/pacemaker/resource/relations.py
+index d46eaed6c..2b4e76aae 100644
+--- a/pcs/common/pacemaker/resource/relations.py
++++ b/pcs/common/pacemaker/resource/relations.py
+@@ -1,22 +1,15 @@
+ from dataclasses import dataclass
+-from typing import (
+-    Any,
+-    Mapping,
+-    Sequence,
+-)
++from typing import Any, Mapping, Sequence
+ 
+ from pcs.common.interface.dto import DataTransferObject
+-from pcs.common.types import (
+-    ResourceRelationType,
+-    StringSequence,
+-)
++from pcs.common.types import ResourceRelationType
+ 
+ 
+ @dataclass(frozen=True)
+ class RelationEntityDto(DataTransferObject):
+     id: str  # pylint: disable=invalid-name
+     type: ResourceRelationType
+-    members: StringSequence
++    members: list[str]
+     metadata: Mapping[str, Any]
+ 
+ 
+diff --git a/pcs/common/pacemaker/tag.py b/pcs/common/pacemaker/tag.py
+index 63c55464f..57f0f0724 100644
+--- a/pcs/common/pacemaker/tag.py
++++ b/pcs/common/pacemaker/tag.py
+@@ -2,13 +2,12 @@ from dataclasses import dataclass
+ from typing import Sequence
+ 
+ from pcs.common.interface.dto import DataTransferObject
+-from pcs.common.types import StringSequence
+ 
+ 
+ @dataclass(frozen=True)
+ class CibTagDto(DataTransferObject):
+     id: str
+-    idref_list: StringSequence
++    idref_list: list[str]
+ 
+ 
+ @dataclass(frozen=True)
+diff --git a/pcs/lib/permissions/config/types.py b/pcs/lib/permissions/config/types.py
+index cb54e34fa..d0005dbc2 100644
+--- a/pcs/lib/permissions/config/types.py
++++ b/pcs/lib/permissions/config/types.py
+@@ -1,20 +1,16 @@
+ from dataclasses import dataclass
+-from typing import (
+-    Collection,
+-    Sequence,
+-)
++from typing import Collection, Sequence
+ 
+ from pcs.common.permissions.types import (
+     PermissionAccessType,
+     PermissionTargetType,
+ )
+-from pcs.common.types import StringSequence
+ 
+ 
+ @dataclass(frozen=True)
+ class ClusterEntry:
+     name: str
+-    nodes: StringSequence
++    nodes: list[str]
+ 
+ 
+ @dataclass(frozen=True)
+diff --git a/pcs_test/tier0/common/interface/test_dto.py b/pcs_test/tier0/common/interface/test_dto.py
+index 8ea5e5e3a..853112980 100644
+--- a/pcs_test/tier0/common/interface/test_dto.py
++++ b/pcs_test/tier0/common/interface/test_dto.py
+@@ -1,13 +1,7 @@
++import importlib
+ import pkgutil
+-from dataclasses import (
+-    dataclass,
+-    field,
+-    is_dataclass,
+-)
+-from typing import (
+-    Any,
+-    List,
+-)
++from dataclasses import dataclass, field, is_dataclass
++from typing import Any
+ from unittest import TestCase
+ 
+ from dacite.exceptions import WrongTypeError
+@@ -25,12 +19,12 @@ from pcs.common.types import CorosyncNodeAddressType
+ def _import_all(_path):
+     # arbitrary prefix so it doesn't interact with real import in real tests
+     for module_finder, module_name, is_pkg in pkgutil.walk_packages(
+-        _path, prefix="_pcs."
++        _path, prefix="pcs."
+     ):
+-        if module_name.startswith("_pcs.snmp."):
++        del module_finder, is_pkg
++        if module_name.startswith("pcs.snmp."):
+             continue
+-        del is_pkg
+-        module_finder.find_spec(module_name).loader.load_module(module_name)
++        importlib.import_module(module_name)
+ 
+ 
+ def _all_subclasses(cls):
+@@ -62,7 +56,7 @@ class MyDto2(DataTransferObject):
+ @dataclass
+ class MyDto3(DataTransferObject):
+     field_g: MyDto2 = field(metadata=meta(name="field-g"))
+-    field_h: List[MyDto2]
++    field_h: list[MyDto2]
+     field_i: int = field(metadata=meta(name="field-i"))
+ 
+ 
+diff --git a/pcs_test/tier0/lib/permissions/config/test_parser.py b/pcs_test/tier0/lib/permissions/config/test_parser.py
+index 89903a969..a588d13b6 100644
+--- a/pcs_test/tier0/lib/permissions/config/test_parser.py
++++ b/pcs_test/tier0/lib/permissions/config/test_parser.py
+@@ -1,7 +1,7 @@
+ import json
+-from dataclasses import asdict
+ from unittest import TestCase
+ 
++from pcs.common.interface.dto import to_dict
+ from pcs.common.permissions.types import (
+     PermissionAccessType,
+     PermissionTargetType,
+@@ -35,12 +35,10 @@ class ParserV2Test(TestCase):
+     def test_format_version_missing(self):
+         with self.assertRaises(ParserError):
+             self._run_parse(
+-                asdict(
+-                    ConfigV2(
+-                        data_version=1,
+-                        clusters=[],
+-                        permissions=ClusterPermissions(local_cluster=[]),
+-                    )
++                dict(
++                    data_version=1,
++                    clusters=[],
++                    permissions=dict(local_cluster=[]),
+                 )
+             )
+ 
+@@ -48,14 +46,10 @@ class ParserV2Test(TestCase):
+         with self.assertRaises(ParserError):
+             self._run_parse(
+                 dict(
+-                    **asdict(
+-                        ConfigV2(
+-                            data_version=1,
+-                            clusters=[],
+-                            permissions=ClusterPermissions(local_cluster=[]),
+-                        )
+-                    ),
++                    data_version=1,
+                     format_version=3,
++                    clusters=[],
++                    permissions=dict(local_cluster=[]),
+                 )
+             )
+ 
+@@ -63,20 +57,16 @@ class ParserV2Test(TestCase):
+         with self.assertRaises(ParserError):
+             self._run_parse(
+                 dict(
+-                    **asdict(
+-                        ConfigV2(
+-                            data_version=1,
+-                            clusters=[
+-                                ClusterEntry(
+-                                    name="testcluster",
+-                                    nodes=["node1", "node2", "node0"],
+-                                ),
+-                                dict(name="invalid data"),
+-                            ],
+-                            permissions=ClusterPermissions(local_cluster=[]),
+-                        )
+-                    ),
+                     format_version=2,
++                    data_version=1,
++                    clusters=[
++                        dict(
++                            name="testcluster",
++                            nodes=["node1", "node2", "node0"],
++                        ),
++                        dict(name="invalid data"),
++                    ],
++                    permissions=dict(local_cluster=[]),
+                 )
+             )
+ 
+@@ -112,5 +102,5 @@ class ParserV2Test(TestCase):
+             ),
+         )
+         self.assertEqual(
+-            self._run_parse(dict(**asdict(config), format_version=2)), config
++            self._run_parse(dict(**to_dict(config), format_version=2)), config
+         )
+-- 
+2.53.0
+

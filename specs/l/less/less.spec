@@ -3,11 +3,13 @@
 
 Summary: A text file browser similar to more, but better
 Name: less
-Version: 691
-Release: 5%{?dist}
-License: GPL-3.0-only and BSD-2-Clause
+Version: 704
+Release: 4%{?dist}
+# less dual license GPL-3.0-only OR BSD-2-Clause
+# lesspipe GPL-2.0-or-later
+License: (GPL-3.0-only OR BSD-2-Clause) AND GPL-2.0-or-later
 Source0: https://www.greenwoodsoftware.com/less/%{name}-%{version}.tar.gz
-%global lesspipe_version 2.22
+%global lesspipe_version 2.27
 Source1: https://github.com/wofr06/lesspipe/archive/refs/tags/v%{lesspipe_version}.tar.gz#/lesspipe-%{lesspipe_version}.tar.gz
 Source2: less.sh
 Source3: less.csh
@@ -19,6 +21,8 @@ Patch9: less-458-less-filters-man.patch
 Patch10: less-458-lesskey-usage.patch
 Patch11: less-458-old-bot-in-help.patch
 Patch13: less-436-help.patch
+# from upstream, for lesspipe <= 2.27, rhbz#2468485
+Patch14: lesspipe-2.27-fixperldoc.patch
 URL: https://www.greenwoodsoftware.com/less/
 BuildRequires: ncurses-devel
 BuildRequires: autoconf automake libtool
@@ -44,8 +48,10 @@ You should install less because it is a basic utility for viewing text
 files, and you'll use it frequently.
 
 %package color
+License: GPL-2.0-or-later
 Summary: Colorizers for less
 Requires: %{name} = %{version}-%{release}
+Recommends: bat
 Conflicts: less < 685-5
 
 %description color
@@ -54,6 +60,8 @@ Syntax highlighting modes for the less pager.
 
 %prep
 %setup -q -a 1
+# make lesspipe directory constat and predictable
+mv lesspipe-%{lesspipe_version} lesspipe-src
 %patch -P 4 -p1 -b .time
 %patch -P 5 -p2 -b .fsync
 %patch -P 6 -p1 -b .manpage-add-old-bot-option
@@ -62,18 +70,19 @@ Syntax highlighting modes for the less pager.
 %patch -P 10 -p1 -b .lesskey-usage
 %patch -P 11 -p1 -b .old-bot
 %patch -P 13 -p1 -b .help
+%patch -P 14 -p1 -b .fixperldoc
 
 # get consistent result localy and on builders
-sed -i -e 's|"#!/usr/bin/env $selected_shell"|"#!$shellcmd"|' -e '/ZSH_/d' lesspipe-%{lesspipe_version}/configure
+sed -i -e 's|"#!/usr/bin/env $selected_shell"|"#!$shellcmd"|' -e '/ZSH_/d' lesspipe-src/configure
 
 %build
 rm -f ./configure
 autoreconf -fiv
-%configure
+%configure --libexecdir=%{_libexecdir}/%{name}
 %make_build CFLAGS="%{optflags} -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 
-pushd lesspipe-%{lesspipe_version}
-./configure --prefix=%{_prefix} --shell=%{_bindir}/sh --bash-completion-dir=%{_datadir}/bash-completion/completions/
+pushd lesspipe-src
+./configure --prefix=%{_prefix} --shell=%{_bindir}/sh --bash-completion-dir=%{_datadir}/bash-completion/completions/  --libexecdir=%{_libexecdir}/%{name}
 # do not run make, it does nothing atm, but it reruns configure with wrong argumens
 popd
 
@@ -83,13 +92,13 @@ mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 install -p -m 644 %{SOURCE2} $RPM_BUILD_ROOT/etc/profile.d
 install -p -m 644 %{SOURCE3} $RPM_BUILD_ROOT/etc/profile.d
 
-pushd lesspipe-%{lesspipe_version}
+pushd lesspipe-src
 %make_install
 rm -rf $RPM_BUILD_ROOT/usr/share/bash-completion/
 popd
 
 %check
-pushd lesspipe-%{lesspipe_version}
+pushd lesspipe-src
 # we dont have all required components to pass full test, but it is still
 # useful to run for debug purposes
 make test ||:
@@ -100,18 +109,59 @@ popd
 %license LICENSE COPYING
 /etc/profile.d/*
 %{_bindir}/less
-%{_bindir}/lesscomplete
-%{_bindir}/lessecho
 %{_bindir}/lesskey
 %{_bindir}/lesspipe.sh
+%{_libexecdir}/%{name}/lesscomplete
+%{_libexecdir}/%{name}/lessecho
+%{_libexecdir}/%{name}/less-osc8-open
 %{_mandir}/man1/*
 
 %files color
 %{_bindir}/archive_color
-%{_bindir}/code2color
-%{_bindir}/vimcolor
 
 %changelog
+* Wed Aug 19 2026 Michal Hlavinka <mhlavink@redhat.com> - 704-4
+- fix processing wrongly formated perldoc files (rhbz#2501990)
+  credits Wolfgang Friebel
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 704-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jun 23 2026 Michal Hlavinka <mhlavink@redhat.com> - 704-2
+- update lesspipe to 2.27
+
+* Mon Jun 15 2026 Michal Hlavinka <mhlavink@redhat.com> - 704-1
+- updated to 704 (#2486018)
+- update lesspipe to 2.26
+
+* Mon Jun 01 2026 Michal Hlavinka <mhlavink@redhat.com> - 702-1
+- updated to 702 (#2480789)
+
+* Tue Apr 28 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-7
+- update lesspipe to 2.25
+
+* Thu Apr 16 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-6
+- update lesspipe to 2.24
+
+* Tue Mar 31 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-5
+- use upstream fix for the xml issue
+
+* Sun Mar 22 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-4
+- update lesspipe to 2.23
+- dont use html to process xml files, the result isnt usable (rhbz#2451451)
+
+* Thu Mar 12 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-3
+- fix a typo in license field
+
+* Wed Mar 11 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-2
+- fix license tags (rhbz#2445996)
+
+* Wed Feb 25 2026 Michal Hlavinka <mhlavink@redhat.com> - 692-1
+- updated to 692 (#2437657)
+
+* Wed Feb 25 2026 Michal Hlavinka <mhlavink@redhat.com> - 691-3
+- rebuild with updated dependencies for color subpackage (PR#14)
+
 * Tue Jan 27 2026 Michal Hlavinka <mhlavink@redhat.com> - 691-2
 - update lesspipe.sh to 2.22
 

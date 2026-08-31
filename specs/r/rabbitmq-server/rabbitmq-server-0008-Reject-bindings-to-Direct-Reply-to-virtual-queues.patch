@@ -1,0 +1,81 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Michael Klishin <michaelklishin@icloud.com>
+Date: Sun, 5 Apr 2026 16:00:44 -0700
+Subject: [PATCH] Reject bindings to Direct Reply-to virtual "queues"
+
+(cherry picked from commit 9055500d10ca7629dd2b051c6dc7a4b0bb8f6734)
+(cherry picked from commit 7971061dba915cc67dcd11e7503395c1e68c2f9a)
+
+diff --git a/deps/rabbit/src/rabbit_amqp_session.erl b/deps/rabbit/src/rabbit_amqp_session.erl
+index 29d6b33401..5b8a4a65d5 100644
+--- a/deps/rabbit/src/rabbit_amqp_session.erl
++++ b/deps/rabbit/src/rabbit_amqp_session.erl
+@@ -2592,19 +2592,24 @@ ensure_source_v1(Address,
+                     XNameBin = unicode:characters_to_binary(XNameList),
+                     XName = exchange_resource(Vhost, XNameBin),
+                     QName = queue_resource(Vhost, QNameBin),
+-                    Binding = #binding{source = XName,
+-                                       destination = QName,
+-                                       key = RoutingKey},
+-                    PermCache2 = check_resource_access(QName, write, User, PermCache1),
+-                    PermCache = check_resource_access(XName, read, User, PermCache2),
+-                    {ok, X} = rabbit_exchange:lookup(XName),
+-                    TopicPermCache = check_read_permitted_on_topic(
+-                                       X, User, RoutingKey, TopicPermCache0),
+-                    case rabbit_binding:add(Binding, Username) of
+-                        ok ->
+-                            {ok, QName, PermCache, TopicPermCache};
+-                        {error, _} = Err ->
+-                            Err
++                    case QNameBin of
++                        <<"amq.rabbitmq.reply-to.", _/binary>> ->
++                            {error, {volatile_queue_not_bindable, QNameBin}};
++                        _ when is_binary (QNameBin) ->
++                            Binding = #binding{source = XName,
++                                               destination = QName,
++                                               key = RoutingKey},
++                            PermCache2 = check_resource_access(QName, write, User, PermCache1),
++                            PermCache = check_resource_access(XName, read, User, PermCache2),
++                            {ok, X} = rabbit_exchange:lookup(XName),
++                            TopicPermCache = check_read_permitted_on_topic(
++                                               X, User, RoutingKey, TopicPermCache0),
++                            case rabbit_binding:add(Binding, Username) of
++                                ok ->
++                                    {ok, QName, PermCache, TopicPermCache};
++                                {error, _} = Err ->
++                                    Err
++                            end
+                     end
+             end;
+         {error, _} = Err ->
+diff --git a/deps/rabbit/src/rabbit_channel.erl b/deps/rabbit/src/rabbit_channel.erl
+index d136c92db3..04ce3e5283 100644
+--- a/deps/rabbit/src/rabbit_channel.erl
++++ b/deps/rabbit/src/rabbit_channel.erl
+@@ -1062,6 +1062,18 @@ check_exchange_deletion(XName = #resource{name = <<"amq.", _/binary>>,
+ check_exchange_deletion(_) ->
+     ok.
+ 
++reject_volatile_queue_as_binding_target(queue, DestinationNameBin) ->
++    case DestinationNameBin of
++        <<"amq.rabbitmq.reply-to.", _/binary>> ->
++            rabbit_misc:protocol_error(
++              access_refused,
++              "cannot bind or unbind to a volatile (direct reply-to) queue", []);
++        _ when is_binary (DestinationNameBin) ->
++            ok
++    end;
++reject_volatile_queue_as_binding_target(_, _) ->
++    ok.
++
+ %% check that an exchange/queue name does not contain the reserved
+ %% "amq."  prefix.
+ %%
+@@ -1794,6 +1806,7 @@ binding_action_with_checks(
+   #user{username = Username} = User) ->
+     ExchangeNameBin = strip_cr_lf(SourceNameBin0),
+     DestinationNameBin = strip_cr_lf(DestinationNameBin0),
++    reject_volatile_queue_as_binding_target(DestinationType, DestinationNameBin),
+     DestinationName = name_to_resource(DestinationType, DestinationNameBin, VHostPath),
+     check_write_permitted(DestinationName, User, AuthzContext),
+     ExchangeName = rabbit_misc:r(VHostPath, exchange, ExchangeNameBin),

@@ -6,11 +6,11 @@
 %global rpcbind_state_dir %{_rundir}/rpcbind
 
 Name:           rpcbind
-Version:        1.2.8
-Release: 3%{?dist}
+Version:        1.2.9
+Release:        2%{?dist}
 Summary:        Universal Addresses to RPC Program Number Mapper
 License:        BSD-3-Clause
-URL:            http://nfsv4.bullopensource.org
+URL:            https://sourceforge.net/projects/rpcbind
 
 Source0:        http://downloads.sourceforge.net/rpcbind/%{name}-%{version}.tar.bz2
 Source1: %{name}.sysconfig
@@ -25,6 +25,8 @@ Requires(pre): coreutils
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd coreutils
+
+Patch001: rpcbind-0.2.9-mem-leak-main.patch
 
 Patch100: rpcbind-0.2.3-systemd-tmpfiles.patch
 Patch101: rpcbind-0.2.4-systemd-rundir.patch
@@ -121,6 +123,18 @@ install -m0644 -D rpcbind.sysusers.conf %{buildroot}%{_sysusersdir}/rpcbind.conf
 %{_sysusersdir}/rpcbind.conf
 
 %changelog
+* Wed Jul  1 2026 Steve Dickson <steved@redhat.com> 1.2.9-2
+- Fix leak of nconf in main()
+
+* Tue Jun 30 2026 Scott Mayhew <smayhew@redhat.com> 1.2.9-1
+- Renamed RPCBIND_ARGS to RPCBIND_OPTIONS in /etc/sysconfig/rpcbind
+
+* Sat Jun 13 2026 Steve Dickson <steved@redhat.com> 1.2.9-0
+- Updated to latest upstream release: rpcbind-1_2_9 (bz 2482426)
+
+* Fri May 15 2026 Steve Dickson <steved@redhat.com> 1.2.8-1
+- Updated the URL to  https://sourceforge.net/projects/rpcbind
+
 * Sat Jul 26 2025 Steve Dickson <steved@redhat.com> 1.2.8-0
 - Updated to latest upstream release: rpcbind-1_2_8 (bz 2300081)
 

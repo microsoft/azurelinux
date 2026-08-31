@@ -1,0 +1,60 @@
+From 0c6d4e79e2666415a58602b536d91f4adec569fa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alejandro=20S=C3=A1ez?= <asm@redhat.com>
+Date: Wed, 12 Mar 2025 13:18:27 +0100
+Subject: [PATCH] Fix format string issues
+
+---
+ autorest/adal/config.go                | 2 +-
+ autorest/adal/token_test.go            | 4 ++--
+ autorest/validation/validation_test.go | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/autorest/adal/config.go b/autorest/adal/config.go
+index fa59647..6cb8a33 100644
+--- a/autorest/adal/config.go
++++ b/autorest/adal/config.go
+@@ -40,7 +40,7 @@ func (oac OAuthConfig) IsZero() bool {
+ 
+ func validateStringParam(param, name string) error {
+ 	if len(param) == 0 {
+-		return fmt.Errorf("parameter '" + name + "' cannot be empty")
++		return fmt.Errorf("parameter '%s' cannot be empty", name)
+ 	}
+ 	return nil
+ }
+diff --git a/autorest/adal/token_test.go b/autorest/adal/token_test.go
+index 1d556b6..50519d2 100644
+--- a/autorest/adal/token_test.go
++++ b/autorest/adal/token_test.go
+@@ -1060,7 +1060,7 @@ func TestRefreshCallback(t *testing.T) {
+ func TestRefreshCallbackErrorPropagates(t *testing.T) {
+ 	errorText := "this is an error text"
+ 	spt := newServicePrincipalToken(func(Token) error {
+-		return fmt.Errorf(errorText)
++		return fmt.Errorf("%s", errorText)
+ 	})
+ 
+ 	expiresOn := strconv.Itoa(int(time.Now().Add(3600 * time.Second).Sub(date.UnixEpoch()).Seconds()))
+@@ -1519,7 +1519,7 @@ func TestMSIAvailableSlow(t *testing.T) {
+ func TestMSIAvailableFail(t *testing.T) {
+ 	expectErr := "failed to make msi http request"
+ 	c := mocks.NewSender()
+-	c.AppendAndRepeatError(fmt.Errorf(expectErr), 2)
++	c.AppendAndRepeatError(fmt.Errorf("%s", expectErr), 2)
+ 	if MSIAvailable(context.Background(), c) {
+ 		t.Fatal("unexpected true")
+ 	}
+diff --git a/autorest/validation/validation_test.go b/autorest/validation/validation_test.go
+index bfe1bae..27bc654 100644
+--- a/autorest/validation/validation_test.go
++++ b/autorest/validation/validation_test.go
+@@ -2429,5 +2429,5 @@ func TestNewError(t *testing.T) {
+ 	err := createError(reflect.ValueOf(p.C), v[0].Constraints[0].Chain[0], "value can not be null; required parameter")
+ 	z := fmt.Sprintf("batch.AccountClient#Create: Invalid input: %s",
+ 		err.Error())
+-	require.Equal(t, NewError("batch.AccountClient", "Create", err.Error()).Error(), z)
++	require.Equal(t, NewError("batch.AccountClient", "Create", "%s", err.Error()).Error(), z)
+ }
+-- 
+2.48.1
+

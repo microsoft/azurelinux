@@ -10,7 +10,7 @@
 Name: hunspell-gu
 Summary: Gujarati hunspell dictionaries
 Version: 1.0.0
-Release: 30%{?dist}
+Release: 27%{?dist}
 Epoch: 1
 Source: http://anishpatil.fedorapeople.org/gu_in.%{version}.tar.gz
 URL: https://gitorious.org/hunspell_dictionaries/hunspell_dictionaries.git

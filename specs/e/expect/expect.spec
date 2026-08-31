@@ -8,7 +8,7 @@
 Summary: A program-script interaction and testing utility
 Name: expect
 Version: %{majorver}
-Release: 32%{?dist}
+Release: 31%{?dist}
 License: LicenseRef-Fedora-Public-Domain
 URL: https://core.tcl.tk/expect/index
 Source: http://downloads.sourceforge.net/%{name}/%{name}%{version}.tar.gz
@@ -196,6 +196,14 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libexpect%{version}.so
 %{_mandir}/man1/tknewsbiff.1*
 
 %changelog
+* Fri Mar 27 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 5.45.4-31
+- Revert port to tcl9
+  Related: #2442621
+
+* Tue Mar 10 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 5.45.4-30
+- Port to tcl9
+  Resolves: #2442621
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.45.4-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

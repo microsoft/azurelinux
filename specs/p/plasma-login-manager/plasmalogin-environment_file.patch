@@ -1,10 +1,9 @@
-diff --git a/services/plasmalogin.service.in b/services/plasmalogin.service.in
-index d652b0f..1c51101 100644
---- a/services/plasmalogin.service.in
-+++ b/services/plasmalogin.service.in
-@@ -9,6 +9,7 @@ StartLimitBurst=2
- 
+diff -ur a/services/plasmalogin.service.in b/services/plasmalogin.service.in
+--- a/services/plasmalogin.service.in	2026-05-14 15:05:14.221923999 -0400
++++ b/services/plasmalogin.service.in	2026-05-14 15:05:37.843115826 -0400
+@@ -10,6 +10,7 @@
  [Service]
+ ExecStartPre=-udevadm settle --timeout=10
  ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/plasmalogin
 +EnvironmentFile=-/etc/sysconfig/plasmalogin
  Restart=always

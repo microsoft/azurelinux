@@ -26,7 +26,7 @@
 Name:       python-oslo-config
 Epoch:      2
 Version:    9.6.0
-Release: 10%{?dist}
+Release:    7%{?dist}
 Summary:    OpenStack common configuration library
 
 Group:      Development/Languages

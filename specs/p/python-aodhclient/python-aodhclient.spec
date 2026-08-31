@@ -20,7 +20,7 @@ provides a Python API (the aodhclient module) and a command-line tool.
 
 Name:             python-aodhclient
 Version:          3.6.0
-Release: 9%{?dist}
+Release:          6%{?dist}
 Summary:          Python API and CLI for OpenStack Aodh
 
 License:          Apache-2.0

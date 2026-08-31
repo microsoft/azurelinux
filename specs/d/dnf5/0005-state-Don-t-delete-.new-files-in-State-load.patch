@@ -1,0 +1,84 @@
+From b4efe087e9465fef14f9cc4e3911e068979aa75c Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Tue, 7 Apr 2026 11:42:21 +0000
+Subject: [PATCH] state: Don't delete .new files in State::load()
+
+When multiple libdnf5 processes run concurrently (e.g. dnf5 transaction
++ PackageKit/GNOME Software loading the system repo), the .new file
+recovery code in State::load() can race with State::save() in another
+process. The recovery code would delete or rename .new files that the
+concurrent save() just wrote, causing save()'s subsequent rename() to
+fail with "cannot copy/rename" errors.
+
+Fix by making load() purely read-only with respect to .new files. In
+case there are any .new files present, just log a warning and keep using
+the non-.new state files from the last successful save().
+
+An alternative approach using Locker to synchronize State::load() and
+State::save() was considered. This would preserve crash recovery for the
+case where save() was interrupted during the rename phase (all .new
+files fully written). However, a crash during the write phase still
+leaves state inconsistent with rpmdb, requiring a full state rebuild
+(see #1610). Also, Locker requires write access to create the lock file
+in the state directory, which would break non-root read-only operations
+(e.g. dnf5 repoquery) unless fallback logic was added. The added
+complexity was not justified given these limitations.
+
+Resolves: https://github.com/rpm-software-management/dnf5/issues/2601
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+(cherry picked from commit c63f7a4d3872f6e44a9716881bcebf61c8532d00)
+---
+ libdnf5/system/state.cpp | 35 +++++++++++++----------------------
+ 1 file changed, 13 insertions(+), 22 deletions(-)
+
+diff --git a/libdnf5/system/state.cpp b/libdnf5/system/state.cpp
+index e5b9759d..edae67fc 100644
+--- a/libdnf5/system/state.cpp
++++ b/libdnf5/system/state.cpp
+@@ -666,29 +666,20 @@ void State::load() {
+     try {
+         auto new_suffix_files = gather_suffix_new_files(this->path);
+         if (!new_suffix_files.empty()) {
++            // The .new files are either stale leftovers from a previously
++            // crashed save(), or they belong to a concurrent save() in another
++            // process. We cannot safely delete or rename them - doing so would
++            // race with a concurrent save() and cause errors (
++            // https://github.com/rpm-software-management/dnf5/issues/2601).
++            // Load from the non-.new files which are always in a consistent
++            // state from the last successful save(). Stale .new
++            // files will be overwritten by the next save().
++            // TODO(amatej): Once https://github.com/rpm-software-management/dnf5/issues/1610
++            //               is done we should suggest to rebuild the system state.
+             auto logger = base->get_logger();
+-            logger->warning("System state: unfinished update found");
+-
+-            try {
+-                // package_state new file is renamed first, if it exists the .new system state
+-                // files are likely incomplete and we cannot use them
+-                if (std::filesystem::exists(suffix_new(get_package_state_path()))) {
+-                    // TODO(amatej): Once https://github.com/rpm-software-management/dnf5/issues/1610 is done we should
+-                    //               suggest to rebuild the system state, some information is likely missing because
+-                    //               system state update happens after the transaction is finished.
+-                    logger->error("System state: cannot use partially written system state files");
+-                    for (const auto & f : new_suffix_files) {
+-                        std::filesystem::remove(f);
+-                    }
+-                } else {
+-                    logger->warning(
+-                        "System state: update interruption happened during renaming which means all the new system "
+-                        "state files were written, using them.");
+-                    rename_new_system_state_files(true);
+-                }
+-            } catch (const std::filesystem::filesystem_error & ex) {
+-                logger->error("System state: cannot recover: ", ex.what());
+-            }
++            logger->warning(
++                "System state: found .new state files from an unfinished transaction, "
++                "loading from last successfully written state files");
+         }
+ 
+         path = get_package_state_path();
+-- 
+2.53.0
+

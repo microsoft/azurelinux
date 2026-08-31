@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           python-genshi
-Version:        0.7.10
-Release: 4%{?dist}
+Version:        0.7.11
+Release:        1%{?dist}
 Summary:        Toolkit for stream-based generation of output for the web
 
 License:        BSD-3-Clause
@@ -69,6 +69,9 @@ sed -i -e '/_speedups.c/d' %{pyproject_files}
 
 
 %changelog
+* Mon May 18 2026 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.11-1
+- update to 0.7.11
+
 * Sat Dec 06 2025 Felix Schwarz <fschwarz@fedoraproject.org> - 0.7.10-1
 - update to 0.7.10
 

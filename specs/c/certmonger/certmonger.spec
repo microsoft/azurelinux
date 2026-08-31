@@ -31,7 +31,7 @@
 
 Name:		certmonger
 Version:	0.79.21
-Release: 4%{?dist}
+Release:	1%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
 License:	GPL-3.0-or-later

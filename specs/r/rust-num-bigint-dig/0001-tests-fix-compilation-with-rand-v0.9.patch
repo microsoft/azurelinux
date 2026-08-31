@@ -1,0 +1,26 @@
+From 0d5fefdcbeaf5cc344f06515918cd5801711889c Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Fri, 7 Aug 2026 19:01:22 +0200
+Subject: [PATCH] tests: fix compilation with rand v0.9
+
+---
+ tests/torture.rs | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tests/torture.rs b/tests/torture.rs
+index 024c1d4..9b2744c 100644
+--- a/tests/torture.rs
++++ b/tests/torture.rs
+@@ -10,9 +10,6 @@ use rand::prelude::*;
+ 
+ fn test_mul_divide_torture_count(count: usize) {
+     let bits_max = 1 << 12;
+-    #[cfg(target_pointer_width = "32")]
+-    let seed = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+-    #[cfg(target_pointer_width = "64")]
+     let seed = [
+         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+         26, 27, 28, 29, 30, 31, 32,
+-- 
+2.55.0
+

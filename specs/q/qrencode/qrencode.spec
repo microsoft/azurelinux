@@ -15,7 +15,7 @@
 
 Name:           qrencode
 Version:        4.1.1
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        Generate QR 2D barcodes
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

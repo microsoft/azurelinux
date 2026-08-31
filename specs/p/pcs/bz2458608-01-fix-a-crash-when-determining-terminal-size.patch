@@ -1,0 +1,197 @@
+From e6db4a23494a68f945a5987b38b1571c8c59b0b1 Mon Sep 17 00:00:00 2001
+From: Tomas Jelinek <tojeline@redhat.com>
+Date: Mon, 20 Apr 2026 17:06:05 +0200
+Subject: [PATCH 1/2] fix a crash when determining terminal size
+
+---
+ pcs/resource.py | 34 ++++------------------------------
+ pcs/stonith.py  | 30 ++++++++----------------------
+ pcs/utils.py    | 25 -------------------------
+ 3 files changed, 12 insertions(+), 77 deletions(-)
+
+diff --git a/pcs/resource.py b/pcs/resource.py
+index f81444928..60b75aa52 100644
+--- a/pcs/resource.py
++++ b/pcs/resource.py
+@@ -2,7 +2,6 @@
+ import json
+ import re
+ import sys
+-import textwrap
+ from functools import partial
+ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional
+ from xml.dom.minidom import parseString
+@@ -12,6 +11,7 @@ import pcs.lib.resource_agent as lib_ra
+ from pcs import constraint, utils
+ from pcs.cli.cluster_property.output import PropertyConfigurationFacade
+ from pcs.cli.common.errors import CmdLineInputError
++from pcs.cli.common.output import format_wrap_for_terminal
+ from pcs.cli.common.parse_args import (
+     FUTURE_OPTION,
+     OUTPUT_FORMAT_VALUE_CMD,
+@@ -505,12 +505,10 @@ def resource_list_available(
+         name = agent_info["name"]
+         shortdesc = agent_info["shortdesc"]
+         if shortdesc:
++            normalized_desc = " ".join(shortdesc.split())
+             print(
+-                "{0} - {1}".format(
+-                    name,
+-                    _format_desc(
+-                        len(name + " - "), shortdesc.replace("\n", " ")
+-                    ),
++                "\n".join(
++                    format_wrap_for_terminal(f"{name} - {normalized_desc}")
+                 )
+             )
+         else:
+@@ -558,30 +556,6 @@ def resource_list_options(
+     )
+ 
+ 
+-# Return the string formatted with a line length of terminal width  and indented
+-def _format_desc(indentation: int, desc: str) -> str:
+-    """
+-    Commandline options: no options
+-    """
+-    desc = " ".join(desc.split())
+-    dummy_rows, columns = utils.getTerminalSize()
+-    columns = max(int(columns), 40)
+-    afterindent = columns - indentation
+-    if afterindent < 1:
+-        afterindent = columns
+-
+-    output = ""
+-    first = True
+-    for line in textwrap.wrap(desc, afterindent):
+-        if not first:
+-            output += " " * indentation
+-        output += line
+-        output += "\n"
+-        first = False
+-
+-    return output.rstrip()
+-
+-
+ def resource_create(lib: Any, argv: Argv, modifiers: InputModifiers) -> None:  # noqa: PLR0912
+     """
+     Options:
+diff --git a/pcs/stonith.py b/pcs/stonith.py
+index 587405048..b029a393e 100644
+--- a/pcs/stonith.py
++++ b/pcs/stonith.py
+@@ -1,15 +1,10 @@
+ import json
+-from typing import (
+-    Any,
+-    Optional,
+-)
++from typing import Any, Optional
+ 
+-from pcs import (
+-    resource,
+-    utils,
+-)
++from pcs import resource, utils
+ from pcs.cli.common import parse_args
+ from pcs.cli.common.errors import CmdLineInputError
++from pcs.cli.common.output import format_wrap_for_terminal
+ from pcs.cli.common.parse_args import (
+     Argv,
+     InputModifiers,
+@@ -17,9 +12,7 @@ from pcs.cli.common.parse_args import (
+     ensure_unique_args,
+ )
+ from pcs.cli.fencing_topology import target_type_map_cli_to_lib
+-from pcs.cli.reports.output import (
+-    print_to_stderr,
+-)
++from pcs.cli.reports.output import print_to_stderr
+ from pcs.cli.resource.output import resource_agent_metadata_to_text
+ from pcs.cli.resource.parse_args import (
+     parse_primitive as parse_primitive_resource,
+@@ -33,11 +26,7 @@ from pcs.common.pacemaker.resource.list import (
+     get_stonith_resources_ids,
+ )
+ from pcs.common.resource_agent.dto import ResourceAgentNameDto
+-from pcs.common.str_tools import (
+-    format_list,
+-    format_plural,
+-    indent,
+-)
++from pcs.common.str_tools import format_list, format_plural, indent
+ 
+ 
+ def stonith_status_cmd(lib: Any, argv: Argv, modifiers: InputModifiers) -> None:
+@@ -81,13 +70,10 @@ def stonith_list_available(
+         name = agent_info["type"]
+         shortdesc = agent_info["shortdesc"]
+         if shortdesc:
++            normalized_desc = " ".join(shortdesc.split())
+             print(
+-                "{0} - {1}".format(
+-                    name,
+-                    # pylint: disable=protected-access
+-                    resource._format_desc(  # noqa: SLF001
+-                        len(name + " - "), shortdesc.replace("\n", " ")
+-                    ),
++                "\n".join(
++                    format_wrap_for_terminal(f"{name} - {normalized_desc}")
+                 )
+             )
+         else:
+diff --git a/pcs/utils.py b/pcs/utils.py
+index 3d2b8221f..58d08fb83 100644
+--- a/pcs/utils.py
++++ b/pcs/utils.py
+@@ -1,18 +1,15 @@
+ # pylint: disable=too-many-lines
+ import base64
+-import fcntl
+ import getpass
+ import json
+ import logging
+ import os
+ import re
+ import signal
+-import struct
+ import subprocess
+ import sys
+ import tarfile
+ import tempfile
+-import termios
+ import threading
+ import time
+ import xml.dom.minidom
+@@ -1785,28 +1782,6 @@ def set_node_attribute(prop, value, node):
+         err("unable to set attribute %s\n%s" % (prop, o))
+ 
+ 
+-def getTerminalSize(fd=1):
+-    """
+-    Returns height and width of current terminal. First tries to get
+-    size via termios.TIOCGWINSZ, then from environment. Defaults to 25
+-    lines x 80 columns if both methods fail.
+-
+-    :param fd: file descriptor (default: 1=stdout)
+-
+-    Commandline options: no options
+-    """
+-    try:
+-        hw = struct.unpack(
+-            str("hh"), fcntl.ioctl(fd, termios.TIOCGWINSZ, "1234")
+-        )
+-    except OSError:
+-        try:
+-            hw = (os.environ["LINES"], os.environ["COLUMNS"])
+-        except KeyError:
+-            hw = (25, 80)
+-    return hw
+-
+-
+ def get_terminal_input(message=None):
+     """
+     Commandline options: no options
+-- 
+2.54.0
+

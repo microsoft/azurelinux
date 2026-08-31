@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 5;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -14,7 +14,7 @@
 %bcond check 1
 
 Name:           ruff
-Version:        0.15.2
+Version:        0.16.4
 # The ruff package has a permanent exception to the Updates Policy in Fedora,
 # so it can be updated in stable releases across SemVer boundaries (subject to
 # good judgement and actual compatibility of any reverse dependencies). See
@@ -78,13 +78,6 @@ Summary:        Extremely fast Python linter and code formatter
 #
 # Apache-2.0 OR MIT:
 #   - crates/ruff_annotate_snippets/ is a fork of the annotate-snippets crate
-#   - salsa, salsa-macros, salsa-macros-rules, Source300
-#
-# MIT:
-#   - book/mermaid.min.js in the vendored salsa snapshot; does not contribute
-#     to the licenses of the binary RPMs, since we do not package the book, and
-#     it is removed in %%prep to be sure
-#   - lsp-types, Source200
 #
 # =====
 #
@@ -128,7 +121,6 @@ SourceLicense:  %{shrink:
 # Apache-2.0 OR BSL-1.0
 # Apache-2.0 OR MIT
 # Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT
-# BSD-2-Clause OR Apache-2.0 OR MIT
 # CC0-1.0
 # ISC
 # MIT
@@ -148,7 +140,6 @@ License:        %{shrink:
     MIT AND
     Apache-2.0 AND
     (Apache-2.0 OR BSD-2-Clause) AND
-    (Apache-2.0 OR BSD-2-Clause OR MIT) AND
     (Apache-2.0 OR BSL-1.0) AND
     (Apache-2.0 OR MIT) AND
     (Apache-2.0 OR MIT OR Zlib) AND
@@ -170,47 +161,12 @@ License:        %{shrink:
 URL:            https://github.com/astral-sh/ruff
 Source:         %{url}/archive/%{version}/ruff-%{version}.tar.gz
 
-# Currently, ruff must use a fork of lsp-types
-# (https://github.com/gluon-lang/lsp-types), as explained in:
-#   Add README disclaimer
-#   https://github.com/gluon-lang/lsp-types/commit/ddc7dc8
-# which says,
-#   This fork is a temporary solution for supporting Jupyter Notebooks for our
-#   new LSP server, `ruff server`.
-#   This fork is not actively maintained by Astral.
-# We asked for a status update in:
-#   Path to not forking lsp-types?
-#   https://github.com/astral-sh/ruff/issues/20449
-# Upstream has not ruled out “unforking,” but indicates they are in no
-# particular hurry to do so. We therefore bundle the fork as prescribed in:
-#   https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/#_replacing_git_dependencies
-%global lsp_types_git https://github.com/astral-sh/lsp-types
-%global lsp_types_rev 3512a9f33eadc5402cfab1b8f7340824c8ca1439
-%global lsp_types_baseversion 0.95.1
-%global lsp_types_snapdate 20240429
-Source200:      %{lsp_types_git}/archive/%{lsp_types_rev}/lsp-types-%{lsp_types_rev}.tar.gz
-
-# For now, ruff still needs to use a git snapshot of salsa because it
-# frequently needs bug fixes faster than the salsa release cycle delivers them;
-# see https://github.com/astral-sh/ruff/pull/17566#issuecomment-2823146473. We
-# therefore bundle the fork as prescribed in
-#   https://docs.fedoraproject.org/en-US/packaging-guidelines/Rust/#_replacing_git_dependencies
-#
-# Check https://github.com/salsa-rs/salsa/blob/%%{salsa_rev}/Cargo.toml to
-# observe the version and https://github.com/salsa-rs/commit/%%{salsa_rev} to
-# observe the date.
-%global salsa_git https://github.com/salsa-rs/salsa
-%global salsa_rev 53421c2fff87426fa0bb51cab06632b87646de13
-%global salsa_baseversion 0.26.0
-%global salsa_snapdate 20260207
-Source300:      %{salsa_git}/archive/%{salsa_rev}/salsa-%{salsa_rev}.tar.gz
-
 # Get this from ruff/crates/ty_vendored/vendor/typeshed/source_commit.txt.
-%global typeshed_rev 1b3cec156330a93f6bb22b6636bca38c27f8f721
+%global typeshed_rev 6fba3ae73db5a9807780514b463126f1ee8ff216
 # The typeshed project as a whole has never been versioned.
 %global typeshed_baseversion 0
 # Inspect https://github.com/python/typeshed/commit/%%{typeshed_rev}.
-%global typeshed_snapdate 20260214
+%global typeshed_snapdate 20260814
 
 # Downstream patch: always find the system-wide ruff executable
 #
@@ -219,10 +175,11 @@ Source300:      %{salsa_git}/archive/%{salsa_rev}/salsa-%{salsa_rev}.tar.gz
 # “Should uv.find_uv_bin() be able to find /usr/bin/uv?”
 #  https://github.com/astral-sh/uv/issues/4451
 Patch:          0001-Downstream-patch-always-find-the-system-wide-ruff-ex.patch
-# * drop unavailable compile-time diagnostics feature for UUIDs (non-upstreamable)
-Patch:          0002-drop-unavailable-features-from-uuid-dependency.patch
 # * ignore tests in vendored annotate-snippets that hang indefinitely:
-Patch:          0003-ignore-vendored-annotate-snippets-tests-that-hang-in.patch
+Patch:          0002-ignore-vendored-annotate-snippets-tests-that-hang-in.patch
+
+BuildSystem:    pyproject
+BuildOption(install): --assert-license ruff
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch:    %{ix86}
@@ -233,19 +190,6 @@ ExcludeArch:    %{ix86}
 BuildRequires:  cargo-rpm-macros >= 24
 BuildRequires:  rust2rpm-helper
 BuildRequires:  tomcli
-BuildRequires:  python3-devel
-
-# This is a fork of lsp-types; see the notes about Source200.
-%global lsp_types_snapinfo %{lsp_types_snapdate}git%{sub %{lsp_types_rev} 1 7}
-%global lsp_types_version %{lsp_types_baseversion}^%{lsp_types_snapinfo}
-Provides:       bundled(crate(lsp-types)) = %{lsp_types_version}
-
-# This is a snapshot of salsa; see the notes about Source300.
-%global salsa_snapinfo %{salsa_snapdate}git%{sub %{salsa_rev} 1 7}
-%global salsa_version %{salsa_baseversion}^%{salsa_snapinfo}
-Provides:       bundled(crate(salsa)) = %{salsa_version}
-Provides:       bundled(crate(salsa-macros)) = %{salsa_version}
-Provides:       bundled(crate(salsa-macro-rules)) = %{salsa_version}
 
 # This is not versioned or released as a whole, and it is normal for
 # type-checkers to vendor it. See
@@ -276,10 +220,6 @@ Provides:       bundled(typeshed) = %{typeshed_version}
 #   [`annotate-snippets` crate]: https://github.com/rust-lang/annotate-snippets-rs
 Provides:       bundled(crate(annotate-snippets)) = 0.11.5
 
-# forked from lsp-types upstream: https://github.com/gluon-lang/lsp-types
-# with changes applied:           https://github.com/astral-sh/lsp-types/tree/notebook-support
-Provides:       bundled(crate(lsp-types)) = 0.95.1
-
 %global common_description %{expand:
 An extremely fast Python linter and code formatter, written in Rust.
 
@@ -306,78 +246,8 @@ This package provides an importable Python module for ruff.
 
 
 %prep
-%autosetup -N
-%autopatch -p1 -M99
-
+%autosetup -p1
 %cargo_prep
-
-# Usage: git2path SELECTOR PATH
-# Replace a git dependency with a path dependency in Cargo.toml
-git2path() {
-  tomcli set Cargo.toml del "${1}.git"
-  tomcli set Cargo.toml del "${1}.rev"
-  tomcli set Cargo.toml str "${1}.path" "${2}"
-}
-
-# See comments above Source200:
-%setup -q -T -D -b 200 -n ruff-%{version}
-# Adding the crate to the workspace (in this case implicitly, by moving it
-# under crates/) means %%cargo_generate_buildrequires can handle it correctly.
-mv ../lsp-types-%{lsp_types_rev} crates/lsp-types
-git2path workspace.dependencies.lsp-types crates/lsp-types
-pushd crates/lsp-types
-%autopatch -p1 -m200 -M299
-popd
-install -t LICENSE.bundled/lsp-types -D -p -m 0644 crates/lsp-types/LICENSE
-
-# See comments above Source300:
-%setup -q -T -D -b 300 -n ruff-%{version}
-mv ../salsa-%{salsa_rev} crates/salsa
-mv crates/salsa/components/salsa-macro-rules crates/salsa-macro-rules
-mv crates/salsa/components/salsa-macros crates/salsa-macros
-git2path workspace.dependencies.salsa crates/salsa
-pushd crates/salsa
-%autopatch -p1 -m300 -M399
-popd
-# These were taken from salsa’s workspace, but we have added the salsa crates
-# to ruff’s workspace, and we cannot have more than one workspace.
-tomcli set crates/salsa/Cargo.toml del 'workspace.package.authors'
-tomcli set crates/salsa/Cargo.toml list package.authors 'Salsa developers'
-for field in edition license repository rust-version
-do
-  value="$(tomcli get crates/salsa/Cargo.toml "workspace.package.${field}")"
-  tomcli set crates/salsa/Cargo.toml del "workspace.package.${field}"
-  tomcli set crates/salsa/Cargo.toml str "package.${field}" "${value}"
-done
-# Now remove salsa’s workspace entirely.
-tomcli set crates/salsa/Cargo.toml del workspace
-# Fix up paths to ancillary salsa crates since we have moved them into the
-# workspace.
-tomcli set crates/salsa/Cargo.toml str dependencies.salsa-macro-rules.path \
-    '../salsa-macro-rules'
-tomcli set crates/salsa/Cargo.toml str dependencies.salsa-macros.path \
-    '../salsa-macros'
-tomcli set crates/salsa/Cargo.toml str \
-    "target.'cfg(any())'.dependencies.salsa-macros.path" \
-    '../salsa-macros'
-# Remove examples, and omit dev-dependencies that are only for examples:
-rm -rv crates/salsa/examples/
-tomcli set crates/salsa/Cargo.toml del example
-for crate in crossbeam-channel eyre notify-debouncer-mini ordered-float
-do
-  tomcli set crates/salsa/Cargo.toml del "dev-dependencies.${crate}"
-done
-# Remove benchmark-only dev-dependencies
-for crate in annotate-snippets codspeed-criterion-compat
-do
-  tomcli set crates/salsa/Cargo.toml del "dev-dependencies.${crate}"
-done
-# Remove the shuttle feature since rust-shuttle is not packaged
-tomcli set crates/salsa/Cargo.toml del features.shuttle
-tomcli set crates/salsa/Cargo.toml del dependencies.shuttle
-# Remove bundled, pre-compiled mermaid JavaScript to prove it is not used.
-rm crates/salsa/book/mermaid.min.js
-install -t LICENSE.bundled/salsa -D -p -m 0644 crates/salsa/LICENSE-*
 
 # Loosen some version bounds. We retain this comment and the following example
 # even when there are currently no dependencies that need to be adjusted.
@@ -388,10 +258,20 @@ install -t LICENSE.bundled/salsa -D -p -m 0644 crates/salsa/LICENSE-*
 # #   https://bugzilla.redhat.com/show_bug.cgi?id=1234567
 # tomcli set Cargo.toml str workspace.dependencies.foocrate.version 0.1.2
 
+# tikv-jemallocator
+#   wanted: 0.6.0
+#   currently packaged: 0.7.0
+# We haven’t suggested this upstream because we know they use renovate with
+# dependency cooldowns, and we expect they will soon update without prompting.
+tomcli set Cargo.toml str workspace.dependencies.tikv-jemallocator.version \
+    '>=0.6.0, <0.8.0'
+
 # Collect license files of vendored dependencies in the main source archive
-install -t LICENSE.bundled/typeshed -D -p -m 0644 \
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/typeshed \
     crates/ty_vendored/vendor/typeshed/LICENSE
-install -t LICENSE.bundled/annotate_snippets -D -p -m 0644 \
+install -D --preserve-timestamps --mode=0644 \
+    --target=LICENSE.bundled/annotate_snippets \
     crates/ruff_annotate_snippets/LICENSE-*
 
 # Patch out foreign (e.g. Windows-only) dependencies. Follow symbolic links so
@@ -401,12 +281,12 @@ find -L . -type f -name Cargo.toml -print \
 
 # Drop unused subproject crates.
 # binary crate for running micro-benchmarks.
-rm -rv crates/ruff_benchmark
+rm --recursive --verbose crates/ruff_benchmark
 # binary crate containing utilities used in the development of Ruff itself
-rm -rv crates/ruff_dev
+rm --recursive --verbose crates/ruff_dev
 # library crate for exposing Ruff as a WebAssembly module. Powers the
 # [Ruff Playground](https://play.ruff.rs/).
-rm -rv crates/ruff_wasm crates/ty_wasm
+rm --recursive --verbose crates/ruff_wasm crates/ty_wasm
 
 # Verify we have the correct snapshot hash for typeshed
 typeshed_rev_file='crates/ty_vendored/vendor/typeshed/source_commit.txt'
@@ -423,22 +303,8 @@ EOF
   exit 1
 fi
 
-# Verify we have the correct base version for salsa
-salsa_version_in_source="$(tomcli get crates/salsa/Cargo.toml package.version)"
-if [[ '%{salsa_baseversion}' != "${salsa_version_in_source}" ]]
-then
-  cat 1>&2 <<EOF
-Mismatch between %%{salsa_baseversion}:
-  %{salsa_baseversion}
-and version in crates/salsa/Cargo.toml:
-  ${salsa_version_in_source}
-Please update %%{salsa_baseversion} in the spec file!
-EOF
-  exit 1
-fi
 
-
-%generate_buildrequires
+%generate_buildrequires -p
 # For unclear reasons, maturin checks for all crate dependencies when it is
 # invoked as part of %%pyproject_buildrequires – including those corresponding
 # to optional features.
@@ -453,17 +319,12 @@ fi
 %pyproject_buildrequires
 
 
-%build
-%pyproject_wheel
-
+%build -a
 %{cargo_license_summary}
 %{cargo_license} > LICENSE.dependencies
 
 
-%install
-%pyproject_install
-%pyproject_save_files ruff
-
+%install -a
 if [ '%{python3_sitearch}' != '%{python3_sitelib}' ]
 then
   # Maturin is really designed to build compiled Python extensions, but (when
@@ -471,9 +332,10 @@ then
   # library is actually pure-Python, and the python3-ruff subpackage can be
   # noarch. We can’t tell maturin to install to the appropriate site-packages
   # directory, but we can fix the installation path manually.
-  install -d %{buildroot}%{python3_sitelib}
+  install --directory %{buildroot}%{python3_sitelib}
   mv %{buildroot}%{python3_sitearch}/ruff* %{buildroot}%{python3_sitelib}
-  sed -r -i 's@%{python3_sitearch}@%{python3_sitelib}@' %{pyproject_files}
+  sed --regexp-extended --in-place \
+      's@%{python3_sitearch}@%{python3_sitelib}@' %{pyproject_files}
 fi
 
 # generate and install shell completions
@@ -486,31 +348,13 @@ install -Dpm 0644 ruff.fish -t %{buildroot}/%{fish_completions_dir}
 install -Dpm 0644 _ruff -t %{buildroot}/%{zsh_completions_dir}
 
 
-%check
+%check -a
 %if %{with check}
 # Ignore false positive snapshot test failures.
 #export INSTA_UPDATE=always
 
 # We may need this if rustc diagnostics change from what upstream expects.
 #export TRYBUILD=overwrite
-
-# In the bundled salsa, this fails because the source paths are different than
-# expected, i.e. crates/salsa/tests/backtrace.rs instead of tests/backtrace.rs.
-# We skip the test because it is unnecessary and potentially brittle, but the
-# error message notes that exporting UPDATE_EXPECT=1 would also be a way to
-# ignore this kind of discrepancy.
-skip="${skip-} --skip backtrace_works"
-# These also fail due to similar path issues.
-#   color/ann_{eof,insertion,multiline,multiline2,removed_nl}.toml
-#   color/ensure-emoji-highlight-width.toml
-#   color/fold_{ann_multiline,bad_origin_line,leading,trailing}.toml
-#   color/issue_9.toml
-#   color/multiple_annotations.toml
-#   color/simple.toml
-#   color/strip_line{,_char,_non_ws}.toml
-# We could export SNAPSHOTS=overwrite, but that would ignore many other
-# possible discrepancies. Skipping the affected tests is better.
-skip="${skip-} --skip color/"
 
 # Fails cryptically: requires network, perhaps?
 #   error: no matching package named `boxcar` found
@@ -538,12 +382,6 @@ skip="${skip-} --skip python_environment::ty_environment_is_system_not_virtual"
 # This panics consistently on s390x only; not reported upstream since it
 # couldn’t be reproduced in a git checkout under qemu-user-static emulation.
 skip="${skip-} --skip mdtest__generics_specialize_constrained"
-
-%if %{defined fc42}
-# Segfaults on F42 only. LLVM bug? Not worth reporting upstream since it
-# doesn’t appear elsewhere.
-skip="${skip-} --skip cycle_nested_deep_panic"
-%endif
 %endif
 
 # Avoid flaky “text file busy” errors in insta tests
@@ -572,14 +410,92 @@ export RUST_TEST_THREADS=1
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.15.2-5
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 0.16.4-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.15.2-4
-- build: mass rebuild auto-bumpable components
+* Fri Aug 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.16.4-1
+- Update to 0.16.4 (close RHBZ#2520735)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 0.15.2-3
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Thu Aug 13 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.16.3-1
+- Update to 0.16.3 (close RHBZ#2501369)
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jul 10 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.21-1
+- Update to 0.15.21 (close RHBZ#2498772)
+
+* Fri Jun 26 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.20-1
+- Update to 0.15.20 (close RHBZ#2493018)
+
+* Wed Jun 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.19-1
+- Update to 0.15.19 (close RHBZ#2492070)
+
+* Sun Jun 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.18-1
+- Update to 0.15.18 (close RHBZ#2488001)
+
+* Sun Jun 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.17-1
+- Update to 0.15.17
+
+* Sun Jun 07 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.16-2
+- Allow get-size2 0.10
+
+* Fri Jun 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.16-1
+- Update to 0.15.16 (close RHBZ#2484855)
+
+* Thu Jun 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.15-2
+- Allow tikv-jemallocator 0.7
+
+* Thu Jun 04 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.15-1
+- Update to 0.15.15 (close RHBZ#2482696)
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 0.15.14-3
+- Rebuilt for Python 3.15
+
+* Sat May 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.14-2
+- Use various long options
+
+* Fri May 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.14-1
+- Update to 0.15.14 (close RHBZ#2480538)
+
+* Fri May 15 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.13-2
+- Allow get-size2 0.9.0
+
+* Fri May 15 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.13-1
+- Update to 0.15.13 (close RHBZ#2477454)
+
+* Wed May 13 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.12-5
+- Use the pyproject declarative buildsystem
+
+* Wed May 13 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.12-4
+- Use pyproject long options
+
+* Wed May 13 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.12-3
+- Assert that a license file is in .dist-info for python3-ruff
+
+* Wed May 06 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.12-1
+- Update to 0.15.12 (close RHBZ#2461621)
+
+* Tue Apr 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.11-1
+- Update to version 0.15.11; Fixes RHBZ#2459087
+
+* Sat Apr 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.10-1
+- Update to 0.15.10 (close RHBZ#2456938)
+
+* Sun Apr 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.9-1
+- Update to 0.15.9 (close RHBZ#2454711)
+
+* Thu Mar 26 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.8-1
+- Update to 0.15.8 (close RHBZ#2451955)
+
+* Sat Mar 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.7-1
+- Update to 0.15.7 (close RHBZ#2447206)
+
+* Sun Mar 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.5-1
+- Update to 0.15.5 (close RHBZ#2445125)
+
+* Fri Feb 27 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.4-1
+- Update to 0.15.4 (close RHBZ#2443064)
 
 * Sat Feb 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.15.2-2
 - Export RUST_TEST_THREADS=1 to avoid flaky “text file busy” errors

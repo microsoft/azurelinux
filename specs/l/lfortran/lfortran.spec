@@ -3,7 +3,7 @@
 
 Version:        0.56.0
 Name:           lfortran
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        A modern Fortran compiler
 
 # Main code is BSD-3-Clause

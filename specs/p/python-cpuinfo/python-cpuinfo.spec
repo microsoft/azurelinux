@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        9.0.0
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        %{sum}
 
 License:        MIT

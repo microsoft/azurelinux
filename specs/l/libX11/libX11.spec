@@ -7,8 +7,8 @@
 
 Summary: Core X11 protocol client library
 Name: libX11
-Version: 1.8.12
-Release: 3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Version: 1.8.13
+Release: 1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License: MIT AND X11
 URL: http://www.x.org
 
@@ -126,6 +126,9 @@ make %{?_smp_mflags} check
 %{_mandir}/man5/*.5*
 
 %changelog
+* Tue Mar 24 2026 Olivier Fourdan <ofourdan@redhat.com> - 1.8.13-1
+- libX11 1.8.13 (#2437578)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.12-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

@@ -51,11 +51,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.12
+%global general_version %{pybasever}.15
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -115,31 +115,30 @@ License: Python-2.0.1
 # This needs to be manually updated when we update Python.
 # Explore the sources tarball (you need the version before %%prep is executed):
 #  $ tar -tf Python-%%{upstream_version}.tar.xz | grep whl
-%global pip_version 25.3
+%global pip_version 26.2.1
 %global setuptools_version 79.0.1
 # All of those also include a list of indirect bundled libs:
 # pip
 #  $ %%{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt)
 %global pip_bundled_provides %{expand:
-Provides: bundled(python3dist(cachecontrol)) = 0.14.3
-Provides: bundled(python3dist(certifi)) = 2025.10.5
-Provides: bundled(python3dist(dependency-groups)) = 1.3.1
-Provides: bundled(python3dist(distlib)) = 0.4
+Provides: bundled(python3dist(cachecontrol)) = 0.14.4
+Provides: bundled(python3dist(certifi)) = 2026.6.17
+Provides: bundled(python3dist(distlib)) = 0.4.2
 Provides: bundled(python3dist(distro)) = 1.9
-Provides: bundled(python3dist(idna)) = 3.10
+Provides: bundled(python3dist(idna)) = 3.18
 Provides: bundled(python3dist(msgpack)) = 1.1.2
-Provides: bundled(python3dist(packaging)) = 25
-Provides: bundled(python3dist(platformdirs)) = 4.5
-Provides: bundled(python3dist(pygments)) = 2.19.2
+Provides: bundled(python3dist(packaging)) = 26.2
+Provides: bundled(python3dist(platformdirs)) = 4.10
+Provides: bundled(python3dist(pygments)) = 2.20
 Provides: bundled(python3dist(pyproject-hooks)) = 1.2
-Provides: bundled(python3dist(requests)) = 2.32.5
+Provides: bundled(python3dist(requests)) = 2.34.2
 Provides: bundled(python3dist(resolvelib)) = 1.2.1
 Provides: bundled(python3dist(rich)) = 14.2
 Provides: bundled(python3dist(setuptools)) = 70.3
-Provides: bundled(python3dist(tomli)) = 2.3
+Provides: bundled(python3dist(tomli)) = 2.4.1
 Provides: bundled(python3dist(tomli-w)) = 1.2
 Provides: bundled(python3dist(truststore)) = 0.10.4
-Provides: bundled(python3dist(urllib3)) = 1.26.20
+Provides: bundled(python3dist(urllib3)) = 2.7
 }
 # setuptools
 # vendor.txt not in .whl
@@ -274,7 +273,6 @@ BuildRequires: libuuid-devel
 BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: python-rpm-macros
 BuildRequires: readline-devel
@@ -286,6 +284,10 @@ BuildRequires: tk-devel < 1:9
 BuildRequires: xz-devel
 BuildRequires: zlib-devel
 BuildRequires: /usr/bin/dtrace
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{undefined rhel}
 BuildRequires: libb2-devel
@@ -375,23 +377,6 @@ Source9999: python3.13.azl.macros
 # pypa/distutils integration: https://github.com/pypa/distutils/pull/70
 Patch251: 00251-change-user-install-location.patch
 
-# 00464 # 292acffec7a379cb6d1f3c47b9e5a2f170bbadb6
-# Enable PAC and BTI protections for aarch64
-#
-# Apply protection against ROP/JOP attacks for aarch64 on asm_trampoline.S
-#
-# The BTI flag must be applied in the assembler sources for this class
-# of attacks to be mitigated on newer aarch64 processors.
-#
-# Upstream PR: https://github.com/python/cpython/pull/130864/files
-#
-# The upstream patch is incomplete but only for the case where
-# frame pointers are not used on 3.13+.
-#
-# Since on Fedora we always compile with frame pointers the BTI/PAC
-# hardware protections can be enabled without losing Perf unwinding.
-Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
-
 # 00466 # e10760fb955ee33d2917f8a57bb4e24d71e5341c
 # Downstream only: Skip tests not working with older expat version
 #
@@ -400,12 +385,6 @@ Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
 # in the conditionalized skip to a release available in CentOS Stream 10,
 # which is tested as working.
 Patch466: 00466-downstream-only-skip-tests-not-working-with-older-expat-version.patch
-
-# 00474 # 837ddca0372fa87ff9cee47142200caa21e77def
-# CVE-2025-15366
-#
-# Reject control characters in IMAP commands
-Patch474: 00474-cve-2025-15366.patch
 
 # 00475 # d44fac01037662db286449a78c8fb819788f764c
 # CVE-2025-15367
@@ -552,7 +531,7 @@ Summary:        Python runtime libraries
 # Combined manually from https://docs.python.org/3.13/license.html
 # Hash of Doc/license.rst which is compared in %%prep, generated with:
 # $ sha256sum Doc/license.rst | cut -f1 -d" "
-%global license_file_hash 62f2c9c2c75d511170eb464ad5f83b78cc1f37eb2eb49c2846c9aa6c4557ee99
+%global license_file_hash 952ac05720d7f1dcb63589b35eb0931b1442eb250230a4ad31198eddf0ad6abc
 # Licenses of incorporated software:
 # Mersenne Twister in _random C extension contains code under BSD-3-Clause
 # socket.getaddrinfo() and socket.getnameinfo() are BSD-3-Clause
@@ -575,10 +554,11 @@ Summary:        Python runtime libraries
 # mimalloc is MIT
 # parts of asyncio from uvloop are MIT
 # Python/qsbr.c is adapted from code under BSD-2-Clause
+# An extract of the `Unicode Character Database` converted to an internal format is Unicode-3.0
 # Bundled libb2 is not declared in the upstream document, but it's:
 # CC0-1.0, covered by grandfathering exception
 # We don't query upstream for changes, as 3.13 is the last Python version containing it.
-%global libs_license Python-2.0.1 AND CC0-1.0 AND MIT AND BSD-3-Clause AND MIT-CMU AND HPND-SMC AND BSD-2-Clause AND dtoa
+%global libs_license Python-2.0.1 AND CC0-1.0 AND MIT AND BSD-3-Clause AND MIT-CMU AND HPND-SMC AND BSD-2-Clause AND dtoa AND Unicode-3.0
 %if %{with rpmwheels}
 Requires: %{python_wheel_pkg_prefix}-pip-wheel >= 23.1.2
 License: %{libs_license}
@@ -626,8 +606,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -806,7 +790,9 @@ License: %{libs_license} AND Apache-2.0 AND ISC AND LGPL-2.1-only AND MPL-2.0 AN
 Provides: bundled(libb2) = 0.98.1
 Provides: bundled(mimalloc) = 2.12
 Requires: tzdata
-Requires: expat >= %{expat_version}
+%if v"%{expat_version}" < v"2.7.4"
+Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 %description -n python%{pybasever}-freethreading
 The provisional Free Threading (PEP 703) build of Python.
@@ -1380,6 +1366,7 @@ CheckPython() {
   # test.test_concurrent_futures.test_deadlock tends to time out on s390x and ppc64le in
   # freethreading{,-debug} build, skipping it to shorten the build time
   # see: https://github.com/python/cpython/issues/121719
+  # test_subparser_inherits_reparse_deferral: https://github.com/python/cpython/issues/155485
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest %{_smp_mflags} \
     %ifarch riscv64
@@ -1395,6 +1382,9 @@ CheckPython() {
     %ifarch s390x ppc64le
     -x test_signal \
     -i test_deadlock \
+    %endif
+    %if 0%{?rhel} == 9
+    -i test_subparser_inherits_reparse_deferral \
     %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
@@ -1827,6 +1817,21 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Mon Aug 10 2026 Karolina Surma <ksurma@redhat.com> - 3.13.15-1
+- Update to Python 3.13.15
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.13.14-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 11 2026 Karolina Surma <ksurma@redhat.com> - 3.13.14-1
+- Update to Python 3.13.14
+
+* Wed Apr 08 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.13.13-1
+- Update to 3.13.13
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.13.12-2
+- Security fix for CVE-2026-4519 (rhbz#2449729)
+
 * Wed Feb 04 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.13.12-1
 - Update to 3.13.12
 

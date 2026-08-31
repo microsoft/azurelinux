@@ -1,6 +1,6 @@
-diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/Blender/BlenderTessellator.h assimp-6.0.4-new/code/AssetLib/Blender/BlenderTessellator.h
---- assimp-6.0.4/code/AssetLib/Blender/BlenderTessellator.h	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/code/AssetLib/Blender/BlenderTessellator.h	2026-01-27 13:39:44.575779653 +0100
+diff -rupN --no-dereference assimp-6.0.5/code/AssetLib/Blender/BlenderTessellator.h assimp-6.0.5-new/code/AssetLib/Blender/BlenderTessellator.h
+--- assimp-6.0.5/code/AssetLib/Blender/BlenderTessellator.h	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/code/AssetLib/Blender/BlenderTessellator.h	2026-05-01 23:05:56.394994265 +0200
 @@ -143,7 +143,7 @@ namespace Assimp
  
  #if ASSIMP_BLEND_WITH_POLY_2_TRI
@@ -10,9 +10,9 @@ diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/Blender/BlenderTessellato
  
  namespace Assimp
  {
-diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCGeometry.cpp assimp-6.0.4-new/code/AssetLib/IFC/IFCGeometry.cpp
---- assimp-6.0.4/code/AssetLib/IFC/IFCGeometry.cpp	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/code/AssetLib/IFC/IFCGeometry.cpp	2026-01-27 13:39:44.576069780 +0100
+diff -rupN --no-dereference assimp-6.0.5/code/AssetLib/IFC/IFCGeometry.cpp assimp-6.0.5-new/code/AssetLib/IFC/IFCGeometry.cpp
+--- assimp-6.0.5/code/AssetLib/IFC/IFCGeometry.cpp	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/code/AssetLib/IFC/IFCGeometry.cpp	2026-05-01 23:05:56.395488723 +0200
 @@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  #include "IFCUtil.h"
  #include "Common/PolyTools.h"
@@ -22,9 +22,9 @@ diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCGeometry.cpp assim
  #include "contrib/clipper/clipper.hpp"
  
  #include <iterator>
-diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCOpenings.cpp assimp-6.0.4-new/code/AssetLib/IFC/IFCOpenings.cpp
---- assimp-6.0.4/code/AssetLib/IFC/IFCOpenings.cpp	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/code/AssetLib/IFC/IFCOpenings.cpp	2026-01-27 13:39:44.576388357 +0100
+diff -rupN --no-dereference assimp-6.0.5/code/AssetLib/IFC/IFCOpenings.cpp assimp-6.0.5-new/code/AssetLib/IFC/IFCOpenings.cpp
+--- assimp-6.0.5/code/AssetLib/IFC/IFCOpenings.cpp	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/code/AssetLib/IFC/IFCOpenings.cpp	2026-05-01 23:05:56.395944757 +0200
 @@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  #include "IFCUtil.h"
  #include "Common/PolyTools.h"
@@ -34,9 +34,9 @@ diff -rupN --no-dereference assimp-6.0.4/code/AssetLib/IFC/IFCOpenings.cpp assim
  #include "contrib/clipper/clipper.hpp"
  
  #include <deque>
-diff -rupN --no-dereference assimp-6.0.4/code/CMakeLists.txt assimp-6.0.4-new/code/CMakeLists.txt
---- assimp-6.0.4/code/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/code/CMakeLists.txt	2026-01-27 13:39:44.576700550 +0100
+diff -rupN --no-dereference assimp-6.0.5/code/CMakeLists.txt assimp-6.0.5-new/code/CMakeLists.txt
+--- assimp-6.0.5/code/CMakeLists.txt	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/code/CMakeLists.txt	2026-05-01 23:05:56.396488774 +0200
 @@ -1117,13 +1117,7 @@ IF(ASSIMP_HUNTER_ENABLED)
    hunter_add_package(pugixml)
    find_package(pugixml CONFIG REQUIRED)
@@ -162,9 +162,9 @@ diff -rupN --no-dereference assimp-6.0.4/code/CMakeLists.txt assimp-6.0.4-new/co
  ENDIF()
  
  if(ASSIMP_ANDROID_JNIIOSYSTEM)
-diff -rupN --no-dereference assimp-6.0.4/code/PostProcessing/TriangulateProcess.cpp assimp-6.0.4-new/code/PostProcessing/TriangulateProcess.cpp
---- assimp-6.0.4/code/PostProcessing/TriangulateProcess.cpp	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/code/PostProcessing/TriangulateProcess.cpp	2026-01-27 13:39:44.577050877 +0100
+diff -rupN --no-dereference assimp-6.0.5/code/PostProcessing/TriangulateProcess.cpp assimp-6.0.5-new/code/PostProcessing/TriangulateProcess.cpp
+--- assimp-6.0.5/code/PostProcessing/TriangulateProcess.cpp	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/code/PostProcessing/TriangulateProcess.cpp	2026-05-01 23:05:56.396804235 +0200
 @@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  #include "PostProcessing/TriangulateProcess.h"
  #include "PostProcessing/ProcessHelper.h"
@@ -174,9 +174,9 @@ diff -rupN --no-dereference assimp-6.0.4/code/PostProcessing/TriangulateProcess.
  
  #include <memory>
  #include <cstdint>
-diff -rupN --no-dereference assimp-6.0.4/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp assimp-6.0.4-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp
---- assimp-6.0.4/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-01-27 13:39:44.577289599 +0100
+diff -rupN --no-dereference assimp-6.0.5/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp assimp-6.0.5-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp
+--- assimp-6.0.5/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/samples/SimpleTexturedOpenGL/SimpleTexturedOpenGL/src/model_loading.cpp	2026-05-01 23:05:56.397018289 +0200
 @@ -24,7 +24,7 @@
  #endif // _MSC_VER
  
@@ -186,9 +186,9 @@ diff -rupN --no-dereference assimp-6.0.4/samples/SimpleTexturedOpenGL/SimpleText
  
  #ifdef _MSC_VER
  #pragma warning(default: 4100) // Enable warning 'unreferenced formal parameter'
-diff -rupN --no-dereference assimp-6.0.4/test/CMakeLists.txt assimp-6.0.4-new/test/CMakeLists.txt
---- assimp-6.0.4/test/CMakeLists.txt	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/test/CMakeLists.txt	2026-01-27 13:39:44.577547330 +0100
+diff -rupN --no-dereference assimp-6.0.5/test/CMakeLists.txt assimp-6.0.5-new/test/CMakeLists.txt
+--- assimp-6.0.5/test/CMakeLists.txt	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/test/CMakeLists.txt	2026-05-01 23:05:56.397240462 +0200
 @@ -43,14 +43,6 @@ INCLUDE_DIRECTORIES(
      ${Assimp_SOURCE_DIR}/code
  )
@@ -234,9 +234,9 @@ diff -rupN --no-dereference assimp-6.0.4/test/CMakeLists.txt assimp-6.0.4-new/te
  
  IF (ASSIMP_BUILD_DRACO)
    ADD_DEFINITIONS( -DASSIMP_ENABLE_DRACO )
-diff -rupN --no-dereference assimp-6.0.4/test/unit/utglTF2ImportExport.cpp assimp-6.0.4-new/test/unit/utglTF2ImportExport.cpp
---- assimp-6.0.4/test/unit/utglTF2ImportExport.cpp	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/test/unit/utglTF2ImportExport.cpp	2026-01-27 13:39:44.577770978 +0100
+diff -rupN --no-dereference assimp-6.0.5/test/unit/utglTF2ImportExport.cpp assimp-6.0.5-new/test/unit/utglTF2ImportExport.cpp
+--- assimp-6.0.5/test/unit/utglTF2ImportExport.cpp	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/test/unit/utglTF2ImportExport.cpp	2026-05-01 23:05:56.397488826 +0200
 @@ -987,7 +987,7 @@ namespace {
              rapidjson::Document schemaDoc;
              schemaDoc.Parse(R"==({"properties":{"scene" : { "type" : "integer" }}, "required": [ "scene" ]})==");

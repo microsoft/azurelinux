@@ -3,7 +3,7 @@
 
 Name:      libxcvt
 Version:   0.1.2
-Release: 13%{?dist}
+Release:   10%{?dist}
 Summary:   VESA CVT standard timing modelines generator
 
 URL:       https://gitlab.freedesktop.org/xorg/lib/libxcvt/

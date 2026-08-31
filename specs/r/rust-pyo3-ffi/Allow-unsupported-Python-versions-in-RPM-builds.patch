@@ -1,4 +1,4 @@
-From af6273b4fbc1c9439a9b1e69761838479ba4bd71 Mon Sep 17 00:00:00 2001
+From 4d514c8ad63974137fb401245b4875b7ce85593f Mon Sep 17 00:00:00 2001
 From: Karolina Surma <ksurma@redhat.com>
 Date: Thu, 18 Apr 2024 09:48:04 +0200
 Subject: [PATCH] Allow unsupported Python versions in RPM builds
@@ -13,10 +13,10 @@ hence we explicitly allow to skip version check when building RPMs.
  1 file changed, 5 insertions(+)
 
 diff --git a/build.rs b/build.rs
-index 286767d..ef666d7 100644
+index c978ad0..289f20c 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -36,6 +36,11 @@ fn ensure_python_version(interpreter_config: &InterpreterConfig) -> Result<()> {
+@@ -55,6 +55,11 @@ fn ensure_python_version(interpreter_config: &InterpreterConfig) -> Result<()> {
          return Ok(());
      }
  
@@ -25,9 +25,9 @@ index 286767d..ef666d7 100644
 +        return Ok(());
 +    }
 +
-     match interpreter_config.implementation {
+     match interpreter_config.target_abi().implementation() {
          PythonImplementation::CPython => {
              let versions = SUPPORTED_VERSIONS_CPYTHON;
 -- 
-2.44.0
+2.54.0
 

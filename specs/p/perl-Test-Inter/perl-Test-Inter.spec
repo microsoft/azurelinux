@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-Test-Inter
-Version:        1.12
-Release: 6%{?dist}
+Version:        1.13
+Release:        1%{?dist}
 Summary:        Framework for more readable interactive test scripts
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Inter
@@ -88,6 +88,9 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue Jul 14 2026 Michal Josef Špaček <mspacek@redhat.com> - 1.13-1
+- 1.13 bump
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.12-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,4 +1,4 @@
-From 36c1e6ff0d889cef5c57af64d4f6fc08b455bada Mon Sep 17 00:00:00 2001
+From 89fcff4174c1fb107d8f6b2512016182c932d319 Mon Sep 17 00:00:00 2001
 From: Maxwell G <maxwell@gtmx.me>
 Date: Sat, 7 Jun 2025 15:42:53 -0500
 Subject: [PATCH 2/2] Initial support for Python 3.14
@@ -31,10 +31,10 @@ index 50f951c845..5edd5cc4de 100644
 -coverage == 7.6.1 ; python_version >= '3.8' and python_version <= '3.13'
 +coverage == 7.6.1 ; python_version >= '3.8' and python_version <= '3.14'
 diff --git a/test/lib/ansible_test/_internal/coverage_util.py b/test/lib/ansible_test/_internal/coverage_util.py
-index 2bec9c791e..e900ddb801 100644
+index 4c96ff7d60..f3147fbcd3 100644
 --- a/test/lib/ansible_test/_internal/coverage_util.py
 +++ b/test/lib/ansible_test/_internal/coverage_util.py
-@@ -69,7 +69,7 @@ class CoverageVersion:
+@@ -68,7 +68,7 @@ class CoverageVersion:
  
  COVERAGE_VERSIONS = (
      # IMPORTANT: Keep this in sync with the ansible-test.txt requirements file.
@@ -178,5 +178,5 @@ index 6f15bed122..799ba4b52f 100644
  
  #
 -- 
-2.50.1
+2.54.0
 

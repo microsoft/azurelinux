@@ -1,17 +1,17 @@
-From d8f778ba9f589cd7a31f81556dc061602b23a38d Mon Sep 17 00:00:00 2001
+From 2d7410d178769192411980424de1ec627de06681 Mon Sep 17 00:00:00 2001
 From: Fabio Valentini <decathorpe@gmail.com>
-Date: Thu, 11 Dec 2025 21:52:19 +0100
+Date: Thu, 11 Jun 2026 16:44:46 +0200
 Subject: [PATCH] unconditionally use pkg-config to link with system libcurl
 
 ---
- build.rs | 548 +------------------------------------------------------
- 1 file changed, 5 insertions(+), 543 deletions(-)
+ build.rs | 572 +------------------------------------------------------
+ 1 file changed, 5 insertions(+), 567 deletions(-)
 
 diff --git a/build.rs b/build.rs
-index b74c085..497789c 100644
+index 0441955..497789c 100644
 --- a/build.rs
 +++ b/build.rs
-@@ -1,570 +1,32 @@
+@@ -1,594 +1,32 @@
 -use std::env;
 -use std::fs;
 -use std::path::{Path, PathBuf};
@@ -111,7 +111,7 @@ index b74c085..497789c 100644
 -            .replace("@LIBCURL_LIBS@", "")
 -            .replace("@SUPPORT_FEATURES@", "")
 -            .replace("@SUPPORT_PROTOCOLS@", "")
--            .replace("@CURLVERSION@", "8.17.0"),
+-            .replace("@CURLVERSION@", "8.20.0"),
 -    )
 -    .unwrap();
 -
@@ -141,11 +141,14 @@ index b74c085..497789c 100644
 -        .define("HAVE_LIBZ", None)
 -        .define("HAVE_BOOL_T", None)
 -        .define("HAVE_STDBOOL_H", None)
+-        .define("HAVE_STDINT_H", None)
+-        .define("USE_RESOLV_THREADED", None)
 -        .file("curl/lib/altsvc.c")
 -        .file("curl/lib/asyn-base.c")
 -        .file("curl/lib/asyn-thrdd.c")
 -        .file("curl/lib/bufq.c")
 -        .file("curl/lib/bufref.c")
+-        .file("curl/lib/cf-dns.c")
 -        .file("curl/lib/cf-h1-proxy.c")
 -        .file("curl/lib/cf-haproxy.c")
 -        .file("curl/lib/cf-https-connect.c")
@@ -163,14 +166,19 @@ index b74c085..497789c 100644
 -        .file("curl/lib/curl_memrchr.c")
 -        .file("curl/lib/curl_range.c")
 -        .file("curl/lib/curl_sha512_256.c")
+-        .file("curl/lib/curl_share.c")
 -        .file("curl/lib/curl_threads.c")
 -        .file("curl/lib/curl_trc.c")
 -        .file("curl/lib/curlx/base64.c")
+-        .file("curl/lib/curlx/basename.c")
 -        .file("curl/lib/curlx/dynbuf.c")
 -        .file("curl/lib/curlx/fopen.c")
 -        .file("curl/lib/curlx/inet_ntop.c")
 -        .file("curl/lib/curlx/inet_pton.c")
 -        .file("curl/lib/curlx/nonblock.c")
+-        .file("curl/lib/curlx/snprintf.c")
+-        .file("curl/lib/curlx/strcopy.c")
+-        .file("curl/lib/curlx/strdup.c")
 -        .file("curl/lib/curlx/strerr.c")
 -        .file("curl/lib/curlx/strparse.c")
 -        .file("curl/lib/curlx/timediff.c")
@@ -179,6 +187,8 @@ index b74c085..497789c 100644
 -        .file("curl/lib/curlx/warnless.c")
 -        .file("curl/lib/cw-out.c")
 -        .file("curl/lib/cw-pause.c")
+-        .file("curl/lib/dict.c")
+-        .file("curl/lib/dnscache.c")
 -        .file("curl/lib/doh.c")
 -        .file("curl/lib/dynhds.c")
 -        .file("curl/lib/easy.c")
@@ -186,8 +196,10 @@ index b74c085..497789c 100644
 -        .file("curl/lib/file.c")
 -        .file("curl/lib/fileinfo.c")
 -        .file("curl/lib/formdata.c")
+-        .file("curl/lib/ftp.c")
 -        .file("curl/lib/getenv.c")
 -        .file("curl/lib/getinfo.c")
+-        .file("curl/lib/gopher.c")
 -        .file("curl/lib/hash.c")
 -        .file("curl/lib/headers.c")
 -        .file("curl/lib/hmac.c")
@@ -202,6 +214,8 @@ index b74c085..497789c 100644
 -        .file("curl/lib/http_proxy.c")
 -        .file("curl/lib/idn.c")
 -        .file("curl/lib/if2ip.c")
+-        .file("curl/lib/imap.c")
+-        .file("curl/lib/ldap.c")
 -        .file("curl/lib/llist.c")
 -        .file("curl/lib/macos.c")
 -        .file("curl/lib/md5.c")
@@ -214,24 +228,30 @@ index b74c085..497789c 100644
 -        .file("curl/lib/netrc.c")
 -        .file("curl/lib/noproxy.c")
 -        .file("curl/lib/parsedate.c")
+-        .file("curl/lib/pop3.c")
 -        .file("curl/lib/progress.c")
+-        .file("curl/lib/protocol.c")
 -        .file("curl/lib/rand.c")
--        .file("curl/lib/rename.c")
+-        .file("curl/lib/ratelimit.c")
 -        .file("curl/lib/request.c")
+-        .file("curl/lib/rtsp.c")
 -        .file("curl/lib/select.c")
 -        .file("curl/lib/sendf.c")
 -        .file("curl/lib/setopt.c")
 -        .file("curl/lib/sha256.c")
--        .file("curl/lib/share.c")
 -        .file("curl/lib/slist.c")
+-        .file("curl/lib/smb.c")
+-        .file("curl/lib/smtp.c")
 -        .file("curl/lib/socketpair.c")
 -        .file("curl/lib/socks.c")
--        .file("curl/lib/speedcheck.c")
 -        .file("curl/lib/splay.c")
 -        .file("curl/lib/strcase.c")
--        .file("curl/lib/strdup.c")
 -        .file("curl/lib/strequal.c")
 -        .file("curl/lib/strerror.c")
+-        .file("curl/lib/telnet.c")
+-        .file("curl/lib/tftp.c")
+-        .file("curl/lib/thrdpool.c")
+-        .file("curl/lib/thrdqueue.c")
 -        .file("curl/lib/transfer.c")
 -        .file("curl/lib/uint-bset.c")
 -        .file("curl/lib/uint-hash.c")
@@ -243,10 +263,10 @@ index b74c085..497789c 100644
 -        .file("curl/lib/vauth/vauth.c")
 -        .file("curl/lib/version.c")
 -        .file("curl/lib/vquic/curl_ngtcp2.c")
--        .file("curl/lib/vquic/curl_osslq.c")
 -        .file("curl/lib/vquic/curl_quiche.c")
 -        .file("curl/lib/vquic/vquic-tls.c")
 -        .file("curl/lib/vquic/vquic.c")
+-        .file("curl/lib/vssh/vssh.c")
 -        .file("curl/lib/vtls/hostcheck.c")
 -        .file("curl/lib/vtls/keylog.c")
 -        .file("curl/lib/vtls/vtls.c")
@@ -395,7 +415,7 @@ index b74c085..497789c 100644
 -            .define("HAVE_SOCKETPAIR", None)
 -            .define("HAVE_STRUCT_TIMEVAL", None)
 -            .define("HAVE_SYS_UN_H", None)
--            .define("USE_THREADS_POSIX", None)
+-            .define("HAVE_THREADS_POSIX", None)
 -            .define("USE_UNIX_SOCKETS", None)
 -            .define("RECV_TYPE_ARG2", "void*")
 -            .define("RECV_TYPE_ARG3", "size_t")
@@ -457,6 +477,10 @@ index b74c085..497789c 100644
 -    if windows {
 -        println!("cargo:rustc-link-lib=ws2_32");
 -        println!("cargo:rustc-link-lib=crypt32");
+-        println!("cargo:rustc-link-lib=iphlpapi");
+-        println!("cargo:rustc-link-lib=advapi32");
+-        println!("cargo:rustc-link-lib=secur32");
+-        println!("cargo:rustc-link-lib=bcrypt");
 -    }
 -
 -    // Illumos/Solaris requires explicit linking with libnsl
@@ -588,5 +612,5 @@ index b74c085..497789c 100644
      }
  
 -- 
-2.52.0
+2.54.0
 

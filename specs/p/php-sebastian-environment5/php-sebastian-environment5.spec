@@ -28,7 +28,7 @@
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
 Version:        5.1.5
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Handle HHVM/PHP environments, version %{major}
 
 License:        BSD-3-Clause

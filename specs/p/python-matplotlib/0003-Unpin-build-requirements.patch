@@ -1,0 +1,47 @@
+From c111ec4612f00cca5be9eba71d77833f0c6898d4 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 13 Dec 2024 02:03:33 -0500
+Subject: [PATCH 3/5] Unpin build requirements
+
+meson-python is pinned to fix sdists, but we already have one and are
+building a wheel, which should be fine.
+
+setuptools-scm is pinned to fix editable installs, which aren't used in
+Fedora.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ pyproject.toml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 96b69829e6..f762c85d98 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -48,9 +48,9 @@ requires-python = ">=3.10"
+ [project.optional-dependencies]
+ # Should be a copy of the build dependencies below.
+ dev = [
+-    "meson-python>=0.13.1,<0.17.0",
++    "meson-python>=0.13.1",
+     "pybind11>=2.13.2,!=2.13.3",
+-    "setuptools_scm>=7,<10",
++    "setuptools_scm>=7",
+     # Not required by us but setuptools_scm without a version, cso _if_
+     # installed, then setuptools_scm 8 requires at least this version.
+     # Unfortunately, we can't do a sort of minimum-if-instaled dependency, so
+@@ -72,9 +72,9 @@ dev = [
+ build-backend = "mesonpy"
+ # Also keep in sync with optional dependencies above.
+ requires = [
+-    "meson-python>=0.13.1,<0.17.0",
++    "meson-python>=0.13.1",
+     "pybind11>=2.13.2,!=2.13.3",
+-    "setuptools_scm>=7,<10",
++    "setuptools_scm>=7",
+ ]
+ 
+ [tool.meson-python.args]
+-- 
+2.52.0
+

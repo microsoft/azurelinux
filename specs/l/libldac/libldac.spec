@@ -9,7 +9,7 @@
 
 Name:           libldac
 Version:        %{sonamebase}.0.2.3
-Release: 21%{?dist}
+Release:        18%{?dist}
 Summary:        A lossy audio codec for Bluetooth connections
 
 License:        Apache-2.0

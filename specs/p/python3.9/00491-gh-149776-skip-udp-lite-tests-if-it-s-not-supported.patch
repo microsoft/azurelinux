@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Wed, 13 May 2026 17:27:56 +0200
+Subject: 00491: gh-149776: Skip UDP Lite tests if it's not supported
+
+Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if
+it's not supported.
+
+(cherry picked from commit 3cfc249e11a132dc69624150843779aa96c72b2b)
+(cherry picked from commit 49d08674d8dba50dc29539e3c7bce21d66066b06)
+---
+ Lib/test/test_socket.py                       | 22 ++++++++++++++++++-
+ ...-05-13-14-53-23.gh-issue-149776.orqgsn.rst |  2 ++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Tests/2026-05-13-14-53-23.gh-issue-149776.orqgsn.rst
+
+diff --git a/Lib/test/test_socket.py b/Lib/test/test_socket.py
+index 256938577a..53927bd95b 100755
+--- a/Lib/test/test_socket.py
++++ b/Lib/test/test_socket.py
+@@ -140,6 +140,26 @@ def _have_socket_bluetooth():
+     return True
+ 
+ 
++def _have_udp_lite():
++    if not hasattr(socket, "IPPROTO_UDPLITE"):
++        return False
++    # Older Android versions block UDPLITE with SELinux.
++    if support.is_android and platform.android_ver().api_level < 29:
++        return False
++
++    try:
++        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDPLITE)
++    except OSError as exc:
++        # Linux 7.1 removed UDP Lite support
++        if exc.errno == errno.EPROTONOSUPPORT:
++            return False
++        raise
++    sock.close()
++
++    return True
++
++
++
+ @contextlib.contextmanager
+ def socket_setdefaulttimeout(timeout):
+     old_timeout = socket.getdefaulttimeout()
+@@ -164,7 +184,7 @@ HAVE_SOCKET_QIPCRTR = _have_socket_qipcrtr()
+ 
+ HAVE_SOCKET_VSOCK = _have_socket_vsock()
+ 
+-HAVE_SOCKET_UDPLITE = hasattr(socket, "IPPROTO_UDPLITE")
++HAVE_SOCKET_UDPLITE = _have_udp_lite()
+ 
+ HAVE_SOCKET_BLUETOOTH = _have_socket_bluetooth()
+ 
+diff --git a/Misc/NEWS.d/next/Tests/2026-05-13-14-53-23.gh-issue-149776.orqgsn.rst b/Misc/NEWS.d/next/Tests/2026-05-13-14-53-23.gh-issue-149776.orqgsn.rst
+new file mode 100644
+index 0000000000..e86a9130ff
+--- /dev/null
++++ b/Misc/NEWS.d/next/Tests/2026-05-13-14-53-23.gh-issue-149776.orqgsn.rst
+@@ -0,0 +1,2 @@
++Fix test_socket on Linux kernel 7.1 and newer: skip UDP Lite tests if it's
++not supported. Patch by Victor Stinner.

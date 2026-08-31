@@ -6,7 +6,7 @@
 
 Name:             libev
 Version:          4.33
-Release: 17%{?dist}
+Release:          14%{?dist}
 Summary:          High-performance event loop/event model with lots of features
 
 License:          BSD-2-Clause OR GPL-2.0-or-later

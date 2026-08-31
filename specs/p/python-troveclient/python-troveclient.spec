@@ -22,7 +22,7 @@ implements 100% (or less ;) ) of the Trove API.
 
 Name:           python-troveclient
 Version:        8.6.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Client library for OpenStack DBaaS API
 
 License:        Apache-2.0

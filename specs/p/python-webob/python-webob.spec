@@ -11,11 +11,13 @@ environment.
 
 Name:           python-webob
 Summary:        WSGI request and response object
-Version:        1.8.9
-Release: 9%{?dist}
+Version:        1.8.11
+Release:        1%{?dist}
 License:        MIT
 URL:            https://webob.org
 Source:         %{pypi_source webob}
+Patch1:         fix-datetime-utc.patch
+Patch2:         fix-threading-daemon.patch
 
 BuildArch:      noarch
 
@@ -39,7 +41,7 @@ Summary:        %{summary}
 
 
 %prep
-%setup -q -n webob-%{version}
+%autosetup -n webob-%{version} -p1
 # Disable performance_test, which requires repoze.profile, which isn't
 # in Fedora.
 rm -f tests/performance_test.py
@@ -79,6 +81,27 @@ exit 0
 
 
 %changelog
+* Sun Aug 02 2026 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 1.8.11-1
+- Update to upstream - CVE-2024-42353.
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 1.8.10-3
+- Rebuilt for Python 3.15
+
+* Wed Jun 03 2026 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 1.8.10-2
+- Enable test_client_cookies again.
+
+* Wed Jun 03 2026 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 1.8.10-1
+- Update to upstream.
+
+* Sat Feb 21 2026 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 1.8.9-8
+- Skip test_client_cookies test too to unblock python3.15 build
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.9-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.8.9-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

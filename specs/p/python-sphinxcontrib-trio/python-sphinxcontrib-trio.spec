@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.1.2
-Release: 29%{?dist}
+Release:        26%{?dist}
 Summary:        Make Sphinx better at documenting Python functions and methods
 # Automatically converted from old format: MIT or ASL 2.0 - review is highly recommended.
 License:        LicenseRef-Callaway-MIT OR Apache-2.0

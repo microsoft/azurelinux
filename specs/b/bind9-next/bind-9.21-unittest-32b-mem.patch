@@ -1,0 +1,112 @@
+From 4623873e588c86c6add4d53708e754e2d6f3e087 Mon Sep 17 00:00:00 2001
+From: Michal Nowak <mnowak@isc.org>
+Date: Wed, 20 May 2026 08:59:49 +0000
+Subject: [PATCH] Make deleg cleanuptests memory assertions 32-bit-safe
+
+Each address entry stored by dns_delegset_addaddr() is an
+isc_netaddrlink_t, whose size depends on sizeof(void *) via the
+ISC_LINK macro (24 bytes of address + two prev/next pointers): 40
+bytes on 64-bit, 32 bytes on 32-bit. The hardcoded 4 MB / 8 MB
+ranges only held on 64-bit, so dns_deleg_cleanuptests failed on
+armv7l with isc_mem_inuse() returning ~3.2 MB.
+
+Express the expected ranges in terms of sizeof(isc_netaddrlink_t)
+so they scale with pointer width, and pull the 99999 entry count
+out into a NENTRIES macro.
+
+Assisted-by: Claude:claude-opus-4-7
+---
+ tests/dns/deleg_test.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/tests/dns/deleg_test.c b/tests/dns/deleg_test.c
+index d3af6aba966..9497caf2753 100644
+--- a/tests/dns/deleg_test.c
++++ b/tests/dns/deleg_test.c
+@@ -52,6 +52,15 @@ isc_stdtime_now(void) {
+ 
+ #include <tests/isc.h>
+ 
++/*
++ * cleanuptests adds NENTRIES address entries to a delegset; each is an
++ * isc_netaddrlink_t whose size depends on sizeof(void *) via ISC_LINK.
++ * Express memory expectations in terms of that struct so the test works
++ * on both 32-bit and 64-bit targets.
++ */
++#define NENTRIES       99999
++#define ENTRIES_MEM(n) ((size_t)(n) * sizeof(isc_netaddrlink_t))
++
+ static void
+ shutdownloop(ISC_ATTR_UNUSED void *arg) {
+ 	isc_loopmgr_shutdown();
+@@ -587,7 +596,8 @@ cleanuptests_phase3(void *arg) {
+ 	dns_delegset_t *delegset = NULL;
+ 	isc_result_t result;
+ 
+-	assert_int_in_range(isc_mem_inuse(db->mctx), 8000000, 8100000);
++	assert_int_in_range(isc_mem_inuse(db->mctx), ENTRIES_MEM(2 * NENTRIES),
++			    ENTRIES_MEM(2 * NENTRIES) + 100000);
+ 
+ 	/*
+ 	 * baz. is there, but bar. is gone, as it has been
+@@ -612,7 +622,8 @@ cleanuptests_phase2(void *arg) {
+ 	dns_delegset_t *delegset = NULL;
+ 	isc_result_t result;
+ 
+-	assert_int_in_range(isc_mem_inuse(db->mctx), 4000000, 4100000);
++	assert_int_in_range(isc_mem_inuse(db->mctx), ENTRIES_MEM(NENTRIES),
++			    ENTRIES_MEM(NENTRIES) + 100000);
+ 
+ 	/*
+ 	 * bar. is there
+@@ -629,10 +640,11 @@ cleanuptests_phase2(void *arg) {
+ 	dns_delegset_allocdeleg(delegset, DNS_DELEGTYPE_DELEG_ADDRESSES,
+ 				&deleg);
+ 
+-	for (size_t i = 0; i < 99999; i++) {
++	for (size_t i = 0; i < NENTRIES; i++) {
+ 		addipdeleg(AF_INET6, "1111::2222", delegset, deleg);
+ 	}
+-	assert_int_in_range(isc_mem_inuse(db->mctx), 8000000, 8100000);
++	assert_int_in_range(isc_mem_inuse(db->mctx), ENTRIES_MEM(2 * NENTRIES),
++			    ENTRIES_MEM(2 * NENTRIES) + 100000);
+ 	writedb(db, "baz.", 30, &delegset, true);
+ 	deleg = NULL;
+ 
+@@ -677,11 +689,12 @@ cleanuptests(ISC_ATTR_UNUSED void *arg) {
+ 
+ 	assert_int_in_range(isc_mem_inuse(db->mctx), 500, 2000);
+ 
+-	for (size_t i = 0; i < 99999; i++) {
++	for (size_t i = 0; i < NENTRIES; i++) {
+ 		addipdeleg(AF_INET6, "1111::2222", delegset, deleg);
+ 	}
+ 
+-	assert_int_in_range(isc_mem_inuse(db->mctx), 4000000, 4100000);
++	assert_int_in_range(isc_mem_inuse(db->mctx), ENTRIES_MEM(NENTRIES),
++			    ENTRIES_MEM(NENTRIES) + 100000);
+ 
+ 	writedb(db, "stuff.", 10, &delegset, true);
+ 	deleg = NULL;
+@@ -694,7 +707,7 @@ cleanuptests(ISC_ATTR_UNUSED void *arg) {
+ 	dns_delegset_allocdeleg(delegset, DNS_DELEGTYPE_DELEG_ADDRESSES,
+ 				&deleg);
+ 
+-	for (size_t i = 0; i < 99999; i++) {
++	for (size_t i = 0; i < NENTRIES; i++) {
+ 		addipdeleg(AF_INET6, "1111::2222", delegset, deleg);
+ 	}
+ 
+@@ -703,7 +716,8 @@ cleanuptests(ISC_ATTR_UNUSED void *arg) {
+ 	 * with DB mem context) overmem conditions will be detected, and the
+ 	 * expired node will be removed
+ 	 */
+-	assert_int_in_range(isc_mem_inuse(db->mctx), 8000000, 8100000);
++	assert_int_in_range(isc_mem_inuse(db->mctx), ENTRIES_MEM(2 * NENTRIES),
++			    ENTRIES_MEM(2 * NENTRIES) + 100000);
+ 	writedb(db, "bar.", 30, &delegset, true);
+ 	deleg = NULL;
+ 
+-- 
+2.54.0
+

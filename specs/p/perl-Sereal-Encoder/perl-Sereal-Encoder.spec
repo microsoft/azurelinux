@@ -9,8 +9,8 @@
 %endif
 
 Name:           perl-Sereal-Encoder
-Version:        5.004
-Release: 15%{?dist}
+Version:        5.005
+Release:        1%{?dist}
 Summary:        Perl serialization into Sereal format
 # lib/Sereal/Encoder.pm:    GPL+ or Artistic
 # qsort.h:                  LGPLv2+ (borrowed from glibc)
@@ -127,6 +127,14 @@ make test
 %{_mandir}/man3/Sereal::Encoder.3*
 
 %changelog
+* Wed May 20 2026 Paul Howarth <paul@city-fan.org> - 5.005-1
+- Update to 5.005
+  - Update spec to document changes from version 5
+  - Security fixes in decoder
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.004-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Sep 22 2025 Paul Howarth <paul@city-fan.org> - 5.004-12
 - Fix detection of miniz 3.1.0
 

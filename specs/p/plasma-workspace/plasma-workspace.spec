@@ -5,8 +5,8 @@
 
 Name:    plasma-workspace
 Summary: Plasma workspace, applications and applets
-Version: 6.6.0
-Release: 5%{?dist}
+Version: 6.7.4
+Release: 1%{?dist}
 
 # Automatically converted from old format: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT - review is highly recommended.
 License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND LGPL-3.0-or-later AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT
@@ -436,8 +436,8 @@ ln -sr %{buildroot}%{_kf6_bindir}/startplasma-wayland %{buildroot}%{_kf6_bindir}
 sed -E 's| \(.*\)||g' -i %{buildroot}%{_datadir}/wayland-sessions/plasma.desktop
 
 # move sddm configuration snippet to the right place
-mkdir -p %{buildroot}%{_prefix}/lib/sddm
-mv %{buildroot}%{_sysconfdir}/sddm.conf.d %{buildroot}%{_prefix}/lib/sddm
+#mkdir -p %{buildroot}%{_prefix}/lib/sddm
+#mv %{buildroot}%{_sysconfdir}/sddm.conf.d %{buildroot}%{_prefix}/lib/sddm
 
 ## customize plasma-lookandfeel-fedora defaults
 # from [Wallpaper] Image=Next to Image=Fedora
@@ -483,6 +483,8 @@ fi
 
 %files -f %{name}.lang
 %{_libexecdir}/ksecretprompter
+%{_libexecdir}/plasma-startup-sound
+%{_kf6_datadir}/xdg-desktop-portal/portals/plasmanotify.portal
 %{_kf6_datadir}/applications/org.kde.baloorunner.desktop
 %{_kf6_datadir}/applications/org.kde.secretprompter.desktop
 %{_kf6_datadir}/xdg-desktop-portal/kde-portals.conf
@@ -663,6 +665,63 @@ fi
 
 
 %changelog
+* Tue Aug 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-1
+- 6.7.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Steve Cossette <farchord@gmail.com> - 6.7.3-1
+- 6.7.3
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-2
+- Fix an issue for a sandbox escape vuln
+
+* Wed Jul 01 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-1
+- 6.7.2
+
+* Tue Jun 23 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Jun 11 2026 Steve Cossette <farchord@gmail.com> - 6.7.0-1
+- 6.7.0
+
+* Mon Jun 08 2026 František Zatloukal <fzatlouk@redhat.com> - 6.6.91-2
+- Rebuilt for icu 78.3
+
+* Fri May 29 2026 Steve Cossette <farchord@gmail.com> - 6.6.91-1
+- 6.6.91
+
+* Sat May 16 2026 Steve Cossette <farchord@gmail.com> - 6.6.90-1
+- 6.6.90
+
+* Mon May 18 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-2
+- Fix for notifications being partially broken since Qt 6.11.1
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-1
+- 6.6.5
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-3
+- Rebuild (qt6)
+
+* Thu Apr 16 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-2
+- Rebuild (qt6)
+
+* Fri Apr 10 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-1
+- 6.6.4
+
+* Tue Mar 17 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-1
+- 6.6.3
+
+* Fri Mar 13 2026 Adam Williamson <awilliam@redhat.com> - 6.6.2-2
+- Backport MR #6413 to back off the logout greeter focus grab timeout
+
+* Tue Mar 03 2026 Steve Cossette <farchord@gmail.com> - 6.6.2-1
+- 6.6.2
+
+* Tue Feb 24 2026 Steve Cossette <farchord@gmail.com> - 6.6.1-1
+- 6.6.1
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.6.0-1
 - 6.6.0
 

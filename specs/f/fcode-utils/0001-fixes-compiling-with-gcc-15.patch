@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yonggang Luo <luoyonggang@gmail.com>
+Date: Mon, 5 Jan 2026 12:14:31 +0800
+Subject: [PATCH] fixes compiling with gcc 15
+
+
+diff --git a/detok/detok.c b/detok/detok.c
+index c3b5fb6..01fdfbf 100644
+--- a/detok/detok.c
++++ b/detok/detok.c
+@@ -60,7 +60,7 @@ bool show_offsets = false;
+  *       TRUE preceding error-exit   */
+ static void print_copyright(bool is_error)
+ {
+-	typedef void (*vfunct) ();	/*  Pointer to function returning void  */
++	typedef void (*vfunct) (char *);	/*  Pointer to function returning void  */
+ 	vfunct pfunct;
+ 	char buffr[512];
+ 
+diff --git a/toke/conditl.c b/toke/conditl.c
+index b491310..842a8f6 100644
+--- a/toke/conditl.c
++++ b/toke/conditl.c
+@@ -594,7 +594,7 @@ static void conditionally_tokenize( bool cond, bool alr_ign )
+ 
+ static void conditional_word_in_line( bool alr_ign,
+                                           bool exist_test,
+-                                              bool (*exist_funct)() )
++                                              bool (*exist_funct)(char *) )
+ {
+     if ( get_word_in_line( statbuf) )
+     {
+diff --git a/toke/nextfcode.c b/toke/nextfcode.c
+index d0bbacb..7c01fcf 100644
+--- a/toke/nextfcode.c
++++ b/toke/nextfcode.c
+@@ -369,7 +369,7 @@ void list_fcode_ranges( bool final_tally)
+ 	    }else{   /*  List the collection of Ranges  */
+ 
+ 		/*  Pionter to function returning void  */
+-		typedef void (*vfunct)();
++		typedef void (*vfunct)(char *, unsigned int);
+ 
+ 		/*  Function for the  started_at()  part of the message  */
+ 		vfunct start_at_funct =
+diff --git a/toke/scanner.c b/toke/scanner.c
+index 2bc1047..46d327d 100644
+--- a/toke/scanner.c
++++ b/toke/scanner.c
+@@ -343,7 +343,7 @@ typedef struct source_state
+ 	unsigned int           old_lineno;
+ 	bool                   pause_before_pop;
+ 	bool                   sav_rep_multlin;
+-	void                 (*resump_func)();
++	void                 (*resump_func)(_PTR);
+ 	_PTR                   resump_param;
+     } source_state_t ;
+ 
+diff --git a/toke/ticvocab.h b/toke/ticvocab.h
+index a53e092..d9a6ec5 100644
+--- a/toke/ticvocab.h
++++ b/toke/ticvocab.h
+@@ -179,7 +179,7 @@ typedef struct tic_hdr
+     {
+         char             *name;
+ 	struct tic_hdr   *next;
+-	void            (*funct)();      /*  Function for active processing  */
++	void            (*funct)(tic_param_t);      /*  Function for active processing  */
+ 	tic_param_t       pfield;
+ 	fwtoken           fword_defr;    /*  FWord Token of entry's Definer  */
+ 	bool              is_token;      /*  Is entry a single-token FCode?  */
+@@ -278,7 +278,7 @@ typedef struct tic_bool_hdr
+ 	tic_bool_param_t     pfield;
+ 	fwtoken              fword_defr;
+ 	bool                is_token;    /*  Is entry a single-token FCode?  */
+-	void               (*ign_func)();
++	void               (*ign_func)(tic_bool_param_t);
+ 	int                  pfld_size;
+ 	bool                 tracing;    /*  TRUE if Invoc'n Msg required    */
+     }  tic_bool_hdr_t ;

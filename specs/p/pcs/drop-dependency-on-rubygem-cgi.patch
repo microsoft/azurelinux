@@ -1,0 +1,52 @@
+From 8ffe54a16e9bfae829efd4706b0328477d98fa15 Mon Sep 17 00:00:00 2001
+From: Miroslav Lisik <mlisik@redhat.com>
+Date: Thu, 12 Feb 2026 18:41:24 +0100
+Subject: [PATCH 3/3] drop dependency on rubygem cgi
+
+* rubygem cgi was removed from default gems in Ruby-4.0.0
+  https://www.ruby-lang.org/en/news/2025/12/25/ruby-4-0-0-released/
+* there is no rubygem-cgi package in Fedora
+* replace CGI::Cookie.to_s method with Rack::Utils.set_cookie_header
+  function
+---
+ pcsd/pcs.rb  | 4 ++--
+ pcsd/pcsd.rb | 1 -
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/pcsd/pcs.rb b/pcsd/pcs.rb
+index 924a3dda1..86be4db0c 100644
+--- a/pcsd/pcs.rb
++++ b/pcsd/pcs.rb
+@@ -3,7 +3,7 @@
+ require 'etc'
+ require 'childprocess'
+ require 'shellwords'
+-require 'cgi'
++require 'rack'
+ require 'net/http'
+ require 'net/https'
+ require 'uri'
+@@ -431,7 +431,7 @@ def _get_cookie_list(auth_user, cookies_data)
+ 
+   cookies_data_default.update(cookies_data)
+   cookies_data_default.each { |name, value|
+-    cookie_list << CGI::Cookie.new('name' => name, 'value' => value).to_s
++    cookie_list << Rack::Utils.set_cookie_header(name, value)
+   }
+   return cookie_list
+ end
+diff --git a/pcsd/pcsd.rb b/pcsd/pcsd.rb
+index 181945b9d..2a515f70c 100644
+--- a/pcsd/pcsd.rb
++++ b/pcsd/pcsd.rb
+@@ -4,7 +4,6 @@ require 'openssl'
+ require 'logger'
+ require 'thread'
+ require 'fileutils'
+-require 'cgi'
+ 
+ require 'bootstrap.rb'
+ require 'resource.rb'
+-- 
+2.53.0
+

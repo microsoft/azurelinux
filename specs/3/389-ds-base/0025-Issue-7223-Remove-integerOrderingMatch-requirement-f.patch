@@ -1,0 +1,538 @@
+From 273e0a92d902a2f2989f8def0f4fb42b7c08cae9 Mon Sep 17 00:00:00 2001
+From: Viktor Ashirov <vashirov@redhat.com>
+Date: Wed, 18 Feb 2026 09:26:57 +0100
+Subject: [PATCH] Issue 7223 - Remove integerOrderingMatch requirement for
+ parentid (#7264)
+
+Description:
+integerOrderingMatch was introduced as a requirement for parentid and
+ancestorid indexes for performance reasons. But after #7096 the order
+for parentid doesn't make a lot of difference.
+
+Fix Description:
+* Remove integerOrderingMatch requirement for parentid.
+* Read only first 100 keys from dbscan in index ordering check
+* Do not run dsctl index-check during RPM upgrade
+
+Relates: https://github.com/389ds/389-ds-base/pull/7223
+
+Reviewed by: @progier389, @tbordaz (Thanks!)
+---
+ .../healthcheck/health_system_indexes_test.py |  83 ++++----------
+ ldap/servers/slapd/upgrade.c                  | 105 ------------------
+ rpm/389-ds-base.spec.in                       |   3 -
+ src/lib389/lib389/backend.py                  |   5 +-
+ src/lib389/lib389/cli_ctl/dbtasks.py          |  99 ++++++++---------
+ 5 files changed, 73 insertions(+), 222 deletions(-)
+
+diff --git a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+index 6fbcf666c..9c48bd79b 100644
+--- a/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
++++ b/dirsrvtests/tests/suites/healthcheck/health_system_indexes_test.py
+@@ -180,7 +180,8 @@ def test_missing_parentid(topology_st, log_buffering_enabled):
+ 
+ 
+ def test_missing_matching_rule(topology_st, log_buffering_enabled):
+-    """Check if healthcheck returns DSBLE0007 code when parentId index is missing integerOrderingMatch
++    """Check that healthcheck does NOT report DSBLE0007 when parentId index is missing integerOrderingMatch.
++    Both lexicographic and integer orderings are valid for parentid.
+ 
+     :id: 7ffa71db-8995-430a-bed8-59bce944221c
+     :setup: Standalone instance
+@@ -190,19 +191,14 @@ def test_missing_matching_rule(topology_st, log_buffering_enabled):
+         3. Use healthcheck without --json option
+         4. Use healthcheck with --json option
+         5. Re-add the matching rule
+-        6. Use healthcheck without --json option
+-        7. Use healthcheck with --json option
+     :expectedresults:
+         1. Success
+         2. Success
+-        3. healthcheck reports DSBLE0007 code and related details
+-        4. healthcheck reports DSBLE0007 code and related details
++        3. healthcheck reports no issues found
++        4. healthcheck reports no issues found
+         5. Success
+-        6. healthcheck reports no issues found
+-        7. healthcheck reports no issues found
+     """
+ 
+-    RET_CODE = "DSBLE0007"
+     PARENTID_DN = "cn=parentid,cn=index,cn=userroot,cn=ldbm database,cn=plugins,cn=config"
+ 
+     standalone = topology_st.standalone
+@@ -211,17 +207,14 @@ def test_missing_matching_rule(topology_st, log_buffering_enabled):
+     parentid_index = Index(standalone, PARENTID_DN)
+     parentid_index.remove("nsMatchingRule", "integerOrderingMatch")
+ 
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=RET_CODE)
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=RET_CODE)
++    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
++    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+ 
+     log.info("Re-add the integerOrderingMatch matching rule")
+     parentid_index = Index(standalone, PARENTID_DN)
+     parentid_index.add("nsMatchingRule", "integerOrderingMatch")
+     standalone.restart()
+ 
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=False, searched_code=CMD_OUTPUT)
+-    run_healthcheck_and_flush_log(topology_st, standalone, json=True, searched_code=JSON_OUTPUT)
+-
+ 
+ def test_usn_plugin_missing_entryusn(topology_st, usn_plugin_enabled, log_buffering_enabled):
+     """Check if healthcheck returns DSBLE0007 code when USN plugin is enabled but entryusn index is missing
+@@ -911,7 +904,9 @@ def test_index_check_fixes_ancestorid_config(topology_st):
+ 
+ 
+ def test_index_check_fixes_missing_matching_rule(topology_st):
+-    """Check if dsctl index-check --fix adds missing integerOrderingMatch
++    """Check that removing integerOrderingMatch from parentid config is not
++    flagged as an issue when disk ordering cannot be determined.
++    Both lexicographic and integer orderings are valid for parentid.
+ 
+     :id: 6c1d4e9f-0a3b-4d5c-1e7f-8a9b0c2d3e4f
+     :setup: Standalone instance
+@@ -919,18 +914,14 @@ def test_index_check_fixes_missing_matching_rule(topology_st):
+         1. Create DS instance
+         2. Stop the server
+         3. Remove integerOrderingMatch from parentid index using DSEldif
+-        4. Run dsctl index-check (should detect issue)
+-        5. Run dsctl index-check --fix
+-        6. Verify integerOrderingMatch was added back
+-        7. Start the server
++        4. Run dsctl index-check (should NOT detect issue since disk ordering is unknown)
++        5. Start the server
+     :expectedresults:
+         1. Success
+         2. Success
+         3. Success
+-        4. index-check returns False and detects missing matching rule
+-        5. index-check returns True after fix
+-        6. integerOrderingMatch is present
+-        7. Success
++        4. index-check returns True (no issues, disk ordering unknown)
++        5. Success
+     """
+     from lib389.cli_ctl.dbtasks import dbtasks_index_check
+     from lib389.dseldif import DSEldif
+@@ -964,34 +955,20 @@ def test_index_check_fixes_missing_matching_rule(topology_st):
+                 f"integerOrderingMatch should be removed, but found: {mr}"
+     log.info("integerOrderingMatch removed from parentid index")
+ 
+-    log.info("Run index-check without --fix (should detect issue)")
++    log.info("Run index-check (should NOT detect issue - disk ordering unknown)")
+     args = FakeArgs()
+     args.backend = "userRoot"
+     args.fix = False
+ 
+     result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
+-    assert result is False, "index-check should detect missing matching rule"
+-    assert topology_st.logcap.contains("missing integerOrderingMatch")
++    assert result is True, \
++        "index-check should not flag missing integerOrderingMatch when disk ordering is unknown"
++    assert topology_st.logcap.contains("could not determine disk ordering")
+     topology_st.logcap.flush()
+ 
+-    log.info("Run index-check with --fix")
+-    args.fix = True
+-    result = dbtasks_index_check(standalone, topology_st.logcap.log, args)
+-    assert result is True, "index-check --fix should succeed"
+-    assert topology_st.logcap.contains("integerOrderingMatch")
+-    topology_st.logcap.flush()
+-
+-    log.info("Verify integerOrderingMatch was added back")
+-    dse_ldif = DSEldif(standalone)  # Reload to get fresh data
+-    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
+-    assert matching_rules is not None, "nsMatchingRule should be present"
+-    found_int_order = False
+-    for mr in matching_rules:
+-        if "integerorderingmatch" in mr.lower():
+-            found_int_order = True
+-            break
+-    assert found_int_order, f"integerOrderingMatch should be present, got: {matching_rules}"
+-    log.info("integerOrderingMatch successfully added back")
++    log.info("Restore integerOrderingMatch and start the server")
++    dse_ldif = DSEldif(standalone)
++    dse_ldif.add(parentid_dn, "nsMatchingRule", "integerOrderingMatch")
+ 
+     log.info("Start the server")
+     standalone.start()
+@@ -1081,7 +1058,7 @@ def test_index_check_fixes_multiple_issues(topology_st):
+     :steps:
+         1. Create DS instance
+         2. Stop the server
+-        3. Add multiple issues: scanlimit, ancestorid config, missing matching rule
++        3. Add multiple issues: scanlimit and ancestorid config
+         4. Run dsctl index-check (should detect all issues)
+         5. Run dsctl index-check --fix
+         6. Verify all issues were fixed
+@@ -1123,14 +1100,6 @@ def test_index_check_fixes_multiple_issues(topology_st):
+     ]
+     dse_ldif.add_entry(ancestorid_entry)
+ 
+-    log.info("Add issue 3: Remove integerOrderingMatch from parentid")
+-    dse_ldif = DSEldif(standalone)  # Reload
+-    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
+-    if matching_rules:
+-        for mr in matching_rules:
+-            if "integerorderingmatch" in mr.lower():
+-                dse_ldif.delete(parentid_dn, "nsMatchingRule", mr)
+-
+     log.info("Run index-check without --fix (should detect all issues)")
+     args = FakeArgs()
+     args.backend = "userRoot"
+@@ -1161,16 +1130,6 @@ def test_index_check_fixes_multiple_issues(topology_st):
+     cn_value = dse_ldif.get(ancestorid_dn, "cn", single=True)
+     assert cn_value is None, f"ancestorid config should be removed, got: {cn_value}"
+ 
+-    # Check matching rule added back
+-    matching_rules = dse_ldif.get(parentid_dn, "nsMatchingRule")
+-    found_int_order = False
+-    if matching_rules:
+-        for mr in matching_rules:
+-            if "integerorderingmatch" in mr.lower():
+-                found_int_order = True
+-                break
+-    assert found_int_order, f"integerOrderingMatch should be present, got: {matching_rules}"
+-
+     log.info("All issues verified as fixed")
+ 
+     log.info("Run index-check again to confirm all clear")
+diff --git a/ldap/servers/slapd/upgrade.c b/ldap/servers/slapd/upgrade.c
+index 6b1b012da..9557e9066 100644
+--- a/ldap/servers/slapd/upgrade.c
++++ b/ldap/servers/slapd/upgrade.c
+@@ -551,107 +551,6 @@ upgrade_remove_ancestorid_index_config(void)
+     return uresult;
+ }
+ 
+-/*
+- * Check if parentid/ancestorid indexes are missing the integerOrderingMatch
+- * matching rule.
+- *
+- * This function logs a warning if we detect this condition, advising
+- * the administrator to reindex the affected attributes.
+- */
+-static upgrade_status
+-upgrade_check_id_index_matching_rule(void)
+-{
+-    struct slapi_pblock *pb = slapi_pblock_new();
+-    Slapi_Entry **backends = NULL;
+-    const char *be_base_dn = "cn=ldbm database,cn=plugins,cn=config";
+-    const char *be_filter = "(objectclass=nsBackendInstance)";
+-    const char *attrs_to_check[] = {"parentid", NULL};
+-    upgrade_status uresult = UPGRADE_SUCCESS;
+-
+-    /* Search for all backend instances */
+-    slapi_search_internal_set_pb(
+-            pb, be_base_dn,
+-            LDAP_SCOPE_ONELEVEL,
+-            be_filter, NULL, 0, NULL, NULL,
+-            plugin_get_default_component_id(), 0);
+-    slapi_search_internal_pb(pb);
+-    slapi_pblock_get(pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &backends);
+-
+-    if (backends) {
+-        for (size_t be_idx = 0; backends[be_idx] != NULL; be_idx++) {
+-            const char *be_dn = slapi_entry_get_dn_const(backends[be_idx]);
+-            const char *be_name = slapi_entry_attr_get_ref(backends[be_idx], "cn");
+-            if (!be_dn || !be_name) {
+-                continue;
+-            }
+-
+-            /* Check each attribute that should have integerOrderingMatch */
+-            for (size_t attr_idx = 0; attrs_to_check[attr_idx] != NULL; attr_idx++) {
+-                const char *attr_name = attrs_to_check[attr_idx];
+-                struct slapi_pblock *idx_pb = slapi_pblock_new();
+-                Slapi_Entry **idx_entries = NULL;
+-                char *idx_dn = slapi_create_dn_string("cn=%s,cn=index,%s",
+-                                                       attr_name, be_dn);
+-                char *idx_filter = "(objectclass=nsIndex)";
+-                PRBool has_matching_rule = PR_FALSE;
+-
+-                if (!idx_dn) {
+-                    slapi_pblock_destroy(idx_pb);
+-                    continue;
+-                }
+-
+-                slapi_search_internal_set_pb(
+-                        idx_pb, idx_dn,
+-                        LDAP_SCOPE_BASE,
+-                        idx_filter, NULL, 0, NULL, NULL,
+-                        plugin_get_default_component_id(), 0);
+-                slapi_search_internal_pb(idx_pb);
+-                slapi_pblock_get(idx_pb, SLAPI_PLUGIN_INTOP_SEARCH_ENTRIES, &idx_entries);
+-
+-                if (idx_entries && idx_entries[0]) {
+-                    /* Index exists, check if it has integerOrderingMatch */
+-                    Slapi_Attr *mr_attr = NULL;
+-                    if (slapi_entry_attr_find(idx_entries[0], "nsMatchingRule", &mr_attr) == 0) {
+-                        Slapi_Value *sval = NULL;
+-                        int idx;
+-                        for (idx = slapi_attr_first_value(mr_attr, &sval);
+-                             idx != -1;
+-                             idx = slapi_attr_next_value(mr_attr, idx, &sval)) {
+-                            const struct berval *bval = slapi_value_get_berval(sval);
+-                            if (bval && bval->bv_val &&
+-                                strcasecmp(bval->bv_val, "integerOrderingMatch") == 0) {
+-                                has_matching_rule = PR_TRUE;
+-                                break;
+-                            }
+-                        }
+-                    }
+-
+-                    if (!has_matching_rule) {
+-                        /* Index exists but doesn't have integerOrderingMatch, log a warning */
+-                        slapi_log_err(SLAPI_LOG_ERR, "upgrade_check_id_index_matching_rule",
+-                                "Index '%s' in backend '%s' is missing 'nsMatchingRule: integerOrderingMatch'. "
+-                                "Incorrectly configured system indexes can lead to poor search performance, replication issues, and other operational problems. "
+-                                "To fix this, add the matching rule and reindex: "
+-                                "dsconf <instance> backend index set --add-mr integerOrderingMatch --attr %s %s && "
+-                                "dsconf <instance> backend index reindex --attr %s %s. "
+-                                "WARNING: Reindexing can be resource-intensive and may impact server performance on a live system. "
+-                                "Consider scheduling reindexing during maintenance windows or periods of low activity.\n",
+-                                attr_name, be_name, attr_name, be_name, attr_name, be_name);
+-                    }
+-                }
+-
+-                slapi_ch_free_string(&idx_dn);
+-                slapi_free_search_results_internal(idx_pb);
+-                slapi_pblock_destroy(idx_pb);
+-            }
+-        }
+-    }
+-
+-    slapi_free_search_results_internal(pb);
+-    slapi_pblock_destroy(pb);
+-
+-    return uresult;
+-}
+ 
+ /*
+  * Upgrade the base config of the PAM PTA plugin.
+@@ -879,10 +778,6 @@ upgrade_server(void)
+         return UPGRADE_FAILURE;
+     }
+ 
+-    if (upgrade_check_id_index_matching_rule() != UPGRADE_SUCCESS) {
+-        return UPGRADE_FAILURE;
+-    }
+-
+     return UPGRADE_SUCCESS;
+ }
+ 
+diff --git a/rpm/389-ds-base.spec.in b/rpm/389-ds-base.spec.in
+index ae359ab6b..61a8cb368 100644
+--- a/rpm/389-ds-base.spec.in
++++ b/rpm/389-ds-base.spec.in
+@@ -650,9 +650,6 @@ for dir in "$instbase"/slapd-* ; do
+     else
+        echo "instance $inst is not running" >> "$output" 2>&1 || :
+     fi
+-    # Run index-check on all instances (running or not)
+-    # This fixes index ordering mismatches from older versions
+-    dsctl "$inst_name" index-check --fix >> "$output2" 2>&1 || :
+     ninst=$((ninst + 1))
+ done
+ 
+diff --git a/src/lib389/lib389/backend.py b/src/lib389/lib389/backend.py
+index f3dbe7c92..6c8cbc018 100644
+--- a/src/lib389/lib389/backend.py
++++ b/src/lib389/lib389/backend.py
+@@ -647,9 +647,10 @@ class Backend(DSLdapObject):
+         # Default system indexes taken from ldap/servers/slapd/back-ldbm/instance.c
+         # Note: entryrdn and ancestorid are internal system indexes that are not
+         # exposed in cn=config - they are managed internally by the server.
+-        # Only parentid has a DSE config entry (for the integerOrderingMatch rule).
++        # parentid works correctly with both lexicographic and integer ordering,
++        # so integerOrderingMatch is not required.
+         expected_system_indexes = {
+-            'parentid': {'types': ['eq'], 'matching_rule': 'integerOrderingMatch'},
++            'parentid': {'types': ['eq'], 'matching_rule': None},
+             'objectClass': {'types': ['eq'], 'matching_rule': None},
+             'aci': {'types': ['pres'], 'matching_rule': None},
+             'nscpEntryDN': {'types': ['eq'], 'matching_rule': None},
+diff --git a/src/lib389/lib389/cli_ctl/dbtasks.py b/src/lib389/lib389/cli_ctl/dbtasks.py
+index cd96cdaf7..b02de203f 100644
+--- a/src/lib389/lib389/cli_ctl/dbtasks.py
++++ b/src/lib389/lib389/cli_ctl/dbtasks.py
+@@ -10,6 +10,7 @@
+ import glob
+ import os
+ import re
++import signal
+ import subprocess
+ from enum import Enum
+ from lib389._constants import TaskWarning
+@@ -263,45 +264,53 @@ def _check_disk_ordering(db_dir, backend, index_name, dbscan_path, is_mdb, log):
+         if not index_file:
+             return IndexOrdering.UNKNOWN
+ 
++    # Only read the first 100 lines from dbscan to avoid scanning the
++    # entire index (which can take hours on large databases).
+     try:
+-        result = subprocess.run(
++        proc = subprocess.Popen(
+             [dbscan_path, "-f", index_file],
+             stdout=subprocess.PIPE,
+             stderr=subprocess.PIPE,
+             universal_newlines=True,
+-            timeout=60,
+         )
+ 
+-        if result.returncode != 0:
+-            log.warning("  dbscan returned non-zero exit code for %s", index_file)
+-            return IndexOrdering.UNKNOWN
+-
+-        # Parse keys from dbscan output
+         keys = []
+-        for line in result.stdout.split("\n"):
++        line_count = 0
++        assert proc.stdout is not None
++        for line in proc.stdout:
++            line_count += 1
++            if line_count > 100:
++                break
+             line = line.strip()
+             if line.startswith("="):
+                 match = re.match(r"^=(\d+)", line)
+                 if match:
+                     keys.append(int(match.group(1)))
+ 
++        proc.terminate()
++        try:
++            proc.wait(timeout=5)
++        except subprocess.TimeoutExpired:
++            proc.kill()
++            proc.wait()
++
++        if proc.returncode not in (0, -signal.SIGTERM):
++            log.warning("  dbscan returned non-zero exit code for %s", index_file)
++            return IndexOrdering.UNKNOWN
++
+         if len(keys) < 2:
+             return IndexOrdering.UNKNOWN
+ 
+         # Check if keys are in integer order by looking for decreasing numeric values
+         # (which would indicate lexicographic ordering, e.g., "3" < "30" < "4")
+         prev_id = keys[0]
+-        for i in range(1, min(len(keys), 100)):
+-            current_id = keys[i]
++        for current_id in keys[1:]:
+             if prev_id > current_id:
+                 return IndexOrdering.LEXICOGRAPHIC
+             prev_id = current_id
+ 
+         return IndexOrdering.INTEGER
+ 
+-    except subprocess.TimeoutExpired:
+-        log.warning("  dbscan timed out for %s", index_file)
+-        return IndexOrdering.UNKNOWN
+     except OSError as e:
+         log.warning("  Error running dbscan: %s", e)
+         return IndexOrdering.UNKNOWN
+@@ -375,8 +384,7 @@ def dbtasks_index_check(inst, log, args):
+ 
+     # Track all issues found
+     all_ok = True
+-    mismatches = []  # (backend, index_name) tuples needing reindex
+-    missing_matching_rules = []  # (backend, index_name) tuples missing integerOrderingMatch
++    config_fixes = []  # (backend, index_name, action) tuples: action is "add_mr" or "remove_mr"
+     scan_limits_to_remove = []  # (backend, index_name) tuples with nsIndexIDListScanLimit
+     ancestorid_configs_to_remove = []  # backend names with ancestorid config entries
+     remove_ancestorid_from_defaults = False  # Flag to remove from cn=default indexes
+@@ -409,13 +417,6 @@ def dbtasks_index_check(inst, log, args):
+ 
+             if disk_ordering == IndexOrdering.UNKNOWN:
+                 log.info("  %s - could not determine disk ordering, skipping", index_name)
+-                # For parentid, still check if matching rule is missing
+-                if index_name == "parentid":
+-                    config_has_int_order = _has_integer_ordering_match(dse_ldif, backend, index_name)
+-                    if not config_has_int_order:
+-                        log.warning("  %s - missing integerOrderingMatch in config", index_name)
+-                        missing_matching_rules.append((backend, index_name))
+-                        all_ok = False
+                 continue
+ 
+             config_has_int_order = _has_integer_ordering_match(dse_ldif, backend, index_name)
+@@ -423,18 +424,15 @@ def dbtasks_index_check(inst, log, args):
+             log.info("  %s - config: %s, disk: %s",
+                      index_name, config_desc, disk_ordering.value)
+ 
+-            # For parentid, the desired state is always integer ordering
++            # Both orderings are valid for parentid, but config must match disk.
+             if index_name == "parentid":
+-                if not config_has_int_order:
+-                    log.warning("  %s - missing integerOrderingMatch in config", index_name)
+-                    if (backend, index_name) not in missing_matching_rules:
+-                        missing_matching_rules.append((backend, index_name))
++                if config_has_int_order and disk_ordering == IndexOrdering.LEXICOGRAPHIC:
++                    log.warning("  %s - MISMATCH: config has integerOrderingMatch but disk is lexicographic", index_name)
++                    config_fixes.append((backend, index_name, "remove_mr"))
+                     all_ok = False
+-
+-                if disk_ordering == IndexOrdering.LEXICOGRAPHIC:
+-                    log.warning("  %s - disk ordering is lexicographic, needs reindex", index_name)
+-                    if (backend, index_name) not in mismatches:
+-                        mismatches.append((backend, index_name))
++                elif not config_has_int_order and disk_ordering == IndexOrdering.INTEGER:
++                    log.warning("  %s - MISMATCH: config is lexicographic but disk has integer ordering", index_name)
++                    config_fixes.append((backend, index_name, "add_mr"))
+                     all_ok = False
+ 
+     # Handle issues
+@@ -480,26 +478,27 @@ def dbtasks_index_check(inst, log, args):
+                     log.error("  Failed to remove ancestorid config from backend %s: %s", backend, e)
+                     return False
+ 
+-            # Add missing matching rules to dse.ldif
+-            for backend, index_name in missing_matching_rules:
++            # Fix config-vs-disk ordering mismatches by adjusting config to match disk
++            for backend, index_name, action in config_fixes:
+                 index_dn = "cn={},cn=index,cn={},cn=ldbm database,cn=plugins,cn=config".format(
+                     index_name, backend
+                 )
+-                log.info("  Adding integerOrderingMatch to %s in backend %s...", index_name, backend)
+-                try:
+-                    dse_ldif.add(index_dn, "nsMatchingRule", "integerOrderingMatch")
+-                    log.info("  Updated dse.ldif with integerOrderingMatch for %s", index_name)
+-                except Exception as e:
+-                    log.error("  Failed to update dse.ldif for %s: %s", index_name, e)
+-                    return False
+-
+-            # Reindex indexes with disk ordering issues
+-            for backend, index_name in mismatches:
+-                log.info("  Reindexing %s in backend %s...", index_name, backend)
+-                if not inst.db2index(bename=backend, attrs=[index_name]):
+-                    log.error("  Failed to reindex %s", index_name)
+-                    return False
+-                log.info("  Reindex of %s completed successfully", index_name)
++                if action == "add_mr":
++                    log.info("  Adding integerOrderingMatch to %s in backend %s...", index_name, backend)
++                    try:
++                        dse_ldif.add(index_dn, "nsMatchingRule", "integerOrderingMatch")
++                        log.info("  Updated dse.ldif with integerOrderingMatch for %s", index_name)
++                    except Exception as e:
++                        log.error("  Failed to update dse.ldif for %s: %s", index_name, e)
++                        return False
++                elif action == "remove_mr":
++                    log.info("  Removing integerOrderingMatch from %s in backend %s...", index_name, backend)
++                    try:
++                        dse_ldif.delete(index_dn, "nsMatchingRule", "integerOrderingMatch")
++                        log.info("  Removed integerOrderingMatch from %s", index_name)
++                    except Exception as e:
++                        log.error("  Failed to remove integerOrderingMatch from %s: %s", index_name, e)
++                        return False
+ 
+             log.info("All issues fixed")
+             return True
+@@ -563,5 +562,5 @@ def create_parser(subcommands):
+     index_check_parser.add_argument('backend', nargs='?', default=None,
+         help="Backend to check. If not specified, all backends are checked.")
+     index_check_parser.add_argument('--fix', action='store_true', default=False,
+-        help="Fix mismatches by reindexing affected indexes")
++        help="Fix mismatches by adjusting config to match on-disk data")
+     index_check_parser.set_defaults(func=dbtasks_index_check)
+-- 
+2.53.0
+

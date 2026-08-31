@@ -122,9 +122,7 @@ subdirectory in the /etc hierarchy.
    shipped with the ca-certificates package.)
 * certificate files without trust flags in either the DER file format or in
   the PEM (BEGIN/END CERTIFICATE) file format (any file name). Such files 
-  will be added with neutral trust, neither trusted nor distrusted.
-  They will simply be known to the system, which might be helpful to
-  assist cryptographic software in constructing chains of certificates.
+  will be distrusted.
   (If you want a CA certificate in these file formats to be trusted, you 
    should remove it from this directory and move it to the 
    ./anchors subdirectory instead.)

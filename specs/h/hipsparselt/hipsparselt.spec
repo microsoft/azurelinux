@@ -60,7 +60,7 @@
 
 Name:           hipsparselt
 Version:        %{rocm_version}
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        A SPARSE marshaling library
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT

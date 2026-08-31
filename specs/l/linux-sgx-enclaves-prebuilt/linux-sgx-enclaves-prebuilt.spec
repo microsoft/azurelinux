@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 8;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -15,8 +15,8 @@
 # There's no concept of debuginfo for SGX enclaves
 %global debug_package %{nil}
 
-%global linux_sgx_version 2.25
-%global dcap_version 1.22
+%global linux_sgx_version 2.28
+%global dcap_version 1.25
 
 # If setting any of these to 0, modify repack.sh to strip
 # the binary from the prebuilt_dcap tarball to prevent src.rpm
@@ -43,8 +43,18 @@
 # XXX Disabled as it is known to link to an openssl build that has
 # crypto algorithms that haven't been approved by legal. Thus it
 # is currently unknown if we can ship such code. See also comments
-# against Patch0202/Patch0203 later
+# in linux-sgx.spec
+# is currently unknown if we can ship such code.
 %global with_enclave_qve 0
+
+
+# Quote Appraisal Enclave. Optional
+# XXX Disabled as it is known to link to an openssl build that has
+# crypto algorithms that haven't been approved by legal. Thus it
+# is currently unknown if we can ship such code. See also comments
+# in linux-sgx.spec
+# is currently unknown if we can ship such code.
+%global with_enclave_qae 0
 
 
 Name:           linux-sgx-enclaves-prebuilt
@@ -61,7 +71,7 @@ Summary:        Intel SGX prebuilt architectural enclaves
 # This license list is determined from analyzing that build
 # which is equivalent to the pre-bult binaries, without a sig.
 License: %{shrink:
-  %dnl sdk/tlibcxx, external/ippcp_internal, external/epid-sdk
+  %dnl sdk/tlibcxx, external/ippcp_internal
   Apache-2.0 AND
 
   %dnl sdk/cpprt, sdk/tlibc
@@ -159,9 +169,10 @@ prebuilt by Intel. \
 %do_package qe3 %{with_enclave_qe3} %{dcap_version}
 %do_package tdqe %{with_enclave_tdqe} %{dcap_version}
 %do_package qve %{with_enclave_qve} %{dcap_version}
+%do_package qae %{with_enclave_qae} %{dcap_version}
 
 %prep
-%autosetup -n linux-sgx-sgx_%{linux_sgx_version}_reproducible
+%autosetup -n confidential-computing.sgx-sgx_%{linux_sgx_version}_reproducible
 
 # dcap
 (
@@ -189,8 +200,6 @@ prebuilt by Intel. \
 # that is known to be built into the enclaves
 mkdir licenses
 for f in License.txt \
-         external/epid-sdk/LICENSE.txt \
-         external/epid-sdk/ext/argtable3/LICENSE \
          sdk/compiler-rt/LICENSE.TXT \
          sdk/cpprt/linux/libunwind/LICENSE \
          sdk/gperftools/gperftools-2.7/COPYING \
@@ -220,28 +229,28 @@ done
 
 # @arg1: boolean condition for whether to ship this enclave
 # @arg2: base name of the enclave
-# @arg3: directory containing locally built enclave
-# @arg4: directory containing pre-bult enclave
-# @arg5: symbol name that defines the enclave SO version
+# @arg3: directory containing pre-built enclave
+# @arg4: symbol name that defines the enclave SO version
 %global do_install() \
 %if %1 \
-version="$(grep %5 $version_file | awk '{print $3}' | sed -e 's/"//g')" \
+version="$(grep %4 $version_file | awk '{print $3}' | sed -e 's/"//g')" \
 libname="libsgx_%2.signed.so" \
 libnameso="$libname.$(echo $version | awk -F . '{print $1}')" \
 libnamever="$libname.$version" \
-%__install -m 0755 %4/$libname %{buildroot}%{sgx_libdir}/$libnamever \
+%__install -m 0755 %3/$libname %{buildroot}%{sgx_libdir}/$libnamever \
 ln -s $libnamever %{buildroot}%{sgx_libdir}/$libnameso \
 ln -s $libnameso %{buildroot}%{sgx_libdir}/$libname \
 %endif
 
 version_file=common/inc/internal/se_version.h
-%do_install %{with_enclave_pce} pce psw/ae/pce external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt PCE_VERSION
+%do_install %{with_enclave_pce} pce external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt PCE_VERSION
 
 version_file=external/dcap_source/QuoteGeneration/common/inc/internal/se_version.h
-%do_install %{with_enclave_ide} id_enclave external/dcap_source/QuoteGeneration/quote_wrapper/quote/id_enclave/linux external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt IDE_VERSION
-%do_install %{with_enclave_qe3} qe3 external/dcap_source/QuoteGeneration/quote_wrapper/quote/enclave/linux external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt QE3_VERSION
-%do_install %{with_enclave_tdqe} tdqe external/dcap_source/QuoteGeneration/quote_wrapper/tdx_quote/enclave/linux external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt TDQE_VERSION
-%do_install %{with_enclave_qve} qve external/dcap_source/QuoteVerification/QvE external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt QVE_VERSION
+%do_install %{with_enclave_ide} id_enclave external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt IDE_VERSION
+%do_install %{with_enclave_qe3} qe3 external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt QE3_VERSION
+%do_install %{with_enclave_tdqe} tdqe external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt TDQE_VERSION
+%do_install %{with_enclave_qve} qve external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt QVE_VERSION
+%do_install %{with_enclave_qae} qae external/dcap_source/QuoteGeneration/psw/ae/data/prebuilt QAE_VERSION
 
 
 %files -n sgx-enclave-prebuilt-common
@@ -260,18 +269,16 @@ version_file=external/dcap_source/QuoteGeneration/common/inc/internal/se_version
 %do_files qe3 qe3 %{with_enclave_qe3}
 %do_files tdqe tdqe %{with_enclave_tdqe}
 %do_files qve qve %{with_enclave_qve}
+%do_files qae qae %{with_enclave_qae}
 
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.25-8
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 2.28-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.25-7
-- build: mass rebuild auto-bumpable components
-
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2.25-6
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Mar 23 2026 Daniel P. Berrangé <berrange@redhat.com> - 2.28-1
+- Update to SGX 2.28 / DCAP 1.25
 
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.25-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild

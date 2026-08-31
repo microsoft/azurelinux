@@ -1,0 +1,11 @@
+--- similar-3.1.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ similar-3.1.1/Cargo.toml	2026-05-26T15:18:19.283634+00:00
+@@ -108,8 +108,5 @@
+ [dev-dependencies.serde_json]
+ version = "1.0.68"
+ 
+-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies.criterion]
+-version = "0.8.2"
+-
+ [profile.release]
+ debug = 2

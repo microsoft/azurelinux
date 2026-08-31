@@ -9,7 +9,7 @@
 
 Name:           uuid
 Version:        1.6.2
-Release: 70%{?dist}
+Release:        67%{?dist}
 Summary:        Universally Unique Identifier library
 License:        MIT
 URL:            http://www.ossp.org/pkg/lib/uuid/

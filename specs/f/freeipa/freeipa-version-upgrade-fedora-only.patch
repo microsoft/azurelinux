@@ -1,0 +1,59 @@
+From 3d52493ae13e85d5e151e4858b1877c542597c55 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Fri, 21 Aug 2026 06:50:59 +0300
+Subject: [PATCH] downstream: workaround upgrade issues
+
+FreeIPA 4.12.5 was shipped in Fedora with a patchset collection on top
+of 4.12.2 because upstream did not have a release for long time. The
+base version was internally bumped in the spec to represent 4.12.5.
+
+With 4.13.2 release the bump script wasn't removed and 4.13.2 builds in
+Fedora releases think they are 4.13.5. This prevents upgrades.
+
+Change upgrade logic:
+  - if we are cross Fedora releases, always force upgrade (fc43 to f44, for
+    example)
+
+  - if we are on the same Fedora release, force upgrade if the data
+    version claims it is 4.13.5.
+
+At worst, it is one more data upgrade run.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ ipaserver/install/installutils.py | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/ipaserver/install/installutils.py b/ipaserver/install/installutils.py
+index 613cbc6ac..56b24ed9c 100644
+--- a/ipaserver/install/installutils.py
++++ b/ipaserver/install/installutils.py
+@@ -59,6 +59,7 @@ from ipaserver.install import certs, sysupgrade
+ from ipaplatform import services
+ from ipaplatform.paths import paths
+ from ipaplatform.tasks import tasks
++from ipaplatform.osinfo import osinfo
+ 
+ 
+ logger = logging.getLogger(__name__)
+@@ -1270,6 +1271,17 @@ def check_version():
+                 "version '%s')" % (version.VENDOR_VERSION, data_version)
+             )
+         elif parsed_data_ver > parsed_ipa_ver:
++            # Handle wrong numbering in 4.12.2...4.13.2 Fedora builds
++            if osinfo.id == 'fedora':
++                # '1.2.3-1.fcX'
++                distro = int(data_version.split('.')[-1][2:])
++                # if we are on newer Fedora release, upgrade
++                if osinfo.version_number[0] > distro:
++                    return
++                # 4.12.2+patches was represented as 4.12.5
++                # 4.13.2 was mistakenly marked as 4.13.5, force upgrade
++                if data_version.split('-')[0] == '4.13.5':
++                    return
+             raise UpgradeDataNewerVersionError(
+                 "data are in newer version than IPA (data version '%s', IPA "
+                 "version '%s')" % (data_version, version.VENDOR_VERSION)
+-- 
+2.55.0
+

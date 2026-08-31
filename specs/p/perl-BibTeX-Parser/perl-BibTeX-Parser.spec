@@ -5,8 +5,8 @@
 %bcond_without perl_BibTeX_Parser_enables_optional_test
 
 Name:           perl-BibTeX-Parser
-Version:        1.93
-Release: 2%{?dist}
+Version:        1.95
+Release:        1%{?dist}
 Summary:        Pure Perl BibTeX parser
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/BibTeX-Parser
@@ -109,6 +109,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Jun 24 2026 Petr Pisar <ppisar@redhat.com> - 1.95-1
+- 1.95 bump
+
+* Tue Jun 23 2026 Petr Pisar <ppisar@redhat.com> - 1.94-1
+- 1.94 bump
+
 * Mon Sep 01 2025 Petr Pisar <ppisar@redhat.com> - 1.93-1
 - 1.93 bump
 

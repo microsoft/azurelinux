@@ -1,0 +1,435 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Kevin Buettner <kevinb@redhat.com>
+Date: Fri, 11 Jul 2025 16:18:13 -0700
+Subject: gdb-backport-s390x-return-crash.patch
+
+;; Backporting upstream commit f3ce0ce31fb3f0563510b9af0ae49aff96a72057
+;; to fix a rebase regression.
+
+Fix unwinding when restoring a register from one of a greater size
+
+When debugging functions where a callee-saved register is moved to a
+register of a larger size (e.g., a 64-bit general-purpose register to
+a 128-bit vector register), GDB would crash when the user issued the
+"return" command.  For example:
+
+    ldgr %f0, %r11        ; Move 64-bit general-purpose register (r11)
+                          ; to 128-bit vector register (f0)
+    .cfi_register r11, f0 ; DW_CFA_register: r11 is stored in f0
+    ...
+    lgdr %r11, %f0        ; Restore r11 from f0
+    .cfi_restore r11      ; DW_CFA_restore: r11 is restored to its original
+                          ; register
+
+(This example uses instructions and registers for the S390x architecture,
+where this bug was originally found.)
+
+If GDB is stopped in the "..." section and the user issues the
+"return" command, GDB crashes due to a buffer size mismatch during
+unwinding.  Specifically, in frame_register_unwind in frame.c, a
+buffer the size of the original register (the 64-bit r11 in this
+example) has been allocated and GDB would like to use memcpy to copy
+the contents of the register where the original register was saved
+(the 128-bit f0) to the buffer for the original register.  But,
+fortunately, GDB has an assertion which prevents this from happening:
+
+    gdb_assert (buffer.size () >= value->type ()->length ());
+
+This patch ensures that GDB uses the original register's type (e.g.,
+r11's type) when unwinding, even if it was marked as saved to a differently
+typed/sized register (e.g., f0) via .cfi_register (DW_CFA_register).
+
+The fix adds a 'struct type *' parameter to value_of_register_lazy() to
+explicitly track the original register's type.  The function
+frame_unwind_got_register is updated to pass the correct type for the
+original register.
+
+The call chain from frame_register_unwind to frame_unwind_got_register
+is shown by this backtrace:
+
+  #0  frame_unwind_got_register (frame=..., regnum=13, new_regnum=128)
+      at gdb/frame-unwind.c:300
+  #1  0x000000000135d894 in dwarf2_frame_prev_register (this_frame=...,
+      this_cache=0x2204528, regnum=13)
+      at gdb/dwarf2/frame.c:1187
+  #2  0x00000000014d9186 in frame_unwind_legacy::prev_register (
+      this=0x211f428 <dwarf2_frame_unwind>, this_frame=...,
+      this_prologue_cache=0x2204528, regnum=13) at gdb/frame-unwind.c:401
+  #3  0x00000000014e1d12 in frame_unwind_register_value (next_frame=...,
+      regnum=13) at gdb/frame.c:1263
+  #4  0x00000000014e16b8 in frame_register_unwind (next_frame=..., regnum=13,
+      optimizedp=0x3ffffff813c, unavailablep=0x3ffffff8138,
+      lvalp=0x3ffffff8134, addrp=0x3ffffff8128, realnump=0x3ffffff8124,
+      buffer=...) at gdb/frame.c:1189
+
+The register numbers shown above are for s390x.  On s390x,
+S390_R11_REGNUM has value 13.  Vector registers (like f0) are numbered
+differently from floating-point registers of the same name, leading to
+regnum 128 for f0 despite S390_F0_REGNUM being assigned a different
+value in s390-tdep.h.
+
+New test cases for aarch64 and x86_64 check for this on more popular
+architectures and also without dependency on a particular compiler to
+generate an unusual prologue in which a general purpose register is
+being moved to a vector register.  In both cases, the test simulates
+the bug found on s390x where a 64-bit frame pointer was being moved to
+a much wider vector register.  These test cases will cause an internal
+error on their respective architecture, but will pass with this fix in
+place.
+
+When tested on s390x linux (native), this change fixes 59 GDB internal
+errors and around 200 failures overall. This is the list of internal
+errors that no longer occur on s390x:
+
+FAIL: gdb.base/call-sc.exp: tc: return foo; return call-sc-tc (GDB internal error)
+FAIL: gdb.base/call-sc.exp: td: return foo; return call-sc-td (GDB internal error)
+FAIL: gdb.base/call-sc.exp: te: return foo; return call-sc-te (GDB internal error)
+FAIL: gdb.base/call-sc.exp: tf: return foo; return call-sc-tf (GDB internal error)
+FAIL: gdb.base/call-sc.exp: ti: return foo; return call-sc-ti (GDB internal error)
+FAIL: gdb.base/call-sc.exp: tl: return foo; return call-sc-tl (GDB internal error)
+FAIL: gdb.base/call-sc.exp: tld: return foo; return call-sc-tld (GDB internal error)
+FAIL: gdb.base/call-sc.exp: tll: return foo; return call-sc-tll (GDB internal error)
+FAIL: gdb.base/call-sc.exp: ts: return foo; return call-sc-ts (GDB internal error)
+FAIL: gdb.base/gnu_vector.exp: return from vector-valued function (GDB internal error)
+FAIL: gdb.base/return-3.exp: in foo: return (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: double: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: float: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: int: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: long-long: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: long: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: short: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return-nodebug.exp: signed-char: return from function with no debug info with a cast (GDB internal error)
+FAIL: gdb.base/return.exp: return value 5 (GDB internal error)
+FAIL: gdb.base/return.exp: return value 5.0 (GDB internal error)
+FAIL: gdb.base/return2.exp: return from char_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from double_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from float_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from int_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from long_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from long_long_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from short_func (GDB internal error)
+FAIL: gdb.base/return2.exp: return from void_func (GDB internal error)
+FAIL: gdb.base/sigstep.exp: return from handleri: leave handler (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc-ti: return foo<n>; return 2 structs-tc-ti (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc-tl: return foo<n>; return 2 structs-tc-tl (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc-ts: return foo<n>; return 2 structs-tc-ts (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 1 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 2 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 3 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 4 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 5 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 6 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 7 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tc: return foo<n>; return 8 structs-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=td-tf: return foo<n>; return 2 structs-td-tf (GDB internal error)
+FAIL: gdb.base/structs.exp: types=td: return foo<n>; return 1 structs-td (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tf-tc: return foo<n>; return 2 structs-tf-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tf-td: return foo<n>; return 2 structs-tf-td (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tf: return foo<n>; return 1 structs-tf (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tf: return foo<n>; return 2 structs-tf (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ti-tc: return foo<n>; return 2 structs-ti-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ti: return foo<n>; return 1 structs-ti (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ti: return foo<n>; return 2 structs-ti (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tl-tc: return foo<n>; return 2 structs-tl-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tl: return foo<n>; return 1 structs-tl (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tl: return foo<n>; return 2 structs-tl (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tld: return foo<n>; return 1 structs-tld (GDB internal error)
+FAIL: gdb.base/structs.exp: types=tll: return foo<n>; return 1 structs-tll (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ts-tc: return foo<n>; return 2 structs-ts-tc (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ts: return foo<n>; return 1 structs-ts (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ts: return foo<n>; return 2 structs-ts (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ts: return foo<n>; return 3 structs-ts (GDB internal error)
+FAIL: gdb.base/structs.exp: types=ts: return foo<n>; return 4 structs-ts (GDB internal error)
+
+I have tested this commit on Fedora Linux, with architectures s390x,
+x86_64, x86_64/-m32, aarch64, ppc64le, and riscv64, with no
+regressions found.
+
+This v2 version makes some changes suggested by Andrew Burgess: It
+adds an assert to frame_unwind_got_register() and always passes the
+type of REGNUM to value_of_register_lazy().  It also updates value.h's
+comment describing value_of_register_lazy().
+
+In his approval message, Andrew requested some changes to the tests.
+Those have been made exactly as requested.
+
+Approved-By: Andrew Burgess <aburgess@redhat.com>
+
+diff --git a/gdb/findvar.c b/gdb/findvar.c
+--- a/gdb/findvar.c
++++ b/gdb/findvar.c
+@@ -65,14 +65,15 @@ value_of_register (int regnum, const frame_info_ptr &next_frame)
+ /* See value.h.  */
+ 
+ value *
+-value_of_register_lazy (const frame_info_ptr &next_frame, int regnum)
++value_of_register_lazy (const frame_info_ptr &next_frame, int regnum,
++			struct type *type)
+ {
+   gdbarch *gdbarch = frame_unwind_arch (next_frame);
+ 
+   gdb_assert (regnum < gdbarch_num_cooked_regs (gdbarch));
+   gdb_assert (next_frame != nullptr);
+ 
+-  return value::allocate_register_lazy (next_frame, regnum);
++  return value::allocate_register_lazy (next_frame, regnum, type);
+ }
+ 
+ /* Given a pointer of type TYPE in target form in BUF, return the
+diff --git a/gdb/frame-unwind.c b/gdb/frame-unwind.c
+--- a/gdb/frame-unwind.c
++++ b/gdb/frame-unwind.c
+@@ -297,8 +297,16 @@ struct value *
+ frame_unwind_got_register (const frame_info_ptr &frame,
+ 			   int regnum, int new_regnum)
+ {
++  struct gdbarch *gdbarch = frame_unwind_arch (frame);
++  struct type *regnum_type = register_type (gdbarch, regnum);
++  struct type *new_regnum_type = register_type (gdbarch, new_regnum);
++
++  /* REGNUM has been copied into NEW_REGNUM, therefore, the former
++     must be smaller or equal in size to the latter.  */
++  gdb_assert (regnum_type->length () <= new_regnum_type->length ());
++
+   return value_of_register_lazy (get_next_frame_sentinel_okay (frame),
+-				 new_regnum);
++				 new_regnum, regnum_type);
+ }
+ 
+ /* Return a value which indicates that FRAME saved REGNUM in memory at
+diff --git a/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.c b/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.c
+@@ -0,0 +1,62 @@
++/* Copyright 2025 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++volatile void dummy () {}
++
++long test_function(void)
++{
++  __asm__ volatile (
++    /* Zero d0 (64-bit vector register part of v0). */
++    "movi d0, #0\n\t"
++
++    /* Move the frame pointer (x29) to d0 using fmov. */
++    "fmov d0, x29\n\t"
++
++    /* Describe CFI: Frame pointer is now in d0. */
++    ".cfi_register x29, d0\n\t"
++
++    /* Clobber list: Specify all modified registers. */
++    : /* No output operands. */
++    : /* No input operands. */
++    : "d0"
++  );
++
++  dummy ();                     /* break-here */
++
++  __asm__ volatile (
++    /* Restore the frame pointer (x29) from d0 using fmov. */
++    "fmov x29, d0\n\t"
++
++    /* Describe CFI: Frame pointer is restored. */
++    ".cfi_restore x29\n\t"
++
++    /* Clobber list: Specify all modified registers. */
++    : /* No output operands. */
++    : /* No input operands. */
++    : "x29", "d0"
++  );
++
++  return 0;
++}
++
++int
++main ()
++{
++  long result = test_function ();
++  dummy ();
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.exp b/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/aarch64-frameptr-vecreg-unwind.exp
+@@ -0,0 +1,33 @@
++# Copyright 2025 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++require is_aarch64_target
++
++standard_testfile
++
++if { [prepare_for_testing "failed to prepare" ${testfile} \
++	"${srcfile}" {debug}] } {
++    return -1
++}
++
++if {![runto_main]} {
++    return
++}
++
++gdb_breakpoint [gdb_get_line_number "break-here"]
++gdb_continue_to_breakpoint "break-here"
++gdb_test "with confirm off --return -1" "result = test_function \\(\\);"
++gdb_test "step" "dummy \\(\\);"
++gdb_test "print result" "= -1"
+diff --git a/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.c b/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.c
+@@ -0,0 +1,63 @@
++/* Copyright 2025 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++volatile void dummy () {}
++
++long test_function(void)
++{
++  __asm__ volatile (
++    /* Clear xmm0.  */
++    "vxorps %%xmm0, %%xmm0, %%xmm0\n\t"
++
++    /* Move the frame pointer (rbp) to xmm0.  */
++    "movq %%rbp, %%xmm0\n\t"
++
++    /* CFI: Frame pointer is in xmm0.  */
++    ".cfi_register %%rbp, %%xmm0\n\t"
++
++    /* Clobber list: Specify all modified registers  */
++    : // No output operands
++    : // No input operands
++    : "xmm0"
++  );
++
++  dummy ();			/* break-here */
++
++  /* Pseudo-epilogue: Restore rbp from xmm0.  */
++  __asm__ volatile (
++      /* Restore rbp.  */
++      "movq %%xmm0, %%rbp\n\t"
++
++      /* Describe CFI: Frame pointer is restored.  */
++      ".cfi_restore %%rbp\n\t"
++
++      /* Clobber list: Specify all modified registers  */
++      : /* No output operands.  */
++      : /* No input operands.  */
++      : /* Despite clobbering rbp, gcc doesn't let us list it here.  */
++  );
++
++  return 0;
++}
++
++int
++main ()
++{
++  long result = test_function ();
++  dummy ();
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.exp b/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.arch/amd64-frameptr-vecreg-unwind.exp
+@@ -0,0 +1,40 @@
++# Copyright 2025 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# This test verifies that we can read and write the value of a pseudo register
++# in unwound frames.  For the test, we choose one raw register, rbx, and one
++# pseudo register that is backed by rbx, ebx.  We have two frames (the inner one,
++# #0 and the outer one, #1) that each set a value for rbx.  We verify that we
++# can read both rbx and ebx correctly for each frame, and that when we write to
++# ebx, rbx for that frame is correctly updated.
++
++require is_x86_64_m64_target
++
++standard_testfile
++
++if { [prepare_for_testing "failed to prepare" ${testfile} \
++	"${srcfile}" {debug}] } {
++    return -1
++}
++
++if {![runto_main]} {
++    return
++}
++
++gdb_breakpoint [gdb_get_line_number "break-here"]
++gdb_continue_to_breakpoint "break-here"
++gdb_test "with confirm off --return -1" "result = test_function \\(\\);"
++gdb_test "step" "dummy \\(\\);"
++gdb_test "print result" "= -1"
+diff --git a/gdb/value.h b/gdb/value.h
+--- a/gdb/value.h
++++ b/gdb/value.h
+@@ -1156,9 +1156,12 @@ extern struct value *address_of_variable (struct symbol *var,
+ 
+ extern value *value_of_register (int regnum, const frame_info_ptr &next_frame);
+ 
+-/* Same as the above, but the value is not fetched.  */
++/* Same as the above, but the value is not fetched.  If TYPE is
++   non-nullptr, use it as the value type.  Otherwise, 'register_type'
++   will be used to obtain the type.  */
+ 
+-extern value *value_of_register_lazy (const frame_info_ptr &next_frame, int regnum);
++extern value *value_of_register_lazy (const frame_info_ptr &next_frame,
++				      int regnum, struct type *type = nullptr);
+ 
+ /* Return the symbol's reading requirement.  */
+ 

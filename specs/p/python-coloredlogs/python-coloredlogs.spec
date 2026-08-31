@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        15.0.1
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        Colored terminal output for Python's logging module
 
 License:        MIT

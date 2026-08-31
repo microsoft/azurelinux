@@ -25,6 +25,54 @@ Patch001: 0001-curl-8.15.0-curl-tool_read_cb-fix-of-segfault.patch
 # fix broken TLS options for threaded LDAPS (CVE-2025-14017)
 Patch002: 0002-curl-8.15.0-CVE-2025-14017.patch
 
+# fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+Patch003: 0003-curl-8.15.0-CVE-2026-1965.patch
+
+# fix token leak with redirect and netrc (CVE-2026-3783)
+Patch004: 0004-curl-8.15.0-CVE-2026-3783.patch
+
+# fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+Patch005: 0005-curl-8.15.0-CVE-2026-3784.patch
+
+# fix use after free in SMB connection reuse (CVE-2026-3805)
+Patch006: 0006-curl-8.15.0-CVE-2026-3805.patch
+
+# fix Out of bounds read for cookie path (CVE-2025-9086)
+Patch007: 0007-curl-8.15.0-CVE-2025-9086.patch
+
+# fix cross-proxy Digest auth state leak (CVE-2026-7168)
+Patch008: 0008-curl-8.15.0-CVE-2026-7168.patch
+
+# fix cross-origin Digest auth state leak (CVE-2026-11856)
+Patch009: 0009-curl-8.15.0-CVE-2026-11856.patch
+
+# fix password leak with netrc and user in URL (CVE-2026-8926)
+Patch010: 0010-curl-8.15.0-CVE-2026-8926.patch
+
+# fix SSH improper host validation (CVE-2026-9547)
+Patch011: 0011-curl-8.15.0-CVE-2026-9547.patch
+
+# fix trailing dot domain super cookie (CVE-2026-8924)
+Patch012: 0012-curl-8.15.0-CVE-2026-8924.patch
+
+# fix proto-default skips SSH verification (CVE-2026-12064)
+Patch013: 0013-curl-8.15.0-CVE-2026-12064.patch
+
+# fix wrong STARTTLS connection reuse (CVE-2026-8286)
+Patch014: 0014-curl-8.15.0-CVE-2026-8286.patch
+
+# fix SASL double-free (CVE-2026-8925)
+Patch015: 0015-curl-8.15.0-CVE-2026-8925.patch
+
+# fix env-set cross-proxy Digest auth state leak (CVE-2026-8927)
+Patch016: 0016-curl-8.15.0-CVE-2026-8927.patch
+
+# fix exposing HTTP/3 early data (CVE-2026-9545)
+Patch017: 0017-curl-8.15.0-CVE-2026-9545.patch
+
+# fix UAF after pause in socket callback (CVE-2026-9080)
+Patch018: 0018-curl-8.15.0-CVE-2026-9080.patch
+
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
 
@@ -228,6 +276,9 @@ be installed.
 # <https://github.com/bagder/curl/commit/21e82bd6#commitcomment-12226582>
 printf "1801\n" >>tests/data/DISABLED
 
+# # disable test 1701 -- nghttpx rejects h2c upgrade with 400 Bad Request
+printf "1701\n" >>tests/data/DISABLED
+
 # test3026: avoid pthread_create() failure due to resource exhaustion on i386
 %ifarch %{ix86}
 sed -e 's|NUM_THREADS 1000$|NUM_THREADS 256|' \
@@ -423,6 +474,30 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
+* Wed Aug 26 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-9
+- fix proto-default skips SSH verification (CVE-2026-12064)
+- fix wrong STARTTLS connection reuse (CVE-2026-8286)
+- fix SASL double-free (CVE-2026-8925)
+- fix env-set cross-proxy Digest auth state leak (CVE-2026-8927)
+- fix exposing HTTP/3 early data (CVE-2026-9545)
+- fix UAF after pause in socket callback (CVE-2026-9080)
+
+* Mon Aug 03 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-8
+- fix cross-proxy Digest auth state leak (CVE-2026-7168)
+- fix cross-origin Digest auth state leak (CVE-2026-11856)
+- fix password leak with netrc and user in URL (CVE-2026-8926)
+- fix SSH improper host validation (CVE-2026-9547)
+- fix trailing dot domain super cookie (CVE-2026-8924)
+
+* Mon May 11 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-7
+- fix Out of bounds read for cookie path (CVE-2025-9086)
+
+* Mon Apr 13 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-6
+- fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+- fix token leak with redirect and netrc (CVE-2026-3783)
+- fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+- fix use after free in SMB connection reuse (CVE-2026-3805)
+
 * Mon Jan 19 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-5
 - fix broken TLS options for threaded LDAPS (CVE-2025-14017)
 

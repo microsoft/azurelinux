@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Object
 Version:        0.08
-Release: 28%{?dist}
+Release:        25%{?dist}
 Summary:        Thoroughly testing objects via registered handlers
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Object

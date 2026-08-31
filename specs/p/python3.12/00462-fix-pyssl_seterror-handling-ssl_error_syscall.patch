@@ -84,7 +84,7 @@ index 0000000000..75d926ab59
 +Fix the :mod:`ssl` module error handling of connection terminate by peer.
 +It now throws an OSError with the appropriate error code instead of an EOFError.
 diff --git a/Modules/_ssl.c b/Modules/_ssl.c
-index 0b8cf0b6df..42a4c95890 100644
+index aae4dc323d..27dd7bbe11 100644
 --- a/Modules/_ssl.c
 +++ b/Modules/_ssl.c
 @@ -573,7 +573,7 @@ PySSL_ChainExceptions(PySSLSocket *sslsock) {

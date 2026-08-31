@@ -1,0 +1,453 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Wed, 15 Apr 2026 10:43:31 +0100
+Subject: gdb-rhbz2366461-bad-solib-entry-addr.patch
+
+;; Backport upstream commit cd289df068e to address rhbz2366461.  This
+;; commit will drop out with GDB 18.
+
+gdb: don't use .text as default entry point section
+
+We got a Fedora GDB bug report that a user tried to debug an Appimage,
+and GDB would reliably crash like this:
+
+  (gdb) run
+  Starting program: /tmp/build/gdb/testsuite/outputs/gdb.base/solib-bad-entry-addr/solib-bad-entry-addr
+  ../../src/gdb/symfile.c:843: internal-error: sect_index_text not initialized
+  A problem internal to GDB has been detected,
+  further debugging may prove unreliable.
+  ----- Backtrace -----
+  ... etc ...
+
+The specific AppImage being debugged can be found here, I've modified
+the URL with a warning marker.  I make no claims about whether it is
+safe to download the image, and running it is definitely at your own
+risk.  If you wish to, delete the warning marker to download:
+
+  https://github.com/Murmele/Gittyup/<RUN AT YOUR OWN RISK>/releases/download/gittyup_v1.4.0/Gittyup-1.4.0-x86_64.AppImage
+
+At the point of the above crash GDB's stack is:
+
+  #9  0x000000000190c6ed in internal_error_loc (file=0x1e4a94e "../../src/gdb/symfile.c", line=838, fmt=0x1e4aa50 "sect_index_text not initialized") at ../../src/gdbsupport/errors.cc:57
+  #10 0x0000000000f5f5ac in init_entry_point_info (objfile=0x5a98e80) at ../../src/gdb/symfile.c:838
+  #11 0x0000000000f5f943 in syms_from_objfile (objfile=0x5a98e80, addrs=0x7ffd78728490, add_flags=...) at ../../src/gdb/symfile.c:962
+  #12 0x0000000000f5fe6d in symbol_file_add_with_addrs (abfd=..., name=0x3e76e50 "/tmp/.mount_GittyujmIBkD/usr/bin/../../home/runner/work/Gittyup/Qt/5.15.2/gcc_64/lib/./libicudata.so.56", add_flags=..., addrs=0x7ffd78728490, flags=..., parent=0x0) at ../../src/gdb/symfile.c:1071
+  #13 0x0000000000f601aa in symbol_file_add_from_bfd (abfd=..., name=0x3e76e50 "/tmp/.mount_GittyujmIBkD/usr/bin/../../home/runner/work/Gittyup/Qt/5.15.2/gcc_64/lib/./libicudata.so.56", add_flags=..., addrs=0x7ffd78728490, flags=..., parent=0x0) at ../../src/gdb/symfile.c:1145
+  #14 0x0000000000f0f2ad in solib_read_symbols (so=..., flags=...) at ../../src/gdb/solib.c:627
+  #15 0x0000000000f10263 in solib_add (pattern=0x0, from_tty=0, readsyms=1) at ../../src/gdb/solib.c:960
+
+From this we can see GDB is trying to add the shared library:
+
+  /tmp/.mount_GittyujmIBkD/usr/bin/../../home/runner/work/Gittyup/Qt/5.15.2/gcc_64/lib/./libicudata.so.56
+
+The internal error is triggered from these lines in
+init_entry_point_info:
+
+  if (!found)
+    ei->the_bfd_section_index = SECT_OFF_TEXT (objfile);
+
+Where SECT_OFF_TEXT is:
+
+  #define SECT_OFF_TEXT(objfile) \
+     ((objfile->sect_index_text == -1) \
+      ? (internal_error (_("sect_index_text not initialized")), -1)	\
+      : objfile->sect_index_text)
+
+So we can see that objfile::sect_index_text is -1, which leads to the
+internal error.
+
+Looking at the 'readelf -Wa ...' output for the shared library in
+question we see this:
+
+  ELF Header:
+    Magic:   7f 45 4c 46 02 01 01 00 00 00 00 00 00 00 00 00
+    Class:                             ELF64
+    Data:                              2's complement, little endian
+    Version:                           1 (current)
+    OS/ABI:                            UNIX - System V
+    ABI Version:                       0
+    Type:                              DYN (Shared object file)
+    Machine:                           Advanced Micro Devices X86-64
+    Version:                           0x1
+    Entry point address:               0x2d7
+    Start of program headers:          25051136 (bytes into file)
+    Start of section headers:          25047552 (bytes into file)
+    Flags:                             0x0
+    Size of this header:               64 (bytes)
+    Size of program headers:           56 (bytes)
+    Number of program headers:         7
+    Size of section headers:           64 (bytes)
+    Number of section headers:         11
+    Section header string table index: 7
+
+  Section Headers:
+    [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
+    [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
+    [ 1] .note.gnu.build-id NOTE            0000000000000190 000190 000024 00   A  0   0  4
+    [ 2] .gnu.hash         GNU_HASH        00000000000001b8 0001b8 000034 00   A  3   0  8
+    [ 3] .dynsym           DYNSYM          00000000000001f0 0001f0 000090 18   A 10   2  8
+    [ 4] .rodata           PROGBITS        00000000000002e0 0002e0 17e27d0 00   A  0   0 16
+    [ 5] .eh_frame         PROGBITS        00000000017e2ab0 17e2ab0 000000 00   A  0   0  8
+    [ 6] .dynamic          DYNAMIC         00000000019e2f10 17e2f10 0000f0 10  WA 10   0  8
+    [ 7] .shstrtab         STRTAB          0000000000000000 17e3000 000063 00      0   0  1
+    [ 8] .symtab           SYMTAB          0000000000000000 17e3068 000150 18      9  10  8
+    [ 9] .strtab           STRTAB          0000000000000000 17e31b8 000044 00      0   0  1
+    [10] .dynstr           STRTAB          00000000019e3188 17e4188 000420 00   A  0   0  8
+  Key to Flags:
+    W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+    L (link order), O (extra OS processing required), G (group), T (TLS),
+    C (compressed), x (unknown), o (OS specific), E (exclude),
+    D (mbind), l (large), p (processor specific)
+
+  There are no section groups in this file.
+
+  Program Headers:
+    Type           Offset   VirtAddr           PhysAddr           FileSiz  MemSiz   Flg Align
+    LOAD           0x000000 0x0000000000000000 0x0000000000000000 0x17e2ab0 0x17e2ab0 R   0x200000
+    GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x000000 RW  0x10
+    NOTE           0x000190 0x0000000000000190 0x0000000000000190 0x000024 0x000024 R   0x4
+    LOAD           0x17e2f10 0x00000000019e2f10 0x00000000019e2f10 0x0000f0 0x0000f0 RW  0x200000
+    DYNAMIC        0x17e2f10 0x00000000019e2f10 0x00000000019e2f10 0x0000f0 0x0000f0 RW  0x8
+    GNU_RELRO      0x17e2f10 0x00000000019e2f10 0x00000000019e2f10 0x0000f0 0x0000f0 R   0x1
+    LOAD           0x17e4000 0x00000000019e3000 0x00000000019e3000 0x0005a8 0x0005a8 RW  0x1000
+
+Things to note here are:
+
+  1. There really is no .text section, or any executable sections,
+
+  2. there are 3 LOAD segments.  This will be important later, and
+
+  3. the "Entry point address" is outside all sections, and is
+     non-zero.
+
+Next we can investigate where objfile::sect_index_text is set to
+something other than -1.  Starting in init_objfile_sect_indices, if
+the objfile has a ".text" section then sect_index_text can be set.
+This case clearly doesn't apply.
+
+Next symfile_find_segment_sections is called.  This tries to match a
+common case where we have either 1 or 2 LOAD segments, and assumes a
+default distribution of sections to segments.  However, we have 3 LOAD
+segments, so these lines:
+
+  if (data->segments.size () != 1 && data->segments.size () != 2)
+    return;
+
+result in an early return from symfile_find_segment_sections without
+sect_index_text being set.
+
+Back in init_objfile_sect_indices, if no sections have an offset then
+we set any currently unset sect_index_* values, including
+sect_index_text, to point at section 0.  However, in our case the
+objfile is a relocatable shared library, so the sections will have an
+offset, and so this final fallback case doesn't apply.
+
+The result is that init_objfile_sect_indices never sets
+sect_index_text.  This worries me a little as
+init_objfile_sect_indices contains this comment:
+
+  /* This is where things get really weird...  We MUST have valid
+     indices for the various sect_index_* members or gdb will abort.
+     So if for example, there is no ".text" section, we have to
+     accommodate that.  First, check for a file with the standard
+     one or two segments.  */
+
+Notice the emphasis on MUST in that comment, and indeed, we exit this
+function without setting sect_index_text, and GDB does indeed abort.
+The comment seems to imply that the following code is going to try to
+figure out a suitable stand-in sect_index_text for when there is no
+".text" section, but clearly I've run into a case that isn't covered.
+
+All of this code relating to setting sect_index_text was introduced in
+commit:
+
+  commit 31d99776c73d6fca13163da59c852b0fa99f89b8
+  Date:   Mon Jun 18 15:46:38 2007 +0000
+
+Which unfortunately is from a time where we didn't write useful commit
+messages, so to understand the commit you need to go read the mailing
+list archive, but they don't offer much more insight:
+
+  https://sourceware.org/pipermail/gdb-patches/2007-May/050527.html
+
+Clearly the comment in init_objfile_sect_indices would suggest that
+the fix here is to figure out some "fake" value for sect_index_text,
+and that would certainly avoid the problem here.  But, at least for
+this problem, I think there's maybe a better solution.
+
+The original internal error is triggered by a use of SECT_OFF_TEXT in
+init_entry_point_info.  We have an entry point address, we try to find
+the section index for the section containing the entry point, and
+failing that, we assume the entry point is in the text section.  This
+fall-back assumption means that, if the text section has an offset
+applied, then the entry point will also have that same offset
+applied.  But it's not clear to me why picking the text section is
+going to be any more valid than any other section, especially in a
+case like this where we don't even have a text section, so the
+sect_index_text might itself point to some other arbitrary section.
+
+Earlier in init_entry_point_info we already have a fall-back case
+where we set entry_info::entry_point_p to false to indicate that the
+objfile has no entry point, so this is always a possibility.  So I
+wondered about writing something like:
+
+  if (!found)
+    {
+      if (objfile->sect_index_text != -1)
+	ei->the_bfd_section_index = SECT_OFF_TEXT (objfile);
+      else
+        ei->entry_point_p = false;
+    }
+
+If we have no text section index then we just claim the objfile has no
+entry point.  But I didn't like this for two reasons, first, the
+comment back in init_objfile_sect_indices saying that the index should
+be set, this seems to indicate that we should not be making decisions
+later within GDB based on whether the index is set or not.
+
+And second, using the text section as a fall back, when the entry
+address is outside every section, just seems off.  So I wondered, why
+not just reject the entry point completely in this case?  Which is how
+I ended up with:
+
+  if (!found)
+    ei->entry_point_p = false;
+
+With this patch in place I was able to start debugging the AppImage
+linked above.
+
+I created a simple test case which reproduces this issue.  It's a
+little contrived because it has to hit all the points required to
+trigger this bug:
+
+  1. No .text section,
+
+  2. more than 2 LOAD segments, and
+
+  3. entry address outside every section.
+
+I have no idea what caused the original shared library to take on
+these characteristics, it might even be a tool issue building the
+original shared library.  I haven't investigated this, as I don't
+think it really matters, GDB shouldn't be crashing just because the
+incoming objects are a little weird.
+
+I've attached a link to the Fedora bug in the 'Bug:' tag, but it's a
+little confusing.  An automated system has merged together two bug
+reports.  As such the overall bug report linked too is for a
+completely different issue, only comments 21, 22, 23, and 24 relate to
+the bug being fixed here.
+
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=2366461#c21
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+diff --git a/gdb/symfile.c b/gdb/symfile.c
+--- a/gdb/symfile.c
++++ b/gdb/symfile.c
+@@ -822,7 +822,6 @@ init_entry_point_info (struct objfile *objfile)
+   if (ei->entry_point_p)
+     {
+       CORE_ADDR entry_point =  ei->entry_point;
+-      int found;
+ 
+       /* Make certain that the address points at real code, and not a
+ 	 function descriptor.  */
+@@ -834,7 +833,7 @@ init_entry_point_info (struct objfile *objfile)
+       ei->entry_point
+ 	= gdbarch_addr_bits_remove (objfile->arch (), entry_point);
+ 
+-      found = 0;
++      bool found = false;
+       for (obj_section &osect : objfile->sections ())
+ 	{
+ 	  struct bfd_section *sect = osect.the_bfd_section;
+@@ -845,13 +844,17 @@ init_entry_point_info (struct objfile *objfile)
+ 	    {
+ 	      ei->the_bfd_section_index
+ 		= gdb_bfd_section_index (objfile->obfd.get (), sect);
+-	      found = 1;
++	      found = true;
+ 	      break;
+ 	    }
+ 	}
+ 
++      /* We store the section index so that the entry address can be
++	 relocated when used.  If the entry address is outside of any
++	 section then we cannot relocate it.  Just claim that there is no
++	 entry address in this case.  */
+       if (!found)
+-	ei->the_bfd_section_index = SECT_OFF_TEXT (objfile);
++	ei->entry_point_p = false;
+     }
+ }
+ 
+diff --git a/gdb/testsuite/gdb.base/solib-bad-entry-addr-lib.s b/gdb/testsuite/gdb.base/solib-bad-entry-addr-lib.s
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/solib-bad-entry-addr-lib.s
+@@ -0,0 +1,33 @@
++/* Copyright 2026 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++	.section .rodata
++	.globl lib_var
++	.type lib_var, @object
++lib_var:
++	.long 42
++	.size lib_var, .-lib_var
++
++	/* This executable section exists solely to force the linker
++	   to create an additional LOAD segment (with R+X permissions),
++	   giving the library 3+ LOAD segments instead of the default 2.
++
++	   This matters because GDB's symfile_find_segment_sections only
++	   runs for objects with exactly 1 or 2 segments.  When it runs,
++	   it sets sect_index_text from the first section in segment 1,
++	   which masks the bug we are testing for, see the .exp file for
++	   details.  */
++	.section .not_text, "ax", @progbits
++	.byte 0
+diff --git a/gdb/testsuite/gdb.base/solib-bad-entry-addr.c b/gdb/testsuite/gdb.base/solib-bad-entry-addr.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/solib-bad-entry-addr.c
+@@ -0,0 +1,22 @@
++/* Copyright 2026 Free Software Foundation, Inc.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++extern int lib_var;
++
++int
++main ()
++{
++  return lib_var;
++}
+diff --git a/gdb/testsuite/gdb.base/solib-bad-entry-addr.exp b/gdb/testsuite/gdb.base/solib-bad-entry-addr.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.base/solib-bad-entry-addr.exp
+@@ -0,0 +1,99 @@
++# Copyright 2026 Free Software Foundation, Inc.
++
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# This test aims to exercise a specific situation which was seen
++# causing GDB to crash.  An application has a shared library that
++# meets the following conditions:
++#
++# 1. No ".text" section,
++# 2. at least 3 LOAD segments, and
++# 3. a non-zero entry address that is outside of every section.
++#
++# When these 3 conditions are met then GDB would run into a problem in
++# init_entry_point_info for the shared library.  The non-zero entry
++# address means GDB would try to find the section corresponding to the
++# address.  As the address is outside of all sections then GDB would
++# try to use the .text section as a fall-back.  But there is no text
++# section, so an internal error would be triggered.
++#
++# The 3 LOAD segments is important because, if there are only 1 or 2
++# segments GDB has a default in symfile_find_segment_sections where
++# it assumes the text section is the first section in the first
++# segment, which means init_entry_point_info will have a .text section
++# to use.
++#
++# This test has a very simple assembler file (which hopefully contains
++# no architecture specific content), which will compile to a couple of
++# sections, but no .text section.  These sections force the creation
++# of more than 2 LOAD segments.  The compiler flags then set the entry
++# address to 0x1, which (we hope) is outside all sections.  This
++# assembler file is compiled into a shared library.
++
++require allow_shlib_tests
++require !use_gdb_stub
++require {istarget *-linux*}
++
++standard_testfile .c -lib.s
++
++# Build shared library.
++set lib_testfile ${testfile}-lib.so
++set lib_srcfile ${srcfile2}
++set lib_binfile [standard_output_file ${lib_testfile}]
++set lib_flags {shlib \
++		   additional_flags=-nostartfiles \
++		   additional_flags=-Wl,-e,0x1 \
++		   additional_flags=-Wl,-z,separate-code}
++if { [build_executable "build solib" $lib_testfile $lib_srcfile \
++	  $lib_flags] == -1 } {
++    return
++}
++
++# Build the test executable.
++if { [build_executable "build exec" $testfile $srcfile \
++	  [list debug pie shlib=${lib_binfile}]] == -1 } {
++    return
++}
++
++# Confirm we have more than 2 LOAD segments in the shared library.
++set readelf_program [gdb_find_readelf]
++set command "exec $readelf_program -Wl $lib_binfile"
++verbose -log "command is $command"
++set result [catch {{*}$command} output]
++verbose -log "result is $result"
++verbose -log "output is $output"
++if {$result != 0} {
++    fail "read program headers from $lib_testfile"
++    return
++}
++if {![regexp {\nProgram Headers:\n *Type [^\n]* Align\n(.*?)\n\n} $output trash phdr]} {
++    fail "no Program Headers found"
++    return
++}
++set load_segment_count 0
++foreach line [regexp -line -all -inline {^ *LOAD .* 0x[0-9]+$} $phdr] {
++    incr load_segment_count
++}
++if { $load_segment_count <= 2 } {
++    fail "not enough LOAD segments"
++    return
++}
++
++# Start GDB and run to main.  If the shared library is causing issues
++# then we will see an internal error once the inferior starts running.
++clean_restart $testfile
++
++if {![runto_main message]} {
++  return 0
++}

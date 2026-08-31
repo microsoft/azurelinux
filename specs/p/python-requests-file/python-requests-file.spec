@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        2.0.0
-Release: 12%{?dist}
+Release:        9%{?dist}
 Summary:        Transport adapter for using file:// URLs with python-requests
 
 License:        Apache-2.0

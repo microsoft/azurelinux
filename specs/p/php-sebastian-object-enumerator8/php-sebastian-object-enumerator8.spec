@@ -10,13 +10,10 @@
 # Please, preserve the changelog entries
 #
 
-%bcond_with          tests
+%bcond_without       tests
 
-%global gh_commit    b39ab125fd9a7434b0ecbc4202eebce11a98cfc5
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   object-enumerator
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -27,34 +24,31 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.0
-Release: 4%{?dist}
+Version:        8.1.0
+Release:        1%{?dist}
 Summary:        Traverses array and object to enumerate all referenced objects, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
 BuildRequires:  php(language) >= 8.4.1
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
-BuildRequires:  (php-composer(%{pk_vendor}/object-reflector) >= 6.0   with php-composer(%{pk_vendor}/object-reflector) < 7)
-BuildRequires:  (php-composer(sebastian/recursion-context)   >= 8.0   with php-composer(sebastian/recursion-context)   < 9)
+BuildRequires:  (php-composer(sebastian/recursion-context)   >= 8.0.1   with php-composer(sebastian/recursion-context)   < 9)
 # From composer.json"require-dev": {
-#        "phpunit/phpunit": "^13.0"
-BuildRequires:  phpunit13
+#        "phpunit/phpunit": "^13.3.0"
+BuildRequires:  phpunit13  >= 13.3.0
 %endif
 
 # from composer.json
 #        "php": ">=8.4.1",
-#        "sebastian/object-reflector": "^6.0",
-#        "sebastian/recursion-context": "^8.0"
+#        "sebastian/recursion-context": "^8.0.1"
 Requires:       php(language) >= 8.3
-Requires:       (php-composer(%{pk_vendor}/object-reflector) >= 6.0   with php-composer(%{pk_vendor}/object-reflector) < 7)
-Requires:       (php-composer(sebastian/recursion-context)   >= 8.0   with php-composer(sebastian/recursion-context)   < 9)
+Requires:       (php-composer(sebastian/recursion-context)   >= 8.0.1   with php-composer(sebastian/recursion-context)   < 9)
 # from phpcompatinfo report for version 5.0.0:
 #nothing
 # Autoloader
@@ -73,7 +67,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -83,7 +77,6 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 %{_bindir}/phpab --template fedora --output src/autoload.php src
 cat << 'EOF' | tee -a src/autoload.php
 \Fedora\Autoloader\Dependencies::required([
-    '%{php_home}/%{ns_vendor}/ObjectReflector6/autoload.php',
     '%{php_home}/%{ns_vendor}/RecursionContext8/autoload.php',
 ]);
 EOF
@@ -101,7 +94,7 @@ mkdir vendor
 
 : Run upstream test suite
 ret=0
-for cmd in php php84 php85; do
+for cmd in php php84 php85 php86; do
   if which $cmd; then
    $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
      %{_bindir}/phpunit13 --bootstrap vendor/autoload.php || ret=1
@@ -120,6 +113,12 @@ exit $ret
 
 
 %changelog
+* Thu Aug 13 2026 Remi Collet <remi@remirepo.net> - 8.1.0-1
+- update to 8.1.0
+- drop dependency on sebastian/object-reflector
+- raise dependency on sebastian/recursion-context 8.0.1
+- enable test suite
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 8.0.0-1
 - update to 8.0.0
 - raise dependency on PHP 8.4

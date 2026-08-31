@@ -5,8 +5,8 @@
 %define version_underscore %(echo %{version} | tr '.' '_')
 
 Name:     squid
-Version:  7.4
-Release: 4%{?dist}
+Version:  7.5
+Release:  1%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
 # See CREDITS for breakdown of non GPLv2+ code
@@ -309,6 +309,9 @@ fi
 
 
 %changelog
+* Mon Apr 27 2026 Luboš Uhliarik <luhliari@redhat.com> - 7:7.5-1
+- new version 7.5
+
 * Thu Jan 22 2026 Luboš Uhliarik <luhliari@redhat.com> - 7:7.4-1
 - new version 7.4
 

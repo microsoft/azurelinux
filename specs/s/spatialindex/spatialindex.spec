@@ -3,7 +3,7 @@
 
 Name:      spatialindex
 Version:   2.1.0
-Release: 5%{?dist}
+Release:   2%{?dist}
 %global so_version 8
 Summary:   Spatial index library 
 

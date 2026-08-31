@@ -6,7 +6,7 @@
 
 Name:               python-oauthlib
 Version:            3.2.2
-Release: 13%{?dist}
+Release:            10%{?dist}
 Summary:            An implementation of the OAuth request-signing logic
 
 License:            BSD-3-Clause

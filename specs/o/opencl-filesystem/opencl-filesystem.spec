@@ -3,7 +3,7 @@
 
 Name:		opencl-filesystem
 Version:	1.0
-Release: 26%{?dist}
+Release:	23%{?dist}
 Summary:	OpenCL filesystem layout
 
 License:	LicenseRef-Not-Copyrightable

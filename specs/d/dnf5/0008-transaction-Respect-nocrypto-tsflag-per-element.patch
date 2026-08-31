@@ -1,0 +1,34 @@
+From 57263d0ac3b34fa32c94e6e2be127027abbaa4c1 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Thu, 9 Apr 2026 13:58:28 +0000
+Subject: [PATCH] transaction: Respect nocrypto tsflag per-element
+
+Now when nocrypto tsflag is set, the verify level is lowered to
+RPMSIG_NONE_TYPE.
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2443503
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ libdnf5/rpm/transaction.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libdnf5/rpm/transaction.cpp b/libdnf5/rpm/transaction.cpp
+index e7c9f659..fd568f84 100644
+--- a/libdnf5/rpm/transaction.cpp
++++ b/libdnf5/rpm/transaction.cpp
+@@ -432,7 +432,10 @@ int Transaction::ts_change_callback(int event, rpmte te, rpmte other, void * dat
+             gpgcheck = repo->get_config().get_pkg_gpgcheck_option().get_value();
+         }
+         if (gpgcheck == false) {
+-            rpmteSetVfyLevel(te, RPMSIG_DIGEST_TYPE);
++            // When nocrypto tsflag is set, skip digest verification as well
++            auto & tsflags = transaction->base->get_config().get_tsflags_option().get_value();
++            bool nocrypto = std::find(tsflags.begin(), tsflags.end(), "nocrypto") != tsflags.end();
++            rpmteSetVfyLevel(te, nocrypto ? RPMSIG_NONE_TYPE : RPMSIG_DIGEST_TYPE);
+         }
+ #endif
+     } else {
+-- 
+2.53.0
+

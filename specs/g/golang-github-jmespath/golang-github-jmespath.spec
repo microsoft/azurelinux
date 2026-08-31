@@ -19,7 +19,7 @@ A JMESPath implementation in Go.}
 %global gosupfiles glide.lock glide.yaml
 
 Name:           %{goname}
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        Golang implementation of JMESPath
 
 # Upstream license specification: Apache-2.0

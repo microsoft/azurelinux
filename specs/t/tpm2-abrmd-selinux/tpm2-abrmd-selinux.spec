@@ -9,7 +9,7 @@
 
 Name: tpm2-abrmd-selinux
 Version: 2.3.1
-Release: 17%{?dist}
+Release: 14%{?dist}
 Summary: SELinux policies for tpm2-abrmd
 
 License: BSD-2-Clause

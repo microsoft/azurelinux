@@ -1,0 +1,25 @@
+From 1d1db8d8ba6155b8cc5477aee9ca34919f38904f Mon Sep 17 00:00:00 2001
+From: "Shane F. Carr" <shane.carr@wustl.edu>
+Date: Fri, 21 Aug 2026 23:40:33 -1000
+Subject: [PATCH] Don't unwrap ZeroVec::try_from_slice
+
+---
+ src/lib.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 5e9865bf40..d710e8c0b7 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -576,7 +576,7 @@ mod tests {
+     #[test]
+     fn test_miri_repro_eyepatch_hack_truncate() {
+         let slice: &[u16] = &[1, 2, 3, 4];
+-        let zv: ZeroVec<u16> = ZeroVec::try_from_slice(slice).unwrap();
++        let zv: ZeroVec<u16> = ZeroVec::from_slice_or_alloc(slice);
+         let _truncated = zv.truncated(2);
+     }
+ 
+-- 
+2.55.0
+

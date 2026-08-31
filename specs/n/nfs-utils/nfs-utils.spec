@@ -4,8 +4,8 @@
 Summary: NFS utilities and supporting clients and daemons for the kernel NFS server
 Name: nfs-utils
 URL: http://linux-nfs.org/
-Version: 2.8.5
-Release: 3%{?dist}
+Version: 2.8.7
+Release: 6%{?dist}
 Epoch: 1
 
 # group all 32bit related archs
@@ -16,6 +16,19 @@ Source1: id_resolver.conf
 Source2: lockd.conf
 Source3: 24-nfs-server.conf
 Source4: 10-nfsv4.conf
+
+Patch001: nfs-utils-2.8.7-nfsdctl-no-listeners.patch
+Patch002: nfs-utils-2.9.1-nfs-iostat-display-MBs.patch
+Patch003: nfs-utils-2.8.7-libnfsidmap-empty-realms.patch
+Patch004: nfs-utils-2.8.7-getport-warning.patch
+Patch005: nfs-utils-2.8.7-nfsd-thread-count-zero.patch
+Patch006: nfs-utils-2.8.7-gssd-pthread.patch
+Patch007: nfs-utils-2.8.7-export-ignore-hosts.patch
+Patch008: nfs-utils-2.8.7-gssd-memory-overflow.patch
+Patch009: nfs-utils-2.8.7-gssd-nfsd-overflow.patch
+Patch010: nfs-utils-2.8.7-statd-memory-leak.patch
+Patch011: nfsutils-2.8.7-getport-def.patch
+
 
 Patch100: nfs-utils-1.2.1-statdpath-man.patch
 Patch102: nfs-utils-1.2.5-idmap-errmsg.patch
@@ -450,7 +463,39 @@ rm -rf /etc/systemd/system/rpc-*.requires
 %{_mandir}/*/nfsiostat.8.gz
 
 %changelog
-* Sat Feb 14 2026 Steve Dickson <steved@redhat.com> 2.8.5-0
+* Sat Aug 15 2026 Steve Dickson <steved@redhat.com> 2.8.7-6
+- nfsd: fix memory overflow for haddr
+- gssd: fix memory leak in gssd_free_client
+- statd: fix memory leak in sm_mon_1_svc() when existing host re-monitors
+- getport: fix missing stddef.h inclusion
+
+* Wed Jul 15 2026 Steve Dickson <steved@redhat.com> 2.8.7-5
+- rpc.gssd: Decrement client referece count on error paths
+- Pass ignore_hosts to export_create() in export_read()
+
+* Tue Jun 16 2026 Steve Dickson <steved@redhat.com> 2.8.7-4
+- nfsd: don't assume service is running when setting thread count to 0
+
+* Sat May 30 2026 Steve Dickson <steved@redhat.com> 2.8.7-3
+- libnfsidmap: avoid malloc(0) for empty Local-Realms
+- Removed warnings in nfs_sockaddr2universal()
+
+* Wed May  6 2026 Steve Dickson <steved@redhat.com> 2.8.7-2
+- nfs-iostat: add option to display throughput in MB/s
+
+* Mon Mar 30 2026 Steve Dickson <steved@redhat.com> 2.8.7-1
+- nfsdctl: check for listeners before starting threads (bz 2453113)
+
+* Sat Mar 14 2026 Steve Dickson <steved@redhat.com> 2.8.7-0
+- Updated to latest upstream release: nfs-utils-2-8-7 (bz 2447326)
+
+* Sun Mar  8 2026 Steve Dickson <steved@redhat.com> 2.8.6-0
+- Updated to latest upstream release: nfs-utils-2-8-6 (bz 2445545)
+
+* Sat Feb 28 2026 Steve Dickson <steved@redhat.com> 2.8.5-0.rc3)
+- Updated to the latest RC release: nfs-utils-2-8-6-rc3
+
+* Sat Feb  14 2026 Steve Dickson <steved@redhat.com> 2.8.5-0
 - Updated to latest upstream release: nfs-utils-2-8-5 (bz 2439968)
 
 * Sat Jan 31 2026 Steve Dickson <steved@redhat.com> 2.8.4-2.rc3

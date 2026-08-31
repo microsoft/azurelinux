@@ -1,0 +1,30 @@
+[tox]
+envlist = py3,bandit
+
+[testenv]
+deps =
+    -r{toxinidir}/requirements.txt
+# We need to access python-rpm, at least, and potentially more on EL6
+sitepackages = true
+setenv =
+    COLUMNS=80
+# Expected that python-rpm is installed on the host
+# If rpm's python bindings are missing, don't continue
+# Also, because coverage might be installed system-wide and it serves as our
+# entry point, let's make sure it's installed in the virtualenv.
+#
+# COLUMNS setting is propagated to optparse and ensures that formatted text
+# is same in the CLI output on all platforms
+commands_pre =
+    {envbindir}/python -c "import rpm"
+
+[testenv:py3]
+deps =
+    -r{toxinidir}/test-requirements.txt
+setenv = 
+    {[testenv]setenv}
+    PYTHONPATH=.:plugins/hub/.:plugins/builder/.:plugins/cli/.:cli/.:www/lib
+commands_pre =
+    {[testenv]commands_pre}
+commands = 
+    python -m pytest

@@ -10,7 +10,7 @@ Name: hunspell-nso
 Summary: Northern Sotho hunspell dictionaries
 %global upstreamid 20091201
 Version: 0.%{upstreamid}
-Release: 36%{?dist}
+Release: 33%{?dist}
 Source: https://downloads.sourceforge.net/project/aoo-extensions/3139/1/dict-ns_za-2009.12.01.oxt
 URL: https://extensions.openoffice.org/en/project/northern-sotho-spell-checker
 License: LGPL-2.1-or-later

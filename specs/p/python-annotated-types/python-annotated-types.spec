@@ -10,7 +10,7 @@
 
 Name:           python-annotated-types
 Version:        0.7.0
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Reusable constraint types to use with typing.Annotated
 
 License:        MIT

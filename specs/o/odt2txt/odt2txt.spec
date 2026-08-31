@@ -3,7 +3,7 @@
 
 Name:           odt2txt
 Version:        0.5
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        Converts an OpenDocument to plain text
 
 # Automatically converted from old format: GPLv2 - review is highly recommended.

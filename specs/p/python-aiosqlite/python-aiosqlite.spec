@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.22.1
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Asyncio bridge to the standard SQLite3 module
 
 License:        MIT

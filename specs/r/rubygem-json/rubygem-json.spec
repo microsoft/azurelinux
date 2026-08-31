@@ -9,7 +9,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        %{pkg_version_num}%{?pkg_version_alpha:~%pkg_version_alpha}
-Release: 4%{?dist}
+Release:        2%{?dist}
 
 Summary:        A JSON implementation in Ruby
 
@@ -20,6 +20,10 @@ Source0:        https://rubygems.org/gems/%{gem_name}-%{gem_version}.gem
 Source1:        rubygem-%{gem_name}-%{gem_version}-missing-files.tar.gz
 # Source1 is created by $ %%SOURCE2 v%%version
 Source2:        json-create-tarball-missing-files.sh
+# https://github.com/ruby/json/commit/393b41c3e5f87491e1e34fa59fa78ff6fa179a74
+# Backport fix for a format string injection vulnerability in JSON.parse
+# CVE-2026-33210
+Patch0:		rubygem-json-393b41c-CVE-2026-33210-string-injection.patch
 
 BuildRequires:  gcc
 BuildRequires:  ruby(release)
@@ -55,6 +59,8 @@ This package contains documentation for %{name}.
 %setup -q -n %{gem_name}-%{gem_version} -a 1
 mv ./%{gem_name}-%{version}/test .
 mv ../%{gem_name}-%{version}.gemspec .
+
+%patch -P0 -p1
 
 # Change cflags to honor Fedora compiler flags correctly
 find . -name extconf.rb | xargs sed -i -e 's|-O3|-O2|' -e 's|-O0|-O2|'
@@ -139,6 +145,10 @@ popd
 
 
 %changelog
+* Fri Mar 20 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.13.2-2
+- Backport upstream fix for format string injection vulnerability in JSON.parse
+  (CVE-2026-33210)
+
 * Thu Jul 31 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.13.2-1
 - 2.13.2
 

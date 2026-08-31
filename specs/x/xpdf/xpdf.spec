@@ -6,7 +6,7 @@
 Summary: A PDF file viewer for the X Window System
 Name: xpdf
 Version: 4.06
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: (GPL-2.0-only OR GPL-3.0-only) AND BSD-3-Clause
 Epoch: 1
 Url: https://www.xpdfreader.com/

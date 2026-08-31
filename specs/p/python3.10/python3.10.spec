@@ -16,11 +16,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.19
+%global general_version %{pybasever}.21
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 7%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -219,7 +219,6 @@ BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
 
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: readline-devel
 BuildRequires: redhat-rpm-config >= 127
@@ -231,6 +230,10 @@ BuildRequires: tcl-devel < 1:9
 BuildRequires: tix-devel
 BuildRequires: tk-devel < 1:9
 BuildRequires: tzdata
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with valgrind}
 BuildRequires: valgrind-devel
@@ -353,15 +356,6 @@ Patch452: 00452-properly-apply-exported-cflags-for-dtrace-systemtap-builds.patch
 # stressed on OpenSSL 3.5.
 Patch462: 00462-fix-pyssl_seterror-handling-ssl_error_syscall.patch
 
-# 00473 # e0df4af4663a200a370a7c7b2391588396bcf20f
-# CVE-2026-0865
-#
-#  gh-143916: Reject control characters in wsgiref.headers.Headers  (GH-143917)
-#
-# * Add 'test.support' fixture for C0 control characters
-# * gh-143916: Reject control characters in wsgiref.headers.Headers
-Patch473: 00473-cve-2026-0865.patch
-
 # 00474 # 837ddca0372fa87ff9cee47142200caa21e77def
 # CVE-2025-15366
 #
@@ -377,6 +371,12 @@ Patch474: 00474-cve-2025-15366.patch
 #
 # (cherry-picked from commit b234a2b67539f787e191d2ef19a7cbdce32874e7)
 Patch475: 00475-cve-2025-15367.patch
+
+# 00494 # 430aab133397ed44cc9ee621fd311e02fee317b5
+# Increase the timeout of test_large_content_length_truncated
+#
+# It has started to fail randomly when run on s390x architecture.
+Patch494: 00494-increase-the-timeout-of-test_large_content_length_truncated.patch
 
 # (New patches go here ^^^)
 #
@@ -535,8 +535,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 # Since patch 251 changed from distutils to sysconfig, pip needed to be adapted
@@ -1677,6 +1681,23 @@ CheckPython optimized
 # ======================================================
 
 %changelog
+* Thu Aug 13 2026 Karolina Surma <ksurma@redhat.com> - 3.10.21-1
+- Update to Python 3.10.21
+
+* Thu Jul 30 2026 Miro Hrončok <mhroncok@redhat.com> - 3.10.20-4
+ - Skip UDP Lite tests if it's not supported
+ - Fixes FTBFS on Linux kernel 7.1 and newer
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.10.20-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Apr 11 2026 Miro Hrončok <mhroncok@redhat.com> - 3.10.20-2
+- Explicitly build with OpenSSL 3
+- Fix ssl.SSLError: [ASN1: NOT_ENOUGH_DATA] not enough data with OpenSSL 3.5.7+
+
+* Tue Mar 03 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.10.20-1
+- Update to 3.10.20
+
 * Mon Feb 09 2026 Tomáš Hrnčiar <thrnciar@redhat.com> - 3.10.19-4
 - Security fixes for CVE-2026-0865, CVE-2025-15366 and CVE-2025-15367
 

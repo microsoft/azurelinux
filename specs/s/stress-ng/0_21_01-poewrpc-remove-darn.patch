@@ -1,0 +1,20 @@
+--- Makefile.config.orig	2026-05-08 11:24:06.277657465 +0200
++++ Makefile.config	2026-05-08 11:24:45.331462306 +0200
+@@ -1232,7 +1232,6 @@
+ 	ASM_OPENRISC_MSYNC \
+ 	ASM_OPENRISC_NOP \
+ 	ASM_OPENRISC_PSYNC \
+-	ASM_PPC64_DARN \
+ 	ASM_PPC64_DCBST \
+ 	ASM_PPC64_DCBT \
+ 	ASM_PPC64_DCBTST \
+@@ -1455,9 +1454,6 @@
+ ASM_OPENRISC_PSYNC:
+ 	$(call check,test-asm-openrisc-psync,HAVE_ASM_OPENRISC_PSYNC,openrisc l.psync instruction)
+ 
+-ASM_PPC64_DARN:
+-	$(call check,test-asm-ppc64-darn,HAVE_ASM_PPC64_DARN,ppc64 darn instruction)
+-
+ ASM_PPC64_DCBST:
+ 	$(call check,test-asm-ppc64-dcbst,HAVE_ASM_PPC64_DCBST,ppc64 dcbst instruction)
+ 

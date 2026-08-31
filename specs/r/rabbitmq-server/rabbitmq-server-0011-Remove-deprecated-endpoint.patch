@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Marcial Rosales <marcial.rosales@broadcom.com>
+Date: Tue, 14 Apr 2026 18:16:15 +0200
+Subject: [PATCH] Remove deprecated endpoint
+
+This api/auth endpoint is not used since
+bootstrap.js endpoint was introduced back in 2023.
+
+diff --git a/deps/rabbitmq_management/priv/www/api/index.html b/deps/rabbitmq_management/priv/www/api/index.html
+index 27c6e1ea59..1654081cb8 100644
+--- a/deps/rabbitmq_management/priv/www/api/index.html
++++ b/deps/rabbitmq_management/priv/www/api/index.html
+@@ -1275,17 +1275,6 @@ or:
+           </p>
+         </td>
+       </tr>
+-      <tr>
+-        <td>X</td>
+-        <td></td>
+-        <td></td>
+-        <td></td>
+-        <td class="path">/api/auth</td>
+-        <td>
+-          Details about the OAuth2 configuration. It will return HTTP
+-          status 200 with body: <pre>{"oauth_enabled":"boolean", "oauth_client_id":"string", "oauth_provider_url":"string"}</pre>
+-        </td>
+-      </tr>
+       <tr>
+         <td></td>
+         <td></td>
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_dispatcher.erl b/deps/rabbitmq_management/src/rabbit_mgmt_dispatcher.erl
+index 06e2756739..fb7bfa6eca 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_dispatcher.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_dispatcher.erl
+@@ -205,7 +205,6 @@ dispatcher() ->
+      {"/reset",                                                rabbit_mgmt_wm_reset, []},
+      {"/reset/:node",                                          rabbit_mgmt_wm_reset, []},
+      {"/rebalance/queues",                                     rabbit_mgmt_wm_rebalance_queues, [{queues, all}]},
+-     {"/auth",                                                 rabbit_mgmt_wm_auth, []},
+      {"/auth/attempts/:node",                                  rabbit_mgmt_wm_auth_attempts, [all]},
+      {"/auth/attempts/:node/source",                           rabbit_mgmt_wm_auth_attempts, [by_source]},
+      {"/login",                                                rabbit_mgmt_wm_login, []},
+diff --git a/deps/rabbitmq_management/src/rabbit_mgmt_wm_auth.erl b/deps/rabbitmq_management/src/rabbit_mgmt_wm_auth.erl
+index 3e5a078dca..5e54ae381e 100644
+--- a/deps/rabbitmq_management/src/rabbit_mgmt_wm_auth.erl
++++ b/deps/rabbitmq_management/src/rabbit_mgmt_wm_auth.erl
+@@ -7,8 +7,6 @@
+ 
+ -module(rabbit_mgmt_wm_auth).
+ 
+--export([init/2, to_json/2, content_types_provided/2, is_authorized/2]).
+--export([variances/2]).
+ -export([authSettings/0]). %% for testing only
+ 
+ -include_lib("rabbitmq_management_agent/include/rabbit_mgmt_records.hrl").
+@@ -16,15 +14,6 @@
+ 
+ %%--------------------------------------------------------------------
+ 
+-init(Req, _State) ->
+-    {cowboy_rest, rabbit_mgmt_headers:set_common_permission_headers(Req, ?MODULE), #context{}}.
+-
+-variances(Req, Context) ->
+-    {[<<"accept-encoding">>, <<"origin">>], Req, Context}.
+-
+-content_types_provided(ReqData, Context) ->
+-   {rabbit_mgmt_util:responder_map(to_json), ReqData, Context}.
+-
+ merge_oauth_provider_info(OAuthResourceServer, MgtResourceServer, ManagementProps) ->
+   OAuthProviderResult = case proplists:get_value(oauth_provider_id, OAuthResourceServer) of
+     undefined -> oauth2_client:get_oauth_provider([issuer]);
+@@ -143,12 +132,6 @@ filter_empty_properties(ListOfProperties) ->
+ 
+ to_binary(Value) -> rabbit_data_coercion:to_binary(Value).
+ 
+-to_json(ReqData, Context) ->
+-   rabbit_mgmt_util:reply(authSettings(), ReqData, Context).
+-
+-is_authorized(ReqData, Context) ->
+-    {true, ReqData, Context}.
+-
+ is_invalid(List) ->
+     lists:any(fun(V) -> case V of
+       "" -> true;

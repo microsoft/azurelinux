@@ -19,8 +19,8 @@
 %global __brp_remove_la_files %nil
 
 Name: openldap
-Version: 2.6.10
-Release: 7%{?dist}
+Version: 2.6.13
+Release: 1%{?dist}
 Summary: LDAP support libraries
 License: OLDAP-2.8
 URL: http://www.openldap.org/
@@ -554,6 +554,9 @@ exit 0
 %endif
 
 %changelog
+* Tue Mar 17 2026 Simon Pichugin <spichugi@redhat.com> - 2.6.13-1
+- Rebase to version 2.6.13 (rhbz#2447584)
+
 * Fri Aug 29 2025 Simon Pichugin <spichugi@redhat.com> - 2.6.10-4
 - Fix LDAP initialization does unnecessary resolution of hostname (rhbz#2392068)
 - Convert STI tests to FMF (rhbz#2392069)

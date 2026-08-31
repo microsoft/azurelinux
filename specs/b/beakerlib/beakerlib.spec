@@ -3,8 +3,8 @@
 
 Name:       beakerlib
 Summary:    A shell-level integration testing library
-Version:    1.33
-Release: 4%{?dist}
+Version:    1.33.3
+Release:    1%{?dist}
 License:    GPL-2.0-only
 BuildArch:  noarch
 URL:        https://github.com/%{name}
@@ -21,18 +21,20 @@ Recommends: /usr/libexec/platform-python
 # rhel <= 7
 Requires:   /usr/bin/python
 %endif
-%if 0%{?rhel} < 8
-Requires:   /usr/bin/perl
-Requires:   wget
-Requires:   python-lxml
-Requires:   /usr/bin/xmllint
-%else
-# rhel > 7 and fedora
+%if 0%{?rhel} >= 8 || 0%{?fedora}
+# rhel >= 8 and fedora
 Recommends: /usr/bin/perl
 Requires:   (wget or curl)
 Suggests:   wget
 Recommends: python3-lxml
+Recommends: python3-six
 Recommends: /usr/bin/xmllint
+%else
+# rhel < 8
+Requires:   /usr/bin/perl
+Requires:   wget
+Requires:   python-lxml
+Requires:   /usr/bin/xmllint
 %endif
 Requires:   grep
 Requires:   sed
@@ -42,10 +44,16 @@ Requires:   tar
 Requires:   gzip
 Requires:   util-linux
 Requires:   which
-%if 0%{?fedora}
-Requires:   dnf-utils
+%if 0%{?fedora} || 0%{?rhel} >= 11
+Requires:   dnf5-command(download)
+Requires:   dnf5-command(repoquery)
+%else
+%if 0%{?rhel} >= 8
+Requires:   dnf-command(download)
+Requires:   dnf-command(repoquery)
 %else
 Requires:   yum-utils
+%endif
 %endif
 Requires:   /usr/bin/bc
 Requires:   /usr/bin/time
@@ -132,6 +140,15 @@ Files for syntax highlighting BeakerLib tests in VIM editor
 %{_datadir}/vim/vimfiles/after/syntax/beakerlib.vim
 
 %changelog
+* Tue Apr 07 2026 Dalibor Pospisil <dapospis@redhat.com> - 1.33.3
+fix rlWaitForSocket for unix sockets, by mrc0mmand
+
+* Thu Mar 05 2026 Cristian Le <fedora@lecris.me> - 1.33.2
+- Add dependency on six from beakerlib-journalling
+
+* Tue Feb 24 2026 Dalibor Pospisil <dapospis@redhat.com> - 1.33.1
+- updated the dnf/yum rpm dependencies, by yselkowitz
+
 * Fri Feb 6 2026 Dalibor Pospisil <dapospis@redhat.com> - 1.33
 - added support for libraries referenced using name only
 

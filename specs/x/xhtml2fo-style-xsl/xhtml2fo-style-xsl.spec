@@ -3,7 +3,7 @@
 
 Name: xhtml2fo-style-xsl
 Version: 20051222
-Release: 35%{?dist}
+Release: 32%{?dist}
 
 Summary: Antenna House, Inc. XHTML to XSL:FO stylesheets
 License: MIT

@@ -3,22 +3,22 @@
 
 Summary:	The PBKDF2 password hashing algorithm
 Name:		perl-Crypt-PBKDF2
-Version:	0.161520
-Release: 27%{?dist}
+Version:	0.261630
+Release:	1%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Crypt-PBKDF2
 Source0:	https://cpan.metacpan.org/modules/by-module/Crypt/Crypt-PBKDF2-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
-BuildRequires:	make
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
-BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:	perl(Module::Build::Tiny) >= 0.034
 BuildRequires:	perl(strict)
 BuildRequires:	perl(warnings)
 # Module Runtime
 BuildRequires:	perl(Carp)
+BuildRequires:	perl(Crypt::URandom)
 BuildRequires:	perl(Digest) >= 1.16
 BuildRequires:	perl(Digest::HMAC) >= 1.01
 BuildRequires:	perl(Digest::SHA)
@@ -38,13 +38,14 @@ BuildRequires:	perl(constant)
 BuildRequires:	perl(Encode)
 BuildRequires:	perl(Test::Fatal)
 BuildRequires:	perl(Test::More)
-# Runtime
+# Dependencies
+# (none)
 
 %description
 PBKDF2 is a secure password hashing algorithm that uses the techniques of "key
 strengthening" to make the complexity of a brute-force attack arbitrarily high.
 PBKDF2 uses any other cryptographic hash or cipher (by convention, usually
-HMAC-SHA1, but Crypt::PBKDF2 is fully pluggable), and allows for an arbitrary
+HMAC-SHA2, but Crypt::PBKDF2 is fully pluggable), and allows for an arbitrary
 number of iterations of the hashing function, and a nearly unlimited output
 hash size (up to 2**32-1 times the size of the output of the backend hash).
 The hash is salted, as any password hash should be, and the salt may also be of
@@ -54,19 +55,19 @@ arbitrary size.
 %setup -q -n Crypt-PBKDF2-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+perl Build.PL --installdirs=vendor
+./Build
 
 %install
-%{make_install}
+./Build install --destdir=%{buildroot} --create_packlist=0
 %{_fixperms} -c %{buildroot}
 
 %check
-make test
+./Build test --verbose
 
 %files
 %license LICENSE
-%doc Changes
+%doc Changes README
 %{perl_vendorlib}/Crypt/
 %{_mandir}/man3/Crypt::PBKDF2.3*
 %{_mandir}/man3/Crypt::PBKDF2::Hash.3*
@@ -76,6 +77,21 @@ make test
 %{_mandir}/man3/Crypt::PBKDF2::Hash::HMACSHA3.3*
 
 %changelog
+* Fri Jun 12 2026 Paul Howarth <paul@city-fan.org> - 0.261630-1
+- Update to 0.261630 (rhbz#2488228)
+  - Change the default hash algorithm to HMAC-SHA256, and increase the default
+    number of iterations to 600,000, in line with current OWASP recommendations
+    (CVE-2026-9641)
+  - Generate salts using Crypt::URandom (a strong system RNG) instead of perl's
+    builtin rand(), which is not cryptographically secure (CVE-2026-9638)
+  - Use a constant-time comparison in 'validate' to avoid timing attacks
+    (CVE-2017-20240)
+- Switch to Module::Build::Tiny flow
+- Package new README file
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.161520-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.161520-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

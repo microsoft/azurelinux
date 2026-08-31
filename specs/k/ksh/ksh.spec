@@ -7,7 +7,7 @@ URL:          http://www.kornshell.com/
 License:      EPL-2.0
 Epoch:        3
 Version:      1.0.10
-Release: 9%{?dist}
+Release:      6%{?dist}
 Source0:      https://github.com/ksh93/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:      kshcomp.conf
 Source2:      kshrc.rhs

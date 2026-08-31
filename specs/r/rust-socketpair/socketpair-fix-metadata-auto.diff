@@ -1,5 +1,5 @@
 --- socketpair-0.19.8/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ socketpair-0.19.8/Cargo.toml	2025-07-08T22:31:26.780858+00:00
++++ socketpair-0.19.8/Cargo.toml	2026-08-14T07:41:50.095286+00:00
 @@ -74,20 +74,6 @@
  version = "1.0.0"
  features = ["net"]

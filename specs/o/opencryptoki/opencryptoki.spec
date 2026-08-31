@@ -3,8 +3,8 @@
 
 Name: opencryptoki
 Summary: Implementation of the PKCS#11 (Cryptoki) specification v3.0 and partially v3.1
-Version: 3.25.0
-Release: 7%{?dist}
+Version: 3.26.0
+Release: 3%{?dist}
 License: CPL-1.0
 URL: https://github.com/opencryptoki/opencryptoki
 Source0: https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -24,11 +24,8 @@ Patch2: opencryptoki-3.24.0-tmpfiles-image-mode.patch
 Patch3: opencryptoki-lockdir-image-mode.patch
 
 # upstream patches
-# Fix detection of EC curve not supported by OpenSSL-3.5.x
-Patch10: opencryptoki-openssl-3.5.x.patch
-
-# Fix covscan findings, https://github.com/opencryptoki/opencryptoki/pull/880
-Patch11: opencryptoki-3.25.0-covscan-findings.patch
+# CVE-3-2026-23893
+Patch100: opencryptoki-3.26.0-CVE-3-2026-23893.patch
 
 Requires(pre): coreutils
 Requires: (selinux-policy >= 34.9-1 if selinux-policy-targeted)
@@ -416,6 +413,15 @@ fi
 
 
 %changelog
+* Tue May 05 2026 Than Ngo <than@redhat.com> - 3.26.0-3
+- Fix rhbz#2432016: CVE-2026-23893, Privilege Escalation or Data Exposure via Symlink Following
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.26.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 28 2025 Than Ngo <than@redhat.com> - 3.26.0-1
+- Update to 3.26.0
+
 * Tue Jul 29 2025 Than Ngo <than@redhat.com> - 3.25.0-4
 - Require openssl >= 3.5.1
 - Fix incorrect effective group id of pkcsslotd daemon

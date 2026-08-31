@@ -1,0 +1,1229 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Andrew Burgess <aburgess@redhat.com>
+Date: Fri, 8 May 2026 21:44:12 +0100
+Subject: gdb-rhbz2467251-computed-location-synthetic-pointers.patch
+
+;; Backport the following upstream commits in order to address RHBZ
+;; 2467251: d980317c7f1, 958d06262a7, 7d1d7386561, 8915de0883c,
+;; 8f65ab7b71f.  These commits will all drop out when we rebase to GDB
+;; 18.
+
+*** Commit d980317c7f1: gdb: int to bool conversion in valprint.{c,}h
+
+gdb: int to bool conversion in valprint.{c,h}
+
+Some int to bool conversion in valprint.c and valprint.h.  I also
+moved the header comment on val_print_scalar_type_p into the header.
+
+There should be no user visible changes after this commit.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+Commit 958d06262a7: gdb: fix coerce_pieced_ref for multi-piece values
+
+gdb: fix coerce_pieced_ref for multi-piece values
+
+Bug PR gdb/30693 describes a case where the following assertion can be
+triggered:
+
+  ../../gdb/dwarf2/loc.c:2213: internal-error: value* coerce_pieced_ref(const value*): Assertion `closure->pieces.size () == 1' failed.
+
+The problem is that coerce_pieced_ref makes the following claim:
+
+      /* gdb represents synthetic pointers as pieced values with a single
+        piece.  */
+      gdb_assert (closure != NULL);
+      gdb_assert (closure->pieces.size () == 1);
+
+But this is not really true.  If an aggregate type contains a synthetic
+pointer, then it is possible that the aggregate type will have a
+computed location consisting of multiple pieces.  When GDB prints the
+fields of that aggregate type these fields are extracted by calling
+value::primitive_field.  Within value::primitive_field the location of
+the field is set by calling value::set_component_location.
+
+When the parent value that holds the field has a computed location, the
+field value gains a reference to the parent value's closure, this can be
+seen in copy_pieced_value_closure in dwarf2/expr.c.
+
+What this means is that, if the aggregate value has a multi-piece
+computed location, then the synthetic pointer field will also have a
+reference to that same multi-piece computed location, even if there is
+really only a single piece that describes the synthetic pointer itself.
+
+Some parts of GDB are already aware of this.  If we look at
+check_pieced_synthetic_pointer which implements the
+value::bits_synthetic_pointer function, you'll see that this function
+searches through all of the pieces to find the piece that covers the
+value we are looking for, it then checks if that piece is an implicit
+pointer location.  But back in coerce_pieced_ref, after calling
+value::bits_synthetic_pointer, we still make the assertion that there
+will be just a single piece.
+
+Fix this by copying the search through all pieces logic into
+coerce_pieced_ref (see note on efficiency below).  We now search through
+all the pieces looking for a piece that describes the location of the
+synthetic pointer, and we then use that piece to form the pointer's
+value.
+
+There are some assertions in the new code, these align with how
+check_pieced_synthetic_pointer operates.
+
+In addition, there is an error for the case where multiple pieces are
+used to describe the location of a synthetic pointer.  This case is
+technically allowed by check_pieced_synthetic_pointer, but supporting
+this would require changes to indirect_synthetic_pointer, so I propose
+leaving that until we see such a case in the wild.
+
+On efficiency, you'll notice that check_pieced_synthetic_pointer
+performs a search through all the location pieces, and
+coerce_pieced_ref also has to search through the pieces.  It would be
+nice if this could be avoided in order to avoid multiple searches.
+Currently though coerce_pieced_ref calls
+value->bits_synthetic_pointer, which is an API that should be agnostic
+to the underlying implementation, i.e. shouldn't need to know that the
+implementation is computed, so passing pieces back would be harder.
+
+Maybe coerce_pieced_ref could avoid the value::bits_synthetic_pointer
+call, and instead call check_pieced_synthetic_pointer directly, or
+some related helper function, and could get the pieces back that way.
+But this breaks the cleanly structured API that we currently have.
+
+For now I'm leaving things as they are.  My assumption is that the
+number of pieces used to represent a value is pretty low, so the
+search is actually pretty cheap.
+
+There's a new test that uses the DWARF assembler to create a
+representative example of a multi-piece aggregate that contains a
+synthetic pointer member variable.  This test triggers the assertion
+before this commit.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=30693
+Bug: https://bugzilla.redhat.com/show_bug.cgi?id=2467251
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+Commit 7d1d7386561: gdb: rename argument in valprint_check_validity
+
+gdb: rename argument in valprint_check_validity
+
+To understand the motivation for this commit you'll need to look ahead
+two commits in this series for an upcoming bug fix.
+
+Look at coerce_pieced_ref in dwarf2/expr.c, and this call:
+
+  if (value->bits_synthetic_pointer (value->embedded_offset (),
+                                     TARGET_CHAR_BIT * type->length ()))
+    { ... }
+
+This passes the result from value::embedded_offset as the first argument.
+Though it's not clear from value.h, the number returned by
+value::embedded_offset is a byte offset.
+
+The value::bits_synthetic_pointer call can end up calling
+check_pieced_synthetic_pointer, with the first argument to
+value::bits_synthetic_pointer becoming the second argument to
+check_pieced_synthetic_pointer.  The second argument to
+check_pieced_synthetic_pointer is called BIT_OFFSET, a value in bits.
+Looking at how this argument is used confirms that it is expected to be
+a value in bits, not bytes.
+
+The fix should be easy, multiply the embedded offset by
+TARGET_CHAR_BIT, but I think things are a little more complex than
+this.
+
+I started looking at how value::bits_synthetic_pointer is used, there
+are only 7 uses, and they can be grouped as follows:
+
+gdb/dwarf2/expr.c
+gdb/valops.c
+
+  These call value::embedded_offset directly within the call to
+  value::bits_synthetic_pointer.
+
+gdb/opencl-lang.c
+
+  This function is used as a wrapper that implements a
+  lval_funcs::check_synthetic_pointer callback, it adjusts the
+  arguments and then calls value::bits_synthetic_pointer.  As such we'd
+  not expect to see embedded offset mentioned here as that would (we
+  assume) be handled by the caller.
+
+gdb/valprint.c (in generic_val_print_ref)
+
+  This call passes an argument called 'embedded_offset', but the
+  function generic_val_print_ref is only used in one place, and the
+  embedded_offset is always passed as zero.
+
+gdb/valprint.c (in valprint_check_validity)
+
+  This call also passes an argument called 'embedded_offset'.  This
+  function is used in two places.  In common_val_print the
+  embedded_offset is always passed as zero, but in
+  valprint_check_validity (in cp-valprint.c) the embedded_offset being
+  passed is the offset of a field within the value, not the value's
+  embedded_offset within some larger value.
+
+gdb/cp-valprint.c
+gdb/p-valprint.c
+
+  As with the call to valprint_check_validity in cp-valprint.c, these
+  two direct calls to value::bits_synthetic_pointer pass the offset of a
+  field within the value, rather than the value's embedded_offset.
+
+What I see in the above is some confusion.  In some places we are
+passing the value::embedded_offset, while in other places we are
+passing the offset of a field within the value itself.
+
+If we consider the direct call to value::bits_synthetic_pointer in
+gdb/cp-valprint.c, where a field offset is passed, then it should be
+possible, that if we can create an object with a non-zero
+embedded_offset (which isn't accounted for in this code path), then we
+should see some bugs in GDB, and indeed, this is what I do see.
+
+My plan for fixing this is to have the offset passed to
+value::bits_synthetic_pointer always be a field offset within the value,
+the value::embedded_offset will then be handled directly within the
+various value::bits_synthetic_pointer implementations.
+
+This commit is a small refactor in preparation for this fix.
+
+I believe part of the confusion here is that we have functions that
+take arguments called embedded_offset, when the value they should
+accept is no longer the embedded offset.
+
+So in this commit I propose renaming the embedded_offset argument to
+field_byte_offset in valprint_check_validity.  This is purely a
+mechanical rename, there should be no user visible changes after this
+commit.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+Commit 8915de0883c: gdb: remove embedded_offset argument that is always 0
+
+gdb: remove embedded_offset argument that is always 0
+
+For the background and motivation for this patch you should read the
+previous commit.
+
+The goal of this commit started as similar to the previous one; rename
+the embedded_offset argument to generic_val_print_ref.  To do this I
+started tracing back which values are passed into this function so I
+could make sure the new argument name matched the usage.
+
+But it turns out that the only value that is ever passed to this
+function is zero.
+
+I believe that, like the last commit, the embedded_offset is actually
+representing the offset of a field within a value.  However, in all of
+the use cases, the "field" being accessed is the entire value, hence
+why we always pass 0, we are asking about the whole value starting
+from the very beginning.
+
+Given this, I couldn't bring myself to rename the argument.  Let's just
+remove it.  It turns out that there's a bunch of functions in
+valprint.c that take an argument called embedded_offset, which are
+always zero.
+
+This commit removes the argument, and updates the code to assume zero.
+
+There should be no user visible changes after this commit.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+Commit 8f65ab7b71f: gdb: use value::embedded_offset in check_pieced_synthetic_pointer
+
+gdb: use value::embedded_offset in check_pieced_synthetic_pointer
+
+This commit builds on the previous two commits.  You should go and
+read them both for context.
+
+Looking at the users of value::bits_synthetic_pointer, all callers but
+two are now passing either the offset of a field within the value, or
+hard-coded zero as they want to ask about the entire value.
+
+The two exceptions are in coerce_pieced_ref (in dwarf2/expr.c) and in
+value_addr (in valops.c) where we still pass value::embedded_offset.
+
+The problem is that some of the other callers, where we currently pass
+just a field offset, might also have a non-zero embedded offset,
+specifically, the call in cp_print_value_fields is in this category.
+In cp_print_value_fields we are printing fields from a value which is
+potentially a base class contained within an instance of a derived
+class, this will be represented by a non-zero embedded_offset, which
+is currently not taken into account.
+
+Additionally, the two callers that currently pass the
+value::embedded_offset don't scale the embedded offset from bytes to
+bits.
+
+The failure to scale from bytes to bits is interesting, I originally
+tried to create some tests that exposed this, but constantly failed.
+It turns out, that in both these locations, in all code paths that I
+could find, the value::embedded_offset will always be zero.  For
+example in coerce_pieced_ref, a reference cannot be a base class, and
+so we never expect to see a non-zero embedded_offset in this case.
+
+Similarly, in value_addr, the use of value::bits_synthetic_pointer is
+within a block that only applies to reference types, which means the
+embedded_offset will be zero.
+
+Now within check_pieced_synthetic_pointer we already add the
+value::offset into the bit_offset which is passed in.  Remember, after
+the previous two commits, the incoming bit_offset is (almost) always
+the offset of a field within the value.  The almost here is the two
+cases mentioned above.
+
+I propose that within check_pieced_synthetic_pointer we should take
+into account both value::offset and value::embedded_offset.  Then the
+two cases that currently pass value::embedded_offset can be changed to
+just pass zero.
+
+With this done, and the previous two commits, we now have a consistent
+model.  value::bits_synthetic_pointer expects the (bit) offset of a
+field within the value to check.  In many cases this will be zero
+meaning we want to check from the start of the value, but in some
+cases it can be non-zero.
+
+Then within value::bits_synthetic_pointer implementations, like
+check_pieced_synthetic_pointer, we will take the value::offset and
+value::embedded_offset into account, remembering to scale them from
+bytes to bits.
+
+I have also changed indirect_pieced_value to also take the
+embedded_offset into account.  I have done this for consistency rather
+than necessity.  I believe that the embedded_offset will always be
+zero within indirect_pieced_value.  The indirect_pieced_value function
+is only called from value_ind (in valops.c), and only operates on
+TYPE_CODE_PTR types (checked for in indirect_pieced_value).  As a
+TYPE_CODE_PTR cannot be the base class for a derived type, then we
+don't expect to ever see a TYPE_CODE_PTR value with a non-zero
+embedded_offset.  But, having indirect_pieced_value take the embedded
+offset into account is simple enough, and future proofs the code.
+
+In both check_pieced_synthetic_pointer and indirect_pieced_value I
+have changed uses of '8' to 'TARGET_CHAR_BIT', I was already touching
+some of these lines, and I think TARGET_CHAR_BIT is clearer, but one
+line in indirect_pieced_value was just updated to use TARGET_CHAR_BIT,
+this is done for consistency.
+
+The gdb.dwarf2/multi-piece-inherited-bitfield.exp test fails without
+this patch, this exposes the case where the embedded_offset is
+non-zero and we were previously failing to take this into account.
+
+The gdb.dwarf2/multi-piece-primitive-field.exp test was something I
+wrote while trying to exercise the coerce_pieced_ref code path some
+more.  It is an inheritance based version of the existing test, I was
+wondering if this would result in a value with a non-zero
+embedded_offset, but due to how the fields are extracted from the
+aggregate prior to calling coerce_pieced_ref the embedded_offset is
+always zero in this function.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+diff --git a/gdb/dwarf2/expr.c b/gdb/dwarf2/expr.c
+--- a/gdb/dwarf2/expr.c
++++ b/gdb/dwarf2/expr.c
+@@ -492,7 +492,8 @@ check_pieced_synthetic_pointer (const value *value, LONGEST bit_offset,
+   piece_closure *c = (piece_closure *) value->computed_closure ();
+   int i;
+ 
+-  bit_offset += 8 * value->offset ();
++  bit_offset += (TARGET_CHAR_BIT
++		 * (value->offset () + value->embedded_offset ()));
+   if (value->bitsize ())
+     bit_offset += value->bitpos ();
+ 
+@@ -537,8 +538,9 @@ indirect_pieced_value (value *value)
+   if (type->code () != TYPE_CODE_PTR)
+     return NULL;
+ 
+-  int bit_length = 8 * type->length ();
+-  LONGEST bit_offset = 8 * value->offset ();
++  int bit_length = TARGET_CHAR_BIT * type->length ();
++  LONGEST bit_offset
++    = (TARGET_CHAR_BIT * (value->offset () + value->embedded_offset ()));
+   if (value->bitsize ())
+     bit_offset += value->bitpos ();
+ 
+@@ -602,22 +604,62 @@ coerce_pieced_ref (const value *value)
+ {
+   struct type *type = check_typedef (value->type ());
+ 
+-  if (value->bits_synthetic_pointer (value->embedded_offset (),
+-				     TARGET_CHAR_BIT * type->length ()))
++  if (value->bits_synthetic_pointer (0, TARGET_CHAR_BIT * type->length ()))
+     {
+       const piece_closure *closure
+ 	= (piece_closure *) value->computed_closure ();
+       frame_info_ptr frame
+ 	= get_selected_frame (_("No frame selected."));
+ 
+-      /* gdb represents synthetic pointers as pieced values with a single
+-	 piece.  */
+-      gdb_assert (closure != NULL);
+-      gdb_assert (closure->pieces.size () == 1);
++      gdb_assert (closure != nullptr);
++
++      /* The value::bits_synthetic_pointer will return true if multiple
++	 pieces are used to cover VALUE, so long as each piece is
++	 DWARF_VALUE_IMPLICIT_POINTER.  I guess maybe this is possible, but
++	 we've not seen such a case in the wild yet.  For now then we look
++	 in CLOSURE for a single DWARF_VALUE_IMPLICIT_POINTER piece that
++	 covers VALUE.  */
++      LONGEST bit_offset = TARGET_CHAR_BIT * (value->embedded_offset ()
++					      + value->offset ());
++      if (value->bitsize ())
++	bit_offset += value->bitpos ();
++      int bit_length = TARGET_CHAR_BIT * type->length ();
++
++      const dwarf_expr_piece *piece = nullptr;
++      for (size_t i = 0; i < closure->pieces.size (); i++)
++	{
++	  const dwarf_expr_piece *p = &closure->pieces[i];
++	  size_t this_size_bits = p->size;
++
++	  if (bit_offset >= this_size_bits)
++	    {
++	      bit_offset -= this_size_bits;
++	      continue;
++	    }
++
++	  /* value::bits_synthetic_pointer does allow for multiple
++	     pieces to describe the location of a single synthetic
++	     pointer, or for a synthetic pointer to not start at the
++	     exact start of a piece, however, we don't currently
++	     support this case.  */
++	  if (bit_offset != 0 || bit_length != this_size_bits)
++	    error (_("unsupported value-piece configuration "
++		     "bit_offset = %s, bit_length = %d, this_size_bits = %s"),
++		   plongest (bit_offset), bit_length,
++		   pulongest (this_size_bits));
++
++	  piece = p;
++	  break;
++	}
++
++      /* If value::bits_synthetic_pointer returned true then we should have
++	 found a suitable piece.  */
++      gdb_assert (piece != nullptr);
++      gdb_assert (piece->location == DWARF_VALUE_IMPLICIT_POINTER);
+ 
+       return indirect_synthetic_pointer
+-	(closure->pieces[0].v.ptr.die_sect_off,
+-	 closure->pieces[0].v.ptr.offset,
++	(piece->v.ptr.die_sect_off,
++	 piece->v.ptr.offset,
+ 	 closure->per_cu, closure->per_objfile, frame, type);
+     }
+   else
+diff --git a/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.c b/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.c
+@@ -0,0 +1,25 @@
++/* Copyright (C) 2026 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++int target_var = 42;
++
++int
++main (void)
++{
++  asm ("main_label: .globl main_label");
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.exp b/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/multi-piece-inherited-bitfield.exp
+@@ -0,0 +1,151 @@
++# Copyright 2026 Free Software Foundation, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Setup a derived struct that uses multiple inheritance and is described
++# by a multi-piece DWARF location.  The second base class contains a
++# bitfield member.  At one time, printing such a struct would incorrectly
++# display the bitfield as <synthetic pointer>.
++#
++# The cause was that check_pieced_synthetic_pointer (dwarf2/expr.c)
++# computes the bit offset as 8 * value->offset() but does not add
++# 8 * value->embedded_offset().  When a base subobject is extracted via
++# primitive_field, it gets a non-zero embedded_offset but offset remains
++# zero.  check_pieced_synthetic_pointer then checks piece 0 instead of
++# the correct piece, and if piece 0 happens to be an implicit pointer,
++# it incorrectly reports the bitfield as a synthetic pointer.
++
++require allow_cplus_tests
++
++load_lib dwarf.exp
++
++# This test can only be run on targets which support DWARF-2 and use gas.
++require dwarf2_support
++
++standard_testfile .c .S
++
++set asm_file [standard_output_file ${srcfile2}]
++
++# First compile the C file only, so we can query some type sizes.
++if {[prepare_for_testing "failed to prepare" ${testfile} ${srcfile}]} {
++    return
++}
++
++Dwarf::assemble ${asm_file} {
++    cu {} {
++	DW_TAG_compile_unit {
++	    {DW_AT_language @DW_LANG_C_plus_plus}
++	} {
++	    declare_labels char_label int_label first_label second_label \
++		derived_label target_label
++	    set int_size [get_sizeof "int" -1]
++
++	    char_label: DW_TAG_base_type {
++		{DW_AT_byte_size 1 DW_FORM_udata}
++		{DW_AT_encoding @DW_ATE_unsigned_char}
++		{DW_AT_name "char"}
++	    }
++
++	    int_label: DW_TAG_base_type {
++		{DW_AT_byte_size ${int_size} DW_FORM_udata}
++		{DW_AT_encoding @DW_ATE_signed}
++		{DW_AT_name "int"}
++	    }
++
++	    first_label: DW_TAG_structure_type {
++		{DW_AT_name "First"}
++		{DW_AT_byte_size 1 DW_FORM_udata}
++	    } {
++		DW_TAG_member {
++		    {DW_AT_name "a"}
++		    {DW_AT_type :${char_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++	    }
++
++	    second_label: DW_TAG_structure_type {
++		{DW_AT_name "Second"}
++		{DW_AT_byte_size 1 DW_FORM_udata}
++	    } {
++		DW_TAG_member {
++		    {DW_AT_name "bf"}
++		    {DW_AT_type :${int_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		    {DW_AT_bit_size 8 DW_FORM_udata}
++		}
++	    }
++
++	    derived_label: DW_TAG_structure_type {
++		{DW_AT_name "Derived"}
++		{DW_AT_byte_size 2 DW_FORM_udata}
++	    } {
++		DW_TAG_inheritance {
++		    {DW_AT_type :${first_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++
++		DW_TAG_inheritance {
++		    {DW_AT_type :${second_label}}
++		    {DW_AT_data_member_location 1 DW_FORM_udata}
++		}
++	    }
++
++	    target_label: DW_TAG_variable {
++		{DW_AT_name "target_var"}
++		{DW_AT_type :${int_label}}
++		{DW_AT_external 1 DW_FORM_flag}
++		{DW_AT_location {
++		    DW_OP_addr [gdb_target_symbol "target_var"]
++		} SPECIAL_expr}
++	    }
++
++	    DW_TAG_subprogram {
++		{MACRO_AT_func { "main" }}
++		{DW_AT_type :${int_label}}
++		{DW_AT_external 1 DW_FORM_flag}
++	    } {
++		DW_TAG_variable {
++		    {DW_AT_name "d"}
++		    {DW_AT_type :${derived_label}}
++		    {DW_AT_location {
++			DW_OP_GNU_implicit_pointer $target_label 0
++			DW_OP_piece 1
++			DW_OP_const1u 42
++			DW_OP_stack_value
++			DW_OP_piece 1
++		    } SPECIAL_expr}
++		}
++	    }
++	}
++    }
++}
++
++# Now compile both C source and generated DWARF assembly.
++if {[prepare_for_testing "failed to prepare" ${testfile} \
++	 [list ${asm_file} ${srcfile}] {}]} {
++    return
++}
++
++# Start the inferior so that 'd' is in scope.
++if {![runto_main]} {
++    return
++}
++
++# With the bug in check_pieced_synthetic_pointer, the bitfield bf in the
++# Second base subobject is incorrectly reported as <synthetic pointer>.
++# This happens because check_pieced_synthetic_pointer does not account for
++# embedded_offset, so it checks piece 0 (the implicit pointer covering
++# First) instead of piece 1 (the stack value covering Second).
++gdb_test "print d" " = {<First> = {a = <synthetic pointer>}, <Second> = {bf = 42}, <No data fields>}" \
++    "bitfield in base subobject is not synthetic pointer"
+diff --git a/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.c b/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.c
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.c
+@@ -0,0 +1,25 @@
++/* Copyright (C) 2026 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++int target_var = 42;
++
++int
++main (void)
++{
++  asm ("main_label: .globl main_label");
++  return 0;
++}
+diff --git a/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.exp b/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.exp
+new file mode 100644
+--- /dev/null
++++ b/gdb/testsuite/gdb.dwarf2/multi-piece-primitive-field.exp
+@@ -0,0 +1,190 @@
++# Copyright 2026 Free Software Foundation, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Setup a struct variable that is described by a multi-piece DWARF location.
++# One of the struct's fields is a C++ reference type implemented via
++# DW_OP_GNU_implicit_pointer.  At one time, attempting to print such a field
++# would trigger an assertion in GDB.
++#
++# The cause was that primitive_field extracts the reference field and
++# set_component_location copies the parent's entire piece_closure (just
++# incrementing its refcount).  Then coerce_pieced_ref would assert
++# closure->pieces.size() == 1, which failed because the closure still had
++# all the parent's pieces.
++#
++# This test confirms that this issue has now been fixed.
++
++require allow_cplus_tests
++
++load_lib dwarf.exp
++
++# This test can only be run on targets which support DWARF-2 and use gas.
++require dwarf2_support
++
++standard_testfile .c .S
++
++set asm_file [standard_output_file ${srcfile2}]
++
++# First compile the C file only, so we can query some type sizes.
++if {[prepare_for_testing "failed to prepare" ${testfile} ${srcfile}]} {
++    return
++}
++
++Dwarf::assemble ${asm_file} {
++    cu {} {
++	DW_TAG_compile_unit {
++	    {DW_AT_language @DW_LANG_C_plus_plus}
++	} {
++	    declare_labels int_label struct_label ref_type_label target_label \
++		first_label second_label derived_label
++	    set int_size [get_sizeof "int" -1]
++	    set addr_size [get_sizeof "void *" -1]
++	    set struct_size [expr {$int_size + $addr_size}]
++
++	    int_label: DW_TAG_base_type {
++		{DW_AT_byte_size ${int_size} DW_FORM_udata}
++		{DW_AT_encoding @DW_ATE_signed}
++		{DW_AT_name "int"}
++	    }
++
++	    ref_type_label: DW_TAG_reference_type {
++		{DW_AT_byte_size ${addr_size} DW_FORM_udata}
++		{DW_AT_type :${int_label}}
++	    }
++
++	    struct_label: DW_TAG_structure_type {
++		{DW_AT_name "S"}
++		{DW_AT_byte_size ${struct_size} DW_FORM_udata}
++	    } {
++		DW_TAG_member {
++		    {DW_AT_name "x"}
++		    {DW_AT_type :${int_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++
++		DW_TAG_member {
++		    {DW_AT_name "ref"}
++		    {DW_AT_type :${ref_type_label}}
++		    {DW_AT_data_member_location ${int_size} DW_FORM_udata}
++		}
++	    }
++
++	    first_label: DW_TAG_structure_type {
++		{DW_AT_name "first"}
++		{DW_AT_byte_size ${int_size} DW_FORM_udata}
++	    } {
++		DW_TAG_member {
++		    {DW_AT_name "x"}
++		    {DW_AT_type :${int_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++	    }
++
++	    second_label: DW_TAG_structure_type {
++		{DW_AT_name "second"}
++		{DW_AT_byte_size ${addr_size} DW_FORM_udata}
++	    } {
++		DW_TAG_member {
++		    {DW_AT_name "ref"}
++		    {DW_AT_type :${ref_type_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++	    }
++
++	    derived_label: DW_TAG_structure_type {
++		{DW_AT_name "derived"}
++		{DW_AT_byte_size ${struct_size} DW_FORM_udata}
++	    } {
++		DW_TAG_inheritance {
++		    {DW_AT_type :${first_label}}
++		    {DW_AT_data_member_location 0 DW_FORM_udata}
++		}
++
++		DW_TAG_inheritance {
++		    {DW_AT_type :${second_label}}
++		    {DW_AT_data_member_location ${int_size} DW_FORM_udata}
++		}
++	    }
++
++	    target_label: DW_TAG_variable {
++		{DW_AT_name "target_var"}
++		{DW_AT_type :${int_label}}
++		{DW_AT_external 1 DW_FORM_flag}
++		{DW_AT_location {
++		    DW_OP_addr [gdb_target_symbol "target_var"]
++		} SPECIAL_expr}
++	    }
++
++	    DW_TAG_subprogram {
++		{MACRO_AT_func { "main" }}
++		{DW_AT_type :${int_label}}
++		{DW_AT_external 1 DW_FORM_flag}
++	    } {
++		DW_TAG_variable {
++		    {DW_AT_name "s"}
++		    {DW_AT_type :${struct_label}}
++		    {DW_AT_location {
++			DW_OP_const4u 123
++			DW_OP_stack_value
++			DW_OP_piece $int_size
++			DW_OP_GNU_implicit_pointer $target_label 0
++			DW_OP_piece $addr_size
++		    } SPECIAL_expr}
++		}
++
++		DW_TAG_variable {
++		    {DW_AT_name "d"}
++		    {DW_AT_type :${derived_label}}
++		    {DW_AT_location {
++			DW_OP_const4u 456
++			DW_OP_stack_value
++			DW_OP_piece $int_size
++			DW_OP_GNU_implicit_pointer $target_label 0
++			DW_OP_piece $addr_size
++		    } SPECIAL_expr}
++		}
++	    }
++	}
++    }
++}
++
++# Now compile both C source and generated DWARF assembly.
++if {[prepare_for_testing "failed to prepare" ${testfile} \
++	 [list ${asm_file} ${srcfile}] {}]} {
++    return
++}
++
++# Start the inferior so that 's' is in scope.
++if {![runto_main]} {
++    return
++}
++
++# Printing `s` used to crash with an assertion failure in coerce_pieced_ref
++# because the ref field inherited the parent struct's multi-piece closure.
++gdb_test "print s" " = {x = 123, ref = @$hex}" \
++    "print multi-piece struct with implicit pointer reference field"
++
++gdb_test "print s.ref" " = \\(int &\\) @$hex: 42" \
++    "print ref member of multi-piece struct"
++
++# Same test but with inheritance.  The reference field is in the
++# second base class, so it reaches coerce_pieced_ref through a
++# different path to the above case.
++gdb_test "print d" \
++    " = {<first> = {x = 456}, <second> = {ref = @$hex}, <No data fields>}" \
++    "print inherited multi-piece struct with implicit pointer ref"
++
++gdb_test "print d.ref" " = \\(int &\\) @$hex: 42" \
++    "print ref member of inherited multi-piece struct"
+diff --git a/gdb/valops.c b/gdb/valops.c
+--- a/gdb/valops.c
++++ b/gdb/valops.c
+@@ -1545,8 +1545,7 @@ value_addr (struct value *arg1)
+ 
+   if (TYPE_IS_REFERENCE (type))
+     {
+-      if (arg1->bits_synthetic_pointer (arg1->embedded_offset (),
+-					TARGET_CHAR_BIT * type->length ()))
++      if (arg1->bits_synthetic_pointer (0, TARGET_CHAR_BIT * type->length ()))
+ 	arg1 = coerce_ref (arg1);
+       else
+ 	{
+diff --git a/gdb/valprint.c b/gdb/valprint.c
+--- a/gdb/valprint.c
++++ b/gdb/valprint.c
+@@ -92,7 +92,6 @@ static void set_output_radix_1 (int, unsigned);
+ 
+ static void val_print_type_code_flags (struct type *type,
+ 				       struct value *original_value,
+-				       int embedded_offset,
+ 				       struct ui_file *stream);
+ 
+ /* Start print_max at this value.  */
+@@ -310,11 +309,9 @@ show_symbol_print (struct ui_file *file, int from_tty,
+ 
+ 
+ 
+-/* A helper function for val_print.  When printing in "summary" mode,
+-   we want to print scalar arguments, but not aggregate arguments.
+-   This function distinguishes between the two.  */
++/* See valprint.h.  */
+ 
+-int
++bool
+ val_print_scalar_type_p (struct type *type)
+ {
+   type = check_typedef (type);
+@@ -330,9 +327,9 @@ val_print_scalar_type_p (struct type *type)
+     case TYPE_CODE_UNION:
+     case TYPE_CODE_SET:
+     case TYPE_CODE_STRING:
+-      return 0;
++      return false;
+     default:
+-      return 1;
++      return true;
+     }
+ }
+ 
+@@ -350,10 +347,10 @@ val_print_scalar_or_string_type_p (struct type *type,
+ 
+ /* See valprint.h.  */
+ 
+-int
++bool
+ valprint_check_validity (struct ui_file *stream,
+ 			 struct type *type,
+-			 LONGEST embedded_offset,
++			 LONGEST field_byte_offset,
+ 			 const struct value *val)
+ {
+   type = check_typedef (type);
+@@ -361,31 +358,31 @@ valprint_check_validity (struct ui_file *stream,
+   if (type_not_associated (type))
+     {
+       val_print_not_associated (stream);
+-      return 0;
++      return false;
+     }
+ 
+   if (type_not_allocated (type))
+     {
+       val_print_not_allocated (stream);
+-      return 0;
++      return false;
+     }
+ 
+   if (type->code () != TYPE_CODE_UNION
+       && type->code () != TYPE_CODE_STRUCT
+       && type->code () != TYPE_CODE_ARRAY)
+     {
+-      if (val->bits_any_optimized_out (TARGET_CHAR_BIT * embedded_offset,
++      if (val->bits_any_optimized_out (TARGET_CHAR_BIT * field_byte_offset,
+ 				       TARGET_CHAR_BIT * type->length ()))
+ 	{
+ 	  val_print_optimized_out (val, stream);
+-	  return 0;
++	  return false;
+ 	}
+ 
+-      if (val->bits_synthetic_pointer (TARGET_CHAR_BIT * embedded_offset,
++      if (val->bits_synthetic_pointer (TARGET_CHAR_BIT * field_byte_offset,
+ 				       TARGET_CHAR_BIT * type->length ()))
+ 	{
+-	  const int is_ref = type->code () == TYPE_CODE_REF;
+-	  int ref_is_addressable = 0;
++	  const bool is_ref = type->code () == TYPE_CODE_REF;
++	  bool ref_is_addressable = false;
+ 
+ 	  if (is_ref)
+ 	    {
+@@ -403,14 +400,14 @@ valprint_check_validity (struct ui_file *stream,
+ 	  return is_ref;
+ 	}
+ 
+-      if (!val->bytes_available (embedded_offset, type->length ()))
++      if (!val->bytes_available (field_byte_offset, type->length ()))
+ 	{
+ 	  val_print_unavailable (stream);
+-	  return 0;
++	  return false;
+ 	}
+     }
+ 
+-  return 1;
++  return true;
+ }
+ 
+ void
+@@ -595,14 +592,13 @@ generic_value_print_ptr (struct value *val, struct ui_file *stream,
+ 
+ static void
+ print_ref_address (struct type *type, const gdb_byte *address_buffer,
+-		  int embedded_offset, struct ui_file *stream)
++		   struct ui_file *stream)
+ {
+   struct gdbarch *gdbarch = type->arch ();
+ 
+   if (address_buffer != NULL)
+     {
+-      CORE_ADDR address
+-	= extract_typed_address (address_buffer + embedded_offset, type);
++      CORE_ADDR address = extract_typed_address (address_buffer, type);
+ 
+       gdb_printf (stream, "@");
+       gdb_puts (paddress (gdbarch, address), stream);
+@@ -631,32 +627,27 @@ get_value_addr_contents (struct value *deref_val)
+ 
+ static void
+ generic_val_print_ref (struct type *type,
+-		       int embedded_offset, struct ui_file *stream, int recurse,
++		       struct ui_file *stream, int recurse,
+ 		       struct value *original_value,
+ 		       const struct value_print_options *options)
+ {
+   struct type *elttype = check_typedef (type->target_type ());
+   struct value *deref_val = NULL;
+   const bool value_is_synthetic
+-    = original_value->bits_synthetic_pointer (TARGET_CHAR_BIT * embedded_offset,
+-					      TARGET_CHAR_BIT * type->length ());
+-  const int must_coerce_ref = ((options->addressprint && value_is_synthetic)
+-			       || options->deref_ref);
+-  const int type_is_defined = elttype->code () != TYPE_CODE_UNDEF;
++    = original_value->bits_synthetic_pointer (0, (TARGET_CHAR_BIT
++						  * type->length ()));
++  const bool must_coerce_ref = ((options->addressprint && value_is_synthetic)
++				|| options->deref_ref);
++  const bool type_is_defined = elttype->code () != TYPE_CODE_UNDEF;
+   const gdb_byte *valaddr = original_value->contents_for_printing ().data ();
+ 
+   if (must_coerce_ref && type_is_defined)
+     {
+       deref_val = coerce_ref_if_computed (original_value);
+ 
+-      if (deref_val != NULL)
+-	{
+-	  /* More complicated computed references are not supported.  */
+-	  gdb_assert (embedded_offset == 0);
+-	}
+-      else
++      if (deref_val == nullptr)
+ 	deref_val = value_at (type->target_type (),
+-			      unpack_pointer (type, valaddr + embedded_offset));
++			      unpack_pointer (type, valaddr));
+     }
+   /* Else, original_value isn't a synthetic reference or we don't have to print
+      the reference's contents.
+@@ -676,7 +667,7 @@ generic_val_print_ref (struct type *type,
+ 				 ? get_value_addr_contents (deref_val)
+ 				 : valaddr);
+ 
+-      print_ref_address (type, address, embedded_offset, stream);
++      print_ref_address (type, address, stream);
+ 
+       if (options->deref_ref)
+ 	gdb_puts (": ", stream);
+@@ -718,7 +709,7 @@ generic_val_print_enum_1 (struct type *type, LONGEST val,
+     }
+   else if (type->is_flag_enum ())
+     {
+-      int first = 1;
++      bool first = true;
+ 
+       /* We have a "flag" enum, so we try to decompose it into pieces as
+ 	 appropriate.  The enum may have multiple enumerators representing
+@@ -738,7 +729,7 @@ generic_val_print_enum_1 (struct type *type, LONGEST val,
+ 	      if (first)
+ 		{
+ 		  gdb_puts ("(", stream);
+-		  first = 0;
++		  first = false;
+ 		}
+ 	      else
+ 		gdb_puts (" | ", stream);
+@@ -780,20 +771,15 @@ generic_val_print_enum_1 (struct type *type, LONGEST val,
+ /* generic_val_print helper for TYPE_CODE_ENUM.  */
+ 
+ static void
+-generic_val_print_enum (struct type *type,
+-			int embedded_offset, struct ui_file *stream,
++generic_val_print_enum (struct type *type, struct ui_file *stream,
+ 			struct value *original_value,
+ 			const struct value_print_options *options)
+ {
+-  LONGEST val;
+-  struct gdbarch *gdbarch = type->arch ();
+-  int unit_size = gdbarch_addressable_memory_unit_size (gdbarch);
+-
+   gdb_assert (!options->format);
+ 
+   const gdb_byte *valaddr = original_value->contents_for_printing ().data ();
+ 
+-  val = unpack_long (type, valaddr + embedded_offset * unit_size);
++  LONGEST val = unpack_long (type, valaddr);
+ 
+   generic_val_print_enum_1 (type, val, stream);
+ }
+@@ -801,8 +787,7 @@ generic_val_print_enum (struct type *type,
+ /* generic_val_print helper for TYPE_CODE_FUNC and TYPE_CODE_METHOD.  */
+ 
+ static void
+-generic_val_print_func (struct type *type,
+-			int embedded_offset, CORE_ADDR address,
++generic_val_print_func (struct type *type, CORE_ADDR address,
+ 			struct ui_file *stream,
+ 			struct value *original_value,
+ 			const struct value_print_options *options)
+@@ -1015,7 +1000,7 @@ generic_value_print (struct value *val, struct ui_file *stream, int recurse,
+ 
+     case TYPE_CODE_REF:
+     case TYPE_CODE_RVALUE_REF:
+-      generic_val_print_ref (type, 0, stream, recurse,
++      generic_val_print_ref (type, stream, recurse,
+ 			     val, options);
+       break;
+ 
+@@ -1023,14 +1008,14 @@ generic_value_print (struct value *val, struct ui_file *stream, int recurse,
+       if (options->format)
+ 	value_print_scalar_formatted (val, options, 0, stream);
+       else
+-	generic_val_print_enum (type, 0, stream, val, options);
++	generic_val_print_enum (type, stream, val, options);
+       break;
+ 
+     case TYPE_CODE_FLAGS:
+       if (options->format)
+ 	value_print_scalar_formatted (val, options, 0, stream);
+       else
+-	val_print_type_code_flags (type, val, 0, stream);
++	val_print_type_code_flags (type, val, stream);
+       break;
+ 
+     case TYPE_CODE_FUNC:
+@@ -1038,7 +1023,7 @@ generic_value_print (struct value *val, struct ui_file *stream, int recurse,
+       if (options->format)
+ 	value_print_scalar_formatted (val, options, 0, stream);
+       else
+-	generic_val_print_func (type, 0, val->address (), stream,
++	generic_val_print_func (type, val->address (), stream,
+ 				val, options);
+       break;
+ 
+@@ -1190,11 +1175,11 @@ val_print_check_max_depth (struct ui_file *stream, int recurse,
+   return false;
+ }
+ 
+-/* Check whether the value VAL is printable.  Return 1 if it is;
+-   return 0 and print an appropriate error message to STREAM according to
+-   OPTIONS if it is not.  */
++/* Check whether the value VAL is printable.  Return true if it is;
++   return false and print an appropriate error message to STREAM
++   according to OPTIONS if it is not.  */
+ 
+-static int
++static bool
+ value_check_printable (struct value *val, struct ui_file *stream,
+ 		       const struct value_print_options *options)
+ {
+@@ -1202,7 +1187,7 @@ value_check_printable (struct value *val, struct ui_file *stream,
+     {
+       fprintf_styled (stream, metadata_style.style (),
+ 		      _("<address of value unknown>"));
+-      return 0;
++      return false;
+     }
+ 
+   if (val->entirely_optimized_out ())
+@@ -1211,7 +1196,7 @@ value_check_printable (struct value *val, struct ui_file *stream,
+ 	gdb_printf (stream, "...");
+       else
+ 	val_print_optimized_out (val, stream);
+-      return 0;
++      return false;
+     }
+ 
+   if (val->entirely_unavailable ())
+@@ -1220,7 +1205,7 @@ value_check_printable (struct value *val, struct ui_file *stream,
+ 	gdb_printf (stream, "...");
+       else
+ 	val_print_unavailable (stream);
+-      return 0;
++      return false;
+     }
+ 
+   if (val->type ()->code () == TYPE_CODE_INTERNAL_FUNCTION)
+@@ -1228,16 +1213,16 @@ value_check_printable (struct value *val, struct ui_file *stream,
+       fprintf_styled (stream, metadata_style.style (),
+ 		      _("<internal function %s>"),
+ 		      value_internal_function_name (val));
+-      return 0;
++      return false;
+     }
+ 
+   if (type_not_allocated (val->type ()))
+     {
+       val_print_not_allocated (stream);
+-      return 0;
++      return false;
+     }
+ 
+-  return 1;
++  return true;
+ }
+ 
+ /* See valprint.h.  */
+@@ -1292,10 +1277,9 @@ debug_val (struct value *val)
+ 
+ static void
+ val_print_type_code_flags (struct type *type, struct value *original_value,
+-			   int embedded_offset, struct ui_file *stream)
++			   struct ui_file *stream)
+ {
+-  const gdb_byte *valaddr = (original_value->contents_for_printing ().data ()
+-			     + embedded_offset);
++  const gdb_byte *valaddr = (original_value->contents_for_printing ().data ());
+   ULONGEST val = unpack_long (type, valaddr);
+   int field, nfields = type->num_fields ();
+   struct gdbarch *gdbarch = type->arch ();
+@@ -3188,7 +3172,7 @@ test_print_flags (gdbarch *arch)
+   store_unsigned_integer (contents, 4, gdbarch_byte_order (arch), 0xaa);
+ 
+   string_file out;
+-  val_print_type_code_flags (flags_type, val, 0, &out);
++  val_print_type_code_flags (flags_type, val, &out);
+   SELF_CHECK (out.string () == "[ A=2 B=1 C=5 ]");
+ }
+ 
+diff --git a/gdb/valprint.h b/gdb/valprint.h
+--- a/gdb/valprint.h
++++ b/gdb/valprint.h
+@@ -197,17 +197,15 @@ extern void print_function_pointer_address (const struct value_print_options *op
+ 
+ /* Helper function to check the validity of some bits of a value.
+ 
+-   If TYPE represents some aggregate type (e.g., a structure), return 1.
++   If TYPE represents some aggregate type (e.g., a structure), return true.
+ 
+-   Otherwise, any of the bytes starting at OFFSET and extending for
+-   TYPE->length () bytes are invalid, print a message to STREAM and
+-   return 0.  The checking is done using FUNCS.
++   For non-aggregate TYPEs, if any of the bytes starting at FIELD_BYTE_OFFSET
++   and extending for TYPE->length () bytes are invalid, print a message to
++   STREAM and return false.  Otherwise, return true.  */
+ 
+-   Otherwise, return 1.  */
+-
+-extern int valprint_check_validity (struct ui_file *stream, struct type *type,
+-				    LONGEST embedded_offset,
+-				    const struct value *val);
++extern bool valprint_check_validity (struct ui_file *stream, struct type *type,
++				     LONGEST field_byte_offset,
++				     const struct value *val);
+ 
+ extern void val_print_optimized_out (const struct value *val,
+ 				     struct ui_file *stream);
+@@ -272,7 +270,11 @@ extern void generic_printstr (struct ui_file *stream, struct type *type,
+ 
+ extern void output_command (const char *args, int from_tty);
+ 
+-extern int val_print_scalar_type_p (struct type *type);
++/* When printing in "summary" mode we want to print scalar arguments
++   but not aggregate arguments.  Return true if TYPE is a scalar type,
++   false if it is an aggregate.  */
++
++extern bool val_print_scalar_type_p (struct type *type);
+ 
+ struct format_data
+   {

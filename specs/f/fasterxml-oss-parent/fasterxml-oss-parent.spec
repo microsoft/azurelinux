@@ -5,7 +5,7 @@
 
 Name:          fasterxml-oss-parent
 Version:       62
-Release: 7%{?dist}
+Release:       4%{?dist}
 Summary:       FasterXML parent pom
 License:       Apache-2.0
 

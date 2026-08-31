@@ -9,7 +9,7 @@ Summary:        C++ header for FFT
 Name:           pocketfft
 License:        BSD-3-Clause
 Version:        1.0^git%{date0}.%{shortcommit0}
-Release: 10%{?dist}
+Release:        7%{?dist}
 
 # Only a header
 BuildArch:      noarch

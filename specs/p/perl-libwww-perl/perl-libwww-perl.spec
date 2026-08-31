@@ -7,8 +7,8 @@
 %bcond_with perl_libwww_perl_enables_internet_test
 
 Name:           perl-libwww-perl
-Version:        6.81
-Release: 4%{?dist}
+Version:        6.83
+Release:        1%{?dist}
 Summary:        A Perl interface to the World-Wide Web
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/libwww-perl
@@ -214,6 +214,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Tue May 19 2026 Michal Josef Špaček <mspacek@redhat.com> - 6.83-1
+- 6.83 bump
+
+* Mon Apr 13 2026 Michal Josef Špaček <mspacek@redhat.com> - 6.82-1
+- 6.82 bump
+
 * Tue Nov 11 2025 Michal Josef Špaček <mspacek@redhat.com> - 6.81-1
 - 6.81 bump
 

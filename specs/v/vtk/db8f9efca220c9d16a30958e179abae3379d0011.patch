@@ -1,0 +1,70 @@
+From db8f9efca220c9d16a30958e179abae3379d0011 Mon Sep 17 00:00:00 2001
+From: Ben Boeckel <ben.boeckel@kitware.com>
+Date: Mon, 15 Apr 2024 22:22:22 -0400
+Subject: [PATCH] vtkXMLDataParser: track `AppendedData` state explicitly
+
+Newer `libexpat` doesn't like being given the appended data after the
+artificially ended document anymore. Avoid pushing it through to its
+parser.
+
+Fixes: #19258
+---
+ IO/XMLParser/vtkXMLDataParser.cxx | 6 +++++-
+ IO/XMLParser/vtkXMLDataParser.h   | 3 +++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/IO/XMLParser/vtkXMLDataParser.cxx b/IO/XMLParser/vtkXMLDataParser.cxx
+index 1f6006d37c2..7d38092fdd7 100644
+--- a/IO/XMLParser/vtkXMLDataParser.cxx
++++ b/IO/XMLParser/vtkXMLDataParser.cxx
+@@ -36,6 +36,7 @@ vtkXMLDataParser::vtkXMLDataParser()
+   this->RootElement = nullptr;
+   this->AppendedDataPosition = 0;
+   this->AppendedDataMatched = 0;
++  this->AppendedDataFound = false;
+   this->DataStream = nullptr;
+   this->InlineDataStream = vtkBase64InputStream::New();
+   this->AppendedDataStream = vtkBase64InputStream::New();
+@@ -88,6 +89,7 @@ void vtkXMLDataParser::PrintSelf(ostream& os, vtkIndent indent)
+ {
+   this->Superclass::PrintSelf(os, indent);
+   os << indent << "AppendedDataPosition: " << this->AppendedDataPosition << "\n";
++  os << indent << "AppendedDataFound: " << this->AppendedDataFound << "\n";
+   if (this->RootElement)
+   {
+     this->RootElement->PrintXML(os, indent);
+@@ -214,7 +216,7 @@ int vtkXMLDataParser::ParsingComplete()
+   // If we have reached the appended data section, we stop parsing.
+   // This prevents the XML parser from having to walk over the entire
+   // appended data section.
+-  if (this->AppendedDataPosition)
++  if (this->AppendedDataPosition || this->AppendedDataFound)
+   {
+     return 1;
+   }
+@@ -433,6 +435,8 @@ int vtkXMLDataParser::ParseBuffer(const char* buffer, unsigned int count)
+     {
+       return 0;
+     }
++
++    this->AppendedDataFound = true;
+   }
+ 
+   return 1;
+diff --git a/IO/XMLParser/vtkXMLDataParser.h b/IO/XMLParser/vtkXMLDataParser.h
+index 1504a4d400b..142bf28327d 100644
+--- a/IO/XMLParser/vtkXMLDataParser.h
++++ b/IO/XMLParser/vtkXMLDataParser.h
+@@ -204,6 +204,9 @@ protected:
+   // How much of the string "<AppendedData" has been matched in input.
+   int AppendedDataMatched;
+ 
++  // Whether AppendedData has been dealt with or not.
++  bool AppendedDataFound;
++
+   // The byte order of the binary input.
+   int ByteOrder;
+ 
+-- 
+GitLab
+

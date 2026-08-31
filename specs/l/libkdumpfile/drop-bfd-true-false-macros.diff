@@ -1,0 +1,64 @@
+Description: Drop use of removed bfd TRUE/FALSE macros
+ binutils 2.46 removed the legacy TRUE/FALSE macros (and bfd_boolean) from
+ its public headers; the second argument of disassembler() is now a plain
+ C bool. kdumpid still passed TRUE/FALSE, and the disassembler detection in
+ m4/tools.m4 did the same in its conftest, so both failed to compile with
+ binutils >= 2.46 ("'FALSE' undeclared").
+ .
+ Use the integer literals 0/1 instead, which are valid for both the old
+ bfd_boolean and the new bool parameter type, keeping compatibility with
+ older binutils.
+Author: Michel Lind <michel@michel-slm.name>
+Bug: https://codeberg.org/ptesarik/libkdumpfile/issues/91
+Forwarded: https://codeberg.org/ptesarik/libkdumpfile/pulls/92
+Last-Update: 2026-06-19
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+diff --git a/m4/tools.m4 b/m4/tools.m4
+index 33078c2..f0560a5 100644
+--- a/m4/tools.m4
++++ b/m4/tools.m4
+@@ -45,7 +45,7 @@ AC_DEFUN([KDUMP_DIS_ASM_LIBS],[dnl determine disassembler libraries
+ DIS_ASM_LIBS=-lopcodes
+ AC_LANG_CONFTEST([AC_LANG_PROGRAM(
+   [#include <dis-asm.h>],
+-  [disassembler(bfd_arch_i386, FALSE, bfd_mach_x86_64, NULL);])])
++  [disassembler(bfd_arch_i386, 0, bfd_mach_x86_64, NULL);])])
+ dnl ignore undefined symbols from missing linker dependencies
+ AC_MSG_CHECKING([for disassembler in $DIS_ASM_LIBS])
+ KDUMP_TRY_LINK_UNDEF($DIS_ASM_LIBS, [-Wl,--require-defined=disassembler])
+diff --git a/tools/kdumpid/s390.c b/tools/kdumpid/s390.c
+index 4be5114..b740463 100644
+--- a/tools/kdumpid/s390.c
++++ b/tools/kdumpid/s390.c
+@@ -159,7 +159,7 @@ looks_like_kcode_s390(struct dump_desc *dd, uint64_t addr)
+ 	info.arch          = bfd_arch_s390;
+ 	info.mach          = bfd_mach_s390_64;
+ 	disassemble_init_for_target(&info);
+-	print_insn = disassembler(bfd_arch_s390, TRUE,
++	print_insn = disassembler(bfd_arch_s390, 1,
+ 				  bfd_mach_s390_64, NULL);
+ 	if (!print_insn)
+ 		return 0;
+diff --git a/tools/kdumpid/x86.c b/tools/kdumpid/x86.c
+index 8cabc4c..23f7bdf 100644
+--- a/tools/kdumpid/x86.c
++++ b/tools/kdumpid/x86.c
+@@ -288,7 +288,7 @@ looks_like_kcode_x86(struct dump_desc *dd, uint64_t addr)
+ 	/* Try i386 code first */
+ 	info.mach          = bfd_mach_i386_i386;
+ 	disassemble_init_for_target(&info);
+-	print_insn = disassembler(bfd_arch_i386, FALSE,
++	print_insn = disassembler(bfd_arch_i386, 0,
+ 				  bfd_mach_i386_i386, NULL);
+ 	if ((!dd->arch || strcmp(dd->arch, "x86_64")) &&
+ 	    print_insn &&
+@@ -301,7 +301,7 @@ looks_like_kcode_x86(struct dump_desc *dd, uint64_t addr)
+ 	memset(priv, 0, sizeof(struct disas_priv) + dd->page_size / 8);
+ 	info.mach          = bfd_mach_x86_64;
+ 	disassemble_init_for_target(&info);
+-	print_insn = disassembler(bfd_arch_i386, FALSE,
++	print_insn = disassembler(bfd_arch_i386, 0,
+ 				  bfd_mach_x86_64, NULL);
+ 	if ((!dd->arch || strcmp(dd->arch, "i386")) &&
+ 	    print_insn &&

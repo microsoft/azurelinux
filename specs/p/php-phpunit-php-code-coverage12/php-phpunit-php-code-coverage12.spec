@@ -13,11 +13,8 @@
 %bcond_without       tests
 
 # Github
-%global gh_commit    b015312f28dd75b75d3422ca37dff2cd1a565e8d
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner    sebastianbergmann
 %global gh_project   php-code-coverage
-%global gh_date      2026-02-06
 # Packagist
 %global pk_vendor    phpunit
 %global pk_project   php-code-coverage
@@ -28,8 +25,8 @@
 %global ver_major    12
 
 Name:           php-%{pk_vendor}-%{pk_project}%{ver_major}
-Version:        12.5.3
-Release: 5%{?dist}
+Version:        12.5.7
+Release:        1%{?dist}
 Summary:        PHP code coverage information, version %{ver_major}
 
 # SPDX: Main license is BSD-3-Clause
@@ -39,7 +36,7 @@ Summary:        PHP code coverage information, version %{ver_major}
 License:        BSD-3-Clause AND MIT AND Apache-2.0
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
@@ -47,11 +44,10 @@ BuildRequires:  php(language) >= 8.3
 BuildRequires:  php-fedora-autoloader-devel >= 1.0.0
 %if %{with tests}
 BuildRequires:  (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-BuildRequires:  (php-composer(phpunit/php-file-iterator)          >= 6.0    with php-composer(phpunit/php-file-iterator)          < 7)
 BuildRequires:  (php-composer(phpunit/php-text-template)          >= 5.0    with php-composer(phpunit/php-text-template)          < 6)
 BuildRequires:  (php-composer(sebastian/complexity)               >= 5.0    with php-composer(sebastian/complexity)               < 6)
-BuildRequires:  (php-composer(sebastian/environment)              >= 8.0.3  with php-composer(sebastian/environment)              < 9)
-BuildRequires:  (php-composer(sebastian/lines-of-code)            >= 4.0    with php-composer(sebastian/lines-of-code)            < 5)
+BuildRequires:  (php-composer(sebastian/environment)              >= 8.1.2  with php-composer(sebastian/environment)              < 9)
+BuildRequires:  (php-composer(sebastian/lines-of-code)            >= 4.0.1  with php-composer(sebastian/lines-of-code)            < 5)
 BuildRequires:  (php-composer(sebastian/version)                  >= 6.0    with php-composer(sebastian/version)                  < 7)
 BuildRequires:  (php-composer(theseer/tokenizer)                  >= 2.0.1  with php-composer(theseer/tokenizer)                  < 3)
 BuildRequires:  php-dom
@@ -60,8 +56,8 @@ BuildRequires:  php-libxml
 BuildRequires:  php-tokenizer
 BuildRequires:  php-xmlwriter
 # From composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.5.1"
-BuildRequires:  phpunit12 >= 12.5
+#        "phpunit/phpunit": "^12.5.28"
+BuildRequires:  phpunit12 >= 12.5.28
 BuildRequires:  php-xdebug
 %endif
 
@@ -71,11 +67,10 @@ BuildRequires:  php-xdebug
 #        "ext-libxml": "*",
 #        "ext-xmlwriter": "*",
 #        "nikic/php-parser": "^5.7.0",
-#        "phpunit/php-file-iterator": "^6.0",
 #        "phpunit/php-text-template": "^5.0",
 #        "sebastian/complexity": "^5.0",
-#        "sebastian/environment": "^8.0.3",
-#        "sebastian/lines-of-code": "^4.0",
+#        "sebastian/environment": "^8.1.2",
+#        "sebastian/lines-of-code": "^4.0.1",
 #        "sebastian/version": "^6.0",
 #        "theseer/tokenizer": "^2.0.1"
 Requires:       php(language) >= 8.3
@@ -83,11 +78,10 @@ Requires:       php-dom
 Requires:       php-libxml
 Requires:       php-xmlwriter
 Requires:       (php-composer(nikic/php-parser)                   >= 5.7.0  with php-composer(nikic/php-parser)                   < 6)
-Requires:       (php-composer(phpunit/php-file-iterator)          >= 6.0    with php-composer(phpunit/php-file-iterator)          < 7)
 Requires:       (php-composer(phpunit/php-text-template)          >= 5.0    with php-composer(phpunit/php-text-template)          < 6)
 Requires:       (php-composer(sebastian/complexity)               >= 5.0    with php-composer(sebastian/complexity)               < 6)
-Requires:       (php-composer(sebastian/environment)              >= 8.0.3  with php-composer(sebastian/environment)              < 9)
-Requires:       (php-composer(sebastian/lines-of-code)            >= 4.0    with php-composer(sebastian/lines-of-code)            < 5)
+Requires:       (php-composer(sebastian/environment)              >= 8.1.2  with php-composer(sebastian/environment)              < 9)
+Requires:       (php-composer(sebastian/lines-of-code)            >= 4.0.1  with php-composer(sebastian/lines-of-code)            < 5)
 Requires:       (php-composer(sebastian/version)                  >= 6.0    with php-composer(sebastian/version)                  < 7)
 Requires:       (php-composer(theseer/tokenizer)                  >= 2.0.1  with php-composer(theseer/tokenizer)                  < 3)
 # From composer.json, suggest
@@ -120,7 +114,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %patch -P0 -p1
@@ -133,7 +127,6 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{ver_major}/autoload.php
 cat << 'EOF' | tee -a src/autoload.php
 \Fedora\Autoloader\Dependencies::required([
     '%{php_home}/PhpParser5/autoload.php',
-    '%{php_home}/%{ns_vendor}/FileIterator6/autoload.php',
     '%{php_home}/%{ns_vendor}/Template5/autoload.php',
     '%{php_home}/%{ns_vendor}/Complexity5/autoload.php',
     '%{php_home}/%{ns_vendor}/Environment8/autoload.php',
@@ -192,6 +185,17 @@ exit $ret
 
 
 %changelog
+* Tue Jun  2 2026 Remi Collet <remi@remirepo.net> - 12.5.7-1
+- update to 12.5.7
+- raise dependency on sebastian/environment 8.1.2
+- raise dependency on sebastian/lines-of-code 4.0.1
+
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 12.5.6-1
+- update to 12.5.6
+
+* Mon Apr 13 2026 Remi Collet <remi@remirepo.net> - 12.5.5-1
+- update to 12.5.5
+
 * Fri Feb  6 2026 Remi Collet <remi@remirepo.net> - 12.5.3-1
 - update to 12.5.3
 

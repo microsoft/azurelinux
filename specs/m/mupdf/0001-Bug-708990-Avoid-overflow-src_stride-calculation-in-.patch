@@ -1,0 +1,28 @@
+From a26f0142e7d390d4a82c6e5ae0e312e07cc4ec85 Mon Sep 17 00:00:00 2001
+Message-ID: <a26f0142e7d390d4a82c6e5ae0e312e07cc4ec85.1775143641.git.mjg@fedoraproject.org>
+From: Tor Andersson <tor.andersson@artifex.com>
+Date: Mon, 5 Jan 2026 17:54:15 +0100
+Subject: [PATCH] Bug 708990: Avoid overflow src_stride calculation in
+ unpack_stream.
+
+By using 64-bit math!
+---
+ source/fitz/draw-unpack.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/fitz/draw-unpack.c b/source/fitz/draw-unpack.c
+index 048abbf35..8c99337db 100644
+--- a/source/fitz/draw-unpack.c
++++ b/source/fitz/draw-unpack.c
+@@ -437,7 +437,7 @@ unpack_drop(fz_context *ctx, void *state)
+ fz_stream *
+ fz_unpack_stream(fz_context *ctx, fz_stream *src, int depth, int w, int h, int n, int indexed, int pad, int skip)
+ {
+-	int src_stride = (w*depth*n+7)>>3;
++	int src_stride = ((int64_t)w*depth*n+7)>>3; // avoid overflow by bumping to 64-bit math
+ 	int dst_stride;
+ 	unpack_state *state;
+ 	fz_unpack_line_fn unpack_line = NULL;
+-- 
+2.53.0.1333.gdad296f530
+

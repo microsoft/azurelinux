@@ -9,18 +9,20 @@
 %define rsyslog_docdir %{_docdir}/rsyslog
 %define qpid_proton_v 0.40.0
 # The following packages are not enabled on rhel:
-#   hiredis, libdbi, mongodb, rabbitmq
+#   hiredis, libdbi, mongodb, rabbitmq, impstats_push
 # The omamqp1 plugin is built differently as qpid-proton is not available on rhel
 %if 0%{?rhel}
 %bcond_with hiredis
 %bcond_with libdbi
 %bcond_with mongodb
 %bcond_with rabbitmq
+%bcond_with impstats_push
 %else
 %bcond_without hiredis
 %bcond_without libdbi
 %bcond_without mongodb
 %bcond_without rabbitmq
+%bcond_without impstats_push
 %endif
 
 # Add options to not build with features listed below,
@@ -42,8 +44,8 @@
 
 Summary: Enhanced system logging and kernel message trapping daemon
 Name: rsyslog
-Version: 8.2510.0
-Release: 5%{?dist}
+Version: 8.2604.0
+Release: 1%{?dist}
 License: GPL-3.0-or-later AND Apache-2.0
 URL: http://www.rsyslog.com/
 Source0: http://www.rsyslog.com/files/download/rsyslog/%{name}-%{version}.tar.gz
@@ -74,6 +76,12 @@ BuildRequires: systemd-devel >= 204-8
 BuildRequires: systemd-rpm-macros
 BuildRequires: zlib-devel
 BuildRequires: libcap-ng-devel
+BuildRequires: libyaml-devel
+%if %{with impstats_push}
+BuildRequires: protobuf-c-devel
+BuildRequires: protobuf-c-compiler
+BuildRequires: snappy-devel
+%endif
 
 Recommends: logrotate
 Obsoletes: rsyslog-logrotate < 8.2310.0-2
@@ -479,6 +487,11 @@ autoreconf -if
 	--enable-omkafka \
 %endif
 	--enable-impstats \
+%if %{with impstats_push}
+	--enable-impstats-push \
+%else
+	--disable-impstats-push \
+%endif
 	--enable-imptcp \
 	--enable-mail \
 	--enable-mmanon \
@@ -563,6 +576,8 @@ rm -f %{buildroot}%{_libdir}/rsyslog/*.la
 # imdiag and liboverride is only used for testing
 rm -f %{buildroot}%{_libdir}/rsyslog/imdiag.so
 rm -f %{buildroot}%{_libdir}/rsyslog/liboverride_gethostname.so
+rm -f %{buildroot}%{_libdir}/rsyslog/liboverride_getaddrinfo.so
+rm -f %{buildroot}%{_libdir}/rsyslog/liboverride_gethostname_nonfqdn.so
 
 %post
 for n in /var/log/{messages,secure,maillog,spooler}
@@ -762,6 +777,10 @@ done
 
 
 %changelog
+* Mon Mar 30 2026 Attila Lakatos <alakatos@redhat.com> - 8.2602.0-1
+- Rebase to 8.2602.0
+  Resolves: rhbz#2419498
+
 * Mon Oct 20 2025 Attila Lakatos <alakatos@redhat.com> - 8.2510.0-1
 - Rebase to 8.2510.0
   Resolves: rhbz#2404131

@@ -1,0 +1,50 @@
+From a74ad95349ec913f1042f5390dbd95a8341aea06 Mon Sep 17 00:00:00 2001
+From: Akseli Lahtinen <akselmo@akselmo.dev>
+Date: Fri, 14 Aug 2026 23:20:58 +0300
+Subject: [PATCH] Use font metrics to only inset where the text can spare it
+
+Applying the inset from aba0f922b unconditionally causes eliding in some
+cases. Check the font metrics instead and take the inset only from items
+that have the width to spare.
+
+BUG: 523118
+
+
+(cherry picked from commit f0b1d7534aa2356d7336241d0c7051522e8a6b68)
+
+Co-authored-by: Allen Hewes <rallenh@hotmail.com>
+---
+ kstyle/breezestyle.cpp | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/kstyle/breezestyle.cpp b/kstyle/breezestyle.cpp
+index 3a9096524..f0d4dfe45 100644
+--- a/kstyle/breezestyle.cpp
++++ b/kstyle/breezestyle.cpp
+@@ -1062,8 +1062,21 @@ QRect Style::subElementRect(SubElement element, const QStyleOption *option, cons
+         QRect rect = ParentStyleClass::subElementRect(element, option, widget);
+         if (viewItem) {
+             const QMargins margins = _helper->itemViewItemMargins(viewItem);
+-            rect.setRight(rect.right() - margins.right() - Metrics::ItemView_ItemPaddingWidth);
+-            rect.setLeft(rect.left() + margins.left() + Metrics::ItemView_ItemPaddingWidth);
++            const int leftInset = margins.left() + Metrics::ItemView_ItemPaddingWidth;
++            const int rightInset = margins.right() + Metrics::ItemView_ItemPaddingWidth;
++
++            // Use the font metrics to inset only as far as the text can spare,
++            // so the inset itself cannot cause elision.
++            const int textMargin = proxy()->pixelMetric(PM_FocusFrameHMargin, option, widget) + 1;
++            const int available = rect.width() - 2 * textMargin; // viewItemDrawText() removes textMargin again
++            const int required = viewItem->fontMetrics.horizontalAdvance(viewItem->text);
++            const int inset = qBound(0, available - required, leftInset + rightInset);
++
++            // Shrink both sides in proportion so the text stays where it was.
++            const int total = leftInset + rightInset;
++            const int right = total > 0 ? inset * rightInset / total : 0;
++            rect.setRight(rect.right() - right);
++            rect.setLeft(rect.left() + (inset - right));
+             rect.moveTop(rect.top() + margins.top() - margins.bottom());
+         }
+ 
+-- 
+GitLab
+

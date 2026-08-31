@@ -1,0 +1,34 @@
+From 5dde0d7d7f774ee0ee8a860dc59b530cb87db4c1 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Wed, 25 Feb 2026 08:52:15 +0100
+Subject: [PATCH 3/4] automatic: relax libcurl-full dependency
+
+The email emitter is the only feature requiring full libcurl with SMTP
+support, and the default configuration uses the stdio emitter. Relaxing
+the dependency to Recommends avoids a conflict with libcurl-minimal on
+systems that do not need email notifications.
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2322918
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dnf5.spec b/dnf5.spec
+index 745f67fe..1a9f3bed 100644
+--- a/dnf5.spec
++++ b/dnf5.spec
+@@ -940,9 +940,9 @@ copr, needs-restarting, repoclosure, repomanage, and reposync commands.
+ Summary:        Package manager - automated upgrades
+ License:        LGPL-2.1-or-later
+ Requires:       dnf5%{?_isa} = %{version}-%{release}
+-Requires:       libcurl-full%{?_isa}
+ Requires:       libdnf5%{?_isa} = %{version}-%{release}
+ Requires:       libdnf5-cli%{?_isa} = %{version}-%{release}
++Recommends:     libcurl-full%{?_isa}
+ Provides:       dnf5-command(automatic)
+ %if %{with dnf5_obsoletes_dnf}
+ Provides:       dnf-automatic = %{version}-%{release}
+-- 
+2.53.0
+

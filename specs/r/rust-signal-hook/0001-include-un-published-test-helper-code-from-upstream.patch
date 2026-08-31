@@ -1,0 +1,45 @@
+From 80654c15a28667c40e3d74c3521221188fd1b248 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Sat, 7 Mar 2026 16:03:57 +0100
+Subject: [PATCH] include un-published test helper code from upstream
+
+---
+ tests/iterator.rs | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/tests/iterator.rs b/tests/iterator.rs
+index 47a37dc..bd4ed2b 100644
+--- a/tests/iterator.rs
++++ b/tests/iterator.rs
+@@ -1,6 +1,7 @@
+ #![cfg(not(windows))]
+ 
+ extern crate signal_hook;
++extern crate lazy_static;
+ 
+ use std::collections::HashSet;
+ use std::sync::atomic::{AtomicBool, Ordering};
+@@ -13,6 +14,20 @@ use signal_hook::consts::{SIGUSR1, SIGUSR2};
+ use signal_hook::iterator::{Handle, Signals};
+ use signal_hook::low_level::raise;
+ 
++mod serial_test {
++    use std::sync::{Mutex, MutexGuard};
++
++    use lazy_static::lazy_static;
++
++    lazy_static! {
++        static ref LOCK: Mutex<()> = Mutex::new(());
++    }
++
++    pub fn lock() -> MutexGuard<'static, ()> {
++        LOCK.lock().unwrap()
++    }
++}
++
+ fn send_sigusr1() {
+     raise(SIGUSR1).unwrap();
+ }
+-- 
+2.53.0
+

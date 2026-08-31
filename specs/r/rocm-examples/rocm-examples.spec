@@ -28,7 +28,7 @@
 
 Name:           rocm-examples
 Version:        %{rocm_version}
-Release: 6%{?dist}
+Release:        2%{?dist}
 Summary:        A collection of examples for the ROCm software stack
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0

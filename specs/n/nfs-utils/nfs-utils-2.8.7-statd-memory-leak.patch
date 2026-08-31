@@ -1,0 +1,33 @@
+commit cf80edaeb9b120b7a533e0d3aea2f05cfcab85ae
+Author: xuchenchen <xuchenchen@kylinos.cn>
+Date:   Sat Aug 15 13:58:16 2026 -0400
+
+    statd: fix memory leak in sm_mon_1_svc() when existing host re-monitors
+    
+    When an already-monitored host sends a new SM_MON request with a
+    different priv cookie, the code sets existing=1 and reuses the
+    existing notify_list entry. However, clnt->dns_name is overwritten
+    with the newly allocated dnsname without freeing the old value,
+    causing a memory leak.
+    
+    Since statd is a long-running daemon, repeated SM_MON requests with
+    changing cookies will accumulate leaked strings.
+    
+    Fix by freeing the old dns_name before overwriting it.
+    
+    Signed-off-by: xuchenchen <xuchenchen@kylinos.cn>
+    Signed-off-by: Steve Dickson <steved@redhat.com>
+
+diff --git a/utils/statd/monitor.c b/utils/statd/monitor.c
+index c76589ca..76ef16f1 100644
+--- a/utils/statd/monitor.c
++++ b/utils/statd/monitor.c
+@@ -187,6 +187,8 @@ sm_mon_1_svc(struct mon *argp, struct svc_req *rqstp)
+ 	NL_MY_VERS(clnt) = id->my_vers;
+ 	NL_MY_PROC(clnt) = id->my_proc;
+ 	memcpy(NL_PRIV(clnt), argp->priv, SM_PRIV_SIZE);
++	if (existing)
++		free(clnt->dns_name);
+ 	clnt->dns_name = dnsname;
+ 
+ 	/*

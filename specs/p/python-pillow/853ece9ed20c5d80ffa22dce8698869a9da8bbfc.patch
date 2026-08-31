@@ -1,0 +1,78 @@
+diff -rupN --no-dereference Pillow-11.3.0/src/PIL/ImageFilter.py Pillow-11.3.0-new/src/PIL/ImageFilter.py
+--- Pillow-11.3.0/src/PIL/ImageFilter.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/src/PIL/ImageFilter.py	2026-07-19 08:50:48.761730315 +0200
+@@ -96,6 +96,12 @@ class RankFilter(Filter):
+     name = "Rank"
+ 
+     def __init__(self, size: int, rank: int) -> None:
++        if size % 2 == 0:
++            msg = "bad filter size"
++            raise ValueError(msg)
++        if rank < 0 or rank >= size * size:
++            msg = "bad rank value"
++            raise ValueError(msg)
+         self.size = size
+         self.rank = rank
+ 
+@@ -118,8 +124,8 @@ class MedianFilter(RankFilter):
+     name = "Median"
+ 
+     def __init__(self, size: int = 3) -> None:
+-        self.size = size
+-        self.rank = size * size // 2
++        rank = size * size // 2
++        super().__init__(size, rank)
+ 
+ 
+ class MinFilter(RankFilter):
+@@ -133,8 +139,8 @@ class MinFilter(RankFilter):
+     name = "Min"
+ 
+     def __init__(self, size: int = 3) -> None:
+-        self.size = size
+-        self.rank = 0
++        rank = 0
++        super().__init__(size, rank)
+ 
+ 
+ class MaxFilter(RankFilter):
+@@ -148,8 +154,8 @@ class MaxFilter(RankFilter):
+     name = "Max"
+ 
+     def __init__(self, size: int = 3) -> None:
+-        self.size = size
+-        self.rank = size * size - 1
++        rank = size * size - 1
++        super().__init__(size, rank)
+ 
+ 
+ class ModeFilter(Filter):
+diff -rupN --no-dereference Pillow-11.3.0/Tests/test_image_filter.py Pillow-11.3.0-new/Tests/test_image_filter.py
+--- Pillow-11.3.0/Tests/test_image_filter.py	2025-07-01 09:41:24.000000000 +0200
++++ Pillow-11.3.0-new/Tests/test_image_filter.py	2026-07-19 08:50:48.762092309 +0200
+@@ -136,11 +136,23 @@ def test_rankfilter_error(filter: ImageF
+ 
+ 
+ def test_rankfilter_properties() -> None:
+-    rankfilter = ImageFilter.RankFilter(1, 2)
++    rankfilter = ImageFilter.RankFilter(3, 2)
+ 
+-    assert rankfilter.size == 1
++    assert rankfilter.size == 3
+     assert rankfilter.rank == 2
+ 
++    with pytest.raises(ValueError, match="bad filter size"):
++        ImageFilter.RankFilter(2, 1)
++    with pytest.raises(ValueError, match="bad filter size"):
++        ImageFilter.MaxFilter(2)
++    with pytest.raises(ValueError, match="bad filter size"):
++        ImageFilter.MedianFilter(2)
++    with pytest.raises(ValueError, match="bad filter size"):
++        ImageFilter.MinFilter(2)
++
++    with pytest.raises(ValueError, match="bad rank value"):
++        ImageFilter.RankFilter(1, 1)
++
+ 
+ def test_builtinfilter_p() -> None:
+     builtin_filter = ImageFilter.BuiltinFilter()

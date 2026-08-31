@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	0.17.3
-Release: 4%{?dist}
+Release:	1%{?dist}
 
 Summary:	Contracts for Ruby
 # SPDX confirmed

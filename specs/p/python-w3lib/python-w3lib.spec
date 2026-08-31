@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        2.3.1
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Library of web-related functions
 
 License:        BSD-3-Clause

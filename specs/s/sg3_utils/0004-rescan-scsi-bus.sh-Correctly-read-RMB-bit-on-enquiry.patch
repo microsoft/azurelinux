@@ -1,0 +1,46 @@
+From fe9739425a5ef5220bd5efa3a45b531d3e9ee29c Mon Sep 17 00:00:00 2001
+From: Paul Evans <pevans@redhat.com>
+Date: Wed, 28 Jan 2026 14:42:02 +0000
+Subject: [PATCH] rescan-scsi-bus.sh Correctly read RMB bit on enquiry
+
+Make changes to is_removable() in rescan-scsi-bus.sh to correctly
+read the RMB byte on its hexedit enquiry response.
+
+As things stand the script incorrectly reads the first byte of the
+repsonse the "Peripheral Qualifier" and will always return a device
+as non-removable.
+
+Signed-off-by: Paul Evans <pevans@redhat.com>
+---
+ scripts/rescan-scsi-bus.sh | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/rescan-scsi-bus.sh b/scripts/rescan-scsi-bus.sh
+index 52991e1e..23a90bb4 100755
+--- a/scripts/rescan-scsi-bus.sh
++++ b/scripts/rescan-scsi-bus.sh
+@@ -4,7 +4,7 @@
+ # (c) 2006--2022 Hannes Reinecke, GNU GPL v2 or later
+ # $Id: rescan-scsi-bus.sh,v 1.57 2012/03/31 14:08:48 garloff Exp $
+ 
+-VERSION="20230413"
++VERSION="20260126"
+ SCAN_WILD_CARD=4294967295
+ 
+ CLEANUP=:
+@@ -256,9 +256,10 @@ is_removable ()
+ 
+   p=/sys/class/scsi_device/${host}:${channel}:${id}:${lun}/device/inquiry
+   # Extract the second byte of the INQUIRY response and check bit 7 (mask 0x80).
+-  b=$(hexdump -n1 -e '/1 "%02X"' "$p" 2>/dev/null)
++  b=$(od -j1 -N1 -An -t x1 "$p" 2>/dev/null)
+   if [ -n "$b" ]; then
+-    echo $(((0x$b & 0x80) != 0))
++    # Handle od leading space with parameter substitution.
++    echo $(((0x${b// /} & 0x80) != 0))
+   else
+     sg_inq "$sg_len_arg" /dev/$SGDEV 2>/dev/null | sed -n 's/^.*RMB=\([0-9]*\).*$/\1/p'
+   fi
+-- 
+2.53.0
+

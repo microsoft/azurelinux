@@ -51,11 +51,11 @@ URL: https://www.python.org/
 
 #  WARNING  When rebasing to a new Python version,
 #           remember to update the python3-docs package as well
-%global general_version %{pybasever}.3
+%global general_version %{pybasever}.7
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 4%{?dist}
+Release: 1%{?dist}
 License: Python-2.0.1
 
 
@@ -93,7 +93,7 @@ License: Python-2.0.1
 %bcond jit_build_stencils %[%{with jit} && 0%{?fedora} >= 41]
 %if %{with jit}
 # When built with JIT, it still needs to be enabled on runtime via PYTHON_JIT=1
-%global jit_flag --enable-experimental-jit=yes-off
+%global jit_flag --enable-experimental-jit=yes-off %{!?with_jit_build_stencils:--enable-prebuilt-jit-stencils}
 %endif
 
 # Main interpreter loop optimization
@@ -118,31 +118,30 @@ License: Python-2.0.1
 # This needs to be manually updated when we update Python.
 # Explore the sources tarball (you need the version before %%prep is executed):
 #  $ tar -tf Python-%%{upstream_version}.tar.xz | grep whl
-%global pip_version 25.3
+%global pip_version 26.2.1
 %global setuptools_version 79.0.1
 # All of those also include a list of indirect bundled libs:
 # pip
 #  $ %%{_rpmconfigdir}/pythonbundles.py <(unzip -p Lib/ensurepip/_bundled/pip-*.whl pip/_vendor/vendor.txt)
 %global pip_bundled_provides %{expand:
-Provides: bundled(python3dist(cachecontrol)) = 0.14.3
-Provides: bundled(python3dist(certifi)) = 2025.10.5
-Provides: bundled(python3dist(dependency-groups)) = 1.3.1
-Provides: bundled(python3dist(distlib)) = 0.4
+Provides: bundled(python3dist(cachecontrol)) = 0.14.4
+Provides: bundled(python3dist(certifi)) = 2026.6.17
+Provides: bundled(python3dist(distlib)) = 0.4.2
 Provides: bundled(python3dist(distro)) = 1.9
-Provides: bundled(python3dist(idna)) = 3.10
+Provides: bundled(python3dist(idna)) = 3.18
 Provides: bundled(python3dist(msgpack)) = 1.1.2
-Provides: bundled(python3dist(packaging)) = 25
-Provides: bundled(python3dist(platformdirs)) = 4.5
-Provides: bundled(python3dist(pygments)) = 2.19.2
+Provides: bundled(python3dist(packaging)) = 26.2
+Provides: bundled(python3dist(platformdirs)) = 4.10
+Provides: bundled(python3dist(pygments)) = 2.20
 Provides: bundled(python3dist(pyproject-hooks)) = 1.2
-Provides: bundled(python3dist(requests)) = 2.32.5
+Provides: bundled(python3dist(requests)) = 2.34.2
 Provides: bundled(python3dist(resolvelib)) = 1.2.1
 Provides: bundled(python3dist(rich)) = 14.2
 Provides: bundled(python3dist(setuptools)) = 70.3
-Provides: bundled(python3dist(tomli)) = 2.3
+Provides: bundled(python3dist(tomli)) = 2.4.1
 Provides: bundled(python3dist(tomli-w)) = 1.2
 Provides: bundled(python3dist(truststore)) = 0.10.4
-Provides: bundled(python3dist(urllib3)) = 1.26.20
+Provides: bundled(python3dist(urllib3)) = 2.7
 }
 # setuptools
 # vendor.txt not in .whl
@@ -282,7 +281,6 @@ BuildRequires: libzstd-devel
 BuildRequires: make
 BuildRequires: mpdecimal-devel
 BuildRequires: ncurses-devel
-BuildRequires: openssl-devel
 BuildRequires: pkgconfig
 BuildRequires: python-rpm-macros
 BuildRequires: readline-devel
@@ -294,6 +292,10 @@ BuildRequires: tk-devel
 BuildRequires: xz-devel
 BuildRequires: zlib-devel
 BuildRequires: /usr/bin/dtrace
+
+# Support for OpenSSL 4 only landed in Python 3.15 for now
+# https://github.com/python/cpython/issues/146207
+BuildRequires: (openssl-devel < 1:4 or openssl3-devel)
 
 %if %{with tests}
 BuildRequires: gcc-c++
@@ -397,23 +399,6 @@ Source9999: python3.14.azl.macros
 # pypa/distutils integration: https://github.com/pypa/distutils/pull/70
 Patch251: 00251-change-user-install-location.patch
 
-# 00464 # 292acffec7a379cb6d1f3c47b9e5a2f170bbadb6
-# Enable PAC and BTI protections for aarch64
-#
-# Apply protection against ROP/JOP attacks for aarch64 on asm_trampoline.S
-#
-# The BTI flag must be applied in the assembler sources for this class
-# of attacks to be mitigated on newer aarch64 processors.
-#
-# Upstream PR: https://github.com/python/cpython/pull/130864/files
-#
-# The upstream patch is incomplete but only for the case where
-# frame pointers are not used on 3.13+.
-#
-# Since on Fedora we always compile with frame pointers the BTI/PAC
-# hardware protections can be enabled without losing Perf unwinding.
-Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
-
 # 00466 # e10760fb955ee33d2917f8a57bb4e24d71e5341c
 # Downstream only: Skip tests not working with older expat version
 #
@@ -422,12 +407,6 @@ Patch464: 00464-enable-pac-and-bti-protections-for-aarch64.patch
 # in the conditionalized skip to a release available in CentOS Stream 10,
 # which is tested as working.
 Patch466: 00466-downstream-only-skip-tests-not-working-with-older-expat-version.patch
-
-# 00474 # 0d9da266d5ecb31d8a417a0a5daa251a2d99389f
-# CVE-2025-15366
-#
-# Downstream only: Reject control characters in IMAP commands
-Patch474: 00474-cve-2025-15366.patch
 
 # 00475 # 91e12ebfb2a88b265f3764a0d852b6fa53b2386a
 # CVE-2025-15367
@@ -450,6 +429,10 @@ Patch475: 00475-cve-2025-15367.patch
 # which is modified with this patch, hence they need a
 # direct call to the check function.
 Patch477: 00477-raise-an-error-when-importing-stdlib-modules-compiled-for-a-different-python-version.patch
+
+# 00486 # 5ae0b81b3135319f8d75a886fb7a11fa40ac11f4
+# gh-148646: Add --enable-prebuilt-jit-stencils configure flag
+Patch486: 00486-gh-148646-add---enable-prebuilt-jit-stencils-configure-flag.patch
 
 # (New patches go here ^^^)
 #
@@ -575,7 +558,7 @@ Summary:        Python runtime libraries
 # Combined manually from https://docs.python.org/3.14/license.html
 # Hash of Doc/license.rst which is compared in %%prep, generated with:
 # $ sha256sum Doc/license.rst | cut -f1 -d" "
-%global license_file_hash c695d550b135e53e38807e76496d1db17d22c40e461d1f3f354c86188d3305dd
+%global license_file_hash cd6f471c0bfdb099efefc25ddff9b3df8bf62e10428987f1f05e6f2f9e35d563
 # Licenses of incorporated software:
 # Mersenne Twister in _random C extension contains code under BSD-3-Clause
 # socket.getaddrinfo() and socket.getnameinfo() are BSD-3-Clause
@@ -599,7 +582,8 @@ Summary:        Python runtime libraries
 # parts of asyncio from uvloop are MIT
 # Python/qsbr.c is adapted from code under BSD-2-Clause
 # Zstandard bindings in Modules/_zstd and Lib/compression/zstd are BSD-3-Clause
-%global libs_license Python-2.0.1 AND MIT AND BSD-3-Clause AND MIT-CMU AND HPND-SMC AND BSD-2-Clause AND dtoa
+# An extract of the `Unicode Character Database` converted to an internal format is Unicode-3.0
+%global libs_license Python-2.0.1 AND MIT AND BSD-3-Clause AND MIT-CMU AND HPND-SMC AND BSD-2-Clause AND dtoa AND Unicode-3.0
 %if %{with rpmwheels}
 Requires: %{python_wheel_pkg_prefix}-pip-wheel >= 23.1.2
 License: %{libs_license}
@@ -643,8 +627,12 @@ Requires: tzdata
 # We avoid this problem by requiring at least the same version of expat that
 # was used during the build time.
 # Other subpackages (like -debug) also need this, but they all depend on -libs.
+# Since expat 2.7.4, the library has versioned symbols and this is no longer needed,
+# as the generated requirement will be in the form of libexpat.so.1(LIBEXPAT_2.7.2) etc.
 %global expat_version %(LANG=C rpm -q --qf '%%{version}' expat.%{_target_cpu} | sed 's/.*not installed/0/')
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 
 %description -n %{pkgname}-libs
@@ -843,7 +831,9 @@ License: %{libs_license} AND Apache-2.0 AND ISC AND LGPL-2.1-only AND MPL-2.0 AN
 # See the comments in the definition of main -libs subpackage for detailed explanations
 Provides: bundled(mimalloc) = 2.12
 Requires: tzdata
+%if v"%{expat_version}" < v"2.7.4"
 Requires: expat%{?_isa} >= %{expat_version}
+%endif
 
 # There are files in the standard library that have python shebang.
 # We've filtered the automatic requirement out so libs are installable without
@@ -1190,12 +1180,6 @@ topdir=$(pwd)
 DirHoldingGdbPy=%{_usr}/lib/debug/%{_libdir}
 mkdir -p %{buildroot}$DirHoldingGdbPy
 
-# When the actual %%{dynload_dir} exists (it does when python3.X is installed for regen-all)
-# %%{buildroot}%%{dynload_dir} is not created by make install and the extension modules are missing
-# Reported upstream as https://github.com/python/cpython/issues/98782
-# A workaround is to create the directory before running make install
-mkdir -p %{buildroot}%{dynload_dir}
-
 # Multilib support for pyconfig.h
 # 32- and 64-bit versions of pyconfig.h are different. For multilib support
 # (making it possible to install 32- and 64-bit versions simultaneously),
@@ -1481,7 +1465,8 @@ done
 %if %{with jit_build_stencils}
 for ConfName in %{?with_debug_build:debug} optimized; do
   if [ -s %{jit_stencils_source} ]; then
-    diff -u %{jit_stencils_source} build/${ConfName}/%{jit_stencils_filename}
+    # The -I option ignores the checksum line (calculated from files incl. pyconfig.h which may change with new autoconf)
+    diff -u -I '^// [0-9a-f]\{64\}$' %{jit_stencils_source} build/${ConfName}/%{jit_stencils_filename}
   else
     echo "%{jit_stencils_source} is empty, not checking if it is up to date"
   fi
@@ -1510,6 +1495,7 @@ CheckPython() {
   # test_check_probes is failing since it was introduced in 3.12.0rc1,
   # the test is skipped until it is fixed in upstream.
   # see: https://github.com/python/cpython/issues/104280#issuecomment-1669249980
+  # test_subparser_inherits_reparse_deferral: https://github.com/python/cpython/issues/155485
   LD_LIBRARY_PATH=$ConfDir $ConfDir/python -m test.regrtest \
     -wW --slowest %{_smp_mflags} \
     %ifarch riscv64
@@ -1518,6 +1504,9 @@ CheckPython() {
     --timeout=2700 \
     %endif
     -i test_check_probes \
+    %if 0%{?rhel} == 9
+    -i test_subparser_inherits_reparse_deferral \
+    %endif
 
   echo FINISHED: CHECKING OF PYTHON FOR CONFIGURATION: $ConfName
 
@@ -2007,6 +1996,34 @@ CheckPython freethreading
 # ======================================================
 
 %changelog
+* Mon Aug 10 2026 Karolina Surma <ksurma@redhat.com> - 3.14.7-1
+- Update to Python 3.14.7
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.14.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 11 2026 Karolina Surma <ksurma@redhat.com> - 3.14.6-1
+- Update to Python 3.14.6
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 3.14.5-2
+- Rebuilt as non-main Python on Fedora 45+
+
+* Mon May 11 2026 Miro Hrončok <mhroncok@redhat.com> - 3.14.5-1
+- Update to 3.14.5
+
+* Tue May 05 2026 Miro Hrončok <mhroncok@redhat.com> - 3.14.5~rc1-1
+- Update to 3.14.5rc1
+
+* Thu Apr 16 2026 Charalampos Stratakis <cstratak@redhat.com> - 3.14.4-2
+- Security fixes for CVE-2026-1502, CVE-2026-4786, CVE-2026-5713, CVE-2026-6100
+Resolves: rhbz#2457944, rhbz#2458224, rhbz#2458488, rhbz#2458016
+
+* Wed Apr 08 2026 Karolina Surma <ksurma@redhat.com> - 3.14.4-1
+- Update to Python 3.14.4
+
+* Thu Mar 26 2026 Lumír Balhar <lbalhar@redhat.com> - 3.14.3-2
+- Security fix for CVE-2026-4519 (rhbz#2449730)
+
 * Wed Feb 04 2026 Karolina Surma <ksurma@redhat.com> - 3.14.3-1
 - Update to Python 3.14.3
 - Fix CVE-2025-15366, CVE-2025-15367

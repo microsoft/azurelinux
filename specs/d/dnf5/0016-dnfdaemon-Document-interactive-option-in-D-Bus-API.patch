@@ -1,0 +1,104 @@
+From fa62428be833723a3acc58d16ce0bf2b2f111c35 Mon Sep 17 00:00:00 2001
+From: Marek Blaha <mblaha@redhat.com>
+Date: Mon, 4 May 2026 10:26:45 +0000
+Subject: [PATCH] dnfdaemon: Document interactive option in D-Bus API
+
+Upstream commit: 496d02f26d5caeda05580f948dae5575109e3c8c
+
+Document the 'interactive' option in the D-Bus interface XML files
+for all methods that accept it. Methods that perform privileged
+operations (do_transaction, system_upgrade, enable/disable repos)
+default to true, while read-only methods (list, resolve) default
+to false.
+
+Signed-off-by: Marek Blaha <mblaha@redhat.com>
+---
+ dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Advisory.xml   | 2 ++
+ dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Goal.xml       | 2 ++
+ dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.History.xml    | 2 ++
+ .../dbus/interfaces/org.rpm.dnf.v0.comps.Group.xml              | 2 ++
+ dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Repo.xml   | 2 ++
+ dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml    | 2 ++
+ 6 files changed, 12 insertions(+)
+
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Advisory.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Advisory.xml
+index 6aecee9..346c380 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Advisory.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Advisory.xml
+@@ -62,6 +62,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 Consider only advisories referencing a Bugzilla ticket.
+             - with_cve: boolean, default False
+                 Consider only advisories referencing a CVE ticket.
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Goal.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Goal.xml
+index 097e9dc..e656cef 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Goal.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.Goal.xml
+@@ -36,6 +36,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+         Following @options are supported:
+             - allow_erasing: boolean, default false
+                 Whether removal of installed package is allowed to resolve the transaction.
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.History.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.History.xml
+index 5df5184..43b52cc 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.History.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.History.xml
+@@ -72,6 +72,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 the Rpm interface.
+             - since: int64, unix timestamp
+                 Get changes since a given point in time.
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.comps.Group.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.comps.Group.xml
+index b12e0ac..a0fa7a4 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.comps.Group.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.comps.Group.xml
+@@ -48,6 +48,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 any group matching to any of patterns is returned
+             - contains_pkgs: list of strings
+                 include only groups containing given packages
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Repo.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Repo.xml
+index 50b2ba3..012b4ea 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Repo.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Repo.xml
+@@ -40,6 +40,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 list of repository attributes that are returned
+             - enable_disable: string (default "enabled")
+                 When set to "enabled" or "disabled", only enabled / disabled repositories are listed. Any other value means all repositories are returned.
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+         Unknown options are ignored.
+     -->
+diff --git a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
+index f24b14d..ba22c94 100644
+--- a/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
++++ b/dnf5daemon-server/dbus/interfaces/org.rpm.dnf.v0.rpm.Rpm.xml
+@@ -53,6 +53,8 @@ along with libdnf.  If not, see <https://www.gnu.org/licenses/>.
+                 include source rpms into the results
+             - icase: bool (default true)
+                 ignore case while matching patterns
++            - interactive: boolean, default false
++                Set to "true", when the operation is done by a user, thus user interaction like password prompts can be done.
+ 
+             - patterns: list of strings
+                 any package matching to any of patterns is returned
+-- 
+2.54.0
+

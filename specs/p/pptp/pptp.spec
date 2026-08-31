@@ -3,7 +3,7 @@
 
 Name:		pptp
 Version:	1.10.0
-Release: 26%{?dist}
+Release:	23%{?dist}
 Summary:	Point-to-Point Tunneling Protocol (PPTP) Client
 License:	gpl-2.0-or-later
 URL:		http://pptpclient.sourceforge.net/

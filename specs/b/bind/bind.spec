@@ -45,6 +45,8 @@
 %global        chroot_create_directories /dev /run/named %{_localstatedir}/{log,named,tmp} \\\
                                          %{_sysconfdir}/{crypto-policies/back-ends,pki/dnssec-keys,named} \\\
                                          %{_libdir}/bind %{_libdir}/named %{_datadir}/{GeoIP,named} /proc/sys/net/ipv4
+%global        upstream_sources 0 2
+%global        pgp_signature_sources 2
 
 ## The order of libs is important. See lib/Makefile.in for details
 %define bind_export_libs isc dns isccfg irs
@@ -88,8 +90,8 @@ License:  MPL-2.0 AND ISC AND MIT AND BSD-3-Clause AND BSD-2-Clause
 #
 # Before rebasing bind, ensure bind-dyndb-ldap is ready to be rebuild and use side-tag with it.
 # Updating just bind will cause freeipa-dns-server package to be uninstallable.
-Version:  9.18.44
-Release: 4%{?dist}
+Version:  9.18.50
+Release:  2%{?dist}
 Epoch:    32
 Url:      https://www.isc.org/downloads/bind/
 #
@@ -114,12 +116,12 @@ Source37: named.service
 Source38: named-chroot.service
 Source41: setup-named-chroot.sh
 Source42: generate-rndc-key.sh
-Source43: named.rwtab
 Source44: named-chroot-setup.service
 Source46: named-setup-rndc.service
 Source48: setup-named-softhsm.sh
 Source49: named-chroot.files
 Source50: named.sysusers
+Source51: bind-chroot.tmpfiles.d
 
 # Common patches
 # FIXME: Is this still required?
@@ -145,6 +147,31 @@ Patch32: bind-9.18-partial-additional-records.patch
 Patch33: bind-9.18-dig-idn-input-always.patch
 # downstream only too
 Patch34: bind-9.18-dig-idn-input-always-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/4fd0755bdd08471f74e6e4c76cd2326f356e0a61
+# https://gitlab.isc.org/isc-projects/bind9/-/work_items/5856
+Patch36: bind-9.18-CVE-2026-11331.patch
+Patch37: bind-9.18-CVE-2026-11331-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/c5d2fc706ca3635d9928c1cc68db73bffb35d772
+Patch38: bind-9.18-CVE-2026-10822.patch
+Patch40: bind-9.18-CVE-2026-10822-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/5a0cef5bdb077df73fa59504efb8ca4c8b0a84c5
+Patch41: bind-9.18-CVE-2026-12617.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/26437be900c68bbe0974ec9ab804c2894c19c419
+Patch42: bind-9.18-CVE-2026-12617-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/14d23a4955c62efe974266a8e96a8c5d7caad040
+Patch43: bind-9.18-CVE-2026-11622.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/58812f64bf14b3930f5bb90a2d0e1f59bc8260b4
+Patch44: bind-9.18-CVE-2026-11721.patch
+Patch45: bind-9.18-CVE-2026-11721-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/348fd47f7636f610a39ba98427fcacab8e62389b
+Patch46: bind-9.18-CVE-2026-10723.patch
+Patch47: bind-9.18-CVE-2026-10723-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/b9ff2c9a36bb678fd1393d4f932b35a6882cd2a8
+Patch48: bind-9.18-CVE-2026-13204.patch
+Patch49: bind-9.18-CVE-2026-13204-test.patch
+# https://gitlab.isc.org/isc-projects/bind9/commit/36f3d50f9c8ebc8d25ee033e707ca502e20b083f
+Patch50: bind-9.18-CVE-2026-13321.patch
+Patch51: bind-9.18-CVE-2026-13321-test.patch
 
 %{?systemd_ordering}
 # https://fedoraproject.org/wiki/Changes/RPMSuportForSystemdSysusers
@@ -187,6 +214,7 @@ BuildRequires:  softhsm
 BuildRequires:  perl(Net::DNS) perl(Net::DNS::Nameserver) perl(Time::HiRes) perl(Getopt::Long)
 BuildRequires:  perl(English)
 BuildRequires:  python3-dns
+BuildRequires:  python3-hypothesis
 # manual configuration requires this tool
 BuildRequires:  iproute
 %endif
@@ -674,9 +702,7 @@ done
 
 mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
 install -p -m 644 %{SOURCE35} ${RPM_BUILD_ROOT}%{_tmpfilesdir}/named.conf
-
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/rwtab.d
-install -p -m 644 %{SOURCE43} ${RPM_BUILD_ROOT}%{_sysconfdir}/rwtab.d/named
+install -p -m 644 %{SOURCE51} ${RPM_BUILD_ROOT}%{_tmpfilesdir}/%{name}-chroot.conf
 
 %post
 %?ldconfig
@@ -771,7 +797,6 @@ fi;
 %config(noreplace) %attr(0644,root,named) %{_sysconfdir}/named.ca
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
 %{_tmpfilesdir}/named.conf
-%{_sysconfdir}/rwtab.d/named
 %{_unitdir}/named.service
 %{_unitdir}/named-setup-rndc.service
 %{_sysusersdir}/named.conf
@@ -901,6 +926,7 @@ fi;
 %{_unitdir}/named-chroot.service
 %{_unitdir}/named-chroot-setup.service
 %{_libexecdir}/setup-named-chroot.sh
+%{_tmpfilesdir}/%{name}-chroot.conf
 %defattr(0664,root,named,-)
 %ghost %dev(c,1,3) %verify(not mtime) %{chroot_prefix}/dev/null
 %ghost %dev(c,1,8) %verify(not mtime) %{chroot_prefix}/dev/random
@@ -946,6 +972,33 @@ fi;
 %endif
 
 %changelog
+* Tue Aug 25 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.50-2
+- Potential wildcard CNAME RPZ policy bypass (CVE-2026-11331)
+- Key Record using PRIVATEDNS algorithm may lead to exit (CVE-2026-10822)
+- Record ordering based unexpected exit with CNAME or DNAME (CVE-2026-12617)
+- Potential memory usage beyond configured limits (CVE-2026-11622)
+- Cache poisoning via label count discrepancy, RRSIG, wildcards (CVE-2026-11721)
+- Incorrect acceptance of NSEC3 records (CVE-2026-10723)
+- Unexpected exit with NSEC and NSEC3 both present (CVE-2026-13204)
+- DNSSEC Validation Bypass via Out-of-Zone NSEC Next Field (CVE-2026-13321)
+
+* Wed Jun 17 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.50-1
+- Update to 9.18.50 (rhbz#2489833)
+- Remove rwtab files
+
+* Wed May 20 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.49-1
+- Update to 9.18.49 (rhbz#2480121)
+
+* Tue Apr 07 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.48-1
+- Update to 9.18.48 (rhbz#2453853)
+
+* Wed Mar 25 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.47-1
+- Update to 9.18.47 (rhbz#2440561)
+
+* Wed Jan 28 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.44-2
+- Create /var/named directories for bind-chroot (RHEL-132053)
+- Add forgotten _libdir/named into bind-chroot tmpfiles
+
 * Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.18.44-1
 - Update to 9.18.44 (rhbz#2431609)
 

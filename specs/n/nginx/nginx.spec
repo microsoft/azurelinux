@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -18,7 +18,11 @@
 # See: https://src.fedoraproject.org/rpms/redhat-rpm-config/c/078af19
 %undefine _strict_symbol_defs_build
 
+%if 0%{?fedora} || 0%{?epel} == 8
+%bcond_without geoip
+%else
 %bcond_with geoip
+%endif
 
 # nginx gperftools support should be disabled for RHEL >= 8
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1931402
@@ -46,12 +50,12 @@
 %endif
 
 # kTLS requires OpenSSL 3.0 (default in F36+ and EL9+, available in EPEL8)
-%if 0%{?fedora} >= 36 || 0%{?rhel} >= 8
+%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9 || 0%{?epel} >= 8
 %global with_ktls 1
 %endif
 
 # Build against OpenSSL 3 on EL8
-%if 0%{?rhel} == 8
+%if 0%{?epel} == 8
 %global openssl_pkgversion 3
 %endif
 
@@ -69,7 +73,7 @@
 
 Name:              nginx
 Epoch:             2
-Version:           1.28.2
+Version:           1.30.4
 Release:           %autorelease
 
 Summary:           A high performance web server and reverse proxy server
@@ -87,7 +91,6 @@ Source10:          nginx.service
 Source11:          nginx.logrotate
 Source12:          nginx.conf
 Source13:          nginx-upgrade
-Source14:          nginx-upgrade.8
 Source15:          macros.nginxmods.in
 Source16:          nginxmods.attr
 Source17:          nginx-ssl-pass-dialog
@@ -116,9 +119,6 @@ Patch3:            0004-Disable-ENGINE-support.patch
 # downstream patch - Compile perl module with O2
 Patch4:            0005-Compile-perl-module-with-O2.patch
 
-# upstream patch - https://github.com/nginx/nginx/pull/1089
-Patch5:            0006-Clarify-binding-behavior-of-t-option.patch
-
 BuildRequires:     make
 BuildRequires:     gcc
 BuildRequires:     gnupg2
@@ -128,7 +128,8 @@ BuildRequires:     gperftools-devel
 BuildRequires:     libxcrypt-devel
 BuildRequires:     openssl%{?openssl_pkgversion}-devel
 BuildRequires:     pcre2-devel
-%if 0%{?fedora} || 0%{?rhel} > 8
+BuildRequires:     perl-podlators
+%if 0%{?fedora} || 0%{?rhel} >= 10 || 0%{?epel} >= 9
 BuildRequires:     zlib-ng-devel
 %else
 BuildRequires:     zlib-devel
@@ -144,8 +145,6 @@ Requires:          %{name}-core = %{epoch}:%{version}-%{release}
 BuildRequires:     systemd
 BuildRequires:     systemd-rpm-macros
 %{?systemd_requires}
-# For external nginx modules
-Provides:          nginx(abi) = %{nginx_abiversion}
 
 %description
 Nginx is a web server and a reverse proxy server for HTTP, SMTP, POP3 and
@@ -160,6 +159,8 @@ Requires:          nginx-mimetypes
 Requires:          openssl%{?openssl_pkgversion}-libs
 Requires(pre):     nginx-filesystem
 Conflicts:         nginx < 1:1.20.2-4
+# For external nginx modules
+Provides:          nginx(abi) = %{nginx_abiversion}
 
 %description core
 nginx minimal core
@@ -170,6 +171,7 @@ BuildArch:         noarch
 
 %if %{with geoip}
 Requires:          nginx-mod-http-geoip = %{epoch}:%{version}-%{release}
+Requires:          nginx-mod-stream-geoip = %{epoch}:%{version}-%{release}
 %endif
 Requires:          nginx-mod-http-image-filter = %{epoch}:%{version}-%{release}
 Requires:          nginx-mod-http-perl = %{epoch}:%{version}-%{release}
@@ -197,9 +199,17 @@ directories.
 Summary:           Nginx HTTP geoip module
 BuildRequires:     GeoIP-devel
 Requires:          nginx(abi) = %{nginx_abiversion}
-Requires:          GeoIP
 
 %description mod-http-geoip
+%{summary}.
+
+%package mod-stream-geoip
+Summary:           Nginx stream geoip module
+BuildRequires:     GeoIP-devel
+Requires:          nginx(abi) = %{nginx_abiversion}
+Requires:          nginx-mod-stream = %{epoch}:%{version}-%{release}
+
+%description mod-stream-geoip
 %{summary}.
 %endif
 
@@ -262,7 +272,11 @@ Requires:          openssl%{?openssl_pkgversion}-devel
 Requires:          pcre2-devel
 Requires:          perl-devel
 Requires:          perl(ExtUtils::Embed)
-Requires:          zlib-devel
+%if 0%{?fedora} || 0%{?rhel} >= 10 || 0%{?epel} >= 9
+BuildRequires:     zlib-ng-devel
+%else
+BuildRequires:     zlib-devel
+%endif
 
 %description mod-devel
 %{summary}.
@@ -297,11 +311,7 @@ mv ../%{name}-%{version}-%{release}-src .
 %build
 # nginx does not utilize a standard configure script.  It has its own
 # and the standard configure options cause the nginx configure script
-# to error out.  This is is also the reason for the DESTDIR environment
-# variable.
-export DESTDIR=%{buildroot}
-# So the perl module finds its symbols:
-nginx_ldopts="$RPM_LD_FLAGS -Wl,-E -O2"
+# to error out.
 if ! ./configure \
     --prefix=%{_datadir}/nginx \
     --sbin-path=%{_sbindir}/nginx \
@@ -365,8 +375,8 @@ if ! ./configure \
     --with-stream_ssl_module \
     --with-stream_ssl_preread_module \
     --with-threads \
-    --with-cc-opt="%{optflags} $(pcre2-config --cflags)" \
-    --with-ld-opt="$nginx_ldopts"; then
+    --with-cc-opt="%{optflags}" \
+    --with-ld-opt="$RPM_LD_FLAGS"; then
   : configure failed
   cat objs/autoconf.err
   exit 1
@@ -434,7 +444,11 @@ install -p -D -m 0644 %{_builddir}/nginx-%{version}/objs/nginx.8 \
     %{buildroot}%{_mandir}/man8/nginx.8
 
 install -p -D -m 0755 %{SOURCE13} %{buildroot}%{_bindir}/nginx-upgrade
-install -p -D -m 0644 %{SOURCE14} %{buildroot}%{_mandir}/man8/nginx-upgrade.8
+pod2man --section=8 --name=nginx-upgrade \
+    --release="%{version}-%{release}" \
+    --center="Nginx Zero-Downtime Upgrade Utility" \
+    --date="$(sed -nE 's/# Last updated: (.+)/\1/p' %{SOURCE13})" \
+    %{SOURCE13} > %{buildroot}%{_mandir}/man8/nginx-upgrade.8
 
 for i in ftdetect ftplugin indent syntax; do
     install -p -D -m644 contrib/vim/${i}/nginx.vim \
@@ -444,6 +458,8 @@ done
 %if %{with geoip}
 echo 'load_module "%{nginx_moduledir}/ngx_http_geoip_module.so";' \
     > %{buildroot}%{nginx_moduleconfdir}/mod-http-geoip.conf
+echo 'load_module "%{nginx_moduledir}/ngx_stream_geoip_module.so";' \
+    > %{buildroot}%{nginx_moduleconfdir}/zz-mod-stream-geoip.conf
 %endif
 echo 'load_module "%{nginx_moduledir}/ngx_http_image_filter_module.so";' \
     > %{buildroot}%{nginx_moduleconfdir}/mod-http-image-filter.conf
@@ -471,9 +487,9 @@ sed -e "s|@@NGINX_ABIVERSION@@|%{nginx_abiversion}|g" \
 install -Dpm0644 %{SOURCE16} %{buildroot}%{_fileattrsdir}/nginxmods.attr
 
 # install http-ssl-pass-dialog
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-install -m755 $RPM_SOURCE_DIR/nginx-ssl-pass-dialog \
-        $RPM_BUILD_ROOT%{_libexecdir}/nginx-ssl-pass-dialog
+mkdir -p %{buildroot}%{_libexecdir}
+install -m755 %{SOURCE17} \
+        %{buildroot}%{_libexecdir}/nginx-ssl-pass-dialog
 
 # install sysusers file
 install -p -D -m 0644 %{SOURCE19} %{buildroot}%{_sysusersdir}/nginx.conf
@@ -482,6 +498,7 @@ install -p -D -m 0644 %{SOURCE19} %{buildroot}%{_sysusersdir}/nginx.conf
 mkdir -p %{buildroot}%{_tmpfilesdir}
 install -m 644 -p %{SOURCE20} %{buildroot}%{_tmpfilesdir}/nginx.conf
 
+
 %pre filesystem
 # RHEL 9 compat, remove after RHEL 9 EOL
 %sysusers_create_compat %{SOURCE19}
@@ -489,48 +506,22 @@ install -m 644 -p %{SOURCE20} %{buildroot}%{_tmpfilesdir}/nginx.conf
 %post
 %systemd_post nginx.service
 
-%if %{with geoip}
-%post mod-http-geoip
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-%endif
-
-%post mod-http-image-filter
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-
-%post mod-http-perl
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-
-%post mod-http-xslt-filter
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-
-%post mod-mail
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-
-%post mod-stream
-if [ $1 -eq 1 ]; then
-    /usr/bin/systemctl reload nginx.service >/dev/null 2>&1 || :
-fi
-
 %preun
 %systemd_preun nginx.service
 
 %postun
 %systemd_postun nginx.service
+
+# Request zero-downtime upgrade upon installation of a new nginx binary or modules
+# A reload is not sufficient here: https://blog.nginx.org/blog/nginx-dynamic-modules-how-they-work#upgradeMod
+%transfiletriggerin -- %{_sbindir}/nginx %{nginx_moduleconfdir} %{nginx_moduledir}
 if [ $1 -ge 1 ]; then
-    /usr/bin/nginx-upgrade >/dev/null 2>&1 || :
+    test -f %{_sysconfdir}/nginx/rpm-disable-upgrade || /usr/bin/nginx-upgrade >/dev/null 2>&1 || :
 fi
 
+
 %files
+%doc instance.conf
 %{_datadir}/nginx/html/*
 %{_bindir}/nginx-upgrade
 %{_datadir}/vim/vimfiles/ftdetect/nginx.vim
@@ -543,10 +534,11 @@ fi
 %{_unitdir}/nginx.service
 %{_unitdir}/nginx@.service
 %{_libexecdir}/nginx-ssl-pass-dialog
+%config(noreplace) %{_sysconfdir}/logrotate.d/nginx
 
 %files core
 %license LICENSE
-%doc CHANGES README.md README.dynamic instance.conf
+%doc CHANGES README.md README.dynamic
 %{_sbindir}/nginx
 %config(noreplace) %{_sysconfdir}/nginx/fastcgi.conf
 %config(noreplace) %{_sysconfdir}/nginx/fastcgi.conf.default
@@ -565,7 +557,6 @@ fi
 %config(noreplace) %{_sysconfdir}/nginx/uwsgi_params
 %config(noreplace) %{_sysconfdir}/nginx/uwsgi_params.default
 %config(noreplace) %{_sysconfdir}/nginx/win-utf
-%config(noreplace) %{_sysconfdir}/logrotate.d/nginx
 %attr(770,%{nginx_user},root) %dir %{_localstatedir}/lib/nginx
 %attr(770,%{nginx_user},root) %dir %{_localstatedir}/lib/nginx/tmp
 %{_tmpfilesdir}/nginx.conf
@@ -591,6 +582,10 @@ fi
 %files mod-http-geoip
 %{nginx_moduleconfdir}/mod-http-geoip.conf
 %{nginx_moduledir}/ngx_http_geoip_module.so
+
+%files mod-stream-geoip
+%{nginx_moduleconfdir}/zz-mod-stream-geoip.conf
+%{nginx_moduledir}/ngx_stream_geoip_module.so
 %endif
 
 %files mod-http-image-filter
@@ -624,14 +619,80 @@ fi
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2:1.28.2-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 2:1.30.4-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2:1.28.2-3
-- build: mass rebuild auto-bumpable components
+* Sun Jul 19 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.30.4-1
+- update to 1.30.4
+- fixes CVE-2026-42533, CVE-2026-60005, CVE-2026-56434
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2:1.28.2-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.30.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 17 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2:1.30.3-2
+- Rebuilt for openssl 4.0
+
+* Wed Jun 17 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.30.3-1
+- update to 1.30.3
+- fixes CVE-2026-42055, CVE-2026-42530 and CVE-2026-48142
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2:1.30.2-2
+- Rebuilt for openssl 4.0
+
+* Fri May 22 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.30.2-1
+- update to 1.30.2
+- fixes CVE-2026-9256
+
+* Wed May 13 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.30.1-1
+- update to 1.30.1
+- fixes CVE-2026-42926, CVE-2026-42945, CVE-2026-42946, CVE-2026-42934,
+  CVE-2026-40460 and CVE-2026-40701
+
+* Wed Apr 15 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.30.0-1
+- update to 1.30.0
+- drop upstreamed manpage patch - https://github.com/nginx/nginx/pull/1089
+- refresh other patches
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.3-1
+- Update to 1.28.3
+- fixes CVE-2026-27654, CVE-2026-27784, CVE-2026-32647, CVE-2026-27651,
+  CVE-2026-28753, CVE-2026-28755
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-9
+- Spec file and macro cleanups
+- move some files into the packages that have the dependencies they rely on
+  (e.g. systemd, logrotate are not present in nginx-core, so don't install
+  files pertaining to them there)
+- remove unused LDFLAGS and DESTDIR overrides, for perl we patch the
+  Makefile.PL already
+- use zlib-ng-devel dependency also in nginx-mod-devel
+- improve macro consistency
+- sync configure command in macros.nginxmods.in with main package
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-8
+- Use systemctl kill in logrotate postrotate script
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-7
+- Use file triggers to reload dynamic modules upon upgrade
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-6
+- Rewrite nginx-upgrade to support instances
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-5
+- Move modular configuration file include after default host
+- fixes rhbz#2413647
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-4
+- Fix RHEL 8 & 9 compatibility
+- Fix SSL passphrase dialog patch when used with OpenSSL < 3 (EL8 w/o EPEL)
+- Build now works with and without EPEL enabled
+
+* Wed Mar 25 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-3
+- Build GeoIP module by default on Fedora and EPEL8
+- fixes rhbz#2445461
+
+* Thu Mar 05 2026 Timothée Ravier <tim@siosm.fr> - 2:1.28.2-2
+- Move ABI 'Provides' to the core sub package
 
 * Wed Feb 04 2026 Felix Kaechele <felix@kaechele.ca> - 2:1.28.2-1
 - Update to 1.28.2

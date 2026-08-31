@@ -1,0 +1,55 @@
+Based on upsteam commit e8eccd46514e4b4f7ee5d970ee08a4e5a59586b8
+
+commit e8eccd46514e4b4f7ee5d970ee08a4e5a59586b8
+Author: Nils Goroll <nils.goroll@uplex.de>
+Date:   Wed Mar 4 10:48:27 2026 +0100
+
+    Enable https_scheme feature by default
+    
+    RFC9110 explicitly names https as "HTTP-related" and RFC9112 states that we MUST
+    convert the host, so not parsing https:// is considered a violation of the
+    standard, which, in turn, should be a deliberate decision.
+    
+    Related to VSV18
+    
+    Conflicts:
+            both modified:   doc/changes.rst
+
+diff --git a/include/tbl/params.h b/include/tbl/params.h
+index c94f771d5..bdb34e085 100644
+--- a/include/tbl/params.h
++++ b/include/tbl/params.h
+@@ -1987,6 +1987,7 @@ PARAM_BITS(
+ 	/* fld */	feature_bits,
+ 	/* def */
+ 	"none,"
++	"+https_scheme,"
+ 	"+validate_headers,"
+ 	"+vcl_req_reset",
+ 	/* descr */
+--- a/bin/varnishtest/tests/r01847.vtc	2026-06-16 17:15:34.491797476 +0200
++++ b/bin/varnishtest/tests/r01847.vtc	2026-06-16 17:20:29.853055662 +0200
+@@ -23,14 +23,9 @@
+ 	rxresp
+ 	expect resp.http.rxhost == www.example.com
+ 	expect resp.http.rxurl == /bar
+-
+-	txreq -url https://www.example.com/bar
+-	rxresp
+-	expect resp.http.rxhost == "${localhost}"
+-	expect resp.http.rxurl == https://www.example.com/bar
+ } -run
+ 
+-varnish v1 -cliok "param.set feature +https_scheme"
++varnish v1 -cliok "param.set feature -https_scheme"
+ 
+ client c1 {
+ 	txreq -url http://www.example.com/bar
+@@ -40,6 +35,5 @@
+ 
+ 	txreq -url https://www.example.com/bar
+ 	rxresp
+-	expect resp.http.rxhost == www.example.com
+-	expect resp.http.rxurl == /bar
++	expect resp.status == 400	
+ } -run

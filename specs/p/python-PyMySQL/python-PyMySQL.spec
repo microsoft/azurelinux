@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           python-PyMySQL
-Version:        1.1.2
-Release: 5%{?dist}
+Version:        1.1.3
+Release:        1%{?dist}
 Summary:        Pure-Python MySQL client library
 
 License:        MIT
@@ -59,6 +59,12 @@ and Jython.
 
 
 %changelog
+* Mon Jul 13 2026 Julien Enselme <jujens@jujens.eu> - 1.1.3-1
+- Update to 1.1.3
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.1.2-2
 - Rebuilt for Python 3.14.0rc3 bytecode
 

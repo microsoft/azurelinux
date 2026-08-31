@@ -10,7 +10,7 @@ Main focus is on modifying existing spec files, any change should result
 in a minimal diff.}
 
 
-%global base_version 0.39.1
+%global base_version 0.41.1
 #global prerelease   rc1
 
 %global package_version %{base_version}%{?prerelease:~%{prerelease}}
@@ -19,7 +19,7 @@ in a minimal diff.}
 
 Name:           python-specfile
 Version:        %{package_version}
-Release: 4%{?dist}
+Release:        1%{?dist}
 
 Summary:        A library for parsing and manipulating RPM spec files
 License:        MIT
@@ -34,6 +34,10 @@ BuildRequires:  python3-devel
 # tests/unit/test_guess_packager.py
 BuildRequires:  git-core
 %endif
+
+# system-rpm-config pulls in packages containing SRPM macros
+# necessary for spec file preprocessing and parsing
+Recommends:     system-rpm-config
 
 
 %description
@@ -80,6 +84,36 @@ sed -i 's/setuptools_scm\[toml\]>=7/setuptools_scm[toml]/' pyproject.toml
 
 
 %changelog
+* Mon Jul 20 2026 Packit <hello@packit.dev> - 0.41.1-1
+- Sanitize multi-pipe shell expansion. (#542)
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.41.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 0.41.0-2
+- Rebuilt for Python 3.15
+
+* Fri May 29 2026 Packit <hello@packit.dev> - 0.41.0-1
+- Fixed an issue where the value of a tag could have been incorrectly expanded if the spec file contained a macro definition shadowing the tag name, e.g.:
+```
+%%global release 12
+%%global release_string %%{release}%%{?dist}
+Release: %%{release_string}.2
+```
+In this case, with `dist` being `.fc44`, `Specfile.expanded_release` returned `12.fc44.fc44` instead of `12.fc44`. (#539)
+
+* Fri Apr 24 2026 Packit <hello@packit.dev> - 0.40.2-1
+- Trailing whitespaces at the end of specfile sections are now ignored during parsing. (#531)
+- Resolves: rhbz#2461109
+
+* Wed Mar 25 2026 Packit <hello@packit.dev> - 0.40.1-1
+- Fixed issues related to introduced sanitization (#523, #524, #525).
+- Resolves: rhbz#2446536
+
+* Wed Mar 11 2026 Packit <hello@packit.dev> - 0.40.0-1
+- `Specfile()` has a new `sanitize` option that enables best effort sanitization of potentially dangerous constructs such as shell expansions and unsafe Lua macros before they are passed to RPM for parsing. (#519)
+- Fixed incorrect parsing of nested macros. (#522)
+
 * Sat Feb 14 2026 Packit <hello@packit.dev> - 0.39.1-1
 - Fixed whitespace padding of day of month in changelog entries. (#511)
 - Resolves: rhbz#2393435

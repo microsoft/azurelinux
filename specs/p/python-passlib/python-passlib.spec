@@ -3,7 +3,7 @@
 
 Name:           python-passlib
 Version:        1.7.4
-Release: 28%{?dist}
+Release:        25%{?dist}
 Summary:        Comprehensive password hashing framework supporting over 20 schemes
 
 # license breakdown is described in LICENSE file

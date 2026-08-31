@@ -10,7 +10,7 @@
 
 Name:           python-invoke
 Version:        2.2.0
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        A Python task execution tool and library
 
 License:        BSD-2-Clause

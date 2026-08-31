@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-recursion-context5
 #
-# SPDX-FileCopyrightText:  Copyright 2015-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2015-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -12,7 +12,7 @@
 
 %bcond_without       tests
 
-%global gh_commit    47e34210757a2f37a97dcd207d032e1b01e64c7a
+%global gh_commit    5d32fe257a9b39cb63146924d6b4e32a22d4502a
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   recursion-context
@@ -26,8 +26,8 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        5.0.1
-Release: 4%{?dist}
+Version:        5.0.2
+Release:        1%{?dist}
 Summary:        Recursively process PHP variables, version %{major}
 
 License:        BSD-3-Clause
@@ -83,7 +83,7 @@ touch vendor/autoload.php
 
 : Run upstream test suite
 ret=0
-for cmd in php php81 php82 php83 php84 php85; do
+for cmd in php php82 php83 php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit10 || ret=1
@@ -103,6 +103,9 @@ exit $ret
 
 
 %changelog
+* Tue Aug 11 2026 Remi Collet <remi@remirepo.net> - 5.0.2-1
+- update to 5.0.2
+
 * Mon Aug 11 2025 Remi Collet <remi@remirepo.net> - 5.0.1-1
 - update to 5.0.1
 

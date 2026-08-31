@@ -1,0 +1,43 @@
+From a434999ca080d30f57a8e4d80621151e71da4fa0 Mon Sep 17 00:00:00 2001
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Thu, 30 Jul 2026 16:04:02 +0200
+Subject: [PATCH] mtcr: fix segfault in pciconf open when VSEC is not fully
+ supported
+
+When a device reports FUNCTIONAL_VSC but does not pass the
+VSEC_SUPPORTED_UL() check, the ctx->mread4 and ctx->mwrite4 function
+pointers are left NULL. The fallback that assigns old-style pciconf
+read/write functions is guarded by !mf->functional_vsec_supp, which was
+already set to 1, so it is skipped. The first mread4() call then
+dereferences NULL and crashes.
+
+Fix this by clearing functional_vsec_supp back to 0 when
+VSEC_SUPPORTED_UL() is false, so the existing fallback assigns
+mtcr_pciconf_mread4_old/mtcr_pciconf_mwrite4_old.
+
+Observed on ConnectX-3 Pro (PCI device ID 0x1007).
+
+Fixes: https://github.com/Mellanox/mstflint/issues/1157
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ mtcr_ul/mtcr_ul_com.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mtcr_ul/mtcr_ul_com.c b/mtcr_ul/mtcr_ul_com.c
+index 6df91f510ac9..f199102bcbd6 100644
+--- a/mtcr_ul/mtcr_ul_com.c
++++ b/mtcr_ul/mtcr_ul_com.c
+@@ -2367,6 +2367,10 @@ static int mtcr_pciconf_open(mfile* mf, const char* name, u_int32_t adv_opt)
+                 ctx->mread4_block = (f_mread4_block)mread4_block_pciconf;
+                 ctx->mwrite4_block = (f_mwrite4_block)mwrite4_block_pciconf;
+             }
++            else
++            {
++                mf->functional_vsec_supp = 0;
++            }
+ 
+             mf->pxir_vsec_supp = 0;
+             if ((mf->vsec_cap_mask & (1 << space_to_cap_offset(AS_PCI_CRSPACE))) && (mf->vsec_cap_mask & (1 << space_to_cap_offset(AS_PCI_ALL_ICMD))) &&
+-- 
+2.55.0
+

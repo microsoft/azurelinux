@@ -1,5 +1,5 @@
---- libdeflate-sys-1.25.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ libdeflate-sys-1.25.2/Cargo.toml	2026-02-08T11:56:03.586567+00:00
+--- libdeflate-sys-1.26.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ libdeflate-sys-1.26.0/Cargo.toml	2026-08-23T10:31:43.000070+00:00
 @@ -41,7 +41,7 @@
  repository = "https://github.com/libdeflater/libdeflater"
  

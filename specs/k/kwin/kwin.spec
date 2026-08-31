@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:    kwin
-Version: 6.6.0
-Release: 5%{?dist}
+Version: 6.7.4
+Release: 1%{?dist}
 Summary: KDE Window manager
 
 License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only) AND MIT
@@ -30,7 +30,6 @@ BuildRequires:  qt6-qtbase-devel
 BuildRequires:  qt6-qtbase-static
 # KWinQpaPlugin (and others?)
 BuildRequires:  qt6-qtbase-private-devel
-BuildRequires:  qt6-qtsensors-devel
 BuildRequires:  qt6-qttools-devel
 BuildRequires:  qt6-qttools-static
 BuildRequires:  qt6-qtwayland-devel
@@ -69,6 +68,7 @@ BuildRequires:  libxkbcommon-devel >= 0.4
 BuildRequires:  pkgconfig(libinput) >= 0.10
 BuildRequires:  pkgconfig(libudev)
 BuildRequires:  pkgconfig(xwayland)
+BuildRequires:  pkgconfig(libevdev)
 
 # KF6
 BuildRequires:  cmake(KF6Completion)
@@ -122,6 +122,7 @@ Requires:       libplasma%{?_isa} >= %{plasma_version}
 Requires:       qt6-qtmultimedia%{?_isa}
 Requires:       qt6-qtdeclarative%{?_isa}
 Requires:       aurorae%{?_isa}
+Requires:       iio-sensor-proxy%{?_isa}
 
 # Before kwin was split out from kde-workspace into a subpackage
 Conflicts:      kde-workspace%{?_isa} < 4.11.14-2
@@ -207,8 +208,14 @@ BuildArch:      noarch
 %autosetup -p1
 
 
-%build
+%conf
+%if "%{__isa_bits}" == "32"
+# No spaceship operator support on 32-bit arches
+%define _pkg_extra_cxxflags -DVULKAN_HPP_NO_SPACESHIP_OPERATOR
+%endif
 %cmake_kf6
+
+%build
 %cmake_build
 
 %install
@@ -248,6 +255,8 @@ ln -sr %{buildroot}%{_kf6_bindir}/kwin_wayland %{buildroot}%{_bindir}/kwin
 %{_libexecdir}/kwin_killer_helper
 %{_libexecdir}/kwin-applywindowdecoration
 %{_libexecdir}/kwin-tabbox-preview
+%{_libexecdir}/kwin_dialog_helper
+%{_libexecdir}/kwin_eis_prompter
 %{_datadir}/kconf_update/kwin.upd
 %{_kf6_datadir}/knotifications6/kwin.notifyrc
 %{_kf6_datadir}/config.kcfg/kwin.kcfg
@@ -277,6 +286,63 @@ ln -sr %{buildroot}%{_kf6_bindir}/kwin_wayland %{buildroot}%{_bindir}/kwin
 
 
 %changelog
+* Tue Aug 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-1
+- 6.7.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Steve Cossette <farchord@gmail.com> - 6.7.3-1
+- 6.7.3
+
+* Wed Jul 01 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-1
+- 6.7.2
+
+* Fri Jun 26 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-2
+- Bump for rebuild for upstream bugfix
+
+* Tue Jun 23 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Jun 11 2026 Steve Cossette <farchord@gmail.com> - 6.7.0-1
+- 6.7.0
+
+* Fri May 29 2026 Steve Cossette <farchord@gmail.com> - 6.6.91-1
+- 6.6.91
+
+* Sat May 16 2026 Steve Cossette <farchord@gmail.com> - 6.6.90-1
+- 6.6.90
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-1
+- 6.6.5
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-4
+- Rebuild (qt6)
+
+* Thu Apr 16 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-3
+- Rebuild (qt6)
+
+* Sun Apr 12 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-2
+- Added evdev as BR for controller support (#22)
+
+* Fri Apr 10 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-1
+- 6.6.4
+
+* Wed Mar 25 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-2
+- Disable DRM color pipelines on AMD
+
+* Tue Mar 17 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-1
+- 6.6.3
+
+* Fri Mar 06 2026 Timothée Ravier <tim@siosm.fr> - 6.6.2-2
+- Require iio-sensor-proxy instead of qt6-qtsensors
+
+* Tue Mar 03 2026 Steve Cossette <farchord@gmail.com> - 6.6.2-1
+- 6.6.2
+
+* Tue Feb 24 2026 Steve Cossette <farchord@gmail.com> - 6.6.1-1
+- 6.6.1
+
 * Sun Feb 15 2026 Neal Gompa <ngompa@fedoraproject.org> - 6.6.0-2
 - Rebuild for libdisplay-info 0.3.0
 

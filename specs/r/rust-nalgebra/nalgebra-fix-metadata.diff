@@ -1,6 +1,56 @@
---- nalgebra-0.33.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ nalgebra-0.33.2/Cargo.toml	2024-11-04T22:21:00.817649+00:00
-@@ -132,12 +132,6 @@
+--- nalgebra-0.34.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ nalgebra-0.34.2/Cargo.toml	2026-04-03T12:57:18.115356+00:00
+@@ -98,24 +98,6 @@
+ ]
+ libm = [
+     "simba/libm",
+-    "glam014?/libm",
+-    "glam015?/libm",
+-    "glam016?/libm",
+-    "glam017?/libm",
+-    "glam018?/libm",
+-    "glam019?/libm",
+-    "glam020?/libm",
+-    "glam021?/libm",
+-    "glam022?/libm",
+-    "glam023?/libm",
+-    "glam024?/libm",
+-    "glam025?/libm",
+-    "glam027?/libm",
+-    "glam028?/libm",
+-    "glam029?/libm",
+-    "glam030?/libm",
+-    "glam031?/libm",
+-    "glam032?/libm",
+ ]
+ libm-force = ["simba/libm_force"]
+ macros = ["nalgebra-macros"]
+@@ -155,24 +137,6 @@
+     "num-rational/std",
+     "approx/std",
+     "simba/std",
+-    "glam014?/std",
+-    "glam015?/std",
+-    "glam016?/std",
+-    "glam017?/std",
+-    "glam018?/std",
+-    "glam019?/std",
+-    "glam020?/std",
+-    "glam021?/std",
+-    "glam022?/std",
+-    "glam023?/std",
+-    "glam024?/std",
+-    "glam025?/std",
+-    "glam027?/std",
+-    "glam028?/std",
+-    "glam029?/std",
+-    "glam030?/std",
+-    "glam031?/std",
+-    "glam032?/std",
+ ]
+ 
+ [lib]
+@@ -252,12 +216,6 @@
  name = "lib"
  path = "tests/lib.rs"
  
@@ -13,14 +63,22 @@
  [dependencies.alga]
  version = "0.9"
  optional = true
-@@ -307,10 +301,6 @@
- 
+@@ -469,10 +427,6 @@
  [dev-dependencies.cool_asserts]
  version = "2.0.3"
--
--[dev-dependencies.criterion]
--version = "0.4"
--features = ["html_reports"]
  
+-[dev-dependencies.criterion]
+-version = "0.7"
+-features = ["html_reports"]
+-
  [dev-dependencies.itertools]
  version = "0.13"
+ 
+@@ -490,7 +444,3 @@
+ 
+ [dev-dependencies.trybuild]
+ version = "1.0.90"
+-
+-[profile.bench]
+-lto = true
+-codegen-units = 1

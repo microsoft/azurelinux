@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.1.0
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Python MessagePack (de)serializer
 
 License:        Apache-2.0

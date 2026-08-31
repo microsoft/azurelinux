@@ -3,7 +3,7 @@
 
 Name:           perl-XML-Writer
 Version:        0.900
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        A simple Perl module for writing XML documents
 License:        LicenseRef-Fedora-UltraPermissive
 URL:            https://metacpan.org/release/XML-Writer

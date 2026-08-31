@@ -5,6 +5,8 @@
 
 # Build as an OpenSSL provider instead of as an engine
 %bcond provider %[0%{?fedora} >= 41 || 0%{?rhel} >= 10]
+# Build as an engine (inverse of provider)
+%bcond engine %[!%{with provider}]
 # QAT_HW only acceleration for RHEL
 %bcond sw %{undefined rhel}
 
@@ -16,9 +18,13 @@
 %endif
 
 Name:           qatengine
-Version:        2.0.0
-Release: 6%{?dist}
+Version:        2.2.0
+Release:        1%{?dist}
+%if %{with provider}
+Summary:        Intel QuickAssist Technology (QAT) OpenSSL Provider
+%else
 Summary:        Intel QuickAssist Technology (QAT) OpenSSL Engine
+%endif
 
 # Most of the source code is BSD, with the following exceptions:
 # - qat.txt, qat_err.h & qat_err.c files are Apache License 2.0
@@ -42,17 +48,24 @@ BuildRequires:  intel-ipsec-mb-devel >= 2.0
 BuildRequires:  openssl
 
 %description
+%if %{with provider}
+This package provides the Intel QuickAssist Technology OpenSSL Provider
+(an OpenSSL Plug-In Provider) which provides cryptographic acceleration
+for both hardware and optimized software using Intel QuickAssist Technology
+enabled Intel platforms.
+%else
 This package provides the Intel QuickAssist Technology OpenSSL Engine
 (an OpenSSL Plug-In Engine) which provides cryptographic acceleration
 for both hardware and optimized software using Intel QuickAssist Technology
 enabled Intel platforms.
+%endif
 
 %prep
 %autosetup -n QAT_Engine-%{version}
 
 %build
 autoreconf -ivf
-%configure %{?with_sw:--enable-qat_sw} %{?with_provider:--enable-qat_provider}
+%configure %{?with_sw:--enable-qat_sw} %{?with_engine:--enable-qat_engine}
 %make_build
 
 %install
@@ -81,9 +94,15 @@ openssl engine -v %{name}
 %endif
 
 %changelog
+* Sat Jun 13 2026 Sharanakumar <sharanakumar@intel.com> - 2.2.0-1
+- Update to qatengine v2.2.0
+
+* Thu Mar 26 2026 Sharanakumar <sharanakumar@intel.com> - 2.1.0-1
+- Update to qatengine v2.1.0
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
-
+ 
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

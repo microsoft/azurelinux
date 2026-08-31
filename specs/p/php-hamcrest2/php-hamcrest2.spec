@@ -20,7 +20,7 @@
 
 Name:           php-hamcrest2
 Version:        2.1.1
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        PHP port of Hamcrest Matchers
 
 License:        BSD-3-Clause

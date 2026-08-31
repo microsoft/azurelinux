@@ -11,7 +11,7 @@ diff --git a/channels.c b/channels.c
 index bfe2e3b2..d46531ce 100644
 --- a/channels.c
 +++ b/channels.c
-@@ -5098,11 +5098,13 @@ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
+@@ -5178,11 +5178,13 @@ x11_create_display_inet(struct ssh *ssh, int x11_display_offset,
  }
  
  static int
@@ -26,7 +26,7 @@ index bfe2e3b2..d46531ce 100644
  	sock = socket(AF_UNIX, SOCK_STREAM, 0);
  	if (sock == -1) {
  		error("socket: %.100s", strerror(errno));
-@@ -5110,11 +5112,12 @@ connect_local_xsocket_path(const char *pathname)
+@@ -5190,11 +5192,12 @@ connect_local_xsocket_path(const char *pathname)
  	}
  	memset(&addr, 0, sizeof(addr));
  	addr.sun_family = AF_UNIX;
@@ -42,7 +42,7 @@ index bfe2e3b2..d46531ce 100644
  	return -1;
  }
  
-@@ -5122,8 +5125,18 @@ static int
+@@ -5099,8 +5102,19 @@
  connect_local_xsocket(u_int dnr)
  {
  	char buf[1024];
@@ -51,10 +51,11 @@ index bfe2e3b2..d46531ce 100644
 +	int len, ret;
 +	len = snprintf(buf + 1, sizeof (buf) - 1, _PATH_UNIX_X, dnr);
 +#ifdef linux
-+	/* try abstract socket first */
-+	buf[0] = '\0';
-+	if ((ret = connect_local_xsocket_path(buf, len + 1)) >= 0)
-+		return ret;
++	if (getenv("SSH_INSECURE_ABSTRACT_SOCKET_ENABLED") != NULL) {
++		buf[0] = '\0';
++		if ((ret = connect_local_xsocket_path(buf, len + 1)) >= 0)
++			return ret;
++	}
 +#endif
 +	if ((ret = connect_local_xsocket_path(buf + 1, len)) >= 0)
 +		return ret;

@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 10;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -18,7 +18,7 @@
 %global crate pbkdf2
 
 Name:           rust-pbkdf2
-Version:        0.12.2
+Version:        0.13.0
 Release:        %autorelease
 Summary:        Generic implementation of PBKDF2
 
@@ -26,9 +26,10 @@ License:        MIT OR Apache-2.0
 URL:            https://crates.io/crates/pbkdf2
 Source:         %{crates_source}
 # Manually created patch for downstream crate metadata changes
-# * allow hex-literal 1.0:
-#   https://github.com/RustCrypto/password-hashes/commit/1dd9906066b561b26ecbfa1bfdf3b91d81ea7566
+# * Drop belt-hash dev-dependency to avoid packaging it
 Patch:          pbkdf2-fix-metadata.diff
+# * Downstream-only: omit a few tests that would require packaging belt-hash
+Patch10:        pbkdf2-0.13.0-no-belt-hash.patch
 
 BuildRequires:  cargo-rpm-macros >= 24
 
@@ -50,7 +51,6 @@ use the "%{crate}" crate.
 %license %{crate_instdir}/LICENSE-APACHE
 %license %{crate_instdir}/LICENSE-MIT
 %doc %{crate_instdir}/CHANGELOG.md
-%doc %{crate_instdir}/README.md
 %{crate_instdir}/
 
 %package     -n %{name}+default-devel
@@ -65,6 +65,30 @@ use the "default" feature of the "%{crate}" crate.
 %files       -n %{name}+default-devel
 %ghost %{crate_instdir}/Cargo.toml
 
+%package     -n %{name}+alloc-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+alloc-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "alloc" feature of the "%{crate}" crate.
+
+%files       -n %{name}+alloc-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+getrandom-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+getrandom-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "getrandom" feature of the "%{crate}" crate.
+
+%files       -n %{name}+getrandom-devel
+%ghost %{crate_instdir}/Cargo.toml
+
 %package     -n %{name}+hmac-devel
 Summary:        %{summary}
 BuildArch:      noarch
@@ -77,16 +101,28 @@ use the "hmac" feature of the "%{crate}" crate.
 %files       -n %{name}+hmac-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+parallel-devel
+%package     -n %{name}+kdf-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+parallel-devel %{_description}
+%description -n %{name}+kdf-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "parallel" feature of the "%{crate}" crate.
+use the "kdf" feature of the "%{crate}" crate.
 
-%files       -n %{name}+parallel-devel
+%files       -n %{name}+kdf-devel
+%ghost %{crate_instdir}/Cargo.toml
+
+%package     -n %{name}+mcf-devel
+Summary:        %{summary}
+BuildArch:      noarch
+
+%description -n %{name}+mcf-devel %{_description}
+
+This package contains library source intended for building other packages which
+use the "mcf" feature of the "%{crate}" crate.
+
+%files       -n %{name}+mcf-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+password-hash-devel
@@ -101,28 +137,28 @@ use the "password-hash" feature of the "%{crate}" crate.
 %files       -n %{name}+password-hash-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+rayon-devel
+%package     -n %{name}+phc-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+rayon-devel %{_description}
+%description -n %{name}+phc-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "rayon" feature of the "%{crate}" crate.
+use the "phc" feature of the "%{crate}" crate.
 
-%files       -n %{name}+rayon-devel
+%files       -n %{name}+phc-devel
 %ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+sha1-devel
+%package     -n %{name}+rand_core-devel
 Summary:        %{summary}
 BuildArch:      noarch
 
-%description -n %{name}+sha1-devel %{_description}
+%description -n %{name}+rand_core-devel %{_description}
 
 This package contains library source intended for building other packages which
-use the "sha1" feature of the "%{crate}" crate.
+use the "rand_core" feature of the "%{crate}" crate.
 
-%files       -n %{name}+sha1-devel
+%files       -n %{name}+rand_core-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %package     -n %{name}+sha2-devel
@@ -135,30 +171,6 @@ This package contains library source intended for building other packages which
 use the "sha2" feature of the "%{crate}" crate.
 
 %files       -n %{name}+sha2-devel
-%ghost %{crate_instdir}/Cargo.toml
-
-%package     -n %{name}+simple-devel
-Summary:        %{summary}
-BuildArch:      noarch
-
-%description -n %{name}+simple-devel %{_description}
-
-This package contains library source intended for building other packages which
-use the "simple" feature of the "%{crate}" crate.
-
-%files       -n %{name}+simple-devel
-%ghost %{crate_instdir}/Cargo.toml
-
-%package     -n %{name}+std-devel
-Summary:        %{summary}
-BuildArch:      noarch
-
-%description -n %{name}+std-devel %{_description}
-
-This package contains library source intended for building other packages which
-use the "std" feature of the "%{crate}" crate.
-
-%files       -n %{name}+std-devel
 %ghost %{crate_instdir}/Cargo.toml
 
 %prep
@@ -181,14 +193,20 @@ use the "std" feature of the "%{crate}" crate.
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.12.2-10
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 0.13.0-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.12.2-9
-- build: mass rebuild auto-bumpable components
+* Tue Jun 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.13.0-2
+- Do not mark README.md as documentation since it’s used in code
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 0.12.2-8
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Jun 22 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.13.0-1
+- Update to version 0.13.0; Fixes RHBZ#2460142
+
+* Mon Jun 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.2-9
+- Avoid the streebog dev-dependency
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Wed Dec 03 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.12.2-7
 - Allow hex-literal 1.0

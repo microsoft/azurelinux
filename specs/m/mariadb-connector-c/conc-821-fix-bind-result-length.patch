@@ -1,0 +1,55 @@
+From: Michal Schorm <mschorm@redhat.com>
+Subject: [PATCH] Revert pack_len-based length init in mysql_stmt_bind_result()
+
+Revert the replacement of the per-type switch with a pack_len lookup
+in mysql_stmt_bind_result(), introduced in commit 40806da9.
+
+The pack_len approach zeroes *bind.length for all types with negative
+pack_len, which includes temporal types (MYSQL_PS_SKIP_RESULT_W_LEN)
+and string/blob types (MYSQL_PS_SKIP_RESULT_STR). The old switch
+correctly set temporal types to sizeof(MYSQL_TIME) and left
+string/blob types untouched (default: break).
+
+The zeroing breaks any client relying on the documented *bind.length
+value for temporal or variable-length result columns:
+- Qt QMYSQL driver produces invalid QDateTime (year 2106, time 00:00:00)
+- Diesel (Rust) truncation-based re-fetch returns empty data
+- Any C-API client checking *bind.length per API documentation
+
+The NULL-column path fix in mthd_stmt_fetch_to_bind() (the actual
+CONC-812 fix) is NOT affected by this revert.
+
+Upstream: https://jira.mariadb.org/browse/CONC-821
+Related: https://github.com/diesel-rs/diesel/discussions/5091
+
+---
+ libmariadb/mariadb_stmt.c | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff -up a/libmariadb/mariadb_stmt.c b/libmariadb/mariadb_stmt.c
+--- a/libmariadb/mariadb_stmt.c
++++ b/libmariadb/mariadb_stmt.c
+@@ -1438,15 +1438,7 @@
+     if (!stmt->bind[i].error)
+       stmt->bind[i].error= &stmt->bind[i].error_value;
+
+-    if (mysql_ps_fetch_functions[stmt->bind[i].buffer_type].pack_len >= 0)
+-    {
+-      *stmt->bind[i].length= stmt->bind[i].length_value= mysql_ps_fetch_functions[stmt->bind[i].buffer_type].pack_len;
+-    } else {
+-      *stmt->bind[i].length= stmt->bind[i].length_value= 0;
+-    }
+-
+     /* set length values for numeric types */
+-/*
+     switch(bind[i].buffer_type) {
+     case MYSQL_TYPE_NULL:
+       *stmt->bind[i].length= stmt->bind[i].length_value= 0;
+@@ -1476,7 +1468,6 @@
+     default:
+       break;
+     }
+-*/
+   }
+   stmt->bind_result_done= 1;
+   CLEAR_CLIENT_STMT_ERROR(stmt);

@@ -1,0 +1,22 @@
+diff --git a/utils/gssd/gssd_proc.c b/utils/gssd/gssd_proc.c
+index e060bee3..d59c8a19 100644
+--- a/utils/gssd/gssd_proc.c
++++ b/utils/gssd/gssd_proc.c
+@@ -897,6 +897,9 @@ out_srchost:
+ 	if (info->srchost)
+ 		free(info->srchost);
+ out_info:
++	pthread_mutex_lock(&clp_lock);
++	clp->refcount--;
++	pthread_mutex_unlock(&clp_lock);
+ 	free(info);
+ 	info = NULL;
+ 	goto out;
+@@ -981,6 +984,7 @@ start_upcall_thread(void (*func)(struct clnt_upcall_info *), struct clnt_upcall_
+ 	tinfo->timeout.tv_sec += upcall_timeout;
+ 	TAILQ_INSERT_TAIL(&active_thread_list, tinfo, list);
+ 	pthread_mutex_unlock(&active_thread_list_lock);
++	pthread_attr_destroy(&attr);
+ 
+ 	return ret;
+ }

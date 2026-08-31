@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-Locale-Codes
-Version:        3.86
-Release: 4%{?dist}
+Version:        3.90
+Release:        1%{?dist}
 Summary:        Distribution of modules to handle locale codes
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Locale-Codes
@@ -92,6 +92,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon Jun 08 2026 Michal Josef Špaček <mspacek@redhat.com> - 3.90-1
+- 3.90 bump
+
+* Fri Apr 10 2026 Michal Josef Špaček <mspacek@redhat.com> - 3.88-1
+- 3.88 bump
+
 * Tue Jan 06 2026 Michal Josef Špaček <mspacek@redhat.com> - 3.86-1
 - 3.86 bump
 

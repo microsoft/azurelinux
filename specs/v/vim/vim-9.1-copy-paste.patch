@@ -1,8 +1,40 @@
-diff --git a/src/testdir/test_cmdline.vim b/src/testdir/test_cmdline.vim
-index b4d11ac..8a56110 100644
---- a/src/testdir/test_cmdline.vim
-+++ b/src/testdir/test_cmdline.vim
-@@ -2057,6 +2057,7 @@ func Test_cmdlineclear_tabenter()
+diff -up vim92/runtime/defaults.vim.copypaste vim92/runtime/defaults.vim
+--- vim92/runtime/defaults.vim.copypaste	2025-12-12 07:37:14.000000000 +0100
++++ vim92/runtime/defaults.vim	2026-03-06 07:22:39.061053083 +0100
+@@ -67,18 +67,6 @@ sunmap Q
+ " Revert with ":iunmap <C-U>".
+ inoremap <C-U> <C-G>u<C-U>
+ 
+-" In many terminal emulators the mouse works just fine.  By enabling it you
+-" can position the cursor, Visually select and scroll with the mouse.
+-" Only xterm can grab the mouse events when using the shift key, for other
+-" terminals use ":", select text and press Esc.
+-if has('mouse')
+-  if &term =~ 'xterm'
+-    set mouse=a
+-  else
+-    set mouse=nvi
+-  endif
+-endif
+-
+ " Only do this part when Vim was compiled with the +eval feature.
+ if 1
+ 
+diff -up vim92/src/testdir/test_balloon.vim.copypaste vim92/src/testdir/test_balloon.vim
+--- vim92/src/testdir/test_balloon.vim.copypaste	2025-12-12 07:37:14.000000000 +0100
++++ vim92/src/testdir/test_balloon.vim	2026-03-06 07:22:39.061169302 +0100
+@@ -7,6 +7,7 @@ CheckFeature balloon_eval_term
+ source util/screendump.vim
+ 
+ let s:common_script =<< trim [CODE]
++  set mouse=a
+   call setline(1, ["one one one", "two tXo two", "three three three"])
+   set balloonevalterm balloonexpr=MyBalloonExpr()..s:trailing balloondelay=100
+   let s:trailing = '<'  " check that script context is set
+diff -up vim92/src/testdir/test_cmdline.vim.copypaste vim92/src/testdir/test_cmdline.vim
+--- vim92/src/testdir/test_cmdline.vim.copypaste	2026-01-30 09:52:17.000000000 +0100
++++ vim92/src/testdir/test_cmdline.vim	2026-03-06 07:22:39.061475070 +0100
+@@ -2067,6 +2067,7 @@ func Test_cmdlineclear_tabenter()
    CheckScreendump
  
    let lines =<< trim [SCRIPT]
@@ -10,11 +42,10 @@ index b4d11ac..8a56110 100644
      call setline(1, range(30))
    [SCRIPT]
  
-diff --git a/src/testdir/test_diffmode.vim b/src/testdir/test_diffmode.vim
-index 7e93ea3..64ada23 100644
---- a/src/testdir/test_diffmode.vim
-+++ b/src/testdir/test_diffmode.vim
-@@ -2213,6 +2214,7 @@ func Test_diff_overlapped_diff_blocks_will_be_merged()
+diff -up vim92/src/testdir/test_diffmode.vim.copypaste vim92/src/testdir/test_diffmode.vim
+--- vim92/src/testdir/test_diffmode.vim.copypaste	2026-02-13 06:37:12.000000000 +0100
++++ vim92/src/testdir/test_diffmode.vim	2026-03-06 07:22:39.061868951 +0100
+@@ -2217,6 +2217,7 @@ func Test_diff_overlapped_diff_blocks_wi
    CheckScreendump
  
    let lines =<< trim END
@@ -22,7 +53,7 @@ index 7e93ea3..64ada23 100644
      func DiffExprStub()
        let txt_in = readfile(v:fname_in)
        let txt_new = readfile(v:fname_new)
-@@ -2228,7 +2230,7 @@ func Test_diff_overlapped_diff_blocks_will_be_merged()
+@@ -2232,7 +2233,7 @@ func Test_diff_overlapped_diff_blocks_wi
    call writefile(lines, 'XdiffSetup', 'D')
  
    call WriteDiffFiles(0, [], [])
@@ -31,7 +62,7 @@ index 7e93ea3..64ada23 100644
    call term_sendkeys(buf, ":set autoread\<CR>\<c-w>w:set autoread\<CR>\<c-w>w")
  
    call WriteDiffFiles(buf, ["a", "b"], ["x", "x"])
-@@ -2470,7 +2472,7 @@ func Test_diff_inline()
+@@ -2474,7 +2475,7 @@ func Test_diff_inline()
    CheckScreendump
  
    call WriteDiffFiles(0, [], [])
@@ -40,7 +71,7 @@ index 7e93ea3..64ada23 100644
    call term_sendkeys(buf, ":set autoread\<CR>\<c-w>w:set autoread\<CR>\<c-w>w")
  
    call WriteDiffFiles(buf, ["abcdef ghi jk n", "x", "y"], ["aBcef gHi lm n", "y", "z"])
-@@ -2899,7 +2901,7 @@ func Test_linematch_diff_iwhite()
+@@ -2903,7 +2904,7 @@ func Test_linematch_diff_iwhite()
    call delete('.Xdifile2.swp')
    call WriteDiffFiles(0, [], [])
    let buf = RunVimInTerminal('-d Xdifile1 Xdifile2', {})
@@ -49,7 +80,7 @@ index 7e93ea3..64ada23 100644
  
    " setup a diff with 2 files and set linematch:30, with ignore white
    call term_sendkeys(buf, ":set diffopt=internal,filler,linematch:30\<CR>")
-@@ -2925,7 +2927,7 @@ func Test_linematch_diff_grouping()
+@@ -2929,7 +2930,7 @@ func Test_linematch_diff_grouping()
    call delete('.Xdifile1.swp')
    call delete('.Xdifile2.swp')
    call WriteDiffFiles(0, [], [])
@@ -58,10 +89,9 @@ index 7e93ea3..64ada23 100644
    call term_sendkeys(buf, ":set autoread\<CR>\<c-w>w:set autoread\<CR>\<c-w>w")
  
    " a diff that would result in multiple groups before grouping optimization
-diff --git a/src/testdir/test_ins_complete.vim b/src/testdir/test_ins_complete.vim
-index 37553e6..6e9103c 100644
---- a/src/testdir/test_ins_complete.vim
-+++ b/src/testdir/test_ins_complete.vim
+diff -up vim92/src/testdir/test_ins_complete.vim.copypaste vim92/src/testdir/test_ins_complete.vim
+--- vim92/src/testdir/test_ins_complete.vim.copypaste	2026-02-24 11:52:24.000000000 +0100
++++ vim92/src/testdir/test_ins_complete.vim	2026-03-06 07:22:39.062284258 +0100
 @@ -883,6 +883,7 @@ func Test_pum_with_folds_two_tabs()
    CheckScreendump
  
@@ -70,7 +100,7 @@ index 37553e6..6e9103c 100644
      set fdm=marker
      call setline(1, ['" x {{{1', '" a some text'])
      call setline(3, range(&lines)->map({_, val -> '" a' .. val}))
-@@ -6045,6 +6046,7 @@ endfunc
+@@ -6073,6 +6074,7 @@ endfunc
  func Test_fuzzy_select_item_when_acl()
    CheckScreendump
    let lines =<< trim [SCRIPT]
@@ -78,10 +108,9 @@ index 37553e6..6e9103c 100644
      call setline(1, ["v", "vi", "vim"])
      set autocomplete completeopt=menuone,noinsert,fuzzy autocompletedelay=300
    [SCRIPT]
-diff --git a/src/testdir/test_messages.vim b/src/testdir/test_messages.vim
-index 0942fe2..baa5e4f 100644
---- a/src/testdir/test_messages.vim
-+++ b/src/testdir/test_messages.vim
+diff -up vim92/src/testdir/test_messages.vim.copypaste vim92/src/testdir/test_messages.vim
+--- vim92/src/testdir/test_messages.vim.copypaste	2025-12-12 07:37:15.000000000 +0100
++++ vim92/src/testdir/test_messages.vim	2026-03-06 07:22:39.062577293 +0100
 @@ -617,6 +617,7 @@ func Test_echowindow()
    CheckScreendump
  
@@ -90,10 +119,9 @@ index 0942fe2..baa5e4f 100644
        call setline(1, 'some text')
        func ShowMessage(arg)
          echowindow a:arg
-diff --git a/src/testdir/test_plugin_termdebug.vim b/src/testdir/test_plugin_termdebug.vim
-index 1f6fd36..5decd00 100644
---- a/src/testdir/test_plugin_termdebug.vim
-+++ b/src/testdir/test_plugin_termdebug.vim
+diff -up vim92/src/testdir/test_plugin_termdebug.vim.copypaste vim92/src/testdir/test_plugin_termdebug.vim
+--- vim92/src/testdir/test_plugin_termdebug.vim.copypaste	2026-02-24 11:52:24.000000000 +0100
++++ vim92/src/testdir/test_plugin_termdebug.vim	2026-03-06 07:22:39.062682914 +0100
 @@ -333,6 +333,7 @@ func Test_termdebug_evaluate_in_popup()
    call system($'{g:GCC} -g -o {bin_name} {src_name}')
  
@@ -102,11 +130,18 @@ index 1f6fd36..5decd00 100644
      edit XTD_evaluate_in_popup.c
      packadd termdebug
      let g:termdebug_config = {}
-diff --git a/src/testdir/test_popup.vim b/src/testdir/test_popup.vim
-index 9086ebb..5ccfcbb 100644
---- a/src/testdir/test_popup.vim
-+++ b/src/testdir/test_popup.vim
-@@ -2205,6 +2205,7 @@ func Test_pum_clear_when_switch_tab_or_win()
+diff -up vim92/src/testdir/test_popup.vim.copypaste vim92/src/testdir/test_popup.vim
+--- vim92/src/testdir/test_popup.vim.copypaste	2025-12-12 07:37:15.000000000 +0100
++++ vim92/src/testdir/test_popup.vim	2026-03-06 07:22:39.062826756 +0100
+@@ -958,6 +958,7 @@ func Test_mouse_popup_position()
+   let script =<< trim END
+     set mousemodel=popup_setpos
+     source $VIMRUNTIME/menu.vim
++    set mouse=a
+     call setline(1, join(range(20)))
+     func Trigger(col)
+       call test_setmouse(1, a:col)
+@@ -2204,6 +2205,7 @@ func Test_pum_clear_when_switch_tab_or_w
    CheckScreendump
  
    let lines =<< trim END
@@ -114,10 +149,9 @@ index 9086ebb..5ccfcbb 100644
      inoremap <F4> <Cmd>wincmd w<CR>
      inoremap <F5> <Cmd>tabnext<CR>
    END
-diff --git a/src/testdir/test_popupwin.vim b/src/testdir/test_popupwin.vim
-index 0348169..7bc1446 100644
---- a/src/testdir/test_popupwin.vim
-+++ b/src/testdir/test_popupwin.vim
+diff -up vim92/src/testdir/test_popupwin.vim.copypaste vim92/src/testdir/test_popupwin.vim
+--- vim92/src/testdir/test_popupwin.vim.copypaste	2026-03-06 07:15:30.000000000 +0100
++++ vim92/src/testdir/test_popupwin.vim	2026-03-06 07:22:39.063102526 +0100
 @@ -8,6 +8,7 @@ func Test_simple_popup()
    CheckScreendump
  
@@ -126,7 +160,55 @@ index 0348169..7bc1446 100644
  	call setline(1, range(1, 100))
  	hi PopupColor1 ctermbg=lightblue
  	hi PopupColor2 ctermbg=lightcyan
-@@ -3531,6 +3532,7 @@ endfunc
+@@ -561,6 +562,7 @@ func Test_popup_drag()
+   " create a popup that covers the command line
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
++	set mouse=a
+ 	split
+ 	vsplit
+ 	$wincmd w
+@@ -628,6 +630,7 @@ func Test_popup_drag_minwidth()
+ 
+   " create a popup that does not fit
+   let lines =<< trim END
++      set mouse=a
+       call range(40)
+ 	      \ ->map({_,i -> string(i)})
+ 	      \ ->popup_create({
+@@ -675,6 +678,7 @@ func Test_popup_drag_termwin()
+   let lines =<< trim END
+ 	set foldmethod=marker
+ 	call setline(1, range(100))
++	set mouse=a
+ 	for nr in range(7)
+ 	  call setline(nr * 12 + 1, "fold {{{")
+ 	  call setline(nr * 12 + 11, "end }}}")
+@@ -727,6 +731,7 @@ func Test_popup_close_with_mouse()
+ 
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
++	set mouse=a
+ 	" With border, can click on X
+ 	let winid = popup_create('foobar', #{
+ 	      \ close: 'button',
+@@ -1564,6 +1569,7 @@ func Test_popup_beval()
+   let lines =<< trim END
+ 	call setline(1, range(1, 20))
+ 	call setline(5, 'here is some text to hover over')
++	set mouse=a
+ 	set balloonevalterm
+ 	set balloonexpr=BalloonExpr()
+ 	set balloondelay=100
+@@ -2274,6 +2280,7 @@ func Test_popup_scrollbar()
+ 
+   let lines =<< trim END
+     call setline(1, range(1, 20))
++    set mouse=a
+     hi ScrollThumb ctermbg=blue
+     hi ScrollBar ctermbg=red
+     let winid = popup_create(['one', 'two', 'three', 'four', 'five',
+@@ -3656,6 +3663,7 @@ endfunc
  
  func Get_popupmenu_lines()
    let lines =<< trim END
@@ -134,7 +216,7 @@ index 0348169..7bc1446 100644
        set completeopt+=preview,popup
        set completefunc=CompleteFuncDict
        hi InfoPopup ctermbg=yellow
-@@ -3792,6 +3794,7 @@ endfunc
+@@ -3917,6 +3925,7 @@ endfunc
  func Test_popupmenu_info_align_item()
    CheckScreendump
    let lines =<< trim END
@@ -142,11 +224,10 @@ index 0348169..7bc1446 100644
      func Omni_test(findstart, base)
          if a:findstart
              return col(".")
-diff --git a/src/testdir/test_startup.vim b/src/testdir/test_startup.vim
-index 6693a76..3275324 100644
---- a/src/testdir/test_startup.vim
-+++ b/src/testdir/test_startup.vim
-@@ -930,7 +930,7 @@ func Test_start_with_tabs()
+diff -up vim92/src/testdir/test_startup.vim.copypaste vim92/src/testdir/test_startup.vim
+--- vim92/src/testdir/test_startup.vim.copypaste	2026-02-13 06:37:12.000000000 +0100
++++ vim92/src/testdir/test_startup.vim	2026-03-06 07:22:39.063446231 +0100
+@@ -953,7 +953,7 @@ func Test_start_with_tabs()
    CheckScreendump
    CheckRunVimInTerminal
  
@@ -155,10 +236,9 @@ index 6693a76..3275324 100644
    call VerifyScreenDump(buf, 'Test_start_with_tabs', {})
  
    " clean up
-diff --git a/src/testdir/test_tabpage.vim b/src/testdir/test_tabpage.vim
-index 05c5669..436423f 100644
---- a/src/testdir/test_tabpage.vim
-+++ b/src/testdir/test_tabpage.vim
+diff -up vim92/src/testdir/test_tabpage.vim.copypaste vim92/src/testdir/test_tabpage.vim
+--- vim92/src/testdir/test_tabpage.vim.copypaste	2025-12-12 07:37:15.000000000 +0100
++++ vim92/src/testdir/test_tabpage.vim	2026-03-06 07:22:39.063647291 +0100
 @@ -690,6 +690,7 @@ func Test_tabpage_cmdheight()
    CheckScreendump
    CheckRunVimInTerminal
@@ -167,11 +247,10 @@ index 05c5669..436423f 100644
          \ 'set laststatus=2',
          \ 'set cmdheight=2',
          \ 'tabnew',
-diff --git a/src/testdir/test_tabpanel.vim b/src/testdir/test_tabpanel.vim
-index 4959693..9306be0 100644
---- a/src/testdir/test_tabpanel.vim
-+++ b/src/testdir/test_tabpanel.vim
-@@ -13,6 +13,7 @@ function Test_tabpanel_showtabpanel_eq_0()
+diff -up vim92/src/testdir/test_tabpanel.vim.copypaste vim92/src/testdir/test_tabpanel.vim
+--- vim92/src/testdir/test_tabpanel.vim.copypaste	2026-03-06 07:15:30.000000000 +0100
++++ vim92/src/testdir/test_tabpanel.vim	2026-03-06 07:23:24.180804214 +0100
+@@ -13,6 +13,7 @@ function Test_tabpanel_showtabpanel_eq_0
    CheckScreendump
  
    let lines =<< trim END
@@ -179,7 +258,7 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set noruler
      call setbufline(bufnr(), 1, ['aaa','bbb','ccc','ddd'])
-@@ -40,6 +41,7 @@ function Test_tabpanel_showtabpanel_eq_1()
+@@ -40,6 +41,7 @@ function Test_tabpanel_showtabpanel_eq_1
    CheckScreendump
  
    let lines =<< trim END
@@ -187,7 +266,7 @@ index 4959693..9306be0 100644
      set showtabpanel=1
      set noruler
    END
-@@ -491,6 +493,7 @@ function Test_tabpanel_tabline_and_tabpanel()
+@@ -495,6 +497,7 @@ function Test_tabpanel_with_tabline()
    CheckScreendump
  
    let lines =<< trim END
@@ -195,7 +274,7 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set tabpanelopt=columns:10,vert
      set fillchars=tpl_vert:│
-@@ -513,6 +516,7 @@ function Test_tabpanel_dont_overflow_into_tabpanel()
+@@ -517,6 +520,7 @@ function Test_tabpanel_dont_overflow_int
    CheckScreendump
  
    let lines =<< trim END
@@ -203,15 +282,15 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set tabpanelopt=columns:10
      set showtabline=2
-@@ -643,6 +647,7 @@ function Test_tabpanel_eval_tabpanel_with_linebreaks()
+@@ -647,6 +651,7 @@ function Test_tabpanel_eval_with_linebre
    CheckScreendump
  
    let lines =<< trim END
 +    set mouse=a
+     let g:ExprRetVal = "top%@$%=[%f]%=$%@bottom"
      function Expr()
-       return "top\n$%=[%f]%=$\nbottom"
-     endfunction
-@@ -670,6 +675,7 @@ function Test_tabpanel_tabonly()
+       return g:ExprRetVal
+@@ -683,6 +688,7 @@ function Test_tabpanel_tabonly()
    CheckScreendump
  
    let lines =<< trim END
@@ -219,7 +298,7 @@ index 4959693..9306be0 100644
      tabnew
      set showtabpanel=1
      norm 100oasdf
-@@ -689,6 +695,7 @@ function Test_tabpanel_equalalways()
+@@ -702,6 +708,7 @@ function Test_tabpanel_equalalways()
    CheckScreendump
  
    let lines =<< trim END
@@ -227,7 +306,7 @@ index 4959693..9306be0 100644
      tabnew
      set showtabpanel=1
      set tabpanelopt=columns:20
-@@ -714,6 +721,7 @@ function Test_tabpanel_quitall()
+@@ -727,6 +734,7 @@ function Test_tabpanel_quitall()
    CheckScreendump
  
    let lines =<< trim END
@@ -235,7 +314,7 @@ index 4959693..9306be0 100644
      tabnew
      set showtabpanel=1
      set laststatus=2
-@@ -733,6 +741,7 @@ function Test_tabpanel_ruler()
+@@ -746,6 +754,7 @@ function Test_tabpanel_ruler()
    CheckScreendump
  
    let lines =<< trim END
@@ -243,7 +322,7 @@ index 4959693..9306be0 100644
      tabnew
      set statusline& laststatus=0
      set rulerformat& ruler
-@@ -770,6 +779,7 @@ function Test_tabpanel_with_msg_scrolled()
+@@ -783,6 +792,7 @@ function Test_tabpanel_with_msg_scrolled
    CheckScreendump
  
    let lines =<< trim END
@@ -251,7 +330,7 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set noruler
      tabnew
-@@ -791,6 +801,7 @@ function Test_tabpanel_with_cmdline_pum()
+@@ -804,6 +814,7 @@ function Test_tabpanel_with_cmdline_pum(
    CheckScreendump
  
    let lines =<< trim END
@@ -259,7 +338,7 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set noruler
      tabnew aaa
-@@ -818,6 +829,7 @@ function Test_tabpanel_with_cmdline_no_pum()
+@@ -831,6 +842,7 @@ function Test_tabpanel_with_cmdline_no_p
    CheckScreendump
  
    let lines =<< trim END
@@ -267,10 +346,9 @@ index 4959693..9306be0 100644
      set showtabpanel=2
      set noruler
      tabnew aaa
-diff --git a/src/testdir/test_window_cmd.vim b/src/testdir/test_window_cmd.vim
-index 02e6fcb..746a905 100644
---- a/src/testdir/test_window_cmd.vim
-+++ b/src/testdir/test_window_cmd.vim
+diff -up vim92/src/testdir/test_window_cmd.vim.copypaste vim92/src/testdir/test_window_cmd.vim
+--- vim92/src/testdir/test_window_cmd.vim.copypaste	2026-01-16 08:01:12.000000000 +0100
++++ vim92/src/testdir/test_window_cmd.vim	2026-03-06 07:22:39.064025283 +0100
 @@ -2360,6 +2360,7 @@ func Test_resize_from_another_tabpage()
    CheckScreendump
  
@@ -279,3 +357,87 @@ index 02e6fcb..746a905 100644
      set laststatus=2
      vnew
      let w = win_getid()
+diff --git a/src/testdir/test_highlight.vim b/src/testdir/test_highlight.vim
+index 0cb6b5b..300b273 100644
+--- a/src/testdir/test_highlight.vim
++++ b/src/testdir/test_highlight.vim
+@@ -1360,6 +1360,7 @@ func Test_winhighlight()
+   CheckScreendump
+ 
+   let lines =<< trim END
++  set mouse=a
+   set cursorline
+   call setline(1, ['Four', 'Five', 'Six'])
+   vsplit
+diff --git a/src/testdir/test_popupwin.vim b/src/testdir/test_popupwin.vim
+index 3a3e989..e3f1648 100644
+--- a/src/testdir/test_popupwin.vim
++++ b/src/testdir/test_popupwin.vim
+@@ -3421,6 +3421,7 @@ func Test_previewpopup()
+         \ + range(12, 20),
+         \ "Xheader.h", 'D')
+   let lines =<< trim END
++        set mouse=a
+         set tags=Xtags
+ 	call setline(1, [
+ 	      \ 'one',
+@@ -3518,6 +3519,7 @@ endfunc
+ 
+ func Test_previewpopup_pum_pedit()
+   let lines =<< trim END
++      set mouse=a
+       call setline(1, ['one', 'two', 'three', 'other', 'once', 'only', 'off'])
+       set previewpopup=height:6,width:40
+       pedit XpreviewText.vim
+@@ -3527,6 +3529,7 @@ endfunc
+ 
+ func Test_previewpopup_pum_pbuffer()
+   let lines =<< trim END
++      set mouse=a
+       call setline(1, ['one', 'two', 'three', 'other', 'once', 'only', 'off'])
+       set previewpopup=height:6,width:40
+       badd XpreviewText.vim
+@@ -3541,6 +3544,7 @@ func Test_previewpopup_border()
+   call writefile(range(1, 20), 'Xppfile', 'D')
+ 
+   let lines =<< trim END
++    set mouse=a
+     call setline(1, ['one', 'two', 'three'])
+     hi BorderColor ctermbg=lightcyan guibg=lightcyan
+   END
+@@ -3642,6 +3646,7 @@ func Test_previewpopup_shadow()
+   call writefile(range(1, 20), 'XppShadowfile', 'D')
+ 
+   let lines =<< trim END
++    set mouse=a
+     call setline(1, ['one', 'two', 'three'])
+     hi BorderColor ctermbg=lightcyan guibg=lightcyan
+   END
+diff --git a/src/testdir/test_cmdline.vim b/src/testdir/test_cmdline.vim
+index c286fc4..b370c30 100644
+--- a/src/testdir/test_cmdline.vim
++++ b/src/testdir/test_cmdline.vim
+@@ -3200,6 +3200,7 @@ func Test_wildmenu_pum_info_async_update()
+   let lines =<< trim END
+       vim9script
+       set completeopt=menuone,popup
++      set mouse=a
+       set wildmenu wildoptions=pum wildcharm=<Tab>
+       augroup Test
+           au!
+@@ -4696,6 +4697,7 @@ func Test_customlist_dict_completion_info_popup()
+             \ 'plain',
+             \ ]
+     endfunc
++    set mouse=a
+     command -nargs=1 -complete=customlist,DictComp DictCmd echo <q-args>
+     set wildmenu wildoptions=pum completeopt=menu,popup
+   END
+@@ -4752,6 +4754,7 @@ func Test_cmdline_complete_findfunc_dict()
+   CheckScreendump
+ 
+   let lines =<< trim END
++    set mouse=a
+     set wildmenu wildoptions=pum completeopt=menu,popup
+     func FindComplete(cmdarg, cmdcomplete)
+       return [

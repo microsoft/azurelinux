@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: pcs
-Version: 0.12.1
-Release: 9%{?dist}
+Version: 0.12.2
+Release: 2%{?dist}
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/LicensingGuidelines/
 # https://fedoraproject.org/wiki/Licensing:Main?rd=Licensing#Good_Licenses
 # GPL-2.0-only: pcs
@@ -29,8 +29,8 @@ BuildArch: noarch
 
 # To build an official pcs-web-ui release, comment out ui_branch_or_commit
 # Last tagged version, also used as fallback version for untagged tarballs
-%global ui_version 0.1.23
-%global ui_modules_version 0.1.23
+%global ui_version 0.1.24.3
+%global ui_modules_version 0.1.24.3
 # Use long commit hash or branch name to build an unreleased version
 # %%global ui_branch_or_commit 34372d1268f065ed186546f55216aaa2d7e76b54
 %global ui_version_or_commit %{ui_version}
@@ -76,8 +76,10 @@ Source101: https://github.com/ClusterLabs/pcs-web-ui/releases/download/%{ui_vers
 # pcs patches: <= 200
 # Patch1: name.patch
 Patch1: show-info-page-instead-of-webui.patch
-Patch2: fix-pcsd-not-starting-with-older-rack.patch
-Patch3: do-not-require-wheel.patch
+Patch2: drop-dependency-on-rubygem-cgi.patch
+Patch3: typing-fixes-for-python-3.15.patch
+Patch4: bz2458608-01-fix-a-crash-when-determining-terminal-size.patch
+Patch5: bz2461143-01-Update-constraint-order-printout.patch
 
 # ui patches: >200
 # Patch201: name-web-ui.patch
@@ -120,23 +122,24 @@ BuildRequires: (python3-wheel if python3-setuptools < 71)
 # ruby and gems for pcsd
 BuildRequires: ruby >= 2.5.0
 BuildRequires: ruby-devel
-BuildRequires: rubygem-backports
-BuildRequires: rubygem-childprocess
-BuildRequires: rubygem-ethon
-BuildRequires: rubygem-ffi
-BuildRequires: rubygem-json
-BuildRequires: rubygem-mustermann
-BuildRequires: rubygem-puma
+BuildRequires: rubygem(backports)
+BuildRequires: rubygem(childprocess)
+BuildRequires: rubygem(ethon)
+BuildRequires: rubygem(ffi)
+BuildRequires: rubygem(json)
+BuildRequires: rubygem(logger)
+BuildRequires: rubygem(mustermann)
+BuildRequires: rubygem(puma)
 BuildRequires: (rubygem(rack) < 3 or (rubygem(rack) >= 3 and rubygem(rackup)))
-BuildRequires: rubygem-rack-protection
-BuildRequires: rubygem-rack-test
-BuildRequires: rubygem-sinatra
-BuildRequires: rubygem-tilt
+BuildRequires: rubygem(rack-protection)
+BuildRequires: rubygem(rack-test)
+BuildRequires: rubygem(sinatra)
+BuildRequires: rubygem(tilt)
 %if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: rubygem(rexml)
 %endif
 # ruby libraries for tests
-BuildRequires: rubygem-test-unit
+BuildRequires: rubygem(test-unit)
 # for touching patch files (sanitization function)
 BuildRequires: diffstat
 # for systemd scriptlet macros
@@ -173,17 +176,18 @@ Requires: python3-pyparsing
 Requires: python3-tornado
 # ruby and gems for pcsd
 Requires: ruby >= 3.3.0
-Requires: rubygem-backports
-Requires: rubygem-childprocess
-Requires: rubygem-ethon
-Requires: rubygem-ffi
-Requires: rubygem-json
-Requires: rubygem-mustermann
-Requires: rubygem-puma
+Requires: rubygem(backports)
+Requires: rubygem(childprocess)
+Requires: rubygem(ethon)
+Requires: rubygem(ffi)
+Requires: rubygem(json)
+Requires: rubygem(logger)
+Requires: rubygem(mustermann)
+Requires: rubygem(puma)
 Requires: (rubygem(rack) < 3 or (rubygem(rack) >= 3 and rubygem(rackup)))
-Requires: rubygem-rack-protection
-Requires: rubygem-sinatra
-Requires: rubygem-tilt
+Requires: rubygem(rack-protection)
+Requires: rubygem(sinatra)
+Requires: rubygem(tilt)
 %if 0%{?fedora} || 0%{?rhel} >= 9
 Requires: rubygem(rexml)
 %endif
@@ -253,7 +257,7 @@ License: GPL-2.0-only AND CC0-1.0
 URL: https://github.com/ClusterLabs/pcs-web-ui
 
 BuildRequires: make
-BuildRequires: nodejs-npm
+BuildRequires: nodejs-npm, /usr/bin/npm
 
 Requires: pcs = %{version}-%{release}
 Requires: cockpit-bridge
@@ -344,6 +348,8 @@ update_times_patch(){
 update_times_patch %{PATCH1}
 update_times_patch %{PATCH2}
 update_times_patch %{PATCH3}
+update_times_patch %{PATCH4}
+update_times_patch %{PATCH5}
 
 # generate .tarball-version if building from an untagged commit, not a released version
 # autogen uses git-version-gen which uses .tarball-version for generating version number
@@ -464,27 +470,56 @@ run_all_tests(){
 run_all_tests
 
 
-# Mark pcsd and pcs_snmp_agent for restart after upgrade
+
+# Scriptlets documentation:
+#  * https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+#  * https://github.com/systemd/systemd/blob/main/src/rpm/macros.systemd.in
+#  * https://github.com/systemd/systemd/blob/main/src/rpm/systemd-update-helper.in
+#  * https://fedoraproject.org/wiki/Changes/Restart_services_at_end_of_rpm_transaction
+
+%post
+# Set systemd preset for pcsd{,-ruby}.service after install
+%systemd_post pcsd.service pcsd-ruby.service
+
+%post -n %{pkg_pcs_snmp}
+# Set systemd preset for pcs_snmp_agent.service after install
+%systemd_post pcs_snmp_agent.service
+
+
+%preun
+# Stop pcsd{,-ruby}.service before pcs uninstall
+%systemd_preun pcsd.service pcsd-ruby.service
+
+%preun -n %{pkg_pcs_snmp}
+# Stop pcs_snmp_agent.service before pcs-snmp uninstall
+%systemd_preun pcs_snmp_agent.service
+
+
 %posttrans
+# Mark pcsd.service for restart after pcs upgrade
 %systemd_posttrans_with_restart pcsd.service
 
 %posttrans -n %{pkg_pcs_snmp}
+# Mark pcs_snmp_agent.service for restart after pcs-snmp upgrade
 %systemd_posttrans_with_restart pcs_snmp_agent.service
+
+%posttrans -n %{pkg_pcs_web_ui}
+# NOTE: Systemd macros cannot be used for pcsd restart from pcs-web-ui because
+# pcs-web-ui does not change unit files and therefore trigger for restart would
+# not happen. Direct call `systemctl try-restart` is used instead.
 
 # Restart pcsd if it is running to reload the Tornado app so it detects
 # presence or absence of the webui backend handler on install/update
 # of pcs-web-ui that contains it
-# Systemd will not pick-up on this change because pcs-web-ui doesn't contain
-# a unit file that would mark it for restart
-# https://fedoraproject.org/wiki/Changes/Restart_services_at_end_of_rpm_transaction
-%posttrans -n %{pkg_pcs_web_ui}
-systemctl try-restart pcsd.service
+if [ $1 -ge 1 ] && [ -d /run/systemd/system ]; then
+  systemctl try-restart pcsd.service || :
+fi
 
-# Runs only on pcs-web-ui uninstall
-# https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+
 %postun -n %{pkg_pcs_web_ui}
-if [ $1 -eq 0 ] ; then
-  systemctl try-restart pcsd.service
+# Restart pcsd.service if running on pcs-web-ui uninstall
+if [ $1 -eq 0 ] && [ -d /run/systemd/system ]; then
+  systemctl try-restart pcsd.service || :
 fi
 
 
@@ -557,6 +592,22 @@ fi
 
 
 %changelog
+* Fri May 15 2026 Michal Pospíšil <mpospisi@redhat.com> - 0.12.2-2
+- Updated standalone web UI and HA Cluster Management Cockpit application to pcs-web-ui 0.1.24.3 (see CHANGELOG_WUI.md)
+  Resolves: rhbz#2454042
+- Fixed a crash when running pcs resource|stonith list
+  Resolves: rhbz#2458608
+- Fixed order of resources in sets when listing configuration of constraints
+  Resolves: rhbz#2461143
+
+* Thu Mar 5 2026 Michal Pospíšil <mpospisi@redhat.com> - 0.12.2-1
+- Rebased pcs to the newest major version (see CHANGELOG.md)
+- Updated standalone web UI and HA Cluster Management Cockpit application to pcs-web-ui 0.1.24.2 (see CHANGELOG_WUI.md)
+  Resolves: rhbz#2432985, rhbz#2433035
+- Fixed FTBFS with Python 3.15
+  Resolves: rhbz#2440684
+- Fixed issues with installing pcs on Fedora 43+, upgrade and uninstall
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

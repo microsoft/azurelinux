@@ -7,7 +7,7 @@
 Name: fstrm
 Summary: Frame Streams implementation in C
 Version: 0.6.1
-Release: 16%{?dist}
+Release: 13%{?dist}
 License: MIT AND NTP
 URL: https://github.com/farsightsec/fstrm
 Source0: https://dl.farsightsecurity.com/dist/%{name}/%{name}-%{version}.tar.gz

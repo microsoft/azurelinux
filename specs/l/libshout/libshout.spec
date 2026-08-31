@@ -3,7 +3,7 @@
 
 Name:           libshout
 Version:        2.4.6
-Release: 12%{?dist}
+Release:        9%{?dist}
 Summary:        Icecast source streaming library
 
 # COPYING:              GPLv2 text

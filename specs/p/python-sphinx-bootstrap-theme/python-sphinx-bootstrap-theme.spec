@@ -15,7 +15,7 @@ of different Bootswatch CSS themes.
 
 Name:           python-%{srcname}
 Version:        0.8.1
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        %{common_sum}
 
 # Automatically converted from old format: MIT and ASL 2.0 - review is highly recommended.

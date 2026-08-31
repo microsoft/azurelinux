@@ -1,0 +1,25 @@
+From 09b7a9f419df84f2913b0f087957abd8a47133da Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Terje=20R=C3=B8sten?= <terjeros@gmail.com>
+Date: Mon, 29 Jun 2026 12:05:12 +0200
+Subject: [PATCH] libxml2 seems to have reverted changes done in 2.13.0 version
+
+---
+ bs4/tests/test_lxml.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bs4/tests/test_lxml.py b/bs4/tests/test_lxml.py
+index 128b391..60c6b85 100644
+--- a/bs4/tests/test_lxml.py
++++ b/bs4/tests/test_lxml.py
+@@ -61,7 +61,7 @@ class TestLXMLTreeBuilder(HTMLTreeBuilderSmokeTest):
+     # For lxml only, we need to skip the test if the libxml2 version doesn't
+     # have the fix from https://gitlab.gnome.org/GNOME/libxml2/-/commit/4dcc2d743eb83b8aaec0d91660d615fdb024dad0. That means any pre-2.13 version.
+     @pytest.mark.skipif(
+-        "not LXML_PRESENT or etree.LIBXML_VERSION < (2, 13, 0)",
++        "not LXML_PRESENT or etree.LIBXML_VERSION < (2, 14, 0)",
+         reason="libxml version doesn't issue REPLACEMENT CHARACTER",
+     )
+     def test_surrogate_in_character_reference(self):
+-- 
+2.54.0
+

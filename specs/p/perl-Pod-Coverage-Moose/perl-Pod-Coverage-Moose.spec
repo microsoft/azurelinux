@@ -3,7 +3,7 @@
 
 Name:           perl-Pod-Coverage-Moose
 Version:        0.08
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Pod::Coverage extension for Moose
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Pod-Coverage-Moose

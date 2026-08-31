@@ -16,8 +16,8 @@
 %bcond_with check_integration
 
 Name:           apt
-Version:        3.1.16
-Release: 5%{?dist}
+Version:        3.3.3
+Release:        1%{?dist}
 Summary:        Command-line package manager for Debian packages
 
 License:        GPL-2.0-or-later
@@ -332,6 +332,30 @@ exit 0
 %doc %{_docdir}/%{name}-utils
 
 %changelog
+* Sun Aug 16 2026 Terje Røsten <terjeros@gmail.com> - 3.3.3-1
+- Update to 3.3.3
+
+* Thu Aug 06 2026 Terje Røsten <terjeros@gmail.com> - 3.3.2-1
+- 3.3.2
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 3.3.1-2
+- Rebuilt for openssl 4.0
+
+* Sun May 17 2026 Packit <hello@packit.dev> - 3.3.1-1
+- Update to version 3.3.1
+- Resolves: rhbz#2478340
+
+* Fri May 01 2026 Packit <hello@packit.dev> - 3.3.0-1
+- Update to version 3.3.0
+- Resolves: rhbz#2464593
+
+* Tue Apr 07 2026 Packit <hello@packit.dev> - 3.2.0-1
+- Update to version 3.2.0
+- Resolves: rhbz#2455922
+
 * Tue Feb 17 2026 Terje Rosten <terjeros@gmail.com> - 3.1.16-2
 - Backport 3.1.16 to epel9
 

@@ -14,7 +14,7 @@
 
 Name:           python-%{pypi_name}
 Version:        %{majorver}.%{minorver}.%{patchver}
-Release: 27%{?dist}
+Release:        24%{?dist}
 Summary:        A high-level cross-protocol url-grabber
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

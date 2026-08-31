@@ -3,7 +3,7 @@
 
 Name:		pbzip2
 Version:	1.1.13
-Release: 18%{?dist}
+Release:	15%{?dist}
 Summary:	Parallel implementation of bzip2
 URL:		https://launchpad.net/pbzip2
 License:	bzip2-1.0.6

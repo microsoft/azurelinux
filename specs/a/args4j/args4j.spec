@@ -3,7 +3,7 @@
 
 Name:           args4j
 Version:        2.33
-Release: 33%{?dist}
+Release:        30%{?dist}
 Summary:        Java command line arguments parser
 License:        MIT
 URL:            https://args4j.kohsuke.org

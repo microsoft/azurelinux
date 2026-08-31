@@ -3,7 +3,7 @@
 
 Name:           perl-List-SomeUtils
 Version:        0.59
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Provide the stuff missing in List::Util
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/List-SomeUtils

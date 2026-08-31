@@ -6,7 +6,7 @@
 
 Name:           js-d3-flame-graph
 Version:        4.0.7
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        A D3.js plugin that produces flame graphs
 
 BuildArch:      noarch

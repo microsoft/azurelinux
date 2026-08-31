@@ -1,13 +1,13 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global DATE 20260123
-%global gitrev 226e8310eed1ce10784f98f199e1aa4b12ca86b7
-%global gcc_version 15.2.1
+%global DATE 20260722
+%global gitrev 329099441ab8919d12caf14e25d1eb6ed7c40bc8
+%global gcc_version 15.3.1
 %global gcc_major 15
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 7
+%global gcc_release 1
 %global nvptx_tools_gitrev a0c1fff6534a4df9fb17937c3c4a4b1071212029
 %global newlib_cygwin_gitrev d35cc82b5ec15bb8a5fe0fe11e183d1887992e99
 %global _unpackaged_files_terminate_build 0
@@ -315,9 +315,6 @@ Patch9: gcc15-Wno-format-security.patch
 Patch10: gcc15-rh1574936.patch
 Patch11: gcc15-d-shared-libphobos.patch
 Patch12: gcc15-pr119006.patch
-Patch13: gcc15-pr123273.patch
-Patch14: gcc15-pr123667.patch
-Patch15: gcc15-pr123737.patch
 
 Patch50: isl-rh2155127.patch
 
@@ -3814,6 +3811,121 @@ end
 %endif
 
 %changelog
+* Wed Jul 22 2026 Jakub Jelinek <jakub@redhat.com> 15.3.1-1
+- update from releases/gcc-15 branch
+  - GCC 15.3 release
+  - PRs ada/107475, ada/121316, ada/123580, ada/123832, ada/123857,
+	ada/123861, ada/123867, ada/123902, ada/124025, ada/124054,
+	ada/124106, ada/124224, ada/124226, ada/124285, ada/124606,
+	ada/124607, ada/124836, ada/125044, ada/125240, ada/125695, c/101312,
+	c/105555, c/122572, c/123365, c/123856, c/123882, c/124532, c/124635,
+	c/125252, c++/65271, c++/98930, c++/101670, c++/117133, c++/118630,
+	c++/119756, c++/120039, c++/120338, c++/120685, c++/120974,
+	c++/121643, c++/121822, c++/121961, c++/122163, c++/122169,
+	c++/122318, c++/122494, c++/122559, c++/122621, c++/123143,
+	c++/123346, c++/123408, c++/123529, c++/123578, c++/123665,
+	c++/123667, c++/123676, c++/123684, c++/123700, c++/123737,
+	c++/123790, c++/123814, c++/123818, c++/123845, c++/123889,
+	c++/123975, c++/123989, c++/124153, c++/124198, c++/124309,
+	c++/124311, c++/124389, c++/124431, c++/124477, c++/124487,
+	c++/124489, c++/124531, c++/124632, c++/124735, c++/124768,
+	c++/124773, c++/124781, c++/124785, c++/124850, c++/125315,
+	c++/125376, c++/125674, c++/126057, d/120096, d/121477, d/122817,
+	d/123046, d/123264, d/123349, d/123407, d/123411, d/123419, d/123422,
+	d/123633, d/123798, d/124026, d/125089, debug/123886, debug/124644,
+	driver/124058, fortran/60576, fortran/66973, fortran/79524,
+	fortran/82721, fortran/84245, fortran/85352, fortran/93715,
+	fortran/93814, fortran/93832, fortran/94978, fortran/95163,
+	fortran/95338, fortran/95879, fortran/96986, fortran/97592,
+	fortran/98203, fortran/100155, fortran/100194, fortran/101760,
+	fortran/102314, fortran/102430, fortran/102459, fortran/102596,
+	fortran/102619, fortran/103367, fortran/105168, fortran/106546,
+	fortran/106946, fortran/107425, fortran/109788, fortran/111952,
+	fortran/115260, fortran/117303, fortran/119273, fortran/120286,
+	fortran/120713, fortran/120723, fortran/121342, fortran/121743,
+	fortran/122046, fortran/123961, fortran/124161, fortran/124450,
+	fortran/124482, fortran/124567, fortran/124631, fortran/124652,
+	fortran/124751, fortran/125021, fortran/125059, fortran/125172,
+	fortran/125606, fortran/125998, fortran/126018, ipa/106260,
+	ipa/111036, ipa/116296, ipa/120098, ipa/122856, ipa/123416,
+	ipa/124777, ipa/125699, libfortran/125095, libfortran/126116,
+	libgcc/123976, libstdc++/90192, libstdc++/105580, libstdc++/109965,
+	libstdc++/114153, libstdc++/114865, libstdc++/116110,
+	libstdc++/119163, libstdc++/120384, libstdc++/120386,
+	libstdc++/120789, libstdc++/121771, libstdc++/122224,
+	libstdc++/122567, libstdc++/122821, libstdc++/123100,
+	libstdc++/123875, libstdc++/123991, libstdc++/124015,
+	libstdc++/124024, libstdc++/124124, libstdc++/124363,
+	libstdc++/124463, libstdc++/124513, libstdc++/124568,
+	libstdc++/125369, libstdc++/125374, libstdc++/125956,
+	libstdc++/126111, lto/121588, lto/125257, middle-end/121661,
+	middle-end/122689, middle-end/123175, middle-end/123386,
+	middle-end/123447, middle-end/123573, middle-end/123575,
+	middle-end/123775, middle-end/123876, middle-end/123887,
+	middle-end/123978, middle-end/124056, middle-end/124250,
+	middle-end/124491, middle-end/124900, middle-end/125146,
+	middle-end/125621, middle-end/126084, pch/14940, preprocessor/105412,
+	preprocessor/123273, rtl-optimization/106859, rtl-optimization/116053,
+	rtl-optimization/116479, rtl-optimization/116600,
+	rtl-optimization/121649, rtl-optimization/121787,
+	rtl-optimization/122170, rtl-optimization/122266,
+	rtl-optimization/122274, rtl-optimization/123294,
+	rtl-optimization/123822, rtl-optimization/124454,
+	rtl-optimization/125173, sanitizer/124248, target/67459, target/69639,
+	target/103383, target/105116, target/105192, target/106895,
+	target/112400, target/117048, target/119210, target/120144,
+	target/120642, target/121571, target/122000, target/122051,
+	target/122448, target/122781, target/122827, target/122869,
+	target/122948, target/123017, target/123102, target/123206,
+	target/123271, target/123285, target/123457, target/123548,
+	target/123584, target/123624, target/123766, target/123779,
+	target/123806, target/123807, target/123870, target/123910,
+	target/123969, target/123971, target/124126, target/124133,
+	target/124134, target/124138, target/124147, target/124236,
+	target/124294, target/124315, target/124316, target/124335,
+	target/124341, target/124349, target/124364, target/124365,
+	target/124366, target/124367, target/124409, target/124461,
+	target/124613, target/124670, target/124674, target/124704,
+	target/124705, target/124710, target/124712, target/124870,
+	target/124876, target/124892, target/124908, target/124933,
+	target/125049, target/125194, target/125215, target/125351,
+	target/125373, target/125409, target/125448, target/125469,
+	target/125478, target/125611, target/125670, target/125751,
+	target/125752, target/125795, target/125818, target/125972,
+	target/125992, target/126049, target/126148, testsuite/93080,
+	testsuite/103515, testsuite/113276, testsuite/118407,
+	testsuite/119930, testsuite/123004, testsuite/123129,
+	testsuite/124043, testsuite/124064, testsuite/124065,
+	testsuite/124361, testsuite/124682, testsuite/124726,
+	testsuite/126261, tree-optimization/109410, tree-optimization/110043,
+	tree-optimization/116747, tree-optimization/117217,
+	tree-optimization/119568, tree-optimization/120201,
+	tree-optimization/120560, tree-optimization/120987,
+	tree-optimization/121103, tree-optimization/121104,
+	tree-optimization/121726, tree-optimization/122537,
+	tree-optimization/122976, tree-optimization/123002,
+	tree-optimization/123061, tree-optimization/123298,
+	tree-optimization/123537, tree-optimization/123596,
+	tree-optimization/123636, tree-optimization/123645,
+	tree-optimization/123672, tree-optimization/123729,
+	tree-optimization/123794, tree-optimization/123864,
+	tree-optimization/123940, tree-optimization/124086,
+	tree-optimization/124130, tree-optimization/124132,
+	tree-optimization/124135, tree-optimization/124151,
+	tree-optimization/124288, tree-optimization/124358,
+	tree-optimization/124555, tree-optimization/124627,
+	tree-optimization/124677, tree-optimization/124754,
+	tree-optimization/124802, tree-optimization/124826,
+	tree-optimization/124868, tree-optimization/124891,
+	tree-optimization/125019, tree-optimization/125025,
+	tree-optimization/125039, tree-optimization/125079,
+	tree-optimization/125153, tree-optimization/125250,
+	tree-optimization/125431, tree-optimization/125501,
+	tree-optimization/125502, tree-optimization/125774,
+	tree-optimization/125776, tree-optimization/125953,
+	tree-optimization/126194, tree-optimization/126257,
+	tree-optimization/126262
+
 * Fri Jan 23 2026 Jakub Jelinek <jakub@redhat.com> 15.2.1-7
 - update from releases/gcc-15 branch
   - PRs c++/122070, c++/122550, c++/123597, libstdc++/123147,

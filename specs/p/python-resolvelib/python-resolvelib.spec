@@ -9,7 +9,7 @@ Name:           python-%{pypi_name}
 Version:        1.0.1
 %global tag %{version}
 %forgemeta
-Release: 14%{?dist}
+Release:        11%{?dist}
 Summary:        Resolve abstract dependencies into concrete ones
 
 License:        ISC

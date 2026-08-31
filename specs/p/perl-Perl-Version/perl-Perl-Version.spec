@@ -3,7 +3,7 @@
 
 Name:           perl-Perl-Version
 Version:        1.018
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Parse and manipulate Perl version strings
 License:        Artistic-2.0
 URL:            https://metacpan.org/release/Perl-Version

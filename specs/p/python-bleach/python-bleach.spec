@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        6.2.0
-Release: 10%{?dist}
+Release:        8%{?dist}
 Summary:        An easy whitelist-based HTML-sanitizing tool
 
 License:        Apache-2.0
@@ -40,9 +40,6 @@ Requires:       python3-html5lib
 %{_description}
 
 Python 3 version.
-
-
-%pyproject_extras_subpkg -n python3-%{modname} css
 
 %prep
 %autosetup -n %{modname}-%{version} -p1
@@ -87,6 +84,9 @@ fi;
 
 
 %changelog
+* Thu Nov 20 2025 Tom Rix <Tom.Rix@amd.com> - 6.2.0-8
+- Remove css subpackage
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 6.2.0-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -7,7 +7,7 @@
 
 Name:           libxml++
 Version:        2.42.3
-Release: 10%{?dist}
+Release:        7%{?dist}
 Summary:        C++ wrapper for the libxml2 XML parser library
 
 License:        LGPL-2.1-or-later

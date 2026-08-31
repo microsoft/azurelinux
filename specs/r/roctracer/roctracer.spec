@@ -27,7 +27,7 @@
 
 Name:           roctracer
 Version:        %{rocm_version}
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        ROCm Tracer Callback/Activity Library for Performance tracing AMD GPUs
 
 Url:            https://github.com/ROCm/%{upstreamname}

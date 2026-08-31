@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-ocplib-endian
 Version:        1.2
-Release: 25%{?dist}
+Release:        22%{?dist}
 Summary:        Functions to read/write int16/32/64 from strings, bigarrays
 
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception

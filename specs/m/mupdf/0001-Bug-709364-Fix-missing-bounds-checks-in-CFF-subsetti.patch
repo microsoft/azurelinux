@@ -1,0 +1,38 @@
+From 7da80849dccb7108a0a732d3c0392a2b575aac6d Mon Sep 17 00:00:00 2001
+Message-ID: <7da80849dccb7108a0a732d3c0392a2b575aac6d.1784187361.git.mjg@fedoraproject.org>
+From: Robin Watts <Robin.Watts@artifex.com>
+Date: Wed, 13 May 2026 14:57:47 +0100
+Subject: [PATCH] Bug 709364: Fix missing bounds checks in CFF subsetting
+
+Thanks to Jenny Guanni Qu for the report and original patch.
+
+(cherry picked from commit 611f75f0c8657b92460554009196c5ac4b68d909)
+---
+ source/fitz/subset-cff.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/source/fitz/subset-cff.c b/source/fitz/subset-cff.c
+index 65cf1564d..38eabcd90 100644
+--- a/source/fitz/subset-cff.c
++++ b/source/fitz/subset-cff.c
+@@ -311,7 +311,7 @@ index_load(fz_context *ctx, index_t *index, const uint8_t *base, uint32_t len, u
+ 	data_offset = 3 + (index->count+1) * os - 1;
+ 	index->data_offset = data_offset + offset;
+ 
+-	if (data_offset > len)
++	if (index->data_offset > len)
+ 		fz_throw(ctx, FZ_ERROR_FORMAT, "Truncated index");
+ 
+ 	data += 3;
+@@ -327,7 +327,7 @@ index_load(fz_context *ctx, index_t *index, const uint8_t *base, uint32_t len, u
+ 			fz_throw(ctx, FZ_ERROR_FORMAT, "Index not monotonic");
+ 		prev = v;
+ 	}
+-	if (v > len)
++	if (index->data_offset + v > len)
+ 		fz_throw(ctx, FZ_ERROR_FORMAT, "Truncated index");
+ 
+ 	data += prev - 1;
+-- 
+2.55.0.349.g25e4f52c35
+

@@ -63,12 +63,12 @@
 %bcond_with      modphp
 %bcond_without   lmdb
 
-%global upver        8.4.18
+%global upver        8.4.25
 
 Summary: PHP scripting language for creating dynamic web sites
 Name: php
 Version: %{upver}%{?rcver:~%{rcver}}
-Release: 4%{?dist}
+Release: 1%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -109,7 +109,7 @@ Patch8: php-8.4.0-libdb.patch
 # Use system nikic/php-parser
 Patch41: php-8.3.3-parser.patch
 # use system tzdata
-Patch42: php-8.4.0-systzdata-v24.patch
+Patch42: php-8.4.22-systzdata-v24.patch
 # See http://bugs.php.net/53436
 # + display PHP version backported from 8.4
 Patch43: php-8.4.0-phpize.patch
@@ -501,7 +501,8 @@ will need to install this package and the php package.
 %package xml
 Summary: A module for PHP applications which use XML
 # All files licensed under PHP version 3.01
-License:  PHP-3.01
+# lexbor is Apache-2.0
+License:  PHP-3.01 AND Apache-2.0
 Requires: php-common%{?_isa} = %{version}-%{release}
 Provides: php-dom, php-dom%{?_isa}
 Provides: php-domxml, php-domxml%{?_isa}
@@ -509,6 +510,9 @@ Provides: php-simplexml, php-simplexml%{?_isa}
 Provides: php-xmlreader, php-xmlreader%{?_isa}
 Provides: php-xmlwriter, php-xmlwriter%{?_isa}
 Provides: php-xsl, php-xsl%{?_isa}
+# See ext/dom/lexbor/patches/README.md
+%global lexborver 2.7.0
+Provides: bundled(lexbor) = %{lexborver}
 BuildRequires: pkgconfig(libxslt)  >= 1.1
 BuildRequires: pkgconfig(libexslt)
 BuildRequires: pkgconfig(libxml-2.0)  >= 2.7.6
@@ -716,6 +720,7 @@ cp ext/mbstring/libmbfl/LICENSE libmbfl_LICENSE
 cp ext/fileinfo/libmagic/LICENSE libmagic_LICENSE
 cp ext/bcmath/libbcmath/LICENSE libbcmath_LICENSE
 cp ext/date/lib/LICENSE.rst timelib_LICENSE
+cp ext/dom/lexbor/LICENSE lexbor_LICENSE
 
 # Multiple builds for multiple SAPIs
 # mod_php (apache2handler) and libphp (embed) can not be built from same tree
@@ -772,6 +777,13 @@ vpdo=`sed -n '/#define PDO_DRIVER_API/{s/.*[ 	]//;p}' ext/pdo/php_pdo_driver.h`
 if test "x${vpdo}" != "x%{pdover}"; then
    : Error: Upstream PDO ABI version is now ${vpdo}, expecting %{pdover}.
    : Update the pdover macro and rebuild.
+   exit 1
+fi
+
+vlexbor=`sed -n '/Lexbor version/{s/.* is //;s/\.$//;p}' ext/dom/lexbor/patches/README.md`
+if test "x${vlexbor}" != "x%{lexborver}"; then
+   : Error: Upstream Lexbor version is now ${vlexbor}, expecting %{lexborver}.
+   : Update the lexborver macro and rebuild.
    exit 1
 fi
 
@@ -1456,6 +1468,7 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 %files ldap -f files.ldap
 %files snmp -f files.snmp
 %files xml -f files.xml
+%license lexbor_LICENSE
 %files mbstring -f files.mbstring
 %license libmbfl_LICENSE
 %files gd -f files.gd
@@ -1491,6 +1504,27 @@ systemctl try-restart php-fpm.service >/dev/null 2>&1 || :
 
 
 %changelog
+* Wed Aug 26 2026 Remi Collet <remi@remirepo.net> - 8.4.25-1
+- Update to 8.4.25 - http://www.php.net/releases/8_4_25.php
+
+* Wed Jul 29 2026 Remi Collet <remi@remirepo.net> - 8.4.24-1
+- Update to 8.4.24 - http://www.php.net/releases/8_4_24.php
+
+* Wed Jul  1 2026 Remi Collet <remi@remirepo.net> - 8.4.23-1
+- Update to 8.4.23 - http://www.php.net/releases/8_4_23.php
+
+* Wed Jun  3 2026 Remi Collet <remi@remirepo.net> - 8.4.22-1
+- Update to 8.4.22 - http://www.php.net/releases/8_4_22.php
+
+* Wed May  6 2026 Remi Collet <remi@remirepo.net> - 8.4.21-1
+- Update to 8.4.21 - http://www.php.net/releases/8_4_21.php
+
+* Wed Apr  8 2026 Remi Collet <remi@remirepo.net> - 8.4.20-1
+- Update to 8.4.20 - http://www.php.net/releases/8_4_20.php
+
+* Wed Mar 11 2026 Remi Collet <remi@remirepo.net> - 8.4.19-1
+- Update to 8.4.19 - http://www.php.net/releases/8_4_19.php
+
 * Wed Feb 11 2026 Remi Collet <remi@remirepo.net> - 8.4.18-1
 - Update to 8.4.18 - http://www.php.net/releases/8_4_18.php
 

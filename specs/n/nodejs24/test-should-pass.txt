@@ -1282,7 +1282,8 @@ parallel/test-crypto-lazy-transform-writable.js
 parallel/test-child-process-net-reuseport.js
 parallel/test-errors-systemerror.js
 parallel/test-fs-fmap.js
-parallel/test-http2-reset-flood.js
+# 2026-03-25: Breaking update of nghttp2 to 1.68.1
+#parallel/test-http2-reset-flood.js
 parallel/test-worker-mjs-workerdata.js
 parallel/test-net-connect-buffer2.js
 parallel/test-http-response-statuscode.js
@@ -1311,7 +1312,8 @@ parallel/test-stream-readable-hwm-0.js
 parallel/test-whatwg-webstreams-adapters-streambase.js
 parallel/test-startup-empty-regexp-statics.js
 parallel/test-http2-respond-file-fd-invalid.js
-parallel/test-http2-misbehaving-flow-control.js
+# 2026-03-25: Breaking update of nghttp2 to 1.68.1
+#parallel/test-http2-misbehaving-flow-control.js
 parallel/test-cluster-rr-ref.js
 parallel/test-domain-no-error-handler-abort-on-uncaught-0.js
 parallel/test-fs-read-offset-null.js
@@ -1500,7 +1502,8 @@ parallel/test-event-emitter-once.js
 parallel/test-stream-writable-final-async.js
 parallel/test-fs-open-no-close.js
 parallel/test-path-glob.js
-parallel/test-http2-multi-content-length.js
+# 2026-03-25: Breaking update of nghttp2 to 1.68.1
+#parallel/test-http2-multi-content-length.js
 parallel/test-timers-process-tampering.js
 parallel/test-url-relative.js
 parallel/test-messageevent-brandcheck.js
@@ -1531,7 +1534,8 @@ parallel/test-punycode.js
 parallel/test-worker-vm-context-terminate.js
 parallel/test-https-agent-session-reuse.js
 parallel/test-stream-objectmode-undefined.js
-parallel/test-http2-client-unescaped-path.js
+# 2026-03-25: Breaking update of nghttp2 to 1.68.1
+#parallel/test-http2-client-unescaped-path.js
 parallel/test-dns-perf_hooks.js
 parallel/test-tls-connect-abort-controller.js
 parallel/test-whatwg-url-custom-searchparams-foreach.js

@@ -12,15 +12,17 @@
 
 Name:		libpfm
 Version:	4.13.0
-Release: 19%{?dist}
+Release:	20%{?dist}
 
 Summary:	Library to encode performance events for use by perf tool
 
 License:	MIT
 URL:		http://perfmon2.sourceforge.net/
 Source0:	http://sourceforge.net/projects/perfmon2/files/libpfm4/%{name}-%{version}.tar.gz
+Patch1:		libpfm-fix-const.patch
 Patch2:		libpfm-python3-setup.patch
 Patch3:		libpfm-gcc14.patch
+Patch4:		libpfm-unused-vars.patch
 
 BuildRequires: make
 BuildRequires:	gcc
@@ -74,8 +76,10 @@ Python bindings for libpfm4 and perf_event_open system call.
 
 %prep
 %setup -q
+%patch -P1 -p1 -b .fix-const
 %patch -P2 -p1 -b .python3
 %patch -P3 -p1 -b .gcc14
+%patch -P4 -p1 -b .unused
 # to prevent setuptools from installing an .egg, we need to pass --root to setup.py install
 # see https://github.com/pypa/setuptools/issues/3143
 # and https://github.com/pypa/pip/issues/11501
@@ -115,26 +119,42 @@ rm $RPM_BUILD_ROOT%{_libdir}/lib*.a
 %ldconfig_scriptlets
 
 %files
+%license COPYING
 %doc README
 %{_libdir}/lib*.so.*
 
 %files devel
+%license COPYING
 %{_includedir}/*
 %{_mandir}/man3/*
 %{_libdir}/lib*.so
 
 %if %{with_static}
 %files static
+%license COPYING
 %{_libdir}/lib*.a
 %endif
 
 %if %{with python}
 %files -n python3-libpfm
+%license COPYING
 %{python3_sitearch}/perfmon-*.egg-info/
 %{python3_sitearch}/perfmon/
 %endif
 
 %changelog
+* Wed May 13 2026 Aaron Merey <amerey@redhat.com> - 4.13.0-20
+- Install COPYING license file in all subpackages
+
+* Wed Jan 21 2026 Aaron Merey <amerey@redhat.com> - 4.13.0-19
+- Add libpfm-unused-vars.patch
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.0-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 16 2025 Aaron Merey <amerey@redhat.com> - 4.13.0-17
+- Add libpfm-fix-const.patch
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.13.0-16
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -6,7 +6,7 @@ Version:        2.14
 %forgemeta
 
 Name:		jansson
-Release: 6%{?dist}
+Release:	3%{?dist}
 Summary:	C library for encoding, decoding and manipulating JSON data
 
 # src/lookup3.h is LicenseRef-Fedora-Public-Domain

@@ -1,0 +1,95 @@
+From 1e1825bf2c28a349c576521fbda4393455297987 Mon Sep 17 00:00:00 2001
+From: Chris Lumens <clumens@redhat.com>
+Date: Thu, 14 May 2026 13:06:57 -0400
+Subject: [PATCH 2/5] High: libcrmcommon: Fix integer overflow in remote
+ message code.
+
+It's possible for a client to send a specifically constructed header
+packet that will cause our size checks in pcmk__remote_message_xml to
+overflow, which could result in crashes (potentially leading to a node
+being fenced) or memory corruption problems.
+
+Such a header would have to indicate that the payload is compressed,
+which nothing in pacemaker is doing.  In fact, we haven't used any of
+the remote message compression code since it was introduced in 2013
+which explains why we haven't seen any problems with it.  Thus, it would
+require a malicious client to cause this to happen.
+
+It would also require remote CIB administration to be enabled via
+remote-clear-port or remote-tls-port, which we do not do by default.
+Additionally, if remote-tls-port is in use, it requires the client to
+complete the gnutls handshake procedure (pcmk__remote_message_xml is
+only called in cib_remote_msg after the handshake but before the client
+has authenticated).
+
+Co-Authored-By: Reid Wahl <nrwahl@protonmail.com>
+---
+ lib/common/remote.c | 49 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 7 deletions(-)
+
+diff --git a/lib/common/remote.c b/lib/common/remote.c
+index f428c4ceda..d15f980f62 100644
+--- a/lib/common/remote.c
++++ b/lib/common/remote.c
+@@ -315,16 +315,51 @@ pcmk__remote_message_xml(pcmk__remote_t *remote)
+     }
+ 
+     /* Support compression on the receiving end now, in case we ever want to add it later */
+-    if (header->payload_compressed) {
++    if (header->payload_compressed != 0) {
+         int rc = 0;
+-        unsigned int size_u = 1 + header->payload_uncompressed;
+-        char *uncompressed =
+-            pcmk__assert_alloc(header->payload_offset + size_u, sizeof(char));
++        unsigned int size_u = 0;
++        char *uncompressed = NULL;
++
++#if (UINT32_MAX < UINT_MAX)
++        if (header->payload_uncompressed >= UINT_MAX) {
++            pcmk__err("Couldn't decompress message because uncompressed "
++                      "payload size (%" PRIu32 ") is greater than UINT_MAX "
++                      "(%u)", header->payload_uncompressed, UINT_MAX);
++            return NULL;
++        }
++#endif
++
++        /* @TODO Is the extra byte for the null terminator?
++         * pcmk__remote_send_xml() also adds one byte to the iov length.
++         * (However, we do need to account for the possibility of receiving a
++         * message from an untrusted sender.)
++         */
++        size_u = 1 + header->payload_uncompressed;
++
++        /* Header and uncompressed payload must fit in the destination buffer.
++         * We do not need to separately check the header size here since
++         * localized_remote_header will return NULL if it's incorrect.
++         */
++#if (UINT_MAX >= SIZE_MAX)
++        if ((size_u >= SIZE_MAX)
++            || (header->payload_offset > (SIZE_MAX - size_u))) {
++#else
++        if (header->payload_offset > (SIZE_MAX - size_u)) {
++#endif
++            pcmk__err("Couldn't decompress message because the required buffer "
++                      "size (%" PRIu32 " + %u) is greater than SIZE_MAX (%zu)",
++                      header->payload_offset, size_u, SIZE_MAX);
++            return NULL;
++        }
++
++        pcmk__trace("Decompressing message data %" PRIu32 " bytes into %u "
++                    "bytes", header->payload_compressed, size_u);
+ 
+-        pcmk__trace("Decompressing message data %d bytes into %d bytes",
+-                    header->payload_compressed, size_u);
++        uncompressed = pcmk__assert_alloc(header->payload_offset + size_u,
++                                          sizeof(char));
+ 
+-        rc = BZ2_bzBuffToBuffDecompress(uncompressed + header->payload_offset, &size_u,
++        rc = BZ2_bzBuffToBuffDecompress(uncompressed + header->payload_offset,
++                                        &size_u,
+                                         remote->buffer + header->payload_offset,
+                                         header->payload_compressed, 1, 0);
+         rc = pcmk__bzlib2rc(rc);
+-- 
+2.54.0
+

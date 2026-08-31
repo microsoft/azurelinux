@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.0.7
-Release: 5%{?dist}
+Release:	2%{?dist}
 
 Summary:	Additional test assertions for Ruby standard libraries
 # SPDX confirmed

@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.16.11
-Release: 6%{?dist}
+Release: 3%{?dist}
 Summary: HTTP User Agent parser
 License: MIT
 URL: https://github.com/gshutler/useragent

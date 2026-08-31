@@ -7,8 +7,8 @@
 %define _binaries_in_noarch_packages_terminate_build 0
 
 Name:		linux-firmware
-Version:	20260221
-Release: 4%{?dist}
+Version:	20260810
+Release:	1%{?dist}
 Summary:	Firmware files used by the Linux kernel
 License:	GPL-1.0-or-later AND GPL-2.0-or-later AND MIT AND LicenseRef-Callaway-Redistributable-no-modification-permitted
 URL:		http://www.kernel.org/
@@ -20,6 +20,7 @@ BuildRequires:	make
 BuildRequires:	git-core
 BuildRequires:	python3
 %if %{undefined rhel}
+BuildRequires:	parallel
 # Not required but de-dupes FW so reduces size
 BuildRequires:	rdfind
 %endif
@@ -288,12 +289,11 @@ Terratec H5 DRX-K, ITEtech IT9135 Ax and Bx, and av7110.
 %build
 
 %install
-mkdir -p %{buildroot}/%{_firmwarepath}
-mkdir -p %{buildroot}/%{_firmwarepath}/updates
+install -dm 0755 %{buildroot}/%{_firmwarepath}/updates
 
-make DESTDIR=%{buildroot}/ FIRMWAREDIR=%{_firmwarepath} install-xz
+%make_build DESTDIR=%{buildroot}/ FIRMWAREDIR=%{_firmwarepath} install-xz
 %if %{undefined rhel}
-make DESTDIR=%{buildroot}/ FIRMWAREDIR=%{_firmwarepath} dedup
+%make_build DESTDIR=%{buildroot}/ FIRMWAREDIR=%{_firmwarepath} dedup
 %endif
 
 #Cleanup files we don't want to ship
@@ -367,7 +367,6 @@ sed \
 	-i -e '/^nvidia\/a/d' \
 	-i -e '/^nvidia\/g/d' \
 	-i -e '/^nvidia\/tu/d' \
-	-i -e '/^lgs8g75/d' \
 	-i -e '/^libertas/d' \
 	-i -e '/^liquidio/d' \
 	-i -e '/^mellanox/d' \
@@ -451,25 +450,27 @@ end
 
 
 %files -f linux-firmware.files
+%license LICENSES/*
 %dir %{_firmwarepath}
-%license LICENCE.* LICENSE.* GPL*
 
 %files whence
-%license WHENCE
+%license LICENSE WHENCE
 
 # GPU firmwares
 %files -n amd-gpu-firmware
-%license LICENSE.radeon LICENSE.amdgpu LICENSE.amdnpu
+%license LICENSES/LICENSE.radeon LICENSES/LICENSE.amdgpu LICENSES/LICENSE.amdnpu
 %{_firmwarepath}/amdgpu/
 %{_firmwarepath}/amdnpu/
 %{_firmwarepath}/radeon/
 
 %files -n intel-gpu-firmware
-%license LICENSE.i915
+%license LICENSES/LICENSE.i915
+%license LICENSES/LICENSE.xe
 %{_firmwarepath}/i915/
+%{_firmwarepath}/xe/
 
 %files -n nvidia-gpu-firmware
-%license LICENCE.nvidia
+%license LICENSES/LICENCE.nvidia
 %dir %{_firmwarepath}/nvidia/
 %{_firmwarepath}/nvidia/a*
 %{_firmwarepath}/nvidia/g*
@@ -477,18 +478,18 @@ end
 
 # Microcode updates
 %files -n amd-ucode-firmware
-%license LICENSE.amd-ucode
+%license LICENSES/LICENSE.amd-ucode
 %{_firmwarepath}/amd/
 %{_firmwarepath}/amdtee/
 %{_firmwarepath}/amd-ucode/
 
 # WiFi/Bluetooth firmwares
 %files -n atheros-firmware
-%license LICENCE.atheros_firmware
-%license LICENSE.QualcommAtheros_ar3k
-%license LICENSE.QualcommAtheros_ath10k
-%license LICENCE.open-ath9k-htc-firmware
-%license qca/NOTICE.txt
+%license LICENSES/LICENCE.atheros_firmware
+%license LICENSES/LICENSE.QualcommAtheros_ar3k
+%license LICENSES/LICENSE.QualcommAtheros_ath10k
+%license LICENSES/LICENCE.open-ath9k-htc-firmware
+%license LICENSES/NOTICE.qca
 %{_firmwarepath}/ar3k/
 %{_firmwarepath}/ath6k/
 %{_firmwarepath}/ath9k_htc/
@@ -498,20 +499,20 @@ end
 %{_firmwarepath}/qca/
 
 %files -n brcmfmac-firmware
-%license LICENCE.broadcom_bcm43xx
-%license LICENCE.cypress
+%license LICENSES/LICENCE.broadcom_bcm43xx
+%license LICENSES/LICENCE.cypress
 %{_firmwarepath}/brcm/
 %{_firmwarepath}/cypress/
 
 %files -n iwlegacy-firmware
-%license LICENCE.iwlwifi_firmware
+%license LICENSES/LICENCE.iwlwifi_firmware
 %{_firmwarepath}/iwlwifi-3945-*.ucode*
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-3945-*.ucode*
 %{_firmwarepath}/iwlwifi-4965-*.ucode*
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-4965-*.ucode*
 
 %files -n iwlwifi-dvm-firmware
-%license LICENCE.iwlwifi_firmware
+%license LICENSES/LICENCE.iwlwifi_firmware
 %{_firmwarepath}/iwlwifi-1??-*.ucode*
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-1??-*.ucode*
 %{_firmwarepath}/iwlwifi-1000-*.ucode*
@@ -526,7 +527,7 @@ end
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-6000g2?-*.ucode*
 
 %files -n iwlwifi-mvm-firmware
-%license LICENCE.iwlwifi_firmware
+%license LICENSES/LICENCE.iwlwifi_firmware
 %{_firmwarepath}/iwlwifi-316?-*.ucode*
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-316?-*.ucode*
 %{_firmwarepath}/iwlwifi-726?-*.ucode*
@@ -563,7 +564,7 @@ end
 %exclude %{_firmwarepath}/intel/iwlwifi/iwlwifi-gl-c0*1??.ucode*
 
 %files -n iwlwifi-mld-firmware
-%license LICENCE.iwlwifi_firmware
+%license LICENSES/LICENCE.iwlwifi_firmware
 %{_firmwarepath}/iwlwifi-bz-b0*9[7-9].ucode*
 %{_firmwarepath}/iwlwifi-bz-b0*1??.ucode*
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-bz-b0*9[7-9].ucode*
@@ -576,54 +577,55 @@ end
 %{_firmwarepath}/intel/iwlwifi/iwlwifi-sc-a0-*1??.ucode*
 
 %files -n libertas-firmware
-%license LICENCE.Marvell LICENCE.OLPC
+%license LICENSES/LICENCE.Marvell LICENSES/LICENCE.OLPC
 %dir %{_firmwarepath}/libertas
 %dir %{_firmwarepath}/mrvl
 %{_firmwarepath}/libertas/*
 %{_firmwarepath}/mrvl/sd8787*
 
 %files -n mt7xxx-firmware
-%license LICENCE.mediatek
-%license LICENCE.ralink_a_mediatek_company_firmware
+%license LICENSES/LICENCE.mediatek
+%license LICENSES/LICENCE.ralink_a_mediatek_company_firmware
 %dir %{_firmwarepath}/mediatek
 %{_firmwarepath}/mediatek/mt76*
 %{_firmwarepath}/mediatek/mt791*
 %{_firmwarepath}/mediatek/mt7925/
+%{_firmwarepath}/mediatek/mt7927/
 %{_firmwarepath}/mediatek/mt7996/
 %{_firmwarepath}/mediatek/BT*
 %{_firmwarepath}/mediatek/WIFI*
 %{_firmwarepath}/mt76*
 
 %files -n nxpwireless-firmware
-%license LICENSE.nxp
+%license LICENSES/LICENSE.nxp
 %dir %{_firmwarepath}/nxp
 %{_firmwarepath}/nxp/*
 
 %files -n qcom-wwan-firmware
-%license LICENSE.qcom qcom/NOTICE.txt
+%license LICENSES/LICENSE.qcom LICENSES/NOTICE.qcom
 %dir %{_firmwarepath}/qcom
 %{_firmwarepath}/qcom/sdx*/
 
 %files -n realtek-firmware
-%license LICENCE.rtlwifi_firmware.txt
+%license LICENSES/LICENCE.rtlwifi_firmware.txt
 %{_firmwarepath}/rtl_bt/
 %{_firmwarepath}/rtlwifi/
 %{_firmwarepath}/rtw88/
 %{_firmwarepath}/rtw89/
 
 %files -n tiwilink-firmware
-%license LICENCE.ti-connectivity
+%license LICENSES/LICENCE.ti-connectivity
 %dir %{_firmwarepath}/ti-connectivity/
 %{_firmwarepath}/ti-connectivity/*
 
 # SMART NIC and network switch firmwares
 %files -n liquidio-firmware
-%license LICENCE.cavium_liquidio
+%license LICENSES/LICENCE.cavium_liquidio
 %dir %{_firmwarepath}/liquidio
 %{_firmwarepath}/liquidio/*
 
 %files -n mrvlprestera-firmware
-%license LICENCE.Marvell
+%license LICENSES/LICENCE.Marvell
 %dir %{_firmwarepath}/mrvl/prestera
 %{_firmwarepath}/mrvl/prestera/*
 
@@ -632,11 +634,12 @@ end
 %{_firmwarepath}/mellanox/*
 
 %files -n netronome-firmware
-%license LICENCE.Netronome
+%license LICENSES/LICENCE.Netronome
 %dir %{_firmwarepath}/netronome
 %{_firmwarepath}/netronome/*
 
 %files -n qcom-accel-firmware
+%license LICENSES/LICENSE.qcom LICENSES/NOTICE.qcom
 %dir %{_firmwarepath}/qcom
 %dir %{_firmwarepath}/qcom/aic100
 %dir %{_firmwarepath}/qcom/qdu100
@@ -649,7 +652,7 @@ end
 
 # Silicon Vendor specific
 %files -n mediatek-firmware
-%license LICENCE.mediatek
+%license LICENSES/LICENCE.mediatek
 %dir %{_firmwarepath}/mediatek
 %{_firmwarepath}/mediatek/mt798?*
 %{_firmwarepath}/mediatek/mt8173/
@@ -664,9 +667,11 @@ end
 %{_firmwarepath}/mediatek/sof-tplg/
 
 %files -n qcom-firmware
-%license LICENSE.qcom LICENSE.qcom_yamato qcom/NOTICE.txt
+%license LICENSES/LICENSE.qcom LICENSES/LICENSE.qcom_yamato LICENSES/NOTICE.qcom
 %dir %{_firmwarepath}/qcom
+%{_firmwarepath}/qcom/eliza/
 %{_firmwarepath}/qcom/glymur/
+%{_firmwarepath}/qcom/hawi/
 %{_firmwarepath}/qcom/kaanapali/
 %{_firmwarepath}/a300_p*
 %{_firmwarepath}/qcom/*.fw*
@@ -677,6 +682,7 @@ end
 %{_firmwarepath}/qcom/qcs*/
 %{_firmwarepath}/qcom/qrb*/
 %{_firmwarepath}/qcom/sa*/
+%{_firmwarepath}/qcom/shikra/
 %{_firmwarepath}/qcom/sc*/
 %{_firmwarepath}/qcom/sdm*/
 %{_firmwarepath}/qcom/sm*/
@@ -686,7 +692,7 @@ end
 
 # Vision and ISP hardware
 %files -n intel-vsc-firmware
-%license LICENSE.ivsc
+%license LICENSES/LICENSE.ivsc
 %dir %{_firmwarepath}/intel/ipu/
 %dir %{_firmwarepath}/intel/vsc/
 %{_firmwarepath}/intel/ipu3-fw.bin*
@@ -696,12 +702,12 @@ end
 
 # Sound codec hardware
 %files -n cirrus-audio-firmware
-%license LICENSE.cirrus
+%license LICENSES/LICENSE.cirrus
 %dir %{_firmwarepath}/cirrus
 %{_firmwarepath}/cirrus/*
 
 %files -n intel-audio-firmware
-%license LICENCE.adsp_sst LICENCE.IntcSST2
+%license LICENSES/LICENCE.adsp_sst LICENSES/LICENCE.IntcSST2
 %dir %{_firmwarepath}/intel/
 %dir %{_firmwarepath}/intel/avs/
 %dir %{_firmwarepath}/intel/catpt/
@@ -713,20 +719,232 @@ end
 
 # Random other hardware
 %files -n dvb-firmware
-%license LICENSE.dib0700 LICENCE.it913x LICENCE.siano
-%license LICENCE.xc4000 LICENCE.xc5000 LICENCE.xc5000c
+%license LICENSES/LICENSE.dib0700 LICENSES/LICENCE.it913x LICENSES/LICENCE.siano
+%license LICENSES/LICENCE.xc4000 LICENSES/LICENCE.xc5000 LICENSES/LICENCE.xc5000c
 %dir %{_firmwarepath}/av7110/
 %{_firmwarepath}/av7110/*
 %{_firmwarepath}/as102_data*
 %{_firmwarepath}/cmmb*
 %{_firmwarepath}/dvb*
 %{_firmwarepath}/isdbt*
-%{_firmwarepath}/lgs8g75*
 %{_firmwarepath}/sms1xxx*
 %{_firmwarepath}/tdmb*
 %{_firmwarepath}/v4l-cx2*
 
 %changelog
+* Tue Aug 11 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260810-1
+- Update to 20260810
+- amdgpu: numerous firmware updates
+- update firmware for MT7922 WiFi device
+- morsemicro: add firmware for mm8108 support
+- ath10k: WCN3990 hw1.0: update board-2.bin
+- Update firmware for an8811hb 2.5G ethernet phy
+- xe: Update GUC to v70.72.1 for BMG, LNL, PTL, NVL-S
+- mediatek MT7922: update bluetooth firmware to 20260724143815
+- airoha: update AN7583 NPU firmwares to version 0.5
+- qcom: Add gpu firmwares for Eliza chipset
+- cirrus: cs35l57: Add firmware for Cirrus Amps for some Samsung laptops
+- rtw89: 8922d: add fw 0.35.113.2
+- qcom: venus-5.4: fix vp9 decoder assertion failure
+- qla2xxx: Add ql2900_fw.bin firmware for 29xx adapters
+- qcom: Update qdsp6sw firmware for shikra platform
+- amdgpu: DMCUB updates for various ASICs
+- intel_vpu: Update NPU firmware
+- qcom: Update DSP firmware for qcs8300 platform
+- tas2783: Add firmware for new soundwire devices
+- rtw88: add firmware v41.0.0 for RTL8723B
+- Update AMD cpu microcode
+- Add firmware file for Intel BlazarIW
+- Update firmware file for Intel BlazarI/BlazarU/Scorpius core
+- amdgpu: DMCUB updates for various ASICs
+- qcom: add ADSP firmware for hawi platform
+- powervr: add firmware for Imagination Technologies BXM-4-64 GPU
+- qcom: Update DSP firmware for sa8775p platform
+- xe: Release GuC firmware for NVL-S
+- cirrus: cs35l56: Update firmware for the ASUS UX5406SA
+- qcom: vpu: add Gen2 firmware binary for Purwa
+- cirrus: cs42l45: Update CS42L45 SDCA codec firmware for Dell laptops
+- QCA: Add Bluetooth firmware for WCN6855 ROM 1.0
+- iwlwifi: add Bz/Sc/Hr/Gf FW for core24.60-33 release
+- iwlwifi: update ty/So/Ma/cc/Qu/QuZ firmwares for core24.60-33 release
+- cirrus: cs35l56: Add firmware for Cirrus Amps for a few Dell laptops
+- ueagle-atm: sadly drop unlicensed files
+- qcom: sync audioreach firmwares from v1.0.4 build
+- QCA: Update Bluetooth QCA6698 firmware to 2.1.2-00072
+- amdgpu: DMCUB updates for various ASICs
+- tas2781: Add firmware for new HP projects
+- rtw89: 8852a: add TX power track R34
+- Update AMD SEV firmware
+
+* Tue Jun 23 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260622-1
+- Update to 20260622
+- Update LICENSE locations
+- Move Intel XE firmware to intel-gpu subpackage
+- nxp: add firmware for IW61x WiFi device
+- mediatek MT7922: update bluetooth firmware to 20260605203811
+- mediatek MT7925: update bluetooth firmware to 20260605184935
+- update firmware for MT7922/MT7925 WiFi device
+- amdgpu: DMCUB updates for various ASICs
+- qcom: add LPAICP/qdsp6sw firmware for shikra platform
+- update firmware for MT7986/MT7981/MT7996/MT7992/MT7990
+- qcom: Update ADSP firmware for Kaanapali platform
+- qcom: update CDSP/ADSP firmware for glymur platform
+- QCA: Add bluetooth firmware nvm files for USI/NFA725B
+- Add firmware file for Intel BlazarIW
+- Update firmware file for Intel BlazarI/BlazarU/Scorpius core
+- qcom: update ADSP firmware for qcs615 platform
+- cirrus: cs42l45: Update CS42L45 SDCA codec firmware for Dell laptops
+- rtl_bt: Update RTL8852A BT USB firmware to 0x244F_91B6
+- realtek: rt1321: Update the patch code to v1.10
+- amdgpu: DMCUB updates for various ASICs
+- QCA: Update Bluetooth WCN3950 firmware 1.3.0-00108 to 1.3.0-00184
+- qcom: update CDSP firmware for shikra platform
+- qcom: Update ADSP firmware for Glymur platform
+- Remove a number of firmwares with unknown licenses
+- LICENSES: update GPL-2.0 text and references
+- LICENSES: rename GPL-3 to GPL-3.0-only
+- LICENSES: rename Apache-2 to Apache-2.0
+- Move firmware licenses to a LICENSES/ directory
+- qcom: update ADSP firmware for sm8750 platform
+- QCA: Update Bluetooth WCN6856 firmware 2.1.0-00666 to 2.1.0-00669
+- qcom: Update DSP firmware for sa8775p/qcs8300 platform
+- amdgpu: Update DMCUB fw for DCN314
+- amdgpu: revert yellow carp/vangogh/sienna cichlid/navy flounder/dimgrey cavefish/beige_goby VCN firmware
+- qcom: update CDSP firmware for x1e80100 platform
+- cirrus: cs35l56: Add firmware for Cirrus Amps for a Dell laptop
+- Add RCA firmware files for tas257x projects
+- intel_vpu: Update NPU firmware
+- cirrus: cs35l63: Add Cirrus CS35L63 firmware mappings for various Dell laptops
+- cirrus: cs35l56: Add/Update firmware for Cirrus Amps for a couple of Lenovo laptops
+- QCA: Add BCS calibration binary for QCC2072
+- QCA: Update Bluetooth firmware for QCC2072 UART interface
+- amdgpu: DMCUB updates for various ASICs
+- rtl_nic: add firmware rtl8261c.bin for RTL8261c
+- cirrus: cs35l56: Add Cirrus CS35L56 firmware mappings for two Dell laptops
+- i915: Xe3LPD DMC v2.36/Xe3LPD_3002 DMC v2.31/Xe3p_LPD DMC v2.37
+- cirrus: cs35l56: Add firmware for Cirrus Amps for some Lenovo laptops
+- cirrus: cs42l45: Add/Update CS42L45 SDCA codec firmware for Lenovo laptops
+- qcom: Add gpu firmwares for Shikra chipset
+- cirrus: cs35l56: Update firmware for Cirrus Amps for some Dell laptops
+- rtw89: 8852b: update fw to v0.29.29.18
+- rtw89: 8852bt: update fw to v0.29.122.2
+- amdgpu: Update gc 11.0.1 microcode
+
+* Tue May 19 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260519-1
+- Update to 20260519
+- ASoC: tas2783: Add Firmware files for tas2783A projects
+- add firmware for MT7927 WiFi device
+- Add HP ISH firmware for Intel Panther Lake systems
+- ti: Add PCM6240 firmware with multiple audio profiles support
+- qcom: add CDSP firmware for shikra platform
+- amdgpu: updates for various ASICs
+- qcom: update ADSP firmware for x1e80100 platform
+- qcom: Add cdsp1r.jsn for sa8775p platform
+- Add firmware for Lontium LT9611C
+- xe: Update GUC to v70.65.0 for LNL, BMG, PTL
+- rtl_bt: Add missing rtl8761a_config.bin for RTL8761AU
+- Add Dell ISH firmware 581.7783.0 for Intel Panther Lake systems.
+- qcom: update ADSP firmware for x1e80100 platform
+- linux-firmware:Add firmware for Lontium LT7911EXC bridge
+- qcom/x1e80100/dell: mark that qcom/NOTICE.txt is applicable too
+- qcom: Update CDSP firmware for Kaanapali platform
+- qcom: vpu: add Gen2 firmware binary for Agatti
+- amdgpu: DMCUB updates for various ASICs
+- Add firmware file for Intel BlazarIGfp2/BlazarIW/ScorpiusGfp2
+- Update firmware file for Intel BlazarI/BlazarU/BlazarU-HrPGfP/Scorpius core
+- qcom: Update ADSP firmware for Glymur platform
+- mediatek MT7925: update bluetooth firmware to 20260414153243
+- update firmware for MT7925 WiFi device
+- Revert "Update firmware file for Intel Quasar core"
+- qcom: Add gpdspr.jsn for qcs8300 platform
+- ath12k: QCC2072 hw1.0: add to WLAN.COL.1.0.c2-00074-QCACOLSWPL_V1_TO_SILICONZ-1
+- ath12k: QCC2072 hw1.0: add board-2.bin
+- ath12k: IPQ5424 hw1.0: add to WLAN.WBE.1.6-01275-QCAHKSWPL_SILICONZ-1
+- ath12k: IPQ5424 hw1.0: add board-2.bin
+- qcom: Update ADSP firmware for Kaanapali platform
+- cirrus: cs35l56: Add firmware for Cirrus Amps for some Lenovo laptops (17aa235c 17aa235d)
+- QCA: Update Bluetooth WCN6856 firmware 2.1.0-00665 to 2.1.0-00666
+- amdgpu: DMCUB updates for DCN36
+- Update AMD cpu microcode
+- powervr: update Imagination Rogue firmware images
+- qcom: Update ADSP firmware for Kaanapali platform
+- i915: Xe3LPD DMC v2.34
+- i915: Xe3LPD_3002 DMC v2.29
+- qcom: Update ADSP firmware for QCM6490 platform
+- firmware/amdgpu: Update DMCUB fw to Release 0.1.55.0
+- mediatek: vpu: drop old sym link
+
+* Sat Apr 11 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260410-1
+- Update to 20260410
+- amdgpu: Revert Yellow Carp DMUB fw to 0x4000045
+- qcom: sync audioreach firmwares from v1.0.3 build
+- intel_vpu: Update NPU firmware
+- Revert "rtl_bt: Update RTL8822C BT USB and UART firmware to 0x0673"
+- nvidia: add acr/bl symlink for booting GSP-RM on GA100
+- qcom: add QUPv3 firmware for shikra
+- xe: Update GUC to v70.60.0 for LNL, BMG, PTL
+- qcom: update ADSP firmware for sm8750 platform
+- qcom: update CDSP firmware for glymur platform
+- cirrus: cs35l41: Add support for new HP laptops
+- cirrus: cs35l41: Add support for new ASUS laptops
+- cirrus: cs35l41: Add support for ASUS GZ302EAC and add 15.5dB bincfg
+- qcom: vpu: add video firmware for SM8450
+- cirrus: cs35l56: Add firmware for Cirrus Amps for some ASUS laptops
+- cirrus: cs35l56: Add firmware for Cirrus Amps for some Lenovo laptops
+- iwlwifi: add Bz/Sc/Hr/Gf FW for core103-40 release
+- iwlwifi: update ty/So/Ma firmwares for core103-40 release
+- amdgpu: DMCUB updates for various ASICs
+- xe: Update PTL GSC to v105.0.2.1397
+- add firmware for Moxa mux50u devices
+- rtl_bt: Update RTL8852B BT USB FW to 0x127C_FD78
+- ath11k: WCN6855 hw2.0@nfa765: update to WLAN.HSP.1.1-04866.5-QCAHSPSWPL_V1_V2_SILICONZ_IOE-1
+- ath11k: QCA6698AQ hw2.1: update to WLAN.HSP.1.1-04866.5-QCAHSPSWPL_V1_V2_SILICONZ_IOE-1
+- update firmware for qat_4xxx/qat_402xx/qat_420xx devices
+- update firmware for an8811hb 2.5G ethernet phy
+- qcom: Add FW blobs for DELL XPS13 9345
+- amdgpu: DMCUB updates for various ASICs
+- cirrus: cs35l63: Update firmware for Cirrus Amps for some Dell laptops
+- cirrus: cs35l63: Fix Cirrus Amp firmware links for some Dell laptops
+- Add firmware file for Intel BlazarIW/BlazarIGfp2
+- iwlwifi: add Bz/Wh FW for core102-56 release
+- ath12k: WCN7850 hw2.0: update to WLAN.HMT.1.1.c7-00108-QCAHMTSWPL_V1.0_V2.0_SILICONZ_UPSTREAM-3
+- mediatek MT7921: update bluetooth firmware to 20260224111243
+- mediatek MT7920: update bluetooth firmware to 20260224111231
+- Add LENOVO ISH firmware v5.8.1.7720 for X1 Carbon (Gen 14) and X1 2-in-1 (Gen 11)
+- Add ISH firmware file for Intel Wildcat Lake platform
+- Update firmware for MT7920/MT7921 WiFi device
+- Intel Bluetooth: Update firmware file for Intel Bluetooth AX201
+- Add firmware file for Intel ScorpiusGfp2 core
+- iwlwifi: Update firmware file for Intel Quasar/Scorpius/BlazarIGfP/BlazarI/BlazarU-HrPGfP/BlazarU core
+- intel_vpu: Update NPU firmware
+- amdgpu: DMCUB updates for various ASICs
+- qcom: add QUPv3 firmware for QCS615 platform
+- Add LENOVO ISH firmware v5.8.0.7720 for X9-15 2025
+
+* Tue Mar 10 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260309-1
+- Update to 20260309
+- mediatek MT7922: update bluetooth firmware to 20260224103448
+- update firmware for MT7922 WiFi device
+- cirrus: cs42l45: Add CS42L45 SDCA codec firmware for Dell laptops
+- cirrus: cs35l63: Add firmware for Cirrus CS35L63 for various Dell laptops
+- Remove duplicate fw and Rename Lenovo ISH LNLM firmware files accordingly
+- amdgpu: updates for various GPUs/ASICs
+- Add firmware file for Intel BlazarIGfp2 core
+- QCA: Update Bluetooth QCA6698 firmware to 2.1.2-00069
+- qcom: Update CDSP firmware for QCM6490 platform
+- add firmware for Lontium LT8713SX DP hub
+- qcom: sync audioreach firmwares from v1.0.2 build
+- qcom: update ADSP, CDSP firmware for sm8750  platform
+- qcom: update ADSP dtb.mbn for glymur platform
+- qca: Update Bluetooth WCN6750 1.1.3-00105 firmware to 1.1.3-00106
+- QCA: Update Bluetooth WCN6856 firmware 2.1.0-00659 to 2.1.0-00665
+- Renaming the file back for HP EliteBook X Flip G1i
+- amdnpu: Restore old NPU firmware for compatibility
+- cirrus: cs42l45: Add CS42L45 SDCA codec firmware for Dell laptops
+- lenovo: remove obsolete ish_lnlm_53c4ffad_2a17559f.bin firmware
+- update firmware for MT7902 BT device
+- update firmware for MT7902 WiFi device
+
 * Sun Feb 22 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 20260221-1
 - Update to 20260221
 - qcom: vpu: fix SC7280 VPU Gen2 firmware and add compatibility symlink

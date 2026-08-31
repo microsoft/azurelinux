@@ -7,7 +7,7 @@ Name: rubygem-%{gem_name}
 Version: 3.1.19
 # Introduce Epoch (related to bug 552972)
 Epoch:  1
-Release: 4%{?dist}
+Release: 1%{?dist}
 Summary: A modular Ruby webserver interface
 # lib/rack/show_{status,exceptions}.rb contains snippets from Django under BSD license.
 License: MIT AND BSD-3-Clause

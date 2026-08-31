@@ -26,7 +26,7 @@
 
 Name:           php-theseer-autoload
 Version:        1.29.4
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        A tool and library to generate autoload code
 
 License:        BSD-3-Clause

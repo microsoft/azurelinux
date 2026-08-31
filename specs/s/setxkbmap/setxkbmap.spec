@@ -3,7 +3,7 @@
 
 Name:       setxkbmap
 Version:    1.3.4
-Release: 9%{?dist}
+Release:    6%{?dist}
 Summary:    X11 keymap client
 
 License:    HPND

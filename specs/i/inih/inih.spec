@@ -8,7 +8,7 @@
 
 Name:     inih
 Version:  62
-Release: 5%{?dist}
+Release:  1%{?dist}
 Summary:  Simple INI file parser library
 
 License:  BSD-3-Clause

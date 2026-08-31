@@ -4,7 +4,7 @@
 Summary: Run-time libraries and programs
 Name: motif
 Version: 2.3.8
-Release: 5%{?dist}
+Release: 2%{?dist}
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License: LicenseRef-Callaway-LGPLv2+
 Source: http://downloads.sf.net/motif/motif-%{version}.tar.gz

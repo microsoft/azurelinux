@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,8 +11,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# Build HTML docs from markdown using pandoc?
-%bcond html_docs 1
+# We ought to be able to re-generate source files that come from cxxbridge, but
+# this currently fails with an “unsupported attribute” error for
+# #[cxx_return_type = "…"] in src/gn/starlark/crates/ffi/src/bridge.rs.
+%bcond regenerate_bridge 0
 
 Name:           gn
 # Upstream uses the number of commits in the git history as the version number.
@@ -37,30 +39,56 @@ Name:           gn
 #  7. Commit the changes
 #
 # See https://gn.googlesource.com/gn/+log for the latest changes.
-%global commit 304bbef6c7e9a86630c12986b99c8654eb7fe648
-%global access 20260205
+%global commit a6473d48ff816bb67b2a24de15a93ec4f2974f40
+%global access 20260826
 %global shortcommit %{sub %{commit} 1 12}
-%global position 2324
+%global position 2534
 Version:        %{position}^%{access}.%{shortcommit}
 Release:        %autorelease
 Summary:        Meta-build system that generates build files for Ninja
 
 # The entire source is BSD-3-Clause, except:
-#   - src/base/third_party/icu/ is (Unicode-DFS-2016 AND ICU); see
-#     src/base/third_party/icu/LICENSE and also the header comment in
-#     src/base/third_party/icu/icu_utf.h.
 #
-# Note that src/util/test/gn_test.cc, which is licensed Apache-2.0, does not
-# contribute to the binary RPMs, only to the gn_unittests executable, which is
-# not installed; you may verify this with:
-#   gdb -ex 'set pagination off' -ex 'info sources' gn | grep -F gn_test.cc
-License:        BSD-3-Clause AND Unicode-DFS-2016 AND ICU
+# - src/base/third_party/icu/ is (Unicode-DFS-2016 AND ICU); see
+#   src/base/third_party/icu/LICENSE and also the header comment in
+#   src/base/third_party/icu/icu_utf.h.
+# - src/gn/starlark/vendor/cxx/include/cxx.h is (MIT OR Apache-2.0); per
+#   src/gn/starlark/vendor/cxx/README.md, it is
+#   https://github.com/dtolnay/cxx/blob/1.0.194/include/cxx.h, but it is most
+#   likely actually based on the version in src/gn/starlark/Cargo.lock at any
+#   given time.
+%global bundled_cxx_version 1.0.196
+#   The license texts for this are missing,
+#   https://gn.issues.chromium.org/issues/529413117.
+# - gn/src/util/test/gn_test.cc, gn/infra/recipes/gn.py, and
+#   gn/infra/recipes.py are Apache-2.0. The first does not contribute to the
+#   binary RPMs, only to the gn_unittests executable, which is not installed;
+#   not installed; you may verify this with:
+#     gdb -ex 'set pagination off' -ex 'info sources' gn | grep -F gn_test.cc
+#   However, the two files from gn/infra/ are installed in the -doc subpackage.
+#   The required Apache-2.0 license text is missing,
+#   https://gn.issues.chromium.org/issues/529413117.
+License:        %{shrink:
+    BSD-3-Clause AND
+    ICU AND
+    Unicode-DFS-2016 AND
+    (Apache-2.0 OR MIT)
+    }
 SourceLicense:  %{license} AND Apache-2.0
 URL:            https://gn.googlesource.com/gn
 Source0:        %{url}/+archive/%{commit}.tar.gz#/gn-%{shortcommit}.tar.gz
 # Generated using script update-version:
 Source1:        last_commit_position.h
 Source2:        update-version
+# Missing Apache-2.0 license text for src/gn/starlark/vendor/cxx/include/cxx.h,
+# gn/src/util/test/gn_test.cc, gn/infra/recipes/gn.py, and gn/infra/recipes.py.
+# https://gn.issues.chromium.org/issues/529413117
+Source3:        https://www.apache.org/licenses/LICENSE-2.0.txt
+# Missing MIT license text for src/gn/starlark/vendor/cxx/include/cxx.h; the
+# corresponding LICENSE-APACHE would be identical to LICENSE-2.0.txt, above, so
+# we don’t need another copy.
+# https://gn.issues.chromium.org/issues/529413117
+Source4:        https://github.com/dtolnay/cxx/raw/refs/tags/%{bundled_cxx_version}/LICENSE-MIT
 
 # Downstream-only: do not override optimization flags
 #
@@ -73,6 +101,11 @@ Patch:          0001-Downstream-only-do-not-override-optimization-flags.patch
 #
 # This conflicts with -Werror=format-security.
 Patch:          0002-Downstream-only-do-not-build-with-Wno-format.patch
+# Downstream-only: omit “check_formatter” test
+#
+# This is only suitable for upstream CI; our version of clang-format may not
+# produce identical results.
+Patch:          0003-Downstream-only-omit-check_formatter-test.patch
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch:    %{ix86}
@@ -84,11 +117,10 @@ BuildRequires:  gcc-c++
 # For RPM macros:
 BuildRequires:  emacs-common
 
-%if %{with html_docs}
-BuildRequires:  pandoc
-BuildRequires:  parallel
-%endif
 BuildRequires:  help2man
+%if %{with regenerate_bridge}
+BuildRequires:  cxxbridge
+%endif
 
 Requires:       vim-filesystem
 Requires:       python3
@@ -110,6 +142,10 @@ Provides:       emacs-gn = %{version}-%{release}
 # See src/base/third_party/icu/README.chromium, from which the version number
 # is taken.
 Provides:       bundled(icu) = 60
+%if %{without regenerate_bridge}
+# src/gn/starlark/vendor/cxx/include/cxx.h
+Provides:       bundled(crate(cxx)) = %{bundled_cxx_version}
+%endif
 
 %description
 GN is a meta-build system that generates build files for Ninja.
@@ -119,6 +155,13 @@ GN is a meta-build system that generates build files for Ninja.
 Summary:        Documentation for GN
 BuildArch:      noarch
 
+# The entire source is BSD-3-Clause, except where otherwise noted in the
+# comment above the base package’s License field.
+#
+# The -doc subpackage contains files that are Apache-2.0:
+# gn/infra/recipes/gn.py and gn/infra/recipes.py.
+License:        BSD-3-Clause AND Apache-2.0
+
 %description doc
 The gn-doc package contains detailed documentation for GN.
 
@@ -127,18 +170,35 @@ The gn-doc package contains detailed documentation for GN.
 %autosetup -c -n gn-%{commit} -p1
 
 # Use pre-generated last_commit_position.h.
-mkdir -p ./out
-cp -vp '%{SOURCE1}' ./out
+mkdir ./out
+cp --preserve '%{SOURCE1}' ./out/
 
 # Copy and rename vim extensions readme for use in the main documentation
 # directory.
-cp -vp misc/vim/README.md README-vim.md
+cp --preserve misc/vim/README.md README-vim.md
 
 # Fix shebangs in examples and such.
 %py3_shebang_fix .
 
+# Copy in missing license texts.
+cp --preserve '%{SOURCE3}' '%{SOURCE4}' .
+# Put the ICU license text somewhere it’s easy to install, with a unique name.
+cp --preserve src/base/third_party/icu/LICENSE LICENSE-ICU
+
+rm src/gn/starlark/Cargo.lock
 
 %conf
+%if %{with regenerate_bridge}
+# Trick src/gn/ffi/update_bridge.sh into finding the system-wide cxxbridge
+# executable and not trying to build one with cargo.
+ln -s /usr src/gn/ffi/.bin
+# Re-generate:
+#   - src/gn/starlark/vendor/cxx/include/cxx.h
+#   - src/gn/ffi/bridge.h
+#   - src/gn/ffi/bridge.cc
+bash -x src/gn/ffi/update_bridge.sh
+%endif
+
 AR='gcc-ar'; export AR
 # Treating warnings as errors is too strict for downstream builds.
 #
@@ -153,13 +213,7 @@ AR='gcc-ar'; export AR
 
 
 %build
-ninja -j %{_smp_build_ncpus} -C out -v
-
-%if %{with html_docs}
-# There is a script, misc/help_as_html.py, that generates some HTML help, but
-# pandoc does a better job and we can cover more Markdown sources.
-find . -type f -name '*.md' | parallel -v pandoc -o '{.}.html' '{}'
-%endif
+%ninja_build -C out
 
 help2man \
     --name='%{summary}' \
@@ -167,41 +221,46 @@ help2man \
     --no-info \
     ./out/gn |
   # Clean up a couple of stray binary bytes in the help output
-  tr -d '\302\240' |
+  tr --delete '\302\240' |
   # Format the entries within the sections as tagged paragraphs, and italicise
   # [placeholders in square brackets].
-  sed -r -e 's/(^[[:alnum:]_]+:)/.TP\n.B \1\n/' \
-      -e 's/\[([^]]+)\]/\\fI[\1]\\fR/g' > out/gn.1
+  sed --regexp-extended --expression='s/(^[[:alnum:]_]+:)/.TP\n.B \1\n/' \
+      --expression='s/\[([^]]+)\]/\\fI[\1]\\fR/g' > out/gn.1
 
 
 %install
-install -t '%{buildroot}%{_bindir}' -D -p out/gn
+install -D --preserve-timestamps --target='%{buildroot}%{_bindir}' out/gn
 
-install -d '%{buildroot}%{_datadir}/vim/vimfiles'
-cp -vrp misc/vim/* '%{buildroot}%{_datadir}/vim/vimfiles'
+install --directory '%{buildroot}%{_datadir}/vim/vimfiles'
+cp --verbose --recursive --preserve misc/vim/* \
+    '%{buildroot}%{_datadir}/vim/vimfiles'
 find '%{buildroot}%{_datadir}/vim/vimfiles' \
     -type f -name 'README.*' -print -delete
 %py_byte_compile %{python3} '%{buildroot}%{_datadir}/vim/vimfiles/gn-format.py'
 
-install -t '%{buildroot}%{_emacs_sitestartdir}' -D -p -m 0644 misc/emacs/*.el
+install -D --preserve-timestamps --mode=0644 \
+    --target='%{buildroot}%{_emacs_sitestartdir}' misc/emacs/*.el
 
-install -t '%{buildroot}%{_mandir}/man1' -D -m 0644 -p out/gn.1
+install -D --preserve-timestamps --mode=0644 \
+    --target='%{buildroot}%{_mandir}/man1' out/gn.1
 
 
 %check
 out/gn_unittests
 
 # Verify consistency of the version header with the spec file
-grep -E '^#define[[:blank:]]+LAST_COMMIT_POSITION_NUM[[:blank:]]+'\
+grep --extended-regexp \
+    '^#define[[:blank:]]+LAST_COMMIT_POSITION_NUM[[:blank:]]+'\
 '%{position}[[:blank:]]*' \
     'out/last_commit_position.h' >/dev/null
-grep -E '^#define[[:blank:]]+LAST_COMMIT_POSITION[[:blank:]]+'\
+grep --extended-regexp \
+    '^#define[[:blank:]]+LAST_COMMIT_POSITION[[:blank:]]+'\
 '"%{position} \(%{shortcommit}\)"[[:blank:]]*' \
     'out/last_commit_position.h' >/dev/null
 
 
 %files
-%license LICENSE
+%license LICENSE LICENSE-ICU LICENSE-2.0.txt LICENSE-MIT
 %{_bindir}/gn
 
 %{_mandir}/man1/gn.1*
@@ -216,13 +275,10 @@ grep -E '^#define[[:blank:]]+LAST_COMMIT_POSITION[[:blank:]]+'\
 
 
 %files doc
-%license LICENSE src/base/third_party/icu/README.chromium
+%license LICENSE LICENSE-2.0.txt
 %doc AUTHORS
 %doc OWNERS
 %doc README*.md
-%if %{with html_docs}
-%doc README*.html
-%endif
 %doc docs/
 %doc examples/
 %doc infra/
@@ -231,14 +287,77 @@ grep -E '^#define[[:blank:]]+LAST_COMMIT_POSITION[[:blank:]]+'\
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2324^20260205.304bbef6c7e9-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 2534^20260826.a6473d48ff81-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2324^20260205.304bbef6c7e9-3
-- build: mass rebuild auto-bumpable components
+* Wed Aug 26 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2534^20260826.a6473d48ff81-1
+- Update to version 2534
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2324^20260205.304bbef6c7e9-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Aug 17 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2517^20260817.e8a8e0932a5e-1
+- Update to version 2517
+
+* Sat Aug 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2509^20260808.64cfb8344ec3-1
+- Update to version 2509
+
+* Sat Aug 01 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2501^20260731.3fd3b0624d8c-1
+- Update to version 2501
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2459^20260708.8d35b83847d1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jul 08 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2459^20260708.8d35b83847d1-1
+- Update to version 2459
+
+* Tue Jul 07 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2455^20260707.127c7783a834-1
+- Update to version 2455
+
+* Tue Jul 07 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2437^20260630.5223a47630df-2
+- Unbundle the header from `crate(cxx)` in `%%conf`, not `%%prep`
+
+* Tue Jun 30 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2437^20260630.5223a47630df-1
+- Update to version 2437
+- Correct and improve License expressions and license text file handling
+- Deal with upstream vendoring of a header from the Rust cxx crate
+- Invoke ninja via the %%ninja_build macro
+
+* Sun Jun 21 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2423^20260621.c276f01685bc-1
+- Update to version 2423
+
+* Sun Jun 14 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2413^20260614.28df2d93df29-1
+- Update to version 2413
+
+* Tue Jun 02 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2409^20260602.6f8c0328ee29-1
+- Update to version 2409
+
+* Mon May 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2400^20260518.f9c7754576bc-1
+- Update to version 2400
+
+* Mon May 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2395^20260509.78e67afc82fa-3
+- Just ship Markdown sources; don’t bother HTMLifying with pandoc
+
+* Mon May 18 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2395^20260509.78e67afc82fa-2
+- Use various long options
+
+* Sat May 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2395^20260509.78e67afc82fa-1
+- Update to version 2395
+
+* Wed Apr 29 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2381^20260429.fa9dacd8eff0-1
+- Update to version 2381
+
+* Sun Apr 12 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2359^20260412.ec56d4d935a0-1
+- Update to version 2359
+
+* Thu Apr 09 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2354^20260408.6e8dcdebbadf-1
+- Update to version 2352
+
+* Thu Mar 26 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2352^20260326.b2ac0e7a9089-1
+- Update to version 2352
+
+* Sat Mar 14 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2345^20260314.2941d2a26fa9-1
+- Update to version 2345
+
+* Tue Feb 24 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2334^20260224.bfffe163a23e-1
+- Update to version 2334
 
 * Thu Feb 05 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 2324^20260205.304bbef6c7e9-1
 - Update to version 2324

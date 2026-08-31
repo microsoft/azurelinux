@@ -22,15 +22,15 @@
 
 Name:           bind-dyndb-ldap
 Version:        11.11
-Release: 13%{?dist}
+Release:        14%{?dist}
 Summary:        LDAP back-end plug-in for BIND
 
 License:        GPL-2.0-or-later
-URL:            https://releases.pagure.org/bind-dyndb-ldap
-Source0:        https://releases.pagure.org/%{name}/%{name}-%{VERSION}.tar.bz2
-Source1:        https://releases.pagure.org/%{name}/%{name}-%{VERSION}.tar.bz2.asc
+URL:            https://codeberg.org/freeipa/bind-dyndb-ldap/releases
+Source0:        https://codeberg.org/freeipa/%{name}/releases/download/v%{VERSION}/%{name}-%{VERSION}.tar.bz2
+Source1:        https://codeberg.org/freeipa/%{name}/releases/download/v%{VERSION}/%{name}-%{VERSION}.tar.bz2.asc
 
-# https://pagure.io/bind-dyndb-ldap/pull-request/244
+# https://codeberg.org/freeipa/bind-dyndb-ldap/issues/243
 Patch1:         bind-dyndb-ldap-11.10-check-pr244.patch
 
 BuildRequires:  bind-devel >= %{bind_version}, bind-lite-devel >= %{bind_version}
@@ -131,6 +131,18 @@ sed -i.bak -e "$SEDSCRIPT" /etc/named.conf
 
 
 %changelog
+* Wed Jun 24 2026 Petr Menšík <pemensik@redhat.com> - 11.11-14
+- Rebuilt for BIND 9.18.50 (rhbz#2489833)
+
+* Wed May 20 2026 Petr Menšík <pemensik@redhat.com> - 11.11-13
+- Rebuilt for BIND 9.18.49 (rhbz#2480121)
+
+* Tue Apr 07 2026 Petr Menšík <pemensik@redhat.com> - 11.11-12
+- Rebuild for BIND 9.18.48 (rhbz#2453853)
+
+* Wed Mar 25 2026 Petr Menšík <pemensik@redhat.com> - 11.11-11
+- Rebuild for BIND 9.18.47 (rhbz#2440561)
+
 * Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 11.11-10
 - Rebuilt for BIND 9.18.44 (rhbz#2431609)
 

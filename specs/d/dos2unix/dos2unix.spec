@@ -3,12 +3,12 @@
 
 Summary: Text file format converters
 Name: dos2unix
-Version: 7.5.3
-Release: 4%{?dist}
+Version: 7.5.6
+Release: 1%{?dist}
 License: BSD-3-Clause
-URL: https://waterlan.home.xs4all.nl/dos2unix.html
-Source: https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz
-Source: https://waterlan.home.xs4all.nl/dos2unix/%{name}-%{version}.tar.gz.asc
+URL: https://waterlander.net/dos2unix/
+Source: https://waterlander.net/dos2unix/files/%{name}-%{version}.tar.gz
+Source: https://waterlander.net/dos2unix/files/%{name}-%{version}.tar.gz.asc
 Source: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x38C1F572B12725BE#./38C1F572B12725BE.asc
 
 BuildRequires: gcc
@@ -56,6 +56,22 @@ make test
 %{_mandir}/man1/*.1*
 
 %changelog
+* Wed Aug 05 2026 Than Ngo <than@redhat.com> - 7.5.6-1
+- Fix rhbz#2483487, update to 7.5.6
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri May 29 2026 Than Ngo <than@redhat.com> - 7.5.5-1
+- Fix rhbz#2435574, update to 7.5.5
+- Fix rhbz#2414009, none-zero exit code
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.5.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Oct 29 2025 Than Ngo <than@redhat.com> - 7.5.3-1
 - Update to 7.5.3
   * Fix: Exit with non-zero code if the conversion is aborted due to a binary file

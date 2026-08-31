@@ -1,10 +1,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global commit a8ac9f9ce50284c5ddeac8b4d50e9bc433eb42b4
+%global commit 4a3650d88725e8fda6387fbdbaa0ed98cdca76ce
 # %%global tag 11 #disabled due to unarragment release line after mass rebuild.
 %global githead %(printf %%.7s %commit)
-%global gitdate 20251223
+%global gitdate 20260302
 
 # epel7 compatibility mode
 %{!?_pkgdocdir: %global _pkgdocdir %{_docdir}/%{name}-%{version}}
@@ -49,11 +49,14 @@ The GNU portability library is a macro system and C declarations and \
 definitions for commonly-used API elements and abstracted system behaviors. \
 It can be used to improve portability and other functionality in your programs.
 
+# without modules1
+%global debug_package %{nil}
+
 Name:     gnulib
 Version:  0
-Release:  56.%{gitdate}git%{?dist}
+Release:  57.%{gitdate}git%{githead}%{?dist}
 Summary:  GNU Portability Library
-License:  Public Domain and BSD and GPLv2+ and GPLv3 and GPLv3+ and LGPLv2 and LGPLv2+ and LGPLv3+
+License:  LicenseRef-Fedora-Public-Domain AND BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 URL:      https://www.gnu.org/software/gnulib
 Source0:  https://git.savannah.gnu.org/gitweb/?p=gnulib.git;a=snapshot;h=%{githead};sf=tgz;name=gnulib-%{githead}.tar.gz#/gnulib-%{githead}.tar.gz
 Source1: https://erislabs.net/gitweb/?p=gnulib.git;a=blob_plain;hb=HEAD;f=debian/manpages/check-module.1#/check-module.1
@@ -80,7 +83,7 @@ BuildRequires:		help2man
 BuildRequires:		git
 BuildRequires:      make
 BuildRequires:      ncurses-devel
-BuildRequires:      python3-devel
+BuildRequires:      python3-devel >= 3.7
 
 
 %description
@@ -103,16 +106,24 @@ done
 
 rm lib/javaversion.class
 # MODULE #1 - git-merge-changelog
-./gnulib-tool --create-testdir --dir=build-%{module1} %{module1}
+
+# The 'gnulib' source package has built and shipped the binary package
+# 'git-merge-changelog' but now upstream split this off into a proper
+# package and there is a release of it:
+# https://lists.gnu.org/archive/html/info-gnu/2025-12/msg00009.html
+# https://linux.debian.devel.narkive.com/LawcvirC/bug-1124418-itp-git-merge-changelog-git-merge-driver-for-gnu-changelog-files
+# https://tracker.debian.org/pkg/git-merge-changelog
+
+#gnulib-tool --create-testdir --dir=build-%{module1} %{module1}
 
 %build
 # MODULE #1 - git-merge-changelog
-pushd build-%{module1}
-%configure --prefix=%_prefix
-make %{?_smp_mflags}
-popd
+#pushd build-%{module1}
+#configure --prefix=%_prefix
+#make_build
+#popd
 #tests build
-cp -p lib/timevar.def build-tests/gllib #Fix timevar.def not found
+#cp -p lib/timevar.def build-tests/gllib #Fix timevar.def not found
 pushd build-tests
 
 # FIX ERROR CAN'T DETECT AC_LIB_PREPARE_PREFIX
@@ -121,7 +132,7 @@ autoreconf -vfi
 
 
 %configure --prefix=%_prefix
-make %{?_smp_mflags}
+%make_build
 popd
 
 # Java JDK dropped in i686
@@ -133,7 +144,7 @@ javac -d lib lib/javaversion.java
 
 # This part is done with the original path
 
-make %{?_smp_mflags} MODULES.html
+%make_build MODULES.html
 
 sed -i -r 's#HREF="(lib|m4|modules)#HREF="%{_datadir}/%{name}/\1#g' MODULES.html
 sed -i "/^[ ]*gnulib_dir=/s#\`[^\`]*\`#%{_datadir}/%{name}#" gnulib-tool
@@ -141,8 +152,8 @@ sed -i "/^[ ]*gnulib_dir=/s#\`[^\`]*\`#%{_datadir}/%{name}#" gnulib-tool.sh
 sed -i "/^[ ]*gnulib_dir=/s#\`[^\`]*\`#%{_datadir}/%{name}#" gnulib-tool.py
 
 # This part is done with the target path
-make %{?_smp_mflags} info
-make %{?_smp_mflags} html
+%make_build info
+%make_build html
 # Removing unused files
 rm -f */.cvsignore
 rm -f */.gitignore
@@ -161,7 +172,8 @@ mkdir -p %{buildroot}%{_pkgdocdir}
 mkdir -p %{buildroot}%{_mandir}/man1
 
 cp -p check-module %{buildroot}%{_bindir}
-cp -p gnulib-tool gnulib-tool.sh gnulib-tool.py %{buildroot}%{_bindir}
+cp -p gnulib-tool gnulib-tool.sh gnulib-tool.py %{buildroot}%{_datadir}/%{name}/
+ln -sr %{buildroot}%{_datadir}/%{name}/gnulib-tool %{buildroot}%{_bindir}
 cp -rp build-aux lib m4 modules config tests %{buildroot}%{_datadir}/%{name}/
 cp -p .gnulib-tool.py %{buildroot}%{_datadir}/%{name}/
 mkdir -p %{buildroot}%{_datadir}/%{name}/doc
@@ -178,14 +190,14 @@ mkdir -p %{buildroot}%{python3_sitelib}
 cp -rp py%{name} %{buildroot}%{python3_sitelib}
 
 # Module installing
-%make_install -C build-%{module1}
-help2man -N --no-discard-stderr %{buildroot}%{_bindir}/%{module1} | gzip -9c > %{buildroot}%{_mandir}/man1/%{module1}.1.gz
+#make_install -C build-%{module1}
+#help2man -N --no-discard-stderr %{buildroot}%{_bindir}/%{module1} | gzip -9c > %{buildroot}%{_mandir}/man1/%{module1}.1.gz
 
 #-------------------------------------------------------------------------
 
 %package docs
 Summary: Documentation for %{name} modules
-License: GFDL
+License: GFDL-1.3-or-later
 Requires:			%{name}-devel = %{version}-%{release}
 BuildArch: noarch
 
@@ -207,7 +219,7 @@ This package contains documentation for %{name}.
 %ifnarch %{ix86}
 %package javaversion
 Summary: javaversion built unit
-License: GPLv3+
+License: GPL-3.0-or-later
 Requires:			%{name}-devel = %{version}-%{release}
 %description javaversion
 This package contains javaversion built unit of %{name}.
@@ -247,8 +259,6 @@ This package contains devel files of %{name}.
 %files devel
 %{_datadir}/%{name}/
 %{_bindir}/gnulib-tool
-%{_bindir}/gnulib-tool.sh
-%{_bindir}/gnulib-tool.py
 %{_bindir}/check-module
 %{_mandir}/*/check-module.*
 %{_mandir}/*/gnulib-tool.*
@@ -281,20 +291,24 @@ Python Implement of Gnulib
 # MODULE #1 - git-merge-changelog
 %package -n %{module1}
 Summary: Git merge driver for ChangeLog files
-License: GPLv2+
+License: GPL-2.0-or-later
 
 %description -n %{module1}
 Git Merge Changelog is a git merge driver for changelogs that combines
 parallel additions to the changelog without generating merge conflicts.
 It can be enabled for specific files by setting appropriate git attributes.
 
-%files -n %{module1}
-%{_bindir}/%{module1}
-%{_mandir}/*/%{module1}.*
-%license doc/COPYINGv2
+#%%files -n %%{module1}
+#%%{_bindir}/%%{module1}
+#%%{_mandir}/*/%%{module1}.*
+#%%license doc/COPYINGv2
 
 #-------------------------------------------------------------------------
 %changelog
+* Tue Mar 10 2026 Sérgio Basto <sergio@serjux.com> - 0-78.20260302git4a3650d
+- Update to git4a3650d branch stable-202601 with ISO C23 fixes
+- The git-merge-changelog binary has been removed from the source and is now maintained in a separate repository.
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0-56.20251223git
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

@@ -3,7 +3,7 @@
 
 Name:           dash
 Version:        0.5.12
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        Small and fast POSIX-compliant shell
 # BSD-3-Clause: DASH in general
 # GPL-2.0-or-later: From src/mksignames.c

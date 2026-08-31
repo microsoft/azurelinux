@@ -1,0 +1,184 @@
+From b24b0452cbce7e991b37b83a228bcae7c6f4266e Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Sun, 12 Apr 2026 22:11:49 +0100
+Subject: [PATCH 07/10] stratis: handle DbusClientMissingPropertyError on D-Bus
+ properties
+
+Resolves: #983
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/manager/plugins/stratis.py | 90 +++++++++++++++++++++++++++-----
+ 1 file changed, 76 insertions(+), 14 deletions(-)
+
+diff --git a/snapm/manager/plugins/stratis.py b/snapm/manager/plugins/stratis.py
+index 1321a897..f408af81 100644
+--- a/snapm/manager/plugins/stratis.py
++++ b/snapm/manager/plugins/stratis.py
+@@ -17,6 +17,10 @@ from uuid import UUID
+ 
+ from dbus.exceptions import DBusException
+ 
++from dbus_client_gen import (
++    DbusClientMissingPropertyError,
++)
++
+ from dbus_python_client_gen import (
+     DPClientInvocationError,
+     DPClientSetPropertyContext,
+@@ -242,20 +246,47 @@ class StratisSnapshot(Snapshot):
+     @property
+     def status(self):
+         (_, filesystem) = self._get_dbus_cache()
+-        if filesystem.MergeScheduled() is True:
+-            return SnapStatus.REVERTING
++        try:
++            if filesystem.MergeScheduled() is True:
++                return SnapStatus.REVERTING
++        except DbusClientMissingPropertyError:  # pragma: no cover
++            # pylint: disable=protected-access
++            self.provider._log_warn(
++                "Could not access filesystem.MergeScheduled() property"
++            )
+         return SnapStatus.ACTIVE
+ 
+     @property
+     def size(self):
+         (_, filesystem) = self._get_dbus_cache()
+-        return int(filesystem.Size())
++        try:
++            return int(filesystem.Size())
++        except DbusClientMissingPropertyError:  # pragma: no cover
++            # pylint: disable=protected-access
++            self.provider._log_warn("Could not access filesystem.Size() property")
++            return 0
+ 
+     @property
+     def free(self):
+         (pool, _) = self._get_dbus_cache()
+-        size = int(pool.TotalPhysicalSize())
+-        used = int(pool.TotalPhysicalUsed()[1]) if pool.TotalPhysicalUsed()[0] else 0
++        try:
++            size = int(pool.TotalPhysicalSize())
++        except DbusClientMissingPropertyError:  # pragma: no cover
++            # pylint: disable=protected-access
++            self.provider._log_warn(
++                "Could not access pool.TotalPhysicalSize() property"
++            )
++            return 0
++        try:
++            used = (
++                int(pool.TotalPhysicalUsed()[1]) if pool.TotalPhysicalUsed()[0] else 0
++            )
++        except DbusClientMissingPropertyError:  # pragma: no cover
++            # pylint: disable=protected-access
++            self.provider._log_warn(
++                "Could not access pool.TotalPhysicalUsed() property"
++            )
++            return 0
+         return size - used
+ 
+     # Pylint does not understand the decorator notation.
+@@ -301,7 +332,10 @@ def filter_stratis_snapshot(filesystem):
+     snapshot or ``False`` otherwise. The ``filesystem`` argument must be a
+     DBus managed object corresponding to a Stratis filesystem.
+     """
+-    return filesystem.Origin()[0]
++    try:
++        return filesystem.Origin()[0]
++    except DbusClientMissingPropertyError:
++        return False
+ 
+ 
+ def _snapshot_min_size(policy_size):
+@@ -417,8 +451,13 @@ def _pool_free_space_bytes(managed_objects, pool_name):
+     ``pool_name``.
+     """
+     (pool, _) = _get_pool_filesystem(managed_objects, pool_name, None)
+-    size = int(pool.TotalPhysicalSize())
+-    used = int(pool.TotalPhysicalUsed()[1]) if pool.TotalPhysicalUsed()[0] else 0
++    try:
++        size = int(pool.TotalPhysicalSize())
++        used = int(pool.TotalPhysicalUsed()[1]) if pool.TotalPhysicalUsed()[0] else 0
++    except DbusClientMissingPropertyError as err:  # pragma: no cover
++        raise SnapmPluginError(
++            f"Could not access Stratis pool capacity properties for {pool_name}"
++        ) from err
+     return size - used
+ 
+ 
+@@ -427,7 +466,12 @@ def _fs_size_bytes(managed_objects, pool_name, fs_name):
+     Return the size of the specified filesystem in bytes.
+     """
+     (_, filesystem) = _get_pool_filesystem(managed_objects, pool_name, fs_name)
+-    return int(filesystem.Size())
++    try:
++        return int(filesystem.Size())
++    except DbusClientMissingPropertyError as err:  # pragma: no cover
++        raise SnapmPluginError(
++            f"Could not access Stratis filesystem size for {pool_name}/{fs_name}"
++        ) from err
+ 
+ 
+ class Stratis(Plugin):
+@@ -505,11 +549,19 @@ class Stratis(Plugin):
+             if not filter_stratis_snapshot(filesystem):
+                 continue
+ 
+-            pool_name = path_to_name[filesystem.Pool()]
+-            filesystem_name = str(filesystem.Name())
++            try:
++                pool_object_path = filesystem.Pool()
++                origin_info = filesystem.Origin()
++                filesystem_name = str(filesystem.Name())
++            except DbusClientMissingPropertyError as err:  # pragma: no cover
++                self._log_warn(
++                    "Skipping filesystem with missing D-Bus property: %s", err
++                )
++                continue
++            pool_name = path_to_name[pool_object_path]
+ 
+             origin = _origin_uuid_to_fs_name(
+-                managed_objects, filesystem.Pool(), str(filesystem.Origin()[1])
++                managed_objects, pool_object_path, str(origin_info[1])
+             )
+ 
+             try:
+@@ -520,7 +572,6 @@ class Stratis(Plugin):
+                 (snapset, timestamp, mount_point) = fields
+                 full_name = f"{pool_name}/{filesystem_name}"
+                 self._log_debug("Found %s snapshot: %s", self.name, full_name)
+-                pool_object_path = filesystem.Pool()
+                 cache_pool = MOPool(managed_objects[pool_object_path])
+                 cache_filesystem = filesystem
+                 snapshots.append(
+@@ -989,7 +1040,13 @@ class Stratis(Plugin):
+             Filesystem.Properties.MergeScheduled.Set(get_object(fs_object_path), True)
+         except DPClientInvocationError as err:
+             if isinstance(err.context, DPClientSetPropertyContext):
+-                origin_uuid = filesystem.Origin()[1]
++                try:
++                    origin_uuid = filesystem.Origin()[1]
++                except DbusClientMissingPropertyError:  # pragma: no cover
++                    self._log_warn("Could not access filesystem.Origin() property")
++                    raise SnapmPluginError(
++                        f"Unexpected D-Bus error setting property for {pool_name}/{fs_name}"
++                    ) from err
+                 if len(
+                     _find_in_progress_merge(
+                         managed_objects, pool_object_path, origin_uuid
+@@ -1005,6 +1062,11 @@ class Stratis(Plugin):
+             raise SnapmPluginError(
+                 f"Unexpected D-Bus error setting property for {pool_name}/{fs_name}"
+             ) from err
++        except DbusClientMissingPropertyError as err:  # pragma: no cover
++            self._log_warn("Could not access filesystem.MergeScheduled property")
++            raise SnapmPluginError(
++                "Unexpected error accessing filesystem.MergeScheduled property"
++            ) from err
+ 
+     def activate_snapshot(self, name):
+         """
+-- 
+2.53.0
+

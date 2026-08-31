@@ -3,7 +3,7 @@
 
 Name:           libcacard
 Version:        2.8.1
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        CAC (Common Access Card) library
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+

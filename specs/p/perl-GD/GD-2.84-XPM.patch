@@ -1,0 +1,11 @@
+--- Makefile.PL
++++ Makefile.PL
+@@ -273,7 +273,7 @@ if( defined($options) )
+   $JPEG      = $options =~ m/JPEG/i;
+   $GD2       = $options =~ m/GD2/i;
+   $FT        = $options =~ m/FT|FREETYPE/i;
+-  $XPM       = $options =~ m/XPM/i && join(' ',@LIBS) =~ m/X11/;
++  $XPM       = $options =~ m/XPM/i;
+   # strawberry has -lXpm without -lX11
+   if (!$XPM && join(' ',@LIBS) =~ m/-lXpm/) {
+     print "Remove -lXpm and XPM feature without -lX11\n" if $options =~ m/XPM/i;

@@ -8,7 +8,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 4.1.1
-Release: 5%{?dist}
+Release: 2%{?dist}
 Summary: Ruby-based web application framework
 License: MIT
 URL: http://sinatrarb.com/

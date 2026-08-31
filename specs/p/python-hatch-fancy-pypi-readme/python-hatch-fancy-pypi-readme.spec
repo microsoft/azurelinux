@@ -3,7 +3,7 @@
 
 Name:           python-hatch-fancy-pypi-readme
 Version:        25.1.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        Hatch plugin for writing fancy PyPI readmes
 
 License:        MIT

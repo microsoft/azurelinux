@@ -1,0 +1,24 @@
+From 17a36dc68964c0f91c2d0fc0e7b8c6dc686251ca Mon Sep 17 00:00:00 2001
+From: crusaderky <crusaderky@gmail.com>
+Date: Tue, 5 Sep 2023 16:04:24 +0100
+Subject: [PATCH] Prevent test timeout on a single CPU
+
+---
+ zict/tests/utils_test.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/zict/tests/utils_test.py b/zict/tests/utils_test.py
+index 0640e2b..e5693d1 100644
+--- a/zict/tests/utils_test.py
++++ b/zict/tests/utils_test.py
+@@ -169,7 +169,9 @@ def check_different_keys_threadsafe(
+ 
+     def worker(idx, key, value):
+         barrier.wait()
+-        while any(c < 10 for c in counters):
++        # When running on a single CPU (`taskset -c 0 pytest`), multitasking can
++        # misbehave and almost completely starve one of the two threads
++        while any(c < 10 for c in counters) and all(c < 1000 for c in counters):
+             z[key] = value
+             try:
+                 assert z[key] == value

@@ -69,10 +69,10 @@
 
 %global major_version 3
 %global minor_version 31
-%global patch_version 10
+%global patch_version 11
 
 # For handling bump release by rpmdev-bumpspec and mass rebuild
-%global baserelease 3
+%global baserelease 1
 
 # Set to RC version if building RC, else comment out.
 #%%global rcsuf rc3
@@ -603,6 +603,9 @@ popd
 
 
 %changelog
+* Sun Mar 22 2026 Björn Esser <besser82@fedoraproject.org> - 3.31.11-1
+- cmake-3.31.11
+
 * Fri Dec 12 2025 Miro Hrončok <mhroncok@redhat.com> - 3.31.10-3
 - Declarative %%generate_buildrequires: Keep the BRs stable
 

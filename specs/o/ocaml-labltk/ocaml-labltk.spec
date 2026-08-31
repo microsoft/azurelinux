@@ -13,7 +13,7 @@ ExcludeArch: %{ix86}
 
 Name:          ocaml-labltk
 Version:       8.06.15
-Release: 6%{?dist}
+Release:       3%{?dist}
 
 Summary:       Tcl/Tk interface for OCaml
 

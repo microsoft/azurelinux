@@ -20,7 +20,7 @@
 Name:           ImageMagick
 Epoch:          1
 Version:        7.1.1.47
-Release: 10%{?dist}
+Release:        6%{?dist}
 Summary:        An X application for displaying and manipulating images
 
 %global VER %(foo=%{version}; echo ${foo:0:5})

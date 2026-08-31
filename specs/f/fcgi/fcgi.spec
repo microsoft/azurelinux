@@ -3,7 +3,7 @@
 
 Name:           fcgi
 Version:        2.4.7
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        FastCGI development kit
 
 License:        OML

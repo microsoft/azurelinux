@@ -3,7 +3,7 @@
 
 Name:           spice-protocol
 Version:        0.14.5
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Spice protocol header files
 # Main headers are BSD, controller / foreign menu are LGPL
 License:        BSD-3-Clause AND LGPL-2.1-or-later

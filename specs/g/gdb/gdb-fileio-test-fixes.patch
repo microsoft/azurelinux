@@ -1,0 +1,91 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Kevin Buettner <kevinb@redhat.com>
+Date: Wed, 25 Feb 2026 23:38:21 -0700
+Subject: gdb-fileio-test-fixes.patch
+
+;; Backport of upstream commit d2cc16cd7fc from Jan Vrany fixing
+;; FAILs in gdb.base/fileio.exp caused by macro expansion of
+;; path components in OUTDIR.
+
+gdb/testsuite: fix FAILs in fileio.exp
+
+I'm experiencing intermittent FAILs in fileio.exp when running on (my)
+CI:
+
+    FAIL: gdb.base/fileio.exp: Open a file
+    FAIL: gdb.base/fileio.exp: Creating already existing file returns EEXIST
+    FAIL: gdb.base/fileio.exp: Open for write but no write permission returns EACCES
+    FAIL: gdb.base/fileio.exp: Writing to a file
+    ...
+
+The problem turned out to be the way the OUTDIR gets defined in fileio.c.
+The path is passed down "naked" and turned into string by STRINGIFY macro.
+
+However, if the path happens to contain name of unrelated pre-existing
+C macro, this macro gets expanded during the "stringification", resulting
+in (likely) different path than used in fileio.exp and therefore causing
+failures.
+
+For example, if the GDB is compiled and tested in directory
+
+    /var/lib/jenkins/workspace/binutils-gdb/build/x86_64-linux-gnu
+
+then fileio.c is compiled with
+
+   -DOUTDIR_=/var/lib/jenkins/workspace/binutils-gdb/build/x86_64-linux-gnu/gdb/testsuite/outputs/gdb.base/fileio
+
+But because there's also C macro named "linux" defined to 1, the resulting
+OUTDIR is actually:
+
+   /var/lib/jenkins/workspace/binutils-gdb/build/x86_64-1-gnu/gdb/testsuite/outputs/gdb.base/fileio
+
+This commit fixes this by defining the OUTDIR as string literal in first
+place (similarly to how it was done prior commit cc91060) and updating
+quote_for_host to handle strings that themselves contains quote (").
+
+Tested on x86_64-linux by running all tests using quote_for_host with
+both target board unix and host/target board local-remote-host-native.
+
+Approved-By: Tom Tromey <tom@tromey.com>
+
+diff --git a/gdb/testsuite/gdb.base/fileio.c b/gdb/testsuite/gdb.base/fileio.c
+--- a/gdb/testsuite/gdb.base/fileio.c
++++ b/gdb/testsuite/gdb.base/fileio.c
+@@ -73,10 +73,6 @@ static const char *strerrno (int err);
+ 
+ #define STRING      "Hello World"
+ 
+-#define STRINGIFY(s) STRINGIFY_(s)
+-#define STRINGIFY_(s) #s
+-#define OUTDIR STRINGIFY (OUTDIR_)
+-
+ static void stop (void) {}
+ 
+ /* A NULL string.  We pass this to stat below instead of a NULL
+diff --git a/gdb/testsuite/gdb.base/fileio.exp b/gdb/testsuite/gdb.base/fileio.exp
+--- a/gdb/testsuite/gdb.base/fileio.exp
++++ b/gdb/testsuite/gdb.base/fileio.exp
+@@ -27,7 +27,7 @@ if {[is_remote host]} {
+ 
+ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" \
+ 	   executable \
+-	   [list debug additional_flags=[quote_for_host -DOUTDIR_=$outdir/]]] != "" } {
++	   [list debug additional_flags=[quote_for_host -DOUTDIR=\"$outdir/\"]]] != "" } {
+     untested "failed to compile"
+     return -1
+ }
+diff --git a/gdb/testsuite/lib/gdb.exp b/gdb/testsuite/lib/gdb.exp
+--- a/gdb/testsuite/lib/gdb.exp
++++ b/gdb/testsuite/lib/gdb.exp
+@@ -6150,9 +6150,9 @@ proc escape_for_host { str } {
+ proc quote_for_host { args } {
+     set str [join $args]
+     if { [is_remote host] } {
+-	set str [join [list {\"} $str {\"}] ""]
++	set str [join [list {\"} [regsub -all {"} $str {\\\"}] {\"}] ""]
+     } else {
+-	set str [join [list {"} $str {"}] ""]
++	set str [join [list {"} [regsub -all {"} $str {\"}] {"}] ""]
+     }
+     return $str
+ }

@@ -4,7 +4,7 @@
        <a class="link" href="https://www.fsf.org" target="_top">FSF
        </a>
      </p><p>
-+      Release 15.2.1
++      Release 15.3.1
 +    </p><p>
        Permission is granted to copy, distribute and/or modify this
        document under the terms of the GNU Free Documentation
@@ -17,7 +17,7 @@
  </p><p>
 -  The API documentation, rendered into HTML, can be viewed online
 +  The API documentation, rendered into HTML, can be viewed locally
-+  <a class="link" href="api/index.html" target="_top">for the 15.2.1 release</a>,
++  <a class="link" href="api/index.html" target="_top">for the 15.3.1 release</a>,
 +  online
    <a class="link" href="https://gcc.gnu.org/onlinedocs/" target="_top">for each GCC release</a>
    and

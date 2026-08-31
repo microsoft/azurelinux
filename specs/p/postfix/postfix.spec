@@ -59,8 +59,8 @@
 
 Name: postfix
 Summary: Postfix Mail Transport Agent
-Version: 3.10.3
-Release: 6%{?dist}
+Version: 3.10.13
+Release: 1%{?dist}
 Epoch: 2
 URL: http://www.postfix.org
 License: (IPL-1.0 OR EPL-2.0) AND GPL-2.0-or-later AND BSD-4-Clause-UC
@@ -99,16 +99,15 @@ Source101: postfix-pam.conf
 
 # Patches
 
-Patch1: postfix-3.10.3-config.patch
+Patch1: postfix-3.10.5-config.patch
 Patch2: postfix-3.9.0-files.patch
 Patch3: postfix-3.9.0-alternatives.patch
 # probably rhbz#428996
-Patch4: postfix-3.8.0-large-fs.patch
+Patch4: postfix-3.10.10-large-fs.patch
+Patch5: postfix-3.10.13-linux-7-fix.patch
 # rhbz#1931403, sent upstream
 Patch9: pflogsumm-1.1.6-syslog-name-underscore-fix.patch
 Patch11: postfix-3.4.4-chroot-example-fix.patch
-# https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
-Patch14: postfix-3.9.0-openssl-no-engine.patch
 
 # Optional patches - set the appropriate environment variables to include
 #                    them when building the package/spec file
@@ -265,6 +264,7 @@ maps with Postfix, you need this.
 %patch -P2 -p1 -b .files
 %patch -P3 -p1 -b .alternatives
 %patch -P4 -p1 -b .large-fs
+%patch -P5 -p1 -b .linux-7-fix
 
 # Change DEF_SHLIB_DIR according to build host
 sed -i \
@@ -278,11 +278,6 @@ pushd pflogsumm-%{pflogsumm_ver}
 popd
 %endif
 %patch -P11 -p1 -b .chroot-example-fix
-%patch -P14 -p1 -b .openssl-no-engine
-
-# Backport 3.8-20221006 fix for uname -r detection
-sed -i makedefs -e '\@Linux\.@s|345|3456|'
-sed -i src/util/sys_defs.h -e 's@defined(LINUX5)@defined(LINUX5) || defined(LINUX6)@'
 
 for f in README_FILES/TLS_{LEGACY_,}README TLS_ACKNOWLEDGEMENTS; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -852,6 +847,14 @@ fi
 %endif
 
 %changelog
+* Mon Aug 17 2026 Jaroslav Škarvada <jskarvad@redhat.com> - 2:3.10.13-1
+- New version
+  Resolves: rhbz#2513537
+
+* Mon May 18 2026 Jaroslav Škarvada <jskarvad@redhat.com> - 2:3.10.10-1
+- New version
+  Resolves: CVE-2026-43964
+
 * Wed Aug 06 2025 František Zatloukal <fzatlouk@redhat.com> - 2:3.10.3-3
 - Rebuilt for icu 77.1
 

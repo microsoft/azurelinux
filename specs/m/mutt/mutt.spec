@@ -22,8 +22,8 @@
 
 Summary: A text mode mail user agent
 Name: mutt
-Version: 2.3.0
-Release: 4%{?dist}
+Version: 2.4.0
+Release: 1%{?dist}
 Epoch: 5
 # The entire source code is GPLv2+ except
 # pgpewrap.c setenv.c sha1.c wcwidth.c which are Public Domain
@@ -33,8 +33,6 @@ Source: http://ftp.mutt.org/pub/%{name}/%{name}-%{version}.tar.gz
 Source1: mutt_ldap_query
 Patch1: mutt-1.10.0-muttrc.patch
 Patch2: mutt-1.8.0-cabundle.patch
-# https://dev.mutt.org/trac/ticket/3569
-Patch3: mutt-1.7.0-syncdebug.patch
 # FIXME make it to upstream
 Patch8: mutt-1.5.23-system_certs.patch
 Patch9: mutt-1.9.0-ssl_ciphers.patch
@@ -92,7 +90,6 @@ for selecting groups of messages.
 autoreconf -fiv
 %patch -P1 -p1 -b .muttrc
 %patch -P2 -p1 -b .cabundle
-%patch -P3 -p1 -b .syncdebug
 %patch -P8 -p1 -b .system_certs
 %patch -P9 -p1 -b .ssl_ciphers
 %patch -P13 -p1 -b .optusegpgagent
@@ -220,6 +217,15 @@ ln -sf ./muttrc.5 %{buildroot}%{_mandir}/man5/muttrc.local.5
 
 
 %changelog
+* Sun Jun 28 2026 Michal Hlavinka <mhlavink@redhat.com> - 5:2.4.0-1
+- updated to 2.4.0 (#2488254)
+
+* Tue May 26 2026 Michal Hlavinka <mhlavink@redhat.com> - 5:2.3.2-1
+- updated to 2.3.2 (#2461889)
+
+* Sun Mar 22 2026 Michal Hlavinka <mhlavink@redhat.com> - 5:2.3.1-1
+- updated to 2.3.1 (#2449477)
+
 * Sun Feb 08 2026 Michal Hlavinka <mhlavink@redhat.com> - 5:2.3.0-1
 - updated to 2.3.0 (#2432625)
 

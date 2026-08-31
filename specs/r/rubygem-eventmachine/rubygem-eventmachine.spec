@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.2.7
-Release: 33%{?dist}
+Release: 30%{?dist}
 Summary: Ruby/EventMachine library
 # Automatically converted from old format: GPLv2 or Ruby - review is highly recommended.
 License: GPL-2.0-only OR Ruby

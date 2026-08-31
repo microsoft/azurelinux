@@ -5,8 +5,8 @@
 %global debug_package %{nil}
 
 Name:           wayland-protocols
-Version:        1.47
-Release: 5%{?dist}
+Version:        1.49
+Release:        1%{?dist}
 Summary:        Wayland protocols that adds functionality not available in the core protocol
 
 License:        MIT
@@ -16,7 +16,7 @@ Source0:        https://gitlab.freedesktop.org/wayland/%{name}/-/releases/%{vers
 BuildRequires:  gcc
 BuildRequires:  gcc-g++
 BuildRequires:  meson
-BuildRequires:  wayland-devel
+BuildRequires:  wayland-devel >= 1.25.0
 
 %description
 wayland-protocols contains Wayland protocols that adds functionality not
@@ -55,6 +55,12 @@ wayland-protocols.
 %{_includedir}/%{name}/
 
 %changelog
+* Sun Jun 07 2026 Neal Gompa <ngompa@fedoraproject.org> - 1.49-1
+- Update to 1.49
+
+* Wed Apr 01 2026 Neal Gompa <ngompa@fedoraproject.org> - 1.48-1
+- Update to 1.48
+
 * Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.47-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

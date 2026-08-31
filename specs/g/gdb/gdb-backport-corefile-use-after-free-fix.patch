@@ -1,0 +1,77 @@
+From FEDORA_PATCHES Mon Sep 17 00:00:00 2001
+From: Lancelot SIX <lancelot.six@amd.com>
+Date: Mon, 13 Oct 2025 15:11:09 +0100
+Subject: gdb-backport-corefile-use-after-free-fix.patch
+
+;; Backport of upstream commit 93f536d813c41527e8c939a5f8a90a4 to fix
+;; RHBZ2498034.
+
+gdb/corelow: Fix use-after-free in gdb_read_core_file_mappings
+
+A recent refactor (fc8e5a565b3 -- gdb: make structured core file
+mappings processing global) in gdb/corelow.c:gdb_read_core_file_mappings
+introduced a use-after-free bug detected by address sanitizer.
+
+In this change, a cache is built which holds addresses to elements of a
+std::vector.  However, as elements as inserted in the vector, the
+addresses in the cache should be invalidated, but are not, leading to
+the use-after-free issue.
+
+This patch proposes to store the index in the vector in the cache
+instead of the address of the element, solving the invalidation issue.
+An alternative approach could be to use a std::list which does not need
+invalidation of addresses/references/iterators as the container is
+grown.
+
+Change-Id: Ib57d87c5d0405ffa3b7d38557fb33f7283c5d063
+Approved-By: Andrew Burgess <aburgess@redhat.com>
+
+diff --git a/gdb/corelow.c b/gdb/corelow.c
+--- a/gdb/corelow.c
++++ b/gdb/corelow.c
+@@ -2090,19 +2090,20 @@ gdb_read_core_file_mappings (struct gdbarch *gdbarch, struct bfd *cbfd)
+   /* A map entry used while building RESULTS.  */
+   struct map_entry
+   {
+-    explicit map_entry (core_mapped_file *ptr)
+-      : file_data (ptr)
++    explicit map_entry (size_t idx)
++      : file_data_index (idx),
++	ignore_build_id_p (false)
+     { /* Nothing.  */ }
+ 
+     /* Points to an entry in RESULTS, this allows entries to be quickly
+        looked up and updated as new mappings are read.  */
+-    core_mapped_file *file_data = nullptr;
++    size_t file_data_index;
+ 
+     /* If true then we have seen multiple different build-ids associated
+        with the filename of FILE_DATA.  The FILE_DATA->build_id field will
+        have been set to nullptr, and we should not set FILE_DATA->build_id
+        in future.  */
+-    bool ignore_build_id_p = false;
++    bool ignore_build_id_p;
+   };
+ 
+   /* All files mapped into the core file.  The key is the filename.  */
+@@ -2141,8 +2142,9 @@ gdb_read_core_file_mappings (struct gdbarch *gdbarch, struct bfd *cbfd)
+ 	    results.emplace_back ();
+ 
+ 	    /* The entry to be added to the lookup map.  */
+-	    map_entry entry (&results.back ());
+-	    entry.file_data->filename = filename;
++	    map_entry entry (std::distance (&results.front (),
++					    &results.back ()));
++	    results[entry.file_data_index].filename = filename;
+ 
+ 	    /* Add entry to the quick lookup map and update ITER.  */
+ 	    auto inserted_result
+@@ -2151,7 +2153,7 @@ gdb_read_core_file_mappings (struct gdbarch *gdbarch, struct bfd *cbfd)
+ 	    iter = inserted_result.first;
+ 	  }
+ 
+-	core_mapped_file &file_data = *iter->second.file_data;
++	core_mapped_file &file_data = results[iter->second.file_data_index];
+ 	bool &ignore_build_id_p = iter->second.ignore_build_id_p;
+ 
+ 	file_data.regions.emplace_back (start, end, file_ofs);

@@ -3,7 +3,7 @@
 
 Name:           jackson-bom
 Version:        2.18.2
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        Bill of materials POM for Jackson projects
 License:        Apache-2.0
 

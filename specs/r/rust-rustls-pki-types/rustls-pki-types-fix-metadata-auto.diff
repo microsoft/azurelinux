@@ -1,5 +1,5 @@
---- rustls-pki-types-1.14.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ rustls-pki-types-1.14.0/Cargo.toml	2026-01-16T20:39:30.927279+00:00
+--- rustls-pki-types-1.15.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ rustls-pki-types-1.15.0/Cargo.toml	2026-06-30T16:22:07.293733+00:00
 @@ -54,17 +54,13 @@
  alloc = ["dep:zeroize"]
  default = ["alloc"]

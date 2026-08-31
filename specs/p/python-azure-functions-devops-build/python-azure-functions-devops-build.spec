@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        0.0.22
-Release: 21%{?dist}
+Release:        18%{?dist}
 Summary:        Python package for integrating Azure Functions with Azure DevOps
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/

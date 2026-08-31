@@ -1,0 +1,184 @@
+From 8871da6e5c6b7d5f72ea1567d80bb4328ef83e9a Mon Sep 17 00:00:00 2001
+From: Dustin Kadrmas <dust.in.space217@gmail.com>
+Date: Thu, 16 Jul 2026 12:07:43 -0700
+Subject: [PATCH] VirtualTerminal: bound the VT-switch wait instead of seizing
+ the VT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Taking over the outgoing VT's VT_PROCESS registration on every switch
+(eb3be406) made the helper acknowledge the VT release before logind had
+paused the outgoing session's devices — revoking input and dropping DRM
+master. logind's own release handler (session_leave_vt) pauses those
+devices *before* acknowledging, in that order; seizing the registration
+replaced that with a bare acknowledgement, so on a normal logout or user
+switch the incoming greeter's compositor found the DRM device still busy
+and gave up on a text console. This is the Plasma 6.7.3 regression Fedora
+reproduced in openQA, cleared by reverting eb3be406.
+
+Wait for the switch to complete instead. A healthy owner acknowledges
+within milliseconds; the case the original fix targeted — an owner still
+registered as VT_PROCESS that never acknowledges (a zombie, stopped, or
+signal-ignoring process) — leaves VT_WAITACTIVE hung for ~30 seconds. A
+fully-gone owner needs no help: the kernel detects the failed signal and
+completes the switch itself.
+
+So poll the active VT for up to five seconds, and only on a real timeout
+clear the stale registration and retry once, bounded again. That
+remediation is scoped to the session-helper path (vt_auto == false),
+where the boot hang lives and which runs in a forked child; the daemon
+call sites switch automatically and their session must survive a user
+switch, so they never touch another owner's registration. Before
+clearing, revalidate that the switch is still incomplete and the VT is
+still VT_PROCESS, so a late acknowledgement is not overwritten. The
+clear matches logind's vt_restore in full — KD_TEXT and VT_AUTO — because
+a VT left in VT_AUTO while still in KD_GRAPHICS cannot be switched away
+from.
+
+This is an interim fix. The structural direction is to stop driving VT
+handoff from the login manager at all and let logind own it (!167).
+
+The signal-disposition half of eb3be406 (ignoreVtSwitches) is unchanged:
+it addresses the separate exec-window problem and does not affect
+teardown ordering.
+---
+ src/common/VirtualTerminal.cpp | 105 +++++++++++++++++++++++++++------
+ 1 file changed, 92 insertions(+), 13 deletions(-)
+
+diff --git a/src/common/VirtualTerminal.cpp b/src/common/VirtualTerminal.cpp
+index 8522128c..9d593f57 100644
+--- a/src/common/VirtualTerminal.cpp
++++ b/src/common/VirtualTerminal.cpp
+@@ -38,6 +38,15 @@ namespace VirtualTerminal
+ {
+ const char *defaultVtPath = "/dev/tty0";
+ 
++// How long to wait for a requested VT switch before concluding the outgoing
++// VT's registered owner will never acknowledge the release. A healthy owner
++// (logind) acknowledges within milliseconds; a wedged one — zombie, stopped,
++// or ignoring the signal — previously left VT_WAITACTIVE hung for ~30 seconds.
++// A fully-gone owner needs no guard: the kernel completes that switch itself.
++// Generous so a slow-but-live owner under load is not mistaken for a wedged one.
++static const int VT_SWITCH_TIMEOUT_MSEC = 5000;
++static const int VT_SWITCH_POLL_INTERVAL_MSEC = 10;
++
+ QString path(int vt)
+ {
+     return QStringLiteral("/dev/tty%1").arg(vt);
+@@ -180,6 +189,49 @@ int setUpNewVt()
+     return vt;
+ }
+ 
++// Outcome of a bounded VT-switch attempt. The three cases are kept distinct so
++// the caller only runs destructive remediation for a switch that was genuinely
++// requested but never completed — never for a request that failed outright or a
++// console whose state could not be read.
++enum class VtSwitchResult {
++    Completed, // the target VT became active within the bounded wait
++    RequestFailed, // VT_ACTIVATE errored, or the active-VT state was unreadable
++    TimedOut, // requested successfully, but never became active in time
++};
++
++// Requests a switch to vt and polls the active VT until it matches, the bounded
++// wait expires, or the state read fails. Polling replaces a blocking
++// VT_WAITACTIVE because this runs both in the helper child between fork and
++// exec and on the daemon's main thread, where the process-wide SIGALRM needed
++// to interrupt a blocking wait is not safe to install. fd may be any console fd.
++static VtSwitchResult activateVt(int fd, int vt)
++{
++    do {
++        errno = 0;
++
++        if (ioctl(fd, VT_ACTIVATE, vt) < 0 && errno != EINTR) {
++            qWarning("Couldn't initiate jump to VT %d: %s", vt, strerror(errno));
++            return VtSwitchResult::RequestFailed;
++        }
++    } while (errno == EINTR);
++
++    // Bounded by construction: at most TIMEOUT/INTERVAL iterations.
++    for (int waitedMsec = 0; waitedMsec < VT_SWITCH_TIMEOUT_MSEC; waitedMsec += VT_SWITCH_POLL_INTERVAL_MSEC) {
++        int active = getVtActive(fd);
++        if (active == vt) {
++            return VtSwitchResult::Completed;
++        }
++        // A failed state read cannot make progress and would only spam the log
++        // once per interval. Report it as a failed request, not a timeout, so no
++        // remediation runs against an unreadable console.
++        if (active < 0) {
++            return VtSwitchResult::RequestFailed;
++        }
++        usleep(VT_SWITCH_POLL_INTERVAL_MSEC * 1000);
++    }
++    return getVtActive(fd) == vt ? VtSwitchResult::Completed : VtSwitchResult::TimedOut;
++}
++
+ void jumpToVt(int vt, bool vt_auto)
+ {
+     qDebug() << "Jumping to VT" << vt;
+@@ -222,23 +274,50 @@ void jumpToVt(int vt, bool vt_auto)
+         handleVtSwitches(fd);
+     }
+ 
+-    do {
+-        errno = 0;
++    // A healthy previous owner — logind, acting for the outgoing session —
++    // acknowledges the VT release within milliseconds, and only after pausing
++    // the session's devices (DRM master dropped, input revoked). Waiting for
++    // the switch, and intervening only on a genuine timeout, preserves that
++    // ordering; taking over the outgoing VT up front (the previous approach)
++    // acknowledged the release before that cleanup ran, leaving the incoming
++    // compositor unable to acquire the DRM device (the Plasma 6.7.3 logout
++    // regression).
++    VtSwitchResult result = activateVt(fd, vt);
++    if (result == VtSwitchResult::TimedOut) {
++        qWarning("Switch to VT %d did not complete within %d ms", vt, VT_SWITCH_TIMEOUT_MSEC);
++    }
+ 
+-        if (ioctl(fd, VT_ACTIVATE, vt) < 0) {
+-            if (errno == EINTR) {
+-                continue;
++    // Remediation is scoped to the session-helper path (vt_auto == false),
++    // where the ~30s boot hang lives and which runs in a forked child. The
++    // daemon call sites pass vt_auto == true: the kernel switches those
++    // automatically, and their outgoing session must survive a user switch —
++    // its VT registration is not ours to clear.
++    if (!vt_auto && result == VtSwitchResult::TimedOut) {
++        // Only clear the outgoing VT if the switch is still incomplete AND the
++        // VT still has an owner that never released it. An owner that
++        // acknowledged after the last poll keeps its registration, so its
++        // device-release handshake is not skipped.
++        vt_mode outgoingMode{};
++        if (getVtActive(activeVtFd) != vt && ioctl(activeVtFd, VT_GETMODE, &outgoingMode) == 0 && outgoingMode.mode == VT_PROCESS) {
++            qWarning("The outgoing VT's owner never released it; clearing the stale registration and retrying");
++
++            // Match logind's vt_restore in full: a VT left in VT_AUTO while
++            // still in KD_GRAPHICS cannot be switched away from, so restore
++            // KD_TEXT as well.
++            if (ioctl(activeVtFd, KDSETMODE, KD_TEXT) < 0) {
++                qWarning("Failed to restore text mode on the outgoing VT: %s", strerror(errno));
++            }
++            vt_mode autoModeRequest{};
++            autoModeRequest.mode = VT_AUTO;
++            if (ioctl(activeVtFd, VT_SETMODE, &autoModeRequest) < 0) {
++                qWarning("Failed to clear stale VT mode: %s", strerror(errno));
+             }
+ 
+-            qWarning("Couldn't initiate jump to VT %d: %s", vt, strerror(errno));
+-            break;
+-        }
+-
+-        if (ioctl(fd, VT_WAITACTIVE, vt) < 0 && errno != EINTR) {
+-            qWarning("Couldn't finalize jump to VT %d: %s", vt, strerror(errno));
++            if (activateVt(fd, vt) != VtSwitchResult::Completed) {
++                qCritical("Switch to VT %d still incomplete after clearing the stale owner registration", vt);
++            }
+         }
+-
+-    } while (errno == EINTR);
++    }
+     close(activeVtFd);
+     if (vtFd != -1) {
+         close(vtFd);
+-- 
+GitLab

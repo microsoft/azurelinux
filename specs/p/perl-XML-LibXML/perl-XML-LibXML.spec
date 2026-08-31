@@ -10,18 +10,18 @@ Name:           perl-XML-LibXML
 # https://bugzilla.redhat.com/show_bug.cgi?id=469480
 # it might not be needed anymore
 # this module is maintained, the other is not
-Version:        2.0210
-Release: 9%{?dist}
+Version:        2.0213
+Release:        1%{?dist}
 Epoch:          1
 Summary:        Perl interface to the libxml2 library
 License:        (GPL-1.0-or-later OR Artistic-1.0-Perl) AND MIT
 URL:            https://metacpan.org/release/XML-LibXML
-Source0:        https://cpan.metacpan.org/authors/id/S/SH/SHLOMIF/XML-LibXML-%{version}.tar.gz 
+Source0:        https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-LibXML-%{version}.tar.gz
 # Fix parsing ampersand entities in SAX interface, CPAN RT#131498,
 # posted to the upstream.
 Patch0:         XML-LibXML-2.0202-Parse-an-ampersand-entity-in-SAX-interface.patch
 # To reduce dependencies replace Alien::Libxml2 with pkg-config
-Patch1:         XML-LibXML-2.0208-Use-pkgconfig-instead-of-Alien-Libxml2.patch
+Patch1:         XML-LibXML-2.0212-Use-pkgconfig-instead-of-Alien-Libxml2.patch
 BuildRequires:  coreutils
 BuildRequires:  findutils
 BuildRequires:  glibc-common
@@ -49,7 +49,6 @@ BuildRequires:  perl(overload)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Tie::Hash)
-BuildRequires:  perl(vars)
 BuildRequires:  perl(XML::NamespaceSupport)
 BuildRequires:  perl(XML::SAX::Base)
 BuildRequires:  perl(XML::SAX::DocumentLocator)
@@ -183,15 +182,22 @@ fi
 
 %files
 %license LICENSE
-%doc Changes HACKING.txt README TODO
+%doc AI_POLICY.md Changes HACKING.txt README.md
 %{perl_vendorarch}/auto/XML
-%{perl_vendorarch}/XML
-%{_mandir}/man3/*.3*
+%dir %{perl_vendorarch}/XML
+%{perl_vendorarch}/XML/LibXML*
+%{_mandir}/man3/XML::LibXML*.3*
 
 %files tests
 %{_libexecdir}/%{name}
 
 %changelog
+* Mon May 25 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1:2.0213-1
+- 2.0213 bump (rhbz#2480549)
+
+* Wed May 20 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1:2.0212-1
+- 2.0212 bump (rhbz#2480078)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0210-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

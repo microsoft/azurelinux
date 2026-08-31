@@ -5,7 +5,7 @@
 
 Name:          cogl
 Version:       1.22.8
-Release: 18%{?dist}
+Release:       15%{?dist}
 Summary:       A library for using 3D graphics hardware to draw pretty pictures
 
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.

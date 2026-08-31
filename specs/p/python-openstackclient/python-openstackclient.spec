@@ -30,7 +30,7 @@ actual REST API client actions.
 
 Name:             python-%{sname}
 Version:          7.1.2
-Release: 12%{?dist}
+Release:          9%{?dist}
 Summary:          OpenStack Command-line Client
 
 License:          Apache-2.0

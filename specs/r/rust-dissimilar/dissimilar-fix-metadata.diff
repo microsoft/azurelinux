@@ -1,0 +1,15 @@
+--- dissimilar-1.0.11/Cargo.toml	2006-07-24T01:21:28+00:00
++++ dissimilar-1.0.11/Cargo.toml	2026-03-20T11:19:51.490825+00:00
+@@ -49,12 +49,3 @@
+ [[test]]
+ name = "test"
+ path = "tests/test.rs"
+-
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+-
+-[target."cfg(not(miri))".dev-dependencies.criterion]
+-version = "0.8"
+-default-features = false

@@ -10,14 +10,20 @@
 %endif
 
 Name:    plasma-breeze
-Version: 6.6.0
-Release: 4%{?dist}
+Version: 6.7.4
+Release: 2%{?dist}
 Summary: Artwork, styles and assets for the Breeze visual style for the Plasma Desktop
 
 License: BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND MIT
 URL:     https://invent.kde.org/plasma/%{base_name}.git
 Source0: https://download.kde.org/%{stable_kf6}/plasma/%{version}/%{base_name}-%{version}.tar.xz
 Source1: https://download.kde.org/%{stable_kf6}/plasma/%{version}/%{base_name}-%{version}.tar.xz.sig
+
+# Upstream Patches
+
+# Use font metrics to only inset where the text can spare it
+# https://invent.kde.org/plasma/breeze/-/commit/a74ad95349ec913f1042f5390dbd95a8341aea06
+Patch0:         a74ad95349ec913f1042f5390dbd95a8341aea06.patch
 
 # Misc
 BuildRequires:  extra-cmake-modules
@@ -171,6 +177,48 @@ popd
 %{_kf6_datadir}/icons/breeze_cursors/index.theme
 
 %changelog
+* Sat Aug 15 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-2
+- Bump for new upstream patch
+
+* Tue Aug 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-1
+- 6.7.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Steve Cossette <farchord@gmail.com> - 6.7.3-1
+- 6.7.3
+
+* Wed Jul 01 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-1
+- 6.7.2
+
+* Tue Jun 23 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Jun 11 2026 Steve Cossette <farchord@gmail.com> - 6.7.0-1
+- 6.7.0
+
+* Fri May 29 2026 Steve Cossette <farchord@gmail.com> - 6.6.91-1
+- 6.6.91
+
+* Sat May 16 2026 Steve Cossette <farchord@gmail.com> - 6.6.90-1
+- 6.6.90
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-1
+- 6.6.5
+
+* Fri Apr 10 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-1
+- 6.6.4
+
+* Tue Mar 17 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-1
+- 6.6.3
+
+* Tue Mar 03 2026 Steve Cossette <farchord@gmail.com> - 6.6.2-1
+- 6.6.2
+
+* Tue Feb 24 2026 Steve Cossette <farchord@gmail.com> - 6.6.1-1
+- 6.6.1
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.6.0-1
 - 6.6.0
 

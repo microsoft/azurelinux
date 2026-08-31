@@ -1,0 +1,288 @@
+From b3bb94d36c1a83bff7b9fc6e7b25b1aa972f4f51 Mon Sep 17 00:00:00 2001
+From: "Bryn M. Reeves" <bmr@redhat.com>
+Date: Mon, 6 Apr 2026 00:02:26 +0100
+Subject: [PATCH 06/10] lvm2: fix pool/origin limit accounting
+
+Resolves: #974
+
+Signed-off-by: Bryn M. Reeves <bmr@redhat.com>
+---
+ snapm/manager/plugins/lvm2.py | 85 ++++++++++++++++++++++++++---------
+ tests/test_lvm2.py            | 74 +++++++++++++++++++++++++++++-
+ 2 files changed, 136 insertions(+), 23 deletions(-)
+
+diff --git a/snapm/manager/plugins/lvm2.py b/snapm/manager/plugins/lvm2.py
+index 44487f5e..ebda23cb 100644
+--- a/snapm/manager/plugins/lvm2.py
++++ b/snapm/manager/plugins/lvm2.py
+@@ -867,7 +867,7 @@ class _Lvm2(Plugin):
+         (vg_name, lv_name) = self.vg_lv_from_device_path(device)
+         return path_join(DEV_PREFIX, vg_name, lv_name)
+ 
+-    def delete_snapshot(self, name):
++    def _delete_snapshot(self, name):
+         """
+         Delete the snapshot named ``name``
+ 
+@@ -1080,36 +1080,37 @@ class Lvm2Cow(_Lvm2):
+         lvs_dict = self.get_lvs_json_report(lvs_all=True)
+         for lv_dict in lvs_dict[LVS_REPORT][0][LVS_LV]:
+             if filter_cow_snapshot(lv_dict):
++                # Initialise pool counters to 0
++                origin = lv_dict[LVS_LV_ORIGIN]
++                vg_name = lv_dict[LVS_VG_NAME]
++                self.origins[path_join(DEV_PREFIX, vg_name, origin)] = 0
+                 try:
+                     lv_name = lv_dict[LVS_LV_NAME]
+                     if lv_name.startswith(LVS_LV_HIDDEN_START):
+                         lv_name = lv_name[1:-1]
+-                    fields = parse_snapshot_name(lv_name, lv_dict[LVS_LV_ORIGIN])
++                    fields = parse_snapshot_name(lv_name, origin)
+                 except ValueError:
+                     continue
+                 if fields is not None:
+                     (snapset, timestamp, mount_point) = fields
+-                    full_name = f"{lv_dict[LVS_VG_NAME]}/{lv_name}"
++                    full_name = f"{vg_name}/{lv_name}"
+                     self._log_debug("Found %s snapshot: %s", self.name, full_name)
+                     snapshots.append(
+                         Lvm2CowSnapshot(
+                             full_name,
+                             snapset,
+-                            f"{lv_dict[LVS_LV_ORIGIN]}",
++                            f"{origin}",
+                             timestamp,
+                             mount_point,
+                             self,
+-                            f"{lv_dict[LVS_VG_NAME]}",
++                            f"{vg_name}",
+                             f"{lv_name}",
+                             lv_dict=lv_dict,
+                         )
+                     )
+ 
+         for snapshot in snapshots:
+-            if snapshot.origin not in self.origins:
+-                self.origins[snapshot.origin] = 1
+-            else:
+-                self.origins[snapshot.origin] += 1
++            self.origins[snapshot.origin] += 1
+ 
+         if self.limits.snapshots_per_origin > 0:
+             for origin, count in self.origins.items():
+@@ -1289,10 +1290,11 @@ class Lvm2Cow(_Lvm2):
+                 f"{LVCREATE_CMD} failed with: {_decode_stderr(err)}"
+             ) from err
+ 
+-        if origin not in self.origins:
+-            self.origins[origin] = 1
++        origin_path = path_join(DEV_PREFIX, origin)
++        if origin_path not in self.origins:
++            self.origins[origin_path] = 1
+         else:
+-            self.origins[origin] += 1
++            self.origins[origin_path] += 1
+ 
+         return Lvm2CowSnapshot(
+             f"{vg_name}/{snapshot_name}",
+@@ -1305,6 +1307,24 @@ class Lvm2Cow(_Lvm2):
+             snapshot_name,
+         )
+ 
++    def delete_snapshot(self, name):
++        """
++        Delete the CoW snapshot named ``name``
++
++        :param name: The name of the snapshot to be removed.
++        """
++        lvs_dict = self.get_lvs_json_report(vg_lv=name)
++        lv_dict = lvs_dict[LVS_REPORT][0][LVS_LV][0]
++        origin = path_join(DEV_PREFIX, lv_dict[LVS_VG_NAME], lv_dict[LVS_LV_ORIGIN])
++
++        self._delete_snapshot(name)
++
++        if origin in self.origins:
++            self.origins[origin] -= 1
++        else:
++            # This is harmless but indicates a bug (plugin methods called out-of-sequence).
++            self._log_warn("Deleted untracked snapshot set member: %s", name)
++
+     def check_resize_snapshot(self, name, origin, mount_point, size_policy):
+         vg_name, lv_name = vg_lv_from_origin(origin)
+         if vg_name not in self.size_map:
+@@ -1389,6 +1409,11 @@ class Lvm2Thin(_Lvm2):
+         lvs_dict = self.get_lvs_json_report(lvs_all=True)
+         for lv_dict in lvs_dict[LVS_REPORT][0][LVS_LV]:
+             if filter_thin_snapshot(lv_dict):
++                # Initialise pool counters to 0
++                vg_name = lv_dict[LVS_VG_NAME]
++                pool = lv_dict[LVS_POOL_LV]
++                pool_key = f"{vg_name}/{pool}"
++                self.pools[pool_key] = 0
+                 try:
+                     lv_name = lv_dict[LVS_LV_NAME]
+                     if lv_name.startswith(LVS_LV_HIDDEN_START):
+@@ -1397,7 +1422,7 @@ class Lvm2Thin(_Lvm2):
+                 except ValueError:
+                     continue
+                 if fields is not None:
+-                    full_name = f"{lv_dict[LVS_VG_NAME]}/{lv_name}"
++                    full_name = f"{vg_name}/{lv_name}"
+                     self._log_debug("Found %s snapshot: %s", self.name, full_name)
+                     (snapset, timestamp, mount_point) = fields
+                     snapshots.append(
+@@ -1408,17 +1433,15 @@ class Lvm2Thin(_Lvm2):
+                             timestamp,
+                             mount_point,
+                             self,
+-                            f"{lv_dict[LVS_VG_NAME]}",
++                            f"{vg_name}",
+                             f"{lv_name}",
+                             lv_dict=lv_dict,
+                         )
+                     )
+ 
+         for snapshot in snapshots:
+-            if snapshot.pool not in self.pools:
+-                self.pools[snapshot.pool] = 1
+-            else:
+-                self.pools[snapshot.pool] += 1
++            pool_key = f"{snapshot.vg_name}/{snapshot.pool}"
++            self.pools[pool_key] += 1
+ 
+         if self.limits.snapshots_per_pool > 0:
+             for pool, count in self.pools.items():
+@@ -1561,10 +1584,11 @@ class Lvm2Thin(_Lvm2):
+                 f"{LVCREATE_CMD} failed with: {_decode_stderr(err)}"
+             ) from err
+ 
+-        if pool_name not in self.pools:
+-            self.pools[pool_name] = 1
++        pool_key = f"{vg_name}/{pool_name}"
++        if pool_key not in self.pools:
++            self.pools[pool_key] = 1
+         else:
+-            self.pools[pool_name] += 1
++            self.pools[pool_key] += 1
+ 
+         return Lvm2ThinSnapshot(
+             f"{vg_name}/{snapshot_name}",
+@@ -1577,6 +1601,25 @@ class Lvm2Thin(_Lvm2):
+             snapshot_name,
+         )
+ 
++    def delete_snapshot(self, name):
++        """
++        Delete the thin snapshot named ``name``
++
++        :param name: The name of the snapshot to be removed.
++        """
++        lvs_dict = self.get_lvs_json_report(vg_lv=name)
++        lv_dict = lvs_dict[LVS_REPORT][0][LVS_LV][0]
++        vg_name = lv_dict[LVS_VG_NAME]
++        pool = lv_dict[LVS_POOL_LV]
++        self._delete_snapshot(name)
++
++        pool_key = f"{vg_name}/{pool}"
++        if pool_key in self.pools:
++            self.pools[pool_key] -= 1
++        else:
++            # This is harmless but indicates a bug (plugin methods called out-of-sequence).
++            self._log_warn("Deleted untracked snapshot set member: %s", name)
++
+     def check_resize_snapshot(self, name, origin, mount_point, size_policy):
+         vg_name, lv_name = vg_lv_from_origin(origin)
+         pool_name = self.pool_name_from_vg_lv(origin)
+diff --git a/tests/test_lvm2.py b/tests/test_lvm2.py
+index 42e4f7c1..9d763473 100644
+--- a/tests/test_lvm2.py
++++ b/tests/test_lvm2.py
+@@ -17,9 +17,12 @@ log = logging.getLogger()
+ import snapm.manager.plugins.lvm2 as lvm2
+ from snapm import SnapmCalloutError
+ 
++from tests import have_root
++from ._util import LvmLoopBacked
+ 
+-class Lvm2Tests(unittest.TestCase):
+-    """Test lvm2 plugin functions"""
++
++class Lvm2TestsSimple(unittest.TestCase):
++    """Unit test lvm2 plugin functions with mock tool output"""
+ 
+     _old_path = None
+ 
+@@ -197,3 +200,70 @@ class Lvm2Tests(unittest.TestCase):
+         snapshots = lvm2thin.discover_snapshots()
+         # FIXME: hardcoded value based on test data
+         self.assertEqual(len(snapshots), 5)
++
++
++@unittest.skipIf(not have_root(), "requires root privileges")
++class Lvm2Tests(unittest.TestCase):
++    """
++    Test command interfaces with devices
++    """
++
++    volumes = ["root"]
++    thin_volumes = ["opt"]
++
++    def setUp(self):
++        log.debug("Preparing %s", self._testMethodName)
++        def cleanup_lvm():
++            log.debug("Cleaning up LVM (%s)", self._testMethodName)
++            if hasattr(self, "_lvm"):
++                self._lvm.destroy()
++
++        self.addCleanup(cleanup_lvm)
++
++        self._lvm = LvmLoopBacked(self.volumes, thin_volumes=self.thin_volumes)
++
++    def test_lvm2cow_create_delete_origin_accounting(self):
++        # Verify that origin snapshot counters are properly updated around
++        # create/delete operations.
++
++        # Plugin setup
++        lvm2cow_plugin = lvm2.Lvm2Cow(log, ConfigParser())
++        snapshots = lvm2cow_plugin.discover_snapshots()
++
++        # Create snapshot via Plugin.create_snapshot()
++        lvm2cow_plugin.start_transaction()
++        lvm2cow_plugin.check_create_snapshot("test_vg0/root", "test", 1721136677, "/", "1%SIZE")
++        lvm2cow_plugin.create_snapshot("test_vg0/root", "test", 1721136677, "/", "1%SIZE")
++        lvm2cow_plugin.end_transaction()
++
++        # Verify counter set to one
++        origin_count = lvm2cow_plugin.origins["/dev/test_vg0/root"]
++        self.assertEqual(origin_count, 1)
++
++        # Delete snapshot & verify decrement
++        lvm2cow_plugin.delete_snapshot("test_vg0/root-snapset_test_1721136677_-")
++        origin_count = lvm2cow_plugin.origins["/dev/test_vg0/root"]
++        self.assertEqual(origin_count, 0)
++
++    def test_lvm2thin_create_delete_pool_accounting(self):
++        # Verify that pool snapshot counters are properly updated around
++        # create/delete operations.
++
++        # Plugin setup
++        lvm2thin_plugin = lvm2.Lvm2Thin(log, ConfigParser())
++        snapshots = lvm2thin_plugin.discover_snapshots()
++
++        # Create snapshot via Plugin.create_snapshot()
++        lvm2thin_plugin.start_transaction()
++        lvm2thin_plugin.check_create_snapshot("test_vg0/opt", "test", 1721136677, "/opt", "1%SIZE")
++        lvm2thin_plugin.create_snapshot("test_vg0/opt", "test", 1721136677, "/opt", "1%SIZE")
++        lvm2thin_plugin.end_transaction()
++
++        # Verify counter incremented
++        pool0_count = lvm2thin_plugin.pools["test_vg0/pool0"]
++        self.assertEqual(pool0_count, 1)
++
++        # Delete snapshot & verify decrement
++        lvm2thin_plugin.delete_snapshot("test_vg0/opt-snapset_test_1721136677_-opt")
++        pool0_count = lvm2thin_plugin.pools["test_vg0/pool0"]
++        self.assertEqual(pool0_count, 0)
+-- 
+2.53.0
+

@@ -9,7 +9,7 @@
 
 Name: docbook5-style-xsl
 Version: 1.79.2
-Release: 27%{?dist}
+Release: 24%{?dist}
 
 Summary: Norman Walsh's XSL stylesheets for DocBook 5.X
 

@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-environment8
 #
-# SPDX-FileCopyrightText:  Copyright 2014-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2014-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -13,11 +13,8 @@
 %bcond_without       tests
 
 # Sources
-%global gh_commit    24a711b5c916efc6d6e62aa65aa2ec98fef77f68
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   environment
-%global gh_date      2025-08-12
 # Packagist
 %global pk_vendor    sebastian
 %global pk_project   %{gh_project}
@@ -28,14 +25,14 @@
 %global ns_project   Environment
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        8.0.3
-Release: 4%{?dist}
+Version:        8.1.2
+Release:        1%{?dist}
 Summary:        Handle HHVM/PHP environments, version %{major}
 
 License:        BSD-3-Clause
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # run makesrc.sh to create a git snapshot with test suite
-Source0:        %{name}-%{version}-%{gh_short}.tgz
+Source0:        %{name}-%{version}.tgz
 Source1:        makesrc.sh
 
 
@@ -46,8 +43,8 @@ BuildRequires:  php-posix
 BuildRequires:  php-fedora-autoloader-devel
 %if %{with tests}
 # from composer.json, "require-dev": {
-#        "phpunit/phpunit": "^12.0"
-BuildRequires:  phpunit12
+#        "phpunit/phpunit": "^12.5.26"
+BuildRequires:  phpunit12 >= 12.5.26
 %endif
 
 # from composer.json, "require": {
@@ -71,7 +68,7 @@ Autoloader: %{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -90,7 +87,7 @@ cp -pr src %{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}
 %if %{with tests}
 %check
 mkdir vendor
-touch vendor/autoload.php
+ln -s %{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php vendor/autoload.php
 
 : Run tests
 ret=0
@@ -113,6 +110,18 @@ exit $ret
 
 
 %changelog
+* Tue May 26 2026 Remi Collet <remi@remirepo.net> - 8.1.2-1
+- update to 8.1.2
+
+* Thu May 21 2026 Remi Collet <remi@remirepo.net> - 8.1.1-1
+- update to 8.1.1
+
+* Wed Apr 15 2026 Remi Collet <remi@remirepo.net> - 8.1.0-1
+- update to 8.1.0
+
+* Tue Mar 17 2026 Remi Collet <remi@remirepo.net> - 8.0.4-1
+- update to 8.0.4
+
 * Wed Aug 13 2025 Remi Collet <remi@remirepo.net> - 8.0.3-1
 - update to 8.0.3
 

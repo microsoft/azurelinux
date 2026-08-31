@@ -8,8 +8,8 @@
 %endif
 
 Name: libgsf
-Version: 1.14.55
-Release: 6%{?dist}
+Version: 1.14.58
+Release: 1%{?dist}
 Summary: GNOME Structured File library
 
 License: LGPL-2.1-only
@@ -176,6 +176,12 @@ find %{buildroot} -name '*.la' -delete -print
 %endif
 
 %changelog
+* Mon May 11 2026 Michael Catanzaro <mcatanzaro@gnome.org> - 1.14.58-1
+- Update to 1.14.58
+
+* Wed Mar 18 2026 Packit <hello@packit.dev> - 1.14.56-1
+- Update to version 1.14.56
+
 * Thu Jan 22 2026 Barry Dunn <badunn@redhat.com> - 1.14.55-1
 - Update to 1.14.55
 

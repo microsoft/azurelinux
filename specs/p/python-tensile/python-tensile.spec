@@ -23,7 +23,7 @@ Name:           python-tensile-devel
 Name:           python-tensile
 %endif
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Tool for creating benchmark-driven backend libraries for GEMMs
 
 URL:            https://github.com/ROCmSoftwarePlatform/Tensile

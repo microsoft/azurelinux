@@ -8,8 +8,8 @@
 
 Name:    plasma-desktop
 Summary: Plasma Desktop shell
-Version: 6.6.0
-Release: 5%{?dist}
+Version: 6.7.4
+Release: 1%{?dist}
 
 License: BSD-2-Clause AND BSD-3-Clause AND CC0-1.0 AND GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (GPL-2.0-only OR GPL-3.0-only) AND (LGPL-2.1-only OR LGPL-3.0-only)
 URL:     https://invent.kde.org/plasma/%{name}
@@ -54,6 +54,7 @@ BuildRequires:  cmake(Qt6ShaderTools)
 BuildRequires:  cmake(Qt6Core5Compat)
 BuildRequires:  cmake(Phonon4Qt6)
 BuildRequires:  wayland-protocols-devel
+BuildRequires:  google-noto-color-emoji-fonts
 
 BuildRequires:  ibus-devel
 %if 0%{?scim}
@@ -151,6 +152,8 @@ Requires:       kde-cli-tools
 
 # Qt Integration (brings in Breeze)
 Requires:       plasma-integration
+
+Requires:       font(notocoloremoji)
 
 # Install systemsettings, full set of KIO slaves and write() notifications
 Requires:       plasma-systemsettings
@@ -289,7 +292,7 @@ sed -i -e 's|^logo=.*$|logo=%{_datadir}/pixmaps/fedora_whitelogo.svg|g' %{buildr
 
 
 %check
-desktop-file-validate %{buildroot}/%{_datadir}/applications/kcm_{keyboard,access,clock,splashscreen,landingpage,keys,smserver,desktoppaths,gamecontroller,activities,recentFiles,kded,krunnersettings,plasmasearch,qtquicksettings,tablet,touchscreen,workspace,baloofile,solid_actions,mouse,touchpad}.desktop
+desktop-file-validate %{buildroot}/%{_datadir}/applications/kcm_{keyboard,access,clock,splashscreen,landingpage,keys,smserver,desktoppaths,gamecontroller,activities,recentFiles,kded,krunnersettings,plasmasearch,qtquicksettings,touchscreen,workspace,baloofile,solid_actions,mouse,touchpad,tablet}.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/kcmspellchecking.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/org.kde.knetattach.desktop
 desktop-file-validate %{buildroot}/%{_datadir}/applications/org.kde.plasma.emojier.desktop
@@ -303,7 +306,6 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kaccess.desktop
 %{_bindir}/plasma-emojier
 %{_bindir}/tastenbrett
 %{_bindir}/krunner-plugininstaller
-%{_kf6_libexecdir}/kauth/kcmdatetimehelper
 %{_libexecdir}/kimpanel-ibus-panel
 %{_libexecdir}/kimpanel-ibus-panel-launcher
 %{_kf6_qmldir}/org/kde/plasma/private
@@ -335,13 +337,11 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kaccess.desktop
 %{_kf6_datadir}/knsrcfiles/
 %{_kf6_datadir}/kcmsolidactions/
 %{_kf6_datadir}/solid/devices/*.desktop
-%{_kf6_datadir}/dbus-1/system.d/*.conf
 %{_kf6_datadir}/knotifications6/*.notifyrc
 %{_datadir}/icons/hicolor/*/*/*
 %{_kf6_metainfodir}/*.xml
 %{_datadir}/applications/*.desktop
-%{_datadir}/dbus-1/system-services/*.service
-%{_datadir}/polkit-1/actions/org.kde.kcontrol.kcmclock.policy
+%{_kf6_datadir}/kconf_update/50-krunner-activate-typing.*
 %{_sysconfdir}/xdg/autostart/*.desktop
 %{_kf6_datadir}/accounts/providers/kde/*.provider
 %{_kf6_datadir}/accounts/services/kde/*.service
@@ -371,6 +371,51 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/kaccess.desktop
 
 
 %changelog
+* Tue Aug 04 2026 Steve Cossette <farchord@gmail.com> - 6.7.4-1
+- 6.7.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Steve Cossette <farchord@gmail.com> - 6.7.3-1
+- 6.7.3
+
+* Wed Jul 01 2026 Steve Cossette <farchord@gmail.com> - 6.7.2-1
+- 6.7.2
+
+* Tue Jun 23 2026 Steve Cossette <farchord@gmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Jun 11 2026 Steve Cossette <farchord@gmail.com> - 6.7.0-1
+- 6.7.0
+
+* Fri May 29 2026 Steve Cossette <farchord@gmail.com> - 6.6.91-1
+- 6.6.91
+
+* Sat May 16 2026 Steve Cossette <farchord@gmail.com> - 6.6.90-1
+- 6.6.90
+
+* Thu May 14 2026 Steve Cossette <farchord@gmail.com> - 6.6.5-1
+- 6.6.5
+
+* Thu May 14 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-3
+- Rebuild (qt6)
+
+* Thu Apr 16 2026 Jan Grulich <jgrulich@redhat.com> - 6.6.4-2
+- Rebuild (qt6)
+
+* Fri Apr 10 2026 Steve Cossette <farchord@gmail.com> - 6.6.4-1
+- 6.6.4
+
+* Tue Mar 17 2026 Steve Cossette <farchord@gmail.com> - 6.6.3-1
+- 6.6.3
+
+* Tue Mar 03 2026 Steve Cossette <farchord@gmail.com> - 6.6.2-1
+- 6.6.2
+
+* Tue Feb 24 2026 Steve Cossette <farchord@gmail.com> - 6.6.1-1
+- 6.6.1
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.6.0-1
 - 6.6.0
 

@@ -1,27 +1,30 @@
-From 1e0b45783529828fba9ddaa6052701d05b6b3767 Mon Sep 17 00:00:00 2001
+From f5f684f1c660e4c300e0900a85bec86371c2a6e1 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
-Date: Mon, 5 Feb 2024 03:21:21 -0500
+Date: Wed, 20 May 2026 14:42:15 +0200
 Subject: [PATCH 2/2] Skip tests that require module mode
 
+Co-authored-by: Alejandro Sáez <asm@redhat.com>
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 ---
- go/analysis/internal/checker/fix_test.go     |  1 +
- go/analysis/unitchecker/separate_test.go     |  1 +
- go/callgraph/cha/cha_test.go                 |  2 ++
- go/callgraph/rta/rta_test.go                 |  1 +
- go/callgraph/static/static_test.go           | 17 +++++++++--------
- go/callgraph/vta/graph_test.go               |  2 ++
- go/callgraph/vta/vta_test.go                 |  2 ++
- go/ssa/builder_test.go                       |  2 ++
- go/types/objectpath/objectpath_go118_test.go |  2 ++
- go/types/objectpath/objectpath_test.go       |  2 ++
- internal/gocommand/invoke_test.go            |  1 +
- internal/refactor/inline/inline_test.go      |  1 +
- refactor/eg/eg_test.go                       |  1 +
- 13 files changed, 27 insertions(+), 8 deletions(-)
+ go/analysis/internal/checker/fix_test.go        |  1 +
+ go/analysis/unitchecker/separate_test.go        |  1 +
+ go/callgraph/cha/cha_test.go                    |  2 ++
+ go/callgraph/rta/rta_test.go                    |  1 +
+ go/callgraph/static/static_test.go              | 17 +++++++++--------
+ go/callgraph/vta/graph_test.go                  |  2 ++
+ go/callgraph/vta/propagation_test.go            |  2 ++
+ go/callgraph/vta/vta_test.go                    |  2 ++
+ go/ssa/builder_test.go                          |  2 ++
+ go/types/objectpath/objectpath_go118_test.go    |  2 ++
+ go/types/objectpath/objectpath_test.go          |  3 +++
+ internal/gocommand/invoke_test.go               |  1 +
+ internal/refactor/inline/inline_test.go         |  1 +
+ .../typesinternal/typeindex/typeindex_test.go   |  1 +
+ refactor/eg/eg_test.go                          |  1 +
+ 15 files changed, 31 insertions(+), 8 deletions(-)
 
 diff --git a/go/analysis/internal/checker/fix_test.go b/go/analysis/internal/checker/fix_test.go
-index d144de402..0bdeaee33 100644
+index 984a41066..98fc05c1a 100644
 --- a/go/analysis/internal/checker/fix_test.go
 +++ b/go/analysis/internal/checker/fix_test.go
 @@ -198,6 +198,7 @@ func TestReportInvalidDiagnostic(t *testing.T) {
@@ -33,10 +36,10 @@ index d144de402..0bdeaee33 100644
  	txtfiles, err := filepath.Glob("testdata/*.txt")
  	if err != nil {
 diff --git a/go/analysis/unitchecker/separate_test.go b/go/analysis/unitchecker/separate_test.go
-index 219815436..16fb15639 100644
+index d65a989f0..0d687e5cd 100644
 --- a/go/analysis/unitchecker/separate_test.go
 +++ b/go/analysis/unitchecker/separate_test.go
-@@ -56,6 +56,7 @@ import (
+@@ -57,6 +57,7 @@ import (
  // which requires a testing.T.
  func TestExampleSeparateAnalysis(t *testing.T) {
  	testenv.NeedsGoPackages(t)
@@ -65,7 +68,7 @@ index 922541d6c..b59b9a7b3 100644
  	// Each of these methods should only be callable by functions in their
  	// own package, because they are unexported.
 diff --git a/go/callgraph/rta/rta_test.go b/go/callgraph/rta/rta_test.go
-index 8cfc73ee4..9811ca369 100644
+index 7b273cc12..0b4f4bc62 100644
 --- a/go/callgraph/rta/rta_test.go
 +++ b/go/callgraph/rta/rta_test.go
 @@ -29,6 +29,7 @@ import (
@@ -124,11 +127,31 @@ index 725749ea6..8aa6af65f 100644
  	for _, file := range []string{
  		"testdata/src/store.go",
  		"testdata/src/phi.go",
+diff --git a/go/callgraph/vta/propagation_test.go b/go/callgraph/vta/propagation_test.go
+index 7471d5668..277236db9 100644
+--- a/go/callgraph/vta/propagation_test.go
++++ b/go/callgraph/vta/propagation_test.go
+@@ -265,6 +265,7 @@ func F4()
+ }
+ 
+ func TestSCC(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	suite := testSuite(t)
+ 	for _, test := range []struct {
+ 		name  string
+@@ -299,6 +300,7 @@ func TestSCC(t *testing.T) {
+ }
+ 
+ func TestPropagation(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	suite := testSuite(t)
+ 	var canon typeutil.Map
+ 	for _, test := range []struct {
 diff --git a/go/callgraph/vta/vta_test.go b/go/callgraph/vta/vta_test.go
-index 42610abb1..ea90a4b3a 100644
+index 3c9979732..eb222cab7 100644
 --- a/go/callgraph/vta/vta_test.go
 +++ b/go/callgraph/vta/vta_test.go
-@@ -146,6 +146,7 @@ func TestVTAPanicMissingDefinitions(t *testing.T) {
+@@ -144,6 +144,7 @@ func TestVTAPanicMissingDefinitions(t *testing.T) {
  }
  
  func TestVTACallGraphGenerics(t *testing.T) {
@@ -136,7 +159,7 @@ index 42610abb1..ea90a4b3a 100644
  	// TODO(zpavlinovic): add more tests
  	files := []string{
  		"testdata/src/arrays_generics.go",
-@@ -173,6 +174,7 @@ func TestVTACallGraphGenerics(t *testing.T) {
+@@ -171,6 +172,7 @@ func TestVTACallGraphGenerics(t *testing.T) {
  }
  
  func TestVTACallGraphGo117(t *testing.T) {
@@ -145,7 +168,7 @@ index 42610abb1..ea90a4b3a 100644
  	prog, want, err := testProg(t, file, ssa.BuilderMode(0))
  	if err != nil {
 diff --git a/go/ssa/builder_test.go b/go/ssa/builder_test.go
-index 2472b3eb1..ca763749a 100644
+index adb04cde7..e5b2621b3 100644
 --- a/go/ssa/builder_test.go
 +++ b/go/ssa/builder_test.go
 @@ -38,6 +38,7 @@ func isEmpty(f *ssa.Function) bool { return f.Blocks == nil }
@@ -165,7 +188,7 @@ index 2472b3eb1..ca763749a 100644
  	fs := openTxtar(t, filepath.Join(analysistest.TestData(), "indirect.txtar"))
  	pkgs := loadPackages(t, fs, "testdata/a")
 diff --git a/go/types/objectpath/objectpath_go118_test.go b/go/types/objectpath/objectpath_go118_test.go
-index 0eb2f024f..c2355d5f9 100644
+index 98f1fb5d7..7cf6f03dd 100644
 --- a/go/types/objectpath/objectpath_go118_test.go
 +++ b/go/types/objectpath/objectpath_go118_test.go
 @@ -13,6 +13,7 @@ import (
@@ -185,25 +208,33 @@ index 0eb2f024f..c2355d5f9 100644
  -- go.mod --
  module x.io
 diff --git a/go/types/objectpath/objectpath_test.go b/go/types/objectpath/objectpath_test.go
-index 642d6da49..7712d23a5 100644
+index b1a55f80f..a8e97999b 100644
 --- a/go/types/objectpath/objectpath_test.go
 +++ b/go/types/objectpath/objectpath_test.go
-@@ -26,6 +26,7 @@ import (
+@@ -25,6 +25,7 @@ import (
  )
  
  func TestPaths(t *testing.T) {
 +	t.Skip("Needs GO111MODULE=on")
- 	for _, aliases := range []int{0, 1} {
- 		t.Run(fmt.Sprint(aliases), func(t *testing.T) {
- 			testPaths(t, aliases)
-@@ -385,6 +386,7 @@ func objectString(obj types.Object) string {
- // names but in a different source order and checks that objectpath is the
- // same for methods with the same name.
- func TestOrdering(t *testing.T) {
-+	t.Skip("Needs GO111MODULE=on")
  	const src = `
  -- go.mod --
  module x.io
+@@ -395,6 +396,7 @@ func objectString(obj types.Object) string {
+ // See golang/go#78495.
+ func TestOrdering(t *testing.T) {
+ 	testenv.NeedsGoPackages(t)
++	t.Skip("Needs GO111MODULE=on")
+ 
+ 	const src = `-- go.mod --
+ module x.io
+@@ -483,6 +485,7 @@ func (T) N() { }
+ }
+ 
+ func TestIssue70418(t *testing.T) {
++	t.Skip("Needs GO111MODULE=on")
+ 	// This cyclic structure exhibited a bug (go.dev/issues/70418)
+ 	// with the seenMethods map that causes a lot of gopls crashes.
+ 	// objectpath would inspect the methods of I:
 diff --git a/internal/gocommand/invoke_test.go b/internal/gocommand/invoke_test.go
 index cc8cc9c6f..5f3ccecca 100644
 --- a/internal/gocommand/invoke_test.go
@@ -217,10 +248,10 @@ index cc8cc9c6f..5f3ccecca 100644
  
  	dir := t.TempDir()
 diff --git a/internal/refactor/inline/inline_test.go b/internal/refactor/inline/inline_test.go
-index 6a2a8b1d6..1623029bf 100644
+index 0a1129a5a..98fcab5e4 100644
 --- a/internal/refactor/inline/inline_test.go
 +++ b/internal/refactor/inline/inline_test.go
-@@ -58,6 +58,7 @@ import (
+@@ -60,6 +60,7 @@ import (
  // is a regular expression that must match the text of resulting error.
  func TestData(t *testing.T) {
  	testenv.NeedsGoPackages(t)
@@ -228,6 +259,18 @@ index 6a2a8b1d6..1623029bf 100644
  
  	files, err := filepath.Glob("testdata/*.txtar")
  	if err != nil {
+diff --git a/internal/typesinternal/typeindex/typeindex_test.go b/internal/typesinternal/typeindex/typeindex_test.go
+index b562782db..826bcda0d 100644
+--- a/internal/typesinternal/typeindex/typeindex_test.go
++++ b/internal/typesinternal/typeindex/typeindex_test.go
+@@ -261,6 +261,7 @@ func (n Named[_]) _() { n.g() }`,
+ 
+ func TestCalls(t *testing.T) {
+ 	testenv.NeedsGoPackages(t)
++	t.Skip("Needs GO111MODULE=on")
+ 	const file = `-- go.mod --
+ module foo
+ 
 diff --git a/refactor/eg/eg_test.go b/refactor/eg/eg_test.go
 index 4dc24f533..e819d4d61 100644
 --- a/refactor/eg/eg_test.go
@@ -241,5 +284,5 @@ index 4dc24f533..e819d4d61 100644
  
  	switch runtime.GOOS {
 -- 
-2.50.0
+2.54.0
 

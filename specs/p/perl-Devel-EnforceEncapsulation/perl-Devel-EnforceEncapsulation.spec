@@ -3,7 +3,7 @@
 
 Name:		perl-Devel-EnforceEncapsulation
 Version:	0.51
-Release: 36%{?dist}
+Release:	33%{?dist}
 Summary:	Find access violations to blessed objects
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Devel-EnforceEncapsulation

@@ -1,0 +1,53 @@
+From 243230c17a52f84457121c7339f4d31bb00f1a30 Mon Sep 17 00:00:00 2001
+From: Fabio Valentini <decathorpe@gmail.com>
+Date: Thu, 18 Jun 2026 19:45:23 +0200
+Subject: [PATCH] Adapt tests for relativeworktrees extension added in libgit2
+ v1.9.4
+
+---
+ tests/add_extensions.rs    | 2 ++
+ tests/get_extensions.rs    | 2 ++
+ tests/remove_extensions.rs | 1 +
+ 3 files changed, 5 insertions(+)
+
+diff --git a/tests/add_extensions.rs b/tests/add_extensions.rs
+index 3cafa60..bf14a25 100644
+--- a/tests/add_extensions.rs
++++ b/tests/add_extensions.rs
+@@ -22,6 +22,8 @@ fn test_add_extensions() -> Result<(), Error> {
+             Some("objectformat"),
+             // The preciousobjects extension was added in 1.9
+             Some("preciousobjects"),
++            // The relativeworktrees extension was added in 1.9.4
++            Some("relativeworktrees"),
+             // The worktreeconfig extension was added in 1.8
+             Some("worktreeconfig")
+         ]
+diff --git a/tests/get_extensions.rs b/tests/get_extensions.rs
+index db8e456..731d987 100644
+--- a/tests/get_extensions.rs
++++ b/tests/get_extensions.rs
+@@ -17,6 +17,8 @@ fn test_get_extensions() -> Result<(), Error> {
+             Some("objectformat"),
+             // The preciousobjects extension was added in 1.9
+             Some("preciousobjects"),
++            // The relativeworktrees extension was added in 1.9.4
++            Some("relativeworktrees"),
+             // The worktreeconfig extension was added in 1.8
+             Some("worktreeconfig")
+         ]
+diff --git a/tests/remove_extensions.rs b/tests/remove_extensions.rs
+index 5a3e21d..422cdf6 100644
+--- a/tests/remove_extensions.rs
++++ b/tests/remove_extensions.rs
+@@ -12,6 +12,7 @@ fn test_remove_extensions() -> Result<(), Error> {
+             "!noop",
+             "!objectformat",
+             "!preciousobjects",
++            "!relativeworktrees",
+             "!worktreeconfig",
+             "other",
+         ])?;
+-- 
+2.54.0
+

@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0.3
-Release: 23%{?dist}
+Release:        20%{?dist}
 Summary:        Sphinx eager ".. only::" directive and other selective rendition extensions
 
 # Automatically converted from old format: BSD - review is highly recommended.

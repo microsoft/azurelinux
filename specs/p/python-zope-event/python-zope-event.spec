@@ -12,7 +12,7 @@
 
 Name:           python-zope-event
 Version:        5.1
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        Zope Event Publication
 License:        ZPL-2.1
 URL:            https://pypi.python.org/pypi/zope.event/

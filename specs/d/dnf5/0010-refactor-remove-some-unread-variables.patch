@@ -1,0 +1,41 @@
+From ba78d365f0b3822b1506946ca94be565a8ea2c94 Mon Sep 17 00:00:00 2001
+From: vil02 <65706193+vil02@users.noreply.github.com>
+Date: Fri, 10 Apr 2026 19:11:12 +0200
+Subject: [PATCH] refactor: remove some unread variables
+
+---
+ dnf5daemon-server/utils.cpp     | 3 +--
+ libdnf5-plugins/local/local.cpp | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/dnf5daemon-server/utils.cpp b/dnf5daemon-server/utils.cpp
+index ba6f96bc..d89ab46f 100644
+--- a/dnf5daemon-server/utils.cpp
++++ b/dnf5daemon-server/utils.cpp
+@@ -40,10 +40,9 @@ bool write_to_fd(const std::string & message, int out_fd, std::string & error_ms
+     ssize_t total_bytes_written = 0;
+     size_t bytes_remaining = message.size();
+ 
+-    int ready = -1;
+     bool success = true;
+     while (bytes_remaining > 0 && success) {
+-        ready = poll(pfds.data(), pfds.size(), timeout);
++        const int ready = poll(pfds.data(), pfds.size(), timeout);
+         switch (ready) {
+             case -1:
+                 // poll call failed
+diff --git a/libdnf5-plugins/local/local.cpp b/libdnf5-plugins/local/local.cpp
+index 7d0ec863..ab7b46fa 100644
+--- a/libdnf5-plugins/local/local.cpp
++++ b/libdnf5-plugins/local/local.cpp
+@@ -87,7 +87,6 @@ public:
+     void post_transaction(const libdnf5::base::Transaction & transaction) override {
+         std::filesystem::create_directories(repodir);
+ 
+-        std::vector<libdnf5::base::TransactionPackage> trans_packages = transaction.get_transaction_packages();
+         bool need_rebuild = false;
+         for (auto & tspkg : transaction.get_transaction_packages()) {
+             if (transaction_item_action_is_inbound(tspkg.get_action())) {
+-- 
+2.53.0
+

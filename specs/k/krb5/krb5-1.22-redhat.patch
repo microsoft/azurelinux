@@ -1,7 +1,7 @@
-From 86bf542577d4ea8829d2932d4046cc504c3abbfb Mon Sep 17 00:00:00 2001
+From d7d716f3270235529995e0d28b8d6c89f4171045 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Fri, 9 Nov 2018 15:12:21 -0500
-Subject: [PATCH 01/18] FIPS: Add support for PRNG, RADIUS (krad), and crypto
+Subject: [PATCH 01/25] FIPS: Add support for PRNG, RADIUS (krad), and crypto
  providers
 
 In FIPS mode:
@@ -656,13 +656,13 @@ index 1a772d450f..32baaecbb8 100644
      vt->name = "spake";
      vt->pa_type_list = pa_types;
 -- 
-2.51.1
+2.53.0
 
 
-From c889d6d7fb14334ff6db9d4534cdfe0f6be7397f Mon Sep 17 00:00:00 2001
+From 1a4d6a7393887bf5372674942eea53030de0fed9 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 5 May 2022 17:15:12 +0200
-Subject: [PATCH 02/18] FIPS: Allow krad UDP/TCP localhost connection
+Subject: [PATCH 02/25] FIPS: Allow krad UDP/TCP localhost connection
 
 libkrad allows to establish connections only to UNIX socket in FIPS
 mode, because MD5 digest is not considered safe enough to be used for
@@ -740,13 +740,13 @@ index 891404d5b7..7654bab21b 100644
          retval = ESOCKTNOSUPPORT;
          goto error;
 -- 
-2.51.1
+2.53.0
 
 
-From 8a1d38c9fa0d072619f5c7db09827b99e5a5e185 Mon Sep 17 00:00:00 2001
+From 9b5aa1ecb9b49d684534bffbad39f08358f797e3 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Tue, 23 May 2023 12:19:54 +0200
-Subject: [PATCH 03/18] FIPS: Make PKINIT CMS SHA-1 signature verification
+Subject: [PATCH 03/25] FIPS: Make PKINIT CMS SHA-1 signature verification
  available
 
 We recommend using the SHA1 crypto-module in order to allow the
@@ -786,13 +786,13 @@ index f222dbdf92..1d99559485 100644
          goto cleanup;
      }
 -- 
-2.51.1
+2.53.0
 
 
-From f263a0efed9f7374ad3390db586efac6732f46cf Mon Sep 17 00:00:00 2001
+From c082c835672d41b9a68d1d3195fe0c44cb689fd7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 19 Jan 2023 19:22:27 +0100
-Subject: [PATCH 04/18] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
+Subject: [PATCH 04/25] FIPS: Allow KRB5KDF, MD5, MD4 and HMAC-MD4/5
 
 OpenSSL's restrictions to use KRB5KDF, MD5, and MD4 in FIPS mode are
 bypassed in case AES SHA-1 HMAC or RC4 encryption types are allowed by
@@ -1218,13 +1218,13 @@ index 7654bab21b..96da3c451d 100644
  static bool is_inet_localhost(struct addrinfo *info)
  {
 -- 
-2.51.1
+2.53.0
 
 
-From 2ba6b85c0957998d52a4e5868de62b2a86e6c8be Mon Sep 17 00:00:00 2001
+From c64ff3431496d96f30ac1303be3a5aedf518cab1 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 26 Mar 2019 18:51:10 -0400
-Subject: [PATCH 05/18] 3DES: Remove support
+Subject: [PATCH 05/25] 3DES: Remove support
 
 Completely remove support for all DES3 enctypes (des3-cbc-raw,
 des3-hmac-sha1, des3-cbc-sha1-kd).  Update all tests and documentation
@@ -7498,13 +7498,13 @@ index 1aebdd0b4a..c38eefd2bd 100644
       <td>The AES Advanced Encryption Standard
  family, like 3DES, is a symmetric block cipher and was designed
 -- 
-2.51.1
+2.53.0
 
 
-From 7be0d2df84b0c3864383c913c9dc3a4073f22a1f Mon Sep 17 00:00:00 2001
+From f6b425e86cec7feb91d62a9d312f2660f06ac2ac Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:29:58 -0400
-Subject: [PATCH 06/18] PAM: Add integration to ksu
+Subject: [PATCH 06/25] PAM: Add integration to ksu
 
 Modify ksu so that it performs account and session management on behalf of
 the target user account, mimicking the action of regular su.  The default
@@ -8278,13 +8278,13 @@ index 9fc569f195..99268dfd78 100644
  if test "${localedir+set}" != set; then
      localedir='$(datadir)/locale'
 -- 
-2.51.1
+2.53.0
 
 
-From d794491cc41944d6f1cc2b4d56f4aa021726415e Mon Sep 17 00:00:00 2001
+From dac2e975d5729d53f22dc7d77428feb55263b982 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:30:53 -0400
-Subject: [PATCH 07/18] SELINUX: Add integration
+Subject: [PATCH 07/25] SELINUX: Add integration
 
 SELinux bases access to files on the domain of the requesting process,
 the operation being performed, and the context applied to the file.
@@ -9320,13 +9320,13 @@ index 0000000000..b10f927b2e
 +
 +#endif /* USE_SELINUX */
 -- 
-2.51.1
+2.53.0
 
 
-From da421afad9b499de867d5bdadac82ae94b3c1b05 Mon Sep 17 00:00:00 2001
+From 8523c362c7a0bc2a702ede1ec82b24555ff12ba5 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 9 Jan 2023 22:39:52 +0100
-Subject: [PATCH 08/18] INSTALL: Do not set root as ksu file owner
+Subject: [PATCH 08/25] INSTALL: Do not set root as ksu file owner
 
 Upstream Makefile uses the install command to set root as owner of the
 ksu executable file. However, this is no longer supported on latest
@@ -9352,13 +9352,13 @@ index 9f64fd190f..3724d26ae6 100644
  ## ${prefix}.
  prefix=@prefix@
 -- 
-2.51.1
+2.53.0
 
 
-From 1388a13772c22e02347d8f6bdc5610a584fbbc09 Mon Sep 17 00:00:00 2001
+From 307d0b16159de59092b00a109d44f68de323f5f1 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 7 Dec 2022 13:22:42 +0100
-Subject: [PATCH 09/18] SSSD: Make tests compatible with
+Subject: [PATCH 09/25] SSSD: Make tests compatible with
  sssd_krb5_locator_plugin.so
 
 The sssd_krb5_locator_plugin.so plugin provided by sssd-client conflicts
@@ -9394,13 +9394,13 @@ index 87bac17929..26bc95a8dc 100644
          fail('URI answers do not match')
      j += 1
 -- 
-2.51.1
+2.53.0
 
 
-From 3d79761243343cb9e870ffac81a53f7b742c04b2 Mon Sep 17 00:00:00 2001
+From 82ec4d257ba4f0ea5e57c56b680bc888b69ae3df Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Wed, 15 Mar 2023 15:56:34 +0100
-Subject: [PATCH 10/18] PAC: Allow to set ticket signature as optional
+Subject: [PATCH 10/25] PAC: Allow to set ticket signature as optional
 
 MS-PAC states that "The ticket signature SHOULD be included in tickets
 that are not encrypted to the krbtgt account". However, the
@@ -9674,13 +9674,13 @@ index 15ddc17dc5..96cdd52982 100644
  .sp
  This command requires the \fBmodify\fP privilege.
 -- 
-2.51.1
+2.53.0
 
 
-From f48585758d9e8f5ba7fff25ac3d2dcf7908e1a47 Mon Sep 17 00:00:00 2001
+From f160430a84cdbc2f24e4e9dc32fafac04ddcb887 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 23 Aug 2016 16:49:25 -0400
-Subject: [PATCH 11/18] BUILD: fix debuginfo with y.tab.c
+Subject: [PATCH 11/25] BUILD: fix debuginfo with y.tab.c
 
 We want to keep these y.tab.c files around because the debuginfo points to
 them.  It would be more elegant at the end to use symbolic links, but that
@@ -9731,13 +9731,13 @@ index 8669c2436c..f243017ce9 100644
 -	$(RM) $(PROG) $(OBJS) getdate.c
 +	$(RM) $(PROG) $(OBJS) getdate.c y.tab.c
 -- 
-2.51.1
+2.53.0
 
 
-From 2a5ddea0ac158f20b92cf1acc953c2ef8abf1f78 Mon Sep 17 00:00:00 2001
+From 621dac3f7d2989adfd746d40ba74468fa0275ab5 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 21 Sep 2025 11:14:51 +0300
-Subject: [PATCH 12/18] PKINIT: If configured, attempt Anonymous PKINIT for
+Subject: [PATCH 12/25] PKINIT: If configured, attempt Anonymous PKINIT for
  FAST
 
 If auto_fast_armor is configured for the realm or globally, optimistically
@@ -9959,13 +9959,13 @@ index 6f7890abcd..12c2ea1e5d 100644
  Specifies the name of the host\(aqs site for the purpose of DNS\-based
  KDC discovery for this realm.  New in release 1.22.
 -- 
-2.51.1
+2.53.0
 
 
-From 5d7099fa78f0cb021763504b0dd94e0282bd9385 Mon Sep 17 00:00:00 2001
+From 347f81103e95536b5655bee31bb9ced05d06b098 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Sun, 19 Oct 2025 18:14:29 +0300
-Subject: [PATCH 13/18] Fix OTP preauth crash with null prompter
+Subject: [PATCH 13/25] Fix OTP preauth crash with null prompter
 
 In doprompt(), check if the caller provided a prompter before
 dereferencing it.  Similar code returns either EIO or
@@ -9995,13 +9995,13 @@ index 07ffc15c22..48003da62f 100644
          return EINVAL;
  
 -- 
-2.51.1
+2.53.0
 
 
-From 3c6340e9d7bfa8d20cd7599a444b66e03ae00190 Mon Sep 17 00:00:00 2001
+From 2073be1acd51f906ac68c1a73c4f1ae8380eee35 Mon Sep 17 00:00:00 2001
 From: Alexander Bokovoy <abokovoy@redhat.com>
 Date: Wed, 10 Dec 2025 10:42:02 +0200
-Subject: [PATCH 14/18] Fix strchr() conformance to C23
+Subject: [PATCH 14/25] Fix strchr() conformance to C23
 
 C23 7.28.5.1 specifies search functions such as strchr() as generic,
 returning const char * if the first argument is of type const char *.
@@ -10185,13 +10185,13 @@ index 82f870ea5d..4221a20283 100644
                  key = strdup(data->otp_answer);
                  if (key == NULL)
 -- 
-2.51.1
+2.53.0
 
 
-From 111f553452b21d4ecca7a78d128264d592ff057a Mon Sep 17 00:00:00 2001
+From df905ea146a4feb39275f657918373e343cda28f Mon Sep 17 00:00:00 2001
 From: Greg Hudson <ghudson@mit.edu>
 Date: Sun, 28 Sep 2025 15:39:10 -0400
-Subject: [PATCH 15/18] Add paChecksum2 to PKINIT ASN.1 tests
+Subject: [PATCH 15/25] Add paChecksum2 to PKINIT ASN.1 tests
 
 Commit 310793ba63782af5ffa3a95d20e41f8f03ca7e00 added the paChecksum2
 field to krb5_pk_authenticator.  ktest_make_sample_pk_authenticator()
@@ -10360,13 +10360,13 @@ index c47bd71f67..418be63546 100644
  .  [2] [Sequence/Sequence Of]
  .  .  [Sequence/Sequence Of]
 -- 
-2.51.1
+2.53.0
 
 
-From d435e59bea1195f0c6332a0656155742d164f1d8 Mon Sep 17 00:00:00 2001
+From c851405051ca0af7779a6d6f40df4f28221230f3 Mon Sep 17 00:00:00 2001
 From: Dax Kelson <dakelson@redhat.com>
 Date: Tue, 13 May 2025 11:54:41 -0600
-Subject: [PATCH 16/18] Add xrealmauthz KDC policy module and tests
+Subject: [PATCH 16/25] Add xrealmauthz KDC policy module and tests
 
 This module provides fine-grained access control for cross-realm
 authentications by checking string attributes on the incoming
@@ -11121,13 +11121,13 @@ index 0000000000..3b3921f036
 +
 +success('Cross-realm authorization tests completed successfully')
 -- 
-2.51.1
+2.53.0
 
 
-From 01657a53828592c699460ed05705397805ca6111 Mon Sep 17 00:00:00 2001
+From 4634ca1f8242c24632e006d7b651064a7556cc92 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Thu, 29 Jan 2026 19:05:01 +0100
-Subject: [PATCH 17/18] Install xrealmauthz like other plugins
+Subject: [PATCH 17/25] Install xrealmauthz like other plugins
 
 The xrealmauthz kdcpolicy plugin was merged upstream, but it is not
 installed my the Makefile. The commit adds additional configuration to
@@ -11185,13 +11185,13 @@ index 78346d6572..b6740210a7 100644
  @libnover_frag@
  @libobj_frag@
 -- 
-2.51.1
+2.53.0
 
 
-From 2637750a603ee7710fc35dafda520753e1aa9935 Mon Sep 17 00:00:00 2001
+From 6d066787d23c913789dcfc220b34cd3a78ada4c7 Mon Sep 17 00:00:00 2001
 From: Julien Rische <jrische@redhat.com>
 Date: Mon, 16 Feb 2026 16:30:14 +0100
-Subject: [PATCH 18/18] Force "fork" method for RADIUS daemon in OTP test
+Subject: [PATCH 18/25] Force "fork" method for RADIUS daemon in OTP test
 
 The RADIUS daemon used in the OTP test relies on
 multiprocessing.Process. Since Python 3.14, multiprocessing changed its
@@ -11255,5 +11255,1016 @@ index dd5cdc5c26..c173b55c41 100755
  daemon2 = UnixRadiusDaemon(args=(socket_file, None, 'accept2', queue2))
  daemon1.start()
 -- 
-2.51.1
+2.53.0
+
+
+From 4d8e778bdbf6476e8aa397ef046126ae532f03d6 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Sun, 8 Mar 2026 21:50:52 +0200
+Subject: [PATCH 19/25] Fix S4U2Self ignoring time_req when acquiring
+ impersonated credentials
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+gss_acquire_cred() for the service locates the existing TGT in the
+ccache and records its KDC-granted endtime as cred->expire; it never
+requests a shorter-lived TGT.  So when gss_acquire_cred_impersonate_name()
+calls kg_impersonate_name() with a time_req, the impersonator TGT already
+carries a KDC-defined lifetime, not the requested one.
+
+kg_impersonate_name() compounds this by zero-initialising in_creds
+(leaving in_creds.times.endtime = 0) and never writing time_req into it.
+When that reaches send_tgs.c:
+
+    req.till = desired->times.endtime ? desired->times.endtime
+                                      : tgt->times.endtime;
+
+the zero endtime causes the fallback to tgt->times.endtime — the
+impersonator TGT's full KDC-granted lifetime.  The KDC therefore issues
+the S4U2Self ticket with KDC-policy lifetime, not the requested time_req.
+
+The subsequent S4U2Proxy request via gss_init_sec_context() gets the
+correct lifetime because that is an entirely separate call with its own
+time_req: kg_new_connection() converts it to an absolute timestamp
+(ctx->krb_times.endtime = ts_incr(now, time_req)) and get_credentials()
+places it into in_creds.times.endtime before calling krb5_get_credentials().
+send_tgs.c then takes the first branch and sends the requested deadline.
+This has nothing to do with what gss_acquire_cred_impersonate_name() did.
+
+Fix kg_impersonate_name() to apply the same time_req-to-endtime
+conversion that kg_new_connection() already performs, so the S4U2Self
+TGS-REQ carries the caller's requested deadline rather than silently
+falling back to the impersonator TGT's full lifetime.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+(cherry picked from commit 083f805989b44a1692784618531fe3134c5ed715)
+---
+ src/lib/gssapi/krb5/s4u_gss_glue.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/lib/gssapi/krb5/s4u_gss_glue.c b/src/lib/gssapi/krb5/s4u_gss_glue.c
+index fa7f980af7..9f2cbebec7 100644
+--- a/src/lib/gssapi/krb5/s4u_gss_glue.c
++++ b/src/lib/gssapi/krb5/s4u_gss_glue.c
+@@ -53,6 +53,17 @@ kg_impersonate_name(OM_uint32 *minor_status,
+     *output_cred = NULL;
+     memset(&in_creds, 0, sizeof(in_creds));
+ 
++    if (time_req != 0 && time_req != GSS_C_INDEFINITE) {
++        krb5_timestamp now;
++
++        code = krb5_timeofday(context, &now);
++        if (code != 0) {
++            *minor_status = code;
++            return GSS_S_FAILURE;
++        }
++        in_creds.times.endtime = ts_incr(now, time_req);
++    }
++
+     if (user->is_cert)
+         subject_cert = user->princ->data;
+     else
+-- 
+2.53.0
+
+
+From 5b185893438f775538a8d6340e9f4f39f6383cc7 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 9 Mar 2026 09:16:56 +0200
+Subject: [PATCH 20/25] Fix S4U2Self ignoring time_req when copying
+ impersonator TGT
+
+gss_acquire_cred_impersonate_name() with a time_req bounded the
+S4U2Self evidence ticket but left the impersonator TGT in the
+delegated ccache with its original unrestricted lifetime.
+
+Replace the krb5_cc_copy_creds() call in make_proxy_cred() with a
+manual iteration that caps each copied credential's endtime to the
+evidence ticket's endtime when time_req was specified.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+(cherry picked from commit 5ece439a6c5950314f9492e04d0441d7b14a9ebb)
+---
+ src/lib/gssapi/krb5/s4u_gss_glue.c | 33 ++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib/gssapi/krb5/s4u_gss_glue.c b/src/lib/gssapi/krb5/s4u_gss_glue.c
+index 9f2cbebec7..10288ebe94 100644
+--- a/src/lib/gssapi/krb5/s4u_gss_glue.c
++++ b/src/lib/gssapi/krb5/s4u_gss_glue.c
+@@ -192,14 +192,35 @@ krb5_gss_acquire_cred_impersonate_name(OM_uint32 *minor_status,
+  */
+ static krb5_error_code
+ make_proxy_cred(krb5_context context, krb5_gss_cred_id_t cred,
+-                krb5_gss_cred_id_t impersonator_cred)
++                krb5_gss_cred_id_t impersonator_cred,
++                krb5_timestamp max_endtime)
+ {
+     krb5_error_code code;
+     krb5_data data;
++    krb5_cc_cursor cur = 0;
++    krb5_creds cur_creds;
+     char *str;
+ 
+-    code = krb5_cc_copy_creds(context, impersonator_cred->ccache,
+-                              cred->ccache);
++    /* Copy credentials from the impersonator ccache, bounding endtime when
++     * requested so copied TGTs don't outlive the S4U2Self evidence ticket. */
++    code = krb5_cc_start_seq_get(context, impersonator_cred->ccache, &cur);
++    if (code)
++        return code;
++
++    while (!(code = krb5_cc_next_cred(context, impersonator_cred->ccache,
++                                      &cur, &cur_creds))) {
++        if (max_endtime != 0 && cur_creds.times.endtime > max_endtime)
++            cur_creds.times.endtime = max_endtime;
++        code = krb5_cc_store_cred(context, cred->ccache, &cur_creds);
++        krb5_free_cred_contents(context, &cur_creds);
++        if (code)
++            break;
++    }
++
++    if (cur)
++        krb5_cc_end_seq_get(context, impersonator_cred->ccache, &cur);
++    if (code == KRB5_CC_END)
++        code = 0;
+     if (code)
+         return code;
+ 
+@@ -275,7 +296,11 @@ kg_compose_deleg_cred(OM_uint32 *minor_status,
+     if (code != 0)
+         goto cleanup;
+ 
+-    code = make_proxy_cred(context, cred, impersonator_cred);
++    /* Bound copied credentials to the evidence ticket's endtime when the
++     * caller specified a time_req, so TGTs don't outlive the impersonation. */
++    code = make_proxy_cred(context, cred, impersonator_cred,
++                           (time_req != 0 && time_req != GSS_C_INDEFINITE) ?
++                           subject_creds->times.endtime : 0);
+     if (code != 0)
+         goto cleanup;
+ 
+-- 
+2.53.0
+
+
+From 8df1c41911e7179d2e6cdb72b3bb568c1db08bd3 Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 9 Mar 2026 09:17:08 +0200
+Subject: [PATCH 21/25] Add t_s4u test for time_req bounding all delegated-cred
+ tickets
+
+Add --time-req N option to t_s4u and a check_cred_endtimes() function
+that exports the S4U2Self credential to a MEMORY ccache and verifies
+every non-config ticket's endtime is within N seconds of now.
+
+Add a t_s4u.py test case that exercises this with time_req=600 to
+catch regressions where the impersonator TGT escapes the lifetime
+bound.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+(cherry picked from commit bbd23bd06efbf31757a0011e303444193df1674e)
+---
+ src/tests/gssapi/t_s4u.c  | 78 +++++++++++++++++++++++++++++++++++++--
+ src/tests/gssapi/t_s4u.py |  5 +++
+ 2 files changed, 80 insertions(+), 3 deletions(-)
+
+diff --git a/src/tests/gssapi/t_s4u.c b/src/tests/gssapi/t_s4u.c
+index 0400f8f61f..c73f187b25 100644
+--- a/src/tests/gssapi/t_s4u.c
++++ b/src/tests/gssapi/t_s4u.c
+@@ -57,6 +57,7 @@
+ #include "common.h"
+ 
+ static int use_spnego = 0;
++static OM_uint32 time_req = GSS_C_INDEFINITE;
+ 
+ static void
+ test_greet_authz_data(gss_name_t *name)
+@@ -122,6 +123,66 @@ init_accept_sec_context(gss_cred_id_t claimant_cred_handle,
+     (void)gss_delete_sec_context(&minor, &acceptor_context, NULL);
+ }
+ 
++/*
++ * Export cred to a MEMORY ccache and verify that every non-config ticket's
++ * endtime is within secs seconds of now.  Used to check that time_req is
++ * honoured for all credentials copied into the delegated-cred ccache (not
++ * just the S4U2Self evidence ticket).
++ */
++static void
++check_cred_endtimes(gss_cred_id_t cred, OM_uint32 secs)
++{
++    krb5_error_code ret;
++    krb5_context context = NULL;
++    krb5_creds kcred;
++    krb5_cc_cursor cur;
++    krb5_ccache ccache;
++    krb5_timestamp now, max_endtime;
++    gss_key_value_set_desc store;
++    gss_key_value_element_desc elem;
++    OM_uint32 major, minor;
++    const char *ccname = "MEMORY:endtime";
++
++    store.count = 1;
++    store.elements = &elem;
++    elem.key = "ccache";
++    elem.value = ccname;
++    major = gss_store_cred_into(&minor, cred, GSS_C_INITIATE, &mech_krb5, 1, 0,
++                                &store, NULL, NULL);
++    check_gsserr("gss_store_cred_into", major, minor);
++
++    ret = krb5_init_context(&context);
++    check_k5err(context, "krb5_init_context", ret);
++
++    ret = krb5_timeofday(context, &now);
++    check_k5err(context, "krb5_timeofday", ret);
++
++    /* Allow 5 seconds of slack for test overhead. */
++    max_endtime = now + (krb5_timestamp)secs + 5;
++
++    ret = krb5_cc_resolve(context, ccname, &ccache);
++    check_k5err(context, "krb5_cc_resolve", ret);
++
++    ret = krb5_cc_start_seq_get(context, ccache, &cur);
++    check_k5err(context, "krb5_cc_start_seq_get", ret);
++
++    while (!krb5_cc_next_cred(context, ccache, &cur, &kcred)) {
++        if (!krb5_is_config_principal(context, kcred.server) &&
++            kcred.times.endtime > max_endtime) {
++            printf("Credential endtime %d exceeds allowed %d (time_req=%u)\n",
++                   (int)kcred.times.endtime, (int)max_endtime, secs);
++            exit(1);
++        }
++        krb5_free_cred_contents(context, &kcred);
++    }
++
++    ret = krb5_cc_end_seq_get(context, ccache, &cur);
++    check_k5err(context, "krb5_cc_end_seq_get", ret);
++
++    krb5_cc_destroy(context, ccache);
++    krb5_free_context(context);
++}
++
+ static void
+ check_ticket_count(gss_cred_id_t cred, int expected)
+ {
+@@ -244,8 +305,8 @@ main(int argc, char *argv[])
+     gss_OID_set mechs;
+     gss_buffer_set_t bufset = GSS_C_NO_BUFFER_SET;
+ 
+-    if (argc < 2 || argc > 5) {
+-        fprintf(stderr, "Usage: %s [--spnego] [user] "
++    if (argc < 2 || argc > 7) {
++        fprintf(stderr, "Usage: %s [--spnego] [--time-req N] user "
+                 "[proxy-target] [keytab]\n", argv[0]);
+         fprintf(stderr, "       proxy-target and keytab are optional\n");
+         exit(1);
+@@ -257,6 +318,12 @@ main(int argc, char *argv[])
+         argv++;
+     }
+ 
++    if (argc > 2 && strcmp(argv[1], "--time-req") == 0) {
++        time_req = (OM_uint32)atol(argv[2]);
++        argc -= 2;
++        argv += 2;
++    }
++
+     user = import_name(argv[1]);
+ 
+     if (argc > 2 && strcmp(argv[2], "-"))
+@@ -281,11 +348,16 @@ main(int argc, char *argv[])
+ 
+     /* Get S4U2Self cred. */
+     major = gss_acquire_cred_impersonate_name(&minor, impersonator_cred_handle,
+-                                              user, GSS_C_INDEFINITE, mechs,
++                                              user, time_req, mechs,
+                                               GSS_C_INITIATE,
+                                               &user_cred_handle, NULL, NULL);
+     check_gsserr("gss_acquire_cred_impersonate_name", major, minor);
+ 
++    /* When a time_req was specified, verify all ccache credentials are
++     * bounded by it, including any TGT copied from the impersonator. */
++    if (time_req != GSS_C_INDEFINITE)
++        check_cred_endtimes(user_cred_handle, time_req);
++
+     init_accept_sec_context(user_cred_handle, impersonator_cred_handle,
+                             &delegated_cred_handle);
+     printf("\n");
+diff --git a/src/tests/gssapi/t_s4u.py b/src/tests/gssapi/t_s4u.py
+index 4a1cdb2355..813e27fc15 100755
+--- a/src/tests/gssapi/t_s4u.py
++++ b/src/tests/gssapi/t_s4u.py
+@@ -113,6 +113,11 @@ if 'auth1: user@' not in out or 'auth2: user@' not in out:
+ # Successful S4U2Self -> S4U2Proxy.
+ out = realm.run(['./t_s4u', puser, pservice2])
+ 
++# Verify that time_req bounds all credentials in the delegated ccache,
++# including the impersonator TGT copied by make_proxy_cred().
++mark('S4U2Self time_req bounds impersonator TGT in delegated ccache')
++realm.run(['./t_s4u', '--time-req', '600', puser, pservice2])
++
+ # Regression test for #8139: get a user ticket directly for service1 and
+ # try krb5 -> S4U2Proxy.
+ realm.kinit(realm.user_princ, None, ['-f', '-k', '-c', usercache,
+-- 
+2.53.0
+
+
+From e79cc39961a0e347e2efc0455d62ea64fdff99ea Mon Sep 17 00:00:00 2001
+From: Samuel Cabrero <scabrero@suse.com>
+Date: Tue, 17 Feb 2026 16:57:40 +0100
+Subject: [PATCH 22/25] Make configure.ac work with autoconf 2.73
+
+autoreconf requires "AC_INIT" to appear in configure.ac.  Prior to
+autoconf 2.73, our indirect invocation via K5_AC_INIT() was
+sufficient, but now the regular expression match checks for word
+boundaries.  Get rid of K5_AC_INIT(), moving the version extraction
+code from aclocal.m4 to a new file version.m4.  In the moved
+versioning code, use m4_fatal() to simplify error handling.
+
+[ghudson@mit.edu: made the m4_fatal() change; rewrote commit message]
+
+ticket: 9202 (new)
+(cherry picked from commit b7290e0cab5b7e39cd4aa7c098beb18a886d4a1d)
+---
+ src/aclocal.m4   | 24 ------------------------
+ src/configure.ac |  4 +++-
+ src/version.m4   | 14 ++++++++++++++
+ 3 files changed, 17 insertions(+), 25 deletions(-)
+ create mode 100644 src/version.m4
+
+diff --git a/src/aclocal.m4 b/src/aclocal.m4
+index 1782be9788..fe22b1e045 100644
+--- a/src/aclocal.m4
++++ b/src/aclocal.m4
+@@ -16,30 +16,6 @@ ac_config_fragdir=$ac_reltopdir/config
+ AC_CONFIG_AUX_DIR(K5_TOPDIR/config)
+ ])dnl
+ dnl
+-dnl Version info.
+-dnl
+-pushdef([x],esyscmd([sed -n 's/#define \([A-Z0-9_]*\)[ \t]*\(.*\)/\1=\2/p' < ]K5_TOPDIR/patchlevel.h))
+-define([PL_KRB5_MAJOR_RELEASE],regexp(x,[KRB5_MAJOR_RELEASE=\(.*\)],[\1]))
+-ifelse(PL_KRB5_MAJOR_RELEASE,,[errprint([Can't determine KRB5_MAJOR_RELEASE value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_MINOR_RELEASE],regexp(x,[KRB5_MINOR_RELEASE=\(.*\)],[\1]))
+-ifelse(PL_KRB5_MINOR_RELEASE,,[errprint([Can't determine KRB5_MINOR_RELEASE value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_PATCHLEVEL],regexp(x,[KRB5_PATCHLEVEL=\(.*\)],[\1]))
+-ifelse(PL_KRB5_PATCHLEVEL,,[errprint([Can't determine KRB5_PATCHLEVEL value from patchlevel.h.
+-]) m4exit(1) dnl sometimes that does not work?
+-builtin(m4exit,1)])
+-define([PL_KRB5_RELTAIL],regexp(x,[KRB5_RELTAIL="\(.*\)"],[\1]))
+-dnl RELTAIL is allowed to not be defined.
+-popdef([x])
+-define([K5_VERSION],PL_KRB5_MAJOR_RELEASE.PL_KRB5_MINOR_RELEASE[]ifelse(PL_KRB5_PATCHLEVEL,0,,.PL_KRB5_PATCHLEVEL)ifelse(PL_KRB5_RELTAIL,,,-PL_KRB5_RELTAIL))
+-define([K5_BUGADDR],krb5-bugs@mit.edu)
+-define([K5_AC_INIT],[AC_INIT(Kerberos 5, K5_VERSION, K5_BUGADDR, krb5)
+-AC_CONFIG_SRCDIR($1)
+-build_dynobj=no])
+-dnl
+ dnl drop in standard rules for all configure files -- CONFIG_RULES
+ dnl
+ AC_DEFUN(CONFIG_RULES,[dnl
+diff --git a/src/configure.ac b/src/configure.ac
+index c0ccfb9be8..064adede3f 100644
+--- a/src/configure.ac
++++ b/src/configure.ac
+@@ -1,4 +1,6 @@
+-K5_AC_INIT([aclocal.m4])
++m4_include([version.m4])
++AC_INIT(Kerberos 5, K5_VERSION, K5_BUGADDR, krb5)
++AC_CONFIG_SRCDIR([aclocal.m4])
+ 
+ # If $runstatedir isn't set by autoconf (<2.70), set it manually.
+ if test x"$runstatedir" = x; then
+diff --git a/src/version.m4 b/src/version.m4
+new file mode 100644
+index 0000000000..4b08edde52
+--- /dev/null
++++ b/src/version.m4
+@@ -0,0 +1,14 @@
++define([K5_TOPDIR],[.])dnl
++dnl
++pushdef([x],esyscmd([sed -n 's/#define \([A-Z0-9_]*\)[ \t]*\(.*\)/\1=\2/p' < ]K5_TOPDIR/patchlevel.h))
++define([PL_KRB5_MAJOR_RELEASE],regexp(x,[KRB5_MAJOR_RELEASE=\(.*\)],[\1]))
++ifelse(PL_KRB5_MAJOR_RELEASE,,[m4_fatal([Can't determine KRB5_MAJOR_RELEASE value from patchlevel.h.])])
++define([PL_KRB5_MINOR_RELEASE],regexp(x,[KRB5_MINOR_RELEASE=\(.*\)],[\1]))
++ifelse(PL_KRB5_MINOR_RELEASE,,[m4_fatal([Can't determine KRB5_MINOR_RELEASE value from patchlevel.h.])])
++define([PL_KRB5_PATCHLEVEL],regexp(x,[KRB5_PATCHLEVEL=\(.*\)],[\1]))
++ifelse(PL_KRB5_PATCHLEVEL,,[m4_fatal([Can't determine KRB5_PATCHLEVEL value from patchlevel.h.])])
++define([PL_KRB5_RELTAIL],regexp(x,[KRB5_RELTAIL="\(.*\)"],[\1]))
++dnl RELTAIL is allowed to not be defined.
++popdef([x])
++m4_define([K5_VERSION],PL_KRB5_MAJOR_RELEASE.PL_KRB5_MINOR_RELEASE[]ifelse(PL_KRB5_PATCHLEVEL,0,,.PL_KRB5_PATCHLEVEL)ifelse(PL_KRB5_RELTAIL,,,-PL_KRB5_RELTAIL))
++m4_define([K5_BUGADDR],krb5-bugs@mit.edu)
+-- 
+2.53.0
+
+
+From a79620c4f0080f436ecae3504c2e0ee3fedb5360 Mon Sep 17 00:00:00 2001
+From: Greg Hudson <ghudson@mit.edu>
+Date: Wed, 25 Feb 2026 19:05:40 -0500
+Subject: [PATCH 23/25] Use X509_check_host() to verify KKDCP server cert
+
+In the k5tls module, rely on X509_check_host() and
+X509_check_ip_asc(), which were added in OpenSSL 1.0.2, instead of
+doing our own verification.
+
+There is one notable difference in behavior: X509_check_host() admits
+wildcards with a prefix or suffix (but not both) within the label,
+like "kdc*.mydomain.com".  The old code only allows a wildcard to
+match a complete label.
+
+ticket: 9198 (new)
+(cherry picked from commit f5bbfa4821cf590a4748f96d0e016bc0485e95c4)
+---
+ src/plugins/tls/k5tls/openssl.c | 211 +-------------------------------
+ 1 file changed, 6 insertions(+), 205 deletions(-)
+
+diff --git a/src/plugins/tls/k5tls/openssl.c b/src/plugins/tls/k5tls/openssl.c
+index aab67c01cb..42d72dc9ec 100644
+--- a/src/plugins/tls/k5tls/openssl.c
++++ b/src/plugins/tls/k5tls/openssl.c
+@@ -71,218 +71,19 @@ flush_errors(krb5_context context)
+     }
+ }
+ 
+-/* Return the passed-in character, lower-cased if it's an ASCII character. */
+-static inline char
+-ascii_tolower(char p)
+-{
+-    if (KRB5_UPPER(p))
+-        return p + ('a' - 'A');
+-    return p;
+-}
+-
+-/*
+- * Check a single label.  If allow_wildcard is true, and the presented name
+- * includes a wildcard, return true and note that we matched a wildcard.
+- * Otherwise, for both the presented and expected values, do a case-insensitive
+- * comparison of ASCII characters, and a case-sensitive comparison of
+- * everything else.
+- */
+-static krb5_boolean
+-label_match(const char *presented, size_t plen, const char *expected,
+-            size_t elen, krb5_boolean allow_wildcard, krb5_boolean *wildcard)
+-{
+-    unsigned int i;
+-
+-    if (allow_wildcard && plen == 1 && presented[0] == '*') {
+-        *wildcard = TRUE;
+-        return TRUE;
+-    }
+-
+-    if (plen != elen)
+-        return FALSE;
+-
+-    for (i = 0; i < elen; i++) {
+-        if (ascii_tolower(presented[i]) != ascii_tolower(expected[i]))
+-            return FALSE;
+-    }
+-    return TRUE;
+-}
+-
+-/* Break up the two names and check them, label by label. */
+-static krb5_boolean
+-domain_match(const char *presented, size_t plen, const char *expected)
+-{
+-    const char *p, *q, *r, *s;
+-    int n_label;
+-    krb5_boolean used_wildcard = FALSE;
+-
+-    n_label = 0;
+-    p = presented;
+-    r = expected;
+-    while (p < presented + plen && *r != '\0') {
+-        q = memchr(p, '.', plen - (p - presented));
+-        if (q == NULL)
+-            q = presented + plen;
+-        s = r + strcspn(r, ".");
+-        if (!label_match(p, q - p, r, s - r, n_label == 0, &used_wildcard))
+-            return FALSE;
+-        p = q < presented + plen ? q + 1 : q;
+-        r = *s ? s + 1 : s;
+-        n_label++;
+-    }
+-    if (used_wildcard && n_label <= 2)
+-        return FALSE;
+-    if (p == presented + plen && *r == '\0')
+-        return TRUE;
+-    return FALSE;
+-}
+-
+-/* Fetch the list of subjectAltNames from a certificate. */
+-static GENERAL_NAMES *
+-get_cert_sans(X509 *x)
+-{
+-    int ext;
+-    X509_EXTENSION *san_ext;
+-
+-    ext = X509_get_ext_by_NID(x, NID_subject_alt_name, -1);
+-    if (ext < 0)
+-        return NULL;
+-    san_ext = X509_get_ext(x, ext);
+-    if (san_ext == NULL)
+-        return NULL;
+-    return X509V3_EXT_d2i(san_ext);
+-}
+-
+-/* Fetch a CN value from the subjct name field, returning its length, or -1 if
+- * there is no subject name or it contains no CN value. */
+-static int
+-get_cert_cn(X509 *x, char *buf, size_t bufsize)
+-{
+-    X509_NAME *name;
+-
+-    name = X509_get_subject_name(x);
+-    if (name == NULL)
+-        return -1;
+-    return X509_NAME_get_text_by_NID(name, NID_commonName, buf, bufsize);
+-}
+-
+-/* Return true if text matches any of the addresses we can recover from x. */
+-static krb5_boolean
+-check_cert_address(X509 *x, const char *text)
+-{
+-    char buf[1024];
+-    GENERAL_NAMES *sans;
+-    GENERAL_NAME *san = NULL;
+-    ASN1_OCTET_STRING *ip;
+-    krb5_boolean found_ip_san = FALSE, matched = FALSE;
+-    int n_sans, i;
+-    int name_length;
+-    struct in_addr sin;
+-    struct in6_addr sin6;
+-
+-    /* Parse the IP address into an octet string. */
+-    ip = ASN1_OCTET_STRING_new();
+-    if (ip == NULL)
+-        return FALSE;
+-    if (inet_pton(AF_INET, text, &sin)) {
+-        ASN1_OCTET_STRING_set(ip, (unsigned char *)&sin, sizeof(sin));
+-    } else if (inet_pton(AF_INET6, text, &sin6)) {
+-        ASN1_OCTET_STRING_set(ip, (unsigned char *)&sin6, sizeof(sin6));
+-    } else {
+-        ASN1_OCTET_STRING_free(ip);
+-        return FALSE;
+-    }
+-
+-    /* Check for matches in ipaddress subjectAltName values. */
+-    sans = get_cert_sans(x);
+-    if (sans != NULL) {
+-        n_sans = sk_GENERAL_NAME_num(sans);
+-        for (i = 0; i < n_sans; i++) {
+-            san = sk_GENERAL_NAME_value(sans, i);
+-            if (san->type != GEN_IPADD)
+-                continue;
+-            found_ip_san = TRUE;
+-            matched = (ASN1_OCTET_STRING_cmp(ip, san->d.iPAddress) == 0);
+-            if (matched)
+-                break;
+-        }
+-        sk_GENERAL_NAME_pop_free(sans, GENERAL_NAME_free);
+-    }
+-    ASN1_OCTET_STRING_free(ip);
+-
+-    if (found_ip_san)
+-        return matched;
+-
+-    /* Check for a match against the CN value in the peer's subject name. */
+-    name_length = get_cert_cn(x, buf, sizeof(buf));
+-    if (name_length >= 0) {
+-        /* Do a string compare to check if it's an acceptable value. */
+-        return strlen(text) == (size_t)name_length &&
+-               strncmp(text, buf, name_length) == 0;
+-    }
+-
+-    /* We didn't find a match. */
+-    return FALSE;
+-}
+-
+-/* Return true if expected matches any of the names we can recover from x. */
+-static krb5_boolean
+-check_cert_servername(X509 *x, const char *expected)
+-{
+-    char buf[1024];
+-    GENERAL_NAMES *sans;
+-    GENERAL_NAME *san = NULL;
+-    unsigned char *dnsname;
+-    krb5_boolean found_dns_san = FALSE, matched = FALSE;
+-    int name_length, n_sans, i;
+-
+-    /* Check for matches in dnsname subjectAltName values. */
+-    sans = get_cert_sans(x);
+-    if (sans != NULL) {
+-        n_sans = sk_GENERAL_NAME_num(sans);
+-        for (i = 0; i < n_sans; i++) {
+-            san = sk_GENERAL_NAME_value(sans, i);
+-            if (san->type != GEN_DNS)
+-                continue;
+-            found_dns_san = TRUE;
+-            dnsname = NULL;
+-            name_length = ASN1_STRING_to_UTF8(&dnsname, san->d.dNSName);
+-            if (dnsname == NULL)
+-                continue;
+-            matched = domain_match((char *)dnsname, name_length, expected);
+-            OPENSSL_free(dnsname);
+-            if (matched)
+-                break;
+-        }
+-        sk_GENERAL_NAME_pop_free(sans, GENERAL_NAME_free);
+-    }
+-
+-    if (matched)
+-        return TRUE;
+-    if (found_dns_san)
+-        return matched;
+-
+-    /* Check for a match against the CN value in the peer's subject name. */
+-    name_length = get_cert_cn(x, buf, sizeof(buf));
+-    if (name_length >= 0)
+-        return domain_match(buf, name_length, expected);
+-
+-    /* We didn't find a match. */
+-    return FALSE;
+-}
+-
+ static krb5_boolean
+ check_cert_name_or_ip(X509 *x, const char *expected_name)
+ {
+     struct in_addr in;
+     struct in6_addr in6;
++    int r;
+ 
+     if (inet_pton(AF_INET, expected_name, &in) != 0 ||
+-        inet_pton(AF_INET6, expected_name, &in6) != 0) {
+-        return check_cert_address(x, expected_name);
+-    } else {
+-        return check_cert_servername(x, expected_name);
+-    }
++        inet_pton(AF_INET6, expected_name, &in6) != 0)
++        r = X509_check_ip_asc(x, expected_name, 0);
++    else
++        r = X509_check_host(x, expected_name, 0, 0, NULL);
++    return r == 1;
+ }
+ 
+ static int
+-- 
+2.53.0
+
+
+From c75afd347838de097522095016690e851f055fa1 Mon Sep 17 00:00:00 2001
+From: Bob Beck <beck@openssl.org>
+Date: Mon, 16 Feb 2026 15:15:55 -0700
+Subject: [PATCH 24/25] Improve future OpenSSL compatibility
+
+Avoid calling deprecated OpenSSL functions when compiling against
+versions of OpenSSL where they are deprecated.  Add
+-DOPENSSL_NO_DEPRECATED to the linux-clang-openssl CI build to help
+detect calls to deprecated functions in the future.
+
+Use const pointer variables to hold values retrieved by accessors
+which will return const pointers in OpenSSL 4.0.  Define macros to
+make certain functions accept these const pointers in versions of
+OpenSSL where they don't already do so.
+
+Use accessor functions instead of direct field access for ASN1_STRING
+values, as the type will become opaque in OpenSSL 4.0.
+
+The PKINIT code is written to assume that DHX support was not present
+until OpenSSL 1.1, but it was added in release 1.0.2, causing a
+compilation error against 1.0.2 from a double definition of
+EVP_PKEY_DHX.  Minimally fix the compilation error.  (The custom DHX
+marshalling code to support 1.0.x could be removed, as 1.0.2 is the
+minimum version after commit f5bbfa4821cf590a4748f96d0e016bc0485e95c4,
+but the plan is to remove 1.0.x compatibility shortly.)
+
+Contains work by Frederik Wedel-Heinen
+<frederik.wedel-heinen@dencrypt.dk> and Dimitri John Ledkov
+<dimitri.ledkov@surgut.co.uk>.
+
+[ghudson@mit.edu: combined numerous commits; added compatibility
+macros; rewrote commit message; fixed 1.0.2 compatibility issue]
+
+(cherry picked from commit 5e4e8452328804948d042235bbf58ca457795857)
+---
+ .../preauth/pkinit/pkinit_crypto_openssl.c    | 54 ++++++++++++++-----
+ src/plugins/tls/k5tls/openssl.c               | 26 +++++++--
+ 2 files changed, 63 insertions(+), 17 deletions(-)
+
+diff --git a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
+index 7779141943..f085323d90 100644
+--- a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
++++ b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
+@@ -209,13 +209,20 @@ create_identifiers_from_stack(STACK_OF(X509) *sk,
+ #define EVP_MD_CTX_new EVP_MD_CTX_create
+ #define EVP_MD_CTX_free EVP_MD_CTX_destroy
+ #define ASN1_STRING_get0_data ASN1_STRING_data
++#define X509_STORE_CTX_set0_trusted_stack X509_STORE_CTX_trusted_stack
+ 
+ /*
+- * 1.1 adds DHX support, which uses the RFC 3279 DomainParameters encoding we
++ * 1.0.2 adds DHX support, which uses the RFC 3279 DomainParameters encoding we
+  * need for PKINIT.  For 1.0 we must use the original DH type when creating
+  * EVP_PKEY objects.
+  */
++#ifndef EVP_PKEY_DHX
+ #define EVP_PKEY_DHX EVP_PKEY_DH
++#endif
++
++/* Make X509_NAME_print_ex() accept a const name pointer by adding a cast. */
++#define X509_NAME_print_ex(a, b, c, d)          \
++    X509_NAME_print_ex(a, (X509_NAME *)b, c, d)
+ 
+ /* 1.1 makes many handle types opaque and adds accessors.  Add compatibility
+  * versions of the new accessors we use for pre-1.1. */
+@@ -295,6 +302,10 @@ compat_ECDSA_SIG_set0(ECDSA_SIG *sig, BIGNUM *r, BIGNUM *s)
+ #define EVP_PKEY_get_bits EVP_PKEY_bits
+ #define EVP_PKEY_get_base_id EVP_PKEY_base_id
+ 
++/* Make X509_dup() accept a const pointer by adding a cast. */
++#define X509_dup(a) X509_dup((X509 *)a)
++#define i2d_X509_NAME(a, b) i2d_X509_NAME((X509_NAME *)a, b)
++
+ /*
+  * Convert *dh to an EVP_PKEY object, taking ownership of *dh and setting it to
+  * NULL.  On error, return NULL and do not take ownership of or change *dh.
+@@ -318,6 +329,11 @@ dh_to_pkey(DH **dh)
+ }
+ #endif /* OPENSSL_VERSION_NUMBER < 0x30000000L */
+ 
++#if OPENSSL_VERSION_NUMBER < 0x40000000L
++/* Make X509V3_EXT_d2i() accept a const pointer by adding a cast. */
++#define X509V3_EXT_d2i(a) X509V3_EXT_d2i((X509_EXTENSION *)a)
++#endif
++
+ /* Encode a bignum as an ASN.1 integer in DER. */
+ static int
+ encode_bn_der(const BIGNUM *bn, uint8_t **der_out, int *len_out)
+@@ -1134,6 +1150,13 @@ oerr_cert(krb5_context context, krb5_error_code code, X509_STORE_CTX *certctx,
+     return oerr(context, code, _("%s (depth %d): %s"), msg, depth, errstr);
+ }
+ 
++/* Convert an OpenSSL ASN.1 string value to krb5_data, without copying. */
++static inline krb5_data
++asn1string_to_data(ASN1_STRING *s)
++{
++    return make_data((char *)ASN1_STRING_get0_data(s), ASN1_STRING_length(s));
++}
++
+ krb5_error_code
+ pkinit_init_plg_crypto(krb5_context context,
+                        pkinit_plg_crypto_context *cryptoctx)
+@@ -1775,7 +1798,7 @@ cms_signeddata_create(krb5_context context,
+             goto cleanup;
+         X509_STORE_CTX_init(certctx, certstore, id_cryptoctx->my_cert,
+                             id_cryptoctx->intermediateCAs);
+-        X509_STORE_CTX_trusted_stack(certctx, id_cryptoctx->trustedCAs);
++        X509_STORE_CTX_set0_trusted_stack(certctx, id_cryptoctx->trustedCAs);
+         if (!X509_verify_cert(certctx)) {
+             retval = oerr_cert(context, 0, certctx,
+                                _("Failed to verify own certificate"));
+@@ -2009,7 +2032,7 @@ cms_signeddata_verify(krb5_context context,
+         unsigned char *d;
+         *is_signed = 0;
+         octets = CMS_get0_content(cms);
+-        if (!octets || ((*octets)->type != V_ASN1_OCTET_STRING)) {
++        if (!octets || (ASN1_STRING_type(*octets) != V_ASN1_OCTET_STRING)) {
+             retval = KRB5KDC_ERR_PREAUTH_FAILED;
+             krb5_set_error_message(context, retval,
+                                    _("Invalid pkinit packet: octet string "
+@@ -2065,7 +2088,8 @@ cms_signeddata_verify(krb5_context context,
+         /* We cannot use CMS_dataInit because there may be no digest */
+         octets = CMS_get0_content(cms);
+         if (octets)
+-            out = BIO_new_mem_buf((*octets)->data, (*octets)->length);
++            out = BIO_new_mem_buf(ASN1_STRING_get0_data(*octets),
++                                  ASN1_STRING_length(*octets));
+         if (out == NULL)
+             goto cleanup;
+     } else {
+@@ -2125,7 +2149,7 @@ cms_signeddata_verify(krb5_context context,
+ 
+         /* add trusted CAs certificates for cert verification */
+         if (idctx->trustedCAs != NULL)
+-            X509_STORE_CTX_trusted_stack(cert_ctx, idctx->trustedCAs);
++            X509_STORE_CTX_set0_trusted_stack(cert_ctx, idctx->trustedCAs);
+         else {
+             pkiDebug("unable to find any trusted CAs\n");
+             goto cleanup;
+@@ -2163,7 +2187,7 @@ cms_signeddata_verify(krb5_context context,
+         i = X509_verify_cert(cert_ctx);
+         if (i <= 0) {
+             int j = X509_STORE_CTX_get_error(cert_ctx);
+-            X509 *cert;
++            const X509 *cert;
+ 
+             cert = X509_STORE_CTX_get_current_cert(cert_ctx);
+             reqctx->received_cert = X509_dup(cert);
+@@ -2323,7 +2347,7 @@ crypto_retrieve_X509_sans(krb5_context context,
+     krb5_principal *princs = NULL;
+     char **upns = NULL;
+     unsigned char **dnss = NULL;
+-    X509_EXTENSION *ext = NULL;
++    const X509_EXTENSION *ext = NULL;
+     GENERAL_NAMES *ialt = NULL;
+     GENERAL_NAME *gen = NULL;
+ 
+@@ -2386,8 +2410,7 @@ crypto_retrieve_X509_sans(krb5_context context,
+         gen = sk_GENERAL_NAME_value(ialt, i);
+         switch (gen->type) {
+         case GEN_OTHERNAME:
+-            name.length = gen->d.otherName->value->value.sequence->length;
+-            name.data = (char *)gen->d.otherName->value->value.sequence->data;
++            name = asn1string_to_data(gen->d.otherName->value->value.sequence);
+             if (princs != NULL &&
+                 OBJ_cmp(plgctx->id_pkinit_san,
+                         gen->d.otherName->type_id) == 0) {
+@@ -2421,12 +2444,13 @@ crypto_retrieve_X509_sans(krb5_context context,
+         case GEN_DNS:
+             if (dnss != NULL) {
+                 /* Prevent abuse of embedded null characters. */
+-                if (memchr(gen->d.dNSName->data, '\0', gen->d.dNSName->length))
++                if (memchr(ASN1_STRING_get0_data(gen->d.dNSName), '\0',
++                           ASN1_STRING_length(gen->d.dNSName)))
+                     break;
+                 pkiDebug("%s: found dns name = %s\n", __FUNCTION__,
+-                         gen->d.dNSName->data);
++                         ASN1_STRING_get0_data(gen->d.dNSName));
+                 dnss[d] = (unsigned char *)
+-                    strdup((char *)gen->d.dNSName->data);
++                    strdup((char *)ASN1_STRING_get0_data(gen->d.dNSName));
+                 if (dnss[d] == NULL) {
+                     pkiDebug("%s: failed to duplicate dns name\n",
+                              __FUNCTION__);
+@@ -3101,8 +3125,10 @@ int
+ pkinit_openssl_init(void)
+ {
+     /* Initialize OpenSSL. */
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+     ERR_load_crypto_strings();
+     OpenSSL_add_all_algorithms();
++#endif
+     return 0;
+ }
+ 
+@@ -4773,7 +4799,7 @@ out:
+ }
+ 
+ static krb5_error_code
+-rfc2253_name(X509_NAME *name, char **str_out)
++rfc2253_name(const X509_NAME *name, char **str_out)
+ {
+     BIO *b = NULL;
+     char *str;
+@@ -5234,7 +5260,7 @@ create_identifiers_from_stack(STACK_OF(X509) *sk,
+     int i = 0, sk_size = sk_X509_num(sk);
+     krb5_external_principal_identifier **krb5_cas = NULL;
+     X509 *x = NULL;
+-    X509_NAME *xn = NULL;
++    const X509_NAME *xn = NULL;
+     unsigned char *p = NULL;
+     int len = 0;
+     PKCS7_ISSUER_AND_SERIAL *is = NULL;
+diff --git a/src/plugins/tls/k5tls/openssl.c b/src/plugins/tls/k5tls/openssl.c
+index 42d72dc9ec..7763327b7a 100644
+--- a/src/plugins/tls/k5tls/openssl.c
++++ b/src/plugins/tls/k5tls/openssl.c
+@@ -38,6 +38,24 @@
+ #include <openssl/x509v3.h>
+ #include <dirent.h>
+ 
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
++/* Make X509_get_subject_name() accept a const pointer by adding a cast. */
++#define X509_get_subject_name(a) X509_get_subject_name((X509 *)a)
++
++/* OpenSSL 1.0 did not have TLS_client_method(); use the best alternative. */
++#define TLS_client_method() SSLv23_client_method()
++#endif
++
++#if OPENSSL_VERSION_NUMBER < 0x40000000L
++/*
++ * OpenSSL 4.0 constifies the result of X509_STORE_CTX_get_current_cert() and
++ * the input of X509_check_host() and X509_check_ip_asc().  For prior versions,
++ * make the latter two functions accept const pointers via a cast.
++ */
++#define X509_check_host(a, b, c, d, e) X509_check_host((X509 *)a, b, c, d, e)
++#define X509_check_ip_asc(a, b, c) X509_check_ip_asc((X509 *)a, b, c)
++#endif
++
+ struct k5_tls_handle_st {
+     SSL *ssl;
+     char *servername;
+@@ -51,9 +69,11 @@ MAKE_INIT_FUNCTION(init_openssl);
+ int
+ init_openssl(void)
+ {
++#if OPENSSL_VERSION_NUMBER < 0x10100000L
+     SSL_library_init();
+     SSL_load_error_strings();
+     OpenSSL_add_all_algorithms();
++#endif
+     ex_context_id = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
+     ex_handle_id = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
+     return 0;
+@@ -72,7 +92,7 @@ flush_errors(krb5_context context)
+ }
+ 
+ static krb5_boolean
+-check_cert_name_or_ip(X509 *x, const char *expected_name)
++check_cert_name_or_ip(const X509 *x, const char *expected_name)
+ {
+     struct in_addr in;
+     struct in6_addr in6;
+@@ -89,7 +109,7 @@ check_cert_name_or_ip(X509 *x, const char *expected_name)
+ static int
+ verify_callback(int preverify_ok, X509_STORE_CTX *store_ctx)
+ {
+-    X509 *x;
++    const X509 *x;
+     SSL *ssl;
+     BIO *bio;
+     krb5_context context;
+@@ -246,7 +266,7 @@ setup(krb5_context context, SOCKET fd, const char *servername,
+         return KRB5_PLUGIN_OP_NOTSUPP;
+ 
+     /* Do general SSL library setup. */
+-    ctx = SSL_CTX_new(SSLv23_client_method());
++    ctx = SSL_CTX_new(TLS_client_method());
+     if (ctx == NULL)
+         goto error;
+ 
+-- 
+2.53.0
+
+
+From 3cf396189876ac661063dc2483ea721d8a8c7441 Mon Sep 17 00:00:00 2001
+From: Greg Hudson <ghudson@mit.edu>
+Date: Wed, 8 Apr 2026 17:57:59 -0400
+Subject: [PATCH 25/25] Fix two NegoEx parsing vulnerabilities
+
+In parse_nego_message(), check the result of the second call to
+vector_base() before dereferencing it.  In parse_message(), check for
+a short header_len to prevent an integer underflow when calculating
+the remaining message length.
+
+Reported by Cem Onat Karagun.
+
+CVE-2026-40355:
+
+In MIT krb5 release 1.18 and later, if an application calls
+gss_accept_sec_context() on a system with a NegoEx mechanism
+registered in /etc/gss/mech, an unauthenticated remote attacker can
+trigger a null pointer dereference, causing the process to terminate.
+
+CVE-2026-40356:
+
+In MIT krb5 release 1.18 and later, if an application calls
+gss_accept_sec_context() on a system with a NegoEx mechanism
+registered in /etc/gss/mech, an unauthenticated remote attacker can
+trigger a read overrun of up to 52 bytes, possibly causing the process
+to terminate.  Exfiltration of the bytes read does not appear
+possible.
+
+ticket: 9205 (new)
+tags: pullup
+target_version: 1.22-next
+
+(cherry picked from commit 2e75f0d9362fb979f5fc92829431a590a130929f)
+---
+ src/lib/gssapi/spnego/negoex_util.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/lib/gssapi/spnego/negoex_util.c b/src/lib/gssapi/spnego/negoex_util.c
+index edc5462e84..a65238e573 100644
+--- a/src/lib/gssapi/spnego/negoex_util.c
++++ b/src/lib/gssapi/spnego/negoex_util.c
+@@ -253,6 +253,10 @@ parse_nego_message(OM_uint32 *minor, struct k5input *in,
+     offset = k5_input_get_uint32_le(in);
+     count = k5_input_get_uint16_le(in);
+     p = vector_base(offset, count, EXTENSION_LENGTH, msg_base, msg_len);
++    if (p == NULL) {
++        *minor = ERR_NEGOEX_INVALID_MESSAGE_SIZE;
++        return GSS_S_DEFECTIVE_TOKEN;
++    }
+     for (i = 0; i < count; i++) {
+         extension_type = load_32_le(p + i * EXTENSION_LENGTH);
+         if (extension_type & EXTENSION_FLAG_CRITICAL) {
+@@ -391,7 +395,8 @@ parse_message(OM_uint32 *minor, spnego_gss_ctx_id_t ctx, struct k5input *in,
+     msg_len = k5_input_get_uint32_le(in);
+     conv_id = k5_input_get_bytes(in, GUID_LENGTH);
+ 
+-    if (in->status || msg_len > token_remaining || header_len > msg_len) {
++    if (in->status || msg_len > token_remaining ||
++        header_len < (size_t)(in->ptr - msg_base) || header_len > msg_len) {
+         *minor = ERR_NEGOEX_INVALID_MESSAGE_SIZE;
+         return GSS_S_DEFECTIVE_TOKEN;
+     }
+-- 
+2.53.0
 

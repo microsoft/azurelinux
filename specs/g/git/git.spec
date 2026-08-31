@@ -50,6 +50,14 @@
 %global use_perl_interpreter 0
 %endif
 
+# Build with Rust support
+# Enable on Fedora >= 45 and EL >= 11, disable on older releases
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 11
+%bcond_without              rust
+%else
+%bcond_with                 rust
+%endif
+
 # Allow cvs subpackage to be toggled via --with/--without
 # Disable cvs subpackage by default on EL >= 8
 %if 0%{?rhel} >= 8
@@ -81,8 +89,8 @@
 %global _package_note_file  %{_builddir}/%{name}-%{real_version}/.package_note-%{name}-%{version}-%{release}.%{_arch}.ld
 
 Name:           git
-Version:        2.53.0
-Release: 4%{?dist}
+Version:        2.55.0
+Release:        1%{?dist}
 Summary:        Fast Version Control System
 License:        BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT
 URL:            https://git-scm.com/
@@ -135,13 +143,6 @@ Patch3:         0003-t-lib-git-svn-try-harder-to-find-a-port.patch
 # Prevents t5540 failures on i686, s390x and ppc64le
 Patch5:         git-test-apache-davlockdbtype-config.patch
 
-# Adds the option to sanitize sideband channel messages
-# CVE-2024-52005 wasn't fixed by upstream. This patch adds the option to harden Git against it.
-# The default behaviour of Git remains unchanged.
-#
-# https://github.com/gitgitgadget/git/pull/1853
-Patch6:         git-2.52-sanitize-sideband-channel-messages.patch
-
 %if %{with docs}
 # pod2man is needed to build Git.3pm
 BuildRequires:  perl-podlators
@@ -180,6 +181,10 @@ BuildRequires:  libcurl-devel
 BuildRequires:  make
 BuildRequires:  openssl-devel
 BuildRequires:  pcre2-devel
+%if %{with rust}
+BuildRequires:  cargo
+BuildRequires:  rust
+%endif
 BuildRequires:  perl(Error)
 BuildRequires:  perl(lib)
 BuildRequires:  perl(Test)
@@ -589,6 +594,9 @@ NO_PYTHON = 1
 %endif
 %if %{with asciidoctor}
 USE_ASCIIDOCTOR = 1
+%endif
+%if %{without rust}
+NO_RUST = 1
 %endif
 htmldir = %{?_pkgdocdir}%{!?_pkgdocdir:%{_docdir}/%{name}-%{version}}
 prefix = %{_prefix}
@@ -1055,6 +1063,13 @@ rmdir --ignore-fail-on-non-empty "$testdir"
 %{?with_docs:%{_pkgdocdir}/git-svn.html}
 
 %changelog
+* Tue Jun 30 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.55.0-1
+- update to 2.55.0
+- enable Rust support for Fedora >= 45 and EL >= 11
+
+* Tue Apr 21 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.54.0-1
+- update to 2.54.0
+
 * Tue Feb 03 2026 Ondřej Pohořelský <opohorel@redhat.com> - 2.53.0-1
 - update to 2.53.0
 

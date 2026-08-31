@@ -1,0 +1,14 @@
+# README for Linux
+
+## File Device printing after CVE-2026-34990 fix
+
+After the fix, cupsd requires user to prepare the output file before printing
+to prevent any unwanted overwrites or removals. For example for file /tmp/ps:
+
+```
+$ touch /tmp/ps
+$ chcon system_u:object_r:cupsd_tmp_t:s0 /tmp/ps
+```
+
+cupsd after the fix requires the file to exist and changing the context is
+for Selinux to allow the cupsd to write into it.

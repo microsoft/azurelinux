@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-myclabs-deep-copy
 #
-# SPDX-FileCopyrightText:  Copyright 2015-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2015-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -11,8 +11,6 @@
 #
 %bcond_without       tests
 
-%global gh_commit    07d290f0c47959fd5eed98c95ee5602db07e0b6a
-%global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     myclabs
 %global gh_project   DeepCopy
 %global c_project    deep-copy
@@ -20,41 +18,36 @@
 %global php_home     %{_datadir}/php
 
 Name:           php-myclabs-deep-copy%{major}
-Version:        1.13.4
-Release: 4%{?dist}
+Version:        1.14.0
+Release:        1%{?dist}
 
 Summary:        Create deep copies (clones) of your objects
 
 License:        MIT
 URL:            https://github.com/%{gh_owner}/%{gh_project}
 # git snashop to get upstream test suite
-Source0:        php-myclabs-deep-copy-%{version}-%{gh_short}.tgz
+Source0:        php-myclabs-deep-copy-%{version}.tgz
 Source1:        makesrc.sh
 
 BuildArch:      noarch
 %if %{with tests}
 # For tests
-BuildRequires:  php(language) >= 7.1
-BuildRequires:  php-reflection
-BuildRequires:  php-spl
+BuildRequires:  php(language)
 # From composer.json, "require-dev": {
 #        "doctrine/collections": "^1.6.8",
 #        "doctrine/common": "^2.13.3 || ^3.2.2",
 #        "phpspec/prophecy": "^1.10",
 #        "phpunit/phpunit": "^7.5.20 || ^8.5.23 || ^9.5.13"
-BuildRequires: (php-composer(phpspec/prophecy)     >= 1.10  with php-composer(phpspec/prophecy)     < 2)
 BuildRequires:  phpunit9 >= 9.5.13
 %endif
 # For autoloader
 BuildRequires:  php-fedora-autoloader-devel
 
 # From composer.json, "require": {
-#        "php": "^7.1 || ^8.0"
-Requires:       php(language) >= 7.1
+#        "php": "^7.1"
+Requires:       php(language)
 # From phpcompatinfo report for version 1.8.0
-Requires:       php-reflection
-Requires:       php-date
-Requires:       php-spl
+# Only date, reflection and spl
 # Required by autoloader
 Requires:       php-composer(fedora/autoloader)
 
@@ -67,7 +60,7 @@ It is designed to handle cycles in the association graph.
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%setup -q -n %{gh_project}-%{version}
 
 
 %build
@@ -91,17 +84,16 @@ cat << 'EOF' | tee vendor/autoload.php
 require '%{buildroot}%{php_home}/%{gh_project}%{major}/autoload.php';
 \Fedora\Autoloader\Autoload::addPsr4('DeepCopy\\', dirname(__DIR__).'/fixtures/');
 \Fedora\Autoloader\Autoload::addPsr4('DeepCopyTest\\', dirname(__DIR__).'/tests/DeepCopyTest/');
-\Fedora\Autoloader\Dependencies::required([
-    '%{php_home}/Prophecy/autoload.php',
-]);
 EOF
 
-# disable doctrine related tests
+# Drop doctrine related tests
 rm -r tests/DeepCopyTest/Matcher/Doctrine \
       tests/DeepCopyTest/Filter/Doctrine
+# Drop tests using phpspec/prophecy
+rm tests/DeepCopyTest/TypeFilter/Spl/ArrayObjectFilterTest.php
 
 ret=0
-for cmd in php php81 php82 php83 php84 php85; do
+for cmd in php php80 php81 php82 php83 php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=vendor/autoload.php \
        %{_bindir}/phpunit9 \
@@ -123,6 +115,9 @@ exit $ret
 
 
 %changelog
+* Tue Aug 11 2026 Remi Collet <remi@remirepo.net> - 1.14.0-1
+- update to 1.14.0
+
 * Fri Aug  1 2025 Remi Collet <remi@remirepo.net> - 1.13.4-1
 - update to 1.13.4
 

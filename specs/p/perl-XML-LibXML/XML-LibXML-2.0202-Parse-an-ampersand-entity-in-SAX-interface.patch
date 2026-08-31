@@ -38,7 +38,7 @@ index 5248ea5..ccc3410 100644
 --- a/MANIFEST
 +++ b/MANIFEST
 @@ -174,6 +174,7 @@ t/49callbacks_returning_undef.t
- t/49global_extent.t
+ t/49global_extent_with_no_network.t
  t/50devel.t
  t/51_parse_html_string_rt87089.t
 +t/52_sax_intent.t
@@ -50,9 +50,9 @@ index b949d3c..232a879 100644
 --- a/perl-libxml-sax.c
 +++ b/perl-libxml-sax.c
 @@ -20,6 +20,7 @@ extern "C" {
- #include "ppport.h"
  
  #include <stdlib.h>
+ #include <stdint.h>
 +#include <string.h>
  #include <libxml/xmlmemory.h>
  #include <libxml/parser.h>

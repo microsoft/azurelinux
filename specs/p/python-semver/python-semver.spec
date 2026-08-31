@@ -5,7 +5,7 @@
 
 Name:           python-%{modname}
 Version:        3.0.4
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        Python helper for Semantic Versioning
 
 License:        BSD-3-Clause

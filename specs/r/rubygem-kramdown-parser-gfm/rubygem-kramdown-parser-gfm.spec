@@ -6,7 +6,7 @@
 Name:           rubygem-%{gem_name}
 Summary:        Kramdown parser for GitHub-flavored markdown
 Version:        1.1.0
-Release: 19%{?dist}
+Release:        16%{?dist}
 
 # SPDX confirmed
 License:        MIT

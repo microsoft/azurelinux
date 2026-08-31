@@ -3,7 +3,7 @@
 
 Name:           nftables
 Version:        1.1.3
-Release: 9%{?dist}
+Release:        6%{?dist}.1
 # Upstream released a 0.100 version, then 0.4. Need Epoch to get back on track.
 Epoch:          1
 Summary:        Netfilter Tables userspace utilities
@@ -18,6 +18,8 @@ Source4:        nftables.conf
 Source5:        main.nft
 Source6:        router.nft
 Source7:        nat.nft
+
+Patch01:        0001-src-netlink-fix-crash-when-ops-doesn-t-support-udata.patch
 
 #BuildRequires: autogen
 #BuildRequires: autoconf
@@ -151,6 +153,9 @@ fi
 %{_unitdir}/nftables.service
 
 %changelog
+* Fri Feb 27 2026 Phil Sutter <psutter@redhat.com> - 1:1.1.3-6.1
+- src: netlink: fix crash when ops doesn't support udata
+
 * Sat Jan 03 2026 Kevin Fenzi <kevin@scrye.com> - 1:1.1.3-6
 - Adjust post to keep service enabled on dist-upgrades. Thanks grumpey0@gmail.com
 

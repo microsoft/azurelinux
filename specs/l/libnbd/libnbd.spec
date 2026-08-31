@@ -23,8 +23,8 @@
 %global source_directory 1.24-stable
 
 Name:           libnbd
-Version:        1.24.1
-Release: 4%{?dist}
+Version:        1.24.3
+Release:        1%{?dist}
 Summary:        NBD client library in userspace
 
 License:        LGPL-2.0-or-later AND BSD-3-Clause
@@ -404,6 +404,13 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
+* Wed Jul 15 2026 Richard W.M. Jones <rjones@redhat.com> - 1.24.3-1
+- New upstream stable version 1.24.3
+- Fixes command injection in nbd+ssh URIs (RHEL-189057)
+
+* Tue Mar 03 2026 Richard W.M. Jones <rjones@redhat.com> - 1.24.2-1
+- New upstream stable version 1.24.2
+
 * Tue Feb 17 2026 Richard W.M. Jones <rjones@redhat.com> - 1.24.1-1
 - New upstream stable version 1.24.1
 

@@ -5,7 +5,7 @@
 
 Name:		accel-config
 Version:	4.1.8
-Release: 14%{?dist}
+Release:	11%{?dist}
 Summary:	Configure accelerator subsystem devices
 License:	GPL-2.0-only
 URL:		https://github.com/intel/%{project_name}

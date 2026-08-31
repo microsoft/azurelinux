@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 5;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,9 +11,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# Requires python-pymongo 4.4.0 or later, so disable for F41/F42.
-# F43: disable until RHBZ#2356166 is fixed in python-pymongo.
-%bcond bson %[ %{undefined fc42} && %{undefined fc41} ]
+%bcond bson 1
 %bcond cbor2 1
 %bcond msgpack 1
 %bcond msgspec 1
@@ -23,7 +21,7 @@
 #global snapdate YYYYMMDD
 
 Name:           python-cattrs
-Version:        25.3.0%{?commit:^%{snapdate}git%{sub %{commit} 1 7}}
+Version:        26.1.0%{?commit:^%{snapdate}git%{sub %{commit} 1 7}}
 Release:        %autorelease
 Summary:        Python library for structuring and unstructuring data
 
@@ -36,7 +34,7 @@ Source:         %{url}/archive/v%{version}/cattrs-%{version}.tar.gz
 %global srcversion %{version}
 %else
 Source:         %{url}/archive/%{commit}/cattrs-%{commit}.tar.gz
-%global srcversion %(echo %{version} | cut -d '^' -f 1)
+%global srcversion %(echo %{version} | cut --delimiter='^' --fields=1)
 %endif
 
 # Downstream: temporarily loosen version bounds on some test dependencies
@@ -47,10 +45,7 @@ Patch:          0001-Downstream-temporarily-loosen-version-bounds-on-some.patch
 # with no compiled code.
 %global debug_package %{nil}
 
-BuildRequires:  python3-devel
-BuildRequires:  tomcli
-
-%global msgspec_enabled 0
+%dnl msgspec_enabled should be defined to 1 or undefined, never defined to 0
 %if %{with msgspec}
 %ifnarch s390x %{ix86}
 %global msgspec_enabled 1
@@ -71,9 +66,6 @@ Summary:        %{summary}
 
 BuildArch:      noarch
 
-%if %{without bson}
-Obsoletes:      python3-cattrs+bson < 25.1.1-2
-%endif
 # Removed for Fedora 42; we can drop the Obsoletes after Fedora 44.
 Obsoletes:      python-cattrs-doc < 24.1.2^20241004gitae80674-6
 
@@ -81,14 +73,14 @@ Obsoletes:      python-cattrs-doc < 24.1.2^20241004gitae80674-6
 
 
 # Most extras metapackages are noarch:
-%pyproject_extras_subpkg -n python3-cattrs -a ujson pyyaml tomlkit
+%pyproject_extras_subpkg -n python3-cattrs -a ujson pyyaml tomlkit tomllib
 %if %{with bson}
 %pyproject_extras_subpkg -n python3-cattrs -a bson
 %endif
 %if %{with cbor2}
 %pyproject_extras_subpkg -n python3-cattrs -a cbor2
 %endif
-%if %{msgspec_enabled}
+%if %{defined msgspec_enabled}
 # python-msgspec is ExcludeArch: s390x i686; the extras metapackage is arched
 # because it is not present on every architecture
 %pyproject_extras_subpkg -n python3-cattrs msgspec
@@ -102,42 +94,33 @@ Obsoletes:      python-cattrs-doc < 24.1.2^20241004gitae80674-6
 
 
 %prep
-%autosetup -n cattrs-%{?!commit:%{version}}%{?commit:%{commit}}
+%autosetup -C
 
 # Don’t run benchmarks when testing
-tomcli set pyproject.toml lists delitem 'dependency-groups.test' \
-    'pytest-benchmark\b.*'
-sed -r -i 's/ --benchmark[^[:blank:]"]*//g' pyproject.toml
+%pyproject_patch_dependency pytest-benchmark:ignore
+sed --regexp-extended --in-place \
+    's/ --benchmark[^[:blank:]"]*//g' pyproject.toml
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
-tomcli set pyproject.toml lists delitem 'dependency-groups.test' \
-    'coverage\b.*'
+%pyproject_patch_dependency coverage:ignore
 
 # Remove bundled fonts to show they are not packaged:
-rm -rv docs/_static/fonts/
+rm --recursive --verbose docs/_static/fonts/
 
 
 %generate_buildrequires
 export SETUPTOOLS_SCM_PRETEND_VERSION='%{srcversion}'
-%{pyproject_buildrequires \
-    -x ujson \
-%if %{with orjson}
-    -x orjson \
-%endif
-%if %{with msgpack}
-    -x msgpack \
-%endif
-    -x pyyaml \
-    -x tomlkit \
-%if %{with cbor2}
-    -x cbor2 \
-%endif
-%if %{with bson}
-    -x bson \
-%endif
-%if %{msgspec_enabled}
-    -x msgspec \
-%endif
-    -g test}
+%{pyproject_buildrequires %{shrink:
+    --extras ujson
+    %{?with_orjson:--extras orjson}
+    %{?with_msgpack:--extras msgpack}
+    --extras pyyaml
+    --extras tomlkit
+    %{?with_cbor2:--extras cbor2}
+    %{?with_bson:--extras bson}
+    %{?msgspec_enabled:--extras msgspec}
+    --extras tomllib
+    --dependency-groups test
+    }}
 
 
 %build
@@ -147,18 +130,18 @@ export SETUPTOOLS_SCM_PRETEND_VERSION='%{srcversion}'
 
 %install
 %pyproject_install
-%pyproject_save_files -l cattrs cattr
+%pyproject_save_files --assert-license cattrs cattr
 
 
 %check
-%if %{without bson} || %{without cbor2}
-# These unconditionally import bson and cbor2, so they error during test
-# collection
+%if %{without bson} || %{without cbor2} || %{without msgpack}
+# These unconditionally import bson, cbor2, and msgpack, so they error during
+# test collection
 ignore="${ignore-} --ignore=tests/test_preconf.py"
 ignore="${ignore-} --ignore=tests/preconf/test_pyyaml.py"
 %endif
 
-%if !%{msgspec_enabled}
+%if %{undefined msgspec_enabled}
 k="${k-}${k+ and }not test_literal_dicts_msgspec"
 k="${k-}${k+ and }not test_msgspec_efficient_enum"
 k="${k-}${k+ and }not test_msgspec_json_converter"
@@ -169,7 +152,17 @@ k="${k-}${k+ and }not test_msgspec_native_enums"
 ignore="${ignore-} --ignore=tests/preconf/test_msgspec_cpython.py"
 %endif
 
-%pytest --ignore-glob='bench/*' ${ignore-} -k "${k-}" -n auto
+%if %{without orjson}
+k="${k-}${k+ and }not test_literal_dicts_orjson"
+k="${k-}${k+ and }not test_orjson"
+k="${k-}${k+ and }not test_orjson_converter"
+k="${k-}${k+ and }not test_orjson_converter_unstruct_collection_overrides"
+k="${k-}${k+ and }not test_orjson_efficient_enum"
+k="${k-}${k+ and }not test_orjson_native_enums"
+k="${k-}${k+ and }not test_orjson_unions"
+%endif
+
+%pytest --ignore-glob='bench/*' ${ignore-} -k "${k-}" --numprocesses=auto
 
 
 %files -n python3-cattrs -f %{pyproject_files}
@@ -179,14 +172,23 @@ ignore="${ignore-} --ignore=tests/preconf/test_msgspec_cpython.py"
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 25.3.0-5
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 26.1.0-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 25.3.0-4
-- build: mass rebuild auto-bumpable components
+* Sat Jul 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 26.1.0-1
+- Update to 26.1.0 (close RHBZ#2440816)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 25.3.0-3
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Sat Jul 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 25.3.0-11
+- Drop unnecessary explicit BR on python3-devel
+
+* Sat Jul 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 25.3.0-6
+- Fix test skips for bconds
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 25.3.0-5
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 25.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Sun Oct 12 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 25.3.0-2
 - Add some additional test skips for msgspec

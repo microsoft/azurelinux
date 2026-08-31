@@ -60,7 +60,7 @@
 Summary: A subset of LAPACK routines redesigned for heterogeneous computing
 Name: scalapack
 Version: 2.2.2
-Release: 8%{?dist}
+Release: 5%{?dist}
 License: BSD-3-Clause-Open-MPI
 URL: http://www.netlib.org/scalapack/
 Source0: https://github.com/Reference-ScaLAPACK/scalapack/archive/v%{version}.tar.gz

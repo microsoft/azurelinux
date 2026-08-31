@@ -6,7 +6,7 @@
 
 Name:           python-%{srcname}
 Version:        0.4.1
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        %{sum}
 
 License:        BSD-3-Clause

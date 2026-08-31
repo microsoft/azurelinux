@@ -6,7 +6,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	5.27.0
-Release: 5%{?dist}
+Release:	2%{?dist}
 
 Summary:	minitest/mock, by Steven Baker, is a beautifully tiny mock (and stub) object framework
 # From README.rdoc

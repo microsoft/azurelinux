@@ -9,7 +9,7 @@ Group:   System Environment/Base
 
 Epoch:   1
 Version: 1.54.3
-Release: 5%{?dist}
+Release: 3%{?dist}
 
 ###############################################################################
 
@@ -170,7 +170,7 @@ Source7: 70-nm-connectivity.conf
 Source8: readme-ifcfg-rh.txt
 Source9: readme-ifcfg-rh-migrated.txt
 
-#Patch1: 0001-some.patch
+Patch1: 0001-pacrunner-don-t-pass-DNS-search-domains-to-PAC-runne.patch
 
 Requires(post): systemd
 Requires(post): systemd-udev
@@ -1063,6 +1063,9 @@ fi
 
 
 %changelog
+* Fri May 15 2026 Íñigo Huguet <ihuguet@riseup.net> - 1:1.54.3-3
+- Don't send DNS domains as proxy domains for pacrunner (rhbz#2467851)
+
 * Tue Dec 16 2025 Cristian Le <git@lecris.dev> - 1:1.54.3-2
 - Convert STI tests to TMT (rhbz#2382851)
 

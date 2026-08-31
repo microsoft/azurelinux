@@ -3,7 +3,7 @@
 
 Name:           xcb-proto
 Version:        1.17.0
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        XCB protocol descriptions
 
 License:        X11-distribute-modifications-variant

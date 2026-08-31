@@ -187,8 +187,8 @@
 # main package definition
 #################################################################################
 Name:		ceph
-Version:	19.2.3
-Release: 13%{?dist}
+Version:	19.2.6
+Release:	1%{?dist}
 %if 0%{?fedora} || 0%{?rhel}
 Epoch:		2
 %endif
@@ -233,8 +233,6 @@ Patch:		0055-python314.patch
 Patch:		0056-libarrow-20.0.0.patch
 Patch:		0057-src-ceph-volume-ceph-volume-main.py.patch
 Patch:		0058-mgr-dashboard-Make-saml2-robust-against-module-load-.patch
-# Fixed in upcoming 19.2.4
-Patch:		0059-mgr-dashboard-catch-protobuf-error-due-to-mismatch-i.patch
 
 # Squid fixes from https://git.proxmox.com/?p=ceph.git;a=tree;f=patches
 # Should be fixed upstream in Ceph 20.
@@ -2760,6 +2758,15 @@ exit 0
 %{python3_sitelib}/ceph_node_proxy-*
 
 %changelog
+* Wed Aug 19 2026 Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 2:19.2.6-1
+- ceph-19.2.6 GA
+
+* Wed Jul 16 2026 Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 2:19.2.5-1
+- ceph-19.2.5 GA
+
+* Mon Jun 1 2026 Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 2:19.2.4-1
+- ceph-19.2.4 GA
+
 * Fri Jan 2 2026 Kaleb S. KEITHLEY <kkeithle[at]redhat.com> - 2:19.2.3-10
 - ceph-19.2.3, rhbz#2425930
 
