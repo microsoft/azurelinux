@@ -1,7 +1,7 @@
 %global goroot          %{_libdir}/golang
 %global gopath          %{_datadir}/gocode
-%global ms_go_filename  go1.26.5-20260709.6.src.tar.gz
-%global ms_go_revision  2
+%global ms_go_filename  go1.26.7-20260819.2.src.tar.gz
+%global ms_go_revision  1
 %ifarch aarch64
 %global gohostarch      arm64
 %else
@@ -14,8 +14,8 @@
 %define __find_requires %{nil}
 Summary:        Go
 Name:           golang
-Version:        1.26.5
-Release:        2%{?dist}
+Version:        1.26.7
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -34,8 +34,6 @@ Source3:        https://github.com/microsoft/go/releases/download/v1.20.14-1/go.
 Source4:        https://github.com/microsoft/go/releases/download/v1.22.12-2/go1.22.12-20250211.4.src.tar.gz
 # bootstrap 04
 Source5:        https://github.com/microsoft/go/releases/download/v1.24.13-1/go1.24.13-20260204.5.src.tar.gz
-
-Patch1:         CVE-2026-39821.patch
 
 Provides:       %{name} = %{version}
 Provides:       go = %{version}-%{release}
@@ -172,6 +170,13 @@ fi
 %{_bindir}/*
 
 %changelog
+* Wed Aug 19 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.7-1
+- Bump version to 1.26.7-1
+
+* Fri Aug 14 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.6-1
+- Bump version to 1.26.6-1
+- Remove patch of CVE-2026-39821
+
 * Fri Jul 10 2026 bot-for-go[bot] <199222863+bot-for-go[bot]@users.noreply.github.com> - 1.26.5-2
 - Bump version to 1.26.5-2
 

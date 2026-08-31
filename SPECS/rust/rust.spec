@@ -9,7 +9,7 @@
 Summary:        Rust Programming Language
 Name:           rust
 Version:        1.90.0
-Release:        9%{?dist}
+Release:        11%{?dist}
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -60,6 +60,7 @@ Patch15:        CVE-2026-34743.patch
 Patch16:        CVE-2026-5222.patch
 Patch17:        CVE-2026-5223.patch
 Patch18:        CVE-2026-40034.patch
+Patch19:        CVE-2026-47143.patch
 
 BuildRequires:  binutils
 BuildRequires:  cmake
@@ -78,7 +79,7 @@ BuildRequires:  python3
 # make sure rust depends on system zlib
 BuildRequires:  zlib-devel
 %if 0%{?with_check}
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:	sudo
 %endif
 # rustc uses a C compiler to invoke the linker, and links to glibc in most cases
@@ -164,6 +165,12 @@ rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
+# Move bundled third-party license texts out of %{_docdir} (where rpm auto-tags them %doc)
+# into the license dir, so they are classified only as %license and not flagged as duplicates.
+mkdir -p %{buildroot}%{_licensedir}/rust-doc
+mv %{buildroot}%{_docdir}/rustc/licenses/* %{buildroot}%{_licensedir}/rust-doc/
+rmdir %{buildroot}%{_docdir}/rustc/licenses
+
 %ldconfig_scriptlets
 
 %files
@@ -186,7 +193,7 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 
 %files doc
 %license LICENSE-APACHE LICENSE-MIT LICENSE-THIRD-PARTY COPYRIGHT
-%license %{_docdir}/rustc/licenses/*
+%license %{_licensedir}/rust-doc/*
 %doc %{_docdir}/rustc/README.md
 %doc %{_docdir}/cargo/*
 %doc %{_docdir}/rustfmt/*
@@ -198,6 +205,14 @@ rm %{buildroot}%{_docdir}/docs/html/.lock
 %{_mandir}/man1/*
 
 %changelog
+* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.90.0-11
+- Bump to rebuild with updated glibc
+
+* Tue Jul 28 2026 SumitJenaHCL <v-sumitjena@microsoft.com> - 1.90.0-10
+- Patch for CVE-2026-47143
+- Update CVE-2026-25541.patch to apply cleanly against vendored bytes 1.10.1
+- Fix rust-doc license check warnings
+
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034
 

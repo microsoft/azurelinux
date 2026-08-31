@@ -2,19 +2,22 @@
 
 Name:           kata-containers
 Version:        3.32.0.kata0
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Kata Containers package developed for Pod Sandboxing on AKS
 License:        ASL 2.0
 URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        %{name}-%{version}-cargo.tar.gz
+# Todo: revert back to %{name}-${version}-cargo.tar.gz next release
+# This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
+Source1:        %{name}-3.32.0.kata1-cargo.tar.gz
 # Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
 Patch0:         dbs-arch-cpuid-unsafe.patch
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
 Patch3:         CVE-2026-56852.patch
+Patch4:         CVE-2026-50540.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -140,6 +143,12 @@ install -m 0644 \
 %{tools_pkg}/tools/osbuilder/node-builder/azure-linux/agent-install/usr/lib/systemd/system/kata-agent.service
 
 %changelog
+* Fri Aug 14 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.32.0.kata0-3
+- Patch for CVE-2026-50540
+
+* Tue Aug 04 2026 Saul Paredes <saulparedes@microsoft.com>  - 3.32.0.kata0-2
+- Use smaller vendored sources
+
 * Mon Jul 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.32.0.kata0-1
 - Auto-upgrade to 3.32.0.kata0
 - Add preview configurations for VM templating

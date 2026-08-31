@@ -51,7 +51,7 @@ Patch18:        0004-Propagate-launcher-pull-secret-to-hotplug-helper-pods.patch
 %global debug_package %{nil}
 BuildRequires:  swtpm-tools
 BuildRequires:  glibc-devel
-BuildRequires:  glibc-static >= 2.38-20%{?dist}
+BuildRequires:  glibc-static >= 2.38-21%{?dist}
 BuildRequires:  golang >= 1.24
 BuildRequires:  golang-packaging
 BuildRequires:  pkgconfig
@@ -305,6 +305,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 - Enable Kubevirt Sidecar
 - Add hotplug volue patches
 - Add live migration blackout observability patch
+
+* Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.1-9
+- Bump to rebuild with updated glibc
 
 * Mon Jul 27 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.7.1-8
 - Patch for CVE-2026-56852
