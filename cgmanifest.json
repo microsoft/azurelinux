@@ -26083,8 +26083,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "9.1.0",
-          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
+          "version": "10.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-10.1.0.tar.xz"
         }
       }
     },
