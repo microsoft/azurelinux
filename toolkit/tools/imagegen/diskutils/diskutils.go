@@ -722,7 +722,14 @@ func createSinglePartition(diskDevPath string, partitionNumber int, partitionTab
 			typeId = partition.TypeUUID
 
 		case partition.Type != "":
-			typeId = configuration.PartitionTypeNameToUUID[partition.Type]
+			// Partition.IsValid() rejects unknown type names, but it is only run on configs that come from JSON.
+			// Check here as well so that a caller that builds a config programmatically can't end up writing an
+			// sfdisk script with an empty "type=" field.
+			uuid, found := configuration.PartitionTypeNameToUUID[partition.Type]
+			if !found {
+				return "", fmt.Errorf("unrecognized partition (%d) type (%s)", partitionNumber, partition.Type)
+			}
+			typeId = uuid
 		}
 	}
 
