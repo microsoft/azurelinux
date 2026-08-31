@@ -662,9 +662,6 @@ Requires: %{name}-core-uname-r = %{KVERREL}
 Requires: %{name}-modules-uname-r = %{KVERREL}
 Requires: %{name}-modules-core-uname-r = %{KVERREL}
 Requires: ((%{name}-modules-extra-uname-r = %{KVERREL}) if %{name}-modules-extra-matched)
-%ifarch x86_64 aarch64
-Requires: ((kmod-nvidia-open-uname-r = %{KVERREL}) if kmod-nvidia-open-matched)
-%endif
 Provides: installonlypkg(kernel)
 %endif
 
