@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"testing"
 
 	"github.com/microsoft/azurelinux/toolkit/tools/imagegen/diskutils"
@@ -108,16 +107,13 @@ func testCustomizeImagePartitionsToEfi(t *testing.T, testName string, imageType 
 		imageVersion)
 
 	// Check the partition types.
-	assert.Equal(t, "c12a7328-f81f-11d2-ba4b-00a0c93ec93b", partitions[1].PartitionTypeUuid) // esp
-	assert.Equal(t, "bc13c2ff-59e6-4262-a352-b275fd6f7172", partitions[2].PartitionTypeUuid) // xbootldr
-	assert.Equal(t, "4d21b016-b534-45c2-a9fb-5c16e091fd2d", partitions[4].PartitionTypeUuid) // var
-
-	switch runtime.GOARCH {
-	case "amd64":
-		assert.Equal(t, "4f68bce3-e8cd-4db1-96e7-fbcaf984b709", partitions[3].PartitionTypeUuid) // root (x64)
-	case "arm64":
-		assert.Equal(t, "b921b045-1df0-41c3-af44-4c6f280d3fae", partitions[3].PartitionTypeUuid) // root (arm64)
-	}
+	// Only the ESP partition has an explicit type in partitions-config.yaml. The imagecustomizer API does not
+	// support the Discoverable Partitions Specification types, so every other partition gets the generic Linux
+	// filesystem data type.
+	assert.Equal(t, diskutils.EfiSystemPartitionTypeUuid, partitions[1].PartitionTypeUuid)    // esp
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[2].PartitionTypeUuid) // boot
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[3].PartitionTypeUuid) // rootfs
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[4].PartitionTypeUuid) // var
 
 	// Check the partition sizes.
 	assert.Equal(t, uint64(8*diskutils.MiB), partitions[1].SizeInBytes)
@@ -186,9 +182,9 @@ func TestCustomizeImagePartitionsSizeOnly(t *testing.T) {
 		baseImageVersionDefault)
 
 	// Check the partition types.
-	assert.Equal(t, "c12a7328-f81f-11d2-ba4b-00a0c93ec93b", partitions[1].PartitionTypeUuid) // esp
-	assert.Equal(t, "0fc63daf-8483-4772-8e79-3d69d8477de4", partitions[2].PartitionTypeUuid) // linux generic
-	assert.Equal(t, "0fc63daf-8483-4772-8e79-3d69d8477de4", partitions[3].PartitionTypeUuid) // linux generic
+	assert.Equal(t, diskutils.EfiSystemPartitionTypeUuid, partitions[1].PartitionTypeUuid)    // esp
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[2].PartitionTypeUuid) // linux generic
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[3].PartitionTypeUuid) // linux generic
 
 	// Check the partition sizes.
 	assert.Equal(t, uint64(8*diskutils.MiB), partitions[1].SizeInBytes)
@@ -252,8 +248,8 @@ func testCustomizeImagePartitionsToLegacy(t *testing.T, testName string, imageTy
 		imageVersion)
 
 	// Check the partition types.
-	assert.Equal(t, "21686148-6449-6e6f-744e-656564454649", partitions[1].PartitionTypeUuid) // BIOS boot
-	assert.Equal(t, "0fc63daf-8483-4772-8e79-3d69d8477de4", partitions[2].PartitionTypeUuid) // linux generic
+	assert.Equal(t, diskutils.BiosBootPartitionTypeUuid, partitions[1].PartitionTypeUuid)     // BIOS boot
+	assert.Equal(t, diskutils.GenericLinuxPartitionTypeUuid, partitions[2].PartitionTypeUuid) // linux generic
 
 	// Check the partition sizes.
 	assert.Equal(t, uint64(8*diskutils.MiB), partitions[1].SizeInBytes)
