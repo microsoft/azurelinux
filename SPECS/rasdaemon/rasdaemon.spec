@@ -2,11 +2,14 @@ Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Name:			rasdaemon
 Version:		0.8.0
-Release:		1%{?dist}
+Release:		2%{?dist}
 Summary:		Utility to receive RAS error tracings
 License:		GPLv2
 URL:			http://git.infradead.org/users/mchehab/rasdaemon.git
 Source0:		http://www.infradead.org/~mchehab/rasdaemon/%{name}-%{version}.tar.bz2
+# Backport of upstream commit b6a64416 ("rasdaemon: Fix SMCA bank type
+# decoding") adapted to the 0.8.0 (HWID, MCATYPE) tuple encoding.
+Patch0:			0001-rasdaemon-Fix-SMCA-bank-type-decoding.patch
 
 ExcludeArch:		s390 s390x
 BuildRequires:		make
@@ -40,7 +43,7 @@ EDAC drivers and DIMM labels are loaded at system startup, as well as
 an utility for reporting current error counts from the EDAC sysfs files.
 
 %prep
-%setup -q
+%autosetup -p1
 autoreconf -vfi
 
 %build
@@ -75,6 +78,10 @@ rm INSTALL %{buildroot}/usr/include/*.h
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 
 %changelog
+* Wed Aug 05 2026 Andreas Zaugg <azaugg@linkedin.com> - 0.8.0-2
+- Backport upstream fix for SMCA bank type decoding (commit b6a64416) to
+  ignore MCA_IPID bits 47:44 (InstanceIdHi) on modern AMD systems.
+
 * Wed May 22 2024 Chris Co <chrco@microsoft.com> - 0.8.0-1
 - Update to version 0.8.0. From Fedora 40. License verified.
 
