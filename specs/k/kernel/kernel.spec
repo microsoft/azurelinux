@@ -9,11 +9,18 @@
 
 # Azure Linux kernel build defines. These were previously injected via the
 # azldev-generated kernel.azl.macros file; they now live directly in the spec.
-# When rebuilding without a version change, bump azl_pkgrelease (manual release).
-%define azl_pkgrelease 16
-# 4th version component from the AZL kernel source (6.18.31.1). Flows into
-# Release:, uname -r, and the /lib/modules/ path.
+# AZL: our kernel source comes to us with a non-standard 4-digit version
+# number (e.g. A.B.C.D), so we remove the 4th number (e.g. D) and use the
+# standard 3-digit version (e.g. A.B.C), and place the 4th number into the
+# leading (dot-separated) position of our release value, in the %{specrelease}
+# macro below. For example, if the kernel source is version "A.B.C.D", our rpm
+# (and uname -r) V-R would start with "A.B.C-D." plus the remaining release
+# macro/arch values.
 %define kextraversion 1
+# When rebuilding without a version change, bump azl_pkgrelease (manual release).
+# This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
+# %{specrelease} macro below instead of a hardcoded value.
+%define azl_pkgrelease 5
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
 %define nvidia_open_version 595.58.03
 
@@ -128,6 +135,9 @@ Summary: The Linux kernel
 %endif
 
 # RHEL/CentOS specific .SBAT entries
+%if 0%{?azl4}
+%global sbat_suffix azurelinux
+%else
 %if 0%{?centos}
 %global sbat_suffix centos
 %else
@@ -135,6 +145,7 @@ Summary: The Linux kernel
 %global sbat_suffix fedora
 %else
 %global sbat_suffix rhel
+%endif
 %endif
 %endif
 
@@ -163,6 +174,12 @@ Summary: The Linux kernel
 %endif
 
 #
+%if 0%{?azl4}
+%define uki_addon_distro azurelinux
+%else
+%define uki_addon_distro %{primary_target}
+%endif
+
 # genspec.sh variables
 #
 
@@ -192,7 +209,7 @@ Summary: The Linux kernel
 #  the --with-release option overrides this setting.)
 %define debugbuildsenabled 1
 # define buildid .local
-%define specrpmversion 6.18.31
+%define specrpmversion 6.18.39
 %define specversion %{specrpmversion}
 %define patchversion 6.18
 %define pkgrelease %{azl_pkgrelease}
@@ -2905,7 +2922,7 @@ BuildKernel() {
 
   KernelAddonsDirOut="$KernelUnifiedImage.extra.d"
   mkdir -p $KernelAddonsDirOut
-  python3 %{SOURCE151} %{SOURCE152} $KernelAddonsDirOut virt %{primary_target} %{_target_cpu} @uki-addons.sbat
+  python3 %{SOURCE151} %{SOURCE152} $KernelAddonsDirOut virt %{uki_addon_distro} %{_target_cpu} @uki-addons.sbat
 
 %if %{signkernel}
 	%{log_msg "Sign the EFI UKI kernel"}
@@ -4612,6 +4629,22 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Thu Aug 27 2026 Hayden Barnes <hbarnes@herodevs.com> - 6.18.39-1.5
+- feat(kernel): enable x86 USB storage and UAS
+
+* Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 6.18.39-1.4
+- feat(kernel): add Azure Linux SBAT records
+- fix(kernel): name UKI addons for Azure Linux
+
+* Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
+- chore(kernel): tidy release macros
+
+* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.2
+- feat(kernel): enable TCP BBR3 congestion control as a module
+
+* Wed Aug 19 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.1
+- feat(kernel): update kernel and kernel-headers to 6.18.39.1
+
 * Tue Aug 11 2026 Andreas Zaugg <azaugg@linkedin.com> - 6.18.31-1.16
 - feat(kernel): enable USB RNDIS host driver (USB_NET_RNDIS_HOST) as module on x86_64
 

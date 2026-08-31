@@ -1,0 +1,27 @@
+From a5707d0f8bf9998392bb1437c121d4b724779714 Mon Sep 17 00:00:00 2001
+From: Mitch Zhu <mitchzhu@microsoft.com>
+Date: Mon, 24 Aug 2026 23:36:00 +0000
+Subject: [PATCH] tests: format HTTP status code as an integer
+
+Go 1.26's stricter printf analysis rejects %q for the integer HTTP
+status code. Use %d while retaining the response status string.
+
+Signed-off-by: Mitch Zhu <mitchzhu@microsoft.com>
+---
+ markdown_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/markdown_test.go b/markdown_test.go
+--- a/markdown_test.go
++++ b/markdown_test.go
+@@ -30,7 +30,7 @@ func TestMarkdownService_Render(t *testing.T) {
+ 	}
+ 
+ 	if resp.StatusCode != http.StatusOK {
+-		t.Fatalf("Render returned status, expected %q but got %q", http.StatusOK, resp.Status)
++		t.Fatalf("Render returned status, expected %d but got %q", http.StatusOK, resp.Status)
+ 	}
+ 
+ 	if markdown.HTML != markdownHTMLResponse {
+--
+2.51.0

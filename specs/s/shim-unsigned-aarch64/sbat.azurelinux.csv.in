@@ -1,0 +1,4 @@
+shim.rh,3,The Fedora Project,shim,@@VERSION@@,https://src.fedoraproject.org/rpms/shim-unsigned-aarch64
+shim.redhat,3,The Fedora Project,shim,@@VERSION@@,https://src.fedoraproject.org/rpms/shim-unsigned-aarch64
+shim.fedora,3,The Fedora Project,shim,@@UPSTREAM_VERSION_RELEASE@@,https://src.fedoraproject.org/rpms/shim-unsigned-aarch64
+shim.azurelinux,1,Microsoft,shim,@@VERSION@@-@@RELEASE@@,https://github.com/microsoft/azurelinux/issues

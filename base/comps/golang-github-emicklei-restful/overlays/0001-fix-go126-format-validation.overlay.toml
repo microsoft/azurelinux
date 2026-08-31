@@ -1,0 +1,14 @@
+[metadata]
+category = "azl-compatibility"
+upstream-status = "upstreamable"
+
+[[overlays]]
+description = "Use a constant route log format for Go 1.26 vet"
+type = "patch-add"
+source = "../0001-route-builder-use-constant-log-format.patch"
+
+[[overlays]]
+description = "Apply the Go 1.26 format validation patch"
+type = "spec-append-lines"
+section = "%prep"
+lines = ["%autopatch -p1"]

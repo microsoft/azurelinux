@@ -1,12 +1,177 @@
 [components.shim-unsigned-x64]
-spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "bacb81905ea6806b97b968527e5ca9b2e3f0f7b4" }
+release = { calculation = "manual" }
+# Pin shim 16.1 to Fedora dist-git commit d355c62164bd48c6f47774fe04b0d730d892e006.
+spec = { type = "upstream", upstream-distro = { name = "fedora", version = "43" }, upstream-commit = "d355c62164bd48c6f47774fe04b0d730d892e006" }
 
-overlays = [
-    # Workaround: add dist tag to the release to avoid NEVR conflicts
-    # while we are still rebuilding all packages in new tags nightly.
-    { type = "spec-update-tag", tag = "Release", value = "2%{?dist}" },
+# Fedora ships one shim package across multiple Fedora releases. Azure Linux
+# historically signs and ships a distinct shim package for each major release,
+# so retain the Azure Linux dist tag. Revisit this if the packaging model changes.
+[[components.shim-unsigned-x64.overlays]]
+description = "Set the Azure Linux 16.1 release with its distribution tag"
+type = "spec-update-tag"
+tag = "Release"
+value = "2%{?dist}"
 
-    # Workaround: create a compat symlink that does not include the dist tag.
-    { type = "spec-append-lines", section = "%install", lines = ["ln -s %{version}-%{release} %{buildroot}%{_datadir}/shim/%{version}-2"] },
-    { type = "spec-append-lines", section = "%files", lines = ["%{_datadir}/shim/%{version}-2"] }
+[[components.shim-unsigned-x64.overlays]]
+description = "Add the Azure Linux shim changelog entries"
+type = "spec-prepend-lines"
+section = "%changelog"
+lines = [
+    "* Mon Aug 24 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 16.1-2",
+    "- Update shim-unsigned packages to 16.1",
+    "- Enforce the grub,5 SBAT generation baseline",
+    "- Remove obsolete %{version}-2 compatibility symlinks",
+    "- Omit unsupported IA32 output",
+    "- Add Azure Linux SBAT provenance",
+    "- Embed the Azure Linux vendor certificate",
+    "- Add NX-compatible EFI variants",
+    "",
 ]
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Enforce the grub,5 SBAT generation baseline"
+type = "spec-search-replace"
+section = "%build"
+regex = '^MAKEFLAGS\+="ENABLE_SHIM_HASH=true "$'
+replacement = "MAKEFLAGS+=\"ENABLE_SHIM_HASH=true \"\nMAKEFLAGS+=\"SBAT_AUTOMATIC_DATE=2025021800 \""
+
+# Azure Linux does not support IA32. Omit its packages and skip its build
+# and installation paths, which require the unsupported setarch -B call.
+[[components.shim-unsigned-x64.overlays]]
+description = "Remove the unsupported IA32 shim-unsigned subpackage"
+type = "spec-remove-subpackage"
+package = "shim-unsigned-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Remove the unsupported IA32 shim-unsigned debuginfo subpackage"
+type = "spec-remove-subpackage"
+package = "shim-unsigned-%{efialtarch}-debuginfo"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Do not run the debug-install helper for the IA32 build"
+type = "spec-search-replace"
+regex = '^%global __debug_install_post %{SOURCE100} %{efiarch} %{efialtarch}$'
+replacement = "%global __debug_install_post %{SOURCE100} %{efiarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip creating the unsupported IA32 build directory"
+type = "spec-search-replace"
+section = "%prep"
+regex = '^mkdir build-%{efialtarch}$'
+replacement = ""
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip the unsupported IA32 build commands"
+type = "spec-search-replace"
+section = "%build"
+regex = '^cd build-%{efialtarch}$'
+replacement = "%if 0\ncd build-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Close the conditional that skips the IA32 build"
+type = "spec-append-lines"
+section = "%build"
+lines = ["%endif"]
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Skip the unsupported IA32 installation commands"
+type = "spec-search-replace"
+section = "%install"
+regex = '^cd build-%{efialtarch}$'
+replacement = "%if 0\ncd build-%{efialtarch}"
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Close the IA32 install conditional"
+type = "spec-append-lines"
+section = "%install"
+lines = ["%endif"]
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Use the Fedora EVR in the shim.fedora SBAT record"
+type = "file-search-replace"
+file = "sbat.redhat.csv.in"
+regex = "@@VERSION@@-@@RELEASE@@"
+replacement = "@@UPSTREAM_VERSION_RELEASE@@"
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Add the Azure Linux shim SBAT record"
+type = "file-search-replace"
+file = "sbat.redhat.csv.in"
+regex = "\\n\\z"
+replacement = "\nshim.azurelinux,1,Microsoft,shim,@@VERSION@@-@@RELEASE@@,https://github.com/microsoft/azurelinux/issues\n"
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Define the upstream Fedora shim EVR for SBAT substitution"
+type = "spec-prepend-lines"
+lines = [
+    "%global upstream_version_release 16.1-1",
+    "",
+]
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Substitute the upstream Fedora shim EVR into SBAT"
+type = "spec-search-replace"
+section = "%prep"
+regex = "^    -e 's/@@RELEASE@@/%{release}/g' \\\\$"
+replacement = "    -e 's/@@RELEASE@@/%{release}/g' \\\n    -e 's/@@UPSTREAM_VERSION_RELEASE@@/%{upstream_version_release}/g' \\"
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Rename the Azure Linux shim SBAT template"
+type = "file-rename"
+file = "sbat.redhat.csv.in"
+replacement = "sbat.azurelinux.csv.in"
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Use the renamed Azure Linux SBAT template as Source3"
+type = "spec-search-replace"
+regex = "sbat\\.redhat\\.csv\\.in"
+replacement = "sbat.azurelinux.csv.in"
+metadata = { category = "azl-branding-policy", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Stage the Azure Linux Secure Boot CA as the shim vendor certificate"
+type = "file-add"
+file = "azurelinux-ca-20230216.der"
+source = "azurelinux-ca-20230216.der"
+metadata = { category = "azl-security-compliance", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Use the Azure Linux Secure Boot CA as shim Source1"
+type = "spec-search-replace"
+regex = "fedora-ca-20200709\\.cer"
+replacement = "azurelinux-ca-20230216.der"
+metadata = { category = "azl-security-compliance", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Create NX-compatible EFI variants"
+type = "spec-append-lines"
+section = "%build"
+lines = [
+    "cd build-%{efiarch}",
+    "for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do",
+    "    cp ${efi}.efi ${efi}.nx.efi",
+    "    ./post-process-pe -n -x ${efi}.nx.efi",
+    "done",
+    "pesign -i shim%{efiarch}.nx.efi -P -h > shim%{efiarch}.nx.hash",
+    "cd ..",
+]
+metadata = { category = "azl-platform-adaptation", upstream-status = "inapplicable" }
+
+[[components.shim-unsigned-x64.overlays]]
+description = "Install NX-compatible EFI variants"
+type = "spec-append-lines"
+section = "%install"
+lines = [
+    "cd build-%{efiarch}",
+    "for efi in shim%{efiarch} mm%{efiarch} fb%{efiarch}; do",
+    "    install -m 0644 ${efi}.nx.efi ${RPM_BUILD_ROOT}/%{shimdir}/",
+    "done",
+    "install -m 0644 shim%{efiarch}.nx.hash ${RPM_BUILD_ROOT}/%{shimdir}/",
+    "cd ..",
+]
+metadata = { category = "azl-platform-adaptation", upstream-status = "inapplicable" }

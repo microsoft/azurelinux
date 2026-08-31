@@ -39,7 +39,7 @@ Summary:        Azure Linux release files
 Name:           azurelinux-release
 Version:        4.0
 # TODO(azl): Review whether we can move back to autorelease (with conditional -p)
-Release:        26%{?dist}
+Release:        28%{?dist}
 License:        MIT
 URL:            https://aka.ms/azurelinux
 
@@ -64,6 +64,7 @@ Source27:       azurelinux-sudo.conf
 Source28:       azurelinux-sudo.logrotate
 Source29:       azurelinux-sugroup.conf
 Source30:       azurelinux-sshd-cis.conf
+Source31:       60-azurelinux-cis-module-denylist.conf
 
 BuildArch:      noarch
 
@@ -422,6 +423,8 @@ install -Dm0644 %{SOURCE16} -t %{buildroot}%{_prefix}/share/dnf5/libdnf.conf.d/
 
 # Install sysctl configuration
 install -Dm0644 %{SOURCE22} -t %{buildroot}%{_sysctldir}/
+# Install CIS network protocol module policy.
+install -Dm0644 %{SOURCE31} -t %{buildroot}%{_prefix}/lib/modprobe.d/
 
 
 
@@ -456,6 +459,7 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 %{_sysconfdir}/swid/swidtags.d
 %{_prefix}/share/dnf5/libdnf.conf.d/20-azurelinux-defaults.conf
 %{_sysctldir}/70-azurelinux-hardening.conf
+%{_prefix}/lib/modprobe.d/60-azurelinux-cis-module-denylist.conf
 %attr(0440,root,root) %config(noreplace) %{_sysconfdir}/sudoers.d/10-azurelinux-cis
 %attr(0644,root,root) %{_prefix}/lib/tmpfiles.d/azurelinux-sudo.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/azurelinux-sudo
@@ -504,6 +508,12 @@ install -Dm0644 %{SOURCE29} %{buildroot}%{_prefix}/lib/sysusers.d/azurelinux-sug
 
 
 %changelog
+* Wed Aug 26 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-28
+- Disable secure redirects and IPv6 router advertisements for CIS hardening
+
+* Sun Aug 23 2026 Lynsey Rydberg <lyrydber@microsoft.com> - 4.0-27
+- Deny unused CIS network protocol modules by default
+
 * Mon Aug 17 2026 Tobias Brick <tobiasb@microsoft.com> - 4.0-26
 - Configure CIS SSH server defaults for Azure Linux cloud images
 

@@ -25,7 +25,7 @@ Version:                2.26.0
 %global dracutlibdir %{_prefix}/lib/dracut
 
 Name:           ignition
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary:        First boot installer and configuration tool
 
 # Upstream license specification: Apache-2.0
@@ -214,21 +214,6 @@ This package contains a tool for validating Ignition configurations.
 ############## validate-redistributable subpackage ##############
 
 %if 0%{?fedora}
-%package validate-redistributable
-
-Summary:   Statically linked validation tool for Ignition configs
-License:   Apache-2.0
-BuildArch: noarch
-
-# In case someone has this subpackage installed, obsolete the old name
-# Drop in Fedora 38
-Obsoletes:     ignition-validate-nonlinux < 2.13.0-4
-
-%description validate-redistributable
-This package contains statically linked Linux, macOS, and Windows
-ignition-validate binaries built through cross-compilation. Do not install it.
-It is only used for building release binaries to be signed by Fedora release
-engineering and uploaded to the Ignition GitHub releases page.
 %endif
 
 ############## ignition-edge subpackage ##############
@@ -284,7 +269,7 @@ echo "Building ignition-validate..."
 
 %global gocrossbuild go build -ldflags "${LDFLAGS:-} -B 0x$(cat /dev/urandom | tr -d -c '0-9a-f' | head -c16)" -a -v -x
 
-%if 0%{?fedora}
+%if 0
 echo "Building statically-linked Linux ignition-validate..."
 GOEXPERIMENT= CGO_ENABLED=0 GOARCH=arm64 GOOS=linux %gocrossbuild -o ./ignition-validate-aarch64-unknown-linux-gnu-static validate/main.go
 GOEXPERIMENT= CGO_ENABLED=0 GOARCH=ppc64le GOOS=linux %gocrossbuild -o ./ignition-validate-ppc64le-unknown-linux-gnu-static validate/main.go
@@ -316,7 +301,7 @@ install -p -m 0644 grub2/05_ignition.cfg  %{buildroot}%{_prefix}/lib/bootupd/gru
 install -d -p %{buildroot}%{_bindir}
 install -p -m 0755 ./ignition-validate %{buildroot}%{_bindir}
 
-%if 0%{?fedora}
+%if 0
 install -d -p %{buildroot}%{_datadir}/ignition
 install -p -m 0644 ./ignition-validate-aarch64-apple-darwin %{buildroot}%{_datadir}/ignition
 install -p -m 0644 ./ignition-validate-aarch64-unknown-linux-gnu-static %{buildroot}%{_datadir}/ignition
@@ -353,16 +338,6 @@ install -p -m 0755 ./ignition %{buildroot}/%{dracutlibdir}/modules.d/30ignition
 %{_bindir}/ignition-validate
 
 %if 0%{?fedora}
-%files validate-redistributable
-%license %{golicenses}
-%dir %{_datadir}/ignition
-%{_datadir}/ignition/ignition-validate-aarch64-apple-darwin
-%{_datadir}/ignition/ignition-validate-aarch64-unknown-linux-gnu-static
-%{_datadir}/ignition/ignition-validate-ppc64le-unknown-linux-gnu-static
-%{_datadir}/ignition/ignition-validate-s390x-unknown-linux-gnu-static
-%{_datadir}/ignition/ignition-validate-x86_64-apple-darwin
-%{_datadir}/ignition/ignition-validate-x86_64-pc-windows-gnu.exe
-%{_datadir}/ignition/ignition-validate-x86_64-unknown-linux-gnu-static
 %endif
 
 %files edge
