@@ -17,9 +17,9 @@
 # When rebuilding without a version change, bump azl_pkgrelease (manual release).
 # This corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 7
+%define azl_pkgrelease 8
 # NVIDIA open GPU kernel module version (built as a kmod subpackage).
-%define nvidia_open_version 595.58.03
+%define nvidia_open_version 610.57.04
 
 # All Global changes to build and install go here.
 # Per the below section about __spec_install_pre, any rpm
@@ -4290,6 +4290,9 @@ fi\
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
+* Mon Aug 31 2026 Elaheh Dehghani <edehghani@microsoft.com> - 6.18.39-1.8
+- feat(kmod-nvidia-open): upgrade to 610.57.04
+
 * Thu Aug 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.7
 - refactor(kernel): remove automotive support
 
