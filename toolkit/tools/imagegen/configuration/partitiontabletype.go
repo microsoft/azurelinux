@@ -10,7 +10,7 @@ import (
 	"fmt"
 )
 
-// PartitionTableType is either gpt, mbr, or none
+// PartitionTableType is either gpt or none. MBR is no longer supported.
 type PartitionTableType string
 
 const (
@@ -21,12 +21,6 @@ const (
 	// PartitionTableTypeNone selects no partition type
 	PartitionTableTypeNone PartitionTableType = ""
 )
-
-var partitionTableTypeToPartedArgument = map[PartitionTableType]string{
-	PartitionTableTypeGpt:  "gpt",
-	PartitionTableTypeMbr:  "msdos",
-	PartitionTableTypeNone: "",
-}
 
 func (p PartitionTableType) String() string {
 	return string(p)
@@ -55,16 +49,6 @@ func (p *PartitionTableType) IsValid() (err error) {
 		}
 	}
 	return fmt.Errorf("invalid value for PartitionTableType (%s)", p)
-}
-
-// ConvertToPartedArgument returns the parted argument corresponding to the
-// partition table type
-func (p *PartitionTableType) ConvertToPartedArgument() (partedArgument string, err error) {
-	if err = p.IsValid(); err != nil {
-		return
-	}
-	partedArgument = partitionTableTypeToPartedArgument[*p]
-	return
 }
 
 // UnmarshalJSON Unmarshals a PartitionTableType entry
