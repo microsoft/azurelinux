@@ -331,6 +331,20 @@
         "justification": "Needed to see early logging in serial console - PR: https://github.com/microsoft/azurelinux/pull/6888"
       },
       {
+        "name": "CONFIG_CRAMFS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure cramfs kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22846"
+      },
+      {
         "name": "CONFIG_CRYPTO",
         "values": [
           {
@@ -1151,6 +1165,34 @@
         "justification": "https://microsoft.visualstudio.com/OS/_workitems/edit/51595441"
       },
       {
+        "name": "CONFIG_FIREWIRE",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure firewire-core kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22850"
+      },
+      {
+        "name": "CONFIG_FIREWIRE_NOSY",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure firewire-core kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22850"
+      },
+      {
         "name": "CONFIG_FPGA_DFL_AFU",
         "values": [
           {
@@ -1207,6 +1249,34 @@
           }
         ],
         "justification": "Needed for Mellanox DPUs - PR: https://github.com/microsoft/azurelinux/pull/5896"
+      },
+      {
+        "name": "CONFIG_HFSPLUS_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure hfsplus kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22849"
+      },
+      {
+        "name": "CONFIG_HFS_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure hfs kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22848"
       },
       {
         "name": "CONFIG_HIBERNATION",
@@ -2931,6 +3001,20 @@
           }
         ],
         "justification": "Needed to see logs in Azure serial console - PR: https://github.com/microsoft/azurelinux/pull/3264"
+      },
+      {
+        "name": "CONFIG_VXFS_FS",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Ensure freevxfs kernel module is not available - https://dev.azure.com/mariner-org/mariner/_workitems/edit/22847"
       },
       {
         "name": "CONFIG_WIREGUARD",
