@@ -1,0 +1,1168 @@
+diff --git a/cmd/virt-handler/virt-handler.go b/cmd/virt-handler/virt-handler.go
+index 65184e793d58a25424f2b264dab1234616d2133c..5d4f07aead51eae9c1d63ac6dfb770eafab78937 100644
+--- a/cmd/virt-handler/virt-handler.go
++++ b/cmd/virt-handler/virt-handler.go
+@@ -495,7 +495,7 @@ func (app *virtHandlerApp) Run() {
+ 		panic(fmt.Errorf("failed to detect the presence of selinux: %v", err))
+ 	}
+ 
+-	if err := metrics.SetupMetrics(app.HostOverride, app.MaxRequestsInFlight, vmiSourceInformer, machines); err != nil {
++	if err := metrics.SetupMetrics(app.HostOverride, app.MaxRequestsInFlight, vmiSourceInformer, vmiInformer, domainSharedInformer, machines); err != nil {
+ 		panic(err)
+ 	}
+ 
+diff --git a/docs/observability/metrics.md b/docs/observability/metrics.md
+index a183cccec85e57b695412d85aecd85e393869e36..49c9ac548f4f6d9c1b731b766bfc610e6b7776bc 100644
+--- a/docs/observability/metrics.md
++++ b/docs/observability/metrics.md
+@@ -60,6 +60,7 @@
+ | kubevirt_vmi_migration_dirty_memory_rate_bytes | Metric | Gauge | The rate of memory being dirty in the Guest OS. |
+ | kubevirt_vmi_migration_end_time_seconds | Metric | Gauge | The time at which the migration ended. |
+ | kubevirt_vmi_migration_failed | Metric | Gauge | Indicates if the VMI migration failed. |
++| kubevirt_vmi_migration_last_downtime_seconds | Metric | Gauge | Time, in seconds, the guest was paused during the cut-over of its last successful live migration, reported by the source node. |
+ | kubevirt_vmi_migration_memory_transfer_rate_bytes | Metric | Gauge | The rate at which the memory is being transferred. |
+ | kubevirt_vmi_migration_phase_transition_time_from_creation_seconds | Metric | Histogram | Histogram of VM migration phase transitions duration from creation time in seconds. |
+ | kubevirt_vmi_migration_start_time_seconds | Metric | Gauge | The time at which the migration started. |
+diff --git a/pkg/monitoring/metrics/virt-handler/domainstats/unit_converter.go b/pkg/monitoring/metrics/virt-handler/domainstats/unit_converter.go
+index 1f257a96c5307a044f37a8ddc2f738c3613d162b..6217cb14bdb1a1cba591712e1937ea742fe688c3 100644
+--- a/pkg/monitoring/metrics/virt-handler/domainstats/unit_converter.go
++++ b/pkg/monitoring/metrics/virt-handler/domainstats/unit_converter.go
+@@ -19,10 +19,21 @@
+ 
+ package domainstats
+ 
++const (
++	nanosecondsPerSecond  float64 = 1_000_000_000
++	millisecondsPerSecond float64 = 1000
++	bytesPerKibibyte      float64 = 1024
++)
++
+ func nanosecondsToSeconds(ns uint64) float64 {
+-	return float64(ns) / 1000000000
++	return float64(ns) / nanosecondsPerSecond
++}
++
++// MillisecondsToSeconds converts a libvirt millisecond duration to seconds.
++func MillisecondsToSeconds(milliseconds uint64) float64 {
++	return float64(milliseconds) / millisecondsPerSecond
+ }
+ 
+ func kibibytesToBytes(kibibytes uint64) float64 {
+-	return float64(kibibytes) * 1024
++	return float64(kibibytes) * bytesPerKibibyte
+ }
+diff --git a/pkg/monitoring/metrics/virt-handler/metrics.go b/pkg/monitoring/metrics/virt-handler/metrics.go
+index 388b4673e1ce3ea905d729ffea6fcab89d15ac0a..34296b4bcab8ff08199acfc2887b14501c499ee9 100644
+--- a/pkg/monitoring/metrics/virt-handler/metrics.go
++++ b/pkg/monitoring/metrics/virt-handler/metrics.go
+@@ -29,7 +29,11 @@ import (
+ 	"kubevirt.io/kubevirt/pkg/monitoring/metrics/virt-handler/migrationdomainstats"
+ )
+ 
+-func SetupMetrics(nodeName string, MaxRequestsInFlight int, vmiInformer cache.SharedIndexInformer, machines []libvirtxml.CapsGuestMachine) error {
++func SetupMetrics(
++	nodeName string, maxRequestsInFlight int,
++	sourceVMIInformer, globalVMIInformer cache.SharedIndexInformer, domainInformer cache.SharedInformer,
++	machines []libvirtxml.CapsGuestMachine,
++) error {
+ 	if err := workqueue.SetupMetrics(); err != nil {
+ 		return err
+ 	}
+@@ -44,9 +48,9 @@ func SetupMetrics(nodeName string, MaxRequestsInFlight int, vmiInformer cache.Sh
+ 	SetVersionInfo()
+ 	ReportDeprecatedMachineTypes(machines, nodeName)
+ 
+-	domainstats.SetupDomainStatsCollector(MaxRequestsInFlight, vmiInformer)
++	domainstats.SetupDomainStatsCollector(maxRequestsInFlight, sourceVMIInformer)
+ 
+-	if err := migrationdomainstats.SetupMigrationStatsCollector(vmiInformer); err != nil {
++	if err := migrationdomainstats.SetupMigrationStatsCollector(nodeName, sourceVMIInformer, globalVMIInformer, domainInformer); err != nil {
+ 		return err
+ 	}
+ 
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/BUILD.bazel b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/BUILD.bazel
+index 79c760a52855df2192b8eded1d12b5ae5149dda7..79b32e88d0501fa6a83326826af294e4a526b60c 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/BUILD.bazel
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/BUILD.bazel
+@@ -13,6 +13,7 @@ go_library(
+         "//pkg/controller:go_default_library",
+         "//pkg/monitoring/metrics/virt-handler/collector:go_default_library",
+         "//pkg/monitoring/metrics/virt-handler/domainstats:go_default_library",
++        "//pkg/virt-launcher/virtwrap/api:go_default_library",
+         "//pkg/virt-launcher/virtwrap/stats:go_default_library",
+         "//staging/src/kubevirt.io/api/core/v1:go_default_library",
+         "//staging/src/kubevirt.io/client-go/log:go_default_library",
+@@ -32,10 +33,15 @@ go_test(
+     race = "on",
+     deps = [
+         "//pkg/monitoring/metrics/testing:go_default_library",
++        "//pkg/virt-launcher/virtwrap/api:go_default_library",
+         "//pkg/virt-launcher/virtwrap/stats:go_default_library",
++        "//staging/src/kubevirt.io/api/core/v1:go_default_library",
+         "//staging/src/kubevirt.io/client-go/testutils:go_default_library",
+         "//vendor/github.com/onsi/ginkgo/v2:go_default_library",
+         "//vendor/github.com/onsi/gomega:go_default_library",
+         "//vendor/github.com/rhobs/operator-observability-toolkit/pkg/operatormetrics:go_default_library",
++        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
++        "//vendor/k8s.io/apimachinery/pkg/types:go_default_library",
++        "//vendor/k8s.io/client-go/tools/cache:go_default_library",
+     ],
+ )
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler.go b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler.go
+index bb5c861c0ead4db466f2fffc9c6ce4def58eec8f..2dd86c48483a08056756eeb949b3ccac0ddf544e 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler.go
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler.go
+@@ -20,14 +20,18 @@ package migrationdomainstats
+ 
+ import (
+ 	"sync"
++	"time"
+ 
+ 	"k8s.io/client-go/tools/cache"
+ 	v1 "kubevirt.io/api/core/v1"
+ 	"kubevirt.io/client-go/log"
+ 
+ 	"kubevirt.io/kubevirt/pkg/controller"
++	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
+ )
+ 
++const logVerbosityInfo = 3
++
+ type vmiQueue interface {
+ 	all() ([]result, bool)
+ 	startPolling()
+@@ -36,22 +40,57 @@ type vmiQueue interface {
+ type handler struct {
+ 	sync.Mutex
+ 
+-	vmiStore cache.Store
+-	vmiStats map[string]vmiQueue
++	sourceVMIStore cache.Store
++	globalVMIStore cache.Store
++	vmiStats       map[string]vmiQueue
++	nodeName       string
++
++	// Completed downtime follows the VMI across node handoff. It is removed when
++	// the VMI disappears or a newer migration succeeds.
++	completedMigrationStats map[string]completedMigrationResult
++}
++
++type completedMigrationResult struct {
++	result
++	vmiUID                  string
++	migrationUID            string
++	migrationStartTimestamp time.Time
+ }
+ 
+-func newHandler(vmiInformer cache.SharedIndexInformer) (*handler, error) {
++func newHandler(
++	nodeName string,
++	sourceVMIInformer, globalVMIInformer cache.SharedIndexInformer,
++	domainInformer cache.SharedInformer,
++) (*handler, error) {
+ 	h := handler{
+-		vmiStore: vmiInformer.GetStore(),
+-		vmiStats: make(map[string]vmiQueue),
++		sourceVMIStore:          sourceVMIInformer.GetStore(),
++		globalVMIStore:          globalVMIInformer.GetStore(),
++		vmiStats:                make(map[string]vmiQueue),
++		nodeName:                nodeName,
++		completedMigrationStats: make(map[string]completedMigrationResult),
+ 	}
+ 
+-	_, err := vmiInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
++	_, err := sourceVMIInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+ 		AddFunc:    h.handleVmiAdd,
+ 		UpdateFunc: h.handleVmiUpdate,
+ 	})
++	if err != nil {
++		return nil, err
++	}
+ 
+-	return &h, err
++	if domainInformer != nil {
++		_, err = domainInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
++			AddFunc: h.handleDomainCompletedMigrationStats,
++			UpdateFunc: func(_oldObj, newObj interface{}) {
++				h.handleDomainCompletedMigrationStats(newObj)
++			},
++		})
++		if err != nil {
++			return nil, err
++		}
++	}
++
++	return &h, nil
+ }
+ 
+ func (h *handler) Collect() []result {
+@@ -70,6 +109,26 @@ func (h *handler) Collect() []result {
+ 		}
+ 	}
+ 
++	for key, completedStats := range h.completedMigrationStats {
++		obj, exists, err := h.globalVMIStore.GetByKey(key)
++		if err != nil {
++			log.Log.Reason(err).Errorf("failed to look up VMI %s for completed migration stats", key)
++			continue
++		}
++		if !exists {
++			delete(h.completedMigrationStats, key)
++			continue
++		}
++
++		vmi, ok := obj.(*v1.VirtualMachineInstance)
++		if !ok || string(vmi.UID) != completedStats.vmiUID || hasNewerSuccessfulMigration(vmi, completedStats.migrationUID, completedStats.migrationStartTimestamp) {
++			delete(h.completedMigrationStats, key)
++			continue
++		}
++
++		allResults = append(allResults, completedStats.result)
++	}
++
+ 	return allResults
+ }
+ 
+@@ -93,6 +152,103 @@ func (h *handler) handleVmiAdd(obj interface{}) {
+ 	h.addMigration(vmi)
+ }
+ 
++func (h *handler) handleDomainCompletedMigrationStats(obj interface{}) {
++	domain := obj.(*api.Domain)
++	if domain.Status.CompletedMigrationStats == nil || !domain.Status.CompletedMigrationStats.DowntimeSet {
++		return
++	}
++
++	key := controller.NamespacedKey(domain.Namespace, domain.Name)
++	vmi, exists := h.vmiForCompletedStats(key)
++	if !exists {
++		log.Log.V(logVerbosityInfo).Infof("dropping completed migration stats for VMI %s: VMI not found", key)
++		return
++	}
++	domainUID := domain.Spec.Metadata.KubeVirt.UID
++	if domainUID == "" {
++		log.Log.Errorf("dropping completed migration stats for VMI %s: domain UID is missing", key)
++		return
++	}
++	if domainUID != vmi.UID {
++		log.Log.V(logVerbosityInfo).Infof("dropping stale completed migration stats for VMI %s: domain UID %q does not match VMI UID %q", key, domainUID, vmi.UID)
++		return
++	}
++
++	completedStats := domain.Status.CompletedMigrationStats
++	migration := domain.Spec.Metadata.KubeVirt.Migration
++	if migration == nil || migration.UID == "" || migration.StartTimestamp == nil {
++		log.Log.Errorf("dropping completed migration stats for VMI %s: incomplete migration metadata", key)
++		return
++	}
++	migrationUID := string(migration.UID)
++	migrationStartTimestamp := migration.StartTimestamp.Time
++	if hasNewerSuccessfulMigration(vmi, migrationUID, migrationStartTimestamp) {
++		log.Log.V(logVerbosityInfo).Infof("dropping stale completed migration stats for VMI %s and migration %s", key, migrationUID)
++		return
++	}
++	r := result{
++		vmi:         domain.Name,
++		namespace:   domain.Namespace,
++		node:        h.nodeName,
++		downtimeSet: completedStats.DowntimeSet,
++		downtime:    completedStats.Downtime,
++	}
++
++	h.Lock()
++	defer h.Unlock()
++
++	previousStats, exists := h.completedMigrationStats[key]
++	if exists && previousStats.vmiUID == string(vmi.UID) {
++		if previousStats.migrationUID == migrationUID {
++			return
++		}
++		if !migrationStartTimestamp.After(previousStats.migrationStartTimestamp) {
++			log.Log.V(logVerbosityInfo).Infof("dropping out-of-order completed migration stats for VMI %s and migration %s", key, migrationUID)
++			return
++		}
++	}
++	h.completedMigrationStats[key] = completedMigrationResult{
++		result:                  r,
++		vmiUID:                  string(vmi.UID),
++		migrationUID:            migrationUID,
++		migrationStartTimestamp: migrationStartTimestamp,
++	}
++}
++
++func hasNewerSuccessfulMigration(vmi *v1.VirtualMachineInstance, migrationUID string, migrationStartTimestamp time.Time) bool {
++	migrationState := vmi.Status.MigrationState
++	// Migration UIDs are opaque, so informer ordering is resolved by the source timestamps.
++	return migrationState != nil &&
++		migrationState.Completed &&
++		!migrationState.Failed &&
++		string(migrationState.MigrationUID) != migrationUID &&
++		migrationState.StartTimestamp != nil &&
++		migrationState.StartTimestamp.Time.After(migrationStartTimestamp)
++}
++
++func (h *handler) vmiForCompletedStats(key string) (*v1.VirtualMachineInstance, bool) {
++	if h.globalVMIStore == nil {
++		return nil, false
++	}
++
++	obj, exists, err := h.globalVMIStore.GetByKey(key)
++	if err != nil {
++		log.Log.Reason(err).Errorf("failed to look up VMI %s for completed migration stats", key)
++		return nil, false
++	}
++	if !exists {
++		return nil, false
++	}
++
++	vmi, ok := obj.(*v1.VirtualMachineInstance)
++	if !ok {
++		log.Log.Errorf("failed to look up VMI %s for completed migration stats: unexpected object type %T", key, obj)
++		return nil, false
++	}
++
++	return vmi, true
++}
++
+ func (h *handler) addMigration(vmi *v1.VirtualMachineInstance) {
+ 	key := controller.NamespacedKey(vmi.Namespace, vmi.Name)
+ 
+@@ -103,7 +259,7 @@ func (h *handler) addMigration(vmi *v1.VirtualMachineInstance) {
+ 		return
+ 	}
+ 
+-	q := newQueue(h.vmiStore, vmi)
++	q := newQueue(h.sourceVMIStore, vmi)
+ 	q.startPolling()
+ 	h.vmiStats[key] = q
+ }
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler_test.go b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler_test.go
+index fd70813e1a0984d078096995ecd45bf466a04b13..3c2d8517a9d93902ff4cb339cfe7229b12b1ef43 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler_test.go
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/handler_test.go
+@@ -19,22 +19,55 @@
+ package migrationdomainstats
+ 
+ import (
++	"time"
++
+ 	. "github.com/onsi/ginkgo/v2"
+ 	. "github.com/onsi/gomega"
++	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
++	"k8s.io/apimachinery/pkg/types"
++	"k8s.io/client-go/tools/cache"
++
++	v1 "kubevirt.io/api/core/v1"
++
++	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
++	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/stats"
+ )
+ 
+ type possiblyFinishedQueue struct {
+ 	isFinished bool
++	results    []result
+ }
+ 
+ func (q *possiblyFinishedQueue) all() ([]result, bool) {
+-	return nil, q.isFinished
++	return q.results, q.isFinished
+ }
+ 
+ func (_ *possiblyFinishedQueue) startPolling() {
+ 	panic("not implemented")
+ }
+ 
++func completedMigrationDomain(downtime uint64, migrationUID string) *api.Domain {
++	return completedMigrationDomainAt(downtime, migrationUID, time.Unix(100, 0))
++}
++
++func completedMigrationDomainAt(downtime uint64, migrationUID string, start time.Time) *api.Domain {
++	return &api.Domain{
++		ObjectMeta: metav1.ObjectMeta{Name: "test-vmi", Namespace: "default", UID: "vmi-uid"},
++		Spec: api.DomainSpec{
++			Metadata: api.Metadata{KubeVirt: api.KubeVirtMetadata{
++				UID: "vmi-uid",
++				Migration: &api.MigrationMetadata{
++					UID:            types.UID(migrationUID),
++					StartTimestamp: &metav1.Time{Time: start},
++				},
++			}},
++		},
++		Status: api.DomainStatus{
++			CompletedMigrationStats: &api.CompletedMigrationStats{DowntimeSet: true, Downtime: downtime},
++		},
++	}
++}
++
+ var _ = Describe("Handler", func() {
+ 	var (
+ 		h *handler
+@@ -42,7 +75,9 @@ var _ = Describe("Handler", func() {
+ 
+ 	BeforeEach(func() {
+ 		h = &handler{
+-			vmiStats: make(map[string]vmiQueue),
++			vmiStats:                make(map[string]vmiQueue),
++			nodeName:                "source-node",
++			completedMigrationStats: make(map[string]completedMigrationResult),
+ 		}
+ 	})
+ 
+@@ -69,4 +104,197 @@ var _ = Describe("Handler", func() {
+ 			})
+ 		})
+ 	})
++
++	Describe("completed migration results", func() {
++		var vmiStore cache.Store
++		var vmi *v1.VirtualMachineInstance
++
++		BeforeEach(func() {
++			vmiStore = cache.NewStore(cache.MetaNamespaceKeyFunc)
++			vmi = &v1.VirtualMachineInstance{
++				ObjectMeta: metav1.ObjectMeta{Name: "test-vmi", Namespace: "default", UID: "vmi-uid"},
++				Status: v1.VirtualMachineInstanceStatus{
++					MigrationState: &v1.VirtualMachineInstanceMigrationState{
++						MigrationUID:   "migration-1",
++						StartTimestamp: &metav1.Time{Time: time.Unix(100, 0)},
++					},
++				},
++			}
++			Expect(vmiStore.Add(vmi)).To(Succeed())
++			h.globalVMIStore = vmiStore
++		})
++
++		It("should store completed downtime without modifying the active queue", func() {
++			q := &possiblyFinishedQueue{
++				results: []result{{domainJobInfo: stats.DomainJobInfo{DataTotalSet: true, DataTotal: 123}}},
++			}
++			h.vmiStats["default/test-vmi"] = q
++
++			domain := completedMigrationDomain(70, "migration-1")
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(q.isFinished).To(BeFalse())
++			Expect(h.vmiStats["default/test-vmi"]).To(BeIdenticalTo(q))
++
++			completedStats := h.completedMigrationStats["default/test-vmi"]
++			Expect(completedStats.node).To(Equal("source-node"))
++			Expect(completedStats.vmiUID).To(Equal("vmi-uid"))
++			Expect(completedStats.migrationUID).To(Equal("migration-1"))
++			Expect(completedStats.downtime).To(Equal(uint64(70)))
++
++			results := h.Collect()
++			Expect(results).To(HaveLen(2))
++			Expect(results[0].domainJobInfo).To(Equal(stats.DomainJobInfo{DataTotalSet: true, DataTotal: 123}))
++			Expect(results[1].domainJobInfo).To(Equal(completedStats.domainJobInfo))
++			Expect(results[1].timestamp).To(BeZero())
++
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(80, "migration-1"))
++			Expect(h.completedMigrationStats["default/test-vmi"].downtime).To(Equal(uint64(70)))
++
++			h.handleDomainCompletedMigrationStats(completedMigrationDomainAt(90, "migration-2", time.Unix(200, 0)))
++			Expect(h.completedMigrationStats["default/test-vmi"].migrationUID).To(Equal("migration-2"))
++			Expect(h.completedMigrationStats["default/test-vmi"].downtime).To(Equal(uint64(90)))
++
++			results = h.Collect()
++			Expect(results).To(HaveLen(2))
++			Expect(results[1].downtimeSet).To(BeTrue())
++			Expect(results[1].downtime).To(Equal(uint64(90)))
++		})
++
++		It("should drop stats when the migration metadata is missing", func() {
++			domain := completedMigrationDomain(70, "migration-1")
++			domain.Spec.Metadata.KubeVirt.Migration = nil
++
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should drop stats when the migration UID is empty", func() {
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(70, ""))
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should drop stats when the migration start timestamp is missing", func() {
++			domain := completedMigrationDomain(70, "migration-1")
++			domain.Spec.Metadata.KubeVirt.Migration.StartTimestamp = nil
++
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should drop stats from a domain belonging to another VMI instance", func() {
++			domain := completedMigrationDomain(70, "migration-1")
++			domain.Spec.Metadata.KubeVirt.UID = "old-vmi-uid"
++
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should drop stats when the domain UID is missing", func() {
++			domain := completedMigrationDomain(70, "migration-1")
++			domain.Spec.Metadata.KubeVirt.UID = ""
++
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should retain new completed stats when the VMI informer still has the prior migration", func() {
++			vmi.Status.MigrationState.Completed = true
++			Expect(vmiStore.Update(vmi)).To(Succeed())
++
++			h.handleDomainCompletedMigrationStats(completedMigrationDomainAt(90, "migration-2", time.Unix(200, 0)))
++
++			Expect(h.Collect()).To(HaveLen(1))
++			Expect(h.completedMigrationStats["default/test-vmi"].migrationUID).To(Equal("migration-2"))
++		})
++
++		It("should drop an older domain replay after a newer successful migration", func() {
++			vmi.Status.MigrationState = &v1.VirtualMachineInstanceMigrationState{
++				MigrationUID:   "migration-2",
++				StartTimestamp: &metav1.Time{Time: time.Unix(200, 0)},
++				Completed:      true,
++			}
++			Expect(vmiStore.Update(vmi)).To(Succeed())
++
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(70, "migration-1"))
++
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should not replace stored stats with an older domain replay", func() {
++			h.handleDomainCompletedMigrationStats(completedMigrationDomainAt(90, "migration-2", time.Unix(200, 0)))
++
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(70, "migration-1"))
++
++			Expect(h.completedMigrationStats["default/test-vmi"].migrationUID).To(Equal("migration-2"))
++			Expect(h.completedMigrationStats["default/test-vmi"].downtime).To(Equal(uint64(90)))
++		})
++
++		It("should store completed migration stats when the domain update arrives before the VMI update creates a queue", func() {
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(70, "migration-1"))
++
++			results := h.Collect()
++			Expect(results).To(HaveLen(1))
++			Expect(results[0].downtimeSet).To(BeTrue())
++			Expect(results[0].downtime).To(Equal(uint64(70)))
++			Expect(h.vmiStats).To(BeEmpty())
++			Expect(h.completedMigrationStats).To(HaveKey("default/test-vmi"))
++
++			results = h.Collect()
++			Expect(results).To(HaveLen(1))
++			Expect(results[0].downtimeSet).To(BeTrue())
++			Expect(results[0].downtime).To(Equal(uint64(70)))
++
++			Expect(vmiStore.Delete(vmi)).To(Succeed())
++			h.Collect()
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		It("should discard stats when a VMI is recreated with the same name", func() {
++			vmi.UID = "old-vmi-uid"
++			Expect(vmiStore.Update(vmi)).To(Succeed())
++			domain := completedMigrationDomain(70, "migration-1")
++			domain.Spec.Metadata.KubeVirt.UID = vmi.UID
++			h.handleDomainCompletedMigrationStats(domain)
++
++			Expect(vmiStore.Update(&v1.VirtualMachineInstance{
++				ObjectMeta: metav1.ObjectMeta{Name: "test-vmi", Namespace: "default", UID: "new-vmi-uid"},
++			})).To(Succeed())
++
++			Expect(h.Collect()).To(BeEmpty())
++			Expect(h.completedMigrationStats).To(BeEmpty())
++		})
++
++		DescribeTable("should retain only the latest successful migration result", func(failed bool, expectedResults int, expectedMigrationUID string, expectedDowntime uint64) {
++			vmi.Status.MigrationState = &v1.VirtualMachineInstanceMigrationState{
++				MigrationUID:   "migration-1",
++				StartTimestamp: &metav1.Time{Time: time.Unix(100, 0)},
++			}
++			Expect(vmiStore.Update(vmi)).To(Succeed())
++			h.handleDomainCompletedMigrationStats(completedMigrationDomain(70, "migration-1"))
++
++			vmi.Status.MigrationState = &v1.VirtualMachineInstanceMigrationState{
++				MigrationUID:   "migration-2",
++				StartTimestamp: &metav1.Time{Time: time.Unix(200, 0)},
++				Completed:      true,
++				Failed:         failed,
++			}
++			Expect(vmiStore.Update(vmi)).To(Succeed())
++
++			results := h.Collect()
++			Expect(results).To(HaveLen(expectedResults))
++			if expectedResults > 0 {
++				Expect(h.completedMigrationStats["default/test-vmi"].migrationUID).To(Equal(expectedMigrationUID))
++				Expect(results[0].downtime).To(Equal(expectedDowntime))
++			}
++		},
++			Entry("discarding the prior result after a newer success", false, 0, "", uint64(0)),
++			Entry("retaining the prior result after a newer failure", true, 1, "migration-1", uint64(70)),
++		)
++	})
+ })
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector.go b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector.go
+index 5eaad5a2a57603db6cc53b0a278693ea56ac435f..e9d5a4a065b3e2357b22110629315614d034a012 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector.go
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector.go
+@@ -22,6 +22,8 @@ package migrationdomainstats
+ import (
+ 	"github.com/rhobs/operator-observability-toolkit/pkg/operatormetrics"
+ 	"k8s.io/client-go/tools/cache"
++
++	"kubevirt.io/kubevirt/pkg/monitoring/metrics/virt-handler/domainstats"
+ )
+ 
+ var (
+@@ -34,6 +36,7 @@ var (
+ 			migrateVMIDataProcessed,
+ 			migrateVmiDirtyMemoryRate,
+ 			migrateVmiMemoryTransferRate,
++			migrateVmiLastDowntime,
+ 		},
+ 		CollectCallback: migrationStatsCollectorCallback,
+ 	}
+@@ -72,15 +75,26 @@ var (
+ 			Help: "The rate at which the memory is being transferred.",
+ 		},
+ 	)
++
++	migrateVmiLastDowntime = operatormetrics.NewGauge(
++		operatormetrics.MetricOpts{
++			Name: "kubevirt_vmi_migration_last_downtime_seconds",
++			Help: "Time, in seconds, the guest was paused during the cut-over of its last successful live migration, reported by the source node.",
++		},
++	)
+ )
+ 
+-func SetupMigrationStatsCollector(vmiInformer cache.SharedIndexInformer) error {
+-	if vmiInformer == nil {
++func SetupMigrationStatsCollector(
++	nodeName string,
++	sourceVMIInformer, globalVMIInformer cache.SharedIndexInformer,
++	domainInformer cache.SharedInformer,
++) error {
++	if sourceVMIInformer == nil {
+ 		return nil
+ 	}
+ 
+ 	var err error
+-	migrationdomainstatsHandler, err = newHandler(vmiInformer)
++	migrationdomainstatsHandler, err = newHandler(nodeName, sourceVMIInformer, globalVMIInformer, domainInformer)
+ 	return err
+ }
+ 
+@@ -120,6 +134,10 @@ func parse(r *result) []operatormetrics.CollectorResult {
+ 		crs = append(crs, newCR(r, migrateVmiMemoryTransferRate, float64(jobInfo.MemoryBps)))
+ 	}
+ 
++	if r.downtimeSet {
++		crs = append(crs, newCR(r, migrateVmiLastDowntime, domainstats.MillisecondsToSeconds(r.downtime)))
++	}
++
+ 	return crs
+ }
+ 
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector_test.go b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector_test.go
+index b8458a27c6e329e86f31df98e0d34dd90f840517..13b8b6a5a89b4a961aa69591987da31b255951fe 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector_test.go
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/migrationstats_collector_test.go
+@@ -31,9 +31,17 @@ import (
+ )
+ 
+ var _ = Describe("migration metrics", func() {
++	It("should register the last downtime gauge", func() {
++		Expect(MigrationStatsCollector.Metrics).To(ContainElement(migrateVmiLastDowntime))
++	})
++
+ 	Context("on Collect", func() {
+ 		vmiStats := &result{
+-			vmi: "test-vmi-1",
++			vmi:         "test-vmi-1",
++			namespace:   "test-namespace",
++			node:        "source-node",
++			downtimeSet: true,
++			downtime:    150,
+ 			domainJobInfo: stats.DomainJobInfo{
+ 				DataTotalSet:     true,
+ 				DataTotal:        3,
+@@ -57,13 +65,44 @@ var _ = Describe("migration metrics", func() {
+ 			Entry("kubevirt_vmi_migration_data_processed_bytes", migrateVMIDataProcessed, 2.0),
+ 			Entry("kubevirt_vmi_migration_dirty_memory_rate_bytes", migrateVmiDirtyMemoryRate, 3.0),
+ 			Entry("kubevirt_vmi_migration_memory_transfer_rate_bytes", migrateVmiMemoryTransferRate, 4.0),
++			Entry("kubevirt_vmi_migration_last_downtime_seconds", migrateVmiLastDowntime, 0.15),
+ 		)
+ 
+-		It("result should be empty if stat not populated or set is false", func() {
+-			vmiStats.domainJobInfo = stats.DomainJobInfo{
+-				DataRemainingSet: false,
++		It("should publish a zero downtime when it was reported", func() {
++			zeroDowntime := &result{vmi: "test-vmi-1", downtimeSet: true}
++
++			crs := parse(zeroDowntime)
++
++			Expect(crs).To(ContainElement(testing.GomegaContainsCollectorResultMatcher(migrateVmiLastDowntime, 0)))
++		})
++
++		It("should not publish downtime when it was not reported", func() {
++			crs := parse(&result{vmi: "test-vmi-1"})
++
++			for _, cr := range crs {
++				Expect(cr.Metric).ToNot(BeIdenticalTo(migrateVmiLastDowntime))
+ 			}
++		})
++
++		It("should label the last downtime with the source node", func() {
+ 			crs := parse(vmiStats)
++			for _, cr := range crs {
++				if cr.Metric == migrateVmiLastDowntime {
++					Expect(cr.ConstLabels).To(HaveKeyWithValue("node", "source-node"))
++					return
++				}
++			}
++			Fail("last downtime result was not emitted")
++		})
++
++		It("result should be empty if stat not populated or set is false", func() {
++			emptyStats := &result{
++				vmi: "test-vmi-1",
++				domainJobInfo: stats.DomainJobInfo{
++					DataRemainingSet: false,
++				},
++			}
++			crs := parse(emptyStats)
+ 			Expect(crs).To(BeEmpty())
+ 		})
+ 	})
+diff --git a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/queue.go b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/queue.go
+index 2bd565a111a05c6d0af79abaefdb73ecde48bcce..3a271ae1024a8df2e799d418cbb5daf766351b8a 100644
+--- a/pkg/monitoring/metrics/virt-handler/migrationdomainstats/queue.go
++++ b/pkg/monitoring/metrics/virt-handler/migrationdomainstats/queue.go
+@@ -46,6 +46,10 @@ type result struct {
+ 	namespace string
+ 	node      string
+ 
++	// Set only from terminal migration events.
++	downtimeSet bool
++	downtime    uint64
++
+ 	domainJobInfo stats.DomainJobInfo
+ 	timestamp     time.Time
+ }
+diff --git a/pkg/virt-launcher/metadata/cache.go b/pkg/virt-launcher/metadata/cache.go
+index 0d4a822d9f52a434b5388fce5d217e57b60ad139..74472db9d8323e552830a2595331f5f25a598512 100644
+--- a/pkg/virt-launcher/metadata/cache.go
++++ b/pkg/virt-launcher/metadata/cache.go
+@@ -25,14 +25,21 @@ import (
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
+ )
+ 
++// CompletedMigrationData binds final job stats to the migration that produced them.
++type CompletedMigrationData struct {
++	Stats     api.CompletedMigrationStats
++	Migration api.MigrationMetadata
++}
++
+ type Cache struct {
+-	UID               SafeData[types.UID]
+-	Migration         SafeData[api.MigrationMetadata]
+-	GracePeriod       SafeData[api.GracePeriodMetadata]
+-	AccessCredential  SafeData[api.AccessCredentialMetadata]
+-	MemoryDump        SafeData[api.MemoryDumpMetadata]
+-	Backup            SafeData[api.BackupMetadata]
+-	GuestPanicHandled SafeData[bool]
++	UID                SafeData[types.UID]
++	Migration          SafeData[api.MigrationMetadata]
++	GracePeriod        SafeData[api.GracePeriodMetadata]
++	AccessCredential   SafeData[api.AccessCredentialMetadata]
++	MemoryDump         SafeData[api.MemoryDumpMetadata]
++	Backup             SafeData[api.BackupMetadata]
++	GuestPanicHandled  SafeData[bool]
++	CompletedMigration SafeData[CompletedMigrationData]
+ 
+ 	notificationSignal chan struct{}
+ }
+@@ -48,6 +55,7 @@ func NewCache() *Cache {
+ 	cache.MemoryDump.dirtyChanel = cache.notificationSignal
+ 	cache.Backup.dirtyChanel = cache.notificationSignal
+ 	cache.GuestPanicHandled.dirtyChanel = cache.notificationSignal
++	cache.CompletedMigration.dirtyChanel = cache.notificationSignal
+ 	return cache
+ }
+ 
+diff --git a/pkg/virt-launcher/notify-client/BUILD.bazel b/pkg/virt-launcher/notify-client/BUILD.bazel
+index 53bfd884d7aea11088f4d90ae7fae19e8b515ba0..e9b7611e460af591a45d254bc745610b24a209f9 100644
+--- a/pkg/virt-launcher/notify-client/BUILD.bazel
++++ b/pkg/virt-launcher/notify-client/BUILD.bazel
+@@ -56,6 +56,7 @@ go_test(
+         "//vendor/github.com/onsi/gomega:go_default_library",
+         "//vendor/go.uber.org/mock/gomock:go_default_library",
+         "//vendor/k8s.io/apimachinery/pkg/api/equality:go_default_library",
++        "//vendor/k8s.io/apimachinery/pkg/apis/meta/v1:go_default_library",
+         "//vendor/k8s.io/apimachinery/pkg/watch:go_default_library",
+         "//vendor/k8s.io/client-go/tools/cache:go_default_library",
+         "//vendor/k8s.io/client-go/tools/record:go_default_library",
+diff --git a/pkg/virt-launcher/notify-client/client.go b/pkg/virt-launcher/notify-client/client.go
+index 3a3115128d74e847ca1107ce7d2f41836476d40b..97c21679dcb05e61a3c8c7e390fea8f6bc97f97d 100644
+--- a/pkg/virt-launcher/notify-client/client.go
++++ b/pkg/virt-launcher/notify-client/client.go
+@@ -420,6 +420,7 @@ func (e *eventCaller) eventCallback(c cli.Connection, domain *api.Domain, libvir
+ 	if fsFreezeStatus != nil {
+ 		domain.Status.FSFreezeStatus = *fsFreezeStatus
+ 	}
++	applyCompletedMigrationStats(domain, metadataCache)
+ 
+ 	event := watch.Event{Type: eventType, Object: domain}
+ 
+@@ -571,13 +572,13 @@ func (n *Notifier) StartDomainNotifier(
+ 		}
+ 	}
+ 	domainEventJobCompletedCallback := func(c *libvirt.Connect, d *libvirt.Domain, event *libvirt.DomainEventJobCompleted) {
+-		log.Log.Infof("Domain Job Completed event type %v received. Job operation: %v, succeeded: %t", event.Info.Type, event.Info.Operation, event.Info.JobSuccess)
+-		name, err := d.GetName()
+-		if err != nil {
+-			log.Log.Reason(err).Info(cantDetermineLibvirtDomainName)
++		log.Log.Infof("Domain Job Completed event type %v received. Job operation: %v, success reported: %t, succeeded: %t", event.Info.Type, event.Info.Operation, event.Info.JobSuccessSet, event.Info.JobSuccess)
++		if event.Info.Operation == libvirt.DOMAIN_JOB_OPERATION_MIGRATION_OUT {
++			storeCompletedMigrationStats(&event.Info, metadataCache)
+ 		}
++		// The domain may already be gone when the terminal callback runs, so use the name captured when callbacks were registered.
+ 		select {
+-		case eventChan <- libvirtEvent{JobCompletedEvent: event, Domain: name}:
++		case eventChan <- libvirtEvent{JobCompletedEvent: event, Domain: domainName}:
+ 		default:
+ 			log.Log.Infof(libvirtEventChannelFull)
+ 		}
+@@ -714,6 +715,37 @@ func processJobCompletedEvent(domain *api.Domain, d cli.VirDomain, jobCompletedE
+ 	return true
+ }
+ 
++func storeCompletedMigrationStats(jobInfo *libvirt.DomainJobInfo, metadataCache *metadata.Cache) {
++	// Migration-out completion is emitted only on success; JobSuccess is not emitted for migration stats.
++	if !jobInfo.DowntimeSet {
++		log.Log.Warning("Ignoring completed migration stats because libvirt did not report a downtime")
++		return
++	}
++	migration, exists := metadataCache.Migration.Load()
++	if !exists || migration.UID == "" {
++		log.Log.Error("Ignoring completed migration stats because no migration is being tracked")
++		return
++	}
++
++	metadataCache.CompletedMigration.Store(metadata.CompletedMigrationData{
++		Stats: api.CompletedMigrationStats{
++			DowntimeSet: jobInfo.DowntimeSet,
++			Downtime:    jobInfo.Downtime,
++		},
++		Migration: migration,
++	})
++}
++
++func applyCompletedMigrationStats(domain *api.Domain, metadataCache *metadata.Cache) {
++	completedMigration, exists := metadataCache.CompletedMigration.Load()
++	if !exists || !completedMigration.Stats.DowntimeSet {
++		return
++	}
++
++	domain.Spec.Metadata.KubeVirt.Migration = &completedMigration.Migration
++	domain.Status.CompletedMigrationStats = &completedMigration.Stats
++}
++
+ func processLifecycleEvent(client *Notifier, domain *api.Domain, lifecycleEvent *libvirt.DomainEventLifecycle, metadataCache *metadata.Cache, events chan watch.Event, c cli.Connection, vmi *v1.VirtualMachineInstance) bool {
+ 	if lifecycleEvent.Event == libvirt.DOMAIN_EVENT_DEFINED &&
+ 		libvirt.DomainEventDefinedDetailType(lifecycleEvent.Detail) == libvirt.DOMAIN_EVENT_DEFINED_ADDED {
+diff --git a/pkg/virt-launcher/notify-client/notify_test.go b/pkg/virt-launcher/notify-client/notify_test.go
+index 354a81cccad2ac302ddb1bbbda0db63b73489ff6..4108cbf36d0e2f9de1c95a07ef45c74ec9eaa0db 100644
+--- a/pkg/virt-launcher/notify-client/notify_test.go
++++ b/pkg/virt-launcher/notify-client/notify_test.go
+@@ -34,6 +34,7 @@ import (
+ 	api2 "kubevirt.io/client-go/api"
+ 
+ 	"k8s.io/apimachinery/pkg/api/equality"
++	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+ 	"k8s.io/apimachinery/pkg/watch"
+ 	"k8s.io/client-go/tools/cache"
+ 	"k8s.io/client-go/tools/record"
+@@ -339,6 +340,93 @@ var _ = Describe("Notify", func() {
+ 			Expect(ok).To(BeTrue())
+ 			Expect(backupMeta.Completed).To(BeTrue())
+ 		})
++
++		It("should convert and persist completed migration stats", func() {
++			domainJobInfo := libvirt.DomainJobInfo{
++				Operation:   libvirt.DOMAIN_JOB_OPERATION_MIGRATION_OUT,
++				DowntimeSet: true,
++				Downtime:    150,
++			}
++			metadataCache := metadata.NewCache()
++			metadataCache.Migration.Store(api.MigrationMetadata{UID: "migration-1"})
++
++			storeCompletedMigrationStats(&domainJobInfo, metadataCache)
++
++			completedMigration, exists := metadataCache.CompletedMigration.Load()
++			Expect(exists).To(BeTrue())
++			Expect(completedMigration.Stats.DowntimeSet).To(BeTrue())
++			Expect(completedMigration.Stats.Downtime).To(Equal(uint64(150)))
++			Expect(string(completedMigration.Migration.UID)).To(Equal("migration-1"))
++		})
++
++		It("should not persist stats without a reported downtime", func() {
++			domainJobInfo := libvirt.DomainJobInfo{
++				Operation: libvirt.DOMAIN_JOB_OPERATION_MIGRATION_OUT,
++			}
++			metadataCache := metadata.NewCache()
++			metadataCache.Migration.Store(api.MigrationMetadata{UID: "migration-1"})
++
++			storeCompletedMigrationStats(&domainJobInfo, metadataCache)
++
++			_, exists := metadataCache.CompletedMigration.Load()
++			Expect(exists).To(BeFalse())
++		})
++
++		It("should not persist stats without migration metadata", func() {
++			metadataCache := metadata.NewCache()
++
++			storeCompletedMigrationStats(&libvirt.DomainJobInfo{DowntimeSet: true, Downtime: 150}, metadataCache)
++
++			_, exists := metadataCache.CompletedMigration.Load()
++			Expect(exists).To(BeFalse())
++		})
++
++		It("should keep completed stats paired with the migration that produced them", func() {
++			metadataCache := metadata.NewCache()
++			metadataCache.Migration.Store(api.MigrationMetadata{UID: "migration-1"})
++			storeCompletedMigrationStats(&libvirt.DomainJobInfo{DowntimeSet: true, Downtime: 150}, metadataCache)
++			metadataCache.Migration.Store(api.MigrationMetadata{UID: "migration-2"})
++			domain := api.NewMinimalDomain("test")
++
++			applyCompletedMigrationStats(domain, metadataCache)
++
++			Expect(domain.Status.CompletedMigrationStats).ToNot(BeNil())
++			Expect(domain.Status.CompletedMigrationStats.Downtime).To(Equal(uint64(150)))
++			Expect(domain.Spec.Metadata.KubeVirt.Migration).ToNot(BeNil())
++			Expect(string(domain.Spec.Metadata.KubeVirt.Migration.UID)).To(Equal("migration-1"))
++		})
++
++		It("should include cached completed migration stats in domain notify events", func() {
++			domain := api.NewMinimalDomain("test")
++			x, err := xml.Marshal(domain.Spec)
++			Expect(err).ToNot(HaveOccurred())
++
++			mockLibvirt.DomainEXPECT().GetState().Return(libvirt.DOMAIN_SHUTOFF, int(libvirt.DOMAIN_SHUTOFF_MIGRATED), nil)
++			mockLibvirt.DomainEXPECT().Free()
++			mockLibvirt.DomainEXPECT().GetName().Return("test", nil).AnyTimes()
++			mockLibvirt.DomainEXPECT().GetXMLDesc(gomock.Eq(libvirt.DomainXMLFlags(0))).Return(string(x), nil)
++
++			metadataCache := metadata.NewCache()
++			migrationStart := metav1.NewTime(time.Unix(100, 0))
++			metadataCache.CompletedMigration.Store(metadata.CompletedMigrationData{
++				Stats:     api.CompletedMigrationStats{DowntimeSet: true, Downtime: 150},
++				Migration: api.MigrationMetadata{UID: "migration-1", StartTimestamp: &migrationStart},
++			})
++
++			e.eventCallback(mockLibvirt.VirtConnection, util.NewDomainFromName("test", "1234"), libvirtEvent{}, client, deleteNotificationSent, nil, nil, nil, nil, metadataCache, false)
++
++			var event watch.Event
++			Eventually(eventChan, 2*time.Second).Should(Receive(&event))
++
++			domainEvent, ok := event.Object.(*api.Domain)
++			Expect(ok).To(BeTrue())
++			Expect(domainEvent.Status.CompletedMigrationStats).ToNot(BeNil())
++			Expect(domainEvent.Status.CompletedMigrationStats.DowntimeSet).To(BeTrue())
++			Expect(domainEvent.Status.CompletedMigrationStats.Downtime).To(Equal(uint64(150)))
++			Expect(domainEvent.Spec.Metadata.KubeVirt.Migration).ToNot(BeNil())
++			Expect(string(domainEvent.Spec.Metadata.KubeVirt.Migration.UID)).To(Equal("migration-1"))
++			Expect(domainEvent.Spec.Metadata.KubeVirt.Migration.StartTimestamp).To(Equal(&migrationStart))
++		})
+ 	})
+ 
+ 	Describe("K8s Events", func() {
+diff --git a/pkg/virt-launcher/virtwrap/api/deepcopy_generated.go b/pkg/virt-launcher/virtwrap/api/deepcopy_generated.go
+index 182a0fc2d5ccb9bb1013179dd3cdd9a209a6bdb8..33203b1530c360689ecd2188dec0d558684513a0 100644
+--- a/pkg/virt-launcher/virtwrap/api/deepcopy_generated.go
++++ b/pkg/virt-launcher/virtwrap/api/deepcopy_generated.go
+@@ -693,6 +693,22 @@ func (in *Commandline) DeepCopy() *Commandline {
+ 	return out
+ }
+ 
++// DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
++func (in *CompletedMigrationStats) DeepCopyInto(out *CompletedMigrationStats) {
++	*out = *in
++	return
++}
++
++// DeepCopy is an autogenerated deepcopy function, copying the receiver, creating a new CompletedMigrationStats.
++func (in *CompletedMigrationStats) DeepCopy() *CompletedMigrationStats {
++	if in == nil {
++		return nil
++	}
++	out := new(CompletedMigrationStats)
++	in.DeepCopyInto(out)
++	return out
++}
++
+ // DeepCopyInto is an autogenerated deepcopy function, copying the receiver, writing into out. in must be non-nil.
+ func (in *Console) DeepCopyInto(out *Console) {
+ 	*out = *in
+@@ -1586,6 +1602,11 @@ func (in *DomainStatus) DeepCopyInto(out *DomainStatus) {
+ 	}
+ 	out.OSInfo = in.OSInfo
+ 	out.FSFreezeStatus = in.FSFreezeStatus
++	if in.CompletedMigrationStats != nil {
++		in, out := &in.CompletedMigrationStats, &out.CompletedMigrationStats
++		*out = new(CompletedMigrationStats)
++		**out = **in
++	}
+ 	return
+ }
+ 
+diff --git a/pkg/virt-launcher/virtwrap/api/schema.go b/pkg/virt-launcher/virtwrap/api/schema.go
+index 94015891b1463b53b941518e8985d92838d67d4e..e2d5c89b8738dd7b423c329d1f0e2cea0ef03078 100644
+--- a/pkg/virt-launcher/virtwrap/api/schema.go
++++ b/pkg/virt-launcher/virtwrap/api/schema.go
+@@ -117,11 +117,17 @@ type Domain struct {
+ }
+ 
+ type DomainStatus struct {
+-	Status         LifeCycle
+-	Reason         StateChangeReason
+-	Interfaces     []InterfaceStatus
+-	OSInfo         GuestOSInfo
+-	FSFreezeStatus FSFreeze
++	Status                  LifeCycle
++	Reason                  StateChangeReason
++	Interfaces              []InterfaceStatus
++	OSInfo                  GuestOSInfo
++	FSFreezeStatus          FSFreeze
++	CompletedMigrationStats *CompletedMigrationStats
++}
++
++type CompletedMigrationStats struct {
++	DowntimeSet bool
++	Downtime    uint64
+ }
+ 
+ // GuestPanicInfo contains details about a guest panic event from QEMU
+diff --git a/pkg/virt-launcher/virtwrap/live-migration-source.go b/pkg/virt-launcher/virtwrap/live-migration-source.go
+index 0dab940fa859e5953ea7181ea9ac2cc3c29d02bc..80ea576681324012b940bc9c090b3fada8dc0c55 100644
+--- a/pkg/virt-launcher/virtwrap/live-migration-source.go
++++ b/pkg/virt-launcher/virtwrap/live-migration-source.go
+@@ -45,6 +45,7 @@ import (
+ 	"kubevirt.io/kubevirt/pkg/util/migrations"
+ 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
+ 	migrationproxy "kubevirt.io/kubevirt/pkg/virt-handler/migration-proxy"
++	"kubevirt.io/kubevirt/pkg/virt-launcher/metadata"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/cli"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/converter/vcpu"
+@@ -326,6 +327,7 @@ func (l *LibvirtDomainManager) initializeMigrationMetadata(vmi *v1.VirtualMachin
+ 		StartTimestamp: &now,
+ 		Mode:           migrationMode,
+ 	}
++	l.metadataCache.CompletedMigration.Set(metadata.CompletedMigrationData{})
+ 	l.metadataCache.Migration.Store(m)
+ 	log.Log.V(4).Infof("initialize migration metadata: %v", m)
+ 	return false, nil
+diff --git a/pkg/virt-launcher/virtwrap/live-migration-source_test.go b/pkg/virt-launcher/virtwrap/live-migration-source_test.go
+index 75ea0b90df1452c84ebbbd1a7d4e2ecc1a5e9769..0db73e2d7b005aaf0e37abf1a8f5011af9fd5724 100644
+--- a/pkg/virt-launcher/virtwrap/live-migration-source_test.go
++++ b/pkg/virt-launcher/virtwrap/live-migration-source_test.go
+@@ -35,6 +35,7 @@ import (
+ 	libvmistatus "kubevirt.io/kubevirt/pkg/libvmi/status"
+ 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/metadata"
++	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/cli"
+ 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/errors"
+ )
+@@ -43,8 +44,10 @@ var _ = Describe("Live migration source", func() {
+ 	var libvirtDomainManager *LibvirtDomainManager
+ 
+ 	Context("Migration result", func() {
++		var vmi *v1.VirtualMachineInstance
++
+ 		BeforeEach(func() {
+-			vmi := &v1.VirtualMachineInstance{
++			vmi = &v1.VirtualMachineInstance{
+ 				Status: v1.VirtualMachineInstanceStatus{
+ 					MigrationState: &v1.VirtualMachineInstanceMigrationState{
+ 						MigrationUID: types.UID(fmt.Sprintf("%v", GinkgoRandomSeed())),
+@@ -78,6 +81,28 @@ var _ = Describe("Live migration source", func() {
+ 			libvirtDomainManager.initializeMigrationMetadata(vmi, v1.MigrationPreCopy)
+ 		})
+ 
++		It("should clear completed data before publishing a new migration", func() {
++			libvirtDomainManager.metadataCache.CompletedMigration.Store(metadata.CompletedMigrationData{
++				Stats: api.CompletedMigrationStats{DowntimeSet: true, Downtime: 150},
++				Migration: api.MigrationMetadata{
++					UID: "previous-migration",
++				},
++			})
++			libvirtDomainManager.metadataCache.ResetNotification()
++			vmi.Status.MigrationState.MigrationUID = "next-migration"
++
++			inProgress, err := libvirtDomainManager.initializeMigrationMetadata(vmi, v1.MigrationPreCopy)
++
++			Expect(err).ToNot(HaveOccurred())
++			Expect(inProgress).To(BeFalse())
++			completedData, exists := libvirtDomainManager.metadataCache.CompletedMigration.Load()
++			Expect(exists).To(BeTrue())
++			Expect(completedData).To(Equal(metadata.CompletedMigrationData{}))
++			migrationData, exists := libvirtDomainManager.metadataCache.Migration.Load()
++			Expect(exists).To(BeTrue())
++			Expect(migrationData.UID).To(Equal(types.UID("next-migration")))
++		})
++
+ 		It("should only be set once", func() {
+ 			libvirtDomainManager.setMigrationResult(false, "", "")
+ 			migrationMetadata, exists := libvirtDomainManager.metadataCache.Migration.Load()
+diff --git a/tests/libmonitoring/metrics.go b/tests/libmonitoring/metrics.go
+index 50af53987f8019955795f8796189fc7ccb82f2db..17b51b7498e5e1d38f27a8eb914827f2a9b657c5 100644
+--- a/tests/libmonitoring/metrics.go
++++ b/tests/libmonitoring/metrics.go
+@@ -30,7 +30,7 @@ func RegisterAllMetrics() error {
+ 		return err
+ 	}
+ 
+-	if err := virthandler.SetupMetrics("", 0, nil, nil); err != nil {
++	if err := virthandler.SetupMetrics("", 0, nil, nil, nil, nil); err != nil {
+ 		return err
+ 	}
+ 
+diff --git a/tests/monitoring/metrics.go b/tests/monitoring/metrics.go
+index a66e3441403aa9ef18e8b1a18658aff7c767760c..3292d33518149997a63252504c78c66f16d4f8c9 100644
+--- a/tests/monitoring/metrics.go
++++ b/tests/monitoring/metrics.go
+@@ -90,6 +90,7 @@ var _ = Describe("[sig-monitoring]Metrics", decorators.SigMonitoring, func() {
+ 			"kubevirt_vmi_migration_data_bytes_total":                            true,
+ 			"kubevirt_vmi_migration_start_time_seconds":                          true,
+ 			"kubevirt_vmi_migration_end_time_seconds":                            true,
++			"kubevirt_vmi_migration_last_downtime_seconds":                       true,
+ 
+ 			// This metric is using a dedicated collector and is being tested separately
+ 			"kubevirt_vmi_dirty_rate_bytes_per_second": true,
+diff --git a/tests/monitoring/vm_monitoring.go b/tests/monitoring/vm_monitoring.go
+index d4c0bc6dcdfee1f0724113a8bac16e803dfbaeb5..91776b2f7e0efe8a489618d6392ddeb62f59ef3e 100644
+--- a/tests/monitoring/vm_monitoring.go
++++ b/tests/monitoring/vm_monitoring.go
+@@ -359,6 +359,15 @@ var _ = Describe("[sig-monitoring]VM Monitoring", decorators.SigMonitoring, func
+ 			}
+ 			libmonitoring.WaitForMetricValueWithLabels(virtClient, "kubevirt_vmi_migration_succeeded", 1, labels, 1)
+ 
++			By("Verifying the migration downtime metric is populated")
++			downtimeLabels := map[string]string{
++				"name":      vmi.Name,
++				"namespace": vmi.Namespace,
++				"node":      vmi.Status.NodeName,
++			}
++			libmonitoring.WaitForMetricValueWithLabelsToBe(
++				virtClient, "kubevirt_vmi_migration_last_downtime_seconds", downtimeLabels, 1, ">=", 0,
++			)
+ 			By("Delete VMIs")
+ 			Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(context.Background(), vmi.Name, metav1.DeleteOptions{})).To(Succeed())
+ 			Expect(libwait.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240*time.Second)).To(Succeed())
