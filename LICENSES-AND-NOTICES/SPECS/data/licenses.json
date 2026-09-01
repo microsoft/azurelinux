@@ -2284,6 +2284,7 @@
                 "dcos-cli",
                 "debugedit",
                 "dejavu-fonts",
+                "dirmngr",
                 "distroless-packages",
                 "docker-buildx",
                 "docker-cli",
