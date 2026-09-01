@@ -10,11 +10,8 @@ device_unit=$(
 )
 
 if [ -z "$device_unit" ]; then
-    exec /usr/bin/udevadm lock \
-        --backing=/ \
-        --timeout=180 \
-        -- \
-        /usr/lib/systemd/systemd-fsck
+    echo "Missing block-device dependency for $unit_name" >&2
+    exit 1
 fi
 
 case "$device_unit" in
