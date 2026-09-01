@@ -306,6 +306,9 @@ install -p -m 0644 cmd/virt-launcher/qemu.conf %{buildroot}%{_datadir}/kube-virt
 - Add hotplug volue patches
 - Add live migration blackout observability patch
 
+* Mon Aug 18 2026 Woojoong Kim <woojoongkim@microsoft.com> - 1.7.1-10
+- Add Kubevirt sidecar
+
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.7.1-9
 - Bump to rebuild with updated glibc
 

@@ -10,7 +10,7 @@ import (
 	"fmt"
 )
 
-// PartitionTableType is either gpt, mbr, or none
+// PartitionTableType is either gpt or none. MBR is no longer supported.
 type PartitionTableType string
 
 const (
@@ -22,12 +22,6 @@ const (
 	PartitionTableTypeNone PartitionTableType = ""
 )
 
-var partitionTableTypeToPartedArgument = map[PartitionTableType]string{
-	PartitionTableTypeGpt:  "gpt",
-	PartitionTableTypeMbr:  "msdos",
-	PartitionTableTypeNone: "",
-}
-
 func (p PartitionTableType) String() string {
 	return string(p)
 }
@@ -37,29 +31,24 @@ func (p PartitionTableType) String() string {
 func (p *PartitionTableType) GetValidPartitionTableTypes() (types []PartitionTableType) {
 	return []PartitionTableType{
 		PartitionTableTypeGpt,
-		PartitionTableTypeMbr,
 		PartitionTableTypeNone,
 	}
 }
 
 // IsValid returns an error if the PartitionTableType is not valid
 func (p *PartitionTableType) IsValid() (err error) {
+	if *p == PartitionTableTypeMbr {
+		// Fail here rather than part way through the build, once the disk has already been created and
+		// partially partitioned.
+		return fmt.Errorf("MBR partition tables are no longer supported, use (%s) instead", PartitionTableTypeGpt)
+	}
+
 	for _, valid := range p.GetValidPartitionTableTypes() {
 		if *p == valid {
 			return
 		}
 	}
 	return fmt.Errorf("invalid value for PartitionTableType (%s)", p)
-}
-
-// ConvertToPartedArgument returns the parted argument corresponding to the
-// partition table type
-func (p *PartitionTableType) ConvertToPartedArgument() (partedArgument string, err error) {
-	if err = p.IsValid(); err != nil {
-		return
-	}
-	partedArgument = partitionTableTypeToPartedArgument[*p]
-	return
 }
 
 // UnmarshalJSON Unmarshals a PartitionTableType entry

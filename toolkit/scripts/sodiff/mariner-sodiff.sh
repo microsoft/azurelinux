@@ -65,14 +65,30 @@ for rpmpackage in $pkgs; do
             # SO file not found, meaning this might be a new .SO
             # or a new version of a preexisting .SO.
             # Check if the previous version exists in the database.
+            #
+            # Derive a version-independent "family" pattern for the .so so we can
+            # locate a predecessor already published in the repo. Two SONAME
+            # styles must be handled:
+            #   1. Conventional:   libfoo.so.<ver>  -> family "libfoo.so"
+            #   2. Name-embedded:  libfoo-<ver>.so  -> family "libfoo-*.so"
+            # Style 2 is used by libraries whose ABI is versioned by package
+            # version (e.g. Apache Thrift's libthrift-0.24.0.so, LLVM's
+            # libLLVM-18.so). For these, every version bump is a SONAME change,
+            # so the changing version lives in the library *base name*. The old
+            # logic only stripped a version that trailed ".so", so it treated
+            # every such release as a brand-new library and never scanned for
+            # orphaned dependents that still required the previous version.
+            sofile_base=$(echo "$sofile" | sed -E 's/[(].*$//')
+            if echo "$sofile_base" | grep -qE '^.*-[0-9][0-9.]*[.]so$' ; then
+                sofile_no_ver=$(echo "$sofile_base" | sed -E 's/-[0-9][0-9.]*[.]so$/-*.so/')
+            else
+                sofile_no_ver=$(echo "$sofile_base" | sed -E 's/[.]so[.].*$/.so/')
+            fi
 
-            # Remove version part from .SO file
-            sofile_no_ver=$(echo "$sofile" | sed -E 's/[.]so[(.].+/.so/')
-
-            # check for generic .so in the repo
+            # check for a prior version of this .so family in the repo
             sos_found=$( 2>/dev/null $dnf_command repoquery $common_options --whatprovides "${sofile_no_ver}*" | wc -l )
             if ! [ "$sos_found" -eq 0 ] ; then
-                # Generic version of SO was found.
+                # A prior version of the SO family was found.
                 # This means it's a new version of a preexisting SO.
                 # Log which packages depend on this functionality
                 echo "Packages that require $sofile_no_ver:"
@@ -120,4 +136,3 @@ if [[ $pkgsFound -gt 0 ]]; then
 else
     echo "No Packages with Conflicting .so Files Found."
 fi
-

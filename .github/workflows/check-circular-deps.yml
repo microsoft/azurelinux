@@ -22,6 +22,9 @@ jobs:
       - name: Workflow trigger checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      - name: Install toolkit prerequisites
+        run: sudo make -C toolkit install-prereqs
+
       - name: Determine DAILY_BUILD_ID value
         run: |
           echo "GitHub 'base_ref': ${{ github.base_ref }}"
