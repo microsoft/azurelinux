@@ -1,1 +1,4 @@
 [components.grub2]
+
+[components.grub2.build]
+emit-upstream-provenance = true
