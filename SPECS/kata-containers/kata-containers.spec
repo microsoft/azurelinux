@@ -9,15 +9,9 @@ URL:            https://github.com/microsoft/kata-containers
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
 Source0:        https://github.com/microsoft/kata-containers/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Todo: revert back to %{name}-${version}-cargo.tar.gz next release
-# This is a temporary workaround so we can use a newer cargo tarball without having to make a new fork release
-Source1:        %{name}-3.32.0.kata1-cargo.tar.gz
-# Only needed up to Rust 1.93; remove once the Rust toolchain is updated to 1.94 or newer.
-Patch0:         dbs-arch-cpuid-unsafe.patch
+Source1:        %{name}-%{version}-cargo.tar.gz
 Patch1:         CVE-2025-11065.patch
 Patch2:         CVE-2026-41602.patch
-Patch3:         CVE-2026-56852.patch
-Patch4:         CVE-2026-50540.patch
 BuildRequires:  azurelinux-release
 BuildRequires:  golang
 BuildRequires:  protobuf-compiler
@@ -51,19 +45,6 @@ This package contains the scripts and files required to build the UVM
 pushd %{_builddir}/%{name}-%{version}/tools/osbuilder/node-builder/azure-linux
 %make_build package
 popd
-
-pushd %{_builddir}/%{name}-%{version}/src/runtime/config
-cp configuration-clh.toml configuration-clh-preview.toml
-cp configuration-clh-debug.toml configuration-clh-preview-debug.toml
-popd
-
-for config_file in \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview.toml \
-  %{_builddir}/%{name}-%{version}/src/runtime/config/configuration-clh-preview-debug.toml; do
-  sed -i 's|^\[hypervisor\.clh\]$|[factory]\nenable_template = true\ntemplate_path = "/run/vc/vm/template"\n\n[hypervisor.clh]|' "${config_file}"
-  sed -i 's|^shared_fs = "virtio-fs"$|shared_fs = "none"|' "${config_file}"
-  sed -i 's|^default_maxmemory = .*$|default_maxmemory = 2048|' "${config_file}"
-done
 
 %define kata_path     /opt/kata-containers
 %define kata_bin      %{_prefix}/local/bin
