@@ -663,6 +663,20 @@
         "justification": "https://dev.azure.com/mariner-org/mariner/_workitems/edit/22294"
       },
       {
+        "name": "CONFIG_CRYPTO_XXHASH",
+        "values": [
+          {
+            "architecture": "x86_64",
+            "value": "n"
+          },
+          {
+            "architecture": "arm64",
+            "value": "n"
+          }
+        ],
+        "justification": "Remove xxhash64 from the Crypto API - https://dev.azure.com/mariner-org/mariner/_workitems/edit/23422"
+      },
+      {
         "name": "CONFIG_CUSE",
         "values": [
           {
