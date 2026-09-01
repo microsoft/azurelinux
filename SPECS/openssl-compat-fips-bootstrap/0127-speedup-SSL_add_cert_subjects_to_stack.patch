@@ -1,0 +1,201 @@
+From e2e469593a15681983d16e36d856bf8fb7de8589 Mon Sep 17 00:00:00 2001
+From: Clemens Lang <cllang@redhat.com>
+Date: Wed, 31 Jul 2024 12:45:11 +0200
+Subject: [PATCH] Speed up SSL_add_{file,dir}_cert_subjects_to_stack
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The X509_NAME comparison function converts its arguments to DER using
+i2d_X509_NAME before comparing the results using memcmp(). For every
+invocation of the comparison function (of which there are many when
+loading many certificates), it allocates two buffers of the appropriate
+size for the DER encoding.
+
+Switching to static buffers (possibly of X509_NAME_MAX size as defined
+in crypto/x509/x_name.c) would not work with multithreaded use, e.g.,
+when two threads sort two separate STACK_OF(X509_NAME)s at the same
+time. A suitable re-usable buffer could have been added to the
+STACK_OF(X509_NAME) if sk_X509_NAME_compfunc did have a void* argument,
+or a pointer to the STACK_OF(X509_NAME) – but it does not.
+
+Instead, copy the solution chosen in SSL_load_client_CA_file() by
+filling an LHASH_OF(X509_NAME) with all existing names in the stack and
+using that to deduplicate, rather than relying on sk_X509_NAME_find(),
+which ends up being very slow.
+
+Adjust SSL_add_dir_cert_subjects_to_stack() to keep a local
+LHASH_OF(X509_NAME)s over the complete directory it is processing.
+
+In a small benchmark that calls SSL_add_dir_cert_subjects_to_stack()
+twice, once on a directory with one entry, and once with a directory
+with 1000 certificates, and repeats this in a loop 10 times, this change
+yields a speed-up of 5.32:
+
+| Benchmark 1: ./bench 10 dir-1 dir-1000
+|   Time (mean ± σ):      6.685 s ±  0.017 s    [User: 6.402 s, System: 0.231 s]
+|   Range (min … max):    6.658 s …  6.711 s    10 runs
+|
+| Benchmark 2: LD_LIBRARY_PATH=. ./bench 10 dir-1 dir-1000
+|   Time (mean ± σ):      1.256 s ±  0.013 s    [User: 1.034 s, System: 0.212 s]
+|   Range (min … max):    1.244 s …  1.286 s    10 runs
+|
+| Summary
+|   LD_LIBRARY_PATH=. ./bench 10 dir-1 dir-1000 ran
+|    5.32 ± 0.06 times faster than ./bench 10 dir-1 dir-1000
+
+In the worst case scenario where many entries are added to a stack that
+is then repeatedly used to add more certificates, and with a larger test
+size, the speedup is still very significant. With 15000 certificates,
+a single pass to load them, followed by attempting to load a subset of
+1000 of these 15000 certificates, followed by a single certificate, the
+new approach is ~85 times faster:
+
+| Benchmark 1: ./bench 1 dir-15000 dir-1000 dir-1
+|   Time (mean ± σ):     176.295 s ±  4.147 s    [User: 174.593 s, System: 0.448 s]
+|   Range (min … max):   173.774 s … 185.594 s    10 runs
+|
+| Benchmark 2: LD_LIBRARY_PATH=. ./bench 1 dir-15000 dir-1000 dir-1
+|   Time (mean ± σ):      2.087 s ±  0.034 s    [User: 1.679 s, System: 0.393 s]
+|   Range (min … max):    2.057 s …  2.167 s    10 runs
+|
+| Summary
+|   LD_LIBRARY_PATH=. ./bench 1 dir-15000 dir-1000 dir-1 ran
+|    84.48 ± 2.42 times faster than ./bench 1 dir-15000 dir-1000 dir-1
+
+Signed-off-by: Clemens Lang <cllang@redhat.com>
+---
+ ssl/ssl_cert.c | 74 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 65 insertions(+), 9 deletions(-)
+
+diff --git a/ssl/ssl_cert.c b/ssl/ssl_cert.c
+index 0ff407bf55edc..5e5ffe39d0655 100644
+--- a/ssl/ssl_cert.c
++++ b/ssl/ssl_cert.c
+@@ -813,16 +813,14 @@ STACK_OF(X509_NAME) *SSL_load_client_CA_file(const char *file)
+     return SSL_load_client_CA_file_ex(file, NULL, NULL);
+ }
+ 
+-int SSL_add_file_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+-                                        const char *file)
++static int add_file_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
++                                           const char *file,
++                                           LHASH_OF(X509_NAME) *name_hash)
+ {
+     BIO *in;
+     X509 *x = NULL;
+     X509_NAME *xn = NULL;
+     int ret = 1;
+-    int (*oldcmp) (const X509_NAME *const *a, const X509_NAME *const *b);
+-
+-    oldcmp = sk_X509_NAME_set_cmp_func(stack, xname_sk_cmp);
+ 
+     in = BIO_new(BIO_s_file());
+ 
+@@ -842,12 +840,15 @@ int SSL_add_file_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+         xn = X509_NAME_dup(xn);
+         if (xn == NULL)
+             goto err;
+-        if (sk_X509_NAME_find(stack, xn) >= 0) {
++        if (lh_X509_NAME_retrieve(name_hash, xn) != NULL) {
+             /* Duplicate. */
+             X509_NAME_free(xn);
+         } else if (!sk_X509_NAME_push(stack, xn)) {
+             X509_NAME_free(xn);
+             goto err;
++        } else {
++            /* Successful insert, add to hash table */
++            lh_X509_NAME_insert(name_hash, xn);
+         }
+     }
+ 
+@@ -859,7 +860,42 @@ int SSL_add_file_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+  done:
+     BIO_free(in);
+     X509_free(x);
+-    (void)sk_X509_NAME_set_cmp_func(stack, oldcmp);
++    return ret;
++}
++
++int SSL_add_file_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
++                                        const char *file)
++{
++    X509_NAME *xn = NULL;
++    int ret = 1;
++    int idx = 0;
++    int num = 0;
++    LHASH_OF(X509_NAME) *name_hash = lh_X509_NAME_new(xname_hash, xname_cmp);
++
++    if (name_hash == NULL) {
++        ERR_raise(ERR_LIB_SSL, ERR_R_CRYPTO_LIB);
++        goto err;
++    }
++
++    /*
++     * Pre-populate the lhash with the existing entries of the stack, since
++     * using the LHASH_OF is much faster for duplicate checking. That's because
++     * xname_cmp converts the X509_NAMEs to DER involving a memory allocation
++     * for every single invocation of the comparison function.
++     */
++    num = sk_X509_NAME_num(stack);
++    for (idx = 0; idx < num; idx++) {
++        xn = sk_X509_NAME_value(stack, idx);
++        lh_X509_NAME_insert(name_hash, xn);
++    }
++
++    ret = add_file_cert_subjects_to_stack(stack, file, name_hash);
++    goto done;
++
++ err:
++    ret = 0;
++ done:
++    lh_X509_NAME_free(name_hash);
+     return ret;
+ }
+ 
+@@ -869,8 +905,27 @@ int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+     OPENSSL_DIR_CTX *d = NULL;
+     const char *filename;
+     int ret = 0;
++    X509_NAME *xn = NULL;
++    int idx = 0;
++    int num = 0;
++    LHASH_OF(X509_NAME) *name_hash = lh_X509_NAME_new(xname_hash, xname_cmp);
++
++    if (name_hash == NULL) {
++        ERR_raise(ERR_LIB_SSL, ERR_R_CRYPTO_LIB);
++        goto err;
++    }
+ 
+-    /* Note that a side effect is that the CAs will be sorted by name */
++    /*
++     * Pre-populate the lhash with the existing entries of the stack, since
++     * using the LHASH_OF is much faster for duplicate checking. That's because
++     * xname_cmp converts the X509_NAMEs to DER involving a memory allocation
++     * for every single invocation of the comparison function.
++     */
++    num = sk_X509_NAME_num(stack);
++    for (idx = 0; idx < num; idx++) {
++        xn = sk_X509_NAME_value(stack, idx);
++        lh_X509_NAME_insert(name_hash, xn);
++    }
+ 
+     while ((filename = OPENSSL_DIR_read(&d, dir))) {
+         char buf[1024];
+@@ -899,7 +954,7 @@ int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+ #endif
+         if (r <= 0 || r >= (int)sizeof(buf))
+             goto err;
+-        if (!SSL_add_file_cert_subjects_to_stack(stack, buf))
++        if (!add_file_cert_subjects_to_stack(stack, buf, name_hash))
+             goto err;
+     }
+ 
+@@ -915,6 +970,7 @@ int SSL_add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
+  err:
+     if (d)
+         OPENSSL_DIR_end(&d);
++    lh_X509_NAME_free(name_hash);
+ 
+     return ret;
+ }

@@ -1,0 +1,85 @@
+From 42ed594a3a905830374fb65cced431748f8c639c Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <dbelyavs@redhat.com>
+Date: Thu, 4 Apr 2024 11:50:58 +0200
+Subject: [PATCH 45/50] 0115-skip-quic-pairwise.patch
+
+Patch-name: 0115-skip-quic-pairwise.patch
+Patch-id: 115
+Patch-status: |
+    # Amend tests according to Fedora/RHEL code
+---
+ test/quicapitest.c                     |  4 +++-
+ test/recipes/01-test_symbol_presence.t |  1 +
+ test/recipes/30-test_pairwise_fail.t   | 13 +++++++++++--
+ 3 files changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/test/quicapitest.c b/test/quicapitest.c
+index 41cf0fc7a8..0fb7492700 100644
+--- a/test/quicapitest.c
++++ b/test/quicapitest.c
+@@ -2139,7 +2139,9 @@ int setup_tests(void)
+     ADD_TEST(test_cipher_find);
+     ADD_TEST(test_version);
+ #if defined(DO_SSL_TRACE_TEST)
+-    ADD_TEST(test_ssl_trace);
++    if (is_fips == 0) {
++        ADD_TEST(test_ssl_trace);
++    }
+ #endif
+     ADD_TEST(test_quic_forbidden_apis_ctx);
+     ADD_TEST(test_quic_forbidden_apis);
+diff --git a/test/recipes/30-test_pairwise_fail.t b/test/recipes/30-test_pairwise_fail.t
+index c837d48fb4..f06ef04b1a 100644
+--- a/test/recipes/30-test_pairwise_fail.t
++++ b/test/recipes/30-test_pairwise_fail.t
+@@ -9,7 +9,7 @@
+ use strict;
+ use warnings;
+ 
+-use OpenSSL::Test qw(:DEFAULT bldtop_dir srctop_file srctop_dir data_file);
++use OpenSSL::Test qw(:DEFAULT bldtop_dir srctop_file srctop_dir data_file with);
+ use OpenSSL::Test::Utils;
+ 
+ BEGIN {
+@@ -31,28 +31,37 @@ run(test(["fips_version_test", "-config", $provconf, ">=3.1.0"]),
+ SKIP: {
+     skip "Skip RSA test because of no rsa in this build", 1
+         if disabled("rsa");
++    with({ exit_checker => sub {my $val = shift; return $val == 134; } },
++    sub {
+     ok(run(test(["pairwise_fail_test", "-config", $provconf,
+                  "-pairwise", "rsa"])),
+        "fips provider rsa keygen pairwise failure test");
++    });
+ }
+ 
+ SKIP: {
+     skip "Skip EC test because of no ec in this build", 2
+         if disabled("ec");
++    with({ exit_checker => sub {my $val = shift; return $val == 134; } },
++    sub {
+     ok(run(test(["pairwise_fail_test", "-config", $provconf,
+                  "-pairwise", "ec"])),
+        "fips provider ec keygen pairwise failure test");
++    });
+ 
+     skip "FIPS provider version is too old", 1
+         if !$fips_exit;
++    with({ exit_checker => sub {my $val = shift; return $val == 134; } },
++    sub {
+     ok(run(test(["pairwise_fail_test", "-config", $provconf,
+                  "-pairwise", "eckat"])),
+        "fips provider ec keygen kat failure test");
++    });
+ }
+ 
+ SKIP: {
+     skip "Skip DSA tests because of no dsa in this build", 2
+-        if disabled("dsa");
++        if 1; #if disabled("dsa");
+     ok(run(test(["pairwise_fail_test", "-config", $provconf,
+                  "-pairwise", "dsa", "-dsaparam", data_file("dsaparam.pem")])),
+        "fips provider dsa keygen pairwise failure test");
+-- 
+2.44.0
+

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+	echo $"Usage: `basename $0` filename" 1>&2
+	exit 1
+fi
+
+PEM=$1
+REQ=`/bin/mktemp /tmp/openssl.XXXXXX`
+KEY=`/bin/mktemp /tmp/openssl.XXXXXX`
+CRT=`/bin/mktemp /tmp/openssl.XXXXXX`
+NEW=${PEM}_
+
+trap "rm -f $REQ $KEY $CRT $NEW" SIGINT
+
+if [ ! -f $PEM ]; then
+	echo "$PEM: file not found" 1>&2
+	exit 1
+fi
+
+umask 077
+
+OWNER=`ls -l $PEM | awk '{ printf "%s.%s", $3, $4; }'`
+
+openssl rsa -inform pem -in $PEM -out $KEY
+openssl x509 -x509toreq -in $PEM -signkey $KEY -out $REQ
+openssl x509 -req -in $REQ -signkey $KEY -days 365 \
+	-extfile /etc/pki/tls/openssl.cnf -extensions v3_ca -out $CRT
+
+(cat $KEY ; echo "" ; cat $CRT) > $NEW
+
+chown $OWNER $NEW
+
+mv -f $NEW $PEM
+
+rm -f $REQ $KEY $CRT
+
+exit 0
+

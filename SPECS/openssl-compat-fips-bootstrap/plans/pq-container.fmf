@@ -1,0 +1,13 @@
+summary: PQ Container Test
+provision:
+    how: container
+    image: fedora:rawhide
+discover:
+    how: shell
+execute:
+    how: tmt
+    script: |
+        curl -O https://raw.githubusercontent.com/QUBIP/pq-container/main/setup.sh
+        curl -O https://raw.githubusercontent.com/QUBIP/pq-container/main/test.sh
+        bash setup.sh
+        bash test.sh

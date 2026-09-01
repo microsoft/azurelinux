@@ -1,0 +1,148 @@
+From 48c09bf05e76f11179dbc8b1b1d3ed036bec3300 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Tue, 4 Nov 2025 20:20:02 +0000
+Subject: [PATCH] Make speed work in FIPS mode.
+
+---
+ apps/speed.c | 102 ++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 80 insertions(+), 22 deletions(-)
+
+diff --git a/apps/speed.c b/apps/speed.c
+index f04e0a5..b3e4d44 100644
+--- a/apps/speed.c
++++ b/apps/speed.c
+@@ -46,6 +46,7 @@
+ #if !defined(OPENSSL_SYS_MSDOS)
+ # include <unistd.h>
+ #endif
++#include <openssl/fips.h>
+ 
+ #if defined(_WIN32)
+ # include <windows.h>
+@@ -2549,6 +2550,63 @@ int speed_main(int argc, char **argv)
+         memset(sigs_doit, 1, sizeof(sigs_doit));
+         do_sigs = 1;
+     }
++
++    // Several fixes to make the speed test work in FIPS mode for AZL3.
++    // - Disable RSA sizes that aren't supported by FIPS
++    // - Disable DSA for FIPS provider because it isn't supported.
++    // - Disable KMAC for FIPS provider because it isn't supported.
++    // - Disable brainpool for FIPS provider because it isn't supported. See curve_list in ec_curve.c.
++    // - Disable X25519 and NID_X448 for FIPS provider because it isn't supported.
++    // - Disable EdDSA for FIPS provider because it isn't supported. See fipsprov.c.
++    // - Disable KEMS for unsupported RSA sizes for FIPS provider because they supported.
++    // - Disable signatures for unsupported RSA sizes for FIPS provider because they supported.
++    if (FIPS_mode()) {
++        for (i = 0; i < RSA_NUM; i++) {
++            if (rsa_keys[i].bits < 2048)
++                rsa_doit[i] = 0;
++        }
++
++        for (i = 0; i < kems_algs_len; i++) {
++            if (kems_doit[i] && strcmp(kems_algname[i], "rsa512") == 0
++                || strcmp(kems_algname[i], "rsa1024") == 0) {
++                kems_doit[i] = 0;
++            }
++        }
++
++        for (i = 0; i < sigs_algs_len; i++) {
++            if (sigs_doit[i] && strcmp(sigs_algname[i], "rsa512") == 0
++                || strcmp(sigs_algname[i], "rsa1024") == 0) {
++                sigs_doit[i] = 0;
++            }
++        }
++
++        memset(dsa_doit, 0, sizeof(dsa_doit));
++        memset(eddsa_doit, 0, sizeof(eddsa_doit));
++
++        doit[D_KMAC128] = doit[D_KMAC256] = 0;
++
++        for (i = 0; i < EC_NUM; i++) {
++            if (ec_curves[i].nid == NID_brainpoolP256r1
++                || ec_curves[i].nid == NID_brainpoolP256t1
++                || ec_curves[i].nid == NID_brainpoolP384r1
++                || ec_curves[i].nid == NID_brainpoolP384t1
++                || ec_curves[i].nid == NID_brainpoolP512r1
++                || ec_curves[i].nid == NID_brainpoolP512t1
++                || ec_curves[i].nid == NID_X25519
++                || ec_curves[i].nid == NID_X448) {
++                ecdsa_doit[i] = 0;
++                ecdh_doit[i] = 0;
++            }
++        }
++        // {"brainpoolP256r1", NID_brainpoolP256r1, 256},
++        // {"brainpoolP256t1", NID_brainpoolP256t1, 256},
++        // {"brainpoolP384r1", NID_brainpoolP384r1, 384},
++        // {"brainpoolP384t1", NID_brainpoolP384t1, 384},
++        // {"brainpoolP512r1", NID_brainpoolP512r1, 512},
++        // {"brainpoolP512t1", NID_brainpoolP512t1, 512},
++
++    }
++
+     for (i = 0; i < ALGOR_NUM; i++)
+         if (doit[i])
+             pr_header++;
+@@ -3125,18 +3183,18 @@ int speed_main(int argc, char **argv)
+                                                       (void *)key32, 16);
+         params[1] = OSSL_PARAM_construct_end();
+ 
+-        if (mac_setup("KMAC-128", &mac, params, loopargs, loopargs_len) < 1)
+-            goto end;
+-        for (testnum = 0; testnum < size_num; testnum++) {
+-            print_message(names[D_KMAC128], lengths[testnum], seconds.sym);
+-            Time_F(START);
+-            count = run_benchmark(async_jobs, KMAC128_loop, loopargs);
+-            d = Time_F(STOP);
+-            print_result(D_KMAC128, testnum, count, d);
+-            if (count < 0)
+-                break;
++        if (mac_setup("KMAC-128", &mac, params, loopargs, loopargs_len) == 1) {
++            for (testnum = 0; testnum < size_num; testnum++) {
++                print_message(names[D_KMAC128], lengths[testnum], seconds.sym);
++                Time_F(START);
++                count = run_benchmark(async_jobs, KMAC128_loop, loopargs);
++                d = Time_F(STOP);
++                print_result(D_KMAC128, testnum, count, d);
++                if (count < 0)
++                    break;
++            }
++            mac_teardown(&mac, loopargs, loopargs_len);
+         }
+-        mac_teardown(&mac, loopargs, loopargs_len);
+     }
+ 
+     if (doit[D_KMAC256]) {
+@@ -3146,18 +3204,18 @@ int speed_main(int argc, char **argv)
+                                                       (void *)key32, 32);
+         params[1] = OSSL_PARAM_construct_end();
+ 
+-        if (mac_setup("KMAC-256", &mac, params, loopargs, loopargs_len) < 1)
+-            goto end;
+-        for (testnum = 0; testnum < size_num; testnum++) {
+-            print_message(names[D_KMAC256], lengths[testnum], seconds.sym);
+-            Time_F(START);
+-            count = run_benchmark(async_jobs, KMAC256_loop, loopargs);
+-            d = Time_F(STOP);
+-            print_result(D_KMAC256, testnum, count, d);
+-            if (count < 0)
+-                break;
++        if (mac_setup("KMAC-256", &mac, params, loopargs, loopargs_len) == 1) {
++            for (testnum = 0; testnum < size_num; testnum++) {
++                print_message(names[D_KMAC256], lengths[testnum], seconds.sym);
++                Time_F(START);
++                count = run_benchmark(async_jobs, KMAC256_loop, loopargs);
++                d = Time_F(STOP);
++                print_result(D_KMAC256, testnum, count, d);
++                if (count < 0)
++                    break;
++            }
++            mac_teardown(&mac, loopargs, loopargs_len);
+         }
+-        mac_teardown(&mac, loopargs, loopargs_len);
+     }
+ 
+     for (i = 0; i < loopargs_len; i++)
+-- 
+2.45.4
+
