@@ -140,6 +140,9 @@ cargo build --release --target=%{rust_musl_target} %{cargo_pkg_feature_opts} %{c
 * Thu Aug 27 2026 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 52.0.152-1
 - Auto-upgrade to 52.0.152
 
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 51.1.101-3
+- Bump release to rebuild with rust
+
 * Fri Jun 05 2026 BinduSri Adabala <v-badabala@microsoft.com> - 51.1.101-2
 - Bump release to rebuild with rust
 
