@@ -1,4 +1,5 @@
 Summary:        Access control list utilities
+# Temporary validation change for the Azure Repos PR-check cutover.
 Name:           acl
 Version:        2.4.0
 Release:        1%{?dist}
