@@ -18,14 +18,18 @@ To avoid potential issues on systems with FMT library between 8.0 and the one wi
 introduce a bundling mechanism for use on such distributions.
 We pre-download the sources archive and supply the CMake with it, instead of the web URL.
 
---- mariadb-10.11.10/cmake/libfmt.cmake	2024-10-29 15:32:31.000000000 +0100
-+++ mariadb-10.11.10/cmake/libfmt.cmake_patched	2024-11-14 12:06:35.961435488 +0100
-@@ -15,7 +15,7 @@ MACRO(BUNDLE_LIBFMT)
-   ExternalProject_Add(
-     libfmt
-     PREFIX   "${dir}"
--    URL      "https://github.com/fmtlib/fmt/releases/download/11.0.2/fmt-11.0.2.zip"
-+    URL      "file:///${dir}/fmt-11.0.2.zip"
-     URL_MD5 c622dca45ec3fc95254c48370a9f7a1d
-     INSTALL_COMMAND ""
-     CONFIGURE_COMMAND ""
+Since 10.11.19 upstream selects the archive via a compiler-dependent SET(source URL ...)
+block: fmt 11.0.2 only for gcc < 4.9 (RHEL-7), otherwise fmt 12.2.0. Azure Linux builds
+with gcc 13, so only the latter branch is redirected to the pre-downloaded archive.
+
+--- mariadb-10.11.19/cmake/libfmt.cmake	2024-10-29 15:32:31.000000000 +0100
++++ mariadb-10.11.19/cmake/libfmt.cmake_patched	2024-11-14 12:06:35.961435488 +0100
+@@ -18,7 +18,7 @@ MACRO(BUNDLE_LIBFMT)
+     SET(source URL "https://github.com/fmtlib/fmt/releases/download/11.0.2/fmt-11.0.2.zip"
+                URL_MD5 c622dca45ec3fc95254c48370a9f7a1d)
+   ELSE()
+-    SET(source URL "https://github.com/fmtlib/fmt/releases/download/12.2.0/fmt-12.2.0.zip"
++    SET(source URL "file:///${dir}/fmt-12.2.0.zip"
+                URL_MD5 6083253772ad29e73a4d5920be08918e)
+   ENDIF()
+ 

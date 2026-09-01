@@ -51,7 +51,7 @@ func (l *Loopback) newLoopbackHelper() error {
 	l.diskIdMin = min
 
 	// Ensure all the partitions have finished populating.
-	err = diskutils.WaitForDevicesToSettle()
+	err = diskutils.WaitForDiskDevice(devicePath)
 	if err != nil {
 		return err
 	}

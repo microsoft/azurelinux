@@ -1827,8 +1827,8 @@
         "type": "other",
         "other": {
           "name": "cloud-hypervisor",
-          "version": "51.1.101",
-          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v51.1.101.tar.gz"
+          "version": "52.0.152",
+          "downloadUrl": "https://github.com/microsoft/cloud-hypervisor/archive/refs/tags/msft/v52.0.152.tar.gz"
         }
       }
     },
@@ -4410,8 +4410,8 @@
         "type": "other",
         "other": {
           "name": "gh",
-          "version": "2.97.0",
-          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.97.0.tar.gz"
+          "version": "2.98.0",
+          "downloadUrl": "https://github.com/cli/cli/archive/refs/tags/v2.98.0.tar.gz"
         }
       }
     },
@@ -9631,8 +9631,8 @@
         "type": "other",
         "other": {
           "name": "libevent",
-          "version": "2.1.12",
-          "downloadUrl": "https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz"
+          "version": "2.1.13",
+          "downloadUrl": "https://github.com/libevent/libevent/releases/download/release-2.1.13-stable/libevent-2.1.13-stable.tar.gz"
         }
       }
     },
@@ -9731,8 +9731,8 @@
         "type": "other",
         "other": {
           "name": "libgcrypt",
-          "version": "1.10.3",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2"
+          "version": "1.11.3",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.11.3.tar.bz2"
         }
       }
     },
@@ -9851,8 +9851,8 @@
         "type": "other",
         "other": {
           "name": "libgpg-error",
-          "version": "1.48",
-          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.48.tar.bz2"
+          "version": "1.49",
+          "downloadUrl": "https://gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.49.tar.bz2"
         }
       }
     },
@@ -13141,8 +13141,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.18",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.18/source/mariadb-10.11.18.tar.gz"
+          "version": "10.11.19",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.19/source/mariadb-10.11.19.tar.gz"
         }
       }
     },
@@ -17333,8 +17333,8 @@
         "type": "other",
         "other": {
           "name": "perl-DBI",
-          "version": "1.651",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.651.tgz"
+          "version": "1.652",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/H/HM/HMBRAND/DBI-1.652.tgz"
         }
       }
     },
@@ -18193,8 +18193,8 @@
         "type": "other",
         "other": {
           "name": "perl-HTTP-Date",
-          "version": "6.06",
-          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.06.tar.gz"
+          "version": "6.08",
+          "downloadUrl": "https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Date-6.08.tar.gz"
         }
       }
     },
@@ -23873,8 +23873,8 @@
         "type": "other",
         "other": {
           "name": "python-mistune",
-          "version": "3.3.0",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.3.0.tar.gz"
+          "version": "3.3.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/m/mistune/mistune-3.3.4.tar.gz"
         }
       }
     },
@@ -25783,8 +25783,8 @@
         "type": "other",
         "other": {
           "name": "python-webob",
-          "version": "1.8.10",
-          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.10.tar.gz"
+          "version": "1.8.11",
+          "downloadUrl": "https://github.com/Pylons/webob/archive/refs/tags/1.8.11.tar.gz"
         }
       }
     },
@@ -27804,8 +27804,8 @@
         "type": "other",
         "other": {
           "name": "rust",
-          "version": "1.90.0",
-          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.90.0-src.tar.xz"
+          "version": "1.96.1",
+          "downloadUrl": "https://static.rust-lang.org/dist/rustc-1.96.1-src.tar.xz"
         }
       }
     },
@@ -27816,6 +27816,16 @@
           "name": "rust-afterburn",
           "version": "5.8.2",
           "downloadUrl": "https://github.com/coreos/afterburn/archive/refs/tags/v5.8.2.tar.gz"
+        }
+      }
+    },
+    {
+      "component": {
+        "type": "other",
+        "other": {
+          "name": "rust-bootstrap",
+          "version": "1.95.0",
+          "downloadUrl": "https://static.rust-lang.org/dist/2026-04-16/cargo-1.95.0-x86_64-unknown-linux-gnu.tar.xz"
         }
       }
     },

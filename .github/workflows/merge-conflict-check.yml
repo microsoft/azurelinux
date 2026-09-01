@@ -20,7 +20,7 @@ jobs:
     steps:
       # Checkout the branch of our repo that triggered this action
       - name: Workflow trigger checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Get base commit for PRs
         if: ${{ github.event_name == 'pull_request' }}

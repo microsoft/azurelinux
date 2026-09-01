@@ -2,7 +2,7 @@
 Summary:        Python cryptography library
 Name:           python-cryptography
 Version:        42.0.5
-Release:        5%{?dist}
+Release:        6%{?dist}
 License:        ASL 2.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -113,6 +113,9 @@ PYTHONPATH=%{buildroot}%{python3_sitearch} \
 %license LICENSE
 
 %changelog
+* Fri Aug 21 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 42.0.5-6
+- Bump release to build with rust
+
 * Fri Aug 07 2026 Akarsh Chaudhary <v-akarshc@microsoft.com> - 42.0.5-5
 - Patch for CVE-2026-69249
 

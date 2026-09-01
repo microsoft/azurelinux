@@ -2456,6 +2456,7 @@
                 "rubygem-yajl-ruby",
                 "rubygem-zip-zip",
                 "runc",
+                "rust-bootstrap",
                 "sdbus-cpp",
                 "sgx-backwards-compatibility",
                 "shim",
