@@ -61,8 +61,8 @@ make %{?_smp_mflags} check
 %{_includedir}/*
 
 %changelog
-* Tue Aug 26 2026 Ankita Pareek <ankitapareek@microsoft.com> - 0.14.0-3
-- Add typename to the C++ URCU_FORCE_CAST macro (backport from 0.15) to fix C++ consumers such as lttng-tools 2.14.
+* Wed Aug 26 2026 Ankita Pareek <ankitapareek@microsoft.com> - 0.14.0-3
+- Add typename to the C++ URCU_FORCE_CAST macro (backport from 0.14.1) to fix C++ consumers such as lttng-tools 2.14.
 
 * Thu May 16 2024 Daniel McIlvaney <damcilva@microsoft.com> - 0.14.0-2
 - Sanitize license files

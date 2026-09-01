@@ -1,7 +1,7 @@
 Add 'typename' to the C++ URCU_FORCE_CAST macro so that rcu_dereference()
 and related casts compile under a C++ dependent context (e.g. GCC's
 -std=gnu++11 used by lttng-tools 2.14). Backported from upstream
-userspace-rcu 0.15.
+userspace-rcu 0.14.1 (commit ebd83c1).
 
 --- a/include/urcu/compiler.h
 +++ b/include/urcu/compiler.h
