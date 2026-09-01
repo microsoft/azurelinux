@@ -58,7 +58,7 @@ make %{?_smp_mflags} check
 %{_docdir}/bison/*
 
 %changelog
-* Thu Jul 30 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 3.8.2-2
+* Wed Sep 02 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 3.8.2-2
 - Patch for CVE-2026-56390, CVE-2026-56389
 
 * Mon Oct 16 2023 CBL-Mariner Servicing Account <cblmargh@microsoft.com> - 3.8.2-1
