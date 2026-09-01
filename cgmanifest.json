@@ -30026,8 +30026,8 @@
         "type": "other",
         "other": {
           "name": "userspace-rcu",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.14.0.tar.gz"
+          "version": "0.14.1",
+          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.14.1.tar.gz"
         }
       }
     },
