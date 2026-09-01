@@ -3,12 +3,12 @@
 
 Name:           libcpuid
 Version:        0.8.1
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        Provides CPU identification for x86 and ARM
 License:        BSD-2-Clause
 URL:            https://github.com/anrieff/libcpuid
 Source0:        https://github.com/anrieff/libcpuid/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-ExcludeArch:    ppc64le s390x
+ExclusiveArch:  %{ix86} x86_64 %{arm} aarch64
 
 BuildRequires:  automake
 BuildRequires:  autoconf
@@ -104,6 +104,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %pytest python/tests
 
 
 %changelog
+* Fri Mar 06 2026 Andrea Bolognani <abologna@redhat.com> - 0.8.1-5
+- Fix architecture list (explicitly limit to x86 and ARM)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

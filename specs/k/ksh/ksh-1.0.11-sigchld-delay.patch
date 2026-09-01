@@ -1,0 +1,12 @@
+# based on https://github.com/ksh93/ksh/pull/922
+--- a/src/cmd/ksh93/tests/sigchld.sh	2026-01-19 10:40:23.150912074 +0100
++++ b/src/cmd/ksh93/tests/sigchld.sh	2026-01-19 10:40:53.146969498 +0100
+@@ -71,6 +71,7 @@
+ 			fi
+ 		done
+ 		wait
++		sleep 1
+ 		print running=$running maxrunning=$maxrunning
+ 	')
+ 	exp='running=0 maxrunning='$jobmax
+

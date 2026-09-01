@@ -7,7 +7,7 @@
 
 Name:           ninja-build
 Version:        1.13.2
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        Small build system with a focus on speed
 License:        Apache-2.0
 URL:            https://ninja-build.org/
@@ -128,6 +128,9 @@ cp -a %{ninja_distinfo} %{buildroot}%{python3_sitelib}
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.13.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Nov 21 2025 Ben Boeckel <fedora@me.benboeckel.net> - 1.13.2-1
 - Update to 1.13.2 (rbhz#2416196)
 

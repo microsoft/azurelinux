@@ -11,12 +11,12 @@
 %endif
 
 Name:           perl-URI
-Version:        5.34
-Release: 5%{?dist}
+Version:        5.36
+Release:        1%{?dist}
 Summary:        A Perl module implementing URI parsing and manipulation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/URI
-Source0:        https://cpan.metacpan.org/modules/by-module/URI/URI-%{version}.tar.gz
+Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/URI-%{version}.tar.gz
 BuildArch:      noarch
 # Module Build
 BuildRequires:  coreutils
@@ -41,6 +41,7 @@ BuildRequires:  perl(overload)
 BuildRequires:  perl(parent)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(strict)
+BuildRequires:  perl(Unicode::Normalize)
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(warnings)
 # Test Suite
@@ -48,7 +49,6 @@ BuildRequires:  perl(File::Spec)
 BuildRequires:  perl(File::Spec::Functions)
 BuildRequires:  perl(File::Temp)
 BuildRequires:  perl(Storable)
-BuildRequires:  perl(Test::Fatal)
 BuildRequires:  perl(Test::More) >= 0.96
 BuildRequires:  perl(Test::Needs)
 BuildRequires:  perl(Test::Warnings)
@@ -161,6 +161,16 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Fri Aug 21 2026 Jitka Plesnikova <jplesnik@redhat.com> - 5.36-1
+- 5.36 bump (rhbz#2520744)
+- Fix CVE-2026-19953 (IDNA host encoding / Unicode NFC normalization)
+
+* Mon Jun 15 2026 Jitka Plesnikova <jplesnik@redhat.com> - 5.35-1
+- 5.35 bump (rhbz#2488799)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.34-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Nov  2 2025 Paul Howarth <paul@city-fan.org> - 5.34-2
 - Obsolete/Provide perl-URI-ws (rhbz#2411728, rhbz#2411834)
   URI::ws incorporated into URI dist at version 5.34

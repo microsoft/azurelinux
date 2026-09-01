@@ -1,0 +1,74 @@
+From 8c6498a639579fabd21af172302878d8dd63d114 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Wed, 3 Dec 2025 14:34:37 +1000
+Subject: [PATCH] Cargo.toml: drop libbpf-sys to 1.5.0
+
+That's what we have in Fedora right now and it's good enough.
+---
+ Cargo.lock | 18 +++---------------
+ Cargo.toml |  2 +-
+ 2 files changed, 4 insertions(+), 16 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 55553a11bbc5..22c2bbfc5081 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -328,7 +328,7 @@ dependencies = [
+  "anyhow",
+  "cargo_metadata",
+  "clap",
+- "libbpf-rs 0.24.8",
++ "libbpf-rs",
+  "memmap2",
+  "regex",
+  "semver",
+@@ -349,18 +349,6 @@ dependencies = [
+  "vsprintf",
+ ]
+ 
+-[[package]]
+-name = "libbpf-rs"
+-version = "0.25.0"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "e23d252d93e246c8787198369f06806c99c5077b5295be29505295f4e5426dc4"
+-dependencies = [
+- "bitflags",
+- "libbpf-sys",
+- "libc",
+- "vsprintf",
+-]
+-
+ [[package]]
+ name = "libbpf-sys"
+ version = "1.6.1+v1.6.1"
+@@ -698,12 +686,12 @@ dependencies = [
+ 
+ [[package]]
+ name = "udev-hid-bpf"
+-version = "2.1.0-20240704"
++version = "2.2.0-20251121"
+ dependencies = [
+  "anyhow",
+  "clap",
+  "libbpf-cargo",
+- "libbpf-rs 0.25.0",
++ "libbpf-rs",
+  "libbpf-sys",
+  "libc",
+  "log",
+diff --git a/Cargo.toml b/Cargo.toml
+index 58e86f727a0b..36d2f8b3fad8 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -9,7 +9,7 @@ rust-version = "1.70"
+ [dependencies]
+ anyhow = "1.0.79"
+ libbpf-rs = ">=0.24"
+-libbpf-sys = "1.5.1"
++libbpf-sys = "1.5.0"
+ udev =  { version = "0.7.0", features = ["mio08"] }
+ mio = { version = "0.8", features = ["os-ext"] }
+ libc = "0.2"
+-- 
+2.51.1
+

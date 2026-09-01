@@ -1,0 +1,51 @@
+From 53a497ae37b3220662ac177e9477e9551e4e37b0 Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Wed, 14 Jan 2026 14:32:40 +0100
+Subject: [PATCH] Update cache_from_source() for Python 3.15
+
+The debug_override parameter of cache_from_source() is deprecated in
+Python 3.14. The function docstring says:
+
+    The debug_override parameter is deprecated. If debug_override
+    is not None, a True value is the same as setting 'optimization'
+    to the empty string while a False value is equivalent to setting
+    'optimization' to '1'.
+
+The parameter has been removed in Python 3.15.
+
+Fixes #255
+---
+ distlib/util.py    | 6 +++++-
+ tests/test_util.py | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/distlib/util.py b/distlib/util.py
+index 0d5bd7a..b700384 100644
+--- a/distlib/util.py
++++ b/distlib/util.py
+@@ -589,7 +589,11 @@ def ensure_dir(self, path):
+                 self.dirs_created.add(path)
+ 
+     def byte_compile(self, path, optimize=False, force=False, prefix=None, hashed_invalidation=False):
+-        dpath = cache_from_source(path, not optimize)
++        if not optimize:
++            optimization = ''
++        else:
++            optimization = '1'
++        dpath = cache_from_source(path, optimization=optimization)
+         logger.info('Byte-compiling %s to %s', path, dpath)
+         if not self.dry_run:
+             if force or self.newer(path, dpath):
+diff --git a/tests/test_util.py b/tests/test_util.py
+index d8694a9..d4bb572 100644
+--- a/tests/test_util.py
++++ b/tests/test_util.py
+@@ -652,7 +652,7 @@ def test_is_writable(self):
+ 
+     def test_byte_compile(self):
+         path = os.path.join(self.workdir, 'hello.py')
+-        dpath = cache_from_source(path, True)
++        dpath = cache_from_source(path, optimization='')
+         self.fileop.write_text_file(path, 'print("Hello, world!")', 'utf-8')
+         self.fileop.byte_compile(path, optimize=False)
+         self.assertTrue(os.path.exists(dpath))

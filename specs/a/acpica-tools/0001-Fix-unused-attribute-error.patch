@@ -1,0 +1,28 @@
+From 312c162f61f8775cec2979bb786baa2d27fbfc2a Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Mon, 2 Feb 2026 15:16:23 -0500
+Subject: [PATCH] Fix unused attribute error
+
+This attribute is only used if debug logging is enabled at compile-time.
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ source/components/namespace/nsaccess.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/source/components/namespace/nsaccess.c b/source/components/namespace/nsaccess.c
+index 5f044e198543e032164168dbceef621cee040add..c3e86eee6ea548457370ddab7d68f6cf35885d02 100644
+--- a/source/components/namespace/nsaccess.c
++++ b/source/components/namespace/nsaccess.c
+@@ -449,7 +449,7 @@ AcpiNsLookup (
+     ACPI_NAMESPACE_NODE     *CurrentNode = NULL;
+     ACPI_NAMESPACE_NODE     *ThisNode = NULL;
+     UINT32                  NumSegments;
+-    UINT32                  NumCarats;
++    UINT32 ACPI_UNUSED_VAR  NumCarats;
+     ACPI_NAME               SimpleName;
+     ACPI_OBJECT_TYPE        TypeToCheckFor;
+     ACPI_OBJECT_TYPE        ThisSearchType;
+-- 
+2.52.0
+

@@ -6,8 +6,8 @@
 %bcond_with network_tests
 
 Name:           python-aiodns
-Version:        3.6.1
-Release: 4%{?dist}
+Version:        4.0.4
+Release:        1%{?dist}
 Summary:        Simple DNS resolver for asyncio
 
 License:        MIT
@@ -36,7 +36,7 @@ Summary:        %{summary}
 
 
 %prep
-%autosetup -n aiodns-%{version}
+%autosetup -n aiodns-%{version} -p0
 
 
 %generate_buildrequires
@@ -64,6 +64,24 @@ Summary:        %{summary}
 
 
 %changelog
+* Mon Aug 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 4.0.4-1
+- 4.0.4
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 4.0.0-3
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Gwyn Ciesla <gwync@protonmail.com> - 4.0.0-1
+- 4.0.0
+
+* Mon Dec 15 2025 Gwyn Ciesla <gwync@protonmail.com> - 3.6.1-2
+- Unpin pycares
+
 * Thu Dec 11 2025 Gwyn Ciesla <gwync@protonmail.com> - 3.6.1-1
 - 3.6.1
 

@@ -4,8 +4,8 @@
 %global pypi_name sip
 
 Name:           sip6
-Version:        6.15.1
-Release: 4%{?dist}
+Version:        6.15.3
+Release:        1%{?dist}
 Summary:        SIP - Python/C++ Bindings Generator
 %py_provides    python3-sip6
 
@@ -55,6 +55,9 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %{python3_sitelib}/sipbuild/
 
 %changelog
+* Tue Mar 31 2026 Jan Grulich <jgrulich@redhat.com> - 6.15.3-1
+- 6.15.3
+
 * Thu Jan 29 2026 Jan Grulich <jgrulich@redhat.com> - 6.15.1-1
 - 6.15.1
 

@@ -1,0 +1,24 @@
+{
+    "description": "OVMF in IGVM format, no secure boot",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "igvm",
+        "filename": "/usr/share/edk2/ovmf/OVMF.igvm"
+    },
+    "targets": [
+        {
+            "architecture": "x86_64",
+            "machines": [
+                "pc-q35-*"
+            ]
+        }
+    ],
+    "features": [
+        "amd-sev-snp",
+        "verbose-dynamic"
+    ],
+    "tags": [
+    ]
+}

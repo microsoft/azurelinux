@@ -1,24 +1,16 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%bcond gpu_demo %{undefined rhel}
+
 Name:           harfbuzz
-Version:        11.5.1
-Release: 5%{?dist}
+Version:        14.1.0
+Release:        2%{?dist}
 Summary:        Text shaping library
 
 License:        MIT-Modern-Variant
 URL:            https://github.com/harfbuzz/harfbuzz/
 Source0:        https://github.com/harfbuzz/harfbuzz/releases/download/%{version}/harfbuzz-%{version}.tar.xz
-
-# [cmap] malloc fail test (#5710)
-# https://github.com/harfbuzz/harfbuzz/commit/1265ff8d990284f04d8768f35b0e20ae5f60daae
-#
-# Fixes:
-#
-# Null Pointer Dereference in SubtableUnicodesCache::create leading to DoS
-# https://www.cve.org/CVERecord?id=CVE-2026-22693
-# https://github.com/harfbuzz/harfbuzz/security/advisories/GHSA-xvjr-f2r9-c7ww
-Patch:          https://github.com/harfbuzz/harfbuzz/commit/1265ff8d990284f04d8768f35b0e20ae5f60daae.patch
 
 BuildRequires:  cairo-devel
 BuildRequires:  freetype-devel
@@ -30,6 +22,10 @@ BuildRequires:  gtk-doc
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  meson
+%if %{with gpu_demo}
+BuildRequires:  glew-devel
+BuildRequires:  glfw-devel
+%endif
 
 # https://github.com/harfbuzz/harfbuzz/issues/3163
 %global _distro_extra_cflags -fno-exceptions
@@ -44,6 +40,9 @@ Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       %{name}-icu%{?_isa} = %{version}-%{release}
 Requires:       %{name}-cairo%{?_isa} = %{version}-%{release}
+Requires:       %{name}-gpu%{?_isa} = %{version}-%{release}
+Requires:       %{name}-raster%{?_isa} = %{version}-%{release}
+Requires:       %{name}-vector%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
@@ -63,12 +62,33 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    cairo
 This package contains Harfbuzz Cairo support library.
 
+%package        gpu
+Summary:        Harfbuzz GPU support library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    gpu
+This package contains Harfbuzz GPU support library.
+
+%package        raster
+Summary:        Harfbuzz Raster support library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    raster
+This package contains Harfbuzz Raster support library.
+
+%package        vector
+Summary:        Harfbuzz Vector support library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    vector
+This package contains Harfbuzz Vector support library.
+
 %prep
 %autosetup -p1
 
 
 %build
-%meson -Dgraphite2=enabled -Dchafa=disabled
+%meson -Dgraphite2=enabled -Dchafa=disabled %{!?with_gpu_demo:-Dgpu_demo=disabled}
 %meson_build
 
 
@@ -86,6 +106,12 @@ This package contains Harfbuzz Cairo support library.
 
 %ldconfig_scriptlets cairo
 
+%ldconfig_scriptlets gpu
+
+%ldconfig_scriptlets raster
+
+%ldconfig_scriptlets vector
+
 %files
 %license COPYING
 %doc NEWS AUTHORS README.md
@@ -97,21 +123,32 @@ This package contains Harfbuzz Cairo support library.
 
 %files devel
 %doc %{_datadir}/gtk-doc
+%if %{with gpu_demo}
+%{_bindir}/hb-gpu
+%endif
 %{_bindir}/hb-info
 %{_bindir}/hb-view
+%{_bindir}/hb-raster
 %{_bindir}/hb-shape
 %{_bindir}/hb-subset
+%{_bindir}/hb-vector
 %{_includedir}/harfbuzz/
 %{_libdir}/libharfbuzz.so
 %{_libdir}/libharfbuzz-gobject.so
 %{_libdir}/libharfbuzz-cairo.so
+%{_libdir}/libharfbuzz-gpu.so
 %{_libdir}/libharfbuzz-icu.so
+%{_libdir}/libharfbuzz-raster.so
 %{_libdir}/libharfbuzz-subset.so
+%{_libdir}/libharfbuzz-vector.so
 %{_libdir}/pkgconfig/harfbuzz.pc
 %{_libdir}/pkgconfig/harfbuzz-cairo.pc
 %{_libdir}/pkgconfig/harfbuzz-gobject.pc
 %{_libdir}/pkgconfig/harfbuzz-icu.pc
+%{_libdir}/pkgconfig/harfbuzz-gpu.pc
+%{_libdir}/pkgconfig/harfbuzz-raster.pc
 %{_libdir}/pkgconfig/harfbuzz-subset.pc
+%{_libdir}/pkgconfig/harfbuzz-vector.pc
 %{_libdir}/cmake/harfbuzz/
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/HarfBuzz-0.0.gir
@@ -122,9 +159,68 @@ This package contains Harfbuzz Cairo support library.
 %files cairo
 %{_libdir}/libharfbuzz-cairo.so.*
 
+%files raster
+%{_libdir}/libharfbuzz-raster.so.*
+
+%files vector
+%{_libdir}/libharfbuzz-vector.so.*
+
+%files gpu
+%{_libdir}/libharfbuzz-gpu.so.*
+
 %changelog
-* Wed Jan 14 2026 Parag Nemade <pnemade AT redhat DOT com> - 11.5.1-2
-- Backport security fix for CVE-2026-22693 (fix RHBZ#2429288)
+* Sun Apr 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 14.1.0-2
+- Disable hb-gpu on RHEL
+
+* Sun Apr 05 2026 Parag Nemade <pnemade AT redhat DOT com> - 14.1.0-1
+- Update to 14.1.0 version (#2455139)
+
+* Thu Apr 02 2026 Parag Nemade <pnemade AT redhat DOT com> - 14.0.0-2
+- Harfbuzz-14.0.0 added new library libharfbuzz-gpu added as new subpackage
+
+* Wed Apr 01 2026 Parag Nemade <pnemade AT redhat DOT com> - 14.0.0-1
+- Update to 14.0.0 version (#2453867)
+
+* Fri Mar 20 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.2.1-1
+- Update to 13.2.1 version (#2448935)
+
+* Fri Mar 13 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.1.1-2
+- add missing hb-raster binary
+
+* Fri Mar 13 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.1.1-1
+- Update to 13.1.1 version (#2446400)
+
+* Sun Mar 08 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.0.1-1
+- Update to 13.0.1 version (#2445520)
+
+* Thu Mar 05 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.0.0-2
+- Upstream added new binary hb-vector
+- Upstream added new pkgconfig files harfbuzz-raster.pc and harfbuzz-vector.pc
+- Added new subpackages harfbuzz-raster and harfbuzz-vector
+
+* Thu Mar 05 2026 Parag Nemade <pnemade AT redhat DOT com> - 13.0.0-1
+- Update to 13.0.0 version (#2444670)
+
+* Sat Jan 24 2026 Parag Nemade <pnemade AT redhat DOT com> - 12.3.2-1
+- Update to 12.3.2 version (#2432559)
+
+* Wed Jan 21 2026 Parag Nemade <pnemade AT redhat DOT com> - 12.3.1-1
+- Update to 12.3.1 version (#2431448)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Dec 28 2025 Parag Nemade <pnemade AT redhat DOT com> - 12.3.0-1
+- Update to 12.3.0 version (#2425647)
+
+* Fri Nov 07 2025 Parag Nemade <pnemade AT redhat DOT com> - 12.2.0-1
+- Update to 12.2.0 version (#2412425)
+
+* Thu Oct 02 2025 Parag Nemade <pnemade AT redhat DOT com> - 12.1.0-1
+- Update to 12.1.0 version (#2400640)
+
+* Sun Sep 28 2025 Parag Nemade <pnemade AT redhat DOT com> - 12.0.0-1
+- Update to 12.0.0 version (#2399955)
 
 * Tue Sep 23 2025 Parag Nemade <pnemade AT redhat DOT com> - 11.5.1-1
 - Update to 11.5.1 version (#2397450)

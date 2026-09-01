@@ -27,13 +27,19 @@
 Name:      %{libname}-awesome
 Summary:   Client library and command line tools for memcached server
 Version:   %{upstream_version}%{?upstream_prever:~%{upstream_prever}}
-Release: 10%{?dist}
+Release:   9%{?dist}
 # SPDX:
 License:   BSD-3-Clause
 URL:       https://github.com/%{gh_owner}/%{gh_project}
 Source0:   https://github.com/%{gh_owner}/%{gh_project}/archive/%{gh_commit}/%{gh_project}-%{version}-%{gh_short}.tar.gz
 
+# Fix test with memcached 1.6.40
+Patch0:    162.patch
+
 BuildRequires: cmake >= 3.9
+# Cannot use Ninja generator because of "multiple rules generate docs/man"
+%global _cmake_generator "Unix Makefiles"
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: gcc-c++
 BuildRequires: python3-sphinx
@@ -118,6 +124,8 @@ rm test/tests/memcached/udp.cpp
 rm test/tests/memcached/regression/lp_000-583-031.cpp
 rm test/tests/memcached/regression/gh-php-memcached_0531.cpp
 
+%patch -P0 -p1
+
 
 %build
 %cmake \
@@ -191,6 +199,17 @@ rm -r %{buildroot}%{_datadir}/doc/%{name}/
 
 
 %changelog
+* Sat Feb 14 2026 Cristian Le <git@lecris.dev> - 1.1.4-9
+- Force using Makefile generator (rhbz#2381045)
+
+* Wed Jan 21 2026 Remi Collet <remi@remirepo.net> - 1.1.4-8
+- fix test suite with memcached 1.6.40
+  reported as https://github.com/awesomized/libmemcached/issues/161
+  using fix from https://github.com/awesomized/libmemcached/pull/162
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

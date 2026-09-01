@@ -43,8 +43,8 @@
       <keyword>Siren</keyword>
     </keywords>
     <project_license>LGPL-2.0 and PatentConcern</project_license>
-    <url type="homepage">http://gstreamer.freedesktop.org/</url>
-    <url type="missing">http://fedoraproject.org/wiki/Multimedia</url>
+    <url type="homepage">https://gstreamer.freedesktop.org/</url>
+    <url type="missing">https://fedoraproject.org/wiki/Multimedia</url>
   </component>
   <component priority="-1" type="codec">
     <id>gstreamer-libav</id>
@@ -91,8 +91,8 @@
       <keyword>OGG</keyword>
     </keywords>
     <project_license>LGPL-2.0</project_license>
-    <url type="homepage">http://gstreamer.freedesktop.org/</url>
-    <url type="missing">http://fedoraproject.org/wiki/Multimedia</url>
+    <url type="homepage">https://gstreamer.freedesktop.org/</url>
+    <url type="missing">https://fedoraproject.org/wiki/Multimedia</url>
   </component>
   <component priority="-1" type="codec">
     <id>gstreamer-ugly</id>
@@ -137,7 +137,7 @@
       <keyword>RealMedia</keyword>
     </keywords>
     <project_license>LGPL-2.0 and PatentConcern</project_license>
-    <url type="homepage">http://gstreamer.freedesktop.org/</url>
-    <url type="missing">http://fedoraproject.org/wiki/Multimedia</url>
+    <url type="homepage">https://gstreamer.freedesktop.org/</url>
+    <url type="missing">https://fedoraproject.org/wiki/Multimedia</url>
   </component>
 </components>

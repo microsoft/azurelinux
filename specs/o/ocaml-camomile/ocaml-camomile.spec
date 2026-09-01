@@ -10,7 +10,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-camomile
 Version:        2.0.0
-Release: 21%{?dist}
+Release:        20%{?dist}
 Summary:        Unicode library for OCaml
 
 # LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception: the project as a whole
@@ -109,13 +109,19 @@ sed -i '\@%{_datadir}@d' .ofiles
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 2.0.0-19
+- OCaml 5.4.0 rebuild
+
 * Fri Aug 22 2025 Jerry James <loganjerry@gmail.com> - 2.0.0-18
 - Rebuild for ocaml-dune 3.20.0
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 2.0.0-16
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 2.0.0-16
 - Rebuild to fix OCaml dependencies
 
 * Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-15

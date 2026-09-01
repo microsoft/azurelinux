@@ -8,7 +8,7 @@
 Summary:       Hardware lister
 Name:          lshw
 Version:       B.02.20
-Release: 13%{?dist}
+Release:       11%{?dist}
 License:       GPL-2.0-only
 URL:           https://github.com/lyonel/lshw
 Source0:       https://github.com/lyonel/lshw/archive/refs/tags/%{version}.tar.gz
@@ -112,6 +112,9 @@ appstream-util validate-relax --nonet %{buildroot}/%{_datadir}/appdata/*.appdata
 %endif
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - B.02.20-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Jan 12 2026 Terje Rosten <terjeros@gmail.com> - B.02.20-10
 - Improve cmake patch to get all required flags added
 - Increase required cmake version

@@ -19,6 +19,18 @@
 
 %_fmoddir		%{_libdir}/gfortran/modules
 
+# man/info compression configuration
+%_man_info_compress gzip -9 -n
+%_man_info_compress_ext .gz
+
+# Packager macros for man/info page compression extension
+%_man_ext %{_man_info_compress_ext}
+%_info_ext %{_man_info_compress_ext}
+
+# Compatibility macros from the openSUSE Build Service
+%_ext_man %{_man_ext}
+%_ext_info %{_info_ext}
+
 %source_date_epoch_from_changelog 1
 %clamp_mtime_to_source_date_epoch %source_date_epoch_from_changelog
 
@@ -262,7 +274,7 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
 # Build root policy macros. Standard naming:
 # convert all '-' in basename to '_', add two leading underscores.
 %__brp_ldconfig /usr/lib/rpm/redhat/brp-ldconfig
-%__brp_compress /usr/lib/rpm/brp-compress
+%__brp_compress %{?_man_info_compress:COMPRESS="%{_man_info_compress}"} %{?_man_info_compress_ext:COMPRESS_EXT="%{_man_info_compress_ext}"} /usr/lib/rpm/brp-compress
 %__brp_strip /usr/lib/rpm/brp-strip %{__strip}
 %__brp_strip_lto /usr/lib/rpm/redhat/brp-strip-lto %{__strip}
 %__brp_strip_comment_note /usr/lib/rpm/brp-strip-comment-note %{__strip} %{__objdump}
@@ -278,7 +290,8 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
 # azurelinux-rpm-config maintainers, don't remove it from %%__os_install_post unless coordinating the change with Python maintainers
 # packagers, don't undefine the entire macro, see the individual macros in /usr/lib/rpm/macros.d/macros.python-srpm
 
-# note: %%__os_install_post_build_reproducibility is defined in add-determinism.
+# note: %%__os_install_post_build_reproducibility and %%__os_install_post_hardlink
+# are defined in add-determinism.
 # See /usr/lib/rpm/macros.d/macros.build-reproducibility for details.
 
 %__os_install_post    \
@@ -295,6 +308,7 @@ for k,_ in pairs(stripped_flags) do print(k .. " ") end
     %{?__brp_remove_la_files} \
     %{__os_install_post_python} \
     %{?__os_install_post_build_reproducibility} \
+    %{?__os_install_post_hardlink} \
 %{nil}
 
 %__spec_install_post\

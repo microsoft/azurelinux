@@ -8,13 +8,13 @@
 %bcond_with docs
 %endif
 # See https://github.com/valkey-io/valkey-doc/tags
-%global doc_version 8.1.5
+%global doc_version 9.0.5
 # Tests fail in mock, not in local build.
 %bcond_with tests
 
 Name:              valkey
-Version:           8.1.5
-Release: 4%{?dist}
+Version:           9.0.5
+Release:           1%{?dist}
 Summary:           A persistent key-value database
 # valkey: BSD-3-Clause
 # hiredis: BSD-3-Clause
@@ -36,6 +36,9 @@ Source50:          https://github.com/valkey-io/%{name}-doc/archive/%{doc_versio
 Patch0:            %{name}-conf.patch
 # Workaround to https://github.com/valkey-io/valkey/issues/2678
 Patch1:            %{name}-loadmod.patch
+# Properly inherits linker flags for modules
+# See https://github.com/valkey-io/valkey/pull/3344
+Patch2:            %{name}-bindnow.patch
 
 BuildRequires:     make
 BuildRequires:     gcc
@@ -56,8 +59,8 @@ BuildRequires:     python3-pyyaml
 %endif
 
 Requires:          logrotate
-# from deps/hiredis/hiredis.h
-Provides:          bundled(hiredis) = 1.0.3
+# from deps/libvalkey/include/valkey/valkey.h
+Provides:          bundled(libvalkey) = 0.2.1
 # from deps/jemalloc/VERSION
 Provides:          bundled(jemalloc) = 5.3.0
 # from deps/lua/src/lua.h
@@ -65,8 +68,9 @@ Provides:          bundled(lua-libs) = 5.1.5
 # from deps/linenoise/linenoise.h
 Provides:          bundled(linenoise) = 1.0
 Provides:          bundled(lzf)
-# from deps/hdr_histogram/README.md
-Provides:          bundled(hdr_histogram) = 0.11.0
+# from deps/README.md
+# e4448cf6d1cd08fff519812d3b1e58bd5a94ac42
+Provides:          bundled(hdr_histogram) = 0.11.9
 # no version
 Provides:          bundled(fpconv)
 
@@ -186,10 +190,11 @@ Provides:          redis-doc = %{version}-%{release}
 %setup -n %{name}-%{version} -a50
 %patch -P0 -p1 -b .rpm
 %patch -P1 -p1 -b .loadmod
+%patch -P2 -p1 -b .bindnow
 
 mv deps/lua/COPYRIGHT             COPYRIGHT-lua
 mv deps/jemalloc/COPYING          COPYING-jemalloc
-mv deps/hiredis/COPYING COPYING-hiredis-BSD-3-Clause
+mv deps/libvalkey/COPYING         COPYING-libvalkey
 mv deps/hdr_histogram/LICENSE.txt LICENSE-hdrhistogram
 mv deps/hdr_histogram/COPYING.txt COPYING-hdrhistogram
 mv deps/fpconv/LICENSE.txt        LICENSE-fpconv
@@ -394,7 +399,7 @@ fi
 %license LICENSE-hdrhistogram
 %license COPYING-hdrhistogram
 %license LICENSE-fpconv
-%license COPYING-hiredis-BSD-3-Clause
+%license COPYING-libvalkey
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %attr(0750, valkey, root) %dir %{_sysconfdir}/%{name}
 %attr(0750, valkey, root) %dir %{valkey_modules_cfg}
@@ -445,13 +450,42 @@ fi
 
 
 %changelog
-* Thu Dec  4 2025 Remi Collet <remi@fedoraproject.org> - 8.1.5-1
-- Valkey 8.1.5 - Released Thu 04 December 2025
+* Wed Jul 22 2026 Remi Collet <remi@remirepo.net> - 9.0.5-1
+- Valkey 9.0.5 - Released Tue 21 July 2026
+- Upgrade urgency SECURITY: This release includes security fixes
+  CVE-2026-56684 CVE-2026-63639
+
+* Wed May  6 2026 Remi Collet <remi@remirepo.net> - 9.0.4-1
+- Valkey 9.0.4 - May 5, 2026
+- Upgrade urgency SECURITY: This release includes security fixes.
+  CVE-2026-23479 CVE-2026-25243 CVE-2026-23631
+
+* Wed Mar 11 2026 Remi Collet <remi@remirepo.net> - 9.0.3-2
+- fix module linker flags using patch from
+  https://github.com/valkey-io/valkey/pull/3344
+
+* Tue Feb 24 2026 Remi Collet <remi@remirepo.net> - 9.0.3-1
+- Valkey 9.0.3 - February 23, 2026
+- Upgrade urgency SECURITY: This release includes security fixes
+
+* Tue Feb  3 2026 Remi Collet <remi@remirepo.net> - 9.0.2-1
+- Valkey 9.0.2 - February 3, 2026
+- Upgrade urgency HIGH: There are critical bugs that may affect a subset of users.
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 10 2025 Remi Collet <remi@remirepo.net> - 9.0.1-1
+- Valkey 9.0.1 - December 9, 2025
 - Upgrade urgency MODERATE
 
-* Thu Nov 27 2025 Remi Collet <remi@fedoraproject.org> - 8.1.4-3
+* Thu Nov 27 2025 Remi Collet <remi@fedoraproject.org> - 9.0.0-2
 - build TLS statically as module not supported by sentinel
 - drop sub-package for TLS module
+
+* Wed Oct 22 2025 Remi Collet <remi@fedoraproject.org> - 9.0.0-1
+- Valkey 9.0.0 GA - October 21, 2025
+- bundled hiredis replaced by libvalkey
 
 * Mon Oct  6 2025 Remi Collet <remi@fedoraproject.org> - 8.1.4-2
 - improve the patch for loadmodule directive

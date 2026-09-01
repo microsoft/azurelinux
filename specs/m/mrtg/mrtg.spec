@@ -14,7 +14,7 @@
 Summary:   Multi Router Traffic Grapher
 Name:      mrtg
 Version:   2.17.10
-Release: 15%{?dist}
+Release:   14%{?dist}
 URL:       http://oss.oetiker.ch/mrtg/
 Source0:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz
 Source1:   http://oss.oetiker.ch/mrtg/pub/mrtg-%{version}.tar.gz.md5
@@ -42,6 +42,8 @@ Patch1:    mrtg-2.17.2-socket6-fix.patch
 # Patch2: some devices return 2**32-2 on ifSpeed (e. g. IBM FibreChannel switches)
 Patch2:    mrtg-2.17.4-cfgmaker-ifhighspeed.patch
 Patch3:    mrtg-configure-c99.patch
+# Patch4: fixes CVE-2026-72694, backported from upstream
+Patch4:    mrtg-2.17.10-CVE-2026-72694.patch
 License:   GPL-2.0-or-later
 Requires(post): systemd-units
 Requires(preun): systemd-units
@@ -87,6 +89,7 @@ Custom SELinux policy module
 %patch -P1 -p1 -b .socket6
 %patch -P2 -p1 -b .ifhighspeed
 %patch -P3 -p1 -b .c99
+%patch -P4 -p1 -b .CVE-2026-72694
 
 for i in doc/mrtg-forum.1 doc/mrtg-squid.1 CHANGES; do
     iconv -f iso-8859-1 -t utf-8 < "$i" > "${i}_"
@@ -215,6 +218,13 @@ fi
 %endif
 
 %changelog
+* Wed Aug 26 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 2.17.10-14
+- Fix CVE-2026-72694: symlink-following privilege escalation in PID file handling
+  Resolves: #2513829
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.17.10-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

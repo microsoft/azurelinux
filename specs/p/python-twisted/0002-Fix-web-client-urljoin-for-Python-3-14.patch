@@ -1,0 +1,44 @@
+From 766980a7a9f78f75c61528a209cd51f231bb21cd Mon Sep 17 00:00:00 2001
+From: Adi Roiban <adiroiban@gmail.com>
+Date: Tue, 30 Sep 2025 19:04:07 +0100
+Subject: [PATCH] Fix test.
+
+---
+ src/twisted/web/client.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/twisted/web/client.py b/src/twisted/web/client.py
+index c7774fa209b..d1647bd1afc 100644
+--- a/src/twisted/web/client.py
++++ b/src/twisted/web/client.py
+@@ -220,7 +220,7 @@ def _urljoin(base, url):
+     """
+     base, baseFrag = urldefrag(base)
+     url, urlFrag = urldefrag(urljoin(base, url))
+-    return urljoin(url, b"#" + (urlFrag or baseFrag))
++    return urljoin(url, b"#" + (urlFrag or baseFrag)).strip('#')
+ 
+ 
+ def _makeGetterFactory(url, factoryFactory, contextFactory=None, *args, **kwargs):
+From 16a9c6d123d0da729640f9855672958cbb5d3806 Mon Sep 17 00:00:00 2001
+From: Adi Roiban <adiroiban@gmail.com>
+Date: Tue, 30 Sep 2025 19:14:20 +0100
+Subject: [PATCH] Fix strip.
+
+---
+ src/twisted/web/client.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/twisted/web/client.py b/src/twisted/web/client.py
+index d1647bd1afc..fb71b01ba37 100644
+--- a/src/twisted/web/client.py
++++ b/src/twisted/web/client.py
+@@ -220,7 +220,7 @@ def _urljoin(base, url):
+     """
+     base, baseFrag = urldefrag(base)
+     url, urlFrag = urldefrag(urljoin(base, url))
+-    return urljoin(url, b"#" + (urlFrag or baseFrag)).strip('#')
++    return urljoin(url, b"#" + (urlFrag or baseFrag)).strip(b'#')
+ 
+ 
+ def _makeGetterFactory(url, factoryFactory, contextFactory=None, *args, **kwargs):

@@ -1,6 +1,6 @@
-From 495c771a6f9be008b783c5f59285d30fdc15fd63 Mon Sep 17 00:00:00 2001
+From 6bb4e674cdc953f5c0048aa84172539900725166 Mon Sep 17 00:00:00 2001
 From: Jan Macku <jamacku@redhat.com>
-Date: Mon, 10 Mar 2025 14:23:59 +0100
+Date: Tue, 16 Dec 2025 10:04:40 +0100
 Subject: [PATCH] prevent multilib conflicts on the curl-config script
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH] prevent multilib conflicts on the curl-config script
  3 files changed, 9 insertions(+), 19 deletions(-)
 
 diff --git a/curl-config.in b/curl-config.in
-index 5518416..324e0b7 100644
+index a1c8185875..bb43ca8335 100644
 --- a/curl-config.in
 +++ b/curl-config.in
 @@ -74,7 +74,7 @@ while test "$#" -gt 0; do
@@ -26,12 +26,12 @@ index 5518416..324e0b7 100644
      ;;
  
    --libs)
--    if test "X@libdir@" != 'X/usr/lib' -a "X@libdir@" != 'X/usr/lib64'; then
+-    if test "@libdir@" != '/usr/lib' && test "@libdir@" != '/usr/lib64'; then
 -      curllibdir="-L@libdir@ "
 -    else
 -      curllibdir=''
 -    fi
--    if test 'X@ENABLE_SHARED@' = 'Xno'; then
+-    if test '@ENABLE_SHARED@' = 'no'; then
 -      echo "${curllibdir}-lcurl @LIBCURL_PC_LIBS_PRIVATE@"
 -    else
 -      echo "${curllibdir}-lcurl"
@@ -44,7 +44,7 @@ index 5518416..324e0b7 100644
      ;;
  
    --static-libs)
--    if test 'X@ENABLE_STATIC@' != 'Xno'; then
+-    if test '@ENABLE_STATIC@' != 'no'; then
 -      echo "@libdir@/libcurl.@libext@ @LIBCURL_PC_LDFLAGS_PRIVATE@ @LIBCURL_PC_LIBS_PRIVATE@"
 -    else
 -      echo 'curl was built with static libraries disabled' >&2
@@ -61,7 +61,7 @@ index 5518416..324e0b7 100644
  
    *)
 diff --git a/docs/curl-config.md b/docs/curl-config.md
-index 12ad245..fa0e03d 100644
+index 12ad245b79..fa0e03d273 100644
 --- a/docs/curl-config.md
 +++ b/docs/curl-config.md
 @@ -87,7 +87,9 @@ no, one or several names. If more than one name, they appear comma-separated.
@@ -76,7 +76,7 @@ index 12ad245..fa0e03d 100644
  ## `--version`
  
 diff --git a/libcurl.pc.in b/libcurl.pc.in
-index c0ba524..f3645e1 100644
+index c0ba5244a8..f3645e1748 100644
 --- a/libcurl.pc.in
 +++ b/libcurl.pc.in
 @@ -28,6 +28,7 @@ libdir=@libdir@
@@ -88,5 +88,5 @@ index c0ba524..f3645e1 100644
  Name: libcurl
  URL: https://curl.se/
 -- 
-2.48.1
+2.52.0
 

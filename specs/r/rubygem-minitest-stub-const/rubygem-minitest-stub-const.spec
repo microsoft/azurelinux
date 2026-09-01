@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.6
-Release: 16%{?dist}
+Release: 15%{?dist}
 Summary: Stub constants for the duration of a block in MiniTest
 License: MIT
 URL: https://github.com/adammck/minitest-stub-const
@@ -18,6 +18,7 @@ BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(minitest)
+BuildRequires: rubygem(minitest-mock)
 BuildArch: noarch
 
 %description
@@ -64,6 +65,12 @@ popd
 %{gem_instdir}/test
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.6-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Dec 28 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.6-14
+- Fix compatibility with minitest 6
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.6-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

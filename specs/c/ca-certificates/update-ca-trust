@@ -31,11 +31,44 @@ usage() {
 		-o DIR, --output DIR: Write the extracted trust store into the given
 		directory instead of updating $DEST. (Note: This option will not
 		populate the ../pki/tls/certs with the directory-hash symbolic links.)
+
+		--rhbz2387674: A temporary compatibility option that restores several
+		legacy certificate-bundle symlinks (e.g., /etc/pki/tls/cert.pem) to
+		address issues with older software.
+		These symlinks will be removed on ca-certificate updates or reinstalls,
+		so you'll have to re-run this command after ca-certificates updates if
+		the issue is still not fixed.
+		WARNING: Do not use in automation or build scripts. This flag
+		is going to be removed in a future release, and any scripts relying on
+		it will inevitably break!
+	EOF
+}
+
+rhbz2387674_msg() {
+	fold -s -w 76 >&2 <<-EOF
+	----------------------------------------------------------------------------
+	** DEPRECATION WARNING **
+	----------------------------------------------------------------------------
+	The option --rhbz2387674 is a temporary workaround and will be removed in a
+	future release. Please do not use it in build scripts or automation.
+
+	----------------------------------------------------------------------------
+	** ACTION REQUIRED **
+	----------------------------------------------------------------------------
+	To ensure the affected package works correctly in the future, a bug report must
+	be filed.
+
+	1.  Check if a bug already exists for the affected package: https://bugzilla.redhat.com/buglist.cgi?component=ca-certificates&product=Fedora&short_desc=droppingOfCertPemFile%20package%3A&short_desc_type=allwordssubstr
+
+	2.  If no bug exists, please file a new one using this template: https://bugzilla.redhat.com/enter_bug.cgi?product=Fedora&component=ca-certificates&version=rawhide&short_desc=droppingOfCertPemFile+package:+<<package_name>>+is+affected
+
+	Thank you for helping improve Fedora.
 	EOF
 }
 
 extract() {
 	USER_DEST=
+	compat=
 
         # can't use getopt here. ca-certificates can't depend on a lot
         # of other libraries since openssl depends on ca-certificates
@@ -53,6 +86,11 @@ extract() {
 		  shift 2
 		  continue
 		  ;;
+		"--rhbz2387674")
+		  compat="true"
+		  shift
+		  continue
+		  ;;
 		"--")
 		  shift
 		  break
@@ -63,6 +101,11 @@ extract() {
 		  ;;
 	    esac
 	done
+
+	if [ "$compat" = "true" ] && [ -n "$USER_DEST" ]; then
+		echo "Error: arguments '-o DIR|--output DIR' and '--rhbz2387674' can't be used together" >&2
+		exit 1
+	fi
 
 	if [ -n "$USER_DEST" ]; then
 		DEST=$USER_DEST
@@ -95,9 +138,20 @@ extract() {
 	/usr/bin/trust extract --format=pem-directory-hash --filter=ca-anchors --overwrite --purpose server-auth "$DEST/pem/directory-hash"
 
 
+	if [ -n "$compat" ]; then
+		# print warning message
+		rhbz2387674_msg
+
+		# create symlinks to /etc/pki/tls/..
+		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/../cert.pem"
+		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/ca-certificates.crt"
+		ln -sf "$DEST/pem/tls-ca-bundle.pem" "$DEST_CERTS/ca-bundle.crt"
+		ln -sf "$DEST/openssl/ca-bundle.trust.crt" "$DEST_CERTS/ca-bundle.trust.crt"
+	fi
+
 	if [ -z "$USER_DEST" ]; then
 		find "$DEST/pem/directory-hash" -type l -regextype posix-extended \
-		     -regex '.*/[0-9a-f]{8}\.[0-9]+' | while read link; do
+		     -regex '.*/[0-9a-f]{8}\.[0-9]+' | while IFS= read -r link; do
 			target=$(readlink -f "$link")
 			new_link="$DEST_CERTS/$(basename "$link")"
 			ln -s "$target" "$new_link"

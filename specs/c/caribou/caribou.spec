@@ -3,7 +3,7 @@
 
 Name:           caribou
 Version:        0.4.21
-Release: 51%{?dist}
+Release:        51%{?dist}
 Summary:        A simplified in-place on-screen keyboard
 # Automatically converted from old format: LGPLv2+ - review is highly recommended.
 License:        LicenseRef-Callaway-LGPLv2+
@@ -11,8 +11,6 @@ URL:            https://wiki.gnome.org/Projects/Caribou
 Source0:        http://download.gnome.org/sources/caribou/0.4/caribou-%{version}.tar.xz
 Patch1:         caribou-0.4.20-fix-python-exec.patch
 Patch2:         caribou-0.4.20-multilib.patch
-# caribou isn't needed in gnome-shell so don't start there
-Patch3:         change_autostart_cinnamon.patch
 Patch4:         fix-style-css.patch
 Patch5:         Fix-compilation-error.patch
 Patch6:         Fix-subkey-popmenu-not-showing-after-being-dismissed.patch
@@ -39,8 +37,8 @@ BuildRequires:  at-spi2-core-devel
 # Changed in F23 to pull python3-caribou default
 Requires:       python3-%{name} = %{version}-%{release}
 Requires:       gobject-introspection
-Recommends:     caribou-gtk2-module
-Requires:       caribou-gtk3-module
+Recommends:     (caribou-gtk2-module if gtk2)
+Requires:       (caribou-gtk3-module if gtk3)
 
 #Following is needed as package moved from noarch to arch
 Obsoletes:      caribou < 0.4.1-3
@@ -115,11 +113,10 @@ make clean
 %make_build
 
 %install
-%make_install
+%make_install autostart_DATA=
 
 find %{buildroot} -name '*.la' -exec rm -f {} ';'
 
-desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/caribou-autostart.desktop || :
 desktop-file-validate %{buildroot}%{_libdir}/gnome-settings-daemon-3.0/gtk-modules/caribou-gtk-module.desktop || :
 
 %find_lang caribou
@@ -132,7 +129,6 @@ desktop-file-validate %{buildroot}%{_libdir}/gnome-settings-daemon-3.0/gtk-modul
 %{_bindir}/caribou-preferences
 %{_datadir}/caribou
 %{_libdir}/girepository-1.0/Caribou-1.0.typelib
-%{_sysconfdir}/xdg/autostart/caribou-autostart.desktop
 %{_datadir}/dbus-1/services/org.gnome.Caribou.Daemon.service
 %{_datadir}/glib-2.0/schemas/org.gnome.caribou.gschema.xml
 %{_libdir}/libcaribou.so.0*
@@ -163,6 +159,16 @@ desktop-file-validate %{buildroot}%{_libdir}/gnome-settings-daemon-3.0/gtk-modul
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.21-51
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.21-50
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 0.4.21-49
+- Disable autostart
+- Conditionalize gtk module dependencies
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.4.21-48
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -1,0 +1,92 @@
+From a166d5450e3f47587b98f6005f9f5627dbe21a5b Mon Sep 17 00:00:00 2001
+From: Akim Demaille <akim.demaille@gmail.com>
+Date: Tue, 2 Aug 2022 08:45:25 +0200
+Subject: [PATCH] yacc.c, lalr1.cc: fix warnings about yynerrs
+
+Most often yynerrs is not used.  Clang 15 now complains about such
+variables.  Bison itself does not compile:
+
+```
+src/parse-gram.c:1797:9: error: variable 'gram_nerrs' set but not used [-Werror,-Wunused-but-set-variable]
+    int yynerrs = 0;
+        ^
+src/parse-gram.c:79:25: note: expanded from macro 'yynerrs'
+                        ^
+1 error generated.
+```
+
+Reported by Nikita Popov.
+Fixes https://github.com/akimd/bison/issues/89.
+
+* data/skeletons/yacc.c (yynerrs): Flag with YY_ATTRIBUTE_UNUSED.
+* data/skeletons/lalr1.cc (yynerrs_): Likewise.
+---
+ THANKS                  | 5 +++--
+ data/skeletons/lalr1.cc | 2 +-
+ data/skeletons/yacc.c   | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/THANKS b/THANKS
+index 8ab720965..391b847e6 100644
+--- a/THANKS
++++ b/THANKS
+@@ -46,8 +46,8 @@ Csaba Raduly              csaba_22@yahoo.co.uk
+ Dagobert Michelsen        dam@baltic-online.de
+ Daniel Frużyński          daniel@poradnik-webmastera.com
+ Daniel Galloway           dg1751@att.com
+-Daniela Becker            daniela@lrde.epita.fr
+ Daniel Hagerty            hag@gnu.org
++Daniela Becker            daniela@lrde.epita.fr
+ David Barto               david.barto@sparqlcity.com
+ David J. MacKenzie        djm@gnu.org
+ David Kastrup             dak@gnu.org
+@@ -143,6 +143,7 @@ Nick Bowler               nbowler@elliptictech.com
+ Nicolas Bedon             nicolas.bedon@univ-rouen.fr
+ Nicolas Burrus            nicolas.burrus@epita.fr
+ Nicolas Tisserand         nicolas.tisserand@epita.fr
++Nikita Popov              nikic@php.net
+ Nikki Valen               nicolettavalencia.nv@gmail.com
+ Noah Friedman             friedman@gnu.org
+ Odd Arild Olsen           oao@fibula.no
+@@ -170,7 +171,6 @@ Quoc Peyrot               chojin@lrde.epita.fr
+ R Blake                   blakers@mac.com
+ Raja R Harinath           harinath@cs.umn.edu
+ Ralf Wildenhues           Ralf.Wildenhues@gmx.de
+-Ryan                      dev@splintermail.com
+ Rich Wilson               richaw@gmail.com
+ Richard Stallman          rms@gnu.org
+ Rici Lake                 ricilake@gmail.com
+@@ -179,6 +179,7 @@ Rob Vermaas               rob.vermaas@gmail.com
+ Robert Anisko             anisko_r@epita.fr
+ Robert Yang               liezhi.yang@windriver.com
+ Roland Levillain          roland@lrde.epita.fr
++Ryan                      dev@splintermail.com
+ Satya Kiran Popuri        satyakiran@gmail.com
+ Sebastian Setzer          sebastian.setzer.ext@siemens.com
+ Sebastien Fricker         sebastien.fricker@gmail.com
+diff --git a/data/skeletons/lalr1.cc b/data/skeletons/lalr1.cc
+index 240f4c362..4242b992d 100644
+--- a/data/skeletons/lalr1.cc
++++ b/data/skeletons/lalr1.cc
+@@ -847,7 +847,7 @@ m4_if(b4_prefix, [yy], [],
+     int yylen = 0;
+ 
+     // Error handling.
+-    int yynerrs_ = 0;
++    int yynerrs_ YY_ATTRIBUTE_UNUSED = 0;
+     int yyerrstatus_ = 0;
+ 
+     /// The lookahead symbol.
+diff --git a/data/skeletons/yacc.c b/data/skeletons/yacc.c
+index fd7e2c33f..07a523b0a 100644
+--- a/data/skeletons/yacc.c
++++ b/data/skeletons/yacc.c
+@@ -256,7 +256,7 @@ int yynerrs;]])])
+ m4_define([b4_declare_parser_state_variables],
+ [b4_pure_if([[
+     /* Number of syntax errors so far.  */
+-    int yynerrs]m4_ifval([$1], [ = 0])[;
++    int yynerrs YY_ATTRIBUTE_UNUSED]m4_ifval([$1], [ = 0])[;
+ ]])[
+     yy_state_fast_t yystate]m4_ifval([$1], [ = 0])[;
+     /* Number of tokens to shift before error messages enabled.  */

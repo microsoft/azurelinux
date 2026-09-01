@@ -1,0 +1,12 @@
+# Configure RPM to find users/groups in nss-altfiles locations.
+#
+# Since RPM no longer uses NSS for user/group lookups (to avoid issues
+# with chroot installations), we need to explicitly tell RPM where to
+# find the passwd and group files used by nss-altfiles.
+#
+# See: https://github.com/rpm-software-management/rpm/pull/3672
+# See: https://issues.redhat.com/browse/RHEL-78693
+# See: https://issues.redhat.com/browse/RHEL-140819
+
+%_passwd_path /usr/lib/passwd:/etc/passwd
+%_group_path /usr/lib/group:/etc/group

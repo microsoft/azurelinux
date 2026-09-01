@@ -5,8 +5,8 @@
 %define version_underscore %(echo %{version} | tr '.' '_')
 
 Name:     squid
-Version:  7.4
-Release: 4%{?dist}
+Version:  7.6
+Release:  1%{?dist}
 Summary:  The Squid proxy caching server
 Epoch:    7
 # See CREDITS for breakdown of non GPLv2+ code
@@ -23,6 +23,7 @@ Source6:  squid.nm
 Source7:  squid.service
 Source8:  cache_swap.sh
 Source9:  squid.sysusers
+Source10: squid.tmpfiles
 
 Source98: perl-requires-squid.sh
 
@@ -40,6 +41,7 @@ Patch203: squid-6.1-perlpath.patch
 # revert this upstream patch - https://bugzilla.redhat.com/show_bug.cgi?id=1936422
 # workaround for #1934919
 Patch204: squid-6.1-symlink-lang-err.patch
+Patch205: squid-7.5-openssl4.patch
 
 # cache_swap.sh
 Requires: bash gawk
@@ -212,6 +214,10 @@ rm -f $RPM_BUILD_ROOT/squid.httpd.tmp
 # sysusers.d
 install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 
+# tmpfiles.d configuration
+mkdir -p %{buildroot}%{_tmpfilesdir}
+install -m 644 -p %{SOURCE10} %{buildroot}%{_tmpfilesdir}/squid.conf
+
 %files
 %license COPYING 
 %doc CONTRIBUTORS README ChangeLog QUICKSTART src/squid.conf.documented
@@ -246,6 +252,7 @@ install -p -D -m 0644 %{SOURCE9} %{buildroot}%{_sysusersdir}/squid.conf
 %{_libdir}/squid/*
 %{_datadir}/snmp/mibs/SQUID-MIB.txt
 %{_sysusersdir}/squid.conf
+%{_tmpfilesdir}/squid.conf
 
 %pre
 %sysusers_create_compat %{SOURCE9}
@@ -309,8 +316,27 @@ fi
 
 
 %changelog
+* Tue Jul 21 2026 Luboš Uhliarik <luhliari@redhat.com> - 7:7.6-1
+- new version 7.6
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7:7.5-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 7:7.5-3
+- Rebuilt for openssl 4.0
+
+* Wed May 06 2026 Pavol Žáčik <pzacik@redhat.com> - 7:7.5-2
+- Add patch to fix OpenSSL 4.0 compatibility
+
+* Mon Apr 27 2026 Luboš Uhliarik <luhliari@redhat.com> - 7:7.5-1
+- new version 7.5
+- Add tmpfiles.d rules for /var directories (bootc compatibility)
+
 * Thu Jan 22 2026 Luboš Uhliarik <luhliari@redhat.com> - 7:7.4-1
 - new version 7.4
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7:7.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Wed Oct 29 2025 Luboš Uhliarik <luhliari@redhat.com> - 7:7.3-1
 - new version 7.3

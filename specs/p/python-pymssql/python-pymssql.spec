@@ -6,8 +6,8 @@
 a Python DB-API (PEP-249) interface to Microsoft SQL Server.}
 
 Name:           python-%{pypi_name}
-Version:        2.3.9
-Release: 4%{?dist}
+Version:        2.3.13
+Release:        1%{?dist}
 Summary:        DB-API interface to Microsoft SQL Server
 
 License:        LGPL-2.0-or-later
@@ -42,21 +42,20 @@ Summary:        %{summary}
 %prep
 %autosetup -n %{pypi_name}-%{version}
 
-# Drop version constraint on setuptools/setuptools_scm
-tomcli set pyproject.toml arrays replace "build-system.requires" "(setuptools(_scm\[toml\])?)\s*[><=]+.*" "\1"
-sed -i -E 's/^(\s*setuptools(_scm\[toml\])?)\s*[><=]+.*$/\1/' setup.cfg %{?with_tests:dev/requirements-dev.txt}
-
 # Drop unneeded dependencies not available in Fedora
 tomcli set pyproject.toml arrays delitem "build-system.requires" "standard-distutils\b.*"
 %{?with_tests:sed -i -E '/^\s*standard-distutils\b/d' dev/requirements-dev.txt}
 
+%if 0%{?fedora} <= 43
+# Drop version constraint on setuptools
+tomcli set pyproject.toml arrays replace "build-system.requires" "(setuptools)\s*[><=]+.*" "\1"
+sed -i -E 's/^(\s*setuptools)\s*[><=]+.*$/\1/' setup.cfg %{?with_tests:dev/requirements-dev.txt}
+
 %if 0%{?fedora} < 43
-# Drop version constraint on setuptools/setuptools_scm
+# Drop version constraint on Cython
 tomcli set pyproject.toml arrays replace "build-system.requires" "(Cython)\s*[><=]+.*" "\1"
 sed -i -E 's/^(\s*cython)\s*[><=]+.*$/\1/' setup.cfg %{?with_tests:dev/requirements-dev.txt}
-
-# setuptools < 77.0.3 doesn't support PEP 639
-tomcli set pyproject.toml del "project.license"
+%endif
 %endif
 
 
@@ -83,9 +82,17 @@ LINK_FREETDS_STATICALLY=no %pyproject_wheel
 %files -n python3-%{pypi_name} -f %{pyproject_files}
 %doc ChangeLog.rst README.rst
 %license LICENSE
+# Remove useless header files and Cython sources
+%exclude %{python3_sitearch}/%{pypi_name}/*.{h,pyx}
 
 
 %changelog
+* Sat Mar 07 2026 Mohamed El Morabity <melmorabity@fedoraproject.org> - 2.3.13-1
+- Update to 2.3.13
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Nov 10 2025 Mohamed El Morabity <melmorabity@fedoraproject.org> - 2.3.9-1
 - Update to 2.3.9
 

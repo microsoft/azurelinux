@@ -1,0 +1,194 @@
+From a4aed7016a4dd0bb092a4001fd7f975254f95102 Mon Sep 17 00:00:00 2001
+From: Guido Imperiale <crusaderky@gmail.com>
+Date: Tue, 12 May 2026 21:38:53 +0100
+Subject: [PATCH 3/4] Test vs. intermediate versions of numpy and pandas
+ (#12372)
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/bytes/tests/test_http.py                  |  2 +-
+ dask/dataframe/dask_expr/_groupby.py           |  4 ++--
+ dask/dataframe/dask_expr/tests/test_groupby.py | 17 ++++++++++-------
+ dask/dataframe/groupby.py                      |  7 +++++--
+ dask/dataframe/tests/test_groupby.py           | 11 +++++++++--
+ dask/tests/test_distributed.py                 |  4 ++++
+ 6 files changed, 31 insertions(+), 14 deletions(-)
+
+diff --git a/dask/bytes/tests/test_http.py b/dask/bytes/tests/test_http.py
+index f9b5f4fc3..f319eb00c 100644
+--- a/dask/bytes/tests/test_http.py
++++ b/dask/bytes/tests/test_http.py
+@@ -175,7 +175,7 @@ def test_parquet():
+     pytest.importorskip("requests", minversion="2.21.0")
+     pytest.importorskip(
+         "pyarrow",
+-        minversion="22.0.0",
++        minversion="23.0.0",
+         reason="https://github.com/apache/arrow/issues/47981",
+     )
+     dd = pytest.importorskip("dask.dataframe")
+diff --git a/dask/dataframe/dask_expr/_groupby.py b/dask/dataframe/dask_expr/_groupby.py
+index 50361e0e9..9cf92e125 100644
+--- a/dask/dataframe/dask_expr/_groupby.py
++++ b/dask/dataframe/dask_expr/_groupby.py
+@@ -12,7 +12,7 @@ from pandas.core.apply import reconstruct_func, validate_func_kwargs
+ from dask import is_dask_collection
+ from dask._task_spec import Task
+ from dask.core import flatten
+-from dask.dataframe._compat import PANDAS_GE_300
++from dask.dataframe._compat import PANDAS_GE_220, PANDAS_GE_300
+ from dask.dataframe.core import (
+     _concat,
+     apply_and_enforce,
+@@ -1093,7 +1093,7 @@ class Median(GroupByShift):
+ 
+ 
+ def groupby_get_group(df, *by_key, get_key=None, columns=None):
+-    if PANDAS_GE_300 and is_scalar(get_key):
++    if PANDAS_GE_220 and is_scalar(get_key):
+         get_key = (get_key,)
+     return _groupby_get_group(df, list(by_key), get_key, columns)
+ 
+diff --git a/dask/dataframe/dask_expr/tests/test_groupby.py b/dask/dataframe/dask_expr/tests/test_groupby.py
+index 8d1e3dcc7..07d1910e6 100644
+--- a/dask/dataframe/dask_expr/tests/test_groupby.py
++++ b/dask/dataframe/dask_expr/tests/test_groupby.py
+@@ -9,7 +9,7 @@ import numpy as np
+ import pytest
+ 
+ import dask
+-from dask.dataframe._compat import PANDAS_GE_300
++from dask.dataframe._compat import PANDAS_GE_220, PANDAS_GE_300
+ from dask.dataframe.dask_expr import from_pandas
+ from dask.dataframe.dask_expr._groupby import Aggregation, GroupByUDFBlockwise
+ from dask.dataframe.dask_expr._reductions import TreeReduce
+@@ -17,6 +17,15 @@ from dask.dataframe.dask_expr._shuffle import Shuffle, TaskShuffle, divisions_lr
+ from dask.dataframe.dask_expr.io import FromPandas
+ from dask.dataframe.dask_expr.tests._util import _backend_library, assert_eq, xfail_gpu
+ 
++if PANDAS_GE_220 and not PANDAS_GE_300:
++    pytestmark = [
++        pytest.mark.filterwarnings(
++            r"ignore:.*DataFrameGroupBy\.apply:DeprecationWarning"
++        ),
++        pytest.mark.filterwarnings(r"ignore:.*DataFrameGroupBy\.apply:FutureWarning"),
++    ]
++
++
+ # Set DataFrame backend for this module
+ pd = _backend_library()
+ 
+@@ -395,7 +404,6 @@ def test_groupby_repartition_to_one(pdf, df):
+     assert_eq(result, expected)
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_groupby_apply(df, pdf):
+     def test(x):
+         x["new"] = x.sum().sum()
+@@ -432,7 +440,6 @@ def test_groupby_apply(df, pdf):
+     assert_eq(query, pdf.groupby("x")[["y"]].apply(test))
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_groupby_transform(df, pdf):
+     def test(x):
+         return x
+@@ -598,7 +605,6 @@ def test_groupby_projection_split_out(df, pdf):
+     assert_eq(result, pdf_result)
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_numeric_column_names():
+     df = pd.DataFrame({0: [0, 1, 0, 1], 1: [1, 2, 3, 4], 2: [0, 1, 0, 1]})
+     ddf = from_pandas(df, npartitions=2)
+@@ -611,7 +617,6 @@ def test_numeric_column_names():
+     )
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_apply_divisions(pdf):
+     pdf = pdf.set_index("x")
+     df = from_pandas(pdf, npartitions=10)
+@@ -669,7 +674,6 @@ def test_groupby_apply_args(df, pdf):
+         )
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_groupby_ffill_bfill(pdf):
+     pdf["y"] = pdf["y"].astype("float64")
+ 
+@@ -806,7 +810,6 @@ def test_groupby_dir(df):
+     assert "y" in dir(df.groupby("x"))
+ 
+ 
+-@pytest.mark.filterwarnings("ignore:DataFrameGroupBy.apply operated ")
+ def test_groupby_udf_user_warning(df, pdf):
+     def func(df):
+         return df + 1
+diff --git a/dask/dataframe/groupby.py b/dask/dataframe/groupby.py
+index 626e2955d..6876f4806 100644
+--- a/dask/dataframe/groupby.py
++++ b/dask/dataframe/groupby.py
+@@ -547,9 +547,12 @@ def _cov_agg(_t, levels, ddof, std=False, sort=False):
+ 
+     # stacking can lead to a sorted index
+     if PANDAS_GE_300:
+-        s_result = result.stack()
++        kwargs = {}
++    elif PANDAS_GE_220:
++        kwargs = {"future_stack": True}
+     else:
+-        s_result = result.stack(dropna=False)
++        kwargs = {"dropna": False}
++    s_result = result.stack(**kwargs)
+     assert is_dataframe_like(s_result)
+     return s_result
+ 
+diff --git a/dask/dataframe/tests/test_groupby.py b/dask/dataframe/tests/test_groupby.py
+index 5b6c6f5bb..fdb52a213 100644
+--- a/dask/dataframe/tests/test_groupby.py
++++ b/dask/dataframe/tests/test_groupby.py
+@@ -29,6 +29,15 @@ from dask.dataframe.groupby import NUMERIC_ONLY_NOT_IMPLEMENTED
+ from dask.dataframe.utils import assert_eq, pyarrow_strings_enabled
+ from dask.utils import M
+ 
++if PANDAS_GE_220 and not PANDAS_GE_300:
++    pytestmark = [
++        pytest.mark.filterwarnings(
++            r"ignore:.*DataFrameGroupBy\.apply:DeprecationWarning"
++        ),
++        pytest.mark.filterwarnings(r"ignore:.*DataFrameGroupBy\.apply:FutureWarning"),
++    ]
++
++
+ AGG_FUNCS = [
+     "sum",
+     pytest.param(
+@@ -2256,8 +2265,6 @@ def test_groupby_shift_with_freq(shuffle_method):
+ # These warnings appear only on pandas >=2.1,<3.0
+ @pytest.mark.filterwarnings(r"ignore:.*(DataFrame|Series)GroupBy\.sum:FutureWarning")
+ @pytest.mark.filterwarnings(r"ignore:.*DataFrame\.sum with axis=None:FutureWarning")
+-@pytest.mark.filterwarnings(r"ignore:.*DataFrameGroupBy\.apply:DeprecationWarning")
+-@pytest.mark.filterwarnings(r"ignore:.*DataFrameGroupBy\.apply:FutureWarning")
+ @pytest.mark.parametrize(
+     "transformation", [lambda x: x.sum(), np.sum, "sum", pd.Series.rank]
+ )
+diff --git a/dask/tests/test_distributed.py b/dask/tests/test_distributed.py
+index e9c046b0c..728d1c92e 100644
+--- a/dask/tests/test_distributed.py
++++ b/dask/tests/test_distributed.py
+@@ -291,6 +291,10 @@ def test_to_hdf_distributed(c):
+ def test_to_hdf_scheduler_distributed(npartitions, c):
+     pytest.importorskip("numpy")
+     pytest.importorskip("pandas")
++    from dask._pandas_compat import PANDAS_GE_220, PANDAS_GE_230
++
++    if PANDAS_GE_220 and not PANDAS_GE_230:
++        pytest.xfail(reason="Poor support for StringDtype")
+ 
+     from dask.dataframe.io.tests.test_hdf import test_to_hdf_schedulers
+ 
+-- 
+2.52.0
+

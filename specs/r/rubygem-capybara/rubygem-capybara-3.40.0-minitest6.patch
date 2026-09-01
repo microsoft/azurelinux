@@ -1,0 +1,56 @@
+diff -urp '--exclude=*~' capybara-3.40.0.orig/spec/minitest_spec.rb capybara-3.40.0/spec/minitest_spec.rb
+--- capybara-3.40.0.orig/spec/minitest_spec.rb	2025-12-31 21:33:58.936822308 +0900
++++ capybara-3.40.0/spec/minitest_spec.rb	2025-12-31 21:33:59.218966377 +0900
+@@ -19,6 +19,10 @@ class MinitestTest < Minitest::Test
+     :sorted
+   end
+ 
++  def self.run_order
++    :sorted
++  end
++
+   def test_assert_text
+     assert_text('Form', normalize_ws: false)
+     assert_no_text('Not on the page')
+@@ -168,7 +172,12 @@ RSpec.describe 'capybara/minitest' do
+     output = StringIO.new
+     reporter = Minitest::SummaryReporter.new(output)
+     reporter.start
+-    MinitestTest.run reporter, {}
++    case Minitest::VERSION
++    when /^6/
++      MinitestTest.run_suite reporter, {}
++    else
++      MinitestTest.run reporter, {}
++    end
+     reporter.report
+     expect(output.string).to include('23 runs, 56 assertions, 0 failures, 0 errors, 1 skips')
+   end
+diff -urp '--exclude=*~' capybara-3.40.0.orig/spec/minitest_spec_spec.rb capybara-3.40.0/spec/minitest_spec_spec.rb
+--- capybara-3.40.0.orig/spec/minitest_spec_spec.rb	2025-12-31 21:33:58.937029139 +0900
++++ capybara-3.40.0/spec/minitest_spec_spec.rb	2025-12-31 21:40:56.668960674 +0900
+@@ -20,6 +20,10 @@ class MinitestSpecTest < Minitest::Spec
+     :sorted
+   end
+ 
++  def self.run_order
++    :sorted
++  end
++
+   it 'supports text expectations' do
+     _(page).must_have_text('Form', minimum: 1)
+     _(page).wont_have_text('Not a form')
+@@ -157,7 +161,12 @@ RSpec.describe 'capybara/minitest/spec'
+     output = StringIO.new
+     reporter = Minitest::SummaryReporter.new(output)
+     reporter.start
+-    MinitestSpecTest.run reporter, {}
++    case Minitest::VERSION
++    when /^6/
++      MinitestSpecTest.run_suite reporter, {}
++    else
++      MinitestSpecTest.run reporter, {}
++    end
+     reporter.report
+     expect(output.string).to include('22 runs, 44 assertions, 1 failures, 0 errors, 1 skips')
+     # Make sure error messages are displayed

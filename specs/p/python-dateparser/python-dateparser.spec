@@ -15,10 +15,12 @@
 %else
 %bcond_without doc_pdf
 %endif
+# Tests use parameterized extensively, orphaned in Fedora
+%bcond_with tests
 
 Name:           python-dateparser
-Version:        1.2.2
-Release: 7%{?dist}
+Version:        1.3.0
+Release:        1%{?dist}
 Summary:        Python parser for human readable dates
 
 License:        BSD-3-Clause
@@ -122,14 +124,14 @@ EOF
 
 %generate_buildrequires
 %global toxenv -e all
-%pyproject_buildrequires -t %{?toxenv} %{?with_calendars:-x calendar }%{?with_fasttext:-x fasttext }-x langdetect dateparser_scripts/requirements.txt
+%pyproject_buildrequires %{?with_tests:-t %{?toxenv}} %{?with_calendars:-x calendar }%{?with_fasttext:-x fasttext }-x langdetect dateparser_scripts/requirements.txt
 
 
 %build
 %pyproject_wheel
 %if %{with doc_pdf}
-PYTHONPATH="${PWD}" %make_build -C docs latex SPHINXOPTS='%{?_smp_mflags}'
-%make_build -C docs/_build/latex LATEXMKOPTS='-quiet'
+PYTHONPATH="${PWD}" %make_build -C docs html SPHINXOPTS='%{?_smp_mflags}'
+#%%make_build -C docs/_build/latex LATEXMKOPTS='-quiet'
 %endif
 
 
@@ -140,6 +142,8 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 '%{SOURCE1}'
 
 
 %check
+%pyproject_check_import %{!?with_calendars:-e '*hijri*' -e '*jalali*'} %{!?with_fasttext:-e '*fasttext*'} -e '*.write_complete_data'
+%if %{with tests}
 %if %{without calendars}
 # Uses hijri_convert
 # --ignore does not seem to prevent doctest collection in tests/
@@ -187,6 +191,7 @@ k="${k-}${k+ and }not (DateDataParser and get_date_data)"
 k="${k-}${k+ and }not search_dates"
 
 %tox -- -- ${ignore-} -k "${k-}" -v
+%endif
 
 
 %files -n python3-dateparser -f %{pyproject_files}
@@ -207,11 +212,18 @@ k="${k-}${k+ and }not search_dates"
 %doc HISTORY.rst
 %doc README.rst
 %if %{with doc_pdf}
-%doc docs/_build/latex/dateparser.pdf
+#%%doc docs/_build/latex/dateparser.pdf
+%doc docs/_build/html/
 %endif
 
 
 %changelog
+* Fri Mar 20 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.3.0-1
+- 1.3.0
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.2.2-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

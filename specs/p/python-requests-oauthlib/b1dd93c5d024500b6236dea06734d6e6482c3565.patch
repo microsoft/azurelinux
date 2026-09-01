@@ -1,0 +1,31 @@
+From b1dd93c5d024500b6236dea06734d6e6482c3565 Mon Sep 17 00:00:00 2001
+From: Jonathan Huot <jonathan.huot@gmail.com>
+Date: Thu, 12 Jun 2025 20:06:32 +0200
+Subject: [PATCH] Updated tests to support 3.3.0/changes rel. to expires_at
+
+---
+ tests/test_compliance_fixes.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/test_compliance_fixes.py b/tests/test_compliance_fixes.py
+index c5166bd..9ad6d09 100644
+--- a/tests/test_compliance_fixes.py
++++ b/tests/test_compliance_fixes.py
+@@ -115,7 +115,7 @@ def test_fetch_access_token(self):
+             authorization_response="https://i.b/?code=hello",
+         )
+         # Times should be close
+-        approx_expires_at = time.time() + 3600
++        approx_expires_at = round(time.time()) + 3600
+         actual_expires_at = token.pop("expires_at")
+         self.assertAlmostEqual(actual_expires_at, approx_expires_at, places=2)
+ 
+@@ -289,7 +289,7 @@ def test_fetch_access_token(self):
+             authorization_response="https://i.b/?code=hello",
+         )
+ 
+-        approx_expires_at = time.time() + 86400
++        approx_expires_at = round(time.time()) + 86400
+         actual_expires_at = token.pop("expires_at")
+         self.assertAlmostEqual(actual_expires_at, approx_expires_at, places=2)
+ 

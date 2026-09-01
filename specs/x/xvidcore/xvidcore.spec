@@ -5,17 +5,19 @@
 
 Name:           xvidcore
 Version:        1.3.7
-Release: 17%{?dist}
+Release:        19%{?dist}
 Summary:        MPEG-4 Simple and Advanced Simple Profile codec
 License:        GPL-2.0-or-later
 URL:            https://www.xvid.com/
 Source0:        https://downloads.xvid.com/downloads/%{name}-%{version_no_tilde}.tar.bz2
 # fix build with -std=gnu23, reported upstream
 Patch0:         %{name}-c23.patch
+Patch1:         0001-Add-CET-enabling-note.patch
 
 BuildRequires:  gcc
 BuildRequires:  make
-%ifarch %{ix86} x86_64
+# Drop ASM on i686, produces texrel
+%ifarch x86_64
 BuildRequires:  nasm >= 2.0
 %endif
 
@@ -59,8 +61,13 @@ done
 
 %build
 cd build/generic
-%configure
-%make_build
+%configure \
+%ifarch %{ix86}
+  --disable-assembly
+%endif
+
+# Our LDFLAGS are overriden by the makefiles - fixes build with f44 rhbz#2435201
+%make_build LDFLAGS+="%{?build_ldflags}"
 
 
 %install
@@ -80,6 +87,21 @@ find %{buildroot} -name "*.a" -delete
 
 
 %changelog
+* Tue Feb 03 2026 Nicolas Chauvet <kwizart@gmail.com> - 1.3.7-19
+- Drop ASM on i686 as it produces TEXTREL
+
+* Tue Feb 03 2026 Nicolas Chauvet <kwizart@gmail.com> - 1.3.7-18
+- Revert mmx code drop
+
+* Tue Feb 03 2026 Nicolas Chauvet <kwizart@gmail.com> - 1.3.7-17
+- Fixup build with LDFLAGS
+
+* Thu Jan 29 2026 Nicolas Chauvet <kwizart@gmail.com> - 1.3.7-16
+- Fix build with f44 rhbz#2435201
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.7-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.7-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

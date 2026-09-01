@@ -3,7 +3,7 @@
 
 %global antlr_version 3.5.3
 %global javascript_runtime_version 3.1
-%global baserelease 16
+%global baserelease 18
 
 # This package needs itself to build.  Use this to bootstrap on a new system.
 %bcond bootstrap 0
@@ -101,10 +101,10 @@ ExclusiveArch:  %{java_arches} noarch
 # This can be removed when F48 reaches EOL
 # The C/C++ backend contains files with the not-allowed
 # LicenseRef-Unicode-legacy-source-code license
-Obsoletes:      %{name}-C < 3.5.3-16
-Obsoletes:      %{name}-C-devel < 3.5.3-16
-Obsoletes:      %{name}-C++-devel < 3.5.3-16
-Obsoletes:      %{name}-C-docs < 3.5.3-16
+Obsoletes:      %{name}-C < 3.5.3-18
+Obsoletes:      %{name}-C-devel < 3.5.3-18
+Obsoletes:      %{name}-C++-devel < 3.5.3-18
+Obsoletes:      %{name}-C-docs < 3.5.3-18
 Provides:       %{name}-C = %{version}-%{release}
 Provides:       %{name}-C-devel = %{version}-%{release}
 Provides:       %{name}-C++-devel = %{version}-%{release}
@@ -259,9 +259,15 @@ popd
 %doc tool/LICENSE.txt
 
 %changelog
-* Fri Feb 20 2026 Jerry James <loganjerry@gmail.com> - 1:3.5.3-16
+* Fri Feb 20 2026 Jerry James <loganjerry@gmail.com> - 1:3.5.3-18
 - Remove the C and C++ backends
 - They contain files with a disallowed license
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.5.3-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.5.3-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Sep 23 2025 Jerry James <loganjerry@gmail.com> - 1:3.5.3-15
 - Remove build dependency on maven-enforcer-plugin

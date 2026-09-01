@@ -26,8 +26,8 @@
 %endif
 
 Name:           %{upstream_name}%{?v2_suffix}
-Version:        2.15.2
-Release: 7%{?dist}
+Version:        2.15.3
+Release:        1%{?dist}
 Summary:        Module metadata manipulation library
 
 # COPYING:      MIT
@@ -81,7 +81,6 @@ more details.
 Summary:        Python 2 bindings for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       python-gobject-base
-Requires:       python-six
 
 %description -n python2-%{name}
 Python 2 bindings for %{name}.
@@ -93,12 +92,6 @@ Python 2 bindings for %{name}.
 Summary:        Python 3 bindings for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       python%{python3_pkgversion}-gobject-base
-%if (0%{?rhel} && 0%{?rhel} <= 7)
-# The py3_dist macro on EPEL 7 doesn't work right at the moment
-Requires:       python3.6dist(six)
-%else
-Requires:       %{py3_dist six}
-%endif
 
 %description -n python%{python3_pkgversion}-%{name}
 Python %{python3_pkgversion} bindings for %{name}.
@@ -192,6 +185,18 @@ mv %{buildroot}%{_mandir}/man1/modulemd-validator.1 \
 
 
 %changelog
+* Fri Jun 12 2026 Petr Pisar <ppisar@redhat.com> - 2.15.3-1
+- 2.15.3 bump
+
+* Tue Feb 24 2026 Petr Pisar <ppisar@redhat.com> - 2.15.2-7
+- Adapt tests to pygobject 3.55.0 (bug #2440570)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.15.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 14 2026 Petr Pisar <ppisar@redhat.com> - 2.15.2-5
+- Adapt tests to glib2-2.87.0 (bug #2423153)
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.15.2-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

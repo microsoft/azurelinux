@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        0.2.3
-Release: 20%{?dist}
+Release:        18%{?dist}
 Summary:        Zero-dependency DBus library for Python with asyncio support
 
 License:        MIT
@@ -93,6 +93,9 @@ PYTHONPATH="${PWD}" %pytest -k 'not test_tcp_connection_with_forwarding'
 %doc CHANGELOG.md README.md examples/
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.3-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Sep 21 2025 Aleksei Bavshin <alebastr@fedoraproject.org> - 0.2.3-17
 - Fix build with pytest-asyncio 1.x
 - Address future deprecations

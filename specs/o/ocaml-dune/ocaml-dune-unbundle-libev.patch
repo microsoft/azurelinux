@@ -1,0 +1,49 @@
+--- dune-3.23.0/boot/duneboot.ml.orig	2026-05-05 10:31:16.920123255 -0600
++++ dune-3.23.0/boot/duneboot.ml	2026-05-05 10:33:01.333241655 -0600
+@@ -2085,7 +2085,7 @@ let build
+             ; allow_unstable_sources
+             ; external_includes
+             ; [ m ]
+-            ; [ "-cclib"; "-llmdb" ]
++            ; [ "-cclib"; "-llmdb"; "-cclib"; "-lev" ]
+             ]
+           |> Process.run ~cwd:build_dir Config.compiler)
+       in
+@@ -2162,7 +2162,7 @@ let build
+     ; link_flags
+     ; (if static then ccopt "-static" else [])
+     ; allow_unstable_sources
+-    ; [ "-cclib"; "-llmdb" ]
++    ; [ "-cclib"; "-llmdb"; "-cclib"; "-lev" ]
+     ]
+   |> Process.run ~cwd:build_dir Config.compiler
+ ;;
+--- dune-3.23.0/src/lev/src/dune.orig	2026-05-04 16:32:10.000000000 -0600
++++ dune-3.23.0/src/lev/src/dune	2026-05-05 10:24:53.818980765 -0600
+@@ -1,25 +1,8 @@
+-(copy_files# ../vendor/*.c)
+-
+-(copy_files# ../vendor/{ev,ev_vars,ev_wrap}.h)
+-
+-(foreign_library
+- (archive_name ev)
+- (extra_deps
+-  ev_kqueue.c
+-  ev_epoll.c
+-  ev_iouring.c
+-  ev_poll.c
+-  ev_port.c
+-  ev_select.c
+-  ev_win32.c)
+- (language c)
+- (names ev))
+-
+ (library
+  (name lev)
+  (synopsis "libev bindings")
+  (libraries stdune unix)
+- (foreign_archives ev)
++ (c_library_flags -lev)
+  (foreign_stubs
+   (language c)
+   (names lev_stubs)))

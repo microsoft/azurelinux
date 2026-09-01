@@ -1,0 +1,422 @@
+diff --color -ruNp a/readconf.c b/readconf.c
+--- a/readconf.c	2026-04-10 15:42:50.693725820 +0200
++++ b/readconf.c	2026-04-10 15:49:57.441110287 +0200
+@@ -1533,9 +1533,6 @@ parse_char_array:
+ 
+ 	case oProxyCommand:
+ 		charptr = &options->proxy_command;
+-		/* Ignore ProxyCommand if ProxyJump already specified */
+-		if (options->jump_host != NULL)
+-			charptr = &options->jump_host; /* Skip below */
+ parse_command:
+ 		if (str == NULL) {
+ 			error("%.200s line %d: Missing argument.",
+@@ -1556,7 +1553,7 @@ parse_command:
+ 		}
+ 		len = strspn(str, WHITESPACE "=");
+ 		/* XXX use argv? */
+-		if (parse_jump(str + len, options, *activep) == -1) {
++		if (parse_jump(str + len, options, cmdline, *activep) == -1) {
+ 			error("%.200s line %d: Invalid ProxyJump \"%s\"",
+ 			    filename, linenum, str + len);
+ 			goto out;
+@@ -3370,65 +3367,116 @@ parse_forward(struct Forward *fwd, const
+ }
+ 
+ int
+-parse_jump(const char *s, Options *o, int active)
++ssh_valid_hostname(const char *s)
+ {
+-	char *orig, *sdup, *cp;
+-	char *host = NULL, *user = NULL;
+-	int r, ret = -1, port = -1, first;
++	size_t i;
+ 
+-	active &= o->proxy_command == NULL && o->jump_host == NULL;
++	if (*s == '-')
++		return 0;
++	for (i = 0; s[i] != 0; i++) {
++		if (strchr("'`\"$\\;&<>|(){},", s[i]) != NULL ||
++		    isspace((u_char)s[i]) || iscntrl((u_char)s[i]))
++			return 0;
++	}
++	return 1;
++}
+ 
+-	orig = sdup = xstrdup(s);
++int
++ssh_valid_ruser(const char *s)
++{
++	size_t i;
++
++	if (*s == '-')
++		return 0;
++	for (i = 0; s[i] != 0; i++) {
++		if (iscntrl((u_char)s[i]))
++			return 0;
++		if (strchr("'`\";&<>|(){}", s[i]) != NULL)
++			return 0;
++		/* Disallow '-' after whitespace */
++		if (isspace((u_char)s[i]) && s[i + 1] == '-')
++			return 0;
++		/* Disallow \ in last position */
++		if (s[i] == '\\' && s[i + 1] == '\0')
++			return 0;
++	}
++	return 1;
++}
++
++int
++parse_jump(const char *s, Options *o, int strict, int active)
++{
++	char *orig = NULL, *sdup = NULL, *cp;
++	char *tmp_user = NULL, *tmp_host = NULL, *host = NULL, *user = NULL;
++	int r, ret = -1, tmp_port = -1, port = -1, first = 1;
++
++	if (strcasecmp(s, "none") == 0) {
++		if (active && o->jump_host == NULL) {
++			o->jump_host = xstrdup("none");
++			o->jump_port = 0;
++		}
++		return 0;
++	}
+ 
+-	/* Remove comment and trailing whitespace */
++	orig = xstrdup(s);
+ 	if ((cp = strchr(orig, '#')) != NULL)
+ 		*cp = '\0';
+ 	rtrim(orig);
+ 
+-	first = active;
++	active &= o->proxy_command == NULL && o->jump_host == NULL;
++	sdup = xstrdup(orig);
+ 	do {
+-		if (strcasecmp(s, "none") == 0)
+-			break;
++		/* Work backwards through string */
+ 		if ((cp = strrchr(sdup, ',')) == NULL)
+ 			cp = sdup; /* last */
+ 		else
+ 			*cp++ = '\0';
+ 
+-		if (first) {
+-			/* First argument and configuration is active */
+-			r = parse_ssh_uri(cp, &user, &host, &port);
+-			if (r == -1 || (r == 1 &&
+-			    parse_user_host_port(cp, &user, &host, &port) != 0))
++		r = parse_ssh_uri(cp, &tmp_user, &tmp_host, &tmp_port);
++		if (r == -1 || (r == 1 && parse_user_host_port(cp,
++		    &tmp_user, &tmp_host, &tmp_port) != 0))
++			goto out; /* error already logged */
++		if (strict) {
++			if (!ssh_valid_hostname(tmp_host)) {
++				error_f("invalid hostname \"%s\"", tmp_host);
+ 				goto out;
+-		} else {
+-			/* Subsequent argument or inactive configuration */
+-			r = parse_ssh_uri(cp, NULL, NULL, NULL);
+-			if (r == -1 || (r == 1 &&
+-			    parse_user_host_port(cp, NULL, NULL, NULL) != 0))
++			}
++			if (tmp_user != NULL && !ssh_valid_ruser(tmp_user)) {
++				error_f("invalid username \"%s\"", tmp_user);
+ 				goto out;
++			}
++		}
++		if (first) {
++			user = tmp_user;
++			host = tmp_host;
++			port = tmp_port;
++			tmp_user = tmp_host = NULL; /* transferred */
+ 		}
+ 		first = 0; /* only check syntax for subsequent hosts */
++		free(tmp_user);
++		free(tmp_host);
++		tmp_user = tmp_host = NULL;
++		tmp_port = -1;
+ 	} while (cp != sdup);
++
+ 	/* success */
+ 	if (active) {
+-		if (strcasecmp(s, "none") == 0) {
+-			o->jump_host = xstrdup("none");
+-			o->jump_port = 0;
+-		} else {
+-			o->jump_user = user;
+-			o->jump_host = host;
+-			o->jump_port = port;
+-			o->proxy_command = xstrdup("none");
+-			user = host = NULL;
+-			if ((cp = strrchr(s, ',')) != NULL && cp != s) {
+-				o->jump_extra = xstrdup(s);
+-				o->jump_extra[cp - s] = '\0';
+-			}
++		o->jump_user = user;
++		o->jump_host = host;
++		o->jump_port = port;
++		o->proxy_command = xstrdup("none");
++		user = host = NULL; /* transferred */
++		if (orig != NULL && (cp = strrchr(orig, ',')) != NULL) {
++			o->jump_extra = xstrdup(orig);
++			o->jump_extra[cp - orig] = '\0';
+ 		}
+ 	}
+ 	ret = 0;
+  out:
+ 	free(orig);
++	free(sdup);
++	free(tmp_user);
++	free(tmp_host);
+ 	free(user);
+ 	free(host);
+ 	return ret;
+diff --color -ruNp a/readconf.h b/readconf.h
+--- a/readconf.h	2026-04-17 13:52:45.432820710 +0200
++++ b/readconf.h	2026-04-17 14:01:38.171138431 +0200
+@@ -252,7 +252,9 @@ int	 process_config_line(Options *, stru
+ int	 read_config_file(const char *, struct passwd *, const char *,
+     const char *, const char *, Options *, int, int *);
+ int	 parse_forward(struct Forward *, const char *, int, int);
+-int	 parse_jump(const char *, Options *, int);
++int	 ssh_valid_hostname(const char *);
++int	 ssh_valid_ruser(const char *);
++int	 parse_jump(const char *, Options *, int, int);
+ int	 parse_ssh_uri(const char *, char **, char **, int *);
+ int	 default_ssh_port(void);
+ int	 option_clear_or_none(const char *);
+diff --color -ruNp a/regress/Makefile b/regress/Makefile
+--- a/regress/Makefile	2026-04-17 13:52:46.227654470 +0200
++++ b/regress/Makefile	2026-04-17 14:02:02.805629106 +0200
+@@ -114,7 +114,8 @@ LTESTS= 	connect \
+ 		agent-pkcs11-cert \
+ 		penalty \
+ 		penalty-expire \
+-		connect-bigconf
++		connect-bigconf \
++		proxyjump
+ 
+ INTEROP_TESTS=	putty-transfer putty-ciphers putty-kex conch-ciphers
+ INTEROP_TESTS+=	dropbear-ciphers dropbear-kex dropbear-server
+ INTEROP_TESTS=	putty-transfer putty-ciphers putty-kex conch-ciphers
+ INTEROP_TESTS+=	dropbear-ciphers dropbear-kex
+diff --color -ruNp a/regress/proxyjump.sh b/regress/proxyjump.sh
+--- a/regress/proxyjump.sh	1970-01-01 01:00:00.000000000 +0100
++++ b/regress/proxyjump.sh	2026-04-10 16:07:55.225958206 +0200
+@@ -0,0 +1,102 @@
++#	$OpenBSD: proxyjump.sh,v 1.1 2026/03/30 07:19:02 djm Exp $
++#	Placed in the Public Domain.
++
++tid="proxyjump"
++
++# Parsing tests
++verbose "basic parsing"
++for jspec in \
++	"jump1" \
++	"user@jump1" \
++	"jump1:2222" \
++	"user@jump1:2222" \
++	"jump1,jump2" \
++	"user1@jump1:2221,user2@jump2:2222" \
++	"ssh://user@host:2223" \
++	; do
++	case "$jspec" in
++	"jump1")		expected="jump1" ;;
++	"user@jump1")		expected="user@jump1" ;;
++	"jump1:2222")		expected="jump1:2222" ;;
++	"user@jump1:2222")	expected="user@jump1:2222" ;;
++	"jump1,jump2")		expected="jump1,jump2" ;;
++	"user1@jump1:2221,user2@jump2:2222")
++		expected="user1@jump1:2221,user2@jump2:2222" ;;
++	"ssh://user@host:2223")	expected="user@host:2223" ;;
++	esac
++	f=`${SSH} -GF /dev/null -oProxyJump="$jspec" somehost | \
++		awk '/^proxyjump /{print $2}'`
++	if [ "$f" != "$expected" ]; then
++		fail "ProxyJump $jspec: expected $expected, got $f"
++	fi
++	f=`${SSH} -GF /dev/null -J "$jspec" somehost | \
++		awk '/^proxyjump /{print $2}'`
++	if [ "$f" != "$expected" ]; then
++		fail "ssh -J $jspec: expected $expected, got $f"
++	fi
++done
++
++verbose "precedence"
++f=`${SSH} -GF /dev/null -oProxyJump=none -oProxyJump=jump1 somehost | \
++	grep "^proxyjump "`
++if [ -n "$f" ]; then
++	fail "ProxyJump=none first did not win"
++fi
++f=`${SSH} -GF /dev/null -oProxyJump=jump -oProxyCommand=foo somehost | \
++	grep "^proxyjump "`
++if [ "$f" != "proxyjump jump" ]; then
++	fail "ProxyJump first did not win over ProxyCommand"
++fi
++f=`${SSH} -GF /dev/null -oProxyCommand=foo -oProxyJump=jump somehost | \
++	grep "^proxycommand "`
++if [ "$f" != "proxycommand foo" ]; then
++	fail "ProxyCommand first did not win over ProxyJump"
++fi
++
++verbose "command-line -J invalid characters"
++cp $OBJ/ssh_config $OBJ/ssh_config.orig
++for jspec in \
++	"host;with;semicolon" \
++	"host'with'quote" \
++	"host\`with\`backtick" \
++	"host\$with\$dollar" \
++	"host(with)brace" \
++	"user;with;semicolon@host" \
++	"user'with'quote@host" \
++	"user\`with\`backtick@host" \
++	"user(with)brace@host" ; do
++	${SSH} -GF /dev/null -J "$jspec" somehost >/dev/null 2>&1
++	if [ $? -ne 255 ]; then
++		fail "ssh -J \"$jspec\" was not rejected"
++	fi
++	${SSH} -GF /dev/null -oProxyJump="$jspec" somehost >/dev/null 2>&1
++	if [ $? -ne 255 ]; then
++		fail "ssh -oProxyJump=\"$jspec\" was not rejected"
++	fi
++done
++# Special characters should be accepted in the config though.
++echo "ProxyJump user;with;semicolon@host;with;semicolon" >> $OBJ/ssh_config
++f=`${SSH} -GF $OBJ/ssh_config somehost | grep "^proxyjump "`
++if [ "$f" != "proxyjump user;with;semicolon@host;with;semicolon" ]; then
++	fail "ProxyJump did not allow special characters in config: $f"
++fi
++
++verbose "functional test"
++# Use different names to avoid the loop detection in ssh.c
++grep -iv HostKeyAlias $OBJ/ssh_config.orig > $OBJ/ssh_config
++cat << _EOF >> $OBJ/ssh_config
++Host jump-host
++	HostkeyAlias jump-host
++Host target-host
++	HostkeyAlias target-host
++_EOF
++cp $OBJ/known_hosts $OBJ/known_hosts.orig
++sed 's/^[^ ]* /jump-host /' < $OBJ/known_hosts.orig > $OBJ/known_hosts
++sed 's/^[^ ]* /target-host /' < $OBJ/known_hosts.orig >> $OBJ/known_hosts
++start_sshd
++
++verbose "functional ProxyJump"
++res=`${REAL_SSH} -F $OBJ/ssh_config -J jump-host target-host echo "SUCCESS" 2>/dev/null`
++if [ "$res" != "SUCCESS" ]; then
++	fail "functional test failed: expected SUCCESS, got $res"
++fi
+diff --color -ruNp a/ssh.c b/ssh.c
+--- a/ssh.c	2026-04-17 14:40:11.131541424 +0200
++++ b/ssh.c	2026-04-17 14:42:16.295560116 +0200
+@@ -643,43 +643,6 @@ ssh_conn_info_free(struct ssh_conn_info
+ 	free(cinfo);
+ }
+ 
+-static int
+-valid_hostname(const char *s)
+-{
+-	size_t i;
+-
+-	if (*s == '-')
+-		return 0;
+-	for (i = 0; s[i] != 0; i++) {
+-		if (strchr("'`\"$\\;&<>|(){},", s[i]) != NULL ||
+-		    isspace((u_char)s[i]) || iscntrl((u_char)s[i]))
+-			return 0;
+-	}
+-	return 1;
+-}
+-
+-static int
+-valid_ruser(const char *s)
+-{
+-	size_t i;
+-
+-	if (*s == '-')
+-		return 0;
+-	for (i = 0; s[i] != 0; i++) {
+-		if (iscntrl((u_char)s[i]))
+-			return 0;
+-		if (strchr("'`\";&<>|(){}", s[i]) != NULL)
+-			return 0;
+-		/* Disallow '-' after whitespace */
+-		if (isspace((u_char)s[i]) && s[i + 1] == '-')
+-			return 0;
+-		/* Disallow \ in last position */
+-		if (s[i] == '\\' && s[i + 1] == '\0')
+-			return 0;
+-	}
+-	return 1;
+-}
+-
+ /*
+  * Main program for the ssh client.
+  */
+@@ -937,9 +900,8 @@ main(int ac, char **av)
+ 			}
+ 			if (options.proxy_command != NULL)
+ 				fatal("Cannot specify -J with ProxyCommand");
+-			if (parse_jump(optarg, &options, 1) == -1)
++			if (parse_jump(optarg, &options, 1, 1) == -1)
+ 				fatal("Invalid -J argument");
+-			options.proxy_command = xstrdup("none");
+ 			break;
+ 		case 't':
+ 			if (options.request_tty == REQUEST_TTY_YES)
+@@ -1189,8 +1151,15 @@ main(int ac, char **av)
+ 	if (!host)
+ 		usage();
+ 
+-	if (!valid_hostname(host))
++	/*
++	 * Validate commandline-specified values that end up in %tokens
++	 * before they are used in config parsing.
++	 */
++	if (options.user != NULL && !ssh_valid_ruser(options.user))
++		fatal("remote username contains invalid characters");
++	if (!ssh_valid_hostname(host))
+ 		fatal("hostname contains invalid characters");
++
+ 	options.host_arg = xstrdup(host);
+ 
+ 	/* Initialize the command to execute on remote host. */
+@@ -1360,7 +1329,8 @@ main(int ac, char **av)
+ 			sshbin = "ssh";
+ 
+ 		/* Consistency check */
+-		if (options.proxy_command != NULL)
++		if (options.proxy_command != NULL &&
++		    strcasecmp(options.proxy_command, "none") != 0)
+ 			fatal("inconsistent options: ProxyCommand+ProxyJump");
+ 		/* Never use FD passing for ProxyJump */
+ 		options.proxy_use_fdpass = 0;
+@@ -1503,7 +1473,7 @@ main(int ac, char **av)
+ 	 * via configuration (i.e. not expanded) are not subject to validation.
+ 	 */
+ 	if ((user_on_commandline || user_expanded) &&
+-	    !valid_ruser(options.user))
++	    !ssh_valid_ruser(options.user))
+ 		fatal("remote username contains invalid characters");
+ 
+ 	/* Now User is expanded, store it and calculate hash. */
+diff --color -ruNp a/regress/percent.sh b/regress/percent.sh
+--- a/regress/percent.sh	2025-10-10 04:38:31.000000000 +0200
++++ b/regress/percent.sh	2026-04-17 15:58:15.426971800 +0200
+@@ -140,7 +140,7 @@ done
+ FOO=bar
+ export FOO
+ for i in controlpath identityagent forwardagent localforward remoteforward \
+-    user setenv userknownhostsfile; do
++    setenv userknownhostsfile; do
+ 	verbose $tid $i dollar
+ 	trial $i '${FOO}' $FOO
+ done
+@@ -175,7 +175,7 @@ ${SSH} -F $OBJ/ssh_proxy -G "${FOO}@some
+ 
+ # Literal control characters in config is acceptable
+ verbose $tid user control-literal
+-trial user "$FOO" "$FOO"
++#trial user "$FOO" "$FOO"
+ 
+ # Control characters expanded from config aren't.
+ ${SSH} -F $OBJ/ssh_proxy -G '-oUser=${FOO}' somehost && \

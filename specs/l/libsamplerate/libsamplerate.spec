@@ -4,7 +4,7 @@
 Summary:	Sample rate conversion library for audio data
 Name:		libsamplerate
 Version:	0.2.2
-Release: 14%{?dist}
+Release:	12%{?dist}
 License:	BSD-2-Clause
 URL:		https://libsndfile.github.io/libsamplerate/
 Source0:	https://github.com/libsndfile/%{name}/releases/download/%{version}/%{name}-%{version}.tar.xz
@@ -75,6 +75,9 @@ unset LD_LIBRARY_PATH
 %exclude %{_pkgdocdir}/README.md
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.2-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -3,7 +3,7 @@
 
 Name: kernelshark
 Version: 2.3.1
-Release: 9%{?dist}
+Release: 8%{?dist}
 Epoch: 1
 
 # As of 2.3.1, only kernelshark.cpp, kshark-record.cpp and examples are GPL-2.0. The rest of kernel-shark is LGPL-2.1.
@@ -65,7 +65,7 @@ cd build
 tt_font=`fc-list NotoSans:style=Regular | cut -d':' -f 1 -z`
 # To fix error: ‘for_each’ is not a member of ‘std’
 sed -i '/iostream/a #include <algorithm>' ../src/plugins/LatencyPlot.cpp
-cmake ..  -DCMAKE_BUILD_TYPE=Package -D_INSTALL_PREFIX=%{_prefix} -D_LIBDIR=%{_libdir} -DCMAKE_C_FLAGS_PACKAGE="%{optflags}" -DCMAKE_EXE_LINKER_FLAGS="%{build_ldflags}" -D_DOXYGEN_DOC=1 -DTT_FONT_FILE=${tt_font}
+cmake ..  -DCMAKE_BUILD_TYPE=Package -D_INSTALL_PREFIX=%{_prefix} -D_LIBDIR=%{_libdir} -DCMAKE_C_FLAGS_PACKAGE="%{optflags}" -DCMAKE_EXE_LINKER_FLAGS="%{build_ldflags}" -D_DOXYGEN_DOC=1 -DTT_FONT_FILE=${tt_font} -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 make V=1 all doc
 
 %install
@@ -102,6 +102,13 @@ chrpath --delete %{buildroot}/%{_bindir}/kshark-record
 %{_includedir}/%{name}
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Aug 15 2025 Zamir SUN <sztsian@gmail.com> - 1:2.3.1-7
+- Add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to support CMake 4.0
+- Fixes rhbz#2380677
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.3.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

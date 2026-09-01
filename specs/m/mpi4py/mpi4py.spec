@@ -23,7 +23,7 @@
 
 Name:           mpi4py
 Version:        4.1.1
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Python bindings of the Message Passing Interface (MPI)
 
 License:        BSD-2-Clause

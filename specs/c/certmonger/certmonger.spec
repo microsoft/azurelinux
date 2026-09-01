@@ -31,13 +31,20 @@
 
 Name:		certmonger
 Version:	0.79.21
-Release: 4%{?dist}
+Release:	4%{?dist}
 Summary:	Certificate status monitor and PKI enrollment client
 
 License:	GPL-3.0-or-later
 URL:		http://pagure.io/certmonger/
 Source0:	http://releases.pagure.org/certmonger/certmonger-%{version}.tar.gz
 #Source1:	http://releases.pagure.org/certmonger/certmonger-%%{version}.tar.gz.sig
+
+Patch0001:	0001-Replace-deprecated-OpenSSL-3.0.0-function-calls.patch
+Patch0002:	0002-Add-initial-ML-DSA-support-with-OpenSSL-3.5.0.patch
+Patch0003:	0003-Add-initial-ML-DSA-support-with-NSS-3.112.0-4.patch
+Patch0004:	0004-Test-for-PQ-support-in-NSS-print-summary-at-end-of-c.patch
+Patch0005:	0005-Implement-more-PQ-testing-for-both-NSS-and-OpenSSL.patch
+Patch0006:	0006-Allow-requesting-a-ML-DSA-key-using-a-strength.patch
 
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -267,6 +274,16 @@ exit 0
 %endif
 
 %changelog
+* Mon Jan 19 2026 Rob Crittenden <rcritten@redhat.com> - 0.79.21-4
+- Include upstream experimental patches to support ML-DSA keys
+- Clean patches in the repo that are no longer used
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.79.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.79.21-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Oct 01 2025 Rob Crittenden <rcritten@redhat.com> - 0.79.21-1
 - Update to upstream 0.79.21
 

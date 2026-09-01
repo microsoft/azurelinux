@@ -17,7 +17,7 @@
 Summary: A Qt implementation of the DBusMenu protocol 
 Name:    dbusmenu-qt
 Version: 0.9.3
-Release: 0.37.%{snapshot}%{?dist}
+Release: 0.40.%{snapshot}%{?dist}
 
 License: LGPL-2.0-or-later
 URL: https://launchpad.net/libdbusmenu-qt/
@@ -92,6 +92,8 @@ Requires: dbusmenu-qt5%{?_isa} = %{version}-%{release}
 
 
 %build
+# TODO: Please submit an issue to upstream (rhbz#2380533)
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 %if 0%{?with_qt4}
 mkdir %{_target_platform}
 pushd %{_target_platform}
@@ -173,6 +175,15 @@ xvfb-run -a dbus-launch --exit-with-session make -C %{_target_platform} check AR
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3-0.40.20160218
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3-0.39.20160218
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 10 2025 Cristian Le <git@lecris.dev> - 0.9.3-0.38.20160218
+- Allow to build with CMake 4.0 (rhbz#2380533)
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3-0.37.20160218
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

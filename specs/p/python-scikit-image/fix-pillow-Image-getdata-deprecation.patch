@@ -1,0 +1,28 @@
+From 66633d95d78107ff762ca51bbcae830061a077dc Mon Sep 17 00:00:00 2001
+From: Stefan van der Walt <stefanv@berkeley.edu>
+Date: Thu, 8 Jan 2026 03:39:36 -0800
+Subject: [PATCH] Handle PIL Image.getdata deprecation (#8010)
+
+Closes #8004 #8005 #8006
+---
+ skimage/io/_plugins/pil_plugin.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/skimage/io/_plugins/pil_plugin.py b/skimage/io/_plugins/pil_plugin.py
+index 659f6f4..04a1584 100644
+--- a/skimage/io/_plugins/pil_plugin.py
++++ b/skimage/io/_plugins/pil_plugin.py
+@@ -47,6 +47,10 @@ def pil_to_ndarray(image, dtype=None, img_num=None):
+     Refer to ``imread``.
+ 
+     """
++    # PIL 12.1.0 renames getdata
++    if hasattr(image, "get_flattened_data"):
++        image.getdata = image.get_flattened_data
++
+     try:
+         # this will raise an IOError if the file is not readable
+         image.getdata()[0]
+-- 
+2.53.0
+

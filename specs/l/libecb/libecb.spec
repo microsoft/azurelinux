@@ -9,7 +9,7 @@ Name:       libecb
 # See ECB_VERSION macro. RPM cannot order them correctly. A decimal encoding
 # would work, but would be uggly. Just use 0.
 Version:    0.%{snapshot}
-Release: 9%{?dist}
+Release:    7%{?dist}
 Summary:    Compiler built-ins
 License:    BSD-2-Clause OR GPL-2.0-or-later
 URL:        http://software.schmorp.de/pkg/libecb.html
@@ -61,6 +61,9 @@ install -m 0644 -t %{buildroot}%{_mandir}/man3 *.3
 %{_mandir}/man3/ecb.*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.20230911-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.20230911-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

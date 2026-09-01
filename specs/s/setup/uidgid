@@ -38,8 +38,7 @@ squid	23	23	/var/spool/squid		/dev/null	squid
 # pvm	24	24	/usr/share/pvm3		/bin/bash	pvm
 named	25	25	/var/named		/bin/false	bind
 postgres	26	26	/var/lib/pgsql		/bin/bash	postgresql-server
-# Dynamic on new systems, removed Mar2025, can be reused if necessary later
-#mysql	27	27	/var/lib/mysql		/bin/bash	mysql
+mysql	27	27	/var/lib/mysql		/usr/sbin/nologin	mysql
 nscd	28	28	/		/bin/false	nscd
 rpcuser	29	29	/var/lib/nfs		/bin/false	nfs-utils
 # Present in https://pagure.io/setup/c/08258e0f748c4f372fcbf1dd7947c132ee0b8a12, probably already unused in 2008

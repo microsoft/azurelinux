@@ -10,7 +10,7 @@
 Name: hunspell-fr
 Summary: French hunspell dictionaries
 Version: 7.0
-Release: 4%{?dist}
+Release: 2%{?dist}
 Source: https://grammalecte.net/dic/hunspell-french-dictionaries-v%{version}.zip
 URL: https://grammalecte.net/
 License: MPL-2.0
@@ -46,6 +46,9 @@ popd
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 11 2025 Parag Nemade <pnemade AT redhat DOT com> - 7.0-1
 - Update to new version 7.0 (rh#2414006)
 

@@ -15,7 +15,7 @@
 
 Name:           flite
 Version:        2.2
-Release: 15%{?dist}
+Release:        13%{?dist}
 Summary:        Small, fast speech synthesis engine (text-to-speech)
 License:        MIT
 URL:            http://cmuflite.org/
@@ -115,6 +115,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} make check
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.2-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

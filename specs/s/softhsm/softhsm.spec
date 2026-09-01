@@ -1,31 +1,19 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-#global prever rc1
+%global prever rc1
 #global prerelease yes
+%global origname SoftHSMv2
 
 Summary: Software version of a PKCS#11 Hardware Security Module
 Name: softhsm
-Version: 2.6.1
-Release: %{?prever:0.}13%{?prever:.%{prever}}%{?dist}.1
+Version: 2.7.0
+Release: %{?prever:0.}1%{?prever:.%{prever}}%{?dist}.1
 License: BSD-2-clause
-Url: http://www.opendnssec.org/
-Source: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz
-Source1: http://dist.opendnssec.org/source/%{?prever:testing/}%{name}-%{version}.tar.gz.sig
+# Upstream moved to a separate namespace from OpenDNSSEC
+Url: http://www.softhsm.org/
+Source: https://github.com/softhsm/SoftHSMv2/archive/refs/tags/%{version}%{?prever:-%prever}/%{origname}-%{version}%{?prever:-%prever}.tar.gz
 Source2: %{name}-sysusers.conf
-
-Patch1: softhsm-2.6.1-rh1831086-exit.patch
-Patch2: softhsm-openssl3-tests.patch
-# based on https://github.com/opendnssec/SoftHSMv2/commit/f94aaffc879ade97a51b8e1308af42f86be1885f
-Patch3: softhsm-2.6.1-uninitialized.patch
-# from https://github.com/Emantor/SoftHSMv2/tree/fix/openssl3
-# as discussed at https://github.com/opendnssec/SoftHSMv2/issues/729
-Patch4: softhsm-prevent-global-deleted-objects-access.patch
-# fix for https://fedoraproject.org/wiki/Changes/OpensslDeprecateEngine
-Patch5: softhsm-disable-usage-of-openssl-engines.patch
-# upstream https://github.com/softhsm/SoftHSMv2/pull/664
-# commits adding tests dropped as they conflict with OpenSSL 3 patches
-Patch6: softhsm-rhbz2337819.patch
 
 BuildRequires: make
 BuildRequires: openssl-devel >= 1.0.1k-6, sqlite-devel >= 3.4.2, cppunit-devel
@@ -57,18 +45,11 @@ BuildRequires: autoconf, libtool, automake
 The devel package contains the libsofthsm include files
 
 %prep
-%setup -q -n %{name}-%{version}%{?prever}
-%patch -P1 -p1
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
-%patch -P5 -p1
-%patch -P6 -p1
+%setup -q -n %{origname}-%{version}%{?prever:-%prever}
 
 %if 0%{?prever:1} || 0%{?prerelease:1}
    # pre-release or post-release snapshots fixup
    sed -i 's:^full_libdir=":#full_libdir=":g' configure.ac
-   sed -i "s:libdir)/@PACKAGE@:libdir):" Makefile.in
 autoreconf -fiv
 %else
    # remove softhsm/ subdir auto-added to --libdir
@@ -149,6 +130,12 @@ if [ -f /var/softhsm/slot0.db ]; then
 fi
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.0-0.1.rc1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Alexander Bokovoy <abokovoy@redhat.com> - 2.7.0-0.1.rc1
+- Upstream release 2.7.0-rc1
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-13.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

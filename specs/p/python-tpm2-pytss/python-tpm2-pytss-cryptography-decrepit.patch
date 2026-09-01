@@ -1,0 +1,42 @@
+Backport of "crypto: fix deprection warnings"
+
+https://github.com/tpm2-software/tpm2-pytss/commit/f792d122ffe00e6264b0cc16458e1ba72d632cd9
+
+diff --git a/src/tpm2_pytss/internal/crypto.py b/src/tpm2_pytss/internal/crypto.py
+index c1b731e..952f118 100644
+--- a/src/tpm2_pytss/internal/crypto.py
++++ b/src/tpm2_pytss/internal/crypto.py
+@@ -19,8 +19,10 @@ from cryptography.hazmat.primitives.serialization import (
+ from cryptography.x509 import load_pem_x509_certificate, load_der_x509_certificate
+ from cryptography.hazmat.primitives.kdf.kbkdf import CounterLocation, KBKDFHMAC, Mode
+ from cryptography.hazmat.primitives.kdf.concatkdf import ConcatKDFHash
+-from cryptography.hazmat.primitives.ciphers.algorithms import AES, Camellia
++from cryptography.hazmat.primitives.ciphers.algorithms import AES
++from cryptography.hazmat.decrepit.ciphers.algorithms import Camellia
+ from cryptography.hazmat.primitives.ciphers import modes, Cipher, CipherAlgorithm
++import cryptography.hazmat.decrepit.ciphers.modes as decrepit_modes
+ from cryptography.hazmat.backends import default_backend
+ from cryptography.exceptions import UnsupportedAlgorithm, InvalidSignature
+ from typing import Tuple, Type, Any
+@@ -52,7 +54,7 @@ if hasattr(hashes, "SM3"):
+ _algtable = (
+     (TPM2_ALG.AES, AES),
+     (TPM2_ALG.CAMELLIA, Camellia),
+-    (TPM2_ALG.CFB, modes.CFB),
++    (TPM2_ALG.CFB, decrepit_modes.CFB),
+ )
+ 
+ try:
+diff --git a/test/test_crypto.py b/test/test_crypto.py
+index 7abbecb..05e5f4f 100644
+--- a/test/test_crypto.py
++++ b/test/test_crypto.py
+@@ -537,7 +537,7 @@ class CryptoTest(TSS2_EsapiTest):
+ 
+         (alg, mode, bits) = crypto._symdef_to_crypt(symdef)
+         self.assertEqual(alg, crypto.AES)
+-        self.assertEqual(mode, crypto.modes.CFB)
++        self.assertEqual(mode, crypto.decrepit_modes.CFB)
+         self.assertEqual(bits, 128)
+ 
+         symdef.mode.sym = TPM2_ALG.LAST + 1

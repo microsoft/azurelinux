@@ -3,7 +3,7 @@
 
 # remirepo/fedora spec file for php-sebastian-exporter4
 #
-# SPDX-FileCopyrightText:  Copyright 2013-2025 Remi Collet
+# SPDX-FileCopyrightText:  Copyright 2013-2026 Remi Collet
 # SPDX-License-Identifier: CECILL-2.1
 # http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
@@ -12,7 +12,7 @@
 
 %bcond_without       tests
 
-%global gh_commit    14c6ba52f95a36c3d27c835d65efc7123c446e8c
+%global gh_commit    4352c1a3df741a7ba9e61af6fed51d1fee41cbf7
 %global gh_short     %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner     sebastianbergmann
 %global gh_project   exporter
@@ -28,8 +28,8 @@
 %global pear_channel pear.phpunit.de
 
 Name:           php-%{pk_vendor}-%{pk_project}%{major}
-Version:        4.0.8
-Release: 4%{?dist}
+Version:        4.0.9
+Release:        1%{?dist}
 Summary:        Export PHP variables for visualization, version %{major}
 
 License:        BSD-3-Clause
@@ -96,7 +96,7 @@ touch vendor/autoload.php
 
 : Run upstream test suite
 ret=0
-for cmd in php php81 php82 php83 php84 php85; do
+for cmd in php php82 php83 php84 php85 php86; do
   if which $cmd; then
     $cmd -d auto_prepend_file=%{buildroot}%{php_home}/%{ns_vendor}/%{ns_project}%{major}/autoload.php \
       %{_bindir}/phpunit9  --verbose || ret=1
@@ -114,6 +114,12 @@ exit $ret
 
 
 %changelog
+* Tue Aug 11 2026 Remi Collet <remi@remirepo.net> - 4.0.9-1
+- update to 4.0.9
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Sep 24 2025 Remi Collet <remi@remirepo.net> - 4.0.8-1
 - update to 4.0.8
 

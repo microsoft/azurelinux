@@ -3,7 +3,7 @@
 
 Name:           armadillo
 Version:        12.8.1
-Release: 10%{?dist}
+Release:        10%{?dist}
 Summary:        Fast C++ matrix library with syntax similar to MATLAB and Octave
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -81,6 +81,8 @@ rm -rf examples/*win64*
 
 
 %build
+# TODO: Please submit an issue to upstream (rhbz#2380466)
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake %{extra_options}
 %cmake_build
 
@@ -90,8 +92,10 @@ rm -rf examples/*win64*
 
 
 %check
+%global _vpath_builddir %{_vpath_builddir}-test
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake %{extra_options} -DBUILD_SMOKE_TEST=ON
-make -C "%{_vpath_builddir}"
+%cmake_build
 %ctest
 
 
@@ -127,6 +131,16 @@ make -C "%{_vpath_builddir}"
 
 
 %changelog
+* Thu Feb 12 2026 Cristian Le <git@lecris.dev> - 12.8.1-10
+- Allow to build with CMake 4.0 (rhbz#2380466)
+- Allow to build with Ninja generator (rhbz#2380967)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.8.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.8.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 12.8.1-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

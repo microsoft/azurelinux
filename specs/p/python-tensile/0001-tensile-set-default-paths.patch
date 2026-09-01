@@ -1,0 +1,36 @@
+From c08f67b1248ddbf5d0c2b188b85a9374f5f12c20 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 20 Sep 2025 08:43:09 -0700
+Subject: [PATCH] tensile set default paths
+
+---
+ Tensile/Utilities/Toolchain.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Tensile/Utilities/Toolchain.py b/Tensile/Utilities/Toolchain.py
+index ee9cbeeea9f3..c328b74bcbc2 100644
+--- a/Tensile/Utilities/Toolchain.py
++++ b/Tensile/Utilities/Toolchain.py
+@@ -29,8 +29,8 @@ from subprocess import PIPE, run
+ from typing import List, NamedTuple, Union
+ from warnings import warn
+ 
+-DEFAULT_ROCM_BIN_PATH_POSIX = Path("/opt/rocm/bin")
+-DEFAULT_ROCM_LLVM_BIN_PATH_POSIX = Path("/opt/rocm/lib/llvm/bin")
++DEFAULT_ROCM_BIN_PATH_POSIX = Path("/usr/bin")
++DEFAULT_ROCM_LLVM_BIN_PATH_POSIX = Path("/usr/lib64/rocm/llvm/bin")
+ DEFAULT_ROCM_BIN_PATH_WINDOWS = Path("C:/Program Files/AMD/ROCm")
+ 
+ 
+@@ -89,7 +89,7 @@ def _posixSearchPaths() -> List[Path]:
+     if os.environ.get("ROCM_PATH"):
+         for p in os.environ["ROCM_PATH"].split(os.pathsep):
+             searchPaths.append(Path(p) / "bin")
+-            searchPaths.append(Path(p) / "lib" / "llvm" / "bin")
++            searchPaths.append(Path(p) / "lib64" / "rocm" / "llvm" / "bin")
+ 
+     searchPaths.extend(
+         [
+-- 
+2.51.0
+

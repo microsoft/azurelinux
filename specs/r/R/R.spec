@@ -15,30 +15,20 @@
 %bcond_without tests
 %endif
 
-# We need at least gcc 10
-%if 0%{?rhel} && 0%{?rhel} < 9
-%global _lto_cflags %nil
-%endif
-
-%if 0%{?fedora} >= 33 || 0%{?rhel} >= 9
-%global blaslib flexiblas
-%global blasvar %{nil}
-%else
-%global blaslib openblas
-%global blasvar o
-%endif
+# We don't want the tex provides that generate here
+%global __provides_exclude tex\\\(.*\\\)
 
 # Should be the previous version, to make mass-rebuilds easier
 %bcond_with bootstrap
-%global bootstrap_abi 4.4
+%global bootstrap_abi 4.5
 
 %global major_version 4
-%global minor_version 5
-%global patch_version 2
+%global minor_version 6
+%global patch_version 1
 
 Name:           R
 Version:        %{major_version}.%{minor_version}.%{patch_version}
-Release: 6%{?dist}
+Release:        1%{?dist}
 Summary:        A language for data analysis and graphics
 
 License:        GPL-2.0-or-later
@@ -66,7 +56,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  libdeflate-devel
 BuildRequires:  libzstd-devel
 BuildRequires:  tre-devel
-BuildRequires:  %{blaslib}-devel
+BuildRequires:  flexiblas-devel
 BuildRequires:  libSM-devel
 BuildRequires:  libX11-devel
 BuildRequires:  libICE-devel
@@ -84,9 +74,12 @@ BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  less
-BuildRequires:  tex(latex)
+BuildRequires:  texlive
 BuildRequires:  texinfo-tex
 BuildRequires:  tex(upquote.sty)
+BuildRequires:  texlive-helvetic
+BuildRequires:  texlive-times
+
 %if 0%{?fedora}
 # No inconsolata on RHEL tex
 BuildRequires:  tex(inconsolata.sty)
@@ -145,30 +138,30 @@ Provides:       R(ABI) = %{bootstrap_abi}
 %add_submodule  base %{version}
 %add_submodule  boot 1.3-32
 %add_submodule  class 7.3-23
-%add_submodule  cluster 2.1.8.1
+%add_submodule  cluster 2.1.8.2
 %add_submodule  codetools 0.2-20
 %add_submodule  compiler %{version}
 %add_submodule  datasets %{version}
-%add_submodule  foreign 0.8-90
+%add_submodule  foreign 0.8-91
 %add_submodule  graphics %{version}
 %add_submodule  grDevices %{version}
 %add_submodule  grid %{version}
 %add_submodule  KernSmooth 2.23-26
-%add_submodule  lattice 0.22-7
+%add_submodule  lattice 0.22-9
 %add_submodule  MASS 7.3-65
-%add_submodule  Matrix 1.7-4
+%add_submodule  Matrix 1.7-5
 Obsoletes:      R-Matrix < 0.999375-7
 %add_submodule  methods %{version}
-%add_submodule  mgcv 1.9-3
-%add_submodule  nlme 3.1-168
+%add_submodule  mgcv 1.9-4
+%add_submodule  nlme 3.1-169
 %add_submodule  nnet 7.3-20
 %add_submodule  parallel %{version}
-%add_submodule  rpart 4.1.24
+%add_submodule  rpart 4.1.27
 %add_submodule  spatial 7.3-18
 %add_submodule  splines %{version}
 %add_submodule  stats %{version}
 %add_submodule  stats4 %{version}
-%add_submodule  survival 3.8-3
+%add_submodule  survival 3.8-6
 %add_submodule  tcltk %{version}
 %add_submodule  tools %{version}
 %add_submodule  translations %{version}
@@ -206,11 +199,11 @@ Requires:       zlib-devel
 Requires:       libdeflate-devel
 Requires:       libzstd-devel
 Requires:       tre-devel
-Requires:       %{blaslib}-devel
+Requires:       flexiblas-devel
 Requires:       libX11-devel
 Requires:       libicu-devel
 Requires:       libtirpc-devel
-Recommends:     tex(latex)
+Recommends:     texlive
 Recommends:     texinfo-tex
 Recommends:     tidy
 Recommends:     devscripts-checkbashisms
@@ -222,7 +215,7 @@ Recommends:     tex(inconsolata.sty)
 Recommends:     qpdf
 %endif
 
-Provides:       R-Matrix-devel = 1.7.4
+Provides:       R-Matrix-devel = 1.7.5
 Obsoletes:      R-Matrix-devel < 0.999375-7
 
 %ifarch %{java_arches}
@@ -320,6 +313,8 @@ sed -i -e '/R_LIBS_SITE=/s/^/#/g' etc/Renviron.in
 # Only packages which are needed as runtime dependencies are rebuilt for
 # flatpaks in /app, build dependencies are from buildroot in /usr
 echo 'R_LIBS_SITE=${R_LIBS_SITE-'"'/usr/local/lib/R/site-library:/usr/local/lib/R/library:%{_libdir}/R/library:%{_datadir}/R/library%{?flatpak::/usr/%{_lib}/R/library:/usr/share/R/library}'"'}' >> etc/Renviron.in
+# Relax texi2any requirement for EPEL9
+sed -i -e 's|texi2any_version_min} -lt 8|texi2any_version_min} -lt 7|' configure
 # No inconsolata on RHEL tex
 %if 0%{?rhel}
 export R_RD4PDF="times,hyper"
@@ -337,7 +332,7 @@ export JAVA_HOME=%{_jvmdir}/jre
   rincludedir=%{_includedir}/R \
   rsharedir=%{_datadir}/R \
   --with-system-tre \
-  --with-blas=%{blaslib}%{blasvar} \
+  --with-blas=flexiblas \
   --with-lapack \
   --with-tcl-config=/usr/%{_lib}/tclConfig.sh \
   --with-tk-config=/usr/%{_lib}/tkConfig.sh \
@@ -669,6 +664,7 @@ TZ="Europe/Paris" make check
 %lang(ko) %{_libdir}/R/library/lattice/po/ko/
 %lang(pl) %{_libdir}/R/library/lattice/po/pl*/
 %{_libdir}/R/library/lattice/R/
+%doc %{_libdir}/R/library/lattice/README.md
 # MASS
 %dir %{_libdir}/R/library/MASS/
 %{_libdir}/R/library/MASS/CITATION
@@ -816,6 +812,7 @@ TZ="Europe/Paris" make check
 %lang(pl) %{_libdir}/R/library/rpart/po/pl/
 %lang(ru) %{_libdir}/R/library/rpart/po/ru/
 %{_libdir}/R/library/rpart/R/
+%doc %{_libdir}/R/library/rpart/README.md
 # spatial
 %dir %{_libdir}/R/library/spatial/
 %{_libdir}/R/library/spatial/CITATION
@@ -905,9 +902,9 @@ TZ="Europe/Paris" make check
 %{_libdir}/R/library/tools/INDEX
 %{_libdir}/R/library/tools/libs/
 %{_libdir}/R/library/tools/Meta/
+%{_libdir}/R/library/tools/misc/
 %{_libdir}/R/library/tools/NAMESPACE
 %{_libdir}/R/library/tools/R/
-%{_libdir}/R/library/tools/wre.txt
 # utils
 %dir %{_libdir}/R/library/utils/
 %{_libdir}/R/library/utils/DESCRIPTION
@@ -965,6 +962,25 @@ TZ="Europe/Paris" make check
 %{_libdir}/libRmath.a
 
 %changelog
+* Wed Jun 24 2026 Iñaki Úcar <iucar@fedoraproject.org> - 4.6.1-1
+- Update to 4.6.1
+- Remove BLAS and LTO adjustments for EPEL 8, no longer supported
+
+* Wed May 27 2026 František Zatloukal <fzatlouk@redhat.com> - 4.6.0-3
+- Rebuilt for icu 78.3
+
+* Fri May  1 2026 Tom Callaway <spot@fedoraproject.org> - 4.6.0-2
+- exclude tex autoprovides
+
+* Fri Apr 24 2026 Iñaki Úcar <iucar@fedoraproject.org> - 4.6.0-1
+- Update to 4.6.0
+
+* Mon Apr 20 2026 Tom Callaway <spot@fedoraproject.org> - 4.5.3-2
+- add BR for tex fonts needed for R CMD check base
+
+* Wed Mar 11 2026 Iñaki Úcar <iucar@fedoraproject.org> - 4.5.3-1
+- Update to 4.5.3
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.5.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

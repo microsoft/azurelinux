@@ -1,192 +1,118 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%if 0%{?rhel} == 7
-%bcond_with    python3
-%bcond_without python2
-%else
-%bcond_with    python2
-%bcond_without python3
+# Sphinx-generated HTML documentation is not suitable for packaging; see
+# https://bugzilla.redhat.com/show_bug.cgi?id=2006555 for discussion.
+%bcond doc %[ %{defined fc43} || %{defined fc42} ]
+
+Name:           python-dictdiffer
+Version:        0.9.0
+Release:        19%{?dist}
+Summary:        Dictdiffer is a module that helps you to diff and patch dictionaries
+
+License:        MIT
+URL:            https://github.com/inveniosoftware/dictdiffer
+Source:         %{url}/archive/v%{version}/dictdiffer-%{version}.tar.gz
+
+# tests: remove pytest-runner / setup.py test support
+# https://github.com/inveniosoftware/dictdiffer/pull/192
+# rebased on v0.9.0
+Patch:          0001-tests-remove-pytest-runner-setup.py-test-support.patch
+# Downstream-only: remove linting/coverage options for pytest
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+Patch:          0002-Downstream-only-remove-linting-coverage-options-for-.patch
+
+# List test dependencies manually since the test extra has various unwanted
+# dependencies, including linting/coverage tools:
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/#_linters
+BuildRequires:  %{py3_dist pytest}
+
+BuildArch:      noarch
+
+%global common_description %{expand:
+%{summary}.}
+
+%description %{common_description}
+
+
+%package -n python3-dictdiffer
+Summary:        %{summary}
+
+%if %{without doc} && %{defined fedora}
+Obsoletes:      python-dictdiffer-doc < 0.9.0-18
 %endif
 
-%global library dictdiffer
+%global common_description %{expand:
+%{summary}.}
 
-Name:       python-%{library}
-Version:    0.9.0
-Release: 20%{?dist}
-Summary:    Dictdiffer is a module that helps you to diff and patch dictionaries
-License:    MIT
-URL:        https://github.com/inveniosoftware/dictdiffer
-Source0:    https://github.com/inveniosoftware/dictdiffer/archive/v%{version}.tar.gz
-BuildArch:  noarch
+%description -n python3-dictdiffer %{common_description}
 
-%if 0%{?with_python2}
-%package -n python2-%{library}
-Summary:    Dictdiffer is a module that helps you to diff and patch dictionaries
-%{?python_provide:%python_provide python2-%{library}}
 
-BuildRequires: python2-devel
-BuildRequires: python-pytest-runner
-BuildRequires: python-setuptools
-BuildRequires: python-setuptools_scm
-BuildRequires: git
+%pyproject_extras_subpkg -n python3-dictdiffer numpy
 
-%if 0%{?fedora}
-BuildRequires: python2-pytest
-BuildRequires: python2-pytest-pep8
-BuildRequires: python2-pytest-cov
-BuildRequires: python2-isort
-BuildRequires: python2-coverage
-BuildRequires: python2-mock
-BuildRequires: python2-tox
-%endif
 
-%description -n python2-%{library}
-Dictdiffer is a module that helps you to diff and patch dictionaries
-%endif
-
-%if 0%{?with_python3}
-%package -n python3-%{library}
-Summary: Dictdiffer is a module that helps you to diff and patch dictionaries
-%if 0%{?rhel} < 8
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{library}}
-%else
-%{?python_provide:%python_provide python3-%{library}}
-%endif
-
-%if 0%{?rhel} < 8
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-pytest-runner
-BuildRequires: python%{python3_pkgversion}-setuptools
-BuildRequires: python%{python3_pkgversion}-setuptools_scm
-%else
-BuildRequires: python3-devel
-%if 0%{?rhel} < 10
-BuildRequires: python3-pytest-runner
-%else
-BuildRequires: python3-wheel
-BuildRequires: python3-pip
-%endif
-BuildRequires: python3-setuptools
-BuildRequires: python3-setuptools_scm
-%endif
-%if 0%{?fedora}
-BuildRequires: python3-pytest
-BuildRequires: python3-pytest-cov
-BuildRequires: python3-pytest-cache
-%if 0%{?fedora} < 32
-BuildRequires: python3-pytest-pep8
-%endif
-BuildRequires: python3-isort
-BuildRequires: python3-coverage
-BuildRequires: python3-pytest-isort
-BuildRequires: python3-tox
-%endif
-
-BuildRequires: git
-%description -n python3-%{library}
-Dictdiffer is a module that helps you to diff and patch dictionaries
-%endif
-
-#recommonmark not available for docs in EPEL
-%if 0%{?fedora}
+%if %{with doc}
 %package doc
-Summary: Documentation for %{name}.
-%if 0%{?with_python3}
-BuildRequires: python3-sphinx
-BuildRequires: python3-recommonmark
-%else
-BuildRequires: python2-sphinx
-BuildRequires: python2-recommonmark
-%endif
+Summary: Documentation for %{name}
+
 %description doc
-%{summary}
+%{summary}.
 %endif
 
-%description
-Dictdiffer is a module that helps you to diff and patch dictionaries
 
 %prep
-%autosetup -n %{library}-%{version} -S git
-# EL7 lacks python2-pytest-runner
-%if 0%{?rhel} < 8
-sed -i -e /pytest-runner/d setup.py
-%endif
+%autosetup -n dictdiffer-%{version}
 
-%if 0%{?rhel} >= 10
-sed -i -e /pytest-runner/d setup.py
-%endif
 
-%if 0%{?rhel} < 10
-sed -i 's/setuptools_scm>=3.1.0/setuptools_scm>=1.15.7/' setup.py
-%endif
+%generate_buildrequires
+export SETUPTOOLS_SCM_PRETEND_VERSION='%{version}'
+%pyproject_buildrequires -x numpy %{?with_doc:-x docs}
 
-sed -i 's/tox>=3.7.0/tox>=3.4.0/' setup.py
-sed -Ei '/--(pydocstyle|pycodestyle)/d' pytest.ini
-
-# python-check-manifest package does not exist
-sed -i -e /check-manifest/d setup.py
 
 %build
-%if 0%{?with_python2}
-%py2_build
-%endif
+export SETUPTOOLS_SCM_PRETEND_VERSION='%{version}'
+%pyproject_wheel
 
-%if 0%{?with_python3}
-%py3_build
-%endif
 
 %install
-%if 0%{?with_python2}
-%py2_install
+%pyproject_install
+%pyproject_save_files -l dictdiffer
+
+%if %{with doc}
+PYTHONPATH='%{buildroot}%{python3_sitelib}' sphinx-build docs/ html
+rm -rf html/.buildinfo html/.doctrees
 %endif
 
-%if 0%{?with_python3}
-%py3_install
-%endif
-
-%if 0%{?fedora}
-PYTHONPATH=%{buildroot}/%{python3_sitelib} sphinx-build docs/ html
-%{__rm} -rf html/.buildinfo
-%{__rm} -rf html/.doctrees
-%endif
 
 %check
-#epel is missing deps for checks
-%if 0%{?fedora}
-#python3-pytest-pep8 seems to be missing in F32 at the moment
+%pyproject_check_import
 
-%if 0%{?with_python2}
-%{__python2} setup.py test
-%endif
+# Since this project does not use src layout, we must make sure pytest does not
+# see both the “local” module and the one installed in the buildroot. The
+# easiest thing to do is to explicitly test the local copy rather than the
+# installed one by setting PYTHONPATH.
+PYTHONPATH="${PWD}" %pytest
 
-%if 0%{?with_python3}
-%pytest
-%endif
 
-%endif
+%files -n python3-dictdiffer -f %{pyproject_files}
 
-%if 0%{?with_python2}
-%files -n python2-%{library}
-%license LICENSE
-%{python2_sitelib}/%{library}/*
-%{python2_sitelib}/%{library}-*.egg-info
-%endif
 
-%if 0%{?with_python3}
-%files -n python3-%{library}
-%license LICENSE
-%{python3_sitelib}/%{library}/*
-%{python3_sitelib}/%{library}-*.egg-info
-%endif
-
-%if 0%{?fedora}
+%if %{with doc}
 %files doc
 %license LICENSE
-%doc html
+%doc html/
 %endif
 
+
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Jan 11 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 0.9.0-18
+- Port to pyproject-rpm-macros, diverge from EPEL8; fixes RHBZ#2377624
+- Drop -doc subpackage starting with F44
+- Add metapackage for numpy extra
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.9.0-17
 - Rebuilt for Python 3.14.0rc3 bytecode
 
@@ -202,9 +128,9 @@ PYTHONPATH=%{buildroot}/%{python3_sitelib} sphinx-build docs/ html
 * Sat Jan 18 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Web Aug 14 2024 Jason Montleon <jmontleo@redhat.com> - 0.9.0-12
+* Wed Aug 14 2024 Jason Montleon <jmontleo@redhat.com> - 0.9.0-12
 - Enable tests again
-- Switch to using %pytest
+- Switch to using %%pytest
 - Disable code and doc style tests
 
 * Fri Jul 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.0-11

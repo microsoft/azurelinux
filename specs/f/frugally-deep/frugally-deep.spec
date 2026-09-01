@@ -1,6 +1,28 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+#
+# Copyright Fedora Project Authors.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
 # For testing
 # Depends on downloading and being in a git repo
 %bcond_with test
@@ -14,7 +36,7 @@ License:        MIT
 # Main license is MIT
 # BSD-2-Clause is only for cmake/HunterGate.cmake and that is not distributed
 Version:        0.15.30
-Release: 12%{?dist}
+Release:        11%{?dist}
 
 URL:            https://github.com/Dobiasd/frugally-deep
 Source0:        %{url}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -121,6 +143,12 @@ sed -i -e 's@cmake_minimum_required(VERSION 3.2)@cmake_minimum_required(VERSION 
 %_libdir/cmake/%{name}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.30-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Aug 27 2025 Tom Rix <Tom.Rix@amd.com> - 0.15.30-10
+- Add Fedora copyright
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.30-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

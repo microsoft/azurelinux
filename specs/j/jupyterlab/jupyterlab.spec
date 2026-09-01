@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 5;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -16,7 +16,7 @@
 %undefine _py3_shebang_s
 
 Name:           jupyterlab
-Version:        4.4.10
+Version:        4.5.3
 Release:        %autorelease
 Summary:        JupyterLab computational environment
 # JupyterLab itself is BSD-3-Clause and
@@ -59,7 +59,7 @@ Source1:        jupyterlab.metainfo.xml
 BuildArch:      noarch
 BuildRequires:  python3-devel
 # Needed for tests
-BuildRequires:  nodejs
+BuildRequires:  nodejs, /usr/bin/node
 BuildRequires:  npm
 # For validating desktop entry and appdata
 BuildRequires:  desktop-file-utils
@@ -88,134 +88,136 @@ Provides:        bundled(npm(@chevrotain/cst-dts-gen)) = 11.0.3
 Provides:        bundled(npm(@chevrotain/gast)) = 11.0.3
 Provides:        bundled(npm(@chevrotain/regexp-to-ast)) = 11.0.3
 Provides:        bundled(npm(@chevrotain/utils)) = 11.0.3
-Provides:        bundled(npm(@codemirror/autocomplete)) = 6.18.6
-Provides:        bundled(npm(@codemirror/commands)) = 6.8.1
-Provides:        bundled(npm(@codemirror/lang-cpp)) = 6.0.2
+Provides:        bundled(npm(@codemirror/autocomplete)) = 6.20.0
+Provides:        bundled(npm(@codemirror/commands)) = 6.10.1
+Provides:        bundled(npm(@codemirror/lang-cpp)) = 6.0.3
 Provides:        bundled(npm(@codemirror/lang-css)) = 6.3.1
-Provides:        bundled(npm(@codemirror/lang-html)) = 6.4.9
-Provides:        bundled(npm(@codemirror/lang-java)) = 6.0.1
-Provides:        bundled(npm(@codemirror/lang-javascript)) = 6.2.3
-Provides:        bundled(npm(@codemirror/lang-json)) = 6.0.1
-Provides:        bundled(npm(@codemirror/lang-markdown)) = 6.3.2
-Provides:        bundled(npm(@codemirror/lang-php)) = 6.0.1
-Provides:        bundled(npm(@codemirror/lang-python)) = 6.2.0
-Provides:        bundled(npm(@codemirror/lang-rust)) = 6.0.1
-Provides:        bundled(npm(@codemirror/lang-sql)) = 6.8.0
+Provides:        bundled(npm(@codemirror/lang-html)) = 6.4.11
+Provides:        bundled(npm(@codemirror/lang-java)) = 6.0.2
+Provides:        bundled(npm(@codemirror/lang-javascript)) = 6.2.4
+Provides:        bundled(npm(@codemirror/lang-json)) = 6.0.2
+Provides:        bundled(npm(@codemirror/lang-markdown)) = 6.5.0
+Provides:        bundled(npm(@codemirror/lang-php)) = 6.0.2
+Provides:        bundled(npm(@codemirror/lang-python)) = 6.2.1
+Provides:        bundled(npm(@codemirror/lang-rust)) = 6.0.2
+Provides:        bundled(npm(@codemirror/lang-sql)) = 6.10.0
 Provides:        bundled(npm(@codemirror/lang-wast)) = 6.0.2
 Provides:        bundled(npm(@codemirror/lang-xml)) = 6.1.0
-Provides:        bundled(npm(@codemirror/language)) = 6.11.0
-Provides:        bundled(npm(@codemirror/legacy-modes)) = 6.5.1
-Provides:        bundled(npm(@codemirror/search)) = 6.5.10
-Provides:        bundled(npm(@codemirror/state)) = 6.5.2
-Provides:        bundled(npm(@codemirror/view)) = 6.38.1
+Provides:        bundled(npm(@codemirror/language)) = 6.12.1
+Provides:        bundled(npm(@codemirror/legacy-modes)) = 6.5.2
+Provides:        bundled(npm(@codemirror/search)) = 6.6.0
+Provides:        bundled(npm(@codemirror/state)) = 6.5.4
+Provides:        bundled(npm(@codemirror/view)) = 6.39.11
 Provides:        bundled(npm(@fortawesome/fontawesome-free)) = 5.15.4
-Provides:        bundled(npm(@iconify/utils)) = 2.3.0
+Provides:        bundled(npm(@iconify/utils)) = 3.0.2
 Provides:        bundled(npm(@jupyter/react-components)) = 0.16.6
 Provides:        bundled(npm(@jupyter/web-components)) = 0.16.6
 Provides:        bundled(npm(@jupyter/ydoc)) = 3.1.0
-Provides:        bundled(npm(@jupyterlab/application)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/application-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/apputils)) = 4.5.9
-Provides:        bundled(npm(@jupyterlab/apputils-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/attachments)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/cell-toolbar)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/cell-toolbar-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/cells)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/celltags-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/codeeditor)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/codemirror)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/codemirror-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/completer)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/completer-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/console)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/console-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/coreutils)) = 6.4.9
-Provides:        bundled(npm(@jupyterlab/csvviewer)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/csvviewer-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/debugger)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/debugger-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/docmanager)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/docmanager-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/docregistry)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/documentsearch)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/documentsearch-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/extensionmanager)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/extensionmanager-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/filebrowser)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/filebrowser-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/fileeditor)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/fileeditor-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/help-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/htmlviewer)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/htmlviewer-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/hub-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/imageviewer)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/imageviewer-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/inspector)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/inspector-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/javascript-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/json-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/launcher)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/launcher-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/logconsole)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/logconsole-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/lsp)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/lsp-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/mainmenu)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/mainmenu-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/markdownviewer)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/markdownviewer-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/markedparser-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/mathjax-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/mermaid)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/mermaid-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/metadataform)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/metadataform-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/nbformat)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/notebook)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/notebook-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/observables)) = 5.4.9
-Provides:        bundled(npm(@jupyterlab/outputarea)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/pdf-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/pluginmanager)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/pluginmanager-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/property-inspector)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/rendermime)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/rendermime-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/rendermime-interfaces)) = 3.12.9
-Provides:        bundled(npm(@jupyterlab/running)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/running-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/services)) = 7.4.9
-Provides:        bundled(npm(@jupyterlab/services-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/settingeditor)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/settingeditor-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/settingregistry)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/shortcuts-extension)) = 5.2.9
-Provides:        bundled(npm(@jupyterlab/statedb)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/statusbar)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/statusbar-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/terminal)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/terminal-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/theme-dark-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/theme-dark-high-contrast-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/theme-light-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/toc)) = 6.4.9
-Provides:        bundled(npm(@jupyterlab/toc-extension)) = 6.4.9
-Provides:        bundled(npm(@jupyterlab/tooltip)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/tooltip-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/translation)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/translation-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/ui-components)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/ui-components-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/vega5-extension)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/workspaces)) = 4.4.9
-Provides:        bundled(npm(@jupyterlab/workspaces-extension)) = 4.4.9
-Provides:        bundled(npm(@lezer/common)) = 1.2.1
+Provides:        bundled(npm(@jupyterlab/application)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/application-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/apputils)) = 4.6.3
+Provides:        bundled(npm(@jupyterlab/apputils-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/attachments)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/audio-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/cell-toolbar)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/cell-toolbar-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/cells)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/celltags-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/codeeditor)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/codemirror)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/codemirror-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/completer)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/completer-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/console)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/console-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/coreutils)) = 6.5.3
+Provides:        bundled(npm(@jupyterlab/csvviewer)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/csvviewer-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/debugger)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/debugger-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/docmanager)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/docmanager-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/docregistry)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/documentsearch)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/documentsearch-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/extensionmanager)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/extensionmanager-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/filebrowser)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/filebrowser-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/fileeditor)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/fileeditor-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/help-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/htmlviewer)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/htmlviewer-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/hub-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/imageviewer)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/imageviewer-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/inspector)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/inspector-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/javascript-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/json-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/launcher)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/launcher-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/logconsole)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/logconsole-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/lsp)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/lsp-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/mainmenu)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/mainmenu-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/markdownviewer)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/markdownviewer-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/markedparser-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/mathjax-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/mermaid)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/mermaid-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/metadataform)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/metadataform-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/nbformat)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/notebook)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/notebook-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/observables)) = 5.5.3
+Provides:        bundled(npm(@jupyterlab/outputarea)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/pdf-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/pluginmanager)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/pluginmanager-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/property-inspector)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/rendermime)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/rendermime-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/rendermime-interfaces)) = 3.13.3
+Provides:        bundled(npm(@jupyterlab/running)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/running-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/services)) = 7.5.3
+Provides:        bundled(npm(@jupyterlab/services-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/settingeditor)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/settingeditor-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/settingregistry)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/shortcuts-extension)) = 5.3.3
+Provides:        bundled(npm(@jupyterlab/statedb)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/statusbar)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/statusbar-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/terminal)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/terminal-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/theme-dark-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/theme-dark-high-contrast-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/theme-light-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/toc)) = 6.5.3
+Provides:        bundled(npm(@jupyterlab/toc-extension)) = 6.5.3
+Provides:        bundled(npm(@jupyterlab/tooltip)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/tooltip-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/translation)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/translation-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/ui-components)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/ui-components-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/vega5-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/video-extension)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/workspaces)) = 4.5.3
+Provides:        bundled(npm(@jupyterlab/workspaces-extension)) = 4.5.3
+Provides:        bundled(npm(@lezer/common)) = 1.5.0
 Provides:        bundled(npm(@lezer/cpp)) = 1.1.0
 Provides:        bundled(npm(@lezer/css)) = 1.1.9
 Provides:        bundled(npm(@lezer/generator)) = 1.7.0
 Provides:        bundled(npm(@lezer/highlight)) = 1.2.1
-Provides:        bundled(npm(@lezer/html)) = 1.3.3
+Provides:        bundled(npm(@lezer/html)) = 1.3.13
 Provides:        bundled(npm(@lezer/java)) = 1.0.3
 Provides:        bundled(npm(@lezer/javascript)) = 1.4.1
 Provides:        bundled(npm(@lezer/json)) = 1.0.0
@@ -225,25 +227,25 @@ Provides:        bundled(npm(@lezer/php)) = 1.0.1
 Provides:        bundled(npm(@lezer/python)) = 1.1.14
 Provides:        bundled(npm(@lezer/rust)) = 1.0.0
 Provides:        bundled(npm(@lezer/xml)) = 1.0.1
-Provides:        bundled(npm(@lumino/algorithm)) = 2.0.3
-Provides:        bundled(npm(@lumino/application)) = 2.4.4
-Provides:        bundled(npm(@lumino/collections)) = 2.0.3
-Provides:        bundled(npm(@lumino/commands)) = 2.3.2
-Provides:        bundled(npm(@lumino/coreutils)) = 2.2.1
-Provides:        bundled(npm(@lumino/datagrid)) = 2.5.2
-Provides:        bundled(npm(@lumino/disposable)) = 2.1.4
-Provides:        bundled(npm(@lumino/domutils)) = 2.0.3
-Provides:        bundled(npm(@lumino/dragdrop)) = 2.1.6
-Provides:        bundled(npm(@lumino/keyboard)) = 2.0.3
-Provides:        bundled(npm(@lumino/messaging)) = 2.0.3
-Provides:        bundled(npm(@lumino/polling)) = 2.1.4
-Provides:        bundled(npm(@lumino/properties)) = 2.0.3
-Provides:        bundled(npm(@lumino/signaling)) = 2.1.4
-Provides:        bundled(npm(@lumino/virtualdom)) = 2.0.3
-Provides:        bundled(npm(@lumino/widgets)) = 2.7.1
+Provides:        bundled(npm(@lumino/algorithm)) = 2.0.4
+Provides:        bundled(npm(@lumino/application)) = 2.4.6
+Provides:        bundled(npm(@lumino/collections)) = 2.0.4
+Provides:        bundled(npm(@lumino/commands)) = 2.3.3
+Provides:        bundled(npm(@lumino/coreutils)) = 2.2.2
+Provides:        bundled(npm(@lumino/datagrid)) = 2.5.4
+Provides:        bundled(npm(@lumino/disposable)) = 2.1.5
+Provides:        bundled(npm(@lumino/domutils)) = 2.0.4
+Provides:        bundled(npm(@lumino/dragdrop)) = 2.1.7
+Provides:        bundled(npm(@lumino/keyboard)) = 2.0.4
+Provides:        bundled(npm(@lumino/messaging)) = 2.0.4
+Provides:        bundled(npm(@lumino/polling)) = 2.1.5
+Provides:        bundled(npm(@lumino/properties)) = 2.0.4
+Provides:        bundled(npm(@lumino/signaling)) = 2.1.5
+Provides:        bundled(npm(@lumino/virtualdom)) = 2.0.4
+Provides:        bundled(npm(@lumino/widgets)) = 2.7.3
 Provides:        bundled(npm(@marijn/find-cluster-break)) = 1.0.2
-Provides:        bundled(npm(@mermaid-js/layout-elk)) = 0.1.9
-Provides:        bundled(npm(@mermaid-js/parser)) = 0.6.2
+Provides:        bundled(npm(@mermaid-js/layout-elk)) = 0.2.0
+Provides:        bundled(npm(@mermaid-js/parser)) = 0.6.3
 Provides:        bundled(npm(@microsoft/fast-colors)) = 5.3.1
 Provides:        bundled(npm(@microsoft/fast-element)) = 1.12.0
 Provides:        bundled(npm(@microsoft/fast-foundation)) = 2.49.4
@@ -253,6 +255,7 @@ Provides:        bundled(npm(@rjsf/utils)) = 5.14.3
 Provides:        bundled(npm(@rjsf/validator-ajv8)) = 5.14.3
 Provides:        bundled(npm(@xterm/addon-canvas)) = 0.7.0
 Provides:        bundled(npm(@xterm/addon-fit)) = 0.10.0
+Provides:        bundled(npm(@xterm/addon-search)) = 0.15.0
 Provides:        bundled(npm(@xterm/addon-web-links)) = 0.11.0
 Provides:        bundled(npm(@xterm/addon-webgl)) = 0.18.0
 Provides:        bundled(npm(@xterm/xterm)) = 5.5.0
@@ -264,9 +267,9 @@ Provides:        bundled(npm(chevrotain-allstar)) = 0.3.1
 Provides:        bundled(npm(clone)) = 2.1.2
 Provides:        bundled(npm(clsx)) = 1.2.1
 Provides:        bundled(npm(color)) = 3.2.1
-Provides:        bundled(npm(color-convert)) = 1.9.3
-Provides:        bundled(npm(color-name)) = 1.1.3
-Provides:        bundled(npm(color-string)) = 1.9.1
+Provides:        bundled(npm(color-convert)) = 3.1.0
+Provides:        bundled(npm(color-name)) = 2.0.0
+Provides:        bundled(npm(color-string)) = 2.0.1
 Provides:        bundled(npm(compute-gcd)) = 1.2.1
 Provides:        bundled(npm(compute-lcm)) = 1.1.2
 Provides:        bundled(npm(cose-base)) = 1.0.3
@@ -302,8 +305,8 @@ Provides:        bundled(npm(d3-time-format)) = 4.1.0
 Provides:        bundled(npm(d3-timer)) = 3.0.1
 Provides:        bundled(npm(d3-transition)) = 3.0.1
 Provides:        bundled(npm(d3-zoom)) = 3.0.0
-Provides:        bundled(npm(dagre-d3-es)) = 7.0.11
-Provides:        bundled(npm(dayjs)) = 1.11.13
+Provides:        bundled(npm(dagre-d3-es)) = 7.0.13
+Provides:        bundled(npm(dayjs)) = 1.11.18
 Provides:        bundled(npm(deepmerge)) = 4.3.0
 Provides:        bundled(npm(delaunator)) = 5.0.0
 Provides:        bundled(npm(dom-serializer)) = 2.0.0
@@ -343,11 +346,11 @@ Provides:        bundled(npm(lodash.curry)) = 4.1.1
 Provides:        bundled(npm(lodash.escape)) = 4.0.1
 Provides:        bundled(npm(lodash.mergewith)) = 4.6.2
 Provides:        bundled(npm(markdown-to-jsx)) = 7.5.0
-Provides:        bundled(npm(marked)) = 16.2.0
+Provides:        bundled(npm(marked)) = 16.4.1
 Provides:        bundled(npm(marked-gfm-heading-id)) = 4.1.2
 Provides:        bundled(npm(marked-mangle)) = 1.1.11
 Provides:        bundled(npm(mathjax-full)) = 3.2.2
-Provides:        bundled(npm(mermaid)) = 11.10.0
+Provides:        bundled(npm(mermaid)) = 11.12.1
 Provides:        bundled(npm(mhchemparser)) = 4.1.1
 Provides:        bundled(npm(minimist)) = 1.2.8
 Provides:        bundled(npm(nanoid)) = 3.3.8
@@ -383,6 +386,7 @@ Provides:        bundled(npm(ts-dedent)) = 2.2.0
 Provides:        bundled(npm(tslib)) = 1.14.1
 Provides:        bundled(npm(typestyle)) = 2.4.0
 Provides:        bundled(npm(url-parse)) = 1.5.10
+Provides:        bundled(npm(uuid)) = 11.1.0
 Provides:        bundled(npm(validate.io-array)) = 1.0.6
 Provides:        bundled(npm(validate.io-function)) = 1.0.2
 Provides:        bundled(npm(validate.io-integer)) = 1.0.5
@@ -395,7 +399,7 @@ Provides:        bundled(npm(vega-dataflow)) = 5.7.7
 Provides:        bundled(npm(vega-embed)) = 6.21.3
 Provides:        bundled(npm(vega-encode)) = 4.10.2
 Provides:        bundled(npm(vega-event-selector)) = 3.0.1
-Provides:        bundled(npm(vega-expression)) = 5.2.0
+Provides:        bundled(npm(vega-expression)) = 5.2.1
 Provides:        bundled(npm(vega-force)) = 4.2.2
 Provides:        bundled(npm(vega-format)) = 1.1.3
 Provides:        bundled(npm(vega-functions)) = 5.18.0
@@ -412,13 +416,13 @@ Provides:        bundled(npm(vega-runtime)) = 6.2.1
 Provides:        bundled(npm(vega-scale)) = 7.4.2
 Provides:        bundled(npm(vega-scenegraph)) = 4.13.1
 Provides:        bundled(npm(vega-schema-url-parser)) = 2.2.0
-Provides:        bundled(npm(vega-selections)) = 5.6.0
+Provides:        bundled(npm(vega-selections)) = 5.6.3
 Provides:        bundled(npm(vega-statistics)) = 1.9.0
 Provides:        bundled(npm(vega-themes)) = 2.12.1
 Provides:        bundled(npm(vega-time)) = 2.1.3
 Provides:        bundled(npm(vega-tooltip)) = 0.30.1
 Provides:        bundled(npm(vega-transforms)) = 4.12.1
-Provides:        bundled(npm(vega-util)) = 1.17.3
+Provides:        bundled(npm(vega-util)) = 1.17.4
 Provides:        bundled(npm(vega-view)) = 5.16.0
 Provides:        bundled(npm(vega-view-transforms)) = 4.6.1
 Provides:        bundled(npm(vega-voronoi)) = 4.2.4
@@ -528,14 +532,26 @@ grep -E '!#.+node' $(find %{buildroot} -type f -executable) && exit 1 || true
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.4.10-5
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 4.5.3-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.4.10-4
-- build: mass rebuild auto-bumpable components
+* Fri Jan 30 2026 Jan Staněk <jstanek@redhat.com> - 4.5.3-2
+- Update BR for nodejs
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 4.4.10-3
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Fri Jan 23 2026 Lumir Balhar <lbalhar@redhat.com> - 4.5.3-1
+- Update to 4.5.3 (rhbz#2432406)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.5.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Lumir Balhar <lbalhar@redhat.com> - 4.5.2-1
+- Update to 4.5.2 (rhbz#2428671)
+
+* Tue Dec 16 2025 Lumir Balhar <lbalhar@redhat.com> - 4.5.1-1
+- Update to 4.5.1 (rhbz#2422338)
+
+* Tue Nov 18 2025 Lumir Balhar <lbalhar@redhat.com> - 4.5.0-1
+- Update to 4.5.0 (rhbz#2415642)
 
 * Thu Oct 30 2025 Lumir Balhar <lbalhar@redhat.com> - 4.4.10-2
 - Do not provide /usr/bin/jupyter-labhub

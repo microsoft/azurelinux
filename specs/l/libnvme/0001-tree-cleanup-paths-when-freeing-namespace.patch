@@ -1,0 +1,40 @@
+diff --git a/src/nvme/tree.c b/src/nvme/tree.c
+index bc83648..98822d0 100644
+--- a/src/nvme/tree.c
++++ b/src/nvme/tree.c
+@@ -632,11 +632,18 @@ nvme_path_t nvme_namespace_next_path(nvme_ns_t ns, nvme_path_t p)
+ 
+ static void __nvme_free_ns(struct nvme_ns *n)
+ {
++	struct nvme_path *p, *_p;
++
+ 	list_del_init(&n->entry);
+ 	nvme_ns_release_fd(n);
+ 	free(n->generic_name);
+ 	free(n->name);
+ 	free(n->sysfs_dir);
++	nvme_namespace_for_each_path_safe(n, p, _p) {
++		list_del_init(&p->nentry);
++		p->n = NULL;
++	}
++	list_head_init(&n->head->paths);
+ 	free(n->head->sysfs_dir);
+ 	free(n->head);
+ 	free(n);
+@@ -3033,16 +3040,8 @@ static int nvme_subsystem_scan_namespace(nvme_root_t r, nvme_subsystem_t s,
+ 		return -1;
+ 	}
+ 	nvme_subsystem_for_each_ns_safe(s, _n, __n) {
+-		struct nvme_path *p, *_p;
+-
+ 		if (strcmp(n->name, _n->name))
+ 			continue;
+-		/* Detach paths */
+-		nvme_namespace_for_each_path_safe(_n, p, _p) {
+-			list_del_init(&p->nentry);
+-			p->n = NULL;
+-		}
+-		list_head_init(&_n->head->paths);
+ 		__nvme_free_ns(_n);
+ 	}
+ 	n->s = s;

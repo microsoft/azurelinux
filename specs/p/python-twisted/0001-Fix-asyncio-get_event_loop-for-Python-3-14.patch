@@ -1,0 +1,36 @@
+From c8a4c700a71c283bd65faee69820f88ec97966cb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mark=C3=A9ta=20Cal=C3=A1bkov=C3=A1?=
+ <meggy.calabkova@gmail.com>
+Date: Fri, 26 Sep 2025 14:37:57 +0200
+Subject: [PATCH] fix `asyncio.get_event_loop` call on Python 3.14
+
+---
+ src/twisted/internet/asyncioreactor.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/twisted/internet/asyncioreactor.py b/src/twisted/internet/asyncioreactor.py
+index cd1cf65f05d..bc5324180ca 100644
+--- a/src/twisted/internet/asyncioreactor.py
++++ b/src/twisted/internet/asyncioreactor.py
+@@ -9,7 +9,7 @@
+ 
+ import errno
+ import sys
+-from asyncio import AbstractEventLoop, get_event_loop
++from asyncio import AbstractEventLoop, get_running_loop, new_event_loop, set_event_loop
+ from typing import Dict, Optional, Type
+ 
+ from zope.interface import implementer
+@@ -47,7 +47,11 @@ class AsyncioSelectorReactor(PosixReactorBase):
+ 
+     def __init__(self, eventloop: Optional[AbstractEventLoop] = None):
+         if eventloop is None:
+-            _eventloop: AbstractEventLoop = get_event_loop()
++            try:
++                _eventloop: AbstractEventLoop = get_running_loop()
++            except RuntimeError:
++                _eventloop: AbstractEventLoop = new_event_loop()
++            set_event_loop(_eventloop)
+         else:
+             _eventloop = eventloop
+ 

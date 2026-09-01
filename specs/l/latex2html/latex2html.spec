@@ -1,12 +1,16 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%if 0%{?fedora}
 %define enable_japanese 1
+%else
+%define enable_japanese 0
+%endif
 
 Summary: Converts LaTeX documents to HTML
 Name: latex2html
-Version: 2023.2
-Release: 11%{?dist}
+Version: 2026
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 URL: https://github.com/latex2html/latex2html/releases
 # main latex2html source
@@ -15,7 +19,7 @@ Source1: cfgcache.pm
 Source2: %{name}-manpages.tar.gz
 # support for Japanese
 # http://takeno.iee.niit.ac.jp/~shige/TeX/latex2html/
-Source3: http://takeno.iee.niit.ac.jp/~shige/TeX/latex2html/data2/l2h-2023-jp3.2b1.37.tar.gz
+Source3: http://takeno.iee.niit.ac.jp/~shige/TeX/latex2html/data2/l2h-2026-jp3.2b1.43.tar.gz
 Patch1: latex2html-2018.2-teTeX-l2h-config.patch
 Patch2: latex2html-2002-2-1-SHLIB.patch
 Requires: tex(latex), tex(dvips), tex(url.sty), tex(preview.sty), netpbm-progs, poppler-utils
@@ -221,6 +225,12 @@ make -C %{name}-%{version}JA check
 %{_mandir}/man1/pstoimg.*
 
 %changelog
+* Tue Jun 09 2026 Than Ngo <than@redhat.com> - 2026-1
+- Update to 2026
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2023.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2023.2-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

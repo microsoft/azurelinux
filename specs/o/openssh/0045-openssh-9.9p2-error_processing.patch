@@ -1,0 +1,25 @@
+From edbbdc306c1710dae777ef315a0d2c5f43134d33 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Fri, 16 May 2025 14:53:54 +0200
+Subject: [PATCH 45/53] openssh-9.9p2-error_processing
+
+---
+ ssh-agent.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/ssh-agent.c b/ssh-agent.c
+index df241379c..dc246066d 100644
+--- a/ssh-agent.c
++++ b/ssh-agent.c
+@@ -1346,6 +1346,8 @@ process_add_identity(SocketEntry *e)
+ 	if ((r = sshkey_private_deserialize(e->request, &k)) != 0 ||
+ 	    k == NULL ||
+ 	    (r = sshbuf_get_cstring(e->request, &comment, NULL)) != 0) {
++		if (!r) /* k == NULL */
++			r = SSH_ERR_INTERNAL_ERROR;
+ 		error_fr(r, "parse");
+ 		goto out;
+ 	}
+-- 
+2.52.0
+

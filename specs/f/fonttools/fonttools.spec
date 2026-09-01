@@ -16,8 +16,10 @@
 %bcond repacker_extra %[ 0%{?fedora} > 41 ]
 # Requires python-sympy (not yet in any EPEL):
 %bcond symfont_extra %{undefined rhel}
-# Requires python-fs:
+# Required python-fs till 4.58.0 release
 %bcond ufo_extra %[ %{undefined rhel} || %{defined epel} ]
+# Requires python-unicodedata2 (depending on python version):
+%bcond unicode_extra %[ %{undefined rhel} || %{defined epel} ]
 # Requires python-brotli, python-zopfli:
 %bcond woff_extra %[ %{undefined rhel} || %{defined epel} ]
 # Requires scipy, munkres, pycairo
@@ -31,8 +33,8 @@ an XML text format, which is also called TTX. It supports TrueType, OpenType,
 AFM and to an extent Type 1 and some Mac-specific formats.}
 
 Name:           fonttools
-Version:        4.61.0
-Release: 4%{?dist}
+Version:        4.62.1
+Release:        1%{?dist}
 Summary:        Tools to manipulate font files
 
 # https://spdx.org/licenses/MIT.html
@@ -113,7 +115,9 @@ Obsoletes: python3-ufolib <= 2.1.1-11
 %if %{with ufo_extra}
 %pyproject_extras_subpkg -n python3-fonttools ufo
 %endif
+%if %{with unicode_extra}
 %pyproject_extras_subpkg -n python3-fonttools unicode
+%endif
 %if %{with woff_extra}
 %pyproject_extras_subpkg -n python3-fonttools woff
 %endif
@@ -139,7 +143,7 @@ export FONTTOOLS_WITH_CYTHON=1
     %{?with_symfont_extra:-x symfont} \
     -x type1 \
     %{?with_ufo_extra:-x ufo} \
-    -x unicode \
+    %{?with_unicode_extra:-x unicode} \
     %{?with_woff_extra:-x woff} \
     }
 
@@ -200,6 +204,21 @@ k="${k-}${k+ and }not (test_ttcompile_timestamp_calcs)"
 %doc NEWS.rst README.rst
 
 %changelog
+* Tue Mar 17 2026 Parag Nemade <pnemade AT redhat DOT com> - 4.62.1-1
+- Update to 4.62.1 version (#2447357)
+
+* Tue Mar 10 2026 Parag Nemade <pnemade AT redhat DOT com> - 4.62.0-1
+- Update to 4.62.0 version (#2445798)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.61.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 16 2025 Parag Nemade <pnemade AT redhat DOT com> - 4.61.1-1
+- Update to 4.61.1 version (#2421833)
+
+* Wed Dec 10 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 4.61.0-2
+- Conditionalize unicode extra
+
 * Tue Dec 09 2025 Parag Nemade <pnemade AT redhat DOT com> - 4.61.0-1
 - Update to 4.61.0 version (#2419183)
 

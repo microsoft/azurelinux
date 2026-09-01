@@ -1,0 +1,135 @@
+diff --git a/src/lib/asiodns/io_fetch.cc b/src/lib/asiodns/io_fetch.cc
+index c140676..24b1761 100644
+--- a/src/lib/asiodns/io_fetch.cc
++++ b/src/lib/asiodns/io_fetch.cc
+@@ -25,6 +25,7 @@
+ #include <boost/scoped_ptr.hpp>
+ #include <boost/date_time/posix_time/posix_time_types.hpp>
+ 
++#include <chrono>
+ #include <functional>
+ #include <unistd.h>             // for some IPC/network system calls
+ #include <netinet/in.h>
+@@ -67,7 +68,7 @@ struct IOFetchData : boost::noncopyable {
+     OutputBufferPtr               msgbuf;            // Wire buffer for question
+     OutputBufferPtr               received;          // Received data put here
+     IOFetch::Callback*            callback;          // Called on I/O Completion
+-    boost::asio::deadline_timer   timer;             // Timer to measure timeouts
++    boost::asio::system_timer     timer;             // Timer to measure timeouts
+     IOFetch::Protocol             protocol;          // Protocol being used
+     size_t                        cumulative;        // Cumulative received amount
+     size_t                        expected;          // Expected amount of data
+@@ -227,7 +228,7 @@ IOFetch::operator()(boost::system::error_code ec, size_t length) {
+         // If we timeout, we stop, which cancels outstanding I/O operations and
+         // shuts down everything.
+         if (data_->timeout != -1) {
+-            data_->timer.expires_from_now(boost::posix_time::milliseconds(
++            data_->timer.expires_after(std::chrono::milliseconds(
+                 data_->timeout));
+             data_->timer.async_wait(std::bind(&IOFetch::stop, *this,
+                 TIME_OUT));
+diff --git a/src/lib/asiodns/io_fetch.h b/src/lib/asiodns/io_fetch.h
+index 6fcbb78..46e6255 100644
+--- a/src/lib/asiodns/io_fetch.h
++++ b/src/lib/asiodns/io_fetch.h
+@@ -16,6 +16,7 @@
+ #include <util/buffer.h>
+ 
+ #include <boost/asio/coroutine.hpp>
++#include <boost/asio/system_timer.hpp>
+ #include <boost/shared_array.hpp>
+ #include <boost/shared_ptr.hpp>
+ #include <boost/date_time/posix_time/posix_time_types.hpp>
+diff --git a/src/lib/asiodns/tests/io_fetch_unittest.cc b/src/lib/asiodns/tests/io_fetch_unittest.cc
+index 7b4cd05..045678f 100644
+--- a/src/lib/asiodns/tests/io_fetch_unittest.cc
++++ b/src/lib/asiodns/tests/io_fetch_unittest.cc
+@@ -23,6 +23,7 @@
+ #include <boost/date_time/posix_time/posix_time_types.hpp>
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <cstdlib>
+ #include <functional>
+ #include <string>
+@@ -66,7 +67,7 @@ public:
+     IOFetch                          tcp_fetch_;                ///< For TCP query test
+     IOFetch::Protocol                protocol_;                 ///< Protocol being tested
+     size_t                           cumulative_;               ///< Cumulative data received by "server".
+-    deadline_timer                   timer_;                    ///< Timer to measure timeouts
++    system_timer                     timer_;                    ///< Timer to measure timeouts
+ 
+     // The next member is the buffer in which the "server" (implemented by the
+     // response handler methods in this class) receives the question sent by the
+@@ -431,7 +432,7 @@ public:
+             // tcpSendData, which will then send the next chunk.  We pass the
+             // socket over which data should be sent as an argument to that
+             // function.
+-            timer_.expires_from_now(boost::posix_time::milliseconds(SEND_INTERVAL));
++            timer_.expires_after(std::chrono::milliseconds(SEND_INTERVAL));
+             timer_.async_wait(std::bind(&IOFetchTest::tcpSendData, this,
+                                         socket));
+         }
+diff --git a/src/lib/asiolink/interval_timer.cc b/src/lib/asiolink/interval_timer.cc
+index fa0d9e1..4c5902b 100644
+--- a/src/lib/asiolink/interval_timer.cc
++++ b/src/lib/asiolink/interval_timer.cc
+@@ -16,6 +16,7 @@
+ #include <exceptions/exceptions.h>
+ 
+ #include <atomic>
++#include <chrono>
+ #include <functional>
+ #include <mutex>
+ 
+@@ -88,7 +89,7 @@ private:
+     IOServicePtr io_service_;
+ 
+     /// @brief The asio timer.
+-    boost::asio::deadline_timer timer_;
++    boost::asio::system_timer timer_;
+ 
+     /// @brief Controls how the timer behaves after expiration.
+     IntervalTimer::Mode mode_;
+@@ -141,7 +142,7 @@ void
+ IntervalTimerImpl::update() {
+     try {
+         // Update expire time to (current time + interval_).
+-        timer_.expires_from_now(boost::posix_time::millisec(long(interval_)));
++        timer_.expires_after(std::chrono::milliseconds(interval_));
+         // Reset timer.
+         // Pass a function bound with a shared_ptr to this.
+         timer_.async_wait(std::bind(&IntervalTimerImpl::callback,
+diff --git a/src/lib/asiolink/interval_timer.h b/src/lib/asiolink/interval_timer.h
+index 0b1c10c..8b7e457 100644
+--- a/src/lib/asiolink/interval_timer.h
++++ b/src/lib/asiolink/interval_timer.h
+@@ -7,6 +7,7 @@
+ #ifndef ASIOLINK_INTERVAL_TIMER_H
+ #define ASIOLINK_INTERVAL_TIMER_H 1
+ 
++#include <boost/asio/system_timer.hpp>
+ #include <boost/shared_ptr.hpp>
+ #include <functional>
+ 
+@@ -18,9 +19,9 @@ namespace asiolink {
+ class IntervalTimerImpl;
+ 
+ /// \brief The \c IntervalTimer class is a wrapper for the ASIO
+-/// \c boost::asio::deadline_timer class.
++/// \c boost::asio::system_timer class.
+ ///
+-/// This class is implemented to use \c boost::asio::deadline_timer as interval
++/// This class is implemented to use \c boost::asio::system_timer as interval
+ /// timer.
+ ///
+ /// \c setup() sets a timer to expire on (now + interval), a call back
+@@ -87,7 +88,7 @@ public:
+     /// This destructor never throws an exception.
+     ///
+     /// On the destruction of this class the timer will be canceled
+-    /// inside \c boost::asio::deadline_timer.
++    /// inside \c boost::asio::system_timer.
+     ~IntervalTimer();
+     //@}
+ 

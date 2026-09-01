@@ -1,9 +1,10 @@
 --- a/galaxy.yml
 +++ b/galaxy.yml
-@@ -20,2 +20,18 @@
+@@ -20,4 +20,19 @@
  homepage: https://github.com/ansible-collections/community.general
  issues: https://github.com/ansible-collections/community.general/issues
-+build_ignore:
+ build_ignore:
+   - .nox
 +  - .azure-pipelines
 +  - .github
 +  - .gitignore

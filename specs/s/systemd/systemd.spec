@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 7;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -36,7 +36,10 @@
 # e.g. when re-building cryptsetup on a json-c SONAME-bump.
 %bcond bootstrap 0
 %bcond tests     1
-%bcond lto       1
+
+# riscv64 has LTO disabled globally
+%bcond lto       %["%_arch" != "riscv64"]
+
 # Build docs on 64-bit architectures only
 %bcond docs      %[%{?__isa_bits} >= 64]
 
@@ -51,6 +54,11 @@
 # that depend on libcryptsetup (e.g. libcryptsetup-plugins, homed)
 %if %{with bootstrap}
 %global __meson_auto_features disabled
+# If we're building for upstream, don't unconditionally enable all
+# new features as new features might be introduced for which we're
+# missing build dependencies.
+%elif %{with upstream}
+%global __meson_auto_features auto
 %endif
 
 # Override %%autorelease. This is ugly, but rpmautospec doesn't implement
@@ -81,7 +89,7 @@ Url:            https://systemd.io
 # But don't do that on OBS, otherwise the version subst fails, and will be
 # like 257-123-gabcd257.1 instead of 257-123-gabcd
 %if %{without obs}
-Version:        %{?version_override}%{!?version_override:258.4}
+Version:        %{?version_override}%{!?version_override:259.8}
 %else
 Version:        %{?version_override}%{!?version_override:%(cat meson.version)}
 %endif
@@ -146,17 +154,9 @@ Patch:          https://github.com/systemd/systemd/pull/26494.patch
 %if %{without upstream}
 # Those are downstream-only patches, but we don't want them in packit builds.
 
-# Temporarily drop use of PrivateTmp=disconnected. This is causing failures
-# in various places:
-# https://bugzilla.redhat.com/show_bug.cgi?id=2334015
-# https://github.com/coreos/fedora-coreos-tracker/issues/1857
-Patch:          0001-Revert-units-use-PrivateTmp-disconnected-instead-of-.patch
-
+# Create user journals for users with high UIDs
 # https://bugzilla.redhat.com/show_bug.cgi?id=2251843
-Patch:          https://github.com/systemd/systemd/pull/30846.patch
-
-# Workaround for a kernel issue. Fixed in kernel-core-6.17.0-0.rc3.31.fc44.x86_64.
-Patch:          https://github.com/systemd/systemd/pull/38724.patch
+Patch:          30846.patch
 
 # Again create runlevelX.target. Dropping those files breaks upgrades.
 # https://bugzilla.redhat.com/show_bug.cgi?id=2411195
@@ -164,10 +164,11 @@ Patch:          0001-Revert-units-drop-runlevel-0-6-.target.patch
 
 # userdb: create userdb root directory with correct label
 # We can drop this after SELinux policy is updated to handle the transition.
-Patch:          https://github.com/systemd/systemd/pull/38769.patch
+Patch:          38769.patch
 
-# userdb: omit empty parameters field in JSON messages
-Patch:          https://github.com/systemd/systemd/pull/38922.patch
+# Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2415701
+Patch:          0002-machined-continue-without-resolve.hook-socket.patch
+
 %endif
 
 %ifarch %{ix86} x86_64 aarch64 riscv64
@@ -179,7 +180,6 @@ BuildRequires:  gcc-c++
 BuildRequires:  clang
 BuildRequires:  coreutils
 BuildRequires:  rpmdevtools
-BuildRequires:  libcap-devel
 BuildRequires:  libmount-devel
 BuildRequires:  libfdisk-devel
 BuildRequires:  libpwquality-devel
@@ -295,8 +295,8 @@ Requires(post): coreutils
 Requires(post): grep
 # systemd-machine-id-setup requires libssl
 Requires(post): openssl-libs
-Requires:       dbus >= 1.9.18
-Requires:       systemd-pam%{_isa} = %{version}-%{release}
+Recommends:     dbus >= 1.9.18
+Recommends:     systemd-pam%{_isa} = %{version}-%{release}
 Requires(meta): (systemd-rpm-macros = %{version}-%{release} if rpm-build)
 Requires:       systemd-libs%{_isa} = %{version}-%{release}
 %{?fedora:Recommends:     systemd-networkd = %{version}-%{release}}
@@ -351,10 +351,14 @@ Provides:       /usr/sbin/halt
 Provides:       /usr/sbin/init
 Provides:       /usr/sbin/poweroff
 Provides:       /usr/sbin/reboot
-Provides:       /usr/sbin/runlevel
 Provides:       /usr/sbin/shutdown
-Provides:       /usr/sbin/telinit
 %endif
+
+# libmount is always required, even in containers, so make it a hard dependency.
+Requires:       libmount.so.1%{?elf_suffix}
+Requires:       libmount.so.1(MOUNT_2.26)%{?elf_bits}
+# Various systemd services have syscall filters so make libseccomp a hard dependency.
+Requires:       libseccomp.so.2%{?elf_suffix}
 
 # Recommends to replace normal Requires deps for stuff that is dlopen()ed
 Recommends:     libxkbcommon.so.0%{?elf_suffix}
@@ -390,8 +394,8 @@ Recommends:     libkmod.so.2(LIBKMOD_5)%{?elf_bits}
 
 Recommends:     libarchive.so.13%{?elf_suffix}
 
-Patch7: systemd-filter-linux-7-errno-aliases.patch
-Patch8: systemd-add-nullfs-magic.patch
+Patch5: systemd-filter-linux-7-errno-aliases.patch
+Patch6: systemd-add-nullfs-magic.patch
 %description
 systemd is a system and service manager that runs as PID 1 and starts the rest
 of the system. It provides aggressive parallelization capabilities, uses socket
@@ -501,6 +505,9 @@ Conflicts:      systemd-networkd < %{version}-%{release}
 # want to load modules, so make this into a hard dependency here.
 Requires:       libkmod.so.2%{?elf_suffix}
 Requires:       libkmod.so.2(LIBKMOD_5)%{?elf_bits}
+# udev uses libblkid in various builtins so make it a hard dependency.
+Requires:       libblkid.so.1%{?elf_suffix}
+Requires:       libblkid.so.1(BLKID_2.30)%{?elf_bits}
 
 # Recommends to replace normal Requires deps for stuff that is dlopen()ed
 # used by dissect, integritysetup, veritysetyp, growfs, repart, cryptenroll, home
@@ -776,7 +783,11 @@ main systemd package and is meant for use in exitrds.
 mv %{_sourcedir}/%{name}.fedora/* %{_sourcedir}
 %endif
 
-%autosetup -C -p1
+# Automatically figure out the name of the top-level directory.
+# TODO: Use %%autosetup -C once we can depend on rpm >= 4.20.
+%if %{undefined _build_in_place}
+%autosetup -n %(tar -tf %{SOURCE0} 2>/dev/null | head -n1) -p1
+%endif
 
 # Disable user lockdown until rpm implements it natively.
 # https://github.com/rpm-software-management/rpm/issues/3450
@@ -938,6 +949,8 @@ CONFIGURE_OPTS=(
         -Dsbat-distro-url=https://github.com/systemd/systemd
         -Dsbat-distro=upstream
         -Dsbat-distro-summary='Upstream build from git'
+        -Defi-stub-extra-sections=500
+        -Defi-addon-extra-sections=100
 %endif
 )
 
@@ -1132,12 +1145,13 @@ mv -v %{buildroot}/usr/sbin/* %{buildroot}%{_bindir}/
 # We skip this on upstream builds so that new users and groups
 # can be added without breaking the build.
 %if 0%{?fedora} >= 43
-%{python3} %{SOURCE4} /usr/lib/sysusers.d/setup.conf %{buildroot}/usr/lib/sysusers.d/basic.conf
+IGNORED=empower \
+  %{python3} %{SOURCE4} /usr/lib/sysusers.d/setup.conf %{buildroot}/usr/lib/sysusers.d/basic.conf
 %else
 %{python3} %{SOURCE4} /usr/lib/sysusers.d/20-setup-{users,groups}.conf %{buildroot}/usr/lib/sysusers.d/basic.conf
 %endif
 %endif
-rm %{buildroot}/usr/lib/sysusers.d/basic.conf
+sed -n -r -i '1,7p; /can .do.|empower/p' %{buildroot}/usr/lib/sysusers.d/basic.conf
 %endif
 
 # Disable sshd_config.d/20-systemd-userdb.conf for now.
@@ -1269,8 +1283,8 @@ systemctl --no-reload preset systemd-journald-audit.socket &>/dev/null || :
                         sleep.target
                         suspend-then-hibernate.target
                         suspend.target
-                        system-systemd\\x2dcryptsetup.slice
-                        system-systemd\\x2dveritysetup.slice
+                        system-systemd\\\\x2dcryptsetup.slice
+                        system-systemd\\\\x2dveritysetup.slice
                         systemd-backlight@.service
                         systemd-binfmt.service
                         systemd-bless-boot.service
@@ -1323,6 +1337,7 @@ systemctl --no-reload preset systemd-journald-audit.socket &>/dev/null || :
                         systemd-suspend.service
                         systemd-sysctl.service
                         systemd-timesyncd.service
+                        systemd-tmpfiles-clear.service
                         systemd-tmpfiles-setup-dev-early.service
                         systemd-tmpfiles-setup-dev.service
                         systemd-udev-load-credentials.service
@@ -1579,199 +1594,160 @@ rm -rf \
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 258.4-7
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 259.8-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 258.4-6
-- build: mass rebuild auto-bumpable components
+* Sat Jul 25 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.8-1
+- Version 259.8
+- a bugfix release with correctness and security-relevant fixes too. 205
+  patches, so too much to describe here.
 
-* Wed Jul 22 2026 Mitch Zhu <mitchzhu@microsoft.com> - 258.4-5
-- fix(systemd): filter errno aliases and recognize NULL_FS_MAGIC
+* Sat Jun 27 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.7-1
+- Version 269.7
+- Various fixes all over, also rhbz#2485587
+- Hardware datebase update
 
-* Tue May 12 2026 Dan Streetman <ddstreet@ieee.org> - 258.4-4
-- fix(systemd): restore default service/device timeout to upstream default
-  of 90s
+* Thu May 28 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.6-1
+- Version 259.6
+- many changes in many components
+- hwdb update
 
-* Fri May 08 2026 Dan Streetman <ddstreet@ieee.org> - 258.4-3
-- fix(systemd): set default llmnr support to disabled
+* Fri Mar 13 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.5-1
+- Version 259.5
+- Even more fixes, incl. a fix for a bad patch in .4
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 258.4-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Thu Mar 12 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.4-1
+- Version 259.4
+- A bunch of bugfixes
+- More sanitization for invalid values received from hardware and firmware
 
-* Sat Feb 07 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 258.4-1
-- Version 258.4
+* Thu Mar 12 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 259.3-3
+- riscv64 port has LTO disabled
 
-* Mon Jan 05 2026 Andreas Schneider <asn@redhat.com> - 258.3-3
-- userdb: Omit empty parameters field in JSON messages
+* Thu Mar 05 2026 Hans de Goede <johannes.goede@oss.qualcomm.com> - 259.3-2
+- Silence false positive "HWID match failed, no DT blob" error
+  (rhbz#2444759)
 
-* Wed Dec 17 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.3-2
-- Add patches for ssh-generator vsock issue
+* Wed Mar 04 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.3-1
+- Version 259.3
+- Fix for GHSA-6pwp-j5vg-5j6m, rhbz#2444375
 
-* Sat Dec 13 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.3-1
-- Version 258.3
-- 148 patches, for all kinds of small issues.
-- Includes a hwdb update.
+* Fri Feb 27 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.2-1
+- Version 259.2
 
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.2-1
+* Sat Feb 07 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@amutable.com> - 259.1-1
+- Version 259.1
+
+* Wed Feb 04 2026 Adam Williamson <awilliam@redhat.com> - 259-19
+- Revert getty changes a bit harder
+
+* Wed Feb 04 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-18
+- Revert all remaing changes to getty@.service
+
+* Wed Feb 04 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-17
+- Revert to previous handling of getty@.service
+
+* Wed Feb 04 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-16
+- Create getty@tty1.service again and move autovt@.service alias to
+  /usr/lib
+
+* Wed Feb 04 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-15
+- Properly enable systemd-tmpfiles-clear.service in scriptlets
+
+* Thu Jan 29 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-14
+- Raise the number of placeholder sections in kernel and addon stubs
+
+* Thu Jan 29 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-13
+- Stop enabling getty@tty1.service
+
+* Thu Jan 29 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-12
+- Fix unit names in systemd-udev scriptlet
+
+* Tue Jan 27 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-11
+- Enable getty@.service through presets
+
+* Sat Jan 24 2026 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-10
+- Move tpm2 and getty support to -udev subpackage
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 259-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Hans de Goede <johannes.goede@oss.qualcomm.com> - 259-8
+- Add 2 patches for automatic aarch64 DTB selection change
+
+* Fri Dec 19 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259-6
+- Make dbus and systemd-pam recommended dependencies
+
+* Fri Dec 19 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259-5
+- Drop libcap-devel BuildRequires
+
+* Thu Dec 18 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259-1
+- Version 259
+- Some bugfixes since -rc3, in particular in the area of image creation and
+  loading of libraries
+
+* Wed Dec 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259~rc3-1
+- Version 259~rc3
+
+* Fri Nov 28 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259~rc2-4
+- Check if --max-lines is supported by meson
+
+* Wed Nov 26 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259~rc2-2
+- Patch machined to continue after selinux denial
+
+* Wed Nov 26 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259~rc2-1
+- Version 259~rc2
+
+* Fri Nov 21 2025 David Tardon <dtardon@redhat.com> - 259~rc1-6
+- Drop provides for removed sysvinit tools (rhbz#2413557)
+
+* Thu Nov 20 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259~rc1-5
+- Set meson auto features to auto when building for upstream
+
+* Thu Nov 20 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259~rc1-4
+- Wrap %%autosetup in %%_build_in_place check
+
+* Thu Nov 20 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 259~rc1-3
+- Revert "Use %%autosetup -C"
+
+* Mon Nov 17 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259~rc1-2
+- Allow empower group
+
+* Mon Nov 17 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 259~rc1-1
+- Version 259~rc1
+- See https://raw.githubusercontent.com/systemd/systemd/v259-rc1/NEWS. Too
+  many changes to list or discuss here.
+
+* Mon Nov 17 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.2-2
+- Add various extra explicit Requires
+
+* Fri Nov 07 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.2-1
 - Version 258.2
 - A bunch of fixes in many components.
 - Stop creating user namespace for system services (rhbz#2391343)
 - Systemd trigger scriptlets are updated
 
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-12
+* Wed Nov 05 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-13
 - Restore runlevelX.target units (rhbz#2411195)
 
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-11
+* Tue Nov 04 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-12
 - Use %%autosetup -C
 
-* Mon Nov 10 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-10
+* Mon Nov 03 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-11
 - Remove hack to stop systemd-networkd-resolve-hook.socket
 
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-9
+* Mon Nov 03 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-10
 - Automatically figure out the name of the top-level tar dir
 
-* Mon Nov 10 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-8
+* Mon Nov 03 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-9
 - Make sure fallback source is listed first
 
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-7
+* Fri Oct 31 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-8
 - Enable sysupdate and sysupdated
 
-* Mon Nov 10 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-6
+* Wed Oct 29 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-7
 - Add missing networkd socket units
 
-* Mon Nov 10 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-5
-- Drop backwards compat logic from integration tests script
-
-* Mon Nov 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-4
-- Require systemd-rpm-macros for build
-
-* Mon Nov 10 2025 Lukáš Zaoral <lzaoral@redhat.com> - 258.1-3
-- Require python3-zstandard in ELN
-
-* Wed Oct 15 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-2
-- Require systemd-libs and systemd-shared to be in the same version
-  (rhbz#2404143)
-
-* Mon Oct 13 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258.1-1
-- Version 258.1
-- This is the first (large) batch of fixes after v258:
-- fixes for boot loader and early boot code
-- fixes for systemd itself, systemd-udevd, systemd-logind, systemd-
-  machined, and library code
-- unprivileged operation in systemd-machined is disabled for now
-- lots of documentation and shell-completion fixes
-- includes an hwdb update
-
-* Sat Sep 27 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258-2
-- Require systemd-networkd and systemd-udev to be in the same version
-  (rhbz#2397579)
-
-* Wed Sep 17 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258-1
-- Version 258 💝
-- See https://raw.githubusercontent.com/systemd/systemd/v258/NEWS for the
-  final list of changes.
-
-* Fri Sep 12 2025 Andreas Schneider <asn@redhat.com> - 258~rc4-2
-- Pre-create /etc/userdb directory
-
-* Fri Sep 05 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc4-1
-- Version 258~rc4
-
-* Thu Sep 04 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc3-4
-- Add to patch to create userdb root directory with correct label
-
-* Wed Sep 03 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc3-3
-- Fix unit name in scriptlet
-
-* Tue Aug 26 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc3-2
-- Add workaround patch to hopefully pass podman CI tests
-
-* Wed Aug 20 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc3-1
-- Version 258~rc3
-- A large number of fixes in various components
-- Hardware database and syscall numbers are updated
-
-* Wed Aug 06 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc2-1
-- Version 258~rc2
-
-* Wed Jul 23 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 258~rc1-1
-- Version 258~rc1
-- See https://raw.githubusercontent.com/systemd/systemd/v258-rc1/NEWS. Too
-  many changes to list or discuss here.
-
-* Tue Jul 08 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.7-3
-- Add "test" that LTO effectively removes unused code from shared lib
-
-* Sat Jul 05 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.7-2
-- Build docs on 64-bit architectures only
-
-* Thu Jun 26 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.7-1
-- Version 257.7
-- Fixes for systemd itself, systemd-repart, systemd-resolved, systemd-
-  vmspawn, systemd-networkd, resolvectl, bootctl, the shared library code,
-  man pages, shell completions, and tests.
-- Hardware database is updated.
-
-* Thu Jun 05 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.6-3
-- Do not mark symlinks as %%ghost
-
-* Wed Jun 04 2025 Matteo Croce <teknoraver@meta.com> - 257.6-2
-- Let systemd-{sysusers,shared} conflict with older systemd
-
-* Thu May 29 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.6-1
-- Version 257.6
-- Fix for local information disclosure in systemd-coredump (CVE-2025-4598)
-- Fixes for systemd itself, run0, systemd-networkd, "secure" pager, man
-  pages, shell completions, sd-boot, sd-varlink
-- Hardware database update
-
-* Tue May 20 2025 David Tardon <dtardon@redhat.com> - 257.5-6
-- Package pcrlock files together with systemd-pcrlock (rhbz#2366948)
-
-* Thu May 08 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.5-5
-- Move mount.ddi symlinks to -container subpackage
-
-* Fri May 02 2025 LuK1337 <priv.luk@gmail.com> - 257.5-4
-- Revert "Disable freezing of user sessions"
-
-* Thu Apr 17 2025 LuK1337 <priv.luk@gmail.com> - 257.5-3
-- Backport adb/fastboot udev rules (BZ#2356537)
-
-* Thu Apr 10 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.5-2
-- Backport CI fix
-
-* Wed Apr 09 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.5-1
-- Version 257.5
-- A lot of small fixes in various components
-
-* Thu Apr 03 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-19
-- fmf: Check out mkosi to some directory in /var/tmp
-
-* Thu Apr 03 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-17
-- fmf: Use mkosi/mkosi.local.conf if the mkosi/ directory exists
-
-* Tue Mar 25 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-15
-- Relax dependencies from noarch packages on archful packages for OBS
-  builds
-
-* Sun Mar 23 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-14
-- Remove purge-nobody-user script
-
-* Sun Mar 23 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.4-13
-- Add more services to %%post for udev and networkd
-
-* Sun Mar 23 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 257.4-12
-- Fix paths for /usr/sbin/nologin and related progs
-
-* Fri Mar 21 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-11
-- Make the source tarball glob in the test script more generic
-
-* Fri Mar 21 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-10
-- Support specifying extra mkosi repositories to the test script
-
-* Fri Mar 21 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-9
-- Use old setup sysusers files on Fedora < 43
-
-* Fri Mar 21 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 257.4-8
+* Sat Oct 25 2025 Daan De Meyer <daan.j.demeyer@gmail.com> - 258.1-6
 - RPMAUTOSPEC: unresolvable merge
 ## END: Generated by rpmautospec

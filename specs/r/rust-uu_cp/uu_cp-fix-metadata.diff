@@ -1,11 +1,28 @@
---- uu_cp-0.0.27/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ uu_cp-0.0.27/Cargo.toml	2025-07-24T15:29:38.943389+00:00
-@@ -50,7 +50,7 @@
- version = "0.2.23"
+--- uu_cp-0.7.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ uu_cp-0.7.0/Cargo.toml	2026-04-14T20:53:21.050000+00:00
+@@ -76,7 +76,7 @@
+ version = "0.2.172"
  
- [dependencies.indicatif]
--version = "0.17.8"
-+version = ">=0.17.8, <0.19.0"
+ [dependencies.selinux]
+-version = "=0.6.0"
++version = "0.6.0"
+ optional = true
  
- [dependencies.libc]
- version = "0.2.153"
+ [dependencies.thiserror]
+@@ -100,16 +100,11 @@
+ [dependencies.walkdir]
+ version = "2.5"
+ 
+-[dev-dependencies.divan]
+-version = "4.0.5"
+-package = "codspeed-divan-compat"
+-
+ [dev-dependencies.tempfile]
+ version = "3.15.0"
+ 
+ [dev-dependencies.uucore]
+ version = "0.7.0"
+-features = ["benchmark"]
+ package = "uucore"
+ 
+ [target."cfg(unix)".dependencies.exacl]

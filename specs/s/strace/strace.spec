@@ -3,8 +3,8 @@
 
 Summary: Tracks and displays system calls associated with a running process
 Name: strace
-Version: 6.19
-Release: 4%{?dist}
+Version: 7.2
+Release: 1%{?dist}
 # The test suite is GPLv2+, the bundled headers are GPLv2 with Linux syscall
 # exception, all the rest is LGPLv2.1+.
 %if 0%{?fedora} >= 35 || 0%{?centos} >= 9 || 0%{?rhel} >= 9
@@ -131,6 +131,11 @@ BuildRequires: pkgconfig(bluez)
 %{?buildrequires_stacktrace}
 %{?buildrequires_selinux}
 
+# rhbz#2461721
+%if 0%{?fedora} >= 45 || 0%{?rhel} >= 11
+Recommends: yama-ptrace-enable
+%endif
+
 # OBS compatibility
 %{?!buildroot:BuildRoot: %_tmppath/buildroot-%name-%version-%release}
 %define maybe_use_defattr %{?suse_version:%%defattr(-,root,root)}
@@ -155,7 +160,7 @@ received by a process.
 %setup -q
 echo -n %version-%release > .tarball-version
 echo -n 2026 > .year
-echo -n 2025-11-13 > doc/.strace.1.in.date
+echo -n 2026-06-25 > doc/.strace.1.in.date
 echo -n 2025-07-02 > doc/.strace-log-merge.1.in.date
 
 %build
@@ -208,6 +213,15 @@ fi
 %{_mandir}/man1/*
 
 %changelog
+* Tue Aug 18 2026 Dmitry V. Levin <ldv@strace.io> - 7.2-1
+- v7.1 -> v7.2.
+
+* Mon Jun 15 2026 Dmitry V. Levin <ldv@strace.io> - 7.1-1
+- v7.0 -> v7.1 (resolves: #2461721).
+
+* Sun Apr 26 2026 Dmitry V. Levin <ldv@strace.io> - 7.0-1
+- v6.19 -> v7.0.
+
 * Tue Feb 10 2026 Dmitry V. Levin <ldv@strace.io> - 6.19-1
 - v6.18 -> v6.19 (resolves: #2435125).
 

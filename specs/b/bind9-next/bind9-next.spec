@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -30,7 +30,6 @@
 # Do not set CI environment, include more unit tests, even less stable
 %bcond_with    UNITTEST_ALL
 %bcond_without DNSTAP
-%bcond_without LMDB
 %bcond_without DOC
 %bcond_with    TSAN
 %bcond_without DTRACE
@@ -45,6 +44,8 @@
 %global        chroot_create_directories /dev /run/named %{_localstatedir}/{log,named,tmp} \\\
                                          %{_sysconfdir}/{crypto-policies/back-ends,pki/dnssec-keys,pki/tls,named} \\\
                                          %{_libdir}/bind %{_libdir}/named %{_datadir}/{GeoIP,dns-root-data} /proc/sys/net/ipv4
+%global        upstream_sources 0 2
+%global        pgp_signed_sources 2
 
 %global forgeurl0 https://gitlab.isc.org/isc-projects/bind9
 
@@ -66,7 +67,7 @@ Summary:  The Berkeley Internet Name Domain (BIND) DNS (Domain Name System) serv
 Name:     bind9-next
 License:  MPL-2.0 AND ISC AND BSD-3-clause AND MIT AND BSD-2-clause
 #
-Version:  9.21.17
+Version:  9.21.22
 Release:  %autorelease
 Epoch:    32
 Url:      https://www.isc.org/downloads/bind/
@@ -89,7 +90,6 @@ Source37: named.service
 Source38: named-chroot.service
 Source41: setup-named-chroot.sh
 Source42: generate-rndc-key.sh
-Source43: named.rwtab
 Source44: named-chroot-setup.service
 Source46: named-setup-rndc.service
 Source48: setup-named-softhsm.sh
@@ -98,11 +98,11 @@ Source49: named-chroot.files
 # Common patches
 # Red Hat specific documentation is not relevant to upstream
 Patch1: bind-9.16-redhat_doc.patch
-# Downstream only. TODO: find a cause and remove this workaround
-Patch3: bind-9.21-unittest-isc_rwlock-s390x.patch
 # https://gitlab.isc.org/isc-projects/bind9/-/issues/5328
 # avoid often fails on i386, unsupported upstream
 Patch4: bind-9.21-unittest-qpdb-i386.patch
+# https://gitlab.isc.org/isc-projects/bind9/-/merge_requests/12061
+Patch5: bind-9.21-unittest-32b-mem.patch
 
 %{?systemd_ordering}
 Requires:       coreutils
@@ -123,32 +123,33 @@ BuildRequires:  libtool
 BuildRequires:  meson >= 1.3.0
 BuildRequires:  ninja-build
 BuildRequires:  pkgconfig
-BuildRequires:  libcap-devel
-BuildRequires:  libidn2-devel
-BuildRequires:  libxml2-devel
+BuildRequires:  pkgconfig(libcap)
+BuildRequires:  pkgconfig(libidn2)
+BuildRequires:  pkgconfig(libxml-2.0)
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  selinux-policy
 BuildRequires:  findutils
 BuildRequires:  sed
-BuildRequires:  libnghttp2-devel
-BuildRequires:  userspace-rcu-devel
+BuildRequires:  pkgconfig(libnghttp2)
+BuildRequires:  pkgconfig(liburcu)
 BuildRequires:  pkgconfig(libedit)
 BuildRequires:  dns-root-data
 # Compress the changelog
 BuildRequires:  gzip
+BuildRequires:  pkgconfig(lmdb)
 %if %{with JEMALLOC}
-BuildRequires:  jemalloc-devel
+BuildRequires:  pkgconfig(jemalloc)
 %endif
 %if ! 0%{?rhel}
 BuildRequires:  gpgverify
 %endif
-BuildRequires:  libuv-devel
+BuildRequires:  pkgconfig(libuv)
 %if %{with OPENSSL_ENGINE}
 BuildRequires:  openssl-devel-engine
 %endif
 %if %{with UNITTEST}
 # make unit dependencies
-BuildRequires:  libcmocka-devel
+BuildRequires:  pkgconfig(cmocka)
 # Ensure we have lscpu
 BuildRequires:  util-linux
 # Catch failing unittests coredumps
@@ -165,18 +166,17 @@ BuildRequires:  perl(English)
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pytest-xdist
 BuildRequires:  python3-dns
+BuildRequires:  python3-hypothesis
 # manual configuration requires this tool
 BuildRequires:  iproute
 BuildRequires:  python3-jinja2
+BuildRequires:  lmdb-devel
 %if %{with SUDO}
 BuildRequires:  libcap sudo
 %endif
 %endif
 %if %{with GSSTSIG}
 BuildRequires:  krb5-devel
-%endif
-%if %{with LMDB}
-BuildRequires:  lmdb-devel
 %endif
 %if %{with JSON}
 BuildRequires:  json-c-devel
@@ -260,14 +260,13 @@ Summary:  Header files and libraries needed for bind-dyndb-ldap
 Provides: %{name}-lite-devel = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-lite-devel < 32:9.16.6-3
 Requires: %{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
-Requires: openssl-devel%{?_isa} libxml2-devel%{?_isa}
+Requires: openssl-devel%{?_isa}
+Requires: libxml2-devel%{?_isa}
 Requires: libcap-devel%{?_isa}
+Requires: lmdb-devel%{?_isa}
 %upname_compat %{upname}-devel
 %if %{with GSSTSIG}
 Requires: krb5-devel%{?_isa}
-%endif
-%if %{with LMDB}
-Requires: lmdb-devel%{?_isa}
 %endif
 %if %{with JSON}
 Requires:  json-c-devel%{?_isa}
@@ -382,11 +381,6 @@ export LIBDIR_SUFFIX
 %if %{with GSSTSIG}
   -Dgssapi=enabled \
 %endif
-%if %{with LMDB}
-  -Dlmdb=enabled \
-%else
-  -Dlmdb=disabled \
-%endif
 %if %{with JSON}
   -Dstats-json=enabled \
 %endif
@@ -426,6 +420,11 @@ gzip doc/changelog/changelog-*.rst
 #systemtest_prepare_build build
 
 %check
+# reduce test loops (from default 100) for isc/{mutex/spinlock/rwlock}
+# to allow rwlock(isc_rwlock_benchmark) to finish within the 300 seconds
+# timeout limit on platforms (riscv64,s390x) where it is slow
+# TODO: find out why it is slow
+export ISC_BENCHMARK_LOOPS=20
 %if %{with UNITTEST} || %{with SYSTEMTEST}
   # Tests require initialization of pkcs11 token
   eval "$(bash %{SOURCE48} -A "`pwd`/softhsm-tokens")"
@@ -569,9 +568,6 @@ find ${RPM_BUILD_ROOT}/%{_libdir} -name '*.la' -exec '/bin/rm' '-f' '{}' ';';
 %if %{without DNSTAP}
 rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/dnstap-read.1* || true
 %endif
-%if %{without LMDB}
-rm -f ${RPM_BUILD_ROOT}%{_mandir}/man8/named-nzd2nzf.8* || true
-%endif
 
 pushd ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s ddns-confgen.8.gz tsig-keygen.8.gz
@@ -637,9 +633,6 @@ done
 
 mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
 install -m 644 %{SOURCE35} ${RPM_BUILD_ROOT}%{_tmpfilesdir}/named.conf
-
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/rwtab.d
-install -m 644 %{SOURCE43} ${RPM_BUILD_ROOT}%{_sysconfdir}/rwtab.d/named
 
 install -m0644 -D bind9-next.sysusers.conf %{buildroot}%{_sysusersdir}/bind9-next.conf
 
@@ -741,7 +734,6 @@ fi;
 %config(noreplace) %{_sysconfdir}/logrotate.d/named
 %{_tmpfilesdir}/named.conf
 %{_sysusersdir}/bind9-next.conf
-%{_sysconfdir}/rwtab.d/named
 %{_unitdir}/named.service
 %{_unitdir}/named-setup-rndc.service
 %{_bindir}/named-journalprint
@@ -825,10 +817,8 @@ fi;
 %{_bindir}/dnstap-read
 %{_mandir}/man1/dnstap-read.1*
 %endif
-%if %{with LMDB}
 %{_bindir}/named-nzd2nzf
 %{_mandir}/man1/named-nzd2nzf.1*
-%endif
 %{_mandir}/man1/host.1*
 %{_mandir}/man1/nsupdate.1*
 %{_mandir}/man1/dig.1*
@@ -916,32 +906,65 @@ fi;
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 32:9.21.17-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 32:9.21.22-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 32:9.21.17-3
-- build: mass rebuild auto-bumpable components
+* Wed Jun 03 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.22-2
+- Switch downstream change to upstream for 32b mem check
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 32:9.21.17-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Jun 03 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.22-1
+- Update to 9.21.22 (rhbz#2480122)
+
+* Tue May 05 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-7
+- Fix build with openssl4 (rhbz#2463851)
+
+* Tue May 05 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-6
+- Remove unused forgotten files
+
+* Thu Apr 30 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-5
+- Stop publishing rwtab.d/named
+
+* Thu Apr 09 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-4
+- Fix failing unittest on 32 bits
+
+* Thu Apr 09 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-3
+- Switch devel libraries to pkgconfig dependencies
+
+* Wed Apr 08 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-2
+- Remove LMDB conditional builds
+
+* Wed Apr 08 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.21-1
+- Update to 9.21.21 (rhbz#2453811)
+
+* Wed Mar 25 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.20-1
+- Update to 9.21.20 (rhbz#2440560)
+
+* Mon Feb 02 2026 Yanko Kaneti <yaneti@declera.com> - 32:9.21.17-2
+- Reduce test loops for tests/isc/{mutex/spinlock/rwlock}
 
 * Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.17-1
 - Update to 9.21.17 (rhbz#2415843)
 
-* Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.16-2
+* Tue Jan 20 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.16-2
 - Fix build for RHEL, disable JEMALLOC there
 
-* Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.16-1
+* Tue Jan 20 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.16-1
 - Update to 9.21.16 (rhbz#2415843)
 
-* Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.15-2
+* Tue Jan 20 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.15-2
 - Use dns-root-data package for hints source
 
-* Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.15-1
+* Fri Jan 16 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.15-1
 - Update to 9.21.15 (rhbz#2415843)
 
-* Thu Jan 22 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.14-3
+* Fri Jan 16 2026 Petr Menšík <pemensik@redhat.com> - 32:9.21.14-5
 - Fix running SYSTEMTEST during build
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 32:9.21.14-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 32:9.21.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Thu Nov 06 2025 Petr Menšík <pemensik@redhat.com> - 32:9.21.14-2
 - Prevent SERVFAIL on dual signed zones with one unsupported signature

@@ -5,7 +5,7 @@
 
 Name:			libtirpc
 Version:		1.3.7
-Release: 4%{?dist}
+Release:		2%{?dist}
 Summary:		Transport Independent RPC Library
 License:		SISSL AND BSD-3-Clause
 URL:  			http://git.linux-nfs.org/?p=steved/libtirpc.git;a=summary
@@ -117,6 +117,9 @@ mv %{buildroot}%{_mandir}/man3 %{buildroot}%{_mandir}/man3t
 %{_mandir}/*/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Oct 31 2025 Steve Dickson <steved@redhat.com> - 1.3.7-1
 - libtirpc licence files missing from filesystem (bz 2315740)
 

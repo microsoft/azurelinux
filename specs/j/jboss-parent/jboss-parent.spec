@@ -3,7 +3,7 @@
 
 Name:           jboss-parent
 Version:        20
-Release: 29%{?dist}
+Release:        27%{?dist}
 Summary:        JBoss Parent POM
 License:        CC0-1.0
 URL:            http://www.jboss.org/
@@ -15,7 +15,12 @@ ExclusiveArch:  %{java_arches} noarch
 Source0:        https://github.com/jboss/jboss-parent-pom/archive/%{name}-%{version}.tar.gz
 Source1:        http://repository.jboss.org/licenses/cc0-1.0.txt
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
+%endif
+
 BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
 
 %description
@@ -50,6 +55,12 @@ sed -i 's/\r//' LICENSE
 %license LICENSE
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 20-26
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 20-25
 - Rebuilt for java-25-openjdk as preffered jdk
 

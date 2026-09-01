@@ -4,7 +4,7 @@
 Summary:        A console-based network monitoring utility
 Name:           iptraf-ng
 Version:        1.2.2
-Release: 21%{?dist}
+Release:        20%{?dist}
 Source0:        https://github.com/iptraf-ng/iptraf-ng/archive/v%{version}.tar.gz
 Source1:        %{name}-logrotate.conf
 Source2:        %{name}-tmpfiles.conf
@@ -44,7 +44,7 @@ make %{?_smp_mflags} V=1 \
 
 %install
 rm -rf %{buildroot}
-make install DESTDIR=%{buildroot} prefix=%{_prefix} sbindir=%{_bindir}
+make install DESTDIR=%{buildroot} prefix=%{_prefix} sbindir=%{_sbindir}
 
 # remove everything besides the html and pictures in Documentation
 find Documentation -type f | grep -v '\.html$\|\.png$\|/stylesheet' | \
@@ -72,6 +72,11 @@ install -d -m 0755 %{buildroot}/run/%{name}/
 %{_prefix}/lib/tmpfiles.d/%{name}.conf
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Sep 19 2025 Bernhard M. Wiedemann <fedoragitbmw@lsmod.de>   - 1.2.2-19
+- install to %{_sbindir} again
 * Tue Aug 05 2025 Alejandro Perez Torres <aeperezt@fedoraproject.org>   - 1.2.2-17
 - Fix date
 * Tue Aug 05 2025 Alejandro Perez Torres <aeperezt@fedoraproject.org>   - 1.2.2-17

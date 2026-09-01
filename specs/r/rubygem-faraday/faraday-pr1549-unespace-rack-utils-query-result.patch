@@ -1,0 +1,23 @@
+From 66551ecc79f5d3d5bca1a2523bd8736db8c2220c Mon Sep 17 00:00:00 2001
+From: Mattia Giuffrida <giuffrida.mattia@gmail.com>
+Date: Sat, 20 Jan 2024 16:48:26 +0000
+Subject: [PATCH] Unescape the result of `Rack::Utils.build_nested_query`
+
+---
+ spec/faraday/params_encoders/nested_spec.rb | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/spec/faraday/params_encoders/nested_spec.rb b/spec/faraday/params_encoders/nested_spec.rb
+index 46312047f..83da22dc4 100644
+--- a/spec/faraday/params_encoders/nested_spec.rb
++++ b/spec/faraday/params_encoders/nested_spec.rb
+@@ -62,7 +62,8 @@
+   it 'encodes rack compat' do
+     params   = { a: [{ one: '1', two: '2' }, '3', ''] }
+     result   = Faraday::Utils.unescape(Faraday::NestedParamsEncoder.encode(params)).split('&')
+-    expected = Rack::Utils.build_nested_query(params).split('&')
++    escaped = Rack::Utils.build_nested_query(params)
++    expected = Rack::Utils.unescape(escaped).split('&')
+     expect(result).to match_array(expected)
+   end
+ 

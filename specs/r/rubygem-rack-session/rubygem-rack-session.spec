@@ -6,11 +6,13 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.1.1
-Release: 5%{?dist}
+Release: 4%{?dist}
 Summary: A session implementation for Rack
 License: MIT
 URL: https://github.com/rack/rack-session
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# Fix compatibility with minitest 6
+Patch0:  rack-session-2.1.1-minitest6.patch
 # git clone https://github.com/rack/rack-session.git && cd rack-session
 # git archive -v -o rack-session-2.1.1-tests.tar.gz v2.1.1 test/
 Source1: rack-session-%{version}-tests.tar.gz
@@ -19,6 +21,8 @@ BuildRequires: rubygems-devel
 BuildRequires: ruby >= 2.5
 BuildRequires: rubygem(base64)
 BuildRequires: rubygem(minitest)
+BuildRequires: rubygem(minitest-global_expectations)
+BuildRequires: rubygem(minitest-mock)
 BuildRequires: rubygem(rack)
 BuildArch: noarch
 
@@ -36,6 +40,9 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version} -b 1
+( cd %{builddir}/test
+%patch -P0 -p2
+)
 
 %build
 # Create the gem as gem install only works on a gem file
@@ -56,11 +63,6 @@ cp -a .%{gem_dir}/* \
 ( cd .%{gem_instdir}
 cp -a %{builddir}/test .
 
-# Avoid minitest-global_expectations in exchange of lot of deprecation warnings.
-# https://github.com/rack/rack/pull/1394
-mkdir -p test/minitest/global_expectations
-echo 'require "minitest/autorun"' > test/minitest/global_expectations/autorun.rb
-
 ruby -Itest -e 'Dir.glob "./test/**/spec_*.rb", &method(:require)'
 )
 
@@ -78,6 +80,13 @@ ruby -Itest -e 'Dir.glob "./test/**/spec_*.rb", &method(:require)'
 %doc %{gem_instdir}/security.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 07 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.1.1-3
+- Use minitest-global_expectations
+- Fix compatibility with minitest 6
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

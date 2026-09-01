@@ -12,7 +12,7 @@
 
 Name:           gstreamer1-plugins-base
 Version:        1.26.10
-Release: 5%{?dist}
+Release:        1%{?dist}
 Summary:        GStreamer streaming media framework base plugins
 
 License:        LGPL-2.1-or-later

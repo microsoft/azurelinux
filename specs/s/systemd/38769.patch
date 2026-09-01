@@ -1,4 +1,4 @@
-From e4e1e425394dcef01317c42b34c133768c26b765 Mon Sep 17 00:00:00 2001
+From 00d70f36a0866660693347009446b7f872a05bf4 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
 Date: Sat, 30 Aug 2025 13:55:56 +0200
 Subject: [PATCH] core: create userdb root directory with correct label
@@ -16,18 +16,18 @@ longer is. Regression introduced in 736349958efe34089131ca88950e2e5bb391d36a.
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/core/varlink.c b/src/core/varlink.c
-index 8c6b95e31d1d5..110b281842373 100644
+index 99f12c59e5..71a8ffd0e5 100644
 --- a/src/core/varlink.c
 +++ b/src/core/varlink.c
-@@ -6,6 +6,7 @@
+@@ -5,6 +5,7 @@
+ #include "constants.h"
  #include "errno-util.h"
- #include "json-util.h"
  #include "manager.h"
 +#include "mkdir-label.h"
  #include "path-util.h"
  #include "pidref.h"
  #include "string-util.h"
-@@ -424,7 +425,11 @@ static int manager_varlink_init_system(Manager *m) {
+@@ -441,7 +442,11 @@ static int manager_varlink_init_system(Manager *m) {
                          if (!fresh && varlink_server_contains_socket(m->varlink_server, address))
                                  continue;
  

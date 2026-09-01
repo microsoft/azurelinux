@@ -1,0 +1,21 @@
+From: Zephyr Lykos <git@mochaa.ws>
+Date: Sun, 5 Nov 2023 15:01:27 +0800
+Subject: [PATCH] arch/s390x: disable little endian tests
+
+Signed-off-by: Zephyr Lykos <git@mochaa.ws>
+
+diff --git a/unit_test/convert_test.cc b/unit_test/convert_test.cc
+index 938f1cb9..8319c0a1 100644
+--- a/unit_test/convert_test.cc
++++ b/unit_test/convert_test.cc
+@@ -34,8 +34,8 @@
+ #endif
+ 
+ // Some functions fail on big endian. Enable these tests on all cpus except
+-// PowerPC, but they are not optimized so disabled by default.
+-#if !defined(DISABLE_SLOW_TESTS) && !defined(__powerpc__)
++// PowerPC and s390x, but they are not optimized so disabled by default.
++#if !defined(DISABLE_SLOW_TESTS) && !defined(__powerpc__) && !defined(__s390x__)
+ #define LITTLE_ENDIAN_ONLY_TEST 1
+ #endif
+ #if !defined(DISABLE_SLOW_TESTS) || defined(__x86_64__) || defined(__i386__)

@@ -1,0 +1,16 @@
+You are looking for your iproute2 config in /etc/iproute2 and it's gone?
+
+Here's an explanation on what's going on:
+
+From v6.5.0, iproute2 supports stateless configuration pattern. This
+means that iproute2 now read its config from /etc/iproute2/FOO, and,
+if it does not exist, fall back to /usr/share/iproute2/FOO.
+
+You can find iproute2 default configuration in /usr/share/iproute2,
+while you can store your user-modified config files in /etc/iproute2.
+
+/usr/share/iproute2 files are not supposed to be manually modified.
+
+If a previous update broke your user config for iproute2, you may
+have one or more ".rpmsave" files in /etc/iproute2. You can restore
+your config simply dropping the ".rpmsave" suffix from the file name.

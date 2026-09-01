@@ -1,7 +1,8 @@
-diff -urNp a/snmplib/snmp_api.c b/snmplib/snmp_api.c
---- a/snmplib/snmp_api.c	2020-11-26 11:05:51.084788775 +0100
-+++ b/snmplib/snmp_api.c	2020-11-26 11:08:27.850751397 +0100
-@@ -235,7 +235,7 @@ static const char *api_errors[-SNMPERR_M
+diff --git a/snmplib/snmp_api.c b/snmplib/snmp_api.c
+index ad30397..307253a 100644
+--- a/snmplib/snmp_api.c
++++ b/snmplib/snmp_api.c
+@@ -231,7 +231,7 @@ static const char *api_errors[-SNMPERR_MAX + 1] = {
      "No error",                 /* SNMPERR_SUCCESS */
      "Generic error",            /* SNMPERR_GENERR */
      "Invalid local port",       /* SNMPERR_BAD_LOCPORT */
@@ -10,7 +11,7 @@ diff -urNp a/snmplib/snmp_api.c b/snmplib/snmp_api.c
      "Unknown session",          /* SNMPERR_BAD_SESSION */
      "Too long",                 /* SNMPERR_TOO_LONG */
      "No socket",                /* SNMPERR_NO_SOCKET */
-@@ -1662,7 +1662,9 @@ _sess_open(netsnmp_session * in_session)
+@@ -1718,7 +1718,9 @@ _sess_open(netsnmp_session * in_session)
          DEBUGMSGTL(("_sess_open", "couldn't interpret peername\n"));
          in_session->s_snmp_errno = SNMPERR_BAD_ADDRESS;
          in_session->s_errno = errno;
@@ -21,10 +22,11 @@ diff -urNp a/snmplib/snmp_api.c b/snmplib/snmp_api.c
          return NULL;
      }
  
-diff -ruNp a/snmplib/transports/snmpUDPIPv4BaseDomain.c b/snmplib/transports/snmpUDPIPv4BaseDomain.c
---- a/snmplib/transports/snmpUDPIPv4BaseDomain.c	2021-01-06 12:51:51.948106797 +0100
-+++ b/snmplib/transports/snmpUDPIPv4BaseDomain.c	2021-01-06 14:17:31.029745744 +0100
-@@ -209,6 +209,8 @@ netsnmp_udpipv4base_transport_bind(netsn
+diff --git a/snmplib/transports/snmpUDPIPv4BaseDomain.c b/snmplib/transports/snmpUDPIPv4BaseDomain.c
+index 1e15a2f..47ac42e 100644
+--- a/snmplib/transports/snmpUDPIPv4BaseDomain.c
++++ b/snmplib/transports/snmpUDPIPv4BaseDomain.c
+@@ -224,6 +224,8 @@ netsnmp_udpipv4base_transport_bind(netsnmp_transport *t,
          DEBUGMSGTL(("netsnmp_udpbase",
                      "failed to bind for clientaddr: %d %s\n",
                      errno, strerror(errno)));

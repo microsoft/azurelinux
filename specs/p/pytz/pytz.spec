@@ -6,7 +6,7 @@
 
 Name:           pytz
 Version:        2025.2
-Release: 9%{?dist}
+Release:        6%{?dist}
 Summary:        World Timezone Definitions for Python
 
 License:        MIT

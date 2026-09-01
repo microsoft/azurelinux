@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 14;
+    release_number = 19;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -39,6 +39,13 @@ Release:        %autorelease
 Summary:        Parser generator (ANother Tool for Language Recognition)
 
 License:        BSD-3-Clause
+# BSL-1.0: runtime/Cpp/runtime/nuget/ANTLR4.Runtime.cpp.*.nuspec
+# DCO-1.1 (not SPDX): developer-cert-of-origin.txt
+# BSD-3-Clause AND MIT: runtime/Dart/LICENSE (the indicated files do not exist)
+# BSD-3-Clause AND LicenseRef-Fedora-Public-Domain:
+#   runtime/Swift/Tests/Antlr4Tests/MurmurHashTests.swift
+# Unicode-3.0: scripts/parse-extended-pictographic/ExtendedPictographic.txt
+SourceLicense:  %{license} AND BSL-1.0 AND MIT AND LicenseRef-Fedora-Public-Domain
 URL:            https://www.antlr.org/
 VCS:            git:%{giturl}.git
 Source:         %{giturl}/archive/%{version}/antlr4-%{version}.tar.gz
@@ -46,6 +53,8 @@ Source9999: antlr4-project.azl.macros
 # Fix some javadoc problems
 # https://github.com/antlr/antlr4/pull/2960
 Patch:          antlr4-javadoc.patch
+# Confine tokenVocab lookup to the search directory (CVE-2026-13503)
+Patch:          %{giturl}/pull/4942.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -55,7 +64,6 @@ BuildRequires:  maven-local-openjdk25
 BuildRequires:  mvn(com.google.code.maven-replacer-plugin:replacer)
 BuildRequires:  mvn(com.ibm.icu:icu4j)
 BuildRequires:  mvn(com.webguys:string-template-maven-plugin)
-BuildRequires:  mvn(jakarta.json:jakarta.json-api)
 BuildRequires:  mvn(junit:junit)
 BuildRequires:  mvn(org.abego.treelayout:org.abego.treelayout.core)
 BuildRequires:  mvn(org.antlr:ST4)
@@ -78,40 +86,37 @@ BuildRequires:  mvn(org.slf4j:slf4j-simple)
 BuildRequires:  mvn(org.sonatype.plexus:plexus-build-api)
 BuildRequires:  mvn(org.twdata.maven:mojo-executor)
 BuildRequires:  python3-devel
-BuildRequires:  utf8cpp-devel
 
 # https://fedoraproject.org/wiki/Changes/Drop_i686_JDKs
 ExclusiveArch:  %{java_arches}
 
-# Subpackages removed in 4.10.  This can be removed when F40 reaches EOL.
-Obsoletes:      antlr4-runtime-test-annotations < 4.10
-Obsoletes:      antlr4-runtime-test-annotation-processors < 4.10
+%global _desc %{expand:ANTLR (ANother Tool for Language Recognition) is a powerful parser generator
+for reading, processing, executing, or translating structured text or binary
+files.  It is widely used to build languages, tools, and frameworks.  From a
+grammar, ANTLR generates a parser that can build and walk parse trees.}
 
-%global _desc %{expand:
-ANTLR (ANother Tool for Language Recognition) is a powerful parser
-generator for reading, processing, executing, or translating structured
-text or binary files.  It is widely used to build languages, tools, and
-frameworks.  From a grammar, ANTLR generates a parser that can build
-and walk parse trees.}
-
-%description %_desc
+%description
+%_desc
 
 %package     -n antlr4-runtime
 Summary:        ANTLR runtime
 BuildArch:      noarch
 
-%description -n antlr4-runtime %_desc
+%description -n antlr4-runtime
+%_desc
 
 This package provides the runtime library used by Java ANTLR parsers.
 
 %package     -n antlr4
 Summary:        Parser generator (ANother Tool for Language Recognition)
+License:        BSD-3-Clause AND Unicode-3.0
 BuildArch:      noarch
 Requires:       antlr4-runtime = %{version}-%{release}
 Requires:       java-25-headless
 Requires:       javapackages-tools
 
-%description -n antlr4 %_desc
+%description -n antlr4
+%_desc
 
 This package provides the ANTLR parser generator.
 
@@ -119,7 +124,8 @@ This package provides the ANTLR parser generator.
 Summary:        API Documentation for antlr4
 BuildArch:      noarch
 
-%description -n antlr4-javadoc %_desc
+%description -n antlr4-javadoc
+%_desc
 
 This package contains API documentation for antlr4.
 
@@ -128,23 +134,26 @@ Summary:        ANTLR plugin for Apache Maven
 BuildArch:      noarch
 Requires:       antlr4 = %{version}-%{release}
 
-%description -n antlr4-maven-plugin %_desc
+%description -n antlr4-maven-plugin
+%_desc
 
-This package provides a plugin for Apache Maven which can be used to
-generate ANTLR parsers during project build.
+This package provides a plugin for Apache Maven which can be used to generate
+ANTLR parsers during project build.
 
 %package     -n antlr4-doc
 Summary:        ANTLR4 documentation
 BuildArch:      noarch
 
-%description -n antlr4-doc %_desc
+%description -n antlr4-doc
+%_desc
 
 This package contains ANTLR4 documentation.
 
 %package     -n antlr4-cpp-runtime
 Summary:        ANTLR runtime for C++
 
-%description -n antlr4-cpp-runtime %_desc
+%description -n antlr4-cpp-runtime
+%_desc
 
 This package provides the runtime library used by C++ ANTLR parsers.
 
@@ -152,10 +161,10 @@ This package provides the runtime library used by C++ ANTLR parsers.
 Summary:        Header files for programs that use C++ ANTLR parsers
 Requires:       antlr4-cpp-runtime%{?_isa} = %{version}-%{release}
 
-%description -n antlr4-cpp-runtime-devel %_desc
+%description -n antlr4-cpp-runtime-devel
+%_desc
 
-This package provides header files for programs that use C++ ANTLR
-parsers.
+This package provides header files for programs that use C++ ANTLR parsers.
 
 %ifarch %go_arches
 %global goipath github.com/antlr4-go/antlr
@@ -169,7 +178,8 @@ BuildRequires:  go-rpm-macros
 Obsoletes:      golang-antlr4-runtime-devel < 4.13
 Provides:       golang-antlr4-runtime-devel = %{version}-%{release}
 
-%description -n golang-github-antlr4-antlr-devel %_desc
+%description -n golang-github-antlr4-antlr-devel
+%_desc
 
 This package provides the runtime library used by Go ANTLR parsers.
 %endif
@@ -181,21 +191,21 @@ This package provides the runtime library used by Go ANTLR parsers.
 License:        BSD-3-Clause AND MIT
 Summary:        ANTLR runtime for JavaScript
 BuildArch:      noarch
-BuildRequires:  nodejs
 BuildRequires:  nodejs-packaging
 Requires:       nodejs
 
-%description -n nodejs-antlr4 %_desc
+%description -n nodejs-antlr4
+%_desc
 
-This package provides the runtime library used by JavaScript ANTLR
-parsers.
+This package provides the runtime library used by JavaScript ANTLR parsers.
 %endif
 
 %package     -n python3-antlr4-runtime
 Summary:        ANTLR runtime for Python 3
 BuildArch:      noarch
 
-%description -n python3-antlr4-runtime %_desc
+%description -n python3-antlr4-runtime
+%_desc
 
 This package provides the runtime library used by Python 3 ANTLR parsers.
 
@@ -205,7 +215,8 @@ Summary:        ANTLR runtime for swift
 BuildRequires:  chrpath
 BuildRequires:  swift-lang
 
-%description -n swift-antlr4-runtime %_desc
+%description -n swift-antlr4-runtime
+%_desc
 
 This package provides the runtime library used by swift ANTLR parsers.
 %endif
@@ -230,9 +241,6 @@ find -name \*.jar -delete
 # io.takari.maven.plugins:takari-plugin-testing
 %pom_remove_dep -r :takari-plugin-testing
 
-# Adapt to jakarta-json 2.x
-%pom_change_dep org.glassfish:javax.json jakarta.json:jakarta.json-api runtime-testsuite
-
 # Missing plugins
 # io.takari.maven.plugins:takari-lifecycle-plugin
 %pom_remove_plugin -r :takari-lifecycle-plugin
@@ -244,12 +252,8 @@ find -name \*.jar -delete
 
 %mvn_package :antlr4-master antlr4-runtime
 
-# Use utf8cpp instead of the deprecated wstring_convert
-sed -i 's/# \(.*DUSE_UTF8_INSTEAD_OF_CODECVT.*\)/\1/' runtime/Cpp/CMakeLists.txt
-
 %generate_buildrequires
-cd runtime/Python3
-%pyproject_buildrequires
+%pyproject_buildrequires -d runtime/Python3
 
 %build
 export JAVA_HOME=%{_jvmdir}/java
@@ -272,9 +276,7 @@ cd runtime/Cpp
 cd -
 
 # Build the Python 3 runtime
-cd runtime/Python3
-%pyproject_wheel
-cd -
+%pyproject_wheel -d runtime/Python3
 
 %if %{with swift}
 # Build the Swift runtime
@@ -417,20 +419,36 @@ rm -fr %{buildroot}%{_docdir}/libantlr4
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.13.2-14
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 4.13.2-19
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 4.13.2-13
-- build: mass rebuild auto-bumpable components
+* Fri Jul 10 2026 Jerry James <loganjerry@gmail.com> - 4.13.2-18
+- Add patch to fix CVE-2026-13503
 
-* Thu Jul 02 2026 Tobias Brick <tobiasb@microsoft.com> - 4.13.2-12
-- fix(antlr4-project): remove subpackage swift-antlr4-runtime
+* Fri Jul 10 2026 Jerry James <loganjerry@gmail.com> - 4.13.2-17
+- Drop unused BuildRequires
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 4.13.2-11
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 4.13.2-16
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
 
-* Wed Nov 12 2025 Vít Ondruch <vondruch@redhat.com> - 4.13.2-10
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.2-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.13.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Jerry James <loganjerry@gmail.com> - 4.13.2-13
+- Add Unicode-3.0 to the antlr4 License field
+
+* Fri Jan 09 2026 Jerry James <loganjerry@gmail.com> - 4.13.2-12
+- Reflow the description text
+- Remove ancient obsoletes
+
+* Wed Nov 12 2025 Vít Ondruch <vondruch@redhat.com> - 4.13.2-11
 - Rebuild for nodejs-packaging
+
+* Fri Oct 10 2025 Maxwell G <maxwell@gtmx.me> - 4.13.2-10
+- Rebuild for golang 1.25.2
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.13.2-9
 - Rebuilt for Python 3.14.0rc3 bytecode

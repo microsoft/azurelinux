@@ -1,0 +1,38 @@
+From 1f75bc9eed8e0e385f64f368bd69f58d96fb8c2b Mon Sep 17 00:00:00 2001
+From: Sviatoslav Sydorenko <wk@sydorenko.org.ua>
+Date: Thu, 20 Nov 2025 01:36:37 +0100
+Subject: [PATCH] =?UTF-8?q?=F0=9F=A7=AA=20Temporarily=20mark=20`test=5Fque?=
+ =?UTF-8?q?ue=5Ffull`=20as=20`xfail`?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ref: https://github.com/cherrypy/cherrypy/issues/2073
+---
+ cherrypy/test/test_conn.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/cherrypy/test/test_conn.py b/cherrypy/test/test_conn.py
+index b9a2cb8b0..5f602e281 100644
+--- a/cherrypy/test/test_conn.py
++++ b/cherrypy/test/test_conn.py
+@@ -13,6 +13,8 @@
+ from cherrypy._cpcompat import HTTPSConnection, ntob, tonative
+ from cherrypy.test import helper
+ 
++import pytest
++
+ 
+ timeout = 1
+ pov = 'pPeErRsSiIsStTeEnNcCeE oOfF vViIsSiIoOnN'
+@@ -797,6 +799,10 @@ def upload(self):
+ class LimitedRequestQueueTests(helper.CPWebCase):
+     setup_server = staticmethod(setup_upload_server)
+ 
++    @pytest.mark.xfail(
++        reason='Cheroot 11 returns HTTP 503 Service Unavailable on overflows: '
++        'https://github.com/cherrypy/cherrypy/issues/2073',
++    )
+     def test_queue_full(self):
+         conns = []
+         overflow_conn = None

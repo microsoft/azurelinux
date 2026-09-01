@@ -5,14 +5,12 @@
 %{bcond_without perl_HTTP_Daemon_enables_optional_test}
 
 Name:           perl-HTTP-Daemon
-Version:        6.16
-Release: 10%{?dist}
+Version:        6.17
+Release:        1%{?dist}
 Summary:        Simple HTTP server class
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/HTTP-Daemon
 Source0:        https://cpan.metacpan.org/authors/id/O/OA/OALDERS/HTTP-Daemon-%{version}.tar.gz
-# Use Makefile.PL without unneeded dependencies
-Patch0:         HTTP-Daemon-6.04-EU-MM-is-not-deprecated.patch
 BuildArch:      noarch
 BuildRequires:  coreutils
 BuildRequires:  make
@@ -20,7 +18,7 @@ BuildRequires:  findutils
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
 BuildRequires:  perl(:VERSION) >= 5.6
-BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
+BuildRequires:  perl(Module::Build::Tiny) >= 0.034
 BuildRequires:  perl(strict)
 # Run-time:
 BuildRequires:  perl(Carp)
@@ -85,7 +83,6 @@ with "%{_libexecdir}/%{name}/test".
 
 %prep
 %setup -q -n HTTP-Daemon-%{version}
-%patch -P0 -p1
 # Help generators to recognize Perl scripts
 for F in $(find t/ -name '*.t'); do
     perl -i -MConfig -ple 'print $Config{startperl} if $. == 1 && !s{\A#!\s*perl}{$Config{startperl}}' "$F"
@@ -93,11 +90,11 @@ for F in $(find t/ -name '*.t'); do
 done
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
-%{make_build}
+perl Build.PL --installdirs vendor --optimize "$RPM_OPT_FLAGS"
+./Build
 
 %install
-%{make_install}
+./Build install --destdir=$RPM_BUILD_ROOT --create_packlist=0
 # Install tests
 mkdir -p %{buildroot}%{_libexecdir}/%{name}
 cp -a t %{buildroot}%{_libexecdir}/%{name}
@@ -109,7 +106,7 @@ chmod +x %{buildroot}%{_libexecdir}/%{name}/test
 %{_fixperms} %{buildroot}/*
 
 %check
-make test
+./Build test
 
 %files
 %license LICENCE
@@ -121,6 +118,12 @@ make test
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed May 20 2026 Michal Josef Špaček <mspacek@redhat.com> - 6.17-1
+- 6.17 bump
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.16-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.16-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -4,10 +4,10 @@
 Summary:	A modern implementation of a DBM
 Name:		tokyocabinet
 Version:	1.4.48
-Release: 31%{?dist}
+Release:	30%{?dist}
 License:	LGPL-2.1-or-later
-URL:		http://fallabs.com/tokyocabinet/
-Source:		http://fallabs.com/%{name}/%{name}-%{version}.tar.gz
+URL:		https://dbmx.net/tokyocabinet/
+Source:		https://dbmx.net/%{name}/%{name}-%{version}.tar.gz
 Patch0:		tokyocabinet-fedora.patch
 Patch1:		tokyocabinet-manhelp.patch
 BuildRequires: make
@@ -19,6 +19,9 @@ successor of QDBM. Tokyo Cabinet runs very fast. For example, the time required
 to store 1 million records is 1.5 seconds for a hash database and 2.2 seconds
 for a B+ tree database. Moreover, the database size is very small and can be up
 to 8EB. Furthermore, the scalability of Tokyo Cabinet is great.
+
+Kyoto Cabinet is the designated successor of Tokyo Cabinet, and Tkrzw is the
+designated successor to Kyoto Cabinet.
 
 %package devel
 Summary:	Headers for developing programs that will use %{name}
@@ -79,6 +82,13 @@ make check
 %doc doc/*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.48-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Dec 04 2025 Stewart Smith <trawets@amazon.com> - 1.4.48-29
+- Update project and source URLs.
+- Update description to include the author's suggestions of successors
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.48-28
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

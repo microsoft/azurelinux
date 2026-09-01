@@ -18,7 +18,7 @@ TMPDIR="$(mktemp -d)"
 trap "rm -rf '${TMPDIR}'" INT TERM EXIT
 
 cd "${TMPDIR}"
-URL="$(rpm -E "%{pypi_source chardet ${VERSION}}")"
+URL="https://github.com/chardet/chardet/archive/${VERSION}/chardet-${VERSION}.tar.gz"
 echo "--> Downloading: ${URL}" 1>&2
 curl -L -O "${URL}"
 

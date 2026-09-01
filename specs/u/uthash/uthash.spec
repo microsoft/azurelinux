@@ -3,7 +3,7 @@
 
 Name:           uthash
 Version:        2.3.0
-Release: 13%{?dist}
+Release:        11%{?dist}
 Summary:        A hash table for C structures
 
 License:        BSD-1-Clause
@@ -107,6 +107,9 @@ rm -f %{buildroot}%{_pkgdocdir}/html/google*.html
 
 
 %changelog
+* Tue Jan 20 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

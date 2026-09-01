@@ -1,0 +1,499 @@
+From 1cf5e40e14d707de2318747758b012fc7245cb7b Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Mon, 10 Jun 2024 23:00:03 +0300
+Subject: [PATCH 48/53] support authentication indicators in GSSAPI
+
+RFC 6680 defines a set of GSSAPI extensions to handle attributes
+associated with the GSSAPI names. MIT Kerberos and FreeIPA use
+name attributes to add information about pre-authentication methods used
+to acquire the initial Kerberos ticket. The attribute 'auth-indicators'
+may contain list of strings that KDC has associated with the ticket
+issuance process.
+
+Use authentication indicators to authorise or deny access to SSH server.
+GSSAPIIndicators setting allows to specify a list of possible indicators
+that a Kerberos ticket presented must or must not contain. More details
+on the syntax are provided in sshd_config(5) man page.
+
+Fixes: https://bugzilla.mindrot.org/show_bug.cgi?id=2696
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ configure.ac    |   1 +
+ gss-serv-krb5.c |  64 +++++++++++++++++++++++++++---
+ gss-serv.c      | 103 +++++++++++++++++++++++++++++++++++++++++++++++-
+ servconf.c      |  15 ++++++-
+ servconf.h      |   2 +
+ ssh-gss.h       |   7 ++++
+ sshd_config.5   |  44 +++++++++++++++++++++
+ 7 files changed, 228 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 805be4b5e..9d3b19925 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5050,6 +5050,7 @@ AC_ARG_WITH([kerberos5],
+ 		AC_CHECK_HEADERS([gssapi.h gssapi/gssapi.h])
+ 		AC_CHECK_HEADERS([gssapi_krb5.h gssapi/gssapi_krb5.h])
+ 		AC_CHECK_HEADERS([gssapi_generic.h gssapi/gssapi_generic.h])
++		AC_CHECK_HEADERS([gssapi_ext.h gssapi/gssapi_ext.h])
+ 
+ 		AC_SEARCH_LIBS([k_hasafs], [kafs], [AC_DEFINE([USE_AFS], [1],
+ 			[Define this if you want to use libkafs' AFS support])])
+diff --git a/gss-serv-krb5.c b/gss-serv-krb5.c
+index 03188d9b3..2c786ef14 100644
+--- a/gss-serv-krb5.c
++++ b/gss-serv-krb5.c
+@@ -43,6 +43,7 @@
+ #include "log.h"
+ #include "misc.h"
+ #include "servconf.h"
++#include "match.h"
+ 
+ #include "ssh-gss.h"
+ 
+@@ -87,6 +88,33 @@ ssh_gssapi_krb5_init(void)
+ 	return 1;
+ }
+ 
++/* Check if any of the indicators in the Kerberos ticket match
++ * one of indicators in the list of allowed/denied rules.
++ * In case of the match, apply the decision from the rule.
++ * In case of no indicator from the ticket matching the rule, deny
++ */
++
++static int
++ssh_gssapi_check_indicators(ssh_gssapi_client *client, int *matched)
++{
++	int ret;
++	u_int i;
++	*matched = -1;
++
++	/* Check indicators */
++	for (i = 0; client->indicators[i] != NULL; i++) {
++		ret = match_pattern_list(client->indicators[i],
++					 options.gss_indicators, 1);
++		/* negative or positive match */
++		if (ret != 0) {
++			*matched = i;
++			return ret;
++		}
++	}
++	/* No rule matched */
++	return 0;
++}
++
+ /* Check if this user is OK to login. This only works with krb5 - other
+  * GSSAPI mechanisms will need their own.
+  * Returns true if the user is OK to log in, otherwise returns 0
+@@ -193,15 +221,15 @@ static int
+ ssh_gssapi_krb5_userok(ssh_gssapi_client *client, char *name)
+ {
+ 	krb5_principal princ;
+-	int retval;
++	int retval, matched, success;
+ 	const char *errmsg;
+ 	int k5login_exists;
+ 
+ 	if (ssh_gssapi_krb5_init() == 0)
+ 		return 0;
+ 
+-	if ((retval = krb5_parse_name(krb_context, client->exportedname.value,
+-	    &princ))) {
++	retval = krb5_parse_name(krb_context, client->exportedname.value, &princ);
++	if (retval) {
+ 		errmsg = krb5_get_error_message(krb_context, retval);
+ 		logit("krb5_parse_name(): %.100s", errmsg);
+ 		krb5_free_error_message(krb_context, errmsg);
+@@ -216,17 +244,60 @@ ssh_gssapi_krb5_userok(ssh_gssapi_client *client, char *name)
+ 	if (k5login_exists &&
+ 	    ssh_krb5_kuserok(krb_context, princ, name, k5login_exists)) {
+ 		retval = 1;
+-		logit("Authorized to %s, krb5 principal %s (krb5_kuserok)",
+-		    name, (char *)client->displayname.value);
++		errmsg = "krb5_kuserok";
+ 	} else if (ssh_gssapi_krb5_cmdok(princ, client->exportedname.value,
+ 		name, k5login_exists)) {
+ 		retval = 1;
+-		logit("Authorized to %s, krb5 principal %s "
+-		    "(ssh_gssapi_krb5_cmdok)",
+-		    name, (char *)client->displayname.value);
+-	} else
++		errmsg = "ssh_gssapi_krb5_cmdok";
++	} else {
+ 		retval = 0;
++		goto out;
++	}
+ 
++	/* At this point we are good if no indicators were defined */
++	if (options.gss_indicators == NULL) {
++		retval = 1;
++		goto out;
++	}
++
++	/* At this point we have indicators defined in the configuration,
++	 * if clientt did not provide any indicators, we reject */
++	if (!client->indicators) {
++		retval = 0;
++		logit("GSSAPI authentication indicators enforced "
++		      "but indicators not provided by the client. "
++		      "krb5 principal %s denied",
++		      (char *)client->displayname.value);
++		goto out;
++	}
++
++	/* At this point the configuration enforces presence of indicators
++	 * check the match */
++	matched = -1;
++	success = ssh_gssapi_check_indicators(client, &matched);
++
++	switch (success) {
++	case 1:
++		logit("Provided indicator %s allowed by the configuration",
++		      client->indicators[matched]);
++		retval = 1;
++		break;
++	case -1:
++		logit("Provided indicator %s rejected by the configuration",
++		      client->indicators[matched]);
++		retval = 0;
++		break;
++	default:
++		logit("Provided indicators do not match the configuration");
++		retval = 0;
++		break;
++	}
++
++out:
++	if (retval == 1) {
++		logit("Authorized to %s, krb5 principal %s (%s)",
++		      name, (char *)client->displayname.value, errmsg);
++	}
+ 	krb5_free_principal(krb_context, princ);
+ 	return retval;
+ }
+diff --git a/gss-serv.c b/gss-serv.c
+index 6eb7d2163..686ac4eb3 100644
+--- a/gss-serv.c
++++ b/gss-serv.c
+@@ -55,7 +55,7 @@ extern ServerOptions options;
+ 
+ static ssh_gssapi_client gssapi_client =
+     { GSS_C_EMPTY_BUFFER, GSS_C_EMPTY_BUFFER, GSS_C_NO_CREDENTIAL,
+-    GSS_C_NO_NAME, NULL, {NULL, NULL, NULL, NULL, NULL}, 0, 0};
++    GSS_C_NO_NAME, NULL, {NULL, NULL, NULL, NULL, NULL}, 0, 0, NULL};
+ 
+ ssh_gssapi_mech gssapi_null_mech =
+     { NULL, NULL, {0, NULL}, NULL, NULL, NULL, NULL, NULL};
+@@ -295,6 +295,99 @@ ssh_gssapi_parse_ename(Gssctxt *ctx, gss
+ 	return GSS_S_COMPLETE;
+ }
+ 
++
++/* Extract authentication indicators from the Kerberos ticket. Authentication
++ * indicators are GSSAPI name attributes for the name "auth-indicators".
++ * Multiple indicators might be present in the ticket.
++ * Each indicator is an utf8 string. */
++
++#define AUTH_INDICATORS_TAG "auth-indicators"
++#define SSH_GSSAPI_MAX_INDICATORS 64
++
++/* Privileged (called from accept_secure_ctx) */
++static OM_uint32
++ssh_gssapi_getindicators(Gssctxt *ctx, gss_name_t gss_name, ssh_gssapi_client *client)
++{
++	gss_buffer_set_t attrs = GSS_C_NO_BUFFER_SET;
++	gss_buffer_desc value = GSS_C_EMPTY_BUFFER;
++	gss_buffer_desc display_value = GSS_C_EMPTY_BUFFER;
++	int is_mechname, authenticated, complete, more;
++	size_t count, i;
++
++	/* always initialize client->indicators */
++	client->indicators = NULL;
++
++	ctx->major = gss_inquire_name(&ctx->minor, gss_name,
++				      &is_mechname, NULL, &attrs);
++	if (ctx->major != GSS_S_COMPLETE)
++		return ctx->major;
++
++	if (attrs == GSS_C_NO_BUFFER_SET) {
++		/* no indicators in the ticket */
++		return GSS_S_COMPLETE;
++	}
++
++	/* client->indicators is NULL terminated */
++	count = 0;
++	client->indicators = xcalloc(count + 1, sizeof(char *));
++
++	for (i = 0; i < attrs->count; i++) {
++		authenticated = 0;
++		complete = 0;
++		more = -1;
++
++		/* skip anything but auth-indicators */
++		if (((sizeof(AUTH_INDICATORS_TAG) - 1) != attrs->elements[i].length) ||
++		    memcmp(AUTH_INDICATORS_TAG, attrs->elements[i].value,
++			   sizeof(AUTH_INDICATORS_TAG) - 1) != 0)
++			continue;
++
++		/* retrieve all indicators */
++		while (more != 0) {
++			value.value = NULL;
++			display_value.value = NULL;
++
++			ctx->major = gss_get_name_attribute(&ctx->minor, gss_name,
++							    &attrs->elements[i],
++							    &authenticated, &complete,
++							    &value, &display_value, &more);
++			if (ctx->major != GSS_S_COMPLETE)
++				goto out;
++
++			if (value.value == NULL || !authenticated)
++				continue;
++
++			if (count >= SSH_GSSAPI_MAX_INDICATORS) {
++				logit("ssh_gssapi_getindicators:"
++				      " too many indicators, truncating at %d",
++				      SSH_GSSAPI_MAX_INDICATORS);
++				goto out;
++			}
++
++			client->indicators[count] = xmalloc(value.length + 1);
++			memcpy(client->indicators[count], value.value, value.length);
++			client->indicators[count][value.length] = '\0';
++			count++;
++
++			/* add NULL terminator */
++			client->indicators = xrecallocarray(client->indicators, count,
++							    count + 1, sizeof(char *));
++		}
++	}
++
++out:
++	if (ctx->major != GSS_S_COMPLETE && client->indicators != NULL) {
++		for (i = 0; i < count; i++)
++			free(client->indicators[i]);
++		free(client->indicators);
++		client->indicators = NULL;
++	}
++	gss_release_buffer(&ctx->minor, &value);
++	gss_release_buffer(&ctx->minor, &display_value);
++	gss_release_buffer_set(&ctx->minor, &attrs);
++	return ctx->major;
++}
++
+ /* Extract the client details from a given context. This can only reliably
+  * be called once for a context */
+ 
+@@ -386,6 +475,12 @@ ssh_gssapi_getclient(Gssctxt *ctx, ssh_gssapi_client *client)
+ 	}
+ 
+ 	gss_release_buffer(&ctx->minor, &ename);
++	/* Retrieve authentication indicators, if they exist */
++	if ((ctx->major = ssh_gssapi_getindicators(ctx,
++	    ctx->client, client))) {
++		ssh_gssapi_error(ctx);
++		return (ctx->major);
++	}
+ 
+ 	/* We can't copy this structure, so we just move the pointer to it */
+ 	client->creds = ctx->client_creds;
+@@ -453,6 +548,7 @@ int
+ ssh_gssapi_userok(char *user, struct passwd *pw, int kex)
+ {
+ 	OM_uint32 lmin;
++	size_t i;
+ 
+ 	(void) kex; /* used in privilege separation */
+ 
+@@ -471,8 +567,14 @@ ssh_gssapi_userok(char *user, struct passwd *pw, int kex)
+ 			gss_release_buffer(&lmin, &gssapi_client.displayname);
+ 			gss_release_buffer(&lmin, &gssapi_client.exportedname);
+ 			gss_release_cred(&lmin, &gssapi_client.creds);
+-			explicit_bzero(&gssapi_client,
+-			    sizeof(ssh_gssapi_client));
++
++			if (gssapi_client.indicators != NULL) {
++				for (i = 0; gssapi_client.indicators[i] != NULL; i++)
++					free(gssapi_client.indicators[i]);
++				free(gssapi_client.indicators);
++			}
++
++			explicit_bzero(&gssapi_client, sizeof(ssh_gssapi_client));
+ 			return 0;
+ 		}
+ 	else
+diff --git a/servconf.c b/servconf.c
+index f78615c28..e53e8ea30 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -146,6 +146,7 @@ initialize_server_options(ServerOptions *options)
+ 	options->gss_strict_acceptor = -1;
+ 	options->gss_store_rekey = -1;
+ 	options->gss_kex_algorithms = NULL;
++	options->gss_indicators = NULL;
+ 	options->use_kuserok = -1;
+ 	options->enable_k5users = -1;
+ 	options->password_authentication = -1;
+@@ -560,6 +561,7 @@ fill_default_server_options(ServerOptions *options)
+ 	CLEAR_ON_NONE(options->routing_domain);
+ 	CLEAR_ON_NONE(options->host_key_agent);
+ 	CLEAR_ON_NONE(options->per_source_penalty_exempt);
++	CLEAR_ON_NONE(options->gss_indicators);
+ 
+ 	for (i = 0; i < options->num_host_key_files; i++)
+ 		CLEAR_ON_NONE(options->host_key_files[i]);
+@@ -591,7 +592,7 @@ typedef enum {
+ 	sPerSourcePenalties, sPerSourcePenaltyExemptList,
+ 	sClientAliveInterval, sClientAliveCountMax, sAuthorizedKeysFile,
+ 	sGssAuthentication, sGssCleanupCreds, sGssEnablek5users, sGssStrictAcceptor,
+-	sGssKeyEx, sGssKexAlgorithms, sGssStoreRekey,
++	sGssKeyEx, sGssIndicators, sGssKexAlgorithms, sGssStoreRekey,
+ 	sAcceptEnv, sSetEnv, sPermitTunnel,
+ 	sMatch, sPermitOpen, sPermitListen, sForceCommand, sChrootDirectory,
+ 	sUsePrivilegeSeparation, sAllowAgentForwarding,
+@@ -687,6 +688,7 @@ static struct {
+ 	{ "gssapistorecredentialsonrekey", sGssStoreRekey, SSHCFG_GLOBAL },
+ 	{ "gssapikexalgorithms", sGssKexAlgorithms, SSHCFG_GLOBAL },
+ 	{ "gssapienablek5users", sGssEnablek5users, SSHCFG_ALL },
++	{ "gssapiindicators", sGssIndicators, SSHCFG_ALL },
+ #else
+ 	{ "gssapiauthentication", sUnsupported, SSHCFG_ALL },
+ 	{ "gssapicleanupcredentials", sUnsupported, SSHCFG_GLOBAL },
+@@ -696,6 +698,7 @@ static struct {
+ 	{ "gssapistorecredentialsonrekey", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapikexalgorithms", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapienablek5users", sUnsupported, SSHCFG_ALL },
++	{ "gssapiindicators", sUnsupported, SSHCFG_ALL },
+ #endif
+ 	{ "gssusesessionccache", sUnsupported, SSHCFG_GLOBAL },
+ 	{ "gssapiusesessioncredcache", sUnsupported, SSHCFG_GLOBAL },
+@@ -1722,6 +1725,15 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ 			options->gss_kex_algorithms = xstrdup(arg);
+ 		break;
+ 
++	case sGssIndicators:
++		arg = argv_next(&ac, &av);
++		if (!arg || *arg == '\0')
++			fatal("%s line %d: %s missing argument.",
++			    filename, linenum, keyword);
++		if (options->gss_indicators == NULL)
++			options->gss_indicators = xstrdup(arg);
++		break;
++
+ 	case sPasswordAuthentication:
+ 		intptr = &options->password_authentication;
+ 		goto parse_flag;
+@@ -3344,6 +3356,7 @@ dump_config(ServerOptions *o)
+ 	dump_cfg_fmtint(sGssStrictAcceptor, o->gss_strict_acceptor);
+ 	dump_cfg_fmtint(sGssStoreRekey, o->gss_store_rekey);
+ 	dump_cfg_string(sGssKexAlgorithms, o->gss_kex_algorithms);
++	dump_cfg_string(sGssIndicators, o->gss_indicators);
+ #endif
+ 	dump_cfg_fmtint(sPasswordAuthentication, o->password_authentication);
+ 	dump_cfg_fmtint(sKbdInteractiveAuthentication,
+diff --git a/servconf.h b/servconf.h
+index c08cf6a7a..c7cec5ece 100644
+--- a/servconf.h
++++ b/servconf.h
+@@ -179,6 +179,7 @@ typedef struct {
+ 	char   **allow_groups;
+ 	u_int num_deny_groups;
+ 	char   **deny_groups;
++	char   *gss_indicators;
+ 
+ 	u_int num_subsystems;
+ 	char   **subsystem_name;
+@@ -308,6 +309,7 @@ TAILQ_HEAD(include_list, include_item);
+ 		M_CP_STROPT(routing_domain); \
+ 		M_CP_STROPT(permit_user_env_allowlist); \
+ 		M_CP_STROPT(pam_service_name); \
++		M_CP_STROPT(gss_indicators); \
+ 		M_CP_STRARRAYOPT(authorized_keys_files, num_authkeys_files); \
+ 		M_CP_STRARRAYOPT(allow_users, num_allow_users); \
+ 		M_CP_STRARRAYOPT(deny_users, num_deny_users); \
+diff --git a/ssh-gss.h b/ssh-gss.h
+index 329dc9da0..1506719a9 100644
+--- a/ssh-gss.h
++++ b/ssh-gss.h
+@@ -34,6 +34,12 @@
+ #include <gssapi/gssapi.h>
+ #endif
+ 
++#ifdef HAVE_GSSAPI_EXT_H
++#include <gssapi_ext.h>
++#elif defined(HAVE_GSSAPI_GSSAPI_EXT_H)
++#include <gssapi/gssapi_ext.h>
++#endif
++
+ #ifdef KRB5
+ # ifndef HEIMDAL
+ #  ifdef HAVE_GSSAPI_GENERIC_H
+@@ -112,6 +118,7 @@ typedef struct {
+ 	ssh_gssapi_ccache store;
+ 	int used;
+ 	int updated;
++	char **indicators; /* auth indicators */
+ } ssh_gssapi_client;
+ 
+ typedef struct ssh_gssapi_mech_struct {
+diff --git a/sshd_config.5 b/sshd_config.5
+index c172d5aab..676d6d4d2 100644
+--- a/sshd_config.5
++++ b/sshd_config.5
+@@ -788,6 +788,52 @@ This option only applies to connections using GSSAPI.
+ .Pp
+ The list of supported key exchange algorithms may also be obtained using
+ .Qq ssh -Q GSSAPIKexAlgorithms .
++.It Cm GSSAPIIndicators
++Specifies whether to accept or deny GSSAPI authenticated access if Kerberos
++mechanism is used and Kerberos ticket contains a particular set of
++authentication indicators. The values can be specified as a comma-separated list
++.Cm [!]name1,[!]name2,... .
++When indicator's name is prefixed with !, the authentication indicator 'name'
++will deny access to the system. Otherwise, one of non-negated authentication
++indicators must be present in the Kerberos ticket to allow access. If
++.Cm GSSAPIIndicators
++is defined, a Kerberos ticket that has indicators but does not match the
++policy will get denial. If at least one indicator is configured, whether for
++access or denial, tickets without authentication indicators will be explicitly
++rejected.
++.Pp
++By default systems using MIT Kerberos 1.17 or later will not assign any
++indicators. SPAKE and PKINIT methods add authentication indicators
++to all successful authentications. The SPAKE pre-authentication method is
++preferred over an encrypted timestamp pre-authentication when passwords used to
++authenticate user principals. Kerberos KDCs built with Heimdal Kerberos
++(including Samba AD DC built with Heimdal) do not add authentication
++indicators. However, OpenSSH built against Heimdal Kerberos library is able to
++inquire authentication indicators and thus can be used to check for their presence.
++.Pp
++Indicator name is case-sensitive and depends on the configuration of a
++particular Kerberos deployment. Indicators available in MIT Kerberos and
++FreeIPA environments:
++.Pp
++.Bl -tag -width XXXX -offset indent -compact
++.It Cm hardened
++SPAKE or encrypted timestamp pre-authentication mechanisms in MIT Kerberos and FreeIPA
++.It Cm pkinit
++smartcard or PKCS11 token-based pre-authentication in MIT Kerberos and FreeIPA
++.It Cm radius
++pre-authentication based on a RADIUS server in MIT Kerberos and FreeIPA
++.It Cm otp
++TOTP/HOTP-based two-factor pre-authentication in FreeIPA
++.It Cm idp
++OAuth2-based pre-authentication in FreeIPA using an external identity provider
++and device authorization grant flow
++.It Cm passkey
++FIDO2-based pre-authentication in FreeIPA, using FIDO2 USB and NFC tokens
++.El
++.Pp
++The default
++.Dq none
++is to not use GSSAPI authentication indicators for access decisions.
+ .It Cm HostbasedAcceptedAlgorithms
+ The default is handled system-wide by
+ .Xr crypto-policies 7 .
+-- 
+2.52.0
+

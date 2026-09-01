@@ -4,7 +4,7 @@
 Name:           xdotool
 Version:        3.20211022.1
 Epoch:          1
-Release: 12%{?dist}
+Release:        10%{?dist}
 Summary:        Fake keyboard/mouse input
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD
@@ -66,6 +66,9 @@ chmod 0644 examples/ffsp.sh
 %doc examples
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.20211022.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:3.20211022.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

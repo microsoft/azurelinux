@@ -10,13 +10,13 @@
 
 Summary: X.Org X11 developmental X transport library
 Name: xorg-x11-xtrans-devel
-Version: 1.5.2
-Release: 6%{?dist}
+Version: 1.6.0
+Release: 2%{?dist}
 License: HPND AND HPND-sell-variant AND MIT AND MIT-open-group AND X11
 URL: http://www.x.org
 BuildArch: noarch
 
-Source0: https://xorg.freedesktop.org/archive/individual/lib/xtrans-%{version}.tar.gz
+Source0: https://xorg.freedesktop.org/archive/individual/lib/xtrans-%{version}.tar.xz
 
 # Fedora specific patch
 Patch1: xtrans-1.0.3-avoid-gethostname.patch
@@ -56,6 +56,12 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p"
 %{_datadir}/pkgconfig/xtrans.pc
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Michel Dänzer  <mdaenzer@redhat.com> - 1.6.0-1
+- xtrans 1.6.0 (#2350923)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

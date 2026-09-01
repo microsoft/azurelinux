@@ -1,0 +1,24 @@
+From 83612ecf30e9192247ad8c2f67f585360f5ea68b Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Wed, 11 Mar 2026 14:27:21 +0000
+Subject: [PATCH] Add bcm2712 compat
+
+---
+ drivers/video/bcm2835.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/video/bcm2835.c b/drivers/video/bcm2835.c
+index 0c81e606622..0e0cc1979eb 100644
+--- a/drivers/video/bcm2835.c
++++ b/drivers/video/bcm2835.c
+@@ -66,6 +66,7 @@ static int bcm2835_video_probe(struct udevice *dev)
+ static const struct udevice_id bcm2835_video_ids[] = {
+ 	{ .compatible = "brcm,bcm2835-hdmi" },
+ 	{ .compatible = "brcm,bcm2711-hdmi0" },
++	{ .compatible = "brcm,bcm2712-hdmi0" },
+ 	{ .compatible = "brcm,bcm2708-fb" },
+ #if !IS_ENABLED(CONFIG_VIDEO_DT_SIMPLEFB)
+ 	{ .compatible = "simple-framebuffer" },
+-- 
+2.53.0
+

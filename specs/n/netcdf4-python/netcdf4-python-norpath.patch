@@ -1,8 +1,9 @@
-diff -up netcdf4-python-1.5.8rel/setup.py.norpath netcdf4-python-1.5.8rel/setup.py
---- netcdf4-python-1.5.8rel/setup.py.norpath	2021-10-31 07:25:17.000000000 -0600
-+++ netcdf4-python-1.5.8rel/setup.py	2022-01-19 19:37:47.204865578 -0700
-@@ -493,7 +493,7 @@ NETCDF4_DIR environment variable not set
- if sys.platform == 'win32':
+diff --git a/setup.py b/setup.py
+index 0f8db25..9ceb274 100644
+--- a/setup.py
++++ b/setup.py
+@@ -374,7 +374,7 @@ else:
+ if sys.platform == 'win32' or sys.platform == 'cygwin':
      runtime_lib_dirs = []
  else:
 -    runtime_lib_dirs = lib_dirs

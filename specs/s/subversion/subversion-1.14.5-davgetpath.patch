@@ -1,0 +1,58 @@
+From e56243a0a9068d2a7fa3c84d2f73c002aaa401ee Mon Sep 17 00:00:00 2001
+From: Joe Orton <jorton@redhat.com>
+Date: Fri, 7 Feb 2025 11:52:42 +0000
+Subject: [PATCH 1/2] mod_dav_svn: Use mod_dav's DAVBasePath setting to
+ determine the repository root path, allowing SVN to be configured via
+ LocationMatch like:
+
+ <LocationMatch ^/repos/svn(.*)>
+    DAV svn
+    SVNParentPath /srv/repos
+    DAVBasePath /repos
+ </LocationMatch>
+
+by mapping URL path "/repos/svnfoo" to the filesystem path of
+"/srv/repos/svnfoo". This partially addresses issues like SVN-4790
+(with minimal added complexity), though does not provide as much
+flexibility as discussed in SVN-2679.
+
+* subversion/mod_dav_svn/mod_dav_svn.c
+  (dav_svn__get_root_dir): Retrieve and return the setting from
+  DavBasePath via dav_get_base_path() where that API is available
+  and DavBasePath is configured.
+  (dav_svn__translate_name): Use dav_svn__get_root_dir() to determine
+  the repos root for the same reason.
+---
+ subversion/mod_dav_svn/mod_dav_svn.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/subversion/mod_dav_svn/mod_dav_svn.c b/subversion/mod_dav_svn/mod_dav_svn.c
+index 72f4470f62624..9b13134f33545 100644
+--- a/subversion/mod_dav_svn/mod_dav_svn.c
++++ b/subversion/mod_dav_svn/mod_dav_svn.c
+@@ -781,6 +781,15 @@ const char *
+ dav_svn__get_root_dir(request_rec *r)
+ {
+   dir_conf_t *conf;
++#if AP_MODULE_MAGIC_AT_LEAST(20120211, 139)
++  const char *base;
++
++  /* Inherit the root path from mod_dav's DavBasePath iff configured
++     where e.g. LocationMatch is used for the repos. */
++  base = dav_get_base_path(r);
++  if (base)
++    return base;
++#endif
+ 
+   conf = ap_get_module_config(r->per_dir_config, &dav_svn_module);
+   return conf->root_dir;
+@@ -1225,7 +1234,7 @@ static int dav_svn__translate_name(request_rec *r)
+   else
+     {
+       /* Retrieve path to repo and within repo for the request */
+-      dav_error *err = dav_svn_split_uri(r, r->uri, conf->root_dir,
++      dav_error *err = dav_svn_split_uri(r, r->uri, dav_svn__get_root_dir(r),
+                                          &ignore_cleaned_uri,
+                                          &ignore_had_slash, &repos_basename,
+                                          &ignore_relative_path, &repos_path);
+

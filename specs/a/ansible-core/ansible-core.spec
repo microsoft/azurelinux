@@ -16,28 +16,36 @@
 %undefine _py3_shebang_s
 
 Name:           ansible-core
-Version:        2.18.12
+Version:        2.20.7
 %global uversion %{version_no_tilde %{quote:%nil}}
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        A radically simple IT automation system
 
 # The main license is GPLv3+. Many of the files in lib/ansible/module_utils
 # are BSD licensed. There are various files scattered throughout the codebase
 # containing code under different licenses.
-License:        GPL-3.0-or-later AND BSD-2-Clause AND PSF-2.0 AND MIT AND Apache-2.0
+# The ssh-agent helper code is BSD-3-Clause.
+License:        GPL-3.0-or-later AND BSD-2-Clause AND BSD-3-Clause AND PSF-2.0 AND MIT AND Apache-2.0
 URL:            https://ansible.com
 
 Source0:        https://github.com/ansible/ansible/archive/v%{uversion}/%{name}-%{uversion}.tar.gz
 Source1:        https://github.com/ansible/ansible-documentation/archive/v%{uversion}/ansible-documentation-%{uversion}.tar.gz
 
-# dnf5,apt: add auto_install_module_deps option (#84292)
-# https://github.com/ansible/ansible/pull/84292.patch
-# https://bugzilla.redhat.com/2322751
-Patch:          0001-dnf5-apt-add-auto_install_module_deps-option-84292.patch
-# Initial support for Python 3.14
-# Downstream patch. See comments in patch file.
-# https://bugzilla.redhat.com/2366307
-Patch:          0002-Initial-support-for-Python-3.14.patch
+# Do not require wheel for building.
+# https://github.com/ansible/ansible/pull/85533 merged upstream.
+# The needlessly required wheel version was pinned, so get rid of it rather than unpinning.
+# Also, wheel is unwanted in ELN: https://github.com/fedora-eln/eln/issues/284
+Patch:          nowheel.patch
+# ansible-core 2.20 does not support Python 3.15 and upstream does not plan to do so until 2.22
+# This is a downstream-only patch to make it possible to build 2.20 with Python 3.15
+Patch:          allow-python3.15-build.patch
+
+# Fix general compatibility with Python 3.15
+# The test fix bit comes from https://github.com/ansible/ansible/commit/d60f11409
+# (rebased to apply on the sources of this version)
+# Changes to the _dataclass_annotation_patch come from merged:
+# https://github.com/ansible/ansible/pull/86976
+Patch:          fix-compatibility-with-python-315.patch
 
 BuildArch:      noarch
 
@@ -50,23 +58,13 @@ Provides:       bundled(python3dist(distro)) = 1.9.0
 
 # lib/ansible/module_utils/six/*
 # SPDX-License-Identifier: MIT
-Provides:       bundled(python3dist(six)) = 1.16.0
+Provides:       bundled(python3dist(six)) = 1.17.0
 
-Conflicts:      ansible <= 2.9.99
-#
-# obsoletes/provides for ansible-base
-#
-Provides:       ansible-base = %{version}-%{release}
-Obsoletes:      ansible-base < 2.10.6-1
+# lib/ansible/_internal/_wrapt.py
+# SPDX-License-Identifier: BSD-2-Clause
+Provides:       bundled(python3dist(wrapt)) = 1.17.2
 
-BuildRequires:  make
 BuildRequires:  python%{python3_pkgversion}-devel
-# This is only used in %%prep to relax the required setuptools version,
-# which is not necessary in RHEL 10+.
-# Not using it in RHEL avoids unwanted dependencies.
-%if %{undefined rhel}
-BuildRequires:  tomcli >= 0.3.0
-%endif
 # Needed to build manpages from source.
 BuildRequires:  python%{python3_pkgversion}-docutils
 
@@ -108,12 +106,9 @@ This package installs extensive documentation for ansible-core
 
 %prep
 %autosetup -p1 -n ansible-%{uversion} -a1
-# Relax setuptools constraint on Fedora
-# Future RHELs have new enough setuptools
-%if %{undefined rhel}
-tomcli-set pyproject.toml lists replace \
-    'build-system.requires' 'setuptools >=.*' 'setuptools'
-%endif
+# Drop setuptools constraints
+# (rawhide might have newer setuptools, older releases might have older)
+%pyproject_patch_dependency setuptools:drop_constraints
 
 sed -i -s 's|/usr/bin/env python|%{python3}|' \
     bin/ansible-test \
@@ -248,8 +243,8 @@ install -Dpm 0644 licenses/* -t %{buildroot}%{_pkglicensedir}
 
 %files -f %{pyproject_files}
 %license COPYING
-%license %{_pkglicensedir}/{Apache-License,MIT-license,PSF-license,simplified_bsd}.txt
-%doc README.md changelogs/CHANGELOG-v2.1?.rst
+%license %{_pkglicensedir}/{Apache-License,MIT-license,PSF-license,simplified_bsd,BSD-3-Clause}.txt
+%doc README.md changelogs/CHANGELOG-v2.2?.rst
 %dir %{_sysconfdir}/ansible/
 %config(noreplace) %{_sysconfdir}/ansible/*
 %{_bindir}/ansible*
@@ -268,8 +263,46 @@ install -Dpm 0644 licenses/* -t %{buildroot}%{_pkglicensedir}
 
 
 %changelog
-* Thu Dec 11 2025 Maxwell G <maxwell@gtmx.me> - 2.18.12-1
-- Update to 2.18.12.
+* Wed Jul 08 2026 Maxwell G <maxwell@gtmx.me> - 2.20.7-1
+- Update to 2.20.7.
+
+* Thu Jun 11 2026 Maxwell G <maxwell@gtmx.me> - 2.20.7~rc1-1
+- Update to 2.20.7~rc1.
+- Mitigates CVE-2026-11332 (rhbz#2485397)
+
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 2.20.6-2
+- Rebuilt for Python 3.15
+
+* Tue May 19 2026 Maxwell G <maxwell@gtmx.me> - 2.20.6-1
+- Update to 2.20.6.
+
+* Thu Apr 30 2026 Maxwell G <maxwell@gtmx.me> - 2.20.5-1
+- Update to 2.20.5. Fixes rhbz#2459946.
+
+* Tue Mar 31 2026 Maxwell G <maxwell@gtmx.me> - 2.20.4-1
+- Update to 2.20.4. Fixes rhbz#2450405.
+
+* Wed Mar 18 2026 Miro Hrončok <mhroncok@redhat.com> - 2.20.3-2
+- Drop an unneeded BuildRequires for python3dist(wheel) = 0.45.1
+
+* Tue Feb 24 2026 Maxwell G <maxwell@gtmx.me> - 2.20.3-1
+- Update to 2.20.3. Fixes rhbz#2442079.
+
+* Thu Feb 12 2026 Maxwell G <maxwell@gtmx.me> - 2.20.2-1
+- Update to 2.20.2. Fixes rhbz#2435360.
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.20.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 09 2025 Maxwell G <maxwell@gtmx.me> - 2.20.1-1
+- Update to 2.20.1. Fixes rhbz#2382388.
+- Update bundled() Provides
+- Remove upstreamed patches
+- Remove old Provides and Obsoletes for ansible-base and Ansible <= 2.9
 
 * Mon Nov 17 2025 Packit <hello@packit.dev> - 2.18.11-1
 - Update to version 2.18.11

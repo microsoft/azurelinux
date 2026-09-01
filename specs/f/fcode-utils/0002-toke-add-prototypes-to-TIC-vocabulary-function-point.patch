@@ -1,0 +1,247 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Wed, 6 May 2026 16:33:30 +0200
+Subject: [PATCH] toke: add prototypes to TIC vocabulary function pointers for
+ GCC 15
+
+GCC 15 enforces strict prototypes; the K&R-style empty `()` parameter
+lists in the tic_*_hdr_t function pointer fields and a few related
+function declarations no longer compile. Type the funct/ign_func slots
+with their actual parameter unions (tic_param_t for active processing,
+tic_bool_param_t for "ignoring" callbacks), update the matching
+function signatures in conditl.c, macros.c, and scanner.c, and cast
+ifunc in DUFNC_FWT_PARM / DUALFUNC_FWT_TIC so dual-purpose functions
+(process_remark, FWORD_EXEC_FUNC) can still land in the bool-typed
+ign_func slot. push_source's res_func is similarly typed as
+void(*)(_PTR), with a cast at the macros.c call site.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+
+diff --git a/toke/conditl.c b/toke/conditl.c
+index 842a8f6..3705bc3 100644
+--- a/toke/conditl.c
++++ b/toke/conditl.c
+@@ -624,7 +624,7 @@ static void conditional_word_in_line( bool alr_ign,
+  *
+  **************************************************************************** */
+ 
+-static void if_exists( tic_param_t pfield )
++static void if_exists( tic_bool_param_t pfield )
+ {
+     bool alr_ign = *pfield.bool_ptr;
+     conditional_word_in_line( alr_ign, true, exists_in_current );
+diff --git a/toke/macros.c b/toke/macros.c
+index a3afb9e..b424d88 100644
+--- a/toke/macros.c
++++ b/toke/macros.c
+@@ -210,7 +210,7 @@ static void macro_recursion_error( tic_param_t pfield)
+  *
+  **************************************************************************** */
+ 
+-typedef void (*vfunct)();  /*  Pointer to function returning void  */
++typedef void (*vfunct)(tic_param_t);  /*  Pointer to function returning void  */
+ static vfunct sav_mac_funct ;
+ 
+ 
+@@ -248,7 +248,7 @@ static void eval_mac_string( tic_param_t pfield)
+     sav_mac_funct = *tic_found->funct;
+     (*tic_found).funct = macro_recursion_error;
+     (*tic_found).ign_func = macro_recursion_error;
+-    push_source( mac_string_recovery, tic_found, false);
++    push_source( (void (*)(_PTR))mac_string_recovery, tic_found, false);
+     report_multiline = false;  /*  Must be done AFTER call to push_source()
+                                 *      because  report_multiline  is part of
+                                 *      the state that  push_source()  saves.
+@@ -455,7 +455,7 @@ static void print_if_mac_err( bool failure, char *func_cpy)
+ /*  This pointer is exported to this file only  */
+ extern tic_hdr_t *tokz_esc_vocab ;
+ 
+-void add_user_macro( void)
++void add_user_macro( tic_param_t pfield)
+ {
+     char *macroname;
+     char *macrobody;
+diff --git a/toke/macros.h b/toke/macros.h
+index 6b42894..6b3622c 100644
+--- a/toke/macros.h
++++ b/toke/macros.h
+@@ -46,7 +46,7 @@
+  **************************************************************************** */
+ 
+ void init_macros( tic_hdr_t **tic_vocab_ptr );
+-void add_user_macro( void);
++void add_user_macro( tic_param_t pfield);
+ void skip_user_macro( tic_bool_param_t pfield );
+ #if  0  /*  What's this doing here?  */
+ char *lookup_macro(char *name);
+diff --git a/toke/scanner.c b/toke/scanner.c
+index 46d327d..a2d7090 100644
+--- a/toke/scanner.c
++++ b/toke/scanner.c
+@@ -388,7 +388,7 @@ static source_state_t  *saved_source = NULL;
+  *
+  **************************************************************************** */
+ 
+-void push_source( void (*res_func)(), _PTR res_parm, bool file_chg )
++void push_source( void (*res_func)(_PTR), _PTR res_parm, bool file_chg )
+ {
+     source_state_t  *new_sav_src;
+ 
+diff --git a/toke/scanner.h b/toke/scanner.h
+index 722ad78..4581859 100644
+--- a/toke/scanner.h
++++ b/toke/scanner.h
+@@ -93,7 +93,7 @@ void init_scan_state( void );
+ void	 fcode_ender( void );
+ 
+ bool skip_until( char lim_ch);
+-void push_source( void (*res_func)(), _PTR res_parm, bool is_f_chg );
++void push_source( void (*res_func)(_PTR), _PTR res_parm, bool is_f_chg );
+ signed long get_word( void);
+ bool get_word_in_line( char *func_nam);
+ bool get_rest_of_line( void);
+diff --git a/toke/ticvocab.c b/toke/ticvocab.c
+index 90ecc8d..08e0ade 100644
+--- a/toke/ticvocab.c
++++ b/toke/ticvocab.c
+@@ -208,12 +208,12 @@ void init_tic_vocab( tic_hdr_t *tic_vocab_tbl,
+  **************************************************************************** */
+ 
+ static tic_hdr_t *make_tic_entry( char *tname,
+-                        void (*tfunct)(),
++                        void (*tfunct)(tic_param_t),
+                              TIC_P_DEFLT_TYPE tparam,
+                                  fwtoken fw_defr,
+ 				     int pfldsiz,
+                                          bool is_single,
+-                                         void (*ign_fnc)(),
++                                           void (*ign_fnc)(tic_param_t),
+                                                bool trace_this,
+                                              tic_hdr_t **tic_vocab )
+ {
+@@ -285,12 +285,12 @@ static tic_hdr_t *make_tic_entry( char *tname,
+  **************************************************************************** */
+ 
+ void add_tic_entry( char *tname,
+-                        void (*tfunct)(),
++                        void (*tfunct)(tic_param_t),
+                              TIC_P_DEFLT_TYPE tparam,
+                                  fwtoken fw_defr,
+ 				     int pfldsiz,
+                                          bool is_single,
+-					   void (*ign_fnc)(),
++                                           void (*ign_fnc)(tic_param_t),
+ 					       tic_hdr_t **tic_vocab )
+ {
+     bool trace_this = is_on_trace_list( tname);
+diff --git a/toke/ticvocab.h b/toke/ticvocab.h
+index d9a6ec5..264e833 100644
+--- a/toke/ticvocab.h
++++ b/toke/ticvocab.h
+@@ -125,6 +125,11 @@
+ #include "types.h"
+ #include "dictionary.h"
+ 
++/*  Forward declaration for use in  tic_fwt_hdr_t  ign_func signature;
++ *      the union itself is fully defined further down.
++ */
++typedef union tic_bool_param tic_bool_param_t;
++
+ /* **************************************************************************
+  *
+  *      In order to work around C's limitations regarding data-typing
+@@ -183,7 +188,7 @@ typedef struct tic_hdr
+ 	tic_param_t       pfield;
+ 	fwtoken           fword_defr;    /*  FWord Token of entry's Definer  */
+ 	bool              is_token;      /*  Is entry a single-token FCode?  */
+-	void            (*ign_func)();   /*  Function in "Ignored" segment   */
++	void            (*ign_func)(tic_param_t);   /*  Function in "Ignored" segment   */
+ 	int               pfld_size;
+ 	bool              tracing;       /*  TRUE if Invoc'n Msg required    */
+     }  tic_hdr_t ;
+@@ -208,11 +213,11 @@ typedef struct tic_fwt_hdr
+     {
+         char               *name;
+ 	struct tic_fwt_hdr *next;
+-	void              (*funct)();    /*  Function for active processing  */
++	void              (*funct)(tic_param_t);    /*  Function for active processing  */
+ 	tic_fwt_param_t     pfield;
+ 	fwtoken             fword_defr;  /*  FWord Token of entry's Definer  */
+ 	bool                is_token;    /*  Is entry a single-token FCode?  */
+-	void              (*ign_func)(); /*  Function in "Ignored" segment   */
++	void              (*ign_func)(tic_bool_param_t); /*  Function in "Ignored" segment   */
+ 	int                 pfld_size;
+ 	bool                tracing;     /*  TRUE if Invoc'n Msg required    */
+     }  tic_fwt_hdr_t ;
+@@ -244,11 +249,11 @@ typedef struct tic_mac_hdr
+     {
+         char               *name;
+ 	struct tic_mac_hdr *next;
+-	void              (*funct)();
++	void              (*funct)(tic_param_t);
+ 	tic_mac_param_t     pfield;
+ 	fwtoken             fword_defr;
+ 	bool                is_token;    /*  Is entry a single-token FCode?  */
+-	void              (*ign_func)();
++	void              (*ign_func)(tic_param_t);
+ 	int                 pfld_size;
+ 	bool                tracing;     /*  TRUE if Invoc'n Msg required    */
+     }  tic_mac_hdr_t ;
+@@ -261,20 +266,20 @@ typedef struct tic_mac_hdr
+  **************************************************************************** */
+ 
+ #define TIC_BOOL_P_DEFLT_TYPE  bool *
+-typedef union tic_bool_param
++union tic_bool_param
+     {
+ 	TIC_BOOL_P_DEFLT_TYPE deflt_elem ;  /*  "Default element" aspect.  */
+ 	long              long_val ;    /*  Long integer                   */
+ 	fwtoken           fw_token ;    /*  FWord Token                    */
+ 	bool             *bool_ptr ;    /*  Explicit Ptr to boolean v'ble  */
+ 	char             *chr_ptr  ;    /*  Pointer to a character string  */
+-    } tic_bool_param_t ;
++    };
+ 
+ typedef struct tic_bool_hdr
+     {
+         char                *name;
+ 	struct tic_bool_hdr *next;
+-	void               (*funct)();
++	void               (*funct)(tic_bool_param_t);
+ 	tic_bool_param_t     pfield;
+ 	fwtoken              fword_defr;
+ 	bool                is_token;    /*  Is entry a single-token FCode?  */
+@@ -385,7 +390,8 @@ typedef struct tic_bool_hdr
+ /*  Similar but a  tic_fwt_hdr_t  type structure  */
+ #define DUFNC_FWT_PARM(nam, afunc, pval, ifunc, definr )  \
+     { nam , (tic_fwt_hdr_t *)NULL , afunc ,  \
+-        { (TIC_FWT_P_DEFLT_TYPE)(pval) }, definr , false , ifunc , 0 , false }
++        { (TIC_FWT_P_DEFLT_TYPE)(pval) }, definr , false ,  \
++        (void (*)(tic_bool_param_t))(ifunc) , 0 , false }
+ 
+ 
+ /* **************************************************************************
+@@ -427,7 +433,7 @@ typedef struct tic_bool_hdr
+  **************************************************************************** */
+ #define DUALFUNC_FWT_TIC(nam, afunc, fw_tokval, ifunc, definr )    \
+     { nam , (tic_fwt_hdr_t *)NULL , afunc , { fw_tokval }, \
+-      definr , false , ifunc , 0 , false }
++      definr , false , (void (*)(tic_bool_param_t))(ifunc) , 0 , false }
+ 
+ /* **************************************************************************
+  *          Macro Name:   BUILTIN_MAC_TIC
+@@ -487,12 +493,12 @@ void init_tic_vocab( tic_hdr_t *tic_vocab_tbl,
+                          int max_indx,
+ 			     tic_hdr_t **tic_vocab_ptr);
+ void add_tic_entry( char *tname,
+-                        void (*tfunct)(),
++                        void (*tfunct)(tic_param_t),
+                              TIC_P_DEFLT_TYPE tparam,
+                                  fwtoken fw_defr,
+ 				     int pfldsiz,
+                                          bool is_single,
+-                                         void (*ign_fnc)(),
++                                         void (*ign_fnc)(tic_param_t),
+                                              tic_hdr_t **tic_vocab );
+ tic_hdr_t *lookup_tic_entry( char *tname, tic_hdr_t *tic_vocab );
+ bool exists_in_tic_vocab( char *tname, tic_hdr_t *tic_vocab );

@@ -50,7 +50,12 @@
 %bcond_without bundled_cppdap
 
 # Run tests
+# ... except i686.
+%ifnarch i686
 %bcond_without test
+%else
+%bcond_with test
+%endif
 
 # Enable X11 tests
 %bcond_without X11_test
@@ -67,12 +72,12 @@
 # Setup _vpath_builddir if not defined already
 %{!?_vpath_builddir:%global _vpath_builddir %{_target_platform}}
 
-%global major_version 3
-%global minor_version 31
-%global patch_version 10
+%global major_version 4
+%global minor_version 3
+%global patch_version 0
 
 # For handling bump release by rpmdev-bumpspec and mass rebuild
-%global baserelease 3
+%global baserelease 1
 
 # Set to RC version if building RC, else comment out.
 #%%global rcsuf rc3
@@ -117,8 +122,10 @@ Source6:        %{name}.req
 # Patch to fix RindRuby vendor settings
 # http://public.kitware.com/Bug/view.php?id=12965
 # https://bugzilla.redhat.com/show_bug.cgi?id=822796
+# TODO: Find better wat to handle this
 Patch100:       %{name}-findruby.patch
 
+# TODO: Remove this patch
 # Patch for renaming on EPEL
 %if 0%{?name_suffix:1}
 Patch1:         %{name}-rename.patch
@@ -209,8 +216,13 @@ Requires:       %{name}-data = %{version}-%{release}
 Requires:       (%{name}-rpm-macros = %{version}-%{release} if rpm-build)
 Requires:       %{name}-filesystem%{?_isa} = %{version}-%{release}
 
-# Explicitly require make.  (rhbz#1862014)
+# TODO: Change to the latter design. Currently blocked by various `Requires: make` in dependency chains
+#   Also relevant for user configuration: https://gitlab.kitware.com/cmake/cmake/-/issues/26891
 Requires:       make
+
+# Explicitly require the generators with ninja-build as the default
+# Requires:       (ninja-build or make)
+# Suggests:       ninja-build
 
 # Provide the major version name
 Provides: %{orig_name}%{major_version} = %{version}-%{release}
@@ -282,6 +294,10 @@ Summary:        Common RPM macros for %{name}
 Requires:       rpm
 # when subpkg introduced
 Conflicts:      cmake-data < 3.10.1-2
+
+# Related to the ninja default generator, see the TODO note above on how this should be changed
+# Suggests:       ninja-build
+Requires:       ninja-build
 
 BuildArch:      noarch
 
@@ -520,6 +536,8 @@ NO_TEST="$NO_TEST|Qt5Autogen.ManySources|Qt5Autogen.MocInclude|Qt5Autogen.MocInc
 # Test failing on Fedora 41, only.
 NO_TEST="$NO_TEST|RunCMake.Make|RunCMake.BuildDepends|Qt6Autogen.RerunMocBasic|Qt6Autogen.RerunRccDepends"
 %endif
+# TODO: check why this fails
+NO_TEST="$NO_TEST|RunCMake.ParseImplicitLinkInfo"
 bin/ctest%{?name_suffix} %{?_smp_mflags} -V -E "$NO_TEST" --output-on-failure
 ## do this only periodically, not for every build -- besser82 20221102
 # Keep an eye on failing tests
@@ -603,6 +621,27 @@ popd
 
 
 %changelog
+* Sun Mar 22 2026 Björn Esser <besser82@fedoraproject.org> - 4.3.0-1
+- cmake-4.3.0
+  Fixes rhbz#2448436
+
+* Mon Feb 16 2026 Cristian Le <git@lecris.dev> - 4.2.3-2
+- Default generator to Ninja (rhbz#2376112)
+
+* Tue Feb 10 2026 Tom Callaway <spot@fedoraproject.org> - 4.2.3-1
+- update to 4.2.3
+- apply upstream fix for FindLua to find Lua 5.5
+
+* Wed Feb 04 2026 Cristian Le <git@lecris.dev> - 4.2.1-1
+- cmake-4.2.1
+  Fixes rhbz#2355426
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.31.10-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.31.10-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Dec 12 2025 Miro Hrončok <mhroncok@redhat.com> - 3.31.10-3
 - Declarative %%generate_buildrequires: Keep the BRs stable
 

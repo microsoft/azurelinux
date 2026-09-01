@@ -1,0 +1,50 @@
+From 391261c849c994ca2d3f42926497e633047ed8c7 Mon Sep 17 00:00:00 2001
+From: Thomas Goirand <zigo@debian.org>
+Date: Thu, 12 Feb 2026 14:53:35 +0100
+Subject: [PATCH] Fix cliff sphinxextention for Python 3.14
+
+sphinxtext.py's _format_usage() is using _format_actions_usage()
+from argparse argparse.HelpFormatter, which is a private API that
+is gone from Python 3.14. This patch rewrites that part without
+the gone function if _format_actions_usage() doesn't exist, so
+the code is compatible with Python >= 3.14.
+
+Signed-off-by: Thomas Goirand <zigo@debian.org>
+Change-Id: I0d18badf1fe03213cc4db9c5a2bebb1dddea9655
+---
+ cliff/sphinxext.py | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/cliff/sphinxext.py b/cliff/sphinxext.py
+index 1b16e10..acb6f0f 100644
+--- a/cliff/sphinxext.py
++++ b/cliff/sphinxext.py
+@@ -84,12 +84,23 @@ def _format_usage(parser: argparse.ArgumentParser) -> list[str]:
+         re.VERBOSE,
+     )
+ 
+-    opt_usage = fmt._format_actions_usage(optionals, groups)
+-    pos_usage = fmt._format_actions_usage(positionals, groups)
++    if sys.version_info >= (3, 14):
++        usage = parser.format_usage().strip()
+ 
+-    opt_parts = part_regexp.findall(opt_usage)
+-    pos_parts = part_regexp.findall(pos_usage)
+-    parts = opt_parts + pos_parts
++        if usage.lower().startswith("usage:"):
++            usage = usage.split(":", 1)[1].strip()
++
++        if usage.startswith(parser.prog):
++            usage = usage[len(parser.prog) :].lstrip()
++
++        parts = part_regexp.findall(usage)
++    else:
++        opt_usage = fmt._format_actions_usage(optionals, groups)
++        pos_usage = fmt._format_actions_usage(positionals, groups)
++
++        opt_parts = part_regexp.findall(opt_usage)
++        pos_parts = part_regexp.findall(pos_usage)
++        parts = opt_parts + pos_parts
+ 
+     if len(' '.join([parser.prog] + parts)) < 72:
+         return [' '.join([parser.prog] + parts)]

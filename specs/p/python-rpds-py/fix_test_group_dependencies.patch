@@ -1,0 +1,13 @@
+diff -U 3 -dHrN a/pyproject.toml b/pyproject.toml
+--- a/pyproject.toml	2006-07-24 03:21:28.000000000 +0200
++++ b/pyproject.toml	2025-11-22 19:03:59.102887442 +0100
+@@ -151,8 +151,7 @@
+   "url-py>=0.18.0",
+ ]
+ test = [
+-  "pytest>=9.0.1",
+-  "pytest-run-parallel>=0.7.1",
++  "pytest>=8.3",
+ ]
+ typing = [
+   { include-group = "test" },

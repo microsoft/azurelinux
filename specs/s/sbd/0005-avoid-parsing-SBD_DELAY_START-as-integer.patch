@@ -1,0 +1,33 @@
+From 12528cdf4d643aa304fd5aaf05ad62effd28b26a Mon Sep 17 00:00:00 2001
+From: "Gao,Yan" <ygao@suse.com>
+Date: Tue, 26 Nov 2024 12:29:35 +0100
+Subject: [PATCH] Fix: sbd-inquisitor: avoid parsing SBD_DELAY_START as a time
+ duration if its value is boolean false
+
+... to prevent the unnecessary call to crm_get_msec() and the warning
+about an invalid value.
+
+This addresses the issue brought up from:
+https://github.com/ClusterLabs/pacemaker/pull/3643#pullrequestreview-2448716154
+---
+ src/sbd-inquisitor.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/sbd-inquisitor.c b/src/sbd-inquisitor.c
+index 56fd8a8..4ec140d 100644
+--- a/src/sbd-inquisitor.c
++++ b/src/sbd-inquisitor.c
+@@ -988,9 +988,7 @@ int main(int argc, char **argv, char **envp)
+ 
+         value = get_env_option("SBD_DELAY_START");
+         if(value) {
+-            delay_start = crm_is_true(value);
+-
+-            if (!delay_start) {
++            if (crm_str_to_boolean(value, (int *) &delay_start) != 1) {
+                 delay = crm_get_msec(value) / 1000;
+                 if (delay > 0) {
+                     delay_start = true;
+-- 
+2.51.0
+

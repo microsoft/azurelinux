@@ -13,7 +13,7 @@
 Name:    kf5-%{framework}
 Epoch:   1
 Version: 5.116.0
-Release: 7%{?dist}
+Release: 5%{?dist}
 Summary: The Syndication Library
 
 License: BSD-2-Clause AND CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.0-or-later
@@ -87,6 +87,9 @@ export CTEST_OUTPUT_ON_FAILURE=1
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:5.116.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:5.116.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

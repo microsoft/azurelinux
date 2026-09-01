@@ -4,15 +4,14 @@
 %bcond_with check
 
 Name:           libqb
-Version:        2.0.8
-Release: 10%{?dist}
+Version:        2.0.10
+Release:        1%{?dist}
 Summary:        Library providing high performance logging, tracing, ipc, and poll
 
 License:        LGPL-2.1-or-later
 URL:            https://github.com/ClusterLabs/libqb
 Source0:        https://github.com/ClusterLabs/libqb/releases/download/v%{version}/%{name}-%{version}.tar.xz
 
-Patch0: include-libxml-parser.patch
 
 BuildRequires:  autoconf automake libtool
 BuildRequires:  check-devel
@@ -34,7 +33,6 @@ and polling.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch -P0 -p1 -b .include-libxml-parser.patch
 
 %build
 ./autogen.sh
@@ -90,6 +88,15 @@ This package contains a program to create nicely-formatted man pages from Doxyge
 
 
 %changelog
+* Wed Jun  3 2026 Christine Caulfield <ccaulfie@redhat.com> 2.0.10-1
+- rebase to v2.0.10
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Sep 29 2025 Christine Caulfield <ccaulfie@redhat.com> 2.0.9-1
+- rebase to v2.0.9
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.8-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -9,7 +9,7 @@
 
 Name:           uuid
 Version:        1.6.2
-Release: 70%{?dist}
+Release:        68%{?dist}
 Summary:        Universally Unique Identifier library
 License:        MIT
 URL:            http://www.ossp.org/pkg/lib/uuid/
@@ -211,6 +211,9 @@ popd
 %{_libdir}/libossp-uuid_dce.so
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2-68
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.2-67
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

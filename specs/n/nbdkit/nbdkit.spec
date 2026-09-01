@@ -54,11 +54,11 @@
 %global verify_tarball_signature 1
 
 # The source directory.
-%global source_directory 1.46-stable
+%global source_directory 1.48-stable
 
 Name:           nbdkit
-Version:        1.46.2
-Release: 5%{?dist}
+Version:        1.48.0
+Release:        6%{?dist}
 Summary:        NBD server
 
 License:        BSD-3-Clause
@@ -695,6 +695,8 @@ nbdkit-time-limit-filter   Set an overall time limit for each connection.
 nbdkit-tls-fallback-filter TLS protection filter.
 
 nbdkit-truncate-filter     Truncate, expand, round up or round down size.
+
+nbdkit-xor-filter          Obfuscate contents of a plugin with XOR.
 
 
 %package bzip2-filter
@@ -1417,6 +1419,7 @@ fi
 %{_libdir}/%{name}/filters/nbdkit-time-limit-filter.so
 %{_libdir}/%{name}/filters/nbdkit-tls-fallback-filter.so
 %{_libdir}/%{name}/filters/nbdkit-truncate-filter.so
+%{_libdir}/%{name}/filters/nbdkit-xor-filter.so
 %{_mandir}/man1/nbdkit-blocksize-filter.1*
 %{_mandir}/man1/nbdkit-blocksize-policy-filter.1*
 %{_mandir}/man1/nbdkit-cache-filter.1*
@@ -1465,6 +1468,7 @@ fi
 %{_mandir}/man1/nbdkit-time-limit-filter.1*
 %{_mandir}/man1/nbdkit-tls-fallback-filter.1*
 %{_mandir}/man1/nbdkit-truncate-filter.1*
+%{_mandir}/man1/nbdkit-xor-filter.1*
 
 
 %files bzip2-filter
@@ -1585,11 +1589,66 @@ fi
 
 
 %changelog
-* Sun Feb 08 2026 Richard W.M. Jones <rjones@redhat.com> - 1.46.2-1
-- New upstream stable version 1.46.2
+* Tue Aug 11 2026 Richard W.M. Jones <rjones@redhat.com> - 1.48.0-6
+- Rebuild for libnfs SONAME 16 -> 17
 
-* Fri Jan 02 2026 Richard W.M. Jones <rjones@redhat.com> - 1.46.1-1
-- New upstream stable version 1.46.1
+* Fri Jul 24 2026 Python Maint <python-maint@redhat.com> - 1.48.0-5
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 23 2026 Jitka Plesnikova <jplesnik@redhat.com> - 1.48.0-4
+- Perl 5.44 rebuild
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 1.48.0-3
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.48.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 14 2026 Richard W.M. Jones <rjones@redhat.com> - 1.48.0-1
+- New upstream stable version 1.48.0
+
+* Thu Jul 09 2026 Jerry James <loganjerry@gmail.com> - 1.47.9-4
+- OCaml 5.5.0 rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.47.9-3
+- Rebuilt for openssl 4.0
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 1.47.9-2
+- Rebuilt for Python 3.15
+
+* Sat May 16 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.9-1
+- New upstream development version 1.47.9
+- New nbdkit-xor-filter
+
+* Sat Apr 25 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.8-1
+- New upstream development version 1.47.8
+
+* Fri Apr 03 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.7-1
+- New upstream development version 1.47.7
+
+* Wed Apr 01 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.6-1
+- New upstream development version 1.47.6
+
+* Sat Feb 21 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.5-2
+- OCaml 5.4.1 rebuild
+
+* Mon Feb 16 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.5-1
+- New upstream development version 1.47.5
+
+* Sun Feb 08 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.4-1
+- New upstream development version 1.47.4
+
+* Sun Feb 01 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.3-1
+- New upstream development version 1.47.3
+
+* Sat Jan 31 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.2-1
+- New upstream development version 1.47.2
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.47.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 02 2026 Richard W.M. Jones <rjones@redhat.com> - 1.47.1-1
+- New upstream development version 1.47.1
 
 * Sat Dec 20 2025 Richard W.M. Jones <rjones@redhat.com> - 1.46.0-1
 - New upstream stable version 1.46.0
@@ -1651,7 +1710,7 @@ fi
 - New upstream version 1.45.2
 - New map filter.
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 1.45.1-5
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 1.45.1-5
 - Rebuild to fix OCaml dependencies
 
 * Wed Jul 09 2025 Jitka Plesnikova <jplesnik@redhat.com> - 1.45.1-4

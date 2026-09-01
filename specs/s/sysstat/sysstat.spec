@@ -3,12 +3,13 @@
 
 Summary: Collection of performance monitoring tools for Linux
 Name: sysstat
-Version: 12.7.8
-Release: 4%{?dist}
+Version: 12.7.9
+Release: 2%{?dist}
 License: GPL-2.0-or-later
 
-URL: http://sebastien.godard.pagesperso-orange.fr
+URL: https://sysstat.github.io
 Source: https://github.com/sysstat/sysstat/archive/v%{version}.tar.gz
+Source1: sysstat-tmpfiles.conf
 
 # PCP is no longer available for %%{ix86} on F40
 %if 0%{?fedora} >= 40 || 0%{?rhel} >= 10
@@ -71,6 +72,10 @@ The cifsiostat command reports I/O statistics for CIFS file systems.
 # Do not install the license as documentation
 rm %{buildroot}%{_docdir}/%{name}/COPYING
 
+# tmpfiles config
+mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
+install -p -m 644 %SOURCE1 ${RPM_BUILD_ROOT}%{_tmpfilesdir}/%{name}.conf
+
 %post
 %systemd_post sysstat.service sysstat-collect.timer sysstat-summary.timer
 
@@ -111,8 +116,17 @@ fi
 %{_mandir}/man8/sa2.8*
 %{_mandir}/man8/sadc.8*
 %{_localstatedir}/log/sa
+%{_tmpfilesdir}/%{name}.conf
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.7.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 10 2025 Lukáš Zaoral <lzaoral@redhat.com> - 12.7.9-1
+- update upstream URL
+- add tmpfiles configs for Image Mode
+- rebase to the latest upstraem release (rhbz#2419756)
+
 * Tue Jul 29 2025 Lukáš Zaoral <lzaoral@redhat.com> - 12.7.8-1
 - rebase to the latest upstream release (rhbz#2383963)
 

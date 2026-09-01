@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           nftables
-Version:        1.1.3
-Release: 9%{?dist}
+Version:        1.1.6
+Release:        2%{?dist}
 # Upstream released a 0.100 version, then 0.4. Need Epoch to get back on track.
 Epoch:          1
 Summary:        Netfilter Tables userspace utilities
@@ -19,17 +19,20 @@ Source5:        main.nft
 Source6:        router.nft
 Source7:        nat.nft
 
+Patch01: 0001-build-fix-.-configure-with-non-bash-shell.patch
+Patch02: 0002-doc-fix-typo-in-man-page.patch
+
 #BuildRequires: autogen
-#BuildRequires: autoconf
-#BuildRequires: automake
-#BuildRequires: libtool
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 BuildRequires: make
 BuildRequires: gcc
 BuildRequires: flex
 BuildRequires: bison
 BuildRequires: pkgconfig(libmnl) >= 1.0.4
 BuildRequires: gmp-devel
-BuildRequires: pkgconfig(libnftnl) >= 1.2.9
+BuildRequires: pkgconfig(libnftnl) >= 1.3.1
 BuildRequires: systemd
 BuildRequires: asciidoc
 BuildRequires: pkgconfig(xtables) >= 1.6.1
@@ -81,7 +84,7 @@ and /etc/sysconfig/nftables.
 %autosetup -p1
 
 %build
-#./autogen.sh
+autoreconf -fi
 %configure --disable-silent-rules --with-xtables --with-json
 %make_build
 cd py/
@@ -151,11 +154,21 @@ fi
 %{_unitdir}/nftables.service
 
 %changelog
-* Sat Jan 03 2026 Kevin Fenzi <kevin@scrye.com> - 1:1.1.3-6
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.1.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Phil Sutter <psutter@redhat.com> - 1:1.1.6-1
+- new version 1.1.6
+
+* Sat Jan 03 2026 Kevin Fenzi <kevin@scrye.com> - 1:1.1.5-3
 - Adjust post to keep service enabled on dist-upgrades. Thanks grumpey0@gmail.com
 
-* Wed Oct 01 2025 Phil Sutter <psutter@redhat.com> - 1:1.1.3-5
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1:1.1.5-2
 - Rebuilt for Python 3.14.0rc3 bytecode
+
+* Wed Sep 03 2025 Phil Sutter <psutter@redhat.com> - 1:1.1.5-1
+- Add fixes from upstream
+- new version 1.1.5
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 1:1.1.3-4
 - Rebuilt for Python 3.14.0rc2 bytecode

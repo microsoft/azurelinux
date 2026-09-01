@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%{!?sources_gpg: %{!?dlrn:%global sources_gpg 1} }
+%{!?sources_gpg: %{!?dlrn:%global sources_gpg 0} }
 %global sources_gpg_sign 0xf8675126e2411e7748dd46662fc2093e4682645f
 %{!?upstream_version: %global upstream_version %{version}%{?milestone}}
 # we are excluding some BRs from automatic generator
@@ -21,12 +21,14 @@ The oslo.i18n library contain utilities for working with internationalization \
 or library.
 
 Name:           python-oslo-i18n
-Version:        6.4.0
-Release: 10%{?dist}
+Version:        6.7.2
+Release:        1%{?dist}
 Summary:        OpenStack i18n library
 License:        Apache-2.0
 URL:            https://github.com/openstack/%{pypi_name}
-Source0:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz
+#Source0:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz
+#Source0:        %{url}/archive/%{version}/%{pypi_name}-%{version}.tar.gz
+Source0:         %{pypi_source oslo_i18n}
 # Required for tarball sources verification
 %if 0%{?sources_gpg} == 1
 Source101:        https://tarballs.openstack.org/%{pypi_name}/%{pypi_name}-%{upstream_version}.tar.gz.asc
@@ -75,7 +77,7 @@ Translation files for Oslo i18n library
 %if 0%{?sources_gpg} == 1
 %{gpgverify}  --keyring=%{SOURCE102} --signature=%{SOURCE101} --data=%{SOURCE0}
 %endif
-%autosetup -n %{pypi_name}-%{upstream_version} -S git
+%autosetup -n oslo_i18n-%{upstream_version} -S git
 
 
 sed -i /^[[:space:]]*-c{env:.*_CONSTRAINTS_FILE.*/d tox.ini
@@ -130,7 +132,7 @@ mv %{buildroot}%{python3_sitelib}/oslo_i18n/locale %{buildroot}%{_datadir}/local
 %find_lang oslo_i18n --all-name
 
 %files -n python3-%{pkg_name}
-%doc ChangeLog CONTRIBUTING.rst PKG-INFO README.rst
+%doc ChangeLog CONTRIBUTING.rst README.rst
 %license LICENSE
 %{python3_sitelib}/oslo_i18n
 %{python3_sitelib}/*.dist-info
@@ -145,6 +147,18 @@ mv %{buildroot}%{python3_sitelib}/oslo_i18n/locale %{buildroot}%{_datadir}/local
 %license LICENSE
 
 %changelog
+* Tue Feb 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 6.7.2-1
+- 6.7.2
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.7.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 20 2025 Gwyn Ciesla <gwync@protonmail.com> - 6.7.1-1
+- 6.7.1
+
+* Thu Nov 13 2025 Gwyn Ciesla <gwync@protonmail.com> - 6.7.0-1
+- 6.7.0
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 6.4.0-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

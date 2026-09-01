@@ -1,12 +1,9 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# RHEL does not include all documentation dependencies (e.g. sphinxcontrib-doxylink)
-%bcond docs %{undefined rhel}
-
 Name:    libcamera
-Version: 0.5.2
-Release: 8%{?dist}
+Version: 0.7.2
+Release: 1%{?dist}
 Summary: A library to support complex camera ISPs
 # see .reuse/dep5 and COPYING for details
 License: LGPL-2.1-or-later
@@ -18,27 +15,6 @@ Source2: qcam.metainfo.xml
 Source3: 70-libcamera.rules
 
 Patch01: 0001-disable-rpi-pisp.patch
-# Upstream 473e2dc89323 ("pipeline: simple: Enable simple pipelinehandler with SoftISP on Intel IPU7")
-Patch02: 0002-pipeline-simple-Enable-simple-pipelinehandler-with-S.patch
-# Posted upstream: https://lists.libcamera.org/pipermail/libcamera-devel/2025-September/053346.html
-Patch03: 0003-ipa-software_isp-Fix-context_.configuration.agc.agai.patch
-Patch04: 0004-ipa-software_isp-AGC-Do-not-lower-gain-below-1.0.patch
-Patch05: 0005-ipa-software_isp-AGC-Raise-exposure-or-gain-not-both.patch
-Patch06: 0006-ipa-software_isp-AGC-Only-use-integers-for-exposure-.patch
-Patch07: 0007-libcamera-software_isp-Add-valid-flag-to-struct-SwIs.patch
-Patch08: 0008-libcamera-software_isp-Run-sw-statistics-once-every-.patch
-# Posted upstream: https://lists.libcamera.org/pipermail/libcamera-devel/2025-September/053307.html
-Patch09: 0009-libcamera-software_isp-Fix-width-adjustment-in-SwSta.patch
-Patch10: 0010-libcamera-software_isp-Clarify-SwStatsCpu-setWindow-.patch
-Patch11: 0011-libcamera-software_isp-Pass-correct-y-coordinate-to-.patch
-Patch12: 0012-libcamera-simple-Avoid-incorrect-arithmetic-in-AWB.patch
-Patch13: 0013-ipa-simple-blc-Prevent-division-by-zero-in-BLC.patch
-Patch14: 0014-ipa-simple-agc-Prevent-division-by-zero-in-AGC.patch
-# Posted upstream: https://lists.libcamera.org/pipermail/libcamera-devel/2025-September/053388.html
-Patch15: 0015-ipa-simple-blc-Use-16-as-starting-blacklevel-when-th.patch
-# Fix initial black image / flickering on IPU6 ov02c10 laptops
-# https://lists.libcamera.org/pipermail/libcamera-devel/2025-December/056017.html
-Patch16: 0016-ipa-simple-agc-Make-sure-activeState.agc-expo-again-.patch
 
 # libcamera does not currently build on these architectures
 ExcludeArch: s390x ppc64le
@@ -57,6 +33,9 @@ BuildRequires: libatomic
 BuildRequires: libevent-devel
 BuildRequires: libjpeg-turbo-devel
 BuildRequires: libtiff-devel
+%if ! 0%{?rhel}
+BuildRequires: libunwind-devel
+%endif
 BuildRequires: libyaml-devel
 BuildRequires: libyuv-devel
 BuildRequires: lttng-ust-devel
@@ -72,13 +51,9 @@ BuildRequires: python3-ply
 BuildRequires: python3-pyyaml
 BuildRequires: SDL2-devel
 BuildRequires: systemd-devel
-%if %{with docs}
-BuildRequires: doxygen
-BuildRequires: python3-sphinx
-BuildRequires: python3-sphinxcontrib-doxylink
-%endif
 # libcamera is not really usable without its IPA plugins
 Recommends: %{name}-ipa%{?_isa}
+Obsoletes: libcamera-doc < 0.6.0
 
 %description
 libcamera is a library that deals with heavy hardware image processing
@@ -95,15 +70,6 @@ Requires:    %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Files for development with %{name}.
-
-%if %{with docs}
-%package     doc
-Summary:     Documentation for %{name}
-License:     LGPL-2.1-or-later AND CC-BY-4.0
-
-%description doc
-HTML based documentation for %{name} including getting started and API.
-%endif
 
 %package     ipa
 Summary:     ISP Image Processing Algorithm Plugins for %{name}
@@ -158,13 +124,20 @@ Python bindings for %{name}
 # cam/qcam crash with LTO
 %global _lto_cflags %{nil}
 export CFLAGS="%{optflags} -Wno-deprecated-declarations"
-export CXXFLAGS="%{optflags} -Wno-deprecated-declarations"
+# Set also max-devirt-targets=1 to prevent compilation errors,
+# maybe due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120345.
+export CXXFLAGS="%{optflags} -Wno-deprecated-declarations --param=max-devirt-targets=1"
 
 # Build and include the virtual and vimc pipelines. This also builds tests but
 # those do not get included in any packages.
-%meson -Dtest=true %{!?with_docs:-Ddocumentation=disabled}
-
-%meson -Dv4l2=enabled
+%meson \
+    -Dv4l2=enabled \
+    -Dlc-compliance=disabled \
+    %{?rhel:-Dlibunwind=disabled} \
+    -Dtest=true \
+    -Ddocumentation=disabled \
+    -Drpi-awb-nn=disabled \
+    %{nil}
 %meson_build
 
 # Stripping requires the re-signing of IPA libraries, manually
@@ -191,14 +164,10 @@ cp -a %SOURCE2 %{buildroot}/%{_metainfodir}/
 mkdir -p %{buildroot}/%{_udevrulesdir}/
 install -D -m 644 %SOURCE3 %{buildroot}/%{_udevrulesdir}/
 
-# Remove the Sphinx build leftovers
-rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.buildinfo
-rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.doctrees
-
 %files
 %license COPYING.rst LICENSES/LGPL-2.1-or-later.txt
 # We leave the version here explicitly to know when it bumps
-%{_libdir}/libcamera*.so.0.5
+%{_libdir}/libcamera*.so.0.7
 %{_libdir}/libcamera*.so.%{version}
 %{_udevrulesdir}/70-libcamera.rules
 
@@ -207,11 +176,6 @@ rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.doctrees
 %{_libdir}/libcamera*.so
 %{_libdir}/pkgconfig/libcamera-base.pc
 %{_libdir}/pkgconfig/libcamera.pc
-
-%if %{with docs}
-%files doc
-%doc %{_docdir}/%{name}-*/
-%endif
 
 %files ipa
 %{_datadir}/libcamera/
@@ -230,7 +194,7 @@ rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.doctrees
 %files tools
 %license LICENSES/GPL-2.0-only.txt
 %{_bindir}/cam
-%{_bindir}/lc-compliance
+%{_bindir}/libcamera-bug-report
 
 %files v4l2
 %{_bindir}/libcamerify
@@ -240,9 +204,34 @@ rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.doctrees
 %{python3_sitearch}/*
 
 %changelog
-* Sat Dec 20 2025 Hans de Goede <johannes.goede@oss.qualcomm.com> - 0.5.2-5
+* Tue Aug 18 2026 Milan Zamazal <mzamazal@redhat.com> - 0.7.2-1
+- Update to version 0.7.2
+- Resolves: rhbz#2483190
+
+* Fri May 01 2026 Milan Zamazal <mzamazal@redhat.com> - 0.7.1-1
+- Update to version 0.7.1
+- New libcamera-bug-report utility added to tools
+
+* Thu Jan 29 2026 Milan Zamazal <mzamazal@redhat.com> - 0.7.0-1
+- Update to version 0.7.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Dec 20 2025 Hans de Goede <johannes.goede@oss.qualcomm.com> - 0.6.0-2
 - Fix initial black image / flickering on IPU6 ov02c10 laptops
 - Related: rhbz#2355032
+
+* Thu Dec 04 2025 Milan Zamazal <mzamazal@redhat.com> - 0.6.0-1
+- Update to version 0.6.0
+- Remove the doc package
+- Resolves: rhbz#2417571
+
+* Thu Nov 20 2025 Kate Hsuan <hpa@redhat.com> - 0.5.2-6
+- Drop lc-compliance from the libcamera-tools package
+
+* Wed Nov 12 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.5.2-5
+- Rebuilt for gtest 1.17.0
 
 * Sun Sep 28 2025 Hans de Goede <hdegoede@redhat.com> - 0.5.2-4
 - Add upstream patch to enable IPU7 (Lunar Lake) support (rhbz#2333383)
@@ -250,9 +239,8 @@ rm -rf ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-*/html/.doctrees
 - Add upstream patches to fix various swstats problems including
   a reproducable divide by zero crash in the AGC code
 
-* Mon Sep 22 2025 Milan Zamazal <mzamazal@redhat.com> - 0.5.2-3
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.5.2-3
 - Rebuilt for Python 3.14.0rc3 bytecode
-- Resolves: rhbz#2397330
 
 * Wed Sep 03 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 0.5.2-2
 - Disable docs in RHEL builds

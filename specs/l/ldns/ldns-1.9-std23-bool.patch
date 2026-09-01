@@ -1,4 +1,4 @@
-From d2fc4ef2f3c64b246c67ffb613d4d26c2d74f596 Mon Sep 17 00:00:00 2001
+From fa04eca688a78d88d96fd08b47a80fd8a73a8156 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
 Date: Thu, 4 Dec 2025 17:01:59 +0100
 Subject: [PATCH] Skip definition of bool on -std=c23 or newer
@@ -11,13 +11,13 @@ compile ldns in default settings.
 
 Signed-off-by: Petr Menšík <pemensik@redhat.com>
 ---
- ldns-1.8.4/ldns/common.h.in | 4 ++++
+ ldns/common.h.in | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/ldns-1.8.4/ldns/common.h.in b/ldns-1.8.4/ldns/common.h.in
+diff --git a/ldns/common.h.in b/ldns/common.h.in
 index db55960..c4e473c 100644
---- a/ldns-1.8.4/ldns/common.h.in
-+++ b/ldns-1.8.4/ldns/common.h.in
+--- a/ldns/common.h.in
++++ b/ldns/common.h.in
 @@ -40,6 +40,10 @@
   */
  /*@ignore@*/

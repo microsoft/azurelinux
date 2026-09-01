@@ -5,8 +5,8 @@
 %global framework kimageformats
 
 Name:           kf6-%{framework}
-Version:        6.23.0
-Release: 7%{?dist}
+Version:        6.29.0
+Release:        1%{?dist}
 Summary:        KDE Frameworks 6 Tier 1 addon with additional image plugins for QtGui
 
 License:        LGPLv2+
@@ -17,7 +17,7 @@ Source1: http://download.kde.org/%{stable_kf6}/frameworks/%{majmin_ver_kf6}/%{fr
 
 # upstream patches
 
-BuildRequires:  extra-cmake-modules >= %{version}
+BuildRequires:  extra-cmake-modules >= %{majmin_ver_kf6}.0
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
 BuildRequires:  kf6-rpm-macros
@@ -75,6 +75,45 @@ developing applications that use %{name}.
 %{_kf6_libdir}/cmake/KF6ImageFormats/
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Wed Jul 22 2026 Steve Cossette <farchord@gmail.com> - 6.28.1-1
+- 6.28.1
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Sat May 30 2026 Richard Shaw <hobbes1069@gmail.com> - 6.26.0-3
+- Rebuild for OpenColorIO 2.5.2.
+
+* Mon May 25 2026 Richard Shaw <hobbes1069@gmail.com> - 6.26.0-2
+- Rebuild for OpenEXR 3.4.12.
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Sat Apr 11 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-2
+- Rebuild for libraw update
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Wed Apr 08 2026 Gwyn Ciesla <gwync@protonmail.com> - 6.24.0-3
+- Libraw rebuild
+
+* Thu Mar 12 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-2
+- Rebuild for libraw soname bump
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Mon Feb 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 6.23.0-2
 - LibRaw rebuild
 

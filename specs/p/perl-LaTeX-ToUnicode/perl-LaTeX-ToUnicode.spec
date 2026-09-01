@@ -3,7 +3,7 @@
 
 Name:           perl-LaTeX-ToUnicode
 Version:        1.93
-Release: 2%{?dist}
+Release:        1%{?dist}
 Summary:        Convert LaTeX commands to Unicode
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/LaTeX-ToUnicode

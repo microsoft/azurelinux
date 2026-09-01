@@ -5,7 +5,7 @@
 
 Name:           python-%{realname}
 Version:        1.1.0
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        MS-KKDCP (kerberos proxy) WSGI module
 
 License:        MIT
@@ -60,6 +60,9 @@ Requires:       python3-pyasn1
 %license COPYING
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Nov 19 2025 Julien Rische <jrische@redhat.com> - 1.1.0-1
 - New upstream version (1.1.0)
 - Use DNS discovery for declared realms only (CVE-2025-59088)

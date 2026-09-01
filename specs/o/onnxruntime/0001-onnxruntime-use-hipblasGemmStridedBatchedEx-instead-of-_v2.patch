@@ -1,0 +1,25 @@
+From cd5402dd802b661ea4fbc57b5ea4f8e1557e7515 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Sun, 18 Jan 2026 00:58:29 -0300
+Subject: [PATCH] onnxruntime use hipblasGemmStridedBatchedEx instead of _v2
+
+---
+ tools/ci_build/hipify-perl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ci_build/hipify-perl b/tools/ci_build/hipify-perl
+index ac1393cf0d..2c36f14e1f 100755
+--- a/tools/ci_build/hipify-perl
++++ b/tools/ci_build/hipify-perl
+@@ -4284,7 +4284,7 @@ sub simpleSubstitutions {
+     subst("cublasDznrm2_v2_64", "hipblasDznrm2_v2_64", "library");
+     subst("cublasGemmBatchedEx", "hipblasGemmBatchedEx_v2", "library");
+     subst("cublasGemmEx", "hipblasGemmEx_v2", "library");
+-    subst("cublasGemmStridedBatchedEx", "hipblasGemmStridedBatchedEx_v2", "library");
++    subst("cublasGemmStridedBatchedEx", "hipblasGemmStridedBatchedEx", "library");
+     subst("cublasGetAtomicsMode", "hipblasGetAtomicsMode", "library");
+     subst("cublasGetMathMode", "hipblasGetMathMode", "library");
+     subst("cublasGetMatrix", "hipblasGetMatrix", "library");
+-- 
+2.52.0
+

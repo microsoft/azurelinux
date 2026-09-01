@@ -1,6 +1,0 @@
-libsvm >> Libsvm
-Support Vector Machines library
-  libsvmread
-  libsvmwrite
-  svmpredict
-  svmtrain

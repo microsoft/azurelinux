@@ -1,6 +1,6 @@
 diff -rupN --no-dereference devscripts/scripts/Makefile devscripts-new/scripts/Makefile
---- devscripts/scripts/Makefile	2025-12-30 09:38:40.057932427 +0100
-+++ devscripts-new/scripts/Makefile	2025-12-30 09:38:40.061633334 +0100
+--- devscripts/scripts/Makefile	2026-01-21 19:18:02.966281365 +0100
++++ devscripts-new/scripts/Makefile	2026-01-21 19:18:02.970604745 +0100
 @@ -188,5 +188,7 @@ install: all
  	install -d $(DESTDIR)$(DATA_DIR)/scripts
  	mv $(DESTDIR)$(BINDIR)/run_bisect $(DESTDIR)$(DATA_DIR)/scripts

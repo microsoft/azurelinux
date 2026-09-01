@@ -1,0 +1,49 @@
+From ba960a576975bf323eb63370a748a7c3c937eafc Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sun, 7 Dec 2025 09:14:08 -0800
+Subject: [PATCH] onnxruntime rocm no CUBLAS_GEMM_DEFAULT_TENSOR_OP support
+
+---
+ .../contrib_ops/cuda/bert/longformer_attention_impl.cu      | 6 ++++++
+ .../contrib_ops/cuda/bert/longformer_attention_softmax.cu   | 6 ++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/onnxruntime/contrib_ops/cuda/bert/longformer_attention_impl.cu b/onnxruntime/contrib_ops/cuda/bert/longformer_attention_impl.cu
+index a8f94304f814..1915a06f40a6 100644
+--- a/onnxruntime/contrib_ops/cuda/bert/longformer_attention_impl.cu
++++ b/onnxruntime/contrib_ops/cuda/bert/longformer_attention_impl.cu
+@@ -413,7 +413,13 @@ Status LaunchLongformerSoftmaxKernel(
+     Btype = CUDA_R_16F;
+     Ctype = CUDA_R_16F;
+     resultType = CUBLAS_COMPUTE_16F;
++#ifdef USE_ROCM
++  return ORT_MAKE_STATUS(ONNXRUNTIME, StatusCode::NOT_IMPLEMENTED,
++                         "ROCm does not support CUBLAS_GEMM_DEFAULT_TENSOR_OP");
++
++#else
+     algo = CUBLAS_GEMM_DEFAULT_TENSOR_OP;
++#endif
+   } else {
+     one_fp32 = 1.f;
+     zero_fp32 = 0.f;
+diff --git a/onnxruntime/contrib_ops/cuda/bert/longformer_attention_softmax.cu b/onnxruntime/contrib_ops/cuda/bert/longformer_attention_softmax.cu
+index 9f92faac25b7..4e2adbd3a904 100644
+--- a/onnxruntime/contrib_ops/cuda/bert/longformer_attention_softmax.cu
++++ b/onnxruntime/contrib_ops/cuda/bert/longformer_attention_softmax.cu
+@@ -238,7 +238,13 @@ Status LaunchLongformerSoftmaxSimpleKernel(
+     Btype = CUDA_R_16F;
+     Ctype = CUDA_R_16F;
+     resultType = CUBLAS_COMPUTE_16F;
++#ifdef USE_ROCM
++  return ORT_MAKE_STATUS(ONNXRUNTIME, StatusCode::NOT_IMPLEMENTED,
++                         "ROCm does not support CUBLAS_GEMM_DEFAULT_TENSOR_OP");
++
++#else
+     algo = CUBLAS_GEMM_DEFAULT_TENSOR_OP;
++#endif
+   } else {
+     one_fp32 = 1.f;
+     zero_fp32 = 0.f;
+-- 
+2.52.0
+

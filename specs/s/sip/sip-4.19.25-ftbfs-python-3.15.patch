@@ -1,0 +1,20 @@
+diff -up sip-4.19.25/siplib/qtlib.c.pyweekref_getobject sip-4.19.25/siplib/qtlib.c
+--- sip-4.19.25/siplib/qtlib.c.pyweekref_getobject	2021-02-26 16:17:35.136483000 +0100
++++ sip-4.19.25/siplib/qtlib.c	2025-11-12 18:23:13.020805318 +0100
+@@ -24,6 +24,16 @@
+ 
+ #include "sipint.h"
+ 
++// Fix FTBFS with python3.15
++#if PY_VERSION_HEX >= 0x30F00A1
++static inline PyObject *compat_PyWeakref_GetObject(PyObject *ref) {
++    PyObject *obj = NULL;
++    if (PyWeakref_GetRef(ref, &obj) < 0)
++        return NULL;
++    return obj;
++}
++#define PyWeakref_GetObject compat_PyWeakref_GetObject
++#endif
+ 
+ /* This is how Qt "types" signals and slots. */
+ #define isQtSlot(s)     (*(s) == '1')

@@ -230,7 +230,7 @@
     end
 }
 
-%python_extras_subpkg(n:i:f:FaA) %{expand:%{lua:
+%python_extras_subpkg(n:i:f:FaAv:) %{expand:%{lua:
     local option_n = '-n (name of the base package)'
     local option_i = '-i (buildroot path to metadata)'
     local option_f = '-f (builddir path to a filelist)'
@@ -243,6 +243,7 @@
     local value_F = rpm.expand('%{-F}')
     local value_a = rpm.expand('%{-a}')
     local value_A = rpm.expand('%{-A}')
+    local value_v = rpm.expand('%{-v}')
     local args = rpm.expand('%{*}')
     if value_n == '' then
         rpm.expand('%{error:%%%0: missing option ' .. option_n .. '}')
@@ -265,7 +266,8 @@
     if args == '' then
         rpm.expand('%{error:%%%0 requires at least one argument with "extras" name}')
     end
-    local requires = 'Requires: ' .. value_n .. ' = %{?epoch:%{epoch}:}%{version}-%{release}'
+    local verrel = rpm.expand('%{?-v*}%{!?-v:%{version}-%{release}}')
+    local requires = 'Requires: ' .. value_n .. ' = %{?epoch:%{epoch}:}' .. verrel
     for extras in args:gmatch('[^%s,]+') do
         local rpmname = value_n .. '+' .. extras
         local pkgdef = '%package -n ' .. rpmname
@@ -285,7 +287,7 @@
                       'It makes sure the dependencies are installed.\\\n'
         local files = ''
         if value_i ~= '' then
-            files = '%files -n ' .. rpmname .. '\\\n' .. '%ghost ' .. value_i
+            files = '%files -n ' .. rpmname .. '\\\n' .. '%ghost %dir ' .. value_i
         elseif value_f ~= '' then
             files = '%files -n ' .. rpmname .. ' -f ' .. value_f
         end

@@ -1,0 +1,55 @@
+From 9c71733011610a53c9f1029ef7aee1f9dd61b572 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Wed, 4 Mar 2026 16:56:48 +0000
+Subject: [PATCH] fold: fix output truncation with 0xFF bytes in input
+
+On signed char platforms, 0xFF was converted to -1
+which matches MBBUF_EOF, causing fold to stop processing.
+
+* gl/lib/mbbuf.h: Avoid sign extension on signed char platforms.
+* tests/fold/fold-characters.sh: Adjust test case.
+Reported at https://src.fedoraproject.org/rpms/coreutils/pull-request/20
+
+(cherry picked from commit a85e9182b1d173c26205dada54133cd9e9174fc1)
+---
+ lib/mbbuf.h                   | 2 +-
+ tests/fold/fold-characters.sh | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/lib/mbbuf.h b/lib/mbbuf.h
+index 9054fc9..ea4b7e7 100644
+--- a/lib/mbbuf.h
++++ b/lib/mbbuf.h
+@@ -96,7 +96,7 @@ mbbuf_get_char (mbbuf_t *mbbuf)
+   else
+     {
+       /* Assume the program will emit the byte, but keep the error flag.  */
+-      g.ch = mbbuf->buffer[mbbuf->offset++];
++      g.ch = (unsigned char) mbbuf->buffer[mbbuf->offset++];
+     }
+   return g;
+ }
+diff --git a/tests/fold/fold-characters.sh b/tests/fold/fold-characters.sh
+index b44276e..5af9856 100755
+--- a/tests/fold/fold-characters.sh
++++ b/tests/fold/fold-characters.sh
+@@ -87,11 +87,12 @@ compare exp3 out3 || fail=1
+ bad_unicode_with_nul ()
+ {
+   # invalid UTF8|unpaired surrogate|NUL|C1 control|noncharacter
+-  env printf '\xC3|\xED\xBA\xAD|\u0000|\u0089|\xED\xA6\xBF\xED\xBF\xBF\n'
++  env printf '\xFF|\xED\xBA\xAD|\u0000|\u0089|\xED\xA6\xBF\xED\xBF\xBF\n'
+ }
+-bad_unicode_with_nul > /dev/null || framework_failure_
+-test $({ bad_unicode_with_nul | fold; \
+-         bad_unicode_with_nul; } | uniq | wc -l) = 1 || fail=1
++bad_unicode_with_nul > exp4 || framework_failure_
++bad_unicode_with_nul | fold > out4 || fail=1
++compare exp4 out4 || fail=1
++
+ # Check bad character at EOF
+ test $(env printf '\xC3' | fold | wc -c) = 1 || fail=1
+ 
+-- 
+2.53.0
+

@@ -1,0 +1,82 @@
+From c4ffe535b58235ff9f9ebe90d24a2cffb57e70ae Mon Sep 17 00:00:00 2001
+From: Anderson Bravalheri <andersonbravalheri@gmail.com>
+Date: Mon, 9 Mar 2026 11:41:56 +0000
+Subject: [PATCH 1/2] Avoid using (deprecated) 'json.__version__' in tests
+
+---
+ setuptools/tests/test_setuptools.py | 36 ++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
+
+diff --git a/setuptools/tests/test_setuptools.py b/setuptools/tests/test_setuptools.py
+index 1d56e1a8a4..c57908b026 100644
+--- a/setuptools/tests/test_setuptools.py
++++ b/setuptools/tests/test_setuptools.py
+@@ -77,30 +77,34 @@ def testFindModule(self):
+         f, _p, _i = dep.find_module('setuptools.tests')
+         f.close()
+ 
+-    @needs_bytecode
+-    def testModuleExtract(self):
+-        from json import __version__
++    @pytest.fixture
++    def sample_module(self, monkeypatch, tmp_path):
++        monkeypatch.syspath_prepend(str(tmp_path))
++        module = "mod_with_version"
++        version = "2.0.9"
++        file = tmp_path / f"{module}.py"
++        file.write_text(f"__version__ = {version!r}", encoding="utf-8")
++        return (module, version)
+ 
+-        assert dep.get_module_constant('json', '__version__') == __version__
++    @needs_bytecode
++    def testModuleExtract(self, sample_module):
++        (module, version) = sample_module
++        assert dep.get_module_constant(module, '__version__') == version
+         assert dep.get_module_constant('sys', 'version') == sys.version
+-        assert (
+-            dep.get_module_constant('setuptools.tests.test_setuptools', '__doc__')
+-            == __doc__
+-        )
++        assert dep.get_module_constant(__name__, '__doc__') == __doc__
+ 
+     @needs_bytecode
+-    def testRequire(self):
+-        req = Require('Json', '1.0.3', 'json')
++    def testRequire(self, sample_module):
++        (module, version) = sample_module
++        req = Require('GivenName', '1.0.3', module)
+ 
+-        assert req.name == 'Json'
+-        assert req.module == 'json'
++        assert req.name == 'GivenName'
++        assert req.module == module
+         assert req.requested_version == Version('1.0.3')
+         assert req.attribute == '__version__'
+-        assert req.full_name() == 'Json-1.0.3'
+-
+-        from json import __version__
++        assert req.full_name() == 'GivenName-1.0.3'
+ 
+-        assert str(req.get_version()) == __version__
++        assert str(req.get_version()) == version
+         assert req.version_ok('1.0.9')
+         assert not req.version_ok('0.9.1')
+         assert not req.version_ok('unknown')
+
+From 461ea56c8e629819a23920f44d9298d4f041abde Mon Sep 17 00:00:00 2001
+From: Anderson Bravalheri <andersonbravalheri@gmail.com>
+Date: Mon, 9 Mar 2026 11:44:33 +0000
+Subject: [PATCH 2/2] Add news fragment
+
+---
+ newsfragments/5186.bugfix.rst | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 newsfragments/5186.bugfix.rst
+
+diff --git a/newsfragments/5186.bugfix.rst b/newsfragments/5186.bugfix.rst
+new file mode 100644
+index 0000000000..9ac71452bb
+--- /dev/null
++++ b/newsfragments/5186.bugfix.rst
+@@ -0,0 +1 @@
++Replace deprecated ``json.__version__`` with fixture in tests.

@@ -6,7 +6,7 @@
 
 Name:           python-pluggy
 Version:        1.6.0
-Release: 7%{?dist}
+Release:        4%{?dist}
 Summary:        The plugin manager stripped of pytest specific details
 
 # SPDX

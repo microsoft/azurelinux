@@ -1,0 +1,21 @@
+From 423e62f9a2cedba7b5e97fd5e2075d991d83551c Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Wed, 21 Jan 2026 15:15:57 +0100
+Subject: [PATCH] delete returns NOT_FOUND as of 1.6.40
+
+---
+ src/bin/memcapable.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/bin/memcapable.cc b/src/bin/memcapable.cc
+index 122c294e..ec8cefb4 100644
+--- a/src/bin/memcapable.cc
++++ b/src/bin/memcapable.cc
+@@ -1074,6 +1074,7 @@ static enum test_return receive_error_response(void) {
+   char buffer[80];
+   execute(receive_line(buffer, sizeof(buffer)));
+   verify(strncmp(buffer, "ERROR", 5) == 0 || strncmp(buffer, "CLIENT_ERROR", 12) == 0
++         || strncmp(buffer, "NOT_FOUND", 9) == 0
+          || strncmp(buffer, "SERVER_ERROR", 12) == 0);
+   return TEST_PASS;
+ }

@@ -1,0 +1,1172 @@
+From e55ff8818f722dfbefc62b9646f69bad19014fdd Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:32 +0200
+Subject: [PATCH 1/9] unit: Add test for sdp_xml_parse_record()
+
+This adds 2 example XML files from other repositories, under a fair use
+license exception.
+Reported-by: Aisle Research
+Reported-by: Aisle Research
+---
+ Makefile.am                               |  13 +++
+ unit/sdp-xml/Bluetooth_HID-sdp_record.xml | 123 ++++++++++++++++++++++
+ unit/sdp-xml/qt-SerialPortSDPRecord.xml   |  57 ++++++++++
+ unit/test-sdp-xml.c                       |  85 +++++++++++++++
+ 4 files changed, 278 insertions(+)
+ create mode 100644 unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+ create mode 100644 unit/sdp-xml/qt-SerialPortSDPRecord.xml
+ create mode 100644 unit/test-sdp-xml.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 19c468d3a504..1ecb5e1ddaec 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -637,6 +637,19 @@ unit_test_sdp_SOURCES = unit/test-sdp.c \
+ unit_test_sdp_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
++unit_tests += unit/test-sdp-xml
++
++unit_test_sdp_xml_SOURCES = unit/test-sdp-xml.c \
++				src/sdp-xml.c src/sdp-xml.h \
++				src/log.h src/log.c
++unit_test_sdp_xml_LDADD = lib/libbluetooth-internal.la \
++				src/libshared-glib.la $(GLIB_LIBS)
++unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)"\"
++unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
++
++EXTRA_DIST += unit/sdp-xml/Bluetooth_HID-sdp_record.xml		\
++	unit/sdp-xml/qt-SerialPortSDPRecord.xml
++
+ unit_tests += unit/test-avdtp
+ 
+ unit_test_avdtp_SOURCES = unit/test-avdtp.c \
+diff --git a/unit/sdp-xml/Bluetooth_HID-sdp_record.xml b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+new file mode 100644
+index 000000000000..687b0b15b520
+--- /dev/null
++++ b/unit/sdp-xml/Bluetooth_HID-sdp_record.xml
+@@ -0,0 +1,123 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++
++<!--
++
++ From: https://github.com/AnesBenmerzoug/Bluetooth_HID/blob/master/sdp_record.xml
++ A description of these fields can be found in the following links:
++ http://www.bluecove.org/bluecove/apidocs/javax/bluetooth/ServiceRecord.html
++ https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
++
++ -->
++
++<record>
++	<attribute id="0x0001"> <!-- Service Class ID List -->
++		<sequence>
++			<uuid value="0x1124" /> <!-- Human Interface Device -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0004"> <!-- Protocol Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x0100" /> <!-- L2CAP -->
++				<uint16 value="0x0011" /> <!-- HIDP -->
++			</sequence>
++			<sequence>
++				<uuid value="0x0011" /> <!-- HIDP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0005"> <!-- Browse Group List -->
++		<sequence>
++			<uuid value="0x1002" />
++		</sequence>
++	</attribute>
++	<attribute id="0x0006"> <!-- Language Based Attribute ID List -->
++		<sequence>
++			<uint16 value="0x656e" /> <!-- code_ISO639 -->
++			<uint16 value="0x006a" /> <!-- encoding -->
++			<uint16 value="0x0100" /> <!-- base_offset -->
++		</sequence>
++	</attribute>
++	<attribute id="0x0009"> <!-- Bluetooth Profile Descriptor List -->
++		<sequence>
++			<sequence>
++				<uuid value="0x1124" /> <!-- Human Interface Device -->
++				<uint16 value="0x0100" /> <!-- L2CAP -->
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x000d"> <!-- Additional Protocol Descriptor Lists -->
++		<sequence>
++			<sequence>
++				<sequence>
++					<uuid value="0x0100" /> <!-- L2CAP -->
++					<uint16 value="0x0013" />
++				</sequence>
++				<sequence>
++					<uuid value="0x0011" /> <!-- HIDP -->
++				</sequence>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0100">
++		<text value="Bluetooth_Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0101">
++		<text value="USB > BT Keyboard/Mouse" />
++	</attribute>
++	<attribute id="0x0102">
++		<text value="Raspberry Pi 3" />
++	</attribute>
++	<attribute id="0x0200">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x0201">
++		<uint16 value="0x0111" />
++	</attribute>
++	<attribute id="0x0202">
++		<uint8 value="0x40" />
++	</attribute>
++	<attribute id="0x0203">
++		<uint8 value="0x00" />
++	</attribute>
++	<attribute id="0x0204">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0205">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x0206">
++		<sequence>
++			<sequence>
++				<uint8 value="0x22" />
++				<text encoding="hex" value="05010906A1018501A100050719E029E71500250175019508810295017508810195087508150025650507190029658100C0C005010902A10185020901A1000509190129031500250175019503810275059501810105010930093109381581257F750895038106C0C0"/>
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x0207">
++		<sequence>
++			<sequence>
++				<uint16 value="0x0409" />
++				<uint16 value="0x0100" />
++			</sequence>
++		</sequence>
++	</attribute>
++	<attribute id="0x020b">
++		<uint16 value="0x0100" />
++	</attribute>
++	<attribute id="0x020c">
++		<uint16 value="0x0c80" />
++	</attribute>
++	<attribute id="0x020d">
++		<boolean value="true" />
++	</attribute>
++	<attribute id="0x020e">
++		<boolean value="false" />
++	</attribute>
++	<attribute id="0x020f">
++		<uint16 value="0x0640" />
++	</attribute>
++	<attribute id="0x0210">
++		<uint16 value="0x0320" />
++	</attribute>
++</record>
+diff --git a/unit/sdp-xml/qt-SerialPortSDPRecord.xml b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+new file mode 100644
+index 000000000000..1f62ccf11a41
+--- /dev/null
++++ b/unit/sdp-xml/qt-SerialPortSDPRecord.xml
+@@ -0,0 +1,57 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++
++<!--
++ This is an XML file describing an SDP service record for a Serial Port
++ service.
++
++ You can use the linux sdptool command to create a file like this for
++ publishing your Bluetooth services. See the "Creating a Bluetooth service"
++ tutorial for more details.
++
++ From: https://radekp.github.io/qtmoko/api/bluetooth-bluetoothservice-serialportsdprecord-xml.html
++-->
++
++ <record>
++         <attribute id="0x0001">
++                 <sequence>
++                         <uuid value="0x1101" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0004">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x0100" />
++                         </sequence>
++                         <sequence>
++                                 <uuid value="0x0003" />
++                                 <uint8 value="0x05" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0005">
++                 <sequence>
++                         <uuid value="0x1002" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0006">
++                 <sequence>
++                         <uint16 value="0x656e" />
++                         <uint16 value="0x006a" />
++                         <uint16 value="0x0100" />
++                 </sequence>
++         </attribute>
++         <attribute id="0x0009">
++                 <sequence>
++                         <sequence>
++                                 <uuid value="0x1101" />
++                                 <uint16 value="0x0100" />
++                         </sequence>
++                 </sequence>
++         </attribute>
++         <attribute id="0x0100">
++                 <text value="Serial Port" />
++         </attribute>
++         <attribute id="0x0101">
++                 <text value="COM Port" />
++         </attribute>
++ </record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+new file mode 100644
+index 000000000000..9af2f8c870f6
+--- /dev/null
++++ b/unit/test-sdp-xml.c
+@@ -0,0 +1,85 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2026  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++
++#include "bluetooth/sdp.h"
++#include "bluetooth/sdp_lib.h"
++
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/log.h"
++#include "src/sdp-xml.h"
++
++struct test_data {
++	GString *s;
++	char *filename;
++	gboolean expected_result;
++};
++
++static void parse_xml(gconstpointer data, gsize len, gboolean expected_result)
++{
++	sdp_record_t *rec = NULL;
++	gboolean ret;
++
++	rec = sdp_xml_parse_record(data, len);
++	ret = rec ? TRUE : FALSE;
++	if (ret == expected_result)
++		tester_test_passed();
++	else
++		tester_test_failed();
++	if (rec)
++		sdp_record_free(rec);
++}
++
++static void parse_xml_for_filename(gconstpointer data)
++{
++	struct test_data *t = (struct test_data *) data;
++	char *path = NULL;
++	GError *error = NULL;
++	char *contents = NULL;
++	gsize len;
++
++	path = g_build_filename(TOP_SRCDIR, "unit", "sdp-xml",
++					t->filename, NULL);
++	if (!g_file_get_contents(path, &contents, &len, &error)) {
++		g_warning("Can't load file '%s': %s", path, error->message);
++		g_free(path);
++		g_error_free(error);
++		tester_test_failed();
++		return;
++	}
++	parse_xml(contents, len, t->expected_result);
++	g_free(contents);
++	g_free(path);
++}
++
++#define DEFINE_TEST(fname, res) {					\
++	data.expected_result = res;					\
++	data.filename = fname;						\
++	tester_add("/" fname, &data, NULL,				\
++			parse_xml_for_filename, NULL);			\
++	}
++
++int main(int argc, char *argv[])
++{
++	struct test_data data;
++
++	tester_init(&argc, &argv);
++
++	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
++	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
++
++	return tester_run();
++}
+-- 
+2.55.0
+
+
+From 985e643d78b09afc81d606bc0a08581fc05b1b15 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:33 +0200
+Subject: [PATCH 2/9] sdp-xml: Fix crash caused by type confusion when parsing
+ crafted SDP XML
+
+When element_end() processes </attribute>, it frees ctx_data->stack_head
+and clears the stack even if parsing is still nested inside a parent
+container.
+
+If a crafted ServiceRecord places a nested <attribute> inside <sequence>,
+a later sibling scalar element such as <uint64> can become the new stack
+head. When the closing </sequence> is then processed, compute_seq_size()
+is reached without first validating that the current node is actually
+a sequence.
+
+sdp_data_t.val stores both scalar members such as uint64 and the
+dataseq pointer in the same union. As a result, attacker-controlled
+scalar data can be reinterpreted as a linked-list pointer and traversed
+until bluetoothd crashes.
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+
+Reported-by: Aisle Research
+Co-authored-by: Aisle Research
+---
+ src/sdp-xml.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index e5b30e88505f..c8f9ed013b29 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -529,7 +529,9 @@ static void element_end(GMarkupParseContext *context,
+ 		return;
+ 
+ 	if (!strcmp(element_name, "attribute")) {
+-		if (ctx_data->stack_head && ctx_data->stack_head->data) {
++		/* Attributes are expected at top-level record scope. */
++		if (ctx_data->stack_head && ctx_data->stack_head->data &&
++		    ctx_data->stack_head->next == NULL) {
+ 			int ret = sdp_attr_add(ctx_data->record, ctx_data->attr_id,
+ 							ctx_data->stack_head->data);
+ 			if (ret == -1)
+@@ -539,6 +541,11 @@ static void element_end(GMarkupParseContext *context,
+ 			ctx_data->stack_head->data = NULL;
+ 			sdp_xml_data_free(ctx_data->stack_head);
+ 			ctx_data->stack_head = NULL;
++		} else if (ctx_data->stack_head && ctx_data->stack_head->next) {
++			g_set_error(err, G_MARKUP_ERROR,
++				    G_MARKUP_ERROR_INVALID_CONTENT,
++				    "Nested <attribute> is invalid");
++			return;
+ 		} else {
+ 			DBG("No data for attribute 0x%04x", ctx_data->attr_id);
+ 		}
+@@ -558,6 +565,13 @@ static void element_end(GMarkupParseContext *context,
+ 	}
+ 
+ 	if (!strcmp(element_name, "sequence")) {
++		if (!SDP_IS_SEQ(ctx_data->stack_head->data->dtd)) {
++			g_set_error(err, G_MARKUP_ERROR,
++				    G_MARKUP_ERROR_INVALID_CONTENT,
++				    "Mismatched </sequence> close");
++			return;
++		}
++
+ 		ctx_data->stack_head->data->unitSize = compute_seq_size(ctx_data->stack_head->data);
+ 
+ 		if (ctx_data->stack_head->data->unitSize > USHRT_MAX) {
+@@ -570,6 +584,13 @@ static void element_end(GMarkupParseContext *context,
+ 			ctx_data->stack_head->data->unitSize += sizeof(uint8_t);
+ 		}
+ 	} else if (!strcmp(element_name, "alternate")) {
++		if (!SDP_IS_ALT(ctx_data->stack_head->data->dtd)) {
++			g_set_error(err, G_MARKUP_ERROR,
++				    G_MARKUP_ERROR_INVALID_CONTENT,
++				    "Mismatched </alternate> close");
++			return;
++		}
++
+ 		ctx_data->stack_head->data->unitSize = compute_seq_size(ctx_data->stack_head->data);
+ 
+ 		if (ctx_data->stack_head->data->unitSize > USHRT_MAX) {
+-- 
+2.55.0
+
+
+From a92683ce81ab92cd7dffd3350284579fbe0d4c30 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:34 +0200
+Subject: [PATCH 3/9] unit: Add test for sdp-xml type-confusion bug
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34
+
+Co-authored-by: Aisle Research
+---
+ Makefile.am                                      | 1 +
+ unit/sdp-xml/compute-seq-size-type-confusion.xml | 9 +++++++++
+ unit/test-sdp-xml.c                              | 2 ++
+ 3 files changed, 12 insertions(+)
+ create mode 100644 unit/sdp-xml/compute-seq-size-type-confusion.xml
+
+diff --git a/Makefile.am b/Makefile.am
+index 1ecb5e1ddaec..1d5f02b0d362 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -648,6 +648,7 @@ unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)
+ unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
+ 
+ EXTRA_DIST += unit/sdp-xml/Bluetooth_HID-sdp_record.xml		\
++	unit/sdp-xml/compute-seq-size-type-confusion.xml	\
+ 	unit/sdp-xml/qt-SerialPortSDPRecord.xml
+ 
+ unit_tests += unit/test-avdtp
+diff --git a/unit/sdp-xml/compute-seq-size-type-confusion.xml b/unit/sdp-xml/compute-seq-size-type-confusion.xml
+new file mode 100644
+index 000000000000..41d6478af276
+--- /dev/null
++++ b/unit/sdp-xml/compute-seq-size-type-confusion.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++<record>
++<attribute id="0x0001">
++<sequence>
++<attribute id="0x0002"><uint8 value="0x01"/></attribute>
++<uint64 value="0x4141414141414141"/>
++</sequence>
++</attribute>
++</record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index 9af2f8c870f6..c8288ca10b8b 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -80,6 +80,8 @@ int main(int argc, char *argv[])
+ 
+ 	DEFINE_TEST("Bluetooth_HID-sdp_record.xml", TRUE);
+ 	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
++	/* From https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34 */
++	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
+ 
+ 	return tester_run();
+ }
+-- 
+2.55.0
+
+
+From ae6c543e892f1fc55d16584ce1ef02e1969352af Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:35 +0200
+Subject: [PATCH 4/9] sdp-xml: Fix memory leak when adding duplicate attributes
+
+When sdp_attr_add() fails because an attribute is duplicated, don't
+unset its pointer in the parsing context data. As the attribute wasn't
+added to the record, the ownership of the attribute didn't get passed
+to the record either.
+
+Don't set the pointer to NULL so it gets freed when cleaning up the
+context.
+
+Fixes those 2 ASan warnings:
+Direct leak of 48 byte(s) in 1 object(s) allocated from:
+    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x562042b747f2 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:350
+
+Indirect leak of 2 byte(s) in 1 object(s) allocated from:
+    #0 0x7f896a8ef24f in calloc (/lib64/libasan.so.8+0xef24f) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x562042b74bd7 in sdp_data_alloc_with_length lib/bluetooth/sdp.c:425
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+
+Reported-by: Aisle Research
+Co-authored-by: Aisle Research
+---
+ src/sdp-xml.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index c8f9ed013b29..816d19611f8b 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -537,8 +537,11 @@ static void element_end(GMarkupParseContext *context,
+ 			if (ret == -1)
+ 				DBG("Could not add attribute 0x%04x",
+ 							ctx_data->attr_id);
++			else {
++				/* ownership transferred to record */
++				ctx_data->stack_head->data = NULL;
++			}
+ 
+-			ctx_data->stack_head->data = NULL;
+ 			sdp_xml_data_free(ctx_data->stack_head);
+ 			ctx_data->stack_head = NULL;
+ 		} else if (ctx_data->stack_head && ctx_data->stack_head->next) {
+-- 
+2.55.0
+
+
+From ab91b45282297e052b2e3be22c198265d19ac097 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:36 +0200
+Subject: [PATCH 5/9] unit: Add test for sdp-xml duplicate attribute bug
+
+See https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc
+
+Co-authored-by: Aisle Research
+---
+ Makefile.am                          | 1 +
+ unit/sdp-xml/duplicate-attribute.xml | 4 ++++
+ unit/test-sdp-xml.c                  | 2 ++
+ 3 files changed, 7 insertions(+)
+ create mode 100644 unit/sdp-xml/duplicate-attribute.xml
+
+diff --git a/Makefile.am b/Makefile.am
+index 1d5f02b0d362..3c6cf92ab403 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -649,6 +649,7 @@ unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
+ 
+ EXTRA_DIST += unit/sdp-xml/Bluetooth_HID-sdp_record.xml		\
+ 	unit/sdp-xml/compute-seq-size-type-confusion.xml	\
++	unit/sdp-xml/duplicate-attribute.xml			\
+ 	unit/sdp-xml/qt-SerialPortSDPRecord.xml
+ 
+ unit_tests += unit/test-avdtp
+diff --git a/unit/sdp-xml/duplicate-attribute.xml b/unit/sdp-xml/duplicate-attribute.xml
+new file mode 100644
+index 000000000000..a30bc59d94ff
+--- /dev/null
++++ b/unit/sdp-xml/duplicate-attribute.xml
+@@ -0,0 +1,4 @@
++<record>
++<attribute id="0x0001"><text value="A"/></attribute>
++<attribute id="0x0001"><text value="B"/></attribute>
++</record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index c8288ca10b8b..9bf35235423b 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -82,6 +82,8 @@ int main(int argc, char *argv[])
+ 	DEFINE_TEST("qt-SerialPortSDPRecord.xml", TRUE);
+ 	/* From https://github.com/bluez/bluez/security/advisories/GHSA-7mmr-gwqx-vc34 */
+ 	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
++	/* From https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc */
++	DEFINE_TEST("duplicate-attribute.xml", TRUE);
+ 
+ 	return tester_run();
+ }
+-- 
+2.55.0
+
+
+From 308e3536688c0011e11b2d9bfdc94cb38e52c060 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:37 +0200
+Subject: [PATCH 6/9] sdp-xml: Optimise parsing large sequences
+
+SDP sequences are stored as single-linked lists, so appending members
+to a sequence requires finding the tail of the list before the
+insertion.
+
+Finding the tail of the list always starts at the beginning of the list,
+so takes longer and longer as the list grows bigger.
+
+Keep track of the tail to avoid that problem. This cuts down the
+sequence_on_squared() test from around 3 to 4 seconds to less than
+0.1 seconds.
+---
+ src/sdp-xml.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 816d19611f8b..fb8417b3fc60 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -44,6 +44,7 @@ struct sdp_xml_data {
+ 	char type;			/* 0 = Text or Hexadecimal */
+ 	char *name;			/* Name, optional in the dtd */
+ 	/* TODO: What is it used for? */
++	sdp_data_t *tail;		/* Tail for O(1) dataseq append */
+ };
+ 
+ struct context_data {
+@@ -609,6 +610,7 @@ static void element_end(GMarkupParseContext *context,
+ 
+ 	if (ctx_data->stack_head->next && ctx_data->stack_head->data &&
+ 					ctx_data->stack_head->next->data) {
++		sdp_data_t *tail;
+ 		switch (ctx_data->stack_head->next->data->dtd) {
+ 		case SDP_SEQ8:
+ 		case SDP_SEQ16:
+@@ -616,10 +618,20 @@ static void element_end(GMarkupParseContext *context,
+ 		case SDP_ALT8:
+ 		case SDP_ALT16:
+ 		case SDP_ALT32:
+-			ctx_data->stack_head->next->data->val.dataseq =
+-				sdp_seq_append(ctx_data->stack_head->next->data->val.dataseq,
+-								ctx_data->stack_head->data);
++			tail = ctx_data->stack_head->next->data->val.dataseq ?
++				ctx_data->stack_head->next->tail : NULL;
++			if (tail) {
++				sdp_seq_append(tail,
++					ctx_data->stack_head->data);
++			} else {
++				ctx_data->stack_head->next->data->val.dataseq =
++					sdp_seq_append(NULL,
++						ctx_data->stack_head->data);
++			}
++			ctx_data->stack_head->next->tail =
++					ctx_data->stack_head->data;
+ 			ctx_data->stack_head->data = NULL;
++			ctx_data->stack_head->tail = NULL;
+ 			break;
+ 		}
+ 
+-- 
+2.55.0
+
+
+From 95fa5735562e9f020c174199f19016cbb1c09ff2 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:38 +0200
+Subject: [PATCH 7/9] unit: Add test for slow element_end() append
+
+This uses 40k iterations as this takes a visible amount of time on a
+pretty fast desktop machine (3-4 secs on an i9 9900k).
+
+See: https://github.com/bluez/bluez/security/advisories/GHSA-4p57-mrcv-r2jc
+---
+ unit/test-sdp-xml.c | 46 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
+
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index 9bf35235423b..5aa98334eabc 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -65,6 +65,47 @@ static void parse_xml_for_filename(gconstpointer data)
+ 	g_free(path);
+ }
+ 
++#define XML_START						\
++	"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"		\
++	"<record>\n"						\
++	"	<attribute id=\"0x0004\">\n"			\
++	"		<sequence>"
++
++#define XML_VALUE						\
++	"			<uint8 value=\"0x01\" />\n"
++
++#define XML_END							\
++	"		</sequence>\n"				\
++	"	</attribute>\n"					\
++	"</record>"
++
++static void sequence_on_squared(gconstpointer data)
++{
++	struct test_data *t = (struct test_data *) data;
++	parse_xml(t->s->str, t->s->len, TRUE);
++}
++
++static void sequence_on_squared_setup(gconstpointer data)
++{
++	struct test_data *t = (struct test_data *) data;
++	guint i;
++
++	t->s = g_string_new(XML_START);
++	for (i = 0; i < 40000; i++)
++		t->s = g_string_append(t->s, XML_VALUE);
++	t->s = g_string_append(t->s, XML_END);
++
++	tester_setup_complete();
++}
++
++static void sequence_on_squared_teardown(gconstpointer data)
++{
++	struct test_data *t = (struct test_data *) data;
++
++	g_string_free(t->s, TRUE);
++	tester_teardown_complete();
++}
++
+ #define DEFINE_TEST(fname, res) {					\
+ 	data.expected_result = res;					\
+ 	data.filename = fname;						\
+@@ -85,5 +126,10 @@ int main(int argc, char *argv[])
+ 	/* From https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc */
+ 	DEFINE_TEST("duplicate-attribute.xml", TRUE);
+ 
++	tester_add("/sequence_on_squared", &data,
++		   sequence_on_squared_setup,
++		   sequence_on_squared,
++		   sequence_on_squared_teardown);
++
+ 	return tester_run();
+ }
+-- 
+2.55.0
+
+
+From e9caa7d3e2bf746203348e50654e7758fc84285d Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:39 +0200
+Subject: [PATCH 8/9] sdp-xml: Fix stack overflow when converting large
+ sequences to XML
+
+Don't make convert_raw_data_to_xml() call itself recursively X times
+if there are X elements in a sequence.
+
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==1684518==ERROR: AddressSanitizer: stack-overflow on address 0x7fff7fb40d98 (pc 0x7fbe1ee95c2b bp 0x7fff7fb41610 sp 0x7fff7fb40d70 T0)
+    #0 0x7fbe1ee95c2b in printf_common(void*, char const*, __va_list_tag*) (/lib64/libasan.so.8+0x95c2b) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #1 0x7fbe1eeb72d6 in vsnprintf (/lib64/libasan.so.8+0xb72d6) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #2 0x7fbe1eeb94f4 in snprintf (/lib64/libasan.so.8+0xb94f4) (BuildId: 5395ec74f54d9ec7bf97c06583dd39a96c230822)
+    #3 0x000000401fc2 in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709
+    #4 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
+[...]
+    #246 0x000000401c4f in convert_raw_data_to_xml ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:994
+
+SUMMARY: AddressSanitizer: stack-overflow ../../../../Projects/jhbuild/bluez/src/sdp-xml.c:709 in convert_raw_data_to_xml
+---
+ src/sdp-xml.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index fb8417b3fc60..5b448fe83410 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -682,9 +682,12 @@ sdp_record_t *sdp_xml_parse_record(const char *data, int size)
+ 	return record;
+ }
+ 
+-
+ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+-		void *data, void (*appender)(void *, const char *))
++		void *data, void (*appender)(void *, const char *));
++
++static inline void convert_raw_data_to_xml_element(sdp_data_t *value,
++		int indent_level,void *data,
++		void (*appender)(void *, const char *))
+ {
+ 	int i, hex;
+ 	char buf[STRBUFSIZE];
+@@ -1002,8 +1005,15 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 
+ 		break;
+ 	}
++}
+ 
+-	convert_raw_data_to_xml(value->next, indent_level, data, appender);
++static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
++		void *data, void (*appender)(void *, const char *))
++{
++	for (; value != NULL; value = value->next) {
++		convert_raw_data_to_xml_element(value, indent_level,
++			data, appender);
++	}
+ }
+ 
+ struct conversion_data {
+-- 
+2.55.0
+
+
+From d01ba78b1d8a3294f82ae003479c922e1499ed49 Mon Sep 17 00:00:00 2001
+From: Bastien Nocera <hadess@hadess.net>
+Date: Wed, 12 Aug 2026 10:01:40 +0200
+Subject: [PATCH 9/9] unit: Add convert_sdp_record_to_xml() to SDP XML testing
+
+This tests SDP binary to XML conversion, including whether a fix for
+a stack overflow when dealing with large sequences, like in
+sequence_on_squared(), works correctly.
+---
+ unit/test-sdp-xml.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index 5aa98334eabc..b338788aa295 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -28,6 +28,12 @@ struct test_data {
+ 	gboolean expected_result;
+ };
+ 
++static void doprintf(void *data, const char *str)
++{
++	/* Do nothing for our tests */
++	/* printf("%s", str); */
++}
++
+ static void parse_xml(gconstpointer data, gsize len, gboolean expected_result)
+ {
+ 	sdp_record_t *rec = NULL;
+@@ -39,8 +45,10 @@ static void parse_xml(gconstpointer data, gsize len, gboolean expected_result)
+ 		tester_test_passed();
+ 	else
+ 		tester_test_failed();
+-	if (rec)
++	if (rec) {
++		convert_sdp_record_to_xml(rec, 0, doprintf);
+ 		sdp_record_free(rec);
++	}
+ }
+ 
+ static void parse_xml_for_filename(gconstpointer data)
+-- 
+2.55.0
+
+From b21edc49b2c3675c7aea19286fdb2b887f29c0ff Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Fri, 14 Aug 2026 13:31:07 -0400
+Subject: [PATCH 1/4] sdp-xml: Use a queue to collect sequence members
+
+Appending a member to a sequence with sdp_seq_append() walks the
+single-linked list to find its tail, so building a sequence is O(n^2).
+
+This was previously worked around by caching the tail of the sequence in
+struct sdp_xml_data, which required the caller to pick between appending
+to the cached tail and initialising val.dataseq, and to keep the cache in
+sync on every append.
+
+Collect the members in a struct queue instead, which tracks its own tail,
+and link them into val.dataseq once the element is closed. Appending is a
+plain queue_push_tail(), and the queue is destroyed along with the rest
+of the element so members that were never linked, such as on malformed
+input, are still freed.
+
+The sequence_on_squared() test stays at less than 0.1 seconds.
+
+Assisted-by: Claude:claude-opus-5
+---
+ Makefile.tools |  4 +++-
+ src/sdp-xml.c  | 60 ++++++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 46 insertions(+), 18 deletions(-)
+
+diff --git a/Makefile.tools b/Makefile.tools
+index 1a4e5660813b..b3ef4ae1c3df 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -437,7 +437,9 @@ tools_hciconfig_LDADD = lib/libbluetooth-internal.la
+ tools_hcitool_SOURCES = tools/hcitool.c src/oui.h src/oui.c
+ tools_hcitool_LDADD = lib/libbluetooth-internal.la $(UDEV_LIBS)
+ 
+-tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c
++tools_sdptool_SOURCES = tools/sdptool.c src/sdp-xml.h src/sdp-xml.c \
++			src/shared/queue.h src/shared/queue.c \
++			src/shared/util.h src/shared/util.c
+ tools_sdptool_LDADD = lib/libbluetooth-internal.la $(GLIB_LIBS)
+ 
+ tools_ciptool_LDADD = lib/libbluetooth-internal.la
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 5b448fe83410..bad9e289344f 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -25,6 +25,8 @@
+ #include "bluetooth/sdp.h"
+ #include "bluetooth/sdp_lib.h"
+ 
++#include "shared/queue.h"
++
+ #include "sdp-xml.h"
+ 
+ #define DBG(...) (void)(0)
+@@ -44,7 +46,7 @@ struct sdp_xml_data {
+ 	char type;			/* 0 = Text or Hexadecimal */
+ 	char *name;			/* Name, optional in the dtd */
+ 	/* TODO: What is it used for? */
+-	sdp_data_t *tail;		/* Tail for O(1) dataseq append */
++	struct queue *seq;		/* Members of a dataseq, if any */
+ };
+ 
+ struct context_data {
+@@ -510,8 +512,37 @@ static void element_start(GMarkupParseContext *context,
+ 	}
+ }
+ 
++/*
++ * Link the members collected in elem->seq into elem->data->val.dataseq.
++ *
++ * Members are collected in a queue so that appending is O(1), sdp_seq_append()
++ * would otherwise have to walk to the tail of the sequence on every append.
++ */
++static void sdp_xml_data_flush_seq(struct sdp_xml_data *elem)
++{
++	const struct queue_entry *entry;
++	sdp_data_t *tail = NULL;
++
++	if (!elem->seq)
++		return;
++
++	for (entry = queue_get_entries(elem->seq); entry; entry = entry->next) {
++		if (tail)
++			sdp_seq_append(tail, entry->data);
++		else
++			elem->data->val.dataseq = sdp_seq_append(NULL,
++								entry->data);
++		tail = entry->data;
++	}
++
++	queue_destroy(elem->seq, NULL);
++	elem->seq = NULL;
++}
++
+ static void sdp_xml_data_free(struct sdp_xml_data *elem)
+ {
++	queue_destroy(elem->seq, (queue_destroy_func_t) sdp_data_free);
++
+ 	if (elem->data)
+ 		sdp_data_free(elem->data);
+ 
+@@ -568,6 +599,8 @@ static void element_end(GMarkupParseContext *context,
+ 		return;
+ 	}
+ 
++	sdp_xml_data_flush_seq(ctx_data->stack_head);
++
+ 	if (!strcmp(element_name, "sequence")) {
+ 		if (!SDP_IS_SEQ(ctx_data->stack_head->data->dtd)) {
+ 			g_set_error(err, G_MARKUP_ERROR,
+@@ -610,28 +643,21 @@ static void element_end(GMarkupParseContext *context,
+ 
+ 	if (ctx_data->stack_head->next && ctx_data->stack_head->data &&
+ 					ctx_data->stack_head->next->data) {
+-		sdp_data_t *tail;
+-		switch (ctx_data->stack_head->next->data->dtd) {
++		struct sdp_xml_data *parent = ctx_data->stack_head->next;
++
++		switch (parent->data->dtd) {
+ 		case SDP_SEQ8:
+ 		case SDP_SEQ16:
+ 		case SDP_SEQ32:
+ 		case SDP_ALT8:
+ 		case SDP_ALT16:
+ 		case SDP_ALT32:
+-			tail = ctx_data->stack_head->next->data->val.dataseq ?
+-				ctx_data->stack_head->next->tail : NULL;
+-			if (tail) {
+-				sdp_seq_append(tail,
+-					ctx_data->stack_head->data);
+-			} else {
+-				ctx_data->stack_head->next->data->val.dataseq =
+-					sdp_seq_append(NULL,
+-						ctx_data->stack_head->data);
+-			}
+-			ctx_data->stack_head->next->tail =
+-					ctx_data->stack_head->data;
+-			ctx_data->stack_head->data = NULL;
+-			ctx_data->stack_head->tail = NULL;
++			if (!parent->seq)
++				parent->seq = queue_new();
++
++			if (queue_push_tail(parent->seq,
++						ctx_data->stack_head->data))
++				ctx_data->stack_head->data = NULL;
+ 			break;
+ 		}
+ 
+-- 
+2.55.0
+
+
+From 97521ab4dd79a38b2c30d8d664b4e11f86680e88 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Fri, 14 Aug 2026 13:40:51 -0400
+Subject: [PATCH 2/4] sdp-xml: Fix leaking the parse stack on malformed input
+
+sdp_xml_parse_record() frees its context but never the elements left on
+ctx_data->stack_head.
+
+element_end() returns early without popping the stack when it rejects a
+document, for instance on a mismatched </sequence> close, so a malformed
+record leaves its elements behind and they are never freed.
+
+Free the remaining stack elements before returning. Found with the
+compute-seq-size-type-confusion.xml test:
+
+56 (direct) + 1,072 (indirect) bytes in 1 blocks are definitely lost
+   at calloc (vg_replace_malloc.c:1678)
+   by sdp_xml_data_alloc (sdp-xml.c:73)
+   by element_start (sdp-xml.c:473)
+   by g_markup_parse_context_parse (gmarkup.c:1369)
+   by sdp_xml_parse_record (sdp-xml.c:696)
+
+Assisted-by: Claude:claude-opus-5
+---
+ src/sdp-xml.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index bad9e289344f..bcd5785f87ca 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -551,6 +551,17 @@ static void sdp_xml_data_free(struct sdp_xml_data *elem)
+ 	free(elem);
+ }
+ 
++/* Free the elements left on the stack, e.g. by a document that is malformed */
++static void sdp_xml_data_free_stack(struct sdp_xml_data *elem)
++{
++	while (elem) {
++		struct sdp_xml_data *next = elem->next;
++
++		sdp_xml_data_free(elem);
++		elem = next;
++	}
++}
++
+ static void element_end(GMarkupParseContext *context,
+ 		const char *element_name, gpointer user_data, GError **err)
+ {
+@@ -696,6 +707,7 @@ sdp_record_t *sdp_xml_parse_record(const char *data, int size)
+ 	if (g_markup_parse_context_parse(ctx, data, size, NULL) == FALSE) {
+ 		error("XML parsing error");
+ 		g_markup_parse_context_free(ctx);
++		sdp_xml_data_free_stack(ctx_data->stack_head);
+ 		sdp_record_free(record);
+ 		free(ctx_data);
+ 		return NULL;
+@@ -703,6 +715,8 @@ sdp_record_t *sdp_xml_parse_record(const char *data, int size)
+ 
+ 	g_markup_parse_context_free(ctx);
+ 
++	sdp_xml_data_free_stack(ctx_data->stack_head);
++
+ 	free(ctx_data);
+ 
+ 	return record;
+-- 
+2.55.0
+
+
+From 078ef10a4531e3fddbac332cf65077f317092555 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Mon, 17 Aug 2026 14:56:16 -0400
+Subject: [PATCH 3/4] sdp: Fix memory leak when freeing alternates
+
+sdp_data_alloc_with_length() stores the members of SDP_ALT8, SDP_ALT16
+and SDP_ALT32 in val.dataseq, exactly like it does for the SDP_SEQ8,
+SDP_SEQ16 and SDP_SEQ32 sequences.
+
+sdp_data_free() only calls data_seq_free() for the sequences though, so
+freeing an alternate frees the alternate itself and leaks every one of
+its members, along with anything they own in turn:
+
+209 (48 direct, 161 indirect) bytes in 1 blocks are definitely lost
+   at calloc (vg_replace_malloc.c:1678)
+   by sdp_data_alloc_with_length (sdp.c:350)
+   by sdp_data_alloc (sdp.c:486)
+   by sdp_xml_parse_int (sdp-xml.c:243)
+   by sdp_xml_parse_datatype (sdp-xml.c:421)
+   by element_start (sdp-xml.c:507)
+
+Free the members of alternates as well.
+
+Assisted-by: Claude:claude-opus-5
+---
+ lib/bluetooth/sdp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/bluetooth/sdp.c b/lib/bluetooth/sdp.c
+index 8c0865398519..1e027f9ebe6d 100644
+--- a/lib/bluetooth/sdp.c
++++ b/lib/bluetooth/sdp.c
+@@ -972,6 +972,9 @@ void sdp_data_free(sdp_data_t *d)
+ 	case SDP_SEQ8:
+ 	case SDP_SEQ16:
+ 	case SDP_SEQ32:
++	case SDP_ALT8:
++	case SDP_ALT16:
++	case SDP_ALT32:
+ 		data_seq_free(d);
+ 		break;
+ 	case SDP_URL_STR8:
+-- 
+2.55.0
+
+
+From 5abc0045b84adcb47af26f88f699f33c0037a00c Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Mon, 17 Aug 2026 14:56:24 -0400
+Subject: [PATCH 4/4] unit/test-sdp-xml: Add a test parsing alternates
+
+None of the existing records contain an <alternate>, so nothing covered
+the SDP_ALT8, SDP_ALT16 and SDP_ALT32 handling.
+
+Add a record with an alternate holding an integer, a string and a nested
+sequence, which leaks its members under valgrind without the previous
+sdp_data_free() fix.
+
+Assisted-by: Claude:claude-opus-5
+---
+ Makefile.am                |  1 +
+ unit/sdp-xml/alternate.xml | 12 ++++++++++++
+ unit/test-sdp-xml.c        |  1 +
+ 3 files changed, 14 insertions(+)
+ create mode 100644 unit/sdp-xml/alternate.xml
+
+diff --git a/Makefile.am b/Makefile.am
+index 3c6cf92ab403..2754e1b7f2da 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -648,6 +648,7 @@ unit_test_sdp_xml_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -DTOP_SRCDIR=\""$(srcdir)
+ unit_test_sdp_xml_CPPFLAGS = -I$(srcdir)/lib
+ 
+ EXTRA_DIST += unit/sdp-xml/Bluetooth_HID-sdp_record.xml		\
++	unit/sdp-xml/alternate.xml				\
+ 	unit/sdp-xml/compute-seq-size-type-confusion.xml	\
+ 	unit/sdp-xml/duplicate-attribute.xml			\
+ 	unit/sdp-xml/qt-SerialPortSDPRecord.xml
+diff --git a/unit/sdp-xml/alternate.xml b/unit/sdp-xml/alternate.xml
+new file mode 100644
+index 000000000000..a35ebccbc71f
+--- /dev/null
++++ b/unit/sdp-xml/alternate.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8" ?>
++<record>
++	<attribute id="0x0004">
++		<alternate>
++			<uint32 value="0x11223344" />
++			<text value="alternate-member" />
++			<sequence>
++				<uint16 value="0x0100" />
++			</sequence>
++		</alternate>
++	</attribute>
++</record>
+diff --git a/unit/test-sdp-xml.c b/unit/test-sdp-xml.c
+index b338788aa295..cb5b91717fca 100644
+--- a/unit/test-sdp-xml.c
++++ b/unit/test-sdp-xml.c
+@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
+ 	DEFINE_TEST("compute-seq-size-type-confusion.xml", FALSE);
+ 	/* From https://github.com/bluez/bluez/security/advisories/GHSA-75v6-6q44-57hc */
+ 	DEFINE_TEST("duplicate-attribute.xml", TRUE);
++	DEFINE_TEST("alternate.xml", TRUE);
+ 
+ 	tester_add("/sequence_on_squared", &data,
+ 		   sequence_on_squared_setup,
+-- 
+2.55.0
+

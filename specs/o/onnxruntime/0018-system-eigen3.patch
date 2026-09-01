@@ -1,0 +1,31 @@
+From dd9a504bb8bfb7374e3111c785d43fdfe35e8190 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Tue, 30 Sep 2025 01:40:16 -0300
+Subject: [PATCH 18/19] system eigen3
+
+---
+ cmake/external/onnxruntime_external_deps.cmake | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
+index 900e4bfa30..24b06fcd89 100644
+--- a/cmake/external/onnxruntime_external_deps.cmake
++++ b/cmake/external/onnxruntime_external_deps.cmake
+@@ -427,10 +427,11 @@ if(TARGET ONNX::onnx_proto AND NOT TARGET onnx_proto)
+   message(STATUS "Aliasing ONNX::onnx_proto to onnx_proto")
+   add_library(onnx_proto ALIAS ONNX::onnx_proto)
+ endif()
+-if(onnxruntime_USE_VCPKG)
+-  find_package(Eigen3 CONFIG REQUIRED)
++find_package(Eigen3 CONFIG)
++if(Eigen3_FOUND)
++  get_target_property(eigen_INCLUDE_DIRS Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
+ else()
+-  include(external/eigen.cmake)
++  include(eigen) # FetchContent
+ endif()
+ 
+ if(WIN32)
+-- 
+2.51.0
+

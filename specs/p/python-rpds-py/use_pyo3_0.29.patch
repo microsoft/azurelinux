@@ -1,0 +1,25 @@
+diff -U 3 -dHrN a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml	2006-07-24 02:21:28.000000000 +0100
++++ b/Cargo.toml	2026-06-30 06:32:09.921013324 +0100
+@@ -12,7 +12,5 @@
+ archery = "1.2.2"
+ 
+ [dependencies.pyo3]
+-version = "0.27.1"
+-# To build extension for PyPy on Windows, "generate-import-lib" is needed:
+-# https://github.com/PyO3/maturin-action/issues/267#issuecomment-2106844429
+-features = ["extension-module", "generate-import-lib"]
++version = "0.29.0"
++features = ["extension-module"]
+diff -U 3 -dHrN a/src/lib.rs b/src/lib.rs
+--- a/src/lib.rs	2006-07-24 02:21:28.000000000 +0100
++++ b/src/lib.rs	2026-06-30 06:29:09.966342645 +0100
+@@ -1545,7 +1545,7 @@
+     }
+ }
+ 
+-#[pymodule(gil_used = false)]
++#[pymodule]
+ #[pyo3(name = "rpds")]
+ fn rpds_py(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
+     m.add_class::<HashTrieMapPy>()?;

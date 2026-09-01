@@ -9,7 +9,7 @@
 Summary: A utility for unpacking zip files
 Name: unzip
 Version: 6.0
-Release: 70%{?dist}
+Release: 69%{?dist}
 License: Info-ZIP
 Source: http://downloads.sourceforge.net/infozip/unzip60.tar.gz
 
@@ -73,10 +73,11 @@ Patch29: unzip-zipbomb-manpage.patch
 Patch30: unzip-zipbomb-part4.patch
 Patch31: unzip-zipbomb-part5.patch
 Patch32: unzip-zipbomb-part6.patch
-Patch33: unzip-zipbomb-switch.patch
-Patch34: unzip-gnu89-build.patch
-Patch35: unzip-6.0-wcstombs-fortify.patch
+Patch33: unzip-zipbomb-part7.patch
+Patch34: unzip-zipbomb-switch.patch
 
+Patch35: unzip-gnu89-build.patch
+Patch36: unzip-6.0-wcstombs-fortify.patch
 URL: http://infozip.sourceforge.net
 BuildRequires: make
 BuildRequires:  bzip2-devel, gcc
@@ -130,6 +131,7 @@ a zip archive.
 %patch -P33 -p1
 %patch -P34 -p1
 %patch -P35 -p1
+%patch -P36 -p1
 
 %build
 # IZ_HAVE_UXUIDGID is needed for right functionality of unzip -X
@@ -148,6 +150,13 @@ make -f unix/Makefile prefix=$RPM_BUILD_ROOT%{_prefix} MANDIR=$RPM_BUILD_ROOT%{_
 %{_mandir}/*/*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.0-69
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Aug 20 2025 Jakub Martisko <jamartis@redhat.com> - 6.0-68
+- Another zipmbomb patch
+Resolves: rhbz#2360938
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.0-67
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -5,8 +5,8 @@
 %bcond_without perl_Clone_enables_optional_test
 
 Name:           perl-Clone
-Version:        0.47
-Release: 7%{?dist}
+Version:        0.48
+Release:        1%{?dist}
 Summary:        Recursively copy perl data types
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Clone
@@ -19,24 +19,35 @@ BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(ExtUtils::MakeMaker) >= 6.76
 BuildRequires:  perl(warnings)
 # Run-time:
-BuildRequires:  perl(AutoLoader)
 BuildRequires:  perl(Exporter)
 BuildRequires:  perl(strict)
 BuildRequires:  perl(XSLoader)
 # Tests:
 BuildRequires:  perl(B)
 BuildRequires:  perl(B::COW) >= 0.004
+BuildRequires:  perl(Config)
 BuildRequires:  perl(Test::More) >= 0.88
+BuildRequires:  perl(threads)
+BuildRequires:  perl(threads::shared)
 BuildRequires:  perl(utf8)
 BuildRequires:  perl(vars)
 %if %{with perl_Clone_enables_optional_test}
 # Optional tests:
+BuildRequires:  perl(Class::DBI)
 BuildRequires:  perl(Data::Dumper)
+BuildRequires:  perl(DBD::SQLite)
+BuildRequires:  perl(DBI)
 BuildRequires:  perl(Devel::Peek)
 BuildRequires:  perl(Hash::Util::FieldHash)
+BuildRequires:  perl(IO::File)
+BuildRequires:  perl(IO::Handle)
+BuildRequires:  perl(IO::Socket::INET)
+BuildRequires:  perl(Math::BigInt)
+BuildRequires:  perl(Math::BigInt::GMP)
+BuildRequires:  perl(overload)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Storable)
 BuildRequires:  perl(Taint::Runtime)
@@ -59,12 +70,11 @@ arrays or hashes, pass them in by reference.
 %setup -q -n Clone-%{version}
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1 OPTIMIZE="%{optflags}"
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 find %{buildroot} -type f -name '*.bs' -empty -delete
 %{_fixperms} -c %{buildroot}
 
@@ -78,6 +88,36 @@ make test
 %{_mandir}/man3/Clone.3*
 
 %changelog
+* Tue Mar  3 2026 Paul Howarth <paul@city-fan.org> - 0.48-1
+- Update to 0.48
+  - Performance: Optimize hot paths in Clone.xs
+  - Fix: Replace subtest with SKIP/bare blocks to avoid Test2 warnings
+  - Fix: Don't require MGf_DUP flag for ext magic duplication
+  - Fix: Lower MAX_DEPTH to 4000 to prevent SEGV on CPAN smokers
+  - Fix t/10-deep_recursion.t for Windows
+  - Fix C89 declaration-after-statement violations in Clone.xs
+  - Fix deep recursion stack overflow on Windows
+  - Fix cloning of Math::BigInt::GMP objects (GH#16)
+  - Fix cloning of threads::shared data structures (GH#18)
+  - Add thread safety test for Class::DBI-like patterns (GH#14)
+  - Add comprehensive documentation with examples and limitations
+  - Improve README.md structure and installation instructions
+  - Add DBI + DBD::SQLite as recommended test dependencies
+  - Fix weakened reference cloning via deferred weakening (GH#15)
+  - Fix memory leak when cloning non-existent hash values (GH#42)
+  - Fix segfault when cloning DBI database handles (GH#27)
+  - Rewrite t/09-circular.t to fix SEGV on CPAN Testers (GH#54)
+  - Replace static recursion_depth with stack parameter
+  - Fix C++ style comments in Clone.xs for C89 portability
+  - Fix memory leak in Clone.xs (GH#42)
+  - Allow a MAX_DEPTH recursion of 32,000 calls (GH#19 aka CPAN RT#97525)
+  - Rename tests with more readable names
+  - Remove TODO from CoW test
+- Use %%{make_build} and %%{make_install}
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.47-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.47-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

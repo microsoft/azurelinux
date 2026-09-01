@@ -4,8 +4,8 @@
 %global abi 8
 
 Name:           libdvdread
-Version:        6.1.3
-Release: 13%{?dist}
+Version:        7.0.1
+Release:        1%{?dist}
 Summary:        A library for reading DVD video discs based on Ogle code
 # msvc/contrib/dirent/dirent.c is HPND-Kevlin-Henney, but is not included in the build
 # src/logger.c and few other are LGPL-2.1-or-later
@@ -13,12 +13,14 @@ Summary:        A library for reading DVD video discs based on Ogle code
 # src/dvdread/nav_types.h and src/nav_print.c are GPL-2.0 or GPL-3.0 (no later versions)
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later AND (GPL-2.0-only OR GPL-3.0-only) AND LicenseRef-Fedora-Public-Domain
 URL:            https://www.videolan.org/developers/libdvdnav.html
-Source0:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.bz2
-Source1:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.bz2.asc
+Source0:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.xz
+Source1:        https://download.videolan.org/pub/videolan/libdvdread/%{version}/libdvdread-%{version}.tar.xz.asc
 Source2:        https://download.videolan.org/pub/keys/7180713BE58D1ADC.asc
+
+BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gnupg2
-BuildRequires: make
+BuildRequires:  meson
 Provides:       bundled(md5-gcc)
 
 %description
@@ -41,15 +43,16 @@ This package contains development files for libdvdread.
 %setup -q
 
 %build
-%configure --disable-static
-
-make V=1 %{?_smp_mflags}
+%meson \
+  -Ddefault_library=shared \
+  -Denable_docs=true \
+  -Dlibdvdcss=disabled
+%meson_build
 
 %install
-%make_install
-rm %{buildroot}%{_libdir}/libdvdread.la %{buildroot}%{_pkgdocdir}/COPYING
+%meson_install
+mv %{buildroot}%{_pkgdocdir}/ docdir/
 
-%ldconfig_scriptlets
 
 %files
 %license COPYING
@@ -57,13 +60,18 @@ rm %{buildroot}%{_libdir}/libdvdread.la %{buildroot}%{_pkgdocdir}/COPYING
 %{_libdir}/libdvdread.so.%{abi}*
 
 %files devel
-%doc %{_pkgdocdir}/ChangeLog
-%doc %{_pkgdocdir}/TODO
+%doc docdir/*
 %{_includedir}/dvdread
 %{_libdir}/libdvdread.so
 %{_libdir}/pkgconfig/dvdread.pc
 
 %changelog
+* Tue Feb 24 2026 Xavier Bachelot <xavier@bachelot.org> - 7.0.1-1
+- Update to 7.0.1 (RHBZ#2413652)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.3-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.3-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -42,7 +42,6 @@ end
 
 -- Sets a spec variable; echoes the result if verbose
 local function explicitset(rpmvar, value, verbose)
-  local value = value
   if (value == nil) or (value == "") then
     value = "%{nil}"
   end
@@ -97,9 +96,9 @@ end
 -- Echo the list of rpm variables, with suffix, if set
 local function echovars(rpmvars, suffix)
   for _, rpmvar in ipairs(rpmvars) do
-    rpmvar = rpmvar .. suffix
-    local header = string.sub("  " .. rpmvar .. ":                                               ",1,21)
-    rpm.expand("%{?" .. rpmvar .. ":%{echo:" .. header .. "%{?" .. rpmvar .. "}}}")
+    local newrpmvar = rpmvar .. suffix
+    local header = string.sub("  " .. newrpmvar .. ":                                               ",1,21)
+    rpm.expand("%{?" .. newrpmvar .. ":%{echo:" .. header .. "%{?" .. newrpmvar .. "}}}")
   end
 end
 
@@ -118,7 +117,7 @@ local function getsuffixed(rpmvar)
   -- only add no suffix if zero suffix is different
   local value = rpm.expand("%{?" .. rpmvar .. "}")
   if (value ~= "") and (value ~= suffixes["0"]) then
-     suffixes[""] = value
+    suffixes[""] = value
   end
   return suffixes
 end
@@ -126,7 +125,7 @@ end
 -- Returns the list of suffixes, including the empty string, for which
 -- <rpmvar><suffix> is set to a non empty value
 local function getsuffixes(rpmvar)
-  suffixes = {}
+  local suffixes = {}
   for suffix in pairs(getsuffixed(rpmvar)) do
     table.insert(suffixes,suffix)
   end
@@ -141,8 +140,8 @@ local function getbestsuffix(rpmvar, value)
   local best         = nil
   local currentmatch = ""
   for suffix, setvalue in pairs(getsuffixed(rpmvar)) do
-  if (string.len(setvalue) > string.len(currentmatch)) and
-     (string.find(value, "^" .. setvalue)) then
+    if (string.len(setvalue) > string.len(currentmatch)) and
+      (string.find(value, "^" .. setvalue)) then
       currentmatch = setvalue
       best         = suffix
     end
@@ -174,11 +173,12 @@ local function wordwrap(text)
   text = string.gsub(text, "\n+\n",           "\n\n")
   text = string.gsub(text, "^\n",             "")
   text = string.gsub(text, "\n( *)[-*—][  ]+", "\n%1– ")
-  output = ""
+  local output = ""
   for line in string.gmatch(text, "[^\n]*\n") do
     local pos = 0
     local advance = ""
-    for word in string.gmatch(line, "%s*[^%s]*\n?") do
+    for match in string.gmatch(line, "%s*[^%s]*\n?") do
+      local word = match
       local wl, bad = utf8.len(word)
       if not wl then
         print("%{warn:Invalid UTF-8 sequence detected in:}" ..
@@ -187,6 +187,7 @@ local function wordwrap(text)
         wl = bad
       end
       if (pos == 0) then
+        local n
         advance, n = string.gsub(word, "^(%s*– ).*", "%1")
         if (n == 0) then
           advance = string.gsub(word, "^(%s*).*", "%1")

@@ -15,7 +15,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-gettext
 Version:        0.5.0
-Release: 9%{?dist}
+Release:        8%{?dist}
 Summary:        OCaml library for i18n
 
 License:        LGPL-2.1-or-later with OCaml-LGPL-linking-exception
@@ -28,6 +28,11 @@ Source0:        %{url}/archive/v%{version}.tar.gz
 # https://github.com/gildor478/ocaml-gettext/issues/36
 # https://github.com/gildor478/ocaml-gettext/pull/37
 Patch:          https://github.com/gildor478/ocaml-gettext/pull/37.patch
+
+# Fix for OCaml >= 5.4
+# https://github.com/gildor478/ocaml-gettext/issues/40
+# https://github.com/gildor478/ocaml-gettext/pull/41
+Patch:          0001-xgettext-Fix-type-for-OCaml-5.4.patch
 
 BuildRequires:  ocaml >= 4.03.0
 BuildRequires:  ocaml-fileutils-devel >= 0.6.6-1
@@ -161,13 +166,19 @@ cat .ofiles-gettext-stub-devel >> .ofiles-gettext-devel
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Oct 14 2025 Richard W.M. Jones <rjones@redhat.com> - 0.5.0-7
+- OCaml 5.4.0 rebuild
+
 * Fri Aug 22 2025 Jerry James <loganjerry@gmail.com> - 0.5.0-6
 - Rebuild for ocaml-dune 3.20.0
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Sat Jul 12 2025 Jerry James  <loganjerry@gmail.com> - 0.5.0-4
+* Sat Jul 12 2025 Jerry James <loganjerry@gmail.com> - 0.5.0-4
 - Rebuild to fix OCaml dependencies
 
 * Thu Apr 03 2025 Richard W.M. Jones <rjones@redhat.com> - 0.5.0-3

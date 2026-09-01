@@ -3,8 +3,8 @@ index 0b7af18..0533e24 100644
 --- a/lib/subdir.am
 +++ b/lib/subdir.am
 @@ -41,7 +41,6 @@ lib_libfrr_la_SOURCES = \
- 	lib/log.c \
  	lib/log_filter.c \
+ 	lib/log_nb.c \
  	lib/log_vty.c \
 -	lib/md5.c \
  	lib/memory.c \

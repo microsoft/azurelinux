@@ -1,0 +1,45 @@
+From fb41a22782cf8e79330427604871ca5166d25dc8 Mon Sep 17 00:00:00 2001
+From: Lumir Balhar <lbalhar@redhat.com>
+Date: Fri, 22 May 2026 13:35:19 +0200
+Subject: [PATCH] Fix %debug and ipdb with Python 3.15
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Python 3.15 introduced PyREPL as the default pdb input backend
+(via _maybe_use_pyrepl_as_stdin()), which temporarily sets
+use_rawinput=False before calling cmdloop(). IPython's TerminalPdb
+raises ValueError when it sees use_rawinput=False.
+
+Override _cmdloop() in IPython.core.debugger.Pdb to bypass the
+PyREPL wrapping — IPython already has its own input handling via
+prompt_toolkit and doesn't need PyREPL.
+
+Fixes: https://github.com/ipython/ipython/issues/15217
+---
+ IPython/core/debugger.py | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/IPython/core/debugger.py b/IPython/core/debugger.py
+index 8d5b66a874..0acec84c1c 100644
+--- a/IPython/core/debugger.py
++++ b/IPython/core/debugger.py
+@@ -540,6 +540,18 @@ def do_exception(self, arg):
+             """
+             return self.do_exceptions(arg)
+ 
++    def _cmdloop(self):
++        # Override to bypass Python 3.15's _maybe_use_pyrepl_as_stdin(), which
++        # sets use_rawinput=False and conflicts with IPython's own input handling.
++        while True:
++            try:
++                self.allow_kbdint = True
++                self.cmdloop()
++                self.allow_kbdint = False
++                break
++            except KeyboardInterrupt:
++                self.message("--KeyboardInterrupt--")
++
+     def interaction(self, frame, tb_or_exc):
+         try:
+             if CHAIN_EXCEPTIONS:

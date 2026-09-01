@@ -1,0 +1,29 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Fri, 21 Sep 2018 12:45:55 +0200
+Subject: [PATCH] Use a proper so-version
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 77e0527f..76937d78 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -169,6 +169,10 @@ if(LOONGARCH64)
+   endif()
+ endif()
+ 
++file(STRINGS "${PROJECT_SOURCE_DIR}/include/libyuv/version.h"
++  LIBYUV_VERSION_LINE REGEX "LIBYUV_VERSION [0-9]+")
++string(REGEX MATCH "[0-9]+" LIBYUV_VERSION "${LIBYUV_VERSION_LINE}")
++
+ # this creates the static library (.a)
+ add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
+ 
+@@ -176,6 +180,7 @@ add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
+ add_library( ${ly_lib_shared} SHARED ${ly_lib_parts})
+ set_target_properties( ${ly_lib_shared} PROPERTIES OUTPUT_NAME "${ly_lib_name}" )
+ set_target_properties( ${ly_lib_shared} PROPERTIES PREFIX "lib" )
++set_target_properties( ${ly_lib_shared} PROPERTIES VERSION "0.0.${LIBYUV_VERSION}" SOVERSION 0)
+ if(WIN32)
+   set_target_properties( ${ly_lib_shared} PROPERTIES IMPORT_PREFIX "lib" )
+ endif()

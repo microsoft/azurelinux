@@ -4,8 +4,8 @@
 %bcond tests 1
 
 Name:           python-webtest
-Version:        3.0.6
-Release: 8%{?dist}
+Version:        3.0.7
+Release:        2%{?dist}
 Summary:        Helper to test WSGI applications
 
 License:        MIT
@@ -71,6 +71,12 @@ rm -f docs/Makefile docs/conf.py docs/changelog.rst
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Oct 07 2025 Ján ONDREJ (SAL) <ondrejj(at)salstar.sk> - 3.0.7-1
+- Update to upstream.
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.0.6-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

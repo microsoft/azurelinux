@@ -1,10 +1,10 @@
-This directory /etc/pki/ca-trust/extracted/openssl/ contains
+This directory /etc/pki/ca-trust/extracted/openssl/ contains 
 CA certificate bundle files which are automatically created
 based on the information found in the
 /usr/share/pki/ca-trust-source/ and /etc/pki/ca-trust/source/
 directories.
 
-All files are in the BEGIN/END TRUSTED CERTIFICATE file format,
+All files are in the BEGIN/END TRUSTED CERTIFICATE file format, 
 as described in the x509(1) manual page.
 
 If your application isn't able to load the PKCS#11 module p11-kit-trust.so,

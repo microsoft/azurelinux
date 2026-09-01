@@ -10,8 +10,8 @@
 %endif
 
 Name:		im-chooser
-Version:	1.7.5
-Release: 7%{?dist}
+Version:	1.7.6
+Release:	1%{?dist}
 License:	GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:		http://pagure.io/im-chooser/
 %{?_with_gtk2:BuildRequires:	gtk2-devel}
@@ -25,7 +25,6 @@ BuildRequires:	gcc
 BuildRequires: make
 
 Source0:	http://releases.pagure.org/%{name}/%{name}-%{version}.tar.bz2
-Patch0:		%{name}-hide-desktop-in-gnome.patch
 
 Summary:	Desktop Input Method configuration tool
 Obsoletes:	im-chooser-gnome3 < 1.4.2-2
@@ -69,23 +68,23 @@ This package contains the XFCE settings panel for im-chooser.
 
 %build
 %configure
-make %{?_smp_mflags}
+%make_build
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="/usr/bin/install -p"
+%make_install
 
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/im-chooser.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/im-chooser.desktop
 %if 0%{?_with_xfce}
-desktop-file-validate $RPM_BUILD_ROOT%{_datadir}/applications/xfce4-im-chooser.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/xfce4-im-chooser.desktop
 %endif
-#%%{!?_with_gtk2:desktop-file-validate $RPM_BUILD_ROOT%%{_datadir}/applications/im-chooser-panel.desktop}
+#%%{!?_with_gtk2:desktop-file-validate %{buildroot}%%{_datadir}/applications/im-chooser-panel.desktop}
 
-rm -rf $RPM_BUILD_ROOT%{_libdir}/libimchooseui.{so,la,a}
-#%%{!?_with_gtk2:rm -rf $RPM_BUILD_ROOT%%{_libdir}/control-center-1/panels/libim-chooser.{a,la}}
+rm -rf %{buildroot}%{_libdir}/libimchooseui.{so,la,a}
+#%%{!?_with_gtk2:rm -rf %{buildroot}%%{_libdir}/control-center-1/panels/libim-chooser.{a,la}}
 
 # disable panel so far
-rm -rf $RPM_BUILD_ROOT%{_libdir}/control-center-1/panels/libim-chooser.so
-rm -rf $RPM_BUILD_ROOT%{_datadir}/applications/im-chooser-panel.desktop
+rm -rf %{buildroot}%{_libdir}/control-center-1/panels/libim-chooser.so
+rm -rf %{buildroot}%{_datadir}/applications/im-chooser-panel.desktop
 
 %find_lang %{name}
 
@@ -116,6 +115,14 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/applications/im-chooser-panel.desktop
 %endif
 
 %changelog
+* Wed Jan 28 2026 Akira TAGOH <tagoh@redhat.com> - 1.7.6-1
+- New upstream release.
+- Drop unneeded patch.
+- Clean up spec file against https://src.fedoraproject.org/rpms/im-chooser/pull-request/1
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.5-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.5-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

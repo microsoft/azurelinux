@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 6;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,961 +11,753 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# Determine if this should be the default version for this Fedora release
-# The default version will own /usr/bin/node and friends
-%global nodejs_pkg_major 22
+# This should be moved to rpm-redhat-config or similar as soon as feasible
+# NOTE: %%SOURCE macros are not yet defined, so explicit path is needed
+%{load:%{_sourcedir}/nodejs.srpm.macros}
 
-%if (0%{?fedora} >= 41 && 0%{?fedora} <= 44) || 0%{?rhel} == 11
-%global nodejs_default %{nodejs_pkg_major}
+# === Versions of any software shipped in the main nodejs tarball
+%nodejs_define_version node 1:22.23.1-%{autorelease} -p
+
+# Special release for sub-packages with their own version string.
+# The complex release string ensures that the subpackage release is always increasing,
+# even in the event that the main package version changes
+# while the sub-package version stays the same.
+%global nodejs_subpackage_release %{node_epoch}.%{node_version}.%{node_release}
+
+# The following ones are generated via script;
+# expect anything between the markers to be overwritten on any update.
+
+# BEGIN automatic-version-macros  # DO NOT REMOVE THIS LINE!
+# Version from node-v22.23.1/src/node_version.h
+%global node_soversion 127
+
+# Version from node-v22.23.1/deps/ada/ada.h
+%nodejs_define_version ada 2.9.2
+# Version from node-v22.23.1/deps/brotli/c/common/version.h
+%nodejs_define_version brotli 1.1.0
+# Version from node-v22.23.1/deps/cares/include/ares_version.h
+%nodejs_define_version c_ares 1.34.6
+# Version from node-v22.23.1/deps/histogram/include/hdr/hdr_histogram_version.h
+%nodejs_define_version histogram 0.11.9
+# Version from node-v22.23.1/tools/icu/current_ver.dep
+%nodejs_define_version icu 78.2 -p
+# Version from node-v22.23.1/deps/uv/include/uv/version.h
+%nodejs_define_version libuv 1.51.0
+# Version from node-v22.23.1/deps/llhttp/include/llhttp.h
+%nodejs_define_version llhttp 9.4.2
+# Version from node-v22.23.1/deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
+%nodejs_define_version nghttp2 1.69.0
+# Version from node-v22.23.1/deps/ngtcp2/nghttp3/lib/includes/nghttp3/version.h
+%nodejs_define_version nghttp3 1.6.0
+# Version from node-v22.23.1/deps/ngtcp2/ngtcp2/lib/includes/ngtcp2/version.h
+%nodejs_define_version ngtcp2 1.11.0
+# Version from node-v22.23.1/deps/cjs-module-lexer/src/package.json
+%nodejs_define_version nodejs-cjs-module-lexer 2.2.0
+# Version from node-v22.23.1/lib/punycode.js
+%nodejs_define_version nodejs-punycode 2.1.0
+# Version from node-v22.23.1/deps/undici/src/package.json
+%nodejs_define_version nodejs-undici 6.27.0
+# Version from node-v22.23.1/deps/npm/package.json
+%nodejs_define_version npm 1:10.9.8-%{nodejs_subpackage_release}
+# Version from node-v22.23.1/deps/sqlite/sqlite3.h
+%nodejs_define_version sqlite 3.51.3
+# Version from node-v22.23.1/deps/uvwasi/include/uvwasi.h
+%nodejs_define_version uvwasi 0.0.23
+# Version from node-v22.23.1/deps/v8/include/v8-version.h
+%nodejs_define_version v8 3:12.4.254.21-%{nodejs_subpackage_release} -p
+# Version from node-v22.23.1/deps/zlib/zlib.h
+%nodejs_define_version zlib 1.3.1
+# END automatic-version-macros  # DO NOT REMOVE THIS LINE!
+
+# === Conditional build – global options
+# Use all vendored dependencies when bootstrapping
+%bcond all_deps_bundled %{with bootstrap}
+
+
+# === Additional definitions ===
+# Architecture-dependent suffix for requiring/providing .so names
+%if 0%{?__isa_bits} == 64
+%global _so_arch_suffix ()(64bit)
 %endif
+# place for data files
+%global nodejs_datadir  %{_datarootdir}/node-%{node_version_major}
+# place for (npm) packages used by multiple streams and/or that are stream-agnostic (do not care)
+%global nodejs_common_sitelib %{_prefix}/lib/node_modules
+# place for (npm) packages specific to this stream
+%global nodejs_private_sitelib %{_prefix}/lib/node_modules_%{node_version_major}
 
-%global nodejs_default_sitelib %{_prefix}/lib/node_modules
-%global nodejs_private_sitelib %{nodejs_default_sitelib}_%{nodejs_pkg_major}
-
-
-# Break circular dependencies
-%bcond bootstrap 0
-
-# 2024-05-21: Temporarily re-enable bundling to work around issues in Rawhide
-%if %{with bootstrap} || 0%{?nodejs_pkg_major} == 22
-%bcond bundled_cjs_module_lexer 1
-%bcond bundled_undici 1
-%else
-%bcond bundled_cjs_module_lexer 0
-%bcond bundled_undici 0
-%endif
-
-%if 0%{?rhel} && 0%{?rhel} < 8
-%bcond_without bundled_zlib
-%else
-%bcond_with bundled_zlib
-%endif
-
-%bcond bundled_sqlite %{with bootstrap}
-%bcond bundled_cares %{with bootstrap}
-
-
-# LTO is currently broken on Node.js builds
-%define _lto_cflags %{nil}
-
-# Heavy-handed approach to avoiding issues with python
-# bytecompiling files in the node_modules/ directory
-%global __python %{python3}
-
-# == Master Relase ==
-# This is used by both the nodejs package and the npm subpackage that
-# has a separate version - the name is special so that rpmdev-bumpspec
-# will bump this rather than adding .1 to the end.
-%global baserelease %autorelease
-
-%{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
-
-# == Node.js Version ==
-# Note: Fedora should only ship LTS versions of Node.js (currently expected
-# to be major versions with even numbers). The odd-numbered versions are new
-# feature releases that are only supported for nine months, which is shorter
-# than a Fedora release lifecycle.
-%global nodejs_epoch 1
-%global nodejs_major 22
-%global nodejs_minor 22
-%global nodejs_patch 0
-# nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 127
-%global nodejs_abi %{nodejs_soversion}
-%global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release %{baserelease}
-%global nodejs_envr %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
-
-%global nodejs_datadir %{_datarootdir}/node-%{nodejs_pkg_major}
-
-
-# == Bundled Dependency Versions ==
-# v8 - from deps/v8/include/v8-version.h
-# Epoch is set to ensure clean upgrades from the old v8 package
-%global v8_epoch 3
-%global v8_major 12
-%global v8_minor 4
-%global v8_build 254
-%global v8_patch 21
-%global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
-%global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
-
-# zlib - from deps/zlib/zlib.h
-%global zlib_version 1.3.1
-
-# c-ares - from deps/cares/include/ares_version.h
-# https://github.com/nodejs/node/pull/9332
-%global c_ares_version 1.34.6
-
-# llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_version 9.3.0
-
-# libuv - from deps/uv/include/uv/version.h
-%global libuv_version 1.51.0
-
-# nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
-%global nghttp2_version 1.64.0
-
-# nghttp3 - from deps/ngtcp2/nghttp3/lib/includes/nghttp3/version.h
-%global nghttp3_version 1.6.0
-
-# ngtcp2 from deps/ngtcp2/ngtcp2/lib/includes/ngtcp2/version.h
-%global ngtcp2_version 1.11.0
-
-# ICU - from tools/icu/current_ver.dep
-%global icu_major 77
-%global icu_minor 1
-%global icu_version %{icu_major}.%{icu_minor}
-
-%global icudatadir %{nodejs_datadir}/icudata
-%{!?little_endian: %global little_endian %(%{python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
-# " this line just fixes syntax highlighting for vim that is confused by the above and continues literal
-
-# simdutf from deps/simdutf/simdutf.h
-%global simdutf_version 6.4.2
-
-# OpenSSL minimum version
-%global openssl11_minimum 1:1.1.1
-%global openssl30_minimum 1:3.0.2
-
-# punycode - from lib/punycode.js
-# Note: this was merged into the mainline since 0.6.x
-# Note: this will be unmerged in an upcoming major release
-%global punycode_version 2.1.0
-
-# npm - from deps/npm/package.json
-%global npm_epoch 1
-%global npm_version 10.9.4
-
-# In order to avoid needing to keep incrementing the release version for the
-# main package forever, we will just construct one for npm that is guaranteed
-# to increment safely. Changing this can only be done during an update when the
-# base npm version number is increasing.
-%global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
-
-%global npm_envr %{npm_epoch}:%{npm_version}-%{npm_release}
-
-# uvwasi - from deps/uvwasi/include/uvwasi.h
-%global uvwasi_version 0.0.23
-
-# histogram_c - assumed from timestamps
-%global histogram_version 0.9.7
-
-# sqlite – from deps/sqlite/sqlite3.h
-%global sqlite_version 3.50.4
-
-
-Name: nodejs%{nodejs_pkg_major}
-Epoch: %{nodejs_epoch}
-Version: %{nodejs_version}
-Release: %{nodejs_release}
-Summary: JavaScript runtime
-# see bundled_licenses.py, which helps identify licenses in bundled NPM modules
-License: Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
-Group: Development/Languages
-URL: http://nodejs.org/
-
-ExclusiveArch: %{nodejs_arches}
-
-# nodejs bundles openssl, but we use the system version in Fedora
-# because openssl contains prohibited code, we remove openssl completely from
-# the tarball, using the script in Source200
-Source0: node-v%{nodejs_version}-stripped.tar.gz
-Source1: npmrc
-Source2: btest402.js
-# The binary data that icu-small can use to get icu-full capability
-Source3: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-b.zip
-Source4: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
-Source5: nodejs_abi.attr.in
-Source6: nodejs_abi.req.in
-Source200: nodejs-sources.sh
-Source201: npmrc.builtin.in
-Source202: nodejs.pc.in
-Source203: v8.pc.in
-Source300: test-runner.sh
-Source301: test-should-pass.txt
-
-Patch: 0001-Remove-unused-OpenSSL-config.patch
-Patch: 0001-fips-disable-options.patch
-
-%if 0%{?nodejs_default}
-%global pkgname nodejs
-%package -n %{pkgname}
-Summary: JavaScript runtime
-%else
-%global pkgname nodejs22
-%endif
-
-BuildRequires: make
-BuildRequires: python%{python3_pkgversion}-devel
-BuildRequires: python%{python3_pkgversion}-setuptools
-BuildRequires: python%{python3_pkgversion}-jinja2
-%if 0%{?rhel} && 0%{?rhel} < 9
-BuildRequires: python-unversioned-command
-%endif
-%if %{with bundled_zlib}
-Provides: bundled(zlib) = %{zlib_version}
-%else
-BuildRequires: zlib-devel
-%endif
-BuildRequires: brotli-devel
-%if 0%{?rhel} && 0%{?rhel} < 8
-BuildRequires: devtoolset-11-gcc
-BuildRequires: devtoolset-11-gcc-c++
-%else
-BuildRequires: gcc >= 8.3.0
-BuildRequires: gcc-c++ >= 8.3.0
-%endif
-
-BuildRequires: pkgconf
-BuildRequires: jq
-
-# needed to generate bundled provides for npm dependencies
-# https://src.fedoraproject.org/rpms/nodejs/pull-request/2
-# https://pagure.io/nodejs-packaging/pull-request/10
-BuildRequires: nodejs-packaging
-
-BuildRequires: chrpath
-BuildRequires: libatomic
-BuildRequires: ninja-build
-BuildRequires: unzip
-
-%if %{with bundled_sqlite}
-Provides: bundled(sqlite) = %{sqlite_version}
-%else
-BuildRequires: pkgconfig(sqlite3)
-%endif
-
-
-
-%if 0%{?nodejs_default}
-Provides: nodejs = %{nodejs_envr}
-# To keep the upgrade path clean, we Obsolete nodejsXX from the nodejs
-# package and nodejsXX-foo from individual subpackages.
-# Note that using Obsoletes without package version is not standard practice.
-# Here we assert that *any* version of the system's default interpreter is
-# preferable to an "extra" interpreter. For example, nodejs-20.5.0 will
-# replace nodejs20-20.6.0.
-%define unversioned_obsoletes_of_nodejsXX_if_default() %{expand:\
-Obsoletes: nodejs%{nodejs_pkg_major}%{?1:-%{1}} < %{nodejs_envr}\
-Provides: nodejs%{nodejs_pkg_major}%{?1:-%{1}} = %{nodejs_envr}\
+# === Backwards compatibility ===
+# Obsolete un-versioned default stream RPMs; can be removed when F43 is EOL
+%define obsolete_default_stream_rpm() %{expand:\
+Obsoletes: nodejs%{?1:-%{1}} < %{?2}%{!?2:1:22.22.0-4%{?dist}}
+Provides:  nodejs%{?1:-%{1}} = %{?2}%{!?2:%{node_evr}}
 }
-%else
-%define unversioned_obsoletes_of_nodejsXX_if_default() %{nil}
-%endif
 
-%if %{with bundled}
-Provides:      bundled(libuv) = %{libuv_version}
-%else
-BuildRequires: libuv-devel >= 1:%{libuv_version}
-Requires:      libuv >= 1:%{libuv_version}
-%endif
+Name:           nodejs%{node_version_major}
+Epoch:          %{node_epoch}
+Version:        %{node_version}
+Release:        %{node_release}
 
-# Node.js frequently bumps this faster than Fedora can follow,
-# so we will bundle it.
-Provides: bundled(nghttp2) = %{nghttp2_version}
-Provides: bundled(nghttp3) = %{nghttp3_version}
-Provides: bundled(ngtcp2) = %{ngtcp2_version}
+Summary:        JavaScript runtime
+License:        Apache-2.0 AND Artistic-2.0 AND BSD-2-Clause AND BSD-3-Clause AND BlueOak-1.0.0 AND CC-BY-3.0 AND CC0-1.0 AND ISC AND MIT
+URL:            https://nodejs.org
 
-# Temporarily bundle llhttp because the upstream doesn't
-# provide releases for it.
-Provides: bundled(llhttp) = %{llhttp_version}
+ExclusiveArch:  %{nodejs_arches}
 
+# SPEC tools – additiona macros, dependency generators, and utilities
+BuildRequires:  chrpath
+BuildRequires:  git-core
+BuildRequires:  jq
+BuildRequires:  nodejs-packaging
+# Build system and supporting tools
+BuildRequires:  gcc >= 10.0, gcc-c++ >= 10.0, pkgconf, ninja-build
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  %{py3_dist setuptools jinja2}
+# Additional libraries, either system or vendored ones
+BuildRequires:  pkgconfig(openssl) >= 3.0.2
+BuildRequires: (pkgconfig(openssl) >= 3.0.2 with pkgconfig(openssl) < 4.0)
+%nodejs_declare_bundled -a  ada
+%nodejs_declare_bundled -a  brotli      -plibbrotlidec,libbrotlienc
+%nodejs_declare_bundled -a  c-ares      -plibcares
+%nodejs_declare_bundled -a  histogram
+%nodejs_declare_bundled -a  icu
+%nodejs_declare_bundled -a  libuv       -p
+%nodejs_declare_bundled -a  llhttp
+%nodejs_declare_bundled -a  nghttp2
+%nodejs_declare_bundled -a  nghttp3
+%nodejs_declare_bundled -a  ngtcp2
+%nodejs_declare_bundled -a  nodejs-cjs-module-lexer
+%nodejs_declare_bundled -a  nodejs-punycode -npunycode
+%nodejs_declare_bundled -a  nodejs-undici
+%nodejs_declare_bundled -a  sqlite      -psqlite3
+%nodejs_declare_bundled -a  uvwasi
+%nodejs_declare_bundled -a  v8
+%nodejs_declare_bundled -a  zlib        -p
+# Run-time dependencies of the main package
+Requires:   ca-certificates
+# We want any nodejs installed to gurantee the node command is present.
+# When multiple nodejs verisons are installed, we don't influence which command this is,
+# but the Recommedns bellow should make it so the "native" one is installed
+# by default when only one nodejs version is installed.
+# We deliberately use %%{_bindir} here as the file comes from this very build.
+Requires:   %{_bindir}/node
+# Required and/or recommended sub-packages
+Requires:   %{name}-libs%{?_isa}      = %{node_evr}
+Recommends: %{name}-bin               = %{node_evr}
+Recommends: %{name}-docs              = %{node_evr}
+Recommends: %{name}-full-i18n%{?_isa} = %{node_evr}
+Recommends: %{name}-npm              >= %{npm_evr}
+# Virtual provides
+Provides:   nodejs(abi) = %{node_soversion}, nodejs(abi%{node_version_major}) = %{node_soversion}
+Provides:   nodejs(engine) = %{node_version}
+# Backwards compatibility
+%obsolete_default_stream_rpm
 
-%if 0%{?rhel} && 0%{?rhel} < 8
-BuildRequires: openssl11-devel >= %{openssl11_minimum}
-Requires: openssl11 >= %{openssl11_minimum}
-%global ssl_configure --shared-openssl --shared-openssl-includes=%{_includedir}/openssl11 --shared-openssl-libpath=%{_libdir}/openssl11
-%else
+# Main source tarball; see packaging/make-nodejs-tarball.sh on how it is created
+Source:         node-v%{node_version}-stripped.tar.gz
+# Sources 001-099: reserved for additional sources to be installed
+# - Full ICU database data
+Source001:      https://github.com/unicode-org/icu/releases/download/release-%{icu_version_major}.%{icu_version_minor}/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-b.zip
+Source002:      https://github.com/unicode-org/icu/releases/download/release-%{icu_version_major}.%{icu_version_minor}/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-l.zip
+# - Downstream/distribution configuration files
+Source003:      nodejs.pc.in
+Source004:      v8.pc.in
+Source005:      npmrc.in
+Source006:      nodejs_abi.attr.in
+Source007:      nodejs_abi.req.in
+# - Check section tests
+Source010:      test-runner.sh
+Source011:      test-should-pass.txt
+Source020:      i18n-btest402.js
+# Source 100+: Packaging support files that won't be installed
+# - Packaging supports scripts and Makefile, used to semi-automate RPM updates. See the Makefile in the tarball on how this is created.
+Source100:      packaging-scripts.tar.gz
+# - Additional SRPM macros
+Source101:      nodejs.srpm.macros
 
-%if 0%{?fedora} >= 36
-BuildRequires: openssl >= %{openssl30_minimum}
-BuildRequires: openssl-devel >= %{openssl30_minimum}
-%global openssl_fips_configure --openssl-is-fips
-%else
-Requires: openssl >= %{openssl11_minimum}
-BuildRequires: openssl-devel >= %{openssl11_minimum}
-%global openssl_fips_configure %{nil}
-%endif
-
-%global ssl_configure --shared-openssl --openssl-conf-name=openssl_conf %{openssl_fips_configure}
-%endif
-
-
-# dtrace is not supported on Node.js 19+
-%global dtrace_configure %{nil}
-
-
-# we need the system certificate store
-Requires: ca-certificates
-
-Requires: %{pkgname}-libs%{?_isa} = %{nodejs_envr}
-
-%if 0%{?fedora} || 0%{?rhel} >= 8
-# Pull in the docs and full-icu data by default
-Recommends: %{pkgname}-docs = %{nodejs_envr}
-Recommends: %{pkgname}-full-i18n%{?_isa} = %{nodejs_envr}
-Recommends: %{pkgname}-npm >= %{npm_envr}
-%endif
-
-# we need ABI virtual provides where SONAMEs aren't enough/not present so deps
-# break when binary compatibility is broken
-Provides: nodejs(abi) = %{nodejs_abi}
-Provides: nodejs(abi%{nodejs_major}) = %{nodejs_abi}
-
-# this corresponds to the "engine" requirement in package.json
-Provides: nodejs(engine) = %{nodejs_version}
-
-# Node.js currently has a conflict with the 'node' package in Fedora
-# The ham-radio group has agreed to rename their binary for us, but
-# in the meantime, we're setting an explicit Conflicts: here
-Conflicts: node <= 0.3.2-12
-
-# The punycode module was absorbed into the standard library in v0.6.
-# It still exists as a seperate package for the benefit of users of older
-# versions.  Since we've never shipped anything older than v0.10 in Fedora,
-# we don't need the seperate nodejs-punycode package, so we Provide it here so
-# dependent packages don't need to override the dependency generator.
-# See also: RHBZ#11511811
-# UPDATE: punycode will be deprecated and so we should unbundle it in Node v8
-# and use upstream module instead
-# https://github.com/nodejs/node/commit/29e49fc286080215031a81effbd59eac092fff2f
-Provides: nodejs-punycode = %{punycode_version}
-Provides: npm(punycode) = %{punycode_version}
-
-%if %{with bundled_cares}
-# Node.js has forked c-ares from upstream in an incompatible way, so we need
-# to carry the bundled version internally.
-# See https://github.com/nodejs/node/commit/766d063e0578c0f7758c3a965c971763f43fec85
-Provides: bundled(c-ares) = %{c_ares_version}
-%else
-BuildRequires: c-ares-devel
-%endif
-
-# Node.js is closely tied to the version of v8 that is used with it. It makes
-# sense to use the bundled version because upstream consistently breaks ABI
-# even in point releases. Node.js upstream has now removed the ability to build
-# against a shared system version entirely.
-# See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
-Provides: bundled(v8) = %{v8_version}
-
-# Node.js is bound to a specific version of ICU which may not match the OS
-# We cannot pin the OS to this version of ICU because every update includes
-# an ABI-break, so we'll use the bundled copy.
-Provides: bundled(icu) = %{icu_version}
-
-# Upstream added new dependencies, but so far they are not available in Fedora
-# or there's no option to built it as a shared dependency, so we bundle them
-Provides: bundled(uvwasi) = %{uvwasi_version}
-Provides: bundled(histogram) = %{histogram_version}
-Provides: bundled(simdutf) = %{simdutf_version}
-
-# Upstream has added a new URL parser that has no option to build as a shared
-# library (19.7.0+)
-Provides: bundled(ada) = 2.9.2
-
-
-# undici and cjs-module-lexer ship with pre-built WASM binaries.
-%if %{with bundled_cjs_module_lexer}
-Provides: bundled(nodejs-cjs-module-lexer) = 2.1.0
-%else
-BuildRequires: nodejs-cjs-module-lexer
-Requires: nodejs-cjs-module-lexer
-%endif
-
-%if %{with bundled_undici}
-Provides: bundled(nodejs-undici) = 6.23.0
-%else
-BuildRequires: nodejs-undici
-Requires: nodejs-undici
-%endif
-
-
-%unversioned_obsoletes_of_nodejsXX_if_default
-
+%patchlist
+0001-Remove-unused-OpenSSL-config.patch
+0001-fips-disable-options.patch
+0002-CVE-2026-42338-ip-address-security-fix.patch
 
 %description
-Node.js is a platform built on Chrome's JavaScript runtime \
-for easily building fast, scalable network applications. \
-Node.js uses an event-driven, non-blocking I/O model that \
-makes it lightweight and efficient, perfect for data-intensive \
-real-time applications that run across distributed devices.}
+Node.js is a platform built on Chrome's JavaScript runtime
+for easily building fast, scalable network applications.
+Node.js uses an event-driven, non-blocking I/O model that
+makes it lightweight and efficient, perfect for data-intensive
+real-time applications that run across distributed devices.
 
+%package        devel
+Summary:        JavaScript runtime – development headers
+Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
+Requires:       nodejs%{node_version_major}-libs%{?_isa} = %{node_evr}
+Requires:       nodejs-packaging
+Requires:       openssl-devel%{?_isa}
+%{!?with_bundled_brotli:Requires: brotli-devel%{?_isa}}
+%{!?with_bundled_libuv:Requires: libuv-devel%{?_isa}}
+%{!?with_bundled_zlib:Requires: zlib-devel%{?_isa}}
+# Note: -devel sub-packages of the various streams conflict with each other,
+# as the headers cannot be easily namespaced (would break at lease node-gyp search path).
+# Hence the Provides: in place of metapackage.
+Provides:       nodejs-devel = %{node_evr}
 
-%if 0%{?nodejs_default}
-%description -n %{pkgname}
-Node.js is a platform built on Chrome's JavaScript runtime \
-for easily building fast, scalable network applications. \
-Node.js uses an event-driven, non-blocking I/O model that \
-makes it lightweight and efficient, perfect for data-intensive \
-real-time applications that run across distributed devices.}
-%endif
-
-
-%package -n %{pkgname}-devel
-Summary: JavaScript runtime - development headers
-Group: Development/Languages
-Requires: %{pkgname}%{?_isa} = %{nodejs_envr}
-Requires: %{pkgname}-libs%{?_isa} = %{nodejs_envr}
-Requires: openssl-devel%{?_isa}
-%if !%{with bundled_zlib}
-Requires: zlib-devel%{?_isa}
-%endif
-Requires: brotli-devel%{?_isa}
-Requires: nodejs-packaging
-
-%if %{without bundled}
-Requires: libuv-devel%{?_isa}
-%endif
-
-%if 0%{?nodejs_default}
-Provides: nodejs-devel = %{nodejs_envr}
-%endif
-%unversioned_obsoletes_of_nodejsXX_if_default devel
-
-Provides: alternative-for(nodejs-devel) = %{nodejs_envr}
+Provides: alternative-for(nodejs-devel) = %{node_evr}
 Conflicts: alternative-for(nodejs-devel)
+# previously VP used for the same reason as alternative-for() above
 Conflicts: nodejs-devel-pkg
- # previously VP used for the same reason as alternative-for() above
+%obsolete_default_stream_rpm devel
 
 
 
-%description -n %{pkgname}-devel
+%description    devel
 Development headers for the Node.js JavaScript runtime.
 
+%package -n     v8-%{v8_version_major}.%{v8_version_minor}-devel
+Summary:        v8 – development headers
+Epoch:          %{v8_epoch}
+Version:        %{v8_version}
+Release:        %{v8_release}
 
-%package -n %{pkgname}-libs
-Summary: Node.js and v8 libraries
+Requires:       nodejs%{node_version_major}-devel%{?_isa} = %{node_evr}
+Requires:       nodejs%{node_version_major}-libs%{?_isa}  = %{node_evr}
+Provides:       v8-devel = %{v8_evr}
+Obsoletes:      v8-devel <= 2:10.2.154, v8-314-devel <= 2:3.14
 
-# Compatibility for obsolete v8 package
-%if 0%{?__isa_bits} == 64
-Provides: libv8.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
-Provides: libv8_libbase.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
-Provides: libv8_libplatform.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
-%else
-# 32-bits
-Provides: libv8.so.%{v8_major} = %{v8_epoch}:%{v8_version}
-Provides: libv8_libbase.so.%{v8_major} = %{v8_epoch}:%{v8_version}
-Provides: libv8_libplatform.so.%{v8_major} = %{v8_epoch}:%{v8_version}
-%endif
-
-Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}
-Provides: v8%{?_isa} = %{v8_epoch}:%{v8_version}-%{nodejs_release}
-Obsoletes: v8 < 1:6.7.17-10
-
-Provides: nodejs-libs = %{nodejs_envr}
-%unversioned_obsoletes_of_nodejsXX_if_default libs
-
-%description -n %{pkgname}-libs
-Libraries to support Node.js and provide stable v8 interfaces.
-
-
-%package -n %{pkgname}-full-i18n
-Summary: Non-English locale data for Node.js
-Requires: %{pkgname}%{?_isa} = %{nodejs_envr}
-
-%unversioned_obsoletes_of_nodejsXX_if_default full-i18n
-
-
-%description -n %{pkgname}-full-i18n
-Optional data files to provide full-icu support for Node.js. Remove this
-package to save space if non-English locales are not needed.
-
-
-%package -n v8-%{v8_major}.%{v8_minor}-devel
-Summary: v8 - development headers
-Epoch: %{v8_epoch}
-Version: %{v8_version}
-Release: %{v8_release}
-Requires: %{pkgname}-devel%{?_isa} = %{nodejs_envr}
-Requires: %{pkgname}-libs%{?_isa} = %{nodejs_envr}
-Provides: v8-devel = %{v8_epoch}:%{v8_version}-%{v8_release}
-
-Conflicts: v8-devel
-Conflicts: v8-314-devel
-
-
-%description -n v8-%{v8_major}.%{v8_minor}-devel
+%description -n v8-%{v8_version_major}.%{v8_version_minor}-devel
 Development headers for the v8 runtime.
 
+%package        libs
+Summary:        Node.js and v8 libraries
+# v8 used to be a separate package; keep providing it virtually
+Provides:       v8 = %{v8_evr}
+Provides:       v8%{?_isa} = %{v8_evr}
+Obsoletes:      v8 < 1:6.7.17-10
+Provides:       libv8.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libbase.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+Provides:       libv8_libplatform.so.%{v8_version_major}%{?_so_arch_suffix} = %{v8_epoch}:%{v8_version}
+%obsolete_default_stream_rpm libs
 
-%package -n %{pkgname}-npm
-Summary: Node.js Package Manager
-Epoch: %{npm_epoch}
-Version: %{npm_version}
-Release: %{npm_release}
+%description    libs
+Libraries to support Node.js and provide stable v8 interfaces.
 
-# If we're using the companion NPM build, make sure to keep it in lock-step
-# with the Node version.
-Requires: %{pkgname} = %{nodejs_envr}
-%if 0%{?fedora} || 0%{?rhel} >= 8
-Recommends: %{pkgname}-docs = %{nodejs_envr}
-%endif
+%package        full-i18n
+Summary:        Non-English locale data for Node.js
+Requires:       nodejs%{node_version_major}%{?_isa} = %{node_evr}
+%obsolete_default_stream_rpm full-i18n
 
-# Do not add epoch to the virtual NPM provides or it will break
-# the automatic dependency-generation script.
-Provides: npm(npm) = %{npm_version}
+%description    full-i18n
+Optional data files to provide full ICU support for Node.js.
+Remove this package to save space if non-English locales are not needed.
 
+%package        docs
+Summary:        Node.js API documentation
+BuildArch:      noarch
+Requires(meta): nodejs%{node_version_major} = %{node_evr}
+%obsolete_default_stream_rpm docs
 
-%if 0%{?nodejs_default}
-# Satisfy dependency requests for "npm"
-Provides: npm = %{npm_envr}
+%description    docs
+The API documentation for the Node.js JavaScript runtime.
 
-# Obsolete the old 'npm' package
-Obsoletes: npm < 1:9
+%package        npm
+Summary:        Node.js Package Manager
+Epoch:          %{npm_epoch}
+Version:        %{npm_version}
+Release:        %{npm_release}
 
-# Obsolete others. We can't use %%unversioned_obsoletes_of_nodejsXX_if_default
-# here because the Provides: needs its own version
-Obsoletes: nodejs%{nodejs_pkg_major}-npm < %{npm_envr}
-Provides: nodejs%{nodejs_pkg_major}-npm = %{npm_envr}
-%endif
+BuildArch:      noarch
+Requires:       nodejs%{node_version_major}         = %{node_evr}
+Recommends:     nodejs%{node_version_major}-docs    = %{node_evr}
+Provides:       npm = %{npm_evr}
+Provides:       npm(npm) = %{npm_version}
 
+# Similarily to the node command, we want a guranteed npm command here.
+Requires:       %{_bindir}/npm
+Recommends:     %{name}-npm-bin >= %{npm_evr}
 
-%description -n %{pkgname}-npm
+Obsoletes:      nodejs-npm < 1:10.9.4-1.22.22.0.4%{?dist}
+Provides:       nodejs-npm = %{npm_evr}
+
+%description    npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
+%package        bin
+Summary:        Node.js JavaScript runtime – unversioned symlinks
+Group:          Development/Languages
+BuildArch:      noarch
+Requires:       nodejs%{node_version_major} = %{node_evr}
+Provides:       alternative-for(nodejs-bin) = %{node_evr}
+Conflicts:      alternative-for(nodejs-bin)
 
-%package -n %{pkgname}-docs
-Summary: Node.js API documentation
-Group: Documentation
-BuildArch: noarch
-Requires(meta): %{pkgname} = %{nodejs_envr}
+%description    bin
+Binary symlinks for Node.js JavaScript runtime.
 
-Provides: nodejs-docs = %{nodejs_envr}
-%unversioned_obsoletes_of_nodejsXX_if_default docs
+%package        npm-bin
+Summary:        Node.js Package Manager – binary symlinks
+Group:          Development/Languages
+BuildArch:      noarch
+Requires:       nodejs%{node_version_major}-npm = %{npm_evr}
+Requires(meta): nodejs%{node_version_major}-bin = %{node_evr}
+Provides:       alternative-for(nodejs-npm-bin) = %{npm_evr}
+Conflicts:      alternative-for(nodejs-npm-bin)
 
-
-%description -n %{pkgname}-docs
-The API documentation for the Node.js JavaScript runtime.
-
+%description    npm-bin
+Binary symlinks for Node.js Package Manager.
 
 %prep
-%autosetup -p1 -n node-v%{nodejs_version}
+%autosetup -n node-v%{node_version} -S git_am
+# clean the archive of the de-vendored dependencies, ensuring they are not used
+readonly -a devendored_paths=(
+    deps/v8/third_party/jinja2 tools/inspector_protocol/jinja2
+    %{?!with_bundled_brotli:deps/brotli}
+    #%{?!with_bundled_c_ares:deps/cares}
+    %{?!with_bundled_libuv:deps/uv}
+    %{?!with_bundled_nodejs_cjs_module_lexer:deps/cjs-module-lexer}
+    %{?!with_bundled_nodejs_undici:deps/undici}
+    %{?!with_bundled_sqlite:deps/sqlite}
+    %{?!with_bundled_zlib:deps/zlib}
+)
+rm -rf "${devendored_paths[@]}"
 
-# remove bundled dependencies that we aren't building
-%if !%{with bundled_zlib}
-rm -rf deps/zlib
-%endif
-
-rm -rf deps/brotli
-rm -rf deps/v8/third_party/jinja2
-rm -rf tools/inspector_protocol/jinja2
-
-%if %{without bundled_cjs_module_lexer}
-rm -rf deps/cjs-module-lexer
-%endif
-
-%if %{without bundled_undici}
-rm -rf deps/undici
-%endif
-
-%if %{without bundled_sqlite}
-rm -rf deps/sqlite
-%endif
-
-# Replace any instances of unversioned python with python3
-pfiles=( $(grep -rl python) )
-%py3_shebang_fix ${pfiles[@]}
-
+# use system python throughout the whole sources
+readonly -a potential_python_scripts=(
+    $(grep --recursive --files-with-matches --max-count=1 python)
+)
+%py3_shebang_fix "${potential_python_scripts[@]}"
 
 %build
-
-# Activate DevToolset 11 on EPEL 7
-%if 0%{?rhel} && 0%{?rhel} < 8
-. /opt/rh/devtoolset-11/enable
-%endif
-
-# When compiled on armv7hl this package generates an out of range
-# reference to the literal pool.  This is most likely a GCC issue.
-%ifarch armv7hl
-%define _lto_cflags %{nil}
-%endif
-
-# Decrease debuginfo verbosity to reduce memory consumption during final
-# library linking
-%global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
-
-export CC='%{__cc}'
-export CXX='%{__cxx}'
-export NODE_GYP_FORCE_PYTHON=%{python3}
-
-# build with debugging symbols and add defines from libuv (#892601)
-# 2022-07-14: There's a bug in either torque or gcc that causes a
-# segmentation fault on ppc64le and s390x if compiled with -O2. Things
-# run fine on -O1 and -O3, so we'll just go with -O3 (like upstream)
-# while this gets sorted out.
-extra_cflags=(
-    -D_LARGEFILE_SOURCE
-    -D_FILE_OFFSET_BITS=64
-    -DOPENSSL_NO_ENGINE  # https://issues.redhat.com/browse/RHEL-33743
-    -DZLIB_CONST
+# additional build flags
+readonly -a extra_cflags=(
+    # Decrease debuginfo verbosity; otherwise,
+    # the linker will run out of memory when linking v8
+    -g1
+    # For i686 compatibility, build with defines from libuv (rhbz#892601)
+    -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+    # Do not use OpenSSL Engine API (RHEL-33743)
+    -DOPENSSL_NO_ENGINE
+    # 2022-07-14: There's a bug in either torque or gcc that causes a
+    # segmentation fault on ppc64le and s390x if compiled with -O2. Things
+    # run fine on -O1 and -O3, so we'll just go with -O3 (like upstream)
+    # while this gets sorted out.
     -O3
+    # v8 segfaults when Identical Code Folding is enabled
+    # - https://github.com/nodejs/node/issues/47865
     -fno-ipa-icf
 )
-export CFLAGS="%{optflags} ${extra_cflags[*]}" CXXFLAGS="%{optflags} ${extra_cflags[*]}"
-export LDFLAGS="%{build_ldflags}"
+# configuration flags
+readonly -a configure_flags=(
+    # Basic build options
+    --verbose --ninja
+    # Use FHS and build separate libnode.so
+    --prefix=%{_prefix} --shared --libdir=%{_lib}
+    # Use system OpenSSL
+    --shared-openssl
+    --openssl-is-fips
+    --openssl-conf-name=openssl_conf
+    --openssl-use-def-ca-store
+    # Link with system libraries where appropriate
+    %{?!with_bundled_brotli:--shared-brotli}
+    # Switching to bundled c-ares for 22.23.1
+    # Due to:
+    # ../../src/cares_wrap.cc:1730:21: error: no matches converting function ‘Callback’ to type ‘ares_host_callback’
+    #%{?!with_bundled_c_ares:--shared-cares}
+    %{?!with_bundled_libuv:--shared-libuv}
+    %{?!with_bundled_sqlite:--shared-sqlite}
+    %{?!with_bundled_zlib:--shared-zlib}
+%if %{without bundled_nodejs_cjs_module_lexer}
+    --shared-builtin-cjs_module_lexer/lexer-path=%{nodejs_common_sitelib}/cjs-module-lexer/lexer.js
+    --shared-builtin-cjs_module_lexer/dist/lexer-path=%{nodejs_common_sitelib}/cjs-module-lexer/dist/lexer.js
+%endif
+%if %{without bundled_nodejs_undici}
+    --shared-builtin-undici/undici-path=%{nodejs_common_sitelib}/undici/loader.js
+%endif
+    # Enable LTO where possible
+    --enable-lto
+    # Compile with small icu, extendable via full-i18n subpackage
+    --with-intl=small-icu --with-icu-default-data-dir=%{nodejs_datadir}/icudata
+    # Do not ship corepack
+    --without-corepack
+    # Use local headers for native addons when available
+    --use-prefix-to-find-headers
+)
 
-# Fake up the unversioned python executable because gyp calls it from the PATH
-mkdir .bin
-cwd=$(pwd)
-ln -srf /usr/bin/python3 ./.bin/python
-export PATH="${cwd}/.bin:$PATH"
-
-%{python3} configure.py \
-           --verbose \
-           --ninja \
-           --enable-lto \
-           --prefix=%{_prefix} \
-           --use-prefix-to-find-headers \
-           --shared \
-           --libdir=%{_lib} \
-           %{ssl_configure} \
-           %{dtrace_configure} \
-           %{!?with_bundled_zlib:--shared-zlib} \
-           %{!?with_bundled_cjs_module_lexer:--shared-builtin-cjs_module_lexer/lexer-path %{nodejs_private_sitelib}/cjs-module-lexer/lexer.js} \
-           %{!?with_bundled_cjs_module_lexer:--shared-builtin-cjs_module_lexer/dist/lexer-path %{nodejs_private_sitelib}/cjs-module-lexer/dist/lexer.js} \
-           %{!?with_bundled_undici:--shared-builtin-undici/undici-path %{nodejs_private_sitelib}/undici/loader.js} \
-           %{!?with_bundled_sqlite:--shared-sqlite} \
-           --shared-brotli \
-           --shared-libuv \
-           %{!?with_bundled_cares:--shared-cares} \
-           --with-intl=small-icu \
-           --with-icu-default-data-dir=%{icudatadir} \
-           --without-corepack \
-           --openssl-use-def-ca-store
-
+export CFLAGS="${CFLAGS} ${extra_cflags[*]}" CXXFLAGS="${CXXFLAGS} ${extra_cflags[*]}"
+%python3 configure.py "${configure_flags[@]}"
 %ninja_build -C out/Release
 
-
 %install
+# Fill in values in configuration file templates
+# usage: mkconfig [additional sed options] <template.in >config_file
+mkconfig() {
+    local -ra replace_opts=(
+        -e 's;@INCLUDEDIR@;%{_includedir};g'
+        -e 's;@LIBDIR@;%{_libdir};g'
+        -e 's;@NODEJS_VERSION@;%{node_version};g'
+        -e 's;@PREFIX@;%{_prefix};g'
+        -e 's;@PYTHON3@;%{python3};g'
+        -e 's;@SYSCONFDIR@;%{_sysconfdir};g'
+        -e 's;@V8_VERSION@;%{v8_version};g'
+    )
 
-# The ninja build does not put the shared library in the expected location, so
-# we will move it.
-mv out/Release/lib/libnode.so.%{nodejs_soversion} out/Release/
+    sed --regexp-extended "${replace_opts[@]}" "$@"
+}
 
-%if 0%{?nodejs_major} >= 20
-./tools/install.py install --dest-dir %{buildroot} --prefix %{_prefix}
-%else
-./tools/install.py install %{buildroot} %{_prefix}
-%endif
+# === Base installation
+%{python3} tools/install.py install --dest-dir="${RPM_BUILD_ROOT}" --prefix="%{_prefix}"
 
+# Correct the main binary permissions and remove RPATH
+chmod 0755       "${RPM_BUILD_ROOT}%{_bindir}/node"
+chrpath --delete "${RPM_BUILD_ROOT}%{_bindir}/node"
 
-# own the sitelib directory
-mv %{buildroot}%{nodejs_default_sitelib} \
-   %{buildroot}%{nodejs_private_sitelib}
+# Provide library symlinks
+pushd "${RPM_BUILD_ROOT}%{_libdir}"
+# - devel symlink for libnode.so
+ln -srf libnode.so.%{node_soversion} libnode.so
+# - compatibility symlinks for libv8
+for soname in libv8{,_libbase,_libplatform}; do
+    ln -srf libnode.so.%{node_soversion} "${soname}.so.%{v8_version_major}.%{v8_version_minor}"
+    ln -srf libnode.so.%{node_soversion} "${soname}.so"
+done
+popd  # from ${RPM_BUILD_ROOT}%%{_libdir}
 
-rm -f %{buildroot}%{_datadir}/systemtap/tapset/node.stp
+# Massage includedir
+pushd "${RPM_BUILD_ROOT}%{_includedir}"
+# - provide compatibility symlinks for libv8
+for header in node/libplatform node/v8*.h node/cppgc; do
+    ln -srf "${header}" "$(basename "${header}")"
+done
+# - config.gypi is platform-dependent and would conflict between arches
+mv node/config.gypi node/config-%{_arch}.gypi
+popd  # ${RPM_BUILD_ROOT}%%{_includedir}
 
+# Install node-gyp configuration files
+install -p -Dt "${RPM_BUILD_ROOT}%{nodejs_datadir}" common.gypi
 
-# Set the binary permissions properly
-chmod 0755 %{buildroot}/%{_bindir}/node
-chrpath --delete %{buildroot}%{_bindir}/node
+# Create pkg-config files
+readonly PKGCONFDIR="${RPM_BUILD_ROOT}%{_libdir}/pkgconfig"
+mkdir -p "${PKGCONFDIR}"
+mkconfig -e 's;@PKGCONFNAME@;nodejs-%{node_version_major};g' \
+    <%{SOURCE3} >"${PKGCONFDIR}/nodejs-%{node_version_major}.pc"
+mkconfig -e 's;@PKGCONFNAME@;v8-%{v8_version_major}.%{v8_version_minor};g' \
+    <%{SOURCE4} >"${PKGCONFDIR}/v8-%{v8_version_major}.%{v8_version_minor}.pc"
 
-# Rename the node binary
-mv %{buildroot}%{_bindir}/node %{buildroot}%{_bindir}/node-%{nodejs_pkg_major}
+# Create automatic RPM requires generator for this stream
+mkdir -p "${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs"
+sed -e 's;@NODEJS_VERSION_MAJOR@;%{node_version_major};g' \
+    <%{SOURCE6} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs/nodejs%{node_version_major}_abi.attr"
+sed -e 's;@NODEJS_VERSION_MAJOR@;%{node_version_major};g' \
+    <%{SOURCE7} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/nodejs%{node_version_major}_abi.req"
 
-# Adjust npm binaries
-# 1. Replace all hashbangs with versioned ones
-readonly NPM_DIR="%{buildroot}%{nodejs_private_sitelib}/npm"
+# Install documentation
+mkdir -p "${RPM_BUILD_ROOT}%{_pkgdocdir}/html"
+cp -pr doc/* "${RPM_BUILD_ROOT}%{_pkgdocdir}/html"
+rm -f "${RPM_BUILD_ROOT}%{_pkgdocdir}/html/node.1"
+
+# Some debugger support files from v8 are provided as documentation from upstream;
+# move them to the correct directory (according to us).
+pushd "${RPM_BUILD_ROOT}%{_defaultdocdir}"
+mv -t "${RPM_BUILD_ROOT}%{_pkgdocdir}" node/gdbinit node/lldb_commands.py
+popd  # from ${RPM_BUILD_ROOT}%%{_defaultdocdir}
+
+# === Full ICU data installation
+# Unzip the data themselves, and make the appropriate documentation available for %%doc
+if test "$(%{python3} -Ic 'import sys; print(sys.byteorder)')" = "little"; then
+readonly icu_source='%{SOURCE2}' icu_data_file='icudt%{icu_version_major}l.dat'
+else
+readonly icu_source='%{SOURCE1}' icu_data_file='icudt%{icu_version_major}b.dat'
+fi
+readonly icu_data_dir="${RPM_BUILD_ROOT}%{nodejs_datadir}/icudata"
+readonly icu_doc_dir="full-icu"
+
+unzip -od "${icu_data_dir}" "${icu_source}" "${icu_data_file}"
+unzip -od "${icu_doc_dir}"  "${icu_source}" -x "${icu_data_file}"
+
+# === NPM installation and tweaks
+# Correct permissions in provided scripts
+# - There are executable scripts for Windows PowerShell; RPM would try to pull it as a dependency
+# - Not all executable bits should be removed; the -not -path lines are the ones that will be kept untouched
+declare NPM_DIR="${RPM_BUILD_ROOT}%{nodejs_common_sitelib}/npm"
+find "${NPM_DIR}" \
+    -not -path "${NPM_DIR}/bin/*" \
+    -not -path "${NPM_DIR}/node_modules/node-gyp/bin/node-gyp.js" \
+    -not -path "${NPM_DIR}/node_modules/@npmcli/run-script/lib/node-gyp-bin/node-gyp" \
+    -type f -executable \
+    -execdir chmod -x '{}' +
+
+# Remove (empty) project-specific .npmrc from npm itself,
+# to avoid confusion with the distro-wide configuration below
+rm -f "${NPM_DIR}/.npmrc"
+# Create distribution-wide configuration file
+mkconfig <%{SOURCE5} >"${NPM_DIR}/npmrc"
+
+# Install HTML documentation to %%_pkgdocdir
+mkdir -p "${RPM_BUILD_ROOT}%{_pkgdocdir}/npm/"
+cp -prt  "${RPM_BUILD_ROOT}%{_pkgdocdir}/npm/" deps/npm/docs
+# - replace the docs in $NPM_DIR with symlink to the doc dir
+rm -rf  "${NPM_DIR}/docs"
+ln -srf "${RPM_BUILD_ROOT}%{_pkgdocdir}/npm/docs" "${NPM_DIR}/docs"
+# Install man pages to %%_mandir
+mkdir -p "${RPM_BUILD_ROOT}%{_mandir}"
+cp -prt  "${RPM_BUILD_ROOT}%{_mandir}" deps/npm/man/*
+# – replace man pages in $NPM_DIR with symlinks to the man dir
+rm -rf  "${NPM_DIR}/man"
+ln -srf "${RPM_BUILD_ROOT}%{_mandir}" "${NPM_DIR}/man"
+
+# === Adjustments to avoid conflict between parallel streams
+# Note: some of the actions here make some of the previous ones redundant
+# (for example, replacing a symlink made few lines above).
+# This is by design; it should allow us to drop this entire section if we want
+# to approach the problem in a different way
+# (for example, backporting the changes to modular packages in EL9).
+
+# Rename the main binary
+readonly NODE_BIN='%{_bindir}/node-%{node_version_major}'
+mv "${RPM_BUILD_ROOT}%{_bindir}/node" "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}"
+
+# Make the sitelib into a private one; but keep providing (empty) common one
+mv "${RPM_BUILD_ROOT}%{nodejs_common_sitelib}" "${RPM_BUILD_ROOT}%{nodejs_private_sitelib}"
+mkdir "${RPM_BUILD_ROOT}%{nodejs_common_sitelib}"
+declare NPM_DIR="${RPM_BUILD_ROOT}%{nodejs_private_sitelib}/npm"
+
+# Adjust npm scripts to use the renamed interpreter
 readonly SHEBANG_ERE='^#!/usr/bin/(env\s+)?node\b'
-readonly SHEBANG_FIX='#!%{_bindir}/node-%{nodejs_pkg_major}'
+readonly SHEBANG_FIX='#!%{_bindir}/node-%{node_version_major}'
 readonly -a npm_bin_dirs=("${NPM_DIR}/bin" "${NPM_DIR}/node_modules")
 
 find "${npm_bin_dirs[@]}" -type f \
 | xargs grep --extended-regexp --files-with-matches "${SHEBANG_ERE}" \
 | xargs sed --regexp-extended --in-place "s;${SHEBANG_ERE};${SHEBANG_FIX};"
 
-# 2. Replace original links with the adjusted ones
-for bin in npm npx; do
-  ln -srf "%{buildroot}%{nodejs_private_sitelib}/npm/bin/${bin}-cli.js" \
-          "%{buildroot}%{_bindir}/${bin}-%{nodejs_pkg_major}"
-  rm -f   "%{buildroot}%{_bindir}/${bin}"
-done
-
-# 3. Add the symlinks back for the default version
-%if 0%{?nodejs_default}
-ln -srf %{buildroot}%{_bindir}/node-%{nodejs_pkg_major} \
-        %{buildroot}%{_bindir}/node
-
-ln -srf %{buildroot}%{_bindir}/npm-%{nodejs_pkg_major} \
-        %{buildroot}%{_bindir}/npm
-
-ln -srf %{buildroot}%{_bindir}/npx-%{nodejs_pkg_major} \
-        %{buildroot}%{_bindir}/npx
-%endif
-
 # Fix shell scripts that call 'node' as command
 readonly -a known_shell_scripts=(
     "${NPM_DIR}/bin/node-gyp-bin/node-gyp"
     "${NPM_DIR}/node_modules/@npmcli/run-script/lib/node-gyp-bin/node-gyp"
 )
-sed --regexp-extended --in-place 's;\bnode(\s);%{_bindir}/node-%{nodejs_pkg_major}\1;' "${known_shell_scripts[@]}"
+sed --regexp-extended --in-place 's;\bnode(\s);%{_bindir}/node-%{node_version_major}\1;' "${known_shell_scripts[@]}"
 
-# Install library symlink
-ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} \
-        %{buildroot}%{_libdir}/libnode.so
+# Replace npm %%{_bindir} symlinks with properly versioned ones
+# usage: relink_bin <basename> <source>
+relink_bin() {
+    local -r basename="${1?No link basename provided!}"
+    local -r source="${2?No link source provided!}"
 
-# Install v8 compatibility symlinks
-for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
-    header=$(basename ${header})
-    ln -sf ./node/${header} %{buildroot}%{_includedir}/${header}
+    ln -srf "${source}" "${RPM_BUILD_ROOT}%{_bindir}/${basename}-%{node_version_major}"
+    rm -f   "${RPM_BUILD_ROOT}%{_bindir}/${basename}"
+}
+relink_bin npm "${NPM_DIR}/bin/npm-cli.js"
+relink_bin npx "${NPM_DIR}/bin/npx-cli.js"
+
+# Move manpages to versioned directories
+readonly VERSIONED_MANDIR="${RPM_BUILD_ROOT}%{nodejs_datadir}/man"
+mkdir -p "${VERSIONED_MANDIR}"
+mv    -t "${VERSIONED_MANDIR}" "${RPM_BUILD_ROOT}%{_mandir}"/man?
+# - compress the man-pages manually so that rpm will (re-)create valid symlinks
+# FIXME: This should probably be replaced with ading /usr/share/node-*/man dir to /usr/lib/rpm/brp-compress
+find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]' -execdir %{_man_info_compress} '{}' +
+# – update npm man symlink
+ln -srfn "${VERSIONED_MANDIR}" "${NPM_DIR}/man"
+
+# === stuff related to -bin packages
+# Create versioned man pages symlinks for base package (when no -bins present)
+mkdir -p "${RPM_BUILD_ROOT}%{_mandir}/man1"
+ln -srf  "${VERSIONED_MANDIR}/man1/node.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/node-%{node_version_major}.1.gz"
+ln -srf  "${VERSIONED_MANDIR}/man1/npm.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npm-%{node_version_major}.1.gz"
+ln -srf  "${VERSIONED_MANDIR}/man1/npx.1.gz" "${RPM_BUILD_ROOT}%{_mandir}/man1/npx-%{node_version_major}.1.gz"
+
+# Create symlinks to the versioned binaries
+pushd '%{buildroot}%{_bindir}'
+for binname in node npm npx; do
+    ln -srfL "${binname}-%{node_version_major}" "${binname}"
 done
-ln -s ./node/cppgc %{buildroot}%{_includedir}/cppgc
+popd
 
-for soname in libv8 libv8_libbase libv8_libplatform; do
-  ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}.%{v8_minor}
-  ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
+# Create unversioned man page symlinks
+# Iterating through versioned manpages location, creating symlinks in standard location
 
-  %if 0%{?nodejs_default}
-    ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
-  %endif
+find "${VERSIONED_MANDIR}" -type d -name 'man[123456789]' -printf "${RPM_BUILD_ROOT}%{_mandir}/%%P\0" | xargs -0 mkdir -p
+# link all the individual manpages
+find "${VERSIONED_MANDIR}" -type f -name '*.[123456789]*' -printf '%%P\n' | while read -r man_stem; do
+    ln -srfL "${VERSIONED_MANDIR}/${man_stem}" "${RPM_BUILD_ROOT}%{_mandir}/${man_stem}"
 done
-
-# Create automatic RPM requires generator for this stream
-mkdir -p "${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs"
-sed -e 's;@NODEJS_VERSION_MAJOR@;%{nodejs_pkg_major};g' \
-    <%{SOURCE5} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/fileattrs/nodejs%{nodejs_pkg_major}_abi.attr"
-sed -e 's;@NODEJS_VERSION_MAJOR@;%{nodejs_pkg_major};g' \
-    <%{SOURCE6} >"${RPM_BUILD_ROOT}%{_rpmconfigdir}/nodejs%{nodejs_pkg_major}_abi.req"
-
-# install documentation
-mkdir -p %{buildroot}%{_pkgdocdir}/html
-cp -pr doc/* %{buildroot}%{_pkgdocdir}/html
-rm -f %{buildroot}%{_pkgdocdir}/html/nodejs.1
-
-# node-gyp needs common.gypi too
-mkdir -p %{buildroot}%{nodejs_datadir}
-cp -p common.gypi %{buildroot}%{nodejs_datadir}
-
-# The config.gypi file is platform-dependent, so rename it to not conflict
-mv %{buildroot}%{_includedir}/node/config.gypi \
-   %{buildroot}%{_includedir}/node/config-%{_arch}.gypi
-
-# Install the GDB init tool into the documentation directory
-mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
-
-mkdir -p %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/man1 \
-         %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/man5 \
-         %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/man7 \
-         %{buildroot}%{nodejs_default_sitelib} \
-         %{buildroot}%{nodejs_private_sitelib}/npm/man \
-         %{buildroot}%{_pkgdocdir}/npm
-
-# install manpage docs to mandir
-cp -pr deps/npm/man/* \
-       %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/
-rm -rf %{buildroot}%{nodejs_private_sitelib}/npm/man
-ln -srf %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major} \
-        %{buildroot}%{nodejs_private_sitelib}/npm/man
-
-%if 0%{?nodejs_default}
-for i in 1 5 7; do
-  mkdir -p %{buildroot}%{_mandir}/man${i}
-  for manpage in %{buildroot}%{nodejs_private_sitelib}/npm/man/man$i/*; do
-    basename=$(basename ${manpage})
-    ln -srf %{buildroot}%{nodejs_private_sitelib}/npm/man/man${i}/${basename} \
-            %{buildroot}%{_mandir}/man${i}/${basename}
-  done
-done
-%endif
-
-# Install the node interpreter manpage
-mv %{buildroot}%{_mandir}/man1/node.1 \
-   %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/man1/
-
-%if 0%{?nodejs_default}
-ln -srf %{buildroot}%{_mandir}/nodejs-%{nodejs_pkg_major}/man1/node.1 \
-        %{buildroot}%{_mandir}/man1/
-%endif
-
-# Install Gatsby HTML documentation to %%{_pkgdocdir}
-cp -pr deps/npm/docs %{buildroot}%{_pkgdocdir}/npm/
-rm -rf %{buildroot}%{nodejs_private_sitelib}/npm/docs
-ln -srf %{buildroot}%{_pkgdocdir}/npm %{buildroot}%{nodejs_private_sitelib}/npm/docs
-
-# Node tries to install some python files into a documentation directory
-# (and not the proper one). Remove them for now until we figure out what to
-# do with them.
-rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
-      %{buildroot}/%{_defaultdocdir}/node/lldbinit
-
-# Some NPM bundled deps are executable but should not be. This causes
-# unnecessary automatic dependencies to be added. Make them not executable.
-# Skip the npm bin directory or the npm binary will not work.
-find %{buildroot}%{nodejs_private_sitelib}/npm \
-    -not -path "%{buildroot}%{nodejs_private_sitelib}/npm/bin/*" \
-    -executable -type f \
-    -exec chmod -x {} \;
-
-# The above command is a little overzealous. Add a few permissions back.
-chmod 0755 %{buildroot}%{nodejs_private_sitelib}/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin/node-gyp
-chmod 0755 %{buildroot}%{nodejs_private_sitelib}/npm/node_modules/node-gyp/bin/node-gyp.js
-
-# Drop the NPM builtin configuration in place
-sed -e 's#@SYSCONFDIR@#%{_sysconfdir}#g' \
-    %{SOURCE201} > %{buildroot}%{nodejs_private_sitelib}/npm/npmrc
-
-# Drop the NPM default configuration in place
-%if 0%{?nodejs_default}
-mkdir -p %{buildroot}%{_sysconfdir}
-cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
-%endif
-
-# Install the full-icu data files
-mkdir -p %{buildroot}%{icudatadir}
-%if 0%{?little_endian}
-unzip -d %{buildroot}%{icudatadir} %{SOURCE4} icudt%{icu_major}l.dat
-%else
-unzip -d %{buildroot}%{icudatadir} %{SOURCE3} icudt%{icu_major}b.dat
-%endif
-
-# Add pkg-config files
-mkdir -p %{buildroot}%{_libdir}/pkgconfig
-sed -e 's#@PREFIX@#%{_prefix}#g' \
-    -e 's#@INCLUDEDIR@#%{_includedir}#g' \
-    -e 's#@LIBDIR@#%{_libdir}#g' \
-    -e 's#@PKGCONFNAME@#nodejs-%{nodejs_pkg_major}#g' \
-    -e 's#@NODEJS_VERSION@#%{nodejs_version}#g' \
-    %{SOURCE202} > %{buildroot}%{_libdir}/pkgconfig/nodejs-%{nodejs_pkg_major}.pc
-
-sed -e 's#@PREFIX@#%{_prefix}#g' \
-    -e 's#@INCLUDEDIR@#%{_includedir}#g' \
-    -e 's#@LIBDIR@#%{_libdir}#g' \
-    -e 's#@PKGCONFVERSION@#v8-%{v8_major}.%{v8_minor}#g' \
-    -e 's#@V8_VERSION@#%{v8_version}#g' \
-    %{SOURCE203} > %{buildroot}%{_libdir}/pkgconfig/v8-%{v8_major}.%{v8_minor}.pc
-
 
 %check
-#run unit test that should pass from list
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} \
-  bash %{SOURCE300} \
-       %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} \
-       %{_builddir}/node-v%{nodejs_version}/test/ \
-       %{SOURCE301}
+# === Common test environment
+export LD_LIBRARY_PATH="${RPM_BUILD_ROOT}%{_libdir}:${LD_LIBRARY_PATH}"
 
-# Fail the build if the versions don't match
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
-%if %{with bundled_cares}
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
+# "aliases" to the just-build binaries
+node() {
+    "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" \
+        --icu-data-dir="${RPM_BUILD_ROOT}%{nodejs_datadir}/icudata" \
+    "$@"
+}
+npm() {
+    node "${RPM_BUILD_ROOT}%{_bindir}/npm-%{node_version_major}" "$@"
+}
+
+# === Sanity check for important versions
+node -e 'require("assert").equal(process.versions.node, "%{node_version}")'
+node -e 'require("assert").equal(process.versions.v8.replace(/-node\.\d+$/, ""), "%{v8_version}")'
+%if %{with bundled_c_ares}
+node -e 'require("assert").equal(process.versions.ares.replace(/-DEV$/, ""), "%{c_ares_version}")'
+%endif
+%if %{with bundled_punycode}
+node --no-deprecation -e 'require("assert").equal(require("punycode").version, "%{nodejs_punycode_version}")'
 %endif
 
-# Ensure we have punycode and that the version matches
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
+npm version --json | jq --exit-status '.npm == "%{npm_version}"'
 
-# Ensure we have npm and that the version matches
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}%{_bindir}/node-%{nodejs_pkg_major} %{buildroot}%{_bindir}/npm-%{nodejs_pkg_major} version --json |jq -e '.npm == "%{npm_version}"'
+# === Custom and/or devendored parts sanity checks
+# - full i18n support is available
+node '%{SOURCE20}'
+# - npm update notifier is disabled
+npm config list --json | jq --exit-status '.["update-notifier"] == false'
 
-# Make sure i18n support is working
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{nodejs_private_sitelib}/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
+# === Upstream test suite
+bash '%{SOURCE10}' "${RPM_BUILD_ROOT}%{_bindir}/node-%{node_version_major}" test/ '%{SOURCE11}'
 
-# Ensure update-notifier is disabled
-%if 0%{?nodejs_default}
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node-%{nodejs_pkg_major} %{buildroot}%{_bindir}/npm-%{nodejs_pkg_major} --globalconfig=%{buildroot}%{_sysconfdir}/npmrc config list --json | jq -e '.["update-notifier"] == false'
-%endif
 
-%pretrans -n %{pkgname} -p <lua>
-path = "/usr/lib/node_modules"
-st = posix.stat(path)
-if st and st.type == "link" then
-  os.remove(path)
+%pretrans -p <lua>
+-- /usr/lib/node_modules was a symlink in F43 and lower. Can be removed once F43 is EOL.
+path = "%{nodejs_common_sitelib}"
+stat = posix.stat(path)
+if stat and stat.type == "link" then
+    os.remove(path)
 end
 
-%files -n %{pkgname}
-%doc CHANGELOG.md onboarding.md GOVERNANCE.md README.md
 
-%if 0%{?nodejs_default}
+%files
+%doc        README.md CHANGELOG.md GOVERNANCE.md onboarding.md
+%license    LICENSE
+%dir        %{nodejs_datadir}/
+%dir        %{nodejs_datadir}/man/
+%dir        %{nodejs_datadir}/man/man1/
+%dir        %{nodejs_common_sitelib}/
+%dir        %{nodejs_private_sitelib}/
+# Symlink to versioned binary
+%{_bindir}/node-%{node_version_major}
+%{nodejs_datadir}/man/man1/node.1*
+# Versioned man page when -bin is not installed
+%{_mandir}/man1/node-%{node_version_major}.1*
+
+%files      bin
+%license    LICENSE
 %{_bindir}/node
-%doc %{_mandir}/man1/node.1*
-%{nodejs_default_sitelib}
+%{_mandir}/man1/node.1*
 
+%files      libs
+%license    LICENSE
+%{_libdir}/libnode.so.%{node_soversion}
+%{_libdir}/libv8.so.%{v8_version_major}.%{v8_version_minor}
+%{_libdir}/libv8_libbase.so.%{v8_version_major}.%{v8_version_minor}
+%{_libdir}/libv8_libplatform.so.%{v8_version_major}.%{v8_version_minor}
 
-%endif
-
-%{_bindir}/node-%{nodejs_pkg_major}
-%dir %{nodejs_private_sitelib}
-
-%doc %{_mandir}/nodejs-%{nodejs_pkg_major}/man1/node.1*
-
-
-%files -n %{pkgname}-devel
-%{_includedir}/node
+%files      devel
+%license    LICENSE
+%dir        %{nodejs_datadir}/
+%{_includedir}/node/
 %{_libdir}/libnode.so
-%{nodejs_datadir}/common.gypi
+%{_libdir}/pkgconfig/nodejs-%{node_version_major}.pc
 %{_pkgdocdir}/gdbinit
-%{_libdir}/pkgconfig/nodejs-%{nodejs_pkg_major}.pc
-%{_rpmconfigdir}/fileattrs/nodejs%{nodejs_pkg_major}_abi.attr
-%{_rpmconfigdir}/nodejs%{nodejs_pkg_major}_abi.req
+%{_pkgdocdir}/lldb_commands.py
+%{_rpmconfigdir}/fileattrs/nodejs%{node_version_major}_abi.attr
+%{_rpmconfigdir}/nodejs%{node_version_major}_abi.req
+%{nodejs_datadir}/common.gypi
 
-%files -n %{pkgname}-full-i18n
-%dir %{icudatadir}
-%{icudatadir}/icudt%{icu_major}*.dat
-
-
-%files -n %{pkgname}-libs
-%license LICENSE
-%{_libdir}/libnode.so.%{nodejs_soversion}
-%{_libdir}/libv8.so.%{v8_major}.%{v8_minor}
-%{_libdir}/libv8_libbase.so.%{v8_major}.%{v8_minor}
-%{_libdir}/libv8_libplatform.so.%{v8_major}.%{v8_minor}
-%dir %{nodejs_datadir}/
-%if 0%{?nodejs_default}
-%{_libdir}/libv8.so.%{v8_major}
-%{_libdir}/libv8_libbase.so.%{v8_major}
-%{_libdir}/libv8_libplatform.so.%{v8_major}
-%endif
-
-%files -n v8-%{v8_major}.%{v8_minor}-devel
+%files -n   v8-%{v8_version_major}.%{v8_version_minor}-devel
+%license    LICENSE
+%{_includedir}/cppgc
 %{_includedir}/libplatform
 %{_includedir}/v8*.h
-%{_includedir}/cppgc
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
-%{_libdir}/pkgconfig/v8-%{v8_major}.%{v8_minor}.pc
+%{_libdir}/pkgconfig/v8-%{v8_version_major}.%{v8_version_minor}.pc
 
+%files      full-i18n
+%doc        full-icu/icu4c-%{icu_version_major}.%{icu_version_minor}-data-bin-?-README.md
+%license    full-icu/LICENSE
+%dir        %{nodejs_datadir}/
+%{nodejs_datadir}/icudata/
 
-%files -n %{pkgname}-npm
-%if 0%{?nodejs_default}
+%files      npm
+%doc        deps/npm/README.md
+%license    deps/npm/LICENSE
+%dir        %{nodejs_datadir}/
+%dir        %{nodejs_private_sitelib}/
+# Symlinks to binaries
+%{_bindir}/npm-%{node_version_major}
+%{_bindir}/npx-%{node_version_major}
+# Versioned man pages for case when -bins are not installed
+%{_mandir}/man1/npm-%{node_version_major}.1*
+%{_mandir}/man1/npx-%{node_version_major}.1*
+# No %dir means recursive (own files)
+%{nodejs_datadir}/man
+%{nodejs_private_sitelib}/npm/
+%exclude    %{nodejs_datadir}/man/man1/node*.1*
+
+%files      npm-bin
+%license    deps/npm/LICENSE
 %{_bindir}/npm
 %{_bindir}/npx
-%config(noreplace) %{_sysconfdir}/npmrc
-%ghost %{_sysconfdir}/npmignore
+%{_mandir}/
+%exclude %{_mandir}/man1/node.1*
+%exclude %{_mandir}/man1/node-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npm-%{node_version_major}.1*
+%exclude %{_mandir}/man1/npx-%{node_version_major}.1*
 
-%doc %{_mandir}/man*/
-%exclude %doc %{_mandir}/man1/node.1*
-%endif
-
-%{_bindir}/npm-%{nodejs_pkg_major}
-%{_bindir}/npx-%{nodejs_pkg_major}
-%{nodejs_private_sitelib}/npm
-
-%doc %{_mandir}/nodejs-%{nodejs_pkg_major}/
-%exclude %doc %{_mandir}/nodejs-%{nodejs_pkg_major}/man1/node.1*
-
-
-%files -n %{pkgname}-docs
-%doc doc
-%dir %{_pkgdocdir}
-%{_pkgdocdir}/html
-%{_pkgdocdir}/npm/docs
-
+%files      docs
+%doc        doc/README.md
+%license    LICENSE
+%dir        %{_pkgdocdir}
+%{_pkgdocdir}/html/
+%{_pkgdocdir}/npm/
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:22.22.0-6
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 1:22.23.1-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:22.22.0-5
-- build: mass rebuild auto-bumpable components
+* Mon Jul 20 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.23.1-2
+- CVE-2026-42338 ip-address HTML escaping fix (rhbz#2487625)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 1:22.22.0-4
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Jul 20 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.23.1-1
+- Update to version 22.23.1 (rhbz#2477273).
 
-* Mon Jan 19 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-3
-- Diverge from rawhide
+* Wed Apr 08 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.22.2-3
+- Rework of update of nghttp2
+
+* Wed Apr 08 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.22.2-2
+- Update bundled nghttp2 to 1.68.1
+
+* Wed Apr 08 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.22.2-1
+- Update to version 22.22.2 (rhbz#2444849)
+
+* Wed Apr 08 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.22.1-1
+- Update to version 22.22.1 (rhbz#2444849)
+
+* Wed Apr 08 2026 tjuhasz <tjuhasz@redhat.com> - 1:22.22.0-9
+- Remove disablement of LTO from specfile
+
+* Wed Apr 08 2026 Andrei Radchenko <aradchen@redhat.com> - 1:22.22.0-8
+- spec: remove obsolete requires
+
+* Mon Feb 16 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-7
+- Own /usr/lib/node_modules again (rhbz#2438835)
+
+* Thu Feb 12 2026 Andrei Radchenko <aradchen@redhat.com> - 1:22.22.0-6
+- [PoC] Ensure /usr/bin/node is installed with nodejs, /usr/bin/npm with
+  npm
+
+* Tue Feb 03 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-5
+- Bake-in obsolete versions
+
+* Fri Jan 16 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-4
+- Obsolete default stream rpms
+
+* Fri Jan 16 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-3
+- Convert to next-gen packaging
+- Use packaging scripts and spec file structure from current nodejs24
+- Introduce -bin packages
 
 * Fri Jan 16 2026 Jan Staněk <jstanek@redhat.com> - 1:22.22.0-2
 - Fix c-ares unbundling bits

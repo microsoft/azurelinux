@@ -3,13 +3,19 @@
 
 Name:           jackson-annotations
 Version:        2.18.2
-Release: 7%{?dist}
+Release:        6%{?dist}
 Summary:        Core annotations for Jackson data processor
 License:        Apache-2.0
 
 URL:            https://github.com/FasterXML/jackson-annotations
 Source0:        %{url}/archive/%{name}-%{version}.tar.gz
+
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
+%endif
+
 BuildRequires:  mvn(com.fasterxml.jackson:jackson-parent:pom:) >= 2.17
 BuildRequires:  mvn(org.junit.jupiter:junit-jupiter)
 BuildRequires:  mvn(org.apache.felix:maven-bundle-plugin)
@@ -59,6 +65,12 @@ sed -i 's/\r//' LICENSE
 %license LICENSE
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.18.2-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.18.2-5
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.18.2-4
 - Rebuilt for java-25-openjdk as preffered jdk
 

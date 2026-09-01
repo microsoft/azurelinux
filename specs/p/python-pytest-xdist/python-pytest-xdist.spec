@@ -5,7 +5,7 @@
 
 Name:           python-pytest-xdist
 Version:        3.7.0
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        pytest plugin for distributed testing and loop-on-failing modes
 
 License:        MIT

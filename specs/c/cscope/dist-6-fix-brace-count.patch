@@ -1,0 +1,141 @@
+From: Oleg Nesterov <oleg@redhat.com>
+Subject: cscope: correct the erroneous brace count caused by the unbalanced { }
+Content-Type: text/plain; charset=us-ascii
+
+cscope can't parse kernel/trace/trace_events.c (and some other files)
+in the linux kernel tree because this file has
+
+	#define do_for_each_event_file(tr, file)			\
+		list_for_each_entry(tr, &ftrace_trace_arrays, list) {	\
+			list_for_each_entry(file, &tr->events, list)
+
+	#define do_for_each_event_file_safe(tr, file)			\
+		list_for_each_entry(tr, &ftrace_trace_arrays, list) {	\
+			struct trace_event_file *___n;				\
+			list_for_each_entry_safe(file, ___n, &tr->events, list)
+
+	#define while_for_each_event_file()		\
+		}
+
+at the top and thus the 2nd '{' in do_for_each_event_file_safe() above
+is not balanced.
+
+Simple example:
+
+	$ cat -n test.c
+	     1	#define open1 {
+	     2	#define open2 {
+	     3	#define close }
+	     4	
+	     5	void func(void)
+	     6	{
+	     7	}
+
+Without this patch:
+
+	$ ./src/cscope -bu test.c
+	$ ./src/cscope -dL -1 func
+
+With this patch:
+
+	$ ./src/cscope -bu test.c
+	$ ./src/cscope -dL -1 func
+	test.c func 5 void func(void )
+
+Signed-off-by: Oleg Nesterov <oleg@redhat.com>
+---
+ src/fscanner.l | 70 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 33 deletions(-)
+
+diff --git a/src/fscanner.l b/src/fscanner.l
+index 43880bf..46734ea 100644
+--- a/src/fscanner.l
++++ b/src/fscanner.l
+@@ -178,19 +178,21 @@ wsnl		[ \t\r\v\f\n]|{comment}
+ 		}
+ 
+ \{		{	/* count unmatched left braces for fcn def detection */
+-			++braces;
+-			
+-			/* mark an untagged enum/struct/union so its beginning
+-			   can be found */
+-			if (tagdef) {
+-				if (braces == 1) {
+-					esudef = YES;
++			if (ppdefine == NO) {
++				++braces;
++
++				/* mark an untagged enum/struct/union so its beginning
++				   can be found */
++				if (tagdef) {
++					if (braces == 1) {
++						esudef = YES;
++					}
++					token = tagdef;
++					tagdef = '\0';
++					last = first;
++					my_yymore();
++					return(token);
+ 				}
+-				token = tagdef;
+-				tagdef = '\0';
+-				last = first;
+-				my_yymore();
+-				return(token);
+ 			}
+ 			goto more;
+ 			/* NOTREACHED */
+@@ -326,28 +328,30 @@ wsnl		[ \t\r\v\f\n]|{comment}
+ 		}
+ 
+ \}		{
+-			/* could be the last enum member initializer */
+-			if (braces == initializerbraces) {
+-				initializerbraces = -1;
+-				initializer = NO;
+-			}
+-			if (--braces <= 0) {
+-		endstate:
+-				braces = 0;
+-				classdef = NO;
+-			}
+-			if (braces == 0 || (braces == 1 && classdef == YES)) {
+-
+-				/* if the end of an enum/struct/union definition */
+-				if (esudef == YES) {
+-					esudef = NO;
++			if (ppdefine == NO) {
++				/* could be the last enum member initializer */
++				if (braces == initializerbraces) {
++					initializerbraces = -1;
++					initializer = NO;
+ 				}
+-				/* if the end of the function */
+-				else if (fcndef == YES) {
+-					fcndef = NO;
+-					last = first;
+-					my_yymore();
+-					return(FCNEND);
++				if (--braces <= 0) {
++			endstate:
++					braces = 0;
++					classdef = NO;
++				}
++				if (braces == 0 || (braces == 1 && classdef == YES)) {
++
++					/* if the end of an enum/struct/union definition */
++					if (esudef == YES) {
++						esudef = NO;
++					}
++					/* if the end of the function */
++					else if (fcndef == YES) {
++						fcndef = NO;
++						last = first;
++						my_yymore();
++						return(FCNEND);
++					}
+ 				}
+ 			}
+ 			goto more;
+-- 
+2.25.1.362.g51ebf55

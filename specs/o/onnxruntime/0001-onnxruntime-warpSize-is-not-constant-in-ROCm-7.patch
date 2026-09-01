@@ -1,0 +1,29 @@
+From 25e0d36127319aaa2e847f2860c520913b0e84dc Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 3 Oct 2025 08:20:29 -0700
+Subject: [PATCH] onnxruntime: warpSize is not constant in ROCm 7
+
+The values can be either 32 (radeon) or 64 (instict).
+Pick 32
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ onnxruntime/core/providers/rocm/cu_inc/common.cuh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/onnxruntime/core/providers/rocm/cu_inc/common.cuh b/onnxruntime/core/providers/rocm/cu_inc/common.cuh
+index cdb4d1f7edac..6e57b5c1e7b6 100644
+--- a/onnxruntime/core/providers/rocm/cu_inc/common.cuh
++++ b/onnxruntime/core/providers/rocm/cu_inc/common.cuh
+@@ -523,7 +523,7 @@ struct alignas(sizeof(T) * vec_size) aligned_vector {
+ #define HIP_KERNEL_ASSERT(...) assert(__VA_ARGS__)
+ 
+ // WARP related definitions and functions
+-constexpr int GPU_WARP_SIZE = warpSize;
++constexpr int GPU_WARP_SIZE = 32;
+ inline int GPU_WARP_SIZE_HOST = warpSizeDynamic();
+ 
+ template <typename T>
+-- 
+2.51.0
+

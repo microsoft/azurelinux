@@ -1,0 +1,40 @@
+From 06bd618cbc7cbae5ca0a8c4d722c279b2a09a867 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Fri, 15 May 2026 04:51:50 -0400
+Subject: [PATCH 4/4] TST: Fix broken condition in test_cpu_affinity_taskset
+
+`taskset` will set a mask for desired CPU affinity, but it cannot give a
+process CPU cores that don't exist. If we ask for `{0, 2}`, then we need
+at least _3_ cores to actually be able to bind them.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/tests/test_system.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/dask/tests/test_system.py b/dask/tests/test_system.py
+index 25de1e647..ab4f781a0 100644
+--- a/dask/tests/test_system.py
++++ b/dask/tests/test_system.py
+@@ -44,8 +44,7 @@ def test_cpu_affinity_psutil(affinity):
+ @pytest.mark.parametrize(("affinity"), [{0}, {1}, {0, 1}, {0, 2}])
+ def test_cpu_affinity_taskset(affinity):
+     """Test that cpu_count() respects the taskset command line tool"""
+-    count = len(affinity)
+-    if (os.cpu_count() or 1) < count:
++    if (os.cpu_count() or 1) < max(affinity) + 1:
+         raise pytest.skip("Not enough CPUs")  # pragma: no cover
+ 
+     subprocess.check_call(
+@@ -55,7 +54,7 @@ def test_cpu_affinity_taskset(affinity):
+             ",".join(str(i) for i in sorted(affinity)),
+             sys.executable,
+             "-c",
+-            f"from dask.system import CPU_COUNT; assert CPU_COUNT == {count}",
++            f"from dask.system import CPU_COUNT; assert CPU_COUNT == {len(affinity)}",
+         ]
+     )
+ 
+-- 
+2.52.0
+

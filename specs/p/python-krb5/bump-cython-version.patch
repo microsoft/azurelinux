@@ -1,0 +1,24 @@
+From 4f2ee8513db50bc8b592f9554420200b6420b75b Mon Sep 17 00:00:00 2001
+From: Jonathan Billings <jsbillings@fedoraproject.org>
+Date: Wed, 21 Jan 2026 08:50:07 -0500
+Subject: [PATCH] Bump version of cython required to whats in Fedora 44/rawhide
+
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 54f2a88..98ab809 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+ requires = [
+-    "Cython == 3.2.1",
++    "Cython == 3.2.4",
+     "setuptools >= 42.0.0",  # Supports license_files
+ ]
+ build-backend = "setuptools.build_meta"
+-- 
+2.52.0
+

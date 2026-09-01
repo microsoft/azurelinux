@@ -3,7 +3,7 @@
 
 Name:           libtpms
 Version:        0.10.2
-Release: 4%{?dist}
+Release:        3%{?dist}
 Summary:        Library providing Trusted Platform Module (TPM) functionality
 License:        BSD-3-Clause AND LicenseRef-TCGL
 
@@ -12,6 +12,8 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{url}/releases/download/v%{version}/v%{version}.tar.gz.asc#/%{name}-%{version}.tar.gz.asc
 # https://github.com/stefanberger.gpg
 Source2:        gpgkey-B818B9CADF9089C2D5CEC66B75AD65802A0B4211.asc
+
+Patch0001:      0001-Fix-a-compilation-error-in-TPMLIB_GetPlaintext.patch
 
 BuildRequires:  autoconf
 BuildRequires:  automake
@@ -66,6 +68,12 @@ make check
 %{_mandir}/man3/TPM*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 02 2026 Stefan Berger <stefanb@linux.ibm.com> - 0.10.2-2
+- Add a patch fixing a compilation error
+
 * Fri Jan 02 2026 Stefan Berger <stefanb@linux.ibm.com> - 0.10.2-1
 - Upgrade to libtpms 0.10.2 fixing CVE-2026-21444
 

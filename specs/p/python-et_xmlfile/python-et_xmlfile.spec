@@ -11,7 +11,7 @@ the openpyxl project but is now a standalone module.
 
 Name:           python-%{pypi_name}
 Version:        2.0.0
-Release: 9%{?dist}
+Release:        7%{?dist}
 Summary:        %{sum}
 
 License:        MIT
@@ -65,6 +65,9 @@ Requires:       %py3_dist lxml
 %license LICENCE.rst
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.0.0-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -8,15 +8,15 @@
 %bcond_without check
 
 %define majorver 3
-%define realver 3500200
-%define docver 3500200
-%define rpmver 3.50.2
-%define year 2025
+%define realver 3510200
+%define docver 3510200
+%define rpmver 3.51.2
+%define year 2026
 
 Summary: Library that implements an embeddable SQL database engine
 Name: sqlite
 Version: %{rpmver}
-Release: 5%{?dist}
+Release: 2%{?dist}
 License: blessing
 URL: http://www.sqlite.org/
 
@@ -26,6 +26,7 @@ Source2: http://www.sqlite.org/%{year}/sqlite-autoconf-%{realver}.tar.gz
 # Support a system-wide lemon template
 Patch1: sqlite-3.6.23-lemon-system-template.patch
 Patch2: sqlite-3.49.0-fix-lemon-missing-cflags.patch
+Patch3: sqlite-3.51.2-CVE-2026-11822-CVE-2026-11824.patch
 
 BuildRequires: make
 BuildRequires: gcc gcc-c++
@@ -174,6 +175,7 @@ This package contains the analysis program for %{name}.
 %setup -q -a1 -n %{name}-src-%{realver}
 %patch -P 1 -p1
 %patch -P 2 -p1
+%patch -P 3 -p1
 
 # The atof test is failing on the i686 architecture, when binary configured with
 # --enable-rtree option. Failing part is text->real conversion and
@@ -269,7 +271,7 @@ install -D -m0755 sqlite3-debug $RPM_BUILD_ROOT/%{_bindir}/sqlite3-debug
 # fix up permissions to enable dep extraction
 install -d $RPM_BUILD_ROOT%{tcl_sitearch}
 mv $RPM_BUILD_ROOT%{_datadir}/tcl%{tcl_version}/sqlite* $RPM_BUILD_ROOT%{tcl_sitearch}/
-chmod 0755 ${RPM_BUILD_ROOT}/%{tcl_sitearch}/sqlite%{majorver}/*.so
+chmod 0755 ${RPM_BUILD_ROOT}/%{tcl_sitearch}/sqlite*/*.so
 # Install sqlite3_analyzer
 install -D -m0755 sqlite3_analyzer $RPM_BUILD_ROOT/%{_bindir}/sqlite3_analyzer
 %endif
@@ -284,7 +286,7 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/*.{la,a}
 %endif
 
 # This is needed since rpath removal using sed won't work for tcl library for some reason
-chrpath --delete $RPM_BUILD_ROOT/%{tcl_sitearch}/sqlite%{majorver}/*.so
+chrpath --delete $RPM_BUILD_ROOT/%{tcl_sitearch}/sqlite*/*.so
 chrpath --delete $RPM_BUILD_ROOT/%{_libdir}/*.so.%{version}
 
 chrpath --delete $RPM_BUILD_ROOT/%{_bindir}/sqlite3
@@ -315,6 +317,7 @@ make test
 %{_mandir}/man?/*
 
 %files libs
+%license LICENSE.md
 %doc README.md
 %{_libdir}/*.so.%{version}
 %{_libdir}/*.so.0
@@ -340,7 +343,7 @@ make test
 
 %if %{with tcl}
 %files tcl
-%{tcl_sitearch}/sqlite%{majorver}
+%{tcl_sitearch}/sqlite*
 
 %if %{with sqldiff}
 %files tools
@@ -352,6 +355,27 @@ make test
 %endif
 
 %changelog
+* Mon Aug 10 2026 Petr Khartskhaev <pkhartsk@redhat.com> - 3.51.2-2
+- Fix CVE-2026-11822 and CVE-2026-11824
+
+* Tue Jan 20 2026 Carl George <carlwgeorge@fedoraproject.org> - 3.51.2-1
+- Update to 3.51.2
+- https://www.sqlite.org/releaselog/3_51_2.html
+- Resolves: rhbz#2417968
+- Include LICENSE.md file
+- Resolves: rhbz#2418961
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.51.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 07 2025 Ales Nezbeda <anezbeda@redhat.com> - 3.51.0-1
+- Update to 3.51.0
+- Resolves: rhbz#2412364
+
+* Wed Aug 06 2025 Packit <hello@packit.dev> - 3.50.4-1
+- Update to version 3.50.4
+- Resolves: rhbz#2381707
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.50.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

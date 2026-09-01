@@ -132,7 +132,7 @@ if [[ -z $reinstall_threshold ]]; then
 	fi
 fi
 
-unsigned_packages_in_rpm_db=$(rpm -q --queryformat "%{SIGPGP:pgpsig}\n" "$package" | grep -c "^(none)$")
+unsigned_packages_in_rpm_db=$(rpm -q --queryformat "%{RSAHEADER}\n" "$package" | grep -c "^(none)$")
 
 if [[ $unsigned_packages_in_rpm_db -ge $reinstall_threshold ]]; then
 	add_by_reinstall

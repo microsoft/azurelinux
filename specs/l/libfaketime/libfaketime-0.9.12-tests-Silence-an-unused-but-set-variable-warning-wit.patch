@@ -1,0 +1,45 @@
+From 712733e5f01e45372f3160cfdbcfd91520cb093d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 6 Jan 2026 10:18:50 +0100
+Subject: [PATCH] tests: Silence an unused-but-set-variable warning with GCC 16
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Compiling tests with GCC 16 results into this warning:
+
+    gcc -shared -o libmallocintercept.so -fpic -std=gnu99 -Wall -DFAKE_STAT -Werror -Wextra  -U_FILE_OFFSET_BITS -U_TIME_BITS libmallocintercept.c
+    libmallocintercept.c: In function ‘free’:
+    libmallocintercept.c:79:12: error: variable ‘ptr2’ set but not used [-Werror=unused-but-set-variable=]
+       79 |   long int ptr2 = (long int) ptr; ptr2 -= (long int) ptr;
+	  |            ^~~~
+    cc1: all warnings being treated as errors
+
+The ptr2 variable was added in the past to silence compiler warnings,
+probably for the very same reason (commits
+75cbe8e507fa6e83a51e868b2ab9cbd0141c9e55 and
+2bfbe19f719c34f07656cd1513b79209f7d22b61). GCC 16 is smarter and
+discovers that the ptr2 variables is not needed.
+
+This patch changes the work around to "(void) unused_variable;" idiom
+recommended by GCC manual and already used in print_msg().
+---
+ test/libmallocintercept.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/libmallocintercept.c b/test/libmallocintercept.c
+index 61edbb8..845b11c 100644
+--- a/test/libmallocintercept.c
++++ b/test/libmallocintercept.c
+@@ -76,7 +76,7 @@ void *malloc(size_t size) {
+ }
+ 
+ void free(void *ptr) {
+-  long int ptr2 = (long int) ptr; ptr2 -= (long int) ptr;
++	(void) ptr; /* unused */
+ 	print_msg("Called free() on from libmallocintercept...");
+ 	poke_faketime();
+ 	print_msg("successfully\n");
+-- 
+2.52.0
+

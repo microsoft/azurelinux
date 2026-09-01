@@ -59,7 +59,7 @@
 %else
 # Temporary disable java tests, because they doesn't pass with java-21-openjdk
 # https://github.com/swig/swig/issues/2767
-%{!?javalang:%global javalang 0}
+%{!?javalang:%global javalang 1}
 %endif
 
 # Do not run Go tests, they failed with 4.0.0 on ppc64le, s390
@@ -71,8 +71,8 @@
 
 Summary: Connects C/C++/Objective C to some high-level programming languages
 Name:    swig
-Version: 4.3.1
-Release: 9%{?dist}
+Version: 4.4.1
+Release: 4%{?dist}
 License: GPL-3.0-or-later AND BSD-3-Clause
 URL:     https://www.swig.org/
 Source0: http://downloads.sourceforge.net/project/swig/swig/swig-%{version}/swig-%{version}.tar.gz
@@ -83,11 +83,8 @@ Source2: description-ccache.h2m
 Source3: ccache-swig.sh
 Source4: ccache-swig.csh
 %endif
-# https://github.com/swig/swig/pull/3159
-Patch0:  swig-python-Python-3.14-support.patch
-# Python DeprecationWarning fixes - in upstream after 4.4.0
-# https://github.com/swig/swig/issues/2881
-Patch1:  swig-4.4.0-Python-DeprecationWarning-fixes.patch
+
+Patch0: swig-R-Fix-compilation-with-R-4.6.0-which-removed-non-API.patch
 
 BuildRequires: coreutils
 BuildRequires: findutils
@@ -191,6 +188,17 @@ Requires:  swig
 This package contains file with commands for easier debugging of SWIG
 in gdb.
 
+%if %{python3lang}
+%package -n python%{python3_pkgversion}-swig
+Summary:   Python package metadata for SWIG
+Requires:  swig = %{version}-%{release}
+BuildArch: noarch
+
+%description -n python%{python3_pkgversion}-swig
+This package registers swig as installed for Python with pip for the
+purpose of using "swig" in build-system.requires of a pyproject.toml file.
+%endif
+
 %prep
 %autosetup -p1
 
@@ -201,6 +209,13 @@ for all in CHANGES README; do
 done
 
 %build
+%if %{golang}
+# Go tests are failing due to binutils changes related to linker setting as
+# documented at https://bugzilla.redhat.com/show_bug.cgi?id=2428281
+# Use workaround decribed in the bugzilla.
+export LDFLAGS="$LDFLAGS -Wl,-z,notext"
+%endif
+
 ./autogen.sh
 
 # Disable maximum compile warnings when octave is supported, because Octave
@@ -346,6 +361,18 @@ install -pm 644 %{SOURCE3} %{SOURCE4} %{buildroot}%{_sysconfdir}/profile.d
 mkdir -p %{buildroot}%{_datadir}/%{name}/gdb
 install -pm 644 Tools/swig.gdb %{buildroot}%{_datadir}/%{name}/gdb
 
+%if %{python3lang}
+# Create python package metadata
+mkdir -p %{buildroot}%{python3_sitelib}/swig-%{version}.dist-info
+echo "rpm" > %{buildroot}%{python3_sitelib}/swig-%{version}.dist-info/INSTALLER
+cat > %{buildroot}%{python3_sitelib}/swig-%{version}.dist-info/METADATA <<_EOF
+Metadata-Version: 2.1
+Name: swig
+Version: %{version}
+_EOF
+%endif
+
+
 %files
 %{_bindir}/%{name}
 %{_datadir}/%{name}
@@ -369,7 +396,31 @@ install -pm 644 Tools/swig.gdb %{buildroot}%{_datadir}/%{name}/gdb
 %files gdb
 %{_datadir}/%{name}/gdb
 
+%if %{python3lang}
+%files -n python%{python3_pkgversion}-swig
+%{python3_sitelib}/swig-%{version}.dist-info/
+%endif
+
 %changelog
+* Tue May 26 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4.4.1-4
+- Fix compilation with R 4.6.0 which removed non-API macros (rhbz#2463423)
+
+* Mon Feb 16 2026 Jitka Plesnikova <jplesnik@redhat.com> - 4.4.1-3
+- Add workaround for failing build due to binutils changes related to
+  linker setting
+
+* Thu Jan 08 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 4.4.1-2
+- Add python3-swig with Python package metadata
+
+* Mon Dec 08 2025 Jitka Plesnikova <jplesnik@redhat.com> - 4.4.1-1
+- 4.4.1 bump (rhbz#2419819, rhbz#2415440)
+
+* Tue Oct 21 2025 Jitka Plesnikova <jplesnik@redhat.com> - 4.4.0-1
+- 4.4.0 bump (rhbz#2405182)
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 4.3.1-6
+- OCaml 5.4.0 rebuild
+
 * Thu Aug 07 2025 Orion Poplawski <orion@nwra.com> - 4.3.1-5
 - Rebuild for Octave 10.2
 

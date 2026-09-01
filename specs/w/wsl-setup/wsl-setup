@@ -73,6 +73,10 @@ case $key in
         exit 2
       fi
 ;;
+--help | -h )
+      usage
+      exit 0
+;;
 * )
     echo
     echo "ERROR BAD OPTION: $key"

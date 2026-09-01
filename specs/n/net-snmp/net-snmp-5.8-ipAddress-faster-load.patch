@@ -1,7 +1,8 @@
-diff -urNp a/agent/mibgroup/mibII/ipAddr.c b/agent/mibgroup/mibII/ipAddr.c
---- a/agent/mibgroup/mibII/ipAddr.c	2020-06-10 14:14:30.113696471 +0200
-+++ b/agent/mibgroup/mibII/ipAddr.c	2020-06-10 14:27:15.345354018 +0200
-@@ -495,14 +495,16 @@ Address_Scan_Next(Index, Retin_ifaddr)
+diff --git a/agent/mibgroup/mibII/ipAddr.c b/agent/mibgroup/mibII/ipAddr.c
+index a89255f..ef67f5f 100644
+--- a/agent/mibgroup/mibII/ipAddr.c
++++ b/agent/mibgroup/mibII/ipAddr.c
+@@ -498,14 +498,16 @@ Address_Scan_Next(Index, Retin_ifaddr)
  }
  
  #elif defined(linux)
@@ -19,7 +20,7 @@ diff -urNp a/agent/mibgroup/mibII/ipAddr.c b/agent/mibgroup/mibII/ipAddr.c
  
      /* get info about all interfaces */
  
-@@ -510,28 +512,45 @@ Address_Scan_Init(void)
+@@ -513,28 +515,45 @@ Address_Scan_Init(void)
      SNMP_FREE(ifc.ifc_buf);
      ifr_counter = 0;
  

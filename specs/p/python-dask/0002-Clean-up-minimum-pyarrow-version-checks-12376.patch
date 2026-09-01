@@ -1,0 +1,212 @@
+From ca435a2dc6da3d05587962d8e33f6503547c4415 Mon Sep 17 00:00:00 2001
+From: Guido Imperiale <crusaderky@gmail.com>
+Date: Thu, 7 May 2026 12:15:59 +0100
+Subject: [PATCH 2/4] Clean up minimum pyarrow version checks (#12376)
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ dask/bag/core.py                             |  5 +++--
+ dask/bytes/tests/test_http.py                | 16 +++++++--------
+ dask/dataframe/_compat.py                    | 16 ++++-----------
+ dask/dataframe/backends.py                   |  4 +---
+ dask/dataframe/dask_expr/_collection.py      |  6 ------
+ dask/dataframe/tests/test_utils_dataframe.py | 21 +++-----------------
+ dask/utils.py                                |  5 ++---
+ 7 files changed, 20 insertions(+), 53 deletions(-)
+
+diff --git a/dask/bag/core.py b/dask/bag/core.py
+index f3aa6f8da..fa169aee0 100644
+--- a/dask/bag/core.py
++++ b/dask/bag/core.py
+@@ -2614,14 +2614,15 @@ def split(seq, n):
+ 
+ def to_dataframe(seq, columns, dtypes):
+     import pandas as pd
+-    from packaging.version import Version
++
++    from dask._pandas_compat import PANDAS_GE_300
+ 
+     seq = reify(seq)
+     # pd.DataFrame expects lists, only copy if necessary
+     if not isinstance(seq, list):
+         seq = list(seq)
+ 
+-    kwargs = {} if Version(pd.__version__).major >= 3 else {"copy": False}
++    kwargs = {} if PANDAS_GE_300 else {"copy": False}
+     res = pd.DataFrame(seq, columns=list(columns))
+     return res.astype(dtypes, **kwargs)
+ 
+diff --git a/dask/bytes/tests/test_http.py b/dask/bytes/tests/test_http.py
+index ccb37edea..f9b5f4fc3 100644
+--- a/dask/bytes/tests/test_http.py
++++ b/dask/bytes/tests/test_http.py
+@@ -171,16 +171,14 @@ def test_open_glob(dir_server):
+ 
+ 
+ @pytest.mark.network
+-@pytest.mark.parametrize(
+-    "engine",
+-    ["pyarrow"],
+-)
+-def test_parquet(engine):
++def test_parquet():
+     pytest.importorskip("requests", minversion="2.21.0")
++    pytest.importorskip(
++        "pyarrow",
++        minversion="22.0.0",
++        reason="https://github.com/apache/arrow/issues/47981",
++    )
+     dd = pytest.importorskip("dask.dataframe")
+-    pa = pytest.importorskip(engine)
+-    if Version(pa.__version__) >= Version("22.0.0"):
+-        pytest.skip(reason="https://github.com/apache/arrow/issues/47981")
+ 
+     df = dd.read_parquet(
+         [
+@@ -188,7 +186,7 @@ def test_parquet(engine):
+             "master/parquet-testdata/impala/1.1.1-NONE/"
+             "nation.impala.parquet"
+         ],
+-        engine=engine,
++        engine="pyarrow",
+     ).compute()
+     assert df.n_nationkey.tolist() == list(range(25))
+     assert df.columns.tolist() == ["n_nationkey", "n_name", "n_regionkey", "n_comment"]
+diff --git a/dask/dataframe/_compat.py b/dask/dataframe/_compat.py
+index e89d07a87..1832e7700 100644
+--- a/dask/dataframe/_compat.py
++++ b/dask/dataframe/_compat.py
+@@ -39,19 +39,12 @@ from dask._pandas_compat import (
+ 
+ try:
+     import pyarrow as pa
++
++    PYARROW_VERSION = Version(pa.__version__)
++    HAS_PYARROW = PYARROW_VERSION >= Version("16.0.0")
+ except ImportError:
++    PYARROW_VERSION = Version("0.0.0")
+     HAS_PYARROW = False
+-else:
+-    HAS_PYARROW = True
+-
+-
+-if HAS_PYARROW:
+-    PYARROW_VERSION: Version | None = Version(pa.__version__)
+-    # we know that Version should be non-None when PYARROW_VERSION is True.
+-    PYARROW_GE_2101: bool | None = PYARROW_VERSION.release >= (21, 0, 1)  # type: ignore[union-attr]
+-else:
+-    PYARROW_VERSION = None
+-    PYARROW_GE_2101 = None
+ 
+ 
+ __all__ = [
+@@ -79,6 +72,5 @@ __all__ = [
+     "IndexingError",
+     "HAS_PYARROW",
+     "PYARROW_VERSION",
+-    "PYARROW_GE_2101",
+     "tm",
+ ]
+diff --git a/dask/dataframe/backends.py b/dask/dataframe/backends.py
+index 0ab20a7a7..8c77a66b0 100644
+--- a/dask/dataframe/backends.py
++++ b/dask/dataframe/backends.py
+@@ -52,9 +52,7 @@ try:
+     import pyarrow as pa
+     import pyarrow.compute
+ except ImportError:
+-    HAS_PYARROW = False
+-else:
+-    HAS_PYARROW = True
++    pass
+ 
+ 
+ class DataFrameBackendEntrypoint(DaskBackendEntrypoint):
+diff --git a/dask/dataframe/dask_expr/_collection.py b/dask/dataframe/dask_expr/_collection.py
+index d428f1cbb..def849730 100644
+--- a/dask/dataframe/dask_expr/_collection.py
++++ b/dask/dataframe/dask_expr/_collection.py
+@@ -11,9 +11,7 @@ from typing import Any, ClassVar, Literal
+ 
+ import numpy as np
+ import pandas as pd
+-import pyarrow as pa
+ from fsspec.utils import stringify_path
+-from packaging.version import parse as parse_version
+ from pandas import CategoricalDtype
+ from pandas.api.types import (
+     is_bool_dtype,
+@@ -5381,10 +5379,6 @@ def read_parquet(
+         or isinstance(filesystem, str)
+         and filesystem.lower() in ("arrow", "pyarrow")
+     ):
+-        if parse_version(pa.__version__) < parse_version("15.0.0"):
+-            raise ValueError(
+-                "pyarrow>=15.0.0 is required to use the pyarrow filesystem."
+-            )
+         if metadata_task_size is not None:
+             raise NotImplementedError(
+                 "metadata_task_size is not supported when using the pyarrow filesystem."
+diff --git a/dask/dataframe/tests/test_utils_dataframe.py b/dask/dataframe/tests/test_utils_dataframe.py
+index 62b326a0b..2f07f1dab 100644
+--- a/dask/dataframe/tests/test_utils_dataframe.py
++++ b/dask/dataframe/tests/test_utils_dataframe.py
+@@ -8,7 +8,6 @@ from collections.abc import Iterable
+ import numpy as np
+ import pandas as pd
+ import pytest
+-from packaging.version import Version
+ 
+ import dask
+ import dask.dataframe as dd
+@@ -713,25 +712,11 @@ def test_valid_divisions(divisions, valid):
+ 
+ 
+ def test_pyarrow_strings_enabled():
+-    try:
+-        import pyarrow as pa
+-    except ImportError:
+-        pa = None
+-
+-    # If `pyarrow>=12` are installed, then default to using pyarrow strings
+-    if (
+-        dask.config.get("dataframe.convert-string") in (True, None)
+-        and pa is not None
+-        and Version(pa.__version__) >= Version("12.0.0")
+-    ):
+-        assert pyarrow_strings_enabled() is True
+-    else:
+-        assert pyarrow_strings_enabled() is False
+-
+-    # Regardless of dependencies that are installed, always obey
+-    # the `dataframe.convert-string` config value if it's specified
+     with dask.config.set({"dataframe.convert-string": False}):
+         assert pyarrow_strings_enabled() is False
+ 
++    with dask.config.set({"dataframe.convert-string": None}):
++        assert pyarrow_strings_enabled() is True
++
+     with dask.config.set({"dataframe.convert-string": True}):
+         assert pyarrow_strings_enabled() is True
+diff --git a/dask/utils.py b/dask/utils.py
+index 1a74f3ccd..a0b5f748a 100644
+--- a/dask/utils.py
++++ b/dask/utils.py
+@@ -2230,12 +2230,11 @@ def get_default_shuffle_method() -> str:
+         return "disk"
+ 
+     try:
+-        from distributed.shuffle import check_minimal_arrow_version
++        from dask.dataframe._compat import HAS_PYARROW
+ 
+-        check_minimal_arrow_version()
++        return "p2p" if HAS_PYARROW else "tasks"
+     except ModuleNotFoundError:
+         return "tasks"
+-    return "p2p"
+ 
+ 
+ def get_meta_library(like):
+-- 
+2.52.0
+

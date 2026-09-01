@@ -5,7 +5,7 @@
 
 Name:           rubygem-%{gem_name}
 Version:        1.0.5
-Release: 15%{?dist}
+Release:        13%{?dist}
 Summary:        Extracting `assigns` and `assert_template` from ActionDispatch
 
 License:        MIT
@@ -75,6 +75,9 @@ popd
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.5-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.5-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

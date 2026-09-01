@@ -1,0 +1,25 @@
+From b20a7bc1bf70b66448bec6b68a61328766cd2e19 Mon Sep 17 00:00:00 2001
+From: DL6ER <dl6er@dl6er.de>
+Date: Thu, 11 Sep 2025 19:57:24 +0200
+Subject: [PATCH] Set minimum CMAKE version for tests
+
+Signed-off-by: DL6ER <dl6er@dl6er.de>
+---
+ unittest/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/unittest/CMakeLists.txt b/unittest/CMakeLists.txt
+index 7aa34971..6aa8f0fd 100644
+--- a/unittest/CMakeLists.txt
++++ b/unittest/CMakeLists.txt
+@@ -30,6 +33,7 @@ DOWNLOAD_NAME "master.zip"
+     "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+     "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+     "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
++    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+   LOG_DOWNLOAD ${THIRD_PARTY_LOGGING}
+   LOG_UPDATE ${THIRD_PARTY_LOGGING}
+   LOG_CONFIGURE ${THIRD_PARTY_LOGGING}
+-- 
+2.55.0
+

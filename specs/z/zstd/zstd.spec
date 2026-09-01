@@ -21,15 +21,16 @@
 
 Name:           zstd
 Version:        1.5.7
-Release: 5%{?dist}
+Release:        5%{?dist}
 Summary:        Zstd compression library
 
-License:        BSD-3-Clause AND GPL-2.0-only
+License:        BSD-3-Clause OR GPL-2.0-only
 URL:            https://github.com/facebook/zstd
 Source0:        https://github.com/facebook/zstd/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 Patch1:         man-pages-1.5.7.patch
 
+BuildRequires:  cmake
 BuildRequires:  make
 BuildRequires:  gcc %{?with_gtest:gtest-devel}
 %if %{with lz4}
@@ -76,33 +77,38 @@ find -name .gitignore -delete
 %patch 1 -p1
 
 %build
-export CFLAGS="$RPM_OPT_FLAGS"
-export LDFLAGS="$RPM_LD_FLAGS"
-export PREFIX="%{_prefix}"
-export LIBDIR="%{_libdir}"
-%make_build -C lib lib-mt %{!?with_asm:ZSTD_NO_ASM=1}
-%make_build -C programs %{!?with_asm:ZSTD_NO_ASM=1}
+%if !%{with asm}
+export CPPFLAGS=-DZSTD_DISABLE_ASM
+%endif
+%global _vpath_srcdir build/cmake
+%global _vpath_builddir build/shared
+%cmake %{?with_pzstd:-DZSTD_BUILD_CONTRIB=ON} -DZSTD_BUILD_STATIC=NO -DZSTD_PROGRAMS_LINK_SHARED=YES
+%cmake_build
+%global _vpath_builddir build/static
+%cmake %{?with_pzstd:-DZSTD_BUILD_CONTRIB=ON} -DZSTD_BUILD_SHARED=NO -DBUILD_TESTING=YES
+%cmake_build
+
+%install
+%global _vpath_builddir build/static
+%cmake_install
+# Install shared second so that cmake config files reference the shared library
+%global _vpath_builddir build/shared
+%cmake_install
 %if %{with pzstd}
-export CXXFLAGS="$RPM_OPT_FLAGS"
-%make_build -C contrib/pzstd %{!?with_asm:ZSTD_NO_ASM=1}
+install -D -m644 programs/%{name}.1 %{buildroot}%{_mandir}/man1/p%{name}.1
 %endif
 
 %check
-execstack lib/libzstd.so.1
+execstack %{_vpath_builddir}/lib/libzstd.so.1
 
+%global _vpath_builddir build/static
+%ctest --verbose
+%if %{with pzstd} && %{with gtest}
+# No pzstd tests with the cmake build at the moment
 export CFLAGS="$RPM_OPT_FLAGS"
 export LDFLAGS="$RPM_LD_FLAGS"
-make -C tests test-zstd
-%if %{with pzstd} && %{with gtest}
 export CXXFLAGS="$RPM_OPT_FLAGS"
-make -C contrib/pzstd test
-%endif
-
-%install
-%make_install PREFIX=%{_prefix} LIBDIR=%{_libdir}
-%if %{with pzstd}
-install -D -m755 contrib/pzstd/pzstd %{buildroot}%{_bindir}/pzstd
-install -D -m644 programs/%{name}.1 %{buildroot}%{_mandir}/man1/p%{name}.1
+make PZSTD_CXX_STD=-std=c++17 -C contrib/pzstd tests check
 %endif
 
 %files
@@ -122,6 +128,7 @@ install -D -m644 programs/%{name}.1 %{buildroot}%{_mandir}/man1/p%{name}.1
 %{_mandir}/man1/%{name}cat.1*
 %{_mandir}/man1/%{name}grep.1*
 %{_mandir}/man1/%{name}less.1*
+%{_pkgdocdir}/zstd_manual.html
 %license COPYING LICENSE
 
 %files -n lib%{name}
@@ -134,6 +141,7 @@ install -D -m644 programs/%{name}.1 %{buildroot}%{_mandir}/man1/p%{name}.1
 %{_includedir}/zstd_errors.h
 %{_libdir}/pkgconfig/libzstd.pc
 %{_libdir}/libzstd.so
+%{_libdir}/cmake/zstd/
 
 %files -n lib%{name}-static
 %{_libdir}/libzstd.a
@@ -141,6 +149,15 @@ install -D -m644 programs/%{name}.1 %{buildroot}%{_mandir}/man1/p%{name}.1
 %ldconfig_scriptlets -n lib%{name}
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Oct 08 2025 Terje Røsten <terjeros@gmail.com> - 1.5.7-4
+- Move to C++17 for gtest 1.17.0
+
+* Sat Sep 20 2025 Orion Poplawski <orion@nwra.com> - 1.5.7-3
+- Build with cmake (bz#2088517)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.7-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

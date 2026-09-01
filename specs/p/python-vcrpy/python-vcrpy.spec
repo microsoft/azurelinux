@@ -7,8 +7,8 @@
 %global modname vcrpy
 
 Name:               python-%{modname}
-Version:            7.0.0
-Release: 9%{?dist}
+Version:            8.1.1
+Release:            2%{?dist}
 Summary:            Automatically mock your HTTP interactions to simplify and speed up testing
 
 License:            MIT
@@ -91,6 +91,18 @@ rm -rf tests/unit/test_stubs.py
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.1.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 8.1.1-1
+- 8.1.1
+
+* Mon Dec 08 2025 Gwyn Ciesla <gwync@protonmail.com> - 8.1.0-1
+- 8.1.0
+
+* Fri Dec 05 2025 Gwyn Ciesla <gwync@protonmail.com> - 8.0.0-1
+- 8.0.0
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 7.0.0-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

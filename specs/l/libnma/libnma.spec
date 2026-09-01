@@ -1,9 +1,6 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global gtk3_version          %(pkg-config --modversion gtk+-3.0 2>/dev/null || echo bad)
-%global gtk4_version          %(pkg-config --modversion gtk4 2>/dev/null || echo bad)
-%global glib2_version         %(pkg-config --modversion glib-2.0 2>/dev/null || echo bad)
 %global nm_version            1:1.8.0
 %global mbp_version           0.20090602
 %global old_libnma_version    1.10.4
@@ -17,7 +14,7 @@
 Name:           libnma
 Summary:        NetworkManager GUI library
 Version:        1.10.6
-Release: 14%{?dist}
+Release:        11%{?dist}
 # The entire source code is GPLv2+ except some files in shared/ which are LGPLv2+
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:            https://gitlab.gnome.org/GNOME/libnma/
@@ -47,9 +44,20 @@ BuildRequires:  iso-codes-devel
 BuildRequires:  gcr-devel
 BuildRequires:  mobile-broadband-provider-info-devel >= %{mbp_version}
 
+Requires:       %{name}-common = %{version}-%{release}
+
 %description
 This package contains the library used for integrating GUI tools with
 NetworkManager.
+
+
+%package common
+Summary:        Common files for NetworkManager GUI library
+Conflicts:      libnma < %{version}-%{release}
+BuildArch:      noarch
+
+%description common
+This package contains common files for the NetworkManager GUI library.
 
 
 %package devel
@@ -58,7 +66,6 @@ Requires:       NetworkManager-libnm-devel >= %{nm_version}
 Obsoletes:      NetworkManager-gtk-devel < 1:0.9.7
 Requires:       libnma%{?_isa} = %{version}-%{release}
 Requires:       gtk3-devel%{?_isa}
-Requires:       pkgconfig
 Conflicts:      libnma < %{old_libnma_version}
 
 %description devel
@@ -66,10 +73,11 @@ This package contains header and pkg-config files to be used for integrating
 GUI tools with NetworkManager.
 
 
+%if %{with libnma_gtk4}
 %package gtk4
 Summary:        Experimental GTK 4 version of NetworkManager GUI library
-Requires:       gtk4%{?_isa} >= %{gtk4_version}
 Requires:       mobile-broadband-provider-info >= %{mbp_version}
+Requires:       %{name}-common = %{version}-%{release}
 Conflicts:      libnma < %{old_libnma_version}
 
 %description gtk4
@@ -82,12 +90,12 @@ Summary:        Header files for experimental GTK4 version of NetworkManager GUI
 Requires:       NetworkManager-libnm-devel >= %{nm_version}
 Requires:       libnma-gtk4%{?_isa} = %{version}-%{release}
 Requires:       gtk4-devel%{?_isa}
-Requires:       pkgconfig
 Conflicts:      libnma < %{old_libnma_version}
 
 %description gtk4-devel
 This package contains the experimental GTK4 version of header and pkg-config
 files to be used for integrating GUI tools with NetworkManager.
+%endif
 
 
 %prep
@@ -115,9 +123,12 @@ files to be used for integrating GUI tools with NetworkManager.
 %meson_test
 
 
-%files -f %{name}.lang
+%files
 %{_libdir}/libnma.so.*
 %{_libdir}/girepository-1.0/NMA-1.0.typelib
+
+
+%files common -f %{name}.lang
 %exclude %{_datadir}/glib-2.0/schemas/org.gnome.nm-applet.gschema.xml
 %{_datadir}/glib-2.0/schemas/org.gnome.nm-applet.eap.gschema.xml
 %doc NEWS CONTRIBUTING
@@ -136,7 +147,6 @@ files to be used for integrating GUI tools with NetworkManager.
 %files gtk4
 %{_libdir}/libnma-gtk4.so.*
 %{_libdir}/girepository-1.0/NMA4-1.0.typelib
-%license COPYING
 
 
 %files gtk4-devel
@@ -148,6 +158,9 @@ files to be used for integrating GUI tools with NetworkManager.
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.6-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.6-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

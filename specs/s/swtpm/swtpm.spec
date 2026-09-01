@@ -10,13 +10,11 @@
 
 Summary: TPM Emulator
 Name:           swtpm
-Version:        0.10.1
-Release: 5%{?dist}
+Version:        0.10.2
+Release:        1%{?dist}
 License:        BSD-3-Clause
 Url:            https://github.com/stefanberger/swtpm
 Source0:        https://github.com/stefanberger/swtpm/archive/v%{version}/%{name}-%{version}.tar.gz
-# tests: Retry NVWrite command after 0x922 return code and inc lockout counter
-Patch0:         https://github.com/stefanberger/swtpm/commit/4da66c66f92438443e66b67555673c9cb898b0ae.patch
 
 BuildRequires: make
 BuildRequires:  git-core
@@ -206,6 +204,15 @@ fi
 %{_libexecdir}/installed-tests/swtpm/
 
 %changelog
+* Wed Aug 19 2026 Stefan Berger <stefanb@linux.ibm.com> - 0.10.2-1
+- Update to v0.10.2 release
+
+* Tue Aug  4 2026 Stefan Berger <stefanb@linux.ibm.com> - 0.10.1-4
+- Applied patch to resolve SELinux policy build issue
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.10.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

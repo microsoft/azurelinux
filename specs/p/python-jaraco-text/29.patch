@@ -1,0 +1,28 @@
+From 8f2770aa82fcee66d944d00de7b767d8c2b4e792 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Thu, 12 Feb 2026 09:29:11 +0000
+Subject: [PATCH] Replace typer-slim dependency with typer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream has deprecated `typer-slim`, and it’s now just a shallow
+wrapper around `typer`. See https://github.com/fastapi/typer/pull/1522,
+https://github.com/fastapi/typer/blob/0.23.0/docs/release-notes.md#0220.
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b4e0a95..f9edd74 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -26,7 +26,7 @@ dependencies = [
+ 	"jaraco.context >= 4.1",
+ 	"jaraco.functools",
+ 	"more_itertools",
+-	"typer-slim",
++	"typer",
+ ]
+ dynamic = ["version"]
+ 

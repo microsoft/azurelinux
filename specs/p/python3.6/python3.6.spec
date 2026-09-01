@@ -20,7 +20,7 @@ URL: https://www.python.org/
 #global prerel ...
 %global upstream_version %{general_version}%{?prerel}
 Version: %{general_version}%{?prerel:~%{prerel}}
-Release: 55%{?dist}
+Release: 52%{?dist}
 # Python is Python
 # pip MIT is and bundles:
 #   appdirs: MIT

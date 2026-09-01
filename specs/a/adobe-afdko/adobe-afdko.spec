@@ -9,7 +9,7 @@
 
 Name:		adobe-afdko
 Version:	4.0.3
-Release: 5%{?dist}
+Release:	3%{?dist}
 Summary:	Adobe Font Development Kit for OpenType
 # Everything is Apache-2.0 except:
 #
@@ -71,6 +71,12 @@ export XFLAGS="${CFLAGS} ${LDFLAGS}"
 %{_bindir}/type1
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Dec 09 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 4.0.3-1
 - Updated to 4.0.3 release
 - Bundled antlr4-cpp-runtime-4.13.2

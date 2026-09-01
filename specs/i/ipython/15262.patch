@@ -1,0 +1,132 @@
+From a715f0bc3a0dcfb830ce0c97a2ad1ec54a46030b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Lum=C3=ADr=20Balhar?= <lbalhar@redhat.com>
+Date: Sun, 14 Jun 2026 09:00:31 +0000
+Subject: [PATCH] Fix init_path ignoring CWD when -P used in script shebang
+ (#15214)
+
+When Python is invoked as a script with -P in the shebang,
+sys.flags.safe_path is set but -P only excludes the
+script's directory from sys.path, not CWD. The previous fix in 9.7 treated
+safe_path as a blanket signal to skip adding CWD.
+
+Now init_path only honors safe_path when Python was invoked as a module
+(-m) or with -c, which is when -P actually excludes the current working
+directory.
+---
+ IPython/core/shellapp.py | 19 +++++++++++--
+ tests/test_shellapp.py   | 58 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+), 2 deletions(-)
+
+diff --git a/IPython/core/shellapp.py b/IPython/core/shellapp.py
+index f5199ff7a18..d42fb837ddc 100644
+--- a/IPython/core/shellapp.py
++++ b/IPython/core/shellapp.py
+@@ -247,7 +247,8 @@ def _user_ns_changed(self, change):
+     def init_path(self):
+         """Add current working directory, '', to sys.path
+ 
+-        Unless disabled by ignore_cwd config or sys.flags.safe_path.
++        Unless disabled by ignore_cwd config, or sys.flags.safe_path is set
++        and IPython was not invoked as a plain script.
+ 
+         Unlike Python's default, we insert before the first `site-packages`
+         or `dist-packages` directory,
+@@ -259,8 +260,22 @@ def init_path(self):
+             Allow optionally not including the current directory in sys.path
+         .. versionchanged:: 9.7
+             Respect sys.flags.safe_path (PYTHONSAFEPATH and -P flag)
++        .. versionchanged:: 9.9
++            Only honor safe_path for -m/-c invocations, not plain scripts.
++            When Python is run as a script (e.g. via a shebang with -P), -P
++            only excludes the script's directory from sys.path, not CWD.
+         """
+-        if "" in sys.path or self.ignore_cwd or sys.flags.safe_path:
++        # sys.flags.safe_path is set by -P or PYTHONSAFEPATH. Its meaning
++        # depends on how Python was invoked:
++        #   python -m ipython: -P excludes CWD → honor safe_path
++        #   python -c "...":   -P excludes CWD → honor safe_path
++        #   python /path/to/ipython (script/shebang): -P only excludes the
++        #     script's directory, NOT CWD → ignore safe_path
++        # Detect script invocation: __main__.__spec__ is None for scripts.
++        _main_spec = getattr(sys.modules.get('__main__'), '__spec__', None)
++        _argv0 = sys.argv[0] if sys.argv else ''
++        _is_script_invocation = _main_spec is None and _argv0 not in ('-c', '-')
++        if "" in sys.path or self.ignore_cwd or (sys.flags.safe_path and not _is_script_invocation):
+             return
+         for idx, path in enumerate(sys.path):
+             parent, last_part = os.path.split(path)
+diff --git a/tests/test_shellapp.py b/tests/test_shellapp.py
+index 3e7964d0e15..0d94de1bfcd 100644
+--- a/tests/test_shellapp.py
++++ b/tests/test_shellapp.py
+@@ -15,12 +15,70 @@
+ # -----------------------------------------------------------------------------
+ # Imports
+ # -----------------------------------------------------------------------------
++import sys
++import types
+ import unittest
++from unittest.mock import patch
+ 
++from IPython.core.shellapp import InteractiveShellApp
+ from IPython.testing import decorators as dec
+ from IPython.testing import tools as tt
+ 
+ 
++class _MinimalApp:
++    """Minimal stub for testing InteractiveShellApp.init_path."""
++    ignore_cwd = False
++    init_path = InteractiveShellApp.init_path
++
++
++class TestInitPath(unittest.TestCase):
++    """Tests for InteractiveShellApp.init_path, focused on safe_path handling."""
++
++    def setUp(self):
++        self._original_path = sys.path[:]
++        # Remove '' so init_path has a chance to add it
++        sys.path[:] = [p for p in sys.path if p != '']
++
++    def tearDown(self):
++        sys.path[:] = self._original_path
++
++    def _call_init_path(self, safe_path, main_spec, argv0):
++        app = _MinimalApp()
++        mock_flags = types.SimpleNamespace(safe_path=safe_path)
++        mock_main = types.SimpleNamespace(__spec__=main_spec)
++        with patch('sys.flags', mock_flags), \
++             patch.dict(sys.modules, {'__main__': mock_main}), \
++             patch.object(sys, 'argv', [argv0]):
++            app.init_path()
++
++    def test_script_with_safe_path_adds_cwd(self):
++        """Script invocation with -P/-PYTHONSAFEPATH should still add CWD.
++
++        When Python is run as a script (e.g. via a shebang containing -P),
++        sys.flags.safe_path is set but -P only excludes the script's directory
++        from sys.path, not CWD.  IPython should still add CWD in this case.
++        Regression test for https://github.com/ipython/ipython/issues/15214
++        """
++        self._call_init_path(safe_path=1, main_spec=None, argv0='/usr/bin/ipython')
++        self.assertIn('', sys.path)
++
++    def test_module_with_safe_path_skips_cwd(self):
++        """Module invocation (-m) with -P should NOT add CWD."""
++        mock_spec = types.SimpleNamespace(name='IPython.__main__')
++        self._call_init_path(safe_path=1, main_spec=mock_spec, argv0='/usr/lib/python/IPython/__main__.py')
++        self.assertNotIn('', sys.path)
++
++    def test_dashc_with_safe_path_skips_cwd(self):
++        """python -P -c invocation should NOT add CWD."""
++        self._call_init_path(safe_path=1, main_spec=None, argv0='-c')
++        self.assertNotIn('', sys.path)
++
++    def test_no_safe_path_adds_cwd(self):
++        """Without safe_path, CWD is always added (existing behavior)."""
++        self._call_init_path(safe_path=0, main_spec=None, argv0='/usr/bin/ipython')
++        self.assertIn('', sys.path)
++
++
+ class TestFileToRun(tt.TempFileMixin, unittest.TestCase):
+     """Test the behavior of the file_to_run parameter."""
+ 

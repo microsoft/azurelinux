@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 19;
+    release_number = 4;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -25,28 +25,24 @@
 
 Name:           python-setuptools
 # When updating, update the bundled libraries versions bellow!
-Version:        78.1.1
+Version:        80.10.2
 Release:        %autorelease
 Summary:        Easily build and distribute Python packages
 # setuptools is MIT
 # autocommand is LGPL-3.0-only
 # backports-tarfile is MIT
 # importlib-metadata is Apache-2.0
-# inflect is MIT
 # jaraco-context is MIT
-# jaraco-collections is MIT
 # jaraco-functools is MIT
 # jaraco-text is MIT
 # more-itertools is MIT
 # packaging is BSD-2-Clause OR Apache-2.0
 # platformdirs is MIT
 # tomli is MIT
-# typeguard is MIT
-# typing-extensions is Python-2.0.1
 # wheel is MIT
 # zipp is MIT
 # the setuptools logo is MIT
-License:        MIT AND Apache-2.0 AND (BSD-2-Clause OR Apache-2.0) AND Python-2.0.1 AND LGPL-3.0-only
+License:        MIT AND Apache-2.0 AND (BSD-2-Clause OR Apache-2.0) AND LGPL-3.0-only
 URL:            https://pypi.python.org/pypi/%{srcname}
 Source0:        %{pypi_source %{srcname} %{version}}
 
@@ -63,6 +59,10 @@ Patch:          Adjust-the-setup.py-install-deprecation-message.patch
 # - Resolution: deprecated functionality won't be fixed.
 # brp-mangle-shebang script cannot mangle this and fails for many pkgs.
 Patch:          Revert-Always-rewrite-a-Python-shebang-to-python.patch
+
+# Avoid using (deprecated in Python 3.15) json.__version__ in tests,
+# merged upstream.
+Patch:          https://github.com/pypa/setuptools/pull/5194.patch
 
 BuildArch:      noarch
 
@@ -103,20 +103,16 @@ execute the software that requires pkg_resources.
 %global bundled %{expand:
 Provides: bundled(python%{python3_pkgversion}dist(autocommand)) = 2.2.2
 Provides: bundled(python%{python3_pkgversion}dist(backports-tarfile)) = 1.2
-Provides: bundled(python%{python3_pkgversion}dist(importlib-metadata)) = 8
-Provides: bundled(python%{python3_pkgversion}dist(inflect)) = 7.3.1
-Provides: bundled(python%{python3_pkgversion}dist(jaraco-collections)) = 5.1
-Provides: bundled(python%{python3_pkgversion}dist(jaraco-context)) = 5.3
-Provides: bundled(python%{python3_pkgversion}dist(jaraco-functools)) = 4.0.1
-Provides: bundled(python%{python3_pkgversion}dist(jaraco-text)) = 3.12.1
-Provides: bundled(python%{python3_pkgversion}dist(more-itertools)) = 10.3
-Provides: bundled(python%{python3_pkgversion}dist(packaging)) = 24.2
-Provides: bundled(python%{python3_pkgversion}dist(platformdirs)) = 4.2.2
-Provides: bundled(python%{python3_pkgversion}dist(tomli)) = 2.0.1
-Provides: bundled(python%{python3_pkgversion}dist(typeguard)) = 4.3
-Provides: bundled(python%{python3_pkgversion}dist(typing-extensions)) = 4.12.2
-Provides: bundled(python%{python3_pkgversion}dist(wheel)) = 0.45.1
-Provides: bundled(python%{python3_pkgversion}dist(zipp)) = 3.19.2
+Provides: bundled(python%{python3_pkgversion}dist(importlib-metadata)) = 8.7.1
+Provides: bundled(python%{python3_pkgversion}dist(jaraco-context)) = 6.1
+Provides: bundled(python%{python3_pkgversion}dist(jaraco-functools)) = 4.4
+Provides: bundled(python%{python3_pkgversion}dist(jaraco-text)) = 4
+Provides: bundled(python%{python3_pkgversion}dist(more-itertools)) = 10.8
+Provides: bundled(python%{python3_pkgversion}dist(packaging)) = 26
+Provides: bundled(python%{python3_pkgversion}dist(platformdirs)) = 4.4
+Provides: bundled(python%{python3_pkgversion}dist(tomli)) = 2.4
+Provides: bundled(python%{python3_pkgversion}dist(wheel)) = 0.46.3
+Provides: bundled(python%{python3_pkgversion}dist(zipp)) = 3.23
 }
 
 %package -n python%{python3_pkgversion}-setuptools
@@ -162,6 +158,9 @@ find setuptools pkg_resources -name \*.py | xargs sed -i -e '1 {/^#!\//d}'
 rm -f setuptools/*.exe
 # Don't ship these
 rm -r docs/conf.py
+# Remove a filter for coverage warning from pytest config
+# In pytest < 9, such a warning filter triggers ImportError without coverage
+sed -i '/:coverage/d' pytest.ini
 
 %if %{without bootstrap}
 %generate_buildrequires
@@ -219,9 +218,12 @@ test ! -d %{buildroot}%{python3_sitelib}/setuptools/_distutils/tests
 
 %if %{with tests}
 # Upstream tests
+# PIP_NO_BUILD_ISOLATION allows us to run more tests offline with pip 25.3+,
+# or else they fecth setuptools from the internet,
+# see https://bugzilla.redhat.com/2417963.
 # --ignore=setuptools/tests/integration/
 # --ignore=setuptools/tests/config/test_apply_pyprojecttoml.py
-# -k "not test_pip_upgrade_from_source and not test_equivalent_output"
+# -k "not not test_equivalent_output"
 #   the tests require internet connection
 # --ignore=setuptools/tests/test_editable_install.py
 #   the tests require pip-run which we don't have in Fedora
@@ -230,12 +232,14 @@ test ! -d %{buildroot}%{python3_sitelib}/setuptools/_distutils/tests
 # --ignore=tools
 #   the tests test various upstream release tools we don't use/ship
 PRE_BUILT_SETUPTOOLS_WHEEL=%{_pyproject_wheeldir}/%{python_wheel_name} \
+PIP_NO_BUILD_ISOLATION=0 \
 PYTHONPATH=$(pwd) %pytest \
+ -n auto \
  --ignore=setuptools/tests/integration/ \
  --ignore=setuptools/tests/test_editable_install.py \
  --ignore=setuptools/tests/config/test_apply_pyprojecttoml.py \
  --ignore=tools \
- -k "not test_pip_upgrade_from_source and not test_wheel_includes_cli_scripts and not test_equivalent_output"
+ -k "not test_wheel_includes_cli_scripts and not test_equivalent_output"
 %endif # with tests
 
 
@@ -259,14 +263,30 @@ PYTHONPATH=$(pwd) %pytest \
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 78.1.1-19
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 80.10.2-4
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 78.1.1-18
-- build: mass rebuild auto-bumpable components
+* Tue Mar 10 2026 Miro Hrončok <miro@hroncok.cz> - 80.10.2-3
+- Run tests in %%check in parallel
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 78.1.1-17
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Mar 09 2026 Miro Hrončok <miro@hroncok.cz> - 80.10.2-2
+- Fix build with Python 3.15.0a6+
+- Fixes: rhbz#2440552
+
+* Mon Jan 26 2026 Miro Hrončok <miro@hroncok.cz> - 80.10.2-1
+- Update to 80.10.2
+- Fixes: rhbz#2431554
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 80.9.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 01 2025 Miro Hrončok <miro@hroncok.cz> - 80.9.0-2
+- Fix build with pip 25.3+
+- Fixes: rhbz#2417963
+
+* Wed Nov 12 2025 Miro Hrončok <miro@hroncok.cz> - 80.9.0-1
+- Update to 80.9.0
+- Fixes: rhbz#2362565
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 78.1.1-15
 - Rebuilt for Python 3.14.0rc3 bytecode

@@ -21,7 +21,7 @@ Object Storage API.
 
 Name:       python-swiftclient
 Version:    4.6.0
-Release: 8%{?dist}
+Release:    6%{?dist}
 Summary:    Client Library for OpenStack Object Storage API
 License:    Apache-2.0
 URL:        http://launchpad.net/python-swiftclient/
@@ -133,6 +133,9 @@ install -p -D -m 644 doc/build/man/*.1 %{buildroot}%{_mandir}/man1/
 %license LICENSE
 %endif
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.6.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.6.0-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -2,10 +2,10 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:             xdp-tools
-Version:          1.5.8
-Release: 5%{?dist}
+Version:          1.6.3
+Release:          1%{?dist}
 Summary:          Utilities and example programs for use with XDP
-%global _soversion 1.5.0
+%global _soversion 1.6.0
 
 License:          GPL-2.0-only
 URL:              https://github.com/xdp-project/%{name}
@@ -125,6 +125,21 @@ make install V=1
 %{_libdir}/pkgconfig/libxdp.pc
 
 %changelog
+* Wed Mar 25 2026 Toke Høiland-Jørgensen <toke@redhat.com> 1.6.3-1
+- Upstream version bump
+
+* Thu Feb 19 2026 Toke Høiland-Jørgensen <toke@redhat.com> 1.6.2-1
+- Upstream version bump
+
+* Wed Feb 11 2026 Toke Høiland-Jørgensen <toke@redhat.com> 1.6.1-1
+- Upstream version bump
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 6 2026 Toke Høiland-Jørgensen <toke@redhat.com> 1.6.0-1
+- Upstream version bump
+
 * Sat Nov 29 2025 Toke Høiland-Jørgensen <toke@redhat.com> 1.5.8-1
 - Upstream version bump
 

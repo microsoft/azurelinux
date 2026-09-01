@@ -8,7 +8,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-lwt
 Version:        5.9.1
-Release: 5%{?dist}
+Release:        4%{?dist}
 Summary:        OCaml lightweight thread library
 
 # The project as a whole is MIT.  The following files are BSD-2-Clause:
@@ -176,10 +176,16 @@ rm -rf %{buildroot}%{ocamldir}/lwt_ppx_let
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Oct 14 2025 Richard W.M. Jones <rjones@redhat.com> - 5.9.1-3
+- OCaml 5.4.0 rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.9.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Sat Jul 12 2025 Jerry James  <loganjerry@gmail.com> - 5.9.1-1
+* Sat Jul 12 2025 Jerry James <loganjerry@gmail.com> - 5.9.1-1
 - Version 5.9.1
 - Add upstream patch for compatibility with ppxlib 0.36
 

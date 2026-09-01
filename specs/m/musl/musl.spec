@@ -95,7 +95,7 @@
 
 Name:		musl
 Version:	1.2.5
-Release: 8%{?dist}
+Release:	5%{?dist}
 Summary:	Fully featured lightweight standard C library for Linux
 License:	MIT
 URL:		https://musl.libc.org

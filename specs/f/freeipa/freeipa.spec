@@ -199,8 +199,9 @@
 
 # Work-around fact that RPM SPEC parser does not accept
 # "Version: @VERSION@" in freeipa.spec.in used for Autoconf string replacement
-%define IPA_VERSION 4.13.1
-%global TARBALL_IPA_VERSION 4.13.1
+%define IPA_VERSION 4.13.3
+%global TARBALL_IPA_VERSION 4.13.3
+%global IPA_RELEASE_PATH %(echo $IPA_VERSION|tr . -)
 # Release candidate version -- uncomment with one percent for RC versions
 #%%global rc_version rc1
 %define AT_SIGN @
@@ -213,15 +214,15 @@
 
 Name:           %{package_name}
 Version:        %{IPA_VERSION}
-Release:        5%{?rc_version:.%rc_version}%{?dist}
+Release:        1.1%{?rc_version:.%rc_version}%{?dist}
 Summary:        The Identity, Policy and Audit system
 
 License:        GPL-3.0-or-later
 URL:            http://www.freeipa.org/
-Source0:        https://releases.pagure.org/freeipa/freeipa-%{TARBALL_IPA_VERSION}%{?rc_version}.tar.gz
+Source0:        https://codeberg.org/freeipa/freeipa/releases/download/release-%{IPA_RELEASE_PATH}/freeipa-%{TARBALL_IPA_VERSION}%{?rc_version}.tar.gz
 # Only use detached signature for the distribution builds. If it is a developer build, skip it
 %if %{NON_DEVELOPER_BUILD}
-Source1:        https://releases.pagure.org/freeipa/freeipa-%{TARBALL_IPA_VERSION}%{?rc_version}.tar.gz.asc
+Source1:        https://codeberg.org/freeipa/freeipa/releases/download/release-%{IPA_RELEASE_PATH}/freeipa-%{TARBALL_IPA_VERSION}%{?rc_version}.tar.gz.asc
 # https://www.freeipa.org/page/Verify_Release_Signature
 #
 # The following commands can be used to fetch the signing key via fingerprint
@@ -229,11 +230,13 @@ Source1:        https://releases.pagure.org/freeipa/freeipa-%{TARBALL_IPA_VERSIO
 #   fpr=0E63D716D76AC080A4A33513F40800B6298EB963
 #   gpg --keyserver keys.openpgp.org --receive-keys $fpr
 #   gpg --armor --export-options export-minimal --export $fpr >gpgkey-$fpr.asc
-Source2:        gpgkey-0E63D716D76AC080A4A33513F40800B6298EB963.asc
+# Source2:        gpgkey-0E63D716D76AC080A4A33513F40800B6298EB963.asc
+# Release 4.13.3 is signed by Rafael Jeffman
+# Rafael's key: 4B7E7AFBB0AAA98947CA2427F17E2569BEE3800C
+Source2:        gpgkey-4B7E7AFBB0AAA98947CA2427F17E2569BEE3800C.asc
 %endif
-Patch0001:      0001-SELinux-expand-policy-coverage-for-Kerberos-usage.patch
-Patch0002:      0002-ipa-sam-use-internal-Samba-method-to-populate-in-mem.patch
 
+Patch0:         freeipa-version-upgrade-fedora-only.patch
 # RHEL spec file only: START: Change branding to IPA and Identity Management
 # Moved branding logos and background to redhat-logos-ipa-80.4:
 # header-logo.png, login-screen-background.jpg, login-screen-logo.png,
@@ -1107,9 +1110,6 @@ export PATH=/usr/bin:/usr/sbin:$PATH
 
 export PYTHON=%{__python3}
 
-# Adjust minor release version because we actually applied all patches post 4.12.2
-sed -i 's@IPA_VERSION_RELEASE, 2@IPA_VERSION_RELEASE, 5@' VERSION.m4
-
 autoreconf -ivf
 %configure --with-vendor-suffix=-%{release} \
            %{enable_server_option} \
@@ -1202,6 +1202,7 @@ rm %{buildroot}/%{plugin_dir}/libipa_otp_counter.la
 rm %{buildroot}/%{plugin_dir}/libipa_otp_lasttoken.la
 rm %{buildroot}/%{plugin_dir}/libipa_graceperiod.la
 rm %{buildroot}/%{plugin_dir}/libtopology.la
+rm %{buildroot}/%{plugin_dir}/libipa_krbprinc_mr.la
 rm %{buildroot}/%{_libdir}/krb5/plugins/kdb/ipadb.la
 rm %{buildroot}/%{_libdir}/samba/pdb/ipasam.la
 
@@ -1649,6 +1650,7 @@ fi
 %attr(755,root,root) %{plugin_dir}/libipa_sidgen_task.so
 %attr(755,root,root) %{plugin_dir}/libipa_extdom_extop.so
 %attr(755,root,root) %{plugin_dir}/libipa_graceperiod.so
+%attr(755,root,root) %{plugin_dir}/libipa_krbprinc_mr.so
 %attr(755,root,root) %{_libdir}/krb5/plugins/kdb/ipadb.so
 %{_mandir}/man1/ipa-replica-conncheck.1*
 %{_mandir}/man1/ipa-replica-install.1*
@@ -1735,6 +1737,8 @@ fi
 %{_usr}/share/ipa/ui/js/freeipa/core.js
 %dir %{_usr}/share/ipa/ui/js/plugins
 %dir %{_usr}/share/ipa/ui/images
+%dir %{_usr}/share/ipa/ui/js/inline
+%{_usr}/share/ipa/ui/js/inline/*.js
 %if 0%{?rhel}
 %{_usr}/share/ipa/ui/images/facet-*.png
 # Moved branding logos and background to redhat-logos-ipa-80.4:
@@ -1776,6 +1780,7 @@ fi
 %attr(0644,root,root) %{_usr}/share/ipa/schema.d/README
 %attr(0644,root,root) %{_usr}/share/ipa/gssapi.login
 %{_usr}/share/ipa/ipakrb5.aug
+%attr(0644,root,root) %{_sysusersdir}/ipa.conf
 
 %files server-dns
 %doc README.md Contributors.txt
@@ -1970,21 +1975,65 @@ fi
 %endif
 
 %changelog
-* Wed Feb 18 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-5
+* Fri Aug 21 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.3-1.1
+- Force upgrade for versions that falsely represent themselves as 4.13.5 (not existing yet)
+
+* Thu Aug 20 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.3-1
+- Upstream release 4.13.3
+- Resolves: CVE-2026-11861, CVE-2026-13097, CVE-2026-19550, CVE-2026-73199, CVE-2026-73198, CVE-2026-73197, CVE-2026-73196
+
+* Wed Aug 19 2026 Adam Williamson <awilliam@redhat.com> - 4.13.2-2
+- Rebuild without changes to keep version ahead of F43
+
+* Fri Aug 14 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-2
+- Rebuilt for Samba-4.25.0-RC1
+
+* Mon Aug 3 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.2-1
+- FreeIPA 4.13.2
+
+* Thu Jul 2 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-13
+- Rebuild against Samba 4.24.4
+
+* Fri May 29 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-12
+- Rebuild against Samba 4.24.3
+
+* Fri May 15 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-11
+- Rebuild against Samba 4.24.2
+
+* Sat Apr 18 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-10
+- Rebuild against Samba 4.24.1
+
+* Thu Mar 19 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-9
+- Ensure proper error code return in case MS-PAC generator not yet enabled
+- Resolves: rhbz#2448253
+- Rebuild against Samba 4.24.0 final release
+- Related: rhbz#2448612
+
+* Fri Mar  6 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-8
+- Fix SELinux policy for SSSD MFA helpers
+- Fix cases when passkey child was crashing when called from ipa-otpd
+
+* Tue Feb 24 2026 Adam Williamson <awilliam@redhat.com> - 4.13.1-7
+- Rebuild against Samba 4.24.0-RC3
+
+* Wed Feb 18 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-6
 - More changes to SELinux policy to help upgrade SSSD helpers' contexts
 
-* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-4
+* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-5
 - Update SELinux policy to allow relabel SSSD helpers during install (rpm_t)
 
-* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-3
+* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-4
 - Update SELinux policy to allow relabel SSSD helpers during install
 
-* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-2
+* Tue Feb 17 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-3
 - Rebuild against MIT Kerberos 1.22.2
 - Fix build against NodeJS in F44/45
 - Allow SELinux policy for ipa-otpd in non-IPA environment (standalone SSSD)
 - Fix freeipa-client package scriptlet to not fail when config is missing
 - Resolves: rhbz#2439482
+
+* Thu Jan 22 2026 Alexander Bokovoy <abokovoy@redhat.com> - 4.13.1-2
+- Rebuild against Samba 4.24.0-RC1
 
 * Fri Jan 16 2026 Rob Crittenden <rcritten@redhat.com> - 4.13.1-0.1
 - Upstream release 4.13.1
@@ -2008,9 +2057,10 @@ fi
 - CVE-2025-7493: host to admin escalation prevention
 
 * Tue Sep 23 2025 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.2-19
-- Rebuild for Python 3.14.0rc3
-- Resolves: rhbz#2396699
 - Update fixes from ipa-4-12 branch
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.12.2-18.1
+- Rebuilt for Python 3.14.0rc3 bytecode
 
 * Tue Sep 09 2025 Alexander Bokovoy <abokovoy@redhat.com> - 4.12.2-18
 - Fix forest trust information handling to support Samba 4.23

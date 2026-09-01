@@ -40,6 +40,9 @@ tar -xf $PKG_TARBALL -C $PKG_TMPDIR
 
 cd $PKG_PATH
 
+echo ">>>>>> Apply patches"
+patch -p2 < $PKG_DIR/CVE-2026-3449.patch
+
 export HATCH_BUILD_HOOKS_ENABLE=true
 export YARN_CACHE_FOLDER="$PWD/.package-cache"
 echo ">>>>>> Install npm modules"

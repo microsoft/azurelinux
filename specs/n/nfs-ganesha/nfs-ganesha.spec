@@ -64,8 +64,8 @@ Requires: openSUSE-release
 %bcond_with kvsfs
 %global use_fsal_kvsfs %{on_off_switch kvsfs}
 
-%bcond_with rdma
-%global use_rdma %{on_off_switch rdma}
+%bcond_with mooshika
+%global use_mooshika %{on_off_switch mooshika}
 
 %bcond_with 9P
 %global use_9P %{on_off_switch 9P}
@@ -122,6 +122,16 @@ Requires: openSUSE-release
 %bcond_with legacy_python_install
 %global use_legacy_python_install %{on_off_switch legacy_python_install}
 
+%bcond_without monitoring
+%global use_monitoring %{on_off_switch monitoring}
+
+%bcond_without grpc
+%global use_grpc %{on_off_switch grpc}
+
+%bcond_without nfs_rdma
+
+%bcond_without rpc_rdma
+
 %if ( 0%{?rhel} && 0%{?rhel} < 7 )
 %global _rundir %{_localstatedir}/run
 %endif
@@ -130,14 +140,16 @@ Requires: openSUSE-release
 #%%global dev rc6
 
 Name:		nfs-ganesha
-Version:	7.2
-Release:	2%{?dev:%{dev}}%{?dist}
+Version:	9.16
+Release:	4%{?dev:%{dev}}%{?dist}
 Summary:	NFS-Ganesha is a NFS Server running in user space
 License:	LGPL-3.0-or-later
 Url:		https://github.com/nfs-ganesha/nfs-ganesha/wiki
 
 Source0:	https://github.com/%{name}/%{name}/archive/V%{version}%{?dev:-%{dev}}/%{name}-%{version}%{?dev:%{dev}}.tar.gz
 Patch:		0001-config_samples-log_rotate.patch
+Patch:		0002-src-scripts-python.patch
+Patch:		0003-src-selinux-ganesha.te.patch
 
 BuildRequires:	cmake
 BuildRequires:	make
@@ -149,15 +161,12 @@ BuildRequires:	flex
 BuildRequires:	pkgconfig
 BuildRequires:	userspace-rcu-devel
 BuildRequires:	krb5-devel
+%if ( 0%{?with_nfs_rdma} || 0%{?with_rpc_rdma} )
+# for RDMA:
+BuildRequires:	rdma-core-devel
+%endif
 %if ( 0%{?with rados_recov} || 0%{?with rados_urls} )
 BuildRequires: librados-devel >= 0.61
-%endif
-%if ( 0%{?suse_version} >= 1330 )
-BuildRequires:	libnsl-devel
-%else
-%if ( 0%{?fedora} >= 28 || 0%{?rhel} >= 8 )
-BuildRequires:	libnsl2-devel
-%endif
 %endif
 %if ( 0%{?suse_version} )
 BuildRequires:	dbus-1-devel
@@ -210,7 +219,7 @@ BuildRequires:	nfsidmap-devel
 BuildRequires:	libnfsidmap-devel
 %endif
 
-%if ( 0%{?with_rdma} )
+%if ( 0%{?with_mooshika} )
 BuildRequires:	libmooshika-devel >= 0.6-0
 %endif
 %if ( 0%{?with_jemalloc} )
@@ -580,7 +589,7 @@ cd src && %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo	\
 	-DUSE_FSAL_SAUNAFS=%{use_fsal_saunafs}		\
 	-DUSE_SYSTEM_NTIRPC=%{use_system_ntirpc}	\
 	-DENABLE_QOS=%{use_qos}				\
-	-DUSE_9P_RDMA=%{use_rdma}			\
+	-DUSE_9P_RDMA=%{use_mooshika}			\
 	-DUSE_LTTNG=%{use_lttng}			\
 	-DUSE_UNWIND=%{use_unwind}			\
 	-DUSE_UNWIND_ENRICHED_BT=%{use_unwind_enriched_bt}	\
@@ -600,8 +609,14 @@ cd src && %cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo	\
 	-D_MSPAC_SUPPORT=%{use_mspac_support}		\
 	-DSANITIZE_ADDRESS=%{use_sanitize_address}	\
 	-DUSE_LEGACY_PYTHON_INSTALL=%{use_legacy_python_install} \
+%if %{with nfs_rdma}
+        -DUSE_NFS_RDMA=ON \
+%endif
+%if %{with rpc_rdma}
+        -DUSE_RPC_RDMA=ON \
+%endif
 %ifarch x86_64 aarch64
-       -DCMAKE_LINKER=%{_bindir}/ld.mold                \
+        -DCMAKE_LINKER=%{_bindir}/ld.mold                \
 %endif
 %if ( 0%{?with_jemalloc} )
 	-DALLOCATOR=jemalloc
@@ -691,23 +706,14 @@ install -p -m 644 selinux/ganesha.if %{buildroot}%{_selinux_store_path}/devel/in
 install -m 0644 selinux/ganesha.pp.bz2 %{buildroot}%{_selinux_store_path}/packages
 %endif
 
-%if ( ! 0%{?with_legacy_python_install} )
-%if ( 0%{?with_gpfs} )
-mv %{buildroot}/usr/bin/gpfs-epoch %{buildroot}/usr/libexec/ganesha/
-%endif
-%endif
-
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-rm -rf %{buildroot}/%{python_sitelib}/gpfs*
-rm -f %{buildroot}/%{python_sitelib}/__init__.*
-%else
-rm -rf %{buildroot}/%{python3_sitelib}/gpfs*
-rm -rf %{buildroot}/%{python3_sitelib}/ganeshactl*
 rm -f %{buildroot}/%{python3_sitelib}/__init__.*
 rm -rf %{buildroot}/%{python3_sitelib}/__pycache__
 rm -f %{buildroot}/%{python3_sitelib}/Ganesha/__init__.*
 rm -f %{buildroot}/%{python3_sitelib}/Ganesha/QtUI/__init__.*
 rm -rf %{buildroot}/%{python3_sitelib}/Ganesha/QtUI/__pycache__
+
+%if ( 0%{?with_gpfs} )
+mv %{buildroot}/usr/bin/gpfs-epoch %{buildroot}/usr/libexec/ganesha/
 %endif
 
 install -m0644 -D ../nfs-ganesha.sysusers.conf %{buildroot}%{_sysusersdir}/nfs-ganesha.conf
@@ -857,6 +863,9 @@ killall -SIGHUP dbus-daemon >/dev/null 2>&1 || :
 %if ( 0%{?with_man_page} )
 %{_mandir}/*/ganesha-gpfs-config.8.gz
 %endif
+%if ( 0%{?with_utils} )
+%{python3_sitelib}/gpfs_epoch*-info
+%endif
 %endif
 
 %if ( 0%{?with_xfs} )
@@ -936,10 +945,9 @@ killall -SIGHUP dbus-daemon >/dev/null 2>&1 || :
 
 %if ( 0%{?with_utils} )
 %files utils
-%if ( 0%{?rhel} && 0%{?rhel} < 8 )
-%{python_sitelib}/Ganesha/*
-%{python_sitelib}/ganeshactl-*-info
-%endif
+%{python3_sitelib}/ganesha*-info
+%{python3_sitelib}/Ganesha/*
+
 %if ( 0%{?with_gui_utils} )
 %{_bindir}/ganesha-admin
 %{_bindir}/manage_clients
@@ -963,12 +971,75 @@ killall -SIGHUP dbus-daemon >/dev/null 2>&1 || :
 %{_bindir}/ganesha_mgr
 %{_bindir}/ganesha_logrotate_mgr
 %{_bindir}/ganesha_conf
+%{_bindir}/ganesha-top
 %{_mandir}/*/ganesha_conf.8.gz
+%if %{with gpfs}
+%{_libexecdir}/ganesha/gpfs-epoch
+%else
+%exclude %{_libexecdir}/ganesha/gpfs-epoch
+%endif
 %endif
 
 %changelog
-* Wed Nov 19 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 7.2-2
-- NFS-Ganesha 8.1, rpc-statd unitdir
+* Tue Aug 11 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.16-4
+- rhbz#2512155 
+
+* Thu Jun 25 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.16-3
+- NFS-Ganesha 9.16, addition selinux policy from Fedora 44
+
+* Tue Jun 16 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.16-2
+- NFS-Ganesha 9.16, missing BR for rdma-core-devel and enable rdma
+
+* Mon Jun 15 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.16-1
+- NFS-Ganesha 9.16 GA
+
+* Mon Jun 8 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.15-1
+- NFS-Ganesha 9.15 GA
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 9.14-2
+- Rebuilt for Python 3.15
+
+* Tue May 26 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.14-1
+- NFS-Ganesha 9.14 GA
+
+* Mon Apr 27 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.13-1
+- NFS-Ganesha 9.13 GA
+
+* Mon Apr 13 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.11-1
+- NFS-Ganesha 9.11 GA
+
+* Mon Apr 6 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.10-1
+- NFS-Ganesha 9.10 GA
+
+* Fri Mar 20 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.9-1
+- NFS-Ganesha 9.9 GA
+
+* Wed Mar 18 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.8-1
+- NFS-Ganesha 9.8 GA, remove libnsl* BRs
+
+* Mon Feb 23 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.6-1
+- NFS-Ganesha 9.6 GA
+
+* Mon Feb 9 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.5-1
+- NFS-Ganesha 9.5 GA
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 6 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.4-1
+- NFS-Ganesha 9.4 GA
+
+* Tue Nov 25 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 9.2-1
+- NFS-Ganesha 9.2 GA
+
+* Wed Nov 19 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 8.1-3
+- NFS-Ganesha 8.1, rpc-statd in unitdir, rhbz#2415128
+
+* Thu Oct 30 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 8.1-2
+- NFS-Ganesha 8.1, python cleanup
+
+* Thu Oct 23 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 8.1-1
+- NFS-Ganesha 8.1 GA
 
 * Tue Sep 30 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> - 7.2-1
 - NFS-Ganesha 7.2 GA

@@ -27,16 +27,23 @@
 %bcond metis %{undefined rhel}
 
 Name:           eigen3
-Version:        3.4.0
-Release: 22%{?dist}
+Version:        5.0.1
+Release:        3%{?dist}
 Summary:        A lightweight C++ template library for vector and matrix math
 
-License:        Apache-2.0 AND MPL-2.0 AND LGPL-2.0-or-later AND BSD-3-Clause AND Minpack
+License:        Apache-2.0 AND MPL-2.0 AND BSD-3-Clause AND Minpack
 URL:            http://eigen.tuxfamily.org/index.php?title=Main_Page
 Source0:        https://gitlab.com/libeigen/eigen/-/archive/%{version}/eigen-%{version}.tar.bz2
 # For mingw, read the comment in the file for details
 Source1:        mingw_TryRunResults.cmake
 Source9999: eigen3.azl.macros
+
+# Fix/workaround doc build failures
+Patch0:         eigen3_docs.patch
+# Fix lib install dir
+Patch1:         eigen3_libinstalldir.patch
+# Fix build error with doxygen >= 1.14
+Patch2:         eigen3-doxygen.patch
 
 BuildRequires:  %{blaslib}-devel
 BuildRequires:  fftw-devel
@@ -70,6 +77,7 @@ BuildRequires:  metis-devel
 BuildRequires:  cmake
 BuildRequires:  make
 BuildRequires:  gcc-c++
+BuildRequires:  gcc-gfortran
 BuildRequires:  doxygen
 BuildRequires:  graphviz
 BuildRequires:  tex(latex)
@@ -103,6 +111,18 @@ Provides:       %{name} = %{version}-%{release}
 Provides:       %{name}-static = %{version}-%{release}
 
 %description devel
+%{summary}.
+
+%package blas
+Summary:        BLAS library built on top of eigen3
+
+%description blas
+%{summary}.
+
+%package lapack
+Summary:        LAPACK library built on top of eigen3
+
+%description lapack
 %{summary}.
 
 %package doc
@@ -163,7 +183,7 @@ rm -f %{_vpath_builddir}/doc/html/unsupported/installdox
 # MinGW build
 MINGW32_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR=%{mingw32_includedir}/%{name} -DCMAKEPACKAGE_INSTALL_DIR=%{mingw32_datadir}/cmake/%{name}" \
 MINGW64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR=%{mingw64_includedir}/%{name} -DCMAKEPACKAGE_INSTALL_DIR=%{mingw64_datadir}/cmake/%{name}" \
-%mingw_cmake -C%{SOURCE1} -DEIGEN_BUILD_PKGCONFIG:BOOL=ON -DEIGEN_TEST_CXX11=ON
+%mingw_cmake -C%{SOURCE1} -DEIGEN_BUILD_PKGCONFIG:BOOL=ON -DEIGEN_TEST_CXX11=ON -DEIGEN_BUILD_BLAS=OFF -DEIGEN_BUILD_LAPACK=OFF
 %endif
 
 
@@ -181,23 +201,31 @@ MINGW64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR=%{mingw64_includedir}/%{name} -DCMAKEP
 
 
 %files devel
-%license COPYING.README COPYING.APACHE COPYING.BSD COPYING.MPL2 COPYING.GPL COPYING.LGPL COPYING.MINPACK
+%license COPYING.BSD COPYING.APACHE COPYING.MPL2 COPYING.MINPACK COPYING.README
 %{_includedir}/%{name}
 %{_datadir}/cmake/%{name}
 %{_datadir}/pkgconfig/%{name}.pc
+
+%files blas
+%{_libdir}/libeigen_blas.so
+%{_libdir}/libeigen_blas_static.a
+
+%files lapack
+%{_libdir}/libeigen_lapack.so
+%{_libdir}/libeigen_lapack_static.a
 
 %files doc
 %doc %{_vpath_builddir}/doc/html
 
 %if %{with mingw}
 %files -n mingw32-%{name}
-%license COPYING.BSD COPYING.LGPL COPYING.MPL2 COPYING.README
+%license COPYING.BSD COPYING.APACHE COPYING.MPL2 COPYING.MINPACK COPYING.README
 %{mingw32_includedir}/%{name}
 %{mingw32_datadir}/pkgconfig/%{name}.pc
 %{mingw32_datadir}/cmake/%{name}/
 
 %files -n mingw64-%{name}
-%license COPYING.BSD COPYING.LGPL COPYING.MPL2 COPYING.README
+%license COPYING.BSD COPYING.APACHE COPYING.MPL2 COPYING.MINPACK COPYING.README
 %{mingw64_includedir}/%{name}
 %{mingw64_datadir}/pkgconfig/%{name}.pc
 %{mingw64_datadir}/cmake/%{name}/
@@ -205,6 +233,18 @@ MINGW64_CMAKE_ARGS="-DINCLUDE_INSTALL_DIR=%{mingw64_includedir}/%{name} -DCMAKEP
 
 
 %changelog
+* Mon Jan 19 2026 Than Ngo <than@redhat.com> - 5.0.1-3
+- Fix FTBFS with doxygen
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Nov 09 2025 Sandro Mani <manisandro@gmail.com> - 5.0.1-1
+- Update to 5.0.1
+
+* Mon Sep 22 2025 Sandro Mani <manisandro@gmail.com> - 5.0.0-1
+- Update to 5.0.0
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.0-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -3,7 +3,7 @@
 
 Name:    libsigsegv
 Version: 2.15
-Release: 4%{?dist}
+Release: 2%{?dist}
 Summary: Library for handling page faults in user mode
 
 License: GPL-2.0-or-later
@@ -81,6 +81,9 @@ make check
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Aug 14 2025 Gwyn Ciesla <gwync@protonmail.com> - 2.15-1
 - 2.15
 

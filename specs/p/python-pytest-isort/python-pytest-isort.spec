@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.0.0
-Release: 6%{?dist}
+Release:        4%{?dist}
 Summary:        Pytest plugin to check import ordering using isort
 
 # Automatically converted from old format: BSD - review is highly recommended.
@@ -50,6 +50,9 @@ py.test plugin to check import ordering using isort.
 %{python3_sitelib}/*.dist-info
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.0.0-3
 - Rebuilt for Python 3.14.0rc3 bytecode
 

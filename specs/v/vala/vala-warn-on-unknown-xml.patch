@@ -1,0 +1,121 @@
+From 80066a3fa9e4c13a6a5e43dac2ceda1d03fbe663 Mon Sep 17 00:00:00 2001
+From: two <two@envs.net>
+Date: Thu, 13 Feb 2025 19:08:34 +0000
+Subject: [PATCH] girparser: Warn about unknown xml element instead of creating
+ a fatal error
+
+(also remove unnecessary comments about it)
+---
+ vala/valagirparser.vala | 29 ++++++++++-------------------
+ 1 file changed, 10 insertions(+), 19 deletions(-)
+
+diff --git a/vala/valagirparser.vala b/vala/valagirparser.vala
+index 7672ad5b0..06f6d4098 100644
+--- a/vala/valagirparser.vala
++++ b/vala/valagirparser.vala
+@@ -1516,7 +1516,6 @@ public class Vala.GirParser : CodeVisitor {
+ 
+ 	void start_element (string name) {
+ 		if (current_token != MarkupTokenType.START_ELEMENT || reader.name != name) {
+-			// error
+ 			Report.error (get_current_src (), "expected start element of `%s'", name);
+ 		}
+ 	}
+@@ -2107,8 +2106,7 @@ public class Vala.GirParser : CodeVisitor {
+ 				//TODO Handle this format information properly
+ 				skip_element ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `repository'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `repository'", reader.name);
+ 				skip_element ();
+ 			}
+ 		}
+@@ -2377,8 +2375,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "docsection") {
+ 				skip_element ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `namespace'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `namespace'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -2551,8 +2548,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "function-macro") {
+ 				skip_element ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `%s'", reader.name, element_name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `%s'", reader.name, element_name);
+ 				skip_element ();
+ 			}
+ 
+@@ -3048,8 +3044,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "union") {
+ 				parse_union ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `record'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `record'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -3167,8 +3162,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "glib:signal") {
+ 				parse_signal ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `class'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `class'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -3246,8 +3240,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "glib:signal") {
+ 				parse_signal ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `interface'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `interface'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -3801,8 +3794,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "union") {
+ 				parse_union ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `class'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `class'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -3847,8 +3839,7 @@ public class Vala.GirParser : CodeVisitor {
+ 					Report.warning (get_current_src (), "unhandled child element `%s' in `transparent union'", reader.name);
+ 					skip_element ();
+ 				} else {
+-					// error
+-					Report.error (get_current_src (), "unknown child element `%s' in `transparent union'", reader.name);
++					Report.warning (get_current_src (), "unknown child element `%s' in `transparent union'", reader.name);
+ 					skip_element ();
+ 				}
+ 
+@@ -3897,8 +3888,7 @@ public class Vala.GirParser : CodeVisitor {
+ 			} else if (reader.name == "record") {
+ 				parse_record ();
+ 			} else {
+-				// error
+-				Report.error (get_current_src (), "unknown child element `%s' in `union'", reader.name);
++				Report.warning (get_current_src (), "unknown child element `%s' in `union'", reader.name);
+ 				skip_element ();
+ 			}
+ 
+@@ -4736,3 +4726,4 @@ public class Vala.GirParser : CodeVisitor {
+ 	}
+ 
+ }
++
+-- 
+GitLab
+

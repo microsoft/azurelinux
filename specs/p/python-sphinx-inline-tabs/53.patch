@@ -1,0 +1,317 @@
+From d34dd6b05053ae1bc39c2c4da4d447ed7640309d Mon Sep 17 00:00:00 2001
+From: Hugo van Kemenade <1324225+hugovk@users.noreply.github.com>
+Date: Sun, 21 Dec 2025 15:27:13 +0200
+Subject: [PATCH] Test on GitHub Actions
+
+---
+ .github/workflows/test.yml                    | 46 +++++++++++++++++++
+ .gitignore                                    |  1 +
+ .pre-commit-config.yaml                       | 12 ++++-
+ noxfile.py                                    |  9 +++-
+ pyproject.toml                                |  3 ++
+ tests/test_markup.py                          | 19 ++++++--
+ .../test_markup_basic_html_markdown_.html     |  2 +-
+ ...t_markup_basic_html_restructuredtext_.html |  2 +-
+ .../test_markup_basic_xml_markdown_.xml       |  4 +-
+ ...est_markup_basic_xml_restructuredtext_.xml |  4 +-
+ .../test_markup_multiple_html_markdown_.html  |  2 +-
+ ...arkup_multiple_html_restructuredtext_.html |  2 +-
+ .../test_markup_multiple_xml_markdown_.xml    |  4 +-
+ ..._markup_multiple_xml_restructuredtext_.xml |  4 +-
+ 14 files changed, 97 insertions(+), 17 deletions(-)
+ create mode 100644 .github/workflows/test.yml
+
+diff --git a/.github/workflows/test.yml b/.github/workflows/test.yml
+new file mode 100644
+index 0000000..2b40bb4
+--- /dev/null
++++ b/.github/workflows/test.yml
+@@ -0,0 +1,46 @@
++name: Test
++
++on: [push, pull_request, workflow_dispatch]
++
++permissions: {}
++
++env:
++  FORCE_COLOR: 1
++  PIP_DISABLE_PIP_VERSION_CHECK: 1
++
++jobs:
++  test:
++    runs-on: ${{ matrix.os }}
++    strategy:
++      fail-fast: false
++      matrix:
++        python-version:
++          - "pypy3.11"
++          - "3.15"
++          - "3.14"
++          - "3.13"
++          - "3.12"
++          - "3.11"
++          - "3.10"
++        sphinx-version: ["7", "8", "9"]
++        os: [macos-latest, ubuntu-latest]
++        exclude:
++          - { python-version: "3.10", sphinx-version: "9" }
++
++    steps:
++      - uses: actions/checkout@v6
++        with:
++          persist-credentials: false
++
++      - name: Set up Python ${{ matrix.python-version }}
++        uses: actions/setup-python@v6
++        with:
++          python-version: ${{ matrix.python-version }}
++          allow-prereleases: true
++
++      - name: Install uv
++        uses: astral-sh/setup-uv@v7
++
++      - name: Nox tests
++        run: |
++          uvx --python ${{ matrix.python-version }} nox -s test -- --sphinx ${{ matrix.sphinx-version }}
+diff --git a/.gitignore b/.gitignore
+index fec3a65..e210890 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,4 +1,5 @@
+ # Python stuff
++.coverage
+ .nox
+ /build
+ /dist
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index 983a0ae..2d77d41 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -1,5 +1,5 @@
+ repos:
+-  - repo: https://github.com/psf/black
++  - repo: https://github.com/psf/black-pre-commit-mirror
+     rev: 23.7.0
+     hooks:
+       - id: black
+@@ -43,3 +43,13 @@ repos:
+     hooks:
+       - id: prettier
+         exclude: tests/test_.+
++
++  - repo: https://github.com/python-jsonschema/check-jsonschema
++    rev: 0.34.0
++    hooks:
++      - id: check-github-workflows
++
++  - repo: https://github.com/rhysd/actionlint
++    rev: v1.7.7
++    hooks:
++      - id: actionlint
+diff --git a/noxfile.py b/noxfile.py
+index 3b540ad..1e79aea 100644
+--- a/noxfile.py
++++ b/noxfile.py
+@@ -1,5 +1,6 @@
+ """Development automation
+ """
++import argparse
+ import datetime
+ import glob
+ import os
+@@ -80,7 +81,13 @@ def lint(session):
+ def test(session):
+     _install_this_project_with_flit(session, extras=["test"])
+ 
+-    args = session.posargs or ["-n", "auto", "--cov", PACKAGE_NAME]
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--sphinx")
++    parsed, posargs = parser.parse_known_args(session.posargs)
++    if parsed.sphinx:
++        session.install(f"sphinx=={parsed.sphinx}.*")
++
++    args = posargs or ["-n", "auto", "--cov", PACKAGE_NAME]
+     session.run("pytest", *args)
+ 
+ 
+diff --git a/pyproject.toml b/pyproject.toml
+index 4671cbd..9773b60 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -14,8 +14,11 @@ dynamic = ["version", "description"]
+ 
+ [project.optional-dependencies]
+ test = [
++  "beautifulsoup4",
++  "myst-parser",
+   "pytest",
+   "pytest-cov",
++  "pytest-regressions",
+   "pytest-xdist",
+ ]
+ doc = ["myst-parser", "furo"]
+diff --git a/tests/test_markup.py b/tests/test_markup.py
+index b311322..c9dedbf 100644
+--- a/tests/test_markup.py
++++ b/tests/test_markup.py
+@@ -1,12 +1,12 @@
+ """Tests to ensure that the generated markup is correct.
+ """
+ 
++import re
+ from pathlib import Path
+ 
+ import bs4
+ import pytest
+ from pytest_regressions.file_regression import FileRegressionFixture
+-from sphinx.testing.path import path as sphinx_path
+ from sphinx.testing.util import SphinxTestApp
+ 
+ DOCSET_ROOT = Path(__file__).parent / "docsets"
+@@ -21,9 +21,20 @@ def only_role_main(html: str) -> str:
+     soup = bs4.BeautifulSoup(html, "html.parser")
+     node = soup.find(attrs={"role": "main"})
+     assert node
++    # Remove clearer div (added in Sphinx 8) for consistent output across versions
++    for clearer in node.find_all("div", class_="clearer"):
++        clearer.decompose()
+     return node.prettify(formatter=bs4.formatter.HTMLFormatter(indent=2))
+ 
+ 
++def normalise_xml_source(xml: str, docset: Path) -> str:
++    """Normalise the source attribute in XML to use relative paths."""
++    # Replace absolute path with relative path for consistent output across machines
++    return re.sub(
++        rf'source="[^"]*{docset.name}/', f'source="tests/docsets/{docset.name}/', xml
++    )
++
++
+ @pytest.mark.parametrize("format", ["markdown", "restructuredtext"])
+ @pytest.mark.parametrize("builder", ["html", "xml"])
+ @pytest.mark.parametrize("docset", DOCSET_ROOT.glob("*"), ids=lambda path: path.name)
+@@ -35,8 +46,8 @@ def test_markup(
+     tmpdir: str,
+ ) -> None:
+     # GIVEN
+-    srcdir = sphinx_path(docset)
+-    builddir = sphinx_path(tmpdir)
++    srcdir = Path(docset)
++    builddir = Path(tmpdir)
+     app = SphinxTestApp(srcdir=srcdir, builddir=builddir, buildername=builder)
+ 
+     infile = Path(app.srcdir) / INPUT_FILES[format]
+@@ -49,4 +60,6 @@ def test_markup(
+     content = outfile.read_text()
+     if builder == "html":
+         content = only_role_main(content)
++    elif builder == "xml":
++        content = normalise_xml_source(content, docset)
+     file_regression.check(content, extension=f".{builder}")
+diff --git a/tests/test_markup/test_markup_basic_html_markdown_.html b/tests/test_markup/test_markup_basic_html_markdown_.html
+index 5d7a0af..1ad6b08 100644
+--- a/tests/test_markup/test_markup_basic_html_markdown_.html
++++ b/tests/test_markup/test_markup_basic_html_markdown_.html
+@@ -2,7 +2,7 @@
+   <section id="markdown">
+     <h1>
+       Markdown
+-      <a class="headerlink" href="#markdown" title="Permalink to this heading">
++      <a class="headerlink" href="#markdown" title="Link to this heading">
+         ¶
+       </a>
+     </h1>
+diff --git a/tests/test_markup/test_markup_basic_html_restructuredtext_.html b/tests/test_markup/test_markup_basic_html_restructuredtext_.html
+index c53bb0a..67dec93 100644
+--- a/tests/test_markup/test_markup_basic_html_restructuredtext_.html
++++ b/tests/test_markup/test_markup_basic_html_restructuredtext_.html
+@@ -2,7 +2,7 @@
+   <section id="restructuredtext">
+     <h1>
+       reStructuredText
+-      <a class="headerlink" href="#restructuredtext" title="Permalink to this heading">
++      <a class="headerlink" href="#restructuredtext" title="Link to this heading">
+         ¶
+       </a>
+     </h1>
+diff --git a/tests/test_markup/test_markup_basic_xml_markdown_.xml b/tests/test_markup/test_markup_basic_xml_markdown_.xml
+index 72676fc..a7ba02d 100644
+--- a/tests/test_markup/test_markup_basic_xml_markdown_.xml
++++ b/tests/test_markup/test_markup_basic_xml_markdown_.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE document PUBLIC "+//IDN docutils.sourceforge.net//DTD Docutils Generic//EN//XML" "http://docutils.sourceforge.net/docs/ref/docutils.dtd">
+-<!-- Generated by Docutils 0.20.1 -->
+-<document source="/Users/pradyunsg/Developer/github/sphinx-inline-tabs/tests/docsets/basic/markdown.md" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
++<!-- Generated by Docutils 0.21.2 -->
++<document source="tests/docsets/basic/markdown.md" translation_progress="{'total': 0, 'translated': 0}" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
+     <section ids="markdown" names="markdown">
+         <title>Markdown</title>
+         <label>Tab 1</label>
+diff --git a/tests/test_markup/test_markup_basic_xml_restructuredtext_.xml b/tests/test_markup/test_markup_basic_xml_restructuredtext_.xml
+index 383bba3..7afdf76 100644
+--- a/tests/test_markup/test_markup_basic_xml_restructuredtext_.xml
++++ b/tests/test_markup/test_markup_basic_xml_restructuredtext_.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE document PUBLIC "+//IDN docutils.sourceforge.net//DTD Docutils Generic//EN//XML" "http://docutils.sourceforge.net/docs/ref/docutils.dtd">
+-<!-- Generated by Docutils 0.20.1 -->
+-<document source="/Users/pradyunsg/Developer/github/sphinx-inline-tabs/tests/docsets/basic/restructuredtext.rst" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
++<!-- Generated by Docutils 0.21.2 -->
++<document source="tests/docsets/basic/restructuredtext.rst" translation_progress="{'total': 0, 'translated': 0}" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
+     <section ids="restructuredtext" names="restructuredtext">
+         <title>reStructuredText</title>
+         <label>Tab 1</label>
+diff --git a/tests/test_markup/test_markup_multiple_html_markdown_.html b/tests/test_markup/test_markup_multiple_html_markdown_.html
+index b203936..2dd0d21 100644
+--- a/tests/test_markup/test_markup_multiple_html_markdown_.html
++++ b/tests/test_markup/test_markup_multiple_html_markdown_.html
+@@ -2,7 +2,7 @@
+   <section id="markdown">
+     <h1>
+       Markdown
+-      <a class="headerlink" href="#markdown" title="Permalink to this heading">
++      <a class="headerlink" href="#markdown" title="Link to this heading">
+         ¶
+       </a>
+     </h1>
+diff --git a/tests/test_markup/test_markup_multiple_html_restructuredtext_.html b/tests/test_markup/test_markup_multiple_html_restructuredtext_.html
+index 0da28a4..198fd3e 100644
+--- a/tests/test_markup/test_markup_multiple_html_restructuredtext_.html
++++ b/tests/test_markup/test_markup_multiple_html_restructuredtext_.html
+@@ -2,7 +2,7 @@
+   <section id="restructuredtext">
+     <h1>
+       reStructuredText
+-      <a class="headerlink" href="#restructuredtext" title="Permalink to this heading">
++      <a class="headerlink" href="#restructuredtext" title="Link to this heading">
+         ¶
+       </a>
+     </h1>
+diff --git a/tests/test_markup/test_markup_multiple_xml_markdown_.xml b/tests/test_markup/test_markup_multiple_xml_markdown_.xml
+index 3b95938..2dd9455 100644
+--- a/tests/test_markup/test_markup_multiple_xml_markdown_.xml
++++ b/tests/test_markup/test_markup_multiple_xml_markdown_.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE document PUBLIC "+//IDN docutils.sourceforge.net//DTD Docutils Generic//EN//XML" "http://docutils.sourceforge.net/docs/ref/docutils.dtd">
+-<!-- Generated by Docutils 0.20.1 -->
+-<document source="/Users/pradyunsg/Developer/github/sphinx-inline-tabs/tests/docsets/multiple/markdown.md" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
++<!-- Generated by Docutils 0.21.2 -->
++<document source="tests/docsets/multiple/markdown.md" translation_progress="{'total': 0, 'translated': 0}" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
+     <section ids="markdown" names="markdown">
+         <title>Markdown</title>
+         <label>Tab 1</label>
+diff --git a/tests/test_markup/test_markup_multiple_xml_restructuredtext_.xml b/tests/test_markup/test_markup_multiple_xml_restructuredtext_.xml
+index 6fdc585..58be2d2 100644
+--- a/tests/test_markup/test_markup_multiple_xml_restructuredtext_.xml
++++ b/tests/test_markup/test_markup_multiple_xml_restructuredtext_.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE document PUBLIC "+//IDN docutils.sourceforge.net//DTD Docutils Generic//EN//XML" "http://docutils.sourceforge.net/docs/ref/docutils.dtd">
+-<!-- Generated by Docutils 0.20.1 -->
+-<document source="/Users/pradyunsg/Developer/github/sphinx-inline-tabs/tests/docsets/multiple/restructuredtext.rst" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
++<!-- Generated by Docutils 0.21.2 -->
++<document source="tests/docsets/multiple/restructuredtext.rst" translation_progress="{'total': 0, 'translated': 0}" xmlns:c="https://www.sphinx-doc.org/" xmlns:changeset="https://www.sphinx-doc.org/" xmlns:citation="https://www.sphinx-doc.org/" xmlns:cpp="https://www.sphinx-doc.org/" xmlns:index="https://www.sphinx-doc.org/" xmlns:js="https://www.sphinx-doc.org/" xmlns:math="https://www.sphinx-doc.org/" xmlns:py="https://www.sphinx-doc.org/" xmlns:rst="https://www.sphinx-doc.org/" xmlns:std="https://www.sphinx-doc.org/">
+     <section ids="restructuredtext" names="restructuredtext">
+         <title>reStructuredText</title>
+         <label>Tab 1</label>

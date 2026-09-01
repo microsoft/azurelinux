@@ -3,14 +3,14 @@
 
 Summary: Utilities for managing filesystem extended attributes
 Name: attr
-Version: 2.5.2
-Release: 9%{?dist}
+Version: 2.6.0
+Release: 1%{?dist}
 Source0: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz
 Source1: https://download.savannah.nongnu.org/releases/attr/attr-%{version}.tar.xz.sig
 # Retreived from https://savannah.nongnu.org/people/viewgpg.php?user_id=15000
-# Source2: agruen-key.gpg
+Source2: agruen-key.gpg
 # Retrieved from https://savannah.nongnu.org/people/viewgpg.php?user_id=42032
-Source2: vapier-key.gpg
+# Source2: vapier-key.gpg
 
 # xattr.conf: remove entries for NFSv4 ACLs namespaces (#1031423)
 # https://lists.nongnu.org/archive/html/acl-devel/2019-03/msg00000.html
@@ -20,8 +20,9 @@ Patch3:  0003-attr-2.4.48-xattr-conf-nfs4-acls.patch
 
 License: GPL-2.0-or-later
 URL: https://savannah.nongnu.org/projects/attr
+
+BuildRequires: gcc
 BuildRequires: gettext
-BuildRequires: libtool
 BuildRequires: make
 BuildRequires: gnupg2
 Requires: libattr%{?_isa} = %{version}-%{release}
@@ -80,7 +81,6 @@ sed -e 's|test/root/getfattr.test||' \
 
 %build
 %configure
-%make_build -C po ka.gmo
 %make_build
 
 %check
@@ -128,6 +128,16 @@ ln -fs ../sys/xattr.h $RPM_BUILD_ROOT%{_includedir}/attr/xattr.h
 %config(noreplace) %{_sysconfdir}/xattr.conf
 
 %changelog
+* Thu Jul 09 2026 Lukáš Zaoral <lzaoral@redhat.com> - 2.6.0-1
+- rebase to v2.6.0 to fix the following CVEs:
+  - CVE-2026-54371 - Symlink Traversal Privilege Escalation via getfattr (rhbz#2494172)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

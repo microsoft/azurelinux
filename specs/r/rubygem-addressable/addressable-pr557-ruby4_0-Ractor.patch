@@ -1,0 +1,26 @@
+From 2d934a90f74fd4598cd05582ee7c5a24b87c76a0 Mon Sep 17 00:00:00 2001
+From: Patrik Ragnarsson <patrik@starkast.net>
+Date: Mon, 10 Nov 2025 20:31:31 +0100
+Subject: [PATCH] CI: `Ractor` fix for Ruby 4.0
+
+Close https://github.com/sporkmonger/addressable/issues/556
+---
+ spec/addressable/uri_spec.rb | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/spec/addressable/uri_spec.rb b/spec/addressable/uri_spec.rb
+index 07818490..68ee3031 100644
+--- a/spec/addressable/uri_spec.rb
++++ b/spec/addressable/uri_spec.rb
+@@ -6816,9 +6816,10 @@ def to_str
+ describe Addressable::URI, "when initialized in a non-main `Ractor`" do
+   it "should have the same value as if used in the main `Ractor`" do
+     pending("Ruby 3.0+ for `Ractor` support") unless defined?(Ractor)
++    value_method = RUBY_VERSION >= "3.5.0" ? :value : :take # see https://github.com/ruby/ruby/pull/13445
+     main = Addressable::URI.parse("http://example.com")
+     expect(
+-      Ractor.new { Addressable::URI.parse("http://example.com") }.take
++      Ractor.new { Addressable::URI.parse("http://example.com") }.public_send(value_method)
+     ).to eq(main)
+   end
+ end

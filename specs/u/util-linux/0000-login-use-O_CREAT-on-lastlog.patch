@@ -1,0 +1,27 @@
+From a2357184ff3dc3beb001fcb12e1e4c0dcf8d0dbd Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 2 Dec 2025 16:15:44 +0100
+Subject: login: use O_CREAT on lastlog
+
+Addresses: https://bugzilla.redhat.com/show_bug.cgi?id=151635
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ login-utils/login.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/login-utils/login.c b/login-utils/login.c
+index 321f9d6ce..edc69fd9a 100644
+--- a/login-utils/login.c
++++ b/login-utils/login.c
+@@ -682,7 +682,7 @@ static void log_lastlog(struct login_context *cxt)
+ 	sa.sa_handler = SIG_IGN;
+ 	sigaction(SIGXFSZ, &sa, &oldsa_xfsz);
+ 
+-	fd = open(_PATH_LASTLOG, O_RDWR, 0);
++	fd = open(_PATH_LASTLOG, O_RDWR | O_CREAT, 0);
+ 	if (fd < 0)
+ 		goto done;
+ 	offset = cxt->pwd->pw_uid * sizeof(ll);
+-- 
+2.51.1
+

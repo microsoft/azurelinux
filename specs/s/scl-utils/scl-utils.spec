@@ -1,13 +1,12 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global __cmake_in_source_build 1
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
 Name:       scl-utils
 Epoch:      1
 Version:    2.0.3
-Release:    6%{dist}
+Release:    8%{dist}
 Summary:    Utilities for alternative packaging
 
 License:    GPL-2.0-or-later
@@ -38,15 +37,19 @@ Requires:   redhat-rpm-config
 %description build
 Essential RPM build macros for alternative packaging.
 
+
 %prep
 %autosetup -p1
+sed -e '/CMAKE_MINIMUM_REQUIRED/s/2.6/3.5/' -i CMakeLists.txt
+
 
 %build
-%cmake .
-make %{?_smp_mflags} CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
+%cmake
+%cmake_build
+
 
 %install
-make install DESTDIR=%{buildroot}
+%cmake_install
 if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
     mkdir -p %{buildroot}%{macrosdir}
     mv %{buildroot}%{_sysconfdir}/rpm/macros.scl %{buildroot}%{macrosdir}
@@ -59,8 +62,10 @@ mkdir modulefiles
 mkdir prefixes
 ln -s prefixes conf
 
+
 %check
-make check
+%ctest
+
 
 %files
 %dir %{_sysconfdir}/scl
@@ -85,7 +90,19 @@ make check
 %{_rpmconfigdir}/brp-scl-compress
 %{_rpmconfigdir}/brp-scl-python-bytecompile
 
+
 %changelog
+* Fri Feb 13 2026 Remi Collet <remi@remirepo.net> - 1:2.0.3-8
+- raise cmake minimum version to 3.5
+- use arch-agnostic test for packaging /usr/lib64 (Joe Orton, PR #2)
+
+* Thu Feb 12 2026 Cristian Le <git@lecris.dev> - 1:2.0.3-8
+- Allow CMake 4.0 (rhbz#2381440)
+- Use standard cmake macros (rhbz#2381120)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Aug  5 2025 Remi Collet <remi@remirepo.net> - 1:2.0.3-6
 - fix build with GCC 15 using patch from
   https://github.com/sclorg/scl-utils/pull/57

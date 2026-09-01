@@ -1,0 +1,61 @@
+From 5a6a225a3f938431666e0a9bf1c1ae5f5d721611 Mon Sep 17 00:00:00 2001
+From: Kadir Cetinkaya <kadircet@google.com>
+Date: Thu, 6 Mar 2025 12:20:44 +0100
+Subject: [PATCH] [clangd] Explicitly block until async task completes
+
+We started seeing some use-after-frees starting with #125433.
+
+This patch ensures we explicitly block for the async task, if there's
+one, before destructing std::future, independent of the stdlib
+implementation.
+---
+ clang-tools-extra/clangd/ClangdServer.cpp | 16 +++++++++++-----
+ clang-tools-extra/clangd/CodeComplete.h   |  1 -
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/clang-tools-extra/clangd/ClangdServer.cpp b/clang-tools-extra/clangd/ClangdServer.cpp
+index 52be15d3da936..49a97da2bfa42 100644
+--- a/clang-tools-extra/clangd/ClangdServer.cpp
++++ b/clang-tools-extra/clangd/ClangdServer.cpp
+@@ -460,18 +460,24 @@ void ClangdServer::codeComplete(PathRef File, Position Pos,
+     CodeCompleteResult Result = clangd::codeComplete(
+         File, Pos, IP->Preamble, ParseInput, CodeCompleteOpts,
+         SpecFuzzyFind ? &*SpecFuzzyFind : nullptr);
++    // We don't want `codeComplete` to wait for the async call if it doesn't use
++    // the result (e.g. non-index completion, speculation fails), so that `CB`
++    // is called as soon as results are available.
+     {
+       clang::clangd::trace::Span Tracer("Completion results callback");
+       CB(std::move(Result));
+     }
+-    if (SpecFuzzyFind && SpecFuzzyFind->NewReq) {
++    if (!SpecFuzzyFind)
++      return;
++    if (SpecFuzzyFind->NewReq) {
+       std::lock_guard<std::mutex> Lock(CachedCompletionFuzzyFindRequestMutex);
+       CachedCompletionFuzzyFindRequestByFile[File] = *SpecFuzzyFind->NewReq;
+     }
+-    // SpecFuzzyFind is only destroyed after speculative fuzzy find finishes.
+-    // We don't want `codeComplete` to wait for the async call if it doesn't use
+-    // the result (e.g. non-index completion, speculation fails), so that `CB`
+-    // is called as soon as results are available.
++    // Explicitly block until async task completes, this is fine as we've
++    // already provided reply to the client and running as a preamble task
++    // (i.e. won't block other preamble tasks).
++    if (SpecFuzzyFind->Result.valid())
++      SpecFuzzyFind->Result.wait();
+   };
+ 
+   // We use a potentially-stale preamble because latency is critical here.
+diff --git a/clang-tools-extra/clangd/CodeComplete.h b/clang-tools-extra/clangd/CodeComplete.h
+index bb2ebd9478645..cd41f04e4fb5c 100644
+--- a/clang-tools-extra/clangd/CodeComplete.h
++++ b/clang-tools-extra/clangd/CodeComplete.h
+@@ -274,7 +274,6 @@ struct SpeculativeFuzzyFind {
+   /// Set by `codeComplete()`. This can be used by callers to update cache.
+   std::optional<FuzzyFindRequest> NewReq;
+   /// The result is consumed by `codeComplete()` if speculation succeeded.
+-  /// NOTE: the destructor will wait for the async call to finish.
+   std::future<std::pair<bool /*Incomplete*/, SymbolSlab>> Result;
+ };
+ 

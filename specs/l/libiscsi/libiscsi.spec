@@ -3,26 +3,18 @@
 
 Name: libiscsi
 Summary: iSCSI client library
-Version: 1.20.0
-Release: 8%{?dist}
+Version: 1.20.3
+Release: 4%{?dist}
 License: LGPL-2.1-or-later
 URL: https://github.com/sahlberg/%{name}
 Source: https://github.com/sahlberg/libiscsi/archive/%{version}.tar.gz
 
-Patch0001: 0001-configure-add-with-libgcrypt-option.patch
-Patch0002: 0002-login-do-not-try-to-emulate-the-libgcrypt-API.patch
-Patch0003: 0003-login-add-support-for-gnutls.patch
-
-BuildRequires: make
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
-BuildRequires: popt-devel
 BuildRequires: CUnit-devel
 BuildRequires: gnutls-devel
-%ifnarch %{arm}
 BuildRequires: rdma-core-devel
-%endif
 
 %description
 libiscsi is a library for attaching to iSCSI resources across
@@ -37,12 +29,11 @@ a network.
 %global libiscsi_libdir %{_libdir}/iscsi
 
 %prep
-%autosetup -N -n libiscsi-%{version}
-%autopatch -p1
+%autosetup -n libiscsi-%{version}
 
 %build
 sh autogen.sh
-%configure --libdir=%{libiscsi_libdir} --disable-werror --without-libgcrypt --with-gnutls
+%configure --libdir=%{libiscsi_libdir} --disable-werror --with-gnutls
 make %{?_smp_mflags}
 
 %install
@@ -52,13 +43,16 @@ echo %{libiscsi_libdir} > $RPM_BUILD_ROOT/etc/ld.so.conf.d/%{name}-%{_arch}.conf
 rm $RPM_BUILD_ROOT/%{libiscsi_libdir}/libiscsi.a
 rm $RPM_BUILD_ROOT/%{libiscsi_libdir}/libiscsi.la
 
-%{?ldconfig_scriptlets}
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
 
 %files
 %license COPYING LICENCE-LGPL-2.1.txt
 %doc README.md TODO
 %dir %{libiscsi_libdir}
-%{libiscsi_libdir}/libiscsi.so.10*
+%{libiscsi_libdir}/libiscsi.so.11*
 %config /etc/ld.so.conf.d/*
 
 %package utils
@@ -81,6 +75,7 @@ to iSCSI servers without having to set up the Linux iSCSI initiator.
 %{_bindir}/iscsi-pr
 %{_bindir}/iscsi-discard
 %{_bindir}/iscsi-md5sum
+%{_bindir}/iscsi-rtpg
 %{_mandir}/man1/iscsi-ls.1.gz
 %{_mandir}/man1/iscsi-inq.1.gz
 %{_mandir}/man1/iscsi-swp.1.gz
@@ -102,6 +97,21 @@ The libiscsi-devel package includes the header files for libiscsi.
 %{_libdir}/pkgconfig/libiscsi.pc
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Sep 04 2025 Adam Williamson <awilliam@redhat.com> - 1.20.3-3
+- Bump to rebuild on a side tag
+
+* Tue Sep 02 2025 Martin Hoyer <mhoyer@redhat.com> - 1.20.3-2
+- Remove redundant libgcrypt patches
+- Update spec file reflecting upstream changes
+- iscsi-rtpg tool
+
+* Sun Aug 31 2025 Packit <hello@packit.dev> - 1.20.3-1
+- Update to version 1.20.3
+- Resolves: rhbz#2363861
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.20.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

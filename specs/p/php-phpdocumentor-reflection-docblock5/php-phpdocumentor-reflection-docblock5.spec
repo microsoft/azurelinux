@@ -18,7 +18,7 @@
 
 Name:           php-phpdocumentor-reflection-docblock%{major}
 Version:        5.6.6
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        DocBlock parser
 
 License:        MIT

@@ -3,7 +3,7 @@
 
 Name:           python-PyMySQL
 Version:        1.1.2
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Pure-Python MySQL client library
 
 License:        MIT

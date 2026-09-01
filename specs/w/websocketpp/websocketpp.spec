@@ -1,21 +1,29 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global basever 0.8.2
+%global commit b9aeec6eaf3d5610503439b4fae3581d9aff08e8
+%global shortcommit %{sub %{commit} 1 7}
+%global snapdate 20220525
 
 Name:    websocketpp
 Summary: C++ WebSocket Protocol Library
-Version: 0.8.2
-Release: 22%{?dist}
+Version: %{basever}%{?snapdate:^git%{snapdate}.%{shortcommit}}
+Release: 1%{?dist}
 
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD
 Url:     https://www.zaphoyd.com/websocketpp
+%if %{defined snapdate}
+Source0: https://github.com/zaphoyd/websocketpp/archive/%{commit}/%{name}-%{commit}.tar.gz
+%else
 Source0: https://github.com/zaphoyd/websocketpp/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+%endif
 Source1: websocketpp.pc
 BuildArch: noarch
 
 # put cmake files in share/cmake instead of lib/cmake
-Patch1: websocketpp-0.7.0-cmake_noarch.patch
+Patch1: websocketpp-0.8.3-cmake_noarch.patch
 
 # Switch from ExactVersion to AnyNewerVersion to improve compatibility
 # https://cmake.org/cmake/help/v3.0/module/CMakePackageConfigHelpers.html
@@ -28,19 +36,10 @@ Patch2: websocketpp-0.8.1-cmake-configversion-compatibility-anynewerversion.patc
 # Disable the following tests, which fail occasionally: test_transport, test_transport_asio_timers
 Patch3: websocketpp-0.7.0-disable-test_transport-test_transport_asio_timers.patch
 
-# Fix cmake find boost
-# https://github.com/zaphoyd/websocketpp/pull/855
-# https://github.com/zaphoyd/websocketpp/commit/3590d77
-Patch4: websocketpp-0.8.2-fix-cmake-find-boost.patch
-
-# fix c++20 build error
-# https://github.com/zaphoyd/websocketpp/issues/991
-# https://github.com/zaphoyd/websocketpp/commit/3197a520eb4c1e4754860441918a5930160373eb
-Patch5: websocketpp-0.8.2-cpp20-fixes.patch
-
-# Update minimum required CMake version to comply with CMake 4.0
-# https://github.com/zaphoyd/websocketpp/commit/deb0a334471362608958ce59a6b0bcd3e5b73c24
-Patch6: websocketpp-0.8.2-cmake40.patch
+# Compatibility fixes for Boost 1.87
+# https://github.com/zaphoyd/websocketpp/pull/1164
+# Patch from PR at commit ee8cf42, 2025-04-09
+Patch4: websocketpp-0.8.2-compatibility_fixes_for_boost_1.87.patch
 
 BuildRequires:  boost-devel
 BuildRequires:  cmake
@@ -69,7 +68,11 @@ iostreams and one based on Boost Asio.
 
 
 %prep
+%if %{defined snapdate}
+%autosetup -p1 -n %{name}-%{commit}
+%else
 %autosetup -p1
+%endif
 
 
 %build
@@ -100,6 +103,20 @@ rm -rfv %{buildroot}%{_includedir}/test_connection/
 
 
 %changelog
+* Tue Jan 27 2026 Wolfgang Stöggl <c72578@yahoo.de> - 0.8.2^git20220525.b9aeec6-1
+- Update to post-release git snapshot on 0.8.2
+- Add patch:
+  websocketpp-0.8.2-compatibility_fixes_for_boost_1.87.patch, which
+  fixes FTBFS with Boost 1.90
+- Update cmake_noarch patch
+- Drop patches:
+  websocketpp-0.8.2-fix-cmake-find-boost.patch
+  websocketpp-0.8.2-cpp20-fixes.patch
+  websocketpp-0.8.2-cmake40.patch
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.2-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

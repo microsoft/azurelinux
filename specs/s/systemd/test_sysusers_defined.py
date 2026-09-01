@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import sys
 
 def parse_sysusers_file(filename):
@@ -30,7 +31,9 @@ for arg in sys.argv[1:-1]:
 
 basic_users, basic_groups = parse_sysusers_file(sys.argv[-1])
 
-if d := basic_users - setup_users:
+ignored = set(os.getenv('IGNORED', '').split())
+
+if d := basic_users - setup_users - ignored:
     exit(f'We have new users: {d}')
-if d := basic_groups - setup_groups:
+if d := basic_groups - setup_groups - ignored:
     exit(f'We have new groups: {d}')

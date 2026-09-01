@@ -9,7 +9,7 @@ License:        Apache-2.0
 Summary:        A framework to implement simple but nice CLIs
 Epoch:          1
 Version:        2.0.2
-Release: 7%{?dist}
+Release:        5%{?dist}
 URL:            https://github.com/open-iscsi/configshell-fb
 Source:         %{url}/archive/v%{version}/%{oname}-%{version}.tar.gz
 BuildArch:      noarch
@@ -49,6 +49,9 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %doc COPYING README.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1:2.0.2-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

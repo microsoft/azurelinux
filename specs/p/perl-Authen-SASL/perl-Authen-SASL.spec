@@ -3,7 +3,7 @@
 
 Name:           perl-Authen-SASL
 Version:        2.2000
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        SASL Authentication framework for Perl
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Authen-SASL
@@ -97,6 +97,9 @@ make test
 %changelog
 * Thu Jan 29 2026 Jitka Plesnikova <jplesnik@redhat.com> - 2.2000-1
 - 2.2000 bump (rhbz#2435236)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1900-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Aug 05 2025 Jitka Plesnikova <jplesnik@redhat.com> - 2.1900-1
 - 2.1900 bump (rhbz#2386534)

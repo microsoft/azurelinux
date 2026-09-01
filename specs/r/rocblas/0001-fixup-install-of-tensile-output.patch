@@ -1,4 +1,4 @@
-From 3d82251d51a9804c28cb84d598084fc12ca0418f Mon Sep 17 00:00:00 2001
+From 87f3c0b3ebab78aa6d126633683720031d886313 Mon Sep 17 00:00:00 2001
 From: Tom Rix <trix@redhat.com>
 Date: Sat, 13 Jan 2024 14:36:01 -0500
 Subject: [PATCH] fixup install of tensile output
@@ -8,10 +8,10 @@ Subject: [PATCH] fixup install of tensile output
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/library/src/CMakeLists.txt b/library/src/CMakeLists.txt
-index 6acedfb2..2877c6e1 100755
+index f4bdfb5f9742..316779134314 100644
 --- a/library/src/CMakeLists.txt
 +++ b/library/src/CMakeLists.txt
-@@ -591,7 +591,7 @@ if( BUILD_WITH_TENSILE )
+@@ -823,7 +823,7 @@ if( BUILD_WITH_TENSILE )
    if (WIN32)
      set( ROCBLAS_TENSILE_LIBRARY_DIR "\${CPACK_PACKAGING_INSTALL_PREFIX}/bin/rocblas" CACHE PATH "path to tensile library" )
    else()
@@ -21,5 +21,5 @@ index 6acedfb2..2877c6e1 100755
    # For ASAN package, Tensile library files(which are not shared libraries) are not required
    if( NOT ENABLE_ASAN_PACKAGING )
 -- 
-2.43.0
+2.51.0
 

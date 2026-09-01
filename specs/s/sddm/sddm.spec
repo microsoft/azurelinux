@@ -6,7 +6,7 @@
 
 Name:           sddm
 Version:        0.21.0
-Release: 13%{?dist}
+Release:        13%{?dist}
 License:        GPL-2.0-or-later
 Summary:        QML based desktop and login manager
 
@@ -14,9 +14,16 @@ URL:            https://github.com/sddm/sddm
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 ## upstream patches
+# Raise to cmake 3.5 (for cmake4)
+Patch0:         https://github.com/sddm/sddm/commit/228778c2b4b7e26db1e1d69fe484ed75c5791c3a.patch
+
 # Port all themes to Qt 6
 # Submitted: https://github.com/sddm/sddm/pull/1876
 Patch1:         sddm-PR1876.patch
+
+# SDDM crashes on loginctl terminate-user/terminate-session
+# Submitted: https://github.com/sddm/sddm/pull/2103
+Patch2:         sddm-0.21.0-fix-restart-greeter-when-helper-is-in-a-wrong-state.patch
 
 ## upstreamable patches
 # Fix race with logind restart, and start seat0 if !CanGraphical on timer
@@ -89,7 +96,7 @@ Obsoletes: kde-settings-sddm < 20-5
 %if 0%{?fedora}
 # for /usr/share/backgrounds/default.{jxl,png}
 BuildRequires: desktop-backgrounds-compat
-BuildRequires: GraphicsMagick
+BuildRequires: ImageMagick
 Requires: desktop-backgrounds-compat
 # for jxl support
 Requires: kf6-kimageformats%{?_isa}
@@ -167,7 +174,7 @@ fi
 cp -v "/usr/share/backgrounds/default.${bg_file_ext}"  \
       "src/greeter/theme/background.${bg_file_ext}"
 ls -sh "src/greeter/theme/background.${bg_file_ext}"
-gm mogrify -resize 1920x1200 "src/greeter/theme/background.${bg_file_ext}"
+magick mogrify -resize 1920x1200 "src/greeter/theme/background.${bg_file_ext}"
 ls -sh "src/greeter/theme/background.${bg_file_ext}"
 
 if [ "$bg_file_ext" != "png" ]; then
@@ -299,6 +306,16 @@ ln -sr %{buildroot}%{_bindir}/sddm-greeter-qt6 %{buildroot}%{_bindir}/sddm-greet
 
 
 %changelog
+* Tue Feb 17 2026 Neal Gompa <ngompa@fedoraproject.org> - 0.21.0-13
+- Fix build with CMake 4
+- Switch GraphicsMagick with ImageMagick to fix JXL image resize failures
+
+* Sat Feb 07 2026 Basil Crow <me@basilcrow.com> - 0.21.0-12
+- Add patch to fix SDDM crashes on loginctl terminate-user/terminate-session
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.21.0-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

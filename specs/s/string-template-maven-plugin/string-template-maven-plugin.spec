@@ -5,7 +5,7 @@
 
 Name:           string-template-maven-plugin
 Version:        1.1
-Release: 21%{?dist}
+Release:        20%{?dist}
 Summary:        Execute StringTemplate files during a maven build
 
 License:        MIT
@@ -26,16 +26,15 @@ Patch:          %{name}-descriptor.patch
 
 BuildRequires:  maven-local-openjdk25
 BuildRequires:  mvn(org.antlr:ST4)
-BuildRequires:  mvn(org.apache.maven.plugins:maven-enforcer-plugin)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-plugin-plugin)
 BuildRequires:  mvn(org.apache.maven.plugin-tools:maven-plugin-annotations)
 BuildRequires:  mvn(org.codehaus.plexus:plexus-component-metadata)
 BuildRequires:  mvn(org.twdata.maven:mojo-executor-maven-plugin)
 
 %description
-This plugin allows you to execute StringTemplate template files during
-your build.  The values for templates can come from static declarations
-or from a Java class specified to be executed.
+This plugin allows you to execute StringTemplate template files during your
+build.  The values for templates can come from static declarations or from a
+Java class specified to be executed.
 
 %package javadoc
 Summary:        API documentation for %{name}
@@ -63,6 +62,9 @@ cp -p %{SOURCE1} .
 # We use xmvn-javadoc instead of maven-javadoc-plugin
 %pom_remove_plugin :maven-javadoc-plugin
 
+# This only enforces use of ancient maven and java versions
+%pom_remove_plugin :maven-enforcer-plugin
+
 # sonatype-oss-parent is deprecated in Fedora
 %pom_remove_parent
 
@@ -83,6 +85,12 @@ sed -i 's/1\.6/1.8/g' pom.xml tests/pom.xml \
 %files javadoc -f .mfiles-javadoc
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Sep 23 2025 Jerry James <loganjerry@gmail.com> - 1.1-19
+- Remove build dependency on maven-enforcer-plugin
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 1.1-18
 - Rebuilt for java-25-openjdk as preffered jdk
 

@@ -3,7 +3,7 @@
 
 Name:           perl-AppConfig
 Version:        1.71
-Release: 36%{?dist}
+Release:        33%{?dist}
 Summary:        Perl module for reading configuration files
 
 # Automatically converted from old format: GPL+ or Artistic - review is highly recommended.

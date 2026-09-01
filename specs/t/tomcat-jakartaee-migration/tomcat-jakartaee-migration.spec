@@ -3,7 +3,7 @@
 
 Name:           tomcat-jakartaee-migration
 Version:        1.0.9
-Release: 11%{?dist}
+Release:        9%{?dist}
 Summary:        Tomcat Migration Tool for Jakarta EE
 
 License:        Apache-2.0
@@ -68,6 +68,9 @@ API documentation for %{name}.
 %license LICENSE.txt
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.9-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Nov 17 2025 Dimitris Soumis <dsoumis@redhat.com> - 1.0.9-8
 - Disable manifest Class-Path in jakartaee-migration.jar to match Fedora system-JAR layout
 

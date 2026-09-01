@@ -1,0 +1,56 @@
+From a3b6182e1d6b69a37a6c841baa43b818251036b1 Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:29 +0200
+Subject: [PATCH 30/53] openssh-8.0p1-preserve-pam-errors
+
+---
+ auth-pam.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/auth-pam.c b/auth-pam.c
+index 70bcae83a..70b2b8580 100644
+--- a/auth-pam.c
++++ b/auth-pam.c
+@@ -551,7 +551,11 @@ sshpam_thread(void *ctxtp)
+ 		goto auth_fail;
+ 
+ 	if (!do_pam_account()) {
+-		sshpam_err = PAM_ACCT_EXPIRED;
++		/* Preserve PAM_PERM_DENIED and PAM_USER_UNKNOWN.
++		 * Backward compatibility for other errors. */
++		if (sshpam_err != PAM_PERM_DENIED
++			&& sshpam_err != PAM_USER_UNKNOWN)
++			sshpam_err = PAM_ACCT_EXPIRED;
+ 		goto auth_fail;
+ 	}
+ 	if (sshpam_authctxt->force_pwchange) {
+@@ -608,8 +612,10 @@ sshpam_thread(void *ctxtp)
+ 	    pam_strerror(sshpam_handle, sshpam_err))) != 0)
+ 		fatal_fr(r, "buffer error");
+ 	/* XXX - can't do much about an error here */
+-	if (sshpam_err == PAM_ACCT_EXPIRED)
+-		ssh_msg_send(ctxt->pam_csock, PAM_ACCT_EXPIRED, buffer);
++	if (sshpam_err == PAM_PERM_DENIED
++		|| sshpam_err == PAM_USER_UNKNOWN
++		|| sshpam_err == PAM_ACCT_EXPIRED)
++		ssh_msg_send(ctxt->pam_csock, sshpam_err, buffer);
+ 	else if (sshpam_maxtries_reached)
+ 		ssh_msg_send(ctxt->pam_csock, PAM_MAXTRIES, buffer);
+ 	else
+@@ -913,9 +919,11 @@ sshpam_query(void *ctx, char **name, char **info,
+ 			free(msg);
+ 			break;
+ 		case PAM_ACCT_EXPIRED:
++			sshpam_account_status = 0;
++			/* FALLTHROUGH */
+ 		case PAM_MAXTRIES:
+-			if (type == PAM_ACCT_EXPIRED)
+-				sshpam_account_status = 0;
++		case PAM_USER_UNKNOWN:
++		case PAM_PERM_DENIED:
+ 			if (type == PAM_MAXTRIES)
+ 				sshpam_set_maxtries_reached(1);
+ 			/* FALLTHROUGH */
+-- 
+2.52.0
+

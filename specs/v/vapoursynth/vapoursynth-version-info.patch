@@ -6,7 +6,7 @@ diff -Naur vapoursynth-R65.old/Makefile.am vapoursynth-R65/Makefile.am
  pkgconfig_DATA += pc/vapoursynth.pc
  
 -libvapoursynth_la_LDFLAGS = -no-undefined -avoid-version $(UNDEFINEDLDFLAGS)
-+libvapoursynth_la_LDFLAGS = -no-undefined -version-info $(PACKAGE_VERSION) $(UNDEFINEDLDFLAGS)
++libvapoursynth_la_LDFLAGS = -no-undefined -version-number 0:1 $(UNDEFINEDLDFLAGS)
  libvapoursynth_la_CPPFLAGS = $(PTHREAD_CFLAGS) $(ZIMG_CFLAGS) -DVS_PATH_PLUGINDIR='"$(PLUGINDIR)"' -DVS_CURRENT_RELEASE='$(VSCURRENTRELEASE)'
  libvapoursynth_la_LIBADD = $(PTHREAD_LIBS) $(ZIMG_LIBS) $(DLOPENLIB)
  

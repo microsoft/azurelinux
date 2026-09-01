@@ -1,6 +1,6 @@
-diff -rupN --no-dereference nuspell-5.1.6/src/nuspell/CMakeLists.txt nuspell-5.1.6-new/src/nuspell/CMakeLists.txt
---- nuspell-5.1.6/src/nuspell/CMakeLists.txt	2024-07-04 13:45:35.000000000 +0200
-+++ nuspell-5.1.6-new/src/nuspell/CMakeLists.txt	2024-07-05 09:59:49.374087496 +0200
+diff -rupN --no-dereference nuspell-5.1.7/src/nuspell/CMakeLists.txt nuspell-5.1.7-new/src/nuspell/CMakeLists.txt
+--- nuspell-5.1.7/src/nuspell/CMakeLists.txt	2025-11-25 14:26:17.000000000 +0100
++++ nuspell-5.1.7-new/src/nuspell/CMakeLists.txt	2025-11-27 07:22:54.078364192 +0100
 @@ -23,6 +23,10 @@ set_target_properties(nuspell PROPERTIES
  	SOVERSION ${PROJECT_VERSION_MAJOR}
  	CXX_VISIBILITY_PRESET hidden)

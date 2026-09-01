@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.1.2
-Release: 24%{?dist}
+Release: 21%{?dist}
 Summary: Facets-bread collection of Hash-like classes
 # Automatically converted from old format: BSD - review is highly recommended.
 License: LicenseRef-Callaway-BSD

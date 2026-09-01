@@ -3,7 +3,7 @@
 
 Name:           rpm-mpi-hooks
 Version:        8
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        RPM dependency generator hooks for MPI packages
 
 License:        MIT

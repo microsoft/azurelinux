@@ -6,7 +6,7 @@
 
 Name:           python-sphinx-tabs
 Version:        3.4.7
-Release: 9%{?dist}
+Release:        8%{?dist}
 Summary:        Tabbed views for Sphinx
 # SPDX
 License:        MIT
@@ -16,6 +16,8 @@ Source0:        https://github.com/executablebooks/%{pypi_name}/archive/v%{versi
 # Open PR for Python Sphinx 8.1 issues with tests
 # https://bugzilla.redhat.com/show_bug.cgi?id=2330154
 Patch0:         https://patch-diff.githubusercontent.com/raw/executablebooks/sphinx-tabs/pull/200.patch
+# Make tests pass with docutils 0.22+
+Patch1:         https://github.com/executablebooks/sphinx-tabs/pull/207.patch
 BuildArch:      noarch
 
 
@@ -56,10 +58,6 @@ Requires:       python3-%{pypi_name}
 %prep
 %autosetup -p1 -n %{pypi_name}-%{version}
 
-# The official package doesn't support docutils 0.19 yet
-# It's OK to relax the requirement, the docs are rendered without visual issues
-# https://github.com/executablebooks/sphinx-tabs/issues/171
-sed -i "s/docutils~=0.18.0/docutils<0.21.0/" setup.py
 
 %build
 %pyproject_wheel
@@ -85,6 +83,12 @@ PYTHONPATH=$(pwd) sphinx-build -b html docs html_docs
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.4.7-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Nov 19 2025 Karolina Surma <ksurma@redhat.com> - 3.4.7-7
+- Fix build with docutils 0.22+
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.4.7-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

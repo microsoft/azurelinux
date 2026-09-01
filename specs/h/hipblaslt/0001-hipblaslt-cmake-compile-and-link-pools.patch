@@ -1,0 +1,49 @@
+From 8b2c3e3316334a2b251cdcd3f73130d2dfea2d0d Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sun, 7 Dec 2025 07:13:20 -0800
+Subject: [PATCH] hipblaslt cmake compile and link pools
+
+---
+ CMakeLists.txt | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d02df50540c2..8e8173fc4205 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -62,6 +62,32 @@ option(HIPBLASLT_BUNDLE_PYTHON_DEPS "Build python dependencies requied for devic
+ option(HIPBLASLT_ENABLE_COVERAGE "Build coverage support." OFF)
+ option(HIPBLASLT_ENABLE_THEROCK "Build hipBLASLt for TheRock." OFF)
+ 
++#
++# Seperate linking jobs from compiling
++# Too many concurrent linking jobs can break the build
++# Copied from LLVM
++set(HIPBLASLT_PARALLEL_LINK_JOBS "" CACHE STRING
++  "Define the maximum number of concurrent link jobs (Ninja only).")
++if(CMAKE_GENERATOR MATCHES "Ninja")
++  if(HIPBLASLT_PARALLEL_LINK_JOBS)
++    set_property(GLOBAL APPEND PROPERTY JOB_POOLS link_job_pool=${HIPBLASLT_PARALLEL_LINK_JOBS})
++    set(CMAKE_JOB_POOL_LINK link_job_pool)
++  endif()
++elseif(HIPBLASLT_PARALLEL_LINK_JOBS)
++  message(WARNING "Job pooling is only available with Ninja generators.")
++endif()
++# Similar for compiling
++set(HIPBLASLT_PARALLEL_COMPILE_JOBS "" CACHE STRING
++  "Define the maximum number of concurrent compile jobs (Ninja only).")
++if(CMAKE_GENERATOR MATCHES "Ninja")
++  if(HIPBLASLT_PARALLEL_COMPILE_JOBS)
++    set_property(GLOBAL APPEND PROPERTY JOB_POOLS compile_job_pool=${HIPBLASLT_PARALLEL_COMPILE_JOBS})
++    set(CMAKE_JOB_POOL_COMPILE compile_job_pool)
++  endif()
++elseif(HIPBLASLT_PARALLEL_COMPILE_JOBS)
++  message(WARNING "Job pooling is only available with Ninja generators.")
++endif()
++
+ option(TENSILELITE_ENABLE_HOST "Build the tensilelite host library." ON)
+ option(TENSILELITE_BUILD_TESTING "Build client when building tests" OFF)
+ option(TENSILELITE_ENABLE_CLIENT "Build tensilelite client" ${TENSILELITE_BUILD_TESTING})
+-- 
+2.52.0
+

@@ -6,19 +6,14 @@
 Summary:        Settings tool for Ethernet NICs
 Name:           ethtool
 Epoch:          2
-Version:        6.15
-Release: 7%{?dist}
+Version:        7.1
+Release:        1%{?dist}
 # {json_print,qsfp,sff-common}.{c,h} are GPL-2.0-or-later, rest is GPL-2.0-only
 License:        GPL-2.0-only AND GPL-2.0-or-later
 URL:            https://www.kernel.org/pub/software/network/%{name}/
 Source0:        https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.xz
 Source1:        https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.sign
 Source2:        https://keys.openpgp.org/vks/v1/by-fingerprint/D2CB120AB45957B721CD9596F4554567B91DE934
-# netlink: fix missing headers in text output
-Patch0:         https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/patch/?id=b70c928661024cd07914feb49122275daab904ea#/ethtool-netlink-fix-missing-headers.diff
-# follow-up fix to allow building with -Werror=format-security
-# https://www.spinics.net/lists/netdev/msg1111128.html
-Patch1:         ethtool-netlink-fix-print_string.diff
 BuildRequires:  gnupg2, xz
 BuildRequires:  gcc
 BuildRequires:  libappstream-glib
@@ -57,6 +52,18 @@ appstream-util validate-relax --nonet $RPM_BUILD_ROOT%{_metainfodir}/%{appstream
 %{_metainfodir}/%{appstream_id}.metainfo.xml
 
 %changelog
+* Sat Jul 18 2026 Robert Scheck <robert@fedoraproject.org> - 2:7.1-1
+- Upgrade to 7.1 (#2498384)
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:7.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Apr 28 2026 Robert Scheck <robert@fedoraproject.org> - 2:7.0-1
+- Upgrade to 7.0 (#2463460)
+
+* Fri Mar 06 2026 Robert Scheck <robert@fedoraproject.org> - 2:6.19-1
+- Upgrade to 6.19 (#2444822)
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:6.15-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

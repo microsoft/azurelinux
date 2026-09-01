@@ -61,26 +61,25 @@ Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 Requires:       %{name}-util-visitor = %{version}-%{release}
 
-%global _desc %{expand:
-Flexmark-java is a Java CommonMark (spec 0.28) parser using the blocks
-first, inlines after Markdown parsing architecture.
+%global _desc %{expand:Flexmark-java is a Java CommonMark (spec 0.28) parser using the blocks first,
+inlines after Markdown parsing architecture.
 
-Its strengths are speed, flexibility, Markdown source element based AST
-with details of the source position down to individual characters of
-lexemes that make up the element and extensibility.
+Its strengths are speed, flexibility, Markdown source element based AST with
+details of the source position down to individual characters of lexemes that
+make up the element and extensibility.
 
-The API allows granular control of the parsing process and is optimized
-for parsing with a large number of installed extensions.  The parser and
-extensions come with plenty of options for parser behavior and HTML
-rendering variations.  The end goal is to have the parser and renderer
-be able to mimic other parsers with great degree of accuracy.  This is
-now partially complete with the implementation of Markdown Processor
-Emulation.}
+The API allows granular control of the parsing process and is optimized for
+parsing with a large number of installed extensions.  The parser and
+extensions come with plenty of options for parser behavior and HTML rendering
+variations.  The end goal is to have the parser and renderer be able to mimic
+other parsers with great degree of accuracy.  This is now partially complete
+with the implementation of Markdown Processor Emulation.}
 
-%description %_desc
+%description
+%_desc
 
-This package contains the core library for parsing markdown and
-rendering to HTML.
+This package contains the core library for parsing markdown and rendering to
+HTML.
 
 %{?javadoc_package}
 
@@ -132,7 +131,8 @@ Requires:       %{name}-util-sequence = %{version}-%{release}
 Requires:       %{name}-util-visitor = %{version}-%{release}
 Requires:       %{name}-youtrack-converter = %{version}-%{release}
 
-%description    all %_desc
+%description    all
+%_desc
 
 This package provides all of the extension and converter modules.
 
@@ -142,7 +142,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-ext-autolink = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-abbreviation %_desc
+%description    ext-abbreviation
+%_desc
 
 This package contains an extension for defining abbreviations and
 turning appearance of these abbreviations in text into <abbr> tags with
@@ -153,7 +154,8 @@ Summary:        Flexmark extension for admonition syntax processing
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-admonition %_desc
+%description    ext-admonition
+%_desc
 
 This package contains an extension for Admonition Extension, Material
 for MkDocs syntax processing, to create block-styled side content.
@@ -163,7 +165,8 @@ Summary:        Flexmark extension to generate anchor links for headers
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-anchorlink %_desc
+%description    ext-anchorlink
+%_desc
 
 This package contains an extension for generating anchor links for
 headings using a GitHub-compatible ID algorithm, with options for the
@@ -175,7 +178,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-jira-converter = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-aside %_desc
+%description    ext-aside
+%_desc
 
 This package contains an extension for converting text prefixed with `|`
 to aside tags.  The syntax is the same as block quotes with the marker
@@ -186,7 +190,8 @@ Summary:        Flexmark extension for attributes
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-attributes %_desc
+%description    ext-attributes
+%_desc
 
 This package contains an extension that converts attribute syntax
 (`{...}`) into attribute AST nodes and adds an attribute provider to set
@@ -198,7 +203,8 @@ Summary:        Flexmark extension for autolinking
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-autolink %_desc
+%description    ext-autolink
+%_desc
 
 This package contains an extension for turning plain URLs and email
 addresses into links.
@@ -208,7 +214,8 @@ Summary:        Flexmark extension for definition list processing
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-definition %_desc
+%description    ext-definition
+%_desc
 
 This package contains an extension for definition list processing.
 
@@ -218,7 +225,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-jira-converter = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-emoji %_desc
+%description    ext-emoji
+%_desc
 
 This package contains an extension for emoji shortcuts.  It converts
 Emoji Cheat Sheet and GitHub Emoji API shortcuts to characters on the
@@ -230,7 +238,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-ext-attributes = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-enumerated-reference %_desc
+%description    ext-enumerated-reference
+%_desc
 
 This package contains an extension for enumerated reference processing.
 
@@ -239,7 +248,8 @@ Summary:        Flexmark extension for escaped characters
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-escaped-character %_desc
+%description    ext-escaped-character
+%_desc
 
 This package contains an extension for converting escaped characters to
 AST EscapedCharacter nodes.  It has no effect on rendered HTML.
@@ -249,7 +259,8 @@ Summary:        Flexmark extension for footnotes
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-footnotes %_desc
+%description    ext-footnotes
+%_desc
 
 This package contains an extension that converts footnote references and
 definitions to HTML footnotes.
@@ -259,7 +270,8 @@ Summary:        Flexmark extension for GitHub issue syntax
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-gfm-issues %_desc
+%description    ext-gfm-issues
+%_desc
 
 This package contains an extension that converts GitHub Flavored
 Markdown issue syntax to HTML links.
@@ -269,7 +281,8 @@ Summary:        Flexmark extension for GitHub strikethrough syntax
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-gfm-strikethrough %_desc
+%description    ext-gfm-strikethrough
+%_desc
 
 This package contains an extension that converts GitHub Flavored
 Markdown strikethrough syntax (~~) to HTML.
@@ -279,7 +292,8 @@ Summary:        Flexmark extension for GitHub task list items
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-gfm-tasklist %_desc
+%description    ext-gfm-tasklist
+%_desc
 
 This package contains an extension that converts GitHub Flavored
 Markdown bullet list items that start with [ ], [x], or [X] to an AST
@@ -290,7 +304,8 @@ Summary:        Flexmark extension for GitHub user syntax
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-gfm-users %_desc
+%description    ext-gfm-users
+%_desc
 
 This package contains an extension that converts GitHub Flavored
 Markdown user syntax to links.
@@ -300,7 +315,8 @@ Summary:        Flexmark extension for GitLab Flavored Markdown
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-gitlab %_desc
+%description    ext-gitlab
+%_desc
 
 This package contains an extension that parses and renders GitLab
 Flavored Markdown.
@@ -310,7 +326,8 @@ Summary:        Flexmark extension for inserted text
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-ins %_desc
+%description    ext-ins
+%_desc
 
 This package contains an extension that converts `++text++` syntax into
 `<ins>text</ins>`, the HTML syntax for inserted text.
@@ -321,7 +338,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-ext-yaml-front-matter = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-jekyll-front-matter %_desc
+%description    ext-jekyll-front-matter
+%_desc
 
 This package contains an extension that converts Jekyll front matter
 YAML to an AST JekyllFrontMatterBlock node.
@@ -331,7 +349,8 @@ Summary:        Flexmark extension for Jekyll tag parsing
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-jekyll-tag %_desc
+%description    ext-jekyll-tag
+%_desc
 
 This package contains an extension that converts Jekyll tags of the form
 `{% tag tag-parameters %}` into AST JekyllTag or JekyllTagBlock nodes.
@@ -342,7 +361,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-ext-gitlab = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-macros %_desc
+%description    ext-macros
+%_desc
 
 This package contains an extension that converts macro text to macro
 definitions and macro references.
@@ -351,7 +371,8 @@ definitions and macro references.
 Summary:        Flexmark extension for HTML5 media tags
 Requires:       %{name} = %{version}-%{release}
 
-%description    ext-media-tags %_desc
+%description    ext-media-tags
+%_desc
 
 This package contains an extension for embedding media using HTML5 media
 tags, in particular the audio, embed, picture, and video tags.
@@ -360,7 +381,8 @@ tags, in particular the audio, embed, picture, and video tags.
 Summary:        Flexmark extension to set image size
 Requires:       %{name} = %{version}-%{release}
 
-%description    ext-resizable-image %_desc
+%description    ext-resizable-image
+%_desc
 
 This package contains an extension to set the width and height of images
 by stating them as `![text](/src =WxH)`, which is used in Azure DevOps
@@ -372,7 +394,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-test-util = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-spec-example %_desc
+%description    ext-spec-example
+%_desc
 
 This package contains an extension that converts flexmark spec example
 syntax into AST nodes.
@@ -382,7 +405,8 @@ Summary:        Flexmark extension for superscript processing
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-superscript %_desc
+%description    ext-superscript
+%_desc
 
 This package contains an extension that converts `^superscript^` syntax
 into `<sup>superscript</sup>`.
@@ -392,7 +416,8 @@ Summary:        Flexmark extension for tables
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-tables %_desc
+%description    ext-tables
+%_desc
 
 This package contains an extension for tables using `|` pipes with
 optional column spans and table caption.
@@ -402,7 +427,8 @@ Summary:        Flexmark extension for table of contents
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-toc %_desc
+%description    ext-toc
+%_desc
 
 This package contains an extension that converts `[TOC style]` text to
 AST TocBlock, SimToc, and SimTocContent nodes.
@@ -412,7 +438,8 @@ Summary:        Flexmark extension for typographic processing
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-typographic %_desc
+%description    ext-typographic
+%_desc
 
 This package contains an extension for typographic processing.  It
 converts:
@@ -429,7 +456,8 @@ Summary:        Flexmark extension for wiki links
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-wikilink %_desc
+%description    ext-wikilink
+%_desc
 
 This package contains an extension that converts references that are
 wrapped in `[[]]` into wiki links with optional text separated by `|`.
@@ -440,7 +468,8 @@ Summary:        Flexmark extension for xwiki application-specific macros
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-xwiki-macros %_desc
+%description    ext-xwiki-macros
+%_desc
 
 This package contains an extension for xwiki application-specific
 macros.  Both block and inline macros are supported.
@@ -450,7 +479,8 @@ Summary:        Flexmark extension for YAML front matter
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-yaml-front-matter %_desc
+%description    ext-yaml-front-matter
+%_desc
 
 This package contains an extension for YAML front matter.
 
@@ -458,7 +488,8 @@ This package contains an extension for YAML front matter.
 Summary:        Flexmark extension for YouTube links
 Requires:       %{name} = %{version}-%{release}
 
-%description    ext-youtube-embedded %_desc
+%description    ext-youtube-embedded
+%_desc
 
 This package contains an extension for converting YouTube links to
 embedded video iframes.
@@ -468,7 +499,8 @@ Summary:        Flexmark extension for zzzzzz
 Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    ext-zzzzzz %_desc
+%description    ext-zzzzzz
+%_desc
 
 This package contains an extension that supports zzzzzz syntax.
 
@@ -478,7 +510,8 @@ Requires:       %{name} = %{version}-%{release}
 Requires:       %{name}-ext-emoji = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    html2md-converter %_desc
+%description    html2md-converter
+%_desc
 
 This package contains a customizable extension to convert HTML to
 Markdown.
@@ -493,7 +526,8 @@ Requires:       %{name}-ext-tables = %{version}-%{release}
 Requires:       %{name}-ext-wikilink = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    jira-converter %_desc
+%description    jira-converter
+%_desc
 
 This package contains an extension for rendering flexmark AST as Jira
 formatted text.
@@ -546,7 +580,8 @@ Requires:       %{name}-util-sequence = %{version}-%{release}
 Requires:       %{name}-util-visitor = %{version}-%{release}
 Requires:       %{name}-youtrack-converter = %{version}-%{release}
 
-%description    osgi %_desc
+%description    osgi
+%_desc
 
 This package contains all extension modules and converter modules except
 the PDF converter in OSGi bundle format.
@@ -559,7 +594,8 @@ Requires:       %{name}-util-format = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 
-%description    test-util %_desc
+%description    test-util
+%_desc
 
 This package contains test utilities.
 
@@ -569,7 +605,8 @@ Requires:       %{name}-util-ast = %{version}-%{release}
 Requires:       %{name}-util-collection = %{version}-%{release}
 Requires:       %{name}-util-data = %{version}-%{release}
 
-%description    tree-iteration %_desc
+%description    tree-iteration
+%_desc
 
 This package contains a library that allows recursive child and sibling
 iteration with filtering, recursion and item mapping provided by
@@ -589,7 +626,8 @@ Requires:       %{name}-util-options = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 Requires:       %{name}-util-visitor = %{version}-%{release}
 
-%description    util %_desc
+%description    util
+%_desc
 
 This package contains utility classes.
 
@@ -601,7 +639,8 @@ Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 Requires:       %{name}-util-visitor = %{version}-%{release}
 
-%description    util-ast %_desc
+%description    util-ast
+%_desc
 
 This package contains AST utility classes.
 
@@ -610,7 +649,8 @@ Summary:        Flexmark builder utilities
 Requires:       %{name}-util-data = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 
-%description    util-builder %_desc
+%description    util-builder
+%_desc
 
 This package contains builder utility classes.
 
@@ -618,7 +658,8 @@ This package contains builder utility classes.
 Summary:        Flexmark collection utilities
 Requires:       %{name}-util-misc = %{version}-%{release}
 
-%description    util-collection %_desc
+%description    util-collection
+%_desc
 
 This package contains collection utility classes.
 
@@ -626,7 +667,8 @@ This package contains collection utility classes.
 Summary:        Flexmark data utilities
 Requires:       %{name}-util-misc = %{version}-%{release}
 
-%description    util-data %_desc
+%description    util-data
+%_desc
 
 This package contains data utility classes.
 
@@ -636,7 +678,8 @@ Requires:       %{name}-util-collection = %{version}-%{release}
 Requires:       %{name}-util-data = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 
-%description    util-dependency %_desc
+%description    util-dependency
+%_desc
 
 This package contains dependency utility classes.
 
@@ -648,7 +691,8 @@ Requires:       %{name}-util-data = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 
-%description    util-experimental %_desc
+%description    util-experimental
+%_desc
 
 This package contains experimental utility classes that may or may not
 work in all cases.  Use at your own risk.
@@ -662,7 +706,8 @@ Requires:       %{name}-util-html = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 
-%description    util-format %_desc
+%description    util-format
+%_desc
 
 This package contains format utility classes.
 
@@ -684,7 +729,8 @@ Summary:        Flexmark HTML utilities
 Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 
-%description    util-html %_desc
+%description    util-html
+%_desc
 
 This package contains HTML utility classes.
 
@@ -695,7 +741,8 @@ This package contains HTML utility classes.
 License:        BSD-2-Clause AND Apache-2.0
 Summary:        Flexmark miscellaneous utilities
 
-%description    util-misc %_desc
+%description    util-misc
+%_desc
 
 This package contains miscellaneous utility classes.
 
@@ -704,7 +751,8 @@ Summary:        Flexmark options utilities
 Requires:       %{name}-util-misc = %{version}-%{release}
 Requires:       %{name}-util-sequence = %{version}-%{release}
 
-%description    util-options %_desc
+%description    util-options
+%_desc
 
 This package contains options utility classes.
 
@@ -714,14 +762,16 @@ Requires:       %{name}-util-collection = %{version}-%{release}
 Requires:       %{name}-util-data = %{version}-%{release}
 Requires:       %{name}-util-misc = %{version}-%{release}
 
-%description    util-sequence %_desc
+%description    util-sequence
+%_desc
 
 This package contains sequence utility classes.
 
 %package        util-visitor
 Summary:        Flexmark visitor utilities
 
-%description    util-visitor %_desc
+%description    util-visitor
+%_desc
 
 This package contains visitor utility classes.
 
@@ -732,7 +782,8 @@ Requires:       %{name}-ext-gfm-strikethrough = %{version}-%{release}
 Requires:       %{name}-ext-tables = %{version}-%{release}
 Requires:       %{name}-util = %{version}-%{release}
 
-%description    youtrack-converter %_desc
+%description    youtrack-converter
+%_desc
 
 This package contains an extension that renders flexmark AST as YouTrack
 formatted text (before YouTrack implemented Markdown comment option).
@@ -891,14 +942,14 @@ done
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.64.6-16
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 0.64.6-16
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.64.6-15
-- build: mass rebuild auto-bumpable components
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.64.6-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 0.64.6-14
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Mon Jan 12 2026 Jerry James <loganjerry@gmail.com> - 0.64.6-14
+- Reflow the description text
 
 * Tue Jul 29 2025 Jiri Vanek <jvanek@redhat.com> - 0.64.6-13
 - Rebuilt for java-25-openjdk as preffered jdk

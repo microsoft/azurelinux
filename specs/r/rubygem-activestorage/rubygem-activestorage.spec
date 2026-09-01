@@ -15,19 +15,22 @@
 %bcond_with js_recompilation
 
 Name: rubygem-%{gem_name}
-Version: 8.0.2
-Release: 6%{?dist}
+Version: 8.0.3
+Release: 3%{?dist}
 Summary: Local and cloud file storage framework
 License: MIT
 URL: https://rubyonrails.org
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}%{?prerelease}.gem
 # git clone https://github.com/rails/rails.git && cd rails/activestorage
-# git archive -v -o activestorage-8.0.2-tests.tar.gz v8.0.2 test/
+# git archive -v -o activestorage-8.0.3-tests.tar.gz v8.0.3 test/
 Source1: %{gem_name}-%{version}%{?prerelease}-tests.tar.gz
 # Source code of pregenerated JS files.
 # git clone https://github.com/rails/rails.git && cd rails/activestorage
-# git archive -v -o activestorage-8.0.2-js.tar.gz v8.0.2 package.json rollup.config.js
+# git archive -v -o activestorage-8.0.3-js.tar.gz v8.0.3 package.json rollup.config.js
 Source2: %{gem_name}-%{version}%{?prerelease}-js.tar.gz
+# Fix a test failing with FFmpeg 8
+# https://github.com/rails/rails/issues/56069
+Patch0: %{gem_name}-ffmpeg8.patch
 
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
@@ -70,6 +73,8 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version}%{?prerelease} -b1 -b2
+cd ..
+%patch -P0 -p0 -b .ffmpeg8
 
 %build
 %if %{with js_recompilation}
@@ -176,6 +181,16 @@ bundle exec ruby -Itest -ractive_storage/engine -e 'Dir.glob "./test/**/*_test.r
 %doc %{gem_instdir}/README.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Oct 15 2025 Dominik Mierzejewski <dominik@greysector.net> - 8.0.3-2
+- Fixed a test failing with FFmpeg 8
+
+* Mon Oct 06 2025 Vít Ondruch <vondruch@redhat.com> - 8.0.3-1
+- Update to Active Storage 8.0.3.
+  Related: rhzb#2388437
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

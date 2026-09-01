@@ -1,0 +1,127 @@
+From 2038c2c1c197375976437d3ed09017548f74bd42 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Mon, 5 Jan 2026 11:04:39 -0500
+Subject: [PATCH] Migrate from pkg_resources
+
+The usage of pkg_resources (subpackage of setuptools distribution)
+is discouraged.
+
+https://setuptools.pypa.io/en/latest/pkg_resources.html:
+
+  Use of pkg_resources is discouraged in favor of importlib.resources,
+  importlib.metadata, and their backports (importlib_resources,
+  importlib_metadata). Please consider using those libraries instead
+  of pkg_resources.
+
+freeipa-healthcheck uses several points of pkg_resources:
+
+ * pkg_resources.iter_entry_points to access entry points.
+   migration: https://importlib-metadata.readthedocs.io/en/latest/migration.html#pkg-resources-iter-entry-points
+ * pkg_resources.get_distribution to access a distribution.
+   migration: https://importlib-metadata.readthedocs.io/en/latest/migration.html#pkg-resources-get-distribution
+ * __import__('pkg_resources').declare_namespace
+   https://packaging.python.org/en/latest/guides/packaging-namespace-packages/#creating-a-namespace-package
+
+Compatibility note: importlib.metadata is in stdlib since Python 3.8:
+https://docs.python.org/3/library/importlib.metadata.html
+
+Fixes: https://github.com/freeipa/freeipa-healthcheck/issues/273
+
+Signed-off-by: Rob Crittenden <rcritten@redhat.com>
+---
+ setup.py                        | 12 ++++++++++--
+ src/ipahealthcheck/__init__.py  |  5 -----
+ src/ipahealthcheck/core/core.py | 17 +++++++++++------
+ 3 files changed, 21 insertions(+), 13 deletions(-)
+ delete mode 100644 src/ipahealthcheck/__init__.py
+
+diff --git a/setup.py b/setup.py
+index 6f47cda..cfe1f14 100644
+--- a/setup.py
++++ b/setup.py
+@@ -15,6 +15,10 @@ setup(
+         'ipahealthcheck.meta',
+         'ipahealthcheck.system',
+     ],
++    # Add importlib-metadata for Python < 3.8 compatibility
++    install_requires=[
++        'importlib-metadata>=1.0; python_version<"3.8"',
++    ],
+     entry_points={
+         # creates bin/ipahealthcheck
+         'console_scripts': [
+@@ -72,7 +76,11 @@ setup(
+         ],
+     },
+     classifiers=[
+-        'Programming Language :: Python :: 3.6',
++        'Programming Language :: Python :: 3.7',
++        'Programming Language :: Python :: 3.8',
++        'Programming Language :: Python :: 3.9',
++        'Programming Language :: Python :: 3.10',
++        'Programming Language :: Python :: 3.11',
+     ],
+-    python_requires='!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*',
++    python_requires='>=3.6',
+ )
+diff --git a/src/ipahealthcheck/__init__.py b/src/ipahealthcheck/__init__.py
+deleted file mode 100644
+index 6c91ef7..0000000
+--- a/src/ipahealthcheck/__init__.py
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#
+-# Copyright (C) 2019 FreeIPA Contributors see COPYING for license
+-#
+-
+-__import__('pkg_resources').declare_namespace(__name__)
+diff --git a/src/ipahealthcheck/core/core.py b/src/ipahealthcheck/core/core.py
+index 1b71fd0..b1a44f2 100644
+--- a/src/ipahealthcheck/core/core.py
++++ b/src/ipahealthcheck/core/core.py
+@@ -5,7 +5,10 @@
+ import argparse
+ import json
+ import logging
+-import pkg_resources
++try:
++    from importlib import metadata as importlib_metadata
++except ImportError:
++    import importlib_metadata
+ import signal
+ import sys
+ import traceback
+@@ -30,15 +33,17 @@ def find_registries(entry_points):
+     registries = {}
+     for entry_point in entry_points:
+         registries.update({
+-            ep.name: ep.resolve()
+-            for ep in pkg_resources.iter_entry_points(entry_point)
++            ep.name: ep.load()
++            for ep in importlib_metadata.entry_points().select(
++                group=entry_point
++            )
+         })
+     logger.setLevel(log_level)
+     return registries
+ 
+ 
+ def find_plugins(name, registry):
+-    for ep in pkg_resources.iter_entry_points(name):
++    for ep in importlib_metadata.entry_points().select(group=name):
+         # load module
+         ep.load()
+     return registry.get_plugins()
+@@ -337,8 +342,8 @@ class RunChecks:
+             for registry in self.entry_points:
+                 name = registry.split('.')[0]
+                 try:
+-                    version = pkg_resources.get_distribution(name).version
+-                except pkg_resources.DistributionNotFound:
++                    version = importlib_metadata.version(name)
++                except importlib_metadata.PackageNotFoundError:
+                     continue
+                 print('%s: %s' % (name, version))
+             return 0
+-- 
+2.52.0

@@ -1,7 +1,7 @@
-From 3b107c9f677e8bf1ea07414bdc8889f9584604dc Mon Sep 17 00:00:00 2001
+From 4213e59bed0b6cac7e1fdbc6283dc2f2456a424e Mon Sep 17 00:00:00 2001
 From: Maxwell G <maxwell@gtmx.me>
 Date: Tue, 10 Jun 2025 14:56:31 -0500
-Subject: [PATCH 2/4] Replace pkginfo2 with pkginfo
+Subject: [PATCH 2/2] Replace pkginfo2 with pkginfo
 
 pkginfo2 is a not-very-well-maintained fork of pkginfo and breaks with
 the latest metadata 2.4 standard.
@@ -13,12 +13,12 @@ fixed, let's use plain pkginfo.
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.cfg b/setup.cfg
-index b0954ef..d4566f5 100644
+index 7c45f388fd..5d7f109102 100644
 --- a/setup.cfg
 +++ b/setup.cfg
-@@ -97,7 +97,7 @@ install_requires =
+@@ -100,7 +100,7 @@ install_requires =
      parameter-expansion-patched >= 0.3.1
-     pdfminer.six >= 20200101
+     pdfminer.six >= 20251227
      pefile >= 2020.1.1
 -    pkginfo2 >= 30.0.0
 +    pkginfo
@@ -26,7 +26,7 @@ index b0954ef..d4566f5 100644
      pluggy >= 1.0.0
      plugincode >= 32.0.0
 diff --git a/src/packagedcode/pypi.py b/src/packagedcode/pypi.py
-index 2610f43..1930bb7 100644
+index b5588ed7ca..34b28dcb5e 100644
 --- a/src/packagedcode/pypi.py
 +++ b/src/packagedcode/pypi.py
 @@ -28,7 +28,7 @@ import dparse2
@@ -35,9 +35,9 @@ index 2610f43..1930bb7 100644
  import pip_requirements_parser
 -import pkginfo2
 +import pkginfo as pkginfo2
- import toml
  from commoncode import fileutils
  from commoncode.fileutils import as_posixpath
+ from commoncode.resource import Resource
 -- 
-2.51.0
+2.53.0
 

@@ -33,7 +33,7 @@ if not _python_deprecated_warned then
 end
 if not _python_deprecated_warned[opt.n] then
     _python_deprecated_warned[opt.n] = true
-    local msg = "The %" .. opt.n .. " macro is deprecated and will likely stop working in Fedora 44. " ..
+    local msg = "The %" .. opt.n .. " macro is deprecated and will likely stop working in Fedora 45. " ..
                 "See the current Python packaging guidelines: " ..
                 "https://docs.fedoraproject.org/en-US/packaging-guidelines/Python/"
     macros.warn({msg})

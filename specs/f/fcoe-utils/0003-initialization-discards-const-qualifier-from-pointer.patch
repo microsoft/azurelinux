@@ -1,0 +1,44 @@
+From dfadd3fd53860a8f44871e479bf602a2fa3bae53 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Tue, 6 Jan 2026 16:20:49 -0800
+Subject: [PATCH 1/1] =?UTF-8?q?initialization=20discards=20=E2=80=98const?=
+ =?UTF-8?q?=E2=80=99=20qualifier=20from=20pointer=20target=20type?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Chris Leech <cleech@redhat.com>
+---
+ lib/fcoe_utils.c | 2 +-
+ lib/sysfs_hba.c  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/fcoe_utils.c b/lib/fcoe_utils.c
+index 4d13dd7ecf9..5ea713679a5 100644
+--- a/lib/fcoe_utils.c
++++ b/lib/fcoe_utils.c
+@@ -161,7 +161,7 @@ int fcoe_checkdir(char *dir)
+  */
+ char *get_ifname_from_symbolic_name(const char *symbolic_name)
+ {
+-	char *last_space = strrchr(symbolic_name, ' ');
++	const char *last_space = strrchr(symbolic_name, ' ');
+ 
+ 	if (!last_space || strlen(last_space) == 1)
+ 		return NULL;
+diff --git a/lib/sysfs_hba.c b/lib/sysfs_hba.c
+index 381f335d7ea..302ce634954 100644
+--- a/lib/sysfs_hba.c
++++ b/lib/sysfs_hba.c
+@@ -441,7 +441,7 @@ char *get_pci_dev_from_netdev(const char *netdev)
+ 	free(path);
+ 	if (ret == -1) {
+ 		char realdev[256];
+-		char *subif;
++		const char *subif;
+ 		size_t len;
+ 
+ 		subif = strchr(netdev, '.');
+-- 
+2.52.0
+

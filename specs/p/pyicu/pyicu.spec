@@ -4,7 +4,7 @@
 %define		realname PyICU
 Name:		pyicu
 Version:	2.14
-Release: 11%{?dist}
+Release:	9%{?dist}
 Summary:	Python extension wrapping the ICU C++ libraries
 
 License:	MIT
@@ -53,6 +53,9 @@ Summary: Python 3 extension wrapping the ICU C++ libraries
 %doc LICENSE
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.14-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.14-8
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -22,8 +22,8 @@
 %global modname numpy
 
 Name:           numpy
-Version:        2.3.5
-Release: 4%{?dist}
+Version:        2.4.6
+Release:        1%{?dist}
 Epoch:          1
 Summary:        A fast multidimensional array facility for Python
 
@@ -37,6 +37,11 @@ License:        BSD-3-Clause AND MIT AND Apache-2.0 AND (Zlib OR BSL-1.0)
 URL:            http://www.numpy.org/
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
 Source1:        https://numpy.org/doc/%(echo %{version} | cut -d. -f1-2)/numpy-html.zip
+
+# Fix FTBFS with GCC 16
+# Sent upstream:
+# https://github.com/numpy/x86-simd-sort/pull/225
+#Patch:          fix-gcc-16-ftbfs.patch
 
 %description
 NumPy is a general-purpose array-processing package designed to
@@ -162,7 +167,7 @@ find . -type f -print0 | xargs -0 sed -i s/mcpu=power8/mcpu=power9/
 %endif
 %endif
 
-%pyproject_wheel -Csetup-args=-Dblas=flexiblas -Csetup-args=-Dlapack=lapack -Ccompile-args=-v
+%pyproject_wheel -Csetup-args=-Dcpu-baseline="none" -Csetup-args=-Dblas=flexiblas -Csetup-args=-Dlapack=lapack -Ccompile-args=-v
 
 %install
 mkdir docs
@@ -259,6 +264,36 @@ export PYTHONPATH=%{buildroot}%{python3_sitearch}
 
 
 %changelog
+* Tue May 19 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.6-1
+- 2.4.6
+
+* Sat May 16 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.5-1
+- 2.4.5
+
+* Sun May 03 2026 Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com> - 1:2.4.4-2
+- Fix for x86-64-v1 #rhbz2452329
+
+* Sun Mar 29 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.4-1
+- 2.4.4
+
+* Mon Mar 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.3-1
+- 2.4.3
+
+* Sat Jan 31 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.2-1
+- 2.4.2
+
+* Fri Jan 23 2026 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.1-1
+- 2.4.1
+
+* Fri Jan 23 2026 Charalampos Stratakis <cstratak@redhat.com> - 1:2.4.0-3
+- Fix FTBFS with GCC 16
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.4.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Dec 20 2025 Gwyn Ciesla <gwync@protonmail.com> - 1:2.4.0-1
+- 2.4.0
+
 * Mon Nov 17 2025 Gwyn Ciesla <gwync@protonmail.com> - 1:2.3.5-1
 - 2.3.5
 

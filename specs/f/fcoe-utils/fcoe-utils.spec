@@ -10,7 +10,7 @@
 
 Name:               fcoe-utils
 Version:            1.0.34
-Release:            12.git%{shortcommit0}%{?dist}
+Release:            14.git%{shortcommit0}%{?dist}
 Summary:            Fibre Channel over Ethernet utilities
 License:            GPL-2.0-only
 URL:                http://www.open-fcoe.org
@@ -34,6 +34,8 @@ Patch1: 0001-fcoemon-add-snprintf-string-precision-modifiers-in-f.patch
 
 # https://github.com/openSUSE/fcoe-utils/pull/25
 Patch2: 0002-Don-t-attempt-to-memcpy-zero-bytes.patch
+
+Patch3: 0003-initialization-discards-const-qualifier-from-pointer.patch
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch: %{ix86}
@@ -89,6 +91,12 @@ done
 %{_libexecdir}/fcoe/
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.34-14.gitb233050
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 07 2026 Chris Leech <cleech@redhat.com> - 1.0.34-13.gitb233050
+- FTBFS: GCC 16 -Werror=discarded-qualifiers
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.34-12.gitb233050
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

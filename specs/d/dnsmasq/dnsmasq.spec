@@ -3,15 +3,15 @@
 
 %bcond_without i18n
 
-%define testrelease 0
-%define releasecandidate 0
+%global testrelease 0
+%global releasecandidate 0
 %if 0%{testrelease}
-  %define extrapath test-releases/
-  %define extraversion test%{testrelease}
+  %global extrapath test-releases/
+  %global extraversion test%{testrelease}
 %endif
 %if 0%{releasecandidate}
-  %define extrapath release-candidates/
-  %define extraversion rc%{releasecandidate}
+  %global extrapath release-candidates/
+  %global extraversion rc%{releasecandidate}
 %endif
 
 %define _hardened_build 1
@@ -19,15 +19,25 @@
 %global forgeurl0 git://thekelleys.org.uk/dnsmasq.git
 # tag of selected version
 %global gittag v%{version}%{?extraversion}
+# Helper for generating URLs. Use spectool -P *.spec to display links.
+# But upstream gitweb seems to block direct links like this, they are not usable anymore.
+%define up_patch_url() https://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=patch;h=%{1}
+%global upstream_sources 0 3
 
 
 # Attempt to prepare source-git with downstream repos
 %bcond_with sourcegit
+# Build with libasan
+%bcond_with    asan
 %bcond_without annocheck
 
+%if %{with asan}
+%global extrabuild asan
+%endif
+
 Name:           dnsmasq
-Version:        2.92
-Release:        1%{?extraversion:.%{extraversion}}%{?dist}
+Version:        2.92rel2
+Release:        9%{?extraversion:.%{extraversion}}%{?extrabuild:.%{extrabuild}}%{?dist}
 Summary:        A lightweight DHCP/caching DNS server
 
 # SPDX identifiers already
@@ -44,6 +54,7 @@ Source4:        %{url}%{?extrapath}test-release-public-key
 %else
 Source4:        http://www.thekelleys.org.uk/srkgpg.txt
 %endif
+Source5:        tmpfiles-dnsmasq.conf
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1495409
 Patch1:         dnsmasq-2.77-underflow.patch
@@ -52,7 +63,13 @@ Patch2:         dnsmasq-2.81-configuration.patch
 Patch3:         dnsmasq-2.78-fips.patch
 Patch7:         dnsmasq-2.90-dbus-interfaces.patch
 # https://lists.thekelleys.org.uk/pipermail/dnsmasq-discuss/2026q1/018378.html
-Patch8:         https://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=patch;h=f603a4f920e6953b11667d424956fd47373870e9#/dnsmasq-2.92-dnssec-wildcard.patch
+Patch8:         %{up_patch_url f603a4f920e6953b11667d424956fd47373870e9}#/dnsmasq-2.92-dnssec-wildcard.patch
+# https://lists.thekelleys.org.uk/pipermail/dnsmasq-discuss/2026q1/018383.html
+Patch9:         %{up_patch_url 1269f074f86bb959863012063060a3a082d37dc4}#/dnsmasq-2.93-dnssec-rrsig-owner.patch
+# https://lists.thekelleys.org.uk/pipermail/dnsmasq-discuss/2026q1/018409.html
+Patch10:        0001-Make-inotify-initialization-non-fatal-error.patch
+# http://thekelleys.org.uk/gitweb/?p=dnsmasq.git;a=commit;h=9ad74926d4f7f34ff902e1db5235535aa813c33f
+Patch11:        %{up_patch_url 9ad74926d4f7f34ff902e1db5235535aa813c33f}#/dnsmasq-2.93-CVE-2026-6507.patch
 
 
 Requires:       nettle
@@ -64,7 +81,7 @@ BuildRequires:  pkgconfig(libnetfilter_conntrack)
 BuildRequires:  nettle-devel
 BuildRequires:  nftables-devel
 Buildrequires:  gcc
-BuildRequires:  gnupg2
+BuildRequires:  sequoia-sqv
 
 BuildRequires:  systemd
 BuildRequires:  systemd-rpm-macros
@@ -78,6 +95,9 @@ BuildRequires: gettext
 %endif
 %if %{with annocheck}
 BuildRequires: annobin-annocheck
+%endif
+%if %{with asan}
+BuildRequires: libasan
 %endif
 
 %description
@@ -113,7 +133,7 @@ Translations for few languages on dnsmasq.
 
 %prep
 %if 0%{?fedora}
-%gpgverify -k 4 -s 3 -d 0
+sqv --keyring=%{SOURCE4} --signature-file=%{SOURCE3} %{SOURCE0}
 %endif
 %if %{with sourcegit}
 %autosetup -n %{name}-%{version}%{?extraversion} -N -S git_am
@@ -146,6 +166,10 @@ sed -i "s|\(#\s*define RUNFILE\) \"/var/run/dnsmasq.pid\"|\1 \"%{_rundir}/dnsmas
 sed -i 's|^COPTS[[:space:]]*=|\0 -DHAVE_DBUS -DHAVE_LIBIDN2 -DHAVE_DNSSEC -DHAVE_CONNTRACK -DHAVE_NFTSET|' Makefile
 
 %build
+%if %{with asan}
+CFLAGS+=" -fsanitize=address"
+LDFLAGS+=" -fsanitize=address"
+%endif
 %make_build CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" BINDIR=%{_sbindir} \
 %if %{with i18n}
   all-i18n
@@ -184,6 +208,9 @@ rm -rf %{buildroot}%{_initrddir}
 
 #install systemd sysuser file
 install -p -Dpm 644 %{SOURCE2} %{buildroot}%{_sysusersdir}/%{name}.conf
+
+# install tmpfiles.d config
+install -Dpm 644 %{SOURCE5} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 %if %{with i18n}
 %make_install PREFIX=%{_prefix} CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" BINDIR=%{_sbindir} install-i18n
@@ -227,6 +254,7 @@ fi
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/trust-anchors.conf
 %{_sysusersdir}/dnsmasq.conf
+%{_tmpfilesdir}/dnsmasq.conf
 
 %files utils
 %license COPYING COPYING-v3
@@ -238,8 +266,32 @@ fi
 %endif
 
 %changelog
+* Tue May 12 2026 Petr Menšík <pemensik@redhat.com> - 2.92rel2-9
+- Update to 2.92rel2 (rhbz#2469245)
+
+* Mon Apr 20 2026 Petr Menšík <pemensik@redhat.com> - 2.92-8
+- Fix 1 byte extra write byte in DHCP reply (rhbz#2459196)
+
+* Mon Feb 16 2026 Petr Menšík <pemensik@redhat.com> - 2.92-7
+- Add optional build support for libasan
+
+* Wed Feb 11 2026 Petr Menšík <<pemensik@redhat.com>> - 2.92-6
+- Do not fail hard on inotify socket or watch failure
+
+* Thu Jan 22 2026 Petr Menšík <<pemensik@redhat.com>> - 2.92-5
+- Do not fail validation if signature owner name does not match (rbhz#2421820)
+
 * Fri Jan 16 2026 Petr Menšík <pemensik@redhat.com> - 2.92-1
 - Update to 9.29 (rhbz#2429567)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.91-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.91-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Dec 18 2025 Fedor Vorobev <fvorobev@redhat.com> - 2.91-2
+- Added installation of a tmpfiles.d config (image mode support)
 
 * Thu Aug 14 2025 Petr Menšík <pemensik@redhat.com> - 2.91-1
 - Update to 2.91 (rhbz#2353910)

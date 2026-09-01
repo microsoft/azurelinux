@@ -11,7 +11,7 @@
 
 Name: oddjob
 Version: 0.34.7
-Release: 20%{?dist}
+Release: 18%{?dist}
 Source0: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz
 Source1: https://releases.pagure.org/oddjob/oddjob-%{version}.tar.gz.asc
 Patch1: oddjob-override-mask-fix.patch
@@ -166,6 +166,9 @@ fi
 exit 0
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.34.7-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Sep 23 2025 Alexander Bokovoy <abokovoy@redhat.com> - 0.34.7-17
 - Remove dbus-daemon restarts as dbus-broker auto-loads changed files
 - Resolves: rhbz#2391493

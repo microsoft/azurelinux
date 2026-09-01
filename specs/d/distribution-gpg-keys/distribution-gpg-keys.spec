@@ -2,14 +2,14 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		distribution-gpg-keys
-Version:	1.117
-Release: 4%{?dist}
+Version:	1.121
+Release:	1%{?dist}
 Summary:	GPG keys of various Linux distributions
 
 License:	CC0-1.0
-URL:		https://github.com/xsuchy/distribution-gpg-keys
+URL:		https://github.com/rpm-software-management/distribution-gpg-keys
 # Sources can be obtained by
-# git clone git://github.com/xsuchy/distribution-gpg-keys.git
+# git git://github.com/rpm-software-management/distribution-gpg-keys.git
 # cd distribution-gpg-keys
 # tito build --tgz
 Source0:	%{name}-%{version}.tar.gz
@@ -56,6 +56,29 @@ cp -a keys/* %{buildroot}%{_datadir}/%{name}/
 %{_datadir}/%{name}/copr
 
 %changelog
+* Tue Aug 11 2026 Miroslav Suchý <msuchy@redhat.com> 1.121-1
+- add RPM-GPG-KEY-fedora-47-primary
+- update copr keys
+
+* Thu Jul 23 2026 Pavel Raiskup <pavel@raiskup.cz> 1.120-1
+- Update RPM-GPG-KEY-openSUSE-2022
+- add Teams for Linux repository key
+- add Oracle Linux 10 key
+- Add NetBSD security officer key
+- update copr keys
+- Added EndeavourOS, Tuxedo OS, and Linux Mint keys
+
+* Sat Mar 28 2026 Miroslav Suchý <msuchy@redhat.com> 1.119-1
+- update copr keys
+- add: ultramarine repository keys
+- add: terra repository keys
+- update Google key block
+
+* Sat Mar 07 2026 Miroslav Suchý <msuchy@redhat.com> 1.118-1
+- update copr keys
+- Add symlinks to rpmfusion 44, 45 and 46
+- update source url
+
 * Tue Feb 03 2026 Pavel Raiskup <pavel@raiskup.cz> 1.117-1
 - Add Fedora 46 key
 - Add Remi's key for 2026 (Fedora 44 and 45)

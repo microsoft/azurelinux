@@ -1,0 +1,38 @@
+From 607f337637f2077b34a9f6f96fc24237255fe175 Mon Sep 17 00:00:00 2001
+From: "djm@openbsd.org" <djm@openbsd.org>
+Date: Thu, 9 Oct 2025 23:25:23 +0000
+Subject: [PATCH] upstream: downgrade a useless error() -> debug()
+
+OpenBSD-Commit-ID: 5b0c9bcddb324f8bed2c8e8ffe9c92d263adc2d9
+---
+ ssh-pkcs11.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ssh-pkcs11.c b/ssh-pkcs11.c
+index c8817947395a..5e956208bb72 100644
+--- a/ssh-pkcs11.c
++++ b/ssh-pkcs11.c
+@@ -1,4 +1,4 @@
+-/* $OpenBSD: ssh-pkcs11.c,v 1.73 2025/10/08 21:02:16 djm Exp $ */
++/* $OpenBSD: ssh-pkcs11.c,v 1.74 2025/10/09 23:25:23 djm Exp $ */
+ /*
+  * Copyright (c) 2010 Markus Friedl.  All rights reserved.
+  * Copyright (c) 2014 Pedro Martelletto. All rights reserved.
+@@ -1486,7 +1486,7 @@ pkcs11_fetch_certs(struct pkcs11_provider *p, CK_ULONG slotidx,
+ 		case CKC_X_509:
+ 			if (pkcs11_fetch_x509_pubkey(p, slotidx, &obj,
+ 			    &key, &label) != 0) {
+-				error("failed to fetch key");
++				debug_f("failed to fetch key");
+ 				continue;
+ 			}
+ 			break;
+@@ -1613,7 +1613,7 @@ pkcs11_fetch_keys(struct pkcs11_provider *p, CK_ULONG slotidx,
+ 		}
+ 
+ 		if (key == NULL) {
+-			error("failed to fetch key");
++			debug_f("failed to fetch key");
+ 			continue;
+ 		}
+ 		note_key(p, slotidx, __func__, key);

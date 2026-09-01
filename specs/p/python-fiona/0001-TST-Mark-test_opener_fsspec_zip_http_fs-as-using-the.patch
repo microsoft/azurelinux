@@ -1,7 +1,8 @@
 From d7a4d9cf4386b7b19ac8179826eb1e97292a483b Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Mon, 18 Nov 2024 04:12:02 -0500
-Subject: [PATCH] TST: Mark test_opener_fsspec_zip_http_fs as using the network
+Subject: [PATCH 1/2] TST: Mark test_opener_fsspec_zip_http_fs as using the
+ network
 
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 ---
@@ -21,5 +22,5 @@ index 5944174..1a6e09f 100644
      """Use fsspec zip+http filesystem as opener."""
      fs = fsspec.filesystem(
 -- 
-2.47.0
+2.50.0
 

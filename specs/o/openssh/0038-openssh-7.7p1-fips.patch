@@ -1,0 +1,752 @@
+From d7dd45f9e19a71269828bc5f8567613a02f6feef Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 28 Aug 2025 14:01:38 +0200
+Subject: [PATCH 38/53] openssh-7.7p1-fips
+
+---
+ dh.c                     | 41 ++++++++++++++++++++++
+ dh.h                     |  1 +
+ kex-names.c              |  6 +++-
+ kex.c                    |  3 +-
+ kexgen.c                 | 74 ++++++++++++++++++++++++++++++++--------
+ kexgexc.c                |  5 +++
+ myproposal.h             | 33 ++++++++++++++++++
+ readconf.c               | 16 ++++++---
+ sandbox-seccomp-filter.c |  3 ++
+ servconf.c               | 18 +++++++---
+ ssh-ed25519.c            |  9 +++++
+ ssh-gss.h                |  5 +++
+ ssh-keygen.c             | 20 +++++++++--
+ ssh-rsa.c                |  3 ++
+ ssh.c                    |  5 +++
+ sshconnect2.c            |  9 ++++-
+ sshd.c                   | 13 +++++++
+ sshkey.c                 | 37 ++++++++++++++++++++
+ 18 files changed, 271 insertions(+), 30 deletions(-)
+
+diff --git a/dh.c b/dh.c
+index 168dea1dd..8c9a29fa7 100644
+--- a/dh.c
++++ b/dh.c
+@@ -36,6 +36,7 @@
+ 
+ #include <openssl/bn.h>
+ #include <openssl/dh.h>
++#include <openssl/fips.h>
+ 
+ #include "dh.h"
+ #include "pathnames.h"
+@@ -164,6 +165,12 @@ choose_dh(int min, int wantbits, int max)
+ 	int best, bestcount, which, linenum;
+ 	struct dhgroup dhg;
+ 
++	if (FIPS_mode()) {
++		verbose("Using arbitrary primes is not allowed in FIPS mode."
++		    " Falling back to known groups.");
++		return (dh_new_group_fallback(max));
++	}
++
+ 	if ((f = fopen(get_moduli_filename(), "r")) == NULL) {
+ 		logit("WARNING: could not open %s (%s), using fixed modulus",
+ 		    get_moduli_filename(), strerror(errno));
+@@ -502,4 +509,38 @@ dh_estimate(int bits)
+ 	return 8192;
+ }
+ 
++/*
++ * Compares the received DH parameters with known-good groups,
++ * which might be either from group14, group16 or group18.
++ */
++int
++dh_is_known_group(const DH *dh)
++{
++	const BIGNUM *p, *g;
++	const BIGNUM *known_p, *known_g;
++	DH *known = NULL;
++	int bits = 0, rv = 0;
++
++	DH_get0_pqg(dh, &p, NULL, &g);
++	bits = BN_num_bits(p);
++
++	if (bits <= 3072) {
++		known = dh_new_group14();
++	} else if (bits <= 6144) {
++		known = dh_new_group16();
++	} else {
++		known = dh_new_group18();
++	}
++
++	DH_get0_pqg(known, &known_p, NULL, &known_g);
++
++	if (BN_cmp(g, known_g) == 0 &&
++	    BN_cmp(p, known_p) == 0) {
++		rv = 1;
++	}
++
++	DH_free(known);
++	return rv;
++}
++
+ #endif /* WITH_OPENSSL */
+diff --git a/dh.h b/dh.h
+index c6326a39d..e51e292b8 100644
+--- a/dh.h
++++ b/dh.h
+@@ -45,6 +45,7 @@ DH	*dh_new_group_fallback(int);
+ 
+ int	 dh_gen_key(DH *, int);
+ int	 dh_pub_is_valid(const DH *, const BIGNUM *);
++int	 dh_is_known_group(const DH *);
+ 
+ u_int	 dh_estimate(int);
+ void	 dh_set_moduli_file(const char *);
+diff --git a/kex-names.c b/kex-names.c
+index 31e395aa2..1360a4095 100644
+--- a/kex-names.c
++++ b/kex-names.c
+@@ -33,6 +33,7 @@
+ 
+ #ifdef WITH_OPENSSL
+ #include <openssl/crypto.h>
++#include <openssl/fips.h>
+ #include <openssl/evp.h>
+ #endif
+ 
+@@ -208,7 +209,10 @@ kex_names_valid(const char *names)
+ 			return 0;
+ 		}
+ 		if (kex_alg_by_name(p) == NULL) {
+-			error("Unsupported KEX algorithm \"%.100s\"", p);
++			if (FIPS_mode())
++				error("\"%.100s\" is not allowed in FIPS mode", p);
++			else
++				error("Unsupported KEX algorithm \"%.100s\"", p);
+ 			free(s);
+ 			return 0;
+ 		}
+diff --git a/kex.c b/kex.c
+index 44f350ce8..da2a537ce 100644
+--- a/kex.c
++++ b/kex.c
+@@ -38,6 +38,7 @@
+ #ifdef WITH_OPENSSL
+ #include <openssl/crypto.h>
+ #include <openssl/dh.h>
++#include <openssl/fips.h>
+ # ifdef HAVE_EVP_KDF_CTX_NEW
+ # include <openssl/kdf.h>
+ # include <openssl/param_build.h>
+@@ -107,7 +108,7 @@ kex_proposal_populate_entries(struct ssh *ssh, char *prop[PROPOSAL_MAX],
+ 
+ 	/* Append EXT_INFO signalling to KexAlgorithms */
+ 	if (kexalgos == NULL)
+-		kexalgos = defprop[PROPOSAL_KEX_ALGS];
++	    kexalgos = FIPS_mode() ? KEX_DEFAULT_KEX_FIPS : defprop[PROPOSAL_KEX_ALGS];
+ 	if ((cp = kex_names_cat(kexalgos, ssh->kex->server ?
+ 	    "ext-info-s,kex-strict-s-v00@openssh.com" :
+ 	    "ext-info-c,kex-strict-c-v00@openssh.com")) == NULL)
+diff --git a/kexgen.c b/kexgen.c
+index 58edc79ad..9a970adf1 100644
+--- a/kexgen.c
++++ b/kexgen.c
+@@ -31,6 +31,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <signal.h>
++#include <openssl/fips.h>
+ 
+ #include "sshkey.h"
+ #include "kex.h"
+@@ -115,13 +116,28 @@ kex_gen_client(struct ssh *ssh)
+ 		break;
+ #endif /* WITH_OPENSSL */
+ 	case KEX_C25519_SHA256:
+-		r = kex_c25519_keypair(kex);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type c25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_c25519_keypair(kex);
++		}
+ 		break;
+ 	case KEX_KEM_SNTRUP761X25519_SHA512:
+-		r = kex_kem_sntrup761x25519_keypair(kex);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type sntrup761 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_sntrup761x25519_keypair(kex);
++		}
+ 		break;
+ 	case KEX_KEM_MLKEM768X25519_SHA256:
+-		r = kex_kem_mlkem768x25519_keypair(kex);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type mlkem768x25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_mlkem768x25519_keypair(kex);
++		}
+ 		break;
+ 	default:
+ 		r = SSH_ERR_INVALID_ARGUMENT;
+@@ -189,15 +205,30 @@ input_kex_gen_reply(int type, u_int32_t seq, struct ssh *ssh)
+ 		break;
+ #endif /* WITH_OPENSSL */
+ 	case KEX_C25519_SHA256:
+-		r = kex_c25519_dec(kex, server_blob, &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type c25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_c25519_dec(kex, server_blob, &shared_secret);
++		}
+ 		break;
+ 	case KEX_KEM_SNTRUP761X25519_SHA512:
+-		r = kex_kem_sntrup761x25519_dec(kex, server_blob,
+-		    &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type sntrup761 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_sntrup761x25519_dec(kex, server_blob,
++		        &shared_secret);
++		}
+ 		break;
+ 	case KEX_KEM_MLKEM768X25519_SHA256:
+-		r = kex_kem_mlkem768x25519_dec(kex, server_blob,
+-		    &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type mlkem768x25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_mlkem768x25519_dec(kex, server_blob,
++		        &shared_secret);
++		}
+ 		break;
+ 	default:
+ 		r = SSH_ERR_INVALID_ARGUMENT;
+@@ -312,16 +343,31 @@ input_kex_gen_init(int type, u_int32_t seq, struct ssh *ssh)
+ 		break;
+ #endif /* WITH_OPENSSL */
+ 	case KEX_C25519_SHA256:
+-		r = kex_c25519_enc(kex, client_pubkey, &server_pubkey,
+-		    &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type c25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_c25519_enc(kex, client_pubkey, &server_pubkey,
++		        &shared_secret);
++		}
+ 		break;
+ 	case KEX_KEM_SNTRUP761X25519_SHA512:
+-		r = kex_kem_sntrup761x25519_enc(kex, client_pubkey,
+-		    &server_pubkey, &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type sntrup761 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_sntrup761x25519_enc(kex, client_pubkey,
++		        &server_pubkey, &shared_secret);
++		}
+ 		break;
+ 	case KEX_KEM_MLKEM768X25519_SHA256:
+-		r = kex_kem_mlkem768x25519_enc(kex, client_pubkey,
+-		    &server_pubkey, &shared_secret);
++		if (FIPS_mode()) {
++		    logit_f("Key exchange type mlkem768x25519 is not allowed in FIPS mode");
++		    r = SSH_ERR_INVALID_ARGUMENT;
++		} else {
++		    r = kex_kem_mlkem768x25519_enc(kex, client_pubkey,
++		        &server_pubkey, &shared_secret);
++		}
+ 		break;
+ 	default:
+ 		r = SSH_ERR_INVALID_ARGUMENT;
+diff --git a/kexgexc.c b/kexgexc.c
+index 097d83f30..ccbb9b580 100644
+--- a/kexgexc.c
++++ b/kexgexc.c
+@@ -28,6 +28,7 @@
+ 
+ #ifdef WITH_OPENSSL
+ 
++#include <openssl/fips.h>
+ #include <sys/types.h>
+ 
+ #include "openbsd-compat/openssl-compat.h"
+@@ -117,6 +118,11 @@ input_kex_dh_gex_group(int type, u_int32
+ 	}
+ 	p = g = NULL; /* belong to kex->dh now */
+ 
++	if (FIPS_mode() && dh_is_known_group(kex->dh) == 0) {
++		r = SSH_ERR_INVALID_ARGUMENT;
++		goto out;
++	}
++
+ 	/* generate and send 'e', client DH public key */
+ 	if ((r = dh_gen_key(kex->dh, kex->we_need * 8)) != 0)
+ 		goto out;
+diff --git a/myproposal.h b/myproposal.h
+index 8fe9276c2..3e0ec6826 100644
+--- a/myproposal.h
++++ b/myproposal.h
+@@ -58,6 +58,18 @@
+ 	"rsa-sha2-512," \
+ 	"rsa-sha2-256"
+ 
++#define	KEX_FIPS_PK_ALG	\
++	"ecdsa-sha2-nistp256-cert-v01@openssh.com," \
++	"ecdsa-sha2-nistp384-cert-v01@openssh.com," \
++	"ecdsa-sha2-nistp521-cert-v01@openssh.com," \
++	"rsa-sha2-512-cert-v01@openssh.com," \
++	"rsa-sha2-256-cert-v01@openssh.com," \
++	"ecdsa-sha2-nistp256," \
++	"ecdsa-sha2-nistp384," \
++	"ecdsa-sha2-nistp521," \
++	"rsa-sha2-512," \
++	"rsa-sha2-256"
++
+ #define	KEX_SERVER_ENCRYPT \
+ 	"chacha20-poly1305@openssh.com," \
+ 	"aes128-gcm@openssh.com,aes256-gcm@openssh.com," \
+@@ -79,6 +91,27 @@
+ 
+ #define KEX_CLIENT_MAC KEX_SERVER_MAC
+ 
++#define	KEX_FIPS_ENCRYPT \
++	"aes128-ctr,aes192-ctr,aes256-ctr," \
++	"aes128-cbc,3des-cbc," \
++	"aes192-cbc,aes256-cbc,rijndael-cbc@lysator.liu.se," \
++	"aes128-gcm@openssh.com,aes256-gcm@openssh.com"
++#define KEX_DEFAULT_KEX_FIPS		\
++	"ecdh-sha2-nistp256," \
++	"ecdh-sha2-nistp384," \
++	"ecdh-sha2-nistp521," \
++	"diffie-hellman-group-exchange-sha256," \
++	"diffie-hellman-group16-sha512," \
++	"diffie-hellman-group18-sha512," \
++	"diffie-hellman-group14-sha256"
++#define KEX_FIPS_MAC \
++	"hmac-sha1," \
++	"hmac-sha2-256," \
++	"hmac-sha2-512," \
++	"hmac-sha1-etm@openssh.com," \
++	"hmac-sha2-256-etm@openssh.com," \
++	"hmac-sha2-512-etm@openssh.com"
++
+ /* Not a KEX value, but here so all the algorithm defaults are together */
+ #define	SSH_ALLOWED_CA_SIGALGS	\
+ 	"ssh-ed25519," \
+diff --git a/readconf.c b/readconf.c
+index 3f67f4de4..b6ad47b49 100644
+--- a/readconf.c
++++ b/readconf.c
+@@ -39,6 +39,7 @@
+ #include <string.h>
+ #include <stdarg.h>
+ #include <unistd.h>
++#include <openssl/fips.h>
+ #ifdef USE_SYSTEM_GLOB
+ # include <glob.h>
+ #else
+@@ -3078,11 +3079,16 @@ fill_default_options(Options * options)
+ 	all_key = sshkey_alg_list(0, 0, 1, ',');
+ 	all_sig = sshkey_alg_list(0, 1, 1, ',');
+ 	/* remove unsupported algos from default lists */
+-	def_cipher = match_filter_allowlist(KEX_CLIENT_ENCRYPT, all_cipher);
+-	def_mac = match_filter_allowlist(KEX_CLIENT_MAC, all_mac);
+-	def_kex = match_filter_allowlist(KEX_CLIENT_KEX, all_kex);
+-	def_key = match_filter_allowlist(KEX_DEFAULT_PK_ALG, all_key);
+-	def_sig = match_filter_allowlist(SSH_ALLOWED_CA_SIGALGS, all_sig);
++	def_cipher = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_ENCRYPT : KEX_CLIENT_ENCRYPT), all_cipher);
++	def_mac = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_MAC : KEX_CLIENT_MAC), all_mac);
++	def_kex = match_filter_allowlist((FIPS_mode() ?
++	    KEX_DEFAULT_KEX_FIPS : KEX_CLIENT_KEX), all_kex);
++	def_key = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_PK_ALG : KEX_DEFAULT_PK_ALG), all_key);
++	def_sig = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_PK_ALG : SSH_ALLOWED_CA_SIGALGS), all_sig);
+ #define ASSEMBLE(what, defaults, all) \
+ 	do { \
+ 		if ((r = kex_assemble_names(&options->what, \
+diff --git a/sandbox-seccomp-filter.c b/sandbox-seccomp-filter.c
+index e0f2d4289..c52f64897 100644
+--- a/sandbox-seccomp-filter.c
++++ b/sandbox-seccomp-filter.c
+@@ -258,6 +258,9 @@ static const struct sock_filter preauth_insns[] = {
+ #ifdef __NR_open
+ 	SC_DENY(__NR_open, EACCES),
+ #endif
++#ifdef __NR_socket
++	SC_DENY(__NR_socket, EACCES),
++#endif
+ #ifdef __NR_openat
+ 	SC_DENY(__NR_openat, EACCES),
+ #endif
+diff --git a/servconf.c b/servconf.c
+index ac84b74d9..f78615c28 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -37,7 +37,10 @@
+ #include <limits.h>
+ #include <stdarg.h>
+ #include <errno.h>
++#include <openssl/fips.h>
++#ifdef HAVE_UTIL_H
+ #include <util.h>
++#endif
+ #ifdef USE_SYSTEM_GLOB
+ # include <glob.h>
+ #else
+@@ -244,11 +247,16 @@ assemble_algorithms(ServerOptions *o)
+ 	all_key = sshkey_alg_list(0, 0, 1, ',');
+ 	all_sig = sshkey_alg_list(0, 1, 1, ',');
+ 	/* remove unsupported algos from default lists */
+-	def_cipher = match_filter_allowlist(KEX_SERVER_ENCRYPT, all_cipher);
+-	def_mac = match_filter_allowlist(KEX_SERVER_MAC, all_mac);
+-	def_kex = match_filter_allowlist(KEX_SERVER_KEX, all_kex);
+-	def_key = match_filter_allowlist(KEX_DEFAULT_PK_ALG, all_key);
+-	def_sig = match_filter_allowlist(SSH_ALLOWED_CA_SIGALGS, all_sig);
++	def_cipher = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_ENCRYPT : KEX_SERVER_ENCRYPT), all_cipher);
++	def_mac = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_MAC : KEX_SERVER_MAC), all_mac);
++	def_kex = match_filter_allowlist((FIPS_mode() ?
++	    KEX_DEFAULT_KEX_FIPS : KEX_SERVER_KEX), all_kex);
++	def_key = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_PK_ALG : KEX_DEFAULT_PK_ALG), all_key);
++	def_sig = match_filter_allowlist((FIPS_mode() ?
++	    KEX_FIPS_PK_ALG : SSH_ALLOWED_CA_SIGALGS), all_sig);
+ #define ASSEMBLE(what, defaults, all) \
+ 	do { \
+ 		if ((r = kex_assemble_names(&o->what, defaults, all)) != 0) \
+diff --git a/ssh-ed25519.c b/ssh-ed25519.c
+index c8caa2221..4bcd9ef81 100644
+--- a/ssh-ed25519.c
++++ b/ssh-ed25519.c
+@@ -24,6 +24,7 @@
+ 
+ #include <string.h>
+ #include <stdarg.h>
++#include <openssl/fips.h>
+ 
+ #include "log.h"
+ #include "sshbuf.h"
+@@ -163,6 +164,10 @@ ssh_ed25519_sign(struct sshkey *key,
+ 	    key->ed25519_sk == NULL ||
+ 	    datalen >= INT_MAX - crypto_sign_ed25519_BYTES)
+ 		return SSH_ERR_INVALID_ARGUMENT;
++	if (FIPS_mode()) {
++	    logit_f("Ed25519 keys are not allowed in FIPS mode");
++	    return SSH_ERR_INVALID_ARGUMENT;
++	}
+ 	smlen = slen = datalen + crypto_sign_ed25519_BYTES;
+ 	if ((sig = malloc(slen)) == NULL)
+ 		return SSH_ERR_ALLOC_FAIL;
+@@ -244,6 +249,10 @@ ssh_ed25519_verify(const struct sshkey *key,
+ 	    dlen >= INT_MAX - crypto_sign_ed25519_BYTES ||
+ 	    sig == NULL || siglen == 0)
+ 		return SSH_ERR_INVALID_ARGUMENT;
++	if (FIPS_mode()) {
++	    logit_f("Ed25519 keys are not allowed in FIPS mode");
++	    return SSH_ERR_INVALID_ARGUMENT;
++	}
+ 
+ 	if ((b = sshbuf_from(sig, siglen)) == NULL)
+ 		return SSH_ERR_ALLOC_FAIL;
+diff --git a/ssh-gss.h b/ssh-gss.h
+index a894e23c9..329dc9da0 100644
+--- a/ssh-gss.h
++++ b/ssh-gss.h
+@@ -88,6 +88,11 @@ extern char **k5users_allowed_cmds;
+ 	KEX_GSS_GRP14_SHA1_ID "," \
+ 	KEX_GSS_GEX_SHA1_ID
+ 
++#define        GSS_KEX_DEFAULT_KEX_FIPS \
++	KEX_GSS_GRP14_SHA256_ID "," \
++	KEX_GSS_GRP16_SHA512_ID	"," \
++	KEX_GSS_NISTP256_SHA256_ID
++
+ #include "digest.h" /* SSH_DIGEST_MAX_LENGTH */
+ 
+ typedef struct {
+diff --git a/ssh-keygen.c b/ssh-keygen.c
+index 3c582a83a..afa279097 100644
+--- a/ssh-keygen.c
++++ b/ssh-keygen.c
+@@ -22,6 +22,7 @@
+ #include "openbsd-compat/openssl-compat.h"
+ #include <openssl/bn.h>
+ #include <openssl/evp.h>
++#include <openssl/fips.h>
+ #include <openssl/pem.h>
+ #endif
+ 
+@@ -68,6 +69,7 @@
+ #endif
+ 
+ #define DEFAULT_KEY_TYPE_NAME "ed25519"
++#define FIPS_DEFAULT_KEY_TYPE_NAME "rsa"
+ 
+ /*
+  * Default number of bits in the RSA and ECDSA keys.  These value can be
+@@ -195,6 +197,10 @@ type_bits_valid(int type, const char *name, u_int32_t *bitsp)
+ #endif
+ 	}
+ #ifdef WITH_OPENSSL
++	if (FIPS_mode()) {
++		if (type == KEY_ED25519 || type == KEY_ED25519_SK)
++			fatal("ED25519 keys are not allowed in FIPS mode");
++	}
+ 	switch (type) {
+ 	case KEY_RSA:
+ 		if (*bitsp < SSH_RSA_MINIMUM_MODULUS_SIZE)
+@@ -248,7 +254,7 @@ ask_filename(struct passwd *pw, const char *prompt)
+ 	char *name = NULL;
+ 
+ 	if (key_type_name == NULL)
+-		name = _PATH_SSH_CLIENT_ID_ED25519;
++		name = FIPS_mode() ? _PATH_SSH_CLIENT_ID_RSA : _PATH_SSH_CLIENT_ID_ED25519;
+ 	else {
+ 		switch (sshkey_type_from_shortname(key_type_name)) {
+ #ifdef OPENSSL_HAS_ECC
+@@ -1057,9 +1063,17 @@ do_gen_all_hostkeys(struct passwd *pw)
+ 			first = 1;
+ 			printf("%s: generating new host keys: ", __progname);
+ 		}
++		type = sshkey_type_from_shortname(key_types[i].key_type);
++
++		/* Skip the keys that are not supported in FIPS mode */
++		if (FIPS_mode() && type == KEY_ED25519) {
++			logit("Skipping %s key in FIPS mode",
++			    key_types[i].key_type_display);
++			goto next;
++		}
++
+ 		printf("%s ", key_types[i].key_type_display);
+ 		fflush(stdout);
+-		type = sshkey_type_from_shortname(key_types[i].key_type);
+ 		if ((fd = mkstemp(prv_tmp)) == -1) {
+ 			error("Could not save your private key in %s: %s",
+ 			    prv_tmp, strerror(errno));
+@@ -3757,7 +3771,7 @@ main(int argc, char **argv)
+ 	}
+ 
+ 	if (key_type_name == NULL)
+-		key_type_name = DEFAULT_KEY_TYPE_NAME;
++		key_type_name = FIPS_mode() ? FIPS_DEFAULT_KEY_TYPE_NAME : DEFAULT_KEY_TYPE_NAME;
+ 
+ 	type = sshkey_type_from_shortname(key_type_name);
+ 	type_bits_valid(type, key_type_name, &bits);
+diff --git a/ssh-rsa.c b/ssh-rsa.c
+index fe1518984..9428df8d1 100644
+--- a/ssh-rsa.c
++++ b/ssh-rsa.c
+@@ -25,6 +25,7 @@
+ #include <openssl/bn.h>
+ #include <openssl/evp.h>
+ #include <openssl/err.h>
++#include <openssl/fips.h>
+ 
+ #include <stdarg.h>
+ #include <string.h>
+@@ -142,6 +143,8 @@ ssh_rsa_generate(struct sshkey *k, int bits)
+ 		goto out;
+ 	}
+ 	if (EVP_PKEY_keygen(ctx, &res) <= 0 || res == NULL) {
++		if (FIPS_mode())
++			logit_f("the key length might be unsupported by FIPS mode approved key generation method");
+ 		ret = SSH_ERR_LIBCRYPTO_ERROR;
+ 		goto out;
+ 	}
+diff --git a/ssh.c b/ssh.c
+index 8d27f6379..7d6ba516e 100644
+--- a/ssh.c
++++ b/ssh.c
+@@ -74,6 +74,7 @@
+ #include <openssl/evp.h>
+ #include <openssl/err.h>
+ #endif
++#include <openssl/fips.h>
+ #include "openbsd-compat/openssl-compat.h"
+ #include "openbsd-compat/sys-queue.h"
+ 
+@@ -1664,6 +1665,10 @@ main(int ac, char **av)
+ 		exit(0);
+ 	}
+ 
++	if (FIPS_mode()) {
++		debug("FIPS mode initialized");
++	}
++
+ 	/* Expand SecurityKeyProvider if it refers to an environment variable */
+ 	if (options.sk_provider != NULL && *options.sk_provider == '$' &&
+ 	    strlen(options.sk_provider) > 1) {
+diff --git a/sshconnect2.c b/sshconnect2.c
+index b253f991b..fffa66c8d 100644
+--- a/sshconnect2.c
++++ b/sshconnect2.c
+@@ -45,6 +45,8 @@
+ #include <vis.h>
+ #endif
+ 
++#include <openssl/fips.h>
++
+ #include "openbsd-compat/sys-queue.h"
+ 
+ #include "xmalloc.h"
+@@ -262,6 +264,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
+ 
+ #if defined(GSSAPI) && defined(WITH_OPENSSL)
+ 	if (options.gss_keyex) {
++		char * gss_kex_filtered = FIPS_mode() ?
++			 match_filter_allowlist(options.gss_kex_algorithms, GSS_KEX_DEFAULT_KEX_FIPS) : xstrdup(options.gss_kex_algorithms);
++
+ 		/* Add the GSSAPI mechanisms currently supported on this
+ 		 * client to the key exchange algorithm proposal */
+ 		orig = myproposal[PROPOSAL_KEX_ALGS];
+@@ -281,7 +286,9 @@ ssh_kex2(struct ssh *ssh, char *host, struct sockaddr *hostaddr, u_short port,
+ 		}
+ 
+ 		gss = ssh_gssapi_client_mechanisms(gss_host,
+-		    options.gss_client_identity, options.gss_kex_algorithms);
++		    options.gss_client_identity, gss_kex_filtered);
++		free(gss_kex_filtered);
++
+ 		if (gss) {
+ 			debug("Offering GSSAPI proposal: %s", gss);
+ 			xasprintf(&myproposal[PROPOSAL_KEX_ALGS],
+diff --git a/sshd.c b/sshd.c
+index ed7faf96d..de2baa5e4 100644
+--- a/sshd.c
++++ b/sshd.c
+@@ -44,6 +44,7 @@
+ #include <poll.h>
+ #include <pwd.h>
+ #include <signal.h>
++#include <syslog.h>
+ #include <stdarg.h>
+ #include <time.h>
+ #include <stdio.h>
+@@ -55,6 +56,7 @@
+ #ifdef WITH_OPENSSL
+ #include <openssl/evp.h>
+ #include <openssl/rand.h>
++#include <openssl/fips.h>
+ #include "openbsd-compat/openssl-compat.h"
+ #endif
+ 
+@@ -1613,6 +1615,13 @@ main(int ac, char **av)
+ 		    &key, NULL)) != 0 && r != SSH_ERR_SYSTEM_ERROR)
+ 			do_log2_r(r, ll, "Unable to load host key \"%s\"",
+ 			    options.host_key_files[i]);
++		if (FIPS_mode() && key != NULL && (sshkey_type_plain(key->type) == KEY_ED25519_SK
++				||  sshkey_type_plain(key->type) == KEY_ED25519)) {
++		    logit_f("sshd: Ed25519 keys are not allowed in FIPS mode, skipping %s", options.host_key_files[i]);
++		    sshkey_free(key);
++		    key = NULL;
++		    continue;
++		}
+ 		if (sshkey_is_sk(key) &&
+ 		    key->sk_flags & SSH_SK_USER_PRESENCE_REQD) {
+ 			debug("host key %s requires user presence, ignoring",
+@@ -1836,6 +1845,10 @@ main(int ac, char **av)
+ 	/* Reinitialize the log (because of the fork above). */
+ 	log_init(__progname, options.log_level, options.log_facility, log_stderr);
+ 
++	if (FIPS_mode()) {
++		debug("FIPS mode initialized");
++	}
++
+ 	/*
+ 	 * Chdir to the root directory so that the current disk can be
+ 	 * unmounted if desired.
+diff --git a/sshkey.c b/sshkey.c
+index 148fee2b7..394d9b105 100644
+--- a/sshkey.c
++++ b/sshkey.c
+@@ -36,6 +36,7 @@
+ #include <openssl/evp.h>
+ #include <openssl/err.h>
+ #include <openssl/pem.h>
++#include <openssl/fips.h>
+ #endif
+ 
+ #include "crypto_api.h"
+@@ -58,6 +59,7 @@
+ #define SSHKEY_INTERNAL
+ #include "sshkey.h"
+ #include "match.h"
++#include "log.h"
+ #include "ssh-sk.h"
+ #include "ssh-pkcs11.h"
+ 
+@@ -386,6 +388,18 @@ sshkey_alg_list(int certs_only, int plain_only, int include_sigonly, char sep)
+ 		impl = keyimpls[i];
+ 		if (impl->name == NULL || impl->type == KEY_NULL)
+ 			continue;
++		if (FIPS_mode()) {
++			switch (impl->type) {
++			case KEY_ED25519:
++			case KEY_ED25519_SK:
++			case KEY_ED25519_CERT:
++			case KEY_ED25519_SK_CERT:
++			     continue;
++			     break;
++			default:
++			     break;
++			}
++		}
+ 		if (!include_sigonly && impl->sigonly)
+ 			continue;
+ 		if ((certs_only && !impl->cert) || (plain_only && impl->cert))
+@@ -1418,6 +1432,20 @@ sshkey_read(struct sshkey *ret, char **cpp)
+ 		return SSH_ERR_EC_CURVE_MISMATCH;
+ 	}
+ 
++	switch (type) {
++	case KEY_ED25519:
++	case KEY_ED25519_SK:
++	case KEY_ED25519_CERT:
++	case KEY_ED25519_SK_CERT:
++		if (FIPS_mode()) {
++		    sshkey_free(k);
++		    logit_f("Ed25519 keys are not allowed in FIPS mode");
++		    return SSH_ERR_INVALID_ARGUMENT;
++		}
++		break;
++	default:
++		break;
++	}
+ 	/* Fill in ret from parsed key */
+ 	sshkey_free_contents(ret);
+ 	*ret = *k;
+@@ -2251,6 +2279,11 @@ sshkey_sign(struct sshkey *key,
+ 		*lenp = 0;
+ 	if (datalen > SSH_KEY_MAX_SIGN_DATA_SIZE)
+ 		return SSH_ERR_INVALID_ARGUMENT;
++	if (FIPS_mode() && ((key->type == KEY_ED25519_SK) || (key->type == KEY_ED25519_SK_CERT))) {
++	    logit_f("Ed25519 keys are not allowed in FIPS mode");
++	    return SSH_ERR_INVALID_ARGUMENT;
++	}
++	/* Fallthrough */
+ 	if ((impl = sshkey_impl_from_key(key)) == NULL)
+ 		return SSH_ERR_KEY_TYPE_UNKNOWN;
+ 	if ((r = sshkey_unshield_private(key)) != 0)
+@@ -2290,6 +2323,10 @@ sshkey_verify(const struct sshkey *key,
+ 		*detailsp = NULL;
+ 	if (siglen == 0 || dlen > SSH_KEY_MAX_SIGN_DATA_SIZE)
+ 		return SSH_ERR_INVALID_ARGUMENT;
++	if (FIPS_mode() && ((key->type == KEY_ED25519_SK) || (key->type == KEY_ED25519_SK_CERT))) {
++	    logit_f("Ed25519 keys are not allowed in FIPS mode");
++	    return SSH_ERR_INVALID_ARGUMENT;
++	}
+ 	if ((impl = sshkey_impl_from_key(key)) == NULL)
+ 		return SSH_ERR_KEY_TYPE_UNKNOWN;
+ 	return impl->funcs->verify(key, sig, siglen, data, dlen,
+-- 
+2.52.0
+

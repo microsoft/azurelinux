@@ -3,7 +3,7 @@
 
 Name:           python-pam
 Version:        2.0.2
-Release: 19%{?dist}
+Release:        16%{?dist}
 Summary:        Pure Python interface to the Pluggable Authentication Modules system on Linux
 License:        MIT
 URL:            https://github.com/FirefighterBlu3/python-pam

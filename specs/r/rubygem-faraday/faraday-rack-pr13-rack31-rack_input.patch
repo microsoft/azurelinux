@@ -1,0 +1,30 @@
+From a590bc34e40b62484440dcd4ab5147c0c02bb425 Mon Sep 17 00:00:00 2001
+From: Andreas Schleifer <github@segaja.de>
+Date: Wed, 9 Apr 2025 09:21:05 +0200
+Subject: [PATCH] Fix tests for rack 3.1: env['rack.input'] is optional (#13)
+
+* fix(spec): fix tests for rack 3.1
+
+* feat(ci): add ruby 3.4 to CI test matrix
+
+---------
+
+Co-authored-by: Olle Jonsson <olle.jonsson@gmail.com>
+---
+ .github/workflows/ci.yml         | 1 +
+ spec/support/webmock_rack_app.rb | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/spec/support/webmock_rack_app.rb b/spec/support/webmock_rack_app.rb
+index a3212c7..894c411 100644
+--- a/spec/support/webmock_rack_app.rb
++++ b/spec/support/webmock_rack_app.rb
+@@ -49,7 +49,7 @@ def req_headers(env)
+   end
+ 
+   def req_body(env)
+-    env['rack.input'].read
++    env['rack.input']&.read
+   end
+ 
+   def process_response(req_signature)

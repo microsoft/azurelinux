@@ -1,0 +1,57 @@
+--- nfs-ganesha-8.1/src/scripts/ganeshactl/CMakeLists.txt.orig	2025-10-29 07:41:46.459444268 -0400
++++ nfs-ganesha-8.1/src/scripts/ganeshactl/CMakeLists.txt	2025-10-29 07:42:06.932104380 -0400
+@@ -166,7 +166,7 @@
+     install(
+       CODE
+       "execute_process(WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+-        COMMAND ${Python3_EXECUTABLE} -m installer --destdir \$ENV{DESTDIR} dist/ganeshactl-${GANESHA_MAJOR_VERSION}${GANESHA_MINOR_VERSION}-py3-none-any.whl)"
++        COMMAND ${Python3_EXECUTABLE} -m installer --destdir \$ENV{DESTDIR} dist/ganeshactl-${GANESHA_VERSION}-py3-none-any.whl)"
+       )
+   endif()
+ endif(Python3_FOUND)
+--- nfs-ganesha-8.1/src/scripts/gpfs-epoch/CMakeLists.txt.orig	2025-10-29 07:42:46.969439665 -0400
++++ nfs-ganesha-8.1/src/scripts/gpfs-epoch/CMakeLists.txt	2025-10-29 07:43:18.538915540 -0400
+@@ -86,7 +86,7 @@
+       install(
+         CODE
+         "execute_process(WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+-        COMMAND ${Python3_EXECUTABLE} -m installer --destdir \$ENV{DESTDIR} dist/gpfs-${GANESHA_MAJOR_VERSION}${GANESHA_MINOR_VERSION}-py3-none-any.whl)"
++        COMMAND ${Python3_EXECUTABLE} -m installer --destdir \$ENV{DESTDIR} dist/gpfs_epoch-${GANESHA_VERSION}-py3-none-any.whl)"
+         )
+       endif()
+   endif(Python3_FOUND)
+--- nfs-ganesha-8.1/src/scripts/gpfs-epoch/setup.py.in.orig	2025-10-29 07:43:23.492833293 -0400
++++ nfs-ganesha-8.1/src/scripts/gpfs-epoch/setup.py.in	2025-10-29 07:43:37.038608404 -0400
+@@ -3,12 +3,11 @@
+ from distutils.core import setup, Extension
+ 
+ if __name__ == '__main__':
+-	setup(name='gpfs',
++	setup(name='gpfs-epoch',
+ 	      version='${GANESHA_VERSION}',
+ 	      author = "NFS-Ganesha Project",
+ 	      maintainer = "NFS-Ganesha Project",
+ 	      maintainer_email = "devel@lists.nfs-ganesha.org",
+ 	      description = "NFS Ganesha Administration tools",
+ 	      package_dir = { '': '${CMAKE_CURRENT_SOURCE_DIR}' },
+-	      packages = ['.'],
+ 	      scripts = [${SCRIPTS_STRING}])
+--- nfs-ganesha-8.1/src/scripts/ganesha-top/CMakeLists.txt.orig	2025-10-29 07:42:19.983887691 -0400
++++ nfs-ganesha-8.1/src/scripts/ganesha-top/CMakeLists.txt	2025-10-29 09:26:50.293505823 -0400
+@@ -61,14 +61,14 @@
+         OUTPUT ${OUTPUT}
+         COMMAND ${Python3_EXECUTABLE} "${SETUP_PY}"  build
+         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
+-        DEPENDS ${GANESHA_TOP_SRCS} ${SCRIPTS}
++        DEPENDS ${GANESHA_TOP_SRC} ${SCRIPTS}
+         )
+     else()
+       add_custom_command(
+         OUTPUT ${OUTPUT}
+         COMMAND ${Python3_EXECUTABLE}  -m build --wheel --no-isolation .
+         COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT}
+-        DEPENDS ${GANESHA_TOP_SRCS} ${SCRIPTS}
++        DEPENDS ${GANESHA_TOP_SRC} ${SCRIPTS}
+         )
+     endif()
+ 

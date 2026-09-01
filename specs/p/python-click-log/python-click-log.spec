@@ -7,7 +7,7 @@
 
 Name:           python-%{srcname}
 Version:        0.4.0
-Release: 18%{?dist}
+Release:        17%{?dist}
 Summary:        %{sum}
 
 License:        MIT
@@ -16,8 +16,10 @@ Source0:        https://files.pythonhosted.org/packages/32/32/228be4f971e4bd556c
 BuildArch:      noarch
  
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
 BuildRequires:  python3-click
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 
 %description
@@ -38,18 +40,24 @@ applications.
 %setup -q -n %{srcname}-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 
 %files -n python3-%{srcname}
 %doc README.rst
 %license LICENSE
 %{python3_sitelib}/%{pyname}
-%{python3_sitelib}/%{pyname}-%{version}-py%{python3_version}.egg-info
+%{python3_sitelib}/%{pyname}-%{version}.dist-info
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.0-17
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 14 2025 Michele Baldessari <michele@acksyn.org> - 0.4.0-16
+- Move to newer python macros (RHBZ#2377515)
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.4.0-15
 - Rebuilt for Python 3.14.0rc3 bytecode
 

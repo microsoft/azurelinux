@@ -1,38 +1,41 @@
-From beaed3d4ce80ae695f7f2a3e02e11c39fbb4e1f8 Mon Sep 17 00:00:00 2001
+From 9786af062919ff75ac676625f3a7d6a2935da125 Mon Sep 17 00:00:00 2001
 From: Marian Koncek <mkoncek@redhat.com>
 Date: Thu, 23 Feb 2023 13:59:25 +0100
-Subject: [PATCH] Avoid bundling asm
+Subject: [PATCH 1/2] Avoid bundling asm
 
 ---
- byte-buddy/pom.xml | 56 +++++++++-------------------------------------
- 1 file changed, 11 insertions(+), 45 deletions(-)
+ byte-buddy/pom.xml | 78 +++++++---------------------------------------
+ 1 file changed, 11 insertions(+), 67 deletions(-)
 
 diff --git a/byte-buddy/pom.xml b/byte-buddy/pom.xml
-index 625e0d6..97ac874 100644
+index ecf3a56..3ec76c9 100644
 --- a/byte-buddy/pom.xml
 +++ b/byte-buddy/pom.xml
-@@ -26,8 +26,6 @@
+@@ -26,10 +26,6 @@
      -->
  
      <properties>
--        <shade.source>org.objectweb.asm</shade.source>
--        <shade.target>net.bytebuddy.jar.asm</shade.target>
+-        <shade.asm.source>org.objectweb.asm</shade.asm.source>
+-        <shade.asm.target>net.bytebuddy.jar.asm</shade.asm.target>
+-        <shade.asmjdkbridge.source>codes.rafael.asmjdkbridge</shade.asmjdkbridge.source>
+-        <shade.asmjdkbridge.target>net.bytebuddy.jar.asmjdkbridge</shade.asmjdkbridge.target>
          <packages.list.external>
              net.bytebuddy,
              net.bytebuddy.agent.builder,
-@@ -62,10 +60,7 @@
+@@ -64,11 +60,7 @@
              net.bytebuddy.utility,
              net.bytebuddy.utility.nullability,
              net.bytebuddy.utility.privilege,
 -            net.bytebuddy.utility.visitor,
--            ${shade.target},
--            ${shade.target}.signature,
--            ${shade.target}.commons
+-            ${shade.asm.target},
+-            ${shade.asm.target}.signature,
+-            ${shade.asm.target}.commons,
+-            ${shade.asmjdkbridge.target}
 +            net.bytebuddy.utility.visitor
          </packages.list.external>
          <packages.list.internal>
              net.bytebuddy.utility.dispatcher
-@@ -166,6 +161,16 @@
+@@ -169,6 +161,16 @@
                          <artifactId>asm</artifactId>
                          <version>${version.asm}</version>
                      </dependency>
@@ -49,14 +52,23 @@ index 625e0d6..97ac874 100644
                  </dependencies>
                  <executions>
                      <execution>
-@@ -253,45 +258,6 @@
+@@ -258,64 +260,6 @@
                                      <createDependencyReducedPom>true</createDependencyReducedPom>
                                      <createSourcesJar>${bytebuddy.extras}</createSourcesJar>
                                      <shadeSourcesContent>true</shadeSourcesContent>
 -                                    <relocations>
 -                                        <relocation>
--                                            <pattern>${shade.source}</pattern>
--                                            <shadedPattern>${shade.target}</shadedPattern>
+-                                            <pattern>${shade.asm.source}</pattern>
+-                                            <shadedPattern>${shade.asm.target}</shadedPattern>
+-                                        </relocation>
+-                                        <relocation>
+-                                            <pattern>${shade.asmjdkbridge.source}</pattern>
+-                                            <shadedPattern>${shade.asmjdkbridge.target}</shadedPattern>
+-                                        </relocation>
+-                                        <relocation>
+-                                            <pattern>codes/rafael/asmjdkbridge</pattern>
+-                                            <shadedPattern>net/bytebuddy/jar/asmjdkbridge</shadedPattern>
+-                                            <rawString>true</rawString>
 -                                        </relocation>
 -                                    </relocations>
 -                                    <filters>
@@ -74,6 +86,16 @@ index 625e0d6..97ac874 100644
 -                                                <exclude>**/module-info.class</exclude>
 -                                                <exclude>**/LICENSE</exclude>
 -                                                <exclude>**/NOTICE</exclude>
+-                                            </excludes>
+-                                        </filter>
+-                                        <filter>
+-                                            <artifact>codes.rafael.asmjdkbridge:*</artifact>
+-                                            <includes>
+-                                                <include>META-INF/versions/**</include>
+-                                            </includes>
+-                                            <excludes>
+-                                                <exclude>META-INF/MANIFEST.MF</exclude>
+-                                                <exclude>**/module-info.class</exclude>
 -                                            </excludes>
 -                                        </filter>
 -                                        <filter>
@@ -96,5 +118,5 @@ index 625e0d6..97ac874 100644
                                          <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                              <mainClass>net.bytebuddy.build.Plugin$Engine$Default</mainClass>
 -- 
-2.39.1
+2.51.0
 

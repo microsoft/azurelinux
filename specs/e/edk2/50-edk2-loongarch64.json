@@ -1,4 +1,5 @@
 {
+    "description": "UEFI firmware for loongarch virtual machines",
     "interface-types": [
         "uefi"
     ],

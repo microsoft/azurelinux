@@ -1,0 +1,88 @@
+diff -up sblim-cmpi-base-1.6.4/provider-register.sh.orig sblim-cmpi-base-1.6.4/provider-register.sh
+--- sblim-cmpi-base-1.6.4/provider-register.sh.orig	2025-09-12 09:02:08.864655498 +0200
++++ sblim-cmpi-base-1.6.4/provider-register.sh	2025-09-12 09:05:12.403814496 +0200
+@@ -221,6 +221,20 @@ pegasus_install()
+ 	echo "Failed to build pegasus registration MOF." >&2
+ 	return 1
+     fi
++
++    # Image Mode: Update factory directory with current Pegasus repository state
++    if [ -d /usr/share/factory/var/lib/Pegasus ]
++    then
++        chatter "Image Mode detected: updating tmpfiles factory"
++        if [ -w /usr/share/factory/var/lib ] && [ -r /var/lib/Pegasus ]
++        then
++            rm -rf /usr/share/factory/var/lib/Pegasus &&
++            cp -a /var/lib/Pegasus /usr/share/factory/var/lib/Pegasus
++            [ $? -eq 0 ] && chatter "Image Mode: factory directory updated successfully"
++        else
++            echo "Warning: Image Mode factory directory update failed - insufficient permissions" >&2
++        fi
++    fi
+ }
+ 
+ pegasus_uninstall()
+@@ -316,6 +330,21 @@ EOFX
+ EOFE
+ 	  $WBEMEXEC > /dev/null $_DELETE_NAME
+ 	done
++
++        # Image Mode: Update factory directory with current Pegasus repository state
++        if [ -d /usr/share/factory/var/lib/Pegasus ]
++        then
++            chatter "Image Mode detected: updating tmpfiles factory after uninstall"
++            if [ -w /usr/share/factory/var/lib ] && [ -r /var/lib/Pegasus ]
++            then
++                rm -rf /usr/share/factory/var/lib/Pegasus &&
++                cp -a /var/lib/Pegasus /usr/share/factory/var/lib/Pegasus
++                [ $? -eq 0 ] && chatter "Image Mode: factory directory updated successfully"
++            else
++                echo "Warning: Image Mode factory directory update failed - insufficient permissions" >&2
++            fi
++        fi
++
+     else
+ 	echo "Sorry, cimserver must be running to deregister the providers." >&2
+ 	return 1
+@@ -433,6 +462,20 @@ sfcb_install()
+ 	echo "Failed to build sfcb registration file." >&2
+ 	return 1
+     fi
++
++    # Image Mode: Update factory directory with current sfcb repository state
++    if [ -d /usr/share/factory/var/lib/sfcb ]
++    then
++        chatter "Image Mode detected: updating tmpfiles factory"
++        if [ -w /usr/share/factory/var/lib ] && [ -r /var/lib/sfcb ]
++        then
++            rm -rf /usr/share/factory/var/lib/sfcb &&
++            cp -a /var/lib/sfcb /usr/share/factory/var/lib/sfcb
++            [ $? -eq 0 ] && chatter "Image Mode: factory directory updated successfully"
++        else
++            echo "Warning: Image Mode factory directory update failed - insufficient permissions" >&2
++        fi
++    fi
+ }
+ 
+ sfcb_uninstall()
+@@ -459,6 +502,20 @@ sfcb_uninstall()
+ 
+     # Rebuild repository
+     sfcb_rebuild
++
++    # Image Mode: Update factory directory with current sfcb repository state
++    if [ -d /usr/share/factory/var/lib/sfcb ]
++    then
++        chatter "Image Mode detected: updating tmpfiles factory after uninstall"
++        if [ -w /usr/share/factory/var/lib ] && [ -r /var/lib/sfcb ]
++        then
++            rm -rf /usr/share/factory/var/lib/sfcb &&
++            cp -a /var/lib/sfcb /usr/share/factory/var/lib/sfcb
++            [ $? -eq 0 ] && chatter "Image Mode: factory directory updated successfully"
++        else
++            echo "Warning: Image Mode factory directory update failed - insufficient permissions" >&2
++        fi
++    fi
+ }
+ 
+ openwbem_transform()

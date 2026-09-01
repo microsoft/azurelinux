@@ -11,7 +11,7 @@
 Summary: The GNU Portable Library Tool
 Name:    libtool
 Version: 2.5.4
-Release: 12%{?dist}
+Release: 10%{?dist}
 
 # To help future rebase, the following licenses were seen in the following files/folders:
 # '*' is anything that was not explicitly listed earlier in the folder
@@ -119,7 +119,7 @@ and GNU Automake).
 %package ltdl
 Summary:  Runtime libraries for GNU Libtool Dynamic Module Loader
 Provides: %{name}-libs = %{version}-%{release}
-License:  LGPLv2+
+License:  LGPL-2.0-or-later WITH Libtool-exception
 
 
 %description ltdl
@@ -136,7 +136,7 @@ the rest of the GNU Autotools (including GNU Autoconf and GNU Automake).
 Summary: Tools needed for development using the GNU Libtool Dynamic Module Loader
 Requires: automake = %automake_version
 Requires: %{name}-ltdl = %{version}-%{release}
-License:  LGPLv2+
+License:  LGPL-2.0-or-later WITH Libtool-exception
 
 
 %description ltdl-devel
@@ -202,6 +202,12 @@ rm -f %{buildroot}%{_libdir}/libltdl.{a,la}
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.4-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Dec 20 2025 Jakub Jelinek <jakub@redhat.com> - 2.5.4-9
+- bump: for gcc 16.* in rawhide
+
 * Fri Sep 19 2025 David Abdurachmanov <davidlt@rivosinc.com> - 2.5.4-8
 - RISC-V doesn't allow linking non-PIC into shared objects
 

@@ -1,0 +1,49 @@
+From 2a14193f39f6865cc87ece21893eb7eec494edea Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Tue, 13 Jan 2026 11:41:46 +0200
+Subject: [PATCH] Remove tabfile support as PLY removed it as well
+
+tabfiles were dumped for debug mode but since they aren't provided by
+PLY anymore (and PLY is no longer developed), simply drop the usage if
+PLY doesn't expose it.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+---
+ lesscpy/lessc/parser.py | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+diff --git a/lesscpy/lessc/parser.py b/lesscpy/lessc/parser.py
+index a16a7d8..e5ca0a4 100644
+--- a/lesscpy/lessc/parser.py
++++ b/lesscpy/lessc/parser.py
+@@ -108,13 +108,20 @@ class LessParser(object):
+         self.ignored = ('css_comment', 'less_comment', 'css_vendor_hack')
+ 
+         self.tokens = [t for t in self.lex.tokens if t not in self.ignored]
+-        self.parser = ply.yacc.yacc(
+-            module=self,
+-            start='tunit',
+-            debug=yacc_debug,
+-            optimize=yacc_optimize,
+-            tabmodule=tabfile,
+-            outputdir=outputdir)
++        if 'tab_module' in ply.yacc.yacc.__code__.co_names:
++            self.parser = ply.yacc.yacc(
++                module=self,
++                start='tunit',
++                debug=yacc_debug,
++                optimize=yacc_optimize,
++                tabmodule=tabfile,
++                outputdir=outputdir)
++        else:
++            self.parser = ply.yacc.yacc(
++                module=self,
++                start='tunit',
++                debug=yacc_debug,
++                optimize=yacc_optimize)
+         self.scope = scope if scope else Scope()
+         self.stash = {}
+         self.result = None
+-- 
+2.52.0
+

@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           iotop-c
-Version:        1.30
-Release: 5%{?dist}
+Version:        1.31
+Release:        1%{?dist}
 Summary:        Simple top-like I/O monitor (implemented in C)
 
 License:        GPL-2.0-or-later
@@ -56,6 +56,12 @@ V=1 STRIP=: BINDIR=$RPM_BUILD_ROOT%{_bindir} %make_install
 %{_mandir}/man8/iotop.8*
 
 %changelog
+* Wed Jan 21 2026 Boian Bonev <bbonev@ipacct.com> - 1.31-1
+- Update to latest ver 1.31
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.30-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

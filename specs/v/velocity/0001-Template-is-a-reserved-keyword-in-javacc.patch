@@ -9,20 +9,20 @@ Forwarded: no
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/velocity-engine-core/src/main/parser/Parser.jjt b/velocity-engine-core/src/main/parser/Parser.jjt
-index 593d044b..f3bed948 100644
+index 4e790735..50c0ebac 100644
 --- a/velocity-engine-core/src/main/parser/Parser.jjt
 +++ b/velocity-engine-core/src/main/parser/Parser.jjt
 @@ -234,12 +234,12 @@ public class ${parser.basename}Parser implements Parser
       * the new stream that we want parsed.
       */
      @Override
--    public SimpleNode parse( Reader reader, Template template )
+-    public SimpleNode parse( Reader reader, Template t )
 +    public SimpleNode parse( Reader reader, Template tmplate )
          throws ParseException
      {
          SimpleNode sn = null;
  
--        currentTemplate = template;
+-        currentTemplate = t;
 +        currentTemplate = tmplate;
  
          try
@@ -31,7 +31,7 @@ index 593d044b..f3bed948 100644
               *  thrown by the Macro class when something is amiss in the
               *  Macro specification
               */
--            log.error("{}: {}", template.getName(), mee.getMessage(), mee);
+-            log.error("{}: {}", t.getName(), mee.getMessage(), mee);
 +            log.error("{}: {}", tmplate.getName(), mee.getMessage(), mee);
              throw mee;
          }
@@ -40,11 +40,11 @@ index 593d044b..f3bed948 100644
          }
          catch (Exception e)
          {
--            String msg = template.getName() + ": " + e.getMessage();
+-            String msg = t.getName() + ": " + e.getMessage();
 +            String msg = tmplate.getName() + ": " + e.getMessage();
              log.error(msg, e);
              throw new VelocityException(msg, e, getRuntimeServices().getLogContext().getStackTrace());
          }
 -- 
-2.41.0
+2.52.0
 

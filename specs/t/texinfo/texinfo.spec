@@ -6,7 +6,7 @@
 Summary: Tools needed to create Texinfo format documentation files
 Name: texinfo
 Version: 7.2
-Release: 10%{?dist}
+Release: 9%{?dist}
 License: GPL-3.0-or-later
 Url: http://www.gnu.org/software/texinfo/
 Source0: ftp://ftp.gnu.org/gnu/texinfo/texinfo-%{version}.tar.xz
@@ -22,6 +22,8 @@ Patch3: texinfo-7.1-various-sast-fixes.patch
 Patch4: texinfo-7.1-make-tainted-data-safe.patch
 # Patch5: fixes Perl precedence warnings (already upstream)
 Patch5: texinfo-7.2-fix-perl-precedence-warnings.patch
+# Patch6: add support for zstd compression
+Patch6: texinfo-6.7-zstd-compression.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -153,9 +155,15 @@ export ALL_TESTS=yes
 %{_mandir}/man1/pdftexi2dvi.1*
 
 %changelog
-* Thu Feb 12 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 7.2-7
+* Thu Feb 12 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 7.2-9
 - Use || : so scriptlets do not fail when devfs is unavailable
   Resolves: #2422085
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Nov 29 2025 Neal Gompa <ngompa@fedoraproject.org> - 7.2-7
+- Add patch to support zstd compressed info pages
 
 * Fri Aug 01 2025 Vitezslav Crhonek <vcrhonek@redhat.com> - 7.2-6
 - Fix FTBFS (Perl precedence warnings)

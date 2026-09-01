@@ -6,7 +6,7 @@
 
 Name:           python-%{modname}
 Version:        2.1.0
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Hamcrest matchers for Python
 
 License:        BSD-3-Clause
@@ -64,6 +64,9 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %files -n python3-%{modname} -f %{pyproject_files}
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.1.0-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

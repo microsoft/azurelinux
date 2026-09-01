@@ -5,11 +5,11 @@
 
 Name:           libcloudproviders
 Summary:        Library for integration of cloud storage providers
-Version:        0.3.6
-Release: 5%{?dist}
+Version:        0.4.0
+Release:        1%{?dist}
 License:        LGPL-3.0-or-later
 
-URL:            https://gitlab.gnome.org/World/libcloudproviders
+URL:            https://gitlab.gnome.org/GNOME/libcloudproviders
 Source0:        https://ftp.gnome.org/pub/GNOME/sources/libcloudproviders/%{api_version}/libcloudproviders-%{version}.tar.xz
 
 BuildRequires:  gcc
@@ -18,6 +18,7 @@ BuildRequires:  meson
 BuildRequires:  vala
 
 BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gi-docgen)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 
@@ -61,13 +62,22 @@ developing applications that use %{name}.
 %{_libdir}/libcloudproviders.so
 %dir %{_datadir}/gir-1.0
 %{_datadir}/gir-1.0/CloudProviders-%{api_version}.gir
-%{_datadir}/gtk-doc/
+%{_datadir}/doc/
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
 %{_datadir}/vala/vapi/cloudproviders.*
 
 
 %changelog
+* Mon Jan 19 2026 Jan Horak <jhorak@redhat.com> - 0.4.0-1
+- Update to 0.4.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 24 2025 Georg Sauthoff <mail@gms.tf> - 0.3.6-3
+- update project URL
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.6-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -3,7 +3,7 @@
 
 Name:           perl-Digest
 Version:        1.20
-Release: 523%{?dist}
+Release:        520%{?dist}
 Summary:        Modules that calculate message digests
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Digest

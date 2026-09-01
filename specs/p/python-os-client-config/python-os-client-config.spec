@@ -22,7 +22,7 @@ have to know extra info to use OpenStack \
 
 Name:           python-%{pypi_name}
 Version:        2.1.0
-Release: 22%{?dist}
+Release:        20%{?dist}
 Summary:        OpenStack Client Configuration Library
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:        Apache-2.0
@@ -113,6 +113,9 @@ export PYTHONPATH=$PWD
 %endif
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.1.0-19
 - Rebuilt for Python 3.14.0rc3 bytecode
 

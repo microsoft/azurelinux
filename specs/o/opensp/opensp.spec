@@ -4,7 +4,7 @@
 Summary: SGML and XML parser
 Name: opensp
 Version: 1.5.2
-Release: 52%{?dist}
+Release: 50%{?dist}
 Requires: sgml-common >= 0.5
 Provides: bundled(gettext) = 0.14.5
 URL: http://openjade.sourceforge.net/
@@ -61,6 +61,11 @@ touch lib/parser_inst.cxx
  --disable-dependency-tracking --disable-static --enable-http \
  --enable-default-catalog=/etc/sgml/catalog \
  --enable-default-search-path=/usr/share/sgml:/usr/share/xml
+
+# Remove rpath from libtool
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+
 make %{?_smp_mflags}
 
 %install
@@ -93,9 +98,6 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/OpenSP
 
 %find_lang sp5
 
-# Stop check-rpaths from complaining about standard runpaths.
-export QA_RPATHS=0x0001
-
 %check
 make check || : # TODO: failures as of 1.5.2 :(
 
@@ -122,6 +124,9 @@ make check || : # TODO: failures as of 1.5.2 :(
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-50
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-49
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

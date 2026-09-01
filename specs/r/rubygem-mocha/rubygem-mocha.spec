@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.6.1
-Release: 7%{?dist}
+Release: 6%{?dist}
 Summary: Mocking and stubbing library
 License: Ruby OR BSD-2-Clause OR MIT
 URL: https://mocha.jamesmead.org
@@ -16,6 +16,9 @@ Source1: %{gem_name}-%{version}-test.tar.gz
 # Use single quote instead of backtick for Ruby 3.4 compatibility
 # https://github.com/freerange/mocha/pull/688
 Patch0: rubygem-mocha-2.6.1-Support-single-quote-instead-of-backtick-for-Ruby-3.4.patch
+# Use URI instead of CGI for ruby3_5
+# https://github.com/freerange/mocha/pull/755
+Patch1: mocha-pr755-replace-CGI-with-URI.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -42,6 +45,7 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version} -b 1
 
+%patch 1 -p1
 pushd %{builddir}
 %patch 0 -p1
 popd
@@ -89,6 +93,12 @@ popd
 %{gem_instdir}/mocha.gemspec
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 03 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.6.1-5
+- Replace CGI with URI for ruby3_5
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -20,7 +20,7 @@
 
 Name:           %{prefix}-healthcheck
 Version:        0.19
-Release: 5%{?dist}
+Release:        4%{?dist}
 Summary:        Health check tool for %{productname}
 BuildArch:      noarch
 License:        GPL-3.0-or-later
@@ -29,20 +29,19 @@ Source0:        https://github.com/freeipa/freeipa-healthcheck/archive/%{version
 Source1:        ipahealthcheck.conf
 
 Patch0001:      0001-Remove-ipaclustercheck.patch
+Patch0002:      0002-Migrate-from-pkg_resources.patch
 
 Requires:       %{name}-core = %{version}-%{release}
 Requires:       %{prefix}-server
 Requires:       python3-ipalib
 Requires:       python3-ipaserver
 Requires:       python3-lib389 >= 1.4.2.14-1
-Requires:       python3-setuptools
 # cronie-anacron provides anacron
 Requires:       anacron
 Requires:       logrotate
 Requires(post): systemd-units
 Requires:       %{name}-core = %{version}-%{release}
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
 BuildRequires:  systemd-devel
 %{?systemd_requires}
 # packages for make check
@@ -66,9 +65,6 @@ proactively detect defects in a FreeIPA cluster.
 
 %package -n %{name}-core
 Summary: Core plugin system for healthcheck
-
-# so that freeipa-healthcheck-core can work standalone
-Requires:       python3-setuptools
 
 # Cross-provides for sibling OS
 Provides:       %{alt_name}-core = %{version}
@@ -166,11 +162,20 @@ PYTHONPATH=src PATH=$PATH:$RPM_BUILD_ROOT/usr/bin pytest-3 tests/test_*
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.19-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 05 2026 Rob Crittenden <rcritten@redhat.com> - 0.19-3
+- Migrate from pkg_resources
+
 * Fri Oct 31 2025 Rob Crittenden <rcritten@redhat.com> - 0.19-2
 - Added Requires on python3-setuptools to the core subpackage
 
 * Mon Sep 22 2025 Rob Crittenden <rcritten@redhat.com> - 0.19-1
 - Update to 0.19 release
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.18-8
+- Rebuilt for Python 3.14.0rc3 bytecode
 
 * Tue Sep 02 2025 Rob Crittenden <rcritten@redhat.com> - 0.18-7
 - Add a dependency on python3-setuptools to fix the broken package while we

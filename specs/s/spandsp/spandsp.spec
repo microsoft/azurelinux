@@ -6,7 +6,7 @@
 Name:           spandsp
 Summary:        A DSP library for telephony
 Version:        0.0.6
-Release:        21%{?pre:.pre%{pre}}%{?dist}
+Release:        22%{?pre:.pre%{pre}}%{?dist}
 License:        LGPL-2.1-only AND GPL-2.0-only
 URL:            https://www.soft-switch.org
 # Remove non-free file (no permission to redistribute)
@@ -84,6 +84,9 @@ mkdir -p %{buildroot}%{_datadir}/%{name}
 %doc doc/api/html/*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.6-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.6-21
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

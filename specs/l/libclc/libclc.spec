@@ -5,19 +5,19 @@
 %global debug_package %{nil}
 
 %global shortname clc
-%global libclc_version 21.1.8
+%global libclc_version 22.1.8
 #global rc_ver 3
-%global libclc_srcdir libclc-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}.src
+%global src_tarball_dir llvm-project-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}.src
 
 Name:           libclc
 Version:        %{libclc_version}%{?rc_ver:~rc%{rc_ver}}
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        An open source implementation of the OpenCL 1.1 library requirements
 
 License:        Apache-2.0 WITH LLVM-exception OR NCSA OR MIT
 URL:            https://libclc.llvm.org
-Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}/%{libclc_srcdir}.tar.xz
-Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}/%{libclc_srcdir}.tar.xz.sig
+Source0:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}/%{src_tarball_dir}.tar.xz
+Source1:        https://github.com/llvm/llvm-project/releases/download/llvmorg-%{libclc_version}%{?rc_ver:-rc%{rc_ver}}/%{src_tarball_dir}.tar.xz.sig
 Source2:        release-keys.asc
 
 BuildRequires:  clang-devel >= %{version}
@@ -77,29 +77,32 @@ developing applications that use %{name}.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup -n %{libclc_srcdir} -p2
+%autosetup -n %{src_tarball_dir}
 
 %build
 export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %set_build_flags
+cd libclc
 %cmake -DCMAKE_INSTALL_DATADIR:PATH=%{_lib}
 
 %cmake_build
 
 %install
+cd libclc
 %cmake_install
 
 %check
+cd libclc
 %cmake_build --target test
 
 %files
-%license LICENSE.TXT
-%doc README.md CREDITS.TXT
+%license libclc/LICENSE.TXT
+%doc libclc/README.md libclc/CREDITS.TXT
 %{_libdir}/%{shortname}/*.bc
 
 %files spirv
-%license LICENSE.TXT
-%doc README.md CREDITS.TXT
+%license libclc/LICENSE.TXT
+%doc libclc/README.md libclc/CREDITS.TXT
 %dir %{_libdir}/%{shortname}
 %{_libdir}/%{shortname}/spirv-mesa3d-.spv
 %{_libdir}/%{shortname}/spirv64-mesa3d-.spv
@@ -108,6 +111,39 @@ export CFLAGS="%{build_cflags} -D__extern_always_inline=inline"
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Tue Jun 16 2026 Packit <hello@packit.dev> - 22.1.8-1
+- Update to version 22.1.8
+- Resolves: rhbz#2489268
+
+* Tue Jun 02 2026 Packit <hello@packit.dev> - 22.1.7-1
+- Update to version 22.1.7
+- Resolves: rhbz#2483916
+
+* Thu May 21 2026 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 22.1.6-1
+- Update to LLVM 22.1.6
+- Resolves: rhbz#2479764
+
+* Wed May 06 2026 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 22.1.5-1
+- Update to LLVM 22.1.5
+- Resolves: rhbz#2466849
+
+* Tue Apr 21 2026 Packit <hello@packit.dev> - 22.1.4-1
+- Update to version 22.1.4
+- Resolves: rhbz#2460022
+
+* Tue Apr 07 2026 Packit <hello@packit.dev> - 22.1.3-1
+- Update to version 22.1.3
+- Resolves: rhbz#2455883
+
+* Tue Mar 31 2026 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 22.1.2-1
+- Update to LLVM 22.1.2
+
+* Thu Mar 12 2026 Tulio Magno Quites Machado Filho <tuliom@redhat.com> - 22.1.1-1
+- Update to LLVM 22.1.1
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 21.1.8-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Dec 16 2025 Packit <hello@packit.dev> - 21.1.8-1
 - Update to version 21.1.8
 - Resolves: rhbz#2422638

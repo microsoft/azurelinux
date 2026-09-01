@@ -4,8 +4,8 @@
 %global         forgeurl https://github.com/osbuild/osbuild
 %global         selinuxtype targeted
 
-Version:        174
-%global         osbuild_initrd_version 0.1
+Version:        191
+%global         osbuild_initrd_version 0.2
 
 %forgemeta
 
@@ -14,7 +14,7 @@ Version:        174
 %global         debug_package %{nil}
 
 Name:           %{pypi_name}
-Release: 4%{?dist}
+Release:        1%{?dist}
 License:        Apache-2.0
 
 URL:            %{forgeurl}
@@ -139,8 +139,8 @@ Osbuild initrd used for in-vm support.
 %package        selinux
 Summary:        SELinux policies
 Requires:       %{name} = %{version}-%{release}
-Requires:       selinux-policy-%{selinuxtype}
-Requires(post): selinux-policy-%{selinuxtype}
+Requires:       selinux-policy-%{selinuxtype} >= %{_selinux_policy_version}
+Requires(post): selinux-policy-%{selinuxtype} >= %{_selinux_policy_version}
 BuildRequires:  selinux-policy-devel
 %{?selinux_requires}
 
@@ -151,9 +151,9 @@ containers it uses to build OS artifacts.
 
 %package        container-selinux
 Summary:        SELinux container policies
-Requires:       selinux-policy-%{selinuxtype}
+Requires:       selinux-policy-%{selinuxtype} >= %{_selinux_policy_version}
 Requires:       container-selinux
-Requires(post): selinux-policy-%{selinuxtype}
+Requires(post): selinux-policy-%{selinuxtype} >= %{_selinux_policy_version}
 Requires(post): container-selinux
 BuildRequires:  selinux-policy-devel
 BuildRequires:  selinux-policy-devel
@@ -184,11 +184,8 @@ manifests and osbuild.
 Summary:        Dependency solving support for DNF
 Requires:       %{name} = %{version}-%{release}
 
-# RHEL 11 and Fedora 41 and later use libdnf5, RHEL < 11 and Fedora < 41 use dnf
-# On Fedora 41 however, we force dnf4 (and depend on python3-dnf) until dnf5 issues are resolved.
-# See https://github.com/rpm-software-management/dnf5/issues/1748
-# and https://issues.redhat.com/browse/COMPOSER-2361
-%if 0%{?rhel} >= 11
+# Default to using DNF5 solver for RHEL 11 and Fedora 45 and later
+%if 0%{?rhel} >= 11 || 0%{?fedora} >= 45
 Requires: python3-libdnf5 >= 5.2.1
 %else
 Requires: python3-dnf
@@ -210,6 +207,17 @@ Provides: osbuild-dnf-json-api = 8
 
 %description    depsolve-dnf
 Contains depsolving capabilities for package managers.
+
+%if ! (0%{?rhel} && "%{_arch}" == "ppc64le")
+%package        virt-deps
+Summary:        Dependencies required for running osbuild pipelines in a VM.
+Requires:       %{name} = %{version}-%{release}
+Requires:       qemu-kvm
+Requires:       virtiofsd
+
+%description    virt-deps
+Dependencies required for running osbuild pipelines in a VM.
+%endif
 
 %prep
 %forgeautosetup -p1
@@ -289,13 +297,13 @@ install -p -m 0755 data/10-osbuild-inhibitor.rules %{buildroot}%{_udevrulesdir}
 mkdir -p %{buildroot}%{_libexecdir}
 install -p -m 0755 tools/osbuild-depsolve-dnf %{buildroot}%{_libexecdir}/osbuild-depsolve-dnf
 
+# Install `osbuild-store` into libexec
+install -p -m 0755 tools/osbuild-store %{buildroot}%{_libexecdir}/osbuild-store
+
 # Configure the solver for dnf
 mkdir -p %{buildroot}%{_datadir}/osbuild
-# RHEL 11 and Fedora 41 and later use dnf5, RHEL < 11 and Fedora < 41 use dnf
-# On Fedora 41 however, we force dnf4 (and depend on python3-dnf) until dnf5 issues are resolved.
-# See https://github.com/rpm-software-management/dnf5/issues/1748
-# and https://issues.redhat.com/browse/COMPOSER-2361
-%if 0%{?rhel} >= 11
+# Default to using DNF5 solver for RHEL 11 and Fedora 45 and later
+%if 0%{?rhel} >= 11 || 0%{?fedora} >= 45
 install -p -m 0644 tools/solver-dnf5.json %{buildroot}%{pkgdir}/solver.json
 %else
 install -p -m 0644 tools/solver-dnf.json %{buildroot}%{pkgdir}/solver.json
@@ -314,7 +322,12 @@ exit 0
 # This means some tests won't be run even though they could,
 # but that's an acceptable tradeoff.
 ignore_files=()
-skip_tests=()
+
+# Fails very regularly downstream recently
+# TestUtilJsonComm.test_send_and_recv_tons_of_data_is_fine - https://github.com/osbuild/osbuild/issues/2336
+skip_tests=(
+    "(TestUtilJsonComm and test_send_and_recv_tons_of_data_is_fine)"
+)
 
 # x86_64-specific tests:
 # test/mod/test_util_sbom_spdx.py
@@ -342,12 +355,10 @@ skip_tests+=(
 
 # fails on ppc64le:
 # TestAPI.test_exception - https://github.com/osbuild/osbuild/issues/2337
-# TestUtilJsonComm.test_send_and_recv_tons_of_data_is_fine - https://github.com/osbuild/osbuild/issues/2336
 # TestUtilJsonComm.test_sendmsg_errors_with_size_on_EMSGSIZE - https://github.com/osbuild/osbuild/issues/2342
 %ifarch ppc64le
 skip_tests+=(
     "(TestAPI and test_exception)"
-    "(TestUtilJsonComm and test_send_and_recv_tons_of_data_is_fine)"
     "(TestUtilJsonComm and test_sendmsg_errors_with_size_on_EMSGSIZE)"
 )
 %endif
@@ -472,12 +483,234 @@ fi
 %{_bindir}/osbuild-image-info
 %{_bindir}/osbuild-mpp
 %{?fedora:%{_bindir}/osbuild-dev}
+%{_libexecdir}/osbuild-store
 
 %files depsolve-dnf
 %{_libexecdir}/osbuild-depsolve-dnf
 %{pkgdir}/solver.json
 
+%if ! (0%{?rhel} && "%{_arch}" == "ppc64le")
+%files virt-deps
+%endif
+
 %changelog
+* Sun Aug 23 2026 Packit <hello@packit.dev> - 191-1
+Changes with 191
+----------------
+  - Add SECURITY.md file (#2536)
+    - Author: Achilleas Koutsou, Reviewers: Sanne Raymaekers, Simon de Vlieger
+  - Add a manifest for buiding a Fedora riscv64 container in an x86_64 buildroot (#2539)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Schutzfile: update Fedora 43 repo snapshots (#2535)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Support rootless osbuild runs without container (#2546)
+    - Author: Alexander Larsson, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update images dependency ref to latest (#2543)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - Update osbuild-ci container images (#2540)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update snapshots to 20260816 (#2541)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - main: Make rootless work when using the /usr/bin/osbuild wrapper (#2547)
+    - Author: Alexander Larsson, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - rhsm: prefer Katello CA on Satellite-registered hosts (SAT-37848) (#2537)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - spec: update osbuild-initrd dependency to 0.2 (#2545)
+    - Author: Achilleas Koutsou, Reviewers: Alexander Larsson, Simon de Vlieger
+  - stages/dd: create `dd` stage (#2533)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - test: fix missing mock_run (#2534)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+
+— Somewhere on the Internet, 2026-08-23
+
+* Tue Aug 11 2026 Packit <hello@packit.dev> - 190-1
+Changes with 190
+----------------
+  - Update images dependency ref to latest (#2523)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update images dependency ref to latest (#2529)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update osbuild-ci container images (#2521)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - Update snapshots to 20260802 (#2522)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update snapshots to 20260809 (#2528)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - stage/rpm: general env options (#2524)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - stage/rpm: query only supported metadata tags (HMS-11174) (#2526)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-08-11
+
+* Wed Jul 29 2026 Packit <hello@packit.dev> - 189-1
+Changes with 189
+----------------
+  - Added new stage org.osbuild.idmap to enable shifting UIDs/GIDs (#2495)
+    - Author: Michael Engel, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Update images dependency ref to latest (#2517)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update osbuild-ci container images (#2508)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - Update snapshots to 20260712 (#2505)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - Update snapshots to 20260719 (#2511)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Lukáš Zapletal
+  - Update snapshots to 20260726 (#2516)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - add Oracle as datasource to cloud init (#2519)
+    - Author: src-up, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - ci: enable allow-unsafe-pr-checkout (#2515)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Brian C. Lane, Simon de Vlieger
+  - stage/rpm: include additional header digests (#2478)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Brian C. Lane
+  - test: adapt to image-builder cache new layout (HMS-10855) (#2514)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Brian C. Lane
+
+— Somewhere on the Internet, 2026-07-29
+
+* Fri Jul 10 2026 Packit <hello@packit.dev> - 187-1
+Changes with 187
+----------------
+  - Update images dependency ref to latest (#2497)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - Update osbuild-ci container images (#2493)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - Update snapshots to 20260705 (#2496)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - containers-storage: Handle missing `storage.conf` values (#2501)
+    - Author: Joel Capitao, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - stages/bootc.install-to-fs: remount /dev/shm in addition to /dev/shm (#2494)
+    - Author: Alexander Larsson, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - stages/org.osbuild.bfb: BFB boot grub shims (#2471)
+    - Author: Eli Elgaev, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - stages: add org.osbuild.grub2.d (#2473)
+    - Author: Jean-Baptiste Trystram, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - utils: add utils.makeefi library (#2499)
+    - Author: Dusty Mabe, Reviewers: Achilleas Koutsou, Renata Ravanelli, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-07-10
+
+* Wed Jun 17 2026 Packit <hello@packit.dev> - 185-1
+Changes with 185
+----------------
+  - Update snapshots to 20260531 (#2466)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Lukáš Zapletal, Simon de Vlieger
+  - ci: fix `test_qemu` (#2483)
+    - Author: Simon de Vlieger, Reviewers: Simon Steinbeiß, Tomáš Hozza
+  - org.osbuild.ovf: support setting virtual hardware version (HMS-3248) (#2468)
+    - Author: Sanne Raymaekers, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - runners: Add Oracle Linux 9 runner symlinked to CentOS9 (#2476)
+    - Author: Laurence Rochfort, Reviewers: Brian C. Lane, Simon de Vlieger
+  - sources/librepo: accept SHA1 (#2477)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Lukáš Zapletal
+
+— Somewhere on the Internet, 2026-06-17
+
+* Wed May 27 2026 Packit <hello@packit.dev> - 183-1
+Changes with 183
+----------------
+  - .gitlab-ci.yml: add 9.8-ga and 10.2-ga (#2457)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Simon Steinbeiß
+  - Optimize osbuild-depsolve-dnf memory and runtime performance (HMS-10526) (#2456)
+    - Author: Tomáš Hozza, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - Update images dependency ref to latest (#2461)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - mounts/ddi: mounting of DDIs (#2459)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - runners: `eln11` (HMS-10652, HMS-10652) (#2453)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - test: update container IDs for manifest-list-test (#2455)
+    - Author: Achilleas Koutsou, Reviewers: Simon de Vlieger, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-05-27
+
+* Mon May 11 2026 Packit <hello@packit.dev> - 181-1
+Changes with 181
+----------------
+  - stages/bootc.install-to-fs: remount /dev (#2440)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-05-11
+
+* Thu Apr 02 2026 Packit <hello@packit.dev> - 178-1
+Changes with 178
+----------------
+  - Packit: disable s390x builds in COPR (#2406)
+    - Author: Tomáš Hozza, Reviewers: Anna Vítová, Simon de Vlieger
+  - Support uri encoded urls (#2405)
+    - Author: Justin Sherrill, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Update osbuild-ci container images (#2408)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - Update snapshots to 20260329 (#2403)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - stage: flatpak.build-import-bundle.oci (HMS-10170) (#2400)
+    - Author: Simon de Vlieger, Reviewers: Dusty Mabe, Lukáš Zapletal, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-04-02
+
+
+* Thu Mar 26 2026 Packit <hello@packit.dev> - 177-1
+Changes with 177
+----------------
+  - Add stages used for building s390x isos (HMS-9967) (#2390)
+    - Author: Brian C. Lane, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - SPEC: default to using DNF5 depsolver on Fedora 45+ (current Rawhide) (HMS-10343) (#2389)
+    - Author: Tomáš Hozza, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Stage changes to support building ppc64le isos (HMS-9968) (#2377)
+    - Author: Brian C. Lane, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Update images dependency ref to latest (#2394)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - Update osbuild-ci container images (#2392)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - Update snapshots to 20260315 (#2393)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Tomáš Hozza
+  - Update snapshots to 20260322 (#2397)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - buildroot: Use bwrap's --drop-cap ALL (#2395)
+    - Author: Lars Karlitski, Reviewers: Achilleas Koutsou, Alexander Larsson
+  - chore: clean up team ssh keys (#2391)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Anna Vítová, Tomáš Hozza
+  - cli: Print checkpoint cache status (#2388)
+    - Author: Lars Karlitski, Reviewers: Achilleas Koutsou, Simon de Vlieger, Tomáš Hozza
+  - stages/aleph: make path parametrizable (#2384)
+    - Author: Jean-Baptiste Trystram, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - tools/osbuild-store: do stuff with sources and store (HMS-10238) (#2364)
+    - Author: Sanne Raymaekers, Reviewers: Brian C. Lane, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-03-26
+
+
+* Wed Mar 11 2026 Packit <hello@packit.dev> - 176-1
+Changes with 176
+----------------
+  - CI: run tests on 9.7+10.1 GA and 9.8+10.2 nightly (HMS-9794) (#2351)
+    - Author: Tomáš Hozza, Reviewers: Lukáš Zapletal, Sanne Raymaekers
+  - Revert "schutzbot: update libsemanage before installing osbuild" (#2378)
+    - Author: Sanne Raymaekers, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - Solver: fix `repo_ids` to restrict all dependency resolution, not just top-level packages (HMS-10314) (#2379)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - Solver: implement per-transaction package excludes in the DNF5 solver (HMS-10318) (#2381)
+    - Author: Tomáš Hozza, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Update images dependency ref to latest (#2383)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Tomáš Hozza
+  - Update osbuild-ci container images (#2367)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Simon de Vlieger
+  - Update snapshots to 20260308 (#2382)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - docs: shift manifest guide headings one level down (#2385)
+    - Author: Achilleas Koutsou, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - solver: add cost field to Repository model (#2380)
+    - Author: Mark Kemel, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - stages/rpm: add nodeps option for `rpm install --nodeps` (#2387)
+    - Author: Dusty Mabe, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - stages: add coreos.bfb for NVIDIA BlueField DPUs (#2349)
+    - Author: Sagi Zigmon, Reviewers: Nobody
+
+— Somewhere on the Internet, 2026-03-11
+
+
 * Thu Feb 19 2026 Packit <hello@packit.dev> - 174-1
 ## What's Changed
  * Fix packaging conflict in initrd directory causing downgrade failures by @thozza in https://github.com/osbuild/osbuild/pull/2347
@@ -490,6 +723,23 @@ fi
 
 
  **Full Changelog**: https://github.com/osbuild/osbuild/compare/v173...v174
+
+* Wed Feb 11 2026 Packit <hello@packit.dev> - 173-1
+Changes with 173
+----------------
+  - Revert "test_objectstore: add time.sleep(0.1) to solve flaky tests" (#2340)
+    - Author: Lukáš Zapletal, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - SPEC: disable tests that tend to fail during rpmbuild in Koji (HMS-9796) (#2338)
+    - Author: Tomáš Hozza, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Update images dependency ref to latest (#2341)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - Update snapshots to 20260208 (#2335)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - stages/module-config: postfix with `.module` (#2344)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-02-11
+
 
 * Fri Feb 06 2026 Packit <hello@packit.dev> - 172-1
 Changes with 172
@@ -507,6 +757,9 @@ Changes with 172
 
 — Somewhere on the Internet, 2026-02-06
 
+
+* Tue Feb 03 2026 Maxwell G <maxwell@gtmx.me> - 171-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
 
 * Tue Jan 27 2026 Packit <hello@packit.dev> - 171-1
 Changes with 171
@@ -553,6 +806,9 @@ Changes with 170
 
 — Somewhere on the Internet, 2026-01-21
 
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 169-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Wed Jan 14 2026 Packit <hello@packit.dev> - 169-1
 Changes with 169
@@ -697,6 +953,35 @@ Changes with 163
 — Somewhere on the Internet, 2025-10-22
 
 
+* Wed Oct 08 2025 Packit <hello@packit.dev> - 162-1
+Changes with 162
+----------------
+  - Added new org.osbuild.systemd-sysuser stage (#2192)
+    - Author: Michael Engel, Reviewers: Nobody
+  - Allow building bootc images in unprivileged containers (#2187)
+    - Author: Alexander Larsson, Reviewers: Brian C. Lane, Michael Vogt, Tomáš Hozza
+  - CI: enable RPM builds and testing on RHEL 9.8 and 10.2 nightly (HMS-9227) (#2203)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Revert "stages: add `efi_src_dir` config to grub2.iso stage" (#2205)
+    - Author: Michael Vogt, Reviewers: Achilleas Koutsou
+  - Update images dependency ref to latest (#2207)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - Update snapshots to 20251001 (#2210)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - docs: document `--quiet, -q` flag (#2214)
+    - Author: Florian Schüller, Reviewers: Michael Vogt, Simon de Vlieger
+  - osbuild: if Loop.mknod() cannot bind mount fallback to mknod (#2208)
+    - Author: Michael Vogt, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - schema/metadata: `exports` (#2198)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - selinux: Add osbuild_container_t domain for using osbuild in a container (#2195)
+    - Author: Alexander Larsson, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - stages: add `efi_src_dir` config to grub2.iso stage (#2202)
+    - Author: Michael Vogt, Reviewers: Achilleas Koutsou, Simon de Vlieger
+
+— Somewhere on the Internet, 2025-10-08
+
+
 * Wed Sep 24 2025 Packit <hello@packit.dev> - 161-1
 Changes with 161
 ----------------
@@ -716,30 +1001,8 @@ Changes with 161
 — Somewhere on the Internet, 2025-09-24
 
 
-* Wed Sep 10 2025 Packit <hello@packit.dev> - 160-1
-Changes with 160
-----------------
-  - Add support for runtime-cleanup.tmpl (#2103)
-    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Sanne Raymaekers
-  - Update images dependency ref to latest (#2173)
-    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
-  - Update images dependency ref to latest (#2181)
-    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Tomáš Hozza
-  - Update images dependency ref to latest (#2186)
-    - Author: SchutzBot, Reviewers: Alexander Larsson, Tomáš Hozza
-  - Update snapshots to 20250825 (#2174)
-    - Author: SchutzBot, Reviewers: Sanne Raymaekers, Simon de Vlieger
-  - Update snapshots to 20250830 (#2180)
-    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Tomáš Hozza
-  - Update snapshots to 20250901 (#2182)
-    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Tomáš Hozza
-  - github: merge CODEOWNERS files (#2176)
-    - Author: Achilleas Koutsou, Reviewers: Simon de Vlieger, Tomáš Hozza
-  - osbuild-mpp: Automatically add extended partition as needed for MBR (#2184)
-    - Author: Alexander Larsson, Reviewers: Achilleas Koutsou, Michael Vogt
-
-— Somewhere on the Internet, 2025-09-10
-
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 159-2
+- Rebuilt for Python 3.14.0rc3 bytecode
 
 * Wed Aug 27 2025 Packit <hello@packit.dev> - 159-1
 Changes with 159
@@ -764,11 +1027,8 @@ Changes with 159
 — Somewhere on the Internet, 2025-08-27
 
 
-* Tue Aug 26 2025 Simon de Vlieger <cmdr@supakeen.com> - 158-3
-- Explicitly depend on setuptools.
-
-* Tue Aug 26 2025 Simon de Vlieger <cmdr@supakeen.com> - 158-2
-- Rebuilt for Python 3.14rc2 bytecode
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 158-2
+- Rebuilt for Python 3.14.0rc2 bytecode
 
 * Wed Aug 13 2025 Packit <hello@packit.dev> - 158-1
 Changes with 158

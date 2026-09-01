@@ -1,0 +1,119 @@
+# ============================================================================
+# Vendored dependencies management
+
+# --- Version macros definition
+# Parse and normalize version string into several macros.
+# By default, stores the whole string in `%<name>_evr` macro,
+# then automatically strips any epoch and/or release parts
+# (specified in the standard "E:V-R" format)
+# and defines `%<name>_epoch`, `%<name>_version`, and `%<name>_release` macros.
+#
+# With the `-p` option, the version is additionally split into
+# `%<name>_version_major`, `%<name>_version_minor`, and `%<name>_version_patch` macros.
+#
+# Any would-be empty macro will evaluate to `%{nil}`.
+#
+# Options:
+# -p : Also define the partial macros.
+#
+# Arguments:
+# 1: Name of the dependency. Any `-' will be replaced by `_' in the macro names.
+# 2: The EVR string to parse.
+%nodejs_define_version(p) %{lua:
+local component <const> = arg[1] or error("No name provided!")
+local evr       <const> = arg[2] or error("No version string provided!")
+
+local name <const> = component:gsub("-", "_")  -- macro-safe name
+
+macros[name .. "_evr"] = evr
+
+local _, epoch_end, epoch <const> = evr:find("^(%d+):")
+macros[name .. "_epoch"] = epoch
+
+local release_start, _, release <const> = evr:find("%-([^-]+)$")
+macros[name .. "_release"] = release
+
+local version_start, version_end = 0, -1
+if epoch_end then version_start = epoch_end + 1 end
+if release_start then version_end = release_start -1 end
+
+local version <const> = evr:sub(version_start, version_end)
+macros[name .. "_version"] = version
+
+if opt.p then
+    local parts = {}; for p in version:gmatch("[^.]+") do table.insert(parts, p) end
+    macros[name .. "_version_major"] = parts[1]
+    macros[name .. "_version_minor"] = parts[2]
+    macros[name .. "_version_patch"] = parts[3]
+end
+}
+
+# --- Declare vendored dependency
+# Emits bcond-controlled RPM tags for a (potentially) vendored dependency.
+#
+# By default, it emits `Provides: bundled(<name>) = <version>` for given arguments.
+# If de-vendoring option is provided, also defines a bcond that controls whether to de-vendor or not.
+# The default is to de-vendor when possible unless a global bcond (`all_deps_bundled`) is set.
+#
+# Options:
+# -a              : Autoversion – try using `<name>_version` macro if the version argument is empty.
+# -n[npmname,...] : Also provide the respective npm module name when vendoring.
+# -p[pkgname,...] : Use pkgconfig to BuildRequire de-vendored dependency.
+# -r[rpmname,...] : Also explicitly declare run time requirement.
+# -s[rpmname,...] : BuildRequire de-vendored dependency by RPM name.
+#
+# All above options accept optional parameter overriding the component name in respective tag.
+# If needed, multiple values can be requested by separating them with a comma.
+#
+# When a name is used in a macro context (for example, in the -a option),
+# the same name-mangling as for nodejs_define_version is used;
+# no need to adjust it by hand.
+#
+# Arguments:
+# 1: Name of the vendored component. Should be appropriate for `Provides: bundled(<name>)` tag.
+# 2: Version of the vendored component. Ignored if de-vendored.
+%nodejs_declare_bundled(an::p::r::s::) %{lua:
+local component <const> = arg[1] or error("Vendored component was not named!")
+local version   <const> = arg[2] or (opt.a and macros[component:gsub("-", "_") .. "_version"]) or error("Missing component version!")
+
+local mapvalues <const> = function(fn, tbl)
+    local output = {}; for _, val in ipairs(tbl) do table.insert(output, fn(val)) end; return output
+end
+local splitnames <const> = function(input)
+    local output = {}; for m in input:gmatch("[^,]+") do table.insert(output, m) end; return output
+end
+local nl <const> = string.char(10);  -- \n does not work in rpmlua
+
+local possible_to_devendor <const> = opt.p or opt.s
+local should_devendor <const> = possible_to_devendor and macros.with{"all_deps_bundled"} == "0"
+
+local bcond_name <const> = "bundled_" .. component:gsub("-", "_")
+macros.bcond{bcond_name, should_devendor and "0" or "1"}
+
+if macros.with{bcond_name} == "1" then
+    local provides = {string.format("bundled(%s) = %s", component, version)}
+    if opt.n then
+        local names = {component}; if opt.n ~= "" then names = splitnames(opt.n) end
+        for _, name in ipairs(names) do
+            table.insert(provides, string.format("npm(%s) = %s", name, version))
+        end
+    end
+    return "Provides: " .. table.concat(provides, ", ")
+end
+
+local buildrequire, require = nil, nil
+if opt.p then
+    local format <const> = function(n) return string.format("pkgconfig(%s)", n) end
+    local names = {component}; if opt.p ~= "" then names = splitnames(opt.p) end
+    buildrequire = "BuildRequires: " .. table.concat(mapvalues(format, names), ", ")
+elseif opt.s then
+    local names = {component}; if opt.s ~= "" then names = splitnames(opt.s) end
+    buildrequire = "BuildRequires: " .. table.concat(names, ", ")
+end
+if opt.r then
+    local names = {component}; if opt.r ~= "" then names = splitnames(opt.r) end
+    require = "Requires: " .. table.concat(names, ", ")
+end
+
+return table.concat({buildrequire, require}, nl)
+}

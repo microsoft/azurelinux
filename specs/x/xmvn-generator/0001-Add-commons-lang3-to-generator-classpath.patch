@@ -1,0 +1,24 @@
+From 6cd6f63c9745a2872ec42a55c3b5d96c16a632cb Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Sat, 11 Oct 2025 07:51:25 +0200
+Subject: [PATCH] Add commons-lang3 to generator classpath
+
+---
+ src/main/conf/xmvn-generator.conf | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/main/conf/xmvn-generator.conf b/src/main/conf/xmvn-generator.conf
+index 4e72124..af77f8b 100644
+--- a/src/main/conf/xmvn-generator.conf
++++ b/src/main/conf/xmvn-generator.conf
+@@ -3,6 +3,7 @@ import io.kojan.dola.rpm from Realm:bsx-api
+ load /usr/share/java/objectweb-asm/asm.jar
+ load /usr/share/java/commons-compress.jar
+ load /usr/share/java/commons-io.jar
++load /usr/share/java/commons-lang3.jar
+ load /usr/share/java/xmvn/xmvn-api.jar
+ load /usr/share/java/xmvn/xmvn-core.jar
+ load /usr/share/java/maven/maven-model.jar
+-- 
+2.51.0
+

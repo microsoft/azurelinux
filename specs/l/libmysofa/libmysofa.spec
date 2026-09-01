@@ -3,7 +3,7 @@
 
 Name:           libmysofa
 Version:        1.3.3
-Release: 6%{?dist}
+Release:        4%{?dist}
 Summary:        C functions for reading HRTFs
 
 License:        BSD-3-Clause
@@ -17,7 +17,7 @@ BuildRequires:  pkgconfig(cunit)
 BuildRequires:  pkgconfig(zlib)
 BuildRequires: make
 # for tests
-%{?!_without_tests:BuildRequires: nodejs}
+%{?!_without_tests:BuildRequires: nodejs, /usr/bin/node}
 
 
 %description
@@ -92,6 +92,9 @@ export MYSOFA2JSON=%{_builddir}/%{buildsubdir}/%{_vpath_builddir}/src/mysofa2jso
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.3-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

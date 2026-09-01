@@ -8,10 +8,10 @@
 %endif
 Name: hunspell-sv
 Summary: Swedish hunspell dictionaries
-Version: 2.28
-Release: 29%{?dist}
-Source: http://extensions.libreoffice.org/extension-center/swedish-spelling-dictionary-den-stora-svenska-ordlistan/releases/2.28/ooo_swedish_dict_2-28.oxt
-URL: http://dsso.se/
+Version: 2.42
+Release: 2%{?dist}
+Source: https://extensions.libreoffice.org/assets/downloads/z/ooo-swedish-dict-2-42.oxt
+URL: https://extensions.libreoffice.org/en/extensions/show/swedish-spelling-dictionary-den-stora-svenska-ordlistan
 License: LGPL-3.0-only
 BuildArch: noarch
 
@@ -22,7 +22,7 @@ Supplements: (hunspell and langpacks-sv)
 Swedish hunspell dictionaries.
 
 %prep
-%setup -q -c -n hunspell-sv
+%autosetup -c -n hunspell-sv
 
 %build
 sed -i 's/\r$//' LICENSE_sv_SE.txt
@@ -35,10 +35,15 @@ cp -p dictionaries/*.dic dictionaries/*.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_d
 
 %files
 %doc LICENSE_sv_SE.txt LICENSE_en_US.txt
-
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.42-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 20 2025 Parag Nemade <pnemade AT redhat DOT com> - 2.42-1
+- Update to new version 2.42 release (rh#2415545)
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.28-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

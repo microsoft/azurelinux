@@ -4,7 +4,7 @@
 Summary: High-performance and highly configurable free RADIUS server
 Name: freeradius
 Version: 3.2.8
-Release: 5%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 URL: http://www.freeradius.org/
 
@@ -206,6 +206,7 @@ BuildRequires: json-c-devel
 
 %description rest
 This plugin provides the REST support for the FreeRADIUS server project.
+
 
 %package kafka
 Summary: Kafka producer support for FreeRADIUS
@@ -933,11 +934,14 @@ fi
 %attr(640,root,radiusd) %config(noreplace) /etc/raddb/mods-config/kafka/messages-json.conf
 
 %changelog
+* Tue Jan 20 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.8-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Jan 05 2026 Antonio Torres <antorres@redhat.com> - 3.2.8-2
 - Enable selinux flag for JIT usage
   Resolves: #2427017
 
-* Wed Nov 12 2025 Antonio Torres <antorres@redhat.com> - 3.2.8-1
+* Mon Nov 10 2025 Antonio Torres <antorres@redhat.com> - 3.2.8-1
 - Update to upstream release 3.2.8
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.7-6

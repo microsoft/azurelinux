@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 %global _hardened_build 1
-%global clknetsim_ver 6ee99f50dec8
+%global clknetsim_ver 93750cc17ebe
 %bcond_without debug
 %bcond_without nts
 
@@ -11,8 +11,8 @@
 %endif
 
 Name:           chrony
-Version:        4.8
-Release: 6%{?dist}
+Version:        4.9
+Release:        1%{?dist}
 Summary:        An NTP client/server
 
 License:        GPL-2.0-only
@@ -22,16 +22,12 @@ Source1:        https://chrony-project.org/releases/chrony-%{version}%{?prerelea
 Source2:        https://chrony-project.org/gpgkey-8F375C7E8D0EE125A3D3BD51537E2B76F7680DAC.asc
 Source3:        chrony.dhclient
 Source4:        chrony.sysusers
+Source5:        chrony.tmpfiles
 # simulator for test suite
 Source10:       https://gitlab.com/chrony/clknetsim/-/archive/master/clknetsim-%{clknetsim_ver}.tar.gz
-%{?gitpatch:Patch0: chrony-%{version}%{?prerelease}-%{gitpatch}.patch.gz}
 
 # add distribution-specific bits to DHCP dispatcher
 Patch1:         chrony-nm-dispatcher-dhcp.patch
-# let systemd create /var/lib/chrony and /var/log/chrony
-Patch2:         chrony-servicedirs.patch
-# update seccomp filter for new glibc
-Patch3:         chrony-seccomp.patch
 
 BuildRequires:  libcap-devel libedit-devel nettle-devel pps-tools-devel
 BuildRequires:  gcc gcc-c++ make bison systemd gnupg2
@@ -55,18 +51,17 @@ can also operate as an NTPv4 (RFC 5905) server and peer to provide a time
 service to other computers in the network.
 
 %if 0%{!?vendorzone:1}
+%if 0%{?eln}
+%global vendorzone fedora.
+%else
 %global vendorzone %(source /etc/os-release && echo ${ID}.)
+%endif
 %endif
 
 %prep
 %{gpgverify} --keyring=%{SOURCE2} --signature=%{SOURCE1} --data=%{SOURCE0}
 %setup -q -n %{name}-%{version}%{?prerelease} -a 10
-%{?gitpatch:%patch -P 0 -p1}
-%patch -P 1 -p1 -b .nm-dispatcher-dhcp
-%patch -P 2 -p1 -b .servicedirs
-%patch -P 3 -p1 -b .seccomp
-
-%{?gitpatch: echo %{version}-%{gitpatch} > version.txt}
+%autopatch -p1
 
 # review changes in packaged configuration files and scripts
 md5sum -c <<-EOF | (! grep -v 'OK$')
@@ -74,8 +69,8 @@ md5sum -c <<-EOF | (! grep -v 'OK$')
         3f2ddca6065c3e8f4565d7422739795a  examples/chrony.conf.example2
         6a3178c4670de7de393d9365e2793740  examples/chrony.logrotate
         c3992e2f985550739cd1cd95f98c9548  examples/chrony.nm-dispatcher.dhcp
-        4e85d36595727318535af3387411070c  examples/chrony.nm-dispatcher.onoffline
-        607c82f56639486f52c31105632909eb  examples/chronyd.service
+        af482fa0dbdd22ff46be41111f251987  examples/chrony.nm-dispatcher.onoffline
+        274a44cd51981d6d4d3a44dfc92c94ab  examples/chronyd.service
         5ddbb8a8055f587cb6b0b462ca73ea46  examples/chronyd-restricted.service
 EOF
 
@@ -128,8 +123,7 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/{sysconfig,logrotate.d,chrony.d}
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/{lib,log}/chrony
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/dhcp/dhclient.d
-mkdir -p $RPM_BUILD_ROOT%{_libexecdir}
-mkdir -p $RPM_BUILD_ROOT%{_sysusersdir}
+mkdir -p $RPM_BUILD_ROOT{%{_libexecdir},%{_sysusersdir},%{_tmpfilesdir}}
 mkdir -p $RPM_BUILD_ROOT%{_prefix}/lib/NetworkManager/dispatcher.d
 mkdir -p $RPM_BUILD_ROOT{%{_unitdir},%{_prefix}/lib/systemd/ntp-units.d}
 
@@ -152,6 +146,8 @@ install -m 644 -p examples/chrony-wait.service \
         $RPM_BUILD_ROOT%{_unitdir}/chrony-wait.service
 install -m 644 -p %{SOURCE4} \
         $RPM_BUILD_ROOT%{_sysusersdir}/chrony.conf
+install -m 644 -p %{SOURCE5} \
+        $RPM_BUILD_ROOT%{_tmpfilesdir}/chrony.conf
 
 cat > $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/chronyd <<EOF
 # Command-line options for chronyd
@@ -207,6 +203,7 @@ fi
 %{_prefix}/lib/systemd/ntp-units.d/*.list
 %{_unitdir}/chrony*.service
 %{_sysusersdir}/chrony.conf
+%{_tmpfilesdir}/chrony.conf
 %{_mandir}/man[158]/%{name}*.[158]*
 %ghost %dir %attr(750,chrony,chrony) %{_localstatedir}/lib/chrony
 %ghost %attr(-,chrony,chrony) %{_localstatedir}/lib/chrony/drift
@@ -215,6 +212,27 @@ fi
 
 %dir %{_sysconfdir}/chrony.d
 %changelog
+* Thu Aug 27 2026 Miroslav Lichvar <mlichvar@redhat.com> 4.9-1
+- update to 4.9
+
+* Tue Aug 18 2026 Miroslav Lichvar <mlichvar@redhat.com> 4.9-0.2.pre1
+- create ghosted directories by tmpfiles instead of chronyd service
+
+* Wed Aug 12 2026 Miroslav Lichvar <mlichvar@redhat.com> 4.9-1
+- update to 4.9-pre1
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Tue Jul 07 2026 Miroslav Lichvar <mlichvar@redhat.com> 4.8-6
+- use fedora pool.ntp.org vendor zone on eln
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.8-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Oct 21 2025 Miroslav Lichvar <mlichvar@redhat.com> 4.8-3
 - update seccomp filter for new glibc (#2405310)
 

@@ -7,7 +7,7 @@
 %global gitversion 58abea394
 
 Name:           libinput
-Version:        1.30.2
+Version:        1.31.3
 Release:        1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 Summary:        Input device library
 
@@ -164,11 +164,23 @@ intended to be run by users.
 
 
 %changelog
-* Tue Feb 24 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.30.2-1
-- libinput 1.30.2
+* Thu Jun 04 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.31.3-1
+- libinput 1.31.3
 
-* Thu Feb 12 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.30.1-2
-- Add a quirk for a Goodix touchpad in current lenovos (#2437977)
+* Thu May 14 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.31.2-1
+- libinput 1.31.2
+
+* Thu Apr 02 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.31.1-1
+- libinput 1.31.1 (CVE-2026-35093, CVE-2026-35094)
+
+* Fri Feb 13 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.31.0-1
+- libinput 1.31.0
+
+* Wed Feb 04 2026 Peter Hutterer <peter.hutterer@redhat.com> - 1.30.901-1
+- libinput 1.30.901
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.30.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Mon Dec 08 2025 Peter Hutterer <peter.hutterer@redhat.com> - 1.30.1-1
 - libinput 1.30.1

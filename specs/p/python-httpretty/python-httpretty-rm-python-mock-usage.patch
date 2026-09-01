@@ -1,0 +1,14 @@
+--- a/tests/functional/test_fakesocket.py
++++ b/tests/functional/test_fakesocket.py
+@@ -28,7 +28,10 @@
+ import functools
+ import socket
+ 
+-import mock
++try:
++    from unittest import mock
++except ImportError:
++    import mock
+ 
+ 
+ class FakeSocket(socket.socket):

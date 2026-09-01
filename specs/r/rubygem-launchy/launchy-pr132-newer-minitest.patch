@@ -1,0 +1,530 @@
+From b7cef9d7ca05258972b5b267a07254ce648d7f82 Mon Sep 17 00:00:00 2001
+From: copiousfreetime <jeremy@copiousfreetime.org>
+Date: Wed, 26 Feb 2020 22:01:29 -0700
+Subject: [PATCH] resolve minitest spec deprecation warnings
+
+---
+ spec/application_spec.rb                    | 14 ++++----
+ spec/applications/browser_spec.rb           | 21 +++++++-----
+ spec/cli_spec.rb                            | 20 ++++++------
+ spec/detect/host_os_family_spec.rb          | 10 +++---
+ spec/detect/host_os_spec.rb                 |  6 ++--
+ spec/detect/nix_desktop_environment_spec.rb |  6 ++--
+ spec/detect/ruby_engine_spec.rb             |  8 ++---
+ spec/detect/runner_spec.rb                  | 24 +++++++-------
+ spec/launchy_spec.rb                        | 36 ++++++++++-----------
+ spec/version_spec.rb                        |  6 ++--
+ 10 files changed, 79 insertions(+), 72 deletions(-)
+
+diff --git a/spec/application_spec.rb b/spec/application_spec.rb
+index ea18e2f..27c8fe0 100644
+--- a/spec/application_spec.rb
++++ b/spec/application_spec.rb
+@@ -14,30 +14,30 @@ def self.handles?( uri )
+         uri.scheme == "junk2"
+       end
+     end
+-    Launchy::Application.children.must_include( Junk2App )
++    _(Launchy::Application.children).must_include( Junk2App )
+     Launchy::Application.children.delete( Junk2App )
+   end
+ 
+   it "can find an app" do
+-    Launchy::Application.children.must_include( JunkApp )
+-    Launchy::Application.children.size.must_equal 3
++    _(Launchy::Application.children).must_include( JunkApp )
++    _(Launchy::Application.children.size).must_equal 3
+     uri = Addressable::URI.parse( "junk:///foo" )
+-    Launchy::Application.handling( uri ).must_equal( JunkApp  )
++    _(Launchy::Application.handling( uri )).must_equal( JunkApp  )
+   end
+ 
+   it "raises an error if an application cannot be found for the given scheme" do
+     uri = Addressable::URI.parse( "foo:///bar" )
+-    lambda { Launchy::Application.handling( uri ) }.must_raise( Launchy::ApplicationNotFoundError )
++    _(lambda { Launchy::Application.handling( uri ) }).must_raise( Launchy::ApplicationNotFoundError )
+   end
+ 
+   it "can find open or curl or xdg-open" do
+     found = %w[ open curl xdg-open ].any? do |app|
+       Launchy::Application.find_executable( app )
+     end
+-    found.must_equal true
++    _(found).must_equal true
+   end
+ 
+   it "does not find xyzzy" do
+-    Launchy::Application.find_executable( "xyzzy" ).must_equal  nil
++    _(Launchy::Application.find_executable( "xyzzy" )).must_be_nil
+   end
+ end
+diff --git a/spec/applications/browser_spec.rb b/spec/applications/browser_spec.rb
+index 497350d..20ba85b 100644
+--- a/spec/applications/browser_spec.rb
++++ b/spec/applications/browser_spec.rb
+@@ -18,11 +18,16 @@
+     'cygwin'  => 'cmd /C start "launchy" /b',
+ 
+     # when running these tests on a linux box, this test will fail
+-    'linux'   => nil                 }.each  do |host_os, cmdline|
++    'linux'   => nil                 }.each  do |host_os, expected|
+     it "when host_os is '#{host_os}' the appropriate 'app_list' method is called" do
+       Launchy.host_os = host_os
+       browser = Launchy::Application::Browser.new
+-      browser.app_list.first.must_equal cmdline
++
++      if expected.nil? then
++        _(browser.app_list.first).must_be_nil
++      else
++        _(browser.app_list.first).must_equal expected
++      end
+     end
+   end
+ 
+@@ -32,14 +37,14 @@
+       Launchy.host_os = host_os
+       browser = Launchy::Application::Browser.new
+       cmd, args = browser.cmd_and_args( @test_url )
+-      cmd.must_equal "my_special_browser --new-tab 'http://example.com/'"
+-      args.must_equal []
++      _(cmd).must_equal "my_special_browser --new-tab 'http://example.com/'"
++      _(args).must_equal []
+     end
+   end
+ 
+   it "handles a file on the file system when there is no file:// scheme" do
+     uri = Addressable::URI.parse( __FILE__ )
+-    Launchy::Application::Browser.handles?( uri ).must_equal true
++    _(Launchy::Application::Browser.handles?( uri )).must_equal true
+   end
+ 
+   it "handles the case where $BROWSER is set and no *nix desktop environment is found" do
+@@ -48,12 +53,12 @@
+     ENV['BROWSER'] = "do-this-instead"
+     Launchy.host_os = 'linux'
+     browser = Launchy::Application::Browser.new
+-    browser.browser_cmdline.must_equal "do-this-instead"
++    _(browser.browser_cmdline).must_equal "do-this-instead"
+   end
+ 
+   # NOTE: Unable to figure out how capture the stderr from the child which has
+   # moved it at least once. This test just serves the purpose of noting why
+-  # something happens, and the proble we are attempting to fix.
++  # something happens, and the problem we are attempting to fix.
+   it "When BROWSER is set to something that is not executable, error still appears on stderr" do
+     ENV['BROWSER'] = "not-an-app"
+     url = "http://example.com/"
+@@ -61,7 +66,7 @@
+     _, err = capture_subprocess_io do 
+       Launchy.open( url )
+     end
+-    #err.must_match( /wibble/m )
++    #_(err).must_match( /wibble/m )
+     err # something
+   end
+ end
+diff --git a/spec/cli_spec.rb b/spec/cli_spec.rb
+index 61c57c6..5913ba1 100644
+--- a/spec/cli_spec.rb
++++ b/spec/cli_spec.rb
+@@ -21,9 +21,9 @@ def cli_test( argv, env, exit_val, stderr_regex, stdout_regex )
+     begin
+       Launchy::Cli.new.run( argv, env )
+     rescue SystemExit => se
+-      se.status.must_equal exit_val
+-      $stderr.string.must_match stderr_regex if stderr_regex
+-      $stdout.string.must_match stdout_regex if stdout_regex
++      _(se.status).must_equal exit_val
++      _($stderr.string).must_match stderr_regex if stderr_regex
++      _($stdout.string).must_match stdout_regex if stdout_regex
+     end
+   end
+ 
+@@ -47,14 +47,14 @@ def cli_test( argv, env, exit_val, stderr_regex, stdout_regex )
+     l = Launchy::Cli.new
+     argv = %w[ --debug --dry-run http://github.com/copiousfreetime/launchy ]
+     l.parse( argv , {} )
+-    argv.size.must_equal 1
+-    argv[0].must_equal "http://github.com/copiousfreetime/launchy" 
++    _(argv.size).must_equal 1
++    _(argv[0]).must_equal "http://github.com/copiousfreetime/launchy" 
+   end
+ 
+   it "prints the command on stdout when using --dry-run" do
+    argv = %w[ --debug --dry-run http://github.com/copiousfreetime/launchy ]
+    Launchy::Cli.new.good_run( argv, {} )
+-   $stdout.string.must_match %r[github.com]
++   _($stdout.string).must_match %r[github.com]
+   end
+ 
+   {
+@@ -65,10 +65,10 @@ def cli_test( argv, env, exit_val, stderr_regex, stdout_regex )
+       argv = [ opt, val[1], "http://github.com/copiousfreetime/launchy" ]
+       l = Launchy::Cli.new
+       rc = l.parse( argv, {} )
+-      rc.must_equal true
+-      argv.size.must_equal 1
+-      argv[0].must_equal "http://github.com/copiousfreetime/launchy"
+-      l.options[val[0]].must_equal val[1]
++      _(rc).must_equal true
++      _(argv.size).must_equal 1
++      _(argv[0]).must_equal "http://github.com/copiousfreetime/launchy"
++      _(l.options[val[0]]).must_equal val[1]
+     end
+   end
+ end
+diff --git a/spec/detect/host_os_family_spec.rb b/spec/detect/host_os_family_spec.rb
+index 36c149d..33ff056 100644
+--- a/spec/detect/host_os_family_spec.rb
++++ b/spec/detect/host_os_family_spec.rb
+@@ -13,7 +13,8 @@
+ 
+   YAML::load( IO.read( File.expand_path( "../../tattle-host-os.yaml", __FILE__ ) ) )['host_os'].keys.sort.each do |os|
+     it "OS family of #{os} is detected" do
+-      Launchy::Detect::HostOsFamily.detect( os ).must_be_kind_of Launchy::Detect::HostOsFamily
++      os_family = Launchy::Detect::HostOsFamily.detect( os )
++      _(os_family).must_be_kind_of Launchy::Detect::HostOsFamily
+     end
+   end
+ 
+@@ -22,19 +23,20 @@
+     'linux'  => :nix?,
+     'cygwin' => :cygwin? }.each_pair do |os, method|
+     it "#{method} returns true for #{os} " do
+-      Launchy::Detect::HostOsFamily.detect( os ).send( method ).must_equal true
++      r = Launchy::Detect::HostOsFamily.detect( os ).send( method )
++      _(r).must_equal true
+     end
+   end
+ 
+   it "uses the global host_os overrides" do
+     ENV['LAUNCHY_HOST_OS'] = "fake-os-2"
+-    lambda { Launchy::Detect::HostOsFamily.detect }.must_raise Launchy::Detect::HostOsFamily::NotFoundError
++    _(lambda { Launchy::Detect::HostOsFamily.detect }).must_raise Launchy::Detect::HostOsFamily::NotFoundError
+     ENV.delete('LAUNCHY_HOST_OS')
+   end
+ 
+ 
+   it "does not find an os of 'dos'" do
+-    lambda { Launchy::Detect::HostOsFamily.detect( 'dos' ) }.must_raise Launchy::Detect::HostOsFamily::NotFoundError
++    _(lambda { Launchy::Detect::HostOsFamily.detect( 'dos' ) }).must_raise Launchy::Detect::HostOsFamily::NotFoundError
+   end
+ 
+ end
+diff --git a/spec/detect/host_os_spec.rb b/spec/detect/host_os_spec.rb
+index c6de254..53ffcff 100644
+--- a/spec/detect/host_os_spec.rb
++++ b/spec/detect/host_os_spec.rb
+@@ -3,16 +3,16 @@
+ describe Launchy::Detect::HostOs do
+ 
+   it "uses the defult host os from ruby's config" do
+-    Launchy::Detect::HostOs.new.host_os.must_equal RbConfig::CONFIG['host_os']
++    _(Launchy::Detect::HostOs.new.host_os).must_equal RbConfig::CONFIG['host_os']
+   end
+ 
+   it "uses the passed in value as the host os" do
+-    Launchy::Detect::HostOs.new( "fake-os-1").host_os.must_equal "fake-os-1"
++    _(Launchy::Detect::HostOs.new( "fake-os-1").host_os).must_equal "fake-os-1"
+   end
+ 
+   it "uses the environment variable LAUNCHY_HOST_OS to override ruby's config" do
+     ENV['LAUNCHY_HOST_OS'] = "fake-os-2"
+-    Launchy::Detect::HostOs.new.host_os.must_equal "fake-os-2"
++    _(Launchy::Detect::HostOs.new.host_os).must_equal "fake-os-2"
+     ENV.delete('LAUNCHY_HOST_OS')
+   end
+ 
+diff --git a/spec/detect/nix_desktop_environment_spec.rb b/spec/detect/nix_desktop_environment_spec.rb
+index 2f084d4..cb45449 100644
+--- a/spec/detect/nix_desktop_environment_spec.rb
++++ b/spec/detect/nix_desktop_environment_spec.rb
+@@ -15,8 +15,8 @@
+     ENV["KDE_FULL_SESSION"] = "launchy-test"
+     kde = Launchy::Detect::NixDesktopEnvironment::Kde
+     nix_env = Launchy::Detect::NixDesktopEnvironment.detect
+-    nix_env.must_equal( kde )
+-    nix_env.browser.must_equal( kde.browser )
++    _(nix_env).must_equal( kde )
++    _(nix_env.browser).must_equal( kde.browser )
+     ENV.delete( 'KDE_FULL_SESSION' )
+   end
+ 
+@@ -22,7 +22,7 @@
+ 
+   it "returns false for XFCE if xprop is not found" do
+     Launchy.host_os = "linux"
+-    Launchy::Detect::NixDesktopEnvironment::Xfce.is_current_desktop_environment?.must_equal( false )
++    _(Launchy::Detect::NixDesktopEnvironment::Xfce.is_current_desktop_environment?).must_equal( false )
+   end
+ 
+   it "returns NotFound if it cannot determine the *nix desktop environment" do
+@@ -30,7 +30,7 @@
+     ENV.delete( "KDE_FULL_SESSION" )
+     ENV.delete( "GNOME_DESKTOP_SESSION_ID" )
+     not_found = Launchy::Detect::NixDesktopEnvironment.detect
+-    not_found.must_equal( Launchy::Detect::NixDesktopEnvironment::NotFound )
+-    not_found.browser.must_equal( Launchy::Argv.new )
++    _(not_found).must_equal( Launchy::Detect::NixDesktopEnvironment::NotFound )
++    _(not_found.browser).must_equal( Launchy::Argv.new )
+   end
+ end
+diff --git a/spec/detect/ruby_engine_spec.rb b/spec/detect/ruby_engine_spec.rb
+index e77b071..17c9373 100644
+--- a/spec/detect/ruby_engine_spec.rb
++++ b/spec/detect/ruby_engine_spec.rb
+@@ -12,18 +12,18 @@
+ 
+   %w[ ruby jruby rbx macruby ].each do |ruby|
+     it "detects the #{ruby} RUBY_ENGINE" do
+-      Launchy::Detect::RubyEngine.detect( ruby ).ancestors.must_include Launchy::Detect::RubyEngine
++      _(Launchy::Detect::RubyEngine.detect( ruby ).ancestors).must_include Launchy::Detect::RubyEngine
+     end
+   end
+ 
+   it "uses the global ruby_engine overrides" do
+     ENV['LAUNCHY_RUBY_ENGINE'] = "rbx"
+-    Launchy::Detect::RubyEngine.detect.must_equal Launchy::Detect::RubyEngine::Rbx
++    _(Launchy::Detect::RubyEngine.detect).must_equal Launchy::Detect::RubyEngine::Rbx
+     ENV.delete('LAUNCHY_RUBY_ENGINE')
+   end
+ 
+   it "does not find a ruby engine of 'foo'" do
+-    lambda { Launchy::Detect::RubyEngine.detect( 'foo' ) }.must_raise Launchy::Detect::RubyEngine::NotFoundError
++    _(lambda { Launchy::Detect::RubyEngine.detect( 'foo' ) }).must_raise Launchy::Detect::RubyEngine::NotFoundError
+   end
+ 
+   { 'rbx'     => :rbx?,
+@@ -31,7 +31,7 @@
+     'macruby' => :macruby?,
+     'jruby'   => :jruby? }.each_pair do |engine, method|
+     it "#{method} returns true for #{engine} " do
+-      Launchy::Detect::RubyEngine.detect( engine ).send( method ).must_equal true
++      _(Launchy::Detect::RubyEngine.detect( engine ).send( method )).must_equal true
+     end
+  end
+ end
+diff --git a/spec/detect/runner_spec.rb b/spec/detect/runner_spec.rb
+index 78aef82..c323f36 100644
+--- a/spec/detect/runner_spec.rb
++++ b/spec/detect/runner_spec.rb
+@@ -13,17 +13,17 @@
+ 
+   it "raises an error when there is an unknown host os" do
+     Launchy.host_os = "foo"
+-    lambda{ Launchy::Detect::Runner.detect }.must_raise Launchy::Detect::HostOsFamily::NotFoundError
++    _(lambda{ Launchy::Detect::Runner.detect }).must_raise Launchy::Detect::HostOsFamily::NotFoundError
+   end
+ 
+   it "raises an error when there is an unknown ruby engine" do
+     Launchy.ruby_engine = "wibble"
+-    lambda{ Launchy::Detect::Runner.detect }.must_raise Launchy::Detect::RubyEngine::NotFoundError
++    _(lambda{ Launchy::Detect::Runner.detect }).must_raise Launchy::Detect::RubyEngine::NotFoundError
+   end
+ 
+   it "raises and error when there is no command found" do
+     runner = Launchy::Detect::Runner.detect
+-    lambda{ runner.run( nil, *%w[ arg1 arg2 arg 3] ) }.must_raise Launchy::CommandNotFoundError
++    _(lambda{ runner.run( nil, *%w[ arg1 arg2 arg 3] ) }).must_raise Launchy::CommandNotFoundError
+   end
+ 
+   # On anything that has fork, use Forkable
+@@ -33,7 +33,7 @@
+         Launchy.host_os = host_os
+         Launchy.ruby_engine = engine_name
+         engine = Launchy::Detect::Runner.detect
+-        engine.must_be_instance_of Launchy::Detect::Runner::Forkable
++        _(engine).must_be_instance_of Launchy::Detect::Runner::Forkable
+       end
+     end
+   end
+@@ -48,7 +48,7 @@
+       Launchy.host_os = host_os
+       Launchy.ruby_engine = 'jruby'
+       engine = Launchy::Detect::Runner.detect
+-      engine.must_be_instance_of runner
++      _(engine).must_be_instance_of runner
+     end
+   end
+ 
+@@ -58,14 +58,14 @@
+       Launchy.host_os = "mingw"
+       Launchy.ruby_engine = engine_name
+       e = Launchy::Detect::Runner.detect
+-      e.must_be_instance_of Launchy::Detect::Runner::Windows
++      _(e).must_be_instance_of Launchy::Detect::Runner::Windows
+     end
+   end
+ 
+   it "Windows launches use the 'cmd' command" do
+     win = Launchy::Detect::Runner::Windows.new
+     cmd = win.dry_run( "not-really", [ "http://example.com" ] )
+-    cmd.must_equal 'cmd /c not-really http://example.com'
++    _(cmd).must_equal 'cmd /c not-really http://example.com'
+   end
+ 
+   %w[ & | ( ) < > ^ ].each do |reserved_char|
+@@ -75,29 +75,29 @@
+       url = parts.join( reserved_char )
+       output_url = parts.join( "^#{reserved_char}" )
+ 
+-      win.all_args( "not-really", [ url ] ).must_equal [ 'cmd', '/c', 'not-really', output_url ]
++      _(win.all_args( "not-really", [ url ] )).must_equal [ 'cmd', '/c', 'not-really', output_url ]
+ 
+       cmd = win.dry_run( "not-really", [ url ] )
+-      cmd.must_equal "cmd /c not-really #{output_url}"
++      _(cmd).must_equal "cmd /c not-really #{output_url}"
+     end
+   end
+ 
+   it "Jruby doesnot escapes '&' in urls" do
+     jruby = Launchy::Detect::Runner::Jruby.new
+     cmd = jruby.dry_run( "not-really", [ @test_url ])
+-    cmd.must_equal 'not-really http://example.com/?foo=bar&baz=wibble'
++    _(cmd).must_equal 'not-really http://example.com/?foo=bar&baz=wibble'
+   end
+ 
+   it "does not escape %38 items in urls" do
+     l = Launchy::Detect::Runner::Forkable.new
+     cmd = l.dry_run( "not-really", [ "http://ja.wikipedia.org/wiki/%E3%81%82" ] )
+-    cmd.must_equal( 'not-really http://ja.wikipedia.org/wiki/%E3%81%82'  )
++    _(cmd).must_equal( 'not-really http://ja.wikipedia.org/wiki/%E3%81%82'  )
+   end
+ 
+   it "can launch a utf8 url" do
+     url = "http://ja.wikipedia.org/wiki/あ"
+     l = Launchy::Detect::Runner::Forkable.new
+     cmd = l.dry_run( "not-really", [ url ] )
+-    cmd.must_equal( "not-really #{url}" )
++    _(cmd).must_equal( "not-really #{url}" )
+   end
+ end
+diff --git a/spec/launchy_spec.rb b/spec/launchy_spec.rb
+index 2f32b26..04d65e6 100644
+--- a/spec/launchy_spec.rb
++++ b/spec/launchy_spec.rb
+@@ -22,7 +22,7 @@
+     old_stderr = $stderr
+     $stderr = StringIO.new
+     Launchy.log "This is a test log message"
+-    $stderr.string.strip.must_equal "LAUNCHY_DEBUG: This is a test log message"
++    _($stderr.string.strip).must_equal "LAUNCHY_DEBUG: This is a test log message"
+     $stderr = old_stderr
+     ENV["LAUNCHY_DEBUG"] = nil
+   end
+@@ -30,81 +30,81 @@
+   it "sets the global option :dry_run to true if LAUNCHY_DRY_RUN environment variable is 'true'" do
+     ENV['LAUNCHY_DRY_RUN'] = 'true'
+     Launchy.extract_global_options({})
+-    Launchy.dry_run?.must_equal true
++    _(Launchy.dry_run?).must_equal true
+     ENV['LAUNCHY_DRY_RUN'] = nil
+   end
+ 
+   it "sets the global option :debug to true if LAUNCHY_DEBUG environment variable is 'true'" do
+     ENV['LAUNCHY_DEBUG'] = 'true'
+     Launchy.extract_global_options({})
+-    Launchy.debug?.must_equal true
++    _(Launchy.debug?).must_equal true
+     ENV['LAUNCHY_DEBUG'] = nil
+   end
+ 
+   it "has the global option :debug" do
+     Launchy.extract_global_options( { :debug => 'true' } )
+-    Launchy.debug?.must_equal true
++    _(Launchy.debug?).must_equal true
+     Launchy.extract_global_options( { :debug => true } )
+-    Launchy.debug?.must_equal true
++    _(Launchy.debug?).must_equal true
+   end
+ 
+   it "has the global option :dry_run" do
+     Launchy.extract_global_options( { :dry_run => 'true' } )
+-    Launchy.dry_run?.must_equal true
++    _(Launchy.dry_run?).must_equal true
+     Launchy.extract_global_options( { :dry_run => true } )
+-    Launchy.dry_run?.must_equal true
++    _(Launchy.dry_run?).must_equal true
+   end
+ 
+   it "has the global option :application" do
+     Launchy.extract_global_options(  { :application => "wibble" } )
+-    Launchy.application.must_equal 'wibble'
++    _(Launchy.application).must_equal 'wibble'
+   end
+ 
+   it "has the global option :host_os" do
+     Launchy.extract_global_options(  { :host_os => "my-special-os-v2" } )
+-    Launchy.host_os.must_equal 'my-special-os-v2'
++    _(Launchy.host_os).must_equal 'my-special-os-v2'
+   end
+ 
+   it "has the global option :ruby_engine" do
+     Launchy.extract_global_options(  { :ruby_engine => "myruby" } )
+-    Launchy.ruby_engine.must_equal 'myruby'
++    _(Launchy.ruby_engine).must_equal 'myruby'
+   end
+ 
+   it "raises an exception if no scheme is found for the given uri" do
+-    lambda { Launchy.open( @invalid_url ) }.must_raise Launchy::ApplicationNotFoundError
++    _(lambda { Launchy.open( @invalid_url ) }).must_raise Launchy::ApplicationNotFoundError
+   end
+ 
+   it "asssumes we open a local file if we have an exception if we have an invalid scheme and a valid path" do
+     uri = "blah://example.com/#{__FILE__}"
+     Launchy.open( uri , :dry_run => true )
+-    $stdout.string.strip.must_equal "/usr/bin/open #{uri}"
++    _($stdout.string.strip).must_equal "/usr/bin/open #{uri}"
+   end
+ 
+   it "opens a local file if we have a drive letter and a valid path on windows" do
+     uri = "C:#{__FILE__}"
+     Launchy.open( uri, :dry_run => true, :host_os => 'windows'  )
+-    $stdout.string.strip.must_equal 'cmd /c start "launchy" /b ' + uri
++    _($stdout.string.strip).must_equal 'cmd /c start "launchy" /b ' + uri
+   end
+ 
+   it "calls the block if instead of raising an exception if there is an error" do
+     Launchy.open( @invalid_url ) { $stderr.puts "oops had an error opening #{@invalid_url}" }
+-    $stderr.string.strip.must_equal "oops had an error opening #{@invalid_url}"
++    _($stderr.string.strip).must_equal "oops had an error opening #{@invalid_url}"
+   end
+ 
+   it "calls the block with the values passed to launchy and the error" do
+     options = { :dry_run => true }
+     Launchy.open( @invalid_url, :dry_run => true ) { |e| $stderr.puts "had an error opening #{@invalid_url} with options #{options}: #{e}" }
+-    $stderr.string.strip.must_equal "had an error opening #{@invalid_url} with options #{options}: No application found to handle '#{@invalid_url}'"
++    _($stderr.string.strip).must_equal "had an error opening #{@invalid_url} with options #{options}: No application found to handle '#{@invalid_url}'"
+   end
+ 
+   it "raises the error in the called block" do
+-    lambda { Launchy.open( @invalid_url ) { raise StandardError, "KABOOM!" } }.must_raise StandardError
++    _(lambda { Launchy.open( @invalid_url ) { raise StandardError, "KABOOM!" } }).must_raise StandardError
+   end
+ 
+   [ 'www.example.com', 'www.example.com/foo/bar', "C:#{__FILE__}" ].each do |x|
+     it "picks a Browser for #{x}" do
+       app = Launchy.app_for_uri_string( x )
+-      app.must_equal( Launchy::Application::Browser )
++      _(app).must_equal( Launchy::Application::Browser )
+     end
+   end
+ end
+diff --git a/spec/version_spec.rb b/spec/version_spec.rb
+index d67a0d8..291e2ad 100644
+--- a/spec/version_spec.rb
++++ b/spec/version_spec.rb
+@@ -2,10 +2,10 @@
+ 
+ describe 'Launchy::VERSION' do
+   it "should have a #.#.# format" do
+-    Launchy::VERSION.must_match( /\d+\.\d+\.\d+/ )
+-    Launchy::Version.to_s.must_match( /\d+\.\d+\.\d+/ )
++    _(Launchy::VERSION).must_match( /\d+\.\d+\.\d+/ )
++    _(Launchy::Version.to_s).must_match( /\d+\.\d+\.\d+/ )
+     Launchy::Version.to_a.each do |n|
+-      n.to_i.must_be :>=, 0
++      _(n.to_i).must_be :>=, 0
+     end
+   end
+ end

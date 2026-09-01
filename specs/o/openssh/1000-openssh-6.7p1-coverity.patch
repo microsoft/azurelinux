@@ -1,0 +1,229 @@
+From aecc5861e1cf7094a32f893ae4bfd8409b77e5cd Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Fri, 12 Dec 2025 14:25:41 +0100
+Subject: [PATCH 53/53] openssh-6.7p1-coverity
+
+---
+ auth-krb5.c                   | 2 ++
+ gss-genr.c                    | 3 ++-
+ krl.c                         | 3 +++
+ loginrec.c                    | 2 ++
+ misc.c                        | 3 +++
+ monitor.c                     | 4 ++--
+ openbsd-compat/bindresvport.c | 2 +-
+ openbsd-compat/bsd-pselect.c  | 8 ++++----
+ readconf.c                    | 1 +
+ servconf.c                    | 5 +++--
+ serverloop.c                  | 2 +-
+ 11 files changed, 24 insertions(+), 11 deletions(-)
+
+diff --git a/auth-krb5.c b/auth-krb5.c
+index b9c261a24..a37be93c3 100644
+--- a/auth-krb5.c
++++ b/auth-krb5.c
+@@ -427,6 +427,7 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
+ 		umask(old_umask);
+ 		if (tmpfd == -1) {
+ 			logit("mkstemp(): %.100s", strerror(oerrno));
++			free(ccname);
+ 			return oerrno;
+ 		}
+ 
+@@ -434,6 +435,7 @@ ssh_krb5_cc_new_unique(krb5_context ctx, krb5_ccache *ccache, int *need_environm
+ 			oerrno = errno;
+ 			logit("fchmod(): %.100s", strerror(oerrno));
+ 			close(tmpfd);
++			free(ccname);
+ 			return oerrno;
+ 		}
+ 		/* make sure the KRB5CCNAME is set for non-standard location */
+diff --git a/gss-genr.c b/gss-genr.c
+index f2d6f59e5..91602e045 100644
+--- a/gss-genr.c
++++ b/gss-genr.c
+@@ -178,8 +178,9 @@ ssh_gssapi_kex_mechs(gss_OID_set gss_supported, ssh_gssapi_check_fn *check,
+ 			enclen = __b64_ntop(digest,
+ 			    ssh_digest_bytes(SSH_DIGEST_MD5), encoded,
+ 			    ssh_digest_bytes(SSH_DIGEST_MD5) * 2);
+-
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
+ 			cp = strncpy(s, kex, strlen(kex));
++#pragma GCC diagnostic pop
+ 			for ((p = strsep(&cp, ",")); p && *p != '\0';
+ 				(p = strsep(&cp, ","))) {
+ 				if (sshbuf_len(buf) != 0 &&
+diff --git a/krl.c b/krl.c
+index bea5b1b98..4dd8a24a9 100644
+--- a/krl.c
++++ b/krl.c
+@@ -1205,6 +1205,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+ 		return r;
+ 	erb = RB_FIND(revoked_blob_tree, &krl->revoked_sha1s, &rb);
+ 	free(rb.blob);
++	rb.blob = NULL; /* make coverity happy */
+ 	if (erb != NULL) {
+ 		KRL_DBG(("revoked by key SHA1"));
+ 		return SSH_ERR_KEY_REVOKED;
+@@ -1215,6 +1216,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+ 		return r;
+ 	erb = RB_FIND(revoked_blob_tree, &krl->revoked_sha256s, &rb);
+ 	free(rb.blob);
++	rb.blob = NULL; /* make coverity happy */
+ 	if (erb != NULL) {
+ 		KRL_DBG(("revoked by key SHA256"));
+ 		return SSH_ERR_KEY_REVOKED;
+@@ -1226,6 +1228,7 @@ is_key_revoked(struct ssh_krl *krl, const struct sshkey *key)
+ 		return r;
+ 	erb = RB_FIND(revoked_blob_tree, &krl->revoked_keys, &rb);
+ 	free(rb.blob);
++	rb.blob = NULL; /* make coverity happy */
+ 	if (erb != NULL) {
+ 		KRL_DBG(("revoked by explicit key"));
+ 		return SSH_ERR_KEY_REVOKED;
+diff --git a/loginrec.c b/loginrec.c
+index 7d1c9dd43..a017e173b 100644
+--- a/loginrec.c
++++ b/loginrec.c
+@@ -677,9 +677,11 @@ construct_utmp(struct logininfo *li,
+ 	 */
+ 
+ 	/* Use strncpy because we don't necessarily want null termination */
++	/* coverity[buffer_size_warning : FALSE] */
+ 	strncpy(ut->ut_name, li->username,
+ 	    MIN_SIZEOF(ut->ut_name, li->username));
+ # ifdef HAVE_HOST_IN_UTMP
++	/* coverity[buffer_size_warning : FALSE] */
+ 	strncpy(ut->ut_host, li->hostname,
+ 	    MIN_SIZEOF(ut->ut_host, li->hostname));
+ # endif
+diff --git a/misc.c b/misc.c
+index 2fd14159d..d4c4e4164 100644
+--- a/misc.c
++++ b/misc.c
+@@ -1573,6 +1573,8 @@ sanitise_stdfd(void)
+ 	}
+ 	if (nullfd > STDERR_FILENO)
+ 		close(nullfd);
++	/* coverity[leaked_handle : FALSE]*/
++	/* coverity[leaked_handle : FALSE]*/
+ }
+ 
+ char *
+@@ -2773,6 +2775,7 @@ stdfd_devnull(int do_stdin, int do_stdout, int do_stderr)
+ 	}
+ 	if (devnull > STDERR_FILENO)
+ 		close(devnull);
++	/* coverity[leaked_handle : FALSE]*/
+ 	return ret;
+ }
+ 
+diff --git a/monitor.c b/monitor.c
+index 2f154a3d7..f959e0124 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -405,7 +405,7 @@ monitor_child_preauth(struct ssh *ssh, struct monitor *pmonitor)
+ 	mm_get_keystate(ssh, pmonitor);
+ 
+ 	/* Drain any buffered messages from the child */
+-	while (pmonitor->m_log_recvfd != -1 && monitor_read_log(pmonitor) == 0)
++	while (pmonitor->m_log_recvfd >= 0 && monitor_read_log(pmonitor) == 0)
+ 		;
+ 
+ 	/* Wait for the child's exit status */
+@@ -1819,7 +1819,7 @@ mm_answer_pty(struct ssh *ssh, int sock, struct sshbuf *m)
+ 	s->ptymaster = s->ptyfd;
+ 
+ 	debug3_f("tty %s ptyfd %d", s->tty, s->ttyfd);
+-
++	/* coverity[leaked_handle : FALSE] */
+ 	return (0);
+ 
+  error:
+diff --git a/openbsd-compat/bindresvport.c b/openbsd-compat/bindresvport.c
+index 346c7fe56..f42792fde 100644
+--- a/openbsd-compat/bindresvport.c
++++ b/openbsd-compat/bindresvport.c
+@@ -59,7 +59,7 @@ bindresvport_sa(int sd, struct sockaddr *sa)
+ 	struct sockaddr_in6 *in6;
+ 	u_int16_t *portp;
+ 	u_int16_t port;
+-	socklen_t salen;
++	socklen_t salen = sizeof(struct sockaddr_storage);
+ 	int i;
+ 
+ 	if (sa == NULL) {
+diff --git a/openbsd-compat/bsd-pselect.c b/openbsd-compat/bsd-pselect.c
+index 26bdc3e08..8e2939b95 100644
+--- a/openbsd-compat/bsd-pselect.c
++++ b/openbsd-compat/bsd-pselect.c
+@@ -85,13 +85,13 @@ pselect_notify_setup(void)
+ static void
+ pselect_notify_parent(void)
+ {
+-	if (notify_pipe[1] != -1)
++	if (notify_pipe[1] >= 0)
+ 		(void)write(notify_pipe[1], "", 1);
+ }
+ static void
+ pselect_notify_prepare(fd_set *readset)
+ {
+-	if (notify_pipe[0] != -1)
++	if (notify_pipe[0] >= 0)
+ 		FD_SET(notify_pipe[0], readset);
+ }
+ static void
+@@ -99,8 +99,8 @@ pselect_notify_done(fd_set *readset)
+ {
+ 	char c;
+ 
+-	if (notify_pipe[0] != -1 && FD_ISSET(notify_pipe[0], readset)) {
+-		while (read(notify_pipe[0], &c, 1) != -1)
++	if (notify_pipe[0] >= 0 && FD_ISSET(notify_pipe[0], readset)) {
++		while (read(notify_pipe[0], &c, 1) >= 0)
+ 			debug2_f("reading");
+ 		FD_CLR(notify_pipe[0], readset);
+ 	}
+diff --git a/readconf.c b/readconf.c
+index b6ad47b49..75e1c953c 100644
+--- a/readconf.c
++++ b/readconf.c
+@@ -2170,6 +2170,7 @@ parse_pubkey_algos:
+ 			} else if (r != 0) {
+ 				error("%.200s line %d: glob failed for %s.",
+ 				    filename, linenum, arg2);
++				free(arg2);
+ 				goto out;
+ 			}
+ 			free(arg2);
+diff --git a/servconf.c b/servconf.c
+index 956205f6d..1093dcbac 100644
+--- a/servconf.c
++++ b/servconf.c
+@@ -2307,8 +2307,9 @@ process_server_config_line_depth(ServerOptions *options, char *line,
+ 		if (*activep && *charptr == NULL) {
+ 			*charptr = tilde_expand_filename(arg, getuid());
+ 			/* increase optional counter */
+-			if (intptr != NULL)
+-				*intptr = *intptr + 1;
++			/* DEAD CODE intptr is still NULL ;)
++  			 if (intptr != NULL)
++				*intptr = *intptr + 1; */
+ 		}
+ 		break;
+ 
+diff --git a/serverloop.c b/serverloop.c
+index 55411a6b4..acc721cd1 100644
+--- a/serverloop.c
++++ b/serverloop.c
+@@ -533,7 +533,7 @@ server_request_tun(struct ssh *ssh)
+ 		debug_f("invalid tun");
+ 		goto done;
+ 	}
+-	if (auth_opts->force_tun_device != -1) {
++	if (auth_opts->force_tun_device >= 0) {
+ 		if (tun != SSH_TUNID_ANY &&
+ 		    auth_opts->force_tun_device != (int)tun)
+ 			goto done;
+-- 
+2.52.0
+

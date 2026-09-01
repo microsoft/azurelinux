@@ -1,0 +1,127 @@
+From 0601b9ca9401aed5bcf1b018be922b15a8cee92a Mon Sep 17 00:00:00 2001
+From: Bradley Lowekamp <blowekamp@mail.nih.gov>
+Date: Thu, 30 Apr 2026 16:09:54 +0000
+Subject: [PATCH] [R] Fix compilation with R 4.6.0 which removed non-API macros
+ #3407
+
+R 4.6.0 (April 2025) removed the non-API macro SET_S4_OBJECT and made
+CHARACTER_POINTER return a const pointer, breaking compilation of SWIG
+generated R code.
+
+Replace with proper R API equivalents:
+- SET_S4_OBJECT(x) -> x = Rf_asS4(x, TRUE, 0)  (3 sites in rrun.swg)
+- CHARACTER_POINTER(v)[i] = ... -> SET_STRING_ELT(v, i, ...)  (2 sites in std_vector.i)
+- CHARACTER_POINTER() via pstr -> STRING_ELT(, i) directly  (argcargv.i)
+
+All replacement APIs have been available since R 2.x so no version
+guards are required.
+
+Assisted-by: GitHub Copilot (Claude Sonnet 4.6)
+---
+ CHANGES.current    | 6 ++++++
+ Lib/r/argcargv.i   | 4 +---
+ Lib/r/rrun.swg     | 6 +++---
+ Lib/r/std_vector.i | 4 ++--
+ 4 files changed, 12 insertions(+), 8 deletions(-)
+
+#diff --git a/CHANGES.current b/CHANGES.current
+#index a92aff2f2..287a795ba 100644
+#--- a/CHANGES.current
+#+++ b/CHANGES.current
+#@@ -7,6 +7,12 @@ the issue number to the end of the URL: https://github.com/swig/swig/issues/
+# Version 4.5.0 (in progress)
+# ===========================
+# 
+#+2026-05-15: blowekamp
+#+            [R] #3407 Fix compilation with R 4.6.0 which removed the non-API macro
+#+            SET_S4_OBJECT and made CHARACTER_POINTER return a const pointer.
+#+            Use Rf_asS4, SET_STRING_ELT and STRING_ELT instead. These replacement
+#+            APIs have been available since R 2.x so no version guards are required.
+#+
+# 2026-05-12: wsfulton
+#             C++20: %template can now instantiate abbreviated function templates
+#             that mix 'auto' parameters with a variadic explicit template pack,
+diff --git a/Lib/r/argcargv.i b/Lib/r/argcargv.i
+index 73380f4e2..af7aa14d6 100644
+--- a/Lib/r/argcargv.i
++++ b/Lib/r/argcargv.i
+@@ -14,7 +14,6 @@
+ %}
+ %typemap(in) (int ARGC, char **ARGV) {
+   $1_ltype i;
+-  SEXP *pstr;
+   if ($input == R_NilValue) {
+     /* Empty array */
+     $1 = 0;
+@@ -22,14 +21,13 @@
+     SWIG_exception_fail(SWIG_RuntimeError, "Wrong array type.");
+   } else {
+     $1 = Rf_length($input);
+-    pstr = CHARACTER_POINTER($input);
+   }
+   $2 = ($2_ltype) malloc(($1+1)*sizeof($*2_ltype));
+   if ($2 == NULL) {
+     SWIG_exception_fail(SWIG_MemoryError, "Memory allocation failed.");
+   }
+   for (i = 0; i < $1; i++) {
+-    $2[i] = ($*2_ltype)STRING_VALUE(pstr[i]);
++    $2[i] = ($*2_ltype)STRING_VALUE(STRING_ELT($input, i));
+   }
+   $2[i] = NULL;
+ }
+diff --git a/Lib/r/rrun.swg b/Lib/r/rrun.swg
+index 4c03d5884..5dee391f3 100644
+--- a/Lib/r/rrun.swg
++++ b/Lib/r/rrun.swg
+@@ -267,7 +267,7 @@ SWIG_MakePtr(void *ptr, const char *typeName, int flags)
+     R_RegisterCFinalizer(external, R_SWIG_ReferenceFinalizer);
+ 
+   r_obj = SET_SLOT(r_obj, Rf_mkString((char *) "ref"), external);
+-  SET_S4_OBJECT(r_obj);
++  r_obj = Rf_asS4(r_obj, TRUE, 0);
+   Rf_unprotect(2);
+ 
+   return(r_obj);
+@@ -285,7 +285,7 @@ R_SWIG_create_SWIG_R_Array(const char *typeName, SEXP ref, int len)
+    Rf_protect(arr = R_do_slot_assign(arr, Rf_mkString("dims"), Rf_ScalarInteger(len)));
+ 
+    Rf_unprotect(3); 			   
+-   SET_S4_OBJECT(arr);	
++   arr = Rf_asS4(arr, TRUE, 0);
+    return arr;
+ }
+ 
+@@ -308,7 +308,7 @@ SWIG_R_NewPointerObj(void *ptr, swig_type_info *type, int flags) {
+   }
+   rptr = R_MakeExternalPtr(ptr, 
+   R_MakeExternalPtr(type, R_NilValue, R_NilValue), R_NilValue); 
+-  SET_S4_OBJECT(rptr);
++  rptr = Rf_asS4(rptr, TRUE, 0);
+   return rptr;
+ }
+ 
+diff --git a/Lib/r/std_vector.i b/Lib/r/std_vector.i
+index 6b32c9f6f..7db6d3814 100644
+--- a/Lib/r/std_vector.i
++++ b/Lib/r/std_vector.i
+@@ -203,7 +203,7 @@
+          PROTECT(result = Rf_allocVector(STRSXP, val->size()));
+          for (unsigned pos = 0; pos < val->size(); pos++)
+            {
+-             CHARACTER_POINTER(result)[pos] = Rf_mkChar(((*val)[pos]).c_str());
++             SET_STRING_ELT(result, pos, Rf_mkChar(((*val)[pos]).c_str()));
+            }
+         UNPROTECT(1);
+         return(result);
+@@ -669,7 +669,7 @@
+             // Fill the R vector
+             for (unsigned vpos = 0; vpos < val->at(pos).size(); ++vpos)
+               {
+-                CHARACTER_POINTER(VECTOR_ELT(result, pos))[vpos] = Rf_mkChar(val->at(pos).at(vpos).c_str());
++                SET_STRING_ELT(VECTOR_ELT(result, pos), vpos, Rf_mkChar(val->at(pos).at(vpos).c_str()));
+               }
+           }
+         UNPROTECT(1);
+-- 
+2.54.0
+

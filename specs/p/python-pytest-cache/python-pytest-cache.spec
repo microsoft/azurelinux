@@ -11,7 +11,7 @@
 
 Name:           python-%{srcname}
 Version:        1.0
-Release: 44%{?dist}
+Release:        41%{?dist}
 Summary:        Pytest plugin with mechanisms for caching across test runs
 
 License:        MIT

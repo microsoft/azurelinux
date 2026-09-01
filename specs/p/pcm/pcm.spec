@@ -3,7 +3,7 @@
 
 Name:           pcm
 Version:        202509
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Intel(r) Performance Counter Monitor
 License:        BSD-3-Clause
 Url:            https://github.com/intel/pcm

@@ -18,6 +18,7 @@
 %global with_sasl2	yes
 %global with_milter	yes
 %global with_ldap	yes
+%global with_smtputf8	yes
 %if 0%{?rhel} < 9
 %global with_nis	yes
 %else
@@ -43,8 +44,8 @@
 
 Summary: A widely used Mail Transport Agent (MTA)
 Name: sendmail
-Version: 8.18.1
-Release: 16%{?dist}
+Version: 8.18.2
+Release: 4%{?dist}
 License: sendmail-8.23 AND MIT AND MIT-CMU AND BSD-3-Clause AND CDDL-1.0 AND BSD-4-Clause AND BSD-4-Clause-UC AND PostgreSQL AND ISC AND HPND-sell-variant AND mailprio
 URL: http://www.sendmail.org/
 
@@ -92,25 +93,23 @@ Patch11: sendmail-8.17.1-dynamic.patch
 # fix cyrus path
 Patch12: sendmail-8.13.0-cyrus.patch
 # fix aliases.db path
-Patch13: sendmail-8.18.1-aliases_dir.patch
+Patch13: sendmail-8.18.2-aliases_dir.patch
 # fix vacation Makefile
 Patch14: sendmail-8.14.9-vacation.patch
 # remove version information from sendmail helpfile
 Patch15: sendmail-8.17.2-noversion.patch
 # do not accept localhost.localdomain as valid address from SMTP
-Patch16: sendmail-8.18.1-localdomain.patch
+Patch16: sendmail-8.18.2-localdomain.patch
 # build libmilter as DSO
 Patch17: sendmail-8.18.1-sharedmilter.patch
 # skip colon separator when parsing service name in ServiceSwitchFile
 Patch18: sendmail-8.17.1-switchfile.patch
 # silence warning about missing sasl2 config in /usr/lib*, now in /etc/sasl2
-Patch23: sendmail-8.17.2-sasl2-in-etc.patch
+Patch23: sendmail-8.18.2-sasl2-in-etc.patch
 # add QoS support, patch from Philip Prindeville <philipp@fedoraproject.org>
 # upstream reserved option ID 0xe7 for testing of this new feature, #576643
-Patch25: sendmail-8.18.1-qos.patch
+Patch25: sendmail-8.18.2-qos.patch
 Patch26: sendmail-8.17.1-libmilter-socket-activation.patch
-# upstream approved patch, it will be included in the next release
-Patch27: sendmail-8.18.1-gcc-15-fix.patch
 
 BuildRequires: make
 %{?with_db:BuildRequires: libdb-devel}
@@ -145,6 +144,9 @@ Requires: /usr/sbin/saslauthd
 %if "%{with_ldap}" == "yes"
 BuildRequires: openldap-devel
 BuildRequires: openssl-devel
+%endif
+%if "%{with_smtputf8}" == "yes"
+BuildRequires: libicu-devel
 %endif
 # Old NetworkManager expects the dispatcher scripts in a different place
 Conflicts: NetworkManager < 1.20
@@ -231,7 +233,6 @@ cp devtools/M4/UNIX/{,shared}library.m4
 %patch -P23 -p1 -b .sasl2-in-etc
 %patch -P25 -p1 -b .qos
 %patch -P26 -p1 -b .libmilter-socket-activation
-%patch -P27 -p1 -b .gcc-15-fix
 
 for f in RELEASE_NOTES contrib/etrn.0; do
 	iconv -f iso8859-1 -t utf8 -o ${f}{_,} &&
@@ -316,6 +317,13 @@ cat >> redhat.config.m4 << EOF
 APPENDDEF(\`confMAPDEF', \`-DLDAPMAP -DLDAP_DEPRECATED')dnl
 APPENDDEF(\`confENVDEF', \`-DSM_CONF_LDAP_MEMFREE=1')dnl
 APPENDDEF(\`confLIBS', \`-lldap -llber -lssl -lcrypto')dnl
+EOF
+%endif
+
+%if "%{with_smtputf8}" == "yes"
+cat >> redhat.config.m4 << EOF
+APPENDDEF(\`confENVDEF',\`-DUSE_EAI')dnl
+APPENDDEF(\`confLIBS', \`-licuuc')dnl
 EOF
 %endif
 
@@ -760,6 +768,20 @@ exit 0
 
 
 %changelog
+* Tue Jun 09 2026 Jaroslav Škarvada <jskarvad@redhat.com> - 8.18.2-4
+- Used self signed certificate instead of the CA bundle
+  Resolves: rhbz#2476449
+
+* Wed Feb 25 2026 Xavier Bachelot <xavier@bachelot.org> - 8.18.2-3
+- Enable support for SMTPUTF8 (RFC 6531)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.18.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Jan 03 2026 Jaroslav Škarvada  <jskarvad@redhat.com> - 8.18.2-1
+- New version
+  Resolves: rhbz#2425602
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.18.1-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

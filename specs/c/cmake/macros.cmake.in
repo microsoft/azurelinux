@@ -1,6 +1,7 @@
 #
 # Macros for cmake
 #
+# TODO: Remove non-standard LIB_SUFFIX and *_INSTALL variables with a change proposal
 %_cmake_lib_suffix64 -DLIB_SUFFIX=64
 %_cmake_shared_libs -DBUILD_SHARED_LIBS:BOOL=ON
 %_cmake_skip_rpath -DCMAKE_SKIP_RPATH:BOOL=ON
@@ -9,6 +10,7 @@
 %__ctest /usr/bin/ctest
 %__cmake_builddir %{!?__cmake_in_source_build:%{_vpath_builddir}}%{?__cmake_in_source_build:.}
 
+%_cmake_generator Ninja
 
 # - Set default compile flags
 # - CMAKE_*_FLAGS_RELEASE are added *after* the *FLAGS environment variables
@@ -22,6 +24,7 @@
   %__cmake \\\
         %{!?__cmake_in_source_build:-S "%{_vpath_srcdir}"} \\\
         %{!?__cmake_in_source_build:-B "%{__cmake_builddir}"} \\\
+        %{?_cmake_generator:-G %{_cmake_generator}} \\\
         -DCMAKE_C_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
         -DCMAKE_CXX_FLAGS_RELEASE:STRING="-DNDEBUG" \\\
         -DCMAKE_Fortran_FLAGS_RELEASE:STRING="-DNDEBUG" \\\

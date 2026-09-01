@@ -6,8 +6,8 @@
 
 
 Name:           python-pycares
-Version:        4.10.0
-Release: 6%{?dist}
+Version:        5.0.1
+Release:        2%{?dist}
 Summary:        Python interface for c-ares
 
 License:        MIT
@@ -108,8 +108,20 @@ rm -rf %{buildroot}%{_pkgdocdir}/html/.buildinfo
 
 
 %changelog
-* Fri Sep 19 2025 Gwyn Ciesla <gwync@protonmail.com> - 4.10.0-3
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 05 2026 Gwyn Ciesla <gwync@protonmail.com> - 5.0.1-1
+- 5.0.1
+
+* Thu Dec 11 2025 Gwyn Ciesla <gwync@protonmail.com> - 5.0.0-1
+- 5.0.0
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.11.0-2
 - Rebuilt for Python 3.14.0rc3 bytecode
+
+* Tue Sep 09 2025 Gwyn Ciesla <gwync@protonmail.com> - 4.11.0-1
+- 4.11.0
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 4.10.0-2
 - Rebuilt for Python 3.14.0rc2 bytecode

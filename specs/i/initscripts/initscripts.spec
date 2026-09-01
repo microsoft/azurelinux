@@ -22,7 +22,7 @@ Requires:         gawk                       \
 Name:             initscripts
 Summary:          Basic support for legacy System V init scripts
 Version:          10.27
-Release: 4%{?dist}
+Release:          2%{?dist}
 
 License:          GPL-2.0-only
 
@@ -309,6 +309,9 @@ mv -v %{buildroot}/usr/sbin/* %{buildroot}%{_bindir}/
 # =============================================================================
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 10.27-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Dec 11 2025 Jan Macku <jamacku@redhat.com> - 10.27-1
 - spec: add missing license files
 - build(deps): bump actions/checkout from 5 to 6

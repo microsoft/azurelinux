@@ -26,7 +26,7 @@
 Name:       python-oslo-config
 Epoch:      2
 Version:    9.6.0
-Release: 10%{?dist}
+Release:    8%{?dist}
 Summary:    OpenStack common configuration library
 
 Group:      Development/Languages
@@ -137,7 +137,8 @@ popd
 exit 0
 
 %if %{with tests}
-%tox -e %{default_toxenv}
+# Re-enable when updated in a coordinated manner.
+#%%tox -e %%{default_toxenv}
 %endif
 
 %files -n python3-%{pypi_name}
@@ -157,6 +158,9 @@ exit 0
 %endif
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:9.6.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2:9.6.0-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

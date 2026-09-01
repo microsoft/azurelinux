@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.8.1
-Release: 106%{?dist}
+Release:	103%{?dist}
 
 Summary:	LALR(1) parser generator
 # SPDX confirmed

@@ -1,0 +1,41 @@
+From 1ac117ac0591a0f1bb67c34f537354c21412b2d8 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 1 Nov 2025 09:43:58 -0700
+Subject: [PATCH] hipblaslt tensilelite use fedora paths
+
+---
+ tensilelite/Tensile/Common/GlobalParameters.py | 2 +-
+ tensilelite/Tensile/Toolchain/Validators.py    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tensilelite/Tensile/Common/GlobalParameters.py b/tensilelite/Tensile/Common/GlobalParameters.py
+index 567188da59bd..1f8037c183a6 100644
+--- a/tensilelite/Tensile/Common/GlobalParameters.py
++++ b/tensilelite/Tensile/Common/GlobalParameters.py
+@@ -538,7 +538,7 @@ def assignGlobalParameters(config, isaInfoMap: Dict[IsaVersion, IsaInfo]):
+         else:
+             print2(" %24s: %8s (unspecified)" % (key, defaultValue))
+ 
+-    globalParameters["ROCmPath"] = "/opt/rocm"
++    globalParameters["ROCmPath"] = "/usr"
+     if "ROCM_PATH" in os.environ:
+         globalParameters["ROCmPath"] = os.environ.get("ROCM_PATH")
+     if "TENSILE_ROCM_PATH" in os.environ:
+diff --git a/tensilelite/Tensile/Toolchain/Validators.py b/tensilelite/Tensile/Toolchain/Validators.py
+index fd5dab5324c0..3ce024d31f52 100644
+--- a/tensilelite/Tensile/Toolchain/Validators.py
++++ b/tensilelite/Tensile/Toolchain/Validators.py
+@@ -30,8 +30,8 @@ from typing import List, NamedTuple, Union
+ 
+ from Tensile.Common.Utilities import isRhel8
+ 
+-DEFAULT_ROCM_BIN_PATH_POSIX = Path("/opt/rocm/bin")
+-DEFAULT_ROCM_LLVM_BIN_PATH_POSIX = Path("/opt/rocm/lib/llvm/bin")
++DEFAULT_ROCM_BIN_PATH_POSIX = Path("/usr/bin")
++DEFAULT_ROCM_LLVM_BIN_PATH_POSIX = Path("/usr/lib64/rocm/llvm/bin")
+ DEFAULT_ROCM_BIN_PATH_WINDOWS = Path("C:/Program Files/AMD/ROCm")
+ 
+ 
+-- 
+2.52.0
+

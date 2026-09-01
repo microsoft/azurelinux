@@ -7,7 +7,7 @@
 
 Name: python-scikit-image
 Version: 0.25.2
-Release: 11%{?dist}
+Release: 10%{?dist}
 Summary: Image processing in Python
 # The following files are BSD 2 clauses, the rest BSD 3 clauses
 # skimage/graph/_mcp.pyx
@@ -23,6 +23,9 @@ Source1: scikit-image-data-20250220.tar.xz
 # In tests, adapt a couple of expected messages for Python 3.14
 # https://github.com/scikit-image/scikit-image/pull/7808
 Patch: https://github.com/scikit-image/scikit-image/pull/7808.patch
+# Handle pillow's 12.1.0 Image.getdata() DeprecationWarning
+# Rebased from: https://github.com/scikit-image/scikit-image/commit/9d8daba419249
+Patch: fix-pillow-Image-getdata-deprecation.patch
 
 # https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
 ExcludeArch:    %{ix86}
@@ -142,6 +145,12 @@ popd
 
 
 %changelog
+* Fri Apr 17 2026 Karolina Surma <ksurma@redhat.com> - 0.25.2-10
+- Fix FTBFS rhbz#2435022
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.25.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.25.2-8
 - Rebuilt for Python 3.14.0rc3 bytecode
 

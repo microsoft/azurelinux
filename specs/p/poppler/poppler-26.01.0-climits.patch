@@ -1,0 +1,75 @@
+From 4a2294f59ebbbe690d09aa6f7e021e29cbb85782 Mon Sep 17 00:00:00 2001
+From: Paul Zander <negril.nx+gentoo@gmail.com>
+Date: Mon, 12 Jan 2026 22:14:33 +0100
+Subject: Include <climits> for GCC 16
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+```
+poppler-26.01.0/poppler/SplashOutputDev.cc: In constructor
+‘T3FontCache::T3FontCache(const Ref*, double, double, double, double, int, int,
+int, int, bool, bool)’:
+poppler-26.01.0/poppler/SplashOutputDev.cc:1129:18: error: ‘INT_MAX’ was not
+declared in this scope
+1129 |     if (glyphW > INT_MAX / glyphH || glyphW <= 0 || glyphH <= 0 ||
+glyphW * glyphH > 100000) {
+      |                  ^~~~~~~
+poppler-26.01.0/poppler/SplashOutputDev.cc:84:1: note: ‘INT_MAX’ is defined in
+header ‘<climits>’; this is probably fixable by adding ‘#include <climits>’
+   83 | #include "SplashOutputDev.h"
+  +++ |+#include <climits>
+   84 | #include <algorithm>
+```
+
+Signed-off-by: Paul Zander <negril.nx+gentoo@gmail.com>
+Signed-off-by: Sam James <sam@gentoo.org>
+
+diff --git a/poppler/Function.cc b/poppler/Function.cc
+index b09c8cbe..51473787 100644
+--- a/poppler/Function.cc
++++ b/poppler/Function.cc
+@@ -30,6 +30,7 @@
+ 
+ #include <config.h>
+ 
++#include <climits>
+ #include <cstdlib>
+ #include <cstring>
+ #include <cctype>
+diff --git a/poppler/Gfx.cc b/poppler/Gfx.cc
+index 964560a2..f05988a3 100644
+--- a/poppler/Gfx.cc
++++ b/poppler/Gfx.cc
+@@ -60,6 +60,7 @@
+ 
+ #include <config.h>
+ 
++#include <climits>
+ #include <cstdlib>
+ #include <cstdio>
+ #include <cstring>
+diff --git a/poppler/Parser.cc b/poppler/Parser.cc
+index e7c3a4c3..5a6ffdd6 100644
+--- a/poppler/Parser.cc
++++ b/poppler/Parser.cc
+@@ -33,6 +33,7 @@
+ 
+ #include <config.h>
+ 
++#include <climits>
+ #include "Object.h"
+ #include "Array.h"
+ #include "Dict.h"
+diff --git a/poppler/SplashOutputDev.cc b/poppler/SplashOutputDev.cc
+index 2abc6f77..237ca3f3 100644
+--- a/poppler/SplashOutputDev.cc
++++ b/poppler/SplashOutputDev.cc
+@@ -53,6 +53,7 @@
+ 
+ #include <config.h>
+ 
++#include <climits>
+ #include <cstring>
+ #include <cmath>
+ #include <vector>

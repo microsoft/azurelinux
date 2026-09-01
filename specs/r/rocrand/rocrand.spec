@@ -86,7 +86,7 @@
 
 Name:           %{rocrand_name}
 Version:        %{rocm_version}
-Release: 8%{?dist}
+Release:        5%{?dist}
 Summary:        ROCm random number generator
 
 Url:            https://github.com/ROCm/rocRAND

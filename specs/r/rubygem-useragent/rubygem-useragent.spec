@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.16.11
-Release: 6%{?dist}
+Release: 5%{?dist}
 Summary: HTTP User Agent parser
 License: MIT
 URL: https://github.com/gshutler/useragent
@@ -18,6 +18,7 @@ BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(rspec) >= 3.0
+BuildRequires: rubygem(ostruct)
 BuildArch: noarch
 
 %description
@@ -68,6 +69,12 @@ popd
 %doc %{gem_instdir}/README.md
 
 %changelog
+* Tue Jan 20 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.11-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Nov 02 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 0.16.11-4
+- Add BR: rubygem(ostruct) for testsuite for ruby3_5
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.11-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -5,7 +5,7 @@
 
 Name:           sblim-testsuite
 Version:        1.3.0
-Release: 37%{?dist}
+Release:        35%{?dist}
 Summary:        SBLIM testsuite
 
 License:        EPL-1.0
@@ -44,6 +44,9 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_localstatedir}/lib/%{name}
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-35
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-34
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

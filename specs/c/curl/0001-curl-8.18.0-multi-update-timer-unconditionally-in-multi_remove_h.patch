@@ -1,0 +1,109 @@
+From 0f566bd818245dd1f6cb42b0d409ce34ebff9259 Mon Sep 17 00:00:00 2001
+From: Stefan Eissing <stefan@eissing.org>
+Date: Tue, 3 Feb 2026 10:18:13 +0100
+Subject: [PATCH] multi: update timer unconditionally in multi_remove_handle
+
+When removing an easy handle from a multi, there was an optimization
+to update the timer only when the removed handle had any timers.
+
+With the introduction of the "dirty" bitset, easy handles can now cause
+a timeout of 0 to be set without having anything in their timer list.
+Removing such a handle needs to update the timer now always, so that
+it may get cleared when there is nothing more to wait for.
+
+The previous "not clearing a 0 timer" should not have any effect on
+application's logic. Without clearing, the timer will fire and then
+adjust itself to the proper value. But it would cause one more timer
+fire than necessary.
+
+Reported-by: Jan Macku
+
+Fixes https://github.com/curl/curl/issues/20498
+Closes https://github.com/curl/curl/pull/20502
+
+(cherry picked from commit 2d4efbb9b36c0f883651020fd7d9a3f62fc0829b)
+---
+ lib/multi.c   | 17 ++++++-----------
+ lib/multiif.h |  2 +-
+ 2 files changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/lib/multi.c b/lib/multi.c
+index 7cfd053c90..6db86abda2 100644
+--- a/lib/multi.c
++++ b/lib/multi.c
+@@ -750,7 +750,6 @@ CURLMcode curl_multi_remove_handle(CURLM *m, CURL *d)
+   bool premature;
+   struct Curl_llist_node *e;
+   CURLMcode mresult;
+-  bool removed_timer = FALSE;
+   uint32_t mid;
+ 
+   /* First, make some basic checks that the CURLM handle is a good handle */
+@@ -805,7 +804,7 @@ CURLMcode curl_multi_remove_handle(CURLM *m, CURL *d)
+   /* The timer must be shut down before data->multi is set to NULL, else the
+      timenode will remain in the splay tree after curl_easy_cleanup is
+      called. Do it after multi_done() in case that sets another time! */
+-  removed_timer = Curl_expire_clear(data);
++  Curl_expire_clear(data);
+ 
+   /* If in `msgsent`, it was deducted from `multi->xfers_alive` already. */
+   if(!Curl_uint32_bset_contains(&multi->msgsent, data->mid))
+@@ -878,11 +877,9 @@ CURLMcode curl_multi_remove_handle(CURLM *m, CURL *d)
+      We do not touch the easy handle here! */
+   process_pending_handles(multi);
+ 
+-  if(removed_timer) {
+-    mresult = Curl_update_timer(multi);
+-    if(mresult)
+-      return mresult;
+-  }
++  mresult = Curl_update_timer(multi);
++  if(mresult)
++    return mresult;
+ 
+   CURL_TRC_M(data, "removed from multi, mid=%u, running=%u, total=%u",
+              mid, Curl_multi_xfers_running(multi),
+@@ -3649,7 +3646,7 @@ void Curl_expire_done(struct Curl_easy *data, expire_id eid)
+  *
+  * Clear ALL timeout values for this handle.
+  */
+-bool Curl_expire_clear(struct Curl_easy *data)
++void Curl_expire_clear(struct Curl_easy *data)
+ {
+   struct Curl_multi *multi = data->multi;
+   struct curltime *nowp = &data->state.expiretime;
+@@ -3657,7 +3654,7 @@ bool Curl_expire_clear(struct Curl_easy *data)
+   /* this is only interesting while there is still an associated multi struct
+      remaining! */
+   if(!multi)
+-    return FALSE;
++    return;
+ 
+   if(nowp->tv_sec || nowp->tv_usec) {
+     /* Since this is an cleared time, we must remove the previous entry from
+@@ -3677,9 +3674,7 @@ bool Curl_expire_clear(struct Curl_easy *data)
+       CURL_TRC_M(data, "[TIMEOUT] all cleared");
+     nowp->tv_sec = 0;
+     nowp->tv_usec = 0;
+-    return TRUE;
+   }
+-  return FALSE;
+ }
+ 
+ CURLMcode curl_multi_assign(CURLM *m, curl_socket_t s,
+diff --git a/lib/multiif.h b/lib/multiif.h
+index 15fc070341..f368639857 100644
+--- a/lib/multiif.h
++++ b/lib/multiif.h
+@@ -30,7 +30,7 @@
+ void Curl_expire(struct Curl_easy *data, timediff_t milli, expire_id);
+ void Curl_expire_ex(struct Curl_easy *data,
+                     timediff_t milli, expire_id id);
+-bool Curl_expire_clear(struct Curl_easy *data);
++void Curl_expire_clear(struct Curl_easy *data);
+ void Curl_expire_done(struct Curl_easy *data, expire_id id);
+ CURLMcode Curl_update_timer(struct Curl_multi *multi) WARN_UNUSED_RESULT;
+ void Curl_attach_connection(struct Curl_easy *data,
+-- 
+2.52.0
+

@@ -1,0 +1,23 @@
+From 407c784c42f8406c6ba9182f5d79fabd4179a3ba Mon Sep 17 00:00:00 2001
+From: Maxwell G <maxwell@gtmx.me>
+Date: Thu, 12 Feb 2026 00:26:47 -0600
+Subject: [PATCH] chore: remove unused mock dev dependency
+
+The tests use unittest.mock from the standard library, so the dependency
+on the mock PyPI backport package is unneeded.
+---
+ pyproject.toml | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b72f468..141c261 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -48,7 +48,6 @@ uvloop = ["uvloop"]
+ dev = [
+     "httpx",
+     "hypothesis",
+-    "mock",
+     "pytest",
+     "pytest-asyncio",
+     "pytest-trio",

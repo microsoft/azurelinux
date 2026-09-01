@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 6;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,11 +11,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global dashver %(echo "%{version}" | sed 's/\\./-/')
 %global giturl  https://github.com/unicode-org/icu
 
 Name:           icu4j
-Version:        77.1
+Version:        78.3
 Release:        %autorelease
 Epoch:          1
 Summary:        International Components for Unicode for Java
@@ -23,7 +22,7 @@ License:        Unicode-3.0
 URL:            https://icu.unicode.org/
 VCS:            git:%{giturl}.git
 
-Source:         %{giturl}/archive/release-%{dashver}.tar.gz
+Source:         %{giturl}/archive/release-%{version}.tar.gz
 
 BuildRequires:  maven-local-openjdk25
 BuildRequires:  mvn(com.google.code.gson:gson)
@@ -40,10 +39,15 @@ BuildRequires:  mvn(org.apache.maven.plugins:maven-source-plugin)
 BuildRequires:  mvn(org.apache.maven.plugins:maven-surefire-plugin)
 BuildRequires:  mvn(org.codehaus.mojo:build-helper-maven-plugin)
 BuildRequires:  mvn(org.codehaus.mojo:exec-maven-plugin)
+BuildRequires:  mvn(org.codehaus.plexus:plexus-io)
 BuildRequires:  mvn(pl.pragmatists:JUnitParams)
 
 BuildArch:      noarch
 ExclusiveArch:  %{java_arches} noarch
+
+# This can be removed when F47 reaches EOL
+Obsoletes:      %{name}-localespi < 78
+Provides:       %{name}-localespi = 1:%{version}-%{release}
 
 %description
 The International Components for Unicode (ICU) library provides robust and
@@ -55,10 +59,10 @@ Java provides a very strong foundation for global programs, and IBM and the
 ICU team played a key role in providing globalization technology into Sun's
 Java. But because of its long release schedule, Java cannot always keep
 up-to-date with evolving standards. The ICU team continues to extend Java's
-Unicode and internationalization support, focusing on improving
-performance, keeping current with the Unicode standard, and providing
-richer APIs, while remaining as compatible as possible with the original
-Java text and internationalization API design.
+Unicode and internationalization support, focusing on improving performance,
+keeping current with the Unicode standard, and providing richer APIs, while
+remaining as compatible as possible with the original Java text and
+internationalization API design.
 
 %package        charset
 Summary:        Charset converter library of %{name}
@@ -67,13 +71,6 @@ Requires:       %{name} = 1:%{version}-%{release}
 %description    charset
 Charset converter library of %{name}.
 
-%package        localespi
-Summary:        Locale SPI library of %{name}
-Requires:       %{name} = 1:%{version}-%{release}
-
-%description    localespi
-Locale SPI library of %{name}.
-
 %package        parent
 Summary:        Parent POM for %{name}
 
@@ -81,9 +78,9 @@ Summary:        Parent POM for %{name}
 Parent POM for %{name}.
 
 %package        javadoc
-# Unicode-DFS-2016: the content
+# Unicode-3.0: the content
 # MIT: jquery
-License:        Unicode-DFS-2016 AND MIT
+License:        Unicode-3.0 AND MIT
 Summary:        API documentation for %{name}
 Provides:       bundled(js-jquery)
 
@@ -91,7 +88,7 @@ Provides:       bundled(js-jquery)
 API documentation for %{name}.
 
 %prep
-%autosetup -p1 -n icu-release-%{dashver}
+%autosetup -p1 -n icu-release-%{version}
 
 %conf
 cd icu4j
@@ -99,12 +96,22 @@ cd icu4j
 %pom_remove_plugin -r :flatten-maven-plugin
 %pom_remove_plugin -r :maven-clean-plugin
 %pom_remove_plugin -r :maven-deploy-plugin
+%pom_remove_plugin :central-publishing-maven-plugin
 %pom_remove_plugin :maven-gpg-plugin
 %pom_remove_plugin :maven-install-plugin
 %pom_remove_plugin :maven-javadoc-plugin
+%pom_remove_plugin :maven-pmd-plugin
 %pom_remove_plugin :maven-project-info-reports-plugin
 %pom_remove_plugin :maven-release-plugin
 %pom_remove_plugin :maven-site-plugin
+
+# Modules we do not want to ship
+%pom_disable_module demos
+%pom_disable_module perf-tests
+%pom_disable_module samples
+%pom_disable_module tools/build
+%pom_disable_module tools/misc
+%pom_disable_module tools/pmd
 cd -
 
 %build
@@ -118,17 +125,16 @@ cd icu4j
 cd -
 
 # We do not want the dev and test component jars
-rm %{buildroot}%{_javadir}/icu4j/{common_tests,demos,framework,perf-tests,samples,tools_misc}.jar
-rm %{buildroot}%{_datadir}/maven-metadata/icu4j-{common_tests,demos,framework,perf-tests,samples,tools_misc}.xml
-rm %{buildroot}%{_mavenpomdir}/icu4j/{common_tests,demos,framework,perf-tests,samples,tools_misc}.pom
+rm %{buildroot}%{_javadir}/icu4j/{common_tests,framework}.jar
+rm %{buildroot}%{_datadir}/maven-metadata/icu4j-{common_tests,framework}.xml
+rm %{buildroot}%{_mavenpomdir}/icu4j/{common_tests,framework}.pom
+sed -i '/%dir/d' icu4j/.mfiles-{c,f,l,r,t}* icu4j/.mfiles-icu4j-charset
 
-%files -f icu4j/.mfiles-icu4j -f icu4j/.mfiles-collate -f icu4j/.mfiles-core -f icu4j/.mfiles-currdata -f icu4j/.mfiles-langdata -f icu4j/.mfiles-regiondata -f icu4j/.mfiles-translit
+%files -f icu4j/.mfiles-icu4j -f icu4j/.mfiles-collate -f icu4j/.mfiles-core -f icu4j/.mfiles-currdata -f icu4j/.mfiles-langdata -f icu4j/.mfiles-regiondata -f icu4j/.mfiles-tools_taglets -f icu4j/.mfiles-translit
 %license LICENSE
 %doc icu4j/readme.html icu4j/APIChangeReport.html
 
 %files charset -f icu4j/.mfiles-icu4j-charset
-
-%files localespi -f icu4j/.mfiles-icu4j-localespi
 
 %files parent -f icu4j/.mfiles-icu4j-root
 
@@ -137,14 +143,22 @@ rm %{buildroot}%{_mavenpomdir}/icu4j/{common_tests,demos,framework,perf-tests,sa
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:77.1-6
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 1:78.3-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:77.1-5
-- build: mass rebuild auto-bumpable components
+* Wed Mar 18 2026 Jerry James <loganjerry@gmail.com> - 1:78.3-1
+- Version 78.3
 
-* Wed Jun 24 2026 Antonio Salinas <asalinas@microsoft.com> - 1:77.1-4
-- fix: moving commits dropped by fedora upstream history rewrite
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:78.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 09 2026 Jerry James <loganjerry@gmail.com> - 1:78.2-1
+- Version 78.2
+- Correct license of the javadoc package
+
+* Fri Oct 31 2025 Jerry James <loganjerry@gmail.com> - 1:78.1-1
+- Version 78.1
+- Remove the icu4j-localespi package
 
 * Tue Jul 29 2025 Jiri Vanek <jvanek@redhat.com> - 1:77.1-3
 - Rebuilt for java-25-openjdk as preffered jdk

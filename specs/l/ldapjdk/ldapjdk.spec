@@ -16,7 +16,7 @@ Name:             ldapjdk
 # Downstream release number:
 # - development/stabilization (unsupported): 0.<n> where n >= 1
 # - GA/update (supported): <n> where n >= 1
-%global           release_number 2
+%global           release_number 1
 
 # Development phase:
 # - development (unsupported): alpha<n> where n >= 1
@@ -31,7 +31,7 @@ Summary:          LDAP SDK
 URL:              https://github.com/dogtagpki/ldap-sdk
 License:          MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later
 Version:          %{major_version}.%{minor_version}.%{update_version}
-Release:          %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
+Release:          %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}.1
 
 # To create a tarball from a version tag:
 # $ git archive \
@@ -165,11 +165,14 @@ ln -sf %{name}/ldaptools.pom %{buildroot}%{_mavenpomdir}/JPP-ldaptools.pom
 
 ################################################################################
 %changelog
-* Fri Nov 28 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 5.6.0-2
-- Really rebuilt for java-25-openjdk as system jdk
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.6.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
-* Tue Nov 04 2025  Dogtag PKI Team <devel@lists.dogtagpki.org> - 5.6.0-2
+* Tue Nov 04 2025  Dogtag PKI Team <devel@lists.dogtagpki.org> - 5.6.0-1
 - Rebase to LDAP SDK 5.6.0
+
+* Wed Jul 30 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 5.6.0-0.1.alpha1.4
+- Really rebuilt for java-25-openjdk as system jdk
 
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 5.6.0-0.1.alpha1.3
 - Rebuilt for java-25-openjdk as preffered jdk

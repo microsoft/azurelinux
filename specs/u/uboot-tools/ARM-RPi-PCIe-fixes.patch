@@ -1,0 +1,172 @@
+From 354971c474d8a595f3fc610942bf160ac9959343 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sat, 11 Apr 2026 16:14:50 +0100
+Subject: [PATCH 1/2] pci: brcmstb: fix iBAR inbound window address for
+ pre-BCM2712
+
+The reworked brcm_pcie_set_inbound_windows() writes bar_pci (the raw
+PCI bus address) directly into the RC BAR config register, and relies
+on the UBUS remap registers to supply the CPU-side translation.
+
+This model works on BCM2712 (RPi5), which has a capable UBUS/AXI
+remap block.  On BCM2711 (RPi4) the BAR config register expects the
+address *offset* (bus_start - phys_start), not the raw bus address,
+and the older UBUS remap registers cannot compensate for the
+difference.  The result is a misconfigured inbound DMA window that
+renders the PCIe-attached XHCI USB controller non-functional.
+
+Fix by branching on the chip type inside brcm_pcie_set_inbound_windows():
+
+- Pre-BCM2712: write the offset (bus_start - phys_start) into the BAR
+  config register, matching the behaviour of the code that was removed.
+  Skip the UBUS remap registers because the older hardware does not
+  need them for a single DMA region and setting them to an incorrect
+  value causes the regression.
+
+- BCM2712: keep the new behaviour unchanged (raw PCI address in BAR
+  config, CPU address in UBUS remap registers).
+
+Also restore the power-of-two size rounding that was present in the
+original code (1ULL << fls64(size - 1)) for pre-BCM2712 paths, since
+brcm_pcie_encode_ibar_size() is documented to require a power-of-two
+input and the DT size value is not guaranteed to already be one.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ drivers/pci/pcie_brcmstb.c | 58 +++++++++++++++++++++++++++++---------
+ 1 file changed, 44 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index bd1dd17e690..796c3b9ff9c 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -476,10 +476,22 @@ static u32 brcm_ubus_reg_offset(int bar)
+ 		return PCIE_MISC_UBUS_BAR4_CONFIG_REMAP_LO + 8 * (bar - 4);
+ }
+ 
++/*
++ * Round size up to the next power of two, as required by
++ * brcm_pcie_encode_ibar_size().  If size is already a power of two
++ * fls64(size - 1) still gives the correct result because the hardware
++ * encodes the exponent, not the raw value.
++ */
++static u64 brcm_ibar_round_size(u64 size)
++{
++	return 1ULL << fls64(size - 1);
++}
++
+ static void brcm_pcie_set_inbound_windows(struct udevice *dev)
+ {
+ 	struct brcm_pcie *pcie = dev_get_priv(dev);
+ 	void __iomem *base = pcie->base;
++	bool is_2712 = (pcie->pcie_cfg->type == BCM2712);
+ 	int i, ibar_no, ret;
+ 	u32 tmp;
+ 
+@@ -504,20 +516,38 @@ static void brcm_pcie_set_inbound_windows(struct udevice *dev)
+ 		bar_cpu = region.phys_start;
+ 		bar_size = region.size;
+ 
+-		tmp = lower_32_bits(bar_pci);
+-		u32p_replace_bits(&tmp, brcm_pcie_encode_ibar_size(bar_size),
+-				  RC_BAR2_CONFIG_LO_SIZE_MASK);
+-		writel(tmp, base + rc_bar_offset);
+-		writel(upper_32_bits(bar_pci), base + rc_bar_offset + 4);
+-
+-		tmp = lower_32_bits(bar_cpu) &
+-				PCIE_MISC_UBUS_BAR_CONFIG_REMAP_LO_MASK;
+-		tmp |= PCIE_MISC_UBUS_BAR_CONFIG_REMAP_ENABLE;
+-		writel(tmp, base + ubus_bar_offset);
+-
+-		tmp = upper_32_bits(bar_cpu) &
+-			PCIE_MISC_UBUS_BAR_CONFIG_REMAP_HI_MASK;
+-		writel(tmp, base + ubus_bar_offset + 4);
++		if (is_2712) {
++			/* BCM2712: BAR holds raw PCI address; UBUS remap
++			 * registers supply the CPU-side translation. */
++			tmp = lower_32_bits(bar_pci);
++			u32p_replace_bits(&tmp, brcm_pcie_encode_ibar_size(bar_size),
++					  RC_BAR2_CONFIG_LO_SIZE_MASK);
++			writel(tmp, base + rc_bar_offset);
++			writel(upper_32_bits(bar_pci), base + rc_bar_offset + 4);
++
++			tmp = lower_32_bits(bar_cpu) &
++					PCIE_MISC_UBUS_BAR_CONFIG_REMAP_LO_MASK;
++			tmp |= PCIE_MISC_UBUS_BAR_CONFIG_REMAP_ENABLE;
++			writel(tmp, base + ubus_bar_offset);
++
++			tmp = upper_32_bits(bar_cpu) &
++				PCIE_MISC_UBUS_BAR_CONFIG_REMAP_HI_MASK;
++			writel(tmp, base + ubus_bar_offset + 4);
++		} else {
++			/* Pre-BCM2712 (e.g. BCM2711 / RPi4): the BAR config
++			 * register holds the offset (bus_start - phys_start),
++			 * not the raw PCI address.  The size must be rounded
++			 * up to the next power of two before encoding. */
++			u64 bar_offset = bar_pci - bar_cpu;
++			u64 bar_size_po2 = brcm_ibar_round_size(bar_size);
++
++			tmp = lower_32_bits(bar_offset);
++			u32p_replace_bits(&tmp, brcm_pcie_encode_ibar_size(bar_size_po2),
++					  RC_BAR2_CONFIG_LO_SIZE_MASK);
++			writel(tmp, base + rc_bar_offset);
++			writel(upper_32_bits(bar_offset), base + rc_bar_offset + 4);
++			/* UBUS remap registers are not used on pre-2712 hardware. */
++		}
+ 	}
+ }
+ 
+-- 
+2.53.0
+
+From d03a2f8be5519519cd1336295cb8627f6a685c07 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sat, 11 Apr 2026 16:21:31 +0100
+Subject: [PATCH 2/2] pci: brcmstb: restore dynamic SCB0 size for pre-BCM2712
+
+The reworked probe code hardcodes SCB0 size to 20 (32GB) for all chip
+variants.  On BCM2712 (RPi5) this is intentional.  On BCM2711 (RPi4)
+the original code derived the SCB0 size from the actual DMA region size
+using ilog2(size) - 15, e.g. 1GB -> value 15 (0xf).  Writing 20
+instead misconfigures the inbound memory window and is the remaining
+cause of the USB regression after the BAR offset fix.
+
+Restore the dynamic calculation for pre-BCM2712 chips.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ drivers/pci/pcie_brcmstb.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/pci/pcie_brcmstb.c b/drivers/pci/pcie_brcmstb.c
+index 796c3b9ff9c..f0b0f1cc117 100644
+--- a/drivers/pci/pcie_brcmstb.c
++++ b/drivers/pci/pcie_brcmstb.c
+@@ -638,9 +638,22 @@ static int brcm_pcie_probe(struct udevice *dev)
+ 			MISC_CTRL_PCIE_RCB_MPS_MODE_MASK |
+ 			tmp);
+ 
+-	/* Enable 32GB memory to be accessed from PCIe in the SCB0 */
+ 	tmp = readl(base + PCIE_MISC_MISC_CTRL);
+-	u32p_replace_bits(&tmp, 20, MISC_CTRL_SCB0_SIZE_MASK);
++	if (pcie->pcie_cfg->type == BCM2712) {
++		/* BCM2712: fixed 32GB SCB0 window */
++		u32p_replace_bits(&tmp, 20, MISC_CTRL_SCB0_SIZE_MASK);
++	} else {
++		/* Pre-BCM2712: size SCB0 to match the actual DMA region.
++		 * rc_bar2_size must be a power of two; ilog2(size) - 15
++		 * gives the hardware encoding (e.g. 1GB -> 15). */
++		struct pci_region region;
++		u64 rc_bar2_size;
++
++		pci_get_dma_regions(dev, &region, 0);
++		rc_bar2_size = brcm_ibar_round_size(region.size);
++		u32p_replace_bits(&tmp, rc_bar2_size ? ilog2(rc_bar2_size) - 15 : 0xf,
++				  MISC_CTRL_SCB0_SIZE_MASK);
++	}
+ 	writel(tmp, base + PCIE_MISC_MISC_CTRL);
+ 
+ 	if (pcie->pcie_cfg->type == BCM2712) {
+-- 
+2.53.0
+

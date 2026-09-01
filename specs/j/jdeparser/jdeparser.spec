@@ -6,7 +6,7 @@
 
 Name:             jdeparser
 Version:          2.0.3
-Release: 24%{?dist}
+Release:          23%{?dist}
 Summary:          Source generator library for Java
 License:          Apache-2.0
 URL:              https://github.com/jdeparser/jdeparser2
@@ -17,7 +17,12 @@ Patch1:           0001-Drop-Assertions.callerIs.patch
 BuildArch:        noarch
 ExclusiveArch:  %{java_arches} noarch
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:    maven-local
+%else
 BuildRequires:    maven-local-openjdk25
+%endif
+
 BuildRequires:    mvn(junit:junit)
 BuildRequires:    mvn(org.jboss:jboss-parent:pom:)
 
@@ -40,6 +45,12 @@ urged to use this project instead for source code generation.
 %license LICENSE.txt
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.3-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 2.0.3-22
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.0.3-21
 - Rebuilt for java-25-openjdk as preffered jdk
 

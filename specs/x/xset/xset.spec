@@ -3,7 +3,7 @@
 
 Name:       xset
 Version:    1.2.5
-Release: 11%{?dist}
+Release:    9%{?dist}
 Summary:    User preference utility for X
 
 License:    MIT-open-group
@@ -41,6 +41,9 @@ autoreconf -v --install
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.5-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

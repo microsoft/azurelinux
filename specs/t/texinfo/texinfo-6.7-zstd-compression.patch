@@ -1,0 +1,69 @@
+diff -up texinfo-6.7/info/filesys.c.omv~ texinfo-6.7/info/filesys.c
+--- texinfo-6.7/info/filesys.c.omv~	2020-01-05 02:24:32.094858726 +0100
++++ texinfo-6.7/info/filesys.c	2020-01-05 02:25:59.789854472 +0100
+@@ -58,9 +58,11 @@ static COMPRESSION_ALIST compress_suffix
+ #if STRIP_DOT_EXE
+   { ".gz", "gunzip" },
+   { ".lz", "lunzip" },
++  { ".zst", "unzstd" },
+ #else
+   { ".gz", "gzip -d" },
+   { ".lz", "lzip -d" },
++  { ".zst", "zstd -d" },
+ #endif
+   { ".xz", "unxz" },
+   { ".bz2", "bunzip2" },
+diff -up texinfo-6.7/install-info/install-info.c.omv~ texinfo-6.7/install-info/install-info.c
+--- texinfo-6.7/install-info/install-info.c.omv~	2020-01-05 02:20:38.837870043 +0100
++++ texinfo-6.7/install-info/install-info.c	2020-01-05 02:24:03.029860136 +0100
+@@ -451,6 +451,16 @@ strip_info_suffix (char *fname)
+       len -= 4;
+       ret[len] = 0;
+     }
++  else if (len > 4 && FILENAME_CMP (ret + len - 4, ".zst") == 0)
++    {
++      len -= 4;
++      ret[len] = 0;
++    }
++  else if (len > 5 && FILENAME_CMP (ret + len - 5, ".zstd") == 0)
++    {
++      len -= 5;
++      ret[len] = 0;
++    }
+ #ifdef __MSDOS__
+   else if (len > 4 && (FILENAME_CMP (ret + len - 4, ".inz") == 0
+                        || FILENAME_CMP (ret + len - 4, ".igz") == 0))
+@@ -727,6 +737,18 @@ open_possibly_compressed_file (char *fil
+      *opened_filename = concat (filename, ".lzma", "");
+      f = fopen (*opened_filename, FOPEN_RBIN);
+     }
++  if (!f)
++    {
++     free (*opened_filename);
++     *opened_filename = concat (filename, ".zst", "");
++     f = fopen (*opened_filename, FOPEN_RBIN);
++    }
++  if (!f)
++    {
++     free (*opened_filename);
++     *opened_filename = concat (filename, ".zstd", "");
++     f = fopen (*opened_filename, FOPEN_RBIN);
++    }
+ #ifdef __MSDOS__
+   if (!f)
+     {
+@@ -850,6 +872,14 @@ determine_file_type:
+     *compression_program = "lzma";
+ #endif
+ 
++  else if (data[0] == 0x28 && data[1] == 0xb5 && data[2] == 0x2f 
++           && data[3] == 0xfd)
++#ifndef STRIP_DOT_EXE
++    *compression_program = "zstd.exe";
++#else
++    *compression_program = "zstd";
++#endif
++
+   else
+     *compression_program = NULL;
+ 

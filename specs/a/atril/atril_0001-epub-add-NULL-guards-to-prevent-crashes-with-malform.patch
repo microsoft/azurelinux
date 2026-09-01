@@ -1,0 +1,59 @@
+From 9230de5a705068411d9ad4ffdba9b5e2d073ac35 Mon Sep 17 00:00:00 2001
+From: Victor Kareh <vkareh@redhat.com>
+Date: Fri, 5 Jun 2026 09:55:53 -0400
+Subject: [PATCH] epub: add NULL guards to prevent crashes with malformed EPUBs
+
+EPUB files with missing or incomplete metadata (like no title or missing
+navigation elements) can cause NULL pointer dereferences in the XML
+parsing functions. This adds NULL checks to xml_parse_children_of_node,
+get_child_list, and the TOC text parsing loop.
+
+Fixes #707
+---
+ backend/epub/epub-document.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/backend/epub/epub-document.c b/backend/epub/epub-document.c
+index 91e33faa..10b13d91 100644
+--- a/backend/epub/epub-document.c
++++ b/backend/epub/epub-document.c
+@@ -549,6 +549,9 @@ xml_parse_children_of_node(xmlNodePtr parent,
+                            xmlChar* attributename,
+                            xmlChar* attributevalue )
+ {
++    if ( parent == NULL )
++        return;
++
+     xmlNodePtr child = parent->xmlChildrenNode ;
+ 
+     while ( child != NULL )
+@@ -612,6 +615,8 @@ xml_get_data_from_node(xmlNodePtr node,
+                        xmlChar* attributename)
+ {
+     xmlChar* datastring ;
++    if ( node == NULL )
++        return NULL;
+     if ( rettype == XML_ATTRIBUTE )
+        datastring= xmlGetProp(node,attributename);
+     else
+@@ -1178,6 +1183,8 @@ static GList*
+ get_child_list(xmlNodePtr ol,gchar* documentdir)
+ {
+     GList *childlist = NULL;
++    if (ol == NULL)
++        return NULL;
+     xmlNodePtr li = ol->xmlChildrenNode;
+ 
+     while (li != NULL) {
+@@ -1302,7 +1309,7 @@ setup_document_index(EpubDocument *epub_document,gchar *containeruri)
+             xml_parse_children_of_node(navLabel,(xmlChar*)"text",NULL,NULL);
+             linknode *newnode = g_new0(linknode,1);
+             newnode->linktext = NULL;
+-            while (newnode->linktext == NULL) {
++            while (newnode->linktext == NULL && xmlretval != NULL) {
+                 newnode->linktext = (gchar*)xml_get_data_from_node(xmlretval,XML_KEYWORD,NULL);
+                 xmlretval = xmlretval->next;
+             }
+-- 
+2.54.0
+

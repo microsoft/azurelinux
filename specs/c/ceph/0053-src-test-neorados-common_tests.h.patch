@@ -1,5 +1,5 @@
---- ceph-19.2.0/src/test/neorados/common_tests.h.orig	2024-09-18 12:27:51.000000000 -0400
-+++ ceph-19.2.0/src/test/neorados/common_tests.h	2025-01-26 19:31:32.545762972 -0500
+--- ceph-20.1.0/src/test/neorados/common_tests.h.orig	2025-09-04 15:35:40.000000000 -0400
++++ ceph-20.1.0/src/test/neorados/common_tests.h	2025-09-16 08:13:03.274896767 -0400
 @@ -47,6 +47,18 @@
  
  #include "gtest/gtest.h"
@@ -19,12 +19,3 @@
  /// \file test/neorados/common_tests.h
  ///
  /// \brief Tools for testing neorados code
-@@ -398,7 +410,7 @@
- 									       \
-   private:                                                                     \
-     boost::asio::awaitable<void> CoTestBody() override;                        \
--    static ::testing::TestInfo *const test_info_ GTEST_ATTRIBUTE_UNUSED_;      \
-+    static ::testing::TestInfo *const test_info_ __attribute__((unused));      \
-   };                                                                           \
- 									       \
-   ::testing::TestInfo *const GTEST_TEST_CLASS_NAME_(test_suite_name,           \

@@ -24,6 +24,10 @@ path = "vendor/github.com/shibumi/go-pathspec/GO-LICENSE"
 sha256sum = "dd26a7abddd02e2d0aba97805b31f248ef7835d9e10da289b22e3b8ab78b324d"
 expression = "BSD-3-Clause"
 [[licensing.licenses]]
+path = "vendor/github.com/segmentio/asm/LICENSE"
+sha256sum = "cca993712df289a5958bdef69031a5dac0f951ac15afeb313f9eeea55ed59443"
+expression = "MIT-0"
+[[licensing.licenses]]
 path = "vendor/go.yaml.in/yaml/v2/LICENSE.libyaml"
 sha256sum = "a94710b55e03b5285f77d048c5ba61bb9d6ee04a06c0eb90e68821e11b0c707a"
 expression = "MIT"

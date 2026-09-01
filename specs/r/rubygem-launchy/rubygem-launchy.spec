@@ -5,11 +5,15 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.4.3
-Release: 23%{?dist}
+Release: 22%{?dist}
 Summary: Helper class for cross-platform launching of applications
 License: ISC
 URL: http://github.com/copiousfreetime/launchy
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# https://github.com/copiousfreetime/launchy/pull/132
+# https://github.com/copiousfreetime/launchy/commit/b7cef9d7ca05258972b5b267a07254ce648d7f82
+# Fix compatibility with newer minitest
+Patch0:  %{gem_name}-pr132-newer-minitest.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -36,6 +40,10 @@ Documentation for %{name}.
 %prep
 %setup -q -c -T
 %gem_install -n %{SOURCE0}
+
+pushd ./%{gem_instdir}
+%patch -P0 -p1
+popd
 
 
 %build
@@ -87,6 +95,12 @@ popd
 %{gem_instdir}/tasks
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.3-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Dec 28 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.4.3-21
+- Backport upstream patch to fix compatibility with newer minitest
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.3-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,49 @@
+commit 976f15ebca3f486902c3da4c98b8f92c3c4ed7a4
+Author: Guilhem Saurel <guilhem.saurel@laas.fr>
+Date:   Tue Dec 16 19:54:18 2025 +0000
+
+    fix doc generation with doxygen 1.14 & 1.15
+    
+    libeigen/eigen!2095
+    
+    Closes #2976
+
+diff --git a/Eigen/src/Core/ArithmeticSequence.h b/Eigen/src/Core/ArithmeticSequence.h
+index ae6373dda..41617713f 100644
+--- a/Eigen/src/Core/ArithmeticSequence.h
++++ b/Eigen/src/Core/ArithmeticSequence.h
+@@ -182,7 +182,7 @@ namespace placeholders {
+  * \returns a symbolic ArithmeticSequence representing the last \a size elements with increment \a incr.
+  *
+  * It is a shortcut for: \code seqN(last-(size-fix<1>)*incr, size, incr) \endcode
+- *
++ * \anchor Eigen_placeholders_lastN
+  * \sa lastN(SizeType), seqN(FirstType,SizeType), seq(FirstType,LastType,IncrType) */
+ template <typename SizeType, typename IncrType>
+ auto lastN(SizeType size, IncrType incr)
+diff --git a/doc/Doxyfile.in b/doc/Doxyfile.in
+index 25a7e2e9a..445fc0a6f 100644
+--- a/doc/Doxyfile.in
++++ b/doc/Doxyfile.in
+@@ -32,7 +32,7 @@ ALIASES                = "only_for_vectors=This is only for vectors (either row-
+                          "cpp14=<span class='cpp14'>[c++14]</span>" \
+                          "cpp17=<span class='cpp17'>[c++17]</span>" \
+                          "newin{1}=<span class='newin3x'>New in %Eigen \1.</span>" \
+-                         eigenAutoToc= \
++                         "eigenAutoToc=<!-- TOC placeholder -->" \
+                          eigenManualPage=\defgroup
+ EXTENSION_MAPPING      = .h=C++ \
+                          no_extension=C++
+diff --git a/doc/UnalignedArrayAssert.dox b/doc/UnalignedArrayAssert.dox
+index ca674a267..0ed6f8835 100644
+--- a/doc/UnalignedArrayAssert.dox
++++ b/doc/UnalignedArrayAssert.dox
+@@ -7,7 +7,7 @@ Hello! You are seeing this webpage because your program terminated on an asserti
+ my_program: path/to/eigen/Eigen/src/Core/DenseStorage.h:44:
+ Eigen::internal::matrix_array<T, Size, MatrixOptions, Align>::internal::matrix_array()
+ [with T = double, int Size = 2, int MatrixOptions = 2, bool Align = true]:
+-Assertion `(reinterpret_cast<size_t>(array) & (sizemask)) == 0 && "this assertion
++Assertion (reinterpret_cast<size_t>(array) & (sizemask)) == 0 && "this assertion
+ is explained here: http://eigen.tuxfamily.org/dox-devel/group__TopicUnalignedArrayAssert.html
+ **** READ THIS WEB PAGE !!! ****"' failed.
+ </pre>

@@ -1,0 +1,24 @@
+From cfa8e85698486f791008fcade4ec2dff8ddd99d9 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 31 Oct 2025 09:10:07 -0700
+Subject: [PATCH] hipfft hipfftw soversion
+
+---
+ library/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/library/CMakeLists.txt b/library/CMakeLists.txt
+index 8c97cc4eeb97..97cacb3451d3 100644
+--- a/library/CMakeLists.txt
++++ b/library/CMakeLists.txt
+@@ -164,6 +164,7 @@ endif()
+ # nvcc can not recognize shared library file name with suffix other than *.so when linking.
+ if (NOT BUILD_WITH_COMPILER STREQUAL "HIP-NVCC")
+   rocm_set_soversion(hipfft ${hipfft_SOVERSION})
++  rocm_set_soversion(hipfftw ${hipfft_SOVERSION})
+ endif()
+ 
+ # Generate export header
+-- 
+2.51.0
+

@@ -1,0 +1,37 @@
+From 5da738898bd27a81064628a7611fea85a63f96be Mon Sep 17 00:00:00 2001
+From: Sebastian Wick <sebastian.wick@redhat.com>
+Date: Tue, 18 Aug 2026 17:13:16 +0200
+Subject: [PATCH] chase: Handle EAGAIN from openat2
+
+From openat2(2):
+
+  EAGAIN how.resolve contains either RESOLVE_IN_ROOT or
+    RESOLVE_BENEATH, and the kernel could not ensure that a
+    ".." component didn't escape (due to a race condition or
+    potential attack).  The caller may choose to retry the
+    openat2() call.
+
+We should handle this by simply retrying the syscall.
+---
+ subprojects/libglnx/glnx-chase.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/subprojects/libglnx/glnx-chase.c b/subprojects/libglnx/glnx-chase.c
+index 2251cb71..49e606a3 100644
+--- a/subprojects/libglnx/glnx-chase.c
++++ b/subprojects/libglnx/glnx-chase.c
+@@ -684,7 +684,10 @@ glnx_chaseat_full (int                 dirfd,
+         .resolve = openat2_resolve,
+       };
+ 
+-      fd = openat2 (dirfd, path, &how, sizeof (how));
++      do
++        fd = openat2 (dirfd, path, &how, sizeof (how));
++      while (fd < 0 && errno == EAGAIN);
++
+       if (fd < 0)
+         {
+           /* If the syscall is not implemented (ENOSYS) or blocked by
+-- 
+2.55.0
+

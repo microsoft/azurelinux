@@ -3,8 +3,8 @@
 
 # Upstream has not made a new release since 2010
 %global srcname clisp
-%global commit  f66220939ea7d36fd085384afa4a0ec44597d499
-%global date    20250504
+%global commit  1248cdf38eebf2d661eb450be9cb4161289420c3
+%global date    20260221
 %global forgeurl https://gitlab.com/gnu-clisp/clisp
 
 # There is a plus on the end for unreleased versions, not for released versions
@@ -27,15 +27,16 @@ Version:	2.49.95
 # - src/socket.d and modules/clx/mit-clx/doc.lisp are HPND
 # - src/xthread.d and modules/asdf/asdf.lisp are X11
 License:	GPL-2.0-or-later AND (GPL-2.0-or-later OR GFDL-1.2-or-later) AND LGPL-2.1-or-later AND HPND AND X11
-Release: 8%{?dist}
+Release:	8%{?dist}
 URL:		http://www.clisp.org/
 VCS:		git:%{forgeurl}.git
 Source0:	%{forgesource}
 # Upstream dropped this file from the distribution
 Source1:	https://gitlab.com/sam-s/clhs/-/raw/master/clhs.el
 # Updated translations
-Source2:	http://translationproject.org/latest/clisp/sv.po
-Source3:	http://translationproject.org/latest/clisp/de.po
+Source2:	https://translationproject.org/latest/clisp/sv.po
+Source3:	https://translationproject.org/latest/clisp/de.po
+Source4:	https://translationproject.org/latest/clisp/fr.po
 # https://sourceforge.net/p/clisp/patches/32/
 Patch0:		%{name}-format.patch
 # The combination of register and volatile is nonsensical
@@ -63,6 +64,8 @@ Patch9:		%{name}-ppc64le-alignment.patch
 # Fix some mismatched readline function declarations
 # https://gitlab.com/gnu-clisp/clisp/-/merge_requests/13
 Patch10:	%{name}-readline.patch
+# Update some POSIX data structures for 64 bit systems
+Patch11:	%{name}-posix-64bit.patch
 
 # Work around a problem inlining a function on ppc64le
 # See https://bugzilla.redhat.com/show_bug.cgi?id=2049371
@@ -148,7 +151,7 @@ Files necessary for linking CLISP programs.
 
 %conf
 cp -p %{SOURCE1} emacs
-cp -p %{SOURCE2} %{SOURCE3} src/po
+cp -p %{SOURCE2} %{SOURCE3} %{SOURCE4} src/po
 
 # We only link against libraries in system directories, so we need -L dir in
 # place of -Wl,-rpath -Wl,dir
@@ -175,6 +178,10 @@ chmod a-x modules/clx/clx-manual/html/doc-index.cgi
 # On some koji builders, something is already listening on port 9090, which
 # causes a spurious test failure.  Change to port 9096 for the test.
 sed -i 's/9090/9096/g' tests/socket.tst
+
+# The Linux kernel recently started reporting the size of /proc/kcore as 0.
+# Update a test to check a nonempty file.
+sed -i 's/kcore/cmdline/' modules/syscalls/test.tst
 
 %build
 # Do not need to specify base modules: i18n, readline, regexp, syscalls.
@@ -463,6 +470,18 @@ make -C build base-mod-check
 
 
 %changelog
+* Sat Apr 04 2026 Jerry James <loganjerry@gmail.com> - 2.49.95-8
+- Update to latest git snapshot to fix gnulib issue
+- Update the French translation
+- Add patch to update POSIX structure sizes for 64-bit systems
+- Fix a broken file-stat test
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.49.95-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.49.95-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.49.95-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,4 +1,4 @@
-From 6d939a46a3d964fc0a4d577571db39d6487b1c1c Mon Sep 17 00:00:00 2001
+From 78443e53fb1f3a23951e5197df08ed42660ab6ab Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Thu, 20 Jun 2024 00:29:06 -0400
 Subject: [PATCH 7/7] Avoid using sys.prefix in CLI test
@@ -26,5 +26,5 @@ index 6f35089c..50730cc0 100644
              f"--port={port}",
          ],
 -- 
-2.50.0
+2.52.0
 

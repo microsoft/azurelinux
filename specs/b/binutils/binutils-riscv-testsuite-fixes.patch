@@ -182,3 +182,141 @@ diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d binutils-2.43.
 +.*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+t3,0x[0-9a-f]+
  .*:[ 	]+[0-9a-f]+[ 	]+ld[ 	]+t3,[0-9]+\(t3\) # [0-9a-f]+ <bar>
  .*:[ 	]+[0-9a-f]+[ 	]+jalr[ 	]+t1,t3
+diff -rup binutils-with-gold-2.45.50-beab972c07d,orig/binutils/testsuite/binutils-all/objcopy.exp binutils-with-gold-2.45.50-beab972c07d/binutils/testsuite/binutils-all/objcopy.exp
+--- binutils-with-gold-2.45.50-beab972c07d,orig/binutils/testsuite/binutils-all/objcopy.exp	2025-12-02 12:47:19.063123207 +0000
++++ binutils-with-gold-2.45.50-beab972c07d/binutils/testsuite/binutils-all/objcopy.exp	2025-12-04 12:39:26.079989597 +0000
+@@ -602,14 +602,19 @@ proc strip_test { } {
+     set exec_output [binutils_run $STRIP "$STRIPFLAGS $objfile"]
+     set exec_output [prune_warnings $exec_output]
+     if ![string equal "" $exec_output] {
+-	fail $test
++	fail "$test (warnings in linker output)"
++	verbose $exec_output
+ 	return
+     }
+ 
+     set exec_output [binutils_run $NM "-a $NMFLAGS $objfile"]
+     set exec_output [prune_warnings $exec_output]
+     if ![string match "*: no symbols*" $exec_output] {
+-	fail $test
++
++	# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++	setup_xfail riscv*-*-* 
++
++	fail "$test (symbols in nm output)"
+ 	return
+     }
+ 
+@@ -659,6 +664,9 @@ proc strip_test_with_saving_a_symbol { }
+     pass $test
+ }
+ 
++# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++setup_xfail riscv*-*-* 
++
+ strip_test_with_saving_a_symbol
+ 
+ # Test stripping an archive.
+@@ -1503,7 +1519,7 @@ proc objcopy_test_without_global_symbol
+ # in object files, so they will fail this test.
+ setup_xfail aarch64*-*-* arm*-*-*
+ # The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
+-# setup_xfail riscv*-*-* 
++setup_xfail riscv*-*-* 
+ 
+ objcopy_test_without_global_symbol
+ 
+diff -rup binutils-with-gold-2.45.50-beab972c07d,orig/ld/testsuite/lib/ld-lib.exp binutils-with-gold-2.45.50-beab972c07d/ld/testsuite/lib/ld-lib.exp
+--- binutils-with-gold-2.45.50-beab972c07d,orig/ld/testsuite/lib/ld-lib.exp	2025-12-02 12:47:19.201090894 +0000
++++ binutils-with-gold-2.45.50-beab972c07d/ld/testsuite/lib/ld-lib.exp	2025-12-03 09:30:07.184360005 +0000
+@@ -1633,6 +1633,12 @@ proc compile_one_cc { src output additio
+ proc check_ctf_available { } {
+     global ctf_available_saved
+ 
++    # Skip CTF tests for the Risc-V target for now, as the
++    # tests have not been tweaked to support the riscv format.
++    if { [istarget "riscv*-*-linux*"] } {
++	return 0
++    }
++    
+     if {![info exists ctf_available_saved]} {
+ 	set ctf_available_saved 0
+ 
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pic.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pic.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pic.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pic.d	2026-03-20 13:05:31.155200130 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv32i -mabi=ilp32 -defsym __abs__=1 -defsym __addr__=1 -defsym __undef__=1
+-#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared
++#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pie.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pie.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pie.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-pie.d	2026-03-20 13:05:52.846252771 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv32i -mabi=ilp32 -defsym __abs__=1 -defsym __addr__=1
+-#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -pie
++#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -pie -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-symbolic.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-symbolic.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv32-symbolic.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv32-symbolic.d	2026-03-20 13:06:01.427273593 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv32i -mabi=ilp32 -defsym __abs__=1 -defsym __addr__=1 -defsym __undef__=1
+-#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -Bsymbolic
++#ld: -m[riscv_choose_ilp32_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -Bsymbolic -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pic.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pic.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pic.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pic.d	2026-03-20 13:04:07.601997355 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv64i -mabi=lp64 -defsym __64_bit__=1 -defsym __abs__=1 -defsym __addr__=1 -defsym __undef__=1
+-#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared
++#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pie.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pie.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pie.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-pie.d	2026-03-20 13:04:57.106117494 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv64i -mabi=lp64 -defsym __64_bit__=1 -defsym __abs__=1 -defsym __addr__=1
+-#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -pie
++#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -pie -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-symbolic.d binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-symbolic.d
+--- binutils.orig/ld/testsuite/ld-riscv-elf/data-reloc-rv64-symbolic.d	2026-03-20 13:02:05.468700958 +0000
++++ binutils-with-gold-2.46/ld/testsuite/ld-riscv-elf/data-reloc-rv64-symbolic.d	2026-03-20 13:05:14.650160073 +0000
+@@ -1,6 +1,6 @@
+ #source: data-reloc.s
+ #as: -march=rv64i -mabi=lp64 -defsym __64_bit__=1 -defsym __abs__=1 -defsym __addr__=1 -defsym __undef__=1
+-#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -Bsymbolic
++#ld: -m[riscv_choose_lp64_emul] -Ttext 0x8000 --defsym _start=0x0 --defsym abs=0x100 --defsym abs_local=0x200 -shared -Bsymbolic -z notext
+ #objdump: -dR
+ 
+ .*:[ 	]+file format .*
+--- binutils.orig/binutils/testsuite/lib/binutils-common.exp	2026-06-09 14:11:37.775595474 +0100
++++ binutils-with-gold-2.46.1/binutils/testsuite/lib/binutils-common.exp	2026-06-09 14:11:57.453043367 +0100
+@@ -795,6 +795,9 @@ proc prune_warnings_extra { text } {
+     # Ignore warnings about linking objects with an old sframe format
+     regsub -all {(^|\n)([^\n]* unexpected SFrame format version [^\n]*\n[^\n]* SFrame section ignored\n?)+} $text {\1} text
+ 
++    # Skip warnings about the LTO plugin being needed.
++    regsub -all "(^|\n)(\[^\n\]*:\[^\n\]*plugin needed to handle lto object\[^\n\]*\n?)+" $text "\\1" text
++    
+     return $text
+ }
+ 

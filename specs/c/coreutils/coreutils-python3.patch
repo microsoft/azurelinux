@@ -1,4 +1,4 @@
-From f1a6e8d840a28eb2ab7a488e0d06450b7192c76d Mon Sep 17 00:00:00 2001
+From ba882f9ed1f26211493df4bfc0c6cfc13562fb6c Mon Sep 17 00:00:00 2001
 From: rpm-build <rpm-build>
 Date: Tue, 2 Apr 2024 14:11:26 +0100
 Subject: [PATCH] coreutils-python3.patch
@@ -10,10 +10,10 @@ Subject: [PATCH] coreutils-python3.patch
  3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/init.cfg b/init.cfg
-index 612d287..9a6fa2d 100644
+index 2c6da89..4ddb0af 100644
 --- a/init.cfg
 +++ b/init.cfg
-@@ -597,10 +597,10 @@ seek_data_capable_()
+@@ -604,10 +604,10 @@ seek_data_capable_()
  # Skip the current test if "." lacks d_type support.
  require_dirent_d_type_()
  {
@@ -37,7 +37,7 @@ index 1a2f76f..42d3924 100644
  # Intended to exit 0 only on Linux/GNU systems.
  import os
 diff --git a/tests/du/move-dir-while-traversing.sh b/tests/du/move-dir-while-traversing.sh
-index 1d0a359..bd03542 100755
+index 9639ac3..962e8e3 100755
 --- a/tests/du/move-dir-while-traversing.sh
 +++ b/tests/du/move-dir-while-traversing.sh
 @@ -21,8 +21,8 @@ print_ver_ du
@@ -61,5 +61,5 @@ index 1d0a359..bd03542 100755
  import os,sys
  
 -- 
-2.48.1
+2.52.0
 

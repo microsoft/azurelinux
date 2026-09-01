@@ -18,7 +18,7 @@ Name:           gpsd-epel
 Name:           gpsd
 %endif
 Version:        3.26.1
-Release: 9%{?dist}
+Release:        6%{?dist}
 Epoch:          1
 Summary:        Service daemon for mediating access to a GPS
 

@@ -22,7 +22,7 @@
 %global shortcommit %(echo %{longcommit}|cut -c1-8)
 %global modified %(echo %{longcommit}-|cut -f2 -d-)
 %global github_owner Clusterlabs
-%global baserelease 2
+%global baserelease 5
 
 %ifarch s390x s390
 # minimum timeout on LPAR diag288 watchdog is 15s
@@ -59,6 +59,8 @@ Patch0:         0001-Fix-query-watchdog-avoid-issues-on-heap-allocation-f.patch
 Patch1:         0002-Refactor-sbd-md-alloc-de-alloc-reverse-order.patch
 Patch2:         0003-spec-convert-license-naming-to-SPDX.patch
 Patch3:         0004-Fix-sbd-cluster-cleanly-include-crm-crm.h-for-crm_sy.patch
+Patch4:         0005-avoid-parsing-SBD_DELAY_START-as-integer.patch
+Patch5:         0006-Fix-sbd-pacemaker-remove-unused-update-counter.patch
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libuuid-devel
@@ -179,6 +181,15 @@ fi
 %{_libdir}/libsbdtestbed*
 
 %changelog
+* Tue Feb 3 2026 Klaus Wenninger <kwenning@redhat.com> - 1.5.2-5
+- remove unused update counter in sbd-pacemaker
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Oct 08 2025 Klaus Wenninger <kwenning@redhat.com> - 1.5.2-3
+- avoid parsing SBD_DELAY_START as integer
+
 * Thu Sep 18 2025 Klaus Wenninger <kwenning@redhat.com> - 1.5.2-2
 - Convert STI tests to TMT (rhbz#2383068)
 - use baserelease as that rpmdev-bumpspec can be used

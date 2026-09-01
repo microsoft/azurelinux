@@ -1,0 +1,33 @@
+--- a/tests/test_util_name.rs
++++ b/tests/test_util_name.rs
+@@ -16,7 +16,7 @@ pub const TESTS_BINARY: &str = env!("CAR
+ // Set the environment variable for any tests
+ 
+ // Use the ctor attribute to run this function before any tests
+-#[ctor::ctor]
++#[ctor::ctor(unsafe)]
+ fn init() {
+     // No need for unsafe here
+     unsafe {
+--- a/tests/test_uudoc.rs
++++ b/tests/test_uudoc.rs
+@@ -23,7 +23,7 @@ pub const TESTS_BINARY: &str = env!("CAR
+ // Set the environment variable for any tests
+ 
+ // Use the ctor attribute to run this function before any tests
+-#[ctor::ctor]
++#[ctor::ctor(unsafe)]
+ fn init() {
+     // No need for unsafe here
+     unsafe {
+--- a/tests/tests.rs
++++ b/tests/tests.rs
+@@ -8,7 +8,7 @@ use std::env;
+ pub const TESTS_BINARY: &str = env!("CARGO_BIN_EXE_coreutils");
+ 
+ // Use the ctor attribute to run this function before any tests
+-#[ctor::ctor]
++#[ctor::ctor(unsafe)]
+ fn init() {
+     unsafe {
+         // Necessary for uutests to be able to find the binary

@@ -20,7 +20,7 @@ various ways.}
 
 Name:           %{goname}
 Version:        0
-Release:        0.25%{?dist}
+Release:        0.27%{?dist}
 Summary:        Utilities for mapping and injecting dependencies in various ways
 
 License:        Apache-2.0
@@ -49,6 +49,12 @@ Source:         %{gosource}
 %gopkgfiles
 
 %changelog
+* Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 0-0.27
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0-0.26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0-0.25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

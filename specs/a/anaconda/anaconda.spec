@@ -3,8 +3,8 @@
 
 Summary: Graphical system installer
 Name:    anaconda
-Version: 43.44
-Release: 7%{?dist}
+Version: 44.30
+Release: 2%{?dist}
 ExcludeArch: %{ix86}
 License: GPL-2.0-or-later
 URL:     http://fedoraproject.org/wiki/Anaconda
@@ -16,21 +16,13 @@ URL:     http://fedoraproject.org/wiki/Anaconda
 # make dist
 Source0: https://github.com/rhinstaller/%{name}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.bz2
 
-# Fix crash on start in Silverblue (and probably other cases)
-# https://github.com/rhinstaller/anaconda/pull/6691
-Patch: 0001-RebootData-don-t-allow-action-to-be-None.patch
-
-# https://github.com/rhinstaller/anaconda/pull/6692
-# Indicate ASCII support in get_keyboard_layouts
-# This is needed for anaconda-webui to be able to make good
-# choices, see:
-# https://bugzilla.redhat.com/show_bug.cgi?id=2402430
-Patch: 0001-pyanaconda-localization-Indicate-ASCII-support-in-ge.patch
+# partitioning: manual: skip requests for devices removed from device tree in setup_kickstart
+Patch: 6767.patch
 
 # Versions of required components (done so we make sure the buildrequires
 # match the requires versions of things).
 
-%bcond glade %{undefined rhel}
+%bcond glade %[%{undefined rhel} && %{undefined eln}]
 %bcond live %[%{defined fedora} || %{defined eln}]
 %if ! 0%{?rhel}
 %define blivetguiver 2.4.2-3
@@ -51,7 +43,7 @@ Patch: 0001-pyanaconda-localization-Indicate-ASCII-support-in-ge.patch
 %define nmver 1.0
 %define pykickstartver 3.65-1
 %define pypartedver 2.5-2
-%define pythonblivetver 1:3.12.1-1
+%define pythonblivetver 1:3.13.0-1
 %define rpmver 4.15.0
 %define simplelinever 1.9.0-1
 %define subscriptionmanagerver 1.29.31
@@ -87,7 +79,7 @@ BuildRequires: libxml2
 Requires: anaconda-gui = %{version}-%{release}
 Requires: anaconda-tui = %{version}-%{release}
 
-Patch2: 0001-flatpak_manager-guard-gi-import-for-missing-typelib.patch
+Patch1: 0001-flatpak_manager-guard-gi-import-for-missing-typelib.patch
 %description
 The anaconda package is a metapackage for the Anaconda installer.
 
@@ -96,7 +88,7 @@ Summary: Core of the Anaconda installer
 # core/signal.py is under MIT
 License: GPL-2.0-or-later AND MIT
 Requires: python3-libs
-%if 0%{?rhel} > 10 || 0%{?fedora} > 40
+%if 0%{?rhel} > 10 || 0%{?fedora} > 40 || %{defined eln}
 Requires: python3-crypt-r
 %endif
 Requires: python3-libdnf5 >= %{dnfver}
@@ -144,6 +136,7 @@ Requires: NetworkManager-libnm >= %{nmver}
 Requires: kbd
 Requires: chrony
 Requires: systemd
+Requires: systemd-pam
 %if ! 0%{?rhel}
 Requires: systemd-resolved
 %endif
@@ -269,7 +262,7 @@ Requires: fcoe-utils >= %{fcoeutilsver}
 Requires: device-mapper-multipath
 # only WeakRequires in -env-
 Requires: kdump-anaconda-addon
-%if ! 0%{?rhel}
+%if ! 0%{?rhel} || 0%{?rhel} >= 10
 Requires: zram-generator-defaults
 %else
 Requires: zram-generator
@@ -299,9 +292,16 @@ Requires: skopeo
 Requires: nvme-cli
 # Needed for bootc
 Requires: podman
+Requires: bootc
+Requires: bootupd
 # needed for encrypted DNS
 Requires: dnsconfd
 Requires: dnsconfd-dracut
+Requires: selinux-policy
+Requires: libselinux-utils
+Requires: selinux-policy-targeted
+Requires: policycoreutils
+Requires: policycoreutils-python-utils
 
 %description install-img-deps
 The anaconda-install-img-deps metapackage lists all boot.iso installation
@@ -385,6 +385,8 @@ runtime on NFS/HTTP/FTP servers or local disks.
 # Work around an issue where a version mismatch between the automake version on
 # the build system and what was used when the tarball was created will cause
 # a failure.
+# The glade configuration is passed to m4 via environment variable.
+%{!?with_glade:export ANACONDA_DISABLE_GLADE=yes}
 autoreconf -vfi
 
 # use actual build-time release number, not tarball creation time release number
@@ -523,6 +525,166 @@ rm -rf \
 %{_prefix}/libexec/anaconda/dd_*
 
 %changelog
+* Fri Apr 17 2026 Katerina Koukiou <kkoukiou@redhat.com> - 44.30-2
+- partitioning: manual: skip requests for devices removed from device tree
+  Resolves: rhbz#2458907
+
+* Thu Mar 26 2026 Packit <hello@packit.dev> - 44.30-1
+- Reload installer SELinux policy at exit so dracut shutdown works (k.koukiou)
+
+* Tue Mar 24 2026 Packit <hello@packit.dev> - 44.29-1
+- Update to version 44.29
+
+* Tue Mar 17 2026 Packit <hello@packit.dev> - 44.28-1
+- anaconda.conf: Add arm64.nopauth to preserved_arguments (johannes.goede)
+
+* Fri Mar 06 2026 Packit <hello@packit.dev> - 44.25-1
+- Workaround rsync xattr errors on KIWI boxed-build ISOs (adamkankovsky)
+- Make --enable-vt-switch backwards compatible with older gnome-kiosk
+  (k.koukiou)
+- Add --enable-vt-switch when running gnome-kiosk (mkolman)
+- Fix asyncio deprecation warnings flooding logs in text mode (bciconel)
+- Hub: Fix grid layout alignment in Hub (yueyuankun)
+- liveinst: prevent launching multiple installer instances (k.koukiou)
+  Resolves: rhbz#2440264
+- doc: update documentation for webui boot.iso build and PR inclusion
+  (rvykydal)
+
+* Wed Mar 04 2026 Packit <hello@packit.dev> - 44.24-1
+- Fix crash when org.freedesktop.ScreenSaver Inhibit is unavailable (k.koukiou)
+  Resolves: rhbz#2440367
+
+* Mon Feb 16 2026 Packit <hello@packit.dev> - 44.21-1
+- anaconda.conf: Add clk_ignore_unused, pd_ignore_unused to preserved_arguments
+  (johannes.goede)
+- storage/bootloader/utils: Make create_bls_entries() work with kernel-uki-
+  dtbloader (johannes.goede)
+- data/profile.d/fedora-kde-mobile: Set the correct payload settings (neal)
+
+* Fri Feb 13 2026 Packit <hello@packit.dev> - 44.20-1
+- Don't pass `-R /` to shadow commands (awilliam)
+  Resolves: rhbz#2435621
+- chore: Support multiple console= kernel entries (ppolawsk)
+- Include JS files to translations (baurthefirst)
+- glib: Fix TypeError in timeout callback (k.koukiou)
+- flatpak: tests: fix unreachable code (fsouza.bruno)
+- flatpak: Only override remote URLs when subscription module is available
+  (bciconel)
+- flatpak: Make installation failures non-blocking (bciconel)
+- Allow manual trigger for container-rebuild-action workflow (k.koukiou)
+
+* Tue Feb 03 2026 Packit <hello@packit.dev> - 44.18-1
+- Always restorecon user home directory after creating it (awilliam)
+- Replace direct inst call with DRACUT_NO_XATTR=1 workaround (k.koukiou)
+- Restructure readthedocs documentation with audience-based organization
+  (k.koukiou)
+- dracut: Include systemd-sysroot-fstab-check binary in initramfs (k.koukiou)
+
+* Tue Jan 27 2026 Packit <hello@packit.dev> - 44.17-1
+- rescue: Change 'immutable' to 'atomic' in warning message (k.koukiou)
+- Only show compatible translations in text mode (mkolman)
+- Add instructions for externally build boot iso updates (mkolman)
+
+* Tue Jan 27 2026 Packit <hello@packit.dev> - 44.16-1
+- Remove Merging examples section from CONTRIBUTING.rst (k.koukiou)
+
+* Tue Jan 27 2026 Packit <hello@packit.dev> - 44.15-1
+- spec: Require zram-generator-defaults for RHEL-10 (k.koukiou)
+- RPM spec: make anaconda-core require systemd-pam (awilliam)
+- payloads: flatpak: fix SSL error detection on older Python versions
+  (bciconel)
+- rescue: Add warning for immutable systems (k.koukiou)
+- rescue: detect OSTree deployments in rescue mode and show deployment path
+  (k.koukiou)
+- pyanaconda: storage: fix FindExistingSystems API for ostree based OSes
+  (k.koukiou)
+
+* Tue Jan 20 2026 Adam Williamson <awilliam@redhat.com> - 44.14-2
+- Require systemd-pam to fix GUI startup with systemd-259-6 and later
+
+* Tue Jan 20 2026 Packit <hello@packit.dev> - 44.14-1
+- installation: run subscription tasks after network configuration (bciconel)
+- subscription: ensure /var/lib/insights exists before running insights-client
+  (bciconel)
+- dnf: Print transaction problems when transaction ends with errors (pkratoch)
+- dnf: Print names and NEVRAs for failed TransactionItems (pkratoch)
+- dnf: Report transaction errors for individual TransactionItems (pkratoch)
+- network: List all network interfaces IP for RDP session (ppolawsk)
+- pyanaconda: rpm_ostree: fix _handle_boot_if_not_mount_point method issues
+  (k.koukiou)
+- network: add release note for INSTALLER-3088 (rvykydal)
+- network: remove DumpMissingConfigFiles API (rvykydal)
+- network: stop creating default profiles for each wired device (rvykydal)
+- network: add API for persisting initramfs configuration (rvykydal)
+- modules: rpm_ostree: allow /boot/efi mount point in bootc installation
+  (k.koukiou)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 44.11-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 44.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 30 2025 Packit <hello@packit.dev> - 44.11-1
+- Update to version 44.11
+
+* Tue Dec 23 2025 Packit <hello@packit.dev> - 44.10-1
+- rhsm: add --flatpak-registry-url support (bciconel)
+- flatpak: handle self-signed certificate errors in registry sources (bciconel)
+- flatpak: add utility to check for self-signed certificate errors (bciconel)
+- docs: Add bootc kickstart command support release note (k.koukiou)
+
+* Tue Dec 16 2025 Packit <hello@packit.dev> - 44.9-1
+- data/profile.d: Add trivial Fedora KDE Plasma Mobile spin profile (neal)
+- data/profile.d/fedora-kde: Disable stages redundant with Plasma Setup (neal)
+- data/profile.d/fedora-kde: Update comment to indicate Edition status (neal)
+- docs: Add Fedora 43 release notes (k.koukiou)
+- bootloader: update GRUB2.check() threshold to match GRUB manual
+  recommendation (k.koukiou)
+- Add x-initrd.attach to /etc/crypttab device for / volumes (mkolman)
+- Handle RuntimeError in vtActivate() during interpreter shutdown (k.koukiou)
+
+* Wed Dec 10 2025 Packit <hello@packit.dev> - 44.8-1
+- ui: gui: fix IndexError when editing NTP servers with empty list (k.koukiou)
+
+* Tue Dec 09 2025 Packit <hello@packit.dev> - 44.7-1
+- storage: add logging in set_default_class (jbock-java)
+- storage: in get_class_by_name, check for X86EFI (jbock-java)
+- Apply RHEL autoconections policy on Fedora ELN. (rvykydal)
+- docs: ci-status: remove non-existing rhel-8 kickstart test (k.koukiou)
+- docs: ci-status: remove container-eln-autoupdate badge (k.koukiou)
+- docs: ci-status: use substitutions for WebUI workflows mentions (k.koukiou)
+- pyanaconda: webui: enable DNF payload support (k.koukiou)
+- docs: ci-status: show webui compose testing (k.koukiou)
+
+* Thu Dec 04 2025 Packit <hello@packit.dev> - 44.6-1
+- Remove --root-mount-spec to enable bootc's btrfs subvolume auto-detection
+  (k.koukiou)
+- Extend ssh config testing (ppolawsk)
+- Fix permissions of the ssh config created by Anaconda (ppolawsk)
+
+* Tue Dec 02 2025 Packit <hello@packit.dev> - 44.5-1
+- storage: add minimum recommended size for /boot/efi partition (k.koukiou)
+- storage: update minimum recommended /boot partition size to 1 GB (k.koukiou)
+- Fix parsing of du output when errors are present (k.koukiou)
+
+* Tue Nov 25 2025 Packit <hello@packit.dev> - 44.4-1
+- bootc: Collect kernel arguments before installation to pass to bootc
+  (k.koukiou)
+- bootc: Bind mount /boot into sysroot for %%post scripts (k.koukiou)
+- pyanaconda: bootc: specify the bootloader to grub for bootc (k.koukiou)
+- storage: stop creating /etc/mtab symlink during installation (k.koukiou)
+
+* Tue Nov 11 2025 Packit <hello@packit.dev> - 44.2-1
+- fix: remove the unused file 'a' (lonicerae)
+
+* Wed Nov 05 2025 Packit <hello@packit.dev> - 44.1-1
+- Update to version 44.1
+
+* Thu Oct 16 2025 Packit <hello@packit.dev> - 43.46-1
+- Introduce SetXKeyboardDefaults D-Bus method for setting sensible keyboard
+  defaults (k.koukiou)
+
 * Tue Oct 14 2025 Adam Williamson <awilliam@redhat.com> - 43.44-3
 - Backport PR #6692 to provide keyboard layout ASCII info to anaconda-webui
 
@@ -549,14 +711,28 @@ rm -rf \
 - spec: enable live in ELN (yselkowi)
 - Mark unused variables with a leading underscore (a.badger)
 
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 43.40-2
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Tue Sep 16 2025 Packit <hello@packit.dev> - 43.40-1
+- Do not catch blivet.safe_dbus exceptions in iSCSI module (vtrefny)
+- Fixing unittests (a.badger)
+- ostree needs to have /boot be bindmounted into sysroot. (a.badger)
+- gui: Fix GTK warnings when removing non-existent accelerators (k.koukiou)
+
 * Tue Sep 09 2025 Packit <hello@packit.dev> - 43.39-1
 - Fix setting of kernel console logging level for anaconda (rvykydal)
 - Use new more suitable API for Gtk UI required space check (rvykydal)
 - Add GetFreeSpaceForSystem API (rvykydal)
 - docs: update CONTRIBUTING.rst with new branching approach (k.koukiou)
 
-* Fri Sep 05 2025 Katerina Koukiou <kkoukiou@redhat.com> - 43.37-2
-- Add GetFreeSpaceForSystem API (kkoukiou)
+* Tue Sep 02 2025 Packit <hello@packit.dev> - 43.38-1
+- Use slots (and a dataclass) to enforce Flag names (a.badger)
+- Reset comps queries when resetting the dnf base (pkratoch)
+- i18n: fix embedded URLs in SMT warning messages (k.koukiou)
+- docs: remove submodule link added by mistake (k.koukiou)
+- docs: tests: we use 'latest' tag - not 'main' for containers (k.koukiou)
+- build: makefile: remove noope CI_TAG self assignment (k.koukiou)
 
 * Mon Aug 25 2025 Packit <hello@packit.dev> - 43.37-1
 - Log correct boot option for iSCSI boot without iBFT (jstodola)
@@ -575,6 +751,13 @@ rm -rf \
 - build: decouple BASE_CONTAINER from branch configuration (k.koukiou)
 - workflows: remove hardcoded CONTAINER_TAG="lorax" usage (k.koukiou)
 - dracut module requires generic initramfs (jstodola)
+
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 43.35-2
+- Rebuilt for Python 3.14.0rc2 bytecode
+
+* Tue Aug 12 2025 Packit <hello@packit.dev> - 43.35-1
+- storage: Fix AttributeError and protect installation media in bootloader
+  partition removal (k.koukiou)
 
 * Tue Aug 05 2025 Packit <hello@packit.dev> - 43.34-1
 - Document Lorax template patching (mkolman)

@@ -10,7 +10,7 @@
 Summary: C source code tree search and browse tool
 Name: cscope
 Version: 15.9
-Release: 33%{?dist}
+Release: 31%{?dist}
 Source0: https://downloads.sourceforge.net/project/%{name}/%{name}/v%{version}/%{name}-%{version}.tar.gz
 URL: http://cscope.sourceforge.net
 License: BSD-3-Clause AND GPL-2.0-or-later
@@ -39,6 +39,8 @@ Patch12: dist-2-cscope-indexer-help.patch
 Patch13: dist-3-add-selftests.patch
 Patch14: dist-4-fix-printf.patch
 Patch15: dist-5-fix-signal-handler.patch
+Patch16: dist-6-fix-brace-count.patch
+Patch17: dist-7-add-new-keywords.patch
 
 %define cscope_share_path %{_datadir}/cscope
 %if %{with xemacs}
@@ -119,6 +121,10 @@ rm -f %{emacs_lisp_path}/xcscope.el
 rm -f %{vim_plugin_path}/cctree.vim
 
 %changelog
+* Wed Mar 25 2026 Vladislav Dronov <vdronov@redhat.com> - 15.9-31
+- Correct the erroneous brace count caused by the unbalanced { }
+- Make it possible to add the new keywords
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 15.9-30
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

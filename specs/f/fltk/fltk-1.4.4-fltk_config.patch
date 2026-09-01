@@ -1,0 +1,43 @@
+diff --git a/fltk-config.in b/fltk-config.in
+index c23b79ce6..0b5cd922b 100644
+--- a/fltk-config.in
++++ b/fltk-config.in
+@@ -264,7 +264,7 @@ if test -n "$BINARY_DIR"; then
+     includes="-I$BINARY_DIR $includes"
+ fi
+ 
+-if test "$libdir" != /usr/lib -a "$libdir" != /usr/lib32; then
++if test "$libdir" != /usr/lib -a "$libdir" != /usr/lib32 -a "$libdir" != /usr/lib64; then
+     libs="-L$libdir"
+ else
+     libs=
+@@ -272,7 +272,7 @@ fi
+ 
+ # Calculate needed libraries
+ LDSTATIC="$libdir/libfltk.a $LDLIBS"
+-LDLIBS="-lfltk$SHAREDSUFFIX $LDLIBS"
++LDLIBS="-lfltk$SHAREDSUFFIX"
+ 
+ if test x$use_forms = xyes; then
+     LDLIBS="-lfltk_forms$SHAREDSUFFIX $LDLIBS"
+@@ -280,17 +280,17 @@ if test x$use_forms = xyes; then
+ fi
+ 
+ if test x$use_gl = xyes; then
+-    LDLIBS="-lfltk_gl$SHAREDSUFFIX $GLLIBS $LDLIBS"
++    LDLIBS="-lfltk_gl$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_gl.a $GLLIBS $LDSTATIC"
+ fi
+ 
+ if test x$use_images = xyes; then
+-    LDLIBS="-lfltk_images$SHAREDSUFFIX $IMAGELIBS $LDLIBS"
++    LDLIBS="-lfltk_images$SHAREDSUFFIX $LDLIBS"
+     LDSTATIC="$libdir/libfltk_images.a $STATICIMAGELIBS $LDSTATIC"
+ fi
+ 
+ if test x$use_cairo = xyes -a -n "$CAIROLIBS"; then
+-    LDLIBS="$CAIROLIBS $LDLIBS"
++    LDLIBS="$LDLIBS"
+     LDSTATIC="$CAIROLIBS $LDSTATIC"
+ fi
+ 

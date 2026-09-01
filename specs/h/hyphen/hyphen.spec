@@ -4,7 +4,7 @@
 Name:      hyphen
 Summary:   A text hyphenation library
 Version:   2.8.8
-Release: 30%{?dist}
+Release:   28%{?dist}
 Source:    http://downloads.sourceforge.net/hunspell/hyphen-%{version}.tar.gz
 URL:       http://hunspell.sf.net
 License:   GPL-2.0-only OR LGPL-2.1-or-later OR MPL-1.1
@@ -74,6 +74,9 @@ popd
 %{_bindir}/substrings.pl
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.8-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.8-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,18 @@
+diff -urp '--exclude=*~' openwsman-2.8.1.orig/bindings/ruby/rdoc_parser_swig.rb openwsman-2.8.1/bindings/ruby/rdoc_parser_swig.rb
+--- openwsman-2.8.1.orig/bindings/ruby/rdoc_parser_swig.rb	2026-01-02 23:43:41.804273994 +0900
++++ openwsman-2.8.1/bindings/ruby/rdoc_parser_swig.rb	2026-01-02 23:56:06.991238037 +0900
+@@ -377,7 +377,13 @@ class RDoc::Parser::SWIG < RDoc::Parser
+       find_modifiers comment, meth_obj if comment
+ 
+       #meth_obj.params = params
+-      meth_obj.start_collecting_tokens
++      # https://github.com/ruby/rdoc/pull/1471 changes the parameter for
++      # RDoc::TokenStream.start_collecting_tokens
++      if meth_obj.method(:start_collecting_tokens).arity == 1
++        meth_obj.start_collecting_tokens :ruby
++      else
++        meth_obj.start_collecting_tokens
++      end
+       begin
+         RDoc::const_get "RubyToken"
+         tk = RDoc::RubyToken::Token.new nil, 1, 1

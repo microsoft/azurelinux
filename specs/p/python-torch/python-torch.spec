@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 9;
+    release_number = 11;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -19,16 +19,17 @@
 # So pre releases can be tried
 %bcond_with gitcommit
 %if %{with gitcommit}
-# v2.8.0-rc8
-%global commit0 a1cb3cc05d46d198467bebbb6e8fba50a325d4e7
+# v2.9.0-rc9
+%global commit0 0fabc3ba44823f257e70ce397d989c8de5e362c1
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
-%global date0 20250723
-%global pypi_version 2.8.0
+%global date0 20251008
+%global pypi_version 2.9.0
 %global flatbuffers_version 24.12.23
 %global miniz_version 3.0.2
 %global pybind11_version 2.13.6
+%global rc_tag -rc9
 %else
-%global pypi_version 2.8.0
+%global pypi_version 2.9.1
 %global flatbuffers_version 24.12.23
 %global miniz_version 3.0.2
 %global pybind11_version 2.13.6
@@ -46,7 +47,6 @@
 %endif
 
 # For testing distributed+rccl etc.
-%bcond_without rccl
 %bcond_with gloo
 %bcond_without mpi
 %bcond_without tensorpipe
@@ -61,10 +61,19 @@
 %bcond_with httplib
 %bcond_with kineto
 
+# In fedora, not in rhel/epel or requires a newer version
 %if 0%{?fedora}
+%bcond_without eigen3
 %bcond_without onnx
+%bcond_without protobuf
+%bcond_without setuptools
+%bcond_without sympy
 %else
+%bcond_with eigen3
 %bcond_with onnx
+%bcond_with protobuf
+%bcond_with setuptools
+%bcond_with sympy
 %endif
 
 Name:           python-%{pypi_name}
@@ -116,28 +125,50 @@ Source70:       https://github.com/yhirose/cpp-httplib/archive/%{hl_commit}/cpp-
 Source80:       https://github.com/pytorch/kineto/archive/%{ki_commit}/kineto-%{ki_scommit}.tar.gz
 %endif
 
-%if %{without onnx}
 %global ox_ver 1.18.0
 Source90:       https://github.com/onnx/onnx/archive/refs/tags/v%{ox_ver}.tar.gz
-%endif
 
-# https://github.com/pytorch/pytorch/issues/150187
-Patch11:       0001-Add-cmake-variable-USE_ROCM_CK.patch
-# https://github.com/pytorch/pytorch/issues/156595
-# Patch12:       0001-Use-horrible-dynamo-stub.patch
-Patch12:       0001-Fix-compilation-and-import-torch-issues-for-cpython-.patch
+%global pb_ver 3.19.6
+Source100:      https://github.com/protocolbuffers/protobuf/archive/refs/tags/v%{pb_ver}.tar.gz
 
-ExclusiveArch:  x86_64 aarch64
+# A problem on RHEL 10
+# + /usr/bin/python3 setup.py build '--executable=/usr/bin/python3 -sP'
+# Traceback (most recent call last):
+#  File "/root/rpmbuild/BUILD/pytorch-v2.9.1/setup.py", line 288, in <module>
+#    import setuptools.command.bdist_wheel
+# ModuleNotFoundError: No module named 'setuptools.command.bdist_wheel'
+# This support came in 70.1.0, RHEL 10.2 has 69.0.3
+# Use ELN version
+%global st_ver 80.9.0
+Source110:      https://github.com/pypa/setuptools/archive/refs/tags/v%{st_ver}.tar.gz
+
+%global pt_arches x86_64 aarch64
+ExclusiveArch:  %pt_arches
+# Switch to clang temporarily on aarch64, GCC 16 + PyTorch 2.9.1 has problems
+# See rhbz#2431943 for more info
+%ifarch aarch64
+%global toolchain clang
+%else
 %global toolchain gcc
+%endif
 %global _lto_cflags %nil
 
 BuildRequires:  cmake
+BuildRequires:  cpuinfo-devel
+%if %{with eigen3}
 BuildRequires:  eigen3-devel
+%endif
 BuildRequires:  flexiblas-devel
 BuildRequires:  fmt-devel
 BuildRequires:  foxi-devel
+%if "%{toolchain}" == "gcc"
 BuildRequires:  gcc-c++
 BuildRequires:  gcc-gfortran
+%endif
+%if "%{toolchain}" == "clang"
+BuildRequires:  clang
+BuildRequires:  flang
+%endif
 
 %if %{with gloo}
 BuildRequires:  gloo-devel
@@ -145,21 +176,22 @@ BuildRequires:  gloo-devel
 BuildRequires:  json-devel
 
 BuildRequires:  libomp-devel
+BuildRequires:  moodycamel-concurrentqueue-devel
 BuildRequires:  numactl-devel
-BuildRequires:  ninja-build
 %if %{with onnx}
 BuildRequires:  onnx-devel
 %endif
 %if %{with mpi}
 BuildRequires:  openmpi-devel
 %endif
+%if %{with protobuf}
 BuildRequires:  protobuf-devel
+%endif
 BuildRequires:  sleef-devel
 BuildRequires:  valgrind-devel
 BuildRequires:  pocketfft-devel
 BuildRequires:  pthreadpool-devel
 
-BuildRequires:  cpuinfo-devel
 BuildRequires:  FP16-devel
 BuildRequires:  fxdiv-devel
 BuildRequires:  psimd-devel
@@ -172,14 +204,21 @@ BuildRequires:  python3dist(networkx)
 BuildRequires:  python3dist(numpy)
 BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(pyyaml)
+%if %{with setuptools}
 BuildRequires:  python3dist(setuptools)
-BuildRequires:  python3dist(sphinx)
+%endif
+%if %{with sympy}
+BuildRequires:  python3dist(sympy)
+%endif
 BuildRequires:  python3dist(typing-extensions)
 
+# Packages missing for RHEL/EPEL
 %if 0%{?fedora}
 BuildRequires:  python3-pybind11
 BuildRequires:  python3dist(fsspec)
-BuildRequires:  python3dist(sympy)
+BuildRequires:  python3dist(sphinx)
+# New for 2.9 / EPEL 10.2
+BuildRequires:  ninja-build
 %endif
 
 %if %{with rocm}
@@ -196,9 +235,7 @@ BuildRequires:  miopen-devel
 BuildRequires:  rocblas-devel
 BuildRequires:  rocrand-devel
 BuildRequires:  rocfft-devel
-%if %{with rccl}
 BuildRequires:  rccl-devel
-%endif
 BuildRequires:  rocprim-devel
 BuildRequires:  rocm-cmake
 BuildRequires:  rocm-comgr-devel
@@ -283,6 +320,18 @@ cp %{SOURCE1000} .
 
 %else
 %autosetup -p1 -n pytorch-v%{version}
+
+# GitHub release tarballs identify the version as an alpha, so replace that
+echo "%{pypi_version}" > version.txt
+
+%endif
+
+%if %{without setuptools}
+mkdir -p extra-python
+cd extra-python
+tar xf %{SOURCE110}
+mv setuptools-* setuptools
+cd ..
 %endif
 
 # Remove bundled egg-info
@@ -336,18 +385,28 @@ rm -rf third_party/onnx/*
 cp -r onnx-*/* third_party/onnx/
 %endif
 
+%if %{without protobuf}
+tar xf %{SOURCE100}
+rm -rf third_party/protobuf/*
+cp -r protobuf-*/* third_party/protobuf/
+%endif
+
 # Adjust for the hipblaslt's we build
-sed -i -e 's@"gfx90a", "gfx940", "gfx941", "gfx942"@"gfx90a", "gfx1103", "gfx1150", "gfx1151", "gfx1100", "gfx1101", "gfx1200", "gfx1201"@' aten/src/ATen/native/cuda/Blas.cpp
+sed -i -e 's@"gfx1100", "gfx1101", "gfx1200", "gfx1201", "gfx908",@"gfx1100", "gfx1101", "gfx1200", "gfx1201", "gfx1151",@' aten/src/ATen/native/cuda/Blas.cpp
 
 %if 0%{?rhel}
 # In RHEL but too old
 sed -i -e '/typing-extensions/d' setup.py
-# Need to pip these
-sed -i -e '/sympy/d' setup.py
+# Need to pip this
 sed -i -e '/fsspec/d' setup.py
-%else
+%endif
+
+%if %{with sympy}
 # for 2.5.0
 sed -i -e 's@sympy==1.13.1@sympy>=1.13.1@' setup.py
+%else
+# Need to pip this
+sed -i -e '/sympy/d' setup.py
 %endif
 
 # A new dependency
@@ -429,6 +488,10 @@ mv third_party/kineto .
 mv third_party/onnx .
 %endif
 
+%if %{without protobuf}
+mv third_party/protobuf .
+%endif
+
 %if %{with test}
 mv third_party/googletest .
 %endif
@@ -459,6 +522,10 @@ mv kineto third_party
 
 %if %{without onnx}
 mv onnx third_party
+%endif
+
+%if %{without protobuf}
+mv protobuf third_party
 %endif
 
 %if %{with test}
@@ -506,16 +573,27 @@ sed -i -e 's@HIP 1.0@HIP MODULE@'            cmake/public/LoadHIP.cmake
 
 %endif
 
+# moodycamel include path needs adjusting to use the system's
+sed -i -e 's@${PROJECT_SOURCE_DIR}/third_party/concurrentqueue@/usr/include/concurrentqueue@' cmake/Dependencies.cmake
+
 %build
+
+# Export the arches
+# echo "%%pytorch_arches %pt_arches"   > macros.pytorch
 
 #
 # Control the number of jobs
 #
 # The build can fail if too many threads exceed the physical memory
-# So count core and and memory and increase the build memory util the build succeeds
+# Run at least one thread, more if CPU & memory resources are available.
 #
+%ifarch x86_64
 # Real cores, No hyperthreading
 COMPILE_JOBS=`cat /proc/cpuinfo | grep -m 1 'cpu cores' | awk '{ print $4 }'`
+%else
+# cpuinfo format varies on other arches, fall back to nproc
+COMPILE_JOBS=`nproc`
+%endif
 if [ ${COMPILE_JOBS}x = x ]; then
     COMPILE_JOBS=1
 fi
@@ -542,7 +620,10 @@ export MAX_JOBS=$COMPILE_JOBS
 # Manually set this hardening flag
 export CMAKE_EXE_LINKER_FLAGS=-pie
 
+%if %{with protobuf}
 export BUILD_CUSTOM_PROTOBUF=OFF
+%endif
+
 export BUILD_NVFUSER=OFF
 export BUILD_SHARED_LIBS=ON
 export BUILD_TEST=OFF
@@ -572,7 +653,9 @@ export USE_OPENMP=ON
 export USE_PYTORCH_QNNPACK=OFF
 export USE_ROCM=OFF
 export USE_SYSTEM_SLEEF=ON
+%if %{with eigen3}
 export USE_SYSTEM_EIGEN_INSTALL=ON
+%endif
 %if %{with onnx}
 export USE_SYSTEM_ONNX=ON
 %endif
@@ -607,29 +690,30 @@ export USE_MPI=ON
 export BUILD_TEST=ON
 %endif
 
-# Why we are using py3_ vs pyproject_
-#
-# current pyproject problem with mock
-# + /usr/bin/python3 -Bs /usr/lib/rpm/redhat/pyproject_wheel.py /builddir/build/BUILD/pytorch-v2.1.0/pyproject-wheeldir
-# /usr/bin/python3: No module named pip
-# Adding pip to build requires does not fix
-#
-# See BZ 2244862
-
 %if %{with rocm}
 
 export USE_ROCM=ON
-export USE_ROCM_CK=OFF
+export USE_ROCM_CK_SDPA=OFF
+export USE_ROCM_CK_GEMM=OFF
+export USE_FBGEMM_GENAI=OFF
+
 export USE_MAGMA=ON
 export HIP_PATH=`hipconfig -p`
 export ROCM_PATH=`hipconfig -R`
-RESOURCE_DIR=`%{rocmllvm_bindir}/clang -print-resource-dir`
-export DEVICE_LIB_PATH=${RESOURCE_DIR}/amdgcn/bitcode
 
 # pytorch uses clang, not hipcc
 export HIP_CLANG_PATH=%{rocmllvm_bindir}
 export PYTORCH_ROCM_ARCH=%{rocm_gpu_list_default}
 
+%endif
+
+%if %{without setuptools}
+cd extra-python
+EXTRA_PYTHON=$PWD
+cd setuptools
+python3 setup.py install --root $EXTRA_PYTHON
+cd ../..
+export PYTHONPATH=${EXTRA_PYTHON}%{python3_sitelib}:$PYTHONPATH
 %endif
 
 %if 0%{?fedora}
@@ -646,53 +730,101 @@ export USE_ROCM=ON
 export USE_ROCM_CK=OFF
 export HIP_PATH=`hipconfig -p`
 export ROCM_PATH=`hipconfig -R`
-RESOURCE_DIR=`%{rocmllvm_bindir}/clang -print-resource-dir`
-export DEVICE_LIB_PATH=${RESOURCE_DIR}/amdgcn/bitcode
 
 # pytorch uses clang, not hipcc
 export HIP_CLANG_PATH=%{rocmllvm_bindir}
 export PYTORCH_ROCM_ARCH=%{rocm_gpu_list_default}
-
 %endif
 
 %if 0%{?fedora}
 %pyproject_install
 %pyproject_save_files '*torch*'
 %else
-%py3_install
-%endif
+# In 2.9+ the 'setup.py install' command is gone
+# + /usr/bin/python3 setup.py install -O1 --skip-build --root /builddir/build/BUILDROOT/python-torch-2.9.1-1.el10.x86_64 --prefix /usr
+# WARNING: Redirecting 'python setup.py install' to 'pip install . -v --no-build-isolation', for more inf
+# So we can no longer use py3_install
+# The replacement from pytorch does not map arguements
+# cobble together a new install based on pyproject_install
 
+PYTHONPATH=$PWD/extra-python/%{python3_sitelib}:$PYTHONPATH \
+ TMPDIR="$PWD/build" \
+ %{__python3} -m pip install --root %{buildroot} --prefix %{_prefix} --no-deps --disable-pip-version-check --progress-bar off --verbose --ignore-installed --no-warn-script-location --no-index --no-cache-dir --no-build-isolation .
+
+%endif
 
 %check
 # Not working yet
 # pyproject_check_import torch
 
-# Do not remote the empty files
-
 %files -n python3-%{pypi_name}
 %license LICENSE
 %doc README.md 
 %{_bindir}/torchrun
+%if 0%{?rhel}
 %{_bindir}/torchfrtrace
+%endif
 %{python3_sitearch}/%{pypi_name}*
 %{python3_sitearch}/functorch
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.8.0-9
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 2.9.1-11
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.8.0-8
-- build: mass rebuild auto-bumpable components
+* Fri Jan 30 2026 Alexander F. Lent <lx@xanderlent.com> - 2.9.1-10
+- Switch to clang on aarch64
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2.8.0-7
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Thu Jan 29 2026 Tom Rix <Tom.Rix@amd.com> - 2.9.1-9
+- Start using sympy again
 
-* Thu Oct 23 2025 Jeremy Newton <Jeremy.Newton@amd.com> - 2.8.0-6
-- Rebuild due to python change
+* Tue Jan 27 2026 Tom Rix <Tom.Rix@amd.com> - 2.9.1-8
+- Work around runtime sympy
 
-* Wed Oct 01 2025 Jeremy Newton <Jeremy.Newton@amd.com> - 2.8.0-5
-- Rebuild for rocprim 6.4.4
+* Fri Jan 23 2026 Tom Rix <Tom.Rix@amd.com> - 2.9.1-7
+- Workaround a broken sympy
+
+* Mon Jan 19 2026 Tom Rix <Tom.Rix@amd.com> - 2.9.1-6
+- Build on EPEL
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Tom Rix <Tom.Rix@amd.com> - 2.9.1-4
+- Fix hip
+
+* Sun Dec 21 2025 Alexander F. Lent <lx@xanderlent.com> - 2.9.1-3
+- Continue to support aarch64 with myself maintaining
+
+* Sat Dec 20 2025 Alexander F. Lent <lx@xanderlent.com> - 2.9.1-2
+- Improve build times on non-x86 systems
+
+* Thu Dec 18 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.1-1
+- Update to 2.9.1
+
+* Mon Nov 24 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0-4
+- Always include onnx src
+
+* Mon Nov 17 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0-3
+- Rebuild for ROCm 7.1
+
+* Fri Oct 17 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0-2
+- Remove pytorch-rpm-macros package.
+
+* Wed Oct 15 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0-1
+- Update to 2.9.0
+
+* Mon Oct 13 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0^git20251008.0fabc3b-1
+- Update to 2.9.0-rc9
+
+* Mon Oct 06 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0^git20251002.fd36458-1
+- Update to 2.9.0-rc6
+
+* Tue Sep 30 2025 Tom Rix <Tom.Rix@amd.com> - 2.9.0^git20250923.715dca6-1
+- Update to 2.9.0-rc4
+
+* Fri Sep 26 2025 Tom Rix <Tom.Rix@amd.com> - 2.8.0-5
+- Disable magma
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.8.0-4
 - Rebuilt for Python 3.14.0rc3 bytecode

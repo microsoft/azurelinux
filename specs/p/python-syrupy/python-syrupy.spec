@@ -3,7 +3,7 @@
 
 Name:           python-syrupy
 Version:        4.9.1
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Pytest snapshot plugin
 
 License:        Apache-2.0
@@ -54,6 +54,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.9.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.9.1-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

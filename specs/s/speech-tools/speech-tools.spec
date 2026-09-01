@@ -3,7 +3,7 @@
 
 Name:           speech-tools
 Version:        2.5
-Release: 29%{?dist}
+Release:        28%{?dist}
 Summary:        Edinburgh speech tools library
 
 License:        MIT-Festival
@@ -38,7 +38,7 @@ and some basic signal processing software.
 %build
 %configure
 # The following make invocation is necessary because configure does not honor the default compiler flags and ignoring those breaks the debuginfo package generation. Also, it disables problematic parallel make.
-%__make CFLAGS="%{optflags} -fPIC -flto -fno-lto" CXXFLAGS="%{optflags} -fPIC -flto -fno-lto" LDFLAGS="$LDFLAGS -flto -fno-lto"
+%__make CFLAGS="%{optflags} -fPIC -flto -fno-lto" CXXFLAGS="%{optflags} -fPIC -flto -fno-lto -std=c++17" LDFLAGS="$LDFLAGS -flto -fno-lto"
 
 %install
 mkdir -p %{buildroot}%{_bindir}
@@ -108,6 +108,12 @@ but they might be depended upon by some third-party developers as well.
 %{_libdir}/*.a
 
 %changelog
+* Mon Feb 02 2026 Lukáš Tyrychtr <lukastyrychtr@gmail.com>
+- Use C++ 17 mode to build, it avoids conflicts with concept names
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.5-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

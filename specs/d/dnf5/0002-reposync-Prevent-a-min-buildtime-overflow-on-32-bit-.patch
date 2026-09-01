@@ -1,0 +1,84 @@
+From 988d838cdcd97760d6733e5d29b3de02c971af62 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 13 Aug 2026 17:00:00 +0200
+Subject: [PATCH 2/2] reposync: Prevent a --min-buildtime overflow on 32-bit
+ platforms
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Compilation on i686 failed:
+
+    /builddir/build/BUILD/dnf5-5.4.3.0-build/dnf5-5.4.3.0/dnf5-plugins/reposync_plugin/reposync.cpp: In member function ‘dnf5::ReposyncCommand::download_list_type dnf5::ReposyncCommand::get_packages_list(const libdnf5::repo::Repo&)’:
+    /builddir/build/BUILD/dnf5-5.4.3.0-build/dnf5-5.4.3.0/dnf5-plugins/reposync_plugin/reposync.cpp:247:60: error: conversion from ‘int64_t’ {aka ‘long long int’} to ‘time_t’ {aka ‘long int’} may change value [-Werror=conversion]
+      247 |         query.filter_recent(min_buildtime_option->get_value());
+	  |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~
+
+The cause was a disagreement between
+libdnf5::cli::session::DateOption::get_value() type (int64_t) and
+PackageQuery::filter_recent() type (time_t).
+
+This quick fix was choosen becaue it does not changes API in any way.
+
+Ideal fix would be either changing
+libdnf5::cli::session::DateOption::get_value() type or adding yet another
+PackageQuery::filter_recent() accepting int64_t. (We could make a template, but
+would not have to forget on adding few instances into language bindings.)
+
+Less deal fix would be adding libdnf5::cli::session::DateOption::get_value()
+which returns time_t, so tthat we can stop usning type casts through out the
+code.
+---
+ dnf5-plugins/reposync_plugin/reposync.cpp |  2 +-
+ libdnf5-cli/session.cpp                   | 14 +++++++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/dnf5-plugins/reposync_plugin/reposync.cpp b/dnf5-plugins/reposync_plugin/reposync.cpp
+index 4c720f307..1fe30639d 100644
+--- a/dnf5-plugins/reposync_plugin/reposync.cpp
++++ b/dnf5-plugins/reposync_plugin/reposync.cpp
+@@ -244,7 +244,7 @@ ReposyncCommand::download_list_type ReposyncCommand::get_packages_list(const lib
+     }
+ 
+     if (min_buildtime_option->get_arg()->get_parse_count() >= 1) {
+-        query.filter_recent(min_buildtime_option->get_value());
++        query.filter_recent(static_cast<time_t>(min_buildtime_option->get_value()));
+     }
+ 
+     if (!arch_option.empty()) {
+diff --git a/libdnf5-cli/session.cpp b/libdnf5-cli/session.cpp
+index c8ac211d8..b2fa196c1 100644
+--- a/libdnf5-cli/session.cpp
++++ b/libdnf5-cli/session.cpp
+@@ -22,7 +22,9 @@
+ #include <libdnf5/utils/bgettext/bgettext-mark-domain.h>
+ 
+ #include <chrono>
++#include <limits>
+ #include <sstream>
++#include <utility>
+ 
+ namespace libdnf5::cli::session {
+ 
+@@ -257,7 +259,17 @@ DateOption::DateOption(
+                     throw libdnf5::cli::ArgumentParserError(
+                         M_("Invalid date passed: \"{}\". Dates in \"YYYY-MM-DD\" format are expected"), value);
+                 }
+-                return tp.time_since_epoch().count();
++                // This option should have used time_t because it is used
++                // elsewhere, e.g. in PackageQuery::filter_recent().
++                // Therefore reject out-of-range values right now instead of
++                // dealing with the overflows throughout the code.
++                auto numeric_value = tp.time_since_epoch().count();
++                if (std::cmp_less(numeric_value, std::numeric_limits<time_t>::lowest()) ||
++                    std::cmp_greater(numeric_value, std::numeric_limits<time_t>::max())) {
++                    throw libdnf5::cli::ArgumentParserError(
++                        M_("\"{}\" date cannot be represented by time_t type on this platform"), value);
++                }
++                return numeric_value;
+             }))));
+     arg->link_value(conf);
+ 
+-- 
+2.55.0
+

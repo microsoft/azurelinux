@@ -1,181 +1,162 @@
+## START: Set by rpmautospec
+## (rpmautospec version 0.8.3)
+## RPMAUTOSPEC: autorelease, autochangelog
+%define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
+    release_number = 2;
+    base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
+    print(release_number + base_release_number - 1);
+}%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
+## END: Set by rpmautospec
+
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# AucTeX includes preview-latex which allows previewing directly in the Emacs
-# buffer. This makes use of preview.sty, a LaTeX class, which is also included
-# with AucTex. preview-latex can either use a privately installed copy of
-# preview.sty, or it can use one installed in the system texmf tree. If the
-# following is set to 1, an add-on LaTeX package will be created which installs
-# into the system texmf tree, and preview-latex will use that. However, TeXLive
-# already includes preview.sty and so this may not be desirable -- setting the
-# following value to 0 means that preview-latex/AucTeX will use a privately
-# installed copy of preview.sty.
-%global separate_preview 1
-
 Summary:        Enhanced TeX modes for Emacs
 Name:           emacs-auctex
-Version:        13.3
-Release: 9%{?dist}
+Version:        14.1.2
+Release:        %autorelease
 
 # The project as a whole is GPL-3.0-or-later.  Exceptions:
-# - README and doc/intro.texi are FSFAP
+# - doc/intro.texi is FSFAP
 # - doc/auctex* and doc/preview* are GFDL-1.3-no-invariants-or-later
-License:        GPL-3.0-or-later AND FSFAP AND GFDL-1.3-no-invariants-or-later
+# - the generated PDF file contains fonts distributed under Knuth-CTAN
+License:        GPL-3.0-or-later AND FSFAP AND GFDL-1.3-no-invariants-or-later AND Knuth-CTAN
 URL:            https://www.gnu.org/software/auctex/
 VCS:            git:https://git.savannah.gnu.org/cgit/auctex.git
-Source:         http://ftp.gnu.org/pub/gnu/auctex/auctex-%{version}.tar.gz
+Source:         https://github.com/emacsmirror/auctex/archive/auctex-%{version}.tar.gz
 
 BuildArch:      noarch
 BuildRequires:  emacs-nw
 BuildRequires:  ghostscript
 BuildRequires:  make
-BuildRequires:  tex(latex)
+BuildRequires:  perl-interpreter
+BuildRequires:  tex(german.ldf)
+BuildRequires:  tex(tex)
+BuildRequires:  texinfo
 BuildRequires:  texinfo-tex
+BuildRequires:  texlive-latex
+BuildRequires:  texlive-mylatex
 
 Requires:       dvipng
 Requires:       emacs(bin) >= %{?_emacs_version}%{!?_emacs_version:0}
 Requires:       ghostscript
-Requires:       tex(dvips)
-Requires:       tex(latex)
-
-%if %{separate_preview}
 Requires:       tex-preview = %{version}-%{release}
-%endif
+Requires:       texlive-dvips
+Requires:       texlive-latex
+
+Recommends:     texlive-mylatex
+
+# This can be removed when F48 reaches EOL
+Obsoletes:      %{name}-doc < 14.0.0
+Provides:       %{name}-doc = %{version}-%{release}
 
 %description
-AUCTeX is an extensible package that supports writing and formatting
-TeX files for most variants of Emacs.
+AUCTeX is an extensible package that supports writing and formatting TeX files
+for most variants of Emacs.
 
-AUCTeX supports many different TeX macro packages, including AMS-TeX,
-LaTeX, Texinfo and basic support for ConTeXt.  Documentation can be
-found under /usr/share/doc, e.g. the reference card (tex-ref.pdf) and
-the FAQ. The AUCTeX manual is available in Emacs info (C-h i d m
-AUCTeX RET). On the AUCTeX home page, we provide manuals in various
-formats.
+AUCTeX supports many different TeX macro packages, including AMS-TeX, LaTeX,
+Texinfo and basic support for ConTeXt.  Documentation can be found under
+/usr/share/doc, e.g. the reference card (tex-ref.pdf) and the FAQ.  The AUCTeX
+manual is available in Emacs info (C-h i d m AUCTeX RET).  On the AUCTeX home
+page, we provide manuals in various formats.
 
-AUCTeX includes preview-latex support which makes LaTeX a tightly
-integrated component of your editing workflow by visualizing selected
-source chunks (such as single formulas or graphics) directly as images
-in the source buffer.
+AUCTeX includes preview-latex support which makes LaTeX a tightly integrated
+component of your editing workflow by visualizing selected source chunks (such
+as single formulas or graphics) directly as images in the source buffer.
 
 This package is for GNU Emacs.
 
-%package doc
-# The content is GFDL-1.3-no-invariants-or-later.  The remaining licenses cover
-# the various fonts embedded in PDFs.
-# CM: Knuth-CTAN
-License:        GFDL-1.3-no-invariants-or-later AND Knuth-CTAN
-Summary:        Documentation in various formats for AUCTeX
-
-%description doc
-Documentation for the AUCTeX package for emacs in various formats,
-including HTML and PDF.
-
-%if %{separate_preview}
 %package -n tex-preview
 # The content is GPL-3.0-or-later.  The remaining licenses cover the various
 # fonts embedded in PDFs.
 # CM: Knuth-CTAN
 License:        GPL-3.0-or-later AND Knuth-CTAN
 Summary:        Preview style files for LaTeX
-Requires:       tex(latex)
-Provides:       tex(preview.sty) = %{version}-%{release}
+Requires:       texlive-base
+Requires:       texlive-kpathsea
 # This is the latest build we accidentally provided from texlive
-Obsoletes:      texlive-preview <= 7:svn44883
-Provides:       texlive-preview = 7:svn44884
+Obsoletes:      texlive-preview <= 12:svn78824-5
+Provides:       texlive-preview = 12:svn78824-5
 
 %description -n tex-preview
-The preview package for LaTeX allows for the processing of selected
-parts of a LaTeX input file.  This package extracts indicated pieces
-from a source file (typically displayed equations, figures and
-graphics) and typesets with their base point at the (1in,1in) magic
-location, shipping out the individual pieces on separate pages without
-any page markup.  You can produce either DVI or PDF files, and options
-exist that will set the page size separately for each page.  In that
-manner, further processing (as with Ghostscript or dvipng) will be
+The preview package for LaTeX allows for the processing of selected parts of a
+LaTeX input file.  This package extracts indicated pieces from a source file
+(typically displayed equations, figures and graphics) and typesets with their
+base point at the (1in,1in) magic location, shipping out the individual pieces
+on separate pages without any page markup.  You can produce either DVI or PDF
+files, and options exist that will set the page size separately for each page.
+In that manner, further processing (as with Ghostscript or dvipng) will be
 able to work in a single pass.
 
-The main purpose of this package is the extraction of certain
-environments (most notably displayed formulas) from LaTeX sources as
-graphics. This works with DVI files postprocessed by either Dvips and
-Ghostscript or dvipng, but it also works when you are using PDFTeX for
-generating PDF files (usually also postprocessed by Ghostscript).
+The main purpose of this package is the extraction of certain environments
+(most notably displayed formulas) from LaTeX sources as graphics.  This works
+with DVI files postprocessed by either Dvips and Ghostscript or dvipng, but it
+also works when you are using PDFTeX for generating PDF files (usually also
+postprocessed by Ghostscript).
 
-The tex-preview package is generated from the AUCTeX package for
-Emacs.
-%endif
+The tex-preview package is generated from the AUCTeX package for Emacs.
 
 %prep
-%autosetup -n auctex-%{version}
-
-%conf
-# Fix some encodings
-iconv -f ISO-8859-1 -t UTF8 RELEASE > RELEASE.utf8 && \
-touch -r RELEASE RELEASE.utf8 && \
-mv RELEASE.utf8 RELEASE
+%autosetup -n auctex-auctex-%{version}
 
 %build
-%if %{separate_preview}
-%configure --with-emacs \
-           --with-texmf-dir=%{_texmf_main} \
-%else
-%configure --with-emacs \
-           --without-texmf-dir
-%endif
-
-%make_build
-
-# Build documentation in various formats
-pushd doc
-make extradist
-popd
+%make_build TEX=tex
+%make_build preview.pdf TEX=tex
 
 %install
+# The makefile no longer has an install target, so install by hand
+mkdir -p %{buildroot}%{_emacs_sitelispdir}/auctex
+cp -a *.el *.elc images style %{buildroot}%{_emacs_sitelispdir}/auctex
+
+# The tex-site file needs to be one directory higher
+mv %{buildroot}%{_emacs_sitelispdir}/auctex/tex-site.el \
+   %{buildroot}%{_emacs_sitelispdir}
+
+# The startup files go in _emacs_sitestartdir
 mkdir -p %{buildroot}%{_emacs_sitestartdir}
-%make_install
-rm -rf %{buildroot}%{_var}
+mv %{buildroot}%{_emacs_sitelispdir}/auctex/auctex{,-autoloads}.el* \
+   %{buildroot}%{_emacs_sitestartdir}
 
-# Remove /usr/share/doc/auctex directory from buildroot since we don't want doc
-# files installed here
-rm -rf %{buildroot}%{_docdir}/auctex
+# Install the info files
+mkdir -p %{buildroot}%{_infodir}
+cp -p doc/{auctex,preview-latex}.info* %{buildroot}%{_infodir}
 
-# Create these .nosearch files to keep the directories from the elisp search path
-touch %{buildroot}%{_emacs_sitelispdir}/auctex/.nosearch
-touch %{buildroot}%{_emacs_sitelispdir}/auctex/style/.nosearch
+# Install the LaTeX files
+mkdir -p %{buildroot}%{_texmf_main}/tex/latex/preview
+cp -p latex/*.{cfg,def,sty} %{buildroot}%{_texmf_main}/tex/latex/preview
+mkdir -p %{buildroot}%{_texmf_main}/doc/latex/preview
+cp -p latex/{README,preview.pdf} %{buildroot}%{_texmf_main}/doc/latex/preview
+
+%check
+make -C tests
 
 %files
-%doc RELEASE README TODO FAQ CHANGES
+%doc ChangeLog.1 NEWS.org
 %doc %{_infodir}/*.info*
 %license COPYING
-%exclude %{_infodir}/dir
 %{_emacs_sitestartdir}/*
-%dir %{_emacs_sitelispdir}/auctex
-%dir %{_emacs_sitelispdir}/auctex/style
-%{_emacs_sitelispdir}/auctex/*.el
-%{_emacs_sitelispdir}/auctex/*.elc
-%{_emacs_sitelispdir}/auctex/style/*.el
-%{_emacs_sitelispdir}/auctex/style/*.elc
-%{_emacs_sitelispdir}/auctex/.nosearch
-%{_emacs_sitelispdir}/auctex/style/.nosearch
-%{_emacs_sitelispdir}/auctex/images
+%{_emacs_sitelispdir}/auctex/
 %{_emacs_sitelispdir}/tex-site.el
-%if !%{separate_preview}
-%{_emacs_sitelispdir}/auctex/latex
-%{_emacs_sitelispdir}/auctex/doc
-%endif
 
-%if %{separate_preview}
 %files -n tex-preview
 %license COPYING
-%{_texmf_main}/tex/latex/preview
-%{_texmf_main}/doc/latex/styles
-%endif
-
-%files doc
-%doc doc/*.{dvi,ps,pdf}
-%doc doc/html
+%{_texmf_main}/tex/latex/preview/
+%{_texmf_main}/doc/latex/preview/
 
 %changelog
+## START: Generated by rpmautospec
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 14.1.2-2
+- Uncommitted changes
+
+* Thu May 14 2026 Jerry James <loganjerry@gmail.com> - 14.1.2-1
+- Version 14.1.2
+- Merge the doc subpackage into the main package
+- Recommend texlive-mylatex (needed for preview)
+- Add a %%check script
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 13.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 13.3-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
@@ -521,3 +502,5 @@ touch %{buildroot}%{_emacs_sitelispdir}/auctex/style/.nosearch
 
 * Sat Feb 16 2002 Jan-Ake Larsson <jalar@imf.au.dk>
 - Prerelease 11.11
+
+## END: Generated by rpmautospec

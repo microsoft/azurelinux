@@ -19,7 +19,6 @@ find ansible_collections -depth -regextype posix-egrep -regex "${hidden_pattern}
 
 # Not needed for runtime
 rm -rv ansible_collections/cisco/meraki/scripts/
-rm -rv ansible_collections/community/digitalocean/scripts/
 rm -rv ansible_collections/community/grafana/hacking/
 rm -rv ansible_collections/community/okd/ci/
 rm -rv ansible_collections/community/vmware/tools/
@@ -29,8 +28,6 @@ rm -rv ansible_collections/google/cloud/test-fixtures/
 rm -rv ansible_collections/grafana/grafana/tools/
 rm -rv ansible_collections/hetzner/hcloud/scripts/
 rm -rv ansible_collections/netbox/netbox/hacking/
-rm -rv ansible_collections/sensu/sensu_go/docker/
-rm -rv ansible_collections/sensu/sensu_go/tools/
 
 rm -v ansible_collections/community/mysql/run_all_tests.py
 rm -v ansible_collections/dellemc/enterprise_sonic/rebuild.sh
@@ -43,7 +40,6 @@ find ansible_collections/cyberark/conjur -type f -name "*.pem" -print -delete
 find -type f -name "*requirements.txt" -size 0 -print -delete
 rm -v ansible_collections/community/zabbix/roles/zabbix_agent/files/win_sample/doSomething.ps1
 rm -v ansible_collections/community/docker/meta/ee-bindep.txt
-rm -vr ansible_collections/ibm/spectrum_virtualize/roles/place_holder
 
 echo "[END] Delete unnecessary files and directories"
 

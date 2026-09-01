@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.0.1
-Release: 20%{?dist}
+Release: 19%{?dist}
 Summary: HTTP/REST API client library
 License: MIT
 URL: https://lostisland.github.io/faraday
@@ -33,6 +33,14 @@ Patch3: faraday-pr1560-ruby34-backtrace-change.patch
 # ruby3.4 Hash#inspect formatting change
 # https://github.com/lostisland/faraday/pull/1604
 Patch4: faraday-pr1604-ruby34-hash-inspect-formatting-change.patch
+# https://github.com/lostisland/faraday-rack/pull/13
+# https://github.com/lostisland/faraday-rack/commit/a590bc34e40b62484440dcd4ab5147c0c02bb425
+# Patch for rack 3.1 wrt env['rack.input'] is optional
+Patch5: faraday-rack-pr13-rack31-rack_input.patch
+# https://github.com/lostisland/faraday/pull/1549
+# https://github.com/lostisland/faraday/commit/66551ecc79f5d3d5bca1a2523bd8736db8c2220c.patch
+# Unescape the result of Rack::Utils.build_nested_query for rack 3.1
+Patch6: faraday-pr1549-unespace-rack-utils-query-result.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby >= 2.3
@@ -122,6 +130,12 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 01 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1.0.1-18
+- Backport upstream patch for rack3.1 change
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,13 @@
+Index: fltk-1.4.4/FL/Fl_Cairo.H
+===================================================================
+--- fltk-1.4.4.orig/FL/Fl_Cairo.H
++++ fltk-1.4.4/FL/Fl_Cairo.H
+@@ -37,7 +37,7 @@
+ 
+ # ifdef FLTK_HAVE_CAIRO
+ 
+-# include <cairo.h>
++# include <cairo/cairo.h>
+ 
+ /**
+   \addtogroup group_cairo

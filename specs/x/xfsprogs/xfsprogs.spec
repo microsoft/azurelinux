@@ -3,14 +3,13 @@
 
 Summary:	Utilities for managing the XFS filesystem
 Name:		xfsprogs
-Version:	6.15.0
-Release: 6%{?dist}
+Version:	7.1.1
+Release:	1%{?dist}
 License:	GPL-1.0-or-later AND LGPL-2.1-or-later
 URL:		https://xfs.wiki.kernel.org
 Source0:	http://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.xz
 Source1:	http://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/%{name}-%{version}.tar.sign
-Source2:	https://git.kernel.org/pub/scm/docs/kernel/pgpkeys.git/plain/keys/13F703E6C11CF6F0.asc
-Source3:	https://git.kernel.org/pub/scm/docs/kernel/pgpkeys.git/plain/keys/46A7EA18AC33E108.asc
+Source2:	https://git.kernel.org/pub/scm/docs/kernel/pgpkeys.git/plain/keys/46A7EA18AC33E108.asc
 
 BuildRequires:	make
 BuildRequires:	gcc
@@ -79,7 +78,7 @@ Extra utilities for XFS filesystems, such as xfs_protofile, that may require
 Python.
 
 %prep
-xzcat '%{SOURCE0}' | %{gpgverify} --keyring='%{SOURCE3}' --signature='%{SOURCE1}' --data=-
+xzcat '%{SOURCE0}' | %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data=-
 %autosetup -p1
 
 # Inject libicuuc to fix link error:
@@ -118,6 +117,7 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/xfsprogs/
 %{_libexecdir}/xfsprogs/*
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%{_unitdir}/*
 %{_sbindir}/*
 %{_datadir}/xfsprogs/mkfs/*.conf
 %dir %{_datadir}/xfsprogs/
@@ -126,15 +126,15 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/xfsprogs/
 %exclude %{_sbindir}/xfs_scrub*
 %exclude %{_sbindir}/xfs_protofile*
 %exclude %{_mandir}/man8/xfs_scrub*
-%exclude %{_libexecdir}/xfsprogs/xfs_scrub*
-%exclude %{_mandir}/man8/xfs_scrub_all*
 %exclude %{_mandir}/man8/xfs_protofile*
+%exclude %{_libexecdir}/xfsprogs/xfs_scrub*
+%exclude %{_unitdir}/*xfs_scrub*
 
 %files xfs_scrub
 %{_sbindir}/xfs_scrub*
 %{_mandir}/man8/xfs_scrub*
 %{_libexecdir}/xfsprogs/xfs_scrub*
-%{_unitdir}/*
+%{_unitdir}/*xfs_scrub*
 %{_udevrulesdir}/64-xfs.rules
 %{_datadir}/xfsprogs/xfs_scrub_all.cron
 
@@ -162,6 +162,45 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/xfsprogs/
 %{_libdir}/*.so
 
 %changelog
+* Fri Jul 17 2026 Pavel Reichl <preichl@redhat.com> - 7.1.1-1
+- Update to upstream v7.1.1
+- Related: rhbz#2501982
+- Related: rhbz#2501833
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.0.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed May 27 2026 František Zatloukal <fzatlouk@redhat.com> - 7.0.1-2
+- Rebuilt for icu 78.3
+
+* Thu May 21 2026 Pavel Reichl <preichl@redhat.com> - 7.0.1-1
+- Update to upstream v7.0.1
+- Move xfs_healer systemd units from xfsprogs-xfs_scrub to main xfsprogs package
+- Related: rhbz#2467694
+
+* Tue May 19 2026 Pavel Reichl <preichl@redhat.com> - 7.0.0-1
+- Update to upstream v7.0.0
+- Related: rhbz#2467694
+
+* Fri Mar 20 2026 Pavel Reichl <preichl@redhat.com> - 6.19.0-1
+- Update to upstream v6.19.0
+- rhbz#2448614
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.18.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Pavel Reichl <preichl@redhat.com> - 6.18.0-1
+- Rebase to v6.18
+- Related: rhbz#2426297
+
+* Fri Oct 24 2025 Pavel Reichl <preichl@redhat.com> - 6.17.0-1
+- Rebase to v6.17
+- Related: rhbz#2405145
+
+* Wed Aug 27 2025 Pavel Reichl <preichl@redhat.com> - 6.16.0-1
+- new version
+- Related: rhbz#2391115
+
 * Wed Aug 06 2025 František Zatloukal <fzatlouk@redhat.com> - 6.15.0-3
 - Rebuilt for icu 77.1
 

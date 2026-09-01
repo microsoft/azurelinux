@@ -6,7 +6,7 @@
 
 Name:		libntirpc
 Version:	7.2
-Release:	1%{?dev:%{dev}}%{?dist}
+Release:	6%{?dev:%{dev}}%{?dist}
 Summary:	New Transport Independent RPC Library
 License:	BSD-3-Clause
 Url:		https://github.com/nfs-ganesha/ntirpc
@@ -16,6 +16,7 @@ Url:		https://github.com/nfs-ganesha/ntirpc
 Source0:	https://github.com/nfs-ganesha/ntirpc/archive/v%{version}/ntirpc-%{version}%{?dev:%{dev}}.tar.gz
 Source1:	https://github.com/biaks/prometheus-cpp-lite/archive/%{prometh_ver_long}/prometheus-cpp-lite-%{prometh_ver_short}.tar.gz
 Patch:		0001-CMakeLists.txt.patch
+Patch:		0002-7.2plus.patch
 
 BuildRequires:	cmake gcc gcc-c++
 %ifarch x86_64 aarch64
@@ -25,9 +26,6 @@ BuildRequires:	librdmacm
 BuildRequires:	rdma-core-devel
 BuildRequires:	krb5-devel
 BuildRequires:	userspace-rcu-devel
-%if ( 0%{?fedora} && 0%{?fedora} > 27 )
-BuildRequires:  libnsl2-devel
-%endif
 # libtirpc has /etc/netconfig, most machines probably have it anyway
 # for NFS client
 Requires:	libtirpc
@@ -98,6 +96,23 @@ ln -s %{name}.so.%{version} %{buildroot}%{_libdir}/%{name}.so.7
 %{_libdir}/pkgconfig/libntirpc.pc
 
 %changelog
+* Tue Aug 11 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> 7.2-6
+- rhbz#2512155 
+
+* Mon Jun 15 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> 7.2-5
+- ntirpc-7.2, ntirpc did not tag/release required updates for
+  ganesha-8.1 and later (nfs-ganesha-9.16)
+
+* Fri Jun 12 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> 7.2-4
+- ntirpc-7.2, ntirpc did not tag/release required updates for
+  ganesha-8.1 and later (nfs-ganesha-9.15)
+
+* Wed Mar 18 2026 Kaleb S. KEITHLEY <kkeithle at redhat.com> 7.2-3
+- ntirpc-7.2, eliminate libnsl* dependency
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Sep 30 2025 Kaleb S. KEITHLEY <kkeithle at redhat.com> 7.2-1
 - ntirpc-7.2 GA
 

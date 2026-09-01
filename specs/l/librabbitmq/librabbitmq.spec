@@ -3,30 +3,29 @@
 
 # Fedora spec file for librabbitmq
 #
-# Copyright (c) 2012-2024 Remi Collet
-# License: CC-BY-SA-4.0
-# http://creativecommons.org/licenses/by-sa/4.0/
+# SPDX-FileCopyrightText:  Copyright 2012-2026 Remi Collet
+# SPDX-License-Identifier: CECILL-2.1
+# http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 #
 # Please, preserve the changelog entries
 #
 
 %bcond_without      tests
 
-%global gh_commit   84b81cd97a1b5515d3d4b304796680da24c666d8
-%global gh_short    %(c=%{gh_commit}; echo ${c:0:7})
 %global gh_owner    alanxz
 %global gh_project  rabbitmq-c
 %global libname     librabbitmq
 %global soname      4
+%global forgeurl    https://github.com/%{gh_owner}/%{gh_project}
 
 Name:      %{libname}
 Summary:   Client library for AMQP
-Version:   0.15.0
-Release: 6%{?dist}
 License:   MIT
-URL:       https://github.com/alanxz/rabbitmq-c
-
-Source0:   https://github.com/%{gh_owner}/%{gh_project}/archive/%{gh_commit}/%{gh_project}-%{version}-%{gh_short}.tar.gz
+Version:   0.17.0
+Release:   1%{?dist}
+%forgemeta
+URL:       %{forgeurl}
+Source0:   %{forgesource}
 
 
 BuildRequires: gcc
@@ -69,7 +68,7 @@ amqp-publish        Publish a message on an AMQP server
 
 
 %prep
-%setup -q -n %{gh_project}-%{gh_commit}
+%forgesetup
 
 # Copy sources to be included in -devel docs.
 cp -pr examples Examples
@@ -84,26 +83,17 @@ sed -e '/test_basic/d' -i tests/CMakeLists.txt
   -DBUILD_TOOLS:BOOL=ON \
   -DBUILD_TOOLS_DOCS:BOOL=ON \
 %if %{with tests}
-  -DINSTALL_STATIC_LIBS:BOOL=OFF \
+  -DINSTALL_STATIC_LIBS:BOOL=OFF
 %else
   -DBUILD_TESTING:BOOL=OFF \
-  -DBUILD_STATIC_LIBS:BOOL=OFF \
+  -DBUILD_STATIC_LIBS:BOOL=OFF
 %endif
-  -S .
 
-%if 0%{?cmake_build:1}
 %cmake_build
-%else
-make %{_smp_mflags}
-%endif
 
 
 %install
-%if 0%{?cmake_install:1}
 %cmake_install
-%else
-make install  DESTDIR="%{buildroot}"
-%endif
 
 
 %check
@@ -116,11 +106,7 @@ grep static %{buildroot}%{_libdir}/cmake/rabbitmq-c/*.cmake && exit 1
 
 %if %{with tests}
 : upstream tests
-%if 0%{?ctest:1}
 %ctest
-%else
-make test
-%endif
 %else
 : Tests disabled
 %endif
@@ -148,6 +134,17 @@ make test
 
 
 %changelog
+* Thu Jul  2 2026 Remi Collet <remi@remirepo.net> - 0.17.0-1
+- update to 0.17.0
+
+* Wed Jun 10 2026 Remi Collet <remi@remirepo.net> - 0.16.0-1
+- update to 0.16.0
+- re-license spec file to CECILL-2.1
+- spec file cleanup
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.15.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

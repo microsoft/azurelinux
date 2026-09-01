@@ -48,6 +48,7 @@
     -DKDE_INSTALL_METAINFODIR:PATH=%{_kf6_metainfodir} \\\
     -DKDE_INSTALL_PLUGINDIR:PATH=%{_qt6_plugindir} \\\
     -DKDE_INSTALL_QMLDIR:PATH=%{_kf6_qmldir} \\\
+    -DKDE_INSTALL_QTMETATYPESDIR:PATH=%{_qt6_metatypesdir} \\\
     -DKDE_INSTALL_QTPLUGINDIR:PATH=%{_qt6_plugindir} \\\
     -DKDE_INSTALL_QTQCHDIR:PATH=%{_qt6_docdir} \\\
     -DKDE_INSTALL_QTQUICKIMPORTSDIR:PATH=%{_qt6_importdir} \\\

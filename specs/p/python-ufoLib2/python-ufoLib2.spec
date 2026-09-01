@@ -6,7 +6,7 @@
 
 Name:           python-ufoLib2
 Version:        0.18.1
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        A library to deal with UFO font sources
 
 License:        Apache-2.0
@@ -55,6 +55,9 @@ Summary:        %{summary}
 %doc README.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.18.1-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

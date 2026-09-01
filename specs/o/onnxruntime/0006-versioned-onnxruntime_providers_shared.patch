@@ -1,0 +1,50 @@
+From dffe190d2d17df510fa5f0cdd29d7f43ecd7be84 Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Mon, 29 Sep 2025 23:50:20 -0300
+Subject: [PATCH 06/19] versioned onnxruntime_providers_shared
+
+---
+ cmake/onnxruntime_providers_cpu.cmake  | 1 +
+ cmake/onnxruntime_providers_cuda.cmake | 1 +
+ cmake/onnxruntime_providers_rocm.cmake | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/cmake/onnxruntime_providers_cpu.cmake b/cmake/onnxruntime_providers_cpu.cmake
+index b9c810e125..83b9cf087e 100644
+--- a/cmake/onnxruntime_providers_cpu.cmake
++++ b/cmake/onnxruntime_providers_cpu.cmake
+@@ -235,6 +235,7 @@ if (NOT onnxruntime_MINIMAL_BUILD AND NOT onnxruntime_EXTENDED_MINIMAL_BUILD
+   if (CMAKE_SYSTEM_NAME MATCHES "AIX")
+     set_target_properties(onnxruntime_providers_shared PROPERTIES AIX_SHARED_LIBRARY_ARCHIVE OFF)
+   endif()
++  set_target_properties(onnxruntime_providers_shared PROPERTIES VERSION ${ORT_VERSION})
+ 
+   target_compile_definitions(onnxruntime_providers_shared PRIVATE FILE_NAME=\"onnxruntime_providers_shared.dll\")
+ 
+diff --git a/cmake/onnxruntime_providers_cuda.cmake b/cmake/onnxruntime_providers_cuda.cmake
+index 6a7510a5d8..7c7b5c488f 100644
+--- a/cmake/onnxruntime_providers_cuda.cmake
++++ b/cmake/onnxruntime_providers_cuda.cmake
+@@ -260,6 +260,7 @@
+     # ${CMAKE_CURRENT_BINARY_DIR} is so that #include "onnxruntime_config.h" inside tensor_shape.h is found
+     set_target_properties(${target} PROPERTIES LINKER_LANGUAGE CUDA)
+     set_target_properties(${target} PROPERTIES FOLDER "ONNXRuntime")
++    set_target_properties(${target} PROPERTIES VERSION ${ORT_VERSION})
+ 
+     if (onnxruntime_ENABLE_CUDA_PROFILING) # configure cupti for cuda profiling
+       target_link_libraries(${target} PRIVATE CUDA::cupti)
+diff --git a/cmake/onnxruntime_providers_rocm.cmake b/cmake/onnxruntime_providers_rocm.cmake
+index 108b8b46de..2e50307598 100644
+--- a/cmake/onnxruntime_providers_rocm.cmake
++++ b/cmake/onnxruntime_providers_rocm.cmake
+@@ -154,6 +154,7 @@
+ 
+   set_target_properties(onnxruntime_providers_rocm PROPERTIES LINKER_LANGUAGE CXX)
+   set_target_properties(onnxruntime_providers_rocm PROPERTIES FOLDER "ONNXRuntime")
++  set_target_properties(onnxruntime_providers_rocm PROPERTIES VERSION ${ORT_VERSION})
+   target_compile_definitions(onnxruntime_providers_rocm PRIVATE HIPBLAS_V2)
+ 
+   if (onnxruntime_ENABLE_TRAINING)
+-- 
+2.51.0
+

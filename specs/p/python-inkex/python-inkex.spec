@@ -12,7 +12,7 @@ Version:        1.4.0^%{commitdate}git%{shortcommit}
 %forgemeta
 
 Name:           python-%{srcname}
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Python extensions for Inkscape core
 
 License:        GPL-2.0-or-later
@@ -128,6 +128,9 @@ exit 0
 %license LICENSE.txt
  
 %changelog
+* Tue Jan 20 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0^20250307git89726a33-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.4.0^20250307git89726a33-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

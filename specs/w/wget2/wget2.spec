@@ -14,7 +14,7 @@
 
 Name:           wget2
 Version:        2.2.1
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        An advanced file and recursive website downloader
 
 # Documentation is GFDL
@@ -186,6 +186,9 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jan 01 2026 LuK1337 <priv.luk@gmail.com> - 2.2.1-1
 - New version 2.2.1
 

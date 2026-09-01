@@ -13,7 +13,7 @@ Name:           jss
 
 # Upstream version number:
 %global         major_version 5
-%global         minor_version 8
+%global         minor_version 9
 %global         update_version 0
 
 # Downstream release number:
@@ -25,11 +25,9 @@ Name:           jss
 # - development (unsupported): alpha<n> where n >= 1
 # - stabilization (unsupported): beta<n> where n >= 1
 # - GA/update (supported): <none>
-#global         phase
+#global         phase beta1
 
-%if 0%{?rhel} && 0%{?rhel} >= 10
 %global enable_nss_version_pqc_def_flag -DENABLE_NSS_VERSION_PQC_DEF=ON
-%endif
 
 %undefine       timestamp
 %undefine       commit_id
@@ -38,7 +36,7 @@ Summary:        Java Security Services (JSS)
 URL:            https://github.com/dogtagpki/jss
 License:        (MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later) AND Apache-2.0
 Version:        %{major_version}.%{minor_version}.%{update_version}
-Release:        %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}
+Release:        %{release_number}%{?phase:.}%{?phase}%{?timestamp:.}%{?timestamp}%{?commit_id:.}%{?commit_id}%{?dist}.1
 
 # To generate the source tarball:
 # $ git clone https://github.com/dogtagpki/jss.git
@@ -72,7 +70,7 @@ ExcludeArch: i686
 
 # maven-local is a subpackage of javapackages-tools
 
-%if 0%{?fedora} && 0%{?fedora} >= 43
+%if 0%{?fedora} && 0%{?fedora} >= 43 || 0%{?rhel} >= 11
 
 %define java_devel java-25-openjdk-devel
 %define java_headless java-25-openjdk-headless
@@ -112,8 +110,8 @@ BuildRequires:  zip
 BuildRequires:  unzip
 
 BuildRequires:  gcc-c++
-BuildRequires:  nss-devel >= 3.101
-BuildRequires:  nss-tools >= 3.101
+BuildRequires:  nss-devel >= 3.118
+BuildRequires:  nss-tools >= 3.118
 
 BuildRequires:  %{java_devel}
 BuildRequires:  %{maven_local}
@@ -132,7 +130,7 @@ This only works with gcj. Other JREs require that JCE providers be signed.
 
 Summary:        Java Security Services (JSS)
 
-Requires:       nss >= 3.101
+Requires:       nss >= 3.118
 
 Requires:       %{java_headless}
 Requires:       mvn(org.apache.commons:commons-lang3)
@@ -166,7 +164,7 @@ BuildRequires:  mvn(org.apache.tomcat:tomcat-juli) >= 10.1.36
 
 Requires:       %{product_id} = %{version}-%{release}
 Requires:       mvn(org.apache.tomcat:tomcat-catalina) >= 10.1.36
-Requires:       mvn(org.apache.tomcat:tomcat-coyote) >= 10.1.36 
+Requires:       mvn(org.apache.tomcat:tomcat-coyote) >= 10.1.36
 Requires:       mvn(org.apache.tomcat:tomcat-juli) >= 10.1.36
 
 # Tomcat JSS has been replaced with JSS Connector for Tomcat.
@@ -261,6 +259,8 @@ This package provides test suite for JSS.
 %mvn_package org.dogtagpki.jss:jss-tomcat      jss-tomcat
 %mvn_package org.dogtagpki.jss:jss-tomcat-10.1  jss-tomcat
 
+%pom_disable_module tomcat-9.0
+
 ################################################################################
 %build
 ################################################################################
@@ -324,7 +324,6 @@ touch %{_vpath_builddir}/.targets/finished_generate_javadocs
     --cmake="%{__cmake} %{?enable_nss_version_pqc_def_flag}" \
     --java-home=%{java_home} \
     --jni-dir=%{_jnidir} \
-    --version=%{version} \
     --without-java \
     --without-javadoc \
     %{!?with_tests:--without-tests} \
@@ -404,8 +403,20 @@ cp base/target/jss-tests.jar %{buildroot}%{_datadir}/jss/tests/lib
 
 ################################################################################
 %changelog
+* Fri Feb 27 2026 Dogtag PKI Team <devel@lists.dogtagpki.org> 5.9.0-1
+- Rebase to JSS 5.9.0
+
+* Fri Jan 16 2026 Dogtag PKI Team <devel@lists.dogtagpki.org> 5.9.0-0.1.beta1
+- Rebase to JSS 5.9.0-0.1.beta1
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.8.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 04 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> 5.8.0-1
 - Rebase to JSS 5.8.0-1
+
+* Fri Aug 22 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 5.8.0-0.6.beta4
+- Build with Java 25 for ELN
 
 * Mon Aug 11 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> 5.8.0-0.5.beta4
 - Rebuild for Fedora 43

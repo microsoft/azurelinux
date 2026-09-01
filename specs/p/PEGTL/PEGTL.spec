@@ -5,7 +5,7 @@
 
 Name:           PEGTL
 Version:        2.8.3
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        Parsing Expression Grammar Template Library
 License:        MIT
 URL:            https://github.com/taocpp/%{name}

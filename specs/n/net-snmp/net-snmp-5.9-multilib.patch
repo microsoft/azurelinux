@@ -1,5 +1,5 @@
 diff --git a/man/netsnmp_config_api.3.def b/man/netsnmp_config_api.3.def
-index 90b20d9..bd5abe1 100644
+index d4e0c1a..9e3a166 100644
 --- a/man/netsnmp_config_api.3.def
 +++ b/man/netsnmp_config_api.3.def
 @@ -295,7 +295,7 @@ for one particular machine.
@@ -11,7 +11,7 @@ index 90b20d9..bd5abe1 100644
  followed by \fC $HOME/.snmp\fP.
  This list can be changed by setting the environmental variable
  .I SNMPCONFPATH
-@@ -367,7 +367,7 @@ A colon separated list of directories to search for configuration
+@@ -367,7 +367,7 @@ A colon-separated list of directories to search for configuration
  files in.
  Default:
  .br
@@ -34,10 +34,10 @@ index fd30873..c3437d6 100644
  snmptrapd.conf, as well as snmp.local.conf, snmpd.local.conf
  and/or snmptrapd.local.conf. *.local.conf are always
 diff --git a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
-index 7ce8a46..a4000f9 100644
+index 6acd8c7..0a8b9fa 100644
 --- a/man/snmpd.conf.5.def
 +++ b/man/snmpd.conf.5.def
-@@ -1593,7 +1593,7 @@ filename), and call the initialisation routine \fIinit_NAME\fR.
+@@ -1609,7 +1609,7 @@ filename), and call the initialisation routine \fIinit_NAME\fR.
  .RS
  .IP "Note:"
  If the specified PATH is not a fully qualified filename, it will

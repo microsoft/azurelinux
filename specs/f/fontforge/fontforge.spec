@@ -4,34 +4,13 @@
 %global gettext_package FontForge
 
 Name:           fontforge
-Version:        20230101
-Release: 22%{?dist}
+Version:        20251009
+Release:        2%{?dist}
 Summary:        Outline and bitmap font editor
 
 License:        GPL-3.0-or-later
 URL:            http://fontforge.github.io/
 Source0:        https://github.com/fontforge/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-# Fix translations with gettext-0.22, https://github.com/fontforge/fontforge/pull/5257
-Patch0:         0001-Fix-errors-in-French-and-Italian-translations.patch
-# https://github.com/fontforge/fontforge/pull/5367
-# Fixes CVE-2024-25081 and CVE-2024-25082
-Patch1:         https://patch-diff.githubusercontent.com/raw/fontforge/fontforge/pull/5367.patch#/Fix_Splinefont_shell_invocation.patch
-Patch2:         pyconfig.patch
-# https://github.com/fontforge/fontforge/pull/5491
-Patch3:         fix_memleak_in_function_DlgCreate8-5491.patch
-# CVE-2025-15279 https://github.com/fontforge/fontforge/pull/5720
-# https://sourceforge.net/p/fontforge/patches/32/
-Patch4:         https://patch-diff.githubusercontent.com/raw/fontforge/fontforge/pull/5720.patch
-# CVE-2025-15275 https://github.com/fontforge/fontforge/pull/5721
-# https://sourceforge.net/p/fontforge/patches/37/
-Patch5:          https://patch-diff.githubusercontent.com/raw/fontforge/fontforge/pull/5721.patch
-# CVE-2025-15269 https://github.com/fontforge/fontforge/pull/5722
-# https://sourceforge.net/p/fontforge/patches/40/
-Patch6:         https://patch-diff.githubusercontent.com/raw/fontforge/fontforge/pull/5722.patch
-# CVE-2025-15279 https://github.com/fontforge/fontforge/pull/5723
-# https://sourceforge.net/p/fontforge/patches/32/
-Patch7:         https://patch-diff.githubusercontent.com/raw/fontforge/fontforge/pull/5723.patch
-
 
 Requires:       xdg-utils
 Requires:       (autotrace or potrace)
@@ -62,6 +41,8 @@ BuildRequires:  shared-mime-info
 BuildRequires:  gtk3-devel
 BuildRequires:  python3-sphinx
 BuildRequires: make
+# 20151009 version requires below
+BuildRequires: gtkmm3.0-devel
 
 %py_provides python3-fontforge
 %py_provides python3-psMat
@@ -90,11 +71,7 @@ This package contains documentation files for %{name}.
 
 
 %prep
-%autosetup -p1
-
-# Remove tests that requires Internet access
-sed -i '45d;82d;101d;127d' tests/CMakeLists.txt
-
+%autosetup
 
 %build
 export CFLAGS="%{optflags} -fno-strict-aliasing"
@@ -145,10 +122,13 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 %doc %{_pkgdocdir}
 
 %changelog
-* Fri Jan 23 2026 Parag Nemade <pnemade AT redhat DOT com> - 20230101-19
-- Resolves: CVE-2025-15279
-- Resolves: CVE-2025-15275
-- Resolves: CVE-2025-15269
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251009-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Oct 10 2025 Parag Nemade <pnemade AT redhat DOT com> - 20251009-1
+- Update to 20251009 version (#2402960)
+- Remove upstream released patches
+- Add new BR: gtkmm3.0-devel
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20230101-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

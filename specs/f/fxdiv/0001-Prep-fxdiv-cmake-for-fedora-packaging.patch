@@ -54,7 +54,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(multiply-high-test test/multiply-high.cc)
    SET_TARGET_PROPERTIES(multiply-high-test PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(multiply-high-test fxdiv gtest gtest_main)
 +  TARGET_INCLUDE_DIRECTORIES(multiply-high-test PRIVATE include)
@@ -64,7 +64,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(quotient-test test/quotient.cc)
    SET_TARGET_PROPERTIES(quotient-test PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(quotient-test fxdiv gtest gtest_main)
 +  TARGET_INCLUDE_DIRECTORIES(quotient-test PRIVATE include)
@@ -84,7 +84,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(init-bench bench/init.cc)
    SET_TARGET_PROPERTIES(init-bench PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(init-bench fxdiv benchmark)
 +  TARGET_INCLUDE_DIRECTORIES(init-bench PRIVATE include)
@@ -93,7 +93,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(multiply-bench bench/multiply.cc)
    SET_TARGET_PROPERTIES(multiply-bench PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(multiply-bench fxdiv benchmark)
 +  TARGET_INCLUDE_DIRECTORIES(multiply-bench PRIVATE include)
@@ -102,7 +102,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(divide-bench bench/divide.cc)
    SET_TARGET_PROPERTIES(divide-bench PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(divide-bench fxdiv benchmark)
 +  TARGET_INCLUDE_DIRECTORIES(divide-bench PRIVATE include)
@@ -111,7 +111,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(quotient-bench bench/quotient.cc)
    SET_TARGET_PROPERTIES(quotient-bench PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(quotient-bench fxdiv benchmark)
 +  TARGET_INCLUDE_DIRECTORIES(quotient-bench PRIVATE include)
@@ -120,7 +120,7 @@ index bcae6b5..f1f6054 100644
    ADD_EXECUTABLE(round-down-bench bench/round-down.cc)
    SET_TARGET_PROPERTIES(round-down-bench PROPERTIES
 -    CXX_STANDARD 11
-+    CXX_STANDARD 14
++    CXX_STANDARD 17
      CXX_EXTENSIONS YES)
 -  TARGET_LINK_LIBRARIES(round-down-bench fxdiv benchmark)
 +  TARGET_INCLUDE_DIRECTORIES(round-down-bench PRIVATE include)

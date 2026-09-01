@@ -1,4 +1,4 @@
-From 62b1096003369b00139370e7da5b3375968ab1a2 Mon Sep 17 00:00:00 2001
+From 826c154c423e158f0f80b6a1e7fc6cd128870b88 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Sun, 26 Sep 2021 22:40:49 -0400
 Subject: [PATCH 1/7] Increase test timeout for slower architectures
@@ -10,10 +10,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/distributed/tests/test_worker_memory.py b/distributed/tests/test_worker_memory.py
-index 4a222861..f1cc6b75 100644
+index 96589a16..4bc6ade6 100644
 --- a/distributed/tests/test_worker_memory.py
 +++ b/distributed/tests/test_worker_memory.py
-@@ -1097,12 +1097,12 @@ async def test_pause_while_idle(s, a, b):
+@@ -1098,12 +1098,12 @@ async def test_pause_while_idle(s, a, b):
      assert sa in s.running
  
      a.monitor.get_process_memory = lambda: 2**40
@@ -28,7 +28,7 @@ index 4a222861..f1cc6b75 100644
      assert a.address in s.idle
      assert sa in s.running
  
-@@ -1112,17 +1112,17 @@ async def test_pause_while_saturated(c, s, a, b):
+@@ -1113,17 +1113,17 @@ async def test_pause_while_saturated(c, s, a, b):
      sa = s.workers[a.address]
      ev = Event()
      futs = c.map(lambda i, ev: ev.wait(), range(3), ev=ev, workers=[a.address])
@@ -50,7 +50,7 @@ index 4a222861..f1cc6b75 100644
      assert sa in s.running
  
 diff --git a/distributed/utils_test.py b/distributed/utils_test.py
-index 8720dcd8..3f62b200 100644
+index 99928a4e..0d308a54 100644
 --- a/distributed/utils_test.py
 +++ b/distributed/utils_test.py
 @@ -108,7 +108,7 @@ logging_levels = {
@@ -63,5 +63,5 @@ index 8720dcd8..3f62b200 100644
  
  
 -- 
-2.50.0
+2.52.0
 

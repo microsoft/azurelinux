@@ -6,7 +6,7 @@
 
 Name:          sbsigntools
 Version:       0.9.5
-Release: 16%{?dist}
+Release:       14%{?dist}
 Summary:       Signing utility for UEFI secure boot
 # Most source code is GPL-3.0-or-later, except:
 # LicenseRef-Fedora-Public-Domain:
@@ -46,6 +46,8 @@ Patch2:        %{name}-no-wchar_t.patch
 Patch3:        %{name}-no-openssl-engines.patch
 # avoid wrong --target option usage that's been fixed in recent binutils
 Patch4:        %{name}-binutils.patch
+# remove unused variable
+Patch5:        %{name}-unused-var.patch
 # same as gnu-efi
 ExclusiveArch: x86_64 aarch64 %{arm} %{ix86} riscv64
 BuildRequires: make
@@ -94,6 +96,7 @@ Tools to add signatures to EFI binaries and Drivers.
 %patch -p 1 -P 3
 %endif
 %patch -p 1 -P 4
+%patch -p 1 -P 5
 
 %build
 ./autogen.sh
@@ -125,6 +128,12 @@ make check
 %{_mandir}/man1/sbverify.1.*
 
 %changelog
+* Fri Feb 20 2026 Dominik Mierzejewski <dominik@greysector.net> - 0.9.5-15
+- fix build with GCC16 (resolves rhbz#2435092)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.5-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Dec 12 2025 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 0.9.5-13
 - enable RISC-V 64-bit architecture
 

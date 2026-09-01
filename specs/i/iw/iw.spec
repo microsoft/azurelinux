@@ -3,7 +3,7 @@
 
 Name:           iw
 Version:        6.17
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        A nl80211 based wireless configuration tool
 
 # part of sha256.c is public domain
@@ -44,6 +44,9 @@ export CFLAGS="$RPM_OPT_FLAGS" LDFLAGS="$RPM_LD_FLAGS"
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Nov 26 2025 Jose Ignacio Tornos Martinez <jtornosm@redhat.com> - 6.17-1
 - Update to 6.17
 

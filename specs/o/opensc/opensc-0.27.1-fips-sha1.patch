@@ -1,0 +1,41 @@
+commit 0a75757af176a21a9c791de167a05122ee12c377
+Author: Jakub Jelen <jjelen@redhat.com>
+Date:   Sun Apr 19 20:42:44 2026 +0200
+
+    Revert "Do not register SHA1-based mechanisms in FIPS mode"
+    
+    This reverts commit 91e61b9a7667ce0bf62e4b0e872e39a34295eb89.
+    
+    Not registering SHA1 in the OpenSSL module fails later on when registering
+    hash + sign mechanisms, leading to unexpected issues. Alternative solution
+    was to not register the compound mechanisms, but reverting this change
+    looks cleaner. When we will really have FIPS provider without SHA1,
+    it can be resurrected.
+
+diff --git a/src/pkcs11/openssl.c b/src/pkcs11/openssl.c
+index 0a5d4394a..c9c7c7150 100644
+--- a/src/pkcs11/openssl.c
++++ b/src/pkcs11/openssl.c
+@@ -305,14 +305,12 @@ sc_pkcs11_register_openssl_mechanisms(struct sc_pkcs11_card *p11card)
+ #endif
+ #endif /* !defined(OPENSSL_NO_ENGINE) */
+ 
+-	if (!FIPS_mode()) {
+-		openssl_sha1_mech.mech_data = sc_evp_md(context, "sha1");
+-		openssl_sha1_mech.free_mech_data = ossl_md_free;
+-		openssl_sha1_mech.copy_mech_data = ossl_md_copy;
+-		mt = dup_mem(&openssl_sha1_mech, sizeof openssl_sha1_mech);
+-		sc_pkcs11_register_mechanism(p11card, mt, NULL);
+-		sc_pkcs11_free_mechanism(&mt);
+-	}
++	openssl_sha1_mech.mech_data = sc_evp_md(context, "sha1");
++	openssl_sha1_mech.free_mech_data = ossl_md_free;
++	openssl_sha1_mech.copy_mech_data = ossl_md_copy;
++	mt = dup_mem(&openssl_sha1_mech, sizeof openssl_sha1_mech);
++	sc_pkcs11_register_mechanism(p11card, mt, NULL);
++	sc_pkcs11_free_mechanism(&mt);
+ 
+ 	openssl_sha224_mech.mech_data = sc_evp_md(context, "sha224");
+ 	openssl_sha224_mech.free_mech_data = ossl_md_free;
+
+

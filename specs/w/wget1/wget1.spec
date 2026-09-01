@@ -4,7 +4,7 @@
 Summary: A utility for retrieving files using the HTTP or FTP protocols
 Name: wget1
 Version: 1.25.0
-Release: 5%{?dist}
+Release: 4%{?dist}
 # Generally wget is distributed under GPLv3 or later but there are files in lib/ directory
 # which are under LGPLv2.1 or later and are actually built into the resulting rpm.
 # This version of wget is built with gnutls so I believe that the 'with openssl'
@@ -14,6 +14,10 @@ Url: http://www.gnu.org/software/wget/
 Source: https://ftp.gnu.org/gnu/wget/wget-%{version}.tar.gz
 
 Patch1: wget-1.17-path.patch
+Patch2: wget-1.25-fix-cve-2026-15146.patch
+Patch3: wget-1.25-fix-cve-2026-58470.patch
+Patch4: wget-1.25-fix-cve-2026-58471.patch
+Patch5: wget-1.25-fix-cve-2026-58472.patch
 
 Provides: bundled(gnulib) 
 # needed for test suite
@@ -115,6 +119,12 @@ echo ".so man1/%{name}.1" > %{buildroot}%{_mandir}/man1/wget.1
 %config(noreplace) %{_sysconfdir}/wgetrc
 
 %changelog
+* Thu Jul 16 2026 Michal Ruprich <mruprich@redhat.com> - 1.25.0-4
+- Fix for CVE-2026-15146, CVE-2026-58470, CVE-2026-58471, CVE-2026-58472
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.25.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.25.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

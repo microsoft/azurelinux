@@ -4,7 +4,7 @@
 Name:    lksctp-tools
 Summary: User-space access to Linux Kernel SCTP
 Version: 1.0.21
-Release: 4%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-only AND MIT
 Group:   System Environment/Libraries
 URL:     https://github.com/sctp/lksctp-tools/wiki
@@ -80,6 +80,12 @@ find $RPM_BUILD_ROOT -type f -name "*.la" -delete
 %doc doc/*.txt
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Aug 24 2025 Peter Hanecak <hany@hany.sk> - 1.0.21-2
+- Some tests migrated from STI to TMT format (#2382959)
+
 * Sat Aug 23 2025 Peter Hanecak <hany@hany.sk> - 1.0.21-1
 - Updated to 1.0.21
 

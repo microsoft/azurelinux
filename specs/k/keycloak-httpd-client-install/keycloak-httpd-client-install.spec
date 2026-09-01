@@ -16,7 +16,7 @@
 
 Name:           %{srcname}
 Version:        1.3
-Release: 9%{?dist}
+Release:        7%{?dist}
 Summary:        %{summary}
 
 License:        GPL-3.0-or-later
@@ -146,6 +146,9 @@ install -c -m 644 doc/keycloak-httpd-client-install.8 %{buildroot}/%{_mandir}/ma
 %endif
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.3-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

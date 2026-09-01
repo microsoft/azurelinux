@@ -15,7 +15,7 @@
 
 Name:		libsmi
 Version:	0.4.8
-Release: 47%{?dist}
+Release:	45%{?dist}
 Summary:	A library to access SMI MIB information
 # lib/parser-smi.c is GPL-2.0-or-later, but with the Bison exception that says it can be used under any terms
 # as part of the larger libsmi work, so we are choosing to use it under the core libsmi licenses instead.
@@ -136,6 +136,9 @@ make check ||:
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.8-45
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.8-44
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

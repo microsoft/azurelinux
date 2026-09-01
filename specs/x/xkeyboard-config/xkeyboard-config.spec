@@ -13,7 +13,7 @@
 
 Summary:    X Keyboard Extension configuration data
 Name:       xkeyboard-config
-Version:    2.46
+Version:    2.47
 Release:    1%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 License:    HPND AND HPND-sell-variant AND X11 AND X11-distribute-modifications-variant AND MIT AND MIT-open-group AND xkeyboard-config-Zinoviev
 URL:        http://www.freedesktop.org/wiki/Software/XKeyboardConfig
@@ -107,6 +107,12 @@ end
 %{_datadir}/pkgconfig/%{name}.pc
 
 %changelog
+* Wed Feb 25 2026 Peter Hutterer <peter.hutterer@redhat.com> - 2.47-1
+- xkeyboard-config 2.47
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.46-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Oct 09 2025 Peter Hutterer <peter.hutterer@redhat.com> - 2.46-1
 - xkeyboard-config 2.46
 

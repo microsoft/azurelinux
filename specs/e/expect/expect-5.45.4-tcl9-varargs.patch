@@ -1,0 +1,382 @@
+diff -up expect5.45.4/Dbg.c.tcl9-varargs expect5.45.4/Dbg.c
+--- expect5.45.4/Dbg.c.tcl9-varargs	2026-01-19 11:30:36.708477713 +0100
++++ expect5.45.4/Dbg.c	2026-01-19 11:30:36.907634804 +0100
+@@ -50,7 +50,7 @@ static Dbg_OutputProc *printproc = 0;
+ static ClientData printdata = 0;
+ static int stdinmode;
+ 
+-static void print _ANSI_ARGS_(TCL_VARARGS(Tcl_Interp *,interp));
++static void print (Tcl_Interp * interp, ...);
+ 
+ static int debugger_active = FALSE;
+ 
+@@ -1128,13 +1128,13 @@ Tcl_Interp *interp;
+ 
+ /*VARARGS*/
+ static void
+-print TCL_VARARGS_DEF(Tcl_Interp *,arg1)
++print (Tcl_Interp * arg1, ...)
+ {
+ 	Tcl_Interp *interp;
+ 	char *fmt;
+ 	va_list args;
+ 
+-	interp = TCL_VARARGS_START(Tcl_Interp *,arg1,args);
++	interp = (va_start(args, arg1), arg1);
+ 	fmt = va_arg(args,char *);
+ 	if (!printproc) vprintf(fmt,args);
+ 	else {
+diff -up expect5.45.4/exp_chan.c.tcl9-varargs expect5.45.4/exp_chan.c
+diff -up expect5.45.4/exp_clib.c.tcl9-varargs expect5.45.4/exp_clib.c
+--- expect5.45.4/exp_clib.c.tcl9-varargs	2026-01-19 11:30:36.710223069 +0100
++++ expect5.45.4/exp_clib.c	2026-01-19 11:30:36.911312130 +0100
+@@ -2701,7 +2701,7 @@ when trapping, see below in child half o
+ /* returns fd of master side of pty */
+ /*VARARGS*/
+ int
+-exp_spawnl TCL_VARARGS_DEF(char *,arg1)
++exp_spawnl (char * arg1, ...)
+ /*exp_spawnl(va_alist)*/
+ /*va_dcl*/
+ {
+@@ -2709,7 +2709,7 @@ exp_spawnl TCL_VARARGS_DEF(char *,arg1)
+ 	int i;
+ 	char *arg, **argv;
+ 
+-	arg = TCL_VARARGS_START(char *,arg1,args);
++	arg = (va_start(args, arg1), arg1);
+ 	/*va_start(args);*/
+ 	for (i=1;;i++) {
+ 		arg = va_arg(args,char *);
+@@ -2718,7 +2718,7 @@ exp_spawnl TCL_VARARGS_DEF(char *,arg1)
+ 	va_end(args);
+ 	if (i == 0) sysreturn(EINVAL);
+ 	if (!(argv = (char **)malloc((i+1)*sizeof(char *)))) sysreturn(ENOMEM);
+-	argv[0] = TCL_VARARGS_START(char *,arg1,args);
++	argv[0] = (va_start(args, arg1), arg1);
+ 	/*va_start(args);*/
+ 	for (i=1;;i++) {
+ 		argv[i] = va_arg(args,char *);
+@@ -3177,7 +3177,7 @@ struct exp_case *ecases;
+ 
+ /*VARARGS*/
+ int
+-exp_expectl TCL_VARARGS_DEF(int,arg1)
++exp_expectl (int arg1, ...)
+ /*exp_expectl(va_alist)*/
+ /*va_dcl*/
+ {
+@@ -3187,7 +3187,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
+ 	int i;
+ 	enum exp_type type;
+ 
+-	fd = TCL_VARARGS_START(int,arg1,args);
++	fd = (va_start(args, arg1), arg1);
+ 	/* va_start(args);*/
+ 	/* fd = va_arg(args,int);*/
+ 	/* first just count the arg sets */
+@@ -3215,7 +3215,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
+ 		sysreturn(ENOMEM);
+ 
+ 	/* now set up the actual cases */
+-	fd = TCL_VARARGS_START(int,arg1,args);
++	fd = (va_start(args, arg1), arg1);
+ 	/*va_start(args);*/
+ 	/*va_arg(args,int);*/		/*COMPUTED BUT NOT USED*/
+ 	for (ec=ecases;;ec++) {
+@@ -3243,7 +3243,7 @@ exp_expectl TCL_VARARGS_DEF(int,arg1)
+ }
+ 
+ int
+-exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1)
++exp_fexpectl (FILE * arg1, ...)
+ /*exp_fexpectl(va_alist)*/
+ /*va_dcl*/
+ {
+@@ -3253,7 +3253,7 @@ exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1
+ 	int i;
+ 	enum exp_type type;
+ 
+-	fp = TCL_VARARGS_START(FILE *,arg1,args);
++	fp = (va_start(args, arg1), arg1);
+ 	/*va_start(args);*/
+ 	/*fp = va_arg(args,FILE *);*/
+ 	/* first just count the arg-pairs */
+@@ -3284,7 +3284,7 @@ exp_fexpectl TCL_VARARGS_DEF(FILE *,arg1
+ 	va_start(args);
+ 	va_arg(args,FILE *);		/*COMPUTED, BUT NOT USED*/
+ #endif
+-	(void) TCL_VARARGS_START(FILE *,arg1,args);
++	(void) (va_start(args, arg1), arg1);
+ 
+ 	for (ec=ecases;;ec++) {
+ 		ec->type = va_arg(args,enum exp_type);
+@@ -3372,12 +3372,12 @@ exp_disconnect()
+ /* use this function for recording unusual things in the log */
+ /*VARARGS*/
+ void
+-exp_debuglog TCL_VARARGS_DEF(char *,arg1)
++exp_debuglog (char * arg1, ...)
+ {
+     char *fmt;
+     va_list args;
+ 
+-    fmt = TCL_VARARGS_START(char *,arg1,args);
++    fmt = (va_start(args, arg1), arg1);
+     if (exp_debugfile) vfprintf(exp_debugfile,fmt,args);
+     if (exp_is_debugging) {
+ 	vfprintf(stderr,fmt,args);
+@@ -3393,12 +3393,12 @@ exp_debuglog TCL_VARARGS_DEF(char *,arg1
+ /* use this function for error conditions */
+ /*VARARGS*/
+ void
+-exp_errorlog TCL_VARARGS_DEF(char *,arg1)
++exp_errorlog (char * arg1, ...)
+ {
+     char *fmt;
+     va_list args;
+     
+-    fmt = TCL_VARARGS_START(char *,arg1,args);
++    fmt = (va_start(args, arg1), arg1);
+     vfprintf(stderr,fmt,args);
+     if (exp_debugfile) vfprintf(exp_debugfile,fmt,args);
+     if (exp_logfile) vfprintf(exp_logfile,fmt,args);
+diff -up expect5.45.4/exp_closetcl.c.tcl9-varargs expect5.45.4/exp_closetcl.c
+diff -up expect5.45.4/exp_command.c.tcl9-varargs expect5.45.4/exp_command.c
+--- expect5.45.4/exp_command.c.tcl9-varargs	2026-01-19 11:30:36.711825873 +0100
++++ expect5.45.4/exp_command.c	2026-01-19 11:30:36.915784987 +0100
+@@ -165,7 +165,7 @@ init_traps(RETSIGTYPE (*traps[])())
+ /* Do not terminate format strings with \n!!! */
+ /*VARARGS*/
+ void
+-exp_error TCL_VARARGS_DEF(Tcl_Interp *,arg1)
++exp_error (Tcl_Interp * arg1, ...)
+ /*exp_error(va_alist)*/
+ /*va_dcl*/
+ {
+@@ -174,7 +174,7 @@ exp_error TCL_VARARGS_DEF(Tcl_Interp *,a
+     va_list args;
+     char buffer[2000];
+ 
+-    interp = TCL_VARARGS_START(Tcl_Interp *,arg1,args);
++    interp = (va_start(args, arg1), arg1);
+     fmt = va_arg(args,char *);
+     vsprintf(buffer,fmt,args);
+     Tcl_SetResult(interp,buffer,TCL_VOLATILE);
+diff -up expect5.45.4/exp_command.h.tcl9-varargs expect5.45.4/exp_command.h
+diff -up expect5.45.4/exp_console.c.tcl9-varargs expect5.45.4/exp_console.c
+diff -up expect5.45.4/expect_comm.h.tcl9-varargs expect5.45.4/expect_comm.h
+diff -up expect5.45.4/expect.c.tcl9-varargs expect5.45.4/expect.c
+diff -up expect5.45.4/expect.h.tcl9-varargs expect5.45.4/expect.h
+--- expect5.45.4/expect.h.tcl9-varargs	2026-01-19 11:30:36.735212120 +0100
++++ expect5.45.4/expect.h	2026-01-19 11:30:36.963679087 +0100
+@@ -123,34 +123,12 @@ would appreciate credit if this program
+ #endif
+ 
+ /*
+- * Definitions that allow Tcl functions with variable numbers of
+- * arguments to be used with either varargs.h or stdarg.h.  TCL_VARARGS
+- * is used in procedure prototypes.  TCL_VARARGS_DEF is used to declare
+- * the arguments in a function definiton: it takes the type and name of
+- * the first argument and supplies the appropriate argument declaration
+- * string for use in the function definition.  TCL_VARARGS_START
+- * initializes the va_list data structure and returns the first argument.
++ * Standard C varargs header.
++ * Note: TCL_VARARGS, TCL_VARARGS_DEF, TCL_VARARGS_START macros removed
++ * for Tcl9 compatibility. Use standard C varargs instead.
+  */
+ 
+-#if defined(__STDC__) || defined(HAS_STDARG)
+-#   include <stdarg.h>
+-
+-#   define TCL_VARARGS(type, name) (type name, ...)
+-#   define TCL_VARARGS_DEF(type, name) (type name, ...)
+-#   define TCL_VARARGS_START(type, name, list) (va_start(list, name), name)
+-#else
+-#   include <varargs.h>
+-
+-#   ifdef __cplusplus
+-#	define TCL_VARARGS(type, name) (type name, ...)
+-#	define TCL_VARARGS_DEF(type, name) (type va_alist, ...)
+-#   else
+-#	define TCL_VARARGS(type, name) ()
+-#	define TCL_VARARGS_DEF(type, name) (va_alist)
+-#   endif
+-#   define TCL_VARARGS_START(type, name, list) \
+-	(va_start(list), va_arg(list, type))
+-#endif
++#include <stdarg.h>
+ 
+ /*
+  * Macros used to declare a function to be exported by a DLL.
+@@ -444,17 +422,17 @@ EXTERN void exp_slave_control (int,int);
+ EXTERN int exp_logfile_all;
+ EXTERN FILE *exp_debugfile;
+ EXTERN FILE *exp_logfile;
+-extern void exp_debuglog _ANSI_ARGS_(TCL_VARARGS(char *,fmt));
+-extern void exp_errorlog _ANSI_ARGS_(TCL_VARARGS(char *,fmt));
++extern void exp_debuglog (char * fmt, ...);
++extern void exp_errorlog (char * fmt, ...);
+ 
+ EXTERN int exp_disconnect (void);
+ EXTERN FILE *exp_popen	(char *command);
+ EXTERN void (*exp_child_exec_prelude) (void);
+ 
+ #ifndef EXP_DEFINE_FNS
+-EXTERN int exp_spawnl	_ANSI_ARGS_(TCL_VARARGS(char *,file));
+-EXTERN int exp_expectl	_ANSI_ARGS_(TCL_VARARGS(int,fd));
+-EXTERN int exp_fexpectl	_ANSI_ARGS_(TCL_VARARGS(FILE *,fp));
++EXTERN int exp_spawnl	(char * file, ...);
++EXTERN int exp_expectl	(int fd, ...);
++EXTERN int exp_fexpectl	(FILE * fp, ...);
+ #endif
+ 
+ EXTERN int exp_spawnv	(char *file, char *argv[]);
+diff -up expect5.45.4/expect_tcl.h.tcl9-varargs expect5.45.4/expect_tcl.h
+--- expect5.45.4/expect_tcl.h.tcl9-varargs	2026-01-19 11:30:36.736158969 +0100
++++ expect5.45.4/expect_tcl.h	2026-01-19 11:30:36.965267874 +0100
+@@ -52,6 +52,6 @@ EXTERN void	expCloseOnExec (int);
+ EXTERN void	(*exp_app_exit)(Tcl_Interp *);
+ EXTERN void	exp_exit_handlers (ClientData);
+ 
+-EXTERN void	exp_error _ANSI_ARGS_(TCL_VARARGS(Tcl_Interp *,interp));
++EXTERN void	exp_error (Tcl_Interp * interp, ...);
+ 
+ #endif /* _EXPECT_TCL_H */
+diff -up expect5.45.4/exp_event.c.tcl9-varargs expect5.45.4/exp_event.c
+diff -up expect5.45.4/exp_event.h.tcl9-varargs expect5.45.4/exp_event.h
+diff -up expect5.45.4/exp_glob.c.tcl9-varargs expect5.45.4/exp_glob.c
+diff -up expect5.45.4/exp_inter.c.tcl9-varargs expect5.45.4/exp_inter.c
+diff -up expect5.45.4/exp_int.h.tcl9-varargs expect5.45.4/exp_int.h
+diff -up expect5.45.4/exp_log.c.tcl9-varargs expect5.45.4/exp_log.c
+--- expect5.45.4/exp_log.c.tcl9-varargs	2026-01-19 11:30:36.716585443 +0100
++++ expect5.45.4/exp_log.c	2026-01-19 11:30:36.928125061 +0100
+@@ -164,14 +164,14 @@ expLogInteractionU(esPtr,buf,buflen)
+ #define LOGUSER		(tsdPtr->logUser || force_stdout)
+ /*VARARGS*/
+ void
+-expStdoutLog TCL_VARARGS_DEF(int,arg1)
++expStdoutLog (int arg1, ...)
+ {
+     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+     int force_stdout;
+     char *fmt;
+     va_list args;
+ 
+-    force_stdout = TCL_VARARGS_START(int,arg1,args);
++    force_stdout = (va_start(args, arg1), arg1);
+     fmt = va_arg(args,char *);
+ 
+     if ((!tsdPtr->logUser) && (!force_stdout) && (!tsdPtr->logAll)) {
+@@ -217,14 +217,14 @@ int force_stdout;	/* override value of l
+ /* use this function for error conditions */
+ /*VARARGS*/
+ void
+-expErrorLog TCL_VARARGS_DEF(char *,arg1)
++expErrorLog (char * arg1, ...)
+ {
+     ThreadSpecificData *tsdPtr = TCL_TSD_INIT(&dataKey);
+ 
+     char *fmt;
+     va_list args;
+ 
+-    fmt = TCL_VARARGS_START(char *,arg1,args);
++    fmt = (va_start(args, arg1), arg1);
+     (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+ 
+     expDiagWriteChars(bigbuf,-1);
+@@ -256,7 +256,7 @@ char *buf;
+ /* use this function for recording unusual things in the log */
+ /*VARARGS*/
+ void
+-expDiagLog TCL_VARARGS_DEF(char *,arg1)
++expDiagLog (char * arg1, ...)
+ {
+     char *fmt;
+     va_list args;
+@@ -265,7 +265,7 @@ expDiagLog TCL_VARARGS_DEF(char *,arg1)
+ 
+     if ((tsdPtr->diagToStderr == 0) && (tsdPtr->diagChannel == 0)) return;
+ 
+-    fmt = TCL_VARARGS_START(char *,arg1,args);
++    fmt = (va_start(args, arg1), arg1);
+ 
+     (void) vsnprintf(bigbuf,sizeof(bigbuf),fmt,args);
+ 
+@@ -302,14 +302,14 @@ char *str;
+ 
+ /*VARARGS*/
+ void
+-expPrintf TCL_VARARGS_DEF(char *,arg1)
++expPrintf (char * arg1, ...)
+ {
+   char *fmt;
+   va_list args;
+   char bigbuf[2000];
+   int len, rc;
+ 
+-  fmt = TCL_VARARGS_START(char *,arg1,args);
++  fmt = (va_start(args, arg1), arg1);
+   len = vsnprintf(bigbuf,sizeof(bigbuf),arg1,args);
+  retry:
+   rc = write(2,bigbuf,len);
+diff -up expect5.45.4/exp_log.h.tcl9-varargs expect5.45.4/exp_log.h
+--- expect5.45.4/exp_log.h.tcl9-varargs	2026-01-19 11:30:36.738548957 +0100
++++ expect5.45.4/exp_log.h	2026-01-19 11:30:36.969881625 +0100
+@@ -1,9 +1,9 @@
+ /* exp_log.h */
+ 
+-extern void		expErrorLog _ANSI_ARGS_(TCL_VARARGS(char *,fmt));
++extern void		expErrorLog (char * fmt, ...);
+ extern void		expErrorLogU (char *);
+ 
+-extern void		expStdoutLog _ANSI_ARGS_(TCL_VARARGS(int,force_stdout));
++extern void		expStdoutLog (int force_stdout, ...);
+ extern void		expStdoutLogU (char *buf, int force_stdout);
+ 
+ EXTERN void		expDiagInit (void);
+@@ -16,13 +16,13 @@ EXTERN void		expDiagToStderrSet (int);
+ EXTERN void		expDiagWriteBytes (char *,int);
+ EXTERN void		expDiagWriteChars (char *,int);
+ EXTERN void		expDiagWriteObj (Tcl_Obj *);
+-EXTERN void		expDiagLog _ANSI_ARGS_(TCL_VARARGS(char *,fmt));
++EXTERN void		expDiagLog (char * fmt, ...);
+ EXTERN void		expDiagLogU (char *);
+ 
+ EXTERN char *		expPrintify (char *);
+ EXTERN char *		expPrintifyUni (Tcl_UniChar *,int);
+ EXTERN char *		expPrintifyObj (Tcl_Obj *);
+-EXTERN void		expPrintf _ANSI_ARGS_(TCL_VARARGS(char *,fmt));
++EXTERN void		expPrintf (char * fmt, ...);
+ 
+ EXTERN void		expLogInit (void);
+ EXTERN int		expLogChannelOpen (Tcl_Interp *,char *,int);
+diff -up expect5.45.4/exp_main_exp.c.tcl9-varargs expect5.45.4/exp_main_exp.c
+diff -up expect5.45.4/exp_main_sub.c.tcl9-varargs expect5.45.4/exp_main_sub.c
+diff -up expect5.45.4/exp_memmove.c.tcl9-varargs expect5.45.4/exp_memmove.c
+diff -up expect5.45.4/exp_noevent.c.tcl9-varargs expect5.45.4/exp_noevent.c
+diff -up expect5.45.4/exp_poll.c.tcl9-varargs expect5.45.4/exp_poll.c
+diff -up expect5.45.4/exp_prog.h.tcl9-varargs expect5.45.4/exp_prog.h
+diff -up expect5.45.4/exp_pty.c.tcl9-varargs expect5.45.4/exp_pty.c
+diff -up expect5.45.4/exp_pty.h.tcl9-varargs expect5.45.4/exp_pty.h
+diff -up expect5.45.4/exp_regexp.c.tcl9-varargs expect5.45.4/exp_regexp.c
+diff -up expect5.45.4/exp_regexp.h.tcl9-varargs expect5.45.4/exp_regexp.h
+diff -up expect5.45.4/exp_rename.h.tcl9-varargs expect5.45.4/exp_rename.h
+diff -up expect5.45.4/exp_select.c.tcl9-varargs expect5.45.4/exp_select.c
+diff -up expect5.45.4/exp_simple.c.tcl9-varargs expect5.45.4/exp_simple.c
+diff -up expect5.45.4/exp_strf.c.tcl9-varargs expect5.45.4/exp_strf.c
+diff -up expect5.45.4/expTcl.c.tcl9-varargs expect5.45.4/expTcl.c
+diff -up expect5.45.4/expTcl.h.tcl9-varargs expect5.45.4/expTcl.h
+diff -up expect5.45.4/exp_trap.c.tcl9-varargs expect5.45.4/exp_trap.c
+diff -up expect5.45.4/exp_tstamp.h.tcl9-varargs expect5.45.4/exp_tstamp.h
+diff -up expect5.45.4/exp_tty_comm.c.tcl9-varargs expect5.45.4/exp_tty_comm.c
+diff -up expect5.45.4/exp_tty.c.tcl9-varargs expect5.45.4/exp_tty.c
+diff -up expect5.45.4/exp_tty.h.tcl9-varargs expect5.45.4/exp_tty.h
+diff -up expect5.45.4/exp_tty_in.h.tcl9-varargs expect5.45.4/exp_tty_in.h
+diff -up expect5.45.4/exp_win.c.tcl9-varargs expect5.45.4/exp_win.c
+diff -up expect5.45.4/exp_win.h.tcl9-varargs expect5.45.4/exp_win.h
+diff -up expect5.45.4/pty_sgttyb.c.tcl9-varargs expect5.45.4/pty_sgttyb.c
+diff -up expect5.45.4/pty_termios.c.tcl9-varargs expect5.45.4/pty_termios.c
+diff -up expect5.45.4/pty_unicos.c.tcl9-varargs expect5.45.4/pty_unicos.c
+diff -up expect5.45.4/retoglob.c.tcl9-varargs expect5.45.4/retoglob.c
+diff -up expect5.45.4/tcldbg.h.tcl9-varargs expect5.45.4/tcldbg.h

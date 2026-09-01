@@ -11,6 +11,42 @@ set -ueo pipefail
 
 DEFAULT_USER_ID=1000
 
+function create_user() {
+  local rc=0
+
+  while true; do
+    read -r -p "Create a default Unix user account: " username
+
+    # Create the user.
+    rc=$(
+      set +e
+      /usr/sbin/useradd -m -G wheel --uid "$DEFAULT_USER_ID" "$username" > /dev/null
+      echo $?
+    )
+
+    case $rc in
+      # 3: invalid argument to option
+      # 19: Bad login name (since Fedora 42)
+      3 | 19)
+        echo "Invalid username. A valid username must start with a letter or underscore, and can contain letters, digits, underscores, dots, dashes and a dollar sign at the end."
+        continue
+        ;;
+      # 9: username or group name already in use
+      9)
+        echo "User \"$username\" already exists"
+        continue
+        ;;
+      0)
+        break
+        ;;
+      *)
+        echo "Unexpected error code from useradd: $rc"
+        break
+        ;;
+    esac
+  done
+}
+
 # When `cloud-init-main` is enabled it might take care of user creation and other bits, depending on its
 # configuration contained within the WSL image; or the WSL configuration as provided by the host.
 if systemctl is-enabled cloud-init-main.service > /dev/null ; then
@@ -35,19 +71,15 @@ if systemctl is-enabled cloud-init-main.service > /dev/null ; then
   exit 0
 fi
 
-echo 'Please create a default user account. The username does not need to match your Windows username.'
-echo 'For more information visit: https://aka.ms/wslusers'
-
 if getent passwd $DEFAULT_USER_ID > /dev/null ; then
   echo 'User account already exists, skipping creation'
   exit 0
 fi
 
-# Prompt from the username
-read -r -p 'Enter new UNIX username: ' username
+echo 'Please create a default user account. The username does not need to match your Windows username.'
+echo 'For more information visit: https://aka.ms/wslusers'
 
-# Create the user
-/usr/sbin/useradd -m -G wheel --uid $DEFAULT_USER_ID "$username"
+create_user
 
 cat > /etc/sudoers.d/wsluser << EOF
 # Ensure the WSL initial user can use sudo without a password.

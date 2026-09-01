@@ -7,6 +7,7 @@
 .RB [ \-h ]
 .RB [ \-\-minimal ]
 .RB [ \-l ]
+.RB [ \-e\ \fIENCODING_ERA ]
 .RB [ \-\-version ]
 .RI [ input \ ...]
 .SH OPTIONS
@@ -26,6 +27,19 @@ Print only the encoding to standard output.
 .TP
 .B \-l\fR, \fB\-\-legacy
 Rename legacy encodings to more modern ones.
+.TP
+.B \-e\fR, \fB\-\-encoding\-era\ \fIENCODING_ERA
+Which era of encodings to consider
+(default:
+.BR MODERN_WEB ).
+Choices:
+.BR MODERN_WEB ,
+.BR LEGACY_ISO ,
+.BR LEGACY_MAC ,
+.BR LEGACY_REGIONAL ,
+.BR DOS ,
+.BR MAINFRAME ,
+.BR ALL
 .TP
 .B \-\-version
 Show program\(cqs version number and exit.

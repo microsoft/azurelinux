@@ -9,11 +9,14 @@
 
 Name: hunspell-as
 Summary: Assamese hunspell dictionaries
-Version: 1.0.3
-Release: 38%{?dist}
-Source: https://downloads.sourceforge.net/project/aoo-extensions/2318/4/as_in.oxt
-URL: https://extensions.openoffice.org/en/project/assamese-dictionaryspell-checker
-License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1
+Epoch: 1
+Version: 1.0.1.2resigned1
+Release: 3%{?dist}
+Source0: https://addons.mozilla.org/firefox/downloads/file/4270589/assamese_spell_checker-1.0.1.2resigned1.xpi
+Source1: https://github.com/LibreOffice/dictionaries/raw/refs/heads/master/as_IN/README_as_IN.txt
+URL: https://addons.mozilla.org/en-US/firefox/addon/assamese-spell-checker/
+# license tag explicitly mentioned on website
+License: GPL-3.0-only
 BuildArch: noarch
 
 Requires: hunspell-filesystem
@@ -23,20 +26,30 @@ Supplements: (hunspell and langpacks-as)
 Assamese hunspell dictionaries.
 
 %prep
-%autosetup -c -n hunspell-as
+%autosetup -c
+cp -p %{SOURCE1} .
 
 %build
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
-cp -p as_IN.* $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/
+cp -p dictionaries/as-IN.dic $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/as_IN.dic
+cp -p dictionaries/as-IN.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/as_IN.aff
 
 %files
 %doc README_as_IN.txt
-%license COPYING COPYING.MPL COPYING.GPL COPYING.LGPL
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.0.1.2resigned1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Nov 29 2025 Parag Nemade <pnemade AT redhat DOT com> - 1.0.1.2resigned1-2
+- Use the correct SPDX format for license tag
+
+* Mon Nov 24 2025 Parag Nemade <pnemade AT redhat DOT com> - 1.0.1.2resigned1-1
+- Move to new upstream Firefox add-ons website
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-35
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

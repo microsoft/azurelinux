@@ -1,0 +1,27 @@
+diff -up tboot-1.11.7/safestringlib/safeclib/strpbrk_s.c.orig tboot-1.11.7/safestringlib/safeclib/strpbrk_s.c
+--- tboot-1.11.7/safestringlib/safeclib/strpbrk_s.c.orig	2024-09-25 09:05:53.000000000 -0400
++++ tboot-1.11.7/safestringlib/safeclib/strpbrk_s.c	2026-01-30 06:42:03.232165244 -0500
+@@ -92,7 +92,6 @@ strpbrk_s (char *dest, rsize_t dmax,
+            char *src,  rsize_t slen, char **first)
+ {
+     char *ps;
+-    rsize_t len;
+ 
+     if (first == NULL) {
+         invoke_safe_str_constraint_handler("strpbrk_s: count is null",
+@@ -143,7 +142,6 @@ strpbrk_s (char *dest, rsize_t dmax,
+     while (*dest && dmax) {
+ 
+         ps = src;
+-        len = slen;
+         while (*ps) {
+ 
+             /* check for a match with the substring */
+@@ -152,7 +150,6 @@ strpbrk_s (char *dest, rsize_t dmax,
+                 return RCNEGATE(EOK);
+             }
+             ps++;
+-            len--;
+         }
+         dest++;
+         dmax--;

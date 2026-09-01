@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 10;
+    release_number = 29;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -42,7 +42,7 @@ Source102:     https://keys.openpgp.org/vks/v1/by-fingerprint/12BB9B400EE3F77282
 Source4:       dotemacs.el
 Source5:       site-start.el
 Source6:       default.el
-Source9:       emacs-desktop.sh
+Source9:       emacs-desktop.sh.in
 
 Source10:      emacs_lisp.attr
 Source11:      emacs_lisp.rec
@@ -74,6 +74,20 @@ Patch:         0002-Fall-back-to-the-terminal-from-pure-GTK-when-no-disp.patch
 # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=49505#67
 Patch:         0001-Don-t-specify-StartupWMClass-in-emacs.desktop.patch
 
+# CVE-2026-6861
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=80851
+# https://bugzilla.redhat.com/show_bug.cgi?id=2460586
+Patch:         0001-src-image.c-svg_load_image-Fix-off-by-one-mistake-bu.patch
+
+# Nullify 'read-symbol-shorthands' around risky 'intern' calls.
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=80574#227
+Patch:         0001-Mitigate-arbitrary-code-execution-vulnerability.patch
+
+# CVE-2026-77219
+# https://debbugs.gnu.org/cgi/bugreport.cgi?bug=81344
+# https://bugzilla.redhat.com/show_bug.cgi?id=2523273
+Patch:         0001-Fix-undefined-behavior-in-pbm_load.patch
+
 BuildRequires: alsa-lib-devel
 BuildRequires: atk-devel
 BuildRequires: autoconf
@@ -102,7 +116,6 @@ BuildRequires: libpng-devel
 BuildRequires: librsvg2-devel
 BuildRequires: libselinux-devel
 BuildRequires: libtiff-devel
-BuildRequires: libtree-sitter-devel
 BuildRequires: libwebp-devel
 BuildRequires: libxml2-devel
 BuildRequires: m17n-lib-devel
@@ -112,6 +125,12 @@ BuildRequires: sqlite-devel
 BuildRequires: systemd-devel
 BuildRequires: texinfo
 BuildRequires: zlib-devel
+
+%if v"%{version}" < v"31"
+BuildRequires: pkgconfig(tree-sitter) < 0.26
+%else
+BuildRequires: pkgconfig(tree-sitter)
+%endif
 
 %if %{with gpm}
 BuildRequires: gpm-devel
@@ -164,6 +183,10 @@ Suggests:      (emacs-nw if fedora-release-container)
 Suggests:      (emacs-nw if fedora-release-coreos)
 Suggests:      (emacs-gtk+x11 if fedora-release-i3)
 Suggests:      (emacs-nw if fedora-release-iot)
+Suggests:      (emacs-pgtk if fedora-release-kde)
+Suggests:      (emacs-pgtk if fedora-release-kde-mobile)
+Suggests:      (emacs-pgtk if fedora-release-kinoite)
+Suggests:      (emacs-pgtk if fedora-release-kinoite-mobile)
 Suggests:      (emacs-gtk+x11 if fedora-release-matecompiz)
 Suggests:      (emacs-pgtk if fedora-release-miraclewm)
 Suggests:      (emacs-pgtk if fedora-release-miraclewm-atomic)
@@ -185,10 +208,6 @@ Suggests:      (emacs-gtk+x11 if fedora-release-xfce)
 # Suggests:      (emacs- if fedora-release-cosmic)
 # Suggests:      (emacs- if fedora-release-cosmic-atomic)
 # Suggests:      (emacs- if fedora-release-designsuite)
-# Suggests:      (emacs- if fedora-release-kde)
-# Suggests:      (emacs- if fedora-release-kde-mobile)
-# Suggests:      (emacs- if fedora-release-kinoite)
-# Suggests:      (emacs- if fedora-release-kinoite-mobile)
 # Suggests:      (emacs- if fedora-release-lxqt)
 # Suggests:      (emacs- if fedora-release-soas)
 # Suggests:      (emacs- if fedora-release-wsl)
@@ -208,7 +227,6 @@ Requires(posttrans): /usr/sbin/alternatives
 Requires:      emacs-common = %{epoch}:%{version}-%{release}
 Requires:      libpixbufloader-xpm.so%{?marker}
 Supplements:   ((libwayland-server and emacs) unless emacs-nw)
-Obsoletes:     emacs < 1:30.2-4
 
 %description pgtk
 %desc
@@ -282,7 +300,7 @@ License:       GPL-3.0-or-later AND GFDL-1.3-no-invariants-or-later AND BSD-3-Cl
 Requires(preun): /usr/sbin/alternatives
 Requires(posttrans): /usr/sbin/alternatives
 Requires:      /usr/bin/readlink
-Requires:      %{name}-filesystem
+Requires:      %{name}-filesystem >= 1:30.2
 Requires:      emacsclient
 Requires:      libgccjit
 Recommends:    emacs = %{epoch}:%{version}-%{release}
@@ -482,10 +500,39 @@ cat > macros.emacs << EOF
 %%_emacs_version %{version}
 %%_emacs_ev %{?epoch:%{epoch}:}%{version}
 %%_emacs_evr %{?epoch:%{epoch}:}%{version}-%{release}
+%%_emacs_archsitelispdir %%{_libdir}/emacs/site-lisp
 %%_emacs_sitelispdir %{site_lisp}
 %%_emacs_sitestartdir %{site_start_d}
 %%_emacs_bytecompile(W) /usr/bin/emacs -batch --no-init-file --no-site-file --eval '(push nil load-path)' %%{-W:--eval '(setq byte-compile-error-on-warn t)' }-f batch-byte-compile %%*
 EOF
+
+cat > 00-dynamic-module-dir.el << 'EOF'
+;;; 00-dynamic-module-dir.el --- Add arch-specifc dir to load-path -*- lexical-binding: t -*-
+
+;;; Commentary:
+;;
+;; This directory is for installing Emacs dynamic modules into.  See
+;; also RPM macro %%_emacs_archsitelispdir.
+
+(add-to-list 'load-path "%{_libdir}/emacs/site-lisp")
+
+;;; 00-dynamic-module-dir.el ends here
+EOF
+
+cat > 10-source-directory.el << 'EOF'
+;;; 10-source-directory.el --- Set source-directory -*- lexical-binding: t -*-
+
+;;; Commentary:
+;;
+;; This solves rhbz#474958; Function `update-directory-autoloads' now
+;; finally works.
+
+(setq source-directory "%{_datadir}/emacs/%{version}/")
+
+;;; 10-source-directory.el ends here
+EOF
+
+sed -e 's|@bindir@|%{_bindir}|' %SOURCE9 > emacs-desktop.sh
 
 
 %install
@@ -541,23 +588,17 @@ ln -s emacs-%{version}-nw %{buildroot}%{_bindir}/emacs-nox
 # Make sure movemail isn't setgid
 chmod 755 %{buildroot}%{emacs_libexecdir}/movemail
 
-mkdir -p %{buildroot}%{site_lisp}
+mkdir -p %{buildroot}%{site_lisp} %{buildroot}%{site_start_d}
 install -p -m 0644 %SOURCE5 %{buildroot}%{site_lisp}/site-start.el
 install -p -m 0644 %SOURCE6 %{buildroot}%{site_lisp}
+install -p -m 0644 00-dynamic-module-dir.el %{buildroot}%{site_start_d}/
+install -p -m 0644 10-source-directory.el %{buildroot}%{site_start_d}/
 
-# This solves bz#474958, "update-directory-autoloads" now finally
-# works the path is different each version, so we'll generate it here
-echo "(setq source-directory \"%{_datadir}/emacs/%{version}/\")" \
- >> %{buildroot}%{site_lisp}/site-start.el
-
-mv %{buildroot}%{_bindir}/{etags,etags.emacs}
 mv %{buildroot}%{_mandir}/man1/{ctags.1.gz,gctags.1.gz}
-mv %{buildroot}%{_mandir}/man1/{etags.1.gz,etags.emacs.1.gz}
 mv %{buildroot}%{_bindir}/{ctags,gctags}
+
 # BZ 927996
 mv %{buildroot}%{_infodir}/{info.info.gz,info.gz}
-
-mkdir -p %{buildroot}%{site_lisp}/site-start.d
 
 # Default initialization file
 mkdir -p %{buildroot}%{_sysconfdir}/skel
@@ -580,7 +621,7 @@ install -p -m 0644 macros.emacs %{buildroot}%{_rpmmacrodir}
 rm -f %{buildroot}%{_infodir}/dir
 
 # Install a wrapper to avoid running the Wayland-only build on X11
-install -p -m 0755 %SOURCE9 %{buildroot}%{_bindir}/emacs-desktop
+install -p -m 0755 emacs-desktop.sh %{buildroot}%{_bindir}/emacs-desktop
 
 # Remove duplicate desktop-related files
 rm %{buildroot}%{_datadir}/%{name}/%{version}/etc/%{name}.{desktop,metainfo.xml,service} \
@@ -743,13 +784,7 @@ fi
 %endif
 
 %preun common
-if [ $1 = 0 ]; then
-  /usr/sbin/alternatives --remove emacs.etags %{_bindir}/etags.emacs || :
-fi
-
-%posttrans common
-/usr/sbin/alternatives --install %{_bindir}/etags emacs.etags %{_bindir}/etags.emacs 80 \
-       --slave %{_mandir}/man1/etags.1.gz emacs.etags.man %{_mandir}/man1/etags.emacs.1.gz || :
+/usr/sbin/alternatives --remove emacs.etags %{_bindir}/etags.emacs || :
 
 
 %files
@@ -797,8 +832,7 @@ fi
 %license build-pgtk/etc/COPYING
 %doc build-pgtk/doc/NEWS build-pgtk/BUGS build-pgtk/README
 %{_bindir}/ebrowse
-%ghost %{_bindir}/etags
-%{_bindir}/etags.emacs
+%{_bindir}/etags
 %{_bindir}/gctags
 %{_datadir}/applications/emacs.desktop
 %{_datadir}/applications/emacs-mail.desktop
@@ -809,13 +843,11 @@ fi
 %{_datadir}/icons/hicolor/scalable/mimetypes/emacs-document.svg
 %{_mandir}/man1/ebrowse.1*
 %{_mandir}/man1/emacs.1*
-%{_mandir}/man1/etags.emacs.1*
-%ghost %{_mandir}/man1/etags.1.gz
+%{_mandir}/man1/etags.1*
 %{_mandir}/man1/gctags.1*
 %dir %{_datadir}/emacs/%{version}
 %{_datadir}/emacs/%{version}/etc
 %{_datadir}/emacs/%{version}/site-lisp
-%dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/%{version}
 %dir %{native_lisp}
 %dir %{_libexecdir}/emacs
@@ -835,33 +867,92 @@ fi
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:30.2-10
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 1:30.2-29
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:30.2-9
-- build: mass rebuild auto-bumpable components
+* Tue Aug 25 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-28
+- Fix CVE-2026-77219: Integer overflow in PBM/PPM/PGM image loader
+  (rhbz#2523273)
 
-* Thu Apr 30 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:30.2-8
-- fix(vim): disable optional gpm (console-mouse) support
+* Fri Aug 07 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-27
+- Remember to include patch.
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 1:30.2-7
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Fri Aug 07 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-26
+- Mitigate arbitrary code execution vulnerability around risky 'intern'
+  calls.
+
+* Thu May 14 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-25
+- gdk-pixbuf2 2.44.6 returns libpixbufloader-xpm.so
+
+* Mon Apr 27 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-24
+- Use Tree-sitter 0.25 compatibility package until Emacs 31.
+
+* Wed Apr 22 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-23
+- Fix CVE-2026-6861: memory corruption vulnerability when processing SVG
+  CSS.
+
+* Tue Mar 31 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-22
+- Fix bad backport of Tree-sitter 0.26 compatibility patch.
+
+* Mon Mar 30 2026 Andreas Schneider <asn@cryptomilk.org> - 1:30.2-21
+- Rebuild against tree-sitter-0.26.7-2.fc45
+
+* Fri Mar 27 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-20
+- Recent KDEs default to Wayland, so Suggest PGTK build there.
+
+* Mon Mar 23 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-19
+- Fix emacs-desktop wrapper when %%{_bindir} != /usr/bin
+
+* Thu Mar 19 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-18
+- libpixbufloader-xpm.so no-longer required with recent Glycin.
+
+* Thu Mar 19 2026 Peter Oliver <git@mavit.org.uk>
+- libpixbufloader-xpm.so no-longer required with recent Glycin.
+
+* Tue Feb 03 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-16
+- Fix typo.
+
+* Tue Feb 03 2026 Peter Oliver <git@mavit.org.uk> - 1:30.2-15
+- Detect Tree-sitter parsers loaded via define-treesit-generic-mode.
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:30.2-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 10 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-13
+- Eliminate “File listed twice” warning.
+
+* Wed Dec 10 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-12
+- Fix Tree-sitter 0.26 patch for Emacs 30.
+
+* Wed Dec 10 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-11
+- Support Tree-sitter version 0.26 and later (rhbz#2420305).
+
+* Tue Nov 25 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-10
+- Move ownership of %%{_libdir}/emacs to emacs-filesystem package.
+
+* Mon Nov 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-9
+- New RPM macro %%_emacs_archsitelispdir for Emacs dynamic modules.
+
+* Mon Nov 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-8
+- Set source-directory via site-start.d dropin.
+
+* Fri Nov 14 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-7
+- Drop alternatives for etags
 
 * Fri Nov 14 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-6
-- Glob doesn’t work with the %%ghost macro
-
-* Fri Nov 14 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-5
 - Own etags and man page (rhbz#2414055).
 
-* Fri Oct 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-4
-- Bump release until F43 overtakes F41.
+* Tue Oct 14 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-5
+- Enable lexical binding in `site-start.el` and `default.el`
 
-* Fri Oct 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-3
-- Bump release until F43 overtakes F41.
+* Tue Oct 14 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-4
+- Recent vanilla ~/.emacs defaults to lexical binding.
 
-* Fri Oct 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-2
-- Ensure on upgrade from F42/F41 that emacs-pgtk replaces emacs
-  (rhbz#2406058)
+* Wed Sep 24 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-3
+- Rebuild against tree-sitter-0.25.10-1.fc44
+
+* Tue Sep 09 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-2
+- Rebuild against tree-sitter-0.25.9-1.fc44
 
 * Fri Aug 15 2025 Peter Oliver <git@mavit.org.uk> - 1:30.2-1
 - Update to version 30.2, fixing rhbz#2388544

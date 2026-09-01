@@ -1,45 +1,44 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-Name: libasyncns
+Name:    libasyncns
 Version: 0.8
 Release: 34%{?dist}
 Summary: Asynchronous Name Service Library
-Source0: http://0pointer.de/lennart/projects/libasyncns/libasyncns-%{version}.tar.gz
 License: LGPL-2.1-or-later
-Url: http://0pointer.de/lennart/projects/libasyncns/
+URL:     http://0pointer.de/lennart/projects/libasyncns/
+Source0: %{url}/%{name}-%{version}.tar.gz
+Patch0:  pkg-config-multiarch.patch
+Patch1:  equality_in_assert.patch
 
 BuildRequires:  gcc
-BuildRequires: make
+BuildRequires:  make
 %description
 A small and lightweight library that implements easy to use asynchronous
 wrappers around the libc NSS functions getaddrinfo(), res_query() and related.
 
 %package devel
 Summary: Development Files for libasyncns Client Development
-Requires: %{name} = %{version}-%{release}
-Requires: pkgconfig
+Requires: %{name}%{?_isa} = %{version}-%{release}
 
 %description devel
 Development Files for libasyncns Client Development
 
-%ldconfig_scriptlets
-
 %prep
-%setup -q
+%autosetup -p1
 
 %build
 %configure --disable-static
-make %{?_smp_mflags}
+%{make_build}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
-find $RPM_BUILD_ROOT \( -name *.a -o -name *.la \) -exec rm {} \;
-rm -rf $RPM_BUILD_ROOT/usr/share/doc/libasyncns/
+%{make_install}
+find %{buildroot} \( -name *.a -o -name *.la \) -exec rm {} \;
+rm -rf %{buildroot}%{_datadir}/doc/libasyncns/
 
 %files
-%doc README LICENSE
+%doc README
+%license LICENSE
 %{_libdir}/libasyncns.so.*
 
 %files devel
@@ -48,6 +47,15 @@ rm -rf $RPM_BUILD_ROOT/usr/share/doc/libasyncns/
 %{_libdir}/pkgconfig/libasyncns.pc
 
 %changelog
+* Thu Jun 04 2026 Leigh Scott <leigh123linux@gmail.com> - 0.8-34
+- Add debian patches (RHBZ#2264221)
+
+* Thu Jun 04 2026 Leigh Scott <leigh123linux@gmail.com> - 0.8-33
+- Clean up
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-32
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.8-31
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

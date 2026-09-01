@@ -8,14 +8,3 @@
  REP 27
  REP f ph
  REP ph f
---- scowl/speller/en.aff	2010-04-15 14:56:37.000000000 +0100
-+++ scowl/speller/en.aff	2010-04-15 14:57:08.000000000 +0100
-@@ -12,7 +12,7 @@
- COMPOUNDRULE 2
- COMPOUNDRULE n*1t
- COMPOUNDRULE n*mp
--WORDCHARS 0123456789
-+WORDCHARS 0123456789'
- 
- PFX A Y 1
- PFX A   0     re         .

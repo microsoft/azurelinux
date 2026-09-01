@@ -6,7 +6,7 @@
 
 Name:           python-iniparse
 Version:        0.5.1
-Release: 9%{?dist}
+Release:        7%{?dist}
 Summary:        Accessing and Modifying INI files
 
 # From LICENSE:
@@ -64,6 +64,9 @@ rm -vfr %{buildroot}%{_docdir}/*
 %doc README.md Changelog html/
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.5.1-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

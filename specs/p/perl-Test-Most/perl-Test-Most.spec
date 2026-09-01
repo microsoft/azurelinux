@@ -3,7 +3,7 @@
 
 Name:           perl-Test-Most
 Version:        0.38
-Release: 11%{?dist}
+Release:        9%{?dist}
 Summary:        Perl module with test functions and features
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Test-Most
@@ -75,6 +75,9 @@ make test
 %{_mandir}/man3/Test::Most::Exception.3*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.38-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.38-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

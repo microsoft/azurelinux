@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           ansible-collection-community-general
-Version:        11.4.2
-Release: 4%{?dist}
+Version:        12.6.0
+Release:        1%{?dist}
 Summary:        Modules and plugins supported by Ansible community
 
 # rg --pcre2 -g '!tests/sanity/extra/licenses.py' 'SPDX-License-Identifier: (?!GPL-3\.0-or-later)' | sort | sed 's|^|# |'
@@ -89,11 +89,31 @@ find -type f ! -executable -name '*.py' -print -exec sed -i -e '1{\@^#!.*@d}' '{
 %doc README.md CHANGELOG.rst CHANGELOG.md
 
 %changelog
-* Fri Dec 05 2025 Maxwell G <maxwell@gtmx.me> - 11.4.2-1
-- Update to 11.4.2.
+* Thu Apr 30 2026 Maxwell G <maxwell@gtmx.me> - 12.6.0-1
+- Update to 12.6.0. Fixes rhbz#2459707.
 
-* Mon Nov 17 2025 Maxwell G <maxwell@gtmx.me> - 11.4.1-1
-- Update to 11.4.1.
+* Tue Mar 31 2026 Maxwell G <maxwell@gtmx.me> - 12.5.0-1
+- Update to 12.5.0. Fixes rhbz#2450480.
+
+* Tue Feb 24 2026 Maxwell G <maxwell@gtmx.me> - 12.4.0-1
+- Update to 12.4.0. Fixes rhbz#2441968.
+
+* Thu Feb 12 2026 Maxwell G <maxwell@gtmx.me> - 12.3.0-1
+- Update to 12.3.0. Fixes rhbz#2425788.
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.1.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Dec 05 2025 Packit <hello@packit.dev> - 12.1.0-1
+- Update to version 12.1.0
+- Resolves: rhbz#2419144
+
+* Mon Nov 10 2025 Packit <hello@packit.dev> - 12.0.1-1
+- Update to version 12.0.1
+- Resolves: rhbz#2401965
 
 * Mon Sep 08 2025 Packit <hello@packit.dev> - 11.3.0-1
 - Update to version 11.3.0

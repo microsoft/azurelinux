@@ -1,0 +1,18 @@
+--- a/pyproject.orig.toml	2026-01-26 17:43:46.000000000 +0100
++++ b/pyproject.toml	2026-01-31 17:54:34.505475024 +0100
+@@ -55,10 +53,13 @@
+     "-DBUILD_IDA:BOOL=OFF",
+     "-DEXAMPLES_ENABLE_C:BOOL=OFF",
+     "-DEXAMPLES_ENABLE_CXX:BOOL=OFF",
+-    "-DSUNDIALS_ENABLE_PYTHON:BOOL=ON"
++    "-DSUNDIALS_ENABLE_PYTHON:BOOL=ON",
++    "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
++    "-DCMAKE_C_FLAGS_RELEASE:STRING=${CFLAGS}",
++    "-DCMAKE_CXX_FLAGS_RELEASE:STRING=${CXXFLAGS}"
+ ]
+ 
+-cmake.build-type = "RelWithDebInfo"
++cmake.build-type = "Release"
+ 
+ [tool.pytest.ini_options]
+ addopts = [

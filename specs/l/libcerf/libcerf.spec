@@ -2,9 +2,9 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libcerf
-Version:        3.1
+Version:        3.3
 %global         sover 3
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        A library that provides complex error functions
 
 License:        MIT
@@ -43,11 +43,7 @@ developing applications that use %{name}.
 # avoid non-portable default build flags (-march=native -O3), by setting overwrite
 # CERF_COMPILE_OPTIONS to a harmless flags like -Wall and let cmake do its thing
 %cmake -DCERF_COMPILE_OPTIONS='-Wall' \
-%ifarch s390x
-    -DCERF_IEEE754=OFF
-%else
     %{nil}
-%endif
 %cmake_build
 
 
@@ -76,6 +72,17 @@ mv $RPM_BUILD_ROOT/%{_datadir}/doc/cerf/html $RPM_BUILD_ROOT/%{_datadir}/doc/%{n
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Oct 25 2025 Christoph Junghans <junghans@votca.org> - 3.3-1
+- Version bump to v3.3
+- Fixes: rhbz#2406304
+
+* Fri Aug 22 2025 Christoph Junghans <junghans@votca.org> - 3.2-1
+- Version bump to v3.2
+- Fixes: rhbz#2390270
+
 * Tue Aug 12 2025 Dan Horák <dan[at]danny.cz> - 3.1-2
 - fix build on s390x
 

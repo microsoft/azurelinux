@@ -1,0 +1,110 @@
+From fa7a55949a30fed064a28ea6f0c801fc5e8c5ba7 Mon Sep 17 00:00:00 2001
+From: Alexey Tikhonov <atikhono@redhat.com>
+Date: Mon, 29 Jun 2026 21:46:46 +0200
+Subject: [PATCH] PAM: fix use-after-free during p11_child processing
+
+`pam_check_cert_send()` stored `pctx->sss_certmap_ctx` in the
+request state. If `p11_refresh_certmap_ctx()` ran while `p11_child`
+was still executing (e.g. triggered by a domain refresh), it freed
+and replaced the certmap context, leaving the request state holding
+a dangling pointer. `p11_child_done()` could later use that pointer.
+
+Fix this by passing the `pam_ctx` into `pam_check_cert_send()` and
+dereferencing `pctx->sss_certmap_ctx` at the time it is actually needed
+in `p11_child_done()`, so the current context is always used.
+
+Resolves: https://github.com/SSSD/sssd/issues/8796
+Fixes: CVE-2026-12610
+
+Assisted-By: Claude Code (Opus 4.6)
+Reviewed-by: Iker Pedrosa <ipedrosa@redhat.com>
+Reviewed-by: Sumit Bose <sbose@redhat.com>
+---
+ src/responder/pam/pamsrv.h     |  2 +-
+ src/responder/pam/pamsrv_cmd.c |  2 +-
+ src/responder/pam/pamsrv_p11.c | 11 ++++++-----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/src/responder/pam/pamsrv.h b/src/responder/pam/pamsrv.h
+index 694b391bb..162bfe1a4 100644
+--- a/src/responder/pam/pamsrv.h
++++ b/src/responder/pam/pamsrv.h
+@@ -153,7 +153,7 @@ struct tevent_req *pam_check_cert_send(TALLOC_CTX *mem_ctx,
+                                        const char *ca_db,
+                                        time_t timeout,
+                                        const char *verify_opts,
+-                                       struct sss_certmap_ctx *sss_certmap_ctx,
++                                       struct pam_ctx *pctx,
+                                        const char *uri,
+                                        struct pam_data *pd);
+ errno_t pam_check_cert_recv(struct tevent_req *req, TALLOC_CTX *mem_ctx,
+diff --git a/src/responder/pam/pamsrv_cmd.c b/src/responder/pam/pamsrv_cmd.c
+index cd003ff46..7fadf647d 100644
+--- a/src/responder/pam/pamsrv_cmd.c
++++ b/src/responder/pam/pamsrv_cmd.c
+@@ -1945,7 +1945,7 @@ static errno_t check_cert(TALLOC_CTX *mctx,
+ 
+     req = pam_check_cert_send(mctx, ev,
+                               pctx->ca_db, p11_child_timeout,
+-                              cert_verification_opts, pctx->sss_certmap_ctx,
++                              cert_verification_opts, pctx,
+                               uri, pd);
+     if (req == NULL) {
+         DEBUG(SSSDBG_OP_FAILURE, "pam_check_cert_send failed.\n");
+diff --git a/src/responder/pam/pamsrv_p11.c b/src/responder/pam/pamsrv_p11.c
+index 191bf40c5..29a6edc05 100644
+--- a/src/responder/pam/pamsrv_p11.c
++++ b/src/responder/pam/pamsrv_p11.c
+@@ -749,7 +749,7 @@ done:
+ 
+ struct pam_check_cert_state {
+     struct tevent_context *ev;
+-    struct sss_certmap_ctx *sss_certmap_ctx;
++    struct pam_ctx *pctx;
+     struct child_io_fds *io;
+     struct cert_auth_info *cert_list;
+     struct pam_data *pam_data;
+@@ -763,7 +763,7 @@ struct tevent_req *pam_check_cert_send(TALLOC_CTX *mem_ctx,
+                                        const char *ca_db,
+                                        time_t timeout,
+                                        const char *verify_opts,
+-                                       struct sss_certmap_ctx *sss_certmap_ctx,
++                                       struct pam_ctx *pctx,
+                                        const char *uri,
+                                        struct pam_data *pd)
+ {
+@@ -791,11 +791,12 @@ struct tevent_req *pam_check_cert_send(TALLOC_CTX *mem_ctx,
+         goto done;
+     }
+ 
+-    if (sss_certmap_ctx == NULL) {
++    if (pctx == NULL || pctx->sss_certmap_ctx == NULL) {
+         DEBUG(SSSDBG_CRIT_FAILURE, "Missing certificate matching context.\n");
+         ret = EINVAL;
+         goto done;
+     }
++    state->pctx = pctx;
+ 
+     state->pam_data = pd;
+ 
+@@ -880,7 +881,6 @@ struct tevent_req *pam_check_cert_send(TALLOC_CTX *mem_ctx,
+     }
+ 
+     state->ev = ev;
+-    state->sss_certmap_ctx = sss_certmap_ctx;
+ 
+     ret = sss_child_start(state, ev,
+                           P11_CHILD_PATH, extra_args, false,
+@@ -985,7 +985,8 @@ static void p11_child_done(struct tevent_req *subreq)
+ 
+     FD_CLOSE(state->io->read_from_child_fd);
+ 
+-    ret = parse_p11_child_response(state, buf, buf_len, state->sss_certmap_ctx,
++    ret = parse_p11_child_response(state, buf, buf_len,
++                                   state->pctx->sss_certmap_ctx,
+                                    &state->cert_list);
+     if (ret != EOK) {
+         if (ret == ERR_P11_PIN_LOCKED) {
+-- 
+2.54.0
+

@@ -4,7 +4,7 @@
 Name:           perl-TimeDate
 Version:        2.33
 Epoch:          1
-Release: 20%{?dist}
+Release:        17%{?dist}
 Summary:        A Perl module for time and date manipulation
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/TimeDate

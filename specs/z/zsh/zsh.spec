@@ -36,6 +36,13 @@ Patch8: 0008-zsh-deletefilelist-segfault.patch
 Patch9: 0009-zsh-support-dnf5.patch
 # upstream commit 071e325c826a89b792056c3faf0c400b8c0c5738
 Patch10: 0010-zsh-fix-dnf5-completion-with-rpm-files.patch
+# upstream commit 7708d466dfab8dd29f9ae5de12c74af37bf99a4d
+# fix crash with bracketed-paste-magic and undo (rhbz#2484692)
+Patch11: 0011-zsh-memcpy-sigsegv-bracketed-paste.patch
+
+# downstream patch for rhbz#2449939
+# already fixed upstream in a major refactor of term color attribute handling
+Patch100: 0100-zsh-_IO_putc-SIGSEGV.patch
 
 BuildRequires: autoconf
 BuildRequires: coreutils
@@ -181,6 +188,15 @@ fi
 %doc Doc/*.html
 
 %changelog
+* Wed Jul 22 2026 Lukáš Zaoral <lzaoral@redhat.com> - 5.9-21
+- fix crash with bracketed-paste-magic and undo (rhbz#2484692)
+
+* Tue Mar 24 2026 Lukáš Zaoral <lzaoral@redhat.com> - 5.9-20
+- fix segfault in _IO_putc (rhbz#2449939)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.9-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Sep 29 2025 Christoph Erhardt <fedora@sicherha.de> - 5.9-18
 - Add completion support for dnf5
 

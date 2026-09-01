@@ -4,7 +4,7 @@
 Name:          giflib
 Summary:       A library and utilities for processing GIFs
 Version:       5.2.2
-Release: 12%{?dist}
+Release:       8%{?dist}
 
 License:       MIT
 URL:           http://www.sourceforge.net/projects/%{name}/

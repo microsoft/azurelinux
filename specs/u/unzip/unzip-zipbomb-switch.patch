@@ -137,26 +137,13 @@ index 878817d..3e58071 100644
 -    if ((G.lrec.general_purpose_bit_flag & 8) != 0) {
 +    if (uO.zipbomb == TRUE) {
 +      if ((G.lrec.general_purpose_bit_flag & 8) != 0) {
-         /* skip over data descriptor (harder than it sounds, due to signature
-          * ambiguity)
-          */
-@@ -2189,16 +2196,16 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
-               ((G.lrec.csize & LOW) != SIG ||   /* if not SIG, have signature */
-                (ulen == SIG &&                  /* if not SIG, no signature */
-                 (G.pInfo->zip64 ? G.lrec.csize >> 32 : G.lrec.ucsize) != SIG
--                                                /* if not SIG, have signature */
-+                /* if not SIG, have signature */
-                 )))))
--                   /* skip four more bytes to account for signature */
--                   shy += 4 - readbuf((char *)buf, 4);
-+          /* skip four more bytes to account for signature */
-+          shy += 4 - readbuf((char *)buf, 4);
-         if (G.pInfo->zip64)
--            shy += 8 - readbuf((char *)buf, 8); /* skip eight more for ZIP64 */
-+          shy += 8 - readbuf((char *)buf, 8); /* skip eight more for ZIP64 */
-         if (shy)
--            error = PK_ERR;
-+          error = PK_ERR;
+         // Skip over the data descriptor. We need to correctly position the
+         // read pointer after the data descriptor for the proper detection of
+         // overlapped zip file components.
+@@ -2189,8 +2196,8 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
+             G.incnt += back;
+             G.inptr -= back;
+         }
 +      }
      }
 -

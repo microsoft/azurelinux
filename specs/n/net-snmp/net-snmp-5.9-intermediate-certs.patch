@@ -1,8 +1,8 @@
 diff --git a/include/net-snmp/library/cert_util.h b/include/net-snmp/library/cert_util.h
-index 80e2a19..143adbb 100644
+index 305e367..6117b9a 100644
 --- a/include/net-snmp/library/cert_util.h
 +++ b/include/net-snmp/library/cert_util.h
-@@ -55,7 +55,8 @@ extern "C" {
+@@ -48,7 +48,8 @@ extern "C" {
          char           *common_name;
  
          u_char          hash_type;
@@ -12,7 +12,7 @@ index 80e2a19..143adbb 100644
      } netsnmp_cert;
  
  /** types */
-@@ -100,6 +101,7 @@ extern "C" {
+@@ -93,6 +94,7 @@ extern "C" {
  
      NETSNMP_IMPORT
      netsnmp_cert *netsnmp_cert_find(int what, int where, void *hint);
@@ -35,10 +35,21 @@ index 471bb0b..ac7f69a 100644
          
  #ifdef __cplusplus
 diff --git a/snmplib/cert_util.c b/snmplib/cert_util.c
-index 210ad8b..b1f8144 100644
+index 5b5aaaa..7c07048 100644
 --- a/snmplib/cert_util.c
 +++ b/snmplib/cert_util.c
-@@ -100,7 +100,7 @@ netsnmp_feature_child_of(tls_fingerprint_build, cert_util_all);
+@@ -42,9 +42,7 @@ netsnmp_feature_child_of(tls_fingerprint_build, cert_util_all);
+ 
+ #include <ctype.h>
+ 
+-#include <stddef.h>
+-
+-#if HAVE_STDLIB_H
++#ifdef HAVE_STDLIB_H
+ #include <stdlib.h>
+ #endif
+ 
+@@ -102,7 +100,7 @@ netsnmp_feature_child_of(tls_fingerprint_build, cert_util_all);
   * bump this value whenever cert index format changes, so indexes
   * will be regenerated with new format.
   */
@@ -47,8 +58,28 @@ index 210ad8b..b1f8144 100644
  
  static netsnmp_container *_certs = NULL;
  static netsnmp_container *_keys = NULL;
-@@ -126,6 +126,8 @@ static int  _cert_fn_ncompare(netsnmp_cert_common *lhs,
-                               netsnmp_cert_common *rhs);
+@@ -116,16 +114,20 @@ static netsnmp_container *_trusted_certs = NULL;
+ static void _setup_containers(void);
+ 
+ static void _cert_indexes_load(void);
+-static void _cert_free(void *cert, void *context);
+-static void _key_free(void *key, void *context);
+-static int  _cert_compare(const void *p, const void *q);
+-static int  _cert_sn_compare(const void *p, const void *q);
+-static int  _cert_sn_ncompare(const void *p, const void *q);
+-static int  _cert_cn_compare(const void *p, const void *q);
+-static int  _cert_fn_compare(const void *p, const void *q);
+-static int  _cert_fn_ncompare(const void *p, const void *q);
++static void _cert_free(netsnmp_cert *cert, void *context);
++static void _key_free(netsnmp_key *key, void *context);
++static int  _cert_compare(netsnmp_cert *lhs, netsnmp_cert *rhs);
++static int  _cert_sn_compare(netsnmp_cert *lhs, netsnmp_cert *rhs);
++static int  _cert_sn_ncompare(netsnmp_cert *lhs, netsnmp_cert *rhs);
++static int  _cert_cn_compare(netsnmp_cert *lhs, netsnmp_cert *rhs);
++static int  _cert_fn_compare(netsnmp_cert_common *lhs,
++                             netsnmp_cert_common *rhs);
++static int  _cert_fn_ncompare(netsnmp_cert_common *lhs,
++                              netsnmp_cert_common *rhs);
  static void _find_partner(netsnmp_cert *cert, netsnmp_key *key);
  static netsnmp_cert *_find_issuer(netsnmp_cert *cert);
 +static netsnmp_void_array *_cert_reduce_subset_first(netsnmp_void_array *matching);
@@ -56,7 +87,16 @@ index 210ad8b..b1f8144 100644
  static netsnmp_void_array *_cert_find_subset_fn(const char *filename,
                                                  const char *directory);
  static netsnmp_void_array *_cert_find_subset_sn(const char *subject);
-@@ -345,6 +347,8 @@ _get_cert_container(const char *use)
+@@ -200,7 +202,7 @@ _setup_trusted_certs(void)
+         return;
+     }
+     _trusted_certs->container_name = strdup("trusted certificates");
+-    _trusted_certs->compare = netsnmp_str_compare;
++    _trusted_certs->compare = (netsnmp_container_compare*) strcmp;
+ }
+ 
+ /*
+@@ -345,14 +347,18 @@ _get_cert_container(const char *use)
  {
      netsnmp_container *c;
  
@@ -65,49 +105,61 @@ index 210ad8b..b1f8144 100644
      c = netsnmp_container_find("certs:binary_array");
      if (NULL == c) {
          snmp_log(LOG_ERR, "could not create container for %s\n", use);
-@@ -354,6 +358,8 @@ _get_cert_container(const char *use)
-     c->free_item = (netsnmp_container_obj_func*)_cert_free;
-     c->compare = (netsnmp_container_compare*)_cert_compare;
- 
-+    CONTAINER_SET_OPTIONS(c, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
+         return NULL;
+     }
+     c->container_name = strdup(use);
+-    c->free_item = _cert_free;
+-    c->compare = _cert_compare;
++    c->free_item = (netsnmp_container_obj_func*)_cert_free;
++    c->compare = (netsnmp_container_compare*)_cert_compare;
 +
++    CONTAINER_SET_OPTIONS(c, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
+ 
      return c;
  }
- 
-@@ -362,6 +368,8 @@ _setup_containers(void)
- {
-     netsnmp_container *additional_keys;
- 
-+    int rc;
-+
-     _certs = _get_cert_container("netsnmp certificates");
-     if (NULL == _certs)
-         return;
-@@ -376,6 +384,7 @@ _setup_containers(void)
+@@ -377,7 +383,7 @@ _setup_containers(void)
+     }
      additional_keys->container_name = strdup("certs_cn");
      additional_keys->free_item = NULL;
-     additional_keys->compare = (netsnmp_container_compare*)_cert_cn_compare;
-+    CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
+-    additional_keys->compare = _cert_cn_compare;
++    additional_keys->compare = (netsnmp_container_compare*)_cert_cn_compare;
+     CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
      netsnmp_container_add_index(_certs, additional_keys);
  
-     /** additional keys: subject name */
-@@ -389,6 +398,7 @@ _setup_containers(void)
+@@ -390,8 +396,8 @@ _setup_containers(void)
+     }
+     additional_keys->container_name = strdup("certs_sn");
      additional_keys->free_item = NULL;
-     additional_keys->compare = (netsnmp_container_compare*)_cert_sn_compare;
-     additional_keys->ncompare = (netsnmp_container_compare*)_cert_sn_ncompare;
-+    CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
+-    additional_keys->compare = _cert_sn_compare;
+-    additional_keys->ncompare = _cert_sn_ncompare;
++    additional_keys->compare = (netsnmp_container_compare*)_cert_sn_compare;
++    additional_keys->ncompare = (netsnmp_container_compare*)_cert_sn_ncompare;
+     CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
      netsnmp_container_add_index(_certs, additional_keys);
  
-     /** additional keys: file name */
-@@ -402,6 +412,7 @@ _setup_containers(void)
+@@ -404,8 +410,8 @@ _setup_containers(void)
+     }
+     additional_keys->container_name = strdup("certs_fn");
      additional_keys->free_item = NULL;
-     additional_keys->compare = (netsnmp_container_compare*)_cert_fn_compare;
-     additional_keys->ncompare = (netsnmp_container_compare*)_cert_fn_ncompare;
-+    CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
+-    additional_keys->compare = _cert_fn_compare;
+-    additional_keys->ncompare = _cert_fn_ncompare;
++    additional_keys->compare = (netsnmp_container_compare*)_cert_fn_compare;
++    additional_keys->ncompare = (netsnmp_container_compare*)_cert_fn_ncompare;
+     CONTAINER_SET_OPTIONS(additional_keys, CONTAINER_KEY_ALLOW_DUPLICATES, rc);
      netsnmp_container_add_index(_certs, additional_keys);
  
-     _keys = netsnmp_container_find("cert_keys:binary_array");
-@@ -424,7 +435,7 @@ netsnmp_cert_map_container(void)
+@@ -416,8 +422,8 @@ _setup_containers(void)
+         return;
+     }
+     _keys->container_name = strdup("netsnmp certificate keys");
+-    _keys->free_item = _key_free;
+-    _keys->compare = _cert_fn_compare;
++    _keys->free_item = (netsnmp_container_obj_func*)_key_free;
++    _keys->compare = (netsnmp_container_compare*)_cert_fn_compare;
+ 
+     _setup_trusted_certs();
+ }
+@@ -429,7 +435,7 @@ netsnmp_cert_map_container(void)
  }
  
  static netsnmp_cert *
@@ -116,7 +168,7 @@ index 210ad8b..b1f8144 100644
            int hashType, const char *fingerprint, const char *common_name,
            const char *subject)
  {
-@@ -446,8 +457,10 @@ _new_cert(const char *dirname, const char *filename, int certType,
+@@ -451,8 +457,10 @@ _new_cert(const char *dirname, const char *filename, int certType,
  
      cert->info.dir = strdup(dirname);
      cert->info.filename = strdup(filename);
@@ -128,7 +180,112 @@ index 210ad8b..b1f8144 100644
      if (fingerprint) {
          cert->hash_type = hashType;
          cert->fingerprint = strdup(fingerprint);
-@@ -884,14 +897,86 @@ _certindex_new( const char *dirname )
+@@ -553,22 +561,20 @@ netsnmp_key_free(netsnmp_key *key)
+ }
+ 
+ static void
+-_cert_free(void *cert, void *context)
++_cert_free(netsnmp_cert *cert, void *context)
+ {
+     netsnmp_cert_free(cert);
+ }
+ 
+ static void
+-_key_free(void *key, void *context)
++_key_free(netsnmp_key *key, void *context)
+ {
+     netsnmp_key_free(key);
+ }
+ 
+ static int
+-_cert_compare(const void *p, const void *q)
++_cert_compare(netsnmp_cert *lhs, netsnmp_cert *rhs)
+ {
+-    const netsnmp_cert *lhs = p, *rhs = q;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+     netsnmp_assert((lhs->fingerprint != NULL) &&
+                    (rhs->fingerprint != NULL));
+@@ -578,8 +584,7 @@ _cert_compare(const void *p, const void *q)
+ }
+ 
+ static int
+-_cert_path_compare(const netsnmp_cert_common *lhs,
+-                   const netsnmp_cert_common *rhs)
++_cert_path_compare(netsnmp_cert_common *lhs, netsnmp_cert_common *rhs)
+ {
+     int rc;
+ 
+@@ -595,9 +600,8 @@ _cert_path_compare(const netsnmp_cert_common *lhs,
+ }
+ 
+ static int
+-_cert_cn_compare(const void *p, const void *q)
++_cert_cn_compare(netsnmp_cert *lhs, netsnmp_cert *rhs)
+ {
+-    const netsnmp_cert *lhs = p, *rhs = q;
+     int rc;
+     const char *lhcn, *rhcn;
+ 
+@@ -617,13 +621,13 @@ _cert_cn_compare(const void *p, const void *q)
+         return rc;
+ 
+     /** in case of equal common names, sub-sort by path */
+-    return _cert_path_compare(&lhs->info, &rhs->info);
++    return _cert_path_compare((netsnmp_cert_common*)lhs,
++                              (netsnmp_cert_common*)rhs);
+ }
+ 
+ static int
+-_cert_sn_compare(const void *p, const void *q)
++_cert_sn_compare(netsnmp_cert *lhs, netsnmp_cert *rhs)
+ {
+-    const netsnmp_cert *lhs = p, *rhs = q;
+     int rc;
+     const char *lhsn, *rhsn;
+ 
+@@ -643,13 +647,13 @@ _cert_sn_compare(const void *p, const void *q)
+         return rc;
+ 
+     /** in case of equal common names, sub-sort by path */
+-    return _cert_path_compare(&lhs->info, &rhs->info);
++    return _cert_path_compare((netsnmp_cert_common*)lhs,
++                              (netsnmp_cert_common*)rhs);
+ }
+ 
+ static int
+-_cert_fn_compare(const void *p, const void *q)
++_cert_fn_compare(netsnmp_cert_common *lhs, netsnmp_cert_common *rhs)
+ {
+-    const netsnmp_cert_common *lhs = p, *rhs = q;
+     int rc;
+ 
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+@@ -663,10 +667,8 @@ _cert_fn_compare(const void *p, const void *q)
+ }
+ 
+ static int
+-_cert_fn_ncompare(const void *p, const void *q)
++_cert_fn_ncompare(netsnmp_cert_common *lhs, netsnmp_cert_common *rhs)
+ {
+-    const netsnmp_cert_common *lhs = p, *rhs = q;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+     netsnmp_assert((lhs->filename != NULL) && (rhs->filename != NULL));
+ 
+@@ -674,10 +676,8 @@ _cert_fn_ncompare(const void *p, const void *q)
+ }
+ 
+ static int
+-_cert_sn_ncompare(const void *p, const void *q)
++_cert_sn_ncompare(netsnmp_cert *lhs, netsnmp_cert *rhs)
+ {
+-    const netsnmp_cert *lhs = p, *rhs = q;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+     netsnmp_assert((lhs->subject != NULL) && (rhs->subject != NULL));
+ 
+@@ -897,14 +897,86 @@ _certindex_new( const char *dirname )
   * certificate utility functions
   *
   */
@@ -217,7 +374,7 @@ index 210ad8b..b1f8144 100644
  
      if (NULL == cert)
          return NULL;
-@@ -908,51 +993,33 @@ netsnmp_ocert_get(netsnmp_cert *cert)
+@@ -921,51 +993,33 @@ netsnmp_ocert_get(netsnmp_cert *cert)
          }
      }
  
@@ -277,7 +434,7 @@ index 210ad8b..b1f8144 100644
                  if (NULL != okey) {
                      netsnmp_key  *key;
                      DEBUGMSGT(("cert:read:key", "found key with cert in %s\n",
-@@ -979,7 +1046,7 @@ netsnmp_ocert_get(netsnmp_cert *cert)
+@@ -992,7 +1046,7 @@ netsnmp_ocert_get(netsnmp_cert *cert)
              break;
  #ifdef CERT_PKCS12_SUPPORT_MAYBE_LATER
          case NS_CERT_TYPE_PKCS12:
@@ -286,7 +443,7 @@ index 210ad8b..b1f8144 100644
              PKCS12 *p12 = d2i_PKCS12_bio(certbio, NULL);
              if ( (NULL != p12) && (PKCS12_verify_mac(p12, "", 0) ||
                                     PKCS12_verify_mac(p12, NULL, 0)))
-@@ -999,46 +1066,7 @@ netsnmp_ocert_get(netsnmp_cert *cert)
+@@ -1012,46 +1066,7 @@ netsnmp_ocert_get(netsnmp_cert *cert)
          return NULL;
      }
  
@@ -320,7 +477,7 @@ index 210ad8b..b1f8144 100644
 -    }
 -    
 -    if (NULL == cert->fingerprint) {
--        cert->hash_type = netsnmp_openssl_cert_get_hash_type(ocert);
+-        cert->hash_type = NS_HASH_SHA1;
 -        cert->fingerprint =
 -            netsnmp_openssl_cert_get_fingerprint(ocert, cert->hash_type);
 -    }
@@ -334,7 +491,7 @@ index 210ad8b..b1f8144 100644
  
      return ocert;
  }
-@@ -1048,7 +1076,6 @@ netsnmp_okey_get(netsnmp_key  *key)
+@@ -1061,7 +1076,6 @@ netsnmp_okey_get(netsnmp_key  *key)
  {
      BIO            *keybio;
      EVP_PKEY       *okey;
@@ -342,7 +499,7 @@ index 210ad8b..b1f8144 100644
  
      if (NULL == key)
          return NULL;
-@@ -1056,19 +1083,8 @@ netsnmp_okey_get(netsnmp_key  *key)
+@@ -1069,19 +1083,8 @@ netsnmp_okey_get(netsnmp_key  *key)
      if (key->okey)
          return key->okey;
  
@@ -364,7 +521,7 @@ index 210ad8b..b1f8144 100644
          return NULL;
      }
  
-@@ -1154,7 +1170,7 @@ netsnmp_cert_load_x509(netsnmp_cert *cert)
+@@ -1167,7 +1170,7 @@ netsnmp_cert_load_x509(netsnmp_cert *cert)
              cert->issuer_cert =  _find_issuer(cert);
              if (NULL == cert->issuer_cert) {
                  DEBUGMSGT(("cert:load:warn",
@@ -373,7 +530,7 @@ index 210ad8b..b1f8144 100644
                             cert->info.filename));
                  rc = CERT_LOAD_PARTIAL;
                  break;
-@@ -1163,7 +1179,7 @@ netsnmp_cert_load_x509(netsnmp_cert *cert)
+@@ -1176,7 +1179,7 @@ netsnmp_cert_load_x509(netsnmp_cert *cert)
          /** get issuer ocert */
          if ((NULL == cert->issuer_cert->ocert) &&
              (netsnmp_ocert_get(cert->issuer_cert) == NULL)) {
@@ -382,7 +539,7 @@ index 210ad8b..b1f8144 100644
                         cert->info.filename));
              rc = CERT_LOAD_PARTIAL;
              break;
-@@ -1184,7 +1200,7 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
+@@ -1197,7 +1200,7 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
          return;
      }
  
@@ -391,7 +548,7 @@ index 210ad8b..b1f8144 100644
          if (key->cert) {
              DEBUGMSGT(("cert:partner", "key already has partner\n"));
              return;
-@@ -1197,7 +1213,8 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
+@@ -1210,7 +1213,8 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
              return;
          *pos = 0;
  
@@ -401,7 +558,7 @@ index 210ad8b..b1f8144 100644
          if (!matching)
              return;
          if (1 == matching->size) {
-@@ -1217,7 +1234,7 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
+@@ -1230,7 +1234,7 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
              DEBUGMSGT(("cert:partner", "%s matches multiple certs\n",
                            key->info.filename));
      }
@@ -410,7 +567,7 @@ index 210ad8b..b1f8144 100644
          if (cert->key) {
              DEBUGMSGT(("cert:partner", "cert already has partner\n"));
              return;
-@@ -1255,76 +1272,182 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
+@@ -1268,76 +1272,182 @@ _find_partner(netsnmp_cert *cert, netsnmp_key *key)
      }
  }
  
@@ -646,7 +803,7 @@ index 210ad8b..b1f8144 100644
      }
  
      return 0;
-@@ -1338,7 +1461,8 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
+@@ -1351,7 +1461,8 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
      struct stat     idx_stat;
      char            tmpstr[SNMP_MAXPATH + 5], filename[NAME_MAX];
      char            fingerprint[EVP_MAX_MD_SIZE*3], common_name[64+1], type_str[15];
@@ -656,7 +813,7 @@ index 210ad8b..b1f8144 100644
      int             count = 0, type, hash, version;
      netsnmp_cert    *cert;
      netsnmp_key     *key;
-@@ -1381,7 +1505,8 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
+@@ -1394,7 +1505,8 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
          netsnmp_directory_container_read_some(NULL, dirname,
                                                _time_filter, &idx_stat,
                                                NETSNMP_DIR_NSFILE |
@@ -666,7 +823,7 @@ index 210ad8b..b1f8144 100644
      if (newer) {
          DEBUGMSGT(("cert:index:parse", "Index outdated; files modified\n"));
          CONTAINER_FREE_ALL(newer, NULL);
-@@ -1426,6 +1551,7 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
+@@ -1439,6 +1551,7 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
              pos = &tmpstr[2];
              if ((NULL == (pos=copy_nword(pos, filename, sizeof(filename)))) ||
                  (NULL == (pos=copy_nword(pos, type_str, sizeof(type_str)))) ||
@@ -674,7 +831,7 @@ index 210ad8b..b1f8144 100644
                  (NULL == (pos=copy_nword(pos, hash_str, sizeof(hash_str)))) ||
                  (NULL == (pos=copy_nword(pos, fingerprint,
                                           sizeof(fingerprint)))) ||
-@@ -1438,8 +1564,9 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
+@@ -1451,8 +1564,9 @@ _cert_read_index(const char *dirname, struct stat *dirstat)
                  break;
              }
              type = atoi(type_str);
@@ -685,7 +842,7 @@ index 210ad8b..b1f8144 100644
                               common_name, subject);
              if (cert && 0 == CONTAINER_INSERT(found, cert))
                  ++count;
-@@ -1546,7 +1673,8 @@ _add_certdir(const char *dirname)
+@@ -1559,7 +1673,8 @@ _add_certdir(const char *dirname)
          netsnmp_directory_container_read_some(NULL, dirname,
                                                _cert_cert_filter, NULL,
                                                NETSNMP_DIR_RELATIVE_PATH |
@@ -695,7 +852,15 @@ index 210ad8b..b1f8144 100644
      if (NULL == cert_container) {
          DEBUGMSGT(("cert:index:dir",
                      "error creating container for cert files\n"));
-@@ -1634,7 +1762,7 @@ _cert_print(netsnmp_cert *c, void *context)
+@@ -1642,14 +1757,12 @@ _cert_indexes_load(void)
+ }
+ 
+ static void
+-_cert_print(void *p, void *context)
++_cert_print(netsnmp_cert *c, void *context)
+ {
+-    netsnmp_cert *c = p;
+-
      if (NULL == c)
          return;
  
@@ -704,7 +869,39 @@ index 210ad8b..b1f8144 100644
      DEBUGMSGT(("cert:dump", "   type %d flags 0x%x (%s)\n",
               c->info.type, c->info.allowed_uses,
                _mode_str(c->info.allowed_uses)));
-@@ -1838,7 +1966,8 @@ netsnmp_cert_find(int what, int where, void *hint)
+@@ -1676,10 +1789,8 @@ _cert_print(void *p, void *context)
+ }
+ 
+ static void
+-_key_print(void *p, void *context)
++_key_print(netsnmp_key *k, void *context)
+ {
+-    netsnmp_key *k = p;
+-
+     if (NULL == k)
+         return;
+ 
+@@ -1691,8 +1802,8 @@ _key_print(void *p, void *context)
+ void
+ netsnmp_cert_dump_all(void)
+ {
+-    CONTAINER_FOR_EACH(_certs, _cert_print, NULL);
+-    CONTAINER_FOR_EACH(_keys, _key_print, NULL);
++    CONTAINER_FOR_EACH(_certs, (netsnmp_container_obj_func*)_cert_print, NULL);
++    CONTAINER_FOR_EACH(_keys, (netsnmp_container_obj_func*)_key_print, NULL);
+ }
+ 
+ #ifdef CERT_MAIN
+@@ -1726,6 +1837,8 @@ main(int argc, char** argv)
+ 
+ #endif /* CERT_MAIN */
+ 
++static netsnmp_cert *_cert_find_fp(const char *fingerprint);
++
+ void
+ netsnmp_fp_lowercase_and_strip_colon(char *fp)
+ {
+@@ -1853,7 +1966,8 @@ netsnmp_cert_find(int what, int where, void *hint)
          netsnmp_void_array *matching;
  
          DEBUGMSGT(("cert:find:params", " hint = %s\n", (char *)hint));
@@ -714,7 +911,16 @@ index 210ad8b..b1f8144 100644
          if (!matching)
              return NULL;
          if (1 == matching->size)
-@@ -2281,6 +2410,124 @@ _reduce_subset_dir(netsnmp_void_array *matching, const char *directory)
+@@ -2061,7 +2175,7 @@ netsnmp_cert_trust(SSL_CTX *ctx, netsnmp_cert *thiscert)
+                                 SNMPERR_GENERR);
+ 
+     /* Put the certificate into the store */
+-    fingerprint = netsnmp_openssl_cert_get_fingerprint(cert, NS_HASH_SHA1);
++    fingerprint = netsnmp_openssl_cert_get_fingerprint(cert, -1);
+     DEBUGMSGTL(("cert:trust",
+                 "putting trusted cert %p = %s in certstore %p\n", cert,
+                 fingerprint, certstore));
+@@ -2296,6 +2410,124 @@ _reduce_subset_dir(netsnmp_void_array *matching, const char *directory)
      }
  }
  
@@ -839,11 +1045,95 @@ index 210ad8b..b1f8144 100644
  static netsnmp_void_array *
  _cert_find_subset_common(const char *filename, netsnmp_container *container)
  {
+@@ -2433,7 +2665,7 @@ _time_filter(const void *text, void *ctx)
+  * ***************************************************************************/
+ #define MAP_CONFIG_TOKEN "certSecName"
+ static void _parse_map(const char *token, char *line);
+-static void _map_free(void *map, void *ctx);
++static void _map_free(netsnmp_cert_map* entry, void *ctx);
+ static void _purge_config_entries(void);
+ 
+ static void
+@@ -2538,16 +2770,14 @@ netsnmp_cert_map_find(netsnmp_cert_map *map)
+ #endif /* NETSNMP_FEATURE_REMOVE_CERT_MAP_FIND */
+ 
+ static void
+-_map_free(void *map, void *context)
++_map_free(netsnmp_cert_map *map, void *context)
+ {
+     netsnmp_cert_map_free(map);
+ }
+ 
+ static int
+-_map_compare(const void *p, const void *q)
++_map_compare(netsnmp_cert_map *lhs, netsnmp_cert_map *rhs)
+ {
+-    const netsnmp_cert_map *lhs = p, *rhs = q;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+ 
+     if (lhs->priority < rhs->priority)
+@@ -2559,11 +2789,9 @@ _map_compare(const void *p, const void *q)
+ }
+ 
+ static int
+-_map_fp_compare(const void *p, const void *q)
++_map_fp_compare(netsnmp_cert_map *lhs, netsnmp_cert_map *rhs)
+ {
+-    const netsnmp_cert_map *lhs = p, *rhs = q;
+     int rc;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+ 
+     if ((rc = strcmp(lhs->fingerprint, rhs->fingerprint)) != 0)
+@@ -2578,10 +2806,8 @@ _map_fp_compare(const void *p, const void *q)
+ }
+ 
+ static int
+-_map_fp_ncompare(const void *p, const void *q)
++_map_fp_ncompare(netsnmp_cert_map *lhs, netsnmp_cert_map *rhs)
+ {
+-    const netsnmp_cert_map *lhs = p, *rhs = q;
+-
+     netsnmp_assert((lhs != NULL) && (rhs != NULL));
+ 
+     return strncmp(lhs->fingerprint, rhs->fingerprint,
+@@ -2600,8 +2826,8 @@ netsnmp_cert_map_container_create(int with_fp)
+     }
+ 
+     chain_map->container_name = strdup("cert_map");
+-    chain_map->free_item = _map_free;
+-    chain_map->compare = _map_compare;
++    chain_map->free_item = (netsnmp_container_obj_func*)_map_free;
++    chain_map->compare = (netsnmp_container_compare*)_map_compare;
+ 
+     if (!with_fp)
+         return chain_map;
+@@ -2617,8 +2843,8 @@ netsnmp_cert_map_container_create(int with_fp)
+         return NULL;
+     }
+     fp->container_name = strdup("cert2sn_fp");
+-    fp->compare = _map_fp_compare;
+-    fp->ncompare = _map_fp_ncompare;
++    fp->compare = (netsnmp_container_compare*)_map_fp_compare;
++    fp->ncompare = (netsnmp_container_compare*)_map_fp_ncompare;
+     netsnmp_container_add_index(chain_map, fp);
+ 
+     return chain_map;
+@@ -2769,7 +2995,7 @@ netsnmp_certToTSN_parse_common(char **line)
+         map->fingerprint = strdup(buf);
+     } else {
+         map->fingerprint =
+-            netsnmp_openssl_cert_get_fingerprint(tmpcert->ocert, NS_HASH_SHA1);
++            netsnmp_openssl_cert_get_fingerprint(tmpcert->ocert, -1);
+     }
+     
+     if (NULL == *line) {
 diff --git a/snmplib/dir_utils.c b/snmplib/dir_utils.c
-index c2dd989..e7145e4 100644
+index 48c1a0f..32426f8 100644
 --- a/snmplib/dir_utils.c
 +++ b/snmplib/dir_utils.c
-@@ -107,6 +107,9 @@ netsnmp_directory_container_read_some(netsnmp_container *user_container,
+@@ -105,6 +105,9 @@ netsnmp_directory_container_read_some(netsnmp_container *user_container,
          /** default to unsorted */
          if (! (flags & NETSNMP_DIR_SORTED))
              CONTAINER_SET_OPTIONS(container, CONTAINER_KEY_UNSORTED, rc);

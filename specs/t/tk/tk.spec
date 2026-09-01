@@ -8,7 +8,7 @@
 Summary: The graphical toolkit for the Tcl scripting language
 Name: tk
 Version: %{vers}
-Release: 4%{?dist}
+Release: 2%{?dist}
 Epoch:   1
 License: TCL AND HPND-Pbmplus AND CC-BY-SA-3.0 AND MIT-open-group AND MIT
 URL: http://tcl.sourceforge.net
@@ -25,6 +25,8 @@ Obsoletes: tile <= 0.8.2
 Provides: tile = 0.8.2
 Patch: tk-8.6.12-make.patch
 Patch: tk-8.6.15-conf.patch
+# Fix for https://core.tcl-lang.org/tk/tktview/a4fee83df3.
+Patch: man-macros-groff-warning.patch
 
 %description
 When paired with the Tcl scripting language, Tk provides a fast and powerful
@@ -112,6 +114,9 @@ ln -s %{_bindir}/wish %{_bindir}/wish%{majorver} %{buildroot}%{_usr}/bin/
 %{_mandir}/man3/*
 
 %changelog
+* Tue Apr 14 2026 Tim Landscheidt <tim@tim-landscheidt.de> - 1:9.0.2-2
+- Fix syntax error in man pages
+
 * Tue Jul 08 2025 Jaroslav Škarvada  <jskarvad@redhat.com> - 1:9.0.2-1
 - New version
   Related: rhbz#2347162

@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        3.0.0
-Release: 17%{?dist}
+Release:        15%{?dist}
 Summary:        OpenStack Docs Theme
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -81,6 +81,9 @@ rm -rf html/.{doctrees,buildinfo}
 %doc doc/build/html
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.0.0-14
 - Rebuilt for Python 3.14.0rc3 bytecode
 

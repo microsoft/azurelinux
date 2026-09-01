@@ -1,0 +1,213 @@
+cabal-version:      3.0
+name:               servant-server
+version:            0.20.3.0
+x-revision: 1
+synopsis:
+  A family of combinators for defining webservices APIs and serving them
+
+category:           Servant, Web
+description:
+  A family of combinators for defining webservices APIs and serving them
+  .
+  You can learn about the basics in the <http://docs.servant.dev/en/stable/tutorial/index.html tutorial>.
+  .
+  <https://github.com/haskell-servant/servant/blob/master/servant-server/example/greet.hs Here>
+  is a runnable example, with comments, that defines a dummy API and implements
+  a webserver that serves this API, using this package.
+  .
+  <https://github.com/haskell-servant/servant/blob/master/servant-server/CHANGELOG.md CHANGELOG>
+
+homepage:           http://docs.servant.dev/
+bug-reports:        http://github.com/haskell-servant/servant/issues
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Servant Contributors
+maintainer:         haskell-servant-maintainers@googlegroups.com
+copyright:
+  2014-2016 Zalora South East Asia Pte Ltd, 2016-2019 Servant Contributors
+
+build-type:         Simple
+tested-with:        GHC ==9.2.8 || ==9.4.8 || ==9.6.6 || ==9.8.4 || ==9.10.1 || ==9.12.1
+
+extra-source-files:
+  CHANGELOG.md
+  README.md
+
+source-repository head
+  type:     git
+  location: http://github.com/haskell-servant/servant.git
+
+common extensions
+  default-extensions:
+    AllowAmbiguousTypes
+    ConstraintKinds
+    DataKinds
+    DeriveAnyClass
+    DeriveDataTypeable
+    DeriveFunctor
+    DeriveGeneric
+    DerivingStrategies
+    DerivingVia
+    DuplicateRecordFields
+    EmptyDataDecls
+    ExplicitNamespaces
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GADTs
+    GeneralizedNewtypeDeriving
+    InstanceSigs
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    NamedFieldPuns
+    NoStarIsType
+    OverloadedLabels
+    OverloadedStrings
+    PackageImports
+    PolyKinds
+    QuantifiedConstraints
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    UndecidableInstances
+    ViewPatterns
+
+  default-language:   Haskell2010
+
+common ghc-options
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints
+    -fhide-source-paths -Wno-unused-do-bind -fdicts-strict
+    -Wno-unticked-promoted-constructors -Werror=unused-imports
+    -Wunused-packages
+
+library
+  import:          extensions
+  import:          ghc-options
+  exposed-modules:
+    Servant
+    Servant.Server
+    Servant.Server.Experimental.Auth
+    Servant.Server.Generic
+    Servant.Server.Internal
+    Servant.Server.Internal.BasicAuth
+    Servant.Server.Internal.Context
+    Servant.Server.Internal.Delayed
+    Servant.Server.Internal.DelayedIO
+    Servant.Server.Internal.ErrorFormatter
+    Servant.Server.Internal.Handler
+    Servant.Server.Internal.ResponseRender
+    Servant.Server.Internal.RouteResult
+    Servant.Server.Internal.Router
+    Servant.Server.Internal.RoutingApplication
+    Servant.Server.Internal.ServerError
+    Servant.Server.StaticFiles
+    Servant.Server.UVerb
+
+  -- deprecated
+  exposed-modules: Servant.Utils.StaticFiles
+
+  -- Bundled with GHC: Lower bound to not force re-installs
+  -- text and mtl are bundled starting with GHC-8.4
+  build-depends:
+    , base          >= 4.16.4.0 && < 4.22
+    , bytestring    >=0.11 && <0.13
+    , constraints   >=0.2      && <0.15
+    , containers    >=0.6.5.1  && <0.9
+    , filepath      >=1.4.1.1  && <1.6
+    , mtl           ^>=2.2.2   || ^>=2.3.1
+    , text          >=1.2.3.0  && <2.2
+    , transformers  >=0.5.2.0  && <0.7
+
+  -- Servant dependencies
+  -- strict dependency as we re-export 'servant' things.
+  build-depends:
+    , http-api-data  >=0.4.1 && <0.7
+    , servant        >=0.20.3 && <0.21
+
+  -- Other dependencies: Lower bound around what is in the latest Stackage LTS.
+  -- Here can be exceptions if we really need features from the newer versions.
+  build-depends:
+    , base64-bytestring  >=1.0.0.1 && <1.3
+    , exceptions         >=0.10.0  && <0.11
+    , http-media         >=0.7.1.3 && <0.9
+    , http-types         >=0.12.2  && <0.13
+    , monad-control      >=1.0.2.3 && <1.1
+    , network            >=2.8     && <3.3
+    , resourcet          >=1.2.2   && <1.4
+    , sop-core           >=0.4.0.0 && <0.6
+    , tagged             >=0.8.6   && <0.9
+    , transformers-base  >=0.4.5.2 && <0.5
+    , wai                >=3.2.2.1 && <3.3
+    , wai-app-static     >=3.1.6.2 && <3.2
+    , word8              >=0.1.3   && <0.2
+
+  hs-source-dirs:  src
+
+executable greet
+  import:         extensions
+  import:         ghc-options
+  main-is:        greet.hs
+  hs-source-dirs: example
+  build-depends:
+    , base
+    , base-compat
+    , servant-server
+    , text
+    , wai
+
+  build-depends:
+    , aeson  >=1.4.1.0 && <3
+    , warp   >=3.2.25  && <3.5
+
+test-suite spec
+  import:             extensions
+  import:             ghc-options
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     test
+  main-is:            Spec.hs
+  other-modules:
+    Servant.ArbitraryMonadServerSpec
+    Servant.HoistSpec
+    Servant.Server.ErrorSpec
+    Servant.Server.Internal.ContextSpec
+    Servant.Server.Internal.RoutingApplicationSpec
+    Servant.Server.RouterSpec
+    Servant.Server.StaticFilesSpec
+    Servant.Server.StreamingSpec
+    Servant.Server.UsingContextSpec
+    Servant.Server.UsingContextSpec.TestCombinators
+    Servant.ServerSpec
+
+  -- Dependencies inherited from the library. No need to specify bounds.
+  build-depends:
+    , base
+    , base-compat
+    , base64-bytestring
+    , bytestring
+    , http-types
+    , mtl
+    , resourcet
+    , safe
+    , servant
+    , servant-server
+    , text
+    , wai
+
+  -- Additional dependencies
+  build-depends:
+    , aeson                 >=1.4.1.0  && <3
+    , directory             >=1.3.0.0  && <1.4
+    , hspec                 >=2.6.0    && <2.12
+    , hspec-wai             >=0.10.1   && <0.12
+    , should-not-typecheck  >=2.1.0    && <2.2
+    , temporary             >=1.3      && <1.4
+    , wai-extra             >=3.0.24.3 && <3.2
+
+  build-tool-depends: hspec-discover:hspec-discover >=2.6.0 && <2.12

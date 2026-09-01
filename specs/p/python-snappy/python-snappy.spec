@@ -5,7 +5,7 @@
 
 Name:           python-snappy
 Version:        0.7.3
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        Python library for the snappy compression library from Google
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD
@@ -62,6 +62,9 @@ Python bindings for the snappy compression library from Google.
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.3-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.7.3-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

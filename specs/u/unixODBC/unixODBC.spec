@@ -5,7 +5,7 @@
 
 Name:    unixODBC
 Version: 2.3.14
-Release: 5%{?dist}
+Release: 3%{?dist}
 
 # See README: Programs are GPL, libraries are LGPL
 # News Server library (Drivers/nn/yyparse.c) is GPLv3+
@@ -125,6 +125,9 @@ find $RPM_BUILD_ROOT%{_libdir} -name "*.so"   | sed "s|^$RPM_BUILD_ROOT||" > dev
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.14-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jan 09 2026 Michal Schorm <mschorm@redhat.com> - 2.3.14-2
 - Bump release to test Packit automation
 

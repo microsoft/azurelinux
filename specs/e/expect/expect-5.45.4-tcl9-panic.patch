@@ -1,0 +1,60 @@
+diff -up expect5.45.4/exp_command.h.tcl9-panic expect5.45.4/exp_command.h
+--- expect5.45.4/exp_command.h.tcl9-panic	2026-01-19 11:30:48.397140785 +0100
++++ expect5.45.4/exp_command.h	2026-01-19 11:30:48.401815447 +0100
+@@ -18,10 +18,7 @@ would appreciate credit if this program
+ # endif
+ #endif
+ 
+-#ifdef __APPLE__
+-/* From: "Daniel A. Steffen" <steffen@ics.mq.edu.au> */
+-# undef panic
+-#endif
++/* Note: panic macro removed for Tcl9 compatibility - use Tcl_Panic instead */
+ 
+ #include <tclPort.h>
+ 
+diff -up expect5.45.4/expect.h.tcl9-panic expect5.45.4/expect.h
+--- expect5.45.4/expect.h.tcl9-panic	2026-01-19 11:30:48.397952096 +0100
++++ expect5.45.4/expect.h	2026-01-19 11:30:48.403886046 +0100
+@@ -287,13 +287,10 @@ typedef struct Tcl_RegExp_ *Tcl_RegExp;
+ #define Tcl_TildeSubst Tcl_TranslateFileName
+ 
+ /*
+- * In later releases, Tcl_Panic will be the correct name to use.  For now
+- * we leave it as panic to avoid breaking existing binaries.
++ * Note: panic/panicVA macros removed for Tcl9 compatibility.
++ * Use Tcl_Panic directly.
+  */
+ 
+-#define Tcl_Panic panic
+-#define Tcl_PanicVA panicVA
+-
+ #endif /* RESOURCE_INCLUDED */
+ 
+ #undef TCL_STORAGE_CLASS
+diff -up expect5.45.4/exp_simple.c.tcl9-panic expect5.45.4/exp_simple.c
+--- expect5.45.4/exp_simple.c.tcl9-panic	2026-01-19 11:30:48.396156855 +0100
++++ expect5.45.4/exp_simple.c	2026-01-19 11:30:48.397959335 +0100
+@@ -74,11 +74,11 @@ Tcl_WatchFile(file, mask)
+     fd = (int) Tcl_GetFileInfo(file, &type);
+ 
+     if (type != TCL_UNIX_FD) {
+-	panic("Tcl_WatchFile: unexpected file type");
++	Tcl_Panic("Tcl_WatchFile: unexpected file type");
+     }
+ 
+     if (fd >= FD_SETSIZE) {
+-	panic("Tcl_WatchFile can't handle file id %d", fd);
++	Tcl_Panic("Tcl_WatchFile can't handle file id %d", fd);
+     }
+ 
+     index = fd/(NBBY*sizeof(fd_mask));
+@@ -131,7 +131,7 @@ Tcl_FileReady(file, mask)
+ 
+     fd = (int) Tcl_GetFileInfo(file, &type);
+     if (type != TCL_UNIX_FD) {
+-	panic("Tcl_FileReady: unexpected file type");
++	Tcl_Panic("Tcl_FileReady: unexpected file type");
+     }
+ 
+     index = fd/(NBBY*sizeof(fd_mask));

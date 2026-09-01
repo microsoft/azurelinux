@@ -4,8 +4,8 @@
 %define __cmake_in_source_build 1
 
 Name:           libcomps
-Version:        0.1.23
-Release: 5%{?dist}
+Version:        0.1.24
+Release:        1%{?dist}
 Summary:        Comps XML file manipulation library
 
 License:        GPL-2.0-or-later
@@ -119,6 +119,15 @@ popd
 %{python3_sitearch}/%{name}-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Wed Feb 25 2026 Petr Pisar <ppisar@redhat.com> - 0.1.24-1
+- 0.1.24 bump
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.1.23-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.1.23-2
+- Rebuilt for Python 3.14.0rc3 bytecode
+
 * Thu Sep 11 2025 Marek Blaha <mblaha@redhat.com> - 0.1.23-1
 - Update to 0.1.23
 

@@ -1,0 +1,138 @@
+# The macros in this file are used to add SBOM to wheel files that we ship.
+# Majority of Python packages will not need to do that,
+# as they only use wheels as an intermediate artifact.
+# The macros will be used by packages installing wheel to %%python_wheel_dir
+# or by Python interpreters bundling their own (patched) wheels.
+#
+# The runtime dependencies are not Required by the python-rpm-macros package,
+# users of this macro need to specify them on their own or rely on the fact that
+# they are all available in the default buildroot.
+#
+# Usage: %%python_wheel_inject_sbom PATHS_TO_WHEELS
+#
+# The wheels are modified in-place.
+
+
+# Path of the SBOM file in the PEP 770 .dist-info/sboms directory
+# This filename pattern is explicitly mentioned in https://cyclonedx.org/specification/overview/
+# section Recognized file patterns
+%__python_wheel_sbom_filename rpm.cdx.json
+
+
+# The SBOM content to put to the file
+# This is a CycloneDX component as recommended in https://discuss.python.org/t/97436/7
+%__python_wheel_sbom_content %{expand:{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "metadata": {
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "python-rpm-macros",
+          "version": "%{__python_wheel_macros_verrel}",
+          "purl": "%{__python_wheel_macros_purl}"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "%{name}",
+      "version": "%{version}-%{release}",
+      "purl": "%{__python_wheel_purl}"
+    }
+  ]
+}}
+
+
+# The purl used above
+# We use the src package name (which is easier to get and more useful to consumers).
+# Note that epoch needs special handling, see https://github.com/package-url/purl-spec/issues/69
+# and https://redhatproductsecurity.github.io/security-data-guidelines/purl/
+%__python_wheel_purl pkg:rpm/%{__python_wheel_dist_purl_namespace}/%{name}@%{version}-%{release}?%{?epoch:epoch=%{epoch}&}arch=src
+%__python_wheel_macros_verrel PLACEHOLDER
+%__python_wheel_macros_purl PLACEHOLDER
+
+
+# The purl namespace used above
+# https://lists.fedoraproject.org/archives/list/packaging@lists.fedoraproject.org/thread/GTRCTAF3R3SSBVEJYFCATKNRT7RYVFQI/
+# Distributors, define %%dist_purl_namespace to set this.
+# The rest of the code is fallback for distributions without it (relying on %%dist_name).
+%__python_wheel_dist_purl_namespace %{?dist_purl_namespace}%{!?dist_purl_namespace:%{lua:
+  if macros.epel then
+    -- being epel beats the %%dist_name value
+    -- added in https://src.fedoraproject.org/rpms/epel-rpm-macros/pull-request/86
+    print("epel")
+  else
+    local dist_map = {
+      -- fedora is in the purl-spec examples https://github.com/package-url/purl-spec/blob/main/PURL-TYPES.rst#rpm
+      -- added in https://src.fedoraproject.org/rpms/fedora-release/pull-request/385
+      ["Fedora Linux"] = "fedora",
+      -- added in https://gitlab.com/redhat/centos-stream/rpms/centos-stream-release/-/merge_requests/7
+      ["CentOS Stream"] = "centos",
+      -- documented at https://redhatproductsecurity.github.io/security-data-guidelines/purl/
+      ["Red Hat Enterprise Linux"] = "redhat",
+      -- documented at https://wiki.almalinux.org/documentation/sbom-guide.html
+      ["AlmaLinux"] = "almalinux",
+      -- from https://github.com/google/osv.dev/pull/2939
+      ["Rocky Linux"] = "rocky-linux",
+    }
+    print(dist_map[macros.dist_name] or "unknown")
+  end
+}}
+
+
+# A Bash scriptlet to inject the SBOM file into the wheel(s)
+# The macro takes positional nargs+ with wheel paths
+# For each wheel, it
+#  1. aborts if the SBOM file is already there (it won't override)
+#  2. inserts the SBOM file to .dist-info/sboms
+#  3. amends .dist-info/RECORD with the added SBOM file
+%python_wheel_inject_sbom() %{expand:(
+  %[%# ? "" : "%{error:%%%0: At least one argument (wheel path) is required}"]
+
+  set -eu -o pipefail
+  export LANG=C.utf-8
+
+  tmpdir=$(mktemp -d)
+  trap 'rm -rf "$tmpdir"' EXIT
+  pwd0=$(pwd)
+  ret=0
+
+  for whl in %{*}; do
+    cd "$tmpdir"
+    if [[ "$whl" != /* ]]; then
+        whl="$pwd0/$whl"
+    fi
+
+    record=$(zipinfo -1 "$whl" | grep -E '^[^/]+-[^/]+\.dist-info/RECORD$')
+    distinfo="${record%%/RECORD}"
+    bom="$distinfo/sboms/%{__python_wheel_sbom_filename}"
+
+    if zipinfo -1 "$whl" | grep -qFx "$bom"; then
+      echo -e "\\n\\nERROR %%%%%0: $whl already has $bom, aborting\\n\\n" >&2
+      ret=1
+      continue
+    fi
+
+    unzip "$whl" "$record"
+    mkdir "$distinfo/sboms"
+    echo '%{__python_wheel_sbom_content}' > "$bom"
+    checksum="sha256=$(sha256sum "$bom" | cut -f1 -d' ')"
+    size="$(wc --bytes "$bom" | cut -f1 -d' ')"
+    echo "$bom,$checksum,$size" >> "$record"
+
+    if [[ -n "${SOURCE_DATE_EPOCH:-}" ]]; then
+      touch --date="@$SOURCE_DATE_EPOCH" "$bom" "$record"
+    fi
+
+    zip -r "$whl" "$record" "$bom"
+    rm -rf "$distinfo"
+    cd "$pwd0"
+  done
+
+  exit $ret
+)}
+

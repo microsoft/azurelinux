@@ -6,7 +6,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.8.1
-Release: 9%{?dist}
+Release: 6%{?dist}
 Summary: Mail provides a nice Ruby DSL for making, sending and reading emails
 License: MIT
 URL: https://github.com/mikel/mail

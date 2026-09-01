@@ -1,0 +1,66 @@
+From 2a1acc601ba086612a80ef87dd35c4f268405b21 Mon Sep 17 00:00:00 2001
+From: Mark Wielaard <mark@klomp.org>
+Date: Tue, 17 Mar 2026 14:33:10 +0100
+Subject: [PATCH] tests: check eu-elflint works before testing --check-elf
+
+	* tests/find-debuginfo.at: Add AT_SKIP_IF checking eu-elflint.
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=33991
+
+Signed-off-by: Mark Wielaard <mark@klomp.org>
+---
+ tests/find-debuginfo.at | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/tests/find-debuginfo.at b/tests/find-debuginfo.at
+index ba4beabffc09..039802311444 100644
+--- a/tests/find-debuginfo.at
++++ b/tests/find-debuginfo.at
+@@ -463,6 +463,8 @@ AT_CLEANUP
+ AT_SETUP([find-debuginfo check-elf])
+ AT_KEYWORDS([find-debuginfo] [check-elf])
+ FIND_DEBUGINFO_PKG_BUILD_SETUP
++# Make sure eu-elflint --gnu work on the input file.
++AT_SKIP_IF([! eu-elflint --gnu ./subdir_build/bar | grep -q 'No errors'])
+ # We need to set some environment variables for running find-debuginfo
+ # normally set by rpmbuild.
+ AT_CHECK([env RPM_BUILD_DIR=${PWD} \
+@@ -480,6 +482,8 @@ AT_CLEANUP
+ AT_SETUP([find-debuginfo check-elf debugdata])
+ AT_KEYWORDS([find-debuginfo] [check-elf] [debugdata])
+ FIND_DEBUGINFO_PKG_BUILD_SETUP
++# Make sure eu-elflint --gnu work on the input file.
++AT_SKIP_IF([! eu-elflint --gnu ./subdir_build/bar | grep -q 'No errors'])
+ # We need to set some environment variables for running find-debuginfo
+ # normally set by rpmbuild.
+ #
+@@ -501,6 +505,8 @@ AT_KEYWORDS([find-debuginfo] [check-elf] [debugdata] [gdb-index])
+ # Too new gdb with too old gdb
+ AT_SKIP_IF([test "$GDB_ADD_INDEX_CHECKS_OK" = "no"])
+ FIND_DEBUGINFO_PKG_BUILD_SETUP
++# Make sure eu-elflint --gnu work on the input file.
++AT_SKIP_IF([! eu-elflint --gnu ./subdir_build/bar | grep -q 'No errors'])
+ # We need to set some environment variables for running find-debuginfo
+ # normally set by rpmbuild.
+ #
+@@ -525,6 +531,8 @@ AT_SKIP_IF([test "$DWARF_5_DEBUGADDR" = "yes"])
+ # Too new gdb with too old gdb
+ AT_SKIP_IF([test "$GDB_ADD_INDEX_CHECKS_OK" = "no"])
+ FIND_DEBUGINFO_PKG_BUILD_SETUP
++# Make sure eu-elflint --gnu work on the input file.
++AT_SKIP_IF([! eu-elflint --gnu ./subdir_build/bar | grep -q 'No errors'])
+ # We need to set some environment variables for running find-debuginfo
+ # normally set by rpmbuild.
+ #
+@@ -551,7 +559,7 @@ FIND_DEBUGINFO_PKG_BUILD_SETUP
+ mkdir -p subdir_ar
+ AT_CHECK([ar q ./subdir_ar/archive.a $(find subdir_build -name '*.o')],
+          [0], [ignore], [ignore])
+-# Make sure eu-elflint --gnu work on the simple input archive.
++# Make sure eu-elflint --gnu work on the input archive.
+ # It might not if llvm is used for example.
+ AT_SKIP_IF([! eu-elflint --gnu ./subdir_ar/archive.a | grep -q 'No errors'])
+ # We need to set some environment variables for running find-debuginfo
+-- 
+2.53.0
+

@@ -4,10 +4,10 @@ Subject: [PATCH] fix for MinGW
 
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c9f9e70..36bf4f8 100644
+index 0b5d26d..b633572 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -612,7 +612,7 @@ install(TARGETS ${WAVPACK_INSTALL_TARGETS}
+@@ -632,7 +632,7 @@ install(TARGETS ${WAVPACK_INSTALL_TARGETS}
  
  if(WAVPACK_INSTALL_CMAKE_MODULE)
  

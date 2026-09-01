@@ -9,11 +9,12 @@
 
 Name: hunspell-da
 Summary: Danish hunspell dictionaries
-Version: 1.7.42
-Release: 30%{?dist}
-Source: http://da.speling.org/filer/myspell-da-%{version}.tar.bz2
-URL: http://da.speling.org/
-License: GPL-2.0-or-later
+Version: 2.9.053
+Release: 2%{?dist}
+Source: https://stavekontrolden.dk/dictionaries/da_DK/da_DK-%{version}.oxt
+URL: https://stavekontrolden.dk/
+# license information from README_da_DK.txt
+License: GPL-2.0-or-later OR LGPL-2.1-or-later OR MPL-1.1
 BuildArch: noarch
 
 Requires: hunspell-filesystem
@@ -23,20 +24,26 @@ Supplements: (hunspell and langpacks-da)
 Danish hunspell dictionaries.
 
 %prep
-%setup -q -n myspell-da-%{version}
+%autosetup -c
 
 %build
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
-cp -p *.dic *.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
+cp -p da_DK.dic da_DK.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
 
 %files
-%doc README Copyright contributors COPYING
+%doc README_da_DK.txt
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.053-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 01 2025 Parag Nemade <pnemade AT redhat DOT com> - 2.9.053-1
+- Updated to new URL and new version (rh#2417927)
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.42-27
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

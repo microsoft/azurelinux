@@ -4,21 +4,21 @@ compatibility with future compilers.
 Submitted upstream: <https://github.com/waltligon/orangefs/pull/99>
 
 diff --git a/configure.ac b/configure.ac
-index a506588fa4c081ba..70c2fa12fa620589 100644
+index ce77bd534..ec54db931 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -997,7 +997,9 @@ test_for_epoll()
+@@ -996,7 +996,9 @@ test_for_epoll()
  {
    AC_CHECK_HEADERS(sys/epoll.h)
    AC_MSG_CHECKING(for epoll functions)
--  AC_TRY_LINK([#include <sys/epoll.h>], [
-+  AC_TRY_LINK([#include <sys/epoll.h>
+-  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/epoll.h>]], [[
++  AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sys/epoll.h>
 +	#include <unistd.h>
-+	], [
++	]], [[
  	int fd;
  	fd = epoll_create(1);
  	close(fd);
-@@ -1271,7 +1273,7 @@ AC_MSG_CHECKING(if dlfns needs explicit library request)
+@@ -1289,7 +1291,7 @@ AC_MSG_CHECKING(if dlfns needs explicit library request)
  AC_LINK_IFELSE([AC_LANG_SOURCE([
  #define _GNU_SOURCE 1
  #include <dlfcn.h>

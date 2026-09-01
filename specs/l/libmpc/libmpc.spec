@@ -7,21 +7,24 @@
 
 Summary: C library for multiple precision complex arithmetic
 Name: libmpc
-Version: 1.3.1
-Release: 11%{?dist}
+Version: 1.4.1
+Release: 1%{?dist}
 # LGPL-3.0-or-later: the library
 # FSFAP: README and NEWS
 License: LGPL-3.0-or-later AND FSFAP
 URL: https://www.multiprecision.org/mpc/
-Source0: https://ftp.gnu.org/gnu/mpc/mpc-%{version}.tar.gz
+Source0: https://ftp.gnu.org/gnu/mpc/mpc-%{version}.tar.xz
 %if 0%{?bootstrap}
 Source1: https://ftp.gnu.org/gnu/mpc/mpc-%{bootstrap_version}.tar.gz
 %endif
+Source2: https://ftp.gnu.org/gnu/mpc/mpc-%{version}.tar.xz.sig
+Source3: https://www.multiprecision.org/downloads/enge.gpg
 
 BuildRequires: gcc
 BuildRequires: gmp-devel >= 5.0.0
 BuildRequires: mpfr-devel >= 4.1.0
 BuildRequires: make
+BuildRequires: gpgverify
 
 %if 0%{?bootstrap} == 0
 Obsoletes: compat-libmpc < %{version}-1
@@ -29,9 +32,9 @@ Provides: compat-libmpc = %{version}-%{release}
 %endif
 
 %description
-MPC is a C library for the arithmetic of complex numbers with
-arbitrarily high precision and correct rounding of the result. It is
-built upon and follows the same principles as Mpfr.
+MPC is a C library for the arithmetic of complex numbers with arbitrarily high
+precision and correct rounding of the result.  It is built upon and follows
+the same principles as Mpfr.
 
 %package devel
 Summary: Headers and shared development libraries for MPC
@@ -59,6 +62,7 @@ Contains the .so files for mpc version %{bootstrap-version}.
 %endif
 
 %prep
+%{gpgverify} --data=%{SOURCE0} --signature=%{SOURCE2} --keyring=%{SOURCE3}
 %setup -q -n mpc-%{version}
 %if 0%{?bootstrap}
 %setup -q -n mpc-%{version} -a 1
@@ -98,7 +102,6 @@ rm -fv %{buildroot}%{_infodir}/*
 %endif
 
 %make_install
-rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_infodir}/dir
 
 %check
@@ -107,11 +110,12 @@ make check
 
 %files
 %license COPYING.LESSER
-%doc README NEWS
-%{_libdir}/libmpc.so.3*
+%doc AUTHORS NEWS README
+%{_libdir}/libmpc.so.3{,.*}
 
 %files devel
 %{_libdir}/libmpc.so
+%{_libdir}/pkgconfig/mpc.pc
 %{_includedir}/mpc.h
 
 %files doc
@@ -120,10 +124,20 @@ make check
 
 %if 0%{?bootstrap}
 %files -n compat-libmpc
-%{_libdir}/libmpc.so.2*
+%{_libdir}/libmpc.so.2{,.*}
 %endif
 
 %changelog
+* Thu Apr 16 2026 Jerry James <loganjerry@gmail.com> - 1.4.1-1
+- Upgrade to libmpc version 1.4.1
+
+* Thu Mar 19 2026 Jerry James <loganjerry@gmail.com> - 1.4.0-1
+- Upgrade to libmpc version 1.4.0
+- Verify the source tarball with gpgverify
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

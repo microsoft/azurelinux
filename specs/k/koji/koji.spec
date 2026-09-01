@@ -11,18 +11,15 @@
 %{?!python3_pkgversion:%global python3_pkgversion 3}
 
 Name: koji
-Version: 1.35.3
-Release: 11%{?dist}
+Version: 1.36.1
+Release: 1%{?dist}
 # the included arch lib from yum's rpmUtils is GPLv2+
 License: LGPL-2.1-only AND GPL-2.0-or-later
 Summary: Build system tools
-URL: https://pagure.io/koji/
-Source0: https://releases.pagure.org/koji/koji-%{version}.tar.bz2
-
-# https://pagure.io/koji/pull-request/4342
-# download-build: allow fallback to unsigned with --key
-Patch0: 0001-download-build-allow-fallback-to-unsigned-with-key.patch
-Patch1: 0002-Fix-flake8-and-unit-test.patch
+URL: https://forge.fedoraproject.org/koji/koji
+Source0: https://forge.fedoraproject.org/koji/koji/releases/download/koji-%{version}/koji-%{version}.tar.bz2
+# ship a fedora specific tox file that doesn't run coverage/lint and only python3
+Source1: tox.ini-fedora
 
 # Not upstreamable
 Patch100: fedora-config.patch
@@ -34,6 +31,15 @@ Requires: python3-libcomps
 BuildRequires: systemd
 BuildRequires: pkgconfig
 BuildRequires: sed
+
+# additional packages needed for tests
+BuildRequires: python3-rpm
+BuildRequires: python-unversioned-command
+BuildRequires: python3-pytest
+BuildRequires: python3-dnf
+BuildRequires: python3-librepo
+BuildRequires: python3-requests-mock
+BuildRequires: glibc-langpack-en
 
 %description
 Koji is a system for building and tracking RPMS.  The base package
@@ -214,13 +220,23 @@ m kojibuilder mock
 EOF
 %endif
 
+# copy in our tox.ini for tests
+cp -a %{SOURCE1} tox.ini
+
+# We do not want a 'editable' setup for building
+sed -i -e '/\-e \./d' requirements.txt test-requirements.txt
+# There isn't a psycopg2-binary provide anymore.
+sed -i -e 's/psycopg2-binary/psycopg2/' requirements.txt test-requirements.txt
+
+%generate_buildrequires
+%pyproject_buildrequires -t
+
 %build
-%py3_build_wheel
+%pyproject_wheel
 
 %install
 %define make_with_dirs make DESTDIR=$RPM_BUILD_ROOT SBINDIR=%{_sbindir}
 
-%py3_install_wheel %{name}-%{version}-py3-none-any.whl
 mkdir -p %{buildroot}/etc/koji.conf.d
 cp cli/koji.conf %{buildroot}/etc/koji.conf
 for D in kojihub builder plugins util www vm schemas ; do
@@ -229,13 +245,7 @@ for D in kojihub builder plugins util www vm schemas ; do
     popd
 done
 
-# alter python interpreter in koji CLI
-scripts='%{_bindir}/koji %{_sbindir}/kojid %{_sbindir}/kojira %{_sbindir}/koji-shadow
-         %{_sbindir}/koji-gc %{_sbindir}/kojivmd %{_sbindir}/koji-sweep-db
-         %{_sbindir}/koji-sidetag-cleanup'
-for fn in $scripts ; do
-    sed -i 's|#!/usr/bin/python2|#!/usr/bin/python3|' $RPM_BUILD_ROOT$fn
-done
+%pyproject_install
 
 # handle extra byte compilation
 extra_dirs='
@@ -251,6 +261,11 @@ done
 %if 0%{?fedora} > 42 || 0%{?rhel} >= 10
 install -m0644 -D koji.sysusers.conf %{buildroot}%{_sysusersdir}/koji.conf
 %endif
+
+%check
+export LC_ALL="C"
+PYTHONPATH=.:plugins/hub/.:plugins/builder/.:plugins/cli/.:cli/.:www/lib
+%pytest
 
 %files
 %{_bindir}/koji
@@ -370,6 +385,18 @@ install -m0644 -D koji.sysusers.conf %{buildroot}%{_sysusersdir}/koji.conf
 %systemd_postun kojira.service
 
 %changelog
+* Thu Jul 09 2026 Kevin Fenzi <kevin@scrye.com> - 1.36.1-1
+- Update to 1.36.1.
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 1.36.0-2
+- Rebuilt for Python 3.15
+
+* Mon Mar 23 2026 Kevin Fenzi <kevin@scrye.com> - 1.36.0-1
+- Update to 1.36.0. Fixes rhbz#2450534
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.35.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Dec 16 2025 Adam Williamson <awilliam@redhat.com> - 1.35.3-8
 - Backport PR #4342 (--fallback-unsigned feature) for Bodhi's benefit
 

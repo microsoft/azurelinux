@@ -1,7 +1,7 @@
 From 059339b93cb6bbded15f00c165c3558c2ef3e0f4 Mon Sep 17 00:00:00 2001
 From: Mikolaj Izdebski <mizdebsk@redhat.com>
 Date: Sun, 13 Jul 2025 09:32:17 +0200
-Subject: [PATCH 3/3] Switch to OpenJDK for runtime
+Subject: [PATCH 3/4] Switch to OpenJDK for runtime
 
 ---
  dola-bsx/src/main/rpm/macros.dola-bsx | 2 +-
@@ -19,5 +19,5 @@ index 1cce21e..1a6bf8c 100644
  # Class path of nested JVM.
  %__dola_classpath %{_javadir}/dola/dola-bsx.jar:%{_javadir}/plexus-classworlds.jar
 -- 
-2.50.1
+2.51.0
 

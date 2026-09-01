@@ -7,9 +7,14 @@
 # Change the bcond to 0 to turn off ENGINE support by default
 %bcond openssl_engine_support %[%{defined fedora} || 0%{?rhel} < 10]
 
+# HTTP/3 support
+# This is using ngtcp2 with OpenSSL 3.5 QUIC support instead of curl's
+# experimental native OpenSSL 3.5 support.
+%bcond http3 %[0%{?fedora} >= 43]
+
 Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
 Name: curl
-Version: 8.15.0
+Version: 8.18.0
 Release: 9%{?dist}
 License: curl
 Source0: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz
@@ -19,17 +24,74 @@ Source1: https://curl.se/download/%{name}-%{version_no_tilde}.tar.xz.asc
 # which points to the GPG key as of April 7th 2016 of https://daniel.haxx.se/mykey.asc
 Source2: mykey.asc
 
-# fix curl: tool_read_cb(): curl killed by SIGSEGV
-Patch001: 0001-curl-8.15.0-curl-tool_read_cb-fix-of-segfault.patch
+# update timer unconditionally in multi_remove_handle
+# rubygem-ethon: FTBFS in Fedora Rawhide
+# https://bugzilla.redhat.com/show_bug.cgi?id=2405328
+Patch001: 0001-curl-8.18.0-multi-update-timer-unconditionally-in-multi_remove_h.patch
 
-# fix broken TLS options for threaded LDAPS (CVE-2025-14017)
-Patch002: 0002-curl-8.15.0-CVE-2025-14017.patch
+# Fix `Could not find digest algorithm UNDEF (NID 0)`
+# https://bugzilla.redhat.com/show_bug.cgi?id=2438170
+Patch002: 0002-curl-8.18.0-openssl-channel_binding-lookup-digest-algorithm-with.patch
+
+# Fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+Patch003: 0003-curl-8.18.0-CVE-2026-1965.patch
+
+# Fix token leak with redirect and netrc (CVE-2026-3783)
+Patch004: 0004-curl-8.18.0-CVE-2026-3783.patch
+
+# Fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+Patch005: 0005-curl-8.18.0-CVE-2026-3784.patch
+
+# Fix use after free in SMB connection reuse (CVE-2026-3805)
+Patch006: 0006-curl-8.18.0-CVE-2026-3805.patch
+
+# Fix trailing dot domain super cookie (CVE-2026-8924)
+Patch007: 0007-curl-8.18.0-CVE-2026-8924.patch
+
+# Fix SSH improper host validation (CVE-2026-9547)
+Patch008: 0008-curl-8.18.0-CVE-2026-9547.patch
+
+# Fix password leak with netrc and user in URL (CVE-2026-8926)
+Patch009: 0009-curl-8.18.0-CVE-2026-8926.patch
+
+# Fix cross-origin Digest auth state leak (CVE-2026-11856)
+Patch010: 0010-curl-8.18.0-CVE-2026-11856.patch
+
+# Fix cross-proxy Digest auth state leak (CVE-2026-7168)
+Patch011: 0011-curl-8.18.0-CVE-2026-7168.patch
+
+# Fix OCSP stapling bypass with Apple SecTrust (CVE-2026-7009)
+Patch012: 0012-curl-8.18.0-CVE-2026-7009.patch
+
+# Fix QUIC zero-length UDP datagrams busy-loop (CVE-2026-11352)
+Patch013: 0013-curl-8.18.0-CVE-2026-11352.patch
+
+# Fix WS Auto-PONG memory exhaustion (CVE-2026-11586)
+Patch014: 0014-curl-8.18.0-CVE-2026-11586.patch
+
+# Fix proto-default skips SSH verification (CVE-2026-12064)
+Patch015: 0015-curl-8.18.0-CVE-2026-12064.patch
+
+# Fix wrong STARTTLS connection reuse (CVE-2026-8286)
+Patch016: 0016-curl-8.18.0-CVE-2026-8286.patch
+
+# Fix SASL double-free (CVE-2026-8925)
+Patch017: 0017-curl-8.18.0-CVE-2026-8925.patch
+
+# Fix env-set cross-proxy Digest auth state leak (CVE-2026-8927)
+Patch018: 0018-curl-8.18.0-CVE-2026-8927.patch
+
+# Fix sending old referer (CVE-2026-9546)
+Patch019: 0019-curl-8.18.0-CVE-2026-9546.patch
+
+# Fix exposing HTTP/3 early data (CVE-2026-9545)
+Patch020: 0020-curl-8.18.0-CVE-2026-9545.patch
+
+# Fix UAF after pause in socket callback (CVE-2026-9080)
+Patch021: 0021-curl-8.18.0-CVE-2026-9080.patch
 
 # patch making libcurl multilib ready
 Patch101: 0101-curl-7.32.0-multilib.patch
-
-# test616: disable valgrind
-Patch105: 0105-curl-8.11.1-test616.patch
 
 Provides: curl-full = %{version}-%{release}
 # do not fail when trying to install curl-minimal after drop
@@ -55,10 +117,16 @@ BuildRequires: groff
 BuildRequires: krb5-devel
 BuildRequires: libidn2-devel
 BuildRequires: libnghttp2-devel
+%if %{with http3}
+BuildRequires: libnghttp3-devel
+%endif
 BuildRequires: libpsl-devel
 BuildRequires: libssh-devel
 BuildRequires: libtool
 BuildRequires: make
+%if %{with http3}
+BuildRequires: ngtcp2-crypto-ossl-devel
+%endif
 BuildRequires: openldap-devel
 BuildRequires: openssh-clients
 BuildRequires: openssh-server
@@ -152,6 +220,10 @@ Requires: libcurl%{?_isa} >= %{version}-%{release}
 # to ensure that we have the necessary symbols available (#2144277)
 %global libnghttp2_version %(pkg-config --modversion libnghttp2 2>/dev/null || echo 0)
 
+# require at least the version of libnghttp3 that we were built against,
+# to ensure that we have the necessary symbols available
+%global libnghttp3_version %(pkg-config --modversion libnghttp3 2>/dev/null || echo 0)
+
 # require at least the version of libpsl that we were built against,
 # to ensure that we have the necessary symbols available (#1631804)
 %global libpsl_version %(pkg-config --modversion libpsl 2>/dev/null || echo 0)
@@ -159,6 +231,10 @@ Requires: libcurl%{?_isa} >= %{version}-%{release}
 # require at least the version of libssh that we were built against,
 # to ensure that we have the necessary symbols available (#525002, #642796)
 %global libssh_version %(pkg-config --modversion libssh 2>/dev/null || echo 0)
+
+# require at least the version of ngtcp2 that we were built against,
+# to ensure that we have the necessary symbols available
+%global ngtcp2_version %(pkg-config --modversion libngtcp2 2>/dev/null || echo 0)
 
 # require at least the version of openssl-libs that we were built against,
 # to ensure that we have the necessary symbols available (#1462184, #1462211)
@@ -176,8 +252,14 @@ resume, proxy tunneling and a busload of other useful tricks.
 %package -n libcurl
 Summary: A library for getting files from web servers
 Requires: libnghttp2%{?_isa} >= %{libnghttp2_version}
+%if %{with http3}
+Requires: libnghttp3%{?_isa} >= %{libnghttp3_version}
+%endif
 Requires: libpsl%{?_isa} >= %{libpsl_version}
 Requires: libssh%{?_isa} >= %{libssh_version}
+%if %{with http3}
+Requires: ngtcp2%{?_isa} >= %{ngtcp2_version}
+%endif
 Requires: openssl-libs%{?_isa} >= 1:%{openssl_version}
 Provides: libcurl-full = %{version}-%{release}
 Provides: libcurl-full%{?_isa} = %{version}-%{release}
@@ -227,6 +309,9 @@ be installed.
 # disable test 1801
 # <https://github.com/bagder/curl/commit/21e82bd6#commitcomment-12226582>
 printf "1801\n" >>tests/data/DISABLED
+
+# disable test 1701 -- nghttpx rejects h2c upgrade with 400 Bad Request
+printf "1701\n" >>tests/data/DISABLED
 
 # test3026: avoid pthread_create() failure due to resource exhaustion on i386
 %ifarch %{ix86}
@@ -293,7 +378,9 @@ export common_configure_opts="          \
         --disable-websockets            \
         --without-brotli                \
         --without-libpsl                \
-        --without-libssh
+        --without-libssh                \
+        --without-nghttp3               \
+        --without-ngtcp2
 )
 
 # configure full build
@@ -317,7 +404,11 @@ export common_configure_opts="          \
         --enable-websockets             \
         --with-brotli                   \
         --with-libpsl                   \
-        --with-libssh
+        --with-libssh                   \
+%if %{with http3}
+        --with-nghttp3                  \
+        --with-ngtcp2                   \
+%endif
 )
 
 # avoid using rpath
@@ -393,9 +484,10 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %doc README
 %doc docs/BUGS.md
 %doc docs/DISTROS.md
-%doc docs/FAQ
+%doc docs/FAQ.md
 %doc docs/FEATURES.md
-%doc docs/TODO
+%doc docs/KNOWN_BUGS.md
+%doc docs/TODO.md
 %doc docs/TheArtOfHttpScripting.md
 %{_bindir}/curl
 %{_mandir}/man1/curl.1*
@@ -423,14 +515,92 @@ rm -f ${RPM_BUILD_ROOT}%{_mandir}/man1/wcurl.1*
 %{_libdir}/libcurl.so.4.[0-9].[0-9].minimal
 
 %changelog
-* Mon Jan 19 2026 Jan Macku <jamacku@redhat.com> - 8.15.0-5
-- fix broken TLS options for threaded LDAPS (CVE-2025-14017)
+* Mon Aug 24 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-9
+- Fix QUIC zero-length UDP datagrams busy-loop (CVE-2026-11352)
+- Fix WS Auto-PONG memory exhaustion (CVE-2026-11586)
+- Fix proto-default skips SSH verification (CVE-2026-12064)
+- Fix wrong STARTTLS connection reuse (CVE-2026-8286)
+- Fix SASL double-free (CVE-2026-8925)
+- Fix env-set cross-proxy Digest auth state leak (CVE-2026-8927)
+- Fix sending old referer (CVE-2026-9546)
+- Fix exposing HTTP/3 early data (CVE-2026-9545)
+- Fix UAF after pause in socket callback (CVE-2026-9080)
 
-* Thu Dec 04 2025 Jan Macku <jamacku@redhat.com> - 8.15.0-4
-- fix curl: tool_read_cb(): curl killed by SIGSEGV (#2417738)
+* Wed Jul 29 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-8
+- Fix trailing dot domain super cookie (CVE-2026-8924)
+- Fix SSH improper host validation (CVE-2026-9547)
+- Fix password leak with netrc and user in URL (CVE-2026-8926)
+- Fix cross-origin Digest auth state leak (CVE-2026-11856)
+- Fix cross-proxy Digest auth state leak (CVE-2026-7168)
+- Fix OCSP stapling bypass with Apple SecTrust (CVE-2026-7009)
 
-* Thu Nov 13 2025 Jan Macku <jamacku@redhat.com> - 8.15.0-3
+* Mon Jul 20 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-7
+- explicitly disable HTTP/3 support in the minimal build
+
+* Fri Apr 10 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-6
+- Fix bad reuse of HTTP Negotiate connection (CVE-2026-1965)
+- Fix token leak with redirect and netrc (CVE-2026-3783)
+- Fix wrong proxy connection reuse with credentials (CVE-2026-3784)
+- Fix use after free in SMB connection reuse (CVE-2026-3805)
+
+* Mon Mar 30 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-5
+- Fix `Could not find digest algorithm UNDEF (NID 0)` (#2438170)
+
+* Wed Feb 04 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-4
+- Fix rubygem-ethon: FTBFS in Fedora Rawhide (#2405328)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.18.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.18.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 07 2026 Jan Macku <jamacku@redhat.com> - 8.18.0-1
+- new upstream release
+
+* Mon Jan 05 2026 Jan Macku <jamacku@redhat.com> - 8.18.0~rc3-1
+- new upstream release candidate
+
+* Tue Dec 16 2025 Jan Macku <jamacku@redhat.com> - 8.18.0~rc2-1
+- new upstream release candidate
+- reenable valgrind on test 616
+
+* Tue Dec 09 2025 Jan Macku <jamacku@redhat.com> - 8.18.0~rc1-1
+- new upstream release candidate
+- drop upstreamed patches
+
+* Sun Dec 07 2025 Aleksei Bavshin <alebastr@fedoraproject.org> - 8.17.0-5
+- Enable HTTP/3 support with ngtcp2
+
+* Thu Dec 04 2025 Jan Macku <jamacku@redhat.com> - 8.17.0-4
+- apply upstream patches for valgrind issues in HTTP/3 (#2408809)
+
+* Thu Nov 13 2025 Jan Macku <jamacku@redhat.com> - 8.17.0-3
+- recommend wcurl package instead of bundled wcurl utility
+
+* Thu Nov 13 2025 Jan Macku <jamacku@redhat.com> - 8.17.0-2
 - remove bundled wcurl utility that was added in 8.14.0~rc1, use wcurl package instead
+
+* Mon Nov 10 2025 Jan Macku <jamacku@redhat.com> - 8.17.0-1
+- new upstream release
+
+* Thu Oct 30 2025 Jan Macku <jamacku@redhat.com> - 8.17.0~rc3-1
+- new upstream release candidate
+
+* Tue Oct 21 2025 Jan Macku <jamacku@redhat.com> - 8.17.0~rc2-1
+- new upstream release candidate
+
+* Mon Oct 13 2025 Jan Macku <jamacku@redhat.com> - 8.17.0~rc1-1
+- new upstream release candidate
+
+* Wed Sep 10 2025 Jan Macku <jamacku@redhat.com> - 8.16.0-1
+- new upstream release
+
+* Wed Sep 03 2025 Jan Macku <jamacku@redhat.com> - 8.16.0~rc3-1
+- new upstream release candidate
+
+* Tue Aug 26 2025 Jan Macku <jamacku@redhat.com> - 8.16.0~rc2-1
+- new upstream release candidate
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 8.15.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

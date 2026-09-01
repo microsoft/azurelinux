@@ -10,7 +10,7 @@
 
 Name:           perl-Tie-IxHash
 Version:        1.23
-Release: 44%{?dist}
+Release:        41%{?dist}
 Summary:        Ordered associative arrays for Perl
 
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl

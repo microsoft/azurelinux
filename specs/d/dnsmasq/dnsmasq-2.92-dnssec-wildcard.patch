@@ -1,4 +1,4 @@
-From f603a4f920e6953b11667d424956fd47373870e9 Mon Sep 17 00:00:00 2001
+From 32f10cda64b92b3559cc3b8b4479399496bddb64 Mon Sep 17 00:00:00 2001
 From: Simon Kelley <simon@thekelleys.org.uk>
 Date: Mon, 12 Jan 2026 21:55:41 +0000
 Subject: [PATCH] Fix a corner-case in DNSSEC validation with wildcards.
@@ -11,34 +11,15 @@ is not required, but was being done.
 
 Thanks to Jan Breig for spotting this.
 ---
- CHANGELOG     | 10 ++++++++++
  src/dnsmasq.h |  7 +++----
  src/dnssec.c  | 47 +++++++++++++++++++++++------------------------
- 3 files changed, 36 insertions(+), 28 deletions(-)
+ 2 files changed, 26 insertions(+), 28 deletions(-)
 
-diff --git a/CHANGELOG b/CHANGELOG
-index 32981f8..13f0de9 100644
---- a/CHANGELOG
-+++ b/CHANGELOG
-@@ -1,3 +1,13 @@
-+version 2.93
-+	Fix a corner-case in DNSSEC validation with wildcards. If we have
-+	a wildcard record *.example.com and recieve a query for
-+	a.example.com then that's OK, but we have to check that there isn't
-+	an actual a.example.com record. The corner case is when we get a
-+	query for *.example.com in that case the non-existence check
-+	is not required, was being done. Thanks to Jan Breig for
-+	spotting this.
-+
-+
- version 2.92
-         Redesign the interaction between DNSSEC validation and per-domain
- 	servers, specified as --server=/<domain>/<ip-address>. This should
 diff --git a/src/dnsmasq.h b/src/dnsmasq.h
-index c636563..40f2b5c 100644
+index 58be09f..934517f 100644
 --- a/src/dnsmasq.h
 +++ b/src/dnsmasq.h
-@@ -761,10 +761,9 @@ struct dyndir {
+@@ -760,10 +760,9 @@ struct dyndir {
  #define STAT_NEED_DS            0x40000
  #define STAT_NEED_KEY           0x50000
  #define STAT_TRUNCATED          0x60000
@@ -53,7 +34,7 @@ index c636563..40f2b5c 100644
  #define DNSSEC_FAIL_NYV         0x0001 /* key not yet valid */
  #define DNSSEC_FAIL_EXP         0x0002 /* key expired */
 diff --git a/src/dnssec.c b/src/dnssec.c
-index 0860daa..ef67eb6 100644
+index 3951620..b5e6b35 100644
 --- a/src/dnssec.c
 +++ b/src/dnssec.c
 @@ -438,8 +438,6 @@ int dec_counter(int *counter, char *message)
@@ -85,7 +66,7 @@ index 0860daa..ef67eb6 100644
    
    name_labels = count_labels(name); /* For 4035 5.3.2 check */
  
-@@ -574,7 +572,9 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
+@@ -578,7 +576,9 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
  	  name_start = name;
  	  
  	  /* if more labels than in RRsig name, hash *.<no labels in rrsig labels field>  4035 5.3.2 */
@@ -96,7 +77,7 @@ index 0860daa..ef67eb6 100644
  	    {
  	      for (j = name_labels - labels; j != 0; j--)
  		{
-@@ -584,11 +584,11 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
+@@ -588,11 +588,11 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
  		    name_start++;
  		}
  	      
@@ -112,7 +93,7 @@ index 0860daa..ef67eb6 100644
  	    }
  	  
  	  wire_len = to_wire(name_start);
-@@ -687,7 +687,7 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
+@@ -691,7 +691,7 @@ static int validate_rrset(time_t now, struct dns_header *header, size_t plen, in
  		  return STAT_ABANDONED;
  		
  		if (verify(crecp->addr.key.keydata, crecp->addr.key.keylen, sig, sig_len, digest, hash->digest_size, algo))
@@ -121,7 +102,7 @@ index 0860daa..ef67eb6 100644
  		
  		/* An attacker can waste a lot of our CPU by setting up a giant DNSKEY RRSET full of failing
  		   keys, all of which we have to try. Since many failing keys is not likely for
-@@ -1545,7 +1545,7 @@ static int check_nsec3_coverage(struct dns_header *header, size_t plen, int dige
+@@ -1549,7 +1549,7 @@ static int check_nsec3_coverage(struct dns_header *header, size_t plen, int dige
  
  /* returns 0 on success, or DNSSEC_FAIL_* value on failure. */
  static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, unsigned char **nsecs, int nsec_count, char *workspace1,
@@ -130,7 +111,7 @@ index 0860daa..ef67eb6 100644
  {
    unsigned char *salt, *p, *digest;
    int digest_len, i, iterations, salt_len, base32_len, algo = 0;
-@@ -1643,9 +1643,9 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
+@@ -1647,9 +1647,9 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
        if (*closest_encloser == '.')
  	closest_encloser++;
  
@@ -142,7 +123,7 @@ index 0860daa..ef67eb6 100644
        if (dec_counter(validate_counter, NULL))
  	return DNSSEC_FAIL_WORK;
        
-@@ -1687,7 +1687,7 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
+@@ -1691,7 +1691,7 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
      return DNSSEC_FAIL_NONSEC;
    
    /* Finally, check that there's no seat of wildcard synthesis */
@@ -151,7 +132,7 @@ index 0860daa..ef67eb6 100644
      {
        if (!(wildcard = strchr(next_closest, '.')) || wildcard == next_closest)
  	return DNSSEC_FAIL_NONSEC;
-@@ -1710,7 +1710,7 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
+@@ -1714,7 +1714,7 @@ static int prove_non_existence_nsec3(struct dns_header *header, size_t plen, uns
  
  /* returns 0 on success, or DNSSEC_FAIL_* value on failure. */
  static int prove_non_existence(struct dns_header *header, size_t plen, char *keyname, char *name, int qtype, int qclass,
@@ -160,7 +141,7 @@ index 0860daa..ef67eb6 100644
  {
    static unsigned char **nsecset = NULL, **rrsig_labels = NULL;
    static int nsecset_sz = 0, rrsig_labels_sz = 0;
-@@ -1858,7 +1858,7 @@ static int prove_non_existence(struct dns_header *header, size_t plen, char *key
+@@ -1862,7 +1862,7 @@ static int prove_non_existence(struct dns_header *header, size_t plen, char *key
    if (type_found == T_NSEC)
      return prove_non_existence_nsec(header, plen, nsecset, rrsig_labels, nsecs_found, daemon->workspacename, keyname, name, qtype, nons);
    else if (type_found == T_NSEC3)
@@ -169,7 +150,7 @@ index 0860daa..ef67eb6 100644
    else
      return DNSSEC_FAIL_NONSEC;
  }
-@@ -2183,8 +2183,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
+@@ -2187,8 +2187,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
        else
  	{
  	  /* Not done, validate now */
@@ -179,7 +160,7 @@ index 0860daa..ef67eb6 100644
  	  
  	  if (!explore_rrset(header, plen, class1, type1, name, keyname, &sigcnt, &rrcnt))
  	    return STAT_BOGUS;
-@@ -2238,7 +2237,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
+@@ -2242,7 +2241,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
  		{
  		  unsigned long sig_ttl;
  		  rc = validate_rrset(now, header, plen, class1, type1, sigcnt,
@@ -188,7 +169,7 @@ index 0860daa..ef67eb6 100644
  		  
  		  if (STAT_ISEQUAL(rc, STAT_BOGUS) || STAT_ISEQUAL(rc, STAT_NEED_KEY) || STAT_ISEQUAL(rc, STAT_NEED_DS) || STAT_ISEQUAL(rc, STAT_ABANDONED))
  		    {
-@@ -2247,7 +2246,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
+@@ -2251,7 +2250,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
  		      return rc;
  		    } 
  		  
@@ -197,7 +178,7 @@ index 0860daa..ef67eb6 100644
  		  
  		  /* Note that RR is validated */
  		  daemon->rr_status[i] = sig_ttl;
-@@ -2273,8 +2272,8 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
+@@ -2277,8 +2276,8 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
  		     Note that we may not yet have validated the NSEC/NSEC3 RRsets. 
  		     That's not a problem since if the RRsets later fail
  		     we'll return BOGUS then. */
@@ -208,7 +189,7 @@ index 0860daa..ef67eb6 100644
  		    return  (rc_nsec & DNSSEC_FAIL_WORK) ? STAT_ABANDONED : (STAT_BOGUS | rc_nsec);
  
  		  rc = STAT_SECURE;
-@@ -2302,7 +2301,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
+@@ -2306,7 +2305,7 @@ int dnssec_validate_reply(time_t now, struct dns_header *header, size_t plen, ch
  	   the answer is in an unsigned zone, or there's NSEC records.
  	   For a DS record, we return INSECURE, which almost always turns
  	   into BOGUS in the caller. */
@@ -218,5 +199,5 @@ index 0860daa..ef67eb6 100644
  	    if (rc_nsec & DNSSEC_FAIL_WORK)
  	      return STAT_ABANDONED;
 -- 
-2.20.1
+2.54.0
 

@@ -1,46 +1,35 @@
-diff --git a/files.rs b/files.rs.modded
-index 8dc208a..069164b 100644
---- files.rs
-+++ files.rs.modded
-@@ -17,13 +17,10 @@
+--- files.rs.orig	2026-06-16 11:17:00.470637200 +0200
++++ files.rs	2026-06-16 12:05:52.032336927 +0200
+@@ -17,10 +17,9 @@
  
  use crate::config::OS;
  use crate::config::OS::WINDOWS;
--use crate::{
--    format_one_arg, format_three_args, run_shell_command_by_os, Command, Logger, CP_VOLUME_COMMAND,
--    HDIUTIL_ATTACH_COMMAND, HDIUTIL_DETACH_COMMAND, MACOS, MSIEXEC_INSTALL_COMMAND,
--};
-+use crate::{Logger};
-+
- use anyhow::anyhow;
+-use crate::{Command, Logger, MACOS, format_one_arg, run_shell_command};
++use crate::{Command, Logger, run_shell_command};
  use anyhow::Error;
+ use anyhow::anyhow;
 -use apple_flat_package::PkgReader;
  use bzip2::read::BzDecoder;
  use directories::BaseDirs;
  use flate2::read::GzDecoder;
-@@ -41,19 +38,6 @@ use zip::ZipArchive;
+@@ -43,7 +42,6 @@
+ use winapi::shared::minwindef::LPVOID;
+ #[cfg(windows)]
+ use winapi::um::winver::{GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW};
+-use xz2::read::XzDecoder;
+ use zip::ZipArchive;
  
  pub const PARSE_ERROR: &str = "Wrong browser/driver version";
- const CACHE_FOLDER: &str = ".cache/selenium";
--const ZIP: &str = "zip";
--const GZ: &str = "gz";
--const XML: &str = "xml";
--const HTML: &str = "html";
--const BZ2: &str = "bz2";
--const PKG: &str = "pkg";
--const DMG: &str = "dmg";
--const EXE: &str = "exe";
--const DEB: &str = "deb";
--const MSI: &str = "msi";
--const XZ: &str = "xz";
--const SEVEN_ZIP_HEADER: &[u8; 6] = b"7z\xBC\xAF\x27\x1C";
--const UNCOMPRESS_MACOS_ERR_MSG: &str = "{} files are only supported in macOS";
- 
- #[derive(Hash, Eq, PartialEq, Debug)]
- pub struct BrowserPath {
-@@ -102,228 +102,7 @@
-     single_file: Option<String>,
-     volume: Option<&str>,
+@@ -96,100 +94,15 @@
+     compressed_file: &str,
+     target: &Path,
+     log: &Logger,
+-    os: &str,
+-    single_file: Option<String>,
+-    volume: Option<&str>,
++    _os: &str,
++    _single_file: Option<String>,
++    _volume: Option<&str>,
  ) -> Result<(), Error> {
 -    let mut extension = match infer::get_from_path(compressed_file)? {
 -        Some(kind) => kind.extension(),
@@ -90,7 +79,7 @@ index 8dc208a..069164b 100644
 -    } else if extension.eq_ignore_ascii_case(PKG) {
 -        uncompress_pkg(compressed_file, target, log)?
 -    } else if extension.eq_ignore_ascii_case(DMG) {
--        uncompress_dmg(compressed_file, target, log, os, volume.unwrap_or_default())?
+-        uncompress_dmg(compressed_file, target, log, volume.unwrap_or_default())?
 -    } else if extension.eq_ignore_ascii_case(EXE) {
 -        uncompress_sfx(compressed_file, target, log)?
 -    } else if extension.eq_ignore_ascii_case(DEB) {
@@ -111,8 +100,9 @@ index 8dc208a..069164b 100644
 -    }
 -
 -    Ok(())
--}
--
++    untargz(compressed_file, target, log)
+ }
+ 
 -pub fn uncompress_sfx(compressed_file: &str, target: &Path, log: &Logger) -> Result<(), Error> {
 -    let zip_parent = Path::new(compressed_file).parent().unwrap();
 -    log.trace(format!(
@@ -132,22 +122,15 @@ index 8dc208a..069164b 100644
 -    move_folder_content(&core_str, target, log)?;
 -
 -    Ok(())
--}
--
--pub fn move_folder_content(source: &str, target: &Path, log: &Logger) -> Result<(), Error> {
--    log.trace(format!(
--        "Moving files and folders from {} to {}",
--        source,
--        target.display()
--    ));
--    create_parent_path_if_not_exists(target)?;
--    let mut options = CopyOptions::new();
--    options.content_only = true;
--    options.skip_exist = true;
--    move_dir(source, target, &options)?;
--    Ok(())
--}
--
++pub fn uncompress_sfx(_compressed_file: &str, _target: &Path, _log: &Logger) -> Result<(), Error> {
++    Err(anyhow!("SFX (7-zip self-extracting) archives are not supported in this build"))
+ }
+ 
+ pub fn move_folder_content(source: &str, target: &Path, log: &Logger) -> Result<(), Error> {
+@@ -206,137 +119,30 @@
+     Ok(())
+ }
+ 
 -pub fn uncompress_pkg(compressed_file: &str, target: &Path, log: &Logger) -> Result<(), Error> {
 -    let target_path = Path::new(target);
 -    let mut reader = PkgReader::new(File::open(compressed_file)?)?;
@@ -178,15 +161,20 @@ index 8dc208a..069164b 100644
 -        }
 -    }
 -    Ok(())
--}
--
--pub fn uncompress_dmg(
++pub fn uncompress_pkg(_compressed_file: &str, _target: &Path, _log: &Logger) -> Result<(), Error> {
++    Err(anyhow!("Apple PKG archives are not supported in this build"))
+ }
+ 
+ pub fn uncompress_dmg(
 -    compressed_file: &str,
 -    target: &Path,
 -    log: &Logger,
--    os: &str,
 -    volume: &str,
--) -> Result<(), Error> {
++    _compressed_file: &str,
++    _target: &Path,
++    _log: &Logger,
++    _volume: &str,
+ ) -> Result<(), Error> {
 -    let dmg_file_name = Path::new(compressed_file)
 -        .file_name()
 -        .unwrap_or_default()
@@ -195,34 +183,47 @@ index 8dc208a..069164b 100644
 -        "Mounting {} and copying content to cache",
 -        dmg_file_name.to_str().unwrap_or_default()
 -    ));
--    let mut command = Command::new_single(format_one_arg(HDIUTIL_ATTACH_COMMAND, compressed_file));
+-    let mut command = Command::new(
+-        HDIUTIL_COMMAND,
+-        vec![String::from("attach"), compressed_file.to_string()],
+-    );
 -    log.trace(format!("Running command: {}", command.display()));
--    run_shell_command_by_os(os, command)?;
+-    run_shell_command(command)?;
 -
 -    fs::create_dir_all(target)?;
 -    let target_folder = path_to_string(target);
--    command = Command::new_single(format_three_args(
--        CP_VOLUME_COMMAND,
--        volume,
--        volume,
--        &target_folder,
--    ));
+-    command = Command::new(
+-        "cp",
+-        vec![
+-            String::from("-R"),
+-            format!("/Volumes/{}/{}.app", volume, volume),
+-            target_folder,
+-        ],
+-    );
 -    log.trace(format!("Running command: {}", command.display()));
--    run_shell_command_by_os(os, command)?;
+-    run_shell_command(command)?;
 -
--    command = Command::new_single(format_one_arg(HDIUTIL_DETACH_COMMAND, volume));
+-    command = Command::new(
+-        HDIUTIL_COMMAND,
+-        vec![String::from("detach"), format!("/Volumes/{}", volume)],
+-    );
 -    log.trace(format!("Running command: {}", command.display()));
--    run_shell_command_by_os(os, command)?;
+-    run_shell_command(command)?;
 -
 -    Ok(())
--}
--
--pub fn uncompress_deb(
++    Err(anyhow!("DMG archives are not supported in this build (macOS only)"))
+ }
+ 
+ pub fn uncompress_deb(
 -    compressed_file: &str,
 -    target: &Path,
 -    log: &Logger,
 -    label: &str,
--) -> Result<(), Error> {
++    _compressed_file: &str,
++    _target: &Path,
++    _log: &Logger,
++    _label: &str,
+ ) -> Result<(), Error> {
 -    let zip_parent = Path::new(compressed_file).parent().unwrap();
 -    log.trace(format!(
 -        "Extracting from {} to {}",
@@ -247,9 +248,10 @@ index 8dc208a..069164b 100644
 -    move_folder_content(&opt_edge_str, target, log)?;
 -
 -    Ok(())
--}
--
--pub fn install_msi(msi_file: &str, log: &Logger, os: &str) -> Result<(), Error> {
++    Err(anyhow!("DEB archives are not supported in this build"))
+ }
+ 
+-pub fn install_msi(msi_file: &str, log: &Logger, _os: &str) -> Result<(), Error> {
 -    let msi_file_name = Path::new(msi_file)
 -        .file_name()
 -        .unwrap_or_default()
@@ -259,12 +261,21 @@ index 8dc208a..069164b 100644
 -        msi_file_name.to_str().unwrap_or_default()
 -    ));
 -
--    let command = Command::new_single(format_one_arg(MSIEXEC_INSTALL_COMMAND, msi_file));
+-    let command = Command::new(
+-        "msiexec",
+-        vec![
+-            String::from("/i"),
+-            msi_file.to_string(),
+-            String::from("/qn"),
+-            String::from("ALLOWDOWNGRADE=1"),
+-        ],
+-    );
 -    log.trace(format!("Running command: {}", command.display()));
--    run_shell_command_by_os(os, command)?;
+-    run_shell_command(command)?;
 -
 -    Ok(())
-+      untargz(compressed_file, target, log)
++pub fn install_msi(_msi_file: &str, _log: &Logger, _os: &str) -> Result<(), Error> {
++    Err(anyhow!("MSI installers are not supported in this build (Windows only)"))
  }
  
  pub fn untargz(compressed_file: &str, target: &Path, log: &Logger) -> Result<(), Error> {

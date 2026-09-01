@@ -1,0 +1,25 @@
+From 43c4a61c5d8836a16feb8e53c72f255790523ff3 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Mon, 3 Nov 2025 06:11:40 -0800
+Subject: [PATCH] hipblaslt find origami package
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index dbccca92c84f..d02df50540c2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -218,7 +218,7 @@ if(HIPBLASLT_ENABLE_MSGPACK)
+     endif()
+ endif()
+ 
+-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../shared/origami" origami)
++find_package(origami CONFIG REQUIRED)
+ add_subdirectory(tensilelite)
+ 
+ if(HIPBLASLT_ENABLE_HOST)
+-- 
+2.52.0
+

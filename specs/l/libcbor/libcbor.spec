@@ -2,15 +2,13 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		libcbor
-Version:	0.12.0
-Release: 9%{?dist}
+Version:	0.13.0
+Release:	2%{?dist}
 Summary:	A CBOR parsing library
 
 License:	MIT
 URL:		http://libcbor.org
 Source0:	https://github.com/PJK/%{name}/archive/v%{version}.tar.gz
-# Upstream patch for cmake version min version (supports cmake 4.0)
-Patch0001:      0001-Set-cmake_minimum_required-to-3.5.patch
 
 BuildRequires:	cmake
 BuildRequires:	doxygen
@@ -56,7 +54,7 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %files
 %license LICENSE.md
 %doc README.md
-%{_libdir}/libcbor.so.0.12{,.*}
+%{_libdir}/libcbor.so.0.13{,.*}
 
 %files devel
 %{_includedir}/cbor.h
@@ -67,6 +65,12 @@ cp doc/build/man/libcbor.3 %{buildroot}%{_mandir}/man3/
 %{_mandir}/man3/libcbor.3{,.*}
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Nov 02 2025 Gary Buhrmaster <gary.buhrmaster@gmail.com> - 0.13.0-1
+- Update to version 0.13.0 ( resolves: rhbz:2392142 )
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.12.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

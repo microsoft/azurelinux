@@ -5,7 +5,7 @@
 
 Name:		rubygem-%{gem_name}
 Version:	1.1.1
-Release: 17%{?dist}
+Release:	15%{?dist}
 
 Summary:	Test helper for ordering threaded code
 License:	MIT
@@ -86,6 +86,9 @@ popd
 %doc	%{gem_docdir}
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

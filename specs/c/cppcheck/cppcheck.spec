@@ -8,8 +8,8 @@
 %endif
 
 Name:           cppcheck
-Version:        2.19.1
-Release: 4%{?dist}
+Version:        2.21.1
+Release:        1%{?dist}
 Summary:        Tool for static C/C++ code analysis
 License:        GPL-3.0-or-later
 URL:            http://cppcheck.sourceforge.io/
@@ -140,6 +140,24 @@ grep -l "#\!/usr/bin/env python3" %{buildroot}%{_datadir}/Cppcheck/addons/*.py |
 %{_bindir}/cppcheck-htmlreport
 
 %changelog
+* Mon Jun 22 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.21.1-1
+- 2.21.1
+
+* Thu Jun 04 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.21.0-1
+- 2.21.0
+
+* Fri Mar 27 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.20.1-1
+- 2.20.1
+
+* Tue Mar 03 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.20.0-1
+- 2.20.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.19.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.19.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jan 02 2026 Gwyn Ciesla <gwync@protonmail.com> - 2.19.1-1
 - 2.19.1
 

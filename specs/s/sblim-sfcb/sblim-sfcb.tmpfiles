@@ -1,0 +1,2 @@
+# populate /var/lib/sfcb with content from /usr/share/factory/var/lib/sfcb
+C /var/lib/sfcb - - - -

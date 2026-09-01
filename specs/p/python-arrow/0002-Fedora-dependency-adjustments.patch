@@ -15,7 +15,7 @@ diff --git a/pyproject.toml b/pyproject.toml
 index 89609bd..99f8e79 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -41,11 +41,9 @@ dynamic = ["version"]
+@@ -45,11 +45,9 @@
  [project.optional-dependencies]
  test = [
      "dateparser==1.*",
@@ -23,8 +23,8 @@ index 89609bd..99f8e79 100644
      "pytest",
 -    "pytest-cov",
      "pytest-mock",
--    "pytz==2021.1",
-+    "pytz>=2021.1",
+-    "pytz==2025.2",
++    "pytz>=2025.2",
      "simplejson==3.*",
  ]
  doc = [
@@ -32,11 +32,11 @@ diff --git a/tox.ini b/tox.ini
 index c410a8e..4d994cd 100644
 --- a/tox.ini
 +++ b/tox.ini
-@@ -46,7 +46,7 @@ allowlist_externals = flit
+@@ -46,7 +46,7 @@
  commands = flit publish --setup-py
  
  [pytest]
--addopts = -v --cov-branch --cov=arrow --cov-fail-under=99 --cov-report=term-missing --cov-report=xml
+-addopts = -v --cov-branch --cov=arrow --cov-fail-under=99 --cov-report=term-missing --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
 +addopts = -v
  testpaths = tests
  

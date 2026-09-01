@@ -1,7 +1,13 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global with_http3 0
 %global with_mingw 0
+
+%if 0%{?fedora} >= 43
+# Enable HTTP/3 support in nghttpx and h2load
+%global with_http3 1
+%endif
 
 %if 0%{?fedora}
 %global with_mingw 0
@@ -9,8 +15,8 @@
 
 Summary: Experimental HTTP/2 client, server and proxy
 Name: nghttp2
-Version: 1.66.0
-Release: 7%{?dist}
+Version: 1.68.0
+Release: 5%{?dist}
 
 # Parts of ruby bindings are additionally under GPL-2.0-or-later, MIT and
 # HPND-Kevlin-Henney but they are NOT shipped.
@@ -21,6 +27,9 @@ Source0: https://github.com/tatsuhiro-t/nghttp2/releases/download/v%{version}/ng
 Source1: https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
 Source2: tatsuhiro-t.pgp
 
+# fix HTTP Request/Response Smuggling and Response-Queue Poisoning via ambiguous HTTP/1.1 Upgrade requests (CVE-2026-58055)
+Patch001: 0001-nghttp2-1.68.0-CVE-2026-58055.patch
+
 BuildRequires: CUnit-devel
 BuildRequires: c-ares-devel
 BuildRequires: gcc-c++
@@ -30,6 +39,7 @@ BuildRequires: make
 BuildRequires: openssl-devel
 BuildRequires: python3-devel
 BuildRequires: systemd-rpm-macros
+BuildRequires: systemd-devel
 BuildRequires: zlib-devel
 
 # For gpg verification of source tarball
@@ -37,6 +47,11 @@ BuildRequires: gnupg2
 
 Requires: libnghttp2%{?_isa} = %{version}-%{release}
 %{?systemd_requires}
+
+%if %{with_http3}
+BuildRequires: libnghttp3-devel
+BuildRequires: ngtcp2-crypto-ossl-devel
+%endif
 
 %if %{with_mingw}
 BuildRequires: mingw32-filesystem >= 107
@@ -113,6 +128,9 @@ pushd build
     --disable-hpack-tools                   \
     --disable-python-bindings               \
     --disable-static                        \
+%if %{with_http3}
+    --enable-http3                          \
+%endif
     --with-libxml2
 
 # avoid using rpath
@@ -135,6 +153,8 @@ pushd build
 install -D -m0444 -p contrib/nghttpx.service \
     "$RPM_BUILD_ROOT%{_unitdir}/nghttpx.service"
 popd
+install -D -m0644 -p nghttpx.conf.sample \
+    "$RPM_BUILD_ROOT%{_sysconfdir}/nghttpx/nghttpx.conf"
 
 # not needed on Fedora/RHEL
 rm -f "$RPM_BUILD_ROOT%{_libdir}/libnghttp2.la"
@@ -180,6 +200,8 @@ popd
 %{_mandir}/man1/nghttpd.1*
 %{_mandir}/man1/nghttpx.1*
 %{_unitdir}/nghttpx.service
+%dir %{_sysconfdir}/nghttpx
+%config(noreplace) %{_sysconfdir}/nghttpx/nghttpx.conf
 
 %files -n libnghttp2
 %{_libdir}/libnghttp2.so.*
@@ -212,6 +234,28 @@ popd
 
 
 %changelog
+* Fri Aug 07 2026 Jan Macku <jamacku@redhat.com> - 1.68.0-5
+- fix HTTP Request/Response Smuggling and Response-Queue Poisoning via ambiguous HTTP/1.1 Upgrade requests (CVE-2026-58055)
+
+* Fri May 15 2026 Jan Macku <jamacku@redhat.com> - 1.68.0-4
+- add missing build dependency on systemd-devel (#2460065)
+- install missing sample configuration file for nghttpx service (#2460064)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.68.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 25 2025 Aleksei Bavshin <alebastr@fedoraproject.org> - 1.68.0-2
+- Enable HTTP/3 support in nghttpx and h2load
+
+* Fri Oct 31 2025 Jan Macku <jamacku@redhat.com> - 1.68.0-1
+- update to the latest upstream release
+
+* Tue Sep 16 2025 Jan Macku <jamacku@redhat.com> - 1.67.1-1
+- update to the latest upstream release
+
+* Wed Sep 03 2025 Jan Macku <jamacku@redhat.com> - 1.67.0-1
+- update to the latest upstream release
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.66.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

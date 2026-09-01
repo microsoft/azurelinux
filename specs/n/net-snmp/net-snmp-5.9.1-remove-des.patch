@@ -1,6 +1,6 @@
 diff -urNp a/man/net-snmp-config.1.def b/man/net-snmp-config.1.def
---- a/man/net-snmp-config.1.def	2021-05-26 09:30:07.430790003 +0200
-+++ b/man/net-snmp-config.1.def	2021-05-26 09:35:36.703673542 +0200
+--- a/man/net-snmp-config.1.def	2026-01-12 12:42:08.018134877 +0100
++++ b/man/net-snmp-config.1.def	2026-01-12 12:43:26.749846227 +0100
 @@ -30,7 +30,7 @@ code for a list of available debug token
  SNMP Setup commands:
  .TP
@@ -11,27 +11,27 @@ diff -urNp a/man/net-snmp-config.1.def b/man/net-snmp-config.1.def
  These options produce the various compilation flags needed when
  building external SNMP applications:
 diff -urNp a/man/net-snmp-create-v3-user.1.def b/man/net-snmp-create-v3-user.1.def
---- a/man/net-snmp-create-v3-user.1.def	2021-05-26 09:30:07.430790003 +0200
-+++ b/man/net-snmp-create-v3-user.1.def	2021-05-26 09:34:23.702034230 +0200
+--- a/man/net-snmp-create-v3-user.1.def	2026-01-12 12:42:08.017134868 +0100
++++ b/man/net-snmp-create-v3-user.1.def	2026-01-12 12:44:16.263005034 +0100
 @@ -3,7 +3,7 @@
  net-snmp-create-v3-user \- create a SNMPv3 user in net-snmp configuration file
  .SH SYNOPSIS
  .PP
--.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA] [-X privpass] [-x DES|AES]
-+.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA] [-X privpass] [-x AES]
+-.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-X privpass] [-x DES|AES|AES128]
++.B net-snmp-create-v3-user [-ro] [-A authpass] [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-X privpass] [-x AES|AES128]
  .B [username]
  .SH DESCRIPTION
  .PP
-@@ -27,5 +27,5 @@ specifies the authentication password ha
+@@ -27,5 +27,5 @@ specify authentication algorithm
  \fB\-X privpass\fR
- specifies the encryption password
+ specify encryption password
  .TP
--\fB\-x DES|AES\fR
-+\fB\-x AES\fR
- specifies the encryption algorithm
+-\fB\-x DES|AES|AES128\fR
++\fB\-x AES|AES128\fR
+ specify encryption algorithm
 diff -urNp a/man/snmpcmd.1.def b/man/snmpcmd.1.def
---- a/man/snmpcmd.1.def	2021-05-26 09:30:07.429789994 +0200
-+++ b/man/snmpcmd.1.def	2021-05-26 09:37:51.104850500 +0200
+--- a/man/snmpcmd.1.def	2026-01-12 12:42:08.016788741 +0100
++++ b/man/snmpcmd.1.def	2026-01-12 12:45:15.040041004 +0100
 @@ -311,7 +311,7 @@ Overrides the \fIdefSecurityName\fR toke
  file.
  .TP
@@ -42,8 +42,8 @@ diff -urNp a/man/snmpcmd.1.def b/man/snmpcmd.1.def
  .I snmp.conf
  file. This option is only valid if the Net-SNMP software was build
 diff -urNp a/man/snmp.conf.5.def b/man/snmp.conf.5.def
---- a/man/snmp.conf.5.def	2021-05-26 09:30:07.429789994 +0200
-+++ b/man/snmp.conf.5.def	2021-05-26 09:40:03.730011937 +0200
+--- a/man/snmp.conf.5.def	2026-01-12 12:42:08.018134877 +0100
++++ b/man/snmp.conf.5.def	2026-01-12 12:47:26.967780683 +0100
 @@ -221,13 +221,13 @@ The
  value will be used for the authentication and/or privacy pass phrases
  if either of the other directives are not specified.
@@ -71,8 +71,8 @@ diff -urNp a/man/snmp.conf.5.def b/man/snmp.conf.5.def
  Sets the path of the \fBsshtosnmp\fR socket created by an application
  (e.g. snmpd) listening for incoming ssh connections through the
 diff -urNp a/man/snmpd.examples.5.def b/man/snmpd.examples.5.def
---- a/man/snmpd.examples.5.def	2021-05-26 09:30:07.429789994 +0200
-+++ b/man/snmpd.examples.5.def	2021-05-26 09:41:29.170761436 +0200
+--- a/man/snmpd.examples.5.def	2026-01-12 12:42:08.016788741 +0100
++++ b/man/snmpd.examples.5.def	2026-01-12 12:48:02.264211991 +0100
 @@ -87,8 +87,8 @@ the same authentication and encryption s
  .RS
  .nf
@@ -85,8 +85,8 @@ diff -urNp a/man/snmpd.examples.5.def b/man/snmpd.examples.5.def
  .RE
  Note that this defines three \fIdistinct\fR users, who could be granted
 diff -urNp a/man/snmptrapd.conf.5.def b/man/snmptrapd.conf.5.def
---- a/man/snmptrapd.conf.5.def	2021-05-26 09:30:07.428789985 +0200
-+++ b/man/snmptrapd.conf.5.def	2021-05-26 09:42:02.963064029 +0200
+--- a/man/snmptrapd.conf.5.def	2026-01-12 12:42:08.018134877 +0100
++++ b/man/snmptrapd.conf.5.def	2026-01-12 12:48:43.264773008 +0100
 @@ -117,7 +117,7 @@ to trigger the types of processing liste
  See
  .IR snmpd.conf (5)
@@ -97,8 +97,8 @@ diff -urNp a/man/snmptrapd.conf.5.def b/man/snmptrapd.conf.5.def
  .IR snmpd.conf (5)
  manual page for a description of how to create SNMPv3 users.  This
 diff -urNp a/man/snmpusm.1.def b/man/snmpusm.1.def
---- a/man/snmpusm.1.def	2021-05-26 09:30:07.430790003 +0200
-+++ b/man/snmpusm.1.def	2021-05-26 09:42:24.178253990 +0200
+--- a/man/snmpusm.1.def	2026-01-12 12:42:08.018134877 +0100
++++ b/man/snmpusm.1.def	2026-01-12 12:49:26.488017367 +0100
 @@ -216,7 +216,7 @@ rwuser initial
  # lets add the new user we'll create too:
  rwuser wes
@@ -109,9 +109,9 @@ diff -urNp a/man/snmpusm.1.def b/man/snmpusm.1.def
  .RE
  .PP
 diff -urNp a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
---- a/net-snmp-create-v3-user.in	2021-05-26 09:30:07.369789468 +0200
-+++ b/net-snmp-create-v3-user.in	2021-05-26 09:33:23.966511123 +0200
-@@ -10,7 +10,7 @@ if @PSCMD@ | egrep ' snmpd *$' > /dev/nu
+--- a/net-snmp-create-v3-user.in	2026-01-12 12:42:08.102135636 +0100
++++ b/net-snmp-create-v3-user.in	2026-01-12 12:50:35.760787628 +0100
+@@ -10,7 +10,7 @@ if @PSCMD@ | @EGREP@ ' snmpd *$' > /dev/
  fi
  
  Aalgorithm="MD5"
@@ -138,14 +138,14 @@ diff -urNp a/net-snmp-create-v3-user.in b/net-snmp-create-v3-user.in
      echo ""
      echo "Usage:"
      echo "  net-snmp-create-v3-user [-ro] [-A authpass] [-X privpass]"
--    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x DES|AES] [username]"
-+    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x AES] [username]"
+-    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x DES|AES|AES128] [username]"
++    echo "                          [-a MD5|SHA|SHA-512|SHA-384|SHA-256|SHA-224] [-x AES|AES128] [username]"
      echo ""
      exit
  fi
 diff -urNp a/README.snmpv3 b/README.snmpv3
---- a/README.snmpv3	2021-05-26 09:30:07.352789320 +0200
-+++ b/README.snmpv3	2021-05-26 09:44:49.109551728 +0200
+--- a/README.snmpv3	2026-01-12 12:42:08.021134904 +0100
++++ b/README.snmpv3	2026-01-12 12:51:58.767903013 +0100
 @@ -4,7 +4,7 @@ How to setup SNMPv3, a very brief docume
  do a better job on since I suck at writing documentation and he
  doesn't ;-) --Wes:

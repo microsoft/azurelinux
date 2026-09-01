@@ -1,0 +1,28 @@
+From 5038b2836057e3a512609f100cf0369bfb167541 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Caol=C3=A1n=20McNamara?= <caolanm@gmail.com>
+Date: Tue, 5 May 2026 19:22:32 +0000
+Subject: [PATCH] Resolves #1117 abi-check: tolerate size_t mangling difference
+
+---
+ tests/abi-check.sh | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tests/abi-check.sh b/tests/abi-check.sh
+index 2933ad01..04c1d893 100755
+--- a/tests/abi-check.sh
++++ b/tests/abi-check.sh
+@@ -69,7 +69,13 @@ if [ "$MODE" = "update" ]; then
+     exit 0
+ fi
+ 
+-MISSING="$(LC_ALL=C comm -23 "$BASELINE" "$CURRENT")"
++# size_t at the end of a parameter list mangles as 'm' on LP64 and 'j'
++# on ILP32; retry with the trailing letter swapped before declaring a
++# baseline symbol gone, so the check passes on 32-bit Linux too.
++MISSING="$(LC_ALL=C comm -23 "$BASELINE" "$CURRENT" | while IFS= read -r sym; do
++    alt=$(printf '%s' "$sym" | sed 's/m$/j/; t; s/j$/m/')
++    grep -qxF -- "$alt" "$CURRENT" || printf '%s\n' "$sym"
++done)"
+ if [ -n "$MISSING" ]; then
+     echo "abi-check: FAIL - symbols missing from current build:"
+     echo "$MISSING" | sed 's/^/  /'

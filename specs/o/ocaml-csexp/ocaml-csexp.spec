@@ -20,7 +20,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-csexp
 Version:        1.5.2
-Release: 19%{?dist}
+Release:        18%{?dist}
 Summary:        Parsing and printing of S-expressions in canonical form
 
 License:        MIT
@@ -38,9 +38,9 @@ BuildRequires:  ocaml-rpm-macros
 %endif
 
 %description
-This project provides minimal support for parsing and printing
-S-expressions in canonical form, which is a very simple and canonical
-binary encoding of S-expressions.
+This project provides minimal support for parsing and printing S-expressions
+in canonical form, which is a very simple and canonical binary encoding of
+S-expressions.
 
 %package        devel
 Summary:        Development files for %{name}
@@ -97,7 +97,7 @@ plugin(native) = "csexp.cmxs"
 EOF
 
 cat >> %{buildroot}%{ocamldir}/csexp/dune-package << EOF
-(lang dune 3.19)
+(lang dune 3.20)
 (name csexp)
 (version %{version})
 (sections (lib .) (libexec .) (doc ../../doc/csexp))
@@ -155,10 +155,16 @@ EOF
 %files devel -f .ofiles-devel
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1.5.2-17
+- OCaml 5.4.0 rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.2-16
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 1.5.2-15
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 1.5.2-15
 - Rebuild to fix OCaml dependencies
 - Bump the dune lang up to 3.19
 

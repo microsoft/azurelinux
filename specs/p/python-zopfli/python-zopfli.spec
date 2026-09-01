@@ -5,12 +5,12 @@
 %global pypi_name zopfli
 
 Name:           python-zopfli
-Version:        0.2.3
-Release: 13%{?dist}
+Version:        0.3.0
+Release:        2%{?dist}
 Summary:        Zopfli module for python
 License:        Apache-2.0
-URL:            https://github.com/obp/py-zopfli
-Source0:        %{pypi_source %{pypi_name} %{version} zip}
+URL:            https://pypi.org/project/zopfli/
+Source0:        %{pypi_source %{pypi_name}}
 
 BuildRequires:  gcc
 BuildRequires:  python3-devel
@@ -53,6 +53,12 @@ export PYTHONPATH="${PYTHONPATH:-%{buildroot}%{python3_sitearch}}"
 %doc README.rst
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 07 2025 Parag Nemade <pnemade AT redhat DOT com> - 0.3.0-1
+- Update to 0.3.0 version (#2413326)
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.2.3-10
 - Rebuilt for Python 3.14.0rc3 bytecode
 

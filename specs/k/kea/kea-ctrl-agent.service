@@ -6,13 +6,14 @@ After=network-online.target
 After=time-sync.target
 
 [Service]
+Type=notify
 User=kea
-Environment="KEA_PIDFILE_DIR=/run/kea"
-Environment="KEA_LOCKFILE_DIR=/run/kea"
+#Environment="KEA_PIDFILE_DIR=/var/run/kea"
+#Environment="KEA_LOCKFILE_DIR=/var/run/kea"
 #Environment="KEA_LOGGER_DESTINATION=/var/log/kea/early-startup.log"
-Environment="KEA_DHCP_DATA_DIR=/var/lib/kea"
-Environment="KEA_LOG_FILE_DIR=/var/log/kea"
-Environment="KEA_CONTROL_SOCKET_DIR=/run/kea"
+#Environment="KEA_DHCP_DATA_DIR=/var/lib/kea"
+#Environment="KEA_LOG_FILE_DIR=/var/log/kea"
+#Environment="KEA_CONTROL_SOCKET_DIR=/var/run/kea"
 ConfigurationDirectory=kea
 ConfigurationDirectoryMode=0750
 RuntimeDirectory=kea

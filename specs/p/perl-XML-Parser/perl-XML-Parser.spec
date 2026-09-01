@@ -3,7 +3,7 @@
 
 Name:           perl-XML-Parser
 Version:        2.47
-Release: 11%{?dist}
+Release:        8%{?dist}
 Summary:        Perl module for parsing XML documents
 
 License:        Artistic-2.0

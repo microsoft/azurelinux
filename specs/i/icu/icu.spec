@@ -5,14 +5,14 @@
 
 # Set to 0 when upgrading to a new ICU release that contains up-to-date timezone data.
 # (or update the timezone data update..).
-%global use_tzdata_update 0
+%global use_tzdata_update 1
 
 %define version_dash %{gsub %{version} %. -}
 %define version_underscore %{gsub %{version} %. _}
 
 Name:      icu
 Version:   77.1
-Release: 4%{?dist}
+Release:   3%{?dist}
 Summary:   International Components for Unicode
 
 License:   Unicode-DFS-2016 AND BSD-2-Clause AND BSD-3-Clause AND NAIST-2003 AND LicenseRef-Fedora-Public-Domain
@@ -203,6 +203,12 @@ LD_LIBRARY_PATH=lib:stubdata:tools/ctestfw:$LD_LIBRARY_PATH bin/uconv -l
 
 
 %changelog
+* Wed Jul 01 2026 Mike FABIAN <mfabian@redhat.com> - 77.1-3
+- Update timezone data to 2026b
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 77.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Frantisek Zatloukal <fzatlouk@redhat.com> - 77.1-1
 - Update to 77.1
 

@@ -8,8 +8,8 @@
 %global ftest_shortcommit %(c=%{ftest_commit}; echo ${c:0:7})
 
 Name:       utf8cpp
-Version:    4.0.8
-Release: 4%{?dist}
+Version:    4.1.0
+Release:    1%{?dist}
 Summary:    A simple, portable and lightweight library for handling UTF-8 encoded strings
 License:    BSL-1.0
 URL:        https://github.com/nemtrif/utfcpp
@@ -75,7 +75,7 @@ pushd tests
 popd
 
 %files devel
-%doc README.md
+%doc API_REFERENCE.md README.md
 %license LICENSE
 %{_includedir}/utf8.h
 %dir %{_includedir}/utf8
@@ -89,6 +89,15 @@ popd
 %{_datadir}/cmake/utf8cpp
 
 %changelog
+* Mon May 18 2026 Dominik Mierzejewski <dominik@greysector.net> - 4.1.0-1
+- update to 4.1.0 (resolves rhbz#2478190)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.0.9-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 02 2026 Dominik Mierzejewski <dominik@greysector.net> - 4.0.9-1
+- update to 4.0.9 (resolves rhbz#2425940)
+
 * Sat Sep 20 2025 Dominik Mierzejewski <dominik@greysector.net> - 4.0.8-1
 - update to 4.0.8 (resolves rhbz#2395010)
 

@@ -4,7 +4,7 @@
 Summary:         A library for handling different graphics file formats
 Name:            netpbm
 Version:         11.13.00
-Release: 4%{?dist}
+Release:         2%{?dist}
 # See copyright_summary for details
 License:         BSD-3-Clause AND GPL-2.0-only AND LGPL-2.1-or-later AND GPL-3.0-or-later AND IJG AND MIT AND NTP AND PostgreSQL AND LicenseRef-MIT-CRL-Xim AND LicenseRef-Fedora-Public-Domain
 URL: http://netpbm.sourceforge.net/
@@ -232,6 +232,9 @@ popd
 %doc userguide/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 11.13.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jan 08 2026 Josef Ridky <jridky@redhat.com> - 11.13.00-1
 - New upstream release 11.13.00
 

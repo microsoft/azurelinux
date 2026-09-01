@@ -1,0 +1,51 @@
+From 7dca176bd9ea02e1bba2d597e91fd9cfa3b3a569 Mon Sep 17 00:00:00 2001
+From: "Mika T. Lindqvist" <postmaster@raasu.org>
+Date: Fri, 13 Feb 2026 03:10:55 +0200
+Subject: [PATCH] Fix building on RISC-V without RVV.
+
+---
+ CMakeLists.txt | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index af396fb5a9..2b0481b9ca 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -876,18 +876,18 @@ if(WITH_OPTIM)
+             endif()
+         endif()
+     elseif(BASEARCH_RISCV_FOUND)
++        if(WITH_RVV OR WITH_RISCV_ZBC)
++            add_definitions(-DRISCV_FEATURES)
++            list(APPEND ZLIB_ARCH_HDRS ${ARCHDIR}/riscv_functions.h)
++            if(WITH_RUNTIME_CPU_DETECTION)
++                list(APPEND ZLIB_ARCH_HDRS ${ARCHDIR}/riscv_features.h)
++                list(APPEND ZLIB_ARCH_SRCS ${ARCHDIR}/riscv_features.c)
++            endif()
++        endif()
+         if(WITH_RVV)
+             check_rvv_intrinsics()
+             if(HAVE_RVV_INTRIN)
+-                add_definitions(-DRISCV_FEATURES)
+                 add_definitions(-DRISCV_RVV)
+-                list(APPEND ZLIB_ARCH_HDRS ${ARCHDIR}/riscv_functions.h)
+-                if(WITH_RUNTIME_CPU_DETECTION)
+-                    list(APPEND ZLIB_ARCH_HDRS ${ARCHDIR}/riscv_features.h)
+-                    list(APPEND ZLIB_ARCH_SRCS ${ARCHDIR}/riscv_features.c)
+-                endif()
+-                # FIXME: we will not set compile flags for riscv_features.c when
+-                # the kernels update hwcap or hwprobe for riscv
+                 set(RVV_SRCS ${ARCHDIR}/adler32_rvv.c ${ARCHDIR}/chunkset_rvv.c ${ARCHDIR}/compare256_rvv.c ${ARCHDIR}/slide_hash_rvv.c)
+                 list(APPEND ZLIB_ARCH_SRCS ${RVV_SRCS})
+                 set_property(SOURCE ${RVV_SRCS} PROPERTY COMPILE_FLAGS "${RISCVFLAG} ${NOLTOFLAG}")
+@@ -908,7 +908,9 @@ if(WITH_OPTIM)
+             endif()
+         endif()
+ 
+-        if(WITH_RUNTIME_CPU_DETECTION AND BASEARCH_RISCV_FOUND)
++        # FIXME: we will not set compile flags for riscv_features.c when
++        # the kernels update hwcap or hwprobe for riscv
++        if(WITH_RUNTIME_CPU_DETECTION)
+             if(WITH_RVV AND WITH_RISCV_ZBC AND HAVE_RVV_INTRIN AND HAVE_RISCV_ZBC)
+                 set_property(SOURCE ${ARCHDIR}/riscv_features.c PROPERTY COMPILE_FLAGS "${RISCVFLAG}_zbc ${NOLTOFLAG}")
+             elseif(WITH_RVV AND HAVE_RVV_INTRIN)

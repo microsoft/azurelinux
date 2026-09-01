@@ -1,0 +1,8 @@
+--- ceph-20.2.0/src/jaegertracing/opentelemetry-cpp/CMakeLists.txt.orig	2026-02-17 08:17:06.372917033 -0500
++++ ceph-20.2.0/src/jaegertracing/opentelemetry-cpp/CMakeLists.txt	2026-02-17 08:17:44.026323618 -0500
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.1)
++cmake_minimum_required(VERSION 3.5)
+ 
+ # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
+ # versions of gtest

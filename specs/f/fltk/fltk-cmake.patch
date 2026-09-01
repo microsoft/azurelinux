@@ -1,13 +1,33 @@
-Index: fltk-1.3.11/CMake/setup.cmake
-===================================================================
---- fltk-1.3.11.orig/CMake/setup.cmake
-+++ fltk-1.3.11/CMake/setup.cmake
-@@ -62,7 +62,7 @@ if (WIN32 AND NOT CYGWIN)
- elseif (APPLE)
-   set (FLTK_CONFIG_PATH FLTK.framework/Resources/CMake)
- else ()
--  set (FLTK_CONFIG_PATH ${FLTK_DATADIR}/fltk)
-+  set (FLTK_CONFIG_PATH ${FLTK_DATADIR}/fltk CACHE FILEPATH "Install location for cmake files.")
- endif (WIN32 AND NOT CYGWIN)
+From e6064481c940ec0b487f84257d27eb2929d5013d Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa@fedoraproject.org>
+Date: Mon, 12 Jan 2026 07:55:53 -0500
+Subject: [PATCH] CMake: Use the correct install path for CMake data files
+
+Whether we are building natively or cross-compiling, we consistently
+want to use a single path setup for installing CMake data files.
+---
+ CMake/setup.cmake | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
+
+diff --git a/CMake/setup.cmake b/CMake/setup.cmake
+index 266e1299a..3089f87a8 100644
+--- a/CMake/setup.cmake
++++ b/CMake/setup.cmake
+@@ -93,13 +93,7 @@ set(STATICIMAGELIBS "")
+ #######################################################################
+ 
+ # set where config files go
+-if(WIN32 AND NOT CYGWIN)
+-  set(FLTK_CONFIG_PATH CMake)
+-elseif(APPLE AND NOT FLTK_BACKEND_X11)
+-  set(FLTK_CONFIG_PATH ${FLTK_DATADIR}/fltk)
+-else()
+-  set(FLTK_CONFIG_PATH ${FLTK_DATADIR}/fltk)
+-endif(WIN32 AND NOT CYGWIN)
++set(FLTK_CONFIG_PATH ${FLTK_LIBDIR}/cmake/fltk CACHE FILEPATH "Install location for cmake files.")
  
  include(TestBigEndian)
+ TEST_BIG_ENDIAN(WORDS_BIGENDIAN)
+-- 
+2.52.0
+

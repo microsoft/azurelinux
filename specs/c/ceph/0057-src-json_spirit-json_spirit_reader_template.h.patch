@@ -1,0 +1,10 @@
+--- ceph-20.0.0-2099-gc62cbb7d/src/json_spirit/json_spirit_reader_template.h.orig	2025-06-09 11:56:21.534808695 -0400
++++ ceph-20.0.0-2099-gc62cbb7d/src/json_spirit/json_spirit_reader_template.h	2025-06-09 12:01:56.358334353 -0400
+@@ -136,6 +136,7 @@
+     {
+         typedef typename String_type::const_iterator Iter_type;
+ 
++        if( end - begin < 1 ) return String_type();
+         if( end - begin < 2 ) return String_type( begin, end );
+ 
+         String_type result;

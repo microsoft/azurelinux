@@ -3,7 +3,7 @@
 
 Name:           epstool
 Version:        3.08
-Release: 35%{?dist}
+Release:        33%{?dist}
 Summary:        A utility to create or extract preview images in EPS files
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
@@ -48,6 +48,9 @@ install -D -p -m 644 doc/epstool.1 %{buildroot}%{_mandir}/man1/epstool.1
 %{_mandir}/man1/epstool.1.*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.08-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.08-32
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

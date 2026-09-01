@@ -1,0 +1,56 @@
+From 4082294f5094a7591e4e00658c5a605f05d644f1 Mon Sep 17 00:00:00 2001
+From: Jan Friesse <jfriesse@redhat.com>
+Date: Thu, 2 Apr 2026 09:44:06 +0200
+Subject: [PATCH 2/2] totemsrp: Fix integer overflow in memb_join_sanity
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This commit addresses an integer overflow (wraparound) vulnerability
+in the check_memb_join_sanity function.
+
+Previously, the 32-bit unsigned network values proc_list_entries and
+failed_list_entries were added together before being promoted to
+size_t. This allowed the addition to wrap around in 32-bit arithmetic
+(e.g., 0x80000000 + 0x80000000 = 0), resulting in a required_len
+calculation that was incorrectly small.
+
+The solution is to cast the list entries to size_t and verify that
+neither exceeds the maximum allowed value before the addition occurs.
+
+Fixes: CVE-2026-35092
+
+Reported-by: Sebastián Alba Vives (@Sebasteuo / 0xS4bb1) <sebasjosue84@gmail.com>
+Signed-off-by: Jan Friesse <jfriesse@redhat.com>
+Also-proposed-by: nicholasyang <nicholas.yang@suse.com>
+Reviewed-by: Christine Caulfield <ccaulfie@redhat.com>
+---
+ exec/totemsrp.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/exec/totemsrp.c b/exec/totemsrp.c
+index 372a96d..6759691 100644
+--- a/exec/totemsrp.c
++++ b/exec/totemsrp.c
+@@ -3786,7 +3786,17 @@ static int check_memb_join_sanity(
+ 		failed_list_entries = swab32(failed_list_entries);
+ 	}
+ 
+-	required_len = sizeof(struct memb_join) + ((proc_list_entries + failed_list_entries) * sizeof(struct srp_addr));
++	if (proc_list_entries > PROCESSOR_COUNT_MAX ||
++	    failed_list_entries > PROCESSOR_COUNT_MAX) {
++		log_printf (instance->totemsrp_log_level_security,
++		    "Received memb_join message list_entries exceeds the maximum "
++		    "allowed value...  ignoring.");
++
++		return (-1);
++	}
++
++	required_len = sizeof(struct memb_join) +
++	  (((size_t)proc_list_entries + (size_t)failed_list_entries) * sizeof(struct srp_addr));
+ 	if (msg_len < required_len) {
+ 		log_printf (instance->totemsrp_log_level_security,
+ 		    "Received memb_join message is too short...  ignoring.");
+-- 
+1.8.3.1
+

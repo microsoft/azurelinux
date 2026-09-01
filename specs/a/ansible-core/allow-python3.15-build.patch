@@ -1,0 +1,36 @@
+From 2b3053a64f50858a09cb02e3c847026714624432 Mon Sep 17 00:00:00 2001
+From: Karolina Surma <ksurma@redhat.com>
+Date: Mon, 4 May 2026 13:03:07 +0200
+Subject: [PATCH] Allow building with Python 3.15
+
+---
+ test/lib/ansible_test/_internal/coverage_util.py       | 2 +-
+ test/lib/ansible_test/_util/target/common/constants.py | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/test/lib/ansible_test/_internal/coverage_util.py b/test/lib/ansible_test/_internal/coverage_util.py
+index 6f2bd0a..3d5d026 100644
+--- a/test/lib/ansible_test/_internal/coverage_util.py
++++ b/test/lib/ansible_test/_internal/coverage_util.py
+@@ -69,7 +69,7 @@ class CoverageVersion:
+ 
+ COVERAGE_VERSIONS = (
+     # IMPORTANT: Keep this in sync with the ansible-test.txt requirements file.
+-    CoverageVersion('7.10.7', 7, (3, 9), (3, 14)),
++    CoverageVersion('7.10.7', 7, (3, 9), (3, 15)),
+ )
+ """
+ This tuple specifies the coverage version to use for Python version ranges.
+diff --git a/test/lib/ansible_test/_util/target/common/constants.py b/test/lib/ansible_test/_util/target/common/constants.py
+index 4d55c82..c19dc7c 100644
+--- a/test/lib/ansible_test/_util/target/common/constants.py
++++ b/test/lib/ansible_test/_util/target/common/constants.py
+@@ -14,4 +14,5 @@ CONTROLLER_PYTHON_VERSIONS = (
+     '3.12',
+     '3.13',
+     '3.14',
++    '3.15',
+ )
+-- 
+2.54.0
+

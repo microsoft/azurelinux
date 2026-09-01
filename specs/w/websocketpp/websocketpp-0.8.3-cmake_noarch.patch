@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2022-05-24 17:42:50.000000000 +0200
++++ b/CMakeLists.txt	2026-01-27 20:15:14.456352600 +0100
+@@ -45,7 +45,7 @@ set(INSTALL_INCLUDE_DIR include CACHE PA
+ if (WIN32 AND NOT CYGWIN)
+   set (DEF_INSTALL_CMAKE_DIR cmake)
+ else ()
+-  set (DEF_INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/websocketpp)
++  set (DEF_INSTALL_CMAKE_DIR share/cmake/websocketpp)
+ endif ()
+ set (INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
+ 

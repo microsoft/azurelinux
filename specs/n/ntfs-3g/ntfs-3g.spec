@@ -10,21 +10,13 @@
 
 Name:           ntfs-3g
 Epoch:          2
-Version:        2022.10.3
-Release: 13%{?dist}
+Version:        2026.2.25
+Release:        2%{?dist}
 Summary:        Linux NTFS userspace driver
-# Automatically converted from old format: GPLv2+ - review is highly recommended.
 License:        GPL-2.0-or-later
-URL:            https://www.tuxera.com/company/open-source/
+URL:            https://github.com/tuxera/ntfs-3g
 Source0:        http://tuxera.com/opensource/%{name}_ntfsprogs-%{version}%{?subver}.tgz
 Patch0:         ntfs-3g_ntfsprogs-2011.10.9-RC-ntfsck-unsupported-return-0.patch
-# Upstream seems mostly gone, but there are some patches merged after 2022.10.3
-Patch1:		https://github.com/tuxera/ntfs-3g/commit/e73d481a76a5814076ff78a1c3a70e9b7da7c0e9.patch
-Patch2:		https://github.com/tuxera/ntfs-3g/commit/01b9bddc0c2165baa46abe7562550ef4e8c2752b.patch
-Patch3:		https://github.com/tuxera/ntfs-3g/commit/241ddb38605b6b298174e6f1019e8e2502a45558.patch
-Patch4:		https://github.com/tuxera/ntfs-3g/commit/1565b01e215c74e5c5f83f3ecde1ed682637dc5a.patch
-Patch5:		https://github.com/tuxera/ntfs-3g/commit/233658e5a1599e40bbd8211e64bb98a12751b1ea.patch
-Patch6:		https://github.com/tuxera/ntfs-3g/commit/75dcdc2cf37478fad6c0e3427403d198b554951d.patch
 
 BuildRequires:  make
 # ntfs-3g BuildRequires
@@ -93,7 +85,7 @@ mkntfs, ntfscat, ntfsls, ntfsresize, and ntfsundelete (for a full list of
 included utilities see man 8 ntfsprogs after installation).
 
 %prep
-%autosetup -n %{name}_ntfsprogs-%{version}%{?subver} -p1
+%autosetup -n %{name}-%{version}%{?subver} -p1
 
 
 %build
@@ -132,6 +124,8 @@ ln -s mount.ntfs-3g mount.ntfs-fuse
 # And since there is no other package in Fedora that provides an ntfs
 # mount...
 ln -s mount.ntfs-3g mount.ntfs
+# According to bug2486080, we need "ntfs-3g-mount" ?
+ln -s ntfs-3g ntfs-3g-mount
 # Need this for fsck to find it
 ln -s ../bin/ntfsck fsck.ntfs
 popd
@@ -152,6 +146,7 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %{_sbindir}/mount.ntfs-fuse
 %{_sbindir}/mount.lowntfs-3g
 %{_bindir}/ntfs-3g
+%{_bindir}/ntfs-3g-mount
 %{_bindir}/ntfsmount
 %{_bindir}/ntfs-3g.probe
 %{_bindir}/lowntfs-3g
@@ -203,6 +198,18 @@ rm -rf %{buildroot}%{_defaultdocdir}/%{name}/README
 %exclude %{_mandir}/man8/ntfs-3g*
 
 %changelog
+* Mon Jun  8 2026 Tom Callaway <spot@fedoraproject.org> - 2:2026.2.25-2
+- make symlink to ntfs-3g-mount (bz2486080)
+
+* Tue Jun  2 2026 Tom Callaway <spot@fedoraproject.org> - 2:2026.2.25-1
+- update to latest stable
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:2022.10.3-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 23 2025 Georg Sauthoff <mail@gms.tf> - 2:2022.10.3-11
+- Update project URL
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2:2022.10.3-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

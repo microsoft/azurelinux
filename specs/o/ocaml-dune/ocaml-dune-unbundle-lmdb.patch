@@ -1,0 +1,43 @@
+--- dune-3.21.0/boot/duneboot.ml.orig	2026-01-12 11:35:07.000000000 -0700
++++ dune-3.21.0/boot/duneboot.ml	2026-01-30 10:39:26.440448068 -0700
+@@ -1655,8 +1655,6 @@ module Library = struct
+         ; "-DBLAKE3_NO_AVX2"
+         ; "-DBLAKE3_NO_AVX512"
+         ]
+-      | "lmdb_stubs.c", `Msvc, `Win32, _ -> [ "-I ."; "/wd5287" ]
+-      | "lmdb_stubs.c", _, _, _ -> [ "-I ." ]
+       | "mdb.c", `Msvc, `Win32, _ -> [ "/wd4333"; "/wd4172" ]
+       | "mdb.c", `Other, `Win32, _ -> [ "-Wno-return-local-addr" ]
+       | _, _, _, _ -> []
+@@ -2130,6 +2128,7 @@ let build
+             ; allow_unstable_sources
+             ; external_includes
+             ; [ m ]
++            ; [ "-cclib"; "-llmdb" ]
+             ]
+           |> Process.run ~cwd:build_dir Config.compiler)
+       in
+@@ -2193,6 +2192,7 @@ let build
+     ; link_flags
+     ; (if static then ccopt "-static" else [])
+     ; allow_unstable_sources
++    ; [ "-cclib"; "-llmdb" ]
+     ]
+   |> Process.run ~cwd:build_dir Config.compiler
+ ;;
+--- dune-3.21.0/vendor/ocaml-lmdb/dune.orig	2026-01-12 11:35:07.000000000 -0700
++++ dune-3.21.0/vendor/ocaml-lmdb/dune	2026-01-30 10:41:04.503457493 -0700
+@@ -2,11 +2,10 @@
+  (name lmdb)
+  (synopsis "Bindings for LMDB, a fast in-file database with ACID transactions")
+  (libraries unix bigstringaf)
++ (c_library_flags -llmdb)
+  (foreign_stubs
+   (language c)
+   (flags
+    :standard
+-   -I
+-   .
+    (:include flags/c_flags.sexp))
+-  (names lmdb_stubs mdb midl)))
++  (names lmdb_stubs)))

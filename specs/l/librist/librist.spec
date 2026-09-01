@@ -7,8 +7,8 @@
 %bcond_with tests
 
 Name:           librist
-Version:        0.2.7
-Release: 13%{?dist}
+Version:        0.2.11
+Release:        1%{?dist}
 Summary:        Library for Reliable Internet Stream Transport (RIST) protocol
 
 # Everything used is BSD-2-Clause except getopt-shim, which is ISC as well
@@ -16,15 +16,15 @@ License:        BSD-2-Clause and ISC
 URL:            https://code.videolan.org/rist/librist
 Source0:        %{url}/-/archive/v%{version}/librist-v%{version}.tar.gz
 
-# Backport from upstream
-## From: https://code.videolan.org/rist/librist/-/commit/809390b3b75a259a704079d0fb4d8f1b5f7fa956
-Patch0001:      0001-meson.build-fix-reference-to-libcjson-pc-file.patch
+# upstream: https://code.videolan.org/rist/librist/-/merge_requests/287
+Patch0:         gcc16-fix-const-correctness.patch
 
 BuildRequires:  gcc
 BuildRequires:  meson
 BuildRequires:  ninja-build
 BuildRequires:  libcmocka-devel
-BuildRequires:  mbedtls-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  nettle-devel
 BuildRequires:  pkgconfig(libcjson)
 
 %description
@@ -62,7 +62,7 @@ This package contains the user tools for the RIST protocol library.
 
 
 %build
-%meson
+%meson -Duse_nettle=true -Duse_mbedtls=false
 %meson_build
 
 
@@ -100,12 +100,20 @@ cp -av docs/* %{buildroot}%{_docdir}/%{name}
 %doc %{_docdir}/%{name}/VSF_TR-06-1.pdf
 %doc %{_docdir}/%{name}/VSF_TR-06-2.pdf
 %doc %{_docdir}/%{name}/librist_logo.png
+%doc %{_docdir}/%{name}/RIST_vs_SRT.png
 
 %files -n rist-tools
 %{_bindir}/rist*
 
 
 %changelog
+* Fri Jan 30 2025 Bill Roberts <bill.roberts@arm.com> - 0.2.11-1
+- Use gnutls over mbedtls
+- Update to 0.2.11
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.7-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.7-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

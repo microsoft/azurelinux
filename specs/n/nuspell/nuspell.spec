@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           nuspell
-Version:        5.1.6
-Release: 12%{?dist}
+Version:        5.1.7
+Release:        2%{?dist}
 Summary:        Fast and safe spellchecking C++ library and command-line tool
 License:        LGPL-3.0-or-later
 URL:            https://nuspell.github.io
@@ -17,6 +17,7 @@ BuildRequires:  gcc-c++
 BuildRequires:  libicu-devel
 BuildRequires:  pandoc
 BuildRequires:  catch-devel
+BuildRequires:  doxygen
 
 
 
@@ -82,6 +83,18 @@ The %{name}-devel package contains the header files and developer docs for \
 %{_libdir}/lib%{name}.so
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Nov 26 2025 Parag Nemade <pnemade AT redhat DOT com> - 5.1.7-1
+- Update to 5.1.7 version (#2417044)
+
+* Mon Aug 18 2025 Sandro Mani <manisandro@gmail.com> - 5.1.6-10
+- Rebuild (icu)
+
+* Fri Aug 15 2025 Sandro Mani <manisandro@gmail.com> - 5.1.6-9
+- Rebuild (icu)
+
 * Wed Aug 06 2025 František Zatloukal <fzatlouk@redhat.com> - 5.1.6-8
 - Rebuilt for icu 77.1
 

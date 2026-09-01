@@ -19,7 +19,7 @@ be a replacement for github.com/gobuffalo/packr/v2.}
 %global godocs          examples README.md SHOULDERS.md
 
 Name:           %{goname}
-Release: 19%{?dist}
+Release:        19%{?dist}
 Summary:        Embed static files in Go binaries
 
 License:        MIT
@@ -62,6 +62,15 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %gopkgfiles
 
 %changelog
+* Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 0.17.1-19
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.1-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Oct 10 2025 Alejandro Sáez <asm@redhat.com> - 0.17.1-17
+- rebuild
+
 * Fri Aug 15 2025 Maxwell G <maxwell@gtmx.me> - 0.17.1-16
 - Rebuild for golang-1.25.0
 

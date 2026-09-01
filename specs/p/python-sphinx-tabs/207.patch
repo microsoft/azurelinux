@@ -1,0 +1,582 @@
+From 1df38a85fdf70a4d19001ca862a3d7d0c05a9214 Mon Sep 17 00:00:00 2001
+From: Dmitry Shachnev <mitya57@gmail.com>
+Date: Sat, 27 Sep 2025 13:39:13 +0300
+Subject: [PATCH 1/2] Fix KeyError: 'backrefs' with Docutils 0.22
+
+That attribute is no longer present since this Docutils commit:
+https://sourceforge.net/p/docutils/code/9684/
+
+Fixes #206.
+---
+ sphinx_tabs/tabs.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sphinx_tabs/tabs.py b/sphinx_tabs/tabs.py
+index aa04138..c4000e5 100644
+--- a/sphinx_tabs/tabs.py
++++ b/sphinx_tabs/tabs.py
+@@ -66,7 +66,7 @@ def visit(translator, node):
+     attrs.pop("ids")
+     attrs.pop("names")
+     attrs.pop("dupnames")
+-    attrs.pop("backrefs")
++    attrs.pop("backrefs", None)
+     text = translator.starttag(node, node.tagname, **attrs)
+     translator.body.append(text.strip())
+ 
+
+From c87f86cda4c5eb460ad832c4503802beedee3c97 Mon Sep 17 00:00:00 2001
+From: Dmitry Shachnev <mitya57@gmail.com>
+Date: Sat, 27 Sep 2025 17:49:04 +0300
+Subject: [PATCH 2/2] Update XML expectations for Docutils 0.22
+
+---
+ tests/conftest.py                             |  4 +++
+ ...ional_assets_html_assets_policy_index_.xml | 26 +++++++++----------
+ ...al_assets_html_assets_policy_no_tabs1_.xml | 26 +++++++++----------
+ ...al_assets_html_assets_policy_no_tabs2_.xml | 26 +++++++++----------
+ .../test_conditional_assets_index_.xml        | 26 +++++++++----------
+ .../test_conditional_assets_no_tabs1_.xml     | 26 +++++++++----------
+ .../test_conditional_assets_no_tabs2_.xml     | 26 +++++++++----------
+ tests/test_build/test_custom_lexer.xml        |  4 +--
+ tests/test_build/test_other_with_assets.xml   |  4 +--
+ tests/test_build/test_rinohtype_pdf.xml       |  2 +-
+ 10 files changed, 87 insertions(+), 83 deletions(-)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index 1dbf0ad..94075e2 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -2,6 +2,7 @@
+ import pytest
+ from pathlib import Path
+ from bs4 import BeautifulSoup
++import docutils
+ import sphinx
+ 
+ from sphinx_tabs.tabs import JS_FILES, CSS_FILES
+@@ -128,6 +129,9 @@ def read(app, docname="index", resolve=False, regress=False, replace=None):
+                     '<document source="index.rst">',
+                     "<document source=\"index.rst\" translation_progress=\"{'total': 0, 'translated': 0}\">",
+                 )
++            if docutils.__version_info__ < (0, 22):
++                text = text.replace('="False"', '="0"')
++                text = text.replace('linenos="True"', 'linenos="1"')
+             file_regression.check(text, extension=extension)
+ 
+         return doctree
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_index_.xml b/tests/test_build/test_conditional_assets_html_assets_policy_index_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_index_.xml
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_index_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.xml b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.xml
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs1_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.xml b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.xml
++++ b/tests/test_build/test_conditional_assets_html_assets_policy_no_tabs2_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_conditional_assets_index_.xml b/tests/test_build/test_conditional_assets_index_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_index_.xml
++++ b/tests/test_build/test_conditional_assets_index_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_conditional_assets_no_tabs1_.xml b/tests/test_build/test_conditional_assets_no_tabs1_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_no_tabs1_.xml
++++ b/tests/test_build/test_conditional_assets_no_tabs1_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_conditional_assets_no_tabs2_.xml b/tests/test_build/test_conditional_assets_no_tabs2_.xml
+index 20c4dc9..ff35e60 100644
+--- a/tests/test_build/test_conditional_assets_no_tabs2_.xml
++++ b/tests/test_build/test_conditional_assets_no_tabs2_.xml
+@@ -1,6 +1,6 @@
+ <document source="index.rst" translation_progress="{'total': 0, 'translated': 0}">
+     <compound classes="toctree-wrapper">
+-        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="False" hidden="False" includefiles="no_tabs1 no_tabs2" includehidden="False" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="False">
++        <toctree caption="True" entries="(None,\ 'no_tabs1') (None,\ 'no_tabs2')" glob="0" hidden="0" includefiles="no_tabs1 no_tabs2" includehidden="0" maxdepth="-1" numbered="0" parent="index" rawentries="" titlesonly="0">
+     <section ids="fruits" names="fruits">
+         <title>
+             Fruits
+@@ -54,22 +54,22 @@
+                 <button aria-controls="panel-2-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-2-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-2-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     C Main Function
+             <div aria-labelledby="tab-2-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     C++ Main Function
+             <div aria-labelledby="tab-2-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     Python Main Function
+             <div aria-labelledby="tab-2-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     Java Main Function
+             <div aria-labelledby="tab-2-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     Julia Main Function
+             <div aria-labelledby="tab-2-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-2-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     Fortran Main Function
+         <container classes="sphinx-tabs" type="tab-element">
+             <div aria-label="Tabbed content" classes="closeable" role="tablist">
+@@ -86,31 +86,31 @@
+                 <button aria-controls="panel-3-Rm9ydHJhbg==" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tab" tabindex="-1">
+                     Fortran
+             <div aria-labelledby="tab-3-Qw==" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-3-Qw==" name="Qw==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-Qysr" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="c++" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="c++" xml:space="preserve">
+                     int main(const int argc, const char **argv) {
+                       return 0;
+                     }
+             <div aria-labelledby="tab-3-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="py" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="py" xml:space="preserve">
+                     def main():
+                         return
+             <div aria-labelledby="tab-3-SmF2YQ==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SmF2YQ==" name="SmF2YQ==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="java" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="java" xml:space="preserve">
+                     class Main {
+                         public static void main(String[] args) {
+                         }
+                     }
+             <div aria-labelledby="tab-3-SnVsaWE=" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-SnVsaWE=" name="SnVsaWE=" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="julia" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="julia" xml:space="preserve">
+                     function main()
+                     end
+             <div aria-labelledby="tab-3-Rm9ydHJhbg==" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-3-Rm9ydHJhbg==" name="Rm9ydHJhbg==" role="tabpanel" tabindex="0">
+-                <literal_block force="False" highlight_args="{}" language="fortran" xml:space="preserve">
++                <literal_block force="0" highlight_args="{}" language="fortran" xml:space="preserve">
+                     PROGRAM main
+                     END PROGRAM main
+     <section ids="group-tabs" names="group\ tabs">
+diff --git a/tests/test_build/test_custom_lexer.xml b/tests/test_build/test_custom_lexer.xml
+index a481a88..6203b38 100644
+--- a/tests/test_build/test_custom_lexer.xml
++++ b/tests/test_build/test_custom_lexer.xml
+@@ -6,9 +6,9 @@
+             <button aria-controls="panel-0-QllP-1" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-0-QllP-1" name="QllP-1" role="tab" tabindex="-1">
+                 BYO
+         <div aria-labelledby="tab-0-QllP" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-0-QllP" name="QllP" role="tabpanel" tabindex="0">
+-            <literal_block force="False" highlight_args="{}" language="byo" xml:space="preserve">
++            <literal_block force="0" highlight_args="{}" language="byo" xml:space="preserve">
+                 Test
+                 This is just a test.
+         <div aria-labelledby="tab-0-QllP-1" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-0-QllP-1" name="QllP-1" role="tabpanel" tabindex="0">
+-            <literal_block force="False" highlight_args="{}" language="byo" xml:space="preserve">
++            <literal_block force="0" highlight_args="{}" language="byo" xml:space="preserve">
+                 Some other text.
+diff --git a/tests/test_build/test_other_with_assets.xml b/tests/test_build/test_other_with_assets.xml
+index 1f6ba32..08a218d 100644
+--- a/tests/test_build/test_other_with_assets.xml
++++ b/tests/test_build/test_other_with_assets.xml
+@@ -6,8 +6,8 @@
+             <button aria-controls="panel-0-UHl0aG9u" aria-selected="false" classes="sphinx-tabs-tab code-tab group-tab" ids="tab-0-UHl0aG9u" name="UHl0aG9u" role="tab" tabindex="-1">
+                 Python
+         <div aria-labelledby="tab-0-Qysr" classes="sphinx-tabs-panel code-tab group-tab" ids="panel-0-Qysr" name="Qysr" role="tabpanel" tabindex="0">
+-            <literal_block force="False" highlight_args="{}" language="c++" linenos="True" xml:space="preserve">
++            <literal_block force="0" highlight_args="{}" language="c++" linenos="1" xml:space="preserve">
+                 std::cout << "hello world" << std::endl;
+         <div aria-labelledby="tab-0-UHl0aG9u" classes="sphinx-tabs-panel code-tab group-tab" hidden="true" ids="panel-0-UHl0aG9u" name="UHl0aG9u" role="tabpanel" tabindex="0">
+-            <literal_block force="False" highlight_args="{}" language="python" xml:space="preserve">
++            <literal_block force="0" highlight_args="{}" language="python" xml:space="preserve">
+                 print('hello world')
+diff --git a/tests/test_build/test_rinohtype_pdf.xml b/tests/test_build/test_rinohtype_pdf.xml
+index bc915b1..9a77895 100644
+--- a/tests/test_build/test_rinohtype_pdf.xml
++++ b/tests/test_build/test_rinohtype_pdf.xml
+@@ -3,4 +3,4 @@
+         <title>
+             TESTING PDF
+         <compound classes="toctree-wrapper">
+-            <toctree caption="Contents:" entries="(None,\ 'tabs')" glob="False" hidden="False" includefiles="tabs" includehidden="False" maxdepth="2" numbered="0" parent="index" rawcaption="Contents:" rawentries="" titlesonly="False">
++            <toctree caption="Contents:" entries="(None,\ 'tabs')" glob="0" hidden="0" includefiles="tabs" includehidden="0" maxdepth="2" numbered="0" parent="index" rawcaption="Contents:" rawentries="" titlesonly="0">

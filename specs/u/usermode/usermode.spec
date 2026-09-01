@@ -96,6 +96,7 @@ done
 %{_bindir}/consolehelper
 %{_mandir}/man8/userhelper.8*
 %{_mandir}/man8/consolehelper.8*
+%dir /etc/security/console.apps
 %config(noreplace) /etc/security/console.apps/config-util
 
 %if %{with gtk}
@@ -118,6 +119,16 @@ done
 %endif
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.114-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Aug 27 2025 Michal Hlavinka <mhlavink@redhat.com> - 1.114-15
+- revert back and take ownership of console.apps as usermode still needs it
+
+* Wed Aug 27 2025 Michal Hlavinka <mhlavink@redhat.com> - 1.114-14
+- drop console.apps files as pam no longer uses those and pam_console
+  was dropped https://fedoraproject.org/wiki/Changes/RemovePamConsole
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.114-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

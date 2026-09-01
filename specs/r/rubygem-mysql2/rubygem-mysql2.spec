@@ -9,7 +9,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 0.5.5
-Release: 13%{?dist}
+Release: 10%{?dist}
 Summary: A simple, fast Mysql library for Ruby, binding to libmysql
 License: MIT
 URL: https://github.com/brianmario/mysql2

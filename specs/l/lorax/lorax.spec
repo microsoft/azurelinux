@@ -7,19 +7,18 @@
 %global forgeurl https://github.com/weldr/lorax
 
 Name:           lorax
-Version:        43.11
-Release: 6%{?dist}
+Version:        44.7
+Release:        1%{?dist}
 Summary:        Tool for creating the anaconda install images
 License:        GPL-2.0-or-later
+
+# qemu is no longer available on 32-bit
+ExcludeArch:    %{ix86}
 
 %global tag %{version}
 %forgemeta
 Url:            %{forgeurl}
 Source0:        %{forgesource}
-
-# https://github.com/weldr/lorax/pull/1495
-# drop tigervnc to save space, anaconda now uses RDP
-Patch:          0001-runtime-install-drop-tigervnc.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
@@ -147,7 +146,7 @@ Lorax templates for creating the boot.iso and live isos are placed in
 /usr/share/lorax/templates.d/99-generic
 
 %prep
-%forgeautosetup -p1
+%forgeautosetup
 
 %build
 
@@ -191,14 +190,51 @@ make DESTDIR=$RPM_BUILD_ROOT mandir=%{_mandir} install
 %{_datadir}/lorax/templates.d/*
 
 %changelog
-* Fri Oct 03 2025 Adam Williamson <awilliam@redhat.com> - 43.11-3
-- Backport PR #1495 to drop tigervnc from installer images
+* Wed Aug 12 2026 Brian C. Lane <bcl@redhat.com> 44.7-1
+- creator: Use safe_joinpaths in mount_boot_part_over_root (bcl@redhat.com)
+- creator: Use safe_joinpaths in make_livecd (bcl@redhat.com)
+- creator: Use safe_joinpaths in make_live_images (bcl@redhat.com)
+- ltmpl: Check for paths inside outroot on hardlink, symlink, copy, move (bcl@redhat.com)
+- sysutils: Add safe_joinpaths function (bcl@redhat.com)
+- ltmpl: Add tests for access outside outroot (bcl@redhat.com)
+- treebuilder: Check for symlink when writing module-info (bcl@redhat.com)
+- findkernels: Exclude kernel symlinks pointing outside root (bcl@redhat.com)
+- novirt_install: Use remove on /tmp paths and /mnt/sysimage (bcl@redhat.com)
+- sysutils: Add a test for remove and symlinked directories (bcl@redhat.com)
 
-* Thu Sep 25 2025 Brian C. Lane <bcl@redhat.com> - 43.11-2
-- Pass 43 to CI testing so it uses the correct repository
+* Wed Mar 11 2026 Brian C. Lane <bcl@redhat.com> 44.6-1
+- Revert "Drop all installs of shim-ia32 (it no longer exists)" (bcl@redhat.com)
 
-* Wed Sep 24 2025 Brian C. Lane <bcl@redhat.com> 43.11-1
+* Tue Mar 10 2026 Brian C. Lane <bcl@redhat.com> 44.5-1
+- runtime-cleanup: don't strip /usr/share from gdb-headless (awilliam@redhat.com)
+- runtime-cleanup: keep policycoreutils /usr/bin for load_policy and setfiles (k.koukiou@gmail.com)
+- executils: Ignore utf-8 decode errors (bcl@redhat.com)
+- mkksiso: Add a --tmp argument to set temporary directory (bcl@redhat.com)
+
+* Mon Dec 01 2025 Brian C. Lane <bcl@redhat.com> 44.4-1
+- Exclude build on the i686 architecture (berrange@redhat.com)
+- runtime-cleanup: mesa no longer includes gallium-pipe drivers (yselkowi@redhat.com)
+
+* Wed Nov 26 2025 Daniel P. Berrangé <berrange@redhat.com> - 44.3-2
+- Add ExcludeArch for i686 to remove qemu dependency
+
+* Wed Oct 15 2025 Brian C. Lane <bcl@redhat.com> 44.3-1
+- Do not remove SELinux from the runtime (ppolawsk@redhat.com)
+
+* Thu Oct 09 2025 Brian C. Lane <bcl@redhat.com> 44.2-1
+- Add mac80211_hwsim for wifi testing to installer image (rvykydal@redhat.com)
+- runtime-install: drop tigervnc (awilliam@redhat.com)
+
+* Wed Sep 24 2025 Brian C. Lane <bcl@redhat.com> 44.1-1
 - runtime-install: skip qcom-accel-firmware (awilliam@redhat.com)
+- executils: decoding after deserialization (oleg.sviridov@red-soft.ru)
+- mkksiso: make ISO reproducible with SOURCE_DATE_EPOCH (e.champetier@ateme.com)
+
+* Mon Sep 08 2025 Brian C. Lane <bcl@redhat.com> 44.0-1
+- maint: Switch default platform to F44 (bcl@redhat.com)
+- Drop all installs of shim-ia32 (it no longer exists) (awilliam@redhat.com)
+- templates: Support product version to contain blank character in
+  templates.d/99-generic (songmingliang@uniontech.com)
 
 * Thu Aug 14 2025 Brian C. Lane <bcl@redhat.com> 43.10-1
 - executils: Remove binary_output flag (bcl@redhat.com)

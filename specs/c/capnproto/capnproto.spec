@@ -7,8 +7,8 @@
 %global modulename %{name}-c++
 
 Name:           capnproto
-Version:        1.0.1
-Release: 9%{?dist}
+Version:        1.3.0
+Release:        4%{?dist}
 Summary:        A data interchange format and capability-based RPC system
 
 License:        MIT
@@ -17,7 +17,7 @@ Source0:        https://capnproto.org/%{modulename}-%{version}.tar.gz
 
 # We need C++
 BuildRequires:  gcc-c++
-BuildRequires:  cmake >= 3.1
+BuildRequires:  cmake >= 3.10
 
 # Ensure that we use matching version of libraries
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
@@ -50,18 +50,16 @@ developing applications that use %{name}.
 %prep
 %autosetup -n %{modulename}-%{version} -p2
 
-# Disable broken test
-## Cf. https://github.com/capnproto/capnproto/issues/1349
-## Cf. https://github.com/capnproto/capnproto/issues/1398
-sed -e '/TEST(AsyncIo, AncillaryMessageHandler)/,/^}/s/^/\/\//' -i src/kj/async-io-test.c++
 
-
-%build
+%conf
 # The tests are randomly failing due to poor sparsing support in the build system
 export CFLAGS="%{build_cflags} -DHOLES_NOT_SUPPORTED=1"
 export CXXFLAGS="%{build_cxxflags} -DHOLES_NOT_SUPPORTED=1"
 
 %cmake -DBUILD_TESTING=ON
+
+
+%build
 %cmake_build
 
 
@@ -90,7 +88,24 @@ find %{buildroot} -name '*.la' -delete
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/cmake/CapnProto/
 
+
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Jan 03 2026 Neal Gompa <ngompa@fedoraproject.org> - 1.3.0-2
+- Remove disabling tests for asyncio
+- Modernize spec
+
+* Sat Jan 03 2026 Neal Gompa <ngompa@fedoraproject.org> - 1.3.0-1
+- Update to 1.3.0
+
+* Fri Nov 28 2025 Neal Gompa <ngompa@fedoraproject.org> - 1.2.0-1
+- Update to 1.2.0
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

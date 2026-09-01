@@ -1,38 +1,38 @@
-From d3117ae1bb422f771f1c19af54f81d5151f55065 Mon Sep 17 00:00:00 2001
+From 7726f5fb4e833b23f95120ff7f29d10b4f36185d Mon Sep 17 00:00:00 2001
 From: Kamil Dudka <kdudka@redhat.com>
 Date: Mon, 29 Mar 2010 17:20:34 +0000
 Subject: [PATCH] coreutils-df-direct.patch
 
 ---
- doc/coreutils.texi |  7 ++++++
- src/df.c           | 34 ++++++++++++++++++++++++++--
+ doc/coreutils.texi |  6 +++++
+ src/df.c           | 37 +++++++++++++++++++++++++++++--
  tests/df/direct.sh | 55 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 94 insertions(+), 2 deletions(-)
+ tests/local.mk     |  1 +
+ 4 files changed, 97 insertions(+), 2 deletions(-)
  create mode 100755 tests/df/direct.sh
 
 diff --git a/doc/coreutils.texi b/doc/coreutils.texi
-index d1c282f..6d1ee11 100644
+index a02e8d7..12756ab 100644
 --- a/doc/coreutils.texi
 +++ b/doc/coreutils.texi
-@@ -12467,6 +12467,13 @@ some systems (notably Solaris), doing this yields more up to date results,
+@@ -11976,6 +11976,12 @@ some systems (notably Solaris), doing this yields more up to date results,
  but in general this option makes @command{df} much slower, especially when
  there are many or very busy file systems.
  
-+@item --direct
-+@opindex --direct
++@optItem{df,--direct,}
 +@cindex direct statfs for a file
 +Do not resolve mount point and show statistics directly for a file. It can be
 +especially useful for NFS mount points if there is a boundary between two
 +storage policies behind the mount point.
 +
- @item --total
- @opindex --total
+ @optItem{df,--total,}
  @cindex grand total of file system size, usage and available space
+ Print a grand total of all arguments after all arguments have
 diff --git a/src/df.c b/src/df.c
-index a969c5c..c465a3f 100644
+index 25235a2..7f8faac 100644
 --- a/src/df.c
 +++ b/src/df.c
-@@ -122,6 +122,9 @@ static bool print_type;
+@@ -121,6 +121,9 @@ static bool print_type;
  /* If true, print a grand total at the end.  */
  static bool print_grand_total;
  
@@ -42,7 +42,7 @@ index a969c5c..c465a3f 100644
  /* Grand total data.  */
  static struct fs_usage grand_fsu;
  
-@@ -249,13 +252,15 @@ enum
+@@ -248,13 +251,15 @@ enum
    NO_SYNC_OPTION = CHAR_MAX + 1,
    SYNC_OPTION,
    TOTAL_OPTION,
@@ -53,13 +53,13 @@ index a969c5c..c465a3f 100644
  
  static struct option const long_options[] =
  {
-   {"all", no_argument, nullptr, 'a'},
-   {"block-size", required_argument, nullptr, 'B'},
-+  {"direct", no_argument, nullptr, DIRECT_OPTION},
-   {"inodes", no_argument, nullptr, 'i'},
-   {"human-readable", no_argument, nullptr, 'h'},
-   {"si", no_argument, nullptr, 'H'},
-@@ -572,7 +577,10 @@ get_header (void)
+   {"all", no_argument, NULL, 'a'},
+   {"block-size", required_argument, NULL, 'B'},
++  {"direct", no_argument, NULL, DIRECT_OPTION},
+   {"inodes", no_argument, NULL, 'i'},
+   {"human-readable", no_argument, NULL, 'h'},
+   {"si", no_argument, NULL, 'H'},
+@@ -571,7 +576,10 @@ get_header (void)
    for (idx_t col = 0; col < ncolumns; col++)
      {
        char *cell;
@@ -71,7 +71,7 @@ index a969c5c..c465a3f 100644
  
        if (columns[col]->field == SIZE_FIELD
            && (header_mode == DEFAULT_MODE
-@@ -1454,6 +1462,17 @@ get_point (char const *point, const struct stat *statp)
+@@ -1439,6 +1447,17 @@ get_point (char const *point, const struct stat *statp)
  static void
  get_entry (char const *name, struct stat const *statp)
  {
@@ -89,15 +89,18 @@ index a969c5c..c465a3f 100644
    if ((S_ISBLK (statp->st_mode) || S_ISCHR (statp->st_mode))
        && get_device (name))
      return;
-@@ -1524,6 +1543,7 @@ or all file systems by default.\n\
-   -B, --block-size=SIZE  scale sizes by SIZE before printing them; e.g.,\n\
-                            '-BM' prints sizes in units of 1,048,576 bytes;\n\
-                            see SIZE format below\n\
-+      --direct          show statistics for a file instead of mount point\n\
-   -h, --human-readable  print sizes in powers of 1024 (e.g., 1023M)\n\
-   -H, --si              print sizes in powers of 1000 (e.g., 1.1G)\n\
- "), stdout);
-@@ -1618,6 +1638,9 @@ main (int argc, char **argv)
+@@ -1510,6 +1529,10 @@ or all file systems by default.\n\
+   -B, --block-size=SIZE\n\
+          scale sizes by SIZE before printing them; see SIZE format below;\n\
+          E.g., '-BM' prints sizes in units of 1,048,576 bytes\n\
++"));
++      oputs (_("\
++      --direct\n\
++         show statistics for a file instead of mount point\n\
+ "));
+       oputs (_("\
+   -h, --human-readable\n\
+@@ -1633,6 +1656,9 @@ main (int argc, char **argv)
                xstrtol_fatal (e, oi, c, long_options, optarg);
            }
            break;
@@ -107,7 +110,7 @@ index a969c5c..c465a3f 100644
          case 'i':
            if (header_mode == OUTPUT_MODE)
              {
-@@ -1714,6 +1737,13 @@ main (int argc, char **argv)
+@@ -1729,6 +1755,13 @@ main (int argc, char **argv)
          }
      }
  
@@ -123,7 +126,7 @@ index a969c5c..c465a3f 100644
        if (posix_format)
 diff --git a/tests/df/direct.sh b/tests/df/direct.sh
 new file mode 100755
-index 0000000..8e4cfb8
+index 0000000..1428779
 --- /dev/null
 +++ b/tests/df/direct.sh
 @@ -0,0 +1,55 @@
@@ -145,7 +148,7 @@ index 0000000..8e4cfb8
 +# You should have received a copy of the GNU General Public License
 +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +
-+. "${srcdir=.}/init.sh"; path_prepend_ ../src
++. "${srcdir=.}/tests/init.sh"; path_prepend_ ./src
 +print_ver_ df
 +
 +df || skip_ "df fails"
@@ -182,6 +185,18 @@ index 0000000..8e4cfb8
 +compare file_out file_exp || fail=1
 +
 +Exit $fail
+diff --git a/tests/local.mk b/tests/local.mk
+index e337235..1682d1b 100644
+--- a/tests/local.mk
++++ b/tests/local.mk
+@@ -590,6 +590,7 @@ all_tests =					\
+   tests/df/no-mtab-status-masked-proc.sh			\
+   tests/df/skip-duplicates.sh			\
+   tests/df/skip-rootfs.sh			\
++  tests/df/direct.sh				\
+   tests/dd/ascii.sh				\
+   tests/dd/conv-case.sh				\
+   tests/dd/direct.sh				\
 -- 
-2.49.0
+2.53.0
 

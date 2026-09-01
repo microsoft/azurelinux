@@ -1,0 +1,51 @@
+From fd5c6e191bffcf5b3e6c9abb8b0b03479accc04b Mon Sep 17 00:00:00 2001
+From: David Rheinsberg <david@readahead.eu>
+Date: Thu, 4 Sep 2025 10:23:36 +0200
+Subject: [PATCH] test/sockopt: loosen verification of stale pidfds
+
+Newer kernels now properly return stale pidfds from AF_UNIX sockets,
+rather than refusing the operation. Ensure that our tests adopt to this
+and properly verify staleness.
+
+Signed-off-by: David Rheinsberg <david@readahead.eu>
+---
+ src/util/test-sockopt.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/src/util/test-sockopt.c b/src/util/test-sockopt.c
+index 04148af..eaa8fba 100644
+--- a/src/util/test-sockopt.c
++++ b/src/util/test-sockopt.c
+@@ -81,17 +81,25 @@ static void test_peerpidfd_client(
+ 
+         r = sockopt_get_peerpidfd(fd, &pidfd);
+         if (r != SOCKOPT_E_UNSUPPORTED) {
+-                if (stale) {
+-                        c_assert(r == SOCKOPT_E_REAPED);
++                if (r == SOCKOPT_E_REAPED) {
++                        /*
++                         * Old kernels refused to return stale pidfds. Hence,
++                         * in that case verify that we expected a stale pidfd.
++                         */
++                        c_assert(stale);
+                 } else {
+                         c_assert(!r);
+                         c_assert(pidfd >= 0);
+ 
+                         r = proc_resolve_pidfd(pidfd, &pid_socket);
+                         c_assert(!r);
+-                        c_assert(pid_socket > 0);
+ 
+-                        c_assert(pid_socket == pid_server);
++                        if (stale) {
++                                c_assert(pid_socket == -1);
++                        } else {
++                                c_assert(pid_socket > 0);
++                                c_assert(pid_socket == pid_server);
++                        }
+                 }
+         }
+ }
+-- 
+2.52.0
+

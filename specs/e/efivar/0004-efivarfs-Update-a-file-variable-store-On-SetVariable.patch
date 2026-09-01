@@ -1,0 +1,237 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Wed, 18 Jun 2025 22:37:04 +0300
+Subject: [PATCH] efivarfs: Update a file variable store On SetVariable RT
+
+Embedded boards have hardware limitations when storing and managing EFI
+variables. Some hardware comes with an eMMC & an RPMB partition which they
+use to store the EFI variables securely. However, the vast majority of
+boards (using U-Boot), stores the EFI variables in a file in the ESP.
+
+This has a few limitations
+- UEFI secure boot cannot be enabled as it can be very easily
+  overridden
+- SetVariable at runtime is impossible to support
+
+Distros and capsule updates on-disk do rely on the that service though
+and U-Boot does implement a workaround.
+
+U-Boot enables SetVariableRT in the RTPROP table and creates a memory backend,
+so the linux kernel can naturally read and write variables via the efivarfs
+filesystem. Those reads and writes end up in memory though. So they are visible
+while the OS is live and are lost in the event of a reboot.
+
+At the same time it also creates two EFI RO variables.
+RTStorageVolatile -- Holds the filename  the variables are stored relative to
+                     the ESP
+VarToFile -- Holds a binary dump of all the EFI variables that should be
+             preserved (BS, NV, RT).
+
+By using these two variables we can persist the changes after reboots by
+doing
+dd if=/sys/firmware/efi/efivars/VarToFile-b2ac5fc9-92b7-4acd-aeac-11e818c3130c of=/boot/efi/ubootefi.var skip=4 bs=1
+
+So let's plug this functionality into the efivafs backend and enable it
+automatically if those variables are detected.
+
+Signed-off-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+---
+ src/efivarfs.c | 157 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 153 insertions(+), 4 deletions(-)
+
+diff --git a/src/efivarfs.c b/src/efivarfs.c
+index 034d6c19a9b7..2dea252510f9 100644
+--- a/src/efivarfs.c
++++ b/src/efivarfs.c
+@@ -28,6 +28,24 @@
+ #  define EFIVARFS_MAGIC 0xde5e81e4
+ #endif
+ 
++/*
++ * RTStorageVolatile-b2ac5fc9-92b7-4acd-aeac-11e818c3130c holds the name of
++ * the file we need to update relative to the ESP
++ */
++#define NAME_RTSV	"RTStorageVolatile"
++/*
++ * Namespace of the special EFI variables pointing to the file and data we
++ * need to update
++ */
++#define GUID_FILE_STORE_VARS \
++	EFI_GUID(0xB2AC5FC9,0x92B7,0x4ACD,0xAEAC,0x11,0xE8,0x18,0xC3,0x13,0x0C)
++
++static const char *esp_paths[] = {
++	"/boot/efi/",
++	"/boot/",
++	"/efi/"
++};
++
+ static char const default_efivarfs_path[] = "/sys/firmware/efi/efivars/";
+ static char *efivarfs_path;
+ 
+@@ -64,6 +82,137 @@ fini_efivarfs_path(void)
+ 	}
+ }
+ 
++static int
++get_esp_filepath(const char *filename, char *filepath, size_t sz)
++{
++	size_t num_paths = sizeof(esp_paths) / sizeof(esp_paths[0]);
++	size_t rc;
++
++	for (size_t i = 0; i < num_paths; ++i) {
++		struct stat buffer;
++
++		rc = snprintf(filepath, sz, "%s%s", esp_paths[i], filename);
++		if (rc >= sz) {
++			fprintf(stderr, "Error: Filepath too big. Max allowed %ld\n", sz);
++			return -1;
++		}
++		if (!stat(filepath, &buffer))
++			return 0;
++	}
++
++	return -1;
++}
++
++static int
++get_esp_filename(char *filename, size_t sz)
++{
++	size_t size;
++	uint32_t attr;
++	uint8_t *data = NULL;
++	int rc = 0;
++
++	rc = efi_get_variable(GUID_FILE_STORE_VARS, NAME_RTSV, &data, &size, &attr);
++	if (rc < 0)
++		/*
++		 * Return an error here so we can bail out and not try to
++		 * write the file
++		 */
++		return rc;
++
++	if (size > sz) {
++		fprintf(stderr, "Error: Filename too big. Max allowed %ld\n", sz);
++		free(data);
++		return -1;
++	}
++
++	memcpy(filename, data, sz);
++	free(data);
++
++	return 0;
++}
++
++#define make_efivarfs_path(str, guid, name) ({				\
++		asprintf(str, "%s%s-" GUID_FORMAT, get_efivarfs_path(),	\
++			name, GUID_FORMAT_ARGS(&(guid)));		\
++	})
++
++static void
++write_file(const char *filepath) {
++	size_t bytes_read;
++	unsigned char buffer[1024];
++	FILE *output_file = NULL;
++	FILE *var2file = NULL;
++	bool fail = false;
++	char *path;
++	int rc;
++
++	rc = make_efivarfs_path(&path, GUID_FILE_STORE_VARS, "VarToFile");
++	if (rc < 0) {
++		efi_error("make_efivarfs_path failed");
++		exit(1);
++	}
++
++	var2file = fopen(path, "rb");
++	if (!var2file) {
++		fprintf(stderr, "Error: Could not open file '%s'\n", path);
++		goto err;
++	}
++
++	output_file = fopen(filepath, "wb");
++	if (!output_file) {
++		fprintf(stderr, "Error: Could not open file '%s'\n", filepath);
++		goto err;
++	}
++
++	if (fread(buffer, 1, 4, var2file) < 4) {
++		fprintf(stderr, "Error: Could not skip first 4 bytes or '%s' file is too small\n", filepath);
++		fail = true;
++		goto err;
++	}
++
++	while ((bytes_read = fread(buffer, 1, sizeof(buffer), var2file)) > 0) {
++		size_t total_written = 0;
++		while (total_written < bytes_read) {
++			size_t written = fwrite(buffer + total_written, 1, bytes_read - total_written, output_file);
++			if (!written) {
++				fprintf(stderr, "Error: Could not write data to ESP '%s' file\n", filepath);
++				fail = true;
++				goto err;
++			}
++			total_written += written;
++		}
++	}
++
++err:
++	if (path)
++		free(path);
++	if (var2file)
++		fclose(var2file);
++	if (output_file)
++		fclose(output_file);
++
++	if (fail)
++		exit(1);
++}
++
++static void
++efi_update_var_file(void)
++{
++	int rc = 0;
++	char filename[PATH_MAX / 4] = { 0 };
++	char filepath[PATH_MAX] = { 0 };
++
++	rc = get_esp_filename(filename, sizeof(filename));
++	if (rc < 0)
++		return;
++
++	rc = get_esp_filepath(filename, filepath, sizeof(filepath));
++	if (!rc)
++		write_file(filepath);
++	else
++		fprintf(stderr, "Error: '%s' file not found in ESP partition. EFI variable changes won't persist reboots\n", filename);
++}
++
+ static int
+ efivarfs_probe(void)
+ {
+@@ -94,10 +243,6 @@ efivarfs_probe(void)
+ 	return 0;
+ }
+ 
+-#define make_efivarfs_path(str, guid, name) ({				\
+-		asprintf(str, "%s%s-" GUID_FORMAT, get_efivarfs_path(),	\
+-			name, GUID_FORMAT_ARGS(&(guid)));		\
+-	})
+ 
+ static int
+ efivarfs_set_fd_immutable(int fd, int immutable)
+@@ -312,6 +457,8 @@ efivarfs_del_variable(efi_guid_t guid, const char *name)
+ 	if (rc < 0)
+ 		efi_error("unlink failed");
+ 
++	efi_update_var_file();
++
+ 	__typeof__(errno) errno_value = errno;
+ 	free(path);
+ 	errno = errno_value;
+@@ -442,6 +589,8 @@ efivarfs_set_variable(efi_guid_t guid, const char *name, const uint8_t *data,
+ 		goto err;
+ 	}
+ 
++	efi_update_var_file();
++
+ 	/* we're done */
+ 	ret = 0;
+ 

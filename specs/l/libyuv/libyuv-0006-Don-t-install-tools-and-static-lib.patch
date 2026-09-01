@@ -1,0 +1,19 @@
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sun, 22 Feb 2026 22:57:32 +0100
+Subject: [PATCH] Don't install tools and static lib
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6a30c363..b5562ee2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -250,8 +250,6 @@ endif()
+ include(GNUInstallDirs)
+ 
+ # install the conversion tool, .so, .a, and all the header files
+-install ( PROGRAMS yuvconvert DESTINATION ${CMAKE_INSTALL_BINDIR} )
+-install ( TARGETS ${ly_lib_static}			DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install ( TARGETS ${ly_lib_shared} LIBRARY		DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ 

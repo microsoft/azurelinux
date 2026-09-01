@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 14;
+    release_number = 20;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -31,6 +31,7 @@
 %bcond imagemagick_tests %{undefined rhel}
 
 # During texlive updates, sometimes the latex environment is unstable
+# NOTE: LaTeX tests are never run when building for ELN.
 %bcond latex_tests 1
 
 Name:       python-sphinx
@@ -73,6 +74,9 @@ Patch:      Make-the-first-party-extensions-optional.patch
 Patch:      https://github.com/sphinx-doc/sphinx/commit/8962398b761c3d85a.patch
 Patch:      https://github.com/sphinx-doc/sphinx/commit/e01e42f5fc738815b.patch
 Patch:      https://github.com/sphinx-doc/sphinx/pull/13527.patch
+# Compatibility with docutils 0.22+
+Patch:      https://github.com/sphinx-doc/sphinx/pull/13610.patch
+Patch:      https://github.com/sphinx-doc/sphinx/pull/13883.patch
 
 BuildArch:     noarch
 
@@ -102,36 +106,67 @@ BuildRequires: texinfo
 BuildRequires: ImageMagick
 %endif
 
-%if %{with latex_tests}
+%if %{undefined rhel} && %{with latex_tests}
 BuildRequires: texlive-collection-fontsrecommended
 BuildRequires: texlive-collection-latex
+BuildRequires: texlive-gnu-freefont
+BuildRequires: latexmk
 BuildRequires: texlive-dvipng
 BuildRequires: texlive-dvisvgm
+BuildRequires: tex(article.cls)
+BuildRequires: tex(utf8x.def)
+# Other dependencies.
+BuildRequires: tex(alltt.sty)
+BuildRequires: tex(amsfonts.sty)
 BuildRequires: tex(amsmath.sty)
+BuildRequires: tex(amssymb.sty)
+BuildRequires: tex(amstext.sty)
 BuildRequires: tex(amsthm.sty)
 BuildRequires: tex(anyfontsize.sty)
-BuildRequires: tex(article.cls)
+BuildRequires: tex(atbegshi.sty)
+BuildRequires: tex(babel.sty)
+BuildRequires: tex(bm.sty)
+BuildRequires: tex(booktabs.sty)
 BuildRequires: tex(capt-of.sty)
 BuildRequires: tex(cmap.sty)
-BuildRequires: tex(color.sty)
-BuildRequires: tex(ctablestack.sty)
+BuildRequires: tex(colortbl.sty)
+BuildRequires: tex(ellipse.sty)
+BuildRequires: tex(etoolbox.sty)
 BuildRequires: tex(fancyhdr.sty)
 BuildRequires: tex(fancyvrb.sty)
+BuildRequires: tex(float.sty)
 BuildRequires: tex(fncychap.sty)
+BuildRequires: tex(fontawesome.sty)
+BuildRequires: tex(fontawesome5.sty)
+BuildRequires: tex(fontenc.sty)
+BuildRequires: tex(fontspec.sty)
 BuildRequires: tex(framed.sty)
-BuildRequires: tex(FreeSerif.otf)
 BuildRequires: tex(geometry.sty)
+BuildRequires: tex(graphicx.sty)
+BuildRequires: tex(hypcap.sty)
 BuildRequires: tex(hyperref.sty)
+BuildRequires: tex(inputenc.sty)
 BuildRequires: tex(kvoptions.sty)
+BuildRequires: tex(longtable.sty)
+BuildRequires: tex(ltxcmds.sty)
 BuildRequires: tex(luatex85.sty)
+BuildRequires: tex(makeidx.sty)
+BuildRequires: tex(multicol.sty)
 BuildRequires: tex(needspace.sty)
 BuildRequires: tex(parskip.sty)
+BuildRequires: tex(pict2e.sty)
 BuildRequires: tex(polyglossia.sty)
+BuildRequires: tex(remreset.sty)
 BuildRequires: tex(tabulary.sty)
+BuildRequires: tex(textalpha.sty)
+BuildRequires: tex(textcomp.sty)
+BuildRequires: tex(tgheros.sty)
+BuildRequires: tex(tgtermes.sty)
 BuildRequires: tex(titlesec.sty)
 BuildRequires: tex(upquote.sty)
-BuildRequires: tex(utf8x.def)
+BuildRequires: tex(varwidth.sty)
 BuildRequires: tex(wrapfig.sty)
+BuildRequires: tex(xcolor.sty)
 %endif
 %endif
 
@@ -170,6 +205,7 @@ Summary:       Python documentation generator
 
 Recommends:    graphviz
 Recommends:    ImageMagick
+Recommends:    make
 
 # Upstream Requires those, but we have a patch to remove the dependency.
 # We keep them Recommended to preserve the default user experience.
@@ -210,39 +246,92 @@ the Python docs:
       snippets and inclusion of appropriately formatted docstrings.
 
 
+%if %{undefined rhel}
 %package -n python%{python3_pkgversion}-sphinx-latex
 Summary:       LaTeX builder dependencies for python%{python3_pkgversion}-sphinx
 
 Requires:      python%{python3_pkgversion}-sphinx = %{epoch}:%{version}-%{release}
+# Required dependencies as stated in the documentation [1]:
+#
+#   - texlive-collection-latexrecommended
+#   - texlive-collection-fontsrecommended
+#   - texlive-collection-fontsextra
+#   - texlive-collection-latexextra
+#   - texlive-tex-gyre
+#   - latexmk
+#
+# [1] https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
+#
+# These packages install 2500+ other packages requiring ~3 GiB of space.
+# Therefore, a more precise list of dependencies.
+
 Requires:      texlive-collection-fontsrecommended
 Requires:      texlive-collection-latex
+Requires:      texlive-gnu-freefont
+Requires:      latexmk
+
+# Required by sphinx.ext.imgmath – Render math as images
 Requires:      texlive-dvipng
 Requires:      texlive-dvisvgm
+#Requires:     tex(preview.sty)    Pulls in texlive-collection-latexrecommended
+
+Requires:      tex(article.cls)
+Requires:      tex(utf8x.def)
+
+# Other dependencies.
+# -- After searching for \RequirePackage{..} and \usepackage{..}.
+Requires:      tex(alltt.sty)
+Requires:      tex(amsfonts.sty)
 Requires:      tex(amsmath.sty)
+Requires:      tex(amssymb.sty)
+Requires:      tex(amstext.sty)
 Requires:      tex(amsthm.sty)
 Requires:      tex(anyfontsize.sty)
-Requires:      tex(article.cls)
+Requires:      tex(atbegshi.sty)
+Requires:      tex(babel.sty)
+Requires:      tex(bm.sty)
+Requires:      tex(booktabs.sty)
 Requires:      tex(capt-of.sty)
 Requires:      tex(cmap.sty)
-Requires:      tex(color.sty)
-Requires:      tex(ctablestack.sty)
+Requires:      tex(colortbl.sty)
+Requires:      tex(ellipse.sty)
+Requires:      tex(etoolbox.sty)
 Requires:      tex(fancyhdr.sty)
 Requires:      tex(fancyvrb.sty)
+Requires:      tex(float.sty)
 Requires:      tex(fncychap.sty)
+Requires:      tex(fontawesome.sty)
+Requires:      tex(fontawesome5.sty)
+Requires:      tex(fontenc.sty)
+Requires:      tex(fontspec.sty)
 Requires:      tex(framed.sty)
-Requires:      tex(FreeSerif.otf)
 Requires:      tex(geometry.sty)
+Requires:      tex(graphicx.sty)
+Requires:      tex(hypcap.sty)
 Requires:      tex(hyperref.sty)
+Requires:      tex(inputenc.sty)
 Requires:      tex(kvoptions.sty)
+Requires:      tex(longtable.sty)
+Requires:      tex(ltxcmds.sty)
 Requires:      tex(luatex85.sty)
+Requires:      tex(makeidx.sty)
+Requires:      tex(multicol.sty)
 Requires:      tex(needspace.sty)
 Requires:      tex(parskip.sty)
+Requires:      tex(pict2e.sty)
 Requires:      tex(polyglossia.sty)
+Requires:      tex(remreset.sty)
 Requires:      tex(tabulary.sty)
+Requires:      tex(textalpha.sty)
+Requires:      tex(textcomp.sty)
+Requires:      tex(tgheros.sty)
+Requires:      tex(tgtermes.sty)
 Requires:      tex(titlesec.sty)
 Requires:      tex(upquote.sty)
-Requires:      tex(utf8x.def)
+Requires:      tex(varwidth.sty)
 Requires:      tex(wrapfig.sty)
+Requires:      tex(xcolor.sty)
+#Requires:     tex(xeCJK.sty)      Pulls in pLaTeX and upLaTeX
 
 # No files in this package, automatic provides don't work:
 %py_provides   python%{python3_pkgversion}-sphinx-latex
@@ -257,6 +346,7 @@ useful to many other projects.
 
 This package pulls in the TeX dependencies needed by Sphinx's LaTeX
 builder.
+%endif
 
 
 %package doc
@@ -284,6 +374,9 @@ This package contains documentation in the HTML format.
 %if 0%{?rhel}
 sed -i -e '/pytest-xdist/d' pyproject.toml
 %endif
+
+# Support for docutils 0.22+
+sed -i -e 's/docutils>=0.20,<0.22/docutils>=0.20,<0.23/' pyproject.toml
 
 # Drop test-dependency on defusedxml,
 # use xml from the standard library instead.
@@ -420,10 +513,10 @@ k="${k} and not test_check_js_search_indexes"
 %dir %{_datadir}/sphinx/locale/*
 %{_mandir}/man1/sphinx-*
 
-
+%if %{undefined rhel}
 %files -n python%{python3_pkgversion}-sphinx-latex
 # empty, this is a metapackage
-
+%endif
 
 %files doc
 %license LICENSE.rst
@@ -432,14 +525,32 @@ k="${k} and not test_check_js_search_indexes"
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:8.2.3-14
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 1:8.2.3-20
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 1:8.2.3-13
-- build: mass rebuild auto-bumpable components
+* Thu Jan 29 2026 Miro Hrončok <miro@hroncok.cz> - 1:8.2.3-19
+- latex: Drop unnecessary requirement on obsoleted substitutefont
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 1:8.2.3-12
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.2.3-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Nov 19 2025 Karolina Surma <ksurma@redhat.com> - 1:8.2.3-17
+- Ensure compatibility with python-docutils 0.22+
+
+* Mon Oct 20 2025 Dennis van Raaij <dvraaij@fedoraproject.org> - 1:8.2.3-16
+- Make recommended TeX packages mandatory
+
+* Fri Oct 17 2025 Dennis van Raaij <dvraaij@fedoraproject.org> - 1:8.2.3-15
+- Don't build python-sphinx-latex for ELN
+
+* Tue Oct 14 2025 Dennis van Raaij <dvraaij@fedoraproject.org> - 1:8.2.3-14
+- Update the list of TeX packages required by Sphinx
+
+* Tue Oct 14 2025 Dennis van Raaij <dvraaij@fedoraproject.org> - 1:8.2.3-13
+- Require package latexmk
+
+* Tue Oct 14 2025 Dennis van Raaij <dvraaij@fedoraproject.org> - 1:8.2.3-12
+- Recommend package make
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1:8.2.3-11
 - Rebuilt for Python 3.14.0rc3 bytecode

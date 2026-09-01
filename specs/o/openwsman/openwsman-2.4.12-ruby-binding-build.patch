@@ -1,12 +1,73 @@
-diff -up openwsman-2.7.2/bindings/ruby/extconf.rb.orig openwsman-2.7.2/bindings/ruby/extconf.rb
---- openwsman-2.7.2/bindings/ruby/extconf.rb.orig	2022-12-28 16:43:03.000000000 +0100
-+++ openwsman-2.7.2/bindings/ruby/extconf.rb	2023-08-09 12:50:21.361216733 +0200
-@@ -32,7 +32,7 @@ swig = find_executable("swig")
+--- openwsman-2.8.1/bindings/ruby/extconf.rb.orig	2025-11-11 11:49:59.880195434 +0100
++++ openwsman-2.8.1/bindings/ruby/extconf.rb	2025-11-11 11:50:46.870685458 +0100
+@@ -5,20 +5,41 @@
+ require 'mkmf'
+ # $CFLAGS = "#{$CFLAGS} -Werror"
+ 
++# libwsman requires 'int facility' to be defined by the application
++# Add syslog.h for LOG_DAEMON constant
++$CFLAGS = "#{$CFLAGS} -include syslog.h"
++
+ # requires wsman, wsman_client, and libxml2
++# Use CPATH and LIBRARY_PATH environment variables set by the build system
++if ENV['CPATH']
++  ENV['CPATH'].split(':').each do |path|
++    $CPPFLAGS = "#{$CPPFLAGS} -I#{path}"
++  end
++end
++if ENV['LIBRARY_PATH']
++  ENV['LIBRARY_PATH'].split(':').each do |path|
++    $LDFLAGS = "#{$LDFLAGS} -L#{path}"
++  end
++end
+ 
+-unless have_library('wsman', 'wsman_create_doc')
++# Custom test for libwsman that includes facility definition
++unless try_link("#include <syslog.h>\n#include <wsman-soap-envelope.h>\nint facility = LOG_DAEMON;\nint main() {\n  wsman_create_doc(\"test\");\n  return 0;\n}", '-lwsman')
+   STDERR.puts "Cannot find wsman_create_doc() in libwsman"
+   STDERR.puts "Is openwsman-devel installed ?"
+   exit 1
+ end
++# Explicitly add libwsman to linker flags since we used try_link instead of have_library
++$libs = append_library($libs, "wsman")
+ find_header 'wsman-xml-api.h', '/usr/include/openwsman'
+ 
+-unless have_library('wsman_client', 'wsmc_create')
++# Custom test for libwsman_client that includes facility definition
++unless try_link("#include <syslog.h>\n#include <wsman-client-api.h>\nint facility = LOG_DAEMON;\nint main() {\n  wsmc_create(\"localhost\", 80, \"/wsman\", \"http\", \"user\", \"pass\");\n  return 0;\n}", '-lwsman_client -lwsman')
+   STDERR.puts "Cannot find wsmc_create() in libwsman_client"
+   STDERR.puts "Is openwsman-devel installed ?"
+   exit 1
+ end
++# Explicitly add libwsman_client to linker flags since we used try_link instead of have_library
++$libs = append_library($libs, "wsman_client")
+ find_header 'wsman-client-api.h', '/usr/include/openwsman'
+ 
+ unless have_library('xml2', 'xmlNewDoc')
+@@ -28,12 +49,25 @@
+ end
+ find_header 'libxml/parser.h', '/usr/include/libxml2'
+ 
++# Check for Ruby 3.3+ IO types
++have_type('rb_io_t', 'ruby/io.h')
++have_header 'ruby/thread.h'
++
+ swig = find_executable("swig")
  raise "SWIG not found" unless swig
  
  major, minor, path = RUBY_VERSION.split(".")
 -raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} -I. -I/usr/include/openwsman -o openwsman_wrap.c openwsman.i")
-+raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} -I. -I/usr/include/openwsman -I/builddir/build/BUILD/openwsman-2.8.1-build/openwsman-2.8.1/include -o openwsman_wrap.c openwsman.i")
++
++# Build SWIG include paths from CPATH environment variable
++swig_includes = "-I. -I/usr/include/openwsman"
++if ENV['CPATH']
++  ENV['CPATH'].split(':').each do |path|
++    swig_includes += " -I#{path}"
++  end
++end
++raise "SWIG failed to run" unless system("#{swig} -ruby -autorename -DRUBY_VERSION=#{major}#{minor} #{swig_includes} -o openwsman_wrap.c openwsman.i")
  
  $CPPFLAGS = "-I/usr/include/openwsman -I.."
  
+ create_makefile('_openwsman')
++

@@ -50,15 +50,23 @@
     %{?with_rust:%cargo_generate_buildrequires}
 
 %buildsystem_tree_sitter_build() \
-    %make_build all PARSER_URL=%{url} %* \
+    %make_build all \\\
+        PARSER_URL=%{url} \\\
+        PREFIX=%{_prefix} \\\
+        INCLUDEDIR=%{_includedir} \\\
+        LIBDIR=%{_libdir} \\\
+        %* \\\
+    \
     %{?with_python:%pyproject_wheel} \
     %{?with_rust:%cargo_build}
 
 %buildsystem_tree_sitter_install() \
     %make_install \\\
+        PARSER_URL=%{url} \\\
         PREFIX=%{_prefix} \\\
         INCLUDEDIR=%{_includedir} \\\
-        LIBDIR=%{_libdir} %* \\\
+        LIBDIR=%{_libdir} \\\
+        %* \\\
     \
     install -d $RPM_BUILD_ROOT%{_datadir}/tree-sitter/queries/%{tree_sitter_shortname}/ \
     find $RPM_BUILD_ROOT -name '*.a' -delete \
@@ -71,7 +79,13 @@
     if [[ -f tree-sitter.json ]]; then \
         sed -i -E 's#"node_modules/tree-sitter-([^/])/queries/#"%{_datadir}/tree-sitter/queries/\\1/#g' tree-sitter.json \
     fi \
-    %{__make} test %* \
+    %make_build test \\\
+        PARSER_URL=%{url} \\\
+        PREFIX=%{_prefix} \\\
+        INCLUDEDIR=%{_includedir} \\\
+        LIBDIR=%{_libdir} \\\
+        %* \\\
+    \
     %{?with_python:%pyproject_check_import} \
     %{?with_rust:%cargo_test}
 
@@ -152,7 +166,7 @@ which use the "default" feature of the "%{name}" crate.
 %files -n lib%{name} \
 %%license LICENSE* \
 %doc README* \
-%{_datadir}/tree-sitter/queries/%{tree_sitter_shortname}/ \
+%{_datadir}/tree-sitter/queries/*/ \
 %{_libdir}/libtree-sitter-*.so.* \
 \
 %files -n lib%{name}-devel \

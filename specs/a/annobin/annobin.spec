@@ -4,8 +4,8 @@
 
 Name:    annobin
 Summary: Annotate and examine compiled binary files
-Version: 12.99
-Release: 5%{?dist}
+Version: 13.22
+Release: 1%{?dist}
 License: GPL-3.0-or-later AND LGPL-2.0-or-later AND (GPL-2.0-or-later WITH GCC-exception-2.0) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND GFDL-1.3-or-later
 URL: https://sourceware.org/annobin/
 # Maintainer: nickc@redhat.com
@@ -539,6 +539,65 @@ make check
 #---------------------------------------------------------------------------------
 
 %changelog
+* Tue Jun 16 2026 Nick Clifton  <nickc@redhat.com> - 13.22-1
+- Annocheck: Enable stack-clash test for Risc-V binaries built by gcc-15+.
+- LLVM & Clang Plugins: Build with -fexceptions enabled.  (RHEL-184482)
+- Annocheck: Add support for ZIP files and TAR balls.
+- Testsuite: Fixes for the glibcxx and hardening tests.
+- GCC Plugin: Fix several minor bugs.
+- Annocheck: Fix several minor bugs.
+- Testsuite: Fix discrepancies.
+- GCC Plugin: Fix recording the setting of __GLIBCXX_ASSERTIONS.
+- Annocheck: Add exceptions for kernel bootstrap tools.
+- Add new tests.
+- GCC Plugin: Fix error when checking for function level changes in the PIC and GOW settings. 
+- Annocheck: LTO test: Add exceptions for Clang runtime support object files.
+
+* Wed Apr 29 2026 Nick Clifton  <nickc@redhat.com> - 13.14-1
+- Annocheck: Do not complain about GO binaries that do not support branch protection.
+
+* Tue Apr 28 2026 Nick Clifton  <nickc@redhat.com> - 13.13-1
+- Annocheck: Do not complain about Rust binaries that do not support branch protection.
+- Annocheck: Skip the dynamic-tags test if a GNU Property note is present.
+- Annocheck: Look for compromising characters in pathnames.
+- Require C++17 for building.
+
+* Tue Apr 14 2026 Nick Clifton  <nickc@redhat.com> - 13.09-1
+- Annocheck: Ignore Risc-V attribute sections.
+
+* Thu Mar 12 2026 Nick Clifton  <nickc@redhat.com> - 13.08-1
+- Rebase sources and rebuild against the latest version of gcc.  (#2445165)
+- Annocheck: Change result of failing not-XXX tests from FAIL to MAYB.  Update documentation.
+- Annocheck: Process the .ARM.attributes section.
+- Annocheck: Add more files to the gcc heuristics list.  (RHEL-150659)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 13.05-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 13.05-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Nick Clifton  <nickc@redhat.com> - 13.05-1
+- Annocheck: Add .fc44 to list of known rpm file extensions.
+
+* Sat Dec 20 2025 Jakub Jelinek  <jakub@redhat.com> - 13.04-3
+- NVR bump to allow rebuild for new GCC in a side-tag.
+
+* Sat Dec 20 2025 Jakub Jelinek  <jakub@redhat.com> - 13.04-2
+- NVR bump to allow rebuild for new GCC in a side-tag.
+
+* Thu Dec 18 2025 Nick Clifton  <nickc@redhat.com> - 13.04-1
+- Annocheck: Fix compile time warnings from GCC-15 re: strchr returning a const char *.
+
+* Wed Nov 05 2025 Nick Clifton  <nickc@redhat.com> - 13.03-1
+- Annocheck: Skip production test for gcc libraries.  (RHEL-123175)
+
+* Fri Oct 31 2025 Nick Clifton  <nickc@redhat.com> - 13.02-1
+- Annocheck: Update heuristic to detect gcc libraries.  (RHEL-124869)
+
+* Thu Oct 23 2025 Nick Clifton  <nickc@redhat.com> - 13.01-1
+- Annocheck: Change FAIL for binaries built by a cross compiler to a MAYBE.  (RHEL-123175)
+
 * Wed Aug 06 2025 Nick Clifton  <nickc@redhat.com> - 12.99-1
 - Annocheck: Improve detection of glibc static maths libraries.  (RHEL-107470)
 

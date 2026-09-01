@@ -3,7 +3,7 @@
 
 Name:       xclock
 Version:    1.1.1
-Release: 12%{?dist}
+Release:    11%{?dist}
 Summary:    The classic X Window System clock utility
 
 License:    MIT-open-group AND SMLNJ AND MIT
@@ -33,7 +33,7 @@ frequency which may be specified by the user.
 %autosetup
 
 %build
-autoreconf -v --install --force
+autoreconf -v --install --force --force
 %configure --disable-silent-rules
 %make_build
 
@@ -48,6 +48,12 @@ autoreconf -v --install --force
 %{_datadir}/X11/app-defaults/XClock-color
 
 %changelog
+* Tue Jan 20 2026 Olivier Fourdan <ofourdan@redhat.com> - 1.1.1-11
+- Fix FTBFS
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

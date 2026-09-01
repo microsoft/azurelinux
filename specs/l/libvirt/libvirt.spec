@@ -12,7 +12,7 @@
 %define min_rhel 9
 %define min_fedora 41
 
-%define arches_qemu_kvm         %{ix86} x86_64 %{power64} %{arm} aarch64 s390x riscv64
+%define arches_qemu_kvm         %{ix86} x86_64 %{power64} aarch64 s390x riscv64
 %if 0%{?rhel}
     %if 0%{?rhel} >= 10
         %define arches_qemu_kvm     x86_64 aarch64 s390x riscv64
@@ -38,11 +38,21 @@
 %define arches_ch               x86_64 aarch64
 
 # The hypervisor drivers that run in libvirtd
-%define with_qemu          0%{!?_without_qemu:1}
 %define with_lxc           0%{!?_without_lxc:1}
 %define with_libxl         0%{!?_without_libxl:1}
 %define with_vbox          0%{!?_without_vbox:1}
 %define with_ch            0%{!?_without_ch:1}
+
+%ifarch %{arches_64bit}
+    %define with_qemu      0%{!?_without_qemu:1}
+%else
+    # QEMU drops 32-bit in Fedora 44
+    %if 0%{?fedora} > 43
+        %define with_qemu  0
+    %else
+        %define with_qemu  0%{!?_without_qemu:1}
+    %endif
+%endif
 
 %ifarch %{arches_qemu_kvm}
     %define with_qemu_kvm      %{with_qemu}
@@ -99,7 +109,6 @@
 
 # Other optional features
 %define with_numactl          0%{!?_without_numactl:1}
-%define with_userfaultfd_sysctl 0%{!?_without_userfaultfd_sysctl:1}
 
 # A few optional bits off by default, we enable later
 %define with_fuse             0
@@ -260,17 +269,12 @@
 
 # RHEL releases provide stable tool chains and so it is safe to turn
 # compiler warning into errors without being worried about frequent
-# changes in reported warnings
-%if 0%{?rhel}
+# changes in reported warnings. ELN is a rebuild of Rawhide so should
+# be treated as unstable for this flag
+%if 0%{?rhel} && !0%{?eln}
     %define enable_werror -Dwerror=true
 %else
     %define enable_werror -Dwerror=false -Dgit_werror=disabled
-%endif
-
-# Fedora and RHEL-9 are new enough to support /dev/userfaultfd, which
-# does not require enabling vm.unprivileged_userfaultfd sysctl.
-%if 0%{?fedora} || 0%{?rhel}
-    %define with_userfaultfd_sysctl 0
 %endif
 
 %define tls_priority "@LIBVIRT,SYSTEM"
@@ -296,8 +300,8 @@
 
 Summary: Library providing a simple virtualization API
 Name: libvirt
-Version: 11.6.0
-Release: 7%{?dist}
+Version: 12.0.0
+Release: 3%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND OFL-1.1
 URL: https://libvirt.org/
 
@@ -307,15 +311,9 @@ URL: https://libvirt.org/
 Source: https://download.libvirt.org/%{?mainturl}libvirt-%{version}.tar.xz
 Source9999: libvirt.azl.macros
 
-Patch: 0001-wireshark-Drop-needless-declaration-of-proto_registe.patch
-Patch: 0002-wireshark-Switch-header-files-to-pragma-once.patch
-Patch: 0003-wireshark-Move-WIRESHARK_VERSION-macro-definition.patch
-Patch: 0004-wireshark-Fix-int-type-of-some-virNetMessageHeader-m.patch
-Patch: 0005-wireshark-Don-t-special-case-retval-of-get_program_d.patch
-Patch: 0006-wireshark-Introduce-and-use-vir_val_to_str.patch
-Patch: 0007-wireshark-Don-t-leak-column-strings.patch
-Patch: 0008-wireshark-Adapt-to-wireshark-4.6.0.patch
-
+# Fix IPv6 connections to ESXi
+# Upstream in > 12.0.0
+Patch: 0001-esx-Allow-connecting-to-IPv6-server.patch
 
 Requires: libvirt-daemon = %{version}-%{release}
 Requires: libvirt-daemon-config-network = %{version}-%{release}
@@ -423,7 +421,7 @@ BuildRequires: numactl-devel
     %endif
 BuildRequires: libcap-ng-devel >= 0.5.0
     %if %{with_fuse}
-BuildRequires: fuse-devel >= 2.8.6
+BuildRequires: fuse3-devel
     %endif
     %if %{with_libssh2}
 BuildRequires: libssh2-devel >= 1.3.0
@@ -1352,12 +1350,6 @@ exit 1
     %define arg_remote_mode -Dremote_default_mode=legacy
 %endif
 
-%if %{with_userfaultfd_sysctl}
-    %define arg_userfaultfd_sysctl -Duserfaultfd_sysctl=enabled
-%else
-    %define arg_userfaultfd_sysctl -Duserfaultfd_sysctl=disabled
-%endif
-
 %define when  %(date +"%%F-%%T")
 %define where %(hostname)
 %define who   %{?packager}%{!?packager:Unknown}
@@ -1441,7 +1433,6 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
            -Dqemu_datadir=%{qemu_datadir} \
            -Dtls_priority=%{tls_priority} \
            -Dsysctl_config=enabled \
-           %{?arg_userfaultfd_sysctl} \
            -Dssh_proxy=enabled \
            %{?enable_werror} \
            -Dexpensive_tests=enabled \
@@ -1529,7 +1520,6 @@ export SOURCE_DATE_EPOCH=$(stat --printf='%Y' %{_specdir}/libvirt.spec)
   -Dstorage_vstorage=disabled \
   -Dstorage_zfs=disabled \
   -Dsysctl_config=disabled \
-  -Duserfaultfd_sysctl=disabled \
   -Dssh_proxy=disabled \
   -Dtests=disabled \
   -Dudev=disabled \
@@ -2337,9 +2327,6 @@ exit 0
     %if %{with_qemu}
 %files daemon-driver-qemu
 %config(noreplace) %{_sysconfdir}/libvirt/virtqemud.conf
-        %if %{with_userfaultfd_sysctl}
-%config(noreplace) %{_prefix}/lib/sysctl.d/60-qemu-postcopy-migration.conf
-        %endif
 %{_datadir}/augeas/lenses/virtqemud.aug
 %{_datadir}/augeas/lenses/tests/test_virtqemud.aug
 %{_unitdir}/virtqemud.service
@@ -2491,6 +2478,9 @@ exit 0
 %{_unitdir}/virtchd.service
 %{_unitdir}/virtchd.socket
 %{_libdir}/libvirt/connection-driver/libvirt_driver_ch.so
+%config(noreplace) %{_sysconfdir}/libvirt/ch.conf
+%{_datadir}/augeas/lenses/libvirtd_ch.aug
+%{_datadir}/augeas/lenses/tests/test_libvirtd_ch.aug
     %endif
 
 %files client
@@ -2712,11 +2702,50 @@ exit 0
 
 
 %changelog
-* Mon Feb 16 2026 Daniel P. Berrangé <berrange@redhat.com> - 11.6.0-3
-- Re-enable ZFS (rhbz#2407005)
+* Mon Jan 26 2026 Richard W.M. Jones <rjones@redhat.com> - 12.0.0-3
+- Backport fix for IPv6 connections to ESXi
 
-* Fri Oct 31 2025 Cole Robinson <crobinso@redhat.com> - 11.6.0-2
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Daniel P. Berrangé <berrange@redhat.com> - 12.0.0-1
+- Update to 12.0.0
+
+* Mon Jan 12 2026 Daniel P. Berrangé <berrange@redhat.com> - 11.10.0-3
+- Disable -Werror on ELN
+
+* Thu Jan 08 2026 Richard W.M. Jones <rjones@redhat.com> - 11.10.0-2
+- Rebuild for xen 4.21.0
+
+* Mon Dec 01 2025 Cole Robinson <crobinso@redhat.com> - 11.10.0-1
+- Update to version 11.10.0
+
+* Mon Nov 17 2025 Richard W.M. Jones <rjones@redhat.com> - 11.9.0-3
+- Add upstream patches to fix parallel libguestfs
+
+* Tue Nov  4 2025 Tom Callaway <spot@fedoraproject.org> - 11.9.0-2
+- rebuild against new fuse3
+
+* Mon Nov  3 2025 Daniel P. Berrangé <berrange@redhat.com> - 11.9.0-1
+- Update to 11.9.0 release
+
+* Wed Oct 29 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 11.8.0-3
+- Build against fuse3, supported since 8.2
+
+* Tue Oct 14 2025 Cole Robinson <crobinso@redhat.com> - 11.8.0-2
 - Fix build with latest wireshark
+
+* Wed Oct 01 2025 Cole Robinson <crobinso@redhat.com> - 11.8.0-1
+- Update to version 11.8.0
+
+* Thu Sep 04 2025 Adam Williamson <awilliam@redhat.com> - 11.7.0-3
+- Rebuild on a side tag
+
+* Thu Sep 04 2025 Adam Williamson <awilliam@redhat.com> - 11.7.0-2
+- Rebuild for libiscsi.so.11
+
+* Tue Sep 02 2025 Cole Robinson <crobinso@redhat.com> - 11.7.0-1
+- Update to version 11.7.0
 
 * Tue Aug 05 2025 Cole Robinson <crobinso@redhat.com> - 11.6.0-1
 - Update to version 11.6.0

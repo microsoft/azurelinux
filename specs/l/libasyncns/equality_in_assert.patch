@@ -1,0 +1,27 @@
+Author: Myhailo Danylenko <isbear@isbear.org.ua>
+Last-Update: 2017-05-14
+Bug-Debian: https://bugs.debian.org/862596
+Origin: https://bugs.freedesktop.org/show_bug.cgi?id=91859
+Description: Replace possibly unwanted assignment by check for equality
+FIXME: Needs review
+
+--- a/libasyncns/asyncns.c
++++ b/libasyncns/asyncns.c
+@@ -1506,7 +1506,7 @@ int asyncns_isdone(asyncns_t *asyncns, a
+ void asyncns_setuserdata(asyncns_t *asyncns, asyncns_query_t *q, void *userdata) {
+     assert(q);
+     assert(asyncns);
+-    assert(q->asyncns = asyncns);
++    assert(q->asyncns == asyncns);
+ 
+     q->userdata = userdata;
+ }
+@@ -1514,7 +1514,7 @@ void asyncns_setuserdata(asyncns_t *asyn
+ void* asyncns_getuserdata(asyncns_t *asyncns, asyncns_query_t *q) {
+     assert(q);
+     assert(asyncns);
+-    assert(q->asyncns = asyncns);
++    assert(q->asyncns == asyncns);
+ 
+     return q->userdata;
+ }

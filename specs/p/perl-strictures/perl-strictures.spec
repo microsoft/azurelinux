@@ -10,7 +10,7 @@
 
 Name:           perl-strictures
 Version:        2.000006
-Release: 25%{?dist}
+Release:        23%{?dist}
 Summary:        Turn on strict and make most warnings fatal
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/strictures
@@ -76,6 +76,9 @@ make test
 %{_mandir}/man3/strictures::extra.3*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.000006-23
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.000006-22
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

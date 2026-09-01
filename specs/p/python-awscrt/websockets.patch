@@ -1,0 +1,25 @@
+diff --git a/test/test_websocket.py b/test/test_websocket.py
+index fcbcedb..ebebbcb 100644
+--- a/test/test_websocket.py
++++ b/test/test_websocket.py
+@@ -122,6 +122,7 @@ class WebSocketServer:
+         # that the asyncio server thread has finished startup.
+         self._server_started_event = threading.Event()
+         self._server_thread = threading.Thread(target=self._run_server_thread)
++        self._current_connection = None
+ 
+     def __enter__(self):
+         # main thread is entering the `with` block: start the server...
+@@ -179,6 +180,13 @@ class WebSocketServer:
+             self._current_connection = None
+ 
+     def send_async(self, msg):
++        # Wait for a connection to be established before trying to send
++        max_wait = time() + TIMEOUT
++        while self._current_connection is None:
++            if time() > max_wait:
++                raise RuntimeError("Timeout waiting for WebSocket connection to be established")
++            sleep(0.01)
++
+         asyncio.run_coroutine_threadsafe(self._current_connection.send(msg), self._server_loop)
+

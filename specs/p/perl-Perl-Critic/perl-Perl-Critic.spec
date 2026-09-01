@@ -10,7 +10,7 @@
 
 Name:		perl-Perl-Critic
 Version:	1.156
-Release: 6%{?dist}
+Release:	5%{?dist}
 Summary:	Critique Perl source code for best-practices
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Perl-Critic
@@ -71,9 +71,7 @@ BuildRequires:	perl(version) >= 0.77
 BuildRequires:	perl(warnings)
 
 # Main test suite
-%if 0%{?fedora} > 23 || 0%{?rhel} > 7
 BuildRequires:	glibc-langpack-en
-%endif
 BuildRequires:	perl(File::Spec::Functions)
 BuildRequires:	perl(Test::Memory::Cycle)
 BuildRequires:	perl(Test::More)
@@ -145,9 +143,9 @@ perl Build.PL --installdirs=vendor
 
 %check
 %if 0%{!?perl_bootstrap:1} && %{with perl_Perl_Critic_enables_extra_test}
-LC_ALL=en_US ./Build authortest
+LANG=en_US.UTF-8 ./Build authortest
 %else
-LC_ALL=en_US ./Build test
+LANG=en_US.UTF-8 ./Build test
 %endif
 
 %files
@@ -163,6 +161,12 @@ LC_ALL=en_US ./Build test
 %{_mandir}/man3/Test::Perl::Critic::Policy.3*
 
 %changelog
+* Mon Jun  1 2026 Paul Howarth <paul@city-fan.org> - 1.156-5
+- Run tests with LANG=en_US.UTF-8 to fix pod spelling test on Rawhide
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.156-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.156-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,121 @@
+From f55698272a23bdcbb993712a4f7cab3fa660207e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Men=C5=A1=C3=ADk?= <pemensik@redhat.com>
+Date: Wed, 11 Feb 2026 22:02:48 +0100
+Subject: [PATCH] Make inotify initialization non-fatal error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When inotify watch creation is not successful, print only warning. Retry
+after dropping privileges because that might help too. Log warning only
+the second time, when logging is properly initialized.
+
+Signed-off-by: Petr Menšík <pemensik@redhat.com>
+---
+ src/dnsmasq.c | 13 +++++++++++--
+ src/dnsmasq.h |  2 +-
+ src/inotify.c | 22 ++++++++++++++++------
+ 3 files changed, 28 insertions(+), 9 deletions(-)
+
+diff --git a/src/dnsmasq.c b/src/dnsmasq.c
+index 6369a14..91f4efd 100644
+--- a/src/dnsmasq.c
++++ b/src/dnsmasq.c
+@@ -441,7 +441,7 @@ int main (int argc, char **argv)
+ #ifdef HAVE_INOTIFY
+   if ((daemon->port != 0 && !option_bool(OPT_NO_RESOLV)) ||
+       daemon->dynamic_dirs)
+-    inotify_dnsmasq_init();
++    inotify_dnsmasq_init(0);
+   else
+     daemon->inotifyfd = -1;
+ #endif
+@@ -865,6 +865,15 @@ int main (int argc, char **argv)
+     }
+ #endif
+ 
++#ifdef HAVE_INOTIFY
++  /* inotify creation failed for the root user.
++   * Retry with unprivileged user, log warnings this time. */
++  if (daemon->inotifyfd == -1 &&
++      ((daemon->port != 0 && !option_bool(OPT_NO_RESOLV)) ||
++       daemon->dynamic_dirs))
++    inotify_dnsmasq_init(1);
++#endif
++
+   if (daemon->port == 0)
+     my_syslog(LOG_INFO, _("started, version %s DNS disabled"), VERSION);
+   else 
+@@ -1296,7 +1305,7 @@ int main (int argc, char **argv)
+ 	  check_ubus_listeners();
+ 	}
+ #endif
+-      
++
+       if (daemon->port != 0)
+ 	check_dns_listeners(now);
+ 
+diff --git a/src/dnsmasq.h b/src/dnsmasq.h
+index 3d176ba..6ceb697 100644
+--- a/src/dnsmasq.h
++++ b/src/dnsmasq.h
+@@ -1889,7 +1889,7 @@ int detect_loop(char *query, int type);
+ 
+ /* inotify.c */
+ #ifdef HAVE_INOTIFY
+-void inotify_dnsmasq_init(void);
++void inotify_dnsmasq_init(int log_warn);
+ int inotify_check(time_t now);
+ void set_dynamic_inotify(int flag, int total_size, struct crec **rhash, int revhashsz);
+ #endif
+diff --git a/src/inotify.c b/src/inotify.c
+index f70daea..d01b416 100644
+--- a/src/inotify.c
++++ b/src/inotify.c
+@@ -85,18 +85,22 @@ static char *my_readlink(char *path)
+     }
+ }
+ 
+-void inotify_dnsmasq_init()
++void inotify_dnsmasq_init(int log_warn)
+ {
+   struct resolvc *res;
+   inotify_buffer = safe_malloc(INOTIFY_SZ);
+   daemon->inotifyfd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+-  
++
+   if (daemon->inotifyfd == -1)
+-    die(_("failed to create inotify: %s"), NULL, EC_MISC);
++    {
++      if (log_warn)
++        my_syslog(LOG_WARNING, _("failed to create inotify: %s"), strerror(errno));
++      return;
++    }
+ 
+   if (daemon->port == 0 || option_bool(OPT_NO_RESOLV))
+     return;
+-  
++
+   for (res = daemon->resolv_files; res; res = res->next)
+     {
+       char *d, *new_path, *path = safe_malloc(strlen(res->name) + 1);
+@@ -127,8 +131,14 @@ void inotify_dnsmasq_init()
+ 	    die(_("directory %s for resolv-file is missing, cannot poll"), res->name, EC_MISC);
+ 	}	  
+ 	 
+-      if (res->wd == -1)
+-	die(_("failed to create inotify for %s: %s"), res->name, EC_MISC);
++      if (res->wd == -1) {
++	free(path);
++	if (log_warn)
++	  my_syslog(LOG_WARNING, _("failed to create inotify watch for %s: %s"), res->name, strerror(errno));
++	close(daemon->inotifyfd);
++	daemon->inotifyfd = -1;
++	return;
++      }
+ 	
+     }
+ }
+-- 
+2.53.0
+

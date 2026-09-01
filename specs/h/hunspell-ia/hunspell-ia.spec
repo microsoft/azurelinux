@@ -9,12 +9,13 @@
 
 Name: hunspell-ia
 Summary: Interlingua hunspell dictionaries
-%global upstreamid 20050226
+%global upstreamid 20240316
 Version: 0.%{upstreamid}
-Release: 37%{?dist}
-Source: http://download.savannah.gnu.org/releases/interlingua/ia_myspell.zip
-URL: http://wiki.services.openoffice.org/wiki/Dictionaries#Interlingua_.28x-register.29
-License: LGPL-2.1-or-later
+Release: 2%{?dist}
+Source: https://downloads.sourceforge.net/project/aoo-extensions/2215/12/dict-ia-2024-03-16.oxt
+# Another URL is https://addons.mozilla.org/en-US/firefox/addon/dict-ia/
+URL: https://extensions.openoffice.org/en/project/interlingua-dictionario-orthographic-e-regulas-de-division-de-parolas.html
+License: GPL-3.0-or-later
 BuildArch: noarch
 
 Requires: hunspell-filesystem
@@ -24,23 +25,27 @@ Supplements: (hunspell and langpacks-ia)
 Interlingua hunspell dictionaries.
 
 %prep
-%setup -q -c
+%autosetup -c
 
 %build
-tr -d '\r' < README_ia.txt > README_ia.txt.new
-touch -r README_ia.txt README_ia.txt.new
-mv -f README_ia.txt.new README_ia.txt
+# nothing here
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 cp -p ia.* $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}
 
-
 %files
-%doc README_ia.txt
+%license GPLv3.txt
+%doc README_dict-ia.txt
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.20240316-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 08 2025 Parag Nemade <pnemade AT redhat DOT com> - 0.20240316-1
+- Update to new upstream URL and Source (rh#2419831)
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.20050226-34
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

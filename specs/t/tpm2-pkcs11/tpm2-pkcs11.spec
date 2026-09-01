@@ -4,8 +4,8 @@
 #global candidate RC0
 
 Name:		tpm2-pkcs11
-Version:	1.9.1
-Release:	6%{?candidate:.%{candidate}}%{?dist}
+Version:	1.10.1
+Release:	1%{?candidate:.%{candidate}}%{?dist}
 Summary:	PKCS#11 interface for TPM 2.0 hardware
 
 License:	BSD-2-Clause
@@ -18,7 +18,6 @@ Source2:	gpgkey-8E1F50C1.gpg
 BuildRequires:	gcc
 BuildRequires:	make
 BuildRequires:	python3
-BuildRequires:	libgcrypt-devel
 BuildRequires:	libyaml-devel
 BuildRequires:	openssl-devel
 BuildRequires:	p11-kit-devel
@@ -70,7 +69,9 @@ popd >&2
 
 
 %build
-%configure --enable-unit --with-fapi=yes
+# the ptool checks require ancient pkcs11 module
+# https://github.com/tpm2-software/tpm2-pkcs11/issues/908
+%configure --enable-unit --with-fapi=yes --disable-ptool-checks
 %{make_build}
 pushd tools
 %pyproject_wheel
@@ -79,12 +80,10 @@ popd
 
 %install
 %make_install
-mkdir $RPM_BUILD_ROOT/%{_includedir}/
-install src/pkcs11.h $RPM_BUILD_ROOT/%{_includedir}/
-[ -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.la ] && \
-  rm $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.la
-[ -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.a ] && \
-  rm $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.a
+mkdir $RPM_BUILD_ROOT%{_includedir}/
+install src/pkcs11.h $RPM_BUILD_ROOT%{_includedir}/
+rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/pkcs11/libtpm2_pkcs11.a
 
 pushd tools
 %pyproject_install
@@ -114,6 +113,31 @@ make check
 
 
 %changelog
+* Mon Aug 10 2026 Jakub Jelen <jjelen@redhat.com> - 1.10.1-1
+- New upstream release (#2512059)
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 1.10.0-5
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Fri Jul 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.10.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.10.0-3
+- Rebuilt for openssl 4.0
+
+* Wed Jun 10 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.10.0-2
+- Rebuilt for Python 3.15
+- Drop unused libgcrypt dependency
+
+* Wed May 20 2026 Jakub Jelen <jjelen@redhat.com> - 1.10.0-1
+- New upstream release (#2400481)
+
+* Fri Apr 17 2026 Simo Sorce <ssorce@redhat.com> - 1.9.1-8
+- OpenSSL 4 build fixes
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.9.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.9.1-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

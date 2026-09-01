@@ -3,7 +3,7 @@
 
 Name:           munin
 Version:        2.0.76
-Release: 11%{?dist}
+Release:        9%{?dist}
 Summary:        Network-wide resource monitoring tool
 License:        GPL-2.0-only
 URL:            http://munin-monitoring.org/
@@ -635,6 +635,9 @@ fi
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.76-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Dec 28 2025 Kim B. Heino  <b@bbbs.net> - 2.0.76-8
 - rhbz 2406177: Move sysusers.d config to munin-common
 

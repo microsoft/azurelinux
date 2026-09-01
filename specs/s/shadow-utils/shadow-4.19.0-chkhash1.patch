@@ -1,0 +1,88 @@
+From 87ec7a52ab25dd6e91253c274fd651f16844cf2a Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 7 Jan 2026 23:39:53 +0100
+Subject: [PATCH 1/2] lib/chkhash.c: is_valid_hash(): Accept a leading '!'
+
+A leading '!' means that the account is locked.
+
+Fixes: c44f1e096a19 (2025-07-20; "chpasswd: Check hash before write when using -e")
+Link: <https://github.com/shadow-maint/shadow/issues/1483>
+Link: <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1124835>
+Reported-by: Chris Hofstaedtler <zeha@debian.org>
+Reviewed-by: Chris Hofstaedtler <zeha@debian.org>
+Cc: vinz <mmpx09@protonmail.com>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/chkhash.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index 66870500..cb45f3aa 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -7,6 +7,8 @@
+ #include <stddef.h>
+ #include <string.h>
+ 
++#include "string/strcmp/strprefix.h"
++
+ 
+ /*
+  * match_regex - return true if match, false if not
+@@ -37,6 +39,8 @@ match_regex(const char *pattern, const char *string)
+ bool 
+ is_valid_hash(const char *hash) 
+ {
++	hash = strprefix(hash, "!") ?: hash;
++
+ 	// Minimum hash length
+ 	if (strlen(hash) < 13)
+ 		return false;
+-- 
+2.52.0
+
+
+From ddc2549f87e3001f663d5179e9b6d7fe2e1f3b3f Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 7 Jan 2026 23:44:26 +0100
+Subject: [PATCH 2/2] lib/chkhash.c: is_valid_hash(): Accept '*' as the hash
+
+This is widely accepted as an invalid hash, to remove password access
+for an account (that is, no passwords will match the "hash").
+
+Fixes: c44f1e096a19 (2025-07-20; "chpasswd: Check hash before write when using -e")
+Closes: <https://github.com/shadow-maint/shadow/issues/1483>
+Closes: <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1124835>
+Reported-by: Chris Hofstaedtler <zeha@debian.org>
+Reviewed-by: Chris Hofstaedtler <zeha@debian.org>
+Cc: vinz <mmpx09@protonmail.com>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/chkhash.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index cb45f3aa..71e0fb4e 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -7,6 +7,7 @@
+ #include <stddef.h>
+ #include <string.h>
+ 
++#include "string/strcmp/streq.h"
+ #include "string/strcmp/strprefix.h"
+ 
+ 
+@@ -41,6 +42,9 @@ is_valid_hash(const char *hash)
+ {
+ 	hash = strprefix(hash, "!") ?: hash;
+ 
++	if (streq(hash, "*"))
++		return true;
++
+ 	// Minimum hash length
+ 	if (strlen(hash) < 13)
+ 		return false;
+-- 
+2.52.0
+

@@ -5,11 +5,11 @@
 %bcond_with tests
 # The *.py files we ship are not python scripts, #813651
 %global _python_bytecompile_errors_terminate_build 0
-%define upstream_version 2.16.0
+%define upstream_version 2.17.0
 
 Name:           bash-completion
-Version:        2.16
-Release: 5%{?dist}
+Version:        2.17
+Release:        2%{?dist}
 Epoch:          1
 Summary:        Programmable completion for Bash
 
@@ -65,6 +65,9 @@ rm %{buildroot}%{_datadir}/bash-completion/completions/prelink
 # Bug 2188865 - Remove bash completions for javaws as it's not shipped with Fedora
 rm %{buildroot}%{_datadir}/bash-completion/completions/javaws
 
+# Bug 2391218 - patchutils package contains its own completion for this
+rm %{buildroot}%{_datadir}/bash-completion/completions/interdiff
+
 %check
 # For some tests involving non-ASCII filenames
 export LANG=C.UTF-8
@@ -94,6 +97,17 @@ make -C completions check
 %{_datadir}/pkgconfig/bash-completion.pc
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 11 2025 Siteshwar Vashisht <svashisht@redhat.com> - 1:2.17-1
+- Update to version 2.17
+  Resolves: #2408890
+
+* Tue Aug 26 2025 Adam Williamson <awilliam@redhat.com> - 1:2.16-3
+- Remove interdiff completion as patchutils started shipping one
+  Resolves: #2391218
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.16-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

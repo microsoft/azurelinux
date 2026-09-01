@@ -1,0 +1,41 @@
+From b1fee3819121fb773dd3678be923efc91b50338e Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 25 Nov 2025 12:07:49 +0000
+Subject: [PATCH 1/2] Adjust interface test SKIP_METHODS for Python 3.15.0a2
+
+---
+ tests/test_frozenlist.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/test_frozenlist.py b/tests/test_frozenlist.py
+index c37f5c0d..6cc4de33 100644
+--- a/tests/test_frozenlist.py
++++ b/tests/test_frozenlist.py
+@@ -17,6 +17,9 @@ class FrozenListMixin:
+         "__slots__",
+         "__static_attributes__",
+         "__firstlineno__",
++        # Since Python 3.15.0a2: https://github.com/python/cpython/pull/132345
++        "__annotate_func__",
++        "__annotations_cache__",
+     }
+ 
+     def test___class_getitem__(self) -> None:
+
+From d8a1c9e3e598db55b4101005cd9b7aa55d225051 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Tue, 25 Nov 2025 12:16:04 +0000
+Subject: [PATCH 2/2] News fragment for PR#723
+
+---
+ CHANGES/723.bugfix | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 CHANGES/723.bugfix
+
+diff --git a/CHANGES/723.bugfix b/CHANGES/723.bugfix
+new file mode 100644
+index 00000000..5827a267
+--- /dev/null
++++ b/CHANGES/723.bugfix
+@@ -0,0 +1 @@
++Fix a test regression in Python 3.15.0a2.

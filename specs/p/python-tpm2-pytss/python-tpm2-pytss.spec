@@ -6,7 +6,7 @@
 
 Name:           python-%{pypi_name}
 Version:        2.3.0
-Release: 12%{?dist}
+Release:        12%{?dist}
 Summary:        TPM 2.0 TSS Bindings for Python
 
 License:        BSD-2-Clause
@@ -22,6 +22,10 @@ Patch3:         %{name}-gcc15.patch
 # cryptography >= 45.0.0 requires the copy dunder for private key implementations.
 # https://github.com/tpm2-software/tpm2-pytss/commit/6ab4c74e6fb3da7cd38e97c1f8e92532312f8439
 Patch4:         %{name}-copy-dunder.patch
+# cryptography: fix support for cryptography 47.
+Patch5:         %{name}-cryptography47.patch
+# crypto: fix deprection warnings (backport)
+Patch6:         %{name}-cryptography-decrepit.patch
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pytest
@@ -69,6 +73,7 @@ Summary:        %{summary}
 
 
 %check
+export OPENSSL_ENABLE_SHA1_SIGNATURES=1
 %pyproject_check_import
 # The test test_tools_decode_tpml_tagged_tpm_property checks TPM2 revision which is not stable
 # In upstream this test as well as the tools are removed so I do not have any good way to fix it
@@ -86,6 +91,15 @@ Summary:        %{summary}
 
 
 %changelog
+* Mon Jun 08 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2.3.0-12
+- Fix build with latest python-cryptography
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 2.3.0-11
+- Rebuilt for Python 3.15
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.0-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.3.0-9
 - Rebuilt for Python 3.14.0rc3 bytecode
 

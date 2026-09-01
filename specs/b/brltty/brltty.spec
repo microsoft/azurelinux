@@ -1,8 +1,8 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%define pkg_version 6.8
-%define api_version 0.8.7
+%define pkg_version 6.9
+%define api_version 0.8.8
 
 # minimal means brltty-minimal subpackage with minimal deps for
 # braille support in Anaconda installer
@@ -39,8 +39,8 @@
 %global __requires_exclude ^(%{_privatelibs})$
 
 Name: brltty
-Version: 6.8
-Release: 7%{?dist}
+Version: 6.9
+Release: 1%{?dist}
 License: LGPL-2.0-or-later AND LGPL-2.1-or-later AND GPL-2.0-or-later
 URL: http://brltty.app/
 Source0: http://brltty.app/archive/%{name}-%{version}.tar.xz
@@ -624,6 +624,7 @@ fi
 %{_bindir}/vstp
 %{_bindir}/eutp
 %{_bindir}/xbrlapi
+%dir %{_libdir}/brltty
 %{_libdir}/brltty/libbrlttybba.so
 %{_libdir}/libbrlapi.so.*
 %ghost %verify(not group) %{_sysconfdir}/brlapi.key
@@ -677,13 +678,28 @@ fi
 %config(noreplace) %verify(not size md5 mtime) %{_sysconfdir}/brltty/Initramfs/cmdline
 
 %changelog
+* Tue Feb 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 6.9-1
+- 6.9
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.8-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.8-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 6.8-6
+- OCaml 5.4.0 rebuild
+
+* Wed Oct 08 2025 Dominik Mierzejewski <dominik@greysector.net> - 6.8-5
+- own _libdir/brltty directory in brlapi
+
 * Wed Aug 06 2025 František Zatloukal <fzatlouk@redhat.com> - 6.8-4
 - Rebuilt for icu 77.1
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.8-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 6.8-2
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 6.8-2
 - Rebuild to fix OCaml dependencies
 
 * Mon Jul 07 2025 Gwyn Ciesla <gwync@protonmail.com> - 6.8-1

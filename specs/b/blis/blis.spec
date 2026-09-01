@@ -11,13 +11,6 @@
 %global sover .4.0.0
 %global soshort .4
 
-%if 0%{?el7}
-# Use devtoolset for avx512 support
-%ifnarch ppc64le ppc64
-%global dts 9
-%endif
-%endif
-
 # Both these are necessary to avoid asm error
 # error: bp cannot be used in ‘asm’ here
 # Fixme: patch to localize this
@@ -26,7 +19,7 @@
 
 Name:		blis
 Version:	2.0
-Release: 5%{?dist}
+Release:	5%{?dist}
 Summary:	BLAS-like Library Instantiation Software Framework
 License:	BSD-3-Clause
 URL:		https://github.com/flame/blis
@@ -35,14 +28,14 @@ Source0:	https://github.com/flame/blis/archive/%commit/%name-%shortcommit.tar.gz
 %else
 Source0:	https://github.com/flame/blis/archive/%version/%name-%version.tar.gz
 %endif
+Patch1:         0001-Update-Haswell-gemmsup-fix-for-gcc-16-and-later.-891.patch
 BuildRequires:	perl
-BuildRequires:	%{?dts:devtoolset-%{?dts}-binutils devtoolset-%{?dts}-}gcc
+BuildRequires:	binutils gcc
 BuildRequires:	python3-devel gcc-gfortran chrpath
 BuildRequires:	make
 # memkind is currently only relevant for KNL as far as I know, but
-# might be relevant in future for other targets with HBM.  It needs
-# updating in el7.  It should support other targets, but only x86_64
-# is packaged.
+# might be relevant in future for other targets with HBM.  It should
+# support other targets, but only x86_64 is packaged.
 %ifarch x86_64
 # removed from RHEL10
 %if 0%{?el8}%{?el9}%{?fedora}
@@ -136,14 +129,9 @@ BLIS architecture macros.
 
 %prep
 %setup -q %{?commit: -n %name-%commit}
-# The soversion changed in release 0.7.0, but abipkgdiff suggests it
-# shouldn't have, since only undocumented interfaces have changed from
-# 0.6.0: removed bli_thread_get_env, bli_thread_init_rntm; indirect
-# sub-types in bli_addd_ex; ARCH enum in bli_arch_query_id.
-#echo %sover | awk -F. '{printf("%s\n%s.%s\n", $2,$3,$4)}' >so_version
+%patch -P1 -p1 -b .gcc16
 
 %build
-%{?dts:. /opt/rh/devtoolset-%{?dts}/enable}
 case %_arch in
 x86_64) arch=x86_64 ;;
 # a57 runs on all aarch64 and the optimized micro-kernel should be a
@@ -298,7 +286,6 @@ EOF
 
 
 %check
-%{?dts:. /opt/rh/devtoolset-%{?dts}/enable}
 # A quick check which tests the Fortran BLAS interface with gfortran,
 # unlike the "test" or "check" targets.
 # Fixme: check a 64-bit version where relevant
@@ -388,6 +375,16 @@ export LD_LIBRARY_PATH=`pwd`/serial/lib
 %{macrosdir}/macros.blis-srpm
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan  6 2026 Dave Love <loveshack@fedoraproject.org> - 2.0-3
+- Add patch for gcc16
+- Remove el7 support
+
 * Tue Jul 29 2025 Dave Love <loveshack@fedoraproject.org> - 2.0-2
 - Avoid memkind on EL10
 

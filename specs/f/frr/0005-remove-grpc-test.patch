@@ -7,12 +7,12 @@ index 7b5eaa4..5c82f69 100644
  	$(INSTALL_SCRIPT) $< tests/lib/script1.lua
  
 -##############################################################################
--GRPC_TESTS_LDADD = mgmtd/libmgmt_be_nb.la staticd/libstatic.a grpc/libfrrgrpc_pb.la $(GRPC_LIBS) $(ALL_TESTS_LDADD) $(LIBYANG_LIBS) -lm
+-GRPC_TESTS_LDADD = mgmtd/libmgmt_be_nb.la staticd/libstatic.a grpc/libfrrgrpc_pb.la $(GRPC_LIBS) $(ALL_TESTS_LDADD) $(LIBYANG_LIBS) $(UST_LIBS) -lm
 -
 -if GRPC
 -check_PROGRAMS += tests/lib/test_grpc
 -endif
--tests_lib_test_grpc_CXXFLAGS = $(WERROR) $(TESTS_CXXFLAGS)
+-tests_lib_test_grpc_CXXFLAGS = $(WERROR) $(TESTS_CXXFLAGS) $(GRPC_CXXFLAGS)
 -tests_lib_test_grpc_CPPFLAGS = $(TESTS_CPPFLAGS)
 -tests_lib_test_grpc_LDADD = $(GRPC_TESTS_LDADD)
 -tests_lib_test_grpc_SOURCES = tests/lib/test_grpc.cpp

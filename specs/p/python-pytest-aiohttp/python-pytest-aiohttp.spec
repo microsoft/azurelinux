@@ -8,7 +8,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.1.0
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Pytest plugin for aiohttp support
 
 License:        Apache-2.0
@@ -57,6 +57,9 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %license LICENSE
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.1.0-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

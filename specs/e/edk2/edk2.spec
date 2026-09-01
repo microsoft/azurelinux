@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 8;
+    release_number = 5;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -29,16 +29,16 @@
 %global debug_package %{nil}
 %endif
 
-# edk2-stable202511
-%define GITDATE        20251119
-%define GITCOMMIT      46548b1adac8
+# edk2-stable202608
+%define GITDATE        20260812
+%define GITCOMMIT      2970e5699ba6
 %define TOOLCHAIN      GCC
 
-%define PLATFORMS_COMMIT 1e64c1109ae2
+%define PLATFORMS_COMMIT f8dbb5c60330
 
-%define OPENSSL_VER    3.5.5
+%define OPENSSL_VER    3.5.8
 
-%define DBXDATE        20251016
+%define DBXDATE        20260630
 
 # Undefine this to get *HUGE* (50MB+) verbose build logs
 %define silent --silent
@@ -91,7 +91,7 @@ URL:        http://www.tianocore.org
 # | xz -9ev >/tmp/edk2-$COMMIT.tar.xz
 Source0: edk2-%{GITCOMMIT}.tar.xz
 Source1: ovmf-whitepaper-c770f8c.txt
-Source2: openssl-%{OPENSSL_VER}.tar.gz
+Source2: https://github.com/openssl/openssl/releases/download/openssl-%{OPENSSL_VER}/openssl-%{OPENSSL_VER}.tar.gz
 Source4: edk2-platforms-%{PLATFORMS_COMMIT}.tar.xz
 Source5: jansson-2.13.1.tar.bz2
 Source6: dtc-1.7.0.tar.xz
@@ -103,6 +103,12 @@ Source11: 51-edk2-aarch64-raw.json
 Source12: 52-edk2-aarch64-verbose-qcow2.json
 Source13: 53-edk2-aarch64-verbose-raw.json
 
+Source20: 90-edk2-ovmf-qemuvars-x64-sb-enrolled.json
+Source21: 91-edk2-ovmf-qemuvars-x64-sb.json
+Source22: 90-edk2-aarch64-qemuvars-sb-enrolled.json
+Source23: 91-edk2-aarch64-qemuvars-sb.json
+Source24: 92-edk2-ovmf-igvm-x64-nosb.json
+
 Source40: 30-edk2-ovmf-4m-qcow2-x64-sb-enrolled.json
 Source41: 31-edk2-ovmf-2m-raw-x64-sb-enrolled.json
 Source42: 40-edk2-ovmf-4m-qcow2-x64-sb.json
@@ -113,6 +119,7 @@ Source46: 51-edk2-ovmf-2m-raw-x64-nosb.json
 Source47: 60-edk2-ovmf-x64-stateless.json
 Source48: 61-edk2-ovmf-x64-amdsev.json
 Source49: 61-edk2-ovmf-x64-inteltdx.json
+Source51: 62-edk2-ovmf-x64-inteltdx-nosb.json
 
 Source50: 50-edk2-riscv-qcow2.json
 
@@ -130,30 +137,22 @@ Source92: DBXUpdate-%{DBXDATE}.aa64.bin
 
 Patch0001: 0001-BaseTools-do-not-build-BrotliCompress-RH-only.patch
 Patch0002: 0002-MdeModulePkg-remove-package-private-Brotli-include-p.patch
-Patch0003: 0003-MdeModulePkg-TerminalDxe-set-xterm-resolution-on-mod.patch
-Patch0004: 0004-OvmfPkg-take-PcdResizeXterm-from-the-QEMU-command-li.patch
-Patch0005: 0005-ArmVirtPkg-take-PcdResizeXterm-from-the-QEMU-command.patch
-Patch0006: 0006-OvmfPkg-enable-DEBUG_VERBOSE-RHEL-only.patch
-Patch0007: 0007-OvmfPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuVide.patch
-Patch0008: 0008-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
-Patch0009: 0009-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
-Patch0010: 0010-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
-Patch0011: 0011-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
-Patch0012: 0012-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
-Patch0013: 0013-CryptoPkg-CrtLib-add-stat.h.patch
-Patch0014: 0014-CryptoPkg-CrtLib-add-access-open-read-write-close-sy.patch
-Patch0015: 0015-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
+Patch0003: 0003-OvmfPkg-enable-DEBUG_VERBOSE-RHEL-only.patch
+Patch0004: 0004-OvmfPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuVide.patch
+Patch0005: 0005-ArmVirtPkg-silence-DEBUG_VERBOSE-0x00400000-in-QemuR.patch
+Patch0006: 0006-OvmfPkg-QemuRamfbDxe-Do-not-report-DXE-failure-on-Aa.patch
+Patch0007: 0007-OvmfPkg-silence-EFI_D_VERBOSE-0x00400000-in-NvmExpre.patch
+Patch0008: 0008-OvmfPkg-QemuKernelLoaderFsDxe-suppress-error-on-no-k.patch
+Patch0009: 0009-SecurityPkg-Tcg2Dxe-suppress-error-on-no-swtpm-in-si.patch
+Patch0010: 0010-OvmfPkg-set-PcdVariableStoreSize-PcdMaxVolatileVaria.patch
+Patch0011: 0011-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
+Patch0012: 0012-OvmfPkg-X64-add-opt-org.tianocore-UninstallMemAttrPr.patch
+Patch0013: 0013-OvmfPkg-PlatformDxe-register-page-fault-handler-for-.patch
+Patch0014: 0014-OvmfPkg-PlatformDxe-add-check-for-1g-page-support.patch
+Patch0015: 0015-Revert-OvmfPkg-X86QemuLoadImageLib-flip-default-for-.patch
+Patch0016: 0016-OvmfPkg-PlatformDxe-proper-addr-masking.patch
 %if 0%{?fedora} >= 38 || 0%{?rhel} >= 10
-Patch0016: 0016-silence-.-has-a-LOAD-segment-with-RWX-permissions-wa.patch
 %endif
-Patch0017: 0017-OvmfPkg-X64-add-opt-org.tianocore-UninstallMemAttrPr.patch
-Patch0018: 0018-openssl-silence-unused-variable-warning.patch
-Patch0019: 0019-OvmfPkg-PlatformDxe-register-page-fault-handler-for-.patch
-Patch0020: 0020-OvmfPkg-PlatformDxe-add-check-for-1g-page-support.patch
-Patch0021: 0021-UefiCpuPkg-CpuExceptionHandlerLib-fix-push-instructi.patch
-Patch0022: 0022-OvmfPkg-PlatformPei-Do-not-enable-S3-support-for-con.patch
-Patch0023: 0023-OvmfPkg-MemDebugLogLib-use-AcquireSpinLockOrFail.patch
-Patch0024: 0024-BaseTools-EfiRom-fix-compiler-warning.patch
 
 
 # needed by %prep
@@ -177,6 +176,10 @@ BuildRequires:  perl(File::Copy)
 BuildRequires:  perl(JSON)
 BuildRequires:  perl(Time::Piece)
 
+# For generating the variable store template with
+# the default certificates enrolled.
+BuildRequires:  python3-virt-firmware >= 24.2
+
 %if %{build_ovmf}
 # Only OVMF includes 80x86 assembly files (*.nasm*).
 BuildRequires:  nasm
@@ -186,10 +189,6 @@ BuildRequires:  nasm
 BuildRequires:  dosfstools
 BuildRequires:  mtools
 BuildRequires:  xorriso
-
-# For generating the variable store template with the default certificates
-# enrolled.
-BuildRequires:  python3-virt-firmware >= 24.2
 
 %if %{defined fedora}
 # generate igvm files (using igvm-wrap)
@@ -398,8 +397,10 @@ chmod -Rf a+rX,u+w,g-w,o-w .
 cp -a -- \
    %{SOURCE9} \
    %{SOURCE10} %{SOURCE11} %{SOURCE12} %{SOURCE13} \
+   %{SOURCE20} %{SOURCE21} %{SOURCE22} %{SOURCE23} %{SOURCE24} \
    %{SOURCE40} %{SOURCE41} %{SOURCE42} %{SOURCE43} %{SOURCE44} \
    %{SOURCE45} %{SOURCE46} %{SOURCE47} %{SOURCE48} %{SOURCE49} \
+   %{SOURCE51} \
    %{SOURCE50} \
    %{SOURCE60} \
    %{SOURCE80} %{SOURCE81} %{SOURCE82} %{SOURCE83} %{SOURCE84} \
@@ -462,6 +463,12 @@ virt-fw-vars --input   %{RHELCFG}/ovmf/OVMF.inteltdx.fd \
              --output  %{RHELCFG}/ovmf/OVMF.inteltdx.secboot.fd \
              --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
              --enroll-redhat --secure-boot
+%if %{qemuvars}
+virt-fw-vars --output-json %{RHELCFG}/ovmf/vars.blank.json
+virt-fw-vars --output-json %{RHELCFG}/ovmf/vars.secboot.json \
+             --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
+             --enroll-redhat --secure-boot
+%endif
 build_iso %{RHELCFG}/ovmf
 cp DBXUpdate-%{DBXDATE}.x64.bin %{RHELCFG}/ovmf
 
@@ -481,6 +488,12 @@ virt-fw-vars --input   Fedora/ovmf/OVMF.inteltdx.fd \
              --output  Fedora/ovmf/OVMF.inteltdx.secboot.fd \
              --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
              --enroll-redhat --secure-boot
+%if %{qemuvars}
+virt-fw-vars --output-json Fedora/ovmf/vars.blank.json
+virt-fw-vars --output-json Fedora/ovmf/vars.secboot.json \
+             --set-dbx DBXUpdate-%{DBXDATE}.x64.bin \
+             --enroll-redhat --secure-boot
+%endif
 build_iso Fedora/ovmf
 cp DBXUpdate-%{DBXDATE}.x64.bin Fedora/ovmf
 
@@ -525,6 +538,12 @@ done
 %if %{build_aarch64}
 %if %{defined rhel}
 ./edk2-build.py --config edk2-build.%{rhelcfg} %{?silent} --release-date "$RELEASE_DATE" -m armvirt
+%if %{qemuvars}
+virt-fw-vars --output-json %{RHELCFG}/aarch64/vars.blank.json
+virt-fw-vars --output-json %{RHELCFG}/aarch64/vars.secboot.json \
+             --set-dbx DBXUpdate-%{DBXDATE}.aa64.bin \
+             --enroll-redhat --secure-boot
+%endif
 cp DBXUpdate-%{DBXDATE}.aa64.bin %{RHELCFG}/aarch64
 %else
 ./edk2-build.py --config edk2-build.fedora %{?silent} --release-date "$RELEASE_DATE" -m armvirt
@@ -533,6 +552,12 @@ virt-fw-vars --input   Fedora/aarch64/vars-template-pflash.raw \
              --output  Fedora/experimental/vars-template-secboot-testonly-pflash.raw \
              --set-dbx DBXUpdate-%{DBXDATE}.aa64.bin \
              --enroll-redhat --secure-boot --distro-keys rhel
+%if %{qemuvars}
+virt-fw-vars --output-json Fedora/aarch64/vars.blank.json
+virt-fw-vars --output-json Fedora/aarch64/vars.secboot.json \
+             --set-dbx DBXUpdate-%{DBXDATE}.aa64.bin \
+             --enroll-redhat --secure-boot
+%endif
 cp DBXUpdate-%{DBXDATE}.aa64.bin Fedora/aarch64
 %endif
 for raw in */aarch64/*.raw; do
@@ -610,11 +635,19 @@ install -m 0644 \
         51-edk2-ovmf-2m-raw-x64-nosb.json \
         61-edk2-ovmf-x64-amdsev.json \
         61-edk2-ovmf-x64-inteltdx.json \
+        62-edk2-ovmf-x64-inteltdx-nosb.json \
         %{buildroot}%{_datadir}/qemu/firmware
+%if %{qemuvars}
+install -m 0644 \
+        90-edk2-ovmf-qemuvars-x64-sb-enrolled.json \
+        91-edk2-ovmf-qemuvars-x64-sb.json \
+        %{buildroot}%{_datadir}/qemu/firmware
+%endif
 %if %{defined fedora}
 install -m 0644 \
         50-edk2-ovmf-x64-microvm.json \
         60-edk2-ovmf-x64-stateless.json \
+        92-edk2-ovmf-igvm-x64-nosb.json \
         %{buildroot}%{_datadir}/qemu/firmware
 %endif
 
@@ -639,6 +672,12 @@ install -m 0644 \
         52-edk2-aarch64-verbose-qcow2.json \
         53-edk2-aarch64-verbose-raw.json \
         %{buildroot}%{_datadir}/qemu/firmware
+%if %{qemuvars}
+install -m 0644 \
+        90-edk2-aarch64-qemuvars-sb-enrolled.json \
+        91-edk2-aarch64-qemuvars-sb.json \
+        %{buildroot}%{_datadir}/qemu/firmware
+%endif
 
 # endif build_aarch64
 %endif
@@ -726,8 +765,12 @@ done
 %{_datadir}/qemu/firmware/51-edk2-ovmf-2m-raw-x64-nosb.json
 %{_datadir}/qemu/firmware/61-edk2-ovmf-x64-amdsev.json
 %{_datadir}/qemu/firmware/61-edk2-ovmf-x64-inteltdx.json
+%{_datadir}/qemu/firmware/62-edk2-ovmf-x64-inteltdx-nosb.json
 %if %{qemuvars}
 %{_datadir}/%{name}/ovmf/OVMF.qemuvars.fd
+%{_datadir}/%{name}/ovmf/vars.*.json
+%{_datadir}/qemu/firmware/90-edk2-ovmf-qemuvars-x64-sb-enrolled.json
+%{_datadir}/qemu/firmware/91-edk2-ovmf-qemuvars-x64-sb.json
 %endif
 %if %{defined fedora}
 %{_datadir}/%{name}/ovmf/MICROVM.fd
@@ -736,6 +779,7 @@ done
 %{_datadir}/%{name}/ovmf/OVMF.stateless.secboot.fd
 %{_datadir}/qemu/firmware/50-edk2-ovmf-x64-microvm.json
 %{_datadir}/qemu/firmware/60-edk2-ovmf-x64-stateless.json
+%{_datadir}/qemu/firmware/92-edk2-ovmf-igvm-x64-nosb.json
 %{_datadir}/%{name}/ovmf/OVMF_CODE_4M.qcow2
 %{_datadir}/%{name}/ovmf/OVMF_CODE_4M.secboot.qcow2
 %{_datadir}/%{name}/ovmf/OVMF_VARS_4M.qcow2
@@ -765,6 +809,9 @@ done
 %if %{qemuvars}
 %{_datadir}/%{name}/aarch64/QEMU_EFI-qemuvars-pflash.*
 %{_datadir}/%{name}/aarch64/QEMU_EFI.qemuvars.fd
+%{_datadir}/%{name}/aarch64/vars.*.json
+%{_datadir}/qemu/firmware/90-edk2-aarch64-qemuvars-sb-enrolled.json
+%{_datadir}/qemu/firmware/91-edk2-aarch64-qemuvars-sb.json
 %endif
 %if %{defined fedora}
 %{_datadir}/%{name}/aarch64/QEMU_EFI.kernel.fd
@@ -865,20 +912,89 @@ done
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 20251119-8
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 20260812-5
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 20251119-7
-- build: mass rebuild auto-bumpable components
+* Wed Aug 26 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260812-4
+- update openssl tarball to 3.5.8
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 20251119-6
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Aug 26 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260812-3
+- [rebase] update patches
 
-* Tue Feb 03 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-5
+* Wed Aug 26 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260812-2
+- [rebase] turn off ipv6 for 2m builds
+
+* Wed Aug 26 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260812-1
+- [rebase] update tarballs
+
+* Wed Aug 05 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-8
+- cherry-pick one more tdx fix
+
+* Mon Aug 03 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-7
+- cherry-pick two tdx fixes
+
+* Wed Jul 08 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-6
+- update dbx to 20260630 (v1.6.5)
+
+* Wed Jul 08 2026 Paul Meyer <katexochen0@gmail.com> - 20260508-5
+- add non-secure-boot TDX firmware descriptor
+
+* Thu Jun 18 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-4
+- add 0020-OvmfPkg-PlatformDxe-proper-addr-masking.patch
+
+* Thu Jun 11 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-3
+- update openssl to 3.5.7
+
+* Fri May 22 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-2
+- exclude xen firmware from annocheck
+
+* Fri May 22 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260508-1
+- update to edk2-stable202605
+
+* Thu Apr 23 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-6
+- unbreak https boot
+
+* Thu Apr 09 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-5
+- update openssl to 3.5.6
+
+* Thu Mar 12 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-4
+- add 0018-Revert-OvmfPkg-X86QemuLoadImageLib-flip-default-for-.patch
+
+* Fri Mar 06 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-3
+- add description to 50-edk2-loongarch64.json
+
+* Wed Feb 25 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-2
+- add firmware json file for OVMF.igvm
+
+* Mon Feb 23 2026 Gerd Hoffmann <kraxel@redhat.com> - 20260213-1
+- update to edk2-stable202602
+
+* Mon Feb 23 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-12
+- add qemuvars firmware json files
+
+* Wed Feb 18 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-11
+- remove leftover 50-edk2-arm-verbose.json from repo
+
+* Tue Feb 03 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-10
 - add build dep for openssl Configure perl script
 
-* Tue Feb 03 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-4
+* Tue Feb 03 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-9
 - switch to vanilla upstream openssl tarballs, update to openssl-3.3.5
+
+* Fri Jan 30 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-8
+- one more gcc 16 warning fix
+
+* Fri Jan 30 2026 Gerd Hoffmann <kraxel@redhat.com> - 20251119-7
+- fix gcc 16 warnings
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251119-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Dec 11 2025 Gerd Hoffmann <kraxel@redhat.com> - 20251119-5
+- OvmfPkg/X86QemuLoadImageLib: flip default for EnableLegacyLoader to false
+
+* Thu Dec 11 2025 Gerd Hoffmann <kraxel@redhat.com> - 20251119-4
+- OvmfPkg/PlatformInitLib: reserve igvm parameter area
 
 * Mon Dec 08 2025 Gerd Hoffmann <kraxel@redhat.com> - 20251119-3
 - BaseTools/EfiRom: fix compiler warning

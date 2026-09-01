@@ -4,7 +4,7 @@
 Summary: A front end for testing other programs
 Name: dejagnu
 Version: 1.6.3
-Release: 16%{?dist}
+Release: 18%{?dist}
 Epoch: 1
 # Note: baseboards/riscv-sim.exp is GPL 2.0 or later
 # GFDL-1.3-or-later: Everything in doc/
@@ -19,6 +19,7 @@ BuildRequires: expect texinfo
 BuildRequires: make
 
 Patch0: rhbz460153.patch
+Patch1: tcl9.patch
 
 %description
 DejaGnu is an Expect/Tcl based framework for testing other programs.
@@ -31,6 +32,7 @@ into software development).
 %prep
 %setup -q
 %patch -P0 -p1
+%patch -P1 -p1
 
 %build
 %configure -v
@@ -66,6 +68,23 @@ install -D -m 644 doc/dejagnu.info $RPM_BUILD_ROOT/%{_infodir}/%{name}.info
 %{_infodir}/dejagnu*
 
 %changelog
+* Thu May 21 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 1.6.3-18
+- Apply another Tcl 9 compatibility fix from upstream PR81083 branch
+
+* Thu Apr 16 2026 Jakub Jelinek <jakub@redhat.com> - 1:1.6.3-17
+- Apply full set of Tcl 9 compatibility fixes from upstream PR80674 branch
+  (#2448542)
+
+* Tue Mar 24 2026 Jakub Jelinek <jakub@redhat.com> - 1:1.6.3-16
+- Use -translation binary instead of -encoding binary for Tcl 9 compatibility
+  (#2440542)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.3-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.3-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.6.3-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

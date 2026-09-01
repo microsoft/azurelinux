@@ -68,16 +68,16 @@ diff --git a/src/runtime-rs/Makefile b/src/runtime-rs/Makefile
 index a5f8bed..5d14316 100644
 --- a/src/runtime-rs/Makefile
 +++ b/src/runtime-rs/Makefile
-@@ -734,7 +734,7 @@ static-checks-build: $(GENERATED_FILES)
+@@ -738,7 +738,7 @@ static-checks-build: $(GENERATED_FILES)
  $(TARGET): $(GENERATED_FILES) $(TARGET_PATH)
 
  $(TARGET_PATH): $(SOURCES) | show-summary
--	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
-+	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo build -p runtime-rs --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo build -p runtime-rs --target $(TRIPLE) $(if $(findstring release,$(BUILD_TYPE)),--release) $(EXTRA_RUSTFEATURES)
 
  $(GENERATED_FILES): %: %.in
  	@sed \
-@@ -744,7 +744,7 @@ $(GENERATED_FILES): %: %.in
+@@ -748,7 +748,7 @@ $(GENERATED_FILES): %: %.in
 
  ##TARGET optimize: optimized  build
  optimize: $(SOURCES) | show-summary show-header
@@ -125,8 +125,8 @@ index 3cd6b35..ccc9be3 100644
  	cargo vendor
 
  test: $(GENERATED_FILES)
--	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo test --all-targets --all-features --target $(TRIPLE)
-+	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo test --all-targets --all-features --target $(TRIPLE)
+-	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo test -p genpolicy --all-targets --all-features --target $(TRIPLE)
++	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) " cargo test -p genpolicy --all-targets --all-features --target $(TRIPLE)
 
  install: $(GENERATED_FILES)
 -	@RUSTFLAGS="$(EXTRA_RUSTFLAGS) --deny warnings" cargo install --locked --target $(TRIPLE) --path .

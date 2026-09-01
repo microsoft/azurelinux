@@ -17,7 +17,7 @@
 Name:           ghc-%{pkg_name}
 Version:        0.5.1.4
 # can only be reset when subpkg bumped
-Release: 24%{?dist}
+Release:        21%{?dist}
 Summary:        Generic Programming using True Sums of Products
 
 License:        BSD-3-Clause

@@ -1,0 +1,31 @@
+{
+    "description": "OVMF for qemu uefi-vars, SB enabled, MS certs enrolled",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "memory",
+        "filename": "/usr/share/edk2/ovmf/OVMF.qemuvars.fd",
+        "uefi-vars": {
+            "template": "/usr/share/edk2/ovmf/vars.secboot.json"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "x86_64",
+            "machines": [
+                "pc-q35-*"
+            ]
+        }
+    ],
+    "features": [
+        "acpi-s3",
+        "enrolled-keys",
+        "secure-boot",
+        "host-uefi-vars",
+        "verbose-dynamic"
+    ],
+    "tags": [
+
+    ]
+}

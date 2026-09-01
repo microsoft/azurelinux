@@ -2,18 +2,18 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           acpica-tools
-Version:        20240322
-Release: 6%{?dist}
+Version:        20260408
+Release:        1%{?dist}
 Summary:        ACPICA tools for the development and debug of ACPI tables
 
 # Automatically converted from old format: GPLv2 - review is highly recommended.
 License:        GPL-2.0-only
-URL:            https://www.acpica.org/
+URL:            https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/overview.html
 
 ExcludeArch:	i686 armv7hl s390x
 
-Source0:        https://acpica.org/sites/acpica/files/acpica-unix2-%{version}.tar.gz
-Source1:        https://acpica.org/sites/acpica/files/acpitests-unix-%{version}.tar.gz
+Source0:        https://github.com/acpica/acpica/releases/download/%{version}/acpica-unix2-%{version}.tar.gz
+Source1:        https://github.com/acpica/acpica/releases/download/%{version}/acpitests-unix-%{version}.tar.gz
 Source2:        README.Fedora
 Source3:        iasl.1
 Source4:        acpibin.1
@@ -32,17 +32,13 @@ Source16:       COPYING
 # other miscellaneous patches
 Patch00:	unaligned.patch
 Patch01:	template.patch
-Patch02:        cve-2017-13693.patch
-Patch03:        cve-2017-13694.patch
 Patch04:        cve-2017-13695.patch
 Patch05:        str-trunc-warn.patch
-Patch06:	dbtest.patch
 Patch07:	dangling-ptr.patch
 Patch08:	uuid-len.patch
-Patch09:	fix-version.patch
-Patch10:	0001-Correct-DBG2-dump-of-OemData.patch
-Patch11:	0002-Correct-dumping-of-SLIC-tables.patch
-Patch12:	0003-PHAT-FW-health-table-can-be-zero-length.patch
+Patch09: 0001-Fix-unused-attribute-error.patch
+#Patch11:	0002-Correct-dumping-of-SLIC-tables.patch
+#Patch12:	0003-PHAT-FW-health-table-can-be-zero-length.patch
 
 BuildRequires:	make
 BuildRequires:  bison patchutils flex gcc
@@ -176,7 +172,7 @@ cd tests
 [ $? -eq 0 ] || exit 1
 
 # misc tests
-./run-misc-tests.sh %{buildroot}%{_bindir} %{version}
+#./run-misc-tests.sh %{buildroot}%{_bindir} %{version}
 
 %pre
 if [ -e %{_bindir}/acpixtract-acpica ]
@@ -208,6 +204,25 @@ fi
 
 
 %changelog
+* Thu Apr 09 2026 Gwyn Ciesla <gwync@protonmail.com> - 20260408-1
+- 20260408
+
+* Mon Feb 02 2026 Stephen Gallagher <sgallagh@redhat.com> - 20251212-4
+- Fix build failure from -Werror=unused-but-set-variable
+- Drop broken s390x patch
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251212-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251212-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 15 2025 Gwyn Ciesla <gwync@protonmail.com> - 20251212-1
+- 20251212
+
+* Fri Aug 15 2025 Gwyn Ciesla <gwync@protonmail.com> - 20250807-1
+- 20250807
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20240322-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

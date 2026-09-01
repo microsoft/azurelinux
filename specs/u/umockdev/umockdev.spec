@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:             umockdev
-Version:          0.19.5
-Release: 5%{?dist}
+Version:          0.19.8
+Release:          1%{?dist}
 Summary:          Mock hardware devices
 
 License:          LGPL-2.1-or-later
@@ -78,10 +78,23 @@ rm -rf $RPM_BUILD_ROOT/%{_datadir}/doc/umockdev
 %{_datadir}/vala/vapi/umockdev-1.0.vapi
 
 %changelog
+* Mon Jul 06 2026 Packit <hello@packit.dev> - 0.19.8-1
+- preload: Fix libc name on alpha architecture (Thanks Michael Cree!)
+- preload: Check dlopen(libc) failure
+- ioctl: Fix array.resize(0) to work with gcc 16 static analyzer
+- tests: Fix Gentoo tests, re-enable them in CI
+
+* Sun Mar 22 2026 Packit <hello@packit.dev> - 0.19.6-1
+- preload: Reinitialize mutexes after forking. (Thanks Daniel van Vugt) (LP: #2144723)
+
+
 * Sat Feb 21 2026 Packit <hello@packit.dev> - 0.19.5-1
 - ioctl: Forward standard termios calls to real pty (fixes tests with Rust coreutils)
 - ioctl: Implement POSIX-compliant errno handling
 
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Sun Oct 12 2025 Packit <hello@packit.dev> - 0.19.4-1
 - preload: Hide sticky bit from emulated block dev stat

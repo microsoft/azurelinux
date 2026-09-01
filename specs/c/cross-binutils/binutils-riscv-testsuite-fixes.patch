@@ -182,3 +182,97 @@ diff -rup binutils.orig/ld/testsuite/ld-riscv-elf/pcgp-relax-02.d binutils-2.43.
 +.*:[ 	]+[0-9a-f]+[ 	]+auipc[ 	]+t3,0x[0-9a-f]+
  .*:[ 	]+[0-9a-f]+[ 	]+ld[ 	]+t3,[0-9]+\(t3\) # [0-9a-f]+ <bar>
  .*:[ 	]+[0-9a-f]+[ 	]+jalr[ 	]+t1,t3
+diff -rup binutils-with-gold-2.45.50-beab972c07d,orig/binutils/testsuite/binutils-all/objcopy.exp binutils-with-gold-2.45.50-beab972c07d/binutils/testsuite/binutils-all/objcopy.exp
+--- binutils-with-gold-2.45.50-beab972c07d,orig/binutils/testsuite/binutils-all/objcopy.exp	2025-12-02 12:47:19.063123207 +0000
++++ binutils-with-gold-2.45.50-beab972c07d/binutils/testsuite/binutils-all/objcopy.exp	2025-12-04 12:39:26.079989597 +0000
+@@ -602,14 +602,19 @@ proc strip_test { } {
+     set exec_output [binutils_run $STRIP "$STRIPFLAGS $objfile"]
+     set exec_output [prune_warnings $exec_output]
+     if ![string equal "" $exec_output] {
+-	fail $test
++	fail "$test (warnings in linker output)"
++	verbose $exec_output
+ 	return
+     }
+ 
+     set exec_output [binutils_run $NM "-a $NMFLAGS $objfile"]
+     set exec_output [prune_warnings $exec_output]
+     if ![string match "*: no symbols*" $exec_output] {
+-	fail $test
++
++	# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++	setup_xfail riscv*-*-* 
++
++	fail "$test (symbols in nm output)"
+ 	return
+     }
+ 
+@@ -659,6 +664,9 @@ proc strip_test_with_saving_a_symbol { }
+     pass $test
+ }
+ 
++# The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++setup_xfail riscv*-*-* 
++
+ strip_test_with_saving_a_symbol
+ 
+ # Test stripping an archive.
+@@ -1186,6 +1194,10 @@ switch [copy_setup] {
+ 					 "$OBJCOPY" "$OBJCOPYFLAGS" "$test5"
+ 	if [is_elf_format] {
+ 	    keep_debug_symbols_and_check_links "$STRIP" "--only-keep-debug $STRIPFLAGS" "$test6"
++
++	    # The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++	    setup_xfail riscv*-*-* 
++	    
+ 	    keep_debug_symbols_for_elf_relocatable "$STRIP" "--only-keep-debug $STRIPFLAGS" "$test7"
+ 	}
+     }
+@@ -1197,6 +1209,10 @@ switch [copy_setup] {
+ 					 "$OBJCOPY" "$OBJCOPYFLAGS" "$test5"
+ 	if [is_elf_format] {
+ 	    keep_debug_symbols_and_check_links "$STRIP" "--only-keep-debug $STRIPFLAGS" "$test6"
++
++	    # The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
++	    setup_xfail riscv*-*-* 
++
+ 	    keep_debug_symbols_for_elf_relocatable "$STRIP" "--only-keep-debug $STRIPFLAGS" "$test7"
+ 	}
+     }
+@@ -1503,7 +1519,7 @@ proc objcopy_test_without_global_symbol
+ # in object files, so they will fail this test.
+ setup_xfail aarch64*-*-* arm*-*-*
+ # The RISC-V target compiles with annotation enabled and these symbols remain after stripping.
+-# setup_xfail riscv*-*-* 
++setup_xfail riscv*-*-* 
+ 
+ objcopy_test_without_global_symbol
+ 
+diff -rup binutils-with-gold-2.45.50-beab972c07d,orig/ld/testsuite/lib/ld-lib.exp binutils-with-gold-2.45.50-beab972c07d/ld/testsuite/lib/ld-lib.exp
+--- binutils-with-gold-2.45.50-beab972c07d,orig/ld/testsuite/lib/ld-lib.exp	2025-12-02 12:47:19.201090894 +0000
++++ binutils-with-gold-2.45.50-beab972c07d/ld/testsuite/lib/ld-lib.exp	2025-12-03 09:30:07.184360005 +0000
+@@ -1633,6 +1633,12 @@ proc compile_one_cc { src output additio
+ proc check_ctf_available { } {
+     global ctf_available_saved
+ 
++    # Skip CTF tests for the Risc-V target for now, as the
++    # tests have not been tweaked to support the riscv format.
++    if { [istarget "riscv*-*-linux*"] } {
++	return 0
++    }
++    
+     if {![info exists ctf_available_saved]} {
+ 	set ctf_available_saved 0
+ 
+--- binutils.orig/binutils/testsuite/lib/binutils-common.exp	2026-01-05 08:49:32.868601146 +0000
++++ binutils-with-gold-2.45.50-be970c68891/binutils/testsuite/lib/binutils-common.exp	2026-01-05 08:50:01.876703040 +0000
+@@ -757,6 +757,9 @@ proc prune_warnings_extra { text } {
+     regsub -all "(^|\n)(\[^\n\]*lto-wrapper: warning: using serial compilation of \[0-9\]+ LTRANS jobs\[^\n\]*\n?)+" $text "\\1" text
+     regsub -all "(^|\n)(\[^\n\]*lto-wrapper: note: \[^\n\]*\n?)+" $text "\\1" text
+ 
++    # Skip warnings about the LTO plugin being needed.
++    regsub -all "(^|\n)(\[^\n\]*:\[^\n\]*plugin needed to handle lto object\[^\n\]*\n?)+" $text "\\1" text
++    
+     return $text
+ }
+ 

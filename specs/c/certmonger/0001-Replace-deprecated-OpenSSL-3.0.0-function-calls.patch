@@ -1,0 +1,884 @@
+From 0e526d0d41b572f3f7857278526f3668be4b68a4 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Thu, 7 Aug 2025 17:52:03 +0000
+Subject: [PATCH 1/6] Replace deprecated OpenSSL 3.0.0 function calls
+
+Use EVP_PKEY instead of algorithm-specific calls to generate
+required parameters and keys.
+
+This is a prerequisite for supporting PQ algorithms in a clean
+way and will future-proof certmonger.
+
+While not strictly related to OSSL 3.0.0 deprecation, add a
+global error logging function so we can reduce code duplication
+and make it easier to log what happened when a call fails.
+This was helpful during development of this change.
+
+Fixes: https://pagure.io/certmonger/issue/292
+
+Signed-off-by: Rob Crittenden <rcritten@redhat.com>
+---
+ src/Makefile.am  |  18 ++---
+ src/certsave-o.c |   2 +-
+ src/keygen-o.c   | 171 +++++++++++++++++++++++++++++++----------------
+ src/local.c      |  45 ++++++++-----
+ src/log.c        |  28 ++++++++
+ src/log.h        |   1 +
+ src/pkcs7.c      |  43 ++++--------
+ src/scep.c       |  12 ++--
+ src/scepgen-n.c  |  53 ++++++++++-----
+ src/submit-n.c   |  88 +++++++++++++++++-------
+ 10 files changed, 301 insertions(+), 160 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index b20cb435..ef3b743e 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -196,7 +196,8 @@ if WITH_XMLRPC
+ noinst_PROGRAMS += submit-x
+ endif
+ tdbusm_check_SOURCES = tdbusm-check.c tm.c tm.h
+-tdbusm_check_LDADD = libcm.a $(CERTMONGER_LIBS) $(POPT_LIBS) $(LDAP_LIBS)
++tdbusm_check_LDADD = libcm.a $(CERTMONGER_LIBS) $(POPT_LIBS) $(LDAP_LIBS) \
++			$(OPENSSL_LIBS) $(NSS_LIBS)
+ serial_check_LDADD = libcm.a $(CERTMONGER_LIBS) $(LTLIBICONV) $(LDAP_LIBS)
+ nl_check_LDADD = libcm.a $(CERTMONGER_LIBS) $(LDAP_LIBS)
+ if WITH_XMLRPC
+@@ -230,7 +231,7 @@ ipa_submit_SOURCES = ipa.c srvloc.c srvloc.h store.h store-gen.c \
+ ipa_submit_LDADD = $(XMLRPC_LIBS) $(LDAP_LIBS) $(KRB5_LIBS) $(TALLOC_LIBS) \
+ 		   $(GMP_LIBS) $(IDN_LIBS) $(OPENSSL_LIBS) $(UUID_LIBS) \
+ 		   $(RESOLV_LIBS) $(LTLIBICONV) $(POPT_LIBS) $(CURL_LIBS) \
+-		   $(JANSSON_LIBS)
++		   $(JANSSON_LIBS) $(OPENSSL_LIBS) $(NSS_LIBS)
+ if WITH_XMLRPC
+ certmaster_submit_CFLAGS = $(AM_CFLAGS) $(NSS_CFLAGS)
+ certmaster_submit_SOURCES = certmaster.c submit-x.c submit-x.h \
+@@ -285,17 +286,18 @@ local_submit_SOURCES = local.c env.h store.h store-gen.c submit-o.c submit-o.h \
+ 		       util.c util.h util-o.c util-o.h pin.c pin.h
+ local_submit_LDADD = $(NSS_LIBS) $(OPENSSL_LIBS) $(TALLOC_LIBS) $(UUID_LIBS) \
+ 		     $(POPT_LIBS)
+-submit_d_CFLAGS = $(AM_CFLAGS) $(CURL_CFLAGS) $(XML_CFLAGS) -DCM_SUBMIT_D_MAIN
++submit_d_CFLAGS = $(AM_CFLAGS) $(CURL_CFLAGS) $(XML_CFLAGS) $(OPENSSL_CFLAGS) \
++		 $(NSS_CFLAGS) -DCM_SUBMIT_D_MAIN
+ submit_d_SOURCES = submit-d.c submit-d.h submit-h.c submit-h.h \
+ 		   submit-u.c submit-u.h log.c log.h tm.c tm.h util-m.c util-m.h
+ submit_d_LDADD = libcm-o.a $(CURL_LIBS) $(OPENSSL_LIBS) $(XML_LIBS) \
+ 		 $(TALLOC_LIBS) $(GMP_LIBS) $(UUID_LIBS) $(LTLIBICONV) \
+-		 $(POPT_LIBS) $(JANSSON_LIBS)
+-submit_h_CFLAGS = $(AM_CFLAGS) $(CURL_CFLAGS) $(XML_CFLAGS) \
+-				  $(JANSSON_CFLAGS) -DCM_SUBMIT_H_MAIN
++		 $(POPT_LIBS) $(JANSSON_LIBS) $(OPENSSL_LIBS) $(NSS_LIBS)
++submit_h_CFLAGS = $(AM_CFLAGS) $(NSS_CFLAGS) $(CURL_CFLAGS) $(XML_CFLAGS) \
++		 $(JANSSON_CFLAGS) -DCM_SUBMIT_H_MAIN
+ submit_h_SOURCES = submit-h.c submit-h.h log.c log.h tm.c tm.h
+-submit_h_LDADD = $(CURL_LIBS) $(XML_LIBS) $(TALLOC_LIBS) $(LTLIBICONV) \
+-		 $(POPT_LIBS)
++submit_h_LDADD = $(NSS_LIBS) $(OPENSSL_LIBS) $(CURL_LIBS) $(XML_LIBS) $(TALLOC_LIBS) \
++		 $(LTLIBICONV) $(POPT_LIBS)
+ 
+ .PHONY: manlint
+ manlint: $(man_MANS)
+diff --git a/src/certsave-o.c b/src/certsave-o.c
+index b145a218..caab151c 100644
+--- a/src/certsave-o.c
++++ b/src/certsave-o.c
+@@ -285,7 +285,7 @@ cm_certsave_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 			/* Double-check that we're not trying to rotate in a
+ 			 * key that we won't actually be using. */
+ 			if ((old_pkey != NULL) &&
+-			    (EVP_PKEY_cmp(old_pkey, X509_get_pubkey(cert)) == 1)) {
++			    (EVP_PKEY_eq(old_pkey, X509_get_pubkey(cert)) == 1)) {
+ 				entry->cm_key_next_marker = NULL;
+ 				if (next_key != NULL) {
+ 					cm_log(1, "Public key was not changed.\n");
+diff --git a/src/keygen-o.c b/src/keygen-o.c
+index 676db8bc..ff929fda 100644
+--- a/src/keygen-o.c
++++ b/src/keygen-o.c
+@@ -99,6 +99,8 @@ cm_keygen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 	struct cm_pin_cb_data cb_data;
+ 	FILE *fp, *status;
+ 	EVP_PKEY *pkey;
++	EVP_PKEY_CTX *pctx = NULL;
++	EVP_PKEY_CTX *check_ctx = NULL;
+ 	char buf[LINE_MAX], *pin, *pubhex, *pubihex, *oldfile;
+ 	unsigned char *p, *q;
+ 	long error, errno_save;
+@@ -106,13 +108,9 @@ cm_keygen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 	int cm_key_size;
+ 	int len;
+ 	int keyfd;
++	int ret;
+ 	char *filename;
+ 	char *marker;
+-	BIGNUM *exponent;
+-	RSA *rsa;
+-#ifdef CM_ENABLE_DSA
+-	DSA *dsa;
+-#endif
+ #ifdef CM_ENABLE_EC
+ 	EC_KEY *ec;
+ 	int ecurve;
+@@ -146,95 +144,155 @@ retry_gen:
+ 	}
+ 	switch (cm_key_algorithm) {
+ 	case cm_key_rsa:
+-		exponent = BN_new();
+-		if (exponent == NULL) {
+-			cm_log(1, "Error setting up exponent.\n");
++		unsigned int exponent = CM_DEFAULT_RSA_EXPONENT;
++		unsigned int bits = cm_key_size;
++		OSSL_PARAM params[3];
++
++		pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
++		if (pctx == NULL) {
++			cm_log(1, "Error allocating new RSA context.\n");
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		BN_set_word(exponent, CM_DEFAULT_RSA_EXPONENT);
+-		rsa = RSA_new();
+-		if (rsa == NULL) {
+-			cm_log(1, "Error allocating new RSA key.\n");
++
++		if (EVP_PKEY_keygen_init(pctx) == 0) {
++			cm_log(1, "Error initializing RSA key generation.\n");
++			EVP_PKEY_CTX_free(pctx);
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		if (RSA_generate_key_ex(rsa, cm_key_size, exponent, NULL) != 1) {
++
++		params[0] = OSSL_PARAM_construct_uint("bits", &bits);
++		params[1] = OSSL_PARAM_construct_uint("e", &exponent);
++		params[2] = OSSL_PARAM_construct_end();
++		if (EVP_PKEY_CTX_set_params(pctx, params) == 0) {
++			cm_log(1, "Error setting RSA key parameters.\n");
++			EVP_PKEY_CTX_free(pctx);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		}
++
++		if (EVP_PKEY_generate(pctx, &pkey) != 1) {
+ 			if (cm_key_size != CM_DEFAULT_PUBKEY_SIZE) {
+-				cm_log(1, "Error generating %d-bit key, "
++				cm_log(1, "Error generating RSA %d-bit key, "
+ 				       "attempting %d bits.\n",
+ 				       cm_key_size, CM_DEFAULT_PUBKEY_SIZE);
+ 				cm_key_size = CM_DEFAULT_PUBKEY_SIZE;
++				EVP_PKEY_CTX_free(pctx);
+ 				goto retry_gen;
+ 			}
+-			cm_log(1, "Error generating key.\n");
++			cm_log(1, "Error generating RSA key.\n");
++			EVP_PKEY_CTX_free(pctx);
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		if (RSA_check_key(rsa) != 1) { /* should be unnecessary */
+-			cm_log(1, "Key fails checks.  Retrying.\n");
+-			goto retry_gen;
++		EVP_PKEY_CTX_free(pctx);
++
++		check_ctx = EVP_PKEY_CTX_new(pkey, NULL);
++
++		ret = EVP_PKEY_check(check_ctx);
++		if (ret == 0) {
++			cm_log(1, "keygen-o: EVP_PKEY_check): Key pair is invalid.\n");
++			EVP_PKEY_CTX_free(check_ctx);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		} else if (ret == -2) {
++			cm_log(1, "keygen-o: EVP_PKEY_check: RSA operation not supported for this algorithm.\n");
++			EVP_PKEY_CTX_free(check_ctx);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		EVP_PKEY_set1_RSA(pkey, rsa);
++		EVP_PKEY_CTX_free(check_ctx);
+ 		break;
+ #ifdef CM_ENABLE_DSA
+ 	case cm_key_dsa:
+-		dsa = DSA_new();
+-		if (dsa == NULL) {
+-			cm_log(1, "Error allocating new DSA key.\n");
++		EVP_PKEY_CTX *pctx_params = NULL;
++		EVP_PKEY* pkey_params = NULL;
++
++		bits = cm_key_size;
++
++		pctx_params = EVP_PKEY_CTX_new_from_name(NULL, "DSA", NULL);
++		if (pctx_params == NULL) {
++			cm_log(1, "keygen-o: Error allocating new DSA params context.\n");
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		if (DSA_generate_parameters_ex(dsa, cm_key_size,
+-					       NULL, 0,
+-					       NULL, NULL, NULL) != 1) {
++
++		if (EVP_PKEY_paramgen_init(pctx_params) == 0) {
++			cm_log(1, "keygen-o: Error initializing DSA param generation.\n");
++			EVP_PKEY_CTX_free(pctx_params);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		}
++		if (EVP_PKEY_CTX_set_dsa_paramgen_bits(pctx_params, bits) == 0) {
++			cm_log(1, "keygen-o: Error setting DSA bits to %d.\n", bits);
++			EVP_PKEY_CTX_free(pctx_params);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		}
++
++		if (EVP_PKEY_paramgen(pctx_params, &pkey_params) != 1) {
++			cm_log(1, "keygen-o: Error in DSA paramgen.\n");
++			EVP_PKEY_CTX_free(pctx_params);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		}
++
++		pctx = EVP_PKEY_CTX_new(pkey_params, NULL);
++		if (EVP_PKEY_keygen_init(pctx) == 0) {
++			cm_log(1, "keygen-o: Error initializing parameter DSA key generation.\n");
++			EVP_PKEY_CTX_free(pctx);
++			EVP_PKEY_CTX_free(pctx_params);
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		}
++
++		if (EVP_PKEY_generate(pctx, &pkey) != 1) {
+ 			if (cm_key_size != CM_DEFAULT_PUBKEY_SIZE) {
+-				cm_log(1, "Error generating %d-bit key, "
++				cm_log(1, "keygen-o: Error generating DSA %d-bit key, "
+ 				       "attempting %d bits.\n",
+ 				       cm_key_size, CM_DEFAULT_PUBKEY_SIZE);
+ 				cm_key_size = CM_DEFAULT_PUBKEY_SIZE;
++				EVP_PKEY_CTX_free(pctx);
++				EVP_PKEY_CTX_free(pctx_params);
+ 				goto retry_gen;
+ 			}
+-			cm_log(1, "Error generating parameters.\n");
++			cm_log(1, "Error generating DSA key.\n");
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		if (DSA_generate_key(dsa) != 1) {
+-			cm_log(1, "Error generating key.\n");
++		EVP_PKEY_free(pkey_params);
++		EVP_PKEY_CTX_free(pctx);
++		EVP_PKEY_CTX_free(pctx_params);
++
++		check_ctx = EVP_PKEY_CTX_new(pkey, NULL);
++		ret = EVP_PKEY_param_check(check_ctx);
++		if (ret == 0) {
++			cm_log(1, "keygen-o: DSA key pair is invalid\n");
++			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++		} else if (ret == -2) {
++			cm_log(1, "keygen-o: EVP_PKEY_check: DSA operation not supported for this algorithm.\n");
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		EVP_PKEY_set1_DSA(pkey, dsa);
++		EVP_PKEY_CTX_free(check_ctx);
+ 		break;
+ #endif
+ #ifdef CM_ENABLE_EC
+ 	case cm_key_ecdsa:
++		char *curve = NULL;
+ 		if (cm_key_size <= 256)
+-			ecurve = NID_X9_62_prime256v1;
++			// ecurve = NID_X9_62_prime256v1;
++			curve = "prime256v1";
+ 		else if (cm_key_size <= 384)
+-			ecurve = NID_secp384r1;
++			// ecurve = NID_secp384r1;
++			curve = "secp384r1";
+ 		else
+-			ecurve = NID_secp521r1;
+-		ec = EC_KEY_new_by_curve_name(ecurve);
+-		while ((ec == NULL) && (ecurve != NID_X9_62_prime256v1)) {
+-			cm_log(1, "Error allocating new EC key.\n");
+-			switch (ecurve) {
+-			case NID_secp521r1:
+-				cm_log(1, "Trying with a smaller key.\n");
+-				ecurve = NID_secp384r1;
+-				ec = EC_KEY_new_by_curve_name(ecurve);
+-				break;
+-			case NID_secp384r1:
+-				cm_log(1, "Trying with a smaller key.\n");
+-				ecurve = NID_X9_62_prime256v1;
+-				ec = EC_KEY_new_by_curve_name(ecurve);
+-				break;
++			// ecurve = NID_secp521r1;
++			curve = "secp521r1";
++
++		pkey = EVP_EC_gen(curve);
++		if (pkey == NULL) {
++			if (strcmp(curve, "prime256v1") == 0) {
++				cm_log(1, "Error generating EC %s key, "
++				       "attempting prime256v1.\n",
++				       curve);
++				curve = "prime256v1";
++				EVP_PKEY_CTX_free(pctx);
++				goto retry_gen;
+ 			}
+-		}
+-		if (ec == NULL) {
+-			cm_log(1, "Error allocating new EC key.\n");
+-			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+-		}
+-		if (EC_KEY_generate_key(ec) != 1) {
+-			cm_log(1, "Error generating key.\n");
++			cm_log(1, "Error generating RSA key.\n");
++			EVP_PKEY_CTX_free(pctx);
+ 			_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 		}
+-		EC_KEY_set_asn1_flag(ec, OPENSSL_EC_NAMED_CURVE);
+-		EVP_PKEY_set1_EC_KEY(pkey, ec);
++		EVP_PKEY_CTX_free(pctx);
+ 		break;
+ #endif
+ 	default:
+@@ -372,6 +430,7 @@ retry_gen:
+ 	fprintf(status, "%s\n%s\n%s\n", pubihex, pubhex, marker);
+ 	fclose(fp);
+ 	fclose(status);
++	EVP_PKEY_free(pkey);
+ 
+ 	/* Try to remove any keys with old candidate names. */
+ 	if ((entry->cm_key_next_marker != NULL) &&
+diff --git a/src/local.c b/src/local.c
+index a62ebda3..7d2e9421 100644
+--- a/src/local.c
++++ b/src/local.c
+@@ -199,11 +199,14 @@ get_signer_info(void *parent, char *localdir, X509 ***roots,
+ 	char *creds, *hexserial = NULL, *serial, buf[LINE_MAX], *csr;
+ 	STACK_OF(X509) *cas = NULL;
+ 	PKCS12 *p12 = NULL;
+-	BIGNUM *exponent = NULL;
+-	RSA *rsa;
++	unsigned int bits = CM_DEFAULT_PUBKEY_SIZE;
++	unsigned int exponent = CM_DEFAULT_RSA_EXPONENT;
++	OSSL_PARAM rsa_params[3];
++	EVP_PKEY_CTX *pctx = NULL;
++	EVP_PKEY_CTX *check_ctx = NULL;
+ 	dbus_bool_t save = FALSE;
+ 	time_t now, then, life, lifedelta;
+-	int i;
++	int i, ret;
+ 
+ 	*roots = NULL;
+ 	*signer_cert = NULL;
+@@ -301,29 +304,39 @@ get_signer_info(void *parent, char *localdir, X509 ***roots,
+ 		}
+ 		/* Generate a new key.  For now at least, generate RSA of the
+ 		 * default size with the default exponent. */
+-		exponent = BN_new();
+-		if (exponent == NULL) {
+-			cm_log(1, "Error setting up exponent.\n");
++		pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
++		if (pctx == NULL) {
++			cm_log(1, "Error allocating new RSA context.\n");
+ 			return CM_SUBMIT_STATUS_UNREACHABLE;
+ 		}
+-		BN_set_word(exponent, CM_DEFAULT_RSA_EXPONENT);
+-		rsa = RSA_new();
+-		if (rsa == NULL) {
+-			cm_log(1, "Error allocating new RSA key.\n");
++
++		if (EVP_PKEY_keygen_init(pctx) == 0) {
++			cm_log(1, "Error initializing RSA key generation.\n");
++			return CM_SUBMIT_STATUS_UNREACHABLE;
++		}
++
++		rsa_params[0] = OSSL_PARAM_construct_uint("bits", &bits);
++		rsa_params[1] = OSSL_PARAM_construct_uint("e", &exponent);
++		rsa_params[2] = OSSL_PARAM_construct_end();
++		if (EVP_PKEY_CTX_set_params(pctx, rsa_params) == 0) {
++			cm_log(1, "Error setting RSA key parameters.\n");
+ 			return CM_SUBMIT_STATUS_UNREACHABLE;
+ 		}
++
++
+ 	retry_gen:
+-		if (RSA_generate_key_ex(rsa, CM_DEFAULT_PUBKEY_SIZE, exponent,
+-					NULL) != 1) {
+-			cm_log(1, "Error generating key.\n");
++		if (EVP_PKEY_generate(pctx, signer_key) != 1) {
++			cm_log(1, "Error generating RSA %d-bit key.\n", bits);
++			EVP_PKEY_CTX_free(pctx);
+ 			return CM_SUBMIT_STATUS_UNREACHABLE;
+ 		}
+-		if (RSA_check_key(rsa) != 1) { /* should be unnecessary */
++		check_ctx = EVP_PKEY_CTX_new(*signer_key, NULL);
++
++		ret = EVP_PKEY_check(check_ctx);
++		if (ret == 0) {
+ 			cm_log(1, "Key fails checks.  Retrying.\n");
+ 			goto retry_gen;
+ 		}
+-		*signer_key = EVP_PKEY_new();
+-		EVP_PKEY_set1_RSA(*signer_key, rsa);
+ 		/* Build a suitable CA signing request. */
+ 		csr = make_ca_csr(parent, *signer_key, *signer_cert);
+ 		if (csr == NULL) {
+diff --git a/src/log.c b/src/log.c
+index 4cc8368b..b0a1a318 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -28,6 +28,9 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
++#include <openssl/err.h>
++#include <secport.h>
++#include <prerror.h>
+ #include <talloc.h>
+ 
+ #include "log.h"
+@@ -112,3 +115,28 @@ cm_log(int level, const char *fmt, ...)
+ 		}
+ 	}
+ }
++
++/* Log the passed message at level and then display all errors reported
++ * by OpenSSL and NSS. Then clear all errors in both.
++ */
++void
++cm_log_errors(int level, char *msg)
++{
++	char buf[LINE_MAX] = "";
++	long error;
++	int nss_err;
++
++	cm_log(level, "%s\n", msg);
++	while ((error = ERR_get_error()) != 0) {
++		memset(buf, '\0', sizeof(buf));
++		ERR_error_string_n(error, buf, sizeof(buf));
++		cm_log(level, "%s\n", buf);
++	}
++	ERR_clear_error();
++
++	nss_err = PORT_GetError();
++	if (nss_err < 0) {
++		cm_log(level, "%d: %s\n", nss_err, PR_ErrorToString(nss_err, 0));
++	}
++	PORT_SetError(0);
++}
+diff --git a/src/log.h b/src/log.h
+index e4645e12..5ad2fd55 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -43,5 +43,6 @@ void cm_log(int level, const char *fmt, ...)
+ __attribute__((format(printf,2,3)))
+ #endif
+ ;
++void cm_log_errors(int level, char *msg);
+ 
+ #endif
+diff --git a/src/pkcs7.c b/src/pkcs7.c
+index b2cccc0d..3b940434 100644
+--- a/src/pkcs7.c
++++ b/src/pkcs7.c
+@@ -275,25 +275,6 @@ cm_pkcs7_parse_buffer(const unsigned char *buffer, size_t length,
+ 	}
+ }
+ 
+-void
+-log_pkcs7_errors(int level, char *msg)
+-{
+-    char buf[LINE_MAX] = "";
+-    long error;
+-	int nss_err;   
+-
+-    cm_log(level, "%s\n", msg);
+-    while ((error = ERR_get_error()) != 0) {
+-            memset(buf, '\0', sizeof(buf));
+-            ERR_error_string_n(error, buf, sizeof(buf));
+-            cm_log(level, "%s\n", buf);
+-    }
+-	nss_err = PORT_GetError();
+-    if (nss_err < 0) {
+-		cm_log(level, "%d: %s\n", nss_err, PR_ErrorToString(nss_err, 0));
+-	}
+-}
+-
+ int
+ cm_pkcs7_parsev(unsigned int flags, void *parent,
+ 		char **certleaf, char **certtop, char ***certothers,
+@@ -545,7 +526,7 @@ cm_pkcs7_envelope_data(char *encryption_cert, enum cm_prefs_cipher cipher,
+ 	}
+ 	recipient = PEM_read_bio_X509(in, NULL, NULL, NULL);
+ 	if (recipient == NULL) {
+-		log_pkcs7_errors(0, "Error parsing recipient certificate.\n");
++		cm_log_errors(0, "Error parsing recipient certificate.\n");
+ 		goto done;
+ 	}
+ 	BIO_free(in);
+@@ -567,12 +548,12 @@ cm_pkcs7_envelope_data(char *encryption_cert, enum cm_prefs_cipher cipher,
+ 	BIO_free(in);
+ 
+ 	if (p7 == NULL) {
+-		log_pkcs7_errors(0, "Error encrypting signing request.\n");
++		cm_log_errors(0, "Error encrypting signing request.\n");
+ 		goto done;
+ 	}
+ 	len = i2d_PKCS7(p7, NULL);
+ 	if (len < 0) {
+-		log_pkcs7_errors(0, "Error encoding encrypted signing request.\n");
++		cm_log_errors(0, "Error encoding encrypted signing request.\n");
+ 		goto done;
+ 	}
+ 	dp7 = malloc(len);
+@@ -582,7 +563,7 @@ cm_pkcs7_envelope_data(char *encryption_cert, enum cm_prefs_cipher cipher,
+ 	}
+ 	u = dp7;
+ 	if (i2d_PKCS7(p7, &u) != len) {
+-		log_pkcs7_errors(0, "Error encoding encrypted signing request.\n");
++		cm_log_errors(0, "Error encoding encrypted signing request.\n");
+ 		goto done;
+ 	}
+ 	*enveloped = dp7;
+@@ -619,13 +600,13 @@ cm_pkcs7_envelope_csr(char *encryption_cert, enum cm_prefs_cipher cipher,
+ 	req = PEM_read_bio_X509_REQ(in, NULL, NULL, NULL);
+ 	BIO_free(in);
+ 	if (req == NULL) {
+-		log_pkcs7_errors(0, "Error parsing certificate signing request.\n");
++		cm_log_errors(0, "Error parsing certificate signing request.\n");
+ 		goto done;
+ 	}
+ 
+ 	dlen = i2d_X509_REQ(req, NULL);
+ 	if (dlen < 0) {
+-		log_pkcs7_errors(0, "Error encoding certificate signing request.\n");
++		cm_log_errors(0, "Error encoding certificate signing request.\n");
+ 		goto done;
+ 	}
+ 	dreq = malloc(dlen);
+@@ -635,7 +616,7 @@ cm_pkcs7_envelope_csr(char *encryption_cert, enum cm_prefs_cipher cipher,
+ 	}
+ 	u = dreq;
+ 	if (i2d_X509_REQ(req, &u) != dlen) {
+-		log_pkcs7_errors(0, "Error encoding certificate signing request.\n");
++		cm_log_errors(0, "Error encoding certificate signing request.\n");
+ 		goto done;
+ 	}
+ 	ret = cm_pkcs7_envelope_data(encryption_cert, cipher, dreq, dlen,
+@@ -697,7 +678,7 @@ cm_pkcs7_generate_ias(char *cacert, char *minicert,
+ 	ca = PEM_read_bio_X509(in, NULL, NULL, NULL);
+ 	BIO_free(in);
+ 	if (ca == NULL) {
+-		log_pkcs7_errors(0, "Error parsing CA certificate.\n");
++		cm_log_errors(0, "Error parsing CA certificate.\n");
+ 		goto done;
+ 	}
+ 
+@@ -709,7 +690,7 @@ cm_pkcs7_generate_ias(char *cacert, char *minicert,
+ 	mini = PEM_read_bio_X509(in, NULL, NULL, NULL);
+ 	BIO_free(in);
+ 	if (mini == NULL) {
+-		log_pkcs7_errors(0, "Error parsing client certificate.\n");
++		cm_log_errors(0, "Error parsing client certificate.\n");
+ 		goto done;
+ 	}
+ 
+@@ -725,7 +706,7 @@ cm_pkcs7_generate_ias(char *cacert, char *minicert,
+ 	}
+ 	u = issuer;
+ 	if (i2d_X509_NAME(X509_get_issuer_name(ca), &u) != issuerlen) {
+-		log_pkcs7_errors(0, "Error encoding CA certificate issuer name.\n");
++		cm_log_errors(0, "Error encoding CA certificate issuer name.\n");
+ 		goto done;
+ 	}
+ 
+@@ -741,7 +722,7 @@ cm_pkcs7_generate_ias(char *cacert, char *minicert,
+ 	}
+ 	u = subject;
+ 	if (i2d_X509_NAME(X509_get_subject_name(mini), &u) != subjectlen) {
+-		log_pkcs7_errors(0, "Error encoding client certificate subject name.\n");
++		cm_log_errors(0, "Error encoding client certificate subject name.\n");
+ 		goto done;
+ 	}
+ 	PORT_SetError(0);
+@@ -753,7 +734,7 @@ cm_pkcs7_generate_ias(char *cacert, char *minicert,
+ 	issuerandsubject.subject.len = subjectlen;
+ 	if (SEC_ASN1EncodeItem(NULL, &encoded, &issuerandsubject,
+ 			       cm_pkcs7_ias_template) != &encoded) {
+-		log_pkcs7_errors(0, "Error encoding issuer and subject names.\n");
++		cm_log_errors(0, "Error encoding issuer and subject names.\n");
+ 		goto done;
+ 	}
+ 	*ias = malloc(encoded.len);
+diff --git a/src/scep.c b/src/scep.c
+index 120bd3ac..c9dd10e1 100644
+--- a/src/scep.c
++++ b/src/scep.c
+@@ -441,7 +441,7 @@ main(int argc, const char **argv)
+ 				       NULL, NULL,
+ 				       NULL, NULL, NULL, NULL);
+ 		if (i != 0) {
+-			log_pkcs7_errors(0, "Error: failed to verify signature on "
++			cm_log_errors(0, "Error: failed to verify signature on "
+ 					"rekey PKCSReq.\n");
+ 		}
+ 		if ((msgtype == NULL) ||
+@@ -471,7 +471,7 @@ main(int argc, const char **argv)
+ 				       &sent_nonce, &sent_nonce_length,
+ 				       NULL, NULL, NULL, NULL);
+ 		if (i != 0) {
+-			log_pkcs7_errors(0, "Error: failed to verify signature on "
++			cm_log_errors(0, "Error: failed to verify signature on "
+ 					"message.\n");
+ 		}
+ 		if ((msgtype == NULL) ||
+@@ -1005,7 +1005,7 @@ main(int argc, const char **argv)
+ 					printf("%s", buf);
+ 				}
+ 				printf("\n");
+-				log_pkcs7_errors(0, "Error: failed to verify signature on "
++				cm_log_errors(0, "Error: failed to verify signature on "
+ 						  "server response.\n");
+ 				s = cm_store_base64_from_bin(ctx, (unsigned char *) results2,
+ 							     results_length2);
+@@ -1126,7 +1126,7 @@ main(int argc, const char **argv)
+ 				p7 = d2i_PKCS7(NULL, &u, payload_length);
+ 				if (p7 == NULL) {
+ 					printf(_("Error: couldn't parse signed-data.\n"));
+-					log_pkcs7_errors(0, "Error: couldn't parse signed-data.\n");
++					cm_log_errors(0, "Error: couldn't parse signed-data.\n");
+ 					s = cm_store_base64_from_bin(ctx,
+ 								     (unsigned char *) results2,
+ 								     results_length2);
+@@ -1138,7 +1138,7 @@ main(int argc, const char **argv)
+ 				}
+ 				if (!PKCS7_type_is_enveloped(p7)) {
+ 					printf(_("Error: signed-data payload is not enveloped-data.\n"));
+-					log_pkcs7_errors(0, "Error: signed-data payload is not "
++					cm_log_errors(0, "Error: signed-data payload is not "
+ 								"enveloped-data.\n");
+ 					s = cm_store_base64_from_bin(ctx,
+ 								     (unsigned char *) results2,
+@@ -1154,7 +1154,7 @@ main(int argc, const char **argv)
+ 				    (p7->d.enveloped->enc_data->content_type == NULL) ||
+ 				    (OBJ_obj2nid(p7->d.enveloped->enc_data->content_type) != NID_pkcs7_data)) {
+ 					printf(_("Error: enveloped-data payload is not data.\n"));
+-					log_pkcs7_errors(0, "Error: enveloped-data payload is "
++					cm_log_errors(0, "Error: enveloped-data payload is "
+ 								"not data.\n");
+ 					s = cm_store_base64_from_bin(ctx,
+ 								     (unsigned char *) results2,
+diff --git a/src/scepgen-n.c b/src/scepgen-n.c
+index e5a0a813..46244de7 100644
+--- a/src/scepgen-n.c
++++ b/src/scepgen-n.c
+@@ -134,10 +134,14 @@ cm_scepgen_n_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 	struct cm_keyiread_n_ctx_and_keys *keys;
+ 	const char *p, *es, *reason;
+ 	int ec;
++	int ret;
+ 	PKCS7 *csr_new, *csr_old, *ias_new, *ias_old;
++	unsigned int bits = CM_DEFAULT_PUBKEY_SIZE;
++	unsigned int exponent = CM_DEFAULT_RSA_EXPONENT;
+ 	EVP_PKEY *key;
+-	RSA *rsa;
+-	BIGNUM *exponent;
++	OSSL_PARAM params[3];
++	EVP_PKEY_CTX *pctx = NULL;
++	EVP_PKEY_CTX *check_ctx = NULL;
+ 
+ 	status = fdopen(fd, "w");
+ 	if (status == NULL) {
+@@ -205,32 +209,48 @@ cm_scepgen_n_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 
+ 	/* Use a dummy key to sign using OpenSSL. */
+ 	cm_log(1, "Generating dummy key.\n");
++	pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
++	if (pctx == NULL) {
++		cm_log(1, "Error allocating new RSA context.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++
++	if (EVP_PKEY_keygen_init(pctx) == 0) {
++		cm_log(1, "Error initializing RSA key generation.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++
+ 	key = EVP_PKEY_new();
+ 	if (key == NULL) {
+ 		cm_log(0, "Error allocating new key.\n");
+ 		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	exponent = BN_new();
+-	if (exponent == NULL) {
+-		cm_log(0, "Error setting up exponent.\n");
+-		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+-	}
+-	BN_set_word(exponent, CM_DEFAULT_RSA_EXPONENT);
+-	rsa = RSA_new();
+-	if (rsa == NULL) {
+-		cm_log(0, "Error allocating new RSA key.\n");
++	params[0] = OSSL_PARAM_construct_uint("bits", &bits);
++	params[1] = OSSL_PARAM_construct_uint("e", &exponent);
++	params[2] = OSSL_PARAM_construct_end();
++	if (EVP_PKEY_CTX_set_params(pctx, params) == 0) {
++		cm_log(1, "Error setting RSA key parameters.\n");
+ 		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
++
+ retry_gen:
+-	if (RSA_generate_key_ex(rsa, CM_DEFAULT_PUBKEY_SIZE, exponent, NULL) != 1) {
+-		cm_log(0, "Error generating key.\n");
++	if (EVP_PKEY_generate(pctx, &key) != 1) {
++		cm_log(1, "Error generating RSA %d-bit key.\n", bits);
++		EVP_PKEY_CTX_free(pctx);
+ 		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	if (RSA_check_key(rsa) != 1) { /* should be unnecessary */
+-		cm_log(1, "Key fails checks.  Retrying.\n");
++
++	check_ctx = EVP_PKEY_CTX_new(key, NULL);
++
++	ret = EVP_PKEY_check(check_ctx);
++	if (ret == 0) {
++		cm_log(1, "EVP_PKEY_check (pairwise check): Key pair is invalid.\n");
+ 		goto retry_gen;
++	} else if (ret == -2) {
++		cm_log(1, "EVP_PKEY_check: Operation not supported for this algorithm.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	BN_free(exponent);
++	EVP_PKEY_CTX_free(check_ctx);
+ 
+ 	/* Read the proper keys. */
+ 	keys = cm_keyiread_n_get_keys(entry, 0);
+@@ -242,7 +262,6 @@ retry_gen:
+ 	}
+ 
+ 	/* Sign using a dummy key. */
+-	EVP_PKEY_set1_RSA(key, rsa);
+ 	csr_new = NULL;
+ 	csr_old = NULL;
+ 	ias_new = NULL;
+diff --git a/src/submit-n.c b/src/submit-n.c
+index 2b649025..dcb88b8f 100644
+--- a/src/submit-n.c
++++ b/src/submit-n.c
+@@ -93,10 +93,14 @@ try_to_decode(void *parent, PLArenaPool *arena, SECItem *item,
+ 	ASN1_STRING *params = NULL;
+ 	PKCS7 *p7 = NULL;
+ 	PKCS7_RECIP_INFO *p7i = NULL;
+-	BIGNUM *exponent = NULL;
+ 	EVP_PKEY *pkey = NULL;
++	unsigned int bits = CM_DEFAULT_PUBKEY_SIZE;
++	unsigned int exponent = CM_DEFAULT_RSA_EXPONENT;
++	OSSL_PARAM rsa_params[3];
++	EVP_PKEY_CTX *pctx = NULL;
++	EVP_PKEY_CTX *check_ctx = NULL;
++	int rc = 0;
+ 	BIO *out;
+-	RSA *rsa = NULL;
+ 	char buf[BUFSIZ];
+ 	const unsigned char *u;
+ 	unsigned char *enc_key, *dec, *reenc, *param_data;
+@@ -191,36 +195,69 @@ try_to_decode(void *parent, PLArenaPool *arena, SECItem *item,
+ 	pkey = EVP_PKEY_new();
+ 	if (pkey == NULL) {
+ 		cm_log(1, "Error allocating new key.\n");
+-		goto done;
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	exponent = BN_new();
+-	if (exponent == NULL) {
+-		cm_log(1, "Error setting up exponent.\n");
+-		goto done;
++retry_gen:
++	pctx = EVP_PKEY_CTX_new_from_name(NULL, "RSA", NULL);
++	if (pctx == NULL) {
++		cm_log(1, "Error allocating new RSA context.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	BN_set_word(exponent, CM_DEFAULT_RSA_EXPONENT);
+-	rsa = RSA_new();
+-	if (rsa == NULL) {
+-		cm_log(1, "Error allocating new RSA key.\n");
+-		goto done;
++
++	if (EVP_PKEY_keygen_init(pctx) == 0) {
++		cm_log(1, "Error initializing RSA key generation.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-retry_gen:
+-	if (RSA_generate_key_ex(rsa, CM_DEFAULT_PUBKEY_SIZE, exponent, NULL) != 1) {
+-		cm_log(1, "Error generating key.\n");
+-		goto done;
++
++
++	rsa_params[0] = OSSL_PARAM_construct_uint("bits", &bits);
++	rsa_params[1] = OSSL_PARAM_construct_uint("e", &exponent);
++	rsa_params[2] = OSSL_PARAM_construct_end();
++	if (EVP_PKEY_CTX_set_params(pctx, rsa_params) == 0) {
++		cm_log(1, "Error setting RSA key parameters.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++
++	if (EVP_PKEY_generate(pctx, &pkey) != 1) {
++		cm_log(1, "Error generating RSA %d-bit key.\n", bits);
++		EVP_PKEY_CTX_free(pctx);
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	if (RSA_check_key(rsa) != 1) { /* should be unnecessary */
+-		cm_log(1, "Key fails checks.  Retrying.\n");
++
++	check_ctx = EVP_PKEY_CTX_new(pkey, NULL);
++
++	rc = EVP_PKEY_check(check_ctx);
++	if (rc == 0) {
++		cm_log(1, "submit-n: EVP_PKEY_check (pairwise check): Key pair %d bits is invalid.\n", bits);
++
++		EVP_PKEY_CTX_free(pctx);
+ 		goto retry_gen;
++	} else if (rc == -2) {
++		cm_log(1, "EVP_PKEY_check: Operation not supported for this algorithm.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
+ 	}
+-	EVP_PKEY_set1_RSA(pkey, rsa);
++	EVP_PKEY_CTX_free(pctx);
++	EVP_PKEY_CTX_free(check_ctx);
+ 
+ 	/* Encrypt the bulk key.  We're about to decrypt it again, so do it the
+ 	 * simplest way that we can. */
+-	reenc_len = dec_len + RSA_size(rsa);
++	pctx = EVP_PKEY_CTX_new_from_pkey(NULL, pkey, NULL);
++	if (pctx == NULL) {
++		cm_log(1, "submit-n: Error allocating new RSA context.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++	if (EVP_PKEY_encrypt_init(pctx) <= 0) {
++		cm_log(1, "submit-n: Error initializing RSA encrypt context.\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++	if (EVP_PKEY_CTX_set_rsa_padding(pctx, RSA_PKCS1_PADDING) <= 0) {
++		cm_log(1, "submit-n: Error setting RSA encrypt padding to RSA_PKCS1_PADDING\n");
++		_exit(CM_SUB_STATUS_INTERNAL_ERROR);
++	}
++
++	reenc_len = dec_len + EVP_PKEY_size(pkey);
+ 	reenc = talloc_size(parent, reenc_len);
+-	padding = RSA_PKCS1_PADDING;
+-	reenc_len = RSA_public_encrypt(dec_len, dec, reenc, rsa, padding);
++	EVP_PKEY_encrypt(pctx, reenc, &reenc_len, dec, dec_len);
+ 	if (reenc_len < 0) {
+ 		cm_log(1, "Error reencrypting.\n");
+ 		goto retry_gen;
+@@ -253,17 +290,18 @@ retry_gen:
+ 
+ done:
+ 	if (ret == NULL) {
++		cm_log(1, "something failed, ret is NULL\n");
+ 		while ((error = ERR_get_error()) != 0) {
+ 			ERR_error_string_n(error, buf, sizeof(buf));
+ 			cm_log(1, "%s\n", buf);
+ 		}
+ 	}
++	if (pctx) {
++		EVP_PKEY_CTX_free(pctx);
++	}
+ 	if (pkey != NULL) {
+ 		EVP_PKEY_free(pkey);
+ 	}
+-	if (exponent != NULL) {
+-		BN_free(exponent);
+-	}
+ 	if (p7 != NULL) {
+ 		PKCS7_free(p7);
+ 	}
+-- 
+2.52.0
+

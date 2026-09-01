@@ -1,6 +1,6 @@
-diff -rupN --no-dereference assimp-6.0.4/port/PyAssimp/pyassimp/helper.py assimp-6.0.4-new/port/PyAssimp/pyassimp/helper.py
---- assimp-6.0.4/port/PyAssimp/pyassimp/helper.py	2026-01-24 21:57:37.000000000 +0100
-+++ assimp-6.0.4-new/port/PyAssimp/pyassimp/helper.py	2026-01-27 13:39:44.892545456 +0100
+diff -rupN --no-dereference assimp-6.0.5/port/PyAssimp/pyassimp/helper.py assimp-6.0.5-new/port/PyAssimp/pyassimp/helper.py
+--- assimp-6.0.5/port/PyAssimp/pyassimp/helper.py	2026-04-30 11:15:09.000000000 +0200
++++ assimp-6.0.5-new/port/PyAssimp/pyassimp/helper.py	2026-05-01 23:05:56.685129855 +0200
 @@ -29,6 +29,7 @@ additional_dirs, ext_whitelist = [],[]
  # depending on the platform we're running on.
  if os.name=='posix':

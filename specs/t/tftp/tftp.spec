@@ -6,12 +6,13 @@
 Summary: The client for the Trivial File Transfer Protocol (TFTP)
 Name: tftp
 Version: 5.3
-Release: 4%{?dist}
+Release: 3%{?dist}
 License: BSD-4-Clause-UC
 URL: http://www.kernel.org/pub/software/network/tftp/
 Source0: https://git.kernel.org/pub/scm/network/tftp/tftp-hpa.git/snapshot/tftp-hpa-%{version}.tar.gz
 Source1: tftp.socket
 Source2: tftp.service
+Source3: tftp-server-tmpfiles.conf
 
 Patch0: tftp-0.40-remap.patch
 Patch2: tftp-hpa-0.39-tzfix.patch
@@ -27,6 +28,7 @@ Patch12: tftp-off-by-one.patch
 Patch14: tftp-hpa-5.2-osh.patch
 # https://git.kernel.org/pub/scm/network/tftp/tftp-hpa.git/patch/?id=b9f2335e88dcb3939015843c7143f1533c755a46
 Patch15: tftp-hpa-5.3-setjmp.patch
+Patch16: tftp-hpa-5.3-tftp-exit-code-cmdmode.patch
 
 BuildRequires: autoconf
 BuildRequires: gcc
@@ -70,6 +72,7 @@ systemd socket activation, and is disabled by default.
 %patch -P12 -p1 -b .off-by-one
 %patch -P14 -p1 -b .osh
 %patch -P15 -p1 -b .setjmp
+%patch -P16 -p1 -b .cmd_exit_code
 
 %build
 autoreconf
@@ -81,12 +84,14 @@ mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,8}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/lib/tftpboot
+mkdir -p ${RPM_BUILD_ROOT}%{_tmpfilesdir}
 mkdir -p ${RPM_BUILD_ROOT}%{_unitdir}
 
 %make_install INSTALLROOT=%{buildroot} SBINDIR=%{_sbindir} MANDIR=%{_mandir}
 
 install -p -m 644 %SOURCE1 ${RPM_BUILD_ROOT}%{_unitdir}
 install -p -m 644 %SOURCE2 ${RPM_BUILD_ROOT}%{_unitdir}
+install -p -m 644 %SOURCE3 ${RPM_BUILD_ROOT}%{_tmpfilesdir}/%{name}.conf
 
 %post server
 %systemd_post tftp.socket
@@ -109,10 +114,19 @@ install -p -m 644 %SOURCE2 ${RPM_BUILD_ROOT}%{_unitdir}
 %{_sbindir}/in.tftpd
 %{_mandir}/man8/in.tftpd.8*
 %{_mandir}/man8/tftpd.8*
+%{_tmpfilesdir}/%{name}.conf
 %{_unitdir}/tftp.service
 %{_unitdir}/tftp.socket
 
 %changelog
+* Mon Jan 26 2026 Lukáš Zaoral <lzaoral@redhat.com> - 5.3-3
+- apply following patches from RHEL 10
+  - tftp: propagate exit codes in non-interactive mode
+  - fix creation of /var/lib/tftpboot on bootc systems
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Dec 26 2025 Dominik Mierzejewski <dominik@greysector.net> - 5.3-1
 - Updated to 5.3 (resolves rhbz#2419684)
 - drop obsolete patch

@@ -9,8 +9,8 @@
 %endif
 
 Name:           drpm
-Version:        0.5.2
-Release: 12%{?dist}
+Version:        0.5.3
+Release:        2%{?dist}
 Summary:        A library for making, reading and applying deltarpm packages
 # the entire source code is LGPLv2+, except src/drpm_diff.c and src/drpm_search.c which are BSD
 # Automatically converted from old format: LGPLv2+ and BSD - review is highly recommended.
@@ -18,9 +18,10 @@ License:        LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-BSD
 URL:            https://github.com/rpm-software-management/%{name}
 Source:         %{url}/releases/download/%{version}/%{name}-%{version}.tar.bz2
 
+Patch01:        0001-Add-libcmocka-suppresion-file.patch
 
 BuildRequires:  gcc-c++
-BuildRequires:  cmake >= 2.8.5
+BuildRequires:  cmake >= 3.5.0
 BuildRequires:  gcc
 
 BuildRequires:  rpm-devel
@@ -85,6 +86,13 @@ The drpm-devel package provides a C interface (drpm.h) for the drpm library.
 %{_libdir}/pkgconfig/%{name}.pc
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Dec 12 2025 Aleš Matěj <amatej@redhat.com> - 0.5.3-1
+- Update to 0.5.3
+- Update `cmake_minimum_required` to support modern CMake
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.2-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

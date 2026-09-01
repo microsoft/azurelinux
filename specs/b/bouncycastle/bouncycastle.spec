@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global gittag r1rv77
+%global gittag r1rv83
 %global classname org.bouncycastle.jce.provider.BouncyCastleProvider
 %global profilen 1.8
 %global profile %(echo %{profilen} | sed "s/\\.//g" )
@@ -9,8 +9,8 @@
 
 Summary:          Bouncy Castle Cryptography APIs for Java
 Name:             bouncycastle
-Version:          1.77
-Release: 8%{?dist}
+Version:          1.83
+Release:          7%{?dist}
 License:          MIT
 URL:              http://www.bouncycastle.org
 
@@ -137,7 +137,11 @@ cp -p %{SOURCE6} bcutil.pom
 cp -p %{SOURCE7} bcjmail.pom
 
 # this test needs additional dependeces
-rm prov/src/test/java/org/bouncycastle/jce/provider/test/X509LDAPCertStoreTest.java
+rm -v prov/src/test/java/org/bouncycastle/jce/provider/test/X509LDAPCertStoreTest.java
+# and those depends on it
+rm -v prov/src/test/java/org/bouncycastle/jce/provider/test/RegressionTest.java
+rm -v prov/src/test/java/org/bouncycastle/jce/provider/test/SimpleTestTest.java
+rm -v prov/src/test/java/org/bouncycastle/jce/provider/test/AllTests.java
 
 %build
 ant -f ant/jdk%{profile}+.xml \
@@ -246,6 +250,12 @@ fi
 %license LICENSE.html
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.83-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.83-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 1.77-5
 - Rebuilt for java-25-openjdk as preffered jdk
 

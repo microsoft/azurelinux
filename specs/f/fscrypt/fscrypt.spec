@@ -24,7 +24,7 @@ provides a uniform interface for creating and modifying encrypted directories.}
 %global godocs          CODE_OF_CONDUCT.md CONTRIBUTING.md NEWS.md README.md
 
 Name:           fscrypt
-Release: 7%{?dist}
+Release:        7%{?dist}
 Summary:        Go tool for managing Linux filesystem encryption
 
 License:        Apache-2.0
@@ -100,6 +100,15 @@ install -m 0644 -vp %{SOURCE1}          %{buildroot}%{_pam_vendordir}/%{name}
 %gopkgfiles
 
 %changelog
+* Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 0.3.5-7
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.3.5-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Oct 10 2025 Alejandro Sáez <asm@redhat.com> - 0.3.5-5
+- rebuild
+
 * Fri Aug 15 2025 Maxwell G <maxwell@gtmx.me> - 0.3.5-4
 - Rebuild for golang-1.25.0
 

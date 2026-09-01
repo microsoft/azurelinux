@@ -6,7 +6,7 @@
 Summary: Trace extension module for the crash utility
 Name: crash-trace-command
 Version: 3.0
-Release: 17%{?dist}
+Release: 16%{?dist}
 License: GPL-2.0-only
 Source: https://github.com/fujitsu/crash-trace/archive/v%{version}/%{name}-%{version}.tar.gz
 URL: https://github.com/fujitsu/crash-trace
@@ -41,8 +41,14 @@ install -m 0755 -t %{buildroot}%{_libdir}/crash/extensions %{_builddir}/%{repona
 %license COPYING
 
 %changelog
-* Mon Feb 16 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 3.0-14
+* Mon Feb 16 2026 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 3.0-16
 - Enable the RISC-V 64-bit architecture port
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.0-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

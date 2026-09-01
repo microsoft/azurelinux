@@ -6,7 +6,7 @@
 Summary: A tool for generating scanners (text pattern recognizers)
 Name: flex
 Version: 2.6.4
-Release: 23%{?dist}
+Release: 24%{?dist}
 
 # An SPDX license string check done against flex-2.6.4 using fossology
 # found strings corresponding to the licenses noted below across the flex
@@ -89,13 +89,12 @@ statically link against instead of implementing their own.
 %build
 autoreconf -i
 %configure --docdir=%{_pkgdocdir} CFLAGS="-fPIC $RPM_OPT_FLAGS"
-make %{?_smp_mflags}
+%make_build
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
-rm -f $RPM_BUILD_ROOT/%{_infodir}/dir
-rm -f $RPM_BUILD_ROOT/%{_pkgdocdir}/{README.cvs,TODO,AUTHORS,COPYING,ONEWS}
+%make_install
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f $RPM_BUILD_ROOT%{_pkgdocdir}/{README.cvs,TODO,AUTHORS,COPYING,ONEWS}
 # Exclude libtool archives (.la) as per Fedora packaging guidelines
 find %{buildroot} -name '*.la' -delete
 
@@ -137,6 +136,19 @@ echo ============END TESTING===========
 %{_libdir}/*.a
 
 %changelog
+* Tue Feb 03 2026 Arjun Shankar <arjun@redhat.com> - 2.6.4-24
+- Rebuild
+
+* Mon Feb 02 2026 Arjun Shankar <arjun@redhat.com> - 2.6.4-23
+- Minor packaging improvements
+
+* Mon Feb 02 2026 Tom Stellard <tstellar@redhat.com> - 2.6.4-22
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.4-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.4-20
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

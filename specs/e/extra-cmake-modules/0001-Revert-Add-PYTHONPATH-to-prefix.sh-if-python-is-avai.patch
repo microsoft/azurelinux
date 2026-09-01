@@ -1,0 +1,55 @@
+From 79802fdb938ac3b3c6fc0b57eb2fcbf60100e0b0 Mon Sep 17 00:00:00 2001
+From: Steve Cossette <farchord@gmail.com>
+Date: Wed, 13 May 2026 21:47:52 -0400
+Subject: [PATCH] Revert "Add PYTHONPATH to prefix.sh if python is available"
+
+This reverts commit e46088158e5631417602322ecdc08cc692192134.
+---
+ kde-modules/KDESetupPrefixScript.cmake | 9 ---------
+ kde-modules/prefix.sh.cmake            | 2 --
+ kde-modules/prefix.sh.fish.cmake       | 2 --
+ 3 files changed, 13 deletions(-)
+
+diff --git a/kde-modules/KDESetupPrefixScript.cmake b/kde-modules/KDESetupPrefixScript.cmake
+index a1cc261a..b2bae93b 100644
+--- a/kde-modules/KDESetupPrefixScript.cmake
++++ b/kde-modules/KDESetupPrefixScript.cmake
+@@ -15,15 +15,6 @@ if (CMAKE_CROSSCOMPILING)
+     return()
+ endif()
+ 
+-find_package(Python3 COMPONENTS Interpreter)
+-if (Python3_EXECUTABLE)
+-    execute_process(COMMAND ${Python3_EXECUTABLE} -Esc "import sysconfig; print(sysconfig.get_path('platlib', vars={'platbase': '${CMAKE_INSTALL_PREFIX}', 'base': '${CMAKE_INSTALL_PREFIX}'}))" OUTPUT_VARIABLE sysconfig_output)
+-    string(STRIP ${sysconfig_output} PYTHON_INSTALL_DIR)
+-
+-    set(SH_EXPORT_PYTHONPATH "export PYTHONPATH=\"${PYTHON_INSTALL_DIR}\":$PYTHONPATH")
+-    set(FISH_EXPORT_PYTHONPATH "set -x --path PYTHONPATH \"${PYTHON_INSTALL_DIR}\" $PYTHONPATH")
+-endif()
+-
+ configure_file(${CMAKE_CURRENT_LIST_DIR}/prefix.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/prefix.sh @ONLY)
+ 
+ find_program(FISH_EXECUTABLE fish)
+diff --git a/kde-modules/prefix.sh.cmake b/kde-modules/prefix.sh.cmake
+index 2d75471a..43b41e9f 100644
+--- a/kde-modules/prefix.sh.cmake
++++ b/kde-modules/prefix.sh.cmake
+@@ -14,5 +14,3 @@ export QT_QUICK_CONTROLS_STYLE_PATH=@KDE_INSTALL_FULL_QMLDIR@/QtQuick/Controls.2
+ export MANPATH=@KDE_INSTALL_FULL_DATADIR@/man:${MANPATH:-/usr/local/share/man:/usr/share/man}
+ 
+ export SASL_PATH=@KDE_INSTALL_FULL_LIBDIR@/sasl2:${SASL_PATH:-/usr/@CMAKE_INSTALL_LIBDIR@/sasl2}
+-
+-@SH_EXPORT_PYTHONPATH@
+diff --git a/kde-modules/prefix.sh.fish.cmake b/kde-modules/prefix.sh.fish.cmake
+index 3cb4c4a0..d59c1b87 100644
+--- a/kde-modules/prefix.sh.fish.cmake
++++ b/kde-modules/prefix.sh.fish.cmake
+@@ -20,5 +20,3 @@ set -x --path QT_PLUGIN_PATH "@KDE_INSTALL_FULL_QTPLUGINDIR@" $QT_PLUGIN_PATH
+ set -x --path QML2_IMPORT_PATH "@KDE_INSTALL_FULL_QMLDIR@" $QML2_IMPORT_PATH
+ 
+ set -x --path QT_QUICK_CONTROLS_STYLE_PATH "@KDE_INSTALL_FULL_QMLDIR@/QtQuick/Controls.2/" $QT_QUICK_CONTROLS_STYLE_PATH
+-
+-@FISH_EXPORT_PYTHONPATH@
+-- 
+2.54.0
+

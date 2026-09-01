@@ -9,8 +9,8 @@
 
 Name:      elinks
 Summary:   A text-mode Web browser
-Version:   0.18.0
-Release: 6%{?dist}
+Version:   0.19.0
+Release:   2%{?dist}
 License:   GPL-2.0-only
 URL:       https://github.com/rkd77/elinks
 Source:    https://github.com/rkd77/elinks/releases/download/v%{version}/elinks-%{version}.tar.xz
@@ -41,7 +41,7 @@ Provides: links = 1:0.97-1
 Provides: text-www-browser
 
 # Prevent crash when HOME is unset (bug #90663).
-Patch0: 0000-elinks-0.15.0-ssl-noegd.patch
+Patch0: 0000-elinks-0.19.0-ssl-noegd.patch
 
 # UTF-8 by default
 Patch1: 0001-elinks-0.15.1-utf_8_io-default.patch
@@ -139,6 +139,12 @@ exit 0
 %{_mandir}/man5/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.19.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Lukáš Zaoral <lzaoral@redhat.com> - 0.19.0-1
+- rebase to the latest upstream version (rhbz#2425384)
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.18.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

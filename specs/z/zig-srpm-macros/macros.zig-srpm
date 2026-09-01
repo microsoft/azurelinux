@@ -1,3 +1,9 @@
 # zig_arches lists what arches Zig works on
+# Zig depends on a C compiler (gcc) during bootstraping
+# older versions of gcc fail to compile the transpiled code 
+# so we limit it to x86_64 on rhel
 
-%zig_arches x86_64 aarch64 riscv64 %{mips64}
+%zig_arches %{shrink: \
+    %{!?rhel:x86_64 aarch64 riscv64 %{mips64}} \
+    %{?rhel:x86_64} \
+}

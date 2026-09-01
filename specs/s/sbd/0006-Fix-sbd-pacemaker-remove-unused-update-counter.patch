@@ -1,0 +1,27 @@
+From 41e811bb995078e5b71b5274398e28959c9bc04d Mon Sep 17 00:00:00 2001
+From: Klaus Wenninger <klaus.wenninger@aon.at>
+Date: Mon, 12 Jan 2026 09:59:18 +0100
+Subject: [PATCH] Fix: sbd-pacemaker: remove unused update counter
+
+---
+ src/sbd-pacemaker.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/sbd-pacemaker.c b/src/sbd-pacemaker.c
+index 4806b0a..379a720 100644
+--- a/src/sbd-pacemaker.c
++++ b/src/sbd-pacemaker.c
+@@ -351,13 +351,10 @@ cib_connect(gboolean full)
+ static void
+ compute_status(pe_working_set_t * data_set)
+ {
+-    static int updates = 0;
+     static int ever_had_quorum = FALSE;
+ 
+     node_t *node = NULL;
+ 
+-    updates++;
+-
+     if (data_set->dc_node == NULL) {
+         set_servant_health(pcmk_health_transient, LOG_INFO, "We don't have a DC right now.");
+         notify_parent();

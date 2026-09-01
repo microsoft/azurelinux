@@ -1,34 +1,19 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+%global with_selinux 1
+%global selinuxtype targeted
+%global modulename adcli
+
 Name:    adcli
-Version: 0.9.2
-Release: 13%{?dist}
+Version: 0.9.3.1
+Release: 5%{?dist}
 Summary: Active Directory enrollment
 License: LGPL-2.1-or-later
 URL:     https://gitlab.freedesktop.org/realmd/adcli
-Source0: https://gitlab.freedesktop.org/realmd/adcli/uploads/ea560656ac921b3fe0d455976aaae9be/adcli-%{version}.tar.gz
+Source0: https://gitlab.freedesktop.org/-/project/1196/uploads/5a1c55410c0965835b81fbd28d820d46/adcli-%{version}.tar.gz
 
-# Add support for Samba's offline join feature
-Patch1: 0001-disco-Add-functions-to-extract-domain-GUID-from-LDAP.patch
-Patch2: 0002-disco-Extract-domain-GUID-from-LDAP-ping.patch
-Patch3: 0003-conn-Copy-domain-GUID-from-disco.patch
-Patch4: 0004-conn-Copy-forest-name-from-disco.patch
-Patch5: 0005-conn-Stop-as-soon-as-we-have-a-valid-LDAP-connection.patch
-Patch6: 0006-conn-Store-the-address-of-the-connected-server.patch
-Patch7: 0007-conn-Allow-to-retrieve-the-connected-LDAP-address.patch
-Patch8: 0008-util-Allow-to-append-variables-to-external-program-e.patch
-Patch9: 0009-util-Flag-write-end-of-pipe-as-invalid-after-closing.patch
-Patch10: 0010-util-Return-failure-if-child-exit-status-reports-so.patch
-Patch11: 0011-enroll-Issue-a-warning-if-Samba-provision-was-reques.patch
-Patch12: 0012-enroll-Add-a-function-to-convert-an-IP-address-to-te.patch
-Patch13: 0013-build-Check-for-NetComposeOfflineDomainJoin-in-samba.patch
-Patch14: 0014-enroll-Populate-Samba-s-secrets-database-using-offli.patch
-Patch15: 0015-doc-improve-some-Samba-related-doc-items.patch
-
-# fixes for issues found by static analyser
-Patch16: 0016-Various-fixes-for-issues-found-by-static-code-scanne.patch
-Patch17: 0017-krb5-add-adcli_krb5_get_error_message.patch
+Patch1: 0001-enroll-fix-issues-if-default-keytab-is-used.patch
 
 BuildRequires: gcc
 BuildRequires: intltool pkgconfig
@@ -41,6 +26,12 @@ BuildRequires: xmlto
 BuildRequires: make
 BuildRequires: libnetapi-devel
 
+# Build dependencies for SELinux policy
+%if %{with selinux}
+BuildRequires:  libselinux-devel
+BuildRequires:  selinux-policy-devel
+%endif
+
 Requires: cyrus-sasl-gssapi
 Conflicts: adcli-doc < %{version}-%{release}
 
@@ -48,9 +39,30 @@ Conflicts: adcli-doc < %{version}-%{release}
 # the adcli tool itself is to be used by callers
 Obsoletes: adcli-devel < 0.5
 
+%if %{with selinux}
+# This ensures that the *-selinux package and all it’s dependencies are not
+# pulled into containers and other systems that do not use SELinux. The
+# policy defines types and file contexts for client and server.
+Requires:       (%{name}-selinux if selinux-policy-%{selinuxtype})
+%endif
+
 %description
 adcli is a tool for joining an Active Directory domain using
 standard LDAP and Kerberos calls.
+
+%if %{with selinux}
+# SELinux subpackage
+%package selinux
+Summary:             The adcli SELinux policy
+BuildArch:           noarch
+Requires:            selinux-policy-%{selinuxtype}
+Requires(post):      selinux-policy-%{selinuxtype}
+%{?selinux_requires_min}
+
+%description selinux
+Custom SELinux policy module for adcli to make sure generated Kerberos keytab
+files have the right SELinux context.
+%endif
 
 %define _hardened_build 1
 
@@ -75,13 +87,32 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 %ldconfig_scriptlets
 
+%if %{with selinux}
+# SELinux contexts are saved so that only affected files can be
+# relabeled after the policy module installation
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
+
+%post selinux
+%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp
+
+%postun selinux
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s %{selinuxtype} %{modulename}
+fi
+
+%posttrans selinux
+%selinux_relabel_post -s %{selinuxtype}
+
+%endif
+
 %files
 %{_sbindir}/adcli
 %doc AUTHORS COPYING ChangeLog NEWS README
 %doc %{_mandir}/*/*
 
 %package doc
-Summary: adcli documentation
+Summary: The adcli documentation package
 BuildArch: noarch
 Conflicts: adcli < %{version}-%{release}
 
@@ -93,7 +124,29 @@ documentation.
 %files doc
 %doc %{_datadir}/doc/adcli/*
 
+%if %{with selinux}
+%files selinux
+%{_datadir}/selinux/packages/%{selinuxtype}/%{modulename}.pp
+%ghost %verify(not md5 size mode mtime) %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/%{modulename}
+%endif
+
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.3.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Dec 19 2025 Sumit Bose <sbose@redhat.com> - 0.9.3.1-3
+- Fix issue with restoring SELinux file label
+
+* Tue Dec 16 2025 Sumit Bose <sbose@redhat.com> - 0.9.3.1-2
+- Use selinux_requires_min to avoid policycoreutils-python-utils dependency
+  Resolves: rhbz#2422451
+
+* Tue Dec 09 2025 Sumit Bose <sbose@redhat.com> - 0.9.3.1-1
+- Rebase to latest upstream version
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.9.2-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

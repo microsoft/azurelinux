@@ -6,7 +6,7 @@
 
 Name:           pixman
 Version:        0.46.2
-Release: 5%{?dist}
+Release:        2%{?dist}
 Summary:        Pixel manipulation library
 
 # SPDX

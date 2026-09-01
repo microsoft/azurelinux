@@ -1,6 +1,6 @@
---- tikv-jemallocator-0.6.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ tikv-jemallocator-0.6.1/Cargo.toml	2025-10-16T21:31:20.522090+00:00
-@@ -88,14 +88,6 @@
+--- tikv-jemallocator-0.7.0/Cargo.toml	1970-01-01T00:00:01+00:00
++++ tikv-jemallocator-0.7.0/Cargo.toml	2026-06-05T09:09:50.363913+00:00
+@@ -92,14 +92,6 @@
  bench = false
  
  [[test]]
@@ -15,7 +15,7 @@
  name = "ffi"
  path = "tests/ffi.rs"
  required-features = ["stats"]
-@@ -103,10 +95,6 @@
+@@ -107,10 +99,6 @@
  [[test]]
  name = "grow_in_place"
  path = "tests/grow_in_place.rs"
@@ -26,10 +26,3 @@
  
  [[test]]
  name = "shrink_in_place"
-@@ -138,6 +126,3 @@
- 
- [dev-dependencies.paste]
- version = "1"
--
--[dev-dependencies.tikv-jemalloc-ctl]
--version = "0.6.1"

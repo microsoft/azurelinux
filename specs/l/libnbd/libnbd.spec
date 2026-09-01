@@ -11,20 +11,24 @@
 %global have_ublk 1
 %endif
 
-# No nbd.ko in RHEL 9.
+# nbd kernel module and nbd package (only used for testing).
+# There is no nbd package in RHEL.
+# The nbd package was disabled in Fedora i686 >= 44.
 %if !0%{?rhel}
+%ifnarch %{ix86}
 %global have_nbd_ko 1
+%endif
 %endif
 
 # If we should verify tarball signature with GPGv2.
 %global verify_tarball_signature 1
 
 # The source directory.
-%global source_directory 1.24-stable
+%global source_directory 1.25-development
 
 Name:           libnbd
-Version:        1.24.1
-Release: 4%{?dist}
+Version:        1.25.7
+Release:        1%{?dist}
 Summary:        NBD client library in userspace
 
 License:        LGPL-2.0-or-later AND BSD-3-Clause
@@ -78,7 +82,7 @@ BuildRequires:  glib2-devel
 
 # For bash-completion.
 BuildRequires:  bash-completion
-%if !0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} >= 11
 BuildRequires:  bash-completion-devel
 %endif
 
@@ -376,7 +380,7 @@ make %{?_smp_mflags} check || {
 
 
 %files bash-completion
-%if !0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} >= 11
 %dir %{bash_completions_dir}
 %{bash_completions_dir}/nbdcopy
 %{bash_completions_dir}/nbddiscard
@@ -404,8 +408,44 @@ make %{?_smp_mflags} check || {
 
 
 %changelog
-* Tue Feb 17 2026 Richard W.M. Jones <rjones@redhat.com> - 1.24.1-1
-- New upstream stable version 1.24.1
+* Tue Jul 28 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.7-1
+- New upstream development version 1.25.7
+
+* Wed Jul 22 2026 Python Maint <python-maint@redhat.com> - 1.25.6-5
+- Rebuilt for Python 3.15.0b4 ABI change
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.25.6-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jul 15 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.6-1
+- New upstream development version 1.25.6
+
+* Thu Jul 09 2026 Jerry James <loganjerry@gmail.com> - 1.25.5-3
+- OCaml 5.5.0 rebuild
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 1.25.5-2
+- Rebuilt for Python 3.15
+
+* Thu Apr 30 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.5-1
+- New upstream development version 1.25.5
+
+* Tue Mar 03 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.4-1
+- New upstream development version 1.25.4
+
+* Tue Feb 24 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.3-1
+- New upstream development version 1.25.3
+
+* Fri Feb 20 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.2-2
+- OCaml 5.4.1 rebuild
+
+* Tue Feb 17 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.2-1
+- New upstream development version 1.25.2
+
+* Sun Feb 01 2026 Richard W.M. Jones <rjones@redhat.com> - 1.25.1-1
+- New upstream development version 1.25.1
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.24.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Dec 16 2025 Richard W.M. Jones <rjones@redhat.com> - 1.24.0-1
 - New upstream stable version 1.24.0
@@ -419,6 +459,9 @@ make %{?_smp_mflags} check || {
 * Fri Nov 14 2025 Richard W.M. Jones <rjones@redhat.com> - 1.23.11-1
 - New upstream development version 1.23.11
 
+* Tue Nov  4 2025 Tom Callaway <spot@fedoraproject.org> - 1.23.10-2
+- rebuild for new fuse3
+
 * Sun Nov  2 2025 Richard W.M. Jones <rjones@redhat.com> - 1.23.10-1
 - New upstream development version 1.23.10
 - New tools nbddiscard and nbdzero.
@@ -428,8 +471,11 @@ make %{?_smp_mflags} check || {
 - Fixes security issue with nbd+ssh URIs
   https://lists.libguestfs.org/archives/list/guestfs@lists.libguestfs.org/thread/YZMBF3SJRWTRVT5L3KWSNHITFTRMQNTT/
 
-* Fri Sep 19 2025 Richard W.M. Jones <rjones@redhat.com> - 1.23.8-2
-- Bump release and rebuild (RHBZ#2396714)
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1.23.8-3
+- OCaml 5.4.0 rebuild
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.23.8-2
+- Rebuilt for Python 3.14.0rc3 bytecode
 
 * Sat Sep 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1.23.8-1
 - New upstream development version 1.23.8
@@ -450,7 +496,7 @@ make %{?_smp_mflags} check || {
 - New upstream development version 1.23.5
 - Add './configure --with-extra' containing downstream package information.
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 1.23.4-3
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 1.23.4-3
 - Rebuild to fix OCaml dependencies
 
 * Fri Jun 06 2025 Python Maint <python-maint@redhat.com> - 1.23.4-2

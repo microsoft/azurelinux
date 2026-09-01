@@ -1,0 +1,266 @@
+diff --git a/ChangeLog b/ChangeLog
+index 235125f..5010324 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,43 @@
++2026-05-21  Jacob Bachmeyer  <jcb@gnu.org>
++
++	PR81083
++
++	* runtest.exp: Add test to verify that HOME is set in the
++	environment before attempting to use it to locate .dejagnurc.
++	Previously, this was covered by a catch(n) in load_file.
++
++2026-05-20  Jacob Bachmeyer  <jcb@gnu.org>
++
++	PR81083
++
++	* runtest.exp: Replace use of tilde expansion when loading
++	.dejagnurc with direct use of $env(HOME) and [file join] for
++	compatibility with Tcl 9.  The direct substitution of HOME is the
++	documented behavior of GNU bash in this situation.
++	(load_file): Add detail about Tcl 9 behavior change to comment.
++
++2026-04-02  Jacob Bachmeyer  <jcb@gnu.org>
++
++	PR80674
++
++	* runtest (LC_ALL): Set this to "C" and export to ensure that
++	DejaGnu testsuites run in the standard POSIX locale.
++
++2026-03-26  Jacob Bachmeyer  <jcb@gnu.org>
++
++	PR80674
++
++	Thanks to Jakub Jelinek <jakub@redhat.com> for reporting this issue.
++
++	* lib/utils.exp (diff): Use "-translation" option instead of
++	"-encoding" option to fconfigure(n) for compatibility with Tcl 9.
++
++2026-03-25  Jacob Bachmeyer  <jcb@gnu.org>
++
++	PR80674
++
++	* baseboards/qemu.exp: Convert obsolete Tcl case(n) to switch(n).
++
+ 2021-06-16  Jacob Bachmeyer  <jcb@gnu.org>
+ 
+ 	* DejaGnu 1.6.3 released.
+
+diff --git a/baseboards/qemu.exp b/baseboards/qemu.exp
+index b419f85..d5523cf 100644
+--- a/baseboards/qemu.exp
++++ b/baseboards/qemu.exp
+@@ -1,5 +1,5 @@
+ #
+-# Copyright (C) 2020 Free Software Foundation, Inc.
++# Copyright (C) 2020, 2026 Free Software Foundation, Inc.
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # under the terms of the GNU General Public License as published by
+@@ -64,99 +64,96 @@ if { [string length $specfiles] == 0 } {
+ 
+ # The basic set of flags needed to build "hello world" for this
+ # board. This board uses libgloss and newlib.
+-case "$target_triplet" in {
+-    { "armeb-*-eabi*" } {
++switch -glob -- $target_triplet {
++    "armeb-*-eabi*" {
+ 	set qemu "qemu-armeb"
+ 	set spec  "elf-rdimon.specs"
+     }
+-    { "arm-pi3-*" } {
++    "arm-pi3-*" {
+ 	set qemu "qemu-arm"
+-	set spec="-static"
++	set spec "-static"
+ 	set target_list pi
+     }
+-    { "arm*-*-eabi*" } {
++    "arm*-*-eabi*" {
+ 	set qemu "qemu-arm"
+-	set spec="-static"
++	set spec "-static"
+ 	set spec  "elf-rdimon.specs"
+     }
+-    { "aarch64be-*-elf" } {
++    "aarch64be-*-elf" {
+ 	set qemu "qemu-aarch64_be"
+ 	set spec  "rdimon.specs"
+     }
+-    { "aarch64*-gnu*" } {
++    "aarch64*-gnu*" {
+ 	set qemu "qemu-aarch64"
+ 	set spec  "-static"
+     }
+-    { "aarch64*-*elf*" } {
++    "aarch64*-*elf*" {
+ 	# There's multiple spec files, but rdimon is the
+ 	# one usually used for testing.
+ 	set qemu "qemu-aarch64"
+ 	set spec "rdimon.specs"
+     }
+-    # FIXME: These following qemu variants are just what QEMU
+-    # supports, the pattern to match for the target needs to be
+-    # researched.
+-    { "cris*" } {
++    "cris*" {
+ 	set qemu "qemu-cris"
+     }
+-    { "microblaze-*" } {
++    "microblaze-*" {
+ 	set qemu "qemu-microblaze"
+ 	set spec "elf-gloss-linux.specs"
+     }
+-    { "microblazeel-*" } {
++    "microblazeel-*" {
+ 	set qemu "qemu-microblazeel"
+ 	set spec "elf-gloss-linux.specs"
+     }
+-    { "mips" } {
++    "mips" {
+ 	set qemu "qemu-mips"
+     }
+-    { "mips64-*" } {
++    "mips64-*" {
+ 	set qemu "qemu-mips64"
+     }
+-    { "mips64el-*" } {
++    "mips64el-*" {
+ 	set qemu "qemu-mips64el"
+     }
+-    { "mipsel-*" } {
++    "mipsel-*" {
+ 	set qemu "qemu-mipsel"
+     }
+-    { "mipsn32-*" } {
++    "mipsn32-*" {
+ 	set qemu "qemu-mipsn32"
+     }
+-    { "mipsn32el-*" } {
++    "mipsn32el-*" {
+ 	set qemu "qemu-mipsn32el"
+     }
+-    { "ppc-*" } {
++    "ppc-*" {
+ 	set qemu "qemu-ppc"
+     }
+-    { "ppc64-*" } {
++    "ppc64-*" {
+ 	set qemu "qemu-ppc64"
+     }
+-    { "ppc64abi32-*" } {
++    "ppc64abi32-*" {
+ 	set qemu "qemu-ppc64abi32"
+     }
+-    { "ppc64le-*" } {
++    "ppc64le-*" {
+ 	set qemu "qemu-ppc64le"
+     }
+-    { "riscv32-elf" } {
++    "riscv32-elf" {
+ 	set qemu "qemu-riscv32"
+     }
+-    { "riscv64-elf" } {
++    "riscv64-elf" {
+ 	set qemu "qemu-riscv64"
+ 	set spec "nano.spec"
+     }
+-    { "sh4-*" } {
++    "sh4-*" {
+ 	set qemu "qemu-sh4"
+     }
+-    { "sh4eb-*" } {
++    "sh4eb-*" {
+ 	set qemu "qemu-sh4eb"
+     }
+-    { "sparc=*" } {
++    "sparc=*" {
+ 	set qemu "qemu-sparc"
+     }
+-    { "sparc32plus-*" } {
++    "sparc32plus-*" {
+ 	set qemu "qemu-sparc32plus"
+     }
+-    { "sparc64-*" } {
++    "sparc64-*" {
+ 	set qemu "qemu-sparc64"
+     }
+     default {
+diff --git a/lib/utils.exp b/lib/utils.exp
+index beb4e39..2067688 100644
+--- a/lib/utils.exp
++++ b/lib/utils.exp
+@@ -1,4 +1,4 @@
+-# Copyright (C) 1992-2019, 2020 Free Software Foundation, Inc.
++# Copyright (C) 1992-2019, 2020, 2026 Free Software Foundation, Inc.
+ #
+ # This file is part of DejaGnu.
+ #
+@@ -303,7 +303,7 @@ proc diff { file_1 file_2 } {
+ 
+     if {[file exists $file_1]} {
+ 	set file_a [open $file_1 r]
+-	fconfigure $file_a -encoding binary
++	fconfigure $file_a -translation binary
+     } else {
+ 	warning "$file_1 doesn't exist"
+ 	return 0
+@@ -311,7 +311,7 @@ proc diff { file_1 file_2 } {
+ 
+     if {[file exists $file_2]} {
+ 	set file_b [open $file_2 r]
+-	fconfigure $file_b -encoding binary
++	fconfigure $file_b -translation binary
+     } else {
+ 	warning "$file_2 doesn't exist"
+ 	return 0
+diff --git a/runtest b/runtest
+index 73122d5..0410e42 100755
+--- a/runtest
++++ b/runtest
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ #
+-# Copyright (C) 1992-2016, 2021 Free Software Foundation, Inc.
++# Copyright (C) 1992-2016, 2021, 2026 Free Software Foundation, Inc.
+ #
+ # This file is part of DejaGnu.
+ #
+@@ -33,6 +33,10 @@
+ # is simple enough to work.  Most notably, nesting backtick command
+ # substitution is tricky, but we do not do that.
+ 
++# Ensure that DejaGnu will be run in the POSIX locale
++LC_ALL=C
++export LC_ALL
++
+ # Get the execution path to this script and the current directory.
+ 
+ mypath=${0-.}
+diff --git a/runtest.exp b/runtest.exp
+index f4e45ae..20c0619 100644
+--- a/runtest.exp
++++ b/runtest.exp
+@@ -339,8 +339,9 @@ proc load_file { args } {
+     set found 0
+     foreach file [lrange $args $i end] {
+ 	verbose "Looking for $file" 2
+-	# In Tcl, "file exists" fails if the filename looks like
++	# In Tcl 8, "file exists" fails if the filename looks like
+ 	# ~/FILE and the environment variable HOME does not exist.
++	# In Tcl 9, this tilde expansion no longer exists.
+ 	if {! [catch {file exists $file} result] && $result} {
+ 	    set found 1
+ 	    verbose "Found $file"
+@@ -1071,7 +1071,9 @@ if {[info exists env(DEJAGNU)]} {
+ }
+ 
+ # Load user .dejagnurc file last as the ultimate override.
+-load_file ~/.dejagnurc
++if { [info exists env(HOME)] } {
++    load_file [file join $env(HOME) .dejagnurc]
++}
+ 
+ if {![info exists boards_dir]} {
+     set boards_dir ""

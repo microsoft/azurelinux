@@ -3,7 +3,7 @@
 
 Name:          liblc3
 Version:       1.1.3
-Release: 8%{?dist}
+Release:       7%{?dist}
 Summary:       Low Complexity Communication Codec (LC3)
 
 License:       Apache-2.0
@@ -30,7 +30,8 @@ Files for development with %{name}.
 
 %package -n python3-lc3
 Summary: Python3 bindings for %{name}
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+BuildArch: noarch
 
 %description -n python3-lc3
 Python3 bindings for %{name}.
@@ -66,13 +67,19 @@ the %{name} library.
 %{_libdir}/liblc3.so
 
 %files -n python3-lc3
-%{python3_sitelib}/*
+%pycached %{python3_sitelib}/lc3.py
 
 %files utils
 %{_bindir}/dlc3
 %{_bindir}/elc3
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.3-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Nov 09 2025 Neal Gompa <ngompa@fedoraproject.org> - 1.1.3-6
+- Fix Python bindings subpackage
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.1.3-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

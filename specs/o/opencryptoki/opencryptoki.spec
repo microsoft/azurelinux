@@ -2,9 +2,9 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: opencryptoki
-Summary: Implementation of the PKCS#11 (Cryptoki) specification v3.0 and partially v3.1
-Version: 3.25.0
-Release: 7%{?dist}
+Summary: Implementation of the PKCS#11 (Cryptoki) specification v3.0 and partially v3.1, v3.2
+Version: 3.27.0
+Release: 1%{?dist}
 License: CPL-1.0
 URL: https://github.com/opencryptoki/opencryptoki
 Source0: https://github.com/opencryptoki/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -14,7 +14,7 @@ Source1: opencryptoki.module
 Source2: opencryptoki.sysusers.conf
 
 # fix install problem in buildroot
-Patch1: opencryptoki-3.25.0-p11sak.patch
+Patch1: opencryptoki-3.25.0-buildroot-install.patch
 
 # tmpfiles.d config files for image mode
 Patch2: opencryptoki-3.24.0-tmpfiles-image-mode.patch
@@ -24,11 +24,9 @@ Patch2: opencryptoki-3.24.0-tmpfiles-image-mode.patch
 Patch3: opencryptoki-lockdir-image-mode.patch
 
 # upstream patches
-# Fix detection of EC curve not supported by OpenSSL-3.5.x
-Patch10: opencryptoki-openssl-3.5.x.patch
 
-# Fix covscan findings, https://github.com/opencryptoki/opencryptoki/pull/880
-Patch11: opencryptoki-3.25.0-covscan-findings.patch
+# https://fedoraproject.org/wiki/Changes/EncourageI686LeafRemoval
+ExcludeArch:    %{ix86}
 
 Requires(pre): coreutils
 Requires: (selinux-policy >= 34.9-1 if selinux-policy-targeted)
@@ -65,7 +63,7 @@ Requires(postun): systemd
 
 
 %description
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -78,7 +76,7 @@ Summary: The run-time libraries for opencryptoki package
 Requires(pre): shadow-utils
 
 %description libs
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -104,7 +102,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description swtok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -120,7 +118,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description tpmtok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -136,7 +134,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description icsftok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -152,7 +150,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description icatok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -169,7 +167,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description ccatok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -186,7 +184,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Provides: %{name}(token)
 
 %description ep11tok
-Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1
+Opencryptoki implements the PKCS#11 specification  v3.0 and partially v3.1, v3.2
 for a set of cryptographic hardware, such as IBM 4767, 4768, 4769 and 4770
 crypto cards, and the Trusted Platform Module (TPM) chip. Opencryptoki also
 brings a software token implementation that can be used without any cryptographic
@@ -416,6 +414,45 @@ fi
 
 
 %changelog
+* Tue Jun 09 2026 Than Ngo <than@redhat.com> - 3.27.0-1
+- Update to 3.27.0
+  * Add base support for PKCS#11 v3.2
+  * Add support for PKCS#11 v3.2 C_VerifySignature[Init|Update|Final]
+  * Add support for PKCS#11 v3.2 C_EncapsulateKey/C_DecapsulateKey
+  * Soft/ICA/CCA/EP11: Add support for PKCS#11 v3.2 en-/decapsulate with RSA-PKCS and RSA-OAEP mechanisms
+  * Soft/ICA/CCA/EP11: Add support for PKCS#11 v3.2 en-/decapsulate with the ECDH mechanism
+  * Soft/EP11: Add support for PKCS#11 v3.2 en-/decapsulate with the DH-PKCS mechanism
+  * Soft: Add support for PKCS#11 v3.2 ML-DSA and ML-KEM key types
+    and mechanisms (requires OpenSSL 3.5 or later, or the OQS-provider must be configured)
+  * CCA: Add support for PKCS#11 v3.2 ML-DSA key type and mechanisms (requires CCA v8.4 or later)
+  * EP11: Add support for PKCS#11 v3.2 ML-DSA and ML-KEM key types and mechanisms
+    (requires an EP11 host library v4.2 or later, and a CEX8P crypto card with firmware v9.6 or
+    later on IBM z17, and v8.39 or later on IBM z16)
+  * p11sak: Add support for PKCS#11 v3.2 ML-DSA and ML-KEM key types
+  * Soft/ICA: Add support for PKCS#11 v3.2 mechanisms CKM_ECDH_X_AES_KEY_WRAP and CKM_ECDH_COF_AES_KEY_WRAP
+  * p11sak: Add support for key wrapping with PKCS#11 v3.2 mechanisms
+    CKM_ECDH_X_AES_KEY_WRAP and CKM_ECDH_COF_AES_KEY_WRAP
+  * Soft/ICA/CCA/EP11: Add support for PKCS#11 v3.2 mechanism CKM_PUB_KEY_FROM_PRIV_KEY
+  * Soft/ICA/CCA/EP11: Add support for PKCS#11 v3.0 Edwards and Montgomery key types and mechanisms
+  * Soft/ICA: Support CKM_ECDH_AES_KEY_WRAP also for Montgomery keys
+  * p11sak: Add support for PKCS#11 v3.0 Edwards and Montgomery key types
+  * Soft: Add support for CKM_ECDH1_COFACTOR_DERIVE
+  * CCA: Add support for additional RSA public exponent values 5, 17, or 257
+  * p11sak: Add option to list-key command to show EP11 session IDs
+  * Make the maximum number of token objects supported configurable
+  * Fixes for CVE-2026-40253, CVE-2026-23893, and CVE-2026-22791
+  * Bug fixes
+- Drop %%{ix86} build
+
+* Tue May 05 2026 Than Ngo <than@redhat.com> - 3.26.0-3
+- Fix rhbz#2432016: CVE-2026-23893, Privilege Escalation or Data Exposure via Symlink Following
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.26.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 28 2025 Than Ngo <than@redhat.com> - 3.26.0-1
+- Update to 3.26.0
+
 * Tue Jul 29 2025 Than Ngo <than@redhat.com> - 3.25.0-4
 - Require openssl >= 3.5.1
 - Fix incorrect effective group id of pkcsslotd daemon

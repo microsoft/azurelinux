@@ -1,0 +1,21 @@
+diff --color -ruNp a/auth-pam.c b/auth-pam.c
+--- a/auth-pam.c	2026-02-16 13:15:24.863871754 +0100
++++ b/auth-pam.c	2026-02-16 13:59:45.073207084 +0100
+@@ -471,6 +471,7 @@ static int
+ check_pam_user(Authctxt *authctxt)
+ {
+ 	const char *pam_user;
++	const struct passwd *pam_pw;
+ 
+ 	if (authctxt == NULL || authctxt->pw == NULL ||
+ 	    authctxt->pw->pw_name == NULL)
+@@ -485,7 +486,8 @@ check_pam_user(Authctxt *authctxt)
+ 		return PAM_USER_UNKNOWN;
+ 	}
+ 
+-	if (strcmp(authctxt->pw->pw_name, pam_user) != 0) {
++	pam_pw = getpwnam(pam_user);
++	if (pam_pw == NULL || pam_pw->pw_uid != authctxt->pw->pw_uid) {
+ 		debug("PAM user \"%s\" does not match expected \"%s\"",
+ 		      pam_user, authctxt->pw->pw_name);
+ 		return PAM_USER_UNKNOWN;

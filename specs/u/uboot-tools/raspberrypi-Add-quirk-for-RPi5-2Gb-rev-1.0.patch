@@ -1,0 +1,32 @@
+From 72fd4fdb54721a31d2b4e9f95fdd3b3e398bb2c0 Mon Sep 17 00:00:00 2001
+From: Peter Robinson <pbrobinson@gmail.com>
+Date: Sun, 12 Apr 2026 01:14:12 +0100
+Subject: [PATCH] board/raspberrypi: Add quirk for RPi5 2Gb rev 1.0
+
+All 2Gb Raspberry Pi 5s use the BCM2712D0 silicon, but
+the early boards were still rev 1.0 so we need a quirk
+to ensure the correct device tree is used.
+
+Signed-off-by: Peter Robinson <pbrobinson@gmail.com>
+---
+ board/raspberrypi/rpi/rpi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/board/raspberrypi/rpi/rpi.c b/board/raspberrypi/rpi/rpi.c
+index b0a1484c0fa..ff9cab6521b 100644
+--- a/board/raspberrypi/rpi/rpi.c
++++ b/board/raspberrypi/rpi/rpi.c
+@@ -371,6 +371,10 @@ static void set_fdtfile(void)
+ 	const char *fdtfile;
+ 	int rev = revision & 0x0f;
+ 
++	/* 2GB Pi 5B board rev 1.0 always has BCM2712D0 silicon */
++	if (revision == 0xb04170)
++		rev = 1;
++
+ 	if (env_get("fdtfile"))
+ 		return;
+ 
+-- 
+2.53.0
+

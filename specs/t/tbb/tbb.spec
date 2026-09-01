@@ -8,8 +8,8 @@
 
 Name:    tbb
 Summary: The Threading Building Blocks library abstracts low-level threading details
-Version: 2022.2.0
-Release: 5%{?dist}
+Version: 2022.3.0
+Release: 3%{?dist}
 License: Apache-2.0 AND BSD-3-Clause
 URL:     https://uxlfoundation.github.io/oneTBB/
 VCS:     git:%{giturl}.git
@@ -21,9 +21,6 @@ Source8: tbbmalloc_proxy.pc
 
 # Fix failure to link with GCC 15
 Patch:   tbb-c++-linkage.patch
-
-# Do not use -fcf-protection=full on non-x86 architectures
-Patch:   %{giturl}/pull/1768.patch
 
 BuildRequires: cmake
 BuildRequires: gcc-c++
@@ -123,9 +120,11 @@ for file in %{SOURCE7} %{SOURCE8}; do
 done
 
 # Upstream installs tbb32.pc on 32-bit but it's already in a separate directory
-# because %_libdir is different for 32-bit and 64-bit, so rename it to tbb.pc.
+# because %_libdir is different for 32-bit and 64-bit.
+# Some projects expect tbb.pc and some expect tbb32.pc, so provide both (as hard
+# links).
 if [ -f %{buildroot}/%{_libdir}/pkgconfig/%{name}32.pc ]; then
-    mv %{buildroot}/%{_libdir}/pkgconfig/%{name}32.pc %{buildroot}/%{_libdir}/pkgconfig/%{name}.pc
+    ln %{buildroot}/%{_libdir}/pkgconfig/%{name}32.pc %{buildroot}/%{_libdir}/pkgconfig/%{name}.pc
 fi
 
 rm -fr %{buildroot}%{_datadir}/doc
@@ -137,13 +136,13 @@ ctest --output-on-failure --force-new-ctest-process
 %files
 %doc README.md
 %license LICENSE.txt
-%{_libdir}/libtbb.so.12*
-%{_libdir}/libtbbmalloc.so.2*
-%{_libdir}/libtbbmalloc_proxy.so.2*
+%{_libdir}/libtbb.so.12{,.*}
+%{_libdir}/libtbbmalloc.so.2{,.*}
+%{_libdir}/libtbbmalloc_proxy.so.2{,.*}
 %{_libdir}/libirml.so.1
 
 %files bind
-%{_libdir}/libtbbbind_2_5.so.3*
+%{_libdir}/libtbbbind_2_5.so.3{,.*}
 
 %files devel
 %doc cmake/README.md
@@ -157,6 +156,16 @@ ctest --output-on-failure --force-new-ctest-process
 %doc python/README.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2022.3.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 14 2026 Christoph Erhardt <fedora@sicherha.de> - 2022.3.0-2
+- Ship both tbb32.pc and tbb.pc on i686
+
+* Sat Nov 22 2025 Jerry James <loganjerry@gmail.com> - 2022.3.0-1
+- Version 2022.3.0
+- Drop upstreamed fcf-protection patch
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2022.2.0-2
 - Rebuilt for Python 3.14.0rc3 bytecode
 

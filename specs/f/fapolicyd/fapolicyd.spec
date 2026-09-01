@@ -3,12 +3,12 @@
 
 %global selinuxtype targeted
 %global moduletype distributed
-%define semodule_version 1.1
+%define semodule_version 1.2
 
 Summary: Application Whitelisting Daemon
 Name: fapolicyd
-Version: 1.4.3
-Release: 6%{?dist}
+Version: 2.0.1
+Release: 1%{?dist}
 License: GPL-3.0-or-later
 URL: https://github.com/linux-application-whitelisting/fapolicyd
 Source0: https://github.com/linux-application-whitelisting/fapolicyd/releases/download/v%{version}/fapolicyd-%{version}.tar.gz
@@ -21,15 +21,11 @@ Source11: https://github.com/linux-application-whitelisting/%{name}-selinux/rele
 Source20: https://github.com/troydhanson/uthash/archive/refs/tags/v2.3.0.tar.gz#/uthash-2.3.0.tar.gz
 
 # https://github.com/linux-application-whitelisting/fapolicyd
-# $ git format-patch -N v1.4.3
+# $ git format-patch -N v2.0.1
 # https://github.com/linux-application-whitelisting/fapolicyd-selinux
 # $ git format-patch -N --start-number 100 --src-prefix=a/fapolicyd-selinux-1.1/ --dst-prefix=b/fapolicyd-selinux-1.1/ v1.1
 # $ for j in [0-9]*.patch; do printf "Patch: %s\n" $j; done
 # Patch list start
-Patch: 0002-If-less-than-16-chars-were-read-allow-shebang-test-c.patch
-Patch: 0003-Fix-binary-path-of-rpm-loader.patch
-Patch: 0004-Map-file-with-MAP_SHARED-instead-of-MAP_PRIVATE.patch
-Patch: 0005-Fix-segfault-when-interrupting-fapolicyd-startup.patch
 # Patch list end
 
 BuildRequires: gcc
@@ -123,7 +119,7 @@ make
 popd
 
 %check
-make check
+make check VERBOSE=yes
 
 # selinux
 %pre selinux
@@ -202,16 +198,18 @@ fi
 %attr(644,root,root) %{_unitdir}/%{name}.service
 %attr(644,root,root) %{_tmpfilesdir}/%{name}.conf
 %attr(644,root,root) %{_sysusersdir}/%{name}.conf
-%attr(755,root,root) %{_bindir}/%{name}-rpm-loader
 %attr(755,root,root) %{_sbindir}/%{name}
 %attr(755,root,root) %{_sbindir}/%{name}-cli
 %attr(755,root,root) %{_sbindir}/fagenrules
+%attr(755,root,root) %{_libexecdir}/%{name}-rpm-loader
 %attr(644,root,root) %{_mandir}/man8/*
 %attr(644,root,root) %{_mandir}/man5/*
 %ghost %attr(440,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/log/%{name}-access.log
 %attr(770,root,%{name}) %dir %{_localstatedir}/lib/%{name}
-%attr(770,root,%{name}) %dir /run/%{name}
-%ghost %attr(660,root,%{name}) /run/%{name}/%{name}.fifo
+%ghost %attr(770,root,%{name}) %dir %{_rundir}/%{name}
+%ghost %attr(660,root,%{name}) %{_rundir}/%{name}/%{name}.fifo
+%ghost %attr(600,root,root) %verify(not md5 size mtime) %{_rundir}/%{name}/%{name}.pid
+%ghost %attr(640,%{name},%{name}) %verify(not md5 size mtime) %{_rundir}/%{name}/%{name}.state
 %ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/data.mdb
 %ghost %attr(660,%{name},%{name}) %verify(not md5 size mtime) %{_localstatedir}/lib/%{name}/lock.mdb
 
@@ -234,6 +232,36 @@ fi
 %selinux_relabel_post -s %{selinuxtype}
 
 %changelog
+* Wed Aug 19 2026 Petr Lautrbach <lautrbach@redhat.com> - 2.0.1-1
+- fapolicyd-2.0.1
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v2.0.1
+
+* Thu Jul 23 2026 Petr Lautrbach <lautrbach@redhat.com> - 2.0-1
+- fapolicyd-2.0
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v2.0
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Jun 12 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.6-2
+- Rebuilt for openssl 4.0
+
+* Thu Jun 11 2026 Petr Lautrbach <lautrbach@redhat.com> - 1.6-1
+- fapolicyd-1.6
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v1.6
+
+* Wed May 20 2026 Petr Lautrbach <lautrbach@redhat.com> - 1.5-1
+- fapolicyd-1.5
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v1.5
+
+* Mon Mar 30 2026 Petr Lautrbach <lautrbach@redhat.com> - 1.4.5-1
+- fapolicyd-1.4.5
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v1.4.5
+
+* Thu Mar 19 2026 Petr Lautrbach <lautrbach@redhat.com> - 1.4.4-1
+- fapolicyd-1.4.4
+  https://github.com/linux-application-whitelisting/fapolicyd/releases/tag/v1.4.4
+
 * Tue Jan 27 2026 Petr Lautrbach <lautrbach@redhat.com> - 1.4.3-3
 - Fix binary path of rpm-loader
 - Map file with MAP_SHARED instead of MAP_PRIVATE

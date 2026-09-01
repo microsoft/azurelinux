@@ -68,8 +68,8 @@
 %define default_generate_notes 0
 
 Name: %{cross}-binutils
-Version: 2.45
-Release: 4%{?dist}
+Version: 2.46
+Release: 1%{?dist}
 Summary: A GNU collection of cross-compilation binary utilities
 License: GPL-3.0-or-later AND (GPL-3.0-or-later WITH Bison-exception-2.2) AND (LGPL-2.0-or-later WITH GCC-exception-2.0) AND BSD-3-Clause AND GFDL-1.3-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-2.0-or-later
 URL: https://sourceware.org/binutils
@@ -78,7 +78,7 @@ URL: https://sourceware.org/binutils
 # many controversial patches so we stick with the official FSF version
 # instead.
 
-Source: http://ftp.gnu.org/gnu/binutils/binutils-%{version}.tar.xz
+Source: http://ftp.gnu.org/gnu/binutils/binutils-with-gold-%{version}.tar.xz
 
 Source2: binutils-2.19.50.0.1-output-format.sed
 
@@ -134,40 +134,44 @@ Patch07: binutils-do-not-link-with-static-libstdc++.patch
 
 # Purpose:  Allow the binutils to be configured with any (recent) version of
 #            autoconf.
-# Lifetime: Fixed in 2.44 (maybe ?)
-Patch11: binutils-autoconf-version.patch
+# Lifetime: Fixed in 2.46 (maybe ?)
+Patch08: binutils-autoconf-version.patch
 
 # Purpose:  Stop libtool from inserting useless runpaths into binaries.
 # Lifetime: Who knows.
-Patch12: binutils-libtool-no-rpath.patch
+Patch09: binutils-libtool-no-rpath.patch
 
 # Purpose:  Fix binutils testsuite failures.
 # Lifetime: Permanent, but varies with each rebase.
-Patch14: binutils-testsuite-fixes.patch
+Patch10: binutils-testsuite-fixes.patch
 
 # Purpose:  Fix binutils testsuite failures for the RISCV-64 target.
 # Lifetime: Permanent, but varies with each rebase.
-Patch15: binutils-riscv-testsuite-fixes.patch
+Patch11: binutils-riscv-testsuite-fixes.patch
 
 # Purpose:  Fix the ar test of non-deterministic archives.
-# Lifetime: Fixed in 2.44
-Patch18: binutils-fix-ar-test.patch
+# Lifetime: Fixed in 2.46
+Patch12: binutils-fix-ar-test.patch
 
 # Purpose:  Fix a seg fault in the AArch64 linker when building u-boot.
-# Lifetime: Fixed in 2.45
-Patch19: binutils-aarch64-small-plt0.patch
+# Lifetime: Fixed in 2.46
+Patch13: binutils-aarch64-small-plt0.patch
+
+# Purpose:  Fix ld testsuite failures when enable_textrel is set.
+# Lifetime: Permanent.
+Patch20: binutils-ld-default-z-text.patch
+
 
 #----------------------------------------------------------------------------
 
-# Purpose:  Suppress the x86 linker's p_align-1 tests due to kernel bug on CentOS-10
+# Purpose:  Remove the Build protected-func-2 without PIE linker tests
+#            as these are currently failing.
+# Lifetime: TEMPORARY - should be fixed by the 2.46 release.
+Patch98: binutils-remove-ld-protected-func-2-test.patch
+
+# Purpose:  Suppress the x86 linker's p_align-1 tests due to kernel bug on CentOS-10.
 # Lifetime: TEMPORARY
 Patch99: binutils-suppress-ld-align-tests.patch
-
-# Purpose: Disable GCS warnings when shared dependencies are not built with GCS
-# support
-# Lifetime: TEMPORARY
-Patch100: binutils-disable-gcs-report-dynamic.patch
-Patch101: binutils-disable-gcs-report-dynamic-tests.patch
 
 #----------------------------------------------------------------------------
 
@@ -274,7 +278,7 @@ Cross-build binary image generation, manipulation and query tools. \
 #
 ###############################################################################
 %prep
-%global srcdir binutils-%{version}
+%global srcdir binutils-with-gold-%{version}
 %setup -q -n %{srcdir} -c
 cd %{srcdir}
 %patch -P01 -p1
@@ -284,15 +288,15 @@ cd %{srcdir}
 %patch -P05 -p1
 %patch -P06 -p1
 %patch -P07 -p1
+%patch -P08 -p1
+%patch -P09 -p1
+%patch -P10 -p1
 %patch -P11 -p1
 %patch -P12 -p1
-%patch -P14 -p1
-%patch -P15 -p1
-%patch -P18 -p1
-%patch -P19 -p1
+%patch -P13 -p1
+%patch -P20 -p1
+%patch -P98 -p1
 %patch -P99 -p1
-%patch -P100 -p1
-%patch -P101 -p1
 
 # We cannot run autotools as there is an exact requirement of autoconf-2.59.
 
@@ -774,6 +778,15 @@ cd -
 %do_files xtensa-linux-gnu	%{build_xtensa}
 
 %changelog
+* Sun Mar 29 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 2.46-1
+- Update to the binutils 2.46 release
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.45-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.45-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Sep 28 2025 Peter Robinson <pbrobinson@fedoraproject.org> - 2.45-1
 - Update to 2.45
 

@@ -4,7 +4,7 @@
 Name:           apache-logging-parent
 Summary:        Parent pom for Apache Logging Services projects
 Version:        9
-Release: 13%{?dist}
+Release:        13%{?dist}
 License:        Apache-2.0
 
 URL:            https://logging.apache.org/
@@ -13,7 +13,12 @@ Source1:        https://www.apache.org/licenses/LICENSE-2.0.txt
 BuildArch:      noarch
 ExclusiveArch:  %{java_arches} noarch
 
+%if 0%{?rhel} || 0%{?fedora} && 0%{?fedora} <= 42
+BuildRequires:  maven-local
+%else
 BuildRequires:  maven-local-openjdk25
+%endif
+
 BuildRequires:  mvn(org.apache:apache:pom:)
 
 %description
@@ -39,6 +44,15 @@ cp -p %SOURCE1 LICENSE
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 3 2025 Dogtag PKI Team <devel@lists.dogtagpki.org> - 9-11
+- Restore support for RHEL and older Fedora
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 9-10
 - Rebuilt for java-25-openjdk as preffered jdk
 

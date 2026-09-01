@@ -1,6 +1,6 @@
 diff -rupN --no-dereference devscripts/scripts/Makefile devscripts-new/scripts/Makefile
---- devscripts/scripts/Makefile	2025-12-30 09:38:40.010782155 +0100
-+++ devscripts-new/scripts/Makefile	2025-12-30 09:38:40.014342906 +0100
+--- devscripts/scripts/Makefile	2026-01-21 19:18:02.908736356 +0100
++++ devscripts-new/scripts/Makefile	2026-01-21 19:18:02.913217362 +0100
 @@ -174,7 +174,7 @@ clean:
  test: test_pl test_sh test_py
  

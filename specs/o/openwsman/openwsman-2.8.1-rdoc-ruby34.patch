@@ -1,0 +1,29 @@
+--- openwsman-2.8.1/bindings/ruby/rdoc_parser_swig.rb	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/bindings/ruby/rdoc_parser_swig.rb	2025-11-10 15:00:00.000000000 +0100
+@@ -108,10 +108,24 @@ class RDoc::Parser::SWIG < RDoc::Parser
+   ##
+   # Prepare to parse a SWIG file
+ 
+-  def initialize(top_level, file_name, content, options, stats)
+-    super
++  def initialize(top_level, file_name, content, options, stats = nil)
++    # RDoc 6.6+ (Ruby 3.3+) removed the stats parameter from Parser.initialize
++    # Check the arity of the parent class initialize method to determine which API we're using
++    parent_arity = RDoc::Parser.instance_method(:initialize).arity
++    
++    if parent_arity == 4 || parent_arity == -5
++      # RDoc 6.6+: only pass 4 arguments to super
++      super(top_level, file_name, content, options)
++      # Create a dummy stats object for compatibility
++      @stats = Object.new
++      def @stats.method_missing(m, *args); end
++    else
++      # Older RDoc: pass all 5 arguments including stats
++      super(top_level, file_name, content, options, stats)
++      @stats = stats
++    end
+ 
+     @known_classes = RDoc::KNOWN_CLASSES.dup
+     @content = handle_tab_width handle_ifdefs_in(@content)
+     @renames = {} # maps old_name => [ new_name, args ]
+     @aliases = {} # maps name => [ alias_name, args ]

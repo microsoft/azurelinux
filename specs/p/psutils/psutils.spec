@@ -9,7 +9,7 @@
 
 Name:       psutils
 Version:    2.10
-Release: 12%{?dist}
+Release:    9%{?dist}
 Summary:    PostScript utilities
 # COPYING:          GPLv3 text
 # epsffit.1:        GPLv3+

@@ -1,0 +1,137 @@
+From f7ac5e0f3fa806cb417277f63e738a9e862c64b0 Mon Sep 17 00:00:00 2001
+From: Enji Cooper <ngie@FreeBSD.org>
+Date: Sat, 30 Nov 2024 10:56:54 -0800
+Subject: [PATCH] Add more information to failed results
+
+This change adds more information to "premature failures" or failures
+where no output was provided on the command-line. This is being done to
+help make the reasons for why a failure occurred clearer to the
+end-user.
+
+This also fixes the fact that several ATF-related tests were failing with
+"empty output" (lacking exit code data), or not failing with the
+appropriate (expected) "timeout" messages.
+
+While here, address the fact that newer versions of sqlite3 fail when
+executing statements with `sqlite::api_error` instead of `store::error`.
+
+This addresses part of #237 and makes the kyua tests pass cleanly
+again on FreeBSD.
+
+Signed-off-by: Enji Cooper <ngie@FreeBSD.org>
+---
+ engine/atf_result.cpp            | 16 ++++++++++++----
+ engine/atf_result_test.cpp       |  7 ++++---
+ engine/atf_test.cpp              |  2 +-
+ integration/cmd_test_test.sh     |  4 ++--
+ store/write_transaction_test.cpp | 13 ++++++++++++-
+ 5 files changed, 31 insertions(+), 11 deletions(-)
+
+diff --git a/engine/atf_result.cpp b/engine/atf_result.cpp
+index f99b28f9..e8a20daf 100644
+--- a/engine/atf_result.cpp
++++ b/engine/atf_result.cpp
+@@ -625,13 +625,21 @@ engine::calculate_atf_result(const optional< process::status >& body_status,
+     try {
+         result = atf_result::load(results_file);
+     } catch (const engine::format_error& error) {
+-        result = atf_result(atf_result::broken, error.what());
++        if (body_status) {
++            result = atf_result(atf_result::broken,
++                F("Error: %s. Test case %s") %
++                error.what() %
++                format_status(body_status.get()));
++        } else {
++            // The test case timed out.  apply() handles this case later.
++        }
+     } catch (const std::runtime_error& error) {
+-        if (body_status)
++        if (body_status) {
+             result = atf_result(
+-                atf_result::broken, F("Premature exit; test case %s") %
++                atf_result::broken,
++                F("Error: Premature exit. Test case %s") %
+                 format_status(body_status.get()));
+-        else {
++        } else {
+             // The test case timed out.  apply() handles this case later.
+         }
+     }
+diff --git a/engine/atf_result_test.cpp b/engine/atf_result_test.cpp
+index 8ec61dc3..91938e02 100644
+--- a/engine/atf_result_test.cpp
++++ b/engine/atf_result_test.cpp
+@@ -664,7 +664,7 @@ ATF_TEST_CASE_BODY(calculate_atf_result__missing_file)
+     const status body_status = status::fake_exited(EXIT_SUCCESS);
+     const model::test_result expected(
+         model::test_result_broken,
+-        "Premature exit; test case exited with code 0");
++        "Error: Premature exit. Test case exited with code 0");
+     ATF_REQUIRE_EQ(expected, engine::calculate_atf_result(
+         utils::make_optional(body_status), fs::path("foo")));
+ }
+@@ -677,8 +677,9 @@ ATF_TEST_CASE_BODY(calculate_atf_result__bad_file)
+ 
+     const status body_status = status::fake_exited(EXIT_SUCCESS);
+     atf::utils::create_file("foo", "invalid\n");
+-    const model::test_result expected(model::test_result_broken,
+-                                      "Unknown test result 'invalid'");
++    const model::test_result expected(
++	model::test_result_broken,
++        "Error: Unknown test result 'invalid'. Test case exited with code 0");
+     ATF_REQUIRE_EQ(expected, engine::calculate_atf_result(
+         utils::make_optional(body_status), fs::path("foo")));
+ }
+diff --git a/engine/atf_test.cpp b/engine/atf_test.cpp
+index 9fe7797f..5f9b8c59 100644
+--- a/engine/atf_test.cpp
++++ b/engine/atf_test.cpp
+@@ -310,7 +310,7 @@ ATF_TEST_CASE_BODY(test__body_only__crashes)
+ 
+     const model::test_result exp_result(
+         model::test_result_broken,
+-        F("Premature exit; test case received signal %s (core dumped)") %
++        F("Error: Empty test result or no new line. Test case received signal %s (core dumped)") %
+         SIGABRT);
+     run_one(this, "crash", exp_result);
+ }
+diff --git a/integration/cmd_test_test.sh b/integration/cmd_test_test.sh
+index bc8c62da..d1d740fa 100644
+--- a/integration/cmd_test_test.sh
++++ b/integration/cmd_test_test.sh
+@@ -224,8 +224,8 @@ EOF
+ 
+ # CHECK_STYLE_DISABLE
+     cat >expout <<EOF
+-bogus_test_cases:die  ->  broken: Premature exit; test case received signal 9  [S.UUUs]
+-bogus_test_cases:exit  ->  broken: Premature exit; test case exited with code 0  [S.UUUs]
++bogus_test_cases:die  ->  broken: Error: Empty test result or no new line. Test case received signal 9  [S.UUUs]
++bogus_test_cases:exit  ->  broken: Error: Empty test result or no new line. Test case exited with code 0  [S.UUUs]
+ bogus_test_cases:pass  ->  passed  [S.UUUs]
+ 
+ Results file id is $(utils_results_id)
+diff --git a/store/write_transaction_test.cpp b/store/write_transaction_test.cpp
+index 984e328d..28107288 100644
+--- a/store/write_transaction_test.cpp
++++ b/store/write_transaction_test.cpp
+@@ -137,8 +137,19 @@ ATF_TEST_CASE_BODY(commit__fail)
+         backend.database().exec(
+             "CREATE TABLE foo ("
+             "a REFERENCES env_vars(var_name) DEFERRABLE INITIALLY DEFERRED)");
+-        backend.database().exec("INSERT INTO foo VALUES (\"WHAT\")");
++        // For whatever reason, multiple Linux distros seem to execute the
++        // sqlite statements differently from BSD-based OSes. The exception is
++        // raised on transaction commit in Linux, whereas it's executed
++        // immediately with BSD-based OSes. Linux's behavior seems more
++        // correct, because a deferred transaction was started, but not
++        // committed.
++        const char *bad_sql = "INSERT INTO foo VALUES ('WHAT')";
++#if defined(__linux__)
++        backend.database().exec(bad_sql);
+         ATF_REQUIRE_THROW(store::error, tx.commit());
++#else
++        ATF_REQUIRE_THROW(sqlite::api_error, backend.database().exec(bad_sql);
++#endif
+     }
+     // If the code attempts to maintain any state regarding the already-put
+     // objects and the commit does not clean up correctly, this would fail in

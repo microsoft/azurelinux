@@ -1,0 +1,28 @@
+From ec6bb812eef4521c18084a6eb9fc07455a7c7065 Mon Sep 17 00:00:00 2001
+From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Date: Tue, 19 Aug 2025 03:48:18 -0400
+Subject: [PATCH 2/2] Remove duplicate click option
+
+The most recent click is now warning about the duplication.
+
+Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+---
+ fiona/fio/cat.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/fiona/fio/cat.py b/fiona/fio/cat.py
+index ace1548..6e6a2a8 100644
+--- a/fiona/fio/cat.py
++++ b/fiona/fio/cat.py
+@@ -55,8 +55,6 @@ warnings.simplefilter("default")
+     default=False,
+     help="Optionally cut geometries at the anti-meridian. To be used only for a geographic destination CRS.",
+ )
+-@click.option('--where', default=None,
+-              help="attribute filter using SQL where clause")
+ @options.open_opt
+ @click.pass_context
+ @with_context_env
+-- 
+2.50.0
+

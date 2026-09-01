@@ -1,35 +1,48 @@
---- handlebars-5.1.2/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ handlebars-5.1.2/Cargo.toml	2024-04-28T20:46:28.101792+00:00
-@@ -97,9 +97,6 @@
+--- handlebars-6.4.3/Cargo.toml	2006-07-24T01:21:28+00:00
++++ handlebars-6.4.3/Cargo.toml	2026-07-12T17:46:55.043878+00:00
+@@ -72,10 +72,6 @@
+ path = "examples/decorator.rs"
+ 
+ [[example]]
+-name = "dev_mode"
+-path = "examples/dev_mode.rs"
+-
+-[[example]]
+ name = "error"
+ path = "examples/error.rs"
+ 
+@@ -155,11 +151,6 @@
+ [[test]]
+ name = "whitespace"
+ path = "tests/whitespace.rs"
+-
+-[[bench]]
+-name = "bench"
+-path = "benches/bench.rs"
+-harness = false
+ 
+ [dependencies.derive_builder]
+ version = "0.20.2"
+@@ -206,11 +197,12 @@
  version = "2.2.3"
  optional = true
  
 -[dev-dependencies.criterion]
--version = "0.5"
+-version = "0.8"
 -
  [dev-dependencies.env_logger]
- version = "0.10"
+ version = "0.11"
++
++[dev-dependencies.serde]
++version = "1.0.75"
++features = ["derive"]
  
-@@ -117,9 +114,6 @@
+ [dev-dependencies.serde_derive]
+ version = "1.0.75"
+@@ -225,6 +217,3 @@
+     "formatting",
      "parsing",
  ]
- 
+-
 -[dev-dependencies.tiny_http]
 -version = "0.12"
--
- [features]
- default = []
- dir_source = ["walkdir"]
-@@ -127,12 +121,5 @@
- script_helper = ["rhai"]
- string_helpers = ["heck"]
- 
--[target."cfg(unix)".dev-dependencies.pprof]
--version = "0.13"
--features = [
--    "flamegraph",
--    "prost-codec",
--]
--
- [badges.maintenance]
- status = "actively-developed"

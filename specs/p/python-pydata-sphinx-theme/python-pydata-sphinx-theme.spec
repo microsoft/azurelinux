@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 13;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -19,7 +19,7 @@
 %global giturl  https://github.com/pydata/pydata-sphinx-theme
 
 Name:           python-pydata-sphinx-theme
-Version:        0.16.1
+Version:        0.21.0
 Release:        %autorelease
 Summary:        Bootstrap-based Sphinx theme from the PyData community
 
@@ -33,17 +33,12 @@ Source0:        %{giturl}/archive/v%{version}/pydata-sphinx-theme-%{version}.tar
 Source1:        pydata-sphinx-theme-%{version}-vendor.tar.xz
 Source2:        pydata-sphinx-theme-%{version}-vendor-licenses.txt
 
-# Compatibility with Pygments 2.19+
-Patch:          https://github.com/pydata/pydata-sphinx-theme/pull/2091.patch
-
 %if %{with docs}
 # Generating image files requires network access.  Instead, we scrape these from
 # https://pydata-sphinx-theme.readthedocs.io/en/latest/_images.  See
 # docs/_static/gallery.yaml for a list of images to download.
 Source3:        pydata-gallery.tar.xz
 %endif
-# Fedora-only patch: unbundle the fontawesome fonts
-Patch:          %{name}-fontawesome.patch
 
 BuildArch:      noarch
 BuildSystem:    pyproject
@@ -51,15 +46,11 @@ BuildOption(install): -L pydata_sphinx_theme
 BuildOption(generate_buildrequires): -x test%{?with_docs:,doc}
 
 BuildRequires:  babel
-BuildRequires:  fontawesome-fonts-all
-BuildRequires:  fontawesome-fonts-web
 BuildRequires:  gcc-c++
 BuildRequires:  make
 BuildRequires:  nodejs-devel
-BuildRequires:  nodejs-npm
-BuildRequires:  yarnpkg
-
-Provides:       bundled(js-bootstrap) = 5.3.8
+BuildRequires:  /usr/bin/node
+BuildRequires:  /usr/bin/npm
 
 %if %{without docs}
 Obsoletes:      %{name}-doc < 0.13.0-1
@@ -89,7 +80,8 @@ See https://pydata-sphinx-theme.readthedocs.io/ for documentation.}
 Summary:        Bootstrap-based Sphinx theme from the PyData community
 Requires:       fontawesome-fonts-all
 Requires:       fontawesome-fonts-web
-Provides:       bundled(js-bootstrap) = 5.3.7
+
+Provides:       bundled(npm(bootstrap)) = 5.3.8
 
 %if %{without docs}
 Obsoletes:      %{name}-doc < 0.13.0-1
@@ -108,8 +100,6 @@ Documentation for pydata-sphinx-theme.
 
 %prep
 %autosetup -n pydata-sphinx-theme-%{version} -p1 -a1
-
-%conf
 cp -p %{SOURCE2} .
 
 %if %{with docs}
@@ -123,15 +113,17 @@ sed -i 's,https://pydata-sphinx-theme\.readthedocs\.io/en/latest/,,' docs/conf.p
 %global nodejs_version %(%{_bindir}/node -v | sed s/v//)
 sed -i 's,^\(node-version = \)".*",\1"%{nodejs_version}",' pyproject.toml
 
-%generate_buildrequires -p
+# Skip the playwright tests, since playwright is not available in Fedora
+%pyproject_patch_dependency pytest-playwright:ignore
+
+# Do not run coverage tools in an RPM build
+%pyproject_patch_dependency pytest-cov:ignore
+
 # The Fedora sphinx package does not provide sphinx[test]
 sed -i 's/\(sphinx\)\[test\]/\1/' pyproject.toml
-# Do not run code coverage tools
-sed -i 's/, "pytest-cov"//' pyproject.toml
 
 %build -p
-export YARN_CACHE_FOLDER="$PWD/.package-cache"
-yarn install --offline
+export npm_config_cache="$PWD/.package-cache"
 nodeenv --node=system --prebuilt --clean-src $PWD/.nodeenv
 
 %install -a
@@ -140,16 +132,25 @@ nodeenv --node=system --prebuilt --clean-src $PWD/.nodeenv
 sed -i '/\.gitignore/d' %{pyproject_files}
 rm %{themedir}/.gitignore
 
-# More work is required to fully unbundle the fontawesome fonts
-sed -i 's,pydata_sphinx_theme/\.\./\.\./\.\./\.\./\.\.,,g' \
-    %{themedir}/scripts/fontawesome.js.map \
+# Clean up build-host paths leaking into the source maps
+sed -i 's|pydata_sphinx_theme/\.\.||g' %{themedir}/scripts/fontawesome.js.map
+sed -i 's|pydata_sphinx_theme/\.\./\.\./\.\./\.\./\.\.||g' \
     %{themedir}/styles/pydata-sphinx-theme.css.map
-sed -e 's,url.*fa-solid-900\.woff2.*format("truetype"),local("fontawesome-free-fonts/Font Awesome 6 Free-Solid-900") format("opentype"),g' \
-    -e 's,url.*fa-regular-400\.woff2.*format("truetype"),local("fontawesome-free-fonts/Font Awesome 6 Free-Regular-400") format("opentype"),g' \
-    -e 's,url.*fa-brands-400\.woff2.*format("truetype"),local("fontawesome-brands-fonts/Font Awesome 6 Brands-Regular-400") format("opentype"),g' \
-    -i %{themedir}/styles/pydata-sphinx-theme.css
-sed -i '/vendor/d' %{pyproject_files}
-rm -fr %{themedir}/vendor
+
+# Unbundle the FontAwesome fonts: webpack already vendors the woff2 files
+# referenced by the (Fedora-patched) SCSS/JS imports into
+# vendor/fontawesome/webfonts/, copying them from the system
+# fontawesome-fonts-web package.  Replace those copies with symlinks back to
+# that package instead of shipping duplicate binaries.  The CSS/JS keep
+# referencing them with the same relative url()/path, so nothing else needs to
+# change; Sphinx dereferences the symlinks (real files, real bytes) when it
+# copies the static assets into a project's own build output, so the generated
+# documentation stays fully self-contained.
+for font in fa-brands-400.woff2 fa-regular-400.woff2 fa-solid-900.woff2; do
+    rm -f %{themedir}/vendor/fontawesome/webfonts/$font
+    ln -s %{_datadir}/fontawesome/webfonts/$font \
+        %{themedir}/vendor/fontawesome/webfonts/$font
+done
 
 %if %{with docs}
 # We need an installed tree before documentation building works properly
@@ -174,14 +175,45 @@ cd -
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.16.1-13
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 0.21.0-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 0.16.1-12
-- build: mass rebuild auto-bumpable components
+* Wed Aug 26 2026 Jerry James <loganjerry@gmail.com> - 0.21.0-1
+- Version 0.21.0
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 0.16.1-11
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Aug 26 2026 Jerry James <loganjerry@gmail.com> - 0.20.0-4
+- Remove the yarnpkg dependency
+
+* Tue Jul 28 2026 Jerry James <loganjerry@gmail.com> - 0.20.0-3
+- Yet another attempt at unbundling the fonts
+- Thanks to Corentin Noël for this approach
+
+* Tue Jul 14 2026 Jerry James <loganjerry@gmail.com> - 0.20.0-2
+- Correct paths to FontAwesome fonts
+
+* Fri Jul 10 2026 Jerry James <loganjerry@gmail.com> - 0.20.0-1
+- Version 0.20.0
+- Work harder to unbundle the FontAwesome fonts
+
+* Mon Jun 15 2026 Jerry James <loganjerry@gmail.com> - 0.19.0-1
+- Version 0.19.0
+
+* Wed May 20 2026 Jerry James <loganjerry@gmail.com> - 0.18.0-1
+- Version 0.18.0
+
+* Tue Apr 21 2026 Jerry James <loganjerry@gmail.com> - 0.17.1-1
+- Version 0.17.1
+- Do not run coverage tools in an RPM build
+
+* Fri Apr 03 2026 Jerry James <loganjerry@gmail.com> - 0.17.0-1
+- Version 0.17.0
+- Drop upstreamed pygments 2.19 patch
+
+* Thu Jan 29 2026 Jerry James <loganjerry@gmail.com> - 0.16.1-12
+- Adapt to nodejs changes in Rawhide
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.16.1-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Tue Dec 09 2025 Jerry James <loganjerry@gmail.com> - 0.16.1-10
 - Adapt to removal of %%{nodejs_version}

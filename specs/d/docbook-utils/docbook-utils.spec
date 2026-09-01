@@ -44,7 +44,7 @@ Requires: texlive-jadetex >= 7
 Requires: docbook-utils = %{version}
 Requires: tex(dvips)
 Requires: texlive-collection-fontsrecommended
-Requires: texlive-collection-htmlxml
+Requires: texlive-collection-formatsextra
 License: GPL-1.0-or-later
 Obsoletes: stylesheets-db2pdf <= %{version}-%{release}
 Provides: stylesheets-db2pdf = %{version}-%{release}
@@ -119,6 +119,15 @@ rm -rf $RPM_BUILD_ROOT/tmp
 %{_mandir}/*/docbook2ps.*
 
 %changelog
+* Tue Feb 10 2026 Than Ngo <than@redhat.com> - 0.6.15-6
+- Fix rhbz#2437555 - F44FailsToInstall 
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.15-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.15-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.6.15-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

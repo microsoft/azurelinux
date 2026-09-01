@@ -1,18 +1,52 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+#
+# Copyright Fedora Project Authors.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 %global upstreamname HIPIFY
 
-%global rocm_release 6.4
-%global rocm_patch 1
+%global rocm_release 7.1
+%global rocm_patch 0
 %global rocm_version %{rocm_release}.%{rocm_patch}
+
+%bcond_with compat
+%if %{with compat}
+%global pkg_libdir lib
+%global pkg_prefix %{_prefix}/lib64/rocm/rocm-%{rocm_release}/
+%global pkg_suffix -%{rocm_release}
+%global pkg_module rocm%{pkg_suffix}
+%else
+%global pkg_libdir %{_lib}
+%global pkg_prefix %{_prefix}
+%global pkg_suffix %{nil}
+%global pkg_module default
+%endif
 
 # This is a clang tool so best to build with clang
 %global toolchain clang
 
-Name:           hipify
+Name:           hipify%{pkg_suffix}
 Version:        %{rocm_version}
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        Convert CUDA to HIP
 
 Url:            https://github.com/ROCm
@@ -25,9 +59,9 @@ BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  perl
 # System clang may be too old, use rocm-llvm
-BuildRequires:  rocm-llvm-static
-BuildRequires:  rocm-clang-devel
-BuildRequires:  rocm-compilersupport-macros
+BuildRequires:  rocm-llvm%{pkg_suffix}-static
+BuildRequires:  rocm-clang%{pkg_suffix}-devel
+BuildRequires:  rocm-compilersupport%{pkg_suffix}-macros
 BuildRequires:  zlib-devel
 
 Requires:       perl
@@ -46,6 +80,8 @@ HIP C++ automatically.
 %cmake \
     -DCMAKE_CXX_COMPILER=%rocmllvm_bindir/clang++ \
     -DCMAKE_C_COMPILER=%rocmllvm_bindir/clang \
+    -DCMAKE_INSTALL_LIBDIR=%{pkg_libdir} \
+    -DCMAKE_INSTALL_PREFIX=%{pkg_prefix} \
     -DCMAKE_PREFIX_PATH=%{rocmllvm_cmakedir}/..
 
 %cmake_build
@@ -58,32 +94,45 @@ diff e.hip t.hip
 
 %install
 %cmake_install
-rm -rf %{buildroot}/usr/hip
+rm -rf %{buildroot}%{pkg_prefix}/hip
 # Fix executable perm:
-chmod a+x %{buildroot}%{_bindir}/*
+chmod a+x %{buildroot}%{pkg_prefix}/bin/*
 # Fix script shebang (Fedora doesn't allow using "env"):
-sed -i 's|\(/usr/bin/\)env perl|\1perl|' %{buildroot}%{_bindir}//hipify-perl
+sed -i 's|\(/usr/bin/\)env perl|\1perl|' %{buildroot}%{pkg_prefix}/bin//hipify-perl
 
 # Fix
 # /usr/bin/hipify-clang: error while loading shared libraries: libclang-cpp.so.19.0git
-chrpath %{buildroot}%{_bindir}/hipify-clang -r %rocmllvm_libdir
+chrpath %{buildroot}%{pkg_prefix}/bin/hipify-clang -r %rocmllvm_libdir
 
-if [ -d %{buildroot}%{_includedir} ]; then
-    rm -rf %{buildroot}%{_includedir}
-fi
+# No devel package
+rm -rf %{buildroot}%{pkg_prefix}/include
 
 %files
 %doc README.md
 %license LICENSE.txt
-%{_bindir}/hipconvertinplace-perl.sh
-%{_bindir}/hipconvertinplace.sh
-%{_bindir}/hipexamine-perl.sh
-%{_bindir}/hipexamine.sh
-%{_bindir}/hipify-clang
-%{_bindir}/hipify-perl
-%{_libexecdir}/%{name}
+%{pkg_prefix}/bin/hipify-clang
+%{pkg_prefix}/bin/hipify-perl
+%{pkg_prefix}/libexec/hipify/
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 22 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-2
+- Add --with compat
+
+* Fri Oct 31 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-1
+- Update to 7.1.0
+
+* Fri Sep 19 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.1-1
+- Update to 7.0.1
+
+* Thu Aug 28 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.1-5
+- Add Fedora copyright
+
+* Mon Aug 25 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.1-4
+- Simplify file removal
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.4.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

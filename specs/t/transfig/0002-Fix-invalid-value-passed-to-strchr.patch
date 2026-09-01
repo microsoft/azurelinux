@@ -1,0 +1,50 @@
+From 8422350ba8391d13d074cd7cea93c3fc479b4df4 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Wed, 10 Dec 2025 12:19:46 +0100
+Subject: [PATCH] Fix invalid value passed to strchr
+
+Upstream: https://sourceforge.net/p/mcj/tickets/200/
+---
+ fig2dev/bound.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/fig2dev/bound.c b/fig2dev/bound.c
+index baa2700..7e41bf4 100644
+--- a/fig2dev/bound.c
++++ b/fig2dev/bound.c
+@@ -718,19 +718,19 @@ text_bound(F_text *t, int *xmin, int *ymin, int *xmax, int *ymax, int inc_text)
+ 			 strchr(t->cstring,'x')		/* xi    */ ||
+ 			 strchr(t->cstring,'y')		/* psi   */ ||
+ 			 strchr(t->cstring,'z')		/* zeta  */ ||
+-			 strchr(t->cstring,'C'+'\200')	/* weierstrass    */ ||
+-			 strchr(t->cstring,'J'+'\200')	/* reflexsuperset */ ||
+-			 strchr(t->cstring,'M'+'\200')	/* reflexsubset   */ ||
+-			 strchr(t->cstring,'U'+'\200')	/* product        */ ||
+-			 strchr(t->cstring,'a'+'\200')	/* angleleft      */ ||
+-			 strchr(t->cstring,'e'+'\200')	/* summation      */ ||
+-			 strchr(t->cstring,'f'+'\200')	/* parenlefttp    */ ||
+-			 strchr(t->cstring,'h'+'\200')	/* parenleftbt    */ ||
+-			 strchr(t->cstring,'q'+'\200')	/* angleright     */ ||
+-			 strchr(t->cstring,'r'+'\200')	/* integral       */ ||
+-			 strchr(t->cstring,'v'+'\200')	/* parenrighttp   */ ||
+-			 strchr(t->cstring,'x'+'\200')	/* parenrightbt   */ ||
+-			 strchr(t->cstring,'&'+'\200')); /* florin        */
++			 strchr(t->cstring,'C'+0x80)	/* weierstrass    */ ||
++			 strchr(t->cstring,'J'+0x80)	/* reflexsuperset */ ||
++			 strchr(t->cstring,'M'+0x80)	/* reflexsubset   */ ||
++			 strchr(t->cstring,'U'+0x80)	/* product        */ ||
++			 strchr(t->cstring,'a'+0x80)	/* angleleft      */ ||
++			 strchr(t->cstring,'e'+0x80)	/* summation      */ ||
++			 strchr(t->cstring,'f'+0x80)	/* parenlefttp    */ ||
++			 strchr(t->cstring,'h'+0x80)	/* parenleftbt    */ ||
++			 strchr(t->cstring,'q'+0x80)	/* angleright     */ ||
++			 strchr(t->cstring,'r'+0x80)	/* integral       */ ||
++			 strchr(t->cstring,'v'+0x80)	/* parenrighttp   */ ||
++			 strchr(t->cstring,'x'+0x80)	/* parenrightbt   */ ||
++			 strchr(t->cstring,'&'+0x80));	/* florin        */
+ 
+ 	/* characters have some extent downside */
+ 	if (t->type == T_CENTER_JUSTIFIED) {
+-- 
+2.51.1
+

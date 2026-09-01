@@ -1,0 +1,189 @@
+From 6018c366dfdbfe5bc673019f307944b4d4f0b421 Mon Sep 17 00:00:00 2001
+From: Matt Clay <matt@mystile.com>
+Date: Fri, 15 May 2026 18:17:43 -0700
+Subject: [PATCH 1/2] ansible-test - Update base/default containers (#86958)
+
+---
+ .../_internal/_patches/_dataclass_annotation_patch.py     | 4 +++-
+ .../targets/ansible-test-sanity-pylint/aliases            | 1 +
+ test/lib/ansible_test/_internal/commands/sanity/pylint.py | 8 ++++++++
+ .../units/module_utils/_internal/_patches/test_patches.py | 3 ++-
+ 4 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/lib/ansible/module_utils/_internal/_patches/_dataclass_annotation_patch.py b/lib/ansible/module_utils/_internal/_patches/_dataclass_annotation_patch.py
+index 43da39a..85bf4e4 100644
+--- a/lib/ansible/module_utils/_internal/_patches/_dataclass_annotation_patch.py
++++ b/lib/ansible/module_utils/_internal/_patches/_dataclass_annotation_patch.py
+@@ -6,6 +6,8 @@ import dataclasses
+ import sys
+ import typing as t
+ 
++# deprecated: description='remove this patch once Python 3.14 is no longer supported on targets' python_version='3.14'
++
+ from . import CallablePatch
+ 
+ # trigger the bug by exposing typing.ClassVar via a module reference that is not `typing`
+@@ -24,7 +26,7 @@ class DataclassesIsTypePatch(CallablePatch):
+         @dataclasses.dataclass
+         class CheckClassVar:
+             # this is the broken case requiring patching: ClassVar dot-referenced from a module that is not `typing` is treated as an instance field
+-            # DTFIX-FUTURE: file/link CPython bug report, deprecate this patch if/when it's fixed in CPython
++            # fixed in CPython 3.15.0b1, see: https://github.com/python/cpython/pull/140541
+             a_classvar: _ts.ClassVar[int]  # type: ignore[name-defined]
+             a_field: int
+ 
+diff --git a/test/integration/targets/ansible-test-sanity-pylint/aliases b/test/integration/targets/ansible-test-sanity-pylint/aliases
+index 7741d44..d83e46d 100644
+--- a/test/integration/targets/ansible-test-sanity-pylint/aliases
++++ b/test/integration/targets/ansible-test-sanity-pylint/aliases
+@@ -2,3 +2,4 @@ shippable/posix/group3  # runs in the distro test containers
+ shippable/generic/group1  # runs in the default test container
+ context/controller
+ needs/target/collection
++skip/python3.15  # see: https://github.com/uqfoundation/dill/issues/753
+diff --git a/test/lib/ansible_test/_internal/commands/sanity/pylint.py b/test/lib/ansible_test/_internal/commands/sanity/pylint.py
+index 301ff47..71275ec 100644
+--- a/test/lib/ansible_test/_internal/commands/sanity/pylint.py
++++ b/test/lib/ansible_test/_internal/commands/sanity/pylint.py
+@@ -13,6 +13,7 @@ from . import (
+     SanitySingleVersion,
+     SanityMessage,
+     SanityFailure,
++    SanitySkipped,
+     SanitySuccess,
+     SanityTargets,
+     SANITY_ROOT,
+@@ -39,6 +40,7 @@ from ...util import (
+     SubprocessError,
+     display,
+     is_subdir,
++    str_to_version,
+ )
+ 
+ from ...util_common import (
+@@ -86,6 +88,12 @@ class PylintTest(SanitySingleVersion):
+         return [target for target in targets if os.path.splitext(target.path)[1] == '.py' or is_subdir(target.path, 'bin')]
+ 
+     def test(self, args: SanityConfig, targets: SanityTargets, python: PythonConfig) -> TestResult:
++        if str_to_version(python.version) >= (3, 15):
++            # see: https://github.com/uqfoundation/dill/issues/753
++            result = SanitySkipped(self.name, python.version)
++            result.reason = f'Skipping sanity test "{self.name}" due to lack of support for Python version {python.version} in the "dill" package.'
++            return result
++
+         target_paths = set(target.path for target in self.filter_remote_targets(list(targets.targets)))
+ 
+         plugin_dir = os.path.join(SANITY_ROOT, 'pylint', 'plugins')
+diff --git a/test/units/module_utils/_internal/_patches/test_patches.py b/test/units/module_utils/_internal/_patches/test_patches.py
+index 08c8497..c5b8d66 100644
+--- a/test/units/module_utils/_internal/_patches/test_patches.py
++++ b/test/units/module_utils/_internal/_patches/test_patches.py
+@@ -10,7 +10,7 @@ import typing as t
+ import pytest
+ 
+ from ansible.module_utils._internal import _patches
+-from ansible.module_utils._internal._patches import _socket_patch
++from ansible.module_utils._internal._patches import _socket_patch, _dataclass_annotation_patch
+ from ansible.module_utils.common._utils import get_all_subclasses
+ 
+ module_to_patch = sys.modules[__name__]
+@@ -38,6 +38,7 @@ def get_patch_required_test_cases() -> list:
+         # Example:
+         # _patches._some_patch_module.SomePatchClass: sys.version_info >= (3, 13),
+         _socket_patch.GetAddrInfoPatch: sys.version_info >= (3, 14),
++        _dataclass_annotation_patch.DataclassesIsTypePatch: sys.version_info >= (3, 15, 0, 'beta', 1),
+     }
+ 
+     patches = sorted(get_all_subclasses(_patches.CallablePatch), key=lambda item: item.__name__)
+-- 
+2.54.0
+
+
+From 7fd0f2b8cba8d120bcdac75d77fa95ea74730250 Mon Sep 17 00:00:00 2001
+From: Matt Davis <nitzmahone@redhat.com>
+Date: Mon, 11 May 2026 15:49:20 -0700
+Subject: [PATCH 2/2] Defer patch target attribute failure until verified
+ needed
+
+* Fixes startup failure under Python 3.15.0b1 on dataclass ClassVar annotation patch (which appears to have been fixed).
+* Adds explicit failure if the target attribute does not exist but `is_patch_needed` is True.
+* Added surrogate test coverage for the new defensive error case.
+---
+ changelogs/fragments/patch_resilience.yml     |  2 ++
+ .../_internal/_patches/__init__.py            |  8 ++++++-
+ test/units/_internal/_patches/__init__.py     |  0
+ test/units/_internal/_patches/test_patch.py   | 23 +++++++++++++++++++
+ 4 files changed, 32 insertions(+), 1 deletion(-)
+ create mode 100644 changelogs/fragments/patch_resilience.yml
+ create mode 100644 test/units/_internal/_patches/__init__.py
+ create mode 100644 test/units/_internal/_patches/test_patch.py
+
+diff --git a/changelogs/fragments/patch_resilience.yml b/changelogs/fragments/patch_resilience.yml
+new file mode 100644
+index 0000000..67b3991
+--- /dev/null
++++ b/changelogs/fragments/patch_resilience.yml
+@@ -0,0 +1,2 @@
++bugfixes:
++  - Internal patch framework - Defer failure on missing target patch attribute until `is_patch_needed` validator has confirmed that the behavior to be patched is present.
+diff --git a/lib/ansible/module_utils/_internal/_patches/__init__.py b/lib/ansible/module_utils/_internal/_patches/__init__.py
+index 7e08b04..4365ea9 100644
+--- a/lib/ansible/module_utils/_internal/_patches/__init__.py
++++ b/lib/ansible/module_utils/_internal/_patches/__init__.py
+@@ -42,7 +42,7 @@ class CallablePatch(abc.ABC):
+     @classmethod
+     def get_current_implementation(cls) -> t.Any:
+         """Get the current (possibly patched) implementation from the patch target container."""
+-        return getattr(cls.target_container, cls.target_attribute)
++        return getattr(cls.target_container, cls.target_attribute, ...)
+ 
+     @classmethod
+     def patch(cls) -> None:
+@@ -55,6 +55,12 @@ class CallablePatch(abc.ABC):
+         if not cls.is_patch_needed():
+             return
+ 
++        if cls.unpatched_implementation is ...:
++            raise RuntimeError(
++                f"Patch {cls.__name__!r} appears to be needed, but implementation to be patched "
++                f"('{cls.target_container.__name__}.{cls.target_attribute}') is not present."
++            )
++
+         # __call__ requires an instance (otherwise it'll be __new__)
+         setattr(cls.target_container, cls.target_attribute, cls())
+ 
+diff --git a/test/units/_internal/_patches/__init__.py b/test/units/_internal/_patches/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/test/units/_internal/_patches/test_patch.py b/test/units/_internal/_patches/test_patch.py
+new file mode 100644
+index 0000000..fe942c1
+--- /dev/null
++++ b/test/units/_internal/_patches/test_patch.py
+@@ -0,0 +1,23 @@
++import pytest
++import typing as t
++
++from ansible.module_utils._internal._patches import CallablePatch
++
++
++class BogusPatch(CallablePatch):
++    """Coverage-oriented simulated patch where the patch is required but the original implementation to be patched does not exist."""
++
++    target_container: t.ClassVar = dict
++    target_attribute = '_bogus_dict_attr'
++
++    @classmethod
++    def is_patch_needed(cls) -> bool:
++        return True
++
++    def __call__(self, annotation, cls, a_module, a_type, is_type_predicate) -> bool:
++        raise NotImplementedError("should not be called")
++
++
++def test_bogus_patch():
++    with pytest.raises(RuntimeError, match="implementation to be patched .* is not present"):
++        BogusPatch.patch()
+-- 
+2.54.0
+

@@ -7,7 +7,7 @@
 
 Name: kdump-anaconda-addon
 Version: 006
-Release: 16.%{snapshotdate}git%{gitshortcommit}%{?dist}
+Release: 17.%{snapshotdate}git%{gitshortcommit}%{?dist}
 Url: https://github.com/rhinstaller/kdump-anaconda-addon
 License: GPL-2.0-only
 Summary: Kdump configuration anaconda addon
@@ -44,6 +44,9 @@ Kdump anaconda addon
 %{_datadir}/icons/hicolor/scalable/apps/kdump.svg
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 006-17.20250925git2a3605a
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Sep 25 2025 Coiby Xu <coxu@redhat.com> - 006-16.20250925git2a3605a
 - Feature: Set up crypttab for encrypted dump target
 

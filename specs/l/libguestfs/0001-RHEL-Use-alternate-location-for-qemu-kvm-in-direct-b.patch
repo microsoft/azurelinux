@@ -1,0 +1,30 @@
+From f7143b63d106bfab2ec8198932fb8ceeba502b23 Mon Sep 17 00:00:00 2001
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Tue, 17 Mar 2026 20:14:16 +0000
+Subject: [PATCH] RHEL: Use alternate location for qemu-kvm in direct backend
+
+We don't have to change the libvirt backend since libvirt knows where
+to find qemu on RHEL.
+---
+ lib/launch-direct.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/launch-direct.c b/lib/launch-direct.c
+index b2021ee2c..12f969c7e 100644
+--- a/lib/launch-direct.c
++++ b/lib/launch-direct.c
+@@ -446,6 +446,11 @@ free_pid_path:
+ static const char *
+ get_default_hv_direct (guestfs_h *g, void *datav)
+ {
++  /* RHEL puts qemu in a strange place. */
++  static const char rhel_qemu[] = "/usr/libexec/qemu-kvm";
++  if (access (rhel_qemu, X_OK) == 0)
++    return rhel_qemu;
++
+   if (host_cpu[0] == 'i' && strchr ("3456", host_cpu[1]) &&
+       host_cpu[2] == '8' && host_cpu[3] == '6' && host_cpu[4] == '\0')
+     return "qemu-system-i386";
+-- 
+2.53.0
+

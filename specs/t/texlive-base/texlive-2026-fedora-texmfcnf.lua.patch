@@ -1,0 +1,42 @@
+diff -up texmf-dist/web2c/texmfcnf.lua.orig texmf-dist/web2c/texmfcnf.lua
+--- texmf-dist/web2c/texmfcnf.lua.orig	2026-02-20 16:05:40.000000000 -0500
++++ texmf-dist/web2c/texmfcnf.lua	2026-03-14 15:16:26.451351540 -0400
+@@ -42,7 +42,7 @@ local package_revision = "A"
+ -- The location of the distribution's TEXMF tree. The contents stored in this
+ -- path should not be modified by users, and are solely managed by the
+ -- distribution itself.
+-local distribution_path = "selfautoparent:texmf-dist"
++local distribution_path = "/usr/share/texlive/texmf-dist"
+ 
+ -- Where ConTeXt should store any caches. There is a single "system" folder for
+ -- the entire computer, and this folder is typically only writable by
+@@ -57,7 +57,7 @@ local user_cache   = "home:.texlive2026"
+ -- Where ConTeXt should search for custom files. "system" and "user" have the
+ -- same meaning as above. ConTeXt will never write to or otherwise modify these
+ -- files itself.
+-local system_data = "selfautoparent:../texmf-local"
++local system_data = "/usr/share/texlive/texmf-local"
+ local user_data   = "home:texmf"
+ 
+ -- The location of non-TeX files optionally used by ConTeXt. Different paths are
+@@ -155,9 +155,10 @@ return {
+         variables = {
+             -- System trees
+             TEXMFDIST      = distribution_path,
++            TEXMFFEDORA    = "/usr/share/texmf",
+             TEXMFLOCAL     = system_data,
+-            TEXMFSYSCONFIG = system_cache .. "/texmf-config",
+-            TEXMFSYSVAR    = system_cache .. "/texmf-var",
++            TEXMFSYSCONFIG = "/usr/share/texlive/texmf-config",
++            TEXMFSYSVAR    = "/var/lib/texmf",
+ 
+             -- User trees
+             TEXMFCONFIG = user_cache .. "/texmf-config",
+@@ -172,6 +173,7 @@ return {
+                               !!$TEXMFSYSCONFIG,\z
+                               !!$TEXMFSYSVAR,\z
+                               !!$TEXMFLOCAL,\z
++                              !!$TEXMFFEDORA,\z
+                               !!$TEXMFDIST\z
+                           }",
+ 

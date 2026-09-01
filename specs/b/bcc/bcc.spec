@@ -22,7 +22,7 @@
 
 Name:           bcc
 Version:        0.35.0
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        BPF Compiler Collection (BCC)
 License:        Apache-2.0
 URL:            https://github.com/iovisor/bcc
@@ -141,8 +141,8 @@ Command line libbpf tools for BPF Compiler Collection (BCC)
 # renaming them in there and the install code will just
 # take them.
 pushd libbpf-tools;
-make BPFTOOL=bpftool LIBBPF_OBJ=%{_libdir}/libbpf.a CFLAGS="%{optflags}" LDFLAGS="%{build_ldflags}"
-make DESTDIR=./tmp-install prefix= install
+%make_build BPFTOOL=bpftool LIBBPF_OBJ=%{_libdir}/libbpf.a CFLAGS="%{optflags}" LDFLAGS="%{build_ldflags}"
+%make_install DESTDIR=./tmp-install prefix=
 (
     cd tmp-install/bin
     for file in *; do
@@ -177,6 +177,9 @@ done
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mv %{buildroot}%{_datadir}/%{name}/examples %{buildroot}%{_docdir}/%{name}/
 
+# Delete static libraries we don't want to ship
+rm -f %{buildroot}%{_libdir}/lib%{name}*.a
+
 # Delete old tools we don't want to ship
 rm -rf %{buildroot}%{_datadir}/%{name}/tools/old/
 
@@ -199,8 +202,6 @@ cp -a libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}/
 %{_libdir}/libbcc_bpf.so.*
 
 %files devel
-%exclude %{_libdir}/lib%{name}*.a
-%exclude %{_libdir}/lib%{name}*.la
 %{_libdir}/lib%{name}.so
 %{_libdir}/libbcc_bpf.so
 %{_libdir}/pkgconfig/lib%{name}.pc
@@ -228,9 +229,11 @@ cp -a libbpf-tools/tmp-install/bin/* %{buildroot}/%{_sbindir}/
 %{_sbindir}/bpf-*
 
 %changelog
-* Tue Nov 04 2025 Jerome Marchand <jmarchan@redhat.com> - 0.35.0-3
-- Fix build with clang 21
-- Rebuilt for Python 3.14.0rc3 bytecode (rhbz#2397403)
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.35.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.35.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.35.0-3
 - Rebuilt for Python 3.14.0rc3 bytecode

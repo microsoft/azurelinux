@@ -1,16 +1,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-# The minimum required osbuild version, note that this used to be 129
-# but got bumped to 138 for librepo support which is not strictly
-# required. So if this needs backport to places where there is no
-# recent osbuild available we could simply make --use-librepo false
-# and go back to 129.
-%global min_osbuild_version 171
+%global min_osbuild_version 183
+%global goipath         github.com/osbuild/image-builder
 
-%global goipath         github.com/osbuild/image-builder-cli
-
-Version:        51
+Version:        79.0.0
 
 %gometa
 
@@ -20,7 +14,7 @@ OSTree commits. Uses osbuild under the hood.
 }
 
 Name:           image-builder
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        An image building executable using osbuild
 ExcludeArch:    i686
 
@@ -30,18 +24,21 @@ ExcludeArch:    i686
 License:        Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND CC-BY-SA-4.0 AND ISC AND MIT AND MPL-2.0 AND Unlicense
 
 URL:            %{gourl}
-Source0:        https://github.com/osbuild/image-builder-cli/releases/download/v%{version}/image-builder-cli-%{version}.tar.gz
+Source0:        https://github.com/osbuild/image-builder/releases/download/v%{version}/image-builder-%{version}.tar.gz
 
 
 BuildRequires:  %{?go_compiler:compiler(go-compiler)}%{!?go_compiler:golang}
+BuildRequires:  libvirt-devel
+BuildRequires:  skopeo
+
+# Build requirements of the `kerby/kerby` package
+BuildRequires:  krb5-devel
 # Build requirements of 'theproglottis/gpgme' package
 BuildRequires:  gpgme-devel
 BuildRequires:  libassuan-devel
 # Build requirements of 'github.com/containers/storage' package
 BuildRequires:  device-mapper-devel
 BuildRequires:  libxcrypt-devel
-# Build requiremets of 'github.com/osbuild/images' package
-BuildRequires:  libvirt-devel
 %if 0%{?fedora}
 # Build requirements of 'github.com/containers/storage' package
 BuildRequires:  btrfs-progs-devel
@@ -49,96 +46,118 @@ BuildRequires:  btrfs-progs-devel
 BuildRequires:  systemd-rpm-macros
 # DO NOT REMOVE the BUNDLE_START and BUNDLE_END markers as they are used by 'tools/rpm_spec_add_provides_bundle.sh' to generate the Provides: bundled list
 # BUNDLE_START
-Provides: bundled(golang(dario.cat/mergo)) = 1.0.2
+Provides: bundled(golang(cel.dev/expr)) = 0.25.1
+Provides: bundled(golang(cloud.google.com/go)) = 0.121.6
+Provides: bundled(golang(cloud.google.com/go/auth)) = 0.16.5
+Provides: bundled(golang(cloud.google.com/go/auth/oauth2adapt)) = 0.2.8
+Provides: bundled(golang(cloud.google.com/go/compute)) = 1.45.0
+Provides: bundled(golang(cloud.google.com/go/compute/metadata)) = 0.9.0
+Provides: bundled(golang(cloud.google.com/go/iam)) = 1.5.2
+Provides: bundled(golang(cloud.google.com/go/monitoring)) = 1.24.2
+Provides: bundled(golang(cloud.google.com/go/storage)) = 1.56.1
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/azcore)) = 1.21.0
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/azidentity)) = 1.13.1
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/internal)) = 1.11.2
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute/v5)) = 5.7.0
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork/v7)) = 7.2.0
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources)) = 1.2.0
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/storage/armstorage)) = 1.8.1
+Provides: bundled(golang(github.com/Azure/azure-sdk-for-go/sdk/storage/azblob)) = 1.6.4
+Provides: bundled(golang(github.com/AzureAD/microsoft-authentication-library-for-go)) = 1.6.0
 Provides: bundled(golang(github.com/BurntSushi/toml)) = 1.6.0
+Provides: bundled(golang(github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp)) = 1.30.0
+Provides: bundled(golang(github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric)) = 0.53.0
+Provides: bundled(golang(github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping)) = 0.53.0
 Provides: bundled(golang(github.com/IBM/go-sdk-core/v5)) = 5.21.0
 Provides: bundled(golang(github.com/IBM/ibm-cos-sdk-go)) = 1.12.3
-Provides: bundled(golang(github.com/Microsoft/go-winio)) = 0.6.2
-Provides: bundled(golang(github.com/Microsoft/hcsshim)) = 0.13.0
 Provides: bundled(golang(github.com/VividCortex/ewma)) = 1.2.0
 Provides: bundled(golang(github.com/acarl005/stripansi)) = 5a71ef0
 Provides: bundled(golang(github.com/asaskevich/govalidator)) = a9d515a
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2)) = 1.38.3
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream)) = 1.7.1
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/config)) = 1.31.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/credentials)) = 1.18.10
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/feature/ec2/imds)) = 1.18.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/feature/s3/manager)) = 1.19.4
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/configsources)) = 1.4.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/endpoints/v2)) = 2.7.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/ini)) = 1.8.3
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/v4a)) = 1.4.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/ec2)) = 1.249.0
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding)) = 1.13.1
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/checksum)) = 1.8.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/presigned-url)) = 1.13.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/s3shared)) = 1.19.6
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/s3)) = 1.87.3
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/sso)) = 1.29.1
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/ssooidc)) = 1.34.2
-Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/sts)) = 1.38.2
-Provides: bundled(golang(github.com/aws/smithy-go)) = 1.23.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2)) = 1.42.1
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream)) = 1.7.14
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/config)) = 1.32.29
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/credentials)) = 1.19.28
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/feature/ec2/imds)) = 1.18.30
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/feature/s3/transfermanager)) = 0.3.1
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/configsources)) = 1.4.30
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/endpoints/v2)) = 2.7.30
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/internal/v4a)) = 1.4.31
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/ec2)) = 1.316.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding)) = 1.13.13
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/checksum)) = 1.9.23
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/presigned-url)) = 1.13.30
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/internal/s3shared)) = 1.19.31
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/s3)) = 1.105.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/signin)) = 1.4.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/sso)) = 1.32.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/ssooidc)) = 1.37.0
+Provides: bundled(golang(github.com/aws/aws-sdk-go-v2/service/sts)) = 1.44.0
+Provides: bundled(golang(github.com/aws/smithy-go)) = 1.27.3
+Provides: bundled(golang(github.com/cespare/xxhash/v2)) = 2.3.0
 Provides: bundled(golang(github.com/cheggaaa/pb/v3)) = 3.1.7
-Provides: bundled(golang(github.com/containerd/cgroups/v3)) = 3.0.5
-Provides: bundled(golang(github.com/containerd/errdefs)) = 1.0.0
-Provides: bundled(golang(github.com/containerd/errdefs/pkg)) = 0.3.0
-Provides: bundled(golang(github.com/containerd/stargz-snapshotter/estargz)) = 0.16.3
-Provides: bundled(golang(github.com/containerd/typeurl/v2)) = 2.2.3
-Provides: bundled(golang(github.com/containers/common)) = 0.64.1
-Provides: bundled(golang(github.com/containers/image/v5)) = 5.36.1
+Provides: bundled(golang(github.com/cncf/xds/go)) = ee656c7
+Provides: bundled(golang(github.com/containers/common)) = 0.64.2
+Provides: bundled(golang(github.com/containers/image/v5)) = 5.36.2
 Provides: bundled(golang(github.com/containers/libtrust)) = c1716e8
 Provides: bundled(golang(github.com/containers/ocicrypt)) = 1.2.1
 Provides: bundled(golang(github.com/containers/storage)) = 1.59.1
 Provides: bundled(golang(github.com/coreos/go-semver)) = 0.3.1
+Provides: bundled(golang(github.com/cpuguy83/go-md2man/v2)) = 2.0.6
 Provides: bundled(golang(github.com/cyberphone/json-canonicalization)) = 19d51d7
-Provides: bundled(golang(github.com/cyphar/filepath-securejoin)) = 0.4.1
 Provides: bundled(golang(github.com/davecgh/go-spew)) = d8f796a
 Provides: bundled(golang(github.com/distribution/reference)) = 0.6.0
 Provides: bundled(golang(github.com/docker/distribution)) = 2.8.3+incompatible
-Provides: bundled(golang(github.com/docker/docker)) = 28.3.3+incompatible
+Provides: bundled(golang(github.com/docker/docker)) = 28.3.2+incompatible
 Provides: bundled(golang(github.com/docker/docker-credential-helpers)) = 0.9.3
 Provides: bundled(golang(github.com/docker/go-connections)) = 0.5.0
 Provides: bundled(golang(github.com/docker/go-units)) = 0.5.0
+Provides: bundled(golang(github.com/dougm/pretty)) = add1dbc
+Provides: bundled(golang(github.com/envoyproxy/go-control-plane/envoy)) = 1.36.0
+Provides: bundled(golang(github.com/envoyproxy/protoc-gen-validate)) = 1.3.0
 Provides: bundled(golang(github.com/fatih/color)) = 1.18.0
 Provides: bundled(golang(github.com/felixge/httpsnoop)) = 1.0.4
 Provides: bundled(golang(github.com/gabriel-vasile/mimetype)) = 1.4.8
-Provides: bundled(golang(github.com/go-jose/go-jose/v4)) = 4.0.5
+Provides: bundled(golang(github.com/go-jose/go-jose/v4)) = 4.1.4
 Provides: bundled(golang(github.com/go-logr/logr)) = 1.4.3
 Provides: bundled(golang(github.com/go-logr/stdr)) = 1.2.2
-Provides: bundled(golang(github.com/go-openapi/errors)) = 0.22.0
+Provides: bundled(golang(github.com/go-openapi/errors)) = 0.22.1
 Provides: bundled(golang(github.com/go-openapi/strfmt)) = 0.23.0
 Provides: bundled(golang(github.com/go-playground/locales)) = 0.14.1
 Provides: bundled(golang(github.com/go-playground/universal-translator)) = 0.18.1
 Provides: bundled(golang(github.com/go-playground/validator/v10)) = 10.26.0
 Provides: bundled(golang(github.com/gobwas/glob)) = 0.2.3
-Provides: bundled(golang(github.com/gogo/protobuf)) = 1.3.2
-Provides: bundled(golang(github.com/golang/groupcache)) = 2c02b82
+Provides: bundled(golang(github.com/gocomply/scap)) = 0.1.3
+Provides: bundled(golang(github.com/golang-jwt/jwt/v5)) = 5.3.0
 Provides: bundled(golang(github.com/golang/protobuf)) = 1.5.4
+Provides: bundled(golang(github.com/google/go-cmp)) = 0.7.0
 Provides: bundled(golang(github.com/google/go-containerregistry)) = 0.20.3
-Provides: bundled(golang(github.com/google/go-intervals)) = 0.0.2
+Provides: bundled(golang(github.com/google/s2a-go)) = 0.1.9
 Provides: bundled(golang(github.com/google/uuid)) = 1.6.0
-Provides: bundled(golang(github.com/gophercloud/gophercloud/v2)) = 2.8.0
+Provides: bundled(golang(github.com/googleapis/enterprise-certificate-proxy)) = 0.3.6
+Provides: bundled(golang(github.com/googleapis/gax-go/v2)) = 2.15.0
+Provides: bundled(golang(github.com/gophercloud/gophercloud/v2)) = 2.10.0
 Provides: bundled(golang(github.com/gorilla/mux)) = 1.8.1
 Provides: bundled(golang(github.com/hashicorp/errwrap)) = 1.1.0
 Provides: bundled(golang(github.com/hashicorp/go-cleanhttp)) = 0.5.2
 Provides: bundled(golang(github.com/hashicorp/go-multierror)) = 1.1.1
 Provides: bundled(golang(github.com/hashicorp/go-retryablehttp)) = 0.7.8
-Provides: bundled(golang(github.com/hashicorp/go-version)) = 1.7.0
+Provides: bundled(golang(github.com/hashicorp/go-version)) = 1.9.0
 Provides: bundled(golang(github.com/inconshreveable/mousetrap)) = 1.1.0
 Provides: bundled(golang(github.com/jmespath/go-jmespath)) = b0104c8
 Provides: bundled(golang(github.com/json-iterator/go)) = 1.1.12
 Provides: bundled(golang(github.com/klauspost/compress)) = 1.18.0
 Provides: bundled(golang(github.com/klauspost/pgzip)) = 1.2.6
+Provides: bundled(golang(github.com/kolo/xmlrpc)) = a4b6fa1
+Provides: bundled(golang(github.com/kr/text)) = 0.2.0
+Provides: bundled(golang(github.com/kylelemons/godebug)) = 1.1.0
 Provides: bundled(golang(github.com/leodido/go-urn)) = 1.4.0
 Provides: bundled(golang(github.com/letsencrypt/boulder)) = de9c061
 Provides: bundled(golang(github.com/mattn/go-colorable)) = 0.1.14
-Provides: bundled(golang(github.com/mattn/go-isatty)) = 0.0.20
+Provides: bundled(golang(github.com/mattn/go-isatty)) = 0.0.22
 Provides: bundled(golang(github.com/mattn/go-runewidth)) = 0.0.16
 Provides: bundled(golang(github.com/mattn/go-sqlite3)) = 1.14.28
 Provides: bundled(golang(github.com/miekg/pkcs11)) = 1.1.1
-Provides: bundled(golang(github.com/mistifyio/go-zfs/v3)) = 3.0.1
 Provides: bundled(golang(github.com/mitchellh/mapstructure)) = 1.5.0
-Provides: bundled(golang(github.com/moby/docker-image-spec)) = 1.3.1
 Provides: bundled(golang(github.com/moby/sys/capability)) = 0.4.0
 Provides: bundled(golang(github.com/moby/sys/mountinfo)) = 0.7.2
 Provides: bundled(golang(github.com/moby/sys/user)) = 0.4.0
@@ -148,53 +167,65 @@ Provides: bundled(golang(github.com/oklog/ulid)) = 1.3.1
 Provides: bundled(golang(github.com/opencontainers/go-digest)) = 1.0.0
 Provides: bundled(golang(github.com/opencontainers/image-spec)) = 1.1.1
 Provides: bundled(golang(github.com/opencontainers/runtime-spec)) = 1.2.1
-Provides: bundled(golang(github.com/opencontainers/selinux)) = 1.12.0
-Provides: bundled(golang(github.com/osbuild/blueprint)) = 1.23.0
-Provides: bundled(golang(github.com/osbuild/images)) = 0.244.0
-Provides: bundled(golang(github.com/pkg/errors)) = 0.9.1
+Provides: bundled(golang(github.com/oracle/oci-go-sdk/v54)) = 54.0.0
+Provides: bundled(golang(github.com/osbuild/blueprint)) = 1.32.0
+Provides: bundled(golang(github.com/pkg/browser)) = 5ac0b6a
+Provides: bundled(golang(github.com/planetscale/vtprotobuf)) = 0393e58
 Provides: bundled(golang(github.com/pmezard/go-difflib)) = 5d4384e
 Provides: bundled(golang(github.com/proglottis/gpgme)) = 0.1.4
-Provides: bundled(golang(github.com/prometheus/client_golang)) = 1.23.0
 Provides: bundled(golang(github.com/rivo/uniseg)) = 0.4.7
+Provides: bundled(golang(github.com/russross/blackfriday/v2)) = 2.1.0
 Provides: bundled(golang(github.com/secure-systems-lab/go-securesystemslib)) = 0.9.0
 Provides: bundled(golang(github.com/sigstore/fulcio)) = 1.6.6
 Provides: bundled(golang(github.com/sigstore/protobuf-specs)) = 0.4.1
 Provides: bundled(golang(github.com/sigstore/sigstore)) = 1.9.5
 Provides: bundled(golang(github.com/sirupsen/logrus)) = 1.9.4
 Provides: bundled(golang(github.com/smallstep/pkcs7)) = 0.1.1
+Provides: bundled(golang(github.com/sony/gobreaker)) = dd874f9
 Provides: bundled(golang(github.com/spf13/cobra)) = 1.10.2
 Provides: bundled(golang(github.com/spf13/pflag)) = 1.0.10
+Provides: bundled(golang(github.com/spiffe/go-spiffe/v2)) = 2.6.0
 Provides: bundled(golang(github.com/stefanberger/go-pkcs11uri)) = 7828495
 Provides: bundled(golang(github.com/stretchr/testify)) = 1.11.1
-Provides: bundled(golang(github.com/sylabs/sif/v2)) = 2.21.1
-Provides: bundled(golang(github.com/tchap/go-patricia/v2)) = 2.3.3
+Provides: bundled(golang(github.com/supakeen/yamlplus)) = 1.1.0
 Provides: bundled(golang(github.com/titanous/rocacheck)) = afe7314
-Provides: bundled(golang(github.com/ulikunitz/xz)) = 0.5.12
+Provides: bundled(golang(github.com/ubccr/kerby)) = 412be7b
+Provides: bundled(golang(github.com/ulikunitz/xz)) = 0.5.15
 Provides: bundled(golang(github.com/vbatts/tar-split)) = 0.12.1
 Provides: bundled(golang(github.com/vbauerster/mpb/v8)) = 8.10.2
+Provides: bundled(golang(github.com/vmware/govmomi)) = 0.52.0
 Provides: bundled(golang(go.mongodb.org/mongo-driver)) = 1.17.2
-Provides: bundled(golang(go.opencensus.io)) = 0.24.0
-Provides: bundled(golang(go.opentelemetry.io/auto/sdk)) = 1.1.0
+Provides: bundled(golang(go.opentelemetry.io/auto/sdk)) = 1.2.1
+Provides: bundled(golang(go.opentelemetry.io/contrib/detectors/gcp)) = 1.39.0
+Provides: bundled(golang(go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc)) = 0.61.0
 Provides: bundled(golang(go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp)) = 0.61.0
-Provides: bundled(golang(go.opentelemetry.io/otel)) = 1.36.0
-Provides: bundled(golang(go.opentelemetry.io/otel/metric)) = 1.36.0
-Provides: bundled(golang(go.opentelemetry.io/otel/trace)) = 1.36.0
+Provides: bundled(golang(go.opentelemetry.io/otel)) = 1.39.0
+Provides: bundled(golang(go.opentelemetry.io/otel/metric)) = 1.39.0
+Provides: bundled(golang(go.opentelemetry.io/otel/sdk)) = 1.39.0
+Provides: bundled(golang(go.opentelemetry.io/otel/sdk/metric)) = 1.39.0
+Provides: bundled(golang(go.opentelemetry.io/otel/trace)) = 1.39.0
 Provides: bundled(golang(go.yaml.in/yaml/v2)) = 2.4.2
 Provides: bundled(golang(go.yaml.in/yaml/v3)) = 3.0.4
-Provides: bundled(golang(golang.org/x/crypto)) = 0.41.0
+Provides: bundled(golang(golang.org/x/crypto)) = 0.47.0
 Provides: bundled(golang(golang.org/x/exp)) = 7d7fa50
-Provides: bundled(golang(golang.org/x/net)) = 0.43.0
-Provides: bundled(golang(golang.org/x/sync)) = 0.16.0
-Provides: bundled(golang(golang.org/x/sys)) = 0.35.0
-Provides: bundled(golang(golang.org/x/term)) = 0.34.0
-Provides: bundled(golang(golang.org/x/text)) = 0.28.0
-Provides: bundled(golang(google.golang.org/genproto/googleapis/api)) = 3122310
-Provides: bundled(golang(google.golang.org/genproto/googleapis/rpc)) = 3122310
-Provides: bundled(golang(google.golang.org/grpc)) = 1.74.2
-Provides: bundled(golang(google.golang.org/protobuf)) = 1.36.7
-Provides: bundled(golang(gopkg.in/ini.v1)) = 1.67.0
+Provides: bundled(golang(golang.org/x/mod)) = 0.31.0
+Provides: bundled(golang(golang.org/x/net)) = 0.49.0
+Provides: bundled(golang(golang.org/x/oauth2)) = 0.35.0
+Provides: bundled(golang(golang.org/x/sync)) = 0.19.0
+Provides: bundled(golang(golang.org/x/sys)) = 0.41.0
+Provides: bundled(golang(golang.org/x/term)) = 0.40.0
+Provides: bundled(golang(golang.org/x/text)) = 0.33.0
+Provides: bundled(golang(golang.org/x/time)) = 0.12.0
+Provides: bundled(golang(golang.org/x/tools)) = 0.40.0
+Provides: bundled(golang(google.golang.org/api)) = 0.248.0
+Provides: bundled(golang(google.golang.org/genproto)) = 513f239
+Provides: bundled(golang(google.golang.org/genproto/googleapis/api)) = ff82c1b
+Provides: bundled(golang(google.golang.org/genproto/googleapis/rpc)) = ff82c1b
+Provides: bundled(golang(google.golang.org/grpc)) = 1.79.3
+Provides: bundled(golang(google.golang.org/protobuf)) = 1.36.10
+Provides: bundled(golang(gopkg.in/ini.v1)) = 1.67.3
 Provides: bundled(golang(gopkg.in/yaml.v3)) = 3.0.1
-Provides: bundled(golang(libvirt.org/go/libvirt)) = 1.11006.0
+Provides: bundled(golang(libvirt.org/go/libvirt)) = 1.12005.0
 Provides: bundled(golang(sigs.k8s.io/yaml)) = 1.6.0
 # BUNDLE_END
 %endif
@@ -240,14 +271,20 @@ GOTAGS="exclude_graphdriver_btrfs"
 %endif
 
 export LDFLAGS="${LDFLAGS} -X 'main.version=%{version}'"
-%gobuild ${GOTAGS:+-tags=$GOTAGS} -o %{gobuilddir}/bin/image-builder %{goipath}/cmd/image-builder
+%gobuild ${GOTAGS:+-tags=$GOTAGS} -o _bin/image-builder %{goipath}/cmd/image-builder
+
+# Generate man pages
+mkdir -p man/man1
+_bin/image-builder doc man/man1/
 
 %install
 install -m 0755 -vd                                 %{buildroot}%{_bindir}
-install -m 0755 -vp %{gobuilddir}/bin/image-builder %{buildroot}%{_bindir}/
+install -m 0755 -vp _bin/image-builder              %{buildroot}%{_bindir}/
 # tmpfiles.d snippet
 install -m 0755 -vd                                 %{buildroot}%{_tmpfilesdir}
 install -m 0644 -vp data/tmpfiles.d/image-builder.conf %{buildroot}%{_tmpfilesdir}/image-builder.conf
+install -m 0755 -vd                                 %{buildroot}%{_mandir}/man1
+install -m 0644 -vp man/man1/image-builder*.1       %{buildroot}%{_mandir}/man1/
 %check
 export GOFLAGS="-buildmode=pie"
 %if 0%{?rhel}
@@ -265,9 +302,519 @@ cd $PWD/_build/src/%{goipath}
 %doc README.md
 %{_bindir}/image-builder
 %{_tmpfilesdir}/image-builder.conf
+%{_mandir}/man1/image-builder*.1*
 %ghost %attr(0755, root, root) %dir /var/cache/image-builder
 
 %changelog
+* Thu Aug 20 2026 Packit <hello@packit.dev> - 79.0.0-1
+Changes with 79.0.0
+----------------
+  - Fix the container resolver tests (#2602)
+    - Author: Achilleas Koutsou, Reviewers: Florian Schüller, Sanne Raymaekers
+  - Run privileged unit tests on gitlab (#2603)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Start container with repos support for legacy ISO only [HMS-11156] (#2582)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2600)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update snapshots to 20260816 (#2599)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - anaconda_installer: platform build packages (#2589)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Sanne Raymaekers
+  - distrodefs: Add aliases to Fedora for GCP (HMS-11182) (#2583)
+    - Author: Tomáš Koscielniak, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - fedora: drop explicit `anaconda-widgets` (#2597)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Katerina Koukiou, Lukáš Zapletal
+  - image-builder: reuse progress bars for upload (#2592)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Simon de Vlieger
+  - manifest: accept human-readable image sizes (#2571)
+    - Author: tomatotomata, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - osbuild/rpm: implement generic env   (#2586)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+  - ova: set os type and virtual hardware version (HMS-3248) (#2480)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - packit: enable riscv64 (#2595)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - pkg/disk.yaml: add an option to not grow root (#2524)
+    - Author: Jean-Baptiste Trystram, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - test: add GPG keys to Fedora 44 test repos (#2585)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Simon de Vlieger
+  - test: mock host arch for package search (#2594)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+
+— Somewhere on the Internet, 2026-08-20
+
+* Mon Aug 10 2026 Packit <hello@packit.dev> - 78.0.0-1
+Changes with 78.0.0
+----------------
+  - Simplify early manifest generation code and enable custom seeds for bootc-based images (#2565)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Update RHEL 9, 10 OCI image defs to add Oracle as cloud init datasource (#2559)
+    - Author: src-up, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2576)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update snapshots to 20260719 (#2530)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - ci: tag containers (#2575)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Brian C. Lane
+  - cmd/image-builder: drop `images` from version (#2573)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Brian C. Lane
+  - container: add SetAuthFilePath method to Resolver (#2580)
+    - Author: Ondřej Budai, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - disk: align footer to grain by default (#2562)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+  - disk: take the ESP size from the image type's partition table (RHEL-214147) (#2552)
+    - Author: Lucas Garfield, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - distro/generic: pass subscription options to pxe-tar-xz images (HMS-11108) (#2564)
+    - Author: Lucas Garfield, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - fedora: create 46 (#2546)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Florian Schüller
+  - imgtestlib: configure setuptools package discovery (#2563)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - test/imgtestlib: revert boot.py to old behaviour (#2579)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - test: remove iot-bootable-container image type (#2569)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-08-10
+
+* Tue Jul 28 2026 Packit <hello@packit.dev> - 77.0.0-1
+Changes with 77.0.0
+----------------
+  - Generate bootc-image-builder test jobs dynamically and enable all tests [HMS-11073] (#2539)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Simon de Vlieger
+  - Refactor CLI setup (#2503)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2555)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - anaconda: rectify comment (#2548)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová, Lukáš Zapletal
+  - bib: Replace logrus usage with olog (#2543)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - bib_legacy: Use functions from bootc (#2540)
+    - Author: Brian C. Lane, Reviewers: Anna Vítová, Lukáš Zapletal, Simon de Vlieger
+  - build(deps): bump actions/setup-python from 6 to 7 (#2556)
+    - Author: dependabot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - eln: enable `aarch64` for `gce` (HMS-11095) (#2558)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - github: enable building the bootc-image-builder container [HMS-11005] (#2549)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - gitlab: remove setup-show option for pytest (#2551)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Brian C. Lane
+  - manifest/raw_bootc: support subscription registration on first boot (HMS-10897) (#2528)
+    - Author: Lucas Garfield, Reviewers: Brian C. Lane, Simon de Vlieger
+  - pkg/koji/upload: session credentials to headers (#2550)
+    - Author: Anna Vítová, Reviewers: Florian Schüller, Sanne Raymaekers
+
+— Somewhere on the Internet, 2026-07-28
+
+* Wed Jul 22 2026 Packit <hello@packit.dev> - 76.0.0-1
+Changes with 76.0.0
+----------------
+  - Restore anaconda-iso/iso type to bootc-image-builder (#2527)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2531)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - anaconda: enable shell shenanigans for anaconda (#2544)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - build(deps): bump actions/setup-go from 6 to 7 (#2532)
+    - Author: dependabot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - eln: set runner to eln11 (#2535)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+  - image-builder: distro detection for `build` and `manifest` (#2542)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Ondřej Budai
+
+— Somewhere on the Internet, 2026-07-22
+
+* Tue Jul 21 2026 Packit <hello@packit.dev> - 75.0.0-1
+Changes with 75.0.0
+----------------
+  - Add hidden pkgsearch subcommand for querying available packages (HMS-11011) (#2515)
+    - Author: Gianluca Zuccarelli, Reviewers: Sanne Raymaekers, Simon de Vlieger
+  - Always use seed argument directly (#2516)
+    - Author: Achilleas Koutsou, Reviewers: Sanne Raymaekers, Simon de Vlieger
+  - Enable basic bootc-image-builder tests [HMS-10851] (#2467)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Tomáš Koscielniak
+  - Enable image-builder container builds [HMS-10851] (#2497)
+    - Author: Achilleas Koutsou, Reviewers: Florian Schüller, Simon de Vlieger
+  - Fedora ISO Modernization (HMS-9965) (#2533)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Sanne Raymaekers
+  - Improve error message for pkgsearch with no packages (#2526)
+    - Author: Gianluca Zuccarelli, Reviewers: Brian C. Lane, Lucas Garfield
+  - README: update deprecated information in docs (#2498)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Run more bootc-image-builder tests in gitlab [HMS-10854] (#2520)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Tomáš Hozza
+  - Update dependencies 2026-07-12 (#2513)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová
+  - Update osbuild dependency commit ID (#2512)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - Update snapshots to 20260705 (#2488)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Simon de Vlieger
+  - bootc: support grub2 serial console customization (#2403)
+    - Author: Jean-Baptiste Trystram, Reviewers: Brian C. Lane, Joel Capitao, Tomáš Hozza
+  - build(deps): bump actions/checkout from 6 to 7 (#2452)
+    - Author: dependabot, Reviewers: Anna Vítová, Simon de Vlieger
+  - ci: enable allow-unsafe-pr-checkout in checkout/7 (#2523)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - cmd/image-builder: mock simple integration tests (HMS-10857) (#2473)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+  - disk: systemd-repart compatibility (#2510)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Brian C. Lane
+  - fedora: drop slirp4netns from the IoT image (#2478)
+    - Author: Peter Robinson, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - image-builder: add hidden `--with-upload-result` option (#2521)
+    - Author: Sanne Raymaekers, Reviewers: Brian C. Lane, Tomáš Hozza
+  - pkg/disk: add XFS agcount option in `disk.yaml` (#2496)
+    - Author: Jean-Baptiste Trystram, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - progress: add file progress (HMS-10977) (#2493)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Anna Vítová, Simon de Vlieger
+  - test: fix build info cache path creation to use correct runner_distro (#2495)
+    - Author: Achilleas Koutsou, Reviewers: Sanne Raymaekers, Simon de Vlieger
+  - test: fix vm.py import error [HMS-11012] (#2522)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - test: go 1.27 compatibility (#2504)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+  - test: mock cache dir (#2519)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+
+— Somewhere on the Internet, 2026-07-21
+
+* Wed Jul 08 2026 Packit <hello@packit.dev> - 74.0.0-1
+Changes with 74.0.0
+----------------
+  - Test depsolvednf with dnf5 [HMS-10324] (#2475)
+    - Author: Achilleas Koutsou, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - Update dependencies 2026-06-28 (#2472)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update dependencies 2026-07-05 (#2490)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - depsolvednf: don't require solver.json in test (#2479)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Brian C. Lane
+  - distro/eln: use dnf5 and update package lists (#2482)
+    - Author: Yaakov Selkowitz, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - gen-manifest: optimize checksum calculation (#2382)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Tomáš Hozza
+  - generic/bootc: allow disk.yaml to provide root filesystem type (#2405)
+    - Author: Joel Capitao, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - github: remove osbuild-composer reverse dependency test (#2477)
+    - Author: Achilleas Koutsou, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - image-builder/build: add json format option (#2484)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - manifest: add firstboot support (HMS-9187) (#1913)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - many: plumb sdboot options (#2456)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - many: use `image-builder upload` in tests (HMS-10856) (#2476)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - partition_table: Make AlignUp clearer (#2419)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - pkg/rhsm: match subscription baseurls with wildcards (RHEL-36789) (#2460)
+    - Author: Lucas Garfield, Reviewers: Achilleas Koutsou, Brian C. Lane, Lukáš Zapletal
+  - progress: lock around sub progress (#2487)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - workflows: Add a link to the osbuild-composer API unit test results (#2469)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - workflows: Update old images urls to image-builder (#2468)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-07-08
+
+* Mon Jun 29 2026 Packit <hello@packit.dev> - 73.0.0-1
+Changes with 73.0.0
+----------------
+  - Update dependencies 2026-06-21 (#2451)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - Update osbuild dependency commit ID (#2450)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - disk: check all partitions for boot partition requirement (#2459)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - github: drop the reverse dependency check with image-builder-cli (#2454)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - imgtestlib: handle missing sources key in tests (#2447)
+    - Author: Anna Vítová, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - osbuild: ddi mount (#2457)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - rhel-10: reintroduce minimal-raw-xz (#2465)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+
+— Somewhere on the Internet, 2026-06-29
+
+* Wed Jun 17 2026 Packit <hello@packit.dev> - 69-1
+Changes with 69
+----------------
+  - deps: bump osbuild/images dependency (#548)
+    - Author: SchutzBot, Reviewers: Nobody
+  - deps: bump osbuild/images dependency (#551)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - deps: bump osbuild/images dependency (#552)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger
+  - deps: images 0.273.0 (#549)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Gianluca Zuccarelli, Lucas Garfield
+  - main: `system` subcommand (#537)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+
+osbuild/images changes (v0.270.0 -> v0.274.0):
+
+  - Add BootcRootFS pipeline and use it for bootc pxe-tar-xz (#2361)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Add Custom menus to X86 and PPC64 ISO bootloaders (#2394)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Test: stop testing EOL RHEL releases (#2415)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - Update dependencies 2026-05-31 (#2391)
+    - Author: SchutzBot, Reviewers: Anna Vítová, Lukáš Zapletal, Simon de Vlieger
+  - Update dependencies 2026-06-07 (#2402)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Anna Vítová, Simon de Vlieger
+  - config-list: narrow down the matrix (#2366)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - data/repositories: add PQC keys to rolling distros (#2411)
+    - Author: Sanne Raymaekers, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - deps: drop `golang.org/x/exp/slices` (#2399)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers
+  - distro/eln: clean up part 1 (HMS-10764) (#2384)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - distro/eln: installers use erofs (HMS-10634) (#2398)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - fedora-42: eol (#2385)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Brian C. Lane
+  - imgtestlib: support bootc-foundry image types (#2393)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - manifest: use boot root for fix bls (#2412)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Gianluca Zuccarelli
+  - many: copy boot files from build (#2410)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Brian C. Lane
+  - many: initial `systemd-boot` support (#2392)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - oscap: drop dead code (#2409)
+    - Author: Simon de Vlieger, Reviewers: Gianluca Zuccarelli, Lukáš Zapletal
+  - test/imgtestlib: boot test network installer on RHEL 10.2 (#2387)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Ondřej Budai, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-06-17
+
+* Thu Jun 04 2026 Packit <hello@packit.dev> - 68-1
+Changes with 68
+----------------
+  - Containerfile*: correct base image reference in tag (#531)
+    - Author: Zephyr Lykos, Reviewers: Brian C. Lane, Tomáš Hozza
+  - deps: bump osbuild/images dependency (#533)
+    - Author: SchutzBot, Reviewers: Brian C. Lane, Simon de Vlieger
+  - deps: bump osbuild/images dependency (#538)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - doc: mention additional requirements (#530)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - main: `--force-defs-dir` (#534)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - main: `bootc inspect` (#529)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - pr-best-practices: Update authentication scheme for Jira Cloud (HMS-10749) (#535)
+    - Author: Florian Schüller, Reviewers: Lukáš Zapletal, Simon de Vlieger
+
+osbuild/images changes (v0.267.0 -> v0.270.0):
+
+  - Break down imgtestlib module and  use log sections (#2383)
+    - Author: Achilleas Koutsou, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - CI: run tests on Fedora 44 (#2343)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger
+  - Make EFIPartitionTable function public, move it into disk (#2354)
+    - Author: Brian C. Lane, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Repos: Add/update AlmaLinux repository definitions (#2376)
+    - Author: Eduard Abdullin, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update dependencies 2026-05-25 (#2368)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - bootc: assert non-nil kernel info (#2370)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal, Tomáš Hozza
+  - cicd: run gobump per commit (#2352)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - container: guess at mime type (#2372)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Tomáš Hozza
+  - depsolver: catch all errors from the child process (#2365)
+    - Author: Ondřej Budai, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - distro/loader: expand installerConfig template by copying (HMS-10718) (#2373)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - distro: Make isoCustomizations usable by bootcImageType (#2360)
+    - Author: Brian C. Lane, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - fedora: drop no_timer_check leftover (#2282)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - gitlab: exit with error code when manifests fail to validate (#2374)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - install-dependencies: Add a note about it being used by image-builder-cli workflows (#2353)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger, Tomáš Hozza
+  - loader: allow custom path (#2378)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - many: fix non-determistic manifest generation (#2381)
+    - Author: Ondřej Budai, Reviewers: Achilleas Koutsou, Simon de Vlieger, Tomáš Hozza
+  - pr-best-practices: Update authentication scheme for Jira Cloud (HMS-10749) (#2386)
+    - Author: Florian Schüller, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - stage/grub2: allow VFAT for boot fs (#2371)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-06-04
+
+* Mon May 25 2026 Packit <hello@packit.dev> - 66-1
+Changes with 66
+----------------
+  - cmd: introduce profiling options (#516)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - deps: bump osbuild/images dependency (#524)
+    - Author: SchutzBot, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - packit: enable ELN (HMS-10701) (#521)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+
+osbuild/images changes (v0.266.0 -> v0.267.0):
+
+  - Add osbuild stages for mounting erofs and squashfs compressed filesystems (#2348)
+    - Author: Brian C. Lane, Reviewers: Simon de Vlieger, Tomáš Hozza
+  - arch: map OCI platform architecture to GOARCH (#2315)
+    - Author: Zephyr Lykos, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - bootloaders: Move the iso bootloader setup into its own struct (#2347)
+    - Author: Brian C. Lane, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - container: resolve containers using skopeo [RHEL-56367] (#2346)
+    - Author: Achilleas Koutsou, Reviewers: Gianluca Zuccarelli, Tomáš Hozza
+  - fedora: Update IoT arm images with newer RPi dtbs (#2358)
+    - Author: Peter Robinson, Reviewers: Achilleas Koutsou, Simon de Vlieger, Tomáš Koscielniak
+  - many: upgrade deps with deprecated APIs (HMS-10702) (#2356)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-05-25
+
+* Thu May 21 2026 Packit <hello@packit.dev> - 65-1
+Changes with 65
+----------------
+  - deps: bump images to 0.266.0 (#520)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - deps: bump osbuild/images dependency (#515)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - main: default to XDG cache directory for non-root users (#511)
+    - Author: Guillermo N. Leiro Arroyo, Reviewers: Brian C. Lane, Lukáš Zapletal
+
+osbuild/images changes (v0.262.0 -> v0.266.0):
+
+  - Add bootc-foundry boot test infrastructure (HMS-10336) (#2335)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - Update RHEL 9 and 10 OCI image definitions [HMS-10328, HMS-10472] (#2333)
+    - Author: Achilleas Koutsou, Reviewers: Simon Steinbeiß, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2321)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - Update osbuild dependency commit ID (#2328)
+    - Author: SchutzBot, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - Update snapshots to 20260504 (#2323)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - boot-azure: switch machine type (#2344)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Sanne Raymaekers, Simon Steinbeiß
+  - ci: include flatpaks (#2349)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Tomáš Hozza
+  - ci: use f43 for cross-arch (#2322)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - defs/bootc: set XBOOTLDR GUID (#2325)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - disk: partition table policies (#2330)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Lukáš Zapletal
+  - distro/rhel-9: fix OCI partitioning (#2351)
+    - Author: Achilleas Koutsou, Reviewers: Brian C. Lane, Simon de Vlieger, Tomáš Hozza
+  - experimental: use yamlplus (#2319)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - fedora: remove vc4 module blacklist from ostree kernel options (#2331)
+    - Author: Paul Whalen, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - flatpak: use container resolver to resolve flatpak refs (#2334)
+    - Author: Lukáš Zapletal, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - import ELN (HMS-10620, HMS-10621, HMS-10623) (#2318)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - many: bootc sealed images (composefs, and bootloader) (HMS-10628) (#2326)
+    - Author: Simon de Vlieger, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - pkg/bootc/resolver: handle missing 'bootc container inspect' (#2342)
+    - Author: Tomáš Hozza, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - rhel: enable sshd service for WSL images (#2332)
+    - Author: Simon Steinbeiß, Reviewers: Achilleas Koutsou, Sanne Raymaekers, Simon de Vlieger
+  - schutzbot: update terraform commit ID (#2341)
+    - Author: Achilleas Koutsou, Reviewers: Anna Vítová, Brian C. Lane
+  - test: close filesystem/disk customization coverage gaps with osbuild-composer (#2329)
+    - Author: Simon Steinbeiß, Reviewers: Achilleas Koutsou, Lukáš Zapletal, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-05-21
+
+* Wed May 13 2026 Packit <hello@packit.dev> - 64-1
+Changes with 64
+----------------
+  - cmd: drop "bootc is experimental" (#510)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - deps: bump osbuild/images dependency (#507)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - deps: update dependencies (w/o osbuild/images) (#508)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Simon de Vlieger
+  - doc: fix broken link (#509)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Lukáš Zapletal
+  - doc: introduce advanced bootc (#462)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - docs: generate manpages (#504)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - main: hide `--use-librepo` (#513)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+  - main: hide `--with-rpmlist` (#512)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-05-13
+
+* Wed Apr 29 2026 Packit <hello@packit.dev> - 63-1
+Changes with 63
+----------------
+  - deps: bump images to 0.259.0 (#501)
+    - Author: Anna Vítová, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - docs: update satellite info (#503)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Tomáš Hozza
+  - main: `--version` -> `version` subcommand (#505)
+    - Author: Simon de Vlieger, Reviewers: Brian C. Lane, Lukáš Zapletal
+  - many: Generate rpmlist as an output of manifestgen (#502)
+    - Author: Anna Vítová, Reviewers: Lukáš Zapletal, Simon de Vlieger
+
+— Somewhere on the Internet, 2026-04-29
+
+* Tue Apr 07 2026 Packit <hello@packit.dev> - 58-1
+Changes with 58
+----------------
+  - deps: bump images to 0.256.0 (#491)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Lukáš Zapletal
+
+— Somewhere on the Internet, 2026-04-07
+
+* Mon Apr 06 2026 Packit <hello@packit.dev> - 57-1
+Changes with 57
+----------------
+  - deps: update `images` to 0.254.0 (#489)
+    - Author: Simon de Vlieger, Reviewers: Anna Vítová, Lukáš Zapletal
+
+— Somewhere on the Internet, 2026-04-06
+
+
+* Tue Mar 24 2026 Packit <hello@packit.dev> - 55-1
+Changes with 55
+----------------
+  - chore: bump dependencies via gobump (#460)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal
+  - deps: bump images (#483)
+    - Author: Simon de Vlieger, Reviewers: Achilleas Koutsou, Anna Vítová
+
+— Somewhere on the Internet, 2026-03-24
+
+
+* Fri Mar 13 2026 Packit <hello@packit.dev> - 53-1
+Changes with 53
+----------------
+  - chore: bump dependencies via gobump (#475)
+    - Author: SchutzBot, Reviewers: Lukáš Zapletal, Tomáš Hozza
+  - cmd: allow specifying AWS credentials profile (#443)
+    - Author: Jakub Kadlčík, Reviewers: Achilleas Koutsou, Simon de Vlieger
+  - deps: bump images to 0.248.0 (#479)
+    - Author: Simon de Vlieger, Reviewers: Nobody
+  - docs: update COPR command for RHEL (#477)
+    - Author: Lukáš Zapletal, Reviewers: Brian C. Lane, Simon de Vlieger
+  - test: bump ISO timeout (#469)
+    - Author: Lukáš Zapletal, Reviewers: Simon de Vlieger, Tomáš Hozza
+
+— Somewhere on the Internet, 2026-03-13
+
+
 * Thu Feb 19 2026 Packit <hello@packit.dev> - 51-1
 Changes with 51
 ----------------
@@ -307,6 +854,9 @@ Changes with 48
 — Somewhere on the Internet, 2026-02-04
 
 
+* Tue Feb 03 2026 Maxwell G <maxwell@gtmx.me> - 47-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
 * Fri Jan 16 2026 Packit <hello@packit.dev> - 47-1
 Changes with 47
 ----------------
@@ -315,6 +865,8 @@ Changes with 47
 
 — Somewhere on the Internet, 2026-01-16
 
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 45-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Mon Jan 05 2026 Packit <hello@packit.dev> - 45-1
 Changes with 45
@@ -470,6 +1022,9 @@ Changes with 39
 
 — Somewhere on the Internet, 2025-10-15
 
+
+* Fri Oct 10 2025 Alejandro Sáez <asm@redhat.com> - 38-2
+- rebuild
 
 * Mon Oct 06 2025 Packit <hello@packit.dev> - 38-1
 Changes with 38

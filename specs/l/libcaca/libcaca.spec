@@ -22,7 +22,7 @@
 Summary: Library for Colour AsCii Art, text mode graphics
 Name: libcaca
 Version: 0.99
-Release: 0.80.%{beta}%{?dist}
+Release: 0.82.%{beta}%{?dist}
 License: WTFPL
 URL: http://caca.zoy.org/wiki/libcaca
 
@@ -61,15 +61,6 @@ well as powerful image to text conversion routines.
 %package devel
 Summary: Development files for libcaca, the library for Colour AsCii Art
 Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: imlib2-devel
-Requires: libX11-devel
-Requires: ncurses-devel
-Requires: pango-devel
-Requires: slang-devel
-%if %{with gl}
-Requires: freeglut-devel
-Requires: mesa-libGLU-devel
-%endif
 
 %description devel
 libcaca is the Colour AsCii Art library. It provides high level functions for
@@ -205,6 +196,12 @@ mv %{buildroot}%{_docdir}/libcaca-dev libcaca-dev-docs
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.99-0.82.beta20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 07 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 0.99-0.81.beta20
+- Drop unused devel dependencies
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.99-0.80.beta20
 - Rebuilt for Python 3.14.0rc3 bytecode
 

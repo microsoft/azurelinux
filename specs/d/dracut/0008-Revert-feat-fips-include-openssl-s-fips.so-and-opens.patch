@@ -1,0 +1,53 @@
+From 50410db6e50422ea795c816408b0b7fd06819bef Mon Sep 17 00:00:00 2001
+From: Pavel Valena <pvalena@redhat.com>
+Date: Fri, 4 Jul 2025 02:51:15 +0200
+Subject: [PATCH 8/9] Revert "feat(fips): include openssl's fips.so and
+ openssl.cnf"
+
+This reverts commit 97c5d43ceb9d65bc0970f1e7ad44bc43bc93fc26.
+
+Fedora has the new openssl module instead.
+---
+ modules.d/11fips/module-setup.sh | 13 -------------
+ modules.d/11fips/openssl.cnf     |  7 -------
+ 2 files changed, 20 deletions(-)
+ delete mode 100644 modules.d/11fips/openssl.cnf
+
+diff --git a/modules.d/11fips/module-setup.sh b/modules.d/11fips/module-setup.sh
+index 4ae4a873..95959d4b 100755
+--- a/modules.d/11fips/module-setup.sh
++++ b/modules.d/11fips/module-setup.sh
+@@ -68,17 +68,4 @@ install() {
+     inst_multiple -o sha512hmac
+ 
+     inst_simple /etc/system-fips
+-
+-    # if we have openssl we need to install their fips library and configuration
+-    [ -x /usr/bin/openssl ] && {
+-        read -r _ conf < <(openssl version -d)
+-        conf=${conf#\"}
+-        conf=${conf%\"}
+-        inst_simple "${moddir}/openssl.cnf" "$conf/openssl.cnf"
+-
+-        read -r _ mod < <(openssl version -m)
+-        mod=${mod#\"}
+-        mod=${mod%\"}
+-        inst_simple "$mod/fips.so"
+-    }
+ }
+diff --git a/modules.d/11fips/openssl.cnf b/modules.d/11fips/openssl.cnf
+deleted file mode 100644
+index ee9adcf0..00000000
+--- a/modules.d/11fips/openssl.cnf
++++ /dev/null
+@@ -1,7 +0,0 @@
+-openssl_conf = openssl_init
+-[openssl_init]
+-providers = provider_sect
+-[provider_sect]
+-default = default_sect
+-[default_sect]
+-activate = 1
+-- 
+2.50.1
+

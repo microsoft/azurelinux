@@ -6,7 +6,7 @@
 
 Name:           zopfli
 Version:        %{so_ver}
-Release: 16%{?dist}
+Release:        15%{?dist}
 Summary:        Zlib compatible better compressor
 
 License:        Apache-2.0
@@ -36,6 +36,8 @@ Devolopment files for zopfli and zopflipng.
 %autosetup -n %{name}-%{name}-%{version}
 
 %build
+# TODO: Please submit an issue to upstream (rhbz#2381653)
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 %cmake -DZOPFLI_BUILD_SHARED=ON
 %cmake_build
 
@@ -64,6 +66,12 @@ Devolopment files for zopfli and zopflipng.
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 11 2025 Cristian Le <git@lecris.dev> - 1.0.3-14
+- Allow to build with CMake 4.0 (rhbz#2381653)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.3-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

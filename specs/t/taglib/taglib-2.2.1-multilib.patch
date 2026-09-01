@@ -1,0 +1,36 @@
+diff --git a/taglib-config.cmake b/taglib-config.cmake
+index c2539fb..56bae51 100644
+--- a/taglib-config.cmake
++++ b/taglib-config.cmake
+@@ -23,11 +23,6 @@ if test -z "$prefix"; then
+ else
+   includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+ fi
+-if test -z "$exec_prefix"; then
+-  libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+-else
+-  libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+-fi
+
+ flags=""
+
+@@ -39,7 +34,7 @@ while test $# -gt 0
+ do
+   case $1 in
+     --libs)
+-      flags="$flags -L$libdir -ltag@TAGLIB_INSTALL_SUFFIX@ @ZLIB_LIBRARIES_FLAGS@"
++      flags="$flags -ltag@TAGLIB_INSTALL_SUFFIX@"
+       ;;
+     --cflags)
+       flags="$flags -I$includedir -I$includedir/taglib@TAGLIB_INSTALL_SUFFIX@"
+diff --git a/taglib.pc.cmake b/taglib.pc.cmake
+index 6608731..439a775 100644
+--- a/taglib.pc.cmake
++++ b/taglib.pc.cmake
+@@ -7,5 +7,5 @@ Name: TagLib
+ Description: Audio meta-data library
+ Requires:
+ Version: @TAGLIB_LIB_VERSION_STRING@
+-Libs: -L${libdir} -ltag@TAGLIB_INSTALL_SUFFIX@ @ZLIB_LIBRARIES_FLAGS@
++Libs: -L${libdir} -ltag@TAGLIB_INSTALL_SUFFIX@
+ Cflags: -I${includedir} -I${includedir}/taglib@TAGLIB_INSTALL_SUFFIX@

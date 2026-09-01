@@ -17,7 +17,7 @@
 
 Name:           lua
 Version:        %{major_version}.8
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        Powerful light-weight programming language
 License:        MIT
 URL:            https://www.lua.org/
@@ -219,6 +219,9 @@ popd
 %{_libdir}/*.a
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.4.8-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Dec 04 2025 Miro Hrončok <mhroncok@redhat.com> - 5.4.8-4
 - Move the license file to lua-libs, so it is always present if any combination of subpackages is installed
 - Fixes: rhbz#2418960

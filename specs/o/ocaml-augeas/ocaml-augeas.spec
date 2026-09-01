@@ -6,7 +6,7 @@ ExcludeArch: %{ix86}
 
 Name:           ocaml-augeas
 Version:        0.7
-Release: 6%{?dist}
+Release:        5%{?dist}
 Summary:        OCaml bindings for Augeas configuration API
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 
@@ -88,10 +88,16 @@ ocamlfind install augeas META *.mli *.cma *.a augeas.cmi *.so
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 0.7-4
+- OCaml 5.4.0 rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.7-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Fri Jul 11 2025 Jerry James  <loganjerry@gmail.com> - 0.7-2
+* Fri Jul 11 2025 Jerry James <loganjerry@gmail.com> - 0.7-2
 - Rebuild to fix OCaml dependencies
 
 * Thu May 08 2025 Richard W.M. Jones <rjones@redhat.com> - 0.7-1

@@ -6,10 +6,15 @@ Wants=network-online.target
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/ptp4l
-ExecStart=/usr/sbin/ptp4l $OPTIONS
+ExecStart=!/usr/sbin/ptp4l $OPTIONS
 
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
-CapabilityBoundingSet=CAP_SYS_ADMIN CAP_SYS_TIME
+User=linuxptp
+RuntimeDirectory=ptp
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SYS_ADMIN CAP_SYS_TIME
+CapabilityBoundingSet=CAP_DAC_OVERRIDE CAP_SETGID CAP_SETUID
 DeviceAllow=char-pps rw
 DeviceAllow=char-ptp rw
 DevicePolicy=closed

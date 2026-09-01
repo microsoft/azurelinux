@@ -1,0 +1,2 @@
+d /var/lib/varnish  755 root root -
+d /var/log/varnish  700 varnish varnish -

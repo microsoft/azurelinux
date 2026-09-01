@@ -12,6 +12,9 @@
 # Build openldap-servers package and its libslapi in openldap-devel and openldap-compat
 %bcond servers 1
 
+# Build with argon2 support
+%bcond argon2 %{undefined rhel}
+
 # When you change "Version: " to the new major version, remember to change this value too
 %global major_version 2.6
 
@@ -19,8 +22,8 @@
 %global __brp_remove_la_files %nil
 
 Name: openldap
-Version: 2.6.10
-Release: 7%{?dist}
+Version: 2.6.13
+Release: 1%{?dist}
 Summary: LDAP support libraries
 License: OLDAP-2.8
 URL: http://www.openldap.org/
@@ -77,6 +80,9 @@ BuildRequires: unixODBC-devel
 BuildRequires: cracklib-devel
 BuildRequires: systemd
 BuildRequires: systemd-rpm-macros
+%if %{with argon2}
+BuildRequires: libsodium-devel
+%endif
 
 %description
 OpenLDAP is an open source suite of LDAP (Lightweight Directory Access
@@ -224,6 +230,9 @@ pushd openldap-%{version}
 	--enable-rlookups \
 %if %{with servers}
 	--enable-slapi \
+%if %{with argon2}
+        --enable-argon2 \
+%endif
 %endif
 	--disable-slp \
 	\
@@ -463,6 +472,12 @@ exit 0
 %{_datadir}/openldap-servers/
 %{_libdir}/openldap/accesslog*
 %{_libdir}/openldap/allop*
+%if %{with argon2}
+%{_libdir}/openldap/argon2*
+%{_mandir}/man5/slappw-argon2.5*
+%else
+%exclude %{_mandir}/man5/slappw-argon2.5*
+%endif
 %{_libdir}/openldap/auditlog*
 %{_libdir}/openldap/autoca*
 %{_libdir}/openldap/back_asyncmeta*
@@ -505,7 +520,6 @@ exit 0
 %{_mandir}/man8/lloadd.8*
 %{_mandir}/man5/slapd*.5*
 %{_mandir}/man5/slapo-*.5*
-%{_mandir}/man5/slappw-argon2.5*
 %{_mandir}/man8/slap*.8*
 %{_sysusersdir}/openldap.conf
 # obsolete configuration
@@ -554,9 +568,22 @@ exit 0
 %endif
 
 %changelog
+* Tue Mar 17 2026 Simon Pichugin <spichugi@redhat.com> - 2.6.13-1
+- Rebase to version 2.6.13 (rhbz#2447583)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 14 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2.6.10-6
+- Enable argon2 only in Fedora
+
+* Tue Jan 13 2026 Simon Pichugin <spichugi@redhat.com> - 2.6.10-5
+- Add support for argon2 (rhbz#2229405)
+- Bump version 2.6.10-5
+
 * Fri Aug 29 2025 Simon Pichugin <spichugi@redhat.com> - 2.6.10-4
-- Fix LDAP initialization does unnecessary resolution of hostname (rhbz#2392068)
-- Convert STI tests to FMF (rhbz#2392069)
+- Fix LDAP initialization does unnecessary resolution of hostname (rhbz#2331728)
+- Convert STI tests to FMF (rhbz#2382998)
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.10-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

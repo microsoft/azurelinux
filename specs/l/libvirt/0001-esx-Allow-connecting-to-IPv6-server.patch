@@ -1,0 +1,41 @@
+From 845210011a9ffd9d17e30c51cbc81ba67c5d3166 Mon Sep 17 00:00:00 2001
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Tue, 20 Jan 2026 10:08:29 +0100
+Subject: [PATCH] esx: Allow connecting to IPv6 server
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When connecting to a VMWare server, the hostname from URI is
+resolved using esxUtil_ResolveHostname() which in turn calls
+getaddrinfo(). But in the hints argument, we restrict the return
+address to be IPv4 (AF_INET) which obviously fails if the address
+to resolve is an IPv6 address. Set the hint to AF_UNSPEC which
+allows both IPv4 and IPv6. While at it, also allow IPv4 addresses
+mapped in IPv6 by setting AI_V4MAPPED flag.
+
+Resolves: https://issues.redhat.com/browse/RHEL-138300
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ src/esx/esx_util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/esx/esx_util.c b/src/esx/esx_util.c
+index 88b3dc893f..a6275babd5 100644
+--- a/src/esx/esx_util.c
++++ b/src/esx/esx_util.c
+@@ -275,8 +275,8 @@ esxUtil_ResolveHostname(const char *hostname, char **ipAddress)
+     int errcode;
+     g_autofree char *address = NULL;
+ 
+-    hints.ai_flags = AI_ADDRCONFIG;
+-    hints.ai_family = AF_INET;
++    hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
++    hints.ai_family = AF_UNSPEC;
+     hints.ai_socktype = SOCK_STREAM;
+     hints.ai_protocol = 0;
+ 
+-- 
+2.52.0
+

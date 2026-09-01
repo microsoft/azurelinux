@@ -1,0 +1,260 @@
+From eefb28f301f42350c2491087b8166fd47624cce0 Mon Sep 17 00:00:00 2001
+From: Coiby Xu <coxu@redhat.com>
+Date: Thu, 16 Oct 2025 15:43:05 +0800
+Subject: [PATCH 12/12] fix(dracut): use grep -q/-s to silence output/error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+There is no need to redirect output/error to /dev/null. Simply use -q/-s
+option provided by grep.
+
+Note we should use avoid using
+"set -o pipefail lsinitrd PAHT_PATH_INITRAMFS | grep -q PATTERN".
+Because with set -o pipefail, a pipeline’s exit status becomes non-zero
+if any element of the pipeline fails and grep -q exits as soon as it
+sees a match.
+
+Signed-off-by: Coiby Xu <coxu@redhat.com>
+(cherry picked from commit 10e335b8088ba56036a2f2430d36103ff20b5c29)
+---
+ dracut-init.sh                                   |  8 ++++----
+ dracut-initramfs-restore.sh                      |  2 +-
+ modules.d/10systemd/module-setup.sh              | 14 +++++++-------
+ modules.d/11systemd-ask-password/module-setup.sh |  2 +-
+ modules.d/35network-legacy/dhcp-multi.sh         |  2 +-
+ modules.d/35network-legacy/ifup.sh               |  2 +-
+ modules.d/35network-manager/nm-run.sh            |  2 +-
+ modules.d/70bluetooth/module-setup.sh            |  2 +-
+ modules.d/74debug/module-setup.sh                |  2 +-
+ modules.d/74fcoe/module-setup.sh                 |  4 ++--
+ modules.d/74resume/module-setup.sh               |  2 +-
+ modules.d/74udev-rules/module-setup.sh           |  4 ++--
+ modules.d/77dracut-systemd/parse-root.sh         |  2 +-
+ modules.d/80base/module-setup.sh                 |  4 ++--
+ 14 files changed, 26 insertions(+), 26 deletions(-)
+
+diff --git a/dracut-init.sh b/dracut-init.sh
+index 82dcdf05..d64eb446 100755
+--- a/dracut-init.sh
++++ b/dracut-init.sh
+@@ -480,15 +480,15 @@ inst_rule_group_owner() {
+ 
+     # shellcheck disable=SC2013
+     for i in $(sed -nr 's/.*OWNER=?"([^ "]+).*/\1/p' "$1"); do
+-        if ! grep -Eq "^$i:" "$initdir/etc/passwd" 2> /dev/null; then
+-            grep -E "^$i:" "${dracutsysrootdir-}/etc/passwd" 2> /dev/null >> "$initdir/etc/passwd"
++        if ! grep -Eqs "^$i:" "$initdir/etc/passwd"; then
++            grep -Es "^$i:" "${dracutsysrootdir-}/etc/passwd" >> "$initdir/etc/passwd"
+         fi
+     done
+ 
+     # shellcheck disable=SC2013
+     for i in $(sed -nr 's/.*GROUP=?"([^ "]+).*/\1/p' "$1"); do
+-        if ! grep -Eq "^$i:" "$initdir/etc/group" 2> /dev/null; then
+-            grep -E "^$i:" "${dracutsysrootdir-}/etc/group" 2> /dev/null >> "$initdir/etc/group"
++        if ! grep -Eqs "^$i:" "$initdir/etc/group"; then
++            grep -Es "^$i:" "${dracutsysrootdir-}/etc/group" >> "$initdir/etc/group"
+         fi
+     done
+ }
+diff --git a/dracut-initramfs-restore.sh b/dracut-initramfs-restore.sh
+index 45aeead8..828edca5 100755
+--- a/dracut-initramfs-restore.sh
++++ b/dracut-initramfs-restore.sh
+@@ -99,7 +99,7 @@ elif [[ -f erofs-root.img ]]; then
+     fi
+ fi
+ 
+-if grep -q -w selinux /sys/kernel/security/lsm 2> /dev/null \
++if grep -qs -w selinux /sys/kernel/security/lsm \
+     && [ -e /etc/selinux/config ] && [ -x /usr/sbin/setfiles ]; then
+     . /etc/selinux/config
+     if [[ $SELINUX != "disabled" && -n $SELINUXTYPE ]]; then
+diff --git a/modules.d/10systemd/module-setup.sh b/modules.d/10systemd/module-setup.sh
+index cda64219..91cfd385 100755
+--- a/modules.d/10systemd/module-setup.sh
++++ b/modules.d/10systemd/module-setup.sh
+@@ -114,18 +114,18 @@ install() {
+ 
+     inst_multiple -o nologin
+     {
+-        grep '^adm:' "${dracutsysrootdir-}"/etc/passwd 2> /dev/null
++        grep -s '^adm:' "${dracutsysrootdir-}"/etc/passwd
+         # we don't use systemd-networkd, but the user is in systemd.conf tmpfiles snippet
+-        grep '^systemd-network:' "${dracutsysrootdir-}"/etc/passwd 2> /dev/null
++        grep -s '^systemd-network:' "${dracutsysrootdir-}"/etc/passwd
+     } >> "$initdir/etc/passwd"
+ 
+     {
+-        grep '^wheel:' "${dracutsysrootdir-}"/etc/group 2> /dev/null
+-        grep '^adm:' "${dracutsysrootdir-}"/etc/group 2> /dev/null
+-        grep '^utmp:' "${dracutsysrootdir-}"/etc/group 2> /dev/null
+-        grep '^root:' "${dracutsysrootdir-}"/etc/group 2> /dev/null
++        grep -s '^wheel:' "${dracutsysrootdir-}"/etc/group
++        grep -s '^adm:' "${dracutsysrootdir-}"/etc/group
++        grep -s '^utmp:' "${dracutsysrootdir-}"/etc/group
++        grep -s '^root:' "${dracutsysrootdir-}"/etc/group
+         # we don't use systemd-networkd, but the user is in systemd.conf tmpfiles snippet
+-        grep '^systemd-network:' "${dracutsysrootdir-}"/etc/group 2> /dev/null
++        grep -s '^systemd-network:' "${dracutsysrootdir-}"/etc/group
+     } >> "$initdir/etc/group"
+ 
+     local _systemdbinary="$systemdutildir"/systemd
+diff --git a/modules.d/11systemd-ask-password/module-setup.sh b/modules.d/11systemd-ask-password/module-setup.sh
+index 73ada440..aed0bada 100755
+--- a/modules.d/11systemd-ask-password/module-setup.sh
++++ b/modules.d/11systemd-ask-password/module-setup.sh
+@@ -27,7 +27,7 @@ depends() {
+         # - ramfb is not enough
+         # Therefore, depend on the drm module if virtio_gpu is loaded on the system.
+         if [[ ${DRACUT_ARCH:-$(uname -m)} == arm* || ${DRACUT_ARCH:-$(uname -m)} == aarch64 ]] \
+-            && grep -r -q "virtio:d00000010v" /sys/bus/virtio/devices/*/modalias 2> /dev/null; then
++            && grep -r -qs "virtio:d00000010v" /sys/bus/virtio/devices/*/modalias; then
+             echo drm
+         fi
+     fi
+diff --git a/modules.d/35network-legacy/dhcp-multi.sh b/modules.d/35network-legacy/dhcp-multi.sh
+index f8104c33..1c5ee733 100755
+--- a/modules.d/35network-legacy/dhcp-multi.sh
++++ b/modules.d/35network-legacy/dhcp-multi.sh
+@@ -22,7 +22,7 @@ do_dhclient() {
+     _DHCPRETRY=$(getargnum 1 1 1000000000 rd.net.dhcp.retry=)
+ 
+     if [ -n "$_timeout" ]; then
+-        if ! (dhclient --help 2>&1 | grep -q -F -- '--timeout' 2> /dev/null); then
++        if ! (dhclient --help 2>&1 | grep -qs -F -- '--timeout'); then
+             warn "rd.net.timeout.dhcp has no effect because dhclient does not implement the --timeout option"
+             unset _timeout
+         fi
+diff --git a/modules.d/35network-legacy/ifup.sh b/modules.d/35network-legacy/ifup.sh
+index 59629f11..b2ed4607 100755
+--- a/modules.d/35network-legacy/ifup.sh
++++ b/modules.d/35network-legacy/ifup.sh
+@@ -73,7 +73,7 @@ do_dhcp() {
+     fi
+ 
+     if [ -n "$_timeout" ]; then
+-        if ! (dhclient --help 2>&1 | grep -q -F -- '--timeout' 2> /dev/null); then
++        if ! (dhclient --help 2>&1 | grep -qs -F -- '--timeout'); then
+             warn "rd.net.timeout.dhcp has no effect because dhclient does not implement the --timeout option"
+             unset _timeout
+         fi
+diff --git a/modules.d/35network-manager/nm-run.sh b/modules.d/35network-manager/nm-run.sh
+index ef4db2e8..9a67b912 100755
+--- a/modules.d/35network-manager/nm-run.sh
++++ b/modules.d/35network-manager/nm-run.sh
+@@ -58,7 +58,7 @@ dhcpopts_create() {
+ for _i in /sys/class/net/*; do
+     [ -d "$_i" ] || continue
+     state="/run/NetworkManager/devices/$(cat "$_i"/ifindex)"
+-    grep -q '^connection-uuid=' "$state" 2> /dev/null || continue
++    grep -qs '^connection-uuid=' "$state" || continue
+     ifname="${_i##*/}"
+     dhcpopts_create "$state" > /tmp/dhclient."$ifname".dhcpopts
+     source_hook initqueue/online "$ifname"
+diff --git a/modules.d/70bluetooth/module-setup.sh b/modules.d/70bluetooth/module-setup.sh
+index c87e589a..3db75d44 100755
+--- a/modules.d/70bluetooth/module-setup.sh
++++ b/modules.d/70bluetooth/module-setup.sh
+@@ -13,7 +13,7 @@ check() {
+         #  * Keyboard (0x40)
+         #  * Keyboard/pointing (0xC0)
+         # and if Appearance is set to the value defined for keyboard (0x03C1)
+-        [ -d "/sys/class/bluetooth" ] && grep -qiE -e 'Class=0x[0-9a-f]{3}5[4c]0' -e 'Appearance=0x03c1' /var/lib/bluetooth/*/*/info 2> /dev/null \
++        [ -d "/sys/class/bluetooth" ] && grep -qsiE -e 'Class=0x[0-9a-f]{3}5[4c]0' -e 'Appearance=0x03c1' /var/lib/bluetooth/*/*/info \
+             && dwarn "If you need to use bluetooth, please include it explicitly."
+     fi
+ 
+diff --git a/modules.d/74debug/module-setup.sh b/modules.d/74debug/module-setup.sh
+index 38566c6b..a0e5ffb0 100755
+--- a/modules.d/74debug/module-setup.sh
++++ b/modules.d/74debug/module-setup.sh
+@@ -47,5 +47,5 @@ install() {
+         tcpdump \
+         vi
+ 
+-    grep '^tcpdump:' "${dracutsysrootdir-}"/etc/passwd 2> /dev/null >> "$initdir/etc/passwd"
++    grep -s '^tcpdump:' "${dracutsysrootdir-}"/etc/passwd >> "$initdir/etc/passwd"
+ }
+diff --git a/modules.d/74fcoe/module-setup.sh b/modules.d/74fcoe/module-setup.sh
+index b18e9289..2629edbb 100755
+--- a/modules.d/74fcoe/module-setup.sh
++++ b/modules.d/74fcoe/module-setup.sh
+@@ -79,12 +79,12 @@ cmdline() {
+             # DCB_REQUIRED in "/etc/fcoe/cfg-xxx" is expected to set to "no".
+             #
+             # Force "nodcb" if there's any DCB_REQUIRED="no"(child or vlan parent).
+-            if grep -q '^[[:blank:]]*DCB_REQUIRED="no"' /etc/fcoe/cfg-"${i##*/}" &> /dev/null; then
++            if grep -qs '^[[:blank:]]*DCB_REQUIRED="no"' /etc/fcoe/cfg-"${i##*/}"; then
+                 dcb="nodcb"
+             fi
+ 
+             if [ "$p" ]; then
+-                if grep -q '^[[:blank:]]*DCB_REQUIRED="no"' /etc/fcoe/cfg-"${p}" &> /dev/null; then
++                if grep -qs '^[[:blank:]]*DCB_REQUIRED="no"' /etc/fcoe/cfg-"${p}"; then
+                     dcb="nodcb"
+                 fi
+             fi
+diff --git a/modules.d/74resume/module-setup.sh b/modules.d/74resume/module-setup.sh
+index a2693af5..650c2c38 100755
+--- a/modules.d/74resume/module-setup.sh
++++ b/modules.d/74resume/module-setup.sh
+@@ -14,7 +14,7 @@ check() {
+     if [[ ${hostonly-} ]] || [[ $mount_needs ]]; then
+         # Resuming won't work if swap is on a netdevice
+         swap_on_netdevice && return 255
+-        if grep -rq 'resume=' /proc/cmdline /etc/cmdline /etc/cmdline.d /etc/kernel/cmdline /usr/lib/kernel/cmdline 2> /dev/null; then
++        if grep -rqsE '(^| )resume=' /proc/cmdline /etc/cmdline /etc/cmdline.d /etc/kernel/cmdline /usr/lib/kernel/cmdline; then
+             # hibernation support requested on kernel command line
+             return 0
+         else
+diff --git a/modules.d/74udev-rules/module-setup.sh b/modules.d/74udev-rules/module-setup.sh
+index 35e43997..7efe38e7 100755
+--- a/modules.d/74udev-rules/module-setup.sh
++++ b/modules.d/74udev-rules/module-setup.sh
+@@ -62,8 +62,8 @@ install() {
+ 
+     {
+         for i in cdrom tape dialout floppy; do
+-            if ! grep -q "^$i:" "$initdir"/etc/group 2> /dev/null; then
+-                if ! grep "^$i:" "${dracutsysrootdir-}"/etc/group 2> /dev/null; then
++            if ! grep -qs "^$i:" "$initdir"/etc/group; then
++                if ! grep -s "^$i:" "${dracutsysrootdir-}"/etc/group; then
+                     case $i in
+                         cdrom) echo "$i:x:11:" ;;
+                         dialout) echo "$i:x:18:" ;;
+diff --git a/modules.d/77dracut-systemd/parse-root.sh b/modules.d/77dracut-systemd/parse-root.sh
+index 350951b5..7f96d660 100755
+--- a/modules.d/77dracut-systemd/parse-root.sh
++++ b/modules.d/77dracut-systemd/parse-root.sh
+@@ -26,7 +26,7 @@ if [ "$rootok" = "1" ]; then
+         # after remote-fs-pre.target since the initqueue is ordered before it so
+         # it will never actually show up (think Tang-pinned rootfs).
+         cat > "$hookdir/initqueue/finished/devexists-${root_name}.sh" << EOF
+-if ! grep -q After=remote-fs-pre.target /run/systemd/generator/systemd-cryptsetup@*.service 2>/dev/null; then
++if ! grep -qs After=remote-fs-pre.target /run/systemd/generator/systemd-cryptsetup@*.service; then
+     [ -e "$root_dev" ]
+ fi
+ EOF
+diff --git a/modules.d/80base/module-setup.sh b/modules.d/80base/module-setup.sh
+index 7fb83018..6ad40ad4 100755
+--- a/modules.d/80base/module-setup.sh
++++ b/modules.d/80base/module-setup.sh
+@@ -66,11 +66,11 @@ install() {
+     # add common users in /etc/passwd, it will be used by nfs/ssh currently
+     # use password for hostonly images to facilitate secure sulogin in emergency console
+     [[ ${hostonly-} ]] && pwshadow='x'
+-    grep '^root:' "$initdir/etc/passwd" > /dev/null 2>&1 || echo "root:$pwshadow:0:0::/root:/bin/sh" >> "$initdir/etc/passwd"
++    grep -qs '^root:' "$initdir/etc/passwd" || echo "root:$pwshadow:0:0::/root:/bin/sh" >> "$initdir/etc/passwd"
+ 
+     if [[ ${hostonly-} ]]; then
+         # check if other dracut modules already created an entry for root in /etc/shadow
+-        if grep -q '^root:' "$initdir/etc/shadow"; then
++        if grep -qs '^root:' "$initdir/etc/shadow"; then
+             grep -v '^root:' "$initdir/etc/shadow" > "$initdir/etc/shadow-"
+             mv "$initdir/etc/shadow-" "$initdir/etc/shadow"
+         fi
+-- 
+2.53.0
+

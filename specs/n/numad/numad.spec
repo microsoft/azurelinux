@@ -3,7 +3,7 @@
 
 Name: numad
 Version: 0.5
-Release: 47.20150602git%{?dist}
+Release: 50.20251104git%{?dist}
 Summary: NUMA user daemon
 
 License: LGPL-2.1-only
@@ -13,10 +13,6 @@ URL: https://pagure.io/numad
 #   git clone https://pagure.io/numad.git numad-0.5git
 #   tar --exclude-vcs -cJf numad-0.5git.tar.xz numad-0.5git/
 Source0: %{name}-%{version}git.tar.xz
-
-Patch0: 0000-remove-conf.patch
-Patch1: 0001-numad_log-fix-buffer-overflow.patch
-Patch2: 0002-recognize--m-option-correctly.patch
 
 BuildRequires: gcc
 BuildRequires: make
@@ -54,6 +50,15 @@ install -D -p -m 644 {,%{buildroot}%{_sysconfdir}/logrotate.d/%{name}/}numad.log
 %systemd_postun numad.service
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5-50.20251104git
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 04 2025 Lukas Nykryn <lnykryn@redhat.com> - 0.5-49.20251031git
+- improve single-node system support
+
+* Mon Nov 03 2025 Lukas Nykryn <lnykryn@redhat.com> - 0.5-48.20251031git
+- numad v20251031
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.5-47.20150602git
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,40 @@
+From b721cdd03daa3416127289da02fe781efb2562df Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Tue, 27 Jan 2026 15:11:07 -0800
+Subject: [PATCH] lib/chkhash.c: fix escaping in SHA-256 / SHA-512 / MD5
+ regexes
+
+`\\n` inside square brackets doesn't include or exclude the
+newline character. It includes or excludes a literal slash and
+the literal character 'n'.
+
+Fixes: c44f1e096a19 (2025-07-20; "chpasswd: Check hash before write when using -e")
+Closes: <https://github.com/shadow-maint/shadow/issues/1519>
+Signed-off-by: Adam Williamson <awilliam@redhat.com>
+---
+ lib/chkhash.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index 101f2004e8..9123038ade 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -62,15 +62,15 @@ is_valid_hash(const char *hash)
+ 		return true;
+ 
+ 	// SHA-512: $6$ + salt + $ + 86-char hash
+-	if (match_regex("^\\$6\\$(rounds=[1-9][0-9]{3,8}\\$)?[^$:\\n]{1,16}\\$[./A-Za-z0-9]{86}$", hash))
++	if (match_regex("^\\$6\\$(rounds=[1-9][0-9]{3,8}\\$)?[^$:\n]{1,16}\\$[./A-Za-z0-9]{86}$", hash))
+ 		return true;
+ 
+ 	// SHA-256: $5$ + salt + $ + 43-char hash
+-	if (match_regex("^\\$5\\$(rounds=[1-9][0-9]{3,8}\\$)?[^$:\\n]{1,16}\\$[./A-Za-z0-9]{43}$", hash))
++	if (match_regex("^\\$5\\$(rounds=[1-9][0-9]{3,8}\\$)?[^$:\n]{1,16}\\$[./A-Za-z0-9]{43}$", hash))
+ 		return true;
+ 
+ 	// MD5: $1$ + salt + $ + 22-char hash
+-	if (match_regex("^\\$1\\$[^$:\\n]{1,8}\\$[./A-Za-z0-9]{22}$", hash))
++	if (match_regex("^\\$1\\$[^$:\n]{1,8}\\$[./A-Za-z0-9]{22}$", hash))
+ 		return true;
+ 
+ 	// DES: exactly 13 characters from [A-Za-z0-9./]

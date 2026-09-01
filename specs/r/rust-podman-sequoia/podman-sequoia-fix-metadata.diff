@@ -1,5 +1,5 @@
---- podman-sequoia-0.2.0/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ podman-sequoia-0.2.0/Cargo.toml	2025-11-10T07:12:03.650690+00:00
+--- podman-sequoia-0.3.2/Cargo.toml	1970-01-01T00:00:01+00:00
++++ podman-sequoia-0.3.2/Cargo.toml	2026-01-29T09:29:07.907266+00:00
 @@ -40,12 +40,7 @@
  repository = "https://github.com/ueno/podman-sequoia"
  
@@ -13,12 +13,13 @@
  default = ["crypto-openssl"]
  
  [lib]
-@@ -57,7 +52,7 @@
+@@ -98,7 +93,8 @@
+ version = "0.1.4"
+ 
+ [build-dependencies.dlwrap]
+-version = "0.3.8"
++version = "0.3.9"
++features = ["clang-runtime"]
+ 
+ [build-dependencies.regex]
  version = "1"
- 
- [dependencies.dirs]
--version = "5"
-+version = ">=5, <7"
- 
- [dependencies.libc]
- version = "0.2"

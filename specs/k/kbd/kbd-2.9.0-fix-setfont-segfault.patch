@@ -1,0 +1,25 @@
+diff -up kbd-2.9.0/src/setfont.c.orig kbd-2.9.0/src/setfont.c
+--- kbd-2.9.0/src/setfont.c.orig	2025-09-01 13:02:27.718045775 +0200
++++ kbd-2.9.0/src/setfont.c	2026-03-23 10:47:59.579868180 +0100
+@@ -158,8 +158,8 @@ kbd_getopt(int argc, char **argv, const
+ 	return '?';
+ 
+ required_argument:
+-	kbd_warning(0, "option '%s' requires an argument", name);
+-	return '?';
++	optind--;
++	return '!';
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -296,6 +296,10 @@ int main(int argc, char *argv[])
+ 					kbd_error(EX_USAGE, 0, _("Too many input files."));
+ 				ifiles[ifilct++] = argv[optind++];
+ 				break;
++			case '!':
++				kbd_warning(0, "option '%s' requires an argument", argv[optind]);
++				usage(EX_USAGE, opthelp);
++				break;
+ 		}
+ 	}
+ 

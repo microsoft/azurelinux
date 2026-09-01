@@ -1,7 +1,7 @@
-From 95f4e30195382c3df7104c2ad3e5e9953f8ad554 Mon Sep 17 00:00:00 2001
+From b6875ceaca4be9e0de0d6d260d8fcff1772f5fb5 Mon Sep 17 00:00:00 2001
 From: Dmitry Belyavskiy <beldmit@gmail.com>
 Date: Thu, 15 May 2025 13:43:28 +0200
-Subject: [PATCH 01/50] openssh-7.8p1-role-mls
+Subject: [PATCH 01/53] openssh-7.8p1-role-mls
 
 ---
  auth-pam.c                       |   2 +-
@@ -26,10 +26,10 @@ Subject: [PATCH 01/50] openssh-7.8p1-role-mls
  create mode 100644 openbsd-compat/port-linux-sshd.c
 
 diff --git a/auth-pam.c b/auth-pam.c
-index 13c0a792..b4100ea1 100644
+index 5591f094e..70bcae83a 100644
 --- a/auth-pam.c
 +++ b/auth-pam.c
-@@ -1238,7 +1238,7 @@ is_pam_session_open(void)
+@@ -1261,7 +1261,7 @@ is_pam_session_open(void)
   * during the ssh authentication process.
   */
  int
@@ -39,7 +39,7 @@ index 13c0a792..b4100ea1 100644
  	int ret = 1;
  	char *compound;
 diff --git a/auth-pam.h b/auth-pam.h
-index 8d801c68..9dd7ae07 100644
+index 8d801c689..9dd7ae078 100644
 --- a/auth-pam.h
 +++ b/auth-pam.h
 @@ -33,7 +33,7 @@ u_int do_pam_account(void);
@@ -52,7 +52,7 @@ index 8d801c68..9dd7ae07 100644
  char ** fetch_pam_child_environment(void);
  void free_pam_environment(char **);
 diff --git a/auth.h b/auth.h
-index 98bb23d4..83d07ae8 100644
+index 98bb23d4c..83d07ae8b 100644
 --- a/auth.h
 +++ b/auth.h
 @@ -65,6 +65,9 @@ struct Authctxt {
@@ -66,7 +66,7 @@ index 98bb23d4..83d07ae8 100644
  	/* Method lists for multiple authentication */
  	char		**auth_methods;	/* modified from server config */
 diff --git a/auth2-gss.c b/auth2-gss.c
-index 75eb4e3a..f7898ab3 100644
+index 75eb4e3a3..f7898ab3e 100644
 --- a/auth2-gss.c
 +++ b/auth2-gss.c
 @@ -284,6 +284,7 @@ input_gssapi_mic(int type, u_int32_t plen, struct ssh *ssh)
@@ -102,7 +102,7 @@ index 75eb4e3a..f7898ab3 100644
  
  	authctxt->postponed = 0;
 diff --git a/auth2-hostbased.c b/auth2-hostbased.c
-index eb21479a..a3be6e49 100644
+index 9d8b860eb..976484fc5 100644
 --- a/auth2-hostbased.c
 +++ b/auth2-hostbased.c
 @@ -129,7 +129,16 @@ userauth_hostbased(struct ssh *ssh, const char *method)
@@ -123,10 +123,10 @@ index eb21479a..a3be6e49 100644
  	    (r = sshbuf_put_cstring(b, method)) != 0 ||
  	    (r = sshbuf_put_string(b, pkalg, alen)) != 0 ||
 diff --git a/auth2-pubkey.c b/auth2-pubkey.c
-index aa24fda0..267a27d2 100644
+index 15ad3000c..c326a69ba 100644
 --- a/auth2-pubkey.c
 +++ b/auth2-pubkey.c
-@@ -206,9 +206,16 @@ userauth_pubkey(struct ssh *ssh, const char *method)
+@@ -204,9 +204,16 @@ userauth_pubkey(struct ssh *ssh, const char *method)
  			goto done;
  		}
  		/* reconstruct packet */
@@ -146,7 +146,7 @@ index aa24fda0..267a27d2 100644
  		    (r = sshbuf_put_cstring(b, userstyle)) != 0 ||
  		    (r = sshbuf_put_cstring(b, authctxt->service)) != 0 ||
 diff --git a/auth2.c b/auth2.c
-index 82f6e621..5ba45c12 100644
+index b9bb46f59..1345d3257 100644
 --- a/auth2.c
 +++ b/auth2.c
 @@ -271,6 +271,9 @@ input_userauth_request(int type, u_int32_t seq, struct ssh *ssh)
@@ -186,10 +186,10 @@ index 82f6e621..5ba45c12 100644
  		if ((r = kex_server_update_ext_info(ssh)) != 0)
  			fatal_fr(r, "kex_server_update_ext_info failed");
 diff --git a/misc.c b/misc.c
-index dd0bd032..c932f9bb 100644
+index ce77ec943..5bed34735 100644
 --- a/misc.c
 +++ b/misc.c
-@@ -806,6 +806,7 @@ char *
+@@ -822,6 +822,7 @@ char *
  colon(char *cp)
  {
  	int flag = 0;
@@ -197,7 +197,7 @@ index dd0bd032..c932f9bb 100644
  
  	if (*cp == ':')		/* Leading colon is part of file name. */
  		return NULL;
-@@ -821,6 +822,13 @@ colon(char *cp)
+@@ -837,6 +838,13 @@ colon(char *cp)
  			return (cp);
  		if (*cp == '/')
  			return NULL;
@@ -212,10 +212,10 @@ index dd0bd032..c932f9bb 100644
  	return NULL;
  }
 diff --git a/monitor.c b/monitor.c
-index 2179553d..02b3eaaa 100644
+index a9e854bec..85dc1b1b7 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -120,6 +120,9 @@ int mm_answer_sign(struct ssh *, int, struct sshbuf *);
+@@ -110,6 +110,9 @@ int mm_answer_sign(struct ssh *, int, struct sshbuf *);
  int mm_answer_pwnamallow(struct ssh *, int, struct sshbuf *);
  int mm_answer_auth2_read_banner(struct ssh *, int, struct sshbuf *);
  int mm_answer_authserv(struct ssh *, int, struct sshbuf *);
@@ -225,7 +225,7 @@ index 2179553d..02b3eaaa 100644
  int mm_answer_authpassword(struct ssh *, int, struct sshbuf *);
  int mm_answer_bsdauthquery(struct ssh *, int, struct sshbuf *);
  int mm_answer_bsdauthrespond(struct ssh *, int, struct sshbuf *);
-@@ -194,6 +197,9 @@ struct mon_table mon_dispatch_proto20[] = {
+@@ -184,6 +187,9 @@ struct mon_table mon_dispatch_proto20[] = {
      {MONITOR_REQ_SIGN, MON_ONCE, mm_answer_sign},
      {MONITOR_REQ_PWNAM, MON_ONCE, mm_answer_pwnamallow},
      {MONITOR_REQ_AUTHSERV, MON_ONCE, mm_answer_authserv},
@@ -235,7 +235,7 @@ index 2179553d..02b3eaaa 100644
      {MONITOR_REQ_AUTH2_READ_BANNER, MON_ONCE, mm_answer_auth2_read_banner},
      {MONITOR_REQ_AUTHPASSWORD, MON_AUTH, mm_answer_authpassword},
  #ifdef USE_PAM
-@@ -912,6 +918,9 @@ mm_answer_pwnamallow(struct ssh *ssh, int sock, struct sshbuf *m)
+@@ -919,6 +925,9 @@ mm_answer_pwnamallow(struct ssh *ssh, int sock, struct sshbuf *m)
  
  	/* Allow service/style information on the auth context */
  	monitor_permit(mon_dispatch, MONITOR_REQ_AUTHSERV, 1);
@@ -245,7 +245,7 @@ index 2179553d..02b3eaaa 100644
  	monitor_permit(mon_dispatch, MONITOR_REQ_AUTH2_READ_BANNER, 1);
  
  #ifdef USE_PAM
-@@ -986,6 +995,26 @@ key_base_type_match(const char *method, const struct sshkey *key,
+@@ -993,6 +1002,26 @@ key_base_type_match(const char *method, const struct sshkey *key,
  	return found;
  }
  
@@ -272,7 +272,7 @@ index 2179553d..02b3eaaa 100644
  int
  mm_answer_authpassword(struct ssh *ssh, int sock, struct sshbuf *m)
  {
-@@ -1358,7 +1387,7 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
+@@ -1364,7 +1393,7 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
  	struct sshbuf *b;
  	struct sshkey *hostkey = NULL;
  	const u_char *p;
@@ -281,7 +281,7 @@ index 2179553d..02b3eaaa 100644
  	size_t len;
  	u_char type;
  	int hostbound = 0, r, fail = 0;
-@@ -1389,6 +1418,8 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
+@@ -1395,6 +1424,8 @@ monitor_valid_userblob(struct ssh *ssh, const u_char *data, u_int datalen)
  		fail++;
  	if ((r = sshbuf_get_cstring(b, &cp, NULL)) != 0)
  		fatal_fr(r, "parse userstyle");
@@ -290,7 +290,7 @@ index 2179553d..02b3eaaa 100644
  	xasprintf(&userstyle, "%s%s%s", authctxt->user,
  	    authctxt->style ? ":" : "",
  	    authctxt->style ? authctxt->style : "");
-@@ -1439,7 +1470,7 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
+@@ -1445,7 +1476,7 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
  {
  	struct sshbuf *b;
  	const u_char *p;
@@ -299,7 +299,7 @@ index 2179553d..02b3eaaa 100644
  	size_t len;
  	int r, fail = 0;
  	u_char type;
-@@ -1460,6 +1491,8 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
+@@ -1466,6 +1497,8 @@ monitor_valid_hostbasedblob(const u_char *data, u_int datalen,
  		fail++;
  	if ((r = sshbuf_get_cstring(b, &cp, NULL)) != 0)
  		fatal_fr(r, "parse userstyle");
@@ -309,7 +309,7 @@ index 2179553d..02b3eaaa 100644
  	    authctxt->style ? ":" : "",
  	    authctxt->style ? authctxt->style : "");
 diff --git a/monitor.h b/monitor.h
-index 3f8a9bea..9dcd9c29 100644
+index 3f8a9bea3..9dcd9c293 100644
 --- a/monitor.h
 +++ b/monitor.h
 @@ -56,6 +56,10 @@ enum monitor_reqtype {
@@ -324,10 +324,10 @@ index 3f8a9bea..9dcd9c29 100644
  	MONITOR_REQ_PAM_ACCOUNT = 102, MONITOR_ANS_PAM_ACCOUNT = 103,
  	MONITOR_REQ_PAM_INIT_CTX = 104, MONITOR_ANS_PAM_INIT_CTX = 105,
 diff --git a/monitor_wrap.c b/monitor_wrap.c
-index bd900b2f..ef3ab1b1 100644
+index 33494b73f..347eb6870 100644
 --- a/monitor_wrap.c
 +++ b/monitor_wrap.c
-@@ -442,6 +442,27 @@ mm_inform_authserv(char *service, char *style)
+@@ -453,6 +453,27 @@ mm_inform_authserv(char *service, char *style)
  	sshbuf_free(m);
  }
  
@@ -356,10 +356,10 @@ index bd900b2f..ef3ab1b1 100644
  int
  mm_auth_password(struct ssh *ssh, char *password)
 diff --git a/monitor_wrap.h b/monitor_wrap.h
-index 7134afee..38a280c8 100644
+index c87295388..9b42ddbcb 100644
 --- a/monitor_wrap.h
 +++ b/monitor_wrap.h
-@@ -46,6 +46,9 @@ int mm_sshkey_sign(struct ssh *, struct sshkey *, u_char **, size_t *,
+@@ -50,6 +50,9 @@ int mm_sshkey_sign(struct ssh *, struct sshkey *, u_char **, size_t *,
      const u_char *, size_t, const char *, const char *,
      const char *, u_int compat);
  void mm_inform_authserv(char *, char *);
@@ -370,10 +370,10 @@ index 7134afee..38a280c8 100644
  char *mm_auth2_read_banner(void);
  int mm_auth_password(struct ssh *, char *);
 diff --git a/openbsd-compat/Makefile.in b/openbsd-compat/Makefile.in
-index 1d549954..78e6fa5b 100644
+index 53c87db6d..39531ae77 100644
 --- a/openbsd-compat/Makefile.in
 +++ b/openbsd-compat/Makefile.in
-@@ -100,7 +100,8 @@ PORTS=	port-aix.o \
+@@ -102,7 +102,8 @@ PORTS=	port-aix.o \
  	port-prngd.o \
  	port-solaris.o \
  	port-net.o \
@@ -385,7 +385,7 @@ index 1d549954..78e6fa5b 100644
  	$(CC) $(CFLAGS_NOPIE) $(PICFLAG) $(CPPFLAGS) -c $<
 diff --git a/openbsd-compat/port-linux-sshd.c b/openbsd-compat/port-linux-sshd.c
 new file mode 100644
-index 00000000..b9fbe38b
+index 000000000..b9fbe38b7
 --- /dev/null
 +++ b/openbsd-compat/port-linux-sshd.c
 @@ -0,0 +1,420 @@
@@ -810,7 +810,7 @@ index 00000000..b9fbe38b
 +#endif
 +
 diff --git a/openbsd-compat/port-linux.c b/openbsd-compat/port-linux.c
-index c1d54f38..7426f6f7 100644
+index c1d54f38d..7426f6f79 100644
 --- a/openbsd-compat/port-linux.c
 +++ b/openbsd-compat/port-linux.c
 @@ -109,37 +109,6 @@ ssh_selinux_getctxbyname(char *pwname)
@@ -865,7 +865,7 @@ index c1d54f38..7426f6f7 100644
  	/* XXX: should these calls fatal() upon failure in enforcing mode? */
  
 diff --git a/openbsd-compat/port-linux.h b/openbsd-compat/port-linux.h
-index 959430de..055c825e 100644
+index 959430de1..055c825e4 100644
 --- a/openbsd-compat/port-linux.h
 +++ b/openbsd-compat/port-linux.h
 @@ -20,9 +20,10 @@
@@ -881,7 +881,7 @@ index 959430de..055c825e 100644
  
  #ifdef LINUX_OOM_ADJUST
 diff --git a/platform.c b/platform.c
-index 4c4fe57e..1bfb4bea 100644
+index fd1a7a7c2..bcf1b0491 100644
 --- a/platform.c
 +++ b/platform.c
 @@ -140,7 +140,7 @@ platform_setusercontext_post_groups(struct passwd *pw)
@@ -894,10 +894,10 @@ index 4c4fe57e..1bfb4bea 100644
  }
  
 diff --git a/sshd-session.c b/sshd-session.c
-index c64eb29f..74d2cbc7 100644
+index 8979f743b..cb4b0523d 100644
 --- a/sshd-session.c
 +++ b/sshd-session.c
-@@ -1328,6 +1328,9 @@ main(int ac, char **av)
+@@ -1306,6 +1306,9 @@ main(int ac, char **av)
  		restore_uid();
  	}
  #endif
@@ -908,5 +908,5 @@ index c64eb29f..74d2cbc7 100644
  	if (options.use_pam) {
  		do_pam_setcred();
 -- 
-2.49.0
+2.52.0
 

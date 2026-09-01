@@ -1,0 +1,51 @@
+Adapted for 8.1/9.0 from
+
+
+From 8051de740dd38172476b04e892e5517630e3eaed Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Wed, 11 Mar 2026 11:40:15 +0100
+Subject: [PATCH] Inherit LDFLAGS for TLS and RDMA modules (#3344)
+
+With current Makefile, `LDFLAGS` are not used for modules.
+
+This results in security options not applied.
+
+```
+$ annocheck /usr/lib64/valkey/modules/rdma.so
+annocheck: Version 12.99.
+Hardened: rdma.so: FAIL: bind-now test because not linked with -Wl,-z,now
+Hardened: Rerun annocheck with --verbose to see more information on the tests.
+Hardened: rdma.so: Overall: FAIL.
+```
+
+With this patch
+
+```
+$ annocheck /usr/lib64/valkey/modules/rdma.so
+annocheck: Version 12.99.
+Hardened: rdma.so: PASS.
+```
+
+Signed-off-by: Remi Collet <remi@remirepo.net>
+---
+ src/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index eb4a6e939a..5d3814d019 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -524,11 +524,11 @@ $(ENGINE_CHECK_AOF_NAME): $(SERVER_NAME)
+ 
+ # valkey-tls.so
+ $(TLS_MODULE_NAME): $(SERVER_NAME)
+-	$(QUIET_CC)$(CC) -o $@ tls.c -shared -fPIC $(TLS_MODULE_CFLAGS) $(TLS_CLIENT_LIBS)
++	$(QUIET_CC)$(CC) $(LDFLAGS) -o $@ tls.c -shared -fPIC $(TLS_MODULE_CFLAGS) $(TLS_CLIENT_LIBS)
+ 
+ # valkey-rdma.so
+ $(RDMA_MODULE_NAME): $(SERVER_NAME)
+-	$(QUIET_CC)$(CC) -o $@ rdma.c -shared -fPIC $(RDMA_MODULE_CFLAGS)
++	$(QUIET_CC)$(CC) $(LDFLAGS) -o $@ rdma.c -shared -fPIC $(RDMA_MODULE_CFLAGS)
+ 
+ # valkey-cli
+ $(ENGINE_CLI_NAME): $(ENGINE_CLI_OBJ)

@@ -1,0 +1,33 @@
+diff -rup binutils.orig/ld/testsuite/ld-x86-64/x86-64.exp binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-x86-64/x86-64.exp
+--- binutils.orig/ld/testsuite/ld-x86-64/x86-64.exp	2025-11-20 12:02:23.738336155 +0000
++++ binutils-with-gold-2.45.50-96b8a8a633a/ld/testsuite/ld-x86-64/x86-64.exp	2025-11-20 12:03:17.894485264 +0000
+@@ -1413,14 +1413,6 @@ if { [isnative] && [check_compiler_avail
+ 	    "libprotected-func-2b.so" \
+ 	] \
+ 	[list \
+-	    "Build protected-func-2 without PIE" \
+-	    "$NOPIE_LDFLAGS -Wl,--no-as-needed tmpdir/libprotected-func-2b.so" \
+-	    "$DIRECT_EXTERN_ACCESS_CFLAGS $NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
+-	    { protected-func-1b.c } \
+-	    {} \
+-	    "protected-func-2" \
+-	] \
+-	[list \
+ 	    "Build libprotected-func-2c.so" \
+ 	    "-shared" \
+ 	    "-fPIC -Wa,-mx86-used-note=yes" \
+@@ -1429,14 +1421,6 @@ if { [isnative] && [check_compiler_avail
+ 	    "libprotected-func-2c.so" \
+ 	] \
+ 	[list \
+-	    "Build protected-func-2a without PIE" \
+-	    "$NOPIE_LDFLAGS -Wl,--no-as-needed tmpdir/libprotected-func-2c.so" \
+-	    "$DIRECT_EXTERN_ACCESS_CFLAGS $NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
+-	    { protected-func-1b.c } \
+-	    {} \
+-	    "protected-func-2a" \
+-	] \
+-	[list \
+ 	    "Build libprotected-data-1a.so" \
+ 	    "-shared -z noindirect-extern-access" \
+ 	    "-fPIC -Wa,-mx86-used-note=yes" \

@@ -1,0 +1,29 @@
+From c5686b5fd8d45326b63f6bf505a0f8c791a5867f Mon Sep 17 00:00:00 2001
+From: Jeremy Sowden <jeremy@azazel.net>
+Date: Sat, 6 Dec 2025 21:53:36 +0000
+Subject: [PATCH] doc: fix typo in man-page
+
+"interally" -> "internally"
+
+Fixes: f34381547094 ("doc: minor improvements the `reject` statement")
+
+Signed-off-by: Jeremy Sowden <jeremy@azazel.net>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+(cherry picked from commit 76c90e438f6ae5c6d4b72a4720b8c2576b2457b3)
+---
+ doc/statements.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/doc/statements.txt b/doc/statements.txt
+index 0b14398117de6..8f96bf6b84fa1 100644
+--- a/doc/statements.txt
++++ b/doc/statements.txt
+@@ -203,7 +203,7 @@ ____
+ ____
+ 
+ A reject statement tries to send back an error packet in response to the matched
+-packet and then interally issues a *drop* verdict.
++packet and then internally issues a *drop* verdict.
+ It’s thus a terminating statement with all consequences of the latter (see
+ <<OVERALL_EVALUATION_OF_THE_RULESET>> respectively <<VERDICT_STATEMENTS>>).
+ This statement is only valid in base chains using the *prerouting*, *input*,

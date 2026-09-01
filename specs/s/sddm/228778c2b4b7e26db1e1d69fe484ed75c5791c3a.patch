@@ -1,0 +1,22 @@
+From 228778c2b4b7e26db1e1d69fe484ed75c5791c3a Mon Sep 17 00:00:00 2001
+From: Heiko Becker <heiko.becker@kde.org>
+Date: Sun, 23 Feb 2025 22:21:25 +0100
+Subject: [PATCH] CMake: Raise required version to 3.5
+
+CMake >= 4.0.0-rc1 removed compatibility with versions < 3.5 and errors
+out with such versions passed to cmake_minimum_required(). 3.5.0 has
+been released 9 years ago, so I'd assume it's available almost everywhere.
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 690ee7095..1b5f54af5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.4)
++cmake_minimum_required(VERSION 3.5)
+ 
+ project(SDDM)
+ 

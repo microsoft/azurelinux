@@ -1,0 +1,65 @@
+From 2b985cd2848d3c5f492ea5da356de9903062ab30 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 28 Jan 2026 10:27:59 -0500
+Subject: [PATCH] objcopy: use --output-target instead of --target
+
+In recent versions of binutils, efi-app-x64 and similar are output-only
+targets, and can't be specified with --target.
+
+This switches them to use --output-target instead.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ Make.defaults | 2 +-
+ README.gnuefi | 4 ++--
+ apps/Makefile | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/Make.defaults b/Make.defaults
+index 0068e319ecc..c43a37a8923 100755
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -155,7 +155,7 @@ ifeq ($(ARCH),mips64el)
+ endif
+ 
+ #
+-# Set HAVE_EFI_OBJCOPY if objcopy understands --target efi-[app|bsdrv|rtdrv],
++# Set HAVE_EFI_OBJCOPY if objcopy understands --output-target efi-[app|bsdrv|rtdrv],
+ # otherwise we need to compose the PE/COFF header using the assembler
+ #
+ ifneq ($(ARCH),arm)
+diff --git a/README.gnuefi b/README.gnuefi
+index 512698c28b4..200dd39cf0a 100644
+--- a/README.gnuefi
++++ b/README.gnuefi
+@@ -181,8 +181,8 @@ see the spec at
+ 
+ In theory, converting a suitable ELF64 binary to PE32+ is easy and
+ could be accomplished with the "objcopy" utility by specifying option
+---target=efi-app-ia32 (x86) or --target=efi-app-ia64 (IA-64).  But
+-life never is that easy, so here some complicating factors:
++--output-target=efi-app-ia32 (x86) or --output-target=efi-app-ia64 (IA-64).
++But life never is that easy, so here some complicating factors:
+ 
+  (1) COFF sections are very different from ELF sections.
+ 
+diff --git a/apps/Makefile b/apps/Makefile
+index 18980f1645c..f71879d8638 100644
+--- a/apps/Makefile
++++ b/apps/Makefile
+@@ -68,9 +68,9 @@ TARGET_RTDRIVERS =
+ 
+ ifneq ($(HAVE_EFI_OBJCOPY),)
+ 
+-FORMAT		:= --target efi-app-$(ARCH)
+-$(TARGET_BSDRIVERS): FORMAT=--target efi-bsdrv-$(ARCH)
+-$(TARGET_RTDRIVERS): FORMAT=--target efi-rtdrv-$(ARCH)
++FORMAT		:= --output-target efi-app-$(ARCH)
++$(TARGET_BSDRIVERS): FORMAT=--output-target efi-bsdrv-$(ARCH)
++$(TARGET_RTDRIVERS): FORMAT=--output-target efi-rtdrv-$(ARCH)
+ 
+ else
+ 
+-- 
+2.52.0
+

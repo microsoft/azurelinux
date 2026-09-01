@@ -10,7 +10,7 @@
 
 Name:           python-sphinx-basic-ng
 Version:        1.0.0
-Release:        0.17.%{prerel}%{?dist}
+Release:        0.19.%{prerel}%{?dist}
 Summary:        Modernized skeleton for Sphinx themes
 
 License:        MIT
@@ -19,8 +19,11 @@ VCS:            git:%{giturl}.git
 Source:         %{giturl}/archive/%{version}.%{prerel}/sphinx-basic-ng-%{version}.%{prerel}.tar.gz
 
 BuildArch:      noarch
-
-BuildRequires:  python3-devel
+BuildSystem:    pyproject
+%if %{without bootstrap}
+BuildOption(generate_buildrequires): -x docs
+%endif
+BuildOption(install): -l sphinx_basic_ng
 
 %if %{without bootstrap}
 BuildRequires:  python-sphinx-doc
@@ -82,21 +85,12 @@ sed -e 's|\("https://docs\.python\.org/3", \)None|\1"%{_docdir}/python3-docs/htm
     -e 's|\("https://www\.sphinx-doc\.org/en/master", \)None|\1"%{_docdir}/python-sphinx-doc/html/objects.inv"|' \
     -i docs/conf.py
 
-%generate_buildrequires
-%pyproject_buildrequires %{!?with_bootstrap:-x docs}
-
-%build
-%pyproject_wheel
-
+%build -a
 %if %{without bootstrap}
 # Build documentation
 PYTHONPATH=$PWD/src sphinx-build -b html docs html
 rm -rf html/{.buildinfo,.doctrees}
 %endif
-
-%install
-%pyproject_install
-%pyproject_save_files -l sphinx_basic_ng
 
 %check
 # The nox tests require network access, so we do not run them
@@ -112,6 +106,12 @@ rm -rf html/{.buildinfo,.doctrees}
 %endif
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.0-0.19.beta2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Oct 31 2025 Jerry James <loganjerry@gmail.com> - 1.0.0-0.18.beta2
+- Use the pyproject declarative buildsystem
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.0.0-0.17.beta2
 - Rebuilt for Python 3.14.0rc3 bytecode
 

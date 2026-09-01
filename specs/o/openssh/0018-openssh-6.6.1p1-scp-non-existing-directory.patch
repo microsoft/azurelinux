@@ -1,0 +1,27 @@
+From 931f22f77ab2b9cebd96e113f1e3ab179dd1b6cb Mon Sep 17 00:00:00 2001
+From: Dmitry Belyavskiy <beldmit@gmail.com>
+Date: Thu, 15 May 2025 13:43:28 +0200
+Subject: [PATCH 18/53] openssh-6.6.1p1-scp-non-existing-directory
+
+---
+ scp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/scp.c b/scp.c
+index d97a54cc4..e1992622f 100644
+--- a/scp.c
++++ b/scp.c
+@@ -1866,6 +1866,10 @@ sink(int argc, char **argv, const char *src)
+ 			free(vect[0]);
+ 			continue;
+ 		}
++		if (buf[0] == 'C' && ! exists && np[strlen(np)-1] == '/') {
++			errno = ENOTDIR;
++			goto bad;
++		}
+ 		omode = mode;
+ 		mode |= S_IWUSR;
+ 		if ((ofd = open(np, O_WRONLY|O_CREAT, mode)) == -1) {
+-- 
+2.52.0
+

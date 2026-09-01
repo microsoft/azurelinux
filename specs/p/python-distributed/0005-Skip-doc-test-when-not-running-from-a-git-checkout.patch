@@ -1,4 +1,4 @@
-From 079a03ed03f0a29ba5a6cc02ee8c904058be16c1 Mon Sep 17 00:00:00 2001
+From 9cc062f6522aeac52b24fa1f946fb9804d46195e Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Sat, 8 Apr 2023 21:01:58 -0400
 Subject: [PATCH 5/7] Skip doc test when not running from a git checkout
@@ -26,5 +26,5 @@ index 3bccaf11..f6bd13c7 100644
          for row in fh:
              row = row.strip()
 -- 
-2.50.0
+2.52.0
 

@@ -1,0 +1,26 @@
+From dd0eb7e2bb7a9278770eb208af6f6adb27df51d9 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <neal@gompa.dev>
+Date: Tue, 18 Aug 2026 21:02:25 -0400
+Subject: [PATCH] thermald: platform: intel: Re-add Wildcat Lake support
+
+This was accidentally dropped during the refactor that split out
+Intel platform code into a separate backend.
+
+Fixes: 4cf42fc89cc ("Refactor Intel-specific logic into separate files")
+Signed-off-by: Neal Gompa <neal@gompa.dev>
+---
+ src/thd_platform_intel.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/thd_platform_intel.cpp b/src/thd_platform_intel.cpp
+index 1d8337c9..4be95fdc 100644
+--- a/src/thd_platform_intel.cpp
++++ b/src/thd_platform_intel.cpp
+@@ -81,6 +81,7 @@ static supported_ids_t intel_id_table[] = {
+     { 6, 0xc5, 1 }, // Arrow Lake H
+     { 6, 0xb5, 1 }, // Arrow Lake U
+     { 6, 0xcc, 1 }, // Panther Lake L
++    { 6, 0xd5, 1 }, // Wildcat Lake L
+     { 15, 0x01, 1 }, // Nova Lake S
+     { 15, 0x03, 1 }, // Nova Lake U/P/H/Hx
+     { 0, 0, 0 } // Last Invalid entry

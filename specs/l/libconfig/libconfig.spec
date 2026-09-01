@@ -5,19 +5,16 @@
 
 Name:                   libconfig
 Summary:                C/C++ configuration file library
-Version:                1.7.3
-Release: 15%{?dist}
+Version:                1.8.2
+Release:                2%{?dist}
 # lib/grammar.* are GPL-3.0-or-later WITH Bison-exception-2.2
 License:                LGPL-2.1-or-later AND GPL-3.0-or-later WITH Bison-exception-2.2
 URL:                    http://www.hyperrealm.com/libconfig/
 Source0:                https://hyperrealm.github.io/%name/dist/%name-%version.tar.gz
-# Generated from libconfig 1.7.2 on Fedora 28 x86_64 (2018-07-18)
+# Generated from libconfig 1.8.2 on Fedora 44 x86_64 (2025-12-17)
 Source1:                libconfig-%version.pdf
 # Helper script to generate Source1 (locally)
 Source2:                generate-pdf.sh
-
-# Backport of https://github.com/hyperrealm/libconfig/pull/249
-Patch0:                 gcc15.patch
 
 BuildRequires:          gcc, gcc-c++
 BuildRequires:          texinfo
@@ -42,7 +39,6 @@ libconfig.
 
 %prep
 %setup -q
-%patch -P0 -p1 -b .gcc15
 iconv -f iso-8859-1 -t utf-8 -o AUTHORS{.utf8,}
 mv AUTHORS{.utf8,}
 
@@ -73,7 +69,7 @@ make check
 %files
 %license COPYING.LIB
 %doc AUTHORS ChangeLog README
-%{_libdir}/libconfig*.so.11*
+%{_libdir}/libconfig*.so.15*
 
 
 %files devel
@@ -87,6 +83,12 @@ make check
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 17 2025 Tom Callaway <spot@fedoraproject.org> - 1.8.2-1
+- update to 1.8.2
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.3-12
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -23,7 +23,7 @@
 Summary: PyQt5 is Python bindings for Qt5
 Name:    python-qt5
 Version: 5.15.12
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 
 # Automatically converted from old format: GPLv3 - review is highly recommended.
 License: GPL-3.0-only
@@ -294,6 +294,9 @@ sed -i \
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.12-0.2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 04 2025 Jan Grulich <jgrulich@redhat.com> - 5.15.12-0.1^dev2507081429
 - Update to snapshot of pyqt5 5.15.12
 

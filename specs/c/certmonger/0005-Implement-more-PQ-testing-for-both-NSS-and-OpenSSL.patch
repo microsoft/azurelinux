@@ -1,0 +1,2386 @@
+From 63ad363b7cccfccf46f01a0a50a01f8cc5dcd44f Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Mon, 12 Jan 2026 13:31:32 +0000
+Subject: [PATCH 5/6] Implement more PQ testing for both NSS and OpenSSL
+
+This adds keyiread and csrgen tests for both NSS and
+OpenSSL. keyiread, keygen and csrgen will now run by
+default when PQ is enabled.
+
+It also fixes the 028-dbus test if PQ is not enabled either
+by configuration (--disable-ml-dsa) or because it isn't
+available.
+---
+ src/csrgen-o.c                                |  20 +-
+ src/prefs-n.c                                 |  41 +
+ src/prefs-o.c                                 |  33 +
+ src/prefs-o.h                                 |   1 +
+ tests/001-keyiread-mldsa/expected.out         |   7 +
+ tests/001-keyiread-mldsa/run.sh               |  36 +
+ .../expected.out                              |   0
+ .../prequal.sh                                |   0
+ .../run.sh                                    |   5 +
+ tests/003-csrgen-mldsa/expected.out           |   7 +
+ tests/003-csrgen-mldsa/run.sh                 |  52 +
+ tests/028-dbus/expected.out.nodsa.withmldsa   | 965 ++++++++++++++++++
+ tests/028-dbus/expected.out.nomldsa           | 965 ++++++++++++++++++
+ tests/Makefile.am                             |  21 +
+ 14 files changed, 2149 insertions(+), 4 deletions(-)
+ create mode 100644 tests/001-keyiread-mldsa/expected.out
+ create mode 100755 tests/001-keyiread-mldsa/run.sh
+ rename tests/{002-keygen-ml-dsa => 002-keygen-mldsa}/expected.out (100%)
+ rename tests/{002-keygen-ml-dsa => 002-keygen-mldsa}/prequal.sh (100%)
+ mode change 100644 => 100755
+ rename tests/{002-keygen-ml-dsa => 002-keygen-mldsa}/run.sh (96%)
+ create mode 100644 tests/003-csrgen-mldsa/expected.out
+ create mode 100755 tests/003-csrgen-mldsa/run.sh
+ create mode 100644 tests/028-dbus/expected.out.nodsa.withmldsa
+ create mode 100644 tests/028-dbus/expected.out.nomldsa
+
+diff --git a/src/csrgen-o.c b/src/csrgen-o.c
+index f1091c52..e1f8c4a5 100644
+--- a/src/csrgen-o.c
++++ b/src/csrgen-o.c
+@@ -191,6 +191,7 @@ cm_csrgen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 	unsigned int bmpcount, mdlen;
+ 	long error;
+ 	int i;
++	const EVP_MD *sign_md = cm_prefs_ossl_sig_alg(entry->cm_key_type.cm_key_algorithm);
+ 
+ 	status = fdopen(fd, "w");
+ 	if (status == NULL) {
+@@ -344,8 +345,15 @@ cm_csrgen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 							  upassword,
+ 							  strlen(password));
+ 			}
+-			X509_REQ_sign(req, pkey, cm_prefs_ossl_hash());
+-			PEM_write_X509_REQ(status, req);
++
++			if (X509_REQ_sign(req, pkey, sign_md) == 0) {
++				cm_log_errors(1, "Error signing the CSR.\n");
++				_exit(CM_SUB_STATUS_ERROR_AUTH); /* XXX */
++			}
++			if (PEM_write_X509_REQ(status, req) != 1) {
++				cm_log_errors(1, "Error while writing the CSR PEM.\n");
++				_exit(CM_SUB_STATUS_ERROR_AUTH); /* XXX */
++			}
+ 			/* Generate the SPKAC. */
+ 			memset(&spkac, 0, sizeof(spkac));
+ 			spkac.challenge = util_ASN1_IA5STRING_new();
+@@ -362,7 +370,9 @@ cm_csrgen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 			util_NETSCAPE_SPKI_set_sig_alg(&spki, sig_alg);
+ 			spki.signature = util_ASN1_BIT_STRING_new();
+ 			NETSCAPE_SPKI_set_pubkey(&spki, pkey);
+-			NETSCAPE_SPKI_sign(&spki, pkey, cm_prefs_ossl_hash());
++			if (NETSCAPE_SPKI_sign(&spki, pkey, sign_md) == 0) {
++				cm_log_errors(1, "NETSCAPE_SPKI_sign failed.\n");
++			}
+ 			s = NETSCAPE_SPKI_b64_encode(&spki);
+ 			if (s != NULL) {
+ 				fprintf(status, "%s", s);
+@@ -429,7 +439,9 @@ cm_csrgen_o_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 			}
+ 			X509_set_serialNumber(minicert, serial);
+ 			X509_set_pubkey(minicert, pkey);
+-			X509_sign(minicert, pkey, cm_prefs_ossl_hash());
++			if (X509_sign(minicert, pkey, sign_md) == 0) {
++				cm_log_errors(1, "Signing minicert failed.\n");
++			}
+ 			len = i2d_X509(minicert, NULL);
+ 			mcb64 = NULL;
+ 			if (len > 0) {
+diff --git a/src/prefs-n.c b/src/prefs-n.c
+index 584bdd7b..d080f0a1 100644
+--- a/src/prefs-n.c
++++ b/src/prefs-n.c
+@@ -19,7 +19,9 @@
+ 
+ #include <nss.h>
+ #include <nss.h>
++#include <keyhi.h>
+ #include <keythi.h>
++#include <pk11pub.h>
+ #include <secoidt.h>
+ 
+ #include "prefs.h"
+@@ -114,6 +116,45 @@ cm_prefs_nss_sig_alg(SECKEYPrivateKey *pkey)
+ 			return SEC_OID_ANSIX962_ECDSA_SHA256_SIGNATURE;
+ 			break;
+ 		}
++#ifdef CM_ENABLE_ML_DSA
++	case mldsaKey:
++		/* This is a simplified version of
++		 * cm_GetSignatureAlgorithmFromPrivateKey from keyiread-n.c.
++		 * Once the NSS function is exported that can be moved to
++		 * something like util-n.c and be generalized. For now I
++		 * duplicate.
++		 */
++		SECItem item;
++		CK_ULONG paramSet;
++		SECStatus rv;
++
++		rv = PK11_ReadRawAttribute(PK11_TypePrivKey, pkey, CKA_PARAMETER_SET, &item);
++		if (rv != SECSuccess) {
++			return SEC_OID_UNKNOWN;
++		}
++
++		if (item.len != sizeof(paramSet)) {
++			PORT_Free(item.data);	
++			PORT_SetError(SEC_ERROR_INVALID_KEY);
++			return SEC_OID_UNKNOWN;
++		}
++		paramSet = *(CK_ULONG *)item.data;
++		PORT_Free(item.data);
++		switch (paramSet) {
++		case CKP_ML_DSA_44:
++			return SEC_OID_ML_DSA_44_SIGNATURE;
++			break;
++		case CKP_ML_DSA_65:
++			return SEC_OID_ML_DSA_65_SIGNATURE;
++			break;
++		case CKP_ML_DSA_87:
++			return SEC_OID_ML_DSA_87_SIGNATURE;
++			break;
++		default:
++			return SEC_OID_UNKNOWN;
++			break;
++		}
++#endif
+ 	default:
+ 		return SEC_OID_UNKNOWN;
+ 		break;
+diff --git a/src/prefs-o.c b/src/prefs-o.c
+index 4b6ef6fd..39cabb7e 100644
+--- a/src/prefs-o.c
++++ b/src/prefs-o.c
+@@ -32,6 +32,39 @@
+ #include "prefs.h"
+ #include "prefs-o.h"
+ #include "util-o.h"
++#include "log.h"
++#include "store-int.h"
++
++const EVP_MD *
++cm_prefs_ossl_sig_alg(enum cm_key_algorithm cm_key_algorithm)
++{
++	switch(cm_key_algorithm) {
++	case cm_key_rsa:
++#ifdef CM_ENABLE_DSA
++	case cm_key_dsa:
++#endif
++#ifdef CM_ENABLE_EC
++	case cm_key_ecdsa:
++#endif
++		return cm_prefs_ossl_hash();
++		break;
++#ifdef CM_ENABLE_ML_DSA
++	case cm_key_ml_dsa_44:
++		return EVP_get_digestbyname("ML-DSA-44");
++		break;
++	case cm_key_ml_dsa_65:
++		return EVP_get_digestbyname("ML-DSA-65");
++		break;
++	case cm_key_ml_dsa_87:
++		return EVP_get_digestbyname("ML-DSA-87");
++		break;
++#endif
++	default:
++		cm_log(1, "Unknown or unsupported key type.\n");
++		return NULL;
++		break;
++	}
++}
+ 
+ const EVP_MD *
+ cm_prefs_ossl_hash_by_pref(enum cm_prefs_digest digest)
+diff --git a/src/prefs-o.h b/src/prefs-o.h
+index 1dcd4e81..9c233ab7 100644
+--- a/src/prefs-o.h
++++ b/src/prefs-o.h
+@@ -18,6 +18,7 @@
+ #ifndef cmprefso_h
+ #define cmprefso_h
+ 
++const EVP_MD * cm_prefs_ossl_sig_alg(enum cm_key_algorithm cm_key_algorithm);
+ const EVP_CIPHER *cm_prefs_ossl_cipher(void);
+ const EVP_CIPHER *cm_prefs_ossl_cipher_by_pref(enum cm_prefs_cipher cipher);
+ const EVP_MD *cm_prefs_ossl_hash(void);
+diff --git a/tests/001-keyiread-mldsa/expected.out b/tests/001-keyiread-mldsa/expected.out
+new file mode 100644
+index 00000000..82ab39a5
+--- /dev/null
++++ b/tests/001-keyiread-mldsa/expected.out
+@@ -0,0 +1,7 @@
++OK (ML-DSA-44:10496).
++OK (ML-DSA-44:10496).
++OK (ML-DSA-65:15616).
++OK (ML-DSA-65:15616).
++OK (ML-DSA-87:20736).
++OK (ML-DSA-87:20736).
++Test complete.
+diff --git a/tests/001-keyiread-mldsa/run.sh b/tests/001-keyiread-mldsa/run.sh
+new file mode 100755
+index 00000000..9c01c2f2
+--- /dev/null
++++ b/tests/001-keyiread-mldsa/run.sh
+@@ -0,0 +1,36 @@
++#!/bin/bash -e
++
++cd "$tmpdir"
++
++source "$srcdir"/functions
++initnssdb "$tmpdir"
++
++for size in ML-DSA-44 ML-DSA-65 ML-DSA-87 ; do
++	# Generate a self-signed cert.
++	run_certutil -d "$tmpdir" -S -n keyi$size \
++		-s "cn=T$size" -c "cn=T$size" \
++		-x -t u -k mldsa -q $size
++	# Check the size of the key.
++	cat > entry.nss.$size <<- EOF
++	key_storage_type=NSSDB
++	key_storage_location=$tmpdir
++	key_nickname=keyi$size
++	EOF
++	$toolsdir/keyiread entry.nss.$size
++	# Export the key.
++	if ! pk12util -C AES-128-CBC -c AES-128-CBC -d "$tmpdir" -o $size.p12 -W "" -n "keyi$size" > /dev/null 2>&1 ; then
++		echo Error exporting key for $size, continuing.
++		continue
++	fi
++	if ! openssl pkcs12 -in $size.p12 -out key.$size -passin pass: -nodes -nocerts > /dev/null 2>&1 ; then
++		echo Error parsing exported key for $size, continuing.
++		continue
++	fi
++	cat > entry.openssl.$size <<- EOF
++	key_storage_type=FILE
++	key_storage_location=$tmpdir/key.$size
++	key_nickname=keyi$size
++	EOF
++	$toolsdir/keyiread entry.openssl.$size
++done
++echo Test complete.
+diff --git a/tests/002-keygen-ml-dsa/expected.out b/tests/002-keygen-mldsa/expected.out
+similarity index 100%
+rename from tests/002-keygen-ml-dsa/expected.out
+rename to tests/002-keygen-mldsa/expected.out
+diff --git a/tests/002-keygen-ml-dsa/prequal.sh b/tests/002-keygen-mldsa/prequal.sh
+old mode 100644
+new mode 100755
+similarity index 100%
+rename from tests/002-keygen-ml-dsa/prequal.sh
+rename to tests/002-keygen-mldsa/prequal.sh
+diff --git a/tests/002-keygen-ml-dsa/run.sh b/tests/002-keygen-mldsa/run.sh
+similarity index 96%
+rename from tests/002-keygen-ml-dsa/run.sh
+rename to tests/002-keygen-mldsa/run.sh
+index 6adc541c..66317178 100755
+--- a/tests/002-keygen-ml-dsa/run.sh
++++ b/tests/002-keygen-mldsa/run.sh
+@@ -5,6 +5,11 @@ cd "$tmpdir"
+ source "$srcdir"/functions
+ initnssdb "$tmpdir"
+ 
++cd "$tmpdir"
++
++source "$srcdir"/functions
++initnssdb "$tmpdir"
++
+ for size in 44 65 87 ; do
+ 	echo "[nss:$size]"
+ 	# Generate a key.
+diff --git a/tests/003-csrgen-mldsa/expected.out b/tests/003-csrgen-mldsa/expected.out
+new file mode 100644
+index 00000000..ed22729b
+--- /dev/null
++++ b/tests/003-csrgen-mldsa/expected.out
+@@ -0,0 +1,7 @@
++verify OK
++verify OK
++Signature OK
++Signature OK
++minicert.openssl.ML-DSA-65.pem: OK
++minicert.nss.ML-DSA-65.pem: OK
++Test complete.
+diff --git a/tests/003-csrgen-mldsa/run.sh b/tests/003-csrgen-mldsa/run.sh
+new file mode 100755
+index 00000000..0dc07201
+--- /dev/null
++++ b/tests/003-csrgen-mldsa/run.sh
+@@ -0,0 +1,52 @@
++#!/bin/bash -e
++
++cd "$tmpdir"
++
++source "$srcdir"/functions
++initnssdb "$tmpdir"
++
++size=ML-DSA-65
++
++# Build a self-signed certificate.
++run_certutil -d "$tmpdir" -S -n keyi$size \
++	-s "cn=T$size" -c "cn=T$size" \
++	-x -t u -k mldsa -q $size
++# Export the key.
++pk12util -C AES-128-CBC -c AES-128-CBC -d "$tmpdir" -o $size.p12 -W "" -n "keyi$size" > /dev/null 2>&1
++openssl pkcs12 -in $size.p12 -out key.$size -passin pass: -nodes -nocerts > /dev/null 2>&1 | ( grep -v '^MAC verified OK$' || : )
++# Read the public key and cache it.
++cat > entry.openssl.$size <<- EOF
++key_storage_type=FILE
++key_storage_location=$tmpdir/key.$size
++key_nickname=keyi$size
++id=keyi$size
++EOF
++$toolsdir/keyiread entry.openssl.$size > /dev/null 2>&1
++# Add the cached value to the prepping for the NSS copy.
++cat > entry.nss.$size <<- EOF
++key_storage_type=NSSDB
++key_storage_location=$tmpdir
++key_nickname=keyi$size
++id=keyi$size
++EOF
++# Generate a new CSR for that certificate's key.
++$toolsdir/csrgen entry.nss.$size > csr.nss.$size
++grep ^spkac= entry.nss.$size | sed s,spkac,SPKAC, > spkac.nss.$size
++# Generate a new CSR using the extracted key.
++$toolsdir/csrgen entry.openssl.$size > csr.openssl.$size
++grep ^spkac= entry.openssl.$size | sed s,spkac,SPKAC, > spkac.openssl.$size
++# Pull out the mini-cert.
++grep ^minicert= entry.openssl.$size | sed s,^minicert=,, | base64 -d > minicert.openssl.$size
++openssl x509 -out minicert.openssl.$size.pem -in minicert.openssl.$size -inform der
++grep ^minicert= entry.nss.$size | sed s,^minicert=,, | base64 -d > minicert.nss.$size
++openssl x509 -out minicert.nss.$size.pem -in minicert.nss.$size -inform der
++# The RSA tests already verify the contents of the requests, so we really only
++# need to care about the signatures passing verification.
++openssl req   -verify -noout -in csr.nss.$size 2>&1 | sed 's/Certificate request self-signature //'
++openssl req   -verify -noout -in csr.openssl.$size 2>&1 | sed 's/Certificate request self-signature //'
++openssl spkac -verify -noout < spkac.nss.$size 2>&1
++openssl spkac -verify -noout < spkac.openssl.$size 2>&1
++openssl verify -CAfile minicert.openssl.$size.pem minicert.openssl.$size.pem 2>&1
++openssl verify -CAfile minicert.nss.$size.pem minicert.nss.$size.pem 2>&1
++
++echo Test complete.
+diff --git a/tests/028-dbus/expected.out.nodsa.withmldsa b/tests/028-dbus/expected.out.nodsa.withmldsa
+new file mode 100644
+index 00000000..99d9356e
+--- /dev/null
++++ b/tests/028-dbus/expected.out.nodsa.withmldsa
+@@ -0,0 +1,965 @@
++Certificate in file "${tmpdir}/test.crt" issued by CA and saved.
++Certificate in file "${tmpdir}/test.crt" issued by CA and saved.
++[[ getcert ]]
++State MONITORING, stuck: no.
++Number of certificates and requests being tracked: 1.
++Request ID 'Buddy':
++	status: MONITORING
++	stuck: no
++	key pair storage: type=FILE,location='$tmpdir/test.key'
++	certificate: type=FILE,location='$tmpdir/test.crt'
++	CA: local
++	issuer: CN=$UUID,CN=Local Signing Authority
++	subject: CN=localhost
++	issued: sometime
++	expires: sometime
++	dns: localhost
++	principal name: host/localhost@LOCALHOST
++	key usage: digitalSignature,dataEncipherment
++	eku: id-kp-serverAuth
++	certificate template/profile: SomeProfileName
++	profile: SomeProfileName
++	pre-save command: echo Pre
++	post-save command: echo Post
++	track: yes
++	auto-renew: yes
++CA 'local':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $tmpdir/local-submit
++CA 'SelfSign':
++	is-default: no
++	ca-type: INTERNAL:SELF
++	next-serial-number: 01
++CA 'IPA':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $libexecdir/ipa-submit
++CA 'dogtag-ipa-renew-agent':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $libexecdir/dogtag-ipa-renew-agent-submit
++
++[[ API ]]
++[ simpleprop.py ]
++/org/fedorahosted/certmonger/cas/CA5
++/org/fedorahosted/certmonger/cas/CA5
++: -> : -k admin@localhost -> :
++0 -> 1 -> 0
++[ walk.py ]
++[ /: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="org"/>
++</node>
++
++[ /org: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="fedorahosted"/>
++</node>
++
++[ /org/fedorahosted: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="certmonger"/>
++</node>
++
++[ /org/fedorahosted/certmonger: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger">
++  <method name="add_known_ca">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="command" type="s" direction="in"/>
++   <arg name="known_names" type="as" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <method name="add_request">
++   <arg name="template" type="a{sv}" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <method name="find_ca_by_nickname">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="ca" type="o" direction="out"/>
++  </method>
++  <method name="find_request_by_nickname">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="request" type="o" direction="out"/>
++  </method>
++  <method name="get_known_cas">
++   <arg name="ca_list" type="ao" direction="out"/>
++  </method>
++  <method name="get_requests">
++   <arg name="requests" type="ao" direction="out"/>
++  </method>
++  <method name="get_supported_key_types">
++   <arg name="key_type_list" type="as" direction="out"/>
++  </method>
++  <method name="get_supported_key_storage">
++   <arg name="key_storage_type_list" type="as" direction="out"/>
++  </method>
++  <method name="get_supported_cert_storage">
++   <arg name="cert_storage_type_list" type="as" direction="out"/>
++  </method>
++  <method name="remove_known_ca">
++   <arg name="ca" type="o" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++  </method>
++  <method name="remove_request">
++   <arg name="request" type="o" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++  </method>
++ </interface>
++ <node name="requests"/>
++ <node name="cas"/>
++</node>
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.add_known_ca ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.add_request ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.find_ca_by_nickname ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.find_request_by_nickname ]
++OK
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_known_cas ]
++dbus.Array([dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA1'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA2'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA3'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA4')], signature=dbus.Signature('o'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_requests ]
++dbus.Array([dbus.ObjectPath('/org/fedorahosted/certmonger/requests/Request2')], signature=dbus.Signature('o'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_key_types ]
++dbus.Array([dbus.String('RSA'), dbus.String('EC'), dbus.String('ML-DSA-44'), dbus.String('ML-DSA-65'), dbus.String('ML-DSA-87')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_key_storage ]
++dbus.Array([dbus.String('NSSDB'), dbus.String('FILE')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_cert_storage ]
++dbus.Array([dbus.String('NSSDB'), dbus.String('FILE')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.remove_known_ca ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.remove_request ]
++OK
++
++[ /org/fedorahosted/certmonger/requests: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/requests">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="Request2"/>
++</node>
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/requests/Request2">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.request">
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <method name="get_autorenew">
++   <arg name="enabled" type="b" direction="out"/>
++  </method>
++  <property name="autorenew" type="b" access="read"/>
++  <method name="get_cert_data">
++   <arg name="pem" type="s" direction="out"/>
++  </method>
++  <property name="cert" type="s" access="read">
++   <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
++  </property>
++  <property name="cert-chain" type="a(ss)" access="read"/>
++  <property name="cert-roots" type="a(ss)" access="read"/>
++  <method name="get_cert_info">
++   <arg name="issuer" type="s" direction="out"/>
++   <arg name="serial_hex" type="s" direction="out"/>
++   <arg name="subject" type="s" direction="out"/>
++   <arg name="not_after" type="x" direction="out"/>
++   <arg name="email" type="as" direction="out"/>
++   <arg name="dns" type="as" direction="out"/>
++   <arg name="principal_names" type="as" direction="out"/>
++   <arg name="key_usage" type="x" direction="out"/>
++   <arg name="extended_key_usage" type="as" direction="out"/>
++   <arg name="not_before" type="x" direction="out"/>
++  </method>
++  <property name="issuer" type="s" access="read"/>
++  <property name="serial" type="s" access="read"/>
++  <property name="subject" type="s" access="read"/>
++  <property name="not-valid-before" type="x" access="read"/>
++  <property name="not-valid-after" type="x" access="read"/>
++  <property name="email" type="as" access="read"/>
++  <property name="ku" type="s" access="read"/>
++  <property name="eku" type="as" access="read"/>
++  <property name="hostname" type="as" access="read"/>
++  <property name="principal" type="as" access="read"/>
++  <method name="get_cert_last_checked">
++   <arg name="date" type="x" direction="out"/>
++  </method>
++  <property name="last-checked" type="x" access="read"/>
++  <method name="get_cert_storage_info">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="location_or_nickname" type="s" direction="out"/>
++   <arg name="nss_token" type="s" direction="out"/>
++  </method>
++  <property name="cert-storage" type="s" access="read"/>
++  <property name="cert-file" type="s" access="read"/>
++  <property name="cert-database" type="s" access="read"/>
++  <property name="cert-nickname" type="s" access="read"/>
++  <property name="cert-token" type="s" access="read"/>
++  <property name="cert-owner" type="s" access="readwrite"/>
++  <property name="cert-perms" type="x" access="readwrite"/>
++  <method name="get_csr_data">
++   <arg name="pem" type="s" direction="out"/>
++  </method>
++  <property name="csr" type="s" access="read"/>
++  <method name="get_csr_info">
++   <arg name="subject" type="s" direction="out"/>
++   <arg name="email" type="as" direction="out"/>
++   <arg name="dns" type="as" direction="out"/>
++   <arg name="principal_names" type="as" direction="out"/>
++   <arg name="key_usage" type="x" direction="out"/>
++   <arg name="extended_key_usage" type="as" direction="out"/>
++  </method>
++  <property name="key-pin" type="s" access="readwrite"/>
++  <property name="key-pin-file" type="s" access="readwrite"/>
++  <property name="key-generated-date" type="x" access="read"/>
++  <property name="key-issued-count" type="x" access="read"/>
++  <property name="template-subject" type="s" access="readwrite"/>
++  <property name="template-email" type="as" access="readwrite"/>
++  <property name="template-ku" type="s" access="readwrite"/>
++  <property name="template-eku" type="as" access="readwrite"/>
++  <property name="template-hostname" type="as" access="readwrite"/>
++  <property name="template-principal" type="as" access="readwrite"/>
++  <property name="template-ip-address" type="as" access="readwrite"/>
++  <property name="template-is-ca" type="b" access="read"/>
++  <property name="template-ca-path-length" type="x" access="read"/>
++  <property name="template-ocsp" type="as" access="readwrite"/>
++  <property name="template-crldp" type="as" access="readwrite"/>
++  <property name="template-freshest-crl" type="as" access="readwrite"/>
++  <property name="template-ns-comment" type="s" access="readwrite"/>
++  <property name="template-profile" type="s" access="readwrite"/>
++  <property name="template-issuer" type="s" access="readwrite"/>
++  <property name="template-ms-certificate-template" type="s" access="readwrite"/>
++  <property name="template-ns-certtype" type="s" access="readwrite"/>
++  <property name="template-challenge-password" type="s" access="readwrite"/>
++  <property name="template-challenge-password-file" type="s" access="readwrite"/>
++  <method name="get_key_pin">
++   <arg name="pin" type="s" direction="out"/>
++  </method>
++  <method name="get_key_pin_file">
++   <arg name="pin_file" type="s" direction="out"/>
++  </method>
++  <method name="get_key_storage_info">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="location_or_nickname" type="s" direction="out"/>
++   <arg name="nss_token" type="s" direction="out"/>
++  </method>
++  <property name="key-storage" type="s" access="read"/>
++  <property name="key-file" type="s" access="read"/>
++  <property name="key-database" type="s" access="read"/>
++  <property name="key-nickname" type="s" access="read"/>
++  <property name="key-token" type="s" access="read"/>
++  <property name="key-owner" type="s" access="readwrite"/>
++  <property name="key-perms" type="x" access="readwrite"/>
++  <method name="get_key_type_and_size">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="size" type="x" direction="out"/>
++  </method>
++  <property name="key-type" type="s" access="read"/>
++  <property name="key-size" type="x" access="read"/>
++  <method name="get_monitoring">
++   <arg name="enabled" type="b" direction="out"/>
++  </method>
++  <property name="monitoring" type="b" access="read"/>
++  <method name="get_notification_info">
++   <arg name="method" type="s" direction="out"/>
++   <arg name="destination" type="s" direction="out"/>
++  </method>
++  <property name="notification-type" type="s" access="read"/>
++  <property name="notification-syslog-priority" type="s" access="read"/>
++  <property name="notification-email" type="s" access="read"/>
++  <property name="notification-command" type="s" access="read"/>
++  <method name="get_status">
++   <arg name="state" type="s" direction="out"/>
++   <arg name="blocked" type="b" direction="out"/>
++  </method>
++  <property name="status" type="s" access="read"/>
++  <property name="stuck" type="b" access="read"/>
++  <method name="get_ca">
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <property name="ca" type="o" access="read"/>
++  <property name="ca-profile" type="s" access="read"/>
++  <property name="nss-user" type="s" access="readwrite"/>
++  <property name="root-cert-files" type="as" access="read"/>
++  <property name="root-other-cert-files" type="as" access="read"/>
++  <property name="other-cert-files" type="as" access="read"/>
++  <property name="root-cert-nssdbs" type="as" access="read"/>
++  <property name="root-other-cert-nssdbs" type="as" access="read"/>
++  <property name="other-cert-nssdbs" type="as" access="read"/>
++  <method name="get_submitted_cookie">
++   <arg name="cookie" type="s" direction="out"/>
++  </method>
++  <property name="ca-cookie" type="s" access="read"/>
++  <method name="get_ca_error">
++   <arg name="text" type="s" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <method name="get_submitted_date">
++   <arg name="date" type="x" direction="out"/>
++  </method>
++  <property name="submitted-date" type="x" access="read"/>
++  <method name="modify">
++   <arg name="updates" type="a{sv}" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="path" type="o" direction="out"/>
++  </method>
++  <method name="rekey">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <method name="resubmit">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="cert-presave-command" type="s" access="read"/>
++  <property name="cert-presave-uid" type="s" access="read"/>
++  <property name="cert-postsave-command" type="s" access="read"/>
++  <property name="cert-postsave-uid" type="s" access="read"/>
++  <signal name="SavedCertificate">
++  </signal>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_nickname ]
++Buddy
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_autorenew ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_data ]
++
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_info ]
++(dbus.String('CN=$UUID,CN=Local Signing Authority'), dbus.String('$UUID'), dbus.String('CN=localhost'), dbus.Int64(tomorrow), dbus.Array([], signature=dbus.Signature('s')), dbus.Array([dbus.String('localhost')], signature=dbus.Signature('s')), dbus.Array([dbus.String('host/localhost@LOCALHOST')], signature=dbus.Signature('s')), dbus.Int64(9), dbus.Array([dbus.String('1.3.6.1.5.5.7.3.1')], signature=dbus.Signature('s')), dbus.Int64(recently))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_last_checked ]
++recently
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_storage_info ]
++(dbus.String('FILE'), dbus.String('$tmpdir/test.crt'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_csr_data ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_csr_info ]
++(dbus.String('CN=localhost'), dbus.Array([], signature=dbus.Signature('s')), dbus.Array([dbus.String('localhost')], signature=dbus.Signature('s')), dbus.Array([dbus.String('host/localhost@LOCALHOST')], signature=dbus.Signature('s')), dbus.Int64(9), dbus.Array([dbus.String('id-kp-serverAuth')], signature=dbus.Signature('s')))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_pin ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_pin_file ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_storage_info ]
++(dbus.String('FILE'), dbus.String('$tmpdir/test.key'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_type_and_size ]
++(dbus.String('RSA'), dbus.Int64(512))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_monitoring ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_notification_info ]
++(dbus.String('stdout'), dbus.String('daemon.notice'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_status ]
++(dbus.String('MONITORING'), dbus.Boolean(False))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_ca ]
++/org/fedorahosted/certmonger/cas/CA1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_submitted_cookie ]
++None
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_ca_error ]
++None
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_submitted_date ]
++recently
++
++[ /org/fedorahosted/certmonger/requests/Request2 : org.fedorahosted.certmonger.request.modify ]
++1 on /org/fedorahosted/certmonger/requests/Request2
++After setting template-eku to 1.2.3.4.5.6.7.8.9.10, we got dbus.Array([dbus.String('1.2.3.4.5.6.7.8.9.10')], signature=dbus.Signature('s'), variant_level=1)
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.rekey ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.resubmit ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.refresh ]
++0
++
++[ /org/fedorahosted/certmonger/cas: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="CA1"/>
++ <node name="CA2"/>
++ <node name="CA3"/>
++ <node name="CA4"/>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA1">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/local
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_nickname ]
++local
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_location ]
++$tmpdir/local-submit
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA2">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20260112190743
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_nickname ]
++SelfSign
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_type ]
++INTERNAL:SELF
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_serial ]
++01
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_location ]
++
++
++/org/fedorahosted/certmonger/cas/CA2: warning: property org.fedorahosted.certmonger.ca.external-helper not settable on this object
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++/org/fedorahosted/certmonger/cas/CA2: property org.fedorahosted.certmonger.ca.scep-cipher not set: (, x)
++[ /org/fedorahosted/certmonger/cas/CA3: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA3">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20260112190743-1
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_nickname ]
++IPA
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_location ]
++$libexecdir/ipa-submit
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA4">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20260112190743-2
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_nickname ]
++dogtag-ipa-renew-agent
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_location ]
++$libexecdir/dogtag-ipa-renew-agent-submit
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.refresh ]
++1
++
+diff --git a/tests/028-dbus/expected.out.nomldsa b/tests/028-dbus/expected.out.nomldsa
+new file mode 100644
+index 00000000..86cba020
+--- /dev/null
++++ b/tests/028-dbus/expected.out.nomldsa
+@@ -0,0 +1,965 @@
++Certificate in file "${tmpdir}/test.crt" issued by CA and saved.
++Certificate in file "${tmpdir}/test.crt" issued by CA and saved.
++[[ getcert ]]
++State MONITORING, stuck: no.
++Number of certificates and requests being tracked: 1.
++Request ID 'Buddy':
++	status: MONITORING
++	stuck: no
++	key pair storage: type=FILE,location='$tmpdir/test.key'
++	certificate: type=FILE,location='$tmpdir/test.crt'
++	CA: local
++	issuer: CN=$UUID,CN=Local Signing Authority
++	subject: CN=localhost
++	issued: sometime
++	expires: sometime
++	dns: localhost
++	principal name: host/localhost@LOCALHOST
++	key usage: digitalSignature,dataEncipherment
++	eku: id-kp-serverAuth
++	certificate template/profile: SomeProfileName
++	profile: SomeProfileName
++	pre-save command: echo Pre
++	post-save command: echo Post
++	track: yes
++	auto-renew: yes
++CA 'local':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $tmpdir/local-submit
++CA 'SelfSign':
++	is-default: no
++	ca-type: INTERNAL:SELF
++	next-serial-number: 01
++CA 'IPA':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $libexecdir/ipa-submit
++CA 'dogtag-ipa-renew-agent':
++	is-default: no
++	ca-type: EXTERNAL
++	helper-location: $libexecdir/dogtag-ipa-renew-agent-submit
++
++[[ API ]]
++[ simpleprop.py ]
++/org/fedorahosted/certmonger/cas/CA5
++/org/fedorahosted/certmonger/cas/CA5
++: -> : -k admin@localhost -> :
++0 -> 1 -> 0
++[ walk.py ]
++[ /: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="org"/>
++</node>
++
++[ /org: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="fedorahosted"/>
++</node>
++
++[ /org/fedorahosted: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="certmonger"/>
++</node>
++
++[ /org/fedorahosted/certmonger: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger">
++  <method name="add_known_ca">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="command" type="s" direction="in"/>
++   <arg name="known_names" type="as" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <method name="add_request">
++   <arg name="template" type="a{sv}" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <method name="find_ca_by_nickname">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="ca" type="o" direction="out"/>
++  </method>
++  <method name="find_request_by_nickname">
++   <arg name="nickname" type="s" direction="in"/>
++   <arg name="request" type="o" direction="out"/>
++  </method>
++  <method name="get_known_cas">
++   <arg name="ca_list" type="ao" direction="out"/>
++  </method>
++  <method name="get_requests">
++   <arg name="requests" type="ao" direction="out"/>
++  </method>
++  <method name="get_supported_key_types">
++   <arg name="key_type_list" type="as" direction="out"/>
++  </method>
++  <method name="get_supported_key_storage">
++   <arg name="key_storage_type_list" type="as" direction="out"/>
++  </method>
++  <method name="get_supported_cert_storage">
++   <arg name="cert_storage_type_list" type="as" direction="out"/>
++  </method>
++  <method name="remove_known_ca">
++   <arg name="ca" type="o" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++  </method>
++  <method name="remove_request">
++   <arg name="request" type="o" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++  </method>
++ </interface>
++ <node name="requests"/>
++ <node name="cas"/>
++</node>
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.add_known_ca ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.add_request ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.find_ca_by_nickname ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.find_request_by_nickname ]
++OK
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_known_cas ]
++dbus.Array([dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA1'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA2'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA3'), dbus.ObjectPath('/org/fedorahosted/certmonger/cas/CA4')], signature=dbus.Signature('o'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_requests ]
++dbus.Array([dbus.ObjectPath('/org/fedorahosted/certmonger/requests/Request2')], signature=dbus.Signature('o'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_key_types ]
++dbus.Array([dbus.String('RSA'), dbus.String('DSA'), dbus.String('EC')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_key_storage ]
++dbus.Array([dbus.String('NSSDB'), dbus.String('FILE')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger: org.fedorahosted.certmonger.get_supported_cert_storage ]
++dbus.Array([dbus.String('NSSDB'), dbus.String('FILE')], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.remove_known_ca ]
++OK
++
++[ /org/fedorahosted/certmonger : org.fedorahosted.certmonger.remove_request ]
++OK
++
++[ /org/fedorahosted/certmonger/requests: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/requests">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="Request2"/>
++</node>
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/requests/Request2">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.request">
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <method name="get_autorenew">
++   <arg name="enabled" type="b" direction="out"/>
++  </method>
++  <property name="autorenew" type="b" access="read"/>
++  <method name="get_cert_data">
++   <arg name="pem" type="s" direction="out"/>
++  </method>
++  <property name="cert" type="s" access="read">
++   <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
++  </property>
++  <property name="cert-chain" type="a(ss)" access="read"/>
++  <property name="cert-roots" type="a(ss)" access="read"/>
++  <method name="get_cert_info">
++   <arg name="issuer" type="s" direction="out"/>
++   <arg name="serial_hex" type="s" direction="out"/>
++   <arg name="subject" type="s" direction="out"/>
++   <arg name="not_after" type="x" direction="out"/>
++   <arg name="email" type="as" direction="out"/>
++   <arg name="dns" type="as" direction="out"/>
++   <arg name="principal_names" type="as" direction="out"/>
++   <arg name="key_usage" type="x" direction="out"/>
++   <arg name="extended_key_usage" type="as" direction="out"/>
++   <arg name="not_before" type="x" direction="out"/>
++  </method>
++  <property name="issuer" type="s" access="read"/>
++  <property name="serial" type="s" access="read"/>
++  <property name="subject" type="s" access="read"/>
++  <property name="not-valid-before" type="x" access="read"/>
++  <property name="not-valid-after" type="x" access="read"/>
++  <property name="email" type="as" access="read"/>
++  <property name="ku" type="s" access="read"/>
++  <property name="eku" type="as" access="read"/>
++  <property name="hostname" type="as" access="read"/>
++  <property name="principal" type="as" access="read"/>
++  <method name="get_cert_last_checked">
++   <arg name="date" type="x" direction="out"/>
++  </method>
++  <property name="last-checked" type="x" access="read"/>
++  <method name="get_cert_storage_info">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="location_or_nickname" type="s" direction="out"/>
++   <arg name="nss_token" type="s" direction="out"/>
++  </method>
++  <property name="cert-storage" type="s" access="read"/>
++  <property name="cert-file" type="s" access="read"/>
++  <property name="cert-database" type="s" access="read"/>
++  <property name="cert-nickname" type="s" access="read"/>
++  <property name="cert-token" type="s" access="read"/>
++  <property name="cert-owner" type="s" access="readwrite"/>
++  <property name="cert-perms" type="x" access="readwrite"/>
++  <method name="get_csr_data">
++   <arg name="pem" type="s" direction="out"/>
++  </method>
++  <property name="csr" type="s" access="read"/>
++  <method name="get_csr_info">
++   <arg name="subject" type="s" direction="out"/>
++   <arg name="email" type="as" direction="out"/>
++   <arg name="dns" type="as" direction="out"/>
++   <arg name="principal_names" type="as" direction="out"/>
++   <arg name="key_usage" type="x" direction="out"/>
++   <arg name="extended_key_usage" type="as" direction="out"/>
++  </method>
++  <property name="key-pin" type="s" access="readwrite"/>
++  <property name="key-pin-file" type="s" access="readwrite"/>
++  <property name="key-generated-date" type="x" access="read"/>
++  <property name="key-issued-count" type="x" access="read"/>
++  <property name="template-subject" type="s" access="readwrite"/>
++  <property name="template-email" type="as" access="readwrite"/>
++  <property name="template-ku" type="s" access="readwrite"/>
++  <property name="template-eku" type="as" access="readwrite"/>
++  <property name="template-hostname" type="as" access="readwrite"/>
++  <property name="template-principal" type="as" access="readwrite"/>
++  <property name="template-ip-address" type="as" access="readwrite"/>
++  <property name="template-is-ca" type="b" access="read"/>
++  <property name="template-ca-path-length" type="x" access="read"/>
++  <property name="template-ocsp" type="as" access="readwrite"/>
++  <property name="template-crldp" type="as" access="readwrite"/>
++  <property name="template-freshest-crl" type="as" access="readwrite"/>
++  <property name="template-ns-comment" type="s" access="readwrite"/>
++  <property name="template-profile" type="s" access="readwrite"/>
++  <property name="template-issuer" type="s" access="readwrite"/>
++  <property name="template-ms-certificate-template" type="s" access="readwrite"/>
++  <property name="template-ns-certtype" type="s" access="readwrite"/>
++  <property name="template-challenge-password" type="s" access="readwrite"/>
++  <property name="template-challenge-password-file" type="s" access="readwrite"/>
++  <method name="get_key_pin">
++   <arg name="pin" type="s" direction="out"/>
++  </method>
++  <method name="get_key_pin_file">
++   <arg name="pin_file" type="s" direction="out"/>
++  </method>
++  <method name="get_key_storage_info">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="location_or_nickname" type="s" direction="out"/>
++   <arg name="nss_token" type="s" direction="out"/>
++  </method>
++  <property name="key-storage" type="s" access="read"/>
++  <property name="key-file" type="s" access="read"/>
++  <property name="key-database" type="s" access="read"/>
++  <property name="key-nickname" type="s" access="read"/>
++  <property name="key-token" type="s" access="read"/>
++  <property name="key-owner" type="s" access="readwrite"/>
++  <property name="key-perms" type="x" access="readwrite"/>
++  <method name="get_key_type_and_size">
++   <arg name="type" type="s" direction="out"/>
++   <arg name="size" type="x" direction="out"/>
++  </method>
++  <property name="key-type" type="s" access="read"/>
++  <property name="key-size" type="x" access="read"/>
++  <method name="get_monitoring">
++   <arg name="enabled" type="b" direction="out"/>
++  </method>
++  <property name="monitoring" type="b" access="read"/>
++  <method name="get_notification_info">
++   <arg name="method" type="s" direction="out"/>
++   <arg name="destination" type="s" direction="out"/>
++  </method>
++  <property name="notification-type" type="s" access="read"/>
++  <property name="notification-syslog-priority" type="s" access="read"/>
++  <property name="notification-email" type="s" access="read"/>
++  <property name="notification-command" type="s" access="read"/>
++  <method name="get_status">
++   <arg name="state" type="s" direction="out"/>
++   <arg name="blocked" type="b" direction="out"/>
++  </method>
++  <property name="status" type="s" access="read"/>
++  <property name="stuck" type="b" access="read"/>
++  <method name="get_ca">
++   <arg name="name" type="o" direction="out"/>
++  </method>
++  <property name="ca" type="o" access="read"/>
++  <property name="ca-profile" type="s" access="read"/>
++  <property name="nss-user" type="s" access="readwrite"/>
++  <property name="root-cert-files" type="as" access="read"/>
++  <property name="root-other-cert-files" type="as" access="read"/>
++  <property name="other-cert-files" type="as" access="read"/>
++  <property name="root-cert-nssdbs" type="as" access="read"/>
++  <property name="root-other-cert-nssdbs" type="as" access="read"/>
++  <property name="other-cert-nssdbs" type="as" access="read"/>
++  <method name="get_submitted_cookie">
++   <arg name="cookie" type="s" direction="out"/>
++  </method>
++  <property name="ca-cookie" type="s" access="read"/>
++  <method name="get_ca_error">
++   <arg name="text" type="s" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <method name="get_submitted_date">
++   <arg name="date" type="x" direction="out"/>
++  </method>
++  <property name="submitted-date" type="x" access="read"/>
++  <method name="modify">
++   <arg name="updates" type="a{sv}" direction="in"/>
++   <arg name="status" type="b" direction="out"/>
++   <arg name="path" type="o" direction="out"/>
++  </method>
++  <method name="rekey">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <method name="resubmit">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="cert-presave-command" type="s" access="read"/>
++  <property name="cert-presave-uid" type="s" access="read"/>
++  <property name="cert-postsave-command" type="s" access="read"/>
++  <property name="cert-postsave-uid" type="s" access="read"/>
++  <signal name="SavedCertificate">
++  </signal>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_nickname ]
++Buddy
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_autorenew ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_data ]
++
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_info ]
++(dbus.String('CN=$UUID,CN=Local Signing Authority'), dbus.String('$UUID'), dbus.String('CN=localhost'), dbus.Int64(tomorrow), dbus.Array([], signature=dbus.Signature('s')), dbus.Array([dbus.String('localhost')], signature=dbus.Signature('s')), dbus.Array([dbus.String('host/localhost@LOCALHOST')], signature=dbus.Signature('s')), dbus.Int64(9), dbus.Array([dbus.String('1.3.6.1.5.5.7.3.1')], signature=dbus.Signature('s')), dbus.Int64(recently))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_last_checked ]
++recently
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_cert_storage_info ]
++(dbus.String('FILE'), dbus.String('$tmpdir/test.crt'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_csr_data ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_csr_info ]
++(dbus.String('CN=localhost'), dbus.Array([], signature=dbus.Signature('s')), dbus.Array([dbus.String('localhost')], signature=dbus.Signature('s')), dbus.Array([dbus.String('host/localhost@LOCALHOST')], signature=dbus.Signature('s')), dbus.Int64(9), dbus.Array([dbus.String('id-kp-serverAuth')], signature=dbus.Signature('s')))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_pin ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_pin_file ]
++
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_storage_info ]
++(dbus.String('FILE'), dbus.String('$tmpdir/test.key'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_key_type_and_size ]
++(dbus.String('RSA'), dbus.Int64(512))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_monitoring ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_notification_info ]
++(dbus.String('stdout'), dbus.String('daemon.notice'))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_status ]
++(dbus.String('MONITORING'), dbus.Boolean(False))
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_ca ]
++/org/fedorahosted/certmonger/cas/CA1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_submitted_cookie ]
++None
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_ca_error ]
++None
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.get_submitted_date ]
++recently
++
++[ /org/fedorahosted/certmonger/requests/Request2 : org.fedorahosted.certmonger.request.modify ]
++1 on /org/fedorahosted/certmonger/requests/Request2
++After setting template-eku to 1.2.3.4.5.6.7.8.9.10, we got dbus.Array([dbus.String('1.2.3.4.5.6.7.8.9.10')], signature=dbus.Signature('s'), variant_level=1)
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.rekey ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.resubmit ]
++1
++
++[ /org/fedorahosted/certmonger/requests/Request2: org.fedorahosted.certmonger.request.refresh ]
++0
++
++[ /org/fedorahosted/certmonger/cas: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <node name="CA1"/>
++ <node name="CA2"/>
++ <node name="CA3"/>
++ <node name="CA4"/>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA1">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/local
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_nickname ]
++local
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_location ]
++$tmpdir/local-submit
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA1: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA2">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20180327134236
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_nickname ]
++SelfSign
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_type ]
++INTERNAL:SELF
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_serial ]
++01
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_location ]
++
++
++/org/fedorahosted/certmonger/cas/CA2: warning: property org.fedorahosted.certmonger.ca.external-helper not settable on this object
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA2: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++/org/fedorahosted/certmonger/cas/CA2: property org.fedorahosted.certmonger.ca.scep-cipher not set: (, x)
++[ /org/fedorahosted/certmonger/cas/CA3: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA3">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20180327134236-1
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_nickname ]
++IPA
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_location ]
++$libexecdir/ipa-submit
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA3: org.fedorahosted.certmonger.ca.refresh ]
++1
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.freedesktop.DBus.Introspectable.Introspect ]
++<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
++"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
++
++<node name="/org/fedorahosted/certmonger/cas/CA4">
++ <interface name="org.freedesktop.DBus.Introspectable">
++  <method name="Introspect">
++   <arg name="xml_data" type="s" direction="out"/>
++  </method>
++ </interface>
++ <interface name="org.freedesktop.DBus.Properties">
++  <method name="Get">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="out"/>
++  </method>
++  <method name="Set">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="property_name" type="s" direction="in"/>
++   <arg name="value" type="v" direction="in"/>
++  </method>
++  <method name="GetAll">
++   <arg name="interface_name" type="s" direction="in"/>
++   <arg name="props" type="a{sv}" direction="out"/>
++  </method>
++  <signal name="PropertiesChanged">
++   <arg name="interface_name" type="s"/>
++   <arg name="changed_properties" type="a{sv}"/>
++   <arg name="invalidated_properties" type="as"/>
++  </signal>
++ </interface>
++ <interface name="org.fedorahosted.certmonger.ca">
++  <method name="get_config_file_path">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <method name="get_nickname">
++   <arg name="nickname" type="s" direction="out"/>
++  </method>
++  <property name="nickname" type="s" access="read"/>
++  <property name="aka" type="s" access="read"/>
++  <method name="get_is_default">
++   <arg name="default" type="b" direction="out"/>
++  </method>
++  <property name="is-default" type="b" access="readwrite"/>
++  <method name="get_type">
++   <arg name="type" type="s" direction="out"/>
++  </method>
++  <method name="get_serial">
++   <arg name="serial_hex" type="s" direction="out"/>
++  </method>
++  <method name="get_location">
++   <arg name="path" type="s" direction="out"/>
++  </method>
++  <property name="external-helper" type="s" access="readwrite"/>
++  <method name="get_issuer_names">
++   <arg name="names" type="as" direction="out"/>
++  </method>
++  <method name="refresh">
++   <arg name="working" type="b" direction="out"/>
++  </method>
++  <property name="ca-error" type="s" access="read"/>
++  <property name="issuer-names" type="as" access="read"/>
++  <property name="root-certs" type="a(ss)" access="read"/>
++  <property name="root-other-certs" type="a(ss)" access="read"/>
++  <property name="other-certs" type="a(ss)" access="read"/>
++  <property name="required-enroll-attributes" type="as" access="read"/>
++  <property name="required-renew-attributes" type="as" access="read"/>
++  <property name="supported-profiles" type="as" access="read"/>
++  <property name="default-profile" type="s" access="read"/>
++  <property name="root-cert-files" type="as" access="readwrite"/>
++  <property name="root-other-cert-files" type="as" access="readwrite"/>
++  <property name="other-cert-files" type="as" access="readwrite"/>
++  <property name="root-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="root-other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="other-cert-nssdbs" type="as" access="readwrite"/>
++  <property name="ca-presave-command" type="s" access="read"/>
++  <property name="ca-presave-uid" type="s" access="read"/>
++  <property name="ca-postsave-command" type="s" access="read"/>
++  <property name="ca-postsave-uid" type="s" access="read"/>
++  <property name="scep-cipher" type="s" access="readwrite"/>
++  <property name="scep-digest" type="s" access="readwrite"/>
++  <property name="scep-ca-identifier" type="s" access="readwrite"/>
++  <property name="scep-ca-capabilities" type="as" access="read"/>
++  <property name="scep-ra-cert" type="s" access="read"/>
++  <property name="scep-ca-cert" type="s" access="read"/>
++  <property name="scep-other-certs" type="s" access="read"/>
++ </interface>
++</node>
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_config_file_path ]
++$tmpdir/cas/20180327134236-3
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_nickname ]
++dogtag-ipa-renew-agent
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_is_default ]
++0
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_type ]
++EXTERNAL
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_serial ]
++None
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_location ]
++$libexecdir/dogtag-ipa-renew-agent-submit
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.get_issuer_names ]
++dbus.Array([], signature=dbus.Signature('s'))
++
++[ /org/fedorahosted/certmonger/cas/CA4: org.fedorahosted.certmonger.ca.refresh ]
++1
++
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 9977aed2..67c93667 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -6,6 +6,8 @@ CLEANFILES = \
+ 	001-keyiread-ec/actual.err \
+ 	001-keyiread-rsa/actual.out \
+ 	001-keyiread-rsa/actual.err \
++	001-keyiread-mldsa/actual.out \
++	001-keyiread-mldsa/actual.err \
+ 	002-keygen/actual.out \
+ 	002-keygen/actual.err \
+ 	002-keygen-dbm/actual.out \
+@@ -18,12 +20,16 @@ CLEANFILES = \
+ 	002-keygen-ec/actual.err \
+ 	002-keygen-rsa/actual.out \
+ 	002-keygen-rsa/actual.err \
++	002-keygen-mldsa/actual.err \
++	002-keygen-mldsa/actual.out \
+ 	003-csrgen/actual.out \
+ 	003-csrgen/actual.err \
+ 	003-csrgen-ec/actual.out \
+ 	003-csrgen-ec/actual.err \
+ 	003-csrgen-rsa/actual.out \
+ 	003-csrgen-rsa/actual.err \
++	003-csrgen-mldsa/actual.out \
++	003-csrgen-mldsa/actual.err \
+ 	004-selfsign/actual.out \
+ 	004-selfsign/actual.err \
+ 	004-selfsign-ec/actual.out \
+@@ -145,6 +151,8 @@ EXTRA_DIST = \
+ 	001-keyiread-ec/expected.out.2 \
+ 	001-keyiread-ec/expected.out.3 \
+ 	001-keyiread-ec/expected.out.4 \
++	001-keyiread-mldsa/run.sh \
++	001-keyiread-mldsa/expected.out \
+ 	002-keygen/prequal.sh \
+ 	002-keygen/run.sh \
+ 	002-keygen/expected.out \
+@@ -164,12 +172,17 @@ EXTRA_DIST = \
+ 	002-keygen-ec/expected.out.2 \
+ 	002-keygen-ec/expected.out.3 \
+ 	002-keygen-ec/expected.out.4 \
++	002-keygen-mldsa/prequal.sh \
++	002-keygen-mldsa/run.som \
++	002-keygen-mldsa/expected.out \
+ 	003-csrgen/run.sh \
+ 	003-csrgen/expected.out \
+ 	003-csrgen-rsa/run.sh \
+ 	003-csrgen-rsa/expected.out \
+ 	003-csrgen-ec/run.sh \
+ 	003-csrgen-ec/expected.out \
++	003-csrgen-mldsa/run.sh \
++	003-csrgen-mldsa/expected.out \
+ 	004-selfsign/run.sh \
+ 	004-selfsign/expected.out \
+ 	004-selfsign-rsa/run.sh \
+@@ -295,6 +308,7 @@ EXTRA_DIST = \
+ 	027-hooks/expected.out \
+ 	027-hooks/run.sh \
+ 	028-dbus/expected.out 028-dbus/expected.out.nodsa \
++	028-dbus/expected.out.nomldsa \
+ 	028-dbus/entry 028-dbus/bogus-entry \
+ 	028-dbus/prequal.sh \
+ 	028-dbus/run.sh \
+@@ -450,6 +464,13 @@ subdirs += \
+ 	004-selfsign-ec
+ endif
+ 
++if HAVE_ML_DSA
++subdirs += \
++	001-keyiread-mldsa \
++	002-keygen-mldsa \
++	003-csrgen-mldsa
++endif
++
+ check: all
+ 	if [ ! -e $$HOME/.rnd ] ; then \
+ 		openssl rand -writerand $$HOME/.rnd; \
+-- 
+2.52.0
+

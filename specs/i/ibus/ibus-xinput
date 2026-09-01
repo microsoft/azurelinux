@@ -1,4 +1,5 @@
 XIM=ibus
+# imsettings does not support "ibus start" yet.
 XIM_PROGRAM="/usr/bin/ibus-daemon"
 ICON="ibus"
 XIM_ARGS="-r --xim"
@@ -11,7 +12,9 @@ NOT_RUN=gnome3
 # in /usr/libexec/imsettings-functions and the value is case-sensitive.
 IMSETTINGS_IGNORE_SESSION=KDE-wayland
 
-if test -f /usr/lib64/qt5/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so || \
+if test -f /usr/lib64/qt6/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so || \
+   test -f /usr/lib/qt6/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so || \
+   test -f /usr/lib64/qt5/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so || \
    test -f /usr/lib/qt5/plugins/platforminputcontexts/libibusplatforminputcontextplugin.so || \
    test -f /usr/lib64/qt4/plugins/inputmethods/libqtim-ibus.so || \
    test -f /usr/lib/qt4/plugins/inputmethods/libqtim-ibus.so;
@@ -19,4 +22,12 @@ then
     QT_IM_MODULE=ibus
 else
     QT_IM_MODULE=xim
+fi
+
+# imsettings does not support QT_IM_MODULES environment yet.
+if test "x$WAYLAND_DISPLAY" != "x" ; then
+    if test "x$QT_IM_MODULE" = "xibus" ; then
+        QT_IM_MODULE=
+    fi
+    GTK_IM_MODULE='wayland:ibus'
 fi

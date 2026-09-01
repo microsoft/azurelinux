@@ -1,18 +1,38 @@
-From 969dfb6b9a575a8291abbe03e11c00cb0d95dbba Mon Sep 17 00:00:00 2001
-From: Tom Rix <trix@redhat.com>
-Date: Sun, 1 Oct 2023 06:15:36 -0700
+From 09f8a64f7bfd3c012c255e54f23a9e175468d669 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 19 Sep 2025 07:56:53 -0700
 Subject: [PATCH] prepare hipify cmake for fedora
 
-Signed-off-by: Tom Rix <trix@redhat.com>
 ---
- CMakeLists.txt | 36 ++----------------------------------
- 1 file changed, 2 insertions(+), 34 deletions(-)
+ CMakeLists.txt | 31 ++-----------------------------
+ 1 file changed, 2 insertions(+), 29 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index ce188b7..3c69c80 100644
+index 36a3b1ddf9cc..f2be64d9ffb1 100755
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -69,40 +69,8 @@ if (NOT HIPIFY_CLANG_TESTS_ONLY)
+@@ -78,20 +78,6 @@ if (NOT HIPIFY_CLANG_TESTS_ONLY)
+     Core
+   )
+   
+-  if(LLVM_PACKAGE_VERSION VERSION_GREATER "6.0.1")
+-    list(APPEND HIPIFY_ADDL_LINK_LIBS clangToolingInclusions)
+-  endif()
+-
+-  if(LLVM_PACKAGE_VERSION VERSION_GREATER "9.0.1")
+-    list(APPEND LLVM_LINK_COMPONENTS FrontendOpenMP)
+-  endif()
+-
+-  if(LLVM_PACKAGE_VERSION VERSION_EQUAL "15.0.0" OR LLVM_PACKAGE_VERSION VERSION_GREATER "15.0.0")
+-    list(APPEND LLVM_LINK_COMPONENTS WindowsDriver)
+-    list(APPEND HIPIFY_ADDL_LINK_LIBS clangSupport)
+-  endif()
+-
+-
+   add_llvm_executable(hipify-clang
+     ${HIPIFY_SOURCES} ${HIPIFY_HEADERS}
+   )
+@@ -129,21 +115,8 @@ if (NOT HIPIFY_CLANG_TESTS_ONLY)
  
    # Link against LLVM and CLANG libraries.
    target_link_libraries(hipify-clang PRIVATE
@@ -31,30 +51,11 @@ index ce188b7..3c69c80 100644
 -    clangToolingCore
 -    clangRewrite
 -    clangBasic
--    LLVMProfileData
--    LLVMSupport
--    LLVMMCParser
--    LLVMMC
--    LLVMBitReader
--    LLVMOption
--    LLVMCore)
--
--  if(LLVM_PACKAGE_VERSION VERSION_GREATER "6.0.1")
--    target_link_libraries(hipify-clang PRIVATE clangToolingInclusions)
--  endif()
--
--  if(LLVM_PACKAGE_VERSION VERSION_GREATER "9.0.1")
--    target_link_libraries(hipify-clang PRIVATE LLVMFrontendOpenMP)
--  endif()
--
--  if(LLVM_PACKAGE_VERSION VERSION_EQUAL "15.0.0" OR LLVM_PACKAGE_VERSION VERSION_GREATER "15.0.0")
--    target_link_libraries(hipify-clang PRIVATE LLVMWindowsDriver clangSupport)
--  endif()
 +    clang-cpp
-+    LLVM)
++    LLVM
+     ${HIPIFY_ADDL_LINK_LIBS}
+   )
  
-   if(LLVM_PACKAGE_VERSION VERSION_EQUAL "16.0.0" OR LLVM_PACKAGE_VERSION VERSION_GREATER "16.0.0")
-     if(MSVC)
 -- 
-2.41.0
+2.51.0
 

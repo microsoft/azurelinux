@@ -23,7 +23,7 @@
 
 Name:           php-%{gh_owner}-%{gh_project}%{major}
 Version:        2.3.2
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        PHPDoc parser with support for nullable, intersection and generic types
 
 License:        MIT

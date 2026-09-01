@@ -16,3 +16,12 @@ diff -rupN libkml-1.3.0/cmake/UriParser_cmake_lists_txt libkml-1.3.0-new/cmake/U
  
  set(SRCS
    lib/UriCommon.c
+diff -ru minizip/minizip/CMakeLists.txt minizip-new/minizip/CMakeLists.txt
+--- minizip/minizip/CMakeLists.txt	2015-07-19 18:45:55.000000000 +0200
++++ minizip-new/minizip/CMakeLists.txt	2025-07-17 15:49:13.405475091 +0200
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.5)
+ 
+ include_directories(${ZLIB_INCLUDE_DIR})
+ 

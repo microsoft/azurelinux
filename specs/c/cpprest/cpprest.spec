@@ -8,7 +8,7 @@
 %define minor 10
 Name:           cpprest
 Version:        2.10.19
-Release: 11%{?dist}
+Release:        11%{?dist}
 Summary:        C++ REST library
 License:        MIT
 Url:            https://github.com/Microsoft/cpprestsdk
@@ -22,6 +22,12 @@ Patch3:         cpprest-2.10.9-disable-test-extract_floating_point.patch
 # Revert "libcpprestsdk: fix building as a static library (#1344)"
 # https://github.com/microsoft/cpprestsdk/pull/1401
 Patch4:         cpprest-2.10.16-revert_commit_cb7ca74.patch
+# Fix Boost asio errors
+# Patch modified from:
+# https://github.com/microsoft/vcpkg/pull/42678
+# https://raw.githubusercontent.com/microsoft/vcpkg/566f949/ports/cpprestsdk/fix-asio-error.patch
+# Additionally fixed: Release/tests/functional/pplx/pplx_test/pplx_op_test.cpp
+Patch5:         cpprest-2.10.19-fix-boost-asio-errors.patch
 
 BuildRequires:  boost-devel >= 1.55
 # The lowest version in currently supported Fedora was tested under F27: brotli-devel 0.6.0
@@ -100,6 +106,17 @@ cd Release/%{_vpath_builddir}/Binaries
 
 
 %changelog
+* Fri Jan 30 2026 Wolfgang Stöggl <c72578@yahoo.de> - 2.10.19-11
+- Add patch:
+  cpprest-2.10.19-fix-boost-asio-errors.patch
+- Fix FTBFS (#2433966)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.19-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.19-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Sep 14 2025 Wolfgang Stöggl <c72578@yahoo.de> - 2.10.19-8
 - Disable link time optimization (LTO)
 - Fixes: #2394765

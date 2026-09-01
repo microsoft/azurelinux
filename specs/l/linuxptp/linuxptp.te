@@ -108,7 +108,7 @@ optional_policy(`
 # phc2sys local policy
 #
 
-allow phc2sys_t self:capability sys_time;
+allow phc2sys_t self:capability { chown dac_override sys_time };
 allow phc2sys_t self:fifo_file rw_fifo_file_perms;
 allow phc2sys_t self:unix_stream_socket create_stream_socket_perms;
 allow phc2sys_t self:shm create_shm_perms;
@@ -159,11 +159,14 @@ allow ptp4l_t self:packet_socket create_socket_perms;
 allow ptp4l_t self:unix_stream_socket create_stream_socket_perms;
 allow ptp4l_t self:shm create_shm_perms;
 allow ptp4l_t self:udp_socket create_socket_perms;
-allow ptp4l_t self:capability { net_admin net_raw sys_admin sys_time };
+allow ptp4l_t self:capability { dac_override net_admin net_raw setuid setgid sys_admin sys_time };
 allow ptp4l_t self:capability2 { bpf wake_alarm };
+allow ptp4l_t self:process { setcap };
 allow ptp4l_t self:netlink_route_socket rw_netlink_socket_perms;
 
 allow ptp4l_t phc2sys_t:unix_dgram_socket sendto;
+
+create_lnk_files_pattern(ptp4l_t, var_run_t, var_run_t)
 
 manage_dirs_pattern(ptp4l_t, timemaster_var_run_t, timemaster_var_run_t)
 manage_files_pattern(ptp4l_t, timemaster_var_run_t, timemaster_var_run_t)
@@ -173,6 +176,8 @@ files_pid_filetrans(ptp4l_t, timemaster_var_run_t, { dir file sock_file })
 manage_dirs_pattern(ptp4l_t, timemaster_tmpfs_t, timemaster_tmpfs_t)
 manage_files_pattern(ptp4l_t, timemaster_tmpfs_t, timemaster_tmpfs_t)
 fs_tmpfs_filetrans(ptp4l_t, timemaster_tmpfs_t, { dir file })
+
+auth_use_nsswitch(ptp4l_t)
 
 corenet_udp_bind_generic_node(ptp4l_t)
 corenet_udp_bind_ptp_event_port(ptp4l_t)

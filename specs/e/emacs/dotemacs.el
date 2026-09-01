@@ -1,4 +1,4 @@
-;; .emacs
+;;; -*- lexical-binding: t -*-
 
 (custom-set-variables
  ;; uncomment to always end a file with a newline

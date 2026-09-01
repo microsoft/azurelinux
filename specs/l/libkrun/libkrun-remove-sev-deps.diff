@@ -1,18 +1,30 @@
+diff --git a/src/libkrun/Cargo.toml b/src/libkrun/Cargo.toml
+index 16f8d28..d95784a 100644
+--- a/src/libkrun/Cargo.toml
++++ b/src/libkrun/Cargo.toml
+@@ -12,7 +12,6 @@ repository = "https://github.com/containers/libkrun"
+ default = ["init-blob"]
+ init-blob = ["dep:init-blob"]
+ tee = ["vmm/tee", "devices/tee"]
+-amd-sev = ["blk", "tee", "vmm/amd-sev", "devices/amd-sev"]
+ net = ["devices/net", "vmm/net"]
+ blk = ["devices/blk", "vmm/blk"]
+ efi = ["blk", "net", "vmm/efi", "devices/efi"]
 diff --git a/src/vmm/Cargo.toml b/src/vmm/Cargo.toml
-index 9f09774..b8bfe07 100644
+index aff9696..5cd693f 100644
 --- a/src/vmm/Cargo.toml
 +++ b/src/vmm/Cargo.toml
-@@ -6,7 +6,6 @@ edition = "2021"
+@@ -10,7 +10,6 @@ repository = "https://github.com/containers/libkrun"
  
  [features]
- tee = []
--amd-sev = [ "blk", "bitfield", "bitflags", "iocuddle", "tee", "kbs-types", "serde", "serde_json" ]
- net = []
- blk = []
- efi = [ "blk", "net" ]
-@@ -34,14 +33,6 @@ kernel = { path = "../kernel" }
- utils = { path = "../utils" }
- polly = { path = "../polly" }
+ tee = ["devices/tee", "arch/tee"]
+-amd-sev = ["blk", "bitfield", "bitflags", "iocuddle", "tee", "kbs-types", "serde", "serde_json", "devices/amd-sev", "arch/amd-sev"]
+ net = ["devices/net"]
+ blk = ["devices/blk"]
+ efi = ["blk", "net", "devices/efi", "arch/efi"]
+@@ -38,14 +37,6 @@ kernel = { package = "krun-kernel", version = "=0.1.0-1.19.0", path = "../kernel
+ utils = { package = "krun-utils", version = "=0.1.0-1.19.0", path = "../utils" }
+ polly = { package = "krun-polly", version = "=0.1.0-1.19.0", path = "../polly" }
  
 -# Dependencies for amd-sev
 -kbs-types = { version = "0.13.0", optional = true }
@@ -24,4 +36,4 @@ index 9f09774..b8bfe07 100644
 -
  [target.'cfg(target_arch = "x86_64")'.dependencies]
  bzip2 = "0.6"
- cpuid = { path = "../cpuid" }
+ cpuid = { package = "krun-cpuid", version = "=0.1.0-1.19.0", path = "../cpuid" }

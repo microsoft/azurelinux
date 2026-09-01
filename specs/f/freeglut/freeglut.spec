@@ -5,7 +5,7 @@
 Summary:        A freely licensed alternative to the GLUT library
 Name:           freeglut
 Version:        3.8.0
-Release: 4%{?dist}
+Release:        2%{?dist}
 URL:            http://freeglut.sourceforge.net
 Source0:        https://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # For the manpages
@@ -88,6 +88,9 @@ install -p -m 644 doc/man/*.3 $RPM_BUILD_ROOT/%{_mandir}/man3
 %{_libdir}/cmake/FreeGLUT/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Nov 17 2025 Gwyn Ciesla <gwync@protonmail.com> - 3.8.0-1
 - 3.8.0
 

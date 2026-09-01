@@ -16,11 +16,13 @@
 Name: fence-agents
 Summary: Set of unified programs capable of host isolation ("fencing")
 Version: 4.17.0
-Release: 1%{?alphatag:.%{alphatag}}%{?dist}
+Release: 2%{?alphatag:.%{alphatag}}%{?dist}
 License: GPL-2.0-or-later AND LGPL-2.0-or-later
 Group: System Environment/Base
 URL: https://github.com/ClusterLabs/fence-agents
 Source0: https://fedorahosted.org/releases/f/e/fence-agents/%{name}-%{version}.tar.gz
+
+ExcludeArch: %{ix86}
 
 %define boto3_br 1
 
@@ -1356,8 +1358,14 @@ are located on corosync cluster nodes.
 %{_libdir}/fence-virt/cpg.so
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.17.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Jan  5 2026 Oyvind Albrigtsen <oalbrigt@redhat.com> - 4.17.0-1
 - new upstream release
+
+* Thu Oct  2 2025 Daniel P. Berrangé <berrange@redhat.com> - 4.16.0-6
+- Exclude build on i686 arch
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.16.0-5
 - Rebuilt for Python 3.14.0rc3 bytecode

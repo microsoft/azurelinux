@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        1.1.2
-Release: 29%{?dist}
+Release:        27%{?dist}
 Summary:        Make Sphinx better at documenting Python functions and methods
 # Automatically converted from old format: MIT or ASL 2.0 - review is highly recommended.
 License:        LicenseRef-Callaway-MIT OR Apache-2.0
@@ -76,6 +76,9 @@ rst2html README.rst README.html
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.2-27
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.1.2-26
 - Rebuilt for Python 3.14.0rc3 bytecode
 

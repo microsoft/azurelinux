@@ -1,0 +1,25 @@
+From b54bbb81c2526a9fdec4c259fe7e3e2b4738fcea Mon Sep 17 00:00:00 2001
+From: Scott Talbert <swt@techie.net>
+Date: Sun, 14 Dec 2025 11:07:25 -0500
+Subject: [PATCH] Document wxObjectRefData as a typedef (vs class)
+
+While this is actually more true to reality, this also helps work around
+an issue with Doxygen 1.15.0 (and wxPython builds).  See:
+https://github.com/doxygen/doxygen/issues/11889
+---
+ interface/wx/object.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/interface/wx/object.h b/interface/wx/object.h
+index 0f77969165f8..3e9f4f306eaa 100644
+--- a/ext/wxWidgets/interface/wx/object.h
++++ b/ext/wxWidgets/interface/wx/object.h
+@@ -5,7 +5,7 @@
+ // Licence:     wxWindows licence
+ /////////////////////////////////////////////////////////////////////////////
+ 
+-/** @class wxObjectRefData
++/** @typedef wxObjectRefData
+ 
+     This class is just a typedef to wxRefCounter and is used by wxObject.
+ 

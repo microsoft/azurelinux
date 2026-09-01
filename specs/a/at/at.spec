@@ -6,7 +6,7 @@
 Summary:    Job spooling tools
 Name:       at
 Version:    3.2.5
-Release: 20%{?dist}
+Release:    21%{?dist}
 # http://packages.debian.org/changelogs/pool/main/a/at/current/copyright
 # + install-sh is MIT license with changes under Public Domain
 License:    GPL-3.0-or-later AND GPL-2.0-or-later AND ISC
@@ -15,6 +15,7 @@ URL:        http://ftp.debian.org/debian/pool/main/a/at
 Source:     http://software.calhariz.com/at/at_%{version}.orig.tar.gz
 # git upstream source git://git.debian.org/git/collab-maint/at.git
 Source1:    pam_atd
+Source2:    at-tmpfiles.conf
 Source3:    atd.sysconf
 Source5:    atd.systemd
 
@@ -41,6 +42,7 @@ BuildRequires: flex flex-static bison autoconf
 BuildRequires: libselinux-devel >= 1.27.9
 BuildRequires: perl(Test::Harness)
 BuildRequires: perl(Test::More)
+BuildRequires: systemd-rpm-macros
 
 %if %{with pam}
 BuildRequires: pam-devel
@@ -118,17 +120,23 @@ install -m 644 %{SOURCE3} %{buildroot}/etc/sysconfig/atd
 mkdir -p %{buildroot}/%{_unitdir}/
 install -m 644 %{SOURCE5} %{buildroot}/%{_unitdir}/atd.service
 
+# install tmpfiles configuration
+mkdir -p %{buildroot}%{_tmpfilesdir}
+install -m 644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/at.conf
+
 # remove unpackaged files from the buildroot
 rm -r  %{buildroot}%{_prefix}/doc
+# Remove .SEQ file created by make install - tmpfiles will create it
+rm -f %{buildroot}%{_localstatedir}/spool/at/.SEQ
 
 %check
 make test
 
 %post
-touch %{_localstatedir}/spool/at/.SEQ
-chmod 600 %{_localstatedir}/spool/at/.SEQ
-chown root:root %{_localstatedir}/spool/at/.SEQ
 %systemd_post atd.service
+
+# Create directories and files using tmpfiles
+%tmpfiles_create at.conf
 
 %preun
 %systemd_preun atd.service
@@ -154,10 +162,10 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %doc README timespec ChangeLog
 %attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/at.deny
 %attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/sysconfig/atd
-%attr(0700,root,root)       %dir %{_localstatedir}/spool/at
-%attr(0600,root,root)       %verify(not md5 size mtime) %ghost %{_localstatedir}/spool/at/.SEQ
-%attr(0700,root,root)       %dir %{_localstatedir}/spool/at/spool
 %attr(0644,root,root)       %config(noreplace) %{_sysconfdir}/pam.d/atd
+%attr(0700,root,root)       %dir %{_localstatedir}/spool/at
+%attr(0700,root,root)       %dir %{_localstatedir}/spool/at/spool
+%{_tmpfilesdir}/at.conf
 %{_bindir}/atrun
 %attr(0755,root,root)       %{_bindir}/atd
 %{_mandir}/man*/*
@@ -166,10 +174,22 @@ chown root:root %{_localstatedir}/spool/at/.SEQ
 %{_bindir}/atq
 %attr(4755,root,root)       %{_bindir}/at
 %{_datadir}/at/
-%{_datadir}/at/batch-job
 %attr(0644,root,root)       /%{_unitdir}/atd.service
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Sep 18 2025 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-19
+- Add /var/spool/at and /var/spool/at/spool directories into %%files section
+- Resolves: rhbz#2396330
+
+* Wed Aug 27 2025 Ondřej Pohořelský <opohorel@redhat.com> - 3.2.5-18
+- Use systemd-tmpfiles for /var/spool/at directories
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.5-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

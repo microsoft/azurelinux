@@ -1,7 +1,7 @@
-diff -rupN flatbuffers-24.3.25/CMakeLists.txt flatbuffers-24.3.25-new/CMakeLists.txt
---- flatbuffers-24.3.25/CMakeLists.txt	2024-03-26 06:18:07.000000000 +0100
-+++ flatbuffers-24.3.25-new/CMakeLists.txt	2024-07-27 12:48:29.167611354 +0200
-@@ -483,6 +483,9 @@ if(FLATBUFFERS_BUILD_SHAREDLIB)
+diff -rupN --no-dereference flatbuffers-25.9.23/CMakeLists.txt flatbuffers-25.9.23-new/CMakeLists.txt
+--- flatbuffers-25.9.23/CMakeLists.txt	2025-09-24 07:18:02.000000000 +0200
++++ flatbuffers-25.9.23-new/CMakeLists.txt	2025-09-24 09:05:52.087296275 +0200
+@@ -490,6 +490,9 @@ if(FLATBUFFERS_BUILD_SHAREDLIB)
                          OUTPUT_NAME flatbuffers
                          SOVERSION "${FlatBuffers_Library_SONAME_FULL}"
                          VERSION "${FlatBuffers_Library_SONAME_FULL}")
@@ -11,7 +11,7 @@ diff -rupN flatbuffers-24.3.25/CMakeLists.txt flatbuffers-24.3.25-new/CMakeLists
    if(FLATBUFFERS_ENABLE_PCH)
      add_pch_to_target(flatbuffers_shared include/flatbuffers/pch/pch.h)
    endif()
-@@ -656,7 +659,7 @@ if(FLATBUFFERS_INSTALL)
+@@ -663,7 +666,7 @@ if(FLATBUFFERS_INSTALL)
      install(
        TARGETS flatbuffers_shared EXPORT FlatBuffersSharedTargets
        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

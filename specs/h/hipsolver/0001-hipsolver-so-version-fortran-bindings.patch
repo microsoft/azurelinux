@@ -1,0 +1,24 @@
+From 2d228ee883a538d67af24e944a2a24a95d779345 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sun, 21 Sep 2025 08:37:33 -0700
+Subject: [PATCH] hipsolver so version fortran bindings
+
+---
+ library/src/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/library/src/CMakeLists.txt b/library/src/CMakeLists.txt
+index a4e8649cdcae..69437d603d7a 100644
+--- a/library/src/CMakeLists.txt
++++ b/library/src/CMakeLists.txt
+@@ -75,6 +75,7 @@ set(hipsolver_f90_source
+ if(BUILD_FORTRAN_BINDINGS)
+   # Create hipSOLVER Fortran module
+   add_library(hipsolver_fortran ${hipsolver_f90_source})
++  rocm_set_soversion(hipsolver_fortran ${hipsolver_SOVERSION})
+   rocm_install(TARGETS hipsolver_fortran)
+ endif()
+ 
+-- 
+2.51.0
+

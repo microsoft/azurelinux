@@ -1,0 +1,24 @@
+diff -up expect5.45.4/expect.c.tcl9-eval expect5.45.4/expect.c
+--- expect5.45.4/expect.c.tcl9-eval	2026-01-19 11:30:58.662069055 +0100
++++ expect5.45.4/expect.c	2026-01-19 11:30:58.663720515 +0100
+@@ -325,15 +325,16 @@ exp_eval_with_one_arg(
+ 		 numWords--, tokenPtr += (tokenPtr->numComponents + 1)) {
+ 		/* FUTURE: Save token information, do substitution later */
+ 
+-		Tcl_Obj* w = Tcl_EvalTokens(interp, tokenPtr+1,
++		Tcl_Obj* w;
++		int code = Tcl_EvalTokensStandard(interp, tokenPtr+1,
+ 			tokenPtr->numComponents);
+-		/* w has refCount 1 here, if not NULL */
+-		if (w == NULL) {
++		if (code != TCL_OK) {
+ 		    Tcl_DecrRefCount (res);
+ 		    res = NULL;
+ 		    goto done;
+-
+ 		}
++		w = Tcl_GetObjResult(interp);
++		Tcl_IncrRefCount(w);
+ 		Tcl_ListObjAppendElement (interp, res, w);
+ 		Tcl_DecrRefCount (w); /* Local reference goes away */
+ 	    }

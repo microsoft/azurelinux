@@ -1,0 +1,618 @@
+From 662053b769c1c15ad0ff2a9eee72cb74ccede34a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Luk=C3=A1=C5=A1=20Zaoral?= <lzaoral@redhat.com>
+Date: Wed, 16 Jul 2025 15:03:43 +0200
+Subject: [PATCH] tftp: propagate errors to exit code in single command mode
+
+---
+ tftp/extern.h |   4 +-
+ tftp/main.c   | 132 ++++++++++++++++++++++++++++----------------------
+ tftp/tftp.c   |  22 +++++++--
+ 3 files changed, 94 insertions(+), 64 deletions(-)
+
+diff --git a/tftp/extern.h b/tftp/extern.h
+index 9c578e6..7923eac 100644
+--- a/tftp/extern.h
++++ b/tftp/extern.h
+@@ -36,8 +36,8 @@
+ 
+ #include "config.h"
+ 
+-void tftp_recvfile(int, const char *, const char *);
+-void tftp_sendfile(int, const char *, const char *);
++int tftp_recvfile(int, const char *, const char *);
++int tftp_sendfile(int, const char *, const char *);
+ extern sigjmp_buf toplevel;
+ 
+ #endif
+diff --git a/tftp/main.c b/tftp/main.c
+index ac06330..74f63f8 100644
+--- a/tftp/main.c
++++ b/tftp/main.c
+@@ -102,20 +102,20 @@ int portrange = 0;
+ unsigned int portrange_from = 0;
+ unsigned int portrange_to = 0;
+ 
+-void get(int, char **);
+-void help(int, char **);
+-void modecmd(int, char **);
+-void put(int, char **);
+-void quit(int, char **);
+-void setascii(int, char **);
+-void setbinary(int, char **);
+-void setpeer(int, char **);
+-void setrexmt(int, char **);
+-void settimeout(int, char **);
+-void settrace(int, char **);
+-void setverbose(int, char **);
+-void status(int, char **);
+-void setliteral(int, char **);
++int get(int, char **);
++int help(int, char **);
++int modecmd(int, char **);
++int put(int, char **);
++int quit(int, char **);
++int setascii(int, char **);
++int setbinary(int, char **);
++int setpeer(int, char **);
++int setrexmt(int, char **);
++int settimeout(int, char **);
++int settrace(int, char **);
++int setverbose(int, char **);
++int status(int, char **);
++int setliteral(int, char **);
+ 
+ static void command(void);
+ 
+@@ -129,7 +129,7 @@ static void settftpmode(const struct modes *);
+ struct cmd {
+     const char *name;
+     const char *help;
+-    void (*handler) (int, char **);
++    int (*handler) (int, char **);
+ };
+ 
+ struct cmd cmdtab[] = {
+@@ -188,7 +188,7 @@ char *xstrdup(const char *);
+ 
+ const char *program;
+ 
+-static void usage(int errcode)
++static int usage(int errcode)
+ {
+     fprintf(stderr,
+ #ifdef HAVE_IPV6
+@@ -203,7 +203,7 @@ static void usage(int errcode)
+ int main(int argc, char *argv[])
+ {
+     union sock_addr sa;
+-    int arg;
++    int arg, ret;
+     static int pargc, peerargc;
+     static int iscmd = 0;
+     char **pargv;
+@@ -342,8 +342,8 @@ int main(int argc, char *argv[])
+                     pargv[1]);
+             exit(EX_USAGE);
+         }
+-        (*c->handler) (pargc, pargv);
+-        exit(0);
++        ret = (*c->handler) (pargc, pargv);
++        exit(ret);
+     }
+ #ifdef WITH_READLINE
+ #ifdef HAVE_READLINE_HISTORY_H
+@@ -398,7 +398,7 @@ static void getmoreargs(const char *partial, const char *mprompt)
+ #endif
+ }
+ 
+-void setpeer(int argc, char *argv[])
++int setpeer(int argc, char *argv[])
+ {
+     int err;
+ 
+@@ -410,7 +410,7 @@ void setpeer(int argc, char *argv[])
+     }
+     if ((argc < 2) || (argc > 3)) {
+         printf("usage: %s host-name [port]\n", argv[0]);
+-        return;
++        return EX_USAGE;
+     }
+ 
+     peeraddr.sa.sa_family = ai_fam;
+@@ -419,7 +419,7 @@ void setpeer(int argc, char *argv[])
+         printf("Error: %s\n", gai_strerror(err));
+         printf("%s: unknown host\n", argv[1]);
+         connected = 0;
+-        return;
++        return EX_NOHOST;
+     }
+     ai_fam = peeraddr.sa.sa_family;
+     if (f == -1) { /* socket not open */
+@@ -456,7 +456,7 @@ void setpeer(int argc, char *argv[])
+             if (*ep || myport > 65535UL) {
+                 printf("%s: bad port number\n", argv[2]);
+                 connected = 0;
+-                return;
++                return EX_USAGE;
+             }
+             port = htons((u_short) myport);
+         }
+@@ -472,16 +472,17 @@ void setpeer(int argc, char *argv[])
+                hostname, tp, (unsigned int)ntohs(port));
+     }
+     connected = 1;
++    return 0;
+ }
+ 
+-void modecmd(int argc, char *argv[])
++int modecmd(int argc, char *argv[])
+ {
+     const struct modes *p;
+     const char *sep;
+ 
+     if (argc < 2) {
+         printf("Using %s mode to transfer files.\n", mode->m_mode);
+-        return;
++        return 0;
+     }
+     if (argc == 2) {
+         for (p = modes; p->m_name; p++)
+@@ -489,7 +490,7 @@ void modecmd(int argc, char *argv[])
+                 break;
+         if (p->m_name) {
+             settftpmode(p);
+-            return;
++            return 0;
+         }
+         printf("%s: unknown mode\n", argv[1]);
+         /* drop through and print usage message */
+@@ -503,21 +504,23 @@ void modecmd(int argc, char *argv[])
+             sep = " | ";
+     }
+     printf(" ]\n");
+-    return;
++    return EX_USAGE;
+ }
+ 
+-void setbinary(int argc, char *argv[])
++int setbinary(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+     settftpmode(MODE_OCTET);
++    return 0;
+ }
+ 
+-void setascii(int argc, char *argv[])
++int setascii(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+     settftpmode(MODE_NETASCII);
++    return 0;
+ }
+ 
+ static void settftpmode(const struct modes *newmode)
+@@ -530,7 +533,7 @@ static void settftpmode(const struct modes *newmode)
+ /*
+  * Send file(s).
+  */
+-void put(int argc, char *argv[])
++int put(int argc, char *argv[])
+ {
+     int fd;
+     int n, err;
+@@ -544,14 +547,14 @@ void put(int argc, char *argv[])
+     }
+     if (argc < 2) {
+         putusage(argv[0]);
+-        return;
++        return EX_USAGE;
+     }
+     targ = argv[argc - 1];
+     if (!literal && strchr(argv[argc - 1], ':')) {
+         for (n = 1; n < argc - 1; n++)
+             if (strchr(argv[n], ':')) {
+                 putusage(argv[0]);
+-                return;
++                return EX_USAGE;
+             }
+         cp = argv[argc - 1];
+         targ = strchr(cp, ':');
+@@ -562,14 +565,14 @@ void put(int argc, char *argv[])
+             printf("Error: %s\n", gai_strerror(err));
+             printf("%s: unknown host\n", argv[1]);
+             connected = 0;
+-            return;
++            return EX_NOHOST;
+         }
+         ai_fam = peeraddr.sa.sa_family;
+         connected = 1;
+     }
+     if (!connected) {
+         printf("No target machine specified.\n");
+-        return;
++        return EX_USAGE;
+     }
+     if (argc < 4) {
+         cp = argc == 2 ? tail(targ) : argv[1];
+@@ -587,14 +590,14 @@ void put(int argc, char *argv[])
+         if (fd < 0) {
+             fprintf(stderr, "tftp: ");
+             perror(cp);
+-            return;
++            return EX_OSERR;
+         }
+         if (verbose)
+             printf("putting %s to %s:%s [%s]\n",
+                    cp, hostname, targ, mode->m_mode);
+         sa_set_port(&peeraddr, port);
+-        tftp_sendfile(fd, targ, mode->m_mode);
+-        return;
++        err = tftp_sendfile(fd, targ, mode->m_mode);
++        return err;
+     }
+     /* this assumes the target is a directory */
+     /* on a remote unix system.  hmmmm.  */
+@@ -605,6 +608,7 @@ void put(int argc, char *argv[])
+     strcpy(remote_pth, targ);
+     remote_pth[dirlen-1] = '/';
+     cp = remote_pth + dirlen;
++    err = 0;
+     for (n = 1; n < argc - 1; n++) {
+ #ifdef WITH_READLINE
+         namelen = strlen(tail(argv[n])) + 1;
+@@ -619,14 +623,17 @@ void put(int argc, char *argv[])
+         if (fd < 0) {
+             fprintf(stderr, "tftp: ");
+             perror(argv[n]);
++            err = EX_OSERR;
+             continue;
+         }
+         if (verbose)
+             printf("putting %s to %s:%s [%s]\n",
+                    argv[n], hostname, remote_pth, mode->m_mode);
+         sa_set_port(&peeraddr, port);
+-        tftp_sendfile(fd, remote_pth, mode->m_mode);
++        err |= tftp_sendfile(fd, remote_pth, mode->m_mode);
+     }
++
++    return err;
+ }
+ 
+ static void putusage(char *s)
+@@ -615,10 +622,10 @@ static void putusage(char *s)
+ /*
+  * Receive file(s).
+  */
+-void get(int argc, char *argv[])
++int get(int argc, char *argv[])
+ {
+     int fd;
+-    int n;
++    int n, err;
+     char *cp;
+     char *src;
+ 
+@@ -630,28 +637,28 @@ void get(int argc, char *argv[])
+     }
+     if (argc < 2) {
+         getusage(argv[0]);
+-        return;
++        return EX_USAGE;
+     }
+     if (!connected) {
+         for (n = 1; n < argc; n++)
+             if (literal || strchr(argv[n], ':') == 0) {
+                 getusage(argv[0]);
+-                return;
++                return EX_USAGE;
+             }
+     }
++    err = 0;
+     for (n = 1; n < argc; n++) {
+         src = strchr(argv[n], ':');
+         if (literal || src == NULL)
+             src = argv[n];
+         else {
+-            int err;
+-
+             *src++ = 0;
+             peeraddr.sa.sa_family = ai_fam;
+             err = set_sock_addr(argv[n], &peeraddr, &hostname);
+             if (err) {
+                 printf("Warning: %s\n", gai_strerror(err));
+                 printf("%s: unknown host\n", argv[1]);
++                err = EX_NOHOST;
+                 continue;
+             }
+             ai_fam = peeraddr.sa.sa_family;
+@@ -664,13 +671,13 @@ void get(int argc, char *argv[])
+             if (fd < 0) {
+                 fprintf(stderr, "tftp: ");
+                 perror(cp);
+-                return;
++                return EX_OSERR;
+             }
+             if (verbose)
+                 printf("getting from %s:%s to %s [%s]\n",
+                        hostname, src, cp, mode->m_mode);
+             sa_set_port(&peeraddr, port);
+-            tftp_recvfile(fd, src, mode->m_mode);
++            err = tftp_recvfile(fd, src, mode->m_mode);
+             break;
+         }
+         cp = tail(src);         /* new .. jdg */
+@@ -679,14 +686,16 @@ void get(int argc, char *argv[])
+         if (fd < 0) {
+             fprintf(stderr, "tftp: ");
+             perror(cp);
++            err = EX_OSERR;
+             continue;
+         }
+         if (verbose)
+             printf("getting from %s:%s to %s [%s]\n",
+                    hostname, src, cp, mode->m_mode);
+         sa_set_port(&peeraddr, port);
+-        tftp_recvfile(fd, src, mode->m_mode);
++        err |= tftp_recvfile(fd, src, mode->m_mode);
+     }
++    return err;
+ }
+ 
+ static void getusage(char *s)
+@@ -697,7 +706,7 @@ static void getusage(char *s)
+ 
+ int rexmtval = TIMEOUT;
+ 
+-void setrexmt(int argc, char *argv[])
++int setrexmt(int argc, char *argv[])
+ {
+     int t;
+ 
+@@ -709,18 +718,19 @@ void setrexmt(int argc, char *argv[])
+     }
+     if (argc != 2) {
+         printf("usage: %s value\n", argv[0]);
+-        return;
++        return EX_USAGE;
+     }
+     t = atoi(argv[1]);
+     if (t < 0)
+         printf("%s: bad value\n", argv[1]);
+     else
+         rexmtval = t;
++    return 0;
+ }
+ 
+ int maxtimeout = 5 * TIMEOUT;
+ 
+-void settimeout(int argc, char *argv[])
++int settimeout(int argc, char *argv[])
+ {
+     int t;
+ 
+@@ -732,24 +742,26 @@ void settimeout(int argc, char *argv[])
+     }
+     if (argc != 2) {
+         printf("usage: %s value\n", argv[0]);
+-        return;
++        return EX_USAGE;
+     }
+     t = atoi(argv[1]);
+     if (t < 0)
+         printf("%s: bad value\n", argv[1]);
+     else
+         maxtimeout = t;
++    return 0;
+ }
+ 
+-void setliteral(int argc, char *argv[])
++int setliteral(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+     literal = !literal;
+     printf("Literal mode %s.\n", literal ? "on" : "off");
++    return 0;
+ }
+ 
+-void status(int argc, char *argv[])
++int status(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+@@ -762,6 +774,7 @@ void status(int argc, char *argv[])
+            literal ? "on" : "off");
+     printf("Rexmt-interval: %d seconds, Max-timeout: %d seconds\n",
+            rexmtval, maxtimeout);
++    return 0;
+ }
+ 
+ void intr(int sig)
+@@ -891,7 +904,7 @@ static void makeargv(void)
+     *argp++ = 0;
+ }
+ 
+-void quit(int argc, char *argv[])
++int quit(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+@@ -901,7 +914,7 @@ void quit(int argc, char *argv[])
+ /*
+  * Help command.
+  */
+-void help(int argc, char *argv[])
++int help(int argc, char *argv[])
+ {
+     struct cmd *c;
+ 
+@@ -911,7 +924,7 @@ void help(int argc, char *argv[])
+         printf("Commands may be abbreviated.  Commands are:\n\n");
+         for (c = cmdtab; c->name; c++)
+             printf("%-*s\t%s\n", (int)HELPINDENT, c->name, c->help);
+-        return;
++        return 0;
+     }
+     while (--argc > 0) {
+         char *arg;
+@@ -924,22 +937,25 @@ void help(int argc, char *argv[])
+         else
+             printf("%s\n", c->help);
+     }
++    return 0;
+ }
+ 
+-void settrace(int argc, char *argv[])
++int settrace(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+ 
+     trace = !trace;
+     printf("Packet tracing %s.\n", trace ? "on" : "off");
++    return 0;
+ }
+ 
+-void setverbose(int argc, char *argv[])
++int setverbose(int argc, char *argv[])
+ {
+     (void)argc;
+     (void)argv;                 /* Quiet unused warning */
+ 
+     verbose = !verbose;
+     printf("Verbose mode %s.\n", verbose ? "on" : "off");
++    return 0;
+ }
+diff --git a/tftp/tftp.c b/tftp/tftp.c
+index 33a4175..19e60dc 100644
+--- a/tftp/tftp.c
++++ b/tftp/tftp.c
+@@ -61,11 +61,11 @@ static void tpacket(const char *, struct tftphdr *, int);
+ /*
+  * Send the requested file.
+  */
+-void tftp_sendfile(int fd, const char *name, const char *mode)
++int tftp_sendfile(int fd, const char *name, const char *mode)
+ {
+     struct tftphdr *ap;         /* data and ack packets */
+     struct tftphdr *dp;
+-    int n;
++    int n, err;
+     volatile int is_request;
+     volatile u_short block;
+     volatile int size, convert;
+@@ -83,6 +83,7 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+     block = 0;
+     is_request = 1;             /* First packet is the actual WRQ */
+     amount = 0;
++    err = 0;
+ 
+     tftp_signal(SIGALRM, timer);
+     do {
+@@ -93,6 +94,7 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+             size = readit(file, &dp, convert);
+             if (size < 0) {
+                 nak(errno + 100, NULL);
++                err = EX_OSERR;
+                 break;
+             }
+             dp->th_opcode = htons((u_short) DATA);
+@@ -107,6 +109,7 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+                    &peeraddr.sa, SOCKLEN(&peeraddr));
+         if (n != size + 4) {
+             perror("tftp: sendto");
++            err = EX_OSERR;
+             goto abort;
+         }
+         read_ahead(file, convert);
+@@ -120,6 +123,7 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+             alarm(0);
+             if (n < 0) {
+                 perror("tftp: recvfrom");
++                err = EX_OSERR;
+                 goto abort;
+             }
+             sa_set_port(&peeraddr, SOCKPORT(&from));  /* added */
+@@ -130,6 +134,7 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+             ap_block = ntohs((u_short) ap->th_block);
+             if (ap_opcode == ERROR) {
+                 printf("Error code %d: %s\n", ap_block, ap->th_msg);
++                err = EX_PROTOCOL;
+                 goto abort;
+             }
+             if (ap_opcode == ACK) {
+@@ -162,16 +167,18 @@ void tftp_sendfile(int fd, const char *name, const char *mode)
+     stopclock();
+     if (amount > 0)
+         printstats("Sent", amount);
++
++    return err;
+ }
+ 
+ /*
+  * Receive a file.
+  */
+-void tftp_recvfile(int fd, const char *name, const char *mode)
++int tftp_recvfile(int fd, const char *name, const char *mode)
+ {
+     struct tftphdr *ap;
+     struct tftphdr *dp;
+-    int n;
++    int n, err;
+     volatile u_short block;
+     volatile int size, firsttrip;
+     volatile unsigned long amount;
+@@ -189,6 +196,7 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+     block = 1;
+     firsttrip = 1;
+     amount = 0;
++    err = 0;
+ 
+     tftp_signal(SIGALRM, timer);
+     do {
+@@ -210,6 +218,7 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+                    SOCKLEN(&peeraddr)) != size) {
+             alarm(0);
+             perror("tftp: sendto");
++            err = EX_OSERR;
+             goto abort;
+         }
+         write_behind(file, convert);
+@@ -223,6 +232,7 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+             alarm(0);
+             if (n < 0) {
+                 perror("tftp: recvfrom");
++                err = EX_OSERR;
+                 goto abort;
+             }
+             sa_set_port(&peeraddr, SOCKPORT(&from));  /* added */
+@@ -233,6 +243,7 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+             dp_block = ntohs((u_short) dp->th_block);
+             if (dp_opcode == ERROR) {
+                 printf("Error code %d: %s\n", dp_block, dp->th_msg);
++                err = EX_PROTOCOL;
+                 goto abort;
+             }
+             if (dp_opcode == DATA) {
+@@ -257,6 +268,7 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+         size = writeit(file, &dp, n - 4, convert);
+         if (size < 0) {
+             nak(errno + 100, NULL);
++            err = EX_OSERR;
+             break;
+         }
+         amount += size;
+@@ -271,6 +283,8 @@ void tftp_recvfile(int fd, const char *name, const char *mode)
+     stopclock();
+     if (amount > 0)
+         printstats("Received", amount);
++
++    return err;
+ }
+ 
+ static int
+-- 
+2.52.0
+

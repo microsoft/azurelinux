@@ -3,7 +3,7 @@
 
 Name:           fcgi
 Version:        2.4.7
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        FastCGI development kit
 
 License:        OML
@@ -88,6 +88,9 @@ rm -f doc/*.{1,3}
 %{_mandir}/man3/FCGI*.3*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Nov 26 2025 Andrew Bauer <zonexpertconsulting@outlook.com> - 2.4.7-1
 - 2.4.7 release, fixes CVE-2025-23016
 

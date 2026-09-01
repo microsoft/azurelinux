@@ -12,7 +12,7 @@ Summary: Esperanto hunspell dictionaries
 %global upstreamid 20100218
 Version: 0.%{upstreamid}
 Epoch: 1
-Release: 21%{?dist}
+Release: 19%{?dist}
 Source: http://www.esperantilo.org/literumilo-fontoj.tar.gz
 URL: http://www.esperantilo.org
 License: GPL-2.0-or-later
@@ -46,6 +46,9 @@ cp -p eo_morf.aff $RPM_BUILD_ROOT/%{_datadir}/%{dict_dirname}/eo.aff
 %{_datadir}/%{dict_dirname}/*
 
 %changelog
+* Tue Jan 20 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.20100218-19
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:0.20100218-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

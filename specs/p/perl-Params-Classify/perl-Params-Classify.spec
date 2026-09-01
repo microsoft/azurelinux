@@ -10,7 +10,7 @@
 
 Name:           perl-Params-Classify
 Version:        0.015
-Release: 30%{?dist}
+Release:        27%{?dist}
 Summary:        Argument type classification
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/Params-Classify

@@ -1,0 +1,27 @@
+From 63e885394a629d194b0aa867e8fbf475cdec6521 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 22 Feb 2026 11:12:27 +0000
+Subject: [PATCH] Adapt test_response_decode_text_using_autodetect for chardet
+ 6.0
+
+See https://github.com/encode/httpx/discussions/3772.
+---
+ tests/models/test_responses.py | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/tests/models/test_responses.py b/tests/models/test_responses.py
+index 06c28e1e30..d2972da5bd 100644
+--- a/tests/models/test_responses.py
++++ b/tests/models/test_responses.py
+@@ -1011,7 +1011,10 @@ def test_response_decode_text_using_autodetect():
+ 
+     assert response.status_code == 200
+     assert response.reason_phrase == "OK"
+-    assert response.encoding == "ISO-8859-1"
++    # The encoded byte string is consistent with either ISO-8859-1 or
++    # WINDOWS-1252. Versions <6.0 of chardet claim the former, while chardet
++    # 6.0 detects the latter.
++    assert response.encoding in ("ISO-8859-1", "WINDOWS-1252")
+     assert response.text == text
+ 
+ 

@@ -2,20 +2,30 @@
 # Do not edit manually; changes may be overwritten.
 
 # SPDX-License-Identifier: MIT
-BuildArch: noarch
+%if 0%{?rhel} > 10
+%bcond build_from_src 0
+%else
+%bcond build_from_src 1
+%endif
 
-BuildRequires: fontforge
-BuildRequires: perl-interpreter
-BuildRequires: perl(Font::TTF)
-BuildRequires: unicode-ucd
-BuildRequires: make
+BuildArch: noarch
 
 %global forgeurl    https://github.com/dejavu-fonts/dejavu-fonts
 Version: 2.37
 %global tag         %{lua:t=string.gsub(rpm.expand("version %{version}"), "[%p%s]+", "_");print(t)}
 %forgemeta
 
+%if %{with build_from_src}
 %global source_name dejavu-fonts
+BuildRequires: fontforge
+BuildRequires: perl-interpreter
+BuildRequires: perl(Font::TTF)
+BuildRequires: unicode-ucd
+BuildRequires: make
+%else
+%global source_name dejavu-fonts-ttf
+%global forgesetupargs -n %{source_name}-%{version}
+%endif
 
 Release: 29%{?dist}
 # original bitstream glyphs are Bitstream Vera
@@ -40,7 +50,12 @@ Obsoletes: dejavu-fonts-common < %{version}-%{release}
 Obsoletes: compat-f32-dejavu-sans-fonts
 Suggests:  font(dejavusansmono)
 }
+%if %{with build_from_src}
 %global fonts1            DejaVuSans.ttf DejaVuSans-*.ttf DejaVuSansCondensed*.ttf
+%else
+%global fonts1            ttf/DejaVuSans.ttf ttf/DejaVuSans-*.ttf ttf/DejaVuSansCondensed*.ttf
+%endif
+
 %global fontconfs1        fontconfig/20*-dejavu-sans.conf
 %global fontconfngs1      %{SOURCE11}
 %global fontdescription1  %{expand:
@@ -56,7 +71,11 @@ their unabridged version.
 Obsoletes: dejavu-math-tex-gyre-fonts < %{version}-%{release}
 Obsoletes: compat-f32-dejavu-serif-fonts
 }
+%if %{with build_from_src}
 %global fonts2            DejaVuSerif.ttf DejaVuSerif-*.ttf DejaVuSerifCondensed*.ttf DejaVuMathTeXGyre.ttf
+%else
+%global fonts2            ttf/DejaVuSerif.ttf ttf/DejaVuSerif-*.ttf ttf/DejaVuSerifCondensed*.ttf ttf/DejaVuMathTeXGyre.ttf
+%endif
 %global fontconfs2        fontconfig/20*-dejavu-serif.conf
 %global fontconfngs2      %{SOURCE12}
 %global fontdescription2  %{expand:
@@ -73,7 +92,11 @@ B. Jackowski, P. Strzelczyk and P. Pianowski, on behalf of TeX user groups.}
 %global fontpkgheader3    %{expand:
 Obsoletes: compat-f32-dejavu-sans-mono-fonts
 }
+%if %{with build_from_src}
 %global fonts3            DejaVuSansMono*.ttf
+%else
+%global fonts3            ttf/DejaVuSansMono*.ttf
+%endif
 %global fontconfs3        fontconfig/20*-dejavu-sans-mono.conf
 %global fontconfngs3      %{SOURCE13}
 %global fontdescription3  %{expand:
@@ -87,8 +110,13 @@ unabridged version.}
 %global fontpkgheader4    %{expand:
 Suggests:  font(dejavusans)
 }
+%if %{with build_from_src}
 %global fonts4            DejaVuLGCSans.ttf DejaVuLGCSans-*.ttf DejaVuLGCSansCondensed*.ttf
 %global fontconfs4        fontconfig/20*-dejavu-lgc-sans.conf
+%else
+%global fonts4            dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSans.ttf dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSans-*.ttf dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSansCondensed*.ttf
+%global fontconfs4        dejavu-lgc-fonts-ttf-2.37/fontconfig/20*-dejavu-lgc-sans.conf
+%endif
 %global fontconfngs4      %{SOURCE14}
 %global fontdescription4  %{expand:
 %{common_description}
@@ -101,8 +129,13 @@ Unicode coverage restricted to Latin, Greek and Cyrillic.}
 %global fontpkgheader5    %{expand:
 Suggests:  font(dejavuserif)
 }
+%if %{with build_from_src}
 %global fonts5            DejaVuLGCSerif.ttf DejaVuLGCSerif-*.ttf DejaVuLGCSerifCondensed*.ttf
 %global fontconfs5        fontconfig/20*-dejavu-lgc-serif.conf
+%else
+%global fonts5            dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSerif.ttf dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSerif-*.ttf dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSerifCondensed*.ttf
+%global fontconfs5        dejavu-lgc-fonts-ttf-2.37/fontconfig/20*-dejavu-lgc-serif.conf
+%endif
 %global fontconfngs5      %{SOURCE15}
 %global fontdescription5  %{expand:
 %{common_description}
@@ -115,8 +148,13 @@ Unicode coverage restricted to Latin, Greek and Cyrillic.}
 %global fontpkgheader6    %{expand:
 Suggests:  font(dejavusansmono)
 }
+%if %{with build_from_src}
 %global fonts6            DejaVuLGCSansMono*.ttf
 %global fontconfs6        fontconfig/20*-dejavu-lgc-sans-mono.conf
+%else
+%global fonts6            dejavu-lgc-fonts-ttf-2.37/ttf/DejaVuLGCSansMono*.ttf
+%global fontconfs6        dejavu-lgc-fonts-ttf-2.37/fontconfig/20*-dejavu-lgc-sans-mono.conf
+%endif
 %global fontconfngs6      %{SOURCE16}
 %global fontdescription6  %{expand:
 %{common_description}
@@ -124,14 +162,18 @@ Suggests:  font(dejavusansmono)
 This package consists of the DejaVu sans-serif mono-space font faces, with
 Unicode coverage restricted to Latin, Greek and Cyrillic.}
 
-Source0:  %{forgesource}
+Source0:  %{forgeurl}/archive/version_2_37/dejavu-fonts-version_2_37.tar.gz
+Source1:  %{forgeurl}/releases/download/%{tag}/dejavu-fonts-ttf-%{version}.tar.bz2
+Source2:  %{forgeurl}/releases/download/%{tag}/dejavu-lgc-fonts-ttf-%{version}.tar.bz2
 Source11: 57-%{fontpkgname1}.xml
 Source12: 57-%{fontpkgname2}.xml
 Source13: 57-%{fontpkgname3}.xml
 Source14: 58-%{fontpkgname4}.xml
 Source15: 58-%{fontpkgname5}.xml
 Source16: 58-%{fontpkgname6}.xml
-Patch0:   %{source_name}-urn-dtd.patch
+Patch0:   dejavu-fonts-ttf-urn-dtd.patch
+Patch1:   dejavu-lgc-fonts-ttf-urn-dtd.patch
+Patch2:   dejavu-fonts-urn-dtd.patch
 
 Name:     dejavu-fonts
 Summary:  The DejaVu font families
@@ -159,22 +201,32 @@ This package provides optional documentation files shipped with
 %{source_name}.
 
 %prep
-%forgesetup
+%if %{with build_from_src}
+%setup -n %{name}-%{tag}
+%patch -P2 -p1
+%else
+%setup -c -T -b1 -a2 %{forgesetupargs}
 %patch -P0 -p1
+%patch -P1 -p1
+%endif
 
 %build
+%if %{with build_from_src}
 make %{?_smp_mflags} VERSION=%{version} FC-LANG="" \
      BLOCKS=/usr/share/unicode/ucd/Blocks.txt \
      UNICODEDATA=/usr/share/unicode/ucd/UnicodeData.txt \
      BUILDDIR=.
 xz -9 *.txt
+%endif
 %fontbuild -a
 
 %install
 %fontinstall -a
 
 %check
+%if %{with build_from_src}
 make check
+%endif
 %fontcheck -a
 
 %fontfiles -a
@@ -182,9 +234,21 @@ make check
 %files doc
 %defattr(644, root, root, 0755)
 %license LICENSE
+%if %{with build_from_src}
 %doc *.txt.xz
+%endif
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-29
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-28
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 03 2025 Parag Nemade <pnemade AT redhat DOT com> - 2.37-27
+- Moving to use binary ttf as a Source for RHEL > 10 releases as we want
+  to drop fontforge dependency from RHEL
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

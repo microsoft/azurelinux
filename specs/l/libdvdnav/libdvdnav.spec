@@ -4,19 +4,20 @@
 %global abi 4
 
 Name:           libdvdnav
-Version:        6.1.1
-Release: 14%{?dist}
+Version:        7.0.0
+Release:        1%{?dist}
 Summary:        A library for reading DVD video discs based on Ogle code
 License:        GPL-2.0-or-later AND LGPL-2.1-or-later
 URL:            http://dvdnav.mplayerhq.hu/
-Source0:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.bz2
-Source1:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.bz2.asc
+Source0:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.xz
+Source1:        https://download.videolan.org/pub/videolan/libdvdnav/%{version}/libdvdnav-%{version}.tar.xz.asc
 Source2:        https://download.videolan.org/pub/keys/7180713BE58D1ADC.asc
+
 BuildRequires:  doxygen
 BuildRequires:  gcc
 BuildRequires:  gnupg2
 BuildRequires:  libdvdread-devel >= 6.0.0
-BuildRequires: make
+BuildRequires:  meson
 
 %description
 libdvdnav provides a simple library for reading DVD video discs.
@@ -37,32 +38,36 @@ libdvdnav library.
 %setup -q
 
 %build
-%configure --disable-static
-
-%{__make} V=1 %{?_smp_mflags}
-pushd doc
-doxygen doxy.conf
-popd
+%meson \
+  -Ddefault_library=shared \
+  -Denable_docs=true \
+  -Denable_examples=true
+%meson_build
 
 %install
-%make_install
-rm %{buildroot}%{_libdir}/libdvdnav.la
-rm %{buildroot}%{_pkgdocdir}/{COPYING,TODO}
+%meson_install
+rm %{buildroot}%{_pkgdocdir}/{COPYING,TODO,AUTHORS,ChangeLog,README.md}
+mv %{buildroot}%{_pkgdocdir}/ docdir/
 
-%ldconfig_scriptlets
 
 %files
 %license COPYING
-%doc AUTHORS ChangeLog README
+%doc AUTHORS ChangeLog README.md
 %{_libdir}/libdvdnav.so.%{abi}*
 
 %files devel
-%doc TODO doc/html/*
+%doc docdir/*
 %{_libdir}/libdvdnav.so
 %{_includedir}/dvdnav
 %{_libdir}/pkgconfig/dvdnav.pc
 
 %changelog
+* Wed Feb 25 2026 Xavier Bachelot <xavier@bachelot.org> - 7.0.0-1
+- Update to 7.0.0 (RHBZ#2413651)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 6.1.1-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

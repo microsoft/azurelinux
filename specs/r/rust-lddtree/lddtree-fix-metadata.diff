@@ -1,6 +1,6 @@
---- lddtree-0.3.8/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ lddtree-0.3.8/Cargo.toml	2025-11-15T22:33:33.025544+00:00
-@@ -27,6 +27,7 @@
+--- lddtree-0.5.1/Cargo.toml	2006-07-24T01:21:28+00:00
++++ lddtree-0.5.1/Cargo.toml	2026-07-08T15:55:03.310334+00:00
+@@ -28,6 +28,7 @@
  ]
  license = "MIT"
  repository = "https://github.com/messense/lddtree-rs"

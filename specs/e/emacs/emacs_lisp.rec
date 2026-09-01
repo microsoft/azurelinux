@@ -12,10 +12,15 @@
 (setq backtrace-on-error-noninteractive nil
       jka-compr-verbose nil)
 
+(defun add-parser-at-point ()
+  "Add symbol at point to list `parsers' (unless in a comment)."
+  (unless (nth 4 (syntax-ppss))
+    (add-to-list 'parsers (thing-at-point 'symbol t))))
+
 (condition-case nil
     (while (setq filename (read-from-minibuffer ""))
       (when (string-match-p (rx ".el" (optional ".gz") line-end)
-                                 filename)
+                            filename)
         (condition-case err
             (let* ((symlink-target (file-symlink-p filename))
                    (source-filename
@@ -25,17 +30,38 @@
                         (file-name-concat (getenv "RPM_BUILD_ROOT")
                                           symlink-target)
                       filename)))
+
               (with-temp-buffer
                 (insert-file-contents source-filename)
                 (setq parsers ())
+
                 (while
                     (search-forward-regexp
-                     (rx "(" (or "treesit-ensure-installed"
-                                 "treesit-parser-create"
-                                 "treesit-ready-p")
-                         " '")
+                     (rx "(" (zero-or-more space)
+                         (or "treesit-ensure-installed"
+                             "treesit-parser-create"
+                             "treesit-ready-p")
+                         (one-or-more space) "'")
                      nil t)
-                  (add-to-list 'parsers (thing-at-point 'symbol t)))
+                  (add-parser-at-point))
+
+                (goto-char (point-min))
+                (while
+                    (search-forward-regexp
+                     (rx "(" (zero-or-more space)
+                         "define-treesit-generic-mode"
+                         (one-or-more space))
+                     nil t)
+                  (backward-char)
+                  (when
+                      (search-forward-regexp
+                       (rx space ":lang" (one-or-more space) "'")
+                       (save-excursion
+                         (end-of-defun)
+                         (point))
+                       t)
+                    (add-parser-at-point)))
+
                 (when parsers
                   (princ (concat ";" filename "\n"))
                   (dolist (parser parsers)

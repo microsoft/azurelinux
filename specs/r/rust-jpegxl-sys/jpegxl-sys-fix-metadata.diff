@@ -1,20 +1,21 @@
---- jpegxl-sys-0.11.2+libjxl-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ jpegxl-sys-0.11.2+libjxl-0.11.1/Cargo.toml	2025-01-11T19:44:18.955274+00:00
-@@ -50,17 +50,12 @@
- [dev-dependencies.pretty_assertions]
- version = "1.4.1"
- 
--[build-dependencies.jpegxl-src]
--version = "0.11.2"
--optional = true
--
- [build-dependencies.pkg-config]
- version = "0.3.31"
- 
+--- jpegxl-sys-0.12.0+libjxl-0.11.1/Cargo.toml	1970-01-01T00:00:01+00:00
++++ jpegxl-sys-0.12.0+libjxl-0.11.1/Cargo.toml	2026-03-13T16:45:52.130652+00:00
+@@ -41,7 +41,6 @@
  [features]
  default = []
  docs = []
--vendored = ["jpegxl-src"]
+-vendored = ["dep:jpegxl-src"]
  
- [lints.clippy]
- module_name_repetitions = "allow"
+ [lib]
+ name = "jpegxl_sys"
+@@ -54,10 +53,6 @@
+ 
+ [dev-dependencies.pretty_assertions]
+ version = "1.4.1"
+-
+-[build-dependencies.jpegxl-src]
+-version = "0.11.3"
+-optional = true
+ 
+ [build-dependencies.pkg-config]
+ version = "0.3.32"

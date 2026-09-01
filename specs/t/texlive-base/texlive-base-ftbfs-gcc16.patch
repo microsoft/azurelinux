@@ -1,0 +1,85 @@
+diff -up texlive-base-20230311-build/texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/libs/clipper/clipper.cpp.me texlive-base-20230311-build/texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/libs/clipper/clipper.cpp
+--- texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/libs/clipper/clipper.cpp.me	2026-01-22 16:05:28.236115941 +0100
++++ texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/libs/clipper/clipper.cpp	2026-01-22 16:10:11.204612649 +0100
+@@ -1970,7 +1970,7 @@ void Clipper::DeleteFromSEL(TEdge *e)
+ #ifdef use_xyz
+ void Clipper::SetZ(IntPoint& pt, TEdge& e1, TEdge& e2)
+ {
+-  if (pt.Z != 0 || !m_ZFill) return;
++  if (pt.Z != ClipperLib::ZType(0) || !m_ZFill) return;
+   else if (pt == e1.Bot) pt.Z = e1.Bot.Z;
+   else if (pt == e1.Top) pt.Z = e1.Top.Z;
+   else if (pt == e2.Bot) pt.Z = e2.Bot.Z;
+diff -up texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/fonts/Base14Fonts.hpp.me texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/fonts/Base14Fonts.hpp
+--- texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/fonts/Base14Fonts.hpp.me	2026-01-22 19:44:39.628015473 +0100
++++ texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/fonts/Base14Fonts.hpp	2026-01-22 19:45:03.071537295 +0100
+@@ -24,7 +24,8 @@
+ #include <string>
+ 
+ struct MemoryFontData {
+-	MemoryFontData () =delete;
++   constexpr MemoryFontData(const char *d, size_t s) noexcept
++      : data(d), size(s) {}
+ 	const char *data;
+ 	size_t size;
+ };
+diff -up texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/Unicode.cpp.me texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/Unicode.cpp
+--- texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/Unicode.cpp.me	2026-01-22 20:01:03.302973419 +0100
++++ texlive-base-20230311/source/texk/dvisvgm/dvisvgm-src/src/Unicode.cpp	2026-01-22 20:02:21.564551895 +0100
+@@ -185,31 +185,31 @@ uint32_t Unicode::toLigature (const stri
+ 		const char *nonlig;
+ 		uint32_t lig;
+ 	} ligatures[39] = {
+-		{u8"AA",  0xA732}, {u8"aa", 0xA733},
+-		{u8"AE",  0x00C6}, {u8"ae", 0x00E6},
+-		{u8"AO",  0xA734}, {u8"ao", 0xA735},
+-		{u8"AU",  0xA736}, {u8"au", 0xA737},
+-		{u8"AV",  0xA738}, {u8"av", 0xA739},
+-		{u8"AY",  0xA73C}, {u8"ay", 0xA73D},
+-		{u8"et", 0x1F670},
+-		{u8"ff",  0xFB00},
+-		{u8"ffi", 0xFB03},
+-		{u8"ffl", 0xFB04},
+-		{u8"fi",  0xFB01},
+-		{u8"fl",  0xFB02},
+-		{u8"Hv",  0x01F6}, {u8"hv", 0x0195},
+-		{u8"lb",  0x2114},
+-		{u8"lL",  0x1EFA}, {u8"ll", 0x1EFB},
+-		{u8"OE",  0x0152}, {u8"oe", 0x0153},
+-		{u8"OO",  0xA74E}, {u8"oo", 0xA74F},
+-		{u8"OO",  0xA74E},
+-		{u8"\u0254e", 0xAB62},
+-		{u8"\u017Fs", 0x1E9E}, {u8"\u017Az", 0x00DF},
+-		{u8"Tz",  0xA728}, {u8"tz",  0xA729},
+-		{u8"ue",  0x1D6B},
+-		{u8"uo",  0xAB63},
+-		{u8"VV",  0x0057}, {u8"tz",  0x0077},
+-		{u8"VY",  0xA760}, {u8"tz",  0xA761},
++		{"AA",  0xA732}, {"aa", 0xA733},
++		{"AE",  0x00C6}, {"ae", 0x00E6},
++		{"AO",  0xA734}, {"ao", 0xA735},
++		{"AU",  0xA736}, {"au", 0xA737},
++		{"AV",  0xA738}, {"av", 0xA739},
++		{"AY",  0xA73C}, {"ay", 0xA73D},
++		{"et", 0x1F670},
++		{"ff",  0xFB00},
++		{"ffi", 0xFB03},
++		{"ffl", 0xFB04},
++		{"fi",  0xFB01},
++		{"fl",  0xFB02},
++		{"Hv",  0x01F6}, {"hv", 0x0195},
++		{"lb",  0x2114},
++		{"lL",  0x1EFA}, {"ll", 0x1EFB},
++		{"OE",  0x0152}, {"oe", 0x0153},
++		{"OO",  0xA74E}, {"oo", 0xA74F},
++		{"OO",  0xA74E},
++		{"\u0254e", 0xAB62},
++		{"\u017Fs", 0x1E9E}, {"\u017Az", 0x00DF},
++		{"Tz",  0xA728}, {"tz",  0xA729},
++		{"ue",  0x1D6B},
++		{"uo",  0xAB63},
++		{"VV",  0x0057}, {"tz",  0x0077},
++		{"VY",  0xA760}, {"tz",  0xA761},
+ 	};
+ 	auto it = find_if(begin(ligatures), end(ligatures), [&nonlig](const Ligature &l) {
+ 		return l.nonlig == nonlig;

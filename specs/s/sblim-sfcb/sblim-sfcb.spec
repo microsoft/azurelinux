@@ -11,7 +11,7 @@ Name: sblim-sfcb
 Summary: Small Footprint CIM Broker
 URL: http://sblim.wiki.sourceforge.net/
 Version: 1.4.9
-Release: 40%{?dist}
+Release: 39%{?dist}
 License: EPL-1.0
 Source0: http://downloads.sourceforge.net/sblim/%{name}-%{version}.tar.bz2
 Source1: sfcb.service
@@ -19,6 +19,8 @@ Source1: sfcb.service
 Source2: sfcbdump.1.gz
 Source3: sfcbinst2mof.1.gz
 Source4: sfcbtrace.1.gz
+# /etc/tmpfiles.d configuration file
+Source5: sblim-sfcb.tmpfiles
 # Patch0: changes schema location to the path we use
 Patch0: sblim-sfcb-1.3.9-sfcbrepos-schema-location.patch
 # Patch1: Fix provider debugging - variable for stopping wait-for-debugger
@@ -130,15 +132,23 @@ echo "%{_libdir}/sfcb/*.so" >> _pkg_list
 cat _pkg_list
 
 install -m0644 -D sblim-sfcb.sysusers.conf %{buildroot}%{_sysusersdir}/sblim-sfcb.conf
+mkdir -p %{buildroot}/%{_tmpfilesdir}
+install -p -D -m 644 %{SOURCE5} %{buildroot}/%{_tmpfilesdir}/sblim-sfcb.conf
 
 %post 
 %{_datadir}/sfcb/genSslCert.sh %{_sysconfdir}/sfcb &>/dev/null || :
 /sbin/ldconfig
 %{_bindir}/sfcbrepos -f > /dev/null 2>&1
 %systemd_post sblim-sfcb.service
+# copy content of /var/lib/sfcb to temporary place for Image Mode
+(mkdir -p /usr/share/factory/var/lib && cp -a /var/lib/sfcb /usr/share/factory/var/lib/sfcb) >/dev/null 2>&1 || :
 
 %preun
 %systemd_preun sblim-sfcb.service
+if [ $1 -eq 0 ]; then
+   # Package removal, not upgrade
+   rm -rf /usr/share/factory/var/lib/sfcb
+fi
 
 %postun
 /sbin/ldconfig
@@ -146,8 +156,15 @@ install -m0644 -D sblim-sfcb.sysusers.conf %{buildroot}%{_sysusersdir}/sblim-sfc
 
 %files -f _pkg_list
 %{_sysusersdir}/sblim-sfcb.conf
+%{_tmpfilesdir}/sblim-sfcb.conf
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.9-39
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Sep 12 2025 Vitezslav Crhonek <vcrhonek@redhat.com> - 1.4.9-38
+- Add support for Image Mode
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.9-37
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

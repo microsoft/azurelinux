@@ -1,0 +1,31 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 2abc580..74f8510 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -5,7 +5,7 @@ requires = [
+     "Cython >=3.0.0, <4",
+     "numpy >=1.25.0, <3",
+     "pkgconfig >=1.5.5",
+-    "setuptools >=77.0.1",
++    "setuptools",
+ ]
+ # use an in-tree build backend, extending setuptools.build_meta
+ build-backend = "backend"
+@@ -22,8 +22,7 @@ maintainers = [
+     {name = "Thomas Kluyver", email = "thomas@kluyver.me.uk"},
+     {name = "Thomas A Caswell", email = "tcaswell@bnl.gov"},
+ ]
+-license = "BSD-3-Clause"
+-license-files = ["LICENSE", "lzf/LICENSE.txt", "licenses/*"]
++license = { text = "BSD-3-Clause" }
+ classifiers = [
+     "Development Status :: 5 - Production/Stable",
+     "Intended Audience :: Developers",
+@@ -41,7 +40,6 @@ classifiers = [
+     "Programming Language :: Python :: 3.12",
+     "Programming Language :: Python :: 3.13",
+     "Programming Language :: Python :: 3.14",
+-    "Programming Language :: Python :: Free Threading :: 1 - Unstable",
+     "Programming Language :: Python :: Implementation :: CPython",
+     "Topic :: Scientific/Engineering",
+     "Topic :: Database",

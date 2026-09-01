@@ -7,8 +7,8 @@
 Summary:	LZMA compression utilities
 Name:		xz
 Epoch:		1
-Version:	5.8.1
-Release: 7%{?dist}
+Version:	5.8.2
+Release:	2%{?dist}
 
 # liblzma - 0BSD
 # xz{,dec}, lzma{dec,info} - 0BSD
@@ -26,14 +26,6 @@ Source2:	https://tukaani.org/misc/lasse_collin_pubkey.txt
 
 Source100:	colorxzgrep.sh
 Source101:	colorxzgrep.csh
-
-# https://github.com/tukaani-project/xz/issues/199
-# https://issues.redhat.com/browse/RHEL-125143
-# Upstream in > 5.8.1
-Patch:          0001-Landlock-Cache-the-ABI-version.patch
-Patch:          0002-Landlock-Workaround-a-bug-in-RHEL-9-kernel.patch
-#Patch:          0003-Update-THANKS.patch
-Patch:          0004-Landlock-Add-missing-ifdefs.patch
 
 URL:		https://tukaani.org/%{name}/
 Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
@@ -149,12 +141,13 @@ LD_LIBRARY_PATH=$PWD/src/liblzma/.libs make check
 %{_mandir}/man1/*xz*
 %lang(de) %{_mandir}/de/man1/*xz*
 %lang(fr) %{_mandir}/fr/man1/*xz*
-%lang(ko) %{_mandir}/ko/man1/*xz*
-%lang(ro) %{_mandir}/ro/man1/*xz*
-%lang(uk) %{_mandir}/uk/man1/*xz*
 %lang(it) %{_mandir}/it/man1/*xz*
-%lang(sr) %{_mandir}/sr/man1/*xz*
+%lang(ko) %{_mandir}/ko/man1/*xz*
 %lang(pt_BR) %{_mandir}/pt_BR/man1/*xz*
+%lang(ro) %{_mandir}/ro/man1/*xz*
+%lang(sr) %{_mandir}/sr/man1/*xz*
+%lang(sv) %{_mandir}/sv/man1/*xz*
+%lang(uk) %{_mandir}/uk/man1/*xz*
 %{profiledir}/*
 
 
@@ -182,15 +175,23 @@ LD_LIBRARY_PATH=$PWD/src/liblzma/.libs make check
 %{_mandir}/man1/*lz*
 %lang(de) %{_mandir}/de/man1/*lz*
 %lang(fr) %{_mandir}/fr/man1/*lz*
-%lang(ko) %{_mandir}/ko/man1/*lz*
-%lang(ro) %{_mandir}/ro/man1/*lz*
-%lang(uk) %{_mandir}/uk/man1/*lz*
 %lang(it) %{_mandir}/it/man1/*lz*
-%lang(sr) %{_mandir}/sr/man1/*lz*
+%lang(ko) %{_mandir}/ko/man1/*lz*
 %lang(pt_BR) %{_mandir}/pt_BR/man1/*lz*
+%lang(ro) %{_mandir}/ro/man1/*lz*
+%lang(sr) %{_mandir}/sr/man1/*lz*
+%lang(sv) %{_mandir}/sv/man1/*lz*
+%lang(uk) %{_mandir}/uk/man1/*lz*
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:5.8.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 05 2026 Richard W.M. Jones <rjones@redhat.com> - 1:5.8.2-1
+- New upstream version 5.8.2 (RHBZ#2423317)
+- Remove patches which are included in this release.
+
 * Sun Nov 23 2025 Richard W.M. Jones <rjones@redhat.com> - 1:5.8.1-4
 - Add final workaround for "Failed to enable the sandbox" (RHEL-125143)
 

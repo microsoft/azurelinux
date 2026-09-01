@@ -1,4 +1,4 @@
-From 06a246f1fbd79d70951488d65d5fe6bfa4afd4ef Mon Sep 17 00:00:00 2001
+From 45ddea6631f696b67095c8387e71a7a8b2f758d6 Mon Sep 17 00:00:00 2001
 From: Lumir Balhar <lbalhar@redhat.com>
 Date: Thu, 13 Mar 2025 11:52:42 +0100
 Subject: [PATCH] Revert "Always rewrite a Python shebang to #!python."
@@ -9,7 +9,7 @@ This reverts commit c71266345c64fd662b5f95bbbc6e4536172f496d.
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/setuptools/_distutils/command/build_scripts.py b/setuptools/_distutils/command/build_scripts.py
-index 127c51d8d..05ba2c93c 100644
+index b86ee6e..05ba2c9 100644
 --- a/setuptools/_distutils/command/build_scripts.py
 +++ b/setuptools/_distutils/command/build_scripts.py
 @@ -5,6 +5,7 @@ Implements the Distutils 'build_scripts' command."""
@@ -35,11 +35,11 @@ index 127c51d8d..05ba2c93c 100644
 +                        ),
 +                    )
                  post_interp = shebang_match.group(1) or ''
--                shebang = f"#!python{post_interp}\n"
+-                shebang = "#!" + self.executable + post_interp + "\n"
 +                shebang = "#!" + executable + post_interp + "\n"
                  self._validate_shebang(shebang, f.encoding)
                  with open(outfile, "w", encoding=f.encoding) as outf:
                      outf.write(shebang)
 -- 
-2.48.1
+2.51.0
 

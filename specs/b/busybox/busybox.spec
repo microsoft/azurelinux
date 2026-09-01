@@ -57,7 +57,7 @@
 
 Name:		busybox
 Version:	1.37.0
-Release: 6%{?dist}
+Release:	7%{?dist}
 Epoch:		1
 Summary:	Statically linked binary providing simplified versions of system commands
 License:	GPL-2.0-only
@@ -96,11 +96,10 @@ BuildRequires:	uClibc-static
 %endif
 BuildRequires:	make
 # $DEITY help you if you need busybox for ia32 in 2022.
-# This also seems of limited use on s390x, since it is missing the necessary kernel headers to support init
-ExcludeArch:    i686 s390x
+ExcludeArch:    i686
 
 # Using header from Fedora, beacuse sabotage-linux/kernel-headers is not available for riscv64
-%ifarch riscv64
+%ifarch riscv64 s390x
 BuildRequires:	kernel-headers
 %endif
 
@@ -148,7 +147,7 @@ arch=`uname -m | sed -e 's/i.86/i386/' -e 's/armv7l/arm/' -e 's/armv5tel/arm/'`
 
 ## STATIC BUILDS
 
-%ifarch riscv64
+%ifarch riscv64 s390x
 mkdir linux-header-stock
 rpm -ql kernel-headers | xargs -i cp -v --parents {} ./linux-header-stock || :
 %endif
@@ -165,7 +164,7 @@ yes "" | make oldconfig && \
 %if 0%{?print_configs}
 cat .config && \
 %endif
-%ifarch riscv64
+%ifarch riscv64 s390x
 make V=1 \
 CC="musl-gcc -static" \
 EXTRA_CFLAGS="-g -Ilinux-header-stock/usr/include %{?hcflags}" \
@@ -212,7 +211,7 @@ cat .config && \
 %endif
 make V=1 \
 EXTRA_CFLAGS="%{?hcflags} -g" \
-CFLAGS_busybox="%{?hldflags}"
+CFLAGS_busybox="-static %{?hldflags}"
 
 cp busybox_unstripped busybox.glibc.static
 cp docs/busybox.1 docs/busybox.glibc.static.1
@@ -245,7 +244,7 @@ yes "" | make oldconfig
 cat .config && \
 %endif
 sed -i -e "s/CONFIG_FEATURE_VI_REGEX_SEARCH=y/CONFIG_FEATURE_VI_REGEX_SEARCH=n/" -e "s/CONFIG_EXTRA_COMPAT=y/CONFIG_EXTRA_COMPAT=n/" -e "s/CONFIG_FEATURE_INETD_RPC=y/CONFIG_FEATURE_INETD_RPC=n/" -e "s/CONFIG_FEATURE_UTMP=y/CONFIG_FEATURE_UTMP=n/" .config && \
-%ifarch riscv64
+%ifarch riscv64 s390x
 make V=1 \
 CC="musl-gcc -static" \
 EXTRA_CFLAGS="-g -Ilinux-header-stock/usr/include %{?hcflags}" \
@@ -363,6 +362,18 @@ ln -s ./busybox %{buildroot}%{_sbindir}/udhcpc
 %{_mandir}/man1/busybox.shared.1.gz
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.37.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.37.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Nov 24 2025 Tom Callaway <spot@fedoraproject.org> - 1:1.37.0-5
+- re-enable s390x, thanks to Ilya Leoshkevich
+
+* Wed Sep 03 2025 Stephen Brennan <stephen.s.brennan@oracle.com> - 1:1.37.0-4
+- Fix static linking when using glibc-static
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.37.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

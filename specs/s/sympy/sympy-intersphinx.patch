@@ -19,7 +19,7 @@
 -)
 +intersphinx_mapping = {
 +    'matplotlib': ('https://matplotlib.org/stable/', None),
-+    'mpmath': ('https://mpmath.org/doc/current/', '/usr/share/doc/python-mpmath-doc/html/objects.inv'),
++    'mpmath': ('https://mpmath.org/doc/current/', None),
 +    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
 +    "numpy": ("https://numpy.org/doc/stable/", None),
 +}

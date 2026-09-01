@@ -1,4 +1,4 @@
-From 952cdd05d6399872258df621e053f8a351fdb9c2 Mon Sep 17 00:00:00 2001
+From d539741a19e2eb3b3e9a7791d49286337a038a65 Mon Sep 17 00:00:00 2001
 From: Adam Williamson <awilliam@redhat.com>
 Date: Wed, 19 Jun 2024 14:20:31 -0700
 Subject: [PATCH 6/7] Update make_tls_certs.py, work with openssl 3 (#8701)
@@ -33,10 +33,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  10 files changed, 808 insertions(+), 514 deletions(-)
 
 diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
-index dcc5c01a..2f246dad 100644
+index 715d80cd..74b2b098 100644
 --- a/.pre-commit-config.yaml
 +++ b/.pre-commit-config.yaml
-@@ -66,6 +66,10 @@ repos:
+@@ -40,6 +40,10 @@ repos:
            - urllib3
            - git+https://github.com/dask/dask
            - git+https://github.com/dask/zict
@@ -1612,5 +1612,5 @@ index 8c322e6a..83585d45 100644
 +w/xKvTtEsx2QRV0rzeWqebU=
  -----END PRIVATE KEY-----
 -- 
-2.50.0
+2.52.0
 

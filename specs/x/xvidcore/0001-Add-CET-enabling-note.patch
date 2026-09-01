@@ -1,0 +1,66 @@
+From 6c324911dbea8edc675a2d47124941f3267a6022 Mon Sep 17 00:00:00 2001
+From: Nicolas Chauvet <kwizart@gmail.com>
+Date: Tue, 3 Feb 2026 17:18:08 +0100
+Subject: [PATCH] Add CET enabling note
+
+The assembly code compiled by nasm is missing a .note.gnu.property
+section to indicate CET support.
+
+This is documented at https://sourceware.org/annobin/annobin.html/Test-cf-protection.html
+
+Signed-off-by: Nicolas Chauvet <kwizart@gmail.com>
+---
+ src/nasm.inc | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/src/nasm.inc b/src/nasm.inc
+index 31b18090ada8..a24ecbe51aa6 100644
+--- a/src/nasm.inc
++++ b/src/nasm.inc
+@@ -23,6 +23,25 @@
+ ; *
+ ; ***************************************************************************/
+ 
++%macro GNUHEADER 0
++	.section	.note.gnu.property,"a"
++	.align 8
++	.long	 1f - 0f
++	.long	 4f - 1f
++	.long	 5
++0:
++	.string	 "GNU"
++1:
++	.align 8
++	.long	 0xc0000002
++	.long	 3f - 2f
++2:
++	.long	 0x3
++3:
++	.align 8
++4:
++%endmacro
++
+ %ifdef ARCH_IS_X86_64
+ 
+ BITS 64
+@@ -62,6 +81,8 @@ DEFAULT REL
+ 
+ %else ; Linux
+ 
++%define GNUHEADER
++
+ %define prm1 rdi
+ %define prm2 rsi
+ %define prm3 rdx
+@@ -111,6 +132,8 @@ DEFAULT REL
+ 
+ %else
+ 
++%define GNUHEADER
++
+ %define SECTION_ALIGN 16
+ 
+ BITS 32
+-- 
+2.52.0
+

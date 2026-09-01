@@ -1,0 +1,57 @@
+From 2664bfa384a416e5f5da18e21244c1fb3c7ed0e3 Mon Sep 17 00:00:00 2001
+From: "Jason K. Moore" <moorepants@gmail.com>
+Date: Thu, 16 Oct 2025 06:28:02 +0200
+Subject: [PATCH] Support llvmlite > 0.45.
+
+---
+ sympy/printing/llvmjitcode.py | 26 ++++++++++++++++++--------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
+
+diff --git a/sympy/printing/llvmjitcode.py b/sympy/printing/llvmjitcode.py
+index 0e657f3b854b..9b4063ba852a 100644
+--- a/sympy/printing/llvmjitcode.py
++++ b/sympy/printing/llvmjitcode.py
+@@ -14,9 +14,11 @@
+ 
+ llvmlite = import_module('llvmlite')
+ if llvmlite:
++    LLVMLITE_VERSION = [int(p) for p in llvmlite.__version__.split('.')[:2]]
+     ll = import_module('llvmlite.ir').ir
+     llvm = import_module('llvmlite.binding').binding
+-    llvm.initialize()
++    if LLVMLITE_VERSION < [0, 45]:
++        llvm.initialize()
+     llvm.initialize_native_target()
+     llvm.initialize_native_asmprinter()
+ 
+@@ -265,15 +267,23 @@ def _convert_expr(self, lj, expr):
+     def _compile_function(self, strmod):
+         llmod = llvm.parse_assembly(strmod)
+ 
+-        pmb = llvm.create_pass_manager_builder()
+-        pmb.opt_level = 2
+-        pass_manager = llvm.create_module_pass_manager()
+-        pmb.populate(pass_manager)
++        target_machine = (llvm.Target.from_default_triple().
++                          create_target_machine())
+ 
+-        pass_manager.run(llmod)
++        if LLVMLITE_VERSION < [0, 45]:
++            pmb = llvm.create_pass_manager_builder()
++            pmb.opt_level = 2
++            pass_manager = llvm.create_module_pass_manager()
++            pmb.populate(pass_manager)
++            pass_manager.run(llmod)
++        else:
++            pto = llvm.create_pipeline_tuning_options(speed_level=2,
++                                                      size_level=0)
++            pto.loop_vectorization = True
++            pass_builder = llvm.create_pass_builder(target_machine, pto)
++            pass_manager = pass_builder.getModulePassManager()
++            pass_manager.run(llmod, pass_builder)
+ 
+-        target_machine = \
+-            llvm.Target.from_default_triple().create_target_machine()
+         exe_eng = llvm.create_mcjit_compiler(llmod, target_machine)
+         exe_eng.finalize_object()
+         exe_engines.append(exe_eng)

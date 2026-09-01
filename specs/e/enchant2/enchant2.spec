@@ -7,8 +7,8 @@
 %bcond mingw %[%{undefined rhel} && %{undefined flatpak}]
 
 Name:          enchant2
-Version:       2.8.15
-Release: 5%{?dist}
+Version:       2.8.19
+Release:       2%{?dist}
 Summary:       An Enchanting Spell Checking Library
 
 License:       LGPL-2.0-or-later
@@ -154,7 +154,7 @@ popd
 # MinGW build
 MINGW32_CONFIGURE_ARGS="--with-hunspell-dir=%{mingw32_datadir}/hunspell" \
 MINGW64_CONFIGURE_ARGS="--with-hunspell-dir=%{mingw64_datadir}/hunspell" \
-%mingw_configure --disable-static --without-hspell --enable-relocatable
+%mingw_configure --disable-static --without-hspell --without-winspell --enable-relocatable
 
 MINGW32_MAKE_ARGS="pkgdatadir=%{mingw32_datadir}/enchant-2" \
 MINGW64_MAKE_ARGS="pkgdatadir=%{mingw64_datadir}/enchant-2" \
@@ -247,6 +247,27 @@ find %{buildroot} -name '*.la' -delete
 
 
 %changelog
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Wed Jul 08 2026 Sandro Mani <manisandro@gmail.com> - 2.8.19-1
+- Update to 2.8.19
+
+* Sat Jul 04 2026 Sandro Mani <manisandro@gmail.com> - 2.8.18-1
+- Update to 2.8.18
+
+* Thu Jul 02 2026 Sandro Mani <manisandro@gmail.com> - 2.8.17-1
+- Update to 2.8.17
+
+* Sat Jun 20 2026 Sandro Mani <manisandro@gmail.com> - 2.8.16-3
+- Rebuild (icu)
+
+* Mon Jun 08 2026 František Zatloukal <fzatlouk@redhat.com> - 2.8.16-2
+- Rebuilt for icu 78.3
+
+* Sun May 03 2026 Sandro Mani <manisandro@gmail.com> - 2.8.16-1
+- Update to 2.8.16
+
 * Tue Feb 17 2026 Sandro Mani <manisandro@gmail.com> - 2.8.15-1
 - Update to 2.8.15
 

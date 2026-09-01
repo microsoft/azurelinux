@@ -11,8 +11,8 @@
 
 Summary:    Xorg X11 wacom input driver
 Name:       xorg-x11-drv-wacom
-Version:    1.2.3
-Release:    3%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
+Version:    1.2.4
+Release:    2%{?gitdate:.%{gitdate}git%{gitversion}}%{?dist}
 URL:        http://www.x.org
 License:    GPL-2.0-or-later
 
@@ -105,6 +105,12 @@ will be available as normal evdev node.
 %{_unitdir}/wacom-inputattach@.service
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Nov 19 2025 Peter Hutterer <peter.hutterer@redhat.com> - 1.2.4-1
+- xf86-input-wacom-1.2.4
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

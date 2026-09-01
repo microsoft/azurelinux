@@ -5,7 +5,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 3.2.0
-Release: 14%{?dist}
+Release: 11%{?dist}
 Summary: Generate XPath expressions from Ruby
 License: MIT
 URL: https://github.com/teamcapybara/xpath

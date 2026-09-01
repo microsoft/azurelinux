@@ -1,0 +1,48 @@
+From 773a08ce76cd62099faf4246a4690887b940acdc Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Sun, 11 Jan 2026 23:50:37 +0000
+Subject: [PATCH 1/2] tests: remove pytest-runner / setup.py test support
+
+---
+ setup.py | 2 --
+ tox.ini  | 3 ++-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index eeb100e..de821b8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -54,7 +54,6 @@ for key, reqs in extras_require.items():
+     extras_require['all'].extend(reqs)
+ 
+ setup_requires = [
+-    'pytest-runner>=2.7',
+     'setuptools_scm>=3.1.0',
+ ]
+ 
+@@ -92,7 +91,6 @@ setup(
+     zip_safe=False,
+     extras_require=extras_require,
+     setup_requires=setup_requires,
+-    tests_require=tests_require,
+     classifiers=[
+         'Programming Language :: Python :: 3',
+         'Programming Language :: Python :: 3.5',
+diff --git a/tox.ini b/tox.ini
+index f185675..a95022f 100644
+--- a/tox.ini
++++ b/tox.ini
+@@ -12,8 +12,9 @@ envlist = py35, py36, py37, py38, py39
+ 
+ [testenv]
+ extras = numpy, tests
++deps = pytest
+ commands =
+     {envpython} -m check_manifest --ignore ".*-requirements.txt"
+     {envpython} -m sphinx.cmd.build -qnNW docs docs/_build/html
+-    {envpython} setup.py test
++    {envpython} -m pytest {posargs}
+     {envpython} -m sphinx.cmd.build -qnNW -b doctest docs docs/_build/doctest
+-- 
+2.52.0
+

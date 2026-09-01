@@ -1,0 +1,43 @@
+From 5d15cad4bde28902a4becb8e2a8e915aba8abbd0 Mon Sep 17 00:00:00 2001
+From: Erik Larsson <who+github@cnackers.org>
+Date: Sun, 26 Apr 2026 11:50:55 +0200
+Subject: [PATCH] cryptography: fix support for cryptography 47.
+
+The abstract classes now require deepcopy support, so add that.
+
+Signed-off-by: Erik Larsson <who+github@cnackers.org>
+---
+ src/tpm2_pytss/cryptography.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/tpm2_pytss/cryptography.py b/src/tpm2_pytss/cryptography.py
+index 5b8432cc..20dc34b2 100644
+--- a/src/tpm2_pytss/cryptography.py
++++ b/src/tpm2_pytss/cryptography.py
+@@ -263,6 +263,14 @@ def __copy__(self) -> "tpm_rsa_private_key":
+             ectx=self._ectx, handle=self._handle, session=self._session
+         )
+ 
++    def __deepcopy__(self, memo: dict) -> "tpm_rsa_private_key":
++        """Retuns a copy of the private key.
++
++        Notes:
++            This behaves as a shallow copy as we don't copy the ESAPI context.
++        """
++        return self.__copy__()
++
+ 
+ class tpm_ecc_private_key(ec.EllipticCurvePrivateKey):
+     """Interface to a TPM ECC key for use with the cryptography module.
+@@ -440,3 +448,11 @@ def __copy__(self) -> "tpm_ecc_private_key":
+         return tpm_ecc_private_key(
+             ectx=self._ectx, handle=self._handle, session=self._session
+         )
++
++    def __deepcopy__(self, memo: dict) -> "tpm_ecc_private_key":
++        """Retuns a copy of the private key.
++
++        Notes:
++            This behaves as a shallow copy as we don't copy the ESAPI context.
++        """
++        return self.__copy__()

@@ -27,8 +27,8 @@
 
 Name:    udisks2
 Summary: Disk Manager
-Version: 2.11.0
-Release: 4%{?dist}
+Version: 2.11.2
+Release: 1%{?dist}
 License: GPL-2.0-or-later
 URL:     https://github.com/storaged-project/udisks
 Source0: https://github.com/storaged-project/udisks/releases/download/udisks-%{version}/udisks-%{version}.tar.bz2
@@ -200,6 +200,7 @@ rm -f src/tests/dbus-tests/config_h.py
 rm -f src/udisks-daemon-resources.{c,h}
 # default to ntfs-3g (#2182206)
 sed -i data/builtin_mount_options.conf -e 's/ntfs_drivers=ntfs3,ntfs/ntfs_drivers=ntfs,ntfs3/'
+sed -i data/builtin_mount_options.conf -e 's/exfat_defaults=uid=\$UID,gid=\$GID,iocharset=utf8,errors=remount-ro/exfat_defaults=uid=\$UID,gid=\$GID,iocharset=utf8,errors=remount-ro,sys_tz/'
 
 %build
 # autoreconf -ivf
@@ -343,6 +344,21 @@ fi
 %endif
 
 %changelog
+* Thu Aug 06 2026 Tomas Bzatek <tbzatek@redhat.com> - 2.11.2-1
+- Version 2.11.2
+
+* Wed Apr 01 2026 Tomas Bzatek <tbzatek@redhat.com> - 2.11.1-2
+- Use 'sys_tz' exfat mount option by default (#2403452)
+
+* Wed Feb 25 2026 Tomas Bzatek <tbzatek@redhat.com> - 2.11.1-1
+- Version 2.11.1 (#2442584,#2442588)
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.11.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 17 2025 Tom Callaway <spot@fedoraproject.org> - 2.11.0-2
+- rebuild for new libconfig
+
 * Thu Nov 06 2025 Tomas Bzatek <tbzatek@redhat.com> - 2.11.0-1
 - Version 2.11.0
 

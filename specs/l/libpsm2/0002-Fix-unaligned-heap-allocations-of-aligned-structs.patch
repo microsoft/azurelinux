@@ -1,0 +1,153 @@
+From f6e0969a100e1cf815214e490190be92b11e2bb8 Mon Sep 17 00:00:00 2001
+From: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+Date: Thu, 9 May 2024 20:11:51 -0400
+Subject: [PATCH 2/2] Fix unaligned heap allocations of aligned structs
+
+gcc can generate instructions that require source or destination
+pointers operands are aligned on boundaries larger than the platform
+(8-byte on x86-64) alignment.
+
+If those pointer operands are not correctly aligned for those
+instructions, they produce misaligned address accesses. Misaligned
+address access can produce general protection faults like so:
+
+    [hds2fnce201:119469] *** Process received signal ***
+    [hds2fnce201:119469] Signal: Segmentation fault (11)
+    [hds2fnce201:119469] Signal code:  (128)
+    [hds2fnce201:119469] Failing at address: (nil)
+    [hds2fnce201:119469] [ 0] /lib64/libpthread.so.0(+0x12cf0)[0x7f45a04b5cf0]
+    [hds2fnce201:119469] [ 1] /home/bcunningham/projects/opa-psm2-internal/build_release/libpsm2.so.2(psm2_mq_irecv2+0x3a5)[0x7f458fc6801a]
+    [hds2fnce201:119469] [ 2] /usr/mpi/gcc/openmpi-4.1.4-hfi/lib64/openmpi/mca_mtl_psm2.so(ompi_mtl_psm2_irecv+0xf6)[0x7f4594146ac6]
+    [hds2fnce201:119469] [ 3] /usr/mpi/gcc/openmpi-4.1.4-hfi/lib64/openmpi/mca_pml_cm.so(+0x21b1)[0x7f459434c1b1]
+    [hds2fnce201:119469] [ 4] /usr/mpi/gcc/openmpi-4.1.4-hfi/lib64/libmpi.so.40(MPI_Irecv+0x145)[0x7f45a1075665]
+    [hds2fnce201:119469] [ 5] ./c/mpi/pt2pt/standard/osu_bibw[0x40254d]
+    [hds2fnce201:119469] [ 6] /lib64/libc.so.6(__libc_start_main+0xe5)[0x7f45a0117d85]
+    [hds2fnce201:119469] [ 7] ./c/mpi/pt2pt/standard/osu_bibw[0x40320e]
+    [hds2fnce201:119469] *** End of error message ***
+
+This fault was on a 'movaps' move-aligned packed single-precision
+floating point instruction. movaps copies 16 bytes of data at a time and
+requires that the destination address is aligned on a 16-byte boundary.
+In this case, the destination address was not a 16-byte multiple.
+
+For these issues to occur, the following conditions must be true:
+- struct involved must have__attribute__(__aligned__(NNN)) where
+  NNN is an alignment greater than the platform alginment, e.g. 8 bytes
+  on x86-64.
+- struct memory must be heap-allocated.
+- libpsm2 must be built with vectorization such as
+  `-ftree-loop-vectorize`. Vectorization is often performed by default
+  at -O2 and -O3.
+
+These issues were found by building libpsm2 with
+"make CFLAGS='-fsanitize=alignment' LDFLAGS='-lubsan'" and then running
+a job that hit the potentially-troubled instructions.
+
+Some of these issues depend on other conditions to occur. E.g. one issue
+occurred with 8-way context sharing but not 4-way context sharing.
+
+Fix these issues by replacing unaligned heap allocations with aligned
+heap allocations with alignment=NNN.
+
+Signed-off-by: Brendan Cunningham <bcunningham@cornelisnetworks.com>
+---
+ psm_hal_gen1/psm_hal_gen1_spio.c | 4 ++--
+ psm_hal_gen1/psm_hal_inline_i.h  | 6 ++++--
+ psm_mq_utils.c                   | 4 ++--
+ ptl_ips/ips_tid.c                | 6 +++---
+ ptl_ips/ips_tidflow.c            | 6 +++---
+ 5 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/psm_hal_gen1/psm_hal_gen1_spio.c b/psm_hal_gen1/psm_hal_gen1_spio.c
+index 5444897a3e44..9c63e29e0394 100644
+--- a/psm_hal_gen1/psm_hal_gen1_spio.c
++++ b/psm_hal_gen1/psm_hal_gen1_spio.c
+@@ -118,8 +118,8 @@ ips_spio_init(const struct psmi_context *context, struct ptl *ptl,
+ 	ctrl->spio_ctrl = (struct ips_spio_ctrl *)context->spio_ctrl;
+ 	if (!ctrl->spio_ctrl) {
+ 		ctrl->spio_ctrl = (volatile struct ips_spio_ctrl *)
+-		    psmi_calloc(context->ep, UNDEFINED, 1,
+-				sizeof(struct ips_spio_ctrl));
++		    psmi_memalign(context->ep, UNDEFINED, __alignof__(struct ips_spio_ctrl),
++				  sizeof(struct ips_spio_ctrl));
+ 		if (ctrl->spio_ctrl == NULL) {
+ 			return PSM2_NO_MEMORY;
+ 		}
+diff --git a/psm_hal_gen1/psm_hal_inline_i.h b/psm_hal_gen1/psm_hal_inline_i.h
+index 6346baee15f1..df8997b134bc 100644
+--- a/psm_hal_gen1/psm_hal_inline_i.h
++++ b/psm_hal_gen1/psm_hal_inline_i.h
+@@ -535,10 +535,12 @@ static PSMI_HAL_INLINE int hfp_gen1_context_open(int unit,
+ 				 uint32_t cap_mask,
+ 				 unsigned retryCnt)
+ {
+-	int fd = -1;
++	hfp_gen1_pc_private *pc_private;
+ 	psm2_error_t err = PSM2_OK;
+-	hfp_gen1_pc_private *pc_private = psmi_malloc(ep, UNDEFINED, sizeof(hfp_gen1_pc_private));
++	int fd = -1;
+ 
++	pc_private = psmi_memalign(ep, UNDEFINED, __alignof__(hfp_gen1_pc_private),
++				   sizeof(hfp_gen1_pc_private));
+ 	if_pf (!pc_private) {
+ 		err = -PSM_HAL_ERROR_CANNOT_OPEN_CONTEXT;
+ 		goto bail;
+diff --git a/psm_mq_utils.c b/psm_mq_utils.c
+index 303277645631..bcfffa8fc60c 100644
+--- a/psm_mq_utils.c
++++ b/psm_mq_utils.c
+@@ -138,7 +138,7 @@ psm2_error_t psmi_mq_req_init(psm2_mq_t mq)
+ 
+ 		if ((mq->sreq_pool =
+ 		     psmi_mpool_create(sizeof(struct psm2_mq_req), chunksz,
+-				       maxsz, 0, DESCRIPTORS, NULL,
++				       maxsz, PSMI_MPOOL_ALIGN, DESCRIPTORS, NULL,
+ 				       NULL)) == NULL) {
+ 			err = PSM2_NO_MEMORY;
+ 			goto fail;
+@@ -157,7 +157,7 @@ psm2_error_t psmi_mq_req_init(psm2_mq_t mq)
+ 			goto fail;
+ 		if ((mq->rreq_pool =
+ 			psmi_mpool_create(sizeof(struct psm2_mq_req), chunksz,
+-				       maxsz, 0, DESCRIPTORS, NULL,
++				       maxsz, PSMI_MPOOL_ALIGN, DESCRIPTORS, NULL,
+ 				       NULL)) == NULL) {
+ 			err = PSM2_NO_MEMORY;
+ 			goto fail;
+diff --git a/ptl_ips/ips_tid.c b/ptl_ips/ips_tid.c
+index 365de2a529aa..a9c323423905 100644
+--- a/ptl_ips/ips_tid.c
++++ b/ptl_ips/ips_tid.c
+@@ -138,9 +138,9 @@ ips_tid_init(const psmi_context_t *context, struct ips_protoexp *protoexp,
+ 	 */
+ 	tidc->tid_ctrl = (struct ips_tid_ctrl *)context->tid_ctrl;
+ 	if (!tidc->tid_ctrl) {
+-		tidc->tid_ctrl = (struct ips_tid_ctrl *)
+-		    psmi_calloc(context->ep, UNDEFINED, 1,
+-				sizeof(struct ips_tid_ctrl));
++		tidc->tid_ctrl = psmi_memalign(context->ep, UNDEFINED,
++					       __alignof__(struct ips_tid_ctrl),
++					       sizeof(struct ips_tid_ctrl));
+ 		if (tidc->tid_ctrl == NULL) {
+ 			return PSM2_NO_MEMORY;
+ 		}
+diff --git a/ptl_ips/ips_tidflow.c b/ptl_ips/ips_tidflow.c
+index 24556e4a5798..b571c16f8aaa 100644
+--- a/ptl_ips/ips_tidflow.c
++++ b/ptl_ips/ips_tidflow.c
+@@ -105,9 +105,9 @@ psm2_error_t ips_tf_init(struct ips_protoexp *protoexp,
+ 	 * for context sharing, otherwise calloc() it */
+ 	tfc->tf_ctrl = (struct ips_tf_ctrl *)context->tf_ctrl;
+ 	if (!tfc->tf_ctrl) {
+-		tfc->tf_ctrl = (struct ips_tf_ctrl *)
+-		    psmi_calloc(context->ep, UNDEFINED, 1,
+-				sizeof(struct ips_tf_ctrl));
++		tfc->tf_ctrl = psmi_memalign(context->ep, UNDEFINED,
++					     __alignof__(struct ips_tf_ctrl),
++					     sizeof(struct ips_tf_ctrl));
+ 		if (tfc->tf_ctrl == NULL) {
+ 			return PSM2_NO_MEMORY;
+ 		}
+-- 
+2.53.0
+

@@ -3,7 +3,7 @@
 
 Name:		perl-Want
 Version:	0.29
-Release: 36%{?dist}
+Release:	33%{?dist}
 Summary:	Perl module implementing a generalisation of wantarray
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Want

@@ -1,0 +1,492 @@
+From 4079070c4b8ced8df9d86366ad113fc3c2e4e49c Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 22 Apr 2026 11:02:36 +0200
+Subject: [PATCH 1/5] lib/btrfs.c: btrfs_is_subvolume(): Simplify error check
+
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/btrfs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lib/btrfs.c b/lib/btrfs.c
+index 85ec7dbc..fe20cf30 100644
+--- a/lib/btrfs.c
++++ b/lib/btrfs.c
+@@ -67,8 +67,7 @@ int btrfs_is_subvolume(const char *path)
+ 	if (ret <= 0)
+ 		return ret;
+ 
+-	ret = stat(path, &st);
+-	if (ret == -1)
++	if (stat(path, &st) == -1)
+ 		return -1;
+ 
+ 	if (st.st_ino != BTRFS_FIRST_FREE_OBJECTID || !S_ISDIR(st.st_mode)) {
+-- 
+2.53.0
+
+
+From 7a4faaaf46314547cc5e6c8264c3a11753ef9352 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 22 Apr 2026 11:14:20 +0200
+Subject: [PATCH 2/5] lib/, src/: Move statfs(2) call out of is_btrfs()
+
+This simplifies the return value of is_btrfs() into a boolean.
+
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/btrfs.c      | 25 +++++++++----------------
+ lib/prototypes.h |  3 ++-
+ src/useradd.c    | 11 +++++++++--
+ 3 files changed, 20 insertions(+), 19 deletions(-)
+
+diff --git a/lib/btrfs.c b/lib/btrfs.c
+index fe20cf30..065c7938 100644
+--- a/lib/btrfs.c
++++ b/lib/btrfs.c
+@@ -60,12 +60,13 @@ int btrfs_remove_subvolume(const char *path)
+  */
+ int btrfs_is_subvolume(const char *path)
+ {
+-	struct stat st;
+-	int ret;
++	struct stat    st;
++	struct statfs  sfs;
+ 
+-	ret = is_btrfs(path);
+-	if (ret <= 0)
+-		return ret;
++	if (statfs(path, &sfs) == -1)
++		return -1;
++	if (!is_btrfs(&sfs))
++		return 0;
+ 
+ 	if (stat(path, &st) == -1)
+ 		return -1;
+@@ -78,16 +79,8 @@ int btrfs_is_subvolume(const char *path)
+ }
+ 
+ 
+-/* Adapted from btrfsprogs */
+-int is_btrfs(const char *path)
++bool
++is_btrfs(const struct statfs *sfs)
+ {
+-	struct statfs sfs;
+-	int ret;
+-
+-	ret = statfs(path, &sfs);
+-	if (ret == -1)
+-		return -1;
+-
+-	return sfs.f_type == BTRFS_SUPER_MAGIC;
++	return sfs->f_type == BTRFS_SUPER_MAGIC;
+ }
+-
+diff --git a/lib/prototypes.h b/lib/prototypes.h
+index 9a03e312..42aa2923 100644
+--- a/lib/prototypes.h
++++ b/lib/prototypes.h
+@@ -23,6 +23,7 @@
+ 
+ #include <sys/socket.h>
+ #include <sys/stat.h>
++#include <sys/statfs.h>
+ #include <sys/types.h>
+ #include <pwd.h>
+ #include <grp.h>
+@@ -54,7 +55,7 @@ extern int isexpired (const struct passwd *, /*@null@*/const struct spwd *);
+ extern int btrfs_create_subvolume(const char *path);
+ extern int btrfs_remove_subvolume(const char *path);
+ extern int btrfs_is_subvolume(const char *path);
+-extern int is_btrfs(const char *path);
++extern bool is_btrfs(const struct statfs *sfs);
+ #endif
+ 
+ /* basename() renamed to Basename() to avoid libc name space confusion */
+diff --git a/src/useradd.c b/src/useradd.c
+index df679d28..5ce6cd6a 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -25,6 +25,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/stat.h>
++#include <sys/statfs.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+ #include <time.h>
+@@ -2265,6 +2266,7 @@ static void create_home(const struct option_flags *flags)
+ #if WITH_BTRFS
+ 		if (subvolflg && (strlen(prefix_user_home) - (int)strlen(path)) <= 1) {
+ 			char *btrfs_check = strdup(path);
++			struct statfs  sfs;
+ 
+ 			if (!btrfs_check) {
+ 				fprintf(stderr,
+@@ -2273,13 +2275,18 @@ static void create_home(const struct option_flags *flags)
+ 				fail_exit(E_HOMEDIR, process_selinux);
+ 			}
+ 			stpcpy(&btrfs_check[strlen(path) - strlen(cp) - 1], "");
+-			if (is_btrfs(btrfs_check) <= 0) {
++			if (statfs(btrfs_check, &sfs) == -1) {
++				fprintf(stderr, "%s: statfs(\"%s\"): %s\n",
++					Prog, btrfs_check, strerrno());
++				fail_exit(E_HOMEDIR, process_selinux);
++			}
++			free(btrfs_check);
++			if (!is_btrfs(&sfs)) {
+ 				fprintf(stderr,
+ 					_("%s: home directory \"%s\" must be mounted on BTRFS\n"),
+ 					Prog, path);
+ 				fail_exit(E_HOMEDIR, process_selinux);
+ 			}
+-			free(btrfs_check);
+ 			// make subvolume to mount for user instead of directory
+ 			if (btrfs_create_subvolume(path)) {
+ 				fprintf(stderr,
+-- 
+2.53.0
+
+
+From 96460c7240264c0022cebc9ba1774993ee2594cf Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Wed, 22 Apr 2026 11:21:14 +0200
+Subject: [PATCH 3/5] lib/, src/: Move btrfs.c prototypes to lib/btrfs.h
+
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/Makefile.am  |  2 +-
+ lib/btrfs.c      |  4 ++++
+ lib/btrfs.h      | 23 +++++++++++++++++++++++
+ lib/prototypes.h |  9 ---------
+ src/useradd.c    |  1 +
+ src/userdel.c    |  1 +
+ src/usermod.c    |  1 +
+ 7 files changed, 31 insertions(+), 10 deletions(-)
+ create mode 100644 lib/btrfs.h
+
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 7c488f82..0664e610 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -290,7 +290,7 @@ libshadow_la_SOURCES += tcbfuncs.c tcbfuncs.h
+ endif
+ 
+ if WITH_BTRFS
+-libshadow_la_SOURCES += btrfs.c
++libshadow_la_SOURCES += btrfs.c btrfs.h
+ endif
+ 
+ if ENABLE_LASTLOG
+diff --git a/lib/btrfs.c b/lib/btrfs.c
+index 065c7938..15b6b315 100644
+--- a/lib/btrfs.c
++++ b/lib/btrfs.c
+@@ -1,3 +1,7 @@
++#include "config.h"
++
++#include "btrfs.h"
++
+ #include <linux/btrfs_tree.h>
+ #include <linux/magic.h>
+ #include <sys/statfs.h>
+diff --git a/lib/btrfs.h b/lib/btrfs.h
+new file mode 100644
+index 00000000..50b70488
+--- /dev/null
++++ b/lib/btrfs.h
+@@ -0,0 +1,23 @@
++// SPDX-FileCopyrightText: 2026, Alejandro Colomar <alx@kernel.org>
++// SPDX-License-Identifier: BSD-3-Clause
++
++
++#ifndef SHADOW_INCLUDE_LIB_BTRFS_H_
++#define SHADOW_INCLUDE_LIB_BTRFS_H_
++
++
++#include "config.h"
++
++#include <stdbool.h>
++#include <sys/statfs.h>
++
++
++#ifdef WITH_BTRFS
++int btrfs_create_subvolume(const char *path);
++int btrfs_remove_subvolume(const char *path);
++int btrfs_is_subvolume(const char *path);
++bool is_btrfs(const struct statfs *sfs);
++#endif
++
++
++#endif  // include guard
+diff --git a/lib/prototypes.h b/lib/prototypes.h
+index 42aa2923..d22c477a 100644
+--- a/lib/prototypes.h
++++ b/lib/prototypes.h
+@@ -23,7 +23,6 @@
+ 
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+-#include <sys/statfs.h>
+ #include <sys/types.h>
+ #include <pwd.h>
+ #include <grp.h>
+@@ -50,14 +49,6 @@ extern int expire (const struct passwd *, /*@null@*/const struct spwd *);
+ /* isexpired.c */
+ extern int isexpired (const struct passwd *, /*@null@*/const struct spwd *);
+ 
+-/* btrfs.c */
+-#ifdef WITH_BTRFS
+-extern int btrfs_create_subvolume(const char *path);
+-extern int btrfs_remove_subvolume(const char *path);
+-extern int btrfs_is_subvolume(const char *path);
+-extern bool is_btrfs(const struct statfs *sfs);
+-#endif
+-
+ /* basename() renamed to Basename() to avoid libc name space confusion */
+ /* basename.c */
+ extern /*@observer@*/const char *Basename (const char *str);
+diff --git a/src/useradd.c b/src/useradd.c
+index 5ce6cd6a..9bd32b11 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -34,6 +34,7 @@
+ #include "alloc/malloc.h"
+ #include "atoi/a2i.h"
+ #include "atoi/getnum.h"
++#include "btrfs.h"
+ #include "chkname.h"
+ #include "defines.h"
+ #include "faillog.h"
+diff --git a/src/userdel.c b/src/userdel.c
+index 9b7d81be..ebd064c0 100644
+--- a/src/userdel.c
++++ b/src/userdel.c
+@@ -20,6 +20,7 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ 
++#include "btrfs.h"
+ #ifdef ACCT_TOOLS_SETUID
+ #ifdef USE_PAM
+ #include "pam_defs.h"
+diff --git a/src/usermod.c b/src/usermod.c
+index 7c0321a6..3afe19ea 100644
+--- a/src/usermod.c
++++ b/src/usermod.c
+@@ -32,6 +32,7 @@
+ #include "alloc/malloc.h"
+ #include "atoi/a2i.h"
+ #include "atoi/getnum.h"
++#include "btrfs.h"
+ #include "chkname.h"
+ #include "defines.h"
+ #include "faillog.h"
+-- 
+2.53.0
+
+
+From 7be9a6540f1cad477fd4f4e83d25904a5095bb86 Mon Sep 17 00:00:00 2001
+From: Hadi Chokr <hadichokr@icloud.com>
+Date: Tue, 21 Apr 2026 09:18:19 +0200
+Subject: [PATCH 4/5] useradd(8): fallback to regular dir for BTRFS home on
+ non-BTRFS parent
+
+When the --btrfs-subvolume-home option is used but the parent directory
+is not on a BTRFS filesystem, useradd previously failed with an error.
+This is too strict; instead, fall back to creating a regular directory
+and issue a warning.  The subvolume creation is attempted only when the
+parent is BTRFS.  Otherwise, a regular directory is created and a
+syslog(3) warning is logged.
+
+Fixes: 3e8c105 (2026-01-02; "src/useradd: Support config for creating home dirs as Btrfs subvolumes")
+Co-authored-by: Hadi Chokr <hadichokr@icloud.com>
+Co-authored-by: Alejandro Colomar <alx@kernel.org>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ man/useradd.8.xml | 27 ++++++++++++++++++++++--
+ src/useradd.c     | 52 +++++++++++++++++++++++------------------------
+ 2 files changed, 51 insertions(+), 28 deletions(-)
+
+diff --git a/man/useradd.8.xml b/man/useradd.8.xml
+index 8a087e13..0bde6683 100644
+--- a/man/useradd.8.xml
++++ b/man/useradd.8.xml
+@@ -2,6 +2,7 @@
+ <!--
+    SPDX-FileCopyrightText: 1991 - 1994, Julianne Frances Haugh
+    SPDX-FileCopyrightText: 2007 - 2011, Nicolas François
++   SPDX-FileCopyrightText: 2025 - 2026, Hadi Chokr
+    SPDX-License-Identifier: BSD-3-Clause
+ -->
+ <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+@@ -156,8 +157,30 @@
+ 		regardless of any configuration file settings.
+ 	  </para>
+ 	  <para>
+-	    Note: this feature works only if the underlying filesystem supports
+-	    Btrfs subvolumes.
++	    If the parent directory of the user's home directory is
++	    <emphasis>not</emphasis> on a Btrfs filesystem,
++	    <command>useradd</command> will <emphasis>not</emphasis> create a
++	    subvolume.
++	    Instead, it creates a regular directory,
++	    prints a warning to standard error,
++	    and logs the event via syslog at level
++	    <constant>LOG_WARN</constant>.
++	    The user account is still created successfully.
++	  </para>
++	  <para>
++	    If the filesystem type cannot be determined (e.g., because of
++	    insufficient permissions, an I/O error,
++	    or a
++	    <citerefentry>
++	      <refentrytitle>statfs</refentrytitle>
++	      <manvolnum>2</manvolnum>
++	    </citerefentry>
++	    failure),
++	    <command>useradd</command> treats this as a fatal error:
++	    the home directory is not created,
++	    the command exits with a non‑zero status
++	    (<literal>E_HOMEDIR</literal>, 12),
++	    and an error message is printed.
+ 	  </para>
+ 	</listitem>
+       </varlistentry>
+diff --git a/src/useradd.c b/src/useradd.c
+index 9bd32b11..9210379c 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -1,11 +1,11 @@
+-/*
+- * SPDX-FileCopyrightText: 1991 - 1994, Julianne Frances Haugh
+- * SPDX-FileCopyrightText: 1996 - 2000, Marek Michałkiewicz
+- * SPDX-FileCopyrightText: 2000 - 2006, Tomasz Kłoczko
+- * SPDX-FileCopyrightText: 2007 - 2012, Nicolas François
+- *
+- * SPDX-License-Identifier: BSD-3-Clause
+- */
++// SPDX-FileCopyrightText: 1991-1994, Julianne Frances Haugh
++// SPDX-FileCopyrightText: 1996-2000, Marek Michałkiewicz
++// SPDX-FileCopyrightText: 2000-2006, Tomasz Kłoczko
++// SPDX-FileCopyrightText: 2007-2012, Nicolas François
++// SPDX-FileCopyrightText: 2025-2026, Hadi Chokr
++// SPDX-FileCopyrightText: 2026, Alejandro Colomar <alx@kernel.org>
++// SPDX-License-Identifier: BSD-3-Clause
++
+ 
+ #include "config.h"
+ 
+@@ -2251,6 +2251,8 @@ static void create_home(const struct option_flags *flags)
+ 	   owner root:root.
+ 	 */
+ 	for (cp = strtok(bhome, "/"); cp != NULL; cp = strtok(NULL, "/")) {
++		bool  dir_created;
++
+ 		/* Avoid turning a relative path into an absolute path. */
+ 		if (strprefix(bhome, "/") || !streq(path, ""))
+ 			strcat(path, "/");
+@@ -2260,10 +2262,7 @@ static void create_home(const struct option_flags *flags)
+ 			continue;
+ 		}
+ 
+-		/* Check if parent directory is BTRFS, fail if requesting
+-		   subvolume but no BTRFS. The paths could be different by the
+-		   trailing slash
+-		 */
++		dir_created = false;
+ #if WITH_BTRFS
+ 		if (subvolflg && (strlen(prefix_user_home) - (int)strlen(path)) <= 1) {
+ 			char *btrfs_check = strdup(path);
+@@ -2284,25 +2283,26 @@ static void create_home(const struct option_flags *flags)
+ 			free(btrfs_check);
+ 			if (!is_btrfs(&sfs)) {
+ 				fprintf(stderr,
+-					_("%s: home directory \"%s\" must be mounted on BTRFS\n"),
+-					Prog, path);
+-				fail_exit(E_HOMEDIR, process_selinux);
++				        _("%s: warning: \"%s\" is not on BTRFS; creating regular directory instead of subvolume\n"),
++				        Prog, prefix_user_home);
++			} else {
++				if (btrfs_create_subvolume(path)) {
++					fprintf(stderr,
++					        _("%s: failed to create BTRFS subvolume: %s\n"),
++						Prog, path);
++					fail_exit(E_HOMEDIR, process_selinux);
++				}
++				dir_created = true;
+ 			}
+-			// make subvolume to mount for user instead of directory
+-			if (btrfs_create_subvolume(path)) {
+-				fprintf(stderr,
+-					_("%s: failed to create BTRFS subvolume: %s\n"),
++		}
++#endif
++		if (!dir_created) {
++			if (mkdir(path, 0) != 0) {
++				fprintf(stderr, _("%s: cannot create directory %s\n"),
+ 					Prog, path);
+ 				fail_exit(E_HOMEDIR, process_selinux);
+ 			}
+ 		}
+-		else
+-#endif
+-		if (mkdir(path, 0) != 0) {
+-			fprintf(stderr, _("%s: cannot create directory %s\n"),
+-				Prog, path);
+-			fail_exit(E_HOMEDIR, process_selinux);
+-		}
+ 		if (chown(path, 0, 0) < 0) {
+ 			fprintf(stderr,
+ 				_("%s: warning: chown on `%s' failed: %m\n"),
+-- 
+2.53.0
+
+
+From 827f69b864461ab6d7549762bef06ab4495d2587 Mon Sep 17 00:00:00 2001
+From: Hadi Chokr <hadichokr@icloud.com>
+Date: Mon, 20 Apr 2026 12:27:31 +0200
+Subject: [PATCH 5/5] man/useradd.8.xml: Remove trailing spaces from
+ useradd.8.xml
+
+Signed-off-by: Hadi Chokr <hadichokr@icloud.com>
+Reviewed-by: Alejandro Colomar <alx@kernel.org>
+---
+ man/useradd.8.xml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/man/useradd.8.xml b/man/useradd.8.xml
+index 0bde6683..f85780e2 100644
+--- a/man/useradd.8.xml
++++ b/man/useradd.8.xml
+@@ -207,7 +207,7 @@
+ 	    user's login directory. The default is to append the
+ 	    <replaceable>LOGIN</replaceable> name to
+ 	    <replaceable>BASE_DIR</replaceable> and use that as the
+-	    login directory name.  
++	    login directory name.
+ 	    The directory <replaceable>HOME_DIR</replaceable> is not created by
+ 	    default.  However it will be created for non-system users if either the
+ 	    <option>-m</option> flag is specifed or
+@@ -422,7 +422,7 @@
+ 	</term>
+ 	<listitem>
+ 	  <para>
+-	    Create the user's home directory if it does not exist. 
++	    Create the user's home directory if it does not exist.
+ 	    The files and directories contained in the skeleton directory
+ 	    (which can be defined with the <option>-k</option> option)
+ 	    will be copied to the home directory.
+@@ -512,7 +512,7 @@
+             password himself.
+ 	  </para>
+ 	  <para>
+-	    <emphasis role="bold">Note:</emphasis>Avoid this option on the command  
++	    <emphasis role="bold">Note:</emphasis>Avoid this option on the command
+ 	     line because the password (or encrypted password) will
+ 	    be visible by users listing the processes.
+ 	  </para>
+-- 
+2.53.0
+

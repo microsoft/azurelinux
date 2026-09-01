@@ -1,0 +1,35 @@
+From f6f1389482fb882c5414f6a74b4f289f1c9c951f Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Thu, 30 Oct 2025 07:23:52 -0700
+Subject: [PATCH] tensile ignore cache check
+
+---
+ Tensile/Common.py | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/Tensile/Common.py b/Tensile/Common.py
+index ad3e8a26b5db..5ab3f6381fcf 100644
+--- a/Tensile/Common.py
++++ b/Tensile/Common.py
+@@ -2103,17 +2103,7 @@ def GetAsmCaps(isaVersion: IsaVersion, hipVersion: SemanticVersion, cachedAsmCap
+ 
+     derivedAsmCaps["SupportedSource"] = True
+ 
+-    ignoreCacheCheck = globalParameters["IgnoreAsmCapCache"]
+-
+-    # disable cache checking for < rocm 5.3
+-    if len(hipVersion) >= 2:
+-      ignoreCacheCheck = ignoreCacheCheck or \
+-                         hipVersion.major < 5 or \
+-                         (hipVersion.major == 5 and hipVersion.minor <= 2)
+-
+-    if not derivedAsmCaps["SupportedISA"] and cachedAsmCaps[isaVersion]["SupportedISA"]:
+-      printWarning("Architecture {} not supported by ROCm {}".format(isaVersion, globalParameters['HipClangVersion']), DeveloperWarning)
+-      ignoreCacheCheck = True
++    ignoreCacheCheck = True
+ 
+     # check if derived caps matches asm cap cache
+     if not ignoreCacheCheck:
+-- 
+2.51.0
+

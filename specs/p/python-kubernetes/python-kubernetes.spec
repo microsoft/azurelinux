@@ -21,7 +21,7 @@
 Name:       python-%{library}
 Epoch:      1
 Version:    34.1.0
-Release: 5%{?dist}
+Release:    3%{?dist}
 Summary:    Python client for the kubernetes API.
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
 License:    Apache-2.0
@@ -145,6 +145,9 @@ cp -pr kubernetes/e2e_test %{buildroot}%{python3_sitelib}/%{library}/
 %{python3_sitelib}/%{library}/e2e_test
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:34.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Sep 30 2025 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 1:34.1.0-2
 - Drop urllib3 upper limit so the package can be installed, https://github.com/kubernetes-client/python/issues/2458
 

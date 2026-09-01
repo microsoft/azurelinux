@@ -6,7 +6,7 @@
 
 Name:           setools
 Version:        4.6.0
-Release: 7%{?dist}
+Release:        6%{?dist}
 Summary:        Policy analysis tools for SELinux
 
 License:        GPL-2.0-only AND LGPL-2.1-only
@@ -21,10 +21,8 @@ Patch:          https://github.com/SELinuxProject/setools/pull/156.patch
 Patch:          https://github.com/SELinuxProject/setools/pull/157.patch
 
 Obsoletes:      setools < 4.0.0, setools-devel < 4.0.0
-BuildRequires:  flex,  bison
 BuildRequires:  glibc-devel, gcc, git-core
-BuildRequires:  libsepol-devel >= %{sepol_ver}, libsepol-static >= %{sepol_ver}
-BuildRequires:  swig
+BuildRequires:  libsepol-devel >= %{sepol_ver}
 BuildRequires:  python3-Cython
 BuildRequires:  python3-devel
 BuildRequires:  libselinux-devel
@@ -153,6 +151,12 @@ Python modules designed to facilitate SELinux policy analysis.
 %{_mandir}/ru/man1/apol*
 
 %changelog
+* Fri Jul 31 2026 Petr Lautrbach <lautrbach@redhat.com> - 4.6.0-6
+- Rebuild with selinux-3.11
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.6.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Dec 01 2025 Veronika Syncakova <vsyncako@redhat.com> - 4.6.0-4
 - Fix seinfo argument parsing when policy path follows query options
 

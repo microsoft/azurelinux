@@ -1,0 +1,229 @@
+From 6e49f0248647a1f3ea6515e0ca304b5e7662e6da Mon Sep 17 00:00:00 2001
+From: "tsrk." <tsrk@tsrk.me>
+Date: Tue, 6 Jan 2026 08:57:05 -0800
+Subject: [PATCH] fix: restart greeter when helper is in a wrong state
+
+Signed-off-by: tsrk. <tsrk@tsrk.me>
+---
+ src/auth/Auth.cpp          |  5 +++-
+ src/helper/HelperApp.cpp   | 51 +++++++++++++++++++++++++++-----------
+ src/helper/HelperApp.h     |  2 +-
+ src/helper/UserSession.cpp |  3 +--
+ src/helper/UserSession.h   |  4 ---
+ 5 files changed, 42 insertions(+), 23 deletions(-)
+
+diff --git a/src/auth/Auth.cpp b/src/auth/Auth.cpp
+index 6c9b5c6..6ff38ef 100644
+--- a/src/auth/Auth.cpp
++++ b/src/auth/Auth.cpp
+@@ -230,7 +230,10 @@ namespace SDDM {
+         else
+             qWarning("Auth: sddm-helper exited with %d", exitCode);
+ 
+-        Q_EMIT qobject_cast<Auth*>(parent())->finished((Auth::HelperExitStatus)exitCode);
++        if (exitStatus == QProcess::NormalExit)
++            Q_EMIT qobject_cast<Auth*>(parent())->finished((Auth::HelperExitStatus)exitCode);
++        else
++            Q_EMIT qobject_cast<Auth*>(parent())->finished(Auth::HELPER_OTHER_ERROR);
+     }
+ 
+     void Auth::Private::childError(QProcess::ProcessError error) {
+diff --git a/src/helper/HelperApp.cpp b/src/helper/HelperApp.cpp
+index 32da42d..744a4ef 100644
+--- a/src/helper/HelperApp.cpp
++++ b/src/helper/HelperApp.cpp
+@@ -53,8 +53,13 @@ namespace SDDM {
+             , m_socket(new QLocalSocket(this)) {
+         qInstallMessageHandler(HelperMessageHandler);
+         SignalHandler *s = new SignalHandler(this);
++        s->addCustomSignal(SIGHUP);
+         QObject::connect(s, &SignalHandler::sigtermReceived, m_session, [] {
+-            QCoreApplication::instance()->exit(-1);
++            QCoreApplication::instance()->exit(Auth::HELPER_OTHER_ERROR);
++        });
++
++        QObject::connect(s, &SignalHandler::customSignalReceived, m_session, [](int) {
++            QCoreApplication::instance()->exit(Auth::HELPER_OTHER_ERROR);
+         });
+ 
+         QTimer::singleShot(0, this, SLOT(setUp()));
+@@ -68,7 +73,7 @@ namespace SDDM {
+         if ((pos = args.indexOf(QStringLiteral("--socket"))) >= 0) {
+             if (pos >= args.length() - 1) {
+                 qCritical() << "This application is not supposed to be executed manually";
+-                exit(Auth::HELPER_OTHER_ERROR);
++                QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+                 return;
+             }
+             server = args[pos + 1];
+@@ -77,7 +82,7 @@ namespace SDDM {
+         if ((pos = args.indexOf(QStringLiteral("--id"))) >= 0) {
+             if (pos >= args.length() - 1) {
+                 qCritical() << "This application is not supposed to be executed manually";
+-                exit(Auth::HELPER_OTHER_ERROR);
++                QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+                 return;
+             }
+             m_id = QString(args[pos + 1]).toLongLong();
+@@ -86,7 +91,7 @@ namespace SDDM {
+         if ((pos = args.indexOf(QStringLiteral("--start"))) >= 0) {
+             if (pos >= args.length() - 1) {
+                 qCritical() << "This application is not supposed to be executed manually";
+-                exit(Auth::HELPER_OTHER_ERROR);
++                QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+                 return;
+             }
+             m_session->setPath(args[pos + 1]);
+@@ -95,7 +100,7 @@ namespace SDDM {
+         if ((pos = args.indexOf(QStringLiteral("--user"))) >= 0) {
+             if (pos >= args.length() - 1) {
+                 qCritical() << "This application is not supposed to be executed manually";
+-                exit(Auth::HELPER_OTHER_ERROR);
++                QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+                 return;
+             }
+             m_user = args[pos + 1];
+@@ -104,7 +109,7 @@ namespace SDDM {
+         if ((pos = args.indexOf(QStringLiteral("--display-server"))) >= 0) {
+             if (pos >= args.length() - 1) {
+                 qCritical() << "This application is not supposed to be executed manually";
+-                exit(Auth::HELPER_OTHER_ERROR);
++                QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+                 return;
+             }
+             m_session->setDisplayServerCommand(args[pos + 1]);
+@@ -121,12 +126,12 @@ namespace SDDM {
+ 
+         if (server.isEmpty() || m_id <= 0) {
+             qCritical() << "This application is not supposed to be executed manually";
+-            exit(Auth::HELPER_OTHER_ERROR);
++            QCoreApplication::exit(Auth::HELPER_OTHER_ERROR);
+             return;
+         }
+ 
+         connect(m_socket, &QLocalSocket::connected, this, &HelperApp::doAuth);
+-        connect(m_session, &UserSession::finished, this, &HelperApp::sessionFinished);
++        connect(m_session, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &HelperApp::sessionFinished);
+         m_socket->connectToServer(server, QIODevice::ReadWrite | QIODevice::Unbuffered);
+     }
+ 
+@@ -146,7 +151,7 @@ namespace SDDM {
+             const QString vt = env.value(QStringLiteral("XDG_VTNR"));
+             utmpLogin(vt, displayId, m_user, 0, false);
+ 
+-            exit(Auth::HELPER_AUTH_ERROR);
++            QCoreApplication::exit(Auth::HELPER_AUTH_ERROR);
+             return;
+         }
+ 
+@@ -160,7 +165,7 @@ namespace SDDM {
+             const QString vt = env.value(QStringLiteral("XDG_VTNR"));
+             utmpLogin(vt, displayId, m_user, 0, false);
+ 
+-            exit(Auth::HELPER_AUTH_ERROR);
++            QCoreApplication::exit(Auth::HELPER_AUTH_ERROR);
+             return;
+         }
+ 
+@@ -173,7 +178,7 @@ namespace SDDM {
+ 
+             if (!m_backend->openSession()) {
+                 sessionOpened(false);
+-                exit(Auth::HELPER_SESSION_ERROR);
++                QCoreApplication::exit(Auth::HELPER_SESSION_ERROR);
+                 return;
+             }
+ 
+@@ -189,12 +194,25 @@ namespace SDDM {
+             }
+         }
+         else
+-            exit(Auth::HELPER_SUCCESS);
++            QCoreApplication::exit(Auth::HELPER_SUCCESS);
+         return;
+     }
+ 
+-    void HelperApp::sessionFinished(int status) {
+-        exit(status);
++    void HelperApp::sessionFinished(int exitCode, QProcess::ExitStatus exitStatus) {
++        if (exitStatus == QProcess::NormalExit) {
++            if (exitCode != 0) {
++                qWarning("Session crashed (exit code %d).", exitCode);
++                QCoreApplication::exit(Auth::HELPER_SESSION_ERROR);
++            }
++            else
++                QCoreApplication::exit(Auth::HELPER_SUCCESS);
++            return;
++        }
++
++        Q_ASSERT_X(exitCode != 0, "HelperApp::sessionFinished", "Crashing with 0 is impossible");
++
++        qWarning("Session crashed (killed by signal %d).", exitCode);
++        QCoreApplication::exit(Auth::HELPER_SESSION_ERROR);
+     }
+ 
+     void HelperApp::info(const QString& message, Auth::Info type) {
+@@ -284,7 +302,10 @@ namespace SDDM {
+     HelperApp::~HelperApp() {
+         Q_ASSERT(getuid() == 0);
+ 
+-        m_session->stop();
++        // Avoid calls to sessionFinished when exiting
++        disconnect(m_session, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &HelperApp::sessionFinished);
++        if (m_session->state() != QProcess::NotRunning)
++            m_session->stop();
+         m_backend->closeSession();
+ 
+         // write logout to utmp/wtmp
+diff --git a/src/helper/HelperApp.h b/src/helper/HelperApp.h
+index 64ea0e1..9874ab8 100644
+--- a/src/helper/HelperApp.h
++++ b/src/helper/HelperApp.h
+@@ -54,7 +54,7 @@ namespace SDDM {
+         void setUp();
+         void doAuth();
+ 
+-        void sessionFinished(int status);
++        void sessionFinished(int exitCode, QProcess::ExitStatus exitStatus);
+ 
+     private:
+         qint64 m_id { -1 };
+diff --git a/src/helper/UserSession.cpp b/src/helper/UserSession.cpp
+index 860f165..d3d7b90 100644
+--- a/src/helper/UserSession.cpp
++++ b/src/helper/UserSession.cpp
+@@ -47,7 +47,6 @@ namespace SDDM {
+     UserSession::UserSession(HelperApp *parent)
+         : QProcess(parent)
+     {
+-        connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &UserSession::finished);
+ #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+         setChildProcessModifier(std::bind(&UserSession::childModifier, this));
+ #endif
+@@ -157,7 +156,7 @@ namespace SDDM {
+                 }
+             }
+         } else {
+-            Q_EMIT finished(Auth::HELPER_OTHER_ERROR);
++            qInfo() << "Attempted to stop session, but was already not running";
+         }
+     }
+ 
+diff --git a/src/helper/UserSession.h b/src/helper/UserSession.h
+index ecaef86..78cd994 100644
+--- a/src/helper/UserSession.h
++++ b/src/helper/UserSession.h
+@@ -51,10 +51,6 @@ namespace SDDM {
+         */
+         qint64 cachedProcessId();
+ 
+-
+-    Q_SIGNALS:
+-        void finished(int exitCode);
+-
+ #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+     protected:
+         void setupChildProcess() override;
+-- 
+2.52.0
+

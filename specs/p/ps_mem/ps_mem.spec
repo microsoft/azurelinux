@@ -4,7 +4,7 @@
 
 Name:           ps_mem
 Version:        3.14
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        Memory profiling tool
 License:        LGPL-2.1-only
 URL:            https://github.com/pixelb/ps_mem

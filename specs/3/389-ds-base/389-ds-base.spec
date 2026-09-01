@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 10;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -66,11 +66,14 @@ ExcludeArch: i686
 
 %if %{with clang}
 %global toolchain clang
-%global _missing_build_ids_terminate_build 0
+%global _lto_cflags %nil
 %endif
 
 # Build cockpit plugin
 %bcond cockpit 1
+
+# Build HIBP password breach checking (requires libcurl)
+%bcond hibp 0
 
 # fedora 15 and later uses tmpfiles.d
 # otherwise, comment this out
@@ -88,122 +91,124 @@ ExcludeArch: i686
 
 Summary:          389 Directory Server (%{variant})
 Name:             389-ds-base
-Version:          3.1.4
+Version:          3.2.2
 Release:          %{autorelease -n %{?with_asan:-e asan}}%{?dist}
-License:          GPL-3.0-or-later WITH GPL-3.0-389-ds-base-exception AND (0BSD OR Apache-2.0 OR MIT) AND (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND (Apache-2.0 OR BSL-1.0) AND (Apache-2.0 OR LGPL-2.1-or-later OR MIT) AND (Apache-2.0 OR MIT OR Zlib) AND (Apache-2.0 OR MIT) AND (CC-BY-4.0 AND MIT) AND (MIT OR Apache-2.0) AND Unicode-3.0 AND (MIT OR CC0-1.0) AND (MIT OR Unlicense) AND 0BSD AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MIT AND ISC AND MPL-2.0 AND PSF-2.0 AND Zlib
+License:          GPL-3.0-or-later WITH GPL-3.0-389-ds-base-exception AND (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND (Apache-2.0 OR LGPL-2.1-or-later OR MIT) AND (Apache-2.0 OR MIT) AND (CC-BY-4.0 AND MIT) AND (MIT OR Apache-2.0) AND Unicode-3.0 AND (MIT OR Unlicense) AND 0BSD AND Apache-2.0 AND BSD-3-Clause AND ISC AND MIT AND MIT AND ISC AND MPL-2.0 AND Zlib
 URL:              https://www.port389.org
 Obsoletes:        %{name}-legacy-tools < 1.4.4.6
 Obsoletes:        %{name}-legacy-tools-debuginfo < 1.4.4.6
 Provides:         ldif2ldbm >= 0
 
 ##### Bundled cargo crates list - START #####
-Provides:  bundled(crate(addr2line)) = 0.24.2
-Provides:  bundled(crate(adler2)) = 2.0.1
 Provides:  bundled(crate(allocator-api2)) = 0.2.21
+Provides:  bundled(crate(anyhow)) = 1.0.102
 Provides:  bundled(crate(atty)) = 0.2.14
-Provides:  bundled(crate(autocfg)) = 1.5.0
-Provides:  bundled(crate(backtrace)) = 0.3.75
+Provides:  bundled(crate(autocfg)) = 1.5.1
 Provides:  bundled(crate(base64)) = 0.13.1
-Provides:  bundled(crate(bitflags)) = 2.9.1
+Provides:  bundled(crate(bitflags)) = 2.12.1
+Provides:  bundled(crate(bumpalo)) = 3.20.3
 Provides:  bundled(crate(byteorder)) = 1.5.0
 Provides:  bundled(crate(cbindgen)) = 0.26.0
-Provides:  bundled(crate(cc)) = 1.2.27
-Provides:  bundled(crate(cfg-if)) = 1.0.1
+Provides:  bundled(crate(cc)) = 1.2.63
+Provides:  bundled(crate(cfg-if)) = 1.0.4
 Provides:  bundled(crate(clap)) = 3.2.25
 Provides:  bundled(crate(clap_lex)) = 0.2.4
-Provides:  bundled(crate(concread)) = 0.5.6
+Provides:  bundled(crate(concread)) = 0.5.10
 Provides:  bundled(crate(crossbeam-epoch)) = 0.9.18
 Provides:  bundled(crate(crossbeam-queue)) = 0.3.12
 Provides:  bundled(crate(crossbeam-utils)) = 0.8.21
 Provides:  bundled(crate(equivalent)) = 1.0.2
-Provides:  bundled(crate(errno)) = 0.3.12
-Provides:  bundled(crate(fastrand)) = 2.3.0
+Provides:  bundled(crate(errno)) = 0.3.14
+Provides:  bundled(crate(fastrand)) = 2.4.1
 Provides:  bundled(crate(fernet)) = 0.1.4
-Provides:  bundled(crate(foldhash)) = 0.1.5
+Provides:  bundled(crate(find-msvc-tools)) = 0.1.9
+Provides:  bundled(crate(foldhash)) = 0.2.0
 Provides:  bundled(crate(foreign-types)) = 0.3.2
 Provides:  bundled(crate(foreign-types-shared)) = 0.1.1
-Provides:  bundled(crate(getrandom)) = 0.3.3
-Provides:  bundled(crate(gimli)) = 0.31.1
-Provides:  bundled(crate(hashbrown)) = 0.15.4
-Provides:  bundled(crate(heck)) = 0.4.1
+Provides:  bundled(crate(futures-core)) = 0.3.32
+Provides:  bundled(crate(futures-task)) = 0.3.32
+Provides:  bundled(crate(futures-util)) = 0.3.32
+Provides:  bundled(crate(getrandom)) = 0.4.2
+Provides:  bundled(crate(hashbrown)) = 0.17.1
+Provides:  bundled(crate(heck)) = 0.5.0
 Provides:  bundled(crate(hermit-abi)) = 0.1.19
-Provides:  bundled(crate(indexmap)) = 1.9.3
-Provides:  bundled(crate(itoa)) = 1.0.15
-Provides:  bundled(crate(jobserver)) = 0.1.33
-Provides:  bundled(crate(libc)) = 0.2.174
-Provides:  bundled(crate(linux-raw-sys)) = 0.9.4
-Provides:  bundled(crate(log)) = 0.4.27
-Provides:  bundled(crate(lru)) = 0.13.0
-Provides:  bundled(crate(memchr)) = 2.7.5
-Provides:  bundled(crate(miniz_oxide)) = 0.8.9
-Provides:  bundled(crate(object)) = 0.36.7
-Provides:  bundled(crate(once_cell)) = 1.21.3
-Provides:  bundled(crate(openssl)) = 0.10.73
+Provides:  bundled(crate(id-arena)) = 2.3.0
+Provides:  bundled(crate(indexmap)) = 2.14.0
+Provides:  bundled(crate(itoa)) = 1.0.18
+Provides:  bundled(crate(jobserver)) = 0.1.34
+Provides:  bundled(crate(js-sys)) = 0.3.99
+Provides:  bundled(crate(leb128fmt)) = 0.1.0
+Provides:  bundled(crate(libc)) = 0.2.186
+Provides:  bundled(crate(linux-raw-sys)) = 0.12.1
+Provides:  bundled(crate(log)) = 0.4.32
+Provides:  bundled(crate(lru)) = 0.16.4
+Provides:  bundled(crate(memchr)) = 2.8.1
+Provides:  bundled(crate(once_cell)) = 1.21.4
+Provides:  bundled(crate(openssl)) = 0.10.80
 Provides:  bundled(crate(openssl-macros)) = 0.1.1
-Provides:  bundled(crate(openssl-sys)) = 0.9.109
+Provides:  bundled(crate(openssl-sys)) = 0.9.116
 Provides:  bundled(crate(os_str_bytes)) = 6.6.1
-Provides:  bundled(crate(paste)) = 0.1.18
-Provides:  bundled(crate(paste-impl)) = 0.1.18
-Provides:  bundled(crate(pin-project-lite)) = 0.2.16
-Provides:  bundled(crate(pkg-config)) = 0.3.32
-Provides:  bundled(crate(proc-macro-hack)) = 0.5.20+deprecated
-Provides:  bundled(crate(proc-macro2)) = 1.0.95
-Provides:  bundled(crate(quote)) = 1.0.40
-Provides:  bundled(crate(r-efi)) = 5.3.0
-Provides:  bundled(crate(rustc-demangle)) = 0.1.25
-Provides:  bundled(crate(rustix)) = 1.0.7
-Provides:  bundled(crate(ryu)) = 1.0.20
-Provides:  bundled(crate(serde)) = 1.0.219
-Provides:  bundled(crate(serde_derive)) = 1.0.219
-Provides:  bundled(crate(serde_json)) = 1.0.140
-Provides:  bundled(crate(shlex)) = 1.3.0
+Provides:  bundled(crate(paste)) = 1.0.15
+Provides:  bundled(crate(pin-project-lite)) = 0.2.17
+Provides:  bundled(crate(pkg-config)) = 0.3.33
+Provides:  bundled(crate(prettyplease)) = 0.2.37
+Provides:  bundled(crate(proc-macro2)) = 1.0.106
+Provides:  bundled(crate(quote)) = 1.0.45
+Provides:  bundled(crate(r-efi)) = 6.0.0
+Provides:  bundled(crate(rustix)) = 1.1.4
+Provides:  bundled(crate(rustversion)) = 1.0.22
+Provides:  bundled(crate(semver)) = 1.0.28
+Provides:  bundled(crate(serde)) = 1.0.228
+Provides:  bundled(crate(serde_core)) = 1.0.228
+Provides:  bundled(crate(serde_derive)) = 1.0.228
+Provides:  bundled(crate(serde_json)) = 1.0.150
+Provides:  bundled(crate(shlex)) = 2.0.1
+Provides:  bundled(crate(slab)) = 0.4.12
 Provides:  bundled(crate(smallvec)) = 1.15.1
 Provides:  bundled(crate(sptr)) = 0.3.2
 Provides:  bundled(crate(strsim)) = 0.10.0
-Provides:  bundled(crate(syn)) = 2.0.103
-Provides:  bundled(crate(tempfile)) = 3.20.0
+Provides:  bundled(crate(syn)) = 2.0.117
+Provides:  bundled(crate(tempfile)) = 3.27.0
 Provides:  bundled(crate(termcolor)) = 1.4.1
 Provides:  bundled(crate(textwrap)) = 0.16.2
-Provides:  bundled(crate(tokio)) = 1.45.1
+Provides:  bundled(crate(tokio)) = 1.52.3
 Provides:  bundled(crate(toml)) = 0.5.11
-Provides:  bundled(crate(tracing)) = 0.1.41
-Provides:  bundled(crate(tracing-attributes)) = 0.1.30
-Provides:  bundled(crate(tracing-core)) = 0.1.34
-Provides:  bundled(crate(unicode-ident)) = 1.0.18
-Provides:  bundled(crate(uuid)) = 0.8.2
+Provides:  bundled(crate(tracing)) = 0.1.44
+Provides:  bundled(crate(tracing-attributes)) = 0.1.31
+Provides:  bundled(crate(tracing-core)) = 0.1.36
+Provides:  bundled(crate(unicode-ident)) = 1.0.24
+Provides:  bundled(crate(unicode-xid)) = 0.2.6
+Provides:  bundled(crate(uuid)) = 1.23.2
 Provides:  bundled(crate(vcpkg)) = 0.2.15
-Provides:  bundled(crate(wasi)) = 0.14.2+wasi_0.2.4
+Provides:  bundled(crate(wasi)) = 0.11.1+wasi_snapshot_preview1
+Provides:  bundled(crate(wasip2)) = 1.0.3+wasi_0.2.9
+Provides:  bundled(crate(wasip3)) = 0.4.0+wasi_0.3.0_rc_2026_01_06
+Provides:  bundled(crate(wasm-bindgen)) = 0.2.122
+Provides:  bundled(crate(wasm-bindgen-macro)) = 0.2.122
+Provides:  bundled(crate(wasm-bindgen-macro-support)) = 0.2.122
+Provides:  bundled(crate(wasm-bindgen-shared)) = 0.2.122
+Provides:  bundled(crate(wasm-encoder)) = 0.244.0
+Provides:  bundled(crate(wasm-metadata)) = 0.244.0
+Provides:  bundled(crate(wasmparser)) = 0.244.0
 Provides:  bundled(crate(winapi)) = 0.3.9
 Provides:  bundled(crate(winapi-i686-pc-windows-gnu)) = 0.4.0
-Provides:  bundled(crate(winapi-util)) = 0.1.9
+Provides:  bundled(crate(winapi-util)) = 0.1.11
 Provides:  bundled(crate(winapi-x86_64-pc-windows-gnu)) = 0.4.0
-Provides:  bundled(crate(windows-sys)) = 0.59.0
-Provides:  bundled(crate(windows-targets)) = 0.52.6
-Provides:  bundled(crate(windows_aarch64_gnullvm)) = 0.52.6
-Provides:  bundled(crate(windows_aarch64_msvc)) = 0.52.6
-Provides:  bundled(crate(windows_i686_gnu)) = 0.52.6
-Provides:  bundled(crate(windows_i686_gnullvm)) = 0.52.6
-Provides:  bundled(crate(windows_i686_msvc)) = 0.52.6
-Provides:  bundled(crate(windows_x86_64_gnu)) = 0.52.6
-Provides:  bundled(crate(windows_x86_64_gnullvm)) = 0.52.6
-Provides:  bundled(crate(windows_x86_64_msvc)) = 0.52.6
-Provides:  bundled(crate(wit-bindgen-rt)) = 0.39.0
-Provides:  bundled(crate(zeroize)) = 1.8.1
-Provides:  bundled(crate(zeroize_derive)) = 1.4.2
-Provides:  bundled(npm(@eslint-community/eslint-utils)) = 4.4.1
-Provides:  bundled(npm(@eslint-community/regexpp)) = 4.12.1
-Provides:  bundled(npm(@eslint/eslintrc)) = 2.1.4
-Provides:  bundled(npm(@eslint/js)) = 8.57.1
+Provides:  bundled(crate(windows-link)) = 0.2.1
+Provides:  bundled(crate(windows-sys)) = 0.61.2
+Provides:  bundled(crate(wit-bindgen)) = 0.57.1
+Provides:  bundled(crate(wit-bindgen-core)) = 0.51.0
+Provides:  bundled(crate(wit-bindgen-rust)) = 0.51.0
+Provides:  bundled(crate(wit-bindgen-rust-macro)) = 0.51.0
+Provides:  bundled(crate(wit-component)) = 0.244.0
+Provides:  bundled(crate(wit-parser)) = 0.244.0
+Provides:  bundled(crate(zeroize)) = 1.8.2
+Provides:  bundled(crate(zeroize_derive)) = 1.4.3
+Provides:  bundled(crate(zmij)) = 1.0.21
 Provides:  bundled(npm(@fortawesome/fontawesome-common-types)) = 0.2.36
 Provides:  bundled(npm(@fortawesome/fontawesome-svg-core)) = 1.2.36
 Provides:  bundled(npm(@fortawesome/free-solid-svg-icons)) = 5.15.4
 Provides:  bundled(npm(@fortawesome/react-fontawesome)) = 0.1.19
-Provides:  bundled(npm(@humanwhocodes/config-array)) = 0.13.0
-Provides:  bundled(npm(@humanwhocodes/module-importer)) = 1.0.1
-Provides:  bundled(npm(@humanwhocodes/object-schema)) = 2.0.3
-Provides:  bundled(npm(@nodelib/fs.scandir)) = 2.1.5
-Provides:  bundled(npm(@nodelib/fs.stat)) = 2.0.5
-Provides:  bundled(npm(@nodelib/fs.walk)) = 1.2.8
 Provides:  bundled(npm(@patternfly/patternfly)) = 5.4.1
 Provides:  bundled(npm(@patternfly/react-charts)) = 7.4.3
 Provides:  bundled(npm(@patternfly/react-core)) = 5.4.1
@@ -212,39 +217,25 @@ Provides:  bundled(npm(@patternfly/react-log-viewer)) = 5.3.0
 Provides:  bundled(npm(@patternfly/react-styles)) = 5.4.0
 Provides:  bundled(npm(@patternfly/react-table)) = 5.4.1
 Provides:  bundled(npm(@patternfly/react-tokens)) = 5.4.0
-Provides:  bundled(npm(@types/d3-array)) = 3.2.1
+Provides:  bundled(npm(@types/d3-array)) = 3.2.2
 Provides:  bundled(npm(@types/d3-color)) = 3.1.3
 Provides:  bundled(npm(@types/d3-ease)) = 3.0.2
 Provides:  bundled(npm(@types/d3-interpolate)) = 3.0.4
-Provides:  bundled(npm(@types/d3-path)) = 3.1.0
-Provides:  bundled(npm(@types/d3-scale)) = 4.0.8
-Provides:  bundled(npm(@types/d3-shape)) = 3.1.6
-Provides:  bundled(npm(@types/d3-time)) = 3.0.3
+Provides:  bundled(npm(@types/d3-path)) = 3.1.1
+Provides:  bundled(npm(@types/d3-scale)) = 4.0.9
+Provides:  bundled(npm(@types/d3-shape)) = 3.1.8
+Provides:  bundled(npm(@types/d3-time)) = 3.0.4
 Provides:  bundled(npm(@types/d3-timer)) = 3.0.2
-Provides:  bundled(npm(@ungap/structured-clone)) = 1.2.0
 Provides:  bundled(npm(@xterm/addon-canvas)) = 0.7.0
 Provides:  bundled(npm(@xterm/xterm)) = 5.5.0
-Provides:  bundled(npm(acorn)) = 8.14.0
-Provides:  bundled(npm(acorn-jsx)) = 5.3.2
-Provides:  bundled(npm(ajv)) = 6.12.6
-Provides:  bundled(npm(ansi-regex)) = 5.0.1
-Provides:  bundled(npm(ansi-styles)) = 4.3.0
-Provides:  bundled(npm(argparse)) = 2.0.1
-Provides:  bundled(npm(attr-accept)) = 2.2.4
+Provides:  bundled(npm(argparse)) = 1.0.10
+Provides:  bundled(npm(attr-accept)) = 2.2.5
 Provides:  bundled(npm(autolinker)) = 3.16.2
-Provides:  bundled(npm(balanced-match)) = 1.0.2
-Provides:  bundled(npm(brace-expansion)) = 1.1.12
-Provides:  bundled(npm(callsites)) = 3.1.0
-Provides:  bundled(npm(chalk)) = 4.1.2
-Provides:  bundled(npm(color-convert)) = 2.0.1
-Provides:  bundled(npm(color-name)) = 1.1.4
-Provides:  bundled(npm(concat-map)) = 0.0.1
 Provides:  bundled(npm(core-util-is)) = 1.0.3
-Provides:  bundled(npm(cross-spawn)) = 7.0.6
 Provides:  bundled(npm(d3-array)) = 3.2.4
 Provides:  bundled(npm(d3-color)) = 3.1.0
 Provides:  bundled(npm(d3-ease)) = 3.0.1
-Provides:  bundled(npm(d3-format)) = 3.1.0
+Provides:  bundled(npm(d3-format)) = 3.1.2
 Provides:  bundled(npm(d3-interpolate)) = 3.0.1
 Provides:  bundled(npm(d3-path)) = 3.1.0
 Provides:  bundled(npm(d3-scale)) = 4.0.2
@@ -252,142 +243,69 @@ Provides:  bundled(npm(d3-shape)) = 3.2.0
 Provides:  bundled(npm(d3-time)) = 3.1.0
 Provides:  bundled(npm(d3-time-format)) = 4.1.0
 Provides:  bundled(npm(d3-timer)) = 3.0.1
-Provides:  bundled(npm(debug)) = 4.3.7
-Provides:  bundled(npm(deep-is)) = 0.1.4
 Provides:  bundled(npm(delaunator)) = 4.0.1
 Provides:  bundled(npm(delaunay-find)) = 0.0.6
 Provides:  bundled(npm(dequal)) = 2.0.3
-Provides:  bundled(npm(doctrine)) = 3.0.0
 Provides:  bundled(npm(encoding)) = 0.1.13
-Provides:  bundled(npm(escape-string-regexp)) = 4.0.0
-Provides:  bundled(npm(eslint)) = 8.57.1
-Provides:  bundled(npm(eslint-plugin-react-hooks)) = 4.6.2
-Provides:  bundled(npm(eslint-scope)) = 7.2.2
-Provides:  bundled(npm(eslint-visitor-keys)) = 3.4.3
-Provides:  bundled(npm(espree)) = 9.6.1
-Provides:  bundled(npm(esquery)) = 1.6.0
-Provides:  bundled(npm(esrecurse)) = 4.3.0
-Provides:  bundled(npm(estraverse)) = 5.3.0
-Provides:  bundled(npm(esutils)) = 2.0.3
-Provides:  bundled(npm(fast-deep-equal)) = 3.1.3
-Provides:  bundled(npm(fast-json-stable-stringify)) = 2.1.0
-Provides:  bundled(npm(fast-levenshtein)) = 2.0.6
-Provides:  bundled(npm(fastq)) = 1.17.1
-Provides:  bundled(npm(file-entry-cache)) = 6.0.1
-Provides:  bundled(npm(file-selector)) = 2.1.0
-Provides:  bundled(npm(find-up)) = 5.0.0
-Provides:  bundled(npm(flat-cache)) = 3.2.0
-Provides:  bundled(npm(flatted)) = 3.3.1
+Provides:  bundled(npm(file-selector)) = 2.1.2
 Provides:  bundled(npm(focus-trap)) = 7.5.4
-Provides:  bundled(npm(fs.realpath)) = 1.0.0
 Provides:  bundled(npm(gettext-parser)) = 2.1.0
-Provides:  bundled(npm(glob)) = 7.2.3
-Provides:  bundled(npm(glob-parent)) = 6.0.2
-Provides:  bundled(npm(globals)) = 13.24.0
-Provides:  bundled(npm(graphemer)) = 1.4.0
-Provides:  bundled(npm(has-flag)) = 4.0.0
 Provides:  bundled(npm(hoist-non-react-statics)) = 3.3.2
 Provides:  bundled(npm(iconv-lite)) = 0.6.3
-Provides:  bundled(npm(ignore)) = 5.3.2
-Provides:  bundled(npm(import-fresh)) = 3.3.0
-Provides:  bundled(npm(imurmurhash)) = 0.1.4
-Provides:  bundled(npm(inflight)) = 1.0.6
 Provides:  bundled(npm(inherits)) = 2.0.4
 Provides:  bundled(npm(internmap)) = 2.0.3
-Provides:  bundled(npm(is-extglob)) = 2.1.1
-Provides:  bundled(npm(is-glob)) = 4.0.3
-Provides:  bundled(npm(is-path-inside)) = 3.0.3
 Provides:  bundled(npm(isarray)) = 1.0.0
-Provides:  bundled(npm(isexe)) = 2.0.0
 Provides:  bundled(npm(js-sha1)) = 0.7.0
 Provides:  bundled(npm(js-sha256)) = 0.11.0
 Provides:  bundled(npm(js-tokens)) = 4.0.0
-Provides:  bundled(npm(js-yaml)) = 4.1.1
-Provides:  bundled(npm(json-buffer)) = 3.0.1
-Provides:  bundled(npm(json-schema-traverse)) = 0.4.1
 Provides:  bundled(npm(json-stable-stringify-without-jsonify)) = 1.0.1
 Provides:  bundled(npm(json-stringify-safe)) = 5.0.1
-Provides:  bundled(npm(keyv)) = 4.5.4
-Provides:  bundled(npm(levn)) = 0.4.1
-Provides:  bundled(npm(locate-path)) = 6.0.0
-Provides:  bundled(npm(lodash)) = 4.17.21
-Provides:  bundled(npm(lodash.merge)) = 4.6.2
+Provides:  bundled(npm(lodash)) = 4.18.1
 Provides:  bundled(npm(loose-envify)) = 1.4.0
 Provides:  bundled(npm(memoize-one)) = 5.2.1
-Provides:  bundled(npm(minimatch)) = 3.1.2
-Provides:  bundled(npm(ms)) = 2.1.3
-Provides:  bundled(npm(natural-compare)) = 1.4.0
 Provides:  bundled(npm(object-assign)) = 4.1.1
-Provides:  bundled(npm(once)) = 1.4.0
-Provides:  bundled(npm(optionator)) = 0.9.4
-Provides:  bundled(npm(p-limit)) = 3.1.0
-Provides:  bundled(npm(p-locate)) = 5.0.0
-Provides:  bundled(npm(parent-module)) = 1.0.1
-Provides:  bundled(npm(path-exists)) = 4.0.0
-Provides:  bundled(npm(path-is-absolute)) = 1.0.1
-Provides:  bundled(npm(path-key)) = 3.1.1
-Provides:  bundled(npm(prelude-ls)) = 1.2.1
-Provides:  bundled(npm(prettier)) = 3.3.3
+Provides:  bundled(npm(prettier)) = 3.8.3
 Provides:  bundled(npm(process-nextick-args)) = 2.0.1
 Provides:  bundled(npm(prop-types)) = 15.8.1
-Provides:  bundled(npm(punycode)) = 2.3.1
-Provides:  bundled(npm(queue-microtask)) = 1.2.3
 Provides:  bundled(npm(react)) = 18.3.1
 Provides:  bundled(npm(react-dom)) = 18.3.1
-Provides:  bundled(npm(react-dropzone)) = 14.3.5
+Provides:  bundled(npm(react-dropzone)) = 14.4.1
 Provides:  bundled(npm(react-fast-compare)) = 3.2.2
 Provides:  bundled(npm(react-is)) = 16.13.1
 Provides:  bundled(npm(readable-stream)) = 2.3.8
 Provides:  bundled(npm(remarkable)) = 2.0.1
-Provides:  bundled(npm(resolve-from)) = 4.0.0
-Provides:  bundled(npm(reusify)) = 1.0.4
-Provides:  bundled(npm(rimraf)) = 3.0.2
-Provides:  bundled(npm(run-parallel)) = 1.2.0
 Provides:  bundled(npm(safe-buffer)) = 5.2.1
 Provides:  bundled(npm(safer-buffer)) = 2.1.2
 Provides:  bundled(npm(scheduler)) = 0.23.2
-Provides:  bundled(npm(shebang-command)) = 2.0.0
-Provides:  bundled(npm(shebang-regex)) = 3.0.0
 Provides:  bundled(npm(sprintf-js)) = 1.0.3
 Provides:  bundled(npm(string_decoder)) = 1.1.1
-Provides:  bundled(npm(strip-ansi)) = 6.0.1
-Provides:  bundled(npm(strip-json-comments)) = 3.1.1
-Provides:  bundled(npm(supports-color)) = 7.2.0
-Provides:  bundled(npm(tabbable)) = 6.2.0
-Provides:  bundled(npm(text-table)) = 0.2.0
+Provides:  bundled(npm(tabbable)) = 6.4.0
 Provides:  bundled(npm(throttle-debounce)) = 5.0.2
 Provides:  bundled(npm(tslib)) = 2.8.1
-Provides:  bundled(npm(type-check)) = 0.4.0
-Provides:  bundled(npm(type-fest)) = 0.20.2
-Provides:  bundled(npm(uri-js)) = 4.4.1
 Provides:  bundled(npm(util-deprecate)) = 1.0.2
-Provides:  bundled(npm(uuid)) = 10.0.0
-Provides:  bundled(npm(victory-area)) = 37.3.1
-Provides:  bundled(npm(victory-axis)) = 37.3.1
-Provides:  bundled(npm(victory-bar)) = 37.3.1
-Provides:  bundled(npm(victory-box-plot)) = 37.3.1
-Provides:  bundled(npm(victory-brush-container)) = 37.3.1
-Provides:  bundled(npm(victory-chart)) = 37.3.1
-Provides:  bundled(npm(victory-core)) = 37.3.1
-Provides:  bundled(npm(victory-create-container)) = 37.3.1
-Provides:  bundled(npm(victory-cursor-container)) = 37.3.1
-Provides:  bundled(npm(victory-group)) = 37.3.1
-Provides:  bundled(npm(victory-legend)) = 37.3.1
-Provides:  bundled(npm(victory-line)) = 37.3.1
-Provides:  bundled(npm(victory-pie)) = 37.3.1
-Provides:  bundled(npm(victory-polar-axis)) = 37.3.1
-Provides:  bundled(npm(victory-scatter)) = 37.3.1
-Provides:  bundled(npm(victory-selection-container)) = 37.3.1
-Provides:  bundled(npm(victory-shared-events)) = 37.3.1
-Provides:  bundled(npm(victory-stack)) = 37.3.1
-Provides:  bundled(npm(victory-tooltip)) = 37.3.1
-Provides:  bundled(npm(victory-vendor)) = 37.3.1
-Provides:  bundled(npm(victory-voronoi-container)) = 37.3.1
-Provides:  bundled(npm(victory-zoom-container)) = 37.3.1
-Provides:  bundled(npm(which)) = 2.0.2
-Provides:  bundled(npm(word-wrap)) = 1.2.5
-Provides:  bundled(npm(wrappy)) = 1.0.2
-Provides:  bundled(npm(yocto-queue)) = 0.1.0
+Provides:  bundled(npm(uuid)) = 14.0.0
+Provides:  bundled(npm(victory-area)) = 37.3.6
+Provides:  bundled(npm(victory-axis)) = 37.3.6
+Provides:  bundled(npm(victory-bar)) = 37.3.6
+Provides:  bundled(npm(victory-box-plot)) = 37.3.6
+Provides:  bundled(npm(victory-brush-container)) = 37.3.6
+Provides:  bundled(npm(victory-chart)) = 37.3.6
+Provides:  bundled(npm(victory-core)) = 37.3.6
+Provides:  bundled(npm(victory-create-container)) = 37.3.6
+Provides:  bundled(npm(victory-cursor-container)) = 37.3.6
+Provides:  bundled(npm(victory-group)) = 37.3.6
+Provides:  bundled(npm(victory-legend)) = 37.3.6
+Provides:  bundled(npm(victory-line)) = 37.3.6
+Provides:  bundled(npm(victory-pie)) = 37.3.6
+Provides:  bundled(npm(victory-polar-axis)) = 37.3.6
+Provides:  bundled(npm(victory-scatter)) = 37.3.6
+Provides:  bundled(npm(victory-selection-container)) = 37.3.6
+Provides:  bundled(npm(victory-shared-events)) = 37.3.6
+Provides:  bundled(npm(victory-stack)) = 37.3.6
+Provides:  bundled(npm(victory-tooltip)) = 37.3.6
+Provides:  bundled(npm(victory-vendor)) = 37.3.6
+Provides:  bundled(npm(victory-voronoi-container)) = 37.3.6
+Provides:  bundled(npm(victory-zoom-container)) = 37.3.6
 ##### Bundled cargo crates list - END #####
 
 # Attach the buildrequires to the top level package:
@@ -431,6 +349,9 @@ BuildRequires:    libdb-devel
 BuildRequires:    net-snmp-devel
 BuildRequires:    bzip2-devel
 BuildRequires:    openssl-devel
+%if %{with hibp}
+BuildRequires:    libcurl-devel
+%endif
 # the following is for the pam passthru auth plug-in
 BuildRequires:    pam-devel
 BuildRequires:    systemd-units
@@ -447,6 +368,7 @@ BuildRequires:    pkgconfig(libpcre2-8)
 BuildRequires:    autoconf
 BuildRequires:    automake
 BuildRequires:    libtool
+BuildRequires:    make
 # For our documentation
 BuildRequires:    doxygen
 # For tests!
@@ -457,8 +379,8 @@ BuildRequires:    python%{python3_pkgversion}-devel
 # For cockpit
 %if %{with cockpit}
 BuildRequires:    rsync
-BuildRequires:    npm
-BuildRequires:    nodejs
+BuildRequires:    /usr/bin/npm
+BuildRequires:    /usr/bin/node
 %endif
 
 # For autosetup -S git
@@ -517,36 +439,16 @@ Source0:          https://github.com/389ds/%{name}/releases/download/%{name}-%{v
 Source2:          %{name}-devel.README
 %if %{with bundle_jemalloc}
 Source3:          https://github.com/jemalloc/%{jemalloc_name}/releases/download/%{jemalloc_ver}/%{jemalloc_name}-%{jemalloc_ver}.tar.bz2
+Source10:          jemalloc-5.3.0_throw_bad_alloc.patch
 %endif
 Source4:          389-ds-base.sysusers
 %if %{with bundle_libdb}
 Source5:          https://fedorapeople.org/groups/389ds/libdb-5.3.28-59.tar.bz2
 %endif
 
-Patch:            0001-Issue-7150-Compressed-access-log-rotations-skipped-a.patch
-Patch:            0002-Sync-lib389-version-to-3.1.4-7161.patch
-Patch:            0003-Issue-7166-db_config_set-asserts-because-of-dynamic-.patch
-Patch:            0004-Issue-7160-Add-lib389-version-sync-check-to-configur.patch
-Patch:            0005-Issue-7096-During-replication-online-total-init-the-.patch
-Patch:            0006-Issue-Revise-paged-result-search-locking.patch
-Patch:            0007-Issue-7108-Fix-shutdown-crash-in-entry-cache-destruc.patch
-Patch:            0008-Issue-7172-Index-ordering-mismatch-after-upgrade-717.patch
-Patch:            0009-Issue-7172-2nd-Index-ordering-mismatch-after-upgrade.patch
-Patch:            0010-Bump-lodash-from-4.17.21-to-4.17.23-in-src-cockpit-3.patch
-Patch:            0011-Issue-7189-DSBLE0007-generates-incorrect-remediation.patch
-Patch:            0012-Issue-7198-Web-console-doesn-t-show-sub-suffix-when-.patch
-Patch:            0013-Issue-7184-argparse.HelpFormatter-_format_actions_us.patch
-Patch:            0014-Issue-7027-2nd-389-ds-base-OpenScanHub-Leaks-Detecte.patch
-Patch:            0015-Issue-7213-MDB_BAD_VALSIZE-error-while-handling-VLV-.patch
-Patch:            0016-Issue-7194-Repl-Log-Analysis-Add-CSN-propagation-det.patch
-Patch:            0017-Issue-7224-CI-Test-Simplify-test_reserve_descriptor_.patch
-Patch:            0018-Issue-7223-Revert-index-scan-limits-for-system-index.patch
-Patch:            0019-Issue-7223-Add-upgrade-function-to-remove-nsIndexIDL.patch
-Patch:            0020-Issue-7223-Add-upgrade-function-to-remove-ancestorid.patch
-Patch:            0021-Issue-7223-Detect-and-log-index-ordering-mismatch-du.patch
-Patch:            0022-Issue-7223-Add-dsctl-index-check-command-for-offline.patch
-Patch:            0023-Issue-7184-2nd-argparse.HelpFormatter-_format_action.patch
-Patch:            0024-Issue-7223-Use-lexicographical-order-for-ancestorid-.patch
+Source6:          vendor-%{version}-1.tar.gz
+Source7:          Cargo-%{version}-1.lock
+Source8:          cockpit_dist-%{version}-1.tar.bz2
 
 %description
 389 Directory Server is an LDAPv3 compliant server.  The base package includes
@@ -560,7 +462,7 @@ Please see http://seclists.org/oss-sec/2016/q1/363 for more information.
 %if %{with libbdb_ro}
 %package        robdb-libs
 Summary:        Read-only Berkeley Database Library
-License:        GPL-2.0-or-later OR LGPL-2.1-or-later
+License:          GPL-3.0-or-later WITH GPL-3.0-389-ds-base-exception AND (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT) AND (Apache-2.0 OR LGPL-2.1-or-later OR MIT) AND (Apache-2.0 OR MIT) AND (CC-BY-4.0 AND MIT) AND (MIT OR Apache-2.0) AND Unicode-3.0 AND (MIT OR Unlicense) AND 0BSD AND Apache-2.0 AND BSD-3-Clause AND ISC AND MIT AND MIT AND ISC AND MPL-2.0 AND Zlib
 
 %description    robdb-libs
 The %{name}-robdb-lib package contains a library derived from rpm
@@ -680,6 +582,13 @@ cd src/lib389
 
 %prep
 %autosetup -S git -p1 -n %{name}-%{version}
+%if %{defined SOURCE6}
+rm -rf vendor
+tar xzf %{SOURCE6}
+%endif
+%if %{defined SOURCE7}
+cp %{SOURCE7} src/Cargo.lock
+%endif
 
 %if %{with bundle_jemalloc}
 %setup -q -n %{name}-%{version} -T -D -b 3
@@ -687,6 +596,11 @@ cd src/lib389
 
 %if %{with bundle_libdb}
 %setup -q -n %{name}-%{version} -T -D -b 5
+%endif
+
+%if %{defined SOURCE8}
+# Unpack prebuilt cockpit files
+tar xvjf %{SOURCE8} -C src/cockpit/389-console
 %endif
 
 cp %{SOURCE2} README.devel
@@ -743,6 +657,7 @@ COCKPIT_FLAGS="--disable-cockpit"
 
 # Build jemalloc
 pushd ../%{jemalloc_name}-%{jemalloc_ver}
+patch -p1 -F3 < %{SOURCE10}
 %configure \
         --libdir=%{_libdir}/%{pkgname}/lib \
         --bindir=%{_libdir}/%{pkgname}/bin \
@@ -757,8 +672,8 @@ mkdir -p ../%{libdb_base_version}
 pushd ../%{libdb_base_version}
 tar -xjf  %{_topdir}/SOURCES/%{libdb_full_version}.tar.bz2
 mv %{libdb_full_version} SOURCES
-sed -i -e '/^CFLAGS=/s/-fno-strict-aliasing/& -std=gnu99/' %{_builddir}/%{name}-%{version}/rpm/bundle-libdb.spec
-rpmbuild  --define "_topdir $PWD" -bc %{_builddir}/%{name}-%{version}/rpm/bundle-libdb.spec
+sed -i -e '/^CFLAGS=/s/-fno-strict-aliasing/& -std=gnu99/' %{_builddir}/%{name}-%{version}/rpm/bundle-libdb.spec.in
+rpmbuild  --define "_topdir $PWD" -bc %{_builddir}/%{name}-%{version}/rpm/bundle-libdb.spec.in
 popd
 %endif
 
@@ -783,6 +698,9 @@ autoreconf -fiv
            $ASAN_FLAGS $MSAN_FLAGS $TSAN_FLAGS $UBSAN_FLAGS $RUST_FLAGS $CLANG_FLAGS $COCKPIT_FLAGS \
 %if 0%{?fedora} >= 34 || 0%{?rhel} >= 9
            --with-libldap-r=no \
+%endif
+%if %{with hibp}
+	  --enable-hibp \
 %endif
            --enable-cmocka
 
@@ -935,9 +853,6 @@ for dir in "$instbase"/slapd-* ; do
     else
        echo "instance $inst is not running" >> "$output" 2>&1 || :
     fi
-    # Run index-check on all instances (running or not)
-    # This fixes index ordering mismatches from older versions
-    dsctl "$inst_name" index-check --fix >> "$output2" 2>&1 || :
     ninst=$((ninst + 1))
 done
 
@@ -971,8 +886,6 @@ fi
 
 %postun snmp
 %systemd_postun_with_restart %{pkgname}-snmp.service
-
-exit 0
 
 %files -f plugins.list
 %if %{with bundle_jemalloc}
@@ -1123,51 +1036,64 @@ exit 0
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.1.4-10
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 3.2.2-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.1.4-9
-- build: mass rebuild auto-bumpable components
+* Thu Jun 04 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.2-1
+- Bump version to 3.2.2
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 3.1.4-8
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Mar 04 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-15
+- Revert patch for Issue 7271
 
-* Fri Feb 13 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-7
+* Mon Mar 02 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-14
+- Resolves: CVE-2025-14905
+
+* Mon Feb 16 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-13
 - Issue 7253 - ipa-backup broken with python3-libs-3.14.3-1.fc43
 
-* Wed Feb 11 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-6
-- Add missing upgrade steps to %%post
-
-* Tue Feb 10 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-5
+* Tue Feb 10 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-10
 - Fix system index configuration issues
 
-* Mon Jan 12 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-4
-- Fix broken FreeIPA upgrade and replication issues
-- Issue 7172 - Index ordering mismatch after upgrade (#7180)
+* Fri Jan 30 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 3.2.0-9
+- Update nodejs dependencies
 
-* Fri Jan 09 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-3
+* Fri Jan 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 3.2.0-8
+- Rebuilt for net-snmp 5.9.5.2
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-5
+- Fix broken FreeIPA upgrade and replication issues
+- Resolves: rhbz#2424132 Upgrade from freeipa-4.12.5-3 and 390-ds-
+  base-3.1.3-10 to latest rawhide fails
+
+* Fri Jan 09 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-4
 - Correct License: string for robdb-libs
 
-* Fri Jan 09 2026 Viktor Ashirov <vashirov@redhat.com> - 3.1.4-2
+* Fri Jan 09 2026 Viktor Ashirov <vashirov@redhat.com> - 3.2.0-3
 - Fix broken FreeIPA upgrade and replication issues
-- Issue 7172 - Index ordering mismatch after upgrade (#7173)
-- Issue 7108 - Fix shutdown crash in entry cache destruction (#7163)
-- Issue - Revise paged result search locking
+- Resolves: rhbz#2424132 Upgrade from freeipa-4.12.5-3 and 390-ds-
+  base-3.1.3-10 to latest rawhide fails
+- Fix jemalloc compilation issue with GCC 15
 - Issue 7096 - During replication online total init the function
-  idl_id_is_in_idlist is not scaling with large database (#7145)
-- Issue 7160 - Add lib389 version sync check to configure (#7165)
-- Issue 7166 - db_config_set asserts because of dynamic list (#7167)
-- Sync lib389 version to 3.1.4 (#7161)
-- Issue 7150 - Compressed access log rotations skipped, accesslog-list out
-  of sync (#7151)
+  idl_id_is_in_idlist is not scaling with large database
+- Issue 7118 - Revise paged result search locking
+- Issue 7108 - Fix shutdown crash in entry cache destruction
 
-* Tue Dec 16 2025 Mark Reynolds <mreynolds@redhat.com> - 3.1.4-1
+* Wed Dec 24 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 3.2.0-2
+- Restore libdb in sources
+
+* Tue Dec 16 2025 Mark Reynolds <mreynolds@redhat.com> - 3.2.0-1
 - Issue 7147 - entrycache_eviction_test is failing (#7148)
 
-* Fri Sep 19 2025 Viktor Ashirov <vashirov@redhat.com> - 3.1.3-10
-- Rebuild for Python 3.14.0rc3
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.1.3-10
+- Rebuilt for Python 3.14.0rc3 bytecode
 
-* Thu Aug 21 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 3.1.3-9
+* Wed Aug 20 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 3.1.3-9
 - Fix build --with-bundle-libdb, enable for ELN
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 3.1.3-8

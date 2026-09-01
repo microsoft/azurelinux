@@ -4,8 +4,8 @@
 %bcond_without check
 
 Name:           libarchive
-Version:        3.8.4
-Release: 4%{?dist}
+Version:        3.8.8
+Release:        1%{?dist}
 Summary:        A library for handling streaming archive formats
 
 # Licenses:
@@ -243,9 +243,32 @@ run_testsuite
 
 
 %changelog
+* Tue Jun 23 2026 Packit <hello@packit.dev> - 3.8.8-1
+- Update to version 3.8.8
+- Resolves: rhbz#2491650
+
+* Mon Apr 13 2026 Packit <hello@packit.dev> - 3.8.7-1
+- Update to version 3.8.7
+- Resolves: rhbz#2457948
+
+* Tue Mar 10 2026 Packit <hello@packit.dev> - 3.8.6-1
+- Update to version 3.8.6
+- Resolves: rhbz#2427134
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Dec 05 2025 Packit <hello@packit.dev> - 3.8.4-1
 - Update to version 3.8.4
 - Resolves: rhbz#2419348
+
+* Tue Nov 18 2025 Packit <hello@packit.dev> - 3.8.3-1
+- Update to version 3.8.3
+- Resolves: rhbz#2415531
+
+* Fri Oct 17 2025 Packit <hello@packit.dev> - 3.8.2-1
+- Update to version 3.8.2
+- Resolves: rhbz#2404317
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

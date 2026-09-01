@@ -3,14 +3,13 @@
 
 Name:           python-configobj
 Version:        5.0.9
-Release: 10%{?dist}
+Release:        9%{?dist}
 Summary:        Config file reading, writing, and validation
 License:        BSD-3-Clause
 URL:            http://configobj.readthedocs.org/
 Source0:        https://pypi.python.org/packages/source/c/configobj/configobj-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-pytest
 %global _description \
 ConfigObj is a simple but powerful configuration file reader and writer: an ini\
@@ -20,32 +19,39 @@ straightforward programmers interface and a simple syntax for config files.
 
 %package     -n python%{python3_pkgversion}-configobj
 Summary:        %{summary}
-%{?python_provide:%python_provide python%{python3_pkgversion}-configobj}
 %description -n python%{python3_pkgversion}-configobj %_description
 
 %prep
 %autosetup -p1 -n configobj-%{version}
 
+%generate_buildrequires
+%pyproject_buildrequires
+
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files -l configobj validate
 
 %check
+%pyproject_check_import
+
 export PYTHONPATH=$(pwd)/build/lib
 %{__python3} src/tests/configobj_doctests.py
 %{__python3} -m configobj.validate
 %pytest -c setup.cfg --color=yes
 
-%files -n python%{python3_pkgversion}-configobj
+%files -n python%{python3_pkgversion}-configobj -f %{pyproject_files}
 %doc README.md
-%license LICENSE
-%{python3_sitelib}/configobj
-%{python3_sitelib}/validate
-%{python3_sitelib}/configobj-%{version}-py%{python3_version}.egg-info
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.0.9-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Sep 28 2025 Terje Rosten <terjeros@gmail.com> - 5.0.9-8
+- Use modern macros
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 5.0.9-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

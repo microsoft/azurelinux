@@ -1,0 +1,489 @@
+commit b7c22497712be6751fbefe155533ae34d5e381f5
+Author: Spiros Tsalikis <spiros.tsalikis@kitware.com>
+Date:   Thu May 22 12:30:19 2025 -0400
+
+    Tcl/Tk: Support version 9.0.0
+
+diff --git a/Rendering/Tk/vtkTkImageViewerWidget.cxx b/Rendering/Tk/vtkTkImageViewerWidget.cxx
+index 43c7a48a13..9d2c4210de 100644
+--- a/Rendering/Tk/vtkTkImageViewerWidget.cxx
++++ b/Rendering/Tk/vtkTkImageViewerWidget.cxx
+@@ -23,6 +23,17 @@
+ #include <algorithm>
+ #include <cstdlib>
+ 
++#if (TCL_MAJOR_VERSION >= 9)
++#define VTK_TCL_CONST const
++#elif ((TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4))
++#define VTK_TCL_CONST CONST84
++#else
++#define VTK_TCL_CONST
++#endif
++#ifndef offsetof
++#define offsetof(type, field) ((size_t)((char*)&((type*)0)->field))
++#endif
++
+ #define VTK_ALL_EVENTS_MASK                                                                        \
+   KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | EnterWindowMask |          \
+     LeaveWindowMask | PointerMotionMask | ExposureMask | VisibilityChangeMask | FocusChangeMask |  \
+@@ -32,14 +43,14 @@
+ // or with the command configure.  The only new one is "-rw" which allows
+ // the uses to set their own ImageViewer window.
+ static Tk_ConfigSpec vtkTkImageViewerWidgetConfigSpecs[] = {
+-  { TK_CONFIG_PIXELS, (char*)"-height", (char*)"height", (char*)"Height", (char*)"400",
+-    Tk_Offset(struct vtkTkImageViewerWidget, Height), 0, nullptr },
++  { TK_CONFIG_PIXELS, "-height", "height", "Height", "400",
++    offsetof(struct vtkTkImageViewerWidget, Height), 0, nullptr },
+ 
+-  { TK_CONFIG_PIXELS, (char*)"-width", (char*)"width", (char*)"Width", (char*)"400",
+-    Tk_Offset(struct vtkTkImageViewerWidget, Width), 0, nullptr },
++  { TK_CONFIG_PIXELS, "-width", "width", "Width", "400",
++    offsetof(struct vtkTkImageViewerWidget, Width), 0, nullptr },
+ 
+-  { TK_CONFIG_STRING, (char*)"-iv", (char*)"iv", (char*)"IV", (char*)"",
+-    Tk_Offset(struct vtkTkImageViewerWidget, IV), 0, nullptr },
++  { TK_CONFIG_STRING, "-iv", "iv", "IV", "", offsetof(struct vtkTkImageViewerWidget, IV), 0,
++    nullptr },
+ 
+   { TK_CONFIG_END, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr }
+ };
+@@ -56,17 +67,22 @@ extern int vtkImageViewerCommand(ClientData cd, Tcl_Interp* interp, int argc, ch
+ //------------------------------------------------------------------------------
+ // It's possible to change with this function or in a script some
+ // options like width, height or the ImageViewer widget.
+-int vtkTkImageViewerWidget_Configure(
+-  Tcl_Interp* interp, struct vtkTkImageViewerWidget* self, int argc, char* argv[], int flags)
++#if (TCL_MAJOR_VERSION >= 9)
++int vtkTkImageViewerWidget_Configure(Tcl_Interp* interp, struct vtkTkImageViewerWidget* self,
++  Tcl_Size objc, Tcl_Obj* const* objv, int flags)
++#else
++int vtkTkImageViewerWidget_Configure(Tcl_Interp* interp, struct vtkTkImageViewerWidget* self,
++  int argc, VTK_TCL_CONST char* argv[], int flags)
++#endif
+ {
+   // Let Tk handle generic configure options.
+-  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkImageViewerWidgetConfigSpecs, argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-        const_cast<CONST84 char**>(argv),
++#if (TCL_MAJOR_VERSION >= 9)
++  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkImageViewerWidgetConfigSpecs, objc, objv,
++        (void*)self, flags) == TCL_ERROR)
+ #else
+-        argv,
+-#endif
++  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkImageViewerWidgetConfigSpecs, argc, argv,
+         (char*)self, flags) == TCL_ERROR)
++#endif
+   {
+     return (TCL_ERROR);
+   }
+@@ -89,11 +105,8 @@ int vtkTkImageViewerWidget_Configure(
+ // to choose the appropriate method to invoke.
+ extern "C"
+ {
+-  int vtkTkImageViewerWidget_Widget(ClientData clientData, Tcl_Interp* interp, int argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char* argv[])
++  int vtkTkImageViewerWidget_Widget(
++    ClientData clientData, Tcl_Interp* interp, int argc, VTK_TCL_CONST char* argv[])
+   {
+     struct vtkTkImageViewerWidget* self = (struct vtkTkImageViewerWidget*)clientData;
+     int result = TCL_OK;
+@@ -106,7 +119,11 @@ extern "C"
+     }
+ 
+     // Make sure the widget is not deleted during this function
++#if (TCL_MAJOR_VERSION >= 9)
++    Tcl_Preserve((ClientData)self);
++#else
+     Tk_Preserve((ClientData)self);
++#endif
+ 
+     // Handle render call to the widget
+     if (strncmp(argv[1], "render", std::max<size_t>(1, strlen(argv[1]))) == 0 ||
+@@ -137,13 +154,27 @@ extern "C"
+       else
+       {
+         /* Execute a configuration change */
+-        result = vtkTkImageViewerWidget_Configure(interp, self, argc - 2,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-          const_cast<char**>(argv + 2),
++#if (TCL_MAJOR_VERSION >= 9)
++        // Convert string arguments to Tcl_Obj for TCL 9.0
++        Tcl_Obj** objv_config = (Tcl_Obj**)ckalloc((argc - 2) * sizeof(Tcl_Obj*));
++        for (int i = 0; i < argc - 2; i++)
++        {
++          objv_config[i] = Tcl_NewStringObj(argv[i + 2], -1);
++          Tcl_IncrRefCount(objv_config[i]);
++        }
++        result = vtkTkImageViewerWidget_Configure(
++          interp, self, argc - 2, objv_config, TK_CONFIG_ARGV_ONLY);
++
++        // Clean up the Tcl_Obj array
++        for (int i = 0; i < argc - 2; i++)
++        {
++          Tcl_DecrRefCount(objv_config[i]);
++        }
++        ckfree((char*)objv_config);
+ #else
+-          argv + 2,
++        result =
++          vtkTkImageViewerWidget_Configure(interp, self, argc - 2, argv + 2, TK_CONFIG_ARGV_ONLY);
+ #endif
+-          TK_CONFIG_ARGV_ONLY);
+       }
+     }
+     else if (!strcmp(argv[1], "GetImageViewer"))
+@@ -165,7 +196,11 @@ extern "C"
+     }
+ 
+     // Unlock the object so it can be deleted.
++#if (TCL_MAJOR_VERSION >= 9)
++    Tcl_Release((ClientData)self);
++#else
+     Tk_Release((ClientData)self);
++#endif
+     return result;
+   }
+ }
+@@ -181,16 +216,10 @@ extern "C"
+ //     * Configures this vtkTkImageViewerWidget for the given arguments
+ extern "C"
+ {
+-  int vtkTkImageViewerWidget_Cmd(ClientData clientData, Tcl_Interp* interp, int argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char** argv)
++  int vtkTkImageViewerWidget_Cmd(
++    ClientData clientData, Tcl_Interp* interp, int argc, VTK_TCL_CONST char** argv)
+   {
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char* name;
++    VTK_TCL_CONST char* name;
+     Tk_Window main = (Tk_Window)clientData;
+     Tk_Window tkwin;
+     struct vtkTkImageViewerWidget* self;
+@@ -233,13 +262,37 @@ extern "C"
+       vtkTkImageViewerWidget_EventProc, (ClientData)self);
+ 
+     // Configure vtkTkImageViewerWidget widget
+-    if (vtkTkImageViewerWidget_Configure(interp, self, argc - 2,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-          const_cast<char**>(argv + 2),
++#if (TCL_MAJOR_VERSION >= 9)
++    // Convert string arguments to Tcl_Obj for TCL 9.0
++    Tcl_Obj** objv_init = (Tcl_Obj**)ckalloc((argc - 2) * sizeof(Tcl_Obj*));
++    for (int i = 0; i < argc - 2; i++)
++    {
++      objv_init[i] = Tcl_NewStringObj(argv[i + 2], -1);
++      Tcl_IncrRefCount(objv_init[i]);
++    }
++
++    if (vtkTkImageViewerWidget_Configure(interp, self, argc - 2, objv_init, 0) == TCL_ERROR)
++    {
++      // Clean up before error return
++      for (int i = 0; i < argc - 2; i++)
++      {
++        Tcl_DecrRefCount(objv_init[i]);
++      }
++      ckfree((char*)objv_init);
++
++      Tk_DestroyWindow(tkwin);
++      Tcl_DeleteCommand(interp, (char*)"vtkTkImageViewerWidget");
++      return TCL_ERROR;
++    }
++
++    // Clean up the Tcl_Obj array
++    for (int i = 0; i < argc - 2; i++)
++    {
++      Tcl_DecrRefCount(objv_init[i]);
++    }
++    ckfree((char*)objv_init);
+ #else
+-          argv + 2,
+-#endif
+-          0) == TCL_ERROR)
++    if (vtkTkImageViewerWidget_Configure(interp, self, argc - 2, argv + 2, 0) == TCL_ERROR)
+     {
+       Tk_DestroyWindow(tkwin);
+       Tcl_DeleteCommand(interp, (char*)"vtkTkImageViewerWidget");
+@@ -247,6 +300,7 @@ extern "C"
+       // free(self);
+       return TCL_ERROR;
+     }
++#endif
+ 
+     Tcl_AppendResult(interp, Tk_PathName(tkwin), nullptr);
+     return TCL_OK;
+@@ -255,7 +309,11 @@ extern "C"
+ 
+ extern "C"
+ {
++#if (TCL_MAJOR_VERSION >= 9)
++  void vtkTkImageViewerWidget_Destroy(void* memPtr)
++#else
+   void vtkTkImageViewerWidget_Destroy(char* memPtr)
++#endif
+   {
+     struct vtkTkImageViewerWidget* self = (struct vtkTkImageViewerWidget*)memPtr;
+ 
+diff --git a/Rendering/Tk/vtkTkRenderWidget.cxx b/Rendering/Tk/vtkTkRenderWidget.cxx
+index 6ddaa5816a..84c940b484 100644
+--- a/Rendering/Tk/vtkTkRenderWidget.cxx
++++ b/Rendering/Tk/vtkTkRenderWidget.cxx
+@@ -29,6 +29,17 @@
+ #include <cstdlib>
+ #include <vector>
+ 
++#if (TCL_MAJOR_VERSION >= 9) || ((TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 6))
++#define VTK_TCL_CONST const
++#elif ((TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4))
++#define VTK_TCL_CONST CONST84
++#else
++#define VTK_TCL_CONST
++#endif
++#ifndef offsetof
++#define offsetof(type, field) ((size_t)((char*)&((type*)0)->field))
++#endif
++
+ // Silence warning like
+ // "dereferencing type-punned pointer will break strict-aliasing rules"
+ // it happens because this kind of expression: (long *)&ptr
+@@ -45,14 +56,13 @@
+ // or with the command configure.  The only new one is "-rw" which allows
+ // the uses to set their own render window.
+ static Tk_ConfigSpec vtkTkRenderWidgetConfigSpecs[] = {
+-  { TK_CONFIG_PIXELS, (char*)"-height", (char*)"height", (char*)"Height", (char*)"400",
+-    Tk_Offset(struct vtkTkRenderWidget, Height), 0, nullptr },
++  { TK_CONFIG_PIXELS, "-height", "height", "Height", "400",
++    offsetof(struct vtkTkRenderWidget, Height), 0, nullptr },
+ 
+-  { TK_CONFIG_PIXELS, (char*)"-width", (char*)"width", (char*)"Width", (char*)"400",
+-    Tk_Offset(struct vtkTkRenderWidget, Width), 0, nullptr },
++  { TK_CONFIG_PIXELS, "-width", "width", "Width", "400", offsetof(struct vtkTkRenderWidget, Width),
++    0, nullptr },
+ 
+-  { TK_CONFIG_STRING, (char*)"-rw", (char*)"rw", (char*)"RW", (char*)"",
+-    Tk_Offset(struct vtkTkRenderWidget, RW), 0, nullptr },
++  { TK_CONFIG_STRING, "-rw", "rw", "RW", "", offsetof(struct vtkTkRenderWidget, RW), 0, nullptr },
+ 
+   { TK_CONFIG_END, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr }
+ };
+@@ -113,11 +123,8 @@ extern "C"
+ #define VTKIMAGEDATATOTKPHOTO_CORONAL 0
+ #define VTKIMAGEDATATOTKPHOTO_SAGITTAL 1
+ #define VTKIMAGEDATATOTKPHOTO_TRANSVERSE 2
+-  int vtkImageDataToTkPhoto_Cmd(ClientData vtkNotUsed(clientData), Tcl_Interp* interp, int argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char** argv)
++  int vtkImageDataToTkPhoto_Cmd(
++    ClientData vtkNotUsed(clientData), Tcl_Interp* interp, int argc, VTK_TCL_CONST char** argv)
+   {
+     int status = 0;
+     vtkImageData* image;
+@@ -330,8 +337,14 @@ extern "C"
+         block.offset[3] = 3;
+         break;
+     }
++#if (TCL_MAJOR_VERSION >= 9)
++    Tk_PhotoSetSize(interp, photo, block.width, block.height);
++    Tk_PhotoPutBlock(
++      interp, photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
++#else
+     Tk_PhotoSetSize(photo, block.width, block.height);
+     Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
++#endif
+     return TCL_OK;
+   }
+ }
+@@ -339,17 +352,22 @@ extern "C"
+ //------------------------------------------------------------------------------
+ // It's possible to change with this function or in a script some
+ // options like width, height or the render widget.
+-int vtkTkRenderWidget_Configure(
+-  Tcl_Interp* interp, struct vtkTkRenderWidget* self, int argc, char* argv[], int flags)
++#if (TCL_MAJOR_VERSION >= 9)
++int vtkTkRenderWidget_Configure(Tcl_Interp* interp, struct vtkTkRenderWidget* self, Tcl_Size objc,
++  Tcl_Obj* const* objv, int flags)
++#else
++int vtkTkRenderWidget_Configure(Tcl_Interp* interp, struct vtkTkRenderWidget* self, int argc,
++  VTK_TCL_CONST char* argv[], int flags)
++#endif
+ {
+   // Let Tk handle generic configure options.
+-  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkRenderWidgetConfigSpecs, argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-        const_cast<CONST84 char**>(argv),
++#if (TCL_MAJOR_VERSION >= 9)
++  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkRenderWidgetConfigSpecs, objc, objv, (void*)self,
++        flags) == TCL_ERROR)
+ #else
+-        argv,
++  if (Tk_ConfigureWidget(interp, self->TkWin, vtkTkRenderWidgetConfigSpecs, argc, argv, (char*)self,
++        flags) == TCL_ERROR)
+ #endif
+-        (char*)self, flags) == TCL_ERROR)
+   {
+     return (TCL_ERROR);
+   }
+@@ -372,11 +390,8 @@ int vtkTkRenderWidget_Configure(
+ // to choose the appropriate method to invoke.
+ extern "C"
+ {
+-  int vtkTkRenderWidget_Widget(ClientData clientData, Tcl_Interp* interp, int argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char* argv[])
++  int vtkTkRenderWidget_Widget(
++    ClientData clientData, Tcl_Interp* interp, int argc, VTK_TCL_CONST char* argv[])
+   {
+     struct vtkTkRenderWidget* self = (struct vtkTkRenderWidget*)clientData;
+     int result = TCL_OK;
+@@ -389,7 +404,11 @@ extern "C"
+     }
+ 
+     // Make sure the widget is not deleted during this function
++#if (TCL_MAJOR_VERSION >= 9)
++    Tcl_Preserve((ClientData)self);
++#else
+     Tk_Preserve((ClientData)self);
++#endif
+ 
+     // Handle render call to the widget
+     if (strncmp(argv[1], "render", std::max<size_t>(1, strlen(argv[1]))) == 0 ||
+@@ -420,13 +439,26 @@ extern "C"
+       else
+       {
+         /* Execute a configuration change */
+-        result = vtkTkRenderWidget_Configure(interp, self, argc - 2,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-          const_cast<char**>(argv + 2),
++#if (TCL_MAJOR_VERSION >= 9)
++        // Convert string arguments to Tcl_Obj for TCL 9.0
++        Tcl_Obj** objv_config = (Tcl_Obj**)ckalloc((argc - 2) * sizeof(Tcl_Obj*));
++        for (int i = 0; i < argc - 2; i++)
++        {
++          objv_config[i] = Tcl_NewStringObj(argv[i + 2], -1);
++          Tcl_IncrRefCount(objv_config[i]);
++        }
++        result =
++          vtkTkRenderWidget_Configure(interp, self, argc - 2, objv_config, TK_CONFIG_ARGV_ONLY);
++
++        // Clean up the Tcl_Obj array
++        for (int i = 0; i < argc - 2; i++)
++        {
++          Tcl_DecrRefCount(objv_config[i]);
++        }
++        ckfree((char*)objv_config);
+ #else
+-          argv + 2,
++        result = vtkTkRenderWidget_Configure(interp, self, argc - 2, argv + 2, TK_CONFIG_ARGV_ONLY);
+ #endif
+-          TK_CONFIG_ARGV_ONLY);
+       }
+     }
+     else if (!strcmp(argv[1], "GetRenderWindow"))
+@@ -448,7 +480,11 @@ extern "C"
+     }
+ 
+     // Unlock the object so it can be deleted.
++#if (TCL_MAJOR_VERSION >= 9)
++    Tcl_Release((ClientData)self);
++#else
+     Tk_Release((ClientData)self);
++#endif
+     return result;
+   }
+ }
+@@ -464,16 +500,10 @@ extern "C"
+ //     * Configures this vtkTkRenderWidget for the given arguments
+ extern "C"
+ {
+-  int vtkTkRenderWidget_Cmd(ClientData clientData, Tcl_Interp* interp, int argc,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char** argv)
++  int vtkTkRenderWidget_Cmd(
++    ClientData clientData, Tcl_Interp* interp, int argc, VTK_TCL_CONST char** argv)
+   {
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-    CONST84
+-#endif
+-    char* name;
++    VTK_TCL_CONST char* name;
+     Tk_Window main = (Tk_Window)clientData;
+     Tk_Window tkwin;
+     struct vtkTkRenderWidget* self;
+@@ -515,13 +545,37 @@ extern "C"
+       tkwin, ExposureMask | StructureNotifyMask, vtkTkRenderWidget_EventProc, (ClientData)self);
+ 
+     // Configure vtkTkRenderWidget widget
+-    if (vtkTkRenderWidget_Configure(interp, self, argc - 2,
+-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
+-          const_cast<char**>(argv + 2),
++#if (TCL_MAJOR_VERSION >= 9)
++    // Convert string arguments to Tcl_Obj for TCL 9.0
++    Tcl_Obj** objv_init = (Tcl_Obj**)ckalloc((argc - 2) * sizeof(Tcl_Obj*));
++    for (int i = 0; i < argc - 2; i++)
++    {
++      objv_init[i] = Tcl_NewStringObj(argv[i + 2], -1);
++      Tcl_IncrRefCount(objv_init[i]);
++    }
++
++    if (vtkTkRenderWidget_Configure(interp, self, argc - 2, objv_init, 0) == TCL_ERROR)
++    {
++      // Clean up before error return
++      for (int i = 0; i < argc - 2; i++)
++      {
++        Tcl_DecrRefCount(objv_init[i]);
++      }
++      ckfree((char*)objv_init);
++
++      Tk_DestroyWindow(tkwin);
++      Tcl_DeleteCommand(interp, (char*)"vtkTkImageViewerWidget");
++      return TCL_ERROR;
++    }
++
++    // Clean up the Tcl_Obj array
++    for (int i = 0; i < argc - 2; i++)
++    {
++      Tcl_DecrRefCount(objv_init[i]);
++    }
++    ckfree((char*)objv_init);
+ #else
+-          argv + 2,
+-#endif
+-          0) == TCL_ERROR)
++    if (vtkTkRenderWidget_Configure(interp, self, argc - 2, argv + 2, 0) == TCL_ERROR)
+     {
+       Tk_DestroyWindow(tkwin);
+       Tcl_DeleteCommand(interp, "vtkTkRenderWidget");
+@@ -529,6 +583,7 @@ extern "C"
+       // free(self);
+       return TCL_ERROR;
+     }
++#endif
+ 
+     Tcl_AppendResult(interp, Tk_PathName(tkwin), nullptr);
+     return TCL_OK;
+@@ -555,7 +610,11 @@ extern "C"
+ 
+ extern "C"
+ {
++#if (TCL_MAJOR_VERSION >= 9)
++  void vtkTkRenderWidget_Destroy(void* memPtr)
++#else
+   void vtkTkRenderWidget_Destroy(char* memPtr)
++#endif
+   {
+     struct vtkTkRenderWidget* self = (struct vtkTkRenderWidget*)memPtr;
+ 

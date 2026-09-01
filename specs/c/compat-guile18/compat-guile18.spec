@@ -7,7 +7,7 @@
 Summary: A GNU implementation of Scheme for application extensibility
 Name: compat-guile18
 Version: %{mver}.8
-Release: 51%{?dist}
+Release: 50%{?dist}
 Source: ftp://ftp.gnu.org/pub/gnu/guile/guile-%{version}.tar.gz
 URL: http://www.gnu.org/software/guile/
 Patch1: guile-1.8.7-multilib.patch
@@ -174,8 +174,13 @@ fi
 %ghost %{_datadir}/guile/%{mver}/slib
 %dir %{_datadir}/guile/site
 %if %{with emacs}
+%ifnarch %{ix86}
 %dir %{_datadir}/emacs/site-lisp
 %{_datadir}/emacs/site-lisp/*.el
+%else
+%dir %{_prefix}/lib/emacs/site-lisp
+%{_prefix}/lib/emacs/site-lisp/*.el
+%endif
 %endif
 %{_mandir}/man1/guile%{mver}.1*
 
@@ -190,6 +195,12 @@ fi
 %{_includedir}/libguile.h
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.8-50
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.8-49
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.8.8-48
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

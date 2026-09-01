@@ -1,0 +1,56 @@
+From b78a5c52ea0161ba6e16302b15ba939971174e2f Mon Sep 17 00:00:00 2001
+Message-ID: <b78a5c52ea0161ba6e16302b15ba939971174e2f.1767954829.git.github@sicherha.de>
+From: Christoph Erhardt <github@sicherha.de>
+Date: Fri, 9 Jan 2026 10:45:25 +0100
+Subject: [PATCH] Fix building the test application on non-x86 machines
+
+On anything other than x86, `make -f Makefile.testing` fails due to
+undefined symbols:
+```
+/usr/bin/ld: /tmp/ccojePfa.o: in function `main':
+main.c:(.text.startup+0x758): undefined reference to `get_cpu_features'
+/usr/bin/ld: main.c:(.text.startup+0x75c): undefined reference to
+`g_cpu_features'
+/usr/bin/ld: main.c:(.text.startup+0x760): undefined reference to
+`g_cpu_features'
+/usr/bin/ld: main.c:(.text.startup+0xcfc): undefined reference to
+`g_cpu_features'
+/usr/bin/ld: main.c:(.text.startup+0xd00): undefined reference to
+`g_cpu_features'
+collect2: error: ld returned 1 exit status
+make: *** [Makefile.testing:50: all] Error 1
+```
+
+The regression was introduced by commit
+34d293eb2aa75005406d8a7d78687896f714e89a.
+
+Here is how the two affected symbols, `g_cpu_features` and
+`get_cpu_features()`, are used in the different configurations.
+
+| `IS_X86` | `BLAKE3_TESTING` | Use of symbols      |
+| :------: | :--------------: | ------------------- |
+| X        |                  | internal            |
+| X        | X                | internal & external |
+|          |                  | N/A                 |
+|          | X                | external            |
+---
+ c/blake3_dispatch.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/c/blake3_dispatch.c b/c/blake3_dispatch.c
+index 14dfbbe..de993ed 100644
+--- a/c/blake3_dispatch.c
++++ b/c/blake3_dispatch.c
+@@ -89,6 +89,9 @@ static void cpuidex(uint32_t out[4], uint32_t id, uint32_t sid) {
+ #endif
+ }
+ 
++#endif
++
++#if defined(IS_X86) || defined(BLAKE3_TESTING)
+ 
+ enum cpu_feature {
+   SSE2 = 1 << 0,
+-- 
+2.52.0
+

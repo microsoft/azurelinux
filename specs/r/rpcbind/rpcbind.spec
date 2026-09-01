@@ -7,7 +7,7 @@
 
 Name:           rpcbind
 Version:        1.2.8
-Release: 3%{?dist}
+Release:        0%{?dist}
 Summary:        Universal Addresses to RPC Program Number Mapper
 License:        BSD-3-Clause
 URL:            http://nfsv4.bullopensource.org

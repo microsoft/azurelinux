@@ -7,7 +7,7 @@ Type=simple
 EnvironmentFile=-/etc/sysconfig/phc2sys
 ExecStart=/usr/sbin/phc2sys $OPTIONS
 
-CapabilityBoundingSet=CAP_SYS_TIME
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_SYS_TIME
 DeviceAllow=char-pps rw
 DeviceAllow=char-ptp rw
 DevicePolicy=closed

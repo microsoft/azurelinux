@@ -1,0 +1,143 @@
+From afbd50ca6470d667cce413c1712c35727c3967a1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Pavol=20=C5=BD=C3=A1=C4=8Dik?= <pzacik@redhat.com>
+Date: Mon, 4 May 2026 16:56:24 +0200
+Subject: [PATCH] Fix OpenSSL 4.0 compatibility
+
+Use ASN1_STRING accessor functions and add const qualifiers.
+---
+ ncat/ncat_ssl.c | 12 ++++++------
+ nse_ssl_cert.cc | 28 +++++++++++++++-------------
+ 2 files changed, 21 insertions(+), 19 deletions(-)
+
+diff --git a/ncat/ncat_ssl.c b/ncat/ncat_ssl.c
+index 0c117b6..d863fac 100644
+--- a/ncat/ncat_ssl.c
++++ b/ncat/ncat_ssl.c
+@@ -266,8 +266,8 @@ static int cert_match_dnsname(X509 *cert, const char *hostname,
+ 
+     /* We must copy this address into a temporary variable because ASN1_item_d2i
+        increments it. We don't want it to corrupt ext->value->data. */
+-    ASN1_OCTET_STRING* asn1_str = X509_EXTENSION_get_data(ext);
+-    data = asn1_str->data;
++    const ASN1_OCTET_STRING* asn1_str = X509_EXTENSION_get_data(ext);
++    data = ASN1_STRING_get0_data(asn1_str);
+     /* Here we rely on the fact that the internal representation (the "i" in
+        "i2d") for NID_subject_alt_name is STACK_OF(GENERAL_NAME). Converting it
+        to a stack of CONF_VALUE with a i2v method is not satisfactory, because a
+@@ -275,15 +275,15 @@ static int cert_match_dnsname(X509 *cert, const char *hostname,
+        presence of null bytes. */
+ #if (OPENSSL_VERSION_NUMBER > 0x00907000L)
+     if (method->it != NULL) {
+-        ASN1_OCTET_STRING* asn1_str_a = X509_EXTENSION_get_data(ext);
++        const ASN1_OCTET_STRING* asn1_str_a = X509_EXTENSION_get_data(ext);
+         gen_names = (STACK_OF(GENERAL_NAME) *) ASN1_item_d2i(NULL,
+             (const unsigned char **) &data,
+-            asn1_str_a->length, ASN1_ITEM_ptr(method->it));
++            ASN1_STRING_length(asn1_str_a), ASN1_ITEM_ptr(method->it));
+     } else {
+-        ASN1_OCTET_STRING* asn1_str_b = X509_EXTENSION_get_data(ext);
++        const ASN1_OCTET_STRING* asn1_str_b = X509_EXTENSION_get_data(ext);
+         gen_names = (STACK_OF(GENERAL_NAME) *) method->d2i(NULL,
+             (const unsigned char **) &data,
+-            asn1_str_b->length);
++            ASN1_STRING_length(asn1_str_b));
+     }
+ #else
+     gen_names = (STACK_OF(GENERAL_NAME) *) method->d2i(NULL,
+diff --git a/nse_ssl_cert.cc b/nse_ssl_cert.cc
+index 3deb8cf..f8a60b3 100644
+--- a/nse_ssl_cert.cc
++++ b/nse_ssl_cert.cc
+@@ -190,14 +190,14 @@ static void obj_to_key(lua_State *L, const ASN1_OBJECT *obj)
+ /* This is a helper function for l_get_ssl_certificate. It builds a table from
+    the given X509_NAME, using keys returned from obj_to_key as keys. The result
+    is pushed on the stack. */
+-static void x509_name_to_table(lua_State *L, X509_NAME *name)
++static void x509_name_to_table(lua_State *L, const X509_NAME *name)
+ {
+   int i;
+ 
+   lua_createtable(L, 0, X509_NAME_entry_count(name));
+ 
+   for (i = 0; i < X509_NAME_entry_count(name); i++) {
+-    X509_NAME_ENTRY *entry;
++    const X509_NAME_ENTRY *entry;
+     const ASN1_OBJECT *obj;
+     const ASN1_STRING *value;
+ 
+@@ -206,7 +206,7 @@ static void x509_name_to_table(lua_State *L, X509_NAME *name)
+     value = X509_NAME_ENTRY_get_data(entry);
+ 
+     obj_to_key(L, obj);
+-    lua_pushlstring(L, (const char *) value->data, value->length);
++    lua_pushlstring(L, (const char *) ASN1_STRING_get0_data(value), ASN1_STRING_length(value));
+ 
+     lua_settable(L, -3);
+   }
+@@ -220,7 +220,7 @@ static bool x509_extensions_to_table(lua_State *L, const STACK_OF(X509_EXTENSION
+   lua_createtable(L, sk_X509_EXTENSION_num(exts), 0);
+ 
+   for (int i = 0; i < sk_X509_EXTENSION_num(exts); i++) {
+-    ASN1_OBJECT *obj;
++    const ASN1_OBJECT *obj;
+     X509_EXTENSION *ext;
+     char *value = NULL;
+     BIO *out;
+@@ -295,13 +295,15 @@ static int parse_int(const unsigned char *s, size_t len)
+ static int time_to_tm(const ASN1_TIME *t, struct tm *result)
+ {
+   const unsigned char *p;
++  const unsigned char *data = ASN1_STRING_get0_data(t);
++  int length = ASN1_STRING_length(t);
+ 
+-  p = t->data;
+-  if (t->length == 13 && t->data[t->length - 1] == 'Z') {
++  p = data;
++  if (length == 13 && data[length - 1] == 'Z') {
+     /* yymmddhhmmssZ */
+     int year;
+ 
+-    year = parse_int(t->data, 2);
++    year = parse_int(data, 2);
+     if (year < 0)
+       return -1;
+     /* "In coming up with the worlds least efficient machine-readable time
+@@ -314,13 +316,13 @@ static int time_to_tm(const ASN1_TIME *t, struct tm *result)
+       result->tm_year = 2000 + year;
+     else
+       result->tm_year = 1900 + year;
+-    p = t->data + 2;
+-  } else if (t->length == 15 && t->data[t->length - 1] == 'Z') {
++    p = data + 2;
++  } else if (length == 15 && data[length - 1] == 'Z') {
+     /* yyyymmddhhmmssZ */
+-    result->tm_year = parse_int(t->data, 4);
++    result->tm_year = parse_int(data, 4);
+     if (result->tm_year < 0)
+       return -1;
+-    p = t->data + 4;
++    p = data + 4;
+   } else {
+     return -1;
+   }
+@@ -381,7 +383,7 @@ static void asn1_time_to_obj(lua_State *L, const ASN1_TIME *s)
+   } else if (time_to_tm(s, &tm) == 0) {
+       tm_to_table(L, &tm);
+   } else {
+-      lua_pushlstring(L, (const char *) s->data, s->length);
++      lua_pushlstring(L, (const char *) ASN1_STRING_get0_data(s), ASN1_STRING_length(s));
+   }
+ }
+ 
+@@ -516,7 +518,7 @@ int l_get_ssl_certificate(lua_State *L)
+ static int parse_ssl_cert(lua_State *L, X509 *cert)
+ {
+   struct cert_userdata *udata;
+-  X509_NAME *subject, *issuer;
++  const X509_NAME *subject, *issuer;
+   EVP_PKEY *pubkey;
+   int pkey_type;
+ 
+-- 
+2.53.0
+

@@ -1,7 +1,7 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh8)}
+%{!?tcl_version: %global tcl_version %(echo 'puts $tcl_version' | tclsh)}
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 %global majorver 5.45.4
 
@@ -13,7 +13,7 @@ License: LicenseRef-Fedora-Public-Domain
 URL: https://core.tcl.tk/expect/index
 Source: http://downloads.sourceforge.net/%{name}/%{name}%{version}.tar.gz
 Buildrequires: gcc autoconf automake chrpath
-BuildRequires: tcl-devel < 1:9
+BuildRequires: tcl-devel
 BuildRequires: make
 # Patch0: fixes change log file permissions
 Patch0: expect-5.43.0-log_file.patch
@@ -36,6 +36,26 @@ Patch7: expect-5.45-fd-leak.patch
 Patch8: expect-5.45.4-unification-of-usage-and-man-page.patch
 # Patch9: fixes issues detected by static analysis
 Patch9: expect-5.45.4-covscan-fixes.patch
+# Patch10: fix error with -Werror=format-security
+Patch10: expect-5.45-format-security.patch
+# Patch11-12 - C99 compatibility
+Patch11: expect-configure-c99.patch
+Patch12: expect-c99.patch
+# tcl9 compatibility patches
+# Patch13: replace CONST/CONST84/CONST84_RETURN macros with plain const
+Patch13: expect-5.45.4-tcl9-const.patch
+# Patch14: remove _ANSI_ARGS_ macro, use plain function prototypes
+Patch14: expect-5.45.4-tcl9-ansi-args.patch
+# Patch15: replace TCL_VARARGS* macros with standard C varargs
+Patch15: expect-5.45.4-tcl9-varargs.patch
+# Patch16: replace panic() with Tcl_Panic()
+Patch16: expect-5.45.4-tcl9-panic.patch
+# Patch17: replace Tcl_EvalTokens with Tcl_EvalTokensStandard
+Patch17: expect-5.45.4-tcl9-eval-tokens.patch
+# Patch18: update deprecated tcl macros for tcl9 compatibility
+Patch18: expect-5.45.4-tcl9-alloc.patch
+# Patch19: update int to Tcl_Size for tcl9 API changes, fix function signatures
+Patch19: expect-5.45.4-tcl9-size.patch
 # examples patches
 # Patch100: changes random function
 Patch100: expect-5.32.2-random.patch
@@ -48,12 +68,9 @@ Patch102: expect-5.45-check-telnet.patch
 Patch103: expect-5.45-passmass-su-full-path.patch
 # Patch104: rhbz 963889, fixes inaccuracy in mkpasswd man page
 Patch104: expect-5.45-mkpasswd-man.patch
-# Patch105: Fix error with -Werror=format-security
-Patch105: expect-5.45-format-security.patch
-Patch106: expect-configure-c99.patch
-Patch107: expect-c99.patch
-# Patch108: fix tclsh path for 'example' binaries (tcl8 compat package has no 'tclsh')
-Patch108: expect-5.45.4-tclsh8.patch
+# Patch105: fix mkpasswd to read /dev/urandom in binary mode for tcl9
+Patch105: expect-5.45.4-tcl9-mkpasswd.patch
+Patch106: expect-5.45.4-tcl9-unbuffer.patch
 
 %description
 Expect is a tcl application for automating and testing
@@ -103,16 +120,25 @@ of expectk.
 %patch -P7 -p1 -b .fd-leak
 %patch -P8 -p1 -b .unification-of-usage-and-man-page
 %patch -P9 -p1 -b .covscan-fixes
+%patch -P10 -p0 -b .format-security
+%patch -P11 -p1 -b .configure-c99
+%patch -P12 -p1 -b .c99
+# tcl9 compatibility patches
+%patch -P13 -p1 -b .tcl9-const
+%patch -P14 -p1 -b .tcl9-ansi-args
+%patch -P15 -p1 -b .tcl9-varargs
+%patch -P16 -p1 -b .tcl9-panic
+%patch -P17 -p1 -b .tcl9-eval-tokens
+%patch -P18 -p1 -b .tcl9-alloc
+%patch -P19 -p1 -b .tcl9-size
 # examples fixes
 %patch -P100 -p1 -b .random
 %patch -P101 -p1 -b .mkpasswd-dash
 %patch -P102 -p1 -b .check-telnet
 %patch -P103 -p1 -b .passmass-su-full-path
 %patch -P104 -p1 -b .mkpasswd-man
-%patch -P105 -p0 -b .format-security
-%patch -P106 -p1 -b .configure-c99
-%patch -P 107 -p1
-%patch -P 108 -p1 -b .tclsh
+%patch -P105 -p1 -b .tcl9-mkpasswd
+%patch -P 106 -p1
 # -pkgpath.patch touch configure.in
 aclocal
 autoconf
@@ -196,6 +222,16 @@ chrpath --delete $RPM_BUILD_ROOT%{_libdir}/libexpect%{version}.so
 %{_mandir}/man1/tknewsbiff.1*
 
 %changelog
+* Wed Jun 17 2026 Florian Weimer  <fweimer@redhat.com> - 5.45.4-32
+- Use binary mode in unbuffer (#2489967)
+
+* Tue Mar 10 2026 Vitezslav Crhonek <vcrhonek@redhat.com> - 5.45.4-31
+- Port to tcl9
+  Resolves: #2442621
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.45.4-30
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.45.4-29
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

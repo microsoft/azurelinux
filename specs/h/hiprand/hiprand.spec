@@ -1,17 +1,56 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%if 0%{?suse_version}
-%global hiprand_name libhiprand1
-%else
-%global hiprand_name hiprand
+#
+# Copyright Fedora Project Authors.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+%bcond_with gitcommit
+%if %{with gitcommit}
+%global commit0 2584e35062ad9c2edb68d93c464cf157bc57e3b0
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+%global date0 20250926
 %endif
 
 %global upstreamname hipRAND
-
-%global rocm_release 6.4
-%global rocm_patch 2
+%global rocm_release 7.1
+%global rocm_patch 0
 %global rocm_version %{rocm_release}.%{rocm_patch}
+
+%bcond_with compat
+%if %{with compat}
+%global pkg_libdir lib
+%global pkg_prefix %{_prefix}/lib64/rocm/rocm-%{rocm_release}
+%global pkg_suffix -%{rocm_release}
+%global pkg_module rocm%{pkg_suffix}
+%else
+%global pkg_libdir %{_lib}
+%global pkg_prefix %{_prefix}
+%global pkg_suffix %{nil}
+%global pkg_module default
+%endif
+%if 0%{?suse_version}
+%global hiprand_name libhiprand1%{pkg_suffix}
+%else
+%global hiprand_name hiprand%{pkg_suffix}
+%endif
 
 %global toolchain rocm
 # hipcc does not support some clang flags
@@ -24,10 +63,13 @@
 %global build_type RelWithDebInfo
 %endif
 
+%if 0%{?fedora}
+%bcond_without test
+%else
 %bcond_with test
+%endif
 %if %{with test}
 %global build_test ON
-%global __brp_check_rpaths %{nil}
 %else
 %global build_test OFF
 %endif
@@ -43,23 +85,32 @@
 %global _binary_payload w7T0.xzdio
 
 Name:           %{hiprand_name}
+%if %{with gitcommit}
+Version:        git%{date0}.%{shortcommit0}
+Release:        3%{?dist}
+%else
 Version:        %{rocm_version}
-Release: 7%{?dist}
+Release:        6%{?dist}
+%endif
 Summary:        HIP random number generator
-
-Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND BSD-3-Clause
+%if %{with gitcommit}
+Url:            https://github.com/ROCm/rocm-libraries
+Source0:        %{url}/archive/%{commit0}/rocm-libraries-%{shortcommit0}.tar.gz
+%else
+Url:            https://github.com/ROCm/%{upstreamname}
 Source0:        %{url}/archive/rocm-%{version}.tar.gz#/%{upstreamname}-%{version}.tar.gz
+%endif
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  rocm-cmake
-BuildRequires:  rocm-comgr-devel
-BuildRequires:  rocm-compilersupport-macros
-BuildRequires:  rocm-hip-devel
-BuildRequires:  rocm-rpm-macros
-BuildRequires:  rocm-runtime-devel
-BuildRequires:  rocrand-devel
+BuildRequires:  rocm-cmake%{pkg_suffix}
+BuildRequires:  rocm-comgr%{pkg_suffix}-devel
+BuildRequires:  rocm-compilersupport%{pkg_suffix}-macros
+BuildRequires:  rocm-hip%{pkg_suffix}-devel
+BuildRequires:  rocm-rpm-macros%{pkg_suffix}
+BuildRequires:  rocm-runtime%{pkg_suffix}-devel
+BuildRequires:  rocrand%{pkg_suffix}-devel
 
 %if %{with test}
 %if 0%{?suse_version}
@@ -73,7 +124,7 @@ BuildRequires:  gtest-devel
 BuildRequires:  doxygen
 %endif
 
-Provides:       hiprand = %{version}-%{release}
+Provides:       hiprand%{pkg_suffix} = %{version}-%{release}
 
 # Only x86_64 works right now:
 ExclusiveArch:  x86_64
@@ -91,8 +142,8 @@ backend. Currently, hipRAND supports either rocRAND or cuRAND.
 %package devel
 Summary:        The hipRAND development package
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       rocrand-devel
-Provides:       hiprand-devel = %{version}-%{release}
+Requires:       rocrand%{pkg_suffix}-devel
+Provides:       hiprand%{pkg_suffix}-devel = %{version}-%{release}
 
 %description devel
 The hipRAND development package.
@@ -107,7 +158,12 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %endif
 
 %prep
+%if %{with gitcommit}
+%setup -q -n rocm-libraries-%{commit0}
+cd projects/hiprand
+%else
 %autosetup -p1 -n %{upstreamname}-rocm-%{version}
+%endif
 
 #Remove RPATH:
 sed -i '/INSTALL_RPATH/d' CMakeLists.txt
@@ -120,10 +176,15 @@ sed -i '/INSTALL_RPATH/d' CMakeLists.txt
 sed -i -e 's@set(CMAKE_CXX_STANDARD 11)@set(CMAKE_CXX_STANDARD 14)@' {,test/package/}CMakeLists.txt
 
 %build
+%if %{with gitcommit}
+cd projects/hiprand
+%endif
 
 %cmake \
-    -DCMAKE_CXX_COMPILER=hipcc \
-    -DCMAKE_C_COMPILER=hipcc \
+    -DCMAKE_C_COMPILER=%rocmllvm_bindir/amdclang \
+    -DCMAKE_CXX_COMPILER=%rocmllvm_bindir/amdclang++ \
+    -DCMAKE_INSTALL_LIBDIR=%{pkg_libdir} \
+    -DCMAKE_INSTALL_PREFIX=%{pkg_prefix} \
     -DCMAKE_LINKER=%rocmllvm_bindir/ld.lld \
     -DCMAKE_AR=%rocmllvm_bindir/llvm-ar \
     -DCMAKE_RANLIB=%rocmllvm_bindir/llvm-ranlib \
@@ -132,21 +193,19 @@ sed -i -e 's@set(CMAKE_CXX_STANDARD 11)@set(CMAKE_CXX_STANDARD 14)@' {,test/pack
     -DCMAKE_SKIP_RPATH=ON \
     -DBUILD_FILE_REORG_BACKWARD_COMPATIBILITY=OFF \
     -DAMDGPU_TARGETS=%{rocm_gpu_list_default} \
-    -DCMAKE_INSTALL_LIBDIR=%_libdir \
     -DBUILD_TEST=%{build_test} \
     -DROCM_SYMLINK_LIBS=OFF
 
 %cmake_build
 
 %install
+%if %{with gitcommit}
+cd projects/hiprand
+%endif
 %cmake_install
 
-if [ -f %{buildroot}%{_prefix}/share/doc/hiprand/LICENSE.txt ]; then
-    rm %{buildroot}%{_prefix}/share/doc/hiprand/LICENSE.txt
-fi
-if [ -f %{buildroot}%{_prefix}/bin/hipRAND/CTestTestfile.cmake ]; then
-    rm %{buildroot}%{_prefix}/bin/hipRAND/CTestTestfile.cmake
-fi
+rm -f %{buildroot}%{pkg_prefix}/share/doc/hiprand/LICENSE.md
+rm -f %{buildroot}%{pkg_prefix}/bin/hipRAND/CTestTestfile.cmake
 
 %check
 %if %{with test}
@@ -160,23 +219,64 @@ export LD_LIBRARY_PATH=$PWD/build/library:$LD_LIBRARY_PATH
 %endif
 
 %files
+%if %{with gitcommit}
+%doc projects/hiprand/README.md
+%license projects/hiprand/LICENSE.md
+%else
 %doc README.md
-%license LICENSE.txt
-%{_libdir}/libhiprand.so.1{,.*}
+%license LICENSE.md
+%endif
+%if %{with debug}
+%{pkg_prefix}/%{pkg_libdir}/libhiprand-d.so.1{,.*}
+%else
+%{pkg_prefix}/%{pkg_libdir}/libhiprand.so.1{,.*}
+%endif
 
 %files devel
-%dir %{_libdir}/cmake/hiprand
-%dir %{_includedir}/hiprand
-%{_includedir}/hiprand/*
-%{_libdir}/libhiprand.so
-%{_libdir}/cmake/hiprand/*.cmake
+%{pkg_prefix}/include/hiprand/
+%if %{with debug}
+%{pkg_prefix}/%{pkg_libdir}/libhiprand-d.so
+%else
+%{pkg_prefix}/%{pkg_libdir}/libhiprand.so
+%endif
+%{pkg_prefix}/%{pkg_libdir}/cmake/hiprand/
 
 %if %{with test}
 %files test
-%{_bindir}/test*
+%{pkg_prefix}/bin/test*
 %endif
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 22 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-5
+- Add --with compat
+
+* Wed Dec 10 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-4
+- Fix debug install
+
+* Thu Nov 20 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-3
+- Remove dir tags
+
+* Mon Nov 17 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 7.1.0-2
+- Rebuilt for gtest 1.17.0
+
+* Fri Oct 31 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-1
+- Update to 7.1.0
+
+* Mon Oct 20 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.1-2
+- Turn on -test for fedora
+
+* Sat Sep 20 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.1-1
+- Update to 7.0.1
+
+* Wed Aug 27 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.2-6
+- Add Fedora copyright
+
+* Mon Aug 25 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.2-5
+- Simplify file removal
+
 * Wed Jul 30 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.2-4
 - Remove -mtls-dialect cflag
 

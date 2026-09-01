@@ -1,0 +1,102 @@
+diff -up openwsman-2.8.1/etc/owsmangencert.sh.cmake.orig openwsman-2.8.1/etc/owsmangencert.sh.cmake
+--- openwsman-2.8.1/etc/owsmangencert.sh.cmake.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/etc/owsmangencert.sh.cmake	2025-10-17 10:16:34.482996406 +0200
+@@ -1,10 +1,74 @@
+-#!/bin/sh
+-
+ #!/bin/sh -e
+ 
+ CERTFILE=@WSMANCONF_DIR@/servercert.pem
+ KEYFILE=@WSMANCONF_DIR@/serverkey.pem
+ CNFFILE=@WSMANCONF_DIR@/ssleay.cnf
++CAFILE=@WSMANCONF_DIR@/ca.crt
++DAYS=365
++
++function create_ssl_cnf
++{
++    # Get minimum RSA key length at current security level
++    # This workarounds openssl not enforcing min. key length enforced by current security level
++    KEYSIZE=`grep min_rsa_size /etc/crypto-policies/state/CURRENT.pol | cut -d ' ' -f 3`
++
++    # Create OpenSSL configuration files for generating certificates
++    echo "[ req ]" > $CNFFILE
++    echo "default_bits            = $KEYSIZE" >> $CNFFILE
++    echo "default_keyfile         = privkey.pem" >> $CNFFILE
++    echo "distinguished_name      = req_distinguished_name" >> $CNFFILE
++
++    echo "[ req_distinguished_name ]" >> $CNFFILE
++    echo "countryName                     = Country Name (2 letter code)" >> $CNFFILE
++    echo "countryName_default             = GB" >> $CNFFILE
++    echo "countryName_min                 = 2" >> $CNFFILE
++    echo "countryName_max                 = 2" >> $CNFFILE
++
++    echo "stateOrProvinceName             = State or Province Name (full name)" >> $CNFFILE
++    echo "stateOrProvinceName_default     = Some-State" >> $CNFFILE
++
++    echo "localityName                    = Locality Name (eg, city)" >> $CNFFILE
++
++    echo "organizationName                = Organization Name (eg, company; recommended)" >> $CNFFILE
++    echo "organizationName_max            = 64" >> $CNFFILE
++
++    echo "organizationalUnitName          = Organizational Unit Name (eg, section)" >> $CNFFILE
++    echo "organizationalUnitName_max      = 64" >> $CNFFILE
++
++    echo "commonName                      = server name (eg. ssl.domain.tld; required!!!)" >> $CNFFILE
++    echo "commonName_max                  = 80" >> $CNFFILE
++
++    echo "emailAddress                    = Email Address" >> $CNFFILE
++    echo "emailAddress_max                = 85" >> $CNFFILE
++}
++
++function selfsign_sscg()
++{
++    sscg --quiet \
++         --lifetime "$DAYS" \
++         --cert-key-file "$KEYFILE" \
++         --cert-file "$CERTFILE" \
++         --ca-file "$CAFILE"
++}
++
++function selfsign_openssl()
++{
++
++    echo
++    echo creating selfsigned certificate
++    echo "replace it with one signed by a certification authority (CA)"
++    echo
++    echo enter your ServerName at the Common Name prompt
++    echo
++
++    # use special .cnf, because with normal one no valid selfsigned
++    # certificate is created
++
++    openssl req -days $DAYS $@ -config $CNFFILE \
++        -new -x509 -nodes -out $CERTFILE \
++        -keyout $KEYFILE
++    chmod 600 $KEYFILE
++}
+ 
+ if [ "$1" != "--force" -a -f $KEYFILE ]; then
+   echo "$KEYFILE exists!  Use \"$0 --force.\""
+@@ -15,18 +79,7 @@ if [ "$1" = "--force" ]; then
+   shift
+ fi
+ 
+-echo
+-echo creating selfsigned certificate
+-echo "replace it with one signed by a certification authority (CA)"
+-echo
+-echo enter your ServerName at the Common Name prompt
+-echo
+-
+-# use special .cnf, because with normal one no valid selfsigned
+-# certificate is created
+-
+-openssl req -days 365 $@ -config $CNFFILE \
+-  -newkey rsa:2048 -x509 -nodes -out $CERTFILE \
+-  -keyout $KEYFILE
+-chmod 600 $KEYFILE
++create_ssl_cnf
+ 
++# If sscg fails, try openssl
++selfsign_sscg || selfsign_openssl

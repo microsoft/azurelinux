@@ -1,17 +1,16 @@
---- event-listener-5.4.1/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ event-listener-5.4.1/Cargo.toml	2025-08-10T14:32:18.423632+00:00
-@@ -43,10 +43,6 @@
+--- event-listener-5.4.2/Cargo.toml	2006-07-24T01:21:28+00:00
++++ event-listener-5.4.2/Cargo.toml	2026-08-01T21:19:57.373780+00:00
+@@ -43,9 +43,6 @@
  
  [features]
  default = ["std"]
 -loom = [
--    "concurrent-queue/loom",
 -    "parking?/loom",
 -]
  portable-atomic = [
      "portable-atomic-util",
      "portable_atomic_crate",
-@@ -67,17 +63,8 @@
+@@ -62,17 +59,8 @@
  path = "examples/mutex.rs"
  
  [[test]]
@@ -27,17 +26,17 @@
 -path = "benches/bench.rs"
 -harness = false
  
- [dependencies.concurrent-queue]
- version = "2.4.0"
-@@ -103,11 +90,6 @@
+ [dependencies.critical-section]
+ version = "1.2.0"
+@@ -93,11 +81,6 @@
+ optional = true
  default-features = false
  package = "portable-atomic"
- 
+-
 -[dev-dependencies.criterion]
--version = "0.7"
+-version = "0.8"
 -features = ["cargo_bench_support"]
 -default-features = false
--
+ 
  [dev-dependencies.critical-section]
  version = "1.2.0"
- features = ["std"]

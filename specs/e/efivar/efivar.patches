@@ -1,3 +1,4 @@
 Patch0001: 0001-ABI-update-for-newer-libabigail.patch
 Patch0002: 0002-ABI-update-after-glibc-changes.patch
 Patch0003: 0003-ABI-update-after-glibc-changes.patch
+Patch0004: 0004-efivarfs-Update-a-file-variable-store-On-SetVariable.patch

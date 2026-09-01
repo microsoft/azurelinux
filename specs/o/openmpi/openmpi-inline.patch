@@ -1,0 +1,13 @@
+diff --git a/ompi/mca/part/persist/part_persist.h b/ompi/mca/part/persist/part_persist.h
+index ccc8f8f197..86fb9bac42 100644
+--- a/ompi/mca/part/persist/part_persist.h
++++ b/ompi/mca/part/persist/part_persist.h
+@@ -490,7 +490,7 @@ mca_part_persist_psend_init(const void* buf,
+     return err;
+ }
+ 
+-__opal_attribute_always_inline__ static inline int
++static inline int
+ mca_part_persist_start(size_t count, ompi_request_t** requests)
+ {
+     int err = OMPI_SUCCESS;

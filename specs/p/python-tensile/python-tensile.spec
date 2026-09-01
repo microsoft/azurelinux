@@ -1,7 +1,27 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-
+#
+# Copyright Fedora Project Authors.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 %if 0%{?suse_version}
 %{?!python_module:%define python_module() python3-%{**}}
 %else
@@ -11,10 +31,16 @@
 %define python_alternative %nil
 %endif
 
-%global upstreamname Tensile
+%bcond_with gitcommit
+%if %{with gitcommit}
+%global commit0 de5c1aebb641af098d9310a9fcca5591a7c066c8
+%global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
+%global date0 20251015
+%endif
 
-%global rocm_release 6.4
-%global rocm_patch 4
+%global upstreamname Tensile
+%global rocm_release 7.1
+%global rocm_patch 0
 %global rocm_version %{rocm_release}.%{rocm_patch}
 
 %if 0%{?suse_version}
@@ -22,17 +48,30 @@ Name:           python-tensile-devel
 %else
 Name:           python-tensile
 %endif
+%if %{with gitcommit}
+Version:        git%{date0}.%{shortcommit0}
+Release:        2%{?dist}
+%else
 Version:        %{rocm_version}
-Release: 4%{?dist}
+Release:        4%{?dist}
+%endif
 Summary:        Tool for creating benchmark-driven backend libraries for GEMMs
 
-URL:            https://github.com/ROCmSoftwarePlatform/Tensile
 License:        MIT
+%if %{with gitcommit}
+URL:            https://github.com/ROCm/rocm-libraries
+Source0:        %{url}/archive/%{commit0}/rocm-libraries-%{shortcommit0}.tar.gz
+%else
+URL:            https://github.com/ROCmSoftwarePlatform/Tensile
 Source0:        %{url}/archive/rocm-%{version}.tar.gz#/%{upstreamname}-%{version}.tar.gz
+%endif
 
 Patch1:         0001-tensile-fedora-gpus.patch
-Patch2:         0001-tensile-gfx950.patch
-Patch3:         0001-tensile-gfx1153.patch
+Patch2:         0001-tensile-gfx1153.patch
+Patch3:         0001-tensile-set-default-paths.patch
+Patch4:         0001-tensile-ignore-cache-check.patch
+Patch5:         0001-tensile-add-cmake-arches.patch
+Patch6:         0001-tensile-gfx1036.patch
 
 %if 0%{?fedora} || 0%{?suse_version}
 BuildRequires:  fdupes
@@ -43,9 +82,7 @@ BuildRequires:  python-rpm-macros
 BuildRequires:  %{python_module setuptools}
 Requires:       hipcc
 Requires:       rocminfo
-%if %{suse_version} >= 1699
 Requires:       %{python_module joblib}
-%endif
 Requires:       %{python_module msgpack}
 Requires:       %{python_module PyYAML}
 Requires:       %{python_module setuptools}
@@ -77,11 +114,11 @@ Summary:        Tool for creating benchmark-driven backend libraries for GEMMs
 Requires:       cmake-filesystem
 Requires:       hipcc
 Requires:       rocminfo
-# Available on ferdora,EPEL
+# Available on ferdora,EPEL 10+
+%if 0%{?fedora} || 0%{?rhel} > 9
 Requires:       python3dist(joblib)
-%if 0%{?fedora}
-Requires:       python3dist(msgpack)
 %endif
+Requires:       python3dist(msgpack)
 Requires:       python3dist(pyyaml)
 Provides:       python3-tensile
 
@@ -94,7 +131,17 @@ rocBLAS. Tensile acts as the performance backbone for a wide variety of
 %endif
 
 %prep
+%if %{with gitcommit}
+%setup -q -n rocm-libraries-%{commit0}
+cd shared/tensile
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+%else
 %autosetup -p1 -n %{upstreamname}-rocm-%{version}
+%endif
 
 #Fix a few things:
 chmod 755 Tensile/Configs/miopen/convert_cfg.py
@@ -124,10 +171,18 @@ sed -i -e '/rich/d' requirements.*
 sed -i -e '/msgpack/d' requirements.*
 
 %build
+%if %{with gitcommit}
+cd shared/tensile
+%endif
+
 %py3_build
 %{?python_build: %python_build}
 
 %install
+%if %{with gitcommit}
+cd shared/tensile
+%endif
+
 %py3_install
 %{?python_install: %python_install}
 
@@ -176,8 +231,13 @@ mv %{buildroot}%{_datadir}/cmake/Tensile/*.cmake %{buildroot}%{python3_sitelib}/
 %files %{python_files}
 %dir %{python_sitelib}/%{upstreamname}
 %dir %{python_sitelib}/%{upstreamname}*.egg-info
+%if %{with gitcommit}
+%doc shared/tensile/README.md
+%license shared/tensile/LICENSE.md
+%else
 %doc README.md
 %license LICENSE.md
+%endif
 %python_alternative %{_bindir}/Tensile
 %python_alternative %{_bindir}/TensileBenchmarkCluster
 %python_alternative %{_bindir}/TensileCreateLibrary
@@ -187,8 +247,29 @@ mv %{buildroot}%{_datadir}/cmake/Tensile/*.cmake %{buildroot}%{python3_sitelib}/
 %{python_sitelib}/%{upstreamname}*.egg-info/*
 
 %changelog
-* Tue Sep 30 2025 Jeremy Newton <alexjnewt at hotmail dot com> - 6.4.4-1
-- Update to 6.4.4
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 7 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-3
+- enable gfx1036
+
+* Wed Nov 5 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-2
+- Allow msgpack on RHEL
+
+* Tue Oct 28 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.0-2
+- joblib is not available on EPEL 9
+
+* Sun Sep 21 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.0-1
+- Update to 7.0.0
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 6.4.0-10
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Wed Aug 27 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.0-9
+- Add Fedora copyright
+
+* Sun Aug 24 2025 Egbert Eich <eich@suse.com> - 6.4.0-8
+- Use python-joblib everywhere on SUSE.
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 6.4.0-7
 - Rebuilt for Python 3.14.0rc2 bytecode

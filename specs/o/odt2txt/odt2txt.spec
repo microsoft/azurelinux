@@ -3,7 +3,7 @@
 
 Name:           odt2txt
 Version:        0.5
-Release: 20%{?dist}
+Release:        18%{?dist}
 Summary:        Converts an OpenDocument to plain text
 
 # Automatically converted from old format: GPLv2 - review is highly recommended.
@@ -52,6 +52,9 @@ odt2txt is...
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5-18
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.5-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

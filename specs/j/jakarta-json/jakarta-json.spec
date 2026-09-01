@@ -5,7 +5,7 @@
 
 Name:           jakarta-json
 Version:        2.1.3
-Release: 11%{?dist}
+Release:        9%{?dist}
 Summary:        Jakarta JSON Processing
 
 License:        EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
@@ -25,14 +25,9 @@ BuildRequires:  mvn(org.glassfish.build:spec-version-maven-plugin)
 BuildArch:      noarch
 ExclusiveArch:  %{java_arches} noarch
 
-# These can be removed when Fedora 41 reaches EOL
-Obsoletes:      jakarta-json-impl < 2.0.0
-Obsoletes:      jakarta-json-api < 2.0.0
-Provides:       jakarta-json-api = %{version}-%{release}
-
 %description
-Jakarta JSON Processing provides portable APIs to parse, generate,
-transform, and query JSON documents.
+Jakarta JSON Processing provides portable APIs to parse, generate, transform,
+and query JSON documents.
 
 %{?javadoc_package}
 
@@ -67,6 +62,9 @@ ln -s api/.mfiles-javadoc .
 %license LICENSE.md NOTICE.md
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.3-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Jul 29 2025 jiri vanek <jvanek@redhat.com> - 2.1.3-8
 - Rebuilt for java-25-openjdk as preffered jdk
 

@@ -1,0 +1,43 @@
+Name:                crypton-connection
+Version:             0.4.5
+x-revision: 1
+Description:
+    Simple network library for all your connection needs.
+    .
+    Features: Really simple to use, SSL/TLS, SOCKS.
+    .
+    This library provides a very simple api to create sockets
+    to a destination with the choice of SSL/TLS, and SOCKS.
+License:             BSD3
+License-file:        LICENSE
+Copyright:           Vincent Hanquez <vincent@snarc.org>
+Author:              Vincent Hanquez <vincent@snarc.org>
+Maintainer:          Kazu Yamamoto <kazu@iij.ad.jp>
+Synopsis:            Simple and easy network connection API
+Build-Type:          Simple
+Category:            Network
+stability:           experimental
+Cabal-Version:       >=1.10
+Homepage:            https://github.com/kazu-yamamoto/crypton-connection
+extra-source-files:  README.md
+                     CHANGELOG.md
+
+Library
+  Default-Language:  Haskell2010
+  Build-Depends:     base >= 3 && < 5
+                   , bytestring
+                   , containers
+                   , data-default
+                   , network >= 2.6.3
+                   , tls >= 1.7 && < 2.3
+                   , crypton-socks >= 0.6
+                   , crypton-x509-store >= 1.5
+                   , crypton-x509-system >= 1.5
+  Exposed-modules:   Network.Connection
+                     Network.Connection.Internal
+  Other-modules:     Network.Connection.Types
+  ghc-options:       -Wall
+
+source-repository head
+  type: git
+  location: https://github.com/kazu-yamamoto/crypton-connection

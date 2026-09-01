@@ -47,7 +47,7 @@
 Summary:    Scientific Tools for Python
 Name:       scipy
 Version:    1.16.2
-Release: 4%{?dist}
+Release:    3%{?dist}
 
 # BSD-3-Clause -- whole package except:
 # BSD-2-Clause -- scipy/_lib/_pep440.py
@@ -180,8 +180,7 @@ sed -i "/numpy/s/,<2\.3//" pyproject.toml
 sed -i "/array-api-strict/s/>=2\.3\.1/>=2/" pyproject.toml
 
 # Loosen the upper bound on Cython
-# This can be removed from scipy >= 1.16.0
-sed -i '/Cython/s/,<3\.1\.0//' pyproject.toml
+sed -i '/Cython/s/,<[0-9.]\+//' pyproject.toml
 
 %generate_buildrequires
 %pyproject_buildrequires -p %{?with_tests:-x test} %{build_backend_args}
@@ -304,6 +303,12 @@ popd
 %endif
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.16.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov 11 2025 Charalampos Stratakis <cstratak@redhat.com> - 1.16.2-2
+- Make Cython upper bound removal version agnostic
+
 * Mon Sep 29 2025 Nikola Forró <nforro@redhat.com> - 1.16.2-1
 - New upstream release 1.16.2
 - Work around ppc64le FTBFS with netlib/atlas

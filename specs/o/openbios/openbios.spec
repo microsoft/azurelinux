@@ -105,6 +105,9 @@ cp -a obj-sparc64/openbios-builtin.elf $qemudir/openbios-sparc64
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:20240913-2.gitc3a19c1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Dec 15 2025 Daniel P. Berrangé <berrange@redhat.com> - 1:20240913-1.gitc3a19c1
 - Update to openbios c3a19c1 to match qemu
 

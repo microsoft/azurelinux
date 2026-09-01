@@ -1,0 +1,175 @@
+From ba207eab76ff5253662a763b9b6e9ea42f03d31b Mon Sep 17 00:00:00 2001
+From: Alexey Tikhonov <atikhono@redhat.com>
+Date: Thu, 2 Jul 2026 17:29:51 +0200
+Subject: [PATCH] gpo: reject path traversal in gPCFileSysPath
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The gPCFileSysPath LDAP attribute from AD Group Policy Objects is parsed
+by ad_gpo_extract_smb_components() which converts backslashes to forward
+slashes but does not reject ".." path traversal sequences. The resulting
+smb_path is used directly in gpo_cache_store_file() to construct a local
+filesystem path under GPO_CACHE_PATH, allowing an attacker with GPO
+write access to write files outside the cache directory.
+
+Due to differential path resolution between libsmbclient (which clamps
+".." at the SMB share root) and the kernel (which resolves ".." fully),
+the SMB download succeeds while the local file write escapes the cache.
+On systems with SELinux enforcing, this enables Kerberos configuration
+injection via /var/lib/sss/pubconf/krb5.include.d/ (sssd_public_t,
+writable by sssd_t). On systems without SELinux, this enables arbitrary
+file writes including cron job injection for root code execution.
+
+This patch adds two layers of defense:
+
+1. Reject ".." as a path component in smb_path at parse time in
+   ad_gpo_extract_smb_components(). Uses component-aware validation
+   that checks for "/..", "../", and exact ".." — not substring matching
+   which would false-positive on legitimate names containing "..".
+
+2. Validate the resolved cache path stays within GPO_CACHE_PATH in
+   gpo_cache_store_file() using realpath(), with a trailing-slash
+   prefix check to prevent prefix-collision attacks (e.g.,
+   /var/lib/sss/gpo_cache_evil/ matching /var/lib/sss/gpo_cache).
+
+Based on the patch by: Ian Murphy <imurphy@redhat.com>
+Amended by: Alexey Tikhonov <atikhono@redhat.com>
+
+:fixes: CVE-2026-14476
+
+Reviewed-by: Sumit Bose <sbose@redhat.com>
+Reviewed-by: Tomáš Halman <thalman@redhat.com>
+---
+ src/providers/ad/ad_gpo.c       | 47 +++++++++++++++++++++++++++++++
+ src/providers/ad/ad_gpo_child.c | 49 +++++++++++++++++++++++++++++++++
+ 2 files changed, 96 insertions(+)
+
+diff --git a/src/providers/ad/ad_gpo.c b/src/providers/ad/ad_gpo.c
+index 5c2f117a5..b8562edc5 100644
+--- a/src/providers/ad/ad_gpo.c
++++ b/src/providers/ad/ad_gpo.c
+@@ -3832,6 +3832,43 @@ ad_gpo_populate_candidate_gpos(TALLOC_CTX *mem_ctx,
+     return ret;
+ }
+ 
++/*
++ * Check whether a path contains ".." as a path component.
++ * Returns true if traversal is detected, false if the path is safe.
++ *
++ * Checks for:
++ *   - "/.." anywhere in the path (component starting with ..)
++ *   - "../" at the start of the path
++ *   - exact match ".." (path is just "..")
++ *   - "/.." at the end of the path
++ *
++ * Does NOT match ".." as a substring of a longer component
++ * (e.g., "my..file" is allowed).
++ */
++static bool gpo_path_has_traversal(const char *path)
++{
++    const char *p;
++
++    if (path == NULL) {
++        return false;
++    }
++
++    /* Exact match */
++    if (strcmp(path, "..") == 0) return true;
++
++    /* Starts with ../ */
++    if (strncmp(path, "../", 3) == 0) return true;
++
++    /* Contains /../ or ends with /.. */
++    p = path;
++    while ((p = strstr(p, "/..")) != NULL) {
++        if (p[3] == '/' || p[3] == '\0') return true;
++        p += 3;
++    }
++
++    return false;
++}
++
+ /*
+  * This function parses the input_path into its components, replaces each
+  * back slash ('\') with a forward slash ('/'), and populates the output params.
+@@ -3908,6 +3945,16 @@ ad_gpo_extract_smb_components(TALLOC_CTX *mem_ctx,
+         goto done;
+     }
+ 
++    /* Reject path traversal. See function comment for what is matched. */
++    if (gpo_path_has_traversal(smb_path)) {
++        DEBUG(SSSDBG_CRIT_FAILURE,
++              "gPCFileSysPath contains path traversal component '..': "
++              "[%s]. Rejecting to prevent cache directory escape.\n",
++              smb_path);
++        ret = EINVAL;
++        goto done;
++    }
++
+     *_smb_server = talloc_asprintf(mem_ctx, "%s%s",
+                                    SMB_STANDARD_URI,
+                                    server_hostname);
+diff --git a/src/providers/ad/ad_gpo_child.c b/src/providers/ad/ad_gpo_child.c
+index b8b47b09e..db3716fdf 100644
+--- a/src/providers/ad/ad_gpo_child.c
++++ b/src/providers/ad/ad_gpo_child.c
+@@ -322,6 +322,55 @@ static errno_t gpo_cache_store_file(const char *smb_path,
+         goto done;
+     }
+ 
++    /* Defense-in-depth: verify the resolved path stays within the cache
++     * directory (when updating existing files). This catches any bypass
++     * of the ".." check in the parser, including encoding tricks, symlink
++     * attacks, or future regressions.
++     *
++     * The trailing-slash comparison prevents prefix-collision attacks:
++     * without it, a path resolving to "/var/lib/sss/gpo_cache_evil/"
++     * would incorrectly match the prefix "/var/lib/sss/gpo_cache".
++     */
++    {
++        char *resolved = realpath(filename, NULL);
++        if (resolved != NULL) {
++            /* Resolve GPO_CACHE_PATH too so the comparison works
++             * even when the cache path contains symlinks. */
++            char *resolved_cache = realpath(GPO_CACHE_PATH, NULL);
++            if (resolved_cache == NULL) {
++                ret = errno;
++                DEBUG(SSSDBG_CRIT_FAILURE,
++                      "realpath(\"%s\") failed: [%d][%s]\n",
++                      GPO_CACHE_PATH, ret, strerror(ret));
++                free(resolved);
++                goto done;
++            }
++
++            /* Check that resolved path starts with resolved cache + "/" */
++            size_t cache_len = strlen(resolved_cache);
++            bool inside = ((strlen(resolved) >= cache_len) &&
++                           (strncmp(resolved, resolved_cache, cache_len) == 0) &&
++                           (resolved[cache_len] == '/' || resolved[cache_len] == '\0'));
++            if (!inside) {
++                DEBUG(SSSDBG_CRIT_FAILURE,
++                      "GPO cache path escapes cache directory: [%s] "
++                      "resolves to [%s] which is outside [%s]. "
++                      "Rejecting.\n",
++                      filename, resolved, resolved_cache);
++                free(resolved_cache);
++                free(resolved);
++                ret = EINVAL;
++                goto done;
++            }
++            free(resolved_cache);
++            free(resolved);
++        }
++        /* If realpath returns NULL, the path doesn't exist yet.
++         * prepare_gpo_cache() will create it — the mkdir calls
++         * are validated by SELinux MAC policy.
++         */
++    }
++
+     tmp_name = talloc_asprintf(tmp_ctx, "%sXXXXXX", filename);
+     if (tmp_name == NULL) {
+         DEBUG(SSSDBG_CRIT_FAILURE, "talloc_asprintf failed.\n");
+-- 
+2.54.0
+

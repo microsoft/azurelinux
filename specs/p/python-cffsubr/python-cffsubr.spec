@@ -3,7 +3,7 @@
 
 Name:           python-cffsubr
 Version:        0.4.0
-Release: 5%{?dist}
+Release:        3%{?dist}
 Summary:        Standalone CFF subroutinizer based on the AFDKO tx tool
 
 # The entire source is Apache-2.0, except:
@@ -89,6 +89,9 @@ install -t '%{buildroot}%{_mandir}/man1' -D -p -m 0644 '%{SOURCE1}'
 %{_mandir}/man1/cffsubr.1*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Dec 24 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 0.4.0-2
 - Require adobe-afdko at least 4.0.3 to match upstream
 

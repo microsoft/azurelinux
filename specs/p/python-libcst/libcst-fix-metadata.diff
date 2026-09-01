@@ -1,16 +1,22 @@
-diff --git a/native/libcst/Cargo.toml b/native/libcst/Cargo.toml
-index b8abcd1..b1e2556 100644
---- a/native/libcst/Cargo.toml
-+++ b/native/libcst/Cargo.toml
-@@ -45,11 +45,6 @@ memchr = "2.7.4"
- libcst_derive = { path = "../libcst_derive", version = "1.8.0" }
+diff -Naur libcst-1.8.6-original/native/libcst/Cargo.toml libcst-1.8.6/native/libcst/Cargo.toml
+--- libcst-1.8.6-original/native/libcst/Cargo.toml	2025-11-03 22:30:33.000000000 +0000
++++ libcst-1.8.6/native/libcst/Cargo.toml	2026-07-07 11:42:02.016593437 +0100
+@@ -36,7 +36,7 @@
+ 
+ [dependencies]
+ paste = "1.0.15"
+-pyo3 = { version = "0.26", optional = true }
++pyo3 = { version = "0.29", optional = true }
+ thiserror = "2.0.12"
+ peg = "0.8.5"
+ annotate-snippets = "0.11.5"
+@@ -45,9 +45,7 @@
+ libcst_derive = { path = "../libcst_derive", version = "1.8.6" }
  
  [dev-dependencies]
--criterion = { version = "0.5.1", features = ["html_reports"] }
+-criterion = { version = "0.6.0", features = ["html_reports"] }
  difference = "2.0.0"
- rayon = "1.10.0"
- itertools = "0.13.0"
--
--[[bench]]
--name = "parser_benchmark"
--harness = false
+-rayon = "1.11.0"
+ itertools = "0.14.0"
+ 
+ [[bench]]

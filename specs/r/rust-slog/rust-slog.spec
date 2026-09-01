@@ -9,7 +9,7 @@
 
 Name:           rust-slog
 Version:        2.7.0
-Release: 16%{?dist}
+Release:        13%{?dist}
 Summary:        Structured, extensible, composable logging for Rust
 
 License:        MPL-2.0 OR MIT OR Apache-2.0

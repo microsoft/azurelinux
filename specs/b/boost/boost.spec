@@ -45,11 +45,17 @@
   %bcond_without quadmath
 %endif
 
+%ifnarch x86_64
+  %bcond_with stacktrace_from_exception
+%else
+  %bcond_without stacktrace_from_exception
+%endif
+
 Name: boost
 %global real_name boost
 Summary: The free peer-reviewed portable C++ source libraries
-Version: 1.83.0
-Release: 20%{?dist}
+Version: 1.90.0
+Release: 7%{?dist}
 License: BSL-1.0 AND MIT AND Python-2.0.1
 
 # Replace each . with _ in %%{version}
@@ -61,12 +67,11 @@ License: BSL-1.0 AND MIT AND Python-2.0.1
 %global toplev_dirname %{real_name}_%{version_enc}
 URL: http://www.boost.org
 
-# https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_83_0.tar.bz2
-Source0: https://boostorg.jfrog.io/artifactory/main/release/%{version}/source/%{name}_%{version_enc}.tar.bz2
-Source1: libboost_thread.so
+# https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2
+Source0: https://archives.boost.io/release/%{version}/source/%{name}_%{version_enc}.tar.bz2
 # Add a manual page for b2, based on the online documentation:
 # http://www.boost.org/boost-build2/doc/html/bbv2/overview.html
-Source2: b2.1
+Source1: b2.1
 
 # Since Fedora 13, the Boost libraries are delivered with sonames
 # equal to the Boost version (e.g., 1.41.0).
@@ -79,7 +84,9 @@ Source2: b2.1
 # The subpackages that don't install shared libraries are also not pulled in
 # (b2, build, doc, doctools, examples, static).
 Requires: %{name}-atomic%{?_isa} = %{version}-%{release}
+Requires: %{name}-charconv%{?_isa} = %{version}-%{release}
 Requires: %{name}-chrono%{?_isa} = %{version}-%{release}
+Requires: %{name}-cobalt%{?_isa} = %{version}-%{release}
 Requires: %{name}-container%{?_isa} = %{version}-%{release}
 Requires: %{name}-contract%{?_isa} = %{version}-%{release}
 %if %{with context}
@@ -98,6 +105,7 @@ Requires: %{name}-locale%{?_isa} = %{version}-%{release}
 Requires: %{name}-log%{?_isa} = %{version}-%{release}
 Requires: %{name}-math%{?_isa} = %{version}-%{release}
 Requires: %{name}-nowide%{?_isa} = %{version}-%{release}
+Requires: %{name}-process%{?_isa} = %{version}-%{release}
 Requires: %{name}-program-options%{?_isa} = %{version}-%{release}
 %if %{with python3}
 Requires: %{name}-python3%{?_isa} = %{version}-%{release}
@@ -106,12 +114,15 @@ Requires: %{name}-random%{?_isa} = %{version}-%{release}
 Requires: %{name}-regex%{?_isa} = %{version}-%{release}
 Requires: %{name}-serialization%{?_isa} = %{version}-%{release}
 Requires: %{name}-stacktrace%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
 Requires: %{name}-test%{?_isa} = %{version}-%{release}
 Requires: %{name}-thread%{?_isa} = %{version}-%{release}
 Requires: %{name}-timer%{?_isa} = %{version}-%{release}
 Requires: %{name}-type_erasure%{?_isa} = %{version}-%{release}
+Requires: %{name}-url%{?_isa} = %{version}-%{release}
 Requires: %{name}-wave%{?_isa} = %{version}-%{release}
+# F44 dropped the boost-system subpackage
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %if %{with python3}
 Recommends: (boost-numpy3 if python3-numpy)
@@ -133,12 +144,13 @@ BuildRequires: libquadmath-devel
 %endif
 BuildRequires: bison
 BuildRequires: libzstd-devel
+BuildRequires: which
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1541035
 Patch0: boost-1.81.0-build-optflags.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1318383
-Patch1: boost-1.78.0-no-rpath.patch
+Patch1: boost-1.90.0-no-rpath.patch
 
 # https://lists.boost.org/Archives/boost/2020/04/248812.php
 Patch2: boost-1.73.0-cmakedir.patch
@@ -146,41 +158,17 @@ Patch2: boost-1.73.0-cmakedir.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1541035
 Patch3: boost-1.78.0-b2-build-flags.patch
 
-# https://github.com/boostorg/random/issues/82
-Patch4: boost-1.76.0-random-test.patch
-
 # PR https://github.com/boostorg/interval/pull/30
 # Fixes narrowing conversions for ppc -
 #   https://github.com/boostorg/interval/issues/29
 Patch5: boost-1.76.0-fix-narrowing-conversions-for-ppc.patch
 
-# https://bugzilla.redhat.com/show_bug.cgi?id=2178210
-# https://github.com/boostorg/phoenix/issues/111
-# https://github.com/boostorg/phoenix/issues/115
-Patch6: boost-1.81-phoenix-multiple-defn.patch
+# Install boost_system for the CMake configuration
+# https://github.com/boostorg/system/issues/132
+Patch6: boost-1.90-system.patch
 
-# https://github.com/boostorg/random/commit/7561690135c67ecf88c2133bad7680ebd2665c36
-# https://github.com/boostorg/random/commit/4239d93dad32a11e4c3829050f8070d456266133
-Patch7: boost-1.81.0-random-test-fixes.patch
-
-Patch8: boost-1.83-regex-test-fixes.patch
-
-# https://github.com/boostorg/multiprecision/commit/ea786494db78efdf178cbe36810f3326156e3347
-Patch9: boost-1.83-multiprecision-convert-noexcept.patch
-
-# https://github.com/boostorg/math/commit/f3e0cde514e444c2e25a3522d05a6e244fb2f23a
-# https://github.com/boostorg/math/issues/1132
-Patch10: boost-1.83-math-Correct-float_next-INF-and-float_prior-INF.patch
-
-# https://github.com/boostorg/context/pull/234
-Patch11: boost-1.83-Fix-ABI-detection-for-empty-os-platform.patch
-
-# https://github.com/boostorg/python/pull/432
-# https://github.com/boostorg/python/pull/443
-Patch12: boost-1.83-NumPy-2.x-dtype.patch
-
-# https://github.com/boostorg/thread/pull/408
-Patch13: boost-1.83-fix-no-member-named_that_error.patch
+# https://github.com/boostorg/range/pull/157
+Patch7: boost-1.90.0-range.patch
 
 %bcond_with tests
 %bcond_with docs_generated
@@ -205,13 +193,34 @@ types and operations on these data types, as well as memory ordering
 constraints required for coordinating multiple threads through atomic
 variables.
 
+%package charconv
+Summary: Run-time component of boost charconv library
+License: BSL-1.0 AND (BSL-1.0 OR Apache-2.0 WITH LLVM-exception)
+
+%description charconv
+
+Run-time support for Boost.Charconv, an implementation of <charconv>
+in C++11.
+
 %package chrono
 Summary: Run-time component of boost chrono library
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
+License: BSL-1.0 AND (MIT OR NCSA)
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description chrono
 
 Run-time support for Boost.Chrono, a set of useful time utilities.
+
+%package cobalt
+Summary: Run-time component of boost cobalt library
+
+%description cobalt
+
+Boost.Cobalt provides a set of easy to use coroutine primitives & utilities
+running on top of boost.asio. These will be of interest for applications that
+perform a lot of IO that want to not block unnecessarily, yet still want to
+have linear & readable code (i..e. avoid callbacks).
 
 %package container
 Summary: Run-time component of boost container library
@@ -221,7 +230,8 @@ Summary: Run-time component of boost container library
 Boost.Container library implements several well-known containers,
 including STL containers. The aim of the library is to offer advanced
 features not present in standard containers or to offer the latest
-standard draft features for compilers that comply with C++03.
+standard draft features for compilers that don't comply with the
+latest C++ standard.
 
 %package contract
 Summary: Run-time component of boost contract library
@@ -278,7 +288,8 @@ micro-/userland-threads (fibers) scheduled cooperatively.
 %package filesystem
 Summary: Run-time component of boost filesystem library
 Requires: %{name}-atomic%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description filesystem
 
@@ -288,6 +299,7 @@ directories.
 
 %package graph
 Summary: Run-time component of boost graph library
+License: BSL-1.0 AND (BSL-1.0 OR MIT)
 Requires: %{name}-regex%{?_isa} = %{version}-%{release}
 
 %description graph
@@ -306,6 +318,7 @@ stream buffers and i/o filters.
 
 %package json
 Summary: Run-time component of boost json library
+License: BSL-1.0 OR Apache-2.0
 Requires: %{name}-container%{?_isa} = %{version}-%{release}
 
 %description json
@@ -317,8 +330,9 @@ simply "JSON"
 %package locale
 Summary: Run-time component of boost locale library
 Requires: %{name}-chrono%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
 Requires: %{name}-thread%{?_isa} = %{version}-%{release}
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description locale
 
@@ -335,17 +349,17 @@ Requires: %{name}-thread%{?_isa} = %{version}-%{release}
 
 %description log
 
-Boost.Log library aims to make logging significantly easier for the
-application developer.  It provides a wide range of out-of-the-box
-tools along with public interfaces for extending the library.
+Run-time support for Boost.Log, a modular and extensible logging
+library that supports both narrow-character and wide-character logging.
 
 %package math
-Summary: Math functions for boost TR1 library
+Summary: Run-time component of boost math toolkit
 
 %description math
 
-Run-time support for C99 and C++ TR1 C-style Functions from the math
-portion of Boost.TR1.
+Run-time support for Boost.Math, including floating-point utilities,
+specific width floating-point types, mathematical constants,
+statistical distributions, special functions, and more.
 
 %package nowide
 Summary: Standard library functions with UTF-8 API on Windows
@@ -370,6 +384,14 @@ tools -- just your C++ compiler.  This package contains run-time
 support for the NumPy extension of the Boost Python Library for Python 3.
 
 %endif
+
+%package process
+Summary:  Run-time component of boost process library
+
+%description process
+
+Run-time support of the Boost.Process library, for managing system
+processes.
 
 %package program-options
 Summary:  Run-time component of boost program_options library
@@ -422,14 +444,6 @@ Summary: Run-time component of boost stacktrace library
 
 Run-time component of the Boost stacktrace library.
 
-%package system
-Summary: Run-time component of boost system support library
-
-%description system
-
-Run-time component of Boost operating system support library, including
-the diagnostics support that is part of the C++11 standard library.
-
 %package test
 Summary: Run-time component of boost test library
 
@@ -440,7 +454,9 @@ program execution monitoring.
 
 %package thread
 Summary: Run-time component of boost thread library
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
+License: BSL-1.0 AND (MIT OR NCSA)
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description thread
 
@@ -452,7 +468,8 @@ data specific to individual threads.
 %package timer
 Summary: Run-time component of boost timer library
 Requires: %{name}-chrono%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description timer
 
@@ -463,8 +480,9 @@ with as little as one #include and one additional line of code.
 %package type_erasure
 Summary: Run-time component of boost type erasure library
 Requires: %{name}-chrono%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
 Requires: %{name}-thread%{?_isa} = %{version}-%{release}
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description type_erasure
 
@@ -484,8 +502,9 @@ Summary: Run-time component of boost C99/C++ preprocessing library
 Requires: %{name}-chrono%{?_isa} = %{version}-%{release}
 Requires: %{name}-date-time%{?_isa} = %{version}-%{release}
 Requires: %{name}-filesystem%{?_isa} = %{version}-%{release}
-Requires: %{name}-system%{?_isa} = %{version}-%{release}
 Requires: %{name}-thread%{?_isa} = %{version}-%{release}
+Obsoletes: boost-system < 1.90.0
+Conflicts: boost-system < 1.90.0
 
 %description wave
 
@@ -495,6 +514,7 @@ preprocessor functionality.
 
 %package devel
 Summary: The Boost C++ headers and shared development libraries
+License: BSL-1.0 AND MIT AND (MIT OR NCSA) AND (BSL-1.0 OR MIT) AND HPND-sell-variant AND Zlib AND Apache-2.0 AND (BSL-1.0 OR Apache-2.0) AND (BSL-1.0 OR Apache-2.0 WITH LLVM-exception)
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Requires: libicu-devel%{?_isa}
 %if %{with quadmath}
@@ -735,7 +755,7 @@ using python : %{python3_version} : /usr/bin/python3 : /usr/include/python%{pyth
 EOF
 %endif
 
-./bootstrap.sh --with-toolset=%{toolchain} --with-icu
+./bootstrap.sh --with-toolset=%{toolchain} --with-icu --prefix=$RPM_BUILD_ROOT%{_prefix}
 
 # N.B. When we build the following with PCH, parts of boost (math
 # library in particular) end up being built second time during
@@ -753,18 +773,10 @@ echo ============================= build serial ==================
 %if %{with python3}
 	python=%{python3_version} \
 %endif
+%if !%{with stacktrace_from_exception}
+	boost.stacktrace.from_exception=off \
+%endif
 	stage
-
-# See libs/thread/build/Jamfile.v2 for where this file comes from.
-if [ $(find serial -type f -name has_atomic_flag_lockfree \
-		-print -quit | wc -l) -ne 0 ]; then
-	DEF=D
-else
-	DEF=U
-fi
-
-m4 -${DEF}HAS_ATOMIC_FLAG_LOCKFREE -DVERSION=%{version} \
-	%{SOURCE1} > $(basename %{SOURCE1})
 
 # Build MPI parts of Boost with OpenMPI support
 
@@ -807,7 +819,7 @@ export PATH=/bin${PATH:+:}$PATH
 
 echo ============================= build Boost.Build ==================
 (cd tools/build
- ./bootstrap.sh --with-toolset=%{toolchain})
+ ./bootstrap.sh --with-toolset=%{toolchain} --prefix=$RPM_BUILD_ROOT%{_prefix})
 
 %check
 :
@@ -899,13 +911,22 @@ echo ============================= install serial ==================
 %if %{with python3}
 	python=%{python3_version} \
 %endif
+%if !%{with stacktrace_from_exception}
+	boost.stacktrace.from_exception=off \
+%endif
 	install
 
-# Override DSO symlink with a linker script.  See the linker script
-# itself for details of why we need to do this.
-[ -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so ] # Must be present
-rm -f $RPM_BUILD_ROOT%{_libdir}/libboost_thread.so
-install -p -m 644 $(basename %{SOURCE1}) $RPM_BUILD_ROOT%{_libdir}/
+cat > $RPM_BUILD_ROOT%{_libdir}/libboost_system.so << EOT
+/* GNU ld script
+
+There is no runtime library for Boost.System.
+This empty linker script exists to support Fedora packages which use
+-lboost_system when linking and so require a library with that name.
+
+This linker script will be remove in a future Fedora release.
+*/
+EOT
+chmod 644 $RPM_BUILD_ROOT%{_libdir}/libboost_system.so
 
 echo ============================= install Boost.Build ==================
 (cd tools/build
@@ -928,7 +949,7 @@ echo ============================= install Boost.Build ==================
  rm $RPM_BUILD_ROOT%{_datadir}/boost-build/src/tools/doxygen/windows-paths-check.hpp
  rm -f $RPM_BUILD_ROOT%{_datadir}/boost-build/src/tools/doxygen/windows-paths-check.hpp
  # Install the manual page
- %{__install} -p -m 644 %{SOURCE2} -D $RPM_BUILD_ROOT%{_mandir}/man1/b2.1
+ %{__install} -p -m 644 %{SOURCE1} -D $RPM_BUILD_ROOT%{_mandir}/man1/b2.1
 )
 
 echo ============================= install Boost.QuickBook ==================
@@ -1004,6 +1025,11 @@ rm -f tmp-doc-files-to-be-installed
 rm -f tmp-doc-directories
 %{__install} -p -m 644 -t $EXAMPLESPATH LICENSE_1_0.txt
 
+# The predef_check utility doesn't seem useful to package.
+(cd $RPM_BUILD_ROOT/%{_datadir}
+ rm boost_predef/tools/check/*
+ rm boost_predef/build.jam
+)
 
 %post doctools
 CATALOG=%{_sysconfdir}/xml/catalog
@@ -1038,9 +1064,18 @@ fi
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_atomic.so.%{sonamever}
 
+%files charconv
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_charconv.so.%{sonamever}
+
 %files chrono
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_chrono.so.%{sonamever}
+
+%files cobalt
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_cobalt.so.%{sonamever}
+%{_libdir}/libboost_cobalt_io.so.%{sonamever}
 
 %files container
 %license LICENSE_1_0.txt
@@ -1112,6 +1147,10 @@ fi
 %{_libdir}/libboost_numpy%{python3_version_nodots}.so.%{sonamever}
 %endif
 
+%files process
+%license LICENSE_1_0.txt
+%{_libdir}/libboost_process.so.%{sonamever}
+
 %files test
 %license LICENSE_1_0.txt
 %{_libdir}/libboost_prg_exec_monitor.so.%{sonamever}
@@ -1145,10 +1184,9 @@ fi
 %{_libdir}/libboost_stacktrace_addr2line.so.%{sonamever}
 %{_libdir}/libboost_stacktrace_basic.so.%{sonamever}
 %{_libdir}/libboost_stacktrace_noop.so.%{sonamever}
-
-%files system
-%license LICENSE_1_0.txt
-%{_libdir}/libboost_system.so.%{sonamever}
+%if %{with stacktrace_from_exception}
+%{_libdir}/libboost_stacktrace_from_exception.so.%{sonamever}
+%endif
 
 %files thread
 %license LICENSE_1_0.txt
@@ -1185,7 +1223,10 @@ fi
 %{_includedir}/%{name}
 %{_libdir}/cmake
 %{_libdir}/libboost_atomic.so
+%{_libdir}/libboost_charconv.so
 %{_libdir}/libboost_chrono.so
+%{_libdir}/libboost_cobalt.so
+%{_libdir}/libboost_cobalt_io.so
 %{_libdir}/libboost_container.so
 %{_libdir}/libboost_contract.so
 %if %{with context}
@@ -1213,6 +1254,7 @@ fi
 %if %{with python3}
 %{_libdir}/libboost_numpy%{python3_version_nodots}.so
 %endif
+%{_libdir}/libboost_process.so
 %{_libdir}/libboost_prg_exec_monitor.so
 %{_libdir}/libboost_unit_test_framework.so
 %{_libdir}/libboost_program_options.so
@@ -1226,6 +1268,9 @@ fi
 %{_libdir}/libboost_stacktrace_addr2line.so
 %{_libdir}/libboost_stacktrace_basic.so
 %{_libdir}/libboost_stacktrace_noop.so
+%if %{with stacktrace_from_exception}
+%{_libdir}/libboost_stacktrace_from_exception.so
+%endif
 %{_libdir}/libboost_system.so
 %{_libdir}/libboost_thread.so
 %{_libdir}/libboost_timer.so
@@ -1254,7 +1299,9 @@ fi
 %license LICENSE_1_0.txt
 %{_libdir}/openmpi/lib/cmake
 %{_libdir}/openmpi/lib/libboost_mpi.so
+%{_libdir}/openmpi/lib/libboost_graph.so
 %{_libdir}/openmpi/lib/libboost_graph_parallel.so
+%{_libdir}/openmpi/lib/libboost_container.so
 
 %if %{with python3}
 
@@ -1271,7 +1318,9 @@ fi
 
 %files graph-openmpi
 %license LICENSE_1_0.txt
+%{_libdir}/openmpi/lib/libboost_graph.so.%{sonamever}
 %{_libdir}/openmpi/lib/libboost_graph_parallel.so.%{sonamever}
+%{_libdir}/openmpi/lib/libboost_container.so.%{sonamever}
 
 %endif
 
@@ -1286,7 +1335,9 @@ fi
 %license LICENSE_1_0.txt
 %{_libdir}/mpich/lib/cmake
 %{_libdir}/mpich/lib/libboost_mpi.so
+%{_libdir}/mpich/lib/libboost_graph.so
 %{_libdir}/mpich/lib/libboost_graph_parallel.so
+%{_libdir}/mpich/lib/libboost_container.so
 
 %if %{with python3}
 
@@ -1302,7 +1353,9 @@ fi
 
 %files graph-mpich
 %license LICENSE_1_0.txt
+%{_libdir}/mpich/lib/libboost_graph.so.%{sonamever}
 %{_libdir}/mpich/lib/libboost_graph_parallel.so.%{sonamever}
+%{_libdir}/mpich/lib/libboost_container.so.%{sonamever}
 
 %endif
 
@@ -1322,6 +1375,32 @@ fi
 %{_mandir}/man1/b2.1*
 
 %changelog
+* Thu Mar 19 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 1.90.0-7
+- Add workaround for failing regex tests (#2430541)
+- Add BR:which as needed by the bootstrap.sh script
+- Add additional SPDX tags
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.90.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 15 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 1.90.0-4
+- Add dependencies on new subpackages to metapackage
+
+* Tue Jan 13 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 1.90.0-3
+- Fix libboost_system.so linker script to avoid ldcondig warning
+
+* Mon Jan 12 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 1.90.0-2
+- Add patch for boost/range/detail/any_iterator_interface.hpp
+
+* Sat Jan 10 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 1.90.0-1
+- Rebase to 1.90.0
+- See https://fedoraproject.org/wiki/Changes/F44Boost189
+- Drop boost-system subpackage and libboost_thread.so linker script
+- Add new boost-charconv, boost-cobalt, and boost-process subpackages
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.83.0-17
 - Rebuilt for Python 3.14.0rc3 bytecode
 

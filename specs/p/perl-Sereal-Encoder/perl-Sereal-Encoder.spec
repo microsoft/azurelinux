@@ -10,7 +10,7 @@
 
 Name:           perl-Sereal-Encoder
 Version:        5.004
-Release: 15%{?dist}
+Release:        12%{?dist}
 Summary:        Perl serialization into Sereal format
 # lib/Sereal/Encoder.pm:    GPL+ or Artistic
 # qsort.h:                  LGPLv2+ (borrowed from glibc)

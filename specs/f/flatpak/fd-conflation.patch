@@ -1,0 +1,48 @@
+From 8a6709e13ca13a56f92e13f4f1c0df869f0046fc Mon Sep 17 00:00:00 2001
+From: Sebastian Wick <sebastian.wick@redhat.com>
+Date: Tue, 18 Aug 2026 16:24:15 +0200
+Subject: [PATCH] portal: Account for source fds in fd_map_remap_fd max_fd
+ tracking
+
+fd_map_remap_fd assigns a temporary fd number (++max_fd) that may later
+be used as a conflict resolution target. If the source fd passed to
+fd_map_remap_fd is higher than max_fd, conflict resolution can assign
+a replacement value that collides with that source fd. In
+child_setup_func, the dup2 for the conflicting entry then overwrites
+the source fd before it is remapped, delivering the wrong fd to the
+child process.
+
+In practice this manifests as sandbox-expose-fd-ro passing a random fd
+(e.g. a socket) instead of the intended O_PATH fd to flatpak run via
+--ro-bind-fd, producing errors like:
+
+  error: /proc/self/fd/21 resolves to non-absolute path socket:[423446]
+
+Similar error have been observed in Epiphany/WebKit:
+https://bugs.webkit.org/show_bug.cgi?id=305344
+---
+ portal/flatpak-portal.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/portal/flatpak-portal.c b/portal/flatpak-portal.c
+index 183d3fe4..3bd68e28 100644
+--- a/portal/flatpak-portal.c
++++ b/portal/flatpak-portal.c
+@@ -619,7 +619,13 @@ fd_map_remap_fd (GArray *fd_map,
+   FdMapEntry fd_map_entry;
+ 
+   /* Use a fd that hasn't been used yet. We might have to reshuffle
+-   * fd_map_entry.to, a bit later. */
++   * fd_map_entry.to a bit later during conflict resolution, which
++   * assigns ++max_fd as replacement values. Account for the source fd
++   * in max_fd so those replacements can never collide with any source
++   * fd in the map. */
++  if (fd > *max_fd_in_out)
++    *max_fd_in_out = fd;
++
+   fd_map_entry.from = fd;
+   fd_map_entry.to = ++(*max_fd_in_out);
+   fd_map_entry.final = fd_map_entry.to;
+-- 
+2.55.0
+

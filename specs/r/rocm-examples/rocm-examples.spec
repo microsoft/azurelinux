@@ -1,10 +1,44 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+#
+# Copyright Fedora Project Authors.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to
+# deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+# sell copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
 %global upstreamname rocm-examples
-%global rocm_release 6.4
-%global rocm_patch 2
+%global rocm_release 7.1
+%global rocm_patch 0
 %global rocm_version %{rocm_release}.%{rocm_patch}
+
+%bcond_with compat
+%if %{with compat}
+%global pkg_libdir lib
+%global pkg_prefix %{_prefix}/lib64/rocm/rocm-%{rocm_release}
+%global pkg_suffix -%{rocm_release}
+%global pkg_module rocm%{pkg_suffix}
+%else
+%global pkg_libdir %{_lib}
+%global pkg_prefix %{_prefix}
+%global pkg_suffix %{nil}
+%global pkg_module default
+%endif
 
 %global toolchain rocm
 
@@ -26,9 +60,14 @@
 %global _source_payload w7T0.xzdio
 %global _binary_payload w7T0.xzdio
 
-Name:           rocm-examples
+# some example cmake's do not like :xnack suffix
+# reduce the default list
+%global gpu_list %rocm_gpu_list_test
+%global _gpu_list gfx1100
+
+Name:           rocm-examples%{pkg_suffix}
 Version:        %{rocm_version}
-Release: 6%{?dist}
+Release:        3%{?dist}
 Summary:        A collection of examples for the ROCm software stack
 Url:            https://github.com/ROCm/%{upstreamname}
 License:        MIT AND Apache-2.0
@@ -42,21 +81,22 @@ Source0:        %{url}/archive/rocm-%{version}.tar.gz#/%{upstreamname}-%{version
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  hipblas-devel
-BuildRequires:  hipcub-devel
-BuildRequires:  hipfft-devel
-BuildRequires:  hipify
-BuildRequires:  hiprand-devel
-BuildRequires:  hipsolver-devel
-BuildRequires:  rocm-comgr-devel
-BuildRequires:  rocm-hip-devel
-BuildRequires:  rocm-runtime-devel
-BuildRequires:  rocm-rpm-macros
-BuildRequires:  rocblas-devel
-BuildRequires:  rocfft-devel
-BuildRequires:  rocsolver-devel
-BuildRequires:  rocsparse-devel
-BuildRequires:  rocthrust-devel
+BuildRequires:  hipblas%{pkg_suffix}-devel
+BuildRequires:  hipcub%{pkg_suffix}-devel
+BuildRequires:  hipfft%{pkg_suffix}-devel
+BuildRequires:  hipify%{pkg_suffix}
+BuildRequires:  hiprand%{pkg_suffix}-devel
+BuildRequires:  hipsolver%{pkg_suffix}-devel
+BuildRequires:  rocm-comgr%{pkg_suffix}-devel
+BuildRequires:  rocm-compilersupport%{pkg_suffix}-macros
+BuildRequires:  rocm-hip%{pkg_suffix}-devel
+BuildRequires:  rocm-runtime%{pkg_suffix}-devel
+BuildRequires:  rocm-rpm-macros%{pkg_suffix}
+BuildRequires:  rocblas%{pkg_suffix}-devel
+BuildRequires:  rocfft%{pkg_suffix}-devel
+BuildRequires:  rocsolver%{pkg_suffix}-devel
+BuildRequires:  rocsparse%{pkg_suffix}-devel
+BuildRequires:  rocthrust%{pkg_suffix}-devel
 
 %if 0%{?suse_version}
 BuildRequires:  benchmark-devel
@@ -98,14 +138,16 @@ The examples are structured in several categories:
 
 # No External, not going to bundle things outside of this project.
 # Not having glfw-devel turns off building examples that use External/glad
-rm -rf External/
+#
+# Need to keep CmdParser
+rm -rf External/{glad,KHR}
 
 # https://github.com/ROCm/rocm-examples/issues/217
 for f in `find . -name 'CMakeLists.txt'`; do
-    sed -i -e 's@opt/rocm@usr@' $f
+    sed -i -e 's@/opt/rocm@%{pkg_prefix}@' $f
 done
 for f in `find . -name 'Makefile'`; do
-    sed -i -e 's@opt/rocm@usr@' $f
+    sed -i -e 's@/opt/rocm@%{pkg_prefix}@' $f
 done
 
 # On SLE 15.6
@@ -118,11 +160,24 @@ sed -i -e 's@add_subdirectory(module_api)@message("no module_api")@'    HIP-Basi
 %endif
 %endif
 
+# Some custom commands need to use hip_flags
+sed -i -e 's@${CMAKE_HIP_COMPILER}@${CMAKE_HIP_COMPILER} -I%{pkg_prefix}/include@' HIP-Basic/llvm_ir_to_executable/CMakeLists.txt
+
 %build
+
+export ROCM_ROOT=%{pkg_prefix}
+
 %cmake \
-    -DCMAKE_CXX_COMPILER=hipcc \
-    -DCMAKE_HIP_ARCHITECTURES=%{rocm_gpu_list_default} \
-    -DAMDGPU_TARGETS=%{rocm_gpu_list_default} \
+    -DCMAKE_C_COMPILER=%rocmllvm_bindir/amdclang \
+    -DCMAKE_CXX_COMPILER=%rocmllvm_bindir/amdclang++ \
+    -DCMAKE_CXX_FLAGS="-I %{pkg_prefix}/include" \
+    -DCMAKE_INSTALL_LIBDIR=%{pkg_libdir} \
+    -DCMAKE_INSTALL_PREFIX=%{pkg_prefix} \
+    -DCMAKE_HIP_ARCHITECTURES=%{gpu_list} \
+    -DCMAKE_HIP_COMPILER=%rocmllvm_bindir/amdclang++ \
+    -DCMAKE_HIP_COMPILER_ROCM_ROOT=%{pkg_prefix} \
+    -DCMAKE_HIP_FLAGS="-I %{pkg_prefix}/include" \
+    -DGPU_TARGETS=%{gpu_list} \
     -DCMAKE_BUILD_TYPE=%{build_type} \
     -DHIP_PLATFORM=amd
 
@@ -134,9 +189,27 @@ sed -i -e 's@add_subdirectory(module_api)@message("no module_api")@'    HIP-Basi
 %files
 %license LICENSE.md
 %doc README.md
-%{_bindir}/*
+%{pkg_prefix}/bin/*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Dec 24 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-2
+- Add --with compat
+
+* Fri Oct 31 2025 Tom Rix <Tom.Rix@amd.com> - 7.1.0-1
+- Update to 7.1.0
+
+* Sat Oct 11 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.2-1
+- Update to 7.0.2
+
+* Sun Sep 21 2025 Tom Rix <Tom.Rix@amd.com> - 7.0.1-1
+- Update to 7.0.1
+
+* Thu Aug 28 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.2-3
+- Add Fedora copyright
+
 * Wed Jul 30 2025 Tom Rix <Tom.Rix@amd.com> - 6.4.2-2
 - Remove -mtls-dialect cflag
 

@@ -1,0 +1,28 @@
+diff --git a/src/kml/dom/kml_ptr.h b/src/kml/dom/kml_ptr.h
+index 05a1bc3..2fde89e 100644
+--- a/src/kml/dom/kml_ptr.h
++++ b/src/kml/dom/kml_ptr.h
+@@ -26,6 +26,7 @@
+ #ifndef KML_DOM_KML_PTR_H__
+ #define KML_DOM_KML_PTR_H__
+ 
++#include "kml/base/referent.h"
+ #include "boost/intrusive_ptr.hpp"
+ 
+ namespace kmldom {
+@@ -146,6 +147,15 @@ class GxTourPrimitive;
+ class GxTrack;
+ class GxWait;
+ 
++template <typename T>
++inline void intrusive_ptr_add_ref(T* r) {
++    kmlbase::intrusive_ptr_add_ref(static_cast<kmlbase::Referent*>(r));
++}
++template <typename T>
++inline void intrusive_ptr_release(T* r) {
++    kmlbase::intrusive_ptr_release(static_cast<kmlbase::Referent*>(r));
++}
++
+ typedef boost::intrusive_ptr<Element> ElementPtr;
+ typedef boost::intrusive_ptr<Field> FieldPtr;
+ 

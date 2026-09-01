@@ -9,7 +9,7 @@ inspection easier.}
 
 Name:           python-%{pypi_name}
 Version:        0.4.1
-Release: 15%{?dist}
+Release:        13%{?dist}
 Summary:        Manage Python errors with ease
 License:        MIT
 
@@ -58,6 +58,9 @@ Summary:        %{summary}
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.1-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.4.1-12
 - Rebuilt for Python 3.14.0rc3 bytecode
 

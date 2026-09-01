@@ -1,0 +1,465 @@
+diff -up expect5.45.4/Dbg.c.tcl9-size expect5.45.4/Dbg.c
+--- expect5.45.4/Dbg.c.tcl9-size	2026-01-19 12:42:48.079014443 +0100
++++ expect5.45.4/Dbg.c	2026-01-19 12:43:24.744271485 +0100
+@@ -398,7 +398,7 @@ char *argv[];
+ #if TCL_MAJOR_VERSION >= 8
+ 					      -1,
+ #endif
+-				&elementPtr,&nextPtr,(int *)0,(int *)0);
++				&elementPtr,&nextPtr,(Tcl_Size *)0,(int *)0);
+ 			if (*elementPtr == '\0') wrap = TRUE;
+ 			else if (*nextPtr == '\0') wrap = FALSE;
+ 			else wrap = TRUE;
+@@ -443,7 +443,7 @@ Tcl_Obj *objv[];
+ {
+     char **argv;
+     int argc;
+-    int len;
++    Tcl_Size len;
+     argv = (char **)ckalloc(objc+1 * sizeof(char *));
+     for (argc=0 ; argc<objc ; argc++) {
+ 	argv[argc] = Tcl_GetStringFromObj(objv[argc],&len);
+diff -up expect5.45.4/exp_chan.c.tcl9-size expect5.45.4/exp_chan.c
+--- expect5.45.4/exp_chan.c.tcl9-size	2026-01-19 12:40:58.986849929 +0100
++++ expect5.45.4/exp_chan.c	2026-01-19 12:48:56.220801289 +0100
+@@ -42,10 +42,12 @@ static int		ExpBlockModeProc (ClientData
+ 			    int mode);
+ static int		ExpCloseProc (ClientData instanceData,
+ 			    Tcl_Interp *interp);
++static int		ExpClose2Proc (ClientData instanceData,
++			    Tcl_Interp *interp, int flags);
+ static int		ExpInputProc (ClientData instanceData,
+ 		            char *buf, int toRead, int *errorCode);
+ static int		ExpOutputProc (
+-			    ClientData instanceData, char *buf, int toWrite,
++			    ClientData instanceData, const char *buf, int toWrite,
+                             int *errorCode);
+ static void		ExpWatchProc (ClientData instanceData,
+ 		            int mask);
+@@ -60,7 +62,7 @@ void			exp_background_channelhandler (Cl
+ 
+ Tcl_ChannelType expChannelType = {
+     "exp",				/* Type name. */
+-    TCL_CHANNEL_VERSION_2,
++    TCL_CHANNEL_VERSION_5,
+     ExpCloseProc,			/* Close proc. */
+     ExpInputProc,			/* Input proc. */
+     ExpOutputProc,			/* Output proc. */
+@@ -69,7 +71,7 @@ Tcl_ChannelType expChannelType = {
+     NULL,				/* Get option proc. */
+     ExpWatchProc,			/* Initialize notifier. */
+     ExpGetHandleProc,			/* Get OS handles out of channel. */
+-    NULL,				/* Close2 proc */
++    ExpClose2Proc,			/* Close2 proc */
+     ExpBlockModeProc,			/* Set blocking/nonblocking mode.*/
+ };
+ 
+@@ -261,7 +263,7 @@ ExpInputProc(instanceData, buf, toRead,
+ static int
+ ExpOutputProc(instanceData, buf, toWrite, errorCodePtr)
+     ClientData instanceData;		/* Exp state. */
+-    char *buf;				/* The data buffer. */
++    const char *buf;				/* The data buffer. */
+     int toWrite;			/* How many bytes to write? */
+     int *errorCodePtr;			/* Where to store error code. */
+ {
+@@ -367,7 +369,37 @@ ExpCloseProc(instanceData, interp)
+     }
+     return 0;
+ }
+-
++
++/*
++ *----------------------------------------------------------------------
++ *
++ * ExpClose2Proc --
++ *
++ *	This procedure is called from the generic IO level to perform
++ *	channel-type-specific cleanup when an exp-based channel is closed.
++ *	This is a Tcl9-required wrapper around ExpCloseProc.
++ *
++ * Results:
++ *	0 if successful, a POSIX error code if failed.
++ *
++ * Side effects:
++ *	Closes the device of the channel.
++ *
++ *----------------------------------------------------------------------
++ */
++
++static int
++ExpClose2Proc(instanceData, interp, flags)
++    ClientData instanceData;	/* Exp state. */
++    Tcl_Interp *interp;		/* For error reporting - unused. */
++    int flags;			/* Flags for close direction. */
++{
++    if ((flags & (TCL_CLOSE_READ|TCL_CLOSE_WRITE)) == 0) {
++	return ExpCloseProc(instanceData, interp);
++    }
++    return EINVAL;
++}
++
+ /*
+  *----------------------------------------------------------------------
+  *
+diff -up expect5.45.4/exp_command.c.tcl9-size expect5.45.4/exp_command.c
+--- expect5.45.4/exp_command.c.tcl9-size	2026-01-19 12:33:33.648821260 +0100
++++ expect5.45.4/exp_command.c	2026-01-19 12:35:09.336277104 +0100
+@@ -216,11 +216,11 @@ expStateCheck(
+ ExpState *
+ expStateFromChannelName(
+     Tcl_Interp *interp,
+-    char *name,
++    const char *name,
+     int open,
+     int adjust,
+     int any,
+-    char *msg)
++    const char *msg)
+ {
+     ExpState *esPtr;
+     Tcl_Channel channel;
+@@ -1728,7 +1728,7 @@ void
+ exp_free_i(
+     Tcl_Interp *interp,
+     struct exp_i *i,
+-    Tcl_VarTraceProc *updateproc)/* proc to invoke if indirect is written */
++    char *(*updateproc)(ClientData, Tcl_Interp *, const char *, const char *, int))/* proc to invoke if indirect is written */
+ {
+     if (i->next) exp_free_i(interp,i->next,updateproc);
+ 
+@@ -1773,7 +1773,7 @@ exp_new_i_complex(
+     char *arg,		/* spawn id list or a variable containing a list */
+     int duration,		/* if we have to copy the args */
+     /* should only need do this in expect_before/after */
+-    Tcl_VarTraceProc *updateproc)	/* proc to invoke if indirect is written */
++    char *(*updateproc)(ClientData, Tcl_Interp *, const char *, const char *, int))	/* proc to invoke if indirect is written */
+ {
+     struct exp_i *i;
+     char **stringp;
+@@ -1837,9 +1837,9 @@ exp_i_parse_states(
+ {
+     struct ExpState *esPtr;
+     char *p = i->value;
+-    int argc;
+-    char **argv;
+-    int j;
++    Tcl_Size argc;
++    const char **argv;
++    Tcl_Size j;
+ 
+     if (Tcl_SplitList(NULL, p, &argc, &argv) != TCL_OK) goto error;
+ 
+@@ -1864,7 +1864,7 @@ exp_i_update(
+     Tcl_Interp *interp,
+     struct exp_i *i)
+ {
+-    char *p;	/* string representation of list of spawn ids */
++    const char *p;	/* string representation of list of spawn ids */
+ 
+     if (i->direct == EXP_INDIRECT) {
+ 	p = Tcl_GetVar(interp,i->variable,TCL_GLOBAL_ONLY);
+@@ -1978,6 +1978,7 @@ Exp_SendObjCmd(
+     int want_cooked = TRUE;
+     char *string;		/* string to send */
+     int len = -1;		/* length of string to send */
++    Tcl_Size str_len;		/* for Tcl_GetStringFromObj */
+     int zeros;		/* count of how many ascii zeros to send */
+ 
+     char *chanName = 0;
+@@ -2058,7 +2059,8 @@ Exp_SendObjCmd(
+ 	    exp_error(interp,"usage: send [args] string");
+ 	    return TCL_ERROR;
+ 	}
+-	string = Tcl_GetStringFromObj(objv[j], &len);
++	string = Tcl_GetStringFromObj(objv[j], &str_len);
++	len = (int)str_len;
+     } else {
+ 	len = strlen(string);
+     }
+@@ -2486,7 +2488,7 @@ Exp_ExitObjCmd(
+ 	    objc--;
+ 	    objv++;
+ 	    if (objc) {
+-		int len;
++		Tcl_Size len;
+ 		char* act = Tcl_GetStringFromObj (objv[0], &len);
+ 
+ 		if (exp_onexit_action)
+diff -up expect5.45.4/exp_command.h.tcl9-size expect5.45.4/exp_command.h
+--- expect5.45.4/exp_command.h.tcl9-size	2026-01-19 12:33:33.650109523 +0100
++++ expect5.45.4/exp_command.h	2026-01-19 12:35:09.337575922 +0100
+@@ -283,12 +283,12 @@ struct exp_i {
+ 	struct exp_i *next;
+ };
+ 
+-EXTERN struct exp_i *	exp_new_i_complex (Tcl_Interp *,
+-					char *, int, Tcl_VarTraceProc *);
++EXTERN struct exp_i *	exp_new_i_complex (Tcl_Interp *, char *, int,
++					char *(*)(ClientData, Tcl_Interp *, const char *, const char *, int));
+ EXTERN struct exp_i *	exp_new_i_simple (ExpState *,int);
+ EXTERN struct exp_state_list *exp_new_state (ExpState *);
+-EXTERN void		exp_free_i (Tcl_Interp *,struct exp_i *,
+-					Tcl_VarTraceProc *);
++EXTERN void		exp_free_i (Tcl_Interp *, struct exp_i *,
++					char *(*)(ClientData, Tcl_Interp *, const char *, const char *, int));
+ EXTERN void		exp_free_state (struct exp_state_list *);
+ EXTERN void		exp_free_state_single (struct exp_state_list *);
+ EXTERN int		exp_i_update (Tcl_Interp *,
+@@ -301,7 +301,7 @@ EXTERN int		exp_i_update (Tcl_Interp *,
+ #define EXP_NOPREFIX	1	/* don't define with "exp_" prefix */
+ #define EXP_REDEFINE	2	/* stomp on old commands with same name */
+ 
+-#define exp_proc(cmdproc) 0, cmdproc
++#define exp_proc(cmdproc) 0, (Tcl_CmdProc *)(cmdproc)
+ 
+ struct exp_cmd_data {
+ 	char		*name;
+@@ -322,7 +322,7 @@ EXTERN void		exp_init_tty_cmds();
+ 
+ EXTERN ExpState *	expStateCheck (Tcl_Interp *,ExpState *,int,int,char *);
+ EXTERN ExpState *       expStateCurrent (Tcl_Interp *,int,int,int);
+-EXTERN ExpState *       expStateFromChannelName (Tcl_Interp *,char *,int,int,int,char *);
++EXTERN ExpState *       expStateFromChannelName (Tcl_Interp *,const char *,int,int,int,const char *);
+ EXTERN void		expStateFree (ExpState *);
+ 
+ EXTERN ExpState *	expCreateChannel (Tcl_Interp *,int,int,int);
+diff -up expect5.45.4/expect.c.tcl9-size expect5.45.4/expect.c
+--- expect5.45.4/expect.c.tcl9-size	2026-01-19 12:33:33.651342903 +0100
++++ expect5.45.4/expect.c	2026-01-19 12:35:09.333895527 +0100
+@@ -163,8 +163,8 @@ static char *exp_indirect_update1( /* 1-
+ static char *exp_indirect_update2( /* 2-part Tcl variable names */
+     ClientData clientData,
+     Tcl_Interp *interp,	/* Interpreter containing variable. */
+-    char *name1,	/* Name of variable. */
+-    char *name2,	/* Second part of variable name. */
++    const char *name1,	/* Name of variable. */
++    const char *name2,	/* Second part of variable name. */
+     int flags);		/* Information about what happened. */
+ 
+ #ifdef SIMPLE_EVENT
+@@ -285,7 +285,8 @@ exp_eval_with_one_arg(
+     const char *p;
+     const char *next;
+     int rc;
+-    int bytesLeft, numWords;
++    Tcl_Size bytesLeft;
++    int numWords;
+     Tcl_Parse parse;
+ 
+     /*
+@@ -491,7 +492,7 @@ parse_expect_args(
+ 		{
+ 		    Tcl_Obj* g;
+ 		    Tcl_UniChar* str;
+-		    int strlen;
++		    Tcl_Size strlen;
+ 
+ 		    str = Tcl_GetUnicodeFromObj (objv[i], &strlen);
+ 		    g = exp_retoglob (str, strlen);
+@@ -853,7 +854,7 @@ eval_case_string(
+ 	expDiagLog("\"? ");
+ 
+ 	if (e->gate) {
+-	    int plen;
++	    Tcl_Size plen;
+ 	    Tcl_UniChar* pat = Tcl_GetUnicodeFromObj(e->gate,&plen);
+ 
+ 	    expDiagLog("Gate \"");
+@@ -916,7 +917,7 @@ eval_case_string(
+ 	expDiagLogU(expPrintify(Tcl_GetString(e->pat)));
+ 	expDiagLog("\"? ");
+ 	if (str) {
+-	    int plen;
++	    Tcl_Size plen;
+ 	    Tcl_UniChar* pat = Tcl_GetUnicodeFromObj(e->pat,&plen);
+ 
+ 	    match = Exp_StringCaseMatch(str,numchars, pat, plen,
+@@ -933,7 +934,7 @@ eval_case_string(
+ 	}
+ 	expDiagLogU(no);
+     } else if (e->use == PAT_EXACT) {
+-	int patLength;
++	Tcl_Size patLength;
+ 	char *pat = Tcl_GetStringFromObj(e->pat, &patLength);
+ 	Tcl_UniChar *p;
+ 
+@@ -1393,6 +1394,7 @@ Exp_ExpectGlobalObjCmd(
+     struct exp_state_list *slPtr;   /* temp for interating over state_list */
+     struct exp_cmd_descriptor eg;
+     int count;
++    Tcl_Size new_objc;		/* for Tcl_ListObjGetElements */
+     Tcl_Obj* new_cmd = NULL;
+ 
+     struct exp_cmd_descriptor *ecmd = (struct exp_cmd_descriptor *) clientData;
+@@ -1415,7 +1417,8 @@ Exp_ExpectGlobalObjCmd(
+ 
+     if (new_cmd) {
+ 	/* Replace old arguments with result of the reparse */
+-	Tcl_ListObjGetElements (interp, new_cmd, &objc, (Tcl_Obj***) &objv);
++	Tcl_ListObjGetElements (interp, new_cmd, &new_objc, (Tcl_Obj***) &objv);
++	objc = (int)new_objc;
+     }
+ 
+     if (objc > 1 && (Tcl_GetString(objv[1])[0] == '-')) {
+@@ -2122,8 +2125,8 @@ static char *
+ exp_indirect_update2(
+     ClientData clientData,
+     Tcl_Interp *interp,	/* Interpreter containing variable. */
+-    char *name1,	/* Name of variable. */
+-    char *name2,	/* Second part of variable name. */
++    const char *name1,	/* Name of variable. */
++    const char *name2,	/* Second part of variable name. */
+     int flags)		/* Information about what happened. */
+ {
+ 	char *msg;
+@@ -2566,6 +2569,7 @@ Exp_ExpectObjCmd(
+     int remtime;		/* remaining time in timeout */
+     int reset_timer;		/* should timer be reset after continue? */
+     Tcl_Time temp_time;
++    Tcl_Size new_objc;		/* for Tcl_ListObjGetElements */
+     Tcl_Obj* new_cmd = NULL;
+ 
+     if ((objc == 2) && exp_one_arg_braced(objv[1])) {
+@@ -2586,7 +2590,8 @@ Exp_ExpectObjCmd(
+ 
+     if (new_cmd) {
+ 	/* Replace old arguments with result of the reparse */
+-	Tcl_ListObjGetElements (interp, new_cmd, &objc, (Tcl_Obj***) &objv);
++	Tcl_ListObjGetElements (interp, new_cmd, &new_objc, (Tcl_Obj***) &objv);
++	objc = (int)new_objc;
+     }
+ 
+     Tcl_GetTime (&temp_time);
+diff -up expect5.45.4/exp_inter.c.tcl9-size expect5.45.4/exp_inter.c
+--- expect5.45.4/exp_inter.c.tcl9-size	2026-01-19 12:33:33.642872498 +0100
++++ expect5.45.4/exp_inter.c	2026-01-19 12:35:09.330575959 +0100
+@@ -696,8 +696,8 @@ static char *
+ inter_updateproc(
+     ClientData clientData,
+     Tcl_Interp *interp,	/* Interpreter containing variable. */
+-    char *name1,	/* Name of variable. */
+-    char *name2,	/* Second part of variable name. */
++    const char *name1,	/* Name of variable. */
++    const char *name2,	/* Second part of variable name. */
+     int flags)		/* Information about what happened. */
+ {
+ 	exp_configure_count++;
+@@ -721,6 +721,7 @@ Exp_InteractObjCmd(
+ 
+     Tcl_Obj *const *objv_copy;	/* original, for error messages */
+     Tcl_Obj **objv = (Tcl_Obj **) initial_objv;
++    Tcl_Size new_objc;		/* for Tcl_ListObjGetElements */
+     char *string;
+     Tcl_UniChar *ustring;
+ 
+@@ -793,7 +794,8 @@ Exp_InteractObjCmd(
+ 	if (!new_cmd) return TCL_ERROR;
+ 
+ 	/* Replace old arguments with result of reparse */
+-	Tcl_ListObjGetElements (interp, new_cmd, &objc, &objv);
++	Tcl_ListObjGetElements (interp, new_cmd, &new_objc, &objv);
++	objc = (int)new_objc;
+ 
+     } else if ((objc == 3) && streq(Tcl_GetString(objv[1]),"-brace")) {
+ 	/* expect -brace {...} ... fake command line for reparsing */
+@@ -805,7 +807,8 @@ Exp_InteractObjCmd(
+ 	new_cmd = exp_eval_with_one_arg(clientData,interp,new_objv);
+ 	if (!new_cmd) return TCL_ERROR;
+ 	/* Replace old arguments with result of reparse */
+-	Tcl_ListObjGetElements (interp, new_cmd, &objc, &objv);
++	Tcl_ListObjGetElements (interp, new_cmd, &new_objc, &objv);
++	objc = (int)new_objc;
+     }
+ 
+     objv_copy = objv;
+diff -up expect5.45.4/exp_main_sub.c.tcl9-size expect5.45.4/exp_main_sub.c
+--- expect5.45.4/exp_main_sub.c.tcl9-size	2026-01-19 12:33:33.643078268 +0100
++++ expect5.45.4/exp_main_sub.c	2026-01-19 12:46:11.979529742 +0100
+@@ -557,7 +557,7 @@ Tcl_Interp *interp;
+       return TCL_ERROR;
+     }
+ #else
+-    if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
++    if (Tcl_InitStubs(interp, "9.0", 0) == NULL) {
+       return TCL_ERROR;
+     }
+ #endif
+@@ -614,7 +614,7 @@ Tcl_Interp *interp;
+ 	expDiagInit();
+ 	expLogInit();
+ 	expDiagLogPtrSet(expDiagLogU);
+-	expErrnoMsgSet(Tcl_ErrnoMsg);
++	expErrnoMsgSet((char * (*)(int))Tcl_ErrnoMsg);
+ 
+ 	Tcl_CreateExitHandler(exp_exit_handlers,(ClientData)interp);
+ 
+@@ -878,7 +878,7 @@ char **argv;
+ 		expDiagLog("set argv0 \"%s\"\r\n",exp_argv0);
+ 	}
+ 
+-	args = Tcl_Merge(argc-optind,argv+optind);
++	args = Tcl_Merge((Tcl_Size)(argc-optind),(const char *const *)(argv+optind));
+ 	expDiagLogU("set argv \"");
+ 	expDiagLogU(args);
+ 	expDiagLogU("\"\r\n");
+diff -up expect5.45.4/exp_pty.c.tcl9-size expect5.45.4/exp_pty.c
+--- expect5.45.4/exp_pty.c.tcl9-size	2026-01-19 12:33:33.646703400 +0100
++++ expect5.45.4/exp_pty.c	2026-01-19 12:35:09.337575922 +0100
+@@ -305,8 +305,7 @@ exp_pty_lock(
+ static void		(*expDiagLogPtrVal) (char *);
+ 
+ void
+-expDiagLogPtrSet(fn)
+-     void (*fn) (char *);
++expDiagLogPtrSet(void (*fn) (char *))
+ {
+   expDiagLogPtrVal = fn;
+ }
+@@ -361,8 +360,7 @@ int errorNo;
+ }
+ 
+ void
+-expErrnoMsgSet(fn)
+-     char * (*fn) (int);
++expErrnoMsgSet(char * (*fn) (int))
+ {
+   expErrnoMsgVal = fn;
+ }
+diff -up expect5.45.4/exp_trap.c.tcl9-size expect5.45.4/exp_trap.c
+--- expect5.45.4/exp_trap.c.tcl9-size	2026-01-19 12:33:33.643414624 +0100
++++ expect5.45.4/exp_trap.c	2026-01-19 12:35:09.330575959 +0100
+@@ -304,10 +304,10 @@ int objc;
+ Tcl_Obj *const objv[];
+ {
+ 	char *action = 0;
+-	int n;		/* number of signals in list */
++	Tcl_Size n;		/* number of signals in list */
+ 	Tcl_Obj **list;	/* list of signals */
+ 	char *arg;
+-	int len;	/* length of action */
++	Tcl_Size len;	/* length of action */
+ 	int i;
+ 	int show_name = FALSE;	/* if user asked for current sig by name */
+ 	int show_number = FALSE;/* if user asked for current sig by number */
+@@ -509,7 +509,7 @@ int oldcode;
+ 
+ 		if (eip) {
+ 		  /* odd that Tcl doesn't have a call that does all this at once */
+-		  int len;
++		  Tcl_Size len;
+ 		  char *s = Tcl_GetStringFromObj(eip,&len);
+ 		  Tcl_AddObjErrorInfo(interp,s,len);
+ 		  Tcl_DecrRefCount(eip);
+diff -up expect5.45.4/retoglob.c.tcl9-size expect5.45.4/retoglob.c
+--- expect5.45.4/retoglob.c.tcl9-size	2026-01-19 12:33:33.647026352 +0100
++++ expect5.45.4/retoglob.c	2026-01-19 13:21:15.720817934 +0100
+@@ -100,7 +100,7 @@ exp_retoglob (
+ #define CHOPC(c) {while (*str != (c) && strlen) CHOP(1) ;}
+ #define EMIT(c)  {lastsz = 1; *nexto++ = (c);}
+ #define EMITX(c) {lastsz++;   *nexto++ = (c);}
+-#define MATCH(lit) ((strlen >= (sizeof (lit)/sizeof (Tcl_UniChar))) && (0 == Tcl_UniCharNcmp (str,(lit),sizeof(lit)/sizeof (Tcl_UniChar))))
++#define MATCH(lit) ((strlen >= (sizeof (lit)/sizeof (Tcl_UniChar))) && (0 == memcmp (str,(lit),sizeof(lit))))
+ #define MATCHC(c) (strlen && (*str == (c)))
+ #define PUSHPAREN {*nextp++ = nexto;}
+ #define UNEMIT {nexto -= lastsz; lastsz = -1;}

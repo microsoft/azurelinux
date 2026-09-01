@@ -1,0 +1,25 @@
+From 9283295bd9c866bafbf4ee13fed5b8cba3328781 Mon Sep 17 00:00:00 2001
+From: "Benjamin A. Beasley" <code@musicinmybrain.net>
+Date: Mon, 12 Jan 2026 00:14:28 +0000
+Subject: [PATCH 2/2] Downstream-only: remove linting/coverage options for
+ pytest
+
+---
+ pytest.ini | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pytest.ini b/pytest.ini
+index f9505b2..833bedd 100644
+--- a/pytest.ini
++++ b/pytest.ini
+@@ -7,6 +7,6 @@
+ # details.
+ 
+ [pytest]
+-addopts = --isort --pydocstyle --pycodestyle --doctest-glob="*.rst" --doctest-modules --cov=dictdiffer --cov-report=term-missing
++addopts = --doctest-glob="*.rst" --doctest-modules
+ testpaths = tests dictdiffer
+ filterwarnings = ignore::pytest.PytestDeprecationWarning
+-- 
+2.52.0
+

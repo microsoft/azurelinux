@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -15,9 +15,7 @@
 %global libxmlb_version 0.3.24
 %global libusb_version 1.0.9
 %global libcurl_version 7.62.0
-%global libjcat_version 0.1.0
 %global systemd_version 249
-%global json_glib_version 1.1.1
 
 # although we ship a few tiny python files these are utilities that 99.99%
 # of users do not need -- use this to avoid dragging python onto CoreOS
@@ -31,13 +29,8 @@
 %global enable_dummy 1
 
 # fwupd.efi is only available on these arches
-%ifarch i686 x86_64 aarch64 riscv64
+%ifarch x86_64 aarch64 riscv64
 %global have_uefi 1
-%endif
-
-# flashrom is only available on these arches
-%ifarch i686 x86_64 armv7hl aarch64 ppc64le riscv64
-%global have_flashrom 1
 %endif
 
 %ifarch i686 x86_64
@@ -55,7 +48,7 @@
 
 Summary:   Firmware update daemon
 Name:      fwupd
-Version:   2.0.19
+Version:   2.1.7
 Release:   %autorelease
 License:   LGPL-2.1-or-later
 URL:       https://github.com/fwupd/fwupd
@@ -67,16 +60,12 @@ BuildRequires: glib2-devel >= %{glib2_version}
 BuildRequires: libxmlb-devel >= %{libxmlb_version}
 BuildRequires: libusb1-devel >= %{libusb_version}
 BuildRequires: libcurl-devel >= %{libcurl_version}
-BuildRequires: libjcat-devel >= %{libjcat_version}
 BuildRequires: polkit-devel >= 0.103
-BuildRequires: protobuf-c-devel
 BuildRequires: python3-packaging
 BuildRequires: python3-jinja2
 BuildRequires: sqlite-devel
 BuildRequires: systemd >= %{systemd_version}
 BuildRequires: systemd-devel
-BuildRequires: libarchive-devel
-BuildRequires: libcbor-devel
 BuildRequires: libblkid-devel
 BuildRequires: readline-devel
 BuildRequires: libmnl-devel
@@ -92,13 +81,9 @@ BuildRequires: gi-docgen
 BuildRequires: gnutls-devel
 BuildRequires: gnutls-utils
 BuildRequires: meson
-BuildRequires: json-glib-devel >= %{json_glib_version}
 BuildRequires: vala
 BuildRequires: pkgconfig(bash-completion)
 BuildRequires: git-core
-%if 0%{?have_flashrom}
-BuildRequires: flashrom-devel >= 1.2-2
-%endif
 BuildRequires: libdrm-devel
 # For fu-polkit-test
 BuildRequires: polkit
@@ -131,6 +116,8 @@ Requires: shared-mime-info
 Obsoletes: dbxtool < 9
 Provides: dbxtool
 
+Obsoletes: %{name}-plugin-flashrom < 2.1.4
+
 # optional, but a really good idea
 Recommends: udisks2
 Recommends: bluez
@@ -141,9 +128,6 @@ Recommends: passim
 
 %if 0%{?have_modem_manager}
 Recommends: %{name}-plugin-modem-manager
-%endif
-%if 0%{?have_flashrom}
-Recommends: %{name}-plugin-flashrom
 %endif
 %if 0%{?have_uefi}
 Recommends: %{name}-efi
@@ -179,16 +163,6 @@ This provides the optional package which is only required on hardware that
 might have mobile broadband hardware. It is probably not required on servers.
 %endif
 
-%if 0%{?have_flashrom}
-%package plugin-flashrom
-Summary: fwupd plugin using flashrom
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description plugin-flashrom
-This provides the optional package which is only required on hardware that
-can be flashed using flashrom. It is probably not required on servers.
-%endif
-
 %if 0%{?have_uefi}
 %package plugin-uefi-capsule-data
 Summary: Localized data for the UEFI UX capsule
@@ -214,11 +188,6 @@ or server machines.
 %else
     -Dtests=false \
 %endif
-%if 0%{?have_flashrom}
-    -Dplugin_flashrom=enabled \
-%else
-    -Dplugin_flashrom=disabled \
-%endif
 %if 0%{?have_modem_manager}
     -Dplugin_modem_manager=enabled \
 %else
@@ -228,6 +197,11 @@ or server machines.
     -Dpassim=enabled \
 %else
     -Dpassim=disabled \
+%endif
+%ifarch i686 x86_64
+    -Dhsi=enabled \
+%else
+    -Dhsi=disabled \
 %endif
     -Dman=true \
     -Dsystemd_unit_user="" \
@@ -244,7 +218,7 @@ or server machines.
 %install
 %meson_install
 
-mkdir -p --mode=0700 $RPM_BUILD_ROOT%{_localstatedir}/lib/fwupd/gnupg
+mkdir -p --mode=0700 $RPM_BUILD_ROOT%{_localstatedir}/lib/fwupd
 
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1757948
 mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/fwupd
@@ -283,6 +257,7 @@ systemctl --no-reload preset fwupd-refresh.timer &>/dev/null || :
 %{_sysconfdir}/fwupd/bios-settings.d/README.md
 %dir %{_sysconfdir}/fwupd/remotes.d
 %config(noreplace)%{_sysconfdir}/fwupd/remotes.d/lvfs.conf
+%config(noreplace)%{_sysconfdir}/fwupd/remotes.d/lvfs-embargo.conf
 %config(noreplace)%{_sysconfdir}/fwupd/remotes.d/lvfs-testing.conf
 %config(noreplace)%{_sysconfdir}/fwupd/remotes.d/vendor-directory.conf
 %config(noreplace)%{_sysconfdir}/pki/fwupd
@@ -335,19 +310,14 @@ systemctl --no-reload preset fwupd-refresh.timer &>/dev/null || :
 /usr/lib/systemd/system-shutdown/fwupd.shutdown
 %dir %{_libdir}/fwupd-%{version}
 %{_libdir}/fwupd-%{version}/libfwupd*.so
-%ghost %{_localstatedir}/lib/fwupd/gnupg
 
 %if 0%{?have_modem_manager}
 %files plugin-modem-manager
 %{_libdir}/fwupd-%{version}/libfu_plugin_modem_manager.so
 %endif
-%if 0%{?have_flashrom}
-%files plugin-flashrom
-%{_libdir}/fwupd-%{version}/libfu_plugin_flashrom.so
-%endif
 %if 0%{?have_uefi}
 %files plugin-uefi-capsule-data
-%{_datadir}/fwupd/uefi-capsule-ux.tar.xz
+%{_datadir}/fwupd/uefi-capsule-ux.zip
 %endif
 
 %files devel
@@ -371,14 +341,35 @@ systemctl --no-reload preset fwupd-refresh.timer &>/dev/null || :
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.0.19-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 2.1.7-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 2.0.19-3
-- build: mass rebuild auto-bumpable components
+* Mon Jul 27 2026 Richard Hughes <richard@hughsie.com> - 2.1.7-1
+- New upstream release
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 2.0.19-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Jul 01 2026 Richard Hughes <richard@hughsie.com> - 2.1.6-1
+- New upstream release
+
+* Wed Jun 10 2026 Richard Hughes <richard@hughsie.com> - 2.1.5-1
+- New upstream release
+
+* Fri May 29 2026 Richard Hughes <richard@hughsie.com> - 2.1.4-1
+- New upstream release
+
+* Tue May 12 2026 Richard Hughes <richard@hughsie.com> - 2.1.3-1
+- New upstream release
+
+* Fri Apr 24 2026 Richard Hughes <richard@hughsie.com> - 2.1.2-1
+- New upstream release
+
+* Thu Mar 12 2026 Richard Hughes <richard@hughsie.com> - 2.1.1-1
+- New upstream release
+
+* Thu Feb 26 2026 Richard Hughes <richard@hughsie.com> - 2.0.20-1
+- New upstream release
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
 * Fri Dec 19 2025 Richard Hughes <richard@hughsie.com> - 2.0.19-1
 - New upstream release
@@ -388,6 +379,9 @@ systemctl --no-reload preset fwupd-refresh.timer &>/dev/null || :
 
 * Wed Nov 05 2025 Richard Hughes <richard@hughsie.com> - 2.0.17-1
 - New upstream release
+
+* Mon Nov 03 2025 Richard Hughes <richard@hughsie.com> - 2.0.16-2
+- Rebuild for libcbor
 
 * Fri Sep 12 2025 Richard Hughes <richard@hughsie.com> - 2.0.16-1
 - New upstream release

@@ -1,0 +1,35 @@
+From 2d0613acd044544e79b034b1cbc248664edf2884 Mon Sep 17 00:00:00 2001
+From: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+Date: Wed, 12 Aug 2026 05:35:52 +0000
+Subject: [PATCH] wayland: Increase global removal timer timeout to 1 day
+
+If an output global is removed due to the 5min timer expiring, the
+wl_fixes.ack_global_remove requests will result in a protocol error
+because the global has been already destroyed.
+
+As a whacky workaround, increase the timer interval to 1 day.
+
+
+(cherry picked from commit ea9edac4824b0d972638b2550c59f58482342efb)
+
+Co-authored-by: Vlad Zahorodnii <vlad.zahorodnii@kde.org>
+---
+ src/wayland/tools/qtwaylandscanner.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/wayland/tools/qtwaylandscanner.cpp b/src/wayland/tools/qtwaylandscanner.cpp
+index 56d2cce0483..d642659dda6 100644
+--- a/src/wayland/tools/qtwaylandscanner.cpp
++++ b/src/wayland/tools/qtwaylandscanner.cpp
+@@ -893,7 +893,7 @@ bool Scanner::process()
+             printf("\n");
+             printf("        struct wl_event_loop *event_loop = wl_display_get_event_loop(m_display);\n");
+             printf("        m_globalRemovedEvent = wl_event_loop_add_timer(event_loop, deferred_destroy_global_func, this);\n");
+-            printf("        wl_event_source_timer_update(m_globalRemovedEvent, 300000);\n");
++            printf("        wl_event_source_timer_update(m_globalRemovedEvent, 24 * 60 * 60 * 1000);\n");
+             printf("\n");
+             printf("        wl_global_remove(m_global);\n");
+             printf("    }\n");
+-- 
+GitLab
+

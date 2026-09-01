@@ -1,0 +1,38 @@
+From e9ad9567d66e5c78f35b8fbd48ea98413091eadf Mon Sep 17 00:00:00 2001
+From: Diego Herrera <dherrera@redhat.com>
+Date: Tue, 30 Sep 2025 00:49:36 -0300
+Subject: [PATCH 11/19] onnx onnxruntime fix
+
+---
+ onnxruntime/core/session/onnxruntime_c_api.cc | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/onnxruntime/core/session/onnxruntime_c_api.cc b/onnxruntime/core/session/onnxruntime_c_api.cc
+index b60d97e38f..b0670c3614 100644
+--- a/onnxruntime/core/session/onnxruntime_c_api.cc
++++ b/onnxruntime/core/session/onnxruntime_c_api.cc
+@@ -44,6 +44,7 @@
+ #include "core/session/ort_apis.h"
+ #include "core/session/ort_env.h"
+ #include "core/session/utils.h"
++#include "onnx/onnxruntime_fix.h"
+ 
+ #if defined(USE_CUDA) || defined(USE_CUDA_PROVIDER_INTERFACE)
+ #include "core/providers/cuda/cuda_provider_factory.h"
+@@ -3094,6 +3095,13 @@ ORT_API(const char*, OrtApis::GetBuildInfoString) {
+ }
+ 
+ const OrtApiBase* ORT_API_CALL OrtGetApiBase(void) NO_EXCEPTION {
++  class RunONNXRuntimeFix {
++   public:
++    RunONNXRuntimeFix() {
++      onnx::ONNXRuntimeFix::disableStaticRegistration();
++    }
++  };
++  static RunONNXRuntimeFix runONNXRuntimeFix;
+   return &ort_api_base;
+ }
+ 
+-- 
+2.51.0
+

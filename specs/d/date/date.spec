@@ -6,7 +6,7 @@
 
 Name:           date
 Version:        3.0.4
-Release: 4%{?dist}
+Release:        3%{?dist}
 Summary:        Date and time library based on the C++11/14/17 <chrono> header
 
 License:        MIT
@@ -107,6 +107,12 @@ export CTEST_OUTPUT_ON_FAILURE=ON
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Dec 28 2025 Aleksei Bavshin <alebastr@fedoraproject.org> - 3.0.4-1
 - Update to 3.0.4
 

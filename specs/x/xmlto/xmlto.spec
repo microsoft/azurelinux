@@ -3,7 +3,7 @@
 
 Name: xmlto
 Version: 0.0.29
-Release: 6%{?dist}
+Release: 5%{?dist}
 Summary: A tool for converting XML files to various formats
 
 License: GPL-2.0-or-later
@@ -32,7 +32,7 @@ stylesheets.
 License: GPL-2.0-or-later
 Summary: A set of xmlto backends with TeX requirements
 # For full functionality, we need passivetex.
-Requires: tex-passivetex
+Requires: texlive-passivetex
 # We require main package
 Requires: xmlto = %{version}-%{release}
 BuildArch: noarch
@@ -91,13 +91,19 @@ make check
 %{_datadir}/xmlto/format/xhtml1/*
 
 %changelog
+* Mon Feb  9 2026 Tom Callaway <spot@fedoraproject.org> - 0.0.29-5
+- fix -tex subpackage to use modern texlive provide
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.29-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.29-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
 * Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.0.29-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
-* Tue Jun 11 2024 Ondrej Sloup <osloup@redhat.com> - 0.0.29-1
+* Sun Aug 11 2024 Ondrej Sloup <osloup@redhat.com> - 0.0.29-1
 - Rebase to the latest upstream version
 
 * Fri Jul 26 2024 Miroslav Suchý <msuchy@redhat.com> - 0.0.28-25

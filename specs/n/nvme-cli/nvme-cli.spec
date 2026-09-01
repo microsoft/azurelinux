@@ -8,7 +8,7 @@
 
 Name:           nvme-cli
 Version:        2.16
-Release: 4%{?dist}
+Release:        3%{?dist}
 Summary:        NVMe management command line interface
 
 License:        GPL-2.0-only
@@ -16,6 +16,9 @@ URL:            https://github.com/linux-nvme/nvme-cli
 Source0:        %{url}/archive/v%{version_no_tilde}/%{name}-%{version_no_tilde}.tar.gz
 Source1:        99-nvme-nbft-connect.sh
 Source2:        99-nvme-nbft-no-ignore-carrier.conf
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2501829
+Patch0:         format-sigint.patch
 
 BuildRequires:  meson >= 0.53
 BuildRequires:  gcc gcc-c++
@@ -122,6 +125,12 @@ fi
 
 
 %changelog
+* Tue Aug 18 2026 Tomas Bzatek <tbzatek@redhat.com> - 2.16-3
+- Fix ignored interruption in format command (#2501829)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.16-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Dec 04 2025 Tomas Bzatek <tbzatek@redhat.com> - 2.16-1
 - Update to 2.16
 

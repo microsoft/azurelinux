@@ -1,4 +1,4 @@
-From 4af2621a60b0cca55ef3353676d1443335e51b7e Mon Sep 17 00:00:00 2001
+From a367c2691bf39bc4509c441b6f634538508d8de8 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 26 Jul 2022 01:32:46 -0400
 Subject: [PATCH 3/7] Disable warnings-as-errors in tests
@@ -9,10 +9,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index 9d6a2939..b7082f87 100644
+index bafc6a0b..9d313003 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -109,7 +109,6 @@ addopts = '''
+@@ -134,7 +134,6 @@ addopts = '''
  -p no:asyncio
  -p no:legacypath'''
  filterwarnings = [
@@ -21,5 +21,5 @@ index 9d6a2939..b7082f87 100644
      # xref: https://github.com/jupyter/jupyter_core/issues/309
      '''ignore:Jupyter is migrating its paths to use standard platformdirs''',
 -- 
-2.50.0
+2.52.0
 

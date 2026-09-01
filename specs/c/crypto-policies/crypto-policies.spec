@@ -1,8 +1,8 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-%global git_date 20251125
-%global git_commit 63291f876cc9fc0ff009de079c76bfe23c7bfa99
+%global git_date 20251128
+%global git_commit 19878fea4c5f62208655e32269842bce55c819b2
 %{?git_commit:%global git_commit_hash %(c=%{git_commit}; echo ${c:0:7})}
 
 %global _python_bytecompile_extra 0
@@ -14,7 +14,7 @@
 
 Name:           crypto-policies
 Version:        %{git_date}
-Release:        1.git%{git_commit_hash}%{?dist}
+Release:        3.git%{git_commit_hash}%{?dist}
 Summary:        System-wide crypto policies
 
 License:        LGPL-2.1-or-later
@@ -292,8 +292,22 @@ exit 0
 %{_datarootdir}/crypto-policies/python
 
 %changelog
-* Tue Nov 25 2025 Alexander Sosedkin <asosedkin@redhat.com> - 20251125-1.git63291f8
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251128-3.git19878fe
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20251128-2.git19878fe
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov 28 2025 Alexander Sosedkin <asosedkin@redhat.com> - 20251128-1.git19878fe
+- openssl: allow disabling all TLS / DTLS protocols
+- gnutls: do enabled-curve for hybrids with said curve
+- nss: enable ML-DSA
+
+* Tue Nov 25 2025 Alexander Sosedkin <asosedkin@redhat.com> - 20251125-1.gitd04d331
 - sequoia: register "eddsa" as an alias to EDDSA-ED25519
+- sequoia: revert "Do not include EdDSA in FIPS policy"
+- openssl: let TLS 1.3 brainpool groups get used for key shares
+- openssh: support mlkem768nistp256-sha256 and mlkem1024nistp384-sha384
 
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 20250714-5.gitcd6043a
 - Rebuilt for Python 3.14.0rc3 bytecode

@@ -1,0 +1,1347 @@
+From 381b5d0d208972586282116d333865ba93b8dec2 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:02:47 -0400
+Subject: [PATCH 01/10] eir: Fix stack buffer overflow when parsing the remote
+ name
+
+name2utf8() copies len bytes into a HCI_MAX_NAME_LENGTH + 2, so 250,
+byte stack buffer without clamping len first.
+
+eir_parse() only rejects a field once it runs past the end of the EIR
+data, and that data is up to 255 bytes, so field_len can be 254 and the
+data_len passed to name2utf8() can reach 253. strncpy() then writes 253
+bytes into the 250 byte buffer and leaves it unterminated, so the
+following g_strstrip() and g_strdup() also read past the end.
+
+The EIR data comes from a remote device, either in an extended inquiry
+response or in an advertising report, so the length is attacker
+controlled.
+
+Clamp len to HCI_MAX_NAME_LENGTH, which is what the local name is
+limited to anyway, and what ad_replace_name() already clamps to.
+
+Fixes: https://github.com/bluez/bluez/security/advisories/GHSA-68h6-5qgp-3975
+Assisted-by: Claude:claude-opus-5
+---
+ src/eir.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/eir.c b/src/eir.c
+index 89c15995a546..4421b1662d65 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -137,6 +137,8 @@ static char *name2utf8(const uint8_t *name, uint8_t len)
+ {
+ 	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+ 
++	len = MIN(len, HCI_MAX_NAME_LENGTH);
++
+ 	memset(utf8_name, 0, sizeof(utf8_name));
+ 	strncpy(utf8_name, (char *) name, len);
+ 	strtoutf8(utf8_name, len);
+-- 
+2.55.0
+
+
+From 784203160e2fb906090059336d86a24f28349b02 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Thu, 20 Aug 2026 13:42:12 -0400
+Subject: [PATCH 02/10] shared/ad: Fix reading past the name that was copied
+
+ad_replace_name() copies at most HCI_MAX_NAME_LENGTH bytes of the name
+into its buffer, but then hands the full iov_len to strisutf8() and
+strtoutf8().
+
+The advertising data is up to 255 bytes, so a complete local name field
+can hold 253 of them, and both end up reading 253 bytes out of a 250
+byte buffer, 3 of them past its end.
+
+Use the same clamped length throughout.
+
+Assisted-by: Claude:claude-opus-5
+---
+ src/shared/ad.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index b1d1b84611aa..ebee078500c6 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -276,15 +276,15 @@ static bool ad_replace_uuid128(struct bt_ad *ad, struct iovec *iov)
+ static bool ad_replace_name(struct bt_ad *ad, struct iovec *iov)
+ {
+ 	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
++	size_t len = MIN(iov->iov_len, (size_t) HCI_MAX_NAME_LENGTH);
+ 
+ 	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (const char *)iov->iov_base,
+-			MIN(iov->iov_len, HCI_MAX_NAME_LENGTH));
++	strncpy(utf8_name, (const char *)iov->iov_base, len);
+ 
+-	if (strisutf8(utf8_name, iov->iov_len))
++	if (strisutf8(utf8_name, len))
+ 		goto done;
+ 
+-	strtoutf8(utf8_name, iov->iov_len);
++	strtoutf8(utf8_name, len);
+ 
+ 	/* Remove leading and trailing whitespace characters */
+ 	strstrip(utf8_name);
+-- 
+2.55.0
+
+
+From debd432ef13c5ea9ffab9ffcbfcb45372946920f Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Thu, 20 Aug 2026 13:28:38 -0400
+Subject: [PATCH 03/10] unit/test-eir: Add tests for the longest local names
+
+Nothing covered a name anywhere near the size of the buffer it is copied
+into, which is why the missing clamp went unnoticed.
+
+Add two tests. The first uses a name of HCI_MAX_NAME_LENGTH bytes, the
+longest one that fits, to pin the boundary down.
+
+The second uses a name of 253 bytes, as large as eir_parse() can be
+handed given the EIR length is a single byte, and which does not fit.
+Run against the code before the previous patch, it dies with
+
+  *** buffer overflow detected ***: terminated
+
+Assisted-by: Claude:claude-opus-5
+---
+ unit/test-eir.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 62 insertions(+)
+
+diff --git a/unit/test-eir.c b/unit/test-eir.c
+index 62164ca993f6..326bc899e251 100644
+--- a/unit/test-eir.c
++++ b/unit/test-eir.c
+@@ -440,6 +440,64 @@ static const struct test_data iso_2022_jp_name_test = {
+ 	.tx_power = 127,
+ };
+ 
++/*
++ * A complete local name of HCI_MAX_NAME_LENGTH bytes, the longest one that
++ * fits the buffer eir_parse() copies the name into.
++ */
++static unsigned char max_name_data[HCI_MAX_NAME_LENGTH + 2];
++static char max_name[HCI_MAX_NAME_LENGTH + 1];
++
++static const struct test_data max_name_test = {
++	.eir_data = max_name_data,
++	.eir_size = sizeof(max_name_data),
++	.name = max_name,
++	.name_complete = true,
++	.tx_power = 127,
++};
++
++static void max_name_setup(const void *data)
++{
++	max_name_data[0] = sizeof(max_name_data) - 1;
++	max_name_data[1] = EIR_NAME_COMPLETE;
++	memset(max_name_data + 2, 'A', HCI_MAX_NAME_LENGTH);
++
++	memset(max_name, 'A', HCI_MAX_NAME_LENGTH);
++	max_name[HCI_MAX_NAME_LENGTH] = '\0';
++
++	tester_setup_complete();
++}
++
++/*
++ * The longest complete local name eir_parse() can be handed at all, which is
++ * bounded by the EIR length being a single byte. That is 253 bytes, more than
++ * the buffer it is copied into, so this used to overflow it.
++ */
++static unsigned char long_name_data[255];
++static char long_name[sizeof(long_name_data) - 2 + 1];
++
++/* The name does not fit, so it comes back clamped to HCI_MAX_NAME_LENGTH */
++#define LONG_NAME_LEN	HCI_MAX_NAME_LENGTH
++
++static const struct test_data long_name_test = {
++	.eir_data = long_name_data,
++	.eir_size = sizeof(long_name_data),
++	.name = long_name,
++	.name_complete = true,
++	.tx_power = 127,
++};
++
++static void long_name_setup(const void *data)
++{
++	long_name_data[0] = sizeof(long_name_data) - 1;
++	long_name_data[1] = EIR_NAME_COMPLETE;
++	memset(long_name_data + 2, 'B', sizeof(long_name_data) - 2);
++
++	memset(long_name, 'B', LONG_NAME_LEN);
++	long_name[LONG_NAME_LEN] = '\0';
++
++	tester_setup_complete();
++}
++
+ static const unsigned char bluesc_data[] = {
+ 		0x02, 0x01, 0x06, 0x03, 0x02, 0x16, 0x18, 0x12,
+ 		0x09, 0x57, 0x61, 0x68, 0x6f, 0x6f, 0x20, 0x42,
+@@ -756,6 +814,10 @@ int main(int argc, char *argv[])
+ 									NULL);
+ 	tester_add("/eir/iso-2022-jp-name", &iso_2022_jp_name_test, NULL,
+ 							test_parsing, NULL);
++	tester_add("/eir/max-name", &max_name_test, max_name_setup,
++							test_parsing, NULL);
++	tester_add("/eir/long-name", &long_name_test, long_name_setup,
++							test_parsing, NULL);
+ 	tester_add("/ad/bluesc", &bluesc_test, NULL, test_parsing, NULL);
+ 	tester_add("/ad/wahooscale", &wahoo_scale_test, NULL, test_parsing,
+ 									NULL);
+-- 
+2.55.0
+
+
+From 3ad832a3c2a989ed9f14586cd3b56f40ad608679 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:10:36 -0400
+Subject: [PATCH 04/10] shared/util: Make strnlenutf8 reject ill-formed
+ sequences
+
+strnlenutf8() only checks the shape of the lead byte and that the
+following bytes are continuation bytes, so it accepts sequences that are
+not well-formed UTF-8:
+
+  C0 80        overlong encoding of U+0000
+  C0 AF        overlong encoding of '/'
+  ED A0 80     UTF-16 surrogate U+D800
+  F5 80 80 80  past the U+10FFFF limit
+
+strisutf8() and strtoutf8() are built on it, so a remote name containing
+any of those is considered valid and passed on unchanged, for instance
+to D-Bus, which does validate UTF-8 strictly and rejects them.
+
+Validate the sequences as defined by table 3-7 of the Unicode Standard
+instead, which constrains the range of the second byte for the E0, ED,
+F0 and F4 lead bytes and rejects the C0, C1 and F5 to FF ones outright.
+
+The decoding is split out into a helper that also reports the size of
+the maximal subpart of an ill-formed sequence, so that callers can skip
+over it, as recommended by section 3.9 of the Unicode Standard.
+
+Assisted-by: Claude:claude-opus-5
+---
+ src/shared/util.c | 90 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 62 insertions(+), 28 deletions(-)
+
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 62dd1369b70d..e946214edbb9 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -2211,44 +2211,78 @@ char *strstrip(char *str)
+ 	return str;
+ }
+ 
+-size_t strnlenutf8(const char *str, size_t len)
+-
++/*
++ * Decode the UTF-8 sequence at str, as defined by table 3-7 of the Unicode
++ * Standard, and return its size, or 0 if it is ill-formed.
++ *
++ * sublen is set to the size of the maximal subpart of the sequence, that is
++ * the number of leading bytes that could still have formed a well-formed
++ * sequence, which is what the caller needs to skip over.
++ */
++static size_t utf8_seqlen(const unsigned char *str, size_t len, size_t *sublen)
+ {
+-	size_t i = 0;
++	unsigned char lo = 0x80, hi = 0xbf;
++	size_t size, i;
+ 
+-	while (i < len) {
+-		unsigned char c = str[i];
+-		size_t size = 0;
++	if (str[0] <= 0x7f) {
++		*sublen = 1;
++		return 1;
++	}
+ 
+-		/* Check the first byte to determine the number of bytes in the
+-		 * UTF-8 character.
++	if (str[0] >= 0xc2 && str[0] <= 0xdf) {
++		size = 2;
++	} else if (str[0] >= 0xe0 && str[0] <= 0xef) {
++		size = 3;
++		/* Reject the overlong encodings and the UTF-16 surrogates */
++		if (str[0] == 0xe0)
++			lo = 0xa0;
++		else if (str[0] == 0xed)
++			hi = 0x9f;
++	} else if (str[0] >= 0xf0 && str[0] <= 0xf4) {
++		size = 4;
++		/* Reject the overlong encodings and anything past U+10FFFF */
++		if (str[0] == 0xf0)
++			lo = 0x90;
++		else if (str[0] == 0xf4)
++			hi = 0x8f;
++	} else {
++		/* C0 and C1 are overlong, F5 to FF are out of range, and a
++		 * continuation byte cannot start a sequence.
+ 		 */
+-		if ((c & 0x80) == 0x00)
+-			size = 1;
+-		else if ((c & 0xE0) == 0xC0)
+-			size = 2;
+-		else if ((c & 0xF0) == 0xE0)
+-			size = 3;
+-		else if ((c & 0xF8) == 0xF0)
+-			size = 4;
+-		else
+-			/* Invalid UTF-8 sequence */
+-			goto done;
++		*sublen = 1;
++		return 0;
++	}
+ 
+-		/* Check the following bytes to ensure they have the correct
+-		 * format.
+-		 */
+-		for (size_t j = 1; j < size; ++j) {
+-			if (i + j >= len || (str[i + j] & 0xC0) != 0x80)
+-				/* Invalid UTF-8 sequence */
+-				goto done;
++	for (i = 1; i < size; i++) {
++		if (i >= len || str[i] < lo || str[i] > hi) {
++			*sublen = i;
++			return 0;
+ 		}
+ 
++		/* Only the second byte has a restricted range */
++		lo = 0x80;
++		hi = 0xbf;
++	}
++
++	*sublen = size;
++	return size;
++}
++
++size_t strnlenutf8(const char *str, size_t len)
++{
++	size_t i = 0;
++
++	while (i < len) {
++		size_t sublen;
++
++		if (!utf8_seqlen((const unsigned char *) str + i, len - i,
++								&sublen))
++			break;
++
+ 		/* Move to the next character */
+-		i += size;
++		i += sublen;
+ 	}
+ 
+-done:
+ 	return i;
+ }
+ 
+-- 
+2.55.0
+
+
+From 11081f60d95f641ddbca4a53922d886972c87aa1 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:11:03 -0400
+Subject: [PATCH 05/10] shared/util: Add str2utf8
+
+There are five near copies of the same "turn a remote name into a UTF-8
+string" helper, in monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c,
+src/eir.c and src/shared/ad.c, and they do not agree with each other.
+
+Most truncate at the first ill-formed sequence, which throws away the
+rest of the name, while the monitor replaces every non-ASCII byte with a
+space, which mangles perfectly valid UTF-8 names as soon as one bad byte
+appears. Most also copy into a fixed size stack buffer first, which is
+what made the missing clamp in src/eir.c a buffer overflow.
+
+Add a single helper they can share. It allocates the result, so there is
+no truncation to a buffer size, and replaces each ill-formed sequence
+with U+FFFD REPLACEMENT CHARACTER rather than dropping the rest of the
+string, matching what g_utf8_make_valid() and the WHATWG Encoding
+Standard do.
+
+The result has been checked byte for byte against Python's
+bytes.decode('utf-8', errors='replace') over all one and two byte
+sequences, a sample of the three byte ones and 200000 random inputs.
+
+Assisted-by: Claude:claude-opus-5
+---
+ src/shared/util.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/util.h |  7 +++++++
+ 2 files changed, 53 insertions(+)
+
+diff --git a/src/shared/util.c b/src/shared/util.c
+index e946214edbb9..8ec9b52e6401 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -2315,3 +2315,49 @@ char *strtoutf8(char *str, size_t len)
+ 	memset(str + i, 0, len - i);
+ 	return str;
+ }
++
++char *str2utf8(const uint8_t *str, size_t len)
++{
++	char *utf8, *out, *stripped;
++	size_t i = 0;
++
++	if (!str)
++		return NULL;
++
++	/*
++	 * Invalid bytes are replaced with U+FFFD REPLACEMENT CHARACTER, which
++	 * is 3 bytes long, so that is the worst case size of the result.
++	 */
++	utf8 = malloc(len * 3 + 1);
++	if (!utf8)
++		return NULL;
++
++	out = utf8;
++
++	while (i < len) {
++		size_t sublen;
++		size_t size = utf8_seqlen(str + i, len - i, &sublen);
++
++		if (size) {
++			memcpy(out, str + i, size);
++			out += size;
++			i += size;
++			continue;
++		}
++
++		/* Replace the maximal subpart with U+FFFD */
++		*out++ = 0xef;
++		*out++ = 0xbf;
++		*out++ = 0xbd;
++		i += sublen;
++	}
++
++	*out = '\0';
++
++	/* Remove leading and trailing whitespace characters */
++	stripped = strstrip(utf8);
++	if (stripped != utf8)
++		memmove(utf8, stripped, strlen(stripped) + 1);
++
++	return utf8;
++}
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 562a5af31751..1984fb75f09e 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -143,6 +143,13 @@ bool strisutf8(const char *str, size_t length);
+ bool argsisutf8(int argc, char *argv[]);
+ char *strtoutf8(char *str, size_t len);
+ 
++/*
++ * Return a newly allocated, NUL terminated and whitespace stripped UTF-8
++ * copy of the first len bytes of str, with each ill-formed sequence replaced
++ * by U+FFFD REPLACEMENT CHARACTER. The result must be freed with free().
++ */
++char *str2utf8(const uint8_t *str, size_t len);
++
+ void *util_malloc(size_t size);
+ void *util_memdup(const void *src, size_t size);
+ 
+-- 
+2.55.0
+
+
+From 74c56dff2aa5d5f3cf41e446a0afeebb21ffc4e4 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:12:11 -0400
+Subject: [PATCH 06/10] unit/test-util: Add str2utf8 tests
+
+Cover the cases str2utf8() is meant to handle: well-formed input that
+has to be left alone, whitespace stripping, input that is not NUL
+terminated, and the ill-formed sequences that have to be replaced,
+including the overlong encodings, the UTF-16 surrogates and the code
+points past U+10FFFF.
+
+Also check that a maximal subpart is replaced by a single U+FFFD rather
+than one per byte, and that the result is always well-formed UTF-8.
+
+Assisted-by: Claude:claude-opus-5
+---
+ unit/test-util.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
+
+diff --git a/unit/test-util.c b/unit/test-util.c
+index 1672b32eb39c..f0b1bb7994fb 100644
+--- a/unit/test-util.c
++++ b/unit/test-util.c
+@@ -83,6 +83,85 @@ static void test_min_max(const void *data)
+ 	tester_test_passed();
+ }
+ 
++struct str2utf8_data {
++	const char *input;	/* Not NUL terminated, len bytes are used */
++	size_t len;
++	const char *expected;
++};
++
++#define FFFD "\xef\xbf\xbd"		/* U+FFFD REPLACEMENT CHARACTER */
++
++static const struct str2utf8_data str2utf8_tests[] = {
++	/* Nothing to do */
++	{ "", 0, "" },
++	{ "Pixel 7", 7, "Pixel 7" },
++	/* Well-formed multi-byte sequences are kept as they are */
++	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5" },		/* U+20AC */
++	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a" },		/* U+1F50A */
++	/* Leading and trailing whitespace is removed */
++	{ "  spaced  ", 10, "spaced" },
++	{ "\t\r\nname\n\r\t", 10, "name" },
++	{ "   ", 3, "" },
++	/* The name is not NUL terminated, only len bytes are used */
++	{ "truncated", 4, "trun" },
++	/* A byte that can never appear in UTF-8 */
++	{ "ab\xff""cd", 5, "ab" FFFD "cd" },
++	/* A continuation byte cannot start a sequence */
++	{ "ab\x80""cd", 5, "ab" FFFD "cd" },
++	/* One U+FFFD per maximal subpart, not per byte */
++	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd" },
++	/* A sequence cut short by len is still one maximal subpart */
++	{ "ab\xe2\x82\xac", 4, "ab" FFFD },
++	/* Latin-1 text is not valid UTF-8 */
++	{ "caf\xe9", 4, "caf" FFFD },
++	/* Overlong encodings are rejected, C0 and C1 are never valid */
++	{ "\xc0\x80", 2, FFFD FFFD },
++	{ "\xc0\xaf", 2, FFFD FFFD },
++	/* UTF-16 surrogates have no UTF-8 encoding */
++	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD },
++	/* U+10FFFF is the last code point, F5 to FF are out of range */
++	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD },
++	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD },
++	/* The last code point itself is fine */
++	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf" },
++	/* Replacement and stripping combined */
++	{ " \xff ", 3, FFFD },
++};
++
++static void test_str2utf8(const void *data)
++{
++	size_t i;
++
++	for (i = 0; i < sizeof(str2utf8_tests) /
++				sizeof(str2utf8_tests[0]); i++) {
++		const struct str2utf8_data *test = &str2utf8_tests[i];
++		char *str = str2utf8((const uint8_t *) test->input,
++								test->len);
++
++		assert(str);
++		if (strcmp(str, test->expected)) {
++			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
++							test->expected, str);
++			free(str);
++			tester_test_failed();
++			return;
++		}
++
++		/* The result is always well-formed UTF-8 */
++		assert(strisutf8(str, strlen(str)));
++
++		free(str);
++	}
++
++	tester_test_passed();
++}
++
++static void test_str2utf8_null(const void *data)
++{
++	assert(!str2utf8(NULL, 0));
++	tester_test_passed();
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+@@ -95,6 +174,10 @@ int main(int argc, char *argv[])
+ 			test_cleanup_type, NULL);
+ 	tester_add("/util/cleanup_fd", NULL, NULL,
+ 			test_cleanup_fd, NULL);
++	tester_add("/util/str2utf8", NULL, NULL,
++			test_str2utf8, NULL);
++	tester_add("/util/str2utf8_null", NULL, NULL,
++			test_str2utf8_null, NULL);
+ 
+ 	return tester_run();
+ }
+-- 
+2.55.0
+
+
+From 8c81ab108b09154b884b1b0549dc9c23ffe3ec6f Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:18:38 -0400
+Subject: [PATCH 07/10] Replace the name2utf8 copies with str2utf8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+monitor/att.c, profiles/audio/mcp.c, profiles/gap/gas.c and src/eir.c
+each carried their own name2utf8(), and src/shared/ad.c open coded the
+same thing in ad_replace_name(), with none of them agreeing.
+
+Use the shared helper instead, which drops around 120 lines and gives
+every caller the same behaviour.
+
+Two things change as a result. The monitor used to replace every
+non-ASCII byte with a space as soon as one bad byte appeared, mangling
+the valid part of the name, and now only the ill-formed sequences are
+replaced. Everything else used to truncate at the first ill-formed
+sequence, throwing away the rest of the name, and now keeps it.
+
+The unit/test-eir expectations are updated accordingly, and they show
+the improvement: the name that used to be reported as "test परी" is now
+reported as "test परी<U+FFFD>्षा invalid".
+
+str2utf8() returns memory from malloc(), so the callers that used
+g_free() now use free().
+
+Assisted-by: Claude:claude-opus-5
+---
+ monitor/att.c        | 66 ++++++++++++++------------------------------
+ profiles/audio/mcp.c | 24 ++--------------
+ profiles/gap/gas.c   | 20 ++------------
+ src/eir.c            | 22 ++-------------
+ src/shared/ad.c      | 20 ++++++--------
+ unit/test-eir.c      | 11 +++++---
+ 6 files changed, 42 insertions(+), 121 deletions(-)
+
+diff --git a/monitor/att.c b/monitor/att.c
+index 7506dc528e85..44965a2aaf3b 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -15,7 +15,6 @@
+ #endif
+ 
+ #define _GNU_SOURCE
+-#include <ctype.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -2325,40 +2324,15 @@ static void vol_flag_notify(const struct l2cap_frame *frame)
+ 	print_vcs_flag(frame);
+ }
+ 
+-static char *name2utf8(const uint8_t *name, uint16_t len)
+-{
+-	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+-	int i;
+-
+-	if (g_utf8_validate((const char *) name, len, NULL))
+-		return g_strndup((char *) name, len);
+-
+-	len = MIN(len, sizeof(utf8_name) - 1);
+-
+-	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (char *) name, len);
+-
+-	/* Assume ASCII, and replace all non-ASCII with spaces */
+-	for (i = 0; utf8_name[i] != '\0'; i++) {
+-		if (!isascii(utf8_name[i]))
+-			utf8_name[i] = ' ';
+-	}
+-
+-	/* Remove leading and trailing whitespace characters */
+-	g_strstrip(utf8_name);
+-
+-	return g_strdup(utf8_name);
+-}
+-
+ static void print_mp_name(const struct l2cap_frame *frame)
+ {
+ 	char *name;
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Media Player Name: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void mp_name_read(const struct l2cap_frame *frame)
+@@ -2385,11 +2359,11 @@ static void print_track_title(const struct l2cap_frame *frame)
+ {
+ 	char *name;
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Track Title: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void track_title_read(const struct l2cap_frame *frame)
+@@ -2520,11 +2494,11 @@ static void print_bearer_name(const struct l2cap_frame *frame)
+ {
+ 	char *name;
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Bearer Name: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void bearer_name_read(const struct l2cap_frame *frame)
+@@ -2541,11 +2515,11 @@ static void bearer_uci_read(const struct l2cap_frame *frame)
+ {
+ 	char *name;
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Bearer Uci Name: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void print_technology_name(const struct l2cap_frame *frame)
+@@ -2612,11 +2586,11 @@ static void print_uri_scheme_list(const struct l2cap_frame *frame)
+ {
+ 	char *name;
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Uri scheme Name: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
+@@ -2726,11 +2700,11 @@ static void print_call_list(const struct l2cap_frame *frame)
+ 
+ 	print_field("  call_flag: 0x%x", call_flag);
+ 
+-	call_uri = name2utf8((uint8_t *)frame->data, frame->size);
++	call_uri = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  call_uri: %s", call_uri);
+ 
+-	g_free(call_uri);
++	free(call_uri);
+ 
+ done:
+ 	if (frame->size)
+@@ -2816,11 +2790,11 @@ static void print_target_uri(const struct l2cap_frame *frame)
+ 
+ 	print_field("  call_idx: %x", call_idx);
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Uri: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ 
+ done:
+ 	if (frame->size)
+@@ -2928,9 +2902,9 @@ static void print_call_cp(const struct l2cap_frame *frame)
+ 		break;
+ 	case 0x04:
+ 		str = "Originate";
+-		name = name2utf8((uint8_t *)frame->data, frame->size);
++		name = str2utf8(frame->data, frame->size);
+ 		print_field("  Operation: %s  Uri: %s", str, name);
+-		g_free(name);
++		free(name);
+ 		break;
+ 	case 0x05:
+ 		str = "Join";
+@@ -3124,11 +3098,11 @@ static void print_incom_call(const struct l2cap_frame *frame)
+ 
+ 	print_field("  Call Index: %u", call_id);
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  call_string: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ 
+ done:
+ 	if (frame->size)
+@@ -3157,11 +3131,11 @@ static void print_call_friendly_name(const struct l2cap_frame *frame)
+ 
+ 	print_field("  Call Index: %u", call_id);
+ 
+-	name = name2utf8((uint8_t *)frame->data, frame->size);
++	name = str2utf8(frame->data, frame->size);
+ 
+ 	print_field("  Friendly Name: %s", name);
+ 
+-	g_free(name);
++	free(name);
+ 
+ done:
+ 	if (frame->size)
+diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+index 0c2e0de0b156..8adf814e8d73 100644
+--- a/profiles/audio/mcp.c
++++ b/profiles/audio/mcp.c
+@@ -73,26 +73,6 @@ struct remote_player {
+ 	uint8_t playing_order;
+ };
+ 
+-static char *name2utf8(const uint8_t *name, uint16_t len)
+-{
+-	char *utf8_name;
+-
+-	utf8_name = malloc(len + 1);
+-	if (!utf8_name)
+-		return NULL;
+-
+-	if (len)
+-		memcpy(utf8_name, name, len);
+-
+-	utf8_name[len] = 0;
+-	strtoutf8(utf8_name, len);
+-
+-	/* Remove leading and trailing whitespace characters */
+-	g_strstrip(utf8_name);
+-
+-	return utf8_name;
+-}
+-
+ static const char *mcp_status_val_to_string(uint8_t status)
+ {
+ 	switch (status) {
+@@ -118,7 +98,7 @@ static void remote_media_player_name(void *data, const uint8_t *value,
+ 	struct remote_player *remote = data;
+ 	char *name;
+ 
+-	name = name2utf8(value, length);
++	name = str2utf8(value, length);
+ 	if (!name)
+ 		return;
+ 
+@@ -145,7 +125,7 @@ static void remote_track_title(void *data, const uint8_t *value,
+ 	char *name;
+ 	uint16_t len;
+ 
+-	name = name2utf8(value, length);
++	name = str2utf8(value, length);
+ 	if (!name)
+ 		return;
+ 
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 0f41c9e6c2a5..5184d74e8f07 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -66,22 +66,6 @@ static void gas_free(struct gas *gas)
+ 	g_free(gas);
+ }
+ 
+-static char *name2utf8(const uint8_t *name, uint16_t len)
+-{
+-	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+-
+-	len = MIN(len, sizeof(utf8_name) - 1);
+-
+-	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (char *) name, len);
+-	strtoutf8(utf8_name, len);
+-
+-	/* Remove leading and trailing whitespace characters */
+-	g_strstrip(utf8_name);
+-
+-	return g_strdup(utf8_name);
+-}
+-
+ static void read_device_name_cb(bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data)
+@@ -98,13 +82,13 @@ static void read_device_name_cb(bool success, uint8_t att_ecode,
+ 	if (!length)
+ 		return;
+ 
+-	name = name2utf8(value, length);
++	name = str2utf8(value, length);
+ 
+ 	DBG("GAP Device Name: %s", name);
+ 
+ 	btd_device_device_set_name(gas->device, name);
+ 
+-	g_free(name);
++	free(name);
+ }
+ 
+ static void handle_device_name(struct gas *gas, uint16_t value_handle)
+diff --git a/src/eir.c b/src/eir.c
+index 4421b1662d65..5c9ebe2af3a3 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -60,7 +60,7 @@ void eir_data_free(struct eir_data *eir)
+ {
+ 	queue_destroy(eir->services, g_free);
+ 	eir->services = NULL;
+-	g_free(eir->name);
++	free(eir->name);
+ 	eir->name = NULL;
+ 	free(eir->hash);
+ 	eir->hash = NULL;
+@@ -133,22 +133,6 @@ static void eir_parse_uuid128(struct eir_data *eir, const uint8_t *data,
+ 	}
+ }
+ 
+-static char *name2utf8(const uint8_t *name, uint8_t len)
+-{
+-	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+-
+-	len = MIN(len, HCI_MAX_NAME_LENGTH);
+-
+-	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (char *) name, len);
+-	strtoutf8(utf8_name, len);
+-
+-	/* Remove leading and trailing whitespace characters */
+-	g_strstrip(utf8_name);
+-
+-	return g_strdup(utf8_name);
+-}
+-
+ static void eir_parse_msd(struct eir_data *eir, const uint8_t *data,
+ 								uint8_t len)
+ {
+@@ -301,9 +285,9 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+ 			while (data_len > 0 && data[data_len - 1] == '\0')
+ 				data_len--;
+ 
+-			g_free(eir->name);
++			free(eir->name);
+ 
+-			eir->name = name2utf8(data, data_len);
++			eir->name = str2utf8(data, data_len);
+ 			eir->name_complete = eir_data[1] != EIR_NAME_SHORT;
+ 			break;
+ 
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index ebee078500c6..236e719507e4 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -275,22 +275,18 @@ static bool ad_replace_uuid128(struct bt_ad *ad, struct iovec *iov)
+ 
+ static bool ad_replace_name(struct bt_ad *ad, struct iovec *iov)
+ {
+-	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
+-	size_t len = MIN(iov->iov_len, (size_t) HCI_MAX_NAME_LENGTH);
++	char *utf8_name;
++	bool ret;
+ 
+-	memset(utf8_name, 0, sizeof(utf8_name));
+-	strncpy(utf8_name, (const char *)iov->iov_base, len);
+-
+-	if (strisutf8(utf8_name, len))
+-		goto done;
++	utf8_name = str2utf8(iov->iov_base, iov->iov_len);
++	if (!utf8_name)
++		return false;
+ 
+-	strtoutf8(utf8_name, len);
++	ret = bt_ad_add_name(ad, utf8_name);
+ 
+-	/* Remove leading and trailing whitespace characters */
+-	strstrip(utf8_name);
++	free(utf8_name);
+ 
+-done:
+-	return bt_ad_add_name(ad, utf8_name);
++	return ret;
+ }
+ 
+ static bool ad_replace_uuid16_data(struct bt_ad *ad, struct iovec *iov)
+diff --git a/unit/test-eir.c b/unit/test-eir.c
+index 326bc899e251..380fcba2f38e 100644
+--- a/unit/test-eir.c
++++ b/unit/test-eir.c
+@@ -407,7 +407,8 @@ static const unsigned char invalid_utf8_name_data[] = {
+ static const struct test_data invalid_utf8_name_test = {
+ 	.eir_data = invalid_utf8_name_data,
+ 	.eir_size = sizeof(invalid_utf8_name_data),
+-	.name = "test परी",
++	/* The truncated sequence is replaced by U+FFFD, the rest is kept */
++	.name = "test परी" "\xef\xbf\xbd" "्षा invalid",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+ };
+@@ -435,7 +436,9 @@ static const unsigned char iso_2022_jp_name_data[] = {
+ static const struct test_data iso_2022_jp_name_test = {
+ 	.eir_data = iso_2022_jp_name_data,
+ 	.eir_size = sizeof(iso_2022_jp_name_data),
+-	.name = "test \033$B",
++	/* The 4 JIS bytes are replaced by U+FFFD, the escapes are ASCII */
++	.name = "test \033$B" "\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd"
++								"\033(B OK",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+ };
+@@ -475,8 +478,8 @@ static void max_name_setup(const void *data)
+ static unsigned char long_name_data[255];
+ static char long_name[sizeof(long_name_data) - 2 + 1];
+ 
+-/* The name does not fit, so it comes back clamped to HCI_MAX_NAME_LENGTH */
+-#define LONG_NAME_LEN	HCI_MAX_NAME_LENGTH
++/* str2utf8() does not clamp, so the whole name is kept */
++#define LONG_NAME_LEN	(sizeof(long_name_data) - 2)
+ 
+ static const struct test_data long_name_test = {
+ 	.eir_data = long_name_data,
+-- 
+2.55.0
+
+
+From 2bf8286c4ebe6256b152c3adab6ea0fed8a834d9 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:27:07 -0400
+Subject: [PATCH 08/10] device: Fix the name truncation splitting UTF-8
+ sequences
+
+btd_device_device_set_name() copies the name with
+
+	strncpy(device->name, name, MAX_NAME_LENGTH);
+
+which cuts at 248 bytes without any regard for where the UTF-8
+characters start and end, so a longer name can be left with a partial
+sequence. The result is no longer valid UTF-8 and D-Bus rejects it when
+the Name property is emitted.
+
+A name made of 249 U+FFFD characters is 747 bytes long and cutting it at
+248 leaves a trailing "ef bf", two thirds of a character.
+
+Truncate on a character boundary instead. The same name now ends up 246
+bytes long and stays valid.
+
+This also means a name that is not valid UTF-8 to begin with, as can be
+had from the neard and sixaxis plugins, is now cut at the first
+ill-formed sequence rather than passed on as is.
+
+Assisted-by: Claude:claude-opus-5
+---
+ src/device.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/src/device.c b/src/device.c
+index 65d84be56ca5..df607f718be1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5103,12 +5103,22 @@ char *btd_device_get_storage_path(struct btd_device *device, const char *name)
+ 
+ void btd_device_device_set_name(struct btd_device *device, const char *name)
+ {
++	size_t len;
++
+ 	if (strncmp(name, device->name, MAX_NAME_LENGTH) == 0)
+ 		return;
+ 
+ 	DBG("%s %s", device->path, name);
+ 
+-	strncpy(device->name, name, MAX_NAME_LENGTH);
++	/*
++	 * Truncate on a character boundary, so that a name longer than
++	 * MAX_NAME_LENGTH does not end up with a partial sequence, which
++	 * would no longer be valid UTF-8 and would be rejected by D-Bus.
++	 */
++	len = strnlenutf8(name, MIN(strlen(name), (size_t) MAX_NAME_LENGTH));
++
++	memcpy(device->name, name, len);
++	device->name[len] = '\0';
+ 
+ 	store_device_info(device);
+ 
+-- 
+2.55.0
+
+
+From bef0faa312eeb83344bb2bead5bbbd0b538414e5 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:27:19 -0400
+Subject: [PATCH 09/10] device: Rename btd_device_device_set_name to
+ btd_device_set_name
+
+The "device" was in there twice.
+
+Assisted-by: Claude:claude-opus-5
+---
+ plugins/neard.c    | 2 +-
+ plugins/sixaxis.c  | 2 +-
+ profiles/gap/gas.c | 2 +-
+ src/adapter.c      | 4 ++--
+ src/device.c       | 2 +-
+ src/device.h       | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/plugins/neard.c b/plugins/neard.c
+index edfc115373ef..1633dd576747 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -629,7 +629,7 @@ static void store_params(struct btd_adapter *adapter, struct btd_device *device,
+ 
+ 	if (params->name) {
+ 		device_store_cached_name(device, params->name);
+-		btd_device_device_set_name(device, params->name);
++		btd_device_set_name(device, params->name);
+ 	}
+ 
+ 	if (params->services)
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index a04a76d394eb..fc2b2a9d0156 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -362,7 +362,7 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 
+ 	info("sixaxis: setting up new device");
+ 
+-	btd_device_device_set_name(device, cp->name);
++	btd_device_set_name(device, cp->name);
+ 	btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp->version);
+ 	btd_device_set_temporary(device, true);
+ 
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index 5184d74e8f07..495799e641d9 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -86,7 +86,7 @@ static void read_device_name_cb(bool success, uint8_t att_ecode,
+ 
+ 	DBG("GAP Device Name: %s", name);
+ 
+-	btd_device_device_set_name(gas->device, name);
++	btd_device_set_name(gas->device, name);
+ 
+ 	free(name);
+ }
+diff --git a/src/adapter.c b/src/adapter.c
+index c21b3e7fbcc2..cf59db4aa5a9 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7628,7 +7628,7 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 	name_known = device_name_known(dev);
+ 
+ 	if (eir_data.name && (eir_data.name_complete || !name_known))
+-		btd_device_device_set_name(dev, eir_data.name);
++		btd_device_set_name(dev, eir_data.name);
+ 
+ 	if (eir_data.class != 0)
+ 		device_set_class(dev, eir_data.class);
+@@ -9814,7 +9814,7 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 
+ 	if (eir_data.name && (eir_data.name_complete || !name_known)) {
+ 		device_store_cached_name(device, eir_data.name);
+-		btd_device_device_set_name(device, eir_data.name);
++		btd_device_set_name(device, eir_data.name);
+ 	}
+ 
+ 	if (eir_data.msd_list)
+diff --git a/src/device.c b/src/device.c
+index df607f718be1..9609a14f7883 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5101,7 +5101,7 @@ char *btd_device_get_storage_path(struct btd_device *device, const char *name)
+ 	return strdup(filename);
+ }
+ 
+-void btd_device_device_set_name(struct btd_device *device, const char *name)
++void btd_device_set_name(struct btd_device *device, const char *name)
+ {
+ 	size_t len;
+ 
+diff --git a/src/device.h b/src/device.h
+index b890f23d4642..7683be82ee3f 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -23,7 +23,7 @@ char *btd_device_get_storage_path(struct btd_device *device,
+ 				const char *filename);
+ 
+ 
+-void btd_device_device_set_name(struct btd_device *device, const char *name);
++void btd_device_set_name(struct btd_device *device, const char *name);
+ void device_store_cached_name(struct btd_device *dev, const char *name);
+ void device_get_name(struct btd_device *device, char *name, size_t len);
+ bool device_name_known(struct btd_device *device);
+-- 
+2.55.0
+
+
+From f0e40c5b3e6af6974c44077ccd0cdc01a2172f30 Mon Sep 17 00:00:00 2001
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date: Wed, 19 Aug 2026 16:29:19 -0400
+Subject: [PATCH 10/10] unit/test-util: Cover strtoutf8 with the str2utf8 tests
+
+strtoutf8() and str2utf8() are the two ways of dealing with a name that
+is not valid UTF-8, so run them over the same inputs and keep the two
+expected results side by side, which documents how they differ:
+strtoutf8() truncates at the first ill-formed sequence and leaves the
+whitespace alone, str2utf8() replaces the ill-formed sequences and
+strips.
+
+The expected results were checked against Python, taking the longest
+prefix that decodes as strict UTF-8, over every one, two and three byte
+sequence, 16646655 of them, with no mismatch.
+
+Assisted-by: Claude:claude-opus-5
+---
+ unit/test-util.c | 94 +++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 66 insertions(+), 28 deletions(-)
+
+diff --git a/unit/test-util.c b/unit/test-util.c
+index f0b1bb7994fb..e605d17b6b56 100644
+--- a/unit/test-util.c
++++ b/unit/test-util.c
+@@ -83,65 +83,101 @@ static void test_min_max(const void *data)
+ 	tester_test_passed();
+ }
+ 
+-struct str2utf8_data {
++struct utf8_data {
+ 	const char *input;	/* Not NUL terminated, len bytes are used */
+ 	size_t len;
+-	const char *expected;
++	const char *str2utf8;	/* Ill-formed sequences replaced, stripped */
++	const char *strtoutf8;	/* Truncated at the first ill-formed one */
+ };
+ 
+ #define FFFD "\xef\xbf\xbd"		/* U+FFFD REPLACEMENT CHARACTER */
+ 
+-static const struct str2utf8_data str2utf8_tests[] = {
++static const struct utf8_data utf8_tests[] = {
+ 	/* Nothing to do */
+-	{ "", 0, "" },
+-	{ "Pixel 7", 7, "Pixel 7" },
++	{ "", 0, "", "" },
++	{ "Pixel 7", 7, "Pixel 7", "Pixel 7" },
+ 	/* Well-formed multi-byte sequences are kept as they are */
+-	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5" },		/* U+20AC */
+-	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a" },		/* U+1F50A */
++	{ "\xe2\x82\xac 5", 5, "\xe2\x82\xac 5",		/* U+20AC */
++						"\xe2\x82\xac 5" },
++	{ "\xf0\x9f\x94\x8a", 4, "\xf0\x9f\x94\x8a",	/* U+1F50A */
++						"\xf0\x9f\x94\x8a" },
+ 	/* Leading and trailing whitespace is removed */
+-	{ "  spaced  ", 10, "spaced" },
+-	{ "\t\r\nname\n\r\t", 10, "name" },
+-	{ "   ", 3, "" },
++	{ "  spaced  ", 10, "spaced", "  spaced  " },
++	{ "\t\r\nname\n\r\t", 10, "name", "\t\r\nname\n\r\t" },
++	{ "   ", 3, "", "   " },
+ 	/* The name is not NUL terminated, only len bytes are used */
+-	{ "truncated", 4, "trun" },
++	{ "truncated", 4, "trun", "trun" },
+ 	/* A byte that can never appear in UTF-8 */
+-	{ "ab\xff""cd", 5, "ab" FFFD "cd" },
++	{ "ab\xff""cd", 5, "ab" FFFD "cd", "ab" },
+ 	/* A continuation byte cannot start a sequence */
+-	{ "ab\x80""cd", 5, "ab" FFFD "cd" },
++	{ "ab\x80""cd", 5, "ab" FFFD "cd", "ab" },
+ 	/* One U+FFFD per maximal subpart, not per byte */
+-	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd" },
++	{ "ab\xe2\x82""cd", 6, "ab" FFFD "cd", "ab" },
+ 	/* A sequence cut short by len is still one maximal subpart */
+-	{ "ab\xe2\x82\xac", 4, "ab" FFFD },
++	{ "ab\xe2\x82\xac", 4, "ab" FFFD, "ab" },
+ 	/* Latin-1 text is not valid UTF-8 */
+-	{ "caf\xe9", 4, "caf" FFFD },
++	{ "caf\xe9", 4, "caf" FFFD, "caf" },
+ 	/* Overlong encodings are rejected, C0 and C1 are never valid */
+-	{ "\xc0\x80", 2, FFFD FFFD },
+-	{ "\xc0\xaf", 2, FFFD FFFD },
++	{ "\xc0\x80", 2, FFFD FFFD, "" },
++	{ "\xc0\xaf", 2, FFFD FFFD, "" },
+ 	/* UTF-16 surrogates have no UTF-8 encoding */
+-	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD },
++	{ "\xed\xa0\x80", 3, FFFD FFFD FFFD, "" },
+ 	/* U+10FFFF is the last code point, F5 to FF are out of range */
+-	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD },
+-	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD },
++	{ "\xf4\x90\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
++	{ "\xf5\x80\x80\x80", 4, FFFD FFFD FFFD FFFD, "" },
+ 	/* The last code point itself is fine */
+-	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf" },
++	{ "\xf4\x8f\xbf\xbf", 4, "\xf4\x8f\xbf\xbf",
++						"\xf4\x8f\xbf\xbf" },
+ 	/* Replacement and stripping combined */
+-	{ " \xff ", 3, FFFD },
++	{ " \xff ", 3, FFFD, " " },
+ };
+ 
+ static void test_str2utf8(const void *data)
+ {
+ 	size_t i;
+ 
+-	for (i = 0; i < sizeof(str2utf8_tests) /
+-				sizeof(str2utf8_tests[0]); i++) {
+-		const struct str2utf8_data *test = &str2utf8_tests[i];
++	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
++		const struct utf8_data *test = &utf8_tests[i];
+ 		char *str = str2utf8((const uint8_t *) test->input,
+ 								test->len);
+ 
+ 		assert(str);
+-		if (strcmp(str, test->expected)) {
++		if (strcmp(str, test->str2utf8)) {
+ 			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
+-							test->expected, str);
++							test->str2utf8, str);
++			free(str);
++			tester_test_failed();
++			return;
++		}
++
++		/* The result is always well-formed UTF-8 */
++		assert(strisutf8(str, strlen(str)));
++
++		free(str);
++	}
++
++	tester_test_passed();
++}
++
++static void test_strtoutf8(const void *data)
++{
++	size_t i;
++
++	for (i = 0; i < sizeof(utf8_tests) / sizeof(utf8_tests[0]); i++) {
++		const struct utf8_data *test = &utf8_tests[i];
++		char *str;
++
++		/* strtoutf8() works in place, so it needs a writable copy */
++		str = malloc(test->len + 1);
++		assert(str);
++		memcpy(str, test->input, test->len);
++		str[test->len] = '\0';
++
++		assert(strtoutf8(str, test->len) == str);
++
++		if (strcmp(str, test->strtoutf8)) {
++			printf("test %zu: expected \"%s\", got \"%s\"\n", i,
++							test->strtoutf8, str);
+ 			free(str);
+ 			tester_test_failed();
+ 			return;
+@@ -178,6 +214,8 @@ int main(int argc, char *argv[])
+ 			test_str2utf8, NULL);
+ 	tester_add("/util/str2utf8_null", NULL, NULL,
+ 			test_str2utf8_null, NULL);
++	tester_add("/util/strtoutf8", NULL, NULL,
++			test_strtoutf8, NULL);
+ 
+ 	return tester_run();
+ }
+-- 
+2.55.0
+

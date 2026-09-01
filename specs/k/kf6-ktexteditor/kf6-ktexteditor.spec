@@ -4,8 +4,8 @@
 %global framework ktexteditor
 
 Name:    kf6-%{framework}
-Version: 6.23.0
-Release: 4%{?dist}
+Version: 6.29.0
+Release: 1%{?dist}
 Summary: KDE Frameworks 6 Tier 3 with advanced embeddable text editor
 
 License: BSD-2-Clause AND CC0-1.0 AND LGPL-2.0-only AND LGPL-2.0-or-later AND MIT
@@ -32,10 +32,10 @@ BuildRequires:  pkgconfig(Qt6PrintSupport)
 BuildRequires:  pkgconfig(Qt6Qml)
 BuildRequires:  pkgconfig(Qt6Xml)
 BuildRequires:  cmake(KF6SyntaxHighlighting)
-BuildRequires:  pkgconfig(libgit2) >= 0.22.0
 BuildRequires:  pkgconfig(editorconfig)
 BuildRequires:  pkgconfig(xkbcommon)
 Requires: kf6-filesystem
+Requires: git-core
 
 %description
 KTextEditor provides a powerful text editor component that you can embed in your
@@ -116,6 +116,30 @@ rm -f %{buildroot}%{_kf6_datadir}/katepart5/script/README.md
 %exclude %{_qt6_docdir}/*/*.index
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Mon Jun 08 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Tue May 05 2026 Fabio Valentini <decathorpe@gmail.com> - 6.26.0-2
+- Fix git dependencies to account for upstream changes
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

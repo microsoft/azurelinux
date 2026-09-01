@@ -13,23 +13,23 @@
 
 Summary:	Incredibly simple helpers for testing code with exceptions 
 Name:		perl-Test-Fatal
-Version:	0.017
-Release: 11%{?dist}
+Version:	0.018
+Release:	2%{?dist}
 License:	GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:		https://metacpan.org/release/Test-Fatal
 Source0:	https://cpan.metacpan.org/modules/by-module/Test/Test-Fatal-%{version}.tar.gz
 BuildArch:	noarch
 # Module Build
 BuildRequires:	coreutils
-BuildRequires:	findutils
 BuildRequires:	make
 BuildRequires:	perl-generators
 BuildRequires:	perl-interpreter
+BuildRequires:	perl(:VERSION) >= 5.12
 BuildRequires:	perl(ExtUtils::MakeMaker) >= 6.78
+BuildRequires:	perl(strict)
 # Module Runtime
 BuildRequires:	perl(Carp)
 BuildRequires:	perl(Exporter) >= 5.57
-BuildRequires:	perl(strict)
 BuildRequires:	perl(Test::Builder)
 BuildRequires:	perl(Try::Tiny) >= 0.07
 BuildRequires:	perl(warnings)
@@ -44,10 +44,11 @@ BuildRequires:	perl(CPAN::Meta) >= 2.120900
 %endif
 %if %{with perl_Test_Fatal_enables_extra_test}
 # Extra Tests
+BuildRequires:	findutils
 BuildRequires:	perl(Encode)
 BuildRequires:	perl(Test::Pod) >= 1.41
 %endif
-# Runtime
+# Dependencies
 Requires:	perl(Test::Builder)
 
 %description
@@ -62,12 +63,11 @@ with about the same amount of typing.
 chmod -c -x examples/*
 
 %build
-perl Makefile.PL INSTALLDIRS=vendor
-make %{?_smp_mflags}
+perl Makefile.PL INSTALLDIRS=vendor NO_PACKLIST=1 NO_PERLLOCAL=1
+%{make_build}
 
 %install
-make pure_install DESTDIR=%{buildroot}
-find %{buildroot} -type f -name .packlist -delete
+%{make_install}
 %{_fixperms} -c %{buildroot}
 
 %check
@@ -83,6 +83,15 @@ make test TEST_FILES="$(echo $(find xt/ -name '*.t'))"
 %{_mandir}/man3/Test::Fatal.3*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.018-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Nov  7 2025 Paul Howarth <paul@city-fan.org> - 0.018-1
+- Update to 0.018
+  - Now requires perl v5.12.0
+  - Now tolerant of false exceptions coming from a boolean-overloaded object
+- Use %%{make_build} and %%{make_install}
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.017-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,28 @@
+{
+    "description": "UEFI firmware for ARM64 virtual machines, SB disabled",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "memory",
+        "filename": "/usr/share/edk2/aarch64/QEMU_EFI.qemuvars.fd",
+        "uefi-vars": {
+            "template": "/usr/share/edk2/aarch64/vars.blank.json"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "aarch64",
+            "machines": [
+                "virt-*"
+            ]
+        }
+    ],
+    "features": [
+        "secure-boot",
+        "host-uefi-vars"
+    ],
+    "tags": [
+
+    ]
+}

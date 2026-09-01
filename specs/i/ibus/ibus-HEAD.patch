@@ -1,2724 +1,2221 @@
-From ea70b2dff6bbcedc8c339f4f016cf6862e20d1e7 Mon Sep 17 00:00:00 2001
+From 2e901bb74d8d7b775a15eddde9f794ffb2c253cb Mon Sep 17 00:00:00 2001
 From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Tue, 7 Oct 2025 14:24:54 +0900
-Subject: [PATCH] Revert "bus: Update gdm bits based on new gdm changes"
+Date: Tue, 19 May 2026 19:31:38 +0900
+Subject: [PATCH 01/15] Update test builds which is part of Meson builds
 
-Unfortunately this patch(4a45bf1) enables ibus-daemon in gdm by default
-and I'm reverting it for ibus 1.5.33.
-The GDM default has been disable IBus.
-
-Fixes: https://github.com/ibus/ibus/commit/4a45bf1
-BUG=https://github.com/ibus/ibus/pull/2804
+bindings/pygobject/test-override-ibus: Add gi.require_versions().
+bus/test-matchrule: Support the TAP test.
+bus/test-stress: Support the TAP test.
+src/ibuscomposetable: Replace g_print() with g_debug() for TAP comments.
+src/tests/ibus-keypress: Prepend "# " for TAP comments.
+src/tests/ibus-registry: Support the TAP test.
+src/tests/ibus-util: Support the TAP test.
+src/tests/runtest:
+ - Expect the relative paths for Autotool and absolute paths for Meson.
+ - Support Python tests.
+ - Cease warnings with `glib-compile-schemas` command.
+ - Enable subtests with TAP for Meson and set G_TEST_ROOT_PROCESS
+   to consist test cases in Plan and ones in test results.
+src/tests/xkb-latin-layouts: Support the TAP test.
 ---
- bus/main.c                                    | 33 +------------------
- ....freedesktop.IBus.session.GNOME.service.in |  3 ++
- configure.ac                                  |  2 +-
- 3 files changed, 5 insertions(+), 33 deletions(-)
+ bindings/pygobject/test-override-ibus.py |   2 +
+ bus/test-matchrule.c                     |  26 ++++--
+ bus/test-stress.c                        |  17 ++--
+ src/ibuscomposetable.c                   |  38 +++++---
+ src/tests/ibus-keypress.c                |   6 +-
+ src/tests/ibus-registry.c                |  15 +++-
+ src/tests/ibus-util.c                    |  14 ++-
+ src/tests/runtest                        | 109 ++++++++++++++++++-----
+ src/tests/xkb-latin-layouts              |  21 +++--
+ 9 files changed, 284 insertions(+), 96 deletions(-)
 
-diff --git a/bus/main.c b/bus/main.c
-index e0db15b3..63ec5536 100644
---- a/bus/main.c
-+++ b/bus/main.c
-@@ -39,7 +39,6 @@
+diff --git a/bindings/pygobject/test-override-ibus.py b/bindings/pygobject/test-override-ibus.py
+index 087a6558..8853ff64 100644
+--- a/bindings/pygobject/test-override-ibus.py
++++ b/bindings/pygobject/test-override-ibus.py
+@@ -31,6 +31,8 @@ tests_builddir = os.path.abspath(os.path.dirname(__file__))
+ sys.path = [path for path in sys.path if path != tests_builddir]
+ sys.path.append(tests_builddir)
  
- #ifdef G_OS_UNIX
- #include <glib-unix.h>
--#include <grp.h>
- #endif
++import gi
++gi.require_versions({'GLib': '2.0', 'IBus': '1.0'})
+ from gi.repository import GLib, IBus
  
- #include "global.h"
-@@ -57,12 +56,10 @@ static gchar *config = "default";
- static gchar *desktop = "gnome";
- 
- static gchar *panel_extension_disable_users[] = {
-+    "gdm",
-     "gnome-initial-setup",
-     "liveuser"
+ class TestOverride(unittest.TestCase):
+diff --git a/bus/test-matchrule.c b/bus/test-matchrule.c
+index d85fc90c..15a4ed45 100644
+--- a/bus/test-matchrule.c
++++ b/bus/test-matchrule.c
+@@ -16,15 +16,13 @@ struct _BusMatchRule {
+     GList *recipients;
  };
--static gchar *panel_extension_disable_groups[] = {
--    "gdm",
--};
  
- static void
- show_version_and_quit (void)
-@@ -187,11 +184,6 @@ main (gint argc, gchar **argv)
+-int
+-main(gint argc, gchar **argv)
++static void
++test (void)
  {
-     int i;
-     const gchar *username = ibus_get_user_name ();
--    const gchar *groupname = NULL;
--#ifdef HAVE_GETGRGID_R
--    char buffer[4096];
--    struct group gbuf;
+     BusMatchRule *rule, *rule1;
+-#if !GLIB_CHECK_VERSION(2,35,0)
+-    g_type_init ();
 -#endif
  
-     setlocale (LC_ALL, "");
+-    rule = bus_match_rule_new (" type='signal' , interface = 'org.freedesktop.IBus' ");
++    rule = bus_match_rule_new (" type='signal' ,"
++                               " interface = 'org.freedesktop.IBus' ");
+     g_assert (rule->message_type == G_DBUS_MESSAGE_TYPE_SIGNAL);
+     g_assert (g_strcmp0 (rule->interface, "org.freedesktop.IBus") == 0 );
+     g_object_unref (rule);
+@@ -55,12 +53,22 @@ main(gint argc, gchar **argv)
+     g_object_unref (rule);
+     g_object_unref (rule1);
  
-@@ -224,23 +216,6 @@ main (gint argc, gchar **argv)
-         }
-     }
+-    rule = bus_match_rule_new ("type='method_call',interface='org.freedesktop.IBus ");
++    rule = bus_match_rule_new ("type='method_call',"
++                               "interface='org.freedesktop.IBus ");
+     g_assert (rule == NULL);
  
--    /* get group name */
--    {
--        struct group *grp = NULL;
--#ifdef HAVE_GETGRGID_R
--        /* MT-Safe locale */
--        getgrgid_r (getgid (), &gbuf, buffer, sizeof(buffer), &grp);
--#else
--        /* MT-Unsafe race:grgid locale */
--        grp = getgrgid (getgid ());
--#endif
--
--        if (grp && grp->gr_name && grp->gr_name[0])
--            groupname = grp->gr_name;
--        else
--            g_warning ("Couldn't get group name");
--    }
--
-     /* daemonize process */
-     if (daemonize) {
-         if (daemon (1, 0) != 0) {
-@@ -284,12 +259,6 @@ main (gint argc, gchar **argv)
-             break;
-         }
-     }
--    for (i = 0; i < G_N_ELEMENTS(panel_extension_disable_groups); i++) {
--        if (g_strcmp0 (groupname, panel_extension_disable_groups[i]) == 0) {
--            emoji_extension = "disable";
--            break;
--        }
--    }
-     if (!single) {
-         /* execute config component */
-         if (g_strcmp0 (config, "default") == 0) {
-diff --git a/bus/services/org.freedesktop.IBus.session.GNOME.service.in b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-index f0debb37..858cf10d 100644
---- a/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-+++ b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-@@ -12,6 +12,9 @@ Before=gnome-session.target
- After=gnome-session-initialized.target
- PartOf=gnome-session-initialized.target
- 
-+# Never run in GDM
-+Conflicts=gnome-session@gnome-login.target
+     rule = bus_match_rule_new ("eavesdrop=true");
+     g_assert (rule != NULL);
+     g_object_unref (rule);
+-    
+-    return 0;
++}
 +
- [Service]
- Type=dbus
- # Only pull --xim in X11 session, it is done via Xwayland-session.d on Wayland
-diff --git a/configure.ac b/configure.ac
-index ad4f1929..b353a654 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -178,7 +178,7 @@ AC_MSG_RESULT([$enable_product_build])
- AC_CHECK_HEADERS([sys/prctl.h])
- 
- # Check functions.
--AC_CHECK_FUNCS(daemon getgrgid_r)
-+AC_CHECK_FUNCS(daemon)
- 
- # Check dlclose() in libc.so.
- AC_CHECK_LIB(c, dlclose, LIBDL="", [AC_CHECK_LIB(dl, dlclose, LIBDL="-ldl")])
--- 
-2.51.0
-
-From 4a45bf155c968bcc2f711d6b4827788802de18d1 Mon Sep 17 00:00:00 2001
-From: Joan Torres Lopez <joantolo@redhat.com>
-Date: Sun, 5 Oct 2025 10:39:50 +0900
-Subject: [PATCH] bus: Update gdm bits based on new gdm changes
-
-Since GDM 49 version, gdm user doesn't exist and for each greeter
-there's a dynamic user creation, e.g. gdm-greeter-1, gdm-greeter-2.
-All of them are part of gdm group, so instead of checking for a specific
-user, we check for a specific group.
-
-Also, remove Conflicts in systemd service to allow ibus in GDM sessions.
-This covers some cases where users might have special characters in their
-password or username.
-
-BUG=https://gitlab.gnome.org/GNOME/gdm/-/issues/1018
-BUG=https://github.com/ibus/ibus/pull/2804
----
- bus/main.c                                    | 33 ++++++++++++++++++-
- ....freedesktop.IBus.session.GNOME.service.in |  3 --
- configure.ac                                  |  2 +-
- 3 files changed, 33 insertions(+), 5 deletions(-)
-
-diff --git a/bus/main.c b/bus/main.c
-index 63ec5536..e0db15b3 100644
---- a/bus/main.c
-+++ b/bus/main.c
-@@ -39,6 +39,7 @@
- 
- #ifdef G_OS_UNIX
- #include <glib-unix.h>
-+#include <grp.h>
- #endif
- 
- #include "global.h"
-@@ -56,10 +57,12 @@ static gchar *config = "default";
- static gchar *desktop = "gnome";
- 
- static gchar *panel_extension_disable_users[] = {
--    "gdm",
-     "gnome-initial-setup",
-     "liveuser"
- };
-+static gchar *panel_extension_disable_groups[] = {
-+    "gdm",
-+};
- 
- static void
- show_version_and_quit (void)
-@@ -184,6 +187,11 @@ main (gint argc, gchar **argv)
++int
++main (int argc, char *argv[])
++{
++    g_test_init (&argc, &argv, NULL);
++#if !GLIB_CHECK_VERSION(2,35,0)
++    g_type_init ();
++#endif
++    g_test_add_func ("/test-matchrule", test);
++    return g_test_run ();
+ }
+diff --git a/bus/test-stress.c b/bus/test-stress.c
+index 1c277e74..3908e60e 100644
+--- a/bus/test-stress.c
++++ b/bus/test-stress.c
+@@ -48,8 +48,8 @@ _sleep (guint millisecond)
+    Key kind are a-z and space.
+    Check ibus-daemon and ibus engine crash.
+ */
+-gint
+-main (gint argc, gchar **argv)
++static void
++test (void)
  {
-     int i;
-     const gchar *username = ibus_get_user_name ();
-+    const gchar *groupname = NULL;
-+#ifdef HAVE_GETGRGID_R
-+    char buffer[4096];
-+    struct group gbuf;
-+#endif
+     GTimer *timer;
+     GRand *rnd;
+@@ -59,9 +59,6 @@ main (gint argc, gchar **argv)
+     int count = 0;
+     int send_key_num = 0;
  
-     setlocale (LC_ALL, "");
- 
-@@ -216,6 +224,23 @@ main (gint argc, gchar **argv)
-         }
-     }
- 
-+    /* get group name */
-+    {
-+        struct group *grp = NULL;
-+#ifdef HAVE_GETGRGID_R
-+        /* MT-Safe locale */
-+        getgrgid_r (getgid (), &gbuf, buffer, sizeof(buffer), &grp);
-+#else
-+        /* MT-Unsafe race:grgid locale */
-+        grp = getgrgid (getgid ());
-+#endif
-+
-+        if (grp && grp->gr_name && grp->gr_name[0])
-+            groupname = grp->gr_name;
-+        else
-+            g_warning ("Couldn't get group name");
-+    }
-+
-     /* daemonize process */
-     if (daemonize) {
-         if (daemon (1, 0) != 0) {
-@@ -259,6 +284,12 @@ main (gint argc, gchar **argv)
-             break;
-         }
-     }
-+    for (i = 0; i < G_N_ELEMENTS(panel_extension_disable_groups); i++) {
-+        if (g_strcmp0 (groupname, panel_extension_disable_groups[i]) == 0) {
-+            emoji_extension = "disable";
-+            break;
-+        }
-+    }
-     if (!single) {
-         /* execute config component */
-         if (g_strcmp0 (config, "default") == 0) {
-diff --git a/bus/services/org.freedesktop.IBus.session.GNOME.service.in b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-index 858cf10d..f0debb37 100644
---- a/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-+++ b/bus/services/org.freedesktop.IBus.session.GNOME.service.in
-@@ -12,9 +12,6 @@ Before=gnome-session.target
- After=gnome-session-initialized.target
- PartOf=gnome-session-initialized.target
- 
--# Never run in GDM
--Conflicts=gnome-session@gnome-login.target
+-    setlocale (LC_ALL, "");
+-    ibus_init ();
 -
- [Service]
- Type=dbus
- # Only pull --xim in X11 session, it is done via Xwayland-session.d on Wayland
-diff --git a/configure.ac b/configure.ac
-index a9396d7e..fc32398c 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -178,7 +178,7 @@ AC_MSG_RESULT([$enable_product_build])
- AC_CHECK_HEADERS([sys/prctl.h])
+     /* need to set active engine */
+     client = bus_test_client_new ();
+     if (client == NULL) {
+@@ -112,6 +109,14 @@ main (gint argc, gchar **argv)
+     g_print ("%f sec\n", g_timer_elapsed (timer, NULL));
+     g_timer_destroy (timer);
+     g_rand_free (rnd);
++}
  
- # Check functions.
--AC_CHECK_FUNCS(daemon)
-+AC_CHECK_FUNCS(daemon getgrgid_r)
- 
- # Check dlclose() in libc.so.
- AC_CHECK_LIB(c, dlclose, LIBDL="", [AC_CHECK_LIB(dl, dlclose, LIBDL="-ldl")])
--- 
-2.51.0
-
-From 94c6ede4289666782d860ae964f9a09cbdc78554 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Thu, 13 Nov 2025 20:15:37 +0900
-Subject: [PATCH] engine: Update simple.xml with xkeyboard-config 2.46
-
----
- engine/gensimple.py  |  8 ++---
- engine/simple.xml.in | 70 ++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 69 insertions(+), 9 deletions(-)
-
-diff --git a/engine/gensimple.py b/engine/gensimple.py
-index de6d7ff5..4e331732 100755
---- a/engine/gensimple.py
-+++ b/engine/gensimple.py
-@@ -248,7 +248,7 @@ class GenerateEngineXML():
-                                   self._AUTHOR,
-                                   self.__first)
-         parser.setContentHandler(self.__handler)
--        f = codecs.open(self.__path, 'r', encoding='utf-8')
-+        f = open(self.__path, 'r', encoding='utf-8')
-         try:
-             parser.parse(f)
-         except SAXParseException:
-@@ -257,7 +257,7 @@ class GenerateEngineXML():
-             f.close()
-     def write(self, output=None):
-         if output != None:
--            od = codecs.open(output, 'w', encoding='utf-8')
-+            od = open(output, 'w', encoding='utf-8')
-         else:
-             if PY3K:
-                 od = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-@@ -311,7 +311,7 @@ class ISO639XML(XMLFilterBase):
- 
- 
- def parse_iso639(path):
--    f = codecs.open(path, 'r', encoding='utf-8')
-+    f = open(path, 'r', encoding='utf-8')
-     parser = sax_make_parser()
-     parser.setFeature(sax_feature_namespaces, 0)
-     handler = ISO639XML(parser)
-@@ -327,7 +327,7 @@ def parse_iso639(path):
- 
- def parse_denylist(denyfile):
-     denylist = []
--    f = codecs.open(denyfile, 'r', encoding='utf-8')
-+    f = open(denyfile, 'r', encoding='utf-8')
-     for line in f.readlines():
-         if line == '\n' or line[0] == '#':
-             continue
-diff --git a/engine/simple.xml.in b/engine/simple.xml.in
-index 92fea8a8..c39d4134 100644
---- a/engine/simple.xml.in
-+++ b/engine/simple.xml.in
-@@ -3,7 +3,7 @@
-     <name>org.freedesktop.IBus.Simple</name>
-     <description>A table based simple engine</description>
-     <exec>@libexecdir@/ibus-engine-simple</exec>
--    <version>1.5.33-beta1.20250916</version>
-+    <version>1.5.33.20251113</version>
-     <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-     <license>GPL</license>
-     <homepage>https://github.com/ibus/ibus/wiki</homepage>
-@@ -2738,8 +2738,20 @@
-             <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-             <layout>us</layout>
-             <layout_variant>mac</layout_variant>
--            <longname>English (Macintosh)</longname>
--            <description>English (Macintosh)</description>
-+            <longname>English (Macintosh, ABC, ANSI)</longname>
-+            <description>English (Macintosh, ABC, ANSI)</description>
-+            <icon>ibus-keyboard</icon>
-+            <rank>1</rank>
-+        </engine>
-+        <engine>
-+            <name>xkb:us:mac-iso:eng</name>
-+            <language>en</language>
-+            <license>GPL</license>
-+            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-+            <layout>us</layout>
-+            <layout_variant>mac-iso</layout_variant>
-+            <longname>English (Macintosh, ABC, ISO)</longname>
-+            <description>English (Macintosh, ABC, ISO)</description>
-             <icon>ibus-keyboard</icon>
-             <rank>1</rank>
-         </engine>
-@@ -2906,8 +2918,20 @@
-             <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-             <layout>us</layout>
-             <layout_variant>dvorak-mac</layout_variant>
--            <longname>English (Dvorak, Macintosh)</longname>
--            <description>English (Dvorak, Macintosh)</description>
-+            <longname>English (Dvorak, Macintosh, ANSI)</longname>
-+            <description>English (Dvorak, Macintosh, ANSI)</description>
-+            <icon>ibus-keyboard</icon>
-+            <rank>1</rank>
-+        </engine>
-+        <engine>
-+            <name>xkb:us:dvorak-mac-iso:eng</name>
-+            <language>en</language>
-+            <license>GPL</license>
-+            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-+            <layout>us</layout>
-+            <layout_variant>dvorak-mac-iso</layout_variant>
-+            <longname>English (Dvorak, Macintosh, ISO)</longname>
-+            <description>English (Dvorak, Macintosh, ISO)</description>
-             <icon>ibus-keyboard</icon>
-             <rank>1</rank>
-         </engine>
-@@ -11041,6 +11065,18 @@
-             <icon>ibus-keyboard</icon>
-             <rank>1</rank>
-         </engine>
-+        <engine>
-+            <name>xkb:th:mnc:tha</name>
-+            <language>th</language>
-+            <license>GPL</license>
-+            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-+            <layout>th</layout>
-+            <layout_variant>mnc</layout_variant>
-+            <longname>Thai (Manoonchai)</longname>
-+            <description>Thai (Manoonchai)</description>
-+            <icon>ibus-keyboard</icon>
-+            <rank>1</rank>
-+        </engine>
-         <engine>
-             <name>xkb:bw::tsn</name>
-             <language>tn</language>
-@@ -11217,6 +11253,18 @@
-             <icon>ibus-keyboard</icon>
-             <rank>1</rank>
-         </engine>
-+        <engine>
-+            <name>xkb:ua:winkeysenhanced:ukr</name>
-+            <language>uk</language>
-+            <license>GPL</license>
-+            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-+            <layout>ua</layout>
-+            <layout_variant>winkeysenhanced</layout_variant>
-+            <longname>Ukrainian (Windows Enhanced)</longname>
-+            <description>Ukrainian (Windows Enhanced)</description>
-+            <icon>ibus-keyboard</icon>
-+            <rank>1</rank>
-+        </engine>
-         <engine>
-             <name>xkb:ua:macOS:ukr</name>
-             <language>uk</language>
-@@ -11324,6 +11372,18 @@
-             <icon>ibus-keyboard</icon>
-             <rank>1</rank>
-         </engine>
-+        <engine>
-+            <name>xkb:pk:pak_urdu_phonetic:urd</name>
-+            <language>ur</language>
-+            <license>GPL</license>
-+            <author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
-+            <layout>pk</layout>
-+            <layout_variant>pak_urdu_phonetic</layout_variant>
-+            <longname>Urdu (Pak Urdu Phonetic)</longname>
-+            <description>Urdu (Pak Urdu Phonetic)</description>
-+            <icon>ibus-keyboard</icon>
-+            <rank>1</rank>
-+        </engine>
-         <engine>
-             <name>xkb:pk:ara:ara</name>
-             <language>ar</language>
--- 
-2.51.0
-
-From 8720838d7f59de485e6769bb939b6eef0c985276 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Fri, 14 Nov 2025 02:39:56 +0900
-Subject: [PATCH] src: Load EN compose file in pt-BR locale
-
-- The EN compose table is enabled in case that language compose files,
-  el-GR, fi-FI, pt-BR languages, are loaded but the user has no
-  user compose file.
-- Output double dead keys with the well-known chars likes the EN compose
-  table in case that the user has a user compose file but not enable
-  the EN compose table.
-- Load language compose files in case the user compose file is loaded
-  with the 'include "%L"' keyword.
-
-Fixes: https://github.com/ibus/ibus/commit/7c2b32b4
-BUG=https://github.com/ibus/ibus/issues/2825
----
- src/ibuscomposetable.c | 32 ++++++++++++++--
- src/ibuscomposetable.h |  1 +
- src/ibusenginesimple.c | 85 +++++++++++++++++++++++++-----------------
- 3 files changed, 81 insertions(+), 37 deletions(-)
-
+-    return 0;
++int
++main (int argc, char *argv[])
++{
++    g_test_init (&argc, &argv, NULL);
++    setlocale (LC_ALL, "");
++    ibus_init ();
++    g_test_add_func ("/test-stress", test);
++    return g_test_run ();
+ }
 diff --git a/src/ibuscomposetable.c b/src/ibuscomposetable.c
-index e60ad091..8e1785ca 100644
+index 116d0131..93262f3a 100644
 --- a/src/ibuscomposetable.c
 +++ b/src/ibuscomposetable.c
-@@ -1576,6 +1576,20 @@ ibus_compose_table_new_with_list (GList   *compose_list,
- }
- 
- 
-+static gboolean
-+_datafile_is_system (const gchar *compose_file)
-+{
-+    g_assert (compose_file);
-+    if (!g_ascii_strncasecmp (compose_file, "/usr", 4) ||
-+        !g_ascii_strncasecmp (compose_file, "/etc", 4) ||
-+        !g_ascii_strncasecmp (compose_file, "/usr", 4) ||
-+        !g_ascii_strncasecmp (compose_file, "/opt", 4)) {
-+        return TRUE;
-+    }
-+    return FALSE;
-+}
-+
-+
- IBusComposeTableEx *
- ibus_compose_table_new_with_file (const gchar *compose_file,
-                                   GSList      *compose_tables)
-@@ -1632,6 +1646,7 @@ ibus_compose_table_new_with_file (const gchar *compose_file,
-             } else {
-                 compose_table->id = g_str_hash (compose_file);
-                 compose_table->can_load_en_us = can_load_en_us;
-+                compose_table->is_system = _datafile_is_system (compose_file);
-                 return compose_table;
-             }
-         }
-@@ -1647,8 +1662,10 @@ ibus_compose_table_new_with_file (const gchar *compose_file,
-             max_compose_len,
-             n_index_stride,
-             g_str_hash (compose_file));
--    if (compose_table)
-+    if (compose_table) {
-         compose_table->can_load_en_us = can_load_en_us;
-+        compose_table->is_system = _datafile_is_system (compose_file);
-+    }
- 
-     g_list_free_full (compose_list,
-                       (GDestroyNotify) ibus_compose_list_element_free);
-@@ -1793,8 +1810,10 @@ ibus_compose_table_list_add_file (GSList      *compose_tables,
- 
-     compose_table = ibus_compose_table_load_cache (compose_file,
-                                                    &saved_version);
--    if (compose_table != NULL)
-+    if (compose_table != NULL) {
-+        compose_table->is_system = _datafile_is_system (compose_file);
-         return g_slist_prepend (compose_tables, compose_table);
-+    }
- 
- parse:
-     if ((compose_table = ibus_compose_table_new_with_file (compose_file,
-@@ -2138,8 +2157,15 @@ ibus_check_algorithmically (const guint   *compose_buffer,
- 
-     for (i = 0; i < n_compose && IS_DEAD_KEY (compose_buffer[i]); i++)
-         ;
--    if (i == n_compose)
-+    if (i == n_compose) {
-+        /* If no EN compose, double dead keys should be output? */
-+        if (i == 2 && compose_buffer[0] == compose_buffer[1]) {
-+            *output_char = ibus_keysym_to_unicode (compose_buffer[0],
-+                                                   FALSE,
-+                                                   NULL);
-+        }
-         return TRUE;
-+    }
- 
-     if (i > 0 && i == n_compose - 1) {
-         combination_buffer[0] = ibus_keyval_to_unicode (compose_buffer[i]);
-diff --git a/src/ibuscomposetable.h b/src/ibuscomposetable.h
-index 2068657d..ce4cdae1 100644
---- a/src/ibuscomposetable.h
-+++ b/src/ibuscomposetable.h
-@@ -65,6 +65,7 @@ struct _IBusComposeTableEx
-     guint32 id;
-     char *rawdata;
-     gboolean can_load_en_us;
-+    gboolean is_system;
- };
- 
- 
-diff --git a/src/ibusenginesimple.c b/src/ibusenginesimple.c
-index baef9508..ac7ffc41 100644
---- a/src/ibusenginesimple.c
-+++ b/src/ibusenginesimple.c
-@@ -173,7 +173,9 @@ ibus_engine_simple_class_init (IBusEngineSimpleClass *class)
-                                                        length,
-                                                        &saved_version);
-     g_bytes_unref (data);
--    if (!en_compose_table && saved_version) {
-+    if (en_compose_table) {
-+        en_compose_table->is_system = TRUE;
-+    } else if (!en_compose_table && saved_version) {
-         g_warning ("Failed to parse the builtin compose due to the different "
-                    "version %u. Please rebuild IBus resource files.",
-                    saved_version);
-@@ -1023,6 +1025,7 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
-     GString *output = g_string_new ("");
-     gboolean success = FALSE;
-     gboolean is_32bit = FALSE;
-+    gboolean all_is_system = TRUE;
-     gboolean can_load_en_us = FALSE;
-     gunichar output_char = '\0';
- 
-@@ -1034,18 +1037,27 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
- 
-     G_LOCK (global_tables);
-     tmp_list = global_tables;
-+    while (tmp_list) {
-+        IBusComposeTableEx *compose_table = tmp_list->data;
-+        if (!compose_table->is_system) {
-+            all_is_system = FALSE;
-+            break;
-+        }
-+        tmp_list = tmp_list->next;
-+    }
-+    tmp_list = global_tables;
-     while (tmp_list) {
-         IBusComposeTableEx *compose_table = tmp_list->data;
-         if (compose_table->can_load_en_us)
-             can_load_en_us = TRUE;
--        /* If global_tables includes en_compose_table only, i.e. no user
--         * or locale compose tables, en_compose_table is used.
--         * If not, en_compose_table is used in case one of the other compose
--         * tables has can_load_en_us = %TRUE, i.e. the table file has
--         * the line of 'include "%L"'.
-+        /* If global_tables includes system compose tables only, i.e. no user
-+         * compose tables, en_compose_table is used.
-+         * If user compose table is included in global_tables, en_compose_table
-+         * is used in case that the user compose table has can_load_en_us =
-+         * %TRUE, i.e. the compose file has the line of 'include "%L"'.
-          * en_compose_table is always appended to the last of global_tables.
-          */
--        if ((compose_table == en_compose_table) && global_tables->next != NULL
-+        if ((compose_table == en_compose_table) && !all_is_system
-             && !can_load_en_us) {
-             tmp_list = tmp_list->next;
-             continue;
-@@ -1102,7 +1114,12 @@ ibus_engine_simple_check_all_compose_table (IBusEngineSimple *simple,
-     g_string_free (output, TRUE);
-     output = NULL;
- 
--    if (ibus_check_algorithmically (priv->compose_buffer,
-+    /* TODO: priv->tentative_match should not be used in case
-+     * success == %TRUE? Now ibus_check_algorithmically() hits double dead
-+     * keys.
-+     */
-+    if (!success &&
-+        ibus_check_algorithmically (priv->compose_buffer,
-                                     n_compose,
-                                     &output_char)) {
-         priv->in_compose_sequence = TRUE;
-@@ -1689,42 +1706,42 @@ ibus_engine_simple_add_table_by_locale (IBusEngineSimple *simple,
-     if (locale == NULL) {
-         path = g_build_filename (g_get_user_config_dir (),
-                                  "ibus", "Compose", NULL);
--        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
-+        if (g_file_test (path, G_FILE_TEST_EXISTS))
-             ibus_engine_simple_add_compose_file (simple, path);
--            g_free (path);
--            return retval;
--        }
-         g_clear_pointer(&path, g_free);
- 
--        path = g_build_filename (g_get_user_config_dir (),
--                                 "gtk-4.0", "Compose", NULL);
--        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
--            ibus_engine_simple_add_compose_file (simple, path);
--            g_free (path);
--            return retval;
-+        /* If user compose is not loaded except for en_compose_table */
-+        if (global_tables && !global_tables->next) {
-+            path = g_build_filename (g_get_user_config_dir (),
-+                                     "gtk-4.0", "Compose", NULL);
-+            if (g_file_test (path, G_FILE_TEST_EXISTS))
-+                ibus_engine_simple_add_compose_file (simple, path);
-+            g_clear_pointer(&path, g_free);
-         }
--        g_clear_pointer(&path, g_free);
- 
--        path = g_build_filename (g_get_user_config_dir (),
--                                 "gtk-3.0", "Compose", NULL);
--        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
--            ibus_engine_simple_add_compose_file (simple, path);
--            g_free (path);
--            return retval;
-+        if (global_tables && !global_tables->next) {
-+            path = g_build_filename (g_get_user_config_dir (),
-+                                     "gtk-3.0", "Compose", NULL);
-+            if (g_file_test (path, G_FILE_TEST_EXISTS))
-+                ibus_engine_simple_add_compose_file (simple, path);
-+            g_clear_pointer(&path, g_free);
-         }
--        g_clear_pointer(&path, g_free);
- 
-         home = g_get_home_dir ();
--        if (home == NULL)
--            return retval;
- 
--        path = g_build_filename (home, ".XCompose", NULL);
--        if (g_file_test (path, G_FILE_TEST_EXISTS)) {
--            ibus_engine_simple_add_compose_file (simple, path);
--            g_free (path);
--            return retval;
-+        if (home && global_tables && !global_tables->next) {
-+            path = g_build_filename (home, ".XCompose", NULL);
-+            if (g_file_test (path, G_FILE_TEST_EXISTS))
-+                ibus_engine_simple_add_compose_file (simple, path);
-+            g_clear_pointer(&path, g_free);
-+        }
-+
-+        /* Decide if both user compose and locale compose is loaded. */
-+        if (global_tables && global_tables->next) {
-+            IBusComposeTableEx *compose_table = global_tables->data;
-+            if (!compose_table->can_load_en_us)
-+                return retval;
-         }
--        g_clear_pointer(&path, g_free);
- 
- #if GLIB_CHECK_VERSION (2, 58, 0)
-         langs = g_get_language_names_with_category ("LC_CTYPE");
--- 
-2.51.0
-
-From 563b433d721201e76b4e8ac6ea593e873fd72a13 Mon Sep 17 00:00:00 2001
-From: Arnout Engelen <arnout@bzzt.net>
-Date: Mon, 3 Nov 2025 09:49:46 +0100
-Subject: [PATCH] ui/gtk3: don't build in parallel
-
-As that led to nondeterministic generated method names. This
-only seems to have a small effect on performance (~10s on a
-whole fresh build).
-
-While I appreciate the ibus project doesn't consider such
-nondeterminisms as particularly problematic (#2272), having
-bitwise reproducible builds is increasingly desirable in Linux
-distributions, so hopefully you could consider applying this
-change nonetheless.
-
-BUG=https://github.com/ibus/ibus/pull/2821
----
- ui/gtk3/Makefile.am | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/ui/gtk3/Makefile.am b/ui/gtk3/Makefile.am
-index d99d8e82..4df6c5eb 100644
---- a/ui/gtk3/Makefile.am
-+++ b/ui/gtk3/Makefile.am
-@@ -317,6 +317,8 @@ panelbinding.o: $(srcdir)/panelbinding.c
- 	$(AM_V_CC_no)$(COMPILE) -c -o $@ $<
- 	$(NULL)
- 
-+.NOTPARALLEL:
-+
- MAINTAINERCLEANFILES += extension.c panelbinding.c
- 
- man_seven_DATA = ibus-emoji.7
--- 
-2.51.0
-
-From 02032bc5f0fc89c7d18774758ae052dd3606408b Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Mon, 6 Oct 2025 20:40:17 +0900
-Subject: [PATCH 1/4] src: Fix GCC `-Wunused-but-set-variable` flag
-
-Add `G_GNUC_UNUSED` flag for the GCC warnings.
-
-BUG=https://github.com/ibus/ibus/pull/2805
----
- src/ibuscomponent.c    | 4 ++--
- src/ibusmessage.c      | 2 +-
- src/ibusserializable.c | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/src/ibuscomponent.c b/src/ibuscomponent.c
-index 80ace332..c453a2f5 100644
---- a/src/ibuscomponent.c
-+++ b/src/ibuscomponent.c
-@@ -2,7 +2,7 @@
- /* vim:set et sts=4: */
- /* bus - The Input Bus
-  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright (C) 2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+ * Copyright (C) 2020-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  * Copyright (C) 2008-2020 Red Hat, Inc.
-  *
-  * This library is free software; you can redistribute it and/or
-@@ -729,7 +729,7 @@ ibus_component_new_varargs (const gchar *first_property_name, ...)
- {
-     va_list var_args;
-     IBusComponent *component;
--    IBusComponentPrivate *priv;
-+    G_GNUC_UNUSED IBusComponentPrivate *priv;
- 
-     g_assert (first_property_name);
- 
-diff --git a/src/ibusmessage.c b/src/ibusmessage.c
-index 89e31771..12fbb48e 100644
---- a/src/ibusmessage.c
-+++ b/src/ibusmessage.c
-@@ -459,7 +459,7 @@ ibus_message_new (guint domain,
-     GValue *values, *values_tmp;
-     guint n_properties = 4, i;
-     IBusMessage *msg;
--    IBusMessagePrivate *priv;
-+    G_GNUC_UNUSED IBusMessagePrivate *priv;
- 
-     g_return_val_if_fail (domain > 0 && domain <= G_MAXUINT8, NULL);
-     g_return_val_if_fail (code <= G_MAXUINT8, NULL);
-diff --git a/src/ibusserializable.c b/src/ibusserializable.c
-index 231020b7..501841b3 100644
---- a/src/ibusserializable.c
-+++ b/src/ibusserializable.c
-@@ -2,7 +2,7 @@
- /* vim:set et sts=4: */
+@@ -1,7 +1,7 @@
+ /* -*- mode: C; c-basic-offset: 4; indent-tabs-mode: nil; -*- */
  /* ibus - The Input Bus
-  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright (C) 2018-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+ * Copyright (C) 2018-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  * Copyright (C) 2008-2019 Red Hat, Inc.
+  * Copyright (C) 2013-2014 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2013-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2013-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
   *
   * This library is free software; you can redistribute it and/or
-@@ -269,7 +269,7 @@ GVariant *
- ibus_serializable_serialize_object (IBusSerializable *object)
- {
-     g_return_val_if_fail (IBUS_IS_SERIALIZABLE (object), FALSE);
--    gboolean retval;
-+    G_GNUC_UNUSED gboolean retval;
+  * modify it under the terms of the GNU Lesser General Public
+@@ -711,6 +711,7 @@ ibus_compose_list_check_duplicated_with_own (GList  *compose_list,
+     IBusComposeData *compose_data_a, *compose_data_b;
+     int i;
+     GList *removed_list = NULL;
++    GString *string;
  
-     GVariantBuilder builder;
-     g_variant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
--- 
-2.51.1
-
-From c9d5d0f521de9f02a876c319c02978235a7453cc Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Mon, 6 Oct 2025 20:40:25 +0900
-Subject: [PATCH 2/4] ui/gtk3/application: --enable-wayland-im option without daemon
-
-Wish to run ibus-daemon after run ibus-ui-gtk3 for the debug purpose.
-
-BUG=https://github.com/ibus/ibus/pull/2805
----
- ui/gtk3/application.vala | 33 ++++++++++++++++++++++++---------
- 1 file changed, 24 insertions(+), 9 deletions(-)
-
-diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
-index 82cc5397..65ab43cf 100644
---- a/ui/gtk3/application.vala
-+++ b/ui/gtk3/application.vala
-@@ -37,6 +37,7 @@ class Application {
-     private static bool m_verbose;
-     private static bool m_enable_wayland_im;
- #if USE_GDK_WAYLAND
-+    private static ulong m_bus_connected_id;
-     private static ulong m_realize_surface_id;
-     private static ulong m_ibus_focus_in_id;
-     private static ulong m_ibus_focus_out_id;
-@@ -285,7 +286,7 @@ class Application {
-         bus = new IBus.Bus();
-         GLib.MainLoop? loop = null;
-         if (!bus.is_connected() && m_exec_daemon) {
--            ulong handler_id = bus.connected.connect((bus) => {
-+            m_bus_connected_id = bus.connected.connect((bus) => {
-                 if (loop != null)
-                     loop.quit();
-             });
-@@ -295,17 +296,31 @@ class Application {
-                     loop.run();
+     if (!compose_list)
+         return NULL;
+@@ -729,18 +730,33 @@ ibus_compose_list_check_duplicated_with_own (GList  *compose_list,
+                     break;
                  }
              }
--            bus.disconnect(handler_id);
-+            bus.disconnect(m_bus_connected_id);
-+            m_bus_connected_id = 0;
-         }
-         if (!bus.is_connected()) {
--            m_log.printf("Failed to connect to ibus-daemon\n");
--            m_log.flush();
--            assert_not_reached();
-+            if (m_exec_daemon) {
-+                m_log.printf("Failed to connect to ibus-daemon\n");
-+                m_log.flush();
-+                assert_not_reached();
++            string = g_string_new (NULL);
++            if (is_different_value) {
++                g_string_append (
++                        string,
++                        "Deleting different outputs for same sequence.");
 +            } else {
-+                m_bus_connected_id = bus.connected.connect((bus) => {
-+                    m_wayland_im = new IBus.WaylandIM("bus", bus,
-+                                                      "wl_display", wl_display,
-+                                                      "log", m_log,
-+                                                      "verbose", m_verbose);
-+                    bus.disconnect(m_bus_connected_id);
-+                    m_bus_connected_id = 0;
-+                });
++                g_string_append (
++                        string,
++                        "Deleting same compose output for same sequence.");
 +            }
-+        }
-+        if (bus.is_connected()) {
-+            m_wayland_im = new IBus.WaylandIM("bus", bus,
-+                                              "wl_display", wl_display,
-+                                              "log", m_log,
-+                                              "verbose", m_verbose);
-         }
--        m_wayland_im = new IBus.WaylandIM("bus", bus,
--                                          "wl_display", wl_display,
--                                          "log", m_log,
--                                          "verbose", m_verbose);
-     }
- 
-     private void set_wayland_surface(void *surface) {
--- 
-2.51.1
-
-From 1a9ea16b12d4e90e4caf74c4569a596660da6e9c Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Wed, 26 Nov 2025 14:55:28 +0900
-Subject: [PATCH 3/4] util/IMdkit: Fix memory leaks with fail safe
-
-- When malloc() is failed, the pointer should not be deallocated
-  and also other allocated memory pointers should be freed in FrameMgr.c.
-- The `XIM_STRFUNC` macro implemented in XimProto.h.
-- GCC `-Wanalyzer-malloc-leak` flag does not have to warn the reallocation
-  since the `address` pointer is not changed and `address->imvalue_mask`
-  should work in i18nMethod.c
-- Seems GCC does not understand `if (!p->value)` and replace it with a
-  wrapper variable in i18nMethod.c
-- Fix exit() from within signal handler by CWE-479 and
-  `-Wanalyzer-unsafe-call-within-signal-handler` in client/x11/main.c
-
-BUG=https://github.com/ibus/ibus/pull/2805
----
- client/x11/main.c        |   7 +-
- util/IMdkit/FrameMgr.c   | 316 ++++++++++++++++++++++++++++++++++-----
- util/IMdkit/XimProto.h   |   7 +-
- util/IMdkit/i18nMethod.c | 104 +++++++------
- 4 files changed, 352 insertions(+), 82 deletions(-)
-
-diff --git a/client/x11/main.c b/client/x11/main.c
-index ab9679dd..5fadd43d 100644
---- a/client/x11/main.c
-+++ b/client/x11/main.c
-@@ -1309,7 +1309,12 @@ _atexit_cb ()
- static void
- _sighandler (int sig)
- {
--    exit(EXIT_FAILURE);
-+    /* rhbz#1767691 _sighandler() is called with SIGTERM
-+     * and exit() causes SEGV during calling atexit functions.
-+     * _atexit_cb() might be broken. _exit() does not call
-+     * atexit functions.
-+     */
-+    _exit (EXIT_FAILURE);
- }
- 
- static void
-diff --git a/util/IMdkit/FrameMgr.c b/util/IMdkit/FrameMgr.c
-index 80d019a0..976db94e 100644
---- a/util/IMdkit/FrameMgr.c
-+++ b/util/IMdkit/FrameMgr.c
-@@ -23,6 +23,7 @@ SOFTWARE.
-                              miyamoto@jrd.dec.com
- 
-     This version tidied and debugged by Steve Underwood May 1999
-+    This version tidied and debugged by Takao Fujiwara Nov 2025
- 
- ******************************************************************/
- 
-@@ -30,6 +31,7 @@ SOFTWARE.
- #include <assert.h>
- #include <stdlib.h>
- #include "FrameMgr.h"
-+#include "XimProto.h"
- 
- /* Convenient macro */
- 
-@@ -218,7 +220,11 @@ FrameMgr FrameMgrInit (XimFrame frame, char* area, Bool byte_swap)
- {
-     FrameMgr fm;
- 
--    fm = (FrameMgr) Xmalloc (sizeof (FrameMgrRec));
-+    if ((fm = (FrameMgr) Xmalloc (sizeof (FrameMgrRec))) == NULL) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return NULL;
-+    }
- 
-     fm->frame = frame;
-     fm->fi = FrameInstInit (frame);
-@@ -259,7 +265,8 @@ void FrameMgrFree (FrameMgr fm)
-     }
-     /*endwhile*/
- 
--    FrameInstFree (fm->fi);
-+    if (fm->fi)
-+        FrameInstFree (fm->fi);
-     Xfree (fm);
- }
- 
-@@ -868,7 +875,11 @@ static FrameInst FrameInstInit (XimFrame frame)
- {
-     FrameInst fi;
- 
--    fi = (FrameInst) Xmalloc (sizeof (FrameInstRec));
-+    if ((fi = (FrameInst) Xmalloc (sizeof (FrameInstRec))) == NULL) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return NULL;
-+    }
- 
-     fi->template = frame;
-     fi->cur_no = 0;
-@@ -884,7 +895,7 @@ static void FrameInstFree (FrameInst fi)
- 
-     ChainIterInit (&ci, &fi->cm);
- 
--    while (ChainIterGetNext (&ci, &frame_no, &d))
-+    while (ChainIterGetNext (&ci, &frame_no, &d) && fi->template)
-     {
-         register XimFrameType type;
-         type = fi->template[frame_no].type;
-@@ -912,6 +923,11 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
- {
-     XimFrameType ret_type;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return -1;
-+    }
-     ret_type = fi->template[fi->cur_no].type;
- 
-     switch (ret_type)
-@@ -944,7 +960,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
-                 if ((d = ChainMgrGetExtraData (&fi->cm, iter_idx)) == NULL)
-                 {
-                     dr.iter = IterInit (&fi->template[iter_idx + 1], NO_VALUE);
-+                    if (!dr.iter)
-+                        return -1;
-                     d = ChainMgrSetData (&fi->cm, iter_idx, dr);
-+                    if (!d) {
-+                        IterFree (dr.iter);
-+                        return -1;
-+                    }
-                 }
-                 /*endif*/
-                 info->counter.iter = d->iter;
-@@ -980,6 +1002,7 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
-             register int unit;
-             register int number;
-             register int size;
-+            register int s;
-             register int i;
- 
-             unit = _UNIT ((long) fi->template[fi->cur_no].data);
-@@ -991,11 +1014,21 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
-             {
-                 i = _FrameInstDecrement (fi->template, i);
-                 assert (i >= 0);
--                size += _FrameInstGetItemSize (fi, i);
-+                s = _FrameInstGetItemSize (fi, i);
-+                if (s == NO_VALUE) {
-+                    size = NO_VALUE;
-+                    number = 0;
-+                    break;
-+                } else {
-+                    size += s;
-+                }
-                 number--;
-             }
-             /*endwhile*/
--            info->num = (unit - (size%unit))%unit;
-+            if (size == NO_VALUE)
-+                info->num = NO_VALUE;
-+            else
-+                info->num = (unit - (size%unit))%unit;
-         }
-         /*endif*/
-         fi->cur_no = _FrameInstIncrement (fi->template, fi->cur_no);
-@@ -1011,7 +1044,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
-             {
-                 dr.iter = IterInit (&fi->template[fi->cur_no + 1], NO_VALUE);
-+                if (!dr.iter)
-+                    return -1;
-                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return -1;
-+                }
-             }
-             /*endif*/
-             sub_type = IterGetNextType (d->iter, info);
-@@ -1037,7 +1076,13 @@ static XimFrameType FrameInstGetNextType(FrameInst fi, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
-             {
-                 dr.fi = FrameInstInit (fi->template[fi->cur_no + 1].data);
-+                if (!dr.fi)
-+                    return -1;
-                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return -1;
-+                }
-             }
-             /*endif*/
-             sub_type = FrameInstGetNextType (d->fi, info);
-@@ -1064,6 +1109,11 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
- {
-     XimFrameType ret_type;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return -1;
-+    }
-     ret_type = fi->template[fi->cur_no].type;
- 
-     switch (ret_type)
-@@ -1096,7 +1146,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
-                 if ((d = ChainMgrGetExtraData (&fi->cm, iter_idx)) == NULL)
-                 {
-                     dr.iter = IterInit (&fi->template[iter_idx + 1], NO_VALUE);
-+                    if (!dr.iter)
-+                        return -1;
-                     d = ChainMgrSetData (&fi->cm, iter_idx, dr);
-+                    if (!d) {
-+                        IterFree (dr.iter);
-+                        return -1;
-+                    }
-                 }
-                 /*endif*/
-                 info->counter.iter = d->iter;
-@@ -1130,6 +1186,7 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
-             register int unit;
-             register int number;
-             register int size;
-+            register int s;
-             register int i;
- 
-             unit = _UNIT ((long) fi->template[fi->cur_no].data);
-@@ -1141,11 +1198,21 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
-             {
-                 i = _FrameInstDecrement (fi->template, i);
-                 assert (i >= 0);
--                size += _FrameInstGetItemSize (fi, i);
-+                s = _FrameInstGetItemSize (fi, i);
-+                if (s == NO_VALUE) {
-+                    size = NO_VALUE;
-+                    number = 0;
-+                    break;
-+                } else {
-+                    size += s;
-+                }
-                 number--;
-             }
-             /*endwhile*/
--            info->num = (unit - (size%unit))%unit;
-+            if (size == NO_VALUE)
-+                info->num = NO_VALUE;
-+            else
-+                info->num = (unit - (size%unit))%unit;
-         }
-         /*endif*/
-         break;
-@@ -1159,7 +1226,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
-             {
-                 dr.iter = IterInit (&fi->template[fi->cur_no + 1], NO_VALUE);
-+                if (!dr.iter)
-+                    return -1;
-                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return -1;
-+                }
-             }
-             /*endif*/
-             sub_type = IterPeekNextType (d->iter, info);
-@@ -1180,7 +1253,13 @@ static XimFrameType FrameInstPeekNextType (FrameInst fi, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&fi->cm, fi->cur_no)) == NULL)
-             {
-                 dr.fi = FrameInstInit (fi->template[fi->cur_no + 1].data);
-+                if (!dr.fi)
-+                    return -1;
-                 d = ChainMgrSetData (&fi->cm, fi->cur_no, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return -1;
-+                }
-             }
-             /*endif*/
-             sub_type = FrameInstPeekNextType (d->fi, info);
-@@ -1202,6 +1281,11 @@ static Bool FrameInstIsIterLoopEnd (FrameInst fi)
- {
-     Bool ret = False;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return True;
-+    }
-     if (fi->template[fi->cur_no].type == ITER)
-     {
-         ExtraData d = ChainMgrGetExtraData (&fi->cm, fi->cur_no);
-@@ -1313,6 +1397,11 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
-     XimFrameType type;
-     register int i;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return FmNoMoreData;
-+    }
-     i = 0;
-     while ((type = fi->template[i].type) != EOL)
-     {
-@@ -1323,6 +1412,8 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
-             {
-                 dr.num = -1;
-                 d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d)
-+                    return FmNoMoreData;
-             }
-             /*endif*/
-             if (d->num == NO_VALUE)
-@@ -1336,7 +1427,13 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
-             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
-             {
-                 dr.iter = IterInit (&fi->template[i + 1], NO_VALUE);
-+                if (!dr.iter)
-+                    return FmNoMoreData;
-                 d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return FmNoMoreData;
-+                }
-             }
-             /*endif*/
-             if (IterSetSize (d->iter, num) == FmSuccess)
-@@ -1348,7 +1445,13 @@ static FmStatus FrameInstSetSize (FrameInst fi, int num)
-             if ((d = ChainMgrGetExtraData(&fi->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit(fi->template[i + 1].data);
--                d = ChainMgrSetData(&fi->cm, i, dr);
-+                if (!dr.fi)
-+                    return FmNoMoreData;
-+                d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return FmNoMoreData;
-+                }
-             }
-             /*endif*/
-             if (FrameInstSetSize(d->fi, num) == FmSuccess)
-@@ -1374,6 +1477,11 @@ static int FrameInstGetSize (FrameInst fi)
-     ExtraDataRec dr;
-     int ret_size;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return NO_VALID_FIELD;
-+    }
-     i = fi->cur_no;
-     while ((type = fi->template[i].type) != EOL)
-     {
-@@ -1389,7 +1497,13 @@ static int FrameInstGetSize (FrameInst fi)
-             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
-             {
-                 dr.iter = IterInit (&fi->template[i + 1], NO_VALUE);
-+                if (!dr.iter)
-+                    return NO_VALID_FIELD;
-                 d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return NO_VALID_FIELD;
-+                }
-             }
-             /*endif*/
-             ret_size = IterGetSize(d->iter);
-@@ -1402,7 +1516,13 @@ static int FrameInstGetSize (FrameInst fi)
-             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit (fi->template[i + 1].data);
-+                if (!dr.fi)
-+                    return NO_VALID_FIELD;
-                 d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return NO_VALID_FIELD;
-+                }
-             }
-             /*endif*/
-             ret_size = FrameInstGetSize (d->fi);
-@@ -1428,6 +1548,11 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
-     register int i;
-     XimFrameType type;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return FmNoMoreData;
-+    }
-     i = 0;
-     while ((type = fi->template[i].type) != EOL)
-     {
-@@ -1437,7 +1562,12 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
-             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
-             {
-                 dr.iter = IterInit (&fi->template[i + 1], num);
--                (void)ChainMgrSetData (&fi->cm, i, dr);
-+                if (!dr.iter)
-+                    return FmNoMoreData;
-+                if (!ChainMgrSetData (&fi->cm, i, dr)) {
-+                    IterFree (dr.iter);
-+                    return FmNoMoreData;
-+                }
-                 return FmSuccess;
-             }
-             /*endif*/
-@@ -1450,7 +1580,13 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
-             if ((d = ChainMgrGetExtraData (&fi->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit (fi->template[i + 1].data);
-+                if (!dr.fi)
-+                    return FmNoMoreData;
-                 d = ChainMgrSetData (&fi->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return FmNoMoreData;
-+                }
-             }
-             /*endif*/
-             if (FrameInstSetIterCount (d->fi, num) == FmSuccess)
-@@ -1472,14 +1608,26 @@ static FmStatus FrameInstSetIterCount (FrameInst fi, int num)
- static int FrameInstGetTotalSize (FrameInst fi)
- {
-     register int size;
-+    register int s;
-     register int i;
- 
-     size = 0;
-     i = 0;
- 
-+    if (!fi) {
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: fi != NULL in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return 0;
-+    }
-     while (fi->template[i].type != EOL)
-     {
--        size += _FrameInstGetItemSize (fi, i);
-+        s = _FrameInstGetItemSize (fi, i);
-+        if (s == NO_VALUE) {
-+            size = NO_VALUE;
-+            break;
-+        } else {
-+            size += s;
-+        }
-         assert (i >= 0);
-         i = _FrameInstIncrement (fi->template, i);
-     }
-@@ -1526,8 +1674,8 @@ static Iter IterInit (XimFrame frame, int count)
- 
-     it = (Iter) Xmalloc (sizeof (IterRec));
-     if (!it) {
--        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
--                 __FILE__, __LINE__);
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-         return NULL;
-     }
-     it->template = frame;
-@@ -1600,7 +1748,7 @@ static void IterFree (Iter it)
-             ExtraDataRec dr;
-     
-             ChainIterInit (&ci, &it->cm);
--            while (ChainIterGetNext (&ci, &count, &dr))
-+            while (ChainIterGetNext (&ci, &count, &dr) && dr.fi)
-                 FrameInstFree (dr.fi);
-             /*endwhile*/
-             ChainIterFree (&ci);
-@@ -1638,8 +1786,12 @@ static Bool IterIsLoopEnd (Iter it, Bool *myself)
-             }
++            g_string_append (string, "\n{");
++            for (i = 0; compose_data_a->values[i]; i++) {
++                g_string_append_printf (string,
++                                        "U+%X, ", compose_data_a->values[i]);
++            }
++            g_string_append (string, "}");
++            g_string_append (string, " {");
++            for (i = 0; compose_data_b->values[i]; i++) {
++                g_string_append_printf (string,
++                                        "U+%X, ", compose_data_b->values[i]);
++            }
++            g_string_append (string, "}\n");
+             if (is_different_value)
+-                g_warning ("Deleting different outputs for same sequence.");
++                g_warning ("%s", string->str);
              else
-             {
--                if (FrameInstIsEnd (d->fi))
--                {
-+                if (!d->fi) {
-+                    fprintf (stderr, "(XIM-IMdkit) WARNING: d->fi != NULL " \
-+                                     "in %s:%s.\n",
-+                             __FILE__, XIM_STRFUNC);
-+                    ret = True;
-+                } else if (FrameInstIsEnd (d->fi)) {
-                     it->cur_no++;
-                     if (!it->allow_expansion  &&  it->cur_no == it->max_count)
-                     {
-@@ -1677,9 +1829,9 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
-     XimFrameType type;
- 
-     if (!it || !it->template) {
--        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
--                 __FILE__, __LINE__);
--	return (XimFrameType) NULL;
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+	return (XimFrameType)NULL;
-     }
- 
-     type = it->template->type;
-@@ -1732,7 +1884,13 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
-             {
-                 dr.iter = IterInit (it->template + 1, NO_VALUE);
-+                if (!dr.iter)
-+	            return (XimFrameType)NULL;
-                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+	            return (XimFrameType)NULL;
-+                }
-             }
-             /*endif*/
- 
-@@ -1755,7 +1913,13 @@ static XimFrameType IterGetNextType (Iter it, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
-             {
-                 dr.fi = FrameInstInit (it->template[1].data);
-+                if (!dr.fi)
-+	            return (XimFrameType)NULL;
-                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+	            return (XimFrameType)NULL;
-+                }
-             }
-             /*endif*/
- 
-@@ -1781,9 +1945,9 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
-     XimFrameType type;
- 
-     if (!it->template) {
--        fprintf (stderr, "(XIM-IMdkit) WARNING: dereference pointer %s:%d.\n",
--                 __FILE__, __LINE__);
--        return (XimFrameType) NULL;
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: dereference pointer %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-+        return (XimFrameType)NULL;
-     }
- 
-     type = it->template->type;
-@@ -1823,7 +1987,13 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
-             {
-                 dr.iter = IterInit (it->template + 1, NO_VALUE);
-+                if (!dr.iter)
-+                    return (XimFrameType)NULL;
-                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return (XimFrameType)NULL;
-+                }
-             }
-             /*endif*/
- 
-@@ -1843,7 +2013,13 @@ static XimFrameType IterPeekNextType (Iter it, XimFrameTypeInfo info)
-             if ((d = ChainMgrGetExtraData (&it->cm, it->cur_no)) == NULL)
-             {
-                 dr.fi = FrameInstInit (it->template[1].data);
-+                if (!dr.fi)
-+                    return (XimFrameType)NULL;
-                 d = ChainMgrSetData (&it->cm, it->cur_no, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return (XimFrameType)NULL;
-+                }
-             }
-             /*endif*/
- 
-@@ -1885,9 +2061,8 @@ static FmStatus IterSetSize (Iter it, int num)
-                 {
-                     dr.num = NO_VALUE;
-                     d = ChainMgrSetData (&it->cm, i, dr);
--                }
--                if (!d) {
--                    return FmNoMoreData;
-+                    if (!d)
-+                        return FmNoMoreData;
-                 }
-                 /*endif*/
-                 if (d->num == NO_VALUE)
-@@ -1903,7 +2078,8 @@ static FmStatus IterSetSize (Iter it, int num)
-                 ExtraDataRec dr;
-                 
-                 dr.num = num;
--                ChainMgrSetData (&it->cm, it->max_count, dr);
-+                if (!ChainMgrSetData (&it->cm, it->max_count, dr))
-+                    return FmNoMoreData;
-                 it->max_count++;
-     
-                 return FmSuccess;
-@@ -1922,7 +2098,13 @@ static FmStatus IterSetSize (Iter it, int num)
-                 if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-                 {
-                     dr.iter = IterInit (it->template + 1, NO_VALUE);
-+                    if (!dr.iter)
-+                        return FmNoMoreData;
-                     d = ChainMgrSetData (&it->cm, i, dr);
-+                    if (!d) {
-+                        IterFree (dr.iter);
-+                        return FmNoMoreData;
-+                    }
-                 }
-                 /*endif*/
-                 if (IterSetSize (d->iter, num) == FmSuccess)
-@@ -1935,7 +2117,12 @@ static FmStatus IterSetSize (Iter it, int num)
-                 ExtraDataRec dr;
- 
-                 dr.iter = IterInit (it->template + 1, NO_VALUE);
--                ChainMgrSetData (&it->cm, it->max_count, dr);
-+                if (!dr.iter)
-+                    return FmNoMoreData;
-+                if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
-+                    IterFree (dr.iter);
-+                    return FmNoMoreData;
-+                }
-                 it->max_count++;
- 
-                 if (IterSetSize(dr.iter, num) == FmSuccess)
-@@ -1956,7 +2143,13 @@ static FmStatus IterSetSize (Iter it, int num)
-                 if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-                 {
-                     dr.fi = FrameInstInit (it->template[1].data);
-+                    if (!dr.fi)
-+                        return FmNoMoreData;
-                     d = ChainMgrSetData (&it->cm, i, dr);
-+                    if (!d) {
-+                        FrameInstFree (dr.fi);
-+                        return FmNoMoreData;
-+                    }
-                 }
-                 /*endif*/
-                 if (FrameInstSetSize (d->fi, num) == FmSuccess)
-@@ -1969,7 +2162,12 @@ static FmStatus IterSetSize (Iter it, int num)
-                 ExtraDataRec dr;
- 
-                 dr.fi = FrameInstInit (it->template[1].data);
--                ChainMgrSetData (&it->cm, it->max_count, dr);
-+                if (!dr.fi)
-+                    return FmNoMoreData;
-+                if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
-+                    FrameInstFree (dr.fi);
-+                    return FmNoMoreData;
-+                }
-                 it->max_count++;
- 
-                 if (FrameInstSetSize (dr.fi, num) == FmSuccess)
-@@ -2013,7 +2211,13 @@ static int IterGetSize (Iter it)
-             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-             {
-                 dr.iter = IterInit (it->template + 1, NO_VALUE);
-+                if (!dr.iter)
-+                    return NO_VALID_FIELD;
-                 d = ChainMgrSetData (&it->cm, i, dr);
-+                if (!d) {
-+                    IterFree (dr.iter);
-+                    return NO_VALID_FIELD;
-+                }
-             }
-             /*endif*/
-             ret_size = IterGetSize (d->iter);
-@@ -2032,7 +2236,13 @@ static int IterGetSize (Iter it)
-             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit (it->template[1].data);
-+                if (!dr.fi)
-+                    return NO_VALID_FIELD;
-                 d = ChainMgrSetData (&it->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return NO_VALID_FIELD;
-+                }
-             }
-             /*endif*/
-             ret_size = FrameInstGetSize (d->fi);
-@@ -2077,7 +2287,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
-             if ((d = ChainMgrGetExtraData(&it->cm, i)) == NULL)
-             {
-                 dr.iter = IterInit(it->template + 1, num);
--                (void)ChainMgrSetData(&it->cm, i, dr);
-+                if (!dr.iter)
-+                    return FmNoMoreData;
-+                if (!ChainMgrSetData(&it->cm, i, dr)) {
-+                    IterFree (dr.iter);
-+                    return FmNoMoreData;
-+                }
-                 return FmSuccess;
-             }
-             /*endif*/
-@@ -2091,7 +2306,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
-             ExtraDataRec dr;
- 
-             dr.iter = IterInit (it->template + 1, num);
--            ChainMgrSetData (&it->cm, it->max_count, dr);
-+            if (!dr.iter)
-+                return FmNoMoreData;
-+            if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
-+                IterFree (dr.iter);
-+                return FmNoMoreData;
-+            }
-             it->max_count++;
- 
-             return FmSuccess;
-@@ -2108,7 +2328,13 @@ static FmStatus IterSetIterCount (Iter it, int num)
-             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit (it->template[1].data);
-+                if (!dr.fi)
-+                    return FmNoMoreData;
-                 d = ChainMgrSetData (&it->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return FmNoMoreData;
-+                }
-             }
-             /*endif*/
-             if (FrameInstSetIterCount (d->fi, num) == FmSuccess)
-@@ -2121,7 +2347,12 @@ static FmStatus IterSetIterCount (Iter it, int num)
-             ExtraDataRec dr;
-             
-             dr.fi = FrameInstInit (it->template[1].data);
--            ChainMgrSetData (&it->cm, it->max_count, dr);
-+            if (!dr.fi)
-+                return FmNoMoreData;
-+            if (!ChainMgrSetData (&it->cm, it->max_count, dr)) {
-+                FrameInstFree (dr.fi);
-+                return FmNoMoreData;
-+            }
-             it->max_count++;
- 
-             if (FrameInstSetIterCount (dr.fi, num) == FmSuccess)
-@@ -2215,7 +2446,13 @@ static int IterGetTotalSize (Iter it)
-             if ((d = ChainMgrGetExtraData (&it->cm, i)) == NULL)
-             {
-                 dr.fi = FrameInstInit (it->template[1].data);
-+                if (!dr.fi)
-+                    return NO_VALUE;
-                 d = ChainMgrSetData (&it->cm, i, dr);
-+                if (!d) {
-+                    FrameInstFree (dr.fi);
-+                    return NO_VALUE;
-+                }
-             }
-             /*endif*/
-             if ((num = FrameInstGetTotalSize (d->fi)) == NO_VALUE)
-@@ -2278,8 +2515,8 @@ static ExtraData ChainMgrSetData (ChainMgr cm,
- {
-     Chain cur = (Chain) Xmalloc (sizeof (ChainRec));
-     if (!cur) {
--        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
--                 __FILE__, __LINE__);
-+        fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%s.\n",
-+                 __FILE__, XIM_STRFUNC);
-         return NULL;
-     }
- 
-@@ -2445,6 +2682,7 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
-             register int unit;
-             register int number;
-             register int size;
-+            register int s;
-             register int i;
- 
-             unit = _UNIT ((long) fi->template[cur_no].data);
-@@ -2456,11 +2694,19 @@ static int _FrameInstGetItemSize (FrameInst fi, int cur_no)
-             {
-                 assert (i >= 0);
-                 i = _FrameInstDecrement (fi->template, i);
--                size += _FrameInstGetItemSize (fi, i);
-+                s = _FrameInstGetItemSize (fi, i);
-+                if (s == NO_VALUE) {
-+                    size = NO_VALUE;
-+                    number = 0;
-+                    break;
-+                } else {
-+                    size += s;
-+                }
-                 number--;
-             }
-             /*endwhile*/
--            size = (unit - (size%unit))%unit;
-+            if (size != NO_VALUE)
-+                size = (unit - (size%unit))%unit;
-             return size;
-         }
- 
-diff --git a/util/IMdkit/XimProto.h b/util/IMdkit/XimProto.h
-index e3ed168c..a25213f5 100644
---- a/util/IMdkit/XimProto.h
-+++ b/util/IMdkit/XimProto.h
-@@ -1,4 +1,4 @@
--/* $XConsortium: XimProto.h,v 1.2 94/01/20 18:02:24 rws Exp $ */
-+/* $XConsortium: XimProto.h,v 1.3 25/09/24 00:00:00 rws Exp $ */
- /******************************************************************
- 
-            Copyright 1992, 1993, 1994 by FUJITSU LIMITED
-@@ -226,5 +226,10 @@ typedef CARD16	XICID;		/* Input Context ID */
- 	}								\
-     }
- 
-+#if (defined(_MSC_VER) && (_MSC_VER > 1300))
-+#define XIM_STRFUNC     ((const char*) (__FUNCTION__))
-+#else
-+#define XIM_STRFUNC     ((const char*) (__func__))
- #endif
- 
-+#endif
-diff --git a/util/IMdkit/i18nMethod.c b/util/IMdkit/i18nMethod.c
-index 7f343d87..f7a53f40 100644
---- a/util/IMdkit/i18nMethod.c
-+++ b/util/IMdkit/i18nMethod.c
-@@ -2,7 +2,8 @@
-  
-          Copyright 1994, 1995 by Sun Microsystems, Inc.
-          Copyright 1993, 1994 by Hewlett-Packard Company
--         Copyright (C) 2014-2025 Red Hat, Inc.
-+         Copyright (C) 2008-2025 Red Hat, Inc.
-+         Copyright (C) 2018-2025 Takao Fujiwara
-  
- Permission to use, copy, modify, distribute, and sell this software
- and its documentation for any purpose is hereby granted without fee,
-@@ -37,6 +38,8 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- #endif
- #include <X11/Xproto.h>
- #undef NEED_EVENTS
-+#include <assert.h>
-+
- #include "FrameMgr.h"
- #include "IMdkit.h"
- #include "Xi18n.h"
-@@ -194,17 +197,18 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 if (address->imvalue_mask & I18N_IM_LOCALE)
-                     return IMLocale;
-                 /*endif*/
--                /* address->im_locale will be released later and don't need
--                 * -Wanalyzer-malloc-leak flag in gcc 11.0.1.
-+                /* xi18n_setup() initialize the `address` structure with 0 and
-+                 * the pointer of the `address` is not changed and
-+                 * `address->imvalue_mask` should avoid the reallocation so
-+                 * the `-Wanalyzer-malloc-leak` flag in GCC 11.0.1 should not
-+                 * warn about leaks of CWE-401.
-                  */
--#pragma GCC diagnostic push
--#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
--                address->im_locale = (char *) malloc (strlen (p->value) + 1);
-+                assert (!address->im_locale);
-+                address->im_locale = (char *)malloc (strlen (p->value) + 1);
-                 if (!address->im_locale)
-                     return IMLocale;
-                 /*endif*/
-                 strcpy (address->im_locale, p->value);
--#pragma GCC diagnostic pop
-                 address->imvalue_mask |= I18N_IM_LOCALE;
-             }
-             else if (strcmp (p->name, IMServerTransport) == 0)
-@@ -212,14 +216,12 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 if (address->imvalue_mask & I18N_IM_ADDRESS)
-                     return IMServerTransport;
-                 /*endif*/
--#pragma GCC diagnostic push
--#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
--                address->im_addr = (char *) malloc (strlen (p->value) + 1);
-+                assert (!address->im_addr);
-+                address->im_addr = (char *)malloc (strlen (p->value) + 1);
-                 if (!address->im_addr)
-                     return IMServerTransport;
-                 /*endif*/
-                 strcpy(address->im_addr, p->value);
--#pragma GCC diagnostic pop
-                 address->imvalue_mask |= I18N_IM_ADDRESS;
-             }
-             else if (strcmp (p->name, IMServerName) == 0)
-@@ -227,14 +229,12 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 if (address->imvalue_mask & I18N_IM_NAME)
-                     return IMServerName;
-                 /*endif*/
--#pragma GCC diagnostic push
--#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
--                address->im_name = (char *) malloc (strlen (p->value) + 1);
-+                assert (!address->im_name);
-+                address->im_name = (char *)malloc (strlen (p->value) + 1);
-                 if (!address->im_name)
-                     return IMServerName;
-                 /*endif*/
-                 strcpy (address->im_name, p->value);
--#pragma GCC diagnostic pop
-                 address->imvalue_mask |= I18N_IM_NAME;
-             }
-             else if (strcmp (p->name, IMServerWindow) == 0)
-@@ -242,7 +242,7 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 if (address->imvalue_mask & I18N_IMSERVER_WIN)
-                     return IMServerWindow;
-                 /*endif*/
--                address->im_window = (Window) p->value;
-+                address->im_window = (Window)p->value;
-                 address->imvalue_mask |= I18N_IMSERVER_WIN;
-             }
-             else if (strcmp (p->name, IMInputStyles) == 0)
-@@ -252,19 +252,21 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 /*endif*/
-                 address->input_styles.count_styles =
-                     ((XIMStyles*)p->value)->count_styles;
--                address->input_styles.supported_styles =
--                    (XIMStyle *) malloc (sizeof (XIMStyle)*address->input_styles.count_styles);
--                if (address->input_styles.supported_styles == (XIMStyle *) NULL)
-+                assert (!address->input_styles.supported_styles);
-+                address->input_styles.supported_styles = (XIMStyle *)malloc (
-+                        sizeof (XIMStyle) * address->input_styles.count_styles);
-+                if (address->input_styles.supported_styles == (XIMStyle *)NULL)
-                     return IMInputStyles;
-                 /*endif*/
-                 memmove (address->input_styles.supported_styles,
--                         ((XIMStyles *) p->value)->supported_styles,
--                         sizeof (XIMStyle)*address->input_styles.count_styles);
-+                         ((XIMStyles *)p->value)->supported_styles,
-+                         sizeof (XIMStyle) *
-+                                 address->input_styles.count_styles);
-                 address->imvalue_mask |= I18N_INPUT_STYLES;
-             }
-             else if (strcmp (p->name, IMProtocolHandler) == 0)
-             {
--                address->improto = (IMProtoHandler) p->value;
-+                address->improto = (IMProtoHandler)p->value;
-                 address->imvalue_mask |= I18N_IM_HANDLER;
-             }
-             else if (strcmp (p->name, IMOnKeysList) == 0)
-@@ -273,15 +275,16 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                     return IMOnKeysList;
-                 /*endif*/
-                 address->on_keys.count_keys =
--                    ((XIMTriggerKeys *) p->value)->count_keys;
--                address->on_keys.keylist =
--                    (XIMTriggerKey *) malloc (sizeof (XIMTriggerKey)*address->on_keys.count_keys);
--                if (address->on_keys.keylist == (XIMTriggerKey *) NULL)
-+                    ((XIMTriggerKeys *)p->value)->count_keys;
-+                assert (!address->on_keys.keylist);
-+                address->on_keys.keylist = (XIMTriggerKey *)malloc (
-+                        sizeof (XIMTriggerKey) * address->on_keys.count_keys);
-+                if (address->on_keys.keylist == (XIMTriggerKey *)NULL)
-                     return IMOnKeysList;
-                 /*endif*/
-                 memmove (address->on_keys.keylist,
--                         ((XIMTriggerKeys *) p->value)->keylist,
--                         sizeof (XIMTriggerKey)*address->on_keys.count_keys);
-+                         ((XIMTriggerKeys *)p->value)->keylist,
-+                         sizeof (XIMTriggerKey) * address->on_keys.count_keys);
-                 address->imvalue_mask |= I18N_ON_KEYS;
-             }
-             else if (strcmp (p->name, IMOffKeysList) == 0)
-@@ -290,15 +293,16 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                     return IMOffKeysList;
-                 /*endif*/
-                 address->off_keys.count_keys =
--                    ((XIMTriggerKeys *) p->value)->count_keys;
--                address->off_keys.keylist =
--                    (XIMTriggerKey *) malloc (sizeof (XIMTriggerKey)*address->off_keys.count_keys);
--                if (address->off_keys.keylist == (XIMTriggerKey *) NULL)
-+                    ((XIMTriggerKeys *)p->value)->count_keys;
-+                assert (!address->off_keys.keylist);
-+                address->off_keys.keylist = (XIMTriggerKey *)malloc (
-+                        sizeof (XIMTriggerKey) * address->off_keys.count_keys);
-+                if (address->off_keys.keylist == (XIMTriggerKey *)NULL)
-                     return IMOffKeysList;
-                 /*endif*/
-                 memmove (address->off_keys.keylist,
--                         ((XIMTriggerKeys *) p->value)->keylist,
--                         sizeof (XIMTriggerKey)*address->off_keys.count_keys);
-+                         ((XIMTriggerKeys *)p->value)->keylist,
-+                         sizeof (XIMTriggerKey) * address->off_keys.count_keys);
-                 address->imvalue_mask |= I18N_OFF_KEYS;
-             }
-             else if (strcmp (p->name, IMEncodingList) == 0)
-@@ -308,17 +312,19 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-                 /*endif*/
-                 address->encoding_list.count_encodings =
-                     ((XIMEncodings *) p->value)->count_encodings;
-+                assert (!address->encoding_list.supported_encodings);
-                 address->encoding_list.supported_encodings =
--                    (XIMEncoding *) malloc (sizeof (XIMEncoding)*address->encoding_list.count_encodings);
-+                        (XIMEncoding *)malloc (sizeof (XIMEncoding) *
-+                                address->encoding_list.count_encodings);
-                 if (address->encoding_list.supported_encodings
--                    == (XIMEncoding *) NULL)
--                {
-+                    == (XIMEncoding *)NULL) {
-                     return IMEncodingList;
-                 }
-                 /*endif*/
-                 memmove (address->encoding_list.supported_encodings,
--                         ((XIMEncodings *) p->value)->supported_encodings,
--                         sizeof (XIMEncoding)*address->encoding_list.count_encodings);
-+                         ((XIMEncodings *)p->value)->supported_encodings,
-+                         sizeof (XIMEncoding) *
-+                                 address->encoding_list.count_encodings);
-                 address->imvalue_mask |= I18N_ENCODINGS;
-             }
-             else if (strcmp (p->name, IMFilterEventMask) == 0)
-@@ -354,30 +360,38 @@ static char *ParseArgs (Xi18n i18n_core, int mode, XIMArg *args)
-     {
-         for (p = args;  p->name != NULL;  p++)
-         {
-+            register char *_p = NULL;
-             if (strcmp (p->name, IMLocale) == 0)
-             {
--                p->value = (char *) malloc (strlen (address->im_locale) + 1);
--                if (!p->value)
-+                _p = (char *)malloc (strlen (address->im_locale) + 1);
-+                /* Workaround to avoid the warning of the leak of '*p.value'
-+                 * CWE-401 and -Wanalyzer-malloc-leak. Seems GCC does not
-+                 * understand the `if (!p->value)` sentence.
-+                 */
-+                if (!_p)
-                     return IMLocale;
-                 /*endif*/
-+                p->value = _p;
-                 strcpy (p->value, address->im_locale);
-             }
-             else if (strcmp (p->name, IMServerTransport) == 0)
-             {
--                p->value = (char *) malloc (strlen (address->im_addr) + 1);
--                if (!p->value)
-+                _p = (char *)malloc (strlen (address->im_addr) + 1);
-+                if (!_p)
-                     return IMServerTransport;
-                 /*endif*/
-+                p->value = _p;
-                 strcpy (p->value, address->im_addr);
-             }
-             else if (strcmp (p->name, IMServerName) == 0)
-             {
-                 if (address->imvalue_mask & I18N_IM_NAME)
-                 {
--                    p->value = (char *) malloc (strlen (address->im_name) + 1);
--                    if (!p->value)
-+                    _p = (char *)malloc (strlen (address->im_name) + 1);
-+                    if (!_p)
-                         return IMServerName;
-                     /*endif*/
-+                    p->value = _p;
-                     strcpy (p->value, address->im_name);
-                 }
-                 else
--- 
-2.51.1
-
-From 59bdaf6169f34a3353d6bf597fef0e84e2ca73c8 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Tue, 14 Oct 2025 09:00:24 +0900
-Subject: [PATCH 4/4] Fix memory leaks #2
-
-- Fix leaks of GOptionContext in bus/main.c
-- Fix leaks of IBusEngineDesc when IME is switched in
-  client/wayland/ibuswaylandim.c
-- Fix leaks of IBusTextClass:copy(), which is used in
-  Emojier:get_one_dimension_lookup_table(), in src/ibustext.c
-- Fix leak of IBusExtensionEvent with commit-text signal and clicking close
-  button since it's not floating in ui/gtk3/panelbinding.vala
-
-Fixes: https://github.com/ibus/ibus/commit/a800957
-BUG=https://github.com/ibus/ibus/pull/2805
----
- bus/main.c                     | 35 +++++++++++++++++++++-------------
- client/wayland/ibuswaylandim.c |  1 +
- src/ibustext.c                 | 11 ++++++++---
- ui/gtk3/panelbinding.vala      |  6 ++++++
- 4 files changed, 37 insertions(+), 16 deletions(-)
-
-diff --git a/bus/main.c b/bus/main.c
-index e0db15b3..ff9941ec 100644
---- a/bus/main.c
-+++ b/bus/main.c
-@@ -182,6 +182,14 @@ _on_sigusr1 (void)
- }
- #endif
- 
-+static inline void
-+exit_and_free_context (int             status,
-+                       GOptionContext *context)
-+{
-+    g_option_context_free (context);
-+    exit (status);
-+}
-+
- gint
- main (gint argc, gchar **argv)
- {
-@@ -203,11 +211,11 @@ main (gint argc, gchar **argv)
-     if (!g_option_context_parse (context, &argc, &argv, &error)) {
-         g_printerr ("Option parsing failed: %s\n", error->message);
- 	g_error_free (error);
--        exit (-1);
-+        exit_and_free_context (EXIT_FAILURE, context);
-     }
-     if (g_gdbus_timeout < -1) {
-         g_printerr ("Bad timeout (must be >= -1): %d\n", g_gdbus_timeout);
--        exit (-1);
-+        exit_and_free_context (EXIT_FAILURE, context);
-     }
- 
-     if (g_mempro) {
-@@ -220,7 +228,7 @@ main (gint argc, gchar **argv)
- 
-         if (pwd == NULL || g_strcmp0 (pwd->pw_name, username) != 0) {
-             g_printerr ("Please run ibus-daemon with login user! Do not run ibus-daemon with sudo or su.\n");
--            exit (-1);
-+            exit_and_free_context (EXIT_FAILURE, context);
+-                g_debug ("Deleting same compose output for same sequence.");
+-            g_print ("{");
+-            for (i = 0; compose_data_a->values[i]; i++)
+-                g_print ("U+%X, ", compose_data_a->values[i]);
+-            g_print ("}");
+-            g_print (" {");
+-            for (i = 0; compose_data_b->values[i]; i++)
+-                g_print ("U+%X, ", compose_data_b->values[i]);
+-            g_print ("}\n");
++                g_debug ("%s", string->str);
++            g_string_free (string, TRUE);
+             removed_list = g_list_append (removed_list, compose_data_a);
          }
      }
- 
-@@ -245,7 +253,7 @@ main (gint argc, gchar **argv)
-     if (daemonize) {
-         if (daemon (1, 0) != 0) {
-             g_printerr ("Cannot daemonize ibus.\n");
--            exit (-1);
-+            exit_and_free_context (EXIT_FAILURE, context);
-         }
-     }
- 
-@@ -267,7 +275,7 @@ main (gint argc, gchar **argv)
-         if (ibus_bus_is_connected (bus)) {
-             if (!replace) {
-                 g_printerr ("current session already has an ibus-daemon.\n");
--                exit (-1);
-+                exit_and_free_context (EXIT_FAILURE, context);
-             }
-             ibus_bus_exit (bus, FALSE);
-             while (ibus_bus_is_connected (bus)) {
-@@ -301,11 +309,11 @@ main (gint argc, gchar **argv)
-             }
-             if (component == NULL || !bus_component_start (component, g_verbose)) {
-                 g_printerr ("Can not execute default config program\n");
--                exit (-1);
-+                exit_and_free_context (EXIT_FAILURE, context);
-             }
-         } else if (g_strcmp0 (config, "disable") != 0 && g_strcmp0 (config, "") != 0) {
-             if (!execute_cmdline (config))
--                exit (-1);
-+                exit_and_free_context (EXIT_FAILURE, context);
-         }
- 
-         /* execute panel component */
-@@ -318,11 +326,11 @@ main (gint argc, gchar **argv)
-             }
-             if (component == NULL || !bus_component_start (component, g_verbose)) {
-                 g_printerr ("Can not execute default panel program\n");
--                exit (-1);
-+                exit_and_free_context (EXIT_FAILURE, context);
-             }
-         } else if (g_strcmp0 (panel, "disable") != 0 && g_strcmp0 (panel, "") != 0) {
-             if (!execute_cmdline (panel))
--                exit (-1);
-+                exit_and_free_context (EXIT_FAILURE, context);
-         }
-     }
- 
-@@ -337,25 +345,25 @@ main (gint argc, gchar **argv)
-         if (component != NULL &&
-             !bus_component_start (component, g_verbose)) {
-             g_printerr ("Can not execute default panel program\n");
--            exit (-1);
-+            exit_and_free_context (EXIT_FAILURE, context);
-         }
-     } else if (g_strcmp0 (emoji_extension, "disable") != 0 &&
-                g_strcmp0 (emoji_extension, "") != 0) {
-         if (!execute_cmdline (emoji_extension))
--            exit (-1);
-+            exit_and_free_context (EXIT_FAILURE, context);
-     }
- #endif
- 
-     /* execute ibus xim server */
-     if (xim) {
-         if (!execute_cmdline (LIBEXECDIR "/ibus-x11 --kill-daemon"))
--            exit (-1);
-+            exit_and_free_context (EXIT_FAILURE, context);
-     }
- 
-     if (!daemonize) {
-         if (getppid () == 1) {
-             g_warning ("The parent process died.");
--            exit (0);
-+            exit_and_free_context (EXIT_SUCCESS, context);
-         }
- #ifdef HAVE_SYS_PRCTL_H
- #ifdef G_OS_UNIX
-@@ -396,5 +404,6 @@ main (gint argc, gchar **argv)
- #endif
-     }
-     bus_server_run ();
-+    g_option_context_free (context);
-     return 0;
- }
-diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
-index e058044f..60257779 100644
---- a/client/wayland/ibuswaylandim.c
-+++ b/client/wayland/ibuswaylandim.c
-@@ -924,6 +924,7 @@ _bus_global_engine_changed_cb (IBusBus       *bus,
-     keymap = create_user_xkb_keymap (priv->xkb_context, desc);
-     if (keymap && !ibus_wayland_im_update_xkb_state (wlim, keymap))
-         xkb_keymap_unref (keymap);
-+    g_object_unref (desc);
- }
- 
- 
-diff --git a/src/ibustext.c b/src/ibustext.c
-index 73d3d10c..0576f6c8 100644
---- a/src/ibustext.c
-+++ b/src/ibustext.c
-@@ -2,7 +2,7 @@
- /* vim:set et sts=4: */
- /* IBus - The Input Bus
-  * Copyright (C) 2008-2010 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright (C) 2011-2021 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+ * Copyright (C) 2011-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  * Copyright (C) 2008-2021 Red Hat, Inc.
-  *
-  * This library is free software; you can redistribute it and/or
-@@ -109,7 +109,7 @@ ibus_text_deserialize (IBusText *text,
-     retval = IBUS_SERIALIZABLE_CLASS (ibus_text_parent_class)->deserialize (
-                             (IBusSerializable *)text, variant);
- 
--    if (text->is_static == FALSE)
-+    if (!text->is_static)
-         g_free (text->text);
-     g_variant_get_child (variant, retval++, "s", &text->text);
-     text->is_static = FALSE;
-@@ -139,10 +139,15 @@ ibus_text_copy (IBusText       *dest,
-     g_return_val_if_fail (IBUS_IS_TEXT (dest), FALSE);
-     g_return_val_if_fail (IBUS_IS_TEXT (src), FALSE);
- 
-+    if (!dest->is_static)
-+        g_free (dest->text);
-     dest->text = g_strdup (src->text);
-     dest->is_static = FALSE;
-+    if (dest->attrs)
-+        g_clear_object (&dest->attrs);
-     if (src->attrs) {
--        dest->attrs = (IBusAttrList *)ibus_serializable_copy ((IBusSerializable *)src->attrs);
-+        dest->attrs = (IBusAttrList *)ibus_serializable_copy (
-+                (IBusSerializable *)src->attrs);
-         g_object_ref_sink (dest->attrs);
-     }
- 
-diff --git a/ui/gtk3/panelbinding.vala b/ui/gtk3/panelbinding.vala
-index 49c91575..507b3dac 100644
---- a/ui/gtk3/panelbinding.vala
-+++ b/ui/gtk3/panelbinding.vala
-@@ -910,6 +910,9 @@ class PanelBinding : IBus.PanelService {
-                         "is-enabled", false,
-                         "is-extension", true);
-                 panel_extension(close_event);
-+                // Vala calls event.ref_sink() and panel_extension() does not
-+                // unref the event and need to call event.unref() here.
-+                close_event.unref();
-             });
-             m_emojier.send_message.connect((m) => {
-                 send_message(m);
-@@ -1175,6 +1178,9 @@ class PanelBinding : IBus.PanelService {
-                     "is-enabled", false,
-                     "is-extension", true);
-             panel_extension(event);
-+            // Vala calls event.ref_sink() and panel_extension() does not unref
-+            // the event and need to call event.unref() here.
-+            event.unref();
-             return;
-         }
-         if (m_emojier == null)
--- 
-2.51.1
-
-From 296192bd69448e5d782a33162de25534db0a79e7 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Fri, 17 Oct 2025 13:14:32 +0900
-Subject: [PATCH 1/5] ui/gtk3: Fix mouse position in Emojier category list
-
-BUG=rhbz#2237664
----
- ui/gtk3/emojier.vala | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/ui/gtk3/emojier.vala b/ui/gtk3/emojier.vala
-index ffa8cdaa..71422266 100644
---- a/ui/gtk3/emojier.vala
-+++ b/ui/gtk3/emojier.vala
-@@ -29,6 +29,8 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-                 valign : Gtk.Align.FILL
-             );
-             this.motion_notify_event.connect((e) => {
-+                if (!m_enter_notify_enable)
-+                    return false;
-                 Gdk.EventMotion pe = e;
-                 if (m_mouse_x == pe.x_root && m_mouse_y == pe.y_root)
-                     return false;
-@@ -37,6 +39,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-                 var row = this.get_row_at_y((int)e.y);
-                 if (row != null)
-                     this.select_row(row);
-+                m_category_active_index = row.get_index();
-                 return false;
-             });
-             this.enter_notify_event.connect((e) => {
-@@ -279,6 +282,12 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-     private const unichar[] EMOJI_VARIANT_LIST = {
-             0x1f3fb, 0x1f3fc, 0x1f3fd, 0x1f3fe, 0x1f3ff, 0x200d };
- 
-+    // Access both class methods and instances.
-+    protected static int m_category_active_index = -1;
-+    protected static bool m_enter_notify_enable = true;
-+    protected static double m_mouse_x;
-+    protected static double m_mouse_y;
-+
-     // Set the actual default values in the constructor
-     // because these fields are used for class_init() and static functions,
-     // e.g. set_emoji_font(), can be called before class_init() is called.
-@@ -348,14 +357,10 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-      * Unicode category list.
-      */
-     private bool m_candidate_panel_mode;
--    private int m_category_active_index = -1;
-     private IBus.LookupTable m_lookup_table;
-     private Gtk.Label[] m_candidates;
--    private bool m_enter_notify_enable = true;
-     private uint m_entry_notify_show_id;
-     private uint m_entry_notify_disable_id;
--    protected static double m_mouse_x;
--    protected static double m_mouse_y;
-     private Gtk.ProgressBar m_unicode_progress_bar;
-     private uint m_unicode_progress_id;
-     private Gtk.Label m_unicode_percent_label;
-@@ -988,7 +993,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-             EPaddedLabelBox widget =
-                     new EPaddedLabelBox(_(category), Gtk.Align.CENTER);
-             row.add(widget);
--            m_list_box.add(row);
-+            m_list_box.insert(row, -1);
-             if (i == m_category_active_index)
-                 m_list_box.select_row(row);
-         }
-@@ -1113,7 +1118,7 @@ public class IBusEmojier : Gtk.ApplicationWindow {
-                                         TravelDirection.NONE,
-                                         caption);
-             row.add(widget);
--            m_list_box.add(row);
-+            m_list_box.insert(row, -1);
-             if (n++ == m_category_active_index) {
-                 m_list_box.select_row(row);
-             }
--- 
-2.51.1
-
-From 0314cf5bf5bb3a46ff96cfb4f93ac937c129b7fb Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Fri, 17 Oct 2025 23:38:00 +0900
-Subject: [PATCH 3/5] client/wayland: Free IBusInputContext in input_method_activate()
-
-Call input_method_deactivate() when input_method_activate() is
-called twice and zwp_input_method_context_v1 is null but
-IBusInputContext is not null.
-This enhances not to cause a SEGV in _context_hide_preedit_text_cb()
-
-BUG=rhbz#2326455
----
- client/wayland/ibuswaylandim.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
-index e058044f..631bea93 100644
---- a/client/wayland/ibuswaylandim.c
-+++ b/client/wayland/ibuswaylandim.c
-@@ -1796,7 +1796,7 @@ input_method_activate (void                               *data,
- 
-     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
-     priv = ibus_wayland_im_get_instance_private (wlim);
--    if (priv->context)
-+    if (priv->context || priv->ibuscontext)
-         input_method_deactivate (data, input_method, context);
- 
-     priv->context = context;
-@@ -1828,10 +1828,7 @@ input_method_activate (void                               *data,
-         g_assert_not_reached ();
-     }
- 
--    if (priv->ibuscontext) {
--        g_object_unref (priv->ibuscontext);
--        priv->ibuscontext = NULL;
--    }
-+    g_assert (!priv->ibuscontext);
- 
-     priv->cancellable = g_cancellable_new ();
-     ibus_bus_create_input_context_async (priv->ibusbus,
-@@ -1884,8 +1881,7 @@ input_method_deactivate (void                               *data,
-                 priv->ibuscontext,
-                 G_CALLBACK (_context_hide_preedit_text_cb),
-                 wlim);
--        g_object_unref (priv->ibuscontext);
--        priv->ibuscontext = NULL;
-+        g_clear_object (&priv->ibuscontext);
-         g_signal_emit (wlim,
-                        wayland_im_signals[IBUS_FOCUS_OUT],
-                        0,
--- 
-2.51.1
-
-From f6c52ce0baf0ad11705a0f9af160076a97104bf2 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Wed, 26 Nov 2025 15:16:03 +0900
-Subject: [PATCH 4/5] util/IMdkit: Fix SEGV with allocation fail in _Xi18nChangeIC()
-
-When malloc() is failed, it should break the for loop to set
-attrib_num value correctly to free attrib_list array.
-
-BUG=rhbz#2346033
----
- util/IMdkit/i18nIc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/util/IMdkit/i18nIc.c b/util/IMdkit/i18nIc.c
-index 14a3dc51..e82ffbcf 100644
---- a/util/IMdkit/i18nIc.c
-+++ b/util/IMdkit/i18nIc.c
-@@ -2,6 +2,8 @@
-  
-          Copyright 1994, 1995 by Sun Microsystems, Inc.
-          Copyright 1993, 1994 by Hewlett-Packard Company
-+         Copyright (C) 2008-2025 Red Hat, Inc.
-+         Copyright (C) 2017-2025 Takao Fujiwara
-  
- Permission to use, copy, modify, distribute, and sell this software
- and its documentation for any purpose is hereby granted without fee,
-@@ -714,10 +716,11 @@ void _Xi18nChangeIC (XIMS ims,
-         FrameMgrSetSize (fm, value_length);
-         attrib_list[attrib_num].value_length = value_length;
-         FrameMgrGetToken (fm, value);
--        attrib_list[attrib_num].value = (void *) malloc (value_length + 1);
-+        attrib_list[attrib_num].value = (void *)malloc (value_length + 1);
-         if (!attrib_list[attrib_num].value) {
-             fprintf (stderr, "(XIM-IMdkit) WARNING: malloc failed in %s:%d.\n",
-                      __FILE__, __LINE__);
-+            break;
-         } else {
-             memmove (attrib_list[attrib_num].value, value, value_length);
-             ((char *)attrib_list[attrib_num].value)[value_length] = '\0';
--- 
-2.51.1
-
-From ca0193f5b1c17f5c8a456e09421d2a8688c5d667 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Thu, 23 Oct 2025 22:45:11 +0900
-Subject: [PATCH 5/5] ui/gtk3: Refer QT_IM_MODULES to check Wayland configuration
-
-QT_IM_MODULES and QT_IM_MODULE is available. The warning message
-is not changed at the moment.
-ibus-setup also runs `ibus start` instead ibus-daemon.
-
-BUG=rhbz#2392358
----
- setup/main.py      | 19 ++++++++++++++-----
- ui/gtk3/panel.vala |  6 +++++-
- 2 files changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/setup/main.py b/setup/main.py
-index d0e05666..31b44037 100644
---- a/setup/main.py
-+++ b/setup/main.py
-@@ -4,8 +4,8 @@
- # ibus - The Input Bus
- #
- # Copyright (c) 2007-2016 Peng Huang <shawn.p.huang@gmail.com>
--# Copyright (c) 2010-2020 Takao Fujiwara <takao.fujiwara1@gmail.com>
--# Copyright (c) 2007-2020 Red Hat, Inc.
-+# Copyright (c) 2010-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+# Copyright (c) 2007-2025 Red Hat, Inc.
- #
- # This library is free software; you can redistribute it and/or
- # modify it under the terms of the GNU Lesser General Public
-@@ -602,13 +602,22 @@ class Setup(object):
-         GLib.timeout_add_seconds(timeout, lambda *args: main_loop.quit())
-         self.__bus.connect("connected", lambda *args: main_loop.quit())
- 
--        os.spawnlp(os.P_NOWAIT, "ibus-daemon", "ibus-daemon", "--xim", "--daemonize")
-+        os.spawnlp(os.P_NOWAIT, "ibus", "ibus", "start", "--xim", "--daemonize")
- 
-         main_loop.run()
- 
-         if self.__bus.is_connected():
--            message = _("IBus has been started! "
--                "If you cannot use IBus, add the following lines to your $HOME/.bashrc; then relog into your desktop.\n"
-+            message = _("IBus has been started. "
-+                "If you cannot use IBus, add the following lines to your "
-+                "$HOME/.bashrc; then relog into your desktop.\n"
-+                "\n"
-+                "  # For Wayland sessions ($XDG_SESSION_TYPE is \"wayland\")\n"
-+                "  export GTK_IM_MODULE=wayland\n"
-+                "  export XMODIFIERS=@im=ibus\n"
-+                "  export QT_IM_MODULES=wayland;ibus\n"
-+                "  export QT_IM_MODULE=ibus\n"
-+                "\n"
-+                "  # For X11 sessions ($XDG_SESSION_TYPE is \"x11\")\n"
-                 "  export GTK_IM_MODULE=ibus\n"
-                 "  export XMODIFIERS=@im=ibus\n"
-                 "  export QT_IM_MODULE=ibus"
-diff --git a/ui/gtk3/panel.vala b/ui/gtk3/panel.vala
-index 90194529..cfa6e50d 100644
---- a/ui/gtk3/panel.vala
-+++ b/ui/gtk3/panel.vala
-@@ -1027,7 +1027,11 @@ class Panel : IBus.PanelService {
-                         "Wayland",
-                         "ibus start");
-         } else if (m_is_wayland && m_is_wayland_im && !is_gnome()) {
--            if (Environment.get_variable("QT_IM_MODULE") == "ibus") {
-+            var qt_im_module = Environment.get_variable("QT_IM_MODULE");
-+            var qt_im_modules = Environment.get_variable("QT_IM_MODULES");
-+            if ((qt_im_module != null && qt_im_module != "wayland") &&
-+                (qt_im_modules == null ||
-+                 !qt_im_modules.has_prefix("wayland"))) {
-                 var format =
-                         _("Please unset QT_IM_MODULE and GTK_IM_MODULE " +
-                           "environment variables and 'ibus-daemon --panel " +
--- 
-2.51.1
-
-From 2f7a74ebef5aac2ed529304beacff25591d29044 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Thu, 4 Dec 2025 19:41:59 +0900
-Subject: [PATCH] src/tests/ibus-keypress: Fix GTK3 build
-
-BUG=https://github.com/ibus/ibus/issues/2829
----
- src/tests/ibus-keypress.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
 diff --git a/src/tests/ibus-keypress.c b/src/tests/ibus-keypress.c
-index cd8afe83..17029512 100644
+index b9068d32..78296381 100644
 --- a/src/tests/ibus-keypress.c
 +++ b/src/tests/ibus-keypress.c
-@@ -431,8 +431,11 @@ destroy_window (gpointer user_data)
-     data->source = 0;
+@@ -1,7 +1,7 @@
+ /* -*- mode: C; c-basic-offset: 4; indent-tabs-mode: nil; -*- */
+ /* vim:set et sts=4: */
+ /* ibus - The Input Bus
+- * Copyright (C) 2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2025-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (c) 2025 Peter Hutterer <peter.hutterer@who-t.net>
+  * Copyright (C) 2025 Red Hat, Inc.
+  *
+@@ -628,7 +628,7 @@ window_inserted_text_cb (GtkEntryBuffer *buffer,
+     if (!(code = g_utf8_get_char (chars)))
+         return;
+     if (code != test_results[i][j++]) {
+-        test = RED "FAIL" NC;
++        test = "# " RED "FAIL" NC;
+         g_test_fail_printf ("%05d:%05d %s expected: %04X typed: %04X",
+                             i, j - 1,
+                             test,
+@@ -637,7 +637,7 @@ window_inserted_text_cb (GtkEntryBuffer *buffer,
+     } else if (test_results[i][j]) {
+         return;
+     } else {
+-        g_print (GREEN "PASS" NC " ");
++        g_print ("# " GREEN "PASS" NC " ");
+         for (k = 0; k < j; k++)
+             g_print ("%lc(%X) ", test_results[i][k], test_results[i][k]);
+         g_print ("\n");
+diff --git a/src/tests/ibus-registry.c b/src/tests/ibus-registry.c
+index 4c612926..1a109e7f 100644
+--- a/src/tests/ibus-registry.c
++++ b/src/tests/ibus-registry.c
+@@ -1,10 +1,17 @@
+ #include <ibus.h>
  
-     g_info ("Destroying window after timeout");
-+#if GTK_CHECK_VERSION (4, 0, 0)
-     gtk_window_destroy (GTK_WINDOW (data->window));
+-int main()
++static void
++test (void)
+ {
+-    ibus_init ();
 -
-+#else
-+    gtk_widget_destroy (data->window);
-+#endif
-     data->window = NULL;
- 
-     return G_SOURCE_REMOVE;
-@@ -470,8 +473,9 @@ create_keypress (void)
- #endif
- 
-     if (!m_replay) {
--        g_test_fail_printf ("Failed to create uinput device: %s",
--                            error->message);
-+        g_test_fail_printf ("Failed to create uinput device: %s: %s",
-+                            error->message,
-+                            "Probably you should run `chmod a+rw /dev/uinput`");
-         g_error_free (error);
-         return FALSE;
-     }
-@@ -741,7 +745,7 @@ test_keypress (gconstpointer user_data)
- #if GTK_CHECK_VERSION (4, 0, 0)
-     gtk_init ();
- #else
--    gtk_init (data->argc, data->argv);
-+    gtk_init (&data->argc, &data->argv);
- #endif
- 
-     g_assert ((channel =  g_io_channel_unix_new (m_pipe_engine[0])));
-@@ -770,7 +774,11 @@ test_keypress (gconstpointer user_data)
-     if (destroy_data.source)
- 	g_source_remove (destroy_data.source);
-     if (destroy_data.window)
-+#if GTK_CHECK_VERSION (4, 0, 0)
- 	gtk_window_destroy (GTK_WINDOW (destroy_data.window));
-+#else
-+        gtk_widget_destroy (destroy_data.window);
-+#endif
-     close (m_pipe_engine[0]);
-     close (m_pipe_engine[1]);
+     IBusRegistry *registry = ibus_registry_new ();
+     g_object_unref (registry);
+-    return 0;
++}
++
++int
++main(int argc, char *argv[])
++{
++    g_test_init (&argc, &argv, NULL);
++    ibus_init ();
++    g_test_add_func ("/ibus-registry", test);
++    return g_test_run ();
  }
--- 
-2.52.0
-
-From 7f5b5c59c9631292d41bb272b7716f5cdb356db5 Mon Sep 17 00:00:00 2001
-From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Wed, 10 Dec 2025 10:18:49 +0900
-Subject: [PATCH] ui/gtk3/propertypanel: Disable X11 display in Wayland
-
-Add a workaround until IBus panel is migrated to GTK4.
-GTK3 causes a SEGV when the session is switched to the console
-in Wayland with Ctrl-Alt-F3 because it calls
-gdk_display_get_default() by
-gdk_x11_get_xatom_by_name("Wacom Serial IDs") and the display
-is not X11.
-
-BUG=rhbz#2418670
----
- ui/gtk3/propertypanel.vala | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/ui/gtk3/propertypanel.vala b/ui/gtk3/propertypanel.vala
-index f1ecd7f7..1ba1681f 100644
---- a/ui/gtk3/propertypanel.vala
-+++ b/ui/gtk3/propertypanel.vala
-@@ -54,7 +54,18 @@ public class PropertyPanel : Gtk.Box {
-         set_visible(true);
+diff --git a/src/tests/ibus-util.c b/src/tests/ibus-util.c
+index 4110e529..9f2ab2b6 100644
+--- a/src/tests/ibus-util.c
++++ b/src/tests/ibus-util.c
+@@ -4,13 +4,19 @@
  
- #if ENABLE_XIM
--        var display = BindingCommon.get_xdisplay();
-+        Gdk.X11.Display? display = null;
-+        // Disable X11 display in Wayland as a workaround.
-+        // GTK3 causes a SEGV when the session is switched to the console
-+        // in Wayland with Ctrl-Alt-F3 because it calls
-+        // gdk_display_get_default() by
-+        // gdk_x11_get_xatom_by_name("Wacom Serial IDs") and the display
-+        // is not X11.
-+        // Need to backport the fix to GTK3:
-+        // https://gitlab.gnome.org/GNOME/gtk/-/commit/920259c2
-+        // or need to migrate IBus panel to GTK4.
-+        if (BindingCommon.default_is_xdisplay())
-+            display = BindingCommon.get_xdisplay();
-         if (display != null) {
-             m_xdisplay = display.get_xdisplay();
-             var screen = display.get_default_screen();
+ #include "ibus.h"
+ 
+-int main (int argc, char **argv)
++static void
++test (void)
+ {
+     gchar *name;
+-    setlocale(LC_ALL, "C");
+-
+     g_assert_cmpstr (name = ibus_get_language_name ("eng"), ==, "English");
+     g_free (name);
++}
+ 
+-    return 0;
++int
++main (int argc, char *argv[])
++{
++    g_test_init (&argc, &argv, NULL);
++    setlocale(LC_ALL, "C");
++    g_test_add_func ("/ibus-util", test);
++    return g_test_run ();
+ }
+diff --git a/src/tests/runtest b/src/tests/runtest
+index 71559fc1..7bd98575 100755
+--- a/src/tests/runtest
++++ b/src/tests/runtest
+@@ -17,10 +17,10 @@
+ #
+ #   $ top_builddir=<...> top_srcdir=<...> builddir=<...> ./runtest ibus-foo
+ 
+-: ${top_builddir:=../..}
+-: ${top_srcdir:=../..}
+-: ${builddir:=.}
+-: ${srcdir:=.}
++: ${top_builddir:='../..'}
++: ${top_srcdir:='../..'}
++: ${builddir:='.'}
++: ${srcdir:='.'}
+ : ${DISABLE_GUI_TESTS:=''}
+ : ${DISABLE_DAEMONIZE_IN_TESTS:=''}
+ : ${TEST_GTK_VERSION:=0}
+@@ -37,7 +37,7 @@ ibus-engine-switch
+ ibus-compose
+ ibus-keypress
+ test-stress
+-xkb-latin-layouts
++test-override-ibus.py
+ "
+ IBUS_SCHEMA_FILE='org.freedesktop.ibus.gschema.xml'
+ GTK_QUERY_MODULE=gtk-query-immodules-3.0-32
+@@ -50,6 +50,22 @@ if ! command -v $GTK_QUERY_MODULE > /dev/null 2>&1 ; then
+     GTK_QUERY_MODULE=gtk-query-immodules-3.0
+ fi
+ 
++if echo "$top_builddir" | grep -q '^/' ; then
++    # absolute path for meson
++    test_top_builddir="$top_builddir"
++else
++    # relative path for autotool and default value
++    test_top_builddir="../$top_builddir"
++fi
++
++if echo "$top_srcdir" | grep -q '^/' ; then
++    # absolute path for meson
++    test_top_srcdir="$top_srcdir"
++else
++    # relative path for autotool and default value
++    test_top_srcdir="../$top_srcdir"
++fi
++
+ retval=0
+ 
+ # Portable replacement of basename.
+@@ -120,21 +136,26 @@ run_test_case()
+     backup_dir=$PWD
+     cd $tstdir
+ 
++    if echo "$tst" | grep -q 'python' ; then
++        name=`func_basename "$1"`
++    else
++        name=`func_basename "$tst"`
++    fi
+     need_bus=no
+     for t in $BUS_REQUIRED_TESTS; do
+-        if test $t = `func_basename $tst`; then
++        if test "$t" = "$name"; then
+             need_bus=yes
+         fi
+     done
+ 
+     if test $need_bus = yes; then
+-        if test ! -f "../$top_builddir/conf/memconf/ibus-memconf" ; then
++        if test ! -f "$test_top_builddir/conf/memconf/ibus-memconf" ; then
+             echo "NOT FOUNND ibus-memconf. Need configure --enable-memconf"
+             exit 1
+         fi
+         # func_copy_component replaces s/$top_srcdir/%top_builddir/
+-        func_copy_component "../$top_srcdir/engine/simple.xml"
+-        func_copy_component "../$top_srcdir/conf/memconf/memconf.xml"
++        func_copy_component "$test_top_srcdir/engine/simple.xml"
++        func_copy_component "$test_top_srcdir/conf/memconf/memconf.xml"
+ 
+         IBUS_COMPONENT_PATH=$PWD/components
+         export IBUS_COMPONENT_PATH
+@@ -144,10 +165,10 @@ run_test_case()
+ 
+         test $TEST_GTK -eq 1 && case $TEST_GTK_VERSION in
+         4)
+-            if test -f "../$top_builddir/client/gtk4/.libs/libim-ibus.so" ; then
+-                IM_IBUS_SO="../$top_builddir/client/gtk4/.libs/libim-ibus.so"
+-            elif test -f "../$top_builddir/client/gtk4/libim-ibus.so" ; then
+-                IM_IBUS_SO="../$top_builddir/client/gtk4/libim-ibus.so"
++            if test -f "$test_top_builddir/client/gtk4/.libs/libim-ibus.so" ; then
++                IM_IBUS_SO="$test_top_builddir/client/gtk4/.libs/libim-ibus.so"
++            elif test -f "$test_top_builddir/client/gtk4/libim-ibus.so" ; then
++                IM_IBUS_SO="$test_top_builddir/client/gtk4/libim-ibus.so"
+             else
+                 echo "NOT FOUND $top_builddir/client/gtk4/libim-ibus.so"
+                 exit 1
+@@ -157,10 +178,10 @@ run_test_case()
+             export GTK_EXE_PREFIX="$PWD"
+             ;;
+         3)
+-            if test -f "../$top_builddir/client/gtk3/.libs/im-ibus.so" ; then
+-                IM_IBUS_SO="../$top_builddir/client/gtk3/.libs/im-ibus.so"
+-            elif test -f "../$top_builddir/client/gtk3/im-ibus.so" ; then
+-                IM_IBUS_SO="../$top_builddir/client/gtk3/im-ibus.so"
++            if test -f "$test_top_builddir/client/gtk3/.libs/im-ibus.so" ; then
++                IM_IBUS_SO="$test_top_builddir/client/gtk3/.libs/im-ibus.so"
++            elif test -f "$test_top_builddir/client/gtk3/im-ibus.so" ; then
++                IM_IBUS_SO="$test_top_builddir/client/gtk3/im-ibus.so"
+             else
+                 echo "NOT FOUND $top_builddir/client/gtk3/im-ibus.so"
+                 exit 1
+@@ -175,8 +196,8 @@ run_test_case()
+             ;;
+         esac || :
+ 
+-        cp "../$top_srcdir/data/dconf/$IBUS_SCHEMA_FILE" $PWD
+-        glib-compile-schemas $PWD
++        cp "$test_top_srcdir/data/dconf/$IBUS_SCHEMA_FILE" $PWD
++        glib-compile-schemas $PWD 2>/dev/null
+         if test $? -ne 0 ; then
+             echo "FAILED glib-compile-schemas"
+             retval=1
+@@ -198,10 +219,10 @@ run_test_case()
+             --verbose
+         '
+         if test x"$DISABLE_DAEMONIZE_IN_TESTS" = x ; then
+-            ../$top_builddir/bus/ibus-daemon \
++            $test_top_builddir/bus/ibus-daemon \
+                 $DAEMON_ARGS --daemonize;
+         else
+-            ../$top_builddir/bus/ibus-daemon \
++            $test_top_builddir/bus/ibus-daemon \
+                 $DAEMON_ARGS &
+         fi
+ 
+@@ -219,7 +240,26 @@ run_test_case()
+ 
+     export IBUS_COMPOSE_CACHE_DIR=$PWD
+ 
+-    "../$tst" ../$top_srcdir/src/tests ${1+"$@"}
++    if echo "$tst" | grep -q '^/' ; then
++        if echo "$tst" | grep -q 'python' ; then
++            interpreter=$tst
++            tst=$1
++            shift
++            if echo "$tst" | grep -q '^/' ; then
++                # absolute path for Meson
++                "$interpreter" "$tst" ${1+"$@"}
++            else
++                # relative path for autotools
++                "$interpreter" "../$tst" ${1+"$@"}
++            fi
++        else
++            # absolute path for Meson
++            "$tst" $test_top_srcdir/src/tests ${1+"$@"}
++        fi
++    else
++        # relative path for each execution
++        "../$tst" $test_top_srcdir/src/tests ${1+"$@"}
++    fi
+ 
+     retval=`expr $retval \| $?`
+ 
+@@ -237,6 +277,16 @@ if test x"$ENVS" = x ; then
+ else
+     LANG_backup=$LANG
+     i=1
++    # mesonbuild/mtest.py:TAPParser.parse_line() says:
++    # 'version number must be on the first line'
++    echo "TAP version 14"
++    NUM_CASES=`wc -l $envfile  | sed -e 's/^\([0-9]*\) .*/\1/'`
++    # Meson checks #Plan with the number of test cases
++    # like "1..Number"
++    # https://testanything.org/tap-version-14-specification.html
++    echo "1..$NUM_CASES"
++    # Set subtest for GTestLog to hide the "TAP version" output
++    export G_TEST_ROOT_PROCESS=1
+     # "for e in $ENVS" separates the variable by space but not line feed.
+     # "echo $ENVS | while read e" does not forward `retval`
+     # to the parent process.
+@@ -248,14 +298,25 @@ else
+         unset NO_LOAD_COMPOSE_FILE
+         unset COMPOSE_FILE
+         export $e
+-        echo "Run `func_basename $tst` on $e"
+-        echo "======================="
++        # TAP info should start with "# ".
++        echo "# Run `func_basename $tst` on $e"
++        echo "# ======================="
+         run_test_case $@
++        name="/"`basename "$1"`":$LANG:$COMPOSE_FILE:$NO_LOAD_COMPOSE_FILE"
++        # Meson compares the numer of tests in #Plan and the number of
++        # #TestPoint like "ok Number Description"
++        # https://testanything.org/tap-version-14-specification.html
++        if test $retval -eq 0; then
++            echo "ok $i $name"
++        else
++            echo "not ok $i $name"
++        fi
+         echo ""
+         i=`expr $i + 1`
+     done << EOF_ENVS
+     `echo "$ENVS"`
+ EOF_ENVS
++    unset G_TEST_ROOT_PROCESS
+     export LANG=$LANG_backup
+ fi
+ 
+diff --git a/src/tests/xkb-latin-layouts b/src/tests/xkb-latin-layouts
+index 45c99358..dd49ff97 100755
+--- a/src/tests/xkb-latin-layouts
++++ b/src/tests/xkb-latin-layouts
+@@ -1,7 +1,7 @@
+ #!/bin/bash
+ 
+ PROGNAME=`basename $0`
+-VERSION=0.1
++VERSION=0.2
+ # POSIX sh has no 'echo -e'
+ : ${ECHO:='/usr/bin/echo'}
+ TMPDIR=
+@@ -25,15 +25,14 @@ usage()
+ parse_args()
+ {
+     # This is GNU getopt. "sudo port getopt" in BSD?
+-    ARGS=`getopt -o hD:Tv --long \
+-          help,schemasdir:,tap,version\
++    ARGS=`getopt -o hD:v --long \
++          help,schemasdir:,version\
+         -- "$@"`;
+     eval set -- "$ARGS"
+     while [ 1 ] ; do
+         case "$1" in
+         -h | --help )        usage; exit 0;;
+         -D | --schemasdir )  INSTALLED_SCHEMAS_DIR="$2"; shift 2;;
+-        -T | --tap )         shift;; # ignore the option
+         -v | --version )     $ECHO -e "$VERSION"; exit 0;;
+         -- )                 shift; break;;
+         * )                  shift;;
+@@ -98,11 +97,11 @@ test_xkb_keymaps()
+         if [ "x$HAS_VARIANT" != "x" ] ; then
+             layout=$($ECHO "$keymap" | sed -e 's/\([^(]*\)([^)]*)/\1/')
+             variant=$($ECHO "$keymap" | sed -e 's/[^(]*(\([^)]*\))/\1/')
+-            $ECHO setxkbmap -layout $layout -variant $variant
++            $ECHO "# setxkbmap -layout $layout -variant $variant"
+             setxkbmap -layout $layout -variant $variant
+         else
+             layout="$keymap"
+-            $ECHO setxkbmap -layout $layout
++            $ECHO "# setxkbmap -layout $layout"
+             setxkbmap -layout $layout
+         fi
+         if [ $? -ne 0 ] ; then
+@@ -121,22 +120,28 @@ EOF_READ_XKB
+ main()
+ {
+     if [ x"$DISPLAY" = x ] ; then
+-        echo "skip: No display. Maybe headless mode."
++        echo "# skip No display. Maybe headless mode."
+         exit 77
+     fi
+     if ! which setxkbmap > /dev/null ; then
+-        echo "skip: No setxkbmap"
++        echo "# skip No setxkbmap"
+         exit 77
+     fi
+ 
+     parse_args "$@"
+ 
++    # Meson checks TAP #Version, #Plan, #TestPoint
++    echo "TAP version 14"
++    echo "1..1"
++
+     if [ x"$INSTALLED_SCHEMAS_DIR" != x ] ; then
+         init
+     fi
+ 
+     test_xkb_keymaps
+ 
++    echo "ok 1 /$PROGNAME"
++
+     if [ x"$INSTALLED_SCHEMAS_DIR" != x ] ; then
+         finit
+     fi
 -- 
-2.52.0
+2.54.0
 
-From b67624c79ad6c26a50194b626b329894b32367f9 Mon Sep 17 00:00:00 2001
+From 6d3a98b94f5f19774595af69c54282565fd31873 Mon Sep 17 00:00:00 2001
 From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Fri, 19 Dec 2025 20:56:27 +0900
-Subject: [PATCH] configure: Add warning to run `make -C tools maintainer-clean-generic`
+Date: Tue, 19 May 2026 20:03:38 +0900
+Subject: [PATCH 02/15] bus: Unset G_DISABLE_ASSERT for test builds
 
-When users specify --disable-wayland option for configure,
-the behavior effects VALA files in tools and need to
-regenerate C files but many users don't know the steps so added
-a warning in the configure output to inform to run
-`make -C tools maintainer-clean-generic` of the users.
+Now GTest is implemented in test-matchrule and test-stress for TAP
+and G_DISABLE_ASSERT cannot be applied to the test builds.
 
-Fixes: https://github.com/ibus/ibus/commit/2bc23ed
-BUG=https://github.com/ibus/ibus/issues/2836
+Also delete the unnecessary GTK2_CFLAGS.
+
+Closes: #2358
 ---
- configure.ac | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ bus/Makefile.am | 10 +++++-----
+ configure.ac    |  3 +++
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
+diff --git a/bus/Makefile.am b/bus/Makefile.am
+index bd3481b9..7fbc9a29 100644
+--- a/bus/Makefile.am
++++ b/bus/Makefile.am
+@@ -3,7 +3,7 @@
+ # ibus - The Input Bus
+ #
+ # Copyright (c) 2007-2013 Peng Huang <shawn.p.huang@gmail.com>
+-# Copyright (c) 2013-2022 Takao Fujiwara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2013-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+ # Copyright (c) 2007-2022 Red Hat, Inc.
+ #
+ # This library is free software; you can redistribute it and/or
+@@ -22,6 +22,7 @@
+ # USA
+ 
+ NULL =
++CFLAGS = $(TEST_CFLAGS)
+ SUBDIRS = . services
+ 
+ libibus = $(top_builddir)/src/libibus-@IBUS_API_VERSION@.la
+@@ -87,6 +88,7 @@ ibus_daemon_SOURCES = \
+ 	$(NULL)
+ ibus_daemon_CFLAGS = \
+ 	$(AM_CFLAGS) \
++	$(PRODUCT_CFLAGS) \
+ 	$(NULL)
+ ibus_daemon_LDADD = \
+ 	$(AM_LDADD) \
+@@ -153,13 +155,11 @@ test_stress_SOURCES = \
+ 	$(NULL)
+ test_stress_CFLAGS = \
+ 	$(AM_CFLAGS) \
+-	@GTK2_CFLAGS@ \
+-	@X11_CFLAGS@ \
++	$(X11_CFLAGS) \
+ 	$(NULL)
+ test_stress_LDADD = \
+ 	$(AM_LDADD) \
+-	@GTK2_LIBS@ \
+-	@X11_LIBS@ \
++	$(X11_LIBS) \
+ 	$(NULL)
+ 
+ EXTRA_DIST =                \
 diff --git a/configure.ac b/configure.ac
-index 401fcd27..401e5f27 100644
+index 49020039..303798fb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -931,6 +931,17 @@ AC_SUBST([GDBUS_CODEGEN], [`$PKG_CONFIG --variable gdbus_codegen gio-2.0`])
+@@ -160,18 +160,21 @@ if test x"$enable_product_build" = xauto; then
+     fi
+ fi
+ TEST_CFLAGS="$CFLAGS"
++PRODUCT_CFLAGS="$CFLAGS"
+ PRODUCT_LIB_CFLAGS=''
+ if test x"$enable_product_build" = xyes; then
+     if test $ac_compiler_gnu = yes; then
+         _CFLAGS="-DG_DISABLE_CAST_CHECKS -Wl,-z,relro -Wl,-z,now $CFLAGS"
+         TEST_CFLAGS="$_CFLAGS"
+         CFLAGS="-DG_DISABLE_ASSERT $_CFLAGS"
++        PRODUCT_CFLAGS="$CFLAGS"
+         PRODUCT_LIB_CFLAGS="-Wl,-Bsymbolic -fno-plt"
+     fi
+     AC_DEFINE(HAVE_PRODUCT_BUILD, 1, [Enable product build])
+ fi
+ AC_SUBST(PRODUCT_LIB_CFLAGS)
+ AC_SUBST(TEST_CFLAGS)
++AC_SUBST(PRODUCT_CFLAGS)
+ AC_MSG_RESULT([$enable_product_build])
  
- OUTPUT_TAIL=''
- HAS_OUTPUT_TAIL=0
-+AS_IF([test x"$enable_wayland" = x"no"],
-+      [OUTPUT_TAIL="$OUTPUT_TAIL
-+You invoked the \`configure\` script with disabled wayland option
-+so you have to run
-+\`make -C tools maintainer-clean-generic\` to regenerate C files with VALA
-+before run \`make\`.
-+"
-+       HAS_OUTPUT_TAIL=1
-+      ],
-+      []
-+)
- AS_IF([test x"$enable_ui" != x"no" &&
-        test -f "$ac_confdir/ui/gtk3/application.c"
-       ],
+ # Check header filess.
 -- 
-2.52.0
+2.54.0
 
-From 63bbe0b43408a1308be797cfab79c9d54bd1c144 Mon Sep 17 00:00:00 2001
+From aeca3e885b1aec02d9f14a5ab6c83f928eca6c9b Mon Sep 17 00:00:00 2001
 From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Thu, 8 Jan 2026 19:48:35 +0900
-Subject: [PATCH 1/2] ui/gtk3/extension: Fix assertion in panel_binding_construct()
+Date: Thu, 7 May 2026 09:35:47 +0900
+Subject: [PATCH 03/15] client/x11: Call setlocale()
 
-Check m_ibus in extension.vala:bus_name_acquired_cb().
+To enhance #2547, ibus-x11 replaces gtk_init() with gdk_init().
+Seems gdk_init() does not call setlocale() internally and ibus-x11
+causes some encoding errors when the multi-byte chars are converted
+to the text property of compound text.
 
-BUG=rhbz#1797120
+BUG=https://github.com/ibus/ibus/issues/2896
+Fixes: https://github.com/ibus/ibus/commit/b185b21
 ---
- ui/gtk3/extension.vala | 4 ++++
- 1 file changed, 4 insertions(+)
+ client/x11/main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/ui/gtk3/extension.vala b/ui/gtk3/extension.vala
-index 5cd1a6ad..3acd76ea 100644
---- a/ui/gtk3/extension.vala
-+++ b/ui/gtk3/extension.vala
-@@ -73,6 +73,10 @@ class ExtensionGtk : Gtk.Application {
-                                       string         signal_name,
-                                       Variant        parameters) {
-         debug("signal_name = %s", signal_name);
-+        /* rhbz#1797120 Fix assert(bus.is_connected()) in
-+         * panel_binding_construct()
-+         */
-+        return_if_fail(m_bus.is_connected());
-         m_panel = new PanelBinding(m_bus, this);
-         m_panel.load_settings();
-     }
+diff --git a/client/x11/main.c b/client/x11/main.c
+index 5fadd43d..accebde5 100644
+--- a/client/x11/main.c
++++ b/client/x11/main.c
+@@ -2,7 +2,7 @@
+ /* vim:set et sts=4: */
+ /* ibus
+  * Copyright (C) 2007-2015 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2015-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
++ * Copyright (C) 2015-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2007-2015 Red Hat, Inc.
+  *
+  * main.c:
+@@ -1368,6 +1368,11 @@ main (int argc, char **argv)
+     gdk_set_allowed_backends ("x11");
+ #endif
+ 
++    /* gdk_init() does not call setlocale() */
++    if (!setlocale (LC_ALL, "")) {
++        g_warning ("Failed to set locale with your environment variables. "
++                   "Some multi-byte characters won't be committed correctly.");
++    }
+     gdk_init (&argc, &argv);
+     XSetErrorHandler (_xerror_handler);
+     XSetIOErrorHandler (_xerror_io_handler);
 -- 
-2.52.0
+2.54.0
 
-From e8628f50640567890e08d2e5fb0230e891bbe0fd Mon Sep 17 00:00:00 2001
+From 3768387b5c1f72c2c3840ebc4c6a46c3c711c71e Mon Sep 17 00:00:00 2001
 From: fujiwarat <takao.fujiwara1@gmail.com>
-Date: Thu, 8 Jan 2026 19:52:12 +0900
-Subject: [PATCH 2/2] ui/gtk3: Fix SEGV with double bus_name_acquired_cb()
+Date: Fri, 17 Apr 2026 19:54:22 +0900
+Subject: [PATCH 04/15] Disable Unicode input with Ctrl-Shift-u twice
 
-When PanelBinding() is called twice, g_dbus_connection_register_object()
-is failed in ibus_service_register() due to the duplicated object path
-and it calls unnecessary g_object_unref() although g_object_unref() is
-called in g_dbus_connection_register_object() and it causes a SEGV.
+Once the Unicode module receives Ctrl-Shift-u key twice, the pre-edit
+should be disabled as the current IBus engines expect the nest format
+<emoji_preedit <engine_predit /> /> but not the reverse format.
 
-But @user_data_free_func in g_dbus_connection_register_object() is not
-called with g_dbus_connection_unregister_object() immediately and I'd
-think not to use @user_data_free_func.
-
-BUG=rhbz#2419469
+Closes: #2903
 ---
- src/ibusservice.c        | 18 ++++++++++++++++--
- ui/gtk3/application.vala | 16 ++++++++++++++--
- ui/gtk3/extension.vala   | 16 ++++++++++++++--
- 3 files changed, 44 insertions(+), 6 deletions(-)
+ bus/inputcontext.c        | 17 ++++++++++++-----
+ ui/gtk3/panelbinding.vala |  3 +++
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/src/ibusservice.c b/src/ibusservice.c
-index 51bd2ee4..3c7c04a4 100644
---- a/src/ibusservice.c
-+++ b/src/ibusservice.c
+diff --git a/bus/inputcontext.c b/bus/inputcontext.c
+index 5adcdf6e..7de594ad 100644
+--- a/bus/inputcontext.c
++++ b/bus/inputcontext.c
 @@ -2,7 +2,7 @@
  /* vim:set et sts=4: */
  /* ibus - The Input Bus
-  * Copyright (C) 2008-2015 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright (C) 2015-2023 Takao Fujiwara <takao.fujiwara1@gmail.com>
+  * Copyright (C) 2008-2014 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2015-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
 + * Copyright (C) 2015-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  * Copyright (C) 2008-2019 Red Hat, Inc.
+  * Copyright (C) 2008-2025 Red Hat, Inc.
   *
   * This library is free software; you can redistribute it and/or
-@@ -495,9 +495,15 @@ ibus_service_unregister_cb (GDBusConnection    *connection,
-     guint *p = ids;
-     while (*p != 0) {
-         g_dbus_connection_unregister_object (connection, *p++);
-+        /* g_dbus_connection_register_object(connection) calls
-+         * g_object_ref(service).
-+         */
-+        g_object_unref (service);
+@@ -3473,10 +3473,17 @@ bus_input_context_update_preedit_text (BusInputContext *context,
      }
-     g_signal_handlers_disconnect_by_func (connection,
-                     G_CALLBACK (ibus_service_connection_closed_cb), service);
-+    /* g_hash_table_insert(service->priv->table) calls g_object_ref(connection)
-+     */
-     g_object_unref (connection);
-     g_free (ids);
- }
-@@ -566,12 +572,19 @@ ibus_service_register (IBusService     *service,
  
-     array = g_array_new (TRUE, TRUE, sizeof (guint));
-     while (*p != NULL) {
-+        /* Probably I think @user_data_free_func in
-+         * g_dbus_connection_register_object() is not useful in this case
-+         * since the free func is not called until the @connection is closed
-+         * but the @connection is shared with other instances
-+         * so it would be better to call g_object_unref(service)
-+         * after g_dbus_connection_unregister_object() is called.
-+         */
-         guint id = g_dbus_connection_register_object (connection,
-                                                       service->priv->object_path,
-                                                       *p,
-                                                       &ibus_service_interface_vtable,
-                                                       g_object_ref (service),
--                                                      (GDestroyNotify)g_object_unref,
-+                                                      NULL,
-                                                       error);
-         if (id != 0) {
-             g_array_append_val (array, id);
-@@ -594,6 +607,7 @@ error_out:
-         guint *ids = (guint*) array->data;
-         while (*ids != 0) {
-             g_dbus_connection_unregister_object (connection, *ids++);
-+            g_object_unref (service);
+     context->preedit_cursor_pos = cursor_pos;
+-    if (use_extension) {
+-        context->preedit_visible = visible;
+-        context->preedit_mode = mode;
+-    }
++    /* The `visible` flag is set whether use_extension is enabled or not.
++     * I.e. If both an emoji preedit text and an engine preedit exist,
++     * the engine preedit is expected to exist in the emoji preedit like
++     * <emoji_preedit  <engine_preedit /> />, so if the emoji preedit is
++     * hidden, the engine preedit is also hidden in the nested state.
++     * If some engines would need the reverse case like
++     * <engine_preedit  <emoji_preedit /> />, probably another API is needed
++     * like ibus_engine_show_emoji_candidate_in_preedit().
++     */
++    context->preedit_visible = visible;
++    context->preedit_mode = mode;
+     context->ignore_focus_out = FALSE;
+     extension_visible = context->preedit_visible ||
+                         (context->emoji_extension != NULL);
+diff --git a/ui/gtk3/panelbinding.vala b/ui/gtk3/panelbinding.vala
+index 56d7f09c..0f20d973 100644
+--- a/ui/gtk3/panelbinding.vala
++++ b/ui/gtk3/panelbinding.vala
+@@ -885,6 +885,9 @@ class PanelBinding : IBus.PanelService {
+         m_enable_extension = event.is_enabled;
+         if (!m_enable_extension) {
+             hide_emoji_lookup_table();
++            update_preedit_text_received(new IBus.Text.from_string(""),
++                                         0,
++                                         false);
+             return;
          }
-         g_array_free (array, TRUE);
+         if (!m_loaded_emoji)
+-- 
+2.54.0
+
+From a8ff755971509f09e1d0ea52a10be1bfc13af39b Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Wed, 27 May 2026 13:38:47 +0900
+Subject: [PATCH 05/15] client/wayland: Fix serial handling
+
+Closes: #2870
+---
+ client/wayland/ibuswaylandim.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index e1bad27d..cf090e2e 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -2431,13 +2431,14 @@ registry_handle_global (void               *data,
+                  interface, name, version);
+         fflush (priv->log);
      }
+-    priv->im_serial = 0;
+     if (!g_strcmp0 (interface, zwp_input_method_manager_v2_interface.name)) {
++        priv->im_serial = 0;
+         priv->version = INPUT_METHOD_V2;
+         priv->input_method_manager_v2 =
+                 wl_registry_bind (registry, name,
+                                   &zwp_input_method_manager_v2_interface, 1);
+     } else if (!g_strcmp0 (interface, zwp_input_method_v1_interface.name)) {
++        priv->im_serial = 0;
+         if (version >= 4)
+             version = 4;
+         priv->version = INPUT_METHOD_V1;
+-- 
+2.54.0
+
+From 18d8e37e112a155f3f80d36e4d6a845cc2e23bd8 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 09:51:11 +0900
+Subject: [PATCH 06/15] client/wayland: Guard against NULL seat in IMv2 code paths
+
+registry_handle_global_remove() sets priv->seat to NULL when the last
+seat is removed.  IBus engine callbacks (commit_text, forward_key_event,
+show/hide_preedit_text, delete_surrounding_text) and the modifier
+handler can fire asynchronously via D-Bus after seat removal, causing
+a NULL pointer dereference.
+
+Add NULL checks for priv->seat in all IMv2 branches that dereference it
+from these callback paths.
+
+Closes: #2877
+---
+ client/wayland/ibuswaylandim.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index cf090e2e..57b0ad21 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -334,6 +334,8 @@ ibus_wayland_im_commit_text (IBusWaylandIM *wlim,
+                                                    str);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_commit_string (priv->seat->input_method_v2, str);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2,
+                                     priv->im_serial);
+@@ -367,6 +369,8 @@ ibus_wayland_im_key (IBusWaylandIM *wlim,
+          * returns "Cannot send a keypress before defining a keymap"
+          * if `has_keymap` is %FALSE.
+          */
++        if (!priv->seat)
++            break;
+         if (priv->seat->has_keymap) {
+             zwp_virtual_keyboard_v1_key (priv->seat->virtual_keyboard,
+                                          time, key, state);
+@@ -663,6 +667,8 @@ _context_show_preedit_text_cb (IBusInputContext *context,
+                                                     commit);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_set_preedit_string  (
+                 priv->seat->input_method_v2,
+                 priv->preedit_text->text,
+@@ -693,6 +699,8 @@ _context_hide_preedit_text_cb (IBusInputContext *context,
+                                                     "");
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_set_preedit_string  (priv->seat->input_method_v2,
+                                                  "", 0, 0);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2,
+@@ -771,6 +779,8 @@ _context_delete_surrounding_text_cb (IBusInputContext *context,
+                 before_length + after_length);
+         break;
+     case INPUT_METHOD_V2:
++        if (!priv->seat)
++            break;
+         zwp_input_method_v2_delete_surrounding_text (
+                 priv->seat->input_method_v2,
+                 before_length,
+@@ -1201,7 +1211,7 @@ ibus_wayland_im_post_key (IBusWaylandIM *wlim,
+             return FALSE;
+         break;
+     case INPUT_METHOD_V2:
+-        if (!priv->seat->active)
++        if (!priv->seat || !priv->seat->active)
+             return FALSE;
+         break;
+     default:
+@@ -1760,6 +1770,8 @@ input_method_keyboard_modifiers (void                      *data,
+          * returns "Cannot send a modifier state before defining a keymap"
+          * if `has_keymap` is %FALSE.
+          */
++        if (!priv->seat)
++            break;
+         if (priv->seat->has_keymap) {
+             zwp_virtual_keyboard_v1_modifiers (priv->seat->virtual_keyboard,
+                                                mods_depressed, mods_latched,
+-- 
+2.54.0
+
+From 06b073dfef47b83ee4cf4969f7269b75dff387f7 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:24:42 +0900
+Subject: [PATCH 07/15] client/wayland: Fix preedit cursor_end in set_preedit_string
+
+cursor_end was set to strlen(text), making the cursor span from the
+cursor position to the end of the preedit string.  Per the
+zwp_input_method_v2 protocol, cursor_begin == cursor_end means a point
+cursor.  Pass cursor for both begin and end.
+
+Closes: #2880
+---
+ client/wayland/ibuswaylandim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 57b0ad21..69d10fe8 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -673,7 +673,7 @@ _context_show_preedit_text_cb (IBusInputContext *context,
+                 priv->seat->input_method_v2,
+                 priv->preedit_text->text,
+                 cursor,
+-                strlen (priv->preedit_text->text));
++                cursor);
+         zwp_input_method_v2_commit (priv->seat->input_method_v2,
+                                     priv->im_serial);
+         priv->hiding_preedit_text = FALSE;
+-- 
+2.54.0
+
+From 72b09de3b4c4c3695eb877a70cbe88c4f5c398cd Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:33:09 +0900
+Subject: [PATCH 08/15] client/wayland: Fix typo "waylayd" -> "wayland" in Makefile.am
+
+The misspelled variable name caused the METADATADIRS and VAPIDIRS
+settings to be silently ignored by automake.
+
+Closes: #2881
+---
+ client/wayland/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/client/wayland/Makefile.am b/client/wayland/Makefile.am
+index 25269557..3275d1c5 100644
+--- a/client/wayland/Makefile.am
++++ b/client/wayland/Makefile.am
+@@ -184,8 +184,8 @@ MAINTAINERCLEANFILES += $(VAPIGEN_VAPIS)
+ DISTCLEANFILES += $(VAPIGEN_VAPIS)
+ $(VAPIGEN_VAPIS): $(INTROSPECTION_GIRS)
+ ibus_wayland_im_1_0_vapi_DEPS = glib-2.0 gobject-2.0 gio-2.0 ibus-1.0
+-ibus_waylayd_im_1_0_vapi_METADATADIRS = $(srcdir) $(top_srcdir)/bindings/vala
+-#ibus_waylayd_im_1_0_vapi_VAPIDIRS = $(top_srcdir)/bindings/vala
++ibus_wayland_im_1_0_vapi_METADATADIRS = $(srcdir) $(top_srcdir)/bindings/vala
++#ibus_wayland_im_1_0_vapi_VAPIDIRS = $(top_srcdir)/bindings/vala
+ ibus_wayland_im_1_0_vapi_FILES = \
+     $(INTROSPECTION_GIRS) \
+     $(srcdir)/ibus-wayland-im-custom.vala \
+-- 
+2.54.0
+
+From 614eb098016afe280e860732c60a50aefdb1ed65 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:47:34 +0900
+Subject: [PATCH 09/15] ui/gtk3: Fix display wait timeout from ~5 years to 3 minutes
+
+MAX_DISPLAY_IDLE_TIME included G_USEC_PER_SEC in the multiplication,
+making the iteration count 18 billion instead of the intended 18000.
+Each iteration sleeps 10ms, so the effective timeout was 5.7 years
+instead of the intended 3 minutes.
+
+The sleep duration already uses G_USEC_PER_SEC / SLEEP_DIV_PER_SEC,
+so the iteration count should just be SLEEP_DIV_PER_SEC * 60 * 3.
+
+Closes: #2882
+---
+ ui/gtk3/application.vala | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
-index 65ab43cf..dcabc892 100644
+index dcabc892..aa331543 100644
 --- a/ui/gtk3/application.vala
 +++ b/ui/gtk3/application.vala
-@@ -3,7 +3,7 @@
-  * ibus - The Input Bus
-  *
-  * Copyright(c) 2011 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright(c) 2017-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+ * Copyright(c) 2017-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-@@ -98,6 +98,16 @@ class Application {
-                                       string         signal_name,
-                                       Variant        parameters) {
-         debug("signal_name = %s", signal_name);
-+        if (m_panel != null) {
-+            // ibus_object_destroy() is needed because g_object_unref() is
-+            // called by ibus_service_unregister_cb() but another
-+            // g_object_unref() is also called by g_object_run_dispose()
-+            // and one g_object_unref() is not needed because Vala calls it
-+            // with `m_panel = null`.
-+            m_panel.ref();
-+            ((IBus.Object)m_panel).destroy();
-+            m_panel.disconnect_signals();
-+        }
-         m_panel = new Panel(bus, m_enable_wayland_im);
-         if (m_log != null)
-             m_panel.set_log(m_log, m_verbose);
-@@ -128,7 +138,8 @@ class Application {
-         // g_dbus_connection_register_object()
-         debug("signal_name = %s", signal_name);
+@@ -25,7 +25,7 @@ const string IBUS_WAYLAND_VERSION="1.1";
+ const ulong G_USEC_PER_SEC=1000000L;
+ const ulong SLEEP_DIV_PER_SEC = 100L;
+ const ulong MAX_DISPLAY_IDLE_TIME =
+-        G_USEC_PER_SEC * SLEEP_DIV_PER_SEC * 60 * 3;
++        SLEEP_DIV_PER_SEC * 60 * 3;
  
--        // unref m_panel
-+        m_panel.ref();
-+        ((IBus.Object)m_panel).destroy();
-         m_panel.disconnect_signals();
- #if USE_GDK_WAYLAND
-         if (m_realize_surface_id != 0) {
-@@ -144,6 +155,7 @@ class Application {
-             m_ibus_focus_out_id = 0;
-         }
- #endif
-+        // unref m_panel
-         m_panel = null;
-     }
- 
-diff --git a/ui/gtk3/extension.vala b/ui/gtk3/extension.vala
-index 3acd76ea..7ee54cd3 100644
---- a/ui/gtk3/extension.vala
-+++ b/ui/gtk3/extension.vala
-@@ -3,7 +3,7 @@
-  * ibus - The Input Bus
-  *
-  * Copyright(c) 2018 Peng Huang <shawn.p.huang@gmail.com>
-- * Copyright(c) 2018-2025 Takao Fujiwara <takao.fujiwara1@gmail.com>
-+ * Copyright(c) 2018-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-@@ -77,6 +77,16 @@ class ExtensionGtk : Gtk.Application {
-          * panel_binding_construct()
-          */
-         return_if_fail(m_bus.is_connected());
-+        if (m_panel != null) {
-+            // ibus_object_destroy() is needed because g_object_unref() is
-+            // called by ibus_service_unregister_cb() but another
-+            // g_object_unref() is also called by g_object_run_dispose()
-+            // and one g_object_unref() is not needed because Vala calls it
-+            // with `m_panel = null`.
-+            m_panel.ref();
-+            ((IBus.Object)m_panel).destroy();
-+            m_panel.disconnect_signals();
-+        }
-         m_panel = new PanelBinding(m_bus, this);
-         m_panel.load_settings();
-     }
-@@ -95,8 +105,10 @@ class ExtensionGtk : Gtk.Application {
-         // g_dbus_connection_register_object()
-         debug("signal_name = %s", signal_name);
- 
--        // unref m_panel
-+        m_panel.ref();
-+        ((IBus.Object)m_panel).destroy();
-         m_panel.disconnect_signals();
-+        // unref m_panel
-         m_panel = null;
-     }
- 
+ static string prgname;
+ static IBus.Bus bus;
 -- 
-2.52.0
+2.54.0
+
+From 41f36c09b47daf34accecb5c0b870af63b3ba730 Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 10:59:14 +0900
+Subject: [PATCH 10/15] ui/gtk3: Fix log timestamp losing microsecond precision
+
+get_microsecond() was divided by 1000 (giving milliseconds) then
+formatted with %06d, producing misleading output like "000846".
+Use get_microsecond() directly with %06d, matching the C counterpart
+in ibuswaylandim.c.  Also use '.' separator instead of ':' to
+distinguish sub-second part from the time fields.
+
+Closes: #2884
+---
+ ui/gtk3/application.vala | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ui/gtk3/application.vala b/ui/gtk3/application.vala
+index aa331543..a9962685 100644
+--- a/ui/gtk3/application.vala
++++ b/ui/gtk3/application.vala
+@@ -216,9 +216,9 @@ class Application {
+         if (m_user == null)
+             m_user = "UNKNOW";
+         GLib.DateTime now = new GLib.DateTime.now_local();
+-        var msec = now.get_microsecond() / 1000;
+-        m_log.printf("Start %02d:%02d:%02d:%06d\n",
+-                     now.get_hour(), now.get_minute(), now.get_second(), msec);
++        m_log.printf("Start %02d:%02d:%02d.%06d\n",
++                     now.get_hour(), now.get_minute(), now.get_second(),
++                     now.get_microsecond());
+         m_log.flush();
+         return true;
+     }
+-- 
+2.54.0
+
+From e8d36baadfb138742403b484dbaaa53d1bdda3bc Mon Sep 17 00:00:00 2001
+From: Danny Milosavljevic <dannym@friendly-machines.com>
+Date: Thu, 28 May 2026 11:07:10 +0900
+Subject: [PATCH 11/15] client/wayland: Copy keysym into async key event
+
+_process_key_event_async() did not copy event->sym into the async
+event struct.  The callback _process_key_event_done() then called
+ibus_wayland_im_post_key() with sym=0, so ISO_Level*_Latch keysyms
+were not filtered in async mode.
+
+Closes: #2886
+---
+ client/wayland/ibuswaylandim.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 69d10fe8..37fe4bad 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -1419,6 +1419,7 @@ _process_key_event_async (IBusWaylandIM       *wlim,
+     async_event->key_serial = event->key_serial;
+     async_event->time = event->time;
+     async_event->key = event->key;
++    async_event->sym = event->sym;
+     async_event->modifiers = event->modifiers & ~IBUS_RELEASE_MASK;
+     async_event->state = event->state;
+     async_event->wlim = wlim;
+-- 
+2.54.0
+
+From 526e509b968cb1334727dbdc9f91f44e8dc038b5 Mon Sep 17 00:00:00 2001
+From: matiwari <matiwari@redhat.com>
+Date: Thu, 28 May 2026 11:21:25 +0900
+Subject: [PATCH 12/15] ui/gtk3: remove unused m_candidates array
+
+The 'm_candidates' array was never read and retained references to obsolete
+Gtk.Label objects during panel rebuilds, contributing to a memory leak.
+
+Closes: #2471
+---
+ ui/gtk3/emojier.vala | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/ui/gtk3/emojier.vala b/ui/gtk3/emojier.vala
+index 097edbda..d899780f 100644
+--- a/ui/gtk3/emojier.vala
++++ b/ui/gtk3/emojier.vala
+@@ -358,7 +358,6 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+      */
+     private bool m_candidate_panel_mode;
+     private IBus.LookupTable m_lookup_table;
+-    private Gtk.Label[] m_candidates;
+     private uint m_entry_notify_show_id;
+     private uint m_entry_notify_disable_id;
+     private Gtk.ProgressBar m_unicode_progress_bar;
+@@ -1668,7 +1667,6 @@ public class IBusEmojier : Gtk.ApplicationWindow {
+                         1, 1);
+             n++;
+ 
+-            m_candidates += label;
+         }
+         m_candidate_panel_is_visible = true;
+         if (!m_is_up_side_down) {
+-- 
+2.54.0
+
+From 5bbe88a1936246185a65f76e58cc85871401e59a Mon Sep 17 00:00:00 2001
+From: Tianhao Chai <cth451@gmail.com>
+Date: Wed, 27 May 2026 13:11:28 +0900
+Subject: [PATCH 13/15] src: make an IBusText own an updated IBusAttrList reference
+
+For all usages of IBusAttrList, the list is an owned reference within a
+IBusText struct. `ibus_panel_convert_text()` and
+`ibus_input_context_convert_text()` violate the invarient by assigning a
+**floating** IBusAttrList reference to anIBusText without sinking it.
+
+When GJS attempts to create a JS representation of an existing GObject,
+it unconditionally sinks the incoming reference.[1] For a non-floating
+reference this up-refs the object.
+
+For this floating IBusAttrLit, `g_object_ref_sink` converts it to a
+strong reference in-place leaving ref-count at 1. At this point the
+`IBusAttrList` is referenced by both the enclosing `IBusText` and the
+newly created GJS wrapper. When one of them is ref-downed the object
+is recycled, leaving the other reference dangling.
+
+To fix this we just need to maintain the list as a non-floating ref.
+We already have a `ibus_text_set_attributes()` that does the intended
+ref sinking, so just use that instead of manually assigning pointers.
+
+[1]: https://gitlab.gnome.org/GNOME/gjs/-/blob/db450465ab0161e131a92992c2509507aa6152aa/gi/object.cpp#L3597
+
+Closes: #2889
+---
+ src/ibusinputcontext.c | 12 ++++--------
+ src/ibuspanelservice.c | 12 ++++--------
+ 2 files changed, 8 insertions(+), 16 deletions(-)
+
+diff --git a/src/ibusinputcontext.c b/src/ibusinputcontext.c
+index 68d12fb5..bdfd166d 100644
+--- a/src/ibusinputcontext.c
++++ b/src/ibusinputcontext.c
+@@ -569,10 +569,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -581,10 +579,8 @@ ibus_input_context_convert_text (IBusInputContext *context,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+diff --git a/src/ibuspanelservice.c b/src/ibuspanelservice.c
+index 16229822..f50cea19 100644
+--- a/src/ibuspanelservice.c
++++ b/src/ibuspanelservice.c
+@@ -1203,10 +1203,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     case IBUS_PREEDIT_FORMAT_HINT:
+         new_attrs = ibus_attr_list_copy_format_to_hint (text->attrs, &error);
+@@ -1215,10 +1213,8 @@ ibus_panel_convert_text (IBusPanelService *panel,
+                        text->text, error->message);
+             g_error_free (error);
+         }
+-        if (new_attrs) {
+-            g_object_unref (text->attrs);
+-            text->attrs = new_attrs;
+-        }
++        if (new_attrs)
++            ibus_text_set_attributes (text, new_attrs);
+         break;
+     default:
+         g_assert_not_reached ();
+-- 
+2.54.0
+
+From 067de1c2b7fa1d464686cce41331b37c0b9c2886 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Wed, 27 May 2026 13:26:43 +0900
+Subject: [PATCH 14/15] Add test-deserialize.py
+
+Add a test case to deserialize IBusText
+
+Closes: #2889
+---
+ bindings/pygobject/Makefile.am           |  41 ++++----
+ bindings/pygobject/test-deserialize.py   | 118 +++++++++++++++++++++++
+ bindings/pygobject/test-override-ibus.py |  11 +--
+ src/ibuspanelservice.c                   |   9 +-
+ src/tests/runtest                        |  12 ++-
+ 6 files changed, 167 insertions(+), 28 deletions(-)
+ create mode 100755 bindings/pygobject/test-deserialize.py
+ mode change 100644 => 100755 bindings/pygobject/test-override-ibus.py
+
+diff --git a/bindings/pygobject/Makefile.am b/bindings/pygobject/Makefile.am
+index 84bd37cb..255f5989 100644
+--- a/bindings/pygobject/Makefile.am
++++ b/bindings/pygobject/Makefile.am
+@@ -4,7 +4,7 @@
+ #
+ # Copyright (c) 2012 Daiki Ueno <ueno@unixuser.org>
+ # Copyright (c) 2014-2016 Peng Huang <shawn.p.huang@gmail.com>
+-# Copyright (c) 2018-2019 Takao Fujiwara <takao.fujiwara1@gmail.com>
++# Copyright (c) 2018-2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
+ # Copyright (c) 2012-2018 Red Hat, Inc.
+ #
+ # This library is free software; you can redistribute it and/or
+@@ -27,37 +27,40 @@ NULL =
+ if ENABLE_PYTHON2
+ py2_compile = PYTHON=$(PYTHON2) $(SHELL) $(py_compile)
+ overrides2dir = $(py2overridesdir)
+-overrides2_DATA =				\
+-	gi/overrides/IBus.py			\
+-	$(NULL)
++overrides2_DATA =                               \
++    gi/overrides/IBus.py                        \
++    $(NULL)
+ endif
+ 
+ overridesdir = $(pyoverridesdir)
+-overrides_PYTHON =				\
+-	gi/overrides/IBus.py			\
+-	$(NULL)
++overrides_PYTHON =                              \
++    gi/overrides/IBus.py                        \
++    $(NULL)
+ 
+ TESTS =
+ 
+ if ENABLE_TESTS
+-TESTS += test-override-ibus.py
++TESTS += test-deserialize.py test-override-ibus.py
+ endif
+ 
+ # IBus.Keymap() accesses keymap files
+ TESTS_ENVIRONMENT = \
+-	PYTHONPATH=$(top_srcdir)/tests:$${PYTHONPATH:+:$$PYTHONPATH} \
+-	LD_LIBRARY_PATH=$(top_builddir)/src/.libs:$$LD_LIBRARY_PATH \
+-	GI_TYPELIB_PATH=$(top_builddir)/src:$$GI_TYPELIB_PATH \
+-	IBUS_KEYMAP_PATH=$(top_srcdir)/data/keymaps \
+-	$(NULL)
++    top_srcdir=$(top_srcdir) \
++    PYTHONPATH=$(abs_top_srcdir)/tests:$${PYTHONPATH:+:$$PYTHONPATH} \
++    PYTHONMALLOC=malloc \
++    LD_LIBRARY_PATH=$(abs_top_builddir)/src/.libs:$$LD_LIBRARY_PATH \
++    GI_TYPELIB_PATH=$(abs_top_builddir)/src:$$GI_TYPELIB_PATH \
++    IBUS_KEYMAP_PATH=$(abs_top_srcdir)/data/keymaps \
++    $(NULL)
+ 
+-LOG_COMPILER = $(PYTHON) -B
++LOG_COMPILER = $(top_srcdir)/src/tests/runtest $(PYTHON)
+ 
+-EXTRA_DIST =					\
+-	gi/__init__.py				\
+-	gi/overrides/__init__.py		\
+-	test-override-ibus.py                   \
+-	$(NULL)
++EXTRA_DIST =                                    \
++    gi/__init__.py                              \
++    gi/overrides/__init__.py                    \
++    test-deserialize.py                         \
++    test-override-ibus.py                       \
++    $(NULL)
+ 
+ install-data-hook:
+ 	@$(NORMAL_INSTALL)
+diff --git a/bindings/pygobject/test-deserialize.py b/bindings/pygobject/test-deserialize.py
+new file mode 100755
+index 00000000..290914d7
+--- /dev/null
++++ b/bindings/pygobject/test-deserialize.py
+@@ -0,0 +1,118 @@
++#!/usr/bin/python
++# ibus - The Input Bus
++#
++# Copyright © 2026 Takao Fujiwara <takao.fujiwara1@gmail.com>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, write to the Free Software
++# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
++# USA
++
++import sys
++import unittest
++from pathlib import Path
++
++# move the script path at the end, so the necessary modules in system
++# pygobject can be loaded first
++tests_builddir = Path(__file__).resolve().parent
++sys.path = [path for path in sys.path if Path(path) != tests_builddir]
++sys.path.append(str(tests_builddir))
++
++from gi import require_versions as gi_require_versions
++
++gi_require_versions({'IBus': '1.0', 'GLib':  '2.0', 'Gio': '2.0', })
++from gi.repository import IBus
++from gi.repository import GLib
++from gi.repository import Gio
++
++
++class TestOverride(unittest.TestCase):
++    __bus = None
++    __text = None
++    __attrs = None
++    __invocation = None
++
++    def setUp(self):
++        IBus.init()
++        self.__bus = IBus.Bus()
++
++    def update_preedit_text_cb(self,
++                               context,
++                               text,
++                               cursor,
++                               visible):
++        self.update_preedit_text_with_mode_cb(
++                context, text, cursor, visible, 0)
++
++    def update_preedit_text_with_mode_cb(self,
++                                         context,
++                                         text,
++                                         cursor,
++                                         visible,
++                                         mode):
++        self.__text = text
++        self.__attrs = self.__text.get_attributes()
++        print('# Got update-preedit-text-with-mode',
++              self.__text.get_text(), cursor, visible, mode)
++
++
++    def test_deserialized_input_context(self):
++        text = IBus.Text.new_from_string('test')
++        text.append_attribute(IBus.AttrType.HINT,
++                              IBus.AttrPreedit.WHOLE,
++                              0,
++                              text.get_length())
++        text_variant = text.serialize_object()
++        update_preedit_variant = GLib.Variant.new_tuple(
++            GLib.Variant.new_variant(text_variant),
++            GLib.Variant.new_uint32(0),
++            GLib.Variant.new_boolean(True),
++            GLib.Variant.new_uint32(0))
++        context = self.__bus.create_input_context('test')
++        context.connect('update-preedit-text-with-mode',
++                        self.update_preedit_text_with_mode_cb)
++        context.do_g_signal(context,
++                            'org.freedesktop.DBus',
++                            'UpdatePreeditTextWithMode',
++                            update_preedit_variant)
++        print('# Last', self.__attrs, self.__text.get_text())
++
++    def test_deserialized_panel(self):
++        text = IBus.Text.new_from_string('test')
++        text.append_attribute(IBus.AttrType.HINT,
++                              IBus.AttrPreedit.WHOLE,
++                              0,
++                              text.get_length())
++        text_variant = text.serialize_object()
++        update_preedit_variant = GLib.Variant.new_tuple(
++            GLib.Variant.new_variant(text_variant),
++            GLib.Variant.new_uint32(0),
++            GLib.Variant.new_boolean(True))
++        panel = IBus.PanelService.new(self.__bus.get_connection())
++        panel.connect('update-preedit-text',
++                      self.update_preedit_text_cb)
++        self.__invocation = Gio.DBusMethodInvocation()
++        panel.do_service_method_call(panel,
++                                     self.__bus.get_connection(),
++                                     'org.freedesktop.IBus.NullInvocation',
++                                     IBus.PATH_PANEL + '/DryTest',
++                                     IBus.INTERFACE_PANEL,
++                                     'UpdatePreeditText',
++                                     update_preedit_variant.ref(),
++                                     self.__invocation)
++        print('# Last', self.__attrs, self.__text.get_text())
++
++
++if __name__ == '__main__':
++    GLib.log_set_fatal_mask('GLib', GLib.LogLevelFlags.LEVEL_WARNING)
++    unittest.main()
+diff --git a/bindings/pygobject/test-override-ibus.py b/bindings/pygobject/test-override-ibus.py
+old mode 100644
+new mode 100755
+index 8853ff64..89073a08
+--- a/bindings/pygobject/test-override-ibus.py
++++ b/bindings/pygobject/test-override-ibus.py
+@@ -20,16 +20,15 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ # USA
+ 
+-import unittest
+-
+-import os
+ import sys
++import unittest
++from pathlib import Path
+ 
+ # move the script path at the end, so the necessary modules in system
+ # pygobject can be loaded first
+-tests_builddir = os.path.abspath(os.path.dirname(__file__))
+-sys.path = [path for path in sys.path if path != tests_builddir]
+-sys.path.append(tests_builddir)
++tests_builddir = Path(__file__).resolve().parent
++sys.path = [path for path in sys.path if Path(path) != tests_builddir]
++sys.path.append(str(tests_builddir))
+ 
+ import gi
+ gi.require_versions({'GLib': '2.0', 'IBus': '1.0'})
+diff --git a/src/ibuspanelservice.c b/src/ibuspanelservice.c
+index f50cea19..14cca3ec 100644
+--- a/src/ibuspanelservice.c
++++ b/src/ibuspanelservice.c
+@@ -1255,6 +1255,7 @@ ibus_panel_service_service_method_call (IBusService           *service,
+         guint cursor = 0;
+         gboolean visible = FALSE;
+         IBusText *text;
++        gboolean is_dry_test;
+ 
+         g_variant_get (parameters, "(vub)", &variant, &cursor, &visible);
+         text = IBUS_TEXT (ibus_serializable_deserialize (variant));
+@@ -1263,7 +1264,13 @@ ibus_panel_service_service_method_call (IBusService           *service,
+ 
+         g_signal_emit (panel, panel_signals[UPDATE_PREEDIT_TEXT], 0, text, cursor, visible);
+         _g_object_unref_if_floating (text);
+-        g_dbus_method_invocation_return_value (invocation, NULL);
++        is_dry_test = !g_strcmp0 (object_path, IBUS_PATH_PANEL "/DryTest");
++        /* GDBusMethodInvocation does not provide instance methods for Python
++         * gobject-introspection binding so we cannot call
++         * g_dbus_method_invocation_return_value() and g_object_unref().
++         */
++        if (!is_dry_test)
++            g_dbus_method_invocation_return_value (invocation, NULL);
+         return;
+     }
+ 
+diff --git a/src/tests/runtest b/src/tests/runtest
+index 7bd98575..4e54420f 100755
+--- a/src/tests/runtest
++++ b/src/tests/runtest
+@@ -37,11 +37,13 @@ ibus-engine-switch
+ ibus-compose
+ ibus-keypress
+ test-stress
++test-deserialize.py
+ test-override-ibus.py
+ "
+ IBUS_SCHEMA_FILE='org.freedesktop.ibus.gschema.xml'
+ GTK_QUERY_MODULE=gtk-query-immodules-3.0-32
+ MACHINE=`uname -m`
++PYTHON_TEST_ARGS='-B'
+ 
+ if test x"$MACHINE" = xx86_64 ; then
+     GTK_QUERY_MODULE=gtk-query-immodules-3.0-64
+@@ -137,6 +139,12 @@ run_test_case()
+     cd $tstdir
+ 
+     if echo "$tst" | grep -q 'python' ; then
++        # Convert the relative path to the absolute path.
++        if echo "$tst" | grep -q "\./" ; then
++            tst=`realpath $tst`
++        elif ! echo "$tst" | grep -q "/" ; then
++            tst=`command -v $tst`
++        fi
+         name=`func_basename "$1"`
+     else
+         name=`func_basename "$tst"`
+@@ -247,10 +255,10 @@ run_test_case()
+             shift
+             if echo "$tst" | grep -q '^/' ; then
+                 # absolute path for Meson
+-                "$interpreter" "$tst" ${1+"$@"}
++                "$interpreter" $PYTHON_TEST_ARGS "$tst" ${1+"$@"}
+             else
+                 # relative path for autotools
+-                "$interpreter" "../$tst" ${1+"$@"}
++                "$interpreter" $PYTHON_TEST_ARGS "../$tst" ${1+"$@"}
+             fi
+         else
+             # absolute path for Meson
+-- 
+2.54.0
+
+From 26aaf13bd62b972cfee1f4b58ba168d214e99eca Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Tue, 26 May 2026 21:19:43 +0900
+Subject: [PATCH 15/15] client/wayland: Ignore wrong cursor and anchor in surrounding-text
+
+KDE Plasma could send wrong cursor and anchor with surrounding_text()
+signal in `zwp_input_method_context_v1_listener`.
+I'm not sure if it's caused by the compositor or IBus engines but
+ibus-wayland should ignore them.
+
+Closes: rhbz#2444787
+---
+ client/wayland/ibuswaylandim.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/client/wayland/ibuswaylandim.c b/client/wayland/ibuswaylandim.c
+index 37fe4bad..367b07c5 100644
+--- a/client/wayland/ibuswaylandim.c
++++ b/client/wayland/ibuswaylandim.c
+@@ -805,11 +805,21 @@ handle_surrounding_text (void                                  *data,
+ #if ENABLE_SURROUNDING
+     IBusWaylandIM *wlim = data;
+     IBusWaylandIMPrivate *priv;
++    size_t len;
+     IBusText *ibustext;
+ 
+     g_return_if_fail (IBUS_IS_WAYLAND_IM (wlim));
++    g_return_if_fail (text);
+     priv = ibus_wayland_im_get_instance_private (wlim);
+ 
++    len = strlen (text);
++    if (G_UNLIKELY (len > G_MAXUINT32 || len < cursor || len < anchor)) {
++        /* Should not show the text as a security reason. */
++        g_warning ("Received a wrong surrounding text length %zu < cursor %u "
++                   "anchor %u",
++                   len, cursor, anchor);
++        return;
++    }
+     ibustext = ibus_text_new_from_string (text);
+ 
+     if (priv->surrounding_text)
+-- 
+2.54.0
+
+From 44e22e5e7602bc79040df42cbfa836ba32da01ef Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Thu, 16 Jul 2026 12:37:28 +0900
+Subject: [PATCH 1/2] src/tests: Fix CI issues in GNOME 50
+
+- 100-ibus-ci.rules: Disable authentication dialogs in gnome-shell
+- ibus-compose:
+  o Add taking screenshots with IBUS_TEST_SCREENSHOT
+  o Define ibus_break_if_fail() from g_return_if_fail()
+- ibus-desktop-testing-autostart: Call dump_screen_of_test_cases()
+- ibus-desktop-testing-module:
+  o Update the latest gnome-shell service file for GNOME 50.
+  o Replace init with systemctl in ibus-desktop-testing-module
+  o Set locale for gnome-shell while the user systemd runs in C locale
+  o Implement dump_screen_of_test_cases() to dump screenshots of test cases
+  o export IBUS_TEST_SCREENSHOT to each test case to take screenshots
+  o Install polkit rule file
+  o forward --screendump option to autostart script
+- runtest: Set tstdir for Python test cases
+
+- src/tests/Makefile: Install 100-ibus-ci.rules
+
+Closes #2921
+---
+ src/tests/100-ibus-ci.rules                 |   8 ++
+ src/tests/Makefile.am                       |  12 +-
+ src/tests/ibus-compose.c                    |  76 ++++++++++++
+ src/tests/ibus-desktop-testing-autostart.in |   1 +
+ src/tests/ibus-desktop-testing-module       | 122 ++++++++++++++++----
+ src/tests/runtest                           |  81 ++++++-------
+ 6 files changed, 266 insertions(+), 80 deletions(-)
+ create mode 100644 src/tests/100-ibus-ci.rules
+
+diff --git a/src/tests/100-ibus-ci.rules b/src/tests/100-ibus-ci.rules
+new file mode 100644
+index 00000000..d6d2f7c0
+--- /dev/null
++++ b/src/tests/100-ibus-ci.rules
+@@ -0,0 +1,8 @@
++polkit.addRule(function(action, subject) {
++    if ((action.id == "org.freedesktop.Flatpak.metadata-update" ||
++         action.id == "org.freedesktop.Flatpak.modify-repo" ||
++         action.id == "org.freedesktop.fwupd.refresh-remote" ) &&
++        subject.isInGroup("itestuser")) {
++        return polkit.Result.YES;
++    }
++});
+diff --git a/src/tests/Makefile.am b/src/tests/Makefile.am
+index 75caab57..47cd3db1 100644
+--- a/src/tests/Makefile.am
++++ b/src/tests/Makefile.am
+@@ -131,11 +131,14 @@ CLEANFILES += ibus-compose-locales
+ endif
+ test_execsdir = $(libexecdir)/installed-tests/ibus
+ libexec_SCRIPTS = \
+-  ibus-desktop-testing-autostart \
+-  ibus-desktop-testing-module \
+-  $(NULL)
++    ibus-desktop-testing-autostart \
++    ibus-desktop-testing-module \
++    $(NULL)
+ 
+-test_frame_DATA = org.freedesktop.IBus.Desktop.Testing.desktop
++test_frame_DATA = \
++    100-ibus-ci.rules \
++    org.freedesktop.IBus.Desktop.Testing.desktop \
++    $(NULL)
+ test_framedir = $(pkgdatadir)/tests
+ org.freedesktop.IBus.Desktop.Testing.desktop: ibus-desktop-testing.desktop.in
+ 	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|g" \
+@@ -194,6 +197,7 @@ ibus-desktop-testing-runner: ibus-desktop-testing-runner.in
+ EXTRA_DIST = \
+     $(test_metas_in) \
+     $(TESTS_SCRIPT) \
++    100-ibus-ci.rules \
+     runtest \
+     ibus-compose.basic \
+     ibus-compose.basic2 \
+diff --git a/src/tests/ibus-compose.c b/src/tests/ibus-compose.c
+index 69f844b2..c36b4c81 100644
+--- a/src/tests/ibus-compose.c
++++ b/src/tests/ibus-compose.c
+@@ -7,6 +7,17 @@
+ #define RED   "\033[0;31m"
+ #define NC    "\033[0m"
+ 
++#define ibus_break_if_fail(expr) \
++    G_STMT_START { \
++        if (G_LIKELY (expr)) { \
++        } else { \
++            g_return_if_fail_warning (G_LOG_DOMAIN, \
++                                      G_STRFUNC, \
++                                      #expr); \
++            break; \
++        } \
++    } G_STMT_END
++
+ static gchar *m_test_locale;
+ static gchar *m_test_name;
+ static gchar *m_session_name;
+@@ -113,6 +124,67 @@ get_compose_path ()
+ }
+ 
+ 
++static void
++take_screenshot (void)
++{
++    gint64 t;
++    GDateTime *dt;
++    gchar *prgname = NULL;
++    gchar *casename = NULL;
++    gchar *filename = NULL;
++    gchar *path = NULL;
++    gchar *args[4] = { "gnome-screenshot", "--file", 0, 0 };
++    GSpawnFlags flags = G_SPAWN_SEARCH_PATH;
++    gchar *std_output = NULL;
++    gchar *std_error = NULL;
++    GError *error = NULL;
++
++    t = g_get_real_time ();
++    t = t / G_USEC_PER_SEC;
++    dt = g_date_time_new_from_unix_utc (t);
++    g_return_if_fail (dt);
++
++    while (FALSE) {
++        prgname = g_path_get_basename (g_get_prgname ());
++        casename = g_path_get_basename (g_test_get_path ());
++        ibus_break_if_fail (prgname);
++        ibus_break_if_fail (casename);
++        filename = g_strdup_printf ("%s%s-%02d%02d%02d.png",
++                                    prgname, casename,
++                                    g_date_time_get_hour (dt),
++                                    g_date_time_get_minute (dt),
++                                    g_date_time_get_second (dt));
++        ibus_break_if_fail (filename);
++        /* The ibus-compose-locales runs in a temp dir. */
++        path = g_build_filename (g_get_home_dir (), filename, NULL);
++        ibus_break_if_fail (path);
++        args[2] = path;
++        if (!g_spawn_sync (NULL, args, NULL, flags, NULL, NULL,
++                           &std_output, &std_error,
++                           NULL,
++                           &error)) {
++            g_warning ("Failed to take a screenshot: %s: %s: %s",
++                       error->message,
++                       std_output ? std_output : "",
++                       std_error ? std_error : "");
++            g_error_free (error);
++        } else if (std_error && *std_error) {
++            g_warning ("Failed to take a screenshot: %s: %s",
++                       std_output ? std_output : "",
++                       std_error);
++        }
++    }
++
++    g_free (prgname);
++    g_free (casename);
++    g_date_time_unref (dt);
++    g_free (filename);
++    g_free (path);
++    g_free (std_output);
++    g_free (std_error);
++}
++
++
+ gboolean
+ idle_cb (gpointer user_data)
+ {
+@@ -436,9 +508,13 @@ set_engine_cb (GObject      *object,
+         return;
+     }
+ 
++    if (g_getenv ("IBUS_TEST_SCREENSHOT"))
++        take_screenshot ();
+     send_key_event (m_compose_table);
+     if (m_no_load_compose_table)
+         send_key_event (m_no_load_compose_table);
++    if (g_getenv ("IBUS_TEST_SCREENSHOT"))
++        take_screenshot ();
+ 
+ #if GTK_CHECK_VERSION (4, 0, 0)
+     g_signal_handlers_disconnect_by_func (
+diff --git a/src/tests/ibus-desktop-testing-autostart.in b/src/tests/ibus-desktop-testing-autostart.in
+index 9ecc8c27..a9a57bed 100755
+--- a/src/tests/ibus-desktop-testing-autostart.in
++++ b/src/tests/ibus-desktop-testing-autostart.in
+@@ -76,6 +76,7 @@ main()
+     #run_monitor
+     save_screen
+     run_test_suite
++    dump_screen_of_test_cases
+     finit
+ }
+ 
+diff --git a/src/tests/ibus-desktop-testing-module b/src/tests/ibus-desktop-testing-module
+index 55eb248e..b71d73a9 100755
+--- a/src/tests/ibus-desktop-testing-module
++++ b/src/tests/ibus-desktop-testing-module
+@@ -51,16 +51,19 @@ TEST_USER=itestuser
+ TEST_USER_HOME=/export/home/$TEST_USER
+ GDM_CONF=/run/gdm/custom.conf
+ AUTOSTART_DESKTOP_FILE="org.freedesktop.IBus.Desktop.Testing.desktop"
++POLKIT_CUSTOM_RULE_FILE="100-ibus-ci.rules"
+ TESTS=""
+ TIMEOUT=300
+ GREEN='\033[0;32m'
+ RED='\033[0;31m'
+ NC='\033[0m'
++DQ='"'
+ ENV_CHECK=0
+ ENV_COMMANDS='
+ id
+ pwd
+ pstree -asp $$
++tr "\\0" "\\n" < /proc/$$/environ
+ gsettings list-recursively org.gnome.shell
+ rpm -q gnome-shell-extension-no-overview gnome-shell gnome-session
+ ps -ef | grep ibus | grep -v TMT | grep -v grep
+@@ -132,7 +135,7 @@ delete-tests\
+ check_tty()
+ {
+     TTY=`tty`
+-    if echo $PROGNAME | grep -q runner ; then
++    if echo "$PROGNAME" | grep -q runner ; then
+         if [ $ENABLED_SYSTEMD -eq 1 ] && [  $SESSION_IS_GNOME -eq 1 ] ; then
+             # "not a tty" is correct with TMT tool
+             if echo "$TTY" | grep -E 'tty|console' | grep -v "not a tty" ; then
+@@ -217,6 +220,20 @@ save_screen()
+ }
+ 
+ 
++dump_screen_of_test_cases()
++{
++    if test x"$SCREEN_LOG" != xSTDOUT ; then
++        return
++    fi
++    for png in "$TEST_USER_HOME"/*.png ; do
++        test -f "$png" || continue
++        echo "## Dump start $png" 2>>$TEST_LOG 1>>$TEST_LOG
++        base64 "$png"             2>>$TEST_LOG 1>>$TEST_LOG
++        echo "## Dump end $png"   2>>$TEST_LOG 1>>$TEST_LOG
++    done
++}
++
++
+ create_test_user()
+ {
+     if grep -q $TEST_USER /etc/passwd; then
+@@ -230,10 +247,11 @@ create_test_user()
+ 
+ create_autologin_gdm()
+ {
+-    if test -f $GDM_CONF && grep -q $TEST_USER $GDM_CONF; then
++    mkdir -p  `dirname "$GDM_CONF"`
++    if test -f "$GDM_CONF" && grep -q "$TEST_USER" "$GDM_CONF"; then
+         return;
+     fi
+-    cat > $GDM_CONF << _EOF_GDM_CONF
++    cat > "$GDM_CONF" << _EOF_GDM_CONF
+ [daemon]
+ AutomaticLoginEnable=true
+ AutomaticLogin=$TEST_USER
+@@ -256,7 +274,12 @@ create_xdg_autostart()
+         exit 1
+     fi
+     mkdir -p "$TEST_USER_HOME/.config/autostart"
+-    sed -e "s/\(^Exec=.*\)tests ibus\(.*\)/\1tests $TESTS\2/" "$desktop_file" \
++    ARGS_PLUS=""
++    if test x"$SCREEN_LOG" != x ; then
++        ARGS_PLUS="$ARGS_PLUS --screendump $SCREEN_LOG"
++    fi
++    sed -e "s/\(^Exec=.*\)tests ibus\(.*\)/\1tests $TESTS $ARGS_PLUS\2/" \
++        "$desktop_file" \
+         > "$TEST_USER_HOME/.config/autostart/$AUTOSTART_DESKTOP_FILE"
+     LINE="AutostartCondition=if-exists $TEST_USER_HOME/.config/autostart/$AUTOSTART_DESKTOP_FILE"
+     echo "$LINE" >> "$TEST_USER_HOME/.config/autostart/$AUTOSTART_DESKTOP_FILE"
+@@ -334,6 +357,21 @@ init_session()
+         TESTS='ibus'
+     fi
+     check_tty
++    IS_SYSTEM_ACCOUNT=false
++    if [ "$LOGIN_USER" = "root" ] ; then
++            IS_SYSTEM_ACCOUNT=true
++    fi
++    if test x"$SESSION_LANG" = x ; then
++        SESSION_LANG=$LANG
++    fi
++    if test x"$SCREEN_LOG" != x ; then
++        export IBUS_TEST_SCREENSHOT=1
++    fi
++
++    if ! echo "$PROGNAME" | grep -q runner ; then
++        return
++    fi
++
+     if [ $ENABLED_SYSTEMD -eq 1 ] && [  $SESSION_IS_GNOME -eq 1 ] ; then
+         SESSION_FILE1="/usr/lib/systemd/system/gnome-headless-session@.service"
+         SESSION_FILE2="/usr/lib/systemd/system/graphical.target"
+@@ -365,13 +403,6 @@ init_session()
+         touch $LOGIN_HOME/.config/gnome-initial-setup-done
+         chown -R $LOGIN_USER $LOGIN_HOME/.config
+     fi
+-    IS_SYSTEM_ACCOUNT=false
+-    if [ "$LOGIN_USER" = "root" ] ; then
+-            IS_SYSTEM_ACCOUNT=true
+-    fi
+-    if test x"$SESSION_LANG" = x ; then
+-        SESSION_LANG=$LANG
+-    fi
+     if test -f /var/lib/AccountsService/users/$LOGIN_USER; then
+         sed -i -e "s/\(Language=\).*/\1$SESSION_LANG/" \
+                 /var/lib/AccountsService/users/$LOGIN_USER
+@@ -384,6 +415,35 @@ XSession=gnome
+ SystemAccount=$IS_SYSTEM_ACCOUNT
+ _EOF_AS_CONF
+     fi
++    # for ibus-keypress
++    ls -l /dev/uinput 2>>$TEST_LOG 1>>$TEST_LOG
++    chgrp itestuser /dev/uinput
++    chmod g+rw /dev/uinput
++    ls -l /dev/uinput 2>>$TEST_LOG 1>>$TEST_LOG
++
++    # aciton.id 'org.freedesktop.fwupd.refresh-remote' and
++    # aciton.message "Authentication is required to update the metadata for a "
++    # "configured remote used for firmware updates" is defined in
++    # /usr/share/polkit-1/actions/org.freedesktop.fwupd.policy file
++    # and that message is shown in "Authentication Required" dialog in
++    # gnome-shell headless session in GNOME 50.
++    # action.id 'org.freedesktop.Flatpak.metadata-update' and
++    # action.id 'org.freedesktop.Flatpak.modify-repo' are also shown.
++    rule_file="$AUTOSTART_DESKTOP_DIR/$POLKIT_CUSTOM_RULE_FILE"
++    if test ! -f "$rule_file" ; then
++        print_log -e "${RED}FAIL${NC}: ${RED}ERROR${NC}: No $rule_file"
++        exit 1
++    fi
++    POLKIT_CUSTOM_RULE_DIR="/etc/polkit-1/rules.d"
++    if test ! -d "$POLKIT_CUSTOM_RULE_DIR" ; then
++        mkdir -p  "$POLKIT_CUSTOM_RULE_DIR"
++        chmod 755 "$POLKIT_CUSTOM_RULE_DIR"
++    fi
++    if test ! -f "$POLKIT_CUSTOM_RULE_DIR/$POLKIT_CUSTOM_RULE_FILE" ; then
++        cp "$rule_file" "$POLKIT_CUSTOM_RULE_DIR/$POLKIT_CUSTOM_RULE_FILE"
++        chmod 644 "$POLKIT_CUSTOM_RULE_DIR/$POLKIT_CUSTOM_RULE_FILE"
++        systemctl restart polkit
++    fi
+ 
+     # Prevent from launching a XDG dialog
+     XDG_LOCALE_FILE="$LOGIN_HOME/.config/user-dirs.locale"
+@@ -503,19 +563,39 @@ init_gnome()
+     ## gnome-headless-session does not pull LANG from AccountsService.
+     ##
+     if [ $LOGIN_USER != $USER ] ; then
+-        SHELL_SERVICE_FILE="org.gnome.Shell@wayland.service"
++        SHELL_SERVICE_FILE="org.gnome.Shell@.service"
++        SHELL_SERVICE_DEST_FILE="org.gnome.Shell@user.service"
+         SYSTEMD_USER_DIR="$TEST_USER_HOME/.config/systemd/user"
+         ENV_USER_DIR="$TEST_USER_HOME/.config/environment.d"
+         LOCALE_CONF="$ENV_USER_DIR/ibus.conf"
++        # If GNOME version < 50
++        if test ! -f "$SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE" ; then
++            SHELL_SERVICE_FILE="org.gnome.Shell@wayland.service"
++            SHELL_SERVICE_DEST_FILE="$SHELL_SERVICE_FILE"
++        else
++            GNOME_SHELL_WAYLAND_COMMAND="$GNOME_SHELL_WAYLAND_COMMAND --mode=%i"
++        fi
++        if test x"$SCREEN_LOG" != x ; then
++            GNOME_SHELL_WAYLAND_COMMAND="$GNOME_SHELL_WAYLAND_COMMAND --unsafe-mode"
++        fi
+         if test $HAVE_GRAPHICS -ne 1 ; then
+             if test ! -f "$SYSTEMD_USER_DIR/$SHELL_SERVICE_FILE" ; then
++                PREV_DIR="$PWD"
+                 mkdir -p "$SYSTEMD_USER_DIR"
+-                pushd "$SYSTEMD_USER_DIR"
++                cd "$SYSTEMD_USER_DIR"
++                # The user systemd and $GNOME_SHELL_WAYLAND_COMMAND no longer
++                # loads $LOCALE_CONF file
++                # So sets Environment in the service file.
+                 sed -e "s|^ExecStart=.*|ExecStart=$GNOME_SHELL_WAYLAND_COMMAND|" \
+-                    $SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE \
+-                    > $SHELL_SERVICE_FILE
+-                diff $SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE $SHELL_SERVICE_FILE
+-                popd
++                    $SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE | \
++                sed -e "/^ExecStart=/i\\
++Environment=LANG=$DQ$SESSION_LANG$DQ" \
++                    > "$SHELL_SERVICE_DEST_FILE"
++                echo "# diff $SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE" \
++                     "$SHELL_SERVICE_DEST_FILE" 2>>$TEST_LOG 1>>$TEST_LOG
++                diff "$SYSTEMD_SYSTEM_DIR/$SHELL_SERVICE_FILE" \
++                     "$SHELL_SERVICE_DEST_FILE" 2>>$TEST_LOG 1>>$TEST_LOG
++                cd "$PREV_DIR"
+             fi
+             mkdir -p "$ENV_USER_DIR"
+             cat > "$LOCALE_CONF" << _EOF_LOCALE_CONF
+@@ -590,7 +670,7 @@ operate_desktop_with_systemd()
+         "start") systemctl isolate graphical.target
+                  echo ""
+                  ;;
+-        "stop")  init 3;;
++        "stop")  systemctl isolate multi-user.target;;
+         "")      print_log -e "${RED}FAIL${NC}: ${RED}ERROR${NC}: Wrong command $COMMAND"
+                  exit 1;;
+         esac
+@@ -808,6 +888,8 @@ run_gnome_desktop_testing_runner()
+     fail=0
+     if echo $PROGNAME | grep -q autostart ; then
+         export IBUS_DAEMON_WITH_SYSTEMD=1
++        #export GSK_RENDERER=cairo
++        export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.`uname -m`.json
+     fi
+     for tst in $TESTS; do
+         tst_dir="$TEST_CASE_DIR/$tst"
+@@ -840,7 +922,7 @@ EOF
+ run_test_suite()
+ {
+     print_log -e "Start test suite `date '+%F %H:%M:%S:%N'`"
+-    if echo $PROGNAME | grep -q runner ; then
++    if echo "$PROGNAME" | grep -q runner ; then
+         if [ $ENABLED_SYSTEMD -eq 1 ] && [  $SESSION_IS_GNOME -eq 1 ] ; then
+             wait_for_systemd_autostart
+             return
+@@ -903,7 +985,7 @@ finit()
+             echo "$LEFT_CALENDAR" | awk '{print $2}' | xargs kill
+         fi
+     fi
+-    if echo $PROGNAME | grep -q runner ; then
++    if echo "$PROGNAME" | grep -q runner ; then
+         if [ $ENABLED_SYSTEMD -eq 1 ] && [  $SESSION_IS_GNOME -eq 1 ] ; then
+             operate_desktop_with_systemd "stop"
+         fi
+diff --git a/src/tests/runtest b/src/tests/runtest
+index 4e54420f..dee675cb 100755
+--- a/src/tests/runtest
++++ b/src/tests/runtest
+@@ -94,12 +94,12 @@ func_dirname () {
+ 
+ # Kill ibus-daemon process and remove temporary files.
+ func_cleanup () {
+-    tstdir=$1
+-    if test -f $tstdir/ibus-daemon.pid; then
+-        . $tstdir/ibus-daemon.pid
++    tstdir="$1"
++    if test -f "$tstdir/ibus-daemon.pid"; then
++        . "$tstdir/ibus-daemon.pid"
+         kill $IBUS_DAEMON_PID > /dev/null 2>&1
+     fi
+-    rm -fr $tstdir
++    rm -fr "$tstdir"
+ }
+ 
+ # Prepare component files necessary for testing, under components/.
+@@ -115,13 +115,18 @@ func_copy_component () {
+     fi
+ }
+ 
+-trap 'func_cleanup $tstdir' 1 2 3 15
++trap 'func_cleanup "$tstdir"' 1 2 3 15
+ 
+-tst=$1; shift
+-tstdir=tmp-`func_basename $tst`
++tst="$1"; shift
++real_tst="$tst"
++if echo "$tst" | grep -q 'python' ; then
++    real_tst="$1"
++fi
++real_tst_name=`func_basename "$real_tst"`
++tstdir="tmp-$real_tst_name"
+ 
+ for t in $DISABLE_GUI_TESTS; do
+-    if test $t = `func_basename $tst`; then
++    if test "$t" = "$real_tst_name"; then
+         exit 77
+     fi
+ done
+@@ -134,24 +139,22 @@ fi
+ 
+ run_test_case()
+ {
+-    test -d $tstdir || mkdir $tstdir
+-    backup_dir=$PWD
+-    cd $tstdir
+-
+     if echo "$tst" | grep -q 'python' ; then
+         # Convert the relative path to the absolute path.
+         if echo "$tst" | grep -q "\./" ; then
+-            tst=`realpath $tst`
++            tst=`realpath "$tst"`
+         elif ! echo "$tst" | grep -q "/" ; then
+-            tst=`command -v $tst`
++            tst=`command -v "$tst"`
+         fi
+-        name=`func_basename "$1"`
+-    else
+-        name=`func_basename "$tst"`
+     fi
++
++    test -d "$tstdir" || mkdir "$tstdir"
++    backup_dir="$PWD"
++    cd "$tstdir"
++
+     need_bus=no
+     for t in $BUS_REQUIRED_TESTS; do
+-        if test "$t" = "$name"; then
++        if test "$t" = "$real_tst_name"; then
+             need_bus=yes
+         fi
+     done
+@@ -165,10 +168,10 @@ run_test_case()
+         func_copy_component "$test_top_srcdir/engine/simple.xml"
+         func_copy_component "$test_top_srcdir/conf/memconf/memconf.xml"
+ 
+-        IBUS_COMPONENT_PATH=$PWD/components
++        IBUS_COMPONENT_PATH="$PWD/components"
+         export IBUS_COMPONENT_PATH
+ 
+-        IBUS_ADDRESS_FILE=$PWD/ibus-daemon.pid
++        IBUS_ADDRESS_FILE="$PWD/ibus-daemon.pid"
+         export IBUS_ADDRESS_FILE
+ 
+         test $TEST_GTK -eq 1 && case $TEST_GTK_VERSION in
+@@ -194,9 +197,9 @@ run_test_case()
+                 echo "NOT FOUND $top_builddir/client/gtk3/im-ibus.so"
+                 exit 1
+             fi
+-            GTK_IM_MODULE_FILE=$PWD/imcache
++            GTK_IM_MODULE_FILE="$PWD/imcache"
+             export GTK_IM_MODULE_FILE
+-            $GTK_QUERY_MODULE "$IM_IBUS_SO" > $GTK_IM_MODULE_FILE
++            $GTK_QUERY_MODULE "$IM_IBUS_SO" > "$GTK_IM_MODULE_FILE"
+             ;;
+         *)
+             echo "NOT SUPPORT GTK_VERSION $TEST_GTK_VERSION"
+@@ -204,19 +207,19 @@ run_test_case()
+             ;;
+         esac || :
+ 
+-        cp "$test_top_srcdir/data/dconf/$IBUS_SCHEMA_FILE" $PWD
+-        glib-compile-schemas $PWD 2>/dev/null
++        cp "$test_top_srcdir/data/dconf/$IBUS_SCHEMA_FILE" "$PWD"
++        glib-compile-schemas "$PWD" 2>/dev/null
+         if test $? -ne 0 ; then
+             echo "FAILED glib-compile-schemas"
+             retval=1
+             return
+         fi
+-        if test ! -f $PWD/gschemas.compiled ; then
++        if test ! -f "$PWD/gschemas.compiled" ; then
+             echo "NOT FOUND $PWD/gschemas.compiled"
+             retval=1
+             return
+         fi
+-        export GSETTINGS_SCHEMA_DIR=$PWD
++        export GSETTINGS_SCHEMA_DIR="$PWD"
+ 
+         # Start ibus-daemon.
+         DAEMON_ARGS='
+@@ -227,10 +230,10 @@ run_test_case()
+             --verbose
+         '
+         if test x"$DISABLE_DAEMONIZE_IN_TESTS" = x ; then
+-            $test_top_builddir/bus/ibus-daemon \
++            "$test_top_builddir/bus/ibus-daemon" \
+                 $DAEMON_ARGS --daemonize;
+         else
+-            $test_top_builddir/bus/ibus-daemon \
++            "$test_top_builddir/bus/ibus-daemon" \
+                 $DAEMON_ARGS &
+         fi
+ 
+@@ -250,8 +253,8 @@ run_test_case()
+ 
+     if echo "$tst" | grep -q '^/' ; then
+         if echo "$tst" | grep -q 'python' ; then
+-            interpreter=$tst
+-            tst=$1
++            interpreter="$tst"
++            tst="$1"
+             shift
+             if echo "$tst" | grep -q '^/' ; then
+                 # absolute path for Meson
+@@ -262,28 +265,28 @@ run_test_case()
+             fi
+         else
+             # absolute path for Meson
+-            "$tst" $test_top_srcdir/src/tests ${1+"$@"}
++            "$tst" "$test_top_srcdir/src/tests" ${1+"$@"}
+         fi
+     else
+         # relative path for each execution
+-        "../$tst" $test_top_srcdir/src/tests ${1+"$@"}
++        "../$tst" "$test_top_srcdir/src/tests" ${1+"$@"}
+     fi
+ 
+     retval=`expr $retval \| $?`
+ 
+-    cd $backup_dir
++    cd "$backup_dir"
+ 
+-    func_cleanup $tstdir
++    func_cleanup "$tstdir"
+ }
+ 
+-envfile=$srcdir/`func_basename $tst`.env
+-if test -f $envfile ; then
++envfile="$srcdir/$real_tst_name".env
++if test -f "$envfile" ; then
+     ENVS="`cat $envfile`"
+ fi;
+ if test x"$ENVS" = x ; then
+     run_test_case $@
+ else
+-    LANG_backup=$LANG
++    LANG_backup="$LANG"
+     i=1
+     # mesonbuild/mtest.py:TAPParser.parse_line() says:
+     # 'version number must be on the first line'
+@@ -307,7 +310,7 @@ else
+         unset COMPOSE_FILE
+         export $e
+         # TAP info should start with "# ".
+-        echo "# Run `func_basename $tst` on $e"
++        echo "# Run $real_tst_name on $e"
+         echo "# ======================="
+         run_test_case $@
+         name="/"`basename "$1"`":$LANG:$COMPOSE_FILE:$NO_LOAD_COMPOSE_FILE"
+@@ -325,7 +328,7 @@ else
+     `echo "$ENVS"`
+ EOF_ENVS
+     unset G_TEST_ROOT_PROCESS
+-    export LANG=$LANG_backup
++    export LANG="$LANG_backup"
+ fi
+ 
+ exit $retval
+-- 
+2.54.0
+
+From 1a0d9a6bc3afe241838c97ca381e1bd0b376a2b5 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Sun, 19 Jul 2026 18:10:01 +0900
+Subject: [PATCH 2/2] src/tests/ibus-compose: Fix typo
+
+Fixes: 44e22e5e
+---
+ src/tests/ibus-compose.c | 4 ++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/tests/ibus-compose.c b/src/tests/ibus-compose.c
+index c36b4c81..d0c573e5 100644
+--- a/src/tests/ibus-compose.c
++++ b/src/tests/ibus-compose.c
+@@ -144,7 +144,7 @@ take_screenshot (void)
+     dt = g_date_time_new_from_unix_utc (t);
+     g_return_if_fail (dt);
+ 
+-    while (FALSE) {
++    do {
+         prgname = g_path_get_basename (g_get_prgname ());
+         casename = g_path_get_basename (g_test_get_path ());
+         ibus_break_if_fail (prgname);
+@@ -173,7 +173,7 @@ take_screenshot (void)
+                        std_output ? std_output : "",
+                        std_error);
+         }
+-    }
++    } while (FALSE);
+ 
+     g_free (prgname);
+     g_free (casename);
+-- 
+2.54.0
 

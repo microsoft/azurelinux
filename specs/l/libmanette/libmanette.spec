@@ -3,7 +3,7 @@
 
 Name:           libmanette
 Version:        0.2.13
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        Game controller library
 
 License:        LGPL-2.1-or-later
@@ -67,6 +67,9 @@ developing applications that use %{name}.
 %{_datadir}/vala/
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Oct 10 2025 Petr Schindler <pschindl@redhat.com> - 0.2.13-1
 - Update to 0.2.13
 

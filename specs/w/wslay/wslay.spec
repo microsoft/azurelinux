@@ -5,7 +5,7 @@
 
 Name:           wslay
 Version:        1.1.1
-Release: 10%{?dist}
+Release:        8%{?dist}
 Summary:        Lightweight WebSocket library in C
 License:        MIT
 URL:            https://tatsuhiro-t.github.io/wslay
@@ -82,6 +82,9 @@ EOF
 %{_libdir}/pkgconfig/lib%{name}.pc
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.1-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sun Jul 27 2025 Rémi Verschelde <akien@fedoraproject.org> - 1.1.1-7
 - Patch config to support CMake 4.0 with min policy 3.5 (rhbz#2381635)
 

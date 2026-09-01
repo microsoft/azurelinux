@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        4.9
-Release: 15%{?dist}
+Release:        13%{?dist}
 Summary:        Pure-Python RSA implementation
 
 License:        Apache-2.0
@@ -76,6 +76,9 @@ cp %{buildroot}%{_bindir}/pyrsa-verify %{buildroot}%{_bindir}/pyrsa-verify-3
 # %{__python3} setup.py test
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.9-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.9-12
 - Rebuilt for Python 3.14.0rc3 bytecode
 

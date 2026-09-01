@@ -7,7 +7,7 @@
 
 Name: python-%{srcname}
 Version: 0.5.1
-Release: 35%{?dist}
+Release: 33%{?dist}
 BuildArch: noarch
 
 # Automatically converted from old format: BSD - review is highly recommended.
@@ -81,6 +81,9 @@ py.test-3
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.1-33
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.5.1-32
 - Rebuilt for Python 3.14.0rc3 bytecode
 

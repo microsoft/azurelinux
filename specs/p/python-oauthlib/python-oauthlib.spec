@@ -5,17 +5,14 @@
 %bcond extras %{undefined rhel}
 
 Name:               python-oauthlib
-Version:            3.2.2
-Release: 13%{?dist}
+Version:            3.3.1
+Release:            1%{?dist}
 Summary:            An implementation of the OAuth request-signing logic
 
 License:            BSD-3-Clause
 URL:                https://github.com/oauthlib/oauthlib
 
 Source0:            https://github.com/oauthlib/oauthlib/archive/v%{version}/%{name}-%{version}.tar.gz
-
-# Make UtilsTests.test_filter_params Python 3.13+ compatible
-Patch:              https://github.com/oauthlib/oauthlib/pull/866.patch
 
 BuildArch:          noarch
 
@@ -67,6 +64,7 @@ echo 'import pytest; __getattr__ = lambda _: pytest.skip("this test needs jwt")'
 %endif
 %{pytest} \
 %if %{without extras}
+  --ignore tests/oauth1/rfc5849/test_signatures.py \
   --ignore tests/oauth2/rfc6749/clients/test_service_application.py \
   --ignore tests/oauth2/rfc6749/clients/test_web_application.py \
   --ignore tests/oauth2/rfc6749/clients/test_mobile_application.py \
@@ -80,6 +78,12 @@ echo 'import pytest; __getattr__ = lambda _: pytest.skip("this test needs jwt")'
 %doc README.rst
 
 %changelog
+* Mon Feb 02 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 3.3.1-1
+- Update to 3.3.1
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 3.2.2-10
 - Rebuilt for Python 3.14.0rc3 bytecode
 

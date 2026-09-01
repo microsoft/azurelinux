@@ -3,7 +3,7 @@
 
 Name:           python-notebook-shim
 Version:        0.2.4
-Release: 11%{?dist}
+Release:        9%{?dist}
 Summary:        A shim layer for notebook traits and config
 License:        BSD-3-Clause
 URL:            https://pypi.org/project/notebook-shim/
@@ -62,6 +62,9 @@ mv -v %{buildroot}{%{_prefix},}%{_sysconfdir}/jupyter/jupyter_server_config.d/no
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.2.4-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.2.4-8
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -1,0 +1,59 @@
+From 1709c39ac6c8743cbac2160ab028cca2332406a3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Thu, 13 Aug 2026 14:29:04 +0200
+Subject: [PATCH 1/2] Fix integer overflow on 32-bit platforms in D-Bus history
+ limit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Building on i686 failed:
+
+    /builddir/build/BUILD/dnf5-5.4.3.0-build/dnf5-5.4.3.0/dnf5daemon-server/services/history/history.cpp: In member function ‘sdbus::MethodReply History::list(sdbus::MethodCall&)’:
+    /builddir/build/BUILD/dnf5-5.4.3.0-build/dnf5-5.4.3.0/dnf5daemon-server/services/history/history.cpp:414:51: error: conversion from ‘long long int’ to ‘__gnu_cxx::__normal_iterator<libdnf5::transaction::Transaction*, std::vector<libdnf5::transaction::Transaction> >::difference_type’ {aka ‘int’} may change value [-Werror=conversion]
+      414 |         transactions.erase(transactions.begin() + limit, transactions.end());
+	  |                                                   ^~~~~
+
+The cause was right-hand side of "+" operator after an iterator requires a
+ptrdiff_t type, which is 32-bit signed int on 32-bit platforms. Hence the
+compiler correctly complained that a limit value larger than 2^31-1 could be
+misinterpreted when coercing 64-bit signed limit variable.
+
+This patch adds thetype cast to placate the compiler and the necessary check
+for the maximal representiable value for ptrdiff_t. It also adds a missing
+uppper bound check for size_t type.
+---
+ dnf5daemon-server/services/history/history.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/dnf5daemon-server/services/history/history.cpp b/dnf5daemon-server/services/history/history.cpp
+index 3460748a5..789858fce 100644
+--- a/dnf5daemon-server/services/history/history.cpp
++++ b/dnf5daemon-server/services/history/history.cpp
+@@ -34,7 +34,10 @@
+ #include <libdnf5/utils/format.hpp>
+ #include <sdbus-c++/sdbus-c++.h>
+ 
++#include <cstddef>
++#include <limits>
+ #include <unordered_map>
++#include <utility>
+ 
+ namespace {
+ 
+@@ -410,8 +413,10 @@ sdbus::MethodReply History::list(sdbus::MethodCall & call) {
+     }
+ 
+     // Apply limit
+-    if (limit > 0 && transactions.size() > static_cast<size_t>(limit)) {
+-        transactions.erase(transactions.begin() + limit, transactions.end());
++    if (limit > 0 && std::cmp_less(limit, std::numeric_limits<size_t>::max()) &&
++        std::cmp_less(limit, std::numeric_limits<ptrdiff_t>::max()) &&
++        transactions.size() > static_cast<size_t>(limit)) {
++        transactions.erase(transactions.begin() + static_cast<ptrdiff_t>(limit), transactions.end());
+     }
+ 
+     // Build output
+-- 
+2.55.0
+

@@ -1,0 +1,53 @@
+From 392d12021a17e33534051d2ce007457f008a6595 Mon Sep 17 00:00:00 2001
+From: Benjamin Drung <benjamin.drung@canonical.com>
+Date: Tue, 27 Jan 2026 12:33:12 +0100
+Subject: [PATCH 13/13] fix(tpm2-tss): add tss user/group in addition to
+ sysusers config
+
+Test 10 on ubuntu:devel shows this warning:
+
+```
+[    0.608623] systemd-tmpfiles[243]: /usr/lib/tmpfiles.d/systemd.conf:33: Duplicate line for path "/var/lib/systemd", ignoring.
+[    0.609389] systemd-tmpfiles[243]: /usr/lib/tmpfiles.d/tpm2-tss-fapi.conf:2: Failed to resolve user 'tss': Unknown user
+[    0.610114] systemd-tmpfiles[243]: Failed to parse ACL "default:group:tss:rwx", ignoring: Invalid argument
+[    0.610800] systemd-tmpfiles[243]: /usr/lib/tmpfiles.d/tpm2-tss-fapi.conf:4: Failed to resolve user 'tss': Unknown user
+[    0.611515] systemd-tmpfiles[243]: Failed to parse ACL "default:group:tss:rwx", ignoring: Invalid argument
+[    0.612262] systemd-tmpfiles[243]: /usr/lib/tmpfiles.d/tpm2-tss-fapi.conf:6: Failed to resolve group 'tss': Unknown group
+[    0.613564] systemd-tmpfiles[243]: /usr/lib/tmpfiles.d/tpm2-tss-fapi.conf:7: Failed to resolve group 'tss': Unknown group
+[    0.627211] systemd-udevd[245]: /usr/lib/udev/rules.d/60-tpm-udev.rules:3 Failed to resolve user 'tss', ignoring: Unknown user
+[    0.628065] systemd-udevd[245]: /usr/lib/udev/rules.d/60-tpm-udev.rules:4 Failed to resolve user 'tss', ignoring: Unknown user
+```
+
+Debian/Ubuntu does not ship a sysusers config for the tss user/group.
+Instead the tpm-udev package creates a tss user and group in its
+postinst script.
+
+So copy the tss user and group into the initrd in addition to shipping
+possible sysusers config for it.
+
+Bug-Ubuntu: https://launchpad.net/bugs/2127725
+Fixes: https://github.com/dracut-ng/dracut-ng/issues/1826
+
+(cherry picked from commit ef4fb8d8e08c6b69e23ee2a8f0286fefd7999619)
+
+Resolves: RHBZ#2442617
+---
+ modules.d/73tpm2-tss/module-setup.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/modules.d/73tpm2-tss/module-setup.sh b/modules.d/73tpm2-tss/module-setup.sh
+index 4687fc90..d7483f1f 100755
+--- a/modules.d/73tpm2-tss/module-setup.sh
++++ b/modules.d/73tpm2-tss/module-setup.sh
+@@ -31,6 +31,8 @@ installkernel() {
+ # Install the required file(s) and directories for the module in the initramfs.
+ install() {
+     inst_sysusers tpm2-tss.conf
++    grep -s '^tss:' "${dracutsysrootdir-}"/etc/passwd >> "$initdir/etc/passwd"
++    grep -s '^tss:' "${dracutsysrootdir-}"/etc/group >> "$initdir/etc/group"
+ 
+     inst_multiple -o \
+         "$tmpfilesdir"/tpm2-tss-fapi.conf \
+-- 
+2.53.0
+

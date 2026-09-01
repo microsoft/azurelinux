@@ -5,7 +5,7 @@ Name:           libharu
 Version:        2.4.5
 # NOTE - sover is major.minor so minor updates will require rebuilds of dependent packages 
 %global sover %(v=%{version}; echo ${v%.*})
-Release: 4%{?dist}
+Release:        2%{?dist}
 Summary:        C library for generating PDF files
 License:        zlib-acknowledgement
 URL:            http://libharu.org
@@ -52,6 +52,9 @@ developing applications that use %{name}.
 %{_libdir}/libhpdf.so
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.4.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Sat Aug 02 2025 Orion Poplawski <orion@nwra.com> - 2.4.5-1
 - Update to 2.4.5
 

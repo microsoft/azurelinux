@@ -1,7 +1,8 @@
-diff -urNp a/agent/mibgroup/ip-mib/data_access/ipaddress_common.c b/agent/mibgroup/ip-mib/data_access/ipaddress_common.c
---- a/agent/mibgroup/ip-mib/data_access/ipaddress_common.c	2020-06-10 13:27:03.213904398 +0200
-+++ b/agent/mibgroup/ip-mib/data_access/ipaddress_common.c	2020-06-10 13:28:41.025863050 +0200
-@@ -121,6 +121,7 @@ _remove_duplicates(netsnmp_container *co
+diff --git a/agent/mibgroup/ip-mib/data_access/ipaddress_common.c b/agent/mibgroup/ip-mib/data_access/ipaddress_common.c
+index 675d4ea..8d3708d 100644
+--- a/agent/mibgroup/ip-mib/data_access/ipaddress_common.c
++++ b/agent/mibgroup/ip-mib/data_access/ipaddress_common.c
+@@ -120,6 +120,7 @@ _remove_duplicates(netsnmp_container *container, u_int container_flags)
  	for (entry = ITERATOR_FIRST(it); entry; entry = ITERATOR_NEXT(it)) {
  		if (prev_entry && _access_ipaddress_entry_compare_addr(prev_entry, entry) == 0) {
  			/* 'entry' is duplicate of the previous one -> delete it */

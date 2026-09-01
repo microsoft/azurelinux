@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -44,13 +44,13 @@
 %global jspspec 3.1
 %global major_version 10
 %global minor_version 1
-%global micro_version 46
+%global micro_version 59
 %global packdname apache-tomcat-%{version}-src
 %global servletspec 6.0
 %global elspec 5.0
 %global tcuid 53
 # Recommended version is specified in java/org/apache/catalina/core/AprLifecycleListener.java
-%global native_version 2.0.8
+%global native_version 2.0.14
 
 
 # FHS 3.0 compliant tree structure - http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
@@ -102,14 +102,14 @@ ExclusiveArch:  %{java_arches} noarch
 BuildRequires: ant-openjdk25  >= 1.10.2
 BuildRequires: ecj >= 4.20
 BuildRequires: findutils
-BuildRequires: java-25-devel >= 17
+BuildRequires: java-25-devel
 BuildRequires: javapackages-local-openjdk25
 BuildRequires: aqute-bnd
 BuildRequires: aqute-bndlib
 BuildRequires: systemd
 BuildRequires: tomcat-jakartaee-migration
 
-Requires:      (java-headless >= 11 or java-25 >= 11)
+Requires:      (java-25-headless or java-25)
 Requires:      javapackages-tools
 Requires:      %{name}-lib = %{epoch}:%{version}-%{release}
 %if 0%{?fedora} || 0%{?rhel} > 7
@@ -536,6 +536,37 @@ install -m0644 -D tomcat.sysusers.conf %{buildroot}%{_sysusersdir}/tomcat.conf
 %{appdir}/ROOT
 
 %changelog
+* Thu Aug 20 2026 Packit <hello@packit.dev> - 1:10.1.59-1
+- Update to version 10.1.59
+- Resolves: rhbz#2520742
+
+* Tue Jul 07 2026 Packit <hello@packit.dev> - 1:10.1.57-1
+- Update to version 10.1.57
+- Resolves: rhbz#2497763
+
+* Tue Jun 23 2026 Packit <hello@packit.dev> - 1:10.1.56-1
+- Update to version 10.1.56
+- Resolves: rhbz#2491608
+
+* Mon May 11 2026 Packit <hello@packit.dev> - 1:10.1.55-1
+- Update to version 10.1.55
+- Resolves: rhbz#2476354
+
+* Thu Apr 02 2026 Packit <hello@packit.dev> - 1:10.1.54-1
+- Update to version 10.1.54
+- Resolves: rhbz#2454692
+
+* Mon Mar 23 2026 Packit <hello@packit.dev> - 1:10.1.53-1
+- Update to version 10.1.53
+- Resolves: rhbz#2450432
+
+* Mon Mar 16 2026 Dimitris Soumis <dsoumis@redhat.com> - 1:10.1.52-1
+- Update to version 10.1.52
+
+* Thu Sep 25 2025 Adam Williamson <awilliam@redhat.com> - 1:10.1.46-2
+- Drop now-unnecessary version bounds in java requirements
+- Specify java-25-headless, not java-headless (#2398212)
+
 * Fri Sep 12 2025 Dimitris Soumis <dsoumis@redhat.com> - 1:10.1.46-1
 - Update to version 10.1.46
 

@@ -2,23 +2,17 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: libcdio
-Version: 2.1.0
-Release: 18%{?dist}
+Version: 2.3.0
+Release: 1%{?dist}
 Summary: CD-ROM input and control library
 # include/cdio/ecma_167.h and lib/driver/netbsd.c and lib/udf/udf_fs.c are BSD-2-Clause
 # src/getopt* are LGPL-2.1-or-later
 License: GPL-3.0-or-later AND BSD-2-Clause AND LGPL-2.1-or-later
 URL: http://www.gnu.org/software/libcdio/
-Source0: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.bz2
-Source1: http://ftp.gnu.org/gnu/libcdio/libcdio-%{version}.tar.bz2.sig
+Source0: https://github.com/libcdio/libcdio/releases/download/%{version}/libcdio-%{version}.tar.bz2
 Source2: libcdio-no_date_footer.hml
 Source3: cdio_config.h
-# Fixed upstream but not in a stable release yet.
-# http://git.savannah.gnu.org/cgit/libcdio.git/commit/?id=2adb43c60afc6e98e94d86dad9f93d3df52862b1
-Patch0: format-security.patch
-# http://git.savannah.gnu.org/cgit/libcdio.git/commit/?id=56335fff0f21d294cd0e478d49542a43e9495ed0
-Patch1: realpath-test-fix.patch
- 
+
 BuildRequires: gcc gcc-c++
 BuildRequires: pkgconfig doxygen
 BuildRequires: ncurses-devel
@@ -43,7 +37,7 @@ This package contains header files and libraries for %{name}.
 
 
 %prep
-%autosetup -p1
+%autosetup
 
 iconv -f ISO88591 -t utf-8 -o THANKS.utf8 THANKS && mv THANKS.utf8 THANKS
 
@@ -115,7 +109,7 @@ make check
 
 %files
 %license COPYING
-%doc AUTHORS NEWS.md README README.libcdio THANKS TODO
+%doc AUTHORS NEWS.md README.md README-libcdio.md THANKS TODO
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_infodir}/*
@@ -131,6 +125,12 @@ make check
 
 
 %changelog
+* Thu Jan 22 2026 Adrian Reber <adrian@lisas.de> - 2.3.0-1
+- updated to 2.3.0 (#2336514)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

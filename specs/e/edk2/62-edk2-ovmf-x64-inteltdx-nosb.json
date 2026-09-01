@@ -1,0 +1,23 @@
+{
+    "description": "OVMF with TDX support, no secure boot",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "memory",
+        "filename": "/usr/share/edk2/ovmf/OVMF.inteltdx.fd"
+    },
+    "targets": [
+        {
+            "architecture": "x86_64",
+            "machines": [
+                "pc-q35-*"
+            ]
+        }
+    ],
+    "features": [
+        "intel-tdx",
+        "verbose-dynamic"
+    ],
+    "tags": []
+}

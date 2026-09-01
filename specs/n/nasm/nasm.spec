@@ -11,12 +11,14 @@
 
 Summary: A portable x86 assembler which uses Intel-like syntax
 Name: nasm
-Version: 2.16.03
-Release: 7%{?dist}
+Version: 3.02
+Release: 1%{?dist}
 License: BSD-2-Clause
 URL: http://www.nasm.us
 Source0: https://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}.tar.xz
 Source1: https://www.nasm.us/pub/nasm/releasebuilds/%{version}/%{name}-%{version}-xdoc.tar.xz
+# https://github.com/netwide-assembler/nasm/issues/203
+Patch0: nasm-CVE-2026-6067.patch
 
 BuildRequires: perl(Env)
 BuildRequires: autoconf
@@ -87,6 +89,20 @@ make -C test golden test diff
 %endif
 
 %changelog
+* Tue Jul 14 2026 Dominik Mierzejewski <dominik@greysector.net> - 3.02-1
+- update to 3.02 (resolves rhbz#2494063)
+- fixes CVE-2026-6068
+
+* Wed Apr 22 2026 Dominik Mierzejewski <rpm@greysector.net> - 3.01-3
+- fix CVE-2026-6067 (resolves rhbz#2458087, rhbz#2458089)
+  patch by Nick Clifton
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.01-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sat Oct 11 2025 Dominik Mierzejewski <rpm@greysector.net> - 3.01-1
+- update to 3.01 (resolves rhbz#2401362)
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.16.03-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -6,11 +6,10 @@
 
 Name:           python-%{pkg_name}
 Version:        0.1
-Release: 27%{?dist}
+Release:        26%{?dist}
 Summary:        Use Search URLs in your Django Application
 
-# Automatically converted from old format: BSD - review is highly recommended.
-License:        LicenseRef-Callaway-BSD
+License:        BSD-2-Clause
 URL:            https://github.com/dstufft/dj-search-url
 Source0:        %{pypi_source}
 BuildArch:      noarch
@@ -23,8 +22,7 @@ SEARCH_URL environment variable to configure your application.
 Summary:        %{summary}
 
 BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-%{?python_provide:%python_provide python3-%{pypi_name}}
+%py_provides    python3-%{pypi_name}
 
 %description -n python3-%{pkg_name}
 This simple Django utility allows you to utilize the 12factor inspired
@@ -32,22 +30,30 @@ SEARCH_URL environment variable to configure your application.
 
 %prep
 %autosetup -n %{pypi_name}-%{version}
-rm -rf %{pypi_name}.egg-info
+
+%generate_buildrequires
+%pyproject_buildrequires
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
+%pyproject_save_files -l dj_search_url
 
-%files -n python3-%{pkg_name}
-%license LICENSE
+%check
+%pyproject_check_import
+
+%files -n python3-%{pkg_name} -f %{pyproject_files}
 %doc README.rst
-%{python3_sitelib}/__pycache__/*
-%{python3_sitelib}/dj_search_url.py
-%{python3_sitelib}/dj_search_url-%{version}-py*.egg-info
 
 %changelog
+* Wed Mar 04 2026 Michel Lind <salimma@fedoraproject.org> - 0.1-26
+- Stop using deprecated macros
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.1-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.1-24
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -1,0 +1,176 @@
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/lib/paxerror.c tar-1.35-rhel-10.2-clean/lib/paxerror.c
+--- a/lib/paxerror.c	2025-12-03 13:59:35.940296110 +0100
++++ b/lib/paxerror.c	2026-01-09 15:00:00.865341402 +0100
+@@ -174,27 +174,41 @@
+ }
+ 
+ void
+-read_error_details (char const *name, off_t offset, size_t size)
++read_error_details (char const *name, off_t offset, size_t size, bool padding)
+ {
+   intmax_t off = offset;
+   int e = errno;
+-  ERROR ((0, e,
+-	  ngettext ("%s: Read error at byte %jd, while reading %zu byte",
+-		    "%s: Read error at byte %jd, while reading %zu bytes",
+-		    size),
+-	  quotearg_colon (name), off, size));
++  if (padding)
++    ERROR ((0, e,
++	    ngettext ("%s: Read error at byte %jd, while reading %zu byte; padding with zeros",
++		      "%s: Read error at byte %jd, while reading %zu bytes; padding with zeros",
++		      size),
++	    quotearg_colon (name), off, size));
++  else
++    ERROR ((0, e,
++	    ngettext ("%s: Read error at byte %jd, while reading %zu byte",
++		      "%s: Read error at byte %jd, while reading %zu bytes",
++		      size),
++	    quotearg_colon (name), off, size));
+ }
+ 
+ void
+-read_warn_details (char const *name, off_t offset, size_t size)
++read_warn_details (char const *name, off_t offset, size_t size, bool padding)
+ {
+   intmax_t off = offset;
+   int e = errno;
+-  WARN ((0, e,
+-	 ngettext ("%s: Warning: Read error at byte %jd, while reading %zu byte",
+-		   "%s: Warning: Read error at byte %jd, while reading %zu bytes",
+-		   size),
+-	 quotearg_colon (name), off, size));
++  if (padding)
++    WARN ((0, e,
++	   ngettext ("%s: Warning: Read error at byte %jd, while reading %zu byte; padding with zeros",
++		     "%s: Warning: Read error at byte %jd, while reading %zu bytes; padding with zeros",
++		     size),
++	   quotearg_colon (name), off, size));
++  else
++    WARN ((0, e,
++	   ngettext ("%s: Warning: Read error at byte %jd, while reading %zu byte",
++		     "%s: Warning: Read error at byte %jd, while reading %zu bytes",
++		     size),
++	   quotearg_colon (name), off, size));
+ }
+ 
+ void
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/lib/paxlib.h tar-1.35-rhel-10.2-clean/lib/paxlib.h
+--- a/lib/paxlib.h	2025-12-03 13:59:35.940296110 +0100
++++ b/lib/paxlib.h	2026-01-09 15:00:00.869341504 +0100
+@@ -92,10 +92,10 @@
+ _Noreturn void open_fatal (char const *);
+ void open_warn (char const *);
+ void read_error (char const *);
+-void read_error_details (char const *, off_t, size_t);
++void read_error_details (char const *, off_t, size_t, bool);
+ _Noreturn void read_fatal (char const *);
+ _Noreturn void read_fatal_details (char const *, off_t, size_t);
+-void read_warn_details (char const *, off_t, size_t);
++void read_warn_details (char const *, off_t, size_t, bool);
+ void readlink_error (char const *);
+ void readlink_warn (char const *);
+ void rmdir_error (char const *);
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/src/common.h tar-1.35-rhel-10.2-clean/src/common.h
+--- a/src/common.h	2025-12-03 13:55:36.040944472 +0100
++++ b/src/common.h	2026-01-12 10:53:18.296266888 +0100
+@@ -730,7 +730,7 @@
+ 
+ void close_diag (char const *name);
+ void open_diag (char const *name);
+-void read_diag_details (char const *name, off_t offset, size_t size);
++void read_diag_details (char const *name, off_t offset, size_t size, bool padding);
+ void readlink_diag (char const *name);
+ void savedir_diag (char const *name);
+ void seek_diag_details (char const *name, off_t offset);
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/src/create.c tar-1.35-rhel-10.2-clean/src/create.c
+--- a/src/create.c	2025-12-03 13:55:36.040944472 +0100
++++ b/src/create.c	2026-01-12 10:53:18.296266888 +0100
+@@ -1079,7 +1079,7 @@
+       if (count == SAFE_READ_ERROR)
+ 	{
+ 	  read_diag_details (st->orig_file_name,
+-	                     st->stat.st_size - size_left, bufsize);
++	                     st->stat.st_size - size_left, bufsize, true);
+ 	  pad_archive (size_left);
+ 	  return dump_status_short;
+ 	}
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/src/misc.c tar-1.35-rhel-10.2-clean/src/misc.c
+--- a/src/misc.c	2025-12-03 13:55:36.040944472 +0100
++++ b/src/misc.c	2026-01-12 10:53:18.296266888 +0100
+@@ -1117,15 +1117,15 @@
+ }
+ 
+ void
+-read_diag_details (char const *name, off_t offset, size_t size)
++read_diag_details (char const *name, off_t offset, size_t size, bool padding)
+ {
+   if (ignore_failed_read_option)
+     {
+       if (WARNING_ENABLED(WARN_FAILED_READ))
+-	read_warn_details (name, offset, size);
++	read_warn_details (name, offset, size, padding);
+     }
+   else
+-    read_error_details (name, offset, size);
++    read_error_details (name, offset, size, padding);
+ }
+ 
+ void
+diff -x '*~' -x autom4te.cache -x gnulib -x paxutils -x build-aux -x gnulib.modules -x gnulib-cache.m4 -x .git -x .gitmodules -x '*.in' --unidirectional-new-file -ur tar-1.35-rhel-10.1/src/sparse.c tar-1.35-rhel-10.2-clean/src/sparse.c
+--- a/src/sparse.c	2025-12-03 13:55:36.044944594 +0100
++++ b/src/sparse.c	2026-01-12 10:53:18.300266996 +0100
+@@ -422,7 +422,7 @@
+ 	                     (file->stat_info->sparse_map[i].offset
+ 			      + file->stat_info->sparse_map[i].numbytes
+ 			      - bytes_left),
+-			     bufsize);
++			     bufsize, false);
+ 	  return false;
+ 	}
+       else if (bytes_read == 0)
+@@ -433,7 +433,7 @@
+ 				 (file->stat_info->sparse_map[i].offset
+ 				  + file->stat_info->sparse_map[i].numbytes
+ 				  - bytes_left),
+-				 bufsize);
++				 bufsize, false);
+ 	      return false;
+ 	    }
+ 	  else
+@@ -632,7 +632,7 @@
+ 	{
+           read_diag_details (file->stat_info->orig_file_name,
+ 	                     beg,
+-			     rdsize);
++			     rdsize, false);
+ 	  return false;
+ 	}
+       else if (bytes_read == 0)
+@@ -640,7 +640,7 @@
+ 	  if (errno != 0)
+ 	    read_diag_details (file->stat_info->orig_file_name,
+ 			       beg,
+-			       rdsize);
++			       rdsize, false);
+ 	  else
+ 	    report_difference (file->stat_info, _("Size differs"));
+ 	  return false;
+@@ -692,7 +692,7 @@
+ 			     (file->stat_info->sparse_map[i].offset
+ 			      + file->stat_info->sparse_map[i].numbytes
+ 			      - size_left),
+-			     rdsize);
++			     rdsize, false);
+ 	  return false;
+ 	}
+       else if (bytes_read == 0)
+@@ -702,7 +702,7 @@
+ 			       (file->stat_info->sparse_map[i].offset
+ 				+ file->stat_info->sparse_map[i].numbytes
+ 				- size_left),
+-			       rdsize);
++			       rdsize, false);
+ 	  else
+ 	    report_difference (&current_stat_info, _("Size differs"));
+ 	  return false;

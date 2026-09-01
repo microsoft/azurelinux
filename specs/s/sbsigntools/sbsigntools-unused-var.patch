@@ -1,0 +1,22 @@
+diff -up sbsigntools-0.9.5/src/image.c.orig sbsigntools-0.9.5/src/image.c
+--- sbsigntools-0.9.5/src/image.c.orig	2023-05-05 12:56:50.000000000 +0200
++++ sbsigntools-0.9.5/src/image.c	2026-02-20 21:09:30.332942432 +0100
+@@ -512,17 +512,14 @@ int image_hash_sha256(struct image *imag
+ {
+ 	struct region *region;
+ 	SHA256_CTX ctx;
+-	int rc, i, n;
++	int rc, i;
+ 
+ 	rc = SHA256_Init(&ctx);
+ 	if (!rc)
+ 		return -1;
+ 
+-	n = 0;
+-
+ 	for (i = 0; i < image->n_checksum_regions; i++) {
+ 		region = &image->checksum_regions[i];
+-		n += region->size;
+ #if 0
+ 		printf("sum region: 0x%04lx -> 0x%04lx [0x%04x bytes]\n",
+ 				region->data - image->buf,

@@ -66,7 +66,7 @@
 
 Name:             avahi
 Version:          0.9%{?rc:~%{rc}}
-Release: 11%{?dist}
+Release:          8%{?dist}
 Summary:          Local network service discovery
 License:          LGPL-2.1-or-later AND LGPL-2.0-or-later AND BSD-2-Clause-Views AND MIT
 URL:              http://avahi.org
@@ -856,6 +856,12 @@ fi
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9~rc2-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.9~rc2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Aug 05 2025 Petr Menšík <pemensik@redhat.com> - 0.9~rc2-6
 - Fix port randomization for wide area queries (CVE-2024-52615)
 - Add systemd-devel dependency

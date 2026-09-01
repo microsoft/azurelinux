@@ -95,10 +95,10 @@ index bedaf15..8dc09bf 100644
 +#elif CRYPTO_INTERNAL
  	memset(&ctx, 0, sizeof(ctx));
  	buffer[0] = '\n';
- 	memcpy(buffer + 1, key, strlen(key->string));
+ 	memcpy(buffer + 1, key->string, strlen(key->string));
 @@ -291,7 +314,7 @@ int eigrp_make_sha256_digest(struct eigrp_interface *ei, struct stream *s,
  			  1 + strlen(key->string) + strlen(source_ip));
- 	HMAC__SHA256_Update(&ctx, ibuf, strlen(ibuf));
+ 	HMAC__SHA256_Update(&ctx, ibuf, backup_end);
  	HMAC__SHA256_Final(digest, &ctx);
 -
 +#endif

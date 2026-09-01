@@ -5,7 +5,7 @@
 
 Name:           python-%{srcname}
 Version:        6.0.0
-Release: 16%{?dist}
+Release:        14%{?dist}
 Summary:        Microsoft Azure Support Management Client Library for Python
 License:        MIT
 URL:            https://pypi.org/project/%{srcname}/
@@ -53,6 +53,9 @@ exit 0
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.0.0-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 6.0.0-13
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -4,7 +4,7 @@
 Summary:	Library for reading and writing sound files
 Name:		libsndfile
 Version:	1.2.2
-Release: 14%{?dist}
+Release:	11%{?dist}
 License:	LGPL-2.1-or-later AND GPL-2.0-or-later AND BSD-3-Clause
 URL:		http://libsndfile.github.io/libsndfile/
 Source0:        https://github.com/libsndfile/libsndfile/releases/download/%{version}/libsndfile-%{version}.tar.xz
@@ -13,6 +13,10 @@ Patch0:		libsndfile-1.0.25-system-gsm.patch
 #from upstream, for <= 1.2.2, rhbz#2322326
 Patch1:	libsndfile-1.2.2-cve-2024-50612.patch
 Patch2:	libsndfile-1.2.2-stdbool.patch
+
+# Test sdlcomp_test_short fails with opus version 1.6
+# https://github.com/libsndfile/libsndfile/issues/1107
+Patch3: libsndfile-1.2.2-tests-opus.patch
 
 %if %{undefined rhel}
 # used to regenerate test .c sources from .def files
@@ -66,6 +70,7 @@ This package contains command line utilities for libsndfile.
 %patch -P0 -p1 -b .system-gsm
 %patch -P 1 -p1 -b .cve-2024-50612
 %patch -P 2 -p1 -b .stdbool
+%patch -P 3 -p1 -b .tests-opus
 rm -r src/GSM610
 
 %build
@@ -161,6 +166,9 @@ LD_LIBRARY_PATH=$PWD/src/.libs make check
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.2-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

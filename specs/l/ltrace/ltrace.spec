@@ -3,8 +3,8 @@
 
 Summary: Tracks runtime library calls from dynamically linked executables
 Name: ltrace
-Version: 0.7.91
-Release: 56%{?dist}
+Version: 0.8.1
+Release: 2%{?dist}
 # In coordination with Juan Céspedes, upstream is now officially on gitlab.
 # We are going to being sending all of our Fedora patches upstream to gitlab.
 URL: https://gitlab.com/cespedes/ltrace
@@ -16,126 +16,8 @@ BuildRequires: autoconf automake libtool
 BuildRequires: gcc-c++
 BuildRequires: make
 
-# Note: this URL needs to be updated for each release, as the file
-# number changes for each file.  Full list of released files is at:
-#  https://alioth.debian.org/frs/?group_id=30892
+#  https://gitlab.com/cespedes/ltrace/-/releases
 Source: ltrace-%{version}.tar.bz2
-
-# Merge of several upstream commits that fixes compilation on ARM.
-Patch0: ltrace-0.7.91-arm.patch
-
-# Upstream patch that fixes accounting of exec, __libc_start_main and
-# others in -c output.
-Patch1: ltrace-0.7.91-account_execl.patch
-
-# Upstream patch that fixes interpretation of PLT on x86_64 when
-# IRELATIVE slots are present.
-Patch2: ltrace-0.7.91-x86_64-irelative.patch
-
-# Upstream patch that fixes fetching of system call arguments on s390.
-Patch3: ltrace-0.7.91-s390-fetch-syscall.patch
-
-# Upstream patch that enables tracing of IRELATIVE PLT slots on s390.
-Patch4: ltrace-0.7.91-s390-irelative.patch
-
-# Fix for a regression in tracing across fork.  Upstream patch.
-Patch5: ltrace-0.7.91-ppc64-fork.patch
-
-# Fix crashing a prelinked PPC64 binary which makes PLT calls through
-# slots that ltrace doesn't trace.
-# https://bugzilla.redhat.com/show_bug.cgi?id=1051221
-Patch6: ltrace-0.7.91-breakpoint-on_install.patch
-Patch7: ltrace-0.7.91-ppc64-unprelink.patch
-
-# Man page nits.  Backport of an upstream patch.
-Patch8: ltrace-0.7.91-man.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1044766
-Patch9: ltrace-0.7.91-cant_open.patch
-
-# Support Aarch64 architecture.
-Patch10: ltrace-0.7.91-aarch64.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1064406
-Patch11: ltrace-0.7.2-e_machine.patch
-
-# Support for ppc64le, backported from upstream.
-# http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commit;h=eea4ad2cce289753aaa35b4e0258a76d8f8f367c
-# https://bugzilla.redhat.com/show_bug.cgi?id=1131956
-Patch13: ltrace-0.7.91-ppc64le-support.patch
-# 35a9677dc9dcb7909ebd28f30200474d7e8b660f,
-# 437d2377119036346f4dbd93039c847b4cc9d0be,
-# eb3993420734f091cde9a6053ca6b4edcf9ae334
-Patch14: ltrace-0.7.91-ppc64le-fixes.patch
-
-# http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commit;h=2e9f9f1f5d0fb223b109429b9c904504b7f638e2
-# http://anonscm.debian.org/gitweb/?p=collab-maint/ltrace.git;a=commit;h=f96635a03b3868057db5c2d7972d5533e2068345
-Patch15: ltrace-0.7.91-parser-ws_after_id.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1171165
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=d8f1287b85e2c2b2ae0235809e956f4365e53c45
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=d80c5371454383e3f9978622e5578cf02af8c44c
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=bf82100966deda9c7d26ad085d97c08126a8ae88
-Patch16: ltrace-0.7.91-ppc-bias.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1158714
-Patch17: ltrace-0.7.91-x86-plt_map.patch
-Patch18: ltrace-0.7.91-x86-unused_label.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1170315
-Patch19: ltrace-0.7.91-unwind-elfutils.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1208351
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=4724bd5a4a19db117a1d280b9d1a3508fd4e03fa
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=72ee29639c55b5942bc07c8ed0013005f8fc5a97
-Patch20: ltrace-0.7.91-multithread-no-f-1.patch
-Patch21: ltrace-0.7.91-multithread-no-f-2.patch
-
-# Fix problems with building a number of test cases.
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=694d19ff14017926454771cbb63a22355b72f1bf
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=a3a03622fb4ca9772dca13eae724a94ba1e728f4
-Patch22: ltrace-0.7.91-testsuite-includes.patch
-Patch23: ltrace-0.7.91-testsuite-includes-2.patch
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1210653
-# http://anonscm.debian.org/cgit/collab-maint/ltrace.git/commit/?id=eea6091f8672b01f7f022b0fc367e0f568225ffc
-Patch24: ltrace-0.7.91-ppc64le-configure.patch
-
-Patch25: ltrace-rh1307754.patch
-
-# GCC now warns (errors) on "tautological compares", and readdir_r is deprecated.
-Patch26: ltrace-0.7.91-tautology.patch
-
-# ARM code has unreachable code after switch statement, move initialization
-Patch27: ltrace-rh1423913.patch
-
-# AARCH64 large parameters and syscall testsuite fixes.
-Patch28: ltrace-0.7.91-aarch64-params.patch
-
-# gcc-9 fix.  Avoid passing NULL as argument to %s
-Patch29: ltrace-0.7.91-null.patch
-
-# Adds support for CET PLTs via second-plt lookups.
-Patch30: ltrace-0.7.91-cet.patch
-
-# Extra #includes for gcc 9
-Patch31: ltrace-0.7.91-aarch64-headers.patch
-# Testsuite: AARCH64 ifuncs not supported yet yet.
-Patch32: ltrace-rh1225568.patch
-
-# testsuite fixes for pre-installed config files
-Patch33: ltrace-0.7.91-testsuite-system_call_params.patch
-
-# Ignore bogus files from the environment
-Patch34: ltrace-0.7.91-XDG_CONFIG_DIRS.patch
-
-# GCC erroneously warns about uninitialized values
-Patch35: ltrace-0.7.91-rh1799619.patch
-
-# Support for both SC and SCV sycall insns
-Patch36: ltrace-0.7.91-ppc64le-scv.patch
-
-Patch37: ltrace-0.7.91-W-use-after-free.patch
 
 %description
 Ltrace is a debugging program which runs a specified command until the
@@ -149,43 +31,6 @@ execution of processes.
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch -P0 -p1
-%patch -P1 -p1
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
-%patch -P5 -p1
-%patch -P6 -p1
-%patch -P7 -p1
-%patch -P8 -p1
-%patch -P9 -p1
-%patch -P10 -p1
-%patch -P11 -p1
-%patch -P13 -p1
-%patch -P14 -p1
-%patch -P15 -p1
-%patch -P16 -p1
-%patch -P17 -p1
-%patch -P18 -p1
-%patch -P19 -p1
-%patch -P20 -p1
-%patch -P21 -p1
-%patch -P22 -p1
-%patch -P23 -p1
-%patch -P24 -p1
-%patch -P25 -p1
-%patch -P26 -p1
-%patch -P27 -p1
-%patch -P28 -p1
-%patch -P29 -p1
-%patch -P30 -p1
-%patch -P31 -p1
-%patch -P32 -p1
-%patch -P33 -p1
-%patch -P34 -p1
-%patch -P35 -p1
-%patch -P36 -p1
-%patch -P37 -p1
 
 %build
 autoreconf -i
@@ -213,6 +58,12 @@ echo ====================TESTING END=====================
 %{_datadir}/ltrace
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Sep 16 2025 DJ Delorie <dj@redhat.com> - 0.8.1-1
+- Rebased to ltrace 0.8.1
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.7.91-53
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

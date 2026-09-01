@@ -1,12 +1,8 @@
 # nodejs binary
 %__nodejs %{_bindir}/node
 
-# currently installed nodejs version
-%nodejs_version %(%{__nodejs} -v | sed s/v//)
-%_nodejs_major_version %(echo %{nodejs_version} | sed 's#^\\([0-9]\\+\\).*#\\1#')
-
 # nodejs library directory
-%nodejs_sitelib %{_prefix}/lib/node_modules_%{_nodejs_major_version}
+%nodejs_sitelib %{_prefix}/lib/node_modules
 
 #arch specific library directory
 #for future-proofing only; we don't do multilib

@@ -1,0 +1,45 @@
+From 533ed1304c57bc7179bf88e5f5f81f4bb329b1dd Mon Sep 17 00:00:00 2001
+From: John Bucy <bucy@gloop.org>
+Date: Wed, 18 Jun 2025 11:05:23 -0700
+Subject: [PATCH 1/2] migrate config_test from pkg_resources to
+ importlib_resources
+
+pkg_resources is now throwing a deprecation warning
+this is only used to get the cert filenames
+
+https://setuptools.pypa.io/en/latest/pkg_resources.html
+https://importlib-resources.readthedocs.io/en/latest/migration.html
+---
+ aiosmtpd/tests/conftest.py | 13 ++++++++++---
+ requirements-dev.txt       |  1 +
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+--- a/aiosmtpd/tests/conftest.py
++++ b/aiosmtpd/tests/conftest.py
+@@ -12,7 +12,7 @@ from smtplib import SMTP as SMTPClient
+ from typing import Any, Callable, Generator, NamedTuple, Optional, Type, TypeVar
+ 
+ import pytest
+-from pkg_resources import resource_filename
++import importlib.resources
+ from pytest_mock import MockFixture
+ 
+ from aiosmtpd.controller import Controller
+@@ -73,8 +73,15 @@ class Global:
+ # If less than 1.0, might cause intermittent error if test system
+ # is too busy/overloaded.
+ AUTOSTOP_DELAY = 1.5
+-SERVER_CRT = resource_filename("aiosmtpd.tests.certs", "server.crt")
+-SERVER_KEY = resource_filename("aiosmtpd.tests.certs", "server.key")
++# https://importlib-resources.readthedocs.io/en/latest/migration.html
++# this assumes these files are already present in the filesystem so
++# it doesn't need to extract a tempfile for the context manager to clean up
++ref = importlib.resources.files("aiosmtpd.tests.certs") / "server.crt"
++with importlib.resources.as_file(ref) as path:
++    SERVER_CRT = str(path)
++ref = importlib.resources.files("aiosmtpd.tests.certs") / "server.key"
++with importlib.resources.as_file(ref) as path:
++    SERVER_KEY = str(path)
+ 
+ # endregion
+ 

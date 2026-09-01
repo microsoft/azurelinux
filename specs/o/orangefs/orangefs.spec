@@ -1,11 +1,17 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-Name: orangefs
-Version: 2.9.8
-Release: 18%{?dist}
-Summary: Parallel network file system client
-URL: https://www.orangefs.org/
+# Workaround for -fcommon issue
+# https://github.com/waltligon/orangefs/issues/80
+%define         _legacy_common_support 1
+
+%global         _hardened_build 1
+
+Name:           orangefs
+Version:        2.10.1
+Release:        3%{?dist}
+Summary:        Parallel network file system client
+URL:            https://www.orangefs.org/
 # BSD (2 clause) maint/config/ssl.m4
 # BSD (3 clause) src/client/usrint/fts.c
 # BSD (3 clause) src/client/usrint/fts.h
@@ -16,92 +22,128 @@ URL: https://www.orangefs.org/
 # LGPLv2 src/common/dotconf/dotconf.c
 # LGPLv2+ remainder
 # Automatically converted from old format: LGPLv2+ and LGPLv2 and BSD and MIT and zlib - review is highly recommended.
-License: LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-LGPLv2 AND LicenseRef-Callaway-BSD AND LicenseRef-Callaway-MIT AND Zlib
-BuildRequires: make
-BuildRequires:  gcc
-BuildRequires: automake
-BuildRequires: bison flex libattr-devel openssl-devel
-BuildRequires: perl(Math::BigInt) perl(Getopt::Long) perl(Term::ReadLine) perl(FindBin)
-BuildRequires: systemd
-BuildRequires: libselinux-devel
-BuildRequires: lmdb-devel
-BuildRequires: fuse-devel
-%ifnarch armv7hl
-BuildRequires: libibverbs-devel
-%endif
-BuildRequires: texlive latex2html ghostscript-tools-dvipdf
-BuildRequires: texlive-dvips
+License:       LicenseRef-Callaway-LGPLv2+ AND LicenseRef-Callaway-LGPLv2 AND LicenseRef-Callaway-BSD AND LicenseRef-Callaway-MIT AND Zlib
+Source0:       https://github.com/waltligon/orangefs/archive/refs/tags/2.10.1.tar.gz
+Source1:       orangefs-server.service
+Source2:       orangefs-client.service
+Source3:       orangefs.conf
+Source4:       pvfs2tab
 
-Source0: https://s3.amazonaws.com/download.orangefs.org/current/source/orangefs-%version.tar.gz
-Source1: orangefs-server.service
-Source2: orangefs-client.service
-Source3: orangefs.conf
-Source4: pvfs2tab
 # Change the configuration generator to default to options and paths
 # appropriate to Fedora.  This causes genconfig to enable syslog logging
 # and to use /var/lib/orangefs for the storage paths.
-Patch0: orangefs-genconfig.patch
+Patch:         orangefs-genconfig.patch
+
 # Remove bundled LMDB, so it cannot be built.
-Patch1: orangefs-lmdb.patch
+Patch:         orangefs-lmdb.patch
+
 # These are scripts which connect to several machines and start or stop
 # the server.  They would require editing and don't work with systemd,
 # so this removes them.
-Patch2: orangefs-no-start-stop.patch
-# Autoconf 2.71 fix, https://github.com/waltligon/orangefs/pull/87
-Patch3: orangefs-autotools-2.71.patch
-Patch4: orangefs-configure-c99.patch
+Patch:         orangefs-no-start-stop.patch
 
-%global _hardened_build 1
+# Compatibility with C99 standard
+# https://github.com/waltligon/orangefs/pull/99>
+Patch:         orangefs-configure-c99.patch
 
-%global desc OrangeFS (formerly PVFS2) is a high-performance parallel \
-network file system designed for use on high performance computing \
-systems.  It provides very high performance access to disk storage for \
-parallel applications.  It is accessible through a variety of \
-interfaces, including the native OrangeFS library, the kernel, FUSE, \
-and MPI-IO. \
-\
-This package provides the pvfs2-client-core which is required to use \
-the kernel module.
+# Hide experimental ib by variable
+Patch:         orangefs-2.10.1-disable-ib-exp.patch
 
-# Workaround for -fcommon issue
-# https://github.com/waltligon/orangefs/issues/80
-%define _legacy_common_support 1
-
+BuildRequires: automake
+BuildRequires: bison
+BuildRequires: flex
+BuildRequires: fuse-devel
+BuildRequires: gcc
+BuildRequires: libattr-devel
+BuildRequires: libselinux-devel
+BuildRequires: lmdb-devel
+BuildRequires: make
+BuildRequires: openssl-devel
+BuildRequires: perl(FindBin)
+BuildRequires: perl(Getopt::Long)
+BuildRequires: perl(Math::BigInt)
+BuildRequires: perl(Term::ReadLine)
+BuildRequires: systemd
+%ifnarch armv7hl
+BuildRequires: libibverbs-devel
+%endif
+# docs
+BuildRequires: ghostscript-tools-dvipdf
+BuildRequires: latex2html
+BuildRequires: texlive
+BuildRequires: texlive-dvips
+BuildRequires: texlive-charter
+BuildRequires: texlive-courier
+BuildRequires: texlive-times
 %description
-%desc
+OrangeFS (formerly PVFS2) is a high-performance parallel
+network file system designed for use on high performance computing
+systems.  It provides very high performance access to disk storage for
+parallel applications.  It is accessible through a variety of
+interfaces, including the native OrangeFS library, the kernel, FUSE,
+and MPI-IO.
+
+This package provides the pvfs2-client-core which is required to use
+he kernel module.
+
+%package       server
+Summary:       Parallel network file system server
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+Requires:      perl(Math::BigInt)
+%description   server
+This package contains the Parallel network file system server
+
+%package       fuse
+Summary:       Parallel network file system FUSE client
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+%description   fuse
+This package contains the Parallel network file system FUSE client
+
+%package       devel
+Summary:       Parallel network file system development libraries
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+%description   devel
+This package contains the headers and libraries necessary for client
+development of the Parallel network file system
+
+%package       docs
+Summary:       Documentation for the  Parallel network file system
+# For upgrade/downgrade
+Requires:      %{name}%{?_isa} = %{version}-%{release}
+%description   docs
+This package contains documentation of the Parallel network file system
 
 %prep
-%autosetup -N -n orangefs-v.%version
-%patch -P0 -p1
-%patch -P1 -p1
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
-
+%autosetup -p1 -n orangefs-%{version}
 rm -r src/apps/devel/lmdb
 rm -r src/common/lmdb
-
-rm src/client/webpack/ltmain.sh
-
 mv doc/man/pvfs2.conf.5 doc/man/orangefs.conf.5
 
+# autotools
 autoupdate -I maint/config
 autoreconf -vif -I maint/config
 
 %build
 export LDFLAGS="%{optflags} -Wl,--as-needed"
-%ifarch armv7hl
-%configure --enable-external-lmdb --enable-shared --disable-static \
-    --enable-fuse --disable-usrint --with-db-backend=lmdb
-%else
-%configure --enable-external-lmdb --enable-shared --disable-static \
-   --enable-fuse --disable-usrint --with-db-backend=lmdb --with-openib=/usr
+%configure --enable-external-lmdb \
+           --enable-shared        \
+           --disable-static       \
+           --enable-fuse          \
+           --disable-usrint-cwd   \
+           --with-db-backend=lmdb \
+%ifnarch armv7hl
+           --with-openib=/usr     \
 %endif
-%make_build
-make docs
+           --disable-olib         \
+           --with-ib=no           \
+           --with-experimental-ib=no
+%make_build V=1
+make docs V=1
 
 %install
 %make_install
+
+# Install docs
 mkdir -p %{buildroot}%{_docdir}/orangefs
 install -p -m 644 doc/*.pdf %{buildroot}%{_docdir}/orangefs
 mkdir -p %{buildroot}%{_docdir}/orangefs/coding
@@ -111,16 +153,20 @@ install -p -m 644 doc/design/*.pdf %{buildroot}%{_docdir}/orangefs/design
 mkdir -p %{buildroot}%{_docdir}/orangefs/random
 install -p -m 644 doc/random/*.pdf %{buildroot}%{_docdir}/orangefs/random
 install -p -m 644 COPYING %{buildroot}%{_docdir}/orangefs
+
+# Services and config
 mkdir -p %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
+install  -p -m 644 %{SOURCE1} %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE2} %{buildroot}%{_unitdir}
 mkdir -p %{buildroot}%{_sharedstatedir}/orangefs
 mkdir -p %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/orangefs
 install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 
-%files
+%ldconfig_scriptlets
 
+%files
+%license %{_docdir}/orangefs/COPYING
 %config(noreplace) %{_sysconfdir}/pvfs2tab
 %{_bindir}/pvfs2-check-server
 %{_bindir}/pvfs2-chmod
@@ -159,7 +205,87 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_sbindir}/pvfs2-client-core
 %{_unitdir}/orangefs-client.service
 %{_libdir}/libpvfs2.so.2
-%{_libdir}/libpvfs2.so.2.9.7
+%{_libdir}/libpvfs2.so.2.*
+%{_mandir}/man1/getmattr.1*
+%{_mandir}/man1/pvfs2-client-core.1*
+%{_mandir}/man1/pvfs2-client.1*
+%{_mandir}/man1/pvfs2-cp.1*
+%{_mandir}/man1/pvfs2-check-server.1*
+%{_mandir}/man1/pvfs2-chmod.1*
+%{_mandir}/man1/pvfs2-chown.1*
+%{_mandir}/man1/pvfs2-config.1*
+%{_mandir}/man1/pvfs2-drop-caches.1*
+%{_mandir}/man1/pvfs2-fs-dump.1*
+%{_mandir}/man1/pvfs2-fsck.1*
+%{_mandir}/man1/pvfs2-get-uid.1*
+%{_mandir}/man1/pvfs2-getmattr.1*
+%{_mandir}/man1/pvfs2-ln.1*
+%{_mandir}/man1/pvfs2-ls.1*
+%{_mandir}/man1/pvfs2-lsplus.1*
+%{_mandir}/man1/pvfs2-mkdir.1*
+%{_mandir}/man1/pvfs2-perf-mon-example.1*
+%{_mandir}/man1/pvfs2-perf-mon-snmp.1*
+%{_mandir}/man1/pvfs2-perror.1*
+%{_mandir}/man1/pvfs2-ping.1*
+%{_mandir}/man1/pvfs2-remove-object.1*
+%{_mandir}/man1/pvfs2-rm.1*
+%{_mandir}/man1/pvfs2-set-debugmask.1*
+%{_mandir}/man1/pvfs2-set-eventmask.1*
+%{_mandir}/man1/pvfs2-set-mode.1*
+%{_mandir}/man1/pvfs2-set-perf-history.1*
+%{_mandir}/man1/pvfs2-set-perf-interval.1*
+%{_mandir}/man1/pvfs2-set-sync.1*
+%{_mandir}/man1/pvfs2-set-turn-off-timeouts.1*
+%{_mandir}/man1/pvfs2-setmattr.1*
+%{_mandir}/man1/pvfs2-stat.1*
+%{_mandir}/man1/pvfs2-statfs.1*
+%{_mandir}/man1/pvfs2-touch.1*
+%{_mandir}/man1/pvfs2-validate.1*
+%{_mandir}/man1/pvfs2-viewdist.1*
+%{_mandir}/man1/pvfs2-write.1*
+%{_mandir}/man1/pvfs2-xattr.1*
+%{_mandir}/man1/pvfs2.1*
+%{_mandir}/man1/setmattr.1*
+%{_mandir}/man5/pvfs2tab.5*
+%exclude %{_mandir}/man1/pvfs2-start-all.1*
+%exclude %{_mandir}/man1/pvfs2-stop-all.1*
+
+%files server
+%dir %{_sysconfdir}/orangefs
+%config(noreplace) %{_sysconfdir}/orangefs/orangefs.conf
+%{_bindir}/pvfs2-genconfig
+%{_bindir}/pvfs2-mkspace
+%{_bindir}/pvfs2-showcoll
+%{_sbindir}/pvfs2-server
+%{_unitdir}/orangefs-server.service
+%{_mandir}/man1/pvfs2-genconfig.1*
+%{_mandir}/man1/pvfs2-mkspace.1*
+%{_mandir}/man1/pvfs2-server.1*
+%{_mandir}/man1/pvfs2-showcoll.1*
+%{_mandir}/man5/orangefs.conf.5*
+%dir %{_sharedstatedir}/orangefs
+
+%files fuse
+%{_bindir}/pvfs2fuse
+
+%files devel
+%{_bindir}/pvfs2-config
+%{_includedir}/orange.h
+%{_includedir}/pvfs2-compat.h
+%{_includedir}/pvfs2-debug.h
+%{_includedir}/pvfs2-encode-stubs.h
+%{_includedir}/pvfs2-hint.h
+%{_includedir}/pvfs2-mgmt.h
+%{_includedir}/pvfs2-mirror.h
+%{_includedir}/pvfs2-request.h
+%{_includedir}/pvfs2-sysint.h
+%{_includedir}/pvfs2-types.h
+%{_includedir}/pvfs2-usrint.h
+%{_includedir}/pvfs2-util.h
+%{_includedir}/pvfs2.h
+%{_libdir}/libpvfs2.so
+
+%files docs
 %dir %{_docdir}/orangefs
 %license %{_docdir}/orangefs/COPYING
 %{_docdir}/orangefs/pvfs2-guide.pdf
@@ -185,120 +311,18 @@ install -p -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}
 %{_docdir}/orangefs/pvfs2-tuning.pdf
 %dir %{_docdir}/orangefs/random
 %{_docdir}/orangefs/random/SystemInterfaceTesting.pdf
-%{_mandir}/man1/getmattr.1.gz
-%{_mandir}/man1/pvfs2-client-core.1.gz
-%{_mandir}/man1/pvfs2-client.1.gz
-%{_mandir}/man1/pvfs2-cp.1.gz
-%{_mandir}/man1/pvfs2-check-server.1.gz
-%{_mandir}/man1/pvfs2-chmod.1.gz
-%{_mandir}/man1/pvfs2-chown.1.gz
-%{_mandir}/man1/pvfs2-drop-caches.1.gz
-%{_mandir}/man1/pvfs2-fs-dump.1.gz
-%{_mandir}/man1/pvfs2-fsck.1.gz
-%{_mandir}/man1/pvfs2-get-uid.1.gz
-%{_mandir}/man1/pvfs2-getmattr.1.gz
-%{_mandir}/man1/pvfs2-ln.1.gz
-%{_mandir}/man1/pvfs2-ls.1.gz
-%{_mandir}/man1/pvfs2-lsplus.1.gz
-%{_mandir}/man1/pvfs2-mkdir.1.gz
-%{_mandir}/man1/pvfs2-perf-mon-example.1.gz
-%{_mandir}/man1/pvfs2-perf-mon-snmp.1.gz
-%{_mandir}/man1/pvfs2-perror.1.gz
-%{_mandir}/man1/pvfs2-ping.1.gz
-%{_mandir}/man1/pvfs2-remove-object.1.gz
-%{_mandir}/man1/pvfs2-rm.1.gz
-%{_mandir}/man1/pvfs2-set-debugmask.1.gz
-%{_mandir}/man1/pvfs2-set-eventmask.1.gz
-%{_mandir}/man1/pvfs2-set-mode.1.gz
-%{_mandir}/man1/pvfs2-set-perf-history.1.gz
-%{_mandir}/man1/pvfs2-set-perf-interval.1.gz
-%{_mandir}/man1/pvfs2-set-sync.1.gz
-%{_mandir}/man1/pvfs2-set-turn-off-timeouts.1.gz
-%{_mandir}/man1/pvfs2-setmattr.1.gz
-%{_mandir}/man1/pvfs2-stat.1.gz
-%{_mandir}/man1/pvfs2-statfs.1.gz
-%{_mandir}/man1/pvfs2-touch.1.gz
-%{_mandir}/man1/pvfs2-validate.1.gz
-%{_mandir}/man1/pvfs2-viewdist.1.gz
-%{_mandir}/man1/pvfs2-write.1.gz
-%{_mandir}/man1/pvfs2-xattr.1.gz
-%{_mandir}/man1/pvfs2.1.gz
-%{_mandir}/man1/setmattr.1.gz
-%{_mandir}/man5/pvfs2tab.5.gz
-
-%ldconfig_scriptlets
-
-%package devel
-
-Summary: Parallel network file system development libraries
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description devel
-%desc
-
-This package contains the headers and libraries necessary for client
-development.
-
-%files devel
-%{_bindir}/pvfs2-config
-%{_includedir}/orange.h
-%{_includedir}/pvfs2-compat.h
-%{_includedir}/pvfs2-debug.h
-%{_includedir}/pvfs2-encode-stubs.h
-%{_includedir}/pvfs2-hint.h
-%{_includedir}/pvfs2-mgmt.h
-%{_includedir}/pvfs2-mirror.h
-%{_includedir}/pvfs2-request.h
-%{_includedir}/pvfs2-sysint.h
-%{_includedir}/pvfs2-types.h
-%{_includedir}/pvfs2-usrint.h
-%{_includedir}/pvfs2-util.h
-%{_includedir}/pvfs2.h
-%{_libdir}/libpvfs2.so
-
-%package server
-
-Summary: Parallel network file system server
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-Requires: perl(Math::BigInt)
-
-%description server
-%desc
-
-This package contains the server.
-
-%files server
-%dir %{_sysconfdir}/orangefs
-%config(noreplace) %{_sysconfdir}/orangefs/orangefs.conf
-%{_bindir}/pvfs2-genconfig
-%{_bindir}/pvfs2-mkspace
-%{_bindir}/pvfs2-showcoll
-%{_sbindir}/pvfs2-server
-%{_unitdir}/orangefs-server.service
-%{_mandir}/man1/pvfs2-genconfig.1.gz
-%{_mandir}/man1/pvfs2-mkspace.1.gz
-%{_mandir}/man1/pvfs2-server.1.gz
-%{_mandir}/man1/pvfs2-showcoll.1.gz
-%{_mandir}/man5/orangefs.conf.5.gz
-%dir %{_sharedstatedir}/orangefs
-
-%package fuse
-
-Summary: Parallel network file system FUSE client
-
-Requires: %{name}%{?_isa} = %{version}-%{release}
-
-%description fuse
-%desc
-
-This package contains the FUSE client.
-
-%files fuse
-%{_bindir}/pvfs2fuse
 
 %changelog
+* Wed Feb 18 2026 Terje Rosten <terjeros@gmail.com> - 2.10.1-3
+- Fix tex buildreqs
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.10.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Oct 20 2025 Terje Rosten <terjeros@gmail.com> - 2.10.1-1
+- 2.10.1
+- move pdf to -docs subpackage
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.9.8-15
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

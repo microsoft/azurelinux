@@ -3,8 +3,8 @@
 
 Name:    libatomic_ops
 Summary: Atomic memory update operations
-Version: 7.8.2
-Release: 9%{?dist}
+Version: 7.10.0
+Release: 2%{?dist}
 
 # libatomic_ops MIT, libatomic_ops_gpl GPLv2+
 License: GPL-2.0-or-later AND MIT
@@ -18,6 +18,11 @@ BuildRequires: make
 Provides: libatomic1 = %{version}-%{release}
 Provides: libatomic1%{?_isa} = %{version}-%{release}
 
+# from README.md:
+# IN NEW CODE, PLEASE USE C11 OR C++14 STANDARD ATOMICS INSTEAD OF THE CORE
+# LIBRARY IN THIS PACKAGE.
+Provides: deprecated()
+
 %description
 Provides implementations for atomic memory update operations on a
 number of architectures. This allows direct use of these in reasonably
@@ -28,12 +33,14 @@ that involves minimum overhead across a variety of architectures.
 %package devel
 Summary: Development files for %{name}
 Requires: %{name}%{?_isa} = %{version}-%{release}
+Provides: deprecated()
 %description devel
 Files for developing with %{name}.
 
 %package static
 Summary: Static library files for %{name}
 Requires: %{name}-devel%{?_isa} = %{version}-%{release}
+Provides: deprecated()
 %description static
 Files for developing with %{name} and linking statically.
 
@@ -85,6 +92,15 @@ export LD_LIBRARY_PATH=%{_builddir}/%{name}-%{version}/src/.libs/
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 7.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Dec 05 2025 Dan Horák <dan[at]danny.cz> - 7.10.0-1
+- Update to 7.10.0 (rhbz#2419349)
+
+* Fri Sep 05 2025 Fedora Release Monitoring <release-monitoring@fedoraproject.org> - 7.8.4-1
+- Update to 7.8.4 (rhbz#2393592)
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.8.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

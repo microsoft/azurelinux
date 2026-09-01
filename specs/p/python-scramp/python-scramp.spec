@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        1.4.6
-Release: 7%{?dist}
+Release:        5%{?dist}
 Summary:        Implementation of the SCRAM protocol
 
 License:        MIT-0
@@ -49,6 +49,9 @@ Scramp is a pure-Python implementation of the SCRAM authentication protocol.
 %license LICENSE
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.6-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.4.6-4
 - Rebuilt for Python 3.14.0rc3 bytecode
 

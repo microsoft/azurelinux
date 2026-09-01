@@ -1,0 +1,67 @@
+From 6e357ac84b20e43635969fdb65dec8ff66f4a408 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 25 Feb 2026 14:10:58 +0100
+Subject: [PATCH] spec: Use cmake macros for invoking a build script
+
+The macros are needed for modern cmake which generates scripts for
+ninja instead of make.
+
+The macros are available since cmake-3.18.0-0.3.rc2.fc33.
+
+Resolves: https://bugzilla.redhat.com/show_bug.cgi?id=2380990
+---
+ dnf-plugins-core.spec | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/dnf-plugins-core.spec b/dnf-plugins-core.spec
+index 8a1c49c..f70e7d1 100644
+--- a/dnf-plugins-core.spec
++++ b/dnf-plugins-core.spec
+@@ -48,7 +48,7 @@ License:        GPL-2.0-or-later
+ URL:            https://github.com/rpm-software-management/dnf-plugins-core
+ Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+ BuildArch:      noarch
+-BuildRequires:  cmake >= 3.5.0
++BuildRequires:  cmake >= 3.18.0
+ BuildRequires:  gettext
+ # Documentation
+ %if %{with python3}
+@@ -491,8 +491,8 @@ pushd build-py2
+   %cmake ../ -DPYTHON_DESIRED:FILEPATH=%{__python2} \
+     -DWITHOUT_DEBUG:str=0%{!?with_debug_plugin:1} \
+     -DWITHOUT_LOCAL:str=0%{?rhel}
+-  %make_build
+-  make doc-man
++  %cmake_build
++  %cmake_build --target doc-man
+ popd
+ %endif
+ %if %{with python3}
+@@ -500,20 +500,20 @@ pushd build-py3
+   %cmake ../ -DPYTHON_DESIRED:FILEPATH=%{__python3} \
+     -DWITHOUT_DEBUG:str=0%{!?with_debug_plugin:1} \
+     -DWITHOUT_LOCAL:str=0%{?rhel}
+-  %make_build
+-  make doc-man
++  %cmake_build
++  %cmake_build --target doc-man
+ popd
+ %endif
+ 
+ %install
+ %if %{with python2}
+ pushd build-py2
+-  %make_install
++  %cmake_install
+ popd
+ %endif
+ %if %{with python3}
+ pushd build-py3
+-  %make_install
++  %cmake_install
+ popd
+ %endif
+ 
+-- 
+2.53.0
+

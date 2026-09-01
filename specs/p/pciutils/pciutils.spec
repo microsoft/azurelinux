@@ -3,7 +3,7 @@
 
 Name:		pciutils
 Version:	3.14.0
-Release: 5%{?dist}
+Release:	2%{?dist}
 Summary:	PCI bus related utilities
 License:	GPL-2.0-or-later
 URL:		https://mj.ucw.cz/sw/pciutils/

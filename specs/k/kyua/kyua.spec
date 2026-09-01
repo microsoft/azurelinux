@@ -6,13 +6,16 @@
 
 Name:           kyua
 Version:        0.13
-Release: 22%{?dist}
+Release:        21%{?dist}
 Summary:        Testing framework for infrastructure software
 
 # Automatically converted from old format: BSD - review is highly recommended.
 License:        LicenseRef-Callaway-BSD
 URL:            https://github.com/jmmv/kyua
 Source0:        %{url}/releases/download/%{name}-%{version}/%{name}-%{version}.tar.gz
+# https://github.com/freebsd/kyua/pull/238
+# Fix test failure wrt empty test result on container
+Patch0:         kyua-pr238-add-more-info-for-failed-tests.patch
 
 BuildRequires:  make
 BuildRequires:  gcc-c++
@@ -54,7 +57,7 @@ Obsoletes:      kyua-testers-tests < 0.10
 %{summary}.
 
 %prep
-%autosetup
+%autosetup -p1
 
 # Disable problematic test
 # https://github.com/jmmv/kyua/issues/214
@@ -89,6 +92,12 @@ HOME=$(pwd)/check %make_build check %{_make_args}
 %{_libexecdir}/%{name}/
 
 %changelog
+* Wed Jan 28 2026 Mamoru TASAKA <mtasaka@tbz.t-com.ne.jp> - 0.13-21
+- Apply upstream fix for test failure wrt empty test result on container
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-20
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.13-19
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

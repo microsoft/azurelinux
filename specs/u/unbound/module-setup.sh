@@ -14,11 +14,6 @@ depends() {
 }
 
 install() {
-    # We have to make unbound wanted by network-online target to make sure
-    # there is a synchronization point when other services are able
-    # to make queries
-    inst_simple "$moddir"/unbound-initrd.conf /etc/systemd/system/unbound.service.d/unbound-initrd.conf
-
     # /etc and /var/lib do not have its variables
     inst_multiple -o \
     "$systemdsystemunitdir"/unbound.service \
@@ -39,6 +34,4 @@ install() {
     unbound \
     unbound-checkconf \
     unbound-control
-
-    $SYSTEMCTL -q --root "$initdir" enable unbound.service
 }

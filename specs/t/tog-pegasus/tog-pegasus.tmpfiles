@@ -1,6 +1,4 @@
 d /run/tog-pegasus 1750 root pegasus -
 
-d /var/lib/Pegasus 0750 root pegasus -
-d /var/lib/Pegasus/cache 0750 root pegasus -
-d /var/lib/Pegasus/log 0750 root pegasus -
-d /var/lib/Pegasus/repository 0750 root pegasus -
+# populate /var/lib/Pegaus with content from /usr/share/factory/var/lib/Pegasus
+C /var/lib/Pegasus - - - -

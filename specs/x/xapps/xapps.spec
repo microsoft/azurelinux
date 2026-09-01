@@ -2,14 +2,14 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           xapps
-Version:        2.8.8
-Release: 9%{?dist}
+Version:        3.2.2
+Release:        3%{?dist}
 Summary:        Common files for XApp desktop apps
 
 License:        LGPL-3.0-only
 URL:            https://github.com/linuxmint/%{name}
 Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-Source1:        http://packages.linuxmint.com/pool/main/f/flags/flags_1.0.2.tar.xz
+Source1:        http://packages.linuxmint.com/pool/main/f/flags/flags_1.0.4.tar.xz
 Patch0:         watcher_fix_libexec.patch
 
 ExcludeArch:    %{ix86}
@@ -127,6 +127,21 @@ rm %{buildroot}%{_datadir}/format
 %{python3_sitearch}/gi/overrides/__pycache__/XApp.cpython-%{python3_version_nodots}*.py*
 
 %changelog
+* Sat Feb 28 2026 Leigh Scott <leigh123linux@gmail.com> - 3.2.2-3
+- Update flags
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 09 2026 Leigh Scott <leigh123linux@gmail.com> - 3.2.2-1
+- Update to 3.2.2
+
+* Sat Dec 13 2025 Leigh Scott <leigh123linux@gmail.com> - 3.2.1-1
+- Update to 3.2.1
+
+* Wed Nov 12 2025 Leigh Scott <leigh123linux@gmail.com> - 3.2.0-1
+- Update to 3.2.0
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.8.8-6
 - Rebuilt for Python 3.14.0rc3 bytecode
 

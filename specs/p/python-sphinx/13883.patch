@@ -1,0 +1,30 @@
+From 4d842a2c4909fe360172826a46eb88b442f44858 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnter=20Milde?= <milde@users.sf.net>
+Date: Tue, 9 Sep 2025 16:17:15 +0200
+Subject: [PATCH] Fix test setup for directive tests.
+
+Set the "parent" attribute of RSTState instances to the `document`
+instead of None.  The attribute holds the state machines "current node"
+which is initialized to the `document` in `RSTStateMachine.run()` and
+required since Docutils 0.22.1 in `RSTState.nested_parse()` to correctly
+support sections in nested parsing.
+---
+ tests/test_util/test_util_docutils_sphinx_directive.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_util/test_util_docutils_sphinx_directive.py b/tests/test_util/test_util_docutils_sphinx_directive.py
+index ecfcab0..7a26e96 100644
+--- a/tests/test_util/test_util_docutils_sphinx_directive.py
++++ b/tests/test_util/test_util_docutils_sphinx_directive.py
+@@ -38,7 +38,7 @@ def make_directive_and_state(
+     inliner = Inliner()
+     inliner.init_customizations(state.document.settings)
+     state.inliner = inliner
+-    state.parent = None
++    state.parent = state.document
+     state.memo = SimpleNamespace(
+         document=state.document,
+         language=english,
+-- 
+2.51.1
+

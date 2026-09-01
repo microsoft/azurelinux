@@ -1,0 +1,375 @@
+From d16adef98a8c5afdd1c3866246bb9e3fe8b837c1 Mon Sep 17 00:00:00 2001
+From: Rob Crittenden <rcritten@redhat.com>
+Date: Tue, 13 Jan 2026 19:11:45 +0000
+Subject: [PATCH 6/6] Allow requesting a ML-DSA key using a strength
+
+I was discouraged from treating the numeric portion of ML-DSA
+algorithms as a "strength" per-se but it seems like other
+crypto products are doing it so I'm adding it for consistentcy.
+
+Interally certmonger will use the full name if a key type of
+ML-DSA is requested. The default will be ML-DSA-65.
+
+While implementing this I discovered there is a public function
+for identifying the ML key type in NSS given a private key blob
+so I switched that out in this as well.
+---
+ configure.ac     | 11 ++++----
+ src/getcert.c    | 25 ++++++++++++++++-
+ src/keygen-n.c   | 12 ++++++---
+ src/keyiread-n.c | 58 +++------------------------------------
+ src/prefs-n.c    | 70 +++++++++++++++++++++++++++---------------------
+ src/prefs-n.h    |  2 ++
+ 6 files changed, 83 insertions(+), 95 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 47e31c02..dd792289 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -721,18 +721,17 @@ if ! ${configure_dist_target_only:-false} ; then
+ 		LIBSsave="$LIBS"
+ 		CFLAGS="$OPENSSL_CFLAGS $CFLAGS"
+ 		LIBS="$OPENSSL_LIBS $LIBS"
++		can_ml_dsa=true
++		PKG_CHECK_MODULES([OPENSSL],[openssl >= 3.5],,[can_ml_dsa=false])
+ 		AC_CHECK_LIB(crypto,EVP_PKEY_Q_keygen)
++		AC_CHECK_DECLS(EVP_PKEY_ML_DSA_65,,can_ml_dsa=false,[#include <openssl/evp.h>])
+ 		CFLAGS="$NSS_CFLAGS $CFLAGS"
+ 		LIBS="$NSS_LIBS $LIBS"
+-		AC_CHECK_TYPES([CKM_ML_DSA_KEY_PAIR_GEN],,,[[#include <pkcs11t.h>]])
++		PKG_CHECK_MODULES([NSS],[nss >= 3.119],,[can_ml_dsa=false])
++		AC_CHECK_DECLS([CKM_ML_DSA_KEY_PAIR_GEN],,can_ml_dsa=false,[#include <pkcs11t.h>])
+ 		AC_CHECK_FUNCS(PK11_GenerateKeyPair)
+-		AC_CHECK_FUNCS(NSS_OptionGet NSS_OptionSet)
+ 		CFLAGS="$CFLAGSsave"
+ 		LIBS="$LIBSsave"
+-		can_ml_dsa=true
+-		if test x$HAVE_CKM_ML_DSA_KEY_PAIR_GEN = xno ; then
+-			can_ml_dsa=false
+-		fi
+ 		if test x$ac_cv_lib_crypto_EVP_PKEY_Q_keygen = xno ; then
+ 			can_ml_dsa=false
+ 		fi
+diff --git a/src/getcert.c b/src/getcert.c
+index a8353285..0771cb8e 100644
+--- a/src/getcert.c
++++ b/src/getcert.c
+@@ -896,6 +896,7 @@ request(const char *argv0, int argc, const char **argv)
+ 			    && (strcasecmp(poptarg, "EC") != 0)
+ #endif
+ #ifdef CM_ENABLE_ML_DSA
++			    && (strcasecmp(poptarg, "ML-DSA") != 0)
+ 			    && (strcasecmp(poptarg, "ML-DSA-44") != 0)
+ 			    && (strcasecmp(poptarg, "ML-DSA-65") != 0)
+ 			    && (strcasecmp(poptarg, "ML-DSA-87") != 0)
+@@ -912,7 +913,7 @@ request(const char *argv0, int argc, const char **argv)
+ 				printf(" EC");
+ #endif
+ #ifdef CM_ENABLE_ML_DSA
+-				printf(" ML-DSA-44 ML-DA-65 ML-DSA-87");
++				printf(" ML-DSA ML-DSA-44 ML-DA-65 ML-DSA-87");
+ #endif
+ 				printf("\n");
+ 				return 1;
+@@ -1140,6 +1141,25 @@ request(const char *argv0, int argc, const char **argv)
+ 			return 1;
+ 		}
+ 	}
++#endif
++#ifdef CM_ENABLE_ML_DSA
++	if ((keytype != NULL) && (strcasecmp(keytype, "ML-DSA") == 0)) {
++		talloc_free(keytype);
++		switch(keysize) {
++		case 44:
++			keytype = talloc_strdup(globals.tctx, "ML-DSA-44");
++			break;
++		case 65:
++			keytype = talloc_strdup(globals.tctx, "ML-DSA-65");
++			break;
++		case 87:
++			keytype = talloc_strdup(globals.tctx, "ML-DSA-87");
++			break;
++		default:
++			keytype = talloc_strdup(globals.tctx, "ML-DSA-65");
++			break;
++		}
++	}
+ #endif
+ 	if ((dbdir != NULL) && (nickname != NULL)) {
+ 		param[i].key = "KEY_STORAGE";
+@@ -2711,7 +2731,10 @@ rekey_or_resubmit(const char *argv0, const char *category, int argc,
+ 			    && (strcasecmp(poptarg, "EC") != 0)
+ #endif
+ #ifdef CM_ENABLE_ML_DSA
++			    && (strcasecmp(poptarg, "ML-DSA") != 0)
++			    && (strcasecmp(poptarg, "ML-DSA-44") != 0)
+ 			    && (strcasecmp(poptarg, "ML-DSA-65") != 0)
++			    && (strcasecmp(poptarg, "ML-DSA-87") != 0)
+ #endif
+ 			    ) {
+ 				printf(_("No support for generating \"%s\" keys.\n"),
+diff --git a/src/keygen-n.c b/src/keygen-n.c
+index 45b1426b..800d4994 100644
+--- a/src/keygen-n.c
++++ b/src/keygen-n.c
+@@ -36,6 +36,7 @@
+ #include <keythi.h>
+ #include <prerror.h>
+ #include <secerr.h>
++#include <cryptohi.h>
+ 
+ #include <talloc.h>
+ 
+@@ -274,15 +275,17 @@ cm_keygen_n_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 		pmech = CKM_EC_KEY_PAIR_GEN;
+ 		break;
+ #endif
+-#ifdef CM_ENABLE_ML_DSA:
++#ifdef CM_ENABLE_ML_DSA
+ 	case cm_key_ml_dsa_44:
+ 		cm_requested_key_size = ML_DSA_44_PRIVATEKEY_LEN;
+ 		mech = CKM_ML_DSA_KEY_PAIR_GEN;
+ 		pmech = CKM_ML_DSA_KEY_PAIR_GEN;
++		break;
+ 	case cm_key_ml_dsa_65:
+ 		cm_requested_key_size = ML_DSA_65_PRIVATEKEY_LEN;
+ 		mech = CKM_ML_DSA_KEY_PAIR_GEN;
+ 		pmech = CKM_ML_DSA_KEY_PAIR_GEN;
++		break;
+ 	case cm_key_ml_dsa_87:
+ 		cm_requested_key_size = ML_DSA_87_PRIVATEKEY_LEN;
+ 		mech = CKM_ML_DSA_KEY_PAIR_GEN;
+@@ -550,7 +553,7 @@ retry_gen:
+ 		/* no parameters to generate */
+ 		break;
+ #endif
+-#ifdef CM_ENABLE_ML_DSA:
++#ifdef CM_ENABLE_ML_DSA
+ 	case cm_key_ml_dsa_44:
+ 	case cm_key_ml_dsa_65:
+ 	case cm_key_ml_dsa_87:
+@@ -592,20 +595,23 @@ retry_gen:
+ 		params = &ec_params;
+ 		break;
+ #endif
+-#ifdef CM_ENABLE_ML_DSA:
++#ifdef CM_ENABLE_ML_DSA
+ 	case cm_key_ml_dsa_44:
+ 		memset(&ml_params, 0, sizeof(ml_params));
+ 		ml_params = CKP_ML_DSA_44;
++		cm_log(0, "params set to 44\n");
+ 		params = &ml_params;
+ 		break;
+ 	case cm_key_ml_dsa_65:
+ 		memset(&ml_params, 0, sizeof(ml_params));
+ 		ml_params = CKP_ML_DSA_65;
++		cm_log(0, "params set to 65\n");
+ 		params = &ml_params;
+ 		break;
+ 	case cm_key_ml_dsa_87:
+ 		memset(&ml_params, 0, sizeof(ml_params));
+ 		ml_params = CKP_ML_DSA_87;
++		cm_log(0, "params set to 87\n");
+ 		params = &ml_params;
+ 		break;
+ #endif
+diff --git a/src/keyiread-n.c b/src/keyiread-n.c
+index 7f9cdf09..254ed363 100644
+--- a/src/keyiread-n.c
++++ b/src/keyiread-n.c
+@@ -47,65 +47,13 @@
+ #include "store-int.h"
+ #include "subproc.h"
+ #include "util-n.h"
++#include "prefs-n.h"
+ 
+ #ifndef PRIVKEY_LIST_EMPTY
+ #define PRIVKEY_LIST_EMPTY(l) PRIVKEY_LIST_END(PRIVKEY_LIST_HEAD(l), l)
+ #endif
+ 
+ 
+-/* FIXME: replace when NSS exposes the capability to get the alg */
+-/* look up the an oid by string.
+- *
+- * The following code was ripped from NSS.
+- * */
+-#include <cryptohi.h>
+-
+-/* If SECKEY_GetParameterSet() is exported then this can be replaced */
+-const char *
+-cm_GetSignatureAlgorithmFromPrivateKey(SECKEYPrivateKey *privKey)
+-{
+-    SECItem item;
+-    CK_ULONG paramSet;
+-    SECStatus rv;
+-
+-    /* don't modify hashAlg if we aren't a DSA key */
+-    if (privKey->keyType != mldsaKey) {
+-	/* should not get here */
+-        return "Invalid ML-DSA key";
+-    }
+-
+-    rv = PK11_ReadRawAttribute(PK11_TypePrivKey, privKey,
+-                                CKA_PARAMETER_SET, &item);
+-
+-    if (rv != SECSuccess) {
+-        return "UNKNOWN";
+-    }
+-    if (item.len != sizeof (paramSet)) {
+-        PORT_Free(item.data);
+-        PORT_SetError(SEC_ERROR_INVALID_KEY);
+-        return "UNKNOWN";
+-    }
+-    paramSet = *(CK_ULONG *)item.data;
+-    PORT_Free(item.data);
+-    switch  (paramSet) {
+-        case CKP_ML_DSA_44:
+-            return "ML-DSA-44";
+-            break;
+-        case CKP_ML_DSA_65:
+-            return "ML-DSA-65";
+-            break;
+-        case CKP_ML_DSA_87:
+-            return "ML-DSA-87";
+-            break;
+-        default:
+-            return "UNKNOWN";
+-            break;
+-    }
+-    return "UNKNOWN";
+-}
+-
+-/* end FIXME */
+-
+ struct cm_keyiread_state {
+ 	struct cm_keyiread_state_pvt pvt;
+ 	struct cm_store_entry *entry;
+@@ -577,8 +525,8 @@ cm_keyiread_n_main(int fd, struct cm_store_ca *ca, struct cm_store_entry *entry,
+ 			alg = "EC";
+ 			break;
+ 		case mldsaKey:
+-			cm_log(3, "Key is an ML-DSA key.\n");
+-			alg = cm_GetSignatureAlgorithmFromPrivateKey(keys->privkey);
++			cm_log(3, "Key is an ML-DSA key %s.\n", alg);
++			alg = cm_GetSignatureMLAlgorithmFromPrivateKey(keys->privkey);
+ 			break;
+ 		case nullKey:
+ 		default:
+diff --git a/src/prefs-n.c b/src/prefs-n.c
+index d080f0a1..49e443b3 100644
+--- a/src/prefs-n.c
++++ b/src/prefs-n.c
+@@ -19,6 +19,7 @@
+ 
+ #include <nss.h>
+ #include <nss.h>
++#include <cryptohi.h>
+ #include <keyhi.h>
+ #include <keythi.h>
+ #include <pk11pub.h>
+@@ -26,6 +27,7 @@
+ 
+ #include "prefs.h"
+ #include "prefs-n.h"
++#include "util-n.h"
+ 
+ unsigned int
+ cm_prefs_nss_sig_alg(SECKEYPrivateKey *pkey)
+@@ -118,41 +120,19 @@ cm_prefs_nss_sig_alg(SECKEYPrivateKey *pkey)
+ 		}
+ #ifdef CM_ENABLE_ML_DSA
+ 	case mldsaKey:
+-		/* This is a simplified version of
+-		 * cm_GetSignatureAlgorithmFromPrivateKey from keyiread-n.c.
+-		 * Once the NSS function is exported that can be moved to
+-		 * something like util-n.c and be generalized. For now I
+-		 * duplicate.
+-		 */
+-		SECItem item;
+-		CK_ULONG paramSet;
+-		SECStatus rv;
++		const char *alg = cm_GetSignatureMLAlgorithmFromPrivateKey(pkey);
+ 
+-		rv = PK11_ReadRawAttribute(PK11_TypePrivKey, pkey, CKA_PARAMETER_SET, &item);
+-		if (rv != SECSuccess) {
+-			return SEC_OID_UNKNOWN;
+-		}
+-
+-		if (item.len != sizeof(paramSet)) {
+-			PORT_Free(item.data);	
+-			PORT_SetError(SEC_ERROR_INVALID_KEY);
+-			return SEC_OID_UNKNOWN;
+-		}
+-		paramSet = *(CK_ULONG *)item.data;
+-		PORT_Free(item.data);
+-		switch (paramSet) {
+-		case CKP_ML_DSA_44:
++		if (strcasecmp(alg, "ML-DSA-44") == 0) {
+ 			return SEC_OID_ML_DSA_44_SIGNATURE;
+-			break;
+-		case CKP_ML_DSA_65:
++		}
++		else if (strcasecmp(alg, "ML-DSA-65") == 0) {
+ 			return SEC_OID_ML_DSA_65_SIGNATURE;
+-			break;
+-		case CKP_ML_DSA_87:
++		}
++		else if (strcasecmp(alg, "ML-DSA-87") == 0) {
+ 			return SEC_OID_ML_DSA_87_SIGNATURE;
+-			break;
+-		default:
++		}
++		else {
+ 			return SEC_OID_UNKNOWN;
+-			break;
+ 		}
+ #endif
+ 	default:
+@@ -211,3 +191,33 @@ cm_prefs_nss_dig_alg_len(void)
+ 		break;
+ 	}
+ }
++
++const char *
++cm_GetSignatureMLAlgorithmFromPrivateKey(SECKEYPrivateKey *privKey)
++{
++	SECOidTag hashAlgTag = SEC_OID_UNKNOWN;
++	SECOidTag tag = SEC_GetSignatureAlgorithmOidTagByKey(privKey, NULL, hashAlgTag);
++
++	if (privKey->keyType != mldsaKey) {
++		return "Not a ML-DSA key";
++	}
++
++	if (tag == SEC_OID_UNKNOWN) {
++	   return "UNKNOWN";
++	}
++
++	switch (tag) {
++		case SEC_OID_ML_DSA_44_PUBLIC_KEY:
++			return "ML-DSA-44";
++			break;
++		case SEC_OID_ML_DSA_65_PUBLIC_KEY:
++			return "ML-DSA-65";
++			break;
++		case SEC_OID_ML_DSA_87_PUBLIC_KEY:
++			return "ML-DSA-87";
++			break;
++		default:
++			return "UNKNOWN";
++			break;
++	}
++}
+diff --git a/src/prefs-n.h b/src/prefs-n.h
+index dff0bc3e..40461f39 100644
+--- a/src/prefs-n.h
++++ b/src/prefs-n.h
+@@ -22,4 +22,6 @@ unsigned int cm_prefs_nss_sig_alg(SECKEYPrivateKey *pkey);
+ unsigned int cm_prefs_nss_dig_alg(void);
+ unsigned int cm_prefs_nss_dig_alg_len(void);
+ 
++const char * cm_GetSignatureMLAlgorithmFromPrivateKey(SECKEYPrivateKey *privKey);
++
+ #endif
+-- 
+2.52.0
+

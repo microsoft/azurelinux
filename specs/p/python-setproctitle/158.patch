@@ -1,0 +1,31 @@
+From 6c72eb7039c124167ed5d3bc9a8b2c2f9d030c6a Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Thu, 30 Oct 2025 15:12:24 +0100
+Subject: [PATCH] Fix for CPython 3.15 (clearenv)
+
+Fix find_argv_from_env() if clearenv() has been called. Python 3.15
+implements os.environ.clear() as clearenv().
+
+Co-Authored-By: Karolina Surma <ksurma@redhat.com>
+---
+ src/spt_setup.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/spt_setup.c b/src/spt_setup.c
+index ba7a7a6..4078d36 100644
+--- a/src/spt_setup.c
++++ b/src/spt_setup.c
+@@ -139,6 +139,13 @@ find_argv_from_env(int argc, char *arg0)
+     }
+     buf[argc] = NULL;
+ 
++    /* environ can be NULL if clearenv() has been called.
++     * Python 3.15 implements os.environ.clear() as clearenv(). */
++    if (!environ) {
++        spt_debug("environ pointer is NULL");
++        goto exit;
++    }
++
+     /* Walk back from environ until you find argc-1 null-terminated strings.
+      * Don't look for argv[0] as it's probably not preceded by 0. */
+     ptr = environ[0];

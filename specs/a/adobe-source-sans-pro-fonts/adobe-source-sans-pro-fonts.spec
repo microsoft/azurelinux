@@ -2,7 +2,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Version:        3.052
-Release: 10%{?dist}
+Release:        9%{?dist}
 URL:            https://github.com/adobe-fonts/source-sans
 
 %global foundry adobe
@@ -48,6 +48,12 @@ Source10:       63-%{fontpkgname}.conf
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.052-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.052-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.052-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

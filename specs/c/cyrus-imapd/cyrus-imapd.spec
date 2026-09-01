@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -14,7 +14,7 @@
 #%%global prever rc1
 
 Name: cyrus-imapd
-Version: 3.10.2
+Version: 3.12.2
 Release: %autorelease %{?prever:-e %prever}
 Summary: A high-performance email, contacts and calendar server
 License: BSD-Attribution-HPND-disclaimer
@@ -30,9 +30,9 @@ URL: http://www.cyrusimap.org/
 
 %define cyrususer cyrus
 %define cyrusgroup mail
-%define cyrexecdir %_libexecdir/%name
+%define cyrexecdir %{_libexecdir}/%{name}
 
-%define ssl_pem_file_prefix /etc/pki/%name/%name
+%define ssl_pem_file_prefix /etc/pki/%{name}/%{name}
 
 %global __provides_exclude ^perl\\(AnnotateInlinedCIDs\\)$
 
@@ -49,8 +49,8 @@ URL: http://www.cyrusimap.org/
 #       # rpmbuild -bi /tmp/rpmbuild/SPECS/cyrus-imapd.spec 2>&1 | tee build.log
 %bcond_with cassandane
 
-Source0: https://github.com/cyrusimap/cyrus-imapd/releases/download/cyrus-imapd-%version%{?prever:-%prever}/cyrus-imapd-%version%{?prever:-%prever}.tar.gz
-Source1: https://github.com/cyrusimap/cyrus-imapd/releases/download/cyrus-imapd-%version%{?prever:-%prever}/cyrus-imapd-%version%{?prever:-%prever}.tar.gz.sig
+Source0: https://github.com/cyrusimap/cyrus-imapd/releases/download/cyrus-imapd-%{version}%{?prever:-%prever}/cyrus-imapd-%{version}%{?prever:-%prever}.tar.gz
+Source1: https://github.com/cyrusimap/cyrus-imapd/releases/download/cyrus-imapd-%{version}%{?prever:-%prever}/cyrus-imapd-%{version}%{?prever:-%prever}.tar.gz.sig
 # Ellie Timoney's public key from https://github.com/elliefm.gpg
 Source2: elliefm-pub.key
 Source10: cyrus-imapd.logrotate
@@ -69,32 +69,27 @@ Source19: systemd-sysusers.conf
 Source81: cassandane.ini
 
 # Adapt a timeout to handle our slower builders
-Patch0: patch-cyrus-testsuite-timeout
+Patch0: cyrus-imapd-testsuite-timeout.patch
 # Fedora-specific patch for the default configuration file
-Patch1: patch-cyrus-default-configs
+Patch1: cyrus-imapd-default-configs.patch
 # We rename quota to cyr_quota to avoid a conflict with /usr/bin/quota; one
 # place in the source must be patched to match.
-Patch2: patch-cyrus-rename-quota
+Patch2: cyrus-imapd-rename-quota.patch
 # cyrus-imapd does not support LTO
 # https://github.com/cyrusimap/cyrus-imapd/pull/4679
 # Remove attribute always_inline to fix compilation error and keep LTO enabled:
 # https://bugzilla.redhat.com/show_bug.cgi?id=2223951
-Patch4: patch-cyrus-remove-always-inline-for-buf-len
-Patch5: patch-cyrus-rename-imtest
+Patch3: cyrus-imapd-remove-always-inline-for-buf-len.patch
+Patch4: cyrus-imapd-rename-imtest.patch
 
 # Cassandane patches:
 # Prevent cassandane from trying to syslog things
-Patch91: patch-cassandane-no-syslog
+Patch91: cassandane-no-syslog.patch
 # Tell the annotator script to run as the current user/group
 # Upstream ticket https://github.com/cyrusimap/cyrus-imapd/issues/1995
-Patch92: patch-cassandane-fix-annotator
-# TODO libexec/cyrus-imapd path element got into upstream:
-# https://github.com/cyrusimap/cyrus-imapd/commit/9233f70bf7a2872ab0b456ea294ce36e0e01e182
-# try to get fixed the below upstream to work on Fedora:
-# https://github.com/cyrusimap/cyrus-imapd/commit/f10eee167313418d84e63d215310477d4fe68e94
-Patch93: patch-cassandane-xapian-delve-path
+Patch92: cassandane-fix-annotator.patch
 # Due to the /usr/sbin->/usr/bin merge, add /usr/bin path to the mix
-Patch94: patch-cassandane-build-info.patch
+Patch93: cassandane-build-info.patch
 
 BuildRequires: autoconf automake bison flex gcc gcc-c++ git glibc-langpack-en
 BuildRequires: groff libtool make perl-devel perl(ExtUtils::MakeMaker)
@@ -105,11 +100,11 @@ BuildRequires: jansson-devel krb5-devel libical-devel libicu-devel
 BuildRequires: libnghttp2-devel libpq-devel libxml2-devel
 BuildRequires: mariadb-connector-c-devel net-snmp-devel
 BuildRequires: openldap-devel openssl-devel pcre2-devel
-BuildRequires: sqlite-devel wslay-devel xapian-core-devel
+BuildRequires: sqlite-devel xapian-core-devel
 # Miscellaneous modules needed for 'make check' to function:
 BuildRequires: cyrus-sasl-plain cyrus-sasl-md5
 %if 0%{?fedora}
-BuildRequires: clamav-devel shapelib-devel
+BuildRequires: clamav-devel shapelib-devel wslay-devel
 %endif
 BuildRequires: gpgverify
 
@@ -269,7 +264,7 @@ Requires: cyrus-imapd-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
-The %name-devel package contains header files and libraries
+The %{name}-devel package contains header files and libraries
 necessary for developing applications which use the imclient library.
 
 %package doc-extra
@@ -323,10 +318,10 @@ This package contains Perl libraries used to interface with Cyrus IMAPd.
 %autosetup -p1 -n cyrus-imapd-%{version}%{?prever:-%{prever}}
 
 # https://github.com/cyrusimap/cyrus-imapd/commit/216934c3f4884999206715db3499fc0162e1d65c
-echo %version > VERSION
+echo %{version} > VERSION
 
 # Install the Fedora-specific documentation file
-install -m 644 %SOURCE15 doc/
+install -m 644 %{SOURCE15} doc/
 
 # The pm files have shebang lines for some reason
 sed -i -e '1{/usr.bin.perl/d}' perl/annotator/{Message,Daemon}.pm
@@ -353,11 +348,11 @@ sed -i \
 
 %if %{with cassandane}
 pushd cassandane
-cp %SOURCE81 cassandane.ini
+cp %{SOURCE81} cassandane.ini
 # RF rpm-buildroot-usage
 sed -i \
     -e "s!CASSDIR!/tmp/cassandane!" \
-    -e "s!BUILDROOT!%buildroot!" \
+    -e "s!BUILDROOT!%{buildroot}!" \
     cassandane.ini
 popd
 %endif
@@ -373,6 +368,9 @@ export CLD2_LIBS="-lcld2"
 > cassandane/cld2-compiled-in
 %endif
 
+# C++17 or later needed for libicu-devel
+export CXXFLAGS="%{optflags} -std=gnu++17"
+
 %configure \
     --disable-silent-rules \
     \
@@ -382,7 +380,7 @@ export CLD2_LIBS="-lcld2"
 `# Needed for Cyrus::FastMail tests to pass` \
     --with-cld2 \
 %endif
-    --with-extraident="%release Fedora" \
+    --with-extraident="%{release} Fedora" \
     --with-krbimpl=mit \
     --with-ldap=/usr \
     --with-libwrap=no \
@@ -393,7 +391,6 @@ export CLD2_LIBS="-lcld2"
     --with-syslogfacility=MAIL \
     \
     --enable-autocreate \
-    --enable-backup \
     --enable-calalarmd \
     --enable-http \
     --enable-idled \
@@ -485,55 +482,55 @@ popd
 
 
 %install
-make install DESTDIR=%buildroot
+make install DESTDIR=%{buildroot}
 
 # Create directories
 install -d \
-    %buildroot/etc/{rc.d/init.d,logrotate.d,pam.d,sysconfig,cron.daily} \
-    %buildroot/%_libdir/sasl \
-    %buildroot/var/spool/imap \
-    %buildroot/var/lib/imap/{user,quota,proc,log,msg,socket,db,sieve,sync,md5,rpm,backup,meta} \
-    %buildroot/var/lib/imap/ptclient \
-    %buildroot/%_datadir/%name/rpm \
-    %buildroot/%cyrexecdir \
-    %buildroot/etc/pki/%name
+    %{buildroot}/etc/{rc.d/init.d,logrotate.d,pam.d,sysconfig,cron.daily} \
+    %{buildroot}/%{_libdir}/sasl \
+    %{buildroot}/var/spool/imap \
+    %{buildroot}/var/lib/imap/{user,quota,proc,log,msg,socket,db,sieve,sync,md5,rpm,backup,meta} \
+    %{buildroot}/var/lib/imap/ptclient \
+    %{buildroot}/%{_datadir}/%{name}/rpm \
+    %{buildroot}/%{cyrexecdir} \
+    %{buildroot}/etc/pki/%{name}
 
 install -d -m 0750 \
-    %buildroot/run/cyrus \
-    %buildroot/run/cyrus/socket
+    %{buildroot}/run/cyrus \
+    %{buildroot}/run/cyrus/socket
 
 install -d -m 0700 \
-    %buildroot/run/cyrus/db \
-    %buildroot/run/cyrus/lock \
-    %buildroot/run/cyrus/proc
+    %{buildroot}/run/cyrus/db \
+    %{buildroot}/run/cyrus/lock \
+    %{buildroot}/run/cyrus/proc
 
 # Some tools which aren't installed by the makefile which we have always installed
-install -m 755 notifyd/notifytest  %buildroot%_bindir/
-install -m 755 perl/imap/cyradm    %buildroot%_bindir/
+install -m 755 notifyd/notifytest  %{buildroot}%{_bindir}/
+install -m 755 perl/imap/cyradm    %{buildroot}%{_bindir}/
 for i in arbitronsort.pl masssievec mkimap mknewsgroups rehash translatesieve; do
-    install -m 755 tools/$i %buildroot/%cyrexecdir/
+    install -m 755 tools/$i %{buildroot}/%{cyrexecdir}/
 done
 
-install -p -m 644 %SOURCE10 %buildroot/etc/logrotate.d/%name
+install -p -m 644 %{SOURCE10} %{buildroot}/etc/logrotate.d/%{name}
 
 # PAM configuration files.
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/csync
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/http
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/imap
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/lmtp
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/mupdate
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/nntp
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/pop
-install -p -m 644 %SOURCE11 %buildroot/etc/pam.d/sieve
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/csync
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/http
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/imap
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/lmtp
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/mupdate
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/nntp
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/pop
+install -p -m 644 %{SOURCE11} %{buildroot}/etc/pam.d/sieve
 
-install -p -m 644 %SOURCE12 %buildroot/etc/sysconfig/%name
-install -p -m 644 %SOURCE13 %buildroot/%_datadir/%name/rpm/magic
-install -p -m 755 %SOURCE14 %buildroot/etc/cron.daily/%name
-install -p -m 644 doc/examples/cyrus_conf/prefork.conf %buildroot/etc/cyrus.conf
-install -p -m 644 doc/examples/imapd_conf/normal.conf %buildroot/etc/imapd.conf
-install -p -D -m 644 %SOURCE16 %buildroot/%_unitdir/cyrus-imapd.service
-install -p -D -m 644 %SOURCE17 %buildroot/%_unitdir/cyrus-imapd-init.service
-install -p -D -m 644 %SOURCE18 %buildroot/%_tmpfilesdir/cyrus-imapd.conf
+install -p -m 644 %{SOURCE12} %{buildroot}/etc/sysconfig/%{name}
+install -p -m 644 %{SOURCE13} %{buildroot}/%{_datadir}/%{name}/rpm/magic
+install -p -m 755 %{SOURCE14} %{buildroot}/etc/cron.daily/%{name}
+install -p -m 644 doc/examples/cyrus_conf/prefork.conf %{buildroot}/etc/cyrus.conf
+install -p -m 644 doc/examples/imapd_conf/normal.conf %{buildroot}/etc/imapd.conf
+install -p -D -m 644 %{SOURCE16} %{buildroot}/%{_unitdir}/cyrus-imapd.service
+install -p -D -m 644 %{SOURCE17} %{buildroot}/%{_unitdir}/cyrus-imapd-init.service
+install -p -D -m 644 %{SOURCE18} %{buildroot}/%{_tmpfilesdir}/cyrus-imapd.conf
 # systemd-sysusers
 install -p -D -m 644 %{SOURCE19} %{buildroot}%{_sysusersdir}/cyrus-imapd.conf
 
@@ -547,13 +544,13 @@ rm -f doc/text/Makefile
 rm -rf doc/man
 
 # fix permissions on perl .so files
-find %buildroot/%_libdir/perl5/ -type f -name "*.so" -exec chmod 755 {} \;
+find %{buildroot}/%{_libdir}/perl5/ -type f -name "*.so" -exec chmod 755 {} \;
 
 # Generate db config file
 # XXX Is this still necessary?
 ( grep '^{' lib/imapoptions | grep _db | cut -d'"' -f 2,4 | \
   sed -e 's/^ *//' -e 's/-nosync//' -e 's/ *$//' -e 's/"/=/'
-  echo sieve_version=2.2.3 ) | sort > %buildroot/%_datadir/%name/rpm/db.cfg
+  echo sieve_version=2.2.3 ) | sort > %{buildroot}/%{_datadir}/%{name}/rpm/db.cfg
 
 # Cyrus has various files with extremely conflicting names.  Some of these are
 # not unexpected ("imapd" itself) but some like "httpd" are rather surprising.
@@ -565,41 +562,37 @@ find %buildroot/%_libdir/perl5/ -type f -name "*.so" -exec chmod 755 {} \;
 
 # Actual binary conflicts
 # Rename 'fetchnews' binary and manpage to avoid clash with leafnode
-mv %buildroot/%_sbindir/fetchnews %buildroot/%_sbindir/cyr_fetchnews
-mv %buildroot/%_mandir/man8/fetchnews.8 %buildroot/%_mandir/man8/cyr_fetchnews.8
-
-# Fix conflict with dump
-mv %buildroot/%_sbindir/restore %buildroot/%_sbindir/cyr_restore
-mv %buildroot/%_mandir/man8/restore.8 %buildroot/%_mandir/man8/cyr_restore.8
+mv %{buildroot}/%{_bindir}/fetchnews %{buildroot}/%{_bindir}/cyr_fetchnews
+mv %{buildroot}/%{_mandir}/man8/fetchnews.8 %{buildroot}/%{_mandir}/man8/cyr_fetchnews.8
 
 # Fix conceptual conflict with quota
-mv %buildroot/%_sbindir/quota %buildroot/%_sbindir/cyr_quota
-mv %buildroot/%_mandir/man8/quota.8 %buildroot/%_mandir/man8/cyr_quota.8
+mv %{buildroot}/%{_bindir}/quota %{buildroot}/%{_bindir}/cyr_quota
+mv %{buildroot}/%{_mandir}/man8/quota.8 %{buildroot}/%{_mandir}/man8/cyr_quota.8
 
 # fix conflicts with uw-imap
-mv %buildroot/%_mandir/man8/imapd.8 %buildroot/%_mandir/man8/imapd.8cyrus
-mv %buildroot/%_mandir/man8/pop3d.8 %buildroot/%_mandir/man8/pop3d.8cyrus
+mv %{buildroot}/%{_mandir}/man8/imapd.8 %{buildroot}/%{_mandir}/man8/imapd.8cyrus
+mv %{buildroot}/%{_mandir}/man8/pop3d.8 %{buildroot}/%{_mandir}/man8/pop3d.8cyrus
 
 # Rename 'master' manpage
-mv %buildroot/%_mandir/man8/master.8 %buildroot/%_mandir/man8/master.8cyrus
+mv %{buildroot}/%{_mandir}/man8/master.8 %{buildroot}/%{_mandir}/man8/master.8cyrus
 
 # Rename 'httpd' manpage to avoid clash with Apache
-mv %buildroot/%_mandir/man8/httpd.8 %buildroot/%_mandir/man8/httpd.8cyrus
+mv %{buildroot}/%{_mandir}/man8/httpd.8 %{buildroot}/%{_mandir}/man8/httpd.8cyrus
 
 # Fix conflict with imtest from python-fslpy
-mv %buildroot/%_bindir/imtest %buildroot/%_bindir/cyr_imtest
-mv %buildroot/%_mandir/man1/imtest.1 %buildroot/%_mandir/man1/cyr_imtest.1
+mv %{buildroot}/%{_bindir}/imtest %{buildroot}/%{_bindir}/cyr_imtest
+mv %{buildroot}/%{_mandir}/man1/imtest.1 %{buildroot}/%{_mandir}/man1/cyr_imtest.1
 # Change individual symlinks to point to cyr_imtest instead of imtest
 for i in httptest lmtptest mupdatetest nntptest pop3test sivtest smtptest synctest; do
-  ln -sfr %buildroot/%_bindir/cyr_imtest %buildroot/%_bindir/$i
+  ln -sfr %{buildroot}/%{_bindir}/cyr_imtest %{buildroot}/%{_bindir}/$i
 done
 
 # Old cyrus packages used to keep the deliver executable in
 # /usr/lib/cyrus-imapd, and MTA configurations might rely on this.
 # Remove this hack in the F30 timeframe.
 # RF hardcoded-library-path in %%buildroot/usr/lib/cyrus-imapd
-mkdir %buildroot/usr/lib/cyrus-imapd
-pushd %buildroot/usr/lib/cyrus-imapd
+mkdir %{buildroot}/usr/lib/cyrus-imapd
+pushd %{buildroot}/usr/lib/cyrus-imapd
 ln -s ../../sbin/deliver
 popd
 
@@ -610,21 +603,21 @@ do
 done
 
 # Remove pointless libtool archives
-rm %buildroot/%_libdir/*.la
+rm %{buildroot}/%{_libdir}/*.la
 
 # Remove installed but not packaged files
-rm %buildroot/%cyrexecdir/pop3proxyd
-find %buildroot -name "perllocal.pod" -exec rm {} \;
-find %buildroot -name ".packlist" -exec rm {} \;
+rm %{buildroot}/%{cyrexecdir}/pop3proxyd
+find %{buildroot} -name "perllocal.pod" -exec rm {} \;
+find %{buildroot} -name ".packlist" -exec rm {} \;
 
 # And this one gets installed with executable permission
-chmod -x %buildroot/%perl_vendorlib/Cyrus/Annotator/Daemon.pm
+chmod -x %{buildroot}/%{perl_vendorlib}/Cyrus/Annotator/Daemon.pm
 
 
 %check
 # TODO: unit tests fail on i686 - https://github.com/cyrusimap/cyrus-imapd/issues/5431
 %ifnarch i686
-LD_LIBRARY_PATH=%buildroot/%_libdir make -j%{?_smp_build_ncpus} check || exit 1
+LD_LIBRARY_PATH=%{buildroot}/%{_libdir} make -j%{?_smp_build_ncpus} check || exit 1
 %endif
 
 %if %{without cassandane}
@@ -636,7 +629,7 @@ exit 0
 #imap/imapd.c:    if (geteuid() == 0) fatal("must run as the Cyrus user", EX_USAGE);
 #imap/httpd.c:    if (geteuid() == 0) fatal("must run as the Cyrus user", EX_USAGE);
 #imap/pop3d.c:    if (geteuid() == 0) fatal("must run as the Cyrus user", EX_USAGE);
-getent group saslauth >/dev/null || /usr/sbin/groupadd -g %gid -r saslauth
+getent group saslauth >/dev/null || /usr/sbin/groupadd -g %{gid} -r saslauth
 getent passwd saslauth >/dev/null && (
     # Workaround for systemd-sysusers bug: https://github.com/systemd/systemd/issues/37495
     # If cyrus-sasl package is installed first, it creates user saslauth with UID 76 instead of only group.
@@ -645,14 +638,14 @@ getent passwd saslauth >/dev/null && (
 )
 # Set up shell and home directory for cyrus so that debugging of failing tests is easier.
 getent passwd cyrus >/dev/null && /usr/sbin/usermod -s /bin/bash cyrus
-getent passwd cyrus >/dev/null || /usr/sbin/useradd -c "Cyrus IMAP Server" -d /var/lib/imap -g %cyrusgroup \
-  -G saslauth -s /bin/bash -u %uid -r %cyrususer -m
+getent passwd cyrus >/dev/null || /usr/sbin/useradd -c "Cyrus IMAP Server" -d /var/lib/imap -g %{cyrusgroup} \
+  -G saslauth -s /bin/bash -u %{uid} -r %{cyrususer} -m
 
 # Set LD_LIBRARY_PATH for cyrus so that it points to cyrus-imapd libraries we just built.
-[ -z "`grep LD_LIBRARY_PATH /var/lib/imap/.bashrc`" ] && echo "export LD_LIBRARY_PATH=%buildroot/%_libdir" >> /var/lib/imap/.bashrc
+[ -z "`grep LD_LIBRARY_PATH /var/lib/imap/.bashrc`" ] && echo "export LD_LIBRARY_PATH=%{buildroot}/%{_libdir}" >> /var/lib/imap/.bashrc
 
 mkdir -p /tmp/cassandane/work
-chown -R %cyrususer:%cyrusgroup /tmp/cassandane/
+chown -R %{cyrususer}:%{cyrusgroup} /tmp/cassandane/
 
 # CASSANDANE
 # Run the Cassandane test suite.  This will exhaustively test the various
@@ -675,14 +668,18 @@ tests=(
     Cyrus::Admin.imap_admins_virtdomains
 
     # TODO currently failing
-    Cyrus::CaldavAlarm.recurring_allday_floating
+    Cyrus::Caldav.freebusy_empty_rrule
     Cyrus::ImapTest.urlauth2
-    Cyrus::JMAPBackup.restore_calendars_batch_size_bug2
-    Cyrus::JMAPCalendars.calendarevent_get_empty_apple_location
+    Cyrus::IMAPLimits.maxargssize_append_flags
     Cyrus::JMAPCalendars.calendarevent_guesstz_ignore_xjmapid
     Cyrus::JMAPCalendars.itip_ignore_invalid_timezone
-    Cyrus::JMAPEmail.email_query_unicodefdfx
-    Cyrus::Prometheus.connection_setup_failure_imapd
+    Cyrus::JMAPEmail.email_query_emailaddress
+    Cyrus::JMAPEmail.email_query_messageid
+    Cyrus::LibCyrus.example_libcyrus
+    Cyrus::LibCyrus.example_libcyrus_min
+    Cyrus::SearchFuzzy.dedup_part_compact
+    Cyrus::SearchFuzzy.dedup_part_index
+    Cyrus::SearchFuzzy.index_tier_audit_bug
     Cyrus::SearchSquat.nonincremental
     Cyrus::SearchSquat.incremental
     Cyrus::SearchSquat.one_doc_per_message
@@ -714,14 +711,13 @@ exclude+=("!Master.maxforkrate")
 %endif
 
 # Add -vvv for too much output
-sudo -u cyrus -g mail LD_LIBRARY_PATH=%buildroot/%_libdir ./testrunner.pl -j%{?_smp_build_ncpus} -v -f pretty ${exclude[@]} 2>&1 || :
+sudo -u cyrus -g mail LD_LIBRARY_PATH=%{buildroot}/%{_libdir} ./testrunner.pl -j%{?_smp_build_ncpus} -v -f pretty ${exclude[@]} 2>&1 || :
 # CASSANDANE_END
 
 if [ -s "work/failed" ]; then
     cat work/failed
     exit 1
 fi
-
 
 
 %post
@@ -740,7 +736,6 @@ fi
 
 %{_sbindir}/arbitron
 %{_sbindir}/chk_cyrus
-%{_sbindir}/ctl_backups
 %{_sbindir}/ctl_conversationsdb
 %{_sbindir}/ctl_cyrusdb
 %{_sbindir}/ctl_deliver
@@ -748,7 +743,6 @@ fi
 %{_sbindir}/ctl_zoneinfo
 %{_sbindir}/cvt_cyrusdb
 %{_sbindir}/cvt_xlist_specialuse
-%{_sbindir}/cyr_backup
 %{_sbindir}/cyr_buildinfo
 %{_sbindir}/cyr_cd.sh
 %{_sbindir}/cyr_dbtool
@@ -760,9 +754,9 @@ fi
 %{_sbindir}/cyr_ls
 %{_sbindir}/cyr_pwd
 %{_sbindir}/cyr_quota
-%{_sbindir}/cyr_restore
 %{_sbindir}/cyr_synclog
 %{_sbindir}/cyr_userseen
+%{_sbindir}/cyr_withlock_run
 %{_sbindir}/cyrdump
 %{_sbindir}/dav_reconstruct
 %{_sbindir}/deliver
@@ -785,11 +779,9 @@ fi
 %{_mandir}/man1/dav_reconstruct.1*
 %{_mandir}/man5/cyrus.conf.5*
 %{_mandir}/man5/imapd.conf.5*
-%{_mandir}/man5/krb.equiv.5*
 %{_mandir}/man8/arbitron.8*
-%{_mandir}/man8/backupd.8*
+%{_mandir}/man8/calalarmd.8*
 %{_mandir}/man8/chk_cyrus.8*
-%{_mandir}/man8/ctl_backups.8*
 %{_mandir}/man8/ctl_conversationsdb.8*
 %{_mandir}/man8/ctl_cyrusdb.8*
 %{_mandir}/man8/ctl_deliver.8*
@@ -797,7 +789,6 @@ fi
 %{_mandir}/man8/ctl_zoneinfo.8*
 %{_mandir}/man8/cvt_cyrusdb.8*
 %{_mandir}/man8/cvt_xlist_specialuse.8*
-%{_mandir}/man8/cyr_backup.8*
 %{_mandir}/man8/cyr_buildinfo.8*
 %{_mandir}/man8/cyr_dbtool.8*
 %{_mandir}/man8/cyr_deny.8*
@@ -807,9 +798,9 @@ fi
 %{_mandir}/man8/cyr_info.8*
 %{_mandir}/man8/cyr_ls.8*
 %{_mandir}/man8/cyr_quota.8*
-%{_mandir}/man8/cyr_restore.8*
 %{_mandir}/man8/cyr_synclog.8*
 %{_mandir}/man8/cyr_userseen.8*
+%{_mandir}/man8/cyr_withlock_run.8*
 %{_mandir}/man8/cyradm.8*
 %{_mandir}/man8/cyrdump.8*
 %{_mandir}/man8/deliver.8*
@@ -866,13 +857,13 @@ fi
 %config(noreplace) /etc/pam.d/*
 
 /etc/cron.daily/cyrus-imapd
-%_unitdir/cyrus-imapd.service
-%_unitdir/cyrus-imapd-init.service
-%_tmpfilesdir/cyrus-imapd.conf
+%{_unitdir}/cyrus-imapd.service
+%{_unitdir}/cyrus-imapd-init.service
+%{_tmpfilesdir}/cyrus-imapd.conf
 %{_sysusersdir}/cyrus-imapd.conf
 
-%dir %cyrexecdir/
-%cyrexecdir/[a-uw-z]*
+%dir %{cyrexecdir}/
+%{cyrexecdir}/[a-uw-z]*
 
 # This creates some directories which in the default configuration cyrus will
 # never use because they are placed under /run instead.  However, old
@@ -969,22 +960,47 @@ fi
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.10.2-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 3.12.2-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.10.2-3
-- build: mass rebuild auto-bumpable components
+* Tue Mar 31 2026 Martin Osvald <mosvald@redhat.com> - 3.12.2-1
+- New version 3.12.2 (rhbz#2452927)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 3.10.2-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Wed Jan 21 2026 Martin Osvald <mosvald@redhat.com> - 3.12.1-7
+- cyrus-imapd.spec: various small fixes
+- rename patches to conform with devel guide
+- do variable substitution in braced form
 
-* Sat Jan 17 2026 Martin Osvald <mosvald@redhat.com> - 3.10.2-1
-- New version 3.10.2 (rhbz#2290535)
+* Mon Jan 19 2026 Martin Osvald <mosvald@redhat.com> - 3.12.1-6
+- Restrict dependency on wslay to Fedora
+
+* Mon Jan 19 2026 Martin Osvald <mosvald@redhat.com> - 3.12.1-5
+- cyrus-imapd.spec: various small fixes
+- Add comment about source of public key
+- Use gpgverify in accordance with devel guide
+- Download imaptest sources from lookaside cache
+- Disable cld2 dependent tests properly
+- Fix rpminspect failures
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.12.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Wed Jan 07 2026 Martin Osvald <mosvald@redhat.com> - 3.12.1-2
+- Fix FTBFS due to gcc 16 on rawhide
+
+* Wed Jan 07 2026 Martin Osvald <mosvald@redhat.com> - 3.12.1-1
+- New version 3.12.1 (rhbz#2290535)
+
+* Fri Dec 12 2025 Martin Osvald <mosvald@redhat.com> - 3.8.3-17
+- Create directory structure under /var using tmpfiles.d
 
 * Mon Nov 24 2025 Martin Osvald <mosvald@redhat.com> - 3.8.3-16
 - Remove sscg option --package from cyrus-imapd-init.service (rhbz#2416688)
 
-* Wed Aug 13 2025 František Hrdina <fhrdina@redhat.com> - 3.8.3-15
+* Tue Aug 12 2025 František Hrdina <fhrdina@redhat.com> - 3.8.3-15
 - Update of fmf plans
 
 * Wed Aug 06 2025 František Zatloukal <fzatlouk@redhat.com> - 3.8.3-14

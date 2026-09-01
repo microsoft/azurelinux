@@ -7,8 +7,8 @@
 Name:           biber
 # Export $BCF_VERSION from lib/Biber/Constants.pm, bug #2048536
 %define bcfversion 3.11
-Version:        2.21
-Release: 5%{?dist}
+Version:        2.22
+Release:        2%{?dist}
 Summary:        Command-line bibliographic manager, BibTeX replacement
 # bin/biber:        Artistic-2.0
 # data/texmap.xsl:  Artistic-2.0
@@ -25,7 +25,7 @@ Summary:        Command-line bibliographic manager, BibTeX replacement
 # etc/tugboat.bib:  LicenseRef-Fedora-Public-Domain
 License:        Artistic-2.0
 SourceLicense:  %{license} AND (GPL-1.0-or-later OR Artistic-1.0-Perl) AND GPL-2.0-or-later AND LicenseRef-Fedora-Public-Domain
-URL:            http://biblatex-biber.sourceforge.net/
+URL:            https://biblatex-biber.sourceforge.net/
 Source0:        https://github.com/plk/biber/archive/v%{version}.tar.gz
 # Not appropriate for upstream: http://github.com/plk/biber/pull/97
 Patch0:         biber-drop-builddeps-for-monolithic-build.patch
@@ -98,6 +98,7 @@ BuildRequires:  perl(Pod::Usage)
 %endif
 BuildRequires:  perl(POSIX)
 BuildRequires:  perl(Regexp::Common)
+BuildRequires:  perl(Safe)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(sigtrap)
 BuildRequires:  perl(Sort::Key)
@@ -272,6 +273,18 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 
 
 %changelog
+* Fri Aug 14 2026 Petr Pisar <ppisar@redhat.com> - 2.22-2
+- Adapt integration tests to changes in packaging of biblatex
+
+* Fri Aug 14 2026 Petr Pisar <ppisar@redhat.com> - 2.22-1
+- 2.22 bump
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.21-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

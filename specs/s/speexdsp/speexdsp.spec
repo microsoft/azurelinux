@@ -3,7 +3,7 @@
 
 Name:           speexdsp
 Version:        1.2.1
-Release: 13%{?dist}
+Release:        10%{?dist}
 Summary:        A voice compression format (DSP)
 
 License:        BSD-3-Clause
@@ -72,6 +72,9 @@ find %{buildroot} -type f -name "*.la" -delete
 %{_libdir}/libspeexdsp.so
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

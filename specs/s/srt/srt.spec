@@ -4,16 +4,13 @@
 %global rc %{nil}
 
 Name:           srt
-Version:        1.5.4
-Release: 7%{?dist}
+Version:        1.5.7
+Release:        1%{?dist}
 Summary:        Secure Reliable Transport protocol tools
 
 License:        MPL-2.0
 URL:            https://www.srtalliance.org
 Source0:        https://github.com/Haivision/srt/archive/v%{version}%{rc}/%{name}-%{version}%{rc}.tar.gz
-
-# https://github.com/Haivision/srt/commit/0def1b1a1094fc57752f241250e9a1aed71bbffd
-Patch0:         0001-build-Update-for-compatibility-with-CMake-4.x-3167.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
@@ -100,6 +97,24 @@ exit 0
 
 
 %changelog
+* Thu Aug 27 2026 Yanko Kaneti <yaneti@declera.com> - 1.5.7-1
+- Update to 1.5.7
+
+* Tue Jul 21 2026 Yanko Kaneti <yaneti@declera.com> - 1.5.6-1
+- Update to 1.5.6
+
+* Tue Apr 28 2026 Yanko Kaneti <yaneti@declera.com> - 1.5.5-1
+- Update to 1.5.5
+
+* Tue Apr  7 2026 Yanko Kaneti <yaneti@declera.com> - 1.5.5-0.rc.2
+- Update to 1.5.5-rc.2
+
+* Mon Mar  9 2026 Yanko Kaneti <yaneti@declera.com> - 1.5.5-0.rc.1
+- Update to 1.5.5-rc.1
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

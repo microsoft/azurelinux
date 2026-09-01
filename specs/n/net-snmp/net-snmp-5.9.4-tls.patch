@@ -1,6 +1,7 @@
-diff -urNp a/include/net-snmp/library/default_store.h b/include/net-snmp/library/default_store.h
---- a/include/net-snmp/library/default_store.h	2025-09-01 10:02:06.355543487 +0200
-+++ b/include/net-snmp/library/default_store.h	2025-09-01 10:06:35.524663762 +0200
+diff --git a/include/net-snmp/library/default_store.h b/include/net-snmp/library/default_store.h
+index 1b1978e..dd590be 100644
+--- a/include/net-snmp/library/default_store.h
++++ b/include/net-snmp/library/default_store.h
 @@ -183,6 +183,8 @@ extern          "C" {
  #define NETSNMP_DS_LIB_SSH_PUBKEY        33
  #define NETSNMP_DS_LIB_SSH_PRIVKEY       34
@@ -10,9 +11,10 @@ diff -urNp a/include/net-snmp/library/default_store.h b/include/net-snmp/library
  #define NETSNMP_DS_LIB_MAX_STR_ID        48 /* match NETSNMP_DS_MAX_SUBIDS */
  
      /*
-diff -urNp a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
---- a/man/snmpd.conf.5.def	2025-09-01 10:02:06.417543463 +0200
-+++ b/man/snmpd.conf.5.def	2025-09-01 10:07:03.717037472 +0200
+diff --git a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
+index 0a8b9fa..d9641cc 100644
+--- a/man/snmpd.conf.5.def
++++ b/man/snmpd.conf.5.def
 @@ -203,6 +203,12 @@ HIGH:!AES128\-SHA
  .RE
  .IP
@@ -26,10 +28,11 @@ diff -urNp a/man/snmpd.conf.5.def b/man/snmpd.conf.5.def
  .IP "[snmp] x509CRLFile"
  If you are using a Certificate Authority (CA) that publishes a
  Certificate Revocation List (CRL) then this token can be used to
-diff -urNp a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLSBaseDomain.c
---- a/snmplib/transports/snmpTLSBaseDomain.c	2025-09-01 10:02:06.457543447 +0200
-+++ b/snmplib/transports/snmpTLSBaseDomain.c	2025-09-01 10:10:02.796751304 +0200
-@@ -479,6 +479,9 @@ SSL_CTX *
+diff --git a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLSBaseDomain.c
+index e301de4..7ae2db7 100644
+--- a/snmplib/transports/snmpTLSBaseDomain.c
++++ b/snmplib/transports/snmpTLSBaseDomain.c
+@@ -490,6 +490,9 @@ SSL_CTX *
  _sslctx_common_setup(SSL_CTX *the_ctx, _netsnmpTLSBaseData *tlsbase) {
      char         *crlFile;
      char         *cipherList;
@@ -39,7 +42,7 @@ diff -urNp a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLS
      X509_LOOKUP  *lookup;
      X509_STORE   *cert_store = NULL;
  
-@@ -502,6 +505,63 @@ _sslctx_common_setup(SSL_CTX *the_ctx, _
+@@ -513,6 +516,63 @@ _sslctx_common_setup(SSL_CTX *the_ctx, _netsnmpTLSBaseData *tlsbase) {
                               X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
      }
  
@@ -103,7 +106,7 @@ diff -urNp a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLS
      cipherList = netsnmp_ds_get_string(NETSNMP_DS_LIBRARY_ID,
                                         NETSNMP_DS_LIB_TLS_ALGORITMS);
      if (NULL != cipherList) {
-@@ -803,6 +863,15 @@ netsnmp_tlsbase_ctor(void) {
+@@ -858,6 +918,15 @@ netsnmp_tlsbase_ctor(void) {
                                 NETSNMP_DS_LIBRARY_ID,
                                 NETSNMP_DS_LIB_TLS_ALGORITMS);
  
@@ -119,27 +122,28 @@ diff -urNp a/snmplib/transports/snmpTLSBaseDomain.c b/snmplib/transports/snmpTLS
      /*
       * for the client
       */
-diff -urNp a/snmplib/transports/snmpTLSTCPDomain.c b/snmplib/transports/snmpTLSTCPDomain.c
---- a/snmplib/transports/snmpTLSTCPDomain.c	2025-09-01 10:02:06.460543446 +0200
-+++ b/snmplib/transports/snmpTLSTCPDomain.c	2025-09-01 10:10:46.100597968 +0200
-@@ -718,10 +718,6 @@ netsnmp_tlstcp_open_client(netsnmp_trans
+diff --git a/snmplib/transports/snmpTLSTCPDomain.c b/snmplib/transports/snmpTLSTCPDomain.c
+index 0ddf023..e0133f9 100644
+--- a/snmplib/transports/snmpTLSTCPDomain.c
++++ b/snmplib/transports/snmpTLSTCPDomain.c
+@@ -718,10 +718,6 @@ netsnmp_tlstcp_open_client(netsnmp_transport *t)
          return NULL;
      }
  
 -#ifdef SSL_CTX_set_max_proto_version
--    SSL_CTX_set_max_proto_version(tlsdata->ssl_context, TLS1_VERSION);
+-    SSL_CTX_set_max_proto_version(tlsdata->ssl_context, 0);
 -#endif
 -
      /* RFC5953 Section 5.3.1:  Establishing a Session as a Client
         3)  Using the destTransportDomain and destTransportAddress values,
         the client will initiate the (D)TLS handshake protocol to
-@@ -917,10 +913,6 @@ netsnmp_tlstcp_open_server(netsnmp_trans
+@@ -917,10 +913,6 @@ netsnmp_tlstcp_open_server(netsnmp_transport *t)
  
      /* create the OpenSSL TLS context */
      tlsdata->ssl_context = sslctx_server_setup(TLS_method());
 -#ifdef SSL_CTX_set_max_proto_version
 -    if (tlsdata->ssl_context)
--        SSL_CTX_set_max_proto_version(tlsdata->ssl_context, TLS1_VERSION);
+-        SSL_CTX_set_max_proto_version(tlsdata->ssl_context, 0);
 -#endif
  
      t->sock = BIO_get_fd(tlsdata->accept_bio, NULL);

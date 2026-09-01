@@ -7,14 +7,14 @@
 
 Name:           imath
 Version:        3.1.12
-Release: 7%{?dist}
+Release:        6%{?dist}
 Summary:        Library of 2D and 3D vector, matrix, and math operations for computer graphics
 
 License:        BSD-3-Clause
 URL:            https://github.com/AcademySoftwareFoundation/Imath
 Source0:        https://github.com/AcademySoftwareFoundation/%{srcname}/archive/v%{version}/%{srcname}-%{version}.tar.gz
 
-Patch0:         imath-python-test.patch
+Patch0:         imath-disable-python-testPlane.patch
 
 BuildRequires:  cmake
 BuildRequires:  gcc gcc-c++
@@ -53,7 +53,8 @@ Requires:       python3-devel
 
 
 %prep
-%autosetup -n %{srcname}-%{version} -p1
+%setup -n %{srcname}-%{version}
+%patch -P0 -p1
 
 
 %build
@@ -100,6 +101,12 @@ Requires:       python3-devel
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.12-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Jonathan Wakely <jwakely@fedoraproject.org> - 3.1.12-5
+- Rebuilt for Boost 1.90
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.1.12-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

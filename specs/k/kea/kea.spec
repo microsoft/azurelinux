@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 4;
+    release_number = 2;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -12,7 +12,7 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           kea
-Version:        3.0.2
+Version:        3.0.3
 Release:        %autorelease
 Summary:        DHCPv4, DHCPv6 and DDNS server from ISC
 License:        MPL-2.0 AND BSL-1.0
@@ -47,6 +47,13 @@ Source15:       systemd-tmpfiles.conf
 Source16:       systemd-sysusers.conf
 
 Patch1:         kea-sd-daemon.patch
+# Patch2 & Patch3:
+# https://bugzilla.redhat.com/show_bug.cgi?id=2430574
+# https://gitlab.isc.org/isc-projects/kea/-/issues/4266
+# Based on: https://gitlab.isc.org/isc-projects/kea/-/commit/c54dfd47714fea7e79c16d99c09b896d9c8d44df
+Patch2:         kea-replace-BOOST_STATIC_ASSERT.patch
+# Based on: https://gitlab.isc.org/isc-projects/kea/-/commit/9a86f27a94677ec9ee1988af892d65b7ab22027e
+Patch3:         kea-move-to-system-timer.patch
 
 BuildRequires: boost-devel
 # %%meson -D crypto=openssl
@@ -92,7 +99,7 @@ BuildRequires: systemd
 BuildRequires: systemd-rpm-macros
 BuildRequires: python3-sphinx
 BuildRequires: python3-sphinx_rtd_theme
-BuildRequires: gnupg2
+BuildRequires: gpgverify
 
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 %upstream_name_compat %{upstream_name}
@@ -150,10 +157,8 @@ The KEA Migration Assistant is an experimental tool which helps to translate
 ISC DHCP configurations to Kea.
 
 %prep
-%if 0%{?fedora} || 0%{?rhel} > 8
 %{gpgverify} --keyring='%{S:10}' --signature='%{S:1}' --data='%{S:0}'
 %{gpgverify} --keyring='%{S:10}' --signature='%{S:3}' --data='%{S:2}'
-%endif
 
 %autosetup -T -b2 -N -n keama-%{keama_version}
 %autosetup -p1 -n kea-%{version}
@@ -268,25 +273,6 @@ mkdir -p %{buildroot}%{_localstatedir}/log
 install -dm 0750 %{buildroot}%{_localstatedir}/log/kea/
 
 %post
-# Kea runs under kea user instead of root now, but if its files got altered, their new
-# ownership&permissions won't get changed so fix them to prevent startup failures
-[ "`stat --format '%U:%G' %{_rundir}/kea/logger_lockfile 2>&1 | grep root:root`" = "root:root" ] \
-    && chown kea:kea %{_rundir}/kea/logger_lockfile
-[ "`stat --format '%U:%G' %{_sharedstatedir}/kea/kea-leases4.csv* 2>&1 | grep root:root | head -1`" = "root:root" ] \
-    && chown kea:kea %{_sharedstatedir}/kea/kea-leases4.csv* && chmod 0640 %{_sharedstatedir}/kea/kea-leases4.csv*
-[ "`stat --format '%U:%G' %{_sharedstatedir}/kea/kea-leases6.csv* 2>&1 | grep root:root | head -1`" = "root:root" ] \
-    && chown kea:kea %{_sharedstatedir}/kea/kea-leases6.csv* && chmod 0640 %{_sharedstatedir}/kea/kea-leases6.csv*
-[ "`stat --format '%U:%G' %{_sharedstatedir}/kea/kea-dhcp6-serverid 2>&1 | grep root:root`" = "root:root" ] \
-    && chown kea:kea %{_sharedstatedir}/kea/kea-dhcp6-serverid
-[ "`stat --format '%U:%G' %{_sysconfdir}/kea/kea*.conf 2>&1 | grep root:root | head -1`" = "root:root" ] \
-    && chown root:kea %{_sysconfdir}/kea/kea*.conf && chmod 0640 %{_sysconfdir}/kea/kea*.conf
-
-# Remove /tmp/ from socket-name for existing configurations to fix CVE-2025-32802
-for i in kea-ctrl-agent.conf kea-dhcp4.conf kea-dhcp6.conf kea-dhcp-ddns.conf; do
-    if [ -n "`grep '\"socket-name\": \"/tmp/' %{_sysconfdir}/kea/$i`" ]; then
-        sed -i.CVE-2025-32802.bak 's#\("socket-name": "/tmp/\)\(.*\)#"socket-name": "\2#g' %{_sysconfdir}/kea/$i
-    fi
-done
 # Set a pseudo-random password for default config to secure fresh install and allow CA startup without user intervention
 if [[ ! -s %{_sysconfdir}/kea/kea-api-password && -n `grep '"password-file": "kea-api-password"' %{_sysconfdir}/kea/kea-ctrl-agent.conf` ]]; then
     (umask 0027; head -c 32 /dev/urandom | base64 > %{_sysconfdir}/kea/kea-api-password)
@@ -410,9 +396,9 @@ fi
 # >=f41: find `rpm --eval %%{_topdir}`/BUILD/kea-*/BUILDROOT/usr/lib64/ -type f | grep /usr/lib64/libkea | sed -e 's#.*/usr/lib64\(.*\.so\.[0-9]\+\)\.[0-9]\+\.[0-9]\+#%%{_libdir}\1*#' | sort
 %{_libdir}/libkea-asiodns.so.62*
 %{_libdir}/libkea-asiolink.so.88*
-%{_libdir}/libkea-cc.so.82*
+%{_libdir}/libkea-cc.so.83*
 %{_libdir}/libkea-cfgrpt.so.3*
-%{_libdir}/libkea-config.so.83*
+%{_libdir}/libkea-config.so.84*
 %{_libdir}/libkea-cryptolink.so.64*
 %{_libdir}/libkea-d2srv.so.63*
 %{_libdir}/libkea-database.so.76*
@@ -422,17 +408,17 @@ fi
 %{_libdir}/libkea-dns.so.71*
 %{_libdir}/libkea-eval.so.84*
 %{_libdir}/libkea-exceptions.so.45*
-%{_libdir}/libkea-hooks.so.120*
+%{_libdir}/libkea-hooks.so.121*
 %{_libdir}/libkea-http.so.87*
 %{_libdir}/libkea-log-interprocess.so.3*
 %{_libdir}/libkea-log.so.75*
 %{_libdir}/libkea-mysql.so.88*
 %{_libdir}/libkea-pgsql.so.88*
-%{_libdir}/libkea-process.so.90*
+%{_libdir}/libkea-process.so.91*
 %{_libdir}/libkea-stats.so.53*
 %{_libdir}/libkea-tcp.so.33*
 %{_libdir}/libkea-util-io.so.12*
-%{_libdir}/libkea-util.so.101*
+%{_libdir}/libkea-util.so.102*
 
 %files keama
 %license COPYING
@@ -441,14 +427,37 @@ fi
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.0.2-4
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 3.0.3-2
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 3.0.2-3
-- build: mass rebuild auto-bumpable components
+* Thu Mar 26 2026 Martin Osvald <mosvald@redhat.com> - 3.0.3-1
+- New version 3.0.3 (rhbz#2451141)
+- Fixes CVE-2026-3608 (rhbz#2451621)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 3.0.2-2
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Sat Jan 17 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-9
+- Use gpgverify in accordance with devel guide
+
+* Sat Jan 17 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-8
+- Fix FTBFS on rawhide (rhbz#2430574)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-6
+- Create /var/lib/kea through systemd-tmpfiles
+
+* Mon Jan 12 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-5
+- Do not set environmental variables to prevent clashes with compilation
+  time settings (rhbz#2428214)
+
+* Fri Jan 09 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-4
+- Remove intrusive post action causing side effects
+
+* Fri Jan 09 2026 Martin Osvald <mosvald@redhat.com> - 3.0.2-3
+- Fix files owned by usbmon in image mode
+
+* Sat Dec 06 2025 Martin Osvald <mosvald@redhat.com> - 3.0.2-2
+- Support for sending startup notifications to systemd II (BZ 2384776)
 
 * Wed Oct 29 2025 Martin Osvald <mosvald@redhat.com> - 3.0.2-1
 - New version 3.0.2 (rhbz#2407048)

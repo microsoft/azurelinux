@@ -1,12 +1,26 @@
---- ntirpc-6.3/CMakeLists.txt.orig	2025-07-16 08:49:56.771709703 -0400
-+++ ntirpc-6.3/CMakeLists.txt	2025-07-16 09:12:12.285427043 -0400
-@@ -2,7 +2,8 @@
+--- ntirpc-7.2/CMakeLists.txt.orig	2026-03-18 11:24:00.125716064 -0400
++++ ntirpc-7.2/CMakeLists.txt	2026-03-18 11:45:40.359470436 -0400
+@@ -2,7 +2,7 @@
  
  # Current version as of Fedora 16.  Not tested with earlier.
  
 -cmake_minimum_required(VERSION 2.6.3)
-+cmake_minimum_required(VERSION 3.3.0...4.0)
-+cmake_policy(VERSION 3.2.2)
++cmake_minimum_required(VERSION 3.5.0...4.0)
  
  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
  
+@@ -237,14 +238,6 @@
+   ${SYSTEM_LIBRARIES}
+ )
+ 
+-if (NOT BSDBASED)
+-  find_package(NSL) # sockets
+-  set(SYSTEM_LIBRARIES
+-    ${SYSTEM_LIBRARIES}
+-    ${NSL_LIBRARY}
+-  )
+-endif (NOT BSDBASED)
+-
+ set(LIBNTIRPC_MAP "${PROJECT_BINARY_DIR}/src/libntirpc.map")
+ # subst files (need add_custom_command for dependency, fyi)
+ configure_file(

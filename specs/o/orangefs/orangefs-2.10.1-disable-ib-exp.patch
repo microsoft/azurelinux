@@ -1,0 +1,13 @@
+diff --git a/src/io/bmi/bmi_ib_exp/module.mk.in b/src/io/bmi/bmi_ib_exp/module.mk.in
+index 135c070..b677e77 100644
+--- a/src/io/bmi/bmi_ib_exp/module.mk.in
++++ b/src/io/bmi/bmi_ib_exp/module.mk.in
+@@ -8,7 +8,7 @@
+ #
+ 
+ # only do any of this if configure decided to use IB or OpenIB
+-ifneq (,$(BUILD_IB)$(BUILD_OPENIB))
++ifneq (,$(BUILD_IB_EXP))
+ 
+ #
+ # Local definitions.

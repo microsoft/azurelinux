@@ -12,7 +12,7 @@
 
 Name:           python-%{srcname}
 Version:        1.3.0
-Release: 10%{?dist}
+Release:        8%{?dist}
 Summary:        NTLM module for python requests (requires md4, thus legacy OpenSSL settings)
 
 License:        ISC
@@ -85,6 +85,9 @@ export OPENSSL_CONF=${PWD}/openssl.cnf
 %doc CONTRIBUTORS.rst README.rst
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.0-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.3.0-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

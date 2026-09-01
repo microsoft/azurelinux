@@ -1,0 +1,25 @@
+From 4d9f28f69cbe468a95e06d8ca81746cab785e9da Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Thu, 30 Oct 2025 07:59:11 -0700
+Subject: [PATCH] tensile add cmake arches
+
+---
+ Tensile/Source/cmake/TensileSupportedArchitectures.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Tensile/Source/cmake/TensileSupportedArchitectures.cmake b/Tensile/Source/cmake/TensileSupportedArchitectures.cmake
+index e8a28d3bfeda..2147db4d5a93 100644
+--- a/Tensile/Source/cmake/TensileSupportedArchitectures.cmake
++++ b/Tensile/Source/cmake/TensileSupportedArchitectures.cmake
+@@ -51,6 +51,8 @@ if(NOT BUILD_ADDRESS_SANITIZER)
+         "gfx1103"
+         "gfx1150"
+         "gfx1151"
++	"gfx1152"
++	"gfx1153"
+         "gfx1200"
+         "gfx1201")
+ 
+-- 
+2.51.0
+

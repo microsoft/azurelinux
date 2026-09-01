@@ -13,6 +13,8 @@
 #
 %global libname libsodium
 %global soname  26
+# Uncomment to update to final version
+#global versuf  -stable
 
 %if 0%{?fedora}
 %bcond_without  mingw
@@ -20,9 +22,10 @@
 %bcond_with     mingw
 %endif
 
+
 Name:           libsodium
-Version:        1.0.21
-Release: 6%{?dist}
+Version:        1.0.22
+Release:        1%{?dist}
 Summary:        The Sodium crypto library
 # Most source code is ISC, except:
 # BSD-2-Clause:
@@ -38,15 +41,11 @@ Summary:        The Sodium crypto library
 License:        ISC AND BSD-2-Clause AND CC0-1.0
 URL:            https://libsodium.org/
 
-Source0:        https://download.libsodium.org/libsodium/releases/%{name}-%{version}.tar.gz
-Source1:        https://download.libsodium.org/libsodium/releases/%{name}-%{version}.tar.gz.sig
-# https://doc.libsodium.org/installation#integrity-checking
-Source2:        %{name}.pubkey
+Source0:        https://download.libsodium.org/libsodium/releases/%{name}-%{version}%{?versuf}.tar.gz
+Source1:        https://download.libsodium.org/libsodium/releases/%{name}-%{version}%{?versuf}.tar.gz.minisig
 Source9999: libsodium.azl.macros
 
-Patch0:        upstream.patch
-
-BuildRequires: gnupg2
+BuildRequires: minisign
 BuildRequires: gcc
 BuildRequires: make
 
@@ -116,10 +115,11 @@ for Win64 target.
 
 
 %prep
-%{?gpgverify:%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'}
+# https://doc.libsodium.org/installation#integrity-checking
+minisign -VP RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3 -m %{SOURCE0}
 
-%setup -q
-%patch -P0 -p1 -b.upstream
+
+%setup -q -n %{name}%{?versuf}%{!?versuf:-%{version}}
 
 
 %build
@@ -204,6 +204,13 @@ make -C build_native check
 
 
 %changelog
+* Fri Apr 10 2026 Remi Collet <remi@remirepo.net> - 1.0.22-1
+- update to 1.0.22
+- verify sources with minisig instead of gnupg
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.21-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jan  7 2026 Remi Collet <remi@remirepo.net> - 1.0.21-2
 - fix aarch64 build failure using upstream patch
 

@@ -39,7 +39,7 @@ generate-gnostic directory.}
                        README-report-messages.md README-generate-gnostic.md
 
 Name:           %{goname}
-Release: 22%{?dist}
+Release:        22%{?dist}
 Summary:        Compiler for APIs described by the OpenAPI Specification
 
 # Upstream license specification: Apache-2.0
@@ -115,6 +115,15 @@ install -m 0755 -vp %{gobuilddir}/bin/* %{buildroot}%{_bindir}/
 %gopkgfiles
 
 %changelog
+* Mon Feb 02 2026 Maxwell G <maxwell@gtmx.me> - 0.5.3-22
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.5.3-21
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Oct 10 2025 Alejandro Sáez <asm@redhat.com> - 0.5.3-20
+- rebuild
+
 * Fri Aug 15 2025 Maxwell G <maxwell@gtmx.me> - 0.5.3-19
 - Rebuild for golang-1.25.0
 

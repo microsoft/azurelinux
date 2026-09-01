@@ -1,0 +1,137 @@
+From 9b67543987e3d140c86f1b8e2b5db5c10d8bc3c5 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Thu, 15 Jan 2026 01:11:52 +0100
+Subject: [PATCH 1/4] lib/chkhash.c: is_valid_hash(): Accept an empty hash
+
+It represents a passwordless account.
+That is discouraged, but accepted.
+
+Fixes: c44f1e096a19 (2025-07-20; "chpasswd: Check hash before write when using -e")
+Link: <https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1124835>
+Reported-by: Marc 'Zugschlus' Haber <mh+githubvisible@zugschlus.de>
+Reported-by: "Serge E. Hallyn" <serge@hallyn.com>
+Reported-by: Adam Williamson <awilliam@redhat.com>
+Co-authored-by: "Serge E. Hallyn" <serge@hallyn.com>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/chkhash.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index 71e0fb4e..d0a8dc01 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -42,6 +42,10 @@ is_valid_hash(const char *hash)
+ {
+ 	hash = strprefix(hash, "!") ?: hash;
+ 
++	// Passwordless account; discouraged
++	if (streq(hash, ""))
++		return true;
++
+ 	if (streq(hash, "*"))
+ 		return true;
+ 
+-- 
+2.52.0
+
+
+From bce404a7a831de911cf20fc8d4c548957f70bc72 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Thu, 15 Jan 2026 01:14:46 +0100
+Subject: [PATCH 2/4] lib/chkhash.c: is_valid_hash(): Update comment
+
+This checks the entire shadow(5) 2nd field, which is more than just
+a hash.
+
+Reported-by: Tobias Stoeckmann <tobias@stoeckmann.org>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/chkhash.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index d0a8dc01..1723f862 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -31,9 +31,7 @@ match_regex(const char *pattern, const char *string)
+ 
+ 
+ /*
+- * is_valid_hash - check if the given string is a valid password hash
+- *
+- * Returns true if the string appears to be a valid hash, false otherwise.
++ * is_valid_hash - check if the string is a valid shadow(5) 2nd field.
+  *
+  * regex from: https://man.archlinux.org/man/crypt.5.en
+  */
+-- 
+2.52.0
+
+
+From 9a86c515a1e7caeeb9e60fa63871170a2dfd98f0 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Thu, 15 Jan 2026 01:24:10 +0100
+Subject: [PATCH 3/4] lib/chkhash.c: is_valid_hash(): Comment meaning of !hash
+ and *
+
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ lib/chkhash.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/chkhash.c b/lib/chkhash.c
+index 1723f862..101f2004 100644
+--- a/lib/chkhash.c
++++ b/lib/chkhash.c
+@@ -38,12 +38,14 @@ match_regex(const char *pattern, const char *string)
+ bool 
+ is_valid_hash(const char *hash) 
+ {
++	// Password temporarily locked
+ 	hash = strprefix(hash, "!") ?: hash;
+ 
+ 	// Passwordless account; discouraged
+ 	if (streq(hash, ""))
+ 		return true;
+ 
++	// Password permanently locked (and forgotten)
+ 	if (streq(hash, "*"))
+ 		return true;
+ 
+-- 
+2.52.0
+
+
+From 6be13b2f84a2c1a0d0f4129b5258b4b443e7f86c Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Fri, 16 Jan 2026 01:52:32 +0100
+Subject: [PATCH 4/4] man/shadow.5.xml: Document "*"
+
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ man/shadow.5.xml | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/man/shadow.5.xml b/man/shadow.5.xml
+index dc7fdfde..d3cc0398 100644
+--- a/man/shadow.5.xml
++++ b/man/shadow.5.xml
+@@ -82,8 +82,12 @@
+ 	    If the password field begins with an exclamation mark <emphasis>!</emphasis>,
+ 	    the password is locked.
+ 	    The remaining characters on the
+-	    line represent the password field before the password was
+-	    locked.
++	    line represent the password hash.
++	  </para>
++	  <para>
++	    If the password hash consists of a star <emphasis>*</emphasis>,
++	    password access is effectively disallowed;
++	    this is because no password can produce a hash like this.
+ 	  </para>
+ 	  <para>
+ 	    Refer to <citerefentry><refentrytitle>crypt</refentrytitle>
+-- 
+2.52.0
+

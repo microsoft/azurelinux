@@ -12,8 +12,8 @@
 %endif
 
 Name:           kio-fuse
-Version:        5.1.0
-Release: 12%{?dist}
+Version:        5.1.1
+Release:        3%{?dist}
 Summary:        KIO FUSE
 
 License:        GPL-3.0-or-later
@@ -23,9 +23,6 @@ Source1:        https://download.kde.org/stable/%{name}/%{name}-%{version}.tar.x
 Source2:        gpgkey-21EC3FD75D26B39E820BE6FBD27C2C1AF21D8BAD.gpg
 
 ## upstream fixes
-# Data loss on remote mount when using rmdir in terminal
-# https://bugs.kde.org/show_bug.cgi?id=482902
-Patch0:         kio-fuse-5.1.0-use-KIO__rmdir-for-unlinking-directories.patch
 
 BuildRequires:  cmake
 BuildRequires:  gnupg2
@@ -90,6 +87,15 @@ dbus-launch --exit-with-session \
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Nov  4 2025 Tom Callaway <spot@fedoraproject.org> - 5.1.1-2
+- rebuild for new fuse3
+
+* Mon Oct 13 2025 Steve Cossette <farchord@gmail.com> - 5.1.1-1
+- 5.1.1
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 5.1.0-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

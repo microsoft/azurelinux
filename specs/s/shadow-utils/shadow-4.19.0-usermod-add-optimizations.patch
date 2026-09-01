@@ -1,0 +1,75 @@
+From 958b4859991e700b61af2f9e07e3aa87ad1d9218 Mon Sep 17 00:00:00 2001
+From: Alejandro Colomar <alx@kernel.org>
+Date: Sat, 17 Jan 2026 00:56:21 +0100
+Subject: [PATCH] Revert "src/usermod.c: Remove optimizations"
+
+This wasn't only an optimization; it also skipped some checks that were
+now spuriously triggering errors.  We may be able to get rid of the
+optimizations, but that will need more analysis.  For now, let's revert
+to a known-good state.
+
+Fixes: 6a8a25dc7de6 (2025-10-15; "src/usermod.c: Remove optimizations")
+Reverts: 6a8a25dc7de6 (2025-10-15; "src/usermod.c: Remove optimizations")
+Closes: <https://github.com/shadow-maint/shadow/issues/1509>
+Reported-by: Adam Williamson <awilliam@redhat.com>
+Signed-off-by: Alejandro Colomar <alx@kernel.org>
+---
+ src/usermod.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+diff --git a/src/usermod.c b/src/usermod.c
+index 7400bf84..7cd7a859 100644
+--- a/src/usermod.c
++++ b/src/usermod.c
+@@ -1391,6 +1391,48 @@ process_flags(int argc, char **argv, struct option_flags *flags)
+ 	}
+ #endif				/* WITH_SELINUX */
+ 
++	if (user_newid == user_id) {
++		uflg = false;
++		oflg = false;
++	}
++	if (user_newgid == user_gid) {
++		gflg = false;
++	}
++	if (   (NULL != user_newshell)
++	    && streq(user_newshell, user_shell)) {
++		sflg = false;
++	}
++	if (streq(user_newname, user_name)) {
++		lflg = false;
++	}
++	if (user_newinactive == user_inactive) {
++		fflg = false;
++	}
++	if (user_newexpire == user_expire) {
++		eflg = false;
++	}
++	if (   (NULL != user_newhome)
++	    && streq(user_newhome, user_home)) {
++		dflg = false;
++		mflg = false;
++	}
++	if (   (NULL != user_newcomment)
++	    && streq(user_newcomment, user_comment)) {
++		cflg = false;
++	}
++
++	if (!(Uflg || uflg || sflg || pflg || mflg || Lflg ||
++	      lflg || Gflg || gflg || fflg || eflg || dflg || cflg
++#ifdef ENABLE_SUBIDS
++	      || vflg || Vflg || wflg || Wflg
++#endif				/* ENABLE_SUBIDS */
++#ifdef WITH_SELINUX
++	      || Zflg
++#endif				/* WITH_SELINUX */
++	)) {
++		exit (E_SUCCESS);
++	}
++
+ 	if (!is_shadow_pwd && (eflg || fflg)) {
+ 		fprintf (stderr,
+ 		         _("%s: shadow passwords required for -e and -f\n"),
+-- 
+2.52.0
+

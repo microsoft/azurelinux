@@ -36,7 +36,7 @@ index 42ccf28..cc6354a 100644
  #mesondefine LIBC_MUSL
  
 diff --git a/meson.build b/meson.build
-index 66e7fd0..dc86d89 100644
+index 8ed5b2d..df4f125 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -100,6 +100,7 @@ krb5_opt = get_option('krb5')
@@ -61,7 +61,7 @@ index 66e7fd0..dc86d89 100644
  # Google Test
  GTEST_DEP = dependency(
      'gtest',
-@@ -867,6 +875,11 @@ else
+@@ -886,6 +894,11 @@ else
      report_conf_data.set('SYSREPOCPP_VERSION', 'no')
      report_conf_data.set('SYSREPOCPP_PREFIX', 'no')
  endif
@@ -85,6 +85,110 @@ index 5c222d5..3ecd2e1 100644
  
  # Options for enabling testing code (not real features).
  option(
+diff --git a/src/bin/agent/ca_process.cc b/src/bin/agent/ca_process.cc
+index f01dd97..4793067 100644
+--- a/src/bin/agent/ca_process.cc
++++ b/src/bin/agent/ca_process.cc
+@@ -18,6 +18,10 @@
+ #include <util/filesystem.h>
+ #include <boost/pointer_cast.hpp>
+ 
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++#include <systemd/sd-daemon.h>
++#endif
++
+ using namespace isc::asiolink;
+ using namespace isc::config;
+ using namespace isc::data;
+@@ -42,7 +46,15 @@ CtrlAgentProcess::init() {
+ 
+ void
+ CtrlAgentProcess::run() {
++
+     LOG_INFO(agent_logger, CTRL_AGENT_STARTED).arg(VERSION);
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++    // Notify systemd about the same
++    sd_notifyf(0, "READY=1\n"
++               "STATUS=Processing requests...\n"
++               "MAINPID=%lu",
++               (unsigned long) getpid());
++#endif
+ 
+     LOG_WARN(agent_logger, CTRL_AGENT_IS_DEPRECATED);
+ 
+diff --git a/src/bin/agent/meson.build b/src/bin/agent/meson.build
+index c6afbfa..2d30179 100644
+--- a/src/bin/agent/meson.build
++++ b/src/bin/agent/meson.build
+@@ -1,3 +1,8 @@
++kea_ctrl_agent_dependencies = [CRYPTO_DEP]
++if SYSTEMD_DEP.found()
++    kea_ctrl_agent_dependencies += [SYSTEMD_DEP]
++endif
++
+ agent_lib = static_library(
+     'agent',
+     'agent_lexer.cc',
+@@ -17,7 +22,7 @@ agent_lib = static_library(
+ executable(
+     'kea-ctrl-agent',
+     'main.cc',
+-    dependencies: [CRYPTO_DEP],
++    dependencies: kea_ctrl_agent_dependencies,
+     include_directories: [include_directories('.')] + INCLUDES,
+     install: true,
+     install_dir: SBINDIR,
+diff --git a/src/bin/d2/d2_process.cc b/src/bin/d2/d2_process.cc
+index 7db49a3..cdb9cef 100644
+--- a/src/bin/d2/d2_process.cc
++++ b/src/bin/d2/d2_process.cc
+@@ -21,6 +21,10 @@
+ #include <hooks/hooks_manager.h>
+ #include <util/filesystem.h>
+ 
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++#include <systemd/sd-daemon.h>
++#endif
++
+ using namespace isc::asiolink;
+ using namespace isc::config;
+ using namespace isc::data;
+@@ -95,6 +99,13 @@ D2Process::init() {
+ void
+ D2Process::run() {
+     LOG_INFO(d2_logger, DHCP_DDNS_STARTED).arg(VERSION);
++#ifdef HAVE_LIBSYSTEMD_DAEMON
++    // Notify systemd about the same
++    sd_notifyf(0, "READY=1\n"
++               "STATUS=Dispatching packets...\n"
++               "MAINPID=%lu",
++               (unsigned long) getpid());
++#endif
+ 
+     if (!PathChecker::shouldEnforceSecurity()) {
+         LOG_WARN(d2_logger, DHCP_DDNS_SECURITY_CHECKS_DISABLED);
+diff --git a/src/bin/d2/meson.build b/src/bin/d2/meson.build
+index 012b40d..3aff0c1 100644
+--- a/src/bin/d2/meson.build
++++ b/src/bin/d2/meson.build
+@@ -1,3 +1,8 @@
++kea_ddns_dependencies = [CRYPTO_DEP]
++if SYSTEMD_DEP.found()
++    kea_ddns_dependencies += [SYSTEMD_DEP]
++endif
++
+ d2_lib = static_library(
+     'd2',
+     'check_exists_add.cc',
+@@ -21,7 +26,7 @@ d2_lib = static_library(
+ executable(
+     'kea-dhcp-ddns',
+     'main.cc',
+-    dependencies: [CRYPTO_DEP],
++    dependencies: kea_ddns_dependencies,
+     include_directories: [include_directories('.')] + INCLUDES,
+     install: true,
+     install_dir: SBINDIR,
 diff --git a/src/bin/dhcp4/main.cc b/src/bin/dhcp4/main.cc
 index 4f88e29..5581b7a 100644
 --- a/src/bin/dhcp4/main.cc

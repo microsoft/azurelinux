@@ -1,0 +1,42 @@
+From d9554db26c3dbb00a6a293ee4fd4966e4e278da8 Mon Sep 17 00:00:00 2001
+From: Peter Dimov <pdimov@gmail.com>
+Date: Mon, 15 Dec 2025 21:51:45 +0200
+Subject: [PATCH] Install boost_system as header-only
+
+---
+ boost-install.jam | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/boost-install.jam b/boost-install.jam
+index b87e308..5e6bfa6 100644
+--- a/tools/boost_install/boost-install.jam
++++ b/tools/boost_install/boost-install.jam
+@@ -1015,7 +1015,7 @@ local rule install-cmake-config- ( install-or-stage : version : name : requireme
+ 
+         local library-type = UNKNOWN ;
+ 
+-        if $(name) = boost_headers || $(name) = boost_math || $(name) = boost_exception
++        if $(name) = boost_headers || $(name) = boost_math || $(name) = boost_exception || $(name) = boost_system
+         {
+             library-type = INTERFACE ;
+         }
+From 9529e070ea9e9afd1da17edd48993d560fdc0d7a Mon Sep 17 00:00:00 2001
+From: Peter Dimov <pdimov@gmail.com>
+Date: Mon, 15 Dec 2025 21:52:49 +0200
+Subject: [PATCH] Still install boost_system, for the CMake configuration. Refs
+ #132.
+
+---
+ build.jam | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/build.jam b/build.jam
+index 65da5aa6..5b6545c8 100644
+--- a/libs/system//build.jam
++++ b/libs/system//build.jam
+@@ -21,4 +21,5 @@ explicit
+     ;
+ 
+ call-if : boost-library system
++    : install boost_system
+     ;

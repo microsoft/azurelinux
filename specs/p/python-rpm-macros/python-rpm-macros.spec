@@ -11,6 +11,7 @@ Source101:      macros.python
 Source102:      macros.python-srpm
 Source104:      macros.python3
 Source105:      macros.pybytecompile
+Source106:      macros.python-wheel-sbom
 
 # Lua files
 Source201:      python.lua
@@ -49,16 +50,14 @@ License:        MIT AND PSF-2.0 AND GPL-2.0-or-later
 # The package version MUST be always the same as %%{__default_python3_version}.
 # To have only one source of truth, we load the macro and use it.
 # The macro is defined in python-srpm-macros.
-%{lua:
-if posix.stat(rpm.expand('%{SOURCE102}')) then
-  rpm.load(rpm.expand('%{SOURCE102}'))
-elseif posix.stat('macros.python-srpm') then
-  -- something is parsing the spec without _sourcedir macro properly set
-  rpm.load('macros.python-srpm')
-end
-}
+%if %{exists:%{SOURCE102}}
+  %{load:%{SOURCE102}}
+%elif %{exists:macros.python-srpm}
+  # something is parsing the spec without %%_sourcedir macro properly set
+  %{load:macros.python-srpm}
+%endif
 Version:        %{__default_python3_version}
-Release: 8%{?dist}
+Release:        12%{?dist}
 
 BuildArch:      noarch
 
@@ -143,15 +142,30 @@ install -m 755 brp-* %{buildroot}%{_rpmconfigdir}/redhat/
 %global __brp_fix_pyc_reproducibility %{add_buildroot __brp_fix_pyc_reproducibility}
 %global __brp_python_rpm_in_distinfo %{add_buildroot __brp_python_rpm_in_distinfo}
 
+# Bake in the version-release and purl namespace of this tool for %%python_wheel_inject_sbom.
+# That way, even when this is installed on a different distro, the purl will still be applicable.
+# We need to load the macro file to know the value of %%__python_wheel_dist_purl_namespace first.
+# When the source does not exist, something is parsing this spec without %%_sourcedir macro properly set,
+# but we don't have to do anything then because that cannot happen during the build.
+%if %{exists:%{SOURCE106}}
+%{load:%{SOURCE106}}
+sed -i \
+  -e 's|%%__python_wheel_macros_verrel PLACEHOLDER|%%__python_wheel_macros_verrel %{version}-%{release}|' \
+  -e 's|%%__python_wheel_macros_purl PLACEHOLDER|%%__python_wheel_macros_purl pkg:rpm/%{__python_wheel_dist_purl_namespace}/python-rpm-macros@%%{__python_wheel_macros_verrel}?arch=src|' \
+  %{buildroot}%{rpmmacrodir}/macros.python-wheel-sbom
+%endif
 
 %check
 # no macros in comments
 grep -E '^#[^%%]*%%[^%%]' %{buildroot}%{rpmmacrodir}/macros.* && exit 1 || true
+# no placeholders in macros
+grep -iF PLACEHOLDER %{buildroot}%{rpmmacrodir}/macros.* && exit 1 || true
 
 
 %files
 %{rpmmacrodir}/macros.python
 %{rpmmacrodir}/macros.pybytecompile
+%{rpmmacrodir}/macros.python-wheel-sbom
 %{_rpmconfigdir}/redhat/import_all_modules.py
 %{_rpmconfigdir}/redhat/pathfix.py
 
@@ -170,6 +184,31 @@ grep -E '^#[^%%]*%%[^%%]' %{buildroot}%{rpmmacrodir}/macros.* && exit 1 || true
 
 
 %changelog
+* Tue Mar 17 2026 Miro Hrončok <mhroncok@redhat.com> - 3.14-12
+- %%python_wheel_inject_sbom: Hardcode the purl of this tool instead of constructing it at runtime
+- %%py3_build, %%py3_install, etc.: Bump the Fedora version in the deprecation message
+
+* Tue Mar 10 2026 Miro Hrončok <mhroncok@redhat.com> - 3.14-11
+- %%python_wheel_inject_sbom: Add more metadata to the SBOM
+- %%python_wheel_inject_sbom: Rename the SBOM file to limit the possibility of clashes
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.14-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Oct 16 2025 Miro Hrončok <mhroncok@redhat.com> - 3.14-9
+- %%python_extras_subpkg: Only %%ghost the egg-info/dist-info directory, not the content
+- That way, accidentally unpackaged files within are reported as errors
+
+* Tue Sep 09 2025 Miro Hrončok <mhroncok@redhat.com> - 3.14-8
+- %%python_extras_subpkg: Add -v option to specify the required version(-release)
+- This is useful when the extras are built from a different specfile (e.g. in EPEL for a RHEL base package)
+
+* Fri Aug 29 2025 Miro Hrončok <mhroncok@redhat.com> - 3.14-7
+- %%python_wheel_inject_sbom: Don't accidentally alter nested .dist-infos
+
+* Wed Aug 13 2025 Miro Hrončok <mhroncok@redhat.com> - 3.14-6
+- Introduce %%python_wheel_inject_sbom
+
 * Mon Aug 11 2025 Lumír Balhar <lbalhar@redhat.com> - 3.14-5
 - import_all_modules: Add error handling for import failures
 

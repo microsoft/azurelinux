@@ -1,0 +1,47 @@
+From: Zephyr Lykos <git@mochaa.ws>
+Date: Sat, 4 Nov 2023 17:16:27 +0800
+Subject: [PATCH] Use CTest switches for testing
+
+Signed-off-by: Zephyr Lykos <git@mochaa.ws>
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 75c0d3a3..6a30c363 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,10 +1,9 @@
+ # CMakeLists for libyuv
+ # Originally created for "roxlu build system" to compile libyuv on windows
+-# Run with -DUNIT_TEST=ON to build unit tests
++# Run with -DBUILD_TESTING=ON to build unit tests
+ 
+ cmake_minimum_required( VERSION 3.16 )
+ project ( YUV C CXX )	# "C" is required even for C++ projects
+-option( UNIT_TEST "Built unit tests" OFF )
+ 
+ include(CheckCSourceCompiles)
+ 
+@@ -204,7 +203,9 @@ if (JPEG_FOUND)
+   add_definitions( -DHAVE_JPEG )
+ endif()
+ 
+-if(UNIT_TEST)
++include(CTest)
++
++if(BUILD_TESTING)
+   find_library(GTEST_LIBRARY gtest)
+   if(GTEST_LIBRARY STREQUAL "GTEST_LIBRARY-NOTFOUND")
+     set(GTEST_SRC_DIR_DEFAULT /usr/src/gtest)
+@@ -220,11 +221,12 @@ if(UNIT_TEST)
+       include_directories(${GTEST_SRC_DIR}/include)
+       set(GTEST_LIBRARY gtest)
+     else()
+-      message(FATAL_ERROR "UNIT_TEST is set but unable to find gtest library")
++      message(FATAL_ERROR "BUILD_TESTING is set but unable to find gtest library")
+     endif()
+   endif()
+ 
+   add_executable(libyuv_unittest ${ly_unittest_sources})
++  add_test(NAME libyuv_test COMMAND libyuv_unittest)
+   target_link_libraries(libyuv_unittest ${ly_lib_shared} ${GTEST_LIBRARY})
+   find_library(PTHREAD_LIBRARY pthread)
+   if(NOT PTHREAD_LIBRARY STREQUAL "PTHREAD_LIBRARY-NOTFOUND")

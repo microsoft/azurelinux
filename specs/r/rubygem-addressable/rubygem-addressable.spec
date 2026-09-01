@@ -6,11 +6,14 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.8.6
-Release: 9%{?dist}
+Release: 8%{?dist}
 Summary: URI Implementation
 License: Apache-2.0
 URL: https://github.com/sporkmonger/addressable
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
+# https://github.com/sporkmonger/addressable/pull/557/commits/2d934a90f74fd4598cd05582ee7c5a24b87c76a0
+# Fix for ruby4_0 Ractor
+Patch0: addressable-pr557-ruby4_0-Ractor.patch
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: rubygem(bigdecimal)
@@ -34,6 +37,7 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n %{gem_name}-%{version}
+%patch -P0 -p1
 
 %build
 gem build ../%{gem_name}-%{version}.gemspec
@@ -74,6 +78,12 @@ popd
 %{gem_instdir}/spec
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.6-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 13 2025 Mamoru TASAKA <mtasaka@fedoraproject.org> - 2.8.6-7
+- Backport upstream patch for ruby4_0 Ractor support
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.8.6-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

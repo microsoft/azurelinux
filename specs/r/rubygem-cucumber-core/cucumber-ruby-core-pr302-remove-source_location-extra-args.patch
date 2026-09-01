@@ -1,0 +1,23 @@
+From 6f157ae0a5d2dac850f3d0d6982dd00b5c25b1d9 Mon Sep 17 00:00:00 2001
+From: Luke Hill <lukehill_uk@hotmail.com>
+Date: Wed, 8 Oct 2025 08:31:03 +0100
+Subject: [PATCH] Permit Location to be called with multiple arguments from
+ various places and discard the extraneous arguments
+
+---
+ lib/cucumber/core/test/location.rb | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/lib/cucumber/core/test/location.rb b/lib/cucumber/core/test/location.rb
+index 33be39f7..b9ea54de 100644
+--- a/lib/cucumber/core/test/location.rb
++++ b/lib/cucumber/core/test/location.rb
+@@ -17,7 +17,7 @@
+           from_source_location(file, raw_line.to_i)
+         end
+ 
+-        def self.from_source_location(file, line)
++        def self.from_source_location(file, line, *_args)
+           file = File.expand_path(file)
+           pwd = File.expand_path(Dir.pwd)
+           pwd.force_encoding(file.encoding)

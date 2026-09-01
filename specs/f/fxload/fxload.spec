@@ -3,7 +3,7 @@
 
 Name: fxload
 Version: 2008_10_13
-Release: 36%{?dist}
+Release: 34%{?dist}
 Summary: A helper program to download firmware into FX and FX2 EZ-USB devices
 
 License: GPL-2.0-or-later
@@ -49,6 +49,9 @@ install -m 644 -Dt %{buildroot}%{_mandir}/man8/ fxload.8
 %{_mandir}/man8/fxload.8*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2008_10_13-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Oct 22 2025 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2008_10_13-33
 - Use %%_sbindir for the binary (rhbz#2405414)
 

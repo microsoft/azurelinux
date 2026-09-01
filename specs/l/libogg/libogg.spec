@@ -5,7 +5,7 @@ Summary:        The Ogg bitstream file format library
 Name:           libogg
 Epoch:          2
 Version:        1.3.6
-Release: 5%{?dist}
+Release:        3%{?dist}
 License:        BSD-3-Clause
 URL:            https://www.xiph.org/
 
@@ -83,6 +83,9 @@ cp -pr ogg.m4 %{buildroot}%{_datadir}/aclocal/
 %doc __installed_docs/*
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.3.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Oct 16 2025 Gwyn Ciesla <gwync@protonmail.com> - 2:1.3.6-2
 - Build with cmake, but still ship m4
 

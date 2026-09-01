@@ -1,0 +1,11 @@
+--- ceph-20.2.0/src/rgw/driver/dbstore/CMakeLists.txt.orig	2026-01-27 19:53:53.780108462 -0500
++++ ceph-20.2.0/src/rgw/driver/dbstore/CMakeLists.txt	2026-01-28 07:30:04.861741687 -0500
+@@ -34,7 +34,7 @@
+   list(APPEND link_targets jaeger_base)
+ endif()
+ list(APPEND link_targets rgw_common)
+-target_link_libraries(dbstore_lib PUBLIC ${link_targets})
++target_link_libraries(dbstore_lib PUBLIC ${link_targets} PRIVATE rgw_a)
+ 
+ set (CMAKE_LINK_LIBRARIES ${CMAKE_LINK_LIBRARIES} dbstore_lib)
+ 

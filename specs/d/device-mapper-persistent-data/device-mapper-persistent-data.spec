@@ -12,16 +12,15 @@
 
 Summary: Device-mapper Persistent Data Tools
 Name: device-mapper-persistent-data
-Version: 1.1.0
-Release: 4%{?dist}%{?release_suffix}
+Version: 1.3.3
+Release: 1%{?dist}%{?release_suffix}
 License: GPL-3.0-only AND (0BSD OR MIT OR Apache-2.0) AND Apache-2.0 AND (Apache-2.0 OR MIT) AND (Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT) AND BSD-3-Clause AND MIT AND (MIT OR Apache-2.0) AND (MIT OR Zlib OR Apache-2.0) AND (Unlicense OR MIT) AND (Zlib OR Apache-2.0 OR MIT)
 
 #ExcludeArch: %%{ix86}
 URL: https://github.com/jthornber/thin-provisioning-tools
 #Source0: https://github.com/jthornber/thin-provisioning-tools/archive/thin-provisioning-tools-%%{version}.tar.gz
 Source0: https://github.com/jthornber/thin-provisioning-tools/archive/v%{version}%{?version_suffix}.tar.gz
-Source1: dmpd110-vendor.tar.gz
-Patch1: 0001-Tweak-cargo.toml-to-work-with-vendor-directory.patch
+Source1: dmpd133-vendor.tar.gz
 
 %if %{defined rhel}
 BuildRequires: rust-toolset
@@ -49,6 +48,18 @@ snapshot eras
 %prep
 %autosetup -p1 -n thin-provisioning-tools-%{version}%{?version_suffix} -a1
 %cargo_prep -v vendor
+
+# NOTE: Following could replace Cargo.toml patching, but some macros are not working well with it
+# Notably at least one of cargo_license_summary, cargo_license_summary, or cargo_vendor_manifest
+#cat >> .cargo/config.toml << EOF
+#
+#[source."git+https://github.com/jthornber/rio?branch=master"]
+#git = "https://github.com/jthornber/rio"
+#branch = "master"
+#replace-with = "vendored-sources"
+#
+#EOF
+
 echo %{version}-%{release} > VERSION
 
 %generate_buildrequires
@@ -123,6 +134,28 @@ echo %{version}-%{release} > VERSION
 #% {_sbindir}/thin_show_duplicates
 
 %changelog
+* Thu Jun 25 2026 Marian Csontos <mcsontos@redhat.com> - 1.3.3-1
+- Update to latest upstream release 1.3.3.
+
+* Tue May 05 2026 Marian Csontos <mcsontos@redhat.com> - 1.3.2-1
+- Update to latest upstream release 1.3.2.
+- Fix RUSTSEC-2026-0097, RUSTSEC-2026-0002
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Dec 02 2025 Marian Csontos <mcsontos@redhat.com> - 1.3.1-1
+- Update to latest upstream release 1.3.1.
+
+* Wed Oct 22 2025 Marian Csontos <mcsontos@redhat.com> - 1.3.0-1
+- Update to latest upstream release 1.3.0.
+
+* Thu Sep 04 2025 Marian Csontos <mcsontos@redhat.com> - 1.2.1-1
+- Update to latest upstream release 1.2.1.
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.1.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

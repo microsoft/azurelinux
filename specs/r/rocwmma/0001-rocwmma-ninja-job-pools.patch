@@ -1,0 +1,48 @@
+From bc63f3ea6ee07366321dc10fb7f73706265c1846 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Sat, 10 Jan 2026 08:54:17 -0800
+Subject: [PATCH] rocwmma ninja job pools
+
+---
+ CMakeLists.txt | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 81b00507c363..532ace1d4c54 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,6 +54,31 @@ if( CMAKE_PROJECT_NAME STREQUAL "rocwmma" )
+   option( ROCWMMA_BUILD_ASSEMBLY "Output assembly files" OFF )
+   option( BUILD_OFFLOAD_COMPRESS "Build rocWMMA with offload compression" ON )
+   option( ROCWMMA_CODE_COVERAGE "Build with code coverage flags (clang only)" OFF)
++  #
++  # Seperate linking jobs from compiling
++  # Too many concurrent linking jobs can break the build
++  # Copied from LLVM
++  set(ROCWMMA_PARALLEL_LINK_JOBS "" CACHE STRING
++    "Define the maximum number of concurrent link jobs (Ninja only).")
++  if(CMAKE_GENERATOR MATCHES "Ninja")
++    if(ROCWMMA_PARALLEL_LINK_JOBS)
++      set_property(GLOBAL APPEND PROPERTY JOB_POOLS link_job_pool=${ROCWMMA_PARALLEL_LINK_JOBS})
++      set(CMAKE_JOB_POOL_LINK link_job_pool)
++    endif()
++  elseif(ROCWMMA_PARALLEL_LINK_JOBS)
++    message(WARNING "Job pooling is only available with Ninja generators.")
++  endif()
++  # Similar for compiling
++  set(ROCWMMA_PARALLEL_COMPILE_JOBS "" CACHE STRING
++    "Define the maximum number of concurrent compile jobs (Ninja only).")
++  if(CMAKE_GENERATOR MATCHES "Ninja")
++    if(ROCWMMA_PARALLEL_COMPILE_JOBS)
++      set_property(GLOBAL APPEND PROPERTY JOB_POOLS compile_job_pool=${ROCWMMA_PARALLEL_COMPILE_JOBS})
++      set(CMAKE_JOB_POOL_COMPILE compile_job_pool)
++    endif()
++  elseif(ROCWMMA_PARALLEL_COMPILE_JOBS)
++    message(WARNING "Job pooling is only available with Ninja generators.")
++  endif()
+ endif()
+ 
+ if( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
+-- 
+2.52.0
+

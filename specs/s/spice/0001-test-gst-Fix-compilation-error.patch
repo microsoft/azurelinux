@@ -1,0 +1,45 @@
+From a904cd86430aa555a50730e9389e210637a546c1 Mon Sep 17 00:00:00 2001
+From: Frediano Ziglio <freddy77@gmail.com>
+Date: Thu, 29 Jan 2026 08:28:16 +0000
+Subject: [PATCH] test-gst: Fix compilation error
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Specifically:
+
+../server/tests/test-gst.cpp: In function ‘TestPipeline* create_pipeline(const char*, SampleProc, void*)’:
+../server/tests/test-gst.cpp:566:41: error: either all initializer clauses should be designated or none of them should be
+  566 |         { NULL, NULL, new_sample, NULL, ._gst_reserved={NULL} };
+      |                                         ^
+
+This fixes https://gitlab.freedesktop.org/spice/spice/-/issues/96.
+
+Signed-off-by: Frediano Ziglio <freddy77@gmail.com>
+---
+ server/tests/test-gst.cpp | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/server/tests/test-gst.cpp b/server/tests/test-gst.cpp
+index 5d920d7d..19ad879b 100644
+--- a/server/tests/test-gst.cpp
++++ b/server/tests/test-gst.cpp
+@@ -561,13 +561,8 @@ create_pipeline(const char *desc, SampleProc sample_proc, void *param)
+         return NULL;
+     }
+ 
+-    static const GstAppSinkCallbacks appsink_cbs_template =
+-#if GST_CHECK_VERSION(1, 20, 0)
+-        { NULL, NULL, new_sample, NULL, ._gst_reserved={NULL} };
+-#else
+-        { NULL, NULL, new_sample, ._gst_reserved={NULL} };
+-#endif
+-    GstAppSinkCallbacks appsink_cbs = appsink_cbs_template;
++    GstAppSinkCallbacks appsink_cbs{};
++    appsink_cbs.new_sample = new_sample;
+     gst_app_sink_set_callbacks(pipeline->appsink, &appsink_cbs, pipeline, NULL);
+ 
+     GstBus *bus = gst_element_get_bus(pipeline->gst_pipeline);
+-- 
+2.52.0
+

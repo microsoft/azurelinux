@@ -1,0 +1,32 @@
+From 8d6d86d1d7e45eeae921e88adde55d6524027c96 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Wed, 26 Nov 2025 22:29:53 +0100
+Subject: [PATCH 3/3] machined: continue without resolve.hook socket
+
+---
+ src/machine/machined-varlink.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/machine/machined-varlink.c b/src/machine/machined-varlink.c
+index f83cbb8562..0b30cd0531 100644
+--- a/src/machine/machined-varlink.c
++++ b/src/machine/machined-varlink.c
+@@ -894,9 +894,15 @@ static int manager_varlink_init_resolve_hook(Manager *m) {
+ 
+         r = sd_varlink_server_listen_address(s, VARLINK_PATH_MACHINED_RESOLVE_HOOK,
+                                              0666 | SD_VARLINK_SERVER_MODE_MKDIR_0755);
+-        if (r < 0)
+-                return log_error_errno(r, "Failed to bind to varlink socket %s: %m",
+-                                       VARLINK_PATH_MACHINED_RESOLVE_HOOK);
++        if (r < 0) {
++                bool ignore = ERRNO_IS_NEG_PRIVILEGE(r);
++                log_full_errno(ignore ? LOG_WARNING : LOG_ERR,
++                               r,
++                               "Failed to bind to varlink socket %s%s: %m",
++                               VARLINK_PATH_MACHINED_RESOLVE_HOOK,
++                               ignore ? ", ignoring" : "");
++                return ignore ? 0 : r;
++        }
+ 
+         r = sd_varlink_server_attach_event(s, m->event, SD_EVENT_PRIORITY_NORMAL);
+         if (r < 0)

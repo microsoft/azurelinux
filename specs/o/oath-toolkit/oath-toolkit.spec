@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:          oath-toolkit
-Version:       2.6.12
-Release: 6%{?dist}
+Version:       2.6.14
+Release:       1%{?dist}
 # Automatically converted from old format: GPLv3+ - review is highly recommended.
 License:       GPL-3.0-or-later
 Summary:       One-time password components
@@ -23,7 +23,7 @@ Source1:       https://download.savannah.nongnu.org/releases/%{name}/%{name}-%{v
 # gpg2 --armor --export D73CF638C53C06BE > keyring.asc
 Source2:       keyring.asc
 URL:           https://www.nongnu.org/oath-toolkit/
-Patch0:        oath-toolkit-2.6.12-lockfile.patch
+Patch:        oath-toolkit-2.6.14-lockfile.patch
 
 %description
 The OATH Toolkit provide components for building one-time password
@@ -127,17 +127,17 @@ autoreconf -fi
 %configure --with-pam-dir=%{_libdir}/security
 
 # Kill rpaths and link with --as-needed
-for d in liboath libpskc pskctool oathtool pam_oath
+for d in liboath libpskc pam_oath
 do
   sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' $d/libtool
   sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' $d/libtool
   sed -i 's| -shared | -Wl,--as-needed\0|g' $d/libtool
 done
 
-make %{?_smp_mflags}
+%make_build
 
 %install
-make %{?_smp_mflags} DESTDIR=%{buildroot} install
+%make_install
 
 # Remove static objects and libtool files
 rm -f %{buildroot}%{_libdir}/*.{a,la}
@@ -151,7 +151,7 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %ldconfig_scriptlets -n libpskc
 
 %files -n liboath
-%doc liboath/COPYING
+%doc COPYING
 %attr(0600, root, root) %dir %{_sysconfdir}/liboath
 %{_libdir}/liboath.so.*
 
@@ -179,7 +179,7 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %{_datadir}/gtk-doc/html/libpskc/*
 
 %files -n oathtool
-%doc oathtool/COPYING
+%doc COPYING
 %{_bindir}/oathtool
 %{_mandir}/man1/oathtool.*
 
@@ -188,10 +188,21 @@ mkdir -p -m 0600 %{buildroot}%{_sysconfdir}/liboath
 %{_mandir}/man1/pskctool.*
 
 %files -n pam_oath
-%doc pam_oath/README pam_oath/COPYING
+%doc pam_oath/README COPYING
 %{_libdir}/security/pam_oath.so
 
 %changelog
+* Thu Jan 29 2026 Jaroslav Škarvada <jskarvad@redhat.com> - 2.6.14-1
+- New version
+  Resolves: rhbz#2433388
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Aug 14 2025 Jaroslav Škarvada  <jskarvad@redhat.com> - 2.6.13-1
+- New version
+  Resolves: rhbz#2384260
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.6.12-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

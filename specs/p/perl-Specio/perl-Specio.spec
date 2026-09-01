@@ -10,7 +10,7 @@
 
 Name:		perl-Specio
 Version:	0.53
-Release: 4%{?dist}
+Release:	2%{?dist}
 Summary:	Type constraints and coercions for Perl
 # lib/Specio/PartialDump.pm:	GPL-1.0-or-later OR Artistic-1.0-Perl
 #				<https://github.com/houseabsolute/Specio/issues/17>
@@ -167,6 +167,9 @@ make test
 %{_mandir}/man3/Test::Specio.3*
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.53-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Oct  8 2025 Paul Howarth <paul@city-fan.org> - 0.53-1
 - Update to 0.53
   - Fixed a test failure when trying to open $^X on some platforms

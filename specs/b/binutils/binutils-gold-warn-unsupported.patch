@@ -24,26 +24,6 @@ diff -rup binutils.orig/gold/configure.ac binutils-2.34/gold/configure.ac
      else
        targetobjs="$targetobjs ${targ_obj}.\$(OBJEXT)"
        if test "$targ_extra_obj" != ""; then
---- binutils.orig/ld/configure.tgt	2020-04-20 12:35:12.465301359 +0100
-+++ binutils-2.34/ld/configure.tgt	2020-04-20 14:17:52.123066333 +0100
-@@ -220,7 +220,7 @@ bfin-*-linux-uclibc*)	targ_emul=elf32bfi
- 			targ_extra_emuls="elf32bfin"
- 			targ_extra_libpath=$targ_extra_emuls
- 			;;
--bpf-*-*)		targ_emul=elf64bpf
-+bpf-* | bpf-*-*)	targ_emul=elf64bpf
- 			;;
- cr16-*-elf*)		targ_emul=elf32cr16
- 			;;
-@@ -1026,7 +1026,7 @@ z8k-*-coff)		targ_emul=z8002
- 			targ_extra_ofiles=
- 			;;
- *)
--  echo 2>&1 "*** ld does not support target ${targ}"
-+  echo 2>&1 "*** ld does not support target '${targ}' NO REALLY"
-   echo 2>&1 "*** see ld/configure.tgt for supported targets"
-   exit 1
- 
 --- binutils.orig/bfd/config.bfd	2020-04-20 12:35:13.038297375 +0100
 +++ binutils-2.34/bfd/config.bfd	2020-04-20 14:25:26.452869193 +0100
 @@ -473,7 +473,7 @@ case "${targ}" in
@@ -55,12 +35,14 @@ diff -rup binutils.orig/gold/configure.ac binutils-2.34/gold/configure.ac
      targ_defvec=bpf_elf64_le_vec
      targ_selvecs=bpf_elf64_be_vec
      targ_underscore=yes
-@@ -1427,7 +1427,7 @@ case "${targ}" in
-     ;;
- 
-   *)
--    echo 1>&2 "*** BFD does not support target ${targ}."
-+    echo 1>&2 "*** BFD does not support target '${targ}'.  Honest."
-     echo 1>&2 "*** Look in bfd/config.bfd for supported targets."
-     exit 1
-     ;;
+--- binutils.orig/ld/configure.tgt	2026-01-05 08:51:02.908224792 +0000
++++ binutils-with-gold-2.45.50-be970c68891/ld/configure.tgt	2026-01-05 08:51:55.852677409 +0000
+@@ -255,7 +255,7 @@ bfin-*-uclinux*)	targ_emul=elf32bfin;
+ bfin-*-linux-uclibc*)	targ_emul=elf32bfinfd;
+ 			targ_extra_libpath=elf32bfin
+ 			;;
+-bpf-*-*)		targ_emul=elf64bpf
++bpf-* | bpf-*-*)	targ_emul=elf64bpf
+ 			;;
+ cr16-*-elf*)		targ_emul=elf32cr16
+ 			;;

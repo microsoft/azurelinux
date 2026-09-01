@@ -1,0 +1,11 @@
+diff -up expect5.45.4/example/mkpasswd.tcl9-mkpasswd expect5.45.4/example/mkpasswd
+--- expect5.45.4/example/mkpasswd.tcl9-mkpasswd	2026-02-12 10:32:04.718884455 +0100
++++ expect5.45.4/example/mkpasswd	2026-02-12 10:32:09.108361088 +0100
+@@ -101,6 +101,7 @@ proc insert {pvar char} {
+ proc rand {m} {
+     set device /dev/urandom            ;# /dev/random can block
+     set fileId [open $device r]
++    fconfigure $fileId -translation binary
+     binary scan [read $fileId 4] i1 number
+     set clipped [expr $number % $m]
+ #    puts "number is $number"

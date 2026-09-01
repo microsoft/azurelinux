@@ -3,14 +3,15 @@
 
 Summary: Library for producing small, fast columnar storage for Hadoop workloads
 Name:    liborc
-Version: 2.1.4
-Release: 4%{?dist}
+Version: 2.2.2
+Release: 2%{?dist}
 License: Apache-2.0
 URL:     http://orc.apache.org/
 Source:  https://downloads.apache.org/orc/orc-%{version}/orc-%{version}.tar.gz
-Source1: https://downloads.apache.org/orc/orc-format-1.1.0/orc-format-1.1.0.tar.gz
-Patch0001:	0001-cmake.patch
-Patch0002:	0002-c++-src-CpuInfoUtil.cc.patch
+Source1: https://downloads.apache.org/orc/orc-format-1.1.1/orc-format-1.1.1.tar.gz
+Patch:	0001-cmake.patch
+Patch:	0002-c++-src-CpuInfoUtil.cc.patch
+
 # Apache ORC has numerous compile errors and apparently assumes a 64-bit
 # build and runtime environment. The only consumer of this package is 
 # Ceph (by way of Apache Arrow) which is also 64-bit only
@@ -137,23 +138,35 @@ rm -f %{buildroot}/%{_includedir}/orc/sargs/._*.hh
      %{_libdir}/liborc.so
 
 %changelog
-* Mon Jan 12 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.4-1
-- Apache ORC 2.1.4 GA
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.2.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 12 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.2.2-1
+- Apache ORC 2.2.2 GA
+
+* Thu Oct 2 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.2.1-1
+- Apache ORC 2.2.1 GA
+
+* Mon Aug 25 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.2.0-2
+- Apache ORC 2.2.0, rebuild with orc-format-1.1.1
+
+* Wed Aug 13 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.2.0-1
+- Apache ORC 2.2.0 GA
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
 * Tue Jul 15 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.3-1
-- Apache ORC 2.1.3 GA
+- Apache ORC 2.1.3
 
 * Thu May 8 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.2-1
-- Apache ORC 2.1.2 GA
+- Apache ORC 2.1.2
 
 * Fri Apr 18 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.1-2
 - Apache ORC 2.1.1, with orc-format-1.1.0
 
 * Thu Mar 13 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.1-1
-- Apache ORC 2.1.1 GA
+- Apache ORC 2.1.1
 
 * Thu Feb 6 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 2.1.0-1
 - Apache ORC 2.1.0

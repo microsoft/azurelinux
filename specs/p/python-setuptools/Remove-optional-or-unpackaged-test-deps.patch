@@ -1,4 +1,4 @@
-From bdaef8a39fe780cf9ae8af7c13128b9b908210d7 Mon Sep 17 00:00:00 2001
+From 9f58514249322c83d5725706578ba9182b6ef0be Mon Sep 17 00:00:00 2001
 From: Karolina Surma <ksurma@redhat.com>
 Date: Thu, 2 May 2024 11:39:09 +0200
 Subject: [PATCH] Remove optional or unpackaged test deps
@@ -16,10 +16,10 @@ Co-authored-by: Tomas Hrnciar <thrnciar@redhat.com>
  1 file changed, 3 deletions(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index cee3b55..eed354e 100644
+index 5988fed..256dc42 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -50,9 +50,6 @@ test = [
+@@ -55,9 +55,6 @@ test = [
  	"ini2toml[lite]>=0.14",
  	"tomli-w>=1.0.0",
  	"pytest-timeout",
@@ -30,5 +30,5 @@ index cee3b55..eed354e 100644
  	"pytest-subprocess",
  
 -- 
-2.46.0
+2.51.0
 

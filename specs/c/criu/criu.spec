@@ -4,18 +4,19 @@
 %global py_prefix python3
 %global py_binary %{py_prefix}
 
-# With annobin enabled, CRIU does not work anymore. It seems CRIU's
-# parasite code breaks if annobin is enabled.
+# CRIU's parasite/restorer code (criu/pie/) is compiled with its own CFLAGS
+# that already disable hardening (-fno-stack-protector, -U_FORTIFY_SOURCE,
+# -D_FORTIFY_SOURCE=0, -nostdlib). Standard RHEL hardening flags (PIE, RELRO,
+# FORTIFY_SOURCE, stack protector) only affect the main criu binary and libs.
+#
+# Annobin remains disabled because its instrumentation gets injected into
+# every compilation unit including parasite code, and there is no per-target
+# way to exclude it through the Makefile.
 %undefine _annotated_build
 
-# Disable automatic call to the set_build_flags macro
-# at the beginning of the build, check, and install.
-# This change was introduced in Fedora 36.
-%undefine _auto_set_build_flags
-
 Name: criu
-Version: 4.2
-Release: 15%{?dist}
+Version: 4.2.1
+Release: 1%{?dist}
 Summary: Tool for Checkpoint/Restore in User-space
 License: GPL-2.0-only AND LGPL-2.1-only AND MIT
 URL: http://criu.org/
@@ -42,11 +43,11 @@ BuildRequires: libselinux-devel
 BuildRequires: gnutls-devel
 BuildRequires: libdrm-devel
 BuildRequires: libuuid-devel
+BuildRequires: nftables-devel
 # Checkpointing containers with a tmpfs requires tar
 Recommends: tar
 %if 0%{?fedora}
 BuildRequires: libbsd-devel
-BuildRequires: nftables-devel
 %endif
 BuildRequires: make
 
@@ -125,21 +126,37 @@ This script can help to workaround the so called "PID mismatch" problem.
 # that is fixed, disable LTO.
 %define _lto_cflags %{nil}
 
+# CRIU's nmk build system calls ld directly for intermediate partial linking
+# (ld -r). RHEL LDFLAGS contain -specs= options that only gcc understands;
+# raw ld rejects them. Create a wrapper that strips -specs= for direct ld
+# calls. The final criu binary link uses gcc (CC), not ld, so it still gets
+# full hardening (-pie, -z relro, -z now) from the spec files.
+mkdir -p %{_builddir}/bin
+cat > %{_builddir}/bin/ld << 'LDWRAPPER'
+#!/bin/sh
+for arg do
+  shift
+  case "$arg" in -specs=*) continue ;; esac
+  set -- "$@" "$arg"
+done
+exec /usr/bin/ld "$@"
+LDWRAPPER
+chmod +x %{_builddir}/bin/ld
+
 # %{?_smp_mflags} does not work
-# -fstack-protector breaks build
-CFLAGS+=`echo %{optflags} | sed -e 's,-fstack-protector\S*,,g'` make V=1 WERROR=0 PREFIX=%{_prefix} RUNDIR=/run/criu PYTHON=%{py_binary} PLUGINDIR=%{_libdir}/criu NETWORK_LOCK_DEFAULT=NETWORK_LOCK_NFTABLES
+CFLAGS+="%{optflags}" make V=1 WERROR=0 LD=%{_builddir}/bin/ld PREFIX=%{_prefix} RUNDIR=/run/criu PYTHON=%{py_binary} PLUGINDIR=%{_libdir}/criu NETWORK_LOCK_DEFAULT=NETWORK_LOCK_NFTABLES
 make V=1 WERROR=0 PREFIX=%{_prefix} PLUGINDIR=%{_libdir}/criu amdgpu_plugin
 make docs V=1
 
 
 %install
 sed -e "s,--upgrade --ignore-installed,--no-index --no-deps -v --no-build-isolation,g" -i lib/Makefile -i crit/Makefile
-make install-criu DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} BINDIR=%{_bindir} SBINDIR=%{_sbindir}
-make install-lib DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
-make install-amdgpu_plugin DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
-make install-cuda_plugin DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
-make install-crit DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}  BINDIR=%{_bindir} SBINDIR=%{_sbindir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
-make install-man DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}
+make install-criu LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} BINDIR=%{_bindir} SBINDIR=%{_sbindir}
+make install-lib LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
+make install-amdgpu_plugin LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
+make install-cuda_plugin LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir} PLUGINDIR=%{_libdir}/criu
+make install-crit LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}  BINDIR=%{_bindir} SBINDIR=%{_sbindir} PYTHON=%{py_binary} PIPFLAGS="--no-build-isolation --no-index --no-deps --progress-bar off --upgrade --ignore-installed"
+make install-man LD=%{_builddir}/bin/ld DESTDIR=$RPM_BUILD_ROOT PREFIX=%{_prefix} LIBDIR=%{_libdir}
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/compel.1
 
 mkdir -p %{buildroot}%{_tmpfilesdir}
@@ -190,6 +207,45 @@ rm -f $RPM_BUILD_ROOT%{_libdir}/libcriu.a
 %tmpfiles_create %{name}.conf
 
 %changelog
+* Tue Jul 21 2026 Radostin Stoyanov <rstoyanov@fedoraproject.org> - 4.2.1-1
+- Update to 4.2.1
+- Drop patches merged upstream
+
+* Wed Jul 15 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-22
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Mon Jul 06 2026 Adrian Reber <areber@redhat.com> - 4.2-21
+- One more test only patch for linux 7.1
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 4.2-20
+- Rebuilt for Python 3.15
+
+* Thu May 28 2026 Miroslav Suchy <msuchy@redhat.com> - 4.2-19
+- rebuild for https://fedoraproject.org/wiki/Changes/Protobuf_5.x/6.x
+
+* Wed Apr 22 2026 Adrian Reber <adrian@lisas.de> - 4.2-18
+- Route veth restore through usernsd for userns mode (upstream PR#3006)
+- Fix rseq01 test for kernel 7.0 rseq changes (upstream PR#3007)
+- Handle UDPLITE removal in kernel 7.1 (upstream PR#3003)
+
+* Thu Mar 26 2026 Adrian Reber <adrian@lisas.de> - 4.2-17
+- Always use nftables network locking backend
+
+* Tue Mar 03 2026 Adrian Reber <areber@redhat.com> - 4.2-16
+- Fix tty compiler error (const qualifier warning)
+
+* Tue Mar 03 2026 Adrian Reber <areber@redhat.com> - 4.2-15
+- Fix rseq build failure with latest glibc in rawhide
+
+* Mon Mar 02 2026 Christopher Lusk <clusk@redhat.com> - 4.2-14
+- Re-enable binary hardening flags for main binary
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Nov 17 2025 Cristian Le <git@lecris.dev> - 4.2-11
 - Convert STI tests to TMT (rhbz#2382879)
 

@@ -5,8 +5,8 @@
 #define  prever_dot .rc3
 #define  postver    a
 
-%define version_alsa_lib  1.2.15.3
-%define version_alsa_ucm  1.2.15.3
+%define version_alsa_lib  1.2.16.1
+%define version_alsa_ucm  1.2.16.1
 %define version_alsa_tplg 1.2.5
 
 %global lib_patch         0
@@ -26,6 +26,9 @@ Source10: asound.conf
 Source11: modprobe-dist-alsa.conf
 Source12: modprobe-dist-oss.conf
 %if %{ucm_patch}
+# https://bugzilla.redhat.com/show_bug.cgi?id=2480230
+# Requested by Lenovo for new model support
+# Includes ee39f9e, fb35cbdm, 97d1f76, 7fd1a77, e8737af
 Source40: alsa-ucm-conf.patch
 %endif
 %if %{lib_patch}
@@ -181,6 +184,22 @@ rm %{buildroot}/%{_includedir}/asoundlib.h
 %{_datadir}/alsa/topology
 
 %changelog
+* Sat Jun 13 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.16.1-1
+- update to 1.2.16.1
+
+* Mon Jun  1 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.16-2
+- update to 1.2.16
+
+* Fri May 22 2026 Adam Williamson <awilliam@redhat.com> - 1.2.15.3-4
+- Backport fix for CVE-2026-25068 (buffer overflow) (#2435423)
+- Backports to support new Lenovo laptop models (#2480230)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.15.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.2.15.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Jan 13 2026 Jaroslav Kysela <perex@perex.cz> - 1.2.15.3-1
 - update to 1.2.15.3
 

@@ -1,6 +1,6 @@
 name:                serialise
 version:             0.2.6.1
-x-revision:          4
+x-revision: 5
 synopsis:            A binary serialisation library for Haskell values.
 description:
   This package (formerly @binary-serialise-cbor@) provides pure, efficient
@@ -138,7 +138,7 @@ test-suite tests
     primitive               >= 0.5     && < 0.10,
     cborg,
     serialise,
-    QuickCheck              >= 2.9     && < 2.16,
+    QuickCheck              >= 2.9     && < 2.17,
     tasty                   >= 0.11    && < 1.6,
     tasty-hunit             >= 0.9     && < 0.11,
     tasty-quickcheck        >= 0.8     && < 0.12,

@@ -1,0 +1,28 @@
+diff -rupN --no-dereference eigen-5.0.1/blas/CMakeLists.txt eigen-5.0.1-new/blas/CMakeLists.txt
+--- eigen-5.0.1/blas/CMakeLists.txt	2025-11-08 21:44:56.000000000 +0100
++++ eigen-5.0.1-new/blas/CMakeLists.txt	2025-11-09 21:19:36.926722101 +0100
+@@ -33,8 +33,8 @@ foreach(target IN LISTS EIGEN_BLAS_TARGE
+   add_dependencies(blas ${target})
+   install(TARGETS ${target}
+           RUNTIME DESTINATION bin
+-          LIBRARY DESTINATION lib
+-          ARCHIVE DESTINATION lib)
++          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ endforeach()
+ 
+ if(EIGEN_BUILD_TESTING)
+diff -rupN --no-dereference eigen-5.0.1/lapack/CMakeLists.txt eigen-5.0.1-new/lapack/CMakeLists.txt
+--- eigen-5.0.1/lapack/CMakeLists.txt	2025-11-08 21:44:56.000000000 +0100
++++ eigen-5.0.1-new/lapack/CMakeLists.txt	2025-11-09 21:19:36.926994409 +0100
+@@ -122,8 +122,8 @@ foreach(target IN LISTS EIGEN_LAPACK_TAR
+   add_dependencies(lapack ${target})
+   install(TARGETS ${target}
+           RUNTIME DESTINATION bin
+-          LIBRARY DESTINATION lib
+-          ARCHIVE DESTINATION lib)
++          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ endforeach()
+ 
+ 

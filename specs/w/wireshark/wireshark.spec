@@ -4,12 +4,15 @@
 %undefine __cmake_in_source_build
 %global with_lua 1
 %global with_maxminddb 1
+%global with_pytools 1
 %global plugins_version 4.6
+
+%bcond http3 %[0%{?fedora} >= 43]
 
 Summary:	Network traffic analyzer
 Name:		wireshark
-Version:	4.6.3
-Release: 5%{?dist}
+Version:	4.6.8
+Release:	1%{?dist}
 Epoch:		1
 License:	BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause AND MIT AND GPL-2.0-or-later AND LGPL-2.0-or-later AND Zlib AND ISC AND (BSD-3-Clause OR GPL-2.0-only) AND (GPL-2.0-or-later AND Zlib)
 Url:		http://www.wireshark.org/
@@ -86,6 +89,9 @@ Buildrequires:	speexdsp-devel
 #needed for sdjournal external capture interface
 BuildRequires:	systemd-devel
 BuildRequires:	libnghttp2-devel
+%if %{with http3}
+BuildRequires:	libnghttp3-devel
+%endif
 BuildRequires:	systemd-rpm-macros
 BuildRequires:	lz4-devel
 BuildRequires:	snappy-devel
@@ -126,6 +132,10 @@ Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	%{name}-cli = %{epoch}:%{version}-%{release}
 Requires:	glibc-devel
 Requires:	glib2-devel
+%if %{with_pytools} && 0%{?fedora}
+Requires: python3-ply
+Requires: omniORB-devel
+%endif
 
 %description devel
 The wireshark-devel package contains the header files, developer
@@ -157,7 +167,8 @@ and plugins.
   -DENABLE_PLUGINS=ON \
   -DENABLE_NETLINK=ON \
   -DBUILD_dcerpcidl2wrs=OFF \
-  -DBUILD_sdjournal=ON
+  -DBUILD_sdjournal=ON \
+  -DBUILD_stratoshark=OFF
 
 %cmake_build
 
@@ -169,10 +180,23 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/org.wireshark.Wiresha
 
 #install devel files (inspired by debian/wireshark-dev.header-files)
 install -d -m 0755  %{buildroot}%{_includedir}/wireshark
+install -m 0644 %{__cmake_builddir}/config.h %{buildroot}%{_includedir}/wireshark/config.h
 IDIR="%{buildroot}%{_includedir}/wireshark"
 mkdir -p %{buildroot}%{_udevrulesdir}
-install -m 644 %{SOURCE2}		%{buildroot}%{_udevrulesdir}
-install -Dpm 644 %{SOURCE3}		%{buildroot}%{_sysusersdir}/%{name}.conf
+install -m 0644 %{SOURCE2}		%{buildroot}%{_udevrulesdir}
+install -Dpm 0644 %{SOURCE3}		%{buildroot}%{_sysusersdir}/%{name}.conf
+
+%if %{with_pytools} && 0%{?fedora}
+#install asn2wrs.py, idl2wrs and make-plugin-reg.py tools
+mkdir -p %{buildroot}%{_libexecdir}/wireshark/pytools
+install -m 0755 tools/asn2wrs.py %{buildroot}%{_libexecdir}/wireshark/pytools/
+install -m 0755 tools/make-plugin-reg.py %{buildroot}%{_libexecdir}/wireshark/pytools/
+install -m 0755 tools/idl2wrs %{buildroot}%{_libexecdir}/wireshark/pytools/
+
+#install idl2wrs dependent scripts
+install -m 0644 tools/wireshark_be.py %{buildroot}%{_libexecdir}/wireshark/pytools/
+install -m 0644 tools/wireshark_gen.py %{buildroot}%{_libexecdir}/wireshark/pytools/
+%endif
 
 touch %{buildroot}%{_bindir}/%{name}
 
@@ -204,8 +228,8 @@ fi
 %doc AUTHORS INSTALL README*
 %{_bindir}/capinfos
 %{_bindir}/captype
-%{_bindir}/dftest
 %{_bindir}/editcap
+%{_bindir}/dftest
 %{_bindir}/mergecap
 %{_bindir}/randpkt
 %{_bindir}/reordercap
@@ -222,6 +246,7 @@ fi
 %dir %{_libexecdir}/wireshark
 %dir %{_libexecdir}/wireshark/extcap
 %dir %{_libdir}/wireshark/plugins
+%dir %{_libdir}/wireshark
 %{_libexecdir}/wireshark/extcap/ciscodump
 %{_libexecdir}/wireshark/extcap/udpdump
 %{_libexecdir}/wireshark/extcap/wifidump
@@ -256,6 +281,7 @@ fi
 %{_mandir}/man1/randpktdump.*
 %{_mandir}/man1/dpauxmon.*
 %{_mandir}/man1/sdjournal.*
+%{_mandir}/man1/sharkd.*
 %{_mandir}/man1/etwdump.*
 %{_mandir}/man4/extcap.*
 %{_datadir}/doc/wireshark/*
@@ -274,18 +300,47 @@ fi
 %{_libdir}/lib*.so
 %{_libdir}/pkgconfig/%{name}.pc
 %{_libdir}/cmake/%{name}/*.cmake
+%if %{with_pytools} && 0%{?fedora}
+%dir %{_libexecdir}/wireshark/pytools
+%{_libexecdir}/wireshark/pytools/*.py
+%{_libexecdir}/wireshark/pytools/idl2wrs
+%endif
 
 %changelog
+* Mon Aug 17 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.8-1
+- New version 4.6.8
+
+* Tue Jul 14 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.7-1
+- New version 4.6.7
+
+* Mon Jun 01 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.6-1
+- New version 4.6.6
+
+* Tue Mar 17 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.4-2
+- Adding a couple of python tools
+
+* Wed Mar 04 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.4-1
+- New version 4.6.4
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.6.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jan 15 2026 Michal Ruprich <mruprich@redhat.com> - 1:4.6.3-1
 - New version 4.6.3
 
-* Fri Nov 28 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.6.1-1
+* Thu Dec 11 2025 Yaakov Selkowitz <yselkowi@redhat.com> - 1:4.6.1-3
+- Enable HTTP/3 support on F43+ only
+
+* Tue Dec 09 2025 Alexey Kurov <nucleo@fedoraproject.org> - 1:4.6.1-2
+- BuildRequires: libnghttp3-devel - needed for HTTP3 support
+
+* Thu Nov 27 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.6.1-1
 - New version 4.6.1
 
-* Mon Oct 13 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.6.0-1
+* Thu Oct 09 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.6.0-1
 - New version 4.6.0
 
-* Thu Sep 25 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.4.9-1
+* Mon Sep 01 2025 Michal Ruprich <mruprich@redhat.com> - 1:4.4.9-1
 - New version 4.4.9
 
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:4.4.8-2

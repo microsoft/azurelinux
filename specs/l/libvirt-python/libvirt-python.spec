@@ -15,11 +15,13 @@
     %define supported_platform 0
 %endif
 
+%define dist_name libvirt_python
+
 Summary: The libvirt virtualization API python3 binding
 Name: libvirt-python
-Version: 11.6.0
-Release: 6%{?dist}
-Source0: https://libvirt.org/sources/python/%{name}-%{version}.tar.gz
+Version: 12.0.0
+Release: 1%{?dist}
+Source0: https://libvirt.org/sources/python/%{dist_name}-%{version}.tar.gz
 Url: https://libvirt.org
 License: LGPL-2.1-or-later
 BuildRequires: libvirt-devel == %{version}
@@ -42,7 +44,6 @@ of recent versions of Linux (and other OSes).
 %package -n python3-libvirt
 Summary: The libvirt virtualization API python3 binding
 Url: http://libvirt.org
-License: LGPLv2+
 %{?python_provide:%python_provide python3-libvirt}
 Provides: libvirt-python3 = %{version}-%{release}
 Obsoletes: libvirt-python3 <= 3.6.0-1%{?dist}
@@ -54,7 +55,7 @@ supplied by the libvirt library to use the virtualization capabilities
 of recent versions of Linux (and other OSes).
 
 %prep
-%setup -q
+%setup -q -n %{dist_name}-%{version}
 
 # Unset execute bit for example scripts; it can introduce spurious
 # RPM dependencies, like /usr/bin/python3
@@ -90,8 +91,23 @@ exit 1
 
 
 %changelog
-* Mon Sep 29 2025 Daniel P. Berrangé <berrange@redhat.com> - 11.6.0-3
-- Rebuilt for Python 3.14.0rc3 bytecode (rhbz #2396717)
+* Mon Jan 19 2026 Daniel P. Berrangé <berrange@redhat.com> - 12.0.0-1
+- Update to 12.0.0 release
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 11.10.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 01 2025 Cole Robinson <crobinso@redhat.com> - 11.10.0-1
+- Update to version 11.10.0
+
+* Wed Oct 01 2025 Cole Robinson <crobinso@redhat.com> - 11.8.0-1
+- Update to version 11.8.0
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 11.7.0-2
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Tue Sep 02 2025 Cole Robinson <crobinso@redhat.com> - 11.7.0-1
+- Update to version 11.7.0
 
 * Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 11.6.0-2
 - Rebuilt for Python 3.14.0rc2 bytecode

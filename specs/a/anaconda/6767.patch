@@ -1,0 +1,52 @@
+From b93de86cb0579168e1b360180e92819c2c5b0151 Mon Sep 17 00:00:00 2001
+From: Katerina Koukiou <k.koukiou@gmail.com>
+Date: Thu, 20 Nov 2025 17:13:03 +0100
+Subject: [PATCH] partitioning: manual: skip requests for devices removed from
+ device tree in setup_kickstart
+
+When  parent is reformatted, the children are removed from the device
+tree. If a request exists for such a device, skip it in setup_kickstart
+to avoid AttributeError when accessing device.path.
+
+Resolves: rhbz#2457287
+---
+ .../partitioning/manual/manual_module.py      | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/partitioning/manual/manual_module.py b/pyanaconda/modules/storage/partitioning/manual/manual_module.py
+index cfef0938e4d..48de7cae08e 100644
+--- a/pyanaconda/modules/storage/partitioning/manual/manual_module.py
++++ b/pyanaconda/modules/storage/partitioning/manual/manual_module.py
+@@ -21,6 +21,7 @@
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+ from pyanaconda.core.signal import Signal
++from pyanaconda.modules.common.errors.storage import UnsupportedPartitioningError
+ from pyanaconda.modules.common.structures.partitioning import MountPointRequest
+ from pyanaconda.modules.storage.partitioning.base import PartitioningModule
+ from pyanaconda.modules.storage.partitioning.constants import PartitioningMethod
+@@ -81,6 +82,24 @@ def setup_kickstart(self, data):
+ 
+             if request.device_spec:
+                 device = self.storage.devicetree.get_device_by_device_id(request.device_spec)
++                # Skip requests for devices that no longer exist in the device tree
++                # (e.g., BTRFS subvolumes removed when their parent is reformatted)
++                # Only skip if the device has no mount point (unmounted/unused devices)
++                if device is None:
++                    if request.mount_point in ("none", ""):
++                        log.warning("Device '%s' not found in devicetree and has no mount point. "
++                                   "This typically occurs when a BTRFS subvolume's parent is reformatted, "
++                                   "causing child subvolumes to be removed from the device tree. Skipping this request.",
++                                   request.device_spec)
++                        continue
++                    else:
++                        # Device with mount point should exist - this is an error condition
++                        raise UnsupportedPartitioningError(
++                            "Device '{}' with mount point '{}' not found in devicetree. "
++                            "This indicates a configuration issue.".format(
++                                request.device_spec, request.mount_point
++                            )
++                        )
+                 mount_data.device = device.path
+             else:
+                 mount_data.device = request.ks_spec

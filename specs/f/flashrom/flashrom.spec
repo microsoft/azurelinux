@@ -2,14 +2,14 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:		flashrom
-Version:	1.4.0
-Release: 6%{?dist}
+Version:	1.6.0
+Release:	3%{?dist}
 Summary:	Simple program for reading/writing flash chips content
 License:	GPL-2.0-only
 URL:		https://flashrom.org
 
-Source0:	https://download.flashrom.org/releases/%{name}-%{version}.tar.xz
-Source1:	https://download.flashrom.org/releases/%{name}-%{version}.tar.xz.asc
+Source0:	https://download.flashrom.org/releases/%{name}-v%{version}.tar.xz
+Source1:	https://download.flashrom.org/releases/%{name}-v%{version}.tar.xz.asc
 # Find which key was used for signing the release:
 #
 # $ LANG=C gpg --verify flashrom-v1.3.0.tar.bz2.asc flashrom-v1.3.0.tar.bz2
@@ -30,6 +30,7 @@ BuildRequires:	libjaylink-devel
 %endif
 BuildRequires:	libusb1-devel
 BuildRequires:	meson
+BuildRequires:	openssl-devel
 BuildRequires:	pciutils-devel
 BuildRequires:	python3-sphinx
 BuildRequires:	systemd
@@ -58,7 +59,7 @@ Files for development with %{name}.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup -p1 -n %{name}-%{version}
+%autosetup -p1 -n %{name}-v%{version}
 # Replace GROUP="plugdev" specifiers with TAG+="uaccess"
 sed -e 's/MODE="[0-9]*", GROUP="plugdev"/TAG+="uaccess"/g' util/flashrom_udev.rules -i
 
@@ -88,6 +89,12 @@ rm %{buildroot}/%{_libdir}/libflashrom.a
 %{_libdir}/pkgconfig/flashrom.pc
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.6.0-2
+- Rebuilt for Python 3.14.0rc3 bytecode
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

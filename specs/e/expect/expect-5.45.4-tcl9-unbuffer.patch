@@ -1,0 +1,37 @@
+With this change, invalid input bytes that are not UTF-8
+are no longer rejected by unbuffer and parsed through verbatim.
+
+This avoids an error:
+
+  i_read(spawn_id fd=6): invalid or incomplete multibyte or wide character
+
+Submitted upstream: <https://sourceforge.net/p/expect/patches/34/>
+
+diff --git a/example/unbuffer b/example/unbuffer
+index ad5db7bd85086586..c12dcaf494bd9588 100755
+--- a/example/unbuffer
++++ b/example/unbuffer
+@@ -5,6 +5,7 @@ exec tclsh "$0" ${1+"$@"}
+ 
+ package require Expect
+ 
++fconfigure $user_spawn_id -translation binary
+ 
+ # -*- tcl -*-
+ # Description: unbuffer stdout of a program
+@@ -14,6 +15,7 @@ if {[string compare [lindex $argv 0] "-p"] == 0} {
+     # pipeline
+     set stty_init "-echo"
+     eval [list spawn -noecho] [lrange $argv 1 end]
++    fconfigure $spawn_id -translation binary
+     close_on_eof -i $user_spawn_id 0
+     interact {
+ 	eof {
+@@ -26,6 +28,7 @@ if {[string compare [lindex $argv 0] "-p"] == 0} {
+     set stty_init "-opost"
+     set timeout -1
+     eval [list spawn -noecho] $argv
++    fconfigure $spawn_id -translation binary
+     expect
+     exit [lindex [wait] 3]
+ }

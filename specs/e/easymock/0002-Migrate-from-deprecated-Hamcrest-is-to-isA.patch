@@ -1,0 +1,94 @@
+From 9c100b4d67397bd096de6caaef58cd8c9f49c692 Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Tue, 23 Sep 2025 12:03:42 +0200
+Subject: [PATCH 2/2] Migrate from deprecated Hamcrest `is` to `isA`
+
+Replace usages of `is(Class)` with `isA(Class)` in
+`EasyMockSupportClassTest` to avoid relying on the deprecated
+`org.hamcrest.core.Is.is` method.  This removes the need for
+`@SuppressWarnings("deprecation")` and keeps the tests aligned with
+current Hamcrest best practices.
+---
+ .../tests2/EasyMockSupportClassTest.java      | 21 +++++++++----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java b/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
+index cbe9e01..9b89ed5 100644
+--- a/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
++++ b/core/src/test/java/org/easymock/tests2/EasyMockSupportClassTest.java
+@@ -25,12 +25,11 @@ import org.junit.jupiter.api.Test;
+ import java.lang.reflect.Method;
+ 
+ import static org.easymock.EasyMock.*;
+-import static org.hamcrest.core.Is.*;
++import static org.hamcrest.core.Is.isA;
+ 
+ /**
+  * @author Henri Tremblay
+  */
+-@SuppressWarnings("deprecation")
+ class EasyMockSupportClassTest extends EasyMockSupport {
+ 
+     public static class ToMock {
+@@ -49,49 +48,49 @@ class EasyMockSupportClassTest extends EasyMockSupport {
+     @Test
+     void testCreateStrictControl() {
+         IMocksControl ctrl = createStrictControl();
+-        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateControl() {
+         IMocksControl ctrl = createControl();
+-        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateNiceControl() {
+         IMocksControl ctrl = createNiceControl();
+-        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(ctrl.createMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateStrictMockClassOfT() {
+-        MatcherAssert.assertThat(createStrictMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createStrictMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateStrictMockStringClassOfT() {
+-        MatcherAssert.assertThat(createStrictMock("myMock", ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createStrictMock("myMock", ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateMockClassOfT() {
+-        MatcherAssert.assertThat(createMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateMockStringClassOfT() {
+-        MatcherAssert.assertThat(createMock("myMock", ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createMock("myMock", ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateNiceMockClassOfT() {
+-        MatcherAssert.assertThat(createNiceMock(ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createNiceMock(ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+     void testCreateNiceMockStringClassOfT() {
+-        MatcherAssert.assertThat(createNiceMock("myMock", ToMock.class), is(ToMock.class));
++        MatcherAssert.assertThat(createNiceMock("myMock", ToMock.class), isA(ToMock.class));
+     }
+ 
+     @Test
+-- 
+2.51.0
+

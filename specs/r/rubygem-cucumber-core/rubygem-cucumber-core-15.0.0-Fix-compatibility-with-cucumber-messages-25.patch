@@ -1,0 +1,48 @@
+From dd971363ab565e5739bf56d3dd7e85003d109620 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?V=C3=ADt=20Ondruch?= <vondruch@redhat.com>
+Date: Fri, 5 Dec 2025 09:55:21 +0100
+Subject: [PATCH] Fix compatibility with cucumber-messages 25.
+
+This is roughly equivalent to:
+
+https://github.com/cucumber/cucumber-ruby-core/pull/285/commits/d16e70eac55bfbbe9f1c207dfa8b910a602a3d93
+https://github.com/cucumber/cucumber-ruby-core/pull/285/commits/39f2fe06eed0e53049a00f5016f862fefaba5e76
+---
+ lib/cucumber/core/compiler.rb    | 4 ++++
+ lib/cucumber/core/test/result.rb | 8 +++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/lib/cucumber/core/compiler.rb b/lib/cucumber/core/compiler.rb
+index 784452d..9241720 100644
+--- a/lib/cucumber/core/compiler.rb
++++ b/lib/cucumber/core/compiler.rb
+@@ -8,6 +8,10 @@ require 'cucumber/core/test/data_table'
+ require 'cucumber/core/test/empty_multiline_argument'
+ require 'cucumber/messages'
+ 
++module Cucumber::Messages::IdGenerator
++  UUID = Cucumber::Messages::Helpers::IdGenerator::UUID unless defined? UUID
++end if defined? Cucumber::Messages::Helpers
++
+ module Cucumber
+   module Core
+     # Compiles the Pickles into test cases
+diff --git a/lib/cucumber/core/test/result.rb b/lib/cucumber/core/test/result.rb
+index f2bcac8..31f67da 100644
+--- a/lib/cucumber/core/test/result.rb
++++ b/lib/cucumber/core/test/result.rb
+@@ -1,7 +1,13 @@
+ # encoding: utf-8
+ # frozen_string_literal: true
+ require "cucumber/messages"
+-require "cucumber/messages/time_conversion"
++begin
++  require "cucumber/messages/helpers/time_conversion"
++
++  Cucumber::Messages::TimeConversion = Cucumber::Messages::Helpers::TimeConversion unless defined? Cucumber::Messages::TimeConversion
++rescue LoadError
++  require "cucumber/messages/time_conversion"
++end
+ 
+ module Cucumber
+   module Core

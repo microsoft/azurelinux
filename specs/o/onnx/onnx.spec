@@ -3,7 +3,7 @@
 
 Name:       onnx
 Version:    1.17.0
-Release: 15%{?dist}
+Release:    12%{?dist}
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 

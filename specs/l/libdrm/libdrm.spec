@@ -49,8 +49,8 @@ end}
 
 Name:           libdrm
 Summary:        Direct Rendering Manager runtime library
-Version:        2.4.131
-Release: 4%{?dist}
+Version:        2.4.134
+Release:        1%{?dist}
 License:        MIT
 
 # Get the patch version.
@@ -284,6 +284,14 @@ cp %{SOURCE1} %{buildroot}%{_docdir}/libdrm
 %endif
 
 %changelog
+* Fri May 29 2026 Packit <hello@packit.dev> - 2.4.134-1
+- Update to version 2.4.134
+- Resolves: rhbz#2483183
+
+* Tue Apr 28 2026 José Expósito <jexposit@redhat.com> - 2.4.133-1
+- Update to version 2.4.133
+- Resolves: rhbz#2463194
+
 * Fri Jan 23 2026 Packit <hello@packit.dev> - 2.4.131-1
 - Update to version 2.4.131
 - Resolves: rhbz#2415436

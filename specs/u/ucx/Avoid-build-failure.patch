@@ -1,0 +1,66 @@
+From 0ee91e1c571668732ee05b1525e7fa8f72427c0f Mon Sep 17 00:00:00 2001
+From: Kamal Heib <kheib@redhat.com>
+Date: Fri, 5 Dec 2025 12:00:49 -0500
+Subject: [PATCH] Avoid build failure
+
+Signed-off-by: Kamal Heib <kheib@redhat.com>
+---
+ src/tools/perf/perftest_params.c | 2 +-
+ src/ucs/config/parser.c          | 2 +-
+ src/uct/ib/base/ib_device.c      | 7 ++++---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/tools/perf/perftest_params.c b/src/tools/perf/perftest_params.c
+index 9098cdaed2f6..b7a5dcde01e2 100644
+--- a/src/tools/perf/perftest_params.c
++++ b/src/tools/perf/perftest_params.c
+@@ -560,7 +560,7 @@ static ucs_status_t init_daemon_params(ucx_perf_params_t *params)
+ ucs_status_t parse_test_params(perftest_params_t *params, char opt,
+                                const char *opt_arg)
+ {
+-    char *optarg2 = NULL;
++    const char *optarg2 = NULL;
+     test_type_t *test;
+     unsigned i;
+ 
+diff --git a/src/ucs/config/parser.c b/src/ucs/config/parser.c
+index 696a4ebd2186..2338ceab0380 100644
+--- a/src/ucs/config/parser.c
++++ b/src/ucs/config/parser.c
+@@ -644,7 +644,7 @@ int ucs_config_sprintf_bw(char *buf, size_t max, const void *src,
+ int ucs_config_sscanf_bw_spec(const char *buf, void *dest, const void *arg)
+ {
+     ucs_config_bw_spec_t *dst = (ucs_config_bw_spec_t*)dest;
+-    char                 *delim;
++    const char *delim;
+ 
+     delim = strchr(buf, ':');
+     if (!delim) {
+diff --git a/src/uct/ib/base/ib_device.c b/src/uct/ib/base/ib_device.c
+index bcef1b0a4025..f77809be5a9a 100644
+--- a/src/uct/ib/base/ib_device.c
++++ b/src/uct/ib/base/ib_device.c
+@@ -1305,7 +1305,8 @@ ucs_status_t uct_ib_device_find_port(uct_ib_device_t *dev,
+     const char *ibdev_name;
+     unsigned port_num;
+     size_t devname_len;
+-    char *p;
++    const char *p;
++    char *endptr;
+ 
+     p = strrchr(resource_dev_name, ':');
+     if (p == NULL) {
+@@ -1320,8 +1321,8 @@ ucs_status_t uct_ib_device_find_port(uct_ib_device_t *dev,
+         goto err; /* Device name is wrong */
+     }
+ 
+-    port_num = strtod(p + 1, &p);
+-    if (*p != '\0') {
++    port_num = strtod(p + 1, &endptr);
++    if (*endptr != '\0') {
+         goto err; /* Failed to parse port number */
+     }
+     if ((port_num < dev->first_port) || (port_num >= dev->first_port + dev->num_ports)) {
+-- 
+2.51.1
+

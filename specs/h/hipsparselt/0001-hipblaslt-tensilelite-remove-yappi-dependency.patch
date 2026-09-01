@@ -1,0 +1,57 @@
+From c20b846b6d594464eccf865045ef0ef10384f407 Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Thu, 25 Sep 2025 13:02:55 -0700
+Subject: [PATCH] hipblaslt tensilelite remove yappi dependency
+
+Signed-off-by: Tom Rix <Tom.Rix@amd.com>
+---
+ tensilelite/Tensile/TensileCreateLibrary/Run.py | 15 ---------------
+ tensilelite/requirements.txt                    |  2 +-
+ 2 files changed, 1 insertion(+), 16 deletions(-)
+
+diff --git a/tensilelite/Tensile/TensileCreateLibrary/Run.py b/tensilelite/Tensile/TensileCreateLibrary/Run.py
+index f0bbe8acd127..fc076e6935e8 100644
+--- a/tensilelite/Tensile/TensileCreateLibrary/Run.py
++++ b/tensilelite/Tensile/TensileCreateLibrary/Run.py
+@@ -231,12 +231,6 @@ def writeSolutionsAndKernels(
+     generateSourcesAndExit=False,
+     compress=True,
+ ):
+-    if globalParameters["PythonProfile"]:
+-        globalParameters["CpuThreads"] = 0
+-        printWarning("Python profiling is enabled. CpuThreads set to 0.")
+-        import yappi
+-        yappi.start()
+-
+     codeObjectFiles = []
+ 
+     outputPath = Path(outputPath)
+@@ -299,15 +293,6 @@ def writeSolutionsAndKernels(
+     writeHelpers(outputPath, kernelHelperObjs, KERNEL_HELPER_FILENAME_CPP, KERNEL_HELPER_FILENAME_H)
+     srcKernelFile = Path(outputPath) / "Kernels.cpp"
+ 
+-    if globalParameters["PythonProfile"]:
+-        yappi.stop()
+-        yappi.get_func_stats().save("yappi_results.profile", type="callgrind")
+-        with open("yappi_results.txt", "w") as f:
+-            yappi.get_func_stats().print_all(out=f)
+-        if globalParameters["CpuThreads"] != 0:
+-            with open("yappi_thread_stats.txt", "w") as f:
+-                yappi.get_thread_stats().print_all(out=f)
+-
+     if not generateSourcesAndExit:
+         codeObjectFiles += buildAssemblyCodeObjectFiles(
+             asmToolchain.linker,
+diff --git a/tensilelite/requirements.txt b/tensilelite/requirements.txt
+index 60c4c1144537..e87db8445411 100644
+--- a/tensilelite/requirements.txt
++++ b/tensilelite/requirements.txt
+@@ -7,4 +7,4 @@ joblib>=1.1.1; python_version < '3.8'
+ simplejson
+ ujson
+ orjson
+-yappi
++
+-- 
+2.51.0
+

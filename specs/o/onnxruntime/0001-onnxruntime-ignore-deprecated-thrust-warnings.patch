@@ -1,0 +1,25 @@
+From a43067dfe698708c98ca9ce4b28238d774b0eccd Mon Sep 17 00:00:00 2001
+From: Tom Rix <Tom.Rix@amd.com>
+Date: Fri, 3 Oct 2025 08:53:56 -0700
+Subject: [PATCH] onnxruntime ignore deprecated thrust warnings
+
+---
+ onnxruntime/core/providers/cuda/tensor/compress_impl.cu | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/onnxruntime/core/providers/cuda/tensor/compress_impl.cu b/onnxruntime/core/providers/cuda/tensor/compress_impl.cu
+index b2c7b60866a7..16a6a9fcd80e 100644
+--- a/onnxruntime/core/providers/cuda/tensor/compress_impl.cu
++++ b/onnxruntime/core/providers/cuda/tensor/compress_impl.cu
+@@ -11,6 +11,8 @@
+ #pragma warning(disable : 4244)
+ #endif
+ 
++#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
++
+ #include "core/providers/cuda/tensor/compress_impl.h"
+ 
+ #include <thrust/iterator/transform_iterator.h>
+-- 
+2.51.0
+

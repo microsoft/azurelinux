@@ -2,7 +2,7 @@
 ## (rpmautospec version 0.8.3)
 ## RPMAUTOSPEC: autorelease, autochangelog
 %define autorelease(e:s:pb:n) %{?-p:0.}%{lua:
-    release_number = 14;
+    release_number = 3;
     base_release_number = tonumber(rpm.expand("%{?-b*}%{!?-b:1}"));
     print(release_number + base_release_number - 1);
 }%{?-e:.%{-e*}}%{?-s:.%{-s*}}%{!?-n:%{?dist}}
@@ -11,35 +11,41 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
+# Documentation is disabled by default
+# because of missing dependencies: sphinx-toml
+%bcond_with doc
+
 %if 0%{?epel}
-# disable build of docs and tests for epel because of missing dependencies:
+# disabled tests for epel because of missing dependencies:
 # - python3-ipykernel
 # - python3-jupyter-client
 # - python3-nbformat
 # - python3-testpath
-# tests and docs subpackages are also disabled
 %bcond_with check
-%bcond_with doc
 %else
 %bcond_without check
-%bcond_without doc
 %endif
 
 Name:           ipython
-Version:        8.37.0
+Version:        9.14.1
 Release:        %autorelease
 Summary:        An enhanced interactive Python shell
 
 # SPDX
 # Source code is licensed under BSD-3-Clause except
-# /IPython/testing/plugin/pytest_ipdoctest.py, which is MIT licensed
-# Docs and examples are licensed under CC-BY-4.0
-License:        BSD-3-Clause AND MIT AND CC-BY-4.0
+# - IPython/testing/plugin/pytest_ipdoctest.py
+# - IPython/external/pickleshare.py - bundled with reduced functionalities
+# which are MIT licensed
+License:        BSD-3-Clause AND MIT
 URL:            http://ipython.org/
 Source0:        %pypi_source
-# Compatibility with Python 3.14
-# released upstream in 9.2.0
-Patch:          https://github.com/ipython/ipython/pull/14876.patch
+
+# Fix %%debug and ipdb with Python 3.15 (PyREPL conflicts with IPython's input handling)
+# https://github.com/ipython/ipython/issues/15217
+Patch:          https://github.com/ipython/ipython/pull/15220.patch
+# Fix init_path ignoring CWD when -P used in script shebang
+# Fixes rhbz#2479711
+Patch:          https://github.com/ipython/ipython/pull/15262.patch
 
 # Unset -s on python shebang - ensure that packages installed with pip
 # to user locations are seen and properly loaded.
@@ -50,21 +56,16 @@ BuildRequires:  make
 BuildRequires:  python3-devel
 
 %if %{with doc}
+BuildRequires:  python3-exceptiongroup
+BuildRequires:  python3-ipykernel
 BuildRequires:  python3-sphinx
 BuildRequires:  python3-sphinx_rtd_theme
-BuildRequires:  python3-ipykernel
+BuildRequires:  python3-sphinx-toml  # Not available in Fedora yet
 BuildRequires:  python3-matplotlib
-BuildRequires:  python3-numpy
 BuildRequires:  python3-typing-extensions
 %endif
 
 %if %{with check}
-BuildRequires:  python3-Cython
-BuildRequires:  python3-tornado >= 4.0
-BuildRequires:  python3-zmq
-BuildRequires:  python3-nbformat
-BuildRequires:  python3-ipykernel
-BuildRequires:  python3-jupyter-client
 # for latex
 BuildRequires: /usr/bin/dvipng
 BuildRequires: tex(amsmath.sty)
@@ -96,11 +97,16 @@ Main features:\
 %description
 %{ipython_desc_base}
 
+
+%pyproject_extras_subpkg -n python3-ipython test
+
+
 %package -n python3-ipython
 Summary:        An enhanced interactive Python shell
 %py_provides    python3-ipython-console
 Provides:       ipython3 = %{version}-%{release}
 Provides:       ipython = %{version}-%{release}
+Provides:       bundled(python3dist(pickleshare)) = 0.7.5
 Obsoletes:      python3-ipython-console < 5.3.0-1
 Conflicts:      python2-ipython < 7
 
@@ -114,7 +120,6 @@ Requires:       (tex(bm.sty)      if /usr/bin/dvipng)
 
 This package provides IPython for in a terminal.
 
-%pyproject_extras_subpkg -n python3-ipython notebook
 
 %package -n python3-ipython-sphinx
 Summary:        Sphinx directive to support embedded IPython code
@@ -126,25 +131,6 @@ Requires:       python3-sphinx
 %{ipython_desc_base}
 
 This package contains the ipython sphinx extension.
-
-%package -n python3-ipython+test
-Summary:        Tests for %{name}
-Obsoletes:      python3-ipython-tests < 8.7.0-2
-%py_provides    python3-ipython-tests
-Requires:       python3-ipykernel
-Requires:       python3-ipython = %{version}-%{release}
-Requires:       python3-jupyter-client
-Requires:       python3-nbformat
-# For latex
-Requires:       /usr/bin/dvipng
-Requires:       tex(amsmath.sty)
-Requires:       tex(amssymb.sty)
-Requires:       tex(amsthm.sty)
-Requires:       tex(bm.sty)
-
-%description -n python3-ipython+test
-This package contains the tests of %{name}.
-You can check this way, if ipython works on your platform.
 
 
 %if %{with doc}
@@ -158,26 +144,8 @@ This package contains the documentation of %{name}.
 %prep
 %autosetup -p1
 
-# delete bundling libs
-pushd IPython/external
-ls -l
-ls -l *
-
-popd
-
 # Remove shebangs
 sed -i '1d' $(grep -lr '^#!/usr/' IPython)
-
-find . -name '*.py' -print0 | xargs -0 sed -i '1s|^#!python|#!%{__python3}|'
-
-# Drop upper bound on `pytest-asyncio`
-# https://bugzilla.redhat.com/show_bug.cgi?id=2273582
-sed -r -i 's/(pytest-asyncio).*"/\1"/' pyproject.toml
-
-# Compatibility with pytest 8
-sed -i "/pytest/s/<8//" pyproject.toml
-sed -i "s/def setup(/def setup_method(/" IPython/core/tests/test_pylabtools.py
-sed -i "s/def teardown(/def teardown_method(/" IPython/core/tests/test_pylabtools.py
 
 
 %generate_buildrequires
@@ -211,27 +179,14 @@ ln -s ./ipython3.1 %{buildroot}%{_mandir}/man1/ipython.1
 export PYTHONSTARTUP=""
 # Koji builders can be slow, especially on arms, we scale timeouts 4 times
 export IPYTHON_TESTING_TIMEOUT_SCALE=4
-# To prevent _pytest.pathlib.ImportPathMismatchError, we are
-# testing directly in buildroot
-pushd %{buildroot}%{python3_sitelib}/IPython
-# test_decorator_skip_with_breakpoint: https://github.com/ipython/ipython/issues/14458
-# The rest of the skipped tests are not compatible with Python 3.14
-# https://github.com/ipython/ipython/issues/14858
-%pytest -k "not test_decorator_skip_with_breakpoint and \
-            not test_unicode_range and \
-            not test_interruptible_core_debugger and \
-            not test_xmode_skip and \
-            not test_where_erase_value and \
-            not test_pinfo_docstring_dynamic and \
-            not test_run_cell and \
-            not test_timeit and \
-            not test_render_signature_long and \
-            not test_profile_create_ipython_dir and \
-            not test_debug_magic_passes_through_generators and \
-            not test_parse_sample and \
-            not test_eval_formatter"
-rm -rf .pytest_cache
+# Switch to a temporary directory to avoid _pytest.pathlib.ImportPathMismatchError
+mkdir test_temp_dir
+pushd test_temp_dir
+# test_get_xdg_dir_3 and test_extension don't work well with out custom paths
+# test_hist_file_config is flaky https://github.com/ipython/ipython/issues/15161
+%pytest -vv -p no:cacheprovider -k "not test_get_xdg_dir_3 and not test_extension and not test_hist_file_config" ../tests
 popd
+rm -rf test_temp_dir
 %endif
 
 %files -n python3-ipython
@@ -239,36 +194,12 @@ popd
 %{_bindir}/ipython
 %{_mandir}/man1/ipython.*
 %{_mandir}/man1/ipython3.*
-
-%dir %{python3_sitelib}/IPython
-%{python3_sitelib}/IPython/external
-%{python3_sitelib}/IPython/__pycache__/
-%{python3_sitelib}/IPython/*.py*
-%{python3_sitelib}/IPython/py.typed
-%dir %{python3_sitelib}/IPython/testing
-%{python3_sitelib}/IPython/testing/__pycache__/
-%{python3_sitelib}/IPython/testing/*.py*
-%{python3_sitelib}/IPython/testing/plugin
 %{python3_sitelib}/ipython-*.dist-info/
-
-%{python3_sitelib}/IPython/core/
-%{python3_sitelib}/IPython/extensions/
-%{python3_sitelib}/IPython/lib/
-%{python3_sitelib}/IPython/terminal/
-%{python3_sitelib}/IPython/utils/
-
-# tests go into subpackage
-%exclude %{python3_sitelib}/IPython/*/tests/
-
+%{python3_sitelib}/IPython
+%exclude %{python3_sitelib}/IPython/sphinxext/
 
 %files -n python3-ipython-sphinx
 %{python3_sitelib}/IPython/sphinxext/
-
-
-%files -n python3-ipython+test
-%ghost %{python3_sitelib}/ipython-*.dist-info/
-%{python3_sitelib}/IPython/*/tests
-
 
 %if %{with doc}
 %files -n python3-ipython-doc
@@ -278,14 +209,58 @@ popd
 
 %changelog
 ## START: Generated by rpmautospec
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 8.37.0-14
-- build: mass rebuild auto-bumpable components
+* Tue Sep 01 2026 Unknown User <please-configure-git-user@example.com> - 9.14.1-3
+- Uncommitted changes
 
-* Wed Aug 19 2026 reuben olinsky <reubeno@users.noreply.github.com> - 8.37.0-13
-- build: mass rebuild auto-bumpable components
+* Sun Jun 14 2026 Lumir Balhar <lbalhar@redhat.com> - 9.14.1-2
+- Fix init_path ignoring CWD when -P used in script shebang (rhbz#2479711)
 
-* Thu Apr 30 2026 Daniel McIlvaney <damcilva@microsoft.com> - 8.37.0-12
-- feat: introduce deterministic commit resolution via Azure Linux lock file
+* Tue Jun 09 2026 Lumir Balhar <lbalhar@redhat.com> - 9.14.1-1
+- Update to 9.14.1 (rhbz#2483307)
+
+* Thu Jun 04 2026 Python Maint <python-maint@redhat.com> - 9.13.0-3
+- Rebuilt for Python 3.15
+
+* Fri May 22 2026 Lumir Balhar <lbalhar@redhat.com> - 9.13.0-2
+- Fix compatibility with Python 3.15 beta 1
+
+* Mon Apr 27 2026 Lumir Balhar <lbalhar@redhat.com> - 9.13.0-1
+- Update to 9.13.0 (rhbz#2461418)
+
+* Mon Mar 30 2026 Lumir Balhar <lbalhar@redhat.com> - 9.12.0-1
+- Update to 9.12.0 (rhbz#2452215)
+
+* Thu Mar 19 2026 Lumir Balhar <lbalhar@redhat.com> - 9.11.0-3
+- Fix test failure with Python 3.15 alpha 7
+
+* Wed Mar 18 2026 Lumir Balhar <lbalhar@redhat.com> - 9.11.0-2
+- Skip flaky test_hist_file_config
+
+* Mon Mar 09 2026 Lumir Balhar <lbalhar@redhat.com> - 9.11.0-1
+- Update to 9.11.0 (rhbz#2444813)
+
+* Tue Feb 03 2026 Lumir Balhar <lbalhar@redhat.com> - 9.10.0-1
+- Update to 9.10.0 (rhbz#2435928)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.9.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Jan 05 2026 Lumir Balhar <lbalhar@redhat.com> - 9.9.0-1
+- Update to 9.9.0 (rhbz#2427149)
+
+* Mon Dec 08 2025 Lumir Balhar <lbalhar@redhat.com> - 9.8.0-1
+- Update to 9.8.0 (rhbz#2419260)
+
+* Thu Nov 13 2025 Lumir Balhar <lbalhar@redhat.com> - 9.7.0-1
+- Update to 9.7.0 (rhbz#2412475)
+
+* Thu Oct 30 2025 Lumir Balhar <lbalhar@redhat.com> - 9.6.0-1
+- Update to 9.6.0 (rhbz#2391773)
+- Documentation is disabled due to missing dependencies
+- Tests files are no longer installed
+- Notebook extra is no longer provided
+- Pickleshare is now bundled
+- Simplified packaging
 
 * Tue Oct 14 2025 Miro Hrončok <miro@hroncok.cz> - 8.37.0-11
 - Remove -s from ipython's shebang

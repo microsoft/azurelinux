@@ -41,7 +41,7 @@ Name: ca-certificates
 Version: 2025.2.80_v9.0.304
 # for Rawhide, please always use release >= 2
 # for Fedora release branches, please use release < 2 (1.0, 1.1, ...)
-Release: 1.1%{?dist}
+Release: 7%{?dist}
 License: MIT AND GPL-2.0-or-later
 
 URL: https://fedoraproject.org/wiki/CA-Certificates
@@ -189,6 +189,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p -m 755 $RPM_BUILD_ROOT%{pkidir}/tls/certs
 mkdir -p -m 755 $RPM_BUILD_ROOT%{pkidir}/java
 mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/ssl
+mkdir -p -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs
 mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source
 mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source/anchors
 mkdir -p -m 755 $RPM_BUILD_ROOT%{catrustdir}/source/blocklist
@@ -299,32 +300,41 @@ sed -i "s|^$RPM_BUILD_ROOT|%ghost /|" .files.txt
 
 # /etc/ssl is provided in a Debian compatible form for (bad) code that
 # expects it: https://bugzilla.redhat.com/show_bug.cgi?id=1053882
-ln -s %{pkidir}/tls/certs \
-    $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs
 ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
     $RPM_BUILD_ROOT%{_sysconfdir}/ssl/cert.pem
+ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
+    $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs/%{classic_tls_bundle}
+ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
+    $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs/ca-certificates.crt
+ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
+    $RPM_BUILD_ROOT%{_sysconfdir}/ssl/certs/%{openssl_format_trust_bundle}
 ln -s /etc/pki/tls/openssl.cnf \
     $RPM_BUILD_ROOT%{_sysconfdir}/ssl/openssl.cnf
 ln -s /etc/pki/tls/ct_log_list.cnf \
     $RPM_BUILD_ROOT%{_sysconfdir}/ssl/ct_log_list.cnf
 # legacy filenames
-ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    $RPM_BUILD_ROOT%{pkidir}/tls/cert.pem
 ln -s %{catrustdir}/extracted/%{java_bundle} \
     $RPM_BUILD_ROOT%{pkidir}/%{java_bundle}
-ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    $RPM_BUILD_ROOT%{pkidir}/tls/certs/%{classic_tls_bundle}
-ln -s %{catrustdir}/extracted/pem/tls-ca-bundle.pem \
-    $RPM_BUILD_ROOT%{pkidir}/tls/certs/ca-certificates.crt
-ln -s %{catrustdir}/extracted/openssl/%{openssl_format_trust_bundle} \
-    $RPM_BUILD_ROOT%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
 
 %clean
 /usr/bin/chmod u+w $RPM_BUILD_ROOT%{catrustdir}/extracted/pem/directory-hash
 rm -rf $RPM_BUILD_ROOT
 
+%pretrans -p <lua>
+-- remove /etc/ssl/certs symlink so we can replace it with a directory
+path = "%{_sysconfdir}/ssl/certs"
+if posix.readlink(path) then
+  posix.unlink(path)
+end
+
 %pre
 if [ $1 -gt 1 ] ; then
+  # Remove the old symlinks
+  rm -f %{pkidir}/tls/cert.pem
+  rm -f %{pkidir}/tls/certs/ca-bundle.crt
+  rm -f %{pkidir}/tls/certs/ca-bundle.trust.crt
+  rm -f %{pkidir}/tls/certs/ca-certificates.crt
+
   # Upgrade or Downgrade.
   # If the classic filename is a regular file, then we are upgrading
   # from an old package and we will move it to an .rpmsave backup file.
@@ -342,28 +352,6 @@ if [ $1 -gt 1 ] ; then
         if ! test -L %{pkidir}/%{java_bundle}; then
         # it's an old regular file, not a link
         mv -f %{pkidir}/%{java_bundle} %{pkidir}/%{java_bundle}.rpmsave
-      fi
-    fi
-  fi
-
-  if ! test -e %{pkidir}/tls/certs/%{classic_tls_bundle}.rpmsave; then
-    # no backup yet
-    if test -e %{pkidir}/tls/certs/%{classic_tls_bundle}; then
-      # a file exists
-      if ! test -L %{pkidir}/tls/certs/%{classic_tls_bundle}; then
-        # it's an old regular file, not a link
-        mv -f %{pkidir}/tls/certs/%{classic_tls_bundle} %{pkidir}/tls/certs/%{classic_tls_bundle}.rpmsave
-      fi
-    fi
-  fi
-
-  if ! test -e %{pkidir}/tls/certs/%{openssl_format_trust_bundle}.rpmsave; then
-    # no backup yet
-    if test -e %{pkidir}/tls/certs/%{openssl_format_trust_bundle}; then
-      # a file exists
-      if ! test -L %{pkidir}/tls/certs/%{openssl_format_trust_bundle}; then
-        # it's an old regular file, not a link
-        mv -f %{pkidir}/tls/certs/%{openssl_format_trust_bundle} %{pkidir}/tls/certs/%{openssl_format_trust_bundle}.rpmsave
       fi
     fi
   fi
@@ -398,6 +386,7 @@ fi
 # The file .files.txt contains the list of (%ghost )files in the directory-hash
 %files -f .files.txt
 %dir %{_sysconfdir}/ssl
+%dir %{_sysconfdir}/ssl/certs
 %dir %{pkidir}/tls
 %dir %{pkidir}/tls/certs
 %dir %{pkidir}/java
@@ -429,19 +418,19 @@ fi
 %{catrustdir}/extracted/edk2/README
 %{catrustdir}/source/README
 
-# symlinks for old locations
-%{pkidir}/tls/cert.pem
-%{pkidir}/tls/certs/%{classic_tls_bundle}
-%{pkidir}/tls/certs/%{openssl_format_trust_bundle}
-%{pkidir}/tls/certs/ca-certificates.crt
-%{pkidir}/%{java_bundle}
-# Hybrid hash directory with bundle file for Debian compatibility
-# See https://bugzilla.redhat.com/show_bug.cgi?id=1053882
-%{_sysconfdir}/ssl/certs
+
+ # Hybrid hash directory with bundle file for Debian compatibility
+ # See https://bugzilla.redhat.com/show_bug.cgi?id=1053882
 %{_sysconfdir}/ssl/README
-%{_sysconfdir}/ssl/cert.pem
 %{_sysconfdir}/ssl/openssl.cnf
 %{_sysconfdir}/ssl/ct_log_list.cnf
+%{_sysconfdir}/ssl/cert.pem
+%{_sysconfdir}/ssl/certs/%{classic_tls_bundle}
+%{_sysconfdir}/ssl/certs/ca-certificates.crt
+%{_sysconfdir}/ssl/certs/%{openssl_format_trust_bundle}
+
+# symlinks for old locations
+%{pkidir}/%{java_bundle}
 
 # primary bundle file with trust
 %{_datadir}/pki/ca-trust-source/%{p11_format_bundle}
@@ -461,22 +450,26 @@ fi
 %ghost %{catrustdir}/extracted/edk2/cacerts.bin
 
 %changelog
-* Tue Aug 26 2025 Frantisek Krenzelok <fkrenzel@redhat.com> - 2025.2.80_v9.0.304-1.1
-- Revert the "Dropping of cert.pem file" change to restore legacy CA symlinks
-- https://fedoraproject.org/wiki/Changes/droppingOfCertPemFile
-- Restored directory /etc/pki/ca-trust/extracted/openssl
-- Remove update-ca-trust extract compatibility option
-- Restored symlinks:
-    - /etc/pki/tls/cert.pem
-    - /etc/pki/tls/certs/ca-certificates.crt
-    - /etc/pki/tls/certs/ca-bundle.trust.crt
-    - /etc/pki/tls/certs/ca-bundle.crt
-    - /etc/ssl/cert.pem
-    - /etc/ssl/certs/ca-certificates.crt
-    - /etc/ssl/certs/ca-bundle.trust.crt
-    - /etc/ssl/certs/ca-bundle.crt
+* Wed Apr 01 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 2025.2.80_v9.0.304-7
+- Restore /etc/ssl/certs legacy structure and OpenSSL trusted bundles.
+  This brings back certificate bundles in /etc/ssl/certs as they were before
+  the "Dropping of cert.pem file" change, ensuring compatibility with software
+  expecting the Debian-style file structure.
 
-*Tue Aug 26 2025 rhel-developer-toolbox <krenzelok.frantisek@gmail.com> - 2025.2.80_v9.0.304-1.0
+* Tue Jan 20 2026 Frantisek Krenzelok <fkrenzel@redhat.com> - 2025.2.80_v9.0.304-6
+- update documentation of update-ca-trust.8.txt
+- remove ca-legacy script dependence on /dev/null
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2025.2.80_v9.0.304-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2025.2.80_v9.0.304-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+*Tue Sep 16 2025 Frantisek Krenzelok <krenzelok.frantisek@gmail.com> - 2025.2.80_v9.0.304-3
+- Migrate STI test to tmt
+
+*Tue Aug 26 2025 rhel-developer-toolbox <krenzelok.frantisek@gmail.com> - 2025.2.80_v9.0.304-2
 - Update to CKBI 2.80_v9.0.304 from NSS 3.114
 -    Adding:
 -     # Certificate "TWCA CYBER Root CA"

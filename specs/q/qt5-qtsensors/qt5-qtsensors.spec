@@ -6,7 +6,7 @@
 Summary: Qt5 - Sensors component
 Name:    qt5-%{qt_module}
 Version: 5.15.18
-Release: 4%{?dist}
+Release: 2%{?dist}
 
 # See LGPL_EXCEPTIONS.txt, LICENSE.GPL3, respectively, for exception details
 License: LGPL-3.0-only OR GPL-3.0-only WITH Qt-GPL-exception-1.0
@@ -95,6 +95,9 @@ popd
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 5.15.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Nov 04 2025 Jan Grulich <jgrulich@redhat.com> - 5.15.18-1
 - 5.15.18
 

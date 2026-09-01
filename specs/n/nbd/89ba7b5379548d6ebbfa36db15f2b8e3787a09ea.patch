@@ -1,0 +1,118 @@
+From a80304e10e9709d4100c935bc4cdc9086e86d5ff Mon Sep 17 00:00:00 2001
+From: Wouter Verhelst <w@uter.be>
+Date: Tue, 14 Apr 2026 19:06:10 +0200
+Subject: [PATCH 1/3] Fix nbd device parsing, for reals
+
+---
+ nbd-client.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/nbd-client.c b/nbd-client.c
+index c5d2b32bce8a..2e98ba5318d0 100644
+--- a/nbd-client.c
++++ b/nbd-client.c
+@@ -225,10 +225,14 @@ static void netlink_disconnect(char *nbddev) {
+ 	struct nl_msg *msg;
+ 	int driver_id;
+ 	int ret;
++	char *local_dev = nbddev;
+ 
+ 	int index = -1;
+ 	if (nbddev) {
+-		if (sscanf(nbddev, "nbd%d", &index) != 1)
++		if (!strncmp(local_dev, "/dev/", 5)) {
++			local_dev += 5;
++		}
++		if (sscanf(local_dev, "nbd%d", &index) != 1)
+ 			err("Invalid nbd device target\n");
+ 	}
+ 	if (index < 0)
+@@ -313,13 +317,15 @@ static int netlink_check_conn(char* devname, int do_print) {
+ 	struct nl_msg *msg;
+ 	int driver_id, ret;
+ 	int index = -1;
++	char *local_dev = devname;
+ 	int connected = -1; /* -1 = unknown, 0 = connected, 1 = disconnected */
+ 
+ 	/* Parse device index from name */
+-	if (sscanf(devname, "/dev/nbd%d", &index) != 1) {
+-		if (sscanf(devname, "nbd%d", &index) != 1) {
+-			return 2; /* Invalid device name */
+-		}
++	if (!strncmp(local_dev, "/dev/", 5)) {
++		local_dev += 5;
++	}
++	if (sscanf(local_dev, "nbd%d", &index) != 1) {
++		return 2; /* Invalid device name */
+ 	}
+ 
+ 	/* Setup netlink socket */
+@@ -1539,7 +1545,11 @@ int main(int argc, char *argv[]) {
+ 	if (netlink) {
+ 		int index = -1;
+ 		if (cur_client->dev) {
+-			if (sscanf(cur_client->dev, "nbd%d", &index) != 1)
++			char *local_dev = cur_client->dev;
++			if(!strncmp(local_dev, "/dev/", 5)) {
++				local_dev += 5;
++			}
++			if (sscanf(local_dev, "nbd%d", &index) != 1)
+ 				err("Invalid nbd device target\n");
+ 		}
+ 		netlink_configure(index, sockfds, flags, identifier);
+-- 
+2.54.0
+
+
+From 1523d9927ba14c93cb8d1339222fd24e98d19110 Mon Sep 17 00:00:00 2001
+From: Wouter Verhelst <w@uter.be>
+Date: Sat, 2 May 2026 00:28:37 +0200
+Subject: [PATCH 2/3] nbdtab man page: Add missing closing tag
+
+---
+ man/nbdtab.5.sgml.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/man/nbdtab.5.sgml.in b/man/nbdtab.5.sgml.in
+index 9973412cd5ab..0a18202e29e5 100644
+--- a/man/nbdtab.5.sgml.in
++++ b/man/nbdtab.5.sgml.in
+@@ -184,7 +184,7 @@ manpage.1: manpage.sgml
+ 	  </listitem>
+ 	</varlistentry>
+ 	<varlistentry>
+-	  <term><option>priority=<replaceable>GnuTLS priority string</replaceable></option>
++	  <term><option>priority=<replaceable>GnuTLS priority string</replaceable></option></term>
+ 	  <listitem>
+ 	    <para>The GnuTLS priority string to use.</para>
+ 	    <para>Corresponds to the <option>-y</option> option on the
+-- 
+2.54.0
+
+
+From 89ba7b5379548d6ebbfa36db15f2b8e3787a09ea Mon Sep 17 00:00:00 2001
+From: Wouter Verhelst <w@uter.be>
+Date: Sat, 2 May 2026 00:33:52 +0200
+Subject: [PATCH 3/3] Fix --help parsing
+
+Closes: gh-191
+---
+ args.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/args.c b/args.c
+index f56f0a4abcce..97a96c141ca0 100644
+--- a/args.c
++++ b/args.c
+@@ -156,7 +156,7 @@ blocksize:
+             client->no_optgo = true;
+             break;
+         case 'h':
+-            usage_error(&result, NULL); // Will show help
++            usage_error(&result, ""); // Will show help
+             return result;
+ #if HAVE_NETLINK
+         case 'i':
+-- 
+2.54.0
+

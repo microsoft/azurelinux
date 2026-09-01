@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        9.1.0
-Release: 8%{?dist}
+Release:        6%{?dist}
 Summary:        Automated testing for the examples in your documentation
 
 License:        MIT
@@ -57,6 +57,9 @@ sed -i "/seeddir/d" setup.py
 %{python3_sitelib}/%{pypi_name}/
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.1.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 9.1.0-5
 - Rebuilt for Python 3.14.0rc3 bytecode
 

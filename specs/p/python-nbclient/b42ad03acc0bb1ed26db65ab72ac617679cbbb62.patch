@@ -1,0 +1,33 @@
+From b42ad03acc0bb1ed26db65ab72ac617679cbbb62 Mon Sep 17 00:00:00 2001
+From: Dror Speiser <dror.mastershin@gmail.com>
+Date: Thu, 4 Dec 2025 17:35:22 +0100
+Subject: [PATCH] correct execution count in tests for ipython 9.8 and above
+ (#335)
+
+Co-authored-by: David Brochart <david.brochart@gmail.com>
+---
+ tests/files/update-display-id.ipynb | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tests/files/update-display-id.ipynb b/tests/files/update-display-id.ipynb
+index 11e17e4b..ff5a7779 100644
+--- a/tests/files/update-display-id.ipynb
++++ b/tests/files/update-display-id.ipynb
+@@ -11,6 +11,8 @@
+     "ip = get_ipython()\n",
+     "\n",
+     "from IPython.display import display\n",
++    "import IPython\n",
++    "do_minus_one = IPython.version_info >= (9, 8)\n",
+     "\n",
+     "\n",
+     "def display_with_id(obj, display_id, update=False, execute_result=False):\n",
+@@ -21,7 +23,7 @@
+     "    content = {\"data\": data, \"metadata\": md, \"transient\": transient}\n",
+     "    if execute_result:\n",
+     "        msg_type = \"execute_result\"\n",
+-    "        content[\"execution_count\"] = ip.execution_count\n",
++    "        content[\"execution_count\"] = ip.execution_count - (1 if do_minus_one else 0)\n",
+     "    else:\n",
+     "        msg_type = \"update_display_data\" if update else \"display_data\"\n",
+     "    session.send(iopub, msg_type, content, parent=ip.parent_header)"

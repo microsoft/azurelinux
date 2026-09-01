@@ -1,0 +1,32 @@
+2026-05-01  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/125079
+	* tree-ssa-strlen.cc (get_string_length): Don't overwrite
+	lenstmt variable with another stmt.
+
+--- gcc/tree-ssa-strlen.cc.jj	2026-05-01 14:56:28.322882547 +0200
++++ gcc/tree-ssa-strlen.cc	2026-05-01 21:53:56.978672178 +0200
+@@ -848,7 +848,7 @@ get_string_length (strinfo *si)
+      attempt to compute the length from the call statement.  */
+   if (si->stmt)
+     {
+-      gimple *stmt = si->stmt, *lenstmt = NULL;
++      gimple *stmt = si->stmt, *lenstmt = NULL, *g;
+       tree callee, lhs, fn, tem;
+       location_t loc;
+       gimple_stmt_iterator gsi;
+@@ -883,11 +883,11 @@ get_string_length (strinfo *si)
+               lhs = force_gimple_operand_gsi (&gsi, lhs, true, NULL_TREE,
+                                               true, GSI_SAME_STMT);
+             }
+-	  lenstmt = gimple_build_assign
++	  g = gimple_build_assign
+ 			(make_ssa_name (TREE_TYPE (gimple_call_arg (stmt, 0))),
+ 			 POINTER_PLUS_EXPR,tem, lhs);
+-	  gsi_insert_before (&gsi, lenstmt, GSI_SAME_STMT);
+-	  gimple_call_set_arg (stmt, 0, gimple_assign_lhs (lenstmt));
++	  gsi_insert_before (&gsi, g, GSI_SAME_STMT);
++	  gimple_call_set_arg (stmt, 0, gimple_assign_lhs (g));
+ 	  lhs = NULL_TREE;
+ 	  /* FALLTHRU */
+ 	case BUILT_IN_STRCPY:

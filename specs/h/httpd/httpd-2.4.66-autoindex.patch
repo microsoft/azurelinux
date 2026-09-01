@@ -1,0 +1,61 @@
+
+- Use charset=UTF-8 on autoindex response pages
+- Ensure that only core dumps get the core-dump icon;
+  the upstream applies also to any directory matching "core"
+- Disable autoindex for /icons/
+- Do follow symlinks in /icons/ since poweredby.png is a symlink
+
+--- httpd-2.4.66/docs/conf/extra/httpd-autoindex.conf.in.8
++++ httpd-2.4.66/docs/conf/extra/httpd-autoindex.conf.in
+@@ -13,7 +13,7 @@
+ # IndexOptions: Controls the appearance of server-generated directory
+ # listings.
+ #
+-IndexOptions FancyIndexing HTMLTable VersionSort
++IndexOptions FancyIndexing HTMLTable VersionSort Charset=UTF-8
+ 
+ # We include the /icons/ alias for FancyIndexed directory listings.  If
+ # you do not use FancyIndexing, you may comment this out.
+@@ -21,7 +21,7 @@
+ Alias /icons/ "@exp_iconsdir@/"
+ 
+ <Directory "@exp_iconsdir@">
+-    Options Indexes MultiViews
++    Options MultiViews FollowSymlinks
+     AllowOverride None
+     Require all granted
+ </Directory>
+@@ -37,6 +37,7 @@
+ AddIconByType (IMG,/icons/image2.gif) image/*
+ AddIconByType (SND,/icons/sound2.gif) audio/*
+ AddIconByType (VID,/icons/movie.gif) video/*
++AddIconByType /icons/bomb.gif application/x-coredump
+ 
+ AddIcon /icons/binary.gif .bin .exe
+ AddIcon /icons/binhex.gif .hqx
+@@ -53,7 +54,6 @@
+ AddIcon /icons/uuencoded.gif .uu
+ AddIcon /icons/script.gif .conf .sh .shar .csh .ksh .tcl
+ AddIcon /icons/tex.gif .tex
+-AddIcon /icons/bomb.gif core
+ 
+ AddIcon /icons/back.gif ..
+ AddIcon /icons/hand.right.gif README
+--- httpd-2.4.66/docs/conf/magic.8
++++ httpd-2.4.66/docs/conf/magic
+@@ -383,3 +383,15 @@
+ 4   string      moov        video/quicktime
+ 4   string      mdat        video/quicktime
+ 
++
++#------------------------------------------------------------------------------
++# application/x-coredump for LE/BE ELF
++#
++0       string          \177ELF
++>5      byte            1
++>16     leshort         4               application/x-coredump
++
++0       string          \177ELF
++>5      byte            2
++>16     beshort         4               application/x-coredump
++

@@ -1,5 +1,5 @@
---- zimpl-3.7.0/CMakeLists.txt.orig	2025-11-23 05:19:53.000000000 -0700
-+++ zimpl-3.7.0/CMakeLists.txt	2025-11-23 13:14:26.606931058 -0700
+--- zimpl-3.7.1/CMakeLists.txt.orig	2026-03-31 18:33:37.000000000 -0600
++++ zimpl-3.7.1/CMakeLists.txt	2026-04-03 09:07:34.324781686 -0600
 @@ -49,8 +49,6 @@ endif()
  
  # use C99 standard
@@ -8,10 +8,10 @@
 -set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
  
  option(ZLIB "use ZLIB" ON)
- option(SANITIZE_ADDRESS "should the address sanitizer be enabled in debug mode if available" OFF)
---- zimpl-3.7.0/src/CMakeLists.txt.orig	2025-11-23 05:19:53.000000000 -0700
-+++ zimpl-3.7.0/src/CMakeLists.txt	2025-11-23 13:15:22.276583290 -0700
-@@ -119,12 +119,10 @@ if(MSVC)
+ option(SANITIZE "should sanitizers be enabled if available" OFF)
+--- zimpl-3.7.1/src/CMakeLists.txt.orig	2026-03-31 18:33:37.000000000 -0600
++++ zimpl-3.7.1/src/CMakeLists.txt	2026-04-03 09:10:52.288477757 -0600
+@@ -118,12 +118,10 @@ if(MSVC)
  endif()
  
  #create zimpl with pic
@@ -24,11 +24,11 @@
 +add_library(libzimpl SHARED ${libsources})
 +set_target_properties(libzimpl PROPERTIES
 +        POSITION_INDEPENDENT_CODE on
-+	VERSION 0.0.0 SOVERSION 0)
++        VERSION 0.0.0 SOVERSION 0)
  target_link_libraries(libzimpl ${libs})
  
  #create zimpl binary
-@@ -141,16 +139,13 @@ endif()
+@@ -138,9 +136,6 @@ endif()
  set_target_properties(libzimpl PROPERTIES
      OUTPUT_NAME "zimpl")
  
@@ -38,7 +38,8 @@
  include(GNUInstallDirs)
  
  # install the header files of zimpl
- install(FILES ${headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/zimpl)
+@@ -150,7 +145,7 @@ if(MSVC)
+ endif()
  
  # install the binary and the library to appropriate locations and add them to an export group
 -install(TARGETS libzimpl zimpl libzimpl-pic EXPORT zimpl-targets
@@ -55,8 +56,8 @@
    FILE "${CMAKE_BINARY_DIR}/zimpl-targets.cmake")
  
  #configure the config file for the build tree
---- zimpl-3.7.0/src/zimpl/zimpllib.c.orig	2025-11-23 05:19:53.000000000 -0700
-+++ zimpl-3.7.0/src/zimpl/zimpllib.c	2025-11-23 13:14:26.607519615 -0700
+--- zimpl-3.7.1/src/zimpl/zimpllib.c.orig	2026-03-31 18:33:37.000000000 -0600
++++ zimpl-3.7.1/src/zimpl/zimpllib.c	2026-04-03 09:07:34.325265327 -0600
 @@ -455,3 +455,66 @@ bool zpl_read_with_args(char** argv, int
  
     return ret;
@@ -124,8 +125,8 @@
 +{
 +   abort();
 +}
---- zimpl-3.7.0/zimpl-config.cmake.in.orig	2025-11-23 05:19:53.000000000 -0700
-+++ zimpl-3.7.0/zimpl-config.cmake.in	2025-11-23 13:14:26.607724336 -0700
+--- zimpl-3.7.1/zimpl-config.cmake.in.orig	2026-03-31 18:33:37.000000000 -0600
++++ zimpl-3.7.1/zimpl-config.cmake.in	2026-04-03 09:07:34.325434322 -0600
 @@ -3,7 +3,7 @@ if(NOT TARGET libzimpl)
  endif()
  

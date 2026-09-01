@@ -10,7 +10,7 @@
 
 Name:           python-pendulum
 Version:        3.2.0~dev0^%{snapdate}git%{sub %{commit} 1 7}
-Release: 4%{?dist}
+Release:        1%{?dist}
 Summary:        Python datetimes made easy
 
 License:        MIT

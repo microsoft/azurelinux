@@ -15,8 +15,8 @@
 %global relccache %(%abs2rel %{_bindir}/ccache %{_libdir}/ccache)
 
 Name:           ccache
-Version:        4.11.3
-Release: 5%{?dist}
+Version:        4.12.3
+Release:        1%{?dist}
 Summary:        C/C++ compiler cache
 
 # See LICENSE.adoc for licenses of bundled codes
@@ -49,6 +49,8 @@ Requires:       coreutils
 Provides:       bundled(blake3) = 1.5.1
 Provides:       bundled(span-lite) = 0.11.0
 Provides:       bundled(cxxurl)
+
+ExcludeArch:    %{ix86}
 
 %description
 ccache is a compiler cache.  It speeds up recompilation of C/C++ code
@@ -115,6 +117,8 @@ find $RPM_BUILD_ROOT%{_libdir}/ccache -type l | \
     sed -e "s|^$RPM_BUILD_ROOT|%%ghost |" > %{name}-%{version}.compilers
 
 install -m0644 -D ccache.sysusers.conf %{buildroot}%{_sysusersdir}/ccache.conf
+
+install -m0644 README.md %{buildroot}%{_pkgdocdir}/
 
 
 %check
@@ -229,7 +233,7 @@ done\
 
 %files -f %{name}-%{version}.compilers
 %license GPL-3.0.txt LICENSE.*
-%doc doc/AUTHORS.*  doc/MANUAL.* doc/NEWS.* README.md
+%{_pkgdocdir}/
 %config(noreplace) %{_sysconfdir}/profile.d/%{name}.*sh
 %{_bindir}/ccache
 %dir %{_libdir}/ccache/
@@ -239,6 +243,22 @@ done\
 
 
 %changelog
+* Sat Feb 07 2026 Gwyn Ciesla <gwync@protonmail.com> - 4.12.3-1
+- 4.12.3
+- Drop 32-bit because cpp-httplib did.
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.2-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.12.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 27 2025 Orion Poplawski <orion@nwra.com> - 4.12.2-1
+- Update to 4.12.2
+
+* Thu Oct 02 2025 Orion Poplawski <orion@nwra.com> - 4.12.1-1
+- Update to 4.12.1
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 4.11.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

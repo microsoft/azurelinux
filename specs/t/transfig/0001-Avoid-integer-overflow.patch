@@ -1,0 +1,36 @@
+From b1698cb88b363965d2a52786f09af640982a8fa8 Mon Sep 17 00:00:00 2001
+From: Marian Koncek <mkoncek@redhat.com>
+Date: Mon, 8 Dec 2025 14:26:56 +0100
+Subject: [PATCH] Avoid integer overflow
+
+Upstream: https://sourceforge.net/p/mcj/tickets/199/
+
+---
+ fig2dev/bound.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fig2dev/bound.c b/fig2dev/bound.c
+index 7221aee..baa2700 100644
+--- a/fig2dev/bound.c
++++ b/fig2dev/bound.c
+@@ -986,7 +986,7 @@ calc_arrow(int x1, int y1, int x2, int y2, int linethick, F_arrow *arrow,
+ 	/* (Don't adjust those with tipmv < 0) */
+ 
+ 	/* alpha is the angle the line is relative to horizontal */
+-	l = sqrt((double)dx * dx + (double)dy * dy);
++	l = hypot(dx, dy);
+ 	sina = dy / l;
+ 	cosa = dx / l;
+ 
+@@ -1303,7 +1303,7 @@ compute_ellarc(F_arc *a,F_el_ends *ellend)
+ 
+     rx = a->point[1].x - a->center.x;
+     ry = a->point[1].y - a->center.y;
+-    radius = round(sqrt(rx * rx + ry * ry));
++    radius = round(hypot(rx, ry));
+     ellend->ra = abs(round(radius*cos(a->angle)));
+     ellend->rb = abs(round(radius*sin(a->angle)));
+     ellend->phi =  a->angle - compute_angle((double)rx,(double)ry);
+-- 
+2.51.1
+

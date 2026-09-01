@@ -3,7 +3,7 @@
 
 Name:           lua-lunitx
 Version:        0.8.1
-Release: 16%{?dist}
+Release:        14%{?dist}
 Summary:        Unit testing framework for Lua
 
 License:        MIT
@@ -51,6 +51,9 @@ LUA_PATH='%{buildroot}%{lua_pkgdir}/?.lua;;' %{buildroot}%{_bindir}/lunit --dont
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-14
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.1-13
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

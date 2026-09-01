@@ -1,0 +1,70 @@
+From 8438f6bafc2ce6c2570fb26c6d1ed93d11a8c0b5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 19 Aug 2026 13:41:51 +0200
+Subject: [PATCH] Remove libdnf5::base::Transaction::persistence to restore ABI
+
+93d42a2ffd9957aadb59f897771b890a09f8c927 commit ("bootc: Add
+transaction persistence field") broke ABI by adding "persistence"
+member to libdnf5::base::Transaction class. This unintentional ABI
+break caused crashing PackageKit daemon compiled against DNF5 5.4.2.1
+and running againt DNF5 5.4.3.0.
+
+This patch moves the member into a private
+libdnf5::base::Transaction::Impl class.
+
+Resolve: #2869
+---
+ include/libdnf5/base/transaction.hpp | 1 -
+ libdnf5/base/transaction.cpp         | 2 +-
+ libdnf5/base/transaction_impl.hpp    | 3 +++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/include/libdnf5/base/transaction.hpp b/include/libdnf5/base/transaction.hpp
+index 5ca23df79..6668724d6 100644
+--- a/include/libdnf5/base/transaction.hpp
++++ b/include/libdnf5/base/transaction.hpp
+@@ -227,7 +227,6 @@ private:
+     std::optional<uint32_t> user_id;
+     std::string comment;
+     std::string description;
+-    libdnf5::base::TransactionPersistence persistence = libdnf5::base::TransactionPersistence::UNKNOWN;
+ 
+     /// Clear the recorded last scriptlet output
+     LIBDNF_LOCAL void clear_last_script_output();
+diff --git a/libdnf5/base/transaction.cpp b/libdnf5/base/transaction.cpp
+index a319b1b0a..444d9c5c1 100644
+--- a/libdnf5/base/transaction.cpp
++++ b/libdnf5/base/transaction.cpp
+@@ -485,7 +485,7 @@ void Transaction::set_comment(const std::string & comment) {
+ }
+ 
+ void Transaction::set_persistence(libdnf5::base::TransactionPersistence persistence) {
+-    this->persistence = persistence;
++    p_impl->persistence = persistence;
+ }
+ 
+ bool Transaction::check_gpg_signatures() {
+diff --git a/libdnf5/base/transaction_impl.hpp b/libdnf5/base/transaction_impl.hpp
+index 9c4146a0a..19f056a0f 100644
+--- a/libdnf5/base/transaction_impl.hpp
++++ b/libdnf5/base/transaction_impl.hpp
+@@ -32,6 +32,7 @@
+ #include "libdnf5/base/transaction_group.hpp"
+ #include "libdnf5/base/transaction_module.hpp"
+ #include "libdnf5/base/transaction_package.hpp"
++#include "libdnf5/base/transaction_persistence.hpp"
+ #include "libdnf5/module/module_sack.hpp"
+ #include "libdnf5/rpm/package.hpp"
+ #include "libdnf5/rpm/rpm_signature.hpp"
+@@ -138,6 +139,8 @@ private:
+     // history db transaction id
+     int64_t history_db_id = 0;
+ 
++    libdnf5::base::TransactionPersistence persistence = libdnf5::base::TransactionPersistence::UNKNOWN;
++
+     // whether also the command line repo packages should be downloaded to the destination
+     bool download_local_pkgs{false};
+ 
+-- 
+2.55.0
+

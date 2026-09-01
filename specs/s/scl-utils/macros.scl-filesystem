@@ -19,7 +19,7 @@
 %{_sysconfdir}/pki
 %{_scl_root}/home
 %{_scl_root}/lib
-%ifarch x86_64 ppc ppc64 ppc64le aarch64 sparc sparc64 s390 s390x
+%if "%{_lib}" == "lib64"
 %{_scl_root}/%{_lib}
 %endif
 %{_scl_root}/media
@@ -38,7 +38,7 @@
 %{_scl_root}/usr/games
 %{_scl_root}/usr/include
 %dir %attr(555,root,root) %{_scl_root}/usr/lib
-%ifarch x86_64 ppc ppc64 ppc64le aarch64 sparc sparc64 s390 s390x
+%if "%{_lib}" == "lib64"
 %attr(555,root,root) %{_scl_root}/usr/%{_lib}
 %endif
 %{_scl_root}/usr/libexec
@@ -279,7 +279,7 @@ pushd %{buildroot}%{_scl_root}
 mkdir -p boot dev \\
         home media mnt opt proc root run/lock srv sys tmp \\
         usr/{bin,etc,games,include,lib/{games,locale,modules,sse2},libexec,local/{bin,etc,games,lib,sbin,src,share/{applications,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x},info},libexec,include,},sbin,share/{aclocal,applications,augeas/lenses,backgrounds,desktop-directories,dict,doc,empty,games,ghostscript/conf.d,gnome,icons,idl,info,licenses,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p},mime-info,misc,omf,pixmaps,sounds,themes,xsessions,X11},src,src/kernels,src/debug}
-%ifarch x86_64 ppc ppc64 ppc64le aarch64 sparc sparc64 s390 s390x
+%if "%{_lib}" == "lib64"
 mkdir -p usr/{%{_lib}/{games,sse2,tls,X11,pm-utils/{module.d,power.d,sleep.d}},local/%{_lib}}
 %endif
 ln -snf %{_localstatedir}/tmp usr/tmp
@@ -287,7 +287,7 @@ ln -snf spool/mail %{buildroot}%{_localstatedir}/mail
 ln -snf usr/bin bin
 ln -snf usr/sbin sbin
 ln -snf usr/lib lib
-%ifarch x86_64 ppc ppc64 ppc64le aarch64 sparc sparc64 s390 s390x
+%if "%{_lib}" == "lib64"
 ln -snf usr/%{_lib} %{_lib}
 %endif
 sed -n -f %{buildroot}/iso_639.sed /usr/share/xml/iso-codes/iso_639.xml >%{buildroot}/iso_639.tab

@@ -1,0 +1,16 @@
+diff --git a/oshmem/mca/memheap/base/memheap_base_frame.c b/oshmem/mca/memheap/base/memheap_base_frame.c
+index 53a71b27a9..82658e0979 100644
+--- a/oshmem/mca/memheap/base/memheap_base_frame.c
++++ b/oshmem/mca/memheap/base/memheap_base_frame.c
+@@ -33,9 +33,9 @@
+ 
+ int mca_memheap_base_output = -1;
+ int mca_memheap_base_key_exchange = 1;
+-opal_list_t mca_memheap_base_components_opened = {{0}};
++opal_list_t mca_memheap_base_components_opened = {};
+ int mca_memheap_base_already_opened = 0;
+-mca_memheap_map_t mca_memheap_base_map = {{{{0}}}};
++mca_memheap_map_t mca_memheap_base_map = {};
+ int mca_memheap_num_segments_warn = 32;
+ 
+ static int mca_memheap_base_register(mca_base_register_flag_t flags)

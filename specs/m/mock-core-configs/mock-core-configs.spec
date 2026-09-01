@@ -7,7 +7,7 @@
 
 Name:       mock-core-configs
 Version:    44.1
-Release: 9%{?dist}
+Release: 3%{?dist}
 Summary:    Mock core config files basic chroots
 
 License:    GPL-2.0-or-later

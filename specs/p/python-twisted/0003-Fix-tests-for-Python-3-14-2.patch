@@ -1,0 +1,37 @@
+From b035f4a1a952c93445a01f2e17df88689ddf9bdf Mon Sep 17 00:00:00 2001
+From: Glyph <code@glyph.im>
+Date: Wed, 10 Dec 2025 01:10:32 -0800
+Subject: [PATCH] use createElement in the test rather than instantiating
+ Element
+
+---
+ src/twisted/newsfragments/12549.misc    | 0
+ src/twisted/web/test/test_domhelpers.py | 6 +++---
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+ create mode 100644 src/twisted/newsfragments/12549.misc
+
+diff --git a/src/twisted/newsfragments/12549.misc b/src/twisted/newsfragments/12549.misc
+new file mode 100644
+index 00000000000..e69de29bb2d
+diff --git a/src/twisted/web/test/test_domhelpers.py b/src/twisted/web/test/test_domhelpers.py
+index bbefd68516b..d28b89f30e8 100644
+--- a/src/twisted/web/test/test_domhelpers.py
++++ b/src/twisted/web/test/test_domhelpers.py
+@@ -109,14 +109,14 @@ def test_clearNode(self):
+         doc1 = self.dom.parseString("<a><b><c><d/></c></b></a>")
+         a_node = doc1.documentElement
+         domhelpers.clearNode(a_node)
+-        self.assertEqual(a_node.toxml(), self.dom.Element("a").toxml())
++        self.assertEqual(a_node.toxml(), doc1.createElement("a").toxml())
+ 
+         doc2 = self.dom.parseString("<a><b><c><d/></c></b></a>")
+         b_node = doc2.documentElement.childNodes[0]
+         domhelpers.clearNode(b_node)
+         actual = doc2.documentElement.toxml()
+-        expected = self.dom.Element("a")
+-        expected.appendChild(self.dom.Element("b"))
++        expected = doc2.createElement("a")
++        expected.appendChild(doc2.createElement("b"))
+         self.assertEqual(actual, expected.toxml())
+ 
+     def test_get(self):

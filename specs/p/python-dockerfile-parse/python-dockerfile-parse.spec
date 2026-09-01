@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        2.0.1
-Release: 14%{?dist}
+Release:        12%{?dist}
 
 Summary:        Python library for Dockerfile manipulation
 # Automatically converted from old format: BSD - review is highly recommended.
@@ -59,6 +59,9 @@ py.test-%{python3_version} -v tests
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.0.1-11
 - Rebuilt for Python 3.14.0rc3 bytecode
 

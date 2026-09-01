@@ -1,10 +1,10 @@
 # This spec file has been modified by azldev to include build configuration overlays.
 # Do not edit manually; changes may be overwritten.
 
-Summary: A GNU general-purpose parser generator
+Summary: GNU general-purpose parser generator
 Name: bison
 Version: 3.8.2
-Release: 14%{?dist}
+Release: 15%{?dist}
 
 # An SPDX license string check done against bison-3.8.2 found strings
 # corresponding to the following licenses across the bison source tree:
@@ -20,13 +20,18 @@ Source2: gpgkey-7DF84374B1EE1F9764BBE25D0DDCAA3278D5264E.gpg
 # from Gentoo sys-devel/bison
 Patch0: bison-3.8.2-gcc15-glibcxx-assertions.patch
 
+# Upstream fix for GCC 16 change:
+# index-parse.c:1114:9: error: variable ‘yynerrs’ set but not used [-Werror=unused-but-set-variable=]
+# https://bugzilla.redhat.com/show_bug.cgi?id=2429571
+Patch1: https://github.com/akimd/bison/commit/a166d5450e3f47587b98f6005f9f5627dbe21a5b.patch
+
 # testsuite dependency
 BuildRequires: gcc-c++
 BuildRequires: autoconf
 BuildRequires: flex
 BuildRequires: gnupg2
 
-URL: http://www.gnu.org/software/%{name}/
+URL: https://www.gnu.org/software/%{name}/
 BuildRequires: m4 >= 1.4
 BuildRequires: make
 #java-1.7.0-openjdk-devel
@@ -100,10 +105,12 @@ make check
 %make_install
 
 # Remove unpackaged files.
-rm -f %{buildroot}/%{_bindir}/yacc
-rm -f %{buildroot}/%{_infodir}/dir
-rm -f %{buildroot}/%{_mandir}/man1/yacc*
-rm -rf %{buildroot}/%{_docdir}/%{name}/examples/*
+rm -f %{buildroot}%{_bindir}/yacc
+rm -f %{buildroot}%{_infodir}/dir
+rm -f %{buildroot}%{_mandir}/man1/yacc*
+rm -rf %{buildroot}%{_docdir}/%{name}/examples/*
+rm -f %{buildroot}%{_docdir}/%{name}/COPYING
+rm -f %{buildroot}%{_docdir}/%{name}/TODO
 
 %find_lang %{name}
 %find_lang %{name}-runtime
@@ -114,7 +121,8 @@ gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/bison.info*
 # The distribution contains also source files.  These are used by m4
 # when the target parser file is generated.
 %files -f %{name}.lang -f %{name}-gnulib.lang
-%doc AUTHORS ChangeLog NEWS README THANKS TODO COPYING
+%license COPYING
+%doc AUTHORS ChangeLog NEWS README THANKS
 %{_mandir}/*/bison*
 %{_datadir}/bison
 %{_infodir}/bison.info*
@@ -122,14 +130,25 @@ gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/bison.info*
 %{_datadir}/aclocal/bison*.m4
 
 %files -f %{name}-runtime.lang runtime
-%doc COPYING
+%license COPYING
 
 %files devel
-%doc COPYING
-%defattr(-,root,root)
+%license COPYING
 %{_libdir}/liby.a
 
 %changelog
+* Mon Feb 02 2026 Robert Scheck <robert@fedoraproject.org> - 3.8.2-15
+- Remove TODO file, install COPYING file correctly in /usr/share/licenses
+
+* Tue Jan 20 2026 Richard W.M. Jones <rjones@redhat.com> - 3.8.2-14
+- Backport upstream fix for GCC 16 (RHBZ#2429571)
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.2-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.2-12
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.8.2-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

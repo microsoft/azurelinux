@@ -15,12 +15,13 @@
 %global build_search %{xapian_core_support}
 %global clang_support ON
 %global system_sqlite3 ON
+%global build_doc OFF
 
 Summary: A documentation system for C/C++
 Name:    doxygen
 Epoch:   2
-Version: 1.14.0
-Release: 8%{?dist}
+Version: 1.16.1
+Release: 3%{?dist}
 # No version is specified.
 License: GPL-2.0-or-later
 Url: https://github.com/doxygen
@@ -33,8 +34,6 @@ Source3: README.rpm-packaging
 Source4: doxygen-unbundler
 
 # upstream fixes
-# fix input buffer overflow
-Patch1: doxygen-input-buffer-overflow.patch
 
 BuildRequires: %{_bindir}/python3
 BuildRequires: perl-interpreter, perl-open
@@ -43,7 +42,7 @@ BuildRequires: web-assets-devel
 # Building an RPM package typically needs unbundling of Javascript assets.
 Requires: (js-doxygen if redhat-rpm-config)
 
-%if ! 0%{?_module_build}
+%if ! 0%{?_module_build} && "%{build_doc}" == "ON"
 BuildRequires: tex(dvips)
 BuildRequires: tex(latex)
 # From doc/manual.sty
@@ -104,35 +103,44 @@ BuildRequires: /usr/bin/epstopdf
 BuildRequires: texlive-epstopdf
 BuildRequires: ghostscript
 BuildRequires: gettext
-BuildRequires: desktop-file-utils
 BuildRequires: graphviz
 %endif
+
+%if "%{build_wizard}" == "ON"
+BuildRequires: desktop-file-utils
+%endif
+
 BuildRequires: zlib-devel
 BuildRequires: flex
 BuildRequires: bison
 BuildRequires: cmake
 BuildRequires: git
-%if "x%{?xapian_core_support}" == "xON"
+
+%if "%{?xapian_core_support}" == "ON"
 BuildRequires: xapian-core-devel
 %endif
-%if "x%{?clang_support}" == "xON"
+
+%if "%{clang_support}" == "ON"
 BuildRequires: llvm-devel
 BuildRequires: clang-devel
 %else
 BuildRequires: gcc-c++ gcc
 %endif
+
 %if "%{system_spdlog}" == "ON"
 BuildRequires: spdlog-devel
 %else
 # SPDLOG_VER* defined in deps/spdlog/include/spdlog/version.h
 Provides: bundled(spdlog) = 1.14.1
 %endif
+
 %if "%{system_sqlite3}" == "ON"
 BuildRequires: sqlite-devel
 %else
 # SQLITE_VERSION defined in deps/sqlite3/sqlite3.h
 Provides: bundled(sqlite) = 3.42.0
 %endif
+
 %if "%{system_fmt}" == "ON"
 BuildRequires: fmt-devel
 %else
@@ -157,11 +165,12 @@ BuildArch: noarch
 %description -n js-doxygen
 Javascript files for use by locally installed Doxygen documentation.
 
-%if  "x%{build_wizard}" == "xON"
+%if  "%{build_wizard}" == "ON"
 %package doxywizard
 Summary: A GUI for creating and editing configuration files
 Requires: %{name} = %{epoch}:%{version}-%{release}
-BuildRequires: qt5-qtbase-devel
+BuildRequires: qt6-qtbase-devel
+BuildRequires: qt6-qtsvg-devel
 
 %description doxywizard
 Doxywizard is a GUI for creating and editing configuration files that
@@ -197,6 +206,10 @@ Requires: tex(adjustbox.sty)
 Requires: tex(amssymb.sty)
 Requires: tex(stackengine.sty)
 Requires: tex(ulem.sty)
+Requires: tex(xltabular.sty)
+Requires: tex(tabularray.sty)
+Requires: tex(enumitem.sty)
+Requires: tex(alphalph.sty)
 # From doc/doxygen_manual.tex
 Requires: tex(ifthen.sty)
 Requires: tex(array.sty)
@@ -237,6 +250,8 @@ Requires: tex(xtab.sty)
 Requires: texlive-bibtex
 Requires: texlive-makeindex
 Requires: texlive-epstopdf
+# fonts
+Requires: texlive-collection-fontsrecommended
 %endif
 
 %description latex
@@ -246,11 +261,6 @@ Requires: texlive-epstopdf
 
 %prep
 %autosetup -p1 -a2
-
-# convert into utf-8
-iconv --from=ISO-8859-1 --to=UTF-8 LANGUAGE.HOWTO > LANGUAGE.HOWTO.new
-touch -r LANGUAGE.HOWTO LANGUAGE.HOWTO.new
-mv LANGUAGE.HOWTO.new LANGUAGE.HOWTO
 
 cp %{SOURCE3} .
 
@@ -262,7 +272,7 @@ cp %{SOURCE3} .
 	-Dbuild_search=%{build_search} \
 	-Duse_libclang=%{clang_support} \
 	-DMAN_INSTALL_DIR=%{_mandir}/man1 \
-	-Dbuild_doc=OFF \
+	-Dbuild_doc=%{build_doc} \
 	-DPYTHON_EXECUTABLE=%{_bindir}/python3 \
 	-Dbuild_xmlparser=ON \
 	-Duse_sys_sqlite3=%{system_sqlite3} \
@@ -278,7 +288,7 @@ cp %{SOURCE3} .
 mkdir -p %{buildroot}/%{_mandir}/man1
 cp doc/*.1 %{buildroot}/%{_mandir}/man1/
 
-%if  "x%{build_wizard}" == "xOFF"
+%if "%{build_wizard}" == "OFF"
 rm -f %{buildroot}/%{_mandir}/man1/doxywizard.1*
 %else
 # install icons
@@ -291,7 +301,7 @@ install -m644 -p -D doxywizard-3.png $icondir/128x128/apps/doxywizard.png
 desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE1}
 %endif
 
-%if "x%{?xapian_core_support}" == "xOFF"
+%if "%{xapian_core_support}" == "OFF"
 rm -f %{buildroot}/%{_mandir}/man1/doxyindexer.1* %{buildroot}/%{_mandir}/man1/doxysearch.1*
 %endif
 
@@ -299,8 +309,8 @@ rm -f %{buildroot}/%{_mandir}/man1/doxyindexer.1* %{buildroot}/%{_mandir}/man1/d
 rm -rf %{buildroot}/%{_docdir}/packages
 
 # Install the asset files.
-install -m644 -D --target-directory=%{buildroot}%{_jsdir}/doxygen \
-  templates/html/*.js
+install -m644 -D --target-directory=%{buildroot}%{_jsdir}/doxygen templates/html/*.js
+
 # Generate the macros file.  Expand version/release/%%_jsdir.
 mkdir -p %{buildroot}%{_rpmconfigdir}/macros.d
 cat > %{buildroot}%{_rpmconfigdir}/macros.d/macros.doxygen <<'EOF'
@@ -308,7 +318,8 @@ cat > %{buildroot}%{_rpmconfigdir}/macros.d/macros.doxygen <<'EOF'
 %%doxygen_unbundle_buildroot() %%{_rpmconfigdir}/redhat/doxygen-unbundler "%{_jsdir}" "%%{buildroot}" %%[ %%# == 0 ? "%%{_docdir}" : "%%1"]
 %%doxygen_unbundle() %{_rpmconfigdir}/redhat/doxygen-unbundler "%{_jsdir}" "" %%*
 EOF
-# Install the unbundler script.
+
+ # Install the unbundler script.
 install -m755 -D --target-directory=%{buildroot}%{_rpmconfigdir}/redhat %{SOURCE4}
 
 %check
@@ -318,20 +329,20 @@ install -m755 -D --target-directory=%{buildroot}%{_rpmconfigdir}/redhat %{SOURCE
 %doc LANGUAGE.HOWTO README.md README.rpm-packaging
 %license LICENSE
 %if ! 0%{?_module_build}
-%if "x%{?xapian_core_support}" == "xON"
+%if "%{xapian_core_support}" == "ON"
 %{_bindir}/doxyindexer
 %{_bindir}/doxysearch*
 %endif
 %endif
 %{_bindir}/doxygen
 %{_mandir}/man1/doxygen.1*
-%if "x%{?xapian_core_support}" == "xON"
+%if "%{xapian_core_support}" == "ON"
 %{_mandir}/man1/doxyindexer.1*
 %{_mandir}/man1/doxysearch.1*
 %endif
 %{_rpmconfigdir}/macros.d/macros.doxygen
 %{_rpmconfigdir}/redhat/doxygen-unbundler
-%if "x%{build_wizard}" == "xON" 
+%if "%{build_wizard}" == "ON"
 %files doxywizard
 %{_bindir}/doxywizard
 %{_mandir}/man1/doxywizard*
@@ -348,8 +359,23 @@ install -m755 -D --target-directory=%{buildroot}%{_rpmconfigdir}/redhat %{SOURCE
 %endif
 
 %changelog
-* Fri Nov 28 2025 Than Ngo <than@redhat.com> - 2:1.14.0-5
-- Fix rhbz#2416173, Rebuilt against llvm-21
+* Wed Mar 04 2026 Yaakov Selkowitz <yselkowi@redhat.com> - 2:1.16.1-3
+- Rebuilt for https://fedoraproject.org/wiki/Changes/LLVM-22
+
+* Sat Jan 31 2026 Than Ngo <than@redhat.com> - 2:1.16.1-2
+- Fix rhbz#2435249, missing dependency
+
+* Mon Jan 26 2026 Than Ngo <than@redhat.com> - 2:1.16.1-1
+- Fix rhbz#2427243, Update to 1.16.1
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.15.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.15.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 13 2025 Than Ngo <than@redhat.com> - 2:1.15.0-1
+- Update to 1.15.0
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.14.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

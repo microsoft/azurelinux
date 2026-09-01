@@ -4,7 +4,7 @@
 # Call the function `setup_build_local_properties` and redirect its output into
 # the file `build.local.properties` and run the tests in the same directory.
 
-. /usr/share/postgresql-setup/postgresql_pkg_tests.sh
+eval $(rpm -E %postgresql_tests_init)
 
 PGTESTS_LOCALE=C.UTF-8
 

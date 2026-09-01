@@ -1,26 +1,27 @@
-From 5f73b687854e8def5b929b03104be52830f65e09 Mon Sep 17 00:00:00 2001
+From 02a3d0535fd8ba3ff540d291b7eb2940a67bc998 Mon Sep 17 00:00:00 2001
 From: Diego Herrera <dherrera@redhat.com>
-Date: Mon, 30 Dec 2024 18:30:27 -0300
-Subject: [PATCH 02/20] system-protobuf
+Date: Mon, 29 Sep 2025 23:37:09 -0300
+Subject: [PATCH 02/19] system protobuf
 
 ---
- .../external/onnxruntime_external_deps.cmake  | 27 +------------------
- 1 file changed, 1 insertion(+), 26 deletions(-)
+ .../external/onnxruntime_external_deps.cmake  | 28 +------------------
+ 1 file changed, 1 insertion(+), 27 deletions(-)
 
 diff --git a/cmake/external/onnxruntime_external_deps.cmake b/cmake/external/onnxruntime_external_deps.cmake
-index ec6aa78672..292856eb99 100644
+index 94bd21a4d1..fdae0b1a9f 100644
 --- a/cmake/external/onnxruntime_external_deps.cmake
 +++ b/cmake/external/onnxruntime_external_deps.cmake
-@@ -211,35 +211,10 @@ else()
+@@ -184,36 +184,10 @@ else()
   set(ONNXRUNTIME_PROTOBUF_PATCH_COMMAND "")
  endif()
  
 -#Protobuf depends on absl and utf8_range
--FetchContent_Declare(
+-onnxruntime_fetchcontent_declare(
 -  Protobuf
 -  URL ${DEP_URL_protobuf}
 -  URL_HASH SHA1=${DEP_SHA1_protobuf}
 -  PATCH_COMMAND ${ONNXRUNTIME_PROTOBUF_PATCH_COMMAND}
+-  EXCLUDE_FROM_ALL
 -  FIND_PACKAGE_ARGS NAMES Protobuf protobuf
 -)
 -
@@ -46,8 +47,8 @@ index ec6aa78672..292856eb99 100644
  
 -onnxruntime_fetchcontent_makeavailable(Protobuf)
  if(Protobuf_FOUND)
-   message(STATUS "Protobuf version: ${Protobuf_VERSION}")
+   message(STATUS "Using protobuf from find_package(or vcpkg). Protobuf version: ${Protobuf_VERSION}")
  else()
 -- 
-2.47.1
+2.51.0
 

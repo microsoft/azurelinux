@@ -2,13 +2,13 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libgexiv2
-Version:        0.14.6
-Release: 5%{?dist}
+Version:        0.16.2
+Release:        1%{?dist}
 Summary:        Gexiv2 is a GObject-based wrapper around the Exiv2 library
 
 License:        GPL-2.0-or-later
 URL:            https://wiki.gnome.org/Projects/gexiv2
-Source0:        https://download.gnome.org/sources/gexiv2/0.14/gexiv2-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/gexiv2/%{version}/gexiv2-%{version}.tar.xz
 
 BuildRequires:  pkgconfig(exiv2)
 BuildRequires:  gcc-c++
@@ -18,9 +18,10 @@ BuildRequires:  meson
 BuildRequires:  vala
 BuildRequires:  python3-devel
 BuildRequires:  python3-gobject-base
+BuildRequires:  gi-docgen
 
 %description
-libgexiv2 is a GObject-based wrapper around the Exiv2 library. 
+libgexiv2 is a GObject-based wrapper around the Exiv2 library.
 It makes the basic features of Exiv2 available to GNOME applications.
 
 %package        devel
@@ -54,33 +55,49 @@ This package contains the python3 bindings for %{name}
 %meson_install
 
 %check
+# Test failures on s390x, filled as https://bugzilla.redhat.com/show_bug.cgi?id=2435118
+%ifnarch s390x
 %meson_test
+%endif
 
 %files
 %license COPYING
 %doc AUTHORS NEWS README.md THANKS
-%{_libdir}/libgexiv2.so.2*
+%{_libdir}/libgexiv2-0.16.so*
 %dir %{_libdir}/girepository-1.0
-%{_libdir}/girepository-1.0/GExiv2-0.10.typelib
+%{_libdir}/girepository-1.0/GExiv2-0.16.typelib
 
 %files devel
-%{_includedir}/gexiv2/
-%{_libdir}/libgexiv2.so
-%{_libdir}/pkgconfig/gexiv2.pc
+%{_includedir}/gexiv2-0.16/gexiv2/
+%{_libdir}/pkgconfig/gexiv2-0.16.pc
 %dir %{_datadir}/gir-1.0
-%{_datadir}/gir-1.0/GExiv2-0.10.gir
-%dir %{_datadir}/gtk-doc
-%dir %{_datadir}/gtk-doc/html
-%{_datadir}/gtk-doc/html/gexiv2/
+%{_datadir}/gir-1.0/GExiv2-0.16.gir
+%dir %{_datadir}/doc/
+%{_datadir}/doc/gexiv2-0.16/
 %dir %{_datadir}/vala
 %dir %{_datadir}/vala/vapi
-%{_datadir}/vala/vapi/gexiv2.deps
-%{_datadir}/vala/vapi/gexiv2.vapi
+%{_datadir}/vala/vapi/gexiv2-0.16.deps
+%{_datadir}/vala/vapi/gexiv2-0.16.vapi
 
 %files -n python3-gexiv2
 %pycached %{python3_sitelib}/gi/overrides/GExiv2.py
 
 %changelog
+* Thu Aug 06 2026 Jan Grulich <jgrulich@redhat.com> - 0.16.2-1
+- Update to version 0.16.2
+
+* Mon Jun 29 2026 Milan Crha <mcrha@redhat.com> - 0.16.1-1
+- Update to version 0.16.1
+
+* Tue Feb 10 2026 Daniel P. Berrangé <berrange@redhat.com> - 0.16.0-2
+- Fix package name in GExiv2-0.16.gir file (rhbz #2438020)
+
+* Fri Jan 30 2026 Jan Horak <jhorak@redhat.com> - 0.16.0-1
+- Update to version 0.16
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 0.14.6-2
 - Rebuilt for Python 3.14.0rc3 bytecode
 
@@ -411,7 +428,7 @@ This package contains the python3 bindings for %{name}
 - changed configure portion
 - added Requires:  vala for devel
 - made the file section more precise
-- bugzilla #599097 
+- bugzilla #599097
 - changed patch to include a default LIB setting
 
 * Fri Jun 04 2010 Ankur Sinha <ankursinha AT fedoraproject DOT org> - 0.0.90-3

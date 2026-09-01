@@ -1,0 +1,11 @@
+diff -urp '--exclude=*~' rack-session-2.1.1.orig/test/spec_session_encryptor.rb rack-session-2.1.1/test/spec_session_encryptor.rb
+--- rack-session-2.1.1.orig/test/spec_session_encryptor.rb	2025-05-06 19:54:57.000000000 +0900
++++ rack-session-2.1.1/test/spec_session_encryptor.rb	2026-01-07 22:48:55.178833890 +0900
+@@ -4,6 +4,7 @@
+ # Copyright, 2022-2023, by Samuel Williams.
+ 
+ require_relative 'helper'
++require 'minitest/mock'
+ require 'rack/session/encryptor'
+ 
+ describe Rack::Session::Encryptor do

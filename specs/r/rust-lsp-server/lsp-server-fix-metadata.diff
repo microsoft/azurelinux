@@ -1,13 +1,28 @@
---- lsp-server-0.7.9/Cargo.toml	1970-01-01T00:00:01+00:00
-+++ lsp-server-0.7.9/Cargo.toml	2025-08-17T13:03:45.634591+00:00
-@@ -28,10 +28,6 @@
- [lib]
+--- lsp-server-0.10.0/Cargo.toml	2006-07-24T01:21:28+00:00
++++ lsp-server-0.10.0/Cargo.toml	2026-08-16T14:02:15.422369+00:00
+@@ -29,10 +29,6 @@
  name = "lsp_server"
  path = "src/lib.rs"
--
+ 
 -[[example]]
 -name = "minimal_lsp"
 -path = "examples/minimal_lsp.rs"
- 
+-
  [dependencies.crossbeam-channel]
  version = "0.5.15"
+ 
+@@ -47,6 +43,14 @@
+ 
+ [dependencies.serde_json]
+ version = "1.0.140"
++
++[dev-dependencies.lsp-types]
++version = ">=0.4.0, <0.12.0"
++package = "gen-lsp-types"
++features = ["url"]
++
++[dev-dependencies.ctrlc]
++version = "3.4.7"
+ 
+ [lints.clippy]
+ assigning_clones = "allow"

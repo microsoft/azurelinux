@@ -7,7 +7,7 @@ URL:          http://www.kornshell.com/
 License:      EPL-2.0
 Epoch:        3
 Version:      1.0.10
-Release: 9%{?dist}
+Release:      8%{?dist}
 Source0:      https://github.com/ksh93/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:      kshcomp.conf
 Source2:      kshrc.rhs
@@ -18,6 +18,10 @@ Patch1:       ksh-1.0.11-SHLVL.patch
 
 # https://github.com/ksh93/ksh/commit/5def43983de3ecfa38c805c02a1f0d6f1581160c
 Patch2:       ksh-1.0.11-redir.patch
+
+# add delay to sigchld.sh test to fix failures on slower builders
+# based on https://github.com/ksh93/ksh/pull/922
+Patch3:       ksh-1.0.11-sigchld-delay.patch
 
 Conflicts:    pdksh
 Requires: coreutils, diffutils
@@ -150,6 +154,12 @@ fi
 %config(noreplace) %{_sysconfdir}/binfmt.d/kshcomp.conf
 
 %changelog
+* Mon Jan 19 2026 Lukáš Zaoral <lzaoral@redhat.com> - 3:1.0.10-8
+- fix flaky sigchld.sh test
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3:1.0.10-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3:1.0.10-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

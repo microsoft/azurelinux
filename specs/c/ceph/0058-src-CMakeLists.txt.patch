@@ -1,0 +1,13 @@
+--- ceph-20.2.0/src/CMakeLists.txt.orig	2026-01-20 14:31:56.764231793 -0500
++++ ceph-20.2.0/src/CMakeLists.txt	2026-01-20 14:35:21.258787691 -0500
+@@ -1051,8 +1051,8 @@
+ if(WITH_RADOSGW)
+   if(WITH_RADOSGW_SELECT_PARQUET OR WITH_RADOSGW_ARROW_FLIGHT)
+     if(WITH_SYSTEM_ARROW)
+-      find_package(Arrow 4 REQUIRED QUIET)
+-      find_package(Parquet 4 REQUIRED QUIET)
++      find_package(Arrow REQUIRED QUIET)
++      find_package(Parquet REQUIRED QUIET)
+     else()
+       # find arrow's dependencies
+       if (WITH_SYSTEM_UTF8PROC)

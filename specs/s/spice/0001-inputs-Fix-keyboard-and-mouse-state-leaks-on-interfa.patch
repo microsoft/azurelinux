@@ -1,0 +1,168 @@
+From c3efe69ecdcb6c1b9d73560d0cfdf88f109f2395 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 22 May 2026 21:47:17 +0400
+Subject: [PATCH] inputs: Fix keyboard and mouse state leaks on interface
+ removal
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+SpiceKbdState and SpiceMouseState allocated by set_keyboard()/set_mouse()
+were never freed — remove_interface() had no handler for KEYBOARD or MOUSE
+types, and the InputsChannel destructor only cleaned up the tablet.
+
+Add detach_keyboard()/detach_mouse() following the existing detach_tablet()
+pattern, call them from the destructor and from remove_interface().
+
+Also give SpiceMouseState a RedsState back-pointer (replacing the dummy
+field) so remove_interface() can locate the server, matching the tablet
+state design.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+---
+ server/inputs-channel.cpp | 40 +++++++++++++++++++++++++++++++++++----
+ server/inputs-channel.h   |  4 ++++
+ server/reds.cpp           | 16 ++++++++++++++--
+ 3 files changed, 54 insertions(+), 6 deletions(-)
+
+diff --git a/server/inputs-channel.cpp b/server/inputs-channel.cpp
+index 029dad4a..37de1051 100644
+--- a/server/inputs-channel.cpp
++++ b/server/inputs-channel.cpp
+@@ -56,12 +56,14 @@ static SpiceKbdState* spice_kbd_state_new(InputsChannel *inputs)
+ }
+ 
+ struct SpiceMouseState {
+-    int dummy;
++    RedsState *reds;
+ };
+ 
+-static SpiceMouseState* spice_mouse_state_new()
++static SpiceMouseState* spice_mouse_state_new(RedsState *reds)
+ {
+-    return g_new0(SpiceMouseState, 1);
++    auto st = g_new0(SpiceMouseState, 1);
++    st->reds = reds;
++    return st;
+ }
+ 
+ struct SpiceTabletState {
+@@ -85,6 +87,16 @@ RedsState* spice_tablet_state_get_server(SpiceTabletState *st)
+     return st->reds;
+ }
+ 
++RedsState* spice_kbd_state_get_server(SpiceKbdState *st)
++{
++    return st->inputs->get_server();
++}
++
++RedsState* spice_mouse_state_get_server(SpiceMouseState *st)
++{
++    return st->reds;
++}
++
+ struct RedKeyModifiersPipeItem: public RedPipeItemNum<RED_PIPE_ITEM_KEY_MODIFIERS> {
+     explicit RedKeyModifiersPipeItem(uint8_t modifiers);
+     uint8_t modifiers;
+@@ -530,6 +542,8 @@ InputsChannel::InputsChannel(RedsState *reds):
+ 
+ InputsChannel::~InputsChannel()
+ {
++    detach_keyboard(keyboard);
++    detach_mouse(mouse);
+     detach_tablet(tablet);
+     red_timer_remove(key_modifiers_timer);
+ }
+@@ -552,7 +566,7 @@ int InputsChannel::set_mouse(SpiceMouseInstance *new_mouse)
+         return -1;
+     }
+     mouse = new_mouse;
+-    mouse->st = spice_mouse_state_new();
++    mouse->st = spice_mouse_state_new(get_server());
+     return 0;
+ }
+ 
+@@ -581,6 +595,24 @@ void InputsChannel::detach_tablet(SpiceTabletInstance *old_tablet)
+     tablet = nullptr;
+ }
+ 
++void InputsChannel::detach_keyboard(SpiceKbdInstance *old_keyboard)
++{
++    if (old_keyboard != nullptr && old_keyboard == keyboard) {
++        g_free(old_keyboard->st);
++        old_keyboard->st = nullptr;
++    }
++    keyboard = nullptr;
++}
++
++void InputsChannel::detach_mouse(SpiceMouseInstance *old_mouse)
++{
++    if (old_mouse != nullptr && old_mouse == mouse) {
++        g_free(old_mouse->st);
++        old_mouse->st = nullptr;
++    }
++    mouse = nullptr;
++}
++
+ bool InputsChannel::is_src_during_migrate() const
+ {
+     return src_during_migrate;
+diff --git a/server/inputs-channel.h b/server/inputs-channel.h
+index d8093ef9..866c5714 100644
+--- a/server/inputs-channel.h
++++ b/server/inputs-channel.h
+@@ -46,6 +46,8 @@ public:
+     int set_tablet(SpiceTabletInstance *tablet);
+     bool has_tablet() const;
+     void detach_tablet(SpiceTabletInstance *tablet);
++    void detach_keyboard(SpiceKbdInstance *keyboard);
++    void detach_mouse(SpiceMouseInstance *mouse);
+ 
+ private:
+     VDAgentMouseState mouse_state;
+@@ -77,6 +79,8 @@ private:
+ red::shared_ptr<InputsChannel> inputs_channel_new(RedsState *reds);
+ 
+ RedsState *spice_tablet_state_get_server(SpiceTabletState *st);
++RedsState *spice_kbd_state_get_server(SpiceKbdState *st);
++RedsState *spice_mouse_state_get_server(SpiceMouseState *st);
+ 
+ #include "pop-visibility.h"
+ 
+diff --git a/server/reds.cpp b/server/reds.cpp
+index 23837b40..4beb6e6c 100644
+--- a/server/reds.cpp
++++ b/server/reds.cpp
+@@ -3360,7 +3360,19 @@ SPICE_GNUC_VISIBLE int spice_server_remove_interface(SpiceBaseInstance *sin)
+     g_return_val_if_fail(sin != nullptr, -1);
+ 
+     base_interface = sin->sif;
+-    if (strcmp(base_interface->type, SPICE_INTERFACE_TABLET) == 0) {
++    if (strcmp(base_interface->type, SPICE_INTERFACE_KEYBOARD) == 0) {
++        SpiceKbdInstance *kbd = SPICE_UPCAST(SpiceKbdInstance, sin);
++        g_return_val_if_fail(kbd->st != nullptr, -1);
++        reds = spice_kbd_state_get_server(kbd->st);
++        spice_debug("remove SPICE_INTERFACE_KEYBOARD");
++        reds->inputs_channel->detach_keyboard(kbd);
++    } else if (strcmp(base_interface->type, SPICE_INTERFACE_MOUSE) == 0) {
++        SpiceMouseInstance *mouse = SPICE_UPCAST(SpiceMouseInstance, sin);
++        g_return_val_if_fail(mouse->st != nullptr, -1);
++        reds = spice_mouse_state_get_server(mouse->st);
++        spice_debug("remove SPICE_INTERFACE_MOUSE");
++        reds->inputs_channel->detach_mouse(mouse);
++    } else if (strcmp(base_interface->type, SPICE_INTERFACE_TABLET) == 0) {
+         SpiceTabletInstance *tablet = SPICE_UPCAST(SpiceTabletInstance, sin);
+         g_return_val_if_fail(tablet->st != nullptr, -1);
+         reds = spice_tablet_state_get_server(tablet->st);
+@@ -3387,7 +3399,7 @@ SPICE_GNUC_VISIBLE int spice_server_remove_interface(SpiceBaseInstance *sin)
+         reds->qxl_instances.remove(qxl); // XXX owning
+         red_qxl_destroy(qxl);
+     } else {
+-        spice_warning("VD_INTERFACE_REMOVING unsupported");
++        spice_warning("%s interface removing is unsupported", base_interface->type);
+         return -1;
+     }
+ 
+-- 
+2.55.0
+

@@ -7,12 +7,12 @@
 
 %global __provides_exclude_from ^%{_libdir}/varnish/vmods
 
-%global abi 2e8180f788715e5bc44df08479d60c9435d79bdd
-%global vrt 21.0
+%global abi 71d4d75665f4d1949f7eeca28092a12df7037f3a
+%global vrt 22.0
 
 # Package scripts are now external
 # https://github.com/varnishcache/pkg-varnish-cache
-%global commit1 7d90347be31891b338dededb318594cebb668ba7
+%global commit1 1f0d212dc45065f38bd80ac57fe22773a20a0595
 %global shortcommit1 %(c=%{commit1}; echo ${c:0:7})
 
 # Default: Use jemalloc, as adviced by upstream project
@@ -34,14 +34,15 @@
 
 Summary: High-performance HTTP accelerator
 Name: varnish
-Version: 7.7.1
-Release: 7%{?dist}
+Version: 8.0.2
+Release: 1%{?dist}
 License: BSD-2-Clause AND (BSD-2-Clause-FreeBSD AND BSD-3-Clause AND LicenseRef-Fedora-Public-Domain AND Zlib)
 URL: https://www.varnish-cache.org/
 Source0: http://varnish-cache.org/_downloads/%{name}-%{version}.tgz
 Source1: https://github.com/varnishcache/pkg-varnish-cache/archive/%{commit1}.tar.gz#/pkg-varnish-cache-%{shortcommit1}.tar.gz
 Source2: varnish.sysusers
 Source3: https://github.com/jemalloc/jemalloc/releases/download/%{jemalloc_version}/jemalloc-%{jemalloc_version}.tar.bz2
+Source4: varnish.tmpfiles
 
 # Fix for h2 switch in varnishtest
 # https://github.com/varnishcache/varnish-cache/issues/4298
@@ -155,7 +156,7 @@ Documentation files for %name
 
 %prep
 %setup -q
-%patch 0 -p1
+#patch 0 -p1
 tar xzf %SOURCE1
 ln -s pkg-varnish-cache-%{commit1}/redhat redhat
 ln -s pkg-varnish-cache-%{commit1}/debian debian
@@ -227,6 +228,10 @@ export CFLAGS="$CFLAGS -ffloat-store -fexcess-precision=standard"
 
 %if 0%{?fedora} > 41 || 0%{?rhel} > 10
 export CFLAGS="$CFLAGS -std=gnu17"
+%endif
+
+%if 0%{?fedora} > 42 || 0%{?rhel} > 10
+export CFLAGS="$CFLAGS -Wno-error=discarded-qualifiers"
 %endif
 
 %ifarch s390x
@@ -303,7 +308,7 @@ export LD_LIBRARY_PATH=%{_builddir}/%{name}-%{version}/jemalloc-%{jemalloc_versi
 %endif
 
 # Just a hack to avoid too high load on secondary arch builders
-%ifarch s390x ppc64le
+%ifarch s390x ppc64le %ix86
 # This works when ran alone, but not in the whole suite. Load and/or timing issues
 rm bin/varnishtest/tests/t02014.vtc
 make -j2 check
@@ -346,6 +351,10 @@ install -D -m 0644 redhat/varnishncsa.service %{buildroot}%{_unitdir}/varnishncs
 install -D -m 0755 redhat/varnishreload %{buildroot}%{_sbindir}/varnishreload
 install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_sysusersdir}/varnish.conf
 
+# tmpfiles.d configuration
+mkdir -p %{buildroot}%{_tmpfilesdir}
+install -m 644 -p %{SOURCE4} %{buildroot}%{_tmpfilesdir}/varnish.conf
+
 echo %{_libdir}/varnish > %{buildroot}%{_sysconfdir}/ld.so.conf.d/%{name}-%{_arch}.conf
 
 # No idea why these ends up with mode 600 in the debug package
@@ -380,6 +389,7 @@ chmod 644 lib/libvmod_*/*.h
 %{_unitdir}/varnish.service
 %{_unitdir}/varnishncsa.service
 %{_sysusersdir}/varnish.conf
+%{_tmpfilesdir}/varnish.conf
 
 %files devel
 %license LICENSE
@@ -410,7 +420,30 @@ test -f /etc/varnish/secret || (uuidgen > /etc/varnish/secret && chmod 0600 /etc
 
 
 %changelog
-* Fri Jun 31 2025 Luboš Uhliarik <luhliari@redhat.com> - 7.7.1-4
+* Tue May 26 2026 Ingvar Hagelund <ingvar@redpill-linpro.com> - 8.0.2-1
+- New upstream release: A security release
+- Includes fix for VSV00019 aka CVE-2026-50052
+
+* Sun May 17 2026 Ingvar Hagelund <ingvar@redpill-linpro.com> - 8.0.1-1
+- New upstream release: A security relase
+- Includes fix for VSV00018, CVE-2026-34475
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 8.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Dec 11 2025 Ingvar Hagelund <ingvar@redpill-linpro.com> - 8.0.0-1
+- New upstream release
+- New pkg-varnish-cache checkout
+- Added cflag -Wno-error=discarded-qualifiers to build on fedora while waiting for upstream
+
+* Wed Oct 29 2025 Luboš Uhliarik <luhliari@redhat.com> - 7.7.3-2
+- Add tmpfiles.d rules for /var directories (bootc compatibility)
+
+* Mon Sep 15 2025 Ingvar Hagelund <ingvar@redpill-linpro.com> - 7.7.3-1
+- New upstream release: A security release
+- Includes fix for VSV00017 aka CVE-2025-8671, rhbz#2388222
+
+* Thu Jul 31 2025 Luboš Uhliarik <luhliari@redhat.com> - 7.7.1-4
 - bundle jemalloc in RHEL
 
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 7.7.1-3

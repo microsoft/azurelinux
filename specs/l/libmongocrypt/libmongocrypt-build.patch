@@ -1,0 +1,27 @@
+From 26e3dc790e7ef828b79a4b02eb38d4303438c57e Mon Sep 17 00:00:00 2001
+From: Remi Collet <remi@remirepo.net>
+Date: Wed, 21 Jan 2026 10:52:50 +0100
+Subject: [PATCH] =?UTF-8?q?MONGOCRYPT-873=20fix=20assignment=20discards=20?=
+ =?UTF-8?q?=E2=80=98const=E2=80=99=20qualifier=20from=20pointer=20target?=
+ =?UTF-8?q?=20type?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ kms-message/test/test_kms_request.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kms-message/test/test_kms_request.c b/kms-message/test/test_kms_request.c
+index efe616a42..fa9ba9c90 100644
+--- a/kms-message/test/test_kms_request.c
++++ b/kms-message/test/test_kms_request.c
+@@ -1118,7 +1118,7 @@ kms_request_kmip_prohibited_test (void)
+ static int
+ count_substrings (const char *big, const char *little)
+ {
+-   char *iter;
++   const char *iter;
+    int count = 0;
+ 
+    iter = strstr (big, little);

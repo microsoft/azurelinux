@@ -1,0 +1,117 @@
+From 9c31bb06590f2d96a2d6d8ce87dc3273c283a671 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Fri, 19 Dec 2025 14:48:13 +0100
+Subject: [PATCH] enroll: fix issues if default keytab is used
+
+librkb5 returns the default keytab with a 'FILE:' prefix which must be
+removed before calling libselinux functions to operate on the keytab
+file.
+
+Resolves: https://issues.redhat.com/browse/RHEL-78631
+---
+ library/adenroll.c | 32 ++++++++++++++++++++------------
+ library/adenroll.h |  3 +--
+ tools/computer.c   |  6 +++---
+ 3 files changed, 24 insertions(+), 17 deletions(-)
+
+diff --git a/library/adenroll.c b/library/adenroll.c
+index 20ad198..9484cbf 100644
+--- a/library/adenroll.c
++++ b/library/adenroll.c
+@@ -2116,30 +2116,38 @@ ensure_host_keytab (adcli_result res,
+ 	return ADCLI_SUCCESS;
+ }
+ 
+-adcli_result
+-ensure_host_keytab_selinux_context (adcli_result res,
+-                                    adcli_enroll *enroll)
++void
++restore_host_keytab_selinux_context (adcli_enroll *enroll)
+ {
+ #ifdef BUILD_SELINUX_POLICY
+ 	int ret;
+-
+-	if (res != ADCLI_SUCCESS)
+-		return res;
++	krb5_context k5;
++	const char *name_start;
+ 
+ 	if (enroll->keytab_name == NULL) {
+ 		_adcli_info ("No keytab name available, skipping SELinux restorecon.");
+-		return ADCLI_SUCCESS;
++		return;
++	}
++
++	name_start = enroll->keytab_name;
++	if (strncmp (name_start, "FILE:", 5) == 0) {
++		name_start = enroll->keytab_name + 5;
+ 	}
+ 
+-	ret = selinux_restorecon (adcli_enroll_get_keytab_name (enroll), 0);
++	if (enroll->keytab != NULL) {
++		k5 = adcli_conn_get_krb5_context (enroll->conn);
++		krb5_kt_close (k5, enroll->keytab);
++		enroll->keytab = NULL;
++	}
++
++	ret = selinux_restorecon (name_start, 0);
+ 	if (ret != 0) {
+-		_adcli_err ("Failed to set SELinux context for %s with error %d: %s",
+-		            enroll->keytab_name, ret, strerror (ret));
+-		return ADCLI_ERR_FAIL;
++		_adcli_err ("Failed to set SELinux context for %s with error %d: %s, ignored",
++		            name_start, ret, strerror (errno));
+ 	}
+ #endif
+ 
+-	return ADCLI_SUCCESS;
++	return;
+ }
+ 
+ 
+diff --git a/library/adenroll.h b/library/adenroll.h
+index 79eb7a8..5aba81b 100644
+--- a/library/adenroll.h
++++ b/library/adenroll.h
+@@ -192,6 +192,5 @@ void               adcli_enroll_set_samba_data_tool     (adcli_enroll *enroll,
+ 
+ const char *       adcli_enroll_get_samba_data_tool     (adcli_enroll *enroll);
+ 
+-adcli_result        ensure_host_keytab_selinux_context  (adcli_result res,
+-                                                         adcli_enroll *enroll);
++void               restore_host_keytab_selinux_context  (adcli_enroll *enroll);
+ #endif /* ADENROLL_H_ */
+diff --git a/tools/computer.c b/tools/computer.c
+index ee027dc..f056366 100644
+--- a/tools/computer.c
++++ b/tools/computer.c
+@@ -520,7 +520,7 @@ adcli_tool_computer_join (adcli_conn *conn,
+ 	else if (show_password)
+ 		dump_password (conn, enroll);
+ 
+-	ensure_host_keytab_selinux_context (ADCLI_SUCCESS, enroll);
++	restore_host_keytab_selinux_context (enroll);
+ 
+ 	adcli_enroll_unref (enroll);
+ 
+@@ -655,7 +655,7 @@ adcli_tool_computer_update (adcli_conn *conn,
+ 	else if (show_password)
+ 		dump_password (conn, enroll);
+ 
+-	ensure_host_keytab_selinux_context (ADCLI_SUCCESS, enroll);
++	restore_host_keytab_selinux_context (enroll);
+ 
+ 	adcli_enroll_unref (enroll);
+ 
+@@ -1275,7 +1275,7 @@ adcli_tool_computer_managed_service_account (adcli_conn *conn,
+ 	else if (show_password)
+ 		dump_password (conn, enroll);
+ 
+-	ensure_host_keytab_selinux_context (ADCLI_SUCCESS, enroll);
++	restore_host_keytab_selinux_context (enroll);
+ 
+ 	adcli_enroll_unref (enroll);
+ 
+-- 
+2.52.0
+

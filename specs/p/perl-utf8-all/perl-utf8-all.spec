@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           perl-utf8-all
-Version:        0.024
-Release: 28%{?dist}
+Version:        0.026
+Release:        1%{?dist}
 Summary:        Turn on Unicode everywhere
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/release/utf8-all
@@ -78,6 +78,12 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Jan 28 2026 Michal Josef Špaček <mspacek@redhat.com> - 0.026-1
+- 0.026 bump
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.024-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.024-25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -33,7 +33,7 @@ There is a limited support for (deprecated) optparse objects, too.
 
 Name:           argparse-manpage
 Version:        4.7
-Release: 6%{?dist}
+Release:        6%{?dist}
 Summary:        %{sum Python}
 BuildArch:      noarch
 
@@ -142,6 +142,10 @@ Requires:       python3-setuptools
 
 %if %{with check}
 %check
+# Disable pip build isolation to make the tests work in offline environment
+# Fixes https://bugzilla.redhat.com/2417959
+export PIP_NO_BUILD_ISOLATION=0
+
 %if %{with python2}
 PYTHONPATH=%buildroot%python2_sitearch %__python2 -m pytest -vv
 %endif
@@ -190,6 +194,16 @@ PYTHONPATH=%buildroot%python3_sitearch %__python3 -m pytest -vv
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.7-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Dec 01 2025 Miro Hrončok <mhroncok@redhat.com> - 4.7-4
+- Fix build with pip 25.3+
+- Fixes: rhbz#2417959
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 4.7-3
 - Rebuilt for Python 3.14.0rc3 bytecode
 

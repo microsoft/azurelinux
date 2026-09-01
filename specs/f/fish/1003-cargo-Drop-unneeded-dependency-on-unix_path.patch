@@ -1,18 +1,26 @@
-From 6e453d2044f0f8a509a4e9fb17c48cde211dc6ed Mon Sep 17 00:00:00 2001
+From 01742bcdcb14ab4804aeeeaeff512128c805d742 Mon Sep 17 00:00:00 2001
 From: Neal Gompa <ngompa@fedoraproject.org>
-Date: Fri, 7 Nov 2025 16:02:20 -0500
+Date: Sat, 28 Mar 2026 07:15:27 -0400
 Subject: [PATCH 1003/1003] cargo: Drop unneeded dependency on unix_path
 
 This is only used for Windows, which we are not building for.
 ---
- Cargo.toml | 3 ---
- 1 file changed, 3 deletions(-)
+ Cargo.toml | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/Cargo.toml b/Cargo.toml
-index 391972c68..dba0ccb7c 100644
+index 0c433f922..0b6ded175 100644
 --- a/Cargo.toml
 +++ b/Cargo.toml
-@@ -129,9 +129,6 @@ fish-gettext-mo-file-parser.workspace = true
+@@ -76,7 +76,6 @@ serial_test = { version = "3", default-features = false }
+ widestring = "1.2.0"
+ unicode-segmentation = "1.12.0"
+ unicode-width = "0.2.0"
+-unix_path = "1.0.1"
+ walkdir = "2.5.0"
+ xterm-color = "1.0.1"
+ 
+@@ -155,9 +154,6 @@ fish-gettext-mo-file-parser.workspace = true
  phf_codegen = { workspace = true, optional = true }
  rsconf.workspace = true
  
@@ -23,5 +31,5 @@ index 391972c68..dba0ccb7c 100644
  crate-type = ["rlib"]
  path = "src/lib.rs"
 -- 
-2.51.1
+2.53.0
 

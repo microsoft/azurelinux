@@ -1,0 +1,27 @@
+From 617a887a6ec7e433f6a9f4c60592ed38b12b9f18 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 2 Dec 2025 16:17:55 +0100
+Subject: login: add /run/motd.d` to the hardcoded MOTD_FILE
+
+Addresses: https://github.com/coreos/console-login-helper-messages/issues/60
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ include/pathnames.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/pathnames.h b/include/pathnames.h
+index 34ba11ca3..c91a077e1 100644
+--- a/include/pathnames.h
++++ b/include/pathnames.h
+@@ -41,7 +41,7 @@
+ #ifndef _PATH_MAILDIR
+ # define _PATH_MAILDIR		"/var/spool/mail"
+ #endif
+-#define	_PATH_MOTDFILE		"/usr/share/misc/motd:/run/motd:/etc/motd"
++#define	_PATH_MOTDFILE		"/usr/share/misc/motd:/run/motd:/run/motd.d:/etc/motd:/etc/motd.d"
+ #ifndef _PATH_NOLOGIN
+ # define _PATH_NOLOGIN		"/etc/nologin"
+ #endif
+-- 
+2.51.1
+

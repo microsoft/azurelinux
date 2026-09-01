@@ -1,0 +1,67 @@
+From 92fcda0792a631eebef413a6608bd9c91794158d Mon Sep 17 00:00:00 2001
+From: Mikolaj Izdebski <mizdebsk@redhat.com>
+Date: Fri, 10 Oct 2025 16:50:15 +0200
+Subject: [PATCH] Port tests to commons-lang3
+
+We want to avoid dependency on commons-text for now.
+---
+ pom.xml                                                     | 4 ++--
+ .../org/apache/commons/cli/example/AptHelpAppendable.java   | 6 +++---
+ .../org/apache/commons/cli/example/XhtmlHelpAppendable.java | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/pom.xml b/pom.xml
+index 2663f3f..95ac48c 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -69,8 +69,8 @@
+     </dependency>
+     <dependency>
+       <groupId>org.apache.commons</groupId>
+-      <artifactId>commons-text</artifactId>
+-      <version>1.14.0</version>
++      <artifactId>commons-lang3</artifactId>
++      <version>3.18.0</version>
+       <scope>test</scope>
+     </dependency>
+     <dependency>
+diff --git a/src/test/java/org/apache/commons/cli/example/AptHelpAppendable.java b/src/test/java/org/apache/commons/cli/example/AptHelpAppendable.java
+index cbedfe2..7e275c1 100644
+--- a/src/test/java/org/apache/commons/cli/example/AptHelpAppendable.java
++++ b/src/test/java/org/apache/commons/cli/example/AptHelpAppendable.java
+@@ -25,8 +25,8 @@ import org.apache.commons.cli.help.FilterHelpAppendable;
+ import org.apache.commons.cli.help.TableDefinition;
+ import org.apache.commons.cli.help.TextStyle;
+ import org.apache.commons.lang3.StringUtils;
+-import org.apache.commons.text.translate.CharSequenceTranslator;
+-import org.apache.commons.text.translate.LookupTranslator;
++import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
++import org.apache.commons.lang3.text.translate.LookupTranslator;
+ 
+ /**
+  * Appends APT formatted text to an {@link Appendable}.
+@@ -45,7 +45,7 @@ public class AptHelpAppendable extends FilterHelpAppendable {
+         escapeAptMap.put("*", "\\*");
+         escapeAptMap.put("+", "\\+");
+         escapeAptMap.put("|", "\\|");
+-        ESCAPE_APT = new LookupTranslator(escapeAptMap);
++        ESCAPE_APT = new LookupTranslator(escapeAptMap.entrySet().stream().map(e -> new CharSequence[]{ e.getKey(), e.getValue() }).toArray(CharSequence[][]::new));
+     }
+ 
+     /**
+diff --git a/src/test/java/org/apache/commons/cli/example/XhtmlHelpAppendable.java b/src/test/java/org/apache/commons/cli/example/XhtmlHelpAppendable.java
+index 51ae058..ee6f2b3 100644
+--- a/src/test/java/org/apache/commons/cli/example/XhtmlHelpAppendable.java
++++ b/src/test/java/org/apache/commons/cli/example/XhtmlHelpAppendable.java
+@@ -24,7 +24,7 @@ import java.util.Objects;
+ import org.apache.commons.cli.help.FilterHelpAppendable;
+ import org.apache.commons.cli.help.TableDefinition;
+ import org.apache.commons.lang3.StringUtils;
+-import org.apache.commons.text.StringEscapeUtils;
++import org.apache.commons.lang3.StringEscapeUtils;
+ 
+ /**
+  * Appends XHTML formatted text to an {@link Appendable}.
+-- 
+2.51.0
+

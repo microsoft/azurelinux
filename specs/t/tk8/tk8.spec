@@ -2,12 +2,12 @@
 # Do not edit manually; changes may be overwritten.
 
 %define majorver 8.6
-%define vers %{majorver}.16
+%define vers %{majorver}.17
 
 Summary: The graphical toolkit for the Tcl scripting language, version 8
 Name: tk8
 Version: %{vers}
-Release: 5%{?dist}
+Release: 2%{?dist}
 Epoch:   1
 License: TCL AND HPND-Pbmplus AND CC-BY-SA-3.0 AND MIT-open-group AND MIT
 URL: http://tcl.sourceforge.net
@@ -120,6 +120,13 @@ ln -s %{_bindir}/wish8 %{_bindir}/wish%{majorver} %{buildroot}%{_usr}/bin/
 %{_datadir}/tk%{majorver}/tkAppInit.c
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.17-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Aug 25 2025 Jaroslav Škarvada  <jskarvad@redhat.com> - 1:8.6.17-1
+- New version
+  Related: rhbz#2386608
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.6.16-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

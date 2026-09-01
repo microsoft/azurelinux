@@ -1,0 +1,162 @@
+From 1e6ce98e3a4ef5c807458a35973af7e3503c678c Mon Sep 17 00:00:00 2001
+From: Sergey Poznyakoff <gray@gnu.org>
+Date: Wed, 5 Jun 2024 18:19:10 +0300
+Subject: [PATCH] Fix spurious diagnostic during extraction of . with
+ --keep-newer-files
+
+Bug reported in https://savannah.gnu.org/bugs/?65838.
+
+Bug introduced by 79d1ac38c1.
+
+* src/extract.c (make_directories): Restore second argument.  This
+reverts the change made in 79d1ac38c1.
+(maybe_recoverable, rename_directory): Update calls to make_directories.
+* tests/extrac27.at: New file.
+* tests/Makefile.am: Add new test.
+* tests/testsuite.at: Likewise.
+---
+ src/extract.c      | 19 ++++++++++---------
+ tests/Makefile.am  |  1 +
+ tests/extrac27.at  | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/testsuite.at |  1 +
+ 4 files changed, 58 insertions(+), 9 deletions(-)
+ create mode 100644 tests/extrac27.at
+
+diff --git a/src/extract.c b/src/extract.c
+index 0fef0562..41f8418f 100644
+--- a/src/extract.c
++++ b/src/extract.c
+@@ -709,9 +709,9 @@ fixup_delayed_set_stat (char const *src, char const *dst)
+ /* After a file/link/directory creation has failed due to ENOENT,
+    create all required directories.  Return zero if all the required
+    directories were created, nonzero (issuing a diagnostic) otherwise.
+-   Set *INTERDIR_MADE if at least one directory was created.  */
++   Set *INTERDIR_MADE (unless NULL) if at least one directory was created. */
+ static int
+-make_directories (char *file_name)
++make_directories (char *file_name, bool *interdir_made)
+ {
+   char *cursor0 = file_name + FILE_SYSTEM_PREFIX_LEN (file_name);
+   char *cursor;	        	/* points into the file name */
+@@ -753,7 +753,8 @@ make_directories (char *file_name)
+ 	  delay_set_stat (file_name,
+ 			  0, mode & ~ current_umask, MODE_RWX,
+ 			  desired_mode, AT_SYMLINK_NOFOLLOW);
+-
++	  if (interdir_made)
++	    *interdir_made = true;
+ 	  print_for_mkdir (file_name, desired_mode);
+ 	  parent_end = NULL;
+ 	}
+@@ -793,6 +794,9 @@ make_directories (char *file_name)
+       errno = parent_errno;
+       mkdir_error (file_name);
+     }
++  else if (interdir_made)
++    *interdir_made = true;
++
+   *parent_end = '/';
+ 
+   return stat_status;
+@@ -910,11 +914,8 @@ maybe_recoverable (char *file_name, bool regular, bool *interdir_made)
+ 
+     case ENOENT:
+       /* Attempt creating missing intermediate directories. */
+-      if (make_directories (file_name) == 0)
+-	{
+-	  *interdir_made = true;
+-	  return RECOVER_OK;
+-	}
++      if (make_directories (file_name, interdir_made) == 0 && *interdir_made)
++	return RECOVER_OK;
+       break;
+ 
+     default:
+@@ -2011,7 +2012,7 @@ rename_directory (char *src, char *dst)
+       switch (e)
+ 	{
+ 	case ENOENT:
+-	  if (make_directories (dst) == 0)
++	  if (make_directories (dst, NULL) == 0)
+ 	    {
+ 	      if (renameat (chdir_fd, src, chdir_fd, dst) == 0)
+ 		return true;
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 5745f69c..5b890b7c 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -136,6 +136,7 @@ TESTSUITE_AT = \
+  extrac23.at\
+  extrac24.at\
+  extrac25.at\
++ extrac27.at\
+  filerem01.at\
+  filerem02.at\
+  dirrem01.at\
+diff --git a/tests/extrac27.at b/tests/extrac27.at
+new file mode 100644
+index 00000000..1992d1bb
+--- /dev/null
++++ b/tests/extrac27.at
+@@ -0,0 +1,46 @@
++# Test suite for GNU tar.                             -*- autotest -*-
++# Copyright 2024 Free Software Foundation, Inc.
++#
++# This file is part of GNU tar.
++#
++# GNU tar is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 3 of the License, or
++# (at your option) any later version.
++#
++# GNU tar is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++
++# Description: When called with --keep-newer-files, tar 1.35 issued
++# spurious diagnostic message:
++#
++#   Unexpected inconsistency when making directory.
++#
++# during extraction of ".".
++#
++# References: https://savannah.gnu.org/bugs/?65838
++
++AT_SETUP([extract current dir with --keep-newer-files])
++AT_KEYWORDS([extract extrac27])
++AT_TAR_CHECK([
++mkdir dir
++touch dir/file
++tar cf a.tar -C dir .
++
++mkdir ext
++tar xv --keep-newer-files -f a.tar -C ext
++],
++[0],
++[./
++./file
++])
++AT_CLEANUP
++
++
++
++
+diff --git a/tests/testsuite.at b/tests/testsuite.at
+index 8a0d39c3..33227ef4 100644
+--- a/tests/testsuite.at
++++ b/tests/testsuite.at
+@@ -353,6 +353,7 @@ m4_include([extrac23.at])
+ m4_include([extrac23.at])
+ m4_include([extrac24.at])
+ m4_include([extrac25.at])
++m4_include([extrac27.at])
+ 
+ m4_include([backup01.at])
+ 
+-- 
+2.45.0
+

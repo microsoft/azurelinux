@@ -11,8 +11,8 @@
 %bcond selinux 1
 
 Name:           frr
-Version:        10.4.1
-Release: 5%{?dist}
+Version:        10.7.0
+Release:        1%{?dist}
 Summary:        Routing daemon
 License:        GPL-2.0-or-later AND ISC AND LGPL-2.0-or-later AND BSD-2-Clause AND BSD-3-Clause AND (GPL-2.0-or-later  OR ISC) AND MIT
 URL:            http://www.frrouting.org
@@ -23,7 +23,6 @@ Source2:        %{name}-sysusers.conf
 Source3:        frr.fc
 Source4:        frr.te
 Source5:        frr.if
-
 Source6:        remove-babeld-ldpd.sh
 
 Patch0000:      0000-remove-babeld-and-ldpd.patch
@@ -72,6 +71,8 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  texinfo
 BuildRequires:  protobuf-c-devel
+# RPKI support
+BuildRequires:  rtrlib-devel
 
 Requires:       ncurses
 Requires:       net-snmp
@@ -97,6 +98,28 @@ EIGRP and BFD.
 
 FRRouting is a fork of Quagga.
 
+%package headers
+Summary: Build headers for FRR
+BuildArch: noarch
+Requires: json-c-devel
+Requires: libyang-devel
+
+%description headers
+Build headers for FRR required to generate out of tree dplane plugins
+
+%package rpki
+Summary: BGP RPKI support (rtrlib)
+Group: System Environment/Daemons
+BuildRequires:  rtrlib-devel >= 0.8
+Requires: %{name}%{_isa} = %{version}-%{release}
+
+%description rpki
+Adds RPKI support to FRR's bgpd, allowing validation of BGP routes
+against cryptographic information stored in WHOIS databases.  This is
+used to prevent hijacking of networks on the wider internet.  It is only
+relevant to internet service providers using their own autonomous system
+number.
+
 %if 0%{?with_selinux}
 %package selinux
 Summary:  Selinux policy for FRR
@@ -116,12 +139,10 @@ SELinux policy modules for FRR package
 #Selinux
 mkdir selinux
 cp -p %{SOURCE3} %{SOURCE4} %{SOURCE5} selinux
-# C++14 or later needed for abseil-cpp 20230125; string_view needs C++17:
-sed -r -i 's/(AX_CXX_COMPILE_STDCXX\(\[)11(\])/\117\2/' configure.ac
 
 %build
-#hopefully just temporary due to rhbz#2327314
-export LDFLAGS="%{build_ldflags} -Wl,-z,noseparate-code"
+# C++17 or later needed for abseil-cpp-20250814
+export CXXFLAGS="%{optflags} -std=gnu++17"
 export CFLAGS="%{optflags} -DINET_NTOP_NO_OVERRIDE"
 autoreconf -ivf
 
@@ -133,8 +154,8 @@ autoreconf -ivf
     --localstatedir=/var \
     --enable-multipath=64 \
     --enable-vtysh=yes \
-    --disable-ospfclient \
-    --disable-ospfapi \
+    --enable-ospfclient \
+    --enable-ospfapi \
     --enable-snmp=agentx \
     --enable-user=frr \
     --enable-group=frr \
@@ -143,11 +164,14 @@ autoreconf -ivf
     --enable-static=no \
     --disable-ldpd \
     --disable-babeld \
+    --with-pkgconfigdir=%{_datadir}/pkgconfig \
     --with-moduledir=%{_libdir}/frr/modules \
     --with-yangmodelsdir=%{_datadir}/frr-yang/ \
     --with-crypto=openssl \
     --enable-fpm \
     --enable-pcre2posix \
+    --enable-rpki \
+    --enable-sharpd \
     %{?with_grpc:--enable-grpc}
 
 %make_build MAKEINFO="makeinfo --no-split" PYTHON=%{__python3}
@@ -163,7 +187,6 @@ bzip2 -9 selinux/%{name}.pp
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/{frr,rc.d/init.d,sysconfig,logrotate.d,pam.d,default} \
-         %{buildroot}%{_localstatedir}/log/frr %{buildroot}%{_localstatedir}/lib/frr \
          %{buildroot}%{_infodir} %{buildroot}%{_unitdir}
 
 mkdir -p -m 0755 %{buildroot}%{_libdir}/frr
@@ -196,9 +219,8 @@ install -D -m 644 selinux/%{name}.if %{buildroot}%{_datadir}/selinux/devel/inclu
 # Delete libtool archives
 find %{buildroot} -type f -name "*.la" -delete -print
 
-#Upstream does not maintain a stable API, these headers from -devel subpackage are no longer needed
+# Upstream does not maintain a stable API
 rm %{buildroot}%{_libdir}/frr/*.so
-rm -r %{buildroot}%{_includedir}/frr/
 
 
 %post
@@ -255,8 +277,6 @@ rm tests/lib/*grpc*
 %license COPYING
 %doc doc/mpls
 %dir %attr(750,frr,frr) %{_sysconfdir}/frr
-%dir %attr(755,frr,frr) %{_localstatedir}/lib/frr
-%dir %attr(755,frr,frr) %{_localstatedir}/log/frr
 %dir %attr(755,frr,frr) /run/frr
 %{_infodir}/*info*
 %{_mandir}/man1/frr.1*
@@ -271,6 +291,7 @@ rm tests/lib/*grpc*
 %{_libdir}/frr/*.so.*
 %dir %{_libdir}/frr/modules
 %{_libdir}/frr/modules/*
+%exclude %{_libdir}/frr/modules/bgpd_rpki.so
 %config(noreplace) %attr(644,root,root) %{_sysconfdir}/logrotate.d/frr
 %config(noreplace) %attr(644,frr,frr) %{_sysconfdir}/frr/daemons
 %config(noreplace) %{_sysconfdir}/pam.d/frr
@@ -280,6 +301,14 @@ rm tests/lib/*grpc*
 %{_tmpfilesdir}/%{name}.conf
 %{_sysusersdir}/%{name}.conf
 
+%files headers
+%dir %{_includedir}/frr/
+%{_includedir}/frr/*
+%{_datadir}/pkgconfig/frr.pc
+
+%files rpki
+%{_libdir}/frr/modules/bgpd_rpki.so
+
 %if 0%{?with_selinux}
 %files selinux
 %{_datadir}/selinux/packages/%{selinuxtype}/%{name}.pp.*
@@ -288,6 +317,39 @@ rm tests/lib/*grpc*
 %endif
 
 %changelog
+* Tue Aug 11 2026 Michal Ruprich <mruprich@redhat.com> - 10.7.0-1
+- New version 10.7.0
+
+* Tue Jun 09 2026 Michal Ruprich <mruprich@redhat.com> - 10.6.1-1
+- New version 10.6.1
+
+* Wed Jan 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 10.5.0-8
+- Rebuilt for abseil-cpp 20260107.0
+
+* Mon Jan 26 2026 Adam Williamson <awilliam@redhat.com> - 10.5.0-7
+- Rebuild with fixed test suite
+
+* Fri Jan 23 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 10.5.0-6
+- Rebuilt for net-snmp 5.9.5.2
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 10.5.0-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 06 2026 Robin Jarry <rjarry@redhat.com> - 10.5.0-4
+- Make frr-headers a noarch package
+- Add missing dependencies to frr-headers
+
+* Mon Dec 22 2025 Michal Ruprich <mruprich@redhat.com> - 10.5.0-3
+- Moving the creation of /var files to tmpfiles.d for immutable systems
+
+* Wed Nov 19 2025 Michal Ruprich <mruprich@redhat.com> - 10.5.0-1
+- New version 10.5.0
+- Enabling RPKI, sharpd ospfapi and ospfclient
+- Adding frr-headers subpackage
+
+* Tue Oct 21 2025 Michal Ruprich <mruprich@redhat.com> - 10.4.1-3
+- Rebuilt for libyang-3.13.5
+
 * Mon Sep 08 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 10.4.1-2
 - Rebuilt for abseil-cpp 20250814.0
 

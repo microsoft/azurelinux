@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:    device-mapper-multipath
-Version: 0.11.1
-Release: 5%{?dist}
+Version: 0.13.1
+Release: 1%{?dist}
 Summary: Tools to manage multipath devices using device-mapper
 # readline uses GPL-3.0-only
 License: GPL-2.0-only AND GPL-3.0-only
@@ -11,26 +11,22 @@ URL:     http://christophe.varoqui.free.fr/
 
 # The source for this package was pulled from upstream's git repo.  Use the
 # following command to generate the tarball
-# curl -L https://github.com/opensvc/multipath-tools/archive/0.11.1.tar.gz -o multipath-tools-0.11.1.tgz
-Source0: multipath-tools-0.11.1.tgz
+# curl -L https://github.com/opensvc/multipath-tools/archive/0.13.1.tar.gz -o multipath-tools-0.13.1.tgz
+Source0: multipath-tools-0.13.1.tgz
 Source1: multipath.conf
-Patch0001: 0001-multipathd-trigger-uevents-for-blacklisted-paths-in-.patch
-Patch0002: 0002-multipath-tools-fix-compilation-with-latest-userspac.patch
-Patch0003: 0003-libmultipath-include-urcu.h-before-urcu-atomic.h.patch
-Patch0004: 0004-libmpathutils-uxsock.c-Include-string.h-for-memcpy.patch
-Patch0005: 0005-RH-fixup-udev-rules-for-redhat.patch
-Patch0006: 0006-RH-Remove-the-property-blacklist-exception-builtin.patch
-Patch0007: 0007-RH-don-t-start-without-a-config-file.patch
-Patch0008: 0008-RH-Fix-nvme-function-missing-argument.patch
-Patch0009: 0009-RH-use-rpm-optflags-if-present.patch
-Patch0010: 0010-RH-add-mpathconf.patch
-Patch0011: 0011-RH-add-wwids-from-kernel-cmdline-mpath.wwids-with-A.patch
-Patch0012: 0012-RH-reset-default-find_mutipaths-value-to-off.patch
-Patch0013: 0013-RH-attempt-to-get-ANA-info-via-sysfs-first.patch
-Patch0014: 0014-RH-make-parse_vpd_pg83-match-scsi_id-output.patch
-Patch0015: 0015-RH-add-scsi-device-handlers-to-modules-load.d.patch
-Patch0016: 0016-RH-compile-with-libreadline-support.patch
-Patch0017: 0017-RH-Add-mpathcleanup.patch
+Patch0001: 0001-RH-fixup-udev-rules-for-redhat.patch
+Patch0002: 0002-RH-Remove-the-property-blacklist-exception-builtin.patch
+Patch0003: 0003-RH-don-t-start-without-a-config-file.patch
+Patch0004: 0004-RH-Fix-nvme-function-missing-argument.patch
+Patch0005: 0005-RH-use-rpm-optflags-if-present.patch
+Patch0006: 0006-RH-add-mpathconf.patch
+Patch0007: 0007-RH-add-wwids-from-kernel-cmdline-mpath.wwids-with-A.patch
+Patch0008: 0008-RH-reset-default-find_mutipaths-value-to-off.patch
+Patch0009: 0009-RH-attempt-to-get-ANA-info-via-sysfs-first.patch
+Patch0010: 0010-RH-make-parse_vpd_pg83-match-scsi_id-output.patch
+Patch0011: 0011-RH-add-scsi-device-handlers-to-modules-load.d.patch
+Patch0012: 0012-RH-compile-with-libreadline-support.patch
+Patch0013: 0013-RH-Add-mpathcleanup.patch
 
 # runtime
 Requires: %{name}-libs = %{version}-%{release}
@@ -118,7 +114,7 @@ This package contains the files needed to develop applications that use
 device-mapper-multipath's libdmmp C API library
 
 %prep
-%autosetup -n multipath-tools-0.11.1 -p1
+%autosetup -n multipath-tools-0.13.1 -p1
 cp %{SOURCE1} .
 
 %build
@@ -170,6 +166,7 @@ fi
 %{_sbindir}/mpathcleanup
 %{_sbindir}/mpathpersist
 %{_unitdir}/multipathd.service
+%{_unitdir}/multipathd-queueing.service
 %{_unitdir}/multipathd.socket
 %{_mandir}/man5/multipath.conf.5*
 %{_mandir}/man8/multipath.8*
@@ -240,6 +237,27 @@ fi
 %{_pkgconfdir}/libdmmp.pc
 
 %changelog
+* Thu Jan 29 2026 Benjamin Marzinski <bmarzins@redhat.com> - 0.13.1-1
+- Update source to upstream release 0.13.1
+- Rebase redhat patches
+- Resolves bz #2433983
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.13.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Nov 13 2025 Benjamin Marzinski <bmarzins@redhat.com> - 0.13.0-2
+- Move STI tests to TMT
+
+* Tue Nov  4 2025 Benjamin Marzinski <bmarzins@redhat.com> - 0.13.0-1
+- Update source to upstream release 0.13.0
+  * Previous patches 0001-0004 are included in the tarball
+- Install /lib/systemd/system/multipathd-queueing.service
+- Rename redhat patches
+  * Previous patches 0005-0017 are now patches 0001-0013
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.11.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -54,7 +54,7 @@ It supports RPMs, modules and comps groups & environments.
 
 Name:           dnf
 Version:        4.24.0
-Release: 4%{?dist}
+Release:        3%{?dist}
 Summary:        %{pkg_summary}
 # For a breakdown of the licensing, see PACKAGE-LICENSING
 License:        GPL-2.0-or-later AND GPL-1.0-only
@@ -419,6 +419,12 @@ fi
 # bootc subpackage does not include any files
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.24.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 4.24.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Tue Oct 21 2025 Petr Pisar <ppisar@redhat.com> - 4.24.0-1
 - 4.24.0 bump
 

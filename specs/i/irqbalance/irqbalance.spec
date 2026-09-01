@@ -2,23 +2,22 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           irqbalance
-Version:        1.9.4
-Release: 10%{?dist}
+Version:        1.9.5
+Release:        2%{?dist}
 Epoch:          2
 Summary:        IRQ balancing daemon
 License:        GPL-2.0-only
 URL:            https://github.com/Irqbalance/irqbalance
 Source0:        %{url}/archive/v%{version}/irqbalance-%{version}.tar.gz
-Patch1:         irqbalance-1.9.0-environment-file-sysconfig.patch
-Patch2:         0001-irqbalance-ui-check-if-using-a-negative-index-of-buf.patch
-Patch3:         0001-Drop-ProtectKernelTunables.patch
-# https://github.com/Irqbalance/irqbalance/commit/b6a831d692ed7e12db7748db49b3b39516d151d2
-Patch4:         b6a831d692ed7e12db7748db49b3b39516d151d2.patch
 
-BuildRequires:  autoconf automake libtool libcap-ng
-BuildRequires:  glib2-devel pkgconf libcap-ng-devel
-BuildRequires:  systemd-devel ncurses-devel
-BuildRequires:  make
+BuildRequires: gcc
+BuildRequires: glib2-devel
+BuildRequires: libcap-ng-devel
+BuildRequires: meson
+BuildRequires: ncurses-devel
+BuildRequires: systemd
+BuildRequires: systemd-devel
+BuildRequires: libnl3-devel
 Requires: ncurses-libs
 
 %ifnarch %{arm}
@@ -26,36 +25,39 @@ BuildRequires:  numactl-devel
 Requires: numactl-libs
 %endif
 
-ExcludeArch: s390 s390x
+ExcludeArch: s390 s390x %{ix86}
 
 %description
-irqbalance is a daemon that evenly distributes IRQ load across
-multiple CPUs for enhanced performance.
+irqbalance is a daemon that evenly distributes IRQ load across multiple CPUs
+for enhanced performance.
 
 %prep
 %autosetup -p1
 
 %build
-./autogen.sh
-%configure --with-systemd
-%{make_build}
+# Move default config file from /usr/etc/default to /usr/lib/irqbalance to not
+# conflict with ostree/rpm-ostree/bootc's usage of /usr/etc.
+# Use /etc/sysconfig/irqbalance as admin config file to keep compatibility with
+# existing installations on update.
+%meson \
+    -Dpkgconfdir=%{_prefix}/lib/irqbalance \
+    -Dusrconfdir=%{_sysconfdir}/sysconfig
+%meson_build
 
 %install
-install -D -p -m 0755 %{name} %{buildroot}%{_sbindir}/%{name}
-install -D -p -m 0644 ./misc/irqbalance.service %{buildroot}/%{_unitdir}/irqbalance.service
-install -D -p -m 0644 ./misc/irqbalance.env %{buildroot}%{_sysconfdir}/sysconfig/%{name}
-install -d %{buildroot}%{_mandir}/man1/
-install -p -m 0644 ./irqbalance.1 %{buildroot}%{_mandir}/man1/
+%meson_install
 
 %check
-make check
+%meson_test
 
 %files
 %doc COPYING AUTHORS
-%{_sbindir}/irqbalance
+%{_bindir}/irqbalance
+%{_bindir}/irqbalance-ui
 %{_unitdir}/irqbalance.service
 %{_mandir}/man1/*
-%config(noreplace) %{_sysconfdir}/sysconfig/irqbalance
+%{_prefix}/lib/irqbalance/irqbalance.env
+%ghost %config(noreplace) %{_sysconfdir}/sysconfig/irqbalance
 
 %post
 %systemd_post irqbalance.service
@@ -67,6 +69,14 @@ make check
 %systemd_postun_with_restart irqbalance.service
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.9.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Dec 11 2025 Timothée Ravier <tim@siosm.fr> - 2:1.9.5-1
+- Update to 1.9.5 (#2420042)
+- Switch build system to meson
+- Don't build for i686
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2:1.9.4-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

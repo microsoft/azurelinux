@@ -14,15 +14,13 @@ index 0000000..d49fdc5
 +Version: @FIREBIRD_VERSION@
 +Cflags: -I${includedir}/firebird
 +Libs: -L${libdir} -lfbclient
-diff --git a/configure.ac b/configure.ac
-index 0a3de36..922c778 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1307,6 +1307,7 @@ case "$PLATFORM" in
+--- Firebird-5.0.3.1683-0-source/configure.ac~	2025-07-14 01:33:58.000000000 -0500
++++ Firebird-5.0.3.1683-0-source/configure.ac	2025-09-26 10:42:45.022624859 -0500
+@@ -1540,6 +1540,7 @@
          gen/install/misc/firebird.init.d.gentoo:builds/install/arch-specific/linux/firebird.init.d.gentoo.in
          gen/install/misc/firebird.init.d.slackware:builds/install/arch-specific/linux/firebird.init.d.slackware.in
          gen/install/misc/rc.config.firebird:builds/install/arch-specific/linux/rc.config.firebird.in
 +        gen/install/misc/fbclient.pc:builds/install/arch-specific/linux/misc/fbclient.pc.in
-         gen/Release/firebird/bin/linuxLibrary.sh:builds/install/arch-specific/linux/linuxLibrary.sh.in
          gen/install/misc/firebird.service:builds/install/arch-specific/linux/firebird.service.in
      ],
+ 	[chmod a+x gen/install/*sh 2>/dev/null])

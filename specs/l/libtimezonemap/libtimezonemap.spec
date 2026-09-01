@@ -2,21 +2,21 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           libtimezonemap
-Version:        0.4.5.3
-Release: 10%{?dist}
+Version:        0.4.5.4
+Release:        2%{?dist}
 Summary:        Time zone map widget for Gtk+
 
 # Automatically converted from old format: GPLv3 - review is highly recommended.
 License:        GPL-3.0-only
 URL:            https://launchpad.net/timezonemap
-Source0:        https://github.com/dashea/timezonemap/archive/%{version}.tar.gz
+Source0:        https://codeberg.org/dashea/timezonemap/archive/%{version}.tar.gz
 
 BuildRequires:  autoconf automake libtool
 BuildRequires:  glib2-devel >= 2.26
 BuildRequires:  gtk3-devel >= 3.1.4
 BuildRequires:  json-glib-devel
 BuildRequires:  gobject-introspection-devel
-BuildRequires:  libsoup-devel >= 2.42.0
+BuildRequires:  libsoup3-devel >= 3.0.7
 BuildRequires:  librsvg2-devel
 BuildRequires: make
 
@@ -37,7 +37,7 @@ libtimezonemap is a time zone map widget for Gtk+. This package contains header
 files used for building applications that use %{name}.
 
 %prep
-%autosetup -n timezonemap-%{version}
+%autosetup -n timezonemap
 
 %build
 ./autogen.sh
@@ -65,6 +65,12 @@ rm -f %{buildroot}%{_libdir}/*.la
 %{_datadir}/glade/catalogs/TimezoneMap.xml
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.5.4-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Oct 16 2025 David Shea <reallylongword@gmail.com> - 0.4.5.4-1
+- Update to use libsoup3
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.4.5.3-7
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

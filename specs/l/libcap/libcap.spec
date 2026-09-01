@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name: libcap
-Version: 2.76
-Release: 7%{?dist}
+Version: 2.78
+Release: 1%{?dist}
 Summary: Library for getting and setting POSIX.1e capabilities
 URL: https://sites.google.com/site/fullycapable/
 License: BSD-3-Clause OR GPL-2.0-only
@@ -124,6 +124,21 @@ chmod +x %{buildroot}/%{_libdir}/*.so.*
 %endif
 
 %changelog
+* Mon Apr 06 2026 Carlos Rodriguez-Fernandez <carlosrodrifernandez@gmail.com> - 2.78-1
+- Update to 2.78 (rhbz#2455366)
+
+* Tue Feb 03 2026 Maxwell G <maxwell@gtmx.me> - 2.77-3
+- Rebuild for https://fedoraproject.org/wiki/Changes/golang1.26
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.77-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Oct 28 2025 Carlos Rodriguez-Fernandez <carlosrodrifernandez@gmail.com> - 2.77-1
+- Update to version 2.77 (rhbz#2406446)
+
+* Fri Oct 10 2025 Alejandro Sáez <asm@redhat.com> - 2.76-4
+- rebuild
+
 * Fri Aug 15 2025 Maxwell G <maxwell@gtmx.me> - 2.76-3
 - Rebuild for golang-1.25.0
 

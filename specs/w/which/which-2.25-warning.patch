@@ -1,0 +1,18 @@
+Fix a warning:
+
+which.c:584:55: warning: suggest parentheses around ‘&&’ within ‘||’ [-Wparentheses]
+  584 |     if (homelen == 0 || !IS_DIRSEP(home[homelen - 1]) && homelen < sizeof(home) - 1)
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+diff -up which-2.25/which.c.me which-2.25/which.c
+--- which-2.25/which.c.me	2026-05-29 17:17:12.948224801 +0200
++++ which-2.25/which.c	2026-05-29 17:16:36.106870955 +0200
+@@ -581,7 +581,7 @@ int main(int argc, char *argv[])
+     strncpy(home, h, sizeof(home));
+     home[sizeof(home) - 1] = 0;
+     homelen = strlen(home);
+-    if (homelen == 0 || !IS_DIRSEP(home[homelen - 1]) && homelen < sizeof(home) - 1)
++    if (homelen == 0 || (!IS_DIRSEP(home[homelen - 1]) && homelen < sizeof(home) - 1))
+     {
+       home[homelen] = DIR_SEPARATOR;
+       home[homelen + 1] = '\0';

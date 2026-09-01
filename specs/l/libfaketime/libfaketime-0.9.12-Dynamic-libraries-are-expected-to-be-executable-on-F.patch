@@ -1,0 +1,25 @@
+From 54a620a45f6d2f125314ad4155dce05ef3819aeb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Tue, 6 Jan 2026 10:02:14 +0100
+Subject: [PATCH] Dynamic libraries are expected to be executable on Fedora
+
+---
+ src/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index d40c90b..3663cc5 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -187,7 +187,7 @@ install: ${LIBS} ${BINS}
+ 	@echo
+ 	@echo "Copying the faketime libraries to ${DESTDIR}${PREFIX}${LIBDIRNAME} and the faketime wrapper script to ${DESTDIR}${PREFIX}/bin ..."
+ 	$(INSTALL) -dm0755 "${DESTDIR}${PREFIX}${LIBDIRNAME}/"
+-	$(INSTALL) -m0644 ${LIBS} "${DESTDIR}${PREFIX}${LIBDIRNAME}/"
++	$(INSTALL) -m0755 ${LIBS} "${DESTDIR}${PREFIX}${LIBDIRNAME}/"
+ 	$(INSTALL) -Dm0755 faketime "${DESTDIR}${PREFIX}/bin/faketime"
+ 
+ uninstall:
+-- 
+2.52.0
+

@@ -60,7 +60,7 @@ dnl # Basic sendmail TLS configuration with self-signed certificate for
 dnl # inbound SMTP (and also opportunistic TLS for outbound SMTP).
 dnl #
 define(`confCACERT_PATH', `/etc/pki/tls/certs')dnl
-define(`confCACERT', `/etc/pki/tls/certs/ca-bundle.crt')dnl
+define(`confCACERT', `/etc/pki/tls/certs/sendmail.pem')dnl
 define(`confSERVER_CERT', `/etc/pki/tls/certs/sendmail.pem')dnl
 define(`confSERVER_KEY', `/etc/pki/tls/private/sendmail.key')dnl
 define(`confTLS_SRV_OPTIONS', `V')dnl

@@ -3,8 +3,8 @@
 
 Summary: A set of basic GNU tools commonly used in shell scripts
 Name:    coreutils
-Version: 9.7
-Release: 10%{?dist}
+Version: 9.10
+Release: 5%{?dist}
 # some used parts of gnulib are under various variants of LGPL
 License: GPL-3.0-or-later AND GFDL-1.3-no-invariants-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
 Url:     https://www.gnu.org/software/coreutils/
@@ -35,28 +35,20 @@ Patch103: coreutils-python3.patch
 # df --direct
 Patch104: coreutils-df-direct.patch
 
-# cp/mv: do not fail when copying of trivial NFSv4 ACLs fails (rhbz#2363149)
-# https://git.savannah.gnu.org/cgit/gnulib.git/patch?id=8a356b77717a2e4f735ec06e326880ca1f61aadb
-# https://git.savannah.gnu.org/cgit/gnulib.git/patch?id=955360a66c99bdd9ac3688519a8b521b06958fd3
-Patch105: coreutils-9.6-cp-improve-nfsv4-acl-support.patch
+# tests: fix "Hangup" termination of non-interactive runs
+# https://github.com/coreutils/coreutils/commit/8fab3c6d30d812cd681e51221bae27930f62615a
+Patch200: coreutils-9.10-fix-tests-hangup.patch
 
-# sort: fix buffer under-read (CVE-2025-5278)
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=8c9602e3a145e9596dc1a63c6ed67865814b6633
-Patch106: coreutils-CVE-2025-5278.patch
+# fold: fix output truncation with 0xFF bytes in input
+# https://github.com/coreutils/coreutils/commit/a85e9182b1d173c26205dada54133cd9e9174fc1
+Patch201: coreutils-9.10-fold-xFF-truncation.patch
 
-# stty: add support for arbitrary baud rates (rhbz#2375439)
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=357fda90d15fd3f7dba61e1ab322b183a48d0081
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=efaec8078142996d958b6720b85a13b12497c3d0
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=b7db7757831e93ca44ae59e1921bc4ebbc87974f
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=8b05eca972f70858749a946ac24f08d0718c1be6
-# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/patch/?id=3d35b3c0e56bd556c90dc98c3e5e2e7289b0eb0d
-Patch107: coreutils-9.7-stty-arbitrary-baud-rates.patch
+# CVE-2026-56391 - uniq: fix read overrun with -w
+# https://cgit.git.savannah.gnu.org/cgit/coreutils.git/commit/?id=d64e35a8a4c0e4608321433e0d84d917e4e36371
+Patch202: coreutils-9.11-CVE-2026-56391.patch
 
 # (sb) lin18nux/lsb compliance - multibyte functionality patch
 Patch800: coreutils-i18n.patch
-
-# downstream SELinux options deprecated since 2009
-Patch950: coreutils-selinux.patch
 
 Conflicts: filesystem < 3
 
@@ -102,10 +94,7 @@ BuildRequires: python3-inotify
 
 %if 23 < 0%{?fedora} || 7 < 0%{?rhel}
 # needed by i18n test-cases
-BuildRequires: glibc-langpack-en
-BuildRequires: glibc-langpack-fr
-BuildRequires: glibc-langpack-ko
-BuildRequires: glibc-langpack-sv
+BuildRequires: glibc-all-langpacks
 %endif
 
 Requires: %{name}-common = %{version}-%{release}
@@ -179,7 +168,13 @@ find tests -name '*.sh' -perm 0644 -print -exec chmod 0755 '{}' '+'
 
 # FIXME: Force a newer gettext version to workaround `autoreconf -i` errors
 # with coreutils 9.6 and bundled gettext 0.19.2 from gettext-common-devel.
-sed -i 's/0.19.2/0.22.5/' bootstrap.conf configure.ac
+sed -i "s/0.19.2/$(rpm -q --queryformat '%%{VERSION}\n' gettext-devel)/" bootstrap.conf configure.ac
+
+%if 0%{?rhel}
+# Temporarily disable test-getaddrinfo from gnulib because it malfunctions in
+# the environment used to bootstrap RHEL.
+sed -i 's/TESTS += test-getaddrinfo//' gnulib-tests/gnulib.mk
+%endif
 
 autoreconf -fiv
 
@@ -215,6 +210,7 @@ for type in separate single; do
              --enable-install-program=arch \
              --enable-no-install-program=kill,uptime \
              --enable-systemd \
+             --enable-manual-url \
              --with-tty-group \
              DEFAULT_POSIX2_VERSION=200112 alternative=199209 || :
   %make_build all V=1
@@ -304,11 +300,47 @@ rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 %license COPYING
 
 %changelog
-* Fri Jan 16 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-7
-- fold: fix processing of malformed UTF-8 sequences
+* Mon Aug 03 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.10-5
+- CVE-2026-56391 - uniq: fix read overrun with -w (rhbz#2507449)
 
-* Mon Sep 29 2025 Lukáš Zaoral <lzaoral@redhat.com> - 9.7-6
+* Thu Jun 11 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.10-4
+- unexpand: fix heap overflows
+
+* Thu Mar 05 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.10-3
+- fix possible hangups during testsuite execution
+- rewrite (un)expand multibyte support using the mbbuf module (rhbz#2443041)
+
+* Tue Feb 24 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.10-2
+- enable the execution of the downstream df/direct.sh test
+- temporarily disable test-getaddrinfo on RHEL builds
+
+* Thu Feb 05 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.10-1
+- rebase to the latest upstream release (rhbz#2436690)
+- enable manual URLs in --help
+- use glibc-all-langpacks to make sure that all locale data required by tests
+  will be always present
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.9-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 9.9-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Tue Jan 13 2026 Lukáš Zaoral <lzaoral@redhat.com> - 9.9-2
+- fix cut test failure on aarch64 rawhide (rhbz#2424302)
+
+* Wed Nov 26 2025 Lukáš Zaoral <lzaoral@redhat.com> - 9.9-1
+- rebase to latest upstream release (rhbz#2413803)
+
+* Mon Sep 29 2025 Lukáš Zaoral <lzaoral@redhat.com> - 9.8-3
 - require gnulib-l10n for translations of gnulib messages (rhbz#2393892)
+
+* Thu Sep 25 2025 Lukáš Zaoral <lzaoral@redhat.com> - 9.8-2
+- tail: fix tailing larger number of lines in regular files (rhbz#2398008)
+
+* Wed Sep 24 2025 Lukáš Zaoral <lzaoral@redhat.com> - 9.8-1
+- rebase to latest upstream release (rhbz#2397467)
+- remove downstream patch for selinux options deprecated since 2009
 
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 9.7-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

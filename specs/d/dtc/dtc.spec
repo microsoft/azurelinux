@@ -10,28 +10,24 @@
 %undefine _auto_set_build_flags
 
 Name:          dtc
-Version:       1.7.2
-Release: 12%{?dist}
+Version:       1.8.0
+Release:       1%{?dist}
 Summary:       Device Tree Compiler
 License:       GPL-2.0-or-later
 URL:           https://devicetree.org/
-
 Source0:       https://www.kernel.org/pub/software/utils/%{name}/%{name}-%{version}.tar.xz
-Patch0001:     0001-build-fix-Dtools-false-build.patch
 
-BuildRequires: gcc make
-BuildRequires: flex bison swig
+BuildRequires: gcc
+BuildRequires: meson
 BuildRequires: python3-devel
-BuildRequires: python3-pip
 BuildRequires: python3-setuptools
-BuildRequires: python3-setuptools_scm
-BuildRequires: python3-wheel
+BuildRequires: libyaml-devel
+BuildRequires: swig bison flex
+BuildRequires: valgrind-devel
 
 %if %{with_mingw}
 BuildRequires: mingw32-filesystem >= 95
 BuildRequires: mingw32-gcc-c++
-
-BuildRequires: meson
 
 BuildRequires: mingw64-filesystem >= 95
 BuildRequires: mingw64-gcc-c++
@@ -112,25 +108,20 @@ This package provides the static library of mingw64-libfdt
 
 %prep
 %autosetup -p1
-# to prevent setuptools from installing an .egg, we need to pass --root to setup.py install
-# since $(PREFIX) already contains %%{buildroot}, we set root to /
-# .eggs are going to be deprecated, see https://github.com/pypa/pip/issues/11501
-sed -i 's@--prefix=$(PREFIX)@--prefix=$(PREFIX) --root=/@' pylibfdt/Makefile.pylibfdt
 
 
 %build
-export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%{make_build} EXTRA_CFLAGS="%{build_cflags}" LDFLAGS="%{build_ldflags}"
+%meson
+%meson_build
 
 %if %{with_mingw}
 %mingw_meson -Dtools=false -Dtests=false
 %mingw_ninja
 %endif
 
+
 %install
-export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
-%{make_install} V=1 DESTDIR=%{buildroot} PREFIX=%{buildroot}/%{_prefix} \
-                LIBDIR=%{_libdir} BINDIR=%{_bindir} INCLUDEDIR=%{_includedir}
+%meson_install
 
 %if %{with_mingw}
 %mingw_ninja_install
@@ -142,7 +133,10 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %files
 %license GPL
 %doc Documentation/manual.txt
-%{_bindir}/*
+%{_bindir}/convert-dtsv0
+%{_bindir}/dtc
+%{_bindir}/dtdiff
+%{_bindir}/fdt*
 
 %files -n libfdt
 %license GPL
@@ -153,10 +147,10 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 
 %files -n libfdt-devel
 %{_libdir}/libfdt.so
+%{_libdir}/pkgconfig/libfdt.pc
 %{_includedir}/*fdt*
 
 %files -n python3-libfdt
-%{python3_sitearch}/libfdt-%{version}-py%{python3_version}.egg-info/
 %{python3_sitearch}/_libfdt%{python3_ext_suffix}
 %pycached %{python3_sitearch}/libfdt.py
 
@@ -169,7 +163,7 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %{mingw32_libdir}/pkgconfig/libfdt.pc
 
 %files -n mingw32-libfdt-static
-%{mingw32_libdir}/libfdt.a
+#%{mingw32_libdir}/libfdt.a
 
 %files -n mingw64-libfdt
 %license GPL
@@ -179,10 +173,19 @@ export SETUPTOOLS_SCM_PRETEND_VERSION=%{version}
 %{mingw64_libdir}/pkgconfig/libfdt.pc
 
 %files -n mingw64-libfdt-static
-%{mingw64_libdir}/libfdt.a
+#%{mingw64_libdir}/libfdt.a
 %endif
 
 %changelog
+* Wed May 27 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1.8.0-1
+- Update to 1.8.0
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.7.2-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Sun Jan 11 2026 Peter Robinson <pbrobinson@fedoraproject.org> - 1.7.2-8
+- Add patch to fix discarded const qualifiers
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1.7.2-7
 - Rebuilt for Python 3.14.0rc3 bytecode
 

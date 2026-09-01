@@ -4,7 +4,7 @@
 Name:    libassuan
 Summary: GnuPG IPC library
 Version: 2.5.7
-Release: 7%{?dist}
+Release: 5%{?dist}
 
 # The library is LGPLv2+, the documentation GPLv3+
 License: GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later
@@ -80,6 +80,9 @@ make check
 
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.7-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 2.5.7-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

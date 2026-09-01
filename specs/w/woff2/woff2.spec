@@ -5,7 +5,7 @@
 
 Name:           woff2
 Version:        1.0.2
-Release: 26%{?dist}
+Release:        25%{?dist}
 Summary:        Web Open Font Format 2.0 library
 
 License:        MIT
@@ -43,6 +43,7 @@ Development files and utils for %{name}
 
 %prep
 %autosetup -p1 -n %{name}-%{version}
+sed -i 's/VERSION 2.8.6/VERSION 3.5...4.0/g' CMakeLists.txt
 
 %build
 %cmake \
@@ -82,6 +83,12 @@ cd -
 %{_libdir}/pkgconfig/libwoff2enc.pc
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Sep 04 2025 Parag Nemade <pnemade AT redhat DOT com> - 1.0.2-24
+- Update cmake_minimum_required variable for CMake4.0 Change proposal(#2381636)
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.2-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

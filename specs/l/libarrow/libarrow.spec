@@ -33,15 +33,15 @@
 %bcond_without have_utf8proc
 
 Name:		libarrow
-Version:	20.0.0
-Release: 13%{?dist}
+Version:	23.0.1
+Release:	1%{?dist}
 Summary:	A toolbox for accelerated data interchange and in-memory processing
 License:	Apache-2.0
 URL:		https://arrow.apache.org/
 Requires:	%{name}-doc = %{version}-%{release}
 Source0:	https://downloads.apache.org/arrow/arrow-%{version}/apache-arrow-%{version}.tar.gz
-Patch0001:	0001-python-pyarrow-tests-read_record_patch.py.patch
-Patch0002:	0002-python-pyarrow-tests-test_ipc.py.patch
+Patch:		0001-python-pyarrow-tests-read_record_patch.py.patch
+Patch:		0002-python-pyarrow-tests-test_ipc.py.patch
 
 # Apache ORC (liborc) has numerous compile errors and apparently assumes
 # a 64-bit build and runtime environment. This is only consumer of the liborc
@@ -117,10 +117,6 @@ fast data access without serialization overhead
 
 %files
 %{_libdir}/libarrow.so.*
-%exclude %{python3_sitearch}/benchmarks/*
-%exclude %{python3_sitearch}/cmake_modules/*
-%exclude %{python3_sitearch}/examples/*
-%exclude %{python3_sitearch}/scripts/*
 
 #--------------------------------------------------------------------
 
@@ -147,6 +143,7 @@ Obsoletes:	gandiva-glib-doc < %{version}-%{release}
 %package devel
 Summary:	Libraries and header files for Apache Arrow C++
 Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	%{name}-compute-devel = %{version}-%{release}
 Requires:	brotli-devel
 Requires:	bzip2-devel
 Requires:	libzstd-devel
@@ -171,6 +168,7 @@ Libraries and header files for Apache Arrow C++.
 %dir %{_includedir}/arrow/
      %{_includedir}/arrow/*
 %exclude %{_includedir}/arrow/dataset/
+%exclude %{_includedir}/arrow/compute/
 %if %{with use_flight}
 %exclude %{_includedir}/arrow/flight/
 %exclude %{_includedir}/arrow-flight-glib
@@ -190,7 +188,6 @@ Libraries and header files for Apache Arrow C++.
      %{_libdir}/cmake/Arrow/ArrowTargets*.cmake
      %{_libdir}/cmake/Arrow/arrow-config.cmake
 %{_libdir}/libarrow.so
-%{_libdir}/pkgconfig/arrow-compute.pc
 %{_libdir}/pkgconfig/arrow-csv.pc
 %{_libdir}/pkgconfig/arrow-filesystem.pc
 %{_libdir}/pkgconfig/arrow-json.pc
@@ -198,6 +195,36 @@ Libraries and header files for Apache Arrow C++.
 %{_libdir}/pkgconfig/arrow.pc
 %{_datadir}/arrow/gdb/gdb_arrow.py
 %{_datadir}/gdb/auto-load%{_libdir}/libarrow.so.*-gdb.py
+
+#--------------------------------------------------------------------
+
+%package compute-libs
+Summary:	C++ library to read and write semantic datasets
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	%{name}-doc = %{version}-%{release}
+
+%description compute-libs
+This package contains the libraries for Apache Arrow Compute
+
+%files compute-libs
+%{_libdir}/libarrow_compute.so.*
+
+#--------------------------------------------------------------------
+
+%package compute-devel
+Summary:	Libraries and header files for Apache Arrow compute
+Requires:	%{name}%{?_isa} = %{version}-%{release}
+Requires:	%{name}-compute-libs%{?_isa} = %{version}-%{release}
+
+%description compute-devel
+Libraries and header files for Apache Arrow Compute
+
+%files compute-devel
+%dir %{_includedir}/arrow/compute/
+     %{_includedir}/arrow/compute/*
+%{_libdir}/cmake/ArrowCompute/*.cmake
+%{_libdir}/libarrow_compute.so
+%{_libdir}/pkgconfig/arrow-compute.pc
 
 #--------------------------------------------------------------------
 
@@ -272,7 +299,7 @@ This package contains the libraries for Apache Arrow Flight.
 %{_libdir}/libarrow_flight.so.*
 %{_libdir}/libarrow-flight-glib.so.*
 %dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/ArrowFlight-1.0.typelib
+     %{_libdir}/girepository-1.0/ArrowFlight-23.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -294,6 +321,8 @@ Libraries and header files for Apache Arrow Flight.
 %{_libdir}/libarrow-flight-glib.so
 %{_libdir}/pkgconfig/arrow-flight.pc
 %{_libdir}/pkgconfig/arrow-flight-glib.pc
+%dir %{_datadir}/gir-1.0/
+     %{_datadir}/gir-1.0/ArrowFlight-23.0.gir
 %endif
 
 #--------------------------------------------------------------------
@@ -488,7 +517,7 @@ This package contains the libraries for Apache Arrow GLib.
 %files glib-libs
 %{_libdir}/libarrow-glib.so.*
 %dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/Arrow-1.0.typelib
+     %{_libdir}/girepository-1.0/Arrow-23.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -512,8 +541,7 @@ Libraries and header files for Apache Arrow GLib.
 %dir %{_datadir}/arrow-glib/
      %{_datadir}/arrow-glib/*
 %dir %{_datadir}/gir-1.0/
-     %{_datadir}/gir-1.0/Arrow-1.0.gir
-     %{_datadir}/gir-1.0/ArrowFlight-1.0.gir
+     %{_datadir}/gir-1.0/Arrow-23.0.gir
 
 #--------------------------------------------------------------------
 
@@ -530,7 +558,7 @@ This package contains the libraries for Apache Arrow dataset GLib.
 %files dataset-glib-libs
 %{_libdir}/libarrow-dataset-glib.so.*
 %dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/ArrowDataset-1.0.typelib
+     %{_libdir}/girepository-1.0/ArrowDataset-23.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -550,7 +578,7 @@ Libraries and header files for Apache Arrow dataset GLib.
 %{_libdir}/libarrow-dataset-glib.so
 %{_libdir}/pkgconfig/arrow-dataset-glib.pc
 %dir %{_datadir}/gir-1.0/
-     %{_datadir}/gir-1.0/ArrowDataset-1.0.gir
+     %{_datadir}/gir-1.0/ArrowDataset-23.0.gir
 
 #--------------------------------------------------------------------
 
@@ -566,8 +594,6 @@ This package contains the libraries for Gandiva GLib.
 
 %files -n gandiva-glib-libs
 %{_libdir}/libgandiva-glib.so.*
-%dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/Gandiva-1.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -584,8 +610,6 @@ Libraries and header files for Gandiva GLib.
      %{_includedir}/gandiva-glib/*
 %{_libdir}/libgandiva-glib.so
 %{_libdir}/pkgconfig/gandiva-glib.pc
-%dir %{_datadir}/gir-1.0/
-     %{_datadir}/gir-1.0/Gandiva-1.0.gir
 %endif
 
 %if %{with use_plasma}
@@ -602,8 +626,6 @@ This package contains the libraries for Plasma GLib.
 
 %files -n plasma-glib-libs
 %{_libdir}/libplasma-glib.so.*
-%dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/Plasma-1.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -621,8 +643,6 @@ Libraries and header files for Plasma GLib.
      %{_includedir}/plasma-glib/*
 %{_libdir}/libplasma-glib.so
 %{_libdir}/pkgconfig/plasma-glib.pc
-%dir %{_datadir}/gir-1.0/
-     %{_datadir}/gir-1.0/Plasma-1.0.gir
 %endif
 
 #--------------------------------------------------------------------
@@ -640,7 +660,7 @@ This package contains the libraries for Apache Parquet GLib.
 %files -n parquet-glib-libs
 %{_libdir}/libparquet-glib.so.*
 %dir %{_libdir}/girepository-1.0/
-     %{_libdir}/girepository-1.0/Parquet-1.0.typelib
+     %{_libdir}/girepository-1.0/Parquet-23.0.typelib
 
 #--------------------------------------------------------------------
 
@@ -660,7 +680,7 @@ Libraries and header files for Apache Parquet GLib.
 %{_libdir}/libparquet-glib.so
 %{_libdir}/pkgconfig/parquet-glib.pc
 %dir %{_datadir}/gir-1.0/
-     %{_datadir}/gir-1.0/Parquet-1.0.gir
+     %{_datadir}/gir-1.0/Parquet-23.0.gir
 
 #--------------------------------------------------------------------
 
@@ -828,27 +848,42 @@ export LD_LIBRARY_PATH='%{buildroot}%{_libdir}'
 #--------------------------------------------------------------------
 
 %changelog
-* Mon Jan 12 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 20.0.0-10
-- Arrow 20.0.0, rebuild with ORC (liborc) 2.1.4
+* Wed Feb 18 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 23.0.1-1
+- apache arrow 23.0.1 GA
 
-* Wed Sep 24 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 20.0.0-9
-- Arrow 20.0.0, rebuild with Python 3.14.0rc3, abseil-cpp-20250814.0-1
-- rhbz#2396709
+* Wed Jan 28 2026 Benjamin A. Beasley <code@musicinmybrain.net> - 23.0.0-2
+- Rebuilt for abseil-cpp 20260107.0
 
-* Mon Sep 22 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 20.0.0-8
-- Arrow 20.0.0, rebuild with Python, abseil-cpp-202514.1-1
-- rhbz#2396709
+* Wed Jan 28 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 23.0.0-1
+- Arrow 23.0.0 GA f44-build-side-127546
 
-* Mon Sep 22 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 20.0.0-7
-- Arrow 20.0.0, rebuild with Python
-- rhbz#2396709
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 22.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 
-* Wed Sep 10 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 20.0.0-6
+* Mon Jan 12 2026  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 22.0.0-2
+- Rebuild w/ liborc-2.2.2 (Apache ORC)
+
+* Fri Oct 24 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 22.0.0-1
+- Arrow 22.0.0 GA f44-build-side-121464
+
+* Fri Oct 3 2025 Python Maint <python-maint@redhat.com> - 21.0.0-6
+- Rebuild w/ liborc-2.2.1 (Apache ORC)
+
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 21.0.0-5
+- Rebuilt for Python 3.14.0rc3 bytecode
+
+* Mon Sep 08 2025 Benjamin A. Beasley <code@musicinmybrain.net> - 21.0.0-4
 - Rebuilt for abseil-cpp 20250814.0
 
-* Mon Aug 18 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 20.0.0-5
-- Arrow 20.0.0, rebuild with Python 3.14.0rc2
-- rhbz#2389167
+* Mon Aug 18 2025 Python Maint <python-maint@redhat.com> - 21.0.0-3
+- Rebuilt for Python 3.14.0rc2 bytecode
+- Plus rebuild w/ liborc-2.2.0 + orc-format-1.1.1 (i.e. liborc-2.2.0-2)
+
+* Sat Aug 16 2025 Orion Poplawski <orion@nwra.com> - 21.0.0-2
+- arrow include files need headers from compute so add requires
+
+* Wed Aug 13 2025  Kaleb S. KEITHLEY <kkeithle [at] redhat.com> - 21.0.0-1
+- Arrow 21.0.0 GA f43-build-side-110906
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 20.0.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild

@@ -1,0 +1,93 @@
+--- sympy-sympy-1.14.0/setup.py.orig	2025-04-27 05:37:26.000000000 -0600
++++ sympy-sympy-1.14.0/setup.py	2026-01-22 08:11:16.736598777 -0700
+@@ -321,7 +321,7 @@ if __name__ == '__main__':
+           },
+           # Set upper bound when making the release branch.
+           install_requires=[
+-              'mpmath >= 1.1.0, < 1.4',
++              'mpmath >= 1.1.0',
+           ],
+           py_modules=['isympy'],
+           packages=['sympy'] + modules + tests,
+--- sympy-sympy-1.14.0/sympy/core/evalf.py.orig	2025-04-27 05:37:26.000000000 -0600
++++ sympy-sympy-1.14.0/sympy/core/evalf.py	2026-01-22 11:49:28.868989572 -0700
+@@ -13,7 +13,7 @@ from mpmath import (
+ from mpmath import inf as mpmath_inf
+ from mpmath.libmp import (from_int, from_man_exp, from_rational, fhalf,
+                           fnan, finf, fninf, fnone, fone, fzero, mpf_abs, mpf_add,
+-                          mpf_atan, mpf_atan2, mpf_cmp, mpf_cos, mpf_e, mpf_exp, mpf_log, mpf_lt,
++                          mpf_atan, mpf_atan2, mpf_cmp, mpf_cos, mpf_e, mpf_exp, mpf_ln, mpf_lt,
+                           mpf_mul, mpf_neg, mpf_pi, mpf_pow, mpf_pow_int, mpf_shift, mpf_sin,
+                           mpf_sqrt, normalize, round_nearest, to_int, to_str, mpf_tan)
+ from mpmath.libmp import bitcount as mpmath_bitcount
+@@ -50,7 +50,7 @@ rnd = round_nearest
+ def bitcount(n):
+     """Return smallest integer, b, such that |n|/2**b < 1.
+     """
+-    return mpmath_bitcount(abs(int(n)))
++    return MPZ(abs(int(n))).bit_length()
+ 
+ # Used in a few places as placeholder values to denote exponents and
+ # precision levels, e.g. of exact numbers. Must be careful to avoid
+@@ -992,7 +992,7 @@ def evalf_log(expr: 'log', prec: int, op
+ 
+     imaginary_term = (mpf_cmp(xre, fzero) < 0)
+ 
+-    re = mpf_log(mpf_abs(xre), prec, rnd)
++    re = mpf_ln(mpf_abs(xre), prec, rnd)
+     size = fastlog(re)
+     if prec - size > workprec and re != fzero:
+         from .add import Add
+@@ -1001,7 +1001,7 @@ def evalf_log(expr: 'log', prec: int, op
+         xre, xim, _, _ = evalf_add(add, prec, options)
+         prec2 = workprec - fastlog(xre)
+         # xre is now x - 1 so we add 1 back here to calculate x
+-        re = mpf_log(mpf_abs(mpf_add(xre, fone, prec2)), prec, rnd)
++        re = mpf_ln(mpf_abs(mpf_add(xre, fone, prec2)), prec, rnd)
+ 
+     re_acc = prec
+ 
+--- sympy-sympy-1.14.0/sympy/core/expr.py.orig	2025-04-27 05:37:26.000000000 -0600
++++ sympy-sympy-1.14.0/sympy/core/expr.py	2026-01-22 11:49:09.173022666 -0700
+@@ -18,7 +18,7 @@ from .kind import NumberKind
+ from sympy.utilities.exceptions import sympy_deprecation_warning
+ from sympy.utilities.misc import as_int, func_name, filldedent
+ from sympy.utilities.iterables import has_variety, sift
+-from mpmath.libmp import mpf_log, prec_to_dps
++from mpmath.libmp import mpf_ln, prec_to_dps
+ from mpmath.libmp.libintmath import giant_steps
+ 
+ 
+@@ -4065,7 +4065,7 @@ def _mag(x):
+     try:
+         mag_first_dig = int(ceil(log10(xpos)))
+     except (ValueError, OverflowError):
+-        mag_first_dig = int(ceil(Float(mpf_log(xpos._mpf_, 53))/log(10)))
++        mag_first_dig = int(ceil(Float(mpf_ln(xpos._mpf_, 53))/log(10)))
+     # check that we aren't off by 1
+     if (xpos/S(10)**mag_first_dig) >= 1:
+         assert 1 <= (xpos/S(10)**mag_first_dig) < 10
+--- sympy-sympy-1.14.0/sympy/polys/polytools.py.orig	2025-04-27 05:37:26.000000000 -0600
++++ sympy-sympy-1.14.0/sympy/polys/polytools.py	2026-01-22 11:56:17.552289296 -0700
+@@ -3726,8 +3726,8 @@ class Poly(Basic):
+         try:
+             # We need to add extra precision to guard against losing accuracy.
+             # 10 times the degree of the polynomial seems to work well.
+-            roots = mpmath.polyroots(coeffs, maxsteps=maxsteps,
+-                    cleanup=cleanup, error=False, extraprec=f.degree()*10)
++            roots = mpmath.polyroots(coeffs[::-1], maxsteps=maxsteps,
++                    cleanup=cleanup, error=False, extraprec=f.degree()*10, asc=True)
+ 
+             # Mpmath puts real roots first, then complex ones (as does all_roots)
+             # so we make sure this convention holds here, too.
+@@ -3736,8 +3736,8 @@ class Poly(Basic):
+         except NoConvergence:
+             try:
+                 # If roots did not converge try again with more extra precision.
+-                roots = mpmath.polyroots(coeffs, maxsteps=maxsteps,
+-                    cleanup=cleanup, error=False, extraprec=f.degree()*15)
++                roots = mpmath.polyroots(coeffs[::-1], maxsteps=maxsteps,
++                    cleanup=cleanup, error=False, extraprec=f.degree()*15, asc=True)
+                 roots = list(map(sympify,
+                     sorted(roots, key=lambda r: (1 if r.imag else 0, r.real, abs(r.imag), sign(r.imag)))))
+             except NoConvergence:

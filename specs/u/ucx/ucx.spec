@@ -13,6 +13,7 @@
 %bcond_with    vfs
 %bcond_with    mad
 %bcond_without mlx5
+%bcond_with    efa
 
 %ifarch x86_64
 %if 0%{?fedora} <= 42
@@ -25,8 +26,8 @@
 %endif
 
 Name: ucx
-Version: 1.18.1
-Release: 5%{?dist}
+Version: 1.19.0
+Release: 2%{?dist}
 Summary: UCX is a communication library implementing high-performance messaging
 
 License: BSD-3-Clause AND MIT AND CC-PDDC AND (BSD-3-Clause OR Apache-2.0)
@@ -42,9 +43,7 @@ License: BSD-3-Clause AND MIT AND CC-PDDC AND (BSD-3-Clause OR Apache-2.0)
 
 URL: http://www.openucx.org
 Source: https://github.com/openucx/%{name}/releases/download/v%{version}/ucx-%{version}.tar.gz
-# TOOLS/PERF: Include omp.h outside of extern C declarations
-Patch0: https://github.com/openucx/%{name}/pull/10664.patch
-
+Patch: Avoid-build-failure.patch
 
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 Prefix: %{_prefix}
@@ -72,6 +71,9 @@ BuildRequires: gdrcopy
 BuildRequires: libibverbs-devel
 %endif
 %if %{with mlx5}
+BuildRequires: rdma-core-devel
+%endif
+%if %{with efa}
 BuildRequires: rdma-core-devel
 %endif
 %if %{with knem}
@@ -125,6 +127,9 @@ Provides header files and examples for developing with UCX.
 # Remove this nonexistent library
 sed -i 's@-lhsakmt@@' config/m4/rocm.m4
 
+# Relax use of -Werror
+sed -i 's@-Werror@@' config/m4/compiler.m4
+
 autoreconf -fiv
 # https://github.com/openucx/ucx/commit/b0a275a5492125a13020cd095fe9934e0b5e7c6a
 # can be removed on release after 1.17.0
@@ -151,6 +156,7 @@ export CFLAGS="$CFLAGS -std=gnu17"
            %_with_arg gdrcopy gdrcopy \
            %_with_arg ib verbs \
            %_with_arg mlx5 mlx5 \
+           %_with_arg efa efa \
            %_with_arg knem knem \
            %_with_arg rdmacm rdmacm \
            %_with_arg xpmem xpmem \
@@ -381,6 +387,19 @@ devices.
 %{_libdir}/ucx/libuct_ib_mlx5.so.*
 %endif
 
+%if %{with efa}
+%package ib-efa
+Requires: %{name}%{?_isa} = %{version}-%{release}
+Summary: UCX EFA device RDMA support
+Group: System Environment/Libraries
+
+%description ib-efa
+Provides support for EFA device as an IBTA transport for UCX.
+
+%files ib-efa
+%{_libdir}/ucx/libuct_ib_efa.so.*
+%endif
+
 %if %{with mad}
 %package mad
 Requires: %{name}%{?_isa} = %{version}-%{release}
@@ -396,6 +415,15 @@ Infiniband datagrams for out-of-band communications.
 %endif
 
 %changelog
+* Fri Jan 16 2026 Tom Rix <Tom.Rix@amd.com> - 1.19.0-2
+- Relax use of -Werror
+
+* Fri Dec 05 2025 Kamal Heib <kheib@redhat.com> - 1.19.0-1
+- Update to version 1.19.0
+
+* Mon Nov 24 2025 Tom Rix <Tom.Rix@amd.com> - 1.18.1-3
+- Rebuild
+
 * Fri Jul 25 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1.18.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

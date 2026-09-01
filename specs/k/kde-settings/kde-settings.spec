@@ -9,12 +9,12 @@
 
 Summary: Config files for KDE
 Name:    kde-settings
-Version: 43.101
-Release: 6%{?dist}
+Version: 44.0
+Release: 1%{?dist}
 
 License: MIT
-URL:     https://pagure.io/fedora-kde/kde-settings
-Source0: %{url}/archive/%{version}/kde-settings-%{version}.tar.gz
+URL:     https://forge.fedoraproject.org/kde/kde-settings
+Source0: %{url}/archive/%{version}.tar.gz#/kde-settings-%{version}.tar.gz
 Source1: COPYING
 
 BuildArch: noarch
@@ -33,7 +33,11 @@ Obsoletes: kde-settings-ksplash < 24-2
 Obsoletes: kde-settings-minimal < 24-3
 
 Requires: kde-filesystem
+%if 0%{?el10}
+Requires: xdg-user-dirs >= 0.18-7
+%else
 Requires: xdg-user-dirs >= 0.18-9
+%endif
 ## add breeze deps here? probably, need more too -- rex
 Requires: breeze-icon-theme
 # Baseline mimeapps associations, e.g. LibreOffice
@@ -69,9 +73,7 @@ Requires: breeze-cursor-theme
 %package plasmalogin
 Summary: Configuration files for Plasma Login Manager
 Requires: plasma-login-manager >= 0.21.0~git1.20260112
-%if 0%{?version_maj:1}
-Requires: f%{version_maj}-backgrounds-kde
-%endif
+Requires: system-backgrounds-kde
 Supplements: (%{name} and plasma-login-manager)
 %description plasmalogin
 %{summary}.
@@ -120,7 +122,7 @@ Enhances: (initial-setup-gui and kwin-wayland)
 
 
 %prep
-%autosetup -p1
+%autosetup -C -p1
 
 # omit crud
 rm -fv Makefile
@@ -230,6 +232,21 @@ test -e %{_datadir}/wallpapers/Default || ls -l %{_datadir}/wallpapers
 
 
 %changelog
+* Wed Aug 19 2026 Neal Gompa <ngompa@fedoraproject.org> - 44.0-1
+- Ship plasmoidsetupscripts as regular files in fedoradark and fedoralight
+  Resolves: rhbz#2444046
+- kde-openssh-askpass: Only set SSH_ASKPASS if ksshaskpass is installed
+  Resolves: rhbz#2433736
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 43.101-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Fri Feb 20 2026 Neal Gompa <ngompa@fedoraproject.org> - 43.101-5
+- Handle correct xdg-user-dirs versioned dependency for EL10
+
+* Wed Feb 18 2026 Neal Gompa <ngompa@fedoraproject.org> - 43.101-4
+- Add backgrounds dep on plasmalogin subpackage
+
 * Sun Feb 08 2026 Neal Gompa <ngompa@fedoraproject.org> - 43.101-3
 - Correctly require plasma-keyboard
 

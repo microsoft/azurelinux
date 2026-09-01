@@ -3,7 +3,7 @@
 
 Name:            polkit-qt-1
 Version:         0.200.0
-Release: 8%{?dist}
+Release:         5%{?dist}
 Summary:         Qt bindings for PolicyKit
 
 License:         BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.0-or-later

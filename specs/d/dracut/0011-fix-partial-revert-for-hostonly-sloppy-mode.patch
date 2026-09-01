@@ -22,31 +22,31 @@ hostonly_mode mode than in strict hostonly mode.
 
 Resolves: rhbz#2394213
 ---
- modules.d/01systemd-cryptsetup/module-setup.sh | 2 +-
- modules.d/90btrfs/module-setup.sh              | 2 +-
- modules.d/90crypt/module-setup.sh              | 2 +-
- modules.d/90dmraid/module-setup.sh             | 2 +-
- modules.d/90lvm/module-setup.sh                | 2 +-
- modules.d/90mdraid/module-setup.sh             | 2 +-
- modules.d/90multipath/module-setup.sh          | 2 +-
- modules.d/90qemu-net/module-setup.sh           | 2 +-
- modules.d/90qemu/module-setup.sh               | 2 +-
- modules.d/95cifs/module-setup.sh               | 2 +-
- modules.d/95fcoe-uefi/module-setup.sh          | 2 +-
- modules.d/95fcoe/module-setup.sh               | 2 +-
- modules.d/95hwdb/module-setup.sh               | 2 +-
- modules.d/95iscsi/module-setup.sh              | 4 ++--
- modules.d/95lunmask/module-setup.sh            | 2 +-
- modules.d/95nbd/module-setup.sh                | 2 +-
- modules.d/95nfs/module-setup.sh                | 2 +-
- modules.d/95nvmf/module-setup.sh               | 2 +-
- modules.d/95virtiofs/module-setup.sh           | 2 +-
+ modules.d/11systemd-cryptsetup/module-setup.sh | 2 +-
+ modules.d/70btrfs/module-setup.sh              | 2 +-
+ modules.d/70crypt/module-setup.sh              | 2 +-
+ modules.d/70dmraid/module-setup.sh             | 2 +-
+ modules.d/70lvm/module-setup.sh                | 2 +-
+ modules.d/70mdraid/module-setup.sh             | 2 +-
+ modules.d/70multipath/module-setup.sh          | 2 +-
+ modules.d/70qemu-net/module-setup.sh           | 2 +-
+ modules.d/70qemu/module-setup.sh               | 2 +-
+ modules.d/74cifs/module-setup.sh               | 2 +-
+ modules.d/74fcoe-uefi/module-setup.sh          | 2 +-
+ modules.d/74fcoe/module-setup.sh               | 2 +-
+ modules.d/74hwdb/module-setup.sh               | 2 +-
+ modules.d/74iscsi/module-setup.sh              | 4 ++--
+ modules.d/74lunmask/module-setup.sh            | 2 +-
+ modules.d/74nbd/module-setup.sh                | 2 +-
+ modules.d/74nfs/module-setup.sh                | 2 +-
+ modules.d/74nvmf/module-setup.sh               | 2 +-
+ modules.d/74virtiofs/module-setup.sh           | 2 +-
  19 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/modules.d/01systemd-cryptsetup/module-setup.sh b/modules.d/01systemd-cryptsetup/module-setup.sh
+diff --git a/modules.d/11systemd-cryptsetup/module-setup.sh b/modules.d/11systemd-cryptsetup/module-setup.sh
 index 0a89ef20..5dfe41f9 100755
---- a/modules.d/01systemd-cryptsetup/module-setup.sh
-+++ b/modules.d/01systemd-cryptsetup/module-setup.sh
+--- a/modules.d/11systemd-cryptsetup/module-setup.sh
++++ b/modules.d/11systemd-cryptsetup/module-setup.sh
 @@ -6,7 +6,7 @@ check() {
      # if cryptsetup is not installed, then we cannot support encrypted devices.
      require_binaries "$systemdutildir"/systemd-cryptsetup || return 1
@@ -56,10 +56,10 @@ index 0a89ef20..5dfe41f9 100755
          for fs in "${host_fs_types[@]}"; do
              [[ $fs == "crypto_LUKS" ]] && return 0
          done
-diff --git a/modules.d/90btrfs/module-setup.sh b/modules.d/90btrfs/module-setup.sh
+diff --git a/modules.d/70btrfs/module-setup.sh b/modules.d/70btrfs/module-setup.sh
 index 8cb77f19..320011ff 100755
---- a/modules.d/90btrfs/module-setup.sh
-+++ b/modules.d/90btrfs/module-setup.sh
+--- a/modules.d/70btrfs/module-setup.sh
++++ b/modules.d/70btrfs/module-setup.sh
 @@ -6,7 +6,7 @@ check() {
      # no point in trying to support it in the initramfs.
      require_binaries btrfs || return 1
@@ -69,10 +69,10 @@ index 8cb77f19..320011ff 100755
          for fs in "${host_fs_types[@]}"; do
              [[ $fs == "btrfs" ]] && return 0
          done
-diff --git a/modules.d/90crypt/module-setup.sh b/modules.d/90crypt/module-setup.sh
+diff --git a/modules.d/70crypt/module-setup.sh b/modules.d/70crypt/module-setup.sh
 index e01e086e..941ebcf4 100755
---- a/modules.d/90crypt/module-setup.sh
-+++ b/modules.d/90crypt/module-setup.sh
+--- a/modules.d/70crypt/module-setup.sh
++++ b/modules.d/70crypt/module-setup.sh
 @@ -6,7 +6,7 @@ check() {
      # if cryptsetup is not installed, then we cannot support encrypted devices.
      require_any_binary "$systemdutildir"/systemd-cryptsetup cryptsetup || return 1
@@ -82,10 +82,10 @@ index e01e086e..941ebcf4 100755
          for fs in "${host_fs_types[@]}"; do
              [[ $fs == "crypto_LUKS" ]] && return 0
          done
-diff --git a/modules.d/90dmraid/module-setup.sh b/modules.d/90dmraid/module-setup.sh
+diff --git a/modules.d/70dmraid/module-setup.sh b/modules.d/70dmraid/module-setup.sh
 index 1d2ab77b..e7c6be60 100755
---- a/modules.d/90dmraid/module-setup.sh
-+++ b/modules.d/90dmraid/module-setup.sh
+--- a/modules.d/70dmraid/module-setup.sh
++++ b/modules.d/70dmraid/module-setup.sh
 @@ -10,7 +10,7 @@ check() {
      require_binaries dmraid || return 1
      require_binaries kpartx || return 1
@@ -95,10 +95,10 @@ index 1d2ab77b..e7c6be60 100755
          for dev in "${!host_fs_types[@]}"; do
              [[ ${host_fs_types[$dev]} != *_raid_member ]] && continue
  
-diff --git a/modules.d/90lvm/module-setup.sh b/modules.d/90lvm/module-setup.sh
+diff --git a/modules.d/70lvm/module-setup.sh b/modules.d/70lvm/module-setup.sh
 index 9f1a4b26..29363cda 100755
---- a/modules.d/90lvm/module-setup.sh
-+++ b/modules.d/90lvm/module-setup.sh
+--- a/modules.d/70lvm/module-setup.sh
++++ b/modules.d/70lvm/module-setup.sh
 @@ -5,7 +5,7 @@ check() {
      # No point trying to support lvm if the binaries are missing
      require_binaries lvm grep || return 1
@@ -108,10 +108,10 @@ index 9f1a4b26..29363cda 100755
          for fs in "${host_fs_types[@]}"; do
              [[ $fs == LVM*_member ]] && return 0
          done
-diff --git a/modules.d/90mdraid/module-setup.sh b/modules.d/90mdraid/module-setup.sh
+diff --git a/modules.d/70mdraid/module-setup.sh b/modules.d/70mdraid/module-setup.sh
 index 5f8f5100..5cf1bdc2 100755
---- a/modules.d/90mdraid/module-setup.sh
-+++ b/modules.d/90mdraid/module-setup.sh
+--- a/modules.d/70mdraid/module-setup.sh
++++ b/modules.d/70mdraid/module-setup.sh
 @@ -7,7 +7,7 @@ check() {
      # No mdadm?  No mdraid support.
      require_binaries mdadm expr || return 1
@@ -121,10 +121,10 @@ index 5f8f5100..5cf1bdc2 100755
          for dev in "${!host_fs_types[@]}"; do
              [[ ${host_fs_types[$dev]} != *_raid_member ]] && continue
  
-diff --git a/modules.d/90multipath/module-setup.sh b/modules.d/90multipath/module-setup.sh
+diff --git a/modules.d/70multipath/module-setup.sh b/modules.d/70multipath/module-setup.sh
 index 9ecbbeed..145fd08e 100755
---- a/modules.d/90multipath/module-setup.sh
-+++ b/modules.d/90multipath/module-setup.sh
+--- a/modules.d/70multipath/module-setup.sh
++++ b/modules.d/70multipath/module-setup.sh
 @@ -25,7 +25,7 @@ check() {
      require_binaries multipath || return 1
      require_binaries kpartx || return 1
@@ -134,10 +134,10 @@ index 9ecbbeed..145fd08e 100755
          for_each_host_dev_and_slaves is_mpath || return 255
      }
  
-diff --git a/modules.d/90qemu-net/module-setup.sh b/modules.d/90qemu-net/module-setup.sh
+diff --git a/modules.d/70qemu-net/module-setup.sh b/modules.d/70qemu-net/module-setup.sh
 index a05f5428..bf64ad9c 100755
---- a/modules.d/90qemu-net/module-setup.sh
-+++ b/modules.d/90qemu-net/module-setup.sh
+--- a/modules.d/70qemu-net/module-setup.sh
++++ b/modules.d/70qemu-net/module-setup.sh
 @@ -4,7 +4,7 @@
  check() {
      is_qemu_virtualized && return 0
@@ -147,10 +147,10 @@ index a05f5428..bf64ad9c 100755
          return 255
      fi
  
-diff --git a/modules.d/90qemu/module-setup.sh b/modules.d/90qemu/module-setup.sh
+diff --git a/modules.d/70qemu/module-setup.sh b/modules.d/70qemu/module-setup.sh
 index fecaca61..06f4dcbb 100755
---- a/modules.d/90qemu/module-setup.sh
-+++ b/modules.d/90qemu/module-setup.sh
+--- a/modules.d/70qemu/module-setup.sh
++++ b/modules.d/70qemu/module-setup.sh
 @@ -4,7 +4,7 @@
  check() {
      is_qemu_virtualized && return 0
@@ -160,10 +160,10 @@ index fecaca61..06f4dcbb 100755
          return 255
      fi
  
-diff --git a/modules.d/95cifs/module-setup.sh b/modules.d/95cifs/module-setup.sh
+diff --git a/modules.d/74cifs/module-setup.sh b/modules.d/74cifs/module-setup.sh
 index 3f422c90..5632b8c1 100755
---- a/modules.d/95cifs/module-setup.sh
-+++ b/modules.d/95cifs/module-setup.sh
+--- a/modules.d/74cifs/module-setup.sh
++++ b/modules.d/74cifs/module-setup.sh
 @@ -5,7 +5,7 @@ check() {
      # If our prerequisites are not met, fail anyways.
      require_binaries mount.cifs || return 1
@@ -173,10 +173,10 @@ index 3f422c90..5632b8c1 100755
          for fs in "${host_fs_types[@]}"; do
              [[ $fs == "cifs" ]] && return 0
          done
-diff --git a/modules.d/95fcoe-uefi/module-setup.sh b/modules.d/95fcoe-uefi/module-setup.sh
+diff --git a/modules.d/74fcoe-uefi/module-setup.sh b/modules.d/74fcoe-uefi/module-setup.sh
 index 5a9aa834..24acf998 100755
---- a/modules.d/95fcoe-uefi/module-setup.sh
-+++ b/modules.d/95fcoe-uefi/module-setup.sh
+--- a/modules.d/74fcoe-uefi/module-setup.sh
++++ b/modules.d/74fcoe-uefi/module-setup.sh
 @@ -7,7 +7,7 @@ check() {
          block_is_fcoe "$1" || return 1
      }
@@ -186,10 +186,10 @@ index 5a9aa834..24acf998 100755
          for_each_host_dev_and_slaves is_fcoe || return 255
          [ -d /sys/firmware/efi ] || return 255
      }
-diff --git a/modules.d/95fcoe/module-setup.sh b/modules.d/95fcoe/module-setup.sh
+diff --git a/modules.d/74fcoe/module-setup.sh b/modules.d/74fcoe/module-setup.sh
 index 9937a22c..b18e9289 100755
---- a/modules.d/95fcoe/module-setup.sh
-+++ b/modules.d/95fcoe/module-setup.sh
+--- a/modules.d/74fcoe/module-setup.sh
++++ b/modules.d/74fcoe/module-setup.sh
 @@ -7,7 +7,7 @@ check() {
          block_is_fcoe "$1" || return 1
      }
@@ -199,10 +199,10 @@ index 9937a22c..b18e9289 100755
          for_each_host_dev_and_slaves is_fcoe || return 255
      }
  
-diff --git a/modules.d/95hwdb/module-setup.sh b/modules.d/95hwdb/module-setup.sh
+diff --git a/modules.d/74hwdb/module-setup.sh b/modules.d/74hwdb/module-setup.sh
 index 2713c92c..21f6f1ea 100644
---- a/modules.d/95hwdb/module-setup.sh
-+++ b/modules.d/95hwdb/module-setup.sh
+--- a/modules.d/74hwdb/module-setup.sh
++++ b/modules.d/74hwdb/module-setup.sh
 @@ -3,7 +3,7 @@
  # SPDX-License-Identifier: GPL-2.0-or-later
  
@@ -212,10 +212,10 @@ index 2713c92c..21f6f1ea 100644
          return 255
      fi
  
-diff --git a/modules.d/95iscsi/module-setup.sh b/modules.d/95iscsi/module-setup.sh
+diff --git a/modules.d/74iscsi/module-setup.sh b/modules.d/74iscsi/module-setup.sh
 index c3860cf8..a18ef0cd 100755
---- a/modules.d/95iscsi/module-setup.sh
-+++ b/modules.d/95iscsi/module-setup.sh
+--- a/modules.d/74iscsi/module-setup.sh
++++ b/modules.d/74iscsi/module-setup.sh
 @@ -6,9 +6,9 @@ check() {
      require_binaries iscsi-iname iscsiadm iscsid || return 1
      require_kernel_modules iscsi_tcp || return 1
@@ -228,10 +228,10 @@ index c3860cf8..a18ef0cd 100755
          pushd . > /dev/null
          for_each_host_dev_and_slaves block_is_iscsi
          local _is_iscsi=$?
-diff --git a/modules.d/95lunmask/module-setup.sh b/modules.d/95lunmask/module-setup.sh
+diff --git a/modules.d/74lunmask/module-setup.sh b/modules.d/74lunmask/module-setup.sh
 index 8bf06be7..ee85e6a1 100755
---- a/modules.d/95lunmask/module-setup.sh
-+++ b/modules.d/95lunmask/module-setup.sh
+--- a/modules.d/74lunmask/module-setup.sh
++++ b/modules.d/74lunmask/module-setup.sh
 @@ -45,7 +45,7 @@ cmdline() {
  
  # called by dracut
@@ -241,10 +241,10 @@ index 8bf06be7..ee85e6a1 100755
          [ -w /sys/module/scsi_mod/parameters/scan ] || return 255
          read -r scan_type < /sys/module/scsi_mod/parameters/scan
          [ "$scan_type" = "manual" ] && return 0
-diff --git a/modules.d/95nbd/module-setup.sh b/modules.d/95nbd/module-setup.sh
+diff --git a/modules.d/74nbd/module-setup.sh b/modules.d/74nbd/module-setup.sh
 index 2ad45a0a..7340c679 100755
---- a/modules.d/95nbd/module-setup.sh
-+++ b/modules.d/95nbd/module-setup.sh
+--- a/modules.d/74nbd/module-setup.sh
++++ b/modules.d/74nbd/module-setup.sh
 @@ -6,7 +6,7 @@ check() {
  
      # if an nbd device is not somewhere in the chain of devices root is
@@ -254,10 +254,10 @@ index 2ad45a0a..7340c679 100755
          _rootdev=$(find_root_block_device)
          [[ -b /dev/block/$_rootdev ]] || return 1
          check_block_and_slaves block_is_nbd "$_rootdev" || return 255
-diff --git a/modules.d/95nfs/module-setup.sh b/modules.d/95nfs/module-setup.sh
+diff --git a/modules.d/74nfs/module-setup.sh b/modules.d/74nfs/module-setup.sh
 index d9ce244a..b6f8ebbe 100755
---- a/modules.d/95nfs/module-setup.sh
-+++ b/modules.d/95nfs/module-setup.sh
+--- a/modules.d/74nfs/module-setup.sh
++++ b/modules.d/74nfs/module-setup.sh
 @@ -23,7 +23,7 @@ check() {
      require_any_binary rpcbind portmap || return 1
      require_binaries rpc.statd mount.nfs mount.nfs4 umount sed chmod chown || return 1
@@ -267,10 +267,10 @@ index d9ce244a..b6f8ebbe 100755
          [[ "$(get_nfs_type)" ]] && return 0
          return 255
      }
-diff --git a/modules.d/95nvmf/module-setup.sh b/modules.d/95nvmf/module-setup.sh
+diff --git a/modules.d/74nvmf/module-setup.sh b/modules.d/74nvmf/module-setup.sh
 index 54feffbb..6dedc5b3 100755
---- a/modules.d/95nvmf/module-setup.sh
-+++ b/modules.d/95nvmf/module-setup.sh
+--- a/modules.d/74nvmf/module-setup.sh
++++ b/modules.d/74nvmf/module-setup.sh
 @@ -42,7 +42,7 @@ check() {
          [[ $found ]]
      }
@@ -280,10 +280,10 @@ index 54feffbb..6dedc5b3 100755
          [ -f /etc/nvme/hostnqn ] || return 255
          [ -f /etc/nvme/hostid ] || return 255
          pushd . > /dev/null
-diff --git a/modules.d/95virtiofs/module-setup.sh b/modules.d/95virtiofs/module-setup.sh
+diff --git a/modules.d/74virtiofs/module-setup.sh b/modules.d/74virtiofs/module-setup.sh
 index 238e52bc..1ef6c939 100755
---- a/modules.d/95virtiofs/module-setup.sh
-+++ b/modules.d/95virtiofs/module-setup.sh
+--- a/modules.d/74virtiofs/module-setup.sh
++++ b/modules.d/74virtiofs/module-setup.sh
 @@ -2,7 +2,7 @@
  
  # called by dracut

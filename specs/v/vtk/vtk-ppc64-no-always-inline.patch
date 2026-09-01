@@ -1,0 +1,13 @@
+diff --git a/Common/Core/vtkDataArrayMeta.h b/Common/Core/vtkDataArrayMeta.h
+index 602305d3ed..8c37a96891 100644
+--- a/Common/Core/vtkDataArrayMeta.h
++++ b/Common/Core/vtkDataArrayMeta.h
+@@ -32,7 +32,7 @@
+ #endif
+ 
+ #if (defined(VTK_ALWAYS_OPTIMIZE_ARRAY_ITERATORS) || !defined(VTK_DEBUG_RANGE_ITERATORS)) &&       \
+-  !defined(VTK_COMPILER_MSVC)
++  !defined(VTK_COMPILER_MSVC) && !defined(__PPC64__)
+ #define VTK_ITER_INLINE VTK_ALWAYS_INLINE
+ #define VTK_ITER_ASSUME VTK_ASSUME_NO_ASSERT
+ #define VTK_ITER_OPTIMIZE_START VTK_ALWAYS_OPTIMIZE_START

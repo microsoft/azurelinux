@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           python-xapp
-Version:        2.4.2
-Release: 11%{?dist}
+Version:        3.0.2
+Release:        2%{?dist}
 Summary:        Python bindings for xapps
 
 # Automatically converted from old format: LGPLv2 - review is highly recommended.
@@ -52,6 +52,18 @@ Requires:      xapps
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.0.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 09 2026 Leigh Scott <leigh123linux@gmail.com> - 3.0.2-1
+- Update to 3.0.2
+
+* Sat Dec 13 2025 Leigh Scott <leigh123linux@gmail.com> - 3.0.1-1
+- Update to 3.0.1
+
+* Wed Nov 12 2025 Leigh Scott <leigh123linux@gmail.com> - 3.0.0-1
+- Update to 3.0.0
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.4.2-8
 - Rebuilt for Python 3.14.0rc3 bytecode
 

@@ -1,0 +1,22 @@
+--- ceph-20.0.0-2787-g838ba95e/src/jaegertracing/opentelemetry-cpp/api/include/opentelemetry/nostd/internal/absl/base/options.h.orig	2025-07-31 10:18:56.636528168 -0400
++++ ceph-20.0.0-2787-g838ba95e/src/jaegertracing/opentelemetry-cpp/api/include/opentelemetry/nostd/internal/absl/base/options.h	2025-07-31 10:19:12.923329646 -0400
+@@ -70,7 +70,7 @@
+ // Include a standard library header to allow configuration based on the
+ // standard library in use.
+ #ifdef __cplusplus
+-#include <ciso646>
++#include <iso646.h>
+ #endif
+ 
+ // -----------------------------------------------------------------------------
+--- ceph-20.2.0/src/boost/boost/redis/adapter/detail/adapters.hpp.orig	2026-02-06 09:54:39.748078321 -0500
++++ ceph-20.2.0/src/boost/boost/redis/adapter/detail/adapters.hpp	2026-02-06 09:55:02.427664048 -0500
+@@ -29,7 +29,7 @@
+ #include <charconv>
+ 
+ // See https://stackoverflow.com/a/31658120/1077832
+-#include<ciso646>
++#include<iso646.h>
+ #ifdef _LIBCPP_VERSION
+ #else
+ #include <cstdlib>

@@ -1,0 +1,9 @@
+diff -Naur breezy-brz-3.3.21-original/Cargo.toml breezy-brz-3.3.21/Cargo.toml
+--- breezy-brz-3.3.21-original/Cargo.toml	2026-02-03 14:33:55.000000000 +0000
++++ breezy-brz-3.3.21/Cargo.toml	2026-07-02 10:53:31.450038984 +0100
+@@ -25,4 +25,4 @@
+ pyo3 = { workspace = true }
+ 
+ [workspace.dependencies]
+-pyo3 = ">=0.26,<0.29"
++pyo3 = ">=0.26,<0.30"

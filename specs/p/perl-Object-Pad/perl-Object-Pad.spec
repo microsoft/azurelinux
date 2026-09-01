@@ -11,7 +11,7 @@
 %endif
 
 Name:           perl-Object-Pad
-Version:        0.823
+Version:        0.825
 Release:        1%{dist}
 Summary:        Simple syntax for lexical slot-based objects
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
@@ -22,7 +22,7 @@ BuildRequires:  coreutils
 BuildRequires:  perl-devel
 BuildRequires:  perl-generators
 BuildRequires:  perl-interpreter
-BuildRequires:  perl(:VERSION) >= 5.18
+BuildRequires:  perl(:VERSION) >= 5.22
 BuildRequires:  perl(Config)
 %if %{with perl_Object_Pad_enables_Devel_MAT}
 BuildRequires:  perl(Devel::MAT::Dumper::Helper) >= 0.45
@@ -66,6 +66,8 @@ BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Sub::Util)
 BuildRequires:  perl(Test2::V0) >= 0.000148
 BuildRequires:  perl(Test2::IPC)
+BuildRequires:  perl(Test2::Require::Perl)
+BuildRequires:  perl(Test2::Require::Threads)
 BuildRequires:  perl(threads)
 BuildRequires:  perl(utf8)
 %if %{with perl_Object_Pad_enables_optional_test} && !%{defined perl_bootstrap}
@@ -231,6 +233,15 @@ export HARNESS_OPTIONS=j$(perl -e 'if ($ARGV[0] =~ /.*-j([0-9][0-9]*).*/) {print
 %{_libexecdir}/%{name}
 
 %changelog
+* Wed Mar 25 2026 Petr Pisar <ppisar@redhat.com> - 0.825-1
+- 0.825 bump
+
+* Wed Mar 25 2026 Petr Pisar <ppisar@redhat.com> - 0.824-1
+- 0.824 bump
+
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 0.823-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Mon Dec 08 2025 Petr Pisar <ppisar@redhat.com> - 0.823-1
 - 0.823 bump
 

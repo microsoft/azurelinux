@@ -11,8 +11,8 @@
 
 Summary: DjVu viewers, encoders, and utilities
 Name: djvulibre
-Version: 3.5.28
-Release: 17%{?dist}
+Version: 3.5.30
+Release: 1%{?dist}
 # Automatically converted from old format: GPLv2+ - review is highly recommended.
 License: GPL-2.0-or-later
 URL: http://djvu.sourceforge.net/
@@ -20,13 +20,8 @@ Source0: http://downloads.sourceforge.net/djvu/%{name}-%{version}.tar.gz
 Patch0: djvulibre-3.5.22-cdefs.patch
 #Patch1: djvulibre-3.5.25.3-cflags.patch
 Patch6: djvulibre-3.5.27-export-file.patch
-Patch8: djvulibre-3.5.27-check-image-size.patch
-Patch9: djvulibre-3.5.27-integer-overflow.patch
-Patch10: djvulibre-3.5.27-check-input-pool.patch
 Patch11: djvulibre-3.5.27-djvuport-stack-overflow.patch
-Patch12: djvulibre-3.5.27-unsigned-short-overflow.patch
 Patch14: djvulibre-3.5.27-out-of-bound-write-2.patch
-Patch15: 0001-Check-for-zero-width-and-height.patch
 
 Requires(post): xdg-utils
 Requires(preun): xdg-utils
@@ -79,13 +74,8 @@ Development files for DjVuLibre.
 %patch -P0 -p1 -b .cdefs
 #%patch1 -p1 -b .cflags
 %patch -P6 -p1 -b .export-file
-%patch -P8 -p1 -b .check-image-size
-%patch -P9 -p1 -b .integer-overflow
-%patch -P10 -p1 -b .check-input-pool
 %patch -P11 -p1 -b .djvuport-stack-overflow
-%patch -P12 -p1 -b .unsigned-short-overflow
 %patch -P14 -p1 -b .out-of-bound-write-2
-%patch -P15 -p1 -b .zero-size-image
 
 
 %build 
@@ -193,6 +183,16 @@ fi
 
 
 %changelog
+* Thu May 21 2026 Marek Kasik <mkasik@redhat.com> - 3.5.30-1
+- Rebase to 3.5.30
+- Resolves: #2376253
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.28-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.28-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.5.28-14
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

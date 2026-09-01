@@ -1,0 +1,172 @@
+From af0d07f95809653b669d88aa0f424c6d5aa48ba0 Mon Sep 17 00:00:00 2001
+From: Mark Adler <fork@madler.net>
+Date: Sat, 2 Jul 2022 14:35:04 -0700
+Subject: [PATCH] Be more liberal in the acceptance of data descriptors.
+
+Previously the zip64 flag determined the size of the lengths in the
+data descriptor. This is compliant with the zip format. However, a
+bug in the Java zip library results in an incorrect setting of that
+flag. This commit permits either 32-bit or 64-bit lengths, auto-
+detecting which it is, which works around the Java bug.
+---
+ extract.c | 146 +++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 123 insertions(+), 23 deletions(-)
+
+diff --git a/extract.c b/extract.c
+index 878817d..b1c74df 100644
+--- a/extract.c
++++ b/extract.c
+@@ -2173,30 +2173,130 @@ static int extract_or_test_member(__G)    /* return PK-type error code */
+     undefer_input(__G);
+ 
+     if ((G.lrec.general_purpose_bit_flag & 8) != 0) {
+-        /* skip over data descriptor (harder than it sounds, due to signature
+-         * ambiguity)
+-         */
+-#       define SIG 0x08074b50
+-#       define LOW 0xffffffff
+-        uch buf[12];
+-        unsigned shy = 12 - readbuf((char *)buf, 12);
+-        ulg crc = shy ? 0 : makelong(buf);
+-        ulg clen = shy ? 0 : makelong(buf + 4);
+-        ulg ulen = shy ? 0 : makelong(buf + 8); /* or high clen if ZIP64 */
+-        if (crc == SIG &&                       /* if not SIG, no signature */
+-            (G.lrec.crc32 != SIG ||             /* if not SIG, have signature */
+-             (clen == SIG &&                    /* if not SIG, no signature */
+-              ((G.lrec.csize & LOW) != SIG ||   /* if not SIG, have signature */
+-               (ulen == SIG &&                  /* if not SIG, no signature */
+-                (G.pInfo->zip64 ? G.lrec.csize >> 32 : G.lrec.ucsize) != SIG
+-                                                /* if not SIG, have signature */
+-                )))))
+-                   /* skip four more bytes to account for signature */
+-                   shy += 4 - readbuf((char *)buf, 4);
+-        if (G.pInfo->zip64)
+-            shy += 8 - readbuf((char *)buf, 8); /* skip eight more for ZIP64 */
+-        if (shy)
++        // Skip over the data descriptor. We need to correctly position the
++        // read pointer after the data descriptor for the proper detection of
++        // overlapped zip file components.
++        //
++        // We need to resolve an ambiguity over four possible data descriptor
++        // formats. We check for all four, and pick the longest match. The data
++        // descriptor can have a signature or not, and it can use four or
++        // eight-byte lengths. The zip format requires resolving the ambiguity
++        // of a signature or not, but it uses the zip64 flag to determine
++        // whether the lengths are four or eight bytes. However there is a bug
++        // in the Java zip library that applies the wrong value of that flag.
++        // This works around that bug by always trying both length formats.
++        //
++        // So why the longest match? And does this resolve the ambiguity? No,
++        // it doesn't definitively resolve the ambiguity. However choosing the
++        // longest match at least resolves it for a normal zip file, where the
++        // bytes following the data descriptor must be another zip signature
++        // that is not a data descriptor signature. There are a few specific
++        // cases for which more than one of the formats will match the given
++        // CRC and lengths. The most plausible is between four and eight-byte
++        // lengths, either with or without a signature. That only occurs for an
++        // entry with an uncompressed size of zero. We consider the data
++        // descriptor to be a vector of four-byte values. Then the possible
++        // data descriptors are [(s) 0 c 0] and [(s) 0 c 0 0 0], where (s) is
++        // the optional signature, and c is the compressed length. c would be
++        // two for the Deflate compressed data format. These look the same, so
++        // if the file contains [(s) 0 c 0 0 0], then we cannot discriminate
++        // them. However if the data descriptor was intended to be [(s) 0 c 0],
++        // then it has been followed by eight zero bytes in the zip file for
++        // some reason. For a normal zip file this cannot be the case. The data
++        // descriptor would always be immediately followed by another zip file
++        // signature, which is four bytes that are not zeros. The other cases
++        // where more than one format matches are vanishingly unlikely, but the
++        // longest match strategy resolves those as well in a normal zip file.
++        // Those pairs are [s s s] vs. [s s s s], [s s s] vs. [s s s 0 s 0],
++        // and [s s s s s] vs. [s s s s s s]. For all, s is the signature for a
++        // data descriptor. For the first two we have an entry whose CRC,
++        // compressed length, and uncompressed length are all equal (!), and
++        // are all equal to the signature (!!). If this occurs, clearly someone
++        // is messing with us. However the strategy works nonetheless. We see
++        // that if the shorter descriptor, [s s s] were what was intended, then
++        // it has been followed by either four zero bytes or a data descriptor
++        // signature. Neither can occur for a normal zip file, where it must be
++        // followed by a signature that is not a data descriptor signature. So
++        // the longest match is the correct choice. The final case is outright
++        // insane, since the compressed and uncompressed lengths are the data
++        // descriptor signature repeated twice to make a 64-bit length, which
++        // is about 6e17. The largest drive available as I write this is 100TB,
++        // which is one six thousandth of that length. If I apply Moore's law
++        // to drive capacity, we might get to 6e17 about 25 years from now. If
++        // this code is still in use then (I've seen other code I've written in
++        // use for over 30 years), then we're still in luck. A data descriptor
++        // cannot be followed by a data descriptor signature in a normal zip
++        // file. The longest match strategy continues to work.
++        //
++        // So what is a not normal zip file, where these assumptions might fall
++        // apart? zip files have been used in a non-standard way as a poor
++        // substitute for a file system, with entries deleted and perhaps
++        // others replacing them partially, with fragmented zip files being the
++        // result. Then all bets are off as to what might or might not follow a
++        // data descriptor. Though if this sort of data descriptor ambiguity
++        // falls in one of those gaps, then there should be no adverse
++        // consequences for picking the unintended one.
++        int len = 0;
++#       define SIG 0x08074b50           // optional data descriptor signature
++#ifdef LARGE_FILE_SUPPORT
++        uch buf[24];
++        int got = readbuf((char *)buf, sizeof(buf));
++        if (got >= 24 && makelong(buf) == SIG &&
++                         makelong(buf + 4) == G.lrec.crc32 &&
++                         makeint64(buf + 8) == G.lrec.csize &&
++                         makeint64(buf + 16) == G.lrec.ucsize)
++            // Have a data descriptor with a signature and 64-bit lengths.
++            len = 24;
++        else if (got >= 20 && makelong(buf) == G.lrec.crc32 &&
++                              makeint64(buf + 4) == G.lrec.csize &&
++                              makeint64(buf + 12) == G.lrec.ucsize)
++            // Have a data descriptor with no signature and 64-bit lengths.
++            len = 20;
++        else if ((G.lrec.csize >> 32) == 0 && (G.lrec.ucsize >> 32) == 0)
++            // Both lengths are short enough to fit in 32 bits.
++#else
++        uch buf[16];
++        int got = readbuf((char *)buf, sizeof(buf));
++#endif
++        {
++            if (got >= 16 && makelong(buf) == SIG &&
++                             makelong(buf + 4) == G.lrec.crc32 &&
++                             makelong(buf + 8) == G.lrec.csize &&
++                             makelong(buf + 12) == G.lrec.ucsize)
++                // Have a data descriptor with a signature and 32-bit lengths.
++                len = 16;
++            else if (got >= 12 && makelong(buf) == G.lrec.crc32 &&
++                                  makelong(buf + 4) == G.lrec.csize &&
++                                  makelong(buf + 8) == G.lrec.ucsize)
++                // Have a data descriptor with no signature and 32-bit lengths.
++                len = 12;
++        }
++        if (len == 0)
++            // There is no data descriptor that matches the entry CRC and
++            // length values.
+             error = PK_ERR;
++
++        // Back up got-len bytes, to position the read pointer after the data
++        // descriptor. Or to where the data descriptor was supposed to be, in
++        // the event none was found.
++        int back = got - len;
++        if (G.incnt + back > INBUFSIZ) {
++            // Need to load the preceding buffer. We've been here before.
++            G.cur_zipfile_bufstart -= INBUFSIZ;
++#ifdef USE_STRM_INPUT
++            zfseeko(G.zipfd, G.cur_zipfile_bufstart, SEEK_SET);
++#else /* !USE_STRM_INPUT */
++            zlseek(G.zipfd, G.cur_zipfile_bufstart, SEEK_SET);
++#endif /* ?USE_STRM_INPUT */
++            read(G.zipfd, (char *)G.inbuf, INBUFSIZ);
++            G.incnt -= INBUFSIZ - back;
++            G.inptr += INBUFSIZ - back;
++        }
++        else {
++            // Back up within current buffer.
++            G.incnt += back;
++            G.inptr -= back;
++        }
+     }
+ 
+     return error;

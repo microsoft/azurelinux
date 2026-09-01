@@ -1,0 +1,77 @@
+--- nfs-ganesha-9.16/src/selinux/ganesha.te.orig	2026-06-25 07:54:15.594771685 -0400
++++ nfs-ganesha-9.16/src/selinux/ganesha.te	2026-06-25 10:21:50.301809751 -0400
+@@ -1,10 +1,10 @@
+ policy_module(ganesha, 1.0.0)
+ 
+ require {
+-	type var_lib_nfs_t;
+ 	type apm_bios_t;
+ 	type autofs_device_t;
+ 	type bpf_t;
++	type cache_home_t;
+ 	type clock_device_t;
+ 	type configfs_t;
+ 	type cpu_device_t;
+@@ -17,6 +17,7 @@
+ 	type fixed_disk_device_t;
+ 	type framebuf_device_t;
+ 	type fs_t;
++	type home_root_t;
+ 	type hugetlbfs_t;
+ 	type initctl_t;
+ 	type kmsg_device_t;
+@@ -32,18 +33,22 @@
+ 	type pstore_t;
+ 	type ptmx_t;
+ 	type removable_device_t;
++	type rpcbind_t;
+ 	type rpc_pipefs_t;
+ 	type scsi_generic_device_t;
+ 	type sound_device_t;
++	type ssh_home_t;
+ 	type sysfs_t;
+ 	type tmpfs_t;
+ 	type usb_device_t;
+ 	type usbmon_device_t;
++	type user_home_dir_t;
++	type user_home_t;
++	type var_lib_nfs_t;
+ 	type virtio_device_t;
+ 	type watchdog_device_t;
+ 	type wireless_device_t;
+ 	type xserver_misc_device_t;
+-	type rpcbind_t;
+ 
+ 	type cgroup_t;
+ 	type usr_t;
+@@ -95,6 +100,7 @@
+ allow ganesha_t self:capability { dac_read_search dac_override fowner setgid setuid };
+ allow ganesha_t self:capability2 block_suspend;
+ allow ganesha_t self:capability sys_resource;
++allow ganesha_t self:capability sys_rawio;
+ allow ganesha_t self:process { setcap setrlimit };
+ allow ganesha_t self:fifo_file rw_fifo_file_perms;
+ allow ganesha_t self:unix_stream_socket create_stream_socket_perms;
+@@ -204,11 +210,21 @@
+ fs_read_cgroup_files(ganesha_t)
+ 
+ #!!!! This avc can be allowed using the boolean 'domain_can_mmap_files'
+-allow ganesha_t usr_t:file map;
++allow ganesha_t usr_t:dir { add_name remove_name };
++allow ganesha_t usr_t:file { map create unlink write };
++allow ganesha_t var_lib_nfs_t:file create;
+ 
+ #============= init_t ==============
+ allow init_t var_lib_nfs_t:dir { create setattr };
++allow init_t var_lib_nfs_t:file { create unlink write };
+ 
++#============= home_dir ==============
++allow ganesha_t cache_home_t:dir getattr;
++allow ganesha_t home_root_t:dir read;
++allow ganesha_t ssh_home_t:dir getattr;
++allow ganesha_t user_home_dir_t:dir { add_name getattr open read remove_name search };
++allow ganesha_t user_home_dir_t:file { create getattr open read unlink write };
++allow ganesha_t user_home_t:dir getattr;
+ 
+ ########################################
+ #

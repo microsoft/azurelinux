@@ -1,0 +1,1102 @@
+commit 31ed9c8c8477c523b123c4d240941db3a8b7d461
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:44 2025 +0200
+
+    util: Add functions for dropping root privileges.
+    
+    Add a function to switch the process UID/GID to a specified user in
+    order to drop the root privileges. Keep only the capabilities needed to
+    adjust the clock, enable HW timestamping, bind to privileged ports and
+    raw sockets, using the libcap library. Initialize the supplementary
+    groups of the user to make it easier to give it permissions to open PHC
+    devices by adding it to a system group.
+    
+    Add a function to create a directory for a UDS address with a specified
+    owner, where the programs will be able to bind and unlink their sockets
+    without root privileges.
+    
+    (Rebased to 4.4)
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/incdefs.sh b/incdefs.sh
+index 060cc0b..4af992d 100755
+--- a/incdefs.sh
++++ b/incdefs.sh
+@@ -140,6 +140,14 @@ user_flags()
+ 			fi
+ 		done
+ 	done
++
++	# Look for libcap support.
++	for d in $dirs; do
++		if test -e $d/sys/capability.h; then
++			printf " -DHAVE_LIBCAP"
++			break
++		fi
++	done
+ }
+ 
+ #
+diff --git a/makefile b/makefile
+index 3c2406b..2069e7e 100644
+--- a/makefile
++++ b/makefile
+@@ -62,6 +62,10 @@ LDLIBS += -lcrypto
+ SECURITY += sad_openssl.o
+ endif
+ 
++ifneq (,$(findstring -DHAVE_LIBCAP,$(incdefs)))
++LDLIBS += -lcap
++endif
++
+ prefix	= /usr/local
+ sbindir	= $(prefix)/sbin
+ mandir	= $(prefix)/man
+diff --git a/util.c b/util.c
+index 5b0302b..c211158 100644
+--- a/util.c
++++ b/util.c
+@@ -19,13 +19,25 @@
+ #include <arpa/inet.h>
+ #include <errno.h>
+ #include <linux/limits.h>
++#include <libgen.h>
+ #include <signal.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/stat.h>
++#include <sys/types.h>
++
++#ifdef HAVE_LIBCAP
++#include <grp.h>
++#include <pwd.h>
++#include <sys/prctl.h>
++#include <sys/capability.h>
++#include <unistd.h>
++#endif
+ 
+ #include "address.h"
++#include "interface.h"
+ #include "phc.h"
+ #include "print.h"
+ #include "sk.h"
+@@ -894,3 +906,102 @@ bool base64_decode(const char *in_str, size_t in_len, void *out, size_t *out_len
+ 	*out_len = *out_len - len;
+ 	return true;
+ }
++
++void create_uds_directory(const char *address, const char *user)
++{
++	char path[MAX_IFNAME_SIZE + 1], *dir;
++#ifdef HAVE_LIBCAP
++	struct passwd *pw;
++#endif
++
++	if (snprintf(path, sizeof(path), "%s", address) >= sizeof(path)) {
++		pr_err("path too long for UDS");
++		return;
++	}
++
++	dir = dirname(path);
++
++	/* Don't do anything if it already exists or cannot be created */
++	if (mkdir(dir, 0775)) {
++		if (errno != EEXIST)
++			pr_err("failed to create %s: %m", dir);
++		return;
++	}
++
++#ifdef HAVE_LIBCAP
++	if (user[0] == '\0')
++		return;
++
++	pw = getpwnam(user);
++	if (!pw) {
++		pr_err("failed to get user/group ID of %s", user);
++		rmdir(dir);
++		return;
++	}
++
++	if (lchown(dir, pw->pw_uid, pw->pw_gid)) {
++		pr_err("failed to change owner of %s: %m", dir);
++		rmdir(dir);
++		return;
++	}
++#endif
++}
++
++int drop_root_privileges(const char *user)
++{
++#ifdef HAVE_LIBCAP
++	struct passwd *pw;
++	cap_t cap;
++#endif
++
++	if (user[0] == '\0')
++		return 0;
++
++#ifdef HAVE_LIBCAP
++	pw = getpwnam(user);
++	if (!pw) {
++		pr_err("failed to get user/group ID of %s", user);
++		return -1;
++	}
++
++	if (prctl(PR_SET_KEEPCAPS, 1)) {
++		pr_err("failed to set KEEPCAPS flag");
++		return -1;
++	}
++
++	if (initgroups(user, pw->pw_gid)) {
++		pr_err("failed to init supplementary groups");
++		return -1;
++	}
++
++	if (setgid(pw->pw_gid)) {
++		pr_err("failed to set group ID");
++		return -1;
++	}
++
++	if (setuid(pw->pw_uid)) {
++		pr_err("failed to set user ID");
++		return -1;
++	}
++
++	cap = cap_from_text("cap_sys_time,cap_net_admin,"
++			    "cap_net_bind_service,cap_net_raw=ep");
++	if (!cap) {
++		pr_err("failed to initialize capabilities");
++		return -1;
++	}
++
++	if (cap_set_proc(cap)) {
++		pr_err("failed to set process capabilities");
++		cap_free(cap);
++		return -1;
++	}
++
++	cap_free(cap);
++
++	return 0;
++#else
++	pr_err("cannot drop root privileges without libcap");
++	return -1;
++#endif
++}
+diff --git a/util.h b/util.h
+index b228745..ed48b21 100644
+--- a/util.h
++++ b/util.h
+@@ -502,4 +502,24 @@ size_t base64_len(const char *str, size_t len);
+  */
+ bool base64_decode(const char *in_str, size_t in_len, void *out, size_t *out_len);
+ 
++/*
++ * Create directory for a UDS address owned by the specified user.
++ * Don't do anything if it already exists, even if it has a different owner.
++ *
++ * @param address   UDS address.
++ * @param user      Name of the user.
++ */
++void create_uds_directory(const char *address, const char *user);
++
++/**
++ * Change the user/group ID in order to drop the root privileges. Initialize
++ * supplementary groups of the user. Keep only capabilities needed to set
++ * and adjust clocks, bind to a privileged port, enable and configure HW
++ * timestamping, and open a raw socket.
++ *
++ * @param user      Name of the user.
++ * @return          0 on success, -1 on error.
++ */
++int drop_root_privileges(const char *user);
++
+ #endif
+
+commit dd55e75a35dc4403606e1f3d06627b476f0b577b
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:45 2025 +0200
+
+    clock: Add support for dropping root privileges.
+    
+    Add "user" option to specify the user to which ptp4l should switch after
+    opening the PHC device and before binding the network/UDS ports. Create
+    the directory that will contain the UDS-RW/RO sockets if it does not
+    exist and change its ownership to allow the UDS sockets to be bound and
+    unlinked there.
+    
+    The default is to keep the identity of the user which started ptp4l.
+    
+    In the jbod mode, or with a bond interface, the PHC devices need to
+    have the permissions set for the non-root user to be able to open them
+    (e.g. by adding the user to a system group owning the PHC devices).
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/clock.c b/clock.c
+index 863e9d8..2423c62 100644
+--- a/clock.c
++++ b/clock.c
+@@ -1083,7 +1083,7 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ {
+ 	int conf_phc_index, i, max_adj = 0, phc_index, required_modes = 0, sfl, sw_ts;
+ 	enum servo_type servo = config_get_int(config, NULL, "clock_servo");
+-	char ts_label[IF_NAMESIZE], phc[32], *tmp;
++	char ts_label[IF_NAMESIZE], phc[32], *tmp, *user;
+ 	enum timestamp_type timestamping;
+ 	struct clock *c = &the_clock;
+ 	const char *uds_ifname;
+@@ -1403,6 +1403,12 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 		return NULL;
+ 	}
+ 
++	user = config_get_string(config, NULL, "user");
++	create_uds_directory(config_get_string(config, NULL, "uds_address"),
++			     user);
++	create_uds_directory(config_get_string(config, NULL, "uds_ro_address"),
++			     user);
++
+ 	/* Create the UDS interfaces. */
+ 
+ 	c->uds_rw_port = port_open(phc_device, phc_index, timestamping, 0,
+@@ -1433,6 +1439,18 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 		}
+ 	}
+ 
++	/*
++	 * Drop the root privileges if configured to do so. It needs to be done
++	 * after opening the ports as generic netlink sockets (whose binding
++	 * requires CAP_SYS_ADMIN) are used to detect virtual clocks. The port
++	 * sockets will be bound and HW timestamping configured later when
++	 * handling the port INITIALIZING state. The process keeps
++	 * CAP_NET_ADMIN, CAP_NET_BIND_SERVICE, and CAP_NET_RAW to be able to
++	 * do that.
++	 */
++	if (drop_root_privileges(user))
++		return NULL;
++
+ 	c->dds.numberPorts = c->nports;
+ 
+ 	LIST_FOREACH(p, &c->ports, list) {
+diff --git a/config.c b/config.c
+index d0bc32c..dfe8736 100644
+--- a/config.c
++++ b/config.c
+@@ -394,6 +394,7 @@ struct config_item config_tab[] = {
+ 	PORT_ITEM_INT("unicast_master_table", 0, 0, INT_MAX),
+ 	PORT_ITEM_INT("unicast_req_duration", 3600, 10, INT_MAX),
+ 	GLOB_ITEM_INT("use_syslog", 1, 0, 1),
++	GLOB_ITEM_STR("user", ""),
+ 	GLOB_ITEM_STR("userDescription", ""),
+ 	GLOB_ITEM_INT("utc_offset", CURRENT_UTC_OFFSET, 0, INT_MAX),
+ 	GLOB_ITEM_INT("verbose", 0, 0, 1),
+diff --git a/ptp4l.8 b/ptp4l.8
+index 87900e3..a302997 100644
+--- a/ptp4l.8
++++ b/ptp4l.8
+@@ -1040,7 +1040,10 @@ is only relevant with IPv6 transport.  See RFC 4291.  The default is
+ .TP
+ .B uds_address
+ Specifies the address of the UNIX domain socket for receiving local
+-management messages. The default is /var/run/ptp4l.
++management messages. The directory containing the socket will be created on
++start if it does not exist, with owner set to the user specified by the
++.B user
++option. The default is /var/run/ptp4l.
+ 
+ .TP
+ .B uds_file_mode
+@@ -1088,6 +1091,19 @@ This option enables using the "write phase" feature of a PTP Hardware
+ Clock.  If supported by the device, this mode uses the hardware's
+ built in phase offset control instead of frequency offset control.
+ The default value is 0 (disabled).
++.TP
++.B user
++The name of the user to which should
++.B ptp4l
++switch after start in order to drop the root privileges. By default,
++.B ptp4l
++will keep the identity of the user under which it is started. With the
++.B boundary_clock_jbod
++option, or if using a bonded interface, the non-root user must have permissions
++to open the PHC devices to be able to switch between them. If using the ntpshm
++or refclock_sock servo, the user must have also permissions to attach to the
++shared memory segment if it already exists or connect to the refclock socket
++respectively.
+ 
+ .SH UNICAST DISCOVERY OPTIONS
+ 
+
+commit 81899d673363f123bfa8e09c1245a368a5007c81
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:46 2025 +0200
+
+    uds: Copy ownership of server socket in pmc clients.
+    
+    ptp4l sending a response to a pmc client needs to have permissions to
+    write to the client's UNIX domain socket. If ptp4l runs under a non-root
+    user, it cannot write to sockets bound by the pmc client if it did that
+    as root.
+    
+    After binding the client socket, change its owner to the owner of the
+    server socket, so it can send the client a response.
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/uds.c b/uds.c
+index 4ddee7b..ce7e92d 100644
+--- a/uds.c
++++ b/uds.c
+@@ -60,6 +60,7 @@ static int uds_open(struct transport *t, struct interface *iface, struct fdarray
+ 	const char* file_mode_cfg;
+ 	struct sockaddr_un sa;
+ 	mode_t file_mode;
++	struct stat st;
+ 	int fd, err;
+ 
+ 	fd = socket(AF_LOCAL, SOCK_DGRAM, 0);
+@@ -97,6 +98,20 @@ static int uds_open(struct transport *t, struct interface *iface, struct fdarray
+ 	uds->address.len = sizeof(sa);
+ 
+ 	chmod(name, file_mode);
++
++	/*
++	 * In the client, copy the ownership of the server's socket if it runs
++	 * under a non-root user to allow it to send a response to the client
++	 * running under root.  Avoid following a symlink if the socket is
++	 * replaced (e.g. by compromised ptp4l process).
++	 */
++	if (uds_path[0] != '\0') {
++		if (!lstat(uds_path, &st) && (st.st_uid || st.st_gid) &&
++		    lchown(name, st.st_uid, st.st_gid)) {
++			pr_err("uds: failed to change socket ownership: %m");
++		}
++	}
++
+ 	fda->fd[FD_EVENT] = -1;
+ 	fda->fd[FD_GENERAL] = fd;
+ 	return 0;
+
+commit 6fa8bd22d754eede09c72b461c4251bdc14dcc46
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:47 2025 +0200
+
+    uds: Don't call chmod() on client socket.
+    
+    The pmc clients should not need to modify the permissions of their
+    socket (following the uds_file_mode setting), they can rely on their
+    umask.
+    
+    Make the chmod() call on the bound socket only in the server.
+    
+    This removes a race condition between the bind() and chmod() calls that
+    could potentially be exploited by ptp4l running under a non-root user.
+    It could replace the socket with a symlink in order to make the client
+    running under root to change the mode of a different file.
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/uds.c b/uds.c
+index ce7e92d..d74b7a8 100644
+--- a/uds.c
++++ b/uds.c
+@@ -97,19 +97,20 @@ static int uds_open(struct transport *t, struct interface *iface, struct fdarray
+ 	uds->address.sun = sa;
+ 	uds->address.len = sizeof(sa);
+ 
+-	chmod(name, file_mode);
+-
+ 	/*
+ 	 * In the client, copy the ownership of the server's socket if it runs
+ 	 * under a non-root user to allow it to send a response to the client
+ 	 * running under root.  Avoid following a symlink if the socket is
+-	 * replaced (e.g. by compromised ptp4l process).
++	 * replaced (e.g. by compromised ptp4l process).  The server just sets
++	 * the permissions on its socket per configuration.
+ 	 */
+ 	if (uds_path[0] != '\0') {
+ 		if (!lstat(uds_path, &st) && (st.st_uid || st.st_gid) &&
+ 		    lchown(name, st.st_uid, st.st_gid)) {
+ 			pr_err("uds: failed to change socket ownership: %m");
+ 		}
++	} else {
++		chmod(name, file_mode);
+ 	}
+ 
+ 	fda->fd[FD_EVENT] = -1;
+
+commit 194d9d965fe20d613adf5ca5346c9bdb48475acd
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:48 2025 +0200
+
+    Follow server UDS location in pmc clients.
+    
+    Modify pmc, phc2sys, ts2phc, and tz2alt to bind their client sockets in
+    the same directory as the server's socket instead of hardcoded /var/run.
+    In the pmc program it's the default, it can still be configured with the
+    -i option to any address.
+    
+    This allows the clients to be started under the same user as to which
+    ptp4l is configured to switch, with all their sockets in the same
+    directory where the user has write permissions. phc2sys and ts2phc will
+    need also permissions to open the PHC devices and the CAP_SYS_TIME
+    capability needed to adjust the clock (e.g. set by setpriv(1)).
+    
+    (Rebased to 4.4)
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/phc2sys.c b/phc2sys.c
+index 6113539..b9ea184 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -1473,7 +1473,7 @@ int main(int argc, char *argv[])
+ 			}
+ 
+ 			snprintf(uds_local, sizeof(uds_local),
+-				 "/var/run/phc2sys.%d.%d", getpid(), i);
++				 "phc2sys.%d.%d", getpid(), i);
+ 
+ 			if (uds_remote_cnt > i)
+ 				config_set_string(cfg, "uds_address",
+@@ -1507,8 +1507,7 @@ int main(int argc, char *argv[])
+ 	r = -1;
+ 
+ 	if (wait_sync) {
+-		snprintf(uds_local, sizeof(uds_local),
+-			 "/var/run/phc2sys.%d", getpid());
++		snprintf(uds_local, sizeof(uds_local), "phc2sys.%d", getpid());
+ 
+ 		if (uds_remote_cnt > 0)
+ 			config_set_string(cfg, "uds_address",
+diff --git a/pmc.8 b/pmc.8
+index 2b08f4d..1019d59 100644
+--- a/pmc.8
++++ b/pmc.8
+@@ -81,8 +81,9 @@ Specify the boundary hops value in sent messages. The default is 1.
+ Specify the domain number in sent messages. The default is 0.
+ .TP
+ .BI \-i " interface"
+-Specify the network interface. The default is /var/run/pmc.$pid for the Unix Domain
+-Socket transport and eth0 for the other transports.
++Specify the network interface. The default is pmc.$pid for the Unix Domain
++Socket transport and eth0 for the other transports. A relative path of the Unix
++Domain socket is relative to the directory of the server's socket.
+ .TP
+ .BI \-s " uds-address"
+ Specifies the address of the server's UNIX domain socket.
+diff --git a/pmc.c b/pmc.c
+index 0b61da4..7c1afb8 100644
+--- a/pmc.c
++++ b/pmc.c
+@@ -696,7 +696,7 @@ static void usage(char *progname)
+ 		" -f [file] read configuration from 'file'\n"
+ 		" -h        prints this message and exits\n"
+ 		" -i [dev]  interface device to use, default 'eth0'\n"
+-		"           for network and '/var/run/pmc.$pid' for UDS.\n"
++		"           for network and 'pmc.$pid' for UDS.\n"
+ 		" -s [path] server address for UDS, default '/var/run/ptp4l'.\n"
+ 		" -t [hex]  transport specific field, default 0x0\n"
+ 		" -v        prints the software version and exits\n"
+@@ -836,7 +836,7 @@ int main(int argc, char *argv[])
+ 	if (!iface_name) {
+ 		if (transport_type == TRANS_UDS) {
+ 			snprintf(uds_local, sizeof(uds_local),
+-				 "/var/run/pmc.%d", getpid());
++				 "pmc.%d", getpid());
+ 			iface_name = uds_local;
+ 		} else {
+ 			iface_name = "eth0";
+diff --git a/pmc_common.c b/pmc_common.c
+index 7c77a10..b619b27 100644
+--- a/pmc_common.c
++++ b/pmc_common.c
+@@ -18,6 +18,7 @@
+  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ #include <errno.h>
++#include <libgen.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/types.h>
+@@ -499,12 +500,38 @@ struct pmc {
+ 	UInteger8 allow_unauth;
+ };
+ 
++static int complete_uds_address(struct config *cfg, const char *iface,
++				char *uds, size_t len)
++{
++	char buf[MAX_IFNAME_SIZE + 1];
++
++	/* Don't change absolute paths */
++	if (iface[0] == '/') {
++		if (snprintf(uds, len, "%s", iface) >= len) {
++			pr_err("UDS path too long");
++			return -1;
++		}
++		return 0;
++	}
++
++	/* Relative paths are relative to the directory of the server socket */
++	if (snprintf(buf, sizeof(buf), "%s", config_get_string(cfg, NULL,
++					     "uds_address")) >= sizeof(buf) ||
++	    snprintf(uds, len, "%s/%s", dirname(buf), iface) >= len) {
++		pr_err("UDS path too long");
++		return -1;
++	}
++
++	return 0;
++}
++
+ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
+ 		       const char *iface_name, const char *remote_address,
+ 		       UInteger8 boundary_hops, UInteger8 domain_number,
+ 		       UInteger8 transport_specific, UInteger8 allow_unauth,
+ 		       int zero_datalen)
+ {
++	char uds[MAX_IFNAME_SIZE + 1];
+ 	struct pmc *pmc;
+ 	UInteger32 proc_id;
+ 
+@@ -517,6 +544,9 @@ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
+ 		pmc->port_identity.clockIdentity.id[6] = (proc_id & 0xFF000000) >> 24;
+ 		pmc->port_identity.clockIdentity.id[7] = (proc_id & 0x00FF0000) >> 16;
+ 		pmc->port_identity.portNumber = proc_id & 0xFFFF;
++		if (complete_uds_address(cfg, iface_name, uds, sizeof(uds)))
++			goto failed;
++		iface_name = uds;
+ 	} else {
+ 		if (generate_clock_identity(&pmc->port_identity.clockIdentity,
+ 					    iface_name)) {
+diff --git a/ts2phc.c b/ts2phc.c
+index 39d31b6..d2d27d2 100644
+--- a/ts2phc.c
++++ b/ts2phc.c
+@@ -707,8 +707,7 @@ int main(int argc, char *argv[])
+ 		return -1;
+ 	}
+ 
+-	snprintf(uds_local, sizeof(uds_local), "/var/run/ts2phc.%d",
+-		 getpid());
++	snprintf(uds_local, sizeof(uds_local), "ts2phc.%d", getpid());
+ 
+ 	if (autocfg) {
+ 		err = init_pmc_node(cfg, priv.agent, uds_local,
+diff --git a/tz2alt.c b/tz2alt.c
+index 905aa0b..afd1941 100644
+--- a/tz2alt.c
++++ b/tz2alt.c
+@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
+ 	print_set_progname(progname);
+ 	print_set_tag(config_get_string(cfg, NULL, "message_tag"));
+ 	print_set_level(config_get_int(cfg, NULL, "logging_level"));
+-	snprintf(uds_local, sizeof(uds_local), "/var/run/tztool.%d", getpid());
++	snprintf(uds_local, sizeof(uds_local), "tztool.%d", getpid());
+ 
+ 	err = do_tztool(timezone);
+ out:
+
+commit 8cde20752b66b9e216a55a5b07894fcdbbfa3d59
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:49 2025 +0200
+
+    config: Move default UDS addresses to /var/run/ptp.
+    
+    /var/run is normally not writable for non-root users. Move the default
+    server UDS and CMLDS addresses to /var/run/ptp, which will be created by
+    ptp4l the first time it runs if it does not exist. This makes the
+    default work well in both cases when the linuxptp programs are running
+    under root and non-root user.
+    
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/config.c b/config.c
+index dfe8736..ed61544 100644
+--- a/config.c
++++ b/config.c
+@@ -386,9 +386,9 @@ struct config_item config_tab[] = {
+ 	GLOB_ITEM_INT("tx_timestamp_timeout", 10, 1, INT_MAX),
+ 	PORT_ITEM_INT("udp_ttl", 1, 1, 255),
+ 	PORT_ITEM_INT("udp6_scope", 0x0E, 0x00, 0x0F),
+-	GLOB_ITEM_STR("uds_address", "/var/run/ptp4l"),
++	GLOB_ITEM_STR("uds_address", "/var/run/ptp/ptp4l"),
+ 	PORT_ITEM_INT("uds_file_mode", UDS_FILEMODE, 0, 0777),
+-	GLOB_ITEM_STR("uds_ro_address", "/var/run/ptp4lro"),
++	GLOB_ITEM_STR("uds_ro_address", "/var/run/ptp/ptp4lro"),
+ 	PORT_ITEM_INT("uds_ro_file_mode", UDS_RO_FILEMODE, 0, 0777),
+ 	PORT_ITEM_INT("unicast_listen", 0, 0, 1),
+ 	PORT_ITEM_INT("unicast_master_table", 0, 0, INT_MAX),
+diff --git a/configs/CMLDS_server.cfg b/configs/CMLDS_server.cfg
+index 36f118c..842fbe4 100644
+--- a/configs/CMLDS_server.cfg
++++ b/configs/CMLDS_server.cfg
+@@ -10,7 +10,7 @@ clockIdentity			C37D50.0000.000000
+ free_running			1
+ ignore_transport_specific	1
+ transportSpecific		2
+-uds_address			/var/run/cmlds_server
++uds_address			/var/run/ptp/cmlds_server
+ 
+ [eth1]
+ delay_mechanism	P2P
+diff --git a/configs/default.cfg b/configs/default.cfg
+index c3ad618..c2e0f93 100644
+--- a/configs/default.cfg
++++ b/configs/default.cfg
+@@ -96,11 +96,11 @@ write_phase_mode	0
+ #
+ # Transport options
+ #
+-cmlds.client_address	/var/run/cmlds_client
++cmlds.client_address	/var/run/ptp/cmlds_client
+ cmlds.domainNumber	0
+ cmlds.majorSdoId	2
+ cmlds.port		0
+-cmlds.server_address	/var/run/cmlds_server
++cmlds.server_address	/var/run/ptp/cmlds_server
+ transportSpecific	0x0
+ ptp_dst_ipv4		224.0.1.129
+ p2p_dst_ipv4		224.0.0.107
+@@ -110,9 +110,9 @@ ptp_dst_mac		01:1B:19:00:00:00
+ p2p_dst_mac		01:80:C2:00:00:0E
+ udp_ttl			1
+ udp6_scope		0x0E
+-uds_address		/var/run/ptp4l
++uds_address		/var/run/ptp/ptp4l
+ uds_file_mode		0660
+-uds_ro_address		/var/run/ptp4lro
++uds_ro_address		/var/run/ptp/ptp4lro
+ uds_ro_file_mode	0666
+ #
+ # Default interface options
+diff --git a/phc2sys.8 b/phc2sys.8
+index dd97a70..0f11f28 100644
+--- a/phc2sys.8
++++ b/phc2sys.8
+@@ -218,7 +218,7 @@ Specifies the address of the server's UNIX domain socket. This option can be
+ used up to 16 times in the automatic mode to synchronize clocks between multiple
+ .B ptp4l
+ instances.
+-The default is /var/run/ptp4l.
++The default is /var/run/ptp/ptp4l.
+ .TP
+ .BI \-l " print-level"
+ Set the maximum syslog level of messages which should be printed or sent to
+@@ -414,7 +414,7 @@ The default is 0.
+ .TP
+ .B uds_address
+ Specifies the address of the server's UNIX domain socket. The default
+-is /var/run/ptp4
++is /var/run/ptp/ptp4l
+ Same as option
+ .B \-z
+ (see above).
+diff --git a/phc2sys.c b/phc2sys.c
+index b9ea184..95cf0a4 100644
+--- a/phc2sys.c
++++ b/phc2sys.c
+@@ -1157,7 +1157,7 @@ static void usage(char *progname)
+ 		" -u [num]       number of clock updates in summary stats (0)\n"
+ 		" -n [num]       domain number (0)\n"
+ 		" -x             apply leap seconds by servo instead of kernel\n"
+-		" -z [path]      server address for UDS (/var/run/ptp4l)\n"
++		" -z [path]      server address for UDS (/var/run/ptp/ptp4l)\n"
+ 		" -l [num]       set the logging level to 'num' (6)\n"
+ 		" -t [tag]       add tag to log messages\n"
+ 		" -m             print messages to stdout\n"
+diff --git a/pmc.8 b/pmc.8
+index 1019d59..4fb740f 100644
+--- a/pmc.8
++++ b/pmc.8
+@@ -87,7 +87,7 @@ Domain socket is relative to the directory of the server's socket.
+ .TP
+ .BI \-s " uds-address"
+ Specifies the address of the server's UNIX domain socket.
+-The default is /var/run/ptp4l.
++The default is /var/run/ptp/ptp4l.
+ .TP
+ .BI \-t " transport-specific-field"
+ Specify the transport specific field in sent messages as a hexadecimal number.
+diff --git a/pmc.c b/pmc.c
+index 7c1afb8..36a6172 100644
+--- a/pmc.c
++++ b/pmc.c
+@@ -697,7 +697,7 @@ static void usage(char *progname)
+ 		" -h        prints this message and exits\n"
+ 		" -i [dev]  interface device to use, default 'eth0'\n"
+ 		"           for network and 'pmc.$pid' for UDS.\n"
+-		" -s [path] server address for UDS, default '/var/run/ptp4l'.\n"
++		" -s [path] server address for UDS, default '/var/run/ptp/ptp4l'.\n"
+ 		" -t [hex]  transport specific field, default 0x0\n"
+ 		" -v        prints the software version and exits\n"
+ 		" -z        send zero length TLV values with the GET actions\n"
+diff --git a/ptp4l.8 b/ptp4l.8
+index a302997..d66843f 100644
+--- a/ptp4l.8
++++ b/ptp4l.8
+@@ -1043,7 +1043,7 @@ Specifies the address of the UNIX domain socket for receiving local
+ management messages. The directory containing the socket will be created on
+ start if it does not exist, with owner set to the user specified by the
+ .B user
+-option. The default is /var/run/ptp4l.
++option. The default is /var/run/ptp/ptp4l.
+ 
+ .TP
+ .B uds_file_mode
+@@ -1056,7 +1056,7 @@ should start with a 0 literal. The default mode is 0660.
+ Specifies the address of the second UNIX domain socket for receiving local
+ management messages, which is restricted to GET actions and does not forward
+ messages to other ports. Access to this socket can be given to untrusted
+-applications for monitoring purposes. The default is /var/run/ptp4lro.
++applications for monitoring purposes. The default is /var/run/ptp/ptp4lro.
+ 
+ .TP
+ .B uds_ro_file_mode
+
+commit dda4b39a14f13da3255d6e7a20ab4882e6150255
+Author: Miroslav Lichvar (via linuxptp-devel Mailing List) <linuxptp-devel@lists.nwtime.org>
+Date:   Thu Jul 31 11:35:50 2025 +0200
+
+    clock: Create compatibility symlinks for UDS.
+    
+    If using the new default UDS-RW/RO addresses, create symlinks at the
+    original location for compatibility with non-linuxptp clients and
+    scripts. This works only when ptp4l is not configured to drop root
+    privileges, otherwise it will not be able to respond to a socket owned
+    by root.
+    
+    Don't call unlink() to remove an existing socket before trying to create
+    the symlink. It might be a different ptp4l instance still running. Print
+    a warning message if the path is not already a symlink and the symlink
+    cannot be created.
+    
+    Suggested-by: Martin Pecka <peckama2@fel.cvut.cz>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+diff --git a/clock.c b/clock.c
+index 2423c62..75830b8 100644
+--- a/clock.c
++++ b/clock.c
+@@ -24,6 +24,7 @@
+ #include <string.h>
+ #include <sys/ioctl.h>
+ #include <sys/queue.h>
++#include <sys/stat.h>
+ 
+ #include "address.h"
+ #include "bmc.h"
+@@ -1078,6 +1079,16 @@ int clock_required_modes(struct clock *c)
+ 	return required_modes;
+ }
+ 
++static void create_symlink(const char *target, const char *path)
++{
++	struct stat st;
++
++	if (!lstat(path, &st) && (st.st_mode & S_IFMT) == S_IFLNK)
++		return;
++	if (symlink(target, path))
++		pr_warning("failed to create symlink %s->%s: %m", path, target);
++}
++
+ struct clock *clock_create(enum clock_type type, struct config *config,
+ 			   const char *phc_device)
+ {
+@@ -1242,9 +1253,14 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 		}
+ 	}
+ 
+-	/* Configure the UDS. */
++	/*
++	 * Configure the UDS ports. If using the new default server addresses,
++	 * create also symlinks for compatibility with older clients.
++	 */
+ 
+ 	uds_ifname = config_get_string(config, NULL, "uds_address");
++	if (!strcmp(uds_ifname, "/var/run/ptp/ptp4l"))
++		create_symlink("ptp/ptp4l", "/var/run/ptp4l");
+ 	c->uds_rw_if = interface_create(uds_ifname, NULL);
+ 	if (config_set_section_int(config, interface_name(c->uds_rw_if),
+ 				   "announceReceiptTimeout", 0)) {
+@@ -1265,6 +1281,8 @@ struct clock *clock_create(enum clock_type type, struct config *config,
+ 
+ 	uds_ifname = config_get_string(config, NULL, "uds_ro_address");
+ 	c->uds_ro_if = interface_create(uds_ifname, NULL);
++	if (!strcmp(uds_ifname, "/var/run/ptp/ptp4lro"))
++		create_symlink("ptp/ptp4lro", "/var/run/ptp4lro");
+ 	if (config_set_section_int(config, interface_name(c->uds_ro_if),
+ 				   "announceReceiptTimeout", 0)) {
+ 		return NULL;
+
+commit 4afa85a3b397480a5a18a5fb061e46e7c7066c54
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Thu Oct 2 13:09:32 2025 +0200
+
+    pmc_agent: Keep pmc_ds_requested set across run_pmc() calls.
+    
+    In the handling of timeout in run_pmc() the pmc_ds_requested variable is
+    always cleared to force the next call of the function to send a new
+    request if a response is not received in that time. This prevents
+    detection of a missed response as nothing is tracking if a request was
+    sent in the previous call. The variable is also set in run_pmc_wait_sync()
+    to avoid sending a new request when waiting multiple port-specific
+    responses.
+    
+    Modify the function to accept a new parameter enabling the receive-only
+    mode and keep the pmc_ds_requested variable set on the timeout to make
+    it clear when a response is missing, which will be needed in the next
+    commit to reopen the transport.
+    
+    (Rebased to 4.4)
+    
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+diff --git a/pmc_agent.c b/pmc_agent.c
+index 86b6ee6..aa42ea9 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -132,16 +132,16 @@ static int run_pmc_err2errno(int code)
+ }
+ 
+ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+-		   struct ptp_message **msg)
++		   int recv_only, struct ptp_message **msg)
+ {
+ #define N_FD 1
+ 	struct pollfd pollfd[N_FD];
+-	int cnt, res;
++	int cnt, res, req_sent = 0;
+ 
+ 	while (1) {
+ 		pollfd[0].fd = pmc_get_transport_fd(node->pmc);
+ 		pollfd[0].events = POLLIN|POLLPRI;
+-		if (!node->pmc_ds_requested && ds_id >= 0)
++		if (!recv_only && !req_sent && ds_id >= 0)
+ 			pollfd[0].events |= POLLOUT;
+ 
+ 		cnt = poll(pollfd, N_FD, timeout);
+@@ -150,8 +150,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 			return RUN_PMC_INTR;
+ 		}
+ 		if (!cnt) {
+-			/* Request the data set again in the next run. */
+-			node->pmc_ds_requested = 0;
++			pr_debug("poll timeout");
+ 			return RUN_PMC_TMO;
+ 		}
+ 
+@@ -167,6 +166,7 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 				break;
+ 			}
+ 			node->pmc_ds_requested = 1;
++			req_sent = 1;
+ 		}
+ 
+ 		if (!(pollfd[0].revents & (POLLIN|POLLPRI)))
+@@ -205,7 +205,7 @@ static int renew_subscription(struct pmc_agent *node, int timeout)
+ 	struct ptp_message *msg;
+ 	int res;
+ 
+-	res = run_pmc(node, timeout, MID_SUBSCRIBE_EVENTS_NP, &msg);
++	res = run_pmc(node, timeout, MID_SUBSCRIBE_EVENTS_NP, 0, &msg);
+ 	if (is_run_pmc_error(res)) {
+ 		return run_pmc_err2errno(res);
+ 	}
+@@ -217,11 +217,11 @@ int run_pmc_wait_sync(struct pmc_agent *node, int timeout)
+ {
+ 	struct ptp_message *msg;
+ 	Enumeration8 portState;
++	int res, recv_only = 0;
+ 	void *data;
+-	int res;
+ 
+ 	while (1) {
+-		res = run_pmc(node, timeout, MID_PORT_DATA_SET, &msg);
++		res = run_pmc(node, timeout, MID_PORT_DATA_SET, recv_only, &msg);
+ 		if (res <= 0)
+ 			return res;
+ 
+@@ -235,7 +235,7 @@ int run_pmc_wait_sync(struct pmc_agent *node, int timeout)
+ 			return 1;
+ 		}
+ 		/* try to get more data sets (for other ports) */
+-		node->pmc_ds_requested = 1;
++		recv_only = 1;
+ 	}
+ }
+ 
+@@ -302,7 +302,7 @@ int pmc_agent_query_dds(struct pmc_agent *node, int timeout)
+ 	struct defaultDS *dds;
+ 	int res;
+ 
+-	res = run_pmc(node, timeout, MID_DEFAULT_DATA_SET, &msg);
++	res = run_pmc(node, timeout, MID_DEFAULT_DATA_SET, 0, &msg);
+ 	if (is_run_pmc_error(res)) {
+ 		return run_pmc_err2errno(res);
+ 	}
+@@ -320,11 +320,12 @@ int pmc_agent_query_port_properties(struct pmc_agent *node, int timeout,
+ 	struct port_properties_np *ppn;
+ 	struct port_hwclock_np *phn;
+ 	struct ptp_message *msg;
+-	int res, len;
++	int res, len, recv_only = 1;
+ 
+ 	pmc_target_port(node->pmc, port);
+-	while (1) {
+-		res = run_pmc(node, timeout, MID_PORT_PROPERTIES_NP, &msg);
++	for (recv_only = 0; ; recv_only = 1) {
++		res = run_pmc(node, timeout, MID_PORT_PROPERTIES_NP, recv_only,
++			      &msg);
+ 		if (is_run_pmc_error(res)) {
+ 			goto out;
+ 		}
+@@ -345,8 +346,9 @@ int pmc_agent_query_port_properties(struct pmc_agent *node, int timeout,
+ 		msg_put(msg);
+ 		break;
+ 	}
+-	while (1) {
+-		res = run_pmc(node, timeout, MID_PORT_HWCLOCK_NP, &msg);
++	for (recv_only = 0; ; recv_only = 1) {
++		res = run_pmc(node, timeout, MID_PORT_HWCLOCK_NP, recv_only,
++			      &msg);
+ 		if (is_run_pmc_error(res)) {
+ 			goto out;
+ 		}
+@@ -372,7 +374,7 @@ int pmc_agent_query_utc_offset(struct pmc_agent *node, int timeout)
+ 	struct ptp_message *msg;
+ 	int res;
+ 
+-	res = run_pmc(node, timeout, MID_TIME_PROPERTIES_DATA_SET, &msg);
++	res = run_pmc(node, timeout, MID_TIME_PROPERTIES_DATA_SET, 0, &msg);
+ 	if (is_run_pmc_error(res)) {
+ 		return run_pmc_err2errno(res);
+ 	}
+@@ -435,7 +437,7 @@ int pmc_agent_update(struct pmc_agent *node)
+ 		}
+ 	}
+ 
+-	run_pmc(node, 0, -1, &msg);
++	run_pmc(node, 0, -1, 1, &msg);
+ 
+ 	return 0;
+ }
+
+commit ea1cd45be4f33626e0f9b430bd96a2869ba43451
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Thu Oct 2 13:57:53 2025 +0200
+
+    pmc_agent: Reopen transport after missed response.
+    
+    If the pmc agent (used in phc2sys and ts2phc) was started as root before
+    ptp4l configured to not run as root could bind its socket, the client
+    socket owner was not changed to follow the server socket, which caused
+    the non-privileged server to not be able to send responses to the
+    client.
+    
+    Add a new function to pmc_common to allow reopening the transport
+    without destroying the pmc instance, and call it in the agent when a
+    response from ptp4l is missed. This allows the client to correct the
+    socket owner if it was started too soon in order to receive responses
+    from the server. It also allows the client to recover if its socket is
+    inadvertently removed.
+    
+    Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+    Signed-off-by: Miroslav Lichvar <mlichvar@redhat.com>
+
+diff --git a/pmc_agent.c b/pmc_agent.c
+index aa42ea9..6f54a10 100644
+--- a/pmc_agent.c
++++ b/pmc_agent.c
+@@ -140,6 +140,12 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 
+ 	while (1) {
+ 		pollfd[0].fd = pmc_get_transport_fd(node->pmc);
++		if (pollfd[0].fd < 0) {
++			if (pmc_reopen_transport(node->pmc))
++				return RUN_PMC_NODEV;
++			continue;
++		}
++
+ 		pollfd[0].events = POLLIN|POLLPRI;
+ 		if (!recv_only && !req_sent && ds_id >= 0)
+ 			pollfd[0].events |= POLLOUT;
+@@ -157,6 +163,12 @@ static int run_pmc(struct pmc_agent *node, int timeout, int ds_id,
+ 		/* Send a new request if there are no pending messages. */
+ 		if ((pollfd[0].revents & POLLOUT) &&
+ 		    !(pollfd[0].revents & (POLLIN|POLLPRI))) {
++			/* Reopen the transport if a response was missed. */
++			if (node->pmc_ds_requested) {
++				if (pmc_reopen_transport(node->pmc))
++					return RUN_PMC_NODEV;
++			}
++
+ 			switch (ds_id) {
+ 			case MID_SUBSCRIBE_EVENTS_NP:
+ 				send_subscription(node);
+diff --git a/pmc_common.c b/pmc_common.c
+index b619b27..ef6880d 100644
+--- a/pmc_common.c
++++ b/pmc_common.c
+@@ -581,11 +581,10 @@ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
+ 		goto failed;
+ 	}
+ 
+-	if (transport_open(pmc->transport, pmc->iface,
+-			   &pmc->fdarray, TS_SOFTWARE)) {
+-		pr_err("failed to open transport");
++	pmc->fdarray.fd[FD_GENERAL] = -1;
++	if (pmc_reopen_transport(pmc))
+ 		goto no_trans_open;
+-	}
++
+ 	pmc->zero_length_gets = zero_datalen ? 1 : 0;
+ 
+ 	return pmc;
+@@ -599,6 +598,23 @@ failed:
+ 	return NULL;
+ }
+ 
++int pmc_reopen_transport(struct pmc *pmc)
++{
++	pr_debug("(re)opening transport");
++
++	if (pmc_get_transport_fd(pmc) >= 0)
++		transport_close(pmc->transport, &pmc->fdarray);
++	pmc->fdarray.fd[FD_GENERAL] = -1;
++
++	if (transport_open(pmc->transport, pmc->iface,
++			   &pmc->fdarray, TS_SOFTWARE)) {
++		pr_err("failed to open transport");
++		return -1;
++	}
++
++	return 0;
++}
++
+ void pmc_destroy(struct pmc *pmc)
+ {
+ 	transport_close(pmc->transport, &pmc->fdarray);
+diff --git a/pmc_common.h b/pmc_common.h
+index 7b76061..93701fb 100644
+--- a/pmc_common.h
++++ b/pmc_common.h
+@@ -34,6 +34,8 @@ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
+ 		       UInteger8 transport_specific, UInteger8 allow_unauth,
+ 		       int zero_datalen);
+ 
++int pmc_reopen_transport(struct pmc *pmc);
++
+ void pmc_destroy(struct pmc *pmc);
+ 
+ int pmc_get_transport_fd(struct pmc *pmc);

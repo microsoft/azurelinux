@@ -1,0 +1,43 @@
+From dd961fb790d6df85ba57b965f8a6f2534328955b Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Thu, 8 Jan 2026 12:14:41 +0100
+Subject: [PATCH] Port C11 test to C++
+
+---
+ lib/autoconf/c.m4                         | 4 ++--
+ tests/data/gnulib_std_gnu11_2020_08_17.m4 | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/autoconf/c.m4 b/lib/autoconf/c.m4
+index d4f7fbe6350f71e2..7e9bc62789cf62a7 100644
+--- a/lib/autoconf/c.m4
++++ b/lib/autoconf/c.m4
+@@ -2639,8 +2639,8 @@ ac_cxx_conftest_cxx11_main='
+ }
+ {
+   // Unicode literals
+-  char const *utf8 = u8"UTF-8 string \u2500";
+-  char16_t const *utf16 = u"UTF-8 string \u2500";
++  auto const *utf8 = u8"UTF-8 string \u2500";
++  char16_t const *utf16 = u"UTF-16 string \u2500";
+   char32_t const *utf32 = U"UTF-32 string \u2500";
+ }
+ '
+diff --git a/tests/data/gnulib_std_gnu11_2020_08_17.m4 b/tests/data/gnulib_std_gnu11_2020_08_17.m4
+index 21f7cc7a1526fdc1..d789f8dc039eaf65 100644
+--- a/tests/data/gnulib_std_gnu11_2020_08_17.m4
++++ b/tests/data/gnulib_std_gnu11_2020_08_17.m4
+@@ -762,8 +762,8 @@ AC_DEFUN([_AC_CXX_CXX11_TEST_BODY],
+ }
+ {
+   // Unicode literals
+-  char const *utf8 = u8"UTF-8 string \u2500";
+-  char16_t const *utf16 = u"UTF-8 string \u2500";
++  auto const *utf8 = u8"UTF-8 string \u2500";
++  char16_t const *utf16 = u"UTF-16 string \u2500";
+   char32_t const *utf32 = U"UTF-32 string \u2500";
+ }
+ ]])
+-- 
+2.52.0
+

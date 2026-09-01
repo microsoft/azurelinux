@@ -1,29 +1,35 @@
---- ceph-19.2.0/src/googletest/googletest/CMakeLists.txt.orig	2025-01-23 07:43:33.314970694 -0500
-+++ ceph-19.2.0/src/googletest/googletest/CMakeLists.txt	2025-01-23 07:44:13.529250429 -0500
-@@ -63,6 +63,8 @@
+--- ceph-20.1.0/src/googletest/googletest/CMakeLists.txt.orig	2025-02-07 11:04:56.000000000 -0500
++++ ceph-20.1.0/src/googletest/googletest/CMakeLists.txt	2025-09-16 08:11:59.341951770 -0400
+@@ -53,6 +53,8 @@
    set_up_hermetic_build()
  endif()
  
 +option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." OFF)
 +
- # These commands only run if this is the main project
+ # These commands only run if this is the main project.
  if(CMAKE_PROJECT_NAME STREQUAL "gtest" OR CMAKE_PROJECT_NAME STREQUAL "googletest-distribution")
  
-@@ -126,9 +128,9 @@
+@@ -121,7 +123,7 @@
  # are used for other targets, to ensure that gtest can be compiled by a user
  # aggressive about warnings.
  cxx_library(gtest "${cxx_strict}" src/gtest-all.cc)
 -set_target_properties(gtest PROPERTIES VERSION ${GOOGLETEST_VERSION})
 +#set_target_properties(gtest PROPERTIES VERSION ${GOOGLETEST_VERSION})
+ if(GTEST_HAS_ABSL)
+   target_compile_definitions(gtest PUBLIC GTEST_HAS_ABSL=1)
+   target_link_libraries(gtest PUBLIC
+@@ -139,7 +141,7 @@
+   )
+ endif()
  cxx_library(gtest_main "${cxx_strict}" src/gtest_main.cc)
 -set_target_properties(gtest_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
 +#set_target_properties(gtest_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
- # If the CMake version supports it, attach header directory information
- # to the targets for when we are part of a parent build (ie being pulled
- # in via add_subdirectory() rather than being a standalone build).
---- ceph-19.2.0/src/googletest/googlemock/CMakeLists.txt.orig	2025-01-23 07:40:52.399853240 -0500
-+++ ceph-19.2.0/src/googletest/googlemock/CMakeLists.txt	2025-01-23 07:43:18.466236642 -0500
-@@ -54,6 +54,7 @@
+ string(REPLACE ";" "$<SEMICOLON>" dirs "${gtest_build_include_dirs}")
+ target_include_directories(gtest SYSTEM INTERFACE
+   "$<BUILD_INTERFACE:${dirs}>"
+--- ceph-20.1.0/src/googletest/googlemock/CMakeLists.txt.orig	2025-02-07 11:04:56.000000000 -0500
++++ ceph-20.1.0/src/googletest/googlemock/CMakeLists.txt	2025-09-16 08:12:18.121641875 -0400
+@@ -49,6 +49,7 @@
  # if they are the same (the default).
  add_subdirectory("${gtest_dir}" "${gmock_BINARY_DIR}/${gtest_dir}")
  
@@ -31,12 +37,27 @@
  
  # These commands only run if this is the main project
  if(CMAKE_PROJECT_NAME STREQUAL "gmock" OR CMAKE_PROJECT_NAME STREQUAL "googletest-distribution")
-@@ -100,7 +101,7 @@
+@@ -96,10 +97,10 @@
  else()
    cxx_library(gmock "${cxx_strict}" src/gmock-all.cc)
    target_link_libraries(gmock PUBLIC gtest)
 -  set_target_properties(gmock PROPERTIES VERSION ${GOOGLETEST_VERSION})
-+  #  set_target_properties(gmock PROPERTIES VERSION ${GOOGLETEST_VERSION})
++  # set_target_properties(gmock PROPERTIES VERSION ${GOOGLETEST_VERSION})
    cxx_library(gmock_main "${cxx_strict}" src/gmock_main.cc)
    target_link_libraries(gmock_main PUBLIC gmock)
-   set_target_properties(gmock_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
+-  set_target_properties(gmock_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
++  # set_target_properties(gmock_main PROPERTIES VERSION ${GOOGLETEST_VERSION})
+ endif()
+ 
+ string(REPLACE ";" "$<SEMICOLON>" dirs "${gmock_build_include_dirs}")
+--- ceph-20.1.0/src/googletest/googletest/cmake/internal_utils.cmake.orig	2025-09-22 10:12:18.037349494 -0400
++++ ceph-20.1.0/src/googletest/googletest/cmake/internal_utils.cmake	2025-09-22 10:13:13.729590249 -0400
+@@ -207,7 +207,7 @@
+ endfunction()
+ 
+ function(cxx_library name cxx_flags)
+-  cxx_library_with_type(${name} "" "${cxx_flags}" ${ARGN})
++  cxx_library_with_type(${name} STATIC "${cxx_flags}" ${ARGN})
+ endfunction()
+ 
+ # cxx_executable_with_flags(name cxx_flags libs srcs...)

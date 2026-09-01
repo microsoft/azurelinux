@@ -5,7 +5,7 @@
 
 Name:           python-%{pypi_name}
 Version:        20.11.0
-Release: 18%{?dist}
+Release:        16%{?dist}
 Summary:        Operations with ISO 8601 durations
 
 License:        ISC
@@ -50,6 +50,9 @@ durations. They have a shape similar to this: P3Y6M4DT12H30M5S
 %doc README.md
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 20.11.0-16
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 20.11.0-15
 - Rebuilt for Python 3.14.0rc3 bytecode
 

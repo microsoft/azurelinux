@@ -74,7 +74,7 @@
 +++ binutils-2.41/ld/testsuite/ld-x86-64/x86-64.exp	2023-08-03 15:46:29.537416942 +0100
 @@ -1386,7 +1386,7 @@ if { [isnative] && [check_compiler_avail
  	    "$NOPIE_LDFLAGS -Wl,--no-as-needed tmpdir/libprotected-func-2b.so" \
- 	    "$NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
+ 	    "$DIRECT_EXTERN_ACCESS_CFLAGS $NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
  	    { protected-func-1b.c } \
 -	    {{error_output "pr28875-func.err"}} \
 +	    {} \
@@ -83,7 +83,7 @@
  	[list \
 @@ -1402,7 +1402,7 @@ if { [isnative] && [check_compiler_avail
  	    "$NOPIE_LDFLAGS -Wl,--no-as-needed tmpdir/libprotected-func-2c.so" \
- 	    "$NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
+ 	    "$DIRECT_EXTERN_ACCESS_CFLAGS $NOPIE_CFLAGS -Wa,-mx86-used-note=yes" \
  	    { protected-func-1b.c } \
 -	    {{error_output "pr28875-func.err"}} \
 +	    {} \
@@ -1043,7 +1043,7 @@ diff -rup bin.orig/ld/testsuite/ld-x86-64/sframe-pltgot-2.d binutils-2.43.50-55e
  	}
      }
  
--    undefined_weak "$NOPIE_CFLAGS" "$NOPIE_LDFLAGS"
+-    undefined_weak "$DIRECT_EXTERN_ACCESS_CFLAGS $NOPIE_CFLAGS" "$NOPIE_LDFLAGS"
      undefined_weak "-fPIE" "$NOPIE_LDFLAGS"
      undefined_weak "-fPIE" "-pie"
      undefined_weak "-fPIE" "$NOPIE_LDFLAGS -Wl,-z,nodynamic-undefined-weak"

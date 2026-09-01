@@ -26,7 +26,7 @@ ExcludeArch: %{ix86}
 %global verify_tarball_signature 1
 
 # The source directory.
-%global source_directory 1.58-stable
+%global source_directory 1.60-stable
 
 # Filter perl provides.
 %{?perl_default_filter}
@@ -37,8 +37,8 @@ ExcludeArch: %{ix86}
 Summary:       Access and modify virtual machine disk images
 Name:          libguestfs
 Epoch:         1
-Version:       1.58.1
-Release: 4%{?dist}
+Version:       1.60.1
+Release:       1%{?dist}
 License:       LGPL-2.1-or-later
 
 # Build only for architectures that have a kernel
@@ -72,6 +72,12 @@ Source7:       libguestfs.keyring
 # Maintainer script which helps with handling patches.
 Source8:       copy-patches.sh
 
+# For applying patches:
+BuildRequires: git
+
+# RHEL-only patch because the location of qemu is different.
+Patch1000:     0001-RHEL-Use-alternate-location-for-qemu-kvm-in-direct-b.patch
+
 BuildRequires: autoconf, automake, libtool, gettext-devel
 
 # Basic build requirements.
@@ -97,8 +103,7 @@ BuildRequires: libselinux-utils
 BuildRequires: libselinux-devel
 BuildRequires: fuse, fuse-devel
 BuildRequires: pcre2-devel
-#BuildRequires: libvirt-devel >= 11.10.0
-BuildRequires: libvirt-devel
+BuildRequires: libvirt-devel >= 11.10.0
 BuildRequires: gperf
 BuildRequires: rpm-devel
 BuildRequires: cpio
@@ -122,7 +127,7 @@ BuildRequires: libldm-devel
 BuildRequires: json-c-devel
 BuildRequires: systemd-devel
 BuildRequires: bash-completion
-%if !0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} >= 11
 BuildRequires: bash-completion-devel
 %endif
 BuildRequires: /usr/bin/ping
@@ -162,11 +167,8 @@ BuildRequires: rubygem-rake
 BuildRequires: rubygem(json)
 BuildRequires: rubygem(rdoc)
 BuildRequires: rubygem(test-unit)
-BuildRequires: ruby-irb
+BuildRequires: rubygem(irb)
 BuildRequires: php-devel
-BuildRequires: gobject-introspection-devel
-BuildRequires: gjs
-BuildRequires: vala
 %endif
 %ifarch %{golang_arches}
 BuildRequires: golang
@@ -306,8 +308,7 @@ Suggests:      qemu-block-rbd
 Suggests:      qemu-block-ssh
 %endif
 Recommends:    libvirt-daemon-config-network
-#Requires:      libvirt-daemon-driver-qemu >= 11.10.0
-Requires:      libvirt-daemon-driver-qemu
+Requires:      libvirt-daemon-driver-qemu >= 11.10.0
 Requires:      libvirt-daemon-driver-secret
 Requires:      libvirt-daemon-driver-storage-core
 Requires:      passt
@@ -363,9 +364,6 @@ For developers:
 
 Language bindings:
 
-%if !0%{?rhel}
-libguestfs-gobject-devel  GObject bindings and GObject Introspection
-%endif
 %ifarch %{golang_arches}
            golang-guestfs  Go language bindings
 %endif
@@ -380,7 +378,6 @@ libguestfs-gobject-devel  GObject bindings and GObject Introspection
        python3-libguestfs  Python 3 bindings
 %if !0%{?rhel}
           ruby-libguestfs  Ruby bindings
-          libguestfs-vala  Vala language bindings
 %endif
 
 
@@ -588,38 +585,6 @@ Requires:      lua
 
 %description -n lua-guestfs
 lua-guestfs contains Lua bindings for %{name}.
-
-
-%package gobject
-Summary:       GObject bindings for %{name}
-Requires:      %{name}%{?_isa} = %{epoch}:%{version}-%{release}
-
-%description gobject
-%{name}-gobject contains GObject bindings for %{name}.
-
-To develop software against these bindings, you need to install
-%{name}-gobject-devel.
-
-
-%package gobject-devel
-Summary:       GObject bindings for %{name}
-Requires:      %{name}-gobject = %{epoch}:%{version}-%{release}
-
-%description gobject-devel
-%{name}-gobject contains GObject bindings for %{name}.
-
-This package is needed if you want to write software using the
-GObject bindings.  It also contains GObject Introspection information.
-
-
-%package vala
-Summary:       Vala for %{name}
-Requires:      %{name}-devel%{?_isa} = %{epoch}:%{version}-%{release}
-Requires:      vala
-
-
-%description vala
-%{name}-vala contains GObject bindings for %{name}.
 %endif
 
 
@@ -663,8 +628,11 @@ for %{name}.
 %if 0%{verify_tarball_signature}
 %{gpgverify} --keyring='%{SOURCE7}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
 %endif
-%setup -q
-%autopatch -p1
+%autosetup -S git -N
+%autopatch -p1 -M 999
+%if 0%{?rhel}
+%autopatch -p1 -m 1000
+%endif
 
 # ACLOCAL_PATH is temporarily required to work around
 # https://bugzilla.redhat.com/show_bug.cgi?id=2366708
@@ -698,7 +666,7 @@ else
   # https://lists.fedorahosted.org/archives/list/koji-devel@lists.fedorahosted.org/thread/ZIBY53JAURLT3QRBBJIJJ7EZWLZDE3TI/
   # -n 1 because of RHBZ#980502.
   dirs=
-  for d in /var/cache/{dnf,libdnf5,yum} ; do
+  for d in /hermetic_repo /var/cache/{dnf,libdnf5,yum} ; do
     if test -d $d ; then dirs="$dirs $d" ; fi
   done
   test -n "$dirs"
@@ -729,7 +697,6 @@ fi
   --without-java \
   --disable-erlang \
 %if 0%{?rhel}
-  --disable-gobject \
   --disable-lua \
   --disable-php \
   --disable-ruby \
@@ -958,7 +925,7 @@ rm ocaml/html/.gitignore
 
 
 %files bash-completion
-%if !0%{?rhel}
+%if 0%{?fedora} || 0%{?rhel} >= 11
 %dir %{bash_completions_dir}
 %{bash_completions_dir}/guestfish
 %{bash_completions_dir}/guestmount
@@ -1042,26 +1009,6 @@ rm ocaml/html/.gitignore
 %doc lua/examples/LICENSE
 %{_libdir}/lua/*/guestfs.so
 %{_mandir}/man3/guestfs-lua.3*
-
-
-%files gobject
-%{_libdir}/libguestfs-gobject-1.0.so.0*
-%{_libdir}/girepository-1.0/Guestfs-1.0.typelib
-
-
-%files gobject-devel
-%{_libdir}/libguestfs-gobject-1.0.so
-%{_includedir}/guestfs-gobject.h
-%dir %{_includedir}/guestfs-gobject
-%{_includedir}/guestfs-gobject/*.h
-%{_datadir}/gir-1.0/Guestfs-1.0.gir
-%{_libdir}/pkgconfig/libguestfs-gobject-1.0.pc
-%{_mandir}/man3/guestfs-gobject.3*
-
-
-%files vala
-%{_datadir}/vala/vapi/libguestfs-gobject-1.0.deps
-%{_datadir}/vala/vapi/libguestfs-gobject-1.0.vapi
 %endif
 
 
@@ -1087,14 +1034,62 @@ rm ocaml/html/.gitignore
 
 
 %changelog
-* Mon Jan 19 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.58.1-1
-- New upstream stable version 1.58.1
+* Tue Jul 14 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.60.1-1
+- New upstream stable version 1.60.1
+
+* Thu Jul 09 2026 Jerry James <loganjerry@gmail.com> - 1:1.60.0-2
+- OCaml 5.5.0 rebuild
+
+* Thu Jul 09 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.60.0-1
+- New upstream stable version 1.60.0
+
+* Fri Jul 03 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.9-1
+- New upstream development version 1.59.9
+
+* Wed Jun 03 2026 Python Maint <python-maint@redhat.com> - 1:1.59.8-2
+- Rebuilt for Python 3.15
+
+* Tue May 05 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.8-1
+- New upstream development version 1.59.8
+
+* Wed Apr 29 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.7-1
+- New upstream development version 1.59.7
+
+* Fri Apr 17 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.6-1
+- New upstream development version 1.59.6
+
+* Thu Apr 02 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.5-1
+- New upstream development version 1.59.5
+
+* Tue Mar 17 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.4-1
+- New upstream development version 1.59.4
+
+* Fri Feb 20 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.3-2
+- OCaml 5.4.1 rebuild
+
+* Wed Feb 11 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.3-1
+- New upstream development version 1.59.3
+- Remove GObject and Vala bindings
+
+* Mon Jan 26 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.2-1
+- New upstream development version 1.59.2
+
+* Mon Jan 19 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.59.1-1
+- New upstream development version 1.59.1
 - Fix potential build failure on s390x
 
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.58.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Thu Jan 08 2026 Mamoru TASAKA <mtasaka@fedoraproject.org> - 1:1.58.0-2
+- Rebuild for https://fedoraproject.org/wiki/Changes/Ruby_4.0
+
 * Mon Jan 05 2026 Richard W.M. Jones <rjones@redhat.com> - 1:1.58.0-1
-- New upstream stable version 1.58.0
-- Require qemu >= 7.2.0 and passt.
-- Libvirt >= 11.10.0 is needed but don't hard require it for F43
+- New upstream development version 1.58.0
+- Require libvirt >= 11.10.0, qemu >= 7.2.0 and passt.
+
+* Wed Dec 17 2025 Tom Callaway <spot@fedoraproject.org> - 1:1.57.7-2
+- rebuild for new libconfig
 
 * Thu Dec 04 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.7-1
 - New upstream development version 1.57.7
@@ -1106,33 +1101,39 @@ rm ocaml/html/.gitignore
 - New upstream development version 1.57.5
 - Test direct backend in %%check
 
-* Wed Oct 15 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.4-2
+* Wed Oct 15 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.4-4
 - Require passt
 - https://lists.fedoraproject.org/archives/list/devel@lists.fedoraproject.org/message/YDHKKQSDURTMSKSN6GW3QGQI43DTFXNH/
+
+* Wed Oct 15 2025 Remi Collet <remi@remirepo.net> - 1:1.57.4-3
+- rebuild for https://fedoraproject.org/wiki/Changes/php85
+
+* Mon Oct 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.4-2
+- OCaml 5.4.0 rebuild
 
 * Tue Sep 30 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.4-1
 - New upstream development version 1.57.4
 - Enable aarch64 tests
 
-* Fri Sep 19 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.3-2
-- Bump release and rebuild (RHBZ#2396712)
+* Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 1:1.57.3-2
+- Rebuilt for Python 3.14.0rc3 bytecode
 
 * Tue Sep 09 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.3-1
 - New upstream development version 1.57.3
 
-* Sat Aug 16 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.2-2
-- Rebuild for Python 3.14.0rc2 (RHBZ#2388845)
+* Fri Aug 15 2025 Python Maint <python-maint@redhat.com> - 1:1.57.2-2
+- Rebuilt for Python 3.14.0rc2 bytecode
 
 * Fri Aug 15 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.2-1
 - New upstream development version 1.57.2
 
-* Wed Aug 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.56.2-1
-- New upstream stable version 1.56.2
+* Wed Aug 13 2025 Richard W.M. Jones <rjones@redhat.com> - 1:1.57.1-1
+- New upstream development version 1.57.1
 
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:1.56.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 
-* Sat Jul 12 2025 Jerry James  <loganjerry@gmail.com> - 1:1.56.1-3
+* Sat Jul 12 2025 Jerry James <loganjerry@gmail.com> - 1:1.56.1-3
 - Rebuild to fix OCaml dependencies
 
 * Mon Jul 07 2025 Jitka Plesnikova <jplesnik@redhat.com> - 1:1.56.1-2

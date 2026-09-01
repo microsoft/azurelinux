@@ -1,6 +1,13 @@
---- snowball-2.2.0/GNUmakefile.orig	2021-11-09 19:42:18.000000000 -0700
-+++ snowball-2.2.0/GNUmakefile	2022-08-19 15:46:07.985433300 -0600
-@@ -175,7 +175,7 @@ CPPFLAGS=
+--- snowball-3.0.1/GNUmakefile.orig	2025-05-08 21:10:41.000000000 -0600
++++ snowball-3.0.1/GNUmakefile	2026-01-18 19:00:59.131393004 -0700
+@@ -190,12 +190,13 @@ C_OTHER_OBJECTS = $(C_OTHER_SOURCES:.c=.
+ JAVA_CLASSES = $(JAVA_SOURCES:.java=.class)
+ JAVA_RUNTIME_CLASSES=$(JAVARUNTIME_SOURCES:.java=.class)
+ 
+-CFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
++EXECFLAGS=-g -O2 -W -Wall -Wmissing-prototypes -Wmissing-declarations -Wshadow $(WERROR)
++CFLAGS=$(EXECFLAGS) -fPIC
+ CPPFLAGS=
  
  INCLUDES=-Iinclude
  
@@ -9,7 +16,16 @@
  
  algorithms.mk: libstemmer/mkalgorithms.pl libstemmer/modules.txt
  	libstemmer/mkalgorithms.pl algorithms.mk libstemmer/modules.txt
-@@ -222,19 +222,24 @@ libstemmer/modules_utf8.h libstemmer/mki
+@@ -236,7 +237,7 @@ $(STEMMING_DATA)/% $(STEMMING_DATA_ABS)/
+ 	@[ -f '$@' ] || { echo '$@: Test data not found'; echo 'Checkout the snowball-data repo as "$(STEMMING_DATA_ABS)"'; exit 1; }
+ 
+ snowball$(EXEEXT): $(COMPILER_OBJECTS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
++	$(CC) $(EXECFLAGS) $(LDFLAGS) -o $@ $^
+ 
+ $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
+ 
+@@ -254,20 +255,25 @@ libstemmer/modules_utf8.h libstemmer/mki
  
  libstemmer/libstemmer.o: libstemmer/modules.h $(C_LIB_HEADERS)
  
@@ -22,17 +38,22 @@
  	$(AR) -cru $@ $^
  
  examples/%.o: examples/%.c
- 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
++	$(CC) $(EXECFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
  
 -stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.a
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 +stemwords$(EXEEXT): $(STEMWORDS_OBJECTS) libstemmer.so
- 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
++	$(CC) $(EXECFLAGS) $(LDFLAGS) -o $@ $^
  
  tests/%.o: tests/%.c
- 	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
+-	$(CC) $(CFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
++	$(CC) $(EXECFLAGS) $(INCLUDES) $(CPPFLAGS) -c -o $@ $<
  
 -stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.a
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 +stemtest$(EXEEXT): $(STEMTEST_OBJECTS) libstemmer.so
- 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
++	$(CC) $(EXECFLAGS) $(LDFLAGS) -o $@ $^
  
  csharp_stemwords$(EXEEXT): $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)
+ 	$(MCS) -unsafe -target:exe -out:$@ $(CSHARP_STEMWORDS_SOURCES) $(CSHARP_RUNTIME_SOURCES) $(CSHARP_SOURCES)

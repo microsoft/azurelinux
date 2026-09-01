@@ -2,8 +2,8 @@
 # Do not edit manually; changes may be overwritten.
 
 Name:           lzip
-Version:        1.25
-Release: 6%{?dist}
+Version:        1.26
+Release:        1%{?dist}
 Summary:        LZMA compressor with integrity checking
 
 License:        GPL-2.0-or-later
@@ -52,6 +52,9 @@ make check
 
 
 %changelog
+* Tue Mar 17 2026 Gwyn Ciesla <gwync@protonmail.com> - 1.26-1
+- 1.26
+
 * Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1.25-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
 

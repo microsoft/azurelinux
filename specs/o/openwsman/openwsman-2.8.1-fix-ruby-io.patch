@@ -1,0 +1,33 @@
+diff -up openwsman-2.8.1/bindings/openwsman.i.orig openwsman-2.8.1/bindings/openwsman.i
+--- openwsman-2.8.1/bindings/openwsman.i.orig	2025-01-23 10:23:52.000000000 +0100
++++ openwsman-2.8.1/bindings/openwsman.i	2025-10-21 16:56:01.025576984 +0200
+@@ -105,15 +105,8 @@ SWIGINTERNINLINE SV *SWIG_From_double  S
+ #if HAVE_RUBY_THREAD_H /* New threading model */
+ #include <ruby/thread.h>
+ #endif
+-#if RUBY_VERSION > 18
+-  #if HAVE_RB_IO_T
+-    #define rb_fptr_t rb_io_t
+-  #else
+-    #define rb_fptr_t struct rb_io
+-  #endif
+-#else
+-  #define rb_fptr_t struct OpenFile
+-#endif
++/* Use rb_io_t for Ruby 1.9+ */
++#define rb_fptr_t rb_io_t
+ %}
+ 
+ %typemap(in) FILE* {
+@@ -122,11 +115,7 @@ SWIGINTERNINLINE SV *SWIG_From_double  S
+   Check_Type($input, T_FILE);
+   GetOpenFile($input, fptr);
+   /*rb_io_check_writable(fptr);*/
+-#if RUBY_VERSION > 18
+   $1 = rb_io_stdio_file(fptr);
+-#else
+-  $1 = GetReadFile(fptr);
+-#endif
+ }
+ 
+ #endif /* SWIGRUBY */

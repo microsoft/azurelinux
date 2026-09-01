@@ -4,8 +4,8 @@
 %global framework krunner
 
 Name:    kf6-%{framework}
-Version: 6.23.0
-Release: 4%{?dist}
+Version: 6.29.0
+Release: 1%{?dist}
 Summary: KDE Frameworks 6 Tier 3 solution with parallelized query system
 
 License: BSD-2-Clause AND CC0-1.0 AND LGPL-2.0-or-later AND LGPL-2.1-only AND LGPL-2.1-or-later AND LGPL-3.0-only AND (LGPL-2.1-only OR LGPL-3.0-only)
@@ -27,8 +27,7 @@ BuildRequires:  cmake(KF6Service)
 BuildRequires:  cmake(KF6Solid)
 BuildRequires:  cmake(KF6ThreadWeaver)
 BuildRequires:  pkgconfig(xkbcommon)
-BuildRequires:  qt6-qtbase-devel
-BuildRequires:  qt6-qtdeclarative-devel
+BuildRequires:  cmake(Qt6Core)
 
 BuildRequires:  cmake(KF6ItemModels)
 
@@ -81,6 +80,7 @@ Developer Documentation files for %{name} in HTML format
 %{_kf6_datadir}/dbus-1/interfaces/*
 %{_kf6_datadir}/kdevappwizard/templates/runner6.tar.bz2
 %{_kf6_datadir}/kdevappwizard/templates/runner6python.tar.bz2
+%{_libdir}/qt6/metatypes/qt6kf6runner_*.json
 %{_qt6_docdir}/*/*.tags
 %{_qt6_docdir}/*/*.index
 
@@ -93,6 +93,27 @@ Developer Documentation files for %{name} in HTML format
 %exclude %{_qt6_docdir}/*/*.index
 
 %changelog
+* Fri Aug 07 2026 Steve Cossette <farchord@gmail.com> - 6.29.0-1
+- 6.29.0
+
+* Thu Jul 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 6.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_45_Mass_Rebuild
+
+* Sat Jul 04 2026 Steve Cossette <farchord@gmail.com> - 6.28.0-1
+- 6.28.0
+
+* Fri Jun 05 2026 Steve Cossette <farchord@gmail.com> - 6.27.0-1
+- 6.27.0
+
+* Fri May 01 2026 Steve Cossette <farchord@gmail.com> - 6.26.0-1
+- 6.26.0
+
+* Thu Apr 09 2026 Steve Cossette <farchord@gmail.com> - 6.25.0-1
+- 6.25.0
+
+* Tue Mar 10 2026 Steve Cossette <farchord@gmail.com> - 6.24.0-1
+- 6.24.0
+
 * Thu Feb 12 2026 Steve Cossette <farchord@gmail.com> - 6.23.0-1
 - 6.23.0
 

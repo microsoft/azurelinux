@@ -1,0 +1,48 @@
+diff -up expect5.45.4/exp_chan.c.tcl9-alloc expect5.45.4/exp_chan.c
+--- expect5.45.4/exp_chan.c.tcl9-alloc	2026-01-19 11:31:11.239907579 +0100
++++ expect5.45.4/exp_chan.c	2026-01-19 11:31:11.243579396 +0100
+@@ -688,7 +688,7 @@ expCreateChannel(interp,fdin,fdout,pid)
+ 
+     channelTypePtr = &expChannelType;
+ 
+-    esPtr = (ExpState *) ckalloc((unsigned) sizeof(ExpState));
++    esPtr = (ExpState *) ckalloc(sizeof(ExpState));
+ 
+     esPtr->nextPtr = tsdPtr->firstExpPtr;
+     tsdPtr->firstExpPtr = esPtr;
+diff -up expect5.45.4/exp_clib.c.tcl9-alloc expect5.45.4/exp_clib.c
+--- expect5.45.4/exp_clib.c.tcl9-alloc	2026-01-19 11:31:11.240768241 +0100
++++ expect5.45.4/exp_clib.c	2026-01-19 11:31:11.244822652 +0100
+@@ -398,7 +398,7 @@ char *exp;
+ 		FAIL("regexp too big");
+ 
+ 	/* Allocate space. */
+-	r = (regexp *)ckalloc(sizeof(regexp) + (unsigned)rcstate->regsize);
++	r = (regexp *)ckalloc(sizeof(regexp) + rcstate->regsize);
+ 	if (r == NULL)
+ 		FAIL("out of space");
+ 
+diff -up expect5.45.4/expect.h.tcl9-alloc expect5.45.4/expect.h
+--- expect5.45.4/expect.h.tcl9-alloc	2026-01-19 11:31:11.239023248 +0100
++++ expect5.45.4/expect.h	2026-01-19 11:31:11.242424280 +0100
+@@ -276,16 +276,12 @@ typedef struct Tcl_RegExp_ *Tcl_RegExp;
+ 
+ 
+ /*
+- * These function have been renamed. The old names are deprecated, but we
+- * define these macros for backwards compatibilty.
++ * Note: The following deprecated macros have been removed for Tcl9 compatibility:
++ *   Tcl_Ckalloc, Tcl_Ckfree, Tcl_Ckrealloc, Tcl_Return, Tcl_TildeSubst
++ * Use the newer API names directly: Tcl_Alloc, Tcl_Free, Tcl_Realloc,
++ * Tcl_SetResult, Tcl_TranslateFileName.
+  */
+ 
+-#define Tcl_Ckalloc Tcl_Alloc
+-#define Tcl_Ckfree Tcl_Free
+-#define Tcl_Ckrealloc Tcl_Realloc
+-#define Tcl_Return Tcl_SetResult
+-#define Tcl_TildeSubst Tcl_TranslateFileName
+-
+ /*
+  * Note: panic/panicVA macros removed for Tcl9 compatibility.
+  * Use Tcl_Panic directly.

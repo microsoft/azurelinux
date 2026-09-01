@@ -3,7 +3,7 @@
 
 Name:           liblzf
 Version:        3.6
-Release: 36%{?dist}
+Release:        34%{?dist}
 Summary:        Small data compression library
 
 # Automatically converted from old format: BSD or GPLv2+ - review is highly recommended.
@@ -77,6 +77,9 @@ rm -f %{buildroot}%{_libdir}/liblzf.la
 %{_libdir}/pkgconfig/liblzf.pc
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 3.6-34
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Thu Jul 24 2025 Fedora Release Engineering <releng@fedoraproject.org> - 3.6-33
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

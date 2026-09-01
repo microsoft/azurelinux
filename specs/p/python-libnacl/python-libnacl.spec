@@ -3,7 +3,7 @@
 
 Name:           python-libnacl
 Version:        2.1.0
-Release: 15%{?dist}
+Release:        13%{?dist}
 Summary:        Python bindings for libsodium based on ctypes
 
 # Automatically converted from old format: ASL 2.0 - review is highly recommended.
@@ -70,6 +70,9 @@ install -D -m 644 doc/_build/man/libnacl.1 %{buildroot}%{_mandir}/man1/libnacl.1
 
 
 %changelog
+* Sat Jan 17 2026 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.0-13
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
 * Fri Sep 19 2025 Python Maint <python-maint@redhat.com> - 2.1.0-12
 - Rebuilt for Python 3.14.0rc3 bytecode
 

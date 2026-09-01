@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 %global forgeurl https://pagure.io/fonts-rpm-macros
 Epoch: 1
-Version: 2.0.5
+Version: 5.0.0
 %forgemeta
 
 #https://src.fedoraproject.org/rpms/redhat-rpm-config/pull-request/51
@@ -21,17 +21,12 @@ Version: 2.0.5
 BuildArch: noarch
 
 Name:      fonts-rpm-macros
-Release: 26%{?dist}
+Release:   2%{?dist}
 Summary:   Build-stage rpm automation for fonts packages
 
 License:   GPL-3.0-or-later
 URL:       https://docs.fedoraproject.org/en-US/packaging-guidelines/FontsPolicy/
 Source:    %{forgesource}
-Patch0:    %{name}-omit-foundry-in-family.patch
-Patch1:    %{name}-drop-yaml.patch
-Patch2:    %{name}-epoch-in-req.patch
-Patch3:    %{name}-fail-on-missing-files.patch
-Patch4:    %{name}-spec-template-license-update.patch
 
 Requires:  fonts-srpm-macros = %{?epoch:%{epoch}:}%{version}-%{release}
 Requires:  fonts-filesystem  = %{?epoch:%{epoch}:}%{version}-%{release}
@@ -108,13 +103,6 @@ for template in templates/rpm/*\.spec ; do
   grep -v '^%%dnl' "${template}" > "${target}"
   touch -r "${template}" "${target}"
 done
-%patch -P0 -p1
-%if 0%{?rhel} >= 10
-%patch -P1 -p1
-%endif
-%patch -P2 -p1
-%patch -P3 -p1
-%patch -P4 -p1
 
 %install
 install -m 0755 -d    %{buildroot}%{_fontbasedir} \
@@ -171,6 +159,12 @@ install -m 0755 -vp   bin/* %{buildroot}%{_bindir}
 %doc %{ftcgtemplatedir}/*txt
 
 %changelog
+* Fri Jan 16 2026 Fedora Release Engineering <releng@fedoraproject.org> - 1:5.0.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_44_Mass_Rebuild
+
+* Mon Sep 29 2025 Parag Nemade <pnemade AT redhat DOT com> - 1:5.0.0-1
+- Update to 5.0.0 version (#2400049)
+
 * Wed Jul 23 2025 Fedora Release Engineering <releng@fedoraproject.org> - 1:2.0.5-23
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_43_Mass_Rebuild
 

@@ -1,0 +1,24 @@
+diff -rupN --no-dereference eigen-5.0.1/doc/QuickReference.dox eigen-5.0.1-new/doc/QuickReference.dox
+--- eigen-5.0.1/doc/QuickReference.dox	2025-11-08 21:44:56.000000000 +0100
++++ eigen-5.0.1-new/doc/QuickReference.dox	2025-11-09 21:19:36.841197655 +0100
+@@ -551,7 +551,6 @@ Read-write access to sub-vectors:
+ <tr>
+ <th>Default versions</th>
+ <th>Optimized versions when the size \n is known at compile time</th></tr>
+-<th></th>
+ 
+ <tr><td>\code vec1.head(n)\endcode</td><td>\code vec1.head<n>()\endcode</td><td>the first \c n coeffs </td></tr>
+ <tr><td>\code vec1.tail(n)\endcode</td><td>\code vec1.tail<n>()\endcode</td><td>the last \c n coeffs </td></tr>
+diff -rupN --no-dereference eigen-5.0.1/doc/TutorialSlicingIndexing.dox eigen-5.0.1-new/doc/TutorialSlicingIndexing.dox
+--- eigen-5.0.1/doc/TutorialSlicingIndexing.dox	2025-11-08 21:44:56.000000000 +0100
++++ eigen-5.0.1-new/doc/TutorialSlicingIndexing.dox	2025-11-09 21:19:36.841520424 +0100
+@@ -114,8 +114,7 @@ Here are some examples for a 2D array/ma
+ 
+ As seen in the last example, referencing the <i> last n </i> elements (or rows/columns) is a bit cumbersome to write.
+ This becomes even more tricky and error prone with a non-default increment.
+-Here comes \link Eigen::placeholders::lastN(SizeType) Eigen::placeholders::lastN(size) \endlink, and
+-\link Eigen::placeholders::lastN(SizeType,IncrType) Eigen::placeholders::lastN(size,incr) \endlink:
++Here comes Eigen::placeholders::lastN(SizeType), and Eigen::placeholders::lastN(SizeType,IncrType):
+ 
+ <table class="manual">
+ <tr>
