@@ -1,4 +1,10 @@
-Release:        31%{?dist}
+Summary:        agent for collecting, processing, aggregating, and writing metrics.
+Name:           telegraf
+Version:        1.31.0
+Release:        32%{?dist}
+License:        MIT
+Vendor:         Microsoft Corporation
+Distribution:   Azure Linux
 Group:          Development/Tools
 URL:            https://github.com/influxdata/telegraf
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
@@ -63,9 +69,12 @@ Patch53:        CVE-2026-56852.patch
 Patch54:        CVE-2025-29923.patch
 Patch55:        CVE-2025-46327.patch
 Patch56:        CVE-2026-54908.patch
-Patch57:        CVE-2026-65819.patch
-Patch58:        CVE-2026-79921.patch
-Patch59:        CVE-2026-54332.patch
+Patch57:        CVE-2026-54332.patch
+Patch58:        CVE-2026-65819.patch
+Patch59:        CVE-2026-79921.patch
+
+BuildRequires:  golang
+BuildRequires:  systemd-devel
 Requires:       logrotate
 Requires:       procps-ng
 Requires:       shadow-utils
@@ -124,11 +133,18 @@ fi
 %{_bindir}/telegraf
 %{_unitdir}/telegraf.service
 %{_sysconfdir}/logrotate.d/%{name}
+%dir %{_sysconfdir}/%{name}/telegraf.d
+
+%changelog
+* Mon Aug 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-32
+- Patch for CVE-2026-54332
+
 * Mon Aug 31 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-31
 - Patch for CVE-2026-79921
 
 * Thu Aug 13 2026 Sushil Sati <v-sushilsati@microsoft.com> - 1.31.0-30
 - Patch for CVE-2026-65819
+
 * Fri Aug 07 2026 Azure Linux Security Servicing Account <azurelinux-security@microsoft.com> - 1.31.0-28
 - Patch for CVE-2026-54908
 
