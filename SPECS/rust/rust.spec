@@ -8,13 +8,8 @@
 
 Summary:        Rust Programming Language
 Name:           rust
-<<<<<<< HEAD
-Version:        1.90.0
-Release:        11%{?dist}
-=======
 Version:        1.96.1
 Release:        1%{?dist}
->>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 License:        (ASL 2.0 OR MIT) AND BSD AND CC-BY-3.0
 Vendor:         Microsoft Corporation
 Distribution:   Azure Linux
@@ -40,34 +35,6 @@ Source0:        https://static.rust-lang.org/dist/rustc-%{version}-src.tar.xz
 #
 
 Source1:        rustc-%{version}-src-cargo.tar.gz
-<<<<<<< HEAD
-Source2:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
-Source3:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
-Source4:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-x86_64-unknown-linux-gnu.tar.xz
-Source5:        https://static.rust-lang.org/dist/%{release_date}/cargo-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Source6:        https://static.rust-lang.org/dist/%{release_date}/rustc-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Source7:        https://static.rust-lang.org/dist/%{release_date}/rust-std-%{stage0_version}-aarch64-unknown-linux-gnu.tar.xz
-Patch0:         CVE-2025-4574.patch
-Patch1:         CVE-2025-53605.patch
-Patch2:         CVE-2024-11738.patch
-Patch3:         CVE-2025-55159.patch
-Patch4:         CVE-2025-67873.patch
-Patch5:         CVE-2025-68114.patch
-Patch6:         CVE-2025-4207.patch
-Patch7:         CVE-2025-12818.patch
-Patch8:         CVE-2026-24116.patch
-Patch9:         CVE-2025-58160.patch
-Patch10:        CVE-2026-25541.patch
-Patch11:        CVE-2026-25727.patch
-Patch12:        CVE-2026-2006.patch
-Patch13:        CVE-2026-33056.patch
-Patch14:        CVE-2026-33055.patch
-Patch15:        CVE-2026-34743.patch
-Patch16:        CVE-2026-5222.patch
-Patch17:        CVE-2026-5223.patch
-Patch18:        CVE-2026-40034.patch
-Patch19:        CVE-2026-47143.patch
-=======
 Patch0:         CVE-2025-53605.patch
 Patch1:         CVE-2025-67873.patch
 Patch2:         CVE-2025-68114.patch
@@ -79,7 +46,6 @@ Patch7:         CVE-2026-2006.patch
 Patch8:         CVE-2026-34743.patch
 Patch9:         CVE-2026-40034.patch
 Patch10:        CVE-2026-47143.patch
->>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 
 # Note: the stage0 bootstrap toolchain (cargo/rustc/rust-std tarballs) is packaged
 # separately in rust-bootstrap, to keep this SRPM's size down. See SPECS/rust-bootstrap.
@@ -204,16 +170,8 @@ rm %{buildroot}%{_docdir}/clippy/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/rustfmt/{LICENSE-APACHE,LICENSE-MIT}
 rm %{buildroot}%{_docdir}/docs/html/.lock
 
-<<<<<<< HEAD
-# Move bundled third-party license texts out of %{_docdir} (where rpm auto-tags them %doc)
-# into the license dir, so they are classified only as %license and not flagged as duplicates.
-mkdir -p %{buildroot}%{_licensedir}/rust-doc
-mv %{buildroot}%{_docdir}/rustc/licenses/* %{buildroot}%{_licensedir}/rust-doc/
-rmdir %{buildroot}%{_docdir}/rustc/licenses
-=======
 # Ambiguous python shebangs in the stdlib sources break brp-mangle-shebangs.
 find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+'
->>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 
 %ldconfig_scriptlets
 
@@ -256,7 +214,11 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 %{_libdir}/rustlib/src
 
 %changelog
-<<<<<<< HEAD
+* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-1
+- Move stage0 bootstrap toolchain tarballs (cargo/rustc/rust-std) out of this
+  SRPM into a new rust-bootstrap BuildRequires package, to keep this SRPM small.
+- Upgrade to 1.96.1
+
 * Wed Aug 12 2026 Kshitiz Godara <kgodara@microsoft.com> - 1.90.0-11
 - Bump to rebuild with updated glibc
 
@@ -264,12 +226,6 @@ find %{buildroot}%{_libdir}/rustlib/src -type f -name '*.py' -exec rm -v '{}' '+
 - Patch for CVE-2026-47143
 - Update CVE-2026-25541.patch to apply cleanly against vendored bytes 1.10.1
 - Fix rust-doc license check warnings
-=======
-* Wed Aug 19 2026 Kavya Sree Kaitepalli <kkaitepalli@microsoft.com> - 1.96.1-1
-- Move stage0 bootstrap toolchain tarballs (cargo/rustc/rust-std) out of this
-  SRPM into a new rust-bootstrap BuildRequires package, to keep this SRPM small.
-- Upgrade to 1.96.1
->>>>>>> 4a21ab0e5b (Unrevert rust change and integrate with kata-containers-cc (#18628))
 
 * Thu Jun 04 2026 BinduSri Adabala <v-badabala@microsoft.com> - 1.90.0-9
 - Add patch for CVE-2026-5222, CVE-2026-5223 & CVE-2026-40034

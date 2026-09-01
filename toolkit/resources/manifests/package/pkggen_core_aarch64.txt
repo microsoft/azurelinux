@@ -170,11 +170,11 @@ gtk-doc-1.33.2-1.azl3.noarch.rpm
 autoconf-2.72-2.azl3.noarch.rpm
 automake-1.16.5-2.azl3.noarch.rpm
 ocaml-srpm-macros-9-4.azl3.noarch.rpm
-openssl-3.3.7-4.azl3.aarch64.rpm
-openssl-devel-3.3.7-4.azl3.aarch64.rpm
-openssl-libs-3.3.7-4.azl3.aarch64.rpm
-openssl-perl-3.3.7-4.azl3.aarch64.rpm
-openssl-static-3.3.7-4.azl3.aarch64.rpm
+openssl-3.3.7-5.azl3.aarch64.rpm
+openssl-devel-3.3.7-5.azl3.aarch64.rpm
+openssl-libs-3.3.7-5.azl3.aarch64.rpm
+openssl-perl-3.3.7-5.azl3.aarch64.rpm
+openssl-static-3.3.7-5.azl3.aarch64.rpm
 libcap-2.69-16.azl3.aarch64.rpm
 libcap-devel-2.69-16.azl3.aarch64.rpm
 debugedit-5.0-3.azl3.aarch64.rpm
@@ -221,8 +221,8 @@ tdnf-devel-3.5.8-8.azl3.aarch64.rpm
 tdnf-plugin-repogpgcheck-3.5.8-8.azl3.aarch64.rpm
 libassuan-2.5.6-1.azl3.aarch64.rpm
 libassuan-devel-2.5.6-1.azl3.aarch64.rpm
-libgpg-error-1.48-1.azl3.aarch64.rpm
-libgcrypt-1.10.3-2.azl3.aarch64.rpm
+libgpg-error-1.49-1.azl3.aarch64.rpm
+libgcrypt-1.11.3-1.azl3.aarch64.rpm
 libksba-1.6.4-1.azl3.aarch64.rpm
 libksba-devel-1.6.4-1.azl3.aarch64.rpm
 libxslt-1.1.43-3.azl3.aarch64.rpm
