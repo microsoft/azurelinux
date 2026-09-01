@@ -22023,8 +22023,8 @@
         "type": "other",
         "other": {
           "name": "pyasn1-modules",
-          "version": "0.2.8",
-          "downloadUrl": "https://github.com/etingof/pyasn1-modules/archive/refs/tags/v0.2.8.tar.gz"
+          "version": "0.4.2",
+          "downloadUrl": "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz"
         }
       }
     },
@@ -24403,8 +24403,8 @@
         "type": "other",
         "other": {
           "name": "python-pyasn1",
-          "version": "0.4.8",
-          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-0.4.8.tar.gz"
+          "version": "0.6.4",
+          "downloadUrl": "https://files.pythonhosted.org/packages/source/p/pyasn1/pyasn1-0.6.4.tar.gz"
         }
       }
     },
