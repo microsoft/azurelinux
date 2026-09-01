@@ -23,11 +23,11 @@
 # AZL: RPM release counter. Bump for rebuilds without a version change. This
 # corresponds to upstream Fedora's %{pkgrelease} macro; we use it in the
 # %{specrelease} macro below instead of a hardcoded value.
-%define azl_pkgrelease 3
+%define azl_pkgrelease 1
 
 # define buildid .local
-%define specversion 6.18.39
-%define tarfile_release 6.18.39
+%define specversion 6.18.45
+%define tarfile_release 6.18.45
 # This is needed to do merge window version magic
 # This allows pkg_release to have configurable %%{?dist} tag
 %define specrelease %{kextraversion}.%{azl_pkgrelease}%{?buildid}%{?dist}
@@ -119,6 +119,9 @@ done
 %{_prefix}/*-linux-gnu/*
 
 %changelog
+* Tue Sep 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.45-1.1
+- feat(kernel): update kernel and kernel-headers to 6.18.45.1
+
 * Mon Aug 24 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.3
 - chore(kernel-headers): tidy release macros
 
