@@ -8711,8 +8711,8 @@
         "type": "other",
         "other": {
           "name": "kubevirt",
-          "version": "1.7.1",
-          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.7.1.tar.gz"
+          "version": "1.8.4",
+          "downloadUrl": "https://github.com/kubevirt/kubevirt/archive/refs/tags/v1.8.4.tar.gz"
         }
       }
     },
@@ -11821,8 +11821,8 @@
         "type": "other",
         "other": {
           "name": "libvirt",
-          "version": "10.10.0",
-          "downloadUrl": "https://download.libvirt.org/libvirt-10.10.0.tar.xz"
+          "version": "11.9.0",
+          "downloadUrl": "https://download.libvirt.org/libvirt-11.9.0.tar.xz"
         }
       }
     },
@@ -26083,8 +26083,8 @@
         "type": "other",
         "other": {
           "name": "qemu",
-          "version": "9.1.0",
-          "downloadUrl": "https://download.qemu.org/qemu-9.1.0.tar.xz"
+          "version": "10.1.0",
+          "downloadUrl": "https://download.qemu.org/qemu-10.1.0.tar.xz"
         }
       }
     },
