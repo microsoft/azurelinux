@@ -13131,8 +13131,8 @@
         "type": "other",
         "other": {
           "name": "mariadb",
-          "version": "10.11.18",
-          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.18/source/mariadb-10.11.18.tar.gz"
+          "version": "10.11.19",
+          "downloadUrl": "https://downloads.mariadb.org/interstitial/mariadb-10.11.19/source/mariadb-10.11.19.tar.gz"
         }
       }
     },
