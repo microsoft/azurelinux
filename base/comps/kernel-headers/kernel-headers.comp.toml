@@ -17,7 +17,7 @@ release = { calculation = "manual" }
 # base/comps/kernel; kept as a separate declaration so kernel-headers builds
 # stand-alone.
 [[components.kernel-headers.source-files]]
-filename = "kernel-6.18.39.1.tar.gz"
-hash = "cd70c68662ae5fca906a45d2feae1e4cdaed63b0427856f46cbfa6398f2e4b32b6a233f05ea49b359abf9119b0644177637b9638ec773b1d26e8725db042e0c5"
+filename = "kernel-6.18.45.1.tar.gz"
+hash = "710483b7d6cdb6bf06f686d457fb9f361421295c115a8adb6f71bb80c55c2bf42046d4fc747aa399c4d7d0b0b3dcf493bd66df399e423c34e5c6b80fc2c70dac"
 hash-type = "SHA512"
-origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.39.1.tar.gz" }
+origin = { type = "download", uri = "https://github.com/microsoft/CBL-Mariner-Linux-Kernel/archive/rolling-lts/azl4/6.18.45.1.tar.gz" }
