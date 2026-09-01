@@ -4295,6 +4295,7 @@ fi\
 %changelog
 * Tue Sep 01 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.45-1.1
 - feat(kernel): update kernel and kernel-headers to 6.18.45.1
+- chore(kernel): disable xxhash64 Crypto API support
 
 * Thu Aug 27 2026 Rachel Menge <rachelmenge@microsoft.com> - 6.18.39-1.7
 - refactor(kernel): remove automotive support
