@@ -197,8 +197,8 @@ rm tests/lib/*grpc*
 %{_sysusersdir}/%{name}.conf
 
 %changelog
-* Mon Aug 31 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 10.5.4-2
-- Patch for CVE-2026-56390
+* Wed Sep 02 2026 Swapnil Sahu <v-swapsahu@microsoft.com> - 10.5.4-2
+- Pass bison output file names via -o to build with hardened bison
 
 * Mon May 04 2026 Kanishk Bansal <kanbansal@microsoft.com> - 10.5.4-1
 - Upgrade to 10.5.4 for CVE-2026-37457
