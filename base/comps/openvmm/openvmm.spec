@@ -10,8 +10,7 @@ Source0:        %{url}/archive/openvmm-v%{version}/%{name}-%{version}.tar.gz
 # maps the workspace's git dependencies into it.
 Source1:        %{url}/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
 
-# Upstream validates this configuration for x86_64-unknown-linux-gnu only.
-ExclusiveArch:  x86_64
+ExclusiveArch:  x86_64 aarch64
 
 BuildRequires:  cargo-rpm-macros >= 25
 BuildRequires:  rust >= 1.95.0
@@ -25,6 +24,10 @@ BuildRequires:  protobuf-devel
 OpenVMM is a modular, cross-platform virtual machine monitor written in Rust.
 This package provides the host binary, which runs virtual machines on Linux
 via KVM or the Microsoft Hypervisor.
+
+# A representative subset of the openvmm binary's dependency closure whose unit
+# tests need no live VM. Not exhaustive; more crates can be added over time.
+%global test_crates -p acpi -p consomme -p crypto -p loader -p mesh_protobuf -p openvmm_core -p openvmm_entry -p pal -p pci_core -p vhdx -p vm_topology -p vmcore -p vmm_core
 
 %prep
 %autosetup -n %{name}-openvmm-v%{version} -N
@@ -61,6 +64,7 @@ set -euo pipefail
 install -D -p -m 0755 target/rpm/%{name} %{buildroot}%{_bindir}/%{name}
 
 %check
+%cargo_test -- --locked --lib %{test_crates}
 target/rpm/%{name} --version
 
 %files
