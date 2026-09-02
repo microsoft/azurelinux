@@ -15,8 +15,7 @@ Source0:        https://github.com/microsoft/openvmm/archive/refs/tags/openvmm-v
 # 'cargo_config' written by cargo vendor.
 Source1:        https://github.com/microsoft/openvmm/releases/download/openvmm-v%{version}/%{name}-%{version}-vendor.tar.gz
 
-# Upstream validates the distribution build for x86_64 only.
-ExclusiveArch:  x86_64
+ExclusiveArch:  x86_64 aarch64
 
 # Cargo enforces the workspace's rust-version.
 BuildRequires:  rust >= 1.95.0
@@ -36,7 +35,12 @@ OpenVMM is a modular, cross-platform, general-purpose virtual machine monitor
 written in Rust. This package provides the OpenVMM host binary, which runs
 virtual machines on Linux via KVM or Microsoft Hypervisor.
 
+%ifarch x86_64
 %global rust_target x86_64-unknown-linux-gnu
+%endif
+%ifarch aarch64
+%global rust_target aarch64-unknown-linux-gnu
+%endif
 
 # Unit tests for the pure-logic crates in the openvmm binary's dependency
 # closure. The rest of the test suite drives a live VM, which needs
