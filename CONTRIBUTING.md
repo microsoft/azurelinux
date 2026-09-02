@@ -127,6 +127,16 @@ For changes that affect RPM output, build and smoke-test the result. Pure docume
 or metadata changes don't require a rebuild. See the [`README.md`](README.md) for
 `azldev` commands.
 
+TOML files must also follow [`.editorconfig`](.editorconfig). Install pre-commit and
+run the same check used by CI:
+
+```bash
+python3 -m pip install -r scripts/ci/pre-commit/requirements.txt
+pre-commit run --all-files
+```
+
+Run `pre-commit install` to execute configured checks automatically before each commit.
+
 ### Responding to review feedback
 
 You can address review comments however you like *during* review — additional commits

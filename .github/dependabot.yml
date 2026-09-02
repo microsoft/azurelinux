@@ -25,6 +25,22 @@ updates:
         patterns:
           - "*"
 
+  # Hooks configured in .pre-commit-config.yaml.
+  - package-ecosystem: pre-commit
+    directory: /
+    target-branch: "4.0"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    cooldown:
+      default-days: 7
+    groups:
+      pre-commit:
+        patterns:
+          - "*"
+
   # GitHub Actions used by PR-check workflows.
   - package-ecosystem: github-actions
     directory: /
