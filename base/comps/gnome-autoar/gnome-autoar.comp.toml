@@ -1,0 +1,15 @@
+[components.gnome-autoar]
+
+# Serve a locally-modified tarball (see modify_source.py) with the three
+# encrypted extract-test fixtures removed. An azldev archive overlay can't be
+# used here: the upstream tarball ships an absolute-target symlink fixture
+# (tests/files/extract/test-symlink-parent/reference/arextract -> /tmp) that
+# azldev's overlay extractor rejects, so the repack is done out-of-band and
+# served via origin=download.
+[[components.gnome-autoar.source-files]]
+filename = "gnome-autoar-0.4.5.tar.xz"
+hash = "855c016959c216b233c5a7c07c8a96f8beeb74b55154fdc054f67768c4b4935b7dc35d16dcd8aa8feee9b5ec283acaf92dd0ea686ebcd9a2a00cc6a2753da4a1"
+hash-type = "SHA512"
+origin = { type = "download", uri = "https://azltempstaginglookaside.blob.core.windows.net/repo/pkgs_modified/gnome-autoar/gnome-autoar-0.4.5.tar.xz/sha512/855c016959c216b233c5a7c07c8a96f8beeb74b55154fdc054f67768c4b4935b7dc35d16dcd8aa8feee9b5ec283acaf92dd0ea686ebcd9a2a00cc6a2753da4a1/gnome-autoar-0.4.5.tar.xz" }
+replace-upstream = true
+replace-reason = "Removes the three encrypted extract-test fixtures (tests/files/extract/test-encrypted*/, password-protected zips) that fail the package-signing scan, plus the three meson test cases that read them (modify_source.py). Test-only, not shipped in any binary RPM. Uses origin=download rather than an archive overlay because the tarball ships an absolute-target symlink fixture azldev's overlay extractor rejects."
