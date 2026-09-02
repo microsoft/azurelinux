@@ -69,6 +69,7 @@ make %{?_smp_mflags} modules \
     KERNEL_UNAME="%{KVERREL}" \
     SYSSRC="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
     SYSOUT="%{_builddir}/kernel-%{tarfile_release}/linux-%{KVERREL}" \
+    OFA_DIR="%{_builddir}/mlnx-ofa_kernel-%{mlnx_ofa_version}/obj" \
     IGNORE_CC_MISMATCH=1 \
     IGNORE_XEN_PRESENCE=1 \
     IGNORE_PREEMPT_RT_PRESENCE=1 \
