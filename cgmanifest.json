@@ -12701,8 +12701,8 @@
         "type": "other",
         "other": {
           "name": "lttng-tools",
-          "version": "2.13.11",
-          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.13.11.tar.bz2"
+          "version": "2.14.0",
+          "downloadUrl": "https://lttng.org/files/lttng-tools/lttng-tools-2.14.0.tar.bz2"
         }
       }
     },
@@ -12711,8 +12711,8 @@
         "type": "other",
         "other": {
           "name": "lttng-ust",
-          "version": "2.13.6",
-          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.13.6.tar.bz2"
+          "version": "2.14.0",
+          "downloadUrl": "https://lttng.org/files/lttng-ust/lttng-ust-2.14.0.tar.bz2"
         }
       }
     },
@@ -30036,8 +30036,8 @@
         "type": "other",
         "other": {
           "name": "userspace-rcu",
-          "version": "0.14.0",
-          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.14.0.tar.gz"
+          "version": "0.14.1",
+          "downloadUrl": "https://github.com/urcu/userspace-rcu/archive/v0.14.1.tar.gz"
         }
       }
     },
