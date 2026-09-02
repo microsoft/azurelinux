@@ -685,6 +685,7 @@
                 "libisofs",
                 "libjaylink",
                 "libjcat",
+                "libjwt",
                 "libkcapi",
                 "libkeepalive",
                 "libkkc",
