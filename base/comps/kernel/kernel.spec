@@ -1031,6 +1031,8 @@ Source6101: mlnx-ofa_kernel.inc
 Source6102: kmod-iser.inc
 Source6103: kmod-isert.inc
 Source6104: kmod-mft.inc
+Source6105: kmod-mlnx-nfsrdma.inc
+Source6106: kmod-srp.inc
 
 ## Patches needed for building this package
 
@@ -1097,6 +1099,14 @@ AutoProv: yes\
 %global _kmod_phase package
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
+
+%global _kmod_phase package
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
+%global _kmod_phase package
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-PACKAGE-ANCHOR — do not remove (kmod overlays chain here)
 %package doc
@@ -2094,6 +2104,14 @@ cd ../..
 %global _kmod_phase prep
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
+
+%global _kmod_phase prep
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
+%global _kmod_phase prep
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-PREP-ANCHOR — do not remove (kmod overlays chain here)
 %build
@@ -3183,6 +3201,14 @@ find Documentation -type d | xargs chmod u+w
 %include %{_sourcedir}/kmod-isert.inc
 
 %global _kmod_phase build
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
+%global _kmod_phase build
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
+
+%global _kmod_phase build
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
 
@@ -3712,6 +3738,14 @@ popd
 %global _kmod_phase install
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
+
+%global _kmod_phase install
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
+%global _kmod_phase install
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-INSTALL-ANCHOR — do not remove (kmod overlays chain here)
 
@@ -4373,6 +4407,14 @@ fi\
 %global _kmod_phase files
 %global _kmod_name mft
 %include %{_sourcedir}/kmod-mft.inc
+
+%global _kmod_phase files
+%global _kmod_name mlnx-nfsrdma
+%include %{_sourcedir}/kmod-mlnx-nfsrdma.inc
+
+%global _kmod_phase files
+%global _kmod_name srp
+%include %{_sourcedir}/kmod-srp.inc
 
 # AZL-KMOD-FILES-ANCHOR — do not remove (kmod overlays chain here)
 %changelog
