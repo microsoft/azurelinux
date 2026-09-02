@@ -161,12 +161,6 @@ Patch0913:      network-also-check-ID_NET_MANAGED_BY-property-on-rec.patch
 Patch0914:      Prevent-corruption-from-stale-alias-state-on-daemon-reload.patch
 Patch0915:      CVE-2026-15059.patch
 Patch0916:      CVE-2026-16742.patch
-
-# Alternative to the proposed native e2fsprogs whole-disk lock:
-# https://lore.kernel.org/linux-ext4/20260824161512.1332649-1-naraghavan@linux.microsoft.com/
-# Do not ship both implementations. systemd-fsck retains its exclusive
-# lock while waiting for fsck; native e2fsck locking would then block on
-# a second independently-opened lock and deadlock boot.
 Patch0917:      systemd-fsck-lock-whole-disk.patch
 
 %ifarch %{ix86} x86_64 aarch64
