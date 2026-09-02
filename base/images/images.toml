@@ -16,13 +16,10 @@
 [images.vm-base]
 description = "VM Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "vm-base" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
 ]
 
 [images.vm-base.capabilities]
@@ -34,7 +31,7 @@ runtime-package-management = true
 [images.container-base]
 description = "Container Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "core" }
-tests.test-suites = [
+tests.tests = [
     { name = "static-image-checks" },
     { name = "runtime-container-tests" },
 ]
@@ -48,7 +45,7 @@ runtime-package-management = true
 [images.container-distroless-minimal]
 description = "Container Distroless Minimal Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-minimal" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-minimal.capabilities]
 machine-bootable = false
@@ -59,7 +56,7 @@ runtime-package-management = false
 [images.container-distroless-base]
 description = "Container Distroless Base Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-base" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-base.capabilities]
 machine-bootable = false
@@ -70,7 +67,7 @@ runtime-package-management = false
 [images.container-distroless-debug]
 description = "Container Distroless Debug Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "distroless-debug" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.tests = [{ name = "static-image-checks" }]
 
 [images.container-distroless-debug.capabilities]
 machine-bootable = false
@@ -83,22 +80,27 @@ runtime-package-management = false
 [images.wsl]
 description = "WSL Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "wsl" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.tests = [{ name = "static-image-checks" }]
 
 [images.wsl.capabilities]
 machine-bootable = false
 container = false
 systemd = true
 runtime-package-management = true
+wsl = true
 
 [images.vm-iso-installer]
 description = "VM ISO Installer"
 definition = { type = "kiwi", path = "vm-iso-installer/vm-iso-installer.kiwi", profile = "vm-iso-installer" }
+tests.tests = [{ name = "iso-install" }]
+
+[images.vm-iso-installer.capabilities]
+installer-media = true
 
 [images.minimal-os]
 description = "Minimal OS Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "minimal-os" }
-tests.test-suites = [{ name = "static-image-checks" }]
+tests.tests = [{ name = "static-image-checks" }]
 
 [images.minimal-os.capabilities]
 machine-bootable = true
@@ -109,13 +111,10 @@ runtime-package-management = true
 [images.1p-vm-base-gen1]
 description = "1P VM Base Gen1 Image (BIOS)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
 ]
 
 [images.1p-vm-base-gen1.capabilities]
@@ -127,13 +126,10 @@ runtime-package-management = true
 [images.1p-vm-base-gen1-fips]
 description = "1P VM Base Gen1 FIPS Image (BIOS)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen1-fips" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
   { name = "lisa-fips" },
 ]
 
@@ -143,17 +139,13 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
-
 [images.1p-vm-base-gen2-fips]
 description = "1P VM Base Gen2 FIPS Image (UEFI)"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "1p-vm-base-gen2-fips" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
   { name = "lisa-fips" },
 ]
 
@@ -163,17 +155,13 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
-
 [images.marketplace-gen2]
 description = "Marketplace Gen2 Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
 ]
 
 [images.marketplace-gen2.capabilities]
@@ -185,13 +173,10 @@ runtime-package-management = true
 [images.marketplace-gen2-fips]
 description = "Marketplace Gen2 FIPS Image"
 definition = { type = "kiwi", path = "AzureLinux.kiwi", profile = "marketplace-gen2-fips" }
-tests.test-suites = [
+tests.tests = [
   { name = "static-image-checks" },
-  { name = "lisa-main" },
-  { name = "lisa-xfs" },
-  { name = "lisa-perf" },
-  { name = "lisa-smoke" },
-  { name = "lisa-kernel-ltp" },
+  { group = "vm-base-functional" },
+  { group = "vm-base-performance" },
   { name = "lisa-fips" },
 ]
 
@@ -201,63 +186,3 @@ container = false
 systemd = true
 runtime-package-management = true
 fips-enabled = true
-
-[test-suites.lisa-main]
-type = "lisa"
-description = "Lisa tests which are run by default"
-
-[test-suites.lisa-xfs]
-type = "lisa"
-description = "Lisa xfs tests"
-
-[test-suites.lisa-perf]
-type = "lisa"
-description = "Lisa perf tests"
-
-[test-suites.lisa-smoke]
-type = "lisa"
-description = "Lisa smoke tests"
-
-[test-suites.lisa-kernel-ltp]
-type = "lisa"
-description = "Lisa kernel LTP tests"
-
-[test-suites.lisa-fips]
-type = "lisa"
-description = "Lisa FIPS tests"
-
-# Single shared pytest suite for static (offline) image validation.
-[test-suites.static-image-checks]
-type = "pytest"
-description = "Offline image validation (shared + image-specific tests)"
-
-[test-suites.static-image-checks.pytest]
-working-dir = "tests"
-install = "pyproject"
-test-paths = ["cases/static/"]
-# {capabilities} is substituted by azldev as a comma-separated list of
-# the names of capabilities set to `true` for the image (e.g.
-# "machine-bootable,systemd,runtime-package-management"). Names use
-# the same dash-case form declared above. The pytest plugin parses
-# this string into a set; @pytest.mark.require_capability("...") tests
-# that don't match are skipped.
-extra-args = [
-    "--image-path", "{image-path}",
-    "--image-name", "{image-name}",
-    "--capabilities", "{capabilities}",
-]
-
-# Runtime container tests — validate live container behavior via podman.
-[test-suites.runtime-container-tests]
-type = "pytest"
-description = "Runtime container validation (exec into live containers)"
-
-[test-suites.runtime-container-tests.pytest]
-working-dir = "tests"
-install = "pyproject"
-test-paths = ["cases/runtime/"]
-extra-args = [
-    "--image-path", "{image-path}",
-    "--image-name", "{image-name}",
-    "--capabilities", "{capabilities}",
-]
